@@ -37,6 +37,8 @@ The DAB is a software framework for the mediation and harmonization of geospatia
 
 
 ## Getting started
+<details>
+  <summary>details</summary>
 
 The DAB is composed by multiple maven modules. GS-service is the main module, capable of starting the DAB Internet services and its web configuration tool.
 
@@ -66,6 +68,8 @@ http://localhost:9090/gs-service/initialize
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
+</details>
+	
 ## License and attribution
 
 Please note that the DAB community edition **is not public domain software**! While using DAB source code you should **give full attribution to the original authors** and redistribute your modifications in the same way, accordingly to the **GNU Affero General Public License v3.0**. In particular:
