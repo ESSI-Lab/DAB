@@ -15,7 +15,7 @@
     <br />
     <br />
     <a href="#license-and-attribution">License and attribution</a>
-    <a href="#contacts">Contacts</a>    
+    <a href="#contact-essi-lab">Contact ESSI-Lab</a>    
   </p>
 </div>
 
@@ -271,7 +271,7 @@ Previous members:
 	
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-## Contact
+## Contact ESSI-Lab
 
 [ESSI-Lab - National Research Council of Italy (CNR)](http://essi-lab.eu/) - [info@essi-lab.eu](info@essi-lab.eu)
 
