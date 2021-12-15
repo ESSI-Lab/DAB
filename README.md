@@ -70,7 +70,7 @@ http://localhost:9090/gs-service/initialize
 
 Please note that the DAB community edition is not public domain software! While using DAB source code you should give **full attribution to the original authors** and redistribute your modifications in the same way, accordingly to the GNU Affero General Public License v3.0. In particular:
 
-###Required attribution in case DAB is offered by a third party as an Internet service
+### Required attribution in case DAB is offered by a third party as an Internet service
 
 AGPL license is more restrictive with respect to GPL with regard to online service providers making use of the licensed software.
 
@@ -79,7 +79,7 @@ This is the case where a third party downloads the DAB source code and offers it
 The brokering service is offered by DAB, a software developed by ESSI-Lab (Stefano Nativi, Paolo Mazzetti, Enrico Boldrini, Fabrizio Papeschi, Roberto Roncella, Massimiliano Olivieri, Lorenzo Bigagli and Mattia Santoro) at Institute of Atmospheric Pollution Research of National Research Council of Italy. For more information is available at https://github.com/ESSI-Lab/DAB/
 
 
-###Required citation in case DAB is used in the work described by a scientific paper / technical report
+### Required citation in case DAB is used in the work described by a scientific paper / technical report
 
 Please note one of the following papers should be cited to give correct author attributions while describing work making use of the DAB:
 
@@ -91,7 +91,7 @@ Please note one of the following papers should be cited to give correct author a
 
 @article{DAB2007,title = {Discovery, query and access services for imagery, gridded and coverage data a clearinghouse solution},journal = {International Geoscience and Remote Sensing Symposium (IGARSS)},year = {2007},pages = {4021-4024},author = {Nativi, S. and Bigagli, L. and Mazzetti, P. and Mattia, U. and Boldrini, E.}}
 
-###Modifications should be made back available with the same license
+### Modifications should be made back available with the same license
 
 The modified source code should be licensed according to AGPL and redistributed back to the community, preferably through the DAB GitHub repository. You are welcome and encouraged to contact ESSI-Lab to propose code contributions to be applied to the present repository (see contributions section).
 
@@ -105,7 +105,6 @@ Copyright (C) 2021  ESSI-Lab (Stefano Nativi, Paolo Mazzetti, Enrico Boldrini, F
 In case a modified version of the DAB is offered by a third party as an Internet service, additionally to the attribution described above also the code (or a link to the DAB GitHub repository holding the modifications) should be made available on the third party site.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-
 
 
 ## Contributions
