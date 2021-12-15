@@ -40,11 +40,11 @@ The DAB is a software framework for the mediation and harmonization of geospatia
 
 The DAB is composed by multiple maven modules. GS-service is the main module, capable of starting the DAB Internet services and its web configuration tool.
 
-The command "mvn clean install" run in the root folder will package the jar files and finally the war package of DAB GS-service.
+The command <code>mvn clean install</code> run in the root folder will package the jar files and finally the war package of DAB GS-service.
 
 Finally, it's possible to launch DAB services  from the gs-service folder with the following maven command:
 
-mvn jetty:run -Ppreconfigured -DdbUser=XXX -DdbPassword=XXX -DquartzUser=root -DquartzPassword=XXX -DadminUser=XXX -DgoogleClientId=XXX -DgoogleClientSecret=XXX
+<code>mvn jetty:run -Ppreconfigured -DdbUser=XXX -DdbPassword=XXX -DquartzUser=root -DquartzPassword=XXX -DadminUser=XXX -DgoogleClientId=XXX -DgoogleClientSecret=XXX</code>
 
 The DAB will launch using a preconfigured configuration where:
 - dbUser/dbPassword are the credentials of a Marklogic db installed on localhost (8002/8004 ports)
@@ -58,7 +58,7 @@ http://localhost:9090/gs-service/conf
 
 The web configurator tool enables to add/remove both profilers and accessors. In this configuration all the profilers are activated. For the accessors, it's needed to specify the data source URL endpoint, the accessor strategy (distributed vs harvested) and the connector type. It's also possible to start harvestings of specific sources.
 
-A demo portal is available at: http://localhost:9090/gs-service/search?
+A demo portal to check that DAB is working as expected is available at: http://localhost:9090/gs-service/search
 
 It's also possible to create a brand new configuration at the URL:
 
@@ -112,7 +112,7 @@ Contributors to the ESSI-Lab DAB CE project are welcome: you can **report bugs a
 
 To **propose code contributions** please contact ESSI-Lab to coordinate the development effort and avoid duplications.
 
-The ESSI-Lab Contributor License Agreement is currently under preparation to enable ESSI-Lab to accept community contributions to the DAB repository. 
+The **ESSI-Lab Contributor License Agreement** is currently under preparation to enable to accept community contributions to the DAB repository even more smoothly. 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
