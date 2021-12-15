@@ -83,7 +83,7 @@ AGPL license is more restrictive with respect to GPL with regard to online servi
 
 This is the case where a third party downloads the DAB source code and offers its functionalities through an online service (e.g. through a server managed by the third party). In this case **the following statement should appear at the third party site** offering the service:
 
-<code>The brokering service is offered by DAB, a software developed by ESSI-Lab (Stefano Nativi, Paolo Mazzetti, Enrico Boldrini, Fabrizio Papeschi, Roberto Roncella, Massimiliano Olivieri, Lorenzo Bigagli and Mattia Santoro) at Institute of Atmospheric Pollution Research of National Research Council of Italy. More information is available at https://github.com/ESSI-Lab/DAB/</code>
+<code>The brokering service is offered by DAB, a software developed by ESSI-Lab (Stefano Nativi, Paolo Mazzetti, Enrico Boldrini, Fabrizio Papeschi, Roberto Roncella, Massimiliano Olivieri, Lorenzo Bigagli and Mattia Santoro) of Institute of Atmospheric Pollution Research of National Research Council of Italy. More information is available at https://github.com/ESSI-Lab/DAB/</code>
 
 </details>
 
@@ -111,7 +111,7 @@ The modified source code should be licensed according to AGPL and **redistribute
 In any case the following attribution headers should be preserved in modified versions of the source code:
 
 <code>Discovery and Access Broker (DAB) Community Edition (CE)</code>
-<code>Copyright (C) 2021  ESSI-Lab (Stefano Nativi, Paolo Mazzetti, Enrico Boldrini, Fabrizio Papeschi, Roberto Roncella, Massimiliano Olivieri, Lorenzo Bigagli and Mattia Santoro) of National Research Council of Italy (CNR)</code>
+<code>Copyright (C) 2021  ESSI-Lab (Stefano Nativi, Paolo Mazzetti, Enrico Boldrini, Fabrizio Papeschi, Roberto Roncella, Massimiliano Olivieri, Lorenzo Bigagli and Mattia Santoro) of Institute of Atmospheric Pollution Research of National Research Council of Italy (CNR)</code>
 
 
 In case a modified version of the DAB is offered by a third party as an Internet service, additionally to the attribution described above also the code (or a link to the DAB GitHub repository holding the modifications) should be made available on the third party site.
@@ -259,6 +259,7 @@ Many computer scientists and software engineers have contributed to DAB design a
 - Mattia Santoro (software design, developer)
 
 Previous members:
+	
 - Francesco Pezzati (past developer)
 - Alessio Baldini (past developer)
 - Fabrizio Vitale (past developer)
