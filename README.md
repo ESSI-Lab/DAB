@@ -4,7 +4,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/ESSI-Lab/DAB">
-    <img src="DAB.png" alt="DAB Logo" width="80" height="80">
+    <img src="DAB.png" alt="DAB Logo" />
   </a>
 
 <h3 align="center">Discovery and Access Broker (DAB) Community Edition (CE)</h3>
@@ -64,6 +64,8 @@ It's also possible to create a brand new configuration at the URL:
 
 http://localhost:9090/gs-service/initialize
 
+<p align="right">(<a href="#top">back to top</a>)</p>
+
 ## License and attribution
 
 Please note that the DAB community edition is not public domain software! While using DAB source code you should give **full attribution to the original authors** and redistribute your modifications in the same way, accordingly to the GNU Affero General Public License v3.0. In particular:
@@ -114,6 +116,7 @@ To propose code contributions please contact ESSI-Lab to coordinate the developm
 
 The ESSI-Lab Contributor License Agreement is currently under preparation to enable ESSI-Lab to accept community contributions to the DAB repository. 
 
+<p align="right">(<a href="#top">back to top</a>)</p>
 
 ## DAB history and acknowledgments
 
