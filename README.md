@@ -38,7 +38,7 @@ The DAB is a software framework for the mediation and harmonization of geospatia
 
 ## Getting started
 <details>
-  <summary>details</summary>
+  <summary>Getting started</summary>
 
 The DAB is composed by multiple maven modules. GS-service is the main module, capable of starting the DAB Internet services and its web configuration tool.
 
@@ -66,15 +66,16 @@ It's also possible to create a brand new configuration at the URL:
 
 http://localhost:9090/gs-service/initialize
 
-<p align="right">(<a href="#top">back to top</a>)</p>
-
 </details>
+	
+<p align="right">(<a href="#top">back to top</a>)</p>
 	
 ## License and attribution
 
-Please note that the DAB community edition **is not public domain software**! While using DAB source code you should **give full attribution to the original authors** and redistribute your modifications in the same way, accordingly to the **GNU Affero General Public License v3.0**. In particular:
+Please note that the DAB community edition **is not public domain software**! While using DAB source code you should **give full attribution to the original authors** and redistribute your modifications in the same way, accordingly to the **GNU Affero General Public License v3.0**. Click on the items below to know more:
 
-### In case DAB services are offered by a third party through the Internet
+<details>
+	<summary>**In case DAB services are offered by a third party through the Internet**</summary>
 
 AGPL license is more restrictive with respect to GPL with regard to online service providers making use of the licensed software.
 
@@ -82,8 +83,11 @@ This is the case where a third party downloads the DAB source code and offers it
 
 <code>The brokering service is offered by DAB, a software developed by ESSI-Lab (Stefano Nativi, Paolo Mazzetti, Enrico Boldrini, Fabrizio Papeschi, Roberto Roncella, Massimiliano Olivieri, Lorenzo Bigagli and Mattia Santoro) at Institute of Atmospheric Pollution Research of National Research Council of Italy. More information is available at https://github.com/ESSI-Lab/DAB/</code>
 
+</details>
 
-### In case DAB is used in the work described by a scientific paper / technical report
+<details>
+	
+<summary>In case DAB is used in the work described by a scientific paper / technical report</summary>
 
 Please note at least **one of the following papers should be cited to give correct author attributions** while describing work making use of the DAB:
 
@@ -94,8 +98,11 @@ Please note at least **one of the following papers should be cited to give corre
 <code>@article{DAB2009,title = {GI-cat: A mediation solution for building a clearinghouse catalog service},journal = {Proceedings of the International Conference on Advanced Geographic Information Systems and Web Services, GEOWS 2009},year = {2009},pages = {68-74},author = {Nativi, S. and Bigagli, L. and Mazzetti, P. and Boldrini, E. and Papeschi, F.}}</code>
 
 <code>@article{DAB2007,title = {Discovery, query and access services for imagery, gridded and coverage data a clearinghouse solution},journal = {International Geoscience and Remote Sensing Symposium (IGARSS)},year = {2007},pages = {4021-4024},author = {Nativi, S. and Bigagli, L. and Mazzetti, P. and Mattia, U. and Boldrini, E.}}</code>
+	
+</details>
 
-### Changes should be made back available with the same license
+<details>
+	<summary>Changes should be made back available with the same license</summary>
 
 The modified source code should be licensed according to AGPL and **redistributed back to the community, preferably through the DAB GitHub repository**. You are welcome and encouraged to contact ESSI-Lab to propose code contributions to be applied to the present repository (see contributions section).
 
@@ -107,6 +114,8 @@ In any case the following attribution headers should be preserved in modified ve
 
 In case a modified version of the DAB is offered by a third party as an Internet service, additionally to the attribution described above also the code (or a link to the DAB GitHub repository holding the modifications) should be made available on the third party site.
 
+</details>	
+	
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
