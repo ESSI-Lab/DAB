@@ -25,11 +25,13 @@
 
 Welcome to the GitHub repository of the DAB Community Edition (CE). This repository includes all consolidated and stable functionalities of the DAB. 
 
-## About The DAB
+## About the DAB
 
 The DAB is a software framework for the mediation and harmonization of geospatial data with particular reference to Earth observation data, both satellite and non-satellite. DAB makes it possible to connect heterogeneous data sources and make them discoverable and accessible through homogeneous and standard interfaces by different data user tools and applications. The DAB supports over 40 protocols and geospatial data profiles and is capable of implementing data discovery and access functionalities by implementing multiple standard interfaces (e.g. OGC, ISO,  ...), and Application Programming Interfaces (API).
 
-<img src="DAB-diagram.png" />
+<div align="center">
+<img src="DAB-diagram.png" width="80%" />
+</div>
 
 
 
@@ -130,6 +132,9 @@ The **ESSI-Lab Contributor License Agreement** is currently under preparation to
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ## DAB history and acknowledgments
+
+<details>
+	<summary>DAB history and acknowledgments</summary>
 
 The DAB was initially conceived and is still designed and developed by ESSI-Lab at Institute on Atmospheric Pollution Research (Florence division) of National Research Council of Italy.
 
@@ -258,6 +263,8 @@ Previous members:
 
 <div> Icons appearing on this page are made by <a href="https://www.freepik.com" title="Freepik"> Freepik </a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
 
+</details>	
+	
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ## Contact
