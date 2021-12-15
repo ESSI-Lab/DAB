@@ -70,7 +70,7 @@ http://localhost:9090/gs-service/initialize
 
 Please note that the DAB community edition is not public domain software! While using DAB source code you should give **full attribution to the original authors** and redistribute your modifications in the same way, accordingly to the GNU Affero General Public License v3.0. In particular:
 
-### In case DAB functionalities are offered by a third party through an Internet service
+### In case DAB services are offered by a third party through the Internet
 
 AGPL license is more restrictive with respect to GPL with regard to online service providers making use of the licensed software.
 
