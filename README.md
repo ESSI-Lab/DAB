@@ -77,7 +77,7 @@ http://localhost:9090/gs-service/initialize
 Please note that the DAB community edition **is not public domain software**! While using DAB source code you should **give full attribution to the original authors** and redistribute your modifications in the same way, accordingly to the **GNU Affero General Public License v3.0**. Click on the items below to know more:
 
 <details>
-	<summary>**In case DAB services are offered by a third party through the Internet**</summary>
+	<summary>In case DAB services are offered by a third party through the Internet</summary>
 
 AGPL license is more restrictive with respect to GPL with regard to online service providers making use of the licensed software.
 
@@ -275,7 +275,7 @@ Previous members:
 
 [ESSI-Lab - National Research Council of Italy (CNR)](http://essi-lab.eu/) - [info@essi-lab.eu](info@essi-lab.eu)
 
-DAB homepage and documentation: [https://confluence.geodab.eu/display/DAB/](https://confluence.geodab.eu/display/DAB/)
+DAB homepage including other other ways to makes use of DAB: [https://confluence.geodab.eu/display/DAB/](https://confluence.geodab.eu/display/DAB/)
 
 GitHub repository link: [https://github.com/ESSI-Lab/DAB](https://github.com/ESSI-Lab/DAB)
 
