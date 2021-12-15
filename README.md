@@ -279,7 +279,7 @@ You are welcome to contact us for any info about the DAB, including bug reports,
 
 [info@essi-lab.eu](info@essi-lab.eu)
 
-DAB homepage including other other ways to makes use of DAB: [https://confluence.geodab.eu/display/DAB/](https://confluence.geodab.eu/display/DAB/)
+DAB homepage including extended documentation: [https://confluence.geodab.eu/display/DAB/](https://confluence.geodab.eu/display/DAB/)
 
 GitHub repository link: [https://github.com/ESSI-Lab/DAB](https://github.com/ESSI-Lab/DAB)
 
