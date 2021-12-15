@@ -273,7 +273,9 @@ Previous members:
 
 ## Contact ESSI-Lab
 
-[ESSI-Lab - National Research Council of Italy (CNR)](http://essi-lab.eu/) - [info@essi-lab.eu](info@essi-lab.eu)
+[ESSI-Lab homepage](http://essi-lab.eu/)
+
+[E-mail (info@essi-lab.eu)](info@essi-lab.eu)
 
 DAB homepage including other other ways to makes use of DAB: [https://confluence.geodab.eu/display/DAB/](https://confluence.geodab.eu/display/DAB/)
 
