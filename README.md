@@ -76,20 +76,20 @@ AGPL license is more restrictive with respect to GPL with regard to online servi
 
 This is the case where a third party downloads the DAB source code and offers its functionalities through an online service (e.g. through a server managed by the third party). In this case **the following statement should appear at the third party site** offering the service:
 
-The brokering service is offered by DAB, a software developed by ESSI-Lab (Stefano Nativi, Paolo Mazzetti, Enrico Boldrini, Fabrizio Papeschi, Roberto Roncella, Massimiliano Olivieri, Lorenzo Bigagli and Mattia Santoro) at Institute of Atmospheric Pollution Research of National Research Council of Italy. For more information is available at https://github.com/ESSI-Lab/DAB/
+<code>The brokering service is offered by DAB, a software developed by ESSI-Lab (Stefano Nativi, Paolo Mazzetti, Enrico Boldrini, Fabrizio Papeschi, Roberto Roncella, Massimiliano Olivieri, Lorenzo Bigagli and Mattia Santoro) at Institute of Atmospheric Pollution Research of National Research Council of Italy. More information is available at https://github.com/ESSI-Lab/DAB/</code>
 
 
 ### In case DAB is used in the work described by a scientific paper / technical report
 
 Please note at least **one of the following papers should be cited to give correct author attributions** while describing work making use of the DAB:
 
-@article {DAB2015,title = {Big Data challenges in building the Global Earth Observation System of Systems},journal = {Environmental Modelling and Software},year = {2015},volume = {68},pages = {1-26},author = {Nativi, S. and Mazzetti, P. and Santoro, M. and Papeschi, F. and Craglia, M. and Ochiai, O.}}
+<code>@article {DAB2015,title = {Big Data challenges in building the Global Earth Observation System of Systems},journal = {Environmental Modelling and Software},year = {2015},volume = {68},pages = {1-26},author = {Nativi, S. and Mazzetti, P. and Santoro, M. and Papeschi, F. and Craglia, M. and Ochiai, O.}}</code>
 
-@article{DAB2014,title = {The brokering approach for enabling collaborative scientific research},journal = {Collaborative Knowledge in Scientific Research Networks},year = {2014},pages = {283-304},author = {Boldrini, E. and Craglia, M. and Mazzetti, P. and Nativi, S.}}
+<code>@article{DAB2014,title = {The brokering approach for enabling collaborative scientific research},journal = {Collaborative Knowledge in Scientific Research Networks},year = {2014},pages = {283-304},author = {Boldrini, E. and Craglia, M. and Mazzetti, P. and Nativi, S.}}</code>
 
-@article{DAB2009,title = {GI-cat: A mediation solution for building a clearinghouse catalog service},journal = {Proceedings of the International Conference on Advanced Geographic Information Systems and Web Services, GEOWS 2009},year = {2009},pages = {68-74},author = {Nativi, S. and Bigagli, L. and Mazzetti, P. and Boldrini, E. and Papeschi, F.}}
+<code>@article{DAB2009,title = {GI-cat: A mediation solution for building a clearinghouse catalog service},journal = {Proceedings of the International Conference on Advanced Geographic Information Systems and Web Services, GEOWS 2009},year = {2009},pages = {68-74},author = {Nativi, S. and Bigagli, L. and Mazzetti, P. and Boldrini, E. and Papeschi, F.}}</code>
 
-@article{DAB2007,title = {Discovery, query and access services for imagery, gridded and coverage data a clearinghouse solution},journal = {International Geoscience and Remote Sensing Symposium (IGARSS)},year = {2007},pages = {4021-4024},author = {Nativi, S. and Bigagli, L. and Mazzetti, P. and Mattia, U. and Boldrini, E.}}
+<code>@article{DAB2007,title = {Discovery, query and access services for imagery, gridded and coverage data a clearinghouse solution},journal = {International Geoscience and Remote Sensing Symposium (IGARSS)},year = {2007},pages = {4021-4024},author = {Nativi, S. and Bigagli, L. and Mazzetti, P. and Mattia, U. and Boldrini, E.}}</code>
 
 ### Changes should be made back available with the same license
 
@@ -97,9 +97,8 @@ The modified source code should be licensed according to AGPL and **redistribute
 
 In any case the following attribution headers should be preserved in modified versions of the source code:
 
-Discovery and Access Broker (DAB) Community Edition (CE)
-
-Copyright (C) 2021  ESSI-Lab (Stefano Nativi, Paolo Mazzetti, Enrico Boldrini, Fabrizio Papeschi, Roberto Roncella, Massimiliano Olivieri, Lorenzo Bigagli and Mattia Santoro) of National Research Council of Italy (CNR)
+<code>Discovery and Access Broker (DAB) Community Edition (CE)</code>
+<code>Copyright (C) 2021  ESSI-Lab (Stefano Nativi, Paolo Mazzetti, Enrico Boldrini, Fabrizio Papeschi, Roberto Roncella, Massimiliano Olivieri, Lorenzo Bigagli and Mattia Santoro) of National Research Council of Italy (CNR)</code>
 
 
 In case a modified version of the DAB is offered by a third party as an Internet service, additionally to the attribution described above also the code (or a link to the DAB GitHub repository holding the modifications) should be made available on the third party site.
@@ -215,13 +214,13 @@ DAB won the **2014 Geospatial World Innovation Awards** [(media coverage here)](
 
 The following papers provide a technical description of the DAB brokering framweork.
 
-@article {DAB2015,title = {Big Data challenges in building the Global Earth Observation System of Systems},journal = {Environmental Modelling and Software},year = {2015},volume = {68},pages = {1-26},author = {Nativi, S. and Mazzetti, P. and Santoro, M. and Papeschi, F. and Craglia, M. and Ochiai, O.}}
+<code>@article {DAB2015,title = {Big Data challenges in building the Global Earth Observation System of Systems},journal = {Environmental Modelling and Software},year = {2015},volume = {68},pages = {1-26},author = {Nativi, S. and Mazzetti, P. and Santoro, M. and Papeschi, F. and Craglia, M. and Ochiai, O.}}</code>
 
-@article{DAB2014,title = {The brokering approach for enabling collaborative scientific research},journal = {Collaborative Knowledge in Scientific Research Networks},year = {2014},pages = {283-304},author = {Boldrini, E. and Craglia, M. and Mazzetti, P. and Nativi, S.}}
+<code>@article{DAB2014,title = {The brokering approach for enabling collaborative scientific research},journal = {Collaborative Knowledge in Scientific Research Networks},year = {2014},pages = {283-304},author = {Boldrini, E. and Craglia, M. and Mazzetti, P. and Nativi, S.}}</code>
 
-@article{DAB2009,title = {GI-cat: A mediation solution for building a clearinghouse catalog service},journal = {Proceedings of the International Conference on Advanced Geographic Information Systems and Web Services, GEOWS 2009},year = {2009},pages = {68-74},author = {Nativi, S. and Bigagli, L. and Mazzetti, P. and Boldrini, E. and Papeschi, F.}}
+<code>@article{DAB2009,title = {GI-cat: A mediation solution for building a clearinghouse catalog service},journal = {Proceedings of the International Conference on Advanced Geographic Information Systems and Web Services, GEOWS 2009},year = {2009},pages = {68-74},author = {Nativi, S. and Bigagli, L. and Mazzetti, P. and Boldrini, E. and Papeschi, F.}}</code>
 
-@article{DAB2007,title = {Discovery, query and access services for imagery, gridded and coverage data a clearinghouse solution},journal = {International Geoscience and Remote Sensing Symposium (IGARSS)},year = {2007},pages = {4021-4024},author = {Nativi, S. and Bigagli, L. and Mazzetti, P. and Mattia, U. and Boldrini, E.}}
+<code>@article{DAB2007,title = {Discovery, query and access services for imagery, gridded and coverage data a clearinghouse solution},journal = {International Geoscience and Remote Sensing Symposium (IGARSS)},year = {2007},pages = {4021-4024},author = {Nativi, S. and Bigagli, L. and Mazzetti, P. and Mattia, U. and Boldrini, E.}}</code>
 
 Many computer scientists and software engineers have contributed to DAB design and development throughout an implementation effort of over 10 years, spanning different maturity stages (from prototypical to operational)  and components (e.g. GI-cat, GI-axe, GI-sem, GI-suite, ...).
 
