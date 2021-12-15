@@ -273,9 +273,11 @@ Previous members:
 
 ## Contact ESSI-Lab
 
-[ESSI-Lab homepage](http://essi-lab.eu/)
+You are welcome to contact us for any info about the DAB, including bug reports, feature enhancements and code contributions.
 
-[E-mail (info@essi-lab.eu)](info@essi-lab.eu)
+[http://essi-lab.eu/](http://essi-lab.eu/)
+
+[info@essi-lab.eu](info@essi-lab.eu)
 
 DAB homepage including other other ways to makes use of DAB: [https://confluence.geodab.eu/display/DAB/](https://confluence.geodab.eu/display/DAB/)
 
