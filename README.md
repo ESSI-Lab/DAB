@@ -70,18 +70,18 @@ http://localhost:9090/gs-service/initialize
 
 Please note that the DAB community edition is not public domain software! While using DAB source code you should give **full attribution to the original authors** and redistribute your modifications in the same way, accordingly to the GNU Affero General Public License v3.0. In particular:
 
-### Required attribution in case DAB is offered by a third party as an Internet service
+### In case DAB functionalities are offered by a third party through an Internet service
 
 AGPL license is more restrictive with respect to GPL with regard to online service providers making use of the licensed software.
 
-This is the case where a third party downloads the DAB source code and offers its functionalities through an online service (e.g. through a server managed by the third party). In this case the following statement should appear at the third party site offering the service:
+This is the case where a third party downloads the DAB source code and offers its functionalities through an online service (e.g. through a server managed by the third party). In this case **the following statement should appear at the third party site** offering the service:
 
 The brokering service is offered by DAB, a software developed by ESSI-Lab (Stefano Nativi, Paolo Mazzetti, Enrico Boldrini, Fabrizio Papeschi, Roberto Roncella, Massimiliano Olivieri, Lorenzo Bigagli and Mattia Santoro) at Institute of Atmospheric Pollution Research of National Research Council of Italy. For more information is available at https://github.com/ESSI-Lab/DAB/
 
 
-### Required citation in case DAB is used in the work described by a scientific paper / technical report
+### In case DAB is used in the work described by a scientific paper / technical report
 
-Please note one of the following papers should be cited to give correct author attributions while describing work making use of the DAB:
+Please note at least **one of the following papers should be cited to give correct author attributions** while describing work making use of the DAB:
 
 @article {DAB2015,title = {Big Data challenges in building the Global Earth Observation System of Systems},journal = {Environmental Modelling and Software},year = {2015},volume = {68},pages = {1-26},author = {Nativi, S. and Mazzetti, P. and Santoro, M. and Papeschi, F. and Craglia, M. and Ochiai, O.}}
 
@@ -91,9 +91,9 @@ Please note one of the following papers should be cited to give correct author a
 
 @article{DAB2007,title = {Discovery, query and access services for imagery, gridded and coverage data a clearinghouse solution},journal = {International Geoscience and Remote Sensing Symposium (IGARSS)},year = {2007},pages = {4021-4024},author = {Nativi, S. and Bigagli, L. and Mazzetti, P. and Mattia, U. and Boldrini, E.}}
 
-### Modifications should be made back available with the same license
+### Changes should be made back available with the same license
 
-The modified source code should be licensed according to AGPL and redistributed back to the community, preferably through the DAB GitHub repository. You are welcome and encouraged to contact ESSI-Lab to propose code contributions to be applied to the present repository (see contributions section).
+The modified source code should be licensed according to AGPL and **redistributed back to the community, preferably through the DAB GitHub repository**. You are welcome and encouraged to contact ESSI-Lab to propose code contributions to be applied to the present repository (see contributions section).
 
 In any case the following attribution headers should be preserved in modified versions of the source code:
 
@@ -109,9 +109,9 @@ In case a modified version of the DAB is offered by a third party as an Internet
 
 ## Contributions
 
-Contributors to the ESSI-Lab DAB CE project are welcome: you can report bugs and request enhancements contacting ESSI-Lab or through the GitHub issue tracker.
+Contributors to the ESSI-Lab DAB CE project are welcome: you can **report bugs and request enhancements** contacting ESSI-Lab or through the GitHub issue tracker.
 
-To propose code contributions please contact ESSI-Lab to coordinate the development effort and avoid duplications.
+To **propose code contributions** please contact ESSI-Lab to coordinate the development effort and avoid duplications.
 
 The ESSI-Lab Contributor License Agreement is currently under preparation to enable ESSI-Lab to accept community contributions to the DAB repository. 
 
@@ -252,7 +252,7 @@ Previous members:
 
 [ESSI-Lab - National Research Council of Italy (CNR)](http://essi-lab.eu/) - [info@essi-lab.eu](info@essi-lab.eu)
 
-DAB homepage: [https://confluence.geodab.eu/display/DAB/](https://confluence.geodab.eu/display/DAB/)
+DAB homepage and documentation: [https://confluence.geodab.eu/display/DAB/](https://confluence.geodab.eu/display/DAB/)
 
 GitHub repository link: [https://github.com/ESSI-Lab/DAB](https://github.com/ESSI-Lab/DAB)
 
