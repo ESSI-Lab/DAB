@@ -113,7 +113,10 @@ The modified source code should be licensed according to AGPL and **redistribute
 In any case the following attribution headers should be preserved in modified versions of the source code:
 
 <code>Discovery and Access Broker (DAB) Community Edition (CE)</code>
-<code>Copyright (C) 2021  ESSI-Lab (Stefano Nativi, Paolo Mazzetti, Enrico Boldrini, Fabrizio Papeschi, Roberto Roncella, Massimiliano Olivieri, Lorenzo Bigagli and Mattia Santoro) of Institute of Atmospheric Pollution Research of National Research Council of Italy (CNR)</code>
+
+<code>Copyright (C) 2021</code>
+	
+<code>National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab (Stefano Nativi, Paolo Mazzetti, Enrico Boldrini, Fabrizio Papeschi, Roberto Roncella, Massimiliano Olivieri, Lorenzo Bigagli and Mattia Santoro)</code>
 
 
 In case a modified version of the DAB is offered by a third party as an Internet service, additionally to the attribution described above also the code (or a link to the DAB GitHub repository holding the modifications) should be made available on the third party site.
