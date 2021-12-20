@@ -59,14 +59,14 @@ The DAB will launch using a preconfigured configuration where:
 The DAB can then be configured at the URL: 
 
 http://localhost:9090/gs-service/conf
-
-The web configurator tool enables to add/remove both profilers and accessors. In this configuration all the profilers are activated. For the accessors, it's needed to specify the data source URL endpoint, the accessor strategy (distributed vs harvested) and the connector type. It's also possible to start harvestings of specific sources.
-
-A demo portal to check that DAB is working as expected is available at: http://localhost:9090/gs-service/search
-
+	
 It's also possible to create a brand new configuration at the URL:
 
 http://localhost:9090/gs-service/initialize
+
+The web configurator tool enables to add/remove both profilers and accessors. In this configuration all the profilers are activated. For the accessors, it's needed to specify the data source URL endpoint, the accessor strategy (distributed vs harvested) and the connector type. It's also possible to start harvestings of specific sources.
+
+A demo portal to check that DAB is working as expected will be available at: http://localhost:9090/gs-service/search
 
 </details>
 	
