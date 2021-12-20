@@ -66,7 +66,9 @@ http://localhost:9090/gs-service/initialize
 
 The web configurator tool enables to add/remove both profilers and accessors. In this configuration all the profilers are activated. For the accessors, it's needed to specify the data source URL endpoint, the accessor strategy (distributed vs harvested) and the connector type. It's also possible to start harvestings of specific sources.
 
-A demo portal to check that DAB is working as expected will be available at: http://localhost:9090/gs-service/search
+A demo portal to check that DAB is working as expected will be available at the URL:
+	
+http://localhost:9090/gs-service/search
 
 </details>
 	
