@@ -76,7 +76,7 @@ http://localhost:9090/gs-service/search
 	
 ## License and attribution
 
-Please note that the DAB community edition **is not public domain software**! While using DAB source code you should **give full attribution to the original authors** and redistribute your modifications in the same way, accordingly to the **GNU Affero General Public License v3.0**. Click on the items below to know more:
+Please note that the DAB community edition **is not public domain software**! While using DAB source code you should **give full attribution to the original authors** and redistribute your modifications in the same way, accordingly to the **GNU Affero General Public License v3.0** (see LICENSE). Click on the items below to know more about how to provide correct attribution:
 
 <details>
 	<summary>In case DAB services are offered by a third party through the Internet</summary>
@@ -268,6 +268,8 @@ Previous members:
 - Fabrizio Vitale (past developer)
 - Ugo Mattia (past developer)
 - Valerio Angelini (past developer)
+	
+ESSI-Lab 
 
 
 <div> Icons appearing on this page are made by <a href="https://www.freepik.com" title="Freepik"> Freepik </a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
