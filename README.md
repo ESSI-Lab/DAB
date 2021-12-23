@@ -97,13 +97,19 @@ This is the case where a third party downloads the DAB source code and offers it
 
 Please note at least **one of the following papers should be cited to give correct author attributions** while describing work making use of the DAB:
 
-<code>@article {DAB2015,title = {Big Data challenges in building the Global Earth Observation System of Systems},journal = {Environmental Modelling and Software},year = {2015},volume = {68},pages = {1-26},author = {Nativi, S. and Mazzetti, P. and Santoro, M. and Papeschi, F. and Craglia, M. and Ochiai, O.}}</code>
+<code><a href="https://www.sciencedirect.com/science/article/pii/S1364815215000481">Stefano Nativi, Paolo Mazzetti, Mattia Santoro, Fabrizio Papeschi, Max Craglia, Osamu Ochiai, Big Data challenges in building the Global Earth Observation System of Systems, Environmental Modelling & Software, Volume 68, 2015,Pages 1-26, ISSN 1364-8152</a></code>
 
-<code>@article{DAB2014,title = {The brokering approach for enabling collaborative scientific research},journal = {Collaborative Knowledge in Scientific Research Networks},year = {2014},pages = {283-304},author = {Boldrini, E. and Craglia, M. and Mazzetti, P. and Nativi, S.}}</code>
+<code><a href="https://www.igi-global.com/chapter/the-brokering-approach-for-enabling-collaborative-scientific-research/119828">Boldrini, Enrico,et al. "The Brokering Approach for Enabling Collaborative Scientific Research." Collaborative Knowledge in Scientific Research Networks, edited by Paolo Diviacco, et al., IGI Global, 2015, pp. 283-304.</a></code>
 
-<code>@article{DAB2009,title = {GI-cat: A mediation solution for building a clearinghouse catalog service},journal = {Proceedings of the International Conference on Advanced Geographic Information Systems and Web Services, GEOWS 2009},year = {2009},pages = {68-74},author = {Nativi, S. and Bigagli, L. and Mazzetti, P. and Boldrini, E. and Papeschi, F.}}</code>
+<code><a href="https://www.sciencedirect.com/science/article/abs/pii/S1364815215000481">Stefano Nativi, Paolo Mazzetti, Mattia Santoro, Fabrizio Papeschi, Max Craglia, Osamu Ochiai, Big Data challenges in building the Global Earth Observation System of Systems, Environmental Modelling & Software, Volume 68, 2015, Pages 1-26.</a></code>
+	
+<code><a href="https://ieeexplore.ieee.org/abstract/document/6506981">S. Nativi, M. Craglia and J. Pearlman, "Earth Science Infrastructures Interoperability: The Brokering Approach," in IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing, vol. 6, no. 3, pp. 1118-1129, June 2013, doi: 10.1109/JSTARS.2013.2243113.</a></code>	
+	
+<code><a href="https://ieeexplore.ieee.org/document/4782694">S. Nativi, L. Bigagli, P. Mazzetti, E. Boldrini and F. Papeschi, "GI-Cat: A Mediation Solution for Building a Clearinghouse Catalog Service," 2009 International Conference on Advanced Geographic Information Systems & Web Services, 2009, pp. 68-74, doi: 10.1109/GEOWS.2009.34.</a></code>
+	
+<code><a href="https://ieeexplore.ieee.org/abstract/document/5200393">S. Nativi and L. Bigagli, "Discovery, Mediation, and Access Services for Earth Observation Data," in IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing, vol. 2, no. 4, pp. 233-240, Dec. 2009, doi: 10.1109/JSTARS.2009.2028584.</a></code>	
 
-<code>@article{DAB2007,title = {Discovery, query and access services for imagery, gridded and coverage data a clearinghouse solution},journal = {International Geoscience and Remote Sensing Symposium (IGARSS)},year = {2007},pages = {4021-4024},author = {Nativi, S. and Bigagli, L. and Mazzetti, P. and Mattia, U. and Boldrini, E.}}</code>
+<code><a href="https://ieeexplore.ieee.org/document/4423731">S. Nativi, L. Bigagli, P. Mazzetti, U. Mattia and E. Boldrini, "Discovery, query and access services for imagery, gridded and coverage data a clearinghouse solution," 2007 IEEE International Geoscience and Remote Sensing Symposium, 2007, pp. 4021-4024, doi: 10.1109/IGARSS.2007.4423731.</a></code>
 	
 </details>
 
@@ -244,13 +250,21 @@ The DAB technology won the **2014 Geospatial World Innovation Awards** [(media c
 
 The following papers provide a technical description of the DAB brokering framweork.
 
-<code>@article {DAB2015,title = {Big Data challenges in building the Global Earth Observation System of Systems},journal = {Environmental Modelling and Software},year = {2015},volume = {68},pages = {1-26},author = {Nativi, S. and Mazzetti, P. and Santoro, M. and Papeschi, F. and Craglia, M. and Ochiai, O.}}</code>
+<code><a href="https://www.sciencedirect.com/science/article/pii/S1364815215000481">Stefano Nativi, Paolo Mazzetti, Mattia Santoro, Fabrizio Papeschi, Max Craglia, Osamu Ochiai, Big Data challenges in building the Global Earth Observation System of Systems, Environmental Modelling & Software, Volume 68, 2015,Pages 1-26, ISSN 1364-8152</a></code>
 
-<code>@article{DAB2014,title = {The brokering approach for enabling collaborative scientific research},journal = {Collaborative Knowledge in Scientific Research Networks},year = {2014},pages = {283-304},author = {Boldrini, E. and Craglia, M. and Mazzetti, P. and Nativi, S.}}</code>
+<code><a href="https://www.igi-global.com/chapter/the-brokering-approach-for-enabling-collaborative-scientific-research/119828">Boldrini, Enrico,et al. "The Brokering Approach for Enabling Collaborative Scientific Research." Collaborative Knowledge in Scientific Research Networks, edited by Paolo Diviacco, et al., IGI Global, 2015, pp. 283-304.</a></code>
 
-<code>@article{DAB2009,title = {GI-cat: A mediation solution for building a clearinghouse catalog service},journal = {Proceedings of the International Conference on Advanced Geographic Information Systems and Web Services, GEOWS 2009},year = {2009},pages = {68-74},author = {Nativi, S. and Bigagli, L. and Mazzetti, P. and Boldrini, E. and Papeschi, F.}}</code>
+<code><a href="https://www.sciencedirect.com/science/article/abs/pii/S1364815215000481">Stefano Nativi, Paolo Mazzetti, Mattia Santoro, Fabrizio Papeschi, Max Craglia, Osamu Ochiai, Big Data challenges in building the Global Earth Observation System of Systems, Environmental Modelling & Software, Volume 68, 2015, Pages 1-26.</a></code>
+	
+<code><a href="https://ieeexplore.ieee.org/abstract/document/6506981">S. Nativi, M. Craglia and J. Pearlman, "Earth Science Infrastructures Interoperability: The Brokering Approach," in IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing, vol. 6, no. 3, pp. 1118-1129, June 2013, doi: 10.1109/JSTARS.2013.2243113.</a></code>	
+	
+<code><a href="https://ieeexplore.ieee.org/document/4782694">S. Nativi, L. Bigagli, P. Mazzetti, E. Boldrini and F. Papeschi, "GI-Cat: A Mediation Solution for Building a Clearinghouse Catalog Service," 2009 International Conference on Advanced Geographic Information Systems & Web Services, 2009, pp. 68-74, doi: 10.1109/GEOWS.2009.34.</a></code>
+	
+<code><a href="https://ieeexplore.ieee.org/abstract/document/5200393">S. Nativi and L. Bigagli, "Discovery, Mediation, and Access Services for Earth Observation Data," in IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing, vol. 2, no. 4, pp. 233-240, Dec. 2009, doi: 10.1109/JSTARS.2009.2028584.</a></code>	
 
-<code>@article{DAB2007,title = {Discovery, query and access services for imagery, gridded and coverage data a clearinghouse solution},journal = {International Geoscience and Remote Sensing Symposium (IGARSS)},year = {2007},pages = {4021-4024},author = {Nativi, S. and Bigagli, L. and Mazzetti, P. and Mattia, U. and Boldrini, E.}}</code>
+<code><a href="https://ieeexplore.ieee.org/document/4423731">S. Nativi, L. Bigagli, P. Mazzetti, U. Mattia and E. Boldrini, "Discovery, query and access services for imagery, gridded and coverage data a clearinghouse solution," 2007 IEEE International Geoscience and Remote Sensing Symposium, 2007, pp. 4021-4024, doi: 10.1109/IGARSS.2007.4423731.</a></code>
+	
+	
 
 ### Contributors
 	
