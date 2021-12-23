@@ -81,7 +81,7 @@ In a more complex configuration the DAB can be deployed on a cloud service, wher
 Please note that the DAB community edition **is not public domain software**! While using DAB source code you should **give full attribution to the original authors** and redistribute your modifications in the same way, accordingly to the **GNU Affero General Public License v3.0** (see LICENSE). Click on the items below to know more about how to provide correct attribution:
 
 <details>
-	<summary>In case DAB services are offered by a third party through the Internet</summary>
+	<summary>To use the DAB technology for providing online services</summary>
 
 AGPL license is more restrictive with respect to GPL with regard to online service providers making use of the licensed software.
 
@@ -93,7 +93,7 @@ This is the case where a third party downloads the DAB source code and offers it
 
 <details>
 	
-<summary>In case DAB is used in the work described by a scientific paper / technical report</summary>
+<summary>To use the DAB technology for a scientific and/or technological publication</summary>
 
 Please note at least **one of the following papers should be cited to give correct author attributions** while describing work making use of the DAB:
 
@@ -107,6 +107,7 @@ Please note at least **one of the following papers should be cited to give corre
 	
 </details>
 
+To start a new branch of the DAB software
 <details>
 	<summary>Changes should be made back available with the same license</summary>
 
