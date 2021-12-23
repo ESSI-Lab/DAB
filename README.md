@@ -40,7 +40,7 @@ The DAB is a **brokering software framework** for the **mediation and harmonizat
 
 ## Getting started
 <details>
-  <summary>Instructions to start the DAB</summary>
+  <summary>Instructions on how to start the DAB</summary>
 
 The DAB is composed by multiple maven modules. GS-service is the main module, capable of starting the DAB Internet services and its web configuration tool.
 
