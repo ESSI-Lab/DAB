@@ -267,22 +267,30 @@ Many data scientists, computer scientists, information and software engineers ha
 - Lorenzo Bigagli (software design)
 - Mattia Santoro (software design, developer)
 	
-Data, community, and User experts who provided valuable inputs and feedbacks
-- Jay Pearlman
-- Max Craglia
+Experts who contributed with valuable inputs and feedbacks representing significant data provider and user communities (in alphabetic order):
+	
 - Alessandro Annoni
-- Barbara Ryan
-- Ben Domenico
-- Dick Schaap
-- Silvano Pecora
-- Antonello Provenzale
-- Nicola Pirrone
 - Igor Chernov
-- Osamu Ochiai
-- Siri Jodha Kalsha
 - Guido Colangeli
-- Joost van Bemmelen
+- Max Craglia
 - Paola De Salvo
+- Ben Domenico
+- Gregory Giuliani
+- Wim Hugo
+- Siri Jodha Khalsa
+- Osamu Ochiai
+- Anthony Lehmann
+- Joan Masò
+- Francoise Pearlman
+- Jay Pearlman
+- Silvano Pecora
+- Nicola Pirrone
+- Antonello Provenzale
+- Barbara Ryan
+- Dick Schaap
+- Richard Signell
+- Joost van Bemmelen
+
 
 Previous members of the development team:
 	
