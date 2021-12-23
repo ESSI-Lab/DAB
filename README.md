@@ -78,7 +78,7 @@ In a more complex configuration the DAB can be deployed on a cloud service, wher
 	
 ## License and attribution
 
-Please note that the DAB community edition **is not public domain software**! While using DAB source code you should **give full attribution to the original authors** and redistribute your modifications in the same way, accordingly to the **GNU Affero General Public License v3.0** (see LICENSE). Click on the items below to know more about how to provide correct attribution:
+While the DAB community edition code is **open source**, it is not a **public domain software**. Therefore, to use the DAB source code you should **give full attribution to the original authors** and **redistribute your modifications** in the same way, accordingly to the **GNU Affero General Public License v3.0** (see LICENSE). To know more about how to correctly utilize the DAB open source code and provide appropriate attribution, please, select the relevant cases:
 
 <details>
 	<summary>To use the DAB technology for providing online services</summary>
@@ -107,10 +107,8 @@ Please note at least **one of the following papers should be cited to give corre
 	
 </details>
 
-To start a new branch of the DAB software
 <details>
-	<summary>Changes should be made back available with the same license</summary>
-
+	<summary>To start a new branch of the DAB software</summary>
 The modified source code should be licensed according to AGPL and **redistributed back to the community, preferably through the DAB GitHub repository**. You are welcome and encouraged to contact ESSI-Lab to propose code contributions to be applied to the present repository (see contributions section).
 
 In any case the following attribution headers should be preserved in modified versions of the source code:
