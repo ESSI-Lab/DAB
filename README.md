@@ -254,9 +254,9 @@ The following papers provide a technical description of the DAB brokering framwe
 
 ### Contributors
 	
-Many computer scientists and software engineers have contributed to DAB design and development throughout an implementation effort of over 10 years, spanning different maturity stages (from prototypical to operational)  and components (e.g. GI-cat, GI-axe, GI-sem, GI-suite, ...).
+Many data scientists, computer scientists, information and software engineers have contributed to the DAB design and development throughout an implementation effort of over ten years, spanning different maturity stages (from prototypical to operational)  and sub-components (e.g. GI-cat, GI-axe, GI-sem, GI-suite, ...).
 
-[Active DAB development team (contact us)](https://www.uos-firenze.essi-lab.eu/personnel):
+[DAB development team (contact us)](https://www.uos-firenze.essi-lab.eu/personnel):
 
 - Stefano Nativi (DAB father)
 - Paolo Mazzetti (sofware design)
@@ -266,8 +266,25 @@ Many computer scientists and software engineers have contributed to DAB design a
 - Massimiliano Olivieri (developer)
 - Lorenzo Bigagli (software design)
 - Mattia Santoro (software design, developer)
+	
+Data, community, and User experts who provided valuable inputs and feedbacks
+- Jay Pearlman
+- Max Craglia
+- Alessandro Annoni
+- Barbara Ryan
+- Ben Domenico
+- Dick Schaap
+- Silvano Pecora
+- Antonello Provenzale
+- Nicola Pirrone
+- Igor Chernov
+- Osamu Ochiai
+- Siri Jodha Kalsha
+- Guido Colangeli
+- Joost van Bemmelen
+- Paola De Salvo
 
-Previous members:
+Previous members of the development team:
 	
 - Francesco Pezzati (past developer)
 - Alessio Baldini (past developer)
@@ -290,7 +307,7 @@ ESSI-Lab would like to credit all the maintainers and developers of the third pa
 	
 ### Credits
 	
-ESSI-Lab would like to credit as well all the maintainers and developers of the third party libraries that DAB uses. They are here listed, along with their license:
+ESSI-Lab would like to credit, as well, all the maintainers and developers of the third party libraries that DAB uses. They are here listed, along with their license:
 	
 - (The Apache Software License, Version 2.0) ant (ant:ant:1.6.5 - http://www.apache.org/ant/)
 - (Public Domain) AOP alliance (aopalliance:aopalliance:1.0 - http://aopalliance.sourceforge.net)
