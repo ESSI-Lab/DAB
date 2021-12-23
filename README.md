@@ -174,6 +174,7 @@ The DAB software has been developed in the context of numerous National, Europea
    <li><b>EuroGEOSS</b> (2009/2012)</li>
    <li><b>SeaDataNet II</b> (2011/2015)</li>
    <li><b>GEOWOW</b> (2011/2014)</li>
+   <li><b>ODIP</b> (2011/2015)</li>
   </ul>
   </li>
 	<li>Horizon 2020
@@ -224,21 +225,17 @@ The DAB software has been developed in the context of numerous National, Europea
 </li>
 </ul>
 		
-As from 2012, the DAB technology has been utilized by GEO (the Group of Earth Observation) as the enabling component of the **GEO-DAB**: the brokerage data services middleware of the GEOSS (Global Earth Observation System of Systems) platform (formerly known as GCI). GEO-DAB is deployed and operated on a scalable cloud infrastructure. In 2021, the GEO-DAB has connected over 190 different geospatial information systems, which allow the search and discovery of more than 10 million datasets, consisting of over 1 billion single downloadable data files (i.e. data granules in GEO jargon). A useful reference is: <code><a href="https://www.sciencedirect.com/science/article/abs/pii/S1364815215000481">Stefano Nativi, Paolo Mazzetti, Mattia Santoro, Fabrizio Papeschi, Max Craglia, Osamu Ochiai, Big Data challenges in building the Global Earth Observation System of Systems, Environmental Modelling & Software, Volume 68, 2015, Pages 1-26.</a></code>
+As from 2012, the DAB technology has been utilized by GEO (the Group of Earth Observation) as the enabling component of the **GEO-DAB**: the brokerage data services middleware of the GEOSS (Global Earth Observation System of Systems) platform (formerly known as GCI). GEO-DAB is deployed and operated on a scalable cloud infrastructure. In 2021, the GEO-DAB has connected over 190 different geospatial information systems, which allow the search and discovery of more than 10 million datasets, consisting of over 1 billion single downloadable data files (i.e. data granules in GEO jargon). A useful reference is: <code><a href="https://www.sciencedirect.com/science/article/abs/pii/S1364815215000481">Stefano Nativi, Paolo Mazzetti, Mattia Santoro, Fabrizio Papeschi, Max Craglia, Osamu Ochiai, Big Data challenges in building the Global Earth Observation System of Systems, Environmental Modelling & Software, Volume 68, 2015, Pages 1-26.</a></code>. More info on GEO-DAB is available [here](https://www.geodab.net/)
 
-[More info on GEO-DAB](https://www.geodab.net/)
+As of 2017, the DAB software has been also adopted by WMO as one of the enabling technologies of the **WMO Hydrological Observing System (WHOS)**: a system of systems capable to share hydrological data, at a global scale. More info on WHOS [here](https://public.wmo.int/en/our-mandate/water/whos). A WHOS webinar was recently hold to introduce users to the WHOS brokering services; the webinar recording is available [here](https://community.wmo.int/news/watch-recording-whos-webinar).
 
-The DAB framework is also currently adopted by WMO as a key component to realize the **WMO Hydrological Observing System (WHOS)**, a system of systems able to share hydrological data at a global scale.
+In 2011, the **SeaDataNet** data platform started utilizing the DAB technology to enable the discovery and access of different international ocean data sources.  More information on SeaDataNet brokering services is availabe [here](https://www.seadatanet.org/Data-Access/Discover-international-data). The DAB mediation and brokering services were also applied by the ODIP community to interconnect the ocean information system-of-systems from USA, Australia, and Europe. More information on ODIP is available [here](http://www.odip.org/).
+	
+	Awards
 
-[More info on WHOS](https://public.wmo.int/en/our-mandate/water/whos)
-
-[WHOS webinar recording](https://community.wmo.int/news/watch-recording-whos-webinar) is a valuable introduction to WHOS and its brokering component.
-
-In the context of **SeaDataNet** the DAB framework is used to enable discovery of international ocean data sources.
-
-[More information on SeaDataNet brokering service](https://www.seadatanet.org/Data-Access/Discover-international-data)
-
-DAB won the **2014 Geospatial World Innovation Awards** [(media coverage here)](https://www.cnr.it/en/news/5795/il-geospatial-world-innovation-award-all-iia-cnr).
+The DAB technology won the **2014 Geospatial World Innovation Awards** [(media coverage here)](https://www.cnr.it/en/news/5795/il-geospatial-world-innovation-award-all-iia-cnr).
+	
+	Useful References
 
 The following papers provide a technical description of the DAB brokering framweork.
 
