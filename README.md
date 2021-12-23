@@ -146,10 +146,12 @@ The **ESSI-Lab Contributor License Agreement** needs to be signed by contributor
 <details>
 	<summary>Learn more about the DAB and its contributors</summary>
 
-DAB was first conceived and is still maintained and advanced by the [ESSI-Lab](https://essi-lab.eu) based at the [Florence division](https://iia.cnr.it/sede-firenze/) of the ["Institute of Atmospheric Pollution Research" (IIA)](https://iia.cnr.it/) of [National Research Council of Italy (CNR)](https://www.cnr.it/).
+DAB was first conceived and is still maintained and advanced by the [ESSI-Lab](https://essi-lab.eu) based at the [Florence division](https://iia.cnr.it/sede-firenze/) of the [Institute of Atmospheric Pollution Research (IIA)](https://iia.cnr.it/) of [National Research Council of Italy (CNR)](https://www.cnr.it/).
 
 DAB implements the **data brokering approach** as introduced by Stefano Nativi et al. in the position paper: <code><a href="https://ieeexplore.ieee.org/abstract/document/6506981">S. Nativi, M. Craglia and J. Pearlman, "Earth Science Infrastructures Interoperability: The Brokering Approach," in IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing, vol. 6, no. 3, pp. 1118-1129, June 2013, doi: 10.1109/JSTARS.2013.2243113.</a></code> by applying the mediation pattern <code><a href="https://ieeexplore.ieee.org/abstract/document/5200393">S. Nativi and L. Bigagli, "Discovery, Mediation, and Access Services for Earth Observation Data," in IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing, vol. 2, no. 4, pp. 233-240, Dec. 2009, doi: 10.1109/JSTARS.2009.2028584.</a></code>
 
+### Projects	
+	
 The DAB software has been developed in the context of numerous National, European, and international projects and initiatives, which have been funded and/or operated by different organizations, over the last ten years, including:
 
 <ul>
@@ -226,12 +228,14 @@ The DAB software has been developed in the context of numerous National, Europea
 </ul>
 </li>
 </ul>
+	
+### Main deployments
 		
-As from 2012, the DAB technology has been utilized by GEO (the Group of Earth Observation) as the enabling component of the **GEO-DAB**: the brokerage data services middleware of the GEOSS (Global Earth Observation System of Systems) platform (formerly known as GCI). GEO-DAB is deployed and operated on a scalable cloud infrastructure. In 2021, the GEO-DAB has connected over 190 different geospatial information systems, which allow the search and discovery of more than 10 million datasets, consisting of over 1 billion single downloadable data files (i.e. data granules in GEO jargon). A useful reference is: <code><a href="https://www.sciencedirect.com/science/article/abs/pii/S1364815215000481">Stefano Nativi, Paolo Mazzetti, Mattia Santoro, Fabrizio Papeschi, Max Craglia, Osamu Ochiai, Big Data challenges in building the Global Earth Observation System of Systems, Environmental Modelling & Software, Volume 68, 2015, Pages 1-26.</a></code>. More info on GEO-DAB is available [here](https://www.geodab.net/)
+As from 2012, the DAB technology has been utilized by [GEO](https://earthobservations.org/) (the Group of Earth Observation) as the enabling component of the **GEO-DAB**: the brokerage data services middleware of the [GEOSS](https://earthobservations.org/geoss.php) (Global Earth Observation System of Systems) platform (formerly known as GCI). GEO-DAB is deployed and operated on a scalable cloud infrastructure. In 2021, the GEO-DAB has connected over 190 different geospatial information systems, which allow the search and discovery of more than 10 million datasets, consisting of over 1 billion single downloadable data files (i.e. data granules in GEO jargon). A useful reference is: <code><a href="https://www.sciencedirect.com/science/article/abs/pii/S1364815215000481">Stefano Nativi, Paolo Mazzetti, Mattia Santoro, Fabrizio Papeschi, Max Craglia, Osamu Ochiai, Big Data challenges in building the Global Earth Observation System of Systems, Environmental Modelling & Software, Volume 68, 2015, Pages 1-26.</a></code>. More info on GEO-DAB is available [here](https://www.geodab.net/)
 
-As of 2017, the DAB software has been also adopted by WMO as one of the enabling technologies of the **WMO Hydrological Observing System (WHOS)**: a system of systems capable to share hydrological data, at a global scale. More info on WHOS [here](https://public.wmo.int/en/our-mandate/water/whos). A WHOS webinar was recently hold to introduce users to the WHOS brokering services; the webinar recording is available [here](https://community.wmo.int/news/watch-recording-whos-webinar).
+As of 2017, the DAB software has been also adopted by [WMO](https://public.wmo.int/en) as one of the enabling technologies of the **WMO Hydrological Observing System (WHOS)**: a system of systems capable to share hydrological data, at a global scale. More info on WHOS [here](https://public.wmo.int/en/our-mandate/water/whos). A WHOS webinar was recently hold to introduce users to the WHOS brokering services; the webinar recording is available [here](https://community.wmo.int/news/watch-recording-whos-webinar).
 
-In 2011, the **SeaDataNet** data platform started utilizing the DAB technology to enable the discovery and access of different international ocean data sources.  More information on SeaDataNet brokering services is availabe [here](https://www.seadatanet.org/Data-Access/Discover-international-data). The DAB mediation and brokering services were also applied by the ODIP community to interconnect the ocean information system-of-systems from USA, Australia, and Europe. More information on ODIP is available [here](http://www.odip.org/).
+In 2011, the [SeaDataNet](https://www.seadatanet.org/) data platform started utilizing the DAB technology to enable the discovery and access of different international ocean data sources.  More information on SeaDataNet brokering services is availabe [here](https://www.seadatanet.org/Data-Access/Discover-international-data). The DAB mediation and brokering services were also applied by the [ODIP](http://www.odip.org/) community to interconnect the ocean information system-of-systems from USA, Australia, and Europe.
 	
 ### Awards
 
@@ -249,6 +253,8 @@ The following papers provide a technical description of the DAB brokering framwe
 
 <code>@article{DAB2007,title = {Discovery, query and access services for imagery, gridded and coverage data a clearinghouse solution},journal = {International Geoscience and Remote Sensing Symposium (IGARSS)},year = {2007},pages = {4021-4024},author = {Nativi, S. and Bigagli, L. and Mazzetti, P. and Mattia, U. and Boldrini, E.}}</code>
 
+### Contributors
+	
 Many computer scientists and software engineers have contributed to DAB design and development throughout an implementation effort of over 10 years, spanning different maturity stages (from prototypical to operational)  and components (e.g. GI-cat, GI-axe, GI-sem, GI-suite, ...).
 
 [Active DAB development team (contact us)](https://www.uos-firenze.essi-lab.eu/personnel):
@@ -282,6 +288,8 @@ ESSI-Lab would like to credit all the maintainers and developers of the third pa
 - Twitter OAuth	
 - Docker
 - Kubernetes
+	
+### Credits
 	
 ESSI-Lab would like to credit as well all the maintainers and developers of the third party libraries that DAB uses. They are here listed, along with their license:
 	
