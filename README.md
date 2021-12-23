@@ -40,13 +40,13 @@ The DAB is a **brokering software framework** for the **mediation and harmonizat
 
 ## Getting started
 <details>
-  <summary>Getting started</summary>
+  <summary>Instructions to start the DAB</summary>
 
 The DAB is composed by multiple maven modules. GS-service is the main module, capable of starting the DAB Internet services and its web configuration tool.
 
 The command <code>mvn clean install</code> run in the root folder will compile the source code into jar files and finally compose the war package of DAB GS-service.
 
-Finally, it's possible to launch DAB services  from the gs-service folder with the following maven command:
+Finally, it's possible to launch DAB services on a single node configuration by launching the following maven command from the gs-service folder:
 
 <code>mvn jetty:run -Ppreconfigured -DdbUser=XXX -DdbPassword=XXX -DquartzUser=root -DquartzPassword=XXX -DadminUser=XXX -DgoogleClientId=XXX -DgoogleClientSecret=XXX</code>
 
@@ -70,6 +70,8 @@ A demo portal to check that DAB is working as expected will be available at the 
 	
 http://localhost:9090/gs-service/search
 
+In a more complex configuration the DAB can be deployed on a cloud service, where multiple containers can be responsible for different tasks (e.g. frontend, harvesting, access). 
+	
 </details>
 	
 <p align="right">(<a href="#top">back to top</a>)</p>
@@ -127,7 +129,7 @@ In case a modified version of the DAB is offered by a third party as an Internet
 ## Contributions
 
 <details>
-	<summary>Contributions</summary>
+	<summary>How to contribute to this project</summary>
 	
 Contributors to the ESSI-Lab DAB CE project are welcome: you can **report bugs and request enhancements** contacting ESSI-Lab or through the GitHub issue tracker.
 
@@ -142,7 +144,7 @@ The **ESSI-Lab Contributor License Agreement** needs to be signed by contributor
 ## DAB history and acknowledgments
 
 <details>
-	<summary>DAB history and acknowledgments</summary>
+	<summary>Learn more about the DAB and its contributors</summary>
 
 DAB was first conceived and is still maintained and advanced by the ESSI-Lab based at the Florence division of the "Institute of Atmospheric Pollution Research" (IIA) of National Research Council of Italy (CNR).
 
