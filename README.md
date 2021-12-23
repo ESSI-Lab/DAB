@@ -146,7 +146,7 @@ The **ESSI-Lab Contributor License Agreement** needs to be signed by contributor
 
 The DAB was initially conceived and is still designed and developed by ESSI-Lab at Institute on Atmospheric Pollution Research (Florence division) of National Research Council of Italy.
 
-DAB implements the **brokering approach** introduced by Stefano Nativi et al. in the position paper: <code>Nativi S, Craglia M, Pearlman J. The Brokering Approach for Multidisciplinary Interoperability: A Position Paper. International Journal of Spatial Data Infrastructures Research 7; 2012. p. 1-15. JRC78581.</code>
+DAB implements the **brokering approach** introduced by Stefano Nativi et al. in the position paper: <code><a href="https://ieeexplore.ieee.org/abstract/document/6506981">S. Nativi, M. Craglia and J. Pearlman, "Earth Science Infrastructures Interoperability: The Brokering Approach," in IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing, vol. 6, no. 3, pp. 1118-1129, June 2013, doi: 10.1109/JSTARS.2013.2243113.</a></code> by applying the mediation pattern <code><a href="https://ieeexplore.ieee.org/abstract/document/5200393">S. Nativi and L. Bigagli, "Discovery, Mediation, and Access Services for Earth Observation Data," in IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing, vol. 2, no. 4, pp. 233-240, Dec. 2009, doi: 10.1109/JSTARS.2009.2028584.</a></code>
 
 DAB software development took and takes place in the context of numerous international projects and initiatives, funded/operated by different entities on a time range of over 10 years.
 
