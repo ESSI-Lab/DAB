@@ -144,11 +144,11 @@ The **ESSI-Lab Contributor License Agreement** needs to be signed by contributor
 <details>
 	<summary>DAB history and acknowledgments</summary>
 
-The DAB was initially conceived and is still designed and developed by ESSI-Lab at Institute on Atmospheric Pollution Research (Florence division) of National Research Council of Italy.
+DAB was first conceived and is still maintained and advanced by the ESSI-Lab based at the Florence division of the "Institute of Atmospheric Pollution Research" (IIA) of National Research Council of Italy (CNR).
 
-DAB implements the **brokering approach** introduced by Stefano Nativi et al. in the position paper: <code><a href="https://ieeexplore.ieee.org/abstract/document/6506981">S. Nativi, M. Craglia and J. Pearlman, "Earth Science Infrastructures Interoperability: The Brokering Approach," in IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing, vol. 6, no. 3, pp. 1118-1129, June 2013, doi: 10.1109/JSTARS.2013.2243113.</a></code> by applying the mediation pattern <code><a href="https://ieeexplore.ieee.org/abstract/document/5200393">S. Nativi and L. Bigagli, "Discovery, Mediation, and Access Services for Earth Observation Data," in IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing, vol. 2, no. 4, pp. 233-240, Dec. 2009, doi: 10.1109/JSTARS.2009.2028584.</a></code>
+DAB implements the **data brokering approach** as introduced by Stefano Nativi et al. in the position paper: <code><a href="https://ieeexplore.ieee.org/abstract/document/6506981">S. Nativi, M. Craglia and J. Pearlman, "Earth Science Infrastructures Interoperability: The Brokering Approach," in IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing, vol. 6, no. 3, pp. 1118-1129, June 2013, doi: 10.1109/JSTARS.2013.2243113.</a></code> by applying the mediation pattern <code><a href="https://ieeexplore.ieee.org/abstract/document/5200393">S. Nativi and L. Bigagli, "Discovery, Mediation, and Access Services for Earth Observation Data," in IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing, vol. 2, no. 4, pp. 233-240, Dec. 2009, doi: 10.1109/JSTARS.2009.2028584.</a></code>
 
-The DAB software development has been done in the context of numerous European and international projects and initiatives, funded and/or operated by different organizations over the last ten years, including:
+The DAB software has been developed in the context of numerous National, European, and international projects and initiatives, which have been funded and/or operated by different organizations, over the last ten years, including:
 
 <ul>
  <li>Intergovernmental initiatives
@@ -160,9 +160,9 @@ The DAB software development has been done in the context of numerous European a
   </li>
   <li>WMO
   <ul>
-   <li><b>LoA "WHOS-Plata"</b> WMO ref. 24351/2019-1.5 CLW (2019/2020)</li>
-   <li><b>LoA "WHOS-Dominican Republic"</b> WMO ref. 09198/2020- 1.6 S/HWR</li>
-   <li><b>LoA "WHOS"</b> WMO ref. 12437/2021-1.4 DSG)</li>
+   <li><b>"WHOS-Plata"</b> (2019/2020)</li>
+   <li><b>"WHOS-Dominican Republic"</b> (2020/2022)</li>
+   <li><b>"WHOS"</b> (2021/2024)</li>
   </ul>
   </li>
   </ul>
@@ -195,6 +195,8 @@ The DAB software development has been done in the context of numerous European a
       <ul>
       <li><b>HMA-T</b> (2008/2009)</li>
       <li><b>Prod-Trees</b> (2012/2015)</li>
+      <li><b>DAB4EDGE</b> (2018/2020)</li>
+      <li><b>GPP(GEOSS Platform Plus)</b> (2022/2025)</li>
       </ul>
       </li>
       </ul>
@@ -222,7 +224,7 @@ The DAB software development has been done in the context of numerous European a
 </li>
 </ul>
 		
-Since 2012, the DAB framework has been leveraged by GEO as **GEO-DAB**, the brokerage component of the GEOSS Common Infrastructure (GCI; or GEOSS platform). GEO DAB is being operated and managed by CNR-IIA on its cloud infrastructure, it connects over 150 information systems that allow the search of over 400 million data (granules), and relative access if allowed by the provider.
+As from 2012, the DAB technology has been utilized by GEO (the Group of Earth Observation) as the enabling component of the **GEO-DAB**: the brokerage data services middleware of the GEOSS (Global Earth Observation System of Systems) platform (formerly known as GCI). GEO-DAB is deployed and operated on a scalable cloud infrastructure. In 2021, the GEO-DAB has connected over 190 different geospatial information systems, which allow the search and discovery of more than 10 million datasets, consisting of over 1 billion single downloadable data files (i.e. data granules in GEO jargon). A useful reference is: <code><a href="https://www.sciencedirect.com/science/article/abs/pii/S1364815215000481">Stefano Nativi, Paolo Mazzetti, Mattia Santoro, Fabrizio Papeschi, Max Craglia, Osamu Ochiai, Big Data challenges in building the Global Earth Observation System of Systems, Environmental Modelling & Software, Volume 68, 2015, Pages 1-26.</a></code>
 
 [More info on GEO-DAB](https://www.geodab.net/)
 
