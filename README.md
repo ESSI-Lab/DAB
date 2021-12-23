@@ -40,7 +40,7 @@ The DAB is a **brokering software framework** for the **mediation and harmonizat
 
 ## Getting started
 <details>
-  <summary>Instructions on how to start the DAB</summary>
+  <summary>Instructions on how to start using the DAB</summary>
 
 The DAB is composed by multiple maven modules. GS-service is the main module, capable of starting the DAB Internet services and its web configuration tool.
 
@@ -144,7 +144,7 @@ The **ESSI-Lab Contributor License Agreement** needs to be signed by contributor
 ## DAB history and acknowledgments
 
 <details>
-	<summary>Learn more about the DAB and its contributors</summary>
+	<summary>Learn more about the DAB history and the main contributors</summary>
 
 DAB was first conceived and is still maintained and advanced by the [ESSI-Lab](https://essi-lab.eu) based at the [Florence division](https://iia.cnr.it/sede-firenze/) of the [Institute of Atmospheric Pollution Research (IIA)](https://iia.cnr.it/) of [National Research Council of Italy (CNR)](https://www.cnr.it/).
 
@@ -229,7 +229,7 @@ The DAB software has been developed in the context of numerous National, Europea
 </li>
 </ul>
 	
-### Main deployments
+### Main running deployments
 		
 As from 2012, the DAB technology has been utilized by [GEO](https://earthobservations.org/) (the Group of Earth Observation) as the enabling component of the **GEO-DAB**: the brokerage data services middleware of the [GEOSS](https://earthobservations.org/geoss.php) (Global Earth Observation System of Systems) platform (formerly known as GCI). GEO-DAB is deployed and operated on a scalable cloud infrastructure. In 2021, the GEO-DAB has connected over 190 different geospatial information systems, which allow the search and discovery of more than 10 million datasets, consisting of over 1 billion single downloadable data files (i.e. data granules in GEO jargon). A useful reference is: <code><a href="https://www.sciencedirect.com/science/article/abs/pii/S1364815215000481">Stefano Nativi, Paolo Mazzetti, Mattia Santoro, Fabrizio Papeschi, Max Craglia, Osamu Ochiai, Big Data challenges in building the Global Earth Observation System of Systems, Environmental Modelling & Software, Volume 68, 2015, Pages 1-26.</a></code>. More info on GEO-DAB is available [here](https://www.geodab.net/)
 
