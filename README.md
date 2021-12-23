@@ -231,11 +231,11 @@ As of 2017, the DAB software has been also adopted by WMO as one of the enabling
 
 In 2011, the **SeaDataNet** data platform started utilizing the DAB technology to enable the discovery and access of different international ocean data sources.  More information on SeaDataNet brokering services is availabe [here](https://www.seadatanet.org/Data-Access/Discover-international-data). The DAB mediation and brokering services were also applied by the ODIP community to interconnect the ocean information system-of-systems from USA, Australia, and Europe. More information on ODIP is available [here](http://www.odip.org/).
 	
-	Awards
+### Awards
 
 The DAB technology won the **2014 Geospatial World Innovation Awards** [(media coverage here)](https://www.cnr.it/en/news/5795/il-geospatial-world-innovation-award-all-iia-cnr).
 	
-	Useful References
+### Useful References
 
 The following papers provide a technical description of the DAB brokering framweork.
 
