@@ -148,7 +148,7 @@ The DAB was initially conceived and is still designed and developed by ESSI-Lab 
 
 DAB implements the **brokering approach** introduced by Stefano Nativi et al. in the position paper: <code><a href="https://ieeexplore.ieee.org/abstract/document/6506981">S. Nativi, M. Craglia and J. Pearlman, "Earth Science Infrastructures Interoperability: The Brokering Approach," in IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing, vol. 6, no. 3, pp. 1118-1129, June 2013, doi: 10.1109/JSTARS.2013.2243113.</a></code> by applying the mediation pattern <code><a href="https://ieeexplore.ieee.org/abstract/document/5200393">S. Nativi and L. Bigagli, "Discovery, Mediation, and Access Services for Earth Observation Data," in IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing, vol. 2, no. 4, pp. 233-240, Dec. 2009, doi: 10.1109/JSTARS.2009.2028584.</a></code>
 
-DAB software development took and takes place in the context of numerous international projects and initiatives, funded/operated by different entities on a time range of over 10 years.
+The DAB software development has been done in the context of numerous European and international projects and initiatives, funded and/or operated by different organizations over the last ten years, including:
 
 <ul>
  <li>Intergovernmental initiatives
