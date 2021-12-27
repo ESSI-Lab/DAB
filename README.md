@@ -151,7 +151,7 @@ Contributors to the ESSI-Lab DAB CE project are welcome: you can **report bugs a
 
 To **propose code contributions** please <a href="#contact-essi-lab">contact ESSI-Lab</a> to coordinate the development effort and avoid duplications.
 
-The **ESSI-Lab Contributor License Agreement** needs to be signed by contributors to enable ESSI-Lab to accept community contributions to the DAB repository even more smoothly: now the signature of the agreement is integrated in the pull request.
+The <a href="https://gist.github.com/ESSI-Lab/68833fd7d9896513ae95a575695a85a2">ESSI-Lab Contributor License Agreement</a> needs to be signed by contributors to enable ESSI-Lab to accept community contributions to the DAB repository even more smoothly: now the signature of the agreement is integrated in the pull request.
 
 </details>
 	
