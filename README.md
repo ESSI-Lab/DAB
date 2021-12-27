@@ -147,7 +147,7 @@ In case a modified version of the DAB is offered by a third party as an Internet
 
 <br/>		
 	
-Contributors to the ESSI-Lab DAB CE project are welcome: you can **report bugs and request enhancements** <a href="#Contacts">contacting ESSI-Lab</a> or through the GitHub issue tracker.
+Contributors to the ESSI-Lab DAB CE project are welcome: you can **report bugs and request enhancements** <a href="#Contact ESSI-Lab">contacting ESSI-Lab</a> or through the GitHub issue tracker.
 
 To **propose code contributions** please contact ESSI-Lab to coordinate the development effort and avoid duplications.
 
