@@ -91,7 +91,7 @@ AGPL license is more restrictive with respect to GPL with regard to online servi
 
 This is the case where a third party downloads the DAB source code and offers its functionalities through an online service (e.g. through a server managed by the third party). In this case **the following statement should appear at the third party site** offering the service:
 
-<code>The brokering service is offered by DAB, a software developed by ESSI-Lab (Stefano Nativi, Paolo Mazzetti, Enrico Boldrini, Fabrizio Papeschi, Roberto Roncella, Massimiliano Olivieri, Lorenzo Bigagli and Mattia Santoro) of Institute of Atmospheric Pollution Research of National Research Council of Italy. More information is available at https://github.com/ESSI-Lab/DAB/</code>
+<code>The brokering service is offered by DAB, a software developed by National Research Council of Italy/Institute of Atmospheric Pollution Research/ESSI-Lab. More information is available at https://github.com/ESSI-Lab/DAB/</code>
 
 </details>
 
@@ -130,7 +130,7 @@ In any case the following attribution headers should be preserved in modified ve
 
 <code>Discovery and Access Broker (DAB) Community Edition (CE)</code>
 
-<code>Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab (Stefano Nativi, Paolo Mazzetti, Enrico Boldrini, Fabrizio Papeschi, Roberto Roncella, Massimiliano Olivieri, Lorenzo Bigagli and Mattia Santoro)</code>
+<code>Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab</code>
 
 
 In case a modified version of the DAB is offered by a third party as an Internet service, additionally to the attribution described above also the code (or a link to the DAB GitHub repository holding the modifications) should be made available on the third party site.
