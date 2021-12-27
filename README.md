@@ -72,7 +72,7 @@ A demo portal to check that DAB is working as expected will be available at the 
 	
 http://localhost:9090/gs-service/search
 
-In a more complex configuration the DAB can be deployed on a cloud service, where multiple containers can be responsible for different tasks (e.g. frontend, harvesting, access). 
+In a more complex configuration the DAB can be deployed on a cloud service, where multiple containers can be responsible for different tasks (e.g. frontend, harvesting, access). The DAB Dockerhub repository is currently under construction.
 	
 </details>
 	
