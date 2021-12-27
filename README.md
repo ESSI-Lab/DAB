@@ -309,7 +309,7 @@ Experts who contributed with valuable inputs and feedbacks representing signific
 - Siri Jodha Khalsa
 - Osamu Ochiai
 - Anthony Lehmann
-- Joan Masò
+- Joan Masó
 - Francoise Pearlman
 - Jay Pearlman
 - Silvano Pecora
