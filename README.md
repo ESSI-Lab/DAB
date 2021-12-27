@@ -153,6 +153,8 @@ To **propose code contributions** please <a href="#contact-essi-lab">contact ESS
 
 The <a href="https://gist.github.com/ESSI-Lab/68833fd7d9896513ae95a575695a85a2">ESSI-Lab Contributor License Agreement</a> (based on HA-CLA-I-OSI) needs to be signed by contributors to enable ESSI-Lab to accept community contributions to the DAB repository even more smoothly. Now the signature of the agreement is fully integrated in the Github pull request.
 
+If you're interested in contributing, please take a look as well at <a href="https://raw.githubusercontent.com/ESSI-Lab/DAB/main/CODE_OF_CONDUCT.md">ESSI-Lab's Contributor Code of Conduct</a>.	
+	
 </details>
 	
 <p align="right">(<a href="#top">back to top</a>)</p>
