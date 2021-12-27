@@ -85,6 +85,8 @@ While the DAB community edition code is **open source**, it is not a **public do
 <details>
 	<summary>To use the DAB technology for providing online services</summary>
 
+<br/>		
+	
 AGPL license is more restrictive with respect to GPL with regard to online service providers making use of the licensed software.
 
 This is the case where a third party downloads the DAB source code and offers its functionalities through an online service (e.g. through a server managed by the third party). In this case **the following statement should appear at the third party site** offering the service:
@@ -97,6 +99,8 @@ This is the case where a third party downloads the DAB source code and offers it
 	
 <summary>To use the DAB technology for a scientific and/or technological publication</summary>
 
+<br/>		
+	
 Please note at least **one of the following papers should be cited to give correct author attributions** while describing work making use of the DAB:
 
 <code><a href="https://www.sciencedirect.com/science/article/pii/S1364815215000481">Stefano Nativi, Paolo Mazzetti, Mattia Santoro, Fabrizio Papeschi, Max Craglia, Osamu Ochiai, Big Data challenges in building the Global Earth Observation System of Systems, Environmental Modelling & Software, Volume 68, 2015,Pages 1-26, ISSN 1364-8152</a></code>
@@ -117,6 +121,9 @@ Please note at least **one of the following papers should be cited to give corre
 
 <details>
 	<summary>To start a new branch of the DAB software</summary>
+
+<br/>		
+	
 The modified source code should be licensed according to AGPL and **redistributed back to the community, preferably through the DAB GitHub repository**. You are welcome and encouraged to contact ESSI-Lab to propose code contributions to be applied to the present repository (see contributions section).
 
 In any case the following attribution headers should be preserved in modified versions of the source code:
@@ -137,6 +144,8 @@ In case a modified version of the DAB is offered by a third party as an Internet
 
 <details>
 	<summary>How to contribute to this project</summary>
+
+<br/>		
 	
 Contributors to the ESSI-Lab DAB CE project are welcome: you can **report bugs and request enhancements** contacting ESSI-Lab or through the GitHub issue tracker.
 
@@ -153,6 +162,8 @@ The **ESSI-Lab Contributor License Agreement** needs to be signed by contributor
 <details>
 	<summary>Learn more about the DAB history and the main contributors</summary>
 
+<br/>	
+	
 DAB was first conceived and is still maintained and advanced by the [ESSI-Lab](https://essi-lab.eu) based at the [Florence division](https://iia.cnr.it/sede-firenze/) of the [Institute of Atmospheric Pollution Research (IIA)](https://iia.cnr.it/) of [National Research Council of Italy (CNR)](https://www.cnr.it/).
 
 DAB implements the **data brokering approach** as introduced by Stefano Nativi et al. in the position paper: <code><a href="https://ieeexplore.ieee.org/abstract/document/6506981">S. Nativi, M. Craglia and J. Pearlman, "Earth Science Infrastructures Interoperability: The Brokering Approach," in IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing, vol. 6, no. 3, pp. 1118-1129, June 2013, doi: 10.1109/JSTARS.2013.2243113.</a></code> by applying the mediation pattern <code><a href="https://ieeexplore.ieee.org/abstract/document/5200393">S. Nativi and L. Bigagli, "Discovery, Mediation, and Access Services for Earth Observation Data," in IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing, vol. 2, no. 4, pp. 233-240, Dec. 2009, doi: 10.1109/JSTARS.2009.2028584.</a></code>
