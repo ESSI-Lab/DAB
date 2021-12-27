@@ -999,6 +999,8 @@ ESSI-Lab would like to credit, as well, all the maintainers and developers of th
 
 <div> Icons appearing on this page are made by <a href="https://www.freepik.com" title="Freepik"> Freepik </a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
 
+<br/>
+
 Altough we have made our best effort to give the appropriate credits, some entries might be missing or incorrect: you are welcome to report to ESSI-Lab any of such issues you might find.
 	
 </details>	
