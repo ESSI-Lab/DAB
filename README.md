@@ -124,7 +124,7 @@ Please note at least **one of the following papers should be cited to give corre
 
 <br/>		
 	
-The modified source code should be licensed according to AGPL and **redistributed back to the community, preferably through the DAB GitHub repository**. You are welcome and encouraged to contact ESSI-Lab to propose code contributions to be applied to the present repository (see contributions section).
+The modified source code should be licensed according to AGPL and **redistributed back to the community, preferably through the DAB GitHub repository**. You are welcome and encouraged to <a href="#contact-essi-lab">contact ESSI-Lab</a> to propose code contributions to be applied to the present repository (see contributions section).
 
 In any case the following attribution headers should be preserved in modified versions of the source code:
 
@@ -147,9 +147,9 @@ In case a modified version of the DAB is offered by a third party as an Internet
 
 <br/>		
 	
-Contributors to the ESSI-Lab DAB CE project are welcome: you can **report bugs and request enhancements** <a href="#Contact">contacting ESSI-Lab</a> or through the GitHub issue tracker.
+Contributors to the ESSI-Lab DAB CE project are welcome: you can **report bugs and request enhancements** <a href="#contact-essi-lab">contacting ESSI-Lab</a> or through the GitHub issue tracker.
 
-To **propose code contributions** please contact ESSI-Lab to coordinate the development effort and avoid duplications.
+	To **propose code contributions** please <a href="contact-essi-lab">contact ESSI-Lab</a> to coordinate the development effort and avoid duplications.
 
 The **ESSI-Lab Contributor License Agreement** needs to be signed by contributors to enable ESSI-Lab to accept community contributions to the DAB repository even more smoothly: now the signature of the agreement is integrated in the pull request.
 
