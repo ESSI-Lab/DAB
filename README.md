@@ -91,7 +91,7 @@ AGPL license is more restrictive with respect to GPL with regard to online servi
 
 This is the case where a third party downloads the DAB source code and offers its functionalities through an online service (e.g. through a server managed by the third party). In this case **the following statement should appear at the third party site** offering the service:
 
-<code>The brokering service is offered by DAB, a software developed by National Research Council of Italy/Institute of Atmospheric Pollution Research/ESSI-Lab. More information is available at https://github.com/ESSI-Lab/DAB/</code>
+<code>The brokering service is offered by DAB, a software developed by National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab. More information is available at https://github.com/ESSI-Lab/DAB/</code>
 
 </details>
 
@@ -342,7 +342,7 @@ ESSI-Lab would like to credit all the maintainers and developers of the third pa
 	
 ### Credits
 	
-ESSI-Lab would like to credit, as well, all the maintainers and developers of the third party libraries that DAB uses. They are here listed, along with their license:
+ESSI-Lab would like to credit, as well, all the maintainers and developers of the third party libraries that DAB uses. They are here listed, along with their licenses:
 	
 - (The Apache Software License, Version 2.0) ant (ant:ant:1.6.5 - http://www.apache.org/ant/)
 - (Public Domain) AOP alliance (aopalliance:aopalliance:1.0 - http://aopalliance.sourceforge.net)
@@ -684,8 +684,6 @@ You are welcome to contact us for any info about the DAB, including bug reports,
 [http://essi-lab.eu/](http://essi-lab.eu/)
 
 [info@essi-lab.eu](info@essi-lab.eu)
-
-DAB homepage including extended documentation: [https://confluence.geodab.eu/display/DAB/](https://confluence.geodab.eu/display/DAB/)
 
 GitHub repository link: [https://github.com/ESSI-Lab/DAB](https://github.com/ESSI-Lab/DAB)
 
