@@ -329,6 +329,8 @@ Previous members of the development team:
 - Ugo Mattia (past developer)
 - Valerio Angelini (past developer)
 	
+### Credits
+	
 ESSI-Lab would like to credit all the maintainers and developers of the third party services and technologies that DAB uses. They include:
 	
 - MarkLogic Server
@@ -341,8 +343,6 @@ ESSI-Lab would like to credit all the maintainers and developers of the third pa
 - Twitter OAuth	
 - Docker
 - Kubernetes
-	
-### Credits
 	
 ESSI-Lab would like to credit, as well, all the maintainers and developers of the third party libraries that DAB uses. They are here listed, along with their licenses:
 	
