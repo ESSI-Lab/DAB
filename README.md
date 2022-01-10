@@ -347,6 +347,7 @@ ESSI-Lab would like to credit all the maintainers and developers of the third pa
 ESSI-Lab would like to credit, as well, all the maintainers and developers of the third party libraries that DAB uses. They are here listed, along with their licenses:
 	
 
+This file contains the list of DAB dependencies, along with their licenses.
 
 (The Apache Software License, Version 2.0) ant (ant:ant:1.6.5 - http://www.apache.org/ant/)
 
@@ -506,13 +507,13 @@ ESSI-Lab would like to credit, as well, all the maintainers and developers of th
 
 (BSD 3-Clause License) bufr (edu.ucar:bufr:4.6.6 - no url defined)
 
-(Unknown license) cdm (edu.ucar:cdm:4.6.12 - no url defined)
+(BSD 3-Clause License) cdm (edu.ucar:cdm:4.6.12 - no url defined)
 
 (Unknown license) httpservices (edu.ucar:httpservices:4.6.12 - no url defined)
 
-(Unknown license) netcdf4 (edu.ucar:netcdf4:4.6.12 - no url defined)
+(BSD 3-Clause License) netcdf4 (edu.ucar:netcdf4:4.6.12 - no url defined)
 
-(Unknown license) udunits (edu.ucar:udunits:4.6.12 - no url defined)
+(BSD 3-Clause License) udunits (edu.ucar:udunits:4.6.12 - no url defined)
 
 (The Apache Software License, Version 2.0) okhttp-digest (io.github.rburgst:okhttp-digest:1.21 - https://github.com/rburgst/okhttp-digest)
 
@@ -996,12 +997,11 @@ ESSI-Lab would like to credit, as well, all the maintainers and developers of th
 
 
 
-
 <div> Icons appearing on this page are made by <a href="https://www.freepik.com" title="Freepik"> Freepik </a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
 
 <br/>
 
-Altough we have made our best effort to give the appropriate credits, some entries might be missing or incorrect: you are welcome to report to ESSI-Lab any of such issues you might find.
+Altough we have made our best effort to give the appropriate credits, some entries might be missing or incorrect: you are welcome to report to ESSI-Lab any of such issues you might identifiy.
 	
 </details>	
 	
