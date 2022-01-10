@@ -346,9 +346,6 @@ ESSI-Lab would like to credit all the maintainers and developers of the third pa
 	
 ESSI-Lab would like to credit, as well, all the maintainers and developers of the third party libraries that DAB uses. They are here listed, along with their licenses:
 	
-
-This file contains the list of DAB dependencies, along with their licenses.
-
 (The Apache Software License, Version 2.0) ant (ant:ant:1.6.5 - http://www.apache.org/ant/)
 
 (Public Domain) AOP alliance (aopalliance:aopalliance:1.0 - http://aopalliance.sourceforge.net)
