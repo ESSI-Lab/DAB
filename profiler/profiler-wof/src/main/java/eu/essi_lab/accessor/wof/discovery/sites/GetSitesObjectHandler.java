@@ -1,0 +1,285 @@
+package eu.essi_lab.accessor.wof.discovery.sites;
+
+/*-
+ * #%L
+ * Discovery and Access Broker (DAB) Community Edition (CE)
+ * %%
+ * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * #L%
+ */
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.ServiceLoader;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.StreamingOutput;
+import javax.ws.rs.core.UriInfo;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.stream.events.Characters;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
+import javax.xml.transform.stream.StreamSource;
+
+import org.apache.commons.io.IOUtils;
+
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.lib.xml.XMLStreamWriterUtils;
+import eu.essi_lab.messages.DiscoveryMessage;
+import eu.essi_lab.messages.Page;
+import eu.essi_lab.messages.ResultSet;
+import eu.essi_lab.messages.ValidationMessage;
+import eu.essi_lab.messages.ValidationMessage.ValidationResult;
+import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.pdk.handler.StreamingRequestHandler;
+import eu.essi_lab.request.executor.IDiscoveryStringExecutor;
+
+public class GetSitesObjectHandler extends StreamingRequestHandler {
+
+    @Override
+    public ValidationMessage validate(WebRequest request) throws GSException {
+	ValidationMessage ret = new ValidationMessage();
+	ret.setResult(ValidationResult.VALIDATION_SUCCESSFUL);
+	return ret;
+    }
+
+    @Override
+    public StreamingOutput getStreamingResponse(WebRequest webRequest) throws GSException {
+
+	return new StreamingOutput() {
+
+	    @Override
+	    public void write(OutputStream output) throws IOException, WebApplicationException {
+
+		try {
+
+		    ServiceLoader<IDiscoveryStringExecutor> loader = ServiceLoader.load(IDiscoveryStringExecutor.class);
+		    IDiscoveryStringExecutor executor = loader.iterator().next();
+
+		    GetSitesObjectFastTransformer transformer = new GetSitesObjectFastTransformer();
+		    DiscoveryMessage discoveryMessage = transformer.transform(webRequest);
+		    discoveryMessage.setDistinctValuesElement(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER);
+
+		    String cuahsiNS = "http://www.cuahsi.org/his/1.1/ws/";
+		    String wmlNS = "http://www.cuahsi.org/waterML/1.1/";
+
+		    XMLStreamWriter writer = XMLStreamWriterUtils.getSOAPWriter(output);
+
+		    writer.writeStartElement("", "GetSitesObjectResponse", cuahsiNS);
+		    writer.writeNamespace("", cuahsiNS);
+
+		    UriInfo uri = webRequest.getUriInfo();
+		    String path = webRequest.getRequestPath();
+		    String url = GetSitesResultSetFormatter.connect(uri.getBaseUri().toString(), path);
+
+		    writer.writeStartElement("", "sitesResponse", wmlNS);
+		    writer.writeNamespace("", wmlNS);
+
+		    writer.writeStartElement("", "queryInfo", wmlNS);
+		    writer.writeStartElement("", "creationTime", wmlNS);
+		    writer.writeCharacters(ISO8601DateTimeUtils.getISO8601DateTime());
+		    writer.writeEndElement();
+		    writer.writeStartElement("", "queryURL", wmlNS);
+		    writer.writeCharacters(url);
+		    writer.writeEndElement();
+		    writer.writeStartElement("", "criteria", wmlNS);
+		    writer.writeAttribute("MethodCalled", "GetSitesObject");
+		    writer.writeStartElement("", "parameter", wmlNS);
+		    writer.writeAttribute("name", "format");
+		    writer.writeAttribute("value", "WML1");
+		    writer.writeEndElement();
+		    writer.writeEndElement();
+		    writer.writeStartElement("", "note", wmlNS);
+		    writer.writeCharacters("Discovery and Access Broker");
+		    writer.writeEndElement();
+		    writer.writeEndElement();
+
+		    Page page = discoveryMessage.getPage();
+		    page.setSize(1000);
+		    int pageSize = page.getSize();
+		    ResultSet<String> resultSet = null;
+		    do {
+
+			try {
+			    resultSet = executor.retrieveStrings(discoveryMessage);
+			    List<String> results = resultSet.getResultsList();
+
+			    XMLInputFactory factory = XMLInputFactory.newInstance();
+
+			    for (String result : results) {
+
+				InputStream stream = IOUtils.toInputStream(result, StandardCharsets.UTF_8);
+				StreamSource source = new StreamSource(stream);
+				XMLEventReader reader = factory.createXMLEventReader(source);
+
+				String west = null;
+				String east = null;
+				String north = null;
+				String south = null;
+				String platformName = null;
+				String platformCode = null;
+				String sourceID = null;
+				String country = null;
+
+				while (reader.hasNext()) {
+
+				    XMLEvent event = reader.nextEvent();
+
+				    if (event.isStartElement()) {
+
+					StartElement startElement = event.asStartElement();
+
+					String startName = startElement.getName().getLocalPart();
+
+					switch (startName) {
+					case "west":
+					    west = readValue(reader);
+					    break;
+					case "east":
+					    east = readValue(reader);
+					    break;
+					case "north":
+					    north = readValue(reader);
+					    break;
+					case "south":
+					    south = readValue(reader);
+					    break;
+					case "platformTitle":
+					    platformName = readValue(reader);
+					    break;
+					case "uniquePlatformId":
+					    platformCode = readValue(reader);
+					    break;
+					case "sourceId":
+					    sourceID = readValue(reader);
+					    break;
+					case "Country":
+					    country = readValue(reader);
+					    break;
+					default:
+					    break;
+					}
+
+				    }
+				}
+
+				reader.close();
+				stream.close();
+
+				if (west != null && !west.equals("") && east != null && !east.equals("") && north != null
+					&& !north.equals("") && south != null && !south.equals("") && platformName != null
+					&& !platformName.equals("")//
+					&& platformCode != null && !platformCode.equals("")//
+				// && sourceID != null && !sourceID.equals("")//
+				) {
+				    writer.writeStartElement("", "site", wmlNS);
+				    writer.writeStartElement("", "siteInfo", wmlNS);
+				    writer.writeStartElement("", "siteName", wmlNS);
+				    writer.writeCharacters(platformName);
+				    writer.writeEndElement();
+				    writer.writeStartElement("", "siteCode", wmlNS);
+				    if (sourceID != null && !sourceID.isEmpty()) {
+					writer.writeAttribute("network", sourceID);
+				    } else {
+					writer.writeAttribute("network", "default");
+				    }
+				    writer.writeAttribute("siteID", "1");
+				    writer.writeCharacters(platformCode);
+				    writer.writeEndElement();
+
+				    writer.writeStartElement("", "geoLocation", wmlNS);
+				    writer.writeStartElement("", "geogLocation", wmlNS);
+				    writer.writeAttribute("srs", "EPSG:4326");
+				    writer.writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "type", "LatLonPointType");
+				    writer.writeStartElement("", "latitude", wmlNS);
+				    writer.writeCharacters(south);
+				    writer.writeEndElement();
+				    writer.writeStartElement("", "longitude", wmlNS);
+				    writer.writeCharacters(west);
+				    writer.writeEndElement();
+				    writer.writeEndElement();
+				    writer.writeEndElement();
+
+				    if (country != null && !country.isEmpty()) {
+					writer.writeStartElement("", "siteProperty", wmlNS);
+					writer.writeAttribute("name", "Country");
+					writer.writeCharacters(country);
+					writer.writeEndElement();
+				    }
+
+				    writer.writeEndElement();
+				    writer.writeEndElement();
+				    writer.flush();
+				}
+
+			    }
+			} catch (Exception e) {
+			    e.printStackTrace();
+			}
+			page.setStart(page.getStart() + pageSize);
+
+		    } while (resultSet.getResultsList().size() < resultSet.getCountResponse().getCount()
+			    && !resultSet.getResultsList().isEmpty());
+
+		    writer.writeEndDocument();
+		    writer.flush();
+		    writer.close();
+		    output.close();
+
+		} catch (Exception ex) {
+		    throw new WebApplicationException(ex.getMessage());
+		}
+
+	    }
+	};
+
+    }
+
+    private String readValue(XMLEventReader reader) {
+
+	String ret = "";
+	XMLEvent event = null;
+	do {
+	    try {
+		event = reader.nextEvent();
+		if (event instanceof Characters) {
+		    Characters cei = (Characters) event;
+		    ret += cei.getData();
+		}
+	    } catch (XMLStreamException e) {
+		e.printStackTrace();
+	    }
+
+	} while (event != null && !event.isEndElement());
+
+	return ret;
+    }
+
+    @Override
+    public MediaType getMediaType(WebRequest webRequest) {
+	return MediaType.APPLICATION_XML_TYPE;
+    }
+
+}

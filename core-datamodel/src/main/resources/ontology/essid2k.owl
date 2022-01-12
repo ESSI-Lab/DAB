@@ -1,0 +1,279 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://eu.essi_lab.core/2018/06/d2k#"
+         xmlns:dct="http://purl.org/dc/terms/"
+         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:owl="http://www.w3.org/2002/07/owl#"
+         xmlns:xml="http://www.w3.org/XML/1998/namespace"
+         xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+         xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <owl:Ontology rdf:about="http://eu.essi_lab.core/2018/06/d2k">
+        <owl:versionIRI rdf:resource="http://eu.essi_lab.core/2018/06/d2k"/>
+        <dct:title xml:lang="en">ESSI Lab Data to Knowledge Ontology</dct:title>
+        <rdfs:label xml:lang="en">ESSI Lab Data to Knowledge Ontology</rdfs:label>
+        <skos:definition xml:lang="en">The core ontology of ESSI Lab Knowledge Base</skos:definition>
+        <dct:creator>Mattia Santoro</dct:creator>
+    </owl:Ontology>
+
+
+    <owl:Class rdf:about="http://eu.essi_lab.core/2018/06/d2k#Root">
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2004/02/skos/core#ConceptScheme"/>
+        <rdfs:isDefinedBy rdf:resource="http://eu.essi_lab.core/2018/06/d2k"/>
+        <rdfs:label xml:lang="en">The entry point of an ontology</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://eu.essi_lab.core/2018/06/d2k#Business_Process">
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+        <rdfs:isDefinedBy rdf:resource="http://eu.essi_lab.core/2018/06/d2k"/>
+        <rdfs:label xml:lang="en">Business Process</rdfs:label>
+        <skos:definition xml:lang="en">A Business Process is an abstract formalization of an algorithm.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://eu.essi_lab.core/2018/06/d2k#Scientific_Business_Process">
+        <rdfs:subClassOf rdf:resource="http://eu.essi_lab.core/2018/06/d2k#Business_Process"/>
+        <rdfs:isDefinedBy rdf:resource="http://eu.essi_lab.core/2018/06/d2k"/>
+        <rdfs:label xml:lang="en">Scientific Business Process</rdfs:label>
+        <skos:definition xml:lang="en">A Scientific Business Process.</skos:definition>
+    </owl:Class>
+
+    <!-- http://eu.essi_lab.core/2018/06/d2k#Knowledge_Business_Process -->
+    <owl:Class rdf:about="http://eu.essi_lab.core/2018/06/d2k#Knowledge_Business_Process">
+        <rdfs:subClassOf rdf:resource="http://eu.essi_lab.core/2018/06/d2k#Business_Process"/>
+        <rdfs:isDefinedBy rdf:resource="http://eu.essi_lab.core/2018/06/d2k"/>
+        <rdfs:label xml:lang="en">Knowledge Business Process</rdfs:label>
+        <skos:definition xml:lang="en">A Knowledge Business Process.</skos:definition>
+    </owl:Class>
+
+
+    <owl:Class rdf:about="http://eu.essi_lab.core/2018/06/d2k#Executable_Encoding">
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+        <rdfs:isDefinedBy rdf:resource="http://eu.essi_lab.core/2018/06/d2k"/>
+        <rdfs:label xml:lang="en">Executable Encoding</rdfs:label>
+        <skos:definition xml:lang="en">An Executable Encoding is an executable encoding of a Business Process.</skos:definition>
+    </owl:Class>
+
+
+    <owl:Class rdf:about="http://eu.essi_lab.core/2018/06/d2k#Execution_Engine">
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+        <rdfs:isDefinedBy rdf:resource="http://eu.essi_lab.core/2018/06/d2k"/>
+        <rdfs:label xml:lang="en">Execution Engine</rdfs:label>
+    </owl:Class>
+
+
+
+    <owl:Class rdf:about="http://eu.essi_lab.core/2018/06/d2k#Input">
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+        <rdfs:isDefinedBy rdf:resource="http://eu.essi_lab.core/2018/06/d2k"/>
+        <rdfs:label xml:lang="en">Input</rdfs:label>
+        <skos:definition xml:lang="en">Input of a Business Process.</skos:definition>
+    </owl:Class>
+
+
+
+    <owl:Class rdf:about="http://eu.essi_lab.core/2018/06/d2k#Output">
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+        <rdfs:isDefinedBy rdf:resource="http://eu.essi_lab.core/2018/06/d2k"/>
+        <rdfs:label xml:lang="en">Output</rdfs:label>
+        <skos:definition xml:lang="en">Output of a Business Process.</skos:definition>
+    </owl:Class>
+
+
+
+    <owl:Class rdf:about="http://eu.essi_lab.core/2018/06/d2k#Essential_Variable">
+        <rdfs:subClassOf rdf:resource="http://eu.essi_lab.core/2018/06/d2k#Output"/>
+        <rdfs:subClassOf rdf:resource="http://eu.essi_lab.core/2018/06/d2k#Input"/>
+        <rdfs:isDefinedBy rdf:resource="http://eu.essi_lab.core/2018/06/d2k"/>
+        <rdfs:label xml:lang="en">Essential Variable</rdfs:label>
+    </owl:Class>
+
+
+    <owl:Class rdf:about="http://eu.essi_lab.core/2018/06/d2k#Indicator">
+        <rdfs:subClassOf rdf:resource="http://eu.essi_lab.core/2018/06/d2k#Output"/>
+        <rdfs:isDefinedBy rdf:resource="http://eu.essi_lab.core/2018/06/d2k"/>
+        <rdfs:label xml:lang="en">Indicator</rdfs:label>
+    </owl:Class>
+
+
+    <owl:Class rdf:about="http://eu.essi_lab.core/2018/06/d2k#Policy_Goal">
+        <rdfs:subClassOf rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+        <rdfs:isDefinedBy rdf:resource="http://eu.essi_lab.core/2018/06/d2k"/>
+        <rdfs:label xml:lang="en">Policy Goal</rdfs:label>
+    </owl:Class>
+
+
+    <owl:Class rdf:about="http://eu.essi_lab.core/2018/06/d2k#Observable">
+        <rdfs:subClassOf rdf:resource="http://eu.essi_lab.core/2018/06/d2k#Input"/>
+        <rdfs:isDefinedBy rdf:resource="http://eu.essi_lab.core/2018/06/d2k"/>
+        <rdfs:label xml:lang="en">Observable</rdfs:label>
+    </owl:Class>
+
+    <owl:ObjectProperty rdf:about="http://eu.essi_lab.core/2018/06/d2k#isChildOf">
+        <owl:inverseOf rdf:resource="http://eu.essi_lab.core/2018/06/d2k#isParentOf"/>
+
+        <rdfs:label xml:lang="en">is child of</rdfs:label>
+        <rdfs:isDefinedBy rdf:resource="http://eu.essi_lab.core/2018/06/d2k"/>
+    </owl:ObjectProperty>
+
+    <!--<owl:ObjectProperty rdf:about="http://eu.essi_lab.core/2018/06/d2k#isParentOf">-->
+        <!--<owl:inverseOf rdf:resource="http://eu.essi_lab.core/2018/06/d2k#isChildOf"/>-->
+        <!--<rdfs:label xml:lang="en">is parent of</rdfs:label>-->
+    <!--</owl:ObjectProperty>-->
+
+
+    <owl:ObjectProperty rdf:about="http://eu.essi_lab.core/2018/06/d2k#input_of">
+        <!--<rdfs:subPropertyOf rdf:resource="http://eu.essi_lab.core/2018/06/d2k#isChildOf"/>-->
+        <rdfs:isDefinedBy rdf:resource="http://eu.essi_lab.core/2018/06/d2k"/>
+        <rdfs:label xml:lang="en">is input of</rdfs:label>
+        <rdfs:domain rdf:resource="http://eu.essi_lab.core/2018/06/d2k#Input"/>
+        <rdfs:range rdf:resource="http://eu.essi_lab.core/2018/06/d2k#Business_Process"/>
+    </owl:ObjectProperty>
+
+
+    <owl:ObjectProperty rdf:about="http://eu.essi_lab.core/2018/06/d2k#input_of_scientific_bp">
+        <rdfs:isDefinedBy rdf:resource="http://eu.essi_lab.core/2018/06/d2k"/>
+        <rdfs:subPropertyOf rdf:resource="http://eu.essi_lab.core/2018/06/d2k#input_of"/>
+        <rdfs:label xml:lang="en">is input of scientific model</rdfs:label>
+        <rdfs:domain rdf:resource="http://eu.essi_lab.core/2018/06/d2k#Observable"/>
+        <rdfs:range rdf:resource="http://eu.essi_lab.core/2018/06/d2k#Scientific_Business_Process"/>
+    </owl:ObjectProperty>
+
+
+    <owl:ObjectProperty rdf:about="http://eu.essi_lab.core/2018/06/d2k#input_of_knowledge_bp">
+        <rdfs:isDefinedBy rdf:resource="http://eu.essi_lab.core/2018/06/d2k"/>
+        <rdfs:subPropertyOf rdf:resource="http://eu.essi_lab.core/2018/06/d2k#input_of"/>
+        <rdfs:label xml:lang="en">is input of knowledge model</rdfs:label>
+        <rdfs:domain rdf:resource="http://eu.essi_lab.core/2018/06/d2k#Essential_Variable"/>
+        <rdfs:range rdf:resource="http://eu.essi_lab.core/2018/06/d2k#Knowledge_Business_Process"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://eu.essi_lab.core/2018/06/d2k#output_of">
+        <rdfs:isDefinedBy rdf:resource="http://eu.essi_lab.core/2018/06/d2k"/>
+        <!--<rdfs:subPropertyOf rdf:resource="http://eu.essi_lab.core/2018/06/d2k#isParentOf"/>-->
+        <rdfs:label xml:lang="en">is output of</rdfs:label>
+        <rdfs:domain rdf:resource="http://eu.essi_lab.core/2018/06/d2k#Output"/>
+        <rdfs:range rdf:resource="http://eu.essi_lab.core/2018/06/d2k#Business_Process"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://eu.essi_lab.core/2018/06/d2k#generates_output">
+        <rdfs:isDefinedBy rdf:resource="http://eu.essi_lab.core/2018/06/d2k"/>
+        <owl:inverseOf rdf:resource="http://eu.essi_lab.core/2018/06/d2k#output_of"/>
+        <rdfs:label xml:lang="en">generates output</rdfs:label>
+        <rdfs:range rdf:resource="http://eu.essi_lab.core/2018/06/d2k#Output"/>
+        <rdfs:domain rdf:resource="http://eu.essi_lab.core/2018/06/d2k#Business_Process"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://eu.essi_lab.core/2018/06/d2k#output_of_scientific_bp">
+        <rdfs:isDefinedBy rdf:resource="http://eu.essi_lab.core/2018/06/d2k"/>
+        <rdfs:subPropertyOf rdf:resource="http://eu.essi_lab.core/2018/06/d2k#output_of"/>
+        <rdfs:label xml:lang="en">is output of scientific model</rdfs:label>
+        <rdfs:domain rdf:resource="http://eu.essi_lab.core/2018/06/d2k#Essential_Variable"/>
+        <rdfs:range rdf:resource="http://eu.essi_lab.core/2018/06/d2k#Scientific_Business_Process"/>
+    </owl:ObjectProperty>
+
+
+    <owl:ObjectProperty rdf:about="http://eu.essi_lab.core/2018/06/d2k#output_of_knowledge_bp">
+        <rdfs:isDefinedBy rdf:resource="http://eu.essi_lab.core/2018/06/d2k"/>
+        <rdfs:subPropertyOf rdf:resource="http://eu.essi_lab.core/2018/06/d2k#output_of"/>
+        <rdfs:label xml:lang="en">is output of knowledge model</rdfs:label>
+        <rdfs:domain rdf:resource="http://eu.essi_lab.core/2018/06/d2k#Indicator"/>
+        <rdfs:range rdf:resource="http://eu.essi_lab.core/2018/06/d2k#Knowledge_Business_Process"/>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://eu.essi_lab.core/2018/06/d2k#addresses">
+        <rdfs:isDefinedBy rdf:resource="http://eu.essi_lab.core/2018/06/d2k"/>
+        <!--<rdfs:subPropertyOf rdf:resource="http://eu.essi_lab.core/2018/06/d2k#isChildOf"/>-->
+        <owl:inverseOf rdf:resource="http://eu.essi_lab.core/2018/06/d2k#addressed_by"/>
+        <rdfs:label xml:lang="en">addresses</rdfs:label>
+    </owl:ObjectProperty>
+
+
+    <owl:ObjectProperty rdf:about="http://eu.essi_lab.core/2018/06/d2k#addressed_by">
+        <rdfs:isDefinedBy rdf:resource="http://eu.essi_lab.core/2018/06/d2k"/>
+        <owl:inverseOf rdf:resource="http://eu.essi_lab.core/2018/06/d2k#addresses"/>
+        <rdfs:label xml:lang="en">addressed by</rdfs:label>
+    </owl:ObjectProperty>
+
+    <!-- Below to be reviewed -->
+
+    <!--<owl:ObjectProperty rdf:about="http://eu.essi_lab.core/2018/06/d2k#encoded_by">-->
+        <!--<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2004/02/skos/core#related"/>-->
+        <!--<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2004/02/skos/core#relatedMatch"/>-->
+        <!--<owl:inverseOf rdf:resource="http://eu.essi_lab.core/2018/06/d2k#encodes"/>-->
+        <!--<rdfs:label xml:lang="en">is encoded by</rdfs:label>-->
+        <!--<skos:definition-->
+                <!--xml:lang="en">Relates an abstract concept (e.g. a model) to an artifact describing it. The target artifact can be either a formal representation (e.g. BPMN) or an unstructured representation (e.g. a text).-->
+        <!--</skos:definition>-->
+    <!--</owl:ObjectProperty>-->
+
+    <!---->
+    <!--<owl:ObjectProperty rdf:about="http://eu.essi_lab.core/2018/06/d2k#encodes">-->
+        <!--<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2004/02/skos/core#related"/>-->
+        <!--<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2004/02/skos/core#relatedMatch"/>-->
+        <!--<owl:inverseOf rdf:resource="http://eu.essi_lab.core/2018/06/d2k#encoded_by"/>-->
+        <!--<rdfs:label xml:lang="en">encodes</rdfs:label>-->
+        <!--<skos:definition xml:lang="en">Relates an artifact to the abstract concept (e.g. a model) it represents.</skos:definition>-->
+    <!--</owl:ObjectProperty>-->
+
+    <!--&lt;!&ndash; http://eu.essi_lab.core/2018/06/d2k#executionURL &ndash;&gt;-->
+    <!--<owl:ObjectProperty rdf:about="http://eu.essi_lab.core/2018/06/d2k#executionURL">-->
+        <!--<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2004/02/skos/core#related"/>-->
+        <!--<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2004/02/skos/core#relatedMatch"/>-->
+        <!--<rdfs:label xml:lang="en">has execution URL</rdfs:label>-->
+    <!--</owl:ObjectProperty>-->
+
+    <!--&lt;!&ndash; http://eu.essi_lab.core/2018/06/d2k#sourceCode &ndash;&gt;-->
+    <!--<owl:ObjectProperty rdf:about="http://eu.essi_lab.core/2018/06/d2k#sourceCode">-->
+        <!--<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2004/02/skos/core#related"/>-->
+        <!--<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2004/02/skos/core#relatedMatch"/>-->
+        <!--<rdfs:label xml:lang="en">has source code</rdfs:label>-->
+    <!--</owl:ObjectProperty>-->
+
+    <!--&lt;!&ndash; http://eu.essi_lab.core/2018/06/d2k#algorithm &ndash;&gt;-->
+    <!--<owl:ObjectProperty rdf:about="http://eu.essi_lab.core/2018/06/d2k#algorithm">-->
+        <!--<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2004/02/skos/core#related"/>-->
+        <!--<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2004/02/skos/core#relatedMatch"/>-->
+        <!--<rdfs:label xml:lang="en">has algorithm</rdfs:label>-->
+    <!--</owl:ObjectProperty>-->
+
+    <!--&lt;!&ndash; http://eu.essi_lab.core/2018/06/d2k#is_composed_of &ndash;&gt;-->
+    <!--<owl:ObjectProperty rdf:about="http://eu.essi_lab.core/2018/06/d2k#is_composed_of">-->
+        <!--<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2004/02/skos/core#related"/>-->
+        <!--<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2004/02/skos/core#relatedMatch"/>-->
+        <!--<rdfs:label xml:lang="en">is composed of</rdfs:label>-->
+    <!--</owl:ObjectProperty>-->
+
+    <!--&lt;!&ndash; http://eu.essi_lab.core/2018/06/d2k#is_realized_by &ndash;&gt;-->
+    <!--<owl:ObjectProperty rdf:about="http://eu.essi_lab.core/2018/06/d2k#is_realized_by">-->
+        <!--<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2004/02/skos/core#related"/>-->
+        <!--<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2004/02/skos/core#narrowMatch"/>-->
+        <!--<owl:inverseOf rdf:resource="http://eu.essi_lab.core/2018/06/d2k#realizes"/>-->
+        <!--<rdfs:label xml:lang="en">is realized by</rdfs:label>-->
+    <!--</owl:ObjectProperty>-->
+
+    <!--&lt;!&ndash; http://eu.essi_lab.core/2018/06/d2k#realizes &ndash;&gt;-->
+    <!--<owl:ObjectProperty rdf:about="http://eu.essi_lab.core/2018/06/d2k#realizes">-->
+        <!--<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2004/02/skos/core#related"/>-->
+        <!--<rdfs:subPropertyOf rdf:resource="http://www.w3.org/2004/02/skos/core#relatedMatch"/>-->
+        <!--<owl:inverseOf rdf:resource="http://eu.essi_lab.core/2018/06/d2k#is_realized_by"/>-->
+        <!--<rdfs:label xml:lang="en">realizes</rdfs:label>-->
+    <!--</owl:ObjectProperty>-->
+
+
+
+    <!--&lt;!&ndash; http://eu.essi_lab.core/2018/06/d2k#imageURL &ndash;&gt;-->
+    <!--<owl:ObjectProperty rdf:about="http://eu.essi_lab.core/2018/06/d2k#imageURL">-->
+        <!--<rdfs:label xml:lang="en">imageURL</rdfs:label>-->
+    <!--</owl:ObjectProperty>-->
+
+    <!--&lt;!&ndash; http://eu.essi_lab.core/2018/06/d2k#webPageURL &ndash;&gt;-->
+    <!--<owl:ObjectProperty rdf:about="http://eu.essi_lab.core/2018/06/d2k#webPageURL">-->
+        <!--<rdfs:label xml:lang="en">webPageURL</rdfs:label>-->
+    <!--</owl:ObjectProperty>-->
+
+    <!--&lt;!&ndash; http://eu.essi_lab.core/2018/06/d2k#kmlURL &ndash;&gt;-->
+    <!--<owl:ObjectProperty rdf:about="http://eu.essi_lab.core/2018/06/d2k#kmlURL">-->
+        <!--<rdfs:label xml:lang="en">kmlURL</rdfs:label>-->
+    <!--</owl:ObjectProperty>-->
+
+
+</rdf:RDF>

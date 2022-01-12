@@ -1,0 +1,258 @@
+package eu.essi_lab.request.executor.discover.submitter;
+
+/*-
+ * #%L
+ * Discovery and Access Broker (DAB) Community Edition (CE)
+ * %%
+ * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * #L%
+ */
+
+import java.io.IOException;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
+
+import eu.essi_lab.adk.distributed.IDistributedAccessor;
+import eu.essi_lab.identifierdecorator.IdentifierDecorator;
+import eu.essi_lab.lib.servlet.RequestManager;
+import eu.essi_lab.messages.Page;
+import eu.essi_lab.messages.ReducedDiscoveryMessage;
+import eu.essi_lab.messages.ResultSet;
+import eu.essi_lab.messages.bond.Bond;
+import eu.essi_lab.messages.bond.parser.IdentifierBondHandler;
+import eu.essi_lab.messages.count.DiscoveryCountResponse;
+import eu.essi_lab.model.GSSource;
+import eu.essi_lab.model.exceptions.ErrorInfo;
+import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.resource.GSResource;
+import eu.essi_lab.request.executor.query.IDistributedQueryExecutor;
+import eu.essi_lab.shared.messages.SharedContentReadResponse;
+import eu.essi_lab.shared.model.SharedContent;
+import eu.essi_lab.shared.yellowpage.GSYellowPage;
+
+public class DistributedQueryExecutor implements IDistributedQueryExecutor {
+
+    private IdentifierDecorator identifierDecorator = null;
+
+    private IDistributedAccessor accessor;
+    private String sourceIdentifier;
+    private GSYellowPage yp;
+
+    private static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
+
+    public DistributedQueryExecutor(IDistributedAccessor accessor, String id) {
+	this.accessor = accessor;
+	this.sourceIdentifier = id;
+    }
+
+    @Override
+    public IdentifierDecorator getIdentifierDecorator() {
+	return identifierDecorator;
+    }
+
+    @Override
+    public void setIdentifierDecorator(IdentifierDecorator identifierDecorator) {
+	this.identifierDecorator = identifierDecorator;
+    }
+
+    @Override
+    public void setYp(GSYellowPage yp) {
+	this.yp = yp;
+    }
+
+    @Override
+    public GSYellowPage getYp() {
+	return this.yp;
+    }
+
+    @Override
+    public String getSourceIdentifier() {
+	return sourceIdentifier;
+    }
+
+    @Override
+    public SimpleEntry<String, DiscoveryCountResponse> count(ReducedDiscoveryMessage message) throws GSException {
+
+	RequestManager.getInstance().addThreadName(message.getRequestId());
+
+	Bond reducedBond = message.getReducedBond();
+
+	IdentifierBondHandler parser = new IdentifierBondHandler(reducedBond);
+
+	DiscoveryCountResponse countResult;
+
+	if (parser.isCanonicalQueryByIdentifiers()) {
+	    ResultSet<GSResource> result = retrieve(message, null);
+	    countResult = new DiscoveryCountResponse();
+	    countResult.setCount(result.getResultsList().size());
+
+	} else {
+
+	    countResult = accessor.count(message);
+	}
+
+	SimpleEntry<String, DiscoveryCountResponse> ret = new SimpleEntry<String, DiscoveryCountResponse>(getSourceIdentifier(),
+		countResult);
+
+	return ret;
+    }
+
+    @Override
+    public ResultSet<Node> retrieveNodes(ReducedDiscoveryMessage message, Page page) throws GSException {
+	ResultSet<GSResource> gsResources = retrieve(message, page);
+	ResultSet<Node> ret = new ResultSet<>();
+
+	for (GSResource resource : gsResources.getResultsList()) {
+
+	    try {
+		Document node = resource.asDocument(true);
+		ret.getResultsList().add(node);
+	    } catch (ParserConfigurationException | JAXBException | SAXException | IOException e) {
+		e.printStackTrace();
+	    }
+	}
+
+	return ret;
+    }
+
+    @Override
+    public ResultSet<String> retrieveStrings(ReducedDiscoveryMessage message, Page page) throws GSException {
+	ResultSet<GSResource> gsResources = retrieve(message, page);
+	ResultSet<String> ret = new ResultSet<>();
+
+	for (GSResource resource : gsResources.getResultsList()) {
+
+	    try {
+		String node = resource.asString(true);
+		ret.getResultsList().add(node);
+	    } catch (JAXBException | IOException e) {
+		e.printStackTrace();
+	    }
+	}
+
+	return ret;
+    }
+
+    @Override
+    public ResultSet<GSResource> retrieve(ReducedDiscoveryMessage message, Page page) throws GSException {
+
+	RequestManager.getInstance().addThreadName(message.getRequestId());
+
+	if (getYp() == null) {
+	    GSException gse = new GSException();
+	    ErrorInfo info = new ErrorInfo();
+	    info.setErrorDescription("Yellow pages not set in Distributed Query executor");
+	    gse.addInfo(info);
+	    throw gse;
+	}
+
+	if (getIdentifierDecorator() == null) {
+	    GSException gse = new GSException();
+	    ErrorInfo info = new ErrorInfo();
+	    info.setErrorDescription("Identifier decorator not set in Distributed Query executor");
+	    gse.addInfo(info);
+	    throw gse;
+	}
+
+	ResultSet<GSResource> ret = new ResultSet<>();
+
+	Bond reducedBond = message.getReducedBond();
+
+	IdentifierBondHandler parser = new IdentifierBondHandler(reducedBond);
+
+	if (parser.isCanonicalQueryByIdentifiers()) {
+
+	    return retrieveFromYP(message);
+	}
+
+	ret = accessor.query(message, page);
+
+	List<GSResource> results = ret.getResultsList();
+
+	for (GSResource result : results) {
+
+	    getIdentifierDecorator().decorateDistributedIdentifier(result);
+
+	    EXECUTOR_SERVICE.execute(new Runnable() {
+		@Override
+		public void run() {
+		    getYp().store(result);
+		}
+	    });
+	}
+
+	return ret;
+    }
+    private ResultSet<GSResource> retrieveFromYP(ReducedDiscoveryMessage message) throws GSException {
+
+	Bond reducedBond = message.getReducedBond();
+
+	IdentifierBondHandler parser = new IdentifierBondHandler(reducedBond);
+
+	List<String> identifiers = parser.getIdentifiers();
+
+	String idString = "";
+	for (String identifier : identifiers) {
+	    idString += identifier + ",";
+	}
+
+	if (idString.endsWith(",")) {
+	    idString = idString.substring(0, idString.length() - 1);
+	}
+
+	ResultSet<GSResource> ret = new ResultSet<>();
+
+	for (String identifier : identifiers) {
+
+	    SharedContentReadResponse<GSResource> results = getYp().read(identifier);
+
+	    List<SharedContent<GSResource>> contents = results.getContents();
+
+	    for (SharedContent<GSResource> content : contents) {
+
+		GSResource resource = content.getContent();
+
+		String sourceId = null;
+		GSSource source = resource.getSource();
+		if (source != null) {
+		    sourceId = source.getUniqueIdentifier();
+		}
+
+		if (sourceId == null || (sourceIdentifier.equals(sourceId))) {
+
+		    ret.getResultsList().add(resource);
+		}
+	    }
+	}
+
+	return ret;
+    }
+
+    @Override
+    public Type getType() {
+	return Type.DISTRIBUTED;
+    }
+
+}

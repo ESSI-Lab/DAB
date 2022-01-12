@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gs:discoveryResponse xmlns:gs="http://flora.eu/gi-suite/1.0/dataModel/schema">
+
+	<gs:timeStamp>TIMESTAMP</gs:timeStamp>
+
+	<gs:pagination>
+		<gs:totalRecords>TOTAL_RECORDS</gs:totalRecords>
+		<gs:startIndex>START_INDEX</gs:startIndex>
+		<gs:returnedRecords>RETURNED_RECORDS</gs:returnedRecords>
+		<gs:nextRecord>NEXT_RECORD</gs:nextRecord>
+	</gs:pagination>
+
+	<gs:records>
+		RESULTS
+	</gs:records>
+
+	<gs:statistics>
+		STATISTICS
+	</gs:statistics>
+
+</gs:discoveryResponse>

@@ -1,0 +1,1430 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "DAB discovery interfaces test page",
+        "version": "1.0.0",
+        "title": "DAB discovery interfaces test page"
+    },
+    "basePath": "/gs-service/services/essi",
+    "tags": [
+        {
+            "name": "oaipmh",
+            "description": "OAI-PMH 2.0 interface",
+            "externalDocs": {
+                "description": "OAI-PMH 2 specification",
+                "url": "https://www.openarchives.org/OAI/openarchivesprotocol.html"
+            }
+        },
+        {
+            "name": "opensearch",
+            "description": "OpenSearch interface",
+            "externalDocs": {
+                "description": "OpenSearch specification",
+                "url": "http://www.opensearch.org/Home"
+            }
+        },
+        {
+            "name": "csw",
+            "description": "OGC CSW 2.0.2 interface",
+            "externalDocs": {
+                "description": "OGC Catalouge Service",
+                "url": "https://www.opengeospatial.org/standards/cat"
+            }
+        },
+        {
+            "name": "rest - Discovery",
+            "description": "DAB REST Discovery interface"
+        },
+        {
+            "name": "rest - Access",
+            "description": "DAB REST Access interface"
+        },
+        {
+            "name": "rest - Semantic",
+            "description": "DAB REST Semantic interface"
+        },
+        {
+            "name": "rest - Information",
+            "description": "DAB REST Informative interface"
+        }
+    ],
+    "schemes": ["http"],
+    "paths": {
+        "/oaipmh": {
+            "get": {
+                "tags": ["oaipmh"],
+                "summary": "OAI-PMH GET interface",
+                "description": "Standard implementation of the OAI-PMH protocol with HTTP GET method",
+                "produces": ["application/xml"],
+                "parameters": [
+                    {
+                        "name": "verb",
+                        "in": "query",
+                        "required": true,
+                        "type": "string",
+                        "enum": [
+                            "Identify",
+                            "ListSets",
+                            "ListMetadataFormats",
+                            "ListRecords",
+                            "ListIdentifiers",
+                            "GetRecord"
+                        ]
+                    },
+                    {
+                        "name": "metadataPrefix",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "resumptionToken",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "set",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "until",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "identifier",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {"description": "Successful operation"}
+                }
+            },
+            "post": {
+                "tags": ["oaipmh"],
+                "summary": "OAI-PMH POST interface",
+                "description": "Standard implementation of the OAI-PMH protocol with HTTP POST method",
+                "consumes": ["application/x-www-form-urlencoded"],
+                "produces": ["application/xml"],
+                "parameters": [
+                    {
+                        "in": "formData",
+                        "required": true,
+                        "name": "verb",
+                        "type": "string",
+                        "enum": [
+                            "Identify",
+                            "ListSets",
+                            "ListMetadataFormats",
+                            "ListRecords",
+                            "ListIdentifiers",
+                            "GetRecord"
+                        ]
+                    },
+                    {
+                        "in": "formData",
+                        "name": "metadataPrefix",
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "resumptionToken",
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "set",
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "from",
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "until",
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "identifier",
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {"description": "Successful operation"}
+                }
+            }
+        },
+        "/opensearch/query": {
+            "get": {
+                "tags": ["opensearch"],
+                "summary": "Opensearch query",
+                "description": "Executes an Opensearch query",
+                "parameters": [
+                    {
+                        "name": "si",
+                        "in": "query",
+                        "description": "The start index of the first result set item, starting from 1",
+                        "default": 1,
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "ct",
+                        "in": "query",
+                        "description": "Maximum number of datasets in each page of the result set",
+                        "default": 10,
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "st",
+                        "in": "query",
+                        "description": "One or more search terms; in case of multiple search terms they must be separated by 'AND' or 'OR' ",
+                        "required": false,
+                        "type": "string"
+                    },                    
+                    {
+                        "name": "sources",
+                        "in": "query",
+                        "description": "Comma separated list of DAB sources identifiers",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "parents",
+                        "in": "query",
+                        "description": "Comma separated list of datasets identifiers",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "identifier",
+                        "in": "query",
+                        "description": "A dataset identifier",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "keyword",
+                        "in": "query",
+                        "description": "A search keyword",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "format",
+                        "in": "query",
+                        "description": "A dataset format",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "protocol",
+                        "in": "query",
+                        "description": "A dataset protocol",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "searchFields",
+                        "in": "query",
+                        "description": "A single search field or a comma separated list of search fields in which to perform the terms search",
+                        "required": false,
+                        "default": "",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "title",
+                                "kwd",
+                                "abstract",
+                                "subject",
+                                "anyText"
+                            ]
+                        },
+                        "collectionFormat": "csv"
+                    },
+                    {
+                        "name": "tf",
+                        "in": "query",
+                        "description": "Term frequency",
+                        "required": false,
+                        "default": "",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "keyword",
+                                "format",
+                                "protocol",
+                                "providerID",
+                                "organisationName",
+                                "sscScore"
+                            ]
+                        },
+                        "collectionFormat": "csv"
+                    },
+                    {
+                        "name": "sscScore",
+                        "in": "query",
+                        "description": "The Service Status Checker range (e.g,: [0,20])",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "ts",
+                        "in": "query",
+                        "description": "Time start. Date or datetime expressed in ISO8601 format (e.g.: '2015-01-01', '2015-01-01'T00:00:00Z )'",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "te",
+                        "in": "query",
+                        "description": "Time end. Date or datetime expressed in ISO8601 format (e.g.: '2015-01-01', '2015-01-01'T00:00:00Z )'",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "bbox",
+                        "in": "query",
+                        "description": "A bounding box (expressed in EPSG:4326) which includes the search results. Comma separated list of values: west,south,east,north",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "instrumentId",
+                        "in": "query",
+                        "description": "Instrument identifier",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "instrumentDesc",
+                        "in": "query",
+                        "description": "Instrument description",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "platformId",
+                        "in": "query",
+                        "description": "Platform identifier",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "platformDesc",
+                        "in": "query",
+                        "description": "Platform description",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "origOrgId",
+                        "in": "query",
+                        "description": "Originator organisation identifier",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "attributeId",
+                        "in": "query",
+                        "description": "Attribute identifier",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "attributeDesc",
+                        "in": "query",
+                        "description": "Attribute description",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "origOrgDesc",
+                        "in": "query",
+                        "description": "Originator organisation description",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "rosetta",
+                        "in": "query",
+                        "description": "Rosetta",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "outputFormat",
+                        "in": "query",
+                        "description": "The output format",
+                        "required": true,
+                        "type": "string",
+                        "enum": [
+                            "application/json",
+                            "application/gs-schema+xml"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {"description": "Successful operation"}
+                }
+            }
+        },
+        "/opensearch/description": {
+            "get": {
+                "tags": ["opensearch"],
+                "summary": "Opensearch description",
+                "description": "Retrieves the OpenSearch description document",
+                "produces": ["text/xml;charset=UTF-8"],
+                "responses": {
+                    "200": {"description": "Successful operation"}
+                }
+            }
+        },
+        "/csw": {
+            "post": {
+                "tags": ["csw"],
+                "summary": "CSW POST interface",
+                "description": "Supported operations: GetRecords, GetCapabilities, DescribeRecord, GetRecordById",
+                "consumes": ["application/xml"],
+                "produces": ["application/xml"],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "required": true,
+                        "name": "body",
+                        "schema": {"type": "object"}
+                    }
+                ],
+                "responses": {
+                    "200": {"description": "Successful operation"}
+                }
+            },
+            "get": {
+                "tags": ["csw"],
+                "summary": "CSW GET interface",
+                "description": "Supported operations: GetCapabilities, DescribeRecord, GetRecordById",
+                "produces": ["application/xml"],
+                "parameters": [
+                    {
+                        "name": "service",
+                        "in": "query",
+                        "default": "csw",
+                        "required": true,
+                        "enum": ["csw"],
+                        "type": "string"
+                    },
+                    {
+                        "name": "request",
+                        "in": "query",
+                        "required": true,
+                        "type": "string",
+                        "enum": [
+                            "GetCapabilities",
+                            "DescribeRecord",
+                            "GetRecordById"
+                        ]
+                    },
+                    {
+                        "name": "version",
+                        "in": "query",
+                        "required": true,
+                        "type": "string",
+                        "enum": ["2.0.2"]
+                    },
+                    {
+                        "name": "Section",
+                        "in": "query",
+                        "required": false,
+                        "default": "",
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "collectionFormat": "csv"
+                    },
+                    {
+                        "name": "outputFormat",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "outputSchema",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "schemaLanguage",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "TypeName",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "ElementSetName",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {"description": "Successful operation"}
+                }
+            }
+        },
+        
+        "/hiscentral.asmx/GetWaterOneFlowServiceInfo": {
+			"get": {
+				"tags": [
+					"HIS Central"
+				],
+				"summary": "HIS Central Get Water One Flow Service Info",
+				"description": "Provides WaterOneFlow data services information.",
+				"operationId": "hisGetWaterOneFlowServiceInfo",
+				"produces": [
+					"application/xml"
+				],
+				"responses": {
+					"200": {
+						"description": "GetWaterOneFlowServiceInfo Response"
+					}
+				}
+			}
+		},
+		"/hiscentral.asmx/GetSeriesCatalogForBox2": {
+			"get": {
+				"tags": [
+					"HIS Central"
+				],
+				"summary": "HIS Central GetSeriesCatalogForBox2",
+				"description": "Gets available series according to the specified constraints.",
+				"operationId": "hisGetSeriesCatalogForBox2",
+				"produces": [
+					"application/xml"
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "xmin",
+						"type": "string",
+						"description": "BBOX west value.",
+						"required": false,
+						"example": "11"
+					},
+					{
+						"in": "query",
+						"name": "xmax",
+						"type": "string",
+						"description": "BBOX east value",
+						"required": false,
+						"example": "13"
+					},
+					{
+						"in": "query",
+						"name": "ymin",
+						"type": "string",
+						"description": "BBOX south value.",
+						"required": false,
+						"example": "41"
+					},
+					{
+						"in": "query",
+						"name": "ymax",
+						"type": "string",
+						"description": "BBOX north value.",
+						"required": false,
+						"example": "42"
+					},
+					{
+						"in": "query",
+						"name": "conceptKeyword",
+						"type": "string",
+						"description": "Search keyword.",
+						"required": false
+					},
+					{
+						"in": "query",
+						"name": "networkIDs",
+						"type": "string",
+						"description": "Network identifiers",
+						"required": false,
+						"example": "1178812113"
+					},
+					{
+						"in": "query",
+						"name": "beginDate",
+						"type": "string",
+						"description": "Begin date",
+						"required": false,
+						"example": "11%2F24%2F1900"
+					},
+					{
+						"in": "query",
+						"name": "endDate",
+						"type": "string",
+						"description": "End date",
+						"required": false,
+						"example": "11%2F24%2F2016"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "GetWaterOneFlowServiceInfo Response"
+					}
+				}
+			}
+		},
+        
+        "/rest/discovery/query": {
+            "post": {
+                "tags": ["rest - Discovery"],
+                "summary": "REST Discovery Query POST interface",
+                "description": "",
+                "consumes": [
+                    "application/xml",
+                    "application/json"
+                ],
+                "produces": [
+                    "application/xml",
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "required": true,
+                        "name": "body",
+                        "schema": {"type": "object"}
+                    },
+                    {
+                        "name": "requestFormat",
+                        "in": "query",
+                        "required": false,
+                        "default": "xml",
+                        "type": "string",
+                        "enum": [
+                            "xml",
+                            "json"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {"description": "Successful operation"}
+                }
+            },
+            "get": {
+                "tags": ["rest - Discovery"],
+                "summary": "REST Discovery Query GET interface",
+                "description": "",
+                "consumes": [
+                    "application/xml",
+                    "application/json"
+                ],
+                "produces": [
+                    "application/xml",
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "resourceSubset",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "default": "FULL",
+                        "enum": [
+                            "FULL",
+                            "NO_HARMONIZED",
+                            "SOURCE_CORE",
+                            "NO_CORE",
+                            "NO_AUGMENTED",
+                            "NO_EXTENDED",
+                            "NO_SOURCE",
+                            "SOURCE",
+                            "HARMONIZED",
+                            "CORE_AUGMENTED",
+                            "CORE_EXTENDED",
+                            "AUGMENTED_EXTENDED",
+                            "CORE",
+                            "AUGMENTED",
+                            "EXTENDED"
+                        ]
+                    },
+                    {
+                        "name": "includeOriginal",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "default": "true",
+                        "enum": [
+                            "false",
+                            "true"
+                        ]
+                    },
+                    {
+                        "name": "indexesPolicy",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "default": "NONE",
+                        "enum": [
+                            "ALL",
+                            "NONE",
+                            "PROPERTIES"
+                        ]
+                    },
+                    {
+                        "name": "indexName",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "responseFormat",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "default": "xml",
+                        "enum": [
+                            "xml",
+                            "json"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {"description": "Successful operation"}
+                }
+            }
+        },
+        "/rest/semantic/browsing/expand": {
+            "get": {
+                "tags": ["rest - Semantic"],
+                "summary": "REST Semantic browsing expansion interface",
+                "description": "",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "start",
+                        "in": "query",
+                        "required": false,
+                        "type": "int"
+                    },
+                    {
+                        "name": "count",
+                        "in": "query",
+                        "required": false,
+                        "type": "int"
+                    },
+                    {
+                        "name": "searchTerms",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "schemeNameSpace",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "enum": [
+                            "http://eu.essi_lab.core/2018/06/d2k#",
+                            "http://www.w3.org/2004/02/skos/core#"
+                        ]
+                    },
+                    {
+                        "name": "ontologyId",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "subjectId",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {"description": "Successful operation"}
+                }
+            }
+        },
+        "/rest/semantic/browsing/collapse": {
+            "get": {
+                "tags": ["rest - Semantic"],
+                "summary": "REST Semantic browsing collapsing interface",
+                "description": "",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "start",
+                        "in": "query",
+                        "required": false,
+                        "type": "int"
+                    },
+                    {
+                        "name": "count",
+                        "in": "query",
+                        "required": false,
+                        "type": "int"
+                    },
+                    {
+                        "name": "searchTerms",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "schemeNameSpace",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "enum": [
+                            "http://eu.essi_lab.core/2018/06/d2k#",
+                            "http://www.w3.org/2004/02/skos/core#"
+                        ]
+                    },
+                    {
+                        "name": "ontologyId",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "subjectId",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {"description": "Successful operation"}
+                }
+            }
+        },
+        "/rest/semantic/search": {
+            "get": {
+                "tags": ["rest - Semantic"],
+                "summary": "REST Semantic search interface",
+                "description": "",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "start",
+                        "in": "query",
+                        "required": false,
+                        "type": "int"
+                    },
+                    {
+                        "name": "count",
+                        "in": "query",
+                        "required": false,
+                        "type": "int"
+                    },
+                    {
+                        "name": "searchTerms",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "schemeNameSpace",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "enum": [
+                            "http://eu.essi_lab.core/2018/06/d2k#",
+                            "http://www.w3.org/2004/02/skos/core#"
+                        ]
+                    },
+                    {
+                        "name": "ontologyId",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {"description": "Successful operation"}
+                }
+            }
+        },
+        "/rest/access/query": {
+            "post": {
+                "tags": ["rest - Access"],
+                "summary": "REST Access Query POST interface",
+                "description": "",
+                "consumes": [
+                    "application/xml",
+                    "application/json"
+                ],
+                "produces": [
+                    "application/xml",
+                    "application/json",
+                    "application/octet-stream"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "requestFormat",
+                        "in": "query",
+                        "required": false,
+                        "default": "xml",
+                        "type": "string",
+                        "enum": [
+                            "xml",
+                            "json"
+                        ]
+                    },
+                    {
+                        "in": "body",
+                        "required": true,
+                        "name": "body",
+                        "schema": {"type": "object"}
+                    }
+                ],
+                "responses": {
+                    "200": {"description": "Successful operation"}
+                }
+            },
+            "get": {
+                "tags": ["rest - Access"],
+                "summary": "REST Access Query GET interface",
+                "description": "",
+                "produces": ["application/xml"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {"description": "Successful operation"}
+                }
+            }
+        },
+        "/rest/discovery/info": {
+            "get": {
+                "tags": ["rest - Information"],
+                "summary": "REST Discovery Informative interface",
+                "description": "",
+                "produces": [
+                    "application/xml",
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "responseFormat",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "default": "xml",
+                        "enum": [
+                            "xml",
+                            "json"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {"description": "Successful operation"}
+                }
+            }
+        },
+        "/rest/access/info": {
+            "get": {
+                "tags": ["rest - Information"],
+                "summary": "REST Access Informative interface",
+                "description": "",
+                "produces": [
+                    "application/xml",
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "maxReports",
+                        "in": "query",
+                        "required": false,
+                        "type": "int"
+                    },
+                    {
+                        "name": "startIndex",
+                        "in": "query",
+                        "required": false,
+                        "type": "int"
+                    },
+                    {
+                        "name": "reportSubset",
+                        "in": "query",
+                        "required": false,
+                        "default": "complete",
+                        "type": "string",
+                        "enum": [
+                            "complete",
+                            "full",
+                            "preview",
+                            "identifier"
+                        ]
+                    },
+                    {
+                        "name": "responseFormat",
+                        "in": "query",
+                        "required": false,
+                        "default": "xml",
+                        "type": "string",
+                        "enum": [
+                            "xml",
+                            "json"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {"description": "Successful operation"}
+                }
+            }
+        },
+        "/rest/sources/info": {
+            "get": {
+                "tags": ["rest - Information"],
+                "summary": "REST Sources Informative interface",
+                "description": "",
+                "produces": [
+                    "application/xml",
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "responseFormat",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "default": "xml",
+                        "enum": [
+                            "xml",
+                            "json"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {"description": "Successful operation"}
+                }
+            }
+        },
+        "/rest/service/info": {
+            "get": {
+                "tags": ["rest - Information"],
+                "summary": "REST Services Informative interface",
+                "description": "",
+                "produces": [
+                    "application/xml",
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "responseFormat",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "default": "xml",
+                        "enum": [
+                            "xml",
+                            "json"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {"description": "Successful operation"}
+                }
+            }
+        },
+        "/rest/stats": {
+            "get": {
+                "tags": ["rest - Statistics"],
+                "summary": "REST Statistics interface",
+                "description": "",
+                "produces": ["application/xml"],
+                "parameters": [
+                    {
+                        "name": "start",
+                        "in": "query",
+                        "required": false,
+                        "type": "int",
+                        "default": 1
+                    },
+                    {
+                        "name": "maxResults",
+                        "in": "query",
+                        "required": false,
+                        "type": "int",
+                        "default": 100
+                    },
+                    {
+                        "name": "groupByTarget",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "groupByPeriodTarget",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "groupByPeriodPeriod",
+                        "in": "query",
+                        "required": false,
+                        "type": "long",
+                        "default": 31556952000
+                    },
+                    {
+                        "name": "groupByPeriodFraction",
+                        "in": "query",
+                        "required": false,
+                        "type": "int",
+                        "default": 12
+                    },
+                    {
+                        "name": "maxTargets",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "minTargets",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "sumTargets",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "avgTargets",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "countDistinctTargets",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "frequencyTargets",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "maxFrequencyItems",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "bboxUnion",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "enum": [
+                            "true",
+                            "false"
+                        ]
+                    },
+                    {
+                        "name": "tempExtentUnion",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "enum": [
+                            "true",
+                            "false"
+                        ]
+                    },
+                    {
+                        "name": "queryBboxUnion",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "enum": [
+                            "true",
+                            "false"
+                        ]
+                    },
+                    {
+                        "name": "queryTempExtentUnion",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "enum": [
+                            "true",
+                            "false"
+                        ]
+                    },
+                    {
+                        "name": "constraints",
+                        "in": "query",
+                        "required": false,
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "collectionFormat": "pipes"
+                    }
+                ],
+                "responses": {
+                    "200": {"description": "Successful operation"}
+                }
+            }
+        },
+        "/rest/stats/gp/discovery": {
+            "get": {
+                "tags": ["rest - Statistics"],
+                "summary": "REST Discovery statistics interface for GEOSS Portal",
+                "description": "",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "statistic",
+                        "description": "The required statistic. The following statistics 'mostPopularDiscoveryServices', 'mostPopularResources', 'mostPopularCatalogs', 'mostPopularOrg' are applied to all the catalogs, so they are available only when the 'catalog' parameter is left blank. The other statistics  are always available, both when the 'catalog' parameter is set and when it's left blank",
+                        "in": "query",
+                        "required": true,
+                        "type": "string",
+                        "default": "mostPopularCatalogs",
+                        "enum": [
+                            "mostPopularResources",
+                            "mostPopularCatalogs",
+                            "mostPopularAreas",
+                            "mostPopularOrg",
+                            "numberOfSearches",
+                            "mostPopularKeywords",
+                            "mostPopularDiscoveryServices"
+                        ]
+                    },
+                    
+                    {
+                        "name": "origin",
+                        "description": "Comma separated list of server names which executed the queries generating the interested statistics",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "default": "https://www.geoportal.org"                   
+                    },
+                    
+                    {
+                        "name": "period",
+                        "description": "Predefined analyzed period. If the period is set, the parameters 'periodRangeStart' and 'periodRangeEnd' must be left blank",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "default": "lastYear",
+                        "enum": [
+                            "lastWeek",
+                            "lastMonth",
+                            "lastYear"
+                        ]
+                    },
+                    {
+                        "name": "periodRangeStart",
+                        "description": "Start of analyzed period. If the period is set, the parameter 'period' must be left blank",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "periodRangeEnd",
+                        "description": "End of analyzed period. This optional parameter can be set only if also the 'periodRangeStart' is set ",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "interval",
+                        "description": "Interval of the statistics results. Useful only if the selected statistic is 'numberOfSearches', for all other statistics this parameter can be left blank (otherwise is ignored)",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "default": "day",
+                        "enum": [
+                            "minute",
+                            "hour",
+                            "day",
+                            "week",
+                            "month"
+                        ]
+                    },
+                    {
+                        "name": "intervalSize",
+                        "description": "Size of the interval expressed by the the 'interval' parameter. Useful only if the selected statistic is 'numberOfSearches', for all other statistics this parameter can be left blank (otherwise is ignored)",
+                        "in": "query",
+                        "required": false,
+                        "type": "int",
+                        "default": 1
+                    },
+                    {
+                        "name": "catalog",
+                        "description": "A catalog target of a selected statistic. May be omitted to target all catalogs",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "maxResults",
+                        "description": "Maximum number of presented results, ignored for the 'numberOfSearches' statistic",
+                        "in": "query",
+                        "required": false,
+                        "type": "int",
+                        "default": 10
+                    }
+                ],
+                "responses": {
+                    "200": {"description": "Successful operation"}
+                }
+            }
+        },
+         "/rest/stats/gp/access": {
+            "get": {
+                "tags": ["rest - Statistics"],
+                "summary": "REST Access statistics interface for GEOSS Portal",
+                "description": "",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "statistic",
+                        "description": "The required statistic",
+                        "in": "query",
+                        "required": true,
+                        "type": "string",
+                        "default": "mostPopularDataTypes",
+                        "enum": [
+                            "mostPopularDataTypes",
+                            "mostPopularDataFormat",
+                            "mostPopularDataCRS",
+                            "mostPopularAccessSources",
+                            "numberOfAccessRequests",
+                            "mostPopularAccessView",
+                            "mostPopularAccessServices"
+                        ]
+                    },
+                    
+                    {
+                        "name": "origin",
+                        "description": "Comma separated list of server names which executed the queries generating the interested statistics",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "default": "https://www.geoportal.org"                   
+                    },
+                    
+                    {
+                        "name": "period",
+                        "description": "Predefined analyzed period. If the period is set, the parameters 'periodRangeStart' and 'periodRangeEnd' must be left blank",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "default": "lastYear",
+                        "enum": [
+                            "lastWeek",
+                            "lastMonth",
+                            "lastYear"
+                        ]
+                    },
+                    {
+                        "name": "periodRangeStart",
+                        "description": "Start of analyzed period. If the period is set, the parameter 'period' must be left blank",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "periodRangeEnd",
+                        "description": "End of analyzed period. This optional parameter can be set only if also the 'periodRangeStart' is set",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "interval",
+                        "description": "Interval of the statistics results. Useful only if the selected statistic is 'numberOfAccessRequests', for all other statistics this parameter can be left blank (otherwise is ignored)",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "default": "day",
+                        "enum": [
+                            "minute",
+                            "hour",
+                            "day",
+                            "week",
+                            "month"
+                        ]
+                    },
+                    {
+                        "name": "intervalSize",
+                        "description": "Size of the interval expressed by the the 'interval' parameter. Useful only if the selected statistic is 'numberOfAccessRequests', for all other statistics this parameter can be left blank (otherwise is ignored)",
+                        "in": "query",
+                        "required": false,
+                        "type": "int",
+                        "default": 1
+                    },
+                    {
+                        "name": "maxResults",
+                        "description": "Maximum number of presented results, ignored for the 'numberOfAccessRequests' statistic",
+                        "in": "query",
+                        "required": false,
+                        "type": "int",
+                        "default": 10
+                    }
+                ],
+                "responses": {
+                    "200": {"description": "Successful operation"}
+                }
+            }
+        }
+    },
+  
+    "externalDocs": {
+        "description": "Find out more about Swagger",
+        "url": "http://swagger.io"
+    }
+}

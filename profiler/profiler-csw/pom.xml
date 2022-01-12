@@ -1,0 +1,34 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>eu.essi_lab</groupId>
+		<artifactId>profiler</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+
+	<name>ESSI-Lab Profiler CSW</name>
+	<artifactId>profiler-csw</artifactId>
+
+	<dependencies>
+		<!-- jaxb-classes -->
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>jaxb-classes-csw-2.0.2</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>gs-lib-xml</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>

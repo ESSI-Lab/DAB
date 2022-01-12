@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<csw:Capabilities version="2.0.2"
+
+	xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/csw.xsd
+    http://www.opengis.net/pubsub/1.0 http://schemas.opengis.net/pubsub/1.0/pubsubAll.xsd http://www.opengis.net/ows/1.1 http://schemas.opengis.net/ows/1.1.0/owsServiceIdentification.xsd"
+	xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmi="http://www.isotc211.org/2005/gmi"
+	xmlns:ows="http://www.opengis.net/ows" xmlns:ogc="http://www.opengis.net/ogc"
+	xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:essi="http://www.essi-lab.eu"
+	xmlns:ows1_1="http://www.opengis.net/ows/1.1" xmlns:xlink="http://www.w3.org/1999/xlink"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<!-- GetCapabilities operation. See pag. 131 OGC 07-006r1 -->
+	<ows:ServiceIdentification>
+		<ows:Title>ESSI-Lab DAB CSW 2.0.2 (ISO AP)</ows:Title>
+		<ows:Abstract>A catalogue service that conforms to the HTTP protocol binding of the OpenGIS
+            Catalogue Service specification version 2.0.2. ISO application profile (see OGC 07-045
+            document)</ows:Abstract>
+		<ows:Keywords>
+			<ows:Keyword>CSW</ows:Keyword>
+			<ows:Keyword>ISO19119</ows:Keyword>
+			<ows:Keyword>ISO19115</ows:Keyword>
+			<ows:Keyword>Catalogue Service</ows:Keyword>
+			<ows:Keyword>metadata</ows:Keyword>
+			<ows:Keyword>ESSI</ows:Keyword>
+			<ows:Keyword>IIA</ows:Keyword>
+			<ows:Keyword>CNR</ows:Keyword>
+		</ows:Keywords>
+		<ows:ServiceType>CSW</ows:ServiceType>
+		<ows:ServiceTypeVersion>2.0.2</ows:ServiceTypeVersion>
+		<ows:Fees>NONE</ows:Fees>
+		<ows:AccessConstraints>NONE</ows:AccessConstraints>
+	</ows:ServiceIdentification>
+	
+	<ows:ServiceProvider>
+		<ows:ProviderName>ESSI Lab</ows:ProviderName>
+		<ows:ProviderSite xlink:href="http://essi-lab.eu" />
+		<ows:ServiceContact>
+			<ows:IndividualName>The DAB team</ows:IndividualName>
+			<ows:PositionName>provider</ows:PositionName>
+			<ows:ContactInfo>
+				<ows:Address>
+					<ows:ElectronicMailAddress>uosfirenze@iia.cnr.it</ows:ElectronicMailAddress>
+				</ows:Address>
+			</ows:ContactInfo>
+		</ows:ServiceContact>
+	</ows:ServiceProvider>
+	
+	<ows:OperationsMetadata>
+
+		<ows:Operation name="GetCapabilities">
+			<ows:DCP>
+				<ows:HTTP>
+					<ows:Get xlink:href="BASE_URL" />
+					<ows:Post xlink:href="BASE_URL">
+						<ows:Constraint name="PostEncoding">
+							<ows:Value>XML</ows:Value>
+						</ows:Constraint>
+					</ows:Post>
+				</ows:HTTP>
+			</ows:DCP>
+			<ows:Parameter name="sections">
+				<ows:Value>ServiceIdentification</ows:Value>
+				<ows:Value>ServiceProvider</ows:Value>
+				<ows:Value>OperationsMetadata</ows:Value>
+				<ows:Value>Filter_Capabilities</ows:Value>
+			</ows:Parameter>
+		</ows:Operation>
+
+		<ows:Operation name="DescribeRecord">
+			<ows:DCP>
+				<ows:HTTP>
+					<ows:Get xlink:href="BASE_URL" />
+					<ows:Post xlink:href="BASE_URL">
+						<ows:Constraint name="PostEncoding">
+							<ows:Value>XML</ows:Value>
+						</ows:Constraint>
+					</ows:Post>
+				</ows:HTTP>
+			</ows:DCP>
+			<ows:Parameter name="TypeName">
+				<!-- <ows:Value>csw:Record</ows:Value>
+				<ows:Value>gmd:MD_Metadata</ows:Value>
+				<ows:Value>gmi:MI_Metadata</ows:Value> -->
+			</ows:Parameter>			
+			<ows:Parameter name="schemaLanguage">
+				<ows:Value>XMLSCHEMA</ows:Value>
+				<ows:Value>http://www.w3.org/TR/xmlschema-1/</ows:Value>
+				<ows:Value>http://www.w3.org/XML/Schema</ows:Value>
+				<ows:Value>http://www.w3.org/2001/XMLSchema</ows:Value>
+			</ows:Parameter>
+			<ows:Parameter name="outputFormat">
+				<ows:Value>application/xml</ows:Value>
+				<ows:Value>text/xml</ows:Value>
+			</ows:Parameter>
+		</ows:Operation>
+
+		<ows:Operation name="GetRecords">
+			<ows:DCP>
+				<ows:HTTP>
+					<ows:Post xlink:href="BASE_URL">
+						<ows:Constraint name="PostEncoding">
+							<ows:Value>XML</ows:Value>
+						</ows:Constraint>
+					</ows:Post>
+				</ows:HTTP>
+			</ows:DCP>
+			<ows:Parameter name="TypeNames">
+				<!-- <ows:Value>csw:Record</ows:Value>
+				<ows:Value>gmd:MD_Metadata</ows:Value>
+				<ows:Value>gmi:MI_Metadata</ows:Value> -->
+			</ows:Parameter>
+			<ows:Parameter name="outputFormat">
+				<ows:Value>application/xml</ows:Value>
+			</ows:Parameter>
+			<ows:Parameter name="OutputSchema">
+				<!-- <ows:Value>http://www.opengis.net/cat/csw/2.0.2</ows:Value>
+				<ows:Value>http://www.isotc211.org/2005/gmd</ows:Value>
+				<ows:Value>http://www.isotc211.org/2005/gmi</ows:Value> -->
+			</ows:Parameter>
+			<ows:Parameter name="resultType">
+				<ows:Value>hits</ows:Value>
+				<ows:Value>results</ows:Value>
+				<ows:Value>validate</ows:Value>
+			</ows:Parameter>
+			<ows:Parameter name="ElementSetName">
+				<ows:Value>brief</ows:Value>
+				<ows:Value>summary</ows:Value>
+				<ows:Value>full</ows:Value>
+			</ows:Parameter>
+			<ows:Parameter name="CONSTRAINTLANGUAGE">
+				<ows:Value>Filter</ows:Value>
+			</ows:Parameter>
+			<ows:Constraint name="SupportedISOQueryables">
+				<ows:Value>RevisionDate</ows:Value>
+				<ows:Value>AlternateTitle</ows:Value>
+				<ows:Value>CreationDate</ows:Value>
+				<ows:Value>PublicationDate</ows:Value>
+				<ows:Value>OrganisationName</ows:Value>
+				<ows:Value>HasSecurityConstraints</ows:Value>
+				<ows:Value>Language</ows:Value>
+				<ows:Value>ResourceIdentifier</ows:Value>
+				<ows:Value>ParentIdentifier</ows:Value>
+				<ows:Value>KeywordType</ows:Value>
+				<ows:Value>TopicCategory</ows:Value>
+				<ows:Value>ResourceLanguage</ows:Value>
+				<ows:Value>GeographicDescriptionCode</ows:Value>
+				<ows:Value>Denominator</ows:Value>
+				<ows:Value>DistanceValue</ows:Value>
+				<ows:Value>DistanceUOM</ows:Value>
+				<ows:Value>TempExtent_begin</ows:Value>
+				<ows:Value>TempExtent_end</ows:Value>
+				<ows:Value>Type</ows:Value>
+				<ows:Value>ServiceType</ows:Value>
+				<ows:Value>ServiceTypeVersion</ows:Value>
+				<ows:Value>Operation</ows:Value>
+				<ows:Value>CouplingType</ows:Value>
+				<ows:Value>OperatesOn</ows:Value>
+				<ows:Value>OperatesOnIdentifier</ows:Value>
+				<ows:Value>OperatesOnName</ows:Value>
+			</ows:Constraint>
+			<!-- <ows:Constraint name="AdditionalQueryables"> </ows:Constraint> -->
+		</ows:Operation>
+
+		<ows:Operation name="GetRecordById">
+			<ows:DCP>
+				<ows:HTTP>
+					<ows:Get xlink:href="BASE_URL" />
+					<ows:Post xlink:href="BASE_URL">
+						<ows:Constraint name="PostEncoding">
+							<ows:Value>XML</ows:Value>
+						</ows:Constraint>
+					</ows:Post>
+				</ows:HTTP>
+			</ows:DCP>
+			<ows:Parameter name="outputSchema">
+				<!-- <ows:Value>http://www.opengis.net/cat/csw/2.0.2</ows:Value>
+				<ows:Value>http://www.isotc211.org/2005/gmd</ows:Value>
+				<ows:Value>http://www.isotc211.org/2005/gmi</ows:Value> -->
+			</ows:Parameter>
+			<ows:Parameter name="ElementSetName">
+				<ows:Value>brief</ows:Value>
+				<ows:Value>summary</ows:Value>
+				<ows:Value>full</ows:Value>
+			</ows:Parameter>
+			<ows:Parameter name="outputFormat">
+				<ows:Value>application/xml</ows:Value>
+			</ows:Parameter>
+		</ows:Operation>
+		<ows:Parameter name="service">
+			<ows:Value>CSW</ows:Value>
+			<ows:Value>http://www.opengis.net/cat/csw/2.0.2</ows:Value>
+		</ows:Parameter>
+		<ows:Parameter name="version">
+			<ows:Value>2.0.2</ows:Value>
+		</ows:Parameter>
+
+		<ows:Constraint name="IsoProfiles">
+			<!-- <ows:Value>http://www.isotc211.org/2005/gmd</ows:Value>
+			<ows:Value>http://www.isotc211.org/2005/gmi</ows:Value> -->
+		</ows:Constraint>
+
+	</ows:OperationsMetadata>
+
+	<ogc:Filter_Capabilities xmlns:gml="http://www.opengis.net/gml">
+		<ogc:Spatial_Capabilities>
+			<ogc:GeometryOperands>
+				<ogc:GeometryOperand>gml:Envelope</ogc:GeometryOperand>
+			</ogc:GeometryOperands>
+			<ogc:SpatialOperators>
+				<ogc:SpatialOperator name="BBOX" />
+				<ogc:SpatialOperator name="Disjoint" />
+				<ogc:SpatialOperator name="Intersects" />
+				<ogc:SpatialOperator name="Contains" />
+			</ogc:SpatialOperators>
+		</ogc:Spatial_Capabilities>
+		<ogc:Scalar_Capabilities>
+			<ogc:LogicalOperators />
+			<ogc:ComparisonOperators>
+				<ogc:ComparisonOperator>LessThan</ogc:ComparisonOperator>
+				<ogc:ComparisonOperator>GreaterThan</ogc:ComparisonOperator>
+				<ogc:ComparisonOperator>LessThanEqualTo</ogc:ComparisonOperator>
+				<ogc:ComparisonOperator>GreaterThanEqualTo</ogc:ComparisonOperator>
+				<ogc:ComparisonOperator>EqualTo</ogc:ComparisonOperator>
+				<ogc:ComparisonOperator>NotEqualTo</ogc:ComparisonOperator>
+				<ogc:ComparisonOperator>Like</ogc:ComparisonOperator>
+				<ogc:ComparisonOperator>NullCheck</ogc:ComparisonOperator>
+			</ogc:ComparisonOperators>
+			<!-- <ogc:ArithmeticOperators> <ogc:SimpleArithmetic /> <ogc:Functions> 
+				<ogc:FunctionNames> <ogc:FunctionName nArgs="1">isChildOrSelf</ogc:FunctionName> 
+				</ogc:FunctionNames> </ogc:Functions> </ogc:ArithmeticOperators> -->
+		</ogc:Scalar_Capabilities>
+		<ogc:Id_Capabilities>
+			<ogc:EID />
+			<ogc:FID />
+		</ogc:Id_Capabilities>
+	</ogc:Filter_Capabilities>
+</csw:Capabilities>

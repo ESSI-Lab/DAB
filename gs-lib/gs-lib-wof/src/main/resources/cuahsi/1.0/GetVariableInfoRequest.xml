@@ -1,0 +1,11 @@
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:ws="http://www.cuahsi.org/his/1.0/ws/">
+   <soap:Header/>
+   <soap:Body>
+      <ws:GetVariableInfoObject>
+         <!--Optional:-->
+         <ws:variable></ws:variable>
+         <!--Optional:-->
+         <ws:authToken></ws:authToken>
+      </ws:GetVariableInfoObject>
+   </soap:Body>
+</soap:Envelope>

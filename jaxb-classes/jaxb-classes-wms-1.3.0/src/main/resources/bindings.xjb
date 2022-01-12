@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jaxb:bindings version="1.0" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+     xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+    xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" xmlns:ows="http://www.opengis.net/ows"
+    jxb:extensionBindingPrefixes="xjc">
+    <jaxb:bindings schemaLocation="schemas/capabilities_1_3_0.xsd">
+        <jaxb:schemaBindings>
+            <jaxb:package name="eu.essi_lab.jaxb.wms._1_3_0"/>
+        </jaxb:schemaBindings>
+    </jaxb:bindings>   
+    <jaxb:bindings schemaLocation="schemas/xlink.xsd">
+        <jaxb:schemaBindings>
+            <jaxb:package name="eu.essi_lab.jaxb.wms._1_3_0.xlink"/>
+        </jaxb:schemaBindings>
+        <jaxb:bindings node="//xs:group[@name='locatorModel']/xs:sequence/xs:element[@ref='xlink:title']">
+			<jaxb:property name="Title1" />
+		</jaxb:bindings>
+		<jaxb:bindings node="//xs:group[@name='arcModel']/xs:sequence/xs:element[@ref='xlink:title']">
+			<jaxb:property name="Title2" />
+		</jaxb:bindings>
+		<jaxb:bindings node="//xs:attributeGroup[@name='locatorAttrs']/xs:attribute[@ref='xlink:title']">
+			<jaxb:property name="Title3" />
+		</jaxb:bindings>
+    </jaxb:bindings>
+
+        
+    
+    <jaxb:globalBindings fixedAttributeAsConstantProperty="true">
+        <xjc:simple/>
+    </jaxb:globalBindings>
+</jaxb:bindings>

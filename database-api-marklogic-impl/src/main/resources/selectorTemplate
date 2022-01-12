@@ -1,0 +1,80 @@
+let $name := fn:local-name($x/*[1])
+
+let $selectedIndexes := SELECTED_INDEXES
+
+let $selectedExtendedElements := SELECTED_EXTENDED_ELEMENTS
+
+return element{ fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', concat('gs:',$name)) }{
+
+  if ($name = 'Dataset') then 
+    attribute{'gs:resourceType'}{'dataset'} else 
+  
+  if ($name = 'DatasetCollection') then 
+    attribute{'gs:resourceType'}{'datasetCollection'} else 
+    
+    attribute{'gs:resourceType'}{'dataset'},
+
+  attribute{'xmlns:gs'}{"http://flora.eu/gi-suite/1.0/dataModel/schema"},
+  attribute{'xmlns:gco'}{"http://www.isotc211.org/2005/gco"},
+  attribute{'xmlns:gmd'}{"http://www.isotc211.org/2005/gmd"},
+  attribute{'xmlns:gmi'}{"http://www.isotc211.org/2005/gmi"},
+  attribute{'xmlns:gml'}{"http://www.opengis.net/gml"},
+  attribute{'xmlns:gmx'}{"http://www.isotc211.org/2005/gmx"},
+  attribute{'xmlns:gts'}{"http://www.isotc211.org/2005/gts"},
+  attribute{'xmlns:srv'}{"http://www.isotc211.org/2005/srv"},
+  attribute{'xmlns:xlink'}{"http://www.w3.org/1999/xlink"},
+  attribute{'xmlns:xs'}{"http://www.w3.org/2001/XMLSchema"},
+  attribute{'xmlns:xsi'}{"http://www.w3.org/2001/XMLSchema-instance"},
+  
+  SOURCE
+
+  element{ fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema','gs:harmonizedMetadata') }{
+     CORE
+     AUGMENTED
+     
+		if($selectedExtendedElements = 'NONE') then 
+       
+            '' else
+  
+  
+       element{fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', 'gs:extendedMetadata') }{
+  
+       if($selectedExtendedElements = 'ALL') then 
+  
+            $x//gs:extendedMetadata/* 
+            
+          
+            else
+
+		element{fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', 'gs:extension') }{
+       		for $el in $x//gs:extendedMetadata/gs:extension/* where contains($selectedExtendedElements,local-name($el))
+       
+       			return $el
+       		}
+       
+       }
+
+
+  },
+
+  element{fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', 'gs:originalMetadata') }{  
+    
+       ORIGINAL
+  },
+  
+  element{fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', 'gs:indexesMetadata') }{  
+  
+       if($selectedIndexes = 'NONE') then 
+       
+            '' else
+  
+       if($selectedIndexes = 'ALL') then 
+       
+            $x//gs:indexesMetadata/* else
+  
+       for $index in $x//gs:indexesMetadata/* where contains($selectedIndexes,local-name($index)) 
+       
+       return $index
+  }
+}
+,xdmp:query-trace(false());

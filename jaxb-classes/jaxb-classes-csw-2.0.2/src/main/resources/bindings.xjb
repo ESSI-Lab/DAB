@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jaxb:bindings version="1.0" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+     xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+    xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" xmlns:ows="http://www.opengis.net/ows"
+    jxb:extensionBindingPrefixes="xjc">
+    <jaxb:bindings schemaLocation="csw/2.0.2/CSW-publication.xsd">
+        <jaxb:schemaBindings>
+            <jaxb:package name="eu.essi_lab.jaxb.csw._2_0_2"/>
+        </jaxb:schemaBindings>
+    </jaxb:bindings>   
+    <!--jxb:bindings schemaLocation="csw/2.0.2/record.xsd" node="/xs:schema">
+        <jxb:bindings node="//xs:complexType[@name='RecordType']//xs:element[@ref='ows:BoundingBox']">
+        <xjc:dom/>    
+        </jxb:bindings>
+        </jxb:bindings-->
+    <!--jaxb:bindings schemaLocation="ows/1.0.0/owsAll.xsd">
+        <jaxb:schemaBindings>
+            <jaxb:package name="eu.essi_lab.jaxb.net.opengis.ows.v_1_0_0"/> 
+        </jaxb:schemaBindings>
+    </jaxb:bindings-->
+    
+    <!--jxb:bindings schemaLocation="ows/1.0.0/owsCommon.xsd" node="/xs:schema">
+        <jxb:bindings node="//xs:complexType[@name='BoundingBoxType']">
+            <xjc:dom/>  
+        </jxb:bindings>
+    </jxb:bindings--> 
+    <!--jaxb:bindings schemaLocation="csw/2.0.2/rec-dcmes.xsd">
+        <jaxb:schemaBindings>
+            <jaxb:package name="it.cnr.imaa.essi.ogc.csw._2_0_2.org.purl.dc.elements._1"/>
+        </jaxb:schemaBindings>
+    </jaxb:bindings>
+    <jaxb:bindings schemaLocation="csw/2.0.2/rec-dcterms.xsd">
+        <jaxb:schemaBindings>
+            <jaxb:package name="it.cnr.imaa.essi.ogc.csw._2_0_2.org.purl.dc.terms"/>            
+        </jaxb:schemaBindings>
+    </jaxb:bindings-->
+    <jaxb:globalBindings fixedAttributeAsConstantProperty="true">
+        <xjc:simple/>
+    </jaxb:globalBindings>
+</jaxb:bindings>

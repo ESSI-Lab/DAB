@@ -1,0 +1,35 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>eu.essi_lab</groupId>
+		<artifactId>DAB</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>gs-lib</artifactId>
+	<packaging>pom</packaging>
+	<name>ESSI-Lab GI-suite Library</name>
+	<description>GI-Suite Common Library</description>
+
+	<modules>
+		<module>gs-lib-net</module>
+		<module>gs-lib-netcdf</module>
+		<module>gs-lib-utils</module>
+		<module>gs-lib-xml</module>
+		<module>gs-lib-what3words</module>
+		<module>gs-lib-wof</module>
+	</modules>
+
+
+	<!--<dependencyManagement>-->
+		<!--<dependencies>-->
+			<!--<dependency>-->
+				<!--<groupId>org.apache.jena</groupId>-->
+				<!--<artifactId>jena-arq</artifactId>-->
+				<!--<version>2.12.1</version>-->
+			<!--</dependency>-->
+		<!--</dependencies>-->
+	<!--</dependencyManagement>-->
+
+</project>

@@ -1,0 +1,282 @@
+package eu.essi_lab.model;
+
+/*-
+ * #%L
+ * Discovery and Access Broker (DAB) Community Edition (CE)
+ * %%
+ * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * #L%
+ */
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
+
+/**
+ * @author Fabrizio
+ */
+public enum RuntimeInfoElement implements Queryable {
+
+    RUNTIME_ID("runtimeId"), //
+    RUNTIME_CONTEXT("runtimeContext"), //
+
+    VIEW_ID("VIEW_ID"), //
+    
+    WEB_REQUEST_TIME_STAMP("WEB_REQUEST_TIME_STAMP"), //
+    WEB_REQUEST_TIME_STAMP_MILLIS("WEB_REQUEST_TIME_STAMP_MILLIS", ContentType.LONG), //
+
+    WEB_REQUEST_HOST("WEB_REQUEST_Host"), // captured from request header
+    WEB_REQUEST_ORIGIN("WEB_REQUEST_origin"), // captured from request header
+    WEB_REQUEST_X_FORWARDER_FOR("WEB_REQUEST_x-forwarded-for"), // captured from request header
+
+    MESSAGE_TYPE("MESSAGE_TYPE"), //
+    
+    DISCOVERY_MESSAGE_TIME_STAMP("DISCOVERY_MESSAGE_TIME_STAMP"), //
+    DISCOVERY_MESSAGE_TIME_STAMP_MILLIS("DISCOVERY_MESSAGE_TIME_STAMP_MILLIS", ContentType.LONG), //
+
+    DISCOVERY_MESSAGE_SCHEDULED("DISCOVERY_MESSAGE_SCHEDULED"), //
+
+    DISCOVERY_MESSAGE_SOURCE_LABEL("DISCOVERY_MESSAGE_SOURCE_LABEL"), //
+    DISCOVERY_MESSAGE_SOURCE_ID("DISCOVERY_MESSAGE_SOURCE_ID"), //
+
+    DISCOVERY_MESSAGE_BBOX_EAST("DISCOVERY_MESSAGE_BBOX_EAST", ContentType.DOUBLE), //
+    DISCOVERY_MESSAGE_BBOX_WEST("DISCOVERY_MESSAGE_BBOX_WEST", ContentType.DOUBLE), //
+    DISCOVERY_MESSAGE_BBOX_NORTH("DISCOVERY_MESSAGE_BBOX_NORTH", ContentType.DOUBLE), //
+    DISCOVERY_MESSAGE_BBOX_SOUTH("DISCOVERY_MESSAGE_BBOX_SOUTH", ContentType.DOUBLE), //
+
+    DISCOVERY_MESSAGE_SHAPE("DISCOVERY_MESSAGE_SHAPE"), //
+    
+    DISCOVERY_MESSAGE_BBOX_SW("DISCOVERY_MESSAGE_BBOX_sw"), //
+    DISCOVERY_MESSAGE_BBOX_SE("DISCOVERY_MESSAGE_BBOX_se"), //
+    DISCOVERY_MESSAGE_BBOX_NW("DISCOVERY_MESSAGE_BBOX_nw"), //
+    DISCOVERY_MESSAGE_BBOX_NE("DISCOVERY_MESSAGE_BBOX_ne"), //
+
+    DISCOVERY_MESSAGE_TMP_EXTENT_BEGIN("DISCOVERY_MESSAGE_tmpExtentBegin"), //
+    DISCOVERY_MESSAGE_TMP_EXTENT_END("DISCOVERY_MESSAGE_tmpExtentEnd"), //
+
+    DISCOVERY_MESSAGE_ABSTRACT("DISCOVERY_MESSAGE_abstract"), //
+    DISCOVERY_MESSAGE_SUBJECT("DISCOVERY_MESSAGE_subject"), //
+    DISCOVERY_MESSAGE_TITLE("DISCOVERY_MESSAGE_title"), //
+    DISCOVERY_MESSAGE_KEYWORD("DISCOVERY_MESSAGE_keyword"), //
+    DISCOVERY_MESSAGE_ORGANISATION_NAME("DISCOVERY_MESSAGE_organisationName"), //
+
+    DISCOVERY_MESSAGE_VIEW_ID("DISCOVERY_MESSAGE_VIEW_ID"), // NEW
+
+    DISCOVERY_MESSAGE_PAGE_SIZE("DISCOVERY_MESSAGE_PAGE_SIZE", ContentType.INTEGER), //
+    DISCOVERY_MESSAGE_PAGE_START("DISCOVERY_MESSAGE_PAGE_START", ContentType.INTEGER), //
+
+    RESULT_SET_TIME_STAMP("RESULT_SET_TIME_STAMP"), //
+    RESULT_SET_TIME_STAMP_MILLIS("RESULT_SET_TIME_STAMP_MILLIS", ContentType.LONG), //
+
+    RESULT_SET_RETURNED("RESULT_SET_RETURNED", ContentType.INTEGER), //
+    RESULT_SET_MATCHED("RESULT_SET_MATCHED", ContentType.INTEGER), //
+    RESULT_SET_RESOURCE_TITLE("RESULT_SET_RESOURCE_TITLE"), //
+    RESULT_SET_SOURCE_ID("RESULT_SET_SOURCE_ID"), // NEW
+    RESULT_SET_RESOURCE_ID("RESULT_SET_RESOURCE_ID"), // NEW
+    RESULT_SET_ATTRIBUTE_TITLE("RESULT_SET_ATTRIBUTE_TITLE"), // NEW
+    
+    RESULT_SET_DISCOVERY_SOURCE_ID("RESULT_SET_DISCOVERY_SOURCE_ID"), // NEW
+    RESULT_SET_DISCOVERY_SOURCE_LABEL("RESULT_SET_DISCOVERY_SOURCE_LABEL"), // NEW
+
+    CHRONOMETER_TIME_STAMP("CHRONOMETER_TIME_STAMP"), //
+    CHRONOMETER_TIME_STAMP_MILLIS("CHRONOMETER_TIME_STAMP_MILLIS", ContentType.LONG), //
+    CHRONOMETER_ELAPSED_TIME_MILLIS("CHRONOMETER_ELAPSED_TIME_MILLIS", ContentType.LONG),
+
+    PROFILER_NAME("PROFILER_NAME"), //
+
+    ACCESS_MESSAGE_TIME_STAMP_MILLIS("ACCESS_MESSAGE_TIME_STAMP_MILLIS", ContentType.LONG), //
+    BULK_DOWNLOAD_MESSAGE_TIME_STAMP_MILLIS("BULK_DOWNLOAD_MESSAGE_TIME_STAMP_MILLIS", ContentType.LONG), //
+
+    BULK_DOWNLOAD_MESSAGE_VIEW_ID("BULK_DOWNLOAD_MESSAGE_VIEW_ID"), // NEW
+    
+    ACCESS_MESSAGE_VIEW_ID("ACCESS_MESSAGE_VIEW_ID"), // NEW
+    ACCESS_MESSAGE_CRS("ACCESS_MESSAGE_crs"), //
+    ACCESS_MESSAGE_DATA_FORMAT("ACCESS_MESSAGE_DATA_format"), ACCESS_MESSAGE_DATA_TYPE("ACCESS_MESSAGE_DATA_type"), //
+
+    RESULT_SET_ACCESS_SOURCE_ID("RESULT_SET_ACCESS_SOURCE_ID"), // NEW
+    RESULT_SET_ACCESS_SOURCE_LABEL("RESULT_SET_ACCESS_SOURCE_LABEL"), // NEW
+
+    PROFILER_TIME_STAMP_MILLIS("PROFILER_TIME_STAMP_MILLIS", ContentType.LONG), // NEW ELEMENT TO BE ADDED
+
+    //
+    //
+    // following elements are disabled, they have no related index
+    //
+    // some other elements which are captured from request/response headers,
+    // also have no StatisticalElement related
+    // See WebRequest, ResponseInfoProvider, DiscoveryMessage
+    //
+    //
+
+    PROFILER_TYPE("PROFILER_TYPE", false),
+
+    BULK_DOWNLOAD_MESSAGE_TIME_STAMP("BULK_DOWNLOAD_MESSAGE_TIME_STAMP", false), //
+    
+    ACCESS_MESSAGE_TIME_STAMP("ACCESS_MESSAGE_TIME_STAMP", false), //
+    ACCESS_MESSAGE_SPATIAL_DIMENSION_NAME("ACCESS_MESSAGE_SPATIAL_DIMENSION_name", false), //
+    ACCESS_MESSAGE_SPATIAL_DIMENSION_ID("ACCESS_MESSAGE_SPATIAL_DIMENSION_id", false), //
+    ACCESS_MESSAGE_TEMPORAL_DIMENSION_NAME("ACCESS_MESSAGE_TEMPORAL_DIMENSION_name", false), //
+    ACCESS_MESSAGE_TEMPORAL_DIMENSION_ID("ACCESS_MESSAGE_TEMPORAL_DIMENSION_id", false), //
+
+    RESPONSE_LENGTH("RESPONSE_LENGTH", false), //
+    RESPONSE_MEDIA_TYPE("RESPONSE_MEDIA_TYPE", false), //
+    RESPONSE_STATUS("RESPONSE_STATUS", false), //
+
+    WEB_REQUEST_VIEW_ID("WEB_REQUEST_VIEW_ID", false), //
+    WEB_REQUEST_QUERY_STRING("WEB_REQUEST_QUERY_STRING", false), //
+    WEB_REQUEST_QUERY_PARAMETERS("WEB_REQUEST_QUERY_PARAMETERS", false), //
+    WEB_REQUEST_REQUEST_PATH("WEB_REQUEST_REQUEST_PATH", false), //
+    WEB_REQUEST_ABSOLUTE_PATH("WEB_REQUEST_ABSOLUTE_PATH", false), //
+    WEB_REQUEST_BASE_URI("WEB_REQUEST_BASE_URI", false), //
+    WEB_REQUEST_REQUEST_URI("WEB_REQUEST_REQUEST_URI", false), //
+    WEB_REQUEST_CONTENT_TYPE("WEB_REQUEST_CONTENT_TYPE", false), //
+    WEB_REQUEST_CHAR_ENCODING("WEB_REQUEST_CHAR_ENCODING", false), //
+    WEB_REQUEST_CONTENT_LENGTH("WEB_REQUEST_CONTENT_LENGTH", false), //
+    WEB_REQUEST_LOCAL_ADDRESS("WEB_REQUEST_LOCAL_ADDRESS", false), //
+    WEB_REQUEST_LOCAL_NAME("WEB_REQUEST_LOCAL_NAME", false), //
+    WEB_REQUEST_LOCAL_PORT("WEB_REQUEST_LOCAL_PORT", false), //
+    WEB_REQUEST_METHOD("WEB_REQUEST_METHOD", false), //
+    WEB_REQUEST_PROTOCOL("WEB_REQUEST_PROTOCOL", false), //
+    WEB_REQUEST_REMOTE_ADDRESS("WEB_REQUEST_REMOTE_ADDRESS", false), //
+    WEB_REQUEST_REMOTE_HOST("WEB_REQUEST_REMOTE_HOST", false), //
+    WEB_REQUEST_REMOTE_PORT("WEB_REQUEST_REMOTE_PORT", false), //
+    WEB_REQUEST_SCHEME("WEB_REQUEST_SCHEME", false), //
+    WEB_REQUEST_SERVER_NAME("WEB_REQUEST_SERVER_NAME", false), //
+    WEB_REQUEST_SERVER_PORT("WEB_REQUEST_SERVER_PORT", false), //
+    WEB_REQUEST_AUTHENTICATED_USER_NAME("WEB_REQUEST_AUTHENTICATED_USER_NAME", false), //
+    WEB_REQUEST_REFERER("WEB_REQUEST_referer", false), //
+
+    DISCOVERY_MESSAGE_BBOX("DISCOVERY_MESSAGE_BBOX", ContentType.SPATIAL, false), // used only as reference
+    DISCOVERY_MESSAGE_STORAGE_URI("DISCOVERY_MESSAGE_STORAGE_URI", false), //
+    DISCOVERY_MESSAGE_DISTINCT_QUERY_ELEMENT("DISCOVERY_MESSAGE_DISTINCT_QUERY_ELEMENT", false), //
+    DISCOVERY_MESSAGE_MAX_FREQUENCY_MAP_ITEMS("DISCOVERY_MESSAGE_MAX_FREQUENCY_MAP_ITEMS", false), //
+    DISCOVERY_MESSAGE_ORDERING_DIRECTION("DISCOVERY_MESSAGE_ORDERING_DIRECTION", false), //
+    DISCOVERY_MESSAGE_ORDERING_PROPERTY("DISCOVERY_MESSAGE_ORDERING_PROPERTY", false), //
+    DISCOVERY_MESSAGE_GS_USER_AUTH_PROVIDER("DISCOVERY_MESSAGE_GS_USER_AUTH_PROVIDER", false), //
+    DISCOVERY_MESSAGE_GS_USER_EMAIL("DISCOVERY_MESSAGE_GS_USER_EMAIL", false), //
+    DISCOVERY_MESSAGE_TERM_FREQUENCY_BOND("DISCOVERY_MESSAGE_TERM_FREQUENCY_BOND", false),
+
+    RESULT_SET_CRS("RESULT_SET_crs", false), //
+    RESULT_SET_DATA_FORMAT("RESULT_SET_DATA_format", false), //
+    RESULT_SET_DATA_TYPE("RESULT_SET_DATA_type", false), //
+    RESULT_SET_SPATIAL_DIMENSION_NAME("RESULT_SET_SPATIAL_DIMENSION_name", false), //
+    RESULT_SET_SPATIAL_DIMENSION_ID("RESULT_SET_SPATIAL_DIMENSION_id", false), //
+    RESULT_SET_TEMPORAL_DIMENSION_NAME("RESULT_SET_TEMPORAL_DIMENSION_name", false), //
+    RESULT_SET_TEMPORAL_DIMENSION_ID("RESULT_SET_TEMPORAL_DIMENSION_id", false); //
+
+    private String name;
+    private ContentType type;
+    private boolean isEnabled;
+
+    /**
+     * 
+     */
+    public static String NAME_SEPARATOR = "_";
+
+    /**
+     * @param name
+     */
+    private RuntimeInfoElement(String name) {
+
+	this(name, ContentType.TEXTUAL, true);
+    }
+
+    /**
+     * @param name
+     * @param type
+     */
+    private RuntimeInfoElement(String name, ContentType type) {
+
+	this(name, type, true);
+    }
+
+    /**
+     * @param name
+     * @param enabled
+     * @param type
+     */
+    private RuntimeInfoElement(String name, ContentType type, boolean enabled) {
+
+	this.name = name;
+	this.type = type;
+	this.isEnabled = enabled;
+    }
+
+    /**
+     * @param name
+     * @param enabled
+     */
+    private RuntimeInfoElement(String name, boolean enabled) {
+
+	this(name, ContentType.TEXTUAL, enabled);
+    }
+
+    public String getName() {
+
+	return name;
+    }
+
+    @Override
+    public ContentType getContentType() {
+
+	return type;
+    }
+
+    public boolean isVolatile() {
+
+	return false;
+    }
+
+    @Override
+    public String toString() {
+
+	return getName();
+    }
+
+    /**
+     * @param name
+     * @return
+     * @throws NoSuchElementException
+     */
+    public static RuntimeInfoElement fromName(String name) throws IllegalArgumentException {
+
+	return (RuntimeInfoElement) Queryable.fromName(name, values());
+    }
+
+    /**
+     * Returns the ordered list of these {@link RuntimeInfoElement}s
+     */
+    public static List<RuntimeInfoElement> getOrderedElements() {
+
+	return Arrays.asList(values()).//
+		stream().//
+		sorted((o1, o2) -> o1.getName().compareTo(o2.getName())).//
+		collect(Collectors.toList());//
+    }
+
+    @Override
+    public boolean isEnabled() {
+
+	return this.isEnabled;
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+
+	this.isEnabled = enabled;
+    }
+}

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bindings version="2.1" xmlns="http://java.sun.com/xml/ns/jaxb">
+  <!--
+
+Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.11 
+Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
+Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
+Generato il: 2015.07.10 alle 09:34:04 AM CEST 
+
+  -->
+  <bindings scd="x-schema::tns" xmlns:tns="http://www.opengis.net/cat/csw/2.0.2">
+    <schemaBindings map="false">
+      <package name="eu.essi_lab.jaxb.csw._2_0_2"/>
+    </schemaBindings>
+    <bindings scd="~tns:AbstractRecordType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.AbstractRecordType"/>
+    </bindings>
+    <bindings scd="~tns:DCMIRecordType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.DCMIRecordType"/>
+    </bindings>
+    <bindings scd="~tns:BriefRecordType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.BriefRecordType"/>
+    </bindings>
+    <bindings scd="~tns:SummaryRecordType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.SummaryRecordType"/>
+    </bindings>
+    <bindings scd="~tns:RecordType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.RecordType"/>
+    </bindings>
+    <bindings scd="~tns:GetCapabilitiesType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.GetCapabilities"/>
+    </bindings>
+    <bindings scd="~tns:CapabilitiesType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.Capabilities"/>
+    </bindings>
+    <bindings scd="~tns:DescribeRecordType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.DescribeRecord"/>
+    </bindings>
+    <bindings scd="~tns:RequestBaseType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.RequestBaseType"/>
+    </bindings>
+    <bindings scd="~tns:DescribeRecordResponseType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.DescribeRecordResponse"/>
+    </bindings>
+    <bindings scd="~tns:SchemaComponentType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.SchemaComponentType"/>
+    </bindings>
+    <bindings scd="~tns:GetRecordsType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.GetRecords"/>
+    </bindings>
+    <bindings scd="~tns:DistributedSearchType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.DistributedSearchType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractQueryType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.AbstractQueryType"/>
+    </bindings>
+    <bindings scd="~tns:QueryType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.QueryType"/>
+    </bindings>
+    <bindings scd="~tns:QueryConstraintType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.Constraint"/>
+    </bindings>
+    <bindings scd="~tns:ElementSetNameType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.ElementSetName"/>
+    </bindings>
+    <bindings scd="~tns:GetRecordsResponseType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.GetRecordsResponse"/>
+    </bindings>
+    <bindings scd="~tns:RequestStatusType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.RequestStatusType"/>
+    </bindings>
+    <bindings scd="~tns:SearchResultsType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.SearchResultsType"/>
+    </bindings>
+    <bindings scd="~tns:GetRecordByIdType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.GetRecordById"/>
+    </bindings>
+    <bindings scd="~tns:GetRecordByIdResponseType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.GetRecordByIdResponse"/>
+    </bindings>
+    <bindings scd="~tns:GetDomainType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.GetDomain"/>
+    </bindings>
+    <bindings scd="~tns:GetDomainResponseType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.GetDomainResponse"/>
+    </bindings>
+    <bindings scd="~tns:DomainValuesType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.DomainValuesType"/>
+    </bindings>
+    <bindings scd="~tns:AcknowledgementType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.Acknowledgement"/>
+    </bindings>
+    <bindings scd="~tns:EchoedRequestType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.EchoedRequestType"/>
+    </bindings>
+    <bindings scd="~tns:TransactionType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.Transaction"/>
+    </bindings>
+    <bindings scd="~tns:InsertType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.InsertType"/>
+    </bindings>
+    <bindings scd="~tns:UpdateType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.UpdateType"/>
+    </bindings>
+    <bindings scd="~tns:DeleteType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.DeleteType"/>
+    </bindings>
+    <bindings scd="~tns:RecordPropertyType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.RecordProperty"/>
+    </bindings>
+    <bindings scd="~tns:TransactionResponseType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.TransactionResponse"/>
+    </bindings>
+    <bindings scd="~tns:TransactionSummaryType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.TransactionSummaryType"/>
+    </bindings>
+    <bindings scd="~tns:InsertResultType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.InsertResultType"/>
+    </bindings>
+    <bindings scd="~tns:HarvestType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.Harvest"/>
+    </bindings>
+    <bindings scd="~tns:HarvestResponseType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.HarvestResponse"/>
+    </bindings>
+    <bindings scd="~tns:EmptyType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.EmptyType"/>
+    </bindings>
+    <bindings scd="~tns:ListOfValuesType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.ListOfValuesType"/>
+    </bindings>
+    <bindings scd="~tns:ConceptualSchemeType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.ConceptualSchemeType"/>
+    </bindings>
+    <bindings scd="~tns:RangeOfValuesType">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.RangeOfValuesType"/>
+    </bindings>
+    <bindings scd="~tns:ResultType">
+      <typesafeEnumClass ref="eu.essi_lab.jaxb.csw._2_0_2.ResultType"/>
+    </bindings>
+    <bindings scd="~tns:ElementSetType">
+      <typesafeEnumClass ref="eu.essi_lab.jaxb.csw._2_0_2.ElementSetType"/>
+    </bindings>
+  </bindings>
+</bindings>
+

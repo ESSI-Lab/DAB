@@ -1,0 +1,4 @@
+eu.essi_lab.pdk.rsm.impl.xml.gs.GS_XML_ResultSetMapper
+eu.essi_lab.pdk.rsm.impl.json.jsapi.JS_API_ResultSetMapper
+eu.essi_lab.pdk.rsm.impl.xml.iso19139.GMD_ResultSetMapper
+eu.essi_lab.pdk.rsm.impl.xml.iso19139.GMI_ResultSetMapper

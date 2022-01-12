@@ -1,0 +1,3 @@
+eu.essi_lab.accessor.wof.discovery.series.GetSeriesCatalogForBoxTransformer
+eu.essi_lab.accessor.wof.discovery.sites.GetSitesTransformer
+eu.essi_lab.accessor.wof.discovery.variables.GetVariablesTransformer

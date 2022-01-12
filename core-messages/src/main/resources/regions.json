@@ -1,0 +1,402 @@
+[
+	{
+		"east": 17.1620685652599,
+		"south": 46.3726520216244,
+		"north": 49.0211627691393,
+		"west": 9.53095237240833,
+		"location": "Austria",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 18.5203814091888,
+		"south": 35.4928525923603,
+		"north": 47.0917837415439,
+		"west": 6.62662135986088,
+		"location": "Italy",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 6.40793743953125,
+		"south": 49.496968483036,
+		"north": 51.5051118897455,
+		"west": 2.54132898439873,
+		"location": "Belgium",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 28.241403,
+		"south": 55.6746669350001,
+		"north": 58.085568788,
+		"west": 20.9691104890001,
+		"location": "Latvia",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 28.6102771760001,
+		"south": 41.2353414930001,
+		"north": 44.215451,
+		"west": 22.357156753,
+		"location": "Bulgaria",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 26.8355231,
+		"south": 53.89679499,
+		"north": 56.4504065100001,
+		"west": 20.941528,
+		"location": "Lithuania",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 19.427389,
+		"south": 42.389832,
+		"north": 46.5549629558487,
+		"west": 13.493222,
+		"location": "Croatia",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 6.5308980672559525,
+		"south": 49.447858677765716,
+		"north": 50.182772453796446,
+		"west": 5.735698938390786,
+		"location": "Luxembourg",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 34.59791599999994,
+		"south": 34.6332846722908,
+		"north": 35.701527,
+		"west": 32.27308300000004,
+		"location": "Cyprus",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 14.5764915000002,
+		"south": 35.786257100000114,
+		"north": 36.0821530995456,
+		"west": 14.1834251000001,
+		"location": "Malta",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 18.8592743799298,
+		"south": 48.551892864201,
+		"north": 51.0557782422661,
+		"west": 12.0906691601139,
+		"location": "Czechia",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 7.22749859212922,
+		"south": 50.7503674993741,
+		"north": 53.5550145156973,
+		"west": 3.35837827202,
+		"location": "Netherlands",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 15.158834,
+		"south": 54.562389,
+		"north": 57.748417,
+		"west": 8.075611,
+		"location": "Denmark",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 24.1457828491313,
+		"south": 49.0020465193443,
+		"north": 54.8357886595169,
+		"west": 14.1228850233809,
+		"location": "Poland",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 28.2090381531431,
+		"south": 57.5093097920079,
+		"north": 59.82201657813772,
+		"west": 21.76453487962259,
+		"location": "Estonia",
+		"accuracyLevel": 0
+	},
+	{
+		"east": -6.18915930748288,
+		"south": 30.030283523608002,
+		"north": 42.154311127408,
+		"west": -31.2688154080396,
+		"location": "Portugal",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 31.580944,
+		"south": 59.767582,
+		"north": 70.096054,
+		"west": 20.556944,
+		"location": "Finland",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 29.7152986907701,
+		"south": 43.6190166499833,
+		"north": 48.2653912058468,
+		"west": 20.2619949052262,
+		"location": "Romania",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 9.56009360694225,
+		"south": 41.3335556861592,
+		"north": 51.0889894407743,
+		"west": -5.14127657354623,
+		"location": "France",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 22.5657383340001,
+		"south": 47.7313590000001,
+		"north": 49.6137360000001,
+		"west": 16.8334234020001,
+		"location": "Slovakia",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 15.0418156516163,
+		"south": 47.2701236047002,
+		"north": 55.0583836008072,
+		"west": 5.8663152683722,
+		"location": "Germany",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 16.6106311807,
+		"south": 45.421812998164,
+		"north": 46.8766275518195,
+		"west": 13.3753342064709,
+		"location": "Slovenia",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 29.642984894413,
+		"south": 34.8020663391466,
+		"north": 41.7484999849641,
+		"west": 19.3736035624134,
+		"location": "Greece",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 4.32778473043961,
+		"south": 27.6377894797159,
+		"north": 43.79237956786995,
+		"west": -18.1612217229543,
+		"location": "Spain",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 22.896564336,
+		"south": 45.7370495590001,
+		"north": 48.585336,
+		"west": 16.113795,
+		"location": "Hungary",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 24.1663846943218,
+		"south": 55.3374438220002,
+		"north": 69.0599672666879,
+		"west": 10.963484537623518,
+		"location": "Sweden",
+		"accuracyLevel": 0
+	},
+	{
+		"east": -5.99627768519354,
+		"south": 51.4199053321416,
+		"north": 55.43513104278,
+		"west": -10.6186478804892,
+		"location": "Ireland",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 2.372,
+		"south": 49.722,
+		"north": 59.666,
+		"west": -10.951,
+		"location": "United Kingdom",
+		"accuracyLevel": 0
+	},
+	{
+		"east": -168.98974609375,
+		"south": -11.00214,
+		"north": 81.8519287109375,
+		"west": 25.6685104370001,
+		"location": "Asia",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 63.49390709700003,
+		"south": -37.432486921640724,
+		"north": 37.5598406350001,
+		"west": -25.36118769,
+		"location": "Africa",
+		"accuracyLevel": 0
+	},
+	{
+		"east": -66.536,
+		"south": 24.312,
+		"north": 49.478,
+		"west": -125.276,
+		"location": "USA",
+		"accuracyLevel": 0
+	},
+	{
+		"east": -25.012222290039062,
+		"south": 5.49857041364627,
+		"north": 83.1355025240001,
+		"west": 172.444761,
+		"location": "North america",
+		"accuracyLevel": 0
+	},
+	{
+		"east": -28.8360947061847,
+		"south": -56.5377657939999,
+		"north": 13.394789727,
+		"west": -109.454879262,
+		"location": "South america",
+		"accuracyLevel": 0
+	},
+	{
+		"east": -52.636291,
+		"south": 41.67598,
+		"north": 83.110626,
+		"west": -141,
+		"location": "Canada",
+		"accuracyLevel": 0
+	},
+	{
+		"east": -168.994995118,
+		"south": 41.1853530000001,
+		"north": 81.8616409300001,
+		"west": 19.6385239100001,
+		"location": "Russia",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 134.7754563,
+		"south": 10.175472,
+		"north": 53.560974001,
+		"west": 73.4994140000001,
+		"location": "China",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 119.931509803,
+		"south": 41.5818330000001,
+		"north": 52.1483550020001,
+		"west": 87.7344790560001,
+		"location": "Mongolia",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 172.061386,
+		"south": -54.778252,
+		"north": -9.2325,
+		"west": 112.911057,
+		"location": "Australia",
+		"accuracyLevel": 0
+	},
+	{
+		"east": -175.836411,
+		"south": -52.607582,
+		"north": -29.241097,
+		"west": 165.883774,
+		"location": "New Zealand",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 153.986844163,
+		"south": 20.422746414,
+		"north": 45.55608764,
+		"west": 122.933653061,
+		"location": "Japan",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 97.4152926679075,
+		"south": 6.7559528993543,
+		"north": 35.524548272882,
+		"west": 68.1862489922762,
+		"location": "India",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 55.6667,
+		"south": 16.094889,
+		"north": 32.1542840000001,
+		"west": 34.495693,
+		"location": "Saudi Arabia",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 63.317471,
+		"south": 25.064083,
+		"north": 39.777222,
+		"west": 44.047279,
+		"location": "Iran",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 74.8894511481168,
+		"south": 29.3770645357176,
+		"north": 38.4907920755748,
+		"west": 60.4720833972263,
+		"location": "Afghanistan",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 77.0132974640001,
+		"south": 23.694695,
+		"north": 37.0841070010001,
+		"west": 60.8729720000001,
+		"location": "Pakistan",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 130.674866,
+		"south": 37.597305,
+		"north": 43.006054,
+		"west": 124.188637,
+		"location": "North Korea",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 131.872205583533,
+		"south": 33.1137120723136,
+		"north": 38.5933891092225,
+		"west": 124.609708786479,
+		"location": "South Korea",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 141.021805,
+		"south": -11.004861,
+		"north": 5.904417,
+		"west": 95.009331,
+		"location": "Indonesia",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 159.477921,
+		"south": -11.657972335,
+		"north": -0.877889,
+		"west": 140.841969,
+		"location": "Papua New Guinea",
+		"accuracyLevel": 0
+	},
+	{
+		"east": 119.267502,
+		"south": 0.855222,
+		"north": 9.32375,
+		"west": 98.935028,
+		"location": "Malaysia",
+		"accuracyLevel": 0
+	}
+]

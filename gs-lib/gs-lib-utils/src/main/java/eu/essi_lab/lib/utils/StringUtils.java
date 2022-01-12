@@ -1,0 +1,182 @@
+package eu.essi_lab.lib.utils;
+
+/*-
+ * #%L
+ * Discovery and Access Broker (DAB) Community Edition (CE)
+ * %%
+ * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * #L%
+ */
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+import org.apache.commons.codec.binary.Hex;
+
+/**
+ * @author Fabrizio
+ */
+public class StringUtils {
+
+    /**
+     * 
+     */
+    public static final String SHA1_IDENTIFIER = "SHA-1";
+
+    /**
+     * @param value
+     * @return
+     * @throws NoSuchAlgorithmException
+     * @throws UnsupportedEncodingException
+     */
+    public static String hashSHA1messageDigest(String value) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+
+	MessageDigest msdDigest = MessageDigest.getInstance(SHA1_IDENTIFIER);
+	msdDigest.update(value.getBytes("UTF-8"), 0, value.length());
+	char[] ret = Hex.encodeHex(msdDigest.digest());
+	return new String(ret).toUpperCase();
+    }
+
+    /**
+     * URL encodes the provided string with UTF-8 using {@link StandardCharsets} defined as "Constant definitions for
+     * the standard Charsets. These charsets are guaranteed to be available on every implementation of the Java platform".
+     * 
+     * @param string
+     */
+    public static String URLEncodeUTF8(String string) {
+
+	try {
+	    return URLEncoder.encode(string, StandardCharsets.UTF_8.name());
+	} catch (UnsupportedEncodingException e) {
+	}
+	return null;// no way
+    }
+
+    /**
+     * URL decodes the provided string with UTF-8 using {@link StandardCharsets} defined as "Constant definitions for
+     * the
+     * standard Charsets. These charsets are guaranteed to be available on every implementation of the Java platform".
+     * 
+     * @param string
+     */
+    public static String URLDecodeUTF8(String string) {
+
+	try {
+	    return URLDecoder.decode(string, StandardCharsets.UTF_8.name());
+	} catch (UnsupportedEncodingException e) {
+	}
+	return null;// no way
+    }
+
+    /**
+     * Encodes the provided string with UTF-8 using {@link StandardCharsets} defined as "Constant definitions for the
+     * standard Charsets. These charsets are guaranteed to be available on every implementation of the Java platform".
+     * 
+     * @param string
+     */
+    public static String encodeUTF8(String string) {
+
+	return new String(string.getBytes(StandardCharsets.UTF_8));
+    }
+
+    /**
+     * Decodes the provided string with UTF-8 using {@link StandardCharsets} defined as "Constant definitions for the
+     * standard Charsets. These charsets are guaranteed to be available on every implementation of the Java platform".
+     * 
+     * @param string
+     */
+    public static String decodeUTF8(String string) {
+
+	try {
+	    return URLDecoder.decode(string, StandardCharsets.UTF_8.name());
+	} catch (UnsupportedEncodingException e) {
+	}
+
+	return null;// no way
+    }
+
+    /**
+     * Removes also the trailing non-breakable space (NBSP) discarding the ones inside the string (if any).<br>
+     * Reference to this solution: https://stackoverflow.com/questions/28295504/how-to-trim-no-break-space-in-java
+     * Removes also the BOM character https://stackoverflow.com/questions/21891578/removing-bom-characters-using-java
+     * 
+     * @param string
+     * @return
+     */
+    public static String trimNBSP(String string) {
+
+	return string.replace('\u00A0', ' ').replace('\u2007', ' ').replace('\u202F', ' ').replace('\uFEFF', ' ').trim();
+    }
+
+    /**
+     * Returns true if the string is null or equals to "null"
+     * 
+     * @param string
+     * @return
+     */
+    public static boolean isNull(String string) {
+
+	return string == null || string.equals("null");
+    }
+
+    /**
+     * Avoid the use of the '!' operator to negate the {@link #isNull(String)} method
+     * 
+     * @param string
+     * @return
+     */
+    public static boolean isNotNull(String string) {
+
+	return !isNull(string);
+    }
+
+    /**
+     * Returns true if the string is null or {@link String#isEmpty()} returns true
+     * 
+     * @param string
+     * @return
+     */
+    public static boolean isEmpty(String string) {
+
+	return string == null || string.isEmpty();
+    }
+
+    /**
+     * Avoid the use of the '!' operator to negate the {@link #isEmpty(String)} method
+     * 
+     * @param string
+     * @return
+     */
+    public static boolean isNotEmpty(String string) {
+
+	return !isEmpty(string);
+    }
+
+    /**
+     * Both methods {@link #isNotEmpty(String)} and {@link #isNotNull(String)} are applied
+     * 
+     * @param string
+     * @return
+     */
+    public static boolean isNotEmptyAndNotNull(String string) {
+
+	return isNotEmpty(string) && isNotNull(string);
+    }
+}

@@ -1,0 +1,138 @@
+<div class="md-list-item-text" layout="row">
+
+    <!-- I used ng-blur but it was triggered too fast, I use ng-change now -->
+    <!-- In some cases I still use blur, for example in strings free text not to send too many requests -->
+
+    <md-input-container style="width:100%;" ng-if="ao.type != 'eu.essi_lab.model.StorageUri' && ao.allowedValues.length > 0">
+
+        <label> {{ ao.label || ao.key }} </label>
+                
+        <md-select ng-if="ao.type != 'eu.essi_lab.model.configuration.option.SubComponentList' 
+        			   && ao.type != 'eu.essi_lab.model.configuration.Subcomponent' 
+       				   && ao.type != 'java.lang.String' 
+        			   && ao.type != 'java.lang.Boolean'" ng-model="ao.value.value" ng-required="ao.mandatory" ng-change="save({componentKey: ckeyprefix, supported : ao})">
+            <md-option ng-repeat="val in ao.allowedValues track by val.value" value="{{ val.value }}">{{val.value}}</md-option>
+        </md-select>
+             
+        <div ng-if="ao.type === 'java.lang.Boolean'" >
+            <md-switch class="md-primary" name="{{ ao.key }}" ng-model="ao.value" ng-required="ao.mandatory" ng-change="save({componentKey: ckeyprefix, supported : ao})"></md-switch>
+        </div>
+        
+        <md-select ng-if="ao.type === 'java.lang.String'" ng-required="ao.mandatory" ng-model="ao.value" ng-change="save({componentKey: ckeyprefix, supported : ao})">
+            <md-option ng-repeat="val in ao.allowedValues track by val" value="{{ val }}">{{val}}</md-option>
+        </md-select>
+  
+        <md-select ng-if="ao.type === 'eu.essi_lab.model.configuration.Subcomponent'"  ng-required="ao.mandatory" ng-model="ao.value.value" ng-change="save({componentKey: ckeyprefix, supported : ao})">
+            <md-option ng-repeat="val in ao.allowedValues track by val.value" value="{{ val.value }}">{{val.label}}</md-option>
+   	    </md-select>
+        
+			
+        <div ng-if="ao.type === 'eu.essi_lab.model.configuration.option.SubComponentList'" class="sublist">
+			
+			  <div layout="row" layout-wrap>
+			    <div flex="100" layout="column">
+			      <div>
+		        
+			        <fieldset class="sublist-fieldset" >
+			          
+			          <div layout="row" layout-wrap flex>
+			          
+						  <div flex-xs flex="50">
+						  
+							<md-checkbox style="margin:3px"  
+
+									  	 aria-label="Select All"
+										 ng-checked="areallselected({option : ao})"						 
+										 ng-click="toggleall({componentKey: ckeyprefix, option : ao})"
+										 md-indeterminate="isindeterminate({option : ao})">
+										 
+							  <span ng-if="areallselected({option : ao})">Un-</span>Select All
+							
+							</md-checkbox>
+						  </div>
+						  
+						 <div class="sublist-select-all-checkboxes" flex="100" ng-repeat="val in ao.allowedValues">
+							 <div  class="sublist-select-all-checkboxes" flex="100" ng-repeat="sub in val.subcomponents">
+						 
+								  <md-checkbox   
+										value="{{sub.label}}" 
+										name="{{sub.value}}" 
+										style="margin:3px" 
+										ng-checked="ischecked({option: ao, label: sub.label})"
+										ng-click="toggle({componentKey: ckeyprefix, option: ao, label: sub.label})">
+												
+								     {{sub.label}}
+									 
+								  </md-checkbox>
+								  
+							  </div>
+						</div>
+			          
+			         </div>
+			         
+			       </fieldset>
+			   </div>
+             </div>			    
+         </div>
+     </div>
+      
+        
+
+
+    </md-input-container>
+
+
+    <md-input-container style="width:100%;" ng-switch="ao.type" ng-if="ao.type != 'eu.essi_lab.model.StorageUri' && (ao.allowedValues.length === undefined || ao.allowedValues.length === 0)">
+
+        <label> {{ ao.label || ao.key }} </label>
+
+
+        <input ng-switch-when="java.lang.Integer" aria-label="Favorite" type="number" step="10" name="{{ ao.key }}" ng-model="ao.value"
+               ng-required="ao.mandatory" ng-blur="save({componentKey: ckeyprefix, supported : ao})">
+
+        <div ng-switch-when="java.lang.Boolean">
+            <md-switch class="md-primary" name="{{ ao.key }}" ng-model="ao.value" ng-required="ao.mandatory" ng-change="save({componentKey: ckeyprefix, supported : ao})"></md-switch>
+        </div>
+
+        <input ng-switch-when="java.lang.String" aria-label="Favorite" type="text" name="{{ ao.key }}" ng-model="ao.value" ng-required="ao.mandatory" ng-blur="save({componentKey: ckeyprefix, supported : ao})">
+
+
+        <input ng-switch-when="java.util.Date" mdc-datetime-picker="" date="true" time="true" type="text" id="datetime"
+               placeholder="Date" show-todays-date="" min-date="date" ng-required="ao.mandatory" ng-model="ao.value" class=" md-input" ng-change="save({componentKey: ckeyprefix, supported : ao})"
+               readonly="readonly">
+
+
+        <!-- This is a fake default, all possible types must be supported above -->
+        <input ng-switch-default="notypeprovided" aria-label="Favorite" type="text" name="{{ ao.key }}" ng-model="ao.value"
+               ng-required="ao.mandatory" ng-blur="save({componentKey: ckeyprefix, supported : ao})">
+
+    </md-input-container>
+
+
+    <div style="width:100%;" ng-if="ao.type == 'eu.essi_lab.model.StorageUri'" class="md-list-item-text" layout="column">
+
+        <md-input-container>
+            <label>Data Base URL</label>
+            <input aria-label="Favorite" type="text" name="{{ ao.key }}" ng-required="ao.mandatory" ng-model="ao.value.uri" ng-change="changevalueconcrete({opt: ao, concrete: 'eu.essi_lab.model.StorageUri'})">
+        </md-input-container>
+        <md-input-container>
+            <label>Data Base Username</label>
+            <input aria-label="Favorite" type="text" name="{{ ao.key }}" ng-required="ao.mandatory" ng-model="ao.value.user" ng-change="changevalueconcrete({opt: ao, concrete: 'eu.essi_lab.model.StorageUri'})">
+        </md-input-container>
+        <md-input-container>
+            <label>Data Base Password</label>
+            <input aria-label="Favorite" type="text" name="{{ ao.key }}" ng-required="ao.mandatory" ng-model="ao.value.password" ng-change="changevalueconcrete({opt: ao, concrete: 'eu.essi_lab.model.StorageUri'})">
+        </md-input-container>
+        <md-input-container>
+            <label>Data Base Name</label>
+            <input aria-label="Favorite" type="text" name="{{ ao.key }}" ng-required="ao.mandatory" ng-model="ao.value.storageName" ng-change="changevalueconcrete({opt: ao, concrete: 'eu.essi_lab.model.StorageUri'})">
+        </md-input-container>
+
+        <md-button ng-if="ao.type == 'eu.essi_lab.model.StorageUri'" class="md-secondary" ng-click="save({componentKey: ckeyprefix, supported : ao})">Save</md-button>
+
+    </div>
+
+    <!-- The save button below is removed in favour of the ng-blur event to be apended on each input -->
+    <!--<md-button class="md-secondary" ng-click="save({componentKey: ckeyprefix, supported : ao})">Save</md-button>-->
+
+</div>

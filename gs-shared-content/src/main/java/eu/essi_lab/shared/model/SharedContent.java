@@ -1,0 +1,61 @@
+package eu.essi_lab.shared.model;
+
+/*-
+ * #%L
+ * Discovery and Access Broker (DAB) Community Edition (CE)
+ * %%
+ * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * #L%
+ */
+public class SharedContent<T> {
+
+    private SharedContentType type;
+    private IGSSharedContentCategory category;
+    private String identifier;
+    private T content;
+
+    public SharedContentType getType() {
+	return type;
+    }
+
+    public void setType(SharedContentType type) {
+	this.type = type;
+    }
+
+    public IGSSharedContentCategory getCategory() {
+	return category;
+    }
+
+    public void setCategory(IGSSharedContentCategory category) {
+	this.category = category;
+    }
+
+    public String getIdentifier() {
+	return identifier;
+    }
+
+    public void setIdentifier(String identifier) {
+	this.identifier = identifier;
+    }
+
+    public T getContent() {
+	return content;
+    }
+
+    public void setContent(T content) {
+	this.content = content;
+    }
+}

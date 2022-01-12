@@ -1,0 +1,12 @@
+{ "properties": {
+			"DISCOVERY_MESSAGE_SCHEDULED": { "type": "boolean" },
+			"DISCOVERY_MESSAGE_PAGE_SIZE": { "type": "long" },
+			"DISCOVERY_MESSAGE_PAGE_START": { "type": "long" },
+			"DISCOVERY_MESSAGE_TIME_STAMP_MILLIS": { "type": "date" },
+			"DISCOVERY_MESSAGE_MAX_FREQUENCY_MAP_ITEMS": { "type": "integer" },
+			"DISCOVERY_MESSAGE_BBOX_NORTH": { "type": "float" },
+			"DISCOVERY_MESSAGE_BBOX_SOUTH": { "type": "float" },
+			"DISCOVERY_MESSAGE_BBOX_EAST": { "type": "float" },
+			"DISCOVERY_MESSAGE_BBOX_WEST": { "type": "float" },
+			"DISCOVERY_MESSAGE_POLYGON": { "type": "geo_shape" }
+}}

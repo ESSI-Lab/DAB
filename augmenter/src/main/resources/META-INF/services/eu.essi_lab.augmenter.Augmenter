@@ -1,0 +1,9 @@
+eu.essi_lab.augmenter.MetadataAugmenter
+eu.essi_lab.augmenter.WHOSVariableAugmenter
+eu.essi_lab.augmenter.WHOSRiverVariableAugmenter
+eu.essi_lab.augmenter.WHOSUnitsAugmenter
+eu.essi_lab.augmenter.MetadataReindexer
+eu.essi_lab.augmenter.RandomSSCScoreAugmenter
+eu.essi_lab.augmenter.WFSAugmenter
+eu.essi_lab.augmenter.OrganizationAugmenter
+eu.essi_lab.augmenter.CountryAugmenter

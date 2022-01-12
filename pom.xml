@@ -1,0 +1,1355 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>eu.essi_lab</groupId>
+	<artifactId>DAB</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>ESSI-Lab DAB</name>
+	<description><![CDATA[The suite of ESSI-Lab DAB related software products.
+	
+    ESSI-Lab is the Earth &amp; Space Science Informatics Laboratory of the Institute of Atmospheric
+    Pollution Research of the National Research Council of Italy (CNR-IIA), Florence Research Unit,
+    Area della Ricerca di Firenze, Via Madonna del Piano 10, 50019 Sesto Fiorentino, Florence, Italy.
+    ]]>  
+    </description>
+
+	<url>http://www.essi-lab.eu/</url>
+
+	<organization>
+		<name>Earth &amp; Space Science Informatics-Laboratory (ESSI-Lab)</name>
+		<url>http://www.essi-lab.eu/</url>
+	</organization>
+
+	<properties>
+		<fabric8-timeout>600000</fabric8-timeout>
+		<fabric8-no-ping-timeout>10000</fabric8-no-ping-timeout>
+		<axis2.version>1.7.4</axis2.version>
+		<jvnet.ogc.version>2.6.1</jvnet.ogc.version>
+		<gt-version>19.2</gt-version>
+		<antplugin.version>1.8</antplugin.version>
+		<cxf.version>3.1.9</cxf.version>
+		<javax.servlet-api.version>3.1.0</javax.servlet-api.version>
+		<jackson.version>2.8.6</jackson.version>
+		<xcc.version>9.0.1</xcc.version>
+		<!-- for an explanation about this particular version see GIP-235 -->
+		<marklogic-client-api.version>4.0.2</marklogic-client-api.version>
+		<org.apache-commons.version>3.9</org.apache-commons.version>
+		<org.apache-commons-text.version>1.6</org.apache-commons-text.version>
+		<saxon-he.version>9.7.0-15</saxon-he.version>
+		<docker.plugin.version>0.20.1</docker.plugin.version>
+		<sonar.plugin.version>3.2</sonar.plugin.version>
+		<drools.version>7.5.0.t018</drools.version>
+		<jacoco.version>0.8.0</jacoco.version>
+		<netcdf.version>4.6.12</netcdf.version>
+		<quartz.version>2.3.0</quartz.version>
+		<mysql.connecotr.version>6.0.6</mysql.connecotr.version>
+		<sesame.version>4.1.2</sesame.version>
+		<jena.version>3.10.0</jena.version>
+		<commonsio.version>2.6</commonsio.version>
+		<aws.version>1.11.560</aws.version>
+		<cloud.localstack.version>0.1.14</cloud.localstack.version>
+		<sis.version>0.8</sis.version>
+		<geonames.version>1.1.9</geonames.version>
+		<authzforce.version>13.3.1</authzforce.version>
+		<status.version>1.0.27</status.version>
+	</properties>
+
+
+	<dependencyManagement>
+		<dependencies>
+
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpcore</artifactId>
+				<version>4.4.12</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.elasticsearch.client</groupId>
+				<artifactId>elasticsearch-rest-high-level-client</artifactId>
+				<version>7.9.2</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.indeed</groupId>
+				<artifactId>status-core</artifactId>
+				<version>${status.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.logicng</groupId>
+				<artifactId>logicng</artifactId>
+				<version>1.6.0</version>
+			</dependency>
+
+			<dependency>
+				<groupId>commons-codec</groupId>
+				<artifactId>commons-codec</artifactId>
+				<version>1.9</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.ws.commons.axiom</groupId>
+				<artifactId>axiom-api</artifactId>
+				<version>1.2.22</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.ws.commons.axiom</groupId>
+				<artifactId>axiom-impl</artifactId>
+				<version>1.2.22</version>
+				<scope>runtime</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.axis2</groupId>
+				<artifactId>axis2-kernel</artifactId>
+				<version>${axis2.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.axis2</groupId>
+				<artifactId>axis2-adb</artifactId>
+				<version>${axis2.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.axis2</groupId>
+				<artifactId>axis2-transport-http</artifactId>
+				<version>${axis2.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.axis2</groupId>
+				<artifactId>axis2-transport-local</artifactId>
+				<version>${axis2.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.axis2</groupId>
+				<artifactId>axis2-xmlbeans</artifactId>
+				<version>${axis2.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.ccil.cowan.tagsoup</groupId>
+				<artifactId>tagsoup</artifactId>
+				<version>1.2</version>
+			</dependency>
+			<!-- To use GDAL libraries, install version 2.1.0 -->
+			<!-- e.g. apt-get install libgdal-dev libgdal-java -->
+			<!-- and add -Djava.library.path=/usr/lib/jni/ -->
+			<dependency>
+				<groupId>org.gdal</groupId>
+				<artifactId>gdal</artifactId>
+				<version>2.1.0</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.sis.core</groupId>
+				<artifactId>sis-referencing</artifactId>
+				<version>${sis.version}</version>
+			</dependency>
+
+			<!-- needed for the @NotThreadSafe annotation -->
+			<dependency>
+				<groupId>com.github.stephenc.jcip</groupId>
+				<artifactId>jcip-annotations</artifactId>
+				<version>1.0-1</version>
+				<scope>test</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>com.helger</groupId>
+				<artifactId>ph-schematron-validator</artifactId>
+				<version>5.0.8</version>
+			</dependency>
+
+			<!-- As for AWS guide it's recommended to import the BOM: https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/setup-project-maven.html -->
+			<dependency>
+				<groupId>com.amazonaws</groupId>
+				<artifactId>aws-java-sdk-bom</artifactId>
+				<version>${aws.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<!-- OGC Schemas from Aleksei Valikov -->
+			<dependency>
+				<groupId>org.jvnet.ogc</groupId>
+				<artifactId>waterml-v_2_0</artifactId>
+				<version>${jvnet.ogc.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jvnet.ogc</groupId>
+				<artifactId>wfs-v_1_1_0</artifactId>
+				<version>${jvnet.ogc.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jvnet.ogc</groupId>
+				<artifactId>iso19139-v_20060504</artifactId>
+				<version>${jvnet.ogc.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jvnet.ogc</groupId>
+				<artifactId>gml-v_3_2_0</artifactId>
+				<version>${jvnet.ogc.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jvnet.ogc</groupId>
+				<artifactId>sensorML-v_2_0</artifactId>
+				<version>${jvnet.ogc.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jvnet.ogc</groupId>
+				<artifactId>sos-v_2_0</artifactId>
+				<version>${jvnet.ogc.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>commons-logging</groupId>
+				<artifactId>commons-logging</artifactId>
+				<version>1.1.3</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>${org.apache-commons.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-text</artifactId>
+				<version>${org.apache-commons-text.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>commons-fileupload</groupId>
+				<artifactId>commons-fileupload</artifactId>
+				<version>1.4</version>
+			</dependency>
+
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>${commonsio.version}</version>
+			</dependency>
+
+			<!-- Geo Tools -->
+			<dependency>
+				<groupId>org.geotools</groupId>
+				<artifactId>gt-shapefile</artifactId>
+				<version>${gt-version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.geotools</groupId>
+				<artifactId>gt-opengis</artifactId>
+				<version>${gt-version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.geotools</groupId>
+				<artifactId>gt-render</artifactId>
+				<version>${gt-version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.geotools</groupId>
+				<artifactId>gt-epsg-hsql</artifactId>
+				<version>${gt-version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.geotools</groupId>
+				<artifactId>gt-geotiff</artifactId>
+				<version>${gt-version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.geotools</groupId>
+				<artifactId>gt-netcdf</artifactId>
+				<version>${gt-version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.geotools</groupId>
+				<artifactId>gt-coverage</artifactId>
+				<version>${gt-version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>net.sf.json-lib</groupId>
+				<artifactId>json-lib</artifactId>
+				<version>2.4</version>
+				<classifier>jdk15</classifier>
+			</dependency>
+
+			<!-- Saxon Home Edition and Woodstox are imported by GS-XML -->
+			<dependency>
+				<groupId>net.sf.saxon</groupId>
+				<artifactId>Saxon-HE</artifactId>
+				<version>${saxon-he.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.codehaus.woodstox</groupId>
+				<artifactId>woodstox-core-asl</artifactId>
+				<version>4.4.1</version>
+			</dependency>
+
+			<!-- This is used for annotating objects to be serialized as json -->
+			<dependency>
+				<groupId>com.fasterxml.jackson.jaxrs</groupId>
+				<artifactId>jackson-jaxrs-json-provider</artifactId>
+				<version>${jackson.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>apache-cxf</artifactId>
+				<version>${cxf.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-frontend-jaxws</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-transports-http</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-web</artifactId>
+				<version>4.1.9.RELEASE</version>
+			</dependency>
+
+
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-tools-common</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-tools-validator</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-tools-wsdlto-core</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-tools-wsdlto-frontend-javascript</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-tools-misctools</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-tools-corba</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-tools-wsdlto-databinding-jaxb</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-tools-wsdlto-frontend-jaxws</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-tools-wadlto-jaxrs</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-tools-java2ws</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-core</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-features-clustering</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-management</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-transports-local</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-transports-udp</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-transports-http-hc</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-transports-http-jetty</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-transports-http-netty-server</artifactId>
+				<version>${cxf.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.apache.geronimo.specs</groupId>
+						<artifactId>geronimo-servlet_2.5_spec</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>io.netty</groupId>
+						<artifactId>netty-codec-http</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-transports-http-netty-client</artifactId>
+				<version>${cxf.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>io.netty</groupId>
+						<artifactId>netty-codec-http</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-jdk14</artifactId>
+				<version>1.7.21</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>jcl-over-slf4j</artifactId>
+				<version>1.7.21</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-transports-jms</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-bindings-soap</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-bindings-corba</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-bindings-xml</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-bindings-object</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-bindings-coloc</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-databinding-aegis</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-databinding-xmlbeans</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-databinding-jibx</artifactId>
+				<version>${cxf.version}</version>
+				<optional>true</optional>
+				<exclusions>
+					<exclusion>
+						<groupId>org.jibx</groupId>
+						<artifactId>jibx-bind</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.jibx</groupId>
+						<artifactId>jibx-run</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.jibx</groupId>
+						<artifactId>jibx-schema</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.jibx</groupId>
+						<artifactId>jibx-tools</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-databinding-sdo</artifactId>
+				<version>${cxf.version}</version>
+				<optional>true</optional>
+				<exclusions>
+					<exclusion>
+						<groupId>org.apache.tuscany.sdo</groupId>
+						<artifactId>tuscany-sdo-tools</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.tuscany.sdo</groupId>
+						<artifactId>tuscany-sdo-impl</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse.persistence</groupId>
+				<artifactId>org.eclipse.persistence.moxy</artifactId>
+				<version>3.0.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-ws-addr</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-ws-rm</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-ws-policy</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-ws-mex</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-ws-security</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-frontend-js</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-frontend-simple</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-frontend-jaxrs</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-rs-extension-providers</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-rs-extension-search</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-rs-security-cors</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-rs-security-oauth</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-rs-security-oauth2</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-rs-security-xml</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-rs-security-sso-saml</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-javascript</artifactId>
+				<version>${cxf.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>javax.servlet-api</artifactId>
+				<version>${javax.servlet-api.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.json</groupId>
+				<artifactId>json</artifactId>
+				<version>20160810</version>
+			</dependency>
+			<dependency>
+				<groupId>org.sonarsource.java</groupId>
+				<artifactId>sonar-jacoco-listeners</artifactId>
+				<version>3.8</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.marklogic</groupId>
+				<artifactId>marklogic-xcc</artifactId>
+				<version>${xcc.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.marklogic</groupId>
+				<artifactId>marklogic-client-api</artifactId>
+				<version>${marklogic-client-api.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.auth0</groupId>
+				<artifactId>java-jwt</artifactId>
+				<version>3.3.0</version>
+			</dependency>
+
+			<dependency>
+				<groupId>commons-validator</groupId>
+				<artifactId>commons-validator</artifactId>
+				<version>1.6</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.eclipse.persistence</groupId>
+				<artifactId>eclipselink</artifactId>
+				<version>2.5.0</version>
+				<exclusions>
+					<exclusion>
+						<artifactId>commonj.sdo</artifactId>
+						<groupId>commonj.sdo</groupId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>com.sun.tools.xjc.maven2</groupId>
+				<artifactId>maven-jaxb-plugin</artifactId>
+				<version>1.1.1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.migesok</groupId>
+				<artifactId>jaxb-java-time-adapters</artifactId>
+				<version>1.1.3</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.openrdf.sesame</groupId>
+				<artifactId>sesame-rio-api</artifactId>
+				<version>${sesame.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.openrdf.sesame</groupId>
+				<artifactId>sesame-rio-rdfxml</artifactId>
+				<version>${sesame.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.jena</groupId>
+				<artifactId>apache-jena-tdb</artifactId>
+				<version>${jena.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.jena</groupId>
+				<artifactId>jena-tdb</artifactId>
+				<version>${jena.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.jena</groupId>
+				<artifactId>jena-arq</artifactId>
+				<version>${jena.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.github.stefanbirkner</groupId>
+				<artifactId>system-rules</artifactId>
+				<version>1.16.1</version>
+				<scope>test</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>cloud.localstack</groupId>
+				<artifactId>localstack-utils</artifactId>
+				<version>${cloud.localstack.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>edu.ucar</groupId>
+				<artifactId>cdm</artifactId>
+				<version>${netcdf.version}</version>
+				<scope>compile</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>edu.ucar</groupId>
+				<artifactId>netcdf4</artifactId>
+				<version>${netcdf.version}</version>
+				<scope>compile</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.ow2.authzforce</groupId>
+				<artifactId>authzforce-ce-core-pdp-engine</artifactId>
+				<version>${authzforce.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>30.1-jre</version>
+			</dependency>
+		</dependencies>
+
+	</dependencyManagement>
+
+	<dependencies>
+
+
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.25</version>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- needed for the @NotThreadSafe annotation -->
+		<dependency>
+			<groupId>com.github.stephenc.jcip</groupId>
+			<artifactId>jcip-annotations</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>2.7.0</version>
+			<scope>test</scope>
+		</dependency>
+
+
+
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>2.9.7</version>
+		</dependency>
+		<dependency>
+			<groupId>org.sonarsource.java</groupId>
+			<artifactId>sonar-jacoco-listeners</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- JAVA VALIDATION -->
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>5.3.4.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator-annotation-processor</artifactId>
+			<version>5.3.4.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.el</groupId>
+			<artifactId>el-api</artifactId>
+			<version>2.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.web</groupId>
+			<artifactId>javax.el</artifactId>
+			<version>2.2.6</version>
+		</dependency>
+		<!-- JAVA VALIDATION -->
+
+	</dependencies>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>license-maven-plugin</artifactId>
+					<version>2.0.0</version>
+					<configuration>
+						<verbose>false</verbose>
+						<addSvnKeyWords>false</addSvnKeyWords>
+						<includes>
+				           <include>main/java/**/*.java</include>
+				        </includes>							        		
+					</configuration>
+					<executions>
+						<execution>
+							<id>ufh</id>
+							<goals>
+								<goal>update-file-header</goal>
+							</goals>
+							<phase>process-sources</phase>
+							<configuration>
+								<licenseName>agpl_v3</licenseName>
+								<inceptionYear>2021</inceptionYear>
+								<organizationName><![CDATA[National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab]]></organizationName>
+								<projectName><![CDATA[Discovery and Access Broker (DAB) Community Edition (CE)]]></projectName>
+								<canUpdateCopyright>true</canUpdateCopyright>
+								<canUpdateDescription>true</canUpdateDescription>
+								<canUpdateLicense>true</canUpdateLicense>							
+							</configuration>
+						</execution>
+						<execution>
+							<id>upl</id>
+							<goals>
+								<goal>update-project-license</goal>
+							</goals>
+							<phase>process-sources</phase>
+							<configuration>
+								<licenseName>agpl_v3</licenseName>
+								<inceptionYear>2021</inceptionYear>
+								<organizationName><![CDATA[National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab]]></organizationName>
+								<projectName><![CDATA[Discovery and Access Broker (DAB) Community Edition (CE)]]></projectName>
+							</configuration>
+						</execution>
+						<execution>
+							<id>atp</id>
+							<goals>
+								<goal>add-third-party</goal>
+							</goals>
+							<phase>process-sources</phase>							
+						</execution>
+						<execution>
+			             <id>default-cli</id>
+			             <configuration>
+			               <licenseMerges>
+			                 <licenseMerge>The Apache Software License, Version 2.0|Apache License, Version 2.0|Apache Public License 2.0|Apache License 2.0|Apache 2.0|Apache 2|Apache Software License, 2.0|The Apache License, Version 2.0|Apache Software License - Version 2.0|Apache License Version 2.0</licenseMerge>
+			               </licenseMerges>
+			               <overrideFile>src/main/license/override-THIRD-PARTY.properties</overrideFile>
+						   <excludedGroups>eu.essi_lab</excludedGroups>
+							
+			             </configuration>
+			           </execution>
+					</executions>
+				</plugin>
+			
+				<plugin>
+					<groupId>org.sonarsource.scanner.maven</groupId>
+					<artifactId>sonar-maven-plugin</artifactId>
+					<version>${sonar.plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<configuration>
+						<skip>false</skip>
+					</configuration>
+					<executions>
+						<execution>
+							<phase>test</phase>
+							<!-- <phase>test</phase> use this to run single test with -Dtest=TestClass 
+								-Dmaven.surefire test -->
+							<goals>
+								<goal>test</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-failsafe-plugin</artifactId>
+					<version>2.19.1</version>
+					<executions>
+						<execution>
+							<id>integration-tests</id>
+							<goals>
+								<goal>integration-test</goal>
+								<goal>verify</goal>
+							</goals>
+							<configuration>
+								<!--suppress MavenModelInspection -->
+								<skipTests>${skip.integration.tests}</skipTests>
+							</configuration>
+						</execution>
+						<execution>
+							<configuration>
+								<argLine>${failsafeArgLine}</argLine>
+							</configuration>
+						</execution>
+					</executions>
+					<configuration>
+						<systemPropertyVariables>
+							<!--suppress MavenModelInspection -->
+							<dbUrl>xdbc://${docker.host.address}:${gi-marklogic.rest-port},${gi-marklogic.xdbc-port}</dbUrl>
+							<!-- marklogic-2.host>xdbc://${docker.host.address}:${gi-marklogic-2.rest-port},${gi-marklogic-2.xdbc-port}</marklogic-2.host -->
+							<!--suppress MavenModelInspection -->
+							<mysql.host>jdbc:mysql://${docker.host.address}:${mysql.port}</mysql.host>
+
+						</systemPropertyVariables>
+					</configuration>
+				</plugin>
+
+				<plugin>
+					<groupId>io.fabric8</groupId>
+					<artifactId>docker-maven-plugin</artifactId>
+					<version>${docker.plugin.version}</version>
+
+					<executions>
+						<execution>
+							<id>run-images</id>
+							<phase>pre-integration-test</phase>
+							<goals>
+								<goal>build</goal>
+								<goal>start</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>destroy-images</id>
+							<phase>post-integration-test</phase>
+							<goals>
+								<goal>stop</goal>
+								<goal>remove</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>external.atlassian.jgitflow</groupId>
+					<artifactId>jgitflow-maven-plugin</artifactId>
+					<version>1.0-m5.1</version>
+				</plugin>
+			</plugins>
+
+		</pluginManagement>
+
+		<plugins>
+			<plugin>
+				<groupId>external.atlassian.jgitflow</groupId>
+				<artifactId>jgitflow-maven-plugin</artifactId>
+				<configuration>
+					<pushReleases>true</pushReleases>
+					<noDeploy>true</noDeploy>
+					<flowInitContext>
+						<masterBranchName>master</masterBranchName>
+						<developBranchName>develop</developBranchName>
+						<featureBranchPrefix>feature/</featureBranchPrefix>
+						<releaseBranchPrefix>release/</releaseBranchPrefix>
+						<hotfixBranchPrefix>hotfix/</hotfixBranchPrefix>
+						<versionTagPrefix>v</versionTagPrefix>
+					</flowInitContext>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<inherited>false</inherited>
+				<!-- Javadoc generation skipped in the general case: the javadocs are 
+					generated by activating the javadoc profile only -->
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>none</phase>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+					<useIncrementalCompilation>false</useIncrementalCompilation>
+				</configuration>
+			</plugin>
+
+
+		</plugins>
+
+
+	</build>
+
+	<profiles>
+
+		<profile>
+			<id>fast</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<parallel>classes</parallel>
+							<threadCount>10</threadCount>
+							<runOrder>alphabetical</runOrder>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<id>javadoc</id>
+			<build>
+				<plugins>
+
+					<!-- generates javadocs -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+
+						<configuration>
+							<additionalparam>-Xdoclint:none</additionalparam>
+							<quiet>false</quiet>
+							<skip>false</skip>
+							<offlineLinks>
+								<offlineLink>
+									<url>http://download.oracle.com/javase/8/docs/api/</url>
+									<location>http://www.essi-lab.eu/projectsSites/lablib-pom/</location>
+								</offlineLink>
+							</offlineLinks>
+						</configuration>
+
+						<executions>
+							<execution>
+								<id>Super POM attach-javadocs</id>
+								<goals>
+									<goal>aggregate</goal>
+								</goals>
+								<phase>package</phase>
+							</execution>
+						</executions>
+
+					</plugin>
+
+					<!-- zip javadocs -->
+					<plugin>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<configuration>
+							<finalName>javadocs</finalName>
+						</configuration>
+						<executions>
+							<execution>
+								<id>docs-assembly</id>
+								<phase>package</phase>
+								<configuration>
+									<appendAssemblyId>false</appendAssemblyId>
+									<descriptors>
+										<descriptor>javadocs-assemble.xml</descriptor>
+									</descriptors>
+								</configuration>
+								<goals>
+									<goal>single</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+
+
+	
+	
+		<profile>
+			<id>java7</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+				<property>
+					<name>java7</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<!-- compiler set to 1.7 -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<configuration>
+							<source>1.7</source>
+							<target>1.7</target>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		
+	</profiles>
+
+	<modules>
+
+		<module>core-messages</module>
+		<module>core-datamodel</module>
+		<module>core-datamodel-iso</module>
+
+		<!-- multi module -->
+		<module>profiler</module>
+
+		<module>profiler-dev-kit</module>
+
+		<!-- multi module -->
+		<module>access-tools-downloader</module>
+
+		<!-- multi module -->
+		<module>access-tools-validator</module>
+
+		<!-- multi module -->
+		<module>accessor</module>
+
+		<module>accessor-dev-kit</module>
+
+		<!-- multi module -->
+		<module>gs-lib</module>
+
+		<!-- multi module -->
+		<module>jaxb-classes</module>
+
+		<module>database-api</module>
+		<module>database-api-marklogic-impl</module>
+		<module>database-indexes</module>
+		<module>database-wrapper-marklogic</module>
+
+		<module>conf-storage-api</module>
+		<module>conf-storage-filesystem-impl</module>
+		<module>conf-manager</module>
+
+
+		<module>request-executor</module>
+		<module>request-executor-default</module>
+
+		<module>identifier-decorator</module>
+		<module>gs-service</module>
+
+		<module>security</module>
+
+		<module>harvester</module>
+
+		<module>augmenter</module>
+		<module>augmenter-worker</module>
+
+		<module>gs-job-scheduler</module>
+		<module>gs-shared-content</module>
+		<module>gs-yellow-page</module>
+
+		<module>views</module>
+
+		<!-- access tools -->
+		<module>access-tools</module>
+		<module>access-tools-workflow-engine</module>
+
+		<!-- demo extension pack -->
+		<module>demo-extensions-pack</module>
+
+		<!-- drivers -->
+		<module>gs-driver-elasticsearch</module>
+		<module>gs-driver-marklogic</module>
+		<module>gs-driver-local-cache</module>
+		<module>runtime-info-provider</module>
+
+	</modules>
+
+	<repositories>
+
+		<!-- repository>
+			<id>hosted.repos</id>
+			<name>ESSI-Lab hosted repositories</name>
+			<url>https://essi-lab.eu/nexus/repository/hosted.repos</url>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+				<updatePolicy>never</updatePolicy>
+			</snapshots>
+		</repository-->
+
+		<repository>
+			<id>MarkLogic-releases</id>
+			<name>MarkLogic Releases</name>
+			<url>https://developer.marklogic.com/maven2</url>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+		</repository>
+
+		<repository>
+			<id>spring-plugins</id>
+			<name>Spring Plugins</name>
+			<url>https://repo.spring.io/plugins-release/</url>				 
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+		</repository>
+
+		<repository>
+			<id>osgeo-release</id>
+			<name>OSGeo Release Repository</name>
+			<url>https://repo.osgeo.org/repository/release/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+
+		<repository>
+			<id>osgeo-snapshot</id>
+			<name>OSGeo Snapshot Repository</name>
+			<url>https://repo.osgeo.org/repository/snapshot/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</repository>
+
+		<repository>
+			<id>osgeos-geotools</id>
+			<name>OS Geo Dev Tools</name>
+			<url>https://download.osgeo.org/webdav/geotools</url>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+		</repository>
+
+		<repository>
+			<id>fish</id>
+			<name>fish</name>
+			<url>http://nexus.focus.fish/nexus/repository/public/</url>
+			<releases>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+
+		<repository>
+			<id>geosolutions</id>
+			<name>geosolutions</name>
+			<url>http://maven.geo-solutions.it/</url>
+			<releases>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+
+		<repository>
+			<id>geotoolkit</id>
+			<name>geotoolkit</name>
+			<url>https://nexus.geomatys.com/repository/geotoolkit/</url>
+			<releases>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+
+		<repository>
+			<id>boundless</id>
+			<name>repo.boundlessgeo.com</name>
+			<url>https://repo.osgeo.org/</url>
+			<releases>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+
+		<repository>
+			<id>central</id>
+			<name>Maven Plugin Repository</name>
+			<url>https://repo1.maven.org/maven2</url>
+			<releases>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+
+		<repository>
+			<id>geotools</id>
+			<name>geotools</name>
+			<url>https://download.osgeo.org/webdav/geotools/</url>
+			<releases>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+
+	</repositories>
+
+</project>

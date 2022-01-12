@@ -1,0 +1,4 @@
+{ "properties": {
+			"RESPONSE_LENGTH": { "type": "long" },
+			"RESPONSE_STATUS": { "type": "integer" }
+}}

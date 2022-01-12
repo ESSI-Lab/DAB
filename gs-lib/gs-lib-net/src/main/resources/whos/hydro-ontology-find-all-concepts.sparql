@@ -1,0 +1,24 @@
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+SELECT DISTINCT ?concept ?prefLabel ?altLabel
+WHERE 
+{
+  {
+ { 
+  ?concept rdf:type skos:Concept.
+  ?concept skos:prefLabel ?match .  
+  ?concept skos:prefLabel ?prefLabel .  
+   OPTIONAL { ?concept skos:altLabel ?altLabel } 
+  } UNION { 
+  ?concept rdf:type skos:Concept.
+  ?concept skos:altLabel ?match .  
+  ?concept skos:prefLabel ?prefLabel .  
+   OPTIONAL { ?concept skos:altLabel ?altLabel } 
+  } 
+}filter 
+   (regex(?match, "^${SEARCH_TERM}$", "i"))
+   
+}
+LIMIT 25

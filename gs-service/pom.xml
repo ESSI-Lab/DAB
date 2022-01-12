@@ -1,0 +1,534 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>eu.essi_lab</groupId>
+		<artifactId>DAB</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+
+	<name>ESSI-Lab GI-suite Service</name>
+	<artifactId>gs-service</artifactId>
+	<packaging>war</packaging>
+
+	<properties>
+		<hostname>localhost</hostname>
+		<jetty.stop_port>9091</jetty.stop_port>
+		<contextPath>gs-service</contextPath>
+		<baseAppServerURL>http://${hostname}:${jetty.port}/${contextPath}/</baseAppServerURL>
+		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
+		<timestamp>${maven.build.timestamp}</timestamp>
+		<quartzUser/>
+		<quartzPassword/>
+		<configuration.url />
+
+
+	</properties>
+
+	<build>
+		<finalName>${contextPath}</finalName>
+		<resources>
+
+			<resource>
+				<directory>src/main/resources/</directory>
+				<filtering>false</filtering>
+			</resource>
+
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>conf/configurationURL.json</include>
+					<include>conf/preconfigured.json</include>
+				</includes>
+			</resource>
+
+		</resources>
+
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+			</plugin>
+
+		
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<!--version>2.4.3</version -->
+				<executions>
+					<execution>
+						<id>copy-license</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/classes/META-INF</outputDirectory>
+							<resources>
+								<resource>
+									<directory>META-INF</directory>
+									<filtering>true</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<addMavenDescriptor>false</addMavenDescriptor>
+					</archive>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<inherited>true</inherited>
+				<groupId>org.codehaus.cargo</groupId>
+				<artifactId>cargo-maven2-plugin</artifactId>
+			</plugin>
+
+			<!-- Jetty Plugin -->
+			<plugin>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<version>9.4.9.v20180320</version>
+				<!-- Updated, because version 9.4.8.v20171121 has an important bugfix: 
+					on HTTP-GET with request header Connection: close it truncates the responses. -->
+				<!-- example request to reproduce, on a machine different from localhost: 
+					wget header="Connection: close" -O result.txt "http://localhost:9090/gs-service/services/essi/cuahsi_1_1.asmx?wsdl" -->
+				<configuration>
+					<stopPort>${jetty.stop_port}</stopPort>
+					<stopKey>stop</stopKey>
+					<webAppConfig>
+						<contextPath>/${contextPath}</contextPath>
+						<webInfIncludeJarPattern>.*/spring-[^/]*\.jar$</webInfIncludeJarPattern>
+						<containerIncludeJarPattern>.*/spring-[^/]*\.jar$</containerIncludeJarPattern>
+					</webAppConfig>
+					<useTestClasspath>false</useTestClasspath>
+
+					<dumpOnStart>false</dumpOnStart>
+					<scanIntervalSeconds>0</scanIntervalSeconds>
+					<jettyXml>${project.basedir}/src/main/webapp/WEB-INF/jetty.xml,${project.basedir}/src/main/webapp/WEB-INF/jetty-http.xml,${project.basedir}/src/main/webapp/WEB-INF/jetty-ssl.xml,${project.basedir}/src/main/webapp/WEB-INF/jetty-https.xml</jettyXml>
+				</configuration>
+			</plugin>
+
+			<!-- War plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<attachClasses>true</attachClasses>
+					<webResources>
+						<resource>
+							<directory>target/classes</directory>
+							<includes>
+								<include>**/*.xml</include>
+								<include>**/*.properties</include>
+								<include>**/PostApplet*.class</include>
+							</includes>
+							<excludes>
+
+								<exclude>src/main/resources/truststore.jks</exclude>
+								<exclude>src/main/webapp/log.jsp</exclude>
+
+							</excludes>
+						</resource>
+
+						<resource>
+							<filtering>true</filtering>
+							<directory>${basedir}/src/main/webapp</directory>
+							<includes>
+								<include>**/*.xml</include>
+								<include>**/*.jsp</include>
+								<include>**/*.properties</include>
+							</includes>
+						</resource>
+
+					</webResources>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.4</version>
+				<executions>
+					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>${basedir}/target/filtered-sources</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											com.samaxes.maven
+										</groupId>
+										<artifactId>
+											maven-minify-plugin
+										</artifactId>
+										<versionRange>
+											[1.2,)
+										</versionRange>
+										<goals>
+											<goal>minify</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.codehaus.mojo
+										</groupId>
+										<artifactId>
+											build-helper-maven-plugin
+										</artifactId>
+										<versionRange>
+											[1.4,)
+										</versionRange>
+										<goals>
+											<goal>add-source</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+
+	<dependencies>
+		<dependency>
+			<groupId>com.indeed</groupId>
+			<artifactId>status-core</artifactId>
+		</dependency>
+		<!-- spring -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+		</dependency>
+
+		<!-- generates the wadl -->
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-tools-wadlto-jaxrs</artifactId>
+		</dependency>
+
+		<!-- json -->
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+		</dependency>
+
+		<!-- core -->
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>core-messages</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>core-datamodel</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<!-- configuration -->
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>conf-storage-api</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>conf-storage-filesystem-impl</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>conf-manager</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<!-- database -->
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>database-api</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>database-api-marklogic-impl</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<!-- request executor -->
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>request-executor</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>request-executor-default</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<!-- harvester -->
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>harvester</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<!-- profilers -->
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-dev-kit</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-administration</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-csw</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-oaipmh</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-opensearch</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-pub-sub</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-rest</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-wms</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-wof</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-wps</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		
+		<!-- accessors -->
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-dev-kit</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-csw</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-local-fs</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-oai-pmh</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-waf</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-wcs</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-wfs</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-wms</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-wof</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<!-- shared content -->
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>gs-shared-content</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>gs-yellow-page</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>gs-driver-local-cache</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>security</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<!-- access tools -->
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>access-tools</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>access-tools-validator-wml</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>access-tools-validator-netcdf</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>access-tools-validator-geotiff</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>access-tools-downloader-wof</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>access-tools-downloader-wcs</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>augmenter-worker</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>augmenter</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.github.stefanbirkner</groupId>
+			<artifactId>system-rules</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>gs-driver-elasticsearch</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>gs-driver-marklogic</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>preconfigured</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<properties>
+				<configuration.url>preconfigured.json</configuration.url>
+			</properties>
+		</profile>
+		<profile>
+			<!-- The configuration.url parameter should be passed as JVM argument, 
+				such as: -DconfigurationUrl=xdbc://$DBPREPRODU:$DBPREPRODP@marklogic.host.production:8000,8004/PRODUCTION-DB/acceptenvconf/ -->
+			<id>remote</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<properties>
+				<configuration.url>${configurationUrl}</configuration.url>
+			</properties>
+		</profile>
+		
+	</profiles>
+	
+</project>

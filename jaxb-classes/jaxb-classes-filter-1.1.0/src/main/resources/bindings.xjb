@@ -1,0 +1,170 @@
+<jxb:bindings version="1.0" xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ogc="http://www.opengis.net/ogc"
+    xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" xmlns:gml="http://www.opengis.net/gml"
+    jxb:extensionBindingPrefixes="xjc">
+    <jxb:bindings schemaLocation="filter/1.1.0/filter.xsd" node="/xs:schema">
+        <jxb:globalBindings fixedAttributeAsConstantProperty="true" typesafeEnumBase="xs:string"
+            typesafeEnumMemberName="generateName" generateIsSetMethod="true">
+            <xjc:noValidator/>
+            <xjc:noValidatingUnmarshaller/>
+        </jxb:globalBindings>
+        <jxb:schemaBindings>
+            <jxb:package name="eu.essi_lab.jaxb.filter._1_1_0"/>
+        </jxb:schemaBindings>
+        <jxb:bindings node="//xs:complexType[@name='BBOXType']//xs:element[@ref='gml:Envelope']">
+            <xjc:dom/>
+        </jxb:bindings>
+        <jxb:bindings
+            node="//xs:complexType[@name='BinarySpatialOpType']//xs:element[@ref!='ogc:PropertyName'][1]">
+            <xjc:dom/>
+        </jxb:bindings>
+        <jxb:bindings
+            node="//xs:complexType[@name='BinarySpatialOpType']//xs:element[@ref!='ogc:PropertyName'][2]">
+            <xjc:dom/>
+        </jxb:bindings>
+        <jxb:bindings
+            node="//xs:complexType[@name='DistanceBufferType']//xs:element[@ref='gml:AbstractGeometry']">
+            <xjc:dom/> 
+        </jxb:bindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="gml/3.2.0/base/gml.xsd" node="/xs:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="eu.essi_lab.schemas.ogc.gml._3_2_0"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="gml/3.2.0/base/gmlBase.xsd">
+        <jxb:bindings node="//xs:element[@ref='gml:member']">
+            <jxb:property name="SingleMember"/>
+        </jxb:bindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="gml/3.2.0/base/feature.xsd">
+        <jxb:bindings node="//xs:element[@ref='gml:featureMember']">
+            <jxb:property name="FeatureMemberSingleMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@ref='gml:featureMembers']">
+            <jxb:property name="FeatureMemberMultipleMember"/>
+        </jxb:bindings>
+    </jxb:bindings>
+
+    <jxb:bindings schemaLocation="gml/3.2.0/base/geometryAggregates.xsd">
+        <jxb:bindings node="//xs:element[@name='pointMember']">
+            <jxb:class name="SinglePointMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='pointMembers']">
+            <jxb:class name="MultiplePointMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@ref='gml:pointMember']">
+            <jxb:property name="SinglePointMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@ref='gml:pointMembers']">
+            <jxb:property name="MultiplePointMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='surfaceMembers']">
+            <jxb:class name="MultipleSurfaceMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@ref='gml:surfaceMember']">
+            <jxb:property name="SingleSurfaceMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@ref='gml:surfaceMembers']">
+            <jxb:property name="MultipleSurfaceMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@ref='gml:solidMembers']">
+            <jxb:property name="MultipleSolidMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@ref='gml:geometryMembers']">
+            <jxb:property name="MultipleGeometryMember"/>
+        </jxb:bindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="gml/3.2.0/base/grids.xsd">
+        <jxb:bindings node="//xs:element[@name='axisLabels']">
+            <jxb:property name="MultipleAxisLabels"/>
+        </jxb:bindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="gml/3.2.0/base/geometryPrimitives.xsd">
+        <jxb:bindings node="//xs:element[@name='surfaceMember']">
+            <jxb:class name="SingleSurfaceMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='rows']">
+            <jxb:property name="MultipleRows"/>
+        </jxb:bindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="gml/3.2.0/base/geometryAggregates.xsd">
+        <jxb:bindings node="//xs:element[@name='curveMembers']">
+            <jxb:property name="MultipleCurveMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='solidMember']">
+            <jxb:class name="SingleSolidMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='solidMembers']">
+            <jxb:class name="MultipleSolidMember"/>
+        </jxb:bindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="gml/3.2.0/base/valueObjects.xsd">
+        <jxb:bindings node="//xs:element[@ref='gml:valueComponents']">
+            <jxb:property name="MultipleValueComponent"/>
+        </jxb:bindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="gml/3.2.0/base/topology.xsd">
+        <jxb:bindings node="//xs:element[@ref='gml:topoPrimitiveMembers']">
+            <jxb:property name="MultipleTopoPrimitiveMember"/>
+        </jxb:bindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="gml/3.2.0/base/datums.xsd">
+        <jxb:bindings node="//xs:element[@name='secondDefiningParameter']">
+            <jxb:class name="SecondDefiningParameterProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='primeMeridian']">
+            <jxb:class name="PrimeMeridianProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='ellipsoid']">
+            <jxb:class name="EllipsoidProperty"/>
+        </jxb:bindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="gml/3.2.0/base/coordinateReferenceSystems.xsd">
+        <jxb:bindings node="//xs:element[@name='temporalDatum']">
+            <jxb:class name="TemporalDatumProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='ellipsoidalCS']">
+            <jxb:class name="EllipsoidalCSProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='timeCS']">
+            <jxb:class name="TimeCSProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='verticalDatum']">
+            <jxb:class name="VerticalDatumProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='conversion']">
+            <jxb:class name="ConversionProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='geodeticDatum']">
+            <jxb:class name="GeodeticDatumProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='affineCS']">
+            <jxb:class name="AffineCSProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='cartesianCS']">
+            <jxb:class name="CartesianCSProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='sphericalCS']">
+            <jxb:class name="SphericalCSProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='verticalCS']">
+            <jxb:class name="VerticalCSProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='engineeringDatum']">
+            <jxb:class name="EngineeringDatumProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='imageDatum']">
+            <jxb:class name="ImageDatumProperty"/>
+        </jxb:bindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="gml/3.2.0/base/coordinateOperations.xsd">
+        <jxb:bindings node="//xs:element[@name='operationParameter']">
+            <jxb:class name="OperationParameterProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='parameterValue']">
+            <jxb:class name="ParameterValueProperty"/>
+        </jxb:bindings>
+    </jxb:bindings>
+
+</jxb:bindings>

@@ -1,0 +1,1252 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bindings version="2.1" xmlns="http://java.sun.com/xml/ns/jaxb">
+  <!--
+
+Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.11 
+Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
+Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
+Generato il: 2015.07.10 alle 09:33:57 AM CEST 
+
+  -->
+  <bindings scd="x-schema::tns" xmlns:tns="http://www.opengis.net/gml">
+    <schemaBindings map="false">
+      <package name="eu.essi_lab.schemas.ogc.gml._3_2_0"/>
+    </schemaBindings>
+    <bindings scd="~tns:TinType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TinType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractGriddedSurfaceType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractGriddedSurfaceType"/>
+    </bindings>
+    <bindings scd="~tns:ClothoidType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ClothoidType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractGMLType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractGMLType"/>
+    </bindings>
+    <bindings scd="~tns:AssociationRoleType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AssociationRoleType"/>
+    </bindings>
+    <bindings scd="~tns:ReferenceType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ReferenceType"/>
+    </bindings>
+    <bindings scd="~tns:InlinePropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.InlinePropertyType"/>
+    </bindings>
+    <bindings scd="~tns:ArrayAssociationType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ArrayAssociationType"/>
+    </bindings>
+    <bindings scd="~tns:MetaDataPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.MetaDataPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:StringOrRefType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.StringOrRefType"/>
+    </bindings>
+    <bindings scd="~tns:CodeType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CodeType"/>
+    </bindings>
+    <bindings scd="~tns:CodeWithAuthorityType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CodeWithAuthorityType"/>
+    </bindings>
+    <bindings scd="~tns:BagType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.BagType"/>
+    </bindings>
+    <bindings scd="~tns:ArrayType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ArrayType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractMetaDataType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractMetaDataType"/>
+    </bindings>
+    <bindings scd="~tns:GenericMetaDataType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.GenericMetaDataType"/>
+    </bindings>
+    <bindings scd="~tns:DefinitionType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.DefinitionType"/>
+    </bindings>
+    <bindings scd="~tns:DictionaryType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.DictionaryType"/>
+    </bindings>
+    <bindings scd="~tns:DictionaryEntryType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.DictionaryEntryType"/>
+    </bindings>
+    <bindings scd="~tns:IndirectEntryType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.IndirectEntryType"/>
+    </bindings>
+    <bindings scd="~tns:DefinitionProxyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.DefinitionProxyType"/>
+    </bindings>
+    <bindings scd="~tns:UnitOfMeasureType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.UnitOfMeasureType"/>
+    </bindings>
+    <bindings scd="~tns:UnitDefinitionType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.UnitDefinitionType"/>
+    </bindings>
+    <bindings scd="~tns:BaseUnitType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.BaseUnitType"/>
+    </bindings>
+    <bindings scd="~tns:DerivedUnitType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.DerivedUnitType"/>
+    </bindings>
+    <bindings scd="~tns:DerivationUnitTermType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.DerivationUnitTermType"/>
+    </bindings>
+    <bindings scd="~tns:ConventionalUnitType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ConventionalUnitType"/>
+    </bindings>
+    <bindings scd="~tns:ConversionToPreferredUnitType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ConversionToPreferredUnitType"/>
+    </bindings>
+    <bindings scd="~tns:MeasureType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.MeasureType"/>
+    </bindings>
+    <bindings scd="~tns:AngleType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AngleType"/>
+    </bindings>
+    <bindings scd="~tns:DMSAngleType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.DMSAngleType"/>
+    </bindings>
+    <bindings scd="~tns:DegreesType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.DegreesType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractGeometryType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractGeometryType"/>
+    </bindings>
+    <bindings scd="~tns:DirectPositionType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.DirectPositionType"/>
+    </bindings>
+    <bindings scd="~tns:DirectPositionListType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.DirectPositionListType"/>
+    </bindings>
+    <bindings scd="~tns:CoordinatesType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CoordinatesType"/>
+    </bindings>
+    <bindings scd="~tns:VectorType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.VectorType"/>
+    </bindings>
+    <bindings scd="~tns:EnvelopeType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.EnvelopeType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractGeometricPrimitiveType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractGeometricPrimitiveType"/>
+    </bindings>
+    <bindings scd="~tns:PointType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.PointType"/>
+    </bindings>
+    <bindings scd="~tns:PointPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.PointPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:PointArrayPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.PointArrayPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractCurveType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractCurveType"/>
+    </bindings>
+    <bindings scd="~tns:CurvePropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CurvePropertyType"/>
+    </bindings>
+    <bindings scd="~tns:CurveArrayPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CurveArrayPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:LineStringType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.LineStringType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractSurfaceType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractSurfaceType"/>
+    </bindings>
+    <bindings scd="~tns:SurfacePropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.SurfacePropertyType"/>
+    </bindings>
+    <bindings scd="~tns:SurfaceArrayPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.SurfaceArrayPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:PolygonType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.PolygonType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractRingPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractRingPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractRingType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractRingType"/>
+    </bindings>
+    <bindings scd="~tns:LinearRingType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.LinearRingType"/>
+    </bindings>
+    <bindings scd="~tns:CurveType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CurveType"/>
+    </bindings>
+    <bindings scd="~tns:OrientableCurveType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.OrientableCurveType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractCurveSegmentType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractCurveSegmentType"/>
+    </bindings>
+    <bindings scd="~tns:CurveSegmentArrayPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CurveSegmentArrayPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:LineStringSegmentType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.LineStringSegmentType"/>
+    </bindings>
+    <bindings scd="~tns:ArcStringType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ArcStringType"/>
+    </bindings>
+    <bindings scd="~tns:ArcType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ArcType"/>
+    </bindings>
+    <bindings scd="~tns:CircleType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CircleType"/>
+    </bindings>
+    <bindings scd="~tns:ArcStringByBulgeType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ArcStringByBulgeType"/>
+    </bindings>
+    <bindings scd="~tns:ArcByBulgeType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ArcByBulgeType"/>
+    </bindings>
+    <bindings scd="~tns:ArcByCenterPointType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ArcByCenterPointType"/>
+    </bindings>
+    <bindings scd="~tns:CircleByCenterPointType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CircleByCenterPointType"/>
+    </bindings>
+    <bindings scd="~tns:CubicSplineType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CubicSplineType"/>
+    </bindings>
+    <bindings scd="~tns:BSplineType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.BSplineType"/>
+    </bindings>
+    <bindings scd="~tns:BezierType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.BezierType"/>
+    </bindings>
+    <bindings scd="~tns:OffsetCurveType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.OffsetCurveType"/>
+    </bindings>
+    <bindings scd="~tns:AffinePlacementType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AffinePlacementType"/>
+    </bindings>
+    <bindings scd="~tns:GeodesicStringType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.GeodesicStringType"/>
+    </bindings>
+    <bindings scd="~tns:GeodesicType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.GeodesicType"/>
+    </bindings>
+    <bindings scd="~tns:SurfaceType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.SurfaceType"/>
+    </bindings>
+    <bindings scd="~tns:OrientableSurfaceType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.OrientableSurfaceType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractSurfacePatchType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractSurfacePatchType"/>
+    </bindings>
+    <bindings scd="~tns:SurfacePatchArrayPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.SurfacePatchArrayPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:PolygonPatchType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.PolygonPatchType"/>
+    </bindings>
+    <bindings scd="~tns:TriangleType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TriangleType"/>
+    </bindings>
+    <bindings scd="~tns:RectangleType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.RectangleType"/>
+    </bindings>
+    <bindings scd="~tns:RingType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.RingType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractParametricCurveSurfaceType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractParametricCurveSurfaceType"/>
+    </bindings>
+    <bindings scd="~tns:ConeType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ConeType"/>
+    </bindings>
+    <bindings scd="~tns:CylinderType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CylinderType"/>
+    </bindings>
+    <bindings scd="~tns:SphereType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.SphereType"/>
+    </bindings>
+    <bindings scd="~tns:PolygonPatchArrayPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.PolygonPatchArrayPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:PolyhedralSurfaceType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.PolyhedralSurfaceType"/>
+    </bindings>
+    <bindings scd="~tns:TrianglePatchArrayPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TrianglePatchArrayPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:TriangulatedSurfaceType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TriangulatedSurfaceType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractSolidType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractSolidType"/>
+    </bindings>
+    <bindings scd="~tns:SolidPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.SolidPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:SolidArrayPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.SolidArrayPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:SolidType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.SolidType"/>
+    </bindings>
+    <bindings scd="~tns:ShellType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ShellType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractGeometricAggregateType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractGeometricAggregateType"/>
+    </bindings>
+    <bindings scd="~tns:MultiGeometryType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.MultiGeometryType"/>
+    </bindings>
+    <bindings scd="~tns:GeometryPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.GeometryPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:GeometryArrayPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.GeometryArrayPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:MultiGeometryPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.MultiGeometryPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:MultiPointType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.MultiPointType"/>
+    </bindings>
+    <bindings scd="~tns:MultiPointPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.MultiPointPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:MultiCurveType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.MultiCurveType"/>
+    </bindings>
+    <bindings scd="~tns:MultiCurvePropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.MultiCurvePropertyType"/>
+    </bindings>
+    <bindings scd="~tns:MultiSurfaceType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.MultiSurfaceType"/>
+    </bindings>
+    <bindings scd="~tns:MultiSurfacePropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.MultiSurfacePropertyType"/>
+    </bindings>
+    <bindings scd="~tns:MultiSolidType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.MultiSolidType"/>
+    </bindings>
+    <bindings scd="~tns:MultiSolidPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.MultiSolidPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractTimeObjectType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractTimeObjectType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractTimePrimitiveType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractTimePrimitiveType"/>
+    </bindings>
+    <bindings scd="~tns:TimePrimitivePropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TimePrimitivePropertyType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractTimeComplexType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractTimeComplexType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractTimeGeometricPrimitiveType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractTimeGeometricPrimitiveType"/>
+    </bindings>
+    <bindings scd="~tns:TimeInstantType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TimeInstantType"/>
+    </bindings>
+    <bindings scd="~tns:TimePeriodType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TimePeriodType"/>
+    </bindings>
+    <bindings scd="~tns:TimePositionType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TimePositionType"/>
+    </bindings>
+    <bindings scd="~tns:TimeIntervalLengthType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TimeIntervalLengthType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractFeatureType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractFeatureType"/>
+    </bindings>
+    <bindings scd="~tns:BoundingShapeType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.BoundingShapeType"/>
+    </bindings>
+    <bindings scd="~tns:EnvelopeWithTimePeriodType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.EnvelopeWithTimePeriodType"/>
+    </bindings>
+    <bindings scd="~tns:LocationPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.LocationPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:PriorityLocationPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.PriorityLocationPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:FeaturePropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.FeaturePropertyType"/>
+    </bindings>
+    <bindings scd="~tns:FeatureArrayPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.FeatureArrayPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractFeatureCollectionType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractFeatureCollectionType"/>
+    </bindings>
+    <bindings scd="~tns:FeatureCollectionType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.FeatureCollectionType"/>
+    </bindings>
+    <bindings scd="~tns:DirectionPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.DirectionPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:DynamicFeatureType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.DynamicFeatureType"/>
+    </bindings>
+    <bindings scd="~tns:DynamicFeatureCollectionType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.DynamicFeatureCollectionType"/>
+    </bindings>
+    <bindings scd="~tns:DynamicFeatureMemberType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.DynamicFeatureMemberType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractTimeSliceType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractTimeSliceType"/>
+    </bindings>
+    <bindings scd="~tns:MovingObjectStatusType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.MovingObjectStatusType"/>
+    </bindings>
+    <bindings scd="~tns:HistoryPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.HistoryPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:GeometricComplexType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.GeometricComplexType"/>
+    </bindings>
+    <bindings scd="~tns:CompositeCurveType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CompositeCurveType"/>
+    </bindings>
+    <bindings scd="~tns:CompositeSurfaceType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CompositeSurfaceType"/>
+    </bindings>
+    <bindings scd="~tns:CompositeSolidType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CompositeSolidType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractTopologyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractTopologyType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractTopoPrimitiveType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractTopoPrimitiveType"/>
+    </bindings>
+    <bindings scd="~tns:IsolatedPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.IsolatedPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:ContainerPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ContainerPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:NodeType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.NodeType"/>
+    </bindings>
+    <bindings scd="~tns:DirectedNodePropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.DirectedNodePropertyType"/>
+    </bindings>
+    <bindings scd="~tns:EdgeType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.EdgeType"/>
+    </bindings>
+    <bindings scd="~tns:DirectedEdgePropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.DirectedEdgePropertyType"/>
+    </bindings>
+    <bindings scd="~tns:FaceType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.FaceType"/>
+    </bindings>
+    <bindings scd="~tns:DirectedFacePropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.DirectedFacePropertyType"/>
+    </bindings>
+    <bindings scd="~tns:TopoSolidType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TopoSolidType"/>
+    </bindings>
+    <bindings scd="~tns:DirectedTopoSolidPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.DirectedTopoSolidPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:TopoPointType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TopoPointType"/>
+    </bindings>
+    <bindings scd="~tns:TopoPointPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TopoPointPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:TopoCurveType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TopoCurveType"/>
+    </bindings>
+    <bindings scd="~tns:TopoCurvePropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TopoCurvePropertyType"/>
+    </bindings>
+    <bindings scd="~tns:TopoSurfaceType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TopoSurfaceType"/>
+    </bindings>
+    <bindings scd="~tns:TopoSurfacePropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TopoSurfacePropertyType"/>
+    </bindings>
+    <bindings scd="~tns:TopoVolumeType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TopoVolumeType"/>
+    </bindings>
+    <bindings scd="~tns:TopoVolumePropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TopoVolumePropertyType"/>
+    </bindings>
+    <bindings scd="~tns:TopoComplexType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TopoComplexType"/>
+    </bindings>
+    <bindings scd="~tns:TopoComplexMemberType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TopoComplexMemberType"/>
+    </bindings>
+    <bindings scd="~tns:TopoPrimitiveMemberType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TopoPrimitiveMemberType"/>
+    </bindings>
+    <bindings scd="~tns:TopoPrimitiveArrayAssociationType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TopoPrimitiveArrayAssociationType"/>
+    </bindings>
+    <bindings scd="~tns:CodeOrNilReasonListType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CodeOrNilReasonListType"/>
+    </bindings>
+    <bindings scd="~tns:MeasureOrNilReasonListType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.MeasureOrNilReasonListType"/>
+    </bindings>
+    <bindings scd="~tns:ValuePropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ValuePropertyType"/>
+    </bindings>
+    <bindings scd="~tns:ValueArrayPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ValueArrayPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:CompositeValueType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CompositeValueType"/>
+    </bindings>
+    <bindings scd="~tns:ValueArrayType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ValueArrayType"/>
+    </bindings>
+    <bindings scd="~tns:CategoryExtentType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CategoryExtentType"/>
+    </bindings>
+    <bindings scd="~tns:QuantityExtentType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.QuantityExtentType"/>
+    </bindings>
+    <bindings scd="~tns:GridType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.GridType"/>
+    </bindings>
+    <bindings scd="~tns:RectifiedGridType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.RectifiedGridType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractCoverageType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractCoverageType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractDiscreteCoverageType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractDiscreteCoverageType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractContinuousCoverageType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractContinuousCoverageType"/>
+    </bindings>
+    <bindings scd="~tns:DomainSetType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.DomainSetType"/>
+    </bindings>
+    <bindings scd="~tns:RangeSetType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.RangeSetType"/>
+    </bindings>
+    <bindings scd="~tns:DataBlockType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.DataBlockType"/>
+    </bindings>
+    <bindings scd="~tns:RangeParametersType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.RangeParametersType"/>
+    </bindings>
+    <bindings scd="~tns:FileType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.FileType"/>
+    </bindings>
+    <bindings scd="~tns:CoverageFunctionType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CoverageFunctionType"/>
+    </bindings>
+    <bindings scd="~tns:MappingRuleType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.MappingRuleType"/>
+    </bindings>
+    <bindings scd="~tns:GridFunctionType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.GridFunctionType"/>
+    </bindings>
+    <bindings scd="~tns:MultiPointCoverageType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.MultiPointCoverageType"/>
+    </bindings>
+    <bindings scd="~tns:MultiPointDomainType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.MultiPointDomainType"/>
+    </bindings>
+    <bindings scd="~tns:MultiCurveCoverageType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.MultiCurveCoverageType"/>
+    </bindings>
+    <bindings scd="~tns:MultiCurveDomainType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.MultiCurveDomainType"/>
+    </bindings>
+    <bindings scd="~tns:MultiSurfaceCoverageType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.MultiSurfaceCoverageType"/>
+    </bindings>
+    <bindings scd="~tns:MultiSurfaceDomainType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.MultiSurfaceDomainType"/>
+    </bindings>
+    <bindings scd="~tns:MultiSolidCoverageType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.MultiSolidCoverageType"/>
+    </bindings>
+    <bindings scd="~tns:MultiSolidDomainType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.MultiSolidDomainType"/>
+    </bindings>
+    <bindings scd="~tns:GridCoverageType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.GridCoverageType"/>
+    </bindings>
+    <bindings scd="~tns:GridDomainType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.GridDomainType"/>
+    </bindings>
+    <bindings scd="~tns:RectifiedGridCoverageType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.RectifiedGridCoverageType"/>
+    </bindings>
+    <bindings scd="~tns:RectifiedGridDomainType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.RectifiedGridDomainType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractCRSType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractCRSType"/>
+    </bindings>
+    <bindings scd="~tns:CRSPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CRSPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:CoordinateSystemAxisType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CoordinateSystemAxisType"/>
+    </bindings>
+    <bindings scd="~tns:CoordinateSystemAxisPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CoordinateSystemAxisPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractCoordinateSystemType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractCoordinateSystemType"/>
+    </bindings>
+    <bindings scd="~tns:CoordinateSystemPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CoordinateSystemPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:EllipsoidalCSType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.EllipsoidalCSType"/>
+    </bindings>
+    <bindings scd="~tns:EllipsoidalCSPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.EllipsoidalCSPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:CartesianCSType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CartesianCSType"/>
+    </bindings>
+    <bindings scd="~tns:CartesianCSPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CartesianCSPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:VerticalCSType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.VerticalCSType"/>
+    </bindings>
+    <bindings scd="~tns:VerticalCSPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.VerticalCSPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:TimeCSType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TimeCSType"/>
+    </bindings>
+    <bindings scd="~tns:TemporalCSType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TemporalCSType"/>
+    </bindings>
+    <bindings scd="~tns:TemporalCSPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TemporalCSPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:LinearCSType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.LinearCSType"/>
+    </bindings>
+    <bindings scd="~tns:LinearCSPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.LinearCSPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:UserDefinedCSType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.UserDefinedCSType"/>
+    </bindings>
+    <bindings scd="~tns:UserDefinedCSPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.UserDefinedCSPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:SphericalCSType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.SphericalCSType"/>
+    </bindings>
+    <bindings scd="~tns:SphericalCSPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.SphericalCSPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:PolarCSType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.PolarCSType"/>
+    </bindings>
+    <bindings scd="~tns:PolarCSPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.PolarCSPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:CylindricalCSType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CylindricalCSType"/>
+    </bindings>
+    <bindings scd="~tns:CylindricalCSPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CylindricalCSPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:AffineCSType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AffineCSType"/>
+    </bindings>
+    <bindings scd="~tns:ObliqueCartesianCSType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ObliqueCartesianCSType"/>
+    </bindings>
+    <bindings scd="~tns:ObliqueCartesianCSPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ObliqueCartesianCSPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractDatumType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractDatumType"/>
+    </bindings>
+    <bindings scd="~tns:DatumPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.DatumPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:GeodeticDatumType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.GeodeticDatumType"/>
+    </bindings>
+    <bindings scd="~tns:PrimeMeridianPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.PrimeMeridianPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:EllipsoidPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.EllipsoidPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:GeodeticDatumPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.GeodeticDatumPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:EllipsoidType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.EllipsoidType"/>
+    </bindings>
+    <bindings scd="tns:secondDefiningParameter">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.SecondDefiningParameterProperty"/>
+    </bindings>
+    <bindings scd="tns:SecondDefiningParameter">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.SecondDefiningParameter"/>
+    </bindings>
+    <bindings scd="~tns:LengthType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.LengthType"/>
+    </bindings>
+    <bindings scd="~tns:PrimeMeridianType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.PrimeMeridianType"/>
+    </bindings>
+    <bindings scd="~tns:EngineeringDatumType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.EngineeringDatumType"/>
+    </bindings>
+    <bindings scd="~tns:EngineeringDatumPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.EngineeringDatumPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:ImageDatumType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ImageDatumType"/>
+    </bindings>
+    <bindings scd="~tns:ImageDatumPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ImageDatumPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:VerticalDatumType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.VerticalDatumType"/>
+    </bindings>
+    <bindings scd="~tns:VerticalDatumPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.VerticalDatumPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:TemporalDatumType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TemporalDatumType"/>
+    </bindings>
+    <bindings scd="~tns:TemporalDatumPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TemporalDatumPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractCoordinateOperationType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractCoordinateOperationType"/>
+    </bindings>
+    <bindings scd="tns:coordinateOperationAccuracy">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CoordinateOperationAccuracy"/>
+    </bindings>
+    <bindings scd="~tns:CoordinateOperationPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CoordinateOperationPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:SingleOperationPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.SingleOperationPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:OperationPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.OperationPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractGeneralConversionType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractGeneralConversionType"/>
+    </bindings>
+    <bindings scd="~tns:GeneralConversionPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.GeneralConversionPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractGeneralTransformationType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractGeneralTransformationType"/>
+    </bindings>
+    <bindings scd="~tns:GeneralTransformationPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.GeneralTransformationPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:ConcatenatedOperationType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ConcatenatedOperationType"/>
+    </bindings>
+    <bindings scd="~tns:ConcatenatedOperationPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ConcatenatedOperationPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:PassThroughOperationType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.PassThroughOperationType"/>
+    </bindings>
+    <bindings scd="~tns:PassThroughOperationPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.PassThroughOperationPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:ConversionType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ConversionType"/>
+    </bindings>
+    <bindings scd="~tns:OperationMethodPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.OperationMethodPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractGeneralParameterValuePropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractGeneralParameterValuePropertyType"/>
+    </bindings>
+    <bindings scd="~tns:ConversionPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ConversionPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:TransformationType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TransformationType"/>
+    </bindings>
+    <bindings scd="~tns:TransformationPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TransformationPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractGeneralParameterValueType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractGeneralParameterValueType"/>
+    </bindings>
+    <bindings scd="~tns:ParameterValueType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ParameterValueType"/>
+    </bindings>
+    <bindings scd="~tns:MeasureListType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.MeasureListType"/>
+    </bindings>
+    <bindings scd="~tns:OperationParameterPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.OperationParameterPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:ParameterValueGroupType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ParameterValueGroupType"/>
+    </bindings>
+    <bindings scd="~tns:OperationParameterGroupPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.OperationParameterGroupPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:OperationMethodType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.OperationMethodType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractGeneralOperationParameterPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractGeneralOperationParameterPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractGeneralOperationParameterType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractGeneralOperationParameterType"/>
+    </bindings>
+    <bindings scd="~tns:OperationParameterType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.OperationParameterType"/>
+    </bindings>
+    <bindings scd="~tns:OperationParameterGroupType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.OperationParameterGroupType"/>
+    </bindings>
+    <bindings scd="~tns:SingleCRSPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.SingleCRSPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractGeneralDerivedCRSType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractGeneralDerivedCRSType"/>
+    </bindings>
+    <bindings scd="~tns:CompoundCRSType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CompoundCRSType"/>
+    </bindings>
+    <bindings scd="~tns:CompoundCRSPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CompoundCRSPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:GeodeticCRSType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.GeodeticCRSType"/>
+    </bindings>
+    <bindings scd="~tns:VerticalCRSType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.VerticalCRSType"/>
+    </bindings>
+    <bindings scd="~tns:VerticalCRSPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.VerticalCRSPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:ProjectedCRSType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ProjectedCRSType"/>
+    </bindings>
+    <bindings scd="~tns:GeodeticCRSPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.GeodeticCRSPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:GeographicCRSPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.GeographicCRSPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:ProjectedCRSPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ProjectedCRSPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:DerivedCRSType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.DerivedCRSType"/>
+    </bindings>
+    <bindings scd="~tns:DerivedCRSPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.DerivedCRSPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:EngineeringCRSType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.EngineeringCRSType"/>
+    </bindings>
+    <bindings scd="~tns:EngineeringCRSPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.EngineeringCRSPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:ImageCRSType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ImageCRSType"/>
+    </bindings>
+    <bindings scd="~tns:AffineCSPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AffineCSPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:ImageCRSPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ImageCRSPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:TemporalCRSType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TemporalCRSType"/>
+    </bindings>
+    <bindings scd="~tns:TimeCSPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TimeCSPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:TemporalCRSPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TemporalCRSPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:GeographicCRSType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.GeographicCRSType"/>
+    </bindings>
+    <bindings scd="~tns:GeocentricCRSType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.GeocentricCRSType"/>
+    </bindings>
+    <bindings scd="~tns:GeocentricCRSPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.GeocentricCRSPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:ObservationType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ObservationType"/>
+    </bindings>
+    <bindings scd="~tns:ProcedurePropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ProcedurePropertyType"/>
+    </bindings>
+    <bindings scd="~tns:TargetPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TargetPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:ResultType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ResultType"/>
+    </bindings>
+    <bindings scd="~tns:DirectedObservationType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.DirectedObservationType"/>
+    </bindings>
+    <bindings scd="~tns:DirectedObservationAtDistanceType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.DirectedObservationAtDistanceType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractTimeTopologyPrimitiveType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractTimeTopologyPrimitiveType"/>
+    </bindings>
+    <bindings scd="~tns:TimeTopologyComplexType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TimeTopologyComplexType"/>
+    </bindings>
+    <bindings scd="~tns:TimeNodeType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TimeNodeType"/>
+    </bindings>
+    <bindings scd="~tns:TimeEdgeType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TimeEdgeType"/>
+    </bindings>
+    <bindings scd="~tns:TimeReferenceSystemType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TimeReferenceSystemType"/>
+    </bindings>
+    <bindings scd="~tns:TimeCoordinateSystemType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TimeCoordinateSystemType"/>
+    </bindings>
+    <bindings scd="~tns:TimeCalendarType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TimeCalendarType"/>
+    </bindings>
+    <bindings scd="~tns:TimeCalendarEraType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TimeCalendarEraType"/>
+    </bindings>
+    <bindings scd="~tns:TimeClockType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TimeClockType"/>
+    </bindings>
+    <bindings scd="~tns:TimeOrdinalReferenceSystemType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TimeOrdinalReferenceSystemType"/>
+    </bindings>
+    <bindings scd="~tns:TimeOrdinalEraType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TimeOrdinalEraType"/>
+    </bindings>
+    <bindings scd="~tns:CodeListType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CodeListType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractMemberType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractMemberType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractMetadataPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractMetadataPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:DefinitionBaseType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.DefinitionBaseType"/>
+    </bindings>
+    <bindings scd="~tns:FormulaType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.FormulaType"/>
+    </bindings>
+    <bindings scd="~tns:ScaleType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ScaleType"/>
+    </bindings>
+    <bindings scd="~tns:TimeType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TimeType"/>
+    </bindings>
+    <bindings scd="~tns:GridLengthType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.GridLengthType"/>
+    </bindings>
+    <bindings scd="~tns:AreaType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AreaType"/>
+    </bindings>
+    <bindings scd="~tns:VolumeType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.VolumeType"/>
+    </bindings>
+    <bindings scd="~tns:SpeedType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.SpeedType"/>
+    </bindings>
+    <bindings scd="~tns:AngleChoiceType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AngleChoiceType"/>
+    </bindings>
+    <bindings scd="~tns:GeometricPrimitivePropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.GeometricPrimitivePropertyType"/>
+    </bindings>
+    <bindings scd="~tns:LinearRingPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.LinearRingPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:KnotType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.KnotType"/>
+    </bindings>
+    <bindings scd="~tns:KnotPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.KnotPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:RingPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.RingPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:LineStringSegmentArrayPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.LineStringSegmentArrayPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:ShellPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.ShellPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:RelatedTimeType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.RelatedTimeType"/>
+    </bindings>
+    <bindings scd="~tns:TimeInstantPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TimeInstantPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:TimePeriodPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TimePeriodPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:BoundedFeatureType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.BoundedFeatureType"/>
+    </bindings>
+    <bindings scd="~tns:AbstractFeatureMemberType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AbstractFeatureMemberType"/>
+    </bindings>
+    <bindings scd="~tns:DirectionVectorType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.DirectionVectorType"/>
+    </bindings>
+    <bindings scd="~tns:DirectionDescriptionType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.DirectionDescriptionType"/>
+    </bindings>
+    <bindings scd="~tns:GeometricComplexPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.GeometricComplexPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:BooleanPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.BooleanPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:CategoryPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CategoryPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:QuantityPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.QuantityPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:CountPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CountPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:GridLimitsType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.GridLimitsType"/>
+    </bindings>
+    <bindings scd="~tns:GridEnvelopeType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.GridEnvelopeType"/>
+    </bindings>
+    <bindings scd="~tns:SequenceRuleType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.SequenceRuleType"/>
+    </bindings>
+    <bindings scd="~tns:IdentifiedObjectType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.IdentifiedObjectType"/>
+    </bindings>
+    <bindings scd="~tns:TemporalDatumBaseType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TemporalDatumBaseType"/>
+    </bindings>
+    <bindings scd="~tns:TimeTopologyPrimitivePropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TimeTopologyPrimitivePropertyType"/>
+    </bindings>
+    <bindings scd="~tns:TimeTopologyComplexPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TimeTopologyComplexPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:TimeNodePropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TimeNodePropertyType"/>
+    </bindings>
+    <bindings scd="~tns:TimeEdgePropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TimeEdgePropertyType"/>
+    </bindings>
+    <bindings scd="~tns:TimeCalendarPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TimeCalendarPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:TimeCalendarEraPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TimeCalendarEraPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:TimeClockPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TimeClockPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:TimeOrdinalEraPropertyType">
+      <class ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TimeOrdinalEraPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:SignType">
+      <typesafeEnumClass ref="eu.essi_lab.schemas.ogc.gml._3_2_0.SignType"/>
+    </bindings>
+    <bindings scd="~tns:AggregationType">
+      <typesafeEnumClass ref="eu.essi_lab.schemas.ogc.gml._3_2_0.AggregationType"/>
+    </bindings>
+    <bindings scd="~tns:CurveInterpolationType">
+      <typesafeEnumClass ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CurveInterpolationType"/>
+    </bindings>
+    <bindings scd="~tns:KnotTypesType">
+      <typesafeEnumClass ref="eu.essi_lab.schemas.ogc.gml._3_2_0.KnotTypesType"/>
+    </bindings>
+    <bindings scd="~tns:SurfaceInterpolationType">
+      <typesafeEnumClass ref="eu.essi_lab.schemas.ogc.gml._3_2_0.SurfaceInterpolationType"/>
+    </bindings>
+    <bindings scd="~tns:TimeIndeterminateValueType">
+      <typesafeEnumClass ref="eu.essi_lab.schemas.ogc.gml._3_2_0.TimeIndeterminateValueType"/>
+    </bindings>
+    <bindings scd="~tns:CompassPointEnumeration">
+      <typesafeEnumClass ref="eu.essi_lab.schemas.ogc.gml._3_2_0.CompassPointEnumeration"/>
+    </bindings>
+    <bindings scd="~tns:FileValueModelType">
+      <typesafeEnumClass ref="eu.essi_lab.schemas.ogc.gml._3_2_0.FileValueModelType"/>
+    </bindings>
+    <bindings scd="~tns:SequenceRuleEnumeration">
+      <typesafeEnumClass ref="eu.essi_lab.schemas.ogc.gml._3_2_0.SequenceRuleEnumeration"/>
+    </bindings>
+    <bindings scd="~tns:IncrementOrder">
+      <typesafeEnumClass ref="eu.essi_lab.schemas.ogc.gml._3_2_0.IncrementOrder"/>
+    </bindings>
+    <bindings scd="~tns:SuccessionType">
+      <typesafeEnumClass ref="eu.essi_lab.schemas.ogc.gml._3_2_0.SuccessionType"/>
+    </bindings>
+  </bindings>
+  <bindings scd="x-schema::tns" xmlns:tns="http://www.opengis.net/ogc">
+    <schemaBindings map="false">
+      <package name="eu.essi_lab.jaxb.filter._1_1_0"/>
+    </schemaBindings>
+    <bindings scd="~tns:BinaryOperatorType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.BinaryOperatorType"/>
+    </bindings>
+    <bindings scd="~tns:ExpressionType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.ExpressionType"/>
+    </bindings>
+    <bindings scd="~tns:PropertyNameType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.PropertyNameType"/>
+    </bindings>
+    <bindings scd="~tns:FunctionType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.FunctionType"/>
+    </bindings>
+    <bindings scd="~tns:LiteralType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.LiteralType"/>
+    </bindings>
+    <bindings scd="~tns:SortByType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.SortByType"/>
+    </bindings>
+    <bindings scd="tns:Filter_Capabilities">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.FilterCapabilities"/>
+    </bindings>
+    <bindings scd="~tns:Spatial_CapabilitiesType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.SpatialCapabilitiesType"/>
+    </bindings>
+    <bindings scd="~tns:Scalar_CapabilitiesType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.ScalarCapabilitiesType"/>
+    </bindings>
+    <bindings scd="~tns:Id_CapabilitiesType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.IdCapabilitiesType"/>
+    </bindings>
+    <bindings scd="tns:LogicalOperators">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.LogicalOperators"/>
+    </bindings>
+    <bindings scd="tns:SimpleArithmetic">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.SimpleArithmetic"/>
+    </bindings>
+    <bindings scd="tns:EID">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.EID"/>
+    </bindings>
+    <bindings scd="tns:FID">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.FID"/>
+    </bindings>
+    <bindings scd="~tns:AbstractIdType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.AbstractIdType"/>
+    </bindings>
+    <bindings scd="~tns:FeatureIdType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.FeatureIdType"/>
+    </bindings>
+    <bindings scd="~tns:GmlObjectIdType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.GmlObjectIdType"/>
+    </bindings>
+    <bindings scd="~tns:FilterType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.FilterType"/>
+    </bindings>
+    <bindings scd="~tns:ComparisonOpsType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.ComparisonOpsType"/>
+    </bindings>
+    <bindings scd="~tns:BinaryComparisonOpType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.BinaryComparisonOpType"/>
+    </bindings>
+    <bindings scd="~tns:PropertyIsLikeType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.PropertyIsLikeType"/>
+    </bindings>
+    <bindings scd="~tns:PropertyIsNullType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.PropertyIsNullType"/>
+    </bindings>
+    <bindings scd="~tns:PropertyIsBetweenType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.PropertyIsBetweenType"/>
+    </bindings>
+    <bindings scd="~tns:SpatialOpsType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.SpatialOpsType"/>
+    </bindings>
+    <bindings scd="~tns:BinarySpatialOpType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.BinarySpatialOpType"/>
+    </bindings>
+    <bindings scd="~tns:DistanceBufferType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.DistanceBufferType"/>
+    </bindings>
+    <bindings scd="~tns:BBOXType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.BBOXType"/>
+    </bindings>
+    <bindings scd="~tns:LogicOpsType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.LogicOpsType"/>
+    </bindings>
+    <bindings scd="~tns:BinaryLogicOpType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.BinaryLogicOpType"/>
+    </bindings>
+    <bindings scd="~tns:UnaryLogicOpType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.UnaryLogicOpType"/>
+    </bindings>
+    <bindings scd="~tns:SortPropertyType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.SortPropertyType"/>
+    </bindings>
+    <bindings scd="~tns:GeometryOperandsType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.GeometryOperandsType"/>
+    </bindings>
+    <bindings scd="~tns:SpatialOperatorsType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.SpatialOperatorsType"/>
+    </bindings>
+    <bindings scd="~tns:SpatialOperatorType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.SpatialOperatorType"/>
+    </bindings>
+    <bindings scd="~tns:ComparisonOperatorsType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.ComparisonOperatorsType"/>
+    </bindings>
+    <bindings scd="~tns:ArithmeticOperatorsType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.ArithmeticOperatorsType"/>
+    </bindings>
+    <bindings scd="~tns:FunctionsType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.FunctionsType"/>
+    </bindings>
+    <bindings scd="~tns:FunctionNamesType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.FunctionNamesType"/>
+    </bindings>
+    <bindings scd="~tns:FunctionNameType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.FunctionNameType"/>
+    </bindings>
+    <bindings scd="~tns:LowerBoundaryType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.LowerBoundaryType"/>
+    </bindings>
+    <bindings scd="~tns:UpperBoundaryType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.UpperBoundaryType"/>
+    </bindings>
+    <bindings scd="~tns:DistanceType">
+      <class ref="eu.essi_lab.jaxb.filter._1_1_0.DistanceType"/>
+    </bindings>
+    <bindings scd="~tns:SortOrderType">
+      <typesafeEnumClass ref="eu.essi_lab.jaxb.filter._1_1_0.SortOrderType"/>
+    </bindings>
+    <bindings scd="~tns:SpatialOperatorNameType">
+      <typesafeEnumClass ref="eu.essi_lab.jaxb.filter._1_1_0.SpatialOperatorNameType"/>
+    </bindings>
+    <bindings scd="~tns:ComparisonOperatorType">
+      <typesafeEnumClass ref="eu.essi_lab.jaxb.filter._1_1_0.ComparisonOperatorType"/>
+    </bindings>
+  </bindings>
+</bindings>
+

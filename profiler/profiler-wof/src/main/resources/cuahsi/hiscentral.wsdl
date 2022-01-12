@@ -1,0 +1,2153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://hiscentral.cuahsi.org/20100205/" xmlns:s1="http://hiscentral.cuahsi.org/20100205/AbstractTypes" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" targetNamespace="http://hiscentral.cuahsi.org/20100205/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://hiscentral.cuahsi.org/20100205/">
+      <s:element name="GetSites">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="xmin" type="s:double" />
+            <s:element minOccurs="1" maxOccurs="1" name="xmax" type="s:double" />
+            <s:element minOccurs="1" maxOccurs="1" name="ymin" type="s:double" />
+            <s:element minOccurs="1" maxOccurs="1" name="ymax" type="s:double" />
+            <s:element minOccurs="0" maxOccurs="1" name="conceptKeyword" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="networkIDs" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="beginDate" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="endDate" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetSitesResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetSitesResult" type="tns:ArrayOfSite" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfSite">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="Site" type="tns:Site" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="Site">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="SiteName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="SiteCode" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="Latitude" type="s:double" />
+          <s:element minOccurs="1" maxOccurs="1" name="Longitude" type="s:double" />
+          <s:element minOccurs="0" maxOccurs="1" name="HUC" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="HUCnumeric" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="servCode" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="servURL" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetSitesInBox2">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="xmin" type="s:double" />
+            <s:element minOccurs="1" maxOccurs="1" name="xmax" type="s:double" />
+            <s:element minOccurs="1" maxOccurs="1" name="ymin" type="s:double" />
+            <s:element minOccurs="1" maxOccurs="1" name="ymax" type="s:double" />
+            <s:element minOccurs="0" maxOccurs="1" name="conceptKeyword" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="networkIDs" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetSitesInBox2Response">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetSitesInBox2Result" type="tns:ArrayOfSite" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetSitesInBox">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="box" type="tns:Box" />
+            <s:element minOccurs="0" maxOccurs="1" name="conceptKeyword" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="networkIDs" type="tns:ArrayOfInt" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="Box">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="xmin" type="s:double" />
+          <s:element minOccurs="1" maxOccurs="1" name="xmax" type="s:double" />
+          <s:element minOccurs="1" maxOccurs="1" name="ymin" type="s:double" />
+          <s:element minOccurs="1" maxOccurs="1" name="ymax" type="s:double" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfInt">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="int" type="s:int" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetSitesInBoxResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetSitesInBoxResult" type="tns:ArrayOfSite" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetMappedVariables2">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="conceptids" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Networkids" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetMappedVariables2Response">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetMappedVariables2Result" type="tns:ArrayOfMappedVariable" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfMappedVariable">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="MappedVariable" type="tns:MappedVariable" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="MappedVariable">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="variableName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="variableCode" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="servCode" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="WSDL" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="conceptKeyword" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="conceptCode" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetMappedVariables">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="conceptids" type="tns:ArrayOfString" />
+            <s:element minOccurs="0" maxOccurs="1" name="Networkids" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfString">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="string" nillable="true" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetMappedVariablesResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetMappedVariablesResult" type="tns:ArrayOfMappedVariable" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetVariables">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="xmin" type="s:double" />
+            <s:element minOccurs="1" maxOccurs="1" name="xmax" type="s:double" />
+            <s:element minOccurs="1" maxOccurs="1" name="ymin" type="s:double" />
+            <s:element minOccurs="1" maxOccurs="1" name="ymax" type="s:double" />
+            <s:element minOccurs="0" maxOccurs="1" name="conceptKeyword" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="networkIDs" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="beginDate" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="endDate" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetVariablesResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetVariablesResult" type="tns:ArrayOfMappedVariable" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetServicesInBox">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="box" type="tns:Box" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetServicesInBoxResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetServicesInBoxResult" type="tns:ArrayOfServiceInfo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfServiceInfo">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="ServiceInfo" type="tns:ServiceInfo" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ServiceInfo">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="servURL" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Title" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ServiceDescriptionURL" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="name" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Email" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="phone" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="organization" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="orgwebsite" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="citation" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="aabstract" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="valuecount" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="variablecount" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="sitecount" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="ServiceID" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="NetworkName" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="minx" type="s:double" />
+          <s:element minOccurs="1" maxOccurs="1" name="miny" type="s:double" />
+          <s:element minOccurs="1" maxOccurs="1" name="maxx" type="s:double" />
+          <s:element minOccurs="1" maxOccurs="1" name="maxy" type="s:double" />
+          <s:element minOccurs="0" maxOccurs="1" name="serviceStatus" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetServicesInBox2">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="xmin" type="s:double" />
+            <s:element minOccurs="1" maxOccurs="1" name="ymin" type="s:double" />
+            <s:element minOccurs="1" maxOccurs="1" name="xmax" type="s:double" />
+            <s:element minOccurs="1" maxOccurs="1" name="ymax" type="s:double" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetServicesInBox2Response">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetServicesInBox2Result" type="tns:ArrayOfServiceInfo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetWaterOneFlowServiceInfo">
+        <s:complexType />
+      </s:element>
+      <s:element name="GetWaterOneFlowServiceInfoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetWaterOneFlowServiceInfoResult" type="tns:ArrayOfServiceInfo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetSeriesCatalogForBox">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="box" type="tns:Box" />
+            <s:element minOccurs="0" maxOccurs="1" name="conceptCode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="networkIDs" type="tns:ArrayOfInt" />
+            <s:element minOccurs="0" maxOccurs="1" name="beginDate" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="endDate" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetSeriesCatalogForBoxResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetSeriesCatalogForBoxResult" type="tns:ArrayOfSeriesRecord" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfSeriesRecord">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="SeriesRecord" type="tns:SeriesRecord" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="SeriesRecord">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="ServCode" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ServURL" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="location" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="VarCode" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="VarName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="beginDate" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="endDate" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="authtoken" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="ValueCount" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="Sitename" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="latitude" type="s:double" />
+          <s:element minOccurs="1" maxOccurs="1" name="longitude" type="s:double" />
+          <s:element minOccurs="0" maxOccurs="1" name="datatype" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="valuetype" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="samplemedium" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="timeunits" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="conceptKeyword" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="genCategory" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="TimeSupport" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetSeriesCatalogForBox2">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="xmin" type="s:double" />
+            <s:element minOccurs="1" maxOccurs="1" name="xmax" type="s:double" />
+            <s:element minOccurs="1" maxOccurs="1" name="ymin" type="s:double" />
+            <s:element minOccurs="1" maxOccurs="1" name="ymax" type="s:double" />
+            <s:element minOccurs="0" maxOccurs="1" name="conceptKeyword" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="networkIDs" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="beginDate" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="endDate" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetSeriesCatalogForBox2Response">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetSeriesCatalogForBox2Result" type="tns:ArrayOfSeriesRecord" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetSeriesCatalogForBox3">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="xmin" type="s:double" />
+            <s:element minOccurs="1" maxOccurs="1" name="xmax" type="s:double" />
+            <s:element minOccurs="1" maxOccurs="1" name="ymin" type="s:double" />
+            <s:element minOccurs="1" maxOccurs="1" name="ymax" type="s:double" />
+            <s:element minOccurs="0" maxOccurs="1" name="sampleMedium" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="dataType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="valueType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="conceptKeyword" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="networkIDs" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="beginDate" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="endDate" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetSeriesCatalogForBox3Response">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetSeriesCatalogForBox3Result" type="tns:ArrayOfSeriesRecordFull" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfSeriesRecordFull">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="SeriesRecordFull" type="tns:SeriesRecordFull" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="SeriesRecordFull">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="ServCode" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ServURL" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="location" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="VarCode" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="VarName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="beginDate" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="endDate" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="authtoken" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="ValueCount" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="Sitename" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="latitude" type="s:double" />
+          <s:element minOccurs="1" maxOccurs="1" name="longitude" type="s:double" />
+          <s:element minOccurs="0" maxOccurs="1" name="datatype" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="valuetype" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="samplemedium" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="timeunits" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="conceptKeyword" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="genCategory" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="TimeSupport" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="SeriesCode" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="QCLID" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="QCLDesc" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Organization" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="TimeUnitAbbrev" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="TimeUnits" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="IsRegular" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Speciation" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="SourceOrg" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="VariableUnitsAbbrev" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="SourceId" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="SourceDesc" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="MethodId" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="MethodDesc" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetCountOrData">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="getData" type="s:boolean" />
+            <s:element minOccurs="1" maxOccurs="1" name="getFacetOnCV" type="s:boolean" />
+            <s:element minOccurs="1" maxOccurs="1" name="xmin" type="s:double" />
+            <s:element minOccurs="1" maxOccurs="1" name="xmax" type="s:double" />
+            <s:element minOccurs="1" maxOccurs="1" name="ymin" type="s:double" />
+            <s:element minOccurs="1" maxOccurs="1" name="ymax" type="s:double" />
+            <s:element minOccurs="0" maxOccurs="1" name="sampleMedium" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="dataType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="valueType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="generalCategory" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="conceptKeyword" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="networkIDs" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="beginDate" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="endDate" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetCountOrDataResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="GetCountOrDataResult" type="tns:CountOrData" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="CountOrData">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="nseries" type="s:long" />
+          <s:element minOccurs="0" maxOccurs="1" name="message" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="facet_fields" type="tns:ArrayOfFacetField" />
+          <s:element minOccurs="0" maxOccurs="1" name="series" type="tns:ArrayOfSeriesRecordFull" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfFacetField">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="FacetField" type="tns:FacetField" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="FacetField">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="name" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="itemCount" type="s:long" />
+          <s:element minOccurs="0" maxOccurs="1" name="items" type="tns:ArrayOfItem" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfItem">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="item" type="tns:item" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="item">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="term" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="definition" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="count" type="s:long" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetSeriesMetadataCountOrData">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="getData" type="s:boolean" />
+            <s:element minOccurs="1" maxOccurs="1" name="getFacetOnCV" type="s:boolean" />
+            <s:element minOccurs="1" maxOccurs="1" name="xmin" type="s:double" />
+            <s:element minOccurs="1" maxOccurs="1" name="xmax" type="s:double" />
+            <s:element minOccurs="1" maxOccurs="1" name="ymin" type="s:double" />
+            <s:element minOccurs="1" maxOccurs="1" name="ymax" type="s:double" />
+            <s:element minOccurs="0" maxOccurs="1" name="sampleMedium" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="dataType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="valueType" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="generalCategory" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="conceptKeyword" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="networkIDs" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="beginDate" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="endDate" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetSeriesMetadataCountOrDataResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="GetSeriesMetadataCountOrDataResult" type="tns:GetSeriesCountOrData" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="GetSeriesCountOrData">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="nseries" type="s:long" />
+          <s:element minOccurs="0" maxOccurs="1" name="message" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="facet_fields" type="tns:ArrayOfFacetField" />
+          <s:element minOccurs="0" maxOccurs="1" name="series" type="tns:ArrayOfSeriesRecordFull2" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfSeriesRecordFull2">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="SeriesRecordFull2" nillable="true" type="tns:SeriesRecordFull2" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="SeriesRecordFull2">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="ServCode" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ServURL" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="location" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="VarCode" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="VarName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="beginDate" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="endDate" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="authtoken" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ValueCount" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Sitename" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="latitude" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="longitude" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="datatype" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="valuetype" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="samplemedium" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="timeunits" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="conceptKeyword" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="genCategory" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="TimeSupport" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="SeriesCode" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="QCLID" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="QCLDesc" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Organization" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="TimeUnitAbbrev" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="IsRegular" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Speciation" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="SourceOrg" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="VariableUnitsAbbrev" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="SourceId" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="SourceDesc" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="MethodId" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="MethodDesc" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetControlledVocabulary">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="cvField" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetControlledVocabularyResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="GetControlledVocabularyResult" type="tns:FacetField" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getSeriesCatalogInBoxPaged">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="xmin" type="s:double" />
+            <s:element minOccurs="1" maxOccurs="1" name="xmax" type="s:double" />
+            <s:element minOccurs="1" maxOccurs="1" name="ymin" type="s:double" />
+            <s:element minOccurs="1" maxOccurs="1" name="ymax" type="s:double" />
+            <s:element minOccurs="0" maxOccurs="1" name="conceptKeyword" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="networkIDs" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="beginDate" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="endDate" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="pageno" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getSeriesCatalogInBoxPagedResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="getSeriesCatalogInBoxPagedResult" type="tns:ArrayOfSeriesRecord" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getSearchablePaths">
+        <s:complexType />
+      </s:element>
+      <s:element name="getSearchablePathsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="getSearchablePathsResult" type="tns:ArrayOfOntologyPath" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfOntologyPath">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="OntologyPath" type="tns:OntologyPath" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="OntologyPath">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="conceptID" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="SearchableKeyword" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ConceptName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ConceptPath" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetSearchableConcepts">
+        <s:complexType />
+      </s:element>
+      <s:element name="GetSearchableConceptsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetSearchableConceptsResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getOntologyTree">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="conceptKeyword" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getOntologyTreeResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="getOntologyTreeResult" type="tns:OntologyNode" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="OntologyNode">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="keyword" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="conceptid" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="childNodes" type="tns:ArrayOfOntologyNode" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfOntologyNode">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="OntologyNode" type="tns:OntologyNode" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="getOntologywithOption">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="conceptKeyword" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="fullTree" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getOntologywithOptionResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="getOntologywithOptionResult" type="tns:OntologyNode" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetWordList">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="prefixText" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="count" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetWordListResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetWordListResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ArrayOfSite" nillable="true" type="tns:ArrayOfSite" />
+      <s:element name="ArrayOfMappedVariable" nillable="true" type="tns:ArrayOfMappedVariable" />
+      <s:element name="ArrayOfServiceInfo" nillable="true" type="tns:ArrayOfServiceInfo" />
+      <s:element name="ArrayOfSeriesRecord" nillable="true" type="tns:ArrayOfSeriesRecord" />
+      <s:element name="ArrayOfSeriesRecordFull" nillable="true" type="tns:ArrayOfSeriesRecordFull" />
+      <s:element name="CountOrData" type="tns:CountOrData" />
+      <s:element name="GetSeriesCountOrData" type="tns:GetSeriesCountOrData" />
+      <s:element name="FacetField" type="tns:FacetField" />
+      <s:element name="ArrayOfOntologyPath" nillable="true" type="tns:ArrayOfOntologyPath" />
+      <s:element name="ArrayOfString" nillable="true" type="tns:ArrayOfString" />
+      <s:element name="OntologyNode" type="tns:OntologyNode" />
+    </s:schema>
+    <s:schema targetNamespace="http://hiscentral.cuahsi.org/20100205/AbstractTypes">
+      <s:import namespace="http://schemas.xmlsoap.org/soap/encoding/" />
+      <s:complexType name="StringArray">
+        <s:complexContent mixed="false">
+          <s:restriction base="soapenc:Array">
+            <s:sequence>
+              <s:element minOccurs="0" maxOccurs="unbounded" name="String" type="s:string" />
+            </s:sequence>
+          </s:restriction>
+        </s:complexContent>
+      </s:complexType>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="GetSitesSoapIn">
+    <wsdl:part name="parameters" element="tns:GetSites" />
+  </wsdl:message>
+  <wsdl:message name="GetSitesSoapOut">
+    <wsdl:part name="parameters" element="tns:GetSitesResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetSitesInBox2SoapIn">
+    <wsdl:part name="parameters" element="tns:GetSitesInBox2" />
+  </wsdl:message>
+  <wsdl:message name="GetSitesInBox2SoapOut">
+    <wsdl:part name="parameters" element="tns:GetSitesInBox2Response" />
+  </wsdl:message>
+  <wsdl:message name="GetSitesInBoxSoapIn">
+    <wsdl:part name="parameters" element="tns:GetSitesInBox" />
+  </wsdl:message>
+  <wsdl:message name="GetSitesInBoxSoapOut">
+    <wsdl:part name="parameters" element="tns:GetSitesInBoxResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetMappedVariables2SoapIn">
+    <wsdl:part name="parameters" element="tns:GetMappedVariables2" />
+  </wsdl:message>
+  <wsdl:message name="GetMappedVariables2SoapOut">
+    <wsdl:part name="parameters" element="tns:GetMappedVariables2Response" />
+  </wsdl:message>
+  <wsdl:message name="GetMappedVariablesSoapIn">
+    <wsdl:part name="parameters" element="tns:GetMappedVariables" />
+  </wsdl:message>
+  <wsdl:message name="GetMappedVariablesSoapOut">
+    <wsdl:part name="parameters" element="tns:GetMappedVariablesResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetVariablesSoapIn">
+    <wsdl:part name="parameters" element="tns:GetVariables" />
+  </wsdl:message>
+  <wsdl:message name="GetVariablesSoapOut">
+    <wsdl:part name="parameters" element="tns:GetVariablesResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetServicesInBoxSoapIn">
+    <wsdl:part name="parameters" element="tns:GetServicesInBox" />
+  </wsdl:message>
+  <wsdl:message name="GetServicesInBoxSoapOut">
+    <wsdl:part name="parameters" element="tns:GetServicesInBoxResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetServicesInBox2SoapIn">
+    <wsdl:part name="parameters" element="tns:GetServicesInBox2" />
+  </wsdl:message>
+  <wsdl:message name="GetServicesInBox2SoapOut">
+    <wsdl:part name="parameters" element="tns:GetServicesInBox2Response" />
+  </wsdl:message>
+  <wsdl:message name="GetWaterOneFlowServiceInfoSoapIn">
+    <wsdl:part name="parameters" element="tns:GetWaterOneFlowServiceInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetWaterOneFlowServiceInfoSoapOut">
+    <wsdl:part name="parameters" element="tns:GetWaterOneFlowServiceInfoResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetSeriesCatalogForBoxSoapIn">
+    <wsdl:part name="parameters" element="tns:GetSeriesCatalogForBox" />
+  </wsdl:message>
+  <wsdl:message name="GetSeriesCatalogForBoxSoapOut">
+    <wsdl:part name="parameters" element="tns:GetSeriesCatalogForBoxResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetSeriesCatalogForBox2SoapIn">
+    <wsdl:part name="parameters" element="tns:GetSeriesCatalogForBox2" />
+  </wsdl:message>
+  <wsdl:message name="GetSeriesCatalogForBox2SoapOut">
+    <wsdl:part name="parameters" element="tns:GetSeriesCatalogForBox2Response" />
+  </wsdl:message>
+  <wsdl:message name="GetSeriesCatalogForBox3SoapIn">
+    <wsdl:part name="parameters" element="tns:GetSeriesCatalogForBox3" />
+  </wsdl:message>
+  <wsdl:message name="GetSeriesCatalogForBox3SoapOut">
+    <wsdl:part name="parameters" element="tns:GetSeriesCatalogForBox3Response" />
+  </wsdl:message>
+  <wsdl:message name="GetCountOrDataSoapIn">
+    <wsdl:part name="parameters" element="tns:GetCountOrData" />
+  </wsdl:message>
+  <wsdl:message name="GetCountOrDataSoapOut">
+    <wsdl:part name="parameters" element="tns:GetCountOrDataResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetSeriesMetadataCountOrDataSoapIn">
+    <wsdl:part name="parameters" element="tns:GetSeriesMetadataCountOrData" />
+  </wsdl:message>
+  <wsdl:message name="GetSeriesMetadataCountOrDataSoapOut">
+    <wsdl:part name="parameters" element="tns:GetSeriesMetadataCountOrDataResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetControlledVocabularySoapIn">
+    <wsdl:part name="parameters" element="tns:GetControlledVocabulary" />
+  </wsdl:message>
+  <wsdl:message name="GetControlledVocabularySoapOut">
+    <wsdl:part name="parameters" element="tns:GetControlledVocabularyResponse" />
+  </wsdl:message>
+  <wsdl:message name="getSeriesCatalogInBoxPagedSoapIn">
+    <wsdl:part name="parameters" element="tns:getSeriesCatalogInBoxPaged" />
+  </wsdl:message>
+  <wsdl:message name="getSeriesCatalogInBoxPagedSoapOut">
+    <wsdl:part name="parameters" element="tns:getSeriesCatalogInBoxPagedResponse" />
+  </wsdl:message>
+  <wsdl:message name="getSearchablePathsSoapIn">
+    <wsdl:part name="parameters" element="tns:getSearchablePaths" />
+  </wsdl:message>
+  <wsdl:message name="getSearchablePathsSoapOut">
+    <wsdl:part name="parameters" element="tns:getSearchablePathsResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetSearchableConceptsSoapIn">
+    <wsdl:part name="parameters" element="tns:GetSearchableConcepts" />
+  </wsdl:message>
+  <wsdl:message name="GetSearchableConceptsSoapOut">
+    <wsdl:part name="parameters" element="tns:GetSearchableConceptsResponse" />
+  </wsdl:message>
+  <wsdl:message name="getOntologyTreeSoapIn">
+    <wsdl:part name="parameters" element="tns:getOntologyTree" />
+  </wsdl:message>
+  <wsdl:message name="getOntologyTreeSoapOut">
+    <wsdl:part name="parameters" element="tns:getOntologyTreeResponse" />
+  </wsdl:message>
+  <wsdl:message name="getOntologywithOptionSoapIn">
+    <wsdl:part name="parameters" element="tns:getOntologywithOption" />
+  </wsdl:message>
+  <wsdl:message name="getOntologywithOptionSoapOut">
+    <wsdl:part name="parameters" element="tns:getOntologywithOptionResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetWordListSoapIn">
+    <wsdl:part name="parameters" element="tns:GetWordList" />
+  </wsdl:message>
+  <wsdl:message name="GetWordListSoapOut">
+    <wsdl:part name="parameters" element="tns:GetWordListResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetSitesHttpGetIn">
+    <wsdl:part name="xmin" type="s:string" />
+    <wsdl:part name="xmax" type="s:string" />
+    <wsdl:part name="ymin" type="s:string" />
+    <wsdl:part name="ymax" type="s:string" />
+    <wsdl:part name="conceptKeyword" type="s:string" />
+    <wsdl:part name="networkIDs" type="s:string" />
+    <wsdl:part name="beginDate" type="s:string" />
+    <wsdl:part name="endDate" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetSitesHttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfSite" />
+  </wsdl:message>
+  <wsdl:message name="GetSitesInBox2HttpGetIn">
+    <wsdl:part name="xmin" type="s:string" />
+    <wsdl:part name="xmax" type="s:string" />
+    <wsdl:part name="ymin" type="s:string" />
+    <wsdl:part name="ymax" type="s:string" />
+    <wsdl:part name="conceptKeyword" type="s:string" />
+    <wsdl:part name="networkIDs" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetSitesInBox2HttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfSite" />
+  </wsdl:message>
+  <wsdl:message name="GetMappedVariables2HttpGetIn">
+    <wsdl:part name="conceptids" type="s:string" />
+    <wsdl:part name="Networkids" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetMappedVariables2HttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfMappedVariable" />
+  </wsdl:message>
+  <wsdl:message name="GetMappedVariablesHttpGetIn">
+    <wsdl:part name="conceptids" type="s1:StringArray" />
+    <wsdl:part name="Networkids" type="s1:StringArray" />
+  </wsdl:message>
+  <wsdl:message name="GetMappedVariablesHttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfMappedVariable" />
+  </wsdl:message>
+  <wsdl:message name="GetVariablesHttpGetIn">
+    <wsdl:part name="xmin" type="s:string" />
+    <wsdl:part name="xmax" type="s:string" />
+    <wsdl:part name="ymin" type="s:string" />
+    <wsdl:part name="ymax" type="s:string" />
+    <wsdl:part name="conceptKeyword" type="s:string" />
+    <wsdl:part name="networkIDs" type="s:string" />
+    <wsdl:part name="beginDate" type="s:string" />
+    <wsdl:part name="endDate" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetVariablesHttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfMappedVariable" />
+  </wsdl:message>
+  <wsdl:message name="GetServicesInBox2HttpGetIn">
+    <wsdl:part name="xmin" type="s:string" />
+    <wsdl:part name="ymin" type="s:string" />
+    <wsdl:part name="xmax" type="s:string" />
+    <wsdl:part name="ymax" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetServicesInBox2HttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfServiceInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetWaterOneFlowServiceInfoHttpGetIn" />
+  <wsdl:message name="GetWaterOneFlowServiceInfoHttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfServiceInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetSeriesCatalogForBox2HttpGetIn">
+    <wsdl:part name="xmin" type="s:string" />
+    <wsdl:part name="xmax" type="s:string" />
+    <wsdl:part name="ymin" type="s:string" />
+    <wsdl:part name="ymax" type="s:string" />
+    <wsdl:part name="conceptKeyword" type="s:string" />
+    <wsdl:part name="networkIDs" type="s:string" />
+    <wsdl:part name="beginDate" type="s:string" />
+    <wsdl:part name="endDate" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetSeriesCatalogForBox2HttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfSeriesRecord" />
+  </wsdl:message>
+  <wsdl:message name="GetSeriesCatalogForBox3HttpGetIn">
+    <wsdl:part name="xmin" type="s:string" />
+    <wsdl:part name="xmax" type="s:string" />
+    <wsdl:part name="ymin" type="s:string" />
+    <wsdl:part name="ymax" type="s:string" />
+    <wsdl:part name="sampleMedium" type="s:string" />
+    <wsdl:part name="dataType" type="s:string" />
+    <wsdl:part name="valueType" type="s:string" />
+    <wsdl:part name="conceptKeyword" type="s:string" />
+    <wsdl:part name="networkIDs" type="s:string" />
+    <wsdl:part name="beginDate" type="s:string" />
+    <wsdl:part name="endDate" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetSeriesCatalogForBox3HttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfSeriesRecordFull" />
+  </wsdl:message>
+  <wsdl:message name="GetCountOrDataHttpGetIn">
+    <wsdl:part name="getData" type="s:string" />
+    <wsdl:part name="getFacetOnCV" type="s:string" />
+    <wsdl:part name="xmin" type="s:string" />
+    <wsdl:part name="xmax" type="s:string" />
+    <wsdl:part name="ymin" type="s:string" />
+    <wsdl:part name="ymax" type="s:string" />
+    <wsdl:part name="sampleMedium" type="s:string" />
+    <wsdl:part name="dataType" type="s:string" />
+    <wsdl:part name="valueType" type="s:string" />
+    <wsdl:part name="generalCategory" type="s:string" />
+    <wsdl:part name="conceptKeyword" type="s:string" />
+    <wsdl:part name="networkIDs" type="s:string" />
+    <wsdl:part name="beginDate" type="s:string" />
+    <wsdl:part name="endDate" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetCountOrDataHttpGetOut">
+    <wsdl:part name="Body" element="tns:CountOrData" />
+  </wsdl:message>
+  <wsdl:message name="GetSeriesMetadataCountOrDataHttpGetIn">
+    <wsdl:part name="getData" type="s:string" />
+    <wsdl:part name="getFacetOnCV" type="s:string" />
+    <wsdl:part name="xmin" type="s:string" />
+    <wsdl:part name="xmax" type="s:string" />
+    <wsdl:part name="ymin" type="s:string" />
+    <wsdl:part name="ymax" type="s:string" />
+    <wsdl:part name="sampleMedium" type="s:string" />
+    <wsdl:part name="dataType" type="s:string" />
+    <wsdl:part name="valueType" type="s:string" />
+    <wsdl:part name="generalCategory" type="s:string" />
+    <wsdl:part name="conceptKeyword" type="s:string" />
+    <wsdl:part name="networkIDs" type="s:string" />
+    <wsdl:part name="beginDate" type="s:string" />
+    <wsdl:part name="endDate" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetSeriesMetadataCountOrDataHttpGetOut">
+    <wsdl:part name="Body" element="tns:GetSeriesCountOrData" />
+  </wsdl:message>
+  <wsdl:message name="GetControlledVocabularyHttpGetIn">
+    <wsdl:part name="cvField" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetControlledVocabularyHttpGetOut">
+    <wsdl:part name="Body" element="tns:FacetField" />
+  </wsdl:message>
+  <wsdl:message name="getSeriesCatalogInBoxPagedHttpGetIn">
+    <wsdl:part name="xmin" type="s:string" />
+    <wsdl:part name="xmax" type="s:string" />
+    <wsdl:part name="ymin" type="s:string" />
+    <wsdl:part name="ymax" type="s:string" />
+    <wsdl:part name="conceptKeyword" type="s:string" />
+    <wsdl:part name="networkIDs" type="s:string" />
+    <wsdl:part name="beginDate" type="s:string" />
+    <wsdl:part name="endDate" type="s:string" />
+    <wsdl:part name="pageno" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="getSeriesCatalogInBoxPagedHttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfSeriesRecord" />
+  </wsdl:message>
+  <wsdl:message name="getSearchablePathsHttpGetIn" />
+  <wsdl:message name="getSearchablePathsHttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfOntologyPath" />
+  </wsdl:message>
+  <wsdl:message name="GetSearchableConceptsHttpGetIn" />
+  <wsdl:message name="GetSearchableConceptsHttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfString" />
+  </wsdl:message>
+  <wsdl:message name="getOntologyTreeHttpGetIn">
+    <wsdl:part name="conceptKeyword" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="getOntologyTreeHttpGetOut">
+    <wsdl:part name="Body" element="tns:OntologyNode" />
+  </wsdl:message>
+  <wsdl:message name="getOntologywithOptionHttpGetIn">
+    <wsdl:part name="conceptKeyword" type="s:string" />
+    <wsdl:part name="fullTree" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="getOntologywithOptionHttpGetOut">
+    <wsdl:part name="Body" element="tns:OntologyNode" />
+  </wsdl:message>
+  <wsdl:message name="GetWordListHttpGetIn">
+    <wsdl:part name="prefixText" type="s:string" />
+    <wsdl:part name="count" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetWordListHttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfString" />
+  </wsdl:message>
+  <wsdl:message name="GetSitesHttpPostIn">
+    <wsdl:part name="xmin" type="s:string" />
+    <wsdl:part name="xmax" type="s:string" />
+    <wsdl:part name="ymin" type="s:string" />
+    <wsdl:part name="ymax" type="s:string" />
+    <wsdl:part name="conceptKeyword" type="s:string" />
+    <wsdl:part name="networkIDs" type="s:string" />
+    <wsdl:part name="beginDate" type="s:string" />
+    <wsdl:part name="endDate" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetSitesHttpPostOut">
+    <wsdl:part name="Body" element="tns:ArrayOfSite" />
+  </wsdl:message>
+  <wsdl:message name="GetSitesInBox2HttpPostIn">
+    <wsdl:part name="xmin" type="s:string" />
+    <wsdl:part name="xmax" type="s:string" />
+    <wsdl:part name="ymin" type="s:string" />
+    <wsdl:part name="ymax" type="s:string" />
+    <wsdl:part name="conceptKeyword" type="s:string" />
+    <wsdl:part name="networkIDs" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetSitesInBox2HttpPostOut">
+    <wsdl:part name="Body" element="tns:ArrayOfSite" />
+  </wsdl:message>
+  <wsdl:message name="GetMappedVariables2HttpPostIn">
+    <wsdl:part name="conceptids" type="s:string" />
+    <wsdl:part name="Networkids" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetMappedVariables2HttpPostOut">
+    <wsdl:part name="Body" element="tns:ArrayOfMappedVariable" />
+  </wsdl:message>
+  <wsdl:message name="GetMappedVariablesHttpPostIn">
+    <wsdl:part name="conceptids" type="s1:StringArray" />
+    <wsdl:part name="Networkids" type="s1:StringArray" />
+  </wsdl:message>
+  <wsdl:message name="GetMappedVariablesHttpPostOut">
+    <wsdl:part name="Body" element="tns:ArrayOfMappedVariable" />
+  </wsdl:message>
+  <wsdl:message name="GetVariablesHttpPostIn">
+    <wsdl:part name="xmin" type="s:string" />
+    <wsdl:part name="xmax" type="s:string" />
+    <wsdl:part name="ymin" type="s:string" />
+    <wsdl:part name="ymax" type="s:string" />
+    <wsdl:part name="conceptKeyword" type="s:string" />
+    <wsdl:part name="networkIDs" type="s:string" />
+    <wsdl:part name="beginDate" type="s:string" />
+    <wsdl:part name="endDate" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetVariablesHttpPostOut">
+    <wsdl:part name="Body" element="tns:ArrayOfMappedVariable" />
+  </wsdl:message>
+  <wsdl:message name="GetServicesInBox2HttpPostIn">
+    <wsdl:part name="xmin" type="s:string" />
+    <wsdl:part name="ymin" type="s:string" />
+    <wsdl:part name="xmax" type="s:string" />
+    <wsdl:part name="ymax" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetServicesInBox2HttpPostOut">
+    <wsdl:part name="Body" element="tns:ArrayOfServiceInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetWaterOneFlowServiceInfoHttpPostIn" />
+  <wsdl:message name="GetWaterOneFlowServiceInfoHttpPostOut">
+    <wsdl:part name="Body" element="tns:ArrayOfServiceInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetSeriesCatalogForBox2HttpPostIn">
+    <wsdl:part name="xmin" type="s:string" />
+    <wsdl:part name="xmax" type="s:string" />
+    <wsdl:part name="ymin" type="s:string" />
+    <wsdl:part name="ymax" type="s:string" />
+    <wsdl:part name="conceptKeyword" type="s:string" />
+    <wsdl:part name="networkIDs" type="s:string" />
+    <wsdl:part name="beginDate" type="s:string" />
+    <wsdl:part name="endDate" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetSeriesCatalogForBox2HttpPostOut">
+    <wsdl:part name="Body" element="tns:ArrayOfSeriesRecord" />
+  </wsdl:message>
+  <wsdl:message name="GetSeriesCatalogForBox3HttpPostIn">
+    <wsdl:part name="xmin" type="s:string" />
+    <wsdl:part name="xmax" type="s:string" />
+    <wsdl:part name="ymin" type="s:string" />
+    <wsdl:part name="ymax" type="s:string" />
+    <wsdl:part name="sampleMedium" type="s:string" />
+    <wsdl:part name="dataType" type="s:string" />
+    <wsdl:part name="valueType" type="s:string" />
+    <wsdl:part name="conceptKeyword" type="s:string" />
+    <wsdl:part name="networkIDs" type="s:string" />
+    <wsdl:part name="beginDate" type="s:string" />
+    <wsdl:part name="endDate" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetSeriesCatalogForBox3HttpPostOut">
+    <wsdl:part name="Body" element="tns:ArrayOfSeriesRecordFull" />
+  </wsdl:message>
+  <wsdl:message name="GetCountOrDataHttpPostIn">
+    <wsdl:part name="getData" type="s:string" />
+    <wsdl:part name="getFacetOnCV" type="s:string" />
+    <wsdl:part name="xmin" type="s:string" />
+    <wsdl:part name="xmax" type="s:string" />
+    <wsdl:part name="ymin" type="s:string" />
+    <wsdl:part name="ymax" type="s:string" />
+    <wsdl:part name="sampleMedium" type="s:string" />
+    <wsdl:part name="dataType" type="s:string" />
+    <wsdl:part name="valueType" type="s:string" />
+    <wsdl:part name="generalCategory" type="s:string" />
+    <wsdl:part name="conceptKeyword" type="s:string" />
+    <wsdl:part name="networkIDs" type="s:string" />
+    <wsdl:part name="beginDate" type="s:string" />
+    <wsdl:part name="endDate" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetCountOrDataHttpPostOut">
+    <wsdl:part name="Body" element="tns:CountOrData" />
+  </wsdl:message>
+  <wsdl:message name="GetSeriesMetadataCountOrDataHttpPostIn">
+    <wsdl:part name="getData" type="s:string" />
+    <wsdl:part name="getFacetOnCV" type="s:string" />
+    <wsdl:part name="xmin" type="s:string" />
+    <wsdl:part name="xmax" type="s:string" />
+    <wsdl:part name="ymin" type="s:string" />
+    <wsdl:part name="ymax" type="s:string" />
+    <wsdl:part name="sampleMedium" type="s:string" />
+    <wsdl:part name="dataType" type="s:string" />
+    <wsdl:part name="valueType" type="s:string" />
+    <wsdl:part name="generalCategory" type="s:string" />
+    <wsdl:part name="conceptKeyword" type="s:string" />
+    <wsdl:part name="networkIDs" type="s:string" />
+    <wsdl:part name="beginDate" type="s:string" />
+    <wsdl:part name="endDate" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetSeriesMetadataCountOrDataHttpPostOut">
+    <wsdl:part name="Body" element="tns:GetSeriesCountOrData" />
+  </wsdl:message>
+  <wsdl:message name="GetControlledVocabularyHttpPostIn">
+    <wsdl:part name="cvField" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetControlledVocabularyHttpPostOut">
+    <wsdl:part name="Body" element="tns:FacetField" />
+  </wsdl:message>
+  <wsdl:message name="getSeriesCatalogInBoxPagedHttpPostIn">
+    <wsdl:part name="xmin" type="s:string" />
+    <wsdl:part name="xmax" type="s:string" />
+    <wsdl:part name="ymin" type="s:string" />
+    <wsdl:part name="ymax" type="s:string" />
+    <wsdl:part name="conceptKeyword" type="s:string" />
+    <wsdl:part name="networkIDs" type="s:string" />
+    <wsdl:part name="beginDate" type="s:string" />
+    <wsdl:part name="endDate" type="s:string" />
+    <wsdl:part name="pageno" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="getSeriesCatalogInBoxPagedHttpPostOut">
+    <wsdl:part name="Body" element="tns:ArrayOfSeriesRecord" />
+  </wsdl:message>
+  <wsdl:message name="getSearchablePathsHttpPostIn" />
+  <wsdl:message name="getSearchablePathsHttpPostOut">
+    <wsdl:part name="Body" element="tns:ArrayOfOntologyPath" />
+  </wsdl:message>
+  <wsdl:message name="GetSearchableConceptsHttpPostIn" />
+  <wsdl:message name="GetSearchableConceptsHttpPostOut">
+    <wsdl:part name="Body" element="tns:ArrayOfString" />
+  </wsdl:message>
+  <wsdl:message name="getOntologyTreeHttpPostIn">
+    <wsdl:part name="conceptKeyword" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="getOntologyTreeHttpPostOut">
+    <wsdl:part name="Body" element="tns:OntologyNode" />
+  </wsdl:message>
+  <wsdl:message name="getOntologywithOptionHttpPostIn">
+    <wsdl:part name="conceptKeyword" type="s:string" />
+    <wsdl:part name="fullTree" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="getOntologywithOptionHttpPostOut">
+    <wsdl:part name="Body" element="tns:OntologyNode" />
+  </wsdl:message>
+  <wsdl:message name="GetWordListHttpPostIn">
+    <wsdl:part name="prefixText" type="s:string" />
+    <wsdl:part name="count" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetWordListHttpPostOut">
+    <wsdl:part name="Body" element="tns:ArrayOfString" />
+  </wsdl:message>
+  <wsdl:portType name="hiscentralSoap">
+    <wsdl:operation name="GetSites">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt;&lt;p style='margin-left:25px;'&gt;Get a list of site information within a specified lat/lon box, and other specified query parameters. &lt;/p&gt;&lt;p style='margin-left:25px;'&gt; Typically used to subset sites dataset and plot the returned sites on a map &lt;/ p &gt; </wsdl:documentation>
+      <wsdl:input message="tns:GetSitesSoapIn" />
+      <wsdl:output message="tns:GetSitesSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSitesInBox2">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt;&lt;p style='margin-left:25px;'&gt;Get a list of site information within a specified lat/lon box, and other specified query parameters. &lt;/p&gt;&lt;p style='margin-left:25px;'&gt;Typically used to subset sites dataset and plot the returned sites on a map &lt;/ p &gt; </wsdl:documentation>
+      <wsdl:input message="tns:GetSitesInBox2SoapIn" />
+      <wsdl:output message="tns:GetSitesInBox2SoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSitesInBox">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt;&lt;p style='margin-left:25px;'&gt; &lt;strong&gt;DEPRECATED&lt;/strong&gt; Get a list of site information within a specified lat/lon box, and other specified query parameters. &lt;/p&gt;&lt;p style='margin-left:25px;'&gt;Typically used to subset sites dataset and plot the returned sites on a map &lt;/ p &gt; </wsdl:documentation>
+      <wsdl:input message="tns:GetSitesInBoxSoapIn" />
+      <wsdl:output message="tns:GetSitesInBoxSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetMappedVariables2">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br &gt;&lt;p  style='margin-left:25px;'&gt;&lt;strong&gt;DEPRECATED&lt;/strong&gt; Input conceptid (as defined in ontology tree) for specified services, return the corresponding variable information including variablename, variablecode, valuetype, timeUnitID, datatype, etc.&lt;/p&gt;</wsdl:documentation>
+      <wsdl:input message="tns:GetMappedVariables2SoapIn" />
+      <wsdl:output message="tns:GetMappedVariables2SoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetMappedVariables">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br &gt;&lt;p  style='margin-left:25px;'&gt;&lt;strong&gt;DEPRECATED&lt;/strong&gt; Input conceptid (as defined in ontology tree) for specified services, return the corresponding variable information including variablename, variablecode, valuetype, timeUnitID, datatype, etc.&lt;/p&gt;</wsdl:documentation>
+      <wsdl:input message="tns:GetMappedVariablesSoapIn" />
+      <wsdl:output message="tns:GetMappedVariablesSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetVariables">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt;Get a list of variable information within a specified lat/lon box, and other specified query parameters.&lt;/p &gt;</wsdl:documentation>
+      <wsdl:input message="tns:GetVariablesSoapIn" />
+      <wsdl:output message="tns:GetVariablesSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetServicesInBox">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt;&lt;strong&gt;DEPRECATED&lt;/strong&gt; Get registered data services within a specified lat/lon box.&lt;/p&gt;&lt;p style = 'margin-left:25px;'&gt;Typically used to subset the data services and use the result as an input for filtering&lt;/p&gt;</wsdl:documentation>
+      <wsdl:input message="tns:GetServicesInBoxSoapIn" />
+      <wsdl:output message="tns:GetServicesInBoxSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetServicesInBox2">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt;Get registered data services within a specified set of coordinates.&lt;/p&gt;&lt;p style = 'margin-left:25px;'&gt;Typically used to subset the data services and use the result as an input for filtering&lt;/p&gt;</wsdl:documentation>
+      <wsdl:input message="tns:GetServicesInBox2SoapIn" />
+      <wsdl:output message="tns:GetServicesInBox2SoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetWaterOneFlowServiceInfo">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt; Get all registered data services from&lt;a href= 'http://hiscentral.cuahsi.org/pub_services.aspx' &gt; http://hiscentral.cuahsi.org/pub_services.aspx&lt;/a&gt;. GetWaterOneFlowServiceInfo can be regarded as a special case of GetServicesInBox2, as the former requests the returns for the global area.&lt;/p&gt;</wsdl:documentation>
+      <wsdl:input message="tns:GetWaterOneFlowServiceInfoSoapIn" />
+      <wsdl:output message="tns:GetWaterOneFlowServiceInfoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSeriesCatalogForBox">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt;&lt;p style = 'margin-left:25px;'&gt;&lt;strong&gt;DEPRECATED&lt;/strong&gt; Returns metadata for timeseries that match the provided parameters.The returned object contains a subset of the available metadata sufficient for basic searches.&lt;/p&gt; &lt;/br&gt;&lt;p style = 'margin-left:25px;'&gt;It does not contain data for e.g Quality control level or source&lt;/p&gt;</wsdl:documentation>
+      <wsdl:input message="tns:GetSeriesCatalogForBoxSoapIn" />
+      <wsdl:output message="tns:GetSeriesCatalogForBoxSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSeriesCatalogForBox2">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt;&lt;p style = 'margin-left:25px;'&gt;Returns metadata for timeseries that match the provided parameters.The returned object contains a subset of the available metadata sufficient for basic searches.&lt;/p&gt; &lt;/br&gt;&lt;p style = 'margin-left:25px;'&gt;It does not contain data for e.g Quality control level or source&lt;/p&gt;</wsdl:documentation>
+      <wsdl:input message="tns:GetSeriesCatalogForBox2SoapIn" />
+      <wsdl:output message="tns:GetSeriesCatalogForBox2SoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSeriesCatalogForBox3">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt;Returns metadata for timeseries that match the provided parameters. The returned object contains the full set of the available metadata sufficient for complex searches.&lt;/p&gt;&lt;p style = 'margin-left:25px;'&gt;It does contain data for e.g Qualitycontrol Level or Source&lt;/p&gt;</wsdl:documentation>
+      <wsdl:input message="tns:GetSeriesCatalogForBox3SoapIn" />
+      <wsdl:output message="tns:GetSeriesCatalogForBox3SoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCountOrData">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt;&lt;strong&gt;DEPRECATED&lt;/strong&gt; use GetSeriesMetadataCountOrData) Provides information about metadata stored in the catalog.Tycally used to search the catalog. &lt;/p&gt;&lt;br&gt;It can return &lt;ul&gt; &lt;li&gt; 1.The count of timeseries that match the provided parameters. &lt;/li&gt;&lt;li&gt; 2.the statistics for the distribution of all facets for timeseries that match the provided parameters.e.g how many timeseries have the datatype 'average', or the keyword 'precipitation'.&lt;/li&gt;&lt;li&gt; 3.the complete set of all metadata records for timeseries that match the provided parameters. &lt;/li &gt;&lt;/ul &gt;&lt;p&gt; The return can be defined by providing the appropriate parameters in the request.The return of this request can not exceed 25.000 timeseries. &lt;/p&gt; </wsdl:documentation>
+      <wsdl:input message="tns:GetCountOrDataSoapIn" />
+      <wsdl:output message="tns:GetCountOrDataSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSeriesMetadataCountOrData">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt;Provides information about metadata stored in the catalog.Tycally used to search the catalog. &lt;br&gt;It can return &lt;ul&gt; &lt;li&gt; 1.The count of timeseries that match the provided parameters. &lt;/li&gt;&lt;li&gt; 2.the statistics for the distribution of all facets for timeseries that match the provided parameters.e.g how many timeseries have the datatype 'average', or the keyword 'precipitation'.&lt;/li&gt;&lt;li&gt; 3.the complete set of all metadata records for timeseries that match the provided parameters. &lt;/li &gt;&lt;/ul &gt;&lt;p&gt; The return can be defined by providing the appropriate parameters in the request.The return of this request can not exceed 25.000 timeseries. &lt;/p&gt; </wsdl:documentation>
+      <wsdl:input message="tns:GetSeriesMetadataCountOrDataSoapIn" />
+      <wsdl:output message="tns:GetSeriesMetadataCountOrDataSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetControlledVocabulary">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt;Get the terms and definitions of controlled vocabulary (CV), which are dynamically updated from &lt;a href='http://his.cuahsi.org/mastercvreg/cv11.aspx'&gt;http://his.cuahsi.org/mastercvreg/cv11.aspx&lt;/a&gt;Typically used when the user requires terms from these controlled vocabularies to provide additional filtering parameters.&lt;/ p &gt;</wsdl:documentation>
+      <wsdl:input message="tns:GetControlledVocabularySoapIn" />
+      <wsdl:output message="tns:GetControlledVocabularySoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getSeriesCatalogInBoxPaged">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt; &lt;strong&gt;DEPRECATED&lt;/strong&gt; Returns metadata for timeseries that match the provided parameters in predefined subsets. The returned object contains a subset of the available metadata sufficient for basic searches. it does not contain dat for e.g Qualitycontrol Level or Source&lt;/p&gt;Typical use was to help with paginatin of results. Not supported anymore &lt;/ p &gt;</wsdl:documentation>
+      <wsdl:input message="tns:getSeriesCatalogInBoxPagedSoapIn" />
+      <wsdl:output message="tns:getSeriesCatalogInBoxPagedSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getSearchablePaths">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt;&lt;strong&gt;DEPRECATED&lt;/strong&gt;&lt;/p &gt;</wsdl:documentation>
+      <wsdl:input message="tns:getSearchablePathsSoapIn" />
+      <wsdl:output message="tns:getSearchablePathsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSearchableConcepts">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt;&lt;p&gt;Get a list of searchable concept keywords from the HIS ontology&lt;/p&gt;&lt;p&gt; Typical use to retrieve list of concepts keywords that can be used as an input parameter for keyword searches or pre - populate fields in e.g. in HydroDesktop.&lt;/ p &gt; </wsdl:documentation>
+      <wsdl:input message="tns:GetSearchableConceptsSoapIn" />
+      <wsdl:output message="tns:GetSearchableConceptsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getOntologyTree">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt;Get the subnodes (both leaf and non-leaf) for input concept &lt;strong&gt;keyword&lt;/strong&gt; in the Ontology Tree.&lt;ul&gt;&lt;li style='font-weight: 400;'&gt;Keyword is one of the search criteria used in HydroClient (refer to notes in this section). &lt;/li&gt;&lt;li style='font-weight: 400;'&gt;Keyword is also used when data provider uploads data and try to make the uploaded data comply with WaterOneFlow schema. Generally, the user is required to choose a leaf keyword in the ontology tree for each input variable name, so that the newly added variable name is searchable in HisCentral catalog.&lt;/li&gt;&lt;li style='font-weight: 400;'&gt;GetOntologyTree() returns nodes in the full ontology tree.&lt;/li&gt;&lt;/ul&gt; &lt;br&gt;&lt;/p&gt;</wsdl:documentation>
+      <wsdl:input message="tns:getOntologyTreeSoapIn" />
+      <wsdl:output message="tns:getOntologyTreeSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getOntologywithOption">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt;Get the subnodes (both leaf and non-leaf) for input concept &lt;strong&gt;keyword&lt;/strong&gt; in the Ontology Tree.&lt;ul&gt;&lt;li style='font-weight: 400;'&gt;Keyword is one of the search criteria used in HydroClient (refer to notes in this section). &lt;/li&gt;&lt;li style='font-weight: 400;'&gt;Keyword is also used when data provider uploads data and try to make the uploaded data comply with WaterOneFlow schema. Generally, the user is required to choose a leaf keyword in the ontology tree for each input variable name, so that the newly added variable name is searchable in HisCentral catalog.&lt;/li&gt;&lt;li style = 'font-weight: 400;' &gt; The current HisCentral catalog has timeseries data that utilize a subset of the total keywords in the &lt; strong &gt; full &lt;/ strong &gt; ontology tree.Hereafter, the ontology tree composed of the nodes with existing variables in HisCentral catalog(i.e., those ~500 keywords) is referred as &lt;strong&gt; partial &lt;/strong &gt; ontology tree.&lt;/li&gt;&lt;li style = 'font-weight: 400;' &gt; GetOntologyTree() returns nodes in the full ontology tree, while GetOntologyTreewithOption() adds the option of returning nodes in the partial ontology tree&lt;/li&gt;&lt;/ul&gt; &lt;br&gt;&lt;/p&gt;</wsdl:documentation>
+      <wsdl:input message="tns:getOntologywithOptionSoapIn" />
+      <wsdl:output message="tns:getOntologywithOptionSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetWordList">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt;&lt;strong&gt;DEPRECATED&lt;/strong&gt; This prefix search routine provides a word match list for HD.&lt;/p &gt;</wsdl:documentation>
+      <wsdl:input message="tns:GetWordListSoapIn" />
+      <wsdl:output message="tns:GetWordListSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="hiscentralHttpGet">
+    <wsdl:operation name="GetSites">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt;&lt;p style='margin-left:25px;'&gt;Get a list of site information within a specified lat/lon box, and other specified query parameters. &lt;/p&gt;&lt;p style='margin-left:25px;'&gt; Typically used to subset sites dataset and plot the returned sites on a map &lt;/ p &gt; </wsdl:documentation>
+      <wsdl:input message="tns:GetSitesHttpGetIn" />
+      <wsdl:output message="tns:GetSitesHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSitesInBox2">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt;&lt;p style='margin-left:25px;'&gt;Get a list of site information within a specified lat/lon box, and other specified query parameters. &lt;/p&gt;&lt;p style='margin-left:25px;'&gt;Typically used to subset sites dataset and plot the returned sites on a map &lt;/ p &gt; </wsdl:documentation>
+      <wsdl:input message="tns:GetSitesInBox2HttpGetIn" />
+      <wsdl:output message="tns:GetSitesInBox2HttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetMappedVariables2">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br &gt;&lt;p  style='margin-left:25px;'&gt;&lt;strong&gt;DEPRECATED&lt;/strong&gt; Input conceptid (as defined in ontology tree) for specified services, return the corresponding variable information including variablename, variablecode, valuetype, timeUnitID, datatype, etc.&lt;/p&gt;</wsdl:documentation>
+      <wsdl:input message="tns:GetMappedVariables2HttpGetIn" />
+      <wsdl:output message="tns:GetMappedVariables2HttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetMappedVariables">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br &gt;&lt;p  style='margin-left:25px;'&gt;&lt;strong&gt;DEPRECATED&lt;/strong&gt; Input conceptid (as defined in ontology tree) for specified services, return the corresponding variable information including variablename, variablecode, valuetype, timeUnitID, datatype, etc.&lt;/p&gt;</wsdl:documentation>
+      <wsdl:input message="tns:GetMappedVariablesHttpGetIn" />
+      <wsdl:output message="tns:GetMappedVariablesHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetVariables">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt;Get a list of variable information within a specified lat/lon box, and other specified query parameters.&lt;/p &gt;</wsdl:documentation>
+      <wsdl:input message="tns:GetVariablesHttpGetIn" />
+      <wsdl:output message="tns:GetVariablesHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetServicesInBox2">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt;Get registered data services within a specified set of coordinates.&lt;/p&gt;&lt;p style = 'margin-left:25px;'&gt;Typically used to subset the data services and use the result as an input for filtering&lt;/p&gt;</wsdl:documentation>
+      <wsdl:input message="tns:GetServicesInBox2HttpGetIn" />
+      <wsdl:output message="tns:GetServicesInBox2HttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetWaterOneFlowServiceInfo">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt; Get all registered data services from&lt;a href= 'http://hiscentral.cuahsi.org/pub_services.aspx' &gt; http://hiscentral.cuahsi.org/pub_services.aspx&lt;/a&gt;. GetWaterOneFlowServiceInfo can be regarded as a special case of GetServicesInBox2, as the former requests the returns for the global area.&lt;/p&gt;</wsdl:documentation>
+      <wsdl:input message="tns:GetWaterOneFlowServiceInfoHttpGetIn" />
+      <wsdl:output message="tns:GetWaterOneFlowServiceInfoHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSeriesCatalogForBox2">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt;&lt;p style = 'margin-left:25px;'&gt;Returns metadata for timeseries that match the provided parameters.The returned object contains a subset of the available metadata sufficient for basic searches.&lt;/p&gt; &lt;/br&gt;&lt;p style = 'margin-left:25px;'&gt;It does not contain data for e.g Quality control level or source&lt;/p&gt;</wsdl:documentation>
+      <wsdl:input message="tns:GetSeriesCatalogForBox2HttpGetIn" />
+      <wsdl:output message="tns:GetSeriesCatalogForBox2HttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSeriesCatalogForBox3">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt;Returns metadata for timeseries that match the provided parameters. The returned object contains the full set of the available metadata sufficient for complex searches.&lt;/p&gt;&lt;p style = 'margin-left:25px;'&gt;It does contain data for e.g Qualitycontrol Level or Source&lt;/p&gt;</wsdl:documentation>
+      <wsdl:input message="tns:GetSeriesCatalogForBox3HttpGetIn" />
+      <wsdl:output message="tns:GetSeriesCatalogForBox3HttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCountOrData">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt;&lt;strong&gt;DEPRECATED&lt;/strong&gt; use GetSeriesMetadataCountOrData) Provides information about metadata stored in the catalog.Tycally used to search the catalog. &lt;/p&gt;&lt;br&gt;It can return &lt;ul&gt; &lt;li&gt; 1.The count of timeseries that match the provided parameters. &lt;/li&gt;&lt;li&gt; 2.the statistics for the distribution of all facets for timeseries that match the provided parameters.e.g how many timeseries have the datatype 'average', or the keyword 'precipitation'.&lt;/li&gt;&lt;li&gt; 3.the complete set of all metadata records for timeseries that match the provided parameters. &lt;/li &gt;&lt;/ul &gt;&lt;p&gt; The return can be defined by providing the appropriate parameters in the request.The return of this request can not exceed 25.000 timeseries. &lt;/p&gt; </wsdl:documentation>
+      <wsdl:input message="tns:GetCountOrDataHttpGetIn" />
+      <wsdl:output message="tns:GetCountOrDataHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSeriesMetadataCountOrData">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt;Provides information about metadata stored in the catalog.Tycally used to search the catalog. &lt;br&gt;It can return &lt;ul&gt; &lt;li&gt; 1.The count of timeseries that match the provided parameters. &lt;/li&gt;&lt;li&gt; 2.the statistics for the distribution of all facets for timeseries that match the provided parameters.e.g how many timeseries have the datatype 'average', or the keyword 'precipitation'.&lt;/li&gt;&lt;li&gt; 3.the complete set of all metadata records for timeseries that match the provided parameters. &lt;/li &gt;&lt;/ul &gt;&lt;p&gt; The return can be defined by providing the appropriate parameters in the request.The return of this request can not exceed 25.000 timeseries. &lt;/p&gt; </wsdl:documentation>
+      <wsdl:input message="tns:GetSeriesMetadataCountOrDataHttpGetIn" />
+      <wsdl:output message="tns:GetSeriesMetadataCountOrDataHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetControlledVocabulary">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt;Get the terms and definitions of controlled vocabulary (CV), which are dynamically updated from &lt;a href='http://his.cuahsi.org/mastercvreg/cv11.aspx'&gt;http://his.cuahsi.org/mastercvreg/cv11.aspx&lt;/a&gt;Typically used when the user requires terms from these controlled vocabularies to provide additional filtering parameters.&lt;/ p &gt;</wsdl:documentation>
+      <wsdl:input message="tns:GetControlledVocabularyHttpGetIn" />
+      <wsdl:output message="tns:GetControlledVocabularyHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getSeriesCatalogInBoxPaged">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt; &lt;strong&gt;DEPRECATED&lt;/strong&gt; Returns metadata for timeseries that match the provided parameters in predefined subsets. The returned object contains a subset of the available metadata sufficient for basic searches. it does not contain dat for e.g Qualitycontrol Level or Source&lt;/p&gt;Typical use was to help with paginatin of results. Not supported anymore &lt;/ p &gt;</wsdl:documentation>
+      <wsdl:input message="tns:getSeriesCatalogInBoxPagedHttpGetIn" />
+      <wsdl:output message="tns:getSeriesCatalogInBoxPagedHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getSearchablePaths">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt;&lt;strong&gt;DEPRECATED&lt;/strong&gt;&lt;/p &gt;</wsdl:documentation>
+      <wsdl:input message="tns:getSearchablePathsHttpGetIn" />
+      <wsdl:output message="tns:getSearchablePathsHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSearchableConcepts">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt;&lt;p&gt;Get a list of searchable concept keywords from the HIS ontology&lt;/p&gt;&lt;p&gt; Typical use to retrieve list of concepts keywords that can be used as an input parameter for keyword searches or pre - populate fields in e.g. in HydroDesktop.&lt;/ p &gt; </wsdl:documentation>
+      <wsdl:input message="tns:GetSearchableConceptsHttpGetIn" />
+      <wsdl:output message="tns:GetSearchableConceptsHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getOntologyTree">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt;Get the subnodes (both leaf and non-leaf) for input concept &lt;strong&gt;keyword&lt;/strong&gt; in the Ontology Tree.&lt;ul&gt;&lt;li style='font-weight: 400;'&gt;Keyword is one of the search criteria used in HydroClient (refer to notes in this section). &lt;/li&gt;&lt;li style='font-weight: 400;'&gt;Keyword is also used when data provider uploads data and try to make the uploaded data comply with WaterOneFlow schema. Generally, the user is required to choose a leaf keyword in the ontology tree for each input variable name, so that the newly added variable name is searchable in HisCentral catalog.&lt;/li&gt;&lt;li style='font-weight: 400;'&gt;GetOntologyTree() returns nodes in the full ontology tree.&lt;/li&gt;&lt;/ul&gt; &lt;br&gt;&lt;/p&gt;</wsdl:documentation>
+      <wsdl:input message="tns:getOntologyTreeHttpGetIn" />
+      <wsdl:output message="tns:getOntologyTreeHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getOntologywithOption">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt;Get the subnodes (both leaf and non-leaf) for input concept &lt;strong&gt;keyword&lt;/strong&gt; in the Ontology Tree.&lt;ul&gt;&lt;li style='font-weight: 400;'&gt;Keyword is one of the search criteria used in HydroClient (refer to notes in this section). &lt;/li&gt;&lt;li style='font-weight: 400;'&gt;Keyword is also used when data provider uploads data and try to make the uploaded data comply with WaterOneFlow schema. Generally, the user is required to choose a leaf keyword in the ontology tree for each input variable name, so that the newly added variable name is searchable in HisCentral catalog.&lt;/li&gt;&lt;li style = 'font-weight: 400;' &gt; The current HisCentral catalog has timeseries data that utilize a subset of the total keywords in the &lt; strong &gt; full &lt;/ strong &gt; ontology tree.Hereafter, the ontology tree composed of the nodes with existing variables in HisCentral catalog(i.e., those ~500 keywords) is referred as &lt;strong&gt; partial &lt;/strong &gt; ontology tree.&lt;/li&gt;&lt;li style = 'font-weight: 400;' &gt; GetOntologyTree() returns nodes in the full ontology tree, while GetOntologyTreewithOption() adds the option of returning nodes in the partial ontology tree&lt;/li&gt;&lt;/ul&gt; &lt;br&gt;&lt;/p&gt;</wsdl:documentation>
+      <wsdl:input message="tns:getOntologywithOptionHttpGetIn" />
+      <wsdl:output message="tns:getOntologywithOptionHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetWordList">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt;&lt;strong&gt;DEPRECATED&lt;/strong&gt; This prefix search routine provides a word match list for HD.&lt;/p &gt;</wsdl:documentation>
+      <wsdl:input message="tns:GetWordListHttpGetIn" />
+      <wsdl:output message="tns:GetWordListHttpGetOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="hiscentralHttpPost">
+    <wsdl:operation name="GetSites">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt;&lt;p style='margin-left:25px;'&gt;Get a list of site information within a specified lat/lon box, and other specified query parameters. &lt;/p&gt;&lt;p style='margin-left:25px;'&gt; Typically used to subset sites dataset and plot the returned sites on a map &lt;/ p &gt; </wsdl:documentation>
+      <wsdl:input message="tns:GetSitesHttpPostIn" />
+      <wsdl:output message="tns:GetSitesHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSitesInBox2">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt;&lt;p style='margin-left:25px;'&gt;Get a list of site information within a specified lat/lon box, and other specified query parameters. &lt;/p&gt;&lt;p style='margin-left:25px;'&gt;Typically used to subset sites dataset and plot the returned sites on a map &lt;/ p &gt; </wsdl:documentation>
+      <wsdl:input message="tns:GetSitesInBox2HttpPostIn" />
+      <wsdl:output message="tns:GetSitesInBox2HttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetMappedVariables2">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br &gt;&lt;p  style='margin-left:25px;'&gt;&lt;strong&gt;DEPRECATED&lt;/strong&gt; Input conceptid (as defined in ontology tree) for specified services, return the corresponding variable information including variablename, variablecode, valuetype, timeUnitID, datatype, etc.&lt;/p&gt;</wsdl:documentation>
+      <wsdl:input message="tns:GetMappedVariables2HttpPostIn" />
+      <wsdl:output message="tns:GetMappedVariables2HttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetMappedVariables">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br &gt;&lt;p  style='margin-left:25px;'&gt;&lt;strong&gt;DEPRECATED&lt;/strong&gt; Input conceptid (as defined in ontology tree) for specified services, return the corresponding variable information including variablename, variablecode, valuetype, timeUnitID, datatype, etc.&lt;/p&gt;</wsdl:documentation>
+      <wsdl:input message="tns:GetMappedVariablesHttpPostIn" />
+      <wsdl:output message="tns:GetMappedVariablesHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetVariables">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt;Get a list of variable information within a specified lat/lon box, and other specified query parameters.&lt;/p &gt;</wsdl:documentation>
+      <wsdl:input message="tns:GetVariablesHttpPostIn" />
+      <wsdl:output message="tns:GetVariablesHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetServicesInBox2">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt;Get registered data services within a specified set of coordinates.&lt;/p&gt;&lt;p style = 'margin-left:25px;'&gt;Typically used to subset the data services and use the result as an input for filtering&lt;/p&gt;</wsdl:documentation>
+      <wsdl:input message="tns:GetServicesInBox2HttpPostIn" />
+      <wsdl:output message="tns:GetServicesInBox2HttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetWaterOneFlowServiceInfo">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt; Get all registered data services from&lt;a href= 'http://hiscentral.cuahsi.org/pub_services.aspx' &gt; http://hiscentral.cuahsi.org/pub_services.aspx&lt;/a&gt;. GetWaterOneFlowServiceInfo can be regarded as a special case of GetServicesInBox2, as the former requests the returns for the global area.&lt;/p&gt;</wsdl:documentation>
+      <wsdl:input message="tns:GetWaterOneFlowServiceInfoHttpPostIn" />
+      <wsdl:output message="tns:GetWaterOneFlowServiceInfoHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSeriesCatalogForBox2">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt;&lt;p style = 'margin-left:25px;'&gt;Returns metadata for timeseries that match the provided parameters.The returned object contains a subset of the available metadata sufficient for basic searches.&lt;/p&gt; &lt;/br&gt;&lt;p style = 'margin-left:25px;'&gt;It does not contain data for e.g Quality control level or source&lt;/p&gt;</wsdl:documentation>
+      <wsdl:input message="tns:GetSeriesCatalogForBox2HttpPostIn" />
+      <wsdl:output message="tns:GetSeriesCatalogForBox2HttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSeriesCatalogForBox3">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt;Returns metadata for timeseries that match the provided parameters. The returned object contains the full set of the available metadata sufficient for complex searches.&lt;/p&gt;&lt;p style = 'margin-left:25px;'&gt;It does contain data for e.g Qualitycontrol Level or Source&lt;/p&gt;</wsdl:documentation>
+      <wsdl:input message="tns:GetSeriesCatalogForBox3HttpPostIn" />
+      <wsdl:output message="tns:GetSeriesCatalogForBox3HttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCountOrData">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt;&lt;strong&gt;DEPRECATED&lt;/strong&gt; use GetSeriesMetadataCountOrData) Provides information about metadata stored in the catalog.Tycally used to search the catalog. &lt;/p&gt;&lt;br&gt;It can return &lt;ul&gt; &lt;li&gt; 1.The count of timeseries that match the provided parameters. &lt;/li&gt;&lt;li&gt; 2.the statistics for the distribution of all facets for timeseries that match the provided parameters.e.g how many timeseries have the datatype 'average', or the keyword 'precipitation'.&lt;/li&gt;&lt;li&gt; 3.the complete set of all metadata records for timeseries that match the provided parameters. &lt;/li &gt;&lt;/ul &gt;&lt;p&gt; The return can be defined by providing the appropriate parameters in the request.The return of this request can not exceed 25.000 timeseries. &lt;/p&gt; </wsdl:documentation>
+      <wsdl:input message="tns:GetCountOrDataHttpPostIn" />
+      <wsdl:output message="tns:GetCountOrDataHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSeriesMetadataCountOrData">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt;Provides information about metadata stored in the catalog.Tycally used to search the catalog. &lt;br&gt;It can return &lt;ul&gt; &lt;li&gt; 1.The count of timeseries that match the provided parameters. &lt;/li&gt;&lt;li&gt; 2.the statistics for the distribution of all facets for timeseries that match the provided parameters.e.g how many timeseries have the datatype 'average', or the keyword 'precipitation'.&lt;/li&gt;&lt;li&gt; 3.the complete set of all metadata records for timeseries that match the provided parameters. &lt;/li &gt;&lt;/ul &gt;&lt;p&gt; The return can be defined by providing the appropriate parameters in the request.The return of this request can not exceed 25.000 timeseries. &lt;/p&gt; </wsdl:documentation>
+      <wsdl:input message="tns:GetSeriesMetadataCountOrDataHttpPostIn" />
+      <wsdl:output message="tns:GetSeriesMetadataCountOrDataHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetControlledVocabulary">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt;Get the terms and definitions of controlled vocabulary (CV), which are dynamically updated from &lt;a href='http://his.cuahsi.org/mastercvreg/cv11.aspx'&gt;http://his.cuahsi.org/mastercvreg/cv11.aspx&lt;/a&gt;Typically used when the user requires terms from these controlled vocabularies to provide additional filtering parameters.&lt;/ p &gt;</wsdl:documentation>
+      <wsdl:input message="tns:GetControlledVocabularyHttpPostIn" />
+      <wsdl:output message="tns:GetControlledVocabularyHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getSeriesCatalogInBoxPaged">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt; &lt;strong&gt;DEPRECATED&lt;/strong&gt; Returns metadata for timeseries that match the provided parameters in predefined subsets. The returned object contains a subset of the available metadata sufficient for basic searches. it does not contain dat for e.g Qualitycontrol Level or Source&lt;/p&gt;Typical use was to help with paginatin of results. Not supported anymore &lt;/ p &gt;</wsdl:documentation>
+      <wsdl:input message="tns:getSeriesCatalogInBoxPagedHttpPostIn" />
+      <wsdl:output message="tns:getSeriesCatalogInBoxPagedHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getSearchablePaths">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt;&lt;strong&gt;DEPRECATED&lt;/strong&gt;&lt;/p &gt;</wsdl:documentation>
+      <wsdl:input message="tns:getSearchablePathsHttpPostIn" />
+      <wsdl:output message="tns:getSearchablePathsHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSearchableConcepts">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt;&lt;p&gt;Get a list of searchable concept keywords from the HIS ontology&lt;/p&gt;&lt;p&gt; Typical use to retrieve list of concepts keywords that can be used as an input parameter for keyword searches or pre - populate fields in e.g. in HydroDesktop.&lt;/ p &gt; </wsdl:documentation>
+      <wsdl:input message="tns:GetSearchableConceptsHttpPostIn" />
+      <wsdl:output message="tns:GetSearchableConceptsHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getOntologyTree">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt;Get the subnodes (both leaf and non-leaf) for input concept &lt;strong&gt;keyword&lt;/strong&gt; in the Ontology Tree.&lt;ul&gt;&lt;li style='font-weight: 400;'&gt;Keyword is one of the search criteria used in HydroClient (refer to notes in this section). &lt;/li&gt;&lt;li style='font-weight: 400;'&gt;Keyword is also used when data provider uploads data and try to make the uploaded data comply with WaterOneFlow schema. Generally, the user is required to choose a leaf keyword in the ontology tree for each input variable name, so that the newly added variable name is searchable in HisCentral catalog.&lt;/li&gt;&lt;li style='font-weight: 400;'&gt;GetOntologyTree() returns nodes in the full ontology tree.&lt;/li&gt;&lt;/ul&gt; &lt;br&gt;&lt;/p&gt;</wsdl:documentation>
+      <wsdl:input message="tns:getOntologyTreeHttpPostIn" />
+      <wsdl:output message="tns:getOntologyTreeHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getOntologywithOption">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt;Get the subnodes (both leaf and non-leaf) for input concept &lt;strong&gt;keyword&lt;/strong&gt; in the Ontology Tree.&lt;ul&gt;&lt;li style='font-weight: 400;'&gt;Keyword is one of the search criteria used in HydroClient (refer to notes in this section). &lt;/li&gt;&lt;li style='font-weight: 400;'&gt;Keyword is also used when data provider uploads data and try to make the uploaded data comply with WaterOneFlow schema. Generally, the user is required to choose a leaf keyword in the ontology tree for each input variable name, so that the newly added variable name is searchable in HisCentral catalog.&lt;/li&gt;&lt;li style = 'font-weight: 400;' &gt; The current HisCentral catalog has timeseries data that utilize a subset of the total keywords in the &lt; strong &gt; full &lt;/ strong &gt; ontology tree.Hereafter, the ontology tree composed of the nodes with existing variables in HisCentral catalog(i.e., those ~500 keywords) is referred as &lt;strong&gt; partial &lt;/strong &gt; ontology tree.&lt;/li&gt;&lt;li style = 'font-weight: 400;' &gt; GetOntologyTree() returns nodes in the full ontology tree, while GetOntologyTreewithOption() adds the option of returning nodes in the partial ontology tree&lt;/li&gt;&lt;/ul&gt; &lt;br&gt;&lt;/p&gt;</wsdl:documentation>
+      <wsdl:input message="tns:getOntologywithOptionHttpPostIn" />
+      <wsdl:output message="tns:getOntologywithOptionHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetWordList">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">&lt;br&gt; &lt;p style = 'margin-left:25px;' &gt;&lt;strong&gt;DEPRECATED&lt;/strong&gt; This prefix search routine provides a word match list for HD.&lt;/p &gt;</wsdl:documentation>
+      <wsdl:input message="tns:GetWordListHttpPostIn" />
+      <wsdl:output message="tns:GetWordListHttpPostOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="hiscentralSoap" type="tns:hiscentralSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetSites">
+      <soap:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetSites" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSitesInBox2">
+      <soap:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetSitesInBox2" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSitesInBox">
+      <soap:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetSitesInBox" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMappedVariables2">
+      <soap:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetMappedVariables2" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMappedVariables">
+      <soap:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetMappedVariables" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetVariables">
+      <soap:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetVariables" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetServicesInBox">
+      <soap:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetServicesInBox" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetServicesInBox2">
+      <soap:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetServicesInBox2" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWaterOneFlowServiceInfo">
+      <soap:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetWaterOneFlowServiceInfo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSeriesCatalogForBox">
+      <soap:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetSeriesCatalogForBox" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSeriesCatalogForBox2">
+      <soap:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetSeriesCatalogForBox2" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSeriesCatalogForBox3">
+      <soap:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetSeriesCatalogForBox3" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCountOrData">
+      <soap:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetCountOrData" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSeriesMetadataCountOrData">
+      <soap:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetSeriesMetadataCountOrData" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetControlledVocabulary">
+      <soap:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetControlledVocabulary" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSeriesCatalogInBoxPaged">
+      <soap:operation soapAction="http://hiscentral.cuahsi.org/20100205/getSeriesCatalogInBoxPaged" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSearchablePaths">
+      <soap:operation soapAction="http://hiscentral.cuahsi.org/20100205/getSearchablePaths" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSearchableConcepts">
+      <soap:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetSearchableConcepts" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getOntologyTree">
+      <soap:operation soapAction="http://hiscentral.cuahsi.org/20100205/getOntologyTree" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getOntologywithOption">
+      <soap:operation soapAction="http://hiscentral.cuahsi.org/20100205/getOntologywithOption" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWordList">
+      <soap:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetWordList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="hiscentralSoap12" type="tns:hiscentralSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetSites">
+      <soap12:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetSites" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSitesInBox2">
+      <soap12:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetSitesInBox2" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSitesInBox">
+      <soap12:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetSitesInBox" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMappedVariables2">
+      <soap12:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetMappedVariables2" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMappedVariables">
+      <soap12:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetMappedVariables" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetVariables">
+      <soap12:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetVariables" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetServicesInBox">
+      <soap12:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetServicesInBox" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetServicesInBox2">
+      <soap12:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetServicesInBox2" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWaterOneFlowServiceInfo">
+      <soap12:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetWaterOneFlowServiceInfo" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSeriesCatalogForBox">
+      <soap12:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetSeriesCatalogForBox" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSeriesCatalogForBox2">
+      <soap12:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetSeriesCatalogForBox2" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSeriesCatalogForBox3">
+      <soap12:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetSeriesCatalogForBox3" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCountOrData">
+      <soap12:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetCountOrData" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSeriesMetadataCountOrData">
+      <soap12:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetSeriesMetadataCountOrData" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetControlledVocabulary">
+      <soap12:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetControlledVocabulary" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSeriesCatalogInBoxPaged">
+      <soap12:operation soapAction="http://hiscentral.cuahsi.org/20100205/getSeriesCatalogInBoxPaged" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSearchablePaths">
+      <soap12:operation soapAction="http://hiscentral.cuahsi.org/20100205/getSearchablePaths" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSearchableConcepts">
+      <soap12:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetSearchableConcepts" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getOntologyTree">
+      <soap12:operation soapAction="http://hiscentral.cuahsi.org/20100205/getOntologyTree" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getOntologywithOption">
+      <soap12:operation soapAction="http://hiscentral.cuahsi.org/20100205/getOntologywithOption" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWordList">
+      <soap12:operation soapAction="http://hiscentral.cuahsi.org/20100205/GetWordList" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="hiscentralHttpGet" type="tns:hiscentralHttpGet">
+    <http:binding verb="GET" />
+    <wsdl:operation name="GetSites">
+      <http:operation location="/GetSites" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSitesInBox2">
+      <http:operation location="/GetSitesInBox2" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMappedVariables2">
+      <http:operation location="/GetMappedVariables2" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMappedVariables">
+      <http:operation location="/GetMappedVariables" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetVariables">
+      <http:operation location="/GetVariables" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetServicesInBox2">
+      <http:operation location="/GetServicesInBox2" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWaterOneFlowServiceInfo">
+      <http:operation location="/GetWaterOneFlowServiceInfo" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSeriesCatalogForBox2">
+      <http:operation location="/GetSeriesCatalogForBox2" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSeriesCatalogForBox3">
+      <http:operation location="/GetSeriesCatalogForBox3" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCountOrData">
+      <http:operation location="/GetCountOrData" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSeriesMetadataCountOrData">
+      <http:operation location="/GetSeriesMetadataCountOrData" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetControlledVocabulary">
+      <http:operation location="/GetControlledVocabulary" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSeriesCatalogInBoxPaged">
+      <http:operation location="/getSeriesCatalogInBoxPaged" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSearchablePaths">
+      <http:operation location="/getSearchablePaths" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSearchableConcepts">
+      <http:operation location="/GetSearchableConcepts" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getOntologyTree">
+      <http:operation location="/getOntologyTree" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getOntologywithOption">
+      <http:operation location="/getOntologywithOption" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWordList">
+      <http:operation location="/GetWordList" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="hiscentralHttpPost" type="tns:hiscentralHttpPost">
+    <http:binding verb="POST" />
+    <wsdl:operation name="GetSites">
+      <http:operation location="/GetSites" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSitesInBox2">
+      <http:operation location="/GetSitesInBox2" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMappedVariables2">
+      <http:operation location="/GetMappedVariables2" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMappedVariables">
+      <http:operation location="/GetMappedVariables" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetVariables">
+      <http:operation location="/GetVariables" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetServicesInBox2">
+      <http:operation location="/GetServicesInBox2" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWaterOneFlowServiceInfo">
+      <http:operation location="/GetWaterOneFlowServiceInfo" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSeriesCatalogForBox2">
+      <http:operation location="/GetSeriesCatalogForBox2" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSeriesCatalogForBox3">
+      <http:operation location="/GetSeriesCatalogForBox3" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCountOrData">
+      <http:operation location="/GetCountOrData" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSeriesMetadataCountOrData">
+      <http:operation location="/GetSeriesMetadataCountOrData" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetControlledVocabulary">
+      <http:operation location="/GetControlledVocabulary" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSeriesCatalogInBoxPaged">
+      <http:operation location="/getSeriesCatalogInBoxPaged" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSearchablePaths">
+      <http:operation location="/getSearchablePaths" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSearchableConcepts">
+      <http:operation location="/GetSearchableConcepts" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getOntologyTree">
+      <http:operation location="/getOntologyTree" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getOntologywithOption">
+      <http:operation location="/getOntologywithOption" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWordList">
+      <http:operation location="/GetWordList" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="hiscentral">
+    <wsdl:port name="hiscentralSoap" binding="tns:hiscentralSoap">
+      <soap:address location="https://hiscentral.cuahsi.org/webservices/hiscentral.asmx" />
+    </wsdl:port>
+    <wsdl:port name="hiscentralSoap12" binding="tns:hiscentralSoap12">
+      <soap12:address location="https://hiscentral.cuahsi.org/webservices/hiscentral.asmx" />
+    </wsdl:port>
+    <wsdl:port name="hiscentralHttpGet" binding="tns:hiscentralHttpGet">
+      <http:address location="https://hiscentral.cuahsi.org/webservices/hiscentral.asmx" />
+    </wsdl:port>
+    <wsdl:port name="hiscentralHttpPost" binding="tns:hiscentralHttpPost">
+      <http:address location="https://hiscentral.cuahsi.org/webservices/hiscentral.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

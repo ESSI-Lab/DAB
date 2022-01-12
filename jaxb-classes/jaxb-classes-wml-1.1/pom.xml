@@ -1,0 +1,91 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>eu.essi_lab</groupId>
+		<artifactId>jaxb-classes</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>jaxb-classes-wml-1.1</artifactId>
+	<description>ESSI-Lab JAXB Classes for WML-1.1</description>
+	<name>ESSI-Lab JAXB Classes for WML-1.1</name>
+	<dependencies>
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-impl</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>eclipselink</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>commonj.sdo</artifactId>
+					<groupId>commonj.sdo</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.tools.xjc.maven2</groupId>
+			<artifactId>maven-jaxb-plugin</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.sonatype.sisu</groupId>
+					<artifactId>sisu-guava</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+	</dependencies>
+	<build>
+
+		<plugins>
+			<plugin>
+				<groupId>org.jvnet.jaxb2.maven2</groupId>
+				<artifactId>maven-jaxb2-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>some-id</id>
+						<!-- Comment the following none line to generate/update the classes! -->
+						<!-- Attention! The following Java locations should have attached a 
+							xmlnullpolicy annotation after class generation, such as: -->
+						<!-- @XmlNullPolicy(emptyNodeRepresentsNull = true, nullRepresentationForXml 
+							= XmlMarshalNullRepresentation.EMPTY_NODE) -->
+						<!-- Java locations: -->
+						<!-- line 172 of VariableInfoType -->
+						<!-- line 1123 of VariableInfoType -->
+						<phase>none</phase>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<extension>true</extension>
+					<strict>false</strict>
+					<generateDirectory>src/main/java</generateDirectory>
+					<removeOldOutput>false</removeOldOutput>
+					<episode>true</episode>
+					<episodeFile>src/main/resources/META-INF/sun-jaxb.episode</episodeFile>
+					<schemaIncludes>
+						<value>schemas/cuahsiTimeSeries_v1_1.xsd</value>
+					</schemaIncludes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+
+	</build>
+</project>

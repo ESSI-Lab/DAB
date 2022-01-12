@@ -1,0 +1,722 @@
+package eu.essi_lab.model.resource;
+
+/*-
+ * #%L
+ * Discovery and Access Broker (DAB) Community Edition (CE)
+ * %%
+ * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * #L%
+ */
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
+
+import eu.essi_lab.model.Queryable;
+import eu.essi_lab.model.index.IndexedElement;
+public enum MetadataElement implements Queryable {
+
+    /**
+     *
+     */
+    ANY_TEXT("anyText", false),
+    //
+
+    /**
+     *
+     */
+    SUBJECT("subject"),
+    //
+
+    /**
+     *
+     */
+    DATE_STAMP("dateStamp", ContentType.ISO8601_DATE_TIME),
+
+    /**
+     * MD_KeywordTypeCode
+     */
+    KEYWORD_TYPE("keywordType"),
+
+    /**
+     * //gmd:keyword/gco:CharacterString
+     */
+    KEYWORD(MetadataElement.KEYWORD_EL_NAME),
+
+    /**
+     * //gmd:topicCategory/gmd:MD_TopicCategoryCode"
+     */
+    TOPIC_CATEGORY("topicCategory"),
+
+    /**
+     * NEW
+     */
+    HIERARCHY_LEVEL_CODE_LIST_VALUE("hLevelCodeValue"),
+
+    /**
+     * NEW
+     */
+    INSTRUMENT_IDENTIFIER(MetadataElement.INSTRUMENT_IDENTIFIER_EL_NAME),
+
+    /**
+     * NEW
+     */
+    UNIQUE_INSTRUMENT_IDENTIFIER(MetadataElement.UNIQUE_INSTRUMENT_IDENTIFIER_EL_NAME, false, true, ContentType.TEXTUAL, true),
+
+    /**
+     * NEW
+     */
+    INSTRUMENT_DESCRIPTION("instrumentDesc"),
+
+    /**
+     * NEW
+     */
+    INSTRUMENT_TITLE("instrumentTitle"),
+
+    /**
+     * NEW
+     */
+    PLATFORM_IDENTIFIER(MetadataElement.PLATFORM_IDENTIFIER_EL_NAME),
+
+    /**
+     * NEW
+     */
+    PLATFORM_TITLE(MetadataElement.PLATFORM_TITLE_EL_NAME),
+
+    /**
+     * NEW
+     */
+    UNIQUE_PLATFORM_IDENTIFIER(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER_EL_NAME, false, true, ContentType.TEXTUAL, true),
+
+    /**
+     * NEW
+     */
+    TIME_INTERPOLATION(MetadataElement.TIME_INTERPOLATION_EL_NAME, false, true, ContentType.TEXTUAL, true),
+
+    /**
+     * NEW
+     */
+    TIME_SUPPORT(MetadataElement.TIME_SUPPORT_EL_NAME, false, true, ContentType.TEXTUAL, true),
+
+    /**
+     * NEW
+     */
+    TIME_RESOLUTION(MetadataElement.TIME_RESOLUTION_EL_NAME, false, true, ContentType.TEXTUAL, true),
+
+    /**
+     * NEW
+     */
+    TIME_UNITS(MetadataElement.TIME_UNITS_EL_NAME, false, true, ContentType.TEXTUAL, true),
+
+    /**
+     * NEW
+     */
+    TIME_UNITS_ABBREVIATION(MetadataElement.TIME_UNITS_ABBREVIATION_EL_NAME, false, true, ContentType.TEXTUAL, true),
+
+    /**
+     * NEW
+     */
+    DATA_SIZE(MetadataElement.DATA_SIZE_EL_NAME, false, true, ContentType.LONG, true),
+
+    /**
+     * NEW
+     */
+    PLATFORM_DESCRIPTION("platformDesc"),
+
+    /**
+     * NEW
+     */
+    ATTRIBUTE_IDENTIFIER(MetadataElement.ATTRIBUTE_IDENTIFIER_EL_NAME),
+
+    /**
+     * NEW
+     */
+    ATTRIBUTE_TITLE("attributeTitle"),
+
+    /**
+     * NEW
+     */
+    ATTRIBUTE_UNITS(MetadataElement.ATTRIBUTE_UNITS_EL_NAME),
+
+    /**
+     * NEW
+     */
+    ATTRIBUTE_UNITS_ABBREVIATION(MetadataElement.ATTRIBUTE_UNITS_ABBREVIATION_EL_NAME, false, true, ContentType.TEXTUAL, true),
+
+    /**
+     * NEW
+     */
+    ATTRIBUTE_MISSING_VALUE(MetadataElement.ATTRIBUTE_MISSING_VALUE_EL_NAME, false, true, ContentType.TEXTUAL, true),
+
+    /**
+     * NEW
+     */
+    UNIQUE_ATTRIBUTE_IDENTIFIER(MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER_EL_NAME, false, true, ContentType.TEXTUAL, true),
+
+    /**
+     * NEW
+     */
+    ATTRIBUTE_DESCRIPTION("attributeDesc"),
+
+    /**
+     * NEW
+     */
+    COVERAGE_CONTENT_TYPE_CODE("coverageContentTypeCode"),
+
+    /**
+     * NEW
+     */
+    COUPLING_TYPE("couplingType"),
+
+    /**
+     * NEW
+     */
+    DISTANCE_UOM("distanceUOM"),
+
+    /**
+     * NEW
+     */
+    REVISION_DATE("revisionDate"),
+
+    /**
+     *
+     */
+    ONLINE_LINKAGE("onlineLinkage", false),
+
+    /**
+     * 
+     */
+    ONLINE_ID("onlineId"),
+
+    /**
+     *
+     */
+    BOUNDING_BOX("bbox", ContentType.SPATIAL),
+    /**
+     *
+     */
+    AUTHOR("creator"),
+    /**
+     *
+     */
+    IDENTIFIER("fileId"),
+
+    /**
+     *
+     */
+    PARENT_IDENTIFIER("parentId"),
+
+    /**
+     *
+     */
+    TITLE("title"),
+
+    /**
+     *
+     */
+    ABSTRACT("abstract"),
+
+    /**
+     *
+     */
+    AGGREGATED_RESOURCE_IDENTIFIER("aggResId"),
+
+    /**
+     *
+     */
+    DISTRIBUTION_FORMAT(MetadataElement.DISTRIBUTION_FORMAT_EL_NAME),
+
+    /**
+     *
+     */
+    RESOURCE_IDENTIFIER("resourceId"),
+
+    /**
+     *
+     */
+    RESOURCE_LANGUAGE("resLanguage"),
+
+    /**
+     *
+     */
+    GEOGRAPHIC_DESCRIPTION_CODE("geoDescCode"),
+
+    /**
+     *
+     */
+    SERVICE_TYPE("srvType"),
+
+    /**
+     *
+     */
+    SERVICE_TYPE_VERSION("srvTypeVersion"),
+
+    /**
+     *
+     */
+    OPERATION("operation"),
+
+    /**
+     *
+     */
+    OPERATES_ON("operatesOn"),
+
+    /**
+     *
+     */
+    OPERATES_ON_IDENTIFIER("operatesOnId"),
+
+    /**
+     *
+     */
+    OPERATES_ON_NAME("operatesOnName"),
+
+    /**
+     *
+     */
+    CRS_AUTHORITY("crsAuthority"),
+    /**
+     *
+     */
+    CRS_VERSION("crsVersion"),
+    /**
+     *
+     */
+    CRS_ID("crsId"),
+    /**
+     *
+     */
+    ALTERNATE_TITLE("alternateTitle"),
+
+    /**
+     *
+     */
+    ORGANISATION_NAME(MetadataElement.ORGANISATION_NAME_EL_NAME),
+    /**
+     *
+     */
+    LANGUAGE("language"),
+    /**
+     *
+     */
+    HAS_SECURITY_CONSTRAINTS("hasSecurityConst", ContentType.BOOLEAN),
+    /**
+     *
+     */
+    HAS_USE_LEGAL_CONSTRAINTS("hasUseLegalConst", ContentType.BOOLEAN),
+    /**
+     *
+     */
+    HAS_ACCESS_LEGAL_CONSTRAINTS("hasAccessLegalConst", ContentType.BOOLEAN),
+    /**
+     *
+     */
+    HAS_OTHER_LEGAL_CONSTRAINTS("hasOtherLegalConst", ContentType.BOOLEAN),
+
+    /**
+     *
+     */
+    DENOMINATOR("denominator", ContentType.INTEGER),
+
+    /**
+     *
+     */
+    DISTANCE_VALUE("distValue", ContentType.DOUBLE),
+
+    /**
+     * Virtual element, given by the union of the {@link #TEMP_EXTENT_BEGIN} and {@link #TEMP_EXTENT_END}
+     */
+    TEMP_EXTENT("tmpExtent", ContentType.ISO8601_DATE_TIME),
+
+    /**
+     *
+     */
+    TEMP_EXTENT_BEGIN("tmpExtentBegin", ContentType.ISO8601_DATE_TIME),
+
+    /**
+     *
+     */
+    TEMP_EXTENT_END("tmpExtentEnd", ContentType.ISO8601_DATE_TIME),
+
+    /**
+    *
+    */
+    TEMP_EXTENT_BEGIN_BEFORE_NOW("tmpExtentBeginBeforeNow", ContentType.TEXTUAL),
+
+    /**
+     *
+     */
+    ONLINE_PROTOCOL(MetadataElement.ONLINE_PROTOCOL_EL_NAME),
+
+    /**
+     *
+     */
+    PROCESSING_LEVEL_CODE("procLevCode"),
+
+    /**
+     *
+     */
+    BAND_RESOLUTION("bandResolution", ContentType.DOUBLE),
+
+    /**
+     *
+     */
+    BAND_PEAK_RESPONSE_WL("bandPeakRespWl", ContentType.DOUBLE),
+    /**
+     *
+     */
+    ILLUMINATION_ZENITH_ANGLE("illZenithAngle", ContentType.DOUBLE),
+    /**
+     *
+     */
+    CLOUD_COVER_PERC("cloudCoverPerc", ContentType.DOUBLE),
+    /**
+     *
+     */
+    ILLUMINATION_AZIMUTH_ANGLE("illAziAngle", ContentType.DOUBLE),
+
+    /**
+     *
+     */
+    CREATION_DATE("creationDate"),
+
+    /**
+     *
+     */
+    PUBLICATION_DATE("publicationDate"),
+    //
+
+    /**
+     *
+     */
+    ESSI_SPATIAL_RESOLUTION_X("spatialResX", ContentType.DOUBLE),
+    /**
+     *
+     */
+    ESSI_SPATIAL_RESOLUTION_Y("spatialResY", ContentType.DOUBLE),
+    /**
+     *
+     */
+    ESSI_TEMPORAL_RESOLUTION("timeResDouble", ContentType.DOUBLE),
+
+    /**
+     * Extended (QuakeML)
+     */
+    QML_MAGNITUDE_VALUE("qmlMagValue", ContentType.DOUBLE),
+
+    /**
+     * Extended (QuakeML)
+     */
+    QML_MAGNITUDE_TYPE("qmlMagType"),
+
+    /**
+     * Extended (QuakeML)
+     */
+    QML_DEPTH_VALUE("qmlDepthValue", ContentType.DOUBLE),
+
+    /**
+     * Extended
+     */
+    EOP_POLARIZATION_MODE("eopPolarizationMode"),
+
+    /**
+     * Extended
+     */
+    VARIABLE("variable"),
+
+    /**
+     * Extended
+     */
+    SITE_INFO("siteInfo"),
+
+    /**
+     * Extended
+     */
+    BNHS_INFO(MetadataElement.BNHS_INFO_EL_NAME, false, true, ContentType.TEXTUAL, true),
+
+    /**
+     * Extended
+     */
+    ORIGINATOR_ORGANISATION_IDENTIFIER(MetadataElement.ORIGINATOR_ORGANISATION_IDENTIFIER_EL_NAME, false, true, ContentType.TEXTUAL, true),
+
+    /**
+     * Extended
+     */
+    ORIGINATOR_ORGANISATION_DESCRIPTION("origOrgDesc", false, true, ContentType.TEXTUAL, true),
+
+    // ----------------------------------------------------------
+    //
+    // LANDSAT SPECIFIC QUERYABLES (available in SatelliteScene)
+    //
+    ROW("row"), //
+    PATH("path"), //
+
+    // ----------------------------------------------------------
+    //
+    // SENTINEL SPECIFIC QUERYABLES (available in SatelliteScene)
+    //
+    PRODUCT_TYPE(MetadataElement.PRODUCT_TYPE_EL_NAME), //
+    SENSOR_OP_MODE(MetadataElement.SENSOR_OP_MODE_EL_NAME), //
+    SENSOR_SWATH(MetadataElement.SENSOR_SWATH_EL_NAME), //
+    S3_INSTRUMENT_IDX(MetadataElement.S3_INSTRUMENT_IDX_EL_NAME), //
+    S3_PRODUCT_LEVEL(MetadataElement.S3_PRODUCT_LEVEL_EL_NAME), //
+    S3_TIMELINESS(MetadataElement.S3_TIMELINESS_EL_NAME), //
+    RELATIVE_ORBIT("relativeOrbit"), //
+    SAR_POL_CH(MetadataElement.SAR_POL_CH_EL_NAME),
+
+    // BNHS QUERYABLES
+
+    HYCOS_IDENTIFIER(MetadataElement.HYCOS_IDENTIFIER_EL_NAME), //
+    STATION_IDENTIFIER(MetadataElement.STATION_IDENTIFIER_EL_NAME), //
+    COUNTRY(MetadataElement.COUNTRY_EL_NAME, false, true, ContentType.TEXTUAL, true), //
+    COUNTRY_ISO3(MetadataElement.COUNTRY_ISO3_EL_NAME, false, true, ContentType.TEXTUAL, true), //
+    RIVER(MetadataElement.RIVER_EL_NAME), //
+    LAKE_STATION(MetadataElement.LAKE_STATION_EL_NAME), //
+    GRDC_ID(MetadataElement.GRDC_ID_EL_NAME), //
+    GRDC_ARDB(MetadataElement.GRDC_ARDB_EL_NAME), //
+    WMO_REGION(MetadataElement.WMO_REGION_EL_NAME), //
+    LATITUDE_OF_DISCHARGE(MetadataElement.LATITUDE_OF_DISCHARGE_EL_NAME), //
+    LONGITUDE_OF_DISCHARGE(MetadataElement.LONGITUDE_OF_DISCHARGE_EL_NAME), //
+    STATUS(MetadataElement.STATUS_EL_NAME), //
+    DRAINAGE_AREA(MetadataElement.DRAINAGE_AREA_EL_NAME), //
+    EFFECTIVE_DRAINAGE_AREA(MetadataElement.EFFECTIVE_DRAINAGE_AREA_EL_NAME), //
+    DRAINAGE_SHAPEFILE(MetadataElement.DRAINAGE_SHAPEFILE_EL_NAME), //
+    LATITUDE(MetadataElement.LATITUDE_EL_NAME), //
+    LONGITUDE(MetadataElement.LONGITUDE_EL_NAME), //
+    ALTITUDE_DATUM(MetadataElement.ALTITUDE_DATUM_EL_NAME), //
+    ALTITUDE(MetadataElement.ALTITUDE_EL_NAME), //
+    FLOW_TO_OCEAN(MetadataElement.FLOW_TO_OCEAN_EL_NAME), //
+    DOWNSTREAM_HYCOS_STATION(MetadataElement.DOWNSTREAM_HYCOS_STATION_EL_NAME), //
+    REGULATION(MetadataElement.REGULATION_EL_NAME), //
+    REGULATION_START_DATE(MetadataElement.REGULATION_START_DATE_EL_NAME), //
+    REGULATION_END_DATE(MetadataElement.REGULATION_END_DATE_EL_NAME), //
+    LAND_USE_CHANGE(MetadataElement.LAND_USE_CHANGE_EL_NAME), //
+    SURFACE_COVER(MetadataElement.SURFACE_COVER_EL_NAME), //
+    DATA_QUALITY_ICE(MetadataElement.DATA_QUALITY_ICE_EL_NAME), //
+    DATA_QUALITY_OPEN(MetadataElement.DATA_QUALITY_OPEN_EL_NAME), //
+    DISCHARGE_AVAILABILITY(MetadataElement.DISCHARGE_AVAILABILITY_EL_NAME), //
+    WATER_LEVEL_AVAILABILITY(MetadataElement.WATER_LEVEL_AVAILABILITY_EL_NAME), //
+    WATER_TEMPERATURE_AVAILABILITY(MetadataElement.WATER_TEMPERATURE_AVAILABILITY_EL_NAME), //
+    ICE_ON_OFF_AVAILABILITY(MetadataElement.ICE_ON_OFF_AVAILABILITY_EL_NAME), //
+    ICE_THICKNESS_AVAILABILITY(MetadataElement.ICE_THICKNESS_AVAILABILITY_EL_NAME), //
+    SNOW_DEPTH_AVAILABILITY(MetadataElement.SNOW_DEPTH_AVAILABILITY_EL_NAME), //
+    MEASUREMENT_METHOD_DISCHARGE(MetadataElement.MEASUREMENT_METHOD_DISCHARGE_EL_NAME), //
+    MEASUREMENT_METHOD_WATER_TEMPERATURE(MetadataElement.MEASUREMENT_METHOD_WATER_TEMPERATURE_EL_NAME), //
+    MEASUREMENT_METHOD_ICE_ON_OFF(MetadataElement.MEASUREMENT_METHOD_ICE_ON_OFF_EL_NAME);
+
+    public static final String KEYWORD_EL_NAME = "keyword";
+    public static final String DISTRIBUTION_FORMAT_EL_NAME = "format";
+    public static final String ONLINE_PROTOCOL_EL_NAME = "protocol";
+    public static final String INSTRUMENT_IDENTIFIER_EL_NAME = "instrumentId";
+    public static final String INSTRUMENT_TITLE_EL_NAME = "instrumentTitle";
+
+    public static final String PLATFORM_IDENTIFIER_EL_NAME = "platformId";
+    public static final String PLATFORM_TITLE_EL_NAME = "platformTitle";
+
+    public static final String DATA_SIZE_EL_NAME = "dataSize";
+
+    public static final String TIME_INTERPOLATION_EL_NAME = "timeInterpolation"; // from enum InterpolationType
+    public static final String TIME_RESOLUTION_EL_NAME = "timeResolution"; // the optional regular distance from a
+									   // sample to the next one in the time series
+    public static final String TIME_SUPPORT_EL_NAME = "timeSupport"; // the time over which the interpolation is
+								     // calculated (e.g. -3 for total precipitation in
+								     // the last 3 hours, or -10 in case average over
+								     // the last 10 minutes)
+    public static final String TIME_UNITS_EL_NAME = "timeUnits"; // can be second, hour, etc.
+    public static final String TIME_UNITS_ABBREVIATION_EL_NAME = "timeUnitsAbbreviation"; // can be s, h, etc.
+
+    public static final String BNHS_INFO_EL_NAME = "bnhsInfo";
+
+    public static final String UNIQUE_PLATFORM_IDENTIFIER_EL_NAME = "uniquePlatformId";
+    public static final String UNIQUE_INSTRUMENT_IDENTIFIER_EL_NAME = "uniqueInstrumentId";
+    public static final String UNIQUE_ATTRIBUTE_IDENTIFIER_EL_NAME = "uniqueAttributeId";
+
+    public static final String ORIGINATOR_ORGANISATION_IDENTIFIER_EL_NAME = "origOrgId";
+    public static final String ORIGINATOR_ORGANISATION_DESCRIPTION_EL_NAME = "origOrgDesc";
+
+    public static final String ATTRIBUTE_IDENTIFIER_EL_NAME = "attributeId";
+    public static final String ATTRIBUTE_TITLE_EL_NAME = "attributeTitle";
+    public static final String ATTRIBUTE_URI_EL_NAME = "attributeURI"; // can be
+								       // http://codes.wmo.int/common/unit/m3_s-1, etc.
+    public static final String ATTRIBUTE_UNITS_EL_NAME = "attributeUnits"; // can be meters, etc.
+    public static final String ATTRIBUTE_UNITS_URI_EL_NAME = "attributeUnitsURI"; // can be
+										  // http://codes.wmo.int/common/unit/m3_s-1,
+										  // etc.
+    public static final String ATTRIBUTE_UNITS_ABBREVIATION_EL_NAME = "attributeUnitsAbbreviation"; // can be m, etc.
+    public static final String ATTRIBUTE_MISSING_VALUE_EL_NAME = "attributeMissingValue"; // can be -9999
+
+    public static final String ORGANISATION_NAME_EL_NAME = "organisationName";
+    public static final String PRODUCT_TYPE_EL_NAME = "prodType";
+    public static final String SENSOR_OP_MODE_EL_NAME = "sensorOpMode";
+    public static final String SENSOR_SWATH_EL_NAME = "sensorSwath";
+    public static final String SAR_POL_CH_EL_NAME = "sarPolCh";
+
+    public static final String S3_INSTRUMENT_IDX_EL_NAME = "s3InstrumentIdx";
+    public static final String S3_PRODUCT_LEVEL_EL_NAME = "s3ProductLevel";
+    public static final String S3_TIMELINESS_EL_NAME = "s3Timeliness";
+
+    public static final String HYCOS_IDENTIFIER_EL_NAME = "HYCOSid";
+    public static final String STATION_IDENTIFIER_EL_NAME = "Stationid";
+    public static final String COUNTRY_EL_NAME = "Country";
+    public static final String COUNTRY_ISO3_EL_NAME = "CountryISO3";
+    // public static final String INSTITUTE = "Institute";
+    // public static final String STATION_NAME="StationName";
+    public static final String RIVER_EL_NAME = "River";
+    public static final String LAKE_STATION_EL_NAME = "LakeStation";
+    public static final String GRDC_ID_EL_NAME = "GRDCid";
+    public static final String GRDC_ARDB_EL_NAME = "GRDCardb";
+    public static final String WMO_REGION_EL_NAME = "WMORegion";
+    public static final String LATITUDE_OF_DISCHARGE_EL_NAME = "LatitudeOfDischarge";
+    public static final String LONGITUDE_OF_DISCHARGE_EL_NAME = "LongitudeOfDischarge";
+    public static final String LATITUDE_EL_NAME = "Latitude";
+    public static final String LONGITUDE_EL_NAME = "Longitude";
+    public static final String STATUS_EL_NAME = "Status";
+    public static final String DRAINAGE_AREA_EL_NAME = "DrainageArea";
+    public static final String EFFECTIVE_DRAINAGE_AREA_EL_NAME = "EffectiveDrainageArea";
+    public static final String DRAINAGE_SHAPEFILE_EL_NAME = "DrainageShapefile";
+    public static final String ALTITUDE_EL_NAME = "Altitude";
+    public static final String ALTITUDE_DATUM_EL_NAME = "AltitudeDatum";
+    public static final String FLOW_TO_OCEAN_EL_NAME = "FlowtoOcean";
+    public static final String DOWNSTREAM_HYCOS_STATION_EL_NAME = "DownstreamHYCOSstation";
+    public static final String REGULATION_EL_NAME = "Regulation";
+    public static final String REGULATION_START_DATE_EL_NAME = "RegulationStartDate";
+    public static final String REGULATION_END_DATE_EL_NAME = "RegulationEndDate";
+    public static final String LAND_USE_CHANGE_EL_NAME = "LandUseChange";
+    public static final String SURFACE_COVER_EL_NAME = "SurfaceCover";
+    public static final String DATA_QUALITY_ICE_EL_NAME = "DataQualityIce";
+    public static final String DATA_QUALITY_OPEN_EL_NAME = "DataQualityOpen";
+    public static final String DISCHARGE_AVAILABILITY_EL_NAME = "DischargeAvailability";
+    public static final String WATER_LEVEL_AVAILABILITY_EL_NAME = "WaterLevelAvailability";
+    public static final String WATER_TEMPERATURE_AVAILABILITY_EL_NAME = "WaterTemperatureAvailability";
+    public static final String ICE_ON_OFF_AVAILABILITY_EL_NAME = "IceOnOffAvailability";
+    public static final String ICE_THICKNESS_AVAILABILITY_EL_NAME = "IceThicknessAvailability";
+    public static final String SNOW_DEPTH_AVAILABILITY_EL_NAME = "SnowDepthAvailability";
+    public static final String MEASUREMENT_METHOD_DISCHARGE_EL_NAME = "MeasurementMethodDischarge";
+    public static final String MEASUREMENT_METHOD_WATER_TEMPERATURE_EL_NAME = "MeasurementMethodWaterTemperature";
+    public static final String MEASUREMENT_METHOD_ICE_ON_OFF_EL_NAME = "MeasurementMethodIceOnOff";
+    // public static final String EQUIPMENT ="Equipment";
+
+    private String name;
+    private boolean volatileElement;
+    private boolean extendedElement;
+    private ContentType type;
+    private boolean isEnabled;
+
+    /**
+     * @param name
+     */
+    private MetadataElement(String name) {
+
+	this(name, false, false, ContentType.TEXTUAL, true);
+    }
+
+    /**
+     * @param name
+     */
+    private MetadataElement(String name, boolean enabled) {
+
+	this(name, false, false, ContentType.TEXTUAL, enabled);
+    }
+
+    /**
+     * @param name
+     * @param type
+     */
+    private MetadataElement(String name, ContentType type) {
+
+	this(name, false, false, type, true);
+    }
+
+    /**
+     * @param name
+     * @param volatileElement
+     * @param type
+     */
+    private MetadataElement(String name, boolean volatileElement, boolean extendedElement, ContentType type, boolean enabled) {
+
+	this.name = name;
+	this.volatileElement = volatileElement;
+	this.type = type;
+	this.isEnabled = enabled;
+	this.extendedElement = extendedElement;
+    }
+
+    public String getName() {
+
+	return name;
+    }
+
+    @Override
+    public ContentType getContentType() {
+
+	return type;
+    }
+
+    /**
+     * Return <code>true</code> if this element has no correspondent {@link IndexedElement}, <code>false</code>
+     * otherwise
+     *
+     * @return
+     */
+    public boolean isVolatile() {
+
+	return volatileElement;
+    }
+
+    @Override
+    public String toString() {
+
+	return getName();
+    }
+
+    /**
+     * @param name
+     * @return
+     * @throws NoSuchElementException
+     */
+    public static MetadataElement fromName(String name) throws IllegalArgumentException {
+
+	return (MetadataElement) Queryable.fromName(name, values());
+    }
+
+    /**
+     * Returns the ordered list of these {@link MetadataElement}s
+     */
+    public static List<MetadataElement> getOrderedElements() {
+
+	return Arrays.asList(values()).//
+		stream().//
+		sorted((o1, o2) -> o1.getName().compareTo(o2.getName())).//
+		collect(Collectors.toList());//
+    }
+
+    @Override
+    public boolean isEnabled() {
+
+	return this.isEnabled;
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+
+	this.isEnabled = enabled;
+    }
+
+    public boolean isExtendedElement() {
+	return extendedElement;
+    }
+}

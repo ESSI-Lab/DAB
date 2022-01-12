@@ -1,0 +1,229 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.1.0-BETA",
+        "termsOfService": "http://swagger.io/terms/"
+    },
+    "basePath": "/gs-service/services/essi/arpa-rest",
+    "tags": [
+        {
+            "name": "Sources",
+            "description": "Retrieves the DAB sources"
+        },
+        {
+            "name": "View",
+            "description": "Manages the DAB views"
+        }
+    ],
+    "schemes": ["http"],
+    "paths": {
+        "/sources": {"get": {
+            "tags": ["Sources"],
+            "summary": "Retrieves all the DAB sources",
+            "description": "Retrieves the sources brokered by this DAB instance. Each source is connected to a data service and provides datasets availble through the <code>/datasets<\/code> and <code>/{apiKey}/{viewId}/datasets<\/code>operations. By default the datasets search includes all the sources. You can use the <code>sources</code> parameter in the <code>/datasets<\/code> and <code>/{apiKey}/{viewId}/datasets<\/code> operations body to include only the sources with the given identifiers",
+            "operationId": "getSources",
+            "produces": ["application/json"],
+            "responses": {"200": {
+                "description": "successful operation"
+                
+            }},
+            "security": [{"api_key": []}]
+        }},
+        "/{apiKey}/views": {
+            "get": {
+                "tags": ["View"],
+                "summary": "Retrieves all the DAB views",
+                "description": "Retrieves the DAB views associated to the given <code>apiKey<\/code>",
+                "operationId": "getViews",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "apiKey",
+                    "in": "path",
+                    "description": "The API key",
+                    "required": true,
+                    "type": "string",
+                    "format": "password"
+                }],
+                "responses": {"200": {
+                    "description": "successful operation"
+                  
+                }},
+                "security": [{"api_key": []}]
+            },
+            "post": {
+                "tags": ["View"],
+                "summary": "Creates a DAB view",
+                "description": "Creates a DAB view. A view defines a <code>ResultSet</code> by means of a fixed set of constraints. The identifier of the created view can be used along with the <code>apiKey<\/code> in the <code>/{apiKey}/{viewId}/datasets<\/code> operation",
+                "operationId": "createView",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "apiKey",
+                        "in": "path",
+                        "description": "The API key",
+                        "required": true,
+                        "type": "string",
+                    		"format": "password"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "type": "object",
+                            "required": ["label"],
+                            "properties": {
+                                "id": {
+                                    "description": "The view identifier",
+                                    "required": true,
+                                    "type": "string"
+                                },
+                                "label": {
+                                    "description": "A descriptive label for this view",
+                                    "required": true,
+                                    "type": "string"
+                                },
+                                "sources": {
+                                    "description": "Array of sources identifiers. Only the content of the correspondent sources (matching the other view constraints if any) is included in the <code>ResultSet</code>",
+                                    "required": false,
+                                    "type": "array",
+                                    "default": [],
+                                    "items": {"type": "string"}
+                                },
+                                "parameters": {
+                                    "description": "Array of parameters",
+                                    "required": false,
+                                    "type": "array",
+                                    "default": [],
+                                    "items": {"type": "string"}
+                                },
+                                "stations": {
+                                    "description": "Array of station identifiers",
+                                    "required": false,
+                                    "type": "array",
+                                    "default": [],
+                                    "items": {"type": "string"}
+                                },
+                                "where": {
+                                    "type": "object",                                    
+                                    "required": false,
+                                    "description": "A bounding box (expressed in EPSG:4326) which includes the search results",
+                                    "properties": {
+                                        "south": {
+                                            "description": "The minimum latitute. Must be less than or equal to north",
+                                            "type": "number",
+                                            "minimum": -90,
+                                            "maximum": 90,
+                                            "default": -90
+                                        },
+                                        "west": {
+                                            "description": "The minimum longitude. Must be less than or equal to east",
+                                            "type": "number",
+                                            "minimum": -180,
+                                            "maximum": 180,
+                                            "default": -180
+                                        },
+                                        "north": {
+                                            "description": "The maximum latitute. Must be greather than or equal to south",
+                                            "type": "number",
+                                            "minimum": -90,
+                                            "maximum": 90,
+                                            "default": 90
+                                        },
+                                        "east": {
+                                            "description": "The maximum longitude. Must be greather than or equal to west",
+                                            "type": "number",
+                                            "minimum": -180,
+                                            "maximum": 180,
+                                            "default": 180
+                                        }
+                                    }
+                                },
+                                "when": {
+                                    "description": "A time period which includes the discover results. Date or datetime expressed in ISO8601 format",
+                                    "required": false,
+                                    "type": "object",
+                                    "properties": {
+                                        "from": {
+                                            "required": false,
+                                            "description": "Start time. If omitted the end time must be set",
+                                            "type": "string",
+                                            "default": "2004-01-01"
+                                        },
+                                        "to": {
+                                            "required": false,
+                                            "description": "End time. If omitted the start time must be set",
+                                            "type": "string",
+                                            "default": "2016-12-31"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {"200": {
+                    "description": "successful operation"
+                }},
+                "security": [{"api_key": []}]
+            }
+        },
+        "/{apiKey}/views/{viewId}": {
+        "get": {
+                "tags": ["View"],
+                "summary": "Retrieves a DAB view",
+                "description": "Retrieves the DAB views associated to the given <code>apiKey<\/code> and <code>viewId</code>",
+                "operationId": "getView",
+                "produces": ["application/json"],
+                "parameters": [{
+                    "name": "apiKey",
+                    "in": "path",
+                    "description": "The API key",
+                    "required": true,
+                    "type": "string",
+                    "format": "password"
+                },
+                {
+                    "name": "viewId",
+                    "in": "path",
+                    "description": "The view identifier",
+                    "required": true,
+                    "type": "string"
+                }
+                ],
+                "responses": {"200": {
+                    "description": "successful operation"
+                  
+                }},
+                "security": [{"api_key": []}]
+            },
+        "delete": {
+            "tags": ["View"],
+            "summary": "Deletes the given DAB view",
+            "description": "Deletes the DAB view with the the given <code>viewId<\/code>",
+            "operationId": "deleteView",
+            "produces": ["application/json"],
+            "parameters": [
+                {
+                    "name": "apiKey",
+                    "in": "path",
+                    "description": "The API key",
+                    "required": true,
+                    "type": "string",
+                    "format": "password"
+                },
+                {
+                    "name": "viewId",
+                    "in": "path",
+                    "description": "The view identifier",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "responses": {"200": {"description": "successful operation"}},
+            "security": [{"api_key": []}]
+        }}
+    },
+    "definitions": {
+      
+    }
+}

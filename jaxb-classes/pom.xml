@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>eu.essi_lab</groupId>
+		<artifactId>DAB</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>jaxb-classes</artifactId>
+	<packaging>pom</packaging>
+
+	<name>ESSI-Lab JAXB Classes</name>
+	<description>ESSI-Lab JAXB Classes</description>
+
+	<modules>
+		<module>jaxb-classes-csw-2.0.2</module>
+		<module>jaxb-classes-filter-1.1.0</module>
+		<module>jaxb-classes-org-purl-dc-1</module>
+		<module>jaxb-classes-ows-1.0.0</module>
+		<module>jaxb-classes-oai-pmh</module>
+		<module>jaxb-classes-common</module>
+		<module>jaxb-classes-19139_2_v1_0</module>
+		<module>jaxb-classes-ogc-pubsub-1.0</module>
+		<module>jaxb-classes-wml-1.1</module>
+		<module>jaxb-classes-wms-1.3.0</module>
+	    <module>jaxb-classes-wml-2.0</module>
+	    <module>jaxb-classes-wms-1.1.1</module>
+	</modules>
+		<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

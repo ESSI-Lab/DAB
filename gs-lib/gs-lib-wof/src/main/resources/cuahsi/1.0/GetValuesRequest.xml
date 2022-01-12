@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ws="http://www.cuahsi.org/his/1.0/ws/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ws:GetValuesObject>
+         <!--Optional:-->
+         <ws:location></ws:location>
+         <!--Optional:-->
+         <ws:variable></ws:variable>
+         <!--Optional:5/20/2010 12:00:00 AM-->
+         <ws:startDate></ws:startDate>
+         <!--Optional:-->
+         <ws:endDate></ws:endDate>
+         <!--Optional:-->
+         <ws:authToken></ws:authToken>
+      </ws:GetValuesObject>
+   </soapenv:Body>
+</soapenv:Envelope>

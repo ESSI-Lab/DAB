@@ -1,0 +1,8 @@
+eu.essi_lab.ommdk.CMRResourceMapper
+eu.essi_lab.ommdk.DublinCoreResourceMapper
+eu.essi_lab.ommdk.CollectionDublinCoreResourceMapper
+eu.essi_lab.ommdk.DublinCoreSAEONResourceMapper
+eu.essi_lab.ommdk.GMDResourceMapper
+eu.essi_lab.ommdk.GMIResourceMapper
+eu.essi_lab.ommdk.GSResourceMapper
+eu.essi_lab.ommdk.MultiResourceMapper

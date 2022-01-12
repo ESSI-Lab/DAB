@@ -1,0 +1,117 @@
+package eu.essi_lab.messages;
+
+/*-
+ * #%L
+ * Discovery and Access Broker (DAB) Community Edition (CE)
+ * %%
+ * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * #L%
+ */
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import eu.essi_lab.messages.count.AbstractCountResponse;
+import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.rip.RuntimeInfoProvider;
+public abstract class MessageResponse<T, C extends AbstractCountResponse> implements RuntimeInfoProvider {
+
+    @Override
+    public String getBaseType() {
+	return "message-response";
+    }
+    
+    private List<T> results;
+    private C countResponse;
+    private GSException exception;
+
+    /**
+     * 
+     */
+    public MessageResponse() {
+	setException(new GSException());
+	setResultsList(new ArrayList<T>());
+    }
+
+    /**
+     * Creates a new {@link MessageResponse} which is a clone of the supplied <code>resultSet</code>
+     * but without {@link #getResultsList()}
+     * 
+     * @param response a non <code>null</code> {@link MessageResponse} to clone
+     */
+    public MessageResponse(MessageResponse<?, C> response) {
+	setException(response.getException());
+	setCountResponse(response.getCountResponse());
+    }
+
+    /**
+     * This default implementation returns an empty map
+     */
+    @Override
+    public HashMap<String, List<String>> provideInfo() {
+
+	return new HashMap<>();
+    }
+
+    /**
+     * @return
+     */
+    public C getCountResponse() {
+
+	return countResponse;
+    }
+
+    /**
+     * @param countResponse
+     */
+    public void setCountResponse(C countResponse) {
+
+	this.countResponse = countResponse;
+    }
+
+    /**
+     * @return
+     */
+    public List<T> getResultsList() {
+
+	return results;
+    }
+
+    /**
+     * @param results
+     */
+    public void setResultsList(List<T> results) {
+
+	this.results = results;
+    }
+
+    /**
+     * @return
+     */
+    public GSException getException() {
+
+	return exception;
+    }
+
+    /**
+     * @param exception
+     */
+    protected void setException(GSException exception) {
+
+	this.exception = exception;
+    }
+}

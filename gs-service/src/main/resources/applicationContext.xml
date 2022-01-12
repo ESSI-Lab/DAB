@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+    http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+    http://cxf.apache.org/jaxrs    http://cxf.apache.org/schemas/jaxrs.xsd"
+	default-dependency-check="none" default-lazy-init="false">
+
+	<!-- Load the needed resources that are present in the cxf* jars -->
+	<import resource="classpath:META-INF/cxf/cxf.xml" />
+	<!-- import resource="classpath:META-INF/cxf/cxf-extension-jaxws.xml" / -->
+	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+
+	<jaxrs:server id="essiService" address="/essi">
+		<jaxrs:serviceBeans>
+			<ref bean="essiProfiler" />
+		</jaxrs:serviceBeans>
+	</jaxrs:server>
+	
+	<jaxrs:server id="essiServiceLegagy" address="/">
+		<jaxrs:serviceBeans>
+			<ref bean="essiProfiler" />
+		</jaxrs:serviceBeans>
+	</jaxrs:server>
+		
+	<bean id="essiProfiler" class="eu.essi_lab.gssrv.rest.ESSIProfilerService" />
+
+	<jaxrs:server id="extService" address="/ext">
+		<jaxrs:serviceBeans>
+			<ref bean="extProfiler" />
+		</jaxrs:serviceBeans>
+	</jaxrs:server>
+
+	<bean id="extProfiler" class="eu.essi_lab.gssrv.rest.EXTProfilerService" />
+	
+
+	<jaxrs:server id="supportService" address="/support">
+		<jaxrs:serviceBeans>
+			<ref bean="support" />
+		</jaxrs:serviceBeans>
+	</jaxrs:server>
+
+	<bean id="support" class="eu.essi_lab.gssrv.rest.SupportService" />
+	
+	<jaxrs:server id="essiUserServer" address="/user">
+		<jaxrs:serviceBeans>
+			<ref bean="essiUserService" />
+		</jaxrs:serviceBeans>
+		<jaxrs:providers>
+			<ref bean="jsonProvider" />
+		</jaxrs:providers>
+	</jaxrs:server>
+	<bean id="essiUserService" class="eu.essi_lab.gssrv.rest.UserService" />
+
+
+	<jaxrs:server id="essiHealthServer" address="/health">
+		<jaxrs:serviceBeans>
+			<ref bean="essiHealthService" />
+		</jaxrs:serviceBeans>
+		<jaxrs:providers>
+			<ref bean="jsonProvider" />
+		</jaxrs:providers>
+	</jaxrs:server>
+	<bean id="essiHealthService" class="eu.essi_lab.gssrv.rest.HealthCheckService" />
+
+
+
+	<jaxrs:server id="essiAdminServer" address="/admin">
+		<jaxrs:serviceBeans>
+			<ref bean="essiAdminService" />
+		</jaxrs:serviceBeans>
+		<jaxrs:providers>
+			<ref bean="jsonProvider" />
+		</jaxrs:providers>
+	</jaxrs:server>
+
+	<bean id="essiAdminService" class="eu.essi_lab.gssrv.rest.ESSIAdminService" />
+	<bean id="jsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider" />
+	
+
+</beans>

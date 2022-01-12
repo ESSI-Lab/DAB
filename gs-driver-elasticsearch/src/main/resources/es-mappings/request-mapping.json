@@ -1,0 +1,20 @@
+{ "properties": {
+			"CHRONOMETER_TIME_STAMP": { "type": "date" },	
+			"DISCOVERY_MESSAGE_tmpExtentBegin": { "type": "date" },
+			"DISCOVERY_MESSAGE_tmpExtentEnd": { "type": "date" },
+			"CHRONOMETER_ELAPSED_TIME_MILLIS": { "type": "long" },		
+			"DISCOVERY_MESSAGE_PAGE_SIZE": { "type": "long" },
+			"DISCOVERY_MESSAGE_PAGE_START": { "type": "long" },
+			"DISCOVERY_MESSAGE_MAX_FREQUENCY_MAP_ITEMS": { "type": "long" },
+			"DISCOVERY_MESSAGE_BBOX_NORTH": { "type": "double" },
+			"DISCOVERY_MESSAGE_BBOX_SOUTH": { "type": "double" },
+			"DISCOVERY_MESSAGE_BBOX_EAST": { "type": "double" },
+			"DISCOVERY_MESSAGE_BBOX_WEST": { "type": "double" },
+			"DISCOVERY_MESSAGE_SHAPE": { "type": "geo_shape" },	
+			"RESULT_SET_RETURNED": { "type": "long" },
+			"RESULT_SET_MATCHED": { "type": "long" },	
+			"RESPONSE_LENGTH": { "type": "long" },
+			"RESPONSE_STATUS": { "type": "long" },
+			"WEB_REQUEST_CONTENT_LENGTH": { "type": "long" }
+													
+}}

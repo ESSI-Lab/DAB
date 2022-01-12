@@ -1,0 +1,25 @@
+<!--<md-button ng-controller="gsLoginController as controller" ng-click="controller.displayLoginDialog()">Login</md-button>-->
+
+
+
+<div ng-controller="gsLoginController as loginController" class="lock-size" layout="row" layout-align="center center">
+    <md-fab-speed-dial md-open="loginController.isOpen" md-direction="right" class="md-fling">
+        <md-fab-trigger>
+            <md-button aria-label="menu" class="md-fab {{ loginController.getFABClass() }}" ng-click="loginController.authenticate()">
+                <md-icon md-svg-src="{{ '' +  loginController.getLockIcon() }}"></md-icon>
+            </md-button>
+        </md-fab-trigger>
+
+        <md-fab-actions ng-show="!loginController.isLoggedIn()">
+            <md-button aria-label="Twitter" class="md-fab md-raised md-mini" ng-click="loginController.authenticate('twitter')">
+                <md-icon md-svg-src="{{ '' +  loginController.getTwitterIcon() }}"></md-icon>
+            </md-button>
+            <md-button aria-label="Facebook" class="md-fab md-raised md-mini" ng-click="loginController.authenticate('facebook')">
+                <md-icon md-svg-src="{{ '' +  loginController.getFacebookIcon() }}"></md-icon>
+            </md-button>
+            <md-button aria-label="Google" class="md-fab md-raised md-mini" ng-click="loginController.authenticate('google')">
+                <md-icon md-svg-src="{{ '' +  loginController.getGoogleIcon() }}"></md-icon>
+            </md-button>
+        </md-fab-actions>
+    </md-fab-speed-dial>
+</div>

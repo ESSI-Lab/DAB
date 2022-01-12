@@ -1,0 +1,13 @@
+<jaxb:bindings xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/jaxb http://java.sun.com/xml/ns/jaxb/bindingschema_2_0.xsd"
+    version="2.0">
+    <jaxb:bindings schemaLocation="ows/1.0.0/owsAll.xsd">
+        <jaxb:schemaBindings>
+            <jaxb:package name="eu.essi_lab.jaxb.ows._1_0_0"/>
+        </jaxb:schemaBindings>
+    </jaxb:bindings>
+    <jaxb:globalBindings fixedAttributeAsConstantProperty="true"/>
+</jaxb:bindings>

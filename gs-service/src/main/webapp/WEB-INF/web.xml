@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://www.oracle.com/webfolder/technetwork/jsc/xml/ns/javaee/web-app_3_0.xsd">
+
+	<display-name>${project.name} ${project.version}</display-name>
+
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:applicationContext.xml</param-value>
+	</context-param>
+
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
+	<listener>
+		<listener-class>eu.essi_lab.gssrv.servlet.ServletListener</listener-class>
+	</listener>
+
+	<servlet>
+		<servlet-name>authenticator</servlet-name>
+		<servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>authenticator</servlet-name>
+		<url-pattern>/auth/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>dispatcher</servlet-name>
+		<servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>	 
+		<load-on-startup>1</load-on-startup>
+		<!-- remove comment to enable async support  -->
+		<!-- <async-supported>true</async-supported> -->	
+	<async-supported>true</async-supported>
+		
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>dispatcher</servlet-name>
+		<url-pattern>/services/*</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>PubSubService</servlet-name>
+		<servlet-class>eu.essi_lab.gssrv.servlet.PubSubService</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>PubSubService</servlet-name>
+		<url-pattern>/services/essi/pubsub/*</url-pattern>
+	</servlet-mapping>	  
+
+	<filter>
+		<filter-name>user-finder-filter</filter-name>
+		<filter-class>eu.essi_lab.gssrv.servlet.UserFinderFilter</filter-class>
+	</filter>
+	<filter>
+		<filter-name>init-filter</filter-name>
+		<filter-class>eu.essi_lab.gssrv.servlet.InitializationFilter</filter-class>
+	</filter>
+
+	<filter>
+		<filter-name>exec-filter</filter-name>
+		<filter-class>eu.essi_lab.gssrv.servlet.ExecutionModeFilter</filter-class>
+	</filter>
+		
+	<filter-mapping>
+		<filter-name>user-finder-filter</filter-name>
+		<url-pattern>/conf/*</url-pattern>
+	</filter-mapping>
+	
+	<filter-mapping>
+		<filter-name>user-finder-filter</filter-name>
+		<url-pattern>/services/*</url-pattern>
+	</filter-mapping>
+	
+	<filter>
+		<filter-name>filter</filter-name>
+		<filter-class>eu.essi_lab.gssrv.servlet.ProfilerServiceFilter</filter-class>
+		<!-- remove comment to enable async support  -->
+		<!-- <async-supported>true</async-supported> -->	
+	</filter>
+	<filter>
+		<filter-name>CorsFilter</filter-name>
+		<filter-class>eu.essi_lab.gssrv.servlet.CORSDelegatorFilter</filter-class>
+		<init-param>
+			<param-name>cors.allowed.origins</param-name>
+			<param-value>*</param-value>
+		</init-param>
+		<init-param>
+			<param-name>cors.allowed.methods</param-name>
+			<param-value>GET,POST,HEAD,OPTIONS,PUT</param-value>
+		</init-param>
+		<init-param>
+			<param-name>cors.allowed.headers</param-name>
+			<param-value>Content-Type,X-Requested-With,accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers</param-value>
+		</init-param>
+		<init-param>
+			<param-name>cors.exposed.headers</param-name>
+			<param-value>Access-Control-Allow-Origin,Access-Control-Allow-Credentials</param-value>
+		</init-param>
+		<!-- commented, as raises an error on the new tomcat init-param>
+			<param-name>cors.support.credentials</param-name>
+			<param-value>true</param-value>
+		</init-param-->
+		<init-param>
+			<param-name>cors.preflight.maxage</param-name>
+			<param-value>10</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>CorsFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
+	<filter-mapping>
+		<filter-name>filter</filter-name>
+		<url-pattern>*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>init-filter</filter-name>
+		<url-pattern>*</url-pattern>
+	</filter-mapping>
+
+</web-app>

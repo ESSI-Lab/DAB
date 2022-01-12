@@ -1,0 +1,6 @@
+eu.essi_lab.model.ontology.annotations.mappers.ConceptLabelMapper
+eu.essi_lab.model.ontology.annotations.mappers.ConceptTypeMapper
+eu.essi_lab.model.ontology.annotations.mappers.ConceptSourceMapper
+eu.essi_lab.model.ontology.annotations.mappers.ConceptDefinitionMapper
+eu.essi_lab.model.ontology.annotations.mappers.ConceptIsChildMapper
+eu.essi_lab.model.ontology.annotations.mappers.ConceptIsParentMapper

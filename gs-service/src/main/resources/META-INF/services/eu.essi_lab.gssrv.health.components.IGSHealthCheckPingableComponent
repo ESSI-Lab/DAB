@@ -1,0 +1,4 @@
+eu.essi_lab.gssrv.health.components.GSNc4IospPingableComponent
+eu.essi_lab.gssrv.health.components.GdalPingableComponent
+eu.essi_lab.gssrv.health.components.ConfClonerPingableComponent
+eu.essi_lab.gssrv.health.components.DiscoveryPingableComponent

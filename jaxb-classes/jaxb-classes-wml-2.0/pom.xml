@@ -1,0 +1,62 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>eu.essi_lab</groupId>
+		<artifactId>jaxb-classes</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>jaxb-classes-wml-2.0</artifactId>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-impl</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>gs-lib-xml</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+	</dependencies>
+	<build>
+
+		<plugins>
+			<plugin>
+				<groupId>org.jvnet.jaxb2.maven2</groupId>
+				<artifactId>maven-jaxb2-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>some-id</id>
+						<!-- Comment the following line to generate/update the classes! -->
+						<phase>none</phase>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<extension>true</extension>
+					<strict>false</strict>
+					<generateDirectory>src/main/java</generateDirectory>
+					<removeOldOutput>false</removeOldOutput>
+					<episode>true</episode>
+					<episodeFile>src/main/resources/META-INF/sun-jaxb.episode</episodeFile>
+					<schemaIncludes>
+						<value>schemas/waterml2.xsd</value>
+					</schemaIncludes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+
+	</build>
+</project>

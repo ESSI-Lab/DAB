@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+    xmlns:pubsub="http://www.opengis.net/pubsub/1.0"
+    elementFormDefault="qualified" attributeFormDefault="unqualified"
+    targetNamespace="http://www.opengis.net/pubsub/1.0" version="1.0">
+    
+    <include schemaLocation="pubsubCommon.xsd"/>
+    
+    <element name="GetSubscription" type="pubsub:GetSubscriptionType"/>
+    <complexType name="GetSubscriptionType">
+        <sequence>
+            <element ref="pubsub:SubscriptionIdentifier" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="pubsub:Extension" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType>
+    
+    <element name="GetSubscriptionResponse" type="pubsub:GetSubscriptionResponseType"/>
+    <complexType name="GetSubscriptionResponseType">
+        <sequence>
+            <element ref="pubsub:Subscription" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="pubsub:Extension" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType>
+</schema>

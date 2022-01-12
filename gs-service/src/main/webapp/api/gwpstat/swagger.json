@@ -1,0 +1,115 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "DAB statistics test page for GEOSS Portal",
+        "version": "1.0.0",
+        "title": "DAB statistics test page for GEOSS Portal"
+    },
+    
+    "basePath": "/gs-service/services/essi",
+    
+    
+    "schemes": ["http"],
+    
+    "paths": {     
+        "/rest/stats/gp": {
+            "get": {
+                "tags": ["rest - Statistics"],
+                "summary": "Statistics interface for GEOSS Portal",
+                "description": "Statistics interface for GEOSS Portal",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "statistic",
+                        "description": "The required statistic. The following statistics 'mostPopularResources', 'mostPopularCatalogs', 'mostPopularOrg' are applied to all the catalogs, so they are available only when the 'catalog' parameter is left blank. The other statistics  are always available, both when the 'catalog' parameter is set and when it's left blank",
+                        "in": "query",
+                        "required": true,
+                        "type": "string",
+                        "default": "mostPopularCatalogs",
+                        "enum": [
+                            "mostPopularResources",
+                            "mostPopularCatalogs",
+                            "mostPopularAreas",
+                            "mostPopularOrg",
+                            "numberOfSearches",
+                            "mostPopularKeywords"
+                        ]
+                    },
+                   
+                    {
+                        "name": "period",
+                        "description": "Predefined analyzed period. If the period is set, the parameters 'periodRangeStart' and 'periodRangeEnd' must be left blank",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "default": "lastYear",
+                        "enum": [
+                            "lastWeek",
+                            "lastMonth",
+                            "lastYear"
+                        ]
+                    },
+                    {
+                        "name": "periodRangeStart",
+                        "description": "Start of analyzed period. If the period is set, the parameter 'period' must be left blank",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "periodRangeEnd",
+                        "description": "End of analyzed period. This optional parameter can be set only if also the 'periodRangeStart' is set",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "interval",
+                        "description": "Interval of the statistics results. Useful only if the selected statistic is 'numberOfSearches', for all other statistics this parameter can be left blank (otherwise is ignored)",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "default": "day",
+                        "enum": [
+                            "minute",
+                            "hour",
+                            "day",
+                            "week",
+                            "month"
+                        ]
+                    },
+                    {
+                        "name": "intervalSize",
+                        "description": "Size of the interval expressed by the the 'interval' parameter. Useful only if the selected statistic is 'numberOfSearches', for all other statistics this parameter can be left blank (otherwise is ignored)",
+                        "in": "query",
+                        "required": false,
+                        "type": "int",
+                        "default": 1
+                    },
+                    {
+                        "name": "catalog",
+                        "description": "A catalog target of a selected statistic. May be omitted to target all catalogs",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "maxResults",
+                        "description": "Maximum number of presented results, ignored for the 'numberOfSearches' statistic",
+                        "in": "query",
+                        "required": false,
+                        "type": "int",
+                        "default": 10
+                    }
+                ],
+                "responses": {
+                    "200": {"description": "Successful operation"}
+                }
+            }
+        }
+    },
+    "externalDocs": {
+        "description": "Find out more about Swagger",
+        "url": "http://swagger.io"
+    }
+}

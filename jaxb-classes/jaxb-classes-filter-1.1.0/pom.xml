@@ -1,0 +1,21 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>eu.essi_lab</groupId>
+		<artifactId>jaxb-classes</artifactId>	
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>jaxb-classes-filter-1.1.0</artifactId>
+	<description>ESSI-Lab JAXB Classes for Filter-1.1.0</description>
+	<name>ESSI-Lab JAXB Classes for Filter-1.1.0</name>
+		<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>

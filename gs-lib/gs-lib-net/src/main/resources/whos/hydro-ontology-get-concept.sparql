@@ -1,0 +1,11 @@
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+SELECT DISTINCT (${CONCEPT_URI} as ?concept) ?prefLabel ?altLabel
+WHERE 
+{
+  ${CONCEPT_URI} rdf:type skos:Concept.
+  ${CONCEPT_URI} skos:prefLabel ?prefLabel .  
+   OPTIONAL { ${CONCEPT_URI} skos:altLabel ?altLabel } 
+}

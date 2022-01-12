@@ -1,0 +1,32 @@
+<csw:SchemaComponent targetNamespace="http://www.opengis.net/cat/csw/2.0.2" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+	schemaLanguage="http://www.w3.org/2001/XMLSchema">
+	<xs:schema targetNamespace="http://www.opengis.net/cat/csw/2.0.2"
+		xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gco="http://www.isotc211.org/2005/gco"
+		xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+		elementFormDefault="qualified" version="0.1">
+		<xsi:import namespace="http://www.opengis.net/cat/csw/2.0.2"
+			schemaLocation="http://schemas.opengis.net/csw/2.0.2/CSW-discovery.xsd" />
+
+		<xs:element name="Record" type="csw:RecordType"
+			substitutionGroup="csw:AbstractRecord" />
+		<xs:complexType name="RecordType" final="#all">
+			<xs:annotation>
+				<xs:documentation xml:lang="en"> This type extends
+					DCMIRecordType to add
+					ows:BoundingBox; it may be used to specify a spatial envelope for the
+					catalogued resource.
+				</xs:documentation>
+			</xs:annotation>
+			<xs:complexContent>
+				<xs:extension base="csw:DCMIRecordType">
+					<xs:sequence>
+						<xs:element name="AnyText" type="csw:EmptyType"
+							minOccurs="0" maxOccurs="unbounded" />
+						<xs:element ref="ows:BoundingBox" minOccurs="0"
+							maxOccurs="unbounded" />
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:schema>
+</csw:SchemaComponent>

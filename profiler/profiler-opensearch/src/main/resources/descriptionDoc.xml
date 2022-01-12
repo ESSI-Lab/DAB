@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"
+	xmlns:moz="http://www.mozilla.org/2006/browser/search/" xmlns:time="http://a9.com/-/opensearch/extensions/time/1.0/"
+	xmlns:geo="http://a9.com/-/opensearch/extensions/geo/1.0/" xmlns:essi="http://essi-lab.eu"
+	xmlns:parameters="http://a9.com/-/spec/opensearch/extensions/parameters/1.0/"
+	>
+	<ShortName>SHORT_NAME</ShortName>
+	<LongName>LONG_NAME</LongName>
+	<Description>DESCRIPTION</Description>
+	<Contact>fabrizio.papeschi@cnr.it</Contact>
+	<Image height="16" width="16" type="image/x-icon">http://essi-lab.eu/projects/gi-cat-favicon/favicon.ico
+	</Image>
+	
+	<Url  
+		type="application/gs-schema+xml"
+		template="TEMPLATE_URL" 
+		parameters:method="GET">
+		PARAMETERS
+   		<parameters:Parameter name="outputFormat" value="application/gs-schema+xml"/>
+	</Url>
+	
+	<Url  
+		type="application/gs-schema+xml"
+		template="TEMPLATE_URL" 
+		parameters:method="POST"
+		parameters:enctype="application/x-www-form-urlencoded" >
+		PARAMETERS
+   		<parameters:Parameter name="outputFormat" value="application/gs-schema+xml"/>
+	</Url>
+
+	<Url  
+		type="application/json"
+		template="TEMPLATE_URL" 
+		parameters:method="GET">
+		PARAMETERS
+   		<parameters:Parameter name="outputFormat" value="application/json"/>
+	</Url>
+	
+	<Url  
+		type="application/json"
+		template="TEMPLATE_URL" 
+		parameters:method="POST"
+		parameters:enctype="application/x-www-form-urlencoded" >
+		PARAMETERS
+   		<parameters:Parameter name="outputFormat" value="application/json"/>
+	</Url>
+	
+	<Url  
+		type="application/atom+xml"
+		template="TEMPLATE_URL" 
+		parameters:method="GET">
+		PARAMETERS
+   		<parameters:Parameter name="outputFormat" value="application/atom+xml"/>
+	</Url>
+	
+	<Url  
+		type="application/atom+xml"
+		template="TEMPLATE_URL" 
+		parameters:method="POST"
+		parameters:enctype="application/x-www-form-urlencoded" >
+		PARAMETERS
+   		<parameters:Parameter name="outputFormat" value="application/atom+xml"/>
+	</Url>
+
+	<Query role="example" geo:box="-180,-90,180,90" />
+	<Query role="example" geo:box="-20,-10,10,20" geo:relation="overlaps" />
+	<Query role="example" geo:box="-20,-10,10,20" geo:relation="contains" />
+	<Query role="example" geo:box="-20,-10,10,20" geo:relation="disjoint" />
+	<Query role="example" time:start="1990-01-01T00:00:00" time:end="2010-01-01T23:39:59" />
+
+	<Developer>fabrizio.papeschi@cnr.it</Developer>
+	<Developer>enrico.boldrini@cnr.it</Developer>
+	<SyndicationRight>open</SyndicationRight>
+	<AdultContent>false</AdultContent>
+	<Language>en-us</Language>
+	<OutputEncoding>UTF-8</OutputEncoding>
+	<InputEncoding>UTF-8</InputEncoding>
+
+</OpenSearchDescription>

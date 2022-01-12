@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gs:response xmlns:gs="http://flora.eu/gi-suite/1.0/dataModel/schema" 
+    xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">
+    <title>OpenSearch response according to the GI-Suite Data model schema</title> 
+    <link href="QUERY"/>
+    <updated>UPDATED</updated>
+    <opensearch:totalResults>TOTAL_RESULTS</opensearch:totalResults>
+    <opensearch:startIndex>START_INDEX</opensearch:startIndex>
+    <opensearch:itemsPerPage>ITEMS_PER_PAGE</opensearch:itemsPerPage>
+       
+    <!--
+    <link rel="self" href="http://example.com/New+York+History?pw=3&amp;format=atom" type="application/atom+xml"/>
+    <link rel="first" href="http://example.com/New+York+History?pw=1&amp;format=atom" type="application/atom+xml"/>
+    <link rel="previous" href="http://example.com/New+York+History?pw=2&amp;format=atom" type="application/atom+xml"/>
+    <link rel="next" href="http://example.com/New+York+History?pw=4&amp;format=atom" type="application/atom+xml"/>
+    <link rel="last" href="http://example.com/New+York+History?pw=42299&amp;format=atom" type="application/atom+xml"/>
+    <link rel="search" type="application/opensearchdescription+xml" href="http://example.com/opensearchdescription.xml"/>
+    
+    -->     
+    
+    <gs:results>
+    	RESULTS
+    </gs:results> 
+    
+    <gs:statistics>
+    	STATISTICS
+    </gs:statistics>
+    
+</gs:response>

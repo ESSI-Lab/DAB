@@ -1,0 +1,213 @@
+package eu.essi_lab.api.database.marklogic;
+
+/*-
+ * #%L
+ * Discovery and Access Broker (DAB) Community Edition (CE)
+ * %%
+ * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * #L%
+ */
+
+import java.io.InputStream;
+import java.util.Date;
+import java.util.Optional;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.marklogic.xcc.ResultSequence;
+import com.marklogic.xcc.exceptions.RequestException;
+
+import eu.essi_lab.api.database.internal.Folder;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.lib.xml.XMLNodeReader;
+public class MarkLogicFolder implements Folder {
+
+    protected String uri;
+    protected MarkLogicDatabase mlDataBase;
+
+    private static final String ESSI_LAST_UPDATE_ELEMNAME = "essilastupdate";
+
+    public MarkLogicFolder(MarkLogicDatabase mlDB, String uri) {
+	this.mlDataBase = mlDB;
+	this.uri = uri;
+    }
+
+    @Override
+    public String getURI() {
+
+	return uri;
+    }
+
+    @Override
+    public String getCompleteName() {
+
+	String name = new String(uri);
+	if (uri.startsWith("/")) {
+	    name = name.substring(1, uri.length());
+	}
+
+	if (uri.endsWith("/")) {
+	    name = name.substring(0, uri.length() - 2);
+	}
+
+	return name;
+    }
+
+    @Override
+    public String getSimpleName() {
+
+	String simpleName = getCompleteName();
+	simpleName = simpleName.replace(mlDataBase.getSuiteIdentifier() + "_", "");
+	simpleName = simpleName.replace(SourceStorageWorker.META_PREFIX, "");
+	simpleName = simpleName.replace(SourceStorageWorker.DATA_1_PREFIX, "");
+	simpleName = simpleName.replace(SourceStorageWorker.DATA_2_PREFIX, "");
+
+	return simpleName;
+    }
+
+    @Override
+    public boolean store(String key, Document doc) throws Exception {
+
+	return mlDataBase.getWrapper().store(createResourceUri(uri, key), doc);
+    }
+
+    @Override
+    public boolean replace(String key, Document doc) throws Exception {
+
+	return mlDataBase.getWrapper().replace(createResourceUri(uri, key), doc);
+    }
+
+    @Override
+    public boolean storeBinary(String key, InputStream res) throws Exception {
+
+	return mlDataBase.getWrapper().storeBinary(createResourceUri(uri, key), res);
+    }
+
+    @Override
+    public boolean storeBinary(String key, InputStream res, Date modificationDate) throws Exception {
+
+	return mlDataBase.getWrapper().storeBinary(createResourceUri(uri, key), res, modificationDate);
+    }
+
+    @Override
+    public boolean replaceBinary(String key, InputStream res) throws Exception {
+
+	return mlDataBase.getWrapper().replaceBinary(createResourceUri(uri, key), res);
+    }
+
+    @Override
+    public Node get(String key) throws Exception {
+
+	return mlDataBase.getWrapper().get(createResourceUri(uri, key));
+    }
+
+    /**
+     * See GIP-244 and test eu.essi_lab.api.database.marklogic.test.GIP_244_Test
+     * Now non transactional method should be no longer required
+     */
+    @Override
+    public InputStream getBinary(String key) throws Exception {
+
+	return mlDataBase.getWrapper().getBinary(createResourceUri(uri, key));
+    }
+
+    @JsonIgnore
+    @Override
+    public Node getBinaryProperties(String key) throws Exception {
+
+	return mlDataBase.getWrapper().getBinaryProperties(createResourceUri(uri, key));
+    }
+
+    @JsonIgnore
+    @Override
+    public Date getBinaryLastUpdate(String key) throws Exception {
+
+	Node props = getBinaryProperties(key);
+
+	XMLNodeReader reader = new XMLNodeReader(props);
+
+	String lastModified = reader.evaluateString("//*[local-name()='" + ESSI_LAST_UPDATE_ELEMNAME + "']");
+
+	Optional<Date> optional = ISO8601DateTimeUtils.parseISO8601ToDate(lastModified);
+
+	if (!optional.isPresent())
+	    throw new Exception("Can't parse element " + ESSI_LAST_UPDATE_ELEMNAME + " with value " + lastModified);
+
+	return optional.get();
+    }
+
+    @Override
+    public boolean remove(String key) throws Exception {
+
+	return mlDataBase.getWrapper().remove(createResourceUri(uri, key));
+    }
+
+    @Override
+    public boolean exists(String key) throws Exception {
+
+	// the getBinary method is more general, the exists method is general
+	// since it tests both xml docs and binaries
+	return getBinary(key) != null;
+    }
+
+    @Override
+    public String[] listKeys() throws RequestException {
+
+	String xQuery = "cts:uris('',(),cts:directory-query(\"" + uri + "\"))";
+
+	ResultSequence rs = mlDataBase.execXQuery(xQuery);
+
+	String[] asStrings = rs.asStrings();
+
+	for (int i = 0; i < asStrings.length; i++) {
+	    asStrings[i] = asStrings[i].substring(uri.length(), asStrings[i].length());
+	}
+
+	return asStrings;
+    }
+
+    @Override
+    public int size() throws RequestException {
+
+	String xQuery = "xdmp:estimate(cts:search(doc(), cts:directory-query(\"" + uri + "\",'1')))";
+
+	ResultSequence rs = mlDataBase.execXQuery(xQuery);
+	return Integer.valueOf(rs.asString());
+    }
+
+    @Override
+    public void clear() throws RequestException {
+
+	int step = 100;
+	while (size() > 0) {
+
+	    int size = size();
+	    if (size < step) {
+		step = size;
+	    }
+
+	    String xQuery = "for $i in cts:uris(\"" + uri + "\",'document')[1 to " + step + "] return xdmp:document-delete( $i )";
+	    mlDataBase.execXQuery(xQuery);
+	}
+    }
+
+    private String createResourceUri(String uri, String key) {
+
+	return uri + key;
+    }
+}

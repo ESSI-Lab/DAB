@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <soap:Body>
+        <GetSites xmlns="http://www.cuahsi.org/his/1.0/ws/">
+            <site>
+                <string />
+            </site>
+            <authToken />
+        </GetSites>
+    </soap:Body>
+</soap:Envelope>

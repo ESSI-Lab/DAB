@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+    xmlns:pubsub="http://www.opengis.net/pubsub/1.0"
+    xmlns:gml="http://www.opengis.net/gml/3.2" 
+    elementFormDefault="qualified" attributeFormDefault="unqualified"
+    targetNamespace="http://www.opengis.net/pubsub/1.0" version="1.0">
+    
+    <import namespace="http://www.opengis.net/gml/3.2" schemaLocation="http://schemas.opengis.net/gml/3.2.1/gml.xsd"/>
+    <include schemaLocation="pubsubCommon.xsd"/>
+    
+    <element name="Renew" type="pubsub:RenewType"/>
+    <complexType name="RenewType">
+        <sequence>
+            <element name="NewExpiration" type="gml:TimeInstantType" minOccurs="1" maxOccurs="1"/>
+            <element ref="pubsub:SubscriptionIdentifier" minOccurs="1" maxOccurs="1"/>
+            <element ref="pubsub:Extension" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType>
+    
+    <element name="RenewResponse" type="pubsub:RenewResponseType"/>
+    <complexType name="RenewResponseType">
+        <sequence>
+            <element ref="pubsub:Extension" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType>
+
+</schema>

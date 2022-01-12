@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Icons at https://material.io/icons/#ic_accessibility -->
+    <!-- CSS -->
+    <!--link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/github.min.css" rel="stylesheet"-->
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css"/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic">
+    <link rel="stylesheet" href="./css/external/material-datetimepicker.css">
+    <link rel="stylesheet" href="./css/confApp.css">
+
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-messages.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.js"></script>
+    <script src="./js/external/moment-with-locales.min.js"></script>
+    <!--script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script-->
+    <!--script src="https://logbon72.github.io/angular-material-datetimepicker/beautifier.js"></script-->
+    <!-- other date time picker https://ripjar.github.io/material-datetime-picker/-->
+    <script src="./js/external/angular-material-datetimepicker.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="../angular/modules/login/loginModule.js"></script>
+    <script src="js/gsConfApp.js"></script>
+
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
+
+</head>
+<body ng-app="gsConfApp" ng-controller="gsConfAppController as controller" style="background-color:white;">
+
+<md-content style="background-color:white;">
+
+    <!-- ------------- -->
+    <!-- Actual Header -->
+    <!-- ------------- -->
+
+    <md-toolbar style="position:fixed">
+        <div class="md-toolbar-tools" layout="row" layout-align="space-around center">
+
+            <!-- Flush button
+            <md-button aria-label="menu" class="md-fab md-warn md-mini conf-app-flush" ng-disabled="!controller.mustFlush" ng-click="flush()">
+                <md-icon md-svg-src="img/ic_backup_white_48px.svg"></md-icon>
+            </md-button> -->
+
+            <h2>
+                {{ controller.configuration.supportedOptions['GS_TITLE_KEY'].value }} Administration
+            </h2>
+            <!--<span flex></span>-->
+            <md-button class="md-icon-button" aria-label="Favorite" ng-click="wps.openLink('http://www.uos-firenze.iia.cnr.it')">
+                <img class="png-icon" src="img/UOS.png" style="width: 30px; height: 20px;">
+            </md-button>
+
+        </div>
+    </md-toolbar>
+
+    <br/><br/><br/>
+
+    <!-- ----------- -->
+    <!-- Actual Body -->
+    <!-- ----------- -->
+
+    <div layout="row" ng-cloak class="md-inline-form" layout-padding layout-margin layout-fill layout-wrap layout-align="center"
+         style="background-color:white;">
+
+        <div class="conf-app-background" flex>
+            <login-Widget clienturl="controller.locationurl + '/gs-service/conf/'"></login-Widget>
+        </div>
+
+        <!--<div class="conf-app-background" flex ng-show="controller.unauthorized"></div>-->
+
+        <div flex="75" style="background-color:white;">
+
+            <!-- -------- -->
+            <!---- Tabs ---->
+            <!-- -------- -->
+
+            <md-tabs md-dynamic-height md-border-bottom ng-show="!controller.unauthorized">
+
+                <!-- -------- -->
+                <!-- Main tab -->
+                <!-- -------- -->
+
+                <md-tab label="Main">
+
+                    <md-list flex ng-show="controller.addNewSource">
+                        <md-list-item class="md-3-line">
+                            <div class="md-list-item-text" layout="column">
+                                <md-input-container>
+                                    <label>Source Label</label>
+                                    <input aria-label="Favorite" type="text" name="{{ sourceOption.key }}" ng-model="sourceOption.label"
+                                           ng-required>
+                                </md-input-container>
+                                <md-input-container>
+                                    <label>Source URL</label>
+                                    <input aria-label="Favorite" type="text" name="{{ sourceOption.key }}" ng-model="sourceOption.endpoint"
+                                           ng-required>
+                                </md-input-container>
+                                <md-input-container>
+                                    <label>Source Identifier</label>
+                                    <input aria-label="Favorite" type="text" name="{{ sourceOption.key }}"
+                                           ng-model="sourceOption.uniqueIdentifier" ng-required="sourceOption.mandatory">
+                                </md-input-container>
+                                <md-button class="md-secondary" ng-click="doAddSourceAction($event, sourceOption)">Save</md-button>
+                            </div>
+                        </md-list-item>
+                    </md-list>
+
+                    <div class="md-padding" layout="row">
+
+                        <!-- ------------- -->
+                        <!-- Profilers div -->
+                        <!-- ------------- -->
+
+                        <div flex="30" layout="column" layout-align="start start">
+
+                            <div layout="raw" layout-align="center center">
+                                <md-subheader class="md-primary">Profilers</md-subheader>
+                            </div>
+
+                            <md-card
+                                    ng-repeat="profiler in controller.configuration.configurableComponents['PROFILERS_KEY'].configurableComponents"
+                                    style="width: 90%">
+
+                                <md-card-title layout="row">
+                                    <md-card-title-text layout="column">
+                                        <span class="md-headline">{{ profiler.supportedOptions.NAME_OPTION_KEY.value }} </span>
+                                        <span class="md-subhead">Type: {{ profiler.supportedOptions.TYPE_OPTION_KEY.value }} </span>
+                                        <span class="md-subhead">Path: {{ profiler.supportedOptions.PATH_OPTION_KEY.value }} </span>
+                                        <span class="md-subhead">Version: {{ profiler.supportedOptions.VERSION_OPTION_KEY.value }} </span>
+
+                                        <table style="margin-top:10px">
+                                            <tr>
+                                                <td style="width:15px">
+                                                    <span style="margin-left: -3px" class="md-subhead">Enabled:</span>
+                                                </td>
+                                                <td>
+                                                    <md-switch
+                                                            style=" display: inline;"
+                                                            class="md-primary"
+                                                            name="{{ profiler.key }}"
+                                                            ng-model="profiler.supportedOptions.ENABLED_OPTION_KEY.value"
+                                                            ng-required="false"
+                                                            ng-change="doSaveOptionAction( 'root-->PROFILERS_KEY-->'+profiler.key, profiler.supportedOptions.ENABLED_OPTION_KEY )">
+                                                    </md-switch>
+                                                </td>
+                                            </tr>
+
+                                        </table>
+
+                                    </md-card-title-text>
+                                </md-card-title>
+                            </md-card>
+
+                        </div>
+
+                        <!-- ------------------ -->
+                        <!-- Administration div -->
+                        <!-- ------------------ -->
+
+                        <div flex="40" layout="column" layout-align="start center">
+
+                            <h2 class="md-display-1">GI-suite</h2>
+
+                            <md-card style="width: 90%">
+
+                                <md-card-title>
+                                    <md-card-title-text>
+                                        <span class="md-headline">Administration</span>
+                                    </md-card-title-text>
+                                </md-card-title>
+
+                                <md-list flex>
+                                    <md-list-item
+                                            class="md-3-line"
+                                            ng-repeat="supportedOption in controller.configuration.supportedOptions"
+                                            es-Display-Option
+                                            ao="supportedOption"
+                                            ckeyprefix="'root'"
+                                            ck="'root'"
+                                            save="doSaveOptionAction(componentKey, supported)">
+                                    </md-list-item>
+                                </md-list>
+
+                            </md-card>
+
+                        </div>
+
+                        <!-- ----------- -->
+                        <!-- Sources div -->
+                        <!-- ----------- -->
+
+                        <div flex="30" layout="column" layout-align="start end">
+
+                            <div layout="raw" layout-align="center center">
+                                <md-button md-theme="forest" class="md-icon-button md-primary" aria-label="Settings"
+                                           ng-click="doNewSourceAction()">
+                                    <md-icon md-svg-src="img/ic_add_circle_48px.svg" aria-label="Insert Drive Icon"></md-icon>
+                                </md-button>
+                                <md-subheader class="md-primary">Brokered Sources</md-subheader>
+                            </div>
+
+                            <md-card
+                                    ng-repeat="brokered in controller.configuration.configurableComponents['BROKERED_SOURCES_KEY'].configurableComponents"
+                                    style="width: 90%">
+
+                                <md-card-title layout="row">
+                                    <md-card-title-text layout="column">
+                                        <span class="md-headline">{{ brokered.supportedOptions['GS_SOURCE_OPTION_KEY'].value.label }} </span>
+                                        <span class="md-subhead">{{ brokered.supportedOptions['GS_SOURCE_OPTION_KEY'].value.endpoint }} </span>
+                                    </md-card-title-text>
+                                </md-card-title>
+
+                                <md-card-actions layout="row" layout-align="center center">
+
+                                    <md-button ng-click="settingsClick(brokered.key)" title="Configure" class="md-icon-button md-primary"
+                                               aria-label="Settings">
+                                        <md-icon md-svg-src="img/ic_settings_48px.svg" aria-label="Insert Drive Icon"></md-icon>
+                                    </md-button>
+
+                                    <md-button title="Disable" class="md-icon-button md-accent" aria-label="Settings">
+                                        <md-icon md-svg-src="img/ic_highlight_off_48px.svg" aria-label="Insert Drive Icon"></md-icon>
+                                    </md-button>
+
+                                    <md-button ng-click="removeSource(brokered.key)" title="Remove" class="md-icon-button md-warn"
+                                               aria-label="Settings">
+                                        <md-icon md-svg-src="img/ic_remove_circle_48px.svg" aria-label="Insert Drive Icon"></md-icon>
+                                    </md-button>
+
+                                </md-card-actions>
+
+                                <div ng-show="controller.configurableAccessors[brokered.key].configure">
+
+                                    <md-list flex es-Olist
+                                             componentkeyprefix="'root-->BROKERED_SOURCES_KEY-->'+brokered.key"
+                                             component="brokered"
+                                             tstest="controller.configuration.timeStamp"
+
+                                             toggleall="doToggleAll(componentKey, option)"
+                                             areallselected="areAllSelected(option)"
+                                             ischecked="doIsChecked(option, label)"
+                                             toggle="doToggle(componentKey, option, label)"
+                                             isindeterminate="isIndeterminate(option)"
+
+                                             save="doSaveOptionAction(componentKey, supported)">
+                                    </md-list>
+                                </div>
+
+                            </md-card>
+                        </div>
+
+                    </div>
+                </md-tab>
+
+
+                <!-- ----------------------------- -->
+                <!-- Batch Job tab -->
+                <!-- ----------------------------- -->
+
+                <md-tab label="Batch Jobs">
+
+                    <br/>
+                    <br/>
+
+                    <div layout="raw" layout-align="start center">
+
+                        <md-button md-theme="forest" class="md-icon-button md-primary" aria-label="Settings"
+                                   ng-click="doNewBatchJobAction()">
+                            <md-icon md-svg-src="img/ic_add_circle_48px.svg" aria-label="Insert Drive Icon"></md-icon>
+                        </md-button>
+
+                    </div>
+
+                    <br/>
+                    <br/>
+
+                    <div flex ng-show="controller.addNewBatchJob">
+
+                        <md-list flex>
+                            <md-list-item
+                                    class="md-3-line"
+                                    ng-repeat="supportedOption in controller.configuration.configurableComponents['BATCH_JOBS_KEY'].supportedOptions"
+                                    es-Display-Option
+                                    ao="supportedOption"
+                                    ckeyprefix="'root-->BATCH_JOBS_KEY'"
+                                    ck="'BATCH_JOBS_KEY'"
+                                    save="doSaveOptionAction(componentKey, supported)">
+                            </md-list-item>
+                        </md-list>
+
+                    </div>
+
+
+                    <div>
+                        <md-card
+                                ng-repeat="batchjob in controller.configuration.configurableComponents['BATCH_JOBS_KEY'].configurableComponents"
+                                style="width: 90%">
+
+                            <md-card-title layout="row">
+                                <md-card-title-text layout="column">
+                                    <span class="md-headline">{{ batchjob.label }} </span>
+
+                                    <span style="color: blue;" class="md-subhead"
+                                          ng-repeat="sourceaug in batchjob.supportedOptions['AUGMENTERS_OPTION_KEY'].value.subcomponents">{{ sourceaug.label }} </span>
+
+                                    <span class="md-subhead"
+                                          ng-repeat="sourceaug in batchjob.supportedOptions['SOURCES_OPTION_KEY'].value.subcomponents">{{ sourceaug.label }} </span>
+
+                                </md-card-title-text>
+                            </md-card-title>
+
+                            <md-card-actions layout="row" layout-align="center center">
+
+                                <md-button ng-click="settingsClick(batchjob.key)" title="Configure" class="md-icon-button md-primary"
+                                           aria-label="Settings">
+                                    <md-icon md-svg-src="img/ic_settings_48px.svg" aria-label="Insert Drive Icon"></md-icon>
+                                </md-button>
+
+                                <md-button title="Disable" class="md-icon-button md-accent" aria-label="Settings">
+                                    <md-icon md-svg-src="img/ic_highlight_off_48px.svg" aria-label="Insert Drive Icon"></md-icon>
+                                </md-button>
+
+                                <!--<md-button ng-click="removeSource(brokered.key)" title="Remove" class="md-icon-button md-warn" aria-label="Settings">-->
+                                <!--<md-icon md-svg-src="img/ic_remove_circle_48px.svg" aria-label="Insert Drive Icon"></md-icon>-->
+                                <!--</md-button>-->
+
+                            </md-card-actions>
+
+                            <div ng-show="controller.configurableAccessors[batchjob.key].configure">
+
+                                <md-list flex es-Olist
+                                         componentkeyprefix="'root-->BATCH_JOBS_KEY-->'+batchjob.key"
+                                         component="batchjob"
+                                         tstest="controller.configuration.timeStamp"
+                                         toggleall="doToggleAll(componentKey, option)"
+                                         areallselected="areAllSelected(option)"
+                                         ischecked="doIsChecked(option, label)"
+                                         toggle="doToggle(componentKey, option, label)"
+                                         isindeterminate="isIndeterminate(option)"
+                                         save="doSaveOptionAction(componentKey, supported)">
+                                </md-list>
+                            </div>
+
+                        </md-card>
+                    </div>
+
+                </md-tab>
+
+                <!-- ----------------------------- -->
+                <!-- Other main configurables tabs -->
+                <!-- ----------------------------- -->
+
+                <md-tab
+                        ng-repeat="confComp in controller.configuration.configurableComponents"
+                        ng-if="confComp.key != 'BROKERED_SOURCES_KEY' &&
+                         	 	confComp.key != 'PROFILERS_KEY' &&
+                                confComp.key != 'BATCH_JOBS_KEY'"
+                        label="{{ confComp.label }}">
+
+                    <md-list flex>
+
+                        <md-list flex es-Olist
+                                 componentkeyprefix="'root-->'+confComp.key"
+                                 component="confComp"
+                                 tstest="controller.configuration.timeStamp"
+                                 toggleall="doToggleAll(componentKey, option)"
+                                 areallselected="areAllSelected(option)"
+                                 ischecked="doIsChecked(option, label)"
+                                 toggle="doToggle(componentKey, option, label)"
+                                 isindeterminate="isIndeterminate(option)"
+                                 save="doSaveOptionAction(componentKey, supported)">
+                        </md-list>
+                    </md-list>
+                </md-tab>
+            </md-tabs>
+
+            <!-- ------------ -->
+            <!-- Login Screen -->
+            <!-- ------------ -->
+
+            <div md-dynamic-height md-border-bottom ng-show="controller.unauthorized" layout-align="center center" layout="row">
+
+                <h2>You must be logged in as Administrator to view this page.</h2>
+
+            </div>
+        </div>
+        <div class="conf-app-background" flex></div>
+    </div>
+</md-content>
+</body>
+</html>

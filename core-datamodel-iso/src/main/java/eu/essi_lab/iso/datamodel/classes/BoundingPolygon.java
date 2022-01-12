@@ -1,0 +1,129 @@
+package eu.essi_lab.iso.datamodel.classes;
+
+/*-
+ * #%L
+ * Discovery and Access Broker (DAB) Community Edition (CE)
+ * %%
+ * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * #L%
+ */
+
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+
+import eu.essi_lab.iso.datamodel.ISOMetadata;
+import eu.essi_lab.jaxb.common.ObjectFactories;
+import net.opengis.gml.v_3_2_0.AbstractRingPropertyType;
+import net.opengis.gml.v_3_2_0.AbstractRingType;
+import net.opengis.gml.v_3_2_0.DirectPositionListType;
+import net.opengis.gml.v_3_2_0.LinearRingType;
+import net.opengis.gml.v_3_2_0.ObjectFactory;
+import net.opengis.gml.v_3_2_0.PolygonType;
+import net.opengis.iso19139.gmd.v_20060504.EXBoundingPolygonType;
+import net.opengis.iso19139.gss.v_20060504.GMObjectPropertyType;
+
+public class BoundingPolygon extends ISOMetadata<EXBoundingPolygonType> {
+
+    public BoundingPolygon(InputStream stream) throws JAXBException {
+
+	super(stream);
+    }
+
+    public BoundingPolygon(EXBoundingPolygonType type) {
+
+	super(type);
+    }
+
+    public BoundingPolygon() {
+
+	super(new EXBoundingPolygonType());
+    }
+
+    @Override
+    public JAXBElement<EXBoundingPolygonType> getElement() {
+
+	JAXBElement<EXBoundingPolygonType> element = ObjectFactories.GMD().createEXBoundingPolygon(type);
+	return element;
+    }
+    public void setId(String id) {
+	type.setId(id);
+    }
+
+    /**
+     * @XPathDirective(target = "@id")
+     * @return
+     */
+    public String getId() {
+	return type.getId();
+    }
+
+    /**
+     * * @XPathDirective(target = "gmd:polygon/gml:Polygon/gml:LinearRing/gml:coordinates")
+     * 
+     * @param coordinates a list of (lat lon) coordinates forming the exterior ring of the polygon
+     * @param coordinates
+     */
+    public void setCoordinates(List<Double> coordinates) {
+	List<GMObjectPropertyType> gmObjects = new ArrayList<>();
+	GMObjectPropertyType objectProperty = new GMObjectPropertyType();
+	ObjectFactory factory = new ObjectFactory();
+	PolygonType polygon = new PolygonType();
+	polygon.setSrsName("EPSG:4326");
+	AbstractRingPropertyType ringProperty = new AbstractRingPropertyType();
+	LinearRingType linearRing = new LinearRingType();
+	DirectPositionListType directPosition = new DirectPositionListType();
+	directPosition.setValue(coordinates);
+	linearRing.setPosList(directPosition);
+	ringProperty.setAbstractRing(factory.createLinearRing(linearRing));
+	polygon.setExterior(ringProperty);
+	objectProperty.setAbstractGeometry(factory.createPolygon(polygon));
+	gmObjects.add(objectProperty);
+	type.setPolygon(gmObjects);
+    }
+
+    public Iterator<Double> getCoordinates() {	
+	List<Double> ret = new ArrayList<>();
+	if (type.isSetPolygon() && //
+		!type.getPolygon().isEmpty() && //
+		type.getPolygon().get(0).isSetAbstractGeometry()) {
+	    Object abstractGeometry = type.getPolygon().get(0).getAbstractGeometry().getValue();
+	    if (abstractGeometry instanceof PolygonType) {
+		PolygonType polygonType = (PolygonType) abstractGeometry;
+		if (polygonType.isSetExterior() && //
+			polygonType.getExterior().isSetAbstractRing()) {
+		    AbstractRingType abstractRing = polygonType.getExterior().getAbstractRing().getValue();
+		    if (abstractRing instanceof LinearRingType) {
+			LinearRingType linearRing = (LinearRingType) abstractRing;
+			if (linearRing.isSetPosList()) {
+			    ret.addAll(linearRing.getPosList().getValue());
+			}
+		    }
+		}
+	    }
+	}
+	return ret.iterator();
+    }
+
+    public void clearCoordinates() {
+	type.unsetPolygon();
+    }
+
+}

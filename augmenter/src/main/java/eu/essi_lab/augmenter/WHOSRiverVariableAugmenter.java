@@ -1,0 +1,69 @@
+package eu.essi_lab.augmenter;
+
+/*-
+ * #%L
+ * Discovery and Access Broker (DAB) Community Edition (CE)
+ * %%
+ * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * #L%
+ */
+
+import java.util.ArrayList;
+import java.util.List;
+
+import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
+public class WHOSRiverVariableAugmenter extends WHOSVariableAugmenter {
+
+    public WHOSRiverVariableAugmenter() {
+
+	setLabel("WHOS River Variable augmenter");
+
+    }
+
+    @Override
+    public List<SKOSConcept> getConcepts(String variable) {
+	List<SKOSConcept> ret = new ArrayList<SKOSConcept>();
+	switch (variable.toLowerCase()) {
+	case "gage height": // gage height workaround: as there is no "Gage Height" concept in the ontology yet
+	    ret.add(new SKOSConcept("http://hydro.geodab.eu/hydro-ontology/concept/12"));
+	    return ret;
+	default:
+	    break;
+	}
+	ret = super.getConcepts(variable);
+
+	List<SKOSConcept> toRemove = new ArrayList<SKOSConcept>();
+	List<SKOSConcept> toAdd = new ArrayList<SKOSConcept>();
+	for (SKOSConcept concept : ret) {
+	    switch (concept.getURI()) {
+	    case "http://hydro.geodab.eu/hydro-ontology/concept/76":
+		toRemove.add(concept);
+		toAdd.add(new SKOSConcept("http://hydro.geodab.eu/hydro-ontology/concept/78"));
+		break;
+	    case "http://hydro.geodab.eu/hydro-ontology/concept/3":
+		toRemove.add(concept);
+		toAdd.add(new SKOSConcept("http://hydro.geodab.eu/hydro-ontology/concept/11"));
+		break;
+	    default:
+		break;
+	    }
+	}
+	ret.removeAll(toRemove);
+	ret.addAll(toAdd);
+	return ret;
+    }
+
+}

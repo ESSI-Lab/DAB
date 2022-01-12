@@ -1,0 +1,25 @@
+<ns2:ExecuteResponse xmlns:ns1="http://www.opengis.net/ows/1.1"
+    xmlns:ns2="http://www.opengis.net/wps/1.0.0" xmlns:ns3="http://www.w3.org/1999/xlink"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    serviceInstance="${ENDPOINT}"
+    service="WPS" version="1.0.0">
+    <ns2:Process ns2:processVersion="1.0.0">
+        <ns1:Identifier>gi-axe-capabilities</ns1:Identifier>
+        <ns1:Title xml:lang="en-US">GI-axe WPS profiler</ns1:Title>
+        <ns1:Abstract xml:lang="en-US">GI-axe is a distributed software system providing mediation-based access/processing services to geospatial data.</ns1:Abstract>
+    </ns2:Process>
+    <ns2:Status creationTime="${DATE_TIME}">
+        <ns2:ProcessSucceeded>ProcessConfiguration ended at ${DATE_TIME}</ns2:ProcessSucceeded>
+    </ns2:Status>
+    <ns2:ProcessOutputs>
+        <ns2:Output>
+            <ns1:Identifier>capabilities</ns1:Identifier>
+            <ns1:Title xml:lang="en-US">Capabilities Document</ns1:Title>
+            <ns2:Data>
+                <ns2:ComplexData mimeType="application/xml" encoding="utf-8">
+				${CAPABILITIES}
+                </ns2:ComplexData>
+            </ns2:Data>
+        </ns2:Output>
+    </ns2:ProcessOutputs>
+</ns2:ExecuteResponse>

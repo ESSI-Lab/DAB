@@ -1,0 +1,71 @@
+package eu.essi_lab.shared.driver.es.connector;
+
+/*-
+ * #%L
+ * Discovery and Access Broker (DAB) Community Edition (CE)
+ * %%
+ * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * #L%
+ */
+
+import java.io.IOException;
+import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.HttpClientBuilder;
+public class ESRequestSubmitter {
+
+    private String user;
+
+    private String pwd;
+
+    protected HttpClient authenticatedClient() {
+	CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+
+	Credentials credentials = new UsernamePasswordCredentials(getUser(), getPwd());
+	credentialsProvider.setCredentials(AuthScope.ANY, credentials);
+
+	return HttpClientBuilder.create().setDefaultCredentialsProvider(credentialsProvider).build();
+
+    }
+
+    public HttpResponse submit(HttpRequestBase request) throws IOException {
+
+	return authenticatedClient().execute(request);
+
+    }
+
+    public String getUser() {
+	return user;
+    }
+
+    public void setUser(String user) {
+	this.user = user;
+    }
+
+    public String getPwd() {
+	return pwd;
+    }
+
+    public void setPwd(String pwd) {
+	this.pwd = pwd;
+    }
+}

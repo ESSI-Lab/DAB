@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bindings version="2.1" xmlns="http://java.sun.com/xml/ns/jaxb">
+  <!--
+
+Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.11 
+Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
+Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
+Generato il: 2015.07.10 alle 09:33:35 AM CEST 
+
+  -->
+  <bindings scd="x-schema::tns" xmlns:tns="http://purl.org/dc/elements/1.1/">
+    <schemaBindings map="false">
+      <package name="eu.essi_lab.jaxb.csw._2_0_2.org.purl.dc.elements._1"/>
+    </schemaBindings>
+    <bindings scd="~tns:SimpleLiteral">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.org.purl.dc.elements._1.SimpleLiteral"/>
+    </bindings>
+    <bindings scd="~tns:elementContainer">
+      <class ref="eu.essi_lab.jaxb.csw._2_0_2.org.purl.dc.elements._1.ElementContainer"/>
+    </bindings>
+  </bindings>
+</bindings>
+

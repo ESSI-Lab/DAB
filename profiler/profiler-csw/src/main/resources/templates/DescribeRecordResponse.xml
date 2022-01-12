@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<csw:DescribeRecordResponse xmlns:ows="http://www.opengis.net/ows"
+	xmlns:ogc="http://www.opengis.net/ogc" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+	xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gml="http://www.opengis.net/gml"
+	xmlns:smXML="http://www.isotc211.org/smXML" xmlns:scXML="http://www.isotc211.org/scXML"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-discovery.xsd
+     http://www.w3.org/1999/xlink http://schemas.opengis.net/xlink/1.0.0/xlinks.xsd">
+
+</csw:DescribeRecordResponse>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<jxb:bindings
+	xmlns:gml="http://www.opengis.net/gml"
+	xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+	xmlns:ogc="http://www.opengis.net/ogc"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+    jxb:extensionBindingPrefixes="xjc"
+    version="2.1">
+    
+    <jxb:bindings schemaLocation="pubsub/1.0/pubsubAll.xsd" node="/xs:schema">
+        <jxb:globalBindings fixedAttributeAsConstantProperty="true" typesafeEnumBase="xs:string"
+            typesafeEnumMemberName="generateName" generateIsSetMethod="true">
+            <xjc:noValidator/>
+            <xjc:noValidatingUnmarshaller/>
+        </jxb:globalBindings>
+        <jxb:schemaBindings>
+            <jxb:package name="eu.essi_lab.ogc.pubsub._1_0"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+
+</jxb:bindings>

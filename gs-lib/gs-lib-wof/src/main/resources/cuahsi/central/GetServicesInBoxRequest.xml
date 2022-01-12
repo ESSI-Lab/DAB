@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <GetServicesInBox xmlns="http://hiscentral.cuahsi.org/20100205/">
+      <box>
+        <xmin>-180</xmin>
+        <xmax>180</xmax>
+        <ymin>-90</ymin>
+        <ymax>90</ymax>
+      </box>
+    </GetServicesInBox>
+  </soap:Body>
+</soap:Envelope>

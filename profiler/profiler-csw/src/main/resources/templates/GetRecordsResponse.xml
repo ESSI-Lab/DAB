@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<csw:GetRecordsResponse version="2.0.2" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+    xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-discovery.xsd"
+    xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:ows="http://www.opengis.net/ows"
+    xmlns:ogc="http://www.opengis.net/ogc" xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <csw:RequestId></csw:RequestId>    
+    <csw:SearchStatus></csw:SearchStatus>    
+    <csw:SearchResults  numberOfRecordsMatched="0" numberOfRecordsReturned="0"
+        recordSchema="http://www.opengis.net/cat/csw/2.0.2">
+        
+    </csw:SearchResults>    
+</csw:GetRecordsResponse>

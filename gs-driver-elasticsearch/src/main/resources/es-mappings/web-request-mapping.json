@@ -1,0 +1,4 @@
+{ "properties": {
+			"WEB_REQUEST_TIME_STAMP_MILLIS": { "type": "date" },
+			"WEB_REQUEST_CONTENT_LENGTH": { "type": "long" }
+}}

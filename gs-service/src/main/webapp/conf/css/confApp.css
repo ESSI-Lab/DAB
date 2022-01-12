@@ -1,0 +1,20 @@
+.conf-app-background {
+    background-image:url("../img/Netz.png");
+}
+
+md-list {
+    padding: 0px 0;
+}
+ 
+.sublist{
+   margin-top:30px;
+} 
+ 
+.sublist-fieldset {
+  border-style: solid;
+  border-width: 1px;
+  height: 100%; }
+
+.sublist-select-all-checkboxes {
+  padding-left: 15px; }
+
