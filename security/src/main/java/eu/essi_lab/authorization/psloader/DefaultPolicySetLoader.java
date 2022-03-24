@@ -27,20 +27,8 @@ import java.util.List;
 import eu.essi_lab.authorization.PolicySetWrapper;
 import eu.essi_lab.authorization.pps.AdminPermissionPolicySet;
 import eu.essi_lab.authorization.pps.AnonymousPermissionPolicySet;
-import eu.essi_lab.authorization.pps.CSW_RIPermissionPolicySet;
-import eu.essi_lab.authorization.pps.GWPPermissionPolicySet;
-import eu.essi_lab.authorization.pps.KMAPermissionPolicySet;
-import eu.essi_lab.authorization.pps.LODGEOSSPermissionPolicySet;
-import eu.essi_lab.authorization.pps.SeadatanetPermissionPolicySet;
-import eu.essi_lab.authorization.pps.WHOSPermissionPolicySet;
 import eu.essi_lab.authorization.rps.AdminRolePolicySet;
 import eu.essi_lab.authorization.rps.AnonymousRolePolicySet;
-import eu.essi_lab.authorization.rps.CSW_RIRolePolicySet;
-import eu.essi_lab.authorization.rps.GWPRolePolicySet;
-import eu.essi_lab.authorization.rps.KMARolePolicySet;
-import eu.essi_lab.authorization.rps.LODGEOSSRolePolicySet;
-import eu.essi_lab.authorization.rps.SeadatanetRolePolicySet;
-import eu.essi_lab.authorization.rps.WHOSRolePolicySet;
 
 /**
  * @author Fabrizio
@@ -51,27 +39,17 @@ public class DefaultPolicySetLoader implements PolicySetLoader {
     public List<PolicySetWrapper> loadRolePolicySets() {
 
 	return Arrays.asList(//
-		new KMARolePolicySet(), //
-		new GWPRolePolicySet(), //
 		new AdminRolePolicySet(), //
-		new AnonymousRolePolicySet(), //
-		new WHOSRolePolicySet(), //
-		new CSW_RIRolePolicySet(),//
-		new SeadatanetRolePolicySet(),
-		new LODGEOSSRolePolicySet());
+		new AnonymousRolePolicySet() //
+);
     }
 
     @Override
     public List<PolicySetWrapper> loadPermissionPolicySets() {
 
 	return Arrays.asList(//
-		new KMAPermissionPolicySet(), //
-		new GWPPermissionPolicySet(), //
 		new AdminPermissionPolicySet(), //
-		new AnonymousPermissionPolicySet(), //
-		new WHOSPermissionPolicySet(), //
-		new CSW_RIPermissionPolicySet(),//
-		new SeadatanetPermissionPolicySet(),
-		new LODGEOSSPermissionPolicySet());
+		new AnonymousPermissionPolicySet() //
+);
     }
 }
