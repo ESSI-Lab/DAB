@@ -4,7 +4,7 @@ package eu.essi_lab.request.executor.discover.submitter;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -40,6 +40,10 @@ import eu.essi_lab.model.StorageUri;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.request.executor.query.IDatabaseQueryExecutor;
+
+/**
+ * @author Fabrizio
+ */
 public class DatabaseQueryExecutor implements IDatabaseQueryExecutor {
 
     List<GSSource> sources = new ArrayList<>();
@@ -59,7 +63,7 @@ public class DatabaseQueryExecutor implements IDatabaseQueryExecutor {
 	
 	StorageUri uri = message.getDataBaseURI();
 
-	DatabaseReader reader = new DatabaseConsumerFactory().createDataBaseReader(uri);
+	DatabaseReader reader = DatabaseConsumerFactory.createDataBaseReader(uri);
 
 	GSLoggerFactory.getLogger(getClass()).info("Count STARTED");
 
@@ -81,7 +85,7 @@ public class DatabaseQueryExecutor implements IDatabaseQueryExecutor {
 	
 	StorageUri uri = message.getDataBaseURI();
 
-	DatabaseReader reader = new DatabaseConsumerFactory().createDataBaseReader(uri);
+	DatabaseReader reader = DatabaseConsumerFactory.createDataBaseReader(uri);
 
 	message.setPage(page);
 	
@@ -101,7 +105,7 @@ public class DatabaseQueryExecutor implements IDatabaseQueryExecutor {
 	
 	StorageUri uri = message.getDataBaseURI();
 
-	DatabaseReader reader = new DatabaseConsumerFactory().createDataBaseReader(uri);
+	DatabaseReader reader = DatabaseConsumerFactory.createDataBaseReader(uri);
 
 	message.setPage(page);
 	
@@ -121,7 +125,7 @@ public class DatabaseQueryExecutor implements IDatabaseQueryExecutor {
 	
 	StorageUri uri = message.getDataBaseURI();
 
-	DatabaseReader reader = new DatabaseConsumerFactory().createDataBaseReader(uri);
+	DatabaseReader reader = DatabaseConsumerFactory.createDataBaseReader(uri);
 
 	message.setPage(page);
 	

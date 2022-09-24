@@ -4,7 +4,7 @@ package eu.essi_lab.shared.driver.es.stats;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,6 +28,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,6 +47,11 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequestInterceptor;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.TaskOperationFailure;
@@ -52,6 +59,7 @@ import org.elasticsearch.action.admin.cluster.node.tasks.list.ListTasksRequest;
 import org.elasticsearch.action.admin.cluster.node.tasks.list.ListTasksResponse;
 import org.elasticsearch.action.admin.cluster.repositories.get.GetRepositoriesRequest;
 import org.elasticsearch.action.admin.cluster.repositories.get.GetRepositoriesResponse;
+import org.elasticsearch.action.admin.cluster.repositories.put.PutRepositoryRequest;
 import org.elasticsearch.action.admin.cluster.snapshots.get.GetSnapshotsRequest;
 import org.elasticsearch.action.admin.cluster.snapshots.get.GetSnapshotsResponse;
 import org.elasticsearch.action.admin.cluster.snapshots.restore.RestoreSnapshotRequest;
@@ -62,6 +70,7 @@ import org.elasticsearch.action.admin.cluster.snapshots.status.SnapshotsStatusRe
 import org.elasticsearch.action.admin.cluster.snapshots.status.SnapshotsStatusResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkItemResponse;
+import org.elasticsearch.action.bulk.BulkItemResponse.Failure;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.get.GetRequest;
@@ -76,12 +85,16 @@ import org.elasticsearch.client.Request;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.core.CountRequest;
 import org.elasticsearch.client.core.CountResponse;
+import org.elasticsearch.client.indices.CloseIndexRequest;
+import org.elasticsearch.client.indices.CloseIndexResponse;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.tasks.CancelTasksRequest;
 import org.elasticsearch.cluster.metadata.RepositoryMetadata;
+import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.geometry.Geometry;
@@ -124,6 +137,7 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 
+import eu.essi_lab.cfga.gs.ConfiguredGmailClient;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.bond.Bond;
@@ -139,6 +153,7 @@ import eu.essi_lab.messages.stats.StatisticsMessage.GroupByPeriod;
 import eu.essi_lab.messages.stats.StatisticsResponse;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.RuntimeInfoElement;
+import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.shared.driver.es.connector.aws.AWSRequestSigningApacheInterceptor;
 
@@ -153,8 +168,14 @@ public class ElasticsearchClient {
 
     private static final String STATS_COMPUTING_STARTED = "STATS_COMPUTING_STARTED";
     private static final String STATS_COMPUTING_ENDED = "STATS_COMPUTING_ENDED";
+    private static final String EL_SEARCH_CLIENT_ERROR = "EL_SEARCH_CLIENT_ERROR";
     private static HashMap<String, RestHighLevelClient> clients = new HashMap<>();
     private RestHighLevelClient client = null;
+
+    public RestHighLevelClient getClient() {
+	return client;
+    }
+
     private String dbName;
 
     public String getDbName() {
@@ -196,19 +217,52 @@ public class ElasticsearchClient {
 
 	if (client == null) {
 
-	    AWS4Signer signer = new AWS4Signer();
-	    signer.setServiceName("es");
-	    signer.setRegionName("us-east-1");
-	    AWSCredentials credentials = new BasicAWSCredentials(username, password);
-	    AWSCredentialsProvider credentialsProvier = new AWSStaticCredentialsProvider(credentials);
-	    HttpRequestInterceptor interceptor = new AWSRequestSigningApacheInterceptor("es", signer, credentialsProvier);
-	    client = new RestHighLevelClient(RestClient.builder(HttpHost.create(endpoint))
-		    .setHttpClientConfigCallback(hacb -> hacb.addInterceptorLast(interceptor)));
-	    clients.put(key, client);
+	    if (endpoint.contains("amazon") || endpoint.contains("aws")) {
+		AWS4Signer signer = new AWS4Signer();
+		signer.setServiceName("es");
+		signer.setRegionName("us-east-1");
+		AWSCredentials credentials = new BasicAWSCredentials(username, password);
+		AWSCredentialsProvider credentialsProvier = new AWSStaticCredentialsProvider(credentials);
+		HttpRequestInterceptor interceptor = new AWSRequestSigningApacheInterceptor("es", signer, credentialsProvier);
+		client = new RestHighLevelClient(RestClient.builder(HttpHost.create(endpoint))
+			.setHttpClientConfigCallback(hacb -> hacb.addInterceptorLast(interceptor)));
+		clients.put(key, client);
+	    } else {
+		CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+
+		if (username != null && password != null) {
+		    credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
+		}
+
+		URL url;
+		try {
+		    url = new URL(endpoint);
+		    RestClientBuilder builder = RestClient.builder(new HttpHost(url.getHost(), url.getPort(), url.getProtocol()))
+			    .setHttpClientConfigCallback(new RestClientBuilder.HttpClientConfigCallback() {
+				@Override
+				public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {
+				    return httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+				}
+			    });
+
+		    client = new RestHighLevelClient(builder);
+		    clients.put(key, client);
+
+		} catch (MalformedURLException e) {
+		    e.printStackTrace();
+		}
+
+	    }
 
 	}
 
     }
+
+    /**
+     * @param message
+     * @return
+     * @throws GSException
+     */
     public StatisticsResponse compute(StatisticsMessage message) throws GSException {
 
 	GSLoggerFactory.getLogger(getClass()).trace(STATS_COMPUTING_STARTED);
@@ -432,11 +486,16 @@ public class ElasticsearchClient {
 	    GSLoggerFactory.getLogger(getClass()).trace(STATS_COMPUTING_ENDED);
 
 	    return ret;
-	} catch (
+	} catch (Exception e) {
 
-	Exception e) {
-	    e.printStackTrace();
-	    throw new GSException();
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    EL_SEARCH_CLIENT_ERROR, //
+		    e); //
 	}
 
     }
@@ -504,7 +563,10 @@ public class ElasticsearchClient {
 
     public void delete(String... indexes) throws IOException {
 	for (String index : indexes) {
-	    String dbIndex = getDbName().toLowerCase() + "-" + index;
+	    String dbIndex = index;
+	    if (dbName != null) {
+		dbIndex = getDbName().toLowerCase() + "-" + index;
+	    }
 	    GSLoggerFactory.getLogger(getClass()).info("Elastic search deleting index {}", dbIndex);
 	    try {
 		boolean exists = checkIndexExistence(dbIndex);
@@ -630,9 +692,11 @@ public class ElasticsearchClient {
 		    GSLoggerFactory.getLogger(getClass()).error("Elasticsearch index failure: {} {} {}", reason, itemId, item);
 		} else {
 		    if (response.getResult() == DocWriteResponse.Result.CREATED) {
-			GSLoggerFactory.getLogger(getClass()).trace("Elasticsearch document created {} {}", index, response.getId());
+			// GSLoggerFactory.getLogger(getClass()).trace("Elasticsearch document created {} {}", index,
+			// response.getId());
 		    } else if (response.getResult() == DocWriteResponse.Result.UPDATED) {
-			GSLoggerFactory.getLogger(getClass()).trace("Elasticsearch document updated {} {}", index, response.getId());
+			// GSLoggerFactory.getLogger(getClass()).trace("Elasticsearch document updated {} {}", index,
+			// response.getId());
 		    }
 		}
 	    }
@@ -649,8 +713,7 @@ public class ElasticsearchClient {
 	    }
 	}
 	if (!success) {
-	    GSMailSenderElasticsearch.sendEmail(
-		    GSMailSenderElasticsearch.MAIL_REPORT_STATISTICS + GSMailSenderElasticsearch.MAIL_ERROR_SUBJECT,
+	    ConfiguredGmailClient.sendEmail(ConfiguredGmailClient.MAIL_REPORT_STATISTICS + ConfiguredGmailClient.MAIL_ERROR_SUBJECT,
 		    "Unable to index document(s) \n\n" + failureMessage);
 	}
 	return success;
@@ -815,39 +878,9 @@ public class ElasticsearchClient {
 
     }
 
-    public static void main(String[] args) throws Exception {
-	ElasticsearchClient client = new ElasticsearchClient(System.getProperty("amazonHost"));
-	client.setIndexes("production-_request-backup", "production-request", "production-request-restored");
-
-	// client.delete("requests-new");
-	// client.deleteBefore("2021-07-01T00:00:00Z");
-
-	// long count = client.count();
-	// System.out.println("Total count: " + count);
-	//
-	boolean includeHarvest = false;
-	client.downloadGEOSSRequests(includeHarvest,new File("/home/boldrini/requests.json"));
-	System.out.println("Include harvest: " + includeHarvest);
-
-	// client.listSnapshots(ISO8601DateTimeUtils.parseISO8601("2021-07-29"));
-	// client.listSnapshots(null);
-
-	// client.recoveryInformation("production","_request-backup");
-	// client.countGEOSS();
-
-//	long count = client.countGEOSS();
-//	System.out.println(count);
-
-//	client.printKeywords(2020);
-
-	// client.restoreSnapshot("cs-automated", "2021-07-29t22-48-13.81b2d4bc-26cc-43d6-b5d5-a43232a65b76",
-	// "production", "request");
-	client.close();
-    }
-
     String[] indexes = null;
 
-    private void setIndexes(String... indexes) {
+    public void setIndexes(String... indexes) {
 	this.indexes = indexes;
 
     }
@@ -868,8 +901,26 @@ public class ElasticsearchClient {
 	client.snapshot().restore(request, RequestOptions.DEFAULT);
     }
 
+    public void restoreSnapshot(String repositoryName, String snapshotName, List<String> indices) throws IOException {
+	RestoreSnapshotRequest request = new RestoreSnapshotRequest(repositoryName, snapshotName);
+	request.indices(indices);
+	// request.renamePattern("(.+)'");
+	// request.renameReplacement("production-request-backup");
+	request.waitForCompletion(false);
+	client.snapshot().restore(request, RequestOptions.DEFAULT);
+    }
+
+    public void listSnapshots() throws Exception {
+	listSnapshots(null);
+    }
+
     public void listSnapshots(Date minDate) throws Exception {
-	GetRepositoriesRequest repoRequest = new GetRepositoriesRequest();
+	listSnapshots(minDate, true);
+    }
+
+    GetRepositoriesRequest repoRequest = new GetRepositoriesRequest();
+
+    public void listSnapshots(Date minDate, boolean showDetails) throws Exception {
 	String[] repositories = new String[] {};
 	repoRequest.repositories(repositories);
 	GetRepositoriesResponse repoResponse = this.client.snapshot().getRepository(repoRequest, RequestOptions.DEFAULT);
@@ -877,8 +928,18 @@ public class ElasticsearchClient {
 
 	List<String> details = new ArrayList<String>();
 
+	int i = 0;
 	for (RepositoryMetadata repo : repos) {
-	    System.out.println(repo.name());
+	    if (i++ == 0) {
+		// continue;
+	    }
+	    System.out.println("Repository name: " + repo.name());
+	    Settings settings = repo.settings();
+	    Set<String> keys = settings.keySet();
+	    for (String key : keys) {
+		String value = settings.get(key);
+		System.out.println("Setting [" + key + "]: " + value);
+	    }
 	    GetSnapshotsRequest request = new GetSnapshotsRequest();
 	    request.repository(repo.name());
 	    GetSnapshotsResponse response = client.snapshot().get(request, RequestOptions.DEFAULT);
@@ -895,8 +956,10 @@ public class ElasticsearchClient {
 		Date endDate = new Date(endTime);
 		if (minDate == null || minDate.before(endDate)) {
 		    details.add(snapshotId.getName());
-		    System.out.println(snapshotId.getName() + " " + snapshotId.getUUID());
-		    listSnapshotDetails(repo.name(), snapshotId.getName());
+		    System.out.println("Snapshot name: " + snapshotId.getName() + " Snapshot id: " + snapshotId.getUUID());
+		    if (showDetails) {
+			listSnapshotDetails(repo.name(), snapshotId.getName());
+		    }
 		}
 	    }
 
@@ -935,44 +998,48 @@ public class ElasticsearchClient {
     }
 
     public void downloadGEOSSRequests(boolean includeHarvest, File file) throws Exception {
-	BoolQueryBuilder builder = getGEOSSQuery(includeHarvest);
 	String[] indices = new String[] { dbName + "-request" };
 	if (indexes != null) {
 	    indices = indexes;
 	}
+
 	SearchRequest searchRequest = new SearchRequest(indices);
-	searchRequest.scroll(TimeValue.timeValueDays(1L)); 
+	searchRequest.scroll(TimeValue.timeValueDays(1L));
+	// searchRequest.scroll();
 	SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-//	int index = 0;
-//	int pageSize = 100;
-//	searchSourceBuilder.from(index);
+	// int index = 0;
+	// int pageSize = 100;
+	// searchSourceBuilder.from(index);
 	searchSourceBuilder.size(100);
-	searchSourceBuilder.query(builder);
+	searchSourceBuilder.query(getGEOSSQuery(includeHarvest));
 	searchRequest.source(searchSourceBuilder);
 	RequestOptions options = RequestOptions.DEFAULT;
 	SearchResponse response = client.search(searchRequest, options);
+	System.out.println("Total hits: " + response.getHits().getTotalHits());
 	String scrollId = response.getScrollId();
-	
-	
-	
+
 	SearchHit[] hits = null;
 	FileOutputStream fos = new FileOutputStream(file);
 	BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
 	int index = 0;
 	do {
-	    
-	    SearchScrollRequest scrollRequest = new SearchScrollRequest(scrollId); 
+
+	    SearchScrollRequest scrollRequest = new SearchScrollRequest(scrollId);
 	    scrollRequest.scroll(TimeValue.timeValueSeconds(30));
+	    // scrollRequest.scroll();
 	    SearchResponse searchScrollResponse = client.scroll(scrollRequest, RequestOptions.DEFAULT);
-	    scrollId = searchScrollResponse.getScrollId();  
+	    scrollId = searchScrollResponse.getScrollId();
 	    SearchHits searchHits = searchScrollResponse.getHits();
 	    hits = searchHits.getHits();
 	    for (SearchHit hit : hits) {
+		String id = hit.getId();
+		bw.write(id);
+		bw.newLine();
 		String str = hit.getSourceAsString();
 		bw.write(str);
 		bw.newLine();
 		index++;
-	    }	    
+	    }
 	    System.out.println(index);
 
 	} while (hits != null && hits.length > 0);
@@ -986,18 +1053,78 @@ public class ElasticsearchClient {
 	return count(builder);
     }
 
-    private BoolQueryBuilder getGEOSSQuery(boolean includeHarvest) {
+    public void countQueriesMatchingSource(String sourceId) throws Exception {
+	BoolQueryBuilder builder = getGEOSSQuery(false);
+	builder.must(QueryBuilders.rangeQuery(RuntimeInfoElement.CHRONOMETER_TIME_STAMP.getName()).from("2021-01-01T00:00:00.000Z")
+		.to("2022-06-01T00:00:00.000Z"));
+	builder.must(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.RESULT_SET_DISCOVERY_SOURCE_ID.getName(), sourceId));
+
+	long count = count(builder);
+	System.out.println("Queries: " + count);
+
+    }
+
+    public BoolQueryBuilder getGEOSSQuery(boolean includeHarvest) {
 	BoolQueryBuilder builder = QueryBuilders.boolQuery();
 
+	// builder.must(QueryBuilders.existsQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName()));
+
 	if (!includeHarvest) {
+
+	    // builder.must(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_ABSOLUTE_PATH.getName(),
+	    // "http://gs-service-production.geodab.eu/gs-service/services/essi/view/geoss/opensearch/query"));
+
 	    builder.must(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REQUEST_PATH.getName(), "opensearch"));
+	    builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.PROFILER_NAME.getName(), "OAIPMHProfiler"));
+	    builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REQUEST_PATH.getName(), "oaipmh"));
+	    // kma
+
+	    // usgs eros
+
 	}
+
+	// fastweb (probably roberto in many cases)
+	
+	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.47.230.149")); // for sure roberto
+//	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.34.139.128"));
+//	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.47.40.34"));
+//	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.44.184.46"));
+//	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.47.40.197"));
+//	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.34.132.8"));
+//	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.47.41.189"));
+//	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.47.44.64"));
+//	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.44.184.109"));
+//	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.47.40.213"));
+//	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.47.40.37"));
+//	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.47.41.5"));
+//	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.47.42.189"));
+//	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.47.43.17"));
+//	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.47.43.213"));
+	
+	// jrc 2017 report
+	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REMOTE_ADDRESS.getName(), "139.191.247.2"));
+	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REMOTE_ADDRESS.getName(), "139.191.247.1"));
+	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REMOTE_ADDRESS.getName(), "139.191.247.0"));
+	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REMOTE_ADDRESS.getName(), "139.191.247.3"));
+
+	builder.mustNot(QueryBuilders.prefixQuery(RuntimeInfoElement.WEB_REQUEST_QUERY_STRING.getName(), "service"));
+
+	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REQUEST_PATH.getName(), "cswisogeo"));
+
+	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REQUEST_PATH.getName(), "csw"));
+
+	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REQUEST_PATH.getName(), "rest"));
+
+	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REQUEST_PATH.getName(), "hiscentral.asmx"));
 
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REQUEST_PATH.getName(), "cite-csw-ri"));
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REQUEST_PATH.getName(), "www.blue-cloud.org"));
 
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REQUEST_PATH.getName(), "gwps"));
 
+	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.DISCOVERY_MESSAGE_GS_USER_EMAIL.getName(), "seadatanet"));
+
+	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.PROFILER_NAME.getName(), "HISCentralProfiler"));
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.PROFILER_NAME.getName(), "THREDDSProfiler"));
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.PROFILER_NAME.getName(), "BNHSProfiler"));
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.PROFILER_NAME.getName(), "HydroServerProfiler"));
@@ -1036,18 +1163,20 @@ public class ElasticsearchClient {
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REQUEST_PATH.getName(), "odip"));
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REQUEST_PATH.getName(), "blue-cloud"));
 
+	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_ABSOLUTE_PATH.getName(), "itaEmr"));
+
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_QUERY_STRING.getName(), "ROOT"));
 
-	if (!includeHarvest) {
-	    builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_QUERY_STRING.getName(),
-		    "satellitescene_collection_prefix_ChinaGEO_CSES-01"));
-	    builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_QUERY_STRING.getName(), "china%20geoss"));
-	}
-
 	// builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_QUERY_STRING.getName(),
-	// "targetIds"));
+	// "satellitescene_collection_prefix_ChinaGEO_CSES-01"));
+	// builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_QUERY_STRING.getName(),
+	// "china%20geoss"));
+	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_QUERY_STRING.getName(), "suggestions"));
+
+	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_QUERY_STRING.getName(), "targetIds"));
 	//
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_HOST.getName(), "localhost"));
+	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_ABSOLUTE_PATH.getName(), "localhost"));
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.RUNTIME_CONTEXT.getName(), "https://geoss.devel.esaportal.eu"));
 
 	builder.mustNot(QueryBuilders.prefixQuery(RuntimeInfoElement.WEB_REQUEST_QUERY_STRING.getName(), "targetid"));
@@ -1055,22 +1184,46 @@ public class ElasticsearchClient {
 	builder.mustNot(QueryBuilders.queryStringQuery("localhost").defaultField(RuntimeInfoElement.WEB_REQUEST_QUERY_STRING.getName()));
 
 	//
-	// CNR
+	// CNR	
+	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "149.139.19.4"));
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "149.139.19.2"));
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "149.139.19.84"));
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "149.139.19.85"));
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "149.139.19.86"));
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "149.139.19.89"));
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "149.139.19.108"));
+	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "149.139.19.135"));
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "149.139.19.212"));
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.57.245.45"));
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REMOTE_HOST.getName(), "149.139.19.2"));
+	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REMOTE_HOST.getName(), "149.139.19.4"));
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REMOTE_HOST.getName(), "149.139.19.84"));
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REMOTE_HOST.getName(), "149.139.19.85"));
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REMOTE_HOST.getName(), "149.139.19.86"));
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REMOTE_HOST.getName(), "149.139.19.89"));
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REMOTE_HOST.getName(), "149.139.19.108"));
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REMOTE_HOST.getName(), "149.139.19.212"));
+	builder.mustNot(QueryBuilders.prefixQuery(RuntimeInfoElement.WEB_REQUEST_HOST.getName(), "papeschi"));
+
+	// // OAI-PMH harvesting by CNR
+	// builder.mustNot(QueryBuilders.matchPhraseQuery("WEB_REQUEST_user-agent", "Apache-HttpClient/4.5.2
+	// (Java/1.8.0_131)"));
+	// // OAI-PMH harvesting for 2017 report (CNR)
+	// builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REMOTE_ADDRESS.getName(),
+	// "3.94.4.114"));
+	// builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REMOTE_ADDRESS.getName(),
+	// "34.207.96.248"));
+	// builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REMOTE_ADDRESS.getName(),
+	// "34.229.209.97"));
+	// builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REMOTE_ADDRESS.getName(),
+	// "34.229.42.83"));
+	// builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REMOTE_ADDRESS.getName(),
+	// "54.89.97.99"));
+	// builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REMOTE_ADDRESS.getName(),
+	// "34.204.93.175"));
+	// builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REMOTE_ADDRESS.getName(),
+	// "54.166.180.245"));
+	// // OAI-PMH harvesting for 2017 report (JRC)
 
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REMOTE_ADDRESS.getName(), "127.0.0.1"));
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REMOTE_HOST.getName(), "127.0.0.1"));
@@ -1112,7 +1265,8 @@ public class ElasticsearchClient {
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "178.73.6.43"));
 
 	// greci
-	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REMOTE_HOST.getName(), "195.251.203.238"));
+	// builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REMOTE_HOST.getName(),
+	// "195.251.203.238"));
 	return builder;
     }
 
@@ -1125,6 +1279,11 @@ public class ElasticsearchClient {
 	if (indexes != null) {
 	    indices = indexes;
 	}
+	return count(builder, indices);
+    }
+
+    public long count(QueryBuilder builder, String[] indices) throws Exception {
+
 	CountRequest countRequest = new CountRequest(indices);
 	if (builder != null) {
 	    countRequest.query(builder);
@@ -1134,6 +1293,132 @@ public class ElasticsearchClient {
 	CountResponse count = client.count(countRequest, options);
 
 	return count.getCount();
+
+    }
+
+    public void addS3SnapshotRepository(String repositoryName, String bucket, String region, String roleARN) throws IOException {
+	PutRepositoryRequest request = new PutRepositoryRequest();
+	request.type("s3");
+	request.name(repositoryName);
+	request = request.settings(
+		"{\n" //
+			+ "    \"bucket\": \"" + bucket + "\",\n" //
+			+ "    \"region\": \"" + region + "\",\n" //
+			+ "    \"role_arn\": \"" + roleARN + "\"\n" //
+			+ "  }", //
+		XContentType.JSON);
+	client.snapshot().createRepository(request, RequestOptions.DEFAULT);
+
+    }
+
+    public void checkSnapshotStatus(String repositoryName) throws IOException {
+	SnapshotsStatusRequest request = new SnapshotsStatusRequest();
+	request = request.repository(repositoryName);
+	SnapshotsStatusResponse response = client.snapshot().status(request, RequestOptions.DEFAULT);
+	List<SnapshotStatus> snapshotStatusesResponse = response.getSnapshots();
+	List<SnapshotStatus> snapshotStatuses = snapshotStatusesResponse;
+	System.out.println("Found " + snapshotStatuses.size() + " snapshot restoring operations");
+	for (SnapshotStatus snapshotStatus : snapshotStatuses) {
+
+	}
+	// SnapshotsInProgress.State snapshotState = snapshotStatus.getState();
+	// SnapshotStats shardStats = snapshotStatus.getIndices().get(indexName).getShards().get(0).getStats();
+
+    }
+
+    public RestHighLevelClient getHighLevelClient() {
+	return client;
+    }
+
+    public void push(HashMap<String, String> items, String index) {
+
+	BulkRequest request = new BulkRequest();
+	List<String> failedItems = new ArrayList<>();
+	Set<Entry<String, String>> entries = items.entrySet();
+	for (Entry<String, String> entry : entries) {
+	    String itemId = entry.getKey();
+	    String item = entry.getValue();
+	    request.add(new IndexRequest(index).id(itemId).source(item, XContentType.JSON));
+	}
+	Boolean success = null;
+	IOException unexpectedError = null;
+	String failureMessage = null;
+	int maxTry = 10;
+	BulkResponse indexResponse = null;
+	while (indexResponse == null && maxTry-- > 0) {
+	    try {
+		indexResponse = client.bulk(request, RequestOptions.DEFAULT);
+	    } catch (IOException e) {
+		unexpectedError = e;
+		GSLoggerFactory.getLogger(getClass()).error("Elasticsearch unexpected errors (sleep a bit before retry): {} try: {}",
+			e.getMessage(), maxTry);
+		try {
+		    Thread.sleep(120000);
+		} catch (InterruptedException e1) {
+		    e1.printStackTrace();
+		}
+	    }
+	}
+	if (indexResponse == null) {
+	    GSLoggerFactory.getLogger(getClass()).error("Elasticsearch unexpected error: {}", unexpectedError.getMessage());
+	    failureMessage = unexpectedError.getMessage() + "\n\n";
+	    for (String item : items.values()) {
+		failureMessage += item + "\n\n";
+	    }
+	    success = false;
+	} else {
+	    Iterator<BulkItemResponse> it = indexResponse.iterator();
+	    while (it.hasNext()) {
+		BulkItemResponse bulkItemResponse = (BulkItemResponse) it.next();
+		DocWriteResponse response = bulkItemResponse.getResponse();
+		if (bulkItemResponse.isFailed()) {
+		    Failure failure = bulkItemResponse.getFailure();
+		    String reason = failure.getMessage();
+		    String itemId = failure.getId();
+		    String item = items.get(itemId);
+		    failedItems.add(item);
+		    GSLoggerFactory.getLogger(getClass()).error("Elasticsearch index failure: {}", reason);
+		    if (reason.contains("failed to parse field")) {
+			String field = reason.substring(reason.indexOf("failed to parse field"));
+			if (field.contains("in document with id")) {
+			    field = field.substring(0, field.indexOf("in document with id"));
+			} else if (field.contains("of type")) {
+			    field = field.substring(0, field.indexOf("of type"));
+			}
+			field = field.replace("failed to parse field", "");
+			field = field.trim();
+		    }
+
+		} else {
+		    if (response.getResult() == DocWriteResponse.Result.CREATED) {
+			GSLoggerFactory.getLogger(getClass()).trace("Elasticsearch document created {} {}", index, response.getId());
+		    } else if (response.getResult() == DocWriteResponse.Result.UPDATED) {
+			GSLoggerFactory.getLogger(getClass()).trace("Elasticsearch document updated {} {}", index, response.getId());
+		    }
+		}
+	    }
+	    if (indexResponse.hasFailures()) {
+		String message = indexResponse.buildFailureMessage();
+		GSLoggerFactory.getLogger(getClass()).error("Elasticsearch index with failures: {}", message);
+		failureMessage = message + "\n\n";
+		for (String f : failedItems) {
+		    failureMessage += f + "\n\n";
+		}
+		success = false;
+	    } else {
+		success = true;
+	    }
+	}
+	if (!success) {
+	    System.err.println("Unable to index document(s) \n\n" + failureMessage);
+	    // System.exit(1);
+	}
+
+    }
+
+    public void closeIndices(List<String> indices) throws IOException {
+	CloseIndexRequest request = new CloseIndexRequest(indices.toArray(new String[] {}));
+	CloseIndexResponse closeIndexResponse = client.indices().close(request, RequestOptions.DEFAULT);
 
     }
 

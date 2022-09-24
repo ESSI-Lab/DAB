@@ -4,7 +4,7 @@ package eu.essi_lab.views;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,6 +26,20 @@ import java.util.Optional;
 
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.model.exceptions.GSException;
+
+/**
+ * The {@link IViewManager} is used to implement CRUD of views.
+ * A view is composed by:
+ * - an id
+ * - a label
+ * - a bond
+ * The {@link IViewManager} can be used by:
+ * - The Query Initializer during the discovery. If a view id is present in the discovery message, then the Query
+ * Initializer uses the View Manager to resolve it to a bond to be added to the user original query.
+ * - The REST service interface, to manage views (add, list, delete, ...)
+ * 
+ * @author boldrini
+ */
 public interface IViewManager {
 
     /**

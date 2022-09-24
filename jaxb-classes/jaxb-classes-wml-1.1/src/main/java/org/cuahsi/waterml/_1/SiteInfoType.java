@@ -12,7 +12,7 @@ package org.cuahsi.waterml._1;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -43,6 +43,109 @@ import javax.xml.bind.annotation.adapters.NormalizedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+
+/**
+ * A sampling station is any place where data are collected.
+ * 
+ * <p>Java class for SiteInfoType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="SiteInfoType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{http://www.cuahsi.org/waterML/1.1/}SourceInfoType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="siteName" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
+ *         &lt;element name="siteCode" maxOccurs="unbounded"&gt;
+ *           &lt;complexType&gt;
+ *             &lt;simpleContent&gt;
+ *               &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema&gt;token"&gt;
+ *                 &lt;attribute name="default" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
+ *                 &lt;attribute name="network" use="required" type="{http://www.w3.org/2001/XMLSchema}token" /&gt;
+ *                 &lt;attribute name="siteID"&gt;
+ *                   &lt;simpleType&gt;
+ *                     &lt;restriction base="{http://www.cuahsi.org/waterML/1.1/}positiveInt"&gt;
+ *                       &lt;minInclusive value="0"/&gt;
+ *                     &lt;/restriction&gt;
+ *                   &lt;/simpleType&gt;
+ *                 &lt;/attribute&gt;
+ *                 &lt;attribute name="agencyCode" type="{http://www.w3.org/2001/XMLSchema}normalizedString" /&gt;
+ *                 &lt;attribute name="agencyName" type="{http://www.w3.org/2001/XMLSchema}normalizedString" /&gt;
+ *               &lt;/extension&gt;
+ *             &lt;/simpleContent&gt;
+ *           &lt;/complexType&gt;
+ *         &lt;/element&gt;
+ *         &lt;element name="timeZoneInfo" minOccurs="0"&gt;
+ *           &lt;complexType&gt;
+ *             &lt;complexContent&gt;
+ *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *                 &lt;sequence&gt;
+ *                   &lt;element name="defaultTimeZone" minOccurs="0"&gt;
+ *                     &lt;complexType&gt;
+ *                       &lt;complexContent&gt;
+ *                         &lt;extension base="{http://www.cuahsi.org/waterML/1.1/}TimeZoneType"&gt;
+ *                         &lt;/extension&gt;
+ *                       &lt;/complexContent&gt;
+ *                     &lt;/complexType&gt;
+ *                   &lt;/element&gt;
+ *                   &lt;element name="daylightSavingsTimeZone" minOccurs="0"&gt;
+ *                     &lt;complexType&gt;
+ *                       &lt;complexContent&gt;
+ *                         &lt;extension base="{http://www.cuahsi.org/waterML/1.1/}TimeZoneType"&gt;
+ *                         &lt;/extension&gt;
+ *                       &lt;/complexContent&gt;
+ *                     &lt;/complexType&gt;
+ *                   &lt;/element&gt;
+ *                 &lt;/sequence&gt;
+ *                 &lt;attribute name="siteUsesDaylightSavingsTime" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
+ *               &lt;/restriction&gt;
+ *             &lt;/complexContent&gt;
+ *           &lt;/complexType&gt;
+ *         &lt;/element&gt;
+ *         &lt;element name="geoLocation"&gt;
+ *           &lt;complexType&gt;
+ *             &lt;complexContent&gt;
+ *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *                 &lt;sequence&gt;
+ *                   &lt;element name="geogLocation" type="{http://www.cuahsi.org/waterML/1.1/}GeogLocationType"/&gt;
+ *                   &lt;element name="localSiteXY" maxOccurs="unbounded" minOccurs="0"&gt;
+ *                     &lt;complexType&gt;
+ *                       &lt;complexContent&gt;
+ *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *                           &lt;sequence&gt;
+ *                             &lt;element name="X" type="{http://www.w3.org/2001/XMLSchema}double"/&gt;
+ *                             &lt;element name="Y" type="{http://www.w3.org/2001/XMLSchema}double"/&gt;
+ *                             &lt;element name="Z" type="{http://www.w3.org/2001/XMLSchema}double" minOccurs="0"/&gt;
+ *                             &lt;element name="note" type="{http://www.cuahsi.org/waterML/1.1/}NoteType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *                           &lt;/sequence&gt;
+ *                           &lt;attribute name="projectionInformation" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *                         &lt;/restriction&gt;
+ *                       &lt;/complexContent&gt;
+ *                     &lt;/complexType&gt;
+ *                   &lt;/element&gt;
+ *                 &lt;/sequence&gt;
+ *               &lt;/restriction&gt;
+ *             &lt;/complexContent&gt;
+ *           &lt;/complexType&gt;
+ *         &lt;/element&gt;
+ *         &lt;element name="elevation_m" type="{http://www.w3.org/2001/XMLSchema}double" minOccurs="0"/&gt;
+ *         &lt;element name="verticalDatum" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
+ *         &lt;element name="note" type="{http://www.cuahsi.org/waterML/1.1/}NoteType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{http://www.cuahsi.org/waterML/1.1/}extension" minOccurs="0"/&gt;
+ *         &lt;element name="altname" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
+ *         &lt;element name="siteType" type="{http://www.cuahsi.org/waterML/1.1/}SiteTypeCodeList" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="siteProperty" type="{http://www.cuahsi.org/waterML/1.1/}PropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attribute ref="{http://www.cuahsi.org/waterML/1.1/}oid"/&gt;
+ *       &lt;attribute ref="{http://www.cuahsi.org/waterML/1.1/}metadataTime"/&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SiteInfoType", propOrder = {
     "siteName",

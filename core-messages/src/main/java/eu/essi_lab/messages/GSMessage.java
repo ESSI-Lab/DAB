@@ -4,7 +4,7 @@ package eu.essi_lab.messages;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,6 +26,18 @@ import java.io.Serializable;
 import eu.essi_lab.model.GSProperty;
 import eu.essi_lab.model.GSPropertyHandler;
 import eu.essi_lab.model.auth.GSUser;
+
+/**
+ * A generic GI-suite message composed by a header and a payload.<br>
+ * The header can be leaved empty, and it can be used to store meta information about the message payload, such as the
+ * {@link GSUser} or the view identifier in case of a discover query.<br>
+ * A message <b>MUST</b> have a payload.<br>
+ * Both header and payload are instances of {@link GSPropertyHandler} and so they can have several
+ * {@link GSProperty}.<br>
+ * <i>Due to its generic nature, it is recommended to implements subclasses which specifies the message content</i>
+ * 
+ * @author Fabrizio
+ */
 public class GSMessage implements Serializable {
 
     /**

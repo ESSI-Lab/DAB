@@ -17,13 +17,18 @@
 	<modules>
 		<module>profiler-oaipmh</module>
 		<module>profiler-opensearch</module>
-		<module>profiler-administration</module>
+		<module>profiler-bnhs</module>
 		<module>profiler-csw</module>
+		<module>profiler-semantic</module>
 		<module>profiler-pub-sub</module>
 		<module>profiler-wof</module>
 		<module>profiler-wps</module>
+		<module>profiler-wfs</module>
 		<module>profiler-rest</module>
-		<module>profiler-wms</module>		
+		<module>profiler-observations</module>
+		<module>profiler-sos</module>
+		<module>profiler-wms</module>
+		<module>profiler-gwis</module>
 	</modules>
 
 	<dependencies>
@@ -89,13 +94,6 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>license-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
+
 
 </project>

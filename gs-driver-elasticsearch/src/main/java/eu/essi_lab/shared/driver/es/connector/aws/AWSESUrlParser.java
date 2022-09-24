@@ -4,7 +4,7 @@ package eu.essi_lab.shared.driver.es.connector.aws;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,23 +21,40 @@ package eu.essi_lab.shared.driver.es.connector.aws;
  * #L%
  */
 
-import eu.essi_lab.lib.utils.GSLoggerFactory;
 import java.net.MalformedURLException;
 import java.net.URL;
-import org.slf4j.Logger;
+
+import eu.essi_lab.lib.utils.GSLoggerFactory;
+
+/**
+ * @author ilsanto
+ */
 public class AWSESUrlParser {
 
-    private transient Logger logger = GSLoggerFactory.getLogger(AWSESUrlParser.class);
-    private final String endpoint;
-    private static final String AWS_DOMAIN_HOST_SUFFIX_2 = ".es.amazonaws.com";
-    private static final String AWS_DOMAIN_HOST_SUFFIX_1 = ".es.amazonaws.com/";
-    private static final String HTTPS_PREFIX = "https://";
+    /**
+     * 
+     */
+    private static final String AWS_DOMAIN_HOST_SUFFIX = ".es.amazonaws.com";
 
+    /**
+     * 
+     */
+    private String endpoint;
+
+    /**
+     * @param url
+     */
     public AWSESUrlParser(String url) {
 
 	this.endpoint = url;
+	if (endpoint.endsWith("/")) {
+	    endpoint = endpoint.substring(0, endpoint.length() - 1);
+	}
     }
 
+    /**
+     * @return
+     */
     public boolean isAWSESEndpoint() {
 
 	try {
@@ -46,32 +63,36 @@ public class AWSESUrlParser {
 
 	    String host = url.getHost();
 
-	    if (host.toLowerCase().contains(AWS_DOMAIN_HOST_SUFFIX_2))
+	    if (host.toLowerCase().contains(AWS_DOMAIN_HOST_SUFFIX)) {
 		return true;
+	    }
 
 	} catch (MalformedURLException e) {
-	    logger.warn("Provided url {} is not well formed, returning false", endpoint, e);
+
+	    GSLoggerFactory.getLogger(AWSESUrlParser.class).warn("Provided url {} is not well formed, returning false", endpoint, e);
 	}
 
 	return false;
     }
 
-    private String removeUnneeded() {
-	return this.endpoint.replace(AWS_DOMAIN_HOST_SUFFIX_1, "").replace(AWS_DOMAIN_HOST_SUFFIX_2, "").replace(HTTPS_PREFIX, "");
-    }
-
+    /**
+     * @return
+     */
     public String getDomainName() {
 
-	String part = removeUnneeded().split("\\.")[0];
+	String end = endpoint.replace("." + getRegion() + AWS_DOMAIN_HOST_SUFFIX, "");
+	end = end.replace("https://search-", "");
 
-	return part.split("-")[1];
+	String name = end.substring(0, end.lastIndexOf("-"));
 
+	return name;
     }
 
+    /**
+     * @return
+     */
     public String getRegion() {
 
-	return removeUnneeded().split("\\.")[1];
-
+	return endpoint.substring(endpoint.indexOf(".") + 1, endpoint.indexOf("es", endpoint.indexOf(".")) - 1);
     }
-
 }

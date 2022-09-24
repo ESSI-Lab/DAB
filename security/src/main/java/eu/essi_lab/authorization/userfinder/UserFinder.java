@@ -1,10 +1,13 @@
+/**
+ * 
+ */
 package eu.essi_lab.authorization.userfinder;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,53 +25,62 @@ package eu.essi_lab.authorization.userfinder;
  */
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.geotools.data.view.DefaultView;
-
 import eu.essi_lab.api.database.DatabaseReader;
+import eu.essi_lab.api.database.DatabaseWriter;
+import eu.essi_lab.api.database.factory.DatabaseConsumerFactory;
 import eu.essi_lab.authentication.util.TokenProvider;
 import eu.essi_lab.authorization.BasicRole;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.utils.ExpiringCache;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.messages.bond.Bond;
+import eu.essi_lab.messages.bond.DynamicView;
+import eu.essi_lab.messages.bond.DynamicViewAnd;
 import eu.essi_lab.messages.bond.View;
+import eu.essi_lab.messages.bond.ViewBond;
+import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.StorageUri;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.auth.UserBaseClient;
-import eu.essi_lab.model.configuration.composite.GSConfiguration;
+import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 
 /**
- * Finds the user who originates the supplied <code>request</code>
- * 
  * @author Fabrizio
  */
-public abstract class UserFinder {
+public class UserFinder {
 
-    /**
-     * 1 day
-     */
-    private static final long UPDATE_PERIOD = 1000 * 60 * 60 * 24;
-    private static final UsersCacheUpdater UPDATER_TASK = new UsersCacheUpdater();
+    private Optional<String> email;
+    private Optional<String> authProvider;
+
+    private static final String USER_FINDING_ERROR = "USER_FINDING_ERROR";
+
+    private static final long USERS_UPDATE_PERIOD = TimeUnit.MINUTES.toMillis(30);
+    private static final UsersCacheUpdater USERS_UPDATER_TASK = new UsersCacheUpdater();
+
+    private static final long VIEWS_CACHE_DURATION = TimeUnit.MINUTES.toMillis(30);
 
     static {
 
 	Timer timer = new Timer();
-	timer.scheduleAtFixedRate(UPDATER_TASK, 0, UPDATE_PERIOD);
+	timer.scheduleAtFixedRate(USERS_UPDATER_TASK, 0, USERS_UPDATE_PERIOD);
     }
 
-    /**
-     * Caches
-     */
     private static List<GSUser> users = new ArrayList<GSUser>();
-    private static ExpiringCache<View> views = new ExpiringCache<>();
+    private static final ExpiringCache<View> VIEWS = new ExpiringCache<>();
     static {
-	views.setDuration(UPDATE_PERIOD);
+	VIEWS.setDuration(VIEWS_CACHE_DURATION);
     }
 
     /**
@@ -115,12 +127,71 @@ public abstract class UserFinder {
 
     private UserBaseClient client;
     private DatabaseReader reader;
-    protected GSConfiguration configuration;
     protected TokenProvider tokenProvider;
+    private DatabaseWriter writer;
+    private StringBuilder builder;
 
     public UserFinder() {
 
 	tokenProvider = new TokenProvider();
+    }
+
+    /**
+     * @return
+     * @throws GSException
+     */
+    public static UserFinder create() throws GSException {
+
+	UserFinder finder = new UserFinder();
+
+	StorageUri storageUri = ConfigurationWrapper.getDatabaseURI();
+
+	DatabaseReader reader = DatabaseConsumerFactory.createDataBaseReader(storageUri);
+	DatabaseWriter writer = DatabaseConsumerFactory.createDataBaseWriter(storageUri);
+
+	finder.setClient(reader);
+	finder.setDatabaseReader(reader);
+	finder.setDatabaseWriter(writer);
+
+	return finder;
+    }
+
+    /**
+     * @param request
+     * @return
+     * @throws GSException
+     */
+    public static GSUser findCurrentUser(HttpServletRequest request) throws GSException {
+
+	UserFinder finder = create();
+
+	GSUser user = null;
+
+	try {
+	    user = finder.findUser(request);
+
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(UserFinder.class).error(e.getMessage(), e);
+
+	    throw GSException.createException(//
+		    UserFinder.class, //
+		    e.getMessage(), //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    USER_FINDING_ERROR);
+	}
+
+	return user;
+    }
+
+    /**
+     * @param writer
+     */
+    private void setDatabaseWriter(DatabaseWriter writer) {
+
+	this.writer = writer;
     }
 
     /**
@@ -142,7 +213,7 @@ public abstract class UserFinder {
      */
     public GSUser findUser(HttpServletRequest request) throws Exception {
 
-	UPDATER_TASK.setUserFinder(this);
+	USERS_UPDATER_TASK.setUserFinder(this);
 
 	List<String> identifiers = findIdentifiers(request);
 
@@ -151,24 +222,163 @@ public abstract class UserFinder {
 	return user;
     }
 
-    /**
-     * @param request
-     * @return
-     * @throws Exception
-     */
-    protected abstract List<String> findIdentifiers(HttpServletRequest request) throws Exception;
+    protected List<String> findIdentifiers(HttpServletRequest request) throws Exception {
+	//
+	// find all the identifiers in the request according
+	// to different strategies
+	//
+	List<String> identifiers = new ArrayList<>();
+
+	//
+	// 1 - OAuth 2.0 identifier
+	//
+	email = tokenProvider.findOAuth2Attribute(request, true);
+	authProvider = tokenProvider.findOAuth2Attribute(request, false);
+
+	builder = new StringBuilder();
+
+	if (email.isPresent()) {
+
+	    builder.append("\n- OAuth 2.0 email: " + email.get());
+	    identifiers.add(email.get());
+	}
+
+	if (authProvider.isPresent()) {
+
+	    builder.append("\n- OAuth 2.0 provider: " + authProvider.get());
+	}
+
+	//
+	// 2 - remote host
+	//
+	String remoteHost = request.getRemoteHost();
+	builder.append("\n- Remote host: " + remoteHost);
+
+	identifiers.add(remoteHost);
+
+	//
+	// 3 - 'x-forwarded-for' header
+	//
+	List<String> xForwardedForHeaders = WebRequest.readXForwardedForHeaders(request);
+
+	identifiers.addAll(xForwardedForHeaders);
+
+	xForwardedForHeaders.forEach(ip -> builder.append("\n- Xforw: " + ip));
+
+	//
+	// 4 - 'Origin' header
+	//
+	Optional<String> originHeader = WebRequest.readOriginHeader(request);
+
+	if (originHeader.isPresent()) {
+
+	    identifiers.add(originHeader.get());
+
+	    builder.append("\n- " + WebRequest.ORIGIN_HEADER + ": " + originHeader.get());
+	}
+
+	//
+	// 5,6 - view identifier and creator
+	//
+	WebRequest webRequest = new WebRequest();
+	webRequest.setServletRequest(request, false);
+
+	Optional<String> viewId = webRequest.extractViewId();
+
+	viewId.ifPresent(id -> {
+
+	    builder.append("\n- View id: " + id);
+	    identifiers.add(id);
+
+	    String creator = getViewCreator(id);
+	    if (creator != null) {
+		builder.append("\n- View creator: " + creator);
+		identifiers.add(creator);
+	    }
+	});
+
+	//
+	// 7 - user token
+	//
+	Optional<String> userTokenId = webRequest.extractTokenId();
+	if (userTokenId.isPresent()) {
+
+	    builder.append("\n- User token: " + userTokenId.get());
+	    identifiers.add(userTokenId.get());
+	}
+
+	//
+	// 8 - client identifier
+	//
+	Optional<String> clientId = webRequest.readClientIdentifierHeader();
+
+	clientId.ifPresent(id -> {
+
+	    builder.append("\n- Client id: " + id);
+	    identifiers.add(id);
+	});
+
+	return identifiers;
+    }
+
+    public String getViewCreator(String id) {
+	Optional<View> view = getView(id);
+	if (view.isPresent()) {
+	    // we can extract the creator of the view
+	    return view.get().getCreator();
+	} else {
+	    // we can extract the creator of the view also in case of dynamic AND bonds (e.g. gs-view-and(...))
+	    Optional<DynamicView> dynamicView = DynamicView.resolveDynamicView(id);
+	    if (dynamicView.isPresent()) {
+		if (dynamicView.get() instanceof DynamicViewAnd) {
+		    DynamicViewAnd dva = (DynamicViewAnd) dynamicView.get();
+		    List<Bond> operands = dva.getDynamicBond().getOperands();
+		    for (Bond operand : operands) {
+			if (operand instanceof ViewBond) {
+			    ViewBond viewBond = (ViewBond) operand;
+			    view = getView(viewBond.getViewIdentifier());
+			    if (view.isPresent()) {
+				return view.get().getCreator();
+			    }
+			}
+		    }
+		}
+	    }
+	}
+	return null;
+    }
 
     /**
-     * @param identifiers
-     * @return
+     * @param identifier
      * @throws Exception
      */
-    protected abstract GSUser findUser(List<String> identifiers) throws Exception;
+    public void enableUser(String identifier) throws Exception {
 
-    public abstract void enableUser(String identifier) throws Exception;
+	List<GSUser> users = getUsers(false);
 
+	Optional<GSUser> user = users.stream().filter(u -> //
+
+	// user must be disabled
+	!u.isEnabled() &&
+
+	//
+	// normal case, string equality comparison
+	//
+		identifier.equals(u.getIdentifier())).findFirst();
+
+	if (user.isPresent()) {
+	    user.get().setEnabled(true);
+	    addUser(user.get());
+	}
+    }
+
+    /**
+     * @param user
+     * @throws Exception
+     */
     public void addUser(GSUser user) throws Exception {
-	client.store(user);
+
+	writer.store(user);
     }
 
     /**
@@ -179,21 +389,21 @@ public abstract class UserFinder {
 	if (Objects.nonNull(client)) {
 
 	    users = client.getUsers();
-
 	}
     }
 
     public List<GSUser> getUsers() throws Exception {
+
 	return getUsers(true);
     }
-    
+
     /**
      * @return
      * @throws Exception
      */
     public List<GSUser> getUsers(boolean useCache) throws Exception {
 
-	synchronized (UPDATER_TASK) {
+	synchronized (USERS_UPDATER_TASK) {
 
 	    if (users.isEmpty() && Objects.nonNull(client) || !useCache) {
 
@@ -201,7 +411,7 @@ public abstract class UserFinder {
 
 	    } else {
 
-		GSLoggerFactory.getLogger(getClass()).debug("Reading users from cache");
+		// GSLoggerFactory.getLogger(getClass()).debug("Reading users from cache");
 	    }
 
 	    return users;
@@ -218,7 +428,7 @@ public abstract class UserFinder {
 	if (identifier == null) {
 	    return Optional.empty();
 	}
-	Optional<View> view = Optional.ofNullable(views.get(identifier));
+	Optional<View> view = Optional.ofNullable(VIEWS.get(identifier));
 	if (!view.isPresent()) {
 
 	    try {
@@ -226,7 +436,7 @@ public abstract class UserFinder {
 
 		if (view.isPresent()) {
 
-		    views.put(identifier, view.get());
+		    VIEWS.put(identifier, view.get());
 		}
 	    } catch (GSException e) {
 
@@ -238,14 +448,6 @@ public abstract class UserFinder {
     }
 
     /**
-     * @return
-     */
-    public TokenProvider getTokenProvider() {
-
-	return tokenProvider;
-    }
-
-    /**
      * @param tokenProvider
      */
     public void setTokenProvider(TokenProvider tokenProvider) {
@@ -254,35 +456,11 @@ public abstract class UserFinder {
     }
 
     /**
-     * @return
-     */
-    public GSConfiguration getConfiguration() {
-
-	return configuration;
-    }
-
-    /**
-     * @param configuration
-     */
-    public void setConfiguration(GSConfiguration configuration) {
-
-	this.configuration = configuration;
-    }
-
-    /**
      * @param client
      */
     public void setClient(UserBaseClient client) {
 
 	this.client = client;
-    }
-
-    /**
-     * @return
-     */
-    public UserBaseClient getClient() {
-
-	return client;
     }
 
     /**
@@ -299,6 +477,99 @@ public abstract class UserFinder {
     public DatabaseReader getDatabaseReader() {
 
 	return reader;
+    }
+
+    /**
+     * @param identifiers
+     * @return
+     * @throws Exception
+     */
+    protected GSUser findUser(List<String> identifiers) throws Exception {
+
+	List<GSUser> users = getUsers();
+
+	List<GSUser> matchedUsers = users.stream().filter(u -> //
+
+	// user must be enabled
+	u.isEnabled() && (
+
+	//
+	// normal case, string equality comparison
+	//
+	identifiers.contains(u.getIdentifier())
+		//
+		// this case is useful for example when a user can be identified not only by
+		// a specific identifier (case covered by the above case)
+		// but from a partial identifier, for example a partial IP
+		// with less than 4 groups (e.g: 192.168.12)
+		//
+		|| identifiers.stream().anyMatch(id -> id.contains(u.getIdentifier())))
+
+	).collect(Collectors.toList());
+
+	Optional<GSUser> user = matchedUsers.stream().sorted(new Comparator<GSUser>() {
+
+	    @Override
+	    public int compare(GSUser o1, GSUser o2) {
+		return o1.getIdentifier().compareTo(o2.getIdentifier());
+	    }
+	}).findFirst(); // selects the matched user with the longer identifier. this is to select whos-34324 instead of
+			// general whos (to be deleted)
+
+	if (!user.isPresent()) {
+
+	    user = Optional.of(BasicRole.createAnonymousUser());
+
+	    //
+	    // if the request is executed by a user logged with OAuth 2.0, then the token provider returns the
+	    // email used as identifier. if such user is not registered in the userbase, the returned user will
+	    // have the anonymous role with the email as identifier.
+	    // the ESSIAdminService allows such user to handle the config since
+	    // to determinate if the email owns to the admin, it makes a comparison with the config user email.
+	    // anyway the user can be an admin user registered in the configuration, and the isAdmin checks it
+	    //
+	    if (email.isPresent()) {
+
+		user.get().setIdentifier(email.get());
+
+		if (isAdmin(user.get())) {
+
+		    GSLoggerFactory.getLogger(getClass()).debug("Admin user registered in the configuration");
+
+		    user.get().setRole(BasicRole.ADMIN.getRole());
+		}
+	    }
+	}
+
+	if (authProvider.isPresent()) {
+
+	    user.get().setAuthProvider(authProvider.get());
+	}
+
+	builder.append("\n- User found: " + user.get());
+
+	GSLoggerFactory.getLogger(getClass()).debug(builder.toString());
+
+	return user.get();
+    }
+
+    /**
+     * Determines if the given user is an admin by comparing its identifier with the one provided by the configuration
+     * 
+     * @param user
+     * @return
+     * @throws GSException
+     */
+    private boolean isAdmin(GSUser user) throws GSException {
+
+	Optional<String> configRootUser = ConfigurationWrapper.readAdminIdentifier();
+
+	if (configRootUser.isPresent()) {
+
+	    return user.getIdentifier() != null && user.getIdentifier().equalsIgnoreCase(configRootUser.get());
+	}
+
+	return false;
     }
 
 }

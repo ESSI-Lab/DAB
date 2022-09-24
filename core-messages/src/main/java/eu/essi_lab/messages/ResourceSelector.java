@@ -4,7 +4,7 @@ package eu.essi_lab.messages;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,6 +21,7 @@ package eu.essi_lab.messages;
  * #L%
  */
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,8 +33,18 @@ import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.HarmonizedMetadata;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
-public class ResourceSelector {
 
+/**
+ * Allows to select specific elements of the discovered {@link GSResource}s in order to speed up the unmarshal time
+ * 
+ * @author Fabrizio
+ */
+public class ResourceSelector implements Serializable{
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -7516805077469988112L;
     private boolean includeOriginal;
 
     /**

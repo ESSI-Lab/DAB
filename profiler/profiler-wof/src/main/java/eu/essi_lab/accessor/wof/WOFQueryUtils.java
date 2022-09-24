@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,7 @@ import java.util.ServiceLoader;
 
 import eu.essi_lab.access.compliance.DataComplianceReport;
 import eu.essi_lab.access.compliance.wrapper.ReportsMetadataHandler;
-import eu.essi_lab.configuration.ConfigurationUtils;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.utils.ExpiringCache;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -77,9 +77,9 @@ public class WOFQueryUtils {
 	discoveryMessage.getResourceSelector().setIncludeOriginal(false);
 	discoveryMessage.setPage(new Page(1, 1));
 
-	discoveryMessage.setSources(ConfigurationUtils.getBrokeredSources());
-	discoveryMessage.setDataBaseURI(ConfigurationUtils.getStorageURI());
-	discoveryMessage.setSharedRepositoryInfo(ConfigurationUtils.getSharedRepositoryInfo());
+	discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
+	discoveryMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	
 
 	SimpleValueBond bond1 = BondFactory.createSimpleValueBond(//
 		BondOperator.EQUAL, //

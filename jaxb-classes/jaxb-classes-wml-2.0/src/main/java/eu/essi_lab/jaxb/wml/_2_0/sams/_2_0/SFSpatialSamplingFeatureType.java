@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.wml._2_0.sams._2_0;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -41,6 +41,39 @@ import eu.essi_lab.jaxb.wml._2_0.iso2005.gmd.DQPositionalAccuracyPropertyType;
 import eu.essi_lab.jaxb.wml._2_0.om__2.OMProcessPropertyType;
 import eu.essi_lab.jaxb.wml._2_0.sf._2_0.SFSamplingFeatureType;
 
+
+/**
+ *  When observations are made to estimate properties of a geospatial
+ * 				feature, in particular where the value of a property varies within the scope of the
+ * 				feature, a spatial sampling feature is used. Depending on accessibility and on the
+ * 				nature of the expected property variation, the sampling feature may be extensive in
+ * 				one, two or three spatial dimensions. Processing and visualization methods are often
+ * 				dependent on the topological dimension of the sampling manifold, so this provides a
+ * 				natural classification system for sampling features. This classification follows
+ * 				common practice in focussing on conventional spatial dimensions. Properties observed
+ * 				on sampling features may be time-dependent, but the temporal axis does not generally
+ * 				contribute to the classification of sampling feature classes. Sampling feature
+ * 				identity is usually less time-dependent than is the property value. 
+ * 
+ * <p>Java class for SF_SpatialSamplingFeatureType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="SF_SpatialSamplingFeatureType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{http://www.opengis.net/sampling/2.0}SF_SamplingFeatureType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;group ref="{http://www.opengis.net/samplingSpatial/2.0}SF_SpatialCommonProperties"/&gt;
+ *         &lt;element ref="{http://www.opengis.net/samplingSpatial/2.0}shape"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SF_SpatialSamplingFeatureType", propOrder = {
     "hostedProcedure",

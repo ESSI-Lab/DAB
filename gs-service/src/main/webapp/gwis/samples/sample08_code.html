@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<!--
+..........................................................
+GWIS Javascript API Sample:
+Interactively Comparing Data at Two Sites
+..........................................................
+U.S. Geological Survey, Texas Water Science Center, Austin
+https://txpub.usgs.gov/DSS/GWIS/
+..........................................................
+-->
+<html>
+    <!-- html head -->
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>GWIS JSAPI Sample</title>
+        
+        <!-- GWIS requires jQuery -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        
+        <!-- GWIS JSAPI 0.0 -->
+        <link rel="stylesheet" href="https://txpub.usgs.gov/DSS/GWIS/0.0/jsapi/gwis-plot-utils.css"/>
+        <script src="https://txpub.usgs.gov/DSS/GWIS/0.0/jsapi/gwis-plot-utils.min.js"></script>
+    </head>
+    
+    <!-- html body -->
+    <body style="background:#eee; font-family:arial;">
+        
+        <!-- title -->
+        <h1>Sample: Interactively Comparing Data at Two Sites</h1>
+        
+        <!-- 2 site menus with groupings -->
+        <p>
+            Select Site 1:
+            <select id="menu_site1" onchange="update_plot();">
+                <optgroup label="San Angelo Field Unit">
+                    <option value="08412500">08412500 Pecos River near Orla, TX                     </option>
+                    <option value="08437710">08437710 Pecos River at RR 1776 near Grandfalls, TX    </option>
+                    <option value="08446500">08446500 Pecos River near Girvin, TX                   </option>
+                    <option value="08447000">08447000 Pecos River near Sheffield, TX                </option>
+                </optgroup>
+                <optgroup label="Fort Worth Field Unit">
+                    <option value="08048000">08048000 West Fork Trinity River at Ft Worth, TX       </option>
+                    <option value="08049500">08049500 West Fork Trinity River at Grand Prairie, TX  </option>
+                    <option value="08052700">08052700 Little Elm Creek near Aubrey, TX              </option>
+                    <option value="08057000">08057000 Trinity River at Dallas, TX                   </option>
+                </optgroup>
+                <optgroup label="Houston Field Unit">
+                    <option value="08065350">08065350 Trinity River near Crockett, TX               </option>
+                    <option value="08068000">08068000 West Fork San Jacinto River near Conroe, TX   </option>
+                    <option value="08068500">08068500 Spring Creek near Spring, TX                  </option>
+                    <option value="08070200">08070200 East Fork San Jacinto River near New Caney, TX</option>
+                </optgroup>
+            </select>
+            <br/>
+            Select Site 2:
+            <select id="menu_site2" onchange="update_plot();"></select>
+            <script>
+                $("#menu_site2")
+                    .html( $("#menu_site1").html()             )  // set site menu 2 items to site menu 1 items...
+                    .val(  $("#menu_site1 option:eq(1)").val() ); // ...and set 2nd item selected at startup
+            </script>
+        </p>
+        
+        <!-- parameter menu used for both sites -->
+        <p>
+            Select Parameter:
+            <select id="menu_pcode" onchange="update_plot();">
+                <option value="00060">Streamflow, ft<sup>3</sup>/sec           </option>
+                <option value="00065">Gage Height, ft                          </option>
+                <option value="00010">Water Temperature, &deg;C                </option>
+                <option value="00095">Specific Conductance, &mu;S/cm @ 25&deg;C</option>
+                <option value="00300">Dissolved Oxygen, mg/L                   </option>
+                <option value="00400">pH, standard units                       </option>
+            </select>
+        </p>
+        
+        <!-- time period menu used for both sites -->
+        <p>
+            Select Time Period:
+            <select id="menu_period" onchange="update_plot();">
+                <option value="p1d" >Past  1 Day </option>
+                <option value="p7d" >Past  7 Days</option>
+                <option value="p14d">Past 14 Days</option>
+                <option value="p30d">Past 30 Days</option>
+                <option value="p60d">Past 60 Days</option>
+            </select>
+        </p>
+        
+        <!-- plot -->
+        <div id="plot1" style="width:95%; height:500px;"></div>
+        
+        <!-- main js -->
+        <script>
+            
+            // declare global plot object for accessing the previous plot when a new plot is created
+            var plot = undefined;
+            
+            // function to update plot using currently selected menu items
+            var update_plot = function() {
+                
+                // create plot
+                plot = GWIS.plot({
+                    div_id : "plot1",
+                    period : $("#menu_period").val(), // current menu value used for both
+                    series : [
+                        { // site 1
+                            site  : $("#menu_site1").val(),                            // current menu value for site 1
+                            pcode : $("#menu_pcode").val(),                            // current menu value used for both
+                            label : "Site 1: "+$("#menu_site1 option:selected").text() // current menu text  for site 1
+                        },
+                        { // site 2
+                            site  : $("#menu_site2").val(),                            // current menu value for site 2
+                            pcode : $("#menu_pcode").val(),                            // current menu value used for both
+                            label : "Site 2: "+$("#menu_site2 option:selected").text() // current menu text  for site 2
+                        }
+                    ],
+                    title          : $("#menu_pcode  option:selected").text(), // current menu text - parameter plotted
+                    xlabel         : $("#menu_period option:selected").text(), // current menu text - time period requested
+                    ylabel         : $("#menu_pcode  option:selected").text(), // current menu text - parameter plotted
+                    range_selector : false,
+                    
+                    // add all controls
+                    controls : "all",
+                    
+                    // we want new plots to keep the same control checkbox state as the previous plot
+                    // use previous plot options for new plot, if previous plot does not exist (eg: startup) set a default
+                    y_fixscale : (plot ? plot.y_fixscale() : false ), // previous state or default false for startup
+                    y_logscale : (plot ? plot.y_logscale() : false ), // ...etc...
+                    y_show0    : (plot ? plot.y_show0()    : false ),
+                    x_grid     : (plot ? plot.x_grid()     : true  ),
+                    y_grid     : (plot ? plot.y_grid()     : true  )
+                });
+            };
+            
+            // update plot on startup using startup menu items
+            update_plot();
+            
+        </script>
+        
+    </body>
+</html>
+<!-- end GWIS JSAPI sample -->

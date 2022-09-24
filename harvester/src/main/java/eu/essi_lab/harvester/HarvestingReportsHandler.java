@@ -1,10 +1,13 @@
+/**
+ * 
+ */
 package eu.essi_lab.harvester;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,6 +32,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import eu.essi_lab.api.database.SourceStorage;
+import eu.essi_lab.cfga.gs.ConfiguredGmailClient;
 import eu.essi_lab.harvester.component.HarvesterComponentException;
 import eu.essi_lab.identifierdecorator.ConflictingResourceException;
 import eu.essi_lab.identifierdecorator.DuplicatedResourceException;
@@ -43,6 +47,8 @@ import eu.essi_lab.model.resource.GSResource;
  * @author Fabrizio
  */
 public class HarvestingReportsHandler {
+
+    private static boolean enabled;
 
     private SourceStorage sourceStorage;
     private GSSource gsSource;
@@ -62,6 +68,11 @@ public class HarvestingReportsHandler {
     */
     void sendErrorAndWarnMessageEmail() {
 
+	if (!enabled) {
+
+	    return;
+	}
+
 	List<String> errorsReport;
 	List<String> warnReport;
 
@@ -72,17 +83,19 @@ public class HarvestingReportsHandler {
 	    if (!errorsReport.isEmpty()) {
 
 		String message = errorsReport.stream().collect(Collectors.joining("\n"));
-		String subject = GSMailSenderHarvesting.MAIL_REPORT_SUBJECT + GSMailSenderHarvesting.MAIL_HARVESTING_SUBJECT + GSMailSenderHarvesting.MAIL_ERROR_SUBJECT;
+		String subject = ConfiguredGmailClient.MAIL_REPORT_SUBJECT + ConfiguredGmailClient.MAIL_HARVESTING_SUBJECT
+			+ ConfiguredGmailClient.MAIL_ERROR_SUBJECT;
 
-		GSMailSenderHarvesting.sendEmail(subject, message);
+		ConfiguredGmailClient.sendEmail(subject, message);
 	    }
 
 	    if (!warnReport.isEmpty()) {
 
 		String message = warnReport.stream().collect(Collectors.joining("\n"));
-		String subject = GSMailSenderHarvesting.MAIL_REPORT_SUBJECT + GSMailSenderHarvesting.MAIL_HARVESTING_SUBJECT + GSMailSenderHarvesting.MAIL_WARNING_SUBJECT;
+		String subject = ConfiguredGmailClient.MAIL_REPORT_SUBJECT + ConfiguredGmailClient.MAIL_HARVESTING_SUBJECT
+			+ ConfiguredGmailClient.MAIL_WARNING_SUBJECT;
 
-		GSMailSenderHarvesting.sendEmail(subject, message);
+		ConfiguredGmailClient.sendEmail(subject, message);
 	    }
 
 	} catch (GSException e) {
@@ -105,7 +118,13 @@ public class HarvestingReportsHandler {
 	    List<String> report, //
 	    HarvestingProperties harvestingProperties) {
 
-	String subject = GSMailSenderHarvesting.MAIL_REPORT_SUBJECT + GSMailSenderHarvesting.MAIL_HARVESTING_SUBJECT + (start ? "[STARTED]" : "[ENDED]");
+	if (!enabled) {
+
+	    return;
+	}
+
+	String subject = ConfiguredGmailClient.MAIL_REPORT_SUBJECT + ConfiguredGmailClient.MAIL_HARVESTING_SUBJECT
+		+ (start ? "[STARTED]" : "[ENDED]");
 
 	String message = "Label: " + source.getLabel() + "\n";
 	message += "Endpoint: " + source.getEndpoint() + "\n";
@@ -138,13 +157,18 @@ public class HarvestingReportsHandler {
 
 	message += "--- \n";
 
-	GSMailSenderHarvesting.sendEmail(subject, message);
+	ConfiguredGmailClient.sendEmail(subject, message);
     }
 
     /**
      * @param ex
      */
     void gatherConflictingResourceException(ConflictingResourceException ex) {
+
+	if (!enabled) {
+
+	    return;
+	}
 
 	List<String> originalIds = ex.getOriginalIds();
 	List<GSSource> currentSources = ex.getIncomingSources();
@@ -177,6 +201,11 @@ public class HarvestingReportsHandler {
      */
     void gatherHarvesterComponentException(HarvesterComponentException hce) {
 
+	if (!enabled) {
+
+	    return;
+	}
+
 	gatherGSException(hce.getException());
     }
 
@@ -185,7 +214,10 @@ public class HarvestingReportsHandler {
      */
     void gatherGSException(GSException exception) {
 
-	GSLoggerFactory.getLogger(getClass()).error(exception.getMessage(), exception);
+	if (!enabled) {
+
+	    return;
+	}
 
 	List<ErrorInfo> list = exception.getErrorInfoList();
 
@@ -236,6 +268,11 @@ public class HarvestingReportsHandler {
      */
     void gatherDuplicatedResourceException(DuplicatedResourceException rex) {
 
+	if (!enabled) {
+
+	    return;
+	}
+
 	String originalId = rex.getOriginalId();
 	GSResource incomingResource = rex.getIncomingResource();
 	GSResource existingResource = rex.getExistingResource();
@@ -284,5 +321,12 @@ public class HarvestingReportsHandler {
 	}
     }
 
-   
+    /**
+     * 
+     */
+    public static void enable() {
+
+	enabled = true;
+    }
+
 }

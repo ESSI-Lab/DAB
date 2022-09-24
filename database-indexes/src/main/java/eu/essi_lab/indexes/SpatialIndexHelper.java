@@ -4,7 +4,7 @@ package eu.essi_lab.indexes;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,7 +21,6 @@ package eu.essi_lab.indexes;
  * #L%
  */
 
-import eu.essi_lab.lib.utils.GSLoggerFactory;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
@@ -31,11 +30,16 @@ import com.google.common.collect.Lists;
 
 import eu.essi_lab.iso.datamodel.classes.DataIdentification;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.index.IndexedMetadataElement;
 import eu.essi_lab.model.index.jaxb.BoundingBox;
 import eu.essi_lab.model.index.jaxb.CardinalValues;
 import eu.essi_lab.model.index.jaxb.DisjointValues;
 import eu.essi_lab.model.resource.GSResource;
+
+/**
+ * @author Fabrizio
+ */
 public class SpatialIndexHelper {
 
     private static final double MAX_AREA = 64800;

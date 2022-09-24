@@ -4,7 +4,7 @@ package eu.essi_lab.request.executor.discover;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,6 +30,18 @@ import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.ResourceProperty;
+
+/**
+ * Utility class used by the {@link Distributor} to calculate a bond reduced with respect to a source (i.e. the subset
+ * of the original bond
+ * that is pertinent to the given source). It will raise exception if the arguments are not consistent (e.g. it was
+ * asked to calculate a
+ * reduced bond on source1 and source1 is not a {@link ResourcePropertyBond} in the original bond, or the original bond
+ * is not in normal
+ * form.
+ *
+ * @author boldrini
+ */
 public class BondReducer {
     public static final String REDUCED_BOND_NULL_SOURCE = "REDUCED_BOND_NULL_SOURCE";
     public static final String REDUCED_BOND_SOURCE_NOT_FOUND = "REDUCED_BOND_SOURCE_NOT_FOUND";

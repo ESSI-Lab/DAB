@@ -31,6 +31,10 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+
+/**
+ * @author ilsanto
+ */
 public class CORSDelegatorFilter implements Filter {
 
     private Filter delegated;
@@ -45,20 +49,40 @@ public class CORSDelegatorFilter implements Filter {
 	    Class<?> delegatedClass = Class.forName("org.apache.catalina.filters.CorsFilter");
 
 	    delegated = (Filter) delegatedClass.newInstance();
+
 	    delegated.init(arg0);
 
 	    GSLoggerFactory.getLogger(getClass()).info("Initialized filter {}", this);
 
 	} catch (Exception e) {
 
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
+	    try {
+
+		Class<?> delegatedClass = Class.forName("org.eclipse.jetty.servlets.CrossOriginFilter");
+
+		delegated = (Filter) delegatedClass.newInstance();
+
+		delegated.init(arg0);
+
+		GSLoggerFactory.getLogger(getClass()).info("Initialized filter {}", this);
+
+	    } catch (Exception e2) {
+
+		if (e2 instanceof ClassNotFoundException) {
+
+		    GSLoggerFactory.getLogger(getClass()).error(e2.getMessage());
+		    return;
+		}
+
+		GSLoggerFactory.getLogger(getClass()).error(e2.getMessage(), e2);
+	    }
 	}
     }
 
     @Override
     public void doFilter(ServletRequest arg0, ServletResponse arg1, FilterChain arg2) throws IOException, ServletException {
 
-	GSLoggerFactory.getLogger(ProfilerServiceFilter.class).trace("Executing filter {}", this);
+	// GSLoggerFactory.getLogger(ProfilerServiceFilter.class).trace("Executing filter {}", this);
 
 	if (delegated != null) {
 	    delegated.doFilter(arg0, arg1, arg2);

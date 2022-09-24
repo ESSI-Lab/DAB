@@ -4,7 +4,7 @@ package eu.essi_lab.workflow.processor;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,6 +26,14 @@ import java.util.Objects;
 import eu.essi_lab.model.resource.data.CRS;
 import eu.essi_lab.model.resource.data.DataFormat;
 import eu.essi_lab.model.resource.data.DataType;
+
+/**
+ * Describes the input and output capabilities of a {@link DataProcessor}
+ *
+ * @author Fabrizio
+ * @see DataProcessor#getInputCapabilities()
+ * @see DataProcessor#getOutputCapabilities()
+ */
 public class ProcessorCapabilities {
 
     private CapabilityElement<DataType> type; // grid, time series, etc.

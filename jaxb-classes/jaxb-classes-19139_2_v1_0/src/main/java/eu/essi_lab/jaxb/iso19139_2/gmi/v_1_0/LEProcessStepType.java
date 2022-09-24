@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -57,6 +57,30 @@ import org.jvnet.jaxb2_commons.locator.util.LocatorUtils;
 
 import net.opengis.iso19139.gmd.v_20060504.LIProcessStepType;
 
+
+/**
+ * Description: Information about an event or transformation in the life of the dataset including details of the algorithm and software used for processing - FGDC:  - shortName: DetailProcStep
+ * 
+ * <p>Java class for LE_ProcessStep_Type complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="LE_ProcessStep_Type"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{http://www.isotc211.org/2005/gmd}LI_ProcessStep_Type"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="output" type="{http://www.isotc211.org/2005/gmi}LE_Source_PropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="report" type="{http://www.isotc211.org/2005/gmi}LE_ProcessStepReport_PropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="processingInformation" type="{http://www.isotc211.org/2005/gmi}LE_Processing_PropertyType" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "LE_ProcessStep_Type", propOrder = {
     "output",

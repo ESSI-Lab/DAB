@@ -12,7 +12,7 @@ package org.cuahsi.waterml._1;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -33,6 +33,31 @@ import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlType;
 
+
+/**
+ * <p>Java class for SampleMediumEnum.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * <pre>
+ * &lt;simpleType name="SampleMediumEnum"&gt;
+ *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
+ *     &lt;enumeration value="Surface Water"/&gt;
+ *     &lt;enumeration value="Ground Water"/&gt;
+ *     &lt;enumeration value="Sediment"/&gt;
+ *     &lt;enumeration value="Soil"/&gt;
+ *     &lt;enumeration value="Air"/&gt;
+ *     &lt;enumeration value="Tissue"/&gt;
+ *     &lt;enumeration value="Precipitation"/&gt;
+ *     &lt;enumeration value="Unknown"/&gt;
+ *     &lt;enumeration value="Other"/&gt;
+ *     &lt;enumeration value="Snow"/&gt;
+ *     &lt;enumeration value="Not Relevant"/&gt;
+ *   &lt;/restriction&gt;
+ * &lt;/simpleType&gt;
+ * </pre>
+ * 
+ */
 @XmlType(name = "SampleMediumEnum")
 @XmlEnum
 public enum SampleMediumEnum {

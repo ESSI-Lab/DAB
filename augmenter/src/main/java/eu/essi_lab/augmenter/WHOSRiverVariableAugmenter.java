@@ -4,7 +4,7 @@ package eu.essi_lab.augmenter;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,13 +24,28 @@ package eu.essi_lab.augmenter;
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.essi_lab.cfga.gs.setting.augmenter.AugmenterSetting;
 import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
+
+/**
+ * This augmenter will call the parent augmenter, and will replace found general concepts with concepts related to
+ * rivers.
+ * 
+ * @author boldrini
+ */
 public class WHOSRiverVariableAugmenter extends WHOSVariableAugmenter {
 
     public WHOSRiverVariableAugmenter() {
 
-	setLabel("WHOS River Variable augmenter");
+	getSetting().setName("WHOS River Variable augmenter");
+    }
 
+    /**
+     * @param setting
+     */
+    public WHOSRiverVariableAugmenter(AugmenterSetting setting) {
+
+	super(setting);
     }
 
     @Override
@@ -64,6 +79,12 @@ public class WHOSRiverVariableAugmenter extends WHOSVariableAugmenter {
 	ret.removeAll(toRemove);
 	ret.addAll(toAdd);
 	return ret;
+    }
+    
+    @Override
+    public String getType() {
+
+	return "WHOSRiverVariableAugmenter";
     }
 
 }

@@ -4,7 +4,7 @@ package eu.essi_lab.adk.timeseries;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,13 +21,22 @@ package eu.essi_lab.adk.timeseries;
  * #L%
  */
 
-import eu.essi_lab.cdk.harvest.IHarvestedQueryConnector;
+import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
+import eu.essi_lab.cfga.gs.setting.connector.HarvestedConnectorSetting;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.OriginalMetadata;
 
-public interface StationConnector extends IHarvestedQueryConnector {
+/**
+ * @author Fabrizio
+ */
+public abstract class StationConnector<T extends HarvestedConnectorSetting> extends HarvestedQueryConnector<T> {
 
-    public ListRecordsResponse<OriginalMetadata> listTimeseries(String stationId) throws GSException;
+    /**
+     * @param stationId
+     * @return
+     * @throws GSException
+     */
+    public abstract ListRecordsResponse<OriginalMetadata> listTimeseries(String stationId) throws GSException;
 
 }

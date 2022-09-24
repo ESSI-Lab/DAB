@@ -1,0 +1,2961 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "ESSI Lab AWS CloudFormation template to create a new VPC or use an existing VPC for ECS deployment in Create Cluster Wizard\n",
+    "Parameters": {
+        "GSPreprodServiceTaskContainerName": {
+            "Type": "String",
+            "Description": "Specifies the name of the container of the gs-service image",
+            "Default": "GSServiceContainer"
+        },
+        "GSPreprodServiceTaskBatchContainerName": {
+            "Type": "String",
+            "Description": "Specifies the name of the container of the gs-service image",
+            "Default": "GSServiceBatchContainer"
+        },
+        "GSPreprodServiceTaskAccessContainerName": {
+            "Type": "String",
+            "Description": "Specifies the name of the container of the gs-service image",
+            "Default": "GSServiceAccessContainer"
+        },
+        "GSPreprodConfigServiceTaskContainerName": {
+            "Type": "String",
+            "Description": "Specifies the name of the container of the gs-service image",
+            "Default": "GSServiceConfigContainer"
+        },
+        "GSServiceImage": {
+            "Type": "String",
+            "Description": "Specifies the image for the gs-service",
+            "Default": ""
+        },
+        "EnvironmentHost": {
+            "Type": "String",
+            "Description": "Specifies the host for the test environment",
+            "Default": ""
+        },
+        "JavaOpts": {
+            "Type": "String",
+            "Description": "Specifies the JVM arguments",
+            "Default": ""
+        },
+        "WhosEnvironmentHost": {
+            "Type": "String",
+            "Description": "Specifies the WHOS host for the test environment",
+            "Default": ""
+        },
+        "SdnEnvironmentHost": {
+            "Type": "String",
+            "Description": "Specifies the SeaDataNet host for the test environment",
+            "Default": ""
+        },
+        "BluecloudEnvironmentHost": {
+            "Type": "String",
+            "Description": "Specifies the Blue-Cloud host for the test environment",
+            "Default": ""
+        },
+        "HostedZoneId": {
+            "Type": "String",
+            "Description": "Specifies the hosted zone id where to create the record set for public dns",
+            "Default": ""
+        },
+        "EcsClusterName": {
+            "Type": "String",
+            "Description": "Specifies the ECS Cluster Name with which the resources would be associated\n",
+            "Default": ""
+        },
+        "EcsAccessClusterName": {
+            "Type": "String",
+            "Description": "Specifies the ECS Cluster Name with which the resources would be associated\n",
+            "Default": ""
+        },
+        "EcsHarvestClusterName": {
+            "Type": "String",
+            "Description": "Specifies the ECS Cluster Name with which the resources would be associated\n",
+            "Default": ""
+        },
+        "EcsAmiIdHarvest": {
+            "Type": "String",
+            "Description": "Specifies the AMI ID for your container instances.",
+            "Default": "ami-098616968d61e549e"
+        },
+        "EcsAmiIdAccess": {
+            "Type": "String",
+            "Description": "Specifies the AMI ID for your container instances.",
+            "Default": "ami-098616968d61e549e"
+        },
+        "EcsAmiIdDiscovery": {
+            "Type": "String",
+            "Description": "Specifies the AMI ID for your container instances.",
+            "Default": "ami-098616968d61e549e"
+        },
+        "EcsInstanceType": {
+            "Type": "String",
+            "Description": "Specifies the EC2 instance type for your container instances. Defaults to m4.large\n",
+            "Default": "m5.large",
+            "ConstraintDescription": "must be a valid EC2 instance type."
+        },
+        "EcsAccessInstanceType": {
+            "Type": "String",
+            "Description": "Specifies the EC2 instance type for your container instances. Defaults to m4.large\n",
+            "Default": "m5.large",
+            "ConstraintDescription": "must be a valid EC2 instance type."
+        },
+        "EcsHarvestInstanceType": {
+            "Type": "String",
+            "Description": "Specifies the EC2 instance type for your container instances. Defaults to m4.large\n",
+            "Default": "m5.large",
+            "ConstraintDescription": "must be a valid EC2 instance type."
+        },
+        "KeyName": {
+            "Type": "String",
+            "Description": "Optional - Specifies the name of an existing Amazon EC2 key pair to enable SSH access to the EC2 instances in your cluster.\n",
+            "Default": "large-key"
+        },
+        "VpcId": {
+            "Type": "String",
+            "Description": "Optional - Specifies the ID of an existing VPC in which to launch your container instances. If you specify a VPC ID, you must specify a list of existing subnets in that VPC. If you do not specify a VPC ID, a new VPC is created with atleast 1 subnet.\n",
+            "Default": "vpc-6bc22212",
+            "AllowedPattern": "^(?:vpc-[0-9a-f]{8}|)$",
+            "ConstraintDescription": "VPC Id must begin with 'vpc-' or leave blank to have a new VPC created\n"
+        },
+        "SubnetIds": {
+            "Type": "CommaDelimitedList",
+            "Description": "Optional - Specifies the Comma separated list of existing VPC Subnet Ids where ECS instances will run\n",
+            "Default": "subnet-22ee1b78"
+        },
+        "SecurityGroupId": {
+            "Type": "String",
+            "Description": "Optional - Specifies the Security Group Id of an existing Security Group. Leave blank to have a new Security Group created\n",
+            "Default": "sg-c6a878b8"
+        },
+        "VpcCidr": {
+            "Type": "String",
+            "Description": "Optional - Specifies the CIDR Block of VPC",
+            "Default": "10.0.0.0/16"
+        },
+        "SubnetCidr1": {
+            "Type": "String",
+            "Description": "Specifies the CIDR Block of Subnet 1",
+            "Default": "10.0.0.0/24"
+        },
+        "SubnetCidr2": {
+            "Type": "String",
+            "Description": "Specifies the CIDR Block of Subnet 2",
+            "Default": "10.0.1.0/24"
+        },
+        "SubnetCidr3": {
+            "Type": "String",
+            "Description": "Specifies the CIDR Block of Subnet 3",
+            "Default": ""
+        },
+        "AsgFrontendSize": {
+            "Type": "Number",
+            "Description": "Specifies the number of instances to launch and register to the cluster. Defaults to 1.\n",
+            "Default": "1"
+        },
+        "AsgFrontendMinSize": {
+            "Type": "Number",
+            "Description": "Specifies the min number of instances to launch and register to the cluster. Defaults to 1.\n",
+            "Default": "1"
+        },
+        "AsgFrontendMaxSize": {
+            "Type": "Number",
+            "Description": "Specifies the max number of instances to launch and register to the cluster. Defaults to 1.\n",
+            "Default": "1"
+        },
+        "AsgAccessSize": {
+            "Type": "Number",
+            "Description": "Specifies the number of instances to launch and register to the cluster. Defaults to 1.\n",
+            "Default": "1"
+        },
+        "AsgAccessMinSize": {
+            "Type": "Number",
+            "Description": "Specifies the min number of instances to launch and register to the cluster. Defaults to 1.\n",
+            "Default": "1"
+        },
+        "AsgAccessMaxSize": {
+            "Type": "Number",
+            "Description": "Specifies the max number of instances to launch and register to the cluster. Defaults to 1.\n",
+            "Default": "1"
+        },
+        "AsgHarvestSize": {
+            "Type": "Number",
+            "Description": "Specifies the number of instances to launch and register to the Harvest cluster. Defaults to 1.\n",
+            "Default": "1"
+        },
+        "AsgHarvestMinSize": {
+            "Type": "Number",
+            "Description": "Specifies the min number of instances to launch and register to the Harvest cluster. Defaults to 1.\n",
+            "Default": "1"
+        },
+        "AsgHarvestMaxSize": {
+            "Type": "Number",
+            "Description": "Specifies the max number of instances to launch and register to the Harvest cluster. Defaults to 1.\n",
+            "Default": "1"
+        },
+        "IamRoleInstanceProfile": {
+            "Type": "String",
+            "Description": "Specifies the Name or the Amazon Resource Name (ARN) of the instance profile associated with the IAM role for the instance\n",
+            "Default": "ecsInstanceRole"
+        },
+        "SecurityIngressFromPort": {
+            "Type": "Number",
+            "Description": "Optional - Specifies the Start of Security Group port to open on ECS instances - defaults to port 0\n",
+            "Default": "80"
+        },
+        "SecurityIngressToPort": {
+            "Type": "Number",
+            "Description": "Optional - Specifies the End of Security Group port to open on ECS instances - defaults to port 65535\n",
+            "Default": "80"
+        },
+        "SecurityIngressCidrIp": {
+            "Type": "String",
+            "Description": "Optional - Specifies the CIDR/IP range for Security Ports - defaults to 0.0.0.0/0\n",
+            "Default": "0.0.0.0/0"
+        },
+        "VpcAvailabilityZones": {
+            "Type": "CommaDelimitedList",
+            "Description": "Specifies a comma-separated list of 3 VPC Availability Zones for the creation of new subnets. These zones must have the available status.\n",
+            "Default": "us-east-1b,us-east-1c,us-east-1a,us-east-1d,us-east-1e"
+        },
+        "EbsVolumeSize": {
+            "Type": "Number",
+            "Description": "Optional - Specifies the Size in GBs, of the newly created Amazon Elastic Block Store (Amazon EBS) volume\n",
+            "Default": "30"
+        },
+        "EbsVolumeType": {
+            "Type": "String",
+            "Description": "Optional - Specifies the Type of (Amazon EBS) volume",
+            "Default": "gp2",
+            "AllowedValues": [
+                "",
+                "standard",
+                "io1",
+                "gp2",
+                "sc1",
+                "st1"
+            ],
+            "ConstraintDescription": "Must be a valid EC2 volume type."
+        },
+        "DeviceName": {
+            "Type": "String",
+            "Description": "Optional - Specifies the device mapping for the Volume",
+            "Default": "/dev/xvda"
+        },
+        "TestStackName": {
+            "Type": "String",
+            "Description": "Specifies the name of the test stack from which to import values",
+            "Default": ""
+        }
+    },
+    "Conditions": {
+        "CreateEC2LCWithKeyPair": {
+            "Fn::Not": [
+                {
+                    "Fn::Equals": [
+                        {"Ref": "KeyName"},
+                        ""
+                    ]
+                }
+            ]
+        },
+        "CreateNewSecurityGroup": {
+            "Fn::Equals": [
+                {"Ref": "SecurityGroupId"},
+                ""
+            ]
+        },
+        "CreateNewVpc": {
+            "Fn::Equals": [
+                {"Ref": "VpcId"},
+                ""
+            ]
+        },
+        "CreateSubnet1": {
+            "Fn::And": [
+                {
+                    "Fn::Not": [
+                        {
+                            "Fn::Equals": [
+                                {"Ref": "SubnetCidr1"},
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {"Condition": "CreateNewVpc"}
+            ]
+        },
+        "CreateSubnet2": {
+            "Fn::And": [
+                {
+                    "Fn::Not": [
+                        {
+                            "Fn::Equals": [
+                                {"Ref": "SubnetCidr2"},
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {"Condition": "CreateSubnet1"}
+            ]
+        },
+        "CreateSubnet3": {
+            "Fn::And": [
+                {
+                    "Fn::Not": [
+                        {
+                            "Fn::Equals": [
+                                {"Ref": "SubnetCidr3"},
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {"Condition": "CreateSubnet2"}
+            ]
+        },
+        "CreateEbsVolume": {
+            "Fn::And": [
+                {
+                    "Fn::Not": [
+                        {
+                            "Fn::Equals": [
+                                {"Ref": "EbsVolumeSize"},
+                                "0"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "Fn::Not": [
+                        {
+                            "Fn::Equals": [
+                                {"Ref": "EbsVolumeType"},
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "Fn::Not": [
+                        {
+                            "Fn::Equals": [
+                                {"Ref": "DeviceName"},
+                                ""
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "Resources": {
+        "RecordSet": {
+            "Type": "AWS::Route53::RecordSet",
+            "Properties": {
+                "AliasTarget": {
+                    "DNSName": {
+                        "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBDNSName"}
+                    },
+                    "HostedZoneId": {
+                        "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBCanonicalHostedZoneID"}
+                    }
+                },
+                "HostedZoneId": {"Ref": "HostedZoneId"},
+                "Name": {"Ref": "EnvironmentHost"},
+                "Type": "A"
+            }
+        },
+        "WHOSRecordSet": {
+            "Type": "AWS::Route53::RecordSet",
+            "Properties": {
+                "AliasTarget": {
+                    "DNSName": {
+                        "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBDNSName"}
+                    },
+                    "HostedZoneId": {
+                        "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBCanonicalHostedZoneID"}
+                    }
+                },
+                "HostedZoneId": {"Ref": "HostedZoneId"},
+                "Name": {"Ref": "WhosEnvironmentHost"},
+                "Type": "A"
+            }
+        },
+        "SDNRecordSet": {
+            "Type": "AWS::Route53::RecordSet",
+            "Properties": {
+                "AliasTarget": {
+                    "DNSName": {
+                        "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBDNSName"}
+                    },
+                    "HostedZoneId": {
+                        "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBCanonicalHostedZoneID"}
+                    }
+                },
+                "HostedZoneId": {"Ref": "HostedZoneId"},
+                "Name": {"Ref": "SdnEnvironmentHost"},
+                "Type": "A"
+            }
+        },
+        "BluecloudRecordSet": {
+            "Type": "AWS::Route53::RecordSet",
+            "Properties": {
+                "AliasTarget": {
+                    "DNSName": {
+                        "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBDNSName"}
+                    },
+                    "HostedZoneId": {
+                        "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBCanonicalHostedZoneID"}
+                    }
+                },
+                "HostedZoneId": {"Ref": "HostedZoneId"},
+                "Name": {"Ref": "BluecloudEnvironmentHost"},
+                "Type": "A"
+            }
+        },
+        "GSPreprodAccessServiceTaskDefinition": {
+            "Type": "AWS::ECS::TaskDefinition",
+            "Properties": {
+                "Volumes": [],
+                "Family": "GSPreprodAccessServiceTaskDefinition",
+                "NetworkMode": "bridge",
+                "ContainerDefinitions": [
+                    {
+                        "LogConfiguration": {
+                            "LogDriver": "awslogs",
+                            "Options": {
+                                "awslogs-group": "gsprodcluster",
+                                "awslogs-region": "us-east-1",
+                                "awslogs-stream-prefix": "gs-service-preprod-access",
+                                "awslogs-datetime-format": "%Y-%m-%d %H:%M:%S%L"
+                            }
+                        },
+                        "Command": ["catalina.sh run"],
+                        "Cpu": 0,
+                        "EntryPoint": [
+                            "/bin/bash",
+                            "-c"
+                        ],
+                        "WorkingDirectory": "/usr/share/tomcat9/bin",
+                        "Environment": [
+                            {
+                                "Name": "EU_FLORA_ESSI_GI_PROJECT_EXECUTION",
+                                "Value": "access"
+                            },
+                            {
+                                "Name": "JAVA_OPTS",
+                                "Value": {"Ref": "JavaOpts"}
+                            }
+                        ],
+                        "Image": {"Ref": "GSServiceImage"},
+                        "MemoryReservation": 2048,
+                        "Name": {"Ref": "GSPreprodServiceTaskAccessContainerName"},
+                        "PortMappings": [
+                            {
+                                "ContainerPort": 8080,
+                                "HostPort": 0,
+                                "Protocol": "tcp"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        "GSPreprodAccessService": {
+            "Type": "AWS::ECS::Service",
+            "DependsOn": ["GSPreprodAccessServiceTaskDefinition"],
+            "Properties": {
+                "Cluster": {"Ref": "ECSAccessCluster"},
+                "DeploymentConfiguration": {
+                    "MaximumPercent": 200,
+                    "MinimumHealthyPercent": 50
+                },
+                "DesiredCount": 1,
+                "HealthCheckGracePeriodSeconds": 180,
+                "LaunchType": "EC2",
+                "LoadBalancers": [
+                    {
+                        "ContainerName": {"Ref": "GSPreprodServiceTaskAccessContainerName"},
+                        "ContainerPort": 8080,
+                        "TargetGroupArn": {"Ref": "ALBGSServiceAccessPreprodTargetGroup"}
+                    }
+                ],
+                "PlacementConstraints": [],
+                "Role": "arn:aws:iam::672812193635:role/ecsServiceRole",
+                "PlacementStrategies": [
+                    {
+                        "Type": "spread",
+                        "Field": "attribute:ecs.availability-zone"
+                    },
+                    {
+                        "Field": "instanceId",
+                        "Type": "spread"
+                    }
+                ],
+                "ServiceName": "GSPreprodAccessService",
+                "TaskDefinition": {"Ref": "GSPreprodAccessServiceTaskDefinition"}
+            }
+        },
+        "GSPreprodHarvestServiceTaskDefinition": {
+            "Type": "AWS::ECS::TaskDefinition",
+            "Properties": {
+                "Volumes": [],
+                "Family": "GSPreprodHarvestServiceTaskDefinition",
+                "NetworkMode": "bridge",
+                "ContainerDefinitions": [
+                    {
+                        "LogConfiguration": {
+                            "LogDriver": "awslogs",
+                            "Options": {
+                                "awslogs-group": "gspreprodcluster",
+                                "awslogs-region": "us-east-1",
+                                "awslogs-stream-prefix": "gs-service-preprod-batch"
+                            }
+                        },
+                        "Command": ["catalina.sh run"],
+                        "Cpu": 0,
+                        "EntryPoint": [
+                            "/bin/bash",
+                            "-c"
+                        ],
+                        "WorkingDirectory": "/usr/share/tomcat9/bin",
+                        "Environment": [
+                            {
+                                "Name": "EU_FLORA_ESSI_GI_PROJECT_EXECUTION",
+                                "Value": "batch"
+                            },
+                            {
+                                "Name": "JAVA_OPTS",
+                                "Value": {"Ref": "JavaOpts"}
+                            }
+                        ],
+                        "Image": {"Ref": "GSServiceImage"},
+                        "MemoryReservation": 2048,
+                        "Name": {"Ref": "GSPreprodServiceTaskBatchContainerName"},
+                        "PortMappings": [
+                            {
+                                "ContainerPort": 8080,
+                                "HostPort": 0,
+                                "Protocol": "tcp"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        "GSPreprodHarvestService": {
+            "Type": "AWS::ECS::Service",
+            "DependsOn": ["GSPreprodHarvestServiceTaskDefinition"],
+            "Properties": {
+                "Cluster": {"Ref": "ECSHarvestCluster"},
+                "DeploymentConfiguration": {
+                    "MaximumPercent": 200,
+                    "MinimumHealthyPercent": 50
+                },
+                "DesiredCount": 1,
+                "HealthCheckGracePeriodSeconds": 180,
+                "LaunchType": "EC2",
+                "LoadBalancers": [
+                    {
+                        "ContainerName": {"Ref": "GSPreprodServiceTaskBatchContainerName"},
+                        "ContainerPort": 8080,
+                        "TargetGroupArn": {"Ref": "ALBGSServiceHarvestPreprodTargetGroup"}
+                    }
+                ],
+                "PlacementConstraints": [],
+                "Role": "arn:aws:iam::672812193635:role/ecsServiceRole",
+                "PlacementStrategies": [
+                    {
+                        "Type": "spread",
+                        "Field": "attribute:ecs.availability-zone"
+                    },
+                    {
+                        "Field": "instanceId",
+                        "Type": "spread"
+                    }
+                ],
+                "ServiceName": "GSPreprodHarvestService",
+                "TaskDefinition": {"Ref": "GSPreprodHarvestServiceTaskDefinition"}
+            }
+        },
+        "GSPreprodServiceTaskDefinition": {
+            "Type": "AWS::ECS::TaskDefinition",
+            "Properties": {
+                "Volumes": [],
+                "Family": "GSPreprodServiceTaskDefinition",
+                "NetworkMode": "bridge",
+                "ContainerDefinitions": [
+                    {
+                        "LogConfiguration": {
+                            "LogDriver": "awslogs",
+                            "Options": {
+                                "awslogs-group": "gsprodcluster",
+                                "awslogs-region": "us-east-1",
+                                "awslogs-stream-prefix": "gs-service-preprod"
+                            }
+                        },
+                        "Command": ["catalina.sh run"],
+                        "Cpu": 0,
+                        "EntryPoint": [
+                            "/bin/bash",
+                            "-c"
+                        ],
+                        "WorkingDirectory": "/usr/share/tomcat9/bin",
+                        "Environment": [
+                            {
+                                "Name": "EU_FLORA_ESSI_GI_PROJECT_EXECUTION",
+                                "Value": "frontend"
+                            },
+                            {
+                                "Name": "JAVA_OPTS",
+                                "Value": {"Ref": "JavaOpts"}
+                            }
+                        ],
+                        "Image": {"Ref": "GSServiceImage"},
+                        "MemoryReservation": 2048,
+                        "Name": {"Ref": "GSPreprodServiceTaskContainerName"},
+                        "PortMappings": [
+                            {
+                                "ContainerPort": 8080,
+                                "HostPort": 0,
+                                "Protocol": "tcp"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        "GSPreprodService": {
+            "Type": "AWS::ECS::Service",
+            "DependsOn": ["GSPreprodServiceTaskDefinition"],
+            "Properties": {
+                "Cluster": {"Ref": "ECSCluster"},
+                "DeploymentConfiguration": {
+                    "MaximumPercent": 200,
+                    "MinimumHealthyPercent": 50
+                },
+                "DesiredCount": 1,
+                "HealthCheckGracePeriodSeconds": 180,
+                "LaunchType": "EC2",
+                "LoadBalancers": [
+                    {
+                        "ContainerName": {"Ref": "GSPreprodServiceTaskContainerName"},
+                        "ContainerPort": 8080,
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "PlacementConstraints": [],
+                "Role": "arn:aws:iam::672812193635:role/ecsServiceRole",
+                "PlacementStrategies": [
+                    {
+                        "Type": "spread",
+                        "Field": "attribute:ecs.availability-zone"
+                    },
+                    {
+                        "Field": "instanceId",
+                        "Type": "spread"
+                    }
+                ],
+                "ServiceName": "GSPreprodService",
+                "TaskDefinition": {"Ref": "GSPreprodServiceTaskDefinition"}
+            }
+        },
+        "GSPreprodConfigServiceTaskDefinition": {
+            "Type": "AWS::ECS::TaskDefinition",
+            "Properties": {
+                "Volumes": [],
+                "Family": "GSPreprodConfigServiceTaskDefinition",
+                "NetworkMode": "bridge",
+                "ContainerDefinitions": [
+                    {
+                        "LogConfiguration": {
+                            "LogDriver": "awslogs",
+                            "Options": {
+                                "awslogs-group": "gsprodcluster",
+                                "awslogs-region": "us-east-1",
+                                "awslogs-stream-prefix": "gs-service-preprod-config"
+                            }
+                        },
+                        "Command": ["catalina.sh run"],
+                        "Cpu": 0,
+                        "EntryPoint": [
+                            "/bin/bash",
+                            "-c"
+                        ],
+                        "WorkingDirectory": "/usr/share/tomcat9/bin",
+                        "Environment": [
+                            {
+                                "Name": "EU_FLORA_ESSI_GI_PROJECT_EXECUTION",
+                                "Value": "configuration"
+                            },
+                            {
+                                "Name": "JAVA_OPTS",
+                                "Value": {"Ref": "JavaOpts"}
+                            }
+                        ],
+                        "Image": {"Ref": "GSServiceImage"},
+                        "MemoryReservation": 1024,
+                        "Name": {"Ref": "GSPreprodConfigServiceTaskContainerName"},
+                        "PortMappings": [
+                            {
+                                "ContainerPort": 8080,
+                                "HostPort": 0,
+                                "Protocol": "tcp"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        "GSPreprodConfigService": {
+            "Type": "AWS::ECS::Service",
+            "DependsOn": ["GSPreprodConfigServiceTaskDefinition"],
+            "Properties": {
+                "Cluster": {"Ref": "ECSCluster"},
+                "DeploymentConfiguration": {
+                    "MaximumPercent": 200,
+                    "MinimumHealthyPercent": 50
+                },
+                "DesiredCount": 1,
+                "HealthCheckGracePeriodSeconds": 180,
+                "LaunchType": "EC2",
+                "LoadBalancers": [
+                    {
+                        "ContainerName": {"Ref": "GSPreprodConfigServiceTaskContainerName"},
+                        "ContainerPort": 8080,
+                        "TargetGroupArn": {"Ref": "ALBGSConfigServicePreprodTargetGroup"}
+                    }
+                ],
+                "PlacementConstraints": [],
+                "Role": "arn:aws:iam::672812193635:role/ecsServiceRole",
+                "PlacementStrategies": [
+                    {
+                        "Type": "spread",
+                        "Field": "attribute:ecs.availability-zone"
+                    },
+                    {
+                        "Field": "instanceId",
+                        "Type": "spread"
+                    }
+                ],
+                "ServiceName": "GSPreprodConfigService",
+                "TaskDefinition": {"Ref": "GSPreprodConfigServiceTaskDefinition"}
+            }
+        },
+        "ALBGSServicePreprodTargetGroup": {
+            "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+            "Properties": {
+                "HealthCheckIntervalSeconds": 30,
+                "HealthCheckPort": "traffic-port",
+                "HealthCheckProtocol": "HTTP",
+                "HealthCheckPath": "/gs-service/services/health/check?gsHealthCheckGroup=frontend",
+                "HealthCheckTimeoutSeconds": 10,
+                "HealthyThresholdCount": 2,
+                "Matcher": {"HttpCode": "200"},
+                "Name": "GSServicePreprodTargetGroup",
+                "Port": 80,
+                "Protocol": "HTTP",
+                "TargetType": "instance",
+                "UnhealthyThresholdCount": 2,
+                "VpcId": {"Ref": "VpcId"},
+                "TargetGroupAttributes": [
+                    {
+                        "Key": "deregistration_delay.timeout_seconds",
+                        "Value": "40"
+                    }
+                ]
+            }
+        },
+        "ALBGSServiceHarvestPreprodTargetGroup": {
+            "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+            "Properties": {
+                "HealthCheckIntervalSeconds": 120,
+                "HealthCheckPort": "traffic-port",
+                "HealthCheckProtocol": "HTTP",
+                "HealthCheckPath": "/gs-service/services/health/check?gsHealthCheckGroup=harvest",
+                "HealthCheckTimeoutSeconds": 30,
+                "HealthyThresholdCount": 2,
+                "Matcher": {"HttpCode": "200"},
+                "Name": "GSServicePreprodHarvTG",
+                "Port": 80,
+                "Protocol": "HTTP",
+                "TargetType": "instance",
+                "UnhealthyThresholdCount": 2,
+                "VpcId": {"Ref": "VpcId"}
+            }
+        },
+        "ALBGSServiceAccessPreprodTargetGroup": {
+            "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+            "Properties": {
+                "HealthCheckIntervalSeconds": 120,
+                "HealthCheckPort": "traffic-port",
+                "HealthCheckProtocol": "HTTP",
+                "HealthCheckPath": "/gs-service/services/health/check?gsHealthCheckGroup=access",
+                "HealthCheckTimeoutSeconds": 30,
+                "HealthyThresholdCount": 2,
+                "Matcher": {"HttpCode": "200"},
+                "Name": "GSServicePreprodAccessTG",
+                "Port": 80,
+                "Protocol": "HTTP",
+                "TargetType": "instance",
+                "UnhealthyThresholdCount": 2,
+                "VpcId": {"Ref": "VpcId"}
+            }
+        },
+        "ALBGSConfigServicePreprodTargetGroup": {
+            "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+            "Properties": {
+                "HealthCheckIntervalSeconds": 120,
+                "HealthCheckPort": "traffic-port",
+                "HealthCheckProtocol": "HTTP",
+                "HealthCheckPath": "/gs-service/services/health/check?gsHealthCheckGroup=configuration",
+                "HealthCheckTimeoutSeconds": 30,
+                "HealthyThresholdCount": 2,
+                "Matcher": {"HttpCode": "200"},
+                "Name": "GSServicePreprodConfigTG",
+                "Port": 80,
+                "Protocol": "HTTP",
+                "TargetType": "instance",
+                "UnhealthyThresholdCount": 2,
+                "VpcId": {"Ref": "VpcId"}
+            }
+        },
+        "GSFrontendHealthCheckRule80": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "EnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "query-string",
+                        "QueryStringConfig": {
+                            "Values": [
+                                {
+                                    "Key": "gsHealthCheckGroup",
+                                    "Value": "frontend"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener80"}
+                },
+                "Priority": 82
+            }
+        },
+        "GSFrontendHealthCheckRule443": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "EnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "query-string",
+                        "QueryStringConfig": {
+                            "Values": [
+                                {
+                                    "Key": "gsHealthCheckGroup",
+                                    "Value": "frontend"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener443"}
+                },
+                "Priority": 82
+            }
+        },
+        "GSAccessHealthCheckRule80": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServiceAccessPreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServiceAccessPreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "EnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "query-string",
+                        "QueryStringConfig": {
+                            "Values": [
+                                {
+                                    "Key": "gsHealthCheckGroup",
+                                    "Value": "access"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener80"}
+                },
+                "Priority": 83
+            }
+        },
+        "GSAccessHealthCheckRule443": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServiceAccessPreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServiceAccessPreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "EnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "query-string",
+                        "QueryStringConfig": {
+                            "Values": [
+                                {
+                                    "Key": "gsHealthCheckGroup",
+                                    "Value": "access"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener443"}
+                },
+                "Priority": 83
+            }
+        },
+        "GSHarvestHealthCheckRule80": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServiceHarvestPreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServiceHarvestPreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "EnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "query-string",
+                        "QueryStringConfig": {
+                            "Values": [
+                                {
+                                    "Key": "gsHealthCheckGroup",
+                                    "Value": "harvest"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener80"}
+                },
+                "Priority": 84
+            }
+        },
+        "GSHarvestHealthCheckRule443": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServiceHarvestPreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServiceHarvestPreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "EnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "query-string",
+                        "QueryStringConfig": {
+                            "Values": [
+                                {
+                                    "Key": "gsHealthCheckGroup",
+                                    "Value": "harvest"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener443"}
+                },
+                "Priority": 84
+            }
+        },
+        "GSServiceRule80n1": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "EnvironmentHost"},
+                            {"Ref": "WhosEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "path-pattern",
+                        "Values": [
+                            "*/opensearch*",
+                            "*/oaipmh*",
+                            "*/csw*"
+                        ]
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener80"}
+                },
+                "Priority": 86
+            }
+        },
+        "GSServiceRule443n1": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "EnvironmentHost"},
+                            {"Ref": "WhosEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "path-pattern",
+                        "Values": [
+                            "*/opensearch*",
+                            "*/oaipmh*",
+                            "*/csw*"
+                        ]
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener443"}
+                },
+                "Priority": 86
+            }
+        },
+        "GSServiceRule80n2": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "EnvironmentHost"},
+                            {"Ref": "WhosEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "path-pattern",
+                        "Values": [
+                            "*/gs-service/search*",
+                            "*/css/*",
+                            "*/seadatanet-broker/*"
+                        ]
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener80"}
+                },
+                "Priority": 87
+            }
+        },
+        "GSServiceRule443n2": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "EnvironmentHost"},
+                            {"Ref": "WhosEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "path-pattern",
+                        "Values": [
+                            "*/gs-service/search*",
+                            "*/css/*",
+                            "*/seadatanet-broker/*"
+                        ]
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener443"}
+                },
+                "Priority": 87
+            }
+        },
+        "GSServiceRule80n3": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "EnvironmentHost"},
+                            {"Ref": "WhosEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "query-string",
+                        "QueryStringConfig": {
+                            "Values": [
+                                {
+                                    "Key": "GetSites",
+                                    "Value": "*"
+                                },
+                                {
+                                    "Key": "GetSitesObject",
+                                    "Value": "*"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener80"}
+                },
+                "Priority": 88
+            }
+        },
+        "GSServiceRule443n3": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "EnvironmentHost"},
+                            {"Ref": "WhosEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "query-string",
+                        "QueryStringConfig": {
+                            "Values": [
+                                {
+                                    "Key": "GetSites",
+                                    "Value": "*"
+                                },
+                                {
+                                    "Key": "GetSitesObject",
+                                    "Value": "*"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener443"}
+                },
+                "Priority": 88
+            }
+        },
+        "GSServiceRule80n4": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "EnvironmentHost"},
+                            {"Ref": "WhosEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "path-pattern",
+                        "Values": ["*/hiscentral.asmx*"]
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener80"}
+                },
+                "Priority": 89
+            }
+        },
+        "GSServiceRule443n4": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "EnvironmentHost"},
+                            {"Ref": "WhosEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "path-pattern",
+                        "Values": ["*/hiscentral.asmx*"]
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener443"}
+                },
+                "Priority": 89
+            }
+        },
+        "GSServiceRule80n5": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "EnvironmentHost"},
+                            {"Ref": "WhosEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "path-pattern",
+                        "Values": ["*/kmaoaipmh*"]
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener80"}
+                },
+                "Priority": 90
+            }
+        },
+        "GSServiceRule443n5": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "EnvironmentHost"},
+                            {"Ref": "WhosEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "path-pattern",
+                        "Values": ["*/kmaoaipmh*"]
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener443"}
+                },
+                "Priority": 90
+            }
+        },
+        "GSServiceRule80n6": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "EnvironmentHost"},
+                            {"Ref": "WhosEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "query-string",
+                        "QueryStringConfig": {
+                            "Values": [
+                                {
+                                    "Key": "WSDL",
+                                    "Value": "*"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener80"}
+                },
+                "Priority": 91
+            }
+        },
+        "GSServiceRule443n6": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "EnvironmentHost"},
+                            {"Ref": "WhosEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "query-string",
+                        "QueryStringConfig": {
+                            "Values": [
+                                {
+                                    "Key": "WSDL",
+                                    "Value": "*"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener443"}
+                },
+                "Priority": 91
+            }
+        },
+        "GSServiceRule80n7": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "EnvironmentHost"},
+                            {"Ref": "WhosEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "path-pattern",
+                        "Values": ["*cuahsi_1_1.asmx*"]
+                    },
+                    {
+                        "Field": "http-header",
+                        "HttpHeaderConfig": {
+                            "HttpHeaderName": "SOAPAction",
+                            "Values": [
+                                "*GetSite*",
+                                "*GetVariable*"
+                            ]
+                        }
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener80"}
+                },
+                "Priority": 92
+            }
+        },
+        "GSServiceRule443n7": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "EnvironmentHost"},
+                            {"Ref": "WhosEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "path-pattern",
+                        "Values": ["*cuahsi_1_1.asmx*"]
+                    },
+                    {
+                        "Field": "http-header",
+                        "HttpHeaderConfig": {
+                            "HttpHeaderName": "SOAPAction",
+                            "Values": [
+                                "*GetSite*",
+                                "*GetVariable*"
+                            ]
+                        }
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener443"}
+                },
+                "Priority": 92
+            }
+        },
+        "GSServiceRule80n8": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "EnvironmentHost"},
+                            {"Ref": "WhosEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "query-string",
+                        "QueryStringConfig": {
+                            "Values": [
+                                {
+                                    "Key": "GetSiteInfo",
+                                    "Value": "*"
+                                },
+                                {
+                                    "Key": "GetSiteInfoObject",
+                                    "Value": "*"
+                                },
+                                {
+                                    "Key": "GetSitesByBoxObject",
+                                    "Value": "*"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener80"}
+                },
+                "Priority": 93
+            }
+        },
+        "GSServiceRule443n8": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "EnvironmentHost"},
+                            {"Ref": "WhosEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "query-string",
+                        "QueryStringConfig": {
+                            "Values": [
+                                {
+                                    "Key": "GetSiteInfo",
+                                    "Value": "*"
+                                },
+                                {
+                                    "Key": "GetSiteInfoObject",
+                                    "Value": "*"
+                                },
+                                {
+                                    "Key": "GetSitesByBoxObject",
+                                    "Value": "*"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener443"}
+                },
+                "Priority": 93
+            }
+        },
+        
+        "GSConfigServicePathRule80": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSConfigServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSConfigServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": ["config-preprod.geodab.eu"]                       
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener80"}
+                },
+                "Priority": 95
+            }
+        },
+        "GSConfigServicePathRule443": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSConfigServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSConfigServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": ["config-preprod.geodab.eu"]                       
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener443"}
+                },
+                "Priority": 95
+            }
+        }, 
+        
+        "GSConfigHealthCheckRule80": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSConfigServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSConfigServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "EnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "query-string",
+                        "QueryStringConfig": {
+                            "Values": [
+                                {
+                                    "Key": "gsHealthCheckGroup",
+                                    "Value": "configuration"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener80"}
+                },
+                "Priority": 97
+            }
+        },
+        "GSConfigHealthCheckRule443": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSConfigServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSConfigServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "EnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "query-string",
+                        "QueryStringConfig": {
+                            "Values": [
+                                {
+                                    "Key": "gsHealthCheckGroup",
+                                    "Value": "configuration"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener443"}
+                },
+                "Priority": 97
+            }
+        },
+        "GSAccessServiceRule80": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServiceAccessPreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServiceAccessPreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "EnvironmentHost"},
+                            {"Ref": "WhosEnvironmentHost"}
+                        ]
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener80"}
+                },
+                "Priority": 100
+            }
+        },
+        "GSAccessServiceRule443": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServiceAccessPreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServiceAccessPreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "EnvironmentHost"},
+                            {"Ref": "WhosEnvironmentHost"}
+                        ]
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener443"}
+                },
+                "Priority": 100
+            }
+        },
+        "GSServiceRule80n1H2": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "SdnEnvironmentHost"},
+                            {"Ref": "BluecloudEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "path-pattern",
+                        "Values": [
+                            "*/opensearch*",
+                            "*/oaipmh*",
+                            "*/csw*"
+                        ]
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener80"}
+                },
+                "Priority": 108
+            }
+        },
+        "GSServiceRule443n1H2": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "SdnEnvironmentHost"},
+                            {"Ref": "BluecloudEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "path-pattern",
+                        "Values": [
+                            "*/opensearch*",
+                            "*/oaipmh*",
+                            "*/csw*"
+                        ]
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener443"}
+                },
+                "Priority": 108
+            }
+        },
+        "GSServiceRule80n2H2": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "SdnEnvironmentHost"},
+                            {"Ref": "BluecloudEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "path-pattern",
+                        "Values": [
+                            "*/gs-service/search*",
+                            "*/css/*",
+                            "*/seadatanet-broker/*"
+                        ]
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener80"}
+                },
+                "Priority": 109
+            }
+        },
+        "GSServiceRule443n2H2": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "SdnEnvironmentHost"},
+                            {"Ref": "BluecloudEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "path-pattern",
+                        "Values": [
+                            "*/gs-service/search*",
+                            "*/css/*",
+                            "*/seadatanet-broker/*"
+                        ]
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener443"}
+                },
+                "Priority": 109
+            }
+        },
+        "GSServiceRule80n3H2": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "SdnEnvironmentHost"},
+                            {"Ref": "BluecloudEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "query-string",
+                        "QueryStringConfig": {
+                            "Values": [
+                                {
+                                    "Key": "GetSites",
+                                    "Value": "*"
+                                },
+                                {
+                                    "Key": "GetSitesObject",
+                                    "Value": "*"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener80"}
+                },
+                "Priority": 110
+            }
+        },
+        "GSServiceRule443n3H2": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "SdnEnvironmentHost"},
+                            {"Ref": "BluecloudEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "query-string",
+                        "QueryStringConfig": {
+                            "Values": [
+                                {
+                                    "Key": "GetSites",
+                                    "Value": "*"
+                                },
+                                {
+                                    "Key": "GetSitesObject",
+                                    "Value": "*"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener443"}
+                },
+                "Priority": 110
+            }
+        },
+        "GSServiceRule80n4H2": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "SdnEnvironmentHost"},
+                            {"Ref": "BluecloudEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "path-pattern",
+                        "Values": ["*/hiscentral.asmx*"]
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener80"}
+                },
+                "Priority": 111
+            }
+        },
+        "GSServiceRule443n4H2": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "SdnEnvironmentHost"},
+                            {"Ref": "BluecloudEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "path-pattern",
+                        "Values": ["*/hiscentral.asmx*"]
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener443"}
+                },
+                "Priority": 111
+            }
+        },
+        "GSServiceRule80n5H2": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "SdnEnvironmentHost"},
+                            {"Ref": "BluecloudEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "path-pattern",
+                        "Values": ["*/kmaoaipmh*"]
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener80"}
+                },
+                "Priority": 112
+            }
+        },
+        "GSServiceRule443n5H2": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "SdnEnvironmentHost"},
+                            {"Ref": "BluecloudEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "path-pattern",
+                        "Values": ["*/kmaoaipmh*"]
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener443"}
+                },
+                "Priority": 112
+            }
+        },
+        "GSServiceRule80n6H2": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "SdnEnvironmentHost"},
+                            {"Ref": "BluecloudEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "query-string",
+                        "QueryStringConfig": {
+                            "Values": [
+                                {
+                                    "Key": "WSDL",
+                                    "Value": "*"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener80"}
+                },
+                "Priority": 113
+            }
+        },
+        "GSServiceRule443n6H2": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "SdnEnvironmentHost"},
+                            {"Ref": "BluecloudEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "query-string",
+                        "QueryStringConfig": {
+                            "Values": [
+                                {
+                                    "Key": "WSDL",
+                                    "Value": "*"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener443"}
+                },
+                "Priority": 113
+            }
+        },
+        "GSServiceRule80n7H2": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "SdnEnvironmentHost"},
+                            {"Ref": "BluecloudEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "path-pattern",
+                        "Values": ["*cuahsi_1_1.asmx*"]
+                    },
+                    {
+                        "Field": "http-header",
+                        "HttpHeaderConfig": {
+                            "HttpHeaderName": "SOAPAction",
+                            "Values": [
+                                "*GetSite*",
+                                "*GetVariable*"
+                            ]
+                        }
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener80"}
+                },
+                "Priority": 114
+            }
+        },
+        "GSServiceRule443n7H2": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "SdnEnvironmentHost"},
+                            {"Ref": "BluecloudEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "path-pattern",
+                        "Values": ["*cuahsi_1_1.asmx*"]
+                    },
+                    {
+                        "Field": "http-header",
+                        "HttpHeaderConfig": {
+                            "HttpHeaderName": "SOAPAction",
+                            "Values": [
+                                "*GetSite*",
+                                "*GetVariable*"
+                            ]
+                        }
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener443"}
+                },
+                "Priority": 114
+            }
+        },
+        "GSServiceRule80n8H2": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "SdnEnvironmentHost"},
+                            {"Ref": "BluecloudEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "query-string",
+                        "QueryStringConfig": {
+                            "Values": [
+                                {
+                                    "Key": "GetSiteInfo",
+                                    "Value": "*"
+                                },
+                                {
+                                    "Key": "GetSiteInfoObject",
+                                    "Value": "*"
+                                },
+                                {
+                                    "Key": "GetSitesByBoxObject",
+                                    "Value": "*"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener80"}
+                },
+                "Priority": 115
+            }
+        },
+        "GSServiceRule443n8H2": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServicePreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServicePreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "SdnEnvironmentHost"},
+                            {"Ref": "BluecloudEnvironmentHost"}
+                        ]
+                    },
+                    {
+                        "Field": "query-string",
+                        "QueryStringConfig": {
+                            "Values": [
+                                {
+                                    "Key": "GetSiteInfo",
+                                    "Value": "*"
+                                },
+                                {
+                                    "Key": "GetSiteInfoObject",
+                                    "Value": "*"
+                                },
+                                {
+                                    "Key": "GetSitesByBoxObject",
+                                    "Value": "*"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener443"}
+                },
+                "Priority": 115
+            }
+        },
+        "GSAccessServiceRule80H2": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServiceAccessPreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServiceAccessPreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "SdnEnvironmentHost"},
+                            {"Ref": "BluecloudEnvironmentHost"}
+                        ]
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener80"}
+                },
+                "Priority": 116
+            }
+        },
+        "GSAccessServiceRule443H2": {
+            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+            "DependsOn": ["ALBGSServiceAccessPreprodTargetGroup"],
+            "Properties": {
+                "Actions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {"Ref": "ALBGSServiceAccessPreprodTargetGroup"}
+                    }
+                ],
+                "Conditions": [
+                    {
+                        "Field": "host-header",
+                        "Values": [
+                            {"Ref": "SdnEnvironmentHost"},
+                            {"Ref": "BluecloudEnvironmentHost"}
+                        ]
+                    }
+                ],
+                "ListenerArn": {
+                    "Fn::ImportValue": {"Fn::Sub": "${TestStackName}-GSServiceAppLBListener443"}
+                },
+                "Priority": 116
+            }
+        },
+        "ECSCluster": {
+            "Type": "AWS::ECS::Cluster",
+            "Properties": {
+                "ClusterName": {"Ref": "EcsClusterName"}
+            }
+        },
+        "ECSHarvestCluster": {
+            "Type": "AWS::ECS::Cluster",
+            "Properties": {
+                "ClusterName": {"Ref": "EcsHarvestClusterName"}
+            }
+        },
+        "ECSAccessCluster": {
+            "Type": "AWS::ECS::Cluster",
+            "Properties": {
+                "ClusterName": {"Ref": "EcsAccessClusterName"}
+            }
+        },
+        "Vpc": {
+            "Condition": "CreateSubnet1",
+            "Type": "AWS::EC2::VPC",
+            "Properties": {
+                "CidrBlock": {"Ref": "VpcCidr"},
+                "EnableDnsSupport": "true",
+                "EnableDnsHostnames": "true"
+            }
+        },
+        "PubSubnetAz1": {
+            "Condition": "CreateSubnet1",
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "VpcId": {"Ref": "Vpc"},
+                "CidrBlock": {"Ref": "SubnetCidr1"},
+                "AvailabilityZone": {
+                    "Fn::Select": [
+                        0,
+                        {"Ref": "VpcAvailabilityZones"}
+                    ]
+                }
+            }
+        },
+        "PubSubnetAz2": {
+            "Condition": "CreateSubnet2",
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "VpcId": {"Ref": "Vpc"},
+                "CidrBlock": {"Ref": "SubnetCidr2"},
+                "AvailabilityZone": {
+                    "Fn::Select": [
+                        1,
+                        {"Ref": "VpcAvailabilityZones"}
+                    ]
+                }
+            }
+        },
+        "PubSubnetAz3": {
+            "Condition": "CreateSubnet3",
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "VpcId": {"Ref": "Vpc"},
+                "CidrBlock": {"Ref": "SubnetCidr3"},
+                "AvailabilityZone": {
+                    "Fn::Select": [
+                        2,
+                        {"Ref": "VpcAvailabilityZones"}
+                    ]
+                }
+            }
+        },
+        "InternetGateway": {
+            "Condition": "CreateSubnet1",
+            "Type": "AWS::EC2::InternetGateway"
+        },
+        "AttachGateway": {
+            "Condition": "CreateSubnet1",
+            "Type": "AWS::EC2::VPCGatewayAttachment",
+            "Properties": {
+                "VpcId": {"Ref": "Vpc"},
+                "InternetGatewayId": {"Ref": "InternetGateway"}
+            }
+        },
+        "RouteViaIgw": {
+            "Condition": "CreateSubnet1",
+            "Type": "AWS::EC2::RouteTable",
+            "Properties": {
+                "VpcId": {"Ref": "Vpc"}
+            }
+        },
+        "PublicRouteViaIgw": {
+            "Condition": "CreateSubnet1",
+            "Type": "AWS::EC2::Route",
+            "DependsOn": "AttachGateway",
+            "Properties": {
+                "RouteTableId": {"Ref": "RouteViaIgw"},
+                "DestinationCidrBlock": "0.0.0.0/0",
+                "GatewayId": {"Ref": "InternetGateway"}
+            }
+        },
+        "PubSubnet1RouteTableAssociation": {
+            "Condition": "CreateSubnet1",
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties": {
+                "SubnetId": {"Ref": "PubSubnetAz1"},
+                "RouteTableId": {"Ref": "RouteViaIgw"}
+            }
+        },
+        "PubSubnet2RouteTableAssociation": {
+            "Condition": "CreateSubnet2",
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties": {
+                "SubnetId": {"Ref": "PubSubnetAz2"},
+                "RouteTableId": {"Ref": "RouteViaIgw"}
+            }
+        },
+        "PubSubnet3RouteTableAssociation": {
+            "Condition": "CreateSubnet3",
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties": {
+                "SubnetId": {"Ref": "PubSubnetAz3"},
+                "RouteTableId": {"Ref": "RouteViaIgw"}
+            }
+        },
+        "EcsSecurityGroup": {
+            "Condition": "CreateNewSecurityGroup",
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "ECS Allowed Ports",
+                "VpcId": {
+                    "Fn::If": [
+                        "CreateSubnet1",
+                        {"Ref": "Vpc"},
+                        {"Ref": "VpcId"}
+                    ]
+                },
+                "SecurityGroupIngress": {
+                    "IpProtocol": "tcp",
+                    "FromPort": {"Ref": "SecurityIngressFromPort"},
+                    "ToPort": {"Ref": "SecurityIngressToPort"},
+                    "CidrIp": {"Ref": "SecurityIngressCidrIp"}
+                }
+            }
+        },
+        "EcsAccessInstanceLc": {
+            "Type": "AWS::AutoScaling::LaunchConfiguration",
+            "Properties": {
+                "ImageId": {"Ref": "EcsAmiIdAccess"},
+                "InstanceType": {"Ref": "EcsAccessInstanceType"},
+                "AssociatePublicIpAddress": true,
+                "IamInstanceProfile": {"Ref": "IamRoleInstanceProfile"},
+                "KeyName": {
+                    "Fn::If": [
+                        "CreateEC2LCWithKeyPair",
+                        {"Ref": "KeyName"},
+                        {"Ref": "AWS::NoValue"}
+                    ]
+                },
+                "SecurityGroups": [
+                    {
+                        "Fn::If": [
+                            "CreateNewSecurityGroup",
+                            {"Ref": "EcsSecurityGroup"},
+                            {"Ref": "SecurityGroupId"}
+                        ]
+                    }
+                ],
+                "BlockDeviceMappings": {
+                    "Fn::If": [
+                        "CreateEbsVolume",
+                        [
+                            {
+                                "DeviceName": {"Ref": "DeviceName"},
+                                "Ebs": {
+                                    "VolumeSize": {"Ref": "EbsVolumeSize"},
+                                    "VolumeType": {"Ref": "EbsVolumeType"}
+                                }
+                            }
+                        ],
+                        {"Ref": "AWS::NoValue"}
+                    ]
+                },
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                            "\n",
+                            [
+                                "#!/bin/bash",
+                                {"Fn::Sub": "echo ECS_CLUSTER=${EcsAccessClusterName} >> /etc/ecs/ecs.config"},
+                                "\necho \"*/1 * * * * docker rm \\$(docker ps -aq --filter status=exited)\" >> mycron\n",
+                                "\ncrontab mycron\n",
+                                "\nrm mycron\n"
+                            ]
+                        ]
+                    }
+                }
+            }
+        },
+        "EcsAccessInstanceAsg": {
+            "Type": "AWS::AutoScaling::AutoScalingGroup",
+            "Properties": {
+                "VPCZoneIdentifier": {
+                    "Fn::If": [
+                        "CreateSubnet1",
+                        {
+                            "Fn::If": [
+                                "CreateSubnet2",
+                                {
+                                    "Fn::If": [
+                                        "CreateSubnet3",
+                                        [
+                                            {"Fn::Sub": "${PubSubnetAz1}, ${PubSubnetAz2}, ${PubSubnetAz3}"}
+                                        ],
+                                        [
+                                            {"Fn::Sub": "${PubSubnetAz1}, ${PubSubnetAz2}"}
+                                        ]
+                                    ]
+                                },
+                                [
+                                    {"Fn::Sub": "${PubSubnetAz1}"}
+                                ]
+                            ]
+                        },
+                        {"Ref": "SubnetIds"}
+                    ]
+                },
+                "LaunchConfigurationName": {"Ref": "EcsAccessInstanceLc"},
+                "MinSize": {"Ref": "AsgAccessMinSize"},
+                "MaxSize": {"Ref": "AsgAccessMaxSize"},
+                "DesiredCapacity": {"Ref": "AsgAccessSize"},
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {"Fn::Sub": "ECS Instance - ${AWS::StackName} - Access"},
+                        "PropagateAtLaunch": "true"
+                    },
+                    {
+                        "Key": "Description",
+                        "Value": "This instance is the part of the Auto Scaling group which was created through ECS Console",
+                        "PropagateAtLaunch": "true"
+                    }
+                ]
+            }
+        },
+        "EcsHarvestInstanceLc": {
+            "Type": "AWS::AutoScaling::LaunchConfiguration",
+            "Properties": {
+                "ImageId": {"Ref": "EcsAmiIdHarvest"},
+                "InstanceType": {"Ref": "EcsHarvestInstanceType"},
+                "AssociatePublicIpAddress": true,
+                "IamInstanceProfile": {"Ref": "IamRoleInstanceProfile"},
+                "KeyName": {
+                    "Fn::If": [
+                        "CreateEC2LCWithKeyPair",
+                        {"Ref": "KeyName"},
+                        {"Ref": "AWS::NoValue"}
+                    ]
+                },
+                "SecurityGroups": [
+                    {
+                        "Fn::If": [
+                            "CreateNewSecurityGroup",
+                            {"Ref": "EcsSecurityGroup"},
+                            {"Ref": "SecurityGroupId"}
+                        ]
+                    }
+                ],
+                "BlockDeviceMappings": {
+                    "Fn::If": [
+                        "CreateEbsVolume",
+                        [
+                            {
+                                "DeviceName": {"Ref": "DeviceName"},
+                                "Ebs": {
+                                    "VolumeSize": {"Ref": "EbsVolumeSize"},
+                                    "VolumeType": {"Ref": "EbsVolumeType"}
+                                }
+                            }
+                        ],
+                        {"Ref": "AWS::NoValue"}
+                    ]
+                },
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                            "\n",
+                            [
+                                "#!/bin/bash",
+                                {"Fn::Sub": "echo ECS_CLUSTER=${EcsHarvestClusterName} >> /etc/ecs/ecs.config"},
+                                "\necho \"*/1 * * * * docker rm \\$(docker ps -aq --filter status=exited)\" >> mycron\n",
+                                "\ncrontab mycron\n",
+                                "\nrm mycron\n"
+                            ]
+                        ]
+                    }
+                }
+            }
+        },
+        "EcsHarvestInstanceAsg": {
+            "Type": "AWS::AutoScaling::AutoScalingGroup",
+            "Properties": {
+                "VPCZoneIdentifier": {
+                    "Fn::If": [
+                        "CreateSubnet1",
+                        {
+                            "Fn::If": [
+                                "CreateSubnet2",
+                                {
+                                    "Fn::If": [
+                                        "CreateSubnet3",
+                                        [
+                                            {"Fn::Sub": "${PubSubnetAz1}, ${PubSubnetAz2}, ${PubSubnetAz3}"}
+                                        ],
+                                        [
+                                            {"Fn::Sub": "${PubSubnetAz1}, ${PubSubnetAz2}"}
+                                        ]
+                                    ]
+                                },
+                                [
+                                    {"Fn::Sub": "${PubSubnetAz1}"}
+                                ]
+                            ]
+                        },
+                        {"Ref": "SubnetIds"}
+                    ]
+                },
+                "LaunchConfigurationName": {"Ref": "EcsHarvestInstanceLc"},
+                "MinSize": {"Ref": "AsgHarvestMinSize"},
+                "MaxSize": {"Ref": "AsgHarvestMaxSize"},
+                "DesiredCapacity": {"Ref": "AsgHarvestSize"},
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {"Fn::Sub": "ECS Instance - ${AWS::StackName} - Harvest"},
+                        "PropagateAtLaunch": "true"
+                    },
+                    {
+                        "Key": "Description",
+                        "Value": "This instance is the part of the Auto Scaling group which was created through ECS Console",
+                        "PropagateAtLaunch": "true"
+                    }
+                ]
+            }
+        },
+        "EcsInstanceLc": {
+            "Type": "AWS::AutoScaling::LaunchConfiguration",
+            "Properties": {
+                "ImageId": {"Ref": "EcsAmiIdDiscovery"},
+                "InstanceType": {"Ref": "EcsInstanceType"},
+                "AssociatePublicIpAddress": true,
+                "IamInstanceProfile": {"Ref": "IamRoleInstanceProfile"},
+                "KeyName": {
+                    "Fn::If": [
+                        "CreateEC2LCWithKeyPair",
+                        {"Ref": "KeyName"},
+                        {"Ref": "AWS::NoValue"}
+                    ]
+                },
+                "SecurityGroups": [
+                    {
+                        "Fn::If": [
+                            "CreateNewSecurityGroup",
+                            {"Ref": "EcsSecurityGroup"},
+                            {"Ref": "SecurityGroupId"}
+                        ]
+                    }
+                ],
+                "BlockDeviceMappings": {
+                    "Fn::If": [
+                        "CreateEbsVolume",
+                        [
+                            {
+                                "DeviceName": {"Ref": "DeviceName"},
+                                "Ebs": {
+                                    "VolumeSize": {"Ref": "EbsVolumeSize"},
+                                    "VolumeType": {"Ref": "EbsVolumeType"}
+                                }
+                            }
+                        ],
+                        {"Ref": "AWS::NoValue"}
+                    ]
+                },
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                            "\n",
+                            [
+                                "#!/bin/bash",
+                                {"Fn::Sub": "echo ECS_CLUSTER=${EcsClusterName} >> /etc/ecs/ecs.config"}
+                            ]
+                        ]
+                    }
+                }
+            }
+        },
+        "EcsInstanceAsg": {
+            "Type": "AWS::AutoScaling::AutoScalingGroup",
+            "Properties": {
+                "VPCZoneIdentifier": {
+                    "Fn::If": [
+                        "CreateSubnet1",
+                        {
+                            "Fn::If": [
+                                "CreateSubnet2",
+                                {
+                                    "Fn::If": [
+                                        "CreateSubnet3",
+                                        [
+                                            {"Fn::Sub": "${PubSubnetAz1}, ${PubSubnetAz2}, ${PubSubnetAz3}"}
+                                        ],
+                                        [
+                                            {"Fn::Sub": "${PubSubnetAz1}, ${PubSubnetAz2}"}
+                                        ]
+                                    ]
+                                },
+                                [
+                                    {"Fn::Sub": "${PubSubnetAz1}"}
+                                ]
+                            ]
+                        },
+                        {"Ref": "SubnetIds"}
+                    ]
+                },
+                "LaunchConfigurationName": {"Ref": "EcsInstanceLc"},
+                "MinSize": {"Ref": "AsgFrontendMinSize"},
+                "MaxSize": {"Ref": "AsgFrontendMaxSize"},
+                "DesiredCapacity": {"Ref": "AsgFrontendSize"},
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {"Fn::Sub": "ECS Instance - ${AWS::StackName}"},
+                        "PropagateAtLaunch": "true"
+                    },
+                    {
+                        "Key": "Description",
+                        "Value": "This instance is the part of the Auto Scaling group which was created through ECS Console",
+                        "PropagateAtLaunch": "true"
+                    }
+                ]
+            }
+        },
+        "GSPreprodServiceScalableTarget": {
+            "Type": "AWS::ApplicationAutoScaling::ScalableTarget",
+            "DependsOn": ["GSPreprodService"],
+            "Properties": {
+                "MaxCapacity": 1,
+                "MinCapacity": 1,
+                "ResourceId": {
+                    "Fn::Join": [
+                        "/",
+                        [
+                            "service",
+                            {"Ref": "EcsClusterName"},
+                            "GSPreprodService"
+                        ]
+                    ]
+                },
+                "RoleARN": "arn:aws:iam::672812193635:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService",
+                "ScalableDimension": "ecs:service:DesiredCount",
+                "ServiceNamespace": "ecs"
+            }
+        },
+        "SimpleIncreaseGSServiceTasksPolicy": {
+            "Type": "AWS::ApplicationAutoScaling::ScalingPolicy",
+            "Properties": {
+                "PolicyName": "SimpleIncreaseGSServiceTasksPolicyName",
+                "PolicyType": "StepScaling",
+                "ScalingTargetId": {"Ref": "GSPreprodServiceScalableTarget"},
+                "StepScalingPolicyConfiguration": {
+                    "MinAdjustmentMagnitude": 1,
+                    "StepAdjustments": [
+                        {
+                            "MetricIntervalLowerBound": 0.0,
+                            "ScalingAdjustment": 50
+                        }
+                    ],
+                    "MetricAggregationType": "Average",
+                    "Cooldown": 300,
+                    "AdjustmentType": "PercentChangeInCapacity"
+                }
+            }
+        },
+        "SimpleDecreaseGSServiceTasksPolicy": {
+            "Type": "AWS::ApplicationAutoScaling::ScalingPolicy",
+            "Properties": {
+                "PolicyName": "SimpleDecreaseGSServiceTasksPolicyName",
+                "PolicyType": "StepScaling",
+                "ScalingTargetId": {"Ref": "GSPreprodServiceScalableTarget"},
+                "StepScalingPolicyConfiguration": {
+                    "StepAdjustments": [
+                        {
+                            "MetricIntervalLowerBound": 0.0,
+                            "ScalingAdjustment": -1
+                        }
+                    ],
+                    "MetricAggregationType": "Average",
+                    "Cooldown": 300,
+                    "AdjustmentType": "ChangeInCapacity"
+                }
+            }
+        },
+        "RequestsPerTaskLowAlarm": {
+            "Type": "AWS::CloudWatch::Alarm",
+            "Properties": {
+                "ActionsEnabled": true,
+                "Dimensions": [
+                    {
+                        "Value": {
+                            "Fn::Select": [
+                                "5",
+                                {
+                                    "Fn::Split": [
+                                        ":",
+                                        {"Ref": "ALBGSServicePreprodTargetGroup"}
+                                    ]
+                                }
+                            ]
+                        },
+                        "Name": "TargetGroup"
+                    }
+                ],
+                "EvaluationPeriods": 6,
+                "Period": 60,
+                "ComparisonOperator": "LessThanOrEqualToThreshold",
+                "Threshold": 5.0,
+                "Statistic": "Sum",
+                "Namespace": "AWS/ApplicationELB",
+                "MetricName": "RequestCountPerTarget",
+                "AlarmActions": [
+                    {"Ref": "SimpleDecreaseGSServiceTasksPolicy"}
+                ]
+            }
+        },
+        "RequestsPerTaskHighAlarm": {
+            "Type": "AWS::CloudWatch::Alarm",
+            "Properties": {
+                "ActionsEnabled": true,
+                "Dimensions": [
+                    {
+                        "Value": {
+                            "Fn::Select": [
+                                "5",
+                                {
+                                    "Fn::Split": [
+                                        ":",
+                                        {"Ref": "ALBGSServicePreprodTargetGroup"}
+                                    ]
+                                }
+                            ]
+                        },
+                        "Name": "TargetGroup"
+                    }
+                ],
+                "EvaluationPeriods": 1,
+                "Period": 60,
+                "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+                "Threshold": 10.0,
+                "Statistic": "Sum",
+                "Namespace": "AWS/ApplicationELB",
+                "MetricName": "RequestCountPerTarget",
+                "AlarmActions": [
+                    {"Ref": "SimpleIncreaseGSServiceTasksPolicy"}
+                ]
+            }
+        }
+    },
+    "Outputs": {
+        "ClusterName": {
+            "Description": "Created ECS Cluster Name",
+            "Value": {"Ref": "EcsClusterName"}
+        },
+        "EcsInstanceAsgName": {
+            "Description": "Auto Scaling Group Name for ECS Instances",
+            "Value": {"Ref": "EcsInstanceAsg"}
+        },
+        "UsedByECSCreateCluster": {
+            "Description": "Flag used by EC2 Container Service Create Cluster Wizard",
+            "Value": "true"
+        }
+    }
+}

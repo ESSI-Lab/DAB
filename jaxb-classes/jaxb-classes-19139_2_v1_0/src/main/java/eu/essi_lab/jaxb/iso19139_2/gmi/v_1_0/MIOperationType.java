@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -62,6 +62,37 @@ import net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType;
 import net.opengis.iso19139.gmd.v_20060504.MDIdentifierPropertyType;
 import net.opengis.iso19139.gmd.v_20060504.MDProgressCodePropertyType;
 
+
+/**
+ * Description: Designations for the operation used to acquire the dataset - shortName: MssnId
+ * 
+ * <p>Java class for MI_Operation_Type complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="MI_Operation_Type"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{http://www.isotc211.org/2005/gco}AbstractObject_Type"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="description" type="{http://www.isotc211.org/2005/gco}CharacterString_PropertyType" minOccurs="0"/&gt;
+ *         &lt;element name="citation" type="{http://www.isotc211.org/2005/gmd}CI_Citation_PropertyType" minOccurs="0"/&gt;
+ *         &lt;element name="identifier" type="{http://www.isotc211.org/2005/gmd}MD_Identifier_PropertyType" minOccurs="0"/&gt;
+ *         &lt;element name="status" type="{http://www.isotc211.org/2005/gmd}MD_ProgressCode_PropertyType"/&gt;
+ *         &lt;element name="type" type="{http://www.isotc211.org/2005/gmi}MI_OperationTypeCode_PropertyType" minOccurs="0"/&gt;
+ *         &lt;element name="objective" type="{http://www.isotc211.org/2005/gmi}MI_Objective_PropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="plan" type="{http://www.isotc211.org/2005/gmi}MI_Plan_PropertyType" minOccurs="0"/&gt;
+ *         &lt;element name="childOperation" type="{http://www.isotc211.org/2005/gmi}MI_Operation_PropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="significantEvent" type="{http://www.isotc211.org/2005/gmi}MI_Event_PropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="platform" type="{http://www.isotc211.org/2005/gmi}MI_Platform_PropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "MI_Operation_Type", propOrder = {
     "description",

@@ -1,10 +1,13 @@
+/**
+ * 
+ */
 package eu.essi_lab.api.database.marklogic.search.module;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,9 +30,9 @@ import eu.essi_lab.api.database.marklogic.search.MarkLogicSearchBuilder;
 import eu.essi_lab.api.database.marklogic.search.MarkLogicSpatialQueryBuilder;
 import eu.essi_lab.api.database.marklogic.search.def.DefaultMarkLogicSearchBuilder;
 import eu.essi_lab.indexes.IndexedElements;
+import eu.essi_lab.lib.xml.QualifiedName;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.bond.BondOperator;
-import eu.essi_lab.model.QualifiedName;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.index.IndexedElement;
 import eu.essi_lab.model.resource.MetadataElement;
@@ -59,7 +62,7 @@ public class ModuleMarkLogicSearchBuilder extends DefaultMarkLogicSearchBuilder 
 		IndexedElements.TEMP_EXTENT_BEGIN_NOW.asQualifiedName() : //
 		IndexedElements.TEMP_EXTENT_END_NOW.asQualifiedName();
 
-	return MarkLogicModuleManager.getInstance().getTempExtentNowQuery(now.getLocalName());
+	return MarkLogicModuleManager.getInstance().getTempExtentNowQuery(now.getLocalPart());
     }
 
     public MarkLogicSpatialQueryBuilder createSpatialQueryBuilder(MarkLogicSearchBuilder builder) {

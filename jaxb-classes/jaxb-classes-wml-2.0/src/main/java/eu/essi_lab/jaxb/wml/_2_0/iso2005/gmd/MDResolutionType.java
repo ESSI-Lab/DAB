@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.wml._2_0.iso2005.gmd;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -34,6 +34,27 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
 import eu.essi_lab.jaxb.wml._2_0.iso2005.gco.DistancePropertyType;
 
+
+/**
+ * <p>Java class for MD_Resolution_Type complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="MD_Resolution_Type"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;choice&gt;
+ *         &lt;element name="equivalentScale" type="{http://www.isotc211.org/2005/gmd}MD_RepresentativeFraction_PropertyType"/&gt;
+ *         &lt;element name="distance" type="{http://www.isotc211.org/2005/gco}Distance_PropertyType"/&gt;
+ *       &lt;/choice&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "MD_Resolution_Type", propOrder = {
     "equivalentScale",

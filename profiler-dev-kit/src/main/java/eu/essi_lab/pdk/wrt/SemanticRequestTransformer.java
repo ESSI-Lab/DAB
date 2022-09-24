@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.wrt;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,7 +24,6 @@ package eu.essi_lab.pdk.wrt;
 import java.util.List;
 import java.util.Optional;
 
-import eu.essi_lab.configuration.ConfigurationUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.sem.SemanticBrowsing;
@@ -37,6 +36,10 @@ import eu.essi_lab.model.ontology.GSKnowledgeScheme;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
+
+/**
+ * @author Fabrizio
+ */
 public abstract class SemanticRequestTransformer extends WebRequestTransformer<SemanticMessage> {
 
     /**
@@ -126,10 +129,6 @@ public abstract class SemanticRequestTransformer extends WebRequestTransformer<S
 
 	try {
 	    ElasticsearchInfoPublisher publisher = new ElasticsearchInfoPublisher(//
-		    ConfigurationUtils.getGIStatsEndpoint(), //
-		    ConfigurationUtils.getGIStatsDbname(), //
-		    ConfigurationUtils.getGIStatsUser(), //
-		    ConfigurationUtils.getGIStatsPassword(), //
 		    message.getRequestId(), //
 		    message.getWebRequest().getRequestContext());
 	    //

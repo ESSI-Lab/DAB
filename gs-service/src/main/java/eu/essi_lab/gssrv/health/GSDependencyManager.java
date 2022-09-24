@@ -29,31 +29,34 @@ import com.indeed.status.core.SimplePingableDependency;
 
 import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.configuration.GIProjectExecutionMode;
-import eu.essi_lab.gssrv.health.components.IGSHealthCheckPingableComponent;
+
+/**
+ * @author Fabrizio
+ */
 public class GSDependencyManager extends AbstractDependencyManager {
 
-    private static GSDependencyManager instance;
+    private static final GSDependencyManager INSTANCE = new GSDependencyManager();
 
     /**
      * 
      */
     private GSDependencyManager() {
 
-	super("ESSI Lab GSService");
+	super("ESSI Lab GS-Service");
 
-	ExecutionMode mode = new GIProjectExecutionMode().getMode();
+	ExecutionMode mode = GIProjectExecutionMode.getMode();
 
-	Iterator<IGSHealthCheckPingableComponent> iterator = ServiceLoader.load(IGSHealthCheckPingableComponent.class).iterator();
+	Iterator<GSPingMethod> methods = ServiceLoader.load(GSPingMethod.class).iterator();
 
-	iterator.forEachRemaining(igsComponentPingable -> {
+	methods.forEachRemaining(method -> {
 
-	    if (igsComponentPingable.applicableTo(mode)) {
+	    if (method.applicableTo(mode)) {
 
 		SimplePingableDependency d1 = SimplePingableDependency.newBuilder()//
-			.setId(igsComponentPingable.getId())//
-			.setDescription(igsComponentPingable.getDescription())//
-			.setPingMethod(igsComponentPingable)//
-			.setUrgency(igsComponentPingable.getUrgency())//
+			.setId(method.getId())//
+			.setDescription(method.getDescription())//
+			.setPingMethod(method)//
+			.setUrgency(method.getUrgency())//
 			.build();
 
 		addDependency(d1);
@@ -66,11 +69,6 @@ public class GSDependencyManager extends AbstractDependencyManager {
      */
     public static GSDependencyManager getInstance() {
 
-	if (instance == null) {
-	    
-	    instance = new GSDependencyManager();
-	}
-
-	return instance;
+	return INSTANCE;
     }
 }

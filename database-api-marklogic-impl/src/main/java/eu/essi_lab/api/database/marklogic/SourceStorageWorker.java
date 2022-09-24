@@ -4,7 +4,7 @@ package eu.essi_lab.api.database.marklogic;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,6 +35,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -49,30 +50,34 @@ import com.google.common.io.ByteStreams;
 import com.marklogic.xcc.exceptions.RequestException;
 
 import eu.essi_lab.access.compliance.wrapper.ReportsMetadataHandler;
-import eu.essi_lab.api.database.HarvestingStrategy;
-import eu.essi_lab.api.database.SourceStorage;
 import eu.essi_lab.api.database.internal.Folder;
+import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.indexes.marklogic.MarkLogicScalarType;
 import eu.essi_lab.iso.datamodel.classes.MIMetadata;
-import eu.essi_lab.jaxb.common.NameSpace;
 import eu.essi_lab.jaxb.common.schemas.BooleanValidationHandler;
 import eu.essi_lab.jaxb.common.schemas.CommonSchemas;
 import eu.essi_lab.jaxb.common.schemas.SchemaValidator;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.utils.IterationLogger;
+import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.HarvestingProperties;
+import eu.essi_lab.messages.JobStatus.JobPhase;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.configuration.option.GSConfOption;
+import eu.essi_lab.model.HarvestingStrategy;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.AugmentedMetadataElement;
 import eu.essi_lab.model.resource.ExtensionHandler;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.PropertiesAdapter.AdaptPolicy;
+
+/**
+ * @author Fabrizio
+ */
 public class SourceStorageWorker {
 
     public static final String META_PREFIX = "-meta";
@@ -90,15 +95,12 @@ public class SourceStorageWorker {
     private static final String SOURCE_STORAGE_DECTECT_WRITING_FOLDER_HARVESTING_END_ERROR = "SOURCE_STORAGE_DECTECT_WRITING_FOLDER_HARVESTING_END_ERROR";
     private static final String ERRORS_REPORT_FILE_NAME = "errorsReport";
     private static final String WARN_REPORT_FILE_NAME = "warnReport";
-    public static double MINIMUM_PERCENT = 90;
-    
-    private static Boolean ENABLE_SMART_HARVESTING = null;
-    
-    
-    public static void enableSmartHarvestingFinalizationFeature(boolean enable) {
-	ENABLE_SMART_HARVESTING = enable;
-    }
-    
+
+    /**
+     * 
+     */
+    private double SMART_STORAGE_PERCENTAGE_TRESHOLD = 60;
+
     private MarkLogicReader reader;
     private List<String> report;
 
@@ -142,10 +144,11 @@ public class SourceStorageWorker {
     }
 
     /**
+     * @param status
      * @return
      * @throws GSException
      */
-    public Folder getWritingFolder() throws GSException {
+    public Folder getWritingFolder(Optional<SchedulerJobStatus> status) throws GSException {
 
 	try {
 
@@ -158,7 +161,7 @@ public class SourceStorageWorker {
 
 	} catch (Exception ex) {
 
-	    error(ex);
+	    error(ex, status);
 
 	    throw GSException.createException(//
 		    getClass(), //
@@ -197,9 +200,10 @@ public class SourceStorageWorker {
     /**
      * @param strategy
      * @param recovery
+     * @param status
      * @throws Exception
      */
-    void harvestingStarted(HarvestingStrategy strategy, boolean recovery) throws Exception {
+    void harvestingStarted(HarvestingStrategy strategy, boolean recovery, Optional<SchedulerJobStatus> status) throws Exception {
 
 	report = new LinkedList<String>();
 
@@ -209,13 +213,13 @@ public class SourceStorageWorker {
 
 	if (recovery) {
 
-	    removeInterruptedHarvestingRecords();
+	    removeInterruptedHarvestingRecords(status);
 	}
 
 	switch (strategy) {
 	case FULL:
 
-	    debug("Selecting writing folder for FULL harvest with recovery flag {}", recovery);
+	    debug("Selecting writing folder for FULL harvest with recovery flag " + recovery, recovery, status);
 
 	    // ----------------------
 	    //
@@ -223,7 +227,7 @@ public class SourceStorageWorker {
 	    //
 	    if (!markLogicDB.existsFolder(getMetaFolderName())) {
 
-		debug("First harvesting detected");
+		debug("First harvesting detected", status);
 
 		// adds the meta folder
 		addMetaFolder();
@@ -249,21 +253,21 @@ public class SourceStorageWorker {
 		//
 		if (existsData1Folder() && existsData2Folder()) {
 
-		    debug("Found data-1 and data-2 folders");
+		    debug("Found data-1 and data-2 folders", status);
 
 		    if (getData1Folder().exists(WRITING_FOLDER)) {
 			// the last writing folder was the data-1, so it is overridden
-			debug("Data-1 folder has WRITING_FOLDER tag");
+			debug("Data-1 folder has WRITING_FOLDER tag", status);
 			writingFolder = getData1Folder();
 		    } else {
 			// the last writing folder was the data-2, so it is overridden
-			debug("Data-2 folder has WRITING_FOLDER tag");
+			debug("Data-2 folder has WRITING_FOLDER tag", status);
 			writingFolder = getData2Folder();
 		    }
 
 		    if (!recovery) {
 			// clears the writing folder
-			debug("Cleaning {}", writingFolder.getURI());
+			debug("Cleaning " + writingFolder.getURI(), writingFolder.getURI(), status);
 			writingFolder.clear();
 		    }
 		}
@@ -274,27 +278,27 @@ public class SourceStorageWorker {
 		//
 		else if (existsData1Folder()) {
 
-		    debug("Only data-1 exists");
+		    debug("Only data-1 exists", status);
 
 		    // in case of recovery continues from the last writing folder
 		    if (recovery) {
 
-			debug("Selecting data-1 because recovery flag is true");
+			debug("Selecting data-1 because recovery flag is true", status);
 
 			writingFolder = getData1Folder();
 
 		    } else {
 
-			debug("Creating data-2");
+			debug("Creating data-2", status);
 
 			// adds the data 2 folder
 			addData2Folder();
 
 			// the writing folder is the data 2 folder
-			debug("Selecting data-2");
+			debug("Selecting data-2", status);
 			writingFolder = getData2Folder();
 
-			debug("Removing WRITING_FOLDER tag from data-1");
+			debug("Removing WRITING_FOLDER tag from data-1", status);
 			getData1Folder().remove(WRITING_FOLDER);
 		    }
 
@@ -303,26 +307,26 @@ public class SourceStorageWorker {
 		    // the current folder is the data 2 folder (*1)
 		    //
 		} else {
-		    debug("Only data-2 exists");
+		    debug("Only data-2 exists", status);
 
 		    // in case of recovery continues from the last writing folder
 		    if (recovery) {
 
-			debug("Selecting data-2 because recovery flag is true");
+			debug("Selecting data-2 because recovery flag is true", status);
 
 			writingFolder = getData2Folder();
 
 		    } else {
 
-			debug("Creating data-1");
+			debug("Creating data-1", status);
 			// adds the data 1 folder
 			addData1Folder();
 
 			// the writing folder is the data 1 folder
-			debug("Selecting data-1");
+			debug("Selecting data-1", status);
 			writingFolder = getData1Folder();
 
-			debug("Removing WRITING_FOLDER tag from data-2");
+			debug("Removing WRITING_FOLDER tag from data-2", status);
 			getData2Folder().remove(WRITING_FOLDER);
 		    }
 		}
@@ -332,11 +336,11 @@ public class SourceStorageWorker {
 
 	case SELECTIVE:
 
-	    debug("Selecting writing folder for SELECTIVE harvest with recovery flag {}", recovery);
+	    debug("Selecting writing folder for SELECTIVE harvest with recovery flag " + recovery, recovery, status);
 
 	    if (!markLogicDB.existsFolder(getMetaFolderName())) {
 
-		debug("First harvesting detected");
+		debug("First harvesting detected", status);
 
 		// adds the meta folder
 		addMetaFolder();
@@ -361,14 +365,14 @@ public class SourceStorageWorker {
 	    //
 	    else if (existsData1Folder()) {
 
-		debug("Only data-1 exists");
+		debug("Only data-1 exists", status);
 
 		// (*3) normal case
 		writingFolder = getData1Folder();
 
 	    } else {
 
-		debug("Data-1 does not exists");
+		debug("Data-1 does not exists", status);
 
 		// (*4) after a time stamp reset
 		writingFolder = getData2Folder();
@@ -379,7 +383,7 @@ public class SourceStorageWorker {
 
 	if (writingFolder == null) {
 
-	    error("Unable to detect writing folder at harvesting START");
+	    error("Unable to detect writing folder at harvesting START", status);
 
 	    throw GSException.createException(//
 		    getClass(), //
@@ -391,69 +395,71 @@ public class SourceStorageWorker {
 	}
 
 	debug("Selected writing folder " + writingFolder.getURI() + " for " + strategy.name() + " harvesting with recovery flag "
-		+ recovery);
+		+ recovery, status);
 
 	// -------------------------------------------------------------------------
 	//
 	// this marker can be used to find the folder to preserve in case
 	// the end method is not called for some reason
 	//
-	debug("Storing WRITING_FOLDER tag to folder {} STARTED", writingFolder.getURI());
+	debug("Storing WRITING_FOLDER tag to folder " + writingFolder.getURI() + " STARTED", writingFolder.getURI(), status);
 
 	writingFolder.storeBinary(WRITING_FOLDER, new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8)));
 
-	debug("Storing WRITING_FOLDER tag to folder {} ENDED", writingFolder.getURI());
+	debug("Storing WRITING_FOLDER tag to folder " + writingFolder.getURI() + " ENDED", writingFolder.getURI(), status);
 
 	if (!recovery && getMetaFolder().exists(ERRORS_REPORT_FILE_NAME)) {
 
-	    debug("Removing errors report file STARTED");
+	    debug("Removing errors report file STARTED", status);
 
 	    getMetaFolder().remove(ERRORS_REPORT_FILE_NAME);
 
-	    debug("Removing errors report file ENDED");
+	    debug("Removing errors report file ENDED", status);
 	}
 
 	if (!recovery && getMetaFolder().exists(WARN_REPORT_FILE_NAME)) {
 
-	    debug("Removing warning report file STARTED");
+	    debug("Removing warning report file STARTED", status);
 
 	    getMetaFolder().remove(WARN_REPORT_FILE_NAME);
 
-	    debug("Removing warning report file ENDED");
+	    debug("Removing warning report file ENDED", status);
 	}
     }
 
     /**
      * @param strategy
      * @param storage
+     * @param status
      * @throws Exception
      */
-    void harvestingEnded(MarkLogicSourceStorage storage, HarvestingStrategy strategy) throws Exception {
+    void harvestingEnded(MarkLogicSourceStorage storage, HarvestingStrategy strategy, Optional<SchedulerJobStatus> status)
+	    throws Exception {
 
 	// -----------------------------------------------------
 	//
 	// validation is enabled with a configured property
 	//
-	GSConfOption<?> isoOption = storage.getSupportedOptions().get(SourceStorage.TEST_ISO_COMPLIANCE_KEY);
+	Boolean isoOption = storage.getSetting().isISOComplianceTestSet(this.sourceId);
 
-	if (isoOption != null && isoOption.getValue().equals(Boolean.TRUE)) {
+	if (isoOption) {
 
-	    debug("ISO compliance test STARTED");
-	    testISOCompliance();
-	    debug("ISO compliance test ENDED");
+	    debug("ISO compliance test STARTED", status);
+	    testISOCompliance(status);
+	    debug("ISO compliance test ENDED", status);
 	}
 
 	// -----------------------------------------------------
 	//
 	// recovering is enabled with a configured property
 	//
-	GSConfOption<?> tagsOption = storage.getSupportedOptions().get(SourceStorage.RECOVER_TAGS_KEY);
+	Boolean tagsOption = storage.getSetting().isRecoverResourceTagsSet(this.sourceId);
 
-	if (tagsOption != null && tagsOption.getValue().equals(Boolean.TRUE)) {
+	if (tagsOption) {
 
-	    debug("Recovering tags STARTED");
-	    recoverTags();
-	    debug("Recovering tags ENDED");
+	    debug("Recovering tags STARTED", status);
+	    recoverTags(status);
+	    debug("Recovering tags ENDED", status);
 	}
 
 	Folder writingFolder = null;
@@ -461,34 +467,28 @@ public class SourceStorageWorker {
 	switch (strategy) {
 	case FULL:
 
-	    GSConfOption<?> deletedOption = storage.getSupportedOptions().get(SourceStorage.MARK_DELETED_RECORDS_KEY);
+	    Boolean deletedOption = storage.getSetting().isMarkDeletedOption(this.sourceId);
 
 	    // -----------------------------------------------------
 	    //
 	    // tagging is enabled with a configured property
 	    //
-	    if (deletedOption != null && deletedOption.getValue().equals(Boolean.TRUE)) {
+	    if (deletedOption) {
 
-		debug("Tagging deleted records STARTED");
-		markDeletedRecords();
-		debug("Tagging deleted records ENDED");
+		debug("Tagging deleted records STARTED", status);
+		markDeletedRecords(status);
+		debug("Tagging deleted records ENDED", status);
 	    }
 
-	    GSConfOption<?> forceOverwriteOption = storage.getSupportedOptions().get(SourceStorage.FORCE_OVERWRITE_TAGS_KEY);
+	    Boolean smartStorageDisabled = storage.getSetting().isSmartStorageDisabledSet(this.sourceId);
 
-	    boolean smartHarvestingFeature = true;
-	    if (forceOverwriteOption != null && forceOverwriteOption.getValue().equals(Boolean.TRUE)) {
-		smartHarvestingFeature = false;
-	    }
-	    if (ENABLE_SMART_HARVESTING!=null) { // this is only used by the tests. At runtime the option is used
-		smartHarvestingFeature = ENABLE_SMART_HARVESTING;
-	    }
+	    if (!smartStorageDisabled) {
 
-	    if (smartHarvestingFeature) {
-
-		writingFolder = smartHarvestingFinalization(isWritingData1Folder());
+		writingFolder = smartStorageFinalization(isWritingData1Folder(), status);
 
 	    } else {
+
+		debug("Classic storage finalization STARTED", status);
 
 		if (isWritingData1Folder()) {
 
@@ -510,6 +510,8 @@ public class SourceStorageWorker {
 			removeData1Folder();
 		    }
 		}
+
+		debug("Classic storage finalization ENDED", status);
 	    }
 
 	    break;
@@ -522,11 +524,11 @@ public class SourceStorageWorker {
 	}
 
 	// updates the harvesting properties at last
-	updateHarvestingProperties(storage.getDatabase(), writingFolder);
+	updateHarvestingProperties(storage.getDatabase(), writingFolder, status);
 
 	if (writingFolder == null) {
 
-	    error("Unable to detect writing folder at harvesting END");
+	    error("Unable to detect writing folder at harvesting END", status);
 
 	    throw GSException.createException(//
 		    getClass(), //
@@ -538,6 +540,11 @@ public class SourceStorageWorker {
 	}
     }
 
+    /**
+     * @param suiteId
+     * @param folderName
+     * @return
+     */
     static String retrieveSourceName(String suiteId, String folderName) {
 
 	if (folderName.endsWith(SourceStorageWorker.META_PREFIX)) {
@@ -551,6 +558,10 @@ public class SourceStorageWorker {
 	return null;
     }
 
+    /**
+     * @param properties
+     * @throws Exception
+     */
     void storeHarvestingProperties(HarvestingProperties properties) throws Exception {
 
 	Folder sourceFolder = getMetaFolder();
@@ -560,21 +571,37 @@ public class SourceStorageWorker {
 	sourceFolder.storeBinary(HarvestingProperties.getFileName(), properties.asStream());
     }
 
+    /**
+     * @return
+     * @throws RequestException
+     */
     Folder getData2Folder() throws RequestException {
 
 	return markLogicDB.getFolder(sourceId + DATA_2_PREFIX);
     }
 
+    /**
+     * @return
+     * @throws RequestException
+     */
     Folder getData1Folder() throws RequestException {
 
 	return markLogicDB.getFolder(sourceId + DATA_1_PREFIX);
     }
 
+    /**
+     * @return
+     * @throws RequestException
+     */
     boolean existsData1Folder() throws RequestException {
 
 	return markLogicDB.existsFolder(sourceId + DATA_1_PREFIX);
     }
 
+    /**
+     * @return
+     * @throws RequestException
+     */
     boolean existsData2Folder() throws RequestException {
 
 	return markLogicDB.existsFolder(sourceId + DATA_2_PREFIX);
@@ -596,7 +623,8 @@ public class SourceStorageWorker {
      */
     void updateErrorsAndWarnHarvestingReport(String report, boolean error) throws RequestException, Exception {
 
-	GSLoggerFactory.getLogger(getClass()).debug("Updating of " + (error ? "error" : "warn") + " harvesting report STARTED");
+	// GSLoggerFactory.getLogger(getClass()).debug("Updating of " + (error ? "error" : "warn") + " harvesting report
+	// STARTED");
 
 	byte[] byteArray = null;
 	boolean exists = false;
@@ -634,7 +662,8 @@ public class SourceStorageWorker {
 	    getMetaFolder().storeBinary(fileName, document);
 	}
 
-	GSLoggerFactory.getLogger(getClass()).debug("Updating of " + (error ? "error" : "warn") + " harvesting report ENDED");
+	// GSLoggerFactory.getLogger(getClass()).debug("Updating of " + (error ? "error" : "warn") + " harvesting report
+	// ENDED");
     }
 
     /**
@@ -670,11 +699,12 @@ public class SourceStorageWorker {
     }
 
     /**
-     * @param writingFolder
+     * @param status
+     * @throws Exception
      */
-    private void removeInterruptedHarvestingRecords() throws Exception {
+    private void removeInterruptedHarvestingRecords(Optional<SchedulerJobStatus> status) throws Exception {
 
-	debug("Removig interrupted harvesting records STARTED");
+	debug("Removig interrupted harvesting records STARTED", status);
 
 	DiscoveryMessage message = new DiscoveryMessage();
 	message.setRequestId(getClass().getSimpleName() + "-" + UUID.randomUUID().toString());
@@ -689,7 +719,7 @@ public class SourceStorageWorker {
 
 	    if (Objects.nonNull(recoveryRemovalToken)) {
 
-		debug("Recovery removal token found: " + recoveryRemovalToken);
+		debug("Recovery removal token found: " + recoveryRemovalToken, status);
 
 		message.setNormalizedBond(BondFactory.createRecoveryRemovalTokenBond(recoveryRemovalToken));
 		message.setPermittedBond(BondFactory.createRecoveryRemovalTokenBond(recoveryRemovalToken));
@@ -704,32 +734,34 @@ public class SourceStorageWorker {
 	    }
 
 	    int count = reader.count(message).getCount();
-	    debug("Found " + count + " records to remove");
+	    debug("Found " + count + " records to remove", status);
 
 	    if (count > 0) {
 
-		debug("Records removal STARTED");
+		debug("Records removal STARTED", status);
 
 		markLogicDB.removeResourcesByRemovalResumptionToken(recoveryRemovalToken, count);
 
-		debug("Records removal ENDED");
+		debug("Records removal ENDED", status);
 	    }
 	}
 
-	debug("Removig interrupted harvesting records ENDED");
+	debug("Removig interrupted harvesting records ENDED", status);
     }
 
     /**
      * @param writingData1
+     * @param status
+     * @return
      * @throws Exception
      */
-    private Folder smartHarvestingFinalization(boolean writingData1) throws Exception {
+    private Folder smartStorageFinalization(boolean writingData1, Optional<SchedulerJobStatus> status) throws Exception {
 
-	debug("Full harvesting finalization STARTED");
+	debug("Smart storage finalization STARTED", status);
 
 	String dataX = writingData1 ? "data-1" : "data-2";
 
-	debug(dataX + " writing folder");
+	debug(dataX + " writing folder", status);
 
 	Folder writingFolder = writingData1 ? getData1Folder() : getData2Folder();
 
@@ -737,32 +769,33 @@ public class SourceStorageWorker {
 
 	int writingFolderSize = writingFolder.size() - 1;
 
-	debug("Writing folder size: {}", writingFolderSize);
+	debug("Writing folder size: " + writingFolderSize, writingFolderSize, status);
 
-	double percent = -1;
+	double treshold = -1;
 
 	boolean dataYexists = writingData1 ? existsData2Folder() : existsData1Folder();
 
 	if (dataYexists) {
+	   
 	    int consolidatedFolderSize = writingData1 ? getData2Folder().size() : getData1Folder().size();
-	    percent = ((double) consolidatedFolderSize / 100) * MINIMUM_PERCENT;
+	    treshold = ((double) consolidatedFolderSize / 100) * SMART_STORAGE_PERCENTAGE_TRESHOLD;
 
-	    debug("Consolidated folder size: {}", consolidatedFolderSize);
+	    debug("Consolidated folder size: " + consolidatedFolderSize, consolidatedFolderSize, status);
 	}
 
-	if (writingFolderSize >= percent) {
+	if (writingFolderSize >= treshold) {
 
-	    debug("Writing folder size >= 90% consolidated size");
+	    debug("Writing folder size >= " + SMART_STORAGE_PERCENTAGE_TRESHOLD + "% ("+treshold+") consolidated size", status);
 
 	    if (writingData1) {
 
-		debug("Removing data-1 writing folder tag");
+		debug("Removing data-1 writing folder tag", status);
 
 		getData1Folder().remove(WRITING_FOLDER);
 
 	    } else {
 
-		debug("Removing data-2 writing folder tag");
+		debug("Removing data-2 writing folder tag", status);
 
 		getData2Folder().remove(WRITING_FOLDER);
 	    }
@@ -771,50 +804,52 @@ public class SourceStorageWorker {
 
 		if (writingData1) {
 
-		    debug("Removing data-2 folder STARTED");
+		    debug("Removing data-2 folder STARTED", status);
 
 		    removeData2Folder();
 
-		    debug("Removing data-2 folder ENDED");
+		    debug("Removing data-2 folder ENDED", status);
 
 		} else {
 
-		    debug("Removing data-1 folder STARTED");
+		    debug("Removing data-1 folder STARTED", status);
 
 		    removeData1Folder();
 
-		    debug("Removing data-1 folder ENDED");
+		    debug("Removing data-1 folder ENDED", status);
 		}
 	    }
 	} else {
 
-	    warn("Writing folder size <= 90% consolidated size, consolidated folder survives");
+	    error("Writing folder size " + writingFolderSize + " <= " + SMART_STORAGE_PERCENTAGE_TRESHOLD
+		    + "% consolidated size, consolidated folder survives", status);
 
-	    updateErrorsAndWarnHarvestingReport("Writing folder size <= 90% consolidated size, consolidated folder survives", false);
+	    updateErrorsAndWarnHarvestingReport("Writing folder size " + writingFolderSize + " <= " + SMART_STORAGE_PERCENTAGE_TRESHOLD
+		    + "% consolidated size, consolidated folder survives", false);
 
 	    if (writingData1) {
 
-		debug("Removing data-1 folder STARTED");
+		debug("Removing data-1 folder STARTED", status);
 
 		removeData1Folder();
 
 		survivedFolder = getData2Folder();
 
-		debug("Removing data-1 folder ENDED");
+		debug("Removing data-1 folder ENDED", status);
 
 	    } else {
 
-		debug("Removing data-2 folder STARTED");
+		debug("Removing data-2 folder STARTED", status);
 
 		removeData2Folder();
 
 		survivedFolder = getData1Folder();
 
-		debug("Removing data-2 folder ENDED");
+		debug("Removing data-2 folder ENDED", status);
 	    }
 	}
 
-	debug("Full harvesting finalization ENDED");
+	debug("Smart storage finalization ENDED", status);
 
 	return survivedFolder;
     }
@@ -834,9 +869,11 @@ public class SourceStorageWorker {
     /**
      * @param markLogicDB
      * @param writingFolder
+     * @param status
      * @throws Exception
      */
-    private void updateHarvestingProperties(MarkLogicDatabase markLogicDB, Folder writingFolder) throws Exception {
+    private void updateHarvestingProperties(MarkLogicDatabase markLogicDB, Folder writingFolder, Optional<SchedulerJobStatus> status)
+	    throws Exception {
 
 	Folder sourceFolder = getMetaFolder();
 	HarvestingProperties properties = new HarvestingProperties();
@@ -856,25 +893,27 @@ public class SourceStorageWorker {
 
 	properties.setHarvestingCount(harvCount);
 
-	int size = -1;
+	final int[] size = new int[] { -1 };
 
 	if (writingFolder == null) {
 
-	    warn("Unable to detect harvesting folder, setting negative count");
+	    warn("Unable to detect harvesting folder, setting negative count", status);
 
 	    updateErrorsAndWarnHarvestingReport("Unable to detect harvesting folder, setting negative count", false);
 
 	} else {
 
-	    size = writingFolder.size();
+	    size[0] = writingFolder.size();
+
+	    status.ifPresent(s -> s.setSize(size[0]));
 	}
 
-	properties.setResourcesCount(size);
+	properties.setResourcesCount(size[0]);
 
 	if (startTimeStamp != null) {
 	    properties.setStartHarvestingTimestamp(startTimeStamp);
 	} else {
-	    warn("Start time stamp field is lost");
+	    warn("Start time stamp field is lost", status);
 	}
 
 	properties.setEndHarvestingTimestamp();
@@ -889,27 +928,22 @@ public class SourceStorageWorker {
 	String sourceId = sourceFolder.getSimpleName().replace(META_PREFIX, "");
 	String indexName = createDataFolderIndexName(sourceId);
 
-	debug("Handling data folder index file STARTED");
+	debug("Handling data folder index file STARTED", status);
 
 	if (!idxManager.rangeIndexExists(//
 		indexName, //
 		MarkLogicScalarType.STRING)) {
 
-	    debug("Adding data folder range index STARTED");
+	    debug("Adding data folder range index STARTED", status);
 
 	    idxManager.addRangeIndex(indexName, //
 		    MarkLogicScalarType.STRING.getType());
 
-	    debug("Adding data folder range index ENDED");
+	    debug("Adding data folder range index ENDED", status);
 	}
 
-	Folder[] folders = markLogicDB.getFolders();
-	for (Folder folder : folders) {
-	    debug("Available folder [" + folder.getCompleteName() + "]");
-	}
-
-	debug("Suite  id [" + markLogicDB.getSuiteIdentifier() + "]");
-	debug("Source id [" + sourceId + "]");
+	debug("Suite  id [" + markLogicDB.getSuiteIdentifier() + "]", status);
+	debug("Source id [" + sourceId + "]", status);
 
 	Folder dataFolder = Arrays.asList(markLogicDB.getFolders()).//
 		stream().//
@@ -923,43 +957,46 @@ public class SourceStorageWorker {
 
 	String dataFolderPostFix = dataFolder.getCompleteName().endsWith(DATA_1_PREFIX) ? DATA_1_PREFIX : DATA_2_PREFIX;
 
-	debug("Data folder postfix [" + dataFolderPostFix + "]");
+	debug("Data folder postfix [" + dataFolderPostFix + "]", status);
 
 	DataFolderIndexDocument doc = new DataFolderIndexDocument(//
 		indexName, //
 		dataFolderPostFix);
 
-	debug("Index name [" + indexName + "]");
+	debug("Index name [" + indexName + "]", status);
 
 	if (sourceFolder.exists(indexName)) {
 
-	    debug("Replacing index STARTED");
+	    debug("Replacing index STARTED", status);
 
 	    boolean replaced = sourceFolder.replace(indexName, doc.getDocument());
 
-	    debug("Replacing index " + (replaced ? "SUCCEEDED" : "FAILED"));
+	    debug("Replacing index " + (replaced ? "SUCCEEDED" : "FAILED"), status);
 
-	    debug("Replacing index ENDED");
+	    debug("Replacing index ENDED", status);
 
 	} else {
 
-	    debug("Storing index STARTED");
+	    debug("Storing index STARTED", status);
 
 	    boolean stored = sourceFolder.store(indexName, doc.getDocument());
 
-	    debug("Storing index " + (stored ? "SUCCEEDED" : "FAILED"));
+	    debug("Storing index " + (stored ? "SUCCEEDED" : "FAILED"), status);
 
-	    debug("Storing index ENDED");
+	    debug("Storing index ENDED", status);
 
 	}
 
-	debug("Handling data folder index file ENDED");
+	debug("Handling data folder index file ENDED", status);
     }
 
     /**
      * @param message
+     * @param status
      */
-    private void debug(String message) {
+    private void debug(String message, Optional<SchedulerJobStatus> status) {
+
+	status.ifPresent(s -> s.addInfoMessage(message));
 
 	GSLoggerFactory.getLogger(getClass()).debug(message);
 	report.add(message);
@@ -968,8 +1005,11 @@ public class SourceStorageWorker {
     /**
      * @param message
      * @param target
+     * @param status
      */
-    private void debug(String message, Object target) {
+    private void debug(String message, Object target, Optional<SchedulerJobStatus> status) {
+
+	status.ifPresent(s -> s.addInfoMessage(message));
 
 	GSLoggerFactory.getLogger(getClass()).debug(message, target);
 	String reportMessage = message.replace("{}", String.valueOf(target));
@@ -978,18 +1018,25 @@ public class SourceStorageWorker {
 
     /**
      * @param message
+     * @param status
      */
-    private void error(String message) {
+    private void error(String message, Optional<SchedulerJobStatus> status) {
+
+	status.ifPresent(s -> s.addErrorMessage(message));
+	status.ifPresent(s -> s.setPhase(JobPhase.ERROR));
 
 	GSLoggerFactory.getLogger(getClass()).error(message);
 	report.add(message);
     }
 
     /**
-     * @param message
      * @param ex
+     * @param status
      */
-    private void error(Exception ex) {
+    private void error(Exception ex, Optional<SchedulerJobStatus> status) {
+
+	status.ifPresent(s -> s.addErrorMessage(ex.getMessage()));
+	status.ifPresent(s -> s.setPhase(JobPhase.ERROR));
 
 	GSLoggerFactory.getLogger(getClass()).error(ex.getMessage(), ex);
 	report.add(ex.getMessage());
@@ -997,13 +1044,20 @@ public class SourceStorageWorker {
 
     /**
      * @param message
+     * @param status
      */
-    private void warn(String message) {
+    private void warn(String message, Optional<SchedulerJobStatus> status) {
+
+	status.ifPresent(s -> s.addWarningMessage(message));
 
 	GSLoggerFactory.getLogger(getClass()).warn(message);
 	report.add(message);
     }
 
+    /**
+     * @return
+     * @throws Exception
+     */
     private boolean isWritingData1Folder() throws Exception {
 
 	if (existsData1Folder()) {
@@ -1014,6 +1068,10 @@ public class SourceStorageWorker {
 	return false;
     }
 
+    /**
+     * @return
+     * @throws Exception
+     */
     private boolean isWritingData2Folder() throws Exception {
 
 	if (existsData2Folder()) {
@@ -1024,11 +1082,16 @@ public class SourceStorageWorker {
 	return false;
     }
 
-    private void markDeletedRecords() throws RequestException, Exception {
+    /**
+     * @param status
+     * @throws RequestException
+     * @throws Exception
+     */
+    private void markDeletedRecords(Optional<SchedulerJobStatus> status) throws RequestException, Exception {
 
 	if (existsData1Folder() && existsData2Folder()) {
 
-	    Folder newFolder = getWritingFolder();
+	    Folder newFolder = getWritingFolder(status);
 	    Folder oldFolder = null;
 
 	    if (isWritingData1Folder()) {
@@ -1046,7 +1109,7 @@ public class SourceStorageWorker {
 	    // but no longer in the new one)
 	    oldIds.removeAll(newIds);
 
-	    debug("Found " + oldIds.size() + " deleted records");
+	    debug("Found " + oldIds.size() + " deleted records", status);
 
 	    GSSource gsSource = new GSSource();
 	    gsSource.setUniqueIdentifier(oldFolder.getSimpleName());
@@ -1069,9 +1132,13 @@ public class SourceStorageWorker {
 	}
     }
 
-    private void testISOCompliance() throws Exception {
+    /**
+     * @param status
+     * @throws Exception
+     */
+    private void testISOCompliance(Optional<SchedulerJobStatus> status) throws Exception {
 
-	Folder newFolder = getWritingFolder();
+	Folder newFolder = getWritingFolder(status);
 
 	// 1) get the original ids of the old folder and the original ids from the new folder
 	List<String> newIds = markLogicDB.getOriginalIDs(newFolder.getCompleteName(), false);
@@ -1092,7 +1159,7 @@ public class SourceStorageWorker {
 	    newIds.removeAll(oldIds);
 	}
 
-	debug("Found " + newIds.size() + " new records");
+	debug("Found " + newIds.size() + " new records", status);
 
 	GSSource gsSource = new GSSource();
 	gsSource.setUniqueIdentifier(newFolder.getSimpleName());
@@ -1120,8 +1187,8 @@ public class SourceStorageWorker {
 
 	    } catch (JAXBException e) {
 
-		error("Error occurred during validation: " + e.getMessage());
-		error(e);
+		error("Error occurred during validation: " + e.getMessage(), status);
+		error(e, status);
 	    }
 
 	    // 5) replaces the resource in the new folder
@@ -1138,11 +1205,11 @@ public class SourceStorageWorker {
     // original id lacked the tags possibly present in the previous copy of the resource)
     //
     //
-    private void recoverTags() throws Exception {
+    private void recoverTags(Optional<SchedulerJobStatus> status) throws Exception {
 
 	if (existsData1Folder() && existsData2Folder()) {
 
-	    Folder newFolder = getWritingFolder();
+	    Folder newFolder = getWritingFolder(status);
 	    Folder oldFolder = null;
 
 	    if (isWritingData1Folder()) {
@@ -1159,7 +1226,7 @@ public class SourceStorageWorker {
 
 	    if (!intersection.isEmpty()) {
 
-		debug("Found " + intersection.size() + " common records to check");
+		debug("Found " + intersection.size() + " common records to check", status);
 
 		GSSource gsSource = new GSSource();
 		gsSource.setUniqueIdentifier(oldFolder.getSimpleName());
@@ -1172,7 +1239,7 @@ public class SourceStorageWorker {
 		    // get the two resources with same original id (the old one and the new one)
 		    List<GSResource> resources = reader.getResources(id, gsSource, true);
 
-		    debug("Found {} resources with same identifier", resources.size());
+		    debug("Found " + resources.size() + " resources with same identifier", resources.size(), status);
 
 		    // sorts the two resources according to their time stamp
 		    List<GSResource> sortedResources = resources.//
@@ -1200,6 +1267,10 @@ public class SourceStorageWorker {
 	}
     }
 
+    /**
+     * @param oldResource
+     * @param newResource
+     */
     private void recoverAugmentedElements(GSResource oldResource, GSResource newResource) {
 
 	List<AugmentedMetadataElement> oldElements = oldResource.getHarmonizedMetadata().getAugmentedMetadataElements();
@@ -1222,6 +1293,10 @@ public class SourceStorageWorker {
 	}
     }
 
+    /**
+     * @param oldResource
+     * @param newResource
+     */
     private void recoverExtendedElements(GSResource oldResource, GSResource newResource) {
 
 	{
@@ -1245,36 +1320,58 @@ public class SourceStorageWorker {
 	}
     }
 
+    /**
+     * @throws RequestException
+     */
     private void addMetaFolder() throws RequestException {
 
 	markLogicDB.addFolder(sourceId + META_PREFIX);
     }
 
+    /**
+     * @return
+     * @throws RequestException
+     */
     private Folder getMetaFolder() throws RequestException {
 
 	return markLogicDB.getFolder(sourceId + META_PREFIX);
     }
 
+    /**
+     * @return
+     */
     private String getMetaFolderName() {
 
 	return sourceId + META_PREFIX;
     }
 
+    /**
+     * @throws RequestException
+     */
     private void addData2Folder() throws RequestException {
 
 	markLogicDB.addFolder(sourceId + DATA_2_PREFIX);
     }
 
+    /**
+     * @throws RequestException
+     */
     private void addData1Folder() throws RequestException {
 
 	markLogicDB.addFolder(sourceId + DATA_1_PREFIX);
     }
 
+    /**
+     * @throws RequestException
+     */
     private void removeData1Folder() throws RequestException {
 
 	markLogicDB.removeFolder(sourceId + DATA_1_PREFIX);
     }
 
+    /**
+     * @throws RequestException
+     */
     private void removeData2Folder() throws RequestException {
 
 	markLogicDB.removeFolder(sourceId + DATA_2_PREFIX);

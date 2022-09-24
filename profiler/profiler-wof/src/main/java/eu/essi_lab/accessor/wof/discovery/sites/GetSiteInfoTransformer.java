@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof.discovery.sites;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -41,12 +41,24 @@ import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.Queryable;
+import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
+
+/**
+ * HYDRO Server GetSiteInfo/GetSitesInfoObject request transformer
+ *
+ * @author boldrini
+ */
 public class GetSiteInfoTransformer extends DiscoveryRequestTransformer {
+
+    /**
+     * 
+     */
+    private static final String GET_SITE_INFO_TRANSFORMER_ERROR = "GET_SITE_INFO_TRANSFORMER_ERROR";
 
     public GetSiteInfoTransformer() {
 	// empty constructor for service loader
@@ -115,9 +127,13 @@ public class GetSiteInfoTransformer extends DiscoveryRequestTransformer {
 	    return BondFactory.createAndBond(operands);
 
 	} catch (Exception e) {
-	    e.printStackTrace();
-	    GSException ret = new GSException();
-	    throw ret;
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    ErrorInfo.ERRORTYPE_CLIENT, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    GET_SITE_INFO_TRANSFORMER_ERROR);
 	}
 
     }

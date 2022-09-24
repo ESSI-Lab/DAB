@@ -4,7 +4,7 @@ package eu.essi_lab.wrapper.marklogic;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
+import java.util.Optional;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -66,11 +67,20 @@ import com.marklogic.xcc.types.XdmNode;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.XMLFactories;
+import eu.essi_lab.model.StorageUri;
+
+/**
+ * @author Fabrizio
+ */
 public class MarkLogicWrapper {
 
-    private static final String ESSI_LAST_UPDATE_ELEMNAME = "essilastupdate";
-    private static final String ESSI_LAST_UPDATE_START = "<" + ESSI_LAST_UPDATE_ELEMNAME + ">";
-    private static final String ESSI_LAST_UPDATE_END = "</" + ESSI_LAST_UPDATE_ELEMNAME + ">";
+    /**
+     * 
+     */
+    public static final String DOC_TIMESTAMP = "timeStamp";
+
+    private static final String DOC_TIMESTAMP_START_ELEMENT = "<" + DOC_TIMESTAMP + ">";
+    private static final String DOC_TIMESTAMP_END_ELEMENT = "</" + DOC_TIMESTAMP + ">";
 
     //
     // 1 minute of timeout
@@ -89,6 +99,59 @@ public class MarkLogicWrapper {
     private URI restURI;
     private GenericDocumentManager genericDocManager;
     private JSONDocumentManager jsonDocumentManager;
+
+    /**
+     * @param xdbc
+     * @return
+     */
+    public static StorageUri fromXDBC(String xdbc) {
+
+	//
+	// xdbc://user:password@hostname:8000,8004/dbName/folder/
+	//
+
+	xdbc = xdbc.replace("xdbc://", "xdbc_");
+
+	// uri --> xdbc://hostname:8000,8004
+	String uri = "xdbc://" + xdbc.substring(xdbc.indexOf("@") + 1, xdbc.indexOf("/"));
+	String user = xdbc.substring(xdbc.indexOf("_") + 1, xdbc.indexOf(":"));
+	String password = xdbc.substring(xdbc.indexOf(":") + 1, xdbc.indexOf("@"));
+
+	xdbc = xdbc.substring(xdbc.indexOf("/") + 1); // dnName/defaultConf/
+	String dbName = xdbc.substring(0, xdbc.indexOf("/"));
+	String folder = xdbc.substring(xdbc.indexOf("/") + 1, xdbc.lastIndexOf("/"));
+
+	StorageUri storageUri = new StorageUri();
+	storageUri.setUri(uri);
+	storageUri.setUser(user);
+	storageUri.setPassword(password);
+	storageUri.setConfigFolder(folder);
+	storageUri.setStorageName(dbName);
+
+	return storageUri;
+    }
+
+    /**
+     * xdbc://user:password@hostname:8000,8004/dbName/folder/
+     * 
+     * @param uri
+     * @throws URISyntaxException
+     * @throws XccConfigException
+     */
+    public MarkLogicWrapper(String xdbc) throws URISyntaxException, XccConfigException {
+
+	this(fromXDBC(xdbc));
+    }
+
+    /**
+     * @param uri
+     * @throws URISyntaxException
+     * @throws XccConfigException
+     */
+    public MarkLogicWrapper(StorageUri uri) throws URISyntaxException, XccConfigException {
+
+	this(uri.getUri(), uri.getUser(), uri.getPassword(), uri.getStorageName());
+    }
 
     /**
      * @param uri
@@ -122,6 +185,8 @@ public class MarkLogicWrapper {
      * @throws XccConfigException
      */
     void init(String uri, String user, String password, String dataBaseName) throws URISyntaxException, XccConfigException {
+
+	GSLoggerFactory.getLogger(getClass()).info("MarkLogicWrapper initialization STARTED");
 
 	this.user = user;
 	this.password = password;
@@ -195,6 +260,8 @@ public class MarkLogicWrapper {
 	binaryDocManager = databaseClient.newBinaryDocumentManager();
 	genericDocManager = databaseClient.newDocumentManager();
 	sparqlQueryManager = databaseClient.newSPARQLQueryManager();
+
+	GSLoggerFactory.getLogger(getClass()).info("MarkLogicWrapper initialization ENDED");
     }
 
     /**
@@ -214,8 +281,7 @@ public class MarkLogicWrapper {
 	    Transaction ret = databaseClient.openTransaction(ISO8601DateTimeUtils.getISO8601DateTime(), DEFAULT_TIMEOUT);
 	    return ret;
 	} catch (Throwable e) {
-	    GSLoggerFactory.getLogger(getClass()).info("Catched exception");
-	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	    throw e;
 	}
     }
@@ -278,20 +344,45 @@ public class MarkLogicWrapper {
 
     /**
      * @param xquery
+     * @param requestID
      * @return
      * @throws RequestException
      */
-    public ResultSequence submit(String xquery) throws RequestException {
+    public ResultSequence submit(String xquery, String requestID) throws RequestException {
 
 	Session session = createNewSession();
 
 	AdhocQuery request = session.newAdhocQuery(xquery);
 
-	ResultSequence result = session.submitRequest(request);
+	ResultSequence result = null;
+	try {
 
-	session.close();
+	    result = session.submitRequest(request);
+
+	} catch (Throwable t) {
+
+	    requestID = requestID == null ? "N/A" : requestID;
+
+	    GSLoggerFactory.getLogger(getClass()).error("MarkLogicWrapper error:\n[" + requestID + "]\n" + xquery);
+
+	    throw t;
+
+	} finally {
+
+	    session.close();
+	}
 
 	return result;
+    }
+
+    /**
+     * @param xquery
+     * @return
+     * @throws RequestException
+     */
+    public ResultSequence submit(String xquery) throws RequestException {
+
+	return submit(xquery, null);
     }
 
     /**
@@ -328,6 +419,40 @@ public class MarkLogicWrapper {
 	    GSLoggerFactory.getLogger(getClass()).error(ex.getMessage(), ex);
 
 	    transaction.rollback();
+
+	    throw ex;
+	}
+    }
+
+    /**
+     * @param uri
+     * @param doc
+     * @return
+     * @throws Exception
+     */
+    public boolean storeNonTransactional(String uri, Document doc) throws Exception {
+
+	XMLDocumentManager docManager = getXMLDocumentManager();
+
+	try {
+
+	    DocumentDescriptor exists = docManager.exists(uri);
+	    boolean out = false;
+
+	    if (exists == null) { // if the doc no not exists
+
+		DOMHandle domHandle = new DOMHandle(doc);
+
+		docManager.write(uri, domHandle);
+
+		out = true;
+	    }
+
+	    return out;
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(ex.getMessage(), ex);
 
 	    throw ex;
 	}
@@ -463,11 +588,11 @@ public class MarkLogicWrapper {
     /**
      * @param uri
      * @param res
-     * @param modificationDate
+     * @param timeStamp
      * @return
      * @throws Exception
      */
-    public boolean storeBinary(String uri, InputStream res, Date modificationDate) throws Exception {
+    public boolean storeBinary(String uri, InputStream res, Date timeStamp) throws Exception {
 
 	Transaction transaction = openTransaction();
 	BinaryDocumentManager docManager = getBinaryDocumentManager();
@@ -488,10 +613,10 @@ public class MarkLogicWrapper {
 
 	    transaction.commit();
 
-	    if (out && modificationDate != null) {
+	    if (out && timeStamp != null) {
 
-		String lastUpdateXQuery = createLastUpdateXQuery(uri, modificationDate);
-		submit(lastUpdateXQuery);
+		String setTimeStampQuery = getSetTimestampQuery(uri, timeStamp);
+		submit(setTimeStampQuery);
 	    }
 
 	    return out;
@@ -660,16 +785,14 @@ public class MarkLogicWrapper {
 
     /**
      * @param uri
-     * @param essiLastUpdate
+     * @param timeStamp
      * @return
      */
-    private String createLastUpdateXQuery(String uri, Date essiLastUpdate) {
+    private String getSetTimestampQuery(String uri, Date timeStamp) {
 
-	String isoDate = ISO8601DateTimeUtils.getISO8601DateTime(essiLastUpdate);
-
-	StringBuilder builder = new StringBuilder(ESSI_LAST_UPDATE_START);
-	builder.append(isoDate);
-	builder.append(ESSI_LAST_UPDATE_END);
+	StringBuilder builder = new StringBuilder(DOC_TIMESTAMP_START_ELEMENT);
+	builder.append(timeStamp.getTime());
+	builder.append(DOC_TIMESTAMP_END_ELEMENT);
 
 	return "xdmp:document-set-property('" + uri + "',(" + builder.toString() + "))";
     }
@@ -687,13 +810,13 @@ public class MarkLogicWrapper {
      * @return
      * @throws Exception
      */
-    public Node getBinaryProperties(String nodeURI) throws Exception {
+    public Optional<Node> getBinaryProperties(String nodeURI) throws Exception {
 
 	ResultSequence rs = submit("xdmp:document-properties('" + nodeURI + "')");
 
 	if (rs.isEmpty()) {
-	    GSLoggerFactory.getLogger(getClass()).warn("Result sequence for binary peroperties of {} is empty, returning null", nodeURI);
-	    return null;
+
+	    return Optional.empty();
 	}
 
 	ResultItem rsItem = rs.next();
@@ -701,11 +824,10 @@ public class MarkLogicWrapper {
 	ItemType itemType = rsItem.getItemType();
 
 	XdmItem item = rsItem.getItem();
+
 	if (itemType == ItemType.BINARY) {
 
-	    GSLoggerFactory.getLogger(getClass()).warn("Item type of binary peroperties of {} is binary, returning null", nodeURI);
-
-	    return null;
+	    return Optional.empty();
 	}
 
 	DocumentBuilderFactory factory = XMLFactories.newDocumentBuilderFactory();
@@ -714,8 +836,7 @@ public class MarkLogicWrapper {
 
 	Node node = ((XdmNode) item).asW3cNode(docBuilder);
 
-	return node;
-
+	return Optional.of(node);
     }
 
     /**

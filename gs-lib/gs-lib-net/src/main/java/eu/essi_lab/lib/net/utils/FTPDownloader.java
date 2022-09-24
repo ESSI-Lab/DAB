@@ -4,7 +4,7 @@ package eu.essi_lab.lib.net.utils;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,14 +21,11 @@ package eu.essi_lab.lib.net.utils;
  * #L%
  */
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.Serializable;
 import java.net.SocketException;
 import java.net.URL;
@@ -45,6 +42,10 @@ import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPFileFilter;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+
+/**
+ * @author roncella
+ */
 public class FTPDownloader implements Serializable {
 
     private Integer timeOut = 15000;

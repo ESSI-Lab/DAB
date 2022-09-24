@@ -1,0 +1,82 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>eu.essi_lab</groupId>
+		<artifactId>DAB</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>ml-stress-test</artifactId>
+	<packaging>jar</packaging>
+	<name>ESSI-Lab MarkLogic stress-test suite</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.sun.mail</groupId>
+			<artifactId>javax.mail</artifactId>
+			<version>1.6.0</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>database-api</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>database-api-marklogic-impl</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>database-wrapper-marklogic</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>jar-with-dep</id>
+			<build>
+				<finalName>ml-stress-test</finalName>
+				<plugins>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-jar-plugin</artifactId>
+						<configuration>
+							<archive>
+								<manifest>
+									<mainClass>eu.essi_lab.mlstresstest.MarkLogicStressTest</mainClass>
+								</manifest>
+							</archive>
+						</configuration>
+					</plugin>
+
+					<plugin>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<version>2.4</version>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>assembly</goal>
+								</goals>
+								<configuration>
+									<archiverConfig>
+									</archiverConfig>
+									<descriptors>
+										<descriptor>${basedir}/src/assemble/bundle-descriptor.xml
+										</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>

@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -57,6 +57,34 @@ import org.jvnet.jaxb2_commons.locator.util.LocatorUtils;
 
 import net.opengis.iso19139.gco.v_20060504.AbstractObjectType;
 
+
+/**
+ * Description: Designations for the measuring instruments and their bands, the platform carrying them, and the mission to which the data contributes - FGDC: Platform_and_Instrument_Identification, Mission_Information - shortName: PltfrmInstId
+ * 
+ * <p>Java class for MI_AcquisitionInformation_Type complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="MI_AcquisitionInformation_Type"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{http://www.isotc211.org/2005/gco}AbstractObject_Type"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="acquisitionRequirement" type="{http://www.isotc211.org/2005/gmi}MI_Requirement_PropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="objective" type="{http://www.isotc211.org/2005/gmi}MI_Objective_PropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="instrument" type="{http://www.isotc211.org/2005/gmi}MI_Instrument_PropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="acquisitionPlan" type="{http://www.isotc211.org/2005/gmi}MI_Plan_PropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="operation" type="{http://www.isotc211.org/2005/gmi}MI_Operation_PropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="platform" type="{http://www.isotc211.org/2005/gmi}MI_Platform_PropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="environmentalConditions" type="{http://www.isotc211.org/2005/gmi}MI_EnvironmentalRecord_PropertyType" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "MI_AcquisitionInformation_Type", propOrder = {
     "acquisitionRequirement",

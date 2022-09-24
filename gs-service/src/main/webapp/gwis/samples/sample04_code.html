@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<!--
+..........................................................
+GWIS Javascript API Sample:
+Using Double Y-Axes
+..........................................................
+U.S. Geological Survey, Texas Water Science Center, Austin
+https://txpub.usgs.gov/DSS/GWIS/
+..........................................................
+-->
+<html>
+    <!-- html head -->
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>GWIS JSAPI Sample</title>
+        
+        <!-- GWIS requires jQuery -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        
+        <!-- GWIS JSAPI 0.0 -->
+        <link rel="stylesheet" href="https://txpub.usgs.gov/DSS/GWIS/0.0/jsapi/gwis-plot-utils.css"/>
+        <script src="https://txpub.usgs.gov/DSS/GWIS/0.0/jsapi/gwis-plot-utils.min.js"></script>
+    </head>
+    
+    <!-- html body -->
+    <body style="background:#eee; font-family:arial;">
+        
+        <!-- title -->
+        <h1>Sample: Using Double Y-Axes</h1>
+        
+        <!-- create plot in document div -->
+        <h2>Streamflow and Specific Conductance at a Site:</h2>
+        <div id="plot1" style="width:95%; height:500px;"></div>
+        <script>
+            GWIS.plot({
+                div_id   : "plot1", // plot div
+                iv_or_dv : "iv",    // instantaneous values
+                period   : "p20d",  // past 20 days
+                series : [          // add data lines on 2 y-axes:
+                    { axis:"y1", site:"08048000", pcode:"00060", label:"Streamflow"           }, // y1 axis
+                    { axis:"y2", site:"08048000", pcode:"00095", label:"Specific Conductance" }  // y2 axis
+                ],
+                title    : "West Fork Trinity River at Fort Worth, TX", // plot title
+                ylabel   : "Streamflow, ft<sup>3</sup>/sec",            // y1 axis label
+                y2label  : "Specific Conductance, &mu;S/cm",            // y2 axis label
+                controls : "all"                                        // add all available controls under plot
+            });
+        </script>
+        
+        <!-- create plot in document div -->
+        <h2>Streamflow and Gage Height at Three Different Sites:</h2>
+        <div id="plot2" style="width:95%; height:500px;"></div>
+        <script>
+            GWIS.plot({
+                div_id   : "plot2", // plot div
+                iv_or_dv : "iv",    // instantaneous values
+                period   : "p20d",  // past 20 days
+                series : [          // add data lines on 2 y-axes:
+                    // ...site 1...
+                    { axis:"y1", site:"08032000", pcode:"00060", label:"08032000: Streamflow",  color:"red"   }, // solid line
+                    { axis:"y2", site:"08032000", pcode:"00065", label:"08032000: Gage Height", color:"red",   stroke_pattern:[3,3] }, // dashed line
+                    // ...site 2...
+                    { axis:"y1", site:"08033000", pcode:"00060", label:"08033000: Streamflow",  color:"green" },
+                    { axis:"y2", site:"08033000", pcode:"00065", label:"08033000: Gage Height", color:"green", stroke_pattern:[3,3] },
+                    // ...site 3...
+                    { axis:"y1", site:"08033500", pcode:"00060", label:"08033500: Streamflow",  color:"blue"  },
+                    { axis:"y2", site:"08033500", pcode:"00065", label:"08033500: Gage Height", color:"blue",  stroke_pattern:[3,3] }
+                ],
+                title    : "Neches River, TX",                  // plot title
+                ylabel   : "Streamflow, cubic feet per second", // y1 axis label
+                y2label  : "Gage Height, feet",                 // y2 axis label
+                controls : "all"                                // add all available controls under plot
+            });
+        </script>
+        
+    </body>
+</html>
+<!-- end GWIS JSAPI sample -->

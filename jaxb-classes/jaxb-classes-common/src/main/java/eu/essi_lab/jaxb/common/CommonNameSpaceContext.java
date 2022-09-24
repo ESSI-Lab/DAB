@@ -4,7 +4,7 @@ package eu.essi_lab.jaxb.common;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -34,7 +34,12 @@ import org.xml.sax.SAXException;
 
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
+import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
+
+/**
+ * @author Fabrizio
+ */
 public class CommonNameSpaceContext extends NamespacePrefixMapper implements NamespaceContext {
 
     public static final String XACML_3_0 = "urn:oasis:names:tc:xacml:3.0:core:schema:wd-17";
@@ -98,21 +103,29 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
     public static final String BNDMET_URI = "https://portal.inmet.gov.br/manual/manual-bndmet";
     public static final String APITEMPO_URI = "https://apitempo.inmet.gov.br/plata/";
     public static final String INUMET_URI = "https://api.inumet.gub.uy";
+    public static final String NRFA_URI = "https://nrfaapps.ceh.ac.uk/nrfa/ws";
     public static final String BUFR_URI = "http://essi-lab.eu/BUFR";
     public static final String INPE_URI = "http://www.dgi.inpe.br/CDSR/";
     public static final String SENTINEL2_URI = "urn:sentinel2:shub";
     public static final String NVE_URI = "https://hydapi.nve.no/api/v1";
     public static final String DMH_URI = "https://meteorologia.gov.py";
+
     public static final String IMO_URI = "http://customer.vedur.is";
     public static final String RIHMI_URI = "http://ws.meteo.ru";
+    public static final String RIHMI_HISTORICAL_URI = "http://ws.meteo.ru/hydro/rest/GetHydroAveMonDischargesRF/xml/";
     public static final String BNHS_URI = "http://wmo.int/bnhs";
     public static final String RASAQM_URI = "http://www.feerc.ru/geoss/rasaqm";
 
     protected HashMap<String, String> map;
     private static final String GEORSS = "http://www.georss.org/georss";
-    public static final String DINAGUA_NS_URI = "https://app.mvotma.gub.uy/dinaguaws/dinaguaws?wsdl";
+    public static final String DINAGUA_URI = "https://www.ambiente.gub.uy/axis2/services/Dinaguaws";
     public static final String WOD = "https://data.nodc.noaa.gov/woa/WOD";
-    
+    public static final String THREDDS_NS_URI = "http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0";
+    public static final String INVENIO_NS_URI = "http://essi-lab.eu/invenio";
+
+    public static final String HISCENTRAL_TOSCANA_NS_URI = "http://essi-lab.eu/his-central/toscana";
+    public static final String HISCENTRAL_MARCHE_NS_URI = "http://essi-lab.eu/his-central/marche";
+    public static final String HISCENTRAL_FRIULI_NS_URI = "http://essi-lab.eu/his-central/friuli";
 
     public CommonNameSpaceContext() {
 
@@ -160,8 +173,11 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
 	map.put("wekeo", WEKEO_NS_URI);
 	map.put("icos", ICOS_NS_URI);
 	map.put("eurobis", EUROBIS_NS_URI);
-
-
+	map.put("catalog", THREDDS_NS_URI);
+	map.put("invenio", INVENIO_NS_URI);
+	map.put("hiscentraltoscana", HISCENTRAL_TOSCANA_NS_URI);
+	map.put("hiscentralmarche", HISCENTRAL_MARCHE_NS_URI);
+	map.put("hiscentralfriuli", HISCENTRAL_FRIULI_NS_URI);
     }
 
     /**

@@ -4,7 +4,7 @@ package eu.essi_lab.iso.datamodel.classes;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -57,6 +57,10 @@ public class Dimension extends ISOMetadata<MDDimensionType> {
 	JAXBElement<MDDimensionType> element = ObjectFactories.GMD().createMDDimension(type);
 	return element;
     }
+
+    /**
+     * @XPathDirective(target = ".", parent = "gmd:dimensionName", position = Position.FIRST)
+     */
     public void setDimensionNameTypeCode(String dimensionNameTypeCode) {
 	MDDimensionNameTypeCodePropertyType property = new MDDimensionNameTypeCodePropertyType();
 	CodeListValueType list = createCodeListValueType(MD_DIMENSION_NAME_TYPE_CODE_CODELIST, dimensionNameTypeCode, ISO_19115_CODESPACE,

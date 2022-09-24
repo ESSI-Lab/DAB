@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.wml._2_0.iso2005.gmd;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -39,6 +39,40 @@ import eu.essi_lab.jaxb.wml._2_0.iso2005.gco.AbstractObjectType;
 import eu.essi_lab.jaxb.wml._2_0.iso2005.gco.CharacterStringPropertyType;
 import eu.essi_lab.jaxb.wml._2_0.iso2005.gco.DatePropertyType;
 
+
+/**
+ * Standardized resource reference
+ * 
+ * <p>Java class for CI_Citation_Type complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="CI_Citation_Type"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{http://www.isotc211.org/2005/gco}AbstractObject_Type"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="title" type="{http://www.isotc211.org/2005/gco}CharacterString_PropertyType"/&gt;
+ *         &lt;element name="alternateTitle" type="{http://www.isotc211.org/2005/gco}CharacterString_PropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="date" type="{http://www.isotc211.org/2005/gmd}CI_Date_PropertyType" maxOccurs="unbounded"/&gt;
+ *         &lt;element name="edition" type="{http://www.isotc211.org/2005/gco}CharacterString_PropertyType" minOccurs="0"/&gt;
+ *         &lt;element name="editionDate" type="{http://www.isotc211.org/2005/gco}Date_PropertyType" minOccurs="0"/&gt;
+ *         &lt;element name="identifier" type="{http://www.isotc211.org/2005/gmd}MD_Identifier_PropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="citedResponsibleParty" type="{http://www.isotc211.org/2005/gmd}CI_ResponsibleParty_PropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="presentationForm" type="{http://www.isotc211.org/2005/gmd}CI_PresentationFormCode_PropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="series" type="{http://www.isotc211.org/2005/gmd}CI_Series_PropertyType" minOccurs="0"/&gt;
+ *         &lt;element name="otherCitationDetails" type="{http://www.isotc211.org/2005/gco}CharacterString_PropertyType" minOccurs="0"/&gt;
+ *         &lt;element name="collectiveTitle" type="{http://www.isotc211.org/2005/gco}CharacterString_PropertyType" minOccurs="0"/&gt;
+ *         &lt;element name="ISBN" type="{http://www.isotc211.org/2005/gco}CharacterString_PropertyType" minOccurs="0"/&gt;
+ *         &lt;element name="ISSN" type="{http://www.isotc211.org/2005/gco}CharacterString_PropertyType" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "CI_Citation_Type", propOrder = {
     "title",

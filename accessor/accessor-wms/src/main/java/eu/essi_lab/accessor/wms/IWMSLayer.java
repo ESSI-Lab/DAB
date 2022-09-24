@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wms;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,6 +21,7 @@ package eu.essi_lab.accessor.wms;
  * #L%
  */
 
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -30,7 +31,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
-import java.time.Period;
 
 import javax.xml.datatype.Duration;
 // import javax.xml.datatype.Duration;
@@ -38,7 +38,6 @@ import javax.xml.xpath.XPathExpressionException;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.model.resource.data.CRS;
 import net.opengis.gml.v_3_2_0.EnvelopeType;
 

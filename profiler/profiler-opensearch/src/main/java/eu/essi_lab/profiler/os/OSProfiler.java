@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.os;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,10 +29,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import eu.essi_lab.jaxb.common.NameSpace;
+import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.ErrorInfo;
@@ -40,11 +39,9 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.pdk.Profiler;
-import eu.essi_lab.pdk.ProfilerInfo;
 import eu.essi_lab.pdk.handler.DiscoveryHandler;
 import eu.essi_lab.pdk.handler.selector.GETRequestFilter;
 import eu.essi_lab.pdk.handler.selector.HandlerSelector;
-import eu.essi_lab.pdk.handler.selector.POSTRequestFilter;
 import eu.essi_lab.pdk.rsf.DiscoveryResultSetFormatter;
 import eu.essi_lab.pdk.rsf.DiscoveryResultSetFormatterFactory;
 import eu.essi_lab.pdk.rsf.FormattingEncoding;
@@ -59,9 +56,16 @@ import eu.essi_lab.pdk.rsm.MappingSchema;
 import eu.essi_lab.pdk.rsm.impl.atom.AtomGPResultSetMapper;
 import eu.essi_lab.pdk.rsm.impl.json.jsapi.JS_API_ResultSetMapper;
 import eu.essi_lab.pdk.validation.WebRequestValidator;
+import eu.essi_lab.profiler.os.handler.discover.OSDiscoveryRequestFilter;
 import eu.essi_lab.profiler.os.handler.discover.OSRequestTransformer;
 import eu.essi_lab.profiler.os.handler.discover.OS_XML_ResultSetFormatter;
 import eu.essi_lab.profiler.os.handler.srvinfo.OSDescriptionDocumentHandler;
+import eu.essi_lab.profiler.os.handler.srvinfo.OSGetSourcesFilter;
+import eu.essi_lab.profiler.os.handler.srvinfo.OSGetSourcesHandler;
+
+/**
+ * @author Fabrizio
+ */
 public class OSProfiler extends Profiler {
 
     /**
@@ -72,13 +76,12 @@ public class OSProfiler extends Profiler {
     /**
      * The OpenSearch service info
      */
-    public static final ProfilerInfo OPENSEARCH_SERVICE_INFO = new ProfilerInfo();
+    public static final ProfilerSetting OPENSEARCH_SERVICE_INFO = new ProfilerSetting();
 
     private static final String INVALID_OS_REQUEST = "INVALID_OS_REQUEST";
     private DiscoveryHandler<String> discoveryHandler;
 
-    @JsonIgnore
-    private transient Logger logger = GSLoggerFactory.getLogger(getClass());
+    private Logger logger = GSLoggerFactory.getLogger(getClass());
 
     static {
 	OPENSEARCH_SERVICE_INFO.setServiceName("OpenSearch Service");
@@ -97,33 +100,33 @@ public class OSProfiler extends Profiler {
     public HandlerSelector getSelector(WebRequest request) {
 
 	HandlerSelector selector = new HandlerSelector();
+	
+	//
+	// Discovery
+	//
+
+	selector.register(//
+		new OSDiscoveryRequestFilter(), //
+		discoveryHandler);
+
+	//
+	// Get sources
+	//
+
+	selector.register(//
+		new OSGetSourcesFilter(), //
+		new OSGetSourcesHandler());
+
+	//
+	// Description
+	//
 
 	selector.register(//
 		new GETRequestFilter("opensearch"), //
-		discoveryHandler);
-
-	selector.register(//
-		new GETRequestFilter("opensearch/query"), //
-		discoveryHandler);
-
-	selector.register(//
-		new POSTRequestFilter("opensearch/query"), //
-		discoveryHandler);
-
-	selector.register(//
-		new GETRequestFilter("opensearch/query", true), //
-		discoveryHandler);
-
-	selector.register(//
-		new POSTRequestFilter("opensearch/query", true), //
-		discoveryHandler);
-
-	selector.register(//
-		new GETRequestFilter("opensearch/description"), //
 		new OSDescriptionDocumentHandler());
 
 	selector.register(//
-		new GETRequestFilter("opensearch/description", true), //
+		new GETRequestFilter("opensearch/description"), //
 		new OSDescriptionDocumentHandler());
 
 	return selector;
@@ -237,7 +240,7 @@ public class OSProfiler extends Profiler {
      * @param parser
      * @return
      */
-    private String readOutputFormat(WebRequest request) {
+    public static String readOutputFormat(WebRequest request) {
 
 	OSRequestParser parser = new OSRequestParser(request);
 
@@ -332,7 +335,7 @@ public class OSProfiler extends Profiler {
     }
 
     @Override
-    public ProfilerInfo getProfilerInfo() {
+    protected ProfilerSetting initSetting() {
 
 	return OPENSEARCH_SERVICE_INFO;
     }

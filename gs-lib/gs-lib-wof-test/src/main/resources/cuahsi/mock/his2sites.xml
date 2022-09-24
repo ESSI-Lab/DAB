@@ -1,0 +1,2436 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitesResponse xmlns="http://www.cuahsi.org/waterML/1.1/"
+               xmlns:gml="http://www.opengis.net/gml"
+               xmlns:wtr="http://www.cuahsi.org/waterML/"
+               xmlns:xlink="http://www.w3.org/1999/xlink"
+               xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <queryInfo>
+      <creationTime>2018-01-10T07:59:07.6076404-05:00</creationTime>
+      <criteria MethodCalled="GetSites"/>
+      <note>ALL Sites(empty request)</note>
+   </queryInfo>
+   <site>
+      <siteInfo>
+         <siteName>Trib to East Fork River Main Stemat Round Bottom Rd. </siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="1">143</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.156</latitude>
+               <longitude>-84.287</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Ohio Asphaltic Limestone Corp, Industrial Discharge to Dodson Creek</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="2">1IJ00060</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.24306</latitude>
+               <longitude>-83.6825</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>USEPA Experimental Stream Facility Discharge</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="3">1IN00116601</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.1475</latitude>
+               <longitude>-84.255</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+         <siteProperty name="Site Comments">Unamended river water and sanitary effluent control system water to a manhole prior to the outfall to  a tributary of the East Fork of the Little Miami River.</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>CECOS Site Outfall 001 to East Branch of Pleasant Run Creek</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="4">1IN00123_001</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.12472</latitude>
+               <longitude>-84.04639</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>CECOS Site Outfall 002 to East Branch of Pleasant Run Creek</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="5">1IN00123_002</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.125</latitude>
+               <longitude>-84.04722</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>CECOS Site Outfall 003 to East Branch of Pleasant Run Creek</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="6">1IN00123_003</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.12389</latitude>
+               <longitude>-84.04861</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>CECOS Site Outfall 004 to East Branch of Pleasant Run Creek</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="7">1IN00123_004</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.12333</latitude>
+               <longitude>-84.04972</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>CECOS Site Outfall 005 to East Branch of Pleasant Run Creek</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="8">1IN00123_005</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.12306</latitude>
+               <longitude>-84.05056</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>CECOS Site Outfall 006 to Pleasant Run Creek</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="9">1IN00123_006</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.12417</latitude>
+               <longitude>-84.05111</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>CECOS Site Outfall 007 to Pleasant Run Creek</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="10">1IN00123_007</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.12528</latitude>
+               <longitude>-84.05111</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>CECOS Site Outfall 008 to Pleasant Run Creek</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="11">1IN00123_008</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.12556</latitude>
+               <longitude>-84.05139</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>CECOS Site Outfall 009 to Pleasant Run Creek</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="12">1IN00123_009</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.12611</latitude>
+               <longitude>-84.05167</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>CECOS Site Outfall 010 to Pleasant Run Creek</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="13">1IN00123_010</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.12667</latitude>
+               <longitude>-84.05167</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>CECOS Site Outfall 011 to Pleasant Run Creek</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="14">1IN00123_011</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.12694</latitude>
+               <longitude>-84.05194</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>CECOS Site Outfall 012 to Pleasant Run Creek</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="15">1IN00123_012</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.12722</latitude>
+               <longitude>-84.05167</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>CECOS Site Outfall 013 to Pleasant Run Creek</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="16">1IN00123_013</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.12806</latitude>
+               <longitude>-84.04944</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>CECOS Site Outfall 014 to Pleasant Run Creek</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="17">1IN00123_014</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.12778</latitude>
+               <longitude>-84.04833</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>CECOS Site Outfall 015 to Pleasant Run Creek</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="18">1IN00123_015</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.12917</latitude>
+               <longitude>-84.04917</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>CECOS Site Outfall 016 to Pleasant Run Creek</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="19">1IN00123_016</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.12833</latitude>
+               <longitude>-84.0425</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>CECOS Site Outfall 017 to East Branch of Pleasant Run Creek</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="20">1IN00123_017</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.125</latitude>
+               <longitude>-84.04389</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>CECOS Site Outfall 018 to East Branch of Pleasant Run Creek</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="21">1IN00123_018</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.12528</latitude>
+               <longitude>-84.04389</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>CECOS Site Outfall 019 to Pleasant Run Creek</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="22">1IN00123_019</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.12972</latitude>
+               <longitude>-84.04861</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>BP Amoco Oil Corp Bulk Plant Bethel</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="23">1IN00251001</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>38.99778</latitude>
+               <longitude>-84.04333</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Hanson Aggregates Midwest - Highland Quarry Industrial Discharge Facility</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="24">1IN00287</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.19417</latitude>
+               <longitude>-83.72222</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Arch Materials LLC, Industrial Discharge to Backbone Creek</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="25">1IN00289</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.08278</latitude>
+               <longitude>-84.09417</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Huhtamaki Plastics Inc, Industrial Stormwater Discharge to EFLMR</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="26">1IQ00016</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.32222</latitude>
+               <longitude>-83.68556</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Bob McEwen WTP</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="27">1IV00150</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.05222</latitude>
+               <longitude>-84.1375</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>New Vienna Water Treatment Plant  to EFLMR</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="28">1IY00122</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.32667</latitude>
+               <longitude>-83.68639</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>New Vienna WWTP_Plant effluent to the East Fork of the Little Miami River Final effluent</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="29">1PA00005001</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.32889</latitude>
+               <longitude>-83.70333</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Batavia WWTP_Plant outfall to East Fork of the Little Miami River</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="30">1PB00001001</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.08222</latitude>
+               <longitude>-84.17667</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Batavia WWTP_Upstream monitoring station at water works dam, River Mile 13.7</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="31">1PB00001801</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.07667</latitude>
+               <longitude>-84.18139</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Batavia WWTP_Downstream monitoring station at River Mile 12.6  </siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="32">1PB00001901</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.08681</latitude>
+               <longitude>-84.18111</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Williamsburg WWTP_Final effluent prior to discharge to effluent ditch,  tributary of East Fork Little Miami River</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="33">1PB00034001</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.05667</latitude>
+               <longitude>-84.04639</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Williamsburg WWTP_East Fork Little Miami River upstream from final outfall at  McKeever Road bridg</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="34">1PB00034801</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.0588</latitude>
+               <longitude>-84.05175</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Williamsburg WWTP_East Fork Little Miami River downstream from final outfall a State Route 133 bridge</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="35">1PB00034901</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.05239</latitude>
+               <longitude>-84.05038</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Rolling Acres WWTP_Final effluent discharge to an unnamed tributary of Dodson Creek. Monitoring just after dechlorination.</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="36">1PB00100001</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.22222</latitude>
+               <longitude>-83.68556</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Lynchburg WWTP_Final effluent to the East Fork of the Little Miami River.  Effluent monitoring after disinfection.</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="37">1PB00105001</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.23806</latitude>
+               <longitude>-83.80028</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Lynchburg WWTP_Upstream monitoring in the East Fork of the Little Miami River at the Pearl Street covered bridge</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="38">1PB00105801</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.24306</latitude>
+               <longitude>-83.79528</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Lynchburg WWTP_Downstream monitoring in the East Fork of the Little  Miami River approximately 150 feet downstream of  1PB00105001</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="39">1PB00105901</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.2375</latitude>
+               <longitude>-83.80056</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Milford STP_Plant effluent to East Fork of the Little Miami River </siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="40">1PC00005001</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.16444</latitude>
+               <longitude>-84.28361</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Milford STP_East Fork of the Little Miami River upstream of plant   outfall at I-275 bridge</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="41">1PC00005801</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.16658</latitude>
+               <longitude>-84.26829</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Fayetteville Perry Twp WWTP_Controlled discharge of treated effluent to the East Fork of the Little Miami River  Discharge point</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="42">1PD00024001</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.18361</latitude>
+               <longitude>-83.93917</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Fayetteville Perry Twp WWTP_Upstream of the controlled discharge point near the Bank St. lift station </siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="43">1PD00024801</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.1875</latitude>
+               <longitude>-83.93694</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Fayetteville Perry Twp WWTP_Downstream of the controlled discharge point at the State Route 131 bridge</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="44">1PD00024901</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.16583</latitude>
+               <longitude>-83.94139</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Lower East Fork Regional WWTP_Final effluent prior to discharge to an unnamed tributary of the East Fork of the Little Miami River.</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="45">1PK00009001</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.14667</latitude>
+               <longitude>-84.25583</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Lower East Fork Regional WWTP_East Fork of the Little Miami River upstream of plant outfall at EPA experimental stream facility intake pump station (RM 5.5)</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="46">1PK00009801</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.1454</latitude>
+               <longitude>-84.25209</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Lower East Fork Regional WWTP_East Fork of the Little Miami downstream of plant outfall at  U.S. Route 50 entrance to I-275 (RM 4.00).</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="47">1PK00009901</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.15854</latitude>
+               <longitude>-84.26069</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Middle East Fork Regional WWTP_Final effluent prior to discharge to the East Fork of the Little Miami River</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="48">1PK00010001</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.08861</latitude>
+               <longitude>-84.18722</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Middle East Fork Regional WWTP_Upstream of plant outfall at State Route 32 bridge</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="49">1PK00010801</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.08561</latitude>
+               <longitude>-84.17921</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Middle East Fork Regional WWTP_ 200 feet downstream of plant outfall.</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="50">1PK00010901</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.08873</latitude>
+               <longitude>-84.18828</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>US DOA William H Harsha Lake_Plant outfall to East Fork of the Little Miami River </siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="51">1PN00000002</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.02639</latitude>
+               <longitude>-84.145</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Stonelick State Campgrounds_Controlled discharge lagoon effluent</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="52">1PP00020001</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.22444</latitude>
+               <longitude>-84.05778</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Cincinnati Nature Center_Final effluent to unnamed tributary of Salt Run </siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="53">1PR00116001</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.12778</latitude>
+               <longitude>-84.24722</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Clermont NE Local Schools_Plant outfall to Patterson Run. </siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="54">1PT00077001</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.12806</latitude>
+               <longitude>-84.10722</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Holly Towne MHP _ Final effluent </siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="55">1PV00002001</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.00722</latitude>
+               <longitude>-84.15889</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Orchard Lake MHP_Final effluent </siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="56">1PV00009001</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.19111</latitude>
+               <longitude>-84.24639</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Forest Creek MHP_Plant effluent to Ulrey Run </siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="57">1PV00034001</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>38.99083</latitude>
+               <longitude>-84.17833</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Royal Hills MHP_Plant outfall to unnamed tribuatry of Happy Hollow Creek  </siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="58">1PV00074001</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.18</latitude>
+               <longitude>-84.265</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Locust Ridge Nursing Home Inc_Final Effluent to unnamed tributary of Light Run</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="59">1PX00059001</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>38.9875</latitude>
+               <longitude>-84.0225</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Snow Hill Country Club_Final effluent to unnamed tributary of East Fork Little Miami River  Effluent sampled after dechlorination. </siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="60">1PZ00029001</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.34917</latitude>
+               <longitude>-83.71583</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>EFLMR at CO. RD. Bridge 0.1 Miles off Elk Lick Road, Batavia, O. Quad. (Near EPA ""DAM"" Site)</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="61">2EFR10000</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.02611</latitude>
+               <longitude>-84.14778</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>East Fork River at 276 bridge crossing in Williamsburg, OH.</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="62">2EFR10002</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.05239</latitude>
+               <longitude>-84.05038</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Poplar Creek and St Route125</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="63">2EFR11204</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>38.97379</latitude>
+               <longitude>-84.10576</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Poplar Creek and St Route232</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="64">2EFR11205</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>38.96139</latitude>
+               <longitude>-84.10667</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Located on East Fork Lake at the Log Boom. (Lake Side of ""DAM"" near USACE Flow Control Structure)</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="65">2EFR20001</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.02</latitude>
+               <longitude>-84.15361</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>East Fork Lake, EFLMR Main Inflow Tribuitary, Willamsburg, O. Quad</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="66">2EFR20004</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.02917</latitude>
+               <longitude>-84.08667</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>East Fork Lake near Cabin Run Inflow</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="67">2EFR20005</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.02336</latitude>
+               <longitude>-84.10129</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>East Fork Lake, Near Boat Launch on Elk Lick Rd</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="68">2EFR20024</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.02</latitude>
+               <longitude>-84.13111</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>East Fork Lake near combined confluences of CLC and Poplar in lake</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="69">2EFR21000</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.01527</latitude>
+               <longitude>-84.09836</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>East Fork Lake, Cloverlick Inflow Tribuitary above Poplar Creek</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="70">2EFR21001</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>38.99917</latitude>
+               <longitude>-84.08583</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>East Fork Lake near Slabcamp Run Inflow</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="71">2EFR23001</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.03919</latitude>
+               <longitude>-84.13638</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>E. FK. L. MIAMI R. UPST. LYNCHBURG WWTP</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="72">506</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.2407</latitude>
+               <longitude>-83.7961</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Five Mile Creek at Bluesky; upstream from Bluesky Pkwy</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="73">5MILECR0.5</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.1136</latitude>
+               <longitude>-84.0203</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>TRIB. TO DODSON CREEK (RM 4.52) at U.S. RT. 50</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="74">890</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.2043</latitude>
+               <longitude>-83.7642</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Avey's Run, StreamSiteB, Cincinnati Nature Center</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="75">AVR</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.12321</latitude>
+               <longitude>-84.2463</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Barnes Run at Bethel-Concord; Bethel Concord Rd</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="76">BARNS1.9</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.0082</latitude>
+               <longitude>-84.07326</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Brushy Fork RM 0.3 at Titus Road</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="77">BRUSH0.3</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.143</latitude>
+               <longitude>-84.1447</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Cabin Run; At Campground Loop G</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="78">CABIN1.5</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.0327</latitude>
+               <longitude>-84.1019</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Cemetery Creek, Union Cemetery, Batavia</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="79">CEC</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.07778</latitude>
+               <longitude>-84.16917</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Cloverlick Creek at end of Ninnichuck Rd. off of St Route 133; 2nd largest inflow to East Fork Lake</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="80">CLC</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>38.99054</latitude>
+               <longitude>-84.05957</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Clover Creek RM 1.9 at St. Rt. 133</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="81">CLOV5.1</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>38.9856</latitude>
+               <longitude>-84.0528</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Cornwell Drainage_us Stahl driveway Marathon Edenton</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="82">CWL</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.18391</latitude>
+               <longitude>-84.01335</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>East Fork River at spillway of East Fork Lake Dam, main outflow from East Fork Lake</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="83">DAM</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.02636</latitude>
+               <longitude>-84.14759</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>USACE Flow Control Structure</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="84">DAMCS</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.02198</latitude>
+               <longitude>-84.15298</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Dodson Creek RM 0.1 at mouth; Dodson Creek at Crampton Rd.</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="85">DODSN0.1</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.22285</latitude>
+               <longitude>-83.81267</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Bob McEwen Drinking Water Treatment Plant, Greenbrier Rd., at sink delivered from  intake tower</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="86">DWT</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.0369</latitude>
+               <longitude>-84.13869</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Inside Bob McEwen Drinking Water Treatment Plant, Pumped from inside intake structure on lake</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="87">DWT-0</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.05169</latitude>
+               <longitude>-84.13561</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Drinking Water Post Chlorine Disenfection, before discharge to  distribution system</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="88">DWT-PCD</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.05169</latitude>
+               <longitude>-84.13561</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Effluent of all filters currently operating</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="89">DWT-PFL</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.05169</latitude>
+               <longitude>-84.13561</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Drinking Water Treatment Plant - Post Manganese addition before coagulent is added</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="90">DWT-PMN</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.05169</latitude>
+               <longitude>-84.13561</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>DWT- effluent from settling basin</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="91">DWT-SET</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.05169</latitude>
+               <longitude>-84.13561</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Mesocosm 1 in the Experimental Stream Facility, 1003 US Route 50, Milford, OH 45150</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="92">E01</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.14718</latitude>
+               <longitude>-84.25477</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Mesocosm 2 in the Experimental Stream Facility, 1003 US Route 50, Milford, OH 45150</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="93">E02</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.14718</latitude>
+               <longitude>-84.25477</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Mesocosm 3 in the Experimental Stream Facility, 1003 US Route 50, Milford, OH 45150</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="94">E03</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.14718</latitude>
+               <longitude>-84.25477</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Mesocosm 4 in the Experimental Stream Facility, 1003 US Route 50, Milford, OH 45150</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="95">E04</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.14718</latitude>
+               <longitude>-84.25477</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Mesocosm 5 in the Experimental Stream Facility, 1003 US Route 50, Milford, OH 45150</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="96">E05</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.14718</latitude>
+               <longitude>-84.25477</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Mesocosm 6 in the Experimental Stream Facility, 1003 US Route 50, Milford, OH 45150</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="97">E06</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.14718</latitude>
+               <longitude>-84.25477</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Mesocosm 7 in the Experimental Stream Facility, 1003 US Route 50, Milford, OH 45150</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="98">E07</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.14718</latitude>
+               <longitude>-84.25477</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Mesocosm 8 in the Experimental Stream Facility, 1003 US Route 50, Milford, OH 45150</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="99">E08</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.14718</latitude>
+               <longitude>-84.25477</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>East Fork Lake at Drinking Water Intake</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="100">EDW</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.03667</latitude>
+               <longitude>-84.13814</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>East Fork Lake East of Narrowed Section, Near Campground Beach</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="101">EEN</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.01624</latitude>
+               <longitude>-84.1082</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>East Fork River at Blue Sky Parkway crossing EFLMR RM 44.1 at Blue Sky Park Rd.</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="102">EFB</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.1155</latitude>
+               <longitude>-84.02469</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>East Fork River near confluence with the Little Miami River at South Milford Rd bridge crossing E FK L MIAMI R NEAR TERRACE PARK COUNTRY CLUB at S MILFORD RD</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="103">EFC</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.15514</latitude>
+               <longitude>-84.28891</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>East Fork River at Morgan Rd and Hwy 68</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="104">EFG</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.21682</latitude>
+               <longitude>-83.91485</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>East Fork River at Experimental Stream Facility Intake E. FK. L. MIAMI R. SE OF MILFORD, ADJ W TECHNE CENTER DRIVE</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="105">EFK</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.1454</latitude>
+               <longitude>-84.25209</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>East Fork Lake at Bob McEwen Drinking Water Treatment Plant Intake Tower</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="106">EFL</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.0369</latitude>
+               <longitude>-84.13869</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>East Fork River in Marathon, OH. Access via 286 and Burdsall Rd./Co Hwy 121 E. FK. L. MIAMI R. NEAR MARATHON at ST. RT. 286</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="107">EFM</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.13785</latitude>
+               <longitude>-84.00289</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>EFLMR RM 0.7 at S. Milford Rd. (Same as EPA EFC site)</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="108">EFRM0.7</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.1533</latitude>
+               <longitude>-84.2975</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>East Fork at State Route 222</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="109">EFRM15.6</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.0624</latitude>
+               <longitude>-84.1789</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>EFLMR at main st. autosampler; Williamsburg Main Street Bridge</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="110">EFRM34.8</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.0525</latitude>
+               <longitude>-84.0504</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>EFLMR RM 44.1 at Blue Sky Park Rd.</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="111">EFRM44.1</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.1158</latitude>
+               <longitude>-84.025</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>EFLMR RM 60.6 at US 50 Fayetteville Lift Station</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="112">EFRM60.6</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.1865</latitude>
+               <longitude>-83.9372</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>East Fork at Wise Road; Clinton Co Wise Road Bridge</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="113">EFRM70.1</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.22513</latitude>
+               <longitude>-83.82554</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>East Fork at Canada Rd; Canada Road Bridge</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="114">EFRM75.3</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.2731</latitude>
+               <longitude>-83.78119</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>East Fork atStonelick-Olive Branch; upstream Stonelick-Olive branch bridge E. FK. L. MIAMI R. AT FAYETTEVILLE at U.S. RT. 50</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="115">EFRM9.1</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.11869</latitude>
+               <longitude>-84.20862</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>East Fork River in Fayetteville, OH. Access via lift station parking area off of Bank St. and US Route 50</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="116">EFY</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.18756</latitude>
+               <longitude>-83.93667</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>East Fork River at 276 bridge crossing in Williamsburg, OH.; main inflow to East Fork Lake E. FK. L. MIAMI R. AT WILLIAMSBURG at MAIN ST.</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="117">ELI</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.05239</latitude>
+               <longitude>-84.05038</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>East Fork Lake Middle Part (Between EWN and EDW)</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="118">EMP</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.02639</latitude>
+               <longitude>-84.13488</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>East Fork Lake Overflow (near DAM control Structure)</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="119">EOF</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.02</latitude>
+               <longitude>-84.15361</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>East Fork River Supply Monitoring Station in the Experimental Stream Facility, 1003 US Route 50, Milford, OH 45150</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="120">ERS</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.14718</latitude>
+               <longitude>-84.25477</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Experimental Stream Facility discharge to unnamed tribuitary manhole access in parking lot of 1003 US Route 50, Milford, OH 45150</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="121">ESF</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.14731</latitude>
+               <longitude>-84.25486</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>East Fork Lake Upstream Lacustrine Part of Main River Inflow</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="122">EUS</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.02594</latitude>
+               <longitude>-84.09061</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>East Fork River at SR 32 crossing</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="123">EUW</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.06659</latitude>
+               <longitude>-84.05453</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>East Fork Lake West of Narrowed Section</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="124">EWN</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.03919</latitude>
+               <longitude>-84.13638</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Fourmile Creek at Jackson Rd</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="125">FMC</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.0973</latitude>
+               <longitude>-84.0262</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Fourmile Run at Elk Lick Rd. crossing FOURMILE RUN NEAR BATAVIA at ELK LICK RD.</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="126">FMR</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.05502</latitude>
+               <longitude>-84.16739</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>FIVEMILE CREEK at BLUE SKY PARK RD. (LOWER CROSSING)</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="127">FVC</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.1136</latitude>
+               <longitude>-84.0203</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Five Mile Creek, Headwater Region at stream crossing just north of Rt 68 and Rt 286 Junction</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="128">FVM</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.10728</latitude>
+               <longitude>-83.93254</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Grassy Fork Stream at crossing of Glancy-Marathon Rd. GRASSY FORK S OF MARATHON at GLANCY CORNER-MARATHON RD.</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="129">GRR</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.13287</latitude>
+               <longitude>-84.01529</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Grassy Fork at 131 Brown County; river left tributary, U.S. 131, Brown County (Also identified as ""GRSSY3.2"" in CC sites)</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="130">GRS</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.1741</latitude>
+               <longitude>-83.9982</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Grassy Fork at GC-Marathon Rd autosampler; Glancy Corner-Marathon Road</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="131">GRSSY0.2</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.1329</latitude>
+               <longitude>-84.0153</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Grassy Fork Marathon Edenton; 5764 Marathon-Edenton Road</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="132">GRSSY3.0</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.1663</latitude>
+               <longitude>-84.0092</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Grassy Fork at 131 Brown County; river left tributary, U.S. 131, Brown County (Also identified as ""GRS"" in USEPA sites)</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="133">GRSSY3.2</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.1741</latitude>
+               <longitude>-83.9982</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Grassy Fork Tribuitary</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="134">GRT</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.16864</latitude>
+               <longitude>-84.0083</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Hall  Run at Roundbottom Rd</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="135">HALL0.2</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.1401</latitude>
+               <longitude>-84.2593</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Hall Run HALL RUN NEAR MILFORD at ROUNDBOTTOM RD.</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="136">HLR</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.14039</latitude>
+               <longitude>-84.25899</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Heiserman Stream at intake to the Experimental Stream Facility</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="137">HST</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.14761</latitude>
+               <longitude>-84.25566</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Howard Run Stream at Burdsall Rd. crossing</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="138">HWR</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.12375</latitude>
+               <longitude>-84.00763</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Howard Run at Burdsall; Burdsall Road</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="139">HWRD0.4</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.1239</latitude>
+               <longitude>-84.0073</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Headwater Tribuitary to Kain Run off of St Route 271, East of St Route 32 overpass</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="140">KRT</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.06615</latitude>
+               <longitude>-84.07395</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Lucy Run Confluence LUCY RUN S OF BATAVIA, NEAR MOUTH</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="141">LRC</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.05701</latitude>
+               <longitude>-84.17948</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Light Run Tributary to Cloverlick Creek </siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="142">LRN</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>38.993</latitude>
+               <longitude>-84.059</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>North Lucy Tributary</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="143">NLT</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.04128</latitude>
+               <longitude>-84.21194</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Newtonsville Stream  TRIB. TO STONELICK CREEK (10.61) at CEDARVILLE RD.</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="144">NWT</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.18501</latitude>
+               <longitude>-84.09489</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Owensville Tributary</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="145">OWT</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.12775</latitude>
+               <longitude>-84.13644</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>TRIB. TO E. FK. L. MIAMI R. (78.45) at RAPID FORGE RD.</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="146">P04</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.3133</latitude>
+               <longitude>-83.7614</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Pleasant Run Hutchinson Prop; Hutchinson Road off SR 133</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="147">PLEAS0.2</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.1084</latitude>
+               <longitude>-84.0374</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Poplar Creek at Macedonia; Macedonia Road Bridge</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="148">POPLR2.1</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>38.982</latitude>
+               <longitude>-84.101</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Pleasant Run at Glancy Corner at Marathon Rd. </siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="149">PSR</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.1125</latitude>
+               <longitude>-84.0422</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>E. FK. L. MIAMI R. DST LYNCHBURG at WISE RD.</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="150">S14</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.225</latitude>
+               <longitude>-83.8258</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>E. FK. L. MIAMI R. UPST. LYNCHBURG at CANADA RD.</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="151">S15</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.2733</latitude>
+               <longitude>-83.7814</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>W. FK. E. FK. L. MIAMI R. at ST. RT. 123</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="152">S50</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.2306</latitude>
+               <longitude>-83.9145</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>DODSON CREEK at 134</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="153">S51</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.207</latitude>
+               <longitude>-83.81</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>SALT RUN Upstream of OEPA M99Q10 at Crossing on Barg Salt Run Rd NEAR PERINTOWN at ROUNDBOTTOM RD.</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="154">SAR</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.1353</latitude>
+               <longitude>-84.2523</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>SUGARCAMP RUN NEAR MILFORD at U.S. RT. 50</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="155">SCR</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.1347</latitude>
+               <longitude>-84.2325</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>South Harsha Tributary at Elk Lick Rd crossing in East Fork Lake State Park</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="156">SHA</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.0072</latitude>
+               <longitude>-84.13683</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Shayler Crossing Headwater</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="157">SHC</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.08114</latitude>
+               <longitude>-84.23188</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Shaylor Run SHAYLER RUN SE OF PERINTOWN at BALDWIN RD.</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="158">SHR</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.11834</latitude>
+               <longitude>-84.21632</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Shayler Run at Baldwin Rd</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="159">SHYLR1.7</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.1183</latitude>
+               <longitude>-84.2163</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Slabcamp Run accessed via Greenbriar Rd; trailhead across from NE WTP pond</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="160">SLAB0.5</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.0511</latitude>
+               <longitude>-84.129</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>South Lucy Tributary Headwater</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="161">SLT</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.04119</latitude>
+               <longitude>-84.2129</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Sterling Run, Eastern Branch, Headwater Region at stream crossing on Rt286 between Moon and Dietrick Rds</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="162">SRE</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.10444</latitude>
+               <longitude>-83.88711</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Sterling Run, Western Branch, Headwater Region at intersection of Greenbush East Rd and Rt 68.</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="163">SRW</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.07561</latitude>
+               <longitude>-83.92561</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Sonelick Creek RM 13.4 at 727</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="164">ST13.4</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.2097</latitude>
+               <longitude>-84.0889</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Stonelick Creek at Stonelick Tr; u/s from Stonelick Tr Private Drive</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="165">ST17.3</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.232</latitude>
+               <longitude>-84.044</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Stonelick Creek RM 0.9 at Anstaett Rd.</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="166">ST5.7</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.1429</latitude>
+               <longitude>-84.1492</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Stonelick Creek STONELICK CREEK NEAR BATAVIA at U.S. RT. 50</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="167">STC</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.12203</latitude>
+               <longitude>-84.19855</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Stonelick Creek at US 50</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="168">STEFLMR</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.1222</latitude>
+               <longitude>-84.1991</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Shayler Run Near Olive Branch, Upst St. Rt. 32</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="169">SYR</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.0883</latitude>
+               <longitude>-84.2217</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Twin Bridges Stream crossing in East Fork Lake State Park</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="170">TBS</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.03799</latitude>
+               <longitude>-84.12024</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Upper Hall Run Headwater</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="171">UHL</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.08526</latitude>
+               <longitude>-84.29503</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Ulrey Runat St.Rt. 125; u/s from St.Rt. 125</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="172">ULREY1.3</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.0017</latitude>
+               <longitude>-84.1515</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Upper Salt Run</siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="173">USR</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.11801</latitude>
+               <longitude>-84.25963</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+   </site>
+</sitesResponse>

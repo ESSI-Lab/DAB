@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.ows._1_0_0;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -38,6 +38,31 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 
+
+/**
+ * Human-readable descriptive information for the object it is included within.
+ * This type shall be extended if needed for specific OWS use to include additional metadata for each type of information. This type shall not be restricted for a specific OWS to change the multiplicity (or optionality) of some elements. 
+ * 
+ * <p>Classe Java per DescriptionType complex type.
+ * 
+ * <p>Il seguente frammento di schema specifica il contenuto previsto contenuto in questa classe.
+ * 
+ * <pre>
+ * &lt;complexType name="DescriptionType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element ref="{http://www.opengis.net/ows}Title" minOccurs="0"/&gt;
+ *         &lt;element ref="{http://www.opengis.net/ows}Abstract" minOccurs="0"/&gt;
+ *         &lt;element ref="{http://www.opengis.net/ows}Keywords" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "DescriptionType", propOrder = {
     "title",

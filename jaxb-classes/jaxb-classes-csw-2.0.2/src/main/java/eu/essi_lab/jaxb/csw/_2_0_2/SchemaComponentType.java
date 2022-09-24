@@ -11,7 +11,7 @@ package eu.essi_lab.jaxb.csw._2_0_2;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -41,6 +41,32 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
 import org.w3c.dom.Element;
+
+/**
+ * A schema component includes a schema fragment (type
+ * definition) or an entire schema from some target namespace;
+ * the schema language is identified by URI. If the component
+ * is a schema fragment its parent MUST be referenced (parentSchema).
+ * <p>
+ * Classe Java per SchemaComponentType complex type.
+ * <p>
+ * Il seguente frammento di schema specifica il contenuto previsto contenuto in questa classe.
+ * 
+ * <pre>
+ * &lt;complexType name="SchemaComponentType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;any processContents='lax'/&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attribute name="targetNamespace" use="required" type="{http://www.w3.org/2001/XMLSchema}anyURI" /&gt;
+ *       &lt;attribute name="parentSchema" type="{http://www.w3.org/2001/XMLSchema}anyURI" /&gt;
+ *       &lt;attribute name="schemaLanguage" use="required" type="{http://www.w3.org/2001/XMLSchema}anyURI" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SchemaComponentType", propOrder = { "content" })
 @XmlRootElement(name = "SchemaComponent")

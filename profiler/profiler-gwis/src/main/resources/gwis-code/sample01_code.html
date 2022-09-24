@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<!--
+..........................................................
+GWIS Javascript API Sample:
+Basic Usage
+..........................................................
+U.S. Geological Survey, Texas Water Science Center, Austin
+https://txpub.usgs.gov/DSS/GWIS/
+..........................................................
+-->
+<html>
+    <!-- html head -->
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>GWIS JSAPI Sample</title>
+        
+        <!-- GWIS requires jQuery -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        
+        <!-- GWIS JSAPI 0.0 -->
+        <link rel="stylesheet" href="https://txpub.usgs.gov/DSS/GWIS/0.0/jsapi/gwis-plot-utils.css"/>
+        <script src="https://txpub.usgs.gov/DSS/GWIS/0.0/jsapi/gwis-plot-utils.min.js"></script>
+    </head>
+    
+    <!-- html body -->
+    <body style="background:#eee; font-family:arial;">
+        
+        <!-- title -->
+        <h1>Sample: Basic Usage</h1>
+        
+        <!-- create plot in document div -->
+        <h2>A Plot Created in the Document:</h2>
+        <div id="plot1" style="width:95%; height:500px;"></div>
+        <script>
+            GWIS.plot({
+                div_id : "plot1",
+                series : [{ site:"08158000", pcode:"00060" }]
+            });
+        </script>
+        
+        <!-- popup a plot when a button is clicked -->
+        <h2>A Pop-Up Plot:</h2>
+        <p>
+            <button onclick="button_onclick()">Open Plot</button>
+        </p>
+        <script>
+            var button_onclick = function() {
+                GWIS.plot({
+                    series : [{ site:"08158000", pcode:"00060" }]
+                });
+            };
+        </script>
+        
+    </body>
+</html>
+<!-- end GWIS JSAPI sample -->

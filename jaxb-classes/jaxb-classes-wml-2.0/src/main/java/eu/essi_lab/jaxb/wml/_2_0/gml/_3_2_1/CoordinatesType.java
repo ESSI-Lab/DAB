@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.wml._2_0.gml._3_2_1;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,6 +35,34 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 
+
+/**
+ * This type is deprecated for tuples with ordinate values that are numbers.
+ * CoordinatesType is a text string, intended to be used to record an array of tuples or coordinates. 
+ * While it is not possible to enforce the internal structure of the string through schema validation, some optional attributes have been provided in previous versions of GML to support a description of the internal structure. These attributes are deprecated. The attributes were intended to be used as follows:
+ * Decimal	symbol used for a decimal point (default="." a stop or period)
+ * cs        	symbol used to separate components within a tuple or coordinate string (default="," a comma)
+ * ts        	symbol used to separate tuples or coordinate strings (default=" " a space)
+ * Since it is based on the XML Schema string type, CoordinatesType may be used in the construction of tables of tuples or arrays of tuples, including ones that contain mixed text and numeric values.
+ * 
+ * <p>Java class for CoordinatesType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="CoordinatesType"&gt;
+ *   &lt;simpleContent&gt;
+ *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema&gt;string"&gt;
+ *       &lt;attribute name="decimal" type="{http://www.w3.org/2001/XMLSchema}string" default="." /&gt;
+ *       &lt;attribute name="cs" type="{http://www.w3.org/2001/XMLSchema}string" default="," /&gt;
+ *       &lt;attribute name="ts" type="{http://www.w3.org/2001/XMLSchema}string" default=" " /&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/simpleContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "CoordinatesType", propOrder = {
     "value"

@@ -4,7 +4,7 @@ package eu.essi_lab.access.augmenter;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,40 +29,33 @@ import eu.essi_lab.access.compliance.DataComplianceTester.DataComplianceTest;
 import eu.essi_lab.access.compliance.wrapper.ReportsMetadataHandler;
 import eu.essi_lab.augmenter.ResourceAugmenter;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.configuration.option.GSConfOption;
-import eu.essi_lab.model.configuration.option.GSConfOptionInteger;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
-public class DownloadReportToSSCScoreAugmenter extends ResourceAugmenter {
+
+/**
+ * @author Fabrizio
+ */
+public class DownloadReportToSSCScoreAugmenter extends ResourceAugmenter<DownloadReportToSSCScoreAugmenterSetting> {
 
     /**
-     * 
+     *  
      */
-    private static final long serialVersionUID = 4029571299312795867L;
-
-    private static final int DOWNLOAD_TIME_TRESHOLD = 15;
-    private static final int EXECUTION_TIME_TRESHOLD = 5;
-
-    private static final String DOWNLOAD_TIME_TRESHOLD_KEY = "DOWNLOAD_TIME_TRESHOLD_KEY";
-    private static final String EXECUTION_TIME_TRESHOLD_KEY = "EXECUTION_TIME_TRESHOLD_KEY";
-
     public DownloadReportToSSCScoreAugmenter() {
 
-	setLabel("Download report to SSCScore augmenter");
+    }
 
-	GSConfOptionInteger downOption = new GSConfOptionInteger();
-	downOption.setLabel("Download time (seconds) sometimes/frequently unavailable treshold");
-	downOption.setValue(DOWNLOAD_TIME_TRESHOLD);
-	downOption.setKey(DOWNLOAD_TIME_TRESHOLD_KEY);
+    /**
+     * @param setting
+     */
+    public DownloadReportToSSCScoreAugmenter(DownloadReportToSSCScoreAugmenterSetting setting) {
 
-	getSupportedOptions().put(DOWNLOAD_TIME_TRESHOLD_KEY, downOption);
+	super(setting);
+    }
 
-	GSConfOptionInteger execOption = new GSConfOptionInteger();
-	execOption.setLabel("Execution time (seconds) mostly/very reliable treshold");
-	execOption.setValue(EXECUTION_TIME_TRESHOLD);
-	execOption.setKey(EXECUTION_TIME_TRESHOLD_KEY);
+    @Override
+    public String getType() {
 
-	getSupportedOptions().put(EXECUTION_TIME_TRESHOLD_KEY, execOption);
+	return "DownloadReportToSSCScoreAugmenter";
     }
 
     @Override
@@ -79,10 +72,10 @@ public class DownloadReportToSSCScoreAugmenter extends ResourceAugmenter {
 
 	int score = 0;
 
-	int value = (Integer) getSupportedOptions().get(DOWNLOAD_TIME_TRESHOLD_KEY).getValue();
+	int value = getSetting().getDownloadTimeTreshold();
 	long downloadTreshold = value * 1000;
 
-	value = (Integer) getSupportedOptions().get(EXECUTION_TIME_TRESHOLD_KEY).getValue();
+	value = getSetting().getExecutionTimeTreshold();
 	long execTreshold = value * 1000;
 
 	for (DataComplianceReport report : reports) {
@@ -143,11 +136,14 @@ public class DownloadReportToSSCScoreAugmenter extends ResourceAugmenter {
     }
 
     @Override
-    public void onOptionSet(GSConfOption<?> opt) throws GSException {
+    protected String initName() {
+
+	return "Download report to SSCScore augmenter";
     }
 
     @Override
-    public void onFlush() throws GSException {
-    }
+    protected DownloadReportToSSCScoreAugmenterSetting initSetting() {
 
+	return new DownloadReportToSSCScoreAugmenterSetting();
+    }
 }

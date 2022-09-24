@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.pubsub;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,7 +21,6 @@ package eu.essi_lab.profiler.pubsub;
  * #L%
  */
 
-import eu.essi_lab.lib.utils.GSLoggerFactory;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -29,7 +28,12 @@ import java.net.URLEncoder;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.web.WebRequest;
+
+/**
+ * @author Fabrizio
+ */
 public class Subscription {
 
     private String id;

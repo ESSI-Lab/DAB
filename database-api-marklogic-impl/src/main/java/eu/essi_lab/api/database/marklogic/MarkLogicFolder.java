@@ -4,7 +4,7 @@ package eu.essi_lab.api.database.marklogic;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,19 +28,20 @@ import java.util.Optional;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.marklogic.xcc.ResultSequence;
 import com.marklogic.xcc.exceptions.RequestException;
 
 import eu.essi_lab.api.database.internal.Folder;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.XMLNodeReader;
+import eu.essi_lab.wrapper.marklogic.MarkLogicWrapper;
+
+/**
+ * @author Fabrizio
+ */
 public class MarkLogicFolder implements Folder {
 
     protected String uri;
     protected MarkLogicDatabase mlDataBase;
-
-    private static final String ESSI_LAST_UPDATE_ELEMNAME = "essilastupdate";
 
     public MarkLogicFolder(MarkLogicDatabase mlDB, String uri) {
 	this.mlDataBase = mlDB;
@@ -99,9 +100,9 @@ public class MarkLogicFolder implements Folder {
     }
 
     @Override
-    public boolean storeBinary(String key, InputStream res, Date modificationDate) throws Exception {
+    public boolean storeBinary(String key, InputStream res, Date timeStamp) throws Exception {
 
-	return mlDataBase.getWrapper().storeBinary(createResourceUri(uri, key), res, modificationDate);
+	return mlDataBase.getWrapper().storeBinary(createResourceUri(uri, key), res, timeStamp);
     }
 
     @Override
@@ -126,29 +127,32 @@ public class MarkLogicFolder implements Folder {
 	return mlDataBase.getWrapper().getBinary(createResourceUri(uri, key));
     }
 
-    @JsonIgnore
     @Override
-    public Node getBinaryProperties(String key) throws Exception {
+    public Optional<Node> getBinaryProperties(String key) throws Exception {
 
 	return mlDataBase.getWrapper().getBinaryProperties(createResourceUri(uri, key));
     }
 
-    @JsonIgnore
     @Override
-    public Date getBinaryLastUpdate(String key) throws Exception {
+    public Optional<Date> getBinaryTimestamp(String key) throws Exception {
 
-	Node props = getBinaryProperties(key);
+	Optional<Node> props = getBinaryProperties(key);
 
-	XMLNodeReader reader = new XMLNodeReader(props);
+	if (props.isPresent()) {
 
-	String lastModified = reader.evaluateString("//*[local-name()='" + ESSI_LAST_UPDATE_ELEMNAME + "']");
+	    XMLNodeReader reader = new XMLNodeReader(props.get());
 
-	Optional<Date> optional = ISO8601DateTimeUtils.parseISO8601ToDate(lastModified);
+	    String timeStampString = reader.evaluateString("//*[local-name()='" + MarkLogicWrapper.DOC_TIMESTAMP + "']");
 
-	if (!optional.isPresent())
-	    throw new Exception("Can't parse element " + ESSI_LAST_UPDATE_ELEMNAME + " with value " + lastModified);
+	    if (timeStampString != null && !timeStampString.isEmpty()) {
 
-	return optional.get();
+		long timeStamp = Long.valueOf(timeStampString);
+
+		return Optional.of(new Date(timeStamp));
+	    }
+	}
+
+	return Optional.empty();
     }
 
     @Override

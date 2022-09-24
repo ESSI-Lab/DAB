@@ -4,7 +4,7 @@ package eu.essi_lab.harvester.component;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,36 +21,27 @@ package eu.essi_lab.harvester.component;
  * #L%
  */
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import javax.validation.ConstraintViolation;
 
 import eu.essi_lab.harvester.HarvestingComponent;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.configuration.option.GSConfOption;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.model.resource.HarmonizedMetadata;
+
+/**
+ * @author Fabrizio
+ */
 public class ResourceValidatorComponent extends HarvestingComponent {
 
-    private static final long serialVersionUID = -5221977749437102778L;
     private static final String RESOURCE_VALIDATION_ERROR = "RESOURCE_VALIDATION_ERROR";
     private static final String NULL_RESOURCE_TO_VALIDATE_ERROR = "NULL_RESOURCE_TO_VALIDATE_ERROR";
-    private final String label = "Resource validator";
 
     public ResourceValidatorComponent() {
-	/**
-	 * Empty constructor. Mandatory due serialization.
-	 */
-    }
-
-    @Override
-    public String getLabel() {
-	return label;
     }
 
     /**
@@ -79,7 +70,7 @@ public class ResourceValidatorComponent extends HarvestingComponent {
 	List<ConstraintViolation<GSResource>> validate = resource.validate();
 	if (!validate.isEmpty()) {
 
-	    GSException gsException = new GSException();
+	    List<ErrorInfo> list = new ArrayList<>();
 
 	    for (ConstraintViolation<GSResource> constraintViolation : validate) {
 
@@ -92,32 +83,12 @@ public class ResourceValidatorComponent extends HarvestingComponent {
 
 		GSLoggerFactory.getLogger(getClass()).error(message);
 
-		gsException.getErrorInfoList().add(errorInfo);
+		list.add(errorInfo);
 	    }
+
+	    GSException gsException = GSException.createException(list);
 
 	    throw new HarvesterComponentException(gsException);
 	}
-    }
-
-    @Override
-    public Map<String, GSConfOption<?>> getSupportedOptions() {
-	/**
-	 * It holds no options, so won't return any.
-	 */
-	return new HashMap<>();
-    }
-
-    @Override
-    public void onOptionSet(GSConfOption<?> opt) throws GSException {
-	/**
-	 * It holds no options, so won't set any.
-	 */
-	return;
-    }
-
-    @Override
-    public void onFlush() throws GSException {
-	// TODO Auto-generated method stub
-
     }
 }

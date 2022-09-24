@@ -4,7 +4,7 @@ package eu.essi_lab.model.resource;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,7 @@ import java.io.InputStream;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import eu.essi_lab.jaxb.common.NameSpace;
+import eu.essi_lab.lib.xml.NameSpace;
 
 @XmlRootElement(name = "Dataset", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
 public class Dataset extends GSResource {
@@ -35,6 +35,13 @@ public class Dataset extends GSResource {
 
 	super(ResourceType.DATASET);
     }
+
+    /**
+     * @param stream
+     * @return
+     * @throws JAXBException
+     * @throws ClassCastException
+     */
     public static Dataset create(InputStream stream) throws JAXBException, ClassCastException {
 
 	return (Dataset) GSResource.create(stream);

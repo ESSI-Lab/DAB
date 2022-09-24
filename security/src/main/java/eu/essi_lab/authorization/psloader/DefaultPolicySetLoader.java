@@ -1,10 +1,13 @@
+/**
+ * 
+ */
 package eu.essi_lab.authorization.psloader;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,14 +24,14 @@ package eu.essi_lab.authorization.psloader;
  * #L%
  */
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.ServiceLoader;
+import java.util.stream.Collectors;
 
 import eu.essi_lab.authorization.PolicySetWrapper;
-import eu.essi_lab.authorization.pps.AdminPermissionPolicySet;
-import eu.essi_lab.authorization.pps.AnonymousPermissionPolicySet;
-import eu.essi_lab.authorization.rps.AdminRolePolicySet;
-import eu.essi_lab.authorization.rps.AnonymousRolePolicySet;
+import eu.essi_lab.authorization.pps.AbstractPermissionPolicySet;
+import eu.essi_lab.authorization.rps.AbstractRolePolicySet;
+import eu.essi_lab.lib.utils.StreamUtils;
 
 /**
  * @author Fabrizio
@@ -37,19 +40,13 @@ public class DefaultPolicySetLoader implements PolicySetLoader {
 
     @Override
     public List<PolicySetWrapper> loadRolePolicySets() {
-
-	return Arrays.asList(//
-		new AdminRolePolicySet(), //
-		new AnonymousRolePolicySet() //
-);
+	
+	return StreamUtils.iteratorToStream(ServiceLoader.load(AbstractRolePolicySet.class).iterator()).collect(Collectors.toList());
     }
 
     @Override
     public List<PolicySetWrapper> loadPermissionPolicySets() {
 
-	return Arrays.asList(//
-		new AdminPermissionPolicySet(), //
-		new AnonymousPermissionPolicySet() //
-);
+	return StreamUtils.iteratorToStream(ServiceLoader.load(AbstractPermissionPolicySet.class).iterator()).collect(Collectors.toList());
     }
 }

@@ -4,7 +4,7 @@ package eu.essi_lab.messages.bond;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,6 +26,12 @@ import java.util.Objects;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import eu.essi_lab.model.resource.ResourceProperty;
+
+/**
+ * A bond applied to a {@link ResourceProperty}
+ * 
+ * @author Fabrizio
+ */
 @XmlRootElement
 public class ResourcePropertyBond extends QueryableBond<String> {
 

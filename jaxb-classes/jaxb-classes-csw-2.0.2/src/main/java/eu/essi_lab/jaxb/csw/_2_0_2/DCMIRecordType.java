@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.csw._2_0_2;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -41,6 +41,32 @@ import javax.xml.bind.annotation.XmlType;
 
 import eu.essi_lab.jaxb.csw._2_0_2.org.purl.dc.elements._1.SimpleLiteral;
 
+
+/**
+ * 
+ *             This type encapsulates all of the standard DCMI metadata terms,
+ *             including the Dublin Core refinements; these terms may be mapped
+ *             to the profile-specific information model.
+ *          
+ * 
+ * <p>Classe Java per DCMIRecordType complex type.
+ * 
+ * <p>Il seguente frammento di schema specifica il contenuto previsto contenuto in questa classe.
+ * 
+ * <pre>
+ * &lt;complexType name="DCMIRecordType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{http://www.opengis.net/cat/csw/2.0.2}AbstractRecordType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;group ref="{http://purl.org/dc/terms/}DCMI-terms"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "DCMIRecordType", propOrder = {
     "dcElements"

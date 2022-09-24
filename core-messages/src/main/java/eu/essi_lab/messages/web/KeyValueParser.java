@@ -4,7 +4,7 @@ package eu.essi_lab.messages.web;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,6 +30,13 @@ import java.util.Objects;
 import java.util.Set;
 
 import eu.essi_lab.lib.utils.StringUtils;
+
+/**
+ * A parser which creates a key/value map from a query string or from an {@link InputStream}. In the latter case, the
+ * stream content should be parsable to a key/value map
+ * 
+ * @author Fabrizio
+ */
 public class KeyValueParser {
 
     /**

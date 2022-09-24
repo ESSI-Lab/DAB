@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -53,6 +53,29 @@ import org.jvnet.jaxb2_commons.locator.util.LocatorUtils;
 
 import net.opengis.iso19139.gco.v_20060504.DistancePropertyType;
 
+
+/**
+ * Description: Distance between adjacent pixels - shortName: nomRes
+ * 
+ * <p>Java class for LE_NominalResolution_Type complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="LE_NominalResolution_Type"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;choice&gt;
+ *         &lt;element name="scanningResolution" type="{http://www.isotc211.org/2005/gco}Distance_PropertyType"/&gt;
+ *         &lt;element name="groundResolution" type="{http://www.isotc211.org/2005/gco}Distance_PropertyType"/&gt;
+ *       &lt;/choice&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "LE_NominalResolution_Type", propOrder = {
     "scanningResolution",

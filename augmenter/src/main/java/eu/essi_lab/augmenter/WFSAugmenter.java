@@ -4,7 +4,7 @@ package eu.essi_lab.augmenter;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -37,28 +36,29 @@ import org.xml.sax.SAXException;
 
 import com.google.common.collect.Lists;
 
-import eu.essi_lab.iso.datamodel.classes.DataIdentification;
+import eu.essi_lab.cfga.gs.setting.augmenter.AugmenterSetting;
 import eu.essi_lab.iso.datamodel.classes.Distribution;
-import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.lib.net.protocols.NetProtocols;
 import eu.essi_lab.lib.net.utils.Downloader;
-import eu.essi_lab.lib.net.utils.whos.WMOOntology;
-import eu.essi_lab.lib.net.utils.whos.WMOUnit;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
-import eu.essi_lab.model.configuration.option.GSConfOption;
 import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.ExtensionHandler;
 import eu.essi_lab.model.resource.GSResource;
-public class WFSAugmenter extends ResourceAugmenter {
+
+/**
+ * It checks if a WFS is present in Distribution Information and adds other Online resources available with
+ * WFS Output Formats reading WFS Capabilities
+ * 
+ * @author roncella
+ */
+public class WFSAugmenter extends ResourceAugmenter<AugmenterSetting> {
 
     private Map<String, List<String>> wfsMap = new HashMap<String, List<String>>();
 
     public WFSAugmenter() {
 
-	setLabel("WFS augmenter");
-
+	super();
     }
 
     @Override
@@ -94,18 +94,15 @@ public class WFSAugmenter extends ResourceAugmenter {
 			newOnline.setName(name + " (" + s + ")"); 
 			String newLinkage = baseWFS.endsWith("?")
 				? baseWFS + "request=GetFeature&service=WFS&version=1.1.0&typeName=" + name + "&outputFormat=" + s
-				: baseWFS +"?request=GetFeature&service=WFS&version=1.1.0&typeName=" + name + "&outputFormat=" + s;
+				: baseWFS + "?request=GetFeature&service=WFS&version=1.1.0&typeName=" + name + "&outputFormat=" + s;
 			newOnline.setLinkage(newLinkage);
 			// String protocol;
 			newOnline.setProtocol(s);
 			newOnline.setDescription("Output Format: " + s +" . WFS layer name: " + name);
 			dist.addDistributionOnline(newOnline);
 		    }
-
 		}
-
 	    }
-
 	}
 
 	GSLoggerFactory.getLogger(getClass()).warn("WFS augmentation of current resource ENDED");
@@ -137,11 +134,20 @@ public class WFSAugmenter extends ResourceAugmenter {
     }
 
     @Override
-    public void onOptionSet(GSConfOption<?> option) throws GSException {
+    public String getType() {
 
+	return "WFSAugmenter";
     }
 
     @Override
-    public void onFlush() throws GSException {
+    protected AugmenterSetting initSetting() {
+
+	return new AugmenterSetting();
+    }
+
+    @Override
+    protected String initName() {
+
+	return "WFS Augmenter";
     }
 }

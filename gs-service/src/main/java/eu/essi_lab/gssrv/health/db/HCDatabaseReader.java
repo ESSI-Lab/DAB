@@ -21,21 +21,16 @@ package eu.essi_lab.gssrv.health.db;
  * #L%
  */
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseProvider;
 import eu.essi_lab.api.database.DatabaseReader;
+import eu.essi_lab.api.database.internal.Folder;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.bond.View;
@@ -48,14 +43,16 @@ import eu.essi_lab.messages.stats.StatisticsResponse;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.StorageUri;
 import eu.essi_lab.model.auth.GSUser;
-import eu.essi_lab.model.configuration.IGSConfigurationInstantiable;
-import eu.essi_lab.model.configuration.option.GSConfOption;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.ontology.GSKnowledgeResourceDescription;
 import eu.essi_lab.model.ontology.GSKnowledgeScheme;
 import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.GSResource;
+
+/**
+ * @author Fabrizio
+ */
 public class HCDatabaseReader implements DatabaseReader, DatabaseProvider {
 
     private static final String HC_DB_ID = "HC_DB_ID";
@@ -82,43 +79,17 @@ public class HCDatabaseReader implements DatabaseReader, DatabaseProvider {
 
 	return resultSet;
     }
-    
+
     @Override
     public ResultSet<Node> discoverNodes(DiscoveryMessage message) throws GSException {
-	checkSources(message);
 
-	GSResource gsResource = new Dataset();
-
-	gsResource.setSource(message.getSources().get(0));
-
-	ResultSet<Node> resultSet = new ResultSet<>();
-
-	try {
-	    resultSet.setResultsList(Arrays.asList(gsResource.asDocument(true)));
-	} catch (ParserConfigurationException | JAXBException | SAXException | IOException e) {
-	    e.printStackTrace();
-	}
-
-	return resultSet;
+	return null;
     }
-    
+
     @Override
     public ResultSet<String> discoverStrings(DiscoveryMessage message) throws GSException {
-	checkSources(message);
 
-	GSResource gsResource = new Dataset();
-
-	gsResource.setSource(message.getSources().get(0));
-
-	ResultSet<String> resultSet = new ResultSet<>();
-
-	try {
-	    resultSet.setResultsList(Arrays.asList(gsResource.asString(true)));
-	} catch (JAXBException | IOException e) {
-	    e.printStackTrace();
-	}
-
-	return resultSet;
+	return null;
     }
 
     @Override
@@ -135,10 +106,10 @@ public class HCDatabaseReader implements DatabaseReader, DatabaseProvider {
     private void checkSources(DiscoveryMessage message) throws GSException {
 
 	if (message.getSources().isEmpty()) {
-	    
+
 	    throw GSException.createException(//
 		    HCDatabaseReader.class, //
-		    "Health Check DB expects a message with at list one source", //
+		    "Health Check DB expects a message with at list one harvested or mixed source", //
 		    null, //
 		    null, //
 		    ErrorInfo.ERRORTYPE_INTERNAL, //
@@ -151,7 +122,7 @@ public class HCDatabaseReader implements DatabaseReader, DatabaseProvider {
     public Optional<GSUser> getUser(String userName) throws GSException {
 	return Optional.empty();
     }
-    
+
     @Override
     public List<GSUser> getUsers() throws GSException {
 	return null;
@@ -212,6 +183,7 @@ public class HCDatabaseReader implements DatabaseReader, DatabaseProvider {
 	return Optional.empty();
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public void setDatabase(Database dataBase) {
 
@@ -227,74 +199,10 @@ public class HCDatabaseReader implements DatabaseReader, DatabaseProvider {
 	return null;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public Database getDatabase() {
 	return new HCDataBase();
-    }
-
-    @Override
-    public Map<String, GSConfOption<?>> getSupportedOptions() {
-	return null;
-    }
-
-    @Override
-    public void setSupportedOptions(Map<String, GSConfOption<?>> opts) {
-
-    }
-
-    @Override
-    public String getLabel() {
-	return null;
-    }
-
-    @Override
-    public void setLabel(String label) {
-
-    }
-
-    @Override
-    public String getKey() {
-	return null;
-    }
-
-    @Override
-    public void setKey(String key) {
-
-    }
-
-    @Override
-    public boolean setOption(GSConfOption<?> option) throws GSException {
-	return false;
-    }
-
-    @Override
-    public void onOptionSet(GSConfOption<?> opt) throws GSException {
-
-    }
-
-    @Override
-    public void onFlush() throws GSException {
-
-    }
-
-    @Override
-    public GSConfOption<?> read(String key) {
-	return null;
-    }
-
-    @Override
-    public IGSConfigurationInstantiable getInstantiableType() {
-	return null;
-    }
-
-    @Override
-    public void setInstantiableType(IGSConfigurationInstantiable instantiableType) {
-
-    }
-
-    @Override
-    public void onStartUp() throws GSException {
-
     }
 
     @Override
@@ -302,5 +210,9 @@ public class HCDatabaseReader implements DatabaseReader, DatabaseProvider {
 
     }
 
-    
+    @Override
+    public Optional<Folder> getFolder(String folderName, boolean createIfNotExist) throws GSException {
+
+	return Optional.empty();
+    }
 }

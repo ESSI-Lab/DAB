@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.wml._2_0.gml._3_2_1;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -43,6 +43,32 @@ import eu.essi_lab.jaxb.wml._2_0.om__2.OMObservationType;
 import eu.essi_lab.jaxb.wml._2_0.sf._2_0.SFSamplingFeatureCollectionType;
 import eu.essi_lab.jaxb.wml._2_0.sf._2_0.SFSamplingFeatureType;
 
+
+/**
+ * The basic feature model is given by the gml:AbstractFeatureType.
+ * The content model for gml:AbstractFeatureType adds two specific properties suitable for geographic features to the content model defined in gml:AbstractGMLType. 
+ * The value of the gml:boundedBy property describes an envelope that encloses the entire feature instance, and is primarily useful for supporting rapid searching for features that occur in a particular location. 
+ * The value of the gml:location property describes the extent, position or relative location of the feature.
+ * 
+ * <p>Java class for AbstractFeatureType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="AbstractFeatureType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{http://www.opengis.net/gml/3.2}AbstractGMLType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element ref="{http://www.opengis.net/gml/3.2}boundedBy" minOccurs="0"/&gt;
+ *         &lt;element ref="{http://www.opengis.net/gml/3.2}location" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "AbstractFeatureType", propOrder = {
     "boundedBy",

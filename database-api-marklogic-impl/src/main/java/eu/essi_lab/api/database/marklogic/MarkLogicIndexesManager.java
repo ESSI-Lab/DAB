@@ -4,7 +4,7 @@ package eu.essi_lab.api.database.marklogic;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -41,17 +41,20 @@ import eu.essi_lab.indexes.CustomIndexedElements;
 import eu.essi_lab.indexes.IndexedElements;
 import eu.essi_lab.indexes.IndexedMetadataElements;
 import eu.essi_lab.indexes.IndexedResourceElements;
-import eu.essi_lab.indexes.IndexedRuntimeInfoElements;
 import eu.essi_lab.indexes.marklogic.MarkLogicIndexTypes;
 import eu.essi_lab.indexes.marklogic.MarkLogicScalarType;
-import eu.essi_lab.jaxb.common.NameSpace;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.model.RuntimeInfoElement;
 import eu.essi_lab.model.index.IndexedElementInfo;
 import eu.essi_lab.model.pluggable.PluginsLoader;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
+
+/**
+ * @author Fabrizio
+ */
 public class MarkLogicIndexesManager {
 
     private MarkLogicDatabase markLogicDB;
@@ -106,11 +109,11 @@ public class MarkLogicIndexesManager {
 	    GSLoggerFactory.getLogger(getClass()).info("Disabling auto index detection ENDED");
 
 	    // 2) disables the automatic reindexing
-	    GSLoggerFactory.getLogger(getClass()).info("Disabling automatic reindexing STARTED");
-	    String setReindexerEnabledQuery = getSetReindexerEnabledQuery(false);
-	    saveConfigQuery = getSaveConfigQuery(setReindexerEnabledQuery);
-	    markLogicDB.execXQuery(saveConfigQuery);
-	    GSLoggerFactory.getLogger(getClass()).info("Disabling automatic reindexing ENDED");
+//	    GSLoggerFactory.getLogger(getClass()).info("Disabling automatic reindexing STARTED");
+//	    String setReindexerEnabledQuery = getSetReindexerEnabledQuery(false);
+//	    saveConfigQuery = getSaveConfigQuery(setReindexerEnabledQuery);
+//	    markLogicDB.execXQuery(saveConfigQuery);
+//	    GSLoggerFactory.getLogger(getClass()).info("Disabling automatic reindexing ENDED");
 
 	    // 3) set a low reindexer throttle (low CPU work when reindexing)
 	    GSLoggerFactory.getLogger(getClass()).info("Setting low reindexer throttle STARTED");
@@ -165,11 +168,11 @@ public class MarkLogicIndexesManager {
 	    GSLoggerFactory.getLogger(getClass()).info("Enabling auto index detection ENDED");
 
 	    // 2) enables the automatic reindexing
-	    GSLoggerFactory.getLogger(getClass()).info("Enabling automatic reindexing STARTED");
-	    setReindexerEnabledQuery = getSetReindexerEnabledQuery(true);
-	    saveConfigQuery = getSaveConfigQuery(setReindexerEnabledQuery);
-	    markLogicDB.execXQuery(saveConfigQuery);
-	    GSLoggerFactory.getLogger(getClass()).info("Enabling automatic reindexing ENDED");
+//	    GSLoggerFactory.getLogger(getClass()).info("Enabling automatic reindexing STARTED");
+//	    setReindexerEnabledQuery = getSetReindexerEnabledQuery(true);
+//	    saveConfigQuery = getSaveConfigQuery(setReindexerEnabledQuery);
+//	    markLogicDB.execXQuery(saveConfigQuery);
+//	    GSLoggerFactory.getLogger(getClass()).info("Enabling automatic reindexing ENDED");
 
 	    GSLoggerFactory.getLogger(getClass()).info("Finalizing configuration ENDED");
 	}
@@ -192,7 +195,7 @@ public class MarkLogicIndexesManager {
 	List<IndexedElementInfo> supportedIndexes = IndexedMetadataElements.getIndexesInfo(DatabaseImpl.MARK_LOGIC);
 	supportedIndexes.addAll(IndexedElements.getIndexesInfo(DatabaseImpl.MARK_LOGIC));
 	supportedIndexes.addAll(IndexedResourceElements.getIndexesInfo(DatabaseImpl.MARK_LOGIC));
-	supportedIndexes.addAll(IndexedRuntimeInfoElements.getIndexesInfo(DatabaseImpl.MARK_LOGIC));
+//	supportedIndexes.addAll(IndexedRuntimeInfoElements.getIndexesInfo(DatabaseImpl.MARK_LOGIC));
 
 	List<IndexedElementInfo> filteredIndexes = supportedIndexes.stream().filter(i -> {
 

@@ -4,7 +4,7 @@ package eu.essi_lab.lib.servlet;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -33,12 +33,14 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 public class RequestInfo {
 
     private String requestId;
+    private Set<String> threadNames;
+    private Date start;
 
-    private Set<String> threadNames = new HashSet<>();
-
-    private Date start = null;
-
+    /**
+     * @param requestId
+     */
     public RequestInfo(String requestId) {
+	this.threadNames = new HashSet<>();
 	this.requestId = requestId;
 	this.start = new Date();
 	addThreadName();
@@ -129,7 +131,11 @@ public class RequestInfo {
 	return ret;
     }
 
+    /**
+     * 
+     */
     public void printLogQuery() {
-	GSLoggerFactory.getLogger(getClass()).info(getLogQuery());
+
+//	GSLoggerFactory.getLogger(getClass()).info(getLogQuery());
     }
 }

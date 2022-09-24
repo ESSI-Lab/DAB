@@ -4,7 +4,7 @@ package eu.essi_lab.harvester.component;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,31 +21,33 @@ package eu.essi_lab.harvester.component;
  * #L%
  */
 
-import java.util.HashMap;
-import java.util.Map;
-
 import eu.essi_lab.api.database.DatabaseWriter;
 import eu.essi_lab.harvester.HarvestingComponent;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.configuration.option.GSConfOption;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.model.resource.HarmonizedMetadata;
+
+/**
+ * @author Fabrizio
+ */
 public class DatabaseComponent extends HarvestingComponent {
 
-    private static final long serialVersionUID = 2327040630737598281L;
     /**
-     * This is the reference to database to store metadata.
-     */
+    * 
+    */
     private DatabaseWriter dBWriter;
 
+    /**
+     * 
+     */
     public DatabaseComponent() {
-	/**
-	 * Empty constructor. Mandatory due serialization.
-	 */
     }
 
+    /**
+     * @param dBWriter
+     */
     public DatabaseComponent(DatabaseWriter dBWriter) {
+
 	this.dBWriter = dBWriter;
     }
 
@@ -60,11 +62,11 @@ public class DatabaseComponent extends HarvestingComponent {
 
 	    try {
 
-		GSLoggerFactory.getLogger(getClass()).trace("Try #" + tries + " STARTED");
+		// GSLoggerFactory.getLogger(getClass()).trace("Try #" + tries + " STARTED");
 
 		dBWriter.store(resource);
 
-		GSLoggerFactory.getLogger(getClass()).trace("Try #" + tries + " ENDED");
+		// GSLoggerFactory.getLogger(getClass()).trace("Try #" + tries + " ENDED");
 
 		return;
 
@@ -89,30 +91,5 @@ public class DatabaseComponent extends HarvestingComponent {
 		}
 	    }
 	}
-    }
-
-    @Override
-    public String getLabel() {
-	return "Database component";
-    }
-
-    @Override
-    public Map<String, GSConfOption<?>> getSupportedOptions() {
-	return new HashMap<>();
-    }
-
-    @Override
-    public void onOptionSet(GSConfOption<?> opt) throws GSException {
-	/**
-	 * DatabaseComponent does not hold any options.
-	 */
-	return;
-    }
-
-    @Override
-    public void onFlush() throws GSException {
-	/**
-	 * DatabaseComponent does not flush anything.
-	 */
     }
 }

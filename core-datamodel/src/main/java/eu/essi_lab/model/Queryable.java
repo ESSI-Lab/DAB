@@ -4,7 +4,7 @@ package eu.essi_lab.model;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,6 +30,18 @@ import eu.essi_lab.model.index.IndexedElement;
 import eu.essi_lab.model.ontology.OntologyObjectProperty;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
+
+/**
+ * An interface for queryable properties with a name.
+ * A queryable property can be used as parameter of a discovery query
+ * <li>The volatile property</li><br>
+ * Usually a queryable property has a correspondent {@link IndexedElement}, otherwise the {@link #isVolatile()}
+ * property is set to <code>true</code>
+ * 
+ * @see MetadataElement
+ * @see ResourceProperty
+ * @author Fabrizio
+ */
 @XmlSeeAlso({ MetadataElement.class, ResourceProperty.class, OntologyObjectProperty.class, RuntimeInfoElement.class })
 public interface Queryable {
 

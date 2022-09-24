@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<!--
+..........................................................
+GWIS Javascript API Sample:
+Basic Usage
+..........................................................
+U.S. Geological Survey, Texas Water Science Center, Austin
+https://txpub.usgs.gov/DSS/GWIS/
+..........................................................
+-->
+<html>
+    <!-- html head -->
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>GWIS JSAPI Sample</title>
+        
+        <!-- GWIS requires jQuery -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        
+        <!-- GWIS JSAPI 0.0 -->
+        <link rel="stylesheet" href="../gwis-plot-utils.css"/>
+        <script src="../gwis-plot-utils.js"></script>
+    </head>
+    
+    <script>
+    var getUrlParameter = function getUrlParameter(sParam) {
+        var sPageURL = window.location.search.substring(1),
+            sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
+
+        for (i = 0; i < sURLVariables.length; i++) {
+            sParameterName = sURLVariables[i].split('=');
+
+            if (sParameterName[0] === sParam) {
+                return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+            }
+        }
+    };
+    </script>
+    
+    <!-- html body -->
+    <body style="background:#eee; font-family:arial;">
+        
+        <!-- title -->
+        <h1>Sample GWIS JS API: Basic Usage</h1>
+        
+        <p>This graph shows the last 7 days of data (if available).</p>
+        <p>Please refer to <a href="https://txpub.usgs.gov/dss/gwis/0.0/doc/#overview">USGS GWIS JS API homepage</a> for advanced use.
+        
+        <div id="plot1" style="width:95%; height:500px;"></div>
+        <script>
+            GWIS.plot({
+            	title:getUrlParameter('title'),
+            	xlabel:getUrlParameter('xlabel'),
+            	ylabel:getUrlParameter('ylabel'),
+            	start_dt:getUrlParameter('start_dt'),
+            	//labels: ["Date",getUrlParameter('ylabel')],            	
+            	end_dt:getUrlParameter('end_dt'),
+                div_id : "plot1",
+                //series : [{ protocol:"urn:usgs:iv", name:"USGS%3A00060%3B%40USGS%3A02458300", linkage:"http%3A%2F%2Fwaterservices.usgs.gov%2Fnwis%2Fiv%2F" }]
+                series : [{ protocol:getUrlParameter('protocol'), name:getUrlParameter('name'), linkage:getUrlParameter('linkage'),label:getUrlParameter('label') }]
+            });
+        </script>
+        
+
+        
+    </body>
+</html>
+<!-- end GWIS JSAPI sample -->

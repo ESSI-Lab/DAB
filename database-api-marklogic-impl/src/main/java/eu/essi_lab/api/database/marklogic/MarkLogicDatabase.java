@@ -4,7 +4,7 @@ package eu.essi_lab.api.database.marklogic;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -36,16 +36,13 @@ import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.slf4j.Logger;
 import org.w3c.dom.Node;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.marklogic.xcc.ContentSource;
 import com.marklogic.xcc.ResultItem;
 import com.marklogic.xcc.ResultSequence;
 import com.marklogic.xcc.exceptions.RequestException;
 import com.marklogic.xcc.exceptions.XQueryException;
-import com.marklogic.xcc.exceptions.XccConfigException;
 import com.marklogic.xcc.types.ItemType;
 import com.marklogic.xcc.types.ValueType;
 import com.marklogic.xcc.types.XdmItem;
@@ -59,10 +56,11 @@ import eu.essi_lab.api.database.marklogic.search.MarkLogicDiscoveryBondHandler;
 import eu.essi_lab.api.database.marklogic.search.MarkLogicSelectorBuilder;
 import eu.essi_lab.api.database.marklogic.search.RegisteredQueriesManager;
 import eu.essi_lab.api.database.marklogic.stats.StatisticsQueryManager;
+import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.jaxb.common.NameSpace;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
+import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.lib.xml.XMLFactories;
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -78,7 +76,11 @@ import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.wrapper.marklogic.MarkLogicWrapper;
-public class MarkLogicDatabase implements DatabaseProvider, Database {
+
+/**
+ * @author Fabrizio
+ */
+public class MarkLogicDatabase implements DatabaseProvider, Database<DatabaseSetting> {
 
     /**
      * Query trace disabled because not strictly necessary and it makes logs unreadable
@@ -109,7 +111,6 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
     private boolean initialized;
     private HashMap<String, SourceStorageWorker> workersMap;
     private RegisteredQueriesManager regQueriesManager;
-    private transient Logger logger = GSLoggerFactory.getLogger(getClass());
     //
     // ---
     //
@@ -165,55 +166,75 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
 
 	if (!initialized) {
 
-	    logger.info("MarkLogic DB initialization STARTED");
+	    GSLoggerFactory.getLogger(this.getClass()).info("MarkLogic DB initialization STARTED");
 
-	    logger.info("MarkLogic DB wrapper initialization STARTED");
+	    GSLoggerFactory.getLogger(this.getClass()).info("MarkLogic DB wrapper initialization STARTED");
 	    initializeWrapper(storageUri, suiteIdentifier);
 	    //
 	    // now the wrapper, required by the manager, is initialized and the manager can be created
 	    //
 	    regQueriesManager = new RegisteredQueriesManager(this);
 
-	    logger.info("MarkLogic DB wrapper initialization ENDED");
+	    GSLoggerFactory.getLogger(this.getClass()).info("MarkLogic DB wrapper initialization ENDED");
 
 	    if (indexesManagerEnabled) {
-		logger.info("MarkLogic DB index manager initialization STARTED");
+		GSLoggerFactory.getLogger(this.getClass()).info("MarkLogic DB index manager initialization STARTED");
 		initializeIndexManager();
-		logger.info("MarkLogic DB index manager initialization ENDED");
+		GSLoggerFactory.getLogger(this.getClass()).info("MarkLogic DB index manager initialization ENDED");
 	    } else {
-		logger.warn("MarkLogic DB index manager initialization DISABLED");
+		GSLoggerFactory.getLogger(this.getClass()).warn("MarkLogic DB index manager initialization DISABLED");
 	    }
 
-	    logger.info("MarkLogic DB folders initialization STARTED");
+	    GSLoggerFactory.getLogger(this.getClass()).info("MarkLogic DB folders initialization STARTED");
 	    initializeFolders();
-	    logger.info("MarkLogic DB folders initialization ENDED");
+	    GSLoggerFactory.getLogger(this.getClass()).info("MarkLogic DB folders initialization ENDED");
 
-	    logger.info("MarkLogic DB module initialization STARTED");
+	    GSLoggerFactory.getLogger(this.getClass()).info("MarkLogic DB module initialization STARTED");
 	    initializeModule();
-	    logger.info("MarkLogic DB module initialization ENDED");
+	    GSLoggerFactory.getLogger(this.getClass()).info("MarkLogic DB module initialization ENDED");
 
 	    if (!SKIP_REGISTERED_QUERIES_MANAGER) {
-		logger.info("MarkLogic DB registered queries doc initialization STARTED");
+		GSLoggerFactory.getLogger(this.getClass()).info("MarkLogic DB registered queries doc initialization STARTED");
 		regQueriesManager.init(storageUri.getStorageName());
-		logger.info("MarkLogic DB registered queries doc initialization ENDED");
+		GSLoggerFactory.getLogger(this.getClass()).info("MarkLogic DB registered queries doc initialization ENDED");
 	    }
 
-	    logger.info("MarkLogic DB initialization ENDED");
+	    GSLoggerFactory.getLogger(this.getClass()).info("MarkLogic DB initialization ENDED");
 	}
 
 	return suiteId;
     }
 
     @Override
+    public void configure(DatabaseSetting setting) {
+
+	try {
+	    initialize(setting.asStorageUri(), setting.asStorageUri().getConfigFolder());
+
+	} catch (GSException e) {
+
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(//
+		    e.getErrorInfoList().get(0).getErrorDescription(), //
+		    e.getCause());
+	}
+    }
+
+    @Override
+    public DatabaseSetting getSetting() {
+
+	return new DatabaseSetting(dbUri);
+    }
+
+    @Override
     public void release() throws GSException {
 
-	logger.info("Releasing MarklogicClient connection");
+	GSLoggerFactory.getLogger(this.getClass()).info("Releasing MarklogicClient connection");
 	getWrapper().getClient().release();
     }
 
     @Override
-    @JsonIgnore
-    public Database getDatabase() {
+    public Database<DatabaseSetting> getDatabase() {
 
 	if (initialized) {
 	    return this;
@@ -234,7 +255,6 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
     }
 
     @Override
-    @JsonIgnore
     public StorageUri getStorageUri() {
 
 	return dbUri;
@@ -258,19 +278,6 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
 	    this.dbUri = storageUri;
 	    this.initialized = true;
 
-	} catch (NullPointerException | IllegalArgumentException | XccConfigException e) {
-
-	    e.printStackTrace();
-
-	    throw GSException.createException(//
-		    getClass(), //
-		    e.getMessage(), //
-		    null, //
-		    ErrorInfo.ERRORTYPE_INTERNAL, //
-		    ErrorInfo.SEVERITY_FATAL, //
-		    MARKLOGIC_XCC_CONFIGURATION_ERROR, //
-		    e);
-
 	} catch (URISyntaxException e) {
 
 	    e.printStackTrace();
@@ -283,6 +290,19 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
 		    ErrorInfo.SEVERITY_FATAL, //
 		    MARKLOGIC_URI_SYNTAX_CONFIGURATION_ERROR, //
 		    e);
+
+	} catch (Exception e) {
+
+	    e.printStackTrace();
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_FATAL, //
+		    MARKLOGIC_XCC_CONFIGURATION_ERROR, //
+		    e);
 	}
     }
 
@@ -291,7 +311,7 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
 	    new MarkLogicIndexesManager(this);
 	} catch (Exception e) {
 
-	    logger.error("Fatal Error instantiating marklogic index manager", e);
+	    GSLoggerFactory.getLogger(this.getClass()).error("Fatal Error instantiating marklogic index manager", e);
 
 	    throw GSException.createException(//
 		    getClass(), //
@@ -321,6 +341,8 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
 
 	} catch (Exception e) {
 
+	    e.printStackTrace();
+
 	    throw GSException.createException(//
 		    getClass(), //
 		    e.getMessage(), //
@@ -345,7 +367,7 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
 
 	} catch (Exception e) {
 
-	    logger.error(e.getMessage(), e);
+	    GSLoggerFactory.getLogger(this.getClass()).error(e.getMessage(), e);
 
 	    throw GSException.createException(//
 		    getClass(), //
@@ -363,7 +385,7 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
      * @return
      * @throws GSException
      */
-    public DiscoveryCountResponse estimate(String ctsSearch, boolean updateRegQueries) throws GSException {
+    public DiscoveryCountResponse estimate(String ctsSearch, boolean updateRegQueries, String requestID) throws GSException {
 
 	// logger.debug("--- Start of ML estimate query ---");
 	// logger.debug(estimate);
@@ -373,41 +395,43 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
 
 	try {
 
-	    GSLoggerFactory.getLogger(getClass()).trace("[1/5] Estimating result sequence STARTED");
+	    // GSLoggerFactory.getLogger(getClass()).trace("[1/5] Estimating result sequence STARTED");
 
-	    ResultSequence rs = getEstimateResultSequence(ctsSearch);
+	    ResultSequence rs = getEstimateResultSequence(ctsSearch, requestID);
 
-	    GSLoggerFactory.getLogger(getClass()).trace("[1/5] Estimating result sequence ENDED");
+	    // GSLoggerFactory.getLogger(getClass()).trace("[1/5] Estimating result sequence ENDED");
 
-	    GSLoggerFactory.getLogger(getClass()).trace("[2/5] Acquiring item STARTED");
+	    // GSLoggerFactory.getLogger(getClass()).trace("[2/5] Acquiring item STARTED");
 
 	    ResultItem next = rs.next();
 
 	    ItemType itemType = next.getItemType();
 
-	    GSLoggerFactory.getLogger(getClass()).trace("Item type: {}", itemType.toString());
+	    // GSLoggerFactory.getLogger(getClass()).trace("Item type: {}", itemType.toString());
 
 	    String nextAsString = next.asString();
-	    GSLoggerFactory.getLogger(getClass()).trace("Item as string: <{}>", nextAsString);
+	    // GSLoggerFactory.getLogger(getClass()).trace("Item as string: <{}>", nextAsString);
 
-	    GSLoggerFactory.getLogger(getClass()).trace("[2/5] Acquiring item ENDED");
+	    // GSLoggerFactory.getLogger(getClass()).trace("[2/5] Acquiring item ENDED");
 
 	    if (itemType.equals(ValueType.XS_INTEGER)) {
 
 		countResult.setCount(Integer.valueOf(nextAsString));
 
-		GSLoggerFactory.getLogger(getClass()).trace("Item is integer, no other phase required");
+		// GSLoggerFactory.getLogger(getClass()).trace("Item is integer, no other phase required");
+
+		// logger.trace(MARKLOGIC_COUNT_COMPLETED);
 
 		return countResult;
 	    }
 
-	    GSLoggerFactory.getLogger(getClass()).trace("[3/5] Parsing item STARTED");
+	    // GSLoggerFactory.getLogger(getClass()).trace("[3/5] Parsing item STARTED");
 
 	    XMLDocumentReader reader = CommonNameSpaceContext.createCommonReader(nextAsString);
 
-	    GSLoggerFactory.getLogger(getClass()).trace("[3/5] Parsing item ENDED");
+	    // GSLoggerFactory.getLogger(getClass()).trace("[3/5] Parsing item ENDED");
 
-	    GSLoggerFactory.getLogger(getClass()).trace("[4/5] Evaluating tf STARTED");
+	    // GSLoggerFactory.getLogger(getClass()).trace("[4/5] Evaluating tf STARTED");
 
 	    Node tfMap = reader.evaluateNodes("//gs:termFrequency")[0];
 
@@ -417,15 +441,15 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
 		countResult.setTermFrequencyMap(termFrequencyMap);
 	    }
 
-	    GSLoggerFactory.getLogger(getClass()).trace("[4/5] Evaluating tf ENDED");
+	    // GSLoggerFactory.getLogger(getClass()).trace("[4/5] Evaluating tf ENDED");
 
-	    GSLoggerFactory.getLogger(getClass()).trace("[5/5] Evaluating estimate STARTED");
+	    // GSLoggerFactory.getLogger(getClass()).trace("[5/5] Evaluating estimate STARTED");
 
 	    String count = reader.evaluateString("//gs:estimate");
 
 	    countResult.setCount(Integer.valueOf(count));
 
-	    GSLoggerFactory.getLogger(getClass()).trace("[5/5] Evaluating estimate ENDED");
+	    // GSLoggerFactory.getLogger(getClass()).trace("[5/5] Evaluating estimate ENDED");
 
 	    //
 	    // *** DISABLED ***
@@ -439,11 +463,13 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
 		regQueriesManager.update(regQuery);
 	    }
 
-	    logger.trace(MARKLOGIC_COUNT_COMPLETED);
+	    // logger.trace(MARKLOGIC_COUNT_COMPLETED);
 
 	    return countResult;
 
 	} catch (XQueryException xqe) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(xqe.getMessage(), xqe);
 
 	    String formatString = xqe.getFormatString();
 	    throw GSException.createException(//
@@ -456,6 +482,8 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
 		    xqe);
 
 	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 
 	    throw GSException.createException(//
 		    getClass(), //
@@ -475,13 +503,14 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
      * @return
      * @throws GSException
      */
+    @SuppressWarnings("unchecked")
     public <T> List<T> search(DiscoveryMessage message, int start, int count, Class<T> clazz) throws GSException {
 
 	List<T> list = new ArrayList<>();
 
 	try {
 
-	    logger.trace(MARKLOGIC_DB_SEARCH_STARTED);
+	    // GSLoggerFactory.getLogger(this.getClass()).trace(MARKLOGIC_DB_SEARCH_STARTED);
 
 	    ResultSequence rs = getDiscoverResultSequence(message, start, count);
 	    Optional<WebRequest> oqs = Optional.ofNullable(message.getWebRequest());
@@ -496,21 +525,25 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
 	    DocumentBuilder builder = factory.newDocumentBuilder();
 
 	    while (iterator.hasNext()) {
+
 		ResultItem next = iterator.next();
 		XdmItem item = next.getItem();
 		XdmNode xdmNode = ((XdmNode) item);
+
 		if (clazz.equals(Node.class)) {
+
 		    Node node = xdmNode.asW3cNode(builder);
 		    list.add((T) node);
-		}else if (clazz.equals(String.class)) {
+
+		} else if (clazz.equals(String.class)) {
+
 		    String str = xdmNode.asString();
 		    list.add((T) str);
 		}
-
 	    }
 
-	    pl.logPerformance(logger);
-	    logger.trace(MARKLOGIC_DB_SEARCH_ENDED);
+	    pl.logPerformance(GSLoggerFactory.getLogger(this.getClass()));
+	    // GSLoggerFactory.getLogger(this.getClass()).trace(MARKLOGIC_DB_SEARCH_ENDED);
 
 	} catch (GSException ex) {
 
@@ -544,29 +577,29 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
 
 	try {
 
-	    logger.trace(MARKLOGIC_DB_COMPUTATION_STARTED);
+	    // GSLoggerFactory.getLogger(this.getClass()).trace(MARKLOGIC_DB_COMPUTATION_STARTED);
 
 	    String statQuery = StatisticsQueryManager.getInstance().createComputeQuery(statsMessage, this);
 
 	    statQuery = includePreamble(statQuery);
 
-	    logger.trace(WRAPPER_SUBMIT_STARTED);
+	    // GSLoggerFactory.getLogger(this.getClass()).trace(WRAPPER_SUBMIT_STARTED);
 
 	    ResultSequence resultSequence = execXQuery(statQuery);
 
-	    logger.trace(WRAPPER_SUBMIT_ENDED);
+	    // GSLoggerFactory.getLogger(this.getClass()).trace(WRAPPER_SUBMIT_ENDED);
 
 	    String stringResult = resultSequence.asString();
 
 	    StatisticsResponse response = StatisticsResponse.create(stringResult);
 
-	    logger.trace(MARKLOGIC_DB_COMPUTATION_ENDED);
+	    // GSLoggerFactory.getLogger(this.getClass()).trace(MARKLOGIC_DB_COMPUTATION_ENDED);
 
 	    return response;
 
 	} catch (Exception ex) {
 
-	    logger.error(ex.getMessage(), ex);
+	    GSLoggerFactory.getLogger(this.getClass()).error(ex.getMessage(), ex);
 
 	    throw GSException.createException(//
 		    getClass(), //
@@ -580,18 +613,19 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
 
     /**
      * @param ctsSearch
+     * @param requestID
      * @return
      * @throws RequestException
      */
-    public ResultSequence getEstimateResultSequence(String ctsSearch) throws RequestException {
+    public ResultSequence getEstimateResultSequence(String ctsSearch, String requestID) throws RequestException {
 
 	String estimate = includePreamble(ctsSearch);
 
-	logger.trace(WRAPPER_COUNT_START);
+	// GSLoggerFactory.getLogger(this.getClass()).trace(WRAPPER_COUNT_START);
 
-	ResultSequence rs = execXQuery(estimate);
+	ResultSequence rs = execXQuery(estimate, requestID);
 
-	logger.trace(WRAPPER_COUNT_ENDED);
+	// GSLoggerFactory.getLogger(this.getClass()).trace(WRAPPER_COUNT_ENDED);
 
 	return rs;
     }
@@ -658,19 +692,19 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
 		    ctsSearch);
 
 	    ctsSearch = selBuilder.applySelection();
-	    pl.logPerformance(logger);
+	    pl.logPerformance(GSLoggerFactory.getLogger(this.getClass()));
 	    // logger.debug("--- Start of ML search query ---");
 	    // logger.debug(ctsSearch);
 	    // logger.debug("--- End of ML search query ---");
 
-	    logger.trace(WRAPPER_SUBMIT_STARTED);
+	    // GSLoggerFactory.getLogger(this.getClass()).trace(WRAPPER_SUBMIT_STARTED);
 
 	    pl = new PerformanceLogger(PerformanceLogger.PerformancePhase.MARKLOGIC_QUERY_EXECUTION, message.getRequestId(), oqs);
 
 	    ResultSequence rs = execXQuery(ctsSearch);
 
-	    pl.logPerformance(logger);
-	    logger.trace(WRAPPER_SUBMIT_ENDED);
+	    pl.logPerformance(GSLoggerFactory.getLogger(this.getClass()));
+	    // GSLoggerFactory.getLogger(this.getClass()).trace(WRAPPER_SUBMIT_ENDED);
 
 	    return rs;
 
@@ -693,7 +727,7 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
      * @return
      * @throws Exception
      */
-    @JsonIgnore
+
     public SourceStorageWorker getWorker(String sourceId) {
 
 	SourceStorageWorker worker = workersMap.get(sourceId);
@@ -708,7 +742,7 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
     /**
      * @return
      */
-    @JsonIgnore
+
     public ContentSource getContentSource() {
 
 	return wrapper.getContentSource();
@@ -717,7 +751,7 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
     /**
      * @return
      */
-    @JsonIgnore
+
     public String getSuiteIdentifier() {
 
 	return suiteId;
@@ -728,7 +762,7 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
     // Folders section
     //
     //
-    @JsonIgnore
+
     public Folder getFolder(String folderName) throws RequestException {
 
 	checkName(folderName);
@@ -741,7 +775,6 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
 	return null;
     }
 
-    @JsonIgnore
     public Optional<Folder> getFolder(String folderName, boolean createIfNotExist) throws RequestException {
 
 	checkName(folderName);
@@ -803,7 +836,6 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
 	return true;
     }
 
-    @JsonIgnore
     public Folder[] getFolders() throws RequestException {
 
 	ResultSequence ret = execXQuery(" for $x in xdmp:directory-properties('/','1')[not(normalize-space())] return base-uri($x)");
@@ -823,7 +855,6 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
 	return out.toArray(new MarkLogicFolder[] {});
     }
 
-    @JsonIgnore
     public Folder[] getDataFolders() throws RequestException {
 
 	Folder[] folders = getFolders();
@@ -838,7 +869,6 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
 	return out.toArray(new MarkLogicFolder[] {});
     }
 
-    @JsonIgnore
     public Folder[] getMetaFolders() throws RequestException {
 
 	Folder[] folders = getFolders();
@@ -853,7 +883,6 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
 	return out.toArray(new MarkLogicFolder[] {});
     }
 
-    @JsonIgnore
     public Folder[] getProtectedFolders() throws RequestException {
 
 	Folder[] folders = getFolders();
@@ -868,7 +897,6 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
 	return out.toArray(new MarkLogicFolder[] {});
     }
 
-    @JsonIgnore
     public static List<String> getProtectedFoldersNames() {
 
 	return Arrays.asList(//
@@ -879,7 +907,6 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
 		RegisteredQueriesManager.REGISTERED_QUERIES_PROTECTED_FOLDER);
     }
 
-    @JsonIgnore
     public int getFoldersCount() throws RequestException {
 
 	return getFolders().length;
@@ -939,6 +966,17 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
     }
 
     /**
+     * @param xQuery
+     * @param requestID
+     * @return
+     * @throws RequestException
+     */
+    public ResultSequence execXQuery(String xQuery, String requestID) throws RequestException {
+
+	return wrapper.submit(xQuery, requestID);
+    }
+
+    /**
      * @param folderName
      * @param excludeDeleted
      * @return
@@ -987,7 +1025,6 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
 	return new MarkLogicFolder(this, dir);
     }
 
-    @JsonIgnore
     private String applyPagination(String ctsSearch, int start, int count) {
 
 	//
@@ -1046,5 +1083,11 @@ public class MarkLogicDatabase implements DatabaseProvider, Database {
 	if (name.startsWith("/") || name.contains("\\") || name.endsWith("/")) {
 	    throw new IllegalArgumentException("Argument cannot start with or end with slashes and it can not contain back slashes");
 	}
+    }
+
+    @Override
+    public String getType() {
+
+	return "MarkLogicDatabase";
     }
 }

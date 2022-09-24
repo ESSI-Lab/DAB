@@ -4,7 +4,7 @@ package eu.essi_lab.model.ontology;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -32,6 +32,139 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.google.common.collect.Lists;
+
+/**
+ * The response of a SPARQL query using the REST Client API is a JSON object which looks like this:
+ * 
+ * <pre>
+ * <code>
+ * {  
+   "head":{  
+      "vars":[  
+         "object",
+         "type",
+         "ontology",
+         "label",
+         "abstract",
+         "ontologyName",
+         "ontologyDescription",
+         "p",
+         "pontology",
+         "pontologyName",
+         "pontologyDescription",
+         "plabel"
+      ]
+   },
+   "results":{  
+      "bindings":[  
+         {  
+            "object":{  
+               "type":"uri",
+               "value":"http://eu.floraresearch.essi.core/test/target2"
+            },
+            "type":{  
+               "type":"uri",
+               "value":"http://eu.essi_lab.core/2018/06/d2k#Policy_Goal"
+            },
+            "ontology":{  
+               "type":"uri",
+               "value":"http://eu.floraresearch.essi.core/test/unontology"
+            },
+            "label":{  
+               "type":"literal",
+               "value":"Target 1.2",
+               "xml:lang":"de"
+            },
+            "abstract":{  
+               "type":"literal",
+               "value":"Target 1.2 Description",
+               "datatype":"http://www.w3.org/2001/XMLSchema#string"
+            },
+            "ontologyName":{  
+               "type":"literal",
+               "value":"Sustainable Development - Knowledge Platform",
+               "datatype":"http://www.w3.org/2001/XMLSchema#string"
+            },
+            "ontologyDescription":{  
+               "type":"literal",
+               "value":"Sustainable Development - Knowledge Platform Description",
+               "datatype":"http://www.w3.org/2001/XMLSchema#string"
+            },
+            "p":{  
+               "type":"uri",
+               "value":"http://eu.essi_lab.core/2018/06/d2k#addressed_by"
+            },
+            "pontology":{  
+               "type":"uri",
+               "value":"http://eu.essi_lab.core/2018/06/d2k"
+            },
+            "pontologyName":{  
+               "type":"literal",
+               "value":"ESSI Lab Data to Knowledge Ontology",
+               "xml:lang":"en"
+            },
+            "pontologyDescription":{  
+               "type":"literal",
+               "value":"The core ontology of ESSI Lab Knowledge Base",
+               "xml:lang":"en"
+            },
+            "plabel":{  
+               "type":"literal",
+               "value":"addressed by",
+               "xml:lang":"en"
+            }
+         }
+      ]
+   }
+} </pre></code>
+ * The "head" object can be ignored.<br>
+ * The "results" object contains the "binding" array, where each binding element represents a concept (or a row)
+ * resulting from the SPARQL query.<br>
+ * Each binding element has 3 properties: "type", "value" and the optional "xml:lang" readable with this wrapper using
+ * the related methods.<br>
+ * If an element (for example label) is expressed in several languages, the SPARQL response contains a binding element
+ * for each
+ * language. These elements differ only for the property "xml:lang" of the label. Since it is preferable to have a
+ * single
+ * binding element having different labels (one for each language), the {@link MarkLogicSemanticReader} executes a
+ * reduction
+ * in such cases. The resulting binding element will have, instead of a single label object like in the example above,
+ * an array of
+ * labels, like in the following example:
+ * 
+ * <pre>
+ * <code>
+ * {
+    "object": {
+        "type": "uri",
+        "value": "http://eu.floraresearch.essi.core/test/target2"
+    },
+    "type": {
+        "type": "uri",
+        "value": "http://eu.essi_lab.core/2018/06/d2k#Policy_Goal"
+    },
+    "ontology": {
+        "type": "uri",
+        "value": "http://eu.floraresearch.essi.core/test/unontology"
+    },
+    "label": [
+        {
+            "type": "literal",
+            "value": "Target 1.2",
+            "xml:lang": "de"
+        },
+        {
+            "type": "literal",
+            "value": "Target 1.2",
+            "xml:lang": "en"
+        }
+    ]
+}
+ * </pre></code>
+ * In order to support this use case, use the following methods: {@link #getElementsCount(String)},
+ * 
+ * @author Fabrizio
+ */
 public class JSONBindingWrapper {
 
     private final JSONObject jsonObject;

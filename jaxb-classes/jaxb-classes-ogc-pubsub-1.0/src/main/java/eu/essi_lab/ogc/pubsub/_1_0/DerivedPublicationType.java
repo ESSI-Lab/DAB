@@ -12,7 +12,7 @@ package eu.essi_lab.ogc.pubsub._1_0;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,6 +35,27 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
+
+/**
+ * <p>Classe Java per DerivedPublicationType complex type.
+ * 
+ * <p>Il seguente frammento di schema specifica il contenuto previsto contenuto in questa classe.
+ * 
+ * <pre>
+ * &lt;complexType name="DerivedPublicationType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{http://www.opengis.net/pubsub/1.0}PublicationType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="Filter" type="{http://www.w3.org/2001/XMLSchema}anyType" minOccurs="0"/&gt;
+ *         &lt;element name="BasePublicationIdentifier" type="{http://www.opengis.net/pubsub/1.0}PublicationIdentifierType"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "DerivedPublicationType", propOrder = {
     "filter",

@@ -1,0 +1,22 @@
+http://www.seadatanet.org/urnurl/SDN:L06::0/;unknown
+http://www.seadatanet.org/urnurl/SDN:L06::11/;fixed benthic node
+http://www.seadatanet.org/urnurl/SDN:L06::14/;land/onshore structure
+http://www.seadatanet.org/urnurl/SDN:L06::17/;coastal structure
+http://www.seadatanet.org/urnurl/SDN:L06::18/;river station
+http://www.seadatanet.org/urnurl/SDN:L06::25/;autonomous underwater vehicle
+http://www.seadatanet.org/urnurl/SDN:L06::26/;lowered unmanned submersible
+http://www.seadatanet.org/urnurl/SDN:L06::30/;ship
+http://www.seadatanet.org/urnurl/SDN:L06::31/;research vessel
+http://www.seadatanet.org/urnurl/SDN:L06::32/;vessel of opportunity
+http://www.seadatanet.org/urnurl/SDN:L06::33/;self-propelled small boat
+http://www.seadatanet.org/urnurl/SDN:L06::34/;vessel at fixed position
+http://www.seadatanet.org/urnurl/SDN:L06::36/;fishing vessel
+http://www.seadatanet.org/urnurl/SDN:L06::37/;self-propelled boat
+http://www.seadatanet.org/urnurl/SDN:L06::39/;naval vessel
+http://www.seadatanet.org/urnurl/SDN:L06::41/;moored surface buoy
+http://www.seadatanet.org/urnurl/SDN:L06::43/;subsurface mooring
+http://www.seadatanet.org/urnurl/SDN:L06::48/;mooring
+http://www.seadatanet.org/urnurl/SDN:L06::62/;aeroplane
+http://www.seadatanet.org/urnurl/SDN:L06::67/;helicopter
+http://www.seadatanet.org/urnurl/SDN:L06::68/;satellite
+http://www.seadatanet.org/urnurl/SDN:L06::71/;human

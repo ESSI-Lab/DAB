@@ -12,7 +12,7 @@ package org.cuahsi.waterml._1;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -44,6 +44,43 @@ import javax.xml.bind.annotation.adapters.NormalizedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+
+/**
+ * <p>Java class for ValueSingleVariable complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="ValueSingleVariable"&gt;
+ *   &lt;simpleContent&gt;
+ *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema&gt;decimal"&gt;
+ *       &lt;attribute name="qualifiers" type="{http://www.w3.org/2001/XMLSchema}NMTOKENS" /&gt;
+ *       &lt;attribute name="censorCode" type="{http://www.cuahsi.org/waterML/1.1/}CensorCodeCodeList" /&gt;
+ *       &lt;attribute name="dateTime" use="required" type="{http://www.w3.org/2001/XMLSchema}dateTime" /&gt;
+ *       &lt;attribute name="timeOffset" type="{http://www.cuahsi.org/waterML/1.1/}TimeOffsetType" /&gt;
+ *       &lt;attribute name="dateTimeUTC" type="{http://www.w3.org/2001/XMLSchema}dateTime" /&gt;
+ *       &lt;attribute name="methodID" type="{http://www.w3.org/2001/XMLSchema}nonNegativeInteger" /&gt;
+ *       &lt;attribute name="sourceID" type="{http://www.w3.org/2001/XMLSchema}nonNegativeInteger" /&gt;
+ *       &lt;attribute name="accuracyStdDev" type="{http://www.w3.org/2001/XMLSchema}double" /&gt;
+ *       &lt;attribute name="sampleID" type="{http://www.w3.org/2001/XMLSchema}nonNegativeInteger" /&gt;
+ *       &lt;attribute name="methodCode" type="{http://www.w3.org/2001/XMLSchema}token" /&gt;
+ *       &lt;attribute name="sourceCode" type="{http://www.w3.org/2001/XMLSchema}token" /&gt;
+ *       &lt;attribute name="labSampleCode" type="{http://www.w3.org/2001/XMLSchema}token" /&gt;
+ *       &lt;attribute name="offsetValue" type="{http://www.w3.org/2001/XMLSchema}double" /&gt;
+ *       &lt;attribute name="offsetTypeID" type="{http://www.w3.org/2001/XMLSchema}nonNegativeInteger" /&gt;
+ *       &lt;attribute name="offsetTypeCode" type="{http://www.w3.org/2001/XMLSchema}token" /&gt;
+ *       &lt;attribute name="codedVocabulary" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
+ *       &lt;attribute name="codedVocabularyTerm" type="{http://www.w3.org/2001/XMLSchema}normalizedString" /&gt;
+ *       &lt;attribute name="qualityControlLevelCode" type="{http://www.w3.org/2001/XMLSchema}token" /&gt;
+ *       &lt;attribute ref="{http://www.cuahsi.org/waterML/1.1/}metadataTime"/&gt;
+ *       &lt;attribute ref="{http://www.cuahsi.org/waterML/1.1/}oid"/&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/simpleContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ValueSingleVariable", propOrder = {
     "value"

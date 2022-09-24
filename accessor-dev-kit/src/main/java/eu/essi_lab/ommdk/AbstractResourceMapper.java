@@ -4,7 +4,7 @@ package eu.essi_lab.ommdk;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,16 +29,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
 import eu.essi_lab.iso.datamodel.classes.MIInstrument;
 import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
-import eu.essi_lab.lib.net.utils.whos.WMOOntology;
-import eu.essi_lab.lib.net.utils.whos.WMOUnit;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.utils.StringUtils;
@@ -47,10 +43,13 @@ import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
-import eu.essi_lab.model.resource.ExtensionHandler;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.OriginalMetadata;
 import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
+
+/**
+ * @author Fabrizio
+ */
 public abstract class AbstractResourceMapper implements IResourceMapper {
 
     private static final String ORIGINAL_METADATA_MISSING_ERROR = "ORIGINAL_METADATA_MISSING_ERROR";
@@ -244,7 +243,7 @@ public abstract class AbstractResourceMapper implements IResourceMapper {
     }
 
     @Override
-    @JsonIgnore
+    
     public Provider getProvider() {
 
 	return new ESSILabProvider();

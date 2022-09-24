@@ -4,7 +4,7 @@ package eu.essi_lab.messages.bond.parser;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,6 +21,9 @@ package eu.essi_lab.messages.bond.parser;
  * #L%
  */
 
+import java.util.Optional;
+
+import eu.essi_lab.messages.ReducedDiscoveryMessage;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.QueryableBond;
@@ -29,11 +32,37 @@ import eu.essi_lab.messages.bond.RuntimeInfoElementBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.SpatialBond;
 import eu.essi_lab.messages.bond.ViewBond;
+import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
+
+/**
+ * @author ilsanto
+ */
 public class ParentIdBondHandler implements DiscoveryBondHandler {
 
     private boolean parentIdFound;
     private String parentValue;
+
+    /**
+     * @param message
+     * @return
+     * @throws GSException
+     */
+    public static Optional<String> readParentId(ReducedDiscoveryMessage message) throws GSException {
+
+	DiscoveryBondParser bondParser = new DiscoveryBondParser(message.getReducedBond());
+
+	ParentIdBondHandler parentIdBondHandler = new ParentIdBondHandler();
+
+	bondParser.parse(parentIdBondHandler);
+
+	if (!parentIdBondHandler.isParentIdFound()) {
+
+	    return Optional.empty();
+	}
+
+	return Optional.of(parentIdBondHandler.getParentValue());
+    }
 
     @Override
     public void resourcePropertyBond(ResourcePropertyBond bond) {
@@ -89,13 +118,13 @@ public class ParentIdBondHandler implements DiscoveryBondHandler {
 
     @Override
     public void nonLogicalBond(Bond bond) {
-	
+
     }
 
     @Override
     public void runtimeInfoElementBond(RuntimeInfoElementBond bond) {
 	// TODO Auto-generated method stub
-	
+
     }
 
 }

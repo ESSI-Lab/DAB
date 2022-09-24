@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.csw._2_0_2;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -37,6 +37,30 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
+
+/**
+ * Governs the behaviour of a distributed search.
+ *          hopCount     - the maximum number of message hops before
+ *                         the search is terminated. Each catalogue node 
+ *                         decrements this value when the request is received, 
+ *                         and must not forward the request if hopCount=0.
+ * 
+ * <p>Classe Java per DistributedSearchType complex type.
+ * 
+ * <p>Il seguente frammento di schema specifica il contenuto previsto contenuto in questa classe.
+ * 
+ * <pre>
+ * &lt;complexType name="DistributedSearchType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;attribute name="hopCount" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" default="2" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "DistributedSearchType")
 public class DistributedSearchType {

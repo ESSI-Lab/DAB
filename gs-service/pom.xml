@@ -21,17 +21,17 @@
 		<baseAppServerURL>http://${hostname}:${jetty.port}/${contextPath}/</baseAppServerURL>
 		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
 		<timestamp>${maven.build.timestamp}</timestamp>
-		<quartzUser/>
-		<quartzPassword/>
+		<jetty.version>9.4.9.v20180320</jetty.version>
 		<configuration.url />
-
 
 	</properties>
 
+
+
 	<build>
 		<finalName>${contextPath}</finalName>
-		<resources>
 
+		<resources>
 			<resource>
 				<directory>src/main/resources/</directory>
 				<filtering>false</filtering>
@@ -40,21 +40,13 @@
 			<resource>
 				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
-				<includes>
-					<include>conf/configurationURL.json</include>
-					<include>conf/preconfigured.json</include>
-				</includes>
 			</resource>
-
 		</resources>
 
 		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>license-maven-plugin</artifactId>
-			</plugin>
 
-		
+			
+
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<!--version>2.4.3</version -->
@@ -94,29 +86,43 @@
 			</plugin>
 
 			<!-- Jetty Plugin -->
+
+
 			<plugin>
 				<groupId>org.eclipse.jetty</groupId>
 				<artifactId>jetty-maven-plugin</artifactId>
-				<version>9.4.9.v20180320</version>
+				<version>${jetty.version}</version>
 				<!-- Updated, because version 9.4.8.v20171121 has an important bugfix: 
 					on HTTP-GET with request header Connection: close it truncates the responses. -->
 				<!-- example request to reproduce, on a machine different from localhost: 
-					wget header="Connection: close" -O result.txt "http://localhost:9090/gs-service/services/essi/cuahsi_1_1.asmx?wsdl" -->
+					wget header="Connection: close" -O result.txt "http://boldrini.essi-lab.eu:9090/gs-service/services/essi/cuahsi_1_1.asmx?wsdl" -->
 				<configuration>
 					<stopPort>${jetty.stop_port}</stopPort>
 					<stopKey>stop</stopKey>
 					<webAppConfig>
 						<contextPath>/${contextPath}</contextPath>
-						<webInfIncludeJarPattern>.*/spring-[^/]*\.jar$</webInfIncludeJarPattern>
-						<containerIncludeJarPattern>.*/spring-[^/]*\.jar$</containerIncludeJarPattern>
-					</webAppConfig>
-					<useTestClasspath>false</useTestClasspath>
 
+						<webInfIncludeJarPattern>.*/spring-[^/]*\.jar$|.*vaadin-[^/]*\.jar$|.*flow-[^/]*\.jar$|.*/togglebutton-[^/]*\.jar$|.*/multiselect-combo-box-flow-[^/]*\.jar$</webInfIncludeJarPattern>
+						<containerIncludeJarPattern>.*/spring-[^/]*\.jar$|.*vaadin-[^/]*\.jar$|.*flow-[^/]*\.jar$|.*/togglebutton-[^/]*\.jar$|.*/multiselect-combo-box-flow-[^/]*\.jar$</containerIncludeJarPattern>
+
+						<!-- Use war output directory to get the webpack files -->
+						<allowDuplicateFragmentNames>true</allowDuplicateFragmentNames>
+
+					</webAppConfig>
+
+					<useTestClasspath>false</useTestClasspath>
 					<dumpOnStart>false</dumpOnStart>
+
 					<scanIntervalSeconds>0</scanIntervalSeconds>
-					<jettyXml>${project.basedir}/src/main/webapp/WEB-INF/jetty.xml,${project.basedir}/src/main/webapp/WEB-INF/jetty-http.xml,${project.basedir}/src/main/webapp/WEB-INF/jetty-ssl.xml,${project.basedir}/src/main/webapp/WEB-INF/jetty-https.xml</jettyXml>
+					<jettyXml>${project.basedir}/src/main/webapp/WEB-INF/jetty.xml,
+						${project.basedir}/src/main/webapp/WEB-INF/jetty-http.xml,
+						${project.basedir}/src/main/webapp/WEB-INF/jetty-ssl.xml,
+						${project.basedir}/src/main/webapp/WEB-INF/jetty-https.xml</jettyXml>
+
 				</configuration>
 			</plugin>
+
+
 
 			<!-- War plugin -->
 			<plugin>
@@ -125,12 +131,13 @@
 				<configuration>
 					<attachClasses>true</attachClasses>
 					<webResources>
+						<!-- packagingExcludes>truststore.jks</packagingExcludes -->
 						<resource>
 							<directory>target/classes</directory>
 							<includes>
 								<include>**/*.xml</include>
 								<include>**/*.properties</include>
-								<include>**/PostApplet*.class</include>
+								<!-- include>GetRecordsTemplate.xml</include> <include>DescribeRecordTemplate.xml</include -->
 							</includes>
 							<excludes>
 
@@ -148,6 +155,16 @@
 								<include>**/*.jsp</include>
 								<include>**/*.properties</include>
 							</includes>
+						</resource>
+
+						<resource>
+							<directory>target/frontend</directory>
+							<targetPath>frontend</targetPath>
+						</resource>
+
+						<resource>
+							<directory>target/flow-frontend</directory>
+							<targetPath>flow-frontend</targetPath>
 						</resource>
 
 					</webResources>
@@ -173,6 +190,22 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<!-- Take care of synchronizing java dependencies and imports in package.json 
+				and main.js files. It also creates webpack.config.js if not exists yet. -->
+			<plugin>
+				<groupId>com.vaadin</groupId>
+				<artifactId>vaadin-maven-plugin</artifactId>
+				<version>${vaadin.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-frontend</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
 		</plugins>
 
 		<pluginManagement>
@@ -234,6 +267,13 @@
 
 
 	<dependencies>
+
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-servlets</artifactId>
+			<version>${jetty.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>com.indeed</groupId>
 			<artifactId>status-core</artifactId>
@@ -268,23 +308,6 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 
-		<!-- configuration -->
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>conf-storage-api</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>conf-storage-filesystem-impl</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>conf-manager</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-
 		<!-- database -->
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
@@ -294,6 +317,11 @@
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>database-api-marklogic-impl</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.essi_lab</groupId>
+			<artifactId>database-api-volatile-impl</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 
@@ -324,12 +352,28 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-administration</artifactId>
+			<artifactId>profiler-gwis</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-csw</artifactId>
+			<artifactId>profiler-observations</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-semantic</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-bnhs</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-sos</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
@@ -339,17 +383,7 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-opensearch</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-pub-sub</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-rest</artifactId>
+			<artifactId>profiler-wps</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
@@ -359,61 +393,36 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-wfs</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-opensearch</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-csw</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-pub-sub</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>profiler-wof</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>profiler-wps</artifactId>
+			<artifactId>profiler-rest</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-		
-		<!-- accessors -->
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>accessor-dev-kit</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>accessor-csw</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>accessor-local-fs</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>accessor-oai-pmh</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>accessor-waf</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>accessor-wcs</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>accessor-wfs</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>accessor-wms</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>accessor-wof</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
+
 
 		<!-- shared content -->
 		<dependency>
@@ -421,17 +430,79 @@
 			<artifactId>gs-shared-content</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>gs-yellow-page</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
+
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>gs-driver-local-cache</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 
+		<!-- accessors -->
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-dev-kit</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-oai-pmh</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+	
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-wcs</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-fdsn</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-wof</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-wms</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-csw</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-waf</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-wfs</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-local-fs</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+	
+	
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>security</artifactId>
@@ -439,6 +510,7 @@
 		</dependency>
 
 		<!-- access tools -->
+
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>access-tools</artifactId>
@@ -501,34 +573,63 @@
 
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>gs-driver-marklogic</artifactId>
+			<artifactId>gs-driver-database</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>configuration-api</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>configuration-api-gs</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>configuration-api-gui</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 
 	</dependencies>
 
 	<profiles>
+
+
 		<profile>
-			<id>preconfigured</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
+			<!-- Production mode is activated using -Pvaadin-production -->
+			<id>vaadin-production</id>
 			<properties>
-				<configuration.url>preconfigured.json</configuration.url>
+				<vaadin.productionMode>true</vaadin.productionMode>
 			</properties>
+
+			<dependencies>
+				<dependency>
+					<groupId>com.vaadin</groupId>
+					<artifactId>flow-server-production-mode</artifactId>
+				</dependency>
+			</dependencies>
+
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.vaadin</groupId>
+						<artifactId>vaadin-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<goals>
+									<goal>build-frontend</goal>
+								</goals>
+								<phase>compile</phase>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
-		<profile>
-			<!-- The configuration.url parameter should be passed as JVM argument, 
-				such as: -DconfigurationUrl=xdbc://$DBPREPRODU:$DBPREPRODP@marklogic.host.production:8000,8004/PRODUCTION-DB/acceptenvconf/ -->
-			<id>remote</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<properties>
-				<configuration.url>${configurationUrl}</configuration.url>
-			</properties>
-		</profile>
-		
 	</profiles>
-	
 </project>

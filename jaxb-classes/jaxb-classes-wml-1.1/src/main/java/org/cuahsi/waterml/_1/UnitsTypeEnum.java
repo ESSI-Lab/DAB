@@ -12,7 +12,7 @@ package org.cuahsi.waterml._1;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -33,6 +33,40 @@ import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlType;
 
+
+/**
+ * <p>Java class for UnitsTypeEnum.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * <pre>
+ * &lt;simpleType name="UnitsTypeEnum"&gt;
+ *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
+ *     &lt;enumeration value="Angle"/&gt;
+ *     &lt;enumeration value="Area"/&gt;
+ *     &lt;enumeration value="Dimensionless"/&gt;
+ *     &lt;enumeration value="Energy"/&gt;
+ *     &lt;enumeration value="Energy Flux"/&gt;
+ *     &lt;enumeration value="Flow"/&gt;
+ *     &lt;enumeration value="Force"/&gt;
+ *     &lt;enumeration value="Frequency"/&gt;
+ *     &lt;enumeration value="Length"/&gt;
+ *     &lt;enumeration value="Light"/&gt;
+ *     &lt;enumeration value="Mass"/&gt;
+ *     &lt;enumeration value="Permeability"/&gt;
+ *     &lt;enumeration value="Power"/&gt;
+ *     &lt;enumeration value="Pressure/Stress"/&gt;
+ *     &lt;enumeration value="Resolution"/&gt;
+ *     &lt;enumeration value="Scale"/&gt;
+ *     &lt;enumeration value="Temperature"/&gt;
+ *     &lt;enumeration value="Time"/&gt;
+ *     &lt;enumeration value="Velocity"/&gt;
+ *     &lt;enumeration value="Volume"/&gt;
+ *   &lt;/restriction&gt;
+ * &lt;/simpleType&gt;
+ * </pre>
+ * 
+ */
 @XmlType(name = "UnitsTypeEnum")
 @XmlEnum
 public enum UnitsTypeEnum {

@@ -1,0 +1,10 @@
+eu.essi_lab.authorization.pps.KMAPermissionPolicySet
+eu.essi_lab.authorization.pps.GWPPermissionPolicySet
+eu.essi_lab.authorization.pps.AdminPermissionPolicySet
+eu.essi_lab.authorization.pps.AnonymousPermissionPolicySet
+eu.essi_lab.authorization.pps.WHOSPermissionPolicySet
+eu.essi_lab.authorization.pps.CSW_RIPermissionPolicySet
+eu.essi_lab.authorization.pps.SeadatanetPermissionPolicySet
+eu.essi_lab.authorization.pps.EIFFELPermissionPolicySet
+eu.essi_lab.authorization.pps.LODGEOSSPermissionPolicySet
+eu.essi_lab.authorization.pps.SSCPermissionPolicySet

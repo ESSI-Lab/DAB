@@ -1,0 +1,6 @@
+eu.essi_lab.gssrv.conf.task.UsersViewerTask
+eu.essi_lab.gssrv.conf.task.IndexesSizeViewerTask
+eu.essi_lab.gssrv.conf.task.DeletedRecordsRemovalTask
+eu.essi_lab.gssrv.conf.task.DatabaseCacheCleanerTask
+eu.essi_lab.gssrv.conf.task.DatabaseCacheStatusTask
+eu.essi_lab.gssrv.conf.task.BigFolderCleanerTask

@@ -1,0 +1,126 @@
+package eu.essi_lab.cfga.gui.components.setting.edit_put;
+
+/*-
+ * #%L
+ * Discovery and Access Broker (DAB) Community Edition (CE)
+ * %%
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * #L%
+ */
+
+import java.util.Optional;
+
+import com.vaadin.flow.component.Component;
+
+import eu.essi_lab.cfga.Configuration;
+import eu.essi_lab.cfga.SelectionUtils;
+import eu.essi_lab.cfga.gui.components.TabContainer;
+import eu.essi_lab.cfga.gui.components.listener.ButtonChangeListener;
+import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
+import eu.essi_lab.cfga.gui.components.setting.listener.SettingEditButtonConfirmationListener;
+import eu.essi_lab.cfga.gui.extension.directive.EditDirective;
+import eu.essi_lab.cfga.setting.Setting;
+import eu.essi_lab.cfga.setting.validation.ValidationContext;
+
+/**
+ * @author Fabrizio
+ */
+@SuppressWarnings("serial")
+public class SettingEditDialog extends SettingPutOrEditDialog {
+
+    private Setting settingToEdit;
+    private SettingComponent currentSettingComponent;
+
+    /**
+     * @param configuration
+     * @param setting
+     */
+    public SettingEditDialog(//
+	    Configuration configuration, //
+	    Setting setting) {//
+
+	this(configuration, setting, null, null);
+    }
+
+    /**
+     * @param configuration
+     * @param setting
+     * @param tabContainer
+     */
+    public SettingEditDialog(//
+	    Configuration configuration, //
+	    Setting setting, //
+	    SettingComponent currentSettingComponent, //
+	    TabContainer tabContainer) {//
+
+	super(configuration, tabContainer, ValidationContext.edit());
+
+	this.currentSettingComponent = currentSettingComponent;
+	
+	Optional<EditDirective> editDirective = tabContainer == null? Optional.empty() : tabContainer.getEditDirective();
+	String title = "Edit setting";
+	
+	if(editDirective.isPresent()){
+	    
+	    title = editDirective.get().getName();	    
+	}
+
+	setTitle(title);
+	setConfirmText("Apply changes");
+	setCancelText("Discard changes");
+
+	this.settingToEdit = SelectionUtils.resetAndSelect(setting);
+
+	//
+	// hides the header and opens expands the setting
+	//
+	this.settingToEdit.setShowHeader(false);
+
+	this.foldedModeEnabled = this.settingToEdit.isFoldedModeEnabled();
+
+	this.settingToEdit.enableFoldedMode(false);
+
+	// SettingHelper.expand(settingToEdit);
+
+	Component settingToAddComponent = createSettingToAddOrEditComponent(configuration, this.settingToEdit, dialogHeight);
+
+	setContent(settingToAddComponent);
+    }
+
+    @Override
+    protected Setting getSetting() {
+
+	return this.settingToEdit;
+    }
+
+    @Override
+    protected ButtonChangeListener getConfirmationListener() {
+
+	return new SettingEditButtonConfirmationListener(//
+		this, //
+		configuration, //
+		settingToEdit, //
+		currentSettingComponent, //
+		tabContainer, //
+		foldedModeEnabled);
+    }
+
+    @Override
+    protected Optional<EditDirective> getDirective() {
+
+	return tabContainer == null ? Optional.empty() : tabContainer.getEditDirective();
+    }
+}

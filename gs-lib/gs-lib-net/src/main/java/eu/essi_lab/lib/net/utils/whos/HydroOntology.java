@@ -4,7 +4,7 @@ package eu.essi_lab.lib.net.utils.whos;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,6 +29,7 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
@@ -37,6 +38,13 @@ import org.json.JSONObject;
 import eu.essi_lab.lib.net.utils.Downloader;
 
 public class HydroOntology {
+
+    /**
+     * Given a variable name, find correspondent concepts in the ontology
+     * 
+     * @param variableName
+     * @return
+     */
     public List<SKOSConcept> findConcepts(String variableName) {
 
 	try {
@@ -85,12 +93,15 @@ public class HydroOntology {
     }
 
     private List<SKOSConcept> conceptQuery(String query) throws Exception {
+	
 	Downloader d = new Downloader();
+	d.setTimeout((int) TimeUnit.SECONDS.toMillis(20));
 
 	String url = "http://hydro.geodab.eu/hydro-ontology/sparql?output=json&format=application/json&query=";
 	query = URLEncoder.encode(query, "UTF-8");
 
 	InputStream stream = d.downloadStream(url + query).get();
+
 	ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	IOUtils.copy(stream, baos);
 	stream.close();

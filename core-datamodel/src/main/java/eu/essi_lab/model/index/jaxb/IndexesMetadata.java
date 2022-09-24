@@ -4,7 +4,7 @@ package eu.essi_lab.model.index.jaxb;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -47,11 +47,16 @@ import com.google.common.collect.Lists;
 
 import eu.essi_lab.iso.datamodel.DOMSerializer;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.jaxb.common.NameSpace;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.model.index.IndexedElement;
 import eu.essi_lab.model.index.IndexedMetadataElement;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
+
+/**
+ * @author Fabrizio
+ */
 @XmlRootElement(name = "indexesMetadata", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
 public class IndexesMetadata extends DOMSerializer {
 
@@ -112,7 +117,7 @@ public class IndexesMetadata extends DOMSerializer {
      * @param element
      * @throws IllegalArgumentException if the supplied element has no value/s
      */
-    public void write(IndexedElement element) throws IllegalArgumentException {
+    public void write(IndexedElement element)   {
 
 	if (element instanceof IndexedMetadataElement) {
 
@@ -129,7 +134,8 @@ public class IndexesMetadata extends DOMSerializer {
 	List<String> values = element.getValues();
 
 	if (values.isEmpty()) {
-	    throw new IllegalArgumentException("Element without values cannot be written: " + element.getElementName());
+	    GSLoggerFactory.getLogger(getClass()).warn("Empty values element found: " + element.getElementName());
+	    return;
 	}
 
 	for (String value : values) {

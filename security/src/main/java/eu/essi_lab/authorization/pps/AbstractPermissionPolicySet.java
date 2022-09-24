@@ -1,10 +1,13 @@
+/**
+ * 
+ */
 package eu.essi_lab.authorization.pps;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -272,6 +275,22 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
     }
 
     /**
+     * @param origin
+     * @return
+     */
+    protected ApplyType createOriginHeaderApply(String ...origin) {
+    
+        AttributeDesignatorType viewCreatorType = new AttributeDesignatorType(//
+        	XacmlAttributeCategory.XACML_1_0_ACCESS_SUBJECT.value(), //
+        	XacmlAttributeId.XACML_1_0_SUBJECT_ID.value(), //
+        	StandardDatatypes.STRING.getId(), //
+        	Issuer.ORIGIN.getId(), //
+        	true);//
+    
+	return XACML_JAXBUtils.createAtLeastAnyOfApply(Arrays.asList(origin), viewCreatorType);       
+    }
+
+    /**
      * @param viewCreator
      * @return
      */
@@ -286,7 +305,7 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
 
 	return XACML_JAXBUtils.createStringEqualApply(viewCreator, viewCreatorType);
     }
-
+    
     /**
      * @param allowedIPs
      * @return

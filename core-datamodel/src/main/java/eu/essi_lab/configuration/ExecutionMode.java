@@ -4,7 +4,7 @@ package eu.essi_lab.configuration;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,6 +23,10 @@ package eu.essi_lab.configuration;
 
 import java.util.Arrays;
 import java.util.Optional;
+
+/**
+ * @author ilsanto
+ */
 public enum ExecutionMode {
 
     /**
@@ -31,14 +35,23 @@ public enum ExecutionMode {
     FRONTEND,
 
     /**
-     * This mode disables execution of incoming requests and enables execution of batch jobs in general (harvestings, bulk download requests)
+     * This mode disables execution of incoming requests and enables execution of batch jobs in general (harvestings,
+     * bulk download requests)
      */
     BATCH,
-    
+
     /**
      * This mode disables execution of incoming requests and enables execution of single download jobs
      */
     ACCESS,
+    /**
+     * 
+     */
+    CONFIGURATION,
+    /**
+     * 
+     */
+    LOCAL_PRODUCTION, 
 
     /**
      * (default) This mode enables execution of batch jobs AND of incoming requests
@@ -46,7 +59,6 @@ public enum ExecutionMode {
     MIXED;
 
     /**
-     * 
      * @param value
      * @return
      */
@@ -56,6 +68,5 @@ public enum ExecutionMode {
 		stream().//
 		filter(e -> e.toString().equalsIgnoreCase(value)).//
 		findFirst();
-
     }
 }

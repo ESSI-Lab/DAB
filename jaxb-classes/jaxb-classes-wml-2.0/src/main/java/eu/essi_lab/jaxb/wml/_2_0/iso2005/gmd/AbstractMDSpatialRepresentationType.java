@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.wml._2_0.iso2005.gmd;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,6 +35,27 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import eu.essi_lab.jaxb.wml._2_0.iso2005.gco.AbstractObjectType;
 
+
+/**
+ * Digital mechanism used to represent spatial information
+ * 
+ * <p>Java class for AbstractMD_SpatialRepresentation_Type complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="AbstractMD_SpatialRepresentation_Type"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{http://www.isotc211.org/2005/gco}AbstractObject_Type"&gt;
+ *       &lt;sequence&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "AbstractMD_SpatialRepresentation_Type")
 @XmlSeeAlso({

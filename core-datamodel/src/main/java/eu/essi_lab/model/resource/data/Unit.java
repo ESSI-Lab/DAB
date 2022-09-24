@@ -4,7 +4,7 @@ package eu.essi_lab.model.resource.data;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -39,6 +39,11 @@ public class Unit implements Serializable {
     public Unit(String value) {
 	this.value = value;
     }
+
+    /**
+     * @param identifier
+     * @return
+     */
     public static Unit fromIdentifier(String identifier) {
 	if (identifier == null) {
 	    return null;

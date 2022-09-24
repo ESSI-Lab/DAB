@@ -21,13 +21,10 @@
 			<artifactId>database-api</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>configuration-api-gs</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
 	</dependencies>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>license-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>	
 </project>

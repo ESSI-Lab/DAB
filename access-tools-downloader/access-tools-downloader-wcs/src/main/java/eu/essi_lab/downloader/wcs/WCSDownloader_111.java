@@ -4,7 +4,7 @@ package eu.essi_lab.downloader.wcs;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -34,8 +34,8 @@ import org.w3c.dom.Node;
 
 import com.google.common.collect.Lists;
 
-import eu.essi_lab.accessor.wcs.connector.WCSConnector;
-import eu.essi_lab.accessor.wcs.connector.WCSConnector_111;
+import eu.essi_lab.accessor.wcs.WCSConnector;
+import eu.essi_lab.accessor.wcs_1_1_1.WCSConnector_111;
 import eu.essi_lab.lib.net.protocols.NetProtocol;
 import eu.essi_lab.lib.net.protocols.NetProtocols;
 import eu.essi_lab.lib.xml.XMLDocumentReader;

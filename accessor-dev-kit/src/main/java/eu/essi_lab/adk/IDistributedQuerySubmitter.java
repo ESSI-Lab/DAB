@@ -4,7 +4,7 @@ package eu.essi_lab.adk;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,6 +28,10 @@ import eu.essi_lab.messages.count.DiscoveryCountResponse;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
+
+/**
+ * @author ilsanto
+ */
 public interface IDistributedQuerySubmitter<T> {
 
     /**

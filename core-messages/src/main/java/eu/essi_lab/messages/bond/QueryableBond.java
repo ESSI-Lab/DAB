@@ -4,7 +4,7 @@ package eu.essi_lab.messages.bond;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,6 +31,19 @@ import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.index.IndexedElement;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
+
+/**
+ * A bond applied to a {@link Queryable} property with a supplied operator. This class provides common
+ * fields and methods for the subclasses and is used to define custom bonds with the method
+ * {@link BondFactory#createCustomBond(Queryable, BondOperator, String)}
+ * 
+ * @see Queryable
+ * @see MetadataElementBond
+ * @see ResourcePropertyBond
+ * @author Fabrizio
+ * @param <T> the type of the queryable property which reflects the content of the related {@link IndexedElement}. For
+ *        example, {@link IndexedElement}s having a simple textual content, can have the {@link String} type
+ */
 public class QueryableBond<T> implements Bond {
 
     @XmlElements({ @XmlElement(name = "metadataElement", type = MetadataElement.class),

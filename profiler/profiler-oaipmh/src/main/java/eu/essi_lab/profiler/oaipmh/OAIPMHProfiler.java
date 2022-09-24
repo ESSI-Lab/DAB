@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.oaipmh;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,6 +27,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.jaxb.common.CommonContext;
 import eu.essi_lab.jaxb.oaipmh.OAIPMHerrorType;
 import eu.essi_lab.jaxb.oaipmh.OAIPMHerrorcodeType;
@@ -37,7 +38,6 @@ import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.pdk.Profiler;
-import eu.essi_lab.pdk.ProfilerInfo;
 import eu.essi_lab.pdk.handler.DiscoveryHandler;
 import eu.essi_lab.pdk.handler.selector.GETRequestFilter.InspectionStrategy;
 import eu.essi_lab.pdk.handler.selector.HandlerSelector;
@@ -47,6 +47,10 @@ import eu.essi_lab.profiler.oaipmh.handler.discover.OAIPMHResultSetMapper;
 import eu.essi_lab.profiler.oaipmh.handler.srvinfo.OAIPMHIdentifyHandler;
 import eu.essi_lab.profiler.oaipmh.handler.srvinfo.OAIPMHListMetadataFormatsHandler;
 import eu.essi_lab.profiler.oaipmh.handler.srvinfo.OAIPMHListSetsHandler;
+
+/**
+ * @author Fabrizio
+ */
 public class OAIPMHProfiler extends Profiler {
 
     /**
@@ -55,7 +59,7 @@ public class OAIPMHProfiler extends Profiler {
     public static final String OAI_PMH_PROFILER_TYPE = "OAI-PMH";
     public static final String SCHEMA_LOCATION = "http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd";
 
-    public static final ProfilerInfo OAIPMH_SERVICE_INFO = new ProfilerInfo();
+    public static final ProfilerSetting OAIPMH_SERVICE_INFO = new ProfilerSetting();
     static {
 	OAIPMH_SERVICE_INFO.setServiceName("OAI-PMH");
 	OAIPMH_SERVICE_INFO.setServiceType(OAI_PMH_PROFILER_TYPE);
@@ -183,7 +187,7 @@ public class OAIPMHProfiler extends Profiler {
     }
 
     @Override
-    public ProfilerInfo getProfilerInfo() {
+    protected ProfilerSetting initSetting() {
 
 	return OAIPMH_SERVICE_INFO;
     }

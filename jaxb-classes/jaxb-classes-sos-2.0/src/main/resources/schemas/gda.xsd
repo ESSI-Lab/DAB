@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+   xmlns:gml="http://www.opengis.net/gml/3.2"
+   xmlns:gda="http://www.opengis.net/sosgda/1.0"
+   xmlns:swes="http://www.opengis.net/swes/2.0"
+   targetNamespace="http://www.opengis.net/sosgda/1.0"
+   elementFormDefault="qualified" attributeFormDefault="unqualified"
+   version="1.0.0">
+   <import namespace="http://www.opengis.net/gml/3.2"
+      schemaLocation="http://schemas.opengis.net/gml/3.2.1/gml.xsd"/>
+   <import namespace="http://www.opengis.net/swes/2.0"
+      schemaLocation="http://schemas.opengis.net/swes/2.0/swes.xsd"/>
+   <annotation>
+      <documentation>
+			SOS is an OGC Standard.
+			Copyright (c) 2014, 2016 Open Geospatial Consortium.
+			To obtain additional rights of use, visit http://www.opengeospatial.org/legal/.
+		</documentation>
+   </annotation>
+   <element name="GetDataAvailability" type="gda:GetDataAvailabilityType" substitutionGroup="swes:ExtensibleRequest">
+      <annotation>
+         <documentation>operation to discover available time series for combinations of feature, observed property, procedure and offering
+			</documentation>
+      </annotation>
+   </element>
+   <complexType name="GetDataAvailabilityType">
+      <complexContent>
+         <extension base="swes:ExtensibleRequestType">
+            <sequence>
+               <element name="procedure" type="anyURI" minOccurs="0" maxOccurs="unbounded">
+                  <annotation>
+                     <documentation>pointer to a procedure for which time series shall be discovered
+							</documentation>
+                  </annotation>
+               </element>
+               <element name="observedProperty" type="anyURI" minOccurs="0" maxOccurs="unbounded">
+                  <annotation>
+                     <documentation>pointer to an observed property for which time series shall be discovered
+							</documentation>
+                  </annotation>
+               </element>
+               <element name="featureOfInterest" type="anyURI" minOccurs="0" maxOccurs="unbounded">
+                  <annotation>
+                     <documentation>pointer to a feature of interest for which time series shall be discovered
+							</documentation>
+                  </annotation>
+               </element>
+               <element name="offering" type="anyURI" minOccurs="0" maxOccurs="unbounded">
+                  <annotation>
+                     <documentation>pointer to an offering for which time series shall be discovered
+							</documentation>
+                  </annotation>
+               </element>
+            </sequence>
+         </extension>
+      </complexContent>
+   </complexType>
+   <complexType name="GetDataAvailabilityPropertyType">
+      <sequence minOccurs="0">
+         <element ref="gda:GetDataAvailability"/>
+      </sequence>
+      <attributeGroup ref="gml:AssociationAttributeGroup"/>
+   </complexType>
+   <!-- ================================================= -->
+   <element name="GetDataAvailabilityResponse" type="gda:GetDataAvailabilityResponseType" substitutionGroup="swes:ExtensibleResponse">
+      <annotation>
+         <documentation>response with result values from observations matching the request criteria
+			</documentation>
+      </annotation>
+   </element>
+   <element name="DataAvailabilityMember" type="gda:DataAvailabilityMemberType" substitutionGroup="gml:AbstractGML">
+      <annotation>
+         <documentation>template which contains observation metadata that is used to form complete observation together with result values that are inserted later on
+			</documentation>
+      </annotation>
+   </element>
+   <complexType name="GetDataAvailabilityResponseType">
+      <complexContent>
+         <extension base="swes:ExtensibleResponseType">
+            <sequence>
+               <element name="dataAvailabilityMember" type="gda:DataAvailabilityMemberType" minOccurs="0" maxOccurs="unbounded">
+                  <annotation>
+                     <documentation>template which contains observation metadata that is used to form complete observation together with result values that are inserted later on
+							</documentation>
+                  </annotation>
+               </element>
+            </sequence>
+         </extension>
+      </complexContent>
+   </complexType>
+   <complexType name="DataAvailabilityMemberType">
+      <annotation>
+         <documentation>The DataAvailabilityMemberType represents an individual time series comprising one procedure/observed property/feature of interest combination
+					</documentation>
+      </annotation>
+      <complexContent>
+         <extension base="gml:AbstractGMLType">
+            <sequence>
+               <element name="procedure" type="gml:ReferenceType">
+                  <annotation>
+                     <documentation>the procedure of the time series
+					</documentation>
+                  </annotation>
+               </element>
+               <element name="observedProperty" type="gml:ReferenceType">
+                  <annotation>
+                     <documentation>the observed property of the time series
+					</documentation>
+                  </annotation>
+               </element>
+               <element name="featureOfInterest" type="gml:ReferenceType">
+                  <annotation>
+                     <documentation>the feature of interest of the time series
+					</documentation>
+                  </annotation>
+               </element>
+               <element name="phenomenonTime" type="gda:TimeObjectPropertyType">
+                  <annotation>
+                     <documentation>The time for which the time series contains data. This element has been copied from the Observation and Measurements schema in order to avoid the need to import the whole Observations and Measurements schema.
+					</documentation>
+                  </annotation>
+               </element>
+               <element name="count" type="nonNegativeInteger" minOccurs="0" maxOccurs="1">
+                  <annotation>
+                     <documentation>the number of observations contained in the time series
+					</documentation>
+                  </annotation>
+               </element>
+               <element name="extension" type="anyType" minOccurs="0" maxOccurs="unbounded">
+                  <annotation>
+                     <documentation>place where other specifications/profiles may insert additional information</documentation>
+                  </annotation>
+               </element>
+            </sequence>
+         </extension>
+      </complexContent>
+   </complexType>
+   <complexType name="GetDataAvailabilityResponsePropertyType">
+      <sequence minOccurs="0">
+         <element ref="gda:GetDataAvailabilityResponse"/>
+      </sequence>
+      <attributeGroup ref="gml:AssociationAttributeGroup"/>
+   </complexType>
+   <complexType name="TimeObjectPropertyType">
+      <annotation>
+         <documentation>This property type is not provided directly by GML</documentation>
+      </annotation>
+      <sequence minOccurs="0">
+         <element ref="gml:AbstractTimeObject"/>
+      </sequence>
+      <attributeGroup ref="gml:AssociationAttributeGroup"/>
+   </complexType>
+</schema>

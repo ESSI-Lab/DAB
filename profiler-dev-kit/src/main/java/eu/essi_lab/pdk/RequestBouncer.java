@@ -4,7 +4,7 @@ package eu.essi_lab.pdk;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,6 +28,14 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+
+/**
+ * Allows the coordination of execution of multiple simultaneous requests by enforcing some rules:
+ * There is a maximum number of requests that a specific client IP can simultaneous execute. Additional requests from
+ * the same IP beyond the maximum number will wait.
+ * 
+ * @author boldrini
+ */
 public class RequestBouncer {
 
     private int maximumSimultaneousRequestsByIP = 3;

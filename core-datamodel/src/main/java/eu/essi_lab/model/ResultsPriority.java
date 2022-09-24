@@ -4,7 +4,7 @@ package eu.essi_lab.model;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,29 +21,49 @@ package eu.essi_lab.model;
  * #L%
  */
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import eu.essi_lab.lib.utils.LabeledEnum;
 
-import eu.essi_lab.model.deserializer.ResultsPriorityDeserializer;
-@JsonFormat(shape = JsonFormat.Shape.OBJECT)
-@JsonDeserialize(using = ResultsPriorityDeserializer.class)
-public enum ResultsPriority {
+/**
+ * @author Fabrizio
+ */
+public enum ResultsPriority implements LabeledEnum {
 
-    UNSET("UNSET"),//
-    COLLECTION("COLLECTION"),//
-    DATASET("DATASET"),//
-    ALL("ALL");
+    /**
+     * 
+     */
+    UNSET("Unset"),
+    /**
+     * 
+     */
+    COLLECTION("Collection"), //
+    /**
+    *  
+    */
+    DATASET("Dataset"), //
+    /**
+    *  
+    */
+    ALL("All");
 
-    @JsonProperty("value")
-    private String name;
+    private String label;
 
+    /**
+     * @param name
+     */
     private ResultsPriority(String name) {
-	this.name = name;
+
+	this.label = name;
     }
 
-    public String getName() {
-	return name;
+    @Override
+    public String getLabel() {
+
+	return label;
     }
 
+    @Override
+    public String toString() {
+
+	return getLabel();
+    }
 }

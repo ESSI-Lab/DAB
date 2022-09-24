@@ -4,7 +4,7 @@ package eu.essi_lab.model.resource;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,9 +29,15 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import eu.essi_lab.iso.datamodel.CDATA_Adapter;
-import eu.essi_lab.jaxb.common.NameSpace;
+import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.model.GSPropertyHandler;
 import eu.essi_lab.model.GSSource;
+
+/**
+ * An original metadata set obtained by a {@link GSSource}
+ * 
+ * @author Fabrizio
+ */
 public class OriginalMetadata {
 
     @NotNull(message = "schemeURI field of OriginalMetadata cannot be null")

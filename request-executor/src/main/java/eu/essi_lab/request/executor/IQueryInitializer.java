@@ -4,7 +4,7 @@ package eu.essi_lab.request.executor;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,6 +26,29 @@ import eu.essi_lab.messages.GSMessage;
 import eu.essi_lab.messages.QueryInitializerMessage;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.model.exceptions.GSException;
+
+/**
+ * Creates a normalized version of the original query bond by performing the following steps:
+ * <ol>
+ * <li>Asks the Request Authorization Converter to set the permitted bond, generated starting from the original query
+ * bond according to the user source discovery grants.</li>
+ * <li>the <b>permitted bond</b> is then normalized by converting it to an equivalent bond expressed in normal form
+ * (<b>normalized bond</b>)</li>
+ * </ol>
+ * Given S1, S2, ... SN source bonds included in the permitted bond (i.e. S1={SOURCE with id 1}), the <b>normalized
+ * bond</b> is a bond that is equivalent to the permitted bond and is a logical disjunction of bonds of type S1_BOND OR
+ * S2_BOND OR SN_BOND, where at most one SI_BOND exists for each SOURCE bond S1, S2, … SN, of the form SI_BOND={SI AND
+ * BOND_I}, where BOND_I is a complex bond that doesn’t contain source bonds.
+ * <p>
+ * Example steps of normalization:
+ * <ol>
+ * <li><b>original bond</b>: temperature OR precipitation</li>
+ * <li><b>permitted bond</b>: (temperature OR precipitation) AND (source 1 OR source2)</li> 
+ * <li><b>normalized bond</b>: (source1 AND (temperature OR precipitation)) OR (source2 AND (temperature OR precipitation))</li>
+ * </ol>
+ * 
+ * @author boldrini
+ */
 public interface IQueryInitializer {
 
     /**

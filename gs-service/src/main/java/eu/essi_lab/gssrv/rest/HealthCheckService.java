@@ -21,7 +21,10 @@ package eu.essi_lab.gssrv.rest;
  * #L%
  */
 
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import javax.jws.WebService;
 import javax.servlet.http.HttpServletRequest;
@@ -34,32 +37,75 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.ws.WebServiceContext;
 
-import eu.essi_lab.gssrv.health.StatusHealthCheck;
+import eu.essi_lab.gssrv.health.HealthCheck;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+
+/**
+ * @author ilsanto
+ */
 @WebService
 @Path("/")
 public class HealthCheckService {
+
+    /**
+     * 
+     */
+    private static Boolean lastResponse;
+    private static HealthCheck lastChecker;
+
+    private static final Timer RESPONSE_TIMER = new Timer();
+    static {
+
+	RESPONSE_TIMER.scheduleAtFixedRate(new TimerTask() {
+
+	    @Override
+	    public void run() {
+
+		synchronized (RESPONSE_TIMER) {
+
+		    lastResponse = null;
+		}
+	    }
+	}, //
+		TimeUnit.MINUTES.toMillis(2), //
+		TimeUnit.MINUTES.toMillis(2));
+
+    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/check")
     public Response health(@Context HttpServletRequest hsr, @Context UriInfo uriInfo, @Context WebServiceContext wscontext) {
 
-	String id = UUID.randomUUID().toString();
+	synchronized (RESPONSE_TIMER) {
 
-	GSLoggerFactory.getLogger(getClass()).info("[HEALTH_CHECK] Started {}", id);
+	    if (lastResponse == null) {
 
-	StatusHealthCheck checker = newChecker();
+		String id = UUID.randomUUID().toString();
 
-	boolean h = checker.isHealthy();
+//		GSLoggerFactory.getLogger(getClass()).info("[HEALTH_CHECK] {} STARTED", id);
 
-	GSLoggerFactory.getLogger(getClass()).info("[HEALTH_CHECK] Ended {} Result: {}", id, h);
+		lastChecker = new HealthCheck();
 
-	return Response.status(responseStatus(h)).type(MediaType.APPLICATION_JSON_TYPE).entity(checker.toJson(h, false)).build();
+		lastResponse = lastChecker.isHealthy();
+
+		if(!lastResponse){
+		    
+		    GSLoggerFactory.getLogger(getClass()).info("[HEALTH_CHECK] {} FAILED", id);
+		}
+		
+//		GSLoggerFactory.getLogger(getClass()).info("[HEALTH_CHECK] {} ENDED: {}", id, lastResponse);
+	    }
+	}
+
+	return Response.//
+		status(responseStatus(lastResponse)).//
+		type(MediaType.APPLICATION_JSON_TYPE).//
+		entity(lastChecker.toJson(lastResponse, false)).build();
     }
 
-    StatusHealthCheck newChecker() {
-	return new StatusHealthCheck();
+    HealthCheck newChecker() {
+	return new HealthCheck();
     }
 
     Response.Status responseStatus(boolean healthy) {

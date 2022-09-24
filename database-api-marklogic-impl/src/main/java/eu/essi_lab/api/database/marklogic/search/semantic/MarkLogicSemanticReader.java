@@ -1,10 +1,13 @@
+/**
+ * 
+ */
 package eu.essi_lab.api.database.marklogic.search.semantic;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,7 +27,6 @@ package eu.essi_lab.api.database.marklogic.search.semantic;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.json.JSONArray;
@@ -32,7 +34,6 @@ import org.json.JSONObject;
 import org.openrdf.model.impl.SimpleValueFactory;
 import org.w3c.dom.Node;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import com.marklogic.client.io.JacksonHandle;
@@ -43,6 +44,7 @@ import com.marklogic.xcc.exceptions.RequestException;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseReader;
+import eu.essi_lab.api.database.internal.Folder;
 import eu.essi_lab.api.database.marklogic.MarkLogicDatabase;
 import eu.essi_lab.api.database.marklogic.MarkLogicReader;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -62,11 +64,6 @@ import eu.essi_lab.messages.stats.StatisticsResponse;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.StorageUri;
 import eu.essi_lab.model.auth.GSUser;
-import eu.essi_lab.model.configuration.IGSConfigurationInstantiable;
-import eu.essi_lab.model.configuration.option.GSConfOption;
-import eu.essi_lab.model.exceptions.DefaultGSExceptionHandler;
-import eu.essi_lab.model.exceptions.DefaultGSExceptionLogger;
-import eu.essi_lab.model.exceptions.DefaultGSExceptionReader;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.ontology.GSKnowledgeOntology;
@@ -91,7 +88,6 @@ public class MarkLogicSemanticReader implements DatabaseReader {
 
     private MarkLogicDatabase markLogicDB;
 
-    @JsonIgnore
     private static String rootType;
 
     static {
@@ -99,7 +95,7 @@ public class MarkLogicSemanticReader implements DatabaseReader {
 	    rootType = new D2KGSOntologyLoader().getRootOWLClass().toString();
 	} catch (GSException e) {
 
-	    DefaultGSExceptionLogger.log(new DefaultGSExceptionHandler(new DefaultGSExceptionReader(e)));
+	    e.log();
 	}
     }
 
@@ -615,77 +611,6 @@ public class MarkLogicSemanticReader implements DatabaseReader {
     }
 
     @Override
-    public Map<String, GSConfOption<?>> getSupportedOptions() {
-
-	return null;
-    }
-
-    @Override
-    public void setSupportedOptions(Map<String, GSConfOption<?>> opts) {
-
-    }
-
-    @Override
-    public String getLabel() {
-
-	return null;
-    }
-
-    @Override
-    public void setLabel(String label) {
-
-    }
-
-    @Override
-    public String getKey() {
-
-	return null;
-    }
-
-    @Override
-    public void setKey(String key) {
-
-    }
-
-    @Override
-    public boolean setOption(GSConfOption<?> option) throws GSException {
-
-	return false;
-    }
-
-    @Override
-    public void onOptionSet(GSConfOption<?> opt) throws GSException {
-
-    }
-
-    @Override
-    public void onFlush() throws GSException {
-
-    }
-
-    @Override
-    public GSConfOption<?> read(String key) {
-
-	return null;
-    }
-
-    @Override
-    public IGSConfigurationInstantiable getInstantiableType() {
-
-	return null;
-    }
-
-    @Override
-    public void setInstantiableType(IGSConfigurationInstantiable instantiableType) {
-
-    }
-
-    @Override
-    public void onStartUp() throws GSException {
-
-    }
-
-    @Override
     public Optional<View> getView(String viewId) throws GSException {
 
 	return null;
@@ -718,7 +643,7 @@ public class MarkLogicSemanticReader implements DatabaseReader {
     public ResultSet<Node> discoverNodes(DiscoveryMessage message) throws GSException {
 	return null;
     }
-    
+
     @Override
     public ResultSet<String> discoverStrings(DiscoveryMessage message) throws GSException {
 	return null;
@@ -763,6 +688,16 @@ public class MarkLogicSemanticReader implements DatabaseReader {
     @Override
     public List<GSUser> getUsers() throws GSException {
 
+	return null;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see eu.essi_lab.api.database.DatabaseReader#getFolder(java.lang.String, boolean)
+     */
+    @Override
+    public Optional<Folder> getFolder(String folderName, boolean createIfNotExist) throws GSException {
+	// TODO Auto-generated method stub
 	return null;
     }
 }

@@ -13,10 +13,17 @@
 	<artifactId>request-executor-default</artifactId>
 
 	<dependencies>
-
+		
 		<dependency>
-			<groupId>com.amazonaws</groupId>
-			<artifactId>aws-java-sdk-s3</artifactId>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>configuration-api</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+    
+    	<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>configuration-api-gs</artifactId>
+			<version>${project.parent.version}</version>
 		</dependency>
 
 		<dependency>
@@ -69,9 +76,9 @@
 
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>gs-job-scheduler</artifactId>
+			<artifactId>gs-shared-content</artifactId>
 			<version>${project.parent.version}</version>
-		</dependency>
+		</dependency> 
 
 		<dependency>
 			<groupId>org.logicng</groupId>
@@ -79,12 +86,5 @@
 		</dependency>
 
 	</dependencies>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>license-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
+
 </project>

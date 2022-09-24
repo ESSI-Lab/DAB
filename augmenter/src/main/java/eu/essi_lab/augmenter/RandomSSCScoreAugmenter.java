@@ -4,7 +4,7 @@ package eu.essi_lab.augmenter;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,36 +24,59 @@ package eu.essi_lab.augmenter;
 import java.util.Optional;
 import java.util.Random;
 
-import eu.essi_lab.model.configuration.option.GSConfOption;
+import eu.essi_lab.cfga.gs.setting.augmenter.AugmenterSetting;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
-public class RandomSSCScoreAugmenter extends ResourceAugmenter {
+
+/**
+ * @author Fabrizio
+ */
+public class RandomSSCScoreAugmenter extends ResourceAugmenter<AugmenterSetting> {
 
     /**
      * 
      */
-    private static final long serialVersionUID = 4029571299312795867L;
-
     public RandomSSCScoreAugmenter() {
 
-	setLabel("Random SSCScore augmenter");
+	super();
+    }
+
+    /**
+     * @param setting
+     */
+    public RandomSSCScoreAugmenter(AugmenterSetting setting) {
+
+	super(setting);
     }
 
     @Override
     public Optional<GSResource> augment(GSResource resource) throws GSException {
 
 	int score = new Random().nextInt(101);
+	
+	GSLoggerFactory.getLogger(getClass()).trace("Random score assigned: "+score);
+	
 	resource.getPropertyHandler().setSSCSCore(score);
 
 	return Optional.of(resource);
     }
 
     @Override
-    public void onOptionSet(GSConfOption<?> opt) throws GSException {
+    protected String initName() {
+
+	return "Random SSC Score augmenter";
     }
 
     @Override
-    public void onFlush() throws GSException {
+    public String getType() {
+
+	return "RandomSSCScoreAugmenter";
     }
 
+    @Override
+    protected AugmenterSetting initSetting() {
+
+	return new AugmenterSetting();
+    }
 }

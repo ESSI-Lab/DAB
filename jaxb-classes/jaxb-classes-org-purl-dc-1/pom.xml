@@ -10,12 +10,5 @@
 	<artifactId>jaxb-classes-org-purl-dc-1</artifactId>
 	<description>ESSI-Lab JAXB Classes for ORG-PURL-DC-1</description>
 	<name>ESSI-Lab JAXB Classes for ORG-PURL-DC-1</name>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>license-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>	
+	
 </project>

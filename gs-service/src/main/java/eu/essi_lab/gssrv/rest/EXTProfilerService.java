@@ -39,7 +39,11 @@ import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.pdk.Profiler;
 
 @WebService
-@Path("/")public class EXTProfilerService extends AbstractProfilerService {
+@Path("/")
+/**
+ * @author Fabrizio
+ */
+public class EXTProfilerService extends AbstractProfilerService {
 
     private class EXTProfilerFilter implements ProfilerFilter {
 

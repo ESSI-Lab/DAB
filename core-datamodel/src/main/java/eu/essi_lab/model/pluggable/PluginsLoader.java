@@ -4,7 +4,7 @@ package eu.essi_lab.model.pluggable;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,6 +35,24 @@ import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+
+/**
+ * This class can be used to load installed plugins. A plugin can be installed (put in the classpath)
+ * before the JVM bootstrap or even after, on a running virtual machine.
+ * In the latter case, in order to be loaded the new plugins JAR must be located in a folder that can be set with
+ * the {@link #setNewPluginsFolder(File)} method. The default folder for the new plugins is located in "GS-Service
+ * classpath/plugins".<br>
+ * The following example loads installed OAI-PMH profiles:<br>
+ * <br>
+ * <code>
+ *    PluginsLoader<OAIPMHProfile> pluginsLoader = new PluginsLoader<>();<br>
+      ServiceLoader<OAIPMHProfile> loader = pluginsLoader.loadPlugins(OAIPMHProfile.class);
+      </code>
+ * 
+ * @see Pluggable
+ * @author Fabrizio
+ * @param <T> the plugin type
+ */
 public class PluginsLoader<T extends Pluggable> {
 
     private static File pluginsFolder;

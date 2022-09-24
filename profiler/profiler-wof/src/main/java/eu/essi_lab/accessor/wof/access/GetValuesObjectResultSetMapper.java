@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof.access;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -39,6 +39,10 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.data.DataObject;
 import eu.essi_lab.wml._2.JAXBWML2;
+
+/**
+ * @author boldrini
+ */
 public class GetValuesObjectResultSetMapper extends GetValuesResultSetMapper {
 
     @Override

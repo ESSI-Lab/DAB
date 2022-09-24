@@ -1,0 +1,657 @@
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/102;CURRENT METER - DIRECTION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/103;CURRENT METER - EAST-WEST COMPONENT (U)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/104;CURRENT METER - NORTH-SOUTH COMPONENT (V)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/105;CURRENT METER - SPEED
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/106;CURRENT SPEED - UP/DOWN COMPONENT (W)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/107;DEBRIS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/109;DEPTH - BOTTOM
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/10;AMMONIA (NH3)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/110;DEPTH - OBSERVATION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/111;DEPTH - SENSOR
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/112;DEWPOINT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/113;DIRECTIONAL WAVE SPECTRA
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/114;DISSOLVED ORGANIC CARBON
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/115;DISSOLVED ORGANIC MATTER
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/116;DISSOLVED OXYGEN
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/117;DYNAMIC DEPTH ANOMALY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/118;EFFLUENT - DISCHARGE DESCRIPTION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/119;EFFLUENT - DISCHARGE DISTANCE TO SHORE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/11;AMMONIUM (NH4)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/120;EFFLUENT - DISCHARGE IDENTIFIER
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/121;EFFLUENT - DISCHARGE POINT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/122;EFFLUENT - DISCHARGE PRIMARY INDUSTRY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/123;EFFLUENT - DISCHARGE QUANTITY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/124;EFFLUENT - ZONE OF INITIAL DILUTION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/125;redox potential (Eh)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/126;ELECTRON TRANSPORT SYSTEM
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/127;FISH BIOMASS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/128;FISH CENSUS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/129;FISH SPECIES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/12;ANALYSES - ANNUAL SUMMARIES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/130;FISHERY SURVEY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/131;FISHERY SURVEY - CATCH MEASUREMENTS - DETAILS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/132;FISHERY SURVEY - CATCH MEASUREMENTS - GENERAL
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/133;FISHERY SURVEY - FISHING DURATION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/134;FISHERY SURVEY - GEAR DEPTH
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/135;FISHERY SURVEY - GEAR DEPTH - SALINITY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/136;FISHERY SURVEY - GEAR DEPTH - WATER TEMPERATURE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/137;FISHERY SURVEY - GEAR TYPE - DETAILS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/138;FISHERY SURVEY - GEAR TYPE - GENERAL
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/139;FISHERY SURVEY - NUMBER OF SCHOOLS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/13;ANALYSES - MONTHLY SUMMARIES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/140;FISHERY SURVEY - PREDOMINANT BEACH TYPE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/141;FISHERY SURVEY - PREDOMINANT BIOTA TYPE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/142;FISHERY SURVEY - PREDOMINANT ESCARPMENT TYPE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/143;FISHERY SURVEY - SCHOOL ACTIVITY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/144;FISHERY SURVEY - SCHOOL LOCATION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/145;FISHERY SURVEY - SCHOOL SIZE INDEX
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/146;FISHERY SURVEY - SCHOOL TAXONOMIC CODE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/147;FLUORESCENCE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/149;FLUX - HEAT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/14;ANALYSES - SEASONAL SUMMARIES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/150;GLARE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/151;GLARE - TYPE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/152;GLARE - DIRECTION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/153;HABITAT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/154;HABITAT - SEDIMENT SIZE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/155;HABITAT - SURFACE ORGANICS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/156;HABITAT - WAVE ENERGY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/157;HELIUM
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/158;HUMAN ACTIVITY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/159;HYDROCARBONS - TOTAL RECOVERABLE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/15;ANIMALS - GROUP - BEHAVIOR
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/160;HYDROCARBONS - TOTAL RESOLVED
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/161;ICE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/162;ICE - CHARACTERISTICS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/163;ICE - COVERAGE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/164;ICE - DEFORMATION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/165;ICE - MOVEMENT - DIRECTION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/166;ICE - MOVEMENT - SPEED
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/167;ICE - TYPE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/168;ICHTHYOPLANKTON IDENTITY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/169;ICHTHYOPLANKTON LENGTH
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/16;ANIMALS - GROUP - NUMBER IN GROUP
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/170;INCOMING SOLAR RADIATION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/172;INCUBATION - TEMPERATURE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/173;INCUBATION - TIME
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/174;INDIVIDUAL FISH EXAMINATION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/175;INDIVIDUAL FISH EXAMINATION - AGE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/176;INDIVIDUAL FISH EXAMINATION - DISEASES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/177;INDIVIDUAL FISH EXAMINATION - FIN ROT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/178;INDIVIDUAL FISH EXAMINATION - FIN ROT - CAUDAL FIN
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/179;INDIVIDUAL FISH EXAMINATION - FIN ROT - INTERIOR ANAL FIN
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/17;ANIMALS - INDIVIDUAL
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/180;INDIVIDUAL FISH EXAMINATION - FIN ROT - INTERIOR DORSAL FIN
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/181;INDIVIDUAL FISH EXAMINATION - FIN ROT - MIDPORTION ANAL FIN
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/182;INDIVIDUAL FISH EXAMINATION - FIN ROT - MIDPORTION DORSAL FIN
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/183;INDIVIDUAL FISH EXAMINATION - FIN ROT - PECTORAL FIN
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/184;INDIVIDUAL FISH EXAMINATION - FIN ROT - PELVIC FIN
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/185;INDIVIDUAL FISH EXAMINATION - FIN ROT - POSTERIOR ANAL FIN
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/186;INDIVIDUAL FISH EXAMINATION - FIN ROT - POSTERIOR DORSAL FIN
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/187;INDIVIDUAL FISH EXAMINATION - GENERAL HEALTH
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/188;INDIVIDUAL FISH EXAMINATION - LENGTH
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/189;INDIVIDUAL FISH EXAMINATION - LESION- LENGTH
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/18;ANIMALS - INDIVIDUAL - AGE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/190;INDIVIDUAL FISH EXAMINATION - LESION- LOCATION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/191;INDIVIDUAL FISH EXAMINATION - LESION- ORGAN AFFECTED
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/192;INDIVIDUAL FISH EXAMINATION - LESION- WIDTH
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/193;INDIVIDUAL FISH EXAMINATION - PARASITE OCCURRENCE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/194;INDIVIDUAL FISH EXAMINATION - PIGMENTATION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/195;INDIVIDUAL FISH EXAMINATION - SEX
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/196;INDIVIDUAL FISH EXAMINATION - SEXUAL MATURITY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/197;INDIVIDUAL FISH EXAMINATION - STATE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/198;INDIVIDUAL FISH EXAMINATION - TUMOR COUNT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/199;INDIVIDUAL FISH EXAMINATION - WEIGHT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/19;ANIMALS - INDIVIDUAL - BEHAVIOR
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/1;ADENOSINE TRIPHOSPHATE (ATP)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/200;INSTRUMENT - DEPTH
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/201;INVERTEBRATE SPECIES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/202;IRON - SOLUBLE REACTIVE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/203;surface irradiance per day
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/204;surface irradiance per incubation period
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/205;LAND COVER - CHANGE ANALYSIS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/206;LAND COVER - CLASSIFICATION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/207;LIFE HISTORY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/208;LIGHT - PERCENT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/209;LIGHT ATTENUATION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/20;ANIMALS - INDIVIDUAL - CAUSE OF DEATH
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/210;LIGHT INTENSITY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/211;LIGHT INTENSITY - LIGHT LEVEL (ABOARD PLATFORM)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/212;LIGHT PENETRATION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/213;LIGHT PENETRATION - ONE PERCENT LIGHT DEPTH
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/214;LIGHT TRANSMISSION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/215;MACROINVERTEBRATE CENSUS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/216;MICROBIOLOGY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/217;MICROSESTON - TOTAL
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/218;MOLLUSKS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/219;MOMENTUM
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/21;ANIMALS - INDIVIDUAL - COUNTS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/220;NANOPLANKTON - CARBON UPTAKE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/221;NANOPLANKTON - CHLOROPHYLL
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/223;NITRATE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/224;nitrate + nitrite content (concentration)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/225;NITRATE/NITRITE RATIO
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/226;NITRITE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/227;NITROGEN - PARTICULATE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/228;PARTICULATE ORGANIC NITROGEN (PON)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/229;NITROGEN
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/22;ANIMALS - INDIVIDUAL - DIVE TIMES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/230;NUTRIENTS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/231;OPTICAL
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/232;OPTICAL ATTENUANCE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/233;OPTICAL BACKSCATTER
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/234;OPTICAL PROPERTIES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/235;ORGANIC CHEMICALS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/236;ORGANIC MATTER - WEIGHT PERCENT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/237;OXYGEN
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/238;OXYGEN - APPARENT UTILIZATION (AOU)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/239;OXYGEN - AVERAGE SEABED CONSUMPTION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/23;ANIMALS - INDIVIDUAL - MARKS OR TAGS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/240;OXYGEN - CONSUMPTION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/242;OXYGEN - DISSOLVED GAS - BOTTOM WATER
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/243;OXYGEN - DISSOLVED ORGANIC
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/244;OXYGEN - PERCENT SATURATION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/245;OYSTER CONDITION INDICES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/247;PAR
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/248;PARTICULATE CARBON
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/249;PARTICULATE MATTER - DRY WEIGHT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/24;ANIMALS - INDIVIDUAL - MASS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/250;PARTICULATE NITROGEN
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/251;PARTICULATE ORGANIC CARBON
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/252;PCB
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/253;pCO2
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/254;pCO2 - AIR
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/256;PERCENT OXYGEN
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/257;pH
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/259;PHAEOPIGMENT CONCENTRATION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/260;PHAEOPIGMENTS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/261;PHAEOPIGMENTS - MEAN PHOTIC ZONE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/262;PHAEOPIGMENTS - INTEGRATED
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/263;phosphate
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/264;PHOSPHATE - INORGANIC
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/266;PHOSPHATE - PO4-P REACTIVE TIME
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/267;PHOSPHATE - TOTAL
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/268;PHOSPHATE - TOTAL FILTER PASSING
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/269;PHOSPHORUS - ORGANIC IN PHOSPHATE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/271;PHOSPHORUS - TOTAL IN PHOSPHATE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/272;PHOTOSYNTHETIC ACTIVE RADIATION (PAR)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/273;PHOTOSYNTHETIC CAPACITY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/274;PHOTOSYNTHETIC CAPACITY - DISSOLVED ORGANIC MATTER
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/275;PHOTOSYNTHETIC CAPACITY - EXPERIMENT ELAPSED TIME
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/276;PHOTOSYNTHETIC CAPACITY - NANOPLANKTON
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/277;PHOTOSYNTHETIC CAPACITY - NET PLANKTON
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/278;PHOTOSYNTHETIC CAPACITY - PHYTOPLANKTON
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/279;PHOTOSYNTHETIC CAPACITY - TOTAL
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/280;PHYTOPLANKTON
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/281;PHYTOPLANKTON - DRY WEIGHT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/283;PHYTOPLANKTON - WET WEIGHT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/284;PHYTOPLANKTON BIOMASS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/285;PLANKTON
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/286;PLANT COVER
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/288;POLYCHLORINATED BIPHENYLS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/289;POLYNUCLEAR AROMATIC HYDROCARBONS (PAH)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/28;ANIMALS - INDIVIDUAL - PHYSICAL CHARACTERISTICS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/290;POSITION - GEOGRAPHIC
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/291;PRECIPITATION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/293;PRESSURE - WATER
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/294;PRIMARY PRODUCTIVITY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/295;PRIMARY PRODUCTIVITY - DISSOLVED ORGANIC MATTER
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/296;PRIMARY PRODUCTIVITY - ELAPSED TIME
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/297;PRIMARY PRODUCTIVITY - NANOPLANKTON
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/298;PRIMARY PRODUCTIVITY - NET PLANKTON
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/299;PRIMARY PRODUCTIVITY - PHYTOPLANKTON
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/29;ANIMALS - INDIVIDUAL - RELATIVE POSITION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/301;PRODUCTIVITY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/302;QUANTA
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/303;RADIATION - EXTINCTION COEFFICIENT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/305;RADIATION - TOTAL INCIDENT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/306;RELATIVE HUMIDITY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/307;SALINITY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/308;SALINITY - BOTTOM WATER
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/309;SALINITY - SURFACE WATER
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/30;ANIMALS - INDIVIDUAL - STOMACH CONTENTS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/310;SEA DIRECTION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/311;SEA HEIGHT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/312;SEA LEVEL
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/313;SEA LEVEL - DAILY AVERAGE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/314;SEA LEVEL - HOURLY AVERAGE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/315;SEA LEVEL - MEAN
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/316;SEA LEVEL - MONTHLY AVERAGE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/317;SEA PERIOD
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/318;SEA STATE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/319;SEA SURFACE TEMPERATURE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/31;ATMOSPHERIC VARIABLES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/320;SEA SURFACE TOPOGRAPHY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/322;SECCHI DEPTH
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/323;SEDIMENT PROPERTIES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/324;SEDIMENTS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/325;SEDIMENTS - BEACH SEDIMENT TEMPERATURE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/326;SEDIMENTS - DRY WEIGHT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/327;SEDIMENTS - ORGANIC CARBON
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/328;SEDIMENTS - PARTICLE SIZE FRACTIONS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/329;SEDIMENTS - PERCENT COVER
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/32;BACTERIA
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/330;SEDIMENTS - TOTAL CARBON
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/331;SEDIMENTS - WEIGHT PERCENT SHELL FRAGMENTS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/332;SIGMA-T
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/333;silicate
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/334;SILICON DIOXIDE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/335;SOLAR RADIATION - ATMOSPHERIC
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/336;SOLIDS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/337;SOUND VELOCITY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/338;SPECIES COUNT PER SAMPLE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/339;SPECIES IDENTIFICATION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/33;BACTERIA - BACTERIAL DENSITY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/340;SPECIES IDENTIFICATION - AGE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/341;SPECIES IDENTIFICATION - ASH-FREE WEIGHT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/342;SPECIES IDENTIFICATION - COUNT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/343;SPECIES IDENTIFICATION - DRY WEIGHT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/344;SPECIES IDENTIFICATION - LIFE HISTORY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/345;SPECIES IDENTIFICATION - LIFE STAGE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/346;SPECIES IDENTIFICATION - NORMAL/ABNORMAL
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/347;SPECIES IDENTIFICATION - ORGANISM LENGTH
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/349;SPECIES IDENTIFICATION - SEX
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/34;BACTERIA - HALOPHILIC
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/350;SPECIES IDENTIFICATION - SEXUAL MATURITY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/351;SPECIES IDENTIFICATION - SUBSPECIES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/352;SPECIES IDENTIFICATION - TOTAL WEIGHT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/353;SPECIES IDENTIFICATION - WET WEIGHT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/354;SPECIES IDENTITY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/355;SPECIES WET WEIGHT PER SAMPLE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/356;STOMACH CONTENTS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/357;STOMACH CONTENTS - CONTENT WEIGHT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/358;STOMACH CONTENTS - DIGESTION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/359;STOMACH CONTENTS - FULLNESS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/35;BACTERIA - HETEROTROPHIC
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/360;STOMACH CONTENTS - PREY COUNT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/361;STOMACH CONTENTS - PREY TAXONOMY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/362;STOMACH CONTENTS - PREY WET WEIGHT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/363;SUBSTRATUM PERCENT COVER
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/365;Sulfate (SO4 2-)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/366;suspended solids
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/368;SWELL DIRECTION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/369;SWELL HEIGHT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/36;BACTERIA - HYDROCARBONOCLASTIC
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/370;SWELL PERIOD
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/371;TAXONOMIC CODE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/373;WATER TEMPERATURE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/374;TEMPERATURE - AIR
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/375;TEMPERATURE - BOTTOM WATER
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/376;AIR TEMPERATURE - DRY BULB
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/377;TEMPERATURE - SEDIMENT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/379;TEMPERATURE - WATER
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/37;BACTERIA - PLATE COUNTS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/381;AIR TEMPERATURE - WET BULB
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/382;THERMOCLINE DEPTH
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/383;TIDE HEIGHT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/384;TIDE STAGE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/385;TOTAL CARBON
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/387;TOTAL PHOSPHATE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/388;TOTAL PHOSPHORUS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/389;TOXIC METALS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/38;BAROMETRIC PRESSURE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/390;TRACE METALS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/391;TRANSMISSIVITY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/392;Tritium (Hydrogen isotope)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/393;turbidity
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/394;UREA
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/395;VERTEBRATES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/396;VISIBILITY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/397;WATER CLARITY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/398;WATER CLARITY INDEX
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/399;WATER COLOR
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/39;BEACH TAR
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/3;AIR TEMPERATURE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/400;water depth
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/401;WATER DEPTH - AVERAGE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/402;WATER LEVEL
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/403;WATER TRANSPARENCY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/404;WAVE DATA
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/405;WAVE DATA - ANGULAR FOURIER COEFFICIENTS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/406;WAVE DATA - CO-SPECTRA
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/407;WAVE DATA - DISPLACEMENT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/408;WAVE DATA - POLAR COORDINATE RADIUS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/409;WAVE DATA - QUAD-SPECTRA
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/40;BEACH TAR - AREA SAMPLED
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/410;WAVE DIRECTION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/411;WAVE DIRECTION - AVERAGE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/412;WAVE DIRECTION - EAST COMPONENT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/413;WAVE DIRECTION - NORTH COMPONENT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/414;WAVE DISPLACEMENT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/415;WAVE ENERGY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/416;WAVE ENERGY - PERIOD OF MAXIMUM ENERGY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/417;WAVE ENERGY - SPECTRAL VALUE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/418;WAVE ENERGY - TOTAL VARIANCE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/419;WAVE ENERGY - WIDTH OF SPECTRAL BANDS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/41;BEACH TAR - BEACH STATUS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/420;WAVE HEIGHT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/421;WAVE HEIGHT - MAXIMUM
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/422;WAVE HEIGHT - SIGNIFICANT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/423;WAVE PERIOD
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/424;WAVE PERIOD - AVERAGE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/425;WAVE PERIOD - DOMINANT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/426;WAVE SPECTRA
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/427;WAVE SPECTRA - DIRECTIONAL
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/428;WAVE SPECTRA - NON-DIRECTIONAL
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/429;WAVE STEEPNESS - MAXIMUM
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/42;BEACH TAR - INTERTIDAL DISTANCE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/430;WEATHER
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/431;WIND DIRECTION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/432;WIND DIRECTION - AVERAGE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/433;WIND DIRECTION - CONTINUOUS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/434;WIND DIRECTION - PREVAILING
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/435;WIND FORCE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/436;WIND GUST
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/437;WIND SPEED
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/438;WIND SPEED - CONTINUOUS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/439;WIND SPEED - AVERAGE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/43;BEACH TAR - LENGTH OF SHOREFRONT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/440;ZOOPLANKTON
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/441;ZOOPLANKTON BIOMASS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/442;ZOOPLANKTON DENSITIES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/443;ZOOPLANKTON IDENTITIES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/444;ZOOPLANKTON SPECIES IDENTITIES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/445;ZOOPLANKTON SPECIES NUMBER PER SAMPLE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/447;BATHYMETRY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/448;TOXIN
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/449;TEMPERATURE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/44;BEACH TAR - SEASHORE SURFACE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/450;NEPHELS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/451;MIXED LAYER DEPTH
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/452;NITROGEN - ORGANIC
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/453;PHOSPHORUS - ORGANIC
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/454;PIGMENTS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/455;CHLOROPHYLL - EXTRACTED
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/456;METALS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/457;PHAEOPHYTIN
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/458;BREVETOXIN
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/459;TOXIN - DOMOIC ACID
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/45;BEACH TAR - WATERLINE TO SAMPLE DISTANCE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/460;TOXIN - PARALYTIC SHELLFISH POISONING (PSP)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/461;irradiance
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/463;BIRDS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/464;SHORELINE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/465;MARINE MAMMALS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/466;LAND MANAGEMENT REGIONS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/467;REPTILES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/468;AMPHIBIANS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/469;NESTING SITES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/46;BENTHIC SPECIES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/470;SHELLFISH
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/471;SOCIOECONOMIC
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/472;TERRESTRIAL MAMMALS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/473;LAND FEATURES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/474;WATER FEATURES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/475;AIDS TO NAVIGATION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/476;HABITAT - BENTHIC
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/477;SEA GRASSES - DENSITY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/478;BENTHIC COMMUNITIES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/479;BIOASSAY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/47;BENTHIC SPECIES - TAXA COUNTS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/480;HPLC PIGMENTS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/481;FLUOROMETRIC PIGMENTS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/482;STIMULATED FLUORESCENCE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/483;UPWELLING IRRADIANCE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/484;UPWELLING RADIANCE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/485;WATER LEAVING RADIANCE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/486;REMOTE SENSING REFLECTANCE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/487;REFLECTANCE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/488;AEROSOL OPTICAL THICKNESS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/489;ABSORPTION - SCATTERING - ATTENUATION COEFFICIENTS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/48;BENTHIC SPECIES - TAXA IDENTITIES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/490;DIFFUSE ATTENUATION COEFFICIENTS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/491;NATURAL FLUORESCENCE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/493;CHLOROFLUOROCARBON-11 (CFC-11)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/494;CHLOROFLUOROCARBON-12 (CFC-12)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/497;subsurface water temperature - monthly mean @ 100m
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/498;WAVELENGTH
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/499;Video Transect Images
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/49;BENTHIC SPECIES - TAXA WET WEIGHTS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/500;WATER DENSITY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/501;Methane (CH4)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/502;SUBSTRATE DESCRIPTION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/503;CORE - BOTTOM
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/504;ZOOPLANKTON ABUNDANCE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/506;SHORTWAVE RADIATION - REFLECTED
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/507;REEF AND/OR BOTTOM REGIME - PERCENT COVER
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/508;PHOSPHATE - SOLUBLE REACTIVE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/509;NANOPLANKTON
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/50;BIOCHEMISTRY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/510;MICROPLANKTON
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/511;PHOTOQUADRAT IMAGES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/512;CRUSTACEANS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/513;POLLUTANTS - ATMOSPHERIC
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/514;CHEMISTRY - SEDIMENT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/515;CORE AGE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/516;OXYGEN ISOTOPES - OXYGEN-18
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/517;OXYGEN ISOTOPES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/518;DOWNWELLING RADIANCE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/51;BIOLOGICAL DATA
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/520;Total nitrogen
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/521;LEAD
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/522;MACROALGAE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/523;FISH - CORAL REEF
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/524;ORGANISMS - SEDIMENT DWELLING
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/525;MARINE SPECIES INVENTORY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/526;MARINE SPECIES ORIGIN
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/527;SPECIES - PERCENT OCCURRENCE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/528;WAVE HEIGHT - BREAKING SURF
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/529;LONGWAVE RADIATION - REFLECTED
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/52;BIOMASS - PLANKTON
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/530;SPONGE SPECIES IDENTIFICATION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/531;CORAL-BLEACHING
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/532;ALKALINE PHOSPHATASE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/533;BIOMASS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/534;growth rate
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/536;CORAL - COLONY SIZE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/537;Hydrogen Sulfide (H2S)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/538;CELLS COUNTS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/539;BACTERIA - PRODUCTION RATE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/540;ACOUSTIC TRAVEL TIME
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/541;CORE - BULK DENSITY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/542;CORE - POROSITY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/543;CORE - WATER CONTENT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/544;CORE - P-WAVE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/545;CORE - VOID RATIO
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/546;CORE - IMPEDANCE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/547;AMPHIPODA
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/548;APLACOPHORA
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/549;BIVALVES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/54;BOTTOM TYPE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/550;FORAMINIFERA
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/551;MANGANESE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/552;MEIOFAUNA
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/554;SEDIMENT - pH
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/555;SEDIMENT - MANGANESE CONTENT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/556;SEDIMENT - OXYGEN CONTENT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/557;SEDIMENT - IRON CONTENT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/558;SEDIMENT - HYDROGEN SULPHIDE CONTENT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/559;POLYCHAETES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/55;CARBON
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/560;SEDIMENT - HYDROCARBON CONTENT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/561;SEDIMENT - POREWATER CHEMISTRY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/562;images
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/563;SEDIMENT - GRAIN SIZE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/564;MACROFAUNA
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/565;BIOCHEMICAL OXYGEN DEMAND
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/566;nitrous oxide (N2O)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/567;ABSOLUTE HUMIDITY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/568;BIOEROSION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/569;CORAL - FISH BITES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/56;CARBON - CARBON 14 ASSIMILATION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/570;CALCIFICATION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/571;DYNAMIC HEIGHT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/572;Potential temperature (theta)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/573;SIGMA-THETA
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/574;SPECIFIC VOLUME ANOMALY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/575;CHLORINITY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/576;CHLOROFLUOROCARBONS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/577;DELTA HELIUM-3
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/578;DELTA CARBON-14
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/579;DELTA CARBON-13
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/57;CARBON - CARBONATE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/580;ARGON
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/581;NEON
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/584;Delta Oxygen-18
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/585;CHLOROFLUOROCARBON-113 (CFC-113)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/586;Silicon
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/587;BEAM ATTENUATION COEFFICIENT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/588;DISSOLVED INORGANIC CARBON (DIC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/589;HYDROSTATIC PRESSURE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/590;LATITUDE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/591;LONGITUDE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/592;JULIAN YEAR - DAY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/593;xCO2 seawater
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/594;xCO2 atmosphere
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/595;xCO2 warm
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/596;WAVE - PEAK PERIOD
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/599;seafloor topography
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/59;CARBON - ORGANIC - SEDIMENT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/5;TOTAL ALKALINITY (TA)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/602;Thiosulfate (S2O3 2-)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/603;Sulfite (SO3 2-)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/604;Sulfur (S)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/605;SHORTWAVE IRRADIANCE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/606;LONGWAVE IRRADIANCE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/610;PRECIPITATION AMOUNT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/611;PRECIPITATION DURATION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/612;Ice Depth/Thickness
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/613;Attenuation/Transmission
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/614;PRECIPITATION RATE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/615;Pesticides
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/616;RADIUM ISOTOPES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/618;Sulfur Hexaflouride (SF6)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/619;thymidine
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/61;CARBON - TOTAL ORGANIC
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/620;leucine
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/621;CARBON - BICARBONATE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/622;ARAGONITE SATURATION STATE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/623;Chromophoric Dissolved Organic Matter (CDOM)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/624;silica
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/625;Pbopt
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/626;productivity index
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/627;surface irradiance
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/628;turbulent kinetic energy (TKE) dissapation rate
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/629;Iron
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/631;Aluminum
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/632;PICOPLANKTON
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/633;Plutonium
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/634;Plutonium 239
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/635;Iodine 129
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/636;Cesium-137
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/637;CALCITE CONCENTRATION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/638;ALGAL BLOOM PRESENCE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/639;CLEAR-SKY RADIANCE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/640;Volatile Organic Compounds
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/641;Semivolatile Organic Compounds
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/642;Total Petroleum Hydrocarbons (TPH)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/643;photoperiod
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/644;Dissolved Organic Nitrogen
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/646;Magnesium
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/647;Potassium
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/648;Calcium
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/649;Copper
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/64;CARBON - TOTAL UPTAKE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/650;zinc
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/651;chromium
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/652;titanium
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/653;Nickel
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/654;DELTA NITROGEN-15
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/655;cloud height
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/656;sunshine
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/657;INDIVIDUAL IDENTITY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/658;Volume Transport
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/659;particulate phosphorus
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/65;CARBON ASSIMILATION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/660;Prochlorococcus
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/661;Synechococcus
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/662;Eukaryote
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/663;Particulate Inorganic Carbon
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/664;TOTAL DISPLACEMENT VOLUME
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/666;Barium
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/667;AIR-SEA FLUX - PARTIAL PRESSURE (OR FUGACITY) OF CARBON DIOXIDE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/668;Total Dissolved Nitrogen (TDN)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/669;Total Organic Carbon (TOC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/66;CARBON ASSIMILATION - MEAN PHOTIC ZONE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/670;Dibromomethane, also called methylene bromide, or methylene dibromide (CH2BR2)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/671;Carbon tetrachloride (CCL4)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/672;Bromomethane, also called methyl bromide (CH3Br)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/673;Chloromethane, also called methyl chloride (CH3CL)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/674;Methyl iodide, also called iodomethane (CH3I)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/675;Dibromochloromethane (CHBr2Cl)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/676;Bromoform (CHBr3)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/677;Chloroform (CHCl3)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/678;methyl chloroform (MC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/679;Disulfur decafluoride, or Sulfur Pentafluoride (SF5, S2F10)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/67;CARBON ASSIMILATION - INTEGRATED
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/680;Extinction coefficient of the atmosphere
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/681;Benzene (C6H6)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/682;Chlorodifluoromethane or difluoromonochloromethane (HCFC-22)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/683;Tetrachloroethylene, or tetrachloroethene, or perchloroethylene (PCE)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/684;Percent modern carbon (PMC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/686;thorium isotope
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/688;species abundance
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/689;Trifluoromethyl sulfur pentafluoride (SF5CF3)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/690;Carbon content of specimen
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/691;Nitrogen content of specimen
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/698;girth
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/69;AIR-SEA DIFFERENCE - PARTIAL PRESSURE (OR FUGACITY) OF CARBON DIOXIDE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/6;ALKALINITY - TITRATION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/701;Wind speed - east-west component (U)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/702;Wind speed - north-south component (V)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/704;cetacean
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/705;Lignin
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/707;fucoxanthin
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/708;Violaxanthin
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/709;Diadinoxanthin
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/70;Partial pressure (or fugacity) of carbon dioxide - water
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/710;Alloxan (or alloxantin)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/712;diatom
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/713;Deoxyribonucleic acid (DNA)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/714;graze rate (or grazing rate)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/716;OTOLITH
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/717;lipids
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/718;fatty acids
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/719;Total Settled Volume
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/71;Partial pressure (or fugacity) of carbon dioxide - atmosphere
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/720;TOTAL WET MASS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/721;TOTAL DRY MASS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/722;TOTAL ASH-FREE DRY MASS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/723;hydrocarbon
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/724;ester
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/725;ketone
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/726;ether
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/727;alcohol
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/728;sterol
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/729;shell parameters (length or weight)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/730;mortality rate
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/731;fecundity
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/732;CYANOBACTERIA
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/733;Fish
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/75;CAROTENOIDS - PLANT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/76;CAS (CHEMICAL ABSTRACTS SERVICE) PARAMETER CODES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/77;CATCH STATISTICS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/78;CATCH STATISTICS - AVERAGES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/79;CATCH STATISTICS - DETAILS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/7;ALKALINITY - TOTAL
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/80;CHLOROFLUOROCARBON (CFC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/81;CHLOROPHYLL
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/82;CHLOROPHYLL - RELATIVE FLUORESCENCE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/83;CHLOROPHYLL A
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/84;CHLOROPHYLL A - MEAN PHOTIC ZONE
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/85;CHLOROPHYLL A - INTEGRATED
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/86;CHLOROPHYLL A CONCENTRATION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/87;CHLOROPHYLL B
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/88;CHLOROPHYLL C
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/89;cloud amount/frequency
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/8;ALTIMETER - CROSSOVER DIFFERENCES
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/90;cloud types
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/91;CONDUCTIVITY
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/93;CORAL
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/94;CORAL - CENSUS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/95;CORAL - SPECIES IDENTIFICATION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/96;CURRENT DIRECTION
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/97;CURRENT SPEED
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/98;CURRENT SPEED - EAST/WEST COMPONENT (U)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/99;CURRENT SPEED - NORTH/SOUTH COMPONENT (V)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/datatype/details/9;ALTIMETER - SEA SURFACE MEASUREMENT

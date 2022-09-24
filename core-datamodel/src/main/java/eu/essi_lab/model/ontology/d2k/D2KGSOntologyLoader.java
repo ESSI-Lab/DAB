@@ -4,7 +4,7 @@ package eu.essi_lab.model.ontology.d2k;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -57,6 +57,10 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.ontology.OntologyURIs;
 import eu.essi_lab.model.ontology.d2k.resources.GSRootResource;
 import eu.essi_lab.model.ontology.d2k.serialization.J2RDFSerializer;
+
+/**
+ * @author ilsanto
+ */
 public class D2KGSOntologyLoader {
 
     private static final String ONTOLOGY_FILE = "ontology/essid2k.owl";

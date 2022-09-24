@@ -4,7 +4,7 @@ package eu.essi_lab.lib.net.utils;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,9 +23,14 @@ package eu.essi_lab.lib.net.utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
+
+/**
+ * A mocked download, useful for tests, that downloads only what indicated in the constructor.
+ * 
+ * @author boldrini
+ */
 public class MockedDownloader extends Downloader {
 
     private String[] urlContentPairs;

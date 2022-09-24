@@ -4,7 +4,7 @@ package eu.essi_lab.api.database.factory;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,7 +21,6 @@ package eu.essi_lab.api.database.factory;
  * #L%
  */
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -33,14 +32,33 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.StorageUri;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
-public class DatabaseProviderFactory implements Serializable {
+
+/**
+ * This factory is the entry point of the "DataBase Manager" API<br>
+ * <br>
+ * <b>Usage notes</b><br>
+ * <br>
+ * Clients should create a suitable {@link DatabaseProvider} for a given {@link StorageUri} and initialize it with the
+ * {@link DatabaseProvider#initialize(StorageUri, String)}
+ * method. If the initialization is successful, the provided {@link Database} instance is shared between all the
+ * suitable {@link DatabaseConsumer}s
+ *
+ * @author Fabrizio
+ */
+public class DatabaseProviderFactory {
+
+    /**
+     * 
+     */
+    static final Object PROVIDER_LOCK = new Object();
 
     private static final String NULL_DB_URI_ERR_ID = "NULL_DB_URI_ERR_ID";
 
+    private static final String DB_PROVIDER_FACTORY_PROVIDER_NOT_FOUND_EXCEPTION = "DB_PROVIDER_FACTORY_PROVIDER_NOT_FOUND_EXCEPTION";
+
     private static Map<StorageUri, DatabaseProvider> providersMap = new HashMap<>();
 
-    public DatabaseProviderFactory() {
-	// nothing to do here
+    private DatabaseProviderFactory() {
     }
 
     public static void clearProviders() {
@@ -55,32 +73,52 @@ public class DatabaseProviderFactory implements Serializable {
      * @return the suitable {@link DatabaseProvider} or <code>null</code> if none is found
      * @throws GSException if dbUri is <code>null</code> or dbUri.getUri is <code>null</code>
      */
-    public DatabaseProvider create(StorageUri dbUri) throws GSException {
+    public static DatabaseProvider create(StorageUri dbUri) throws GSException {
 
-	if (dbUri == null || dbUri.getUri() == null) {
-	    throw GSException.createException(DatabaseProviderFactory.class, "Missing provider uri", null, null, ErrorInfo.ERRORTYPE_CLIENT,
-		    ErrorInfo.SEVERITY_ERROR, NULL_DB_URI_ERR_ID, null);
-	}
+	synchronized (PROVIDER_LOCK) {
 
-	GSLoggerFactory.getLogger(getClass()).trace("Storage URI [" + dbUri + "]");
-	GSLoggerFactory.getLogger(getClass()).trace("Providers map keys: [" + providersMap.keySet() + "]");
+	    if (dbUri == null || dbUri.getUri() == null) {
 
-	if (providersMap.containsKey(dbUri)) {
-
-	    GSLoggerFactory.getLogger(getClass()).trace("Reusing provider with URI [" + dbUri + "]");
-	    return providersMap.get(dbUri);
-	}
-
-	ServiceLoader<DatabaseProvider> inits = ServiceLoader.load(DatabaseProvider.class);
-
-	for (DatabaseProvider init : inits) {
-	    if (init.supports(dbUri)) {
-
-		providersMap.put(dbUri, init);
-		return init;
+		throw GSException.createException(//
+			DatabaseProviderFactory.class, //
+			"Missing provider uri", //
+			null, //
+			null, //
+			ErrorInfo.ERRORTYPE_CLIENT, //
+			ErrorInfo.SEVERITY_ERROR, //
+			NULL_DB_URI_ERR_ID, //
+			null);
 	    }
-	}
 
-	return null;
+	    if (providersMap.containsKey(dbUri)) {
+
+		return providersMap.get(dbUri);
+
+	    } else {
+
+		GSLoggerFactory.getLogger(DatabaseProviderFactory.class).trace("Initializing new provider with URI [" + dbUri + "]");
+	    }
+
+	    ServiceLoader<DatabaseProvider> inits = ServiceLoader.load(DatabaseProvider.class);
+
+	    for (DatabaseProvider init : inits) {
+		if (init.supports(dbUri)) {
+
+		    providersMap.put(dbUri, init);
+
+		    GSLoggerFactory.getLogger(DatabaseProviderFactory.class).trace("Providers map keys: [" + providersMap.keySet() + "]");
+
+		    return init;
+		}
+	    }
+
+	    throw GSException.createException(DatabaseConsumerFactory.class, //
+		    "Suitable provider not found", //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_FATAL, //
+		    DB_PROVIDER_FACTORY_PROVIDER_NOT_FOUND_EXCEPTION);
+
+	}
     }
 }

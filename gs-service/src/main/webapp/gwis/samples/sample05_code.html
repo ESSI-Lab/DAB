@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<!--
+..........................................................
+GWIS Javascript API Sample:
+Using CSS to Style the Plot
+..........................................................
+U.S. Geological Survey, Texas Water Science Center, Austin
+https://txpub.usgs.gov/DSS/GWIS/
+..........................................................
+-->
+<html>
+    <!-- html head -->
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>GWIS JSAPI Sample</title>
+        
+        <!-- GWIS requires jQuery -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        
+        <!-- GWIS JSAPI 0.0 -->
+        <link rel="stylesheet" href="https://txpub.usgs.gov/DSS/GWIS/0.0/jsapi/gwis-plot-utils.css"/>
+        <script src="https://txpub.usgs.gov/DSS/GWIS/0.0/jsapi/gwis-plot-utils.min.js"></script>
+        
+        <!--
+        Custom CSS to style bottom "#plot2".
+        Top "#plot1" is left un-styled for comparison.
+        Replacing "#plot2" with "div" in below CSS will globally apply styling to all plots in the page.
+        Color theme:
+            dk.teal: #006666
+            md.teal: #00cccc
+            lt.teal: #f5ffff
+        -->
+        <style>
+            /* div containing plot and controls */
+            #plot2.gwis {
+                border: none;
+                background: #006666;
+                font-family: "Lucida Console", Monaco, monospace;
+                box-shadow: 8px 8px 20px 0px rgba(0,0,0,0.5);
+            }
+
+            /* div containing plot, title, and axis labels */
+            #plot2 .gwis-plot {
+                border: none;
+                background: #f5ffff;
+                border-radius: 0px;
+            }
+
+            /* plot title */
+            #plot2.gwis .dygraph-title {
+                color: #00cccc;
+                font-size: 25px !important;
+                font-weight: bold !important;
+            }
+
+            /* x-axis: name label, tick labels */
+            #plot2.gwis .dygraph-xlabel,
+            #plot2.gwis .dygraph-axis-label-x {
+                color: #00cccc;
+                font-weight: bold;
+                font-size: 14px !important;
+            }
+
+            /* y1-axis: name label, tick labels */
+            #plot2.gwis .dygraph-ylabel,
+            #plot2.gwis .dygraph-axis-label-y {
+                color: #008000;
+                font-weight: bold;
+                font-size: 14px !important;
+            }
+
+            /* y2-axis: name label, tick labels */
+            #plot2.gwis .dygraph-y2label,
+            #plot2.gwis .dygraph-axis-label-y2 {
+                color: #000080;
+                font-weight: bold;
+                font-size: 14px !important;
+            }
+
+            /* plot legend */
+            #plot2.gwis .dygraph-legend {
+                border: none !important;
+                background: #f5ffff !important;
+                font-size: 18px !important;
+                box-shadow: none !important;
+            }
+
+            /* div containing controls under plot */
+            #plot2.gwis .gwis-controls {
+                font-size: 14px;
+                color: #f5ffff;
+            }
+
+            /* control buttons */
+            #plot2.gwis .gwis-div-button {
+                background: #00cccc !important;
+            }
+            #plot2.gwis .gwis-div-button:hover {
+                background: #f5ffff !important;
+                color: #00cccc;
+            }
+        </style>
+        
+    </head>
+    
+    <!-- html body -->
+    <body style="background:#eee; font-family:arial;">
+        <h1>Sample: Using CSS to Style the Plot</h1>
+        
+        <h2>A Double Axis Plot (No Custom CSS Applied)</h2>
+        <div id="plot1" style="width:90%; height:400px;"></div>
+        
+        <h2>The Same Double Axis Plot with Custom CSS Applied</h2>
+        <div id="plot2" style="width:90%; height:400px;"></div>
+        
+        <script>
+            // create same plot in both divs
+            // css styling above set to only apply to plot with id "plot2"
+            for (var n=1; n<=2; n++) { 
+                GWIS.plot({
+                    div_id : "plot"+n,
+                    series : [
+                        { axis:"y1", site:"08158000", pcode:"00060" },
+                        { axis:"y2", site:"08158000", pcode:"00065" }
+                    ],
+                    range_selector : false,
+                    title          : "Plot Title",
+                    xlabel         : "X Label",
+                    ylabel         : "Y1 Label",
+                    y2label        : "Y2 Label",
+                    controls       : "all"
+                });
+            }
+        </script>
+        
+    </body>
+</html>
+<!-- end GWIS JSAPI sample -->

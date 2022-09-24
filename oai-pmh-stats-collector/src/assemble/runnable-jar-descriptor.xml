@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+        This file is part of GI-go GeoBrowser.
+
+        GI-go GeoBrowser is free software: you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        any later version.
+
+        GI-go GeoBrowser is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU General Public License for more details.
+
+        You should have received a copy of the GNU General Public License
+        along with GI-go GeoBrowser.  If not, see <http://www.gnu.org/licenses/>.
+
+    Copyright (C) 2009-2011 Flora research <info@floraresearch.eu>
+
+-->
+
+<assembly>
+    <id>jar-with-dependencies</id>
+    <formats>
+        <format>jar</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <dependencySets>
+        <dependencySet>
+            <outputDirectory></outputDirectory>
+            <outputFileNameMapping></outputFileNameMapping>
+            <unpack>true</unpack>
+            <scope>runtime</scope>
+           <!-- <excludes>
+                <exclude>**/META-INF/*.RSA</exclude>
+                <exclude>**/META-INF/*.DSA</exclude>
+                <exclude>**/META-INF/*.SF</exclude>
+                <exclude>**/META-INF/*.rsa</exclude>
+                <exclude>**/META-INF/*.dsa</exclude>
+                <exclude>**/META-INF/*.sf</exclude>                    
+                <exclude>**/LICENSE.txt</exclude>
+            </excludes>-->
+            <unpackOptions>
+                <excludes>
+                    <exclude>**/META-INF/*.RSA</exclude>
+                    <exclude>**/META-INF/*.DSA</exclude>
+                    <exclude>**/META-INF/*.SF</exclude>
+                    <exclude>**/META-INF/*.rsa</exclude>
+                    <exclude>**/META-INF/*.dsa</exclude>
+                    <exclude>**/META-INF/*.sf</exclude>
+                    <exclude>**/LICENSE.txt</exclude>
+                </excludes>
+            </unpackOptions>
+        </dependencySet>
+    </dependencySets>
+    <fileSets>
+        <fileSet>
+            <directory>target/classes</directory>
+            <outputDirectory></outputDirectory>
+        </fileSet>
+    </fileSets>
+</assembly>

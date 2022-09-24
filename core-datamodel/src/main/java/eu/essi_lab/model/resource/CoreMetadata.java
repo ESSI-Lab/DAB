@@ -4,7 +4,7 @@ package eu.essi_lab.model.resource;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -38,8 +38,14 @@ import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ServiceIdentification;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
-import eu.essi_lab.jaxb.common.NameSpace;
 import eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0.MIMetadataType;
+import eu.essi_lab.lib.xml.NameSpace;
+
+/**
+ * Core set of harmonized metadata, based on the "ISO-19115 Core metadata for geographic datasets" and on "Dublin Core"
+ * 
+ * @author Fabrizio
+ */
 public class CoreMetadata {
 
     @XmlElement(namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)

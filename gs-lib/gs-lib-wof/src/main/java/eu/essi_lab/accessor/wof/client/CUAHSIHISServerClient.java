@@ -5,7 +5,7 @@ package eu.essi_lab.accessor.wof.client;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -40,21 +40,25 @@ import eu.essi_lab.accessor.wof.client.datamodel.SitesResponseDocument;
 import eu.essi_lab.accessor.wof.client.datamodel.TimeSeries;
 import eu.essi_lab.accessor.wof.client.datamodel.TimeSeriesResponseDocument;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.xml.StAXDocumentReader;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.lib.xml.XMLDocumentWriter;
+import eu.essi_lab.lib.xml.stax.StAXDocumentIterator;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 
 public abstract class CUAHSIHISServerClient {
 
-    transient Logger logger = GSLoggerFactory.getLogger(this.getClass());
+    Logger logger = GSLoggerFactory.getLogger(this.getClass());
 
     static final String REMOTE_SERVER_ERROR = null;
 
     protected String endpoint;
 
     private SimpleDateFormat iso8601OutputFormat;
+
+    /*
+     * CONSTRUCTOR
+     */
 
     protected CUAHSIHISServerClient(String endpoint) {
 	this.endpoint = endpoint;
@@ -124,7 +128,7 @@ public abstract class CUAHSIHISServerClient {
 
 	try {
 	    FileInputStream fis = new FileInputStream(tmpFile);
-	    StAXDocumentReader reader = new StAXDocumentReader(fis, "siteInfo");
+	    StAXDocumentIterator reader = new StAXDocumentIterator(fis, "siteInfo");
 
 	    return new Iterator<SiteInfo>() {
 
@@ -152,20 +156,16 @@ public abstract class CUAHSIHISServerClient {
 	    };
 
 	} catch (Exception e) {
-	    e.printStackTrace();
-	    GSException gse = new GSException();
 
-	    ErrorInfo ei = new ErrorInfo();
-	    ei.setContextId(this.getClass().getName());
-	    ei.setErrorDescription("Unable to complete XML file download");
-	    ei.setErrorId(CUAHSIHISServerClient.REMOTE_SERVER_ERROR);
-	    ei.setSeverity(ErrorInfo.SEVERITY_ERROR);
-
-	    gse.addInfo(ei);
-
-	    throw gse;
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    "Unable to complete XML file download", //
+		    ErrorInfo.ERRORTYPE_SERVICE, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    CUAHSIHISServerClient.REMOTE_SERVER_ERROR, //
+		    e);
 	}
-
     }
 
     /**
@@ -227,7 +227,7 @@ public abstract class CUAHSIHISServerClient {
 
 	try {
 	    FileInputStream fis = new FileInputStream(tmpFile);
-	    StAXDocumentReader reader = new StAXDocumentReader(fis, "siteInfo");
+	    StAXDocumentIterator reader = new StAXDocumentIterator(fis, "siteInfo");
 
 	    return new Iterator<SiteInfo>() {
 
@@ -255,20 +255,16 @@ public abstract class CUAHSIHISServerClient {
 	    };
 
 	} catch (Exception e) {
-	    e.printStackTrace();
-	    GSException gse = new GSException();
 
-	    ErrorInfo ei = new ErrorInfo();
-	    ei.setContextId(this.getClass().getName());
-	    ei.setErrorDescription("Unable to complete XML file download");
-	    ei.setErrorId(CUAHSIHISServerClient.REMOTE_SERVER_ERROR);
-	    ei.setSeverity(ErrorInfo.SEVERITY_ERROR);
-
-	    gse.addInfo(ei);
-
-	    throw gse;
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    "Unable to complete XML file download", //
+		    ErrorInfo.ERRORTYPE_SERVICE, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    CUAHSIHISServerClient.REMOTE_SERVER_ERROR, //
+		    e);
 	}
-
     }
 
     /**
@@ -368,20 +364,15 @@ public abstract class CUAHSIHISServerClient {
 
 	} catch (Exception e) {
 	}
-	GSException gse = new GSException();
 
-	ErrorInfo ei = new ErrorInfo();
-	ei.setContextId(this.getClass().getName());
-	ei.setErrorDescription("Remote server fault: Time zone not available");
-	ei.setErrorId(CUAHSIHISServerClient.REMOTE_SERVER_ERROR);
-	ei.setErrorType(ErrorInfo.ERRORTYPE_CLIENT);
-	ei.setErrorCorrection("Contact remote server administrator");
-	ei.setSeverity(ErrorInfo.SEVERITY_ERROR);
-
-	gse.addInfo(ei);
-
-	throw gse;
-
+	throw GSException.createException(//
+		getClass(), //
+		"Remote server fault: Time zone not available", //
+		"Contact remote server administrator", //
+		ErrorInfo.ERRORTYPE_SERVICE, //
+		ErrorInfo.SEVERITY_ERROR, //
+		CUAHSIHISServerClient.REMOTE_SERVER_ERROR //
+	);
     }
 
     /**
@@ -492,13 +483,13 @@ public abstract class CUAHSIHISServerClient {
 	XMLDocumentReader reader = executor.execute();
 
 	TimeSeriesResponseDocument ret = new TimeSeriesResponseDocument(reader.getDocument());
-	
+
 	// Some HIS server (e.g. http://hydrolite.ddns.net/italia/hsl-emr/index.php/default/services/cuahsi_1_1.asmx?)
 	// put a space instead of a 'T' in the time string, making the document not valid according to the schema
 	ret.fixTimes();
-	
-	ret.reduceValues(methodId, qualityControlLevelCode, sourceId);	
-	
+
+	ret.reduceValues(methodId, qualityControlLevelCode, sourceId);
+
 	return ret;
 
     }

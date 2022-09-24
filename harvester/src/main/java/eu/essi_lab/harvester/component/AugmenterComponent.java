@@ -4,7 +4,7 @@ package eu.essi_lab.harvester.component;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,44 +21,42 @@ package eu.essi_lab.harvester.component;
  * #L%
  */
 
-import java.util.HashMap;
-import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import eu.essi_lab.augmenter.Augmenter;
 import eu.essi_lab.harvester.HarvestingComponent;
-import eu.essi_lab.model.configuration.option.GSConfOption;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
+
+/**
+ * @author Fabrizio
+ */
 public class AugmenterComponent extends HarvestingComponent {
 
     /**
      * 
      */
-    private static final long serialVersionUID = 3159688783069311163L;
-    private static final String AUGMENTER_KEY = "AUGMENTER_KEY";
+    private Augmenter augmenter;
 
     public AugmenterComponent() {
-	/**
-	 * Empty constructor. Mandatory due serialization.
-	 */
     }
 
+    /**
+     * @param augmenter
+     */
     public AugmenterComponent(Augmenter augmenter) {
-	getConfigurableComponents().put(AUGMENTER_KEY, augmenter);
+
+	this.augmenter = augmenter;
     }
 
-    @JsonIgnore
+    /**
+     * @return
+     */
     public Augmenter getAugmenter() {
 
-	return (Augmenter) getConfigurableComponents().get(AUGMENTER_KEY);
+	return augmenter;
     }
 
     @Override
     public void apply(GSResource resource) throws HarvesterComponentException {
-
-	Augmenter augmenter = (Augmenter) getConfigurableComponents().get(AUGMENTER_KEY);
 
 	try {
 	    augmenter.augment(resource);
@@ -68,19 +66,4 @@ public class AugmenterComponent extends HarvestingComponent {
 	    throw new HarvesterComponentException(e);
 	}
     }
-
-    @Override
-    public Map<String, GSConfOption<?>> getSupportedOptions() {
-
-	return new HashMap<>();
-    }
-
-    @Override
-    public void onOptionSet(GSConfOption<?> opt) throws GSException {
-    }
-
-    @Override
-    public void onFlush() throws GSException {
-    }
-
 }

@@ -4,7 +4,7 @@ package eu.essi_lab.workflow.processor.timeseries;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -88,6 +88,7 @@ public class WML20_To_NetCDF_Processor extends DataProcessor {
     public static final String FLAG_DESCRIPTIONS = "flag_descriptions";
     public static final String FLAG_LONG_DESCRIPTIONS = "flag_long_descriptions";
     public static final String FLAG_LINKS = "flag_links";
+    private static final String WML_20_TO_NETCDF_PROCESSOR_ERROR = "WML_20_TO_NETCDF_PROCESSOR_ERROR";
 
     @Override
     public DataObject process(DataObject dataObject, TargetHandler handler) throws Exception {
@@ -190,12 +191,12 @@ public class WML20_To_NetCDF_Processor extends DataProcessor {
 				    ReferenceType referenceName = namedValue.getName();
 				    if (referenceName != null) {
 					String title = referenceName.getTitle();
-					if (title==null) {
+					if (title == null) {
 					    title = referenceName.getHref();
 					}
-					if (title!=null&&!title.isEmpty()) {
+					if (title != null && !title.isEmpty()) {
 					    Object value = namedValue.getValue();
-					    if (value!=null) {
+					    if (value != null) {
 						String v = value.toString();
 						if (value instanceof CharacterStringPropertyType) {
 						    CharacterStringPropertyType cs = (CharacterStringPropertyType) value;
@@ -315,7 +316,8 @@ public class WML20_To_NetCDF_Processor extends DataProcessor {
 		    unitsId = uom;
 		    unitsAbbreviation = uom;
 		} else {
-		    throw new GSException();
+		    throw GSException.createException(getClass(), "Measure value not found", ErrorInfo.ERRORTYPE_INTERNAL,
+			    ErrorInfo.SEVERITY_ERROR, WML_20_TO_NETCDF_PROCESSOR_ERROR);
 		}
 	    }
 
@@ -637,6 +639,13 @@ public class WML20_To_NetCDF_Processor extends DataProcessor {
 	}
 
     }
+
+    /**
+     * Normalizes the name according to NetCDF common syntactic rules
+     * 
+     * @param variableName
+     * @return
+     */
     public String getNetCDFName(String variableName) {
 	return variableName.toLowerCase().replace(" ", "_");
     }
@@ -652,11 +661,12 @@ public class WML20_To_NetCDF_Processor extends DataProcessor {
     }
 
     private GSException getGSException(String message) {
-	GSException ret = new GSException();
-	ErrorInfo info = new ErrorInfo();
-	info.setErrorDescription(message);
-	ret.addInfo(info);
-	return ret;
+	return GSException.createException(//
+		getClass(), //
+		message, //
+		ErrorInfo.ERRORTYPE_INTERNAL, //
+		ErrorInfo.SEVERITY_ERROR, //
+		WML_20_TO_NETCDF_PROCESSOR_ERROR);
 
     }
 

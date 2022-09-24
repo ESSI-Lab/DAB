@@ -4,7 +4,7 @@ package eu.essi_lab.harvester.component;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,44 +21,37 @@ package eu.essi_lab.harvester.component;
  * #L%
  */
 
-import java.util.HashMap;
-import java.util.Map;
-
-import eu.essi_lab.harvester.Harvester;
 import eu.essi_lab.harvester.HarvestingComponent;
 import eu.essi_lab.identifierdecorator.ConflictingResourceException;
 import eu.essi_lab.identifierdecorator.DuplicatedResourceException;
 import eu.essi_lab.identifierdecorator.IdentifierDecorator;
-import eu.essi_lab.model.configuration.option.GSConfOption;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.model.resource.HarmonizedMetadata;
+
+/**
+ * @author Fabrizio
+ */
 public class IdentifierDecoratorComponent extends HarvestingComponent {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -1866300158216492576L;
-    public static final String DECORATOR_KEY = "DECORATOR_KEY";
+    private IdentifierDecorator identifierDecorator;
 
     public IdentifierDecoratorComponent() {
     }
 
     public IdentifierDecoratorComponent(IdentifierDecorator identifierDecorator) {
-	getConfigurableComponents().put(DECORATOR_KEY, identifierDecorator);
+
+	this.identifierDecorator = identifierDecorator;
     }
 
     @Override
     public void apply(GSResource resource) throws HarvesterComponentException, DuplicatedResourceException, ConflictingResourceException {
 
-	IdentifierDecorator decorator = (IdentifierDecorator) getConfigurableComponents().get(DECORATOR_KEY);
-
 	try {
 
-	    decorator.decorateHarvestedIdentifier(//
+	    this.identifierDecorator.decorateHarvestedIdentifier(//
 		    resource, //
 		    getHarvestingProperties(), //
-		    getSourceStorage(),//
+		    getSourceStorage(), //
 		    isFirstHarvesting(), //
 		    isRecovering(), //
 		    isIncrementalHarvesting());
@@ -67,27 +60,5 @@ public class IdentifierDecoratorComponent extends HarvestingComponent {
 
 	    throw new HarvesterComponentException(e);
 	}
-    }
-
-    @Override
-    public String getLabel() {
-	return "Identifier component";
-    }
-
-    @Override
-    public Map<String, GSConfOption<?>> getSupportedOptions() {
-	return new HashMap<>();
-    }
-
-    @Override
-    public void onOptionSet(GSConfOption<?> opt) throws GSException {
-	/**
-	 * It does not hold any option.
-	 */
-	return;
-    }
-
-    @Override
-    public void onFlush() throws GSException {
     }
 }

@@ -1,10 +1,13 @@
+/**
+ * 
+ */
 package eu.essi_lab.api.database.marklogic.search;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,17 +31,17 @@ import java.util.stream.Collectors;
 import eu.essi_lab.api.database.Database.DatabaseImpl;
 import eu.essi_lab.indexes.marklogic.MarkLogicIndexTypes;
 import eu.essi_lab.indexes.marklogic.MarkLogicScalarType;
-import eu.essi_lab.jaxb.common.NameSpace;
-import eu.essi_lab.messages.RankingStrategy;
+import eu.essi_lab.lib.xml.NameSpace;
+import eu.essi_lab.lib.xml.QualifiedName;
 import eu.essi_lab.messages.bond.QueryableBond;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.RuntimeInfoElementBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.SpatialBond;
-import eu.essi_lab.model.QualifiedName;
 import eu.essi_lab.model.index.IndexedElementInfo;
 import eu.essi_lab.model.index.IndexedMetadataElement;
 import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.RankingStrategy;
 import eu.essi_lab.model.resource.ResourceType;
 
 /**

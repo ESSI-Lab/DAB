@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.wml._2_0.gml._3_2_1;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -37,6 +37,40 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
+
+/**
+ * <p>Java class for TinType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="TinType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{http://www.opengis.net/gml/3.2}SurfaceType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="stopLines" type="{http://www.opengis.net/gml/3.2}LineStringSegmentArrayPropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="breakLines" type="{http://www.opengis.net/gml/3.2}LineStringSegmentArrayPropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="maxLength" type="{http://www.opengis.net/gml/3.2}LengthType"/&gt;
+ *         &lt;element name="controlPoint"&gt;
+ *           &lt;complexType&gt;
+ *             &lt;complexContent&gt;
+ *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *                 &lt;choice&gt;
+ *                   &lt;element ref="{http://www.opengis.net/gml/3.2}posList"/&gt;
+ *                   &lt;group ref="{http://www.opengis.net/gml/3.2}geometricPositionGroup" maxOccurs="unbounded" minOccurs="3"/&gt;
+ *                 &lt;/choice&gt;
+ *               &lt;/restriction&gt;
+ *             &lt;/complexContent&gt;
+ *           &lt;/complexType&gt;
+ *         &lt;/element&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "TinType", propOrder = {
     "stopLines",

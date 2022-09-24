@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.wml._2_0.gml._3_2_1;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -33,6 +33,30 @@ import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlType;
 
+
+/**
+ * <p>Java class for SurfaceInterpolationType.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * <pre>
+ * &lt;simpleType name="SurfaceInterpolationType"&gt;
+ *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
+ *     &lt;enumeration value="none"/&gt;
+ *     &lt;enumeration value="planar"/&gt;
+ *     &lt;enumeration value="spherical"/&gt;
+ *     &lt;enumeration value="elliptical"/&gt;
+ *     &lt;enumeration value="conic"/&gt;
+ *     &lt;enumeration value="tin"/&gt;
+ *     &lt;enumeration value="parametricCurve"/&gt;
+ *     &lt;enumeration value="polynomialSpline"/&gt;
+ *     &lt;enumeration value="rationalSpline"/&gt;
+ *     &lt;enumeration value="triangulatedSpline"/&gt;
+ *   &lt;/restriction&gt;
+ * &lt;/simpleType&gt;
+ * </pre>
+ * 
+ */
 @XmlType(name = "SurfaceInterpolationType")
 @XmlEnum
 public enum SurfaceInterpolationType {

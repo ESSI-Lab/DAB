@@ -4,7 +4,7 @@ package eu.essi_lab.request.executor.discover;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -49,6 +49,20 @@ import eu.essi_lab.request.executor.query.IDatabaseQueryExecutor;
 import eu.essi_lab.request.executor.query.IDistributedQueryExecutor;
 import eu.essi_lab.request.executor.query.IQueryExecutor;
 import eu.essi_lab.request.executor.query.IQueryExecutor.Type;
+
+/**
+ * The default implementation of {@link IDistributor} is initialized with an ordered list of query submitters. It
+ * distributes the discovery
+ * message to the query submitters and collect back the results.
+ * <p>
+ * It's in charge of creating a reduced discovery message for each distributed query submitter, where only the subset of
+ * the original bond
+ * that is pertinent for a given source is forwarded. The result page requested by the user will be here translated into
+ * a query submitter
+ * relative result page. Finally, it collects back the results from the query submitter.
+ *
+ * @author boldrini
+ */
 public class Distributor implements IDistributor {
 
     /**
@@ -140,7 +154,8 @@ public class Distributor implements IDistributor {
 		    ReducedDiscoveryMessage reducedMessage = new ReducedDiscoveryMessage(message, reducedBond);
 		    taskList.addTask(() -> ((IDistributedQueryExecutor) queryExecutor).count(reducedMessage));
 
-		    GSLoggerFactory.getLogger(getClass()).info("Distributed counting task created for source {}", sourceIdentifier);
+		    // GSLoggerFactory.getLogger(getClass()).info("Distributed counting task created for source {}",
+		    // sourceIdentifier);
 
 		} catch (GSException e) {
 		    // the reduced bond couldn't be calculated
@@ -153,19 +168,19 @@ public class Distributor implements IDistributor {
 		// the Database is able to directly execute the normalized bond
 		taskList.addTask(() -> ((IDatabaseQueryExecutor) queryExecutor).count(message));
 
-		GSLoggerFactory.getLogger(getClass()).info("Harvested counting task created");
+		// GSLoggerFactory.getLogger(getClass()).info("Harvested counting task created");
 
 		break;
 	    }
 	}
 
-	GSLoggerFactory.getLogger(getClass()).info("Counting tasks STARTED");
+	// GSLoggerFactory.getLogger(getClass()).info("Counting tasks STARTED");
 
 	int timeout = getTimeout(message);
 
 	List<Future<SimpleEntry<String, DiscoveryCountResponse>>> futures = taskList.executeAndWait(timeout);
 
-	GSLoggerFactory.getLogger(getClass()).info("Counting tasks ENDED");
+	// GSLoggerFactory.getLogger(getClass()).info("Counting tasks ENDED");
 
 	CountSet ret = new CountSet();
 	for (int i = 0; i < futures.size(); i++) {
@@ -204,6 +219,9 @@ public class Distributor implements IDistributor {
 			"Interrupted exception joining source: ");
 
 	    } catch (ExecutionException ee) {
+
+		GSLoggerFactory.getLogger(getClass()).error(ee.getMessage(), ee);
+
 		//
 		// in case of exceptions no count pair will be provided for the given source
 		//
@@ -211,11 +229,9 @@ public class Distributor implements IDistributor {
 		if (cause instanceof GSException) {
 
 		    GSException gse = (GSException) cause;
-		    message.getException().addInfoList(gse.getErrorInfoList());
+		    message.getException().getErrorInfoList().addAll(gse.getErrorInfoList());
 
 		} else {
-
-		    GSLoggerFactory.getLogger(getClass()).error(ee.getMessage(), ee);
 
 		    addError(//
 			    message.getException(), //
@@ -233,11 +249,13 @@ public class Distributor implements IDistributor {
 	Integer timeout = message.getRequestTimeout();
 	if (timeout == null) {
 	    timeout = DEFAULT_EXECUTION_TIMEOUT;
-	    String msg = "Timeout not specified in message. Using default.";
+	    // String msg = "Timeout not specified in message. Using default of: " + timeout + "s";
+	    // GSLoggerFactory.getLogger(getClass()).info(msg);
+	} else {
+	    String msg = "Timeout set to: " + timeout + "s";
 	    GSLoggerFactory.getLogger(getClass()).info(msg);
 	}
-	String msg = "Using timeout of: " + timeout + "s";
-	GSLoggerFactory.getLogger(getClass()).info(msg);
+
 	return timeout;
     }
 
@@ -269,7 +287,7 @@ public class Distributor implements IDistributor {
 	CountSet countSet = count(message);
 
 	int size = queryExecutors.size();
-	log.info("Retrieving results from {} executors", size);
+	log.debug("Retrieving results from {} executors", size);
 
 	TaskListExecutor<ResultSet<T>> taskList = new TaskListExecutor<>(size);
 
@@ -304,7 +322,8 @@ public class Distributor implements IDistributor {
 		// the min page start value must be always >=1
 		Page newPage = new Page(relativeStart + 1, relativeCount);
 
-		log.debug("Requesting {} results starting at {} to source {}", relativeCount, relativeStart, sourceIdentifier);
+		// log.debug("Requesting {} results starting at {} to source {}", relativeCount, relativeStart,
+		// sourceIdentifier);
 
 		switch (queryExecutor.getType()) {
 		case DISTRIBUTED:
@@ -346,7 +365,7 @@ public class Distributor implements IDistributor {
 			    log.error("Unexpected result type: {}", clazz.getCanonicalName());
 			}
 
-			log.info("Distributed retrieving task created for source {}", sourceIdentifier);
+			// log.info("Distributed retrieving task created for source {}", sourceIdentifier);
 
 		    } catch (GSException e) {
 			// the reduced bond couldn't be calculated
@@ -372,7 +391,7 @@ public class Distributor implements IDistributor {
 			    }
 			});
 
-		    }  else if (clazz.equals(String.class)) {
+		    } else if (clazz.equals(String.class)) {
 			taskList.addTask(new Callable<ResultSet<T>>() {
 
 			    @Override
@@ -385,7 +404,7 @@ public class Distributor implements IDistributor {
 			log.error("Unexpected result type: {}", clazz.getCanonicalName());
 		    }
 
-		    log.info("Harvested retrieving task created");
+		    // log.info("Harvested retrieving task created");
 
 		    break;
 		}
@@ -396,13 +415,13 @@ public class Distributor implements IDistributor {
 
 	ResultSet<T> outputSet = initResultSet(countSet, page);
 
-	GSLoggerFactory.getLogger(getClass()).info("Retrieving tasks STARTED");
+	// GSLoggerFactory.getLogger(getClass()).info("Retrieving tasks STARTED");
 
 	int timeout = getTimeout(message);
 
 	List<Future<ResultSet<T>>> futures = taskList.executeAndWait(timeout);
 
-	GSLoggerFactory.getLogger(getClass()).info("Retrieving tasks ENDED futures: {}", futures.size());
+	// GSLoggerFactory.getLogger(getClass()).info("Retrieving tasks ENDED futures: {}", futures.size());
 
 	// restores the original page because the data base modifies the page of the message
 	message.setPage(page);
@@ -457,7 +476,7 @@ public class Distributor implements IDistributor {
 		if (cause instanceof GSException) {
 
 		    GSException gse = (GSException) cause;
-		    outputSet.getException().addInfoList(gse.getErrorInfoList());
+		    outputSet.getException().getErrorInfoList().addAll(gse.getErrorInfoList());
 
 		} else {
 
@@ -483,7 +502,7 @@ public class Distributor implements IDistributor {
 
 	countSet.setPageCount(countSet.getCount() == 0 ? 0 : pageCount);
 
-	log.info("page.getStart() [{}], page.getCount() [{}]", page.getStart(), page.getSize());
+	log.info("Page start [{}], page count [{}]", page.getStart(), page.getSize());
 
 	int pageIndex = page.getSize() == 0 ? 0 : page.getStart() <= page.getSize() ? 1 : (page.getStart() / page.getSize()) + 1;
 	countSet.setPageIndex(pageIndex);
@@ -493,9 +512,14 @@ public class Distributor implements IDistributor {
 	return result;
     }
 
-    private ErrorInfo getErrorInfo(String errorId, String errorDescription) {
+    /**
+     * @param errorId
+     * @param errorDescription
+     * @return
+     */
+    private ErrorInfo createErrorInfo(String errorId, String errorDescription) {
 	ErrorInfo info = new ErrorInfo();
-	info.setContextId(this.getClass().getName());
+	info.setCaller(this.getClass());
 	info.setErrorDescription(errorDescription);
 	info.setErrorId(errorId);
 	info.setErrorType(ErrorInfo.ERRORTYPE_INTERNAL);
@@ -512,9 +536,10 @@ public class Distributor implements IDistributor {
      */
     private void addError(GSException ex, int executor, String errorCode, String message) {
 
-	ex.addInfo(getErrorInfo(//
-		errorCode, //
-		message + queryExecutors.get(executor).getSourceIdentifier()));
-    }
+	ex.getErrorInfoList()
+		.add(createErrorInfo(//
+			errorCode, //
+			message + queryExecutors.get(executor).getSourceIdentifier()));
 
+    }
 }

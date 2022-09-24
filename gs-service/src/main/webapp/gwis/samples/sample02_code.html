@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<!--
+..........................................................
+GWIS Javascript API Sample:
+Plot Options
+..........................................................
+U.S. Geological Survey, Texas Water Science Center, Austin
+https://txpub.usgs.gov/DSS/GWIS/
+..........................................................
+-->
+<html>
+    <!-- html head -->
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>GWIS JSAPI Sample</title>
+        
+        <!-- GWIS requires jQuery -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        
+        <!-- GWIS JSAPI 0.0 -->
+        <link rel="stylesheet" href="https://txpub.usgs.gov/DSS/GWIS/0.0/jsapi/gwis-plot-utils.css"/>
+        <script src="https://txpub.usgs.gov/DSS/GWIS/0.0/jsapi/gwis-plot-utils.min.js"></script>
+    </head>
+    
+    <!-- html body -->
+    <body style="background:#eee; font-family:arial;">
+        
+        <!-- title -->
+        <h1>Sample: Plot Options</h1>
+        
+        <!-- create plot in document div -->
+        <h2>A Plot Created in the Document:</h2>
+        <div id="plot1" style="width:95%; height:500px;"></div>
+        <script>
+            GWIS.plot({
+                div_id   : "plot1",      // create plot in div with this id
+                // ...data options...
+                iv_or_dv : "dv",         // whether to plot instantaneous values ("iv", real-time and historical) or daily values ("dv")
+                start_dt : "2011-01-01", // start date-times of data to plot
+                end_dt   : "2012-01-01", // end   date-times of data to plot
+                // ...plot lines...
+                series : [
+                    {
+                        site           : "08052700", // USGS site number
+                        pcode          : "00400",    // 5-digit parameter code of the data to retrieve and plot for the site
+                        dv_stat        : "00001",    // when plotting daily values ('iv_or_dv' = 'dv'), the statistic to use
+                        label          : "pH",       // label to display in legend
+                        stroke_width   : 4,          // line width, in pixels
+                        stroke_pattern : [7,3],      // array defining dashed line style
+                        color          : "#900",     // line color specified as a css-style color
+                        draw_points    : true,       // whether to draw data circles at each data point on the line
+                        point_size     : 6,          // size of the circles to draw at data points, in pixels
+                        fill_graph     : true        // whether to create an fill plot, where the area between the line and y=0 axis is colored
+                    }
+                ],
+                // ...plot options...
+                title                 : "Little Elm Creek", // title string placed above plot
+                xlabel                : "Time",             // x-axis label placed below plot
+                ylabel                : "Daily Minimum pH", // 1st (left) y-axis label
+                legend                : "onmouseover",      // option for displaying legend: "always", "onmouseover", "never"
+                date_window           : 25,                 // date range to show at creation, expressed as a percentage
+                range_selector        : true,               // whether to show interactive range selector mini plot below main plot
+                range_selector_stroke : "#900",             // line color to use for the interactive range selector mini plot below main plot
+                range_selector_fill   : "#900",             // fill color to use for the interactive range selector mini plot below main plot
+                y_fixscale            : false,              // whether to fix the y-axis range to the full available range
+                y_logscale            : false,              // whether to use a base-10 logscale for the y-axis
+                y_show0               : false,              // whether to always show 0 on y-axis
+                x_grid                : false,              // whether to show of hide the x-axis grid lines
+                y_grid                : false,              // whether to show of hide the y-axis grid lines
+                controls              : [                   // which controls to add at the bottom of the plot (set to "all" to add all available)
+                    "full_screen", // (button)   toggles full screen mode for enlarging plot
+                    "full_range",  // (button)   zooms plot to full timespan
+                    "y_fixscale",  // (checkbox) toggles whether the y-scale is fixed to the full y-range
+                    "y_logscale",  // (checkbox) toggles y-scale logscale
+                    "y_show0",     // (checkbox) toggles whether the y-axis always shows 0
+                    "x_grid",      // (checkbox) show or hide the plot x-grid lines
+                    "y_grid"       // (checkbox) show or hide the plot y-grid lines
+                ],
+                // ...events...
+                on_success  : function(plt) { console.warn( "'on_success' event triggered for "+plt.opts.div_id); }, // function to execute after plot is successfully created
+                on_error    : function(msg) { console.warn(   "'on_error' event triggered - message: "+msg     ); }, // function to execute if plot not successfully created
+                on_complete : function(   ) { console.warn("'on_complete' event triggered"                     ); }, // function to execute when plot creation is complete, either upon success or error
+                on_refresh  : function(plt) { console.warn( "'on_refresh' event triggered for "+plt.opts.div_id); }, // function to execute when plot data is successfully refreshed
+                // ..misc...
+                verbose: true // whether to write api status messages to developer console
+            });
+        </script>
+        
+        <!-- popup a plot when a button is clicked -->
+        <h2>A Pop-Up Plot:</h2>
+        <p>
+            <button onclick="button_onclick()">Open Plot</button>
+        </p>
+        <script>
+            var button_onclick = function() {
+                GWIS.plot({
+                    // ...popup options...
+                    popup_size      : [700,300], // size of popup, [width,height], in pixels
+                    popup_singleton : true,      // whether to close all other popup plots opened by GWIS before opening this popup
+                    // ...data options...
+                    iv_or_dv        : "iv",      // whether to plot instantaneous values ("iv", real-time and historical) or daily values ("dv")
+                    iv_local_or_utc : "utc",     // whether to express times for iv plots in your local time zone ("local") or utc ("utc")
+                    period          : "p30d",    // time period from past to now for the data to plot, ISO-8601 duration format
+                    // ...plot lines...
+                    series : [
+                        {
+                            site         : "07332620", // USGS site number
+                            pcode        : "00010",    // 5-digit parameter code of the data to retrieve and plot for the site
+                            stroke_width : 2,          // line width, in pixels
+                            color        : "teal",     // line color specified as a css-style color
+                            fill_graph   : true        // whether to create an fill plot, where the area between the line and y=0 axis is colored
+                        }
+                    ],
+                    // ...plot options...
+                    title          : "Bois D'Arc Creek",    // title string placed above plot
+                    ylabel         : "Water Temp (&deg;C)", // 1st (left) y-axis label
+                    legend         : "never",               // option for displaying legend: "always", "onmouseover", "never"
+                    range_selector : false,                 // whether to show interactive range selector mini plot below main plot
+                    y_fixscale     : false,                 // whether to fix the y-axis range to the full available range
+                    y_logscale     : false,                 // whether to use a base-10 logscale for the y-axis
+                    y_show0        : false,                 // whether to always show 0 on y-axis
+                    x_grid         : false,                 // whether to show of hide the x-axis grid lines
+                    y_grid         : false,                 // whether to show of hide the y-axis grid lines
+                    // ...events...
+                    on_success  : function(   ) { console.warn( "'on_success' event triggered"                ); }, // function to execute after plot is successfully created
+                    on_error    : function(msg) { console.warn(   "'on_error' event triggered - message: "+msg); }, // function to execute if plot not successfully created
+                    on_complete : function(   ) { console.warn("'on_complete' event triggered"                ); }, // function to execute when plot creation is complete, either upon success or error
+                    on_refresh  : function(   ) { console.warn( "'on_refresh' event triggered"                ); }, // function to execute when plot data is successfully refreshed
+                    // ...misc...
+                    verbose: true // whether to write api status messages to developer console
+                });
+            };
+        </script>
+        
+    </body>
+</html>
+<!-- end GWIS JSAPI sample -->

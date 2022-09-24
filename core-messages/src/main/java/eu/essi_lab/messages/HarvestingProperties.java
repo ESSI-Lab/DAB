@@ -4,7 +4,7 @@ package eu.essi_lab.messages;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,6 +31,12 @@ import java.util.Set;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.resource.ResourceProperty;
+
+/**
+ * Provides info about the harvesting performed on a {@link GSSource}
+ *
+ * @author Fabrizio
+ */
 public class HarvestingProperties extends Properties {
 
     private static final long serialVersionUID = 1L;

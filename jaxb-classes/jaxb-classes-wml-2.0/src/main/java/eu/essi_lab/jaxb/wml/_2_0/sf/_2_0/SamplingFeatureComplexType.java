@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.wml._2_0.sf._2_0;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,6 +35,30 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import eu.essi_lab.jaxb.wml._2_0.gml._3_2_1.ReferenceType;
 
+
+/**
+ * A "SamplingFeatureRelation" is used to describe relationships between
+ * 				sampling features, including part-whole, siblings, etc.
+ * 
+ * <p>Java class for SamplingFeatureComplexType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="SamplingFeatureComplexType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="role" type="{http://www.opengis.net/gml/3.2}ReferenceType"/&gt;
+ *         &lt;element name="relatedSamplingFeature" type="{http://www.opengis.net/sampling/2.0}SF_SamplingFeaturePropertyType"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SamplingFeatureComplexType", propOrder = {
     "role",

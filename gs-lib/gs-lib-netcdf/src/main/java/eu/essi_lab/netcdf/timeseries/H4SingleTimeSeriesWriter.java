@@ -4,7 +4,7 @@ package eu.essi_lab.netcdf.timeseries;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,6 +35,13 @@ import ucar.ma2.InvalidRangeException;
 import ucar.nc2.Attribute;
 import ucar.nc2.Dimension;
 import ucar.nc2.Variable;
+
+/**
+ * H.2.3. Single time series
+ * Example H.4. A single timeseries.
+ * 
+ * @author boldrini
+ */
 public class H4SingleTimeSeriesWriter extends TimeSeriesWriter {
 
     public H4SingleTimeSeriesWriter(String location) throws IOException {

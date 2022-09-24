@@ -1,0 +1,30 @@
+http://vocab.aodn.org.au/def/platform/entity/726;WERA beam forming HF radar
+http://vocab.aodn.org.au/def/platform/entity/727;SeaSonde direction finding HF radar
+http://vocab.aodn.org.au/def/platform/entity/823;small boat
+http://vocab.aodn.org.au/def/platform/entity/872;NOAA-17
+http://vocab.aodn.org.au/def/platform/entity/873;NOAA-18
+http://vocab.aodn.org.au/def/platform/entity/874;NOAA-19
+http://vocab.aodn.org.au/def/platform/entity/879;Aqua
+http://vocab.aodn.org.au/def/platform/entity/881;OrbView-2
+http://vocab.nerc.ac.uk/collection/C17/current/353L/;L'Astrolabe
+http://vocab.nerc.ac.uk/collection/L06/current/11/;fixed benthic node
+http://vocab.nerc.ac.uk/collection/L06/current/14/;land/onshore structure
+http://vocab.nerc.ac.uk/collection/L06/current/16/;offshore structure
+http://vocab.nerc.ac.uk/collection/L06/current/17/;coastal structure
+http://vocab.nerc.ac.uk/collection/L06/current/25/;autonomous underwater vehicle
+http://vocab.nerc.ac.uk/collection/L06/current/27/;sub-surface gliders
+http://vocab.nerc.ac.uk/collection/L06/current/31/;research vessel
+http://vocab.nerc.ac.uk/collection/L06/current/32/;vessel of opportunity
+http://vocab.nerc.ac.uk/collection/L06/current/35/;vessel of opportunity on fixed route
+http://vocab.nerc.ac.uk/collection/L06/current/39/;naval vessel
+http://vocab.nerc.ac.uk/collection/L06/current/41/;moored surface buoy
+http://vocab.nerc.ac.uk/collection/L06/current/42/;drifting surface float
+http://vocab.nerc.ac.uk/collection/L06/current/43/;subsurface mooring
+http://vocab.nerc.ac.uk/collection/L06/current/46/;drifting subsurface profiling float
+http://vocab.nerc.ac.uk/collection/L06/current/48/;mooring
+http://vocab.nerc.ac.uk/collection/L06/current/65/;orbiting satellite
+http://vocab.nerc.ac.uk/collection/L06/current/70/;organism
+http://vocab.nerc.ac.uk/collection/L06/current/72/;diver
+http://vocab.nerc.ac.uk/collection/L06/current/73/;flightless bird
+http://vocab.nerc.ac.uk/collection/L06/current/74/;seabird and duck
+http://vocab.nerc.ac.uk/collection/L06/current/77/;land-sea mammals

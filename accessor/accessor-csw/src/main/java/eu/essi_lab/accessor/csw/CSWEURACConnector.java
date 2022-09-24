@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.csw;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,15 +25,10 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.client.methods.HttpRequestBase;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.jaxb.csw._2_0_2.GetRecords;
@@ -42,8 +37,13 @@ import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 
 public class CSWEURACConnector extends CSWGetConnector {
-    private static final long serialVersionUID = -1414274846393306359L;
+
     private static final String CSWEURACCONNECTOR_EXTRACTION_ERROR = "CSWEURACCONNECTOR_EXTRACTION_ERROR";
+
+    /**
+     * 
+     */
+    public static final String TYPE = "CSW EURAC Connector";
 
     public CSWEURACConnector() {
 	// nothing to do here
@@ -76,12 +76,11 @@ public class CSWEURACConnector extends CSWGetConnector {
     }
 
     @Override
-    public String getLabel() {
+    public String getType() {
 
-	return "CSW EURAC Connector";
+	return TYPE;
     }
 
-    @JsonIgnore
     @Override
     protected String getReturnedMetadataSchema() {
 	return CommonNameSpaceContext.MULTI;

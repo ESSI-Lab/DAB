@@ -12,7 +12,7 @@ package eu.essi_lab.ogc.pubsub._1_0;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -44,6 +44,25 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
+
+/**
+ * <p>Classe Java per SubscriptionDeliveryMethodType complex type.
+ * 
+ * <p>Il seguente frammento di schema specifica il contenuto previsto contenuto in questa classe.
+ * 
+ * <pre>
+ * &lt;complexType name="SubscriptionDeliveryMethodType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;attribute name="name" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;anyAttribute processContents='skip'/&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SubscriptionDeliveryMethodType", propOrder = {
     "any"

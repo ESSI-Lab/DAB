@@ -4,7 +4,7 @@ package eu.essi_lab.access.compliance.wrapper;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -40,7 +40,7 @@ import com.google.common.collect.Lists;
 
 import eu.essi_lab.iso.datamodel.DOMSerializer;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.jaxb.common.NameSpace;
+import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.model.resource.data.CRS;
 import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.model.resource.data.DataFormat;
@@ -48,6 +48,10 @@ import eu.essi_lab.model.resource.data.DataType;
 import eu.essi_lab.model.resource.data.dimension.ContinueDimension;
 import eu.essi_lab.model.resource.data.dimension.DataDimension;
 import eu.essi_lab.model.resource.data.dimension.FiniteDimension;
+
+/**
+ * @author Fabrizio
+ */
 @XmlRootElement(name = "DataDescriptor", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
 public class DataDescriptorWrapper extends DOMSerializer {
 

@@ -1,10 +1,13 @@
+/**
+ * 
+ */
 package eu.essi_lab.accessor.wms.demo;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +26,6 @@ package eu.essi_lab.accessor.wms.demo;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 
 import javax.ws.rs.core.MediaType;
 
@@ -33,6 +35,7 @@ import eu.essi_lab.accessor.wms.WMSRequest.Parameter;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.pdk.handler.DefaultRequestHandler;
 
@@ -40,6 +43,8 @@ import eu.essi_lab.pdk.handler.DefaultRequestHandler;
  * @author boldrini
  */
 public class WMSDemoHandler extends DefaultRequestHandler {
+
+    private static final String WMS_DEMO_HANDLER_ERROR = "WMS_DEMO_HANDLER_ERROR";
 
     @Override
     public ValidationMessage validate(WebRequest request) throws GSException {
@@ -91,7 +96,14 @@ public class WMSDemoHandler extends DefaultRequestHandler {
 	    baos.close();
 	    return ret;
 	} catch (Exception e) {
-	    throw new GSException();
+	    e.printStackTrace();
+	
+	    throw GSException.createException(//
+		    getClass(), //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    WMS_DEMO_HANDLER_ERROR, //
+		    e);
 	}
 
     }

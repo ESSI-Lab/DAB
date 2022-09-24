@@ -4,7 +4,7 @@ package eu.essi_lab.shared.driver.es.connector;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,8 +28,13 @@ import java.util.Optional;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
+
+/**
+ * @author ilsanto
+ */
 public class GetDocumentParser extends JSONDocumentParser {
 
     private static final String SOURCE_KEY = "_source";
@@ -49,8 +54,17 @@ public class GetDocumentParser extends JSONDocumentParser {
 	    return Optional.of(new ByteArrayInputStream(source.toString().getBytes()));
 
 	} catch (JSONException e) {
-	    throw GSException.createException(getClass(), "Can't parse document response", null, ErrorInfo.ERRORTYPE_SERVICE,
-		    ErrorInfo.SEVERITY_ERROR, IOEXCEPTION_PARSING_ES_DOCUMENT, e);
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    null, //
+		    ErrorInfo.ERRORTYPE_SERVICE, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    IOEXCEPTION_PARSING_ES_DOCUMENT, //
+		    e);
 	}
     }
 }

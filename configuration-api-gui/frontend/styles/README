@@ -1,0 +1,7 @@
+@CssImport("./styles/shared-styles.css")
+@CssImport(value = "./styles/vaadin-text-field-styles.css", themeFor = "vaadin-text-field")
+@CssImport(value = "./styles/vaadin-item-styles.css", themeFor = "vaadin-item")
+@CssImport(value = "./styles/vaadin-list-box-styles.css", themeFor = "vaadin-list-box")
+@CssImport(value = "./styles/vaadin-vertical-layout-styles.css", themeFor = "vaadin-vertical-layout")
+@CssImport(value = "./styles/vaadin-horizontal-layout-styles.css", themeFor = "vaadin-horizontal-layout")
+@CssImport(value = "./styles/vaadin-select-styles.css", themeFor = "vaadin-select")

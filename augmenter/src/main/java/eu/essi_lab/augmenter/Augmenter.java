@@ -4,7 +4,7 @@ package eu.essi_lab.augmenter;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,75 +21,90 @@ package eu.essi_lab.augmenter;
  * #L%
  */
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.ServiceLoader;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import eu.essi_lab.lib.utils.StreamUtils;
-import eu.essi_lab.model.configuration.AbstractGSconfigurable;
-import eu.essi_lab.model.configuration.option.GSConfOption;
-import eu.essi_lab.model.configuration.option.GSConfOptionString;
+import eu.essi_lab.cfga.Configurable;
+import eu.essi_lab.cfga.gs.setting.augmenter.AugmenterSetting;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.ontology.GSKnowledgeResourceDescription;
 import eu.essi_lab.model.resource.GSResource;
-public abstract class Augmenter extends AbstractGSconfigurable {
 
-    private static final String AUGMENTER_PRIORITY_KEY = "AUGMENTER_PRIORITY_KEY";
+/**
+ * @author Fabrizio
+ */
+public abstract class Augmenter<S extends AugmenterSetting> implements Configurable<S> {
+
+    /**
+    * 
+    */
+    private S setting;
 
     /**
      * 
      */
-    private static final long serialVersionUID = -5889610869314270715L;
-
-    protected HashMap<String, GSConfOption<?>> options = new HashMap<>();
-
     public Augmenter() {
 
-	setKey(getClass().getCanonicalName());
-    }
-
-    @JsonIgnore
-    public int getPriority() {
-
-	GSConfOption<?> option = getSupportedOptions().get(AUGMENTER_PRIORITY_KEY);
-
-	Object value = option != null ? option.getValue() : null;
-	if (value != null) {
-
-	    return Integer.valueOf(value.toString());
-	}
-
-	return 1;
+	init(initSetting());
     }
 
     /**
-     * Creates and put a String option with a range of integer values starting from 1
-     * to the number of all the available augmenters. This initialization CANNOT be done in the constructor
-     * since using the ServiceLoader on this class in that moment causes an initialization error
+     * @param setting
      */
-    public void initPriorityOption() {
+    public Augmenter(S setting) {
 
-	ServiceLoader<Augmenter> loader = ServiceLoader.load(Augmenter.class);
-	int count = (int) StreamUtils.iteratorToStream(loader.iterator()).count();
+	init(setting);
+    }
 
-	List<String> values = IntStream.rangeClosed(1, count).//
-		boxed().//
-		map(i -> String.valueOf(i)).//
-		collect(Collectors.toList());
+    /**
+     * @param setting
+     */
+    protected void init(S setting) {
 
-	GSConfOptionString option = new GSConfOptionString();
-	option.setLabel("Select priority of " + getLabel());
-	option.setKey(AUGMENTER_PRIORITY_KEY);
-	option.setAllowedValues(values);
-	option.setValue(values.get(0));
+	this.setting = setting;
+	this.setting.setName(initName());
+	this.setting.setConfigurableType(getType());
+    }
 
-	getSupportedOptions().put(AUGMENTER_PRIORITY_KEY, option);
+    /**
+     * @return
+     */
+    protected abstract S initSetting();
+
+    /**
+     * @return
+     */
+    protected abstract String initName();
+
+    /**
+     * @param setting
+     * @return
+     * @throws ClassNotFoundException
+     * @throws SecurityException
+     * @throws NoSuchMethodException
+     */
+    public static Augmenter<?> createInstance(AugmenterSetting setting) throws RuntimeException {
+
+	try {
+	    return setting.createConfigurable();
+
+	} catch (Exception e) {
+
+	    e.printStackTrace();
+	    throw new RuntimeException(e);
+	}
+    }
+
+    @Override
+    public void configure(S setting) {
+
+	this.setting = setting;
+    }
+
+    @Override
+    public S getSetting() {
+
+	return this.setting;
     }
 
     /**
@@ -110,15 +125,5 @@ public abstract class Augmenter extends AbstractGSconfigurable {
      * @throws GSException
      */
     public abstract List<GSKnowledgeResourceDescription> generate(GSResource resource) throws GSException;
-
-    /**
-     * Returns all supported options for this GI-suite component.
-     *
-     * @return all supported {@link GSConfOption}s for this GI-suite component.
-     */
-    public Map<String, GSConfOption<?>> getSupportedOptions() {
-
-	return options;
-    }
 
 }

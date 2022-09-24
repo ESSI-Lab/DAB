@@ -4,7 +4,7 @@ package eu.essi_lab.request.executor.semantic;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,6 +31,10 @@ import eu.essi_lab.model.StorageUri;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.ontology.GSKnowledgeResourceDescription;
 import eu.essi_lab.request.executor.ISemanticExecutor;
+
+/**
+ * @author Fabrizio
+ */
 public class SemanticExecutor implements ISemanticExecutor {
 
     @Override
@@ -38,7 +42,7 @@ public class SemanticExecutor implements ISemanticExecutor {
 
 	StorageUri uri = message.getDataBaseURI();
 
-	DatabaseReader reader = new DatabaseConsumerFactory().createDataBaseReader(uri);
+	DatabaseReader reader = DatabaseConsumerFactory.createDataBaseReader(uri);
 
 	GSLoggerFactory.getLogger(getClass()).info("Count STARTED");
 
@@ -54,7 +58,7 @@ public class SemanticExecutor implements ISemanticExecutor {
 
 	StorageUri uri = message.getDataBaseURI();
 
-	DatabaseReader reader = new DatabaseConsumerFactory().createDataBaseReader(uri);
+	DatabaseReader reader = DatabaseConsumerFactory.createDataBaseReader(uri);
 
 	GSLoggerFactory.getLogger(getClass()).info("Retrieve STARTED");
 

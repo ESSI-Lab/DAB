@@ -4,7 +4,7 @@ package eu.essi_lab.api.database;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,6 +24,16 @@ package eu.essi_lab.api.database;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.model.StorageUri;
 import eu.essi_lab.model.exceptions.GSException;
+
+/**
+ * A provider of initialized {@link Database} instances. If the initialization fails, no {@link Database} instance is
+ * provided
+ *
+ * @author Fabrizio
+ * @see DatabaseProviderFactory
+ * @see Database
+ * @see DatabaseConsumer
+ */
 public interface DatabaseProvider extends DatabaseClient {
 
     /**

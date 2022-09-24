@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.rsf.impl.xml.gs;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,7 @@ import java.util.Optional;
 import org.json.JSONObject;
 import org.json.XML;
 
-import eu.essi_lab.configuration.ConfigurationUtils;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.utils.JSONUtils;
 import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
@@ -36,6 +36,10 @@ import eu.essi_lab.messages.termfrequency.TermFrequencyMap.TermFrequencyTarget;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
+
+/**
+ * @author Fabrizio
+ */
 public class TermFrequencyMapFormatter {
 
     private TermFrequencyMap map;
@@ -56,7 +60,7 @@ public class TermFrequencyMapFormatter {
     public String formatAsXML() throws GSException {
 
 	String out = "<gs:sourceStatistics>";
-	out += "<gs:sourcesCount>" + ConfigurationUtils.getAllSources().size() + "</gs:sourcesCount>";
+	out += "<gs:sourcesCount>" + ConfigurationWrapper.getAllSources().size() + "</gs:sourcesCount>";
 
 	{
 	    List<TermFrequencyItem> items = map.getItems(TermFrequencyTarget.SOURCE, ItemsSortOrder.BY_FREQUENCY);
@@ -124,7 +128,7 @@ public class TermFrequencyMapFormatter {
 
     private GSSource find(String sourceId) throws GSException {
 
-	Optional<GSSource> first = ConfigurationUtils.getAllSources().//
+	Optional<GSSource> first = ConfigurationWrapper.getAllSources().//
 		stream().//
 		filter(s -> s.getUniqueIdentifier().equals(sourceId)).//
 		findFirst();

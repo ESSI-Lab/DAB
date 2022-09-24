@@ -1,7 +1,0 @@
-eu.essi_lab.gssrv.starter.BrokeredSourceConfigurableComposed
-eu.essi_lab.gssrv.starter.ProfilerConfigurableComposed
-eu.essi_lab.gssrv.starter.BatchJobConfigurableComposed
-eu.essi_lab.gssrv.mail.MailConfigurable
-eu.essi_lab.gssrv.statistics.StatisticsConfigurable
-eu.essi_lab.gssrv.proxy.ProxyConfigurable
-eu.essi_lab.gssrv.credentials.CredentialsConfigurable

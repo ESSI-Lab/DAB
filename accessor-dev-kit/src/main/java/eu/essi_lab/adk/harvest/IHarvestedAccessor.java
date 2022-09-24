@@ -4,7 +4,7 @@ package eu.essi_lab.adk.harvest;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,16 +23,16 @@ package eu.essi_lab.adk.harvest;
 
 import eu.essi_lab.adk.IHarvestedQuerySubmitter;
 import eu.essi_lab.cdk.harvest.IHarvestedQueryConnector;
-import eu.essi_lab.messages.listrecords.ListRecordsRequest;
-import eu.essi_lab.messages.listrecords.ListRecordsResponse;
+import eu.essi_lab.cfga.Configurable;
+import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.configuration.IGSConfigurableComposed;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.ommdk.IResourceMapper;
 
-public interface IHarvestedAccessor extends IGSConfigurableComposed, IHarvestedQuerySubmitter<GSResource> {
-    public ListRecordsResponse<GSResource> listRecords(ListRecordsRequest request) throws GSException;
+@SuppressWarnings("rawtypes")
+public interface IHarvestedAccessor<C extends IHarvestedQueryConnector>
+	extends Configurable<AccessorSetting>, IHarvestedQuerySubmitter<GSResource> {
 
     /**
      * Returns the {@link GSSource} of this accessor
@@ -45,11 +45,16 @@ public interface IHarvestedAccessor extends IGSConfigurableComposed, IHarvestedQ
      * @return
      * @throws GSException
      */
-    public IHarvestedQueryConnector getConnector() throws GSException;
+    public C getConnector();
 
     /**
      * @return
      * @throws GSException
      */
     public IResourceMapper getMapper(String schemeUri) throws GSException;
+
+    /**
+     * @return
+     */
+    public boolean isMixed();
 }

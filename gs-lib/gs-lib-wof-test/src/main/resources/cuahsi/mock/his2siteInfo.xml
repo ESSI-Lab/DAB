@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitesResponse xmlns="http://www.cuahsi.org/waterML/1.1/"
+               xmlns:gml="http://www.opengis.net/gml"
+               xmlns:wtr="http://www.cuahsi.org/waterML/"
+               xmlns:xlink="http://www.w3.org/1999/xlink"
+               xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <queryInfo>
+      <creationTime>2018-01-10T08:08:32.506078-05:00</creationTime>
+      <criteria MethodCalled="GetSiteInfo">
+         <parameter name="site" value="EPA_Lake_Harsha_Data:143"/>
+      </criteria>
+   </queryInfo>
+   <site>
+      <siteInfo>
+         <siteName>Trib to East Fork River Main Stemat Round Bottom Rd. </siteName>
+         <siteCode network="EPA_Lake_Harsha_Data" siteID="1">143</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>39.156</latitude>
+               <longitude>-84.287</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Clermont</siteProperty>
+         <siteProperty name="State">OH</siteProperty>
+      </siteInfo>
+      <seriesCatalog menuGroupName="WorkOneFlow"
+                     serviceWsdl="https://hisprod.rtnccad.epa.gov/prod/cuahsi_1_1.asmx?WSDL"/>
+   </site>
+</sitesResponse>

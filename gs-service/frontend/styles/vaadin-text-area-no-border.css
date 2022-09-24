@@ -1,0 +1,3 @@
+:host(.text-area-no-border) [part="input-field"] {
+    border: none
+}

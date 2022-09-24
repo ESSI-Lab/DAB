@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.csw;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,7 +28,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
@@ -38,8 +37,6 @@ import org.apache.http.entity.InputStreamEntity;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import eu.essi_lab.iso.datamodel.classes.BrowseGraphic;
-import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.net.utils.Downloader;
 import eu.essi_lab.lib.net.utils.HttpRequestExecutor;
@@ -49,21 +46,21 @@ import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.SatelliteScene;
 
 public class CSWC3SConnector extends CSWConnector {
-    private static final long serialVersionUID = 5563837409915698800L;
+
     private static final String CSWC3SCONNECTOR_EXTRACTION_ERROR = "CSWC3SCONNECTOR_EXTRACTION_ERROR";
     private static final String GCO_DECIMAL = "gco:Decimal";
 
-    public CSWC3SConnector() {
-	// nothing to do here
-    }
+    /**
+     * 
+     */
+    public static final String TYPE = "CSW C3S Connector";
 
     @Override
-    public String getLabel() {
+    public String getType() {
 
-	return "CSW C3S Connector";
+	return TYPE;
     }
 
     /**
@@ -82,27 +79,24 @@ public class CSWC3SConnector extends CSWConnector {
 	    file.delete();
 
 	    String str = new String(bytes, StandardCharsets.UTF_8);
-	    
+
 	    reader = new XMLDocumentReader(str);
 
 	    reader.setNamespaceContext(new CommonNameSpaceContext());
 
-	    
 	    /// fix #1
 	    Node[] graphicOverviews = reader.evaluateNodes("//gmd:graphicOverview/*/gmd:fileName/gco:CharacterString");
-	    Node[] ids = reader.evaluateNodes("//gmd:fileIdentifier/gco:CharacterString");//gmd:fileIdentifier/gco:CharacterString
+	    Node[] ids = reader.evaluateNodes("//gmd:fileIdentifier/gco:CharacterString");// gmd:fileIdentifier/gco:CharacterString
 	    int k = 0;
-	    for(Node overview: graphicOverviews) {
+	    for (Node overview : graphicOverviews) {
 		String putReq = handleThumbnail(overview.getTextContent(), ids[k].getTextContent());
 		k++;
-		if(putReq != null && !putReq.isEmpty())
+		if (putReq != null && !putReq.isEmpty())
 		    overview.setTextContent(putReq);
 	    }
 
-
 	    /// fix #2
 
-	   
 	    Node[] boxes = reader.evaluateNodes("//gmd:EX_GeographicBoundingBox");
 
 	    for (Node box : boxes) {
@@ -110,7 +104,7 @@ public class CSWC3SConnector extends CSWConnector {
 		String value2 = reader.evaluateString(box, "*[2]").trim();
 		String value3 = reader.evaluateString(box, "*[3]").trim();
 		String value4 = reader.evaluateString(box, "*[4]").trim();
-		
+
 		if (value2.equals("360")) {
 		    value1 = "-180";
 		    value2 = "180";
@@ -142,7 +136,7 @@ public class CSWC3SConnector extends CSWConnector {
 		Element northDecimalElement = reader.getDocument().createElementNS(CommonNameSpaceContext.GCO_NS_URI, GCO_DECIMAL);
 		northElement.appendChild(northDecimalElement);
 		northDecimalElement.setTextContent(value4);
-		
+
 		box.appendChild(westElement);
 		box.appendChild(eastElement);
 		box.appendChild(southElement);
@@ -191,14 +185,13 @@ public class CSWC3SConnector extends CSWConnector {
 	}
 
     }
-    
+
     /**
      * @param quickLook
      * @param id
      * @throws Exception
      */
-    public String handleThumbnail(String  quickLook, String id)
-	    throws Exception {
+    public String handleThumbnail(String quickLook, String id) throws Exception {
 
 	if (quickLook == null || quickLook.isEmpty()) {
 
@@ -279,6 +272,5 @@ public class CSWC3SConnector extends CSWConnector {
 
 	return null;
     }
-    
 
 }

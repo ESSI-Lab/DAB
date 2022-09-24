@@ -1,0 +1,6 @@
+eu.essi_lab.cfga.gs.setting.SystemSetting
+eu.essi_lab.cfga.gs.setting.DownloadSetting
+eu.essi_lab.cfga.gs.setting.CredentialsSetting
+eu.essi_lab.cfga.gs.setting.SchedulerViewSetting
+eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting
+eu.essi_lab.cfga.gs.task.CustomTaskWorker

@@ -15,10 +15,12 @@
 	<modules>
 		<module>gs-lib-net</module>
 		<module>gs-lib-netcdf</module>
+		<module>gs-lib-odip</module>
 		<module>gs-lib-utils</module>
 		<module>gs-lib-xml</module>
 		<module>gs-lib-what3words</module>
 		<module>gs-lib-wof</module>
+		<module>gs-lib-wof-test</module>
 	</modules>
 
 

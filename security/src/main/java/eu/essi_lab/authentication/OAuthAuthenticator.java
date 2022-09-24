@@ -4,7 +4,7 @@ package eu.essi_lab.authentication;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,26 +26,71 @@ import java.net.URI;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+
 import com.fasterxml.jackson.databind.JsonNode;
 
 import eu.essi_lab.authentication.model.Token;
+import eu.essi_lab.cfga.Configurable;
+import eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
-public interface OAuthAuthenticator {
 
-    String MISSING_OATH_CONF_PARAMAER_ERR_ID = "MISSING_OATH_CONF_PARAMAER_ERR_ID";
+/**
+ * OAuthAuthenticator types implements oauth/oauth2 requests flow services. This
+ * flow is made up by two/three steps:<br>
+ * -
+ * {@link OAuthAuthenticator#handleLogin(HttpServletRequest, HttpServletResponse)
+ * handleLogin} method covers initial step/steps,<br>
+ * - {@link OAuthAuthenticator#handleCallback(HttpServletRequest)
+ * handleCallback} method covers later steps.<br>
+ * Once we have an access_token we use it to obtain a user identifier, usually
+ * his/her email. This is also covered in later step.
+ *
+ * @author pezzati
+ */
+public abstract class OAuthAuthenticator implements Configurable<OAuthSetting> {
 
-    public final String CLIENT_URL_JSON_KEY = "clienturl";
+    static String MISSING_OATH_CONF_PARAMAER_ERR_ID = "MISSING_OATH_CONF_PARAMAER_ERR_ID";
+
+    public final static String CLIENT_URL_JSON_KEY = "clienturl";
+
+    protected URI redirectUri;
+    protected CloseableHttpClient httpClient;
 
     /**
-     * Implements service inizialization.
+     * 
+     */
+    private OAuthSetting setting;
+
+    /**
+     * 
+     */
+    public OAuthAuthenticator() {
+
+	setHttpClient(HttpClients.createDefault());
+    }
+
+    @Override
+    public void configure(OAuthSetting setting) {
+
+	this.setting = setting;
+    }
+
+    @Override
+    public OAuthSetting getSetting() {
+
+	return this.setting;
+    }
+
+    /**
+     * Implements service initialization.
      *
-     * @param conf json containing configuration the service needs.
+     * @param conf JSON containing configuration the service needs.
      * @throws GSException
      */
-    public void initialize(JsonNode conf) throws GSException;
-
-    public void setRedirectURI(URI uri);
+    public abstract void initialize(JsonNode conf) throws GSException;
 
     /**
      * Implements the initial phase of oauth/oauth2 request flow: user wants to
@@ -56,7 +101,7 @@ public interface OAuthAuthenticator {
      * @param httpResponse servlet's response as by user login request.
      * @throws GSException
      */
-    public void handleLogin(HttpServletRequest httpRequest, HttpServletResponse httpResponse, String clienturl) throws GSException;
+    public abstract void handleLogin(HttpServletRequest httpRequest, HttpServletResponse httpResponse, String clienturl) throws GSException;
 
     /**
      * Implements the final phase of oauth/oauth2 request flow: service provider
@@ -69,7 +114,7 @@ public interface OAuthAuthenticator {
      * @return Token object who wrap access_token and user's email.
      * @throws GSException
      */
-    public Token handleCallback(HttpServletRequest httpRequest) throws GSException;
+    public abstract Token handleCallback(HttpServletRequest httpRequest) throws GSException;
 
     /**
      * Helper method to get a not null value from json configuration.
@@ -80,20 +125,74 @@ public interface OAuthAuthenticator {
      * @throws GSException when property not present.
      */
     public static String getConfigurationValue(String propertyName, JsonNode conf) throws GSException {
+
 	if (conf.get(propertyName) != null && conf.get(propertyName).asText() != null && !conf.get(propertyName).asText().isEmpty()) {
+
 	    return conf.get(propertyName).asText();
+
 	} else {
-	    throw GSException.createException(OAuthAuthenticator.class, "Missing configuraiton " + conf, null, null,
-		    ErrorInfo.ERRORTYPE_INTERNAL, ErrorInfo.SEVERITY_ERROR, MISSING_OATH_CONF_PARAMAER_ERR_ID);
+	    throw GSException.createException(//
+		    OAuthAuthenticator.class, //
+		    "Missing configuration " + conf, //
+		    null, //
+		    null, ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    MISSING_OATH_CONF_PARAMAER_ERR_ID);
 
 	}
     }
 
-    public String getClientId();
+    /**
+     * @param uri
+     */
+    public void setRedirectURI(URI uri) {
 
-    public void setClientId(String clientId);
+	redirectUri = uri;
+    }
 
-    public String getClientSecret();
+    /**
+     * @param httpClient
+     */
+    public void setHttpClient(CloseableHttpClient httpClient) {
 
-    public void setClientSecret(String clientSecret);
+	this.httpClient = httpClient;
+    }
+
+    /**
+     * @return
+     */
+    public String getClientId() {
+
+	return getSetting().getClientId().get();
+    }
+
+    /**
+     * @param clientId
+     */
+    public void setClientId(String clientId) {
+
+	getSetting().setClientId(clientId);
+    }
+
+    /**
+     * @return
+     */
+    public String getClientSecret() {
+
+	return getSetting().getClientSecret().get();
+    }
+
+    /**
+     * @param clientSecret
+     */
+    public void setClientSecret(String clientSecret) {
+
+	getSetting().setClientSecret(clientSecret);
+    }
+
+    @Override
+    public String getType() {
+
+	return getClass().getSimpleName();
+    }
 }

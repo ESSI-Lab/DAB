@@ -4,7 +4,7 @@ package eu.essi_lab.lib.utils;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,6 +29,19 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+
+/**
+ * A parallel executor of a set of tasks, using the given number of threads at the same time.
+ * <p>
+ * Methods:
+ * <ul>
+ * <li><b>addTask</b>: adds a task to the task list. A task can be a {@link Runnable} or a {@link Callable}</li>
+ * <li><b>executeAndWait</b>: starts the task list execution and waits for completion</li>
+ * <li><b>getRunningTasks</b>: returns the number of running tasks</li>
+ * </ul>
+ *
+ * @author boldrini
+ */
 public class TaskListExecutor<T> {
 
     List<Callable<T>> taskList = new ArrayList<>();

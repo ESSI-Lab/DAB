@@ -1,0 +1,7 @@
+eu.essi_lab.accessor.ina.INAAccessor
+eu.essi_lab.accessor.wof.CUAHSIHISCentralAccessor
+eu.essi_lab.accessor.wof.CUAHSIHISServerAccessor
+eu.essi_lab.accessor.wof.CUAHSIHISServerConnector
+eu.essi_lab.accessor.wof.CUAHSIHISCentralConnector
+eu.essi_lab.accessor.ispra.ISPRAConnector
+eu.essi_lab.accessor.ina.INAConnector

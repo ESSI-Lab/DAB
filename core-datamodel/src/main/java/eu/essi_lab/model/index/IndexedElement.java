@@ -4,7 +4,7 @@ package eu.essi_lab.model.index;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,10 +24,38 @@ package eu.essi_lab.model.index;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.essi_lab.jaxb.common.NameSpace;
-import eu.essi_lab.model.QualifiedName;
+import eu.essi_lab.lib.xml.NameSpace;
+import eu.essi_lab.lib.xml.QualifiedName;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.HarmonizedMetadata;
+
+/**
+ * In the GI-suite, "indexed elements" are simple XML elements with a textual content. Each indexed element is related
+ * to some kind of {@link GSResource} property with a name and a value. For example given a property with name "title"
+ * and value "Sea
+ * Surface Temperature", the correspondent indexed element is:
+ * <code> &lt;title&gt;Sea Surface Temperature&lt;/title&gt;</code>; "title" is the <i>indexed element name</i> and "Sea
+ * Surface Temperature" is its <i>value</i>.<br>
+ * <br>
+ * These elements must be written in {@link GSResource#getIndexesMetadata()}s before to store the resource in to a
+ * Database during the harvesting phase. When the {@link GSResource} is stored, according to the indexed elements that
+ * have been previously written in it, the Database builds the correspondent "in memory indexes" in order to speed up
+ * queries which involves those indexed
+ * elements.<br>
+ * <br>
+ * In the example above, the Database builds an in memory index called "title" with the values of the
+ * "title" indexed elements from all the stored {@link GSResource}s. Queries which use the "title" constraint are
+ * quickly resolved by looking in the title index instead of looking in to the stored XML documents.<br>
+ * <br>
+ * Of course in order to build a particular memory index,
+ * the Database must be correctly configured; how it can be done depends from the specific Database implementation
+ * and it's out of the scope of this documentation.<br>
+ * <br>
+ * 
+ * @see IndexedMetadataElement
+ * @see HarmonizedMetadata#getIndexesMetadata()
+ * @author Fabrizio
+ */
 public class IndexedElement {
 
     private String elementName;

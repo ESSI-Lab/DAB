@@ -4,7 +4,7 @@ package eu.essi_lab.shared.driver;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,69 +21,117 @@ package eu.essi_lab.shared.driver;
  * #L%
  */
 
-import eu.essi_lab.model.configuration.AbstractGSconfigurable;
-import eu.essi_lab.model.configuration.option.GSConfOption;
+import java.util.List;
+
+import eu.essi_lab.cfga.gs.setting.driver.SharedCacheDriverSetting;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.shared.SharedContent;
+import eu.essi_lab.model.shared.SharedContent.SharedContentCategory;
+import eu.essi_lab.model.shared.SharedContent.SharedContentType;
 import eu.essi_lab.shared.messages.SharedContentQuery;
-import eu.essi_lab.shared.messages.SharedContentReadResponse;
-import eu.essi_lab.shared.model.SharedContent;
-import eu.essi_lab.shared.model.SharedContentType;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-public class LocalCacheDriver extends AbstractGSconfigurable implements ISharedCacheRepositoryDriver {
 
-    private Map<String, GSConfOption<?>> options = new HashMap<>();
-    private static final String METHOD_NOT_IMPLEMENTED_ERR_ID = "METHOD_NOT_IMPLEMENTED_ERR_ID";
+/**
+ * This implements the driver for using local cache as the shared repository of category cache. Cached objects are
+ * stored into a HashMap
+ * which is periodically cleared. This implementation of the interface {@link ISharedCacheRepositoryDriver} does not
+ * provide the
+ * implementation of the method {@link ISharedCacheRepositoryDriver#read(SharedContentType,
+ * eu.essi_lab.shared.messages.SharedContentQuery)}
+ *
+ * @author ilsanto
+ */
+public class LocalCacheDriver implements ISharedRepositoryDriver<SharedCacheDriverSetting> {
 
-    public LocalCacheDriver() {
-	setLabel("Local Cache");
+    /**
+     * 
+     */
+    static final String CONFIGURABLE_TYPE = "LocalCacheDriver";
+
+    private static final String METHOD_NOT_IMPLEMENTED_ERR_ID = "LOCAL_CACHE_DRIVER_METHOD_NOT_IMPLEMENTED_ERROR";
+
+    private static SharedCacheDriverSetting setting;
+    private static ContentTable contentTable;
+
+    static {
+	contentTable = new ContentTable();
+	setting = new SharedCacheDriverSetting();
     }
 
+    public LocalCacheDriver() {
+
+    }
+
+    @SuppressWarnings("rawtypes")
     @Override
-    public SharedContent readSharedContent(String identifier, SharedContentType type) throws GSException {
+    public void store(SharedContent sharedContent) throws GSException {
 
-	SharedContent content = SharedTable.getInstance().getContent(identifier);
+	contentTable.storeContent(sharedContent);
+    }
 
-	SharedContentReadResponse response = new SharedContentReadResponse();
+    @SuppressWarnings("rawtypes")
+    @Override
+    public synchronized SharedContent read(String identifier, SharedContentType type) throws GSException {
 
-	response.addContent(content);
+	SharedContent content = contentTable.getContent(identifier);
+
+	if (content == null) {
+
+	    return null;
+	}
+
+	if (content.getType() != type) {
+
+	    GSLoggerFactory.getLogger(getClass()).warn("Shared content mismatch. Required: " + type + ", found: " + content.getType());
+
+	    return null;
+	}
 
 	return content;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
-    public List<SharedContent> readSharedContent(SharedContentType type, SharedContentQuery query) throws GSException {
+    public synchronized List<SharedContent> read(SharedContentType type, SharedContentQuery query) throws GSException {
 
-	throw GSException.createException(this.getClass(), "Shared content by timestamp not implemented", null, null,
-		ErrorInfo.ERRORTYPE_INTERNAL, ErrorInfo.SEVERITY_WARNING, METHOD_NOT_IMPLEMENTED_ERR_ID);
+	throw GSException.createException(//
+		this.getClass(), //
+		"Shared content by timestamp not implemented", //
+		null, //
+		null, //
+		ErrorInfo.ERRORTYPE_INTERNAL, //
+		ErrorInfo.SEVERITY_WARNING, //
+		METHOD_NOT_IMPLEMENTED_ERR_ID);
     }
 
     @Override
-    public void store(SharedContent sharedContent) throws GSException {
+    public synchronized Long count(SharedContentType type) throws GSException {
 
-	SharedTable.getInstance().storeContent(sharedContent);
-
+	return contentTable.size(type);
     }
 
     @Override
-    public Long count(SharedContentType type) throws GSException {
-	return SharedTable.getInstance().size();
+    public void configure(SharedCacheDriverSetting setting) {
+
+	LocalCacheDriver.setting = setting;
     }
 
     @Override
-    public Map<String, GSConfOption<?>> getSupportedOptions() {
-	return options;
+    public SharedCacheDriverSetting getSetting() {
+
+	return setting;
     }
 
     @Override
-    public void onOptionSet(GSConfOption<?> opt) throws GSException {
-	//nothing to do here
+    public String getType() {
+
+	return CONFIGURABLE_TYPE;
     }
 
     @Override
-    public void onFlush() throws GSException {
-	//nothing to do here
+    public SharedContentCategory getCategory() {
+
+	return SharedContentCategory.LOCAL_CACHE;
     }
 }

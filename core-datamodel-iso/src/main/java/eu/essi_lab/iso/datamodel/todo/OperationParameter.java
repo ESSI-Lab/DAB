@@ -4,7 +4,7 @@ package eu.essi_lab.iso.datamodel.todo;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -50,7 +50,11 @@ public class OperationParameter extends ISOMetadata<SVParameterType> {
 
 	JAXBElement<SVParameterType> element = ObjectFactories.SRV().createSVParameter(type);
 	return element;
-    }    public String getName() {
+    }
+    /**
+    *    @XPathDirective(target = "srv:name/gco:aName/gco:CharacterString")
+    */
+    public String getName() {
 	return null;
     }
 

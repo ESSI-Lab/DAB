@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.wml._2_0.iso2005.gmd;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -41,6 +41,28 @@ import eu.essi_lab.jaxb.wml._2_0.xlink.ActuateType;
 import eu.essi_lab.jaxb.wml._2_0.xlink.ShowType;
 import eu.essi_lab.jaxb.wml._2_0.xlink.TypeType;
 
+
+/**
+ * <p>Java class for MD_GridSpatialRepresentation_PropertyType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="MD_GridSpatialRepresentation_PropertyType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence minOccurs="0"&gt;
+ *         &lt;element ref="{http://www.isotc211.org/2005/gmd}MD_GridSpatialRepresentation"/&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attGroup ref="{http://www.isotc211.org/2005/gco}ObjectReference"/&gt;
+ *       &lt;attribute ref="{http://www.isotc211.org/2005/gco}nilReason"/&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "MD_GridSpatialRepresentation_PropertyType", propOrder = {
     "mdGridSpatialRepresentation"

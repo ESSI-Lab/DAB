@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<!--
+..........................................................
+GWIS Javascript API Sample:
+Manipulating the Plot Object
+..........................................................
+U.S. Geological Survey, Texas Water Science Center, Austin
+https://txpub.usgs.gov/DSS/GWIS/
+..........................................................
+-->
+<html>
+    <!-- html head -->
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>GWIS JSAPI Sample</title>
+        
+        <!-- GWIS requires jQuery -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        
+        <!-- GWIS JSAPI 0.0 -->
+        <link rel="stylesheet" href="https://txpub.usgs.gov/DSS/GWIS/0.0/jsapi/gwis-plot-utils.css"/>
+        <script src="https://txpub.usgs.gov/DSS/GWIS/0.0/jsapi/gwis-plot-utils.min.js"></script>
+    </head>
+    
+    <!-- html body -->
+    <body style="background:#eee; font-family:arial;">
+        
+        <!-- title -->
+        <h1>Sample: Manipulating the Plot Object</h1>
+        
+        <!-- plot -->
+        <div id="plot1" style="width:95%; height:500px;"></div>
+        <script>
+            // output of the plot method is a dygraphs plot object
+            // set as global variable for later access
+            var plot = GWIS.plot({
+                div_id         : "plot1",
+                date_window    : -25,
+                range_selector : false,
+                series         : [{ site:"07300000", pcode:"00060", label:"series1" }]
+            });
+        </script>
+        
+        <!-- dygraphs plot object methods -->
+        <h2>Example Plot Manipulation Using Dygraphs Methods:</h2>
+        <button type="button" onclick="toggleRollPeriod();">Toggle "rollPeriod"</button>
+        <button type="button" onclick="toggleFillGraph();" >Toggle "fillGraph" </button>
+        <button type="button" onclick="setRandomColor();"  >Set Random Color   </button>
+        <script>
+            // function to toggle dygraphs "rollPeriod" option (rolling average smoothing)
+            // 0 is no smoothing, while 50 uses a 50-point smooth window
+            function toggleRollPeriod() {
+                plot.updateOptions({
+                    "rollPeriod" : ( plot.getOption("rollPeriod") ? 0 : 50)
+                });
+            };
+            // function to toggle dygraphs "fillGraph" option
+            function toggleFillGraph() {
+                plot.updateOptions({
+                    "series" : {
+                        "series1" : {
+                            "fillGraph" : !plot.getOption("series").series1.fillGraph
+                        }
+                    }
+                });
+            };
+            // function to set a random plot series color 
+            function setRandomColor() {
+                plot.updateOptions({
+                    "series" : {
+                        "series1" : {
+                            "color" : "rgb(" +
+                                Math.floor( 256*Math.random() ).toString() + "," + // R 0-255
+                                Math.floor( 256*Math.random() ).toString() + "," + // G 0-255
+                                Math.floor( 256*Math.random() ).toString() +       // B 0-255
+                            ")"
+                        }
+                    }
+                });
+            };
+        </script>
+        
+        <!-- extended GWIS methods -->
+        <h2>Example Plot Manipulation Using GWIS Extension Methods:</h2>
+        <button type="button" onclick="plot.full_screen();"                   >Execute "full_screen"</button>
+        <button type="button" onclick="plot.full_range();"                    >Execute "full_range" </button>
+        <button type="button" onclick="plot.y_fixscale( !plot.y_fixscale() );">Toggle  "y_fixscale" </button>
+        <button type="button" onclick="plot.y_logscale( !plot.y_logscale() );">Toggle  "y_logscale" </button>
+        <button type="button" onclick="plot.y_show0(    !plot.y_show0()    );">Toggle  "y_show0"    </button>
+        <button type="button" onclick="plot.x_grid(     !plot.x_grid()     );">Toggle  "x_grid"     </button>
+        <button type="button" onclick="plot.y_grid(     !plot.y_grid()     );">Toggle  "y_grid"     </button>
+        <button type="button" onclick="plot.refresh();"                       >Execute "refresh"    </button>
+        <button type="button" onclick="confirm_remove();"                     >Execute "remove"     </button>
+        <script>
+            // require confirmation for plot removal
+            function confirm_remove() {
+                if ( confirm("Permanently remove plot?") ) { plot.remove(); }
+            }
+        </script>
+        <p>
+            <input type="checkbox" onclick="GWIS.verbose=this.checked" /> Verbose Mode
+        </p>
+        
+    </body>
+</html>
+<!-- end GWIS JSAPI sample -->

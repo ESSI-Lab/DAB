@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.wrt;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,6 +27,16 @@ import java.util.stream.Collectors;
 import eu.essi_lab.model.pluggable.Pluggable;
 import eu.essi_lab.model.pluggable.PluginsLoader;
 import eu.essi_lab.model.pluggable.Provider;
+
+/**
+ * A factory for {@link DiscoveryRequestTransformer}s.<br>
+ * In order to be loaded, the {@link DiscoveryRequestTransformer}s plugins must be installed.
+ * See {@link PluginsLoader} for more info
+ *
+ * @see Pluggable
+ * @see PluginsLoader
+ * @author Fabrizio
+ */
 public class DiscoveryRequestTransformerFactory {
 
     /**

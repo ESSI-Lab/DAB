@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -54,6 +54,32 @@ import org.jvnet.jaxb2_commons.locator.util.LocatorUtils;
 import net.opengis.iso19139.gco.v_20060504.RealPropertyType;
 import net.opengis.iso19139.gmd.v_20060504.MDBandType;
 
+
+/**
+ * Description: extensions to electromagnetic spectrum wavelength description - shortName: BandExt
+ * 
+ * <p>Java class for MI_Band_Type complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="MI_Band_Type"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{http://www.isotc211.org/2005/gmd}MD_Band_Type"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="bandBoundaryDefinition" type="{http://www.isotc211.org/2005/gmi}MI_BandDefinition_PropertyType" minOccurs="0"/&gt;
+ *         &lt;element name="nominalSpatialResolution" type="{http://www.isotc211.org/2005/gco}Real_PropertyType" minOccurs="0"/&gt;
+ *         &lt;element name="transferFunctionType" type="{http://www.isotc211.org/2005/gmi}MI_TransferFunctionTypeCode_PropertyType" minOccurs="0"/&gt;
+ *         &lt;element name="transmittedPolarisation" type="{http://www.isotc211.org/2005/gmi}MI_PolarisationOrientationCode_PropertyType" minOccurs="0"/&gt;
+ *         &lt;element name="detectedPolarisation" type="{http://www.isotc211.org/2005/gmi}MI_PolarisationOrientationCode_PropertyType" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "MI_Band_Type", propOrder = {
     "bandBoundaryDefinition",

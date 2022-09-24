@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof.discovery.sites;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,9 +22,8 @@ package eu.essi_lab.accessor.wof.discovery.sites;
  */
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ServiceLoader;
 
@@ -32,19 +31,13 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.stream.events.Characters;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
-import javax.xml.transform.stream.StreamSource;
-
-import org.apache.commons.io.IOUtils;
 
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.lib.xml.XMLStreamWriterUtils;
+import eu.essi_lab.lib.xml.stax.StAXDocumentParser;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.ResultSet;
@@ -69,6 +62,15 @@ public class GetSitesObjectHandler extends StreamingRequestHandler {
     public StreamingOutput getStreamingResponse(WebRequest webRequest) throws GSException {
 
 	return new StreamingOutput() {
+
+	    private String west;
+	    private String east;
+	    private String north;
+	    private String south;
+	    private String platformName;
+	    private String platformCode;
+	    private String sourceID;
+	    private String country;
 
 	    @Override
 	    public void write(OutputStream output) throws IOException, WebApplicationException {
@@ -126,67 +128,21 @@ public class GetSitesObjectHandler extends StreamingRequestHandler {
 			    resultSet = executor.retrieveStrings(discoveryMessage);
 			    List<String> results = resultSet.getResultsList();
 
-			    XMLInputFactory factory = XMLInputFactory.newInstance();
-
 			    for (String result : results) {
 
-				InputStream stream = IOUtils.toInputStream(result, StandardCharsets.UTF_8);
-				StreamSource source = new StreamSource(stream);
-				XMLEventReader reader = factory.createXMLEventReader(source);
+				StAXDocumentParser parser = new StAXDocumentParser(result);
 
-				String west = null;
-				String east = null;
-				String north = null;
-				String south = null;
-				String platformName = null;
-				String platformCode = null;
-				String sourceID = null;
-				String country = null;
+				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "west"), v -> west = v);
+				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "south"), v -> south = v);
+				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "east"), v -> east = v);
+				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "north"), v -> north = v);
 
-				while (reader.hasNext()) {
+				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "platformTitle"), v -> platformName = v);
+				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "uniquePlatformId"), v -> platformCode = v);
+				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "sourceId"), v -> sourceID = v);
+				parser.add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "Country"), v -> country = v);
 
-				    XMLEvent event = reader.nextEvent();
-
-				    if (event.isStartElement()) {
-
-					StartElement startElement = event.asStartElement();
-
-					String startName = startElement.getName().getLocalPart();
-
-					switch (startName) {
-					case "west":
-					    west = readValue(reader);
-					    break;
-					case "east":
-					    east = readValue(reader);
-					    break;
-					case "north":
-					    north = readValue(reader);
-					    break;
-					case "south":
-					    south = readValue(reader);
-					    break;
-					case "platformTitle":
-					    platformName = readValue(reader);
-					    break;
-					case "uniquePlatformId":
-					    platformCode = readValue(reader);
-					    break;
-					case "sourceId":
-					    sourceID = readValue(reader);
-					    break;
-					case "Country":
-					    country = readValue(reader);
-					    break;
-					default:
-					    break;
-					}
-
-				    }
-				}
-
-				reader.close();
-				stream.close();
+				parser.parse();
 
 				if (west != null && !west.equals("") && east != null && !east.equals("") && north != null
 					&& !north.equals("") && south != null && !south.equals("") && platformName != null
@@ -254,27 +210,6 @@ public class GetSitesObjectHandler extends StreamingRequestHandler {
 
 	    }
 	};
-
-    }
-
-    private String readValue(XMLEventReader reader) {
-
-	String ret = "";
-	XMLEvent event = null;
-	do {
-	    try {
-		event = reader.nextEvent();
-		if (event instanceof Characters) {
-		    Characters cei = (Characters) event;
-		    ret += cei.getData();
-		}
-	    } catch (XMLStreamException e) {
-		e.printStackTrace();
-	    }
-
-	} while (event != null && !event.isEndElement());
-
-	return ret;
     }
 
     @Override

@@ -1,0 +1,227 @@
+http://www.seadatanet.org/urnurl/SDN:P02::ABAG/;Suspended particulate material aggregates
+http://www.seadatanet.org/urnurl/SDN:P02::ACFL/;Quality control flags
+http://www.seadatanet.org/urnurl/SDN:P02::ACO2/;Carbon monoxide and dioxide concentrations in the atmosphere
+http://www.seadatanet.org/urnurl/SDN:P02::ACSR/;Active seismic refraction
+http://www.seadatanet.org/urnurl/SDN:P02::ACYC/;Reference numbers
+http://www.seadatanet.org/urnurl/SDN:P02::AHGT/;Vertical spatial coordinates
+http://www.seadatanet.org/urnurl/SDN:P02::ALAT/;Horizontal spatial co-ordinates
+http://www.seadatanet.org/urnurl/SDN:P02::ALKY/;Alkalinity, acidity and pH of the water column
+http://www.seadatanet.org/urnurl/SDN:P02::AMON/;Ammonium and ammonia concentration parameters in water bodies
+http://www.seadatanet.org/urnurl/SDN:P02::AMOX/;Nitrification rate in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::AMUP/;Regenerated production in water bodies
+http://www.seadatanet.org/urnurl/SDN:P02::APDA/;Horizontal platform movement
+http://www.seadatanet.org/urnurl/SDN:P02::APZA/;Vertical platform movement
+http://www.seadatanet.org/urnurl/SDN:P02::ASAM/;Acoustic backscatter in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::ASLV/;Sea level
+http://www.seadatanet.org/urnurl/SDN:P02::ATDP/;Atmospheric deposition rates
+http://www.seadatanet.org/urnurl/SDN:P02::ATPX/;Concentration of adenlylates in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::ATTN/;Transmittance and attenuance of the water column
+http://www.seadatanet.org/urnurl/SDN:P02::ATVS/;Atmospheric visibility and transparency
+http://www.seadatanet.org/urnurl/SDN:P02::AYMD/;Date and time
+http://www.seadatanet.org/urnurl/SDN:P02::BATX/;Bacteria taxonomic abundance in water bodies
+http://www.seadatanet.org/urnurl/SDN:P02::BCAH/;Concentration of polycyclic aromatic hydrocarbons (PAHs) in biota
+http://www.seadatanet.org/urnurl/SDN:P02::BCMT/;Metal concentrations in biota
+http://www.seadatanet.org/urnurl/SDN:P02::BCOC/;Concentration of other organic contaminants in biota
+http://www.seadatanet.org/urnurl/SDN:P02::BCPB/;Concentration of polychlorobiphenyls (PCBs) in biota
+http://www.seadatanet.org/urnurl/SDN:P02::BLEN/;Zooplankton and zoobenthos morphological parameters
+http://www.seadatanet.org/urnurl/SDN:P02::BLUM/;Bioluminescence parameters
+http://www.seadatanet.org/urnurl/SDN:P02::BNTC/;Bacteria non taxonomy-related biomass expressed as carbon per unit volume of the water column
+http://www.seadatanet.org/urnurl/SDN:P02::BNTX/;Bacteria generic abundance in water bodies
+http://www.seadatanet.org/urnurl/SDN:P02::BPRP/;Biota properties
+http://www.seadatanet.org/urnurl/SDN:P02::BRAD/;Radioactivity in biota
+http://www.seadatanet.org/urnurl/SDN:P02::BRDA/;Bird counts
+http://www.seadatanet.org/urnurl/SDN:P02::CAPH/;Air pressure
+http://www.seadatanet.org/urnurl/SDN:P02::CARO/;Carotenoid and flavenoid pigment concentrations in water bodies
+http://www.seadatanet.org/urnurl/SDN:P02::CASD/;Concentration of carbohydrates, phenols, alkanols (alcohols), ethers, aldehydes and ketones in sediment
+http://www.seadatanet.org/urnurl/SDN:P02::CATX/;Phytoplankton taxonomic biomass in water bodies
+http://www.seadatanet.org/urnurl/SDN:P02::CBSD/;Carbon concentrations in sediment
+http://www.seadatanet.org/urnurl/SDN:P02::CBSP/;Carbon concentrations in suspended particulate material
+http://www.seadatanet.org/urnurl/SDN:P02::CCPW/;Carbonate chemistry in sediment pore waters
+http://www.seadatanet.org/urnurl/SDN:P02::CD10/;Sediment lipid concentrations
+http://www.seadatanet.org/urnurl/SDN:P02::CDTA/;Air temperature
+http://www.seadatanet.org/urnurl/SDN:P02::CFTM/;Contaminant fluxes between the terrestrial and marine environment
+http://www.seadatanet.org/urnurl/SDN:P02::CHEX/;Cloud cover height and extent
+http://www.seadatanet.org/urnurl/SDN:P02::CHUM/;Atmospheric humidity
+http://www.seadatanet.org/urnurl/SDN:P02::CLAY/;Mineralogical composition
+http://www.seadatanet.org/urnurl/SDN:P02::CLTY/;Cloud type
+http://www.seadatanet.org/urnurl/SDN:P02::CLXX/;Concentration of inorganic halogens in sediment pore waters
+http://www.seadatanet.org/urnurl/SDN:P02::CMFL/;Variable fluorescence parameters
+http://www.seadatanet.org/urnurl/SDN:P02::CNDC/;Electrical conductivity of the water column
+http://www.seadatanet.org/urnurl/SDN:P02::CNTX/;Phytoplankton generic biomass in water bodies
+http://www.seadatanet.org/urnurl/SDN:P02::COAS/;Terrestrial mapping
+http://www.seadatanet.org/urnurl/SDN:P02::COCC/;Colloidal organic carbon concentration in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::COGE/;Coastal geomorphology
+http://www.seadatanet.org/urnurl/SDN:P02::CORG/;Particulate total and organic carbon concentrations in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::CPRP/;Precipitation and evaporation
+http://www.seadatanet.org/urnurl/SDN:P02::CPSD/;Chlorophyll pigment concentrations in sediment
+http://www.seadatanet.org/urnurl/SDN:P02::CPWC/;Chlorophyll pigment concentrations in water bodies
+http://www.seadatanet.org/urnurl/SDN:P02::CSLR/;Solar Radiation
+http://www.seadatanet.org/urnurl/SDN:P02::CYEU/;Plankton biomass expressed as carbon per unit volume of the water column
+http://www.seadatanet.org/urnurl/SDN:P02::DALK/;Concentration of alkanes in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::DBDX/;Geological sample density
+http://www.seadatanet.org/urnurl/SDN:P02::DCMX/;Other halocarbon concentrations in water bodies
+http://www.seadatanet.org/urnurl/SDN:P02::DENS/;Other physical and chemical properties of suspended particulate material
+http://www.seadatanet.org/urnurl/SDN:P02::DGPW/;Dissolved oxygen parameters for sediments
+http://www.seadatanet.org/urnurl/SDN:P02::DMST/;Organosulphur and organoselenium species concentration parameters in water bodies
+http://www.seadatanet.org/urnurl/SDN:P02::DOCC/;Dissolved organic carbon concentration in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::DOXY/;Dissolved oxygen parameters in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::DVLP/;Zooplankton and zoobenthos development stage parameters
+http://www.seadatanet.org/urnurl/SDN:P02::ENGP/;Engineering parameters
+http://www.seadatanet.org/urnurl/SDN:P02::EPSI/;Turbulence in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::EWSB/;Wind strength and direction
+http://www.seadatanet.org/urnurl/SDN:P02::EXCO/;Light extinction and diffusion coefficients
+http://www.seadatanet.org/urnurl/SDN:P02::EXCR/;Excretion rate parameters in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::F001/;Water body lipid concentrations
+http://www.seadatanet.org/urnurl/SDN:P02::FATM/;Fish morphology, age and physiology
+http://www.seadatanet.org/urnurl/SDN:P02::FATX/;Fish abundance in water bodies
+http://www.seadatanet.org/urnurl/SDN:P02::FCST/;Fish and shellfish catch statistics
+http://www.seadatanet.org/urnurl/SDN:P02::FIBM/;Fish biomass in water bodies
+http://www.seadatanet.org/urnurl/SDN:P02::FOCA/;Seal abundance
+http://www.seadatanet.org/urnurl/SDN:P02::FR11/;Chlorofluorocarbon concentrations in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::FVLT/;Raw fluorometer output
+http://www.seadatanet.org/urnurl/SDN:P02::GOXP/;Oxygen production and respiration in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::GP001/;Pollution events
+http://www.seadatanet.org/urnurl/SDN:P02::GP079/;Zooplankton wet weight biomass
+http://www.seadatanet.org/urnurl/SDN:P02::GRAV/;Gravity
+http://www.seadatanet.org/urnurl/SDN:P02::GTCH/;Geotechnics
+http://www.seadatanet.org/urnurl/SDN:P02::GWDR/;Wave direction
+http://www.seadatanet.org/urnurl/SDN:P02::HEAD/;Platform or instrument orientation
+http://www.seadatanet.org/urnurl/SDN:P02::HEAV/;Wave height estimates
+http://www.seadatanet.org/urnurl/SDN:P02::HEXC/;Dissolved noble gas concentration parameters in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::HFLW/;Geothermal heat flow
+http://www.seadatanet.org/urnurl/SDN:P02::HFLX/;Heat fluxes between the water column and the atmosphere
+http://www.seadatanet.org/urnurl/SDN:P02::HLWC/;Concentration of inorganic halogens in water bodies
+http://www.seadatanet.org/urnurl/SDN:P02::HMSB/;Concentration of dissolved organic matter in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::KRTS/;Other wave statistics
+http://www.seadatanet.org/urnurl/SDN:P02::LERR/;Raw current meter output parameters
+http://www.seadatanet.org/urnurl/SDN:P02::LIBI/;Biota lipid concentrations
+http://www.seadatanet.org/urnurl/SDN:P02::LIFX/;Sedimentation flux of terrestrially derived material in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::LITH/;Lithology
+http://www.seadatanet.org/urnurl/SDN:P02::LRZA/;Vertical velocity of the water column (currents)
+http://www.seadatanet.org/urnurl/SDN:P02::LVLT/;Raw light meter output
+http://www.seadatanet.org/urnurl/SDN:P02::MBAN/;Bathymetry and Elevation
+http://www.seadatanet.org/urnurl/SDN:P02::MDBO/;Trace metalloid concentrations in biota
+http://www.seadatanet.org/urnurl/SDN:P02::MDWD/;Dissolved trace metalloid and inorganic selenium concentrations in water bodies
+http://www.seadatanet.org/urnurl/SDN:P02::MFAB/;Zoobenthos generic abundance
+http://www.seadatanet.org/urnurl/SDN:P02::MFWW/;Zoobenthos non taxonomy-related wet weight biomass per unit area of the bed
+http://www.seadatanet.org/urnurl/SDN:P02::MLFX/;Sedimentation flux of metallic and metalloid elements and isotopes in water bodies
+http://www.seadatanet.org/urnurl/SDN:P02::MMAN/;Magnetics
+http://www.seadatanet.org/urnurl/SDN:P02::MNGS/;Sediment grain size parameters
+http://www.seadatanet.org/urnurl/SDN:P02::MPMN/;Moored instrument depth
+http://www.seadatanet.org/urnurl/SDN:P02::MSFX/;Sedimentation flux quantification in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::MTPW/;Metal concentrations in sediment pore waters
+http://www.seadatanet.org/urnurl/SDN:P02::MTWD/;Dissolved metal concentrations in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::MTWP/;Particulate metal concentrations in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::MTWT/;Total metal concentrations in water bodies
+http://www.seadatanet.org/urnurl/SDN:P02::MZBN/;Microzooplankton generic abundance in water bodies
+http://www.seadatanet.org/urnurl/SDN:P02::NOYS/;Acoustic noise in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::NTOT/;Particulate total and organic nitrogen concentrations in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::NTPW/;Nutrient concentrations in sediment pore waters
+http://www.seadatanet.org/urnurl/SDN:P02::NTRA/;Nitrate concentration parameters in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::NTRI/;Nitrite concentration parameters in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::NTSD/;Nitrogen concentrations in sediment
+http://www.seadatanet.org/urnurl/SDN:P02::NTSP/;Nitrogen concentrations in suspended particulate material
+http://www.seadatanet.org/urnurl/SDN:P02::NTUP/;New production in water bodies
+http://www.seadatanet.org/urnurl/SDN:P02::NUTV/;Raw in-situ nutrient analyser output
+http://www.seadatanet.org/urnurl/SDN:P02::OCPW/;Dissolved organic carbon concentrations in sediment pore waters
+http://www.seadatanet.org/urnurl/SDN:P02::OHWC/;Concentration of other hydrocarbons in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::OMBI/;Organometallic species concentration parameters in biota
+http://www.seadatanet.org/urnurl/SDN:P02::OMET/;Other meteorological measurements
+http://www.seadatanet.org/urnurl/SDN:P02::OMPW/;Organometallic and organometalloid species concentration parameters in sediments
+http://www.seadatanet.org/urnurl/SDN:P02::OMWC/;Organometallic and organometalloid species concentration parameters in water bodies
+http://www.seadatanet.org/urnurl/SDN:P02::OPBS/;Optical backscatter
+http://www.seadatanet.org/urnurl/SDN:P02::OPFX/;Sedimentation flux of non-metallic inorganic species in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::OPWC/;Unclassified pigment concentrations in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::OXYC/;Raw oxygen sensor output
+http://www.seadatanet.org/urnurl/SDN:P02::PATX/;Phytoplankton taxonomic abundance in water bodies
+http://www.seadatanet.org/urnurl/SDN:P02::PCAH/;Concentration of polycyclic aromatic hydrocarbons (PAHs) in suspended particulate material
+http://www.seadatanet.org/urnurl/SDN:P02::PCHW/;Concentration of polycyclic aromatic hydrocarbons (PAHs) in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::PCO2/;Partial pressure (pCO2) and fugacity (fCO2) of carbon dioxide in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::PCOC/;Concentration of other organic contaminants in suspended particulate material
+http://www.seadatanet.org/urnurl/SDN:P02::PEBI/;Pesticide concentrations in biota
+http://www.seadatanet.org/urnurl/SDN:P02::PESD/;Pesticide concentrations in sediment
+http://www.seadatanet.org/urnurl/SDN:P02::PEWB/;Pesticide concentrations in water bodies
+http://www.seadatanet.org/urnurl/SDN:P02::PHOS/;Phosphate concentration parameters in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::PHSD/;Phaeopigment concentrations in sediment
+http://www.seadatanet.org/urnurl/SDN:P02::PHWC/;Phaeopigment concentrations in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::PNTX/;Phytoplankton generic abundance in water bodies
+http://www.seadatanet.org/urnurl/SDN:P02::PPAB/;Light absorption in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::PPCB/;Concentration of polychlorobiphenyls (PCBs) in suspended particulate material
+http://www.seadatanet.org/urnurl/SDN:P02::PPRD/;Primary production in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::PPWC/;Concentration of polychlorobiphenyls (PCBs) in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::PSAL/;Salinity of the water column
+http://www.seadatanet.org/urnurl/SDN:P02::PSST/;Skin temperature of the water column
+http://www.seadatanet.org/urnurl/SDN:P02::PTDZ/;Temperature variation in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::PXSP/;Phosphorus concentrations in suspended particulate material
+http://www.seadatanet.org/urnurl/SDN:P02::RACC/;Sediment accumulation rate
+http://www.seadatanet.org/urnurl/SDN:P02::RBSC/;Radar backscatter
+http://www.seadatanet.org/urnurl/SDN:P02::RFVL/;Horizontal velocity of the water column (currents)
+http://www.seadatanet.org/urnurl/SDN:P02::RMIN/;Inorganic chemical composition of sediment or rocks
+http://www.seadatanet.org/urnurl/SDN:P02::RPOT/;Redox potential in sediment
+http://www.seadatanet.org/urnurl/SDN:P02::RTCO/;Rock thermal conductivity
+http://www.seadatanet.org/urnurl/SDN:P02::RVDS/;River flow and discharge
+http://www.seadatanet.org/urnurl/SDN:P02::SABB/;Shellfish abundance and biomass in water bodies
+http://www.seadatanet.org/urnurl/SDN:P02::SAGE/;Sediment age
+http://www.seadatanet.org/urnurl/SDN:P02::SALK/;Concentration of aliphatic hydrocarbons in sediment samples
+http://www.seadatanet.org/urnurl/SDN:P02::SATM/;Shellfish morphology, age and physiology
+http://www.seadatanet.org/urnurl/SDN:P02::SBPH/;Seabed photography
+http://www.seadatanet.org/urnurl/SDN:P02::SCAH/;Concentration of polycyclic aromatic hydrocarbons (PAHs) in sediment samples
+http://www.seadatanet.org/urnurl/SDN:P02::SCOC/;Concentration of other organic contaminants in sediment samples
+http://www.seadatanet.org/urnurl/SDN:P02::SCOX/;Dissolved concentration parameters for other gases in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::SECC/;Secchi disk depth
+http://www.seadatanet.org/urnurl/SDN:P02::SIGT/;Density of the water column
+http://www.seadatanet.org/urnurl/SDN:P02::SIXX/;Concentration of silicon species in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::SLCA/;Silicate concentration parameters in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::SPCB/;Concentration of polychlorobiphenyls (PCBs) in sediment samples
+http://www.seadatanet.org/urnurl/SDN:P02::SPGS/;Suspended particulate material grain size parameters
+http://www.seadatanet.org/urnurl/SDN:P02::SPHT/;Concentration of inorganic sulphur species in sediment pore water
+http://www.seadatanet.org/urnurl/SDN:P02::SPWC/;Concentration of inorganic sulphur species in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::SR2D/;Two-dimensional seismic reflection
+http://www.seadatanet.org/urnurl/SDN:P02::SR3D/;Three-dimensional seismic reflection
+http://www.seadatanet.org/urnurl/SDN:P02::SRAD/;Geological sample radioactivity
+http://www.seadatanet.org/urnurl/SDN:P02::SRFL/;Seismic reflection
+http://www.seadatanet.org/urnurl/SDN:P02::SRFR/;Seismic refraction
+http://www.seadatanet.org/urnurl/SDN:P02::SSCN/;Side-scan sonar
+http://www.seadatanet.org/urnurl/SDN:P02::SSTB/;Stable isotope enrichment in sediment
+http://www.seadatanet.org/urnurl/SDN:P02::SSTR/;Sedimentary structure
+http://www.seadatanet.org/urnurl/SDN:P02::STMP/;Temperature of geological units
+http://www.seadatanet.org/urnurl/SDN:P02::STOM/;Concentration of organic matter in sediments
+http://www.seadatanet.org/urnurl/SDN:P02::SVEL/;Sound velocity and travel time in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::TCFX/;Sedimentation flux of carbon, nitrogen or organic matter in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::TCNT/;Raw temperature and/or salinity instrument output
+http://www.seadatanet.org/urnurl/SDN:P02::TCO2/;Total dissolved inorganic carbon (TCO2) concentration in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::TD00/;Terrestrial detritus in the water column suspended particulate material
+http://www.seadatanet.org/urnurl/SDN:P02::TDIN/;Dissolved inorganic nitrogen concentration in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::TDNT/;Dissolved total and organic nitrogen concentrations in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::TDPX/;Dissolved total or organic phosphorus concentration in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::TEMP/;Temperature of the water column
+http://www.seadatanet.org/urnurl/SDN:P02::TMES/;Metadata parameters
+http://www.seadatanet.org/urnurl/SDN:P02::TOCH/;Concentration of carbohydrates, phenols, alkanols (alcohols), aldehydes and ketones in water bodies
+http://www.seadatanet.org/urnurl/SDN:P02::TPHS/;Particulate total and organic phosphorus concentrations in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::TRIS/;Concentration of inorganic sulphur species in sediment
+http://www.seadatanet.org/urnurl/SDN:P02::TSED/;Concentration of suspended particulate material in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::TVLT/;Raw suspended particulate material concentration sensor output
+http://www.seadatanet.org/urnurl/SDN:P02::UPTH/;Bacterial production in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::UREA/;Urea concentration parameters in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::VATX/;Phytoplankton taxonomic volume in water bodies
+http://www.seadatanet.org/urnurl/SDN:P02::VDFC/;Transport in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::VSRA/;Visible waveband radiance and irradiance measurements in the atmosphere
+http://www.seadatanet.org/urnurl/SDN:P02::VSRW/;Visible waveband radiance and irradiance measurements in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::WBRX/;Water body redox potential
+http://www.seadatanet.org/urnurl/SDN:P02::WCOC/;Concentration of other organic contaminants in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::WCTR/;Water body released tracers
+http://www.seadatanet.org/urnurl/SDN:P02::WCWT/;Sediment water content, porosity and surface area
+http://www.seadatanet.org/urnurl/SDN:P02::WPRO/;Concentration of proteins in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::WRAD/;Radioactivity in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::WSTB/;Stable isotope enrichment in the water column
+http://www.seadatanet.org/urnurl/SDN:P02::WSTR/;Wind stress and shear
+http://www.seadatanet.org/urnurl/SDN:P02::WVSP/;Spectral wave data parameters
+http://www.seadatanet.org/urnurl/SDN:P02::WVST/;Wave height and period statistics
+http://www.seadatanet.org/urnurl/SDN:P02::XMGS/;Geological sample magnetic, electrical and acoustic properties
+http://www.seadatanet.org/urnurl/SDN:P02::ZADX/;Zoobenthos dry weight biomass
+http://www.seadatanet.org/urnurl/SDN:P02::ZATX/;Zooplankton taxonomy-related abundance per unit volume of the water column
+http://www.seadatanet.org/urnurl/SDN:P02::ZBTX/;Zoobenthos taxonomic abundance
+http://www.seadatanet.org/urnurl/SDN:P02::ZNTX/;Zooplankton non taxonomy-related abundance per unit volume of the water column
+http://www.seadatanet.org/urnurl/SDN:P02::ZOOB/;Zoobenthos taxonomy-related counts
+http://www.seadatanet.org/urnurl/SDN:P02::ZWTX/;Zoobenthos taxonomy-related wet weight biomass per unit area of the bed
+http://www.seadatanet.org/urnurl/SDN:P02::ZZZZ/;Unspecified

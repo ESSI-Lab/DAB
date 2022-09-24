@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.rsm.access;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -34,7 +34,6 @@ import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.SharedRepositoryInfo;
 import eu.essi_lab.model.StorageUri;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
@@ -51,7 +50,7 @@ public class AccessQueryUtils {
 	resultCache.setMaxSize(100);
     }
 
-    public static ResultSet<GSResource> findResource(String requestId, List<GSSource> sources, SharedRepositoryInfo sharedRepository,
+    public static ResultSet<GSResource> findResource(String requestId, List<GSSource> sources,
 	    String onlineIdentifier, StorageUri databaseURI) throws GSException {
 
 	if (requestId != null) {
@@ -75,8 +74,6 @@ public class AccessQueryUtils {
 
 	discoveryMessage.setSources(sources);
 	discoveryMessage.setDataBaseURI(databaseURI);
-
-	discoveryMessage.setSharedRepositoryInfo(sharedRepository);
 
 	SimpleValueBond bond = BondFactory.createSimpleValueBond(//
 		BondOperator.EQUAL, //

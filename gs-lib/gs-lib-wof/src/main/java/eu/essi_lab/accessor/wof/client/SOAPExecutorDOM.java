@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof.client;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,10 +22,10 @@ package eu.essi_lab.accessor.wof.client;
  */
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -40,6 +40,12 @@ import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.lib.xml.XMLNodeReader;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
+
+/**
+ * Utility class to be used inside the Hydro Server client to make SOAP requests to HydroServers
+ * 
+ * @author boldrini
+ */
 class SOAPExecutorDOM {
 
     private static final String CUAHSI_HIS_CLIENT_ERROR = "CUAHSI_HIS_CLIENT_ERROR";
@@ -48,7 +54,7 @@ class SOAPExecutorDOM {
     private byte[] input;
     private String resultPath;
 
-    private transient Logger logger = GSLoggerFactory.getLogger(SOAPExecutorDOM.class);
+    private Logger logger = GSLoggerFactory.getLogger(SOAPExecutorDOM.class);
 
     private String endpoint;
 
@@ -78,24 +84,23 @@ class SOAPExecutorDOM {
 	    tmpFile.deleteOnExit();
 	    FileOutputStream fos = new FileOutputStream(tmpFile);
 	    IOUtils.copy(output, fos);
-	    if(output != null)
-	    	output.close();
+	    if (output != null)
+		output.close();
 	    logger.info("Downloaded document. Size: " + tmpFile.length() + " bytes");
 
 	    XMLDocumentReader xdoc = new XMLDocumentReader(tmpFile);
 
 	    logger.info("XML response parsed, removing temporary file: " + tmpFile.getAbsolutePath());
-	    if(fos != null)
-	    	fos.close();
+	    if (fos != null)
+		fos.close();
 	    tmpFile.delete();
 
 	    Node[] nodes = xdoc.evaluateNodes(resultPath);
 
 	    if (nodes == null || nodes.length == 0) {
-		GSException gse = new GSException();
 
 		ErrorInfo ei = new ErrorInfo();
-		ei.setContextId(this.getClass().getName());
+		ei.setCaller(this.getClass());
 		ei.setErrorDescription("Remote server fault: ");
 		ei.setErrorId(CUAHSIHISServerClient.REMOTE_SERVER_ERROR);
 		ei.setErrorType(ErrorInfo.ERRORTYPE_CLIENT);
@@ -107,15 +112,13 @@ class SOAPExecutorDOM {
 		    ei.setErrorDescription("Remote server fault: " + faultMessage);
 		}
 
-		gse.addInfo(ei);
-
-		throw gse;
+		throw GSException.createException(ei);
 
 	    } else {
 
 		XMLNodeReader children = new XMLNodeReader(nodes[0]);
 		// this is to check if we are in the case of the getSites or getSitesObject
-		if (children.evaluateNodes("*[1]").length > 0) {		    
+		if (children.evaluateNodes("*[1]").length > 0) {
 		    return new XMLDocumentReader(children.asStream());
 		} else {
 
@@ -134,6 +137,8 @@ class SOAPExecutorDOM {
 	    throw e;
 
 	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 
 	    throw GSException.createException(//
 		    getClass(), //

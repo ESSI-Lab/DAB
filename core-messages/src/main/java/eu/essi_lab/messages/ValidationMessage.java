@@ -4,7 +4,7 @@ package eu.essi_lab.messages;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,13 +22,28 @@ package eu.essi_lab.messages;
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import com.amazonaws.handlers.AbstractRequestHandler;
 
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.GSProperty;
-public class ValidationMessage extends GSMessage {
+import eu.essi_lab.model.RuntimeInfoElement;
+import eu.essi_lab.rip.RuntimeInfoProvider;
+
+/**
+ * Extends the superclass to provides specific information on the result of a
+ * {@link WebRequestValidator#validate(WebRequest)} call.<br>
+ * The rules by which a {@link WebRequest} is validated depends from the specific {@link WebRequestValidator}
+ * implementation
+ * 
+ * @see WebRequestTransformer#validate(WebRequest)
+ * @see AbstractRequestHandler#validate(WebRequest)
+ * @author Fabrizio
+ */
+public class ValidationMessage extends GSMessage implements RuntimeInfoProvider {
 
     /**
      * 
@@ -52,6 +67,22 @@ public class ValidationMessage extends GSMessage {
     private static final String VALIDATION_EXCEPTIONS = "VALIDATION_EXCEPTIONS";
     private static final String VALIDATION_RESULT = "VALIDATION_RESULT_NAME";
 
+    @Override
+    public HashMap<String, List<String>> provideInfo() {
+
+	HashMap<String, List<String>> map = new HashMap<>();
+
+	map.put(RuntimeInfoElement.VALIDATION_MESSAGE_RESULT.getName(), Arrays.asList(getResult().name()));
+
+	if (!getExceptions().isEmpty()) {
+	    map.put(RuntimeInfoElement.VALIDATION_MESSAGE_ERROR_MESSAGE.getName(), Arrays.asList(getError()));
+	    map.put(RuntimeInfoElement.VALIDATION_MESSAGE_ERROR_CODE.getName(), Arrays.asList(getErrorCode()));
+	    map.put(RuntimeInfoElement.VALIDATION_MESSAGE_LOCATOR.getName(), Arrays.asList(getLocator()));
+	}
+
+	return map;
+    }
+
     public void setResult(ValidationResult result) {
 
 	getPayload().add(new GSProperty<ValidationResult>(VALIDATION_RESULT, result));
@@ -68,6 +99,7 @@ public class ValidationMessage extends GSMessage {
 	getExceptions().add(exception);
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public List<ValidationException> getExceptions() {
 	List exceptions = getPayload().get(VALIDATION_EXCEPTIONS, List.class);
 	if (exceptions == null) {
@@ -153,4 +185,15 @@ public class ValidationMessage extends GSMessage {
 	return out;
     }
 
+    @Override
+    public String getName() {
+
+	return getClass().getSimpleName();
+    }
+
+    @Override
+    public String getBaseType() {
+
+	return "validation-message";
+    }
 }

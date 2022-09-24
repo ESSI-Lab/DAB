@@ -12,7 +12,7 @@ package org.cuahsi.waterml._1;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,6 +35,34 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
 
+
+/**
+ * <p>Java class for TsValuesSingleVariableType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="TsValuesSingleVariableType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="value" type="{http://www.cuahsi.org/waterML/1.1/}ValueSingleVariable" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="units" type="{http://www.cuahsi.org/waterML/1.1/}UnitsType" minOccurs="0"/&gt;
+ *         &lt;element name="qualifier" type="{http://www.cuahsi.org/waterML/1.1/}QualifierType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="qualityControlLevel" type="{http://www.cuahsi.org/waterML/1.1/}QualityControlLevelType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="method" type="{http://www.cuahsi.org/waterML/1.1/}MethodType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="source" type="{http://www.cuahsi.org/waterML/1.1/}SourceType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="offset" type="{http://www.cuahsi.org/waterML/1.1/}OffsetType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="sample" type="{http://www.cuahsi.org/waterML/1.1/}SampleType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="censorCode" type="{http://www.cuahsi.org/waterML/1.1/}CensorCodeType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "TsValuesSingleVariableType", propOrder = {
     "value",

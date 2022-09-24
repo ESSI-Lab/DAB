@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<!--
+..........................................................
+GWIS Javascript API Sample:
+Plot Auto-Generation and Event Handling
+..........................................................
+U.S. Geological Survey, Texas Water Science Center, Austin
+https://txpub.usgs.gov/DSS/GWIS/
+..........................................................
+-->
+<html>
+    <!-- html head -->
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>GWIS JSAPI Sample</title>
+        
+        <!-- GWIS requires jQuery -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        
+        <!-- GWIS JSAPI 0.0 -->
+        <link rel="stylesheet" href="https://txpub.usgs.gov/DSS/GWIS/0.0/jsapi/gwis-plot-utils.css"/>
+        <script src="https://txpub.usgs.gov/DSS/GWIS/0.0/jsapi/gwis-plot-utils.min.js"></script>
+    </head>
+    
+    <!-- html body -->
+    <body style="background:#eee; font-family:arial;">
+        
+        <h1>Sample: Plot Auto-Generation and Event Handling</h1>
+        <div id="plots"></div>
+        <script>
+            // define site list containing valid and invalid site numbers
+            var sites = [
+                "08154700",
+                "08155200",
+                "08155240",
+                "99999999", // invalid
+                "08155300",
+                "08155400",
+                "99999999", // invalid
+                "08155500",
+                "08155541",
+                "08156675",
+                "99999999", // invalid
+                "99999999", // invalid
+                "08156800",
+                "99999999", // invalid
+                "08156910"
+            ];
+            
+            // loop through sites and append plot
+            console.log("creating plots...");
+            var nDone    = 0;
+            var nSuccess = 0;
+            var nFailure = 0;
+            $.each( sites, function(n,site) {
+                
+                // append plot div
+                var div_id = "plot"+n;
+                $("#plots").append( '<div id="'+div_id+'" style="width:700px; height:400px; margin:20px;"></div>' );
+                
+                // create plot
+                var plot = GWIS.plot({
+                    div_id   : div_id,  // plot div
+                    iv_or_dv : "iv",    // instantaneous values
+                    period   : "p7d",   // past 7 days
+                    series : [          // add data lines on 2 y-axes:
+                        { axis:"y1", site:site, pcode:"00060", label:"Streamflow",  color:"#009", stroke_pattern:[],    fill_graph:true  }, // y1 axis
+                        { axis:"y2", site:site, pcode:"00065", label:"Gage Height", color:"#090", stroke_pattern:[3,3], fill_graph:false }  // y2 axis
+                    ],
+                    title    : "USGS Streamgage "+site,             // plot title
+                    ylabel   : "Streamflow, cubic feet per second", // y1 axis label
+                    y2label  : "Gage Height, feet",                 // y2 axis label
+                    controls : "all",                               // add all available controls under plot
+                    on_success : function() {
+                        // triggered after plot created successfully
+                        console.log("...plot created OK: "+site);
+                        nSuccess++;
+                    },
+                    on_error : function() {
+                        // triggered when plot cannot be created
+                        console.warn("...could not create plot for '"+site+"' - plot removed");
+                        $("#"+div_id).remove(); // remove plot div
+                        nFailure++;
+                    },
+                    on_complete : function() {
+                        // triggered upon success or error
+                        nDone++;
+                        if ( nDone >= sites.length ) {
+                            // all plots done
+                            console.log( nDone   +" total sites"                );
+                            console.log( nSuccess+" plots created OK"           );
+                            console.log( nFailure+" plots could not be created" );
+                            console.log( "done." );
+                        }
+                    }
+                });
+                
+            });
+        </script>
+        
+    </body>
+</html>
+<!-- end GWIS JSAPI sample -->

@@ -12,7 +12,7 @@ package org.cuahsi.waterml._1;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -41,6 +41,59 @@ import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.NormalizedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+
+/**
+ * <p>Java class for seriesCatalogType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="seriesCatalogType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="note" type="{http://www.cuahsi.org/waterML/1.1/}NoteType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="series" maxOccurs="unbounded" minOccurs="0"&gt;
+ *           &lt;complexType&gt;
+ *             &lt;complexContent&gt;
+ *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *                 &lt;sequence&gt;
+ *                   &lt;element name="dataType" type="{http://www.cuahsi.org/waterML/1.1/}DataTypeCodeList" minOccurs="0"/&gt;
+ *                   &lt;element name="variable" type="{http://www.cuahsi.org/waterML/1.1/}VariableInfoType"/&gt;
+ *                   &lt;element name="valueCount" minOccurs="0"&gt;
+ *                     &lt;complexType&gt;
+ *                       &lt;simpleContent&gt;
+ *                         &lt;extension base="&lt;http://www.cuahsi.org/waterML/1.1/&gt;positiveInt"&gt;
+ *                           &lt;attribute name="countIsEstimated" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
+ *                         &lt;/extension&gt;
+ *                       &lt;/simpleContent&gt;
+ *                     &lt;/complexType&gt;
+ *                   &lt;/element&gt;
+ *                   &lt;element name="variableTimeInterval" type="{http://www.cuahsi.org/waterML/1.1/}TimePeriodType"/&gt;
+ *                   &lt;element name="valueType" type="{http://www.cuahsi.org/waterML/1.1/}ValueTypeCodeList" minOccurs="0"/&gt;
+ *                   &lt;element name="generalCategory" type="{http://www.cuahsi.org/waterML/1.1/}GeneralCategoryCodeList" minOccurs="0"/&gt;
+ *                   &lt;element name="sampleMedium" type="{http://www.cuahsi.org/waterML/1.1/}SampleMediumCodeList" minOccurs="0"/&gt;
+ *                   &lt;element name="method" type="{http://www.cuahsi.org/waterML/1.1/}MethodType" minOccurs="0"/&gt;
+ *                   &lt;element name="source" type="{http://www.cuahsi.org/waterML/1.1/}SourceType" minOccurs="0"/&gt;
+ *                   &lt;element name="qualityControlLevel" type="{http://www.cuahsi.org/waterML/1.1/}QualityControlLevelType" minOccurs="0"/&gt;
+ *                   &lt;element name="seriesProperty" type="{http://www.cuahsi.org/waterML/1.1/}PropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *                 &lt;/sequence&gt;
+ *               &lt;/restriction&gt;
+ *             &lt;/complexContent&gt;
+ *           &lt;/complexType&gt;
+ *         &lt;/element&gt;
+ *         &lt;element name="seriesCatalogProperty" type="{http://www.cuahsi.org/waterML/1.1/}PropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{http://www.cuahsi.org/waterML/1.1/}extension" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attribute name="menuGroupName" type="{http://www.w3.org/2001/XMLSchema}normalizedString" /&gt;
+ *       &lt;attribute name="serviceWsdl" type="{http://www.w3.org/2001/XMLSchema}anyURI" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "seriesCatalogType", propOrder = {
     "note",

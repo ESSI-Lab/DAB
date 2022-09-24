@@ -30,23 +30,27 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.JSONObject;
 
-import eu.essi_lab.gssrv.rest.exceptions.GSErrorMessage;
-import eu.essi_lab.gssrv.rest.exceptions.GSServiceGSExceptionHandler;
 import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.exceptions.DefaultGSExceptionHandler;
-import eu.essi_lab.model.exceptions.DefaultGSExceptionLogger;
-import eu.essi_lab.model.exceptions.DefaultGSExceptionReader;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.PluginsLoader;
 import eu.essi_lab.pdk.Profiler;
-import eu.essi_lab.request.executor.discover.QueryInitializer;
+
+/**
+ * Subclasses provides a concrete implementation of a JAX-RS/JAX-WS service provider which is in charge to serve one or
+ * more {@link WebRequest}s by selecting the suitable {@link Profiler}
+ *
+ * @author Fabrizio
+ * @see Profiler
+ * @see ProfilerFilter
+ */
 public abstract class AbstractProfilerService {
 
-    public static final String ERR_ID_PROFILER_ALIEN_ERROR = "ERR_ID_PROFILER_ALIEN_ERROR";
     public static final String NO_PROFILER = "NO_PROFILER";
+    private static final String PROFILER_SERVE_ERROR = "PROFILER_SERVE_ERROR";
 
     /**
      * Creates a {@link WebRequest} from the given arguments, selects the suitable {@link Profiler} basing on
@@ -62,7 +66,6 @@ public abstract class AbstractProfilerService {
 
 	Optional<Profiler> profiler = null;
 	Response response = null;
-	GSServiceGSExceptionHandler exHandler = null;
 
 	WebRequest webRequest = new WebRequest();
 
@@ -71,19 +74,20 @@ public abstract class AbstractProfilerService {
 
 	profiler = profilers.stream().filter(strategy::accept).findFirst();
 
+	GSException ex = null;
+
 	if (!profiler.isPresent()) {
-	    GSException ex = GSException.createException(//
+
+	    ex = GSException.createException(//
 		    getClass(), //
 		    "No profiler listening at this URL", //
 		    "No service listening at this URL", //
 		    ErrorInfo.ERRORTYPE_INTERNAL, //
 		    ErrorInfo.SEVERITY_FATAL, //
 		    NO_PROFILER);
-
-	    exHandler = new GSServiceGSExceptionHandler(new DefaultGSExceptionReader(ex));
 	} else {
 
-	    webRequest.setProfilerPath(profiler.get().getProfilerInfo().getServicePath());
+	    webRequest.setProfilerPath(profiler.get().getSetting().getServicePath());
 	    // webRequest.setServicesPath(SERVICES_PATH);
 	    webRequest.setUriInfo(uriInfo);
 
@@ -97,47 +101,34 @@ public abstract class AbstractProfilerService {
 
 		response = profiler.get().handle(webRequest);
 
-	    } catch (GSException ex) {
+	    } catch (GSException gsEx) {
 
-		exHandler = new GSServiceGSExceptionHandler(new DefaultGSExceptionReader(ex));
+		ex = gsEx;
 
 	    } catch (Exception thr) {
 
-		GSException ex = GSException.createException(//
+		ex = GSException.createException(//
 			getClass(), //
-			thr.getMessage(), //
-			thr.getMessage(), //
 			ErrorInfo.ERRORTYPE_INTERNAL, //
-			ErrorInfo.SEVERITY_FATAL, //
-			ERR_ID_PROFILER_ALIEN_ERROR, //
+			ErrorInfo.SEVERITY_ERROR, //
+			PROFILER_SERVE_ERROR, //
 			thr);
 
-		exHandler = new GSServiceGSExceptionHandler(new DefaultGSExceptionReader(ex));
 	    }
 	}
 
-	if (exHandler != null) {
-	    Status status = exHandler.getStatus();
-	    GSErrorMessage gsMessage = exHandler.getErrorMessageForUser();
+	if (ex != null) {
 
-	    DefaultGSExceptionLogger.log(new DefaultGSExceptionHandler(exHandler.getReader()));
-
-	    // view not found is a special error (profiler-independent)
-	    if (gsMessage.getCode().contains(QueryInitializer.VIEW_NOT_FOUND)) {
-		JSONObject error = new JSONObject();
-		error.put("view not found", "The specified view was not found");
-		return Response.serverError().//
-			status(Status.NOT_FOUND).//
-			entity(error.toString(3)).//
-			type(MediaType.APPLICATION_JSON).//
-			build();
-	    }
+	    ex.log();
 
 	    if (profiler.isPresent()) {
-		response = profiler.get().createUncaughtError(webRequest, status, gsMessage.getMessageAndCode());
+
+		response = profiler.get().createUncaughtError(webRequest, Status.INTERNAL_SERVER_ERROR, ExceptionUtils.getStackTrace(ex));
+
 	    } else {
+
 		JSONObject error = new JSONObject();
-		error.put("service not found", "No service listening at this URL");
+		error.put("Service not found", "No service listening at this URL");
 
 		return Response.serverError().//
 			status(Status.NOT_FOUND).//

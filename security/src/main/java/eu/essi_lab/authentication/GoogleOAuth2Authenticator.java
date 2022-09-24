@@ -4,7 +4,7 @@ package eu.essi_lab.authentication;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,10 +30,12 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import eu.essi_lab.authentication.model.Token;
 import eu.essi_lab.authentication.util.RFC3986Encoder;
@@ -41,10 +43,13 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 
-public class GoogleOAuth2Authenticator extends OAuth2Authenticator implements OAuthAuthenticator {
+/**
+ * @author Fabrizio
+ */
+public class GoogleOAuth2Authenticator extends OAuth2Authenticator {
 
     public static final String GOOGLE = "google";
-    private transient Logger logger = GSLoggerFactory.getLogger(GoogleOAuth2Authenticator.class);
+    private Logger logger = GSLoggerFactory.getLogger(GoogleOAuth2Authenticator.class);
     private static final String NULL_TOKEN_ERR_ID = "NULL_TOKEN_ERR_ID";
 
     @Override
@@ -141,6 +146,8 @@ public class GoogleOAuth2Authenticator extends OAuth2Authenticator implements OA
 		    ErrorInfo.ERRORTYPE_SERVICE, ErrorInfo.SEVERITY_ERROR, IOEXCEPTION_TOKEN_ERR_ID, e);
 
 	}
+	
+	GSLoggerFactory.getLogger(getClass()).debug("Token:\n {}", jsonTokenEntity);
 
 	String accessToken = jsonTokenEntity.get("access_token").asText();
 	String tokenType = jsonTokenEntity.get("token_type").asText();
@@ -149,17 +156,42 @@ public class GoogleOAuth2Authenticator extends OAuth2Authenticator implements OA
 
 	try {
 
+	    userInfoUrl += "personFields=emailAddresses";
+
 	    jsonUserEmailEntity = getUserEmail(userInfoUrl, httpClient, objM, accessToken);
 
 	} catch (IOException e) {
 
 	    logger.error("Can't get user email from Google");
 
-	    throw GSException.createException(this.getClass(), "Can't get user email from Google", null, ERR_WITH_GOOGLE_MSG,
-		    ErrorInfo.ERRORTYPE_SERVICE, ErrorInfo.SEVERITY_ERROR, IOEXCEPTION_EMAIL_ERR_ID, e);
+	    throw GSException.createException(//
+		    this.getClass(), //
+		    e.getMessage(), //
+		    null, //
+		    ERR_WITH_GOOGLE_MSG, //
+		    ErrorInfo.ERRORTYPE_SERVICE, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    IOEXCEPTION_EMAIL_ERR_ID, //
+		    e);
 
 	}
-	String email = jsonUserEmailEntity.get("email").asText();
+
+	if (!jsonUserEmailEntity.has("emailAddresses")) {
+
+	    logger.error(new JSONObject(jsonUserEmailEntity.toString()).toString(3));
+
+	    throw GSException.createException(//
+		    this.getClass(), //
+		    "Can't get user email from Google", //
+		    null, //
+		    ERR_WITH_GOOGLE_MSG, //
+		    ErrorInfo.ERRORTYPE_SERVICE, //
+		    ErrorInfo.SEVERITY_ERROR, IOEXCEPTION_EMAIL_ERR_ID);
+
+	}
+
+	ArrayNode arrayNode = (ArrayNode) jsonUserEmailEntity.get("emailAddresses");
+	String email = arrayNode.get(0).get("value").asText();
 
 	logger.info("Succesfull login about user {}. Token is in session.", email);
 

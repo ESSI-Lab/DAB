@@ -4,7 +4,7 @@ package eu.essi_lab.model.resource;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -164,7 +164,7 @@ public enum Country {
     PORTUGAL("Portugal", "the Portuguese Republic", "PRT", "PT"), //
     QATAR("Qatar", "the State of Qatar", "QAT", "QA"), //
     REPUBLIC_OF_KOREA("Republic of Korea", "the Republic of Korea", "KOR", "KR"), //
-    REPUBLIC_OF_MOLDOVA("Republic of Moldova", "the Republic of Moldova", "MDA", "MD"), //
+    REPUBLIC_OF_MOLDOVA("Moldova", "the Republic of Moldova", "MDA", "MD"), //
     ROMANIA("Romania", "Romania", "ROU", "RO"), //
     RUSSIAN_FEDERATION("Russian Federation", "the Russian Federation", "RUS", "RU","Russia"), //
     RWANDA("Rwanda", "the Republic of Rwanda", "RWA", "RW"), //

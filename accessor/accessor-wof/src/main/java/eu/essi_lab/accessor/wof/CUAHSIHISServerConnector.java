@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,10 +30,7 @@ import java.util.Optional;
 
 import javax.xml.transform.TransformerException;
 
-import org.slf4j.Logger;
 import org.xml.sax.SAXException;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import eu.essi_lab.accessor.wof.client.CUAHSIHISServerClient;
 import eu.essi_lab.accessor.wof.client.CUAHSIHISServerClient1_1;
@@ -41,69 +38,56 @@ import eu.essi_lab.accessor.wof.client.datamodel.Site;
 import eu.essi_lab.accessor.wof.client.datamodel.SiteInfo;
 import eu.essi_lab.accessor.wof.client.datamodel.SitesResponseDocument;
 import eu.essi_lab.accessor.wof.client.datamodel.TimeSeries;
-import eu.essi_lab.cdk.harvest.AbstractHarvestedQueryConnector;
+import eu.essi_lab.accessor.wof.setting.CUAHSIHIServerConnectorSetting;
+import eu.essi_lab.cdk.harvest.FirstSiteConnectorSetting;
+import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
-import eu.essi_lab.model.Source;
-import eu.essi_lab.model.configuration.option.GSConfOptionBoolean;
+import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.OriginalMetadata;
-public class CUAHSIHISServerConnector extends AbstractHarvestedQueryConnector {
+
+/**
+ * @author boldrini
+ */
+public class CUAHSIHISServerConnector<C extends FirstSiteConnectorSetting> extends HarvestedQueryConnector<C> {
+
+    // RICHER (e.g. email address) but SLOWER
+    private static final boolean ENRICH_TIME_SERIES = false;
 
     /**
-     *
+     * 
      */
-    private static final long serialVersionUID = 469857080629004420L;
-    @JsonIgnore
-    private static final String FIRST_SITE_ONLY_OPTION_KEY = "FIRST_SITE_ONLY_OPTION_KEY";
-    @JsonIgnore // RICHER (e.g. email address) but SLOWER
-    private static final boolean ENRICH_TIME_SERIES = false;
-    @JsonIgnore
-    private transient Logger logger = GSLoggerFactory.getLogger(this.getClass());
-    @JsonIgnore
-    private transient CUAHSIHISServerClient client = null;
-    @JsonIgnore
-    private transient Iterator<SiteInfo> siteInfoIterator = null;
-    @JsonIgnore
-    private transient SiteInfo cachedSiteInfo = null;
-    @JsonIgnore
-    private transient Integer cachedSiteNumber = null;
-    @JsonIgnore
-    private transient SitesResponseDocument richerSiteInfoDocument = null;
-    @JsonIgnore
-    private transient List<String> sitesWithErrors = new ArrayList<>();
+    public static final String TYPE = "CUAHSIHISServerConnector";
 
-    @JsonIgnore
+    private static final String CUAHSI_HIS_SERVER_CONNECTOR_ERROR = "CUAHSI_HIS_SERVER_CONNECTOR_ERROR";
+
+    private CUAHSIHISServerClient client = null;
+
+    private Iterator<SiteInfo> siteInfoIterator = null;
+
+    private SiteInfo cachedSiteInfo = null;
+
+    private Integer cachedSiteNumber = null;
+
+    private SitesResponseDocument richerSiteInfoDocument = null;
+
+    private List<String> sitesWithErrors = new ArrayList<>();
+
     private Integer recordsReturned = 0;
 
     public List<String> getSiteWithErrors() {
 	return sitesWithErrors;
     }
 
+    /**
+     * 
+     */
     public CUAHSIHISServerConnector() {
 
-	GSConfOptionBoolean option = new GSConfOptionBoolean();
-
-	option.setLabel("Harvest first site only");
-	option.setKey(FIRST_SITE_ONLY_OPTION_KEY);
-	option.setValue(false);
-
-	getSupportedOptions().put(FIRST_SITE_ONLY_OPTION_KEY, option);
-    }
-
-    @Override
-    public boolean enableMaxRecordsOption() {
-
-	return false;
-    }
-
-    @Override
-    public String getLabel() {
-
-	return "CUAHSI HIS Server Connector";
     }
 
     @Override
@@ -112,11 +96,14 @@ public class CUAHSIHISServerConnector extends AbstractHarvestedQueryConnector {
 	if (client == null) {
 	    if (getSourceURL().contains("cuahsi_1_0.asmx")) {
 		// not supported at this time
-		GSException gse = new GSException();
 		ErrorInfo info = new ErrorInfo();
 		info.setErrorDescription("Unsupported HIS server version: 1.0");
-		gse.addInfo(info);
-		throw gse;
+		info.setCaller(this.getClass());
+		info.setErrorId(CUAHSI_HIS_SERVER_CONNECTOR_ERROR);
+		info.setErrorType(ErrorInfo.ERRORTYPE_CLIENT);
+		info.setSeverity(ErrorInfo.SEVERITY_ERROR);
+
+		throw GSException.createException(info);
 	    } else {
 		client = new CUAHSIHISServerClient1_1(getSourceURL());
 	    }
@@ -129,7 +116,8 @@ public class CUAHSIHISServerConnector extends AbstractHarvestedQueryConnector {
 		// here we try to resume with the getSites method, as some HIS server
 		// doesn't implement the getSitesObject method, such as
 		// https://hydro1.gesdisc.eosdis.nasa.gov/daac-bin/his/1.0/NLDAS_FORA_002.cgi?WSDL
-		logger.warn("GetSitesObject method returned error, trying to resume with the GetSites method");
+		GSLoggerFactory.getLogger(this.getClass())
+			.warn("GetSitesObject method returned error, trying to resume with the GetSites method");
 		siteInfoIterator = client.getSitesSTaX();
 	    }
 	    cachedSiteNumber = -1;
@@ -174,11 +162,14 @@ public class CUAHSIHISServerConnector extends AbstractHarvestedQueryConnector {
 		    this.cachedSiteInfo = siteInfoIterator.next();
 		    this.cachedSiteNumber++;
 		} else {
-		    GSException gse = new GSException();
 		    ErrorInfo info = new ErrorInfo();
 		    info.setErrorDescription(getUnableToResumeError(id));
-		    gse.addInfo(info);
-		    throw gse;
+		    info.setCaller(this.getClass());
+		    info.setErrorId(CUAHSI_HIS_SERVER_CONNECTOR_ERROR);
+		    info.setErrorType(ErrorInfo.ERRORTYPE_CLIENT);
+		    info.setSeverity(ErrorInfo.SEVERITY_ERROR);
+
+		    throw GSException.createException(info);
 		}
 	    }
 	}
@@ -249,10 +240,10 @@ public class CUAHSIHISServerConnector extends AbstractHarvestedQueryConnector {
 		    timeSeries = client.getAugmentedTimeSeries(siteInfo, variableCode, methodId, qualityControlLevelCode, sourceId);
 		} catch (GSException e) {
 		    // in case an exception occurred, no metadata is returned for this series
-		    logger.error("Remote server error augmenting time series. ");
-		    logger.error("URL: {}", getSourceURL());
-		    logger.error("Site: {}", siteInfo);
-		    logger.error("Variable: {}", variableCode);
+		    GSLoggerFactory.getLogger(this.getClass()).error("Remote server error augmenting time series. ");
+		    GSLoggerFactory.getLogger(this.getClass()).error("URL: {}", getSourceURL());
+		    GSLoggerFactory.getLogger(this.getClass()).error("Site: {}", siteInfo);
+		    GSLoggerFactory.getLogger(this.getClass()).error("Variable: {}", variableCode);
 		}
 	    }
 
@@ -272,7 +263,8 @@ public class CUAHSIHISServerConnector extends AbstractHarvestedQueryConnector {
 			// this is the case of a time series with duplicated variable code
 			if (nextSeriesVariableCode.equals(visitedVariableCode)) {
 			    duplicated = true;
-			    logger.warn("Found duplicated variable code, skipping: {}", visitedVariableCode);
+			    GSLoggerFactory.getLogger(this.getClass()).warn("Found duplicated variable code, skipping: {}",
+				    visitedVariableCode);
 			    break;
 			}
 		    }
@@ -297,11 +289,14 @@ public class CUAHSIHISServerConnector extends AbstractHarvestedQueryConnector {
 	    }
 
 	} else {
-	    GSException gse = new GSException();
 	    ErrorInfo info = new ErrorInfo();
 	    info.setErrorDescription(getUnableToResumeError(id));
-	    gse.addInfo(info);
-	    throw gse;
+	    info.setCaller(this.getClass());
+	    info.setErrorId(CUAHSI_HIS_SERVER_CONNECTOR_ERROR);
+	    info.setErrorType(ErrorInfo.ERRORTYPE_CLIENT);
+	    info.setSeverity(ErrorInfo.SEVERITY_ERROR);
+
+	    throw GSException.createException(info);
 	}
 
 	ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<OriginalMetadata>();
@@ -318,13 +313,13 @@ public class CUAHSIHISServerConnector extends AbstractHarvestedQueryConnector {
 	    ret.addRecord(metadataRecord);
 	    recordsReturned++;
 
-	    if (!isMaxRecordsUnlimited()) {
+	    if (!getSetting().isMaxRecordsUnlimited()) {
 
-		Optional<Integer> mr = getMaxRecords();
+		Optional<Integer> mr = getSetting().getMaxRecords();
 
 		if (mr.isPresent() && recordsReturned >= mr.get()) {
 
-		    logger.info("Reached max records of {}", mr.get());
+		    GSLoggerFactory.getLogger(this.getClass()).info("Reached max records of {}", mr.get());
 
 		    ret.setResumptionToken(null);
 
@@ -333,18 +328,20 @@ public class CUAHSIHISServerConnector extends AbstractHarvestedQueryConnector {
 		}
 	    }
 	} catch (Exception e) {
-	    GSException gse = new GSException();
 	    ErrorInfo info = new ErrorInfo();
 	    info.setErrorDescription("Error marshalling metadata for site: " + siteName + " variable name: " + seriesName);
-	    gse.addInfo(info);
-	    throw gse;
+	    info.setCaller(this.getClass());
+	    info.setErrorId(CUAHSI_HIS_SERVER_CONNECTOR_ERROR);
+	    info.setErrorType(ErrorInfo.ERRORTYPE_CLIENT);
+	    info.setSeverity(ErrorInfo.SEVERITY_ERROR);
+
+	    throw GSException.createException(info);
 	}
 	ret.setResumptionToken(nextId);
 	return ret;
 
     }
 
-   
     /**
      * Returns a sites response document without series
      *
@@ -365,11 +362,9 @@ public class CUAHSIHISServerConnector extends AbstractHarvestedQueryConnector {
 
     protected SimpleEntry<Integer, Integer> decodeResumptionToken(String id) throws GSException {
 	if (!id.contains(":")) {
-	    GSException gse = new GSException();
 	    ErrorInfo info = new ErrorInfo();
 	    info.setErrorDescription(getUnableToResumeError(id));
-	    gse.addInfo(info);
-	    throw gse;
+	    throw GSException.createException(info);
 	}
 	String[] split = id.split(":");
 	try {
@@ -377,23 +372,27 @@ public class CUAHSIHISServerConnector extends AbstractHarvestedQueryConnector {
 	    Integer series = Integer.parseInt(split[1]);
 
 	    if (sites < 0 || series < 0) {
-		GSException gse = new GSException();
 		ErrorInfo info = new ErrorInfo();
 		info.setErrorDescription(getUnableToResumeError(id));
-		gse.addInfo(info);
-		throw gse;
+		info.setCaller(this.getClass());
+		info.setErrorId(CUAHSI_HIS_SERVER_CONNECTOR_ERROR);
+		info.setErrorType(ErrorInfo.ERRORTYPE_CLIENT);
+		info.setSeverity(ErrorInfo.SEVERITY_ERROR);
+
+		throw GSException.createException(info);
 	    }
 
 	    SimpleEntry<Integer, Integer> ret = new SimpleEntry<Integer, Integer>(sites, series);
 	    return ret;
 	} catch (NumberFormatException e) {
-	    GSException gse = new GSException();
-	    ErrorInfo info = new ErrorInfo();
-	    info.setErrorDescription(getUnableToResumeError(id));
-	    gse.addInfo(info);
-	    throw gse;
-	}
 
+	    throw GSException.createException(//
+		    getClass(), //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    CUAHSI_HIS_SERVER_CONNECTOR_ERROR, //
+		    e);
+	}
     }
 
     private String getUnableToResumeError(String id) {
@@ -405,14 +404,12 @@ public class CUAHSIHISServerConnector extends AbstractHarvestedQueryConnector {
      */
     public void setFirstSiteOnly(Boolean firstSiteOnly) {
 
-	GSConfOptionBoolean option = (GSConfOptionBoolean) getSupportedOptions().get(FIRST_SITE_ONLY_OPTION_KEY);
-	option.setValue(firstSiteOnly);
+	((FirstSiteConnectorSetting) getSetting()).setHarvestFirstSiteOnly(firstSiteOnly);
     }
 
     protected boolean isFirstSiteOnly() {
 
-	GSConfOptionBoolean option = (GSConfOptionBoolean) getSupportedOptions().get(FIRST_SITE_ONLY_OPTION_KEY);
-	return option.getValue().equals(true);
+	return ((FirstSiteConnectorSetting) getSetting()).isFirstSiteHarvestOnlySet();
     }
 
     @Override
@@ -423,7 +420,7 @@ public class CUAHSIHISServerConnector extends AbstractHarvestedQueryConnector {
     }
 
     @Override
-    public boolean supports(Source source) {
+    public boolean supports(GSSource source) {
 	String baseEndpoint = source.getEndpoint();
 	if (baseEndpoint == null) {
 	    return false;
@@ -444,7 +441,7 @@ public class CUAHSIHISServerConnector extends AbstractHarvestedQueryConnector {
 	} catch (Exception e) {
 	    // any exception during download or during XML parsing
 	    String warn = "Exception during download or during XML parsing: " + e.getMessage();
-	    logger.warn(warn);
+	    GSLoggerFactory.getLogger(this.getClass()).warn(warn);
 	}
 	return false;
     }
@@ -462,5 +459,18 @@ public class CUAHSIHISServerConnector extends AbstractHarvestedQueryConnector {
 	    }
 	}
 	return false;
+    }
+
+    @Override
+    public String getType() {
+
+	return TYPE;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    protected C initSetting() {
+
+	return (C) new CUAHSIHIServerConnectorSetting();
     }
 }

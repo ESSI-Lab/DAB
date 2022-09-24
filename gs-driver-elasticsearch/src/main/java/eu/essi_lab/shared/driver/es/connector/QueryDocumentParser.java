@@ -4,7 +4,7 @@ package eu.essi_lab.shared.driver.es.connector;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -32,23 +32,33 @@ import org.json.JSONObject;
 
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
+
+/**
+ * @author ilsanto
+ */
 public class QueryDocumentParser extends JSONDocumentParser {
 
     private static final String SOURCE_KEY = "_source";
     private static final String IOEXCEPTION_PARSING_ES_DOCUMENT = "IOEXCEPTION_PARSING_ES_DOCUMENT";
     private static final String HITS_KEY = "hits";
+    private static final String DOCS_KEY = "docs";
 
     public QueryDocumentParser(String jsonString) throws GSException {
 	super(jsonString);
     }
 
-    public List<InputStream> getSources() throws GSException {
+    /**
+     * @param multiGet
+     * @return
+     * @throws GSException
+     */
+    public List<InputStream> getSources(boolean multiGet) throws GSException {
 
-	List<InputStream> lis = new ArrayList<>();
+	List<InputStream> list = new ArrayList<>();
 
 	try {
 
-	    JSONArray jar = jsonObject.getJSONObject(HITS_KEY).getJSONArray(HITS_KEY);
+	    JSONArray jar = multiGet ? jsonObject.getJSONArray(DOCS_KEY) : jsonObject.getJSONObject(HITS_KEY).getJSONArray(HITS_KEY);
 
 	    for (int i = 0; i < jar.length(); i++) {
 
@@ -56,15 +66,19 @@ public class QueryDocumentParser extends JSONDocumentParser {
 
 		JSONObject source = jobj.getJSONObject(SOURCE_KEY);
 
-		lis.add(new ByteArrayInputStream(source.toString().getBytes()));
-
+		list.add(new ByteArrayInputStream(source.toString().getBytes()));
 	    }
 
-	    return lis;
+	    return list;
 
 	} catch (JSONException e) {
-	    throw GSException.createException(getClass(), "Can't parse document response", null, ErrorInfo.ERRORTYPE_SERVICE,
-		    ErrorInfo.SEVERITY_ERROR, IOEXCEPTION_PARSING_ES_DOCUMENT, e);
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    null, //
+		    ErrorInfo.ERRORTYPE_SERVICE, ErrorInfo.SEVERITY_ERROR, //
+		    IOEXCEPTION_PARSING_ES_DOCUMENT, e);
 	}
     }
 }

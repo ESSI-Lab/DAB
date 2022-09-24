@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.csw.profile;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -39,6 +39,47 @@ import eu.essi_lab.pdk.rsm.DiscoveryResultSetMapper;
 import eu.essi_lab.pdk.rsm.impl.xml.iso19139.GMD_ResultSetMapper;
 import eu.essi_lab.pdk.rsm.impl.xml.iso19139.GMI_ResultSetMapper;
 import eu.essi_lab.profiler.csw.handler.srvinfo.CSWDescribeRecordHandler;
+
+/**
+ * Concrete classes provide information about a specific CSW profile (e.g: ISO profile, CORE profile).<br>
+ * In particular, the information specific of a given profile is provided by the following abstract methods:
+ * <ul>
+ * <li>{@link #getSupportedTypeNames()}
+ * <ul>
+ * <li>the supported type names (e.g: "gmd:MD_Metadata", "gmi:MI_Metadata" for the ISO profile)
+ * </ul>
+ * </li></li>
+ * <li>{@link #getSupportedOutputSchemas()}
+ * <ul>
+ * <li>the supported output schemas (e.g: "http://www.isotc211.org/2005/gmd", "http://www.isotc211.org/2005/gmi" for the
+ * ISO profile)
+ * </ul>
+ * </li></li>
+ * <li>{@link #getSupportedSchemaComponents()}
+ * <ul>
+ * <li>the supported schema components used by the {@link CSWDescribeRecordHandler} to
+ * create the response
+ * </ul>
+ * </li></li>
+ * <li>{@link #getResultSetMapper(String, ElementSetType, List)}
+ * <ul>
+ * <li>the {@link DiscoveryResultSetMapper}s suitable for the supported output schemas (e.g:
+ * {@link GMD_ResultSetMapper},
+ * {@link GMI_ResultSetMapper} for the ISO profile)
+ * </ul>
+ * </li></li>
+ * </ul>
+ * This abstract class also provides some utility methods which merge all the supported schema components, type names
+ * and output schemas
+ * <h3>Implementation note</h3><br>
+ * Each concrete class <b>MUST</b> provide only the information which concerns the <i>specific</i> implemented profile.
+ * So for example a
+ * sub-profile of the ISO profile, must provide only the output schema specific of that profile, omitting the ones
+ * related to the ISO profile<br>
+ * <br>
+ * 
+ * @author Fabrizio
+ */
 public abstract class CSWProfile implements Pluggable {
 
     /**

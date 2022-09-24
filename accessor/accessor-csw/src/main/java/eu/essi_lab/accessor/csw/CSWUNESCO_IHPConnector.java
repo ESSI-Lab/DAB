@@ -1,10 +1,13 @@
+/**
+ * 
+ */
 package eu.essi_lab.accessor.csw;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,48 +24,39 @@ package eu.essi_lab.accessor.csw;
  * #L%
  */
 
-import java.util.Arrays;
-
-import eu.essi_lab.model.Source;
-import eu.essi_lab.model.configuration.option.GSConfOptionInteger;
+import eu.essi_lab.model.GSSource;
 
 /**
  * @author Fabrizio
- *
  */
-public class CSWUNESCO_IHPConnector  extends CSWGetConnector {
+public class CSWUNESCO_IHPConnector extends CSWGetConnector {
 
+    /**
+     * 
+     */
     public CSWUNESCO_IHPConnector() {
- 	
-	GSConfOptionInteger option = (GSConfOptionInteger) getSupportedOptions().get(CSW_CONNECTOR_PAGESIZE_OPTION_KEY);
-	option.setValue(20);
-	option.setAllowedValues(Arrays.asList(10));
+
+	getSetting().selectPageSize(20);
+    }
+
+    /**
+     * 
+     */
+    public static final String TYPE = "CSW UNESCO-IHP Connector";
+
+    @Override
+    public String getType() {
+
+	return TYPE;
     }
 
     @Override
-    public boolean supports(Source source) {
+    public boolean supports(GSSource source) {
 	String endpoint = source.getEndpoint();
 	if (endpoint.contains("ihp-wins.unesco.org")) {
 	    return super.supports(source);
 	} else {
 	    return false;
 	}
-    }
-
-    /**
-     * @return
-     */
-    protected GSConfOptionInteger getPageSizeOption() {
-
-	GSConfOptionInteger option = (GSConfOptionInteger) getSupportedOptions().get(CSW_CONNECTOR_PAGESIZE_OPTION_KEY);
-	option.setValue(20);
-	option.setAllowedValues(Arrays.asList(20));
-	return option;
-    }
-
-    @Override
-    public String getLabel() {
-
-	return "CSW UNESCO-IHP Connector";
     }
 }

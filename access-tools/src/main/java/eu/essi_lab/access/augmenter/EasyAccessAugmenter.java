@@ -4,7 +4,7 @@ package eu.essi_lab.access.augmenter;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,15 +25,45 @@ import eu.essi_lab.access.compliance.DataComplianceLevel;
 import eu.essi_lab.access.compliance.DataComplianceReport;
 import eu.essi_lab.access.compliance.DataComplianceTester;
 import eu.essi_lab.access.compliance.DataComplianceTester.DataComplianceTest;
+import eu.essi_lab.cfga.gs.setting.augmenter.AugmenterSetting;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.data.DataDescriptor;
+
+/**
+ * This access augmenter asks only for remote descriptor, then sets a valid execution report.
+ * 
+ * @author boldrini
+ */
 public class EasyAccessAugmenter extends AccessAugmenter {
 
+    /**
+     * 
+     */
     public EasyAccessAugmenter() {
-	setLabel("Easy access augmenter");
+
+    }
+
+    @Override
+    protected String initName() {
+
+	return "Easy access augmenter";
+    }
+
+    /**
+     * @param setting
+     */
+    public EasyAccessAugmenter(AugmenterSetting setting) {
+
+	super(setting);
+    }
+
+    @Override
+    public String getType() {
+
+	return "EasyAccessAugmenter";
     }
 
     @Override

@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wps;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -42,6 +42,7 @@ import eu.essi_lab.accessor.wps.executor.asynch.GWPSExecuteResultMapper;
 import eu.essi_lab.accessor.wps.executor.asynch.GWPS_GP_ExecuteFormatter;
 import eu.essi_lab.accessor.wps.status.GWPSStatusHandler;
 import eu.essi_lab.accessor.wps.status.GWPSStatusRequestFilter;
+import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.jaxb.csw._2_0_2.ExceptionCode;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.ValidationException;
@@ -51,7 +52,6 @@ import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.model.resource.data.DataObject;
 import eu.essi_lab.pdk.Profiler;
-import eu.essi_lab.pdk.ProfilerInfo;
 import eu.essi_lab.pdk.handler.AccessHandler;
 import eu.essi_lab.pdk.handler.BulkDownloadHandler;
 import eu.essi_lab.pdk.handler.DiscoveryHandler;
@@ -61,6 +61,12 @@ import eu.essi_lab.pdk.handler.selector.HandlerSelector;
 import eu.essi_lab.pdk.rsf.AccessResultSetFormatterAttachment;
 import eu.essi_lab.pdk.rsm.access.DefaultAccessResultSetMapper;
 import eu.essi_lab.pdk.wrt.ScheduleRequestTransformer;
+
+/**
+ * Profiler implementing WPS protocol as requested by legacy GEOSS Web Portal
+ * 
+ * @author boldrini
+ */
 public class GWPSProfiler extends Profiler {
 
     /**
@@ -68,7 +74,7 @@ public class GWPSProfiler extends Profiler {
      */
     private static final String GWPS_PROFILER_TYPE = "GWPS";
 
-    public static final ProfilerInfo GWPS_SERVICE_INFO = new ProfilerInfo();
+    public static final ProfilerSetting GWPS_SERVICE_INFO = new ProfilerSetting();
     static {
 	GWPS_SERVICE_INFO.setServiceName("GWPS Profiler");
 	GWPS_SERVICE_INFO.setServiceType(GWPS_PROFILER_TYPE);
@@ -214,7 +220,7 @@ public class GWPSProfiler extends Profiler {
     }
 
     @Override
-    public ProfilerInfo getProfilerInfo() {
+    protected ProfilerSetting initSetting() {
 
 	return GWPS_SERVICE_INFO;
     }

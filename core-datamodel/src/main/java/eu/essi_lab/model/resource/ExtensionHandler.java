@@ -4,7 +4,7 @@ package eu.essi_lab.model.resource;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,13 +30,24 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.w3c.dom.Node;
 
-import eu.essi_lab.jaxb.common.NameSpace;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.xml.NameSpace;
+
+/**
+ * Utility class to read/write extended metadata
+ * 
+ * @see ExtendedMetadata
+ * @author Fabrizio
+ */
 public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 
     private static final String MAG_LEVEL = "magLevel";
     private static final String ORIGINATOR_ORGANISATION_IDENTIFIER = "OriginatorOrganisationIdentifier";
     private static final String ORIGINATOR_ORGANISATION_DESCRIPTION = "OriginatorOrganisationDescription";
+    private static final String FEDEO_SECOND_LEVEL_TEMPLATE = "fedeoSecondLevel";
+    private static final String NC_FILE_CORRUPTED = "ncFileCorrupted";
+    private static final String AVAILABLE_GRANULES = "availableGranules";
+    private static final String THEME_CATEGORY = "themeCategory";
 
     private ExtendedMetadata metadata;
 
@@ -58,6 +69,99 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     ExtensionHandler(GSResource resource) {
 
 	this(resource.getHarmonizedMetadata());
+    }
+
+    /**
+     * @return
+     */
+    public Boolean isNCFileCorrupted() {
+
+	try {
+
+	    String textContent = this.metadata.getTextContent(NC_FILE_CORRUPTED);
+
+	    if (textContent == null) {
+
+		return false;
+	    }
+
+	    return textContent.equals("true") ? true : false;
+
+	} catch (XPathExpressionException e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return false;
+    }
+
+    /**
+     * @param info
+     */
+    public void setIsNCFileCorrupted() {
+	try {
+	    this.metadata.add(NC_FILE_CORRUPTED, "true");
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getFEDEOSecondLevelInfo() {
+
+	try {
+	    return Optional.ofNullable(this.metadata.getTextContent(FEDEO_SECOND_LEVEL_TEMPLATE));
+	} catch (XPathExpressionException e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @param info
+     */
+    public void setFEDEOSecondLevelInfo(String info) {
+	try {
+	    this.metadata.add(FEDEO_SECOND_LEVEL_TEMPLATE, info);
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getAvailableGranules() {
+
+	try {
+	    if (this.metadata.getTextContent(AVAILABLE_GRANULES) == null) {
+		return Optional.empty();
+	    }
+	    return Optional.of(this.metadata.getTextContent(AVAILABLE_GRANULES));
+	} catch (XPathExpressionException e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @param info
+     */
+    public void setAvailableGranules(String condition) {
+	try {
+	    this.metadata.add(AVAILABLE_GRANULES, condition);
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
     }
 
     /**
@@ -713,5 +817,47 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
     }
+
+    /**
+     * @param themeCategory
+     */
+    public void addThemeCategory(String themeCategory) {
+	try {
+	    this.metadata.add(THEME_CATEGORY, themeCategory);
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+	
+    }
+    
+    /**
+     * @return
+     */
+    public Optional<String> getThemeCategory() {
+	try {
+	    String str = this.metadata.getTextContent("TeamCategory");
+	    return Optional.ofNullable(str);
+	} catch (XPathExpressionException e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return Optional.empty();
+    }
+    
+    /**
+     * 
+     */
+    public void clearThemeCategory() {
+
+	try {
+	    this.metadata.remove("//" + NameSpace.GI_SUITE_DATA_MODEL_SCHEMA_PREFIX + ":" + THEME_CATEGORY);
+	} catch (XPathExpressionException e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
 
 }

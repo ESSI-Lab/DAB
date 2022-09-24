@@ -4,7 +4,7 @@ package eu.essi_lab.harvester.component;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,37 +21,18 @@ package eu.essi_lab.harvester.component;
  * #L%
  */
 
-import java.util.HashMap;
-import java.util.Map;
-
 import eu.essi_lab.harvester.HarvestingComponent;
 import eu.essi_lab.indexes.IndexedElementsWriter;
-import eu.essi_lab.model.configuration.option.GSConfOption;
-import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
+
+/**
+ * @author Fabrizio
+ */
 public class IndexedElementsWriterComponent extends HarvestingComponent {
-
-    private static final long serialVersionUID = 8243369711087334218L;
-
-    private Map<String, GSConfOption<?>> optionMap = new HashMap<>();
 
     @Override
     public void apply(GSResource resource) {
 
 	IndexedElementsWriter.write(resource);
     }
-
-    @Override
-    public Map<String, GSConfOption<?>> getSupportedOptions() {
-	return optionMap;
-    }
-
-    @Override
-    public void onOptionSet(GSConfOption<?> opt) throws GSException {
-    }
-
-    @Override
-    public void onFlush() throws GSException {
-    }
-
 }

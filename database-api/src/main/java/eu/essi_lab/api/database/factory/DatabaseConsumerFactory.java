@@ -4,7 +4,7 @@ package eu.essi_lab.api.database.factory;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,7 +21,6 @@ package eu.essi_lab.api.database.factory;
  * #L%
  */
 
-import java.io.Serializable;
 import java.util.ServiceLoader;
 
 import eu.essi_lab.api.database.Database;
@@ -29,15 +28,26 @@ import eu.essi_lab.api.database.DatabaseProvider;
 import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.DatabaseWriter;
 import eu.essi_lab.api.database.SourceStorage;
-import eu.essi_lab.api.database.configuration.DataBaseConfiguration;
-import eu.essi_lab.api.database.configuration.InstantiableMetadataDBStorageURI;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
-public class DatabaseConsumerFactory implements Serializable {
 
-    public DatabaseConsumerFactory() {
-	//Nothing to init
+/**
+ * @author Fabrizio
+ */
+public class DatabaseConsumerFactory {
+
+    private static final String DB_READER_CREATION_FAILED_DB_NULL_EXCEPTION = "DB_READER_CREATION_FAILED_DB_NULL_EXCEPTION";
+    private static final String DB_READER_CREATION_FAILED_PROVIDER_NOT_FOUND_EXCEPTION = "DB_READER_CREATION_FAILED_PROVIDER_NOT_FOUND";
+
+    private static final String DB_WRITER_CREATION_FAILED_DB_NULL_EXCEPTION = "DB_WRITER_CREATION_FAILED_DB_NULL_EXCEPTION";
+    private static final String DB_WRITER_CREATION_FAILED_PROVIDER_NOT_FOUND_EXCEPTION = "DB_WRITER_CREATION_FAILED_PROVIDER_NOT_FOUND";
+
+    private static final String SOURCE_STORAGE_CREATION_FAILED_DB_NULL_EXCEPTION = "SOURCE_STORAGE_CREATION_FAILED_DB_NULL_EXCEPTION";
+    private static final String SOURCE_STORAGE_CREATION_FAILED_PROVIDER_NOT_FOUND_EXCEPTION = "SOURCE_STORAGE_CREATION_FAILED_PROVIDER_NOT_FOUND";
+
+    private DatabaseConsumerFactory() {
     }
 
     /**
@@ -48,33 +58,55 @@ public class DatabaseConsumerFactory implements Serializable {
      * @return the suitable {@link DatabaseReader} or <code>null</code> if none is found
      * @throws GSException if dbUri is <code>null</code> or dbUri.getUri is <code>null</code>
      */
-    public DatabaseReader createDataBaseReader(StorageUri dbUri) throws GSException {
+    @SuppressWarnings("rawtypes")
+    public static DatabaseReader createDataBaseReader(StorageUri dbUri) throws GSException {
 
-	GSLoggerFactory.getLogger(DatabaseConsumerFactory.class).debug("Creating database reader for uri {}", dbUri.getUri());
+	synchronized (DatabaseProviderFactory.PROVIDER_LOCK) {
 
-	if (dbUri instanceof InstantiableMetadataDBStorageURI) {
-	    GSLoggerFactory.getLogger(DatabaseConsumerFactory.class).debug("StorageURI is instantiable");
-	    return createDataBaseReader((InstantiableMetadataDBStorageURI) dbUri);
-	}
+	    ServiceLoader<DatabaseReader> readers = ServiceLoader.load(DatabaseReader.class);
 
-	GSLoggerFactory.getLogger(DatabaseConsumerFactory.class).debug("StorageURI is not instantiable");
-	ServiceLoader<DatabaseReader> readers = ServiceLoader.load(DatabaseReader.class);
+	    for (DatabaseReader reader : readers) {
 
-	for (DatabaseReader reader : readers) {
+		if (reader.supports(dbUri)) {
 
-	    if (reader.supports(dbUri)) {
+		    DatabaseProvider provider = DatabaseProviderFactory.create(dbUri);
+		    Database dataBase = provider.getDatabase();
 
-		DatabaseProvider provider = new DatabaseProviderFactory().create(dbUri);
-		Database dataBase = provider.getDatabase();
+		    if (dataBase == null) {
 
-		if (dataBase != null) {
-		    reader.setDatabase(dataBase);
-		    return reader;
+			GSLoggerFactory.getLogger(DatabaseConsumerFactory.class)
+				.debug("Initialization of database reader for uri {} STARTED", dbUri.getUri());
+
+			provider.initialize(dbUri, dbUri.getConfigFolder());
+
+			dataBase = provider.getDatabase();
+
+			GSLoggerFactory.getLogger(DatabaseConsumerFactory.class).debug("Initialization of database reader for uri {} ENDED",
+				dbUri.getUri());
+
+		    }
+
+		    if (dataBase != null) {
+			reader.setDatabase(dataBase);
+			return reader;
+		    }
+
+		    throw GSException.createException(DatabaseConsumerFactory.class, //
+			    "Provider for DB reader found but DB instance is null", //
+			    null, //
+			    ErrorInfo.ERRORTYPE_INTERNAL, //
+			    ErrorInfo.SEVERITY_FATAL, //
+			    DB_READER_CREATION_FAILED_DB_NULL_EXCEPTION);
 		}
 	    }
-	}
 
-	return null;
+	    throw GSException.createException(DatabaseConsumerFactory.class, //
+		    "Suitable provider not found", //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_FATAL, //
+		    DB_READER_CREATION_FAILED_PROVIDER_NOT_FOUND_EXCEPTION);
+	}
     }
 
     /**
@@ -85,29 +117,56 @@ public class DatabaseConsumerFactory implements Serializable {
      * @return the suitable {@link DatabaseWriter} or <code>null</code> if none is found
      * @throws GSException if dbUri is <code>null</code> or dbUri.getUri is <code>null</code>
      */
-    public DatabaseWriter createDataBaseWriter(StorageUri dbUri) throws GSException {
+    @SuppressWarnings("rawtypes")
+    public static DatabaseWriter createDataBaseWriter(StorageUri dbUri) throws GSException {
 
-	if (dbUri instanceof InstantiableMetadataDBStorageURI) {
-	    return createDataBaseWriter((InstantiableMetadataDBStorageURI) dbUri);
-	}
+	synchronized (DatabaseProviderFactory.PROVIDER_LOCK) {
 
-	ServiceLoader<DatabaseWriter> writers = ServiceLoader.load(DatabaseWriter.class);
+	    ServiceLoader<DatabaseWriter> writers = ServiceLoader.load(DatabaseWriter.class);
 
-	for (DatabaseWriter writer : writers) {
+	    for (DatabaseWriter writer : writers) {
 
-	    if (writer.supports(dbUri)) {
+		if (writer.supports(dbUri)) {
 
-		DatabaseProvider provider = new DatabaseProviderFactory().create(dbUri);
-		Database dataBase = provider.getDatabase();
+		    DatabaseProvider provider = DatabaseProviderFactory.create(dbUri);
+		    Database dataBase = provider.getDatabase();
 
-		if (dataBase != null) {
-		    writer.setDatabase(dataBase);
-		    return writer;
+		    if (dataBase == null) {
+
+			GSLoggerFactory.getLogger(DatabaseConsumerFactory.class).debug("Initializing of database writer for uri {} STARTED",
+				dbUri.getUri());
+
+			provider.initialize(dbUri, dbUri.getConfigFolder());
+
+			dataBase = provider.getDatabase();
+
+			GSLoggerFactory.getLogger(DatabaseConsumerFactory.class).debug("Initializing of database writer for uri {} ENDED",
+				dbUri.getUri());
+
+		    }
+
+		    if (dataBase != null) {
+			writer.setDatabase(dataBase);
+			return writer;
+		    }
+
+		    throw GSException.createException(DatabaseConsumerFactory.class, //
+			    "Provider for DB reader found but DB instance is null", //
+			    null, //
+			    ErrorInfo.ERRORTYPE_INTERNAL, //
+			    ErrorInfo.SEVERITY_FATAL, //
+			    DB_WRITER_CREATION_FAILED_DB_NULL_EXCEPTION);
 		}
 	    }
-	}
 
-	return null;
+	    throw GSException.createException(DatabaseConsumerFactory.class, //
+		    "Suitable provider not found", //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_FATAL, //
+		    DB_WRITER_CREATION_FAILED_PROVIDER_NOT_FOUND_EXCEPTION);
+
+	}
     }
 
     /**
@@ -118,73 +177,55 @@ public class DatabaseConsumerFactory implements Serializable {
      * @return the suitable {@link SourceStorage} or <code>null</code> if none is found
      * @throws GSException if dbUri is <code>null</code> or dbUri.getUri is <code>null</code>
      */
-    public SourceStorage createSourceStorage(StorageUri dbUri) throws GSException {
+    @SuppressWarnings("rawtypes")
+    public static SourceStorage createSourceStorage(StorageUri dbUri) throws GSException {
 
-	if (dbUri instanceof InstantiableMetadataDBStorageURI) {
-	    return createSourceStorage((InstantiableMetadataDBStorageURI) dbUri);
-	}
+	synchronized (DatabaseProviderFactory.PROVIDER_LOCK) {
 
-	ServiceLoader<SourceStorage> storages = ServiceLoader.load(SourceStorage.class);
+	    ServiceLoader<SourceStorage> storages = ServiceLoader.load(SourceStorage.class);
 
-	for (SourceStorage storage : storages) {
+	    for (SourceStorage storage : storages) {
 
-	    if (storage.supports(dbUri)) {
+		if (storage.supports(dbUri)) {
 
-		DatabaseProvider provider = new DatabaseProviderFactory().create(dbUri);
-		Database dataBase = provider.getDatabase();
+		    DatabaseProvider provider = DatabaseProviderFactory.create(dbUri);
+		    Database dataBase = provider.getDatabase();
 
-		if (dataBase != null) {
-		    storage.setDatabase(dataBase);
-		    return storage;
+		    if (dataBase == null) {
+
+			GSLoggerFactory.getLogger(DatabaseConsumerFactory.class).debug("Initializing of source storage for uri {} STARTED",
+				dbUri.getUri());
+
+			provider.initialize(dbUri, dbUri.getConfigFolder());
+
+			dataBase = provider.getDatabase();
+
+			GSLoggerFactory.getLogger(DatabaseConsumerFactory.class).debug("Initializing of source storage for uri {} ENDED",
+				dbUri.getUri());
+
+		    }
+
+		    if (dataBase != null) {
+			storage.setDatabase(dataBase);
+			return storage;
+		    }
+
+		    throw GSException.createException(DatabaseConsumerFactory.class, //
+			    "Provider for DB reader found but DB instance is null", //
+			    null, //
+			    ErrorInfo.ERRORTYPE_INTERNAL, //
+			    ErrorInfo.SEVERITY_FATAL, //
+			    SOURCE_STORAGE_CREATION_FAILED_DB_NULL_EXCEPTION);
+
 		}
 	    }
+
+	    throw GSException.createException(DatabaseConsumerFactory.class, //
+		    "Suitable provider not found", //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_FATAL, //
+		    SOURCE_STORAGE_CREATION_FAILED_PROVIDER_NOT_FOUND_EXCEPTION);
 	}
-
-	return null;
-    }
-
-    /**
-     * Loads a preconfigured {@link DatabaseReader}s using an {@link InstantiableMetadataDBStorageURI} object. This method must
-     * be invoked at query time
-     *
-     * @param dbUri
-     * @return
-     * @throws GSException
-     */
-    public DatabaseReader createDataBaseReader(InstantiableMetadataDBStorageURI dbUri) throws GSException {
-
-	DataBaseConfiguration dbConf = (DataBaseConfiguration) dbUri.getDataBaseConfiguraiton();
-
-	return dbConf.getReader();
-    }
-
-    /**
-     * Loads a preconfigured {@link DatabaseWriter}s using an {@link InstantiableMetadataDBStorageURI} object. This method must
-     * be invoked at query time
-     *
-     * @param dbUri
-     * @return
-     * @throws GSException
-     */
-    public DatabaseWriter createDataBaseWriter(InstantiableMetadataDBStorageURI dbUri) throws GSException {
-
-	DataBaseConfiguration dbConf = (DataBaseConfiguration) dbUri.getDataBaseConfiguraiton();
-
-	return dbConf.getWriter();
-    }
-
-    /**
-     * Loads a preconfigured {@link SourceStorage}s using an {@link InstantiableMetadataDBStorageURI} object. This method must
-     * be invoked at query time
-     *
-     * @param dbUri
-     * @return
-     * @throws GSException
-     */
-    private SourceStorage createSourceStorage(InstantiableMetadataDBStorageURI dbUri) throws GSException {
-
-	DataBaseConfiguration dbConf = (DataBaseConfiguration) dbUri.getDataBaseConfiguraiton();
-
-	return dbConf.getSourceStorage();
     }
 }

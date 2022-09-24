@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -22,18 +21,6 @@
 		<dependency>
 			<groupId>com.marklogic</groupId>
 			<artifactId>marklogic-client-api</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>com.burgstaller</groupId>
-					<artifactId>okhttp-digest</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		
-		<dependency>
-		  <groupId>io.github.rburgst</groupId>
-		  <artifactId>okhttp-digest</artifactId>
-		  <version>1.21</version>
 		</dependency>
 
 		<dependency>
@@ -47,14 +34,13 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>core-datamodel</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
 	</dependencies>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>license-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
+
 
 </project>

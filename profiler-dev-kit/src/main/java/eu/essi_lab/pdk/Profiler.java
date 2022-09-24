@@ -4,7 +4,7 @@ package eu.essi_lab.pdk;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -32,12 +32,13 @@ import java.util.concurrent.TimeUnit;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import eu.essi_lab.configuration.ConfigurationUtils;
+import eu.essi_lab.cfga.Configurable;
+import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.lib.servlet.RequestManager;
 import eu.essi_lab.lib.utils.Chronometer.TimeFormat;
 import eu.essi_lab.lib.utils.ExpiringCache;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.GSLoggerFactory.GSLogger;
+import eu.essi_lab.lib.utils.HostNamePropertyUtils;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.PerformanceLogger;
@@ -68,24 +69,213 @@ import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
 import eu.essi_lab.rip.RuntimeInfoProvider;
 import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
-public abstract class Profiler implements WebRequestHandler, Pluggable, RuntimeInfoProvider {
 
-    @Override
-    public String getBaseType() {
-	return "profiler";
-    }
+/**
+ * A <code>Profiler</code> implements the business logic of a "GI-suite web service" (from here referred as "profiler
+ * service"), that is a
+ * web service that publishes a "discovery/access interface" and optionally (and preferably) a "service information
+ * interface"
+ * <h3>Discovery interface</h3> The "discovery interface" is in charge to
+ * provide a set of parameters that can be used by supported clients to build a "discovery query".<br>
+ * A discovery query is a query which
+ * uses the constraints provided by the interface parameters in order to retrieve a filtered set of compliant "metadata
+ * records".<br>
+ * <br>
+ * This is a very simple example of discovery query from the <a href="http://www.opensearch.org/Home">OpenSearch</a>
+ * specification:
+ * <code>"http://example.com/search?q=temperature"</code>. The semantic of the "q" parameter is specified by the
+ * discovery interface specification, in this case provided by <a href="http://www.opensearch.org/Home">OpenSearch</a>.
+ * This query discovers
+ * all the metadata records with a textual content matching the keyword "temperature".<br>
+ * <br>
+ * The GI-suite provides a set of components which are in charge to "harmonize" the conceptual model of the profiler
+ * service interface to
+ * the internal conceptual model. From the <code>Profiler</code> point of view, this process consists of three
+ * steps:<br>
+ * <br>
+ * <ol>
+ * <li><b><span style="background-color: lightgreen">request handling</span></b>: the service discovery request is
+ * harmonized in to the internal request</li>
+ * <li><b><span style="background-color: yellow">execution</span></b>: the harmonized internal request is executed by
+ * creating an harmonized result set of suitable metadata records</li>
+ * <li><b><span style="background-color: orange">response handling</span></b>: the harmonized metadata records are then
+ * presented to the client according to the profiler service interface</li>
+ * </ol>
+ * The following table summarizes how the above concepts are mapped to the internal model and the suite components that
+ * are in charge to
+ * implement the above process:<br>
+ * <br>
+ * <html>
+ * <head>
+ * <style>
+ * table { font-family: arial, sans-serif; border-collapse: collapse; width: 100%; } td, th { border: 1px solid #dddddd;
+ * text-align: left;
+ * padding: 8px; }
+ * </style>
+ * </head>
+ * <body>
+ * <table>
+ * <tr>
+ * <td style="background-color: lightgreen">Service discovery request</td>
+ * <td>represented by {@link DiscoveryMessage}</td>
+ * <td>created by {@link DiscoveryRequestTransformer}</td>
+ * </tr>
+ * <tr>
+ * <td style="background-color: lightgreen">Service discovery constraints</td>
+ * <td>represented by {@link Bond}s</td>
+ * <td>provided as property of the {@link DiscoveryMessage}</td>
+ * </tr>
+ * <tr>
+ * <td style="background-color: yellow">Harmonized discovery response</td>
+ * <td>represented by {@link ResultSet} of {@link GSResource}s</td>
+ * <td>provided by internal implementation of {@link IDiscoveryExecutor}</td>
+ * </tr>
+ * <tr>
+ * <td style="background-color: orange">Service metadata records</td>
+ * <td>represented by {@link ResultSet} of <code>String</code>s</td>
+ * <td>created by {@link DiscoveryResultSetMapper}</td>
+ * </tr>
+ * <tr>
+ * <td style="background-color: orange">Service response</td>
+ * <td>represented as {@link Response} entity</td>
+ * <td>created by {@link MessageResponseFormatter}</td>
+ * </tr>
+ * </table>
+ * </body>
+ * </html> <br>
+ * All the steps of the discovery process are handled as a workflow by the {@link DiscoveryHandler}, selected by the
+ * provided {@link
+ * #getSelector()}.<br>
+ * <br>
+ * According to the supplied {@link WebRequestFilter} the {@link DiscoveryHandler} can handles several kind of discovery
+ * queries. This
+ * happens if the supplied {@link WebRequestFilter} accepts more than one {@link WebRequest}s.
+ * <br>
+ * <br>
+ * The components which define the {@link DiscoveryHandler} workflow, can be set once and for all, or on the fly
+ * depending on the current
+ * {@link WebRequest}; see {@link #onRequestValidated(WebRequest, WebRequestValidator, boolean)} method<br>
+ * <h3>Service information interface</h3> The "service information interface" is in charge to provide a
+ * description of the service and its discovery interface that can be used by supported clients to choose if and how to
+ * build a proper
+ * discovery query.<br>
+ * This interface is typically provided by services as a set of one or more descriptive documents like the
+ * "capabilities" document of the "OGC CSW". Another example is the
+ * <a href="http://www.opensearch.org/Specifications/OpenSearch/1.1#OpenSearch_description_document">description
+ * document</a> of a <a href="http://www.opensearch.org/Home">OpenSearch</a> compliant service.<br>
+ * <br>
+ * The requests of this interface are handled by {@link DefaultRequestHandler}s that can be registered using the {@link
+ * #getServiceInfoHandlers()} method. As for the {@link DiscoveryHandler}, according to the supplied
+ * {@link WebRequestFilter} the same
+ * {@link DefaultRequestHandler} can handles several kind of requests or just one. Registering of
+ * {@link DefaultRequestHandler}s is not
+ * mandatory, but it is <b>strongly recommended</b>
+ * <h3>Implementation notes</h3> As for all the {@link Pluggable}, in order to be
+ * loaded the <code>Profiler</code> implementation <b>MUST</b> be registered with the {@link ServiceLoader} API. New
+ * instances of profilers
+ * are loaded at query time by the "GI-suite service" according to the current request path (see
+ * {@link ProfilerSetting#getPath()})
+ * <h3>Implementation guide lines</h3>
+ * Implementing a new <code>Profiler</code> mainly consists in configuring one or more {@link DiscoveryHandler}s with
+ * its {@link Pluggable}
+ * components. The following table shows all the {@link Pluggable} components involved in the development of a new
+ * <code>Profiler</code>
+ * along with a short description and the component which triggers it<br>
+ * <br>
+ * <html>
+ * <head>
+ * <style>
+ * table { font-family: arial, sans-serif; border-collapse: collapse; width: 100%; } td, th { border: 1px solid #dddddd;
+ * text-align: left;
+ * padding: 8px; }
+ * </style>
+ * </head>
+ * <body>
+ * <table>
+ * <tr>
+ * <td style="background-color: #ffbf00"><b>{@link Pluggable} component</b></td>
+ * <td style="background-color: #ffbf00"><b>Main responsibility</b></td>
+ * <td style="background-color: #ffbf00"><b>Triggering component</b></td>
+ * </tr>
+ * <tr>
+ * <td><code>Profiler</code></td>
+ * <td>Dispatches the registered {@link WebRequestHandler} to handle the current {@link WebRequest}</td>
+ * <td>GI-suite service</td>
+ * </tr>
+ * <tr>
+ * <td>{@link DefaultRequestHandler}</td>
+ * <td>Provides information about the profiler service and its discovery interface</td>
+ * <td><code>Profiler</code></td>
+ * </tr>
+ * <tr>
+ * <td>{@link DiscoveryHandler}</td>
+ * <td>Handles a discovery query by executing a workflow which involves three {@link Pluggable} components</td>
+ * <td><code>Profiler</code></td>
+ * </tr>
+ * <tr>
+ * <td>{@link DiscoveryRequestTransformer}</td>
+ * <td>It contributes to the execution of the workflow by transforming a {@link WebRequest} in to a
+ * {@link DiscoveryMessage} according to the specification of the profiler service interface</td>
+ * <td>{@link DiscoveryHandler}</td>
+ * </tr>
+ * <tr>
+ * <td>{@link DiscoveryResultSetMapper}</td>
+ * <td>It contributes to the execution of the workflow by mapping a <code>ResultSet&lt;GSResource&gt;</code> in to a
+ * <code>ResultSet&lt;String&gt;</code> according to a {@link MappingSchema}</td>
+ * <td>{@link DiscoveryHandler}</td>
+ * </tr>
+ * <tr>
+ * <td>{@link MessageResponseFormatter}</td>
+ * <td>It contributes to the execution of the workflow by formatting the <code>ResultSet&lt;String&gt;</code> in a
+ * {@link Response} entity suitable for the client which triggered the discovery query, according to a
+ * {@link FormattingEncoding}</td>
+ * <td>{@link DiscoveryHandler}</td>
+ * </tr>
+ * </table>
+ * </body>
+ * </html> <br>
+ *
+ * @author Fabrizio
+ */
+public abstract class Profiler implements Configurable<ProfilerSetting>, WebRequestHandler, Pluggable, RuntimeInfoProvider {
 
     private static final String NO_VALIDATOR_FOUND = "NO_VALIDATOR_FOUND";
 
-    private static final int MAX_SIMULTANEOUS_REQUESTS_PER_IP = 2;
+    private ProfilerSetting setting;
 
-    private transient GSLogger logger = GSLoggerFactory.getLogger(Profiler.class);
+    //
+    //
+    //
 
-    private static boolean everythingIsBlocked = false;
+    private static final int MAX_SIMULTANEOUS_REQUESTS_PER_IP = 1;
 
+    public static final RequestBouncer bouncer = new RequestBouncer(MAX_SIMULTANEOUS_REQUESTS_PER_IP);
+
+    private static final String REQUEST_BOUNCER_INTERRUPTED_ERROR = "REQUEST_BOUNCER_INTERRUPTED_ERROR";
+
+    private static final String REQUEST_BOUNCER_EVERYTHING_BLOCKED_ERROR = "REQUEST_BOUNCER_EVERYTHING_BLOCKED_ERROR";
+
+    private static boolean everythingIsBlocked;
+    private static Integer concurrentRequests;
+    private static Integer executingRequests;
+
+    private static ExpiringCache<String> successRequests;
+    static {
+	successRequests = new ExpiringCache<String>();
+	successRequests.setDuration(1200000);
+    }
+
+    /**
+     * @return
+     */
     public static boolean everythingIsBlocked() {
+
 	return everythingIsBlocked;
     }
+
+    //
+    //
+    //
 
     /**
      * The type of the handled request
@@ -113,9 +303,14 @@ public abstract class Profiler implements WebRequestHandler, Pluggable, RuntimeI
     }
 
     /**
-     * Creates a new instance of <code>DiscoveryProfiler</code>
+     * Creates a new instance of <code>Profiler</code>
      */
     public Profiler() {
+
+	concurrentRequests = 0;
+	executingRequests = 0;
+
+	configure(initSetting());
     }
 
     /**
@@ -127,35 +322,33 @@ public abstract class Profiler implements WebRequestHandler, Pluggable, RuntimeI
     public abstract HandlerSelector getSelector(WebRequest request);
 
     /**
-     * Returns a {@link ProfilerInfo} for this <code>Profiler</code>
+     * Returns a {@link ProfilerSetting} for this <code>Profiler</code>
      *
-     * @return a non <code>null</code> {@link ProfilerInfo}
+     * @return a non <code>null</code> {@link ProfilerSetting}
      */
-    public abstract ProfilerInfo getProfilerInfo();
+    protected abstract ProfilerSetting initSetting();
 
     /**
-     * Returns a {@link ProfilerConfigurable} which provide the options supported by this
-     * <code>Profiler</code>. This default instance provides information from the {@link #getProfilerInfo()}
-     * and allow the profiler to be enabled/disabled
-     *
-     * @return a non <code>null</code> {@link ProfilerConfigurable}
+     * @param setting
      */
-    public ProfilerConfigurable getConfigurable() {
+    public void configure(ProfilerSetting setting) {
 
-	return new ProfilerConfigurable(this);
+	this.setting = setting;
     }
 
-    public static final RequestBouncer bouncer = new RequestBouncer(MAX_SIMULTANEOUS_REQUESTS_PER_IP);
+    /**
+     * @return
+     */
+    public ProfilerSetting getSetting() {
 
-    private static ExpiringCache<String> successRequests;
-    static {
-	successRequests = new ExpiringCache<String>();
-	successRequests.setDuration(1200000);
+	return setting;
     }
 
-    private static Integer concurrentRequests = 0;
+    @Override
+    public String getType() {
 
-    private static Integer executingRequests = 0;
+	return getSetting().getServiceType();
+    }
 
     /**
      * Selects a {@link WebRequestHandler} with the {@link HandlerSelector} and delegates the handling of the
@@ -172,7 +365,7 @@ public abstract class Profiler implements WebRequestHandler, Pluggable, RuntimeI
     @Override
     public final Response handle(WebRequest request) throws GSException {
 
-	logger.traceFreeMemory(getRequestLogPrefix(request) + " FHSM STARTED: ");
+	GSLoggerFactory.getLogger(getClass()).traceFreeMemory(getRequestLogPrefix(request) + " FHSM STARTED: ");
 
 	String address = request.getRemoteAddress();
 
@@ -182,50 +375,61 @@ public abstract class Profiler implements WebRequestHandler, Pluggable, RuntimeI
 
 	synchronized (concurrentRequests) {
 	    concurrentRequests++;
-	    logger.info("{} QUEUED Remote address: {} {} concurrent requests, {} executing", getRequestLogPrefix(request), address,
-		    concurrentRequests, executingRequests);
+	    GSLoggerFactory.getLogger(getClass()).info("{} QUEUED Remote address: {} {} concurrent requests, {} executing",
+		    getRequestLogPrefix(request), address, concurrentRequests, executingRequests);
 	}
 
 	boolean ret;
 	try {
 	    ret = bouncer.askForExecutionAndWait(address, rid, 10, TimeUnit.MINUTES);
 	} catch (InterruptedException e1) {
-	    logger.info("{} INTERRUPTED Remote address: {}", getRequestLogPrefix(request), address);
-	    GSException gse = new GSException();
-	    ErrorInfo info = new ErrorInfo();
-	    info.setUserErrorDescription("Interrupted while waiting for other pending requests to complete from address: " + address);
-	    gse.addInfo(info);
-	    throw gse;
+
+	    GSLoggerFactory.getLogger(getClass()).info("{} INTERRUPTED Remote address: {}", getRequestLogPrefix(request), address);
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    e1.getMessage(), //
+		    "Interrupted while waiting for other pending requests to complete from address: " + address, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    REQUEST_BOUNCER_INTERRUPTED_ERROR);
 	}
 
 	if (!ret) {
 	    // if after 10 minutes waiting no free slot is made available (e.g. other two requests from this IP are
 	    // being executed)
-	    logger.info("{} BLOCKED Remote address: {} {} concurrent requests, {} executing", getRequestLogPrefix(request), address,
-		    concurrentRequests, executingRequests);
-	    GSException gse = new GSException();
-	    ErrorInfo info = new ErrorInfo();
-	    info.setUserErrorDescription(
-		    "Waiting for other pending requests to complete before accepting new requests on this node from address: " + address);
-	    gse.addInfo(info);
+	    GSLoggerFactory.getLogger(getClass()).info("{} BLOCKED Remote address: {} {} concurrent requests, {} executing",
+		    getRequestLogPrefix(request), address, concurrentRequests, executingRequests);
 
 	    if (successRequests.size() == 0) {
 		everythingIsBlocked = true;
 	    }
 
-	    throw gse;
+	    throw GSException.createException(//
+		    getClass(), //
+		    "Waiting for other pending requests to complete before accepting new requests on this node from address: " + address, //
+		    "Waiting for other pending requests to complete before accepting new requests on this node from address: " + address, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    REQUEST_BOUNCER_EVERYTHING_BLOCKED_ERROR);
 	}
 
 	ElasticsearchInfoPublisher publisher = null;
+
+	Response response = null;
+
+	ChronometerInfoProvider chronometer = new ChronometerInfoProvider(TimeFormat.MIN_SEC_MLS);
+	chronometer.start();
+
+	ValidationMessage validationMessage = null;
+
 	try {
 
 	    synchronized (executingRequests) {
 		executingRequests++;
-		logger.info("{} STARTED Remote address: {} {} concurrent requests, {} executing", getRequestLogPrefix(request), address,
-			concurrentRequests, executingRequests);
+		GSLoggerFactory.getLogger(getClass()).info("{} STARTED Remote address: {} {} concurrent requests, {} executing",
+			getRequestLogPrefix(request), address, concurrentRequests, executingRequests);
 	    }
-	    ChronometerInfoProvider chronometer = new ChronometerInfoProvider(TimeFormat.MIN_SEC_MLS);
-	    chronometer.start();
 
 	    PerformanceLogger pl = new PerformanceLogger(PerformanceLogger.PerformancePhase.REQUEST_HANDLING, rid,
 		    Optional.ofNullable(request));
@@ -236,22 +440,11 @@ public abstract class Profiler implements WebRequestHandler, Pluggable, RuntimeI
 
 	    logRequest(request);
 
-	    try {
-		publisher = new ElasticsearchInfoPublisher(//
-			ConfigurationUtils.getGIStatsEndpoint(), //
-			ConfigurationUtils.getGIStatsDbname(), //
-			ConfigurationUtils.getGIStatsUser(), //
-			ConfigurationUtils.getGIStatsPassword(), //
-			rid, //
-			request.getRequestContext());
-	    } catch (Exception e) {
-		GSLoggerFactory.getLogger(getClass()).error("Error initializing ElasticSearch: {}", e.getMessage());
-	    }
-	    //
-	    // publishes request and profiler info
-	    //
-	    if (publisher != null)
+	    publisher = createPublisher(rid, request);
+
+	    if (publisher != null) {
 		publisher.publish(request);
+	    }
 
 	    HandlerSelector selector = getSelector(request);
 	    Optional<WebRequestHandler> optHandler = selector.select(request);
@@ -292,62 +485,67 @@ public abstract class Profiler implements WebRequestHandler, Pluggable, RuntimeI
 		    validator = (WebRequestValidator) handler;
 		    type = RequestType.OTHER;
 		} else {
-		    throw GSException.createException(getClass(), "Can't find validator", null, ErrorInfo.ERRORTYPE_INTERNAL,
-			    ErrorInfo.SEVERITY_ERROR, NO_VALIDATOR_FOUND);
+		    throw GSException.createException(//
+			    getClass(), //
+			    "Can't find validator", //
+			    ErrorInfo.ERRORTYPE_INTERNAL, //
+			    ErrorInfo.SEVERITY_ERROR, //
+			    NO_VALIDATOR_FOUND);
 		}
 
 		String validatorInfo = "[using validator: " + validator.getClass().getSimpleName() + "]";
-		ValidationMessage message = validator.validate(request);
+		validationMessage = validator.validate(request);
 
 		// get the validation result
-		ValidationResult result = message.getResult();
+		ValidationResult result = validationMessage.getResult();
 
 		// in case of validation failed, throws a GSException with
 		// the validation error message
 		if (result == ValidationResult.VALIDATION_FAILED) {
 
-		    logger.warn("{} Validation FAILED {}", getRequestLogPrefix(request), validatorInfo);
-		    return onValidationFailed(request, message);
+		    GSLoggerFactory.getLogger(getClass()).warn("{} Validation FAILED {}", getRequestLogPrefix(request), validatorInfo);
+		    return onValidationFailed(request, validationMessage);
 		}
 
-		logger.info("{} Validation SUCCESSFUL {}", getRequestLogPrefix(request), validatorInfo);
+		GSLoggerFactory.getLogger(getClass()).info("{} Validation SUCCESSFUL {}", getRequestLogPrefix(request), validatorInfo);
 		onRequestValidated(request, validator, type);
 
-		Response response = handler.handle(request);
+		response = handler.handle(request);
 
 		onHandlingEnded(response);
 
-		pl.logPerformance(logger);
-
-		logger.info("{} ENDED - handling time: {}", getRequestLogPrefix(request), chronometer.formatElapsedTime());
+		pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
 
 		successRequests.put(rid, rid);
-
-		//
-		// publishes the elapsed time in milliseconds
-		//
-		if (publisher != null)
-		    publisher.publish(chronometer);
-
-		//
-		// publishes response info
-		//
-		if (publisher != null)
-		    publisher.publish(new ResponseInfoProvider(response));
-
-		logger.traceFreeMemory(getRequestLogPrefix(request) + " FHSM ENDED: ");
 
 		return response;
 	    }
 
 	} catch (Throwable e) {
-	    logger.info("EXCEPTION {}", e.getMessage());
+	    GSLoggerFactory.getLogger(getClass()).error("EXCEPTION {}", e.getMessage());
 
 	    throw e;
 
 	} finally {
 
+	    GSLoggerFactory.getLogger(getClass()).traceFreeMemory(getRequestLogPrefix(request) + " FHSM ENDED: ");
+
+	    GSLoggerFactory.getLogger(getClass()).info("{} ENDED - handling time: {}", getRequestLogPrefix(request),
+		    chronometer.formatElapsedTime());
+
 	    if (publisher != null) {
+
+		publisher.publish(chronometer);
+
+		if (validationMessage != null) {
+		    publisher.publish(validationMessage);
+		}
+
+		if (response != null) {
+		    publisher.publish(new ResponseInfoProvider(response));
+		}
+		publisher.publish(this);
+
 		publisher.write();
 	    }
 
@@ -364,8 +562,28 @@ public abstract class Profiler implements WebRequestHandler, Pluggable, RuntimeI
 	    bouncer.notifyExecutionEnded(address, rid);
 	}
 
-	logger.warn("{} handler not found!", getRequestLogPrefix(request));
+	GSLoggerFactory.getLogger(getClass()).warn("{} handler not found!", getRequestLogPrefix(request));
 	return onHandlerNotFound(request);
+    }
+
+    /**
+     * @param rid
+     * @param request
+     * @return
+     */
+    private ElasticsearchInfoPublisher createPublisher(String rid, WebRequest request) {
+
+	try {
+
+	    return new ElasticsearchInfoPublisher(//
+		    rid, //
+		    request.getRequestContext());
+
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error("Error initializing ElasticSearch: {}", e.getMessage());
+	}
+
+	return null;
     }
 
     private String getRequestLogPrefix(WebRequest request) {
@@ -377,8 +595,9 @@ public abstract class Profiler implements WebRequestHandler, Pluggable, RuntimeI
 
 	HashMap<String, List<String>> map = new HashMap<>();
 	map.put(RuntimeInfoElement.PROFILER_NAME.getName(), Arrays.asList(getName()));
-	map.put(RuntimeInfoElement.PROFILER_TYPE.getName(), Arrays.asList(getProfilerInfo().getServiceType()));
+	map.put(RuntimeInfoElement.PROFILER_TYPE.getName(), Arrays.asList(initSetting().getServiceType()));
 	map.put(RuntimeInfoElement.PROFILER_TIME_STAMP_MILLIS.getName(), Arrays.asList(String.valueOf(System.currentTimeMillis())));
+	map.put(RuntimeInfoElement.HOST_NAME.getName(), Arrays.asList(HostNamePropertyUtils.getHostNameProperty()));
 
 	return map;
     }
@@ -402,6 +621,11 @@ public abstract class Profiler implements WebRequestHandler, Pluggable, RuntimeI
      * @return a non <code>null</code> {@link Response}
      */
     public abstract Response createUncaughtError(WebRequest request, Status status, String message);
+
+    @Override
+    public String getBaseType() {
+	return "profiler";
+    }
 
     /**
      * This method is called in case the {@link WebRequestHandler} validation failed.<br>

@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof.access;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -44,7 +44,7 @@ import eu.essi_lab.accessor.wof.TimeFormatConverter;
 import eu.essi_lab.accessor.wof.WOFQueryUtils;
 import eu.essi_lab.accessor.wof.WOFRequest;
 import eu.essi_lab.accessor.wof.WOFRequest.Parameter;
-import eu.essi_lab.configuration.ConfigurationUtils;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.AccessMessage;
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -61,7 +61,6 @@ import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.SharedRepositoryInfo;
 import eu.essi_lab.model.StorageUri;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
@@ -75,6 +74,10 @@ import eu.essi_lab.pdk.rsm.access.AccessQueryUtils;
 import eu.essi_lab.pdk.rsm.access.DefaultAccessResultSetMapper;
 import eu.essi_lab.pdk.wrt.AccessRequestTransformer;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
+
+/**
+ * @author boldrini
+ */
 public class GetValuesTransformer extends AccessRequestTransformer {
 
     @Override
@@ -136,7 +139,7 @@ public class GetValuesTransformer extends AccessRequestTransformer {
 
 	    if (siteResource == null) {
 		ValidationException exception = new ValidationException();
-		exception.setMessage("Object reference not set to an instance of an object.");
+		exception.setMessage("Site not found: " + uniqueSiteCode);
 		exception.setCode(HydroServerProfiler.ERROR_SITE_NOT_FOUND);
 		exception.setLocator(uniqueSiteCode);
 		ValidationMessage ret = new ValidationMessage();
@@ -236,7 +239,7 @@ public class GetValuesTransformer extends AccessRequestTransformer {
 
 	message.setQueryRegistrationEnabled(false);
 
-	message.setSources(ConfigurationUtils.getAllSources());
+	message.setSources(ConfigurationWrapper.getAllSources());
 
 	Page page = new Page(1, 1);
 	message.setPage(page);
@@ -244,9 +247,8 @@ public class GetValuesTransformer extends AccessRequestTransformer {
 	message.getResourceSelector().setIndexesPolicy(IndexesPolicy.NONE);
 	message.getResourceSelector().setSubset(ResourceSubset.FULL);
 	message.getResourceSelector().setIncludeOriginal(false);
-	message.setSources(ConfigurationUtils.getBrokeredSources());
-	message.setDataBaseURI(ConfigurationUtils.getStorageURI());
-	message.setSharedRepositoryInfo(ConfigurationUtils.getSharedRepositoryInfo());
+	message.setSources(ConfigurationWrapper.getHarvestedSources());
+	message.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
 
 	GSLoggerFactory.getLogger(getClass()).info("Resource discovery STARTED");
 
@@ -321,11 +323,9 @@ public class GetValuesTransformer extends AccessRequestTransformer {
 
     private DataDescriptor getDefaultDescriptor(String requestId, String onlineIdentifier) throws GSException {
 
-	List<GSSource> sources = ConfigurationUtils.getBrokeredSources();
-	SharedRepositoryInfo sharedRepository = ConfigurationUtils.getSharedRepositoryInfo();
-	StorageUri databaseURI = ConfigurationUtils.getStorageURI();
-	ResultSet<GSResource> resultSet = AccessQueryUtils.findResource(requestId, sources, sharedRepository, onlineIdentifier,
-		databaseURI);
+	List<GSSource> sources = ConfigurationWrapper.getHarvestedSources();
+	StorageUri databaseURI = ConfigurationWrapper.getDatabaseURI();
+	ResultSet<GSResource> resultSet = AccessQueryUtils.findResource(requestId, sources, onlineIdentifier, databaseURI);
 
 	if (resultSet.getResultsList().isEmpty()) {
 	    // TODO: error!

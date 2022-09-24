@@ -4,7 +4,7 @@ package eu.essi_lab.cdk;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,15 +21,31 @@ package eu.essi_lab.cdk;
  * #L%
  */
 
-import eu.essi_lab.model.Source;
-import eu.essi_lab.model.configuration.IGSConfigurable;
+import eu.essi_lab.cfga.Configurable;
+import eu.essi_lab.cfga.gs.setting.connector.ConnectorSetting;
+import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.pluggable.Pluggable;
 
-public interface IDriverConnector extends IGSConfigurable, Pluggable {
+/**
+ * Generic Connector Interface.
+ *
+ * @author roncella
+ */
+public interface IDriverConnector<T extends ConnectorSetting> extends Configurable<T>, Pluggable {
 
-    public boolean supports(Source source);
+    /**
+     * @param source
+     * @return
+     */
+    public boolean supports(GSSource source);
 
+    /**
+     * @param url
+     */
+    public void setSourceURL(String url);
+
+    /**
+     * @return
+     */
     public String getSourceURL();
-
-    public void setSourceURL(String sourceURL);
 }

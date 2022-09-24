@@ -4,7 +4,7 @@ package eu.essi_lab.request.executor.access;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -41,7 +41,6 @@ import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.count.CountSet;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.SharedRepositoryInfo;
 import eu.essi_lab.model.StorageUri;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -54,13 +53,17 @@ import eu.essi_lab.model.resource.data.DataObject;
 import eu.essi_lab.model.resource.data.DataType;
 import eu.essi_lab.model.resource.data.dimension.ContinueDimension;
 import eu.essi_lab.model.resource.data.dimension.ContinueDimension.LimitType;
-import eu.essi_lab.pdk.rsm.access.AccessQueryUtils;
 import eu.essi_lab.model.resource.data.dimension.DataDimension;
+import eu.essi_lab.pdk.rsm.access.AccessQueryUtils;
 import eu.essi_lab.request.executor.AbstractAuthorizedExecutor;
 import eu.essi_lab.request.executor.IAccessExecutor;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
 import eu.essi_lab.workflow.builder.Workflow;
 import eu.essi_lab.workflow.builder.WorkflowBuilder;
+
+/**
+ * @author Fabrizio
+ */
 public class AccessExecutor extends AbstractAuthorizedExecutor implements IAccessExecutor {
 
     private static final String ACCESS_EXECUTOR_UNKNOWN_ONLINE_ID = "ACCESS_EXECUTOR_UNKNOWN_ONLINE_ID";
@@ -76,18 +79,18 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 
 	String onlineId = message.getOnlineId();
 
-	GSLoggerFactory.getLogger(getClass()).info("Counting online with id " + onlineId + " STARTED");
+	// GSLoggerFactory.getLogger(getClass()).info("Counting online with id " + onlineId + " STARTED");
 
 	ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
 	IDiscoveryExecutor executor = loader.iterator().next();
 
 	DiscoveryMessage discoveryMessage = new DiscoveryMessage(message);
 
-	GSLoggerFactory.getLogger(getClass()).info("Counting STARTED");
+	// GSLoggerFactory.getLogger(getClass()).info("Counting STARTED");
 
 	CountSet count = executor.count(discoveryMessage);
 
-	GSLoggerFactory.getLogger(getClass()).info("Counting ENDED");
+	// GSLoggerFactory.getLogger(getClass()).info("Counting ENDED");
 
 	return count;
     }
@@ -102,20 +105,18 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 
 	String onlineId = accessMessage.getOnlineId();
 
-	GSLoggerFactory.getLogger(getClass()).info("[ACCESS] Accessing online with id " + onlineId + " STARTED");
+	GSLoggerFactory.getLogger(getClass()).debug("[ACCESS] Accessing online with id " + onlineId + " STARTED");
 
 	// ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
 	// IDiscoveryExecutor executor = loader.iterator().next();
 
 	// DiscoveryMessage discoveryMessage = new DiscoveryMessage(accessMessage);
 
-	GSLoggerFactory.getLogger(getClass()).info("Resource discovery STARTED");
+	// GSLoggerFactory.getLogger(getClass()).info("Resource discovery STARTED");
 
 	List<GSSource> sources = accessMessage.getSources();
-	SharedRepositoryInfo sharedRepository = accessMessage.getSharedRepositoryInfo();
 	StorageUri databaseURI = accessMessage.getDataBaseURI();
-	ResultSet<GSResource> resultSet = AccessQueryUtils.findResource(accessMessage.getRequestId(), sources, sharedRepository, onlineId,
-		databaseURI);
+	ResultSet<GSResource> resultSet = AccessQueryUtils.findResource(accessMessage.getRequestId(), sources, onlineId, databaseURI);
 
 	if (resultSet.getResultsList().isEmpty()) {
 
@@ -150,9 +151,9 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 		    ACCESS_EXECUTOR_TOO_MANY_RESOURCES);
 	}
 
-	GSLoggerFactory.getLogger(getClass()).info("Resource discovery ENDED");
+	// GSLoggerFactory.getLogger(getClass()).info("Resource discovery ENDED");
 
-	GSLoggerFactory.getLogger(getClass()).info("Retrieving data compliance report STARTED");
+	// GSLoggerFactory.getLogger(getClass()).info("Retrieving data compliance report STARTED");
 
 	GSResource resource = resultSet.getResultsList().get(0);
 	ReportsMetadataHandler handler = new ReportsMetadataHandler(resource);
@@ -180,14 +181,14 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 	DataDownloader downloader = DataDownloaderFactory.getDataDownloader(resource, onlineId);
 	DataDescriptor targetDescriptor = accessMessage.getTargetDataDescriptor();
 
-	GSLoggerFactory.getLogger(getClass()).info("Retrieving data compliance report ENDED");
+	// GSLoggerFactory.getLogger(getClass()).info("Retrieving data compliance report ENDED");
 
 	DataObject dataObject = retrieveDataObject(downloader, report.getFullDataDescriptor(), targetDescriptor);
 	dataObject.setResource(resource);
 
 	ResultSet<DataObject> out = createResultSet(resultSet, dataObject);
 
-	GSLoggerFactory.getLogger(getClass()).info("[ACCESS] Accessing online with id " + onlineId + " ENDED");
+	GSLoggerFactory.getLogger(getClass()).debug("[ACCESS] Accessing online with id " + onlineId + " ENDED");
 
 	return out;
     }
@@ -220,7 +221,7 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 	// that we know it can be safely used for access, as it has been passed the execution tests
 	DataDescriptor remoteDescriptor = chooseDescriptor(remoteDescriptors, reportDescriptor);
 
-	GSLoggerFactory.getLogger(getClass()).info("Data download STARTED");
+	// GSLoggerFactory.getLogger(getClass()).debug("Data download STARTED");
 
 	// In this step we modify the chosen remote descriptor according to the user required target descriptor
 	// and the downloader capabilities (e.g. if user has requested a subset of the entire data and the downloader
@@ -237,7 +238,7 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 	File dataFile = downloader.download(remoteDescriptor);
 	dataFile.deleteOnExit();
 
-	GSLoggerFactory.getLogger(getClass()).info("Data download ENDED");
+	// GSLoggerFactory.getLogger(getClass()).debug("Data download ENDED");
 
 	DataObject dataObject = new DataObject();
 	dataObject.setDataDescriptor(remoteDescriptor);
@@ -289,11 +290,11 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 	    throw GSException.createException(//
 		    getClass(), //
 		    msg, //
-		    null, //
+		    msg, //
 		    ErrorInfo.ERRORTYPE_SERVICE, //
 		    ErrorInfo.SEVERITY_ERROR, //
-		    ACCESS_EXECUTOR_WORKFLOW_EXECUTION_ERROR, //
-		    null);
+		    ACCESS_EXECUTOR_WORKFLOW_EXECUTION_ERROR//
+	    );
 	}
 
 	if (targetDescriptor == null) {
@@ -304,7 +305,7 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 
 	} else {
 
-	    GSLoggerFactory.getLogger(getClass()).info("Workflow execution STARTED");
+	    // GSLoggerFactory.getLogger(getClass()).info("Workflow execution STARTED");
 
 	    WorkflowBuilder builder = WorkflowBuilder.createLoadedBuilder();
 	    Optional<Workflow> optWorkflow = builder.buildPreferred(remoteDescriptor, targetDescriptor);
@@ -340,13 +341,12 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 
 		DataObject result = workflow.execute(dataObject, targetDescriptor);
 
-		GSLoggerFactory.getLogger(getClass()).info("Workflow execution ENDED");
+		// GSLoggerFactory.getLogger(getClass()).info("Workflow execution ENDED");
 
 		return result;
 
 	    } catch (Exception e) {
 
-		e.printStackTrace();
 		GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 
 		throw GSException.createException(//
@@ -708,7 +708,7 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 	out.setResultsList(Arrays.asList(result));
 
 	out.setCountResponse(resultSet.getCountResponse());
-	out.getException().addInfoList(resultSet.getException().getErrorInfoList());
+	out.getException().getErrorInfoList().addAll(resultSet.getException().getErrorInfoList());
 
 	return out;
     }

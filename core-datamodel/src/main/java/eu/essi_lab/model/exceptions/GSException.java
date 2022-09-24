@@ -4,7 +4,7 @@ package eu.essi_lab.model.exceptions;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,46 +21,70 @@ package eu.essi_lab.model.exceptions;
  * #L%
  */
 
+import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.io.output.ByteArrayOutputStream;
+
+import com.google.common.base.Charsets;
+
+import eu.essi_lab.lib.utils.GSLoggerFactory;
+
 public class GSException extends Exception {
-    protected final List<ErrorInfo> errorInfoList = new ArrayList<>();    private static final long serialVersionUID = 4205641760399814704L;
 
-    public ErrorInfo addInfo(ErrorInfo info) {
-	this.errorInfoList.add(info);
-	return info;
-    }
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 4205641760399814704L;
 
-    public void addInfoList(List<ErrorInfo> infoList) {
-	this.errorInfoList.addAll(infoList);
-    }
+    private List<ErrorInfo> errorInfoList;
 
-    public List<ErrorInfo> getErrorInfoList() {
-	return errorInfoList;
+    /**
+     * 
+     */
+    private GSException() {
+
+	errorInfoList = new ArrayList<>();
     }
 
     /**
-     * Creates an exception with a single {@link ErrorInfo} and all the properties set
-     *
-     * @param clazz the caller class; class name is used for {@link ErrorInfo#setContextId(String)}
-     * @param errorDescription see {@link ErrorInfo#setErrorDescription(String)}
-     * @param errorCorrection see {@link ErrorInfo#setErrorCorrection(String)}
-     * @param userError see {@link ErrorInfo#setUserErrorDescription(String)}
-     * @param errorType see {@link ErrorInfo#setErrorType(int)}
-     * @param errorSeverity see {@link ErrorInfo#setSeverity(int)}
-     * @param errorId see {@link ErrorInfo#setErrorId(String)}
-     * @param cause see {@link ErrorInfo#setCause(Throwable)}
+     * Creates a new {@link GSException} with an empty {@link #getErrorInfoList()}
+     * 
+     * @return
+     */
+    public static GSException createException() {
+
+	return new GSException();
+    }
+
+    /**
+     * @param caller
+     * @param errorDescription
+     * @param errorCorrection
+     * @param userError
+     * @param errorType
+     * @param errorSeverity
+     * @param errorId
+     * @param cause
      * @return
      */
     @SuppressWarnings("rawtypes")
-    public static GSException createException(Class clazz, String errorDescription, String errorCorrection, String userError, int errorType,
-	    int errorSeverity, String errorId, Throwable cause) {
+    public static GSException createException(//
+	    Class caller, //
+	    String errorDescription, //
+	    String errorCorrection, //
+	    String userError, //
+	    String errorType, //
+	    String errorSeverity, //
+	    String errorId, //
+	    Throwable cause) {
 
-	GSException gsException = new GSException();
+	GSException ex = new GSException();
 
 	ErrorInfo errorInfo = new ErrorInfo();
-	errorInfo.setContextId(clazz.getName());
+	errorInfo.setCaller(caller);
 	errorInfo.setErrorId(errorId);
 	errorInfo.setCause(cause);
 	errorInfo.setErrorDescription(errorDescription);
@@ -69,67 +93,238 @@ public class GSException extends Exception {
 	errorInfo.setErrorType(errorType);
 	errorInfo.setSeverity(errorSeverity);
 
-	gsException.addInfo(errorInfo);
+	ex.addErrorInfo(errorInfo);
 
-	return gsException;
+	return ex;
     }
 
     /**
-     * Creates an exception with a single {@link ErrorInfo} and all the properties set except
-     * {@link ErrorInfo#getCause()}
-     *
-     * @param clazz the caller class; class name is used for {@link ErrorInfo#setContextId(String)}
-     * @param errorDescription see {@link ErrorInfo#setErrorDescription(String)}
-     * @param errorCorrection see {@link ErrorInfo#setErrorCorrection(String)}
-     * @param userError see {@link ErrorInfo#setUserErrorDescription(String)}
-     * @param errorType see {@link ErrorInfo#setErrorType(int)}
-     * @param errorSeverity see {@link ErrorInfo#setSeverity(int)}
-     * @param errorId see {@link ErrorInfo#setErrorId(String)}
+     * @param caller
+     * @param errorId
+     * @param cause
      * @return
      */
     @SuppressWarnings("rawtypes")
-    public static GSException createException(Class clazz, String errorDescription, String errorCorrection, String userError, int errorType,
-	    int errorSeverity, String errorId) {
+    public static GSException createException(//
+	    Class caller, //
+	    String errorId, //
+	    Throwable cause) {
 
-	return createException(clazz, errorDescription, errorCorrection, userError, errorType, errorSeverity, errorId, null);
+	GSException ex = new GSException();
+
+	ErrorInfo errorInfo = new ErrorInfo();
+	errorInfo.setCaller(caller);
+	errorInfo.setErrorId(errorId);
+	errorInfo.setCause(cause);
+	errorInfo.setErrorDescription(cause.getMessage());
+	errorInfo.setErrorType(ErrorInfo.ERRORTYPE_INTERNAL);
+	errorInfo.setSeverity(ErrorInfo.SEVERITY_ERROR);
+
+	ex.addErrorInfo(errorInfo);
+
+	return ex;
     }
 
     /**
-     * Creates an exception with a single {@link ErrorInfo} and all the properties set except
-     * {@link ErrorInfo#getErrorCorrection()()}
-     *
-     * @param clazz the caller class; class name is used for {@link ErrorInfo#setContextId(String)}
-     * @param errorDescription see {@link ErrorInfo#setErrorDescription(String)}
-     * @param userError see {@link ErrorInfo#setUserErrorDescription(String)}
-     * @param errorType see {@link ErrorInfo#setErrorType(int)}
-     * @param errorSeverity see {@link ErrorInfo#setSeverity(int)}
-     * @param errorId see {@link ErrorInfo#setErrorId(String)}
-     * @param cause see {@link ErrorInfo#setCause(Throwable)}
+     * @param caller
+     * @param errorType
+     * @param errorSeverity
+     * @param errorId
+     * @param cause
      * @return
      */
     @SuppressWarnings("rawtypes")
-    public static GSException createException(Class clazz, String errorDescription, String userError, int errorType, int errorSeverity,
-	    String errorId, Throwable cause) {
+    public static GSException createException(//
+	    Class caller, //
+	    String errorType, //
+	    String errorSeverity, //
+	    String errorId, //
+	    Throwable cause) {
 
-	return createException(clazz, errorDescription, null, userError, errorType, errorSeverity, errorId, cause);
+	GSException ex = new GSException();
+
+	ErrorInfo errorInfo = new ErrorInfo();
+	errorInfo.setCaller(caller);
+	errorInfo.setErrorId(errorId);
+	errorInfo.setCause(cause);
+	errorInfo.setErrorDescription(cause.getMessage());
+	errorInfo.setErrorType(errorType);
+	errorInfo.setSeverity(errorSeverity);
+
+	ex.addErrorInfo(errorInfo);
+
+	return ex;
     }
 
     /**
-     * Creates an exception with a single {@link ErrorInfo} and all the properties set except
-     * {@link ErrorInfo#getErrorCorrection()()} and {@link ErrorInfo#getCause()}
-     *
-     * @param clazz the caller class; class name is used for {@link ErrorInfo#setContextId(String)}
-     * @param errorDescription see {@link ErrorInfo#setErrorDescription(String)}
-     * @param userError see {@link ErrorInfo#setUserErrorDescription(String)}
-     * @param errorType see {@link ErrorInfo#setErrorType(int)}
-     * @param errorSeverity see {@link ErrorInfo#setSeverity(int)}
-     * @param errorId see {@link ErrorInfo#setErrorId(String)}
+     * @param caller
+     * @param errorDescription
+     * @param errorCorrection
+     * @param userError
+     * @param errorType
+     * @param errorSeverity
+     * @param errorId
      * @return
      */
     @SuppressWarnings("rawtypes")
-    public static GSException createException(Class clazz, String errorDescription, String userError, int errorType, int errorSeverity,
+    public static GSException createException(//
+	    Class caller, //
+	    String errorDescription, //
+	    String errorCorrection, //
+	    String userError, //
+	    String errorType, //
+	    String errorSeverity, //
 	    String errorId) {
 
-	return createException(clazz, errorDescription, null, userError, errorType, errorSeverity, errorId, null);
+	return createException(caller, errorDescription, errorCorrection, userError, errorType, errorSeverity, errorId, null);
+    }
+
+    /**
+     * @param caller
+     * @param errorDescription
+     * @param userError
+     * @param errorType
+     * @param errorSeverity
+     * @param errorId
+     * @param cause
+     * @return
+     */
+    @SuppressWarnings("rawtypes")
+    public static GSException createException(//
+	    Class caller, //
+	    String errorDescription, //
+	    String userError, //
+	    String errorType, //
+	    String errorSeverity, //
+	    String errorId, //
+	    Throwable cause) {
+
+	return createException(caller, errorDescription, null, userError, errorType, errorSeverity, errorId, cause);
+    }
+
+    /**
+     * @param caller
+     * @param errorDescription
+     * @param userError
+     * @param errorType
+     * @param errorSeverity
+     * @param errorId
+     * @return
+     */
+    @SuppressWarnings("rawtypes")
+    public static GSException createException(//
+	    Class caller, //
+	    String errorDescription, //
+	    String userError, //
+	    String errorType, //
+	    String errorSeverity, //
+	    String errorId) {
+
+	return createException(caller, errorDescription, null, userError, errorType, errorSeverity, errorId, null);
+    }
+
+    /**
+     * @param caller
+     * @param errorDescription
+     * @param errorType
+     * @param errorSeverity
+     * @param errorId
+     * @return
+     */
+    @SuppressWarnings("rawtypes")
+    public static GSException createException(//
+	    Class caller, //
+	    String errorDescription, //
+	    String errorType, //
+	    String errorSeverity, //
+	    String errorId) {
+
+	return createException(caller, errorDescription, null, null, errorType, errorSeverity, errorId, null);
+    }
+
+    /**
+     * @param errorInfoList
+     * @return
+     */
+    public static GSException createException(List<ErrorInfo> errorInfoList) {
+
+	GSException ex = new GSException();
+	errorInfoList.forEach(info -> ex.addErrorInfo(info));
+	return ex;
+    }
+
+    /**
+     * @param info
+     * @return
+     */
+    public static GSException createException(ErrorInfo info) {
+
+	return createException(Arrays.asList(info));
+    }
+
+    /**
+     * @return
+     */
+    public List<ErrorInfo> getErrorInfoList() {
+
+	return errorInfoList;
+    }
+
+    /**
+     * 
+     */
+    @Override
+    public void printStackTrace(PrintStream s) {
+
+	for (int j = 0; j < getErrorInfoList().size(); j++) {
+
+	    s.println("[ Error info " + j + " ]");
+
+	    ErrorInfo i = getErrorInfoList().get(j);
+
+	    if (i.getCause() != null) {
+
+		i.getCause().printStackTrace(s);
+	    }
+
+	    s.println(i);
+	}
+    }
+
+    @Override
+    public String getMessage() {
+
+	if (!errorInfoList.isEmpty()) {
+
+	    String description = errorInfoList.get(0).getErrorDescription();
+
+	    if (description != null && !description.isEmpty()) {
+
+		return description;
+	    }
+	}
+
+	return "No error description available";
+    }
+
+    /**
+     * 
+     */
+    public void log() {
+
+	ByteArrayOutputStream stream = new ByteArrayOutputStream();
+
+	this.printStackTrace(new PrintStream(stream));
+
+	GSLoggerFactory.getLogger(getClass()).error(stream.toString(Charsets.UTF_8));
+    }
+
+    /**
+     * @param info
+     * @return
+     */
+    private void addErrorInfo(ErrorInfo info) {
+
+	this.errorInfoList.add(info);
     }
 }

@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.handler.selector;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,6 +28,14 @@ import java.util.Set;
 import eu.essi_lab.messages.web.KeyValueParser;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.GSException;
+
+/**
+ * Implementation of {@link WebRequestFilter} specific for {@link WebRequest} with GET method.<br>
+ * 
+ * @see WebRequest#isGetRequest()
+ * @see WebRequest#isPostRequest()
+ * @author Fabrizio
+ */
 public class GETRequestFilter extends PathRequestFilter {
 
     /**
@@ -119,21 +127,6 @@ public class GETRequestFilter extends PathRequestFilter {
 
 	this();
 	setPath(path);
-    }
-
-    /**
-     * Creates a filter which accepts only requests on the supplied <code>path</code>.<br>
-     * See constructor docs for path usage info
-     * 
-     * @see #addQueryCondition(String, InspectionStrategy)
-     * @param path the request path
-     * @param view if <code>true</code> the provided path will be accepted also if preceded by the
-     *        'view/viewId/' path
-     */
-    public GETRequestFilter(String path, boolean view) {
-
-	this();
-	setPath(path, view);
     }
 
     /**

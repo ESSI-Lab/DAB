@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -62,6 +62,35 @@ import net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType;
 import net.opengis.iso19139.gmd.v_20060504.CIResponsiblePartyPropertyType;
 import net.opengis.iso19139.gmd.v_20060504.MDIdentifierPropertyType;
 
+
+/**
+ * Description: requirement to be satisfied by the planned data acquisition - shortName: Requirement
+ * 
+ * <p>Java class for MI_Requirement_Type complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="MI_Requirement_Type"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{http://www.isotc211.org/2005/gco}AbstractObject_Type"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="citation" type="{http://www.isotc211.org/2005/gmd}CI_Citation_PropertyType" minOccurs="0"/&gt;
+ *         &lt;element name="identifier" type="{http://www.isotc211.org/2005/gmd}MD_Identifier_PropertyType"/&gt;
+ *         &lt;element name="requestor" type="{http://www.isotc211.org/2005/gmd}CI_ResponsibleParty_PropertyType" maxOccurs="unbounded"/&gt;
+ *         &lt;element name="recipient" type="{http://www.isotc211.org/2005/gmd}CI_ResponsibleParty_PropertyType" maxOccurs="unbounded"/&gt;
+ *         &lt;element name="priority" type="{http://www.isotc211.org/2005/gmi}MI_PriorityCode_PropertyType"/&gt;
+ *         &lt;element name="requestedDate" type="{http://www.isotc211.org/2005/gmi}MI_RequestedDate_PropertyType"/&gt;
+ *         &lt;element name="expiryDate" type="{http://www.isotc211.org/2005/gco}DateTime_PropertyType"/&gt;
+ *         &lt;element name="satisifiedPlan" type="{http://www.isotc211.org/2005/gmi}MI_Plan_PropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "MI_Requirement_Type", propOrder = {
     "citation",

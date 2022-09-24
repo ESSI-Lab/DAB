@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof.discovery.series;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -32,6 +32,12 @@ import javax.xml.stream.events.Characters;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
+
+/**
+ * Small utility to create a fragment of XML - the SeriesRecord document
+ * 
+ * @author boldrini
+ */
 public class SeriesRecordCreator {
 
     public String createSeriesRecord(String servCode, String servURL, String location, String varCode, String varName, String beginDate,

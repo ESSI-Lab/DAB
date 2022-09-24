@@ -1,0 +1,33 @@
+{
+  "testEnvironment": {
+    "clusterName": "GSServiceTestCluster",
+    "host": "gs-service-test.geodab.eu",
+    "AWS": {
+      "clusterConfigurationFile": "aws/testClusterConfiguration.json"
+    }
+  },
+  "preprodEnvironment": {
+    "clusterName": "GSServicePreprodCluster",
+    "harvestClusterName": "GSServicePreprodHarvestCluster",
+    "accessClusterName": "GSServicePreprodAccessCluster",
+    "host": "gs-service-preproduction.geodab.eu",
+    "whoshost": "whos-preproduction.geodab.eu",
+    "sdnhost": "sdn-preproduction.geodab.eu",    
+    "bluecloudhost": "blue-cloud-preproduction.geodab.eu",
+    "AWS": {
+      "clusterConfigurationFile": "aws/preproductionClusterConfiguration.json"
+    }
+  },
+  "prodEnvironment": {
+    "clusterName": "GSServiceProductionCluster",
+    "harvestClusterName": "GSServiceProductionHarvestCluster",
+    "accessClusterName": "GSServiceProductionAccessCluster",
+    "host": "gs-service-production.geodab.eu",
+    "whoshost": "whos.geodab.eu",    
+    "sdnhost": "seadatanet.geodab.eu",
+    "bluecloudhost": "blue-cloud.geodab.eu",
+    "AWS": {
+      "clusterConfigurationFile": "aws/productionClusterConfiguration.json"
+    }
+  }
+}

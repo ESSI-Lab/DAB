@@ -8,7 +8,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>gs-driver-local-cache</artifactId>
-	<name>ESSI-Lab Local Cache Driver</name>
+	<name>ESSI-Lab Driver Local Cache Implementation</name>
 
 	<dependencies>
 		<dependency>
@@ -21,12 +21,5 @@
 			<artifactId>json</artifactId>
 		</dependency>
 	</dependencies>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>license-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
+
 </project>

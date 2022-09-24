@@ -1,0 +1,64 @@
+<event xmlns="http://quakeml.org/xmlns/bed/1.2" xmlns:anss="http://anss.org/xmlns/event/0.1"
+    xmlns:catalog="http://anss.org/xmlns/catalog/0.1" xmlns:q="http://quakeml.org/xmlns/quakeml/1.2"
+    catalog:datasource="us" catalog:eventsource="us" catalog:eventid="20008se3"
+    publicID="quakeml:earthquake.usgs.gov/fdsnws/event/1/query?eventid=us20008se3&amp;format=quakeml">
+    <description>
+        <type>earthquake name</type>
+        <text>44km SW of Lardos, Greece</text>
+    </description>
+    <origin catalog:datasource="us" catalog:dataid="us20008se3" catalog:eventsource="us"
+        catalog:eventid="20008se3"
+        publicID="quakeml:earthquake.usgs.gov/archive/product/origin/us20008se3/us/1489623324040/product.xml">
+        <time>
+            <value>2017-03-15T23:29:48.250Z</value>
+        </time>
+        <longitude>
+            <value>27.6151</value>
+        </longitude>
+        <latitude>
+            <value>35.863</value>
+        </latitude>
+        <depth>
+            <value>16920</value>
+            <uncertainty>5400</uncertainty>
+        </depth>
+        <originUncertainty>
+            <horizontalUncertainty>4300</horizontalUncertainty>
+            <preferredDescription>horizontal uncertainty</preferredDescription>
+        </originUncertainty>
+        <quality>
+            <usedPhaseCount>96</usedPhaseCount>
+            <standardError>0.99</standardError>
+            <azimuthalGap>59</azimuthalGap>
+            <minimumDistance>0.485</minimumDistance>
+        </quality>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+            <agencyID>us</agencyID>
+            <creationTime>2017-03-16T00:15:24.040Z</creationTime>
+        </creationInfo>
+    </origin>
+    <magnitude catalog:datasource="us" catalog:dataid="us20008se3" catalog:eventsource="us"
+        catalog:eventid="20008se3"
+        publicID="quakeml:earthquake.usgs.gov/archive/product/origin/us20008se3/us/1489623324040/product.xml#magnitude">
+        <mag>
+            <value>4.3</value>
+            <uncertainty>0.078</uncertainty>
+        </mag>
+        <type>mb</type>
+        <stationCount>46</stationCount>
+        <originID>quakeml:earthquake.usgs.gov/archive/product/origin/us20008se3/us/1489623324040/product.xml</originID>
+        <evaluationMode>manual</evaluationMode>
+        <creationInfo>
+            <agencyID>us</agencyID>
+            <creationTime>2017-03-16T00:15:24.040Z</creationTime>
+        </creationInfo>
+    </magnitude>
+    <preferredOriginID>quakeml:earthquake.usgs.gov/archive/product/origin/us20008se3/us/1489623324040/product.xml</preferredOriginID>
+    <preferredMagnitudeID>quakeml:earthquake.usgs.gov/archive/product/origin/us20008se3/us/1489623324040/product.xml#magnitude</preferredMagnitudeID>
+    <type>earthquake</type>
+    <creationInfo>
+        <agencyID>us</agencyID>
+        <creationTime>2017-03-16T00:15:24.040Z</creationTime>
+    </creationInfo>
+</event>

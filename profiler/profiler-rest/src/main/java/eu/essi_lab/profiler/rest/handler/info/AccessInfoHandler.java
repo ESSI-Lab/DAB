@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.rest.handler.info;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -34,7 +34,7 @@ import eu.essi_lab.access.compliance.DataComplianceReport;
 import eu.essi_lab.access.compliance.DataComplianceTester.DataComplianceTest;
 import eu.essi_lab.access.compliance.wrapper.DataDescriptorWrapper;
 import eu.essi_lab.access.compliance.wrapper.ReportsMetadataHandler;
-import eu.essi_lab.configuration.ConfigurationUtils;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -54,6 +54,10 @@ import eu.essi_lab.model.resource.data.CRS;
 import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
 import eu.essi_lab.workflow.processor.ProcessorCapabilities;
+
+/**
+ * @author Fabrizio
+ */
 public class AccessInfoHandler extends RestInfoHandler {
 
     /**
@@ -224,9 +228,9 @@ public class AccessInfoHandler extends RestInfoHandler {
 	message.getResourceSelector().setIndexesPolicy(IndexesPolicy.NONE);
 	message.getResourceSelector().setSubset(ResourceSubset.EXTENDED);
 
-	message.setSources(ConfigurationUtils.getBrokeredSources());
-	message.setDataBaseURI(ConfigurationUtils.getStorageURI());
-	message.setSharedRepositoryInfo(ConfigurationUtils.getSharedRepositoryInfo());
+	message.setSources(ConfigurationWrapper.getHarvestedSources());
+	message.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	
 
 	ResourcePropertyBond bond = BondFactory.createIsExecutableBond(true);
 	message.setUserBond(bond);

@@ -4,7 +4,7 @@ package eu.essi_lab.workflow.processor.timeseries;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -62,6 +62,7 @@ public class NetCDF_To_RDB_Processor extends DataProcessor {
     public static final String FLAG_DESCRIPTIONS = "flag_descriptions";
     public static final String FLAG_LONG_DESCRIPTIONS = "flag_long_descriptions";
     public static final String FLAG_LINKS = "flag_links";
+    private static final String NETCDF_TO_RDB_ERROR = "NETCDF_TO_RDB_ERROR";
 
     @Override
     public DataObject process(DataObject dataObject, TargetHandler handler) throws Exception {
@@ -111,6 +112,10 @@ public class NetCDF_To_RDB_Processor extends DataProcessor {
 	if (variableLongName == null) {
 	    variableLongName = mainVariable.getShortName();
 	}
+
+	/*
+	 * DATA
+	 */
 	Date t1 = null;
 	Date t2 = null;
 	String stationName = null;
@@ -181,11 +186,13 @@ public class NetCDF_To_RDB_Processor extends DataProcessor {
     }
 
     private GSException getGSException(String message) {
-	GSException ret = new GSException();
-	ErrorInfo info = new ErrorInfo();
-	info.setErrorDescription(message);
-	ret.addInfo(info);
-	return ret;
-
+	
+	return GSException.createException(//
+		getClass(),//
+		message,//
+		ErrorInfo.ERRORTYPE_INTERNAL,//
+		ErrorInfo.SEVERITY_ERROR,//
+		NETCDF_TO_RDB_ERROR);
+ 
     }
 }

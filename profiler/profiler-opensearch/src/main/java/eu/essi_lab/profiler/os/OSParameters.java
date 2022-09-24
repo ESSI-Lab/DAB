@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.os;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -38,6 +38,10 @@ import eu.essi_lab.model.resource.ResourceType;
 import eu.essi_lab.profiler.os.OSBox.CardinalPoint;
 
 public abstract class OSParameters {
+
+    /**
+     *
+     */
     public static final OSParameter START_INDEX = new OSParameter("si", "int", "1", "{startIndex}");
 
     /**
@@ -108,8 +112,7 @@ public abstract class OSParameters {
 	    return Optional.of(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.IDENTIFIER, value));
 	}
     };
-    
-    
+
     /**
     *
     */
@@ -149,7 +152,7 @@ public abstract class OSParameters {
 	    return Optional.of(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.PARENT_IDENTIFIER, value));
 	}
     };
-    
+
     /**
     *
     */
@@ -249,7 +252,7 @@ public abstract class OSParameters {
 	    if (value.equals("series") || value.equals("DatasetCollection")) {
 		type = ResourceType.DATASET_COLLECTION;
 	    }
-	    
+
 	    if (value.equals("service") || value.equals("Service")) {
 		type = ResourceType.SERVICE;
 	    }
@@ -292,12 +295,11 @@ public abstract class OSParameters {
 	    return createBond(value, MetadataElement.INSTRUMENT_DESCRIPTION);
 	}
     };
-    
+
     /**
     *
     */
-    public static final OSParameter INSTRUMENT_TITLE = new OSParameter("instrumentTitle", "string", null,
-	    "{gs:instrumentTitle}") {
+    public static final OSParameter INSTRUMENT_TITLE = new OSParameter("instrumentTitle", "string", null, "{gs:instrumentTitle}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
@@ -323,7 +325,7 @@ public abstract class OSParameters {
 	    return createBond(value, MetadataElement.PLATFORM_IDENTIFIER);
 	}
     };
-    
+
     /**
     *
     */
@@ -389,6 +391,21 @@ public abstract class OSParameters {
     /**
     *
     */
+    public static final OSParameter TEAM_CATEGORY = new OSParameter("themeCategory", "string", null, "{gs:themeCategory}") {
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    if (value == null || value.equals("")) {
+		return Optional.empty();
+	    }
+
+	    return createBond(value, MetadataElement.THEME_CATEGORY);
+	}
+    };
+
+    /**
+    *
+    */
     public static final OSParameter ORGANISATION_NAME = new OSParameter("organisationName", "string", null, "{gs:organisationName}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -397,7 +414,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return  createBond(value, MetadataElement.ORGANISATION_NAME);
+	    return createBond(value, MetadataElement.ORGANISATION_NAME);
 	}
     };
 
@@ -435,7 +452,7 @@ public abstract class OSParameters {
 	    return createBond(value, MetadataElement.ATTRIBUTE_DESCRIPTION);
 	}
     };
-    
+
     /**
     *
     */
@@ -462,7 +479,27 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return Optional.of(BondFactory.createSimpleValueBond(BondOperator.GREATER_OR_EQUAL, MetadataElement.TEMP_EXTENT_BEGIN, value));
+	    String spatialRelation = "OVERLAPS"; // by default
+
+	    if (relatedValues.length > 0) {
+		spatialRelation = relatedValues[0];
+	    }
+
+	    BondOperator operator = BondOperator.decode(spatialRelation);
+
+	    switch (operator) {
+	    case BBOX: // same as not disjoint, as OGC filter encoding 09-026r2
+	    case INTERSECTS:
+		return Optional
+			.of(BondFactory.createSimpleValueBond(BondOperator.GREATER_OR_EQUAL, MetadataElement.TEMP_EXTENT_END, value));
+	    case CONTAINS:
+		return Optional
+			.of(BondFactory.createSimpleValueBond(BondOperator.GREATER_OR_EQUAL, MetadataElement.TEMP_EXTENT_BEGIN, value));
+	    case DISJOINT:
+	    default:
+		throw new IllegalArgumentException("Operator not yet implemented: " + operator);
+	    }
+
 	}
     };
 
@@ -507,7 +544,27 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return Optional.of(BondFactory.createSimpleValueBond(BondOperator.LESS_OR_EQUAL, MetadataElement.TEMP_EXTENT_END, value));
+	    String spatialRelation = "OVERLAPS"; // by default
+
+	    if (relatedValues.length > 0) {
+		spatialRelation = relatedValues[0];
+	    }
+	    
+	    BondOperator operator = BondOperator.decode(spatialRelation);
+
+	    switch (operator) {
+	    case BBOX: // same as not disjoint, as OGC filter encoding 09-026r2
+	    case INTERSECTS:
+		return Optional.of(BondFactory.createSimpleValueBond(BondOperator.LESS_OR_EQUAL, MetadataElement.TEMP_EXTENT_BEGIN, value));
+
+	    case CONTAINS:
+		return Optional.of(BondFactory.createSimpleValueBond(BondOperator.LESS_OR_EQUAL, MetadataElement.TEMP_EXTENT_END, value));
+
+	    case DISJOINT:
+	    default:
+		throw new IllegalArgumentException("Operator not yet implemented: " + operator);
+	    }
+
 	}
     };
 
@@ -558,7 +615,7 @@ public abstract class OSParameters {
 		    BondFactory.createSimpleValueBond(BondOperator.LESS_OR_EQUAL, MetadataElement.QML_DEPTH_VALUE, Double.valueOf(value)));
 	}
     };
-    
+
     /**
     *
     */
@@ -570,8 +627,8 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return Optional.of(
-		    BondFactory.createSimpleValueBond(BondOperator.GREATER_OR_EQUAL, MetadataElement.QML_DEPTH_VALUE, Double.valueOf(value)));
+	    return Optional.of(BondFactory.createSimpleValueBond(BondOperator.GREATER_OR_EQUAL, MetadataElement.QML_DEPTH_VALUE,
+		    Double.valueOf(value)));
 	}
     };
 
@@ -595,7 +652,12 @@ public abstract class OSParameters {
     /**
     *
     */
-    public static final OSParameter SPATIAL_RELATION = new OSParameter("rel", "string", "CONTAINS", "{gs:rel}");
+    public static final OSParameter SPATIAL_RELATION = new OSParameter("rel", "string", "OVERLAPS", "{gs:rel}");
+
+    /**
+    *
+    */
+    public static final OSParameter TIME_RELATION = new OSParameter("timeRel", "string", "OVERLAPS", "{gs:timeRel}");
 
     /**
     *

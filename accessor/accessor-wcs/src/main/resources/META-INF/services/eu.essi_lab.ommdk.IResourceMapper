@@ -1,4 +1,4 @@
-eu.essi_lab.accessor.wcs.mapper.WCSMapper_100
-eu.essi_lab.accessor.wcs.mapper.WCSMapper_100_TDS
-eu.essi_lab.accessor.wcs.mapper.WCSMapper_110
-eu.essi_lab.accessor.wcs.mapper.WCSMapper_111
+eu.essi_lab.accessor.wcs_1_0_0.WCSMapper_100
+eu.essi_lab.accessor.wcs_1_0_0_TDS.WCSMapper_100_TDS
+eu.essi_lab.accessor.wcs_1_1_0.WCSMapper_110
+eu.essi_lab.accessor.wcs_1_1_1.WCSMapper_111

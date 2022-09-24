@@ -11,7 +11,7 @@ package eu.essi_lab.jaxb.csw._2_0_2;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -39,6 +39,34 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
+
+/**
+ * This request allows a user to discover elements of the
+ * information model supported by the catalogue. If no TypeName
+ * elements are included, then all of the schemas for the
+ * information model must be returned.
+ * schemaLanguage - preferred schema language
+ * (W3C XML Schema by default)
+ * outputFormat - preferred output format (application/xml by default)
+ * <p>
+ * Classe Java per DescribeRecordType complex type.
+ * <p>
+ * Il seguente frammento di schema specifica il contenuto previsto contenuto in questa classe.
+ * 
+ * <pre>
+ * &lt;complexType name="DescribeRecordType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{http://www.opengis.net/cat/csw/2.0.2}RequestBaseType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="TypeName" type="{http://www.w3.org/2001/XMLSchema}QName" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attribute name="outputFormat" type="{http://www.w3.org/2001/XMLSchema}string" default="application/xml" /&gt;
+ *       &lt;attribute name="schemaLanguage" type="{http://www.w3.org/2001/XMLSchema}anyURI" default="http://www.w3.org/XML/Schema" /&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "DescribeRecordType", propOrder = { "typeNames" })
 @XmlRootElement(name = "DescribeRecord")

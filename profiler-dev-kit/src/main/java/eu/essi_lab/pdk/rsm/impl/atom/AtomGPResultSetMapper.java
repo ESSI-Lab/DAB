@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.rsm.impl.atom;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -77,6 +77,12 @@ import eu.essi_lab.model.resource.SatelliteScene;
 import eu.essi_lab.model.resource.data.DataType;
 import eu.essi_lab.pdk.rsm.DiscoveryResultSetMapper;
 import eu.essi_lab.pdk.rsm.MappingSchema;
+
+/**
+ * This implementation provides a {@link GSResource} mapping suitable for the GEOSS Portal
+ *
+ * @author Fabrizio
+ */
 public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
 
     /**
@@ -87,10 +93,10 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
     private static final String SOS_TAHMO_PROXY_PATH = "sos-tahmo-proxy";
 
     private static final String SOS_TAHMO_URL = "http://hnapi.hydronet.com/api/service/sos";
-    
+
     private static final String SOS_TWIGA_URL = "http://hn4s.hydronet.com/api/service/TWIGA/sos";
 
-    private String formatSource(GSSource gsSource) {
+    private String formatSourceEntry(GSSource gsSource) {
 
 	String out = "<entry>\n";
 	out += "   <title>" + gsSource.getLabel().toString().replace("&", "&amp;") + "</title>\n";
@@ -116,9 +122,10 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
     @Override
     public String map(DiscoveryMessage message, GSResource resource) throws GSException {
 
+	GSSource source = resource.getSource();
+
 	if (message.isOutputSources()) {
-	    GSSource source = resource.getSource();
-	    String ret = formatSource(source);
+	    String ret = formatSourceEntry(source);
 	    return ret;
 	}
 
@@ -126,6 +133,13 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
 
 	CoreMetadata coreMetadata = resource.getHarmonizedMetadata().getCoreMetadata();
 
+	//
+	// source
+	//
+	if (source != null) {
+	    gpEntry.addSourceInfo(source.getUniqueIdentifier(), source.getLabel());
+	}
+	
 	//
 	// identifier
 	//
@@ -237,9 +251,10 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
 	} catch (NullPointerException ex) {
 	}
 
-	getDataIdsStream(coreMetadata).flatMap(//
-		di -> StreamUtils.iteratorToStream(//
-			di.getKeywordsValues()))
+	getDataIdsStream(coreMetadata)
+		.flatMap(//
+			di -> StreamUtils.iteratorToStream(//
+				di.getKeywordsValues()))
 		.map(kwd -> encodeEntities(kwd)).//
 		forEach(kwd -> gpEntry.addCategory(kwd, "keywords"));
 
@@ -493,6 +508,12 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    }
 	}
 
+	Optional<String> availableGranules = resource.getExtensionHandler().getAvailableGranules();
+
+	if (availableGranules.isPresent()) {
+	    gpEntry.setAvailableGranules(availableGranules.get());
+	}
+
 	//
 	// distribution
 	//
@@ -714,7 +735,7 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
 			}
 
 		    }
-		     
+
 		    // TWIGA use case: use proxy (shouuld replace SOS TAHMO)
 		    if (simpleUrl != null && simpleUrl.startsWith(SOS_TWIGA_URL)) {
 			try {

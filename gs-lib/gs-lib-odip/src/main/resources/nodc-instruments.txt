@@ -1,0 +1,198 @@
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/100;AMSR-E
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/101;TMI
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/103;MODIS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/104;WindSat
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/10;current meter
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/110;satellite sensor - active microwave
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/111;satellite sensor - infrared
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/112;satellite sensor - visible
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/113;satellite sensor - visible to infrared
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/114;SeaWiFS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/116;SSM/I
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/117;SMMR
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/118;nephelometer
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/119;satellite sensor - altimeter
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/11;buoy - drifting buoy
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/122;clock
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/123;scale
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/124;calipers
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/125;camera
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/128;chain
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/129;AATSR-NR
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/12;bathythermograph - EBT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/130;AATSR-MET
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/131;cytometer-submersible flow
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/132;inverted echo sounder (IES)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/133;bucket
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/134;tongs
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/135;chisel
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/136;Undulating towed profiler
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/137;bag-collection
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/138;thermograph
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/139;current profiler-expendable (XCP)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/13;fluorometer
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/140;radar - high frequency oceanographic
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/141;sound velocimeter - moving vessel profiler
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/142;wave gauge- non-directional
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/143;absorption and beam attenuation meter
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/144;C-T recorder
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/145;Poseidon-3 altimeter
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/146;AMR
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/147;DORIS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/148;GPSP
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/149;LRA
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/14;chromatograph
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/150;magnetometer
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/151;gravimeter
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/152;multibeam sonar
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/153;PAR Sensor
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/154;seismic reflection profiler
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/155;Turbidity Meter
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/156;spectrophotometer
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/157;Scintillation Counter
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/158;CHN Analyzer
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/159;Automated Ion Analyzer
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/15;GEK
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/161;Fast Repetition Rate Fluorometer
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/162;mass spectrometer
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/163;Glider
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/164;AXCTD
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/165;Flow Cytometer
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/166;gyrocompass
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/167;Nutrient Autoanalyzer
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/168;Marine Animal Recording Tag
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/169;anemometer
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/16;sediment sampler - grab
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/170;directional wave gauge
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/171;pyranometer
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/172;barometers
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/173;Humidity Sensor
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/174;Temperature Sensors
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/175;Aerovanes
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/176;Submarine Cable
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/177;turbulence profiler
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/178;Fluorescence Microscopy
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/179;microscale shear probe
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/17;laboratory analysis
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/181;methane sensor
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/182;PCR machine
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/183;Carbon dioxide (CO2) gas analyzer
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/184;Shower head chamber equilibrator for autonomous carbon dioxide (CO2) measurement
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/186;Autonomous sensor to measure dissolved inorganic carbon (DIC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/187;Present Weather Detector
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/188;Ceilometers
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/189;MTSAT 2 Imager
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/190;Laser In-Situ Scattering and Transmissometer (LISST)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/191;Bubble type equilibrator for autonomous carbon dioxide (CO2) measurement
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/194;Carbon-14 incubation
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/197;Flow-through pump
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/198;Coulometer for DIC measurement
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/199;Alkalinity titrator
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/19;bathythermograph - MBT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/1;ADCP
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/200;spectrophotometer
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/201;Flask with closed headspace for discrete carbon dioxide (CO2) measurement
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/202;Potentiometric titrator for dissolved inorganic carbon (DIC) and total alkalinity (TA) measurement
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/203;Non-dispersive infrared (NDIR) dissolved inorganic carbon (DIC) analyzer
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/204;Thin film type equilibrator for autonomous carbon dioxide (CO2) measurement
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/205;Multi-parameter Inorganic Carbon Analyzer (MICA)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/206;Barometric pressure sensor
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/207;pressure sensors
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/208;Optical plankton counter
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/20;meteorological sensors
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/210;Niskin bottle
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/211;Micro-porous membrane equilibrator
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/212;Free Ocean Carbon Enrichment (FOCE) experimental system
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/213;binoculars
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/216;Acoustic Doppler Velocimeter (ADV)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/217;AMSR2
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/218;VIIRS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/21;Multiple Opening/Closing Net and Environmental Sensing System (MOCNESS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/220;AQUARIUS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/221;microscope
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/223;IASI
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/224;AVHRR-3
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/225;AVHRR-2
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/226;rain gauge
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/227;SAR
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/228;LIDAR
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/22;buoy - moored buoy
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/231;AWS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/23;CTD - moored CTD
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/24;mooring
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/25;net
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/27;oxygen meter
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/28;YSI - handheld multi-parameter instrument
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/29;peristaltic pump
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/2;biota surveys
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/30;photograph
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/31;net - plankton net
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/32;profiling floats
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/33;pump casts
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/34;pump sampler
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/35;refractometer
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/36;satellite sensor - general
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/37;SeaSoar
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/38;secchi disk
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/39;surface seawater intake
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/3;bottle
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/40;swimmer/diver
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/41;buoy - TAO buoy
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/42;acoustic sensor
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/43;thermosalinographs
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/44;bathythermograph - uBT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/45;visual estimate
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/46;visual observation
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/47;water quality sensors
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/48;bathythermograph - XBT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/49;XSV
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/4;bathythermograph - BT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/50;pH sensors
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/51;buoy
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/52;video camera
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/53;compass
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/54;GPS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/55;continuous plankton recorder
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/56;flow meter
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/57;trap
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/58;trap - sediment
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/59;trap - plankton
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/61;echo sounder
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/62;bathythermograph - AXBT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/63;XCTD
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/64;radiometer
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/65;profiling reflectance radiometer
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/66;instrumented tower
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/67;trawl
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/68;net - zooplankton net
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/69;sidescan sonar
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/6;meteorological sensors - coastal meteorological stations
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/70;APBT
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/71;thermistor
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/72;current meter - PCM
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/73;pressure gauge
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/74;transmissometer
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/75;salinometer
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/76;thermometer
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/78;visual analysis
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/79;hydrometer
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/7;coral reef surveys
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/80;tide gauge
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/81;sediment sampler - corer
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/82;accelerometer
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/83;inclinometer
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/84;buoy - non-instrumented drifting device
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/85;buoy - moored - waverider
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/86;dredge
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/87;seine
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/88;conductivity sensor
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/89;temperature probe
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/8;CTD
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/90;sediment sieve
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/92;corer
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/93;water level recorder
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/94;AVHRR
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/95;irradiance detector
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/96;sound velocimeter
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/98;SEVIRI
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/insttype/details/99;GOES Imager

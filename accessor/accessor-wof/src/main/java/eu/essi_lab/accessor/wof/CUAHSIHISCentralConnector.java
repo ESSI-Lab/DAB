@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,47 +26,45 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import eu.essi_lab.accessor.ispra.ISPRAConnector;
 import eu.essi_lab.accessor.wof.client.CUAHSIHISCentralClient;
 import eu.essi_lab.accessor.wof.client.datamodel.ServiceInfo;
-import eu.essi_lab.cdk.harvest.AbstractHarvestedQueryConnector;
+import eu.essi_lab.accessor.wof.setting.CUAHSIHISCentralConnectorSetting;
+import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
-import eu.essi_lab.model.Source;
-import eu.essi_lab.model.configuration.option.GSConfOptionBoolean;
+import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.OriginalMetadata;
 
-public class CUAHSIHISCentralConnector extends AbstractHarvestedQueryConnector {
+public class CUAHSIHISCentralConnector extends HarvestedQueryConnector<CUAHSIHISCentralConnectorSetting> {
 
-    @JsonIgnore
-    protected transient List<String> failedServices = new ArrayList<>();
-    @JsonIgnore
-    private transient Logger logger = GSLoggerFactory.getLogger(this.getClass());
-    @JsonIgnore
-    private transient CUAHSIHISCentralClient client = null;
-    @JsonIgnore
-    private transient List<ServiceInfo> services = null;
-    @JsonIgnore
-    private transient String currentServicePosition = null;
-    @JsonIgnore
-    private transient CUAHSIHISServerConnector currentConnector = null;
-    @JsonIgnore
-    private static final String FIRST_SITE_ONLY_OPTION_KEY = "FIRST_SITE_ONLY_OPTION_KEY";
+    protected List<String> failedServices = new ArrayList<>();
 
-    @JsonIgnore
+    private CUAHSIHISCentralClient client = null;
+
+    private List<ServiceInfo> services = null;
+
+    private String currentServicePosition = null;
+
+    @SuppressWarnings("rawtypes")
+    private CUAHSIHISServerConnector currentConnector = null;
+
     private Integer recordsReturned = 0;
     private static final String CANT_RESUME_FROM_RESUMPTION_TOKEN = "Unable to resume from resumption token: ";
 
+    /**
+     * 
+     */
+    public static final String TYPE = "CUAHSIHISCentralConnector";
+
+    private static final String CUAHSI_HIS_CENTRAL_CONNECTOR_ERROR = "CUAHSI_HIS_CENTRAL_CONNECTOR_ERROR";
+
     @Override
-    public boolean supports(Source source) {
+    public boolean supports(GSSource source) {
 	String baseEndpoint = source.getEndpoint();
 	if (baseEndpoint == null) {
 	    return false;
@@ -80,22 +78,18 @@ public class CUAHSIHISCentralConnector extends AbstractHarvestedQueryConnector {
 	    }
 	} catch (Exception e) {
 
-	    logger.warn("Exception during download or during XML parsing: {}", e.getMessage());
+	    GSLoggerFactory.getLogger(this.getClass()).warn("Exception during download or during XML parsing: {}", e.getMessage());
 	}
 	return false;
     }
 
+    /**
+     * 
+     */
     public CUAHSIHISCentralConnector() {
-
-	GSConfOptionBoolean option = new GSConfOptionBoolean();
-
-	option.setLabel("Harvest first site only");
-	option.setKey(FIRST_SITE_ONLY_OPTION_KEY);
-	option.setValue(false);
-
-	getSupportedOptions().put(FIRST_SITE_ONLY_OPTION_KEY, option);
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public ListRecordsResponse<OriginalMetadata> listRecords(ListRecordsRequest listRecords) throws GSException {
 
@@ -126,11 +120,13 @@ public class CUAHSIHISCentralConnector extends AbstractHarvestedQueryConnector {
 	} else {
 
 	    if (!id.contains(":")) {
-		GSException gse = new GSException();
-		ErrorInfo info = new ErrorInfo();
-		info.setErrorDescription(CANT_RESUME_FROM_RESUMPTION_TOKEN + id);
-		gse.addInfo(info);
-		throw gse;
+
+		throw GSException.createException(//
+			getClass(), //
+			CANT_RESUME_FROM_RESUMPTION_TOKEN + id, //
+			ErrorInfo.ERRORTYPE_INTERNAL, //
+			ErrorInfo.SEVERITY_ERROR, //
+			CUAHSI_HIS_CENTRAL_CONNECTOR_ERROR); //
 	    }
 
 	    String[] split = id.split(":");
@@ -140,11 +136,15 @@ public class CUAHSIHISCentralConnector extends AbstractHarvestedQueryConnector {
 	    try {
 		servicePositionInt = Integer.parseInt(servicePosition);
 	    } catch (NumberFormatException e) {
-		GSException gse = new GSException();
-		ErrorInfo info = new ErrorInfo();
-		info.setErrorDescription(CANT_RESUME_FROM_RESUMPTION_TOKEN + id);
-		gse.addInfo(info);
-		throw gse;
+
+		throw GSException.createException(//
+			getClass(), //
+			CANT_RESUME_FROM_RESUMPTION_TOKEN + id + ", " + e.getMessage(), //
+			null, //
+			ErrorInfo.ERRORTYPE_INTERNAL, //
+			ErrorInfo.SEVERITY_ERROR, //
+			CUAHSI_HIS_CENTRAL_CONNECTOR_ERROR, //
+			e); //
 	    }
 
 	    childResumptionToken = id.substring(id.indexOf(':') + 1);
@@ -159,28 +159,31 @@ public class CUAHSIHISCentralConnector extends AbstractHarvestedQueryConnector {
 	if (currentServicePosition == null || !currentServicePosition.equals(servicePosition)) {
 
 	    if (servicePositionInt < 0 || services.size() < (servicePositionInt + 1)) {
-		GSException gse = new GSException();
-		ErrorInfo info = new ErrorInfo();
-		info.setErrorDescription(CANT_RESUME_FROM_RESUMPTION_TOKEN + id);
-		gse.addInfo(info);
-		throw gse;
+
+		throw GSException.createException(//
+			getClass(), //
+			CANT_RESUME_FROM_RESUMPTION_TOKEN + id, //
+			ErrorInfo.ERRORTYPE_INTERNAL, //
+			ErrorInfo.SEVERITY_ERROR, //
+			CUAHSI_HIS_CENTRAL_CONNECTOR_ERROR); //
 	    }
 
 	    serviceInfo = services.get(servicePositionInt);
-	    logger.info("Creating connector for service: {}", serviceInfo.getTitle());
+	    GSLoggerFactory.getLogger(this.getClass()).info("Creating connector for service: {}", serviceInfo.getTitle());
 	    currentServicePosition = servicePosition;
 	    String url = serviceInfo.getServiceURL();
 	    if (url.contains("hydroserver.ddns.net/italia")) {
 		currentConnector = new ISPRAConnector();
-	    }else {
+	    } else {
 		currentConnector = new CUAHSIHISServerConnector();
-	    }			    
+	    }
 	    currentConnector.setFirstSiteOnly(isFirstSiteOnly());
 	    currentConnector.setSourceURL(serviceInfo.getServiceURL());
-	    Optional<Integer> mr = getMaxRecords();
-	    if (!isMaxRecordsUnlimited() && mr.isPresent()) {
+
+	    Optional<Integer> mr = getSetting().getMaxRecords();
+	    if (!getSetting().isMaxRecordsUnlimited() && mr.isPresent()) {
 		Integer maxRecords = mr.get();
-		currentConnector.setMaxRecords(maxRecords);
+		currentConnector.getSetting().setMaxRecords(maxRecords);
 	    }
 
 	}
@@ -198,12 +201,12 @@ public class CUAHSIHISCentralConnector extends AbstractHarvestedQueryConnector {
 	    if (iterator.hasNext()) {
 		recordsReturned++;
 
-		Optional<Integer> mr = getMaxRecords();
+		Optional<Integer> mr = getSetting().getMaxRecords();
 
-		if (!isMaxRecordsUnlimited() && mr.isPresent()) {
+		if (!getSetting().isMaxRecordsUnlimited() && mr.isPresent()) {
 		    Integer maxRecords = mr.get();
 		    if (recordsReturned >= maxRecords) {
-			logger.info("Reached max records of {}", maxRecords);
+			GSLoggerFactory.getLogger(this.getClass()).info("Reached max records of {}", maxRecords);
 			printServiceErrors();
 			ret.setResumptionToken(null);
 			return ret;
@@ -211,12 +214,12 @@ public class CUAHSIHISCentralConnector extends AbstractHarvestedQueryConnector {
 		}
 	    }
 	} catch (GSException e) {
-	    logger.error("CUAHSI HIS Server returned unexpected errors, skipping");
+	    GSLoggerFactory.getLogger(this.getClass()).error("CUAHSI HIS Server returned unexpected errors, skipping");
 	    if (serviceInfo != null) {
 		failedServices.add(servicePositionInt + ": " + serviceInfo.getTitle());
-		logger.error("HIS Server position: {}", servicePositionInt);
-		logger.error("HIS Server name: {}", serviceInfo.getTitle());
-		logger.error("HIS Server URL: {}", serviceInfo.getServiceURL());
+		GSLoggerFactory.getLogger(this.getClass()).error("HIS Server position: {}", servicePositionInt);
+		GSLoggerFactory.getLogger(this.getClass()).error("HIS Server name: {}", serviceInfo.getTitle());
+		GSLoggerFactory.getLogger(this.getClass()).error("HIS Server URL: {}", serviceInfo.getServiceURL());
 	    }
 	}
 
@@ -240,14 +243,20 @@ public class CUAHSIHISCentralConnector extends AbstractHarvestedQueryConnector {
 	return ret;
 
     }
+
+    /**
+     * Prints the list of service errors occurred during the harvesting. See
+     * {@link CUAHSIHISCentralConnectorExternalTestIT} for
+     * a list of known service errors
+     */
     private void printServiceErrors() {
 
-	logger.error("CUAHSICentralHarvestFinished Got errors from the following services:");
+	GSLoggerFactory.getLogger(this.getClass()).error("CUAHSICentralHarvestFinished Got errors from the following services:");
 	if (failedServices.isEmpty()) {
-	    logger.error("None!");
+	    GSLoggerFactory.getLogger(this.getClass()).error("None!");
 	}
 	for (String failedService : failedServices) {
-	    logger.error(failedService);
+	    GSLoggerFactory.getLogger(this.getClass()).error(failedService);
 	}
     }
 
@@ -258,24 +267,29 @@ public class CUAHSIHISCentralConnector extends AbstractHarvestedQueryConnector {
 	return ret;
     }
 
-    @Override
-    public String getLabel() {
-	return "CUAHSI HIS Central Connector";
-    }
-
     /**
      * @param firstSiteOnly
      */
     public void setFirstSiteOnly(Boolean firstSiteOnly) {
 
-	GSConfOptionBoolean option = (GSConfOptionBoolean) getSupportedOptions().get(FIRST_SITE_ONLY_OPTION_KEY);
-	option.setValue(firstSiteOnly);
+	getSetting().setHarvestFirstSiteOnly(firstSiteOnly);
     }
 
-    private boolean isFirstSiteOnly() {
+    protected boolean isFirstSiteOnly() {
 
-	GSConfOptionBoolean option = (GSConfOptionBoolean) getSupportedOptions().get(FIRST_SITE_ONLY_OPTION_KEY);
-	return option.getValue().equals(true);
+	return getSetting().isFirstSiteHarvestOnlySet();
+    }
+
+    @Override
+    public String getType() {
+
+	return TYPE;
+    }
+
+    @Override
+    protected CUAHSIHISCentralConnectorSetting initSetting() {
+
+	return new CUAHSIHISCentralConnectorSetting();
     }
 
 }

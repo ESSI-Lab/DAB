@@ -4,7 +4,7 @@ package eu.essi_lab.model.auth;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,7 +24,6 @@ package eu.essi_lab.model.auth;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,11 +44,21 @@ import org.w3c.dom.Node;
 
 import eu.essi_lab.iso.datamodel.DOMSerializer;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.jaxb.common.NameSpace;
+import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.model.GSProperty;
 
 @XmlRootElement(name = "user", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
 public class GSUser extends DOMSerializer implements Serializable {
+
+    /**
+     * 
+     */
+    public static final String ESSI_LAB_DOMAIN = "@essi-lab.eu";
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 396389490559553620L;
 
     @NotNull
     @Email
@@ -79,6 +88,12 @@ public class GSUser extends DOMSerializer implements Serializable {
 	    e.printStackTrace();
 	}
     }
+
+    /**
+     * @param stream
+     * @return
+     * @throws JAXBException
+     */
     public static GSUser create(InputStream stream) throws JAXBException {
 
 	return new GSUser().fromStream(stream);

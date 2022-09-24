@@ -1,10 +1,13 @@
+/**
+ * 
+ */
 package eu.essi_lab.authorization.xacml;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,7 +38,6 @@ import org.ow2.authzforce.core.pdp.api.CloseablePdpEngine;
 import eu.essi_lab.authorization.BasicRole;
 import eu.essi_lab.authorization.MessageAuthorizer;
 import eu.essi_lab.authorization.PolicySetWrapper.Action;
-import eu.essi_lab.authorization.userfinder.DefaultUserFinder;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.AccessMessage;
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -52,6 +54,7 @@ import oasis.names.tc.xacml._3_0.core.schema.wd_17.DecisionType;
 public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMessage> {
 
     private PdpEngineWrapper wrapper;
+    private StringBuilder logBuilder;
 
     /**
      * 
@@ -62,7 +65,19 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
     @Override
     public boolean isAuthorized(RequestMessage message) throws GSException {
 
-	GSLoggerFactory.getLogger(getClass()).debug("Authorization check STARTED");
+	logBuilder = new StringBuilder();
+
+	// GSLoggerFactory.getLogger(getClass()).debug("Authorization check STARTED");
+
+	//
+	// developer machine
+	//
+	if (isLocalHost(message)) {
+
+	    GSLoggerFactory.getLogger(getClass()).debug("Dev. machine authorized");
+
+	    return true;
+	}
 
 	Optional<GSUser> requestUser = message.getCurrentUser();
 
@@ -81,7 +96,9 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
 	    role = BasicRole.ANONYMOUS.getRole();
 	}
 
-	GSLoggerFactory.getLogger(getClass()).debug("User role for identifier {}: {}", identifier, role);
+	logBuilder.append("\n- Identifier: " + identifier);
+
+	logBuilder.append("\n- Role: " + role);
 
 	if (message instanceof DiscoveryMessage) {
 	    mapMessage(role, (DiscoveryMessage) message);
@@ -89,15 +106,17 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
 	    mapMessage(role, (AccessMessage) message);
 	}
 
-	GSLoggerFactory.getLogger(getClass()).debug("Evaluating request STARTED");
+	// GSLoggerFactory.getLogger(getClass()).debug("Evaluating request STARTED");
 
 	boolean result = evaluate();
 
-	GSLoggerFactory.getLogger(getClass()).debug("Evaluation result: " + result);
+	logBuilder.append("\n- Evaluation result: " + (!result ? "denied" : "authorized"));
 
-	GSLoggerFactory.getLogger(getClass()).debug("Evaluating request ENDED");
+	GSLoggerFactory.getLogger(getClass()).info(logBuilder.toString());
 
-	GSLoggerFactory.getLogger(getClass()).debug("Authorization check ENDED");
+	// GSLoggerFactory.getLogger(getClass()).debug("Evaluating request ENDED");
+
+	// GSLoggerFactory.getLogger(getClass()).debug("Authorization check ENDED");
 
 	return result;
     }
@@ -105,11 +124,11 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
     @Override
     public void close() throws IOException {
 
-	GSLoggerFactory.getLogger(getClass()).debug("Closing STARTED");
+	// GSLoggerFactory.getLogger(getClass()).debug("Closing STARTED");
 
 	wrapper.close();
 
-	GSLoggerFactory.getLogger(getClass()).debug("Closing ENDED");
+	// GSLoggerFactory.getLogger(getClass()).debug("Closing ENDED");
     }
 
     /**
@@ -132,32 +151,27 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
 	if (message instanceof DiscoveryMessage) {
 
 	    wrapper.setAction(Action.DISCOVERY.getId());
-	    GSLoggerFactory.getLogger(getClass()).info("Action: " + Action.DISCOVERY.getId());
+	    logBuilder.append("\n- Action: " + Action.DISCOVERY.getId());
 
 	} else {
-	    GSLoggerFactory.getLogger(getClass()).info("Action: " + Action.ACCESS.getId());
+	    logBuilder.append("\n- Action: " + Action.ACCESS.getId());
 	    wrapper.setAction(Action.ACCESS.getId());
 	}
 
 	wrapper.setUserRole(role);
-
-	GSLoggerFactory.getLogger(getClass()).info("Role: " + role);
 
 	Page page = message.getPage();
 	if (page != null) {
 
 	    int offset = message.getPage().getStart();
 	    wrapper.setOffset(offset);
-	    
 
-	    GSLoggerFactory.getLogger(getClass()).info("Offset: " + offset);
-	    
+	    logBuilder.append("\n- Offset: " + offset);
+
 	    int maxRecords = message.getPage().getSize();
 	    wrapper.setMaxRecords(maxRecords);
 
-
-	    GSLoggerFactory.getLogger(getClass()).info("Max records: " + maxRecords);
-	    
+	    logBuilder.append("\n- Max records: " + maxRecords);
 	}
 
 	Optional<View> view = message.getView();
@@ -166,14 +180,21 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
 
 	    wrapper.setViewIdentifier(view.get().getId());
 
-	    GSLoggerFactory.getLogger(getClass()).info("View id: " + view.get().getId());
+	    logBuilder.append("\n- View id: " + view.get().getId());
 
 	    String creator = view.get().getCreator();
 	    if (creator != null) {
 		wrapper.setViewCreator(creator);
 
-		GSLoggerFactory.getLogger(getClass()).info("View creator: " + creator);
+		logBuilder.append("\n- View creator: " + creator);
 	    }
+	}
+
+	Optional<String> originHeader = message.getWebRequest().readOriginHeader();
+	if (originHeader.isPresent()) {
+
+	    logBuilder.append("\n- Origin header: " + originHeader.get());
+	    wrapper.setOriginHeader(originHeader.get());
 	}
 
 	ArrayList<String> ips = new ArrayList<String>();
@@ -183,13 +204,13 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
 
 	if (Objects.nonNull(remoteIp) && !remoteIp.isEmpty()) {
 	    ips.add(remoteIp);
-	    GSLoggerFactory.getLogger(getClass()).info("Remote IP: " + remoteIp);
+	    logBuilder.append("\n- Remote IP: " + remoteIp);
 	}
 
 	if (!xforHeaders.isEmpty()) {
 	    ips.addAll(xforHeaders);
 
-	    xforHeaders.forEach(ip -> GSLoggerFactory.getLogger(getClass()).info("x-forwarded-for-header: " + ip));
+	    xforHeaders.forEach(ip -> logBuilder.append("\n- x-forwarded-for-header: " + ip));
 	}
 
 	if (!ips.isEmpty()) {
@@ -200,7 +221,7 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
 	String path = message.getWebRequest().getProfilerPath();
 	if (path != null) {
 
-	    GSLoggerFactory.getLogger(getClass()).info("Path: " + path);
+	    logBuilder.append("\n- Path: " + path);
 
 	    wrapper.setPath(path);
 	}
@@ -208,7 +229,7 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
 	String clientId = message.getWebRequest().readClientIdentifierHeader().orElse(null);
 	if (clientId != null) {
 
-	    GSLoggerFactory.getLogger(getClass()).info("Client Id: " + clientId);
+	    logBuilder.append("\n- Client Id: " + clientId);
 
 	    wrapper.setClientId(clientId);
 	}
@@ -234,7 +255,15 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
 
 	if (ids.length > 0) {
 
-	    GSLoggerFactory.getLogger(getClass()).info("Sources: " + Arrays.asList(ids));
+	    List<String> toPrint = new ArrayList<>(Arrays.asList(ids));
+
+	    if (toPrint.size() > 3) {
+
+		toPrint = toPrint.subList(0, 3);
+		toPrint.add("...");
+	    }
+
+	    logBuilder.append("\n- Sources (" + ids.length + "): " + toPrint);
 
 	    wrapper.setSources(ids);
 	}
@@ -258,6 +287,15 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
 
 	    wrapper.setDownloadCount(count.get());
 	}
+    }
+
+    /**
+     * @param message
+     * @return
+     */
+    private boolean isLocalHost(RequestMessage message) {
+
+	return message.getRequestAbsolutePath() != null && message.getRequestAbsolutePath().startsWith("http://localhost");
     }
 
     /**

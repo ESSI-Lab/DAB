@@ -4,7 +4,7 @@ package eu.essi_lab.access.compliance;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
+import eu.essi_lab.access.DataValidator;
 import eu.essi_lab.access.compliance.DataComplianceTester.DataComplianceTest;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.ValidationMessage;
@@ -36,6 +37,13 @@ import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.model.resource.data.DataFormat;
 import eu.essi_lab.model.resource.data.DataObject;
 import eu.essi_lab.workflow.builder.Workflow;
+
+/**
+ * Provides the certified compliance level of a given data described by a {@link DataDescriptor}, or more generally, certifies if a given
+ * data described by a {@link DataDescriptor} can be transformed to a data described by another (different) {@link DataDescriptor}
+ *
+ * @author Fabrizio
+ */
 public class DataComplianceReport {
 
     public static final String NONE = "none";

@@ -1,9 +1,9 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "DAB statistics test page for GEOSS Portal",
+        "description": "GI-project statistics test page for GEOSS Portal",
         "version": "1.0.0",
-        "title": "DAB statistics test page for GEOSS Portal"
+        "title": "GI-project statistics test page for GEOSS Portal"
     },
     
     "basePath": "/gs-service/services/essi",

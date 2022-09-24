@@ -4,7 +4,7 @@ package eu.essi_lab.workflow.processor.timeseries;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -213,6 +213,23 @@ public class NetCDF_TimeSeries_Subset_Processor extends AbstractTimeSubsetProces
 	}
 
     }
+
+    /**
+     * Given a Date, find the corresponding time index on the time coordinate axis.
+     * Can only call this if hasDate() is true.
+     * This will return
+     * <ul>
+     * <li>0, if d < time(0)
+     * <li>i, if time(i) <= d < time(i+1) (with i from 0 to n-1)
+     * <li>n-1, if d > time(n-1), where n is length of time coordinates
+     * </ul>
+     * 
+     * @param timeAxis
+     * @param d date to look for
+     * @param timeAxisInverted
+     * @return corresponding time index on the time coordinate axis
+     * @throws UnsupportedOperationException is no time axis or isDate() false
+     */
     public int findTimeIndexFromCalendarDate(CoordinateAxis1DTime timeAxis, CalendarDate d, boolean timeAxisInverted) {
 	List<CalendarDate> cdates = timeAxis.getCalendarDates(); // LOOK linear search, switch to binary
 	if (timeAxisInverted) {

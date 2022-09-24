@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof.client;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,9 +35,15 @@ import org.slf4j.Logger;
 
 import eu.essi_lab.lib.net.utils.HttpRequestExecutor;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.xml.StAXDocumentReader;
+import eu.essi_lab.lib.xml.stax.StAXDocumentIterator;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
+
+/**
+ * Utility class to be used inside the Hydro Server client to make SOAP requests to HydroServers
+ * 
+ * @author boldrini
+ */
 class SOAPExecutorStAX {
 
     private static final String CUAHSI_HIS_CLIENT_ERROR = "CUAHSI_HIS_CLIENT_ERROR";
@@ -45,7 +51,7 @@ class SOAPExecutorStAX {
     private String action;
     private byte[] input;
 
-    private transient Logger logger = GSLoggerFactory.getLogger(SOAPExecutorStAX.class);
+    private Logger logger = GSLoggerFactory.getLogger(SOAPExecutorStAX.class);
 
     private String endpoint;
 
@@ -100,7 +106,7 @@ class SOAPExecutorStAX {
 		// here we check that the document is a good response and not a server fault
 
 		FileInputStream fis = new FileInputStream(tmpFile);
-		StAXDocumentReader reader = new StAXDocumentReader(fis, "siteInfo");
+		StAXDocumentIterator reader = new StAXDocumentIterator(fis, "siteInfo");
 		if (!reader.hasNext()) {
 		    fis.close();
 		    throw GSException.createException(//
@@ -109,8 +115,8 @@ class SOAPExecutorStAX {
 			    null, //
 			    ErrorInfo.ERRORTYPE_SERVICE, //
 			    ErrorInfo.SEVERITY_ERROR, //
-			    CUAHSI_HIS_CLIENT_ERROR, //
-			    null);
+			    CUAHSI_HIS_CLIENT_ERROR //
+			    );
 
 		} else {
 		    reader.close();

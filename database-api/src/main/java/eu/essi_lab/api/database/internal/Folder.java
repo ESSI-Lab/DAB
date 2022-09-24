@@ -4,7 +4,7 @@ package eu.essi_lab.api.database.internal;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,11 +23,19 @@ package eu.essi_lab.api.database.internal;
 
 import java.io.InputStream;
 import java.util.Date;
+import java.util.Optional;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 public interface Folder {
+
+    /**
+     * Returns the URI of this folder which is like the complete name but with the starting and trailing '/' (e.g.:
+     * /SUITE_ID_sourcename-data-2/)
+     *
+     * @throws Exception if the key is already used or problems occur.
+     */
     String getURI();
 
     /**
@@ -84,12 +92,12 @@ public interface Folder {
      *
      * @param key the key of the resource.
      * @param res the resource to be stored.
-     * @param modificationDate the value of the last modification date to be used
+     * @param timeStamp a date to use as timestamp
      * @return
      * @throws Exception if the key is already used or problems occur
      * @throws UnsupportedOperationException if this repository does not support this operation
      */
-    boolean storeBinary(String key, InputStream res, Date modificationDate) throws Exception, UnsupportedOperationException;
+    boolean storeBinary(String key, InputStream res, Date timeStamp) throws Exception, UnsupportedOperationException;
 
     /**
      * Returns the DOM resource with the specified <code>key</code>.<br>
@@ -114,9 +122,9 @@ public interface Folder {
      */
     InputStream getBinary(String key) throws Exception;
 
-    Node getBinaryProperties(String key) throws Exception;
+    Optional<Node> getBinaryProperties(String key) throws Exception;
 
-    Date getBinaryLastUpdate(String key) throws Exception;
+    Optional<Date> getBinaryTimestamp(String key) throws Exception;
 
     /**
      * Replace with <code>newDoc</code> the content of the XML resource with the specified <code>key</code>.<br>

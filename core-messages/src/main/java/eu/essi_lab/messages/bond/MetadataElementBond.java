@@ -4,7 +4,7 @@ package eu.essi_lab.messages.bond;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,6 +23,18 @@ package eu.essi_lab.messages.bond;
 
 import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
 import eu.essi_lab.model.resource.MetadataElement;
+
+/**
+ * A bond applied to a {@link MetadataElement}
+ * 
+ * @author Fabrizio
+ * @see SimpleValueBond
+ * @see SpatialBond
+ * @see MetadataElement#isVolatile()
+ * @param <T> the bond value type. The bond value is used by the {@link DiscoveryBondParser} to build the query for the related
+ *        data base. In most cases the String or Boolean type is enough, but in some cases a complex type can be
+ *        required (see {@link SpatialBond} )
+ */
 public abstract class MetadataElementBond<T> extends QueryableBond<T> {
 
     /**

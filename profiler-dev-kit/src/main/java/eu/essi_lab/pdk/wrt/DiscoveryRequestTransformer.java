@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.wrt;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,7 +29,7 @@ import java.util.ServiceLoader;
 
 import org.slf4j.Logger;
 
-import eu.essi_lab.configuration.ConfigurationUtils;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.RequestMessage;
@@ -57,11 +57,59 @@ import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.Profiler;
 import eu.essi_lab.pdk.handler.DiscoveryHandler;
+
+/**
+ * Validates and transforms a "discovery query" in the correspondent {@link DiscoveryMessage}. The discovery query is
+ * represented by a
+ * {@link WebRequest} which encapsulates request parameters and headers.<br>
+ * This component is part of the {@link DiscoveryHandler}
+ * composition and the calling of {@link #transform(WebRequest)} method is the first step of the workflow
+ * <h3>Implementation notes</h3>
+ * The main goal of a transformer is to provide the {@link Bond} representation of the {@link WebRequest}
+ * parameters.<br>
+ * <br>
+ * This goal can be achieved in many different ways, depending also by the request method supported by the
+ * {@link Profiler} service, GET
+ * and/or POST. The {@link WebRequestParameter} API can be used for GET requests. Implementations can define several
+ * {@link
+ * WebRequestParameter}s as
+ * <code>static</code> fields, one for each parameter supported by the {@link Profiler} web service. The
+ * {@link Bond} representation of all the defined {@link WebRequestParameter}s provided by the
+ * {@link WebRequestParameter#asBond(String)}
+ * method, can be used to properly set the {@link DiscoveryMessage#getUserBond(Bond)} property (see
+ * {@link WebRequestParameter} java docs
+ * for more info).<br>
+ * <br>
+ * The mapping from {@link WebRequest} parameters to {@link Bond}s depends from the semantic of the parameters supported
+ * by {@link Profiler}
+ * service. Consider for example an
+ * <a href="http://www.opensearch.org/Home">OpenSearch</a> web service and its <a href=
+ * "http://www.opensearch.org/Specifications/OpenSearch/1.1/Draft_3#The_.22searchTerms.22_parameter">searchTerms</a>
+ * parameter. The semantic
+ * of such parameter can be described in natural language: "give me all the metadata records with a textual content
+ * matching the supplied
+ * search terms". In the GI-suite, the textual content of a {@link GSResource} can be queried by means of the
+ * {@link AnyTextBond}, which
+ * represents a constraint applied on the entire textual content of a {@link GSResource} (for a complete list of the
+ * available {@link Bond}s
+ * see {@link BondFactory}).<br>
+ * <br>
+ * As for all the {@link Pluggable}, in order to be loaded the transformer implementation <b>MUST</b> be registered with
+ * the {@link
+ * ServiceLoader} API<br>
+ * <br>
+ *
+ * @author Fabrizio
+ * @see DiscoveryHandler
+ * @see WebRequestParameter
+ * @see DiscoveryHandler
+ * @see Profiler#handle(WebRequest)
+ */
 public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<DiscoveryMessage> {
 
     private static final String UNIDENTIFIED_SOURCE_ERROR = "NON_EXISTENT_SOURCE_ERROR";
     private static final String EXCLUDED = "EXCLUDED";
-    private transient Logger logger = GSLoggerFactory.getLogger(DiscoveryRequestTransformer.class);
+    private Logger logger = GSLoggerFactory.getLogger(DiscoveryRequestTransformer.class);
 
     /**
      * Refines the <code>message</code> by setting the {@link Bond}, the distinct queryables, {@link GSSource}s and
@@ -165,7 +213,9 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
     protected List<GSSource> getSources(Bond bond) throws GSException {
 
 	logger.trace("Getting sources STARTED");
-
+	
+	List<GSSource> allSources = ConfigurationWrapper.getAllSources();
+	
 	DiscoveryBondParser bondParser = new DiscoveryBondParser(bond);
 	final List<GSSource> sources = new ArrayList<>();
 	final List<GSException> excList = new ArrayList<>();
@@ -186,15 +236,10 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
 			return;
 		    }
 
-		    GSSource source = null;
-		    try {
-			source = ConfigurationUtils.getSource(value);
-		    } catch (GSException ex) {
-			excList.add(ex);
-			return;
-		    }
-		    if (source != null) {
-			sources.add(source);
+		    Optional<GSSource> source = allSources.stream().filter(s -> s.getUniqueIdentifier().equals(value)).findFirst();;
+
+		    if (source.isPresent()) {
+			sources.add(source.get());
 		    } else {
 			// the request validation MUST check the sources ids,
 			// this exception should NEVER be thrown
@@ -231,45 +276,34 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
 
 	    @Override
 	    public void spatialBond(SpatialBond b) {
-		// nothing to do here
 	    }
 
 	    @Override
 	    public void simpleValueBond(SimpleValueBond bond) {
-		// nothing to do here
 	    }
 
 	    @Override
 	    public void separator() {
-		// nothing to do here
 	    }
 
 	    @Override
 	    public void endLogicalBond(LogicalBond b) {
-		// nothing to do here
 	    }
 
 	    @Override
 	    public void customBond(QueryableBond<String> bond) {
-		// nothing to do here
 	    }
 
 	    @Override
 	    public void viewBond(ViewBond bond) {
-		// nothing to do here
-
 	    }
 
 	    @Override
 	    public void nonLogicalBond(Bond bond) {
-		// TODO Auto-generated method stub
-
 	    }
 
 	    @Override
 	    public void runtimeInfoElementBond(RuntimeInfoElementBond bond) {
-		// TODO Auto-generated method stub
-		
 	    }
 	});
 
@@ -278,7 +312,7 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
 	}
 
 	if (sources.isEmpty()) {
-	    sources.addAll(ConfigurationUtils.getAllSources());
+	    sources.addAll(ConfigurationWrapper.getAllSources());
 	}
 
 	for (String excludedSource : exclusionList) {

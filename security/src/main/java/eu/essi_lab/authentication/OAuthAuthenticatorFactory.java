@@ -4,7 +4,7 @@ package eu.essi_lab.authentication;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,25 +21,68 @@ package eu.essi_lab.authentication;
  * #L%
  */
 
-import eu.essi_lab.authentication.configuration.GSOAuthAuthenticator;
-import eu.essi_lab.authentication.configuration.IOAuthAuthenticatorConfigurable;
-import eu.essi_lab.model.GSOAuthProvider;
+import eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting;
+import eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting.OAuthProvider;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
+
+/**
+ * @author Fabrizio
+ */
 public class OAuthAuthenticatorFactory {
 
-    private static final String BAD_PROVIDER_OBJECT_TYPE_ERR_ID = "BAD_PROVIDER_OBJECT_TYPE_ERR_ID";
+    /**
+     * 
+     */
+    private static final String AUTHENTICATOR_FACTORY_ERROR = "AUTHENTICATOR_FACTORY_ERROR";
 
-    public OAuthAuthenticator getOAuthAuthenticator(GSOAuthProvider provider) throws GSException {
+    /**
+     * @param setting
+     * @return
+     * @throws GSException
+     */
+    public static OAuthAuthenticator getOAuthAuthenticator(OAuthSetting setting) throws GSException {
 
-	if (!GSOAuthAuthenticator.class.isAssignableFrom(provider.getClass()))
-	    throw GSException.createException(this.getClass(), "The provided object is not a GSOAuthAuthenticator", null, null,
-		    ErrorInfo.ERRORTYPE_CLIENT, ErrorInfo.SEVERITY_ERROR, BAD_PROVIDER_OBJECT_TYPE_ERR_ID);
+	try {
 
-	IOAuthAuthenticatorConfigurable configurable = (IOAuthAuthenticatorConfigurable) ((GSOAuthAuthenticator) provider)
-		.getOauthConfigurable();
+	    OAuthAuthenticator authenticator = null;
 
-	return configurable.getAuthenticator();
+	    OAuthProvider provider = setting.getSelectedProvider();
+	    switch (provider) {
+	    case FACEBOOK:
 
+		authenticator = new FacebookOAuth2Authenticator();
+
+		break;
+	    case GOOGLE:
+
+		authenticator = new GoogleOAuth2Authenticator();
+
+		break;
+	    case TWITTER:
+
+		authenticator = new TwitterOAuthAuthenticator();
+
+		break;
+	    }
+
+	    authenticator.configure(setting);
+
+	    return authenticator;
+
+	} catch (Exception e) {
+
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(OAuthAuthenticatorFactory.class).error(e.getMessage(), e);
+
+	    throw GSException.createException(//
+		    OAuthAuthenticatorFactory.class, //
+		    e.getMessage(), //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    AUTHENTICATOR_FACTORY_ERROR);
+	}
     }
 }

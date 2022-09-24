@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof.discovery.sites;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,6 +35,7 @@ import eu.essi_lab.messages.ResourceSelector;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.ValidationMessage;
+import eu.essi_lab.messages.RequestMessage.IterationMode;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
@@ -50,12 +51,18 @@ import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.validation.WebRequestValidator;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
+
+/**
+ * HYDRO Server GetSites/GetSitesObject request transformer
+ *
+ * @author boldrini
+ */
 public class GetSitesTransformer extends DiscoveryRequestTransformer {
 
     /**
      * 
      */
-    private static final int DEFAULT_PAGE_SIZE = 100;
+    private static final int DEFAULT_PAGE_SIZE = 10;
 
     public GetSitesTransformer() {
 	// empty constructor for service loader
@@ -71,7 +78,7 @@ public class GetSitesTransformer extends DiscoveryRequestTransformer {
 
 	if (countValue == null || countValue.isEmpty()) {
 
-	    message.setIteratedWorkflow();
+	    message.setIteratedWorkflow(IterationMode.FULL_RESPONSE);
 	}
 
 	return message;

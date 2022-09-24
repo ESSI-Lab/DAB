@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.wml._2_0.sf._2_0;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -37,6 +37,30 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import eu.essi_lab.jaxb.wml._2_0.gml._3_2_1.AbstractFeatureType;
 
+
+/**
+ *  The class SF_SamplingFeatureCollection (Figure 9) is an instance of the
+ * 				«metaclass» GF_FeatureType (ISO 19109:2005), which therefore represents a feature
+ * 				type. SF_SamplingFeatureCollection shall support one association. 
+ * 
+ * <p>Java class for SF_SamplingFeatureCollectionType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="SF_SamplingFeatureCollectionType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{http://www.opengis.net/gml/3.2}AbstractFeatureType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="member" type="{http://www.opengis.net/sampling/2.0}SF_SamplingFeaturePropertyType" maxOccurs="unbounded"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SF_SamplingFeatureCollectionType", propOrder = {
     "member"

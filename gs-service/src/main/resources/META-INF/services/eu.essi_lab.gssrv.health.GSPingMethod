@@ -1,0 +1,6 @@
+eu.essi_lab.gssrv.health.methods.GSNc4IospMethod
+eu.essi_lab.gssrv.health.methods.GdalMethod
+eu.essi_lab.gssrv.health.methods.DiscoveryMethod
+eu.essi_lab.gssrv.health.methods.ProfilerMethod
+eu.essi_lab.gssrv.health.methods.XMLDocumentReaderMethod
+eu.essi_lab.gssrv.health.methods.DistributorMethod

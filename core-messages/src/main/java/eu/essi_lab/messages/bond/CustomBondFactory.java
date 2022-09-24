@@ -4,7 +4,7 @@ package eu.essi_lab.messages.bond;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,6 +31,17 @@ import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.Queryable.ContentType;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
+
+/**
+ * A factory to create custom {@link Bond}s<br>
+ * <br>
+ * <b>Name conventions</b><br>
+ * <br>
+ * The names of the {@link Queryable}s used to build the custom {@link QueryableBond} MUST comply to the conventions specified in the {@link
+ * #checkName(String)} method
+ *
+ * @author Fabrizio
+ */
 public class CustomBondFactory {
 
     private static final String UNSUPPORTED_BINARY_OP = "Unsupported binary operator: ";

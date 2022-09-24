@@ -4,7 +4,7 @@ package eu.essi_lab.indexes;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,6 +30,14 @@ import eu.essi_lab.model.pluggable.PluginsLoader;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.HarmonizedMetadata;
 import eu.essi_lab.model.resource.ResourcePropertyHandler;
+
+/**
+ * Utility class which writes {@link IndexedElement}s in to a {@link GSResource}.<br>
+ * {@link GSResource} indexing is the process of adding the value of {@link IndexedElement}s to the
+ * {@link HarmonizedMetadata#getIndexesMetadata()}
+ * 
+ * @author Fabrizio
+ */
 public class IndexedElementsWriter {
 
     /**
@@ -52,7 +60,10 @@ public class IndexedElementsWriter {
 	// metadata quality
 	//
 	try {
-	    resource.getPropertyHandler().setMetadataQuality();
+	    if (!resource.getPropertyHandler().getMetadataQuality().isPresent()) {
+
+		resource.getPropertyHandler().setMetadataQuality();
+	    }
 	} catch (Exception e) {
 	    // this try catch is needed because in case of an error the harvesting procedure can continue, instead of
 	    // being stopped
@@ -81,8 +92,7 @@ public class IndexedElementsWriter {
 			    index.defineValues(resource);
 			    resource.getIndexesMetadata().write(index);
 			} catch (Exception e) {
-			    e.printStackTrace();
-			    GSLoggerFactory.getLogger(IndexedElementsWriter.class).error("This shouldn't happen, please check and fix");
+			    GSLoggerFactory.getLogger(IndexedElementsWriter.class).error(e);
 			}
 		    });
 	}

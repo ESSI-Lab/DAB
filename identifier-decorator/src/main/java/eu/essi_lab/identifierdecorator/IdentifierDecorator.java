@@ -4,7 +4,7 @@ package eu.essi_lab.identifierdecorator;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,168 +21,53 @@ package eu.essi_lab.identifierdecorator;
  * #L%
  */
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.DatabaseReader.IdentifierType;
-import eu.essi_lab.api.database.DatabaseWriter;
 import eu.essi_lab.api.database.SourceStorage;
+import eu.essi_lab.cfga.gs.setting.SourcePrioritySetting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.HarvestingProperties;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.ResultsPriority;
-import eu.essi_lab.model.configuration.AbstractGSconfigurableComposed;
-import eu.essi_lab.model.configuration.option.GSConfOption;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.ResourceType;
 
-public class IdentifierDecorator extends AbstractGSconfigurableComposed {
+/**
+ * @author Fabrizio
+ */
+public class IdentifierDecorator {
 
-    private static final long serialVersionUID = 5527405836433966422L;
-    public static final String PRIORITY_DOC = "PRIORITY_DOC";
-    public static final String DATABASE_READER = "DATABASE_READER";
-    public static final String DATABASE_WRITER = "DATABASE_WRITER";
+    private DatabaseReader dbReader;
+    private SourcePrioritySetting sourcePrioritySetting;
 
+    /**
+     * 
+     */
     public IdentifierDecorator() {
+	this.sourcePrioritySetting = new SourcePrioritySetting();
     }
 
-    public IdentifierDecorator(SourcePriorityDocument sourcePriorityDoc, DatabaseReader dbReader, DatabaseWriter dbWriter) {
-	getConfigurableComponents().put(PRIORITY_DOC, sourcePriorityDoc);
-	getConfigurableComponents().put(DATABASE_READER, dbReader);
-	getConfigurableComponents().put(DATABASE_WRITER, dbWriter);
+    /**
+     * @param sourcePrioritySetting
+     * @param dbReader
+     */
+    public IdentifierDecorator(SourcePrioritySetting sourcePrioritySetting, DatabaseReader dbReader) {
+	this.sourcePrioritySetting = sourcePrioritySetting;
+	this.dbReader = dbReader;
     }
 
-    public Optional<SourcePriorityDocument> getSourcePriorityDocument() {
-
-	return Optional.ofNullable((SourcePriorityDocument) getConfigurableComponents().get(PRIORITY_DOC));
-    }
-
-    public void setSourcePriorityDocument(SourcePriorityDocument sourcePriorityDocument) {
-	getConfigurableComponents().put(PRIORITY_DOC, sourcePriorityDocument);
-    }
-
-    @JsonIgnore
-    public DatabaseReader getDbReader() {
-	return (DatabaseReader) getConfigurableComponents().get(DATABASE_READER);
-    }
-
-    public void setDbReader(DatabaseReader dbReader) {
-	getConfigurableComponents().put(DATABASE_READER, dbReader);
-    }
-
-    @JsonIgnore
-    public DatabaseWriter getDbWriter() {
-	return (DatabaseWriter) getConfigurableComponents().get(DATABASE_WRITER);
-    }
-
-    public void setDbWriter(DatabaseWriter dbWriter) {
-	getConfigurableComponents().put(DATABASE_WRITER, dbWriter);
-    }
-
+    /**
+     */
     public void decorateDistributedIdentifier(GSResource resource) {
+
 	resource.setPrivateId(generateUniqueIdentifier());
 	resource.setPublicId(resource.getPrivateId());
-    }
-    private int isDuplicate(//
-	    GSResource existingResource, //
-	    GSResource incomingResource, //
-	    HarvestingProperties properties, //
-	    boolean firstHarvesting, //
-	    boolean isRecovery, //
-	    boolean isIncremental) {
-
-	GSLoggerFactory.getLogger(getClass()).debug("Existing resource \"{}\"", existingResource);
-	GSLoggerFactory.getLogger(getClass()).debug("Existing resource source \"{}\"", existingResource.getSource().getLabel());
-
-	boolean sameSource = existingResource.getSource().getUniqueIdentifier().equals(//
-		incomingResource.getSource().getUniqueIdentifier());
-
-	boolean sameOriginalId = Objects.nonNull(existingResource.getOriginalId()) //
-		&& existingResource.getOriginalId().//
-			equals(incomingResource.getOriginalId());
-
-	//
-	// basic condition
-	//
-	if (sameSource && sameOriginalId) {
-
-	    GSLoggerFactory.getLogger(getClass()).debug("Basic condition checked");
-
-	    boolean isReharvesting = Objects.nonNull(properties) && properties.getHarvestingCount() >= 1;
-
-	    //
-	    // case 1
-	    //
-	    if (!isRecovery && firstHarvesting) {
-
-		GSLoggerFactory.getLogger(getClass()).debug("Duplicated resource found: case 1");
-
-		return 1;
-	    }
-
-	    //
-	    // case 2. it should never happen
-	    //
-	    if (isRecovery && (firstHarvesting || isIncremental)) {
-
-		GSLoggerFactory.getLogger(getClass()).debug("Duplicated resource found: case 2");
-
-		return 2;
-	    }
-
-	    //
-	    // case 3
-	    //
-	    if (!firstHarvesting && !isRecovery && isIncremental) {
-
-		GSLoggerFactory.getLogger(getClass()).debug("Duplicated resource found: case 3");
-
-		return 3;
-	    }
-
-	    Optional<String> existingResTimeStamp = existingResource.getPropertyHandler().getResourceTimeStamp();
-	    String endHarvestingTimestamp = properties.getEndHarvestingTimestamp();
-
-	    //
-	    // if this check fails, we are in the case 4
-	    //
-	    boolean isConsolidated = existingResTimeStamp.isPresent() && existingResTimeStamp.get().compareTo(endHarvestingTimestamp) < 0;
-
-	    GSLoggerFactory.getLogger(getClass()).debug("Existing resource time stamp: " + existingResTimeStamp.orElse("none"));
-	    GSLoggerFactory.getLogger(getClass()).debug("End harvesting    time stamp: " + endHarvestingTimestamp);
-
-	    GSLoggerFactory.getLogger(getClass()).debug("Existing resource is consolidated: " + isConsolidated);
-
-	    //
-	    // case 5
-	    //
-	    if (!isRecovery && !isIncremental && isReharvesting && !isConsolidated) {
-
-		GSLoggerFactory.getLogger(getClass()).debug("Duplicated resource found: case 5");
-
-		return 5;
-	    }
-
-	    //
-	    // case 6. it should never happen
-	    //
-	    if (isRecovery && !isIncremental && isReharvesting && !isConsolidated) {
-
-		GSLoggerFactory.getLogger(getClass()).debug("Duplicated resource found: case 6");
-
-		return 6;
-	    }
-	}
-
-	return 0;
     }
 
     /**
@@ -212,7 +97,7 @@ public class IdentifierDecorator extends AbstractGSconfigurableComposed {
 	    // in the whole DB, included the temporary folders in order
 	    // to apply the isDuplicate check since
 	    //
-	    List<GSResource> existingResources = getDbReader().getResources(IdentifierType.ORIGINAL, originalId);
+	    List<GSResource> existingResources = getDatabaseReader().getResources(IdentifierType.ORIGINAL, originalId);
 
 	    if (!existingResources.isEmpty()) {
 
@@ -224,7 +109,8 @@ public class IdentifierDecorator extends AbstractGSconfigurableComposed {
 
 		for (GSResource existingResource : existingResources) {
 
-		    GSLoggerFactory.getLogger(getClass()).debug("Duplicated resource test STARTED");
+		    GSLoggerFactory.getLogger(getClass()).warn("Existing resource \"{}\"", existingResource);
+		    GSLoggerFactory.getLogger(getClass()).warn("Existing resource source \"{}\"", existingResource.getSource().getLabel());
 
 		    int duplicationCase = isDuplicate(//
 			    existingResource, //
@@ -233,8 +119,6 @@ public class IdentifierDecorator extends AbstractGSconfigurableComposed {
 			    isFirstHarvesting, //
 			    isRecovery, //
 			    isIncremental);
-
-		    GSLoggerFactory.getLogger(getClass()).debug("Duplicated resource test ENDED");
 
 		    if (duplicationCase > 0) {
 			//
@@ -284,10 +168,118 @@ public class IdentifierDecorator extends AbstractGSconfigurableComposed {
 	    }
 	} else {
 
-	    GSLoggerFactory.getLogger(getClass()).debug("Using random identifier");
+	    // GSLoggerFactory.getLogger(getClass()).debug("Using random identifier");
 
 	    decorateDistributedIdentifier(incomingResource);
 	}
+    }
+
+    /**
+     * @return
+     */
+    public DatabaseReader getDatabaseReader() {
+
+	return this.dbReader;
+    }
+
+    /**
+     * See diagram https://confluence.geodab.eu/display/GPD/Identifier+Decorator
+     * 
+     * @param existingResource
+     * @param incomingResource
+     * @param properties
+     * @param firstHarvesting
+     * @param isRecovery
+     * @param isIncremental
+     * @return
+     */
+    private int isDuplicate(//
+	    GSResource existingResource, //
+	    GSResource incomingResource, //
+	    HarvestingProperties properties, //
+	    boolean firstHarvesting, //
+	    boolean isRecovery, //
+	    boolean isIncremental) {
+
+	boolean sameSource = existingResource.getSource().getUniqueIdentifier().equals(//
+		incomingResource.getSource().getUniqueIdentifier());
+
+	boolean sameOriginalId = Objects.nonNull(existingResource.getOriginalId()) //
+		&& existingResource.getOriginalId().//
+			equals(incomingResource.getOriginalId());
+
+	//
+	// basic condition
+	//
+	if (sameSource && sameOriginalId) {
+
+	    boolean isReharvesting = Objects.nonNull(properties) && properties.getHarvestingCount() >= 1;
+
+	    //
+	    // case 1
+	    //
+	    if (!isRecovery && firstHarvesting) {
+
+		GSLoggerFactory.getLogger(getClass()).warn("Duplicated resource found: case 1");
+
+		return 1;
+	    }
+
+	    //
+	    // case 2. it should never happen
+	    //
+	    if (isRecovery && (firstHarvesting || isIncremental)) {
+
+		GSLoggerFactory.getLogger(getClass()).warn("Duplicated resource found: case 2");
+
+		return 2;
+	    }
+
+	    //
+	    // case 3
+	    //
+	    if (!firstHarvesting && !isRecovery && isIncremental) {
+
+		GSLoggerFactory.getLogger(getClass()).warn("Duplicated resource found: case 3");
+
+		return 3;
+	    }
+
+	    Optional<String> existingResTimeStamp = existingResource.getPropertyHandler().getResourceTimeStamp();
+	    String endHarvestingTimestamp = properties.getEndHarvestingTimestamp();
+
+	    //
+	    // if this check fails, we are in the case 4
+	    //
+	    boolean isConsolidated = existingResTimeStamp.isPresent() && existingResTimeStamp.get().compareTo(endHarvestingTimestamp) < 0;
+
+	    GSLoggerFactory.getLogger(getClass()).warn("Existing resource time stamp: " + existingResTimeStamp.orElse("none"));
+	    GSLoggerFactory.getLogger(getClass()).warn("End harvesting    time stamp: " + endHarvestingTimestamp);
+
+	    GSLoggerFactory.getLogger(getClass()).warn("Existing resource is consolidated: " + isConsolidated);
+
+	    //
+	    // case 5
+	    //
+	    if (!isRecovery && !isIncremental && isReharvesting && !isConsolidated) {
+
+		GSLoggerFactory.getLogger(getClass()).warn("Duplicated resource found: case 5");
+
+		return 5;
+	    }
+
+	    //
+	    // case 6. it should never happen
+	    //
+	    if (isRecovery && !isIncremental && isReharvesting && !isConsolidated) {
+
+		GSLoggerFactory.getLogger(getClass()).warn("Duplicated resource found: case 6");
+
+		return 6;
+	    }
+	}
+
+	return 0;
     }
 
     /**
@@ -299,54 +291,23 @@ public class IdentifierDecorator extends AbstractGSconfigurableComposed {
      */
     private boolean isConflictingResource(SourceStorage storage, GSResource existingResource, GSSource incomingSource) throws GSException {
 
-	GSLoggerFactory.getLogger(getClass()).debug("Conflicting resource test STARTED");
-
-	GSLoggerFactory.getLogger(getClass()).debug("Existing resource \"{}\"", existingResource);
-	GSLoggerFactory.getLogger(getClass()).debug("Existing resource source \"{}\"", existingResource.getSource().getLabel());
-
 	boolean sameSource = existingResource.getSource().getUniqueIdentifier().//
 		equals(incomingSource.getUniqueIdentifier());
 
-	GSLoggerFactory.getLogger(getClass()).debug("Existing resource is conflicting: {}", !sameSource);
-
-	GSLoggerFactory.getLogger(getClass()).debug("Conflicting resource test ENDED");
+	GSLoggerFactory.getLogger(getClass()).warn("Existing resource is conflicting: {}", !sameSource);
 
 	return !sameSource;
-
-	// HarvestingProperties properties = storage.getProperties(existingResource.getSource());
-	//
-	// if (Objects.isNull(properties)) {
-	//
-	// return false;
-	// }
-	//
-	// String endHarvestingTimestamp = properties.getEndHarvestingTimestamp();
-	//
-	// if (Objects.isNull(endHarvestingTimestamp)) {
-	//
-	// return false;
-	// }
-	//
-	// boolean isConflicting = existingResource.getPropertyHandler().//
-	// getResourceTimeStamp().get().compareTo(endHarvestingTimestamp) < 0;
-	//
-	// GSLoggerFactory.getLogger(getClass()).debug("Existing resource is conflicting: {}", isConflicting);
-	//
-	// GSLoggerFactory.getLogger(getClass()).debug("Conflicting resource test ENDED");
-	//
-	// return isConflicting;
     }
 
     /**
      * The original identifier is used in 3 cases:
      * <ol>
      * <li>The resource is a collection and the related source has the collection priority</li>
-     * <li>The source is in the list of the priority source document</li>
+     * <li>The source is configured as priority source</li>
      * <li>The original id is an UUID</li>
      * </ol>
      * 
      * @param resource
-     * @param isRecovering
      * @return
      */
     private boolean useOriginalId(GSResource resource) {
@@ -361,13 +322,12 @@ public class IdentifierDecorator extends AbstractGSconfigurableComposed {
 	boolean hasCollectionPriority = resource.getSource().getResultsPriority() == ResultsPriority.COLLECTION;
 	boolean collection = resource.getResourceType() == ResourceType.DATASET_COLLECTION;
 
-	boolean hasDocumentPriority = getSourcePriorityDocument().isPresent() && //
-		getSourcePriorityDocument().get().isPrioritySource(resource.getSource());
+	boolean isPrioritySource = sourcePrioritySetting.isPrioritySource(resource.getSource());
 
 	return originalId.isPresent() && (//
 	(collection && hasCollectionPriority) || //
 		isUUID(originalId.get()) || //
-		hasDocumentPriority//
+		isPrioritySource//
 	);
     }
 
@@ -388,20 +348,5 @@ public class IdentifierDecorator extends AbstractGSconfigurableComposed {
 
     String generateUniqueIdentifier() {
 	return UUID.randomUUID().toString();
-    }
-
-    @Override
-    public Map<String, GSConfOption<?>> getSupportedOptions() {
-	return new HashMap<>();
-    }
-
-    @Override
-    public void onOptionSet(GSConfOption<?> opt) throws GSException {
-	return;
-    }
-
-    @Override
-    public void onFlush() throws GSException {
-	return;
     }
 }

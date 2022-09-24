@@ -4,7 +4,7 @@ package eu.essi_lab.messages.web;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -80,13 +80,19 @@ import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.model.RuntimeInfoElement;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.rip.RuntimeInfoProvider;
+
+/**
+ * Encapsulates all the necessary objects to handle a Web request
+ *
+ * @author Fabrizio
+ */
 public class WebRequest implements RuntimeInfoProvider, Serializable {
 
     @Override
     public String getBaseType() {
 	return "web-request";
     }
-    
+
     /**
      * 
      */
@@ -116,24 +122,22 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
     /**
      * 
      */
-    private static final String HTTP_SERVLET_REQUEST_USER_ATTRIBUTE = "user";
+    public static final String HTTP_SERVLET_REQUEST_USER_ATTRIBUTE = "user";
     /**
      * 
      */
     public static final String CLIENT_IDENTIFIER_HEADER = "client_dentifier";
-    /**
-     * 
-     */
-    public static final String X_FORWARDED_FOR_HEADER = "x-forwarded-for";
-    /**
-     * 
-     */
-    public static String ORIGIN_HEADER = "Origin";
+    public static final String ESSI_LAB_CLIENT_IDENTIFIER = "ESSILabClient";
 
     /**
      * 
      */
-    public static final String ESSI_LAB_CLIENT_IDENTIFIER = "ESSILabClient";
+    public static final String X_FORWARDED_FOR_HEADER = "x-forwarded-for";
+   
+    /**
+     * 
+     */
+    public static String ORIGIN_HEADER = "origin";
 
     private transient WebServiceContext context;
     private transient UriInfo uriInfo;
@@ -258,6 +262,18 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 	    if (StringUtils.isNotEmptyAndNotNull(method)) {
 
 		out.put(RuntimeInfoElement.WEB_REQUEST_METHOD.getName(), Arrays.asList(method));
+
+		if (method.equals("POST")) {
+
+		    try {
+			String body = IOStreamUtils.asUTF8String(getBodyStream().clone());
+			out.put(RuntimeInfoElement.WEB_REQUEST_BODY.getName(), Arrays.asList(body));
+
+		    } catch (IOException e) {
+
+			GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
+		    }
+		}
 	    }
 
 	    String protocol = servletRequest.getProtocol();
@@ -864,7 +880,7 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 
 	return context;
     }
-    
+
     /**
      * The more common way to express the token in GS-service is to put it in the first part of the path preceded by
      * "token" key in the
@@ -893,7 +909,8 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
     }
 
     /**
-     * The more common way to express the viewId in GS-service is to put it in the first part of the path (or after the token path parameter) preceded by
+     * The more common way to express the viewId in GS-service is to put it in the first part of the path (or after the
+     * token path parameter) preceded by
      * "view" key in the
      * form /view/{viewId}/service This method extracts view id from the request path.
      *

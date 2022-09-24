@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.rsf.impl.json.jsapi._1_0;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -51,6 +51,19 @@ import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.pdk.rsf.DiscoveryResultSetFormatter;
 import eu.essi_lab.pdk.rsf.FormattingEncoding;
+
+/**
+ * This formatter encapsulates the resources in a JSON object according to an encoding defined for the
+ * <a href="http://api.eurogeoss-broker.eu/docs/index.html">JavaScript API</a>. The {@link #JS_API_FORMATTING_ENCODING}
+ * has the following properties:
+ * <ul>
+ * <li>media type is "application/json; charset=utf-8"</li>
+ * <li>encoding name is {@value #JS_API_FORMATTING_ENCODING_NAME}</li>
+ * <li>encoding version is {@value #JS_API_FORMATTING_ENCODING_VERSION}</li>
+ * </ul>
+ * 
+ * @author Fabrizio
+ */
 public class JS_API_ResultSetFormatter_1_0 extends DiscoveryResultSetFormatter<String> {
 
     /**
@@ -89,13 +102,20 @@ public class JS_API_ResultSetFormatter_1_0 extends DiscoveryResultSetFormatter<S
 
 	String outToString = jsonOutput.toString(3);
 
-	String queryString = message.getWebRequest().getFormData().get();
-	KeyValueParser parser = new KeyValueParser(queryString);
+	Optional<String> formData = message.getWebRequest().getFormData();
 
-	// handles the jquery callback
-	String callback = parser.getValue("callback");
-	if (callback != null) {
-	    outToString = callback + "(" + outToString + ")";
+	if (formData.isPresent()) {
+
+	    //
+	    // handles the jquery callback (if available)
+	    //
+	    String queryString = formData.get();
+	    KeyValueParser parser = new KeyValueParser(queryString);
+
+	    String callback = parser.getValue("callback");
+	    if (callback != null) {
+		outToString = callback + "(" + outToString + ")";
+	    }
 	}
 
 	ResponseBuilder builder = Response.status(Status.OK);

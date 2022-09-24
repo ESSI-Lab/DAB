@@ -24,7 +24,14 @@
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>core-datamodel</artifactId>
 			<version>${project.parent.version}</version>
-		</dependency>		
+		</dependency>
+		<!-- Needed by WML -> NetCDF block and vice versa -->
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>gs-lib-wof-test</artifactId>
+			<version>${project.parent.version}</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>access-tools-validator-wml</artifactId>
@@ -63,13 +70,4 @@
 		</dependency>
 	</dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>license-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
-	
 </project>

@@ -4,7 +4,7 @@ package eu.essi_lab.harvester;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,42 +21,34 @@ package eu.essi_lab.harvester;
  * #L%
  */
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import eu.essi_lab.adk.harvest.IHarvestedAccessor;
 import eu.essi_lab.api.database.SourceStorage;
 import eu.essi_lab.harvester.component.HarvesterComponentException;
 import eu.essi_lab.identifierdecorator.ConflictingResourceException;
 import eu.essi_lab.identifierdecorator.DuplicatedResourceException;
 import eu.essi_lab.messages.HarvestingProperties;
-import eu.essi_lab.model.configuration.AbstractGSconfigurableComposed;
-import eu.essi_lab.model.exceptions.SkipProcessStepException;
 import eu.essi_lab.model.resource.GSResource;
-public abstract class HarvestingComponent extends AbstractGSconfigurableComposed {
+
+/**
+ * @author Fabrizio
+ */
+public abstract class HarvestingComponent {
 
     /**
      * 
      */
-    private static final long serialVersionUID = -6116781346299838771L;
-    @JsonIgnore
     private String resumptionToken;
-    @JsonIgnore
+    @SuppressWarnings("rawtypes")
     private IHarvestedAccessor accessor;
-    @JsonIgnore
     private SourceStorage sourceStorage;
-    @JsonIgnore
     private HarvestingProperties harvestingProperties;
-    @JsonIgnore
     private boolean isRecovering;
-    @JsonIgnore
     private boolean isFirstHarvesting;
-    @JsonIgnore
     private boolean isIncrementalHarvesting;
 
     /**
      * @return
      */
-    @JsonIgnore
     public boolean isIncrementalHarvesting() {
 
 	return isIncrementalHarvesting;
@@ -65,7 +57,6 @@ public abstract class HarvestingComponent extends AbstractGSconfigurableComposed
     /**
      * @param isIncrementalHarvesting
      */
-    @JsonIgnore
     public void setIsIncrementalHarvesting(boolean isIncrementalHarvesting) {
 
 	this.isIncrementalHarvesting = isIncrementalHarvesting;
@@ -74,7 +65,6 @@ public abstract class HarvestingComponent extends AbstractGSconfigurableComposed
     /**
      * @return
      */
-    @JsonIgnore
     public boolean isFirstHarvesting() {
 
 	return isFirstHarvesting;
@@ -83,7 +73,6 @@ public abstract class HarvestingComponent extends AbstractGSconfigurableComposed
     /**
      * @param isFirstHarvesting
      */
-    @JsonIgnore
     public void setIsFirstHarvesting(boolean isFirstHarvesting) {
 
 	this.isFirstHarvesting = isFirstHarvesting;
@@ -92,7 +81,6 @@ public abstract class HarvestingComponent extends AbstractGSconfigurableComposed
     /**
      * @return
      */
-    @JsonIgnore
     public boolean isRecovering() {
 
 	return isRecovering;
@@ -101,7 +89,6 @@ public abstract class HarvestingComponent extends AbstractGSconfigurableComposed
     /**
      * @param isRecovering
      */
-    @JsonIgnore
     public void setIsRecovering(boolean isRecovering) {
 
 	this.isRecovering = isRecovering;
@@ -110,7 +97,6 @@ public abstract class HarvestingComponent extends AbstractGSconfigurableComposed
     /**
      * @return
      */
-    @JsonIgnore
     public HarvestingProperties getHarvestingProperties() {
 
 	return harvestingProperties;
@@ -119,7 +105,6 @@ public abstract class HarvestingComponent extends AbstractGSconfigurableComposed
     /**
      * @param harvestingProperties
      */
-    @JsonIgnore
     public void setHarvestingProperties(HarvestingProperties harvestingProperties) {
 
 	this.harvestingProperties = harvestingProperties;
@@ -128,7 +113,6 @@ public abstract class HarvestingComponent extends AbstractGSconfigurableComposed
     /**
      * @param resumptionToken
      */
-    @JsonIgnore
     public void setResumptionToken(String resumptionToken) {
 
 	this.resumptionToken = resumptionToken;
@@ -137,7 +121,7 @@ public abstract class HarvestingComponent extends AbstractGSconfigurableComposed
     /**
      * @param accessor
      */
-    @JsonIgnore
+    @SuppressWarnings("rawtypes")
     public void setAccessor(IHarvestedAccessor accessor) {
 
 	this.accessor = accessor;
@@ -146,7 +130,6 @@ public abstract class HarvestingComponent extends AbstractGSconfigurableComposed
     /**
      * @param sourceStorage
      */
-    @JsonIgnore
     public void setSourceStorage(SourceStorage sourceStorage) {
 
 	this.sourceStorage = sourceStorage;
@@ -155,7 +138,6 @@ public abstract class HarvestingComponent extends AbstractGSconfigurableComposed
     /**
      * @return
      */
-    @JsonIgnore
     public String getResumptionToken() {
 
 	return resumptionToken;
@@ -164,7 +146,7 @@ public abstract class HarvestingComponent extends AbstractGSconfigurableComposed
     /**
      * @return
      */
-    @JsonIgnore
+    @SuppressWarnings("rawtypes")
     public IHarvestedAccessor getAccessor() {
 
 	return accessor;
@@ -173,18 +155,16 @@ public abstract class HarvestingComponent extends AbstractGSconfigurableComposed
     /**
      * @return
      */
-    @JsonIgnore
     public SourceStorage getSourceStorage() {
 
 	return sourceStorage;
     }
 
     /**
-     * Applies its task to the supplied resource
-     * 
-     * @param resource containing metadata set to elaborate
-     * @throws
-     * @throws {@link SkipProcessStepException}
+     * @param resource
+     * @throws HarvesterComponentException
+     * @throws DuplicatedResourceException
+     * @throws ConflictingResourceException
      */
     public abstract void apply(GSResource resource)
 	    throws HarvesterComponentException, DuplicatedResourceException, ConflictingResourceException;

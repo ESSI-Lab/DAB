@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.oaipmh;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,6 +31,14 @@ import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.pdk.handler.selector.GETRequestFilter;
+
+/**
+ * A selector which support GET method and POST method with the "Content-Type" set to
+ * "application/x-www-form-urlencoded" (see
+ * <a href="https://www.openarchives.org/OAI/openarchivesprotocol.html#HTTPRequestFormat">3.1.1 HTTP Request Format</a>}
+ * 
+ * @author Fabrizio
+ */
 public class OAIPMRequestFilter extends GETRequestFilter {
 
     private static final String OAI_SELECTOR_INVALID_POST_BODY = "OAI_SELECTOR_INVALID_POST_BODY";

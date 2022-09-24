@@ -4,7 +4,7 @@ package eu.essi_lab.api.database;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,13 +26,15 @@ import org.w3c.dom.Node;
 
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.model.auth.GSUser;
-import eu.essi_lab.model.auth.UserBaseClient;
-import eu.essi_lab.model.configuration.IGSConfigurable;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.ontology.GSKnowledgeResourceDescription;
 import eu.essi_lab.model.ontology.d2k.serialization.J2RDFSerializer;
 import eu.essi_lab.model.resource.GSResource;
-public interface DatabaseWriter extends DatabaseConsumer, IGSConfigurable, UserBaseClient{
+
+/**
+ * @author Fabrizio
+ */
+public interface DatabaseWriter extends DatabaseConsumer {
 
     /**
      * Stores the given user, overwriting a possible existing user with the same email

@@ -8,7 +8,7 @@
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 
-	<name>ESSI-Lab MarkLogic Database API Implementation</name>
+	<name>ESSI-Lab DataBase API MarkLogic Implementation</name>
 	<artifactId>database-api-marklogic-impl</artifactId>
 
 	<dependencies>
@@ -47,11 +47,7 @@
 			<artifactId>access-tools</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>conf-storage-api</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
+		 
 	</dependencies>
 
 	<profiles>
@@ -74,12 +70,4 @@
 			</build>
 		</profile>
 	</profiles>
-		<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>license-maven-plugin</artifactId>
-		</plugin>
-		</plugins>
-	</build>
 </project>

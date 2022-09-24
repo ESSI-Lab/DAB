@@ -4,7 +4,7 @@ package eu.essi_lab.lib.xml;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,7 +28,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -47,6 +46,12 @@ import org.xml.sax.SAXException;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.UnicodeBOMInputStream;
+
+/**
+ * A utility class to execute XPaths on a document
+ * 
+ * @author boldrini
+ */
 public class XMLDocumentReader extends XMLNodeReader {
 
     private static boolean LOG = false;
@@ -156,8 +161,7 @@ public class XMLDocumentReader extends XMLNodeReader {
 		Document ret = builder.parse(source);
 		targetNode = ret;
 	    } catch (Exception e) {
-		e.printStackTrace();
-		GSLoggerFactory.getLogger(getClass()).info("Exception during XML parsing: " + e.getMessage());
+		GSLoggerFactory.getLogger(getClass()).error("Exception during XML parsing: " + e.getMessage());
 		throw e;
 	    } finally {
 		if (ubis != null)

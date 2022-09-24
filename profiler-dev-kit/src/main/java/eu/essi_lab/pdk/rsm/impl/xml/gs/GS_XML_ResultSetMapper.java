@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.rsm.impl.xml.gs;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,6 +29,13 @@ import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.pdk.rsm.DiscoveryResultSetMapper;
 import eu.essi_lab.pdk.rsm.MappingSchema;
+
+/**
+ * Basic result set mapper implementation which actually performs no mapping on the {@link GSResource}s, it just
+ * serializes them to a string
+ * 
+ * @author Fabrizio
+ */
 public class GS_XML_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 
     private static final String GS_RES_SET_MAPPER_RES_TO_STRING_ERROR = "GS_RES_SET_MAPPER_RES_TO_STRING_ERROR";

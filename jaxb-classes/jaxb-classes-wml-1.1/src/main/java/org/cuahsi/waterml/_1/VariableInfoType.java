@@ -11,7 +11,7 @@ package org.cuahsi.waterml._1;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -49,6 +49,128 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.eclipse.persistence.oxm.annotations.XmlMarshalNullRepresentation;
 import org.eclipse.persistence.oxm.annotations.XmlNullPolicy;
+
+/**
+ * <p>
+ * Java class for VariableInfoType complex type.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="VariableInfoType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;sequence&gt;
+ *           &lt;element name="variableCode" maxOccurs="unbounded"&gt;
+ *             &lt;complexType&gt;
+ *               &lt;simpleContent&gt;
+ *                 &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema&gt;token"&gt;
+ *                   &lt;attribute name="network" type="{http://www.w3.org/2001/XMLSchema}token" /&gt;
+ *                   &lt;attribute name="vocabulary" type="{http://www.w3.org/2001/XMLSchema}token" /&gt;
+ *                   &lt;attribute name="default" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
+ *                   &lt;attribute name="variableID"&gt;
+ *                     &lt;simpleType&gt;
+ *                       &lt;restriction base="{http://www.cuahsi.org/waterML/1.1/}positiveInt"&gt;
+ *                         &lt;minInclusive value="0"/&gt;
+ *                       &lt;/restriction&gt;
+ *                     &lt;/simpleType&gt;
+ *                   &lt;/attribute&gt;
+ *                 &lt;/extension&gt;
+ *               &lt;/simpleContent&gt;
+ *             &lt;/complexType&gt;
+ *           &lt;/element&gt;
+ *           &lt;element name="variableName" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
+ *           &lt;element name="variableDescription" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
+ *           &lt;element name="valueType" type="{http://www.cuahsi.org/waterML/1.1/}ValueTypeCodeList" minOccurs="0"/&gt;
+ *           &lt;element name="dataType" type="{http://www.cuahsi.org/waterML/1.1/}DataTypeCodeList" minOccurs="0"/&gt;
+ *           &lt;element name="generalCategory" type="{http://www.cuahsi.org/waterML/1.1/}GeneralCategoryCodeList" minOccurs="0"/&gt;
+ *           &lt;element name="sampleMedium" type="{http://www.cuahsi.org/waterML/1.1/}SampleMediumCodeList" minOccurs="0"/&gt;
+ *           &lt;element name="unit" type="{http://www.cuahsi.org/waterML/1.1/}UnitsType" minOccurs="0"/&gt;
+ *           &lt;element ref="{http://www.cuahsi.org/waterML/1.1/}options" minOccurs="0"/&gt;
+ *           &lt;element name="note" type="{http://www.cuahsi.org/waterML/1.1/}NoteType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *           &lt;element name="related" minOccurs="0"&gt;
+ *             &lt;complexType&gt;
+ *               &lt;complexContent&gt;
+ *                 &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *                   &lt;sequence maxOccurs="unbounded"&gt;
+ *                     &lt;element name="parentCode"&gt;
+ *                       &lt;complexType&gt;
+ *                         &lt;simpleContent&gt;
+ *                           &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema&gt;string"&gt;
+ *                             &lt;attribute name="network" type="{http://www.w3.org/2001/XMLSchema}token" /&gt;
+ *                             &lt;attribute name="vocabulary" type="{http://www.w3.org/2001/XMLSchema}token" /&gt;
+ *                             &lt;attribute name="default" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
+ *                           &lt;/extension&gt;
+ *                         &lt;/simpleContent&gt;
+ *                       &lt;/complexType&gt;
+ *                     &lt;/element&gt;
+ *                     &lt;element name="relatedCode"&gt;
+ *                       &lt;complexType&gt;
+ *                         &lt;simpleContent&gt;
+ *                           &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema&gt;string"&gt;
+ *                             &lt;attribute name="network" type="{http://www.w3.org/2001/XMLSchema}token" /&gt;
+ *                             &lt;attribute name="vocabulary" type="{http://www.w3.org/2001/XMLSchema}token" /&gt;
+ *                             &lt;attribute name="default" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
+ *                           &lt;/extension&gt;
+ *                         &lt;/simpleContent&gt;
+ *                       &lt;/complexType&gt;
+ *                     &lt;/element&gt;
+ *                   &lt;/sequence&gt;
+ *                 &lt;/restriction&gt;
+ *               &lt;/complexContent&gt;
+ *             &lt;/complexType&gt;
+ *           &lt;/element&gt;
+ *           &lt;element ref="{http://www.cuahsi.org/waterML/1.1/}extension" minOccurs="0"/&gt;
+ *           &lt;element name="noDataValue" type="{http://www.w3.org/2001/XMLSchema}double" minOccurs="0"/&gt;
+ *           &lt;element name="timeScale" minOccurs="0"&gt;
+ *             &lt;complexType&gt;
+ *               &lt;complexContent&gt;
+ *                 &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *                   &lt;sequence&gt;
+ *                     &lt;element name="unit" type="{http://www.cuahsi.org/waterML/1.1/}UnitsType" minOccurs="0"/&gt;
+ *                     &lt;element name="timeSpacing" type="{http://www.w3.org/2001/XMLSchema}float" minOccurs="0"/&gt;
+ *                     &lt;element name="timeSupport" type="{http://www.w3.org/2001/XMLSchema}float" minOccurs="0"/&gt;
+ *                   &lt;/sequence&gt;
+ *                   &lt;attribute name="isRegular" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
+ *                 &lt;/restriction&gt;
+ *               &lt;/complexContent&gt;
+ *             &lt;/complexType&gt;
+ *           &lt;/element&gt;
+ *           &lt;element name="speciation" type="{http://www.cuahsi.org/waterML/1.1/}SpeciationCodeList" minOccurs="0"/&gt;
+ *           &lt;element name="categories" minOccurs="0"&gt;
+ *             &lt;complexType&gt;
+ *               &lt;complexContent&gt;
+ *                 &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *                   &lt;sequence&gt;
+ *                     &lt;element name="category" maxOccurs="unbounded" minOccurs="0"&gt;
+ *                       &lt;complexType&gt;
+ *                         &lt;complexContent&gt;
+ *                           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *                             &lt;sequence&gt;
+ *                               &lt;element name="dataValue" type="{http://www.w3.org/2001/XMLSchema}decimal"/&gt;
+ *                               &lt;element name="description" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
+ *                             &lt;/sequence&gt;
+ *                             &lt;attribute name="categoryID" type="{http://www.w3.org/2001/XMLSchema}int" /&gt;
+ *                           &lt;/restriction&gt;
+ *                         &lt;/complexContent&gt;
+ *                       &lt;/complexType&gt;
+ *                     &lt;/element&gt;
+ *                   &lt;/sequence&gt;
+ *                 &lt;/restriction&gt;
+ *               &lt;/complexContent&gt;
+ *             &lt;/complexType&gt;
+ *           &lt;/element&gt;
+ *           &lt;element name="variableProperty" type="{http://www.cuahsi.org/waterML/1.1/}PropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;/sequence&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attribute ref="{http://www.cuahsi.org/waterML/1.1/}oid"/&gt;
+ *       &lt;attribute ref="{http://www.cuahsi.org/waterML/1.1/}metadataTime"/&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "VariableInfoType", propOrder = { "variableCode", "variableName", "variableDescription", "valueType", "dataType",
 	"generalCategory", "sampleMedium", "unit", "options", "note", "related", "extension", "noDataValue", "timeScale", "speciation",

@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.handler.selector;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,12 +21,52 @@ package eu.essi_lab.pdk.handler.selector;
  * #L%
  */
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import eu.essi_lab.messages.web.WebRequest;
+
+/**
+ * When a path is set, it <b>MUST NOT</b> include:
+ * <ul>
+ * <li>the base path (e.g: 'gs-service/services/essi')</li>
+ * <li>the user token 'token' path (and its value)</li>
+ * <li>the view 'view' path (and its value)</li>
+ * <li>initial '/'</li>
+ * <li>trailing '/'</li>
+ * </ul>
+ * It is compared with {@link WebRequest#getRequestPath()}, current request path which follows the base path, deprived
+ * of the last '/' and deprived of the 'token' and 'view' path segments and values. This means that user tokens and
+ * views are <i>never</i>
+ * included in the comparison.<br>
+ * The comparison is done by comparing the path segments of both paths at the same position (that is
+ * acceptPath.segment[i] with requestPath.segment[i]).<br>
+ * If the paths have the same number of segments, and they match according to their position, the request path is
+ * accepted.<br>
+ * The accepted path can also include character '*'.<br>
+ * E.g.:
+ * <ul>
+ * <li>accepted path: opensearch/description</li>
+ * <li>request path: http://localhost/gs-service/services/essi/opensearch/description</li>
+ * </ul>
+ * The path can end with the '*' character to indicate a path parameter, e.g.: 'csw/pubsub/subscription/*'. In this case
+ * it is compared with
+ * the current request path which follows the base path deprived of the last path segment and of the last '/'. E.g:
+ * <ul>
+ * <li>set path: csw/pubsub/subscription/*</li>
+ * <li>current path: http://localhost/gs-service/services/essi/csw/pubsub/subscription/ko83fd</li>
+ * <li>comparison path: csw/pubsub/subscription</li>
+ * </ul>
+ *
+ * @author Fabrizio
+ */
 public abstract class PathRequestFilter implements WebRequestFilter {
 
     private String expectedPath;
+    private String servicesPath;
 
     protected PathRequestFilter() {
     }
@@ -39,19 +79,7 @@ public abstract class PathRequestFilter implements WebRequestFilter {
      */
     public PathRequestFilter(String path) {
 
-	setPath(path, false);
-    }
-
-    /**
-     * Creates a filter which accepts only requests on the supplied <code>path</code>.<br>
-     * See constructor docs for path usage info
-     *
-     * @param path the request path
-     * @param view if <code>true</code> the provided path will be accepted also if preceded by the 'view/viewId/' path
-     */
-    public PathRequestFilter(String path, boolean view) {
-
-	setPath(path, view);
+	setPath(path);
     }
 
     /**
@@ -62,22 +90,17 @@ public abstract class PathRequestFilter implements WebRequestFilter {
      */
     public void setPath(String path) {
 
-	setPath(path, false);
+	this.expectedPath = path;
     }
 
     /**
-     * Set the path where the filter accepts the requests.<br>
-     * See constructor docs for path usage info
-     *
-     * @param path the request path
-     * @param view if <code>true</code> the provided path will be accepted also if preceded by the 'view/viewId/' path
+     * Overrides the services path provided by {@link WebRequest#getServicesPath()}.<br>
+     * 
+     * @param servicesPath
      */
-    public void setPath(String path, boolean view) {
+    public void overrideServicesPath(String servicesPath) {
 
-	this.expectedPath = path;
-	if (view) {
-	    this.expectedPath = "view/*/" + path;
-	}
+	this.servicesPath = servicesPath;
     }
 
     /**
@@ -87,74 +110,71 @@ public abstract class PathRequestFilter implements WebRequestFilter {
      */
     protected Optional<Boolean> acceptPath(WebRequest webRequest) {
 
+	//
+	// overrides the default services path
+	//
+	if (this.servicesPath != null) {
+
+	    webRequest.setServicesPath(this.servicesPath);
+	}
+
 	String requestPath = webRequest.getRequestPath();
 
 	if (expectedPath != null && requestPath != null) {
 
-	    String expectedPath_ = new String(expectedPath);
-	    String viewId = null;
+	    List<String> expPaths = Arrays.asList(expectedPath.split("/")).//
+		    stream().//
+		    filter(s -> !s.isEmpty()).// removes the initial /
+		    collect(Collectors.toList());
 
-	    if (expectedPath_.startsWith("view")) {
+	    List<String> reqPaths = new ArrayList<String>(Arrays.asList(requestPath.split("/")));
 
-		String[] reqSplit = requestPath.split("/");
-		String[] expSplit = expectedPath_.split("/");
+	    //
+	    // 1) replaces the 'token' and the 'view' segments and their values with a # char
+	    // that will be removed
+	    //
+	    List<String> reqPaths_ = new ArrayList<>(reqPaths);
 
-		if (reqSplit.length == expSplit.length) {
+	    for (int i = 0; i < reqPaths_.size(); i++) {
 
-		    for (int i = 0; i < reqSplit.length; i++) {
+		String reqPath = reqPaths_.get(i);
+		if (reqPath.equals("#")) {
+		    continue;
+		}
 
-			String reqPath = reqSplit[i];
-			String expPath = expSplit[i];
+		if (reqPath.equals("token") || reqPath.equals("view")) {
 
-			if (expPath.equals("*") || reqPath.equals(expPath)) {
-			    if (expPath.equals("*") && viewId == null) {
-				viewId = reqPath;
-			    }
-			    // OK!
-
-			} else {
-			    return Optional.of(false);
-			}
-		    }
-
-		    expectedPath_ = expectedPath_.replace("view/*/", "view/" + viewId + "/");
-
-		} else {
-
-		    return Optional.of(false);
+		    reqPaths.set(i, "#");
+		    reqPaths.set(i + 1, "#");
 		}
 	    }
 
-	    if (expectedPath_.equals("*")) {
-		return Optional.of(true);
-	    } else if (expectedPath_.endsWith("/*")) {
+	    reqPaths = reqPaths.stream().filter(v -> !v.equals("#")).collect(Collectors.toList());
 
-		String expectedPathTruncated = expectedPath_.replace("/*", "");
+	    //
+	    // 2) segments length check
+	    //
 
-		String requestPathTruncated = requestPath;
-
-		if (requestPath.endsWith("/")) {
-		    requestPathTruncated = requestPath.substring(0, requestPath.length() - 1);
-		}
-
-		if (requestPathTruncated.startsWith(expectedPathTruncated) && !requestPathTruncated.equals(expectedPathTruncated)) {
-
-		    return Optional.of(true);
-		}
+	    if (expPaths.size() != reqPaths.size()) {
 
 		return Optional.of(false);
-
-	    } else if (requestPath.equals(expectedPath_) //
-
-		    || expectedPath_.endsWith("/") && requestPath.equals(expectedPath_.substring(0, expectedPath_.length() - 1))
-		    || requestPath.endsWith("/") && expectedPath_.equals(requestPath.substring(0, requestPath.length() - 1))
-
-	    ) {
-
-		return Optional.of(true);
 	    }
 
-	    return Optional.of(false);
+	    //
+	    // 3) segments check
+	    //
+
+	    boolean accepts = true;
+
+	    for (int i = 0; i < expPaths.size(); i++) {
+
+		String expPath = expPaths.get(i);
+		String reqPath = reqPaths.get(i);
+
+		accepts &= expPath.equals(reqPath) || expPath.equals("*");
+	    }
+
+	    return Optional.of(accepts);
 	}
 
 	return Optional.empty();

@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.csw._2_0_2;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -43,6 +43,51 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+
+/**
+ * Includes representations of result set members if maxRecords > 0.
+ *          The items must conform to one of the csw:Record views or a 
+ *          profile-specific representation. 
+ *          
+ *          resultSetId  - id of the result set (a URI).
+ *          elementSet  - The element set that has been returned
+ *                        (i.e., "brief", "summary", "full")
+ *          recordSchema  - schema reference for included records(URI)
+ *          numberOfRecordsMatched  - number of records matched by the query
+ *          numberOfRecordsReturned - number of records returned to client
+ *          nextRecord - position of next record in the result set
+ *                       (0 if no records remain).
+ *          expires - the time instant when the result set expires and 
+ *                    is discarded (ISO 8601 format)
+ * 
+ * <p>Classe Java per SearchResultsType complex type.
+ * 
+ * <p>Il seguente frammento di schema specifica il contenuto previsto contenuto in questa classe.
+ * 
+ * <pre>
+ * &lt;complexType name="SearchResultsType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;choice&gt;
+ *           &lt;element ref="{http://www.opengis.net/cat/csw/2.0.2}AbstractRecord" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *           &lt;any namespace='##other' maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;/choice&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attribute name="resultSetId" type="{http://www.w3.org/2001/XMLSchema}anyURI" /&gt;
+ *       &lt;attribute name="elementSet" type="{http://www.opengis.net/cat/csw/2.0.2}ElementSetType" /&gt;
+ *       &lt;attribute name="recordSchema" type="{http://www.w3.org/2001/XMLSchema}anyURI" /&gt;
+ *       &lt;attribute name="numberOfRecordsMatched" use="required" type="{http://www.w3.org/2001/XMLSchema}nonNegativeInteger" /&gt;
+ *       &lt;attribute name="numberOfRecordsReturned" use="required" type="{http://www.w3.org/2001/XMLSchema}nonNegativeInteger" /&gt;
+ *       &lt;attribute name="nextRecord" type="{http://www.w3.org/2001/XMLSchema}nonNegativeInteger" /&gt;
+ *       &lt;attribute name="expires" type="{http://www.w3.org/2001/XMLSchema}dateTime" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SearchResultsType", propOrder = {
     "anies",

@@ -4,7 +4,7 @@ package eu.essi_lab.access;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -55,6 +55,8 @@ public abstract class DataValidatorImpl implements DataValidator {
 
     private static final String OTHER_DIMENSION_MISMATCH = "Other dimension mismatch";
 
+    private static final String DATA_VALIDATOR_IMPL_ERROR = "DATA_VALIDATOR_IMPL_ERROR";
+
     public static Double TOL = Math.pow(10, -8);
 
     org.slf4j.Logger logger = GSLoggerFactory.getLogger(DataValidatorImpl.class);
@@ -85,6 +87,12 @@ public abstract class DataValidatorImpl implements DataValidator {
 
 	return check(descriptor, actual);
     }
+
+    /**
+     * subclasses may throw {@link IllegalArgumentException} to signal the descriptor is not supported by the validator
+     * 
+     * @param expected
+     */
     public ValidationMessage checkSupportForDescriptor(DataDescriptor descriptor) {
 	if (descriptor == null) {
 	    return invalidDescriptor("Null descriptor");
@@ -480,11 +488,13 @@ public abstract class DataValidatorImpl implements DataValidator {
     }
 
     public GSException getGSException(String message) {
-	GSException ret = new GSException();
-	ErrorInfo info = new ErrorInfo();
-	info.setErrorDescription(message);
-	ret.addInfo(info);
-	return ret;
+	 	
+	return GSException.createException(//
+		getClass(),//
+		message,//
+		ErrorInfo.ERRORTYPE_INTERNAL,//
+		ErrorInfo.SEVERITY_ERROR,//
+		DATA_VALIDATOR_IMPL_ERROR);
 
     }
 

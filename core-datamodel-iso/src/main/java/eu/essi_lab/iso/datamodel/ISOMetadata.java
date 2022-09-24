@@ -4,7 +4,7 @@ package eu.essi_lab.iso.datamodel;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -40,6 +40,10 @@ import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;
 import net.opengis.iso19139.gco.v_20060504.CodeListValueType;
 import net.opengis.iso19139.gmx.v_20060504.AnchorType;
 import org.xml.sax.SAXException;
+
+/**
+ * @author Fabrizio
+ */
 public class ISOMetadata<T> extends DOMSerializer {
 
     /**

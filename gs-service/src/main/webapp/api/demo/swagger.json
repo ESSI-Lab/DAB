@@ -1,9 +1,9 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "DAB discovery interfaces test page",
+        "description": "GI-project discovery interfaces test page",
         "version": "1.0.0",
-        "title": "DAB discovery interfaces test page"
+        "title": "GI-project discovery interfaces test page"
     },
     "basePath": "/gs-service/services/essi",
     "tags": [

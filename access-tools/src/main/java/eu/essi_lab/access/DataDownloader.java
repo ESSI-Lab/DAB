@@ -4,7 +4,7 @@ package eu.essi_lab.access;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -36,6 +36,16 @@ import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.model.resource.data.dimension.ContinueDimension;
 import eu.essi_lab.model.resource.data.dimension.DataDimension;
 import eu.essi_lab.model.resource.data.dimension.FiniteDimension;
+
+/**
+ * {@link DataDownloader} works with a specified online resource in order to:
+ * <ul>
+ * <li>provide available remote service data descriptors</li>
+ * <li>perform data download of the selected one</li>
+ * </ul>
+ * 
+ * @author boldrini
+ */
 public abstract class DataDownloader implements Pluggable {
 
     private static final String ONLINE_RESOURCE_NOT_FOUND = "ONLINE_RESOURCE_NOT_FOUND";

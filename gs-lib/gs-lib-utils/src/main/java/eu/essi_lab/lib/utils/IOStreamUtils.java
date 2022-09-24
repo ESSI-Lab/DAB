@@ -1,10 +1,13 @@
+/**
+ * 
+ */
 package eu.essi_lab.lib.utils;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,6 +24,7 @@ package eu.essi_lab.lib.utils;
  * #L%
  */
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -29,6 +33,8 @@ import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.lf5.util.StreamUtils;
+
+import com.google.common.base.Charsets;
 
 /**
  * @author Fabrizio
@@ -62,6 +68,15 @@ public class IOStreamUtils {
     }
 
     /**
+     * @param string
+     * @return
+     */
+    public static InputStream asStream(String string) {
+
+	return new ByteArrayInputStream(string.getBytes(Charsets.UTF_8));
+    }
+
+    /**
      * @param stream
      * @return
      */
@@ -90,11 +105,19 @@ public class IOStreamUtils {
 
     /**
      * 
+     * @return
+     */
+    public static File getUserTempDirectory(){
+	
+	return new File(System.getProperty("java.io.tmpdir"));
+    }
+    
+    /**
      * @param stream
      * @param prefix
      * @param postfix
      * @return
-     * @throws IOException 
+     * @throws IOException
      */
     public static File tempFilefromStream(InputStream stream, String prefix, String postfix) throws IOException {
 
@@ -106,6 +129,7 @@ public class IOStreamUtils {
 	fos.close();
 	return tmpFile;
     }
+
     /**
      * @param is
      * @param array

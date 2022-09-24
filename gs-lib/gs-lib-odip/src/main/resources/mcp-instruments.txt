@@ -1,0 +1,37 @@
+http://vocab.aodn.org.au/def/instrument/entity/361;water biogeochemical sensor
+http://vocab.aodn.org.au/def/instrument/entity/365;Conductivity-Temperature sensors
+http://vocab.nerc.ac.uk/collection/L05/current/101/;anemometers
+http://vocab.nerc.ac.uk/collection/L05/current/102/;meteorological packages
+http://vocab.nerc.ac.uk/collection/L05/current/110/;wave recorders
+http://vocab.nerc.ac.uk/collection/L05/current/113/;fluorometers
+http://vocab.nerc.ac.uk/collection/L05/current/114/;current meters
+http://vocab.nerc.ac.uk/collection/L05/current/121/;satellite tracking system
+http://vocab.nerc.ac.uk/collection/L05/current/122/;radiometers
+http://vocab.nerc.ac.uk/collection/L05/current/123/;optical backscatter sensors
+http://vocab.nerc.ac.uk/collection/L05/current/124/;transmissometers
+http://vocab.nerc.ac.uk/collection/L05/current/130/;CTD
+http://vocab.nerc.ac.uk/collection/L05/current/132/;bathythermographs
+http://vocab.nerc.ac.uk/collection/L05/current/133/;thermosalinographs
+http://vocab.nerc.ac.uk/collection/L05/current/134/;water temperature sensor
+http://vocab.nerc.ac.uk/collection/L05/current/157/;multi-beam echosounders
+http://vocab.nerc.ac.uk/collection/L05/current/180/;underwater cameras
+http://vocab.nerc.ac.uk/collection/L05/current/181/;nutrient analysers
+http://vocab.nerc.ac.uk/collection/L05/current/183/;acoustic backscatter sensors
+http://vocab.nerc.ac.uk/collection/L05/current/21/;plankton recorders
+http://vocab.nerc.ac.uk/collection/L05/current/22/;plankton nets
+http://vocab.nerc.ac.uk/collection/L05/current/303/;surface current radars
+http://vocab.nerc.ac.uk/collection/L05/current/304/;ocean colour radiometers
+http://vocab.nerc.ac.uk/collection/L05/current/30/;discrete water samplers
+http://vocab.nerc.ac.uk/collection/L05/current/311/;cameras
+http://vocab.nerc.ac.uk/collection/L05/current/350/;salinity sensor
+http://vocab.nerc.ac.uk/collection/L05/current/351/;dissolved gas sensors
+http://vocab.nerc.ac.uk/collection/L05/current/369/;hydrophones
+http://vocab.nerc.ac.uk/collection/L05/current/379/;altimeter
+http://vocab.nerc.ac.uk/collection/L05/current/381/;precipitation gauges
+http://vocab.nerc.ac.uk/collection/L05/current/382/;atmospheric gas analysers
+http://vocab.nerc.ac.uk/collection/L05/current/385/;platform altitude sensors
+http://vocab.nerc.ac.uk/collection/L05/current/LAB37/;flow cytometers
+http://vocab.nerc.ac.uk/collection/L05/current/TRTG/;tracking tags
+http://vocab.nerc.ac.uk/collection/L05/current/WPS/;water pressure sensors
+http://vocab.nerc.ac.uk/collection/L22/current/TOOL0719/;SMRU Ltd Satellite Relay Data Logger 9000x
+http://vocab.nerc.ac.uk/collection/L22/current/TOOL0873/;SMRU GPS Satellite Relay Data Logger (Argos)

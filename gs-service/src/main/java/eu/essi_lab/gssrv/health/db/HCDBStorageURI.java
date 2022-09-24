@@ -23,36 +23,28 @@ package eu.essi_lab.gssrv.health.db;
 
 import java.util.Objects;
 
-import org.slf4j.Logger;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.StorageUri;
+
+/**
+ * @author Fabrizio
+ */
 public class HCDBStorageURI extends StorageUri {
 
     /**
      * 
      */
     private static final long serialVersionUID = -4260530022257536435L;
-    @JsonIgnore
-    private transient Logger logger = GSLoggerFactory.getLogger(HCDBStorageURI.class);
-    private static final String CONFIG_FOLDER = "CONFIG_FOLDER";
-    private static final String P = "P";
-    private static final String NAME = "NAME";
-    private static final String URI = "URI";
-    private static final String USER = "USER";
 
     /**
      * 
      */
     public HCDBStorageURI() {
 
-	setConfigFolder(CONFIG_FOLDER);
-	setPassword(P);
-	setStorageName(NAME);
-	setUri(URI);
-	setUser(USER);
+	setConfigFolder("Folder");
+	setPassword("Pwd");
+	setStorageName("HCBD");
+	setUri("http://HCBD");
+	setUser("User");
     }
 
     @Override

@@ -1,0 +1,155 @@
+http://vocab.aodn.org.au/def/discovery_parameter/890;Light absorption coefficient of dissolved organic matter
+http://vocab.aodn.org.au/def/discovery_parameter/891;Light absorption coefficient of phytoplankton
+http://vocab.aodn.org.au/def/discovery_parameter/892;Light absorption coefficient of nonalgal particles
+http://vocab.aodn.org.au/def/discovery_parameter/894;Concentration of inferred chlorophyll from relative fluorescence per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/10;Net shortwave heat flux
+http://vocab.aodn.org.au/def/discovery_parameter/entity/11;Net heat flux
+http://vocab.aodn.org.au/def/discovery_parameter/entity/12;Net mass flux
+http://vocab.aodn.org.au/def/discovery_parameter/entity/13;Concentration of total chlorophyll-a per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/14;Concentration of total chlorophyll-c per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/15;Concentration of total chlorophyll-a plus chlorophyll-b plus chlorophyll-c per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/16;Concentration of photoprotective carotenoids per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/17;Concentration of photosynthetic carotenoids per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/18;Concentration of photosynthetic pigments per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/19;Concentration of total accessory pigments per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/1;Concentration of carbon (total inorganic) per unit mass of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/20;Concentration of total pigment per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/21;Concentration of total diagnostic pigments per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/22;Biovolume
+http://vocab.aodn.org.au/def/discovery_parameter/entity/372;Concentration of oxygen {O2} per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/373;Concentration of oxygen {O2} per unit mass of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/374;Concentration of nitrate {NO3} per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/375;Concentration of nitrate {NO3} per unit mass of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/376;Concentration of silicate {SiO4} per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/377;Concentration of ammonium {NH4} per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/378;Concentration of silicate {SiO4} per unit mass of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/379;Concentration of phosphate {PO4} per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/380;Concentration of phosphate {PO4} per unit mass of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/383;Current speed in the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/386;Thickness of precipitation amount (liquid water equivalent) in the atmosphere
+http://vocab.aodn.org.au/def/discovery_parameter/entity/395;Wind speed of gust in the atmosphere
+http://vocab.aodn.org.au/def/discovery_parameter/entity/396;Wind to direction in the atmosphere
+http://vocab.aodn.org.au/def/discovery_parameter/entity/399;Acoustic signal return amplitude from the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/401;Density of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/405;Precipitation duration (liquid water equivalent) in the atmosphere
+http://vocab.aodn.org.au/def/discovery_parameter/entity/406;Wind stress on the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/407;Phytoplankton Colour Index
+http://vocab.aodn.org.au/def/discovery_parameter/entity/411;Significant height of waves on the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/412;Average height of waves on the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/413;Root mean square height of waves on the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/414;Average height of the highest 1/10th of waves on the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/417;Average zero crossing period of the highest 1/3rd of waves on the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/427;Fugacity anomaly (water - air) of carbon dioxide in the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/478;Concentration of echinenone per unit mass of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/488;Abundance of biota
+http://vocab.aodn.org.au/def/discovery_parameter/entity/489;Biotic taxonomic identification
+http://vocab.aodn.org.au/def/discovery_parameter/entity/565;Pressure (measured variable) in the water body exerted by overlying sea water and any medium above it
+http://vocab.aodn.org.au/def/discovery_parameter/entity/566;Pressure (measured variable) in the water body exerted by overlying sea water only
+http://vocab.aodn.org.au/def/discovery_parameter/entity/570;Dry weight biomass per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/572;Downwelling vector irradiance as photons (PAR wavelengths) in the atmosphere
+http://vocab.aodn.org.au/def/discovery_parameter/entity/573;Downwelling vector irradiance as photons (PAR wavelengths) in the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/574;Sea-floor depth below surface of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/576;Downwelling vector irradiance as energy (solar (300-3000nm) wavelengths) in the atmosphere
+http://vocab.aodn.org.au/def/discovery_parameter/entity/590;Temperature anomaly of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/591;Practical salinity anomaly of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/596;Detection of acoustic tag
+http://vocab.aodn.org.au/def/discovery_parameter/entity/597;Sound recorded in the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/629;Colored Dissolved Organic Matter
+http://vocab.aodn.org.au/def/discovery_parameter/entity/637;Hail duration in the atmosphere
+http://vocab.aodn.org.au/def/discovery_parameter/entity/638;Thickness of hail amount in the atmosphere
+http://vocab.aodn.org.au/def/discovery_parameter/entity/639;Hail intensity in the atmosphere
+http://vocab.aodn.org.au/def/discovery_parameter/entity/640;Eastward geostrophic current velocity in the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/641;Northward geostrophic current velocity in the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/642;Sea surface height anomaly
+http://vocab.aodn.org.au/def/discovery_parameter/entity/643;Sea surface height above geoid
+http://vocab.aodn.org.au/def/discovery_parameter/entity/651;Downwelling vector irradiance as energy in the atmosphere
+http://vocab.aodn.org.au/def/discovery_parameter/entity/652;Sky radiance as energy in the atmosphere
+http://vocab.aodn.org.au/def/discovery_parameter/entity/653;Upwelling radiance as energy in the atmosphere
+http://vocab.aodn.org.au/def/discovery_parameter/entity/654;Concentration of suspended particulate material per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/655;Concentration of suspended particulate material (organic) per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/656;Concentration of suspended particulate material (inorganic) per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/658;Concentration of antheraxanthin per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/659;Concentration of canthaxanthin per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/660;Concentration of lutein per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/6;Sensible heat flux
+http://vocab.aodn.org.au/def/discovery_parameter/entity/728;Volume backscattering coefficient
+http://vocab.aodn.org.au/def/discovery_parameter/entity/729;Secchi depth
+http://vocab.aodn.org.au/def/discovery_parameter/entity/733;Downwelling vector irradiance as energy (ultra-violet wavelengths) in the atmosphere
+http://vocab.aodn.org.au/def/discovery_parameter/entity/734;Concentration of neoxanthin per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/735;Concentration of prasinoxanthin per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/736;Concentration of violaxanthin per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/737;Concentration of astaxanthin per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/738;Concentration of dinoxanthin per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/739;Concentration of diatoxanthin per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/740;Concentration of zeaxanthin per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/741;Concentration of lycopene per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/742;Concentration of diadinoxanthin per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/743;Concentration of gyroxanthin diester per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/744;Concentration of diadinochrome per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/745;Concentration of chlorophyll-b per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/746;Concentration of divinyl chlorophyll-b per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/747;Concentration of 19-hexanoyloxyfucoxanthin per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/748;Concentration of pheophytin-a per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/749;Concentration of pheophytin-b per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/750;Concentration of chlorophyll-a per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/751;Concentration of pyropheophytin-a per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/752;Concentration of chlorophyll-a plus divinyl chlorophyll-a per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/753;Concentration of chlorophyll-b plus divinyl chlorophyll-b per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/754;Concentration of divinyl chlorophyll-a per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/755;Concentration of pyropheophorbide-a per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/756;Concentration of pheophorbide-a per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/757;Concentration of chlorophyllide-a per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/758;Concentration of chlorophyll-c2 per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/759;Concentration of chlorophyll-c1 per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/760;Concentration of chlorophyll-c1c2 per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/761;Concentration of chlorophyll-c3 per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/762;Concentration of 19-butanoyloxyfucoxanthin per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/763;Concentration of 4-keto-19-hexanoyloxyfucoxanthin per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/764;Concentration of alpha-carotene per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/765;Concentration of beta-carotene per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/766;Concentration of alpha-carotene and beta-carotene per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/767;Concentration of Mg-2,4-divinyl pheoporphyrin a5 monomethyl ester per unit volume of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/77;Pressure (measured variable) exerted by the atmosphere and correction to sea level
+http://vocab.aodn.org.au/def/discovery_parameter/entity/7;Latent heat flux
+http://vocab.aodn.org.au/def/discovery_parameter/entity/84;Saturation of oxygen {O2} in the water body [dissolved phase]
+http://vocab.aodn.org.au/def/discovery_parameter/entity/8;Sensible heat flux due to precipitation
+http://vocab.aodn.org.au/def/discovery_parameter/entity/94;Precipitation rate (liquid water equivalent) in the atmosphere
+http://vocab.aodn.org.au/def/discovery_parameter/entity/97;Skin temperature of the water body
+http://vocab.aodn.org.au/def/discovery_parameter/entity/9;Net longwave heat flux
+http://vocab.nerc.ac.uk/collection/P01/current/AHSFZZ01/;Height above bed in the water body
+http://vocab.nerc.ac.uk/collection/P01/current/ALATZZ01/;Latitude north
+http://vocab.nerc.ac.uk/collection/P01/current/ALLOXXPX/;Concentration of alloxanthin per unit volume of the water body
+http://vocab.nerc.ac.uk/collection/P01/current/ALONZZ01/;Longitude east
+http://vocab.nerc.ac.uk/collection/P01/current/APSAZZ01/;Speed (over ground) of measurement platform
+http://vocab.nerc.ac.uk/collection/P01/current/CAPHZZ01/;Pressure (measured variable) exerted by the atmosphere
+http://vocab.nerc.ac.uk/collection/P01/current/CDEWZZ01/;Dew point temperature of the atmosphere
+http://vocab.nerc.ac.uk/collection/P01/current/CHLTVOLU/;Concentration of chlorophyll per unit volume of the water body
+http://vocab.nerc.ac.uk/collection/P01/current/CNDCZZ01/;Electrical conductivity of the water body
+http://vocab.nerc.ac.uk/collection/P01/current/CRELZZ01/;Relative humidity of the atmosphere
+http://vocab.nerc.ac.uk/collection/P01/current/CTMPZZ01/;Temperature of the atmosphere
+http://vocab.nerc.ac.uk/collection/P01/current/CWETZZ01/;Wet bulb temperature of the atmosphere
+http://vocab.nerc.ac.uk/collection/P01/current/ESEWZZXX/;Eastward wind velocity in the atmosphere
+http://vocab.nerc.ac.uk/collection/P01/current/ESNSZZXX/;Northward wind velocity in the atmosphere
+http://vocab.nerc.ac.uk/collection/P01/current/ESSAZZ01/;Wind speed in the atmosphere
+http://vocab.nerc.ac.uk/collection/P01/current/EWDAZZ01/;Wind from direction in the atmosphere
+http://vocab.nerc.ac.uk/collection/P01/current/FCO2WTAT/;Fugacity of carbon dioxide (at 100% humidity) in the atmosphere
+http://vocab.nerc.ac.uk/collection/P01/current/FCO2XXXX/;Fugacity of carbon dioxide (at 100% humidity) in the water body
+http://vocab.nerc.ac.uk/collection/P01/current/FLUOZZZZ/;Fluorescence of the water body
+http://vocab.nerc.ac.uk/collection/P01/current/FUCXZZZZ/;Concentration of fucoxanthin per unit volume of the water body
+http://vocab.nerc.ac.uk/collection/P01/current/GCMXZZ01/;Maximum height of waves on the water body
+http://vocab.nerc.ac.uk/collection/P01/current/GSPRZZ01/;Directional spreading of waves on the water body
+http://vocab.nerc.ac.uk/collection/P01/current/GTCAZZ01/;Average crest period of waves on the water body
+http://vocab.nerc.ac.uk/collection/P01/current/GWDRZZ01/;Direction of waves on the water body
+http://vocab.nerc.ac.uk/collection/P01/current/INFLTF01/;Flow rate through instrument
+http://vocab.nerc.ac.uk/collection/P01/current/LCDAZZ01/;Current direction in the water body
+http://vocab.nerc.ac.uk/collection/P01/current/LCEWZZ01/;Eastward current velocity in the water body
+http://vocab.nerc.ac.uk/collection/P01/current/LCNSZZ01/;Northward current velocity in the water body
+http://vocab.nerc.ac.uk/collection/P01/current/LRZAZZZZ/;Upward current velocity in the water body
+http://vocab.nerc.ac.uk/collection/P01/current/LWRDZZ01/;Downwelling vector irradiance as energy (longwave) in the atmosphere
+http://vocab.nerc.ac.uk/collection/P01/current/MDMAP014/;Total alkalinity per unit mass of the water body
+http://vocab.nerc.ac.uk/collection/P01/current/PERDXXXX/;Concentration of peridinin per unit volume of the water body
+http://vocab.nerc.ac.uk/collection/P01/current/PSLTZZ01/;Practical salinity of the water body
+http://vocab.nerc.ac.uk/collection/P01/current/TEMPPR01/;Temperature of the water body
+http://vocab.nerc.ac.uk/collection/P01/current/TURBXXXX/;Turbidity of the water body
+http://vocab.nerc.ac.uk/collection/P01/current/XCO2DRAT/;Mole fraction of carbon dioxide (dry air) in the atmosphere
+http://vocab.nerc.ac.uk/collection/P01/current/XCO2WBDY/;Mole fraction of carbon dioxide (dry air) in the equilibrated marine sample

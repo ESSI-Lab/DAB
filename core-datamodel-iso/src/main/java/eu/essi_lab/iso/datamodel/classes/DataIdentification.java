@@ -4,7 +4,7 @@ package eu.essi_lab.iso.datamodel.classes;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -62,6 +62,12 @@ import net.opengis.iso19139.gmd.v_20060504.MDSpatialRepresentationTypeCodeProper
 import net.opengis.iso19139.gmd.v_20060504.MDTopicCategoryCodePropertyType;
 import net.opengis.iso19139.gmd.v_20060504.MDTopicCategoryCodeType;
 import net.opengis.iso19139.gmd.v_20060504.ObjectFactory;
+
+/**
+ * MD_IDentification
+ *
+ * @author Fabrizio
+ */
 public class DataIdentification extends Identification {
 
     public DataIdentification(InputStream stream) throws JAXBException {
@@ -377,20 +383,19 @@ public class DataIdentification extends Identification {
 	    }
 	}
     }
-    
+
     public void clearVerticalExtents() {
 
-   	List<EXExtentPropertyType> extent = getElementType().getExtent();
-   	if (extent != null) {
-   	    for (EXExtentPropertyType e : extent) {
-   		List<EXVerticalExtentPropertyType> ve = e.getEXExtent().getVerticalElement();
-   		if (ve != null && !ve.isEmpty()) {
-   		    ve.clear();
-   		}
-   	    }
-   	}
-       }
-
+	List<EXExtentPropertyType> extent = getElementType().getExtent();
+	if (extent != null) {
+	    for (EXExtentPropertyType e : extent) {
+		List<EXVerticalExtentPropertyType> ve = e.getEXExtent().getVerticalElement();
+		if (ve != null && !ve.isEmpty()) {
+		    ve.clear();
+		}
+	    }
+	}
+    }
 
     /**
      * @XPathDirective(target = "./*:extent/gmd:EX_Extent/gmd:geographicElement//gmd:EX_GeographicBoundingBox")
@@ -509,13 +514,16 @@ public class DataIdentification extends Identification {
 	List<EXExtentPropertyType> extent = getElementType().getExtent();
 	for (EXExtentPropertyType exExtentPropertyType : extent) {
 	    EXExtentType exExtent = exExtentPropertyType.getEXExtent();
-	    List<EXVerticalExtentPropertyType> verticalElement = exExtent.getVerticalElement();
-	    for (EXVerticalExtentPropertyType exVerticalPropertyType : verticalElement) {
+	    if (exExtent != null) {
 
-		EXVerticalExtentType value = exVerticalPropertyType.getEXVerticalExtent();
-		if (value != null) {
-		    VerticalExtent verticalExtent = new VerticalExtent(value);
-		    out.add(verticalExtent);
+		List<EXVerticalExtentPropertyType> verticalElement = exExtent.getVerticalElement();
+		for (EXVerticalExtentPropertyType exVerticalPropertyType : verticalElement) {
+
+		    EXVerticalExtentType value = exVerticalPropertyType.getEXVerticalExtent();
+		    if (value != null) {
+			VerticalExtent verticalExtent = new VerticalExtent(value);
+			out.add(verticalExtent);
+		    }
 		}
 	    }
 	}

@@ -4,7 +4,7 @@ package eu.essi_lab.workflow.blocks.timeseries;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,6 +27,10 @@ import eu.essi_lab.model.resource.data.DataType;
 import eu.essi_lab.workflow.blocks.DataFormatConverter;
 import eu.essi_lab.workflow.processor.DataProcessor;
 import eu.essi_lab.workflow.processor.timeseries.WML11_To_NetCDF_Processor;
+
+/**
+ * @author Fabrizio
+ */
 public class WML11_4326_To_NetCDF_FormatConverter extends DataFormatConverter {
 
     public WML11_4326_To_NetCDF_FormatConverter() {

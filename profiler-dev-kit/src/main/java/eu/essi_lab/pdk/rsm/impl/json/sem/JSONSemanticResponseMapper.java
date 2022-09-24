@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.rsm.impl.json.sem;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -36,6 +36,10 @@ import eu.essi_lab.model.ontology.d2k.D2KGSKnowledgeScheme;
 import eu.essi_lab.model.ontology.d2k.predicates.D2KGSPredicate;
 import eu.essi_lab.pdk.rsm.MappingSchema;
 import eu.essi_lab.pdk.rsm.SemanticResponseMapper;
+
+/**
+ * @author Fabrizio
+ */
 public class JSONSemanticResponseMapper extends SemanticResponseMapper<JSONObject> {
 
     private static final String MISSING_DESCRIPTION = "Missing description";

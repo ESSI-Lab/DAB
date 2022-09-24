@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,6 +22,7 @@ package eu.essi_lab.accessor.wof;
  */
 
 import java.net.URI;
+import java.util.Optional;
 
 import javax.ws.rs.core.UriInfo;
 
@@ -35,6 +36,10 @@ import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.resource.Country;
+
+/**
+ * @author boldrini
+ */
 public class WOFMapperUtils {
 
     /**
@@ -95,10 +100,10 @@ public class WOFMapperUtils {
 	    if (baseURI.startsWith("http://") && forwardedProto != null && forwardedProto.equals("https")) {
 		baseURI = baseURI.replace("http://", "https://");
 	    }
-	    GSUser user = message.getWebRequest().getCurrentUser();
+	    Optional<String> token = message.getWebRequest().extractTokenId();
 	    String tokenPart = "";
-	    if (user != null) {
-		tokenPart = "/" + WebRequest.TOKEN_PATH + "/" + user.getIdentifier();
+	    if (token.isPresent()) {
+		tokenPart = "/" + WebRequest.TOKEN_PATH + "/" + token.get();
 	    }
 	    ret = baseURI + tokenPart + "/" + WebRequest.VIEW_PATH + "/" + finalViewId + "/"
 		    + HydroServerProfiler.HYDRO_SERVER_INFO.getServicePath();

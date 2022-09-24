@@ -4,7 +4,7 @@ package eu.essi_lab.lib.utils;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,6 +30,15 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 
 import com.google.common.io.ByteStreams;
+
+/**
+ * This class can be useful when a given input stream is read and closed ( for example by a 3rd party library or
+ * application ) and there is the need to read it again.<br>
+ * To avoid the problem of reading a close stream, always use the {@link #clone()} input stream instead of the original
+ * one
+ * 
+ * @author Fabrizio
+ */
 public class ClonableInputStream implements Cloneable {
 
     private ByteArrayOutputStream copy;

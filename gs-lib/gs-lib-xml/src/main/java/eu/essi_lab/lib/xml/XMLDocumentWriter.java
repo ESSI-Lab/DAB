@@ -4,7 +4,7 @@ package eu.essi_lab.lib.xml;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,6 +24,12 @@ package eu.essi_lab.lib.xml;
 import java.io.IOException;
 
 import org.xml.sax.SAXException;
+
+/**
+ * Extends {@link XMLDocumentReader} by adding writing functionalities
+ * 
+ * @author Fabrizio
+ */
 public class XMLDocumentWriter extends XMLNodeWriter {
 
     /**

@@ -4,7 +4,7 @@ package eu.essi_lab.access;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,9 +23,6 @@ package eu.essi_lab.access;
 
 import java.util.List;
 
-import eu.essi_lab.model.exceptions.DefaultGSExceptionHandler;
-import eu.essi_lab.model.exceptions.DefaultGSExceptionLogger;
-import eu.essi_lab.model.exceptions.DefaultGSExceptionReader;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.PluginsLoader;
 import eu.essi_lab.model.resource.GSResource;
@@ -33,7 +30,7 @@ import eu.essi_lab.model.resource.GSResource;
 public class DataDownloaderFactory {
 
     private DataDownloaderFactory() {
-	//private constructor to hide implicit public one
+	// private constructor to hide implicit public one
     }
 
     public static DataDownloader getDataDownloader(GSResource resource, String onlineResourceId) {
@@ -51,7 +48,7 @@ public class DataDownloaderFactory {
 
 	    } catch (GSException e) {
 
-		DefaultGSExceptionLogger.log(new DefaultGSExceptionHandler(new DefaultGSExceptionReader(e)));
+		e.log();
 
 	    }
 	}

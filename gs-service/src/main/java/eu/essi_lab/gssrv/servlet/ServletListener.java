@@ -27,25 +27,22 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.ws.rs.ext.RuntimeDelegate;
 
-import eu.essi_lab.api.configuration.storage.IGSConfigurationStorage;
+import org.quartz.SchedulerException;
+
 import eu.essi_lab.api.database.DatabaseProvider;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
-import eu.essi_lab.configuration.ConfigurationUtils;
-import eu.essi_lab.configuration.MailConfiguration;
-import eu.essi_lab.gssrv.starter.ConfigurationLookup;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.scheduler.SchedulerFactory;
+import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting;
 import eu.essi_lab.gssrv.starter.GISuiteStarter;
-import eu.essi_lab.harvester.GSMailSenderHarvesting;
-import eu.essi_lab.jobs.scheduler.GSJobSchedulerFactory;
 import eu.essi_lab.lib.utils.Chronometer;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.StorageUri;
-import eu.essi_lab.model.exceptions.DefaultGSExceptionHandler;
-import eu.essi_lab.model.exceptions.DefaultGSExceptionLogger;
-import eu.essi_lab.model.exceptions.DefaultGSExceptionReader;
 import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
-import eu.essi_lab.shared.driver.es.stats.GSMailSenderElasticsearch;
 
+/**
+ * @author Fabrizio
+ */
 public class ServletListener implements ServletContextListener {
 
     public void contextInitialized(final ServletContextEvent sce) {
@@ -67,56 +64,23 @@ public class ServletListener implements ServletContextListener {
 	//
 	RuntimeDelegate.setInstance(new org.apache.cxf.jaxrs.impl.RuntimeDelegateImpl());
 
-	//
-	// enables the publishing of runtime info to the database
-	//
-	// DatabaseInfoPublisher.enable(); // disabled
-
-	// enables the publishing of runtime info to the elastic search
-	//
-	ElasticsearchInfoPublisher.enable();
-
 	Chronometer chronometer = new Chronometer();
 	chronometer.start();
+
 	GSLoggerFactory.getLogger(ServletListener.class).info("GI-suite initialization STARTED");
 
 	try {
 
-	    IGSConfigurationStorage storage = new ConfigurationLookup().getDBGIsuiteConfiguration();
-	    //
-	    // see GIP-323
-	    //
-	    // storage is expected to be null only with a fresh suite start, in the other cases
-	    // an exception is caught here and the initialization fails
-	    //
-	    GSLoggerFactory.getLogger(ServletListener.class).info(storage == null ? "Storage null" : "Storage set");
-	    getStarter().start(storage);
+	    getStarter().start();
 
 	} catch (GSException e) {
 
 	    GSLoggerFactory.getLogger(ServletListener.class).error("Error starting GI-suite");
 
-	    DefaultGSExceptionHandler handler = new DefaultGSExceptionHandler(new DefaultGSExceptionReader(e));
-
-	    DefaultGSExceptionLogger.log(handler);
+	    e.log();
 
 	    System.exit(1);
 	}
-
-	MailConfiguration mailConfiguration = ConfigurationUtils.getMailConfiguration();
-	GSMailSenderHarvesting.RECIPIENTS = mailConfiguration.geteMailRecipients();
-	GSMailSenderHarvesting.SMTP_HOST = mailConfiguration.getSmtpHost();
-	GSMailSenderHarvesting.SMTP_PORT = mailConfiguration.getSmtpPort();
-	GSMailSenderHarvesting.SMTP_USER = mailConfiguration.getSmtpUser();
-	GSMailSenderHarvesting.SMTP_PASSWORD = mailConfiguration.getSmtpPassword();
-	GSMailSenderElasticsearch.RECIPIENTS = mailConfiguration.geteMailRecipients();
-	GSMailSenderElasticsearch.SMTP_HOST = mailConfiguration.getSmtpHost();
-	GSMailSenderElasticsearch.SMTP_PORT = mailConfiguration.getSmtpPort();
-	GSMailSenderElasticsearch.SMTP_USER = mailConfiguration.getSmtpUser();
-	GSMailSenderElasticsearch.SMTP_PASSWORD = mailConfiguration.getSmtpPassword();
-	GSLoggerFactory.getLogger(getClass()).info("Setting mail parameters: {}", mailConfiguration);
-	GSMailSenderHarvesting.printMailParameters();
-	GSMailSenderElasticsearch.printMailParameters();
 
 	GSLoggerFactory.getLogger(ServletListener.class).info("GI-suite  initialization ENDED");
 	GSLoggerFactory.getLogger(ServletListener.class).info("GI-suite  initialization time: {}", chronometer.formatElapsedTime());
@@ -127,21 +91,27 @@ public class ServletListener implements ServletContextListener {
 	GSLoggerFactory.getLogger(ServletListener.class).info("Context destroyng STARTED");
 
 	try {
-	    StorageUri uri = ConfigurationUtils.getStorageURI();
+	    StorageUri uri = ConfigurationWrapper.getDatabaseURI();
 
 	    GSLoggerFactory.getLogger(getClass()).info("Releasing database resources");
 
-	    DatabaseProviderFactory factory = new DatabaseProviderFactory();
-	    DatabaseProvider provider = factory.create(uri);
+	    DatabaseProvider provider = DatabaseProviderFactory.create(uri);
 	    if (provider != null) {
 		provider.release();
 	    }
 
-	    new GSJobSchedulerFactory().getGSJobScheduler().stop();
+	    SchedulerSetting schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
+	    SchedulerFactory.getScheduler(schedulerSetting).shutdown();
 
 	} catch (GSException e) {
 
-	    DefaultGSExceptionLogger.log(new DefaultGSExceptionHandler(new DefaultGSExceptionReader(e)));
+	    e.log();
+
+	    System.exit(1);
+
+	} catch (SchedulerException e) {
+
+	    e.printStackTrace();
 
 	    System.exit(1);
 	}

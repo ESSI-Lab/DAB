@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.pubsub;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,6 +28,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.xml.bind.Marshaller;
 
+import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.jaxb.common.CommonContext;
 import eu.essi_lab.jaxb.csw._2_0_2.ExceptionCode;
 import eu.essi_lab.jaxb.ows._1_0_0.ExceptionReport;
@@ -39,7 +40,6 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.pdk.Profiler;
-import eu.essi_lab.pdk.ProfilerInfo;
 import eu.essi_lab.pdk.handler.selector.DELETERequestFilter;
 import eu.essi_lab.pdk.handler.selector.GETRequestFilter;
 import eu.essi_lab.pdk.handler.selector.HandlerSelector;
@@ -48,11 +48,17 @@ import eu.essi_lab.profiler.pubsub.handler.csw.CSWPubSubGetCapabilitiesHandler;
 import eu.essi_lab.profiler.pubsub.handler.csw.CSWSubscribeHandler;
 import eu.essi_lab.profiler.pubsub.handler.csw.CSWSubscriptionsHandler;
 import eu.essi_lab.profiler.pubsub.handler.csw.CSWUnsubscribeHandler;
+
+/**
+ * http://docs.opengeospatial.org/is/13-131r1/13-131r1.html
+ * 
+ * @author Fabrizio
+ */
 public class CSWPubSubProfiler extends Profiler {
 
     static final String CSW_PUB_SUB_PROFILER_TYPE = "CSW-PUB-SUB";
 
-    public static final ProfilerInfo PUB_SUB_SERVICE_INFO = new ProfilerInfo();
+    public static final ProfilerSetting PUB_SUB_SERVICE_INFO = new ProfilerSetting();
     static {
 	PUB_SUB_SERVICE_INFO.setServiceName("CSWPubSub");
 	PUB_SUB_SERVICE_INFO.setServiceType(CSW_PUB_SUB_PROFILER_TYPE);
@@ -86,7 +92,7 @@ public class CSWPubSubProfiler extends Profiler {
     }
 
     @Override
-    public ProfilerInfo getProfilerInfo() {
+    protected ProfilerSetting initSetting() {
 
 	return PUB_SUB_SERVICE_INFO;
     }

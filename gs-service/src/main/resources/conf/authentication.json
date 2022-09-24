@@ -3,7 +3,7 @@
     "redirect-uri": "http://localhost:9090/gs-service/auth/user/callback/google",
     "login-url": "https://accounts.google.com/o/oauth2/v2/auth?client_id=%s&redirect_uri=%s&response_type=code&scope=openid profile email&state=%s",
     "token-url": "https://www.googleapis.com/oauth2/v4/token?client_id=%s&client_secret=%s&redirect_uri=%s&code=%s&grant_type=authorization_code",
-    "userinfo-url": "https://www.googleapis.com/plus/v1/people/me/openIdConnect",
+    "userinfo-url": "https://people.googleapis.com/v1/people/me?",
     "revoke-token-url": "https://accounts.google.com/o/oauth2/revoke?token=%s"
   },
   "twitter": {

@@ -4,7 +4,7 @@ package eu.essi_lab.lib.utils;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,6 +28,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+
+/**
+ * This {@link FilterInputStream}
+ * replaces the given list of strings with the specified replacements inside an UTF-8 encoded inputstream
+ * Copied and expanded from
+ * https://stackoverflow.com/questions/7743534/filter-search-and-replace-array-of-bytes-in-an-inputstream
+ * 
+ * @author boldrini
+ */
 public class ReplacingInputStream extends FilterInputStream {
 
     LinkedList<Integer> inQueue = new LinkedList<Integer>();

@@ -4,7 +4,7 @@ package eu.essi_lab.api.database.marklogic;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,10 +24,8 @@ package eu.essi_lab.api.database.marklogic;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -38,7 +36,7 @@ import javax.xml.bind.Unmarshaller;
 
 import org.w3c.dom.Node;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.marklogic.xcc.ResultSequence;
 import com.marklogic.xcc.exceptions.RequestException;
 
 import eu.essi_lab.api.database.Database;
@@ -47,9 +45,9 @@ import eu.essi_lab.api.database.internal.Folder;
 import eu.essi_lab.api.database.marklogic.search.DistinctQueryHandler;
 import eu.essi_lab.api.database.marklogic.search.MarkLogicDiscoveryBondHandler;
 import eu.essi_lab.api.database.marklogic.search.semantic.MarkLogicSemanticReader;
-import eu.essi_lab.jaxb.common.NameSpace;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StreamUtils;
+import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.PerformanceLogger;
@@ -73,8 +71,6 @@ import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.StorageUri;
 import eu.essi_lab.model.auth.GSUser;
-import eu.essi_lab.model.configuration.AbstractGSconfigurable;
-import eu.essi_lab.model.configuration.option.GSConfOption;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.ontology.GSKnowledgeResourceDescription;
@@ -82,14 +78,12 @@ import eu.essi_lab.model.ontology.GSKnowledgeScheme;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
-public class MarkLogicReader extends AbstractGSconfigurable implements DatabaseReader {
+import eu.essi_lab.wrapper.marklogic.MarkLogicWrapper;
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -7394037640618943119L;
-
-    private Map<String, GSConfOption<?>> supported = new HashMap<>();
+/**
+ * @author Fabrizio
+ */
+public class MarkLogicReader implements DatabaseReader {
 
     //
     // ERROR MESSAGES
@@ -100,6 +94,7 @@ public class MarkLogicReader extends AbstractGSconfigurable implements DatabaseR
     private static final String MARK_LOGIC_GET_USER_ERROR = "MARK_LOGIC_GET_USER_ERROR";
     private static final String MARK_LOGIC_GET_USERS_ERROR = "MARK_LOGIC_GET_USERS_ERROR";
     private static final String MARK_LOGIC_RESOURCE_EXISTS_ERROR = "MARK_LOGIC_RESOURCE_EXISTS_ERROR";
+    private static final String MARK_LOGIC_GET_FOLDER_ERROR = "MARK_LOGIC_GET_FOLDER_ERROR";
 
     //
     // LOGS
@@ -111,25 +106,20 @@ public class MarkLogicReader extends AbstractGSconfigurable implements DatabaseR
     private static final String MARKLOGIC_READER_STATS_COMPUTING_STARTED = "Marklogic Reader Stats computing STARTED";
     private static final String MARKLOGIC_READER_STATS_COMPUTING_ENDED = "Marklogic Reader Stats computing ENDED";
 
-    @JsonIgnore
-    private transient MarkLogicDatabase markLogicDB;
-
-    @JsonIgnore
-    private transient StorageUri dbUri;
+    private MarkLogicDatabase markLogicDB;
+    private StorageUri dbUri;
+    private Folder viewFolder;
 
     public MarkLogicReader() {
-	// empty constructor need by json serializer/deserializer
     }
 
     @Override
-    @JsonIgnore
-    public void setDatabase(Database dataBase) {
+    public void setDatabase(@SuppressWarnings("rawtypes") Database dataBase) {
 
 	this.markLogicDB = (MarkLogicDatabase) dataBase;
     }
 
     @Override
-    @JsonIgnore
     public MarkLogicDatabase getDatabase() {
 
 	return (MarkLogicDatabase) this.markLogicDB;
@@ -330,11 +320,11 @@ public class MarkLogicReader extends AbstractGSconfigurable implements DatabaseR
 
 	try {
 
-	    GSLoggerFactory.getLogger(MarkLogicReader.class).trace(MARKLOGIC_READER_STATS_COMPUTING_STARTED);
+	    // GSLoggerFactory.getLogger(MarkLogicReader.class).trace(MARKLOGIC_READER_STATS_COMPUTING_STARTED);
 
 	    StatisticsResponse response = markLogicDB.compute(message);
 
-	    GSLoggerFactory.getLogger(MarkLogicReader.class).trace(MARKLOGIC_READER_STATS_COMPUTING_ENDED);
+	    // GSLoggerFactory.getLogger(MarkLogicReader.class).trace(MARKLOGIC_READER_STATS_COMPUTING_ENDED);
 
 	    return response;
 
@@ -347,7 +337,7 @@ public class MarkLogicReader extends AbstractGSconfigurable implements DatabaseR
     @Override
     public DiscoveryCountResponse count(DiscoveryMessage message) throws GSException {
 
-	GSLoggerFactory.getLogger(MarkLogicReader.class).trace(MARKLOGIC_READER_COUNT_STARTED);
+	// GSLoggerFactory.getLogger(MarkLogicReader.class).trace(MARKLOGIC_READER_COUNT_STARTED);
 	// String qs = message.getWebRequest().getQueryString();
 	Optional<WebRequest> oqs = Optional.ofNullable(message.getWebRequest());
 	PerformanceLogger pl = new PerformanceLogger(PerformanceLogger.PerformancePhase.MARKLOGIC_COUNTQUERY_GENERATION,
@@ -374,10 +364,10 @@ public class MarkLogicReader extends AbstractGSconfigurable implements DatabaseR
 
 	pl = new PerformanceLogger(PerformanceLogger.PerformancePhase.MARKLOGIC_COUNTQUERY_EXECUTION, message.getRequestId(), oqs);
 
-	DiscoveryCountResponse estimate = markLogicDB.estimate(ctsSearch, message.isQueryRegistrationEnabled());
+	DiscoveryCountResponse estimate = markLogicDB.estimate(ctsSearch, message.isQueryRegistrationEnabled(), message.getRequestId());
 
 	pl.logPerformance(GSLoggerFactory.getLogger(MarkLogicReader.class));
-	GSLoggerFactory.getLogger(MarkLogicReader.class).trace(MARKLOGIC_READER_COUNT_COMPLETED);
+	// GSLoggerFactory.getLogger(MarkLogicReader.class).trace(MARKLOGIC_READER_COUNT_COMPLETED);
 
 	return estimate;
     }
@@ -387,7 +377,8 @@ public class MarkLogicReader extends AbstractGSconfigurable implements DatabaseR
 
 	ResultSet<Node> nodes = discoverNodes(message);
 
-	GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Creation of {} GSResources STARTED", nodes.getResultsList().size());
+	// GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Creation of {} GSResources STARTED",
+	// nodes.getResultsList().size());
 
 	Optional<WebRequest> oqs = Optional.ofNullable(message.getWebRequest());
 
@@ -416,12 +407,13 @@ public class MarkLogicReader extends AbstractGSconfigurable implements DatabaseR
 	}
 
 	pl.logPerformance(GSLoggerFactory.getLogger(MarkLogicReader.class));
-	GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Creation of {} GSResources ENDED", nodes.getResultsList().size());
+	// GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Creation of {} GSResources ENDED",
+	// nodes.getResultsList().size());
 
 	ResultSet<GSResource> resultSet = new ResultSet<>();
 	resultSet.setResultsList(resources);
 
-	GSLoggerFactory.getLogger(MarkLogicReader.class).trace(MARKLOGIC_READER_DISCOVER_COMPLETED);
+	// GSLoggerFactory.getLogger(MarkLogicReader.class).trace(MARKLOGIC_READER_DISCOVER_COMPLETED);
 
 	return resultSet;
     }
@@ -429,7 +421,7 @@ public class MarkLogicReader extends AbstractGSconfigurable implements DatabaseR
     @Override
     public ResultSet<Node> discoverNodes(DiscoveryMessage message) throws GSException {
 
-	GSLoggerFactory.getLogger(MarkLogicReader.class).trace(MARKLOGIC_READER_DISCOVER_STARTED);
+	// GSLoggerFactory.getLogger(MarkLogicReader.class).trace(MARKLOGIC_READER_DISCOVER_STARTED);
 
 	Page page = message.getPage();
 
@@ -441,7 +433,7 @@ public class MarkLogicReader extends AbstractGSconfigurable implements DatabaseR
 	ResultSet<Node> resultSet = new ResultSet<>();
 	resultSet.setResultsList(nodes);
 
-	GSLoggerFactory.getLogger(MarkLogicReader.class).trace(MARKLOGIC_READER_DISCOVER_COMPLETED);
+	// GSLoggerFactory.getLogger(MarkLogicReader.class).trace(MARKLOGIC_READER_DISCOVER_COMPLETED);
 
 	return resultSet;
     }
@@ -449,23 +441,23 @@ public class MarkLogicReader extends AbstractGSconfigurable implements DatabaseR
     @Override
     public ResultSet<String> discoverStrings(DiscoveryMessage message) throws GSException {
 
-	GSLoggerFactory.getLogger(MarkLogicReader.class).trace(MARKLOGIC_READER_DISCOVER_STARTED);
+	// GSLoggerFactory.getLogger(MarkLogicReader.class).trace(MARKLOGIC_READER_DISCOVER_STARTED);
 
 	Page page = message.getPage();
 
 	int start = page.getStart();
 	int count = page.getSize();
 
-	List<String> nodes = markLogicDB.search(message, start, count,String.class);
+	List<String> nodes = markLogicDB.search(message, start, count, String.class);
 
 	ResultSet<String> resultSet = new ResultSet<>();
 	resultSet.setResultsList(nodes);
 
-	GSLoggerFactory.getLogger(MarkLogicReader.class).trace(MARKLOGIC_READER_DISCOVER_COMPLETED);
+	// GSLoggerFactory.getLogger(MarkLogicReader.class).trace(MARKLOGIC_READER_DISCOVER_COMPLETED);
 
 	return resultSet;
     }
-    
+
     @Override
     public SemanticCountResponse count(SemanticMessage message) throws GSException {
 
@@ -499,31 +491,13 @@ public class MarkLogicReader extends AbstractGSconfigurable implements DatabaseR
     }
 
     @Override
-    @JsonIgnore
+
     public StorageUri getStorageUri() {
 
 	return dbUri;
     }
 
     @Override
-    public Map<String, GSConfOption<?>> getSupportedOptions() {
-	return supported;
-    }
-
-    @Override
-    public void onOptionSet(GSConfOption<?> opt) throws GSException {
-	// nothing to do on option set
-    }
-
-    @Override
-    public void onFlush() throws GSException {
-	// nothing to do on flush
-    }
-
- 
-
-    @Override
-    @JsonIgnore
     public Optional<GSUser> getUser(String identifier) throws GSException {
 
 	try {
@@ -546,12 +520,11 @@ public class MarkLogicReader extends AbstractGSconfigurable implements DatabaseR
     }
 
     @Override
-    @JsonIgnore
     public List<GSUser> getUsers() throws GSException {
 
 	try {
 
-	    GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Getting users STARTED");
+	    // GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Getting users STARTED");
 
 	    String suiteId = getDatabase().getSuiteIdentifier();
 
@@ -570,14 +543,14 @@ public class MarkLogicReader extends AbstractGSconfigurable implements DatabaseR
 		    }).filter(Objects::nonNull).//
 		    collect(Collectors.toList());
 
-	    GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Getting users ENDED");
-	    GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Found {} users", users.size());
+	    // GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Getting users ENDED");
+	    // GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Found {} users", users.size());
 
 	    return users;
 
 	} catch (Exception e) {
 
-	    GSLoggerFactory.getLogger(MarkLogicReader.class).error("Exception requesting users");
+	    GSLoggerFactory.getLogger(MarkLogicReader.class).error("Exception requesting users: {}", e.getMessage());
 
 	    throw GSException.createException(//
 		    getClass(), //
@@ -591,42 +564,75 @@ public class MarkLogicReader extends AbstractGSconfigurable implements DatabaseR
     }
 
     @Override
-    public Optional<View> getView(String id) throws GSException {
+    public Optional<View> getView(String viewId) throws GSException {
 
 	try {
 
-	    Folder folder = getViewFolder();
+	    if (viewFolder == null) {
 
-	    if (folder == null) {
+		viewFolder = getViewFolder();
+
+		if (viewFolder == null) {
+
+		    GSLoggerFactory.getLogger(getClass()).warn("View folder missing");
+
+		    return Optional.empty();
+		}
+	    }
+
+	    String viewQuery = getViewQuery(viewFolder, viewId);
+
+	    MarkLogicWrapper wrapper = getDatabase().getWrapper();
+
+	    ResultSequence resultSequence = wrapper.submit(viewQuery);
+
+	    if (resultSequence.hasNext()) {
+
+		ViewFactory factory = new ViewFactory();
+
+		Unmarshaller unmarshaller = factory.createUnmarshaller();
+
+		InputStream stream = resultSequence.next().asInputStream();
+
+		View view = (View) unmarshaller.unmarshal(stream);
+
+		// GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Unmarshalling view {} ENDED", id);
+
+		return Optional.of(view);
+
+	    } else {
+
+		GSLoggerFactory.getLogger(getClass()).warn("View {} not found", viewId);
+
 		return Optional.empty();
 	    }
 
-	    ViewFactory factory = new ViewFactory();
-
-	    Unmarshaller unmarshaller = factory.createUnmarshaller();
-
-	    if (folder.exists(id)) {
-
-		GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Getting view {} STARTED", id);
-
-		InputStream binary = folder.getBinary(id);
-
-		GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Getting view {} ENDED", id);
-
-		GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Unmarshalling view {} STARTED", id);
-
-		View view = (View) unmarshaller.unmarshal(binary);
-
-		GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Unmarshalling view {} ENDED", id);
-
-		return Optional.of(view);
-	    }
-
-	    return Optional.empty();
+	    // ViewFactory factory = new ViewFactory();
+	    //
+	    // Unmarshaller unmarshaller = factory.createUnmarshaller();
+	    //
+	    // if (viewFolder.exists(id)) {
+	    //
+	    // // GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Getting view {} STARTED", id);
+	    //
+	    // InputStream binary = viewFolder.getBinary(id);
+	    //
+	    // // GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Getting view {} ENDED", id);
+	    //
+	    // // GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Unmarshalling view {} STARTED", id);
+	    //
+	    // View view = (View) unmarshaller.unmarshal(binary);
+	    //
+	    // // GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Unmarshalling view {} ENDED", id);
+	    //
+	    // return Optional.of(view);
+	    // }
+	    //
+	    // return Optional.empty();
 
 	} catch (Exception e) {
 
-	    GSLoggerFactory.getLogger(MarkLogicReader.class).error("Exception requesting view {}", id);
+	    GSLoggerFactory.getLogger(getClass()).error("Exception requesting view: {}", e.getMessage(), e);
 
 	    throw GSException.createException(//
 		    getClass(), //
@@ -637,6 +643,30 @@ public class MarkLogicReader extends AbstractGSconfigurable implements DatabaseR
 		    MARK_LOGIC_GET_RESOURCE_ERROR, //
 		    e);
 	}
+    }
+
+    /**
+     * @param viewId
+     * @return
+     */
+    private String getViewQuery(Folder viewFolder, String viewId) {
+
+	String query = "xquery version \"1.0-ml\"; \n";
+	query += "declare namespace html = \"http://www.w3.org/1999/xhtml\"; \n";
+
+	query += "import module namespace gs=\"http://flora.eu/gi-suite/1.0/dataModel/schema\" at \"/gs-modules/functions-module.xqy\"; \n";
+
+	query += "let $id := '" + viewId + "' \n";
+
+	query += "for $uris in cts:uris((),(), cts:directory-query(\"/" + viewFolder.getCompleteName() + "/\", \"infinity\")   ) \n";
+
+	query += "let $doc :=  fn:document($uris) \n";
+
+	query += "let $xml := if ($doc/node() instance of binary()) then (xdmp:binary-decode(fn:doc($uris)/node(), \"UTF-8\")) else $doc \n";
+
+	query += "where (fn:contains($xml,fn:concat('<id>',$id,'</id>')) or $doc//id = $id) return $xml \n";
+
+	return query;
     }
 
     @Override
@@ -691,6 +721,28 @@ public class MarkLogicReader extends AbstractGSconfigurable implements DatabaseR
 		    ErrorInfo.ERRORTYPE_INTERNAL, //
 		    ErrorInfo.SEVERITY_ERROR, //
 		    MARK_LOGIC_LIST_KEYS_ERROR, //
+		    e);
+	}
+    }
+
+    /**
+     * 
+     */
+    public Optional<Folder> getFolder(String folderName, boolean createIfNotExist) throws GSException {
+
+	try {
+	    return getDatabase().getFolder(folderName, createIfNotExist);
+	} catch (RequestException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    MARK_LOGIC_GET_FOLDER_ERROR, //
 		    e);
 	}
     }

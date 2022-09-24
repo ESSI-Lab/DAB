@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jaxb:bindings version="1.0" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+     xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+    xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" xmlns:ows="http://www.opengis.net/ows"
+    jaxb:extensionBindingPrefixes="xjc">
+    <jaxb:bindings schemaLocation="schemas/InvCatalog.1.0.6.xsd">
+        <jaxb:schemaBindings>
+            <jaxb:package name="eu.essi_lab.thredds._1_0_6"/>
+        </jaxb:schemaBindings>
+   
+		<jaxb:bindings node="//xs:attribute[@name='filter']">
+            <jaxb:property name="FilterDeprecated"/>
+        </jaxb:bindings>
+        
+        <jaxb:bindings node="//xs:attribute[@name='addLatest']">
+            <jaxb:property name="AddLatestDeprecated"/>
+        </jaxb:bindings>
+        
+        <jaxb:bindings node="//xs:attribute[@name='addDatasetSize']">
+            <jaxb:property name="AddDatasetSizeDeprecated"/>
+        </jaxb:bindings>
+        
+        <jaxb:bindings node="//xs:attribute[@name='addId']">
+            <jaxb:property name="AddIdDeprecated"/>
+        </jaxb:bindings>
+        
+        <jaxb:bindings node="//xs:attribute[@name='type'][@type='documentationEnumTypes']">
+            <jaxb:property name="DocumentationType"/>
+        </jaxb:bindings>
+		
+    </jaxb:bindings>
+    
+    <jaxb:bindings schemaLocation="schemas/ncml-2.2.xsd">
+        <jaxb:schemaBindings>
+            <jaxb:package name="eu.essi_lab.ncml._2_2"/>
+        </jaxb:schemaBindings>
+   
+		<jaxb:bindings node="//xs:attribute[@name='iospParam']">
+            <jaxb:property name="IOSPParamAttribute"/>
+        </jaxb:bindings>
+      
+    </jaxb:bindings>
+   
+    <jaxb:globalBindings fixedAttributeAsConstantProperty="true">
+       
+    </jaxb:globalBindings>
+</jaxb:bindings>

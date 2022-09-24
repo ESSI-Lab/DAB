@@ -4,7 +4,7 @@ package eu.essi_lab.access.augmenter;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -36,10 +36,10 @@ import eu.essi_lab.access.compliance.DataComplianceTester;
 import eu.essi_lab.access.compliance.DataComplianceTester.DataComplianceTest;
 import eu.essi_lab.access.compliance.wrapper.ReportsMetadataHandler;
 import eu.essi_lab.augmenter.ResourceAugmenter;
+import eu.essi_lab.cfga.gs.setting.augmenter.AugmenterSetting;
 import eu.essi_lab.iso.datamodel.classes.Distribution;
 import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.configuration.option.GSConfOption;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
@@ -47,16 +47,24 @@ import eu.essi_lab.model.resource.ResourcePropertyHandler;
 import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.model.resource.data.DataObject;
 import eu.essi_lab.model.resource.data.DataType;
-public class AccessAugmenter extends ResourceAugmenter {
+
+/**
+ * @author Fabrizio
+ */
+public class AccessAugmenter extends ResourceAugmenter<AugmenterSetting> {
 
     /**
-     *
+     * 
      */
-    private static final long serialVersionUID = 1925873267406623783L;
-
     public AccessAugmenter() {
+    }
 
-	setLabel("Access augmenter");
+    /**
+     * @param setting
+     */
+    public AccessAugmenter(AugmenterSetting setting) {
+
+	super(setting);
     }
 
     public Optional<GSResource> augment(GSResource resource) throws GSException {
@@ -127,6 +135,12 @@ public class AccessAugmenter extends ResourceAugmenter {
 	GSLoggerFactory.getLogger(getClass()).info("Access augmentation of current resource ENDED");
 
 	return Optional.of(resource);
+    }
+
+    @Override
+    public String getType() {
+
+	return "AccessAugmenter";
     }
 
     /**
@@ -342,7 +356,6 @@ public class AccessAugmenter extends ResourceAugmenter {
 	    DataComplianceLevel level) throws GSException {
 	return tester.test(DataComplianceTest.EXECUTION, preview, full, level);
 
-	
     }
 
     private DataComplianceReport chooseBestResult(HashMap<DataComplianceTest, DataComplianceReport> testResults) {
@@ -420,15 +433,14 @@ public class AccessAugmenter extends ResourceAugmenter {
     }
 
     @Override
-    public void onOptionSet(GSConfOption<?> opt) throws GSException {
-	// TODO Auto-generated method stub
+    protected String initName() {
 
+	return "Access augmenter";
     }
 
     @Override
-    public void onFlush() throws GSException {
-	// TODO Auto-generated method stub
+    protected AugmenterSetting initSetting() {
 
+	return new AugmenterSetting();
     }
-
 }

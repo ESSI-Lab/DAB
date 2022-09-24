@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.csw;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,26 +21,27 @@ package eu.essi_lab.accessor.csw;
  * #L%
  */
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
+
+/**
+ * This connector uses the multi mapper, because multiple metadata types are returned by this connector. E.g. GMD and
+ * Dublin core or GMI and GMD etc. The multiple mapper is generic, however it is somewhat slower.
+ * 
+ * @author boldrini
+ */
 public class CSWMultiConnector extends CSWConnector {
 
     /**
      * 
      */
-    private static final long serialVersionUID = -1542182185122468869L;
-
-    public CSWMultiConnector() {
-    }
+    public static final String TYPE = "CSW Multi Connector";
 
     @Override
-    public String getLabel() {
+    public String getType() {
 
-	return "CSW Multi Connector";
+	return TYPE;
     }
 
-    @JsonIgnore
     @Override
     protected String getReturnedMetadataSchema() {
 	return CommonNameSpaceContext.MULTI;

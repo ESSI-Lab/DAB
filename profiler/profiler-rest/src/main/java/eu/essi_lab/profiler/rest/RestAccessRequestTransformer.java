@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.rest;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -33,7 +33,7 @@ import org.json.JSONObject;
 import org.json.XML;
 
 import eu.essi_lab.access.compliance.wrapper.DataDescriptorWrapper;
-import eu.essi_lab.configuration.ConfigurationUtils;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.utils.JSONUtils;
@@ -99,9 +99,9 @@ public class RestAccessRequestTransformer extends AccessRequestTransformer {
 
 	discoveryMessage.setPage(new Page(1, 1));
 
-	discoveryMessage.setSources(ConfigurationUtils.getBrokeredSources());
-	discoveryMessage.setDataBaseURI(ConfigurationUtils.getStorageURI());
-	discoveryMessage.setSharedRepositoryInfo(ConfigurationUtils.getSharedRepositoryInfo());
+	discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
+	discoveryMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	
 
 	SimpleValueBond bond = BondFactory.createSimpleValueBond(//
 		BondOperator.EQUAL, //

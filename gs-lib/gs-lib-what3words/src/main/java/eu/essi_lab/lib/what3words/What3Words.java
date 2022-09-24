@@ -4,7 +4,7 @@ package eu.essi_lab.lib.what3words;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -61,6 +61,17 @@ public class What3Words {
     public String getLongitude() {
 	return longitude;
     }
+
+    /**
+     * Initializes the object from the 3 words. The APIKey is used to contact the W3W server to retrieve latitude and
+     * longitude. A default time out will be applied
+     * 
+     * @param apiKey
+     * @param word1
+     * @param word2
+     * @param word3
+     * @throws Exception
+     */
     public What3Words(String firstWord, String secondWord, String thirdWord) throws Exception {
 	this(firstWord, secondWord, thirdWord, null);
     }

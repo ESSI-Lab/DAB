@@ -4,7 +4,7 @@ package eu.essi_lab.shared.driver.es.connector.aws;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,6 +21,10 @@ package eu.essi_lab.shared.driver.es.connector.aws;
  * #L%
  */
 
+import java.util.Optional;
+
+import org.slf4j.Logger;
+
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.elasticsearch.AWSElasticsearch;
@@ -28,23 +32,26 @@ import com.amazonaws.services.elasticsearch.AWSElasticsearchClientBuilder;
 import com.amazonaws.services.elasticsearch.model.DomainInfo;
 import com.amazonaws.services.elasticsearch.model.ListDomainNamesRequest;
 import com.amazonaws.services.elasticsearch.model.ListDomainNamesResult;
+
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.shared.driver.es.connector.ESConnector;
 import eu.essi_lab.shared.driver.es.connector.ESRequestSubmitter;
-import java.util.Optional;
-import org.slf4j.Logger;
+
+/**
+ * @author ilsanto
+ */
 public class AWSESConnector extends ESConnector {
 
-    private transient Logger logger = GSLoggerFactory.getLogger(AWSESConnector.class);
+    private Logger logger = GSLoggerFactory.getLogger(AWSESConnector.class);
 
     BasicAWSCredentials getAWSCredentials() {
-	return new BasicAWSCredentials(getEsStaorageUri().getUser(), getEsStaorageUri().getPassword());
+	return new BasicAWSCredentials(getEsStorageUri().getUser(), getEsStorageUri().getPassword());
     }
 
     AWSElasticsearch getAWSClient() {
 
 	return AWSElasticsearchClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(getAWSCredentials()))
-		.withRegion(new AWSESUrlParser(getEsStaorageUri().getUri()).getRegion()).build();
+		.withRegion(new AWSESUrlParser(getEsStorageUri().getUri()).getRegion()).build();
     }
 
     @Override
@@ -59,14 +66,14 @@ public class AWSESConnector extends ESConnector {
 
 	ListDomainNamesResult response = doRequestWithRetry(client, listRequest);
 
-	AWSESUrlParser parser = new AWSESUrlParser(getEsStaorageUri().getUri());
+	AWSESUrlParser parser = new AWSESUrlParser(getEsStorageUri().getUri());
 
 	Optional<DomainInfo> found = response.getDomainNames().stream()
 		.filter(domainInfo -> domainInfo.getDomainName().equals(parser.getDomainName())).findFirst();
 
 	if (!found.isPresent()) {
 	    logger.warn("The provided url is aws, but the domain identification failed. Url is: {} Expected domain was {}",
-		    getEsStaorageUri().getUri(), parser.getDomainName());
+		    getEsStorageUri().getUri(), parser.getDomainName());
 
 	    return false;
 	}
@@ -112,9 +119,9 @@ public class AWSESConnector extends ESConnector {
 
 	AWSESRequestSubmitter submitter = new AWSESRequestSubmitter();
 
-	submitter.setPwd(getEsStaorageUri().getPassword());
+	submitter.setPwd(getEsStorageUri().getPassword());
 
-	submitter.setUser(getEsStaorageUri().getUser());
+	submitter.setUser(getEsStorageUri().getUser());
 
 	submitter.setRegion(new AWSESUrlParser(getESUrl()).getRegion());
 
@@ -123,11 +130,11 @@ public class AWSESConnector extends ESConnector {
 
     boolean awsElasticSearch() {
 
-	return new AWSESUrlParser(getEsStaorageUri().getUri()).isAWSESEndpoint();
+	return new AWSESUrlParser(getEsStorageUri().getUri()).isAWSESEndpoint();
     }
 
     String getESUrl() {
-	return getEsStaorageUri().getUri();
+	return getEsStorageUri().getUri();
     }
 
 }

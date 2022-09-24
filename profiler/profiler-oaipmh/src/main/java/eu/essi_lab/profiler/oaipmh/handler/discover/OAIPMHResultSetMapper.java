@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.oaipmh.handler.discover;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -53,6 +53,20 @@ import eu.essi_lab.profiler.oaipmh.OAIPMHNameSpaceMapper;
 import eu.essi_lab.profiler.oaipmh.OAIPMHRequestReader;
 import eu.essi_lab.profiler.oaipmh.profile.OAIPMHProfile;
 import eu.essi_lab.profiler.oaipmh.token.ResumptionToken;
+
+/**
+ * See <a href="https://www.openarchives.org/OAI/openarchivesprotocol.html#GetRecord">GetRecord</a> for an example of
+ * OAIPMH 2 record. The
+ * {@link #OAIPMH_MAPPING_SCHEMA} has the following properties:
+ * <ul>
+ * <li>schema name: {@value #OAIPMH_SCHEMA_NAME}</li>
+ * <li>schema version: {@value #OAIPMH_SCHEMA_VERSION}</li>
+ * <li>schema uri: {@value #OAIPMH_SCHEMA_URI}</li>
+ * <li>encoding media type: {@link MediaType#APPLICATION_XML}</li>
+ * </ul>
+ *
+ * @author Fabrizio
+ */
 public class OAIPMHResultSetMapper extends DiscoveryResultSetMapper<String> {
 
     /**

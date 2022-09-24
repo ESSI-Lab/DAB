@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.rsm;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import eu.essi_lab.lib.utils.GDCSourcesReader;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.ResultSet;
@@ -33,6 +33,13 @@ import eu.essi_lab.messages.count.CountSet;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
+
+/**
+ * Implementation specific to map a <code>ResultSet&ltGSResource&gt</code> in to a <code>ResultSet&ltT&gt</code>
+ * 
+ * @author Fabrizio
+ * @param <T> the type to which to map the {@link GSResource}s of the response (e.g.: String, JSON, XML, etc.)
+ */
 public abstract class DiscoveryResultSetMapper<T>
 	implements MessageResponseMapper<DiscoveryMessage, GSResource, T, CountSet, ResultSet<GSResource>, ResultSet<T>> {
 
@@ -128,7 +135,7 @@ public abstract class DiscoveryResultSetMapper<T>
 	List<T> out = new ArrayList<T>();
 	mappedResSet.setResultsList(out);
 
-	List<String> ids = GDCSourcesReader.readSourceIds();
+	List<String> ids = ConfigurationWrapper.getGDCSourceSetting().getSelectedSourcesIds();
 
 	for (GSResource res : resultSet.getResultsList()) {
 

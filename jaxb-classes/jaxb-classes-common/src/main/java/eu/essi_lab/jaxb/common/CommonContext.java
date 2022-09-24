@@ -4,7 +4,7 @@ package eu.essi_lab.jaxb.common;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -46,6 +46,28 @@ import eu.essi_lab.jaxb.common.schemas.CommonSchemas;
 import eu.essi_lab.jaxb.oaipmh.OAIPMHtype;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.XMLFactories;
+
+/**
+ * A JAXB context including:
+ * <ul>
+ * <li>CSW core elements</li>
+ * <li>Dublin Core elements</li>
+ * <li>Dublin Core terms</li>
+ * <li>GML 3.2.0</li>
+ * <li>OWS BoundingBox</li>
+ * <li>GCO</li>
+ * <li>GMD</li>
+ * <li>GMX</li>
+ * <li>GSR</li>
+ * <li>GSS</li>
+ * <li>GTS</li>
+ * <li>SRV</li>
+ * <li>GMI</li>
+ * <li>OAI-PMH</li>
+ * </ul>
+ *
+ * @author Fabrizio
+ */
 public class CommonContext {
 
     private static JAXBContext jaxbContext;

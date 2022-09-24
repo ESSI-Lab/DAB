@@ -1,0 +1,152 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>eu.essi_lab</groupId>
+		<artifactId>DAB</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>dab-report-manager</artifactId>
+	<version>1.0-alpha-1</version>
+	<packaging>war</packaging>
+
+	<properties>
+		<warName>dab-report-manager</warName>
+		<!-- http://localhost:8096/rm/service?action=start -->
+		<contextPath>rm</contextPath>
+		<jetty.port>8096</jetty.port>
+	</properties>
+
+	<build>
+		<finalName>dab-report-manager</finalName>
+
+		<!-- <resources> <resource> <directory>src/main/resources/</directory> 
+			<filtering>true</filtering> <excludes> <exclude>**/*.xml</exclude> </excludes> 
+			</resource> </resources> -->
+
+		<plugins>
+
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<addMavenDescriptor>false</addMavenDescriptor>
+					</archive>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<inherited>true</inherited>
+				<groupId>org.codehaus.cargo</groupId>
+				<artifactId>cargo-maven2-plugin</artifactId>
+			</plugin>
+
+			<!-- Jetty Plug-in -->
+
+			<!-- ************************************************************ -->
+			<!-- TO START WITH JETTY: http://localhost:8096/rm/service?action=start 
+				***************************************************************** -->
+
+			<plugin>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<version>9.0.0.v20130308</version>
+
+				<configuration>
+
+					<stopPort>9996</stopPort>
+					<stopKey>stop</stopKey>
+
+					<webAppConfig>
+						<contextPath>/${contextPath}</contextPath>
+					</webAppConfig>
+
+					<useTestClasspath>true</useTestClasspath>
+					<httpConnector>
+						<port>${jetty.port}</port>
+						<!-- connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector"> 
+							<port>${jetty.port}</port> <maxIdleTime>60000</maxIdleTime> </connector -->
+					</httpConnector>
+
+				</configuration>
+			</plugin>
+
+			<!-- War plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.4</version>
+				<executions>
+
+				</executions>
+			</plugin>
+
+
+		</plugins>
+	</build>
+
+
+
+	<dependencies>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>gs-lib-utils</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>gs-lib-net</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>gs-lib-xml</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>jfreechart</groupId>
+			<artifactId>jfreechart</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>${javax.servlet-api.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.ws.rs</groupId>
+			<artifactId>javax.ws.rs-api</artifactId>
+			<!-- <version>2.0.1</version> -->
+		</dependency>
+
+		<!-- <dependency> <groupId>commons-net</groupId> <artifactId>commons-net</artifactId> 
+			<version>2.2</version> </dependency> -->
+
+		<!-- <dependency> <groupId>xml-apis</groupId> <artifactId>xml-apis</artifactId> 
+			<version>1.4.01</version> </dependency> -->
+
+	</dependencies>
+
+</project>

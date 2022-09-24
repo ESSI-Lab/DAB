@@ -4,7 +4,7 @@ package eu.essi_lab.authentication;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -66,7 +66,10 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 
-public class TwitterOAuthAuthenticator implements OAuthAuthenticator {
+/**
+ * @author Fabrizio
+ */
+public class TwitterOAuthAuthenticator extends OAuthAuthenticator {
 
     public static final String TWITTER = "twitter";
     private static final String HMAC_SHA1 = "HMAC-SHA1";
@@ -121,6 +124,18 @@ public class TwitterOAuthAuthenticator implements OAuthAuthenticator {
     public void setHttpClient(CloseableHttpClient httpClient) {
 	this.httpClient = httpClient;
     }
+
+    /**
+     * Twitter implements its login service with an OAuth1.0 protocol. This mean
+     * you have to ask for a peculiar oauth_token before redirect the user,
+     * store the token's values you get back in a session, then redirect user.
+     * The oauth_token you store must match with the oauth_token twitter will
+     * give you by the callback. Let's summarize:<br>
+     * - client wants to login by twitter, so call webapp's login endpoint,<br>
+     * - webapp asks twitter about a token to perform a 'safe' redirect,<br>
+     * - twitter returns webapp an oauth_token, webapp store it in a session and
+     * redirect user giving the oauth_token as queryparam.
+     */
     @Override
     public void handleLogin(HttpServletRequest httpRequest, HttpServletResponse httpResponse, String clienturl) throws GSException {
 	if (httpRequest == null) {
@@ -233,8 +248,8 @@ public class TwitterOAuthAuthenticator implements OAuthAuthenticator {
 
 	    try {
 
-		authorizationHeader.append(RFC3986Encoder.encode(header[0], UTF8)).append("=\"").append(
-			RFC3986Encoder.encode(header[1], UTF8)).append("\",");
+		authorizationHeader.append(RFC3986Encoder.encode(header[0], UTF8)).append("=\"")
+			.append(RFC3986Encoder.encode(header[1], UTF8)).append("\",");
 
 	    } catch (UnsupportedEncodingException e) {
 
@@ -323,7 +338,8 @@ public class TwitterOAuthAuthenticator implements OAuthAuthenticator {
 
 	    headers = buildNameValueCollection(
 		    new String[] { "oauth_consumer_key", "oauth_nonce", "oauth_signature_method", "oauth_timestamp", "oauth_version",
-			    "oauth_token" }, new String[] { clientId, UUID.randomUUID().toString().replaceAll("-", ""), HMAC_SHA1,
+			    "oauth_token" },
+		    new String[] { clientId, UUID.randomUUID().toString().replaceAll("-", ""), HMAC_SHA1,
 			    Long.toString(System.currentTimeMillis() / 1000), "1.0", twitterOAuthToken });
 	    parameters = buildNameValueCollection(new String[] { "include_email" }, new String[] { "true" });
 
@@ -351,11 +367,6 @@ public class TwitterOAuthAuthenticator implements OAuthAuthenticator {
 	    throw GSException.createException(this.getClass(), "Exception from twitter service", null, ERR_WITH_TWITTER_MSG,
 		    ErrorInfo.ERRORTYPE_SERVICE, ErrorInfo.SEVERITY_ERROR, IOEXCEPTION_TWITTER_ERR_ID, e);
 	}
-    }
-
-    @Override
-    public String getClientId() {
-	return this.clientId;
     }
 
     private List<String[]> buildNameValueCollection(String[] name, String[] value) {
@@ -423,20 +434,5 @@ public class TwitterOAuthAuthenticator implements OAuthAuthenticator {
 	mac.init(signingKey);
 	byte[] rawHmac = mac.doFinal(data.getBytes(StandardCharsets.UTF_8));
 	return Base64.getEncoder().encodeToString(rawHmac);
-    }
-
-    @Override
-    public void setClientId(String clientId) {
-	this.clientId = clientId;
-    }
-
-    @Override
-    public String getClientSecret() {
-	return this.clientSecret;
-    }
-
-    @Override
-    public void setClientSecret(String clientSecret) {
-	this.clientSecret = clientSecret;
     }
 }

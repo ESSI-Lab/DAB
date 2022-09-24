@@ -4,7 +4,7 @@ package eu.essi_lab.request.executor.discover;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,6 +30,8 @@ import eu.essi_lab.api.database.factory.DatabaseConsumerFactory;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
+import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
+import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
@@ -44,15 +46,24 @@ import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
+
+/**
+ * This class resolves the {@link BrokeringStrategy} of a {@link GSSource} in the context of current query. I.e. for
+ * {@link
+ * BrokeringStrategy#MIXED} sources, this class is able to resolve the actual strategy for the current query ({@link
+ * BrokeringStrategy#HARVESTED} in case of first level queries, {@link BrokeringStrategy#DISTRIBUTED} in case of
+ * second-level queries).
+ *
+ * @author ilsanto
+ */
 public class BrokeringStrategyResolver {
 
-    private transient Logger logger = GSLoggerFactory.getLogger(BrokeringStrategyResolver.class);
     private static final String UNKNOWN_BROKERING_STRATEGY_ERR_ID = "UNKNOWN_BROKERING_STRATEGY_ERR_ID";
 
     public BrokeringStrategyResolver() {
     }
 
-    public BrokeringStrategy resolveStrategy( GSSource source, DiscoveryMessage message) throws GSException {
+    public BrokeringStrategy resolveStrategy(GSSource source, DiscoveryMessage message) throws GSException {
 
 	BrokeringStrategy originalStrategy = source.getBrokeringStrategy();
 
@@ -105,7 +116,6 @@ public class BrokeringStrategyResolver {
 
 	    discoveryMessage.setSources(Arrays.asList(source));
 	    discoveryMessage.setDataBaseURI(message.getDataBaseURI());
-	    discoveryMessage.setSharedRepositoryInfo(message.getSharedRepositoryInfo());
 
 	    SimpleValueBond bond = BondFactory.createSimpleValueBond(//
 		    BondOperator.EQUAL, //
@@ -116,19 +126,21 @@ public class BrokeringStrategyResolver {
 	    discoveryMessage.setUserBond(bond);
 	    discoveryMessage.setNormalizedBond(bond);
 
-	    DatabaseReader reader = new DatabaseConsumerFactory().createDataBaseReader(message.getDataBaseURI());
+	    DatabaseReader reader = DatabaseConsumerFactory.createDataBaseReader(message.getDataBaseURI());
 
 	    DiscoveryCountResponse countResponse = reader.count(message);
 
 	    if (countResponse.getCount() == 0) {
 
-		logger.trace("Found distributed get record by id query");
+		// GSLoggerFactory.getLogger(BrokeringStrategyResolver.class).trace("Found distributed get record by id
+		// query");
 
 		return true;
 	    }
 	}
 
-	logger.trace("No distributed get record by id query found");
+	// GSLoggerFactory.getLogger(BrokeringStrategyResolver.class).trace("No distributed get record by id query
+	// found");
 
 	return false;
     }
@@ -145,7 +157,8 @@ public class BrokeringStrategyResolver {
      */
     public Boolean isMixedSecondLevel(GSSource source, DiscoveryMessage message) throws GSException {
 
-	logger.trace("Checking if message is second-level for source {} [{}]", source.getLabel(), source.getUniqueIdentifier());
+	// GSLoggerFactory.getLogger(BrokeringStrategyResolver.class).trace("Checking if message is second-level for
+	// source {} [{}]", source.getLabel(), source.getUniqueIdentifier());
 
 	DiscoveryBondParser parser = new DiscoveryBondParser(message.getNormalizedBond());
 
@@ -154,7 +167,8 @@ public class BrokeringStrategyResolver {
 
 	if (parentBondHandler.isParentIdFound()) {
 
-	    logger.trace("Found a parent id {}", parentBondHandler.getParentValue());
+	    // GSLoggerFactory.getLogger(BrokeringStrategyResolver.class).trace("Found a parent id {}",
+	    // parentBondHandler.getParentValue());
 
 	    DiscoveryMessage discoveryMessage = new DiscoveryMessage();
 	    discoveryMessage.setRequestId(message.getRequestId());
@@ -162,7 +176,6 @@ public class BrokeringStrategyResolver {
 
 	    discoveryMessage.setSources(Arrays.asList(source));
 	    discoveryMessage.setDataBaseURI(message.getDataBaseURI());
-	    discoveryMessage.setSharedRepositoryInfo(message.getSharedRepositoryInfo());
 
 	    SimpleValueBond bond = BondFactory.createSimpleValueBond(//
 		    BondOperator.EQUAL, //
@@ -173,14 +186,18 @@ public class BrokeringStrategyResolver {
 	    discoveryMessage.setUserBond(bond);
 	    discoveryMessage.setNormalizedBond(bond);
 
-	    DatabaseReader reader = new DatabaseConsumerFactory().createDataBaseReader(message.getDataBaseURI());
+	    discoveryMessage.getResourceSelector().setIndexesPolicy(IndexesPolicy.NONE);
+	    discoveryMessage.getResourceSelector().setSubset(ResourceSubset.SOURCE);
+
+	    DatabaseReader reader = DatabaseConsumerFactory.createDataBaseReader(message.getDataBaseURI());
 
 	    ResultSet<GSResource> results = reader.discover(discoveryMessage);
 
 	    if (!results.getResultsList().isEmpty()) {
 
-		logger.trace("Found on DB resource with id {} from source {}", parentBondHandler.getParentValue(),
-			results.getResultsList().get(0).getSource().getUniqueIdentifier());
+		// GSLoggerFactory.getLogger(BrokeringStrategyResolver.class).trace("Found on DB resource with id {}
+		// from source {}", parentBondHandler.getParentValue(),
+		// results.getResultsList().get(0).getSource().getUniqueIdentifier());
 
 		if (results.getResultsList().get(0).getSource().getUniqueIdentifier().equalsIgnoreCase(source.getUniqueIdentifier())) {
 
@@ -190,12 +207,14 @@ public class BrokeringStrategyResolver {
 		}
 	    }
 
-	    logger.trace("Empty result set was found on DB for resources with id {}", parentBondHandler.getParentValue());
+	    // GSLoggerFactory.getLogger(BrokeringStrategyResolver.class).trace("Empty result set was found on DB for
+	    // resources with id {}", parentBondHandler.getParentValue());
 
 	    return false;
 
 	} else {
-	    logger.trace("No second-level constraint was found in query");
+	    // GSLoggerFactory.getLogger(BrokeringStrategyResolver.class).trace("No second-level constraint was found in
+	    // query");
 	    return false;
 	}
     }

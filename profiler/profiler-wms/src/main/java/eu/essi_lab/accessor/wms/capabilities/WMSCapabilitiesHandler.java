@@ -1,10 +1,13 @@
+/**
+ * 
+ */
 package eu.essi_lab.accessor.wms.capabilities;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -36,7 +39,7 @@ import org.apache.commons.io.IOUtils;
 import eu.essi_lab.access.compliance.DataComplianceReport;
 import eu.essi_lab.access.compliance.wrapper.ReportsMetadataHandler;
 import eu.essi_lab.accessor.wms.WMSProfiler;
-import eu.essi_lab.configuration.ConfigurationUtils;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.jaxb.wms._1_3_0.Capability;
 import eu.essi_lab.jaxb.wms._1_3_0.ContactAddress;
 import eu.essi_lab.jaxb.wms._1_3_0.ContactInformation;
@@ -66,6 +69,7 @@ import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.GSSource;
+import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.data.CRS;
@@ -79,6 +83,8 @@ import eu.essi_lab.request.executor.IDiscoveryExecutor;
  * @author boldrini
  */
 public class WMSCapabilitiesHandler extends DefaultRequestHandler {
+
+    private static final String WMS_CAPABILITIES_HANDLER_ERROR = "WMS_CAPABILITIES_HANDLER_ERROR";
 
     @Override
     public ValidationMessage validate(WebRequest request) throws GSException {
@@ -122,12 +128,12 @@ public class WMSCapabilitiesHandler extends DefaultRequestHandler {
 	    //
 	    DiscoveryMessage discoveryMessage = new DiscoveryMessage();
 
-	    List<GSSource> allSources = ConfigurationUtils.getAllSources();
+	    List<GSSource> allSources = ConfigurationWrapper.getAllSources();
 
 	    // set the required properties
 	    discoveryMessage.setSources(allSources);
-	    discoveryMessage.setDataBaseURI(ConfigurationUtils.getStorageURI());
-	    discoveryMessage.setSharedRepositoryInfo(ConfigurationUtils.getSharedRepositoryInfo());
+	    discoveryMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	    
 	    discoveryMessage.setWebRequest(webRequest);
 
 	    ResourceSelector selector = new ResourceSelector();
@@ -275,7 +281,13 @@ public class WMSCapabilitiesHandler extends DefaultRequestHandler {
 
 	} catch (Exception e) {
 	    e.printStackTrace();
-	    throw new GSException();
+		
+	    throw GSException.createException(//
+		    getClass(), //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    WMS_CAPABILITIES_HANDLER_ERROR, //
+		    e);
 	}
 
     }

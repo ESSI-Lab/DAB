@@ -4,7 +4,7 @@ package eu.essi_lab.messages.count;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,6 +29,12 @@ import java.util.Optional;
 import java.util.Set;
 
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
+
+/**
+ * A count set collecting pairs of (source identifier/count) and the exceptions generated during a count, listed per source
+ *
+ * @author boldrini
+ */
 public class CountSet extends AbstractCountResponse {
 
     private HashMap<String, SimpleEntry<String, DiscoveryCountResponse>> countPairs;

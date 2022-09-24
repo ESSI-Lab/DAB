@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.wml._2_0;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -40,6 +40,32 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import eu.essi_lab.jaxb.wml._2_0.gml._3_2_1.AbstractGMLType;
 import eu.essi_lab.jaxb.wml._2_0.gml._3_2_1.ReferenceType;
 
+
+/**
+ * Metadata relating to the document, when it was created, by what etc.
+ *             
+ * 
+ * <p>Java class for DocumentMetadataType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="DocumentMetadataType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{http://www.opengis.net/gml/3.2}AbstractGMLType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="generationDate" type="{http://www.w3.org/2001/XMLSchema}dateTime"/&gt;
+ *         &lt;element name="version" type="{http://www.opengis.net/gml/3.2}ReferenceType" minOccurs="0"/&gt;
+ *         &lt;element name="generationSystem" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
+ *         &lt;element name="profile" type="{http://www.opengis.net/gml/3.2}ReferenceType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "DocumentMetadataType", propOrder = {
     "generationDate",

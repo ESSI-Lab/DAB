@@ -4,7 +4,7 @@ package eu.essi_lab.api.database;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,6 +26,7 @@ import java.util.Optional;
 
 import org.w3c.dom.Node;
 
+import eu.essi_lab.api.database.internal.Folder;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.ResultSet;
@@ -39,13 +40,16 @@ import eu.essi_lab.messages.stats.StatisticsResponse;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.auth.UserBaseClient;
-import eu.essi_lab.model.configuration.IGSConfigurable;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.ontology.GSKnowledgeResourceDescription;
 import eu.essi_lab.model.ontology.GSKnowledgeScheme;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.HarmonizedMetadata;
-public interface DatabaseReader extends DatabaseConsumer, IGSConfigurable {
+
+/**
+ * @author Fabrizio
+ */
+public interface DatabaseReader extends DatabaseConsumer, UserBaseClient {
 
     /**
      * @author Fabrizio
@@ -136,7 +140,7 @@ public interface DatabaseReader extends DatabaseConsumer, IGSConfigurable {
      * @throws GSException if error occurs during the request processing
      */
     ResultSet<GSResource> discover(DiscoveryMessage message) throws GSException;
-    
+
     /**
      * Performs a discovery query according to the supplied <code>message</code> and returns the resulting
      * <code>ResultSet&lt;Node&gt;</code> .<br>
@@ -220,6 +224,14 @@ public interface DatabaseReader extends DatabaseConsumer, IGSConfigurable {
      * @see DatabaseWriter#store(GSResource)
      */
     GSResource getResource(String originalIdentifier, GSSource source) throws GSException;
+
+    /**
+     * @param folderName
+     * @param createIfNotExist
+     * @return
+     * @throws GSException
+     */
+    Optional<Folder> getFolder(String folderName, boolean createIfNotExist) throws GSException;
 
     /**
      * Counts the {@link GSKnowledgeResourceDescription} which match the supplied

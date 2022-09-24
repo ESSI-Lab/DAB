@@ -4,7 +4,7 @@ package eu.essi_lab.access.compliance.wrapper;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -48,8 +48,8 @@ import eu.essi_lab.access.compliance.DataComplianceReport;
 import eu.essi_lab.access.compliance.DataComplianceTester.DataComplianceTest;
 import eu.essi_lab.iso.datamodel.DOMSerializer;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.jaxb.common.NameSpace;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
@@ -66,6 +66,10 @@ import eu.essi_lab.model.resource.data.dimension.FiniteDimension;
 import eu.essi_lab.workflow.builder.Workblock;
 import eu.essi_lab.workflow.builder.Workflow;
 import eu.essi_lab.workflow.processor.IdentityProcessor;
+
+/**
+ * @author Fabrizio
+ */
 @XmlRootElement(name = "report", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
 @XmlType(propOrder = { //
 	"onlineId", //

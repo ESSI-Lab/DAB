@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.wml._2_0;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -42,6 +42,31 @@ import eu.essi_lab.jaxb.wml._2_0.gml._3_2_1.VerticalDatumPropertyType;
 import eu.essi_lab.jaxb.wml._2_0.iso2005.gmd.CIResponsiblePartyPropertyType;
 import eu.essi_lab.jaxb.wml._2_0.sams._2_0.SFSpatialSamplingFeatureType;
 
+
+/**
+ * <p>Java class for MonitoringPointType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="MonitoringPointType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{http://www.opengis.net/samplingSpatial/2.0}SF_SpatialSamplingFeatureType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="relatedParty" type="{http://www.isotc211.org/2005/gmd}CI_ResponsibleParty_PropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="monitoringType" type="{http://www.opengis.net/gml/3.2}ReferenceType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="descriptionReference" type="{http://www.opengis.net/gml/3.2}ReferenceType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="verticalDatum" type="{http://www.opengis.net/gml/3.2}VerticalDatumPropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="timeZone" type="{http://www.opengis.net/waterml/2.0}TimeZonePropertyType" minOccurs="0"/&gt;
+ *         &lt;element name="daylightSavingTimeZone" type="{http://www.opengis.net/waterml/2.0}TimeZonePropertyType" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "MonitoringPointType", propOrder = {
     "rest"

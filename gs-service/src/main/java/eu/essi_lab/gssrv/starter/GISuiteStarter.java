@@ -21,174 +21,412 @@ package eu.essi_lab.gssrv.starter;
  * #L%
  */
 
-import eu.essi_lab.api.configuration.storage.GSConfigurationStorageFactory;
-import eu.essi_lab.api.configuration.storage.IGSConfigurationStorage;
-import eu.essi_lab.authentication.configuration.OAuthConfigurable;
+import java.io.File;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
+
+import javax.ws.rs.ext.RuntimeDelegate;
+import javax.xml.bind.JAXBException;
+
+import org.quartz.SchedulerException;
+
+import eu.essi_lab.augmenter.worker.AugmentationReportsHandler;
+import eu.essi_lab.cfga.Configuration;
+import eu.essi_lab.cfga.ConfigurationSource;
+import eu.essi_lab.cfga.SelectionUtils;
+import eu.essi_lab.cfga.checker.ConfigurationChecker;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.DefaultConfiguration;
+import eu.essi_lab.cfga.gs.DefaultConfiguration.MainSettingsIdentifier;
+import eu.essi_lab.cfga.gs.DefaultPreProdConfiguration;
+import eu.essi_lab.cfga.gs.DefaultProdConfiguration;
+import eu.essi_lab.cfga.gs.demo.DemoConfiguration;
+import eu.essi_lab.cfga.gs.setting.SchedulerViewSetting;
+import eu.essi_lab.cfga.gs.setting.SystemSetting;
+import eu.essi_lab.cfga.gs.setting.harvesting.SchedulerSupport;
+import eu.essi_lab.cfga.scheduler.Scheduler;
+import eu.essi_lab.cfga.scheduler.SchedulerFactory;
+import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting.JobStoreType;
+import eu.essi_lab.cfga.source.FileSource;
+import eu.essi_lab.cfga.source.MarkLogicSource;
 import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.configuration.GIProjectExecutionMode;
-import eu.essi_lab.configuration.reader.GSConfigurationReader;
-import eu.essi_lab.configuration.sync.ConfigurationSync;
-import eu.essi_lab.gssrv.health.StatusHealthCheck;
+import eu.essi_lab.gssrv.health.HealthCheck;
 import eu.essi_lab.gssrv.servlet.ServletListener;
+import eu.essi_lab.harvester.HarvestingReportsHandler;
 import eu.essi_lab.jaxb.common.CommonContext;
-import eu.essi_lab.jobs.configuration.scheduler.InstantiableSchedulerInfo;
-import eu.essi_lab.jobs.scheduler.GSJobSchedulerFactory;
-import eu.essi_lab.jobs.scheduler.quartz.QuartzSchedulerStarter;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.model.StorageUri;
-import eu.essi_lab.model.configuration.Deserializer;
-import eu.essi_lab.model.configuration.GSInitConfiguration;
-import eu.essi_lab.model.configuration.IGSConfigurable;
-import eu.essi_lab.model.configuration.IGSConfigurableComposed;
-import eu.essi_lab.model.configuration.composite.GSConfiguration;
-import eu.essi_lab.model.configuration.option.GSConfOption;
-import eu.essi_lab.model.configuration.option.GSConfOptionString;
-import eu.essi_lab.model.exceptions.DefaultGSExceptionHandler;
-import eu.essi_lab.model.exceptions.DefaultGSExceptionLogger;
-import eu.essi_lab.model.exceptions.DefaultGSExceptionReader;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.Dataset;
+import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import javax.xml.bind.JAXBException;
-import org.quartz.SchedulerException;
-import org.quartz.impl.StdSchedulerFactory;
-import org.slf4j.Logger;
-
+/**
+ * @author Fabrizio
+ */
 public class GISuiteStarter {
 
-    private static final String ERR_ID_QUARTZ_SCHEDULER = "ERR_ID_QUARTZ_SCHEDULER";
+    private static final String JAXB_INIT_ERR_ID = "ERR_ID_JAXB_INIT";
+    private static final String CONF_INITIALIZATION_ALIEN_ERR_ID = "CONF_INITIALIZATION_ALIEN_ERROR";
+    private static final String CONF_CHECK_FAILED_ERROR_ID = "CONF_CHECK_FAILED_ERROR_ERROR";
 
-    private transient Logger logger = GSLoggerFactory.getLogger(GISuiteStarter.class);
-    private static final String ERR_ID_JAXB_INIT = "ERR_ID_JAXB_INIT";
-    private static final String CONF_INITIALIZATION_ALIEN_ERRID = "CONF_INITIALIZATION_ALIEN_ERRID";
+    private static final String STARTUP_HEALTH_CHECK_FAILED_ERR_ID = "STARTUP_HEALTH_CHECK_FAILED_ERR_ID";
+    private static final String SCHEDULER_START_ERR_ID = "SCHEDULER_START_ERR_ID";
+    private static final String CONF_FILE_MISSING_OR_EMPTY_ERR_ID = "CONF_FILE_MISSING_OR_EMPTY_ERR_ID";
 
+    /**
+     * Reload every 5 minutes
+     */
+    private static final int CONFIG_RELOAD_TIME = 300;
+
+    /**
+     * 
+     */
+    public static Configuration configuration;
+
+    /**
+     * 
+     */
     private final ExecutionMode mode;
-    private static final String STARTUP_HEALTH_CHECK_FAILED = "STARTUP_HEALTH_CHECK_FAILED";
 
+    /**
+     * 
+     */
     public GISuiteStarter() {
 
-	logger.info("Retrieving execution mode");
+	GSLoggerFactory.getLogger(GISuiteStarter.class).info("Retrieving execution mode");
 
-	mode = new GIProjectExecutionMode().getMode();
+	mode = GIProjectExecutionMode.getMode();
 
-	logger.info("GI-suite is starting in execution mode {}", mode);
+	GSLoggerFactory.getLogger(GISuiteStarter.class).info("GI-suite is starting in execution mode {}", mode);
     }
-    public void start(IGSConfigurationStorage confConnector) throws GSException {
+
+    /**
+     * @param confConnector
+     * @throws GSException
+     */
+    public void start() throws GSException {
+
+	//
+	// see GIP-235
+	//
+	RuntimeDelegate.setInstance(new org.apache.cxf.jaxrs.impl.RuntimeDelegateImpl());
+
+	initConfig();
+
+	checkConfig();
+
+	applySystemSettings();
 
 	initLocale();
 
 	initJaxb();
 
-	checkserviceLoader();
+	checkServiceLoader();
 
-	if (confConnector == null) {
-	    startScheduler(false);
-	} else {
+	healthCheckTest();
 
-	    ConfigurationSync.getInstance().setDBGISuiteConfiguration(confConnector);
+	if (mode != ExecutionMode.FRONTEND) {
 
-	    logger.info("Initializing configuration");
+	    startScheduler();
+	}
+    }
 
-	    try {
+    /**
+     * @throws GSException
+     */
+    private void initConfig() throws GSException {
 
-		initializeConfiguration(ConfigurationSync.getInstance().getClonedConfiguration());
+	try {
 
-		logger.info("Completed configuration initialization");
+	    GSLoggerFactory.getLogger(GISuiteStarter.class).info("Initializing configuration STARTED");
 
-		startScheduler(true);
+	    //
+	    // 1) Retrieves the configuration.url parameter
+	    //
 
-		logger.info("Health check at startup"); 
+	    String configURL = System.getProperty("configuration.url");
+	    if (configURL == null) {
+		configURL = System.getenv("configuration.url");
+	    }
 
-		StatusHealthCheck checker = new StatusHealthCheck();
+	    if (configURL == null || configURL.isEmpty()) {
 
-		boolean healthy = checker.isHealthy(true);
+		GSLoggerFactory.getLogger(GISuiteStarter.class).warn("Configuration URL not found, using fallback URL: local FS temp");
+		configURL = "file:temp";
+	    }
 
-		logger.info("Health check at startup result {}", healthy);
+	    String[] split = configURL.split("!");
 
-		if (healthy) {
-		    StatusHealthCheck.START_CHECK_PASSED = true;
-		} else {
-		    logger.error("Health check failed. Is the DAB initialized?");
+	    GSLoggerFactory.getLogger(GISuiteStarter.class).info("Configuration URL: {}", configURL);
+
+	    //
+	    // 2) Creates the source
+	    //
+
+	    Configuration configuration = null;
+
+	    String newConfigName = null;
+
+	    ConfigurationSource source = null;
+
+	    String configFileName = "gs-configuration";
+
+	    if (configURL.startsWith("xdbc:")) {
+
+		//
+		// xdbc://user:password@hostname:8000,8004/dbName/folder/
+		//
+
+		source = new MarkLogicSource(split[0], configFileName);
+
+	    } else {
+
+		if (configURL.startsWith("file:temp")) {
+
+		    //
+		    // -Dconfiguration.url=file:temp
+		    // -Dconfiguration.url=file:temp demo
+		    //
+
+		    GSLoggerFactory.getLogger(GISuiteStarter.class).info("Local FS configuration on the temp user directory");
+
+		    source = new FileSource(configFileName);
+
+		} else if (configURL.startsWith("file://")) {
+
+		    //
+		    // -Dconfiguration.url=file://path/preprodenvconf/
+		    // -Dconfiguration.url=file://path/preprodenvconf!demo
+		    //
+		    GSLoggerFactory.getLogger(GISuiteStarter.class).info("Local FS configuration on given path");
+
+		    String path = split[0].replace("file://", "");
+		    path = path + File.separator + configFileName + ".json";
+
+		    source = new FileSource(new File(path));
+		}
+	    }
+
+	    //
+	    // 3) determines the configuration name to use in case of missing source
+	    // xdbc://user:password@hostname:8000,8004/dbName/folder/!default-prod
+	    //
+	    newConfigName = split.length == 1 ? "default" : split[1];
+
+	    if (source.isEmptyOrMissing()) {
+
+		if (mode != ExecutionMode.MIXED) {
+
+		    throw GSException.createException(//
+			    ServletListener.class, //
+			    "Configuration file empty or missing", //
+			    null, //
+			    null, //
+			    ErrorInfo.ERRORTYPE_INTERNAL, //
+			    ErrorInfo.SEVERITY_FATAL, //
+			    CONF_FILE_MISSING_OR_EMPTY_ERR_ID);
 		}
 
-	    } catch (GSException e) {
-		GSLoggerFactory.getLogger(ServletListener.class).error("Error initializing configuration");
+		switch (newConfigName) {
 
-		DefaultGSExceptionHandler handler = new DefaultGSExceptionHandler(new DefaultGSExceptionReader(e));
+		case "default":
 
-		DefaultGSExceptionLogger.log(handler);
+		    GSLoggerFactory.getLogger(GISuiteStarter.class).info("Creating and flushing new default configuration");
 
-		System.exit(1);
+		    configuration = new DefaultConfiguration(source, TimeUnit.SECONDS, CONFIG_RELOAD_TIME);
 
-	    } catch (Exception throwable) {
+		    break;
 
-		GSLoggerFactory.getLogger(ServletListener.class).error("Error initializing configuration");
+		case "default-prod":
 
-		DefaultGSExceptionHandler handler = new DefaultGSExceptionHandler(new DefaultGSExceptionReader(//
-			GSException.createException(//
+		    GSLoggerFactory.getLogger(GISuiteStarter.class).info("Creating and flushing new default PROD configuration");
+
+		    configuration = new DefaultProdConfiguration(source, TimeUnit.SECONDS, CONFIG_RELOAD_TIME);
+
+		    break;
+
+		case "default-preprod":
+
+		    GSLoggerFactory.getLogger(GISuiteStarter.class).info("Creating and flushing new default PRE-PROD configuration");
+
+		    configuration = new DefaultPreProdConfiguration(source, TimeUnit.SECONDS, CONFIG_RELOAD_TIME);
+
+		    break;
+
+		case "demo":
+
+		    GSLoggerFactory.getLogger(GISuiteStarter.class).info("Creating and flushing new demo configuration");
+
+		    configuration = new DemoConfiguration(source, TimeUnit.SECONDS, CONFIG_RELOAD_TIME);
+
+		    break;
+		}
+
+		SelectionUtils.deepClean(configuration);
+
+		SelectionUtils.deepAfterClean(configuration);
+
+		configuration.flush();
+
+	    } else {
+
+		GSLoggerFactory.getLogger(GISuiteStarter.class).info("Creating configuration from existing source");
+		configuration = new Configuration(source, TimeUnit.SECONDS, CONFIG_RELOAD_TIME);
+	    }
+
+	    //
+	    // in execution mode CONFIGURATION and MIXED there is no need to autoreload
+	    // since there is only one node, no shared configuration (also in LOCAL_PRODUCTION mode
+	    // but this is done in the next rows...)
+	    //
+	    if (mode == ExecutionMode.CONFIGURATION || mode == ExecutionMode.MIXED) {
+
+		configuration.pauseAutoreload();
+	    }
+
+	    //
+	    //
+	    //
+	    if (mode == ExecutionMode.LOCAL_PRODUCTION) {
+
+		GSLoggerFactory.getLogger(GISuiteStarter.class).info("Creating local config with VOLATILE job store STARTED");
+
+		// pause the autoreload to the current config instance, probably not required...
+		configuration.pauseAutoreload();
+
+		SchedulerViewSetting schedulerSetting = configuration.get(//
+			MainSettingsIdentifier.SCHEDULER.getLabel(), //
+			SchedulerViewSetting.class).get();
+
+		JobStoreType jobStoreType = schedulerSetting.getJobStoreType();
+
+		if (jobStoreType == JobStoreType.PERSISTENT) {
+
+		    schedulerSetting.setJobStoreType(JobStoreType.VOLATILE);
+
+		    boolean replaced = configuration.replace(schedulerSetting);
+
+		    if (!replaced) {
+
+			throw GSException.createException(//
 				ServletListener.class, //
-				null, //
+				"Scheduler setting not replaced", //
 				null, //
 				null, //
 				ErrorInfo.ERRORTYPE_INTERNAL, //
 				ErrorInfo.SEVERITY_FATAL, //
-				CONF_INITIALIZATION_ALIEN_ERRID, //
-				throwable)));
+				CONF_INITIALIZATION_ALIEN_ERR_ID);
+		    }
+		}
 
-		DefaultGSExceptionLogger.log(handler);
+		configuration = FileSource.switchSource(configuration);
 
-		System.exit(1);
+		GSLoggerFactory.getLogger(GISuiteStarter.class).info("Creating local config with VOLATILE job store ENDED");
 	    }
-	}
-    }
 
-    private void initJaxb() throws GSException {
-	// --------------------------------------
-	//
-	// this will initialize the JAXB contexts
-	//
-	try {
+	    GISuiteStarter.configuration = configuration;
 
-	    logger.debug("JAXB initialization STARTED");
+	    ConfigurationWrapper.setConfiguration(configuration);
 
-	    CommonContext.createMarshaller(true);
-	    CommonContext.createUnmarshaller();
-	    new Dataset();
+	    GSLoggerFactory.getLogger(GISuiteStarter.class).info("Initializing configuration ENDED");
 
-	    logger.debug("JAXB initialization ENDED");
-
-	} catch (JAXBException e) {
-
-	    logger.error("Fatal error starting gi-suite, JAXB could not be initialized", e);
+	} catch (Exception throwable) {
 
 	    throw GSException.createException(//
-		    this.getClass(), //
-		    "Error thrown by CommonContext", //
+		    ServletListener.class, //
+		    throwable.getMessage(), //
 		    null, //
 		    null, //
 		    ErrorInfo.ERRORTYPE_INTERNAL, //
 		    ErrorInfo.SEVERITY_FATAL, //
-		    ERR_ID_JAXB_INIT, //
-		    e);
+		    CONF_INITIALIZATION_ALIEN_ERR_ID, //
+		    throwable);
 	}
     }
 
-    private void checkserviceLoader() throws GSException {
-	// --------------------------------------
-	//
-	// this checks service loaders
-	//
-	logger.debug("Service loader check");
-	new ServiceLoaderChecker();
+    /**
+     * @throws GSException
+     */
+    private void checkConfig() throws GSException {
+
+	GSLoggerFactory.getLogger(GISuiteStarter.class).info("Configuration check STARTED");
+
+	ConfigurationChecker checker = new ConfigurationChecker();
+
+	List<String> errors = checker.check(GISuiteStarter.configuration);
+
+	if (!errors.isEmpty()) {
+
+	    GSLoggerFactory.getLogger(GISuiteStarter.class).error("Configuration errors detected:");
+
+	    errors.forEach(error -> {
+
+		GSLoggerFactory.getLogger(GISuiteStarter.class).error(error);
+	    });
+
+	    throw GSException.createException(//
+		    ServletListener.class, //
+		    "Configuration errors detected: " + errors, //
+		    null, //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_FATAL, //
+		    CONF_CHECK_FAILED_ERROR_ID //
+	    );
+	}
+
+	GSLoggerFactory.getLogger(GISuiteStarter.class).info("Configuration check ENDED");
     }
 
+    /**
+     * 
+     */
+    private void applySystemSettings() {
+
+	GSLoggerFactory.getLogger(getClass()).info("Applying system settings STARTED");
+
+	// get the system settings
+	SystemSetting systemSetting = ConfigurationWrapper.getSystemSettings();
+
+	//
+	// enables the publishing of runtime info to the database
+	//
+	if (systemSetting.areStatisticsEnabled()) {
+
+	    GSLoggerFactory.getLogger(getClass()).info("Enabling statistics gathering");
+
+	    ElasticsearchInfoPublisher.enable();
+	}
+
+	//
+	// enables the email reporting during harvesting
+	//
+	if (systemSetting.isHarvestingReportMailEnabled()) {
+
+	    GSLoggerFactory.getLogger(getClass()).info("Enabling harvesting e-mail sending");
+
+	    HarvestingReportsHandler.enable();
+	}
+
+	//
+	// enables the email reporting during augmentation
+	//
+	if (systemSetting.isAugmentationReportMailEnabled()) {
+
+	    GSLoggerFactory.getLogger(getClass()).info("Enabling augmentation e-mail sending");
+
+	    AugmentationReportsHandler.enable();
+	}
+
+	GSLoggerFactory.getLogger(getClass()).info("Applying system settings ENDED");
+    }
+
+    /**
+     * 
+     */
     private void initLocale() {
 	// set the English locale
 	Locale.setDefault(Locale.ENGLISH);
@@ -196,150 +434,149 @@ public class GISuiteStarter {
 	ISO8601DateTimeUtils.setGISuiteDefaultTimeZone();
     }
 
-    private void startScheduler(Boolean confExists) throws GSException {
+    /**
+     * @throws GSException
+     */
+    private void initJaxb() throws GSException {
 	// --------------------------------------
 	//
-	// this will initialize the Quartz Scheduler
+	// this will initialize the JAXB contexts
 	//
-	logger.debug("Quartz Scheduler init");
+	try {
 
-	if (confExists)
+	    GSLoggerFactory.getLogger(GISuiteStarter.class).debug("JAXB initialization STARTED");
 
-	    try {
+	    CommonContext.createMarshaller(true);
+	    CommonContext.createUnmarshaller();
+	    new Dataset();
 
-		new GSJobSchedulerFactory().getGSJobScheduler().start(mode);
+	    GSLoggerFactory.getLogger(GISuiteStarter.class).debug("JAXB initialization ENDED");
 
-	    } catch (GSException se) {
+	} catch (JAXBException e) {
 
-		logger.error("Fatal error starting gi-suite, Quartz scheduler could not be started");
+	    GSLoggerFactory.getLogger(GISuiteStarter.class).error("Fatal error on startup, JAXB could not be initialized", e);
+
+	    throw GSException.createException(//
+		    this.getClass(), //
+		    e.getMessage(), //
+		    null, //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_FATAL, //
+		    JAXB_INIT_ERR_ID, //
+		    e);
+	}
+    }
+
+    /**
+     * @throws GSException
+     */
+    private void checkServiceLoader() throws GSException {
+
+	GSLoggerFactory.getLogger(GISuiteStarter.class).debug("Service loader check STARTED");
+	new ServiceLoaderChecker();
+	GSLoggerFactory.getLogger(GISuiteStarter.class).debug("Service loader check ENDED");
+    }
+
+    /**
+     * @throws GSException
+     */
+    private void healthCheckTest() throws GSException {
+
+	String skipHealthCheck = System.getProperty("skip.healthcheck");
+	if (skipHealthCheck == null) {
+	    skipHealthCheck = System.getenv("skip.healthcheck");
+	}
+
+	if (skipHealthCheck != null && skipHealthCheck.equals("true")) {
+
+	    GSLoggerFactory.getLogger(GISuiteStarter.class).info("Skipping health check according to system variable 'skip.healthcheck'");
+	    return;
+	}
+
+	try {
+
+	    GSLoggerFactory.getLogger(GISuiteStarter.class).info("Health check at startup");
+
+	    HealthCheck checker = new HealthCheck();
+
+	    boolean healthy = checker.isHealthy(true);
+
+	    GSLoggerFactory.getLogger(GISuiteStarter.class).info("Health check at startup result {}", healthy);
+
+	    if (healthy) {
+
+		HealthCheck.startCheckPassed = true;
+
+	    } else {
 
 		throw GSException.createException(//
 			getClass(), //
-			"Fatal error starting gi-suite, Quartz scheduler could not be started", //
+			"Startup health check FAILED", //
 			null, //
 			null, //
 			ErrorInfo.ERRORTYPE_INTERNAL, //
 			ErrorInfo.SEVERITY_FATAL, //
-			ERR_ID_QUARTZ_SCHEDULER, se);
+			STARTUP_HEALTH_CHECK_FAILED_ERR_ID);
 	    }
 
-	else {
-	    try {
-		new QuartzSchedulerStarter(mode).startScheduler(new StdSchedulerFactory().getScheduler());
-	    } catch (SchedulerException e) {
+	} catch (GSException e) {
 
-		logger.error("Fatal error starting gi-suite, Quartz scheduler could not be started", e);
+	    throw e;
 
-		throw GSException.createException(//
-			getClass(), //
-			"Failed to start default quartz scheduler", //
-			null, //
-			null, //
-			ErrorInfo.ERRORTYPE_INTERNAL, //
-			ErrorInfo.SEVERITY_FATAL, //
-			ERR_ID_QUARTZ_SCHEDULER, //
-			e);
-	    }
+	} catch (Exception throwable) {
+
+	    throw GSException.createException(//
+		    ServletListener.class, //
+		    throwable.getMessage(), //
+		    null, //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_FATAL, //
+		    CONF_INITIALIZATION_ALIEN_ERR_ID, //
+		    throwable);
 	}
-
     }
 
-    public StorageUri applyInitRequest(GSInitConfiguration initRequest) throws GSException {
+    /**
+     * @throws SchedulerException
+     */
+    private void startScheduler() throws GSException {
 
-	StorageUri url = new StorageUri(initRequest.getUrl());
+	GSLoggerFactory.getLogger(GISuiteStarter.class).info("Starting scheduler STARTED");
 
-	if (!initRequest.getUseExisting()) {
+	SchedulerViewSetting schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
 
-	    GSConfiguration conf = GSConfiguration.createDefaultConfiguration();
+	GSLoggerFactory.getLogger(GISuiteStarter.class).info("JobStore type: {}", schedulerSetting.getJobStoreType());
 
-	    GSConfOption<String> rootOpt = new GSConfOptionString();
-	    rootOpt.setKey(GSConfiguration.GS_ROOT_USER_OPTION_KEY);
-	    rootOpt.setValue(initRequest.getRootUser());
-	    conf.setOption(rootOpt);
+	Scheduler scheduler = SchedulerFactory.getScheduler(schedulerSetting);
 
-	    Map<String, GSConfOption<?>> supportedOAuth = conf.getConfigurableComponents().get(OAuthConfigurable.AUTH_MAIN_COMPONENT_KEY)
-		    .getSupportedOptions();
+	try {
+	    scheduler.start();
 
-	    for (GSConfOption opt : supportedOAuth.values()) {
+	    //
+	    // for these exec modes also starts the SchedulerSupport
+	    //
+	    if (mode == ExecutionMode.CONFIGURATION || mode == ExecutionMode.MIXED) {
 
-		logger.debug("Checking if requested OAuth {} matches {}", initRequest.getOauthProviderName(), opt.getKey());
-
-		if (opt.getKey().toLowerCase().contains(initRequest.getOauthProviderName().toLowerCase())) {
-
-		    opt.setValue(true);
-		    conf.getConfigurableComponents().get(OAuthConfigurable.AUTH_MAIN_COMPONENT_KEY).setOption(opt);
-
-		    IGSConfigurable oauth = ((IGSConfigurableComposed) conf.getConfigurableComponents()
-			    .get(OAuthConfigurable.AUTH_MAIN_COMPONENT_KEY)).getConfigurableComponents().values().iterator().next();
-
-		    Map<String, GSConfOption<?>> pOptions = oauth.getSupportedOptions();
-
-		    for (GSConfOption pOpts : pOptions.values()) {
-
-			if (pOpts.getKey().toLowerCase().contains("secret")) {
-
-			    pOpts.setValue(initRequest.getOauthProviderSecret());
-			    oauth.setOption(pOpts);
-			}
-
-			if (pOpts.getKey().toLowerCase().contains("client_id")) {
-
-			    pOpts.setValue(initRequest.getOauthProviderId());
-			    oauth.setOption(pOpts);
-			}
-		    }
-		}
+		SchedulerSupport.getInstance().updateDelayed();
 	    }
 
-	    Long cm = System.currentTimeMillis();
+	} catch (SchedulerException e) {
 
-	    logger.debug("Setting initialization timestamp to {}", cm);
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 
-	    conf.setTimeStamp(cm);
-
-	    if (isLocal(url))
-		return GSConfigurationStorageFactory.storeConfigurationToRemote(ConfigurationLookup.toAbsolutePath(url), conf);
-
-	    return GSConfigurationStorageFactory.storeConfigurationToRemote(url, conf);
+	    throw GSException.createException(//
+		    ServletListener.class, //
+		    e.getMessage(), //
+		    null, //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_FATAL, //
+		    SCHEDULER_START_ERR_ID, //
+		    e);
 	}
 
-	return url;
-
-    }
-
-    private boolean isLocal(StorageUri url) {
-
-	String lc = url.getUri().toLowerCase();
-
-	return (lc.contains("file://") || ConfigurationLookup.isLocalRelative(url));
-
-    }
-
-    public void initializeConfiguration(GSConfiguration configuration) throws GSException {
-
-	logger.trace("Looking for remote scheduler");
-
-	// TODO write tests for the business logic below
-	List<InstantiableSchedulerInfo> list = new GSConfigurationReader(configuration)
-		.readInstantiableType(InstantiableSchedulerInfo.class, new Deserializer());
-
-	if (!list.isEmpty()) {
-
-	    logger.trace("Found non-empty list of remote schedulers");
-
-	    InstantiableSchedulerInfo scheduler = list.get(0);
-
-	    logger.trace("Invoking onFlush on first");
-
-	    scheduler.getSchedulerInfoConfiguration().onFlush();
-
-	    logger.trace("onFlush on {} completed", scheduler.getComponentId());
-
-	}
-
-	logger.trace("Invoking onStartUp on entire configuration");
-
-	configuration.onStartUp();
-
+	GSLoggerFactory.getLogger(GISuiteStarter.class).info("Starting scheduler ENDED");
     }
 }

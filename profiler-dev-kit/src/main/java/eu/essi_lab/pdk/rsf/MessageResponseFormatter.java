@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.rsf;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,6 +31,26 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.Pluggable;
 import eu.essi_lab.pdk.handler.DiscoveryHandler;
 import eu.essi_lab.pdk.handler.ProfilerHandler;
+
+/**
+ * Formats a {@link MessageResponse} with resources of type <code>T</code> in order to provide a valid
+ * {@link Response} entity, according to the related {@link #getEncoding()}.<br>
+ * In addition to the resources, all the {@link MessageResponse} properties can be formatted, including
+ * {@link MessageResponse#getExceptions()}, and the {@link MessageResponse#getCountResponse()} properties.<br>
+ * This component is part of the {@link ProfilerHandler} composition and the calling of
+ * {@link #format(DiscoveryMessage, MessageResponse)} method is the fourth and last step of the workflow
+ * <br>
+ * 
+ * @see DiscoveryHandler
+ * @see DiscoveryHandler#setMessageResponseFormatter(MessageResponseFormatter)
+ * @see DiscoveryHandler#getMessageResponseFormatter()
+ * @author Fabrizio
+ * @param <M> the type of the incoming {@link RequestMessage}
+ * @param <T> the type of the resources provided by <code>MR</code>
+ * @param <CR> the type of the {@link AbstractCountResponse} handled by <code>MR</code>
+ * @param <MR> the type of the {@link MessageResponse} provided as input of the
+ *        {@link #format(RequestMessage, MessageResponse)} operation
+ */
 public interface MessageResponseFormatter<//
 	M extends RequestMessage, //
 	T, //

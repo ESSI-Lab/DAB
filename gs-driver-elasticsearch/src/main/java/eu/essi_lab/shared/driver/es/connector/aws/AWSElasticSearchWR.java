@@ -4,7 +4,7 @@ package eu.essi_lab.shared.driver.es.connector.aws;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,6 +21,12 @@ package eu.essi_lab.shared.driver.es.connector.aws;
  * #L%
  */
 
+import java.io.InputStream;
+import java.net.URI;
+import java.util.UUID;
+
+import org.slf4j.Logger;
+
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.AmazonWebServiceResponse;
 import com.amazonaws.ClientConfiguration;
@@ -31,14 +37,15 @@ import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.http.AmazonHttpClient;
 import com.amazonaws.http.ExecutionContext;
 import com.amazonaws.http.HttpMethodName;
+
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import java.io.InputStream;
-import java.net.URI;
-import java.util.UUID;
-import org.slf4j.Logger;
+
+/**
+ * @author ilsanto
+ */
 public class AWSElasticSearchWR {
 
-    private transient Logger logger = GSLoggerFactory.getLogger(AWSElasticSearchWR.class);
+    private Logger logger = GSLoggerFactory.getLogger(AWSElasticSearchWR.class);
     private AWSCredentials awsCreds;
 
     public void write(String esURL, String index, InputStream stream) {

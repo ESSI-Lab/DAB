@@ -1,10 +1,13 @@
+/**
+ * 
+ */
 package eu.essi_lab.accessor.wof.info;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -36,7 +39,7 @@ import org.w3c.dom.Node;
 
 import eu.essi_lab.accessor.wof.HISCentralProfiler;
 import eu.essi_lab.accessor.wof.WOFMapperUtils;
-import eu.essi_lab.configuration.ConfigurationUtils;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.XMLNodeReader;
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -65,7 +68,6 @@ import eu.essi_lab.pdk.handler.DefaultRequestHandler;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.request.executor.IDiscoveryNodeExecutor;
 import eu.essi_lab.request.executor.IStatisticsExecutor;
-import eu.essi_lab.views.DefaultViewManager;
 
 /**
  * @author Fabrizio
@@ -81,6 +83,8 @@ public class GetWaterOneFlowServiceInfoHandler extends DefaultRequestHandler {
     public static final String VIEW_WHOS_TRANSBOUNDARY = "whos-transboundary";
 
     public static final String[] transboundaryViews = new String[] { "whos-plata", "whos-arctic" };
+
+    private static final String GET_WATER_ONE_FLOW_VIEW_NOT_PROVIDED_ERROR = "GET_WATER_ONE_FLOW_VIEW_NOT_PROVIDED_ERROR";
 
     @Override
     public ValidationMessage validate(WebRequest request) throws GSException {
@@ -131,12 +135,13 @@ public class GetWaterOneFlowServiceInfoHandler extends DefaultRequestHandler {
 		selected = WOFGroup.SOURCES;
 	    }
 	} else {
-	    // groups by source id
-	    GSException e = new GSException();
-	    ErrorInfo errorInfo = new ErrorInfo();
-	    errorInfo.setErrorDescription("View not provided");
-	    e.addInfo(errorInfo);
-	    throw e;
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    "View not provided", //
+		    ErrorInfo.ERRORTYPE_CLIENT, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    GET_WATER_ONE_FLOW_VIEW_NOT_PROVIDED_ERROR);
 	}
 
 	StatisticsGenerator generator = null;
@@ -158,7 +163,7 @@ public class GetWaterOneFlowServiceInfoHandler extends DefaultRequestHandler {
 	//
 	// creates the message(s)
 	//
-	List<GSSource> allSources = ConfigurationUtils.getAllSources();
+	List<GSSource> allSources = ConfigurationWrapper.getAllSources();
 
 	List<StatisticsMessage> statisticsMessages = generator.getStatisticMessages(webRequest, viewId.get(), selected, allSources,
 		andBond);
@@ -214,7 +219,7 @@ public class GetWaterOneFlowServiceInfoHandler extends DefaultRequestHandler {
 	serviceInfo.setVariableCount(varCount);
 
 	String valueCount = responseItem.getSum(MetadataElement.DATA_SIZE).get().getValue();
-	if (valueCount == null || valueCount.isEmpty() || valueCount.equals("0")) {
+	if (valueCount == null || valueCount.isEmpty() || valueCount.equals("0") || valueCount.startsWith("-")) {
 	    valueCount = "100";
 	}
 	serviceInfo.setValueCount(valueCount);
@@ -346,10 +351,9 @@ public class GetWaterOneFlowServiceInfoHandler extends DefaultRequestHandler {
 
 	String orgWebSite = "http://localhost"; //
 	String citation = ""; //
-	String aabstract = "Original data publication service endpoint: "+source.getEndpoint(); //
+	String aabstract = "Original data publication service endpoint: " + source.getEndpoint(); //
 	String networkName = "ESSI"; //
 
-	
 	serviceInfo.setTitle(title);
 	serviceInfo.setAabstract(aabstract);
 	serviceInfo.setCitation(citation);
@@ -380,7 +384,7 @@ public class GetWaterOneFlowServiceInfoHandler extends DefaultRequestHandler {
 
 	message.setQueryRegistrationEnabled(false);
 
-	message.setSources(ConfigurationUtils.getAllSources());
+	message.setSources(ConfigurationWrapper.getAllSources());
 
 	Page page = new Page(1, 1000);
 	message.setPage(page);
@@ -390,9 +394,9 @@ public class GetWaterOneFlowServiceInfoHandler extends DefaultRequestHandler {
 	message.getResourceSelector().addExtendedElement(MetadataElement.COUNTRY_ISO3);
 	message.getResourceSelector().setSubset(ResourceSubset.EXTENDED);
 	message.getResourceSelector().setIncludeOriginal(false);
-	message.setSources(ConfigurationUtils.getBrokeredSources());
-	message.setDataBaseURI(ConfigurationUtils.getStorageURI());
-	message.setSharedRepositoryInfo(ConfigurationUtils.getSharedRepositoryInfo());
+	message.setSources(ConfigurationWrapper.getHarvestedSources());
+	message.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	// message.setSharedRepositoryInfo(ConfigurationWrapper.getSharedRepositoryInfo());
 	message.setDistinctValuesElement(MetadataElement.COUNTRY_ISO3);
 	WebRequestTransformer.setView(//
 		"whos", //

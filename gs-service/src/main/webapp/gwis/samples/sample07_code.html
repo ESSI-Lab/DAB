@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<!--
+..........................................................
+GWIS Javascript API Sample:
+Dynamically Specifying Plot Data
+..........................................................
+U.S. Geological Survey, Texas Water Science Center, Austin
+https://txpub.usgs.gov/DSS/GWIS/
+..........................................................
+-->
+<html>
+    <!-- html head -->
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>GWIS JSAPI Sample</title>
+        
+        <!-- GWIS requires jQuery -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        
+        <!-- GWIS JSAPI 0.0 -->
+        <link rel="stylesheet" href="https://txpub.usgs.gov/DSS/GWIS/0.0/jsapi/gwis-plot-utils.css"/>
+        <script src="https://txpub.usgs.gov/DSS/GWIS/0.0/jsapi/gwis-plot-utils.min.js"></script>
+    </head>
+    
+    <!-- html body -->
+    <body style="background:#eee; font-family:arial;">
+        
+        <!-- title -->
+        <h1>Sample: Dynamically Specifying Plot Data</h1>
+        
+        <!-- site menu with groupings -->
+        <p>
+            Select Site:
+            <select id="menu_site" onchange="update_plot();">
+                <optgroup label="San Angelo Field Unit">
+                    <option value="08412500">08412500 Pecos River near Orla, TX                     </option>
+                    <option value="08437710">08437710 Pecos River at RR 1776 near Grandfalls, TX    </option>
+                    <option value="08446500">08446500 Pecos River near Girvin, TX                   </option>
+                    <option value="08447000">08447000 Pecos River near Sheffield, TX                </option>
+                </optgroup>
+                <optgroup label="Fort Worth Field Unit">
+                    <option value="08048000">08048000 West Fork Trinity River at Ft Worth, TX       </option>
+                    <option value="08049500">08049500 West Fork Trinity River at Grand Prairie, TX  </option>
+                    <option value="08052700">08052700 Little Elm Creek near Aubrey, TX              </option>
+                    <option value="08057000">08057000 Trinity River at Dallas, TX                   </option>
+                </optgroup>
+                <optgroup label="Houston Field Unit">
+                    <option value="08065350">08065350 Trinity River near Crockett, TX               </option>
+                    <option value="08068000">08068000 West Fork San Jacinto River near Conroe, TX   </option>
+                    <option value="08068500">08068500 Spring Creek near Spring, TX                  </option>
+                    <option value="08070200">08070200 East Fork San Jacinto River near New Caney, TX</option>
+                </optgroup>
+            </select>
+        </p>
+        
+        <!-- parameter menu -->
+        <p>
+            Select Parameter:
+            <select id="menu_pcode" onchange="update_plot();">
+                <option value="00060">Streamflow, ft<sup>3</sup>/sec           </option>
+                <option value="00065">Gage Height, ft                          </option>
+                <option value="00010">Water Temperature, &deg;C                </option>
+                <option value="00095">Specific Conductance, &mu;S/cm @ 25&deg;C</option>
+                <option value="00300">Dissolved Oxygen, mg/L                   </option>
+                <option value="00400">pH, standard units                       </option>
+            </select>
+        </p>
+        
+        <!-- time period menu -->
+        <p>
+            Select Time Period:
+            <select id="menu_period" onchange="update_plot();">
+                <option value="p1d" >Past  1 Day </option>
+                <option value="p7d" >Past  7 Days</option>
+                <option value="p14d">Past 14 Days</option>
+                <option value="p30d">Past 30 Days</option>
+                <option value="p60d">Past 60 Days</option>
+            </select>
+        </p>
+        
+        <!-- plot -->
+        <div id="plot1" style="width:95%; height:500px;"></div>
+        
+        <!-- main js -->
+        <script>
+        
+            // function to update plot using currently selected menu items
+            var update_plot = function() {
+                GWIS.plot({
+                    div_id : "plot1",
+                    period : $("#menu_period").val(),   // current menu value
+                    series : [{
+                        site  : $("#menu_site" ).val(), // current menu value
+                        pcode : $("#menu_pcode").val(), // current menu value
+                        label : $("#menu_pcode option:selected").text() // current menu text
+                    }],
+                    title          : $("#menu_site   option:selected").text(), // current menu text
+                    xlabel         : $("#menu_period option:selected").text(), // current menu text
+                    ylabel         : $("#menu_pcode  option:selected").text(), // current menu text
+                    range_selector : false,
+                    controls       : "all"
+                });
+            };
+            
+            // update plot on startup using startup menu items
+            update_plot();
+            
+        </script>
+        
+    </body>
+</html>
+<!-- end GWIS JSAPI sample -->

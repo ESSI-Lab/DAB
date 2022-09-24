@@ -4,7 +4,7 @@ package eu.essi_lab.downloader.wof;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -139,6 +139,13 @@ public class CUAHSIHISServerDownloader extends DataDownloader {
 		descriptor.getSecondSpatialDimension().getContinueDimension().setUpperTolerance(0.01);
 
 		TimeSeries timeSeries = mySite.getSeries(variableCode, method, quality, source);
+		
+		if(timeSeries == null){
+		    
+		    GSLoggerFactory.getLogger(getClass()).warn("No time series found");
+		    return ret;
+		}
+		
 		Date begin = timeSeries.getBeginTimePositionDate();
 		Date end = timeSeries.getEndTimePositionDate();
 
@@ -190,7 +197,12 @@ public class CUAHSIHISServerDownloader extends DataDownloader {
 			break;
 		    }
 		    temporalDimension.getContinueDimension().setResolution(resolution);
-		    temporalDimension.getContinueDimension().setResolutionTolerance(resolutionTolerance);		    // temporalDimension.getContinueDimension().setSize(valueCount);
+		    temporalDimension.getContinueDimension().setResolutionTolerance(resolutionTolerance);
+		    /**
+		     * N.B.the value count is not used, as it only reports the number of non missing values and not the
+		     * total number of values considering the temporal extent and the resolution
+		     */
+		    // temporalDimension.getContinueDimension().setSize(valueCount);
 
 		    // Long valueCount = timeSeries.getValueCount();
 		    // // a check also on value count is needed to assure that the time series has a regular resolution,

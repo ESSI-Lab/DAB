@@ -4,7 +4,7 @@ package eu.essi_lab.shared.driver;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,28 +21,40 @@ package eu.essi_lab.shared.driver;
  * #L%
  */
 
-import eu.essi_lab.model.configuration.IGSConfigurable;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.shared.messages.SharedContentQuery;
-import eu.essi_lab.shared.model.SharedContent;
-import eu.essi_lab.shared.model.SharedContentType;
 import java.util.List;
-public interface ISharedRepositoryDriver extends IGSConfigurable {
+
+import eu.essi_lab.cfga.Configurable;
+import eu.essi_lab.cfga.gs.setting.driver.DriverSetting;
+import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.shared.SharedContent;
+import eu.essi_lab.model.shared.SharedContent.SharedContentCategory;
+import eu.essi_lab.model.shared.SharedContent.SharedContentType;
+import eu.essi_lab.shared.messages.SharedContentQuery;
+
+/**
+ * @author ilsanto
+ */
+public interface ISharedRepositoryDriver<T extends DriverSetting> extends Configurable<T> {
 
     /**
-     * Reads {@link SharedContent} with id identifier and of the provided type. If no element is found with the given identifier, null is
+     * Reads {@link SharedContent} with id identifier and of the provided type. If no element is found with the given
+     * identifier, null is
      * returned.
      *
      * @param identifier
      * @return
      * @throws GSException
      */
-    SharedContent readSharedContent(String identifier, SharedContentType type) throws GSException;
+    @SuppressWarnings("rawtypes")
+    SharedContent read(String identifier, SharedContentType type) throws GSException;
 
-    List<SharedContent> readSharedContent(SharedContentType type, SharedContentQuery query) throws GSException;
+    @SuppressWarnings("rawtypes")
+    List<SharedContent> read(SharedContentType type, SharedContentQuery query) throws GSException;
 
+    @SuppressWarnings("rawtypes")
     void store(SharedContent sharedContent) throws GSException;
 
     Long count(SharedContentType type) throws GSException;
-
+    
+    SharedContentCategory getCategory();
 }

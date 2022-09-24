@@ -4,7 +4,7 @@ package eu.essi_lab.cdk.harvest;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,8 +23,16 @@ package eu.essi_lab.cdk.harvest;
 
 import eu.essi_lab.adk.IHarvestedQuerySubmitter;
 import eu.essi_lab.cdk.IDriverConnector;
+import eu.essi_lab.cfga.Configurable;
+import eu.essi_lab.cfga.gs.setting.connector.HarvestedConnectorSetting;
 import eu.essi_lab.model.resource.OriginalMetadata;
-public interface IHarvestedQueryConnector extends IDriverConnector, IHarvestedQuerySubmitter<OriginalMetadata> {
 
+/**
+ * Interface for harvested query connectors
+ *
+ * @author roncella
+ * @author ilsanto
+ */
+public interface IHarvestedQueryConnector<T extends HarvestedConnectorSetting> extends Configurable<T>, IDriverConnector<T>, IHarvestedQuerySubmitter<OriginalMetadata> {
 
 }

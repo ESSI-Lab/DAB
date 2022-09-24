@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -43,6 +43,7 @@ import eu.essi_lab.accessor.wof.welcome.HISCentralWelcomeHandler;
 import eu.essi_lab.accessor.wof.welcome.WelcomeRequestFilter;
 import eu.essi_lab.accessor.wof.wsdl.HISCentralWSDLHandler;
 import eu.essi_lab.accessor.wof.wsdl.WSDLRequestFilter;
+import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.jaxb.csw._2_0_2.ExceptionCode;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.web.KeyValueParser;
@@ -50,10 +51,15 @@ import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.pdk.Profiler;
-import eu.essi_lab.pdk.ProfilerInfo;
 import eu.essi_lab.pdk.handler.DiscoveryHandler;
 import eu.essi_lab.pdk.handler.DiscoverySemanticHandler;
 import eu.essi_lab.pdk.handler.selector.HandlerSelector;
+
+/**
+ * Profiler implementing CUAHSI HIS Central protocol
+ * 
+ * @author boldrini
+ */
 public class HISCentralProfiler extends Profiler {
 
     /**
@@ -61,7 +67,7 @@ public class HISCentralProfiler extends Profiler {
      */
     private static final String HIS_CENTRAL_PROFILER_TYPE = "HIS-CENTRAL";
 
-    public static final ProfilerInfo HIS_CENTRAL_SERVICE_INFO = new ProfilerInfo();
+    public static final ProfilerSetting HIS_CENTRAL_SERVICE_INFO = new ProfilerSetting();
     static {
 	HIS_CENTRAL_SERVICE_INFO.setServiceName("CUAHSI HIS Central");
 	HIS_CENTRAL_SERVICE_INFO.setServiceType(HIS_CENTRAL_PROFILER_TYPE);
@@ -192,7 +198,7 @@ public class HISCentralProfiler extends Profiler {
     }
 
     @Override
-    public ProfilerInfo getProfilerInfo() {
+    protected ProfilerSetting initSetting() {
 
 	return HIS_CENTRAL_SERVICE_INFO;
     }

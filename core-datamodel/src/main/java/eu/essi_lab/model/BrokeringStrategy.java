@@ -4,7 +4,7 @@ package eu.essi_lab.model;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,28 +21,41 @@ package eu.essi_lab.model;
  * #L%
  */
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonFormat.Shape;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import eu.essi_lab.lib.utils.LabeledEnum;
 
-import eu.essi_lab.model.deserializer.BrokeringStrategyDeserializer;
+/**
+ * @author Fabrizio
+ */
+public enum BrokeringStrategy implements LabeledEnum {
+    /**
+     * 
+     */
+    DISTRIBUTED("Distributed"),
+    /**
+     * 
+     */
+    HARVESTED("Harvested"),
+    /**
+     * 
+     */
+    MIXED("Mixed");
 
-@JsonFormat(shape = Shape.OBJECT)
-@JsonDeserialize(using = BrokeringStrategyDeserializer.class)
-public enum BrokeringStrategy {
-    DISTRIBUTED("DISTRIBUTED"),
-    HARVESTED("HARVESTED"),
-    MIXED("MIXED");
-
-    @JsonProperty("value")
     private String name;
 
     private BrokeringStrategy(String name) {
+
 	this.name = name;
     }
 
-    public String getName() {
+    @Override
+    public String toString() {
+
+	return getLabel();
+    }
+
+    @Override
+    public String getLabel() {
+
 	return name;
     }
 }

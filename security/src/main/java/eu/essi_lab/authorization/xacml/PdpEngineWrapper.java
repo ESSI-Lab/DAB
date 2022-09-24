@@ -1,10 +1,13 @@
+/**
+ * 
+ */
 package eu.essi_lab.authorization.xacml;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -230,6 +233,14 @@ public class PdpEngineWrapper {
 
 	setAccessSubject(Issuer.VIEW_CREATOR.getId(), viewCreator);
     }
+    
+    /**
+     * @param origin
+     */
+    public void setOriginHeader(String origin) {
+
+	setAccessSubject(Issuer.ORIGIN.getId(), origin);
+    }
 
     /**
      * @param issuer
@@ -275,9 +286,9 @@ public class PdpEngineWrapper {
 
 	DecisionRequest request = requestBuilder.build(false);
 	
-	System.out.println("---------------------------------------\n");
-	System.out.println(request);
-	System.out.println("---------------------------------------\n");
+//	System.out.println("---------------------------------------\n");
+//	System.out.println(request);
+//	System.out.println("---------------------------------------\n");
 	
 	DecisionResult result = pdp.evaluate(request);
 

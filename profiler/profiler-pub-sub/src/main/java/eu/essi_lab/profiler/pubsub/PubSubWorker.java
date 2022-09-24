@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.pubsub;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -42,6 +42,10 @@ import eu.essi_lab.pdk.rsf.DiscoveryResultSetFormatterFactory;
 import eu.essi_lab.pdk.rsf.impl.json.jsapi._2_0.JS_API_ResultSetFormatter_2_0;
 import eu.essi_lab.pdk.rsm.DiscoveryResultSetMapperFactory;
 import eu.essi_lab.pdk.rsm.impl.json.jsapi.JS_API_ResultSetMapper;
+
+/**
+ * @author Fabrizio
+ */
 public class PubSubWorker implements Runnable {
 
     public static final int MAX_SUBSCRIPTIONS = 50;

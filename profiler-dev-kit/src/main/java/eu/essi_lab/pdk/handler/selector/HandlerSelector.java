@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.handler.selector;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,6 +31,15 @@ import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.pdk.Profiler;
 import eu.essi_lab.pdk.handler.WebRequestHandler;
+
+/**
+ * A selector of {@link WebRequestHandler}s. A selector is used by the {@link Profiler} to delegate the
+ * current {@link WebRequest} to a suitable {@link WebRequestHandler}
+ * 
+ * @see WebRequestFilter
+ * @see Profiler#handle(WebRequest)
+ * @author Fabrizio
+ */
 public class HandlerSelector {
 
     private List<SimpleEntry<WebRequestFilter, WebRequestHandler>> list;

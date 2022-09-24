@@ -4,7 +4,7 @@ package eu.essi_lab.workflow.processor.timeseries;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -77,8 +77,6 @@ import eu.essi_lab.jaxb.wml._2_0.om__2.TimeObjectPropertyType;
 import eu.essi_lab.jaxb.wml._2_0.sams._2_0.ShapeType;
 import eu.essi_lab.jaxb.wml._2_0.swe._2.UnitReference;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.model.exceptions.ErrorInfo;
-import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.data.DataObject;
 import eu.essi_lab.wml._2.JAXBWML2;
 import eu.essi_lab.wml._2.ResultWrapper;
@@ -121,6 +119,10 @@ public class WML11_To_WML20_Processor extends DataProcessor {
 	CollectionType collection = new CollectionType();
 	collection.setId("COL.1");
 	JAXBElement<CollectionType> jaxbElement = JAXBWML2.getInstance().getFactory().createCollection(collection);
+
+	/*
+	 * METADATA
+	 */
 
 	// description
 	StringOrRefType descriptionString = new StringOrRefType();
@@ -378,15 +380,6 @@ public class WML11_To_WML20_Processor extends DataProcessor {
 
 	JAXBWML2.getInstance().marshal(jaxbElement, file);
 	ret.setFile(file);
-	return ret;
-
-    }
-
-    private GSException getGSException(String message) {
-	GSException ret = new GSException();
-	ErrorInfo info = new ErrorInfo();
-	info.setErrorDescription(message);
-	ret.addInfo(info);
 	return ret;
 
     }

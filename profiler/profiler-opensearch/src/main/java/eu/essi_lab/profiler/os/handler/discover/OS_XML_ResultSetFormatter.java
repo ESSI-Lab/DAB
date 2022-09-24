@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.os.handler.discover;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -34,8 +34,8 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.cxf.helpers.IOUtils;
 
-import eu.essi_lab.jaxb.common.NameSpace;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
@@ -48,6 +48,21 @@ import eu.essi_lab.pdk.rsf.DiscoveryResultSetFormatter;
 import eu.essi_lab.pdk.rsf.FormattingEncoding;
 import eu.essi_lab.profiler.os.OSParameters;
 import eu.essi_lab.profiler.os.OSRequestParser;
+
+/**
+ * This formatter encapsulates the resources in a document according to the guide line
+ * specified here:
+ * <a href="http://www.opensearch.org/Specifications/OpenSearch/1.1#OpenSearch_response_elements">OpenSearch response
+ * elements</a>. The {@link #OS_XML_FORMATTING_ENCODING}
+ * has the following properties:
+ * <ul>
+ * <li>media type is {@link MediaType#APPLICATION_XML}</li>
+ * <li>encoding name is {@value #OS_XML_FORMATTING_ENCODING_NAME}</li>
+ * <li>encoding version is {@value #OS_XML_FORMATTING_ENCODING_VERSION}</li>
+ * </ul>
+ * 
+ * @author Fabrizio
+ */
 public class OS_XML_ResultSetFormatter extends DiscoveryResultSetFormatter<String> {
 
     /**

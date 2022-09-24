@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.csw;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -33,6 +33,7 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
+import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.jaxb.common.CommonContext;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.jaxb.csw._2_0_2.ElementSetName;
@@ -57,7 +58,6 @@ import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.pdk.Profiler;
-import eu.essi_lab.pdk.ProfilerInfo;
 import eu.essi_lab.pdk.handler.DiscoveryHandler;
 import eu.essi_lab.pdk.handler.selector.GETRequestFilter.InspectionStrategy;
 import eu.essi_lab.pdk.handler.selector.HandlerSelector;
@@ -70,6 +70,10 @@ import eu.essi_lab.profiler.csw.handler.srvinfo.CSWDescribeRecordHandler;
 import eu.essi_lab.profiler.csw.handler.srvinfo.CSWGetCapabilitiesHandler;
 import eu.essi_lab.profiler.csw.handler.srvinfo.CSWValidateGetRecordsHandler;
 import eu.essi_lab.profiler.csw.profile.CSWProfile;
+
+/**
+ * @author Fabrizio
+ */
 public class CSWProfiler extends Profiler {
 
     /**
@@ -77,7 +81,7 @@ public class CSWProfiler extends Profiler {
      */
     protected static final String CSW_PROFILER_TYPE = "CSW";
 
-    public static final ProfilerInfo CSW_SERVICE_INFO = new ProfilerInfo();
+    public static final ProfilerSetting CSW_SERVICE_INFO = new ProfilerSetting();
     static {
 	CSW_SERVICE_INFO.setServiceName("CSW");
 	CSW_SERVICE_INFO.setServiceType(CSW_PROFILER_TYPE);
@@ -340,7 +344,7 @@ public class CSWProfiler extends Profiler {
     }
 
     @Override
-    public ProfilerInfo getProfilerInfo() {
+    protected ProfilerSetting initSetting() {
 
 	return CSW_SERVICE_INFO;
     }

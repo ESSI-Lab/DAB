@@ -4,7 +4,7 @@ package eu.essi_lab.augmenter;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,21 +23,32 @@ package eu.essi_lab.augmenter;
 
 import java.util.Optional;
 
+import eu.essi_lab.cfga.gs.setting.augmenter.AugmenterSetting;
 import eu.essi_lab.lib.net.utils.whos.WMOOntology;
 import eu.essi_lab.lib.net.utils.whos.WMOUnit;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.configuration.option.GSConfOption;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.ExtensionHandler;
 import eu.essi_lab.model.resource.GSResource;
-public class WHOSUnitsAugmenter extends ResourceAugmenter {
 
+/**
+ * It checks variable units name and abbreviation to find out a correspondent concept URI in WMO units ontology. If
+ * found, it adds it in a specific metadata field (attribu
+ * 
+ * @author boldrini
+ */
+public class WHOSUnitsAugmenter extends ResourceAugmenter<AugmenterSetting> {
 
- 
     public WHOSUnitsAugmenter() {
 
-	setLabel("WHOS Units augmenter");
+    }
 
+    /**
+     * @param setting
+     */
+    public WHOSUnitsAugmenter(AugmenterSetting setting) {
+
+	super(setting);
     }
 
     @Override
@@ -88,11 +99,20 @@ public class WHOSUnitsAugmenter extends ResourceAugmenter {
     }
 
     @Override
-    public void onOptionSet(GSConfOption<?> option) throws GSException {
+    protected String initName() {
 
+	return "WHOS Units augmenter";
     }
 
     @Override
-    public void onFlush() throws GSException {
+    public String getType() {
+
+	return "WHOSUnitsAugmenter";
+    }
+
+    @Override
+    protected AugmenterSetting initSetting() {
+
+	return new AugmenterSetting();
     }
 }

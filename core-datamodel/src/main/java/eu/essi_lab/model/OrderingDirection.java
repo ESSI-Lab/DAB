@@ -1,10 +1,13 @@
+/**
+ * 
+ */
 package eu.essi_lab.model;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,18 +24,12 @@ package eu.essi_lab.model;
  * #L%
  */
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
-import eu.essi_lab.model.deserializer.OrderingDirectionDeserializer;
+import eu.essi_lab.lib.utils.LabeledEnum;
 
 /**
  * @author Fabrizio
  */
-@JsonFormat(shape = JsonFormat.Shape.OBJECT)
-@JsonDeserialize(using = OrderingDirectionDeserializer.class)
-public enum OrderingDirection {
+public enum OrderingDirection implements LabeledEnum {
 
     /**
      * 
@@ -43,14 +40,27 @@ public enum OrderingDirection {
      */
     DESCENDING("Descending");
 
-    @JsonProperty("value")
-    private String name;
+    private String label;
 
-    private OrderingDirection(String value) {
-	this.name = value;
+    /**
+     * @param label
+     */
+    private OrderingDirection(String label) {
+
+	this.label = label;
     }
 
-    public String getName() {
-	return name;
+    /**
+     * 
+     */
+    public String getLabel() {
+
+	return label;
+    }
+
+    @Override
+    public String toString() {
+
+	return getLabel();
     }
 }

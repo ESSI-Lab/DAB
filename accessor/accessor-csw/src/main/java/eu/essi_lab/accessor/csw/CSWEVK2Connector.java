@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.csw;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -38,18 +38,19 @@ import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 
 public class CSWEVK2Connector extends CSWConnector {
-    private static final long serialVersionUID = -8193721815089473306L;
+
     private static final String CSWEVK2CONNECTOR_EXTRACTION_ERROR = "CSWEVK2CONNECTOR_EXTRACTION_ERROR";
     private static final String GCO_DECIMAL = "gco:Decimal";
 
-    public CSWEVK2Connector() {
-	// nothing to do here
-    }
+    /**
+     * 
+     */
+    public static final String TYPE = "CSW EVK2 Connector";
 
     @Override
-    public String getLabel() {
+    public String getType() {
 
-	return "CSW EVK2 Connector";
+	return TYPE;
     }
 
     /**

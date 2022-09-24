@@ -4,7 +4,7 @@ package eu.essi_lab.api.database;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,6 +22,17 @@ package eu.essi_lab.api.database;
  */
 
 import eu.essi_lab.model.StorageUri;
+
+/**
+ * Implementations must be able to determine if a {@link Database} referenced by a given {@link StorageUri} is
+ * suitable
+ * 
+ * @see DatabaseProvider
+ * @see DatabaseReader
+ * @see DatabaseWriter
+ * @see IGSConfigurationStorage
+ * @author Fabrizio
+ */
 public interface DatabaseClient {
 
     /**
@@ -46,5 +57,6 @@ public interface DatabaseClient {
      * 
      * @return
      */
+    @SuppressWarnings("rawtypes")
     public Database getDatabase();
 }

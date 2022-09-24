@@ -4,7 +4,7 @@ package eu.essi_lab.downloader.ina;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -106,7 +106,8 @@ public class INADownloader extends DataDownloader {
 		String variableCode = variable.split(":")[1];
 		SitesResponseDocument siteInfo = getConnector().getSiteInfo(siteCode);
 		if (siteInfo == null) {
-		    GSLoggerFactory.getLogger(getClass()).error("XINA no site info: {}",siteCode);
+		    GSLoggerFactory.getLogger(getClass()).error("XINA no site info: {}", siteCode);
+		    return ret;
 		}
 		List<SiteInfo> sitesInfo = siteInfo.getSitesInfo();
 
@@ -114,9 +115,9 @@ public class INADownloader extends DataDownloader {
 		    try {
 			GSLoggerFactory.getLogger(getClass()).error("XINA no sites info " + siteInfo.getReader().asString());
 		    } catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		    }
+		    return ret;
 		}
 
 		if (sitesInfo.isEmpty()) {
@@ -125,7 +126,9 @@ public class INADownloader extends DataDownloader {
 		    } catch (UnsupportedEncodingException | TransformerException e) {
 			e.printStackTrace();
 		    }
+		    return ret;
 		}
+
 		SiteInfo mySite = sitesInfo.get(0);
 
 		Double lat = Double.parseDouble(mySite.getLatitude());
@@ -183,7 +186,13 @@ public class INADownloader extends DataDownloader {
 			break;
 		    }
 
-		    temporalDimension.getContinueDimension().setResolution(resolution);		    // temporalDimension.getContinueDimension().setSize(valueCount);
+		    temporalDimension.getContinueDimension().setResolution(resolution);
+		    /**
+		     * N.B.the value count is not used, as it only reports the number of non missing
+		     * values and not the total number of values considering the temporal extent and
+		     * the resolution
+		     */
+		    // temporalDimension.getContinueDimension().setSize(valueCount);
 
 		    // Long valueCount = timeSeries.getValueCount();
 		    // // a check also on value count is needed to assure that the time series has a

@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wps;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,9 +29,9 @@ import java.io.OutputStream;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.StreamingOutput;
 
 import eu.essi_lab.messages.BulkDownloadMessage;
 import eu.essi_lab.messages.ResultSet;
@@ -47,18 +47,19 @@ public class GWPSBulkDownloadResponseFormatter
 
     @Override
     public Provider getProvider() {
+	
 	return Provider.essiLabProvider();
     }
 
     @Override
     public Response format(BulkDownloadMessage message, ResultSet<DataObject> response) throws GSException {
 
-	DataObject finalResponse = response.getResultsList().get(0);
-
 	ResponseBuilder builder = Response.status(Status.OK);
 
+	DataObject finalResponse = response.getResultsList().get(0);
+
 	final File file = finalResponse.getFile();
-	
+
 	StreamingOutput stream = new StreamingOutput() {
 	    @Override
 	    public void write(OutputStream out) throws IOException, WebApplicationException {
@@ -77,21 +78,17 @@ public class GWPSBulkDownloadResponseFormatter
 		    file.delete();
 		}
 	    }
-
 	};
 
 	builder = builder.entity(stream);
-
 	builder.type(MediaType.valueOf("application/zip"));
 
 	return builder.build();
-
     }
 
     @Override
     public FormattingEncoding getEncoding() {
-	// TODO Auto-generated method stub
+
 	return null;
     }
-
 }

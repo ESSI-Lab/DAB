@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.wml._2_0.iso2005.gmd;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -33,6 +33,39 @@ import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlType;
 
+
+/**
+ * <p>Java class for MD_TopicCategoryCode_Type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * <pre>
+ * &lt;simpleType name="MD_TopicCategoryCode_Type"&gt;
+ *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
+ *     &lt;enumeration value="farming"/&gt;
+ *     &lt;enumeration value="biota"/&gt;
+ *     &lt;enumeration value="boundaries"/&gt;
+ *     &lt;enumeration value="climatologyMeteorologyAtmosphere"/&gt;
+ *     &lt;enumeration value="economy"/&gt;
+ *     &lt;enumeration value="elevation"/&gt;
+ *     &lt;enumeration value="environment"/&gt;
+ *     &lt;enumeration value="geoscientificInformation"/&gt;
+ *     &lt;enumeration value="health"/&gt;
+ *     &lt;enumeration value="imageryBaseMapsEarthCover"/&gt;
+ *     &lt;enumeration value="intelligenceMilitary"/&gt;
+ *     &lt;enumeration value="inlandWaters"/&gt;
+ *     &lt;enumeration value="location"/&gt;
+ *     &lt;enumeration value="oceans"/&gt;
+ *     &lt;enumeration value="planningCadastre"/&gt;
+ *     &lt;enumeration value="society"/&gt;
+ *     &lt;enumeration value="structure"/&gt;
+ *     &lt;enumeration value="transportation"/&gt;
+ *     &lt;enumeration value="utilitiesCommunication"/&gt;
+ *   &lt;/restriction&gt;
+ * &lt;/simpleType&gt;
+ * </pre>
+ * 
+ */
 @XmlType(name = "MD_TopicCategoryCode_Type")
 @XmlEnum
 public enum MDTopicCategoryCodeType {

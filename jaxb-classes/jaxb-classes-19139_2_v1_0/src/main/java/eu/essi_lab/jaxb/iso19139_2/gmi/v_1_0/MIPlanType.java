@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -60,6 +60,32 @@ import net.opengis.iso19139.gco.v_20060504.AbstractObjectType;
 import net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType;
 import net.opengis.iso19139.gmd.v_20060504.MDProgressCodePropertyType;
 
+
+/**
+ * Description: Designations for the planning information related to meeting requirements - shortName: PlanId
+ * 
+ * <p>Java class for MI_Plan_Type complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="MI_Plan_Type"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{http://www.isotc211.org/2005/gco}AbstractObject_Type"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="type" type="{http://www.isotc211.org/2005/gmi}MI_GeometryTypeCode_PropertyType" minOccurs="0"/&gt;
+ *         &lt;element name="status" type="{http://www.isotc211.org/2005/gmd}MD_ProgressCode_PropertyType"/&gt;
+ *         &lt;element name="citation" type="{http://www.isotc211.org/2005/gmd}CI_Citation_PropertyType"/&gt;
+ *         &lt;element name="satisfiedRequirement" type="{http://www.isotc211.org/2005/gmi}MI_Requirement_PropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="operation" type="{http://www.isotc211.org/2005/gmi}MI_Operation_PropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "MI_Plan_Type", propOrder = {
     "type",

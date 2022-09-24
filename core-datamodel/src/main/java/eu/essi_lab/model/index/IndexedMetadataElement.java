@@ -4,7 +4,7 @@ package eu.essi_lab.model.index;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,6 +30,20 @@ import eu.essi_lab.model.resource.BNHSPropertyReader;
 import eu.essi_lab.model.resource.CoreMetadata;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
+
+/**
+ * An {@link IndexedElement} whose {@link #getValues()} are defined by the {@link #defineValues(GSResource)}
+ * method and {@link #getElementName()} can be set according to {@link MetadataElement#getName()}.<br>
+ * All the {@link MetadataElement}s related to these indexes are <i>non-volatile</i>
+ * {@link Queryable} properties.<br>
+ * To create a <b>custom element</b>, use the constructors {@link #IndexedMetadataElement(String)} or
+ * {@link #IndexedMetadataElement(String, String)}
+ * 
+ * @see #getMetadataElement()
+ * @see #defineValues(GSResource)
+ * @see Queryable#isVolatile()
+ * @author Fabrizio
+ */
 public abstract class IndexedMetadataElement extends IndexedElement {
 
     private MetadataElement element;

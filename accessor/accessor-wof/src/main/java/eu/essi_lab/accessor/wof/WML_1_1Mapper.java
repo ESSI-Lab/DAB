@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -32,8 +32,6 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.slf4j.Logger;
 import org.xml.sax.SAXException;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import eu.essi_lab.accessor.wof.client.datamodel.Site;
 import eu.essi_lab.accessor.wof.client.datamodel.SiteInfo;
@@ -65,7 +63,6 @@ import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.CoreMetadata;
-import eu.essi_lab.model.resource.Country;
 import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.ExtensionHandler;
 import eu.essi_lab.model.resource.GSResource;
@@ -73,11 +70,20 @@ import eu.essi_lab.model.resource.InterpolationType;
 import eu.essi_lab.model.resource.OriginalMetadata;
 import eu.essi_lab.ommdk.OriginalIdentifierMapper;
 import net.opengis.iso19139.gmd.v_20060504.MDTopicCategoryCodeType;
+
+/**
+ * Mapper from WaterML 1.1. Supported root elements are sitesResponse and timeSeriesResponse.
+ * The mapper expects to find a single series, which will be mapped as a dataset.
+ * SiteInfo or sourceInfo metadata is also expected to be present in the correct locations.
+ *
+ * @author boldrini
+ */
 public class WML_1_1Mapper extends OriginalIdentifierMapper {
 
     public static final String CUAHSI_DATA_TYPE_CV = "CUAHSI Data Type CV";
     public static final String CUAHSI_VALUE_TYPE_CV = "CUAHSI Value Type CV";
     public static final String CUAHSI_QUALITY_CONTROL_LEVELS_CV = "CUAHSI Quality Control Levels CV";
+    private static final String WML_1_1_MAPPER_ERROR = "WML_1_1_MAPPER_ERROR";
 
     private boolean nowEndDate = true;
 
@@ -90,7 +96,7 @@ public class WML_1_1Mapper extends OriginalIdentifierMapper {
 	this.nowEndDate = nowEndDate;
     }
 
-    private transient Logger logger = GSLoggerFactory.getLogger(this.getClass());
+    private Logger logger = GSLoggerFactory.getLogger(this.getClass());
     private SimpleDateFormat iso8601WMLFormat;
 
     public WML_1_1Mapper() {
@@ -109,7 +115,6 @@ public class WML_1_1Mapper extends OriginalIdentifierMapper {
 	return dataset;
     }
 
-    @JsonIgnore
     @Override
     public String getSupportedOriginalMetadataSchema() {
 	return CommonNameSpaceContext.WML1_NS_URI;
@@ -124,12 +129,16 @@ public class WML_1_1Mapper extends OriginalIdentifierMapper {
 	try {
 	    reader = new XMLDocumentReader(originalMetadata);
 	} catch (SAXException | IOException e1) {
-	    GSException gse = new GSException();
 	    ErrorInfo info = new ErrorInfo();
+	    info.setCaller(this.getClass());
+	    info.setErrorId(WML_1_1_MAPPER_ERROR);
+	    info.setErrorType(ErrorInfo.ERRORTYPE_CLIENT);
+	    info.setSeverity(ErrorInfo.SEVERITY_ERROR);
 	    info.setErrorDescription("Unable to parse WML 1.1 (not a valid XML document): " + originalMetadata);
-	    gse.addInfo(info);
+
 	    logger.error(info.getErrorDescription());
-	    throw gse;
+
+	    throw GSException.createException(info);
 	}
 	SitesResponseDocument srd = null;
 	TimeSeriesResponseDocument tsrd = null;
@@ -148,13 +157,15 @@ public class WML_1_1Mapper extends OriginalIdentifierMapper {
 		tsrd.fixTimes();
 		break;
 	    default:
-		GSException gse = new GSException();
 		ErrorInfo info = new ErrorInfo();
+		info.setCaller(this.getClass());
+		info.setErrorId(WML_1_1_MAPPER_ERROR);
+		info.setErrorType(ErrorInfo.ERRORTYPE_CLIENT);
+		info.setSeverity(ErrorInfo.SEVERITY_ERROR);
 		info.setErrorDescription(
 			"Unable to parse WML 1.1 (missing sitesResponse or TimeSeriesResponse root elements): " + originalMetadata);
-		gse.addInfo(info);
 		logger.error(info.getErrorDescription());
-		throw gse;
+		throw GSException.createException(info);
 	    }
 	} catch (XPathExpressionException e1) {
 	    e1.printStackTrace();
@@ -169,12 +180,14 @@ public class WML_1_1Mapper extends OriginalIdentifierMapper {
 	    List<Site> sites = srd.getSites();
 
 	    if (sites.isEmpty()) {
-		GSException gse = new GSException();
 		ErrorInfo info = new ErrorInfo();
+		info.setCaller(this.getClass());
+		info.setErrorId(WML_1_1_MAPPER_ERROR);
+		info.setErrorType(ErrorInfo.ERRORTYPE_CLIENT);
+		info.setSeverity(ErrorInfo.SEVERITY_ERROR);
 		info.setErrorDescription("Unable to parse WML 1.1 (missing site): " + originalMetadata);
-		gse.addInfo(info);
 		logger.error(info.getErrorDescription());
-		throw gse;
+		throw GSException.createException(info);
 	    }
 
 	    Site site = sites.get(0);
@@ -204,12 +217,14 @@ public class WML_1_1Mapper extends OriginalIdentifierMapper {
 	    checkSiteInfo(siteInfo, originalMetadata);
 
 	} else {
-	    GSException gse = new GSException();
 	    ErrorInfo info = new ErrorInfo();
 	    info.setErrorDescription("This should not happen. Mapper problem with: " + originalMetadata);
-	    gse.addInfo(info);
+	    info.setCaller(this.getClass());
+	    info.setErrorId(WML_1_1_MAPPER_ERROR);
+	    info.setErrorType(ErrorInfo.ERRORTYPE_CLIENT);
+	    info.setSeverity(ErrorInfo.SEVERITY_ERROR);
 	    logger.error(info.getErrorDescription());
-	    throw gse;
+	    throw GSException.createException(info);
 	}
 
 	GSSource source = dataset.getSource();
@@ -398,9 +413,9 @@ public class WML_1_1Mapper extends OriginalIdentifierMapper {
 	String speciation = "";
 
 	String attributeDescription = series.getVariableName() + " Data type: " + series.getDataType() + " Value type: "
-		+ series.getValueType() + " Units: " + getUnitName(series) + " Units type: " + series.getUnitType()
-		+ " Unit abbreviation: " + getUnitAbbreviation(series) + " No data value: " + series.getNoDataValue() + speciation
-		+ " Speciation: " + series.getSpeciation();
+		+ series.getValueType() + " Units: " + getUnitName(series) + " Units type: " + series.getUnitType() + " Unit abbreviation: "
+		+ getUnitAbbreviation(series) + " No data value: " + series.getNoDataValue() + speciation + " Speciation: "
+		+ series.getSpeciation();
 
 	coverageDescription.setAttributeDescription(attributeDescription);
 	coreMetadata.getMIMetadata().addCoverageDescription(coverageDescription);
@@ -663,32 +678,37 @@ public class WML_1_1Mapper extends OriginalIdentifierMapper {
 		return InterpolationType.MIN;
 	    } else if (dataType.contains("categorical")) {
 		return InterpolationType.CATEGORICAL;
-	    }	    
+	    }
 	}
 	return null;
     }
 
     private void checkSeries(List<TimeSeries> seriess, String originalMetadata) throws GSException {
 	if (seriess.isEmpty()) {
-	    GSException gse = new GSException();
 	    ErrorInfo info = new ErrorInfo();
 	    info.setErrorDescription("Unable to parse WML 1.1 (missing series): " + originalMetadata);
-	    gse.addInfo(info);
+	    info.setCaller(this.getClass());
+	    info.setErrorId(WML_1_1_MAPPER_ERROR);
+	    info.setErrorType(ErrorInfo.ERRORTYPE_CLIENT);
+	    info.setSeverity(ErrorInfo.SEVERITY_ERROR);
+
 	    logger.error(info.getErrorDescription());
-	    throw gse;
+	    throw GSException.createException(info);
 	}
     }
 
     private void checkSiteInfo(SiteInfo siteInfo, String originalMetadata) throws GSException {
 	if (siteInfo == null) {
-	    GSException gse = new GSException();
 	    ErrorInfo info = new ErrorInfo();
 	    info.setErrorDescription("Unable to parse WML 1.1 (missing siteInfo): " + originalMetadata);
-	    gse.addInfo(info);
-	    logger.error(info.getErrorDescription());
-	    throw gse;
-	}
+	    info.setCaller(this.getClass());
+	    info.setErrorId(WML_1_1_MAPPER_ERROR);
+	    info.setErrorType(ErrorInfo.ERRORTYPE_CLIENT);
+	    info.setSeverity(ErrorInfo.SEVERITY_ERROR);
 
+	    logger.error(info.getErrorDescription());
+	    throw GSException.createException(info);
+	}
     }
 
     /**

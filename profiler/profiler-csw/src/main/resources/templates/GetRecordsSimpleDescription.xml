@@ -1,22 +1,43 @@
 <?xml version="1.0"?>
+<!--
+
+        This file is part of CSW/Core profiler for GI-cat.
+
+        CSW/Core profiler for GI-cat is free software: you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        any later version.
+
+        CSW/Core profiler for GI-cat is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU General Public License for more details.
+
+        You should have received a copy of the GNU General Public License
+        along with CSW/Core profiler for GI-cat.  If not, see <http://www.gnu.org/licenses/>.
+
+    Copyright (C) 2009-2011 Flora research <info@floraresearch.eu>
+
+-->
+
 <OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"
 	xmlns:moz="http://www.mozilla.org/2006/browser/search/" xmlns:ogcos="http://www.opengis.org/opensearch/extension/1.0"
 	xmlns:geo="http://a9.com/-/opensearch/extensions/geo/1.0/">
-	<ShortName>DAB</ShortName>
-	<LongName>DAB OpenSearch Catalog service</LongName>
+	<ShortName>GI-cat</ShortName>
+	<LongName>GI-cat OpenSearch Catalog service</LongName>
 	<Description>OGC Compliant CSW Service implementing OpenSearch Extensions proposal for OGC Catalogs 3.0.
 	*** Note about the OpenSearch plugin for Firefox toolbar ***. 
 	Url templates with "text/html" type are required in order to enable the Firefox plugin ( at least one is required ) but the actual returned mimetype 
 	is always atom. 
 	For more info see https://developer.mozilla.org/en/Creating_OpenSearch_plugins_for_Firefox 
 	</Description>
-	<Contact>enrico.boldrini@cnr.it</Contact>
+	<Contact>boldrini@imaa.cnr.it</Contact>
 	<Image height="16" width="16" type="image/x-icon">http://essi-lab.eu/projects/gi-cat-favicon/favicon.ico</Image>
 	<Url type="text/html"
 		template="http://ade.pin.unifi.it:8080/gi-cat/services/cswiso?service=CSW&amp;version=2.0.2&amp;request=GetRecordsSimple&amp;resultType=hits&amp;outputFormat=application/atom%2Bxml&amp;outputSchema=http://www.w3.org/2005/Atom&amp;startPosition={startIndex?}&amp;maxRecords={count?}&amp;searchTerms={searchTerms?}&amp;bbox={geo:box?}&amp;time={ogcos:time?}&amp;temporalOp={ogcos:temporalOp?}" />
 	<Url type="application/atom+xml"
 		template="http://ade.pin.unifi.it:8080/gi-cat/services/cswiso?service=CSW&amp;version=2.0.2&amp;request=GetRecordsSimple&amp;resultType=hits&amp;outputFormat=application/atom%2Bxml&amp;outputSchema=http://www.w3.org/2005/Atom&amp;startPosition={startIndex?}&amp;maxRecords={count?}&amp;searchTerms={searchTerms?}&amp;bbox={geo:box?}&amp;time={ogcos:time?}&amp;temporalOp={ogcos:temporalOp?}" />
-	<Developer>enrico.boldrini@cnr.it</Developer>
+	<Developer>boldrini@imaa.cnr.it</Developer>
 	<Developer>papeschi@imaa.cnr.it</Developer>
 	<SyndicationRight>open</SyndicationRight>
 	<AdultContent>false</AdultContent>

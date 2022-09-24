@@ -23,6 +23,12 @@ package eu.essi_lab.gssrv.rest;
 
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.pdk.Profiler;
+
+/**
+ * A filter to select the {@link Profiler} suitable to handle a {@link WebRequest}
+ * 
+ * @author Fabrizio
+ */
 public interface ProfilerFilter {
 
     /**

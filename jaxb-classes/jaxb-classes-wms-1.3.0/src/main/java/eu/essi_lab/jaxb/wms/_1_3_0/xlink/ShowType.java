@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.wms._1_3_0.xlink;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -33,6 +33,25 @@ import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlType;
 
+
+/**
+ * <p>Java class for showType.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * <pre>
+ * &lt;simpleType name="showType"&gt;
+ *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}token"&gt;
+ *     &lt;enumeration value="new"/&gt;
+ *     &lt;enumeration value="replace"/&gt;
+ *     &lt;enumeration value="embed"/&gt;
+ *     &lt;enumeration value="other"/&gt;
+ *     &lt;enumeration value="none"/&gt;
+ *   &lt;/restriction&gt;
+ * &lt;/simpleType&gt;
+ * </pre>
+ * 
+ */
 @XmlType(name = "showType")
 @XmlEnum
 public enum ShowType {

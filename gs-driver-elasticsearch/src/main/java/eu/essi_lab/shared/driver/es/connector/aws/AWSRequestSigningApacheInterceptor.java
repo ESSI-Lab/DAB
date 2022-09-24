@@ -4,7 +4,7 @@ package eu.essi_lab.shared.driver.es.connector.aws;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,10 +21,8 @@ package eu.essi_lab.shared.driver.es.connector.aws;
  * #L%
  */
 
-import com.amazonaws.DefaultRequest;
-import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.Signer;
-import com.amazonaws.http.HttpMethodName;
+import static org.apache.http.protocol.HttpCoreContext.HTTP_TARGET_HOST;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -32,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
 import org.apache.http.Header;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpException;
@@ -43,7 +42,15 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HttpContext;
-import static org.apache.http.protocol.HttpCoreContext.HTTP_TARGET_HOST;
+
+import com.amazonaws.DefaultRequest;
+import com.amazonaws.auth.AWSCredentialsProvider;
+import com.amazonaws.auth.Signer;
+import com.amazonaws.http.HttpMethodName;
+
+/**
+ * @author ilsanto
+ */
 
 /**
  * An {@link HttpRequestInterceptor} that signs requests using any AWS {@link Signer} and {@link AWSCredentialsProvider}.

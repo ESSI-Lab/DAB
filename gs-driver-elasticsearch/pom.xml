@@ -9,19 +9,20 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>gs-driver-elasticsearch</artifactId>
-	<name>ESSI-Lab Elastic Search Driver</name>
+	<name>ESSI-Lab Driver Elastic Search Implementation</name>
 
 	<dependencies>
+	
 		<dependency>
 			<groupId>eu.essi_lab</groupId>
 			<artifactId>gs-shared-content</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 		</dependency>
-
 
 		<dependency>
 			<groupId>com.amazonaws</groupId>
@@ -141,12 +142,4 @@
 			</build>
 		</profile>
 	</profiles>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>license-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>	
 </project>

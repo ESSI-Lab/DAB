@@ -4,7 +4,7 @@ package eu.essi_lab.shared.driver.es.query;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,13 +21,20 @@ package eu.essi_lab.shared.driver.es.query;
  * #L%
  */
 
-import eu.essi_lab.messages.Page;
-import eu.essi_lab.shared.messages.SharedContentQuery;
-import eu.essi_lab.shared.messages.SharedContentTimeContraintCollection;
-import eu.essi_lab.shared.model.SharedContentType;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import eu.essi_lab.messages.Page;
+import eu.essi_lab.shared.messages.SharedContentQuery;
+import eu.essi_lab.shared.messages.SharedContentTimeConstraint;
+
+/**
+ * @author ilsanto
+ */
 public class ESQueryMapper {
 
     private Page defaultPage;
@@ -40,43 +47,90 @@ public class ESQueryMapper {
     private static final String BOOL_KEY = "bool";
     private static final String MUST_KEY = "must";
 
+    /**
+     * 
+     */
     public ESQueryMapper() {
+
 	defaultPage = new Page(1, 10);
     }
 
-    public JSONObject mapToQuery(SharedContentType type, SharedContentQuery query) {
+    /**
+     * @param query
+     * @return
+     */
+    public JSONObject mapToQuery(SharedContentQuery query) {
 
 	JSONObject json = new JSONObject();
 
-	addPage(json, Optional.ofNullable(query.getPage()));
-
+	if(query.getIdsList().isEmpty()){
+	    
+	    addPage(json, Optional.ofNullable(query.getPage()));
+	}
+	
 	addQuery(json, query);
 
 	return json;
-
     }
 
+    /**
+     * @param json
+     * @param query
+     */
     private void addQuery(JSONObject json, SharedContentQuery query) {
 
-	json.put(QUERY_KEY, new JSONObject());
+	if (query.getIdsList().isEmpty()) {
 
-	Optional<SharedContentTimeContraintCollection> optional = query.getTimeConstraints();
+	    json.put(QUERY_KEY, new JSONObject());
+	}
+	
+	List<SharedContentTimeConstraint> timeConstraints = query.getTimeConstraints();
 
-	if (optional.isPresent())
-	    doMapping(json, optional.get());
-	else
+	if (!timeConstraints.isEmpty()) {
+
+	    doMapping(json, timeConstraints);
+
+	} else if (!query.getIdsList().isEmpty()) {
+
+	    doMapping(json, query.getIdsList());
+
+	} else {
+
 	    addMatchAll(json);
-
+	}
     }
 
-    private void doMapping(JSONObject json, SharedContentTimeContraintCollection timeContraintCollection) {
+    /**
+     * @param json
+     * @param idsList
+     */
+    private void doMapping(JSONObject json, ArrayList<String> idsList) {
+
+	json.put("docs", new JSONArray());
+
+	idsList.forEach(id -> {
+	    JSONObject doc = new JSONObject();
+	    
+	    doc.put("_type", "_doc");
+	    doc.put("_id", id);
+	    
+	    json.getJSONArray("docs").put(doc);
+	});
+    }
+
+    /**
+     * @param json
+     * @param list
+     */
+    private void doMapping(JSONObject json, List<SharedContentTimeConstraint> list) {
 
 	addBool(json.getJSONObject(QUERY_KEY));
 
 	addMust(json.getJSONObject(QUERY_KEY).getJSONObject(BOOL_KEY));
 
-	//multiple ranges implemented as in https://stackoverflow.com/questions/20610999/query-in-elasticsearch-with-multiple-ranges-on-multiple-dates
-	timeContraintCollection.getList().forEach(tc -> {
+	// multiple ranges implemented as in
+	// https://stackoverflow.com/questions/20610999/query-in-elasticsearch-with-multiple-ranges-on-multiple-dates
+	list.forEach(tc -> {
 
 	    ESTimeRangeBuilder builder = new ESTimeRangeBuilder(tc.getTimeAxis());
 
@@ -85,17 +139,28 @@ public class ESQueryMapper {
 	    appendRange(json.getJSONObject(QUERY_KEY).getJSONObject(BOOL_KEY).getJSONArray(MUST_KEY), dateRange);
 
 	});
-
     }
 
+    /**
+     * @param json
+     */
     private void addMust(JSONObject json) {
+
 	json.put(MUST_KEY, new JSONArray());
     }
 
+    /**
+     * @param json
+     */
     private void addBool(JSONObject json) {
+
 	json.put(BOOL_KEY, new JSONObject());
     }
 
+    /**
+     * @param array
+     * @param rangeContent
+     */
     private void appendRange(JSONArray array, JSONObject rangeContent) {
 
 	JSONObject jsonObject = new JSONObject();
@@ -106,19 +171,24 @@ public class ESQueryMapper {
 
     }
 
+    /**
+     * @param json
+     */
     private void addMatchAll(JSONObject json) {
 
 	json.getJSONObject(QUERY_KEY).put(MATCH_ALL_KEY, new JSONObject());
 
     }
 
+    /**
+     * @param json
+     * @param page
+     */
     private void addPage(JSONObject json, Optional<Page> page) {
 
 	Page p = page.orElse(defaultPage);
 
 	json.put(FROM_KEY, p.getStart() - 1);
 	json.put(SIZE_KEY, p.getSize());
-
     }
-
 }

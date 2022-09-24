@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.wrt;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,7 +24,7 @@ package eu.essi_lab.pdk.wrt;
 import java.util.List;
 import java.util.Optional;
 
-import eu.essi_lab.configuration.ConfigurationUtils;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.messages.AccessMessage;
 import eu.essi_lab.messages.RequestMessage;
 import eu.essi_lab.messages.web.WebRequest;
@@ -34,6 +34,15 @@ import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.model.resource.data.DataFormat;
 import eu.essi_lab.pdk.handler.AccessHandler;
 import eu.essi_lab.request.executor.IAccessExecutor;
+
+/**
+ * Validates and transforms an "access query" in the correspondent {@link AccessMessage}. The access query is
+ * represented by a {@link WebRequest} which encapsulates request parameters and headers.<br>
+ * This component is part of the {@link AccessHandler} composition and the calling of {@link #transform(WebRequest)}
+ * method is the first step of the workflow
+ * 
+ * @author Fabrizio
+ */
 public abstract class AccessRequestTransformer extends WebRequestTransformer<AccessMessage> {
 
     /**
@@ -119,11 +128,11 @@ public abstract class AccessRequestTransformer extends WebRequestTransformer<Acc
     protected abstract String getOnlineId(WebRequest request) throws GSException;
 
     /**
-     * This default implementation invokes the {@link #ConfigurationUtils.getAllSources()} method
+     * This default implementation invokes the {@link #ConfigurationWrapper.getAllSources()} method
      */
     protected List<GSSource> getSources(WebRequest request) throws GSException {
 
-	return ConfigurationUtils.getAllSources();
+	return ConfigurationWrapper.getAllSources();
     }
 
 }

@@ -1,0 +1,139 @@
+http://www.seadatanet.org/urnurl/SDN:L05::101/;anemometers
+http://www.seadatanet.org/urnurl/SDN:L05::102/;meteorological packages
+http://www.seadatanet.org/urnurl/SDN:L05::103/;radiosondes
+http://www.seadatanet.org/urnurl/SDN:L05::110/;wave recorders
+http://www.seadatanet.org/urnurl/SDN:L05::111/;sea level recorders
+http://www.seadatanet.org/urnurl/SDN:L05::113/;fluorometers
+http://www.seadatanet.org/urnurl/SDN:L05::114/;current meters
+http://www.seadatanet.org/urnurl/SDN:L05::115/;current profilers
+http://www.seadatanet.org/urnurl/SDN:L05::121/;satellite tracking system
+http://www.seadatanet.org/urnurl/SDN:L05::122/;radiometers
+http://www.seadatanet.org/urnurl/SDN:L05::123/;optical backscatter sensors
+http://www.seadatanet.org/urnurl/SDN:L05::124/;transmissometers
+http://www.seadatanet.org/urnurl/SDN:L05::130/;CTD
+http://www.seadatanet.org/urnurl/SDN:L05::132/;bathythermographs
+http://www.seadatanet.org/urnurl/SDN:L05::133/;thermosalinographs
+http://www.seadatanet.org/urnurl/SDN:L05::134/;water temperature sensor
+http://www.seadatanet.org/urnurl/SDN:L05::135/;thermistor chains
+http://www.seadatanet.org/urnurl/SDN:L05::14/;precipitation samplers
+http://www.seadatanet.org/urnurl/SDN:L05::150/;particle sizers
+http://www.seadatanet.org/urnurl/SDN:L05::152/;sidescan sonars
+http://www.seadatanet.org/urnurl/SDN:L05::153/;single-channel seismic reflection systems
+http://www.seadatanet.org/urnurl/SDN:L05::154/;multi-channel seismic reflection systems
+http://www.seadatanet.org/urnurl/SDN:L05::155/;seismic refraction systems
+http://www.seadatanet.org/urnurl/SDN:L05::156/;single-beam echosounders
+http://www.seadatanet.org/urnurl/SDN:L05::157/;multi-beam echosounders
+http://www.seadatanet.org/urnurl/SDN:L05::158/;gravimeters
+http://www.seadatanet.org/urnurl/SDN:L05::159/;magnetometers
+http://www.seadatanet.org/urnurl/SDN:L05::180/;underwater cameras
+http://www.seadatanet.org/urnurl/SDN:L05::181/;nutrient analysers
+http://www.seadatanet.org/urnurl/SDN:L05::182/;inapplicable
+http://www.seadatanet.org/urnurl/SDN:L05::184/;microstructure sensors
+http://www.seadatanet.org/urnurl/SDN:L05::185/;sound velocity sensors
+http://www.seadatanet.org/urnurl/SDN:L05::22/;plankton nets
+http://www.seadatanet.org/urnurl/SDN:L05::23/;pelagic trawl nets
+http://www.seadatanet.org/urnurl/SDN:L05::24/;benthos samplers
+http://www.seadatanet.org/urnurl/SDN:L05::30/;discrete water samplers
+http://www.seadatanet.org/urnurl/SDN:L05::301/;satellite positioning systems
+http://www.seadatanet.org/urnurl/SDN:L05::302/;water body temperature sensor
+http://www.seadatanet.org/urnurl/SDN:L05::304/;ocean colour radiometers
+http://www.seadatanet.org/urnurl/SDN:L05::306/;synthetic aperture radars
+http://www.seadatanet.org/urnurl/SDN:L05::308/;atmospheric radiometers
+http://www.seadatanet.org/urnurl/SDN:L05::31/;continuous water samplers
+http://www.seadatanet.org/urnurl/SDN:L05::310/;laser altimeters
+http://www.seadatanet.org/urnurl/SDN:L05::311/;cameras
+http://www.seadatanet.org/urnurl/SDN:L05::312/;bathymetric LiDARs
+http://www.seadatanet.org/urnurl/SDN:L05::32/;particulates samplers
+http://www.seadatanet.org/urnurl/SDN:L05::33/;sediment traps
+http://www.seadatanet.org/urnurl/SDN:L05::350/;salinity sensor
+http://www.seadatanet.org/urnurl/SDN:L05::351/;dissolved gas sensors
+http://www.seadatanet.org/urnurl/SDN:L05::353/;active fluorometers
+http://www.seadatanet.org/urnurl/SDN:L05::354/;expendable CTDs
+http://www.seadatanet.org/urnurl/SDN:L05::355/;pH sensors
+http://www.seadatanet.org/urnurl/SDN:L05::356/;redox potential sensors
+http://www.seadatanet.org/urnurl/SDN:L05::357/;acoustic tracking systems
+http://www.seadatanet.org/urnurl/SDN:L05::359/;plummets
+http://www.seadatanet.org/urnurl/SDN:L05::361/;penetrometers
+http://www.seadatanet.org/urnurl/SDN:L05::362/;250 Hz top-bandwidth single-channel seismic reflection systems
+http://www.seadatanet.org/urnurl/SDN:L05::363/;1000 Hz top-bandwidth single-channel seismic reflection systems
+http://www.seadatanet.org/urnurl/SDN:L05::364/;1000 Hz top-bandwidth multi-channel seismic reflection systems
+http://www.seadatanet.org/urnurl/SDN:L05::365/;2000 Hz top-bandwidth multi-channel seismic reflection systems
+http://www.seadatanet.org/urnurl/SDN:L05::367/;>2000 Hz top-bandwidth sub-bottom penetrator and mud profiler systems
+http://www.seadatanet.org/urnurl/SDN:L05::370/;geothermometers
+http://www.seadatanet.org/urnurl/SDN:L05::372/;2000 Hz top-bandwidth single-channel seismic reflection systems
+http://www.seadatanet.org/urnurl/SDN:L05::373/;>2000 Hz top-bandwidth single-channel seismic reflection systems
+http://www.seadatanet.org/urnurl/SDN:L05::375/;250 Hz top-bandwidth multi-channel seismic reflection systems
+http://www.seadatanet.org/urnurl/SDN:L05::377/;water level markers
+http://www.seadatanet.org/urnurl/SDN:L05::379/;altimeters
+http://www.seadatanet.org/urnurl/SDN:L05::382/;atmospheric gas analysers
+http://www.seadatanet.org/urnurl/SDN:L05::383/;metal analysers
+http://www.seadatanet.org/urnurl/SDN:L05::384/;ADVs and turbulence probes
+http://www.seadatanet.org/urnurl/SDN:L05::385/;platform attitude sensors
+http://www.seadatanet.org/urnurl/SDN:L05::50/;sediment grabs
+http://www.seadatanet.org/urnurl/SDN:L05::51/;unconsolidated sediment corers
+http://www.seadatanet.org/urnurl/SDN:L05::53/;rock corers
+http://www.seadatanet.org/urnurl/SDN:L05::54/;rock dredges
+http://www.seadatanet.org/urnurl/SDN:L05::57/;manual rock samplers
+http://www.seadatanet.org/urnurl/SDN:L05::58/;continuous air samplers
+http://www.seadatanet.org/urnurl/SDN:L05::60/;sediment dredges
+http://www.seadatanet.org/urnurl/SDN:L05::61/;demersal trawl nets
+http://www.seadatanet.org/urnurl/SDN:L05::62/;beam trawls
+http://www.seadatanet.org/urnurl/SDN:L05::63/;passive fishing gear
+http://www.seadatanet.org/urnurl/SDN:L05::64/;active fishing gear
+http://www.seadatanet.org/urnurl/SDN:L05::65/;gill nets
+http://www.seadatanet.org/urnurl/SDN:L05::66/;flushing drills
+http://www.seadatanet.org/urnurl/SDN:L05::83/;centrifuges
+http://www.seadatanet.org/urnurl/SDN:L05::84/;sieves and filters
+http://www.seadatanet.org/urnurl/SDN:L05::90/;manual biota samplers
+http://www.seadatanet.org/urnurl/SDN:L05::91/;observers
+http://www.seadatanet.org/urnurl/SDN:L05::999/;unknown
+http://www.seadatanet.org/urnurl/SDN:L05::ARAG/;airgun array
+http://www.seadatanet.org/urnurl/SDN:L05::BOMR/;Boomer
+http://www.seadatanet.org/urnurl/SDN:L05::CHRP/;Chirp
+http://www.seadatanet.org/urnurl/SDN:L05::EMSR/;elecromagnetic sensors
+http://www.seadatanet.org/urnurl/SDN:L05::FFES/;Fish-finder echosounders
+http://www.seadatanet.org/urnurl/SDN:L05::LAB01/;elemental analysers
+http://www.seadatanet.org/urnurl/SDN:L05::LAB02/;gas chromatographs
+http://www.seadatanet.org/urnurl/SDN:L05::LAB03/;colorimeters
+http://www.seadatanet.org/urnurl/SDN:L05::LAB04/;autoanalysers
+http://www.seadatanet.org/urnurl/SDN:L05::LAB05/;optical microscopes
+http://www.seadatanet.org/urnurl/SDN:L05::LAB10/;atomic absorption spectrometers
+http://www.seadatanet.org/urnurl/SDN:L05::LAB11/;high performance liquid chromatographs
+http://www.seadatanet.org/urnurl/SDN:L05::LAB12/;titrators
+http://www.seadatanet.org/urnurl/SDN:L05::LAB13/;balances and scales
+http://www.seadatanet.org/urnurl/SDN:L05::LAB14/;inductively-coupled plasma atomic emission spectroscopes
+http://www.seadatanet.org/urnurl/SDN:L05::LAB15/;inductively-coupled plasma mass spectrometers
+http://www.seadatanet.org/urnurl/SDN:L05::LAB16/;mass spectrometers
+http://www.seadatanet.org/urnurl/SDN:L05::LAB19/;gas chromatograph mass spectrometers
+http://www.seadatanet.org/urnurl/SDN:L05::LAB20/;spectrophotometers
+http://www.seadatanet.org/urnurl/SDN:L05::LAB22/;gamma-ray spectrometers
+http://www.seadatanet.org/urnurl/SDN:L05::LAB23/;bench fluorometers
+http://www.seadatanet.org/urnurl/SDN:L05::LAB27/;particle sizers
+http://www.seadatanet.org/urnurl/SDN:L05::LAB29/;rulers
+http://www.seadatanet.org/urnurl/SDN:L05::LAB30/;salinometers
+http://www.seadatanet.org/urnurl/SDN:L05::LAB32/;acoustic velocity systems
+http://www.seadatanet.org/urnurl/SDN:L05::LAB36/;flow injection analysers
+http://www.seadatanet.org/urnurl/SDN:L05::LAB38/;cavity enhanced absorption spectrometers
+http://www.seadatanet.org/urnurl/SDN:L05::MOD07/;Physical oceanographic models
+http://www.seadatanet.org/urnurl/SDN:L05::POS01/;Decca Navigator System main chain receivers
+http://www.seadatanet.org/urnurl/SDN:L05::POS02/;Global Navigation Satellite System receivers
+http://www.seadatanet.org/urnurl/SDN:L05::POS03/;NAVSTAR Global Positioning System receivers
+http://www.seadatanet.org/urnurl/SDN:L05::POS04/;Differential Global Positioning System receivers
+http://www.seadatanet.org/urnurl/SDN:L05::POS05/;Long Range Navigation version C receivers
+http://www.seadatanet.org/urnurl/SDN:L05::POS09/;Toran receivers
+http://www.seadatanet.org/urnurl/SDN:L05::POS10/;Automatic Ranging Grid Overlay DM 54 receivers
+http://www.seadatanet.org/urnurl/SDN:L05::POS11/;Trident receivers
+http://www.seadatanet.org/urnurl/SDN:L05::POS12/;Système leger de measure de distance receivers
+http://www.seadatanet.org/urnurl/SDN:L05::POS14/;Pulse8 receivers
+http://www.seadatanet.org/urnurl/SDN:L05::POS15/;Omega receivers
+http://www.seadatanet.org/urnurl/SDN:L05::POS16/;Argos GPS-localised transmitters
+http://www.seadatanet.org/urnurl/SDN:L05::POS18/;Navy Navigation Satellite System receivers
+http://www.seadatanet.org/urnurl/SDN:L05::POS19/;inertial navigation systems
+http://www.seadatanet.org/urnurl/SDN:L05::POS21/;Hyperfix receivers
+http://www.seadatanet.org/urnurl/SDN:L05::POS22/;Trisponder navigation systems
+http://www.seadatanet.org/urnurl/SDN:L05::POS24/;dead reckoning
+http://www.seadatanet.org/urnurl/SDN:L05::POS25/;Kinematic Global Positioning System receivers
+http://www.seadatanet.org/urnurl/SDN:L05::SNAG/;airgun
+http://www.seadatanet.org/urnurl/SDN:L05::SNWG/;watergun
+http://www.seadatanet.org/urnurl/SDN:L05::SPRK/;Sparker
+http://www.seadatanet.org/urnurl/SDN:L05::WPS/;water pressure sensors

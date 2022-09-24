@@ -4,7 +4,7 @@ package eu.essi_lab.workflow.processor.grid;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -110,6 +110,14 @@ public class NetCDF_To_DDS_FormatConverterProcessor extends DataProcessor {
     public boolean scaleOutput() {
 	return false;
     }
+
+    /**
+     * Sub classes may implement this method to correct possible problems in the output from GDAL. The source data is
+     * also passed.
+     * 
+     * @param ret
+     * @throws GSException
+     */
     public DataObject postProcessCorrections(DataObject input, DataObject output) throws GSException {
 	return output;
     }

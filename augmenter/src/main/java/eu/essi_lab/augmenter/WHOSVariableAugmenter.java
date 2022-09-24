@@ -4,7 +4,7 @@ package eu.essi_lab.augmenter;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,20 +24,33 @@ package eu.essi_lab.augmenter;
 import java.util.List;
 import java.util.Optional;
 
+import eu.essi_lab.cfga.gs.setting.augmenter.AugmenterSetting;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
-import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
 import eu.essi_lab.lib.net.utils.whos.HydroOntology;
+import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.configuration.option.GSConfOption;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.ExtensionHandler;
 import eu.essi_lab.model.resource.GSResource;
-public class WHOSVariableAugmenter extends ResourceAugmenter {
+
+/**
+ * It checks variable name to find out a correspondent concept URI in Hydro ontology. If
+ * found, it adds it in a specific metadata field (attribute URI)
+ * 
+ * @author boldrini
+ */
+public class WHOSVariableAugmenter extends ResourceAugmenter<AugmenterSetting> {
 
     public WHOSVariableAugmenter() {
 
-	setLabel("WHOS Variable augmenter");
+    }
 
+    /**
+     * @param setting
+     */
+    public WHOSVariableAugmenter(AugmenterSetting setting) {
+
+	super(setting);
     }
 
     @Override
@@ -133,11 +146,20 @@ public class WHOSVariableAugmenter extends ResourceAugmenter {
     }
 
     @Override
-    public void onOptionSet(GSConfOption<?> option) throws GSException {
+    protected String initName() {
 
+	return "WHOS Variable augmenter";
     }
 
     @Override
-    public void onFlush() throws GSException {
+    public String getType() {
+
+	return "WHOSVariableAugmenter";
+    }
+
+    @Override
+    protected AugmenterSetting initSetting() {
+
+	return new AugmenterSetting();
     }
 }

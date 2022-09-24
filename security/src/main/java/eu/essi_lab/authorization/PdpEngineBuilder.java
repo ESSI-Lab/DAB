@@ -1,10 +1,13 @@
+/**
+ * 
+ */
 package eu.essi_lab.authorization;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -104,7 +107,7 @@ public class PdpEngineBuilder {
      */
     public CloseablePdpEngine build() throws Exception {
 
-	GSLoggerFactory.getLogger(getClass()).debug("Engine building STARTED");
+//	GSLoggerFactory.getLogger(getClass()).debug("Engine building STARTED");
 
 	//
 	// 1 ---
@@ -120,7 +123,7 @@ public class PdpEngineBuilder {
 
 	BasePdpEngine engine = new BasePdpEngine(pdpEngineConf);
 
-	GSLoggerFactory.getLogger(getClass()).debug("Engine building ENDED");
+//	GSLoggerFactory.getLogger(getClass()).debug("Engine building ENDED");
 
 	return engine;
     }

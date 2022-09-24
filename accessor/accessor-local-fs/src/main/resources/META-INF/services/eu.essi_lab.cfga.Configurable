@@ -1,0 +1,4 @@
+eu.essi_lab.accessor.localfs.LocalFileSystemAccessor
+eu.essi_lab.accessor.localfs.LocalFileSystemConnector
+eu.essi_lab.accessor.localfs.cswtestdata.CSWTestDataAccessor
+eu.essi_lab.accessor.localfs.cswtestdata.CSWTestDataConnector

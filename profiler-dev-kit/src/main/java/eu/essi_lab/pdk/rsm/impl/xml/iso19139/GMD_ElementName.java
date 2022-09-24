@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.rsm.impl.xml.iso19139;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,6 +31,10 @@ import com.google.common.base.CaseFormat;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.jaxb.csw._2_0_2.ElementSetType;
 import eu.essi_lab.lib.xml.XMLPruner;
+
+/**
+ * @author Fabrizio
+ */
 public enum GMD_ElementName {
 
     BOUNDING_BOX("*/gmd:identificationInfo/*/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox//*"), //

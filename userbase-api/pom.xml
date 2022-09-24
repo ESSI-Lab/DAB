@@ -1,0 +1,22 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>eu.essi_lab</groupId>
+		<artifactId>DAB</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>userbase-api</artifactId>
+	<name>ESSI-Lab User Base API</name>
+
+	<properties>
+		<aws-sdk.version>1.11.271</aws-sdk.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>eu.essi_lab</groupId>
+			<artifactId>core-datamodel</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+</project>

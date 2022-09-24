@@ -9,7 +9,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <!-- GetCapabilities operation. See pag. 131 OGC 07-006r1 -->
     <ows:ServiceIdentification>
-        <ows:Title>ESSI Lab DAB CSW 2.0.2 (ISO AP)</ows:Title>
+        <ows:Title>ESSI Lab GI-cat CSW 2.0.2 (ISO AP)</ows:Title>
         <ows:Abstract>A catalogue service that conforms to the HTTP protocol binding of the OpenGIS
             Catalogue Service specification version 2.0.2. ISO application profile (see OGC 07-045
             document). This CSW also implements the OGC Testbed 12 LSA-A016 with PubSub Core Support Server, which includes a 
@@ -258,7 +258,7 @@
                 <pubsub:Publication>
                     <ows1_1:Title>Random new records</ows1_1:Title>
                     <ows1_1:Abstract> Random notifications forged for testing convenience, generated
-                        on regular frequency (configured from DAB configuration manager; default
+                        on regular frequency (configured from GI-cat configuration manager; default
                         is every 1 minute). Each notification contains 1-5 records; the content of
                         "reports" is a constant string. </ows1_1:Abstract>
                     <pubsub:Identifier>RANDOM</pubsub:Identifier>

@@ -1,10 +1,13 @@
+/**
+ * 
+ */
 package eu.essi_lab.profiler.rest.handler.info;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,8 +24,6 @@ package eu.essi_lab.profiler.rest.handler.info;
  * #L%
  */
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -31,15 +32,13 @@ import java.util.Optional;
 
 import javax.ws.rs.core.MediaType;
 
-import org.apache.http.HttpHost;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestHighLevelClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.factory.DatabaseConsumerFactory;
-import eu.essi_lab.configuration.ConfigurationUtils;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.utils.StringUtils;
@@ -59,7 +58,6 @@ import eu.essi_lab.model.RuntimeInfoElement;
 import eu.essi_lab.model.StorageUri;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.pdk.handler.DefaultRequestHandler;
-import eu.essi_lab.shared.driver.es.connector.ESConnector;
 import eu.essi_lab.shared.driver.es.stats.ElasticsearchClient;
 
 /**
@@ -223,21 +221,32 @@ public class GWPStatisticsHandler extends DefaultRequestHandler {
 	if (es) {
 	    // elastic search implementation
 
-	    String endpoint = ConfigurationUtils.getGIStatsEndpoint();
-	    String user = ConfigurationUtils.getGIStatsUser();
-	    String password = ConfigurationUtils.getGIStatsPassword();
-	    ElasticsearchClient client = new ElasticsearchClient(endpoint, user, password);
-	    String dbName = ConfigurationUtils.getGIStatsDbname();		    
-	    client.setDbName(dbName);
-	    response = client.compute(message);
+	    Optional<DatabaseSetting> setting = ConfigurationWrapper.getSystemSettings().getStatisticsSetting();
+
+	    //
+	    // it should be present if stats gathering is enabled!
+	    //
+	    if (setting.isPresent()) {
+
+		DatabaseSetting databaseSetting = setting.get();
+		String databaseName = databaseSetting.getDatabaseName();
+		String databasePassword = databaseSetting.getDatabasePassword();
+		String databaseUri = databaseSetting.getDatabaseUri();
+		String databaseUser = databaseSetting.getDatabaseUser();
+
+		ElasticsearchClient client = new ElasticsearchClient(databaseUri, databaseUser, databasePassword);
+
+		client.setDbName(databaseName);
+		response = client.compute(message);
+	    }
 
 	} else {
 	    // marklogic implementation
 
-	    StorageUri uri = ConfigurationUtils.getStorageURI();
+	    StorageUri uri = ConfigurationWrapper.getDatabaseURI();
 	    GSLoggerFactory.getLogger(FullStatisticsHandler.class).debug("Storage uri: {}", uri);
 
-	    DatabaseReader reader = new DatabaseConsumerFactory().createDataBaseReader(uri);
+	    DatabaseReader reader = DatabaseConsumerFactory.createDataBaseReader(uri);
 
 	    response = reader.compute(message);
 	}
@@ -303,19 +312,19 @@ public class GWPStatisticsHandler extends DefaultRequestHandler {
      */
     public enum Interval {
 
-	MINUTE("minute","m"), //
-	HOUR("hour","h"), //
-	DAY("day","d"), //
-	WEEK("week","w"), //
-	MONTH("month","M"),//
-	QUARTER("quarter","1"),//
-	YEAR("year","y")//	
+	MINUTE("minute", "m"), //
+	HOUR("hour", "h"), //
+	DAY("day", "d"), //
+	WEEK("week", "w"), //
+	MONTH("month", "M"), //
+	QUARTER("quarter", "1"), //
+	YEAR("year", "y")//
 	;
 
 	private String name;
 	private String abbreviation;
 
-	private Interval(String name,String abbreviation) {
+	private Interval(String name, String abbreviation) {
 
 	    this.name = name;
 	    this.abbreviation = abbreviation;
@@ -328,7 +337,7 @@ public class GWPStatisticsHandler extends DefaultRequestHandler {
 
 	    return name;
 	}
-	
+
 	/**
 	 * @return
 	 */
@@ -479,11 +488,11 @@ public class GWPStatisticsHandler extends DefaultRequestHandler {
 
 			forEach(hostName ->
 
-			orBond.getOperands().add(//
-				BondFactory.createRuntimeInfoElementBond(//
-					BondOperator.EQUAL, //
-					RuntimeInfoElement.RUNTIME_CONTEXT, //
-					hostName)));
+		orBond.getOperands().add(//
+			BondFactory.createRuntimeInfoElementBond(//
+				BondOperator.EQUAL, //
+				RuntimeInfoElement.RUNTIME_CONTEXT, //
+				hostName)));
 
 		andBond.getOperands().add(orBond);
 	    }
@@ -573,7 +582,7 @@ public class GWPStatisticsHandler extends DefaultRequestHandler {
 
 	    groupByPeriod.setPeriod(period);
 	    groupByPeriod.setStartTime(startTime);
-	    groupByPeriod.setInterval(intervalSize+interval.getAbbreviation()); // e.g. 2d
+	    groupByPeriod.setInterval(intervalSize + interval.getAbbreviation()); // e.g. 2d
 
 	    double intervalSizeDouble = Double.parseDouble(intervalSize);
 	    double fraction = 0;
@@ -764,10 +773,11 @@ public class GWPStatisticsHandler extends DefaultRequestHandler {
 	    timeConstraint = RuntimeInfoElement.DISCOVERY_MESSAGE_TIME_STAMP_MILLIS;
 	}
 
-	andBond.getOperands().add(BondFactory.createRuntimeInfoElementBond(//
-		BondOperator.GREATER_OR_EQUAL, //
-		timeConstraint, //
-		startTime));
+	andBond.getOperands()
+		.add(BondFactory.createRuntimeInfoElementBond(//
+			BondOperator.GREATER_OR_EQUAL, //
+			timeConstraint, //
+			startTime));
 
 	if (endTime.isPresent()) {
 	    andBond.getOperands()
@@ -930,17 +940,11 @@ public class GWPStatisticsHandler extends DefaultRequestHandler {
      */
     private String getSourceLabel(String id) {
 
-	try {
-	    return ConfigurationUtils.getAllSources().//
-		    stream().//
-		    filter(s -> s.getUniqueIdentifier().equals(id)).//
-		    map(s -> s.getLabel()).//
-		    findFirst().//
-		    get();
-	} catch (GSException e) {
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	}
-
-	return "Unknown";
+	return ConfigurationWrapper.getAllSources().//
+		stream().//
+		filter(s -> s.getUniqueIdentifier().equals(id)).//
+		map(s -> s.getLabel()).//
+		findFirst().//
+		get();
     }
 }

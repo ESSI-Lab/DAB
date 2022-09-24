@@ -4,7 +4,7 @@ package eu.essi_lab.downloader.wcs;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -48,7 +48,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 
 import eu.essi_lab.access.DataDownloader;
-import eu.essi_lab.accessor.wcs.connector.WCSConnector;
+import eu.essi_lab.accessor.wcs.WCSConnector;
 import eu.essi_lab.lib.net.utils.Downloader;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
@@ -71,6 +71,7 @@ public abstract class WCSDownloader extends DataDownloader {
 
     private static final String WCS_COVERAGE_NOT_FOUND = "WCS_COVERAGE_NOT_FOUND";
     private static final String WCS_DOWNLOADER_ERROR = "WCS_DOWNLOADER_ERROR";
+    @SuppressWarnings("rawtypes")
     protected WCSConnector connector;
     protected String name;
     private static Object DOWNLOAD_LOCK = new Object(); // only one thread at a time can download
@@ -86,8 +87,10 @@ public abstract class WCSDownloader extends DataDownloader {
 	this.connector.setSourceURL(linkage);
     }
 
+    @SuppressWarnings("rawtypes")
     public abstract WCSConnector createConnector();
 
+    @SuppressWarnings("rawtypes")
     public WCSConnector getConnector() {
 	return connector;
     }
@@ -107,6 +110,7 @@ public abstract class WCSDownloader extends DataDownloader {
 
     }
 
+    @SuppressWarnings("rawtypes")
     protected void setConnector(WCSConnector connector) {
 	this.connector = connector;
     }
@@ -132,18 +136,19 @@ public abstract class WCSDownloader extends DataDownloader {
 			null, //
 			ErrorInfo.ERRORTYPE_SERVICE, //
 			ErrorInfo.SEVERITY_FATAL, //
-			"REMOTE_SERVER_ERROR", //
-			null);
+			"REMOTE_SERVER_ERROR");
 	    }
 	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+
 	    throw GSException.createException( //
 		    getClass(), //
 		    "Server not ready: " + e.getMessage(), //
 		    null, //
 		    ErrorInfo.ERRORTYPE_SERVICE, //
 		    ErrorInfo.SEVERITY_FATAL, //
-		    "REMOTE_SERVER_ERROR", //
-		    null);
+		    "REMOTE_SERVER_ERROR");
 	}
 
 	try {
@@ -157,8 +162,7 @@ public abstract class WCSDownloader extends DataDownloader {
 			null, //
 			ErrorInfo.ERRORTYPE_INTERNAL, //
 			ErrorInfo.SEVERITY_FATAL, //
-			WCS_COVERAGE_NOT_FOUND, //
-			null);
+			WCS_COVERAGE_NOT_FOUND);
 	    }
 
 	    // FORMATS
@@ -324,6 +328,47 @@ public abstract class WCSDownloader extends DataDownloader {
 
     protected abstract SimpleEntry<Double, Double> getGridOrigin(XMLDocumentReader coverage, CRS crs);
 
+    // /**
+    // * Note: min and maximum are not center of grid, but limits of the envelope
+    // *
+    // * @param min
+    // * @param max
+    // * @param resolution
+    // * @param size
+    // * @return
+    // */
+    // private Long adjustSize(Double min, Double max, Double resolution) {
+    // double extent = max - min;
+    // long points = (long) (extent / resolution);
+    // return points;
+    // }
+    //
+    // /**
+    // * Note: min and maximum are not center of grid, but limits of the envelope
+    // *
+    // * @param min
+    // * @param max
+    // * @param resolution
+    // * @return
+    // */
+    // private Double adjustResolution(Double min, Double max, Double resolution) {
+    // if (resolution == null) {
+    // return null;
+    // }
+    // if (min == null || max == null) {
+    // return null;
+    // }
+    // double extent = max - min;
+    // double reminder = extent % resolution;
+    // if (reminder < TOL) {
+    // return resolution;
+    // } else {
+    // // it's not an exact resolution! -- adjusting...
+    // double points = Math.round(extent / resolution);
+    // return extent / points;
+    // }
+    // }
+
     protected abstract List<Long> getSizes(XMLDocumentReader coverage, CRS crs);
 
     protected abstract Double getUpperCornerSecondDimension(XMLDocumentReader coverage, CRS crs);
@@ -389,8 +434,7 @@ public abstract class WCSDownloader extends DataDownloader {
 			    null, //
 			    ErrorInfo.ERRORTYPE_INTERNAL, //
 			    ErrorInfo.SEVERITY_FATAL, //
-			    WCS_DOWNLOADER_ERROR, //
-			    null);
+			    WCS_DOWNLOADER_ERROR);
 		}
 		return file;
 
@@ -401,8 +445,7 @@ public abstract class WCSDownloader extends DataDownloader {
 			null, //
 			ErrorInfo.ERRORTYPE_INTERNAL, //
 			ErrorInfo.SEVERITY_FATAL, //
-			WCS_DOWNLOADER_ERROR, //
-			null);
+			WCS_DOWNLOADER_ERROR);
 	    }
 
 	    // }
@@ -415,8 +458,7 @@ public abstract class WCSDownloader extends DataDownloader {
 		    null, //
 		    ErrorInfo.ERRORTYPE_INTERNAL, //
 		    ErrorInfo.SEVERITY_FATAL, //
-		    WCS_DOWNLOADER_ERROR, //
-		    null);
+		    WCS_DOWNLOADER_ERROR);
 	}
 
     }
@@ -712,6 +754,7 @@ public abstract class WCSDownloader extends DataDownloader {
     }
 
     public URL getDownloadURL(DataDescriptor descriptor) throws Exception {
+
 	String baseURL = getConnector().getSourceURL();
 
 	if (baseURL.endsWith("?") || baseURL.endsWith("&")) {
@@ -747,8 +790,7 @@ public abstract class WCSDownloader extends DataDownloader {
 		    null, //
 		    ErrorInfo.ERRORTYPE_INTERNAL, //
 		    ErrorInfo.SEVERITY_FATAL, //
-		    WCS_DOWNLOADER_ERROR, //
-		    null);
+		    WCS_DOWNLOADER_ERROR);
 	}
 
 	Set<CRS> requestCrses = getRequestCRSes(coverage);
@@ -809,7 +851,7 @@ public abstract class WCSDownloader extends DataDownloader {
 	userLowerAndUpperCorners = fixUserLowerAndUpperCorners(userLowerAndUpperCorners, userSpatialResolutions);
 
 	String bbox = getSpatialSubsetParameter(coverage, userLowerAndUpperCorners, outputCRS);
-	
+
 	// TIME
 	List<Date> times = getTimes(coverage);
 
@@ -847,8 +889,7 @@ public abstract class WCSDownloader extends DataDownloader {
 		    null, //
 		    ErrorInfo.ERRORTYPE_INTERNAL, //
 		    ErrorInfo.SEVERITY_FATAL, //
-		    WCS_DOWNLOADER_ERROR, //
-		    null);
+		    WCS_DOWNLOADER_ERROR);
 	}
 
 	// REQUEST URL

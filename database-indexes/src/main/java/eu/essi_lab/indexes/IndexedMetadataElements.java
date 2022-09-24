@@ -4,7 +4,7 @@ package eu.essi_lab.indexes;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -58,6 +58,13 @@ import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.SatelliteScene;
 import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
+
+/**
+ * This class groups all the available {@link IndexedMetadataElement}s
+ * 
+ * @see MetadataElement
+ * @author Fabrizio
+ */
 public final class IndexedMetadataElements extends IndexedElementsGroup {
 
     /**
@@ -684,6 +691,20 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 	    getValues().addAll(names);
 
+	}
+    };
+    public static final IndexedMetadataElement TEAM_CATEGORY = new IndexedMetadataElement(
+	    MetadataElement.THEME_CATEGORY) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    ExtensionHandler handler = resource.getExtensionHandler();
+	     Optional<String> themeCategoryOpt = handler.getThemeCategory();
+	    if(themeCategoryOpt.isPresent()) {
+		if (checkStringValue(themeCategoryOpt.get())) {
+		    getValues().add(themeCategoryOpt.get());
+		}
+	    }
 	}
     };
     public static final IndexedMetadataElement CRS_ID = new IndexedMetadataElement(MetadataElement.CRS_ID) {

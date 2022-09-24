@@ -4,7 +4,7 @@ package eu.essi_lab.model;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,22 +21,26 @@ package eu.essi_lab.model;
  * #L%
  */
 
+import java.io.Serializable;
+
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
-import eu.essi_lab.jaxb.common.NameSpace;
-import eu.essi_lab.model.configuration.GSJSONSerializable;
+import eu.essi_lab.lib.xml.NameSpace;
 
-@JsonInclude(Include.NON_ABSENT)
-public class GSSource extends GSJSONSerializable {
+/**
+ * @author Fabrizio
+ */
+public class GSSource implements Serializable {
 
-    private static final long serialVersionUID = -4674529668493840765L;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -8735607845534707851L;
 
     @NotNull(message = "uniqueIdentifier field of GSSource cannot be null")
     @XmlAttribute(namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
@@ -66,6 +70,10 @@ public class GSSource extends GSJSONSerializable {
 
     @XmlElement(namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     private String version;
+
+    /**
+     * 
+     */
     public GSSource() {
 	setResultsPriority(ResultsPriority.UNSET);
 	setOrderingDirection(OrderingDirection.ASCENDING);
@@ -147,9 +155,32 @@ public class GSSource extends GSJSONSerializable {
     }
 
     @Override
-    @JsonIgnore
+    
     public String toString() {
-	return this.getLabel() + " [" + this.getUniqueIdentifier() + "] [" + this.getEndpoint()+"]";
+	return this.getLabel() + " [" + this.getUniqueIdentifier() + "] [" + this.getEndpoint() + "]";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+
+	if (o instanceof GSSource) {
+
+	    GSSource s = (GSSource) o;
+	    return s.getBrokeringStrategy() == this.getBrokeringStrategy() && //
+		    (s.getEndpoint() == null && this.getEndpoint() == null || s.getEndpoint().equals(this.getEndpoint()) && //
+		     s.getOrderingDirection() == this.getOrderingDirection() && s.getOrderingProperty() == this.getOrderingProperty() && //
+		     s.getResultsPriority() == this.getResultsPriority() && //
+		    (s.getUniqueIdentifier() == null && this.getUniqueIdentifier() == null || s.getUniqueIdentifier().equals(this.getUniqueIdentifier())) && //
+		    (s.getVersion() == null && this.getVersion() == null || s.getVersion().equals(this.getVersion())));//
+	}
+
+	return false;
+    }
+
+    @Override
+    public int hashCode() {
+
+	return toString().hashCode();
     }
 
 }

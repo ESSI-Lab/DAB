@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wms;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,7 +35,6 @@ import eu.essi_lab.lib.net.utils.Downloader;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
@@ -238,8 +237,7 @@ public abstract class WMSDownloader extends DataDownloader {
 			null, //
 			ErrorInfo.ERRORTYPE_INTERNAL, //
 			ErrorInfo.SEVERITY_FATAL, //
-			WMS_DOWNLOADER_ERROR, //
-			null);
+			WMS_DOWNLOADER_ERROR);
 	    }
 	} catch (Exception e) {
 	    throw GSException.createException( //
@@ -248,8 +246,7 @@ public abstract class WMSDownloader extends DataDownloader {
 		    null, //
 		    ErrorInfo.ERRORTYPE_INTERNAL, //
 		    ErrorInfo.SEVERITY_FATAL, //
-		    WMS_DOWNLOADER_ERROR, //
-		    null);
+		    WMS_DOWNLOADER_ERROR);
 	}
 
     }
@@ -269,7 +266,7 @@ public abstract class WMSDownloader extends DataDownloader {
 	return getImageURL(descriptor, baseURL);
     }
 
-    public abstract IWMSConnector getConnector();
+    public abstract WMSConnector getConnector();
 
     protected void reduceDescriptor(DataDescriptor desc) {
 

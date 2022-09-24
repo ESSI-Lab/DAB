@@ -12,7 +12,7 @@ package org.cuahsi.waterml._1;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -37,6 +37,32 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
+
+/**
+ * <p>Java class for latLonLineString complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="latLonLineString"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{http://www.cuahsi.org/waterML/1.1/}GeogLocationType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="coordLatLong" type="{http://www.cuahsi.org/waterML/1.1/}CoordType" maxOccurs="unbounded" minOccurs="2"/&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attribute name="zDirection"&gt;
+ *         &lt;simpleType&gt;
+ *           &lt;union memberTypes=" {http://www.w3.org/2001/XMLSchema}string {http://www.cuahsi.org/waterML/1.1/}zDirectionEnum"&gt;
+ *           &lt;/union&gt;
+ *         &lt;/simpleType&gt;
+ *       &lt;/attribute&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "latLonLineString", propOrder = {
     "coordLatLong"

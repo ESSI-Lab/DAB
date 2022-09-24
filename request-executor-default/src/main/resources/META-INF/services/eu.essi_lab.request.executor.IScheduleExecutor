@@ -1,1 +1,1 @@
-eu.essi_lab.request.executor.schedule.ScheduleUserJobExecutor
+eu.essi_lab.request.executor.schedule.UserScheduledWorkerJobExecutor

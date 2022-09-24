@@ -4,7 +4,7 @@ package eu.essi_lab.iso.datamodel.classes;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -50,6 +50,12 @@ import net.opengis.gml.v_3_2_0.TimePeriodType;
 import net.opengis.gml.v_3_2_0.TimePositionType;
 import net.opengis.iso19139.gmd.v_20060504.EXTemporalExtentType;
 import net.opengis.iso19139.gts.v_20060504.TMPrimitivePropertyType;
+
+/**
+ * EX_TemporalExtent
+ * 
+ * @author Fabrizio
+ */
 public class TemporalExtent extends ISOMetadata<EXTemporalExtentType> {
 
     /**

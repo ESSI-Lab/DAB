@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.rsm.impl.xml.iso19139;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,6 +35,10 @@ import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.model.resource.CoreMetadata;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.pdk.rsm.MappingSchema;
+
+/**
+ * @author Fabrizio
+ */
 public class GMI_ResultSetMapper extends GMD_ResultSetMapper {
 
     /**

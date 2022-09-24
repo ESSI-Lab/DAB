@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.csw._2_0_2;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -43,6 +43,44 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+
+/**
+ * 
+ *             Update statements may replace an entire record or only update part 
+ *             of a record:
+ *             1) To replace an existing record, include a new instance of the 
+ *                record;
+ *             2) To update selected properties of an existing record, include
+ *                a set of RecordProperty elements. The scope of the update
+ *                statement  is determined by the Constraint element.
+ *                The 'handle' is a local identifier for the action.
+ *          
+ * 
+ * <p>Classe Java per UpdateType complex type.
+ * 
+ * <p>Il seguente frammento di schema specifica il contenuto previsto contenuto in questa classe.
+ * 
+ * <pre>
+ * &lt;complexType name="UpdateType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;choice&gt;
+ *           &lt;any namespace='##other'/&gt;
+ *           &lt;sequence&gt;
+ *             &lt;element ref="{http://www.opengis.net/cat/csw/2.0.2}RecordProperty" maxOccurs="unbounded"/&gt;
+ *             &lt;element ref="{http://www.opengis.net/cat/csw/2.0.2}Constraint"/&gt;
+ *           &lt;/sequence&gt;
+ *         &lt;/choice&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attribute name="handle" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "UpdateType", propOrder = {
     "recordProperties",

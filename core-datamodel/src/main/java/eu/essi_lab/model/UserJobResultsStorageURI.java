@@ -1,10 +1,10 @@
-package eu.essi_lab.model;
+//package eu.essi_lab.model;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -20,5 +20,9 @@ package eu.essi_lab.model;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-public class UserJobResultsStorageURI extends StorageUri {
-}
+//
+///**
+// * @author ilsanto
+// */
+//public class UserJobResultsStorageURI extends StorageUri {
+//}

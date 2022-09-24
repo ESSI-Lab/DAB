@@ -4,7 +4,7 @@ package eu.essi_lab.lib.utils;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,6 +21,7 @@ package eu.essi_lab.lib.utils;
  * #L%
  */
 
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -38,6 +39,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Period;
 import org.joda.time.chrono.ISOChronology;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -52,9 +54,17 @@ public class ISO8601DateTimeUtils {
 	// force static usage
     }
 
+    /**
+     * 
+     */
     public static void setGISuiteDefaultTimeZone() {
+
 	TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
     }
+
+    /**
+     * @return
+     */
     public static String getISO8601DateTime() {
 
 	Date now = new Date();
@@ -223,6 +233,32 @@ public class ISO8601DateTimeUtils {
 	return Optional.empty();
     }
 
+    public static Duration getDuration(BigDecimal value, String timeUnits) {
+
+	switch (timeUnits) {
+	case "second":
+	    return getDuration("PT" + value + "S");
+	case "millisecond":
+	    return getDuration("PT" + value.divide(new BigDecimal("1000")).toString() + "S");
+	case "minute":
+	    return getDuration("PT" + value + "M");
+	case "hour":
+	    return getDuration("PT" + value + "H");
+	case "day":
+	    return getDuration("P" + value + "D");
+	case "week":
+	    return getDuration("P" + value + "W");
+	case "month":
+	    return getDuration("P" + value + "M");
+	case "year":
+	case "common year":
+	    return getDuration("P" + value + "Y");
+	default:
+	    break;
+	}
+	return null;
+    }
+
     public static Duration getDuration(String lexicalRepresentation) {
 	DatatypeFactory df = null;
 	try {
@@ -240,7 +276,7 @@ public class ISO8601DateTimeUtils {
     public static Date subtractDuration(Date date, Duration duration) {
 	return addDuration(date, duration.negate());
     }
-    
+
     public static Date addDuration(Date date, Duration duration) {
 	XMLGregorianCalendar calendar;
 	try {
@@ -280,15 +316,62 @@ public class ISO8601DateTimeUtils {
 	return Optional.empty();
     }
 
+    /**
+     * Given a date time expressed in ISO8601 (e.g.: 2021-08-04T10:40:00) which refers to the given
+     * <code>dateTimeZone</code>,
+     * this method creates the related
+     * {@link Date} object which refers to the UTC time zone (since when the GI-Project is started, UTC is set
+     * as default time zone).
+     * So if we are in Italy in summer, with local time zone GMT+02:00 DST (Europe/Berlin), and
+     * <code>iso8601dateTime</code> is
+     * '2021-08-04T10:40:00', this method returns a GMT Date 'Wednesday 4 August 2021 08:40:00'
+     * 
+     * @param iso8601dateTime
+     * @param dateTimeZone
+     * @return
+     */
+    public static Date toGMTDateTime(String iso8601dateTime, DateTimeZone dateTimeZone) {
+
+	DateTimeFormatter parser = ISODateTimeFormat.dateTimeParser().withChronology(ISOChronology.getInstance(dateTimeZone));
+
+	DateTime parsed = parser.parseDateTime(iso8601dateTime);
+	parsed = parsed.toDateTime(dateTimeZone);
+
+	return parsed.toDate();
+    }
+
+    /**
+     * @param iso8601DateTime
+     * @param dateTimeZone
+     * @return
+     */
+    public static DateTime toDateTime(String iso8601DateTime, DateTimeZone dateTimeZone) {
+
+	DateTimeFormatter parser = ISODateTimeFormat.dateTimeParser().withChronology(ISOChronology.getInstance(dateTimeZone));
+
+	DateTime parsed = parser.parseDateTime(iso8601DateTime);
+
+	return parsed.toDateTime(dateTimeZone);
+    }
+
+    /**
+     * @param date
+     * @param dateTimeZone
+     * @return
+     */
+    public static DateTime toDateTime(Date date, DateTimeZone dateTimeZone) {
+
+	String iso8601DateTime = getISO8601DateTime(date);
+
+	return toDateTime(iso8601DateTime, dateTimeZone);
+    }
+
     public static void main(String[] args) throws Exception {
-	Optional<Date> res = ISO8601DateTimeUtils.parseNotStandardToDate("20110309");
-	Date date = res.get();
-	System.out.println(date);
-	Duration duration = getDuration("P1M");
-//	duration = duration.negate();
-	Date result = subtractDuration(date, duration);
-	System.out.println(result);
-	
+
+	TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+
+	System.out.println(toDateTime(new Date(), DateTimeZone.forID("Europe/Berlin")));
+
     }
 
 }

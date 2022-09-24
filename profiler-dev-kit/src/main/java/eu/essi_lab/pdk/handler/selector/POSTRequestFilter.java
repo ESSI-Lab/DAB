@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.handler.selector;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,6 +26,13 @@ import java.util.Optional;
 import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.GSException;
+
+/**
+ * Simple implementation which accepts any kind of POST requests also according to the request path.<br>
+ * Subclasses can override the {@link #accept(ClonableInputStream)} method by inspecting the request content
+ * 
+ * @author Fabrizio
+ */
 public class POSTRequestFilter extends PathRequestFilter {
 
     /**
@@ -34,14 +41,6 @@ public class POSTRequestFilter extends PathRequestFilter {
     public POSTRequestFilter(String path) {
 
 	super(path);
-    }
-
-    /**
-     * @param path
-     */
-    public POSTRequestFilter(String path, boolean view) {
-
-	super(path, view);
     }
 
     /**

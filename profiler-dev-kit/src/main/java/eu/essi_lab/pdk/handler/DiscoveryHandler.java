@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.handler;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -32,6 +32,14 @@ import eu.essi_lab.pdk.rsf.MessageResponseFormatter;
 import eu.essi_lab.pdk.rsm.MessageResponseMapper;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
 import eu.essi_lab.request.executor.IRequestExecutor;
+
+/**
+ * Overrides the superclass in order to provide an implementation specific for discovery requests
+ * 
+ * @param <T> the type of the {@link MessageResponse} to map and format (see {@link MessageResponseMapper} and
+ *        {@link MessageResponseFormatter})
+ * @author Fabrizio
+ */
 public class DiscoveryHandler<T> extends ProfilerHandler<DiscoveryMessage, GSResource, T, CountSet, ResultSet<GSResource>, ResultSet<T>> {
 
     public DiscoveryHandler() {

@@ -4,7 +4,7 @@ package eu.essi_lab.workflow.processor.grid;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,13 +25,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.AbstractMap.SimpleEntry;
-
-import org.apache.commons.io.IOUtils;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
+
+import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.model.resource.data.DataFormat;
@@ -48,6 +48,16 @@ import ucar.nc2.Variable;
 import ucar.nc2.dataset.NetcdfDataset;
 
 public class GDALNetCDFPostConversionUtils {
+
+    private static final String GDAL_NETCDF_POST_CONVERSION_ERROR = "GDAL_NETCDF_POST_CONVERSION_ERROR";
+
+    /**
+     * Copy variable attributes (because GDAL eliminates them)
+     * 
+     * @param input
+     * @return
+     * @throws GSException
+     */
     public static DataObject copyAttributes(DataObject source, DataObject input) throws GSException {
 	try {
 
@@ -152,8 +162,15 @@ public class GDALNetCDFPostConversionUtils {
 	    return output;
 
 	} catch (Exception e) {
+	    
 	    e.printStackTrace();
-	    throw new GSException();
+
+	    throw GSException.createException(//
+		    GDALNetCDFPostConversionUtils.class, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    GDAL_NETCDF_POST_CONVERSION_ERROR,//
+		    e);
 	}
     }
 
@@ -182,53 +199,54 @@ public class GDALNetCDFPostConversionUtils {
 		bandNames.add(band.getFullName());
 	    }
 	    HashMap<String, SimpleEntry<Number, Number>> bandToMinMax = new HashMap<>();
-	    if (globalMin != null && Double.isFinite(globalMin.doubleValue()) && globalMax != null && Double.isFinite(globalMax.doubleValue())) {
+	    if (globalMin != null && Double.isFinite(globalMin.doubleValue()) && globalMax != null
+		    && Double.isFinite(globalMax.doubleValue())) {
 		for (String bandName : bandNames) {
 		    bandToMinMax.put(bandName, new SimpleEntry<Number, Number>(globalMin, globalMax));
 		}
 	    } else {
-//		for (Variable band : bands) {
-//		    Number min = null;
-//		    Number max = null;
-//
-//		    Array array = band.read();
-//		    switch (array.getDataType()) {
-//		    default:
-//		    case DOUBLE:
-//			Double minDouble = null;
-//			Double maxDouble = null;
-//			for (int j = 0; j < array.getSize(); j++) {
-//			    double d = array.getDouble(j);
-//			    if (minDouble == null || d < minDouble) {
-//				minDouble = d;
-//			    }
-//			    if (maxDouble == null || d > maxDouble) {
-//				maxDouble = d;
-//			    }
-//			}
-//			min = minDouble;
-//			max = maxDouble;
-//			break;
-//		    case SHORT:
-//			Short minInteger = null;
-//			Short maxInteger = null;
-//			for (int j = 0; j < array.getSize(); j++) {
-//			    short s = array.getShort(j);
-//			    if (minInteger == null || s < minInteger) {
-//				minInteger = s;
-//			    }
-//			    if (maxInteger == null || s > maxInteger) {
-//				maxInteger = s;
-//			    }
-//			}
-//			min = minInteger;
-//			max = maxInteger;
-//			break;
-//		    }
-//		    if (min != null && max != null) {
-//			bandToMinMax.put(band.getShortName(), new SimpleEntry<Number, Number>(min, max));
-//		    }
-//		}
+		// for (Variable band : bands) {
+		// Number min = null;
+		// Number max = null;
+		//
+		// Array array = band.read();
+		// switch (array.getDataType()) {
+		// default:
+		// case DOUBLE:
+		// Double minDouble = null;
+		// Double maxDouble = null;
+		// for (int j = 0; j < array.getSize(); j++) {
+		// double d = array.getDouble(j);
+		// if (minDouble == null || d < minDouble) {
+		// minDouble = d;
+		// }
+		// if (maxDouble == null || d > maxDouble) {
+		// maxDouble = d;
+		// }
+		// }
+		// min = minDouble;
+		// max = maxDouble;
+		// break;
+		// case SHORT:
+		// Short minInteger = null;
+		// Short maxInteger = null;
+		// for (int j = 0; j < array.getSize(); j++) {
+		// short s = array.getShort(j);
+		// if (minInteger == null || s < minInteger) {
+		// minInteger = s;
+		// }
+		// if (maxInteger == null || s > maxInteger) {
+		// maxInteger = s;
+		// }
+		// }
+		// min = minInteger;
+		// max = maxInteger;
+		// break;
+		// }
+		// if (min != null && max != null) {
+		// bandToMinMax.put(band.getShortName(), new SimpleEntry<Number, Number>(min, max));
+		// }
+		// }
 	    }
 
 	    File tmpFile = File.createTempFile("GDAL_To_NetCDF_Processor", ".nc");
@@ -292,8 +310,15 @@ public class GDALNetCDFPostConversionUtils {
 	    return output;
 
 	} catch (Exception e) {
+	    
 	    e.printStackTrace();
-	    throw new GSException();
+	    
+	    throw GSException.createException(//
+		    GDALNetCDFPostConversionUtils.class, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    GDAL_NETCDF_POST_CONVERSION_ERROR,//
+		    e);
 	}
     }
 
@@ -393,7 +418,7 @@ public class GDALNetCDFPostConversionUtils {
 		ret.setDataDescriptor(output.getDataDescriptor());
 		ret.setFile(tmpFile);
 		reader.close();
-		outputFile.delete();		
+		outputFile.delete();
 		return ret;
 
 	    } else {
@@ -401,7 +426,7 @@ public class GDALNetCDFPostConversionUtils {
 		FileOutputStream fos = new FileOutputStream(tmpFile);
 		IOUtils.copy(fis, fos);
 		output.setFile(tmpFile);
-		reader.close();		
+		reader.close();
 		fis.close();
 		fos.close();
 		outputFile.delete();
@@ -409,8 +434,15 @@ public class GDALNetCDFPostConversionUtils {
 	    }
 
 	} catch (Exception e) {
+	    
 	    e.printStackTrace();
-	    throw new GSException();
+	    
+	    throw GSException.createException(//
+		    GDALNetCDFPostConversionUtils.class, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    GDAL_NETCDF_POST_CONVERSION_ERROR,//
+		    e);
 	}
     }
 

@@ -4,7 +4,7 @@ package eu.essi_lab.messages;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -34,12 +33,32 @@ import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.GSProperty;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.RuntimeInfoElement;
-import eu.essi_lab.model.SharedRepositoryInfo;
 import eu.essi_lab.model.StorageUri;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.rip.RuntimeInfoProvider;
+
+/**
+ * @author Fabrizio
+ */
 public abstract class RequestMessage extends GSMessage implements RuntimeInfoProvider {
+
+    /**
+     * @author Fabrizio
+     */
+    public enum IterationMode {
+
+	/**
+	 * Returns <i>all the available items</i> according to the message properties, and the page size of every
+	 * request during the iteration process is set according {@link #getPage()}.getSize()
+	 */
+	FULL_RESPONSE,
+	/**
+	 * Returns a maximum of {@link #getPage()}.getSize() records, and the page size of every
+	 * request during the iteration process is fixed to <i>10</i>
+	 */
+	PARTIAL_RESPONSE
+    }
 
     /**
      * 
@@ -51,7 +70,6 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
     private static final String DATABASE_URL = "databaseURL";
     private static final String USER_JOB_STORAGE_URI = "user_job_storage_uri";
     private static final String USER_JOB_RESULT_ID = "user_job_result_id";
-    private static final String SHARED_REPO_INFO = "shared_repository_info";
     private static final String CURRENT_USER = "user";
     private static final String VIEW = "view";
     private static final String SOURCES = "sources";
@@ -68,6 +86,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
     public HashMap<String, List<String>> provideInfo() {
 	HashMap<String, List<String>> ret = new HashMap<>();
 	ret.put(RuntimeInfoElement.MESSAGE_TYPE.getName(), Arrays.asList(getClass().getSimpleName()));
+
 	return ret;
     }
 
@@ -76,7 +95,7 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
      */
     public RequestMessage() {
 
-	setException(new GSException());
+	setException(GSException.createException());
 	setSources(new ArrayList<GSSource>());
 	setOutputSources(false);
 
@@ -153,16 +172,6 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
     public void setDataBaseURI(StorageUri url) {
 
 	getHeader().add(new GSProperty<StorageUri>(DATABASE_URL, url));
-    }
-
-    public SharedRepositoryInfo getSharedRepositoryInfo() {
-
-	return getHeader().get(SHARED_REPO_INFO, SharedRepositoryInfo.class);
-    }
-
-    public void setSharedRepositoryInfo(SharedRepositoryInfo info) {
-
-	getHeader().add(new GSProperty<SharedRepositoryInfo>(SHARED_REPO_INFO, info));
     }
 
     public WebRequest getWebRequest() {
@@ -314,17 +323,16 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
     /**
      * @return
      */
-    public boolean isIteratedWorkflow() {
+    public Optional<IterationMode> getIteratedWorkflow() {
 
-	Boolean out = getHeader().get(ITERATED_WORKFLOW, Boolean.class);
-	return Objects.isNull(out) ? false : out;
+	return Optional.ofNullable(getHeader().get(ITERATED_WORKFLOW, IterationMode.class));
     }
 
     /**
-     * 
+     * @param iterationMode
      */
-    public void setIteratedWorkflow() {
+    public void setIteratedWorkflow(IterationMode iterationMode) {
 
-	getHeader().add(new GSProperty<Boolean>(ITERATED_WORKFLOW, true));
+	getHeader().add(new GSProperty<IterationMode>(ITERATED_WORKFLOW, iterationMode));
     }
 }

@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.wrt;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,23 +25,30 @@ import java.util.Optional;
 
 import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.factory.DatabaseConsumerFactory;
-import eu.essi_lab.configuration.ConfigurationUtils;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.DownloadSetting;
+import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.RequestMessage;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.SharedRepositoryInfo;
 import eu.essi_lab.model.StorageUri;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.Pluggable;
 import eu.essi_lab.pdk.Profiler;
-import eu.essi_lab.pdk.ProfilerInfo;
 import eu.essi_lab.pdk.validation.WebRequestValidator;
 import eu.essi_lab.views.DefaultViewManager;
+
+/**
+ * Validates and transforms a {@link WebRequest} in the correspondent {@link RequestMessage}
+ *
+ * @param <M> the type of the {@link RequestMessage} to provide as result of the transformation
+ * @author Fabrizio
+ */
 public abstract class WebRequestTransformer<M extends RequestMessage> implements WebRequestValidator, Pluggable {
 
     protected static final String DB_STORAGE_URI_NOT_FOUND = "DB_STORAGE_URI_NOT_FOUND";
@@ -67,7 +74,7 @@ public abstract class WebRequestTransformer<M extends RequestMessage> implements
     public M transform(WebRequest request) throws GSException {
 
 	M message = createMessage();
-	
+
 	message.setRequestId(request.getRequestId());
 
 	message.setWebRequest(request);
@@ -76,11 +83,8 @@ public abstract class WebRequestTransformer<M extends RequestMessage> implements
 
 	message.setCurrentUser(request.getCurrentUser());
 
-	StorageUri userJobStorageURI = ConfigurationUtils.getUserJobStorageURI();
-
-	if (userJobStorageURI != null) {
-	    message.setUserJobStorageURI(userJobStorageURI);
-	}
+	DownloadSetting downloadSetting = ConfigurationWrapper.getDownloadSetting();
+	message.setUserJobStorageURI(downloadSetting.getStorageUri());
 
 	StorageUri storageUri = getStorageURI(message);
 
@@ -91,14 +95,11 @@ public abstract class WebRequestTransformer<M extends RequestMessage> implements
 	    setView(viewId.get(), storageUri, message);
 	}
 
-	SharedRepositoryInfo sharedRepoInfo = ConfigurationUtils.getSharedRepositoryInfo();
-	message.setSharedRepositoryInfo(sharedRepoInfo);
-
 	return refineMessage(message);
     }
 
     protected StorageUri getStorageURI(M message) throws GSException {
-	StorageUri storageUri = ConfigurationUtils.getStorageURI();
+	StorageUri storageUri = ConfigurationWrapper.getDatabaseURI();
 	if (storageUri != null) {
 
 	    message.setDataBaseURI(storageUri);
@@ -112,7 +113,7 @@ public abstract class WebRequestTransformer<M extends RequestMessage> implements
 		    ErrorInfo.SEVERITY_WARNING, //
 		    DB_STORAGE_URI_NOT_FOUND);
 
-	    message.getException().addInfo(exception.getErrorInfoList().get(0));
+	    message.getException().getErrorInfoList().add(exception.getErrorInfoList().get(0));
 
 	    GSLoggerFactory.getLogger(this.getClass()).warn("Data Base storage URI not found");
 	}
@@ -123,7 +124,7 @@ public abstract class WebRequestTransformer<M extends RequestMessage> implements
      * A string which identifies the type of profiler suitable for this transformer
      *
      * @return a non <code>null</code> string which identifies the type of profiler suitable for this transformer
-     * @see ProfilerInfo#getServiceType()
+     * @see ProfilerSetting#getServiceType()
      */
     public abstract String getProfilerType();
 
@@ -182,13 +183,13 @@ public abstract class WebRequestTransformer<M extends RequestMessage> implements
      * @param databaseURI
      * @param viewIdentifier
      * @return
-     * @throws GSException 
+     * @throws GSException
      */
     public static Optional<View> findView(StorageUri databaseURI, String viewIdentifier) throws GSException {
 
 	try {
 
-	    DatabaseReader reader = new DatabaseConsumerFactory().createDataBaseReader(databaseURI);
+	    DatabaseReader reader = DatabaseConsumerFactory.createDataBaseReader(databaseURI);
 
 	    DefaultViewManager manager = new DefaultViewManager();
 	    manager.setDatabaseReader(reader);
@@ -198,7 +199,7 @@ public abstract class WebRequestTransformer<M extends RequestMessage> implements
 	} catch (GSException ex) {
 
 	    GSLoggerFactory.getLogger(WebRequestTransformer.class).error(ex.getMessage(), ex);
-	    
+
 	    throw GSException.createException(//
 		    WebRequestTransformer.class, //
 		    ex.getMessage(), //

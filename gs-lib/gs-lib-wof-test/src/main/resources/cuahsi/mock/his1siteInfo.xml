@@ -1,0 +1,187 @@
+<sitesResponse
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://www.cuahsi.org/waterML/1.1/"><queryInfo>
+		<creationTime>2021-02-04T12:31:47+00:00</creationTime>
+		<criteria MethodCalled="GetSiteInfo">
+			<parameter name="site" value="hsl-tos:TOS01000025" />
+		</criteria></queryInfo><site>
+		<siteInfo>
+			<siteName>Vara</siteName>
+			<siteCode network="hsl-tos" siteID="1">TOS01000025</siteCode>
+			<geoLocation>
+				<geogLocation xsi:type="LatLonPointType">
+					<latitude>44.084009</latitude>
+					<longitude>10.128944</longitude>
+				</geogLocation>
+			</geoLocation>
+			<siteProperty name="County">Toscana</siteProperty>
+		</siteInfo>
+		<seriesCatalog>
+			<series>
+				<variable>
+					<variableCode vocabulary="hsl-tos" default="true"
+						variableID="2">Precipitation</variableCode>
+					<variableName>Precipitation</variableName>
+					<valueType>Field Observation</valueType>
+					<dataType>Cumulative</dataType>
+					<generalCategory>Hydrology</generalCategory>
+					<sampleMedium>Precipitation</sampleMedium>
+					<unit>
+						<unitName>millimeter</unitName>
+						<unitType>Length</unitType>
+						<unitAbbreviation>mm</unitAbbreviation>
+						<unitCode>54</unitCode>
+					</unit>
+					<noDataValue>-9999</noDataValue>
+					<timeScale isRegular="false">
+						<unit>
+							<unitName>day</unitName>
+							<unitType>Time</unitType>
+							<unitAbbreviation>d</unitAbbreviation>
+							<unitCode>104</unitCode>
+						</unit>
+						<timeSupport>1</timeSupport>
+					</timeScale>
+					<speciation>Not Applicable</speciation>
+				</variable>
+				<valueCount>1043</valueCount>
+				<variableTimeInterval
+					xsi:type="TimeIntervalType">
+					<beginDateTime>2003-10-19T09:00:00</beginDateTime>
+					<endDateTime>2015-03-27T09:00:00</endDateTime>
+					<beginDateTimeUTC>2003-10-19T08:00:00</beginDateTimeUTC>
+					<endDateTimeUTC>2015-03-27T08:00:00</endDateTimeUTC>
+				</variableTimeInterval>
+				<method methodID="0">
+					<methodCode>0</methodCode>
+					<methodDescription>No method specified</methodDescription>
+					<methodLink></methodLink>
+				</method>
+				<source sourceID="1">
+					<organization>Toscana</organization>
+					<sourceDescription>Toscana</sourceDescription>
+					<citation>Toscana</citation>
+				</source>
+				<qualityControlLevel qualityControlLevelID="1">
+					<qualityControlLevelCode>1</qualityControlLevelCode>
+					<definition>Quality controlled data</definition>
+				</qualityControlLevel>
+			</series>
+			<series>
+				<variable>
+					<variableCode vocabulary="hsl-tos" default="true"
+						variableID="3">Tmax</variableCode>
+					<variableName>Temperature</variableName>
+					<valueType>Field Observation</valueType>
+					<dataType>Maximum</dataType>
+					<generalCategory>Hydrology</generalCategory>
+					<sampleMedium>Air</sampleMedium>
+					<unit>
+						<unitName>millimeter</unitName>
+						<unitType>Length</unitType>
+						<unitAbbreviation>mm</unitAbbreviation>
+						<unitCode>54</unitCode>
+					</unit>
+					<noDataValue>-9999</noDataValue>
+					<timeScale isRegular="false">
+						<unit>
+							<unitName>day</unitName>
+							<unitType>Time</unitType>
+							<unitAbbreviation>d</unitAbbreviation>
+							<unitCode>104</unitCode>
+						</unit>
+						<timeSupport>1</timeSupport>
+					</timeScale>
+					<speciation>Not Applicable</speciation>
+				</variable>
+				<valueCount>3736</valueCount>
+				<variableTimeInterval
+					xsi:type="TimeIntervalType">
+					<beginDateTime>2005-01-01T09:00:00</beginDateTime>
+					<endDateTime>2015-03-30T09:00:00</endDateTime>
+					<beginDateTimeUTC>2005-01-01T08:00:00</beginDateTimeUTC>
+					<endDateTimeUTC>2015-03-30T08:00:00</endDateTimeUTC>
+				</variableTimeInterval>
+				<method methodID="0">
+					<methodCode>0</methodCode>
+					<methodDescription>No
+						method
+						specified
+					</methodDescription>
+					<methodLink></methodLink>
+				</method>
+				<source sourceID="1">
+					<organization>Toscana</organization>
+					<sourceDescription>Toscana</sourceDescription>
+					<citation>Toscana</citation>
+				</source>
+				<qualityControlLevel qualityControlLevelID="1">
+					<qualityControlLevelCode>1</qualityControlLevelCode>
+					<definition>Quality
+						controlled
+						data
+					</definition>
+				</qualityControlLevel>
+			</series>
+			<series>
+				<variable>
+					<variableCode vocabulary="hsl-tos" default="true"
+						variableID="4">Tmin</variableCode>
+					<variableName>Temperature</variableName>
+					<valueType>Field
+						Observation
+					</valueType>
+					<dataType>Minimum</dataType>
+					<generalCategory>Hydrology</generalCategory>
+					<sampleMedium>Air</sampleMedium>
+					<unit>
+						<unitName>millimeter</unitName>
+						<unitType>Length</unitType>
+						<unitAbbreviation>mm</unitAbbreviation>
+						<unitCode>54</unitCode>
+					</unit>
+					<noDataValue>-9999</noDataValue>
+					<timeScale isRegular="false">
+						<unit>
+							<unitName>day</unitName>
+							<unitType>Time</unitType>
+							<unitAbbreviation>d</unitAbbreviation>
+							<unitCode>104</unitCode>
+						</unit>
+						<timeSupport>1</timeSupport>
+					</timeScale>
+					<speciation>Not
+						Applicable
+					</speciation>
+				</variable>
+				<valueCount>3734</valueCount>
+				<variableTimeInterval
+					xsi:type="TimeIntervalType">
+					<beginDateTime>2005-01-01T09:00:00</beginDateTime>
+					<endDateTime>2015-03-30T09:00:00</endDateTime>
+					<beginDateTimeUTC>2005-01-01T08:00:00</beginDateTimeUTC>
+					<endDateTimeUTC>2015-03-30T08:00:00</endDateTimeUTC>
+				</variableTimeInterval>
+				<method methodID="0">
+					<methodCode>0</methodCode>
+					<methodDescription>No
+						method
+						specified
+					</methodDescription>
+					<methodLink></methodLink>
+				</method>
+				<source sourceID="1">
+					<organization>Toscana</organization>
+					<sourceDescription>Toscana</sourceDescription>
+					<citation>Toscana</citation>
+				</source>
+				<qualityControlLevel qualityControlLevelID="1">
+					<qualityControlLevelCode>1</qualityControlLevelCode>
+					<definition>Quality
+						controlled
+						data
+					</definition>
+				</qualityControlLevel>
+			</series>
+		</seriesCatalog></site>
+</sitesResponse>

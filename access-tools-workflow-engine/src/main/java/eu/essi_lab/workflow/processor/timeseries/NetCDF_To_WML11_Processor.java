@@ -4,7 +4,7 @@ package eu.essi_lab.workflow.processor.timeseries;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -78,6 +78,7 @@ public class NetCDF_To_WML11_Processor extends DataProcessor {
     public static final String FLAG_DESCRIPTIONS = "flag_descriptions";
     public static final String FLAG_LONG_DESCRIPTIONS = "flag_long_descriptions";
     public static final String FLAG_LINKS = "flag_links";
+    private static final String NETCDF_TO_WML_11_ERROR = "NETCDF_TO_WML_11_ERROR";
 
     @Override
     public DataObject process(DataObject dataObject, TargetHandler handler) throws Exception {
@@ -125,6 +126,10 @@ public class NetCDF_To_WML11_Processor extends DataProcessor {
 	if (variableLongName == null) {
 	    variableLongName = mainVariable.getShortName();
 	}
+
+	/*
+	 * METADATA
+	 */
 
 	// PROCEDURE
 
@@ -224,6 +229,25 @@ public class NetCDF_To_WML11_Processor extends DataProcessor {
 		}
 	    }
 	}
+	if (missingValue == null) {
+	    missingValueAttribute = mainVariable.findAttributeIgnoreCase("_FillValue");
+	    if (missingValueAttribute != null) {
+		int length = missingValueAttribute.getLength();
+		if (length > 0) {
+		    Object value = missingValueAttribute.getValue(0);
+		    if (value instanceof Number) {
+			Number number = (Number) value;
+			double d = number.doubleValue();
+			if (Double.isFinite(d)) {
+			    missingValue = d;
+			}
+		    }
+		}
+	    }
+	}
+	if (missingValue==null) {
+	    missingValue = -9999.;
+	}
 	variableInfo.setNoDataValue(missingValue);
 
 	while (pfc.hasNext()) {
@@ -240,7 +264,7 @@ public class NetCDF_To_WML11_Processor extends DataProcessor {
 	    Date date = pf.getObservationTimeAsDate();
 
 	    Double valueDouble = featureData.getScalarDouble(mainVariable.getShortName());
-	    if (valueDouble==null || !Double.isFinite(valueDouble)) {
+	    if (valueDouble == null || !Double.isFinite(valueDouble)) {
 		valueDouble = missingValue;
 	    }
 
@@ -252,7 +276,7 @@ public class NetCDF_To_WML11_Processor extends DataProcessor {
 	    XMLGregorianCalendar date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
 
 	    value.setDateTimeUTC(date2);
-	    if (valueDouble !=null && Double.isFinite(valueDouble)) {
+	    if (valueDouble != null && Double.isFinite(valueDouble)) {
 		value.setValue(new BigDecimal(valueDouble));
 	    }
 	    values.getValue().add(value);
@@ -299,11 +323,13 @@ public class NetCDF_To_WML11_Processor extends DataProcessor {
     }
 
     private GSException getGSException(String message) {
-	GSException ret = new GSException();
-	ErrorInfo info = new ErrorInfo();
-	info.setErrorDescription(message);
-	ret.addInfo(info);
-	return ret;
+	 
+	return GSException.createException(//
+		getClass(),//
+		message,//
+		ErrorInfo.ERRORTYPE_INTERNAL,//
+		ErrorInfo.SEVERITY_ERROR,//
+		NETCDF_TO_WML_11_ERROR);
 
     }
 }

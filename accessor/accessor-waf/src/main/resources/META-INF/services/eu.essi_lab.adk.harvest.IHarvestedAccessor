@@ -1,0 +1,6 @@
+eu.essi_lab.accessor.waf.dirlisting.DirectoryListingAccessor
+eu.essi_lab.accessor.waf.ecovlab.ECOPotentialVlabAccessor
+eu.essi_lab.accessor.waf.httpgetiso.HTTPGetISOAccessor
+eu.essi_lab.accessor.waf.s3bucket.S3BucketAccessor
+eu.essi_lab.accessor.waf.onamet.ONAMETAccessor
+eu.essi_lab.accessor.waf.onamet_stations.ONAMETStationsAccessor

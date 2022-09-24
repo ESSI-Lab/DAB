@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<timeSeries xmlns="http://www.cuahsi.org/waterML/1.1/"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <sourceInfo xsi:type="SiteInfoType">
+         <siteName>Vara</siteName>
+         <siteCode network="hsl-tos" siteID="1">TOS01000025</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>44.084009</latitude>
+               <longitude>10.128944</longitude>
+            </geogLocation>
+         </geoLocation>
+         <siteProperty name="County">Toscana</siteProperty>
+      </sourceInfo>
+      <variable>
+         <variableCode default="true" variableID="2" vocabulary="hsl-tos">Precipitation</variableCode>
+         <variableName>Precipitation</variableName>
+         <valueType>Field Observation</valueType>
+         <dataType>Cumulative</dataType>
+         <generalCategory>Hydrology</generalCategory>
+         <sampleMedium>Precipitation</sampleMedium>
+         <unit>
+            <unitName>millimeter</unitName>
+            <unitType>Length</unitType>
+            <unitAbbreviation>mm</unitAbbreviation>
+            <unitCode>54</unitCode>
+         </unit>
+         <noDataValue>-9999</noDataValue>
+         <timeScale isRegular="false">
+            <unit>
+               <unitName>day</unitName>
+               <unitType>Time</unitType>
+               <unitAbbreviation>d</unitAbbreviation>
+               <unitCode>104</unitCode>
+            </unit>
+            <timeSupport>1</timeSupport>
+         </timeScale>
+         <speciation>Not Applicable</speciation>
+      </variable>
+      <values>
+         <value censorCode="nc"
+             dateTime="2003-10-19T09:00:00"
+             dateTimeUTC="2003-10-19T08:00:00"
+             methodCode="0"
+             qualityControlLevelCode="1"
+             sourceCode="1"
+             timeOffset="1">7</value>
+         <value censorCode="nc"
+             dateTime="2003-10-20T09:00:00"
+             dateTimeUTC="2003-10-20T08:00:00"
+             methodCode="0"
+             qualityControlLevelCode="1"
+             sourceCode="1"
+             timeOffset="1">28</value>
+         <value censorCode="nc"
+             dateTime="2003-10-21T09:00:00"
+             dateTimeUTC="2003-10-21T08:00:00"
+             methodCode="0"
+             qualityControlLevelCode="1"
+             sourceCode="1"
+             timeOffset="1">23.4</value>
+         <qualityControlLevel qualityControlLevelID="1">
+            <qualityControlLevelCode>1</qualityControlLevelCode>
+            <definition>Quality controlled data</definition>
+            <explanation>Quality controlled data that have passed quality assurance procedures such as routine estimation of timing and sensor calibration or visual inspection and removal of obvious errors. An example is USGS published streamflow records following parsing through USGS quality control procedures.</explanation>
+         </qualityControlLevel>
+         <method methodID="0">
+            <methodCode>0</methodCode>
+            <methodDescription>No method specified</methodDescription>
+            <methodLink/>
+         </method>
+         <source sourceID="1">
+            <sourceCode>1</sourceCode>
+            <organization>Toscana</organization>
+            <sourceDescription>Toscana</sourceDescription>
+            <contactInformation>
+               <contactName>Toscana</contactName>
+               <typeOfContact>main</typeOfContact>
+               <email>Toscana@Toscana.it</email>
+               <phone>333</phone>
+               <address xsi:type="xsd:string">Toscana, Toscana, Toscana, 333</address>
+            </contactInformation>
+            <sourceLink/>
+            <citation>Toscana</citation>
+         </source>
+         <censorCode>
+            <censorCode>nc</censorCode>
+            <censorCodeDescription>not censored</censorCodeDescription>
+         </censorCode>
+      </values>
+   </timeSeries>

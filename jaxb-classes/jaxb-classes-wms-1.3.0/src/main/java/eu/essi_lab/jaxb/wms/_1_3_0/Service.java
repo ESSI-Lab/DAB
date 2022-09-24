@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.wms._1_3_0;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -37,6 +37,42 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
+
+/**
+ * <p>Java class for anonymous complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="Name"&gt;
+ *           &lt;simpleType&gt;
+ *             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
+ *               &lt;enumeration value="WMS"/&gt;
+ *             &lt;/restriction&gt;
+ *           &lt;/simpleType&gt;
+ *         &lt;/element&gt;
+ *         &lt;element ref="{http://www.opengis.net/wms}Title"/&gt;
+ *         &lt;element ref="{http://www.opengis.net/wms}Abstract" minOccurs="0"/&gt;
+ *         &lt;element ref="{http://www.opengis.net/wms}KeywordList" minOccurs="0"/&gt;
+ *         &lt;element ref="{http://www.opengis.net/wms}OnlineResource"/&gt;
+ *         &lt;element ref="{http://www.opengis.net/wms}ContactInformation" minOccurs="0"/&gt;
+ *         &lt;element ref="{http://www.opengis.net/wms}Fees" minOccurs="0"/&gt;
+ *         &lt;element ref="{http://www.opengis.net/wms}AccessConstraints" minOccurs="0"/&gt;
+ *         &lt;element ref="{http://www.opengis.net/wms}LayerLimit" minOccurs="0"/&gt;
+ *         &lt;element ref="{http://www.opengis.net/wms}MaxWidth" minOccurs="0"/&gt;
+ *         &lt;element ref="{http://www.opengis.net/wms}MaxHeight" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
     "name",

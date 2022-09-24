@@ -4,7 +4,7 @@ package eu.essi_lab.model.resource;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,15 +22,44 @@ package eu.essi_lab.model.resource;
  */
 
 public enum InterpolationType {
-    CONTINUOUS, DISCONTINUOUS, // these are from wml 2.0
-    INSTANT_TOTAL, // e.g. tipping bucket
-    AVERAGE, MAX, MIN, TOTAL, //
-    AVERAGE_PREC, MAX_PREC, MIN_PREC, TOTAL_PREC, //
-    AVERAGE_SUCC, MAX_SUCC, MIN_SUCC, TOTAL_SUCC, //
-    CONST, CONST_PREC, CONST_SUCC, // e.g. alarms
-    STATISTICAL, //
-    INCREMENTAL, // this is from wml 1.1
-    CATEGORICAL; // this is from wml 1.1
+
+    CONTINUOUS("http://www.opengis.net/def/waterml/2.0/interpolationType/Continuous", "Continuous/Instantaneous"), //
+    DISCONTINUOUS("http://www.opengis.net/def/waterml/2.0/interpolationType/Discontinuous","Discontinuous"), // these are from
+											     // wml 2.0
+    INSTANT_TOTAL("http://www.opengis.net/def/waterml/2.0/interpolationType/InstantTotal","Instantaneous total"), // , // e.g. tipping bucket
+    AVERAGE(null,"Average"), //
+    MAX(null,"Maximum"), //
+    MIN(null,"Minimum"),//
+    TOTAL(null,"Total"), //
+    AVERAGE_PREC("http://www.opengis.net/def/waterml/2.0/interpolationType/AveragePrec","Average in preceding interval"), //
+    MAX_PREC("http://www.opengis.net/def/waterml/2.0/interpolationType/MaxPrec","Maximum in preceding interval"), //
+    MIN_PREC("http://www.opengis.net/def/waterml/2.0/interpolationType/MinPrec","Minimum in preceding interval"), //
+    TOTAL_PREC("http://www.opengis.net/def/waterml/2.0/interpolationType/TotalPrec","Preceding total"), //
+    AVERAGE_SUCC("http://www.opengis.net/def/waterml/2.0/interpolationType/AverageSucc","Average in succeeding interval"), //
+    MAX_SUCC("http://www.opengis.net/def/waterml/2.0/interpolationType/MaxSucc","Maximum in succeeding interval"), //
+    MIN_SUCC("http://www.opengis.net/def/waterml/2.0/interpolationType/MinSucc","Minimum in succeeding interval"), //
+    TOTAL_SUCC("http://www.opengis.net/def/waterml/2.0/interpolationType/TotalSucc","Succeeding total"), //
+    CONST(null,"Constant"), CONST_PREC("http://www.opengis.net/def/waterml/2.0/interpolationType/ConstPrec","Constant in preceding interval"), //
+    CONST_SUCC("http://www.opengis.net/def/waterml/2.0/interpolationType/ConstSucc","Constant in succeeding interval"), // e.g. alarms
+    STATISTICAL("http://www.opengis.net/def/waterml/2.0/interpolationType/Statistical", "Statistical"), //
+    INCREMENTAL(null, "Incremental"), // this is from wml 1.1
+    CATEGORICAL(null, "Categorical"); // this is from wml 1.1
+
+    private String wml2URI;
+    private String label;
+
+    InterpolationType(String wml2URI, String label) {
+	this.wml2URI = wml2URI;
+	this.label = label;
+    }
+
+    public String getWML2URI() {
+	return wml2URI;
+    }
+
+    public String getLabel() {
+	return label;
+    }
 
     public static InterpolationType decode(String str) {
 	if (str == null) {

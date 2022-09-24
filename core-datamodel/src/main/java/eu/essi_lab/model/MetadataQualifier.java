@@ -4,7 +4,7 @@ package eu.essi_lab.model;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,6 +22,13 @@ package eu.essi_lab.model;
  */
 
 import eu.essi_lab.model.resource.HarmonizedMetadata;
+
+/**
+ * Computes the document quality of a given {@link HarmonizedMetadata}.<br> Implementation to be completed, in particular download quality
+ * is missing
+ *
+ * @author Fabrizio
+ */
 public class MetadataQualifier {
 
     private static final int MAX_QUALITY = getMaxQuality();

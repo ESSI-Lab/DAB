@@ -4,7 +4,7 @@ package eu.essi_lab.model.exceptions;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,32 +21,40 @@ package eu.essi_lab.model.exceptions;
  * #L%
  */
 
-import java.util.HashMap;
-import java.util.Map;
+import org.json.JSONObject;
 
 public class ErrorInfo {
 
-    public static final int SEVERITY_WARNING = 0;
-    public static final int SEVERITY_ERROR = 1;
-    public static final int SEVERITY_FATAL = 2;
+    public static final String SEVERITY_WARNING = "SEVERITY_WARNING";
+    public static final String SEVERITY_ERROR = "SEVERITY_ERROR";
+    public static final String SEVERITY_FATAL = "SEVERITY_FATAL";
 
-    public static final int ERRORTYPE_CLIENT = 0;
-    public static final int ERRORTYPE_INTERNAL = 1;
-    public static final int ERRORTYPE_SERVICE = 2;
+    public static final String ERRORTYPE_CLIENT = "ERRORTYPE_CLIENT";
+    public static final String ERRORTYPE_INTERNAL = "ERRORTYPE_INTERNAL";
+    public static final String ERRORTYPE_SERVICE = "ERRORTYPE_SERVICE";
 
-    private Throwable cause = null;
-    private String errorId = null;
-    private String contextId = null;
+    private String errorType;
+    private String errorSeverity;
 
-    private int errorType = -1;
+    private Throwable cause;
 
-    private int severity = -1;
+    private String errorId;
+    private Class<?> caller;
+    private String userErrorDescription;
+    private String errorDescription;
+    private String errorCorrection;
 
-    private String userErrorDescription = null;
-    private String errorDescription = null;
-    private String errorCorrection = null;
+    /**
+     * 
+     */
+    public ErrorInfo() {
+    }
 
-    private Map<String, Object> parameters = new HashMap<String, Object>();
+    /**
+     * Returns the error cause, if an alien exception is caught and wrapped.
+     * 
+     * @return {@link Throwable}
+     */
     public Throwable getCause() {
 	return cause;
     }
@@ -63,18 +71,24 @@ public class ErrorInfo {
     /**
      * Returns a unique id that identifies this error.
      * The errorId tells what went wrong, like FILE_LOAD_ERROR. The id only has to be unique within the same context,
-     * meaning the combination of {@link #getContextId()} and errorId should be unique throughout your application.
+     * meaning the combination of {@link #getCaller()} and errorId should be unique throughout your application.
      * 
      * @return {@link String}
      */
     public String getErrorId() {
+
+	if (errorId == null || errorId.isEmpty()) {
+
+	    return "No error id available";
+	}
+
 	return errorId;
     }
 
     /**
      * Sets a unique id that identifies this error.
      * The errorId tells what went wrong, like FILE_LOAD_ERROR. The id only has to be unique within the same context,
-     * meaning the combination of {@link #getContextId()} and errorId should be unique throughout your application.
+     * meaning the combination of {@link #getCaller()} and errorId should be unique throughout your application.
      * 
      * @param errorId
      */
@@ -83,25 +97,17 @@ public class ErrorInfo {
     }
 
     /**
-     * Returns a unique id that identifies the context where the error occurred. 
-     * The contextId tells where the error occurred (in what class, component, layer etc.). The contextId and {@link #getErrorId()} combination
-     * used at any specific exception handling point should be unique throughout the application.
-     * 
-     * @return {@link String}
+     * @return
      */
-    public String getContextId() {
-	return contextId;
+    public Class<?> getCaller() {
+	return caller;
     }
 
     /**
-     * Sets a unique id that identifies the context where the error occurred. 
-     * The contextId tells where the error occurred (in what class, component, layer etc.). The contextId and {@link #getErrorId()} combination
-     * used at any specific exception handling point should be unique throughout the application.
-     * 
-     * @param contextId
+     * @param caller
      */
-    public void setContextId(String contextId) {
-	this.contextId = contextId;
+    public void setCaller(Class<?> caller) {
+	this.caller = caller;
     }
 
     /**
@@ -112,7 +118,13 @@ public class ErrorInfo {
      * 
      * @return int
      */
-    public int getErrorType() {
+    public String getErrorType() {
+
+	if (errorType == null || errorType.isEmpty()) {
+
+	    return "No error type available";
+	}
+
 	return errorType;
     }
 
@@ -125,43 +137,55 @@ public class ErrorInfo {
      * 
      * @param errorType
      */
-    public void setErrorType(int errorType) {
+    public void setErrorType(String errorType) {
 	this.errorType = errorType;
     }
 
     /**
-     * Returns the severity of the error. E.g. WARNING, ERROR, FATAL etc.
-     * It is up to you to define the severity levels for your application.
+     * Returns the errorSeverity of the error. E.g. WARNING, ERROR, FATAL etc.
+     * It is up to you to define the errorSeverity levels for your application.
      * 
      * @return int
      */
-    public int getSeverity() {
-	return severity;
+    public String getSeverity() {
+
+	if (errorSeverity == null || errorSeverity.isEmpty()) {
+
+	    return "No error severity available";
+	}
+
+	return errorSeverity;
     }
 
     /**
      * Important: Use static fields of this class as parameter.
-     * Sets the severity of the error. E.g. WARNING, ERROR, FATAL etc.
-     * It is up to you to define the severity levels for your application.
+     * Sets the errorSeverity of the error. E.g. WARNING, ERROR, FATAL etc.
+     * It is up to you to define the errorSeverity levels for your application.
      * 
-     * @param severity
+     * @param errorSeverity
      */
-    public void setSeverity(int severity) {
-	this.severity = severity;
+    public void setSeverity(String severity) {
+	this.errorSeverity = severity;
     }
 
     /**
      * Returns the error description to show to the user.
-     *  
+     * 
      * @return {@link String}
      */
     public String getUserErrorDescription() {
+
+	if (userErrorDescription == null || userErrorDescription.isEmpty()) {
+
+	    return "No user error description available";
+	}
+
 	return userErrorDescription;
     }
 
     /**
      * Sets the error description to show to the user.
-     *  
+     * 
      * @return {@link String}
      */
     public void setUserErrorDescription(String userErrorDescription) {
@@ -175,6 +199,12 @@ public class ErrorInfo {
      * @return {@link String}
      */
     public String getErrorDescription() {
+
+	if (errorDescription == null || errorDescription.isEmpty()) {
+
+	    return "No error description available";
+	}
+
 	return errorDescription;
     }
 
@@ -196,6 +226,12 @@ public class ErrorInfo {
      * @return {@link String}
      */
     public String getErrorCorrection() {
+
+	if (errorCorrection == null || errorCorrection.isEmpty()) {
+
+	    return "No error correction available";
+	}
+
 	return errorCorrection;
     }
 
@@ -210,14 +246,91 @@ public class ErrorInfo {
 	this.errorCorrection = errorCorrection;
     }
 
-    /**
-     * Returns a map of any additional parameters needed to construct a meaningful error description,
-     * either for the users or the application operators and developers.
-     * 
-     * @return {@link Map<String, Object>}
-     */
-    public Map<String, Object> getParameters() {
-	return parameters;
+    @Override
+    public String toString() {
+
+	StringBuilder builder = new StringBuilder();
+
+	if (caller != null) {
+
+	    builder.append("- Caller: " + caller.getName() + "\n");
+	}
+
+	if (errorId != null) {
+
+	    builder.append("- Error id: " + errorId + "\n");
+	}
+
+	if (errorDescription != null && !errorDescription.isEmpty()) {
+
+	    builder.append("- Description: " + errorDescription + "\n");
+	}
+
+	if (userErrorDescription != null && !userErrorDescription.isEmpty()) {
+
+	    builder.append("- User decription: " + userErrorDescription + "\n");
+	}
+
+	if (errorCorrection != null && !errorCorrection.isEmpty()) {
+
+	    builder.append("- Error correction: " + errorCorrection + "\n");
+	}
+
+	if (errorType != null && !errorType.isEmpty()) {
+
+	    builder.append("- Error type: " + errorType + "\n");
+	}
+
+	if (errorSeverity != null && !errorSeverity.isEmpty()) {
+
+	    builder.append("- Error severity: " + errorSeverity + "\n");
+	}
+
+	return builder.toString();
     }
 
+    /**
+     * @return
+     */
+    public JSONObject toJSONObject() {
+
+	JSONObject json = new JSONObject();
+
+	if (caller != null) {
+
+	    json.put("Caller: ", caller.getName());
+	}
+
+	if (errorId != null && !errorId.isEmpty()) {
+
+	    json.put("Error id: ", errorId);
+	}
+
+	if (errorDescription != null && !errorDescription.isEmpty()) {
+
+	    json.put("Error message: ", errorDescription);
+	}
+
+	if (userErrorDescription != null && !userErrorDescription.isEmpty()) {
+
+	    json.put("Error decription: ", userErrorDescription);
+	}
+
+	if (errorCorrection != null && !errorCorrection.isEmpty()) {
+
+	    json.put("User error: ", errorCorrection);
+	}
+
+	if (errorType != null && !errorType.isEmpty()) {
+
+	    json.put("Error type: ", errorType);
+	}
+
+	if (errorSeverity != null && !errorSeverity.isEmpty()) {
+
+	    json.put("Error severity: ", errorSeverity);
+	}
+
+	return json;
+    }
 }

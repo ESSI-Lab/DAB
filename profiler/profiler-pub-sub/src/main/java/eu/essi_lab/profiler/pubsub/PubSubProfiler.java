@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.pubsub;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,22 +24,26 @@ package eu.essi_lab.profiler.pubsub;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.pdk.Profiler;
-import eu.essi_lab.pdk.ProfilerInfo;
 import eu.essi_lab.pdk.handler.selector.GETRequestFilter;
 import eu.essi_lab.pdk.handler.selector.HandlerSelector;
 import eu.essi_lab.profiler.pubsub.handler.SubscribeHandler;
 import eu.essi_lab.profiler.pubsub.handler.SubscriptionsHandler;
 import eu.essi_lab.profiler.pubsub.handler.UnsubscribeHandler;
+
+/**
+ * @author Fabrizio
+ */
 public class PubSubProfiler extends Profiler {
 
     static final String PUB_SUB_PROFILER_TYPE = "PUB-SUB";
 
-    public static final ProfilerInfo PUB_SUB_SERVICE_INFO = new ProfilerInfo();
+    public static final ProfilerSetting PUB_SUB_SERVICE_INFO = new ProfilerSetting();
     static {
 	PUB_SUB_SERVICE_INFO.setServiceName("PubSub");
 	PUB_SUB_SERVICE_INFO.setServiceType(PUB_SUB_PROFILER_TYPE);
@@ -59,7 +63,7 @@ public class PubSubProfiler extends Profiler {
     }
 
     @Override
-    public ProfilerInfo getProfilerInfo() {
+    protected ProfilerSetting initSetting() {
 
 	return PUB_SUB_SERVICE_INFO;
     }

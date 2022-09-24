@@ -4,7 +4,7 @@ package eu.essi_lab.shared.driver.es.connector;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,18 +21,24 @@ package eu.essi_lab.shared.driver.es.connector;
  * #L%
  */
 
-import eu.essi_lab.model.StorageUri;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.shared.model.SharedContentType;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
+
 import org.json.JSONObject;
+
+import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.shared.SharedContent.SharedContentType;
+
+/**
+ * @author ilsanto
+ */
 public interface IESConnector {
 
-    StorageUri getEsStaorageUri();
+    StorageUri getEsStorageUri();
 
-    void setEsStaorageUri(StorageUri esStaorageUri);
+    void setEsStorageUri(StorageUri esStaorageUri);
 
     boolean testConnection();
 
@@ -44,5 +50,5 @@ public interface IESConnector {
 
     Optional<InputStream> get(String identifier, SharedContentType type) throws GSException;
 
-    List<InputStream> query(SharedContentType type, JSONObject query) throws GSException;
+    List<InputStream> query(SharedContentType type, JSONObject query, boolean multiGet) throws GSException;
 }

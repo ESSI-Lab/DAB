@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.rsm;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,10 +23,59 @@ package eu.essi_lab.pdk.rsm;
 
 import javax.ws.rs.core.MediaType;
 
-import eu.essi_lab.jaxb.common.NameSpace;
+import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.model.resource.GSResource;
+
+/**
+ * A POJO which provides information about the schema used by a {@link DiscoveryResultSetMapper} to map
+ * {@link GSResource}s. The schema is
+ * also used by the {@link DiscoveryResultSetMapperFactory} to load one or more mappers which satisfy the given mapping
+ * properties <br>
+ * <li>Metadata elements and their encoding</li><br>
+ * The schema <i>name and version</i> refer to the conceptual model which define the set of metadata elements used to
+ * map a {@link
+ * GSResource}. For example, a schema with name "ISO19115" and version "2003", indicates that the metadata elements
+ * derive from the <i>ISO
+ * Geographic information Standard 19115 version 2003.</i> In order to simplify the choice of a
+ * {@link DiscoveryResultSetMapper} using the
+ * {@link DiscoveryResultSetMapperFactory}, it is recommended to use when possible, well known names like in the
+ * previous example.<br>
+ * <br>
+ * While a schema define an abstract dictionary, the <i>encoding name and version</i> define a way to implement that
+ * dictionary on a
+ * particular <i>media type</i>.<br>
+ * In the example above, a mapper {@link Provider} can choose to implement the ISO 19115 dictionary using
+ * the "ISO 19139:2007" which defines a standard XML encoding for ISO 19115; in this case the encoding name will be
+ * "ISO19139", the version
+ * "2007" and the media type "application/xml".<br>
+ * The same provider (or other providers) can also define an own non standard XML encoding
+ * (with the proper encoding name and version ) which best fits his needs.<br>
+ * In another case, the ISO 19115 metadata elements can be
+ * implemented on a JSON format content with the media type "application/json". The mapping of the ISO 19115 terms to
+ * the JSON objects, can
+ * be provided using different encoding names and/or versions. For example an encoding name "ISO115-JSON" version
+ * "2017-1" could implement
+ * the "fileIdentifier" element with a JSON object having the key "fileid", and another version "2017-2" with a JSON
+ * object having key
+ * "FileID".<br>
+ * <br>
+ * The schema mapping can also provide a human readable {@link #getDescription()} which can helps developers to choose a
+ * proper mapper<br>
+ * <br>
+ * <li>Usage note</li><br>
+ * None of the mapping schema properties are mandatory but more properties are defined, the easier it will identify the
+ * right mapper using
+ * the {@link DiscoveryResultSetMapperFactory}<br>
+ * <br>
+ * See {@link #getName()}, {@link #getVersion()}, {@link #getEncoding()}, {@link #getEncodingVersion()}, {@link
+ * #getEncodingMediaType()}<br>
+ * <br>
+ *
+ * @author Fabrizio
+ * @see DiscoveryMessage#setResourceEncoding(ResourceFormat)
+ */
 public class MappingSchema {
 
     /**

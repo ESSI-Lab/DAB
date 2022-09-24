@@ -11,25 +11,38 @@
     <name>ESSI-Lab Shared Content</name>
 
     <dependencies>
+    
         <dependency>
             <groupId>eu.essi_lab</groupId>
             <artifactId>core-datamodel</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+        
+       <dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>configuration-api</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+    
+    	<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>configuration-api-gs</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+        
         <dependency>
             <groupId>eu.essi_lab</groupId>
             <artifactId>core-messages</artifactId>
             <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
+        
+        <dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-s3</artifactId>
+		</dependency>
+		       
     </dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>license-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
+
 </project>

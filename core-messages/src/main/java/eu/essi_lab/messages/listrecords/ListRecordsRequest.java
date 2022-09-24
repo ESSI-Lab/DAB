@@ -4,7 +4,7 @@ package eu.essi_lab.messages.listrecords;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,8 +22,14 @@ package eu.essi_lab.messages.listrecords;
  */
 
 import java.util.Objects;
+import java.util.Optional;
 
 import eu.essi_lab.messages.HarvestingProperties;
+import eu.essi_lab.messages.JobStatus;
+
+/**
+ * @author ilsanto
+ */
 public class ListRecordsRequest {
 
     private String resumptionToken;
@@ -32,9 +38,24 @@ public class ListRecordsRequest {
     private HarvestingProperties properties;
     private Boolean isRecovering;
     private boolean isFirst;
+    private JobStatus status;
 
+    /**
+     * 
+     */
     public ListRecordsRequest() {
 
+	setFirst(true);
+	setRecovering(false);
+    }
+
+    /**
+     * @param status
+     */
+    public ListRecordsRequest(JobStatus status) {
+
+	this.status = status;
+	
 	setFirst(true);
 	setRecovering(false);
     }
@@ -112,12 +133,17 @@ public class ListRecordsRequest {
     }
 
     public Boolean getRecovering() {
-	
+
 	return isRecovering;
     }
 
     public void setRecovering(Boolean recovering) {
 
 	isRecovering = recovering;
+    }
+
+    public Optional<JobStatus> getStatus() {
+
+	return Optional.ofNullable(status);
     }
 }

@@ -1,0 +1,184 @@
+/*
+==========================================
+CSS for gwis-plot-utils
+==========================================
+*/
+
+/*
+------------------------------------------
+layout
+------------------------------------------
+*/
+
+/* user-defined div containing plot and controls */
+div.gwis {
+    position: relative;
+    border: 1px solid #bbb;
+    background: white;
+    padding: 10px;
+    font-family: Arial, Helvetica, sans-serif;
+    overflow: hidden;
+}
+
+/* loading overlay */
+div.gwis-plot-load {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    background: white;
+    z-index: 999;
+}
+div.gwis-plot-load .gwis-center-me {
+    position: absolute;
+    width: 100px;
+    height:100px;
+    background-image: url("./img/ajax-loader.gif");
+}
+
+/* plot area */
+div.gwis-plot {
+    width: 100% !important;
+    height: calc( 100% - 35px ) !important;
+}
+
+/* fixed height controls under plot */
+div.gwis-controls {
+    position: relative;
+    width: 100%;
+    height: 35px;
+    font-size: 12px;
+    padding-top: 5px;
+}
+
+/* plot error message */
+div.gwis.gwis-error {
+    text-align: center;
+    background: #eaeaea;
+    color: #ccc;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+/*
+------------------------------------------
+dygraph elements
+see: http://dygraphs.com/css.html
+------------------------------------------
+*/
+
+/* title */
+.gwis .dygraph-label.dygraph-title {
+    font-size: 16px !important;
+    font-weight: normal !important;
+}
+
+/* x-y axis labels (name label) */
+.gwis .dygraph-label.dygraph-xlabel,
+.gwis .dygraph-label.dygraph-ylabel,
+.gwis .dygraph-label.dygraph-y2label {
+    font-size: 15px !important;
+}
+
+/* x-y axis labels (tick numbers) */
+.gwis .dygraph-axis-label.dygraph-axis-label-x,
+.gwis .dygraph-axis-label.dygraph-axis-label-y,
+.gwis .dygraph-axis-label.dygraph-axis-label-y.dygraph-axis-label-y2 {
+    font-size: 12px !important;
+}
+
+/* legend */
+.gwis .dygraph-legend {
+    top: 35px !important;
+    left: 65px !important;
+    width: auto !important;
+    border: 1px solid #ddd !important;
+    padding: 5px !important;
+    background-color: rgba(255,255,255,1) !important;
+    font-size: 12px !important;
+    text-align: left !important;
+    -webkit-box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.3) !important;
+       -moz-box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.3) !important;
+            box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.3) !important;
+}
+.gwis .dygraph-legend.gwis-no-title {
+    top: 8px !important;
+}
+
+/*
+------------------------------------------
+plot controls
+------------------------------------------
+*/
+
+div.gwis-controls {
+    font-size: 11px;
+    text-align: left;
+}
+div.gwis-controls * {
+    margin: 0px;
+    padding: 0px;
+}
+
+/* button controls */
+div.gwis-div-button {
+    display: inline-block;
+    width: auto;
+    height: auto;
+    margin: 0px 2px;
+    padding: 8px;
+    border-radius: 3px;
+    color: white;
+    background: #337AB7;
+}
+div.gwis-div-button:hover {
+    background: #286090;
+    cursor: pointer;
+}
+div.gwis-div-button-red {
+    background: #c00;
+}
+div.gwis-div-button-red:hover {
+    background: #f66;
+}
+
+/* checkbox controls */
+label.gwis-checkbox span, label.gwis-checkbox input {
+    vertical-align: middle;
+}
+label.gwis-checkbox input {
+    margin-left: 5px;
+    cursor: pointer;
+}
+label.gwis-checkbox span {
+    margin-right: 5px;
+    cursor: pointer;
+}
+
+/* full screen mode */
+div.gwis:-webkit-full-screen { width:95% !important; height:80% !important; margin: auto !important; }
+   div.gwis:-moz-full-screen { width:95% !important; height:80% !important; margin: auto !important; }
+     div.gwis:-ms-fullscreen { width:95% !important; height:80% !important; margin: auto !important; }
+     div.gwis:-o-full-screen { width:95% !important; height:80% !important; margin: auto !important; }
+        div.gwis:full-screen { width:95% !important; height:80% !important; margin: auto !important; }
+         div.gwis:fullscreen { width:95% !important; height:80% !important; margin: auto !important; }
+div.gwis:-ms-fullscreen::-ms-backdrop { background: white; }
+
+/* no mouse-drag-select on any plot elements except range selector zoom handle */
+.gwis *:not(.dygraph-rangesel-zoomhandle) {
+    -webkit-touch-callout: none;
+      -webkit-user-select: none;
+         -moz-user-select: none;
+       -khtml-user-select: none;
+          -ms-user-select: none;
+              user-select: none;
+        -webkit-user-drag: none;
+                user-drag: none;
+}
+
+/*
+==========================================
+END
+==========================================
+*/

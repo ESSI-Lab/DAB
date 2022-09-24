@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.csw.profile;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,6 +35,10 @@ import eu.essi_lab.jaxb.csw._2_0_2.SchemaComponentType;
 import eu.essi_lab.pdk.rsm.DiscoveryResultSetMapper;
 import eu.essi_lab.pdk.rsm.impl.xml.iso19139.GMD_ResultSetMapper;
 import eu.essi_lab.pdk.rsm.impl.xml.iso19139.GMI_ResultSetMapper;
+
+/**
+ * @author Fabrizio
+ */
 public class StandardCSWISOProfile extends CSWProfile {
 
     @Override

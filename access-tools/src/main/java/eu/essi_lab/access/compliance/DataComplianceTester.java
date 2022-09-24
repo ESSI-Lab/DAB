@@ -4,7 +4,7 @@ package eu.essi_lab.access.compliance;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -52,6 +52,15 @@ import eu.essi_lab.workflow.builder.WorkflowBuilder;
 import ucar.nc2.Attribute;
 import ucar.nc2.Variable;
 import ucar.nc2.dataset.NetcdfDataset;
+
+/**
+ * A tool which executes tests in order to determine if a data described by a {@link DataDescriptor} can be transformed
+ * in a data described
+ * by another {@link DataDescriptor}. The {@link DataDescriptor}s used to execute the tests are provided by the {@link
+ * DataDownloader#getPreviewRemoteDescriptors()} method
+ *
+ * @author Fabrizio
+ */
 public class DataComplianceTester {
 
     private static final String EXECUTION_TEST_ERROR = "EXECUTION_TEST_ERROR";
@@ -64,7 +73,7 @@ public class DataComplianceTester {
         return dataDownloader;
     }
 
-    private transient Logger logger = GSLoggerFactory.getLogger(DataComplianceTester.class);
+    private Logger logger = GSLoggerFactory.getLogger(DataComplianceTester.class);
 
     /**
      * Enumeration of available compliance tests

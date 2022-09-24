@@ -4,7 +4,7 @@ package eu.essi_lab.messages;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,6 +22,16 @@ package eu.essi_lab.messages;
  */
 
 import eu.essi_lab.messages.bond.Bond;
+
+/**
+ * The reduced discovery message is a decorator for a discovery message that delegates all the methods to the original
+ * message and adds the following new payloads:
+ * <ul>
+ * <li>Reduced bond of type {@link Bond}</li>
+ * </ul>
+ * 
+ * @author boldrini
+ */
 public class ReducedDiscoveryMessage extends DiscoveryMessage {
 
     private Bond reducedBond;

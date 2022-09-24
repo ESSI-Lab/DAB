@@ -29,20 +29,26 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.LoggerFactory;
 
 import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.configuration.GIProjectExecutionMode;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+
+/**
+ * This class filters out all incoming requests if {@link eu.essi_lab.configuration.ExecutionMode} is {@link
+ * eu.essi_lab.configuration.ExecutionMode#BATCH}
+ *
+ * @author ilsanto
+ */
 public class ExecutionModeFilter implements Filter {
 
     private ExecutionMode mode;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-	mode = new GIProjectExecutionMode().getMode();
+	mode = GIProjectExecutionMode.getMode();
     }
 
     @Override
@@ -53,8 +59,9 @@ public class ExecutionModeFilter implements Filter {
 
 	if (mode.equals(ExecutionMode.BATCH)) {
 
-	    LoggerFactory.getLogger(ExecutionModeFilter.class).warn("Received incoming request altough I'm running in batch mode");
+	    LoggerFactory.getLogger(ExecutionModeFilter.class).error("Received incoming request altough I'm running in batch mode");
 
+	    return;
 	}
 
 	filterChain.doFilter(servletRequest, response);

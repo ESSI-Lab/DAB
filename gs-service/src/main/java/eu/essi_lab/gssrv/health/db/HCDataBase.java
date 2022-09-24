@@ -22,5 +22,27 @@ package eu.essi_lab.gssrv.health.db;
  */
 
 import eu.essi_lab.api.database.Database;
+import eu.essi_lab.cfga.setting.Setting;
+
+/**
+ * @author Fabrizio
+ */
+@SuppressWarnings("rawtypes")
 public class HCDataBase implements Database {
+
+    @Override
+    public void configure(Setting setting) {
+    }
+
+    @Override
+    public Setting getSetting() {
+
+	return null;
+    }
+
+    @Override
+    public String getType() {
+
+	return null;
+    }
 }

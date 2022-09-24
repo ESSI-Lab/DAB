@@ -4,7 +4,7 @@ package eu.essi_lab.authentication;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -39,6 +39,21 @@ import eu.essi_lab.authentication.util.RFC3986Encoder;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
+
+/**
+ * FacebookAuthenticator is a helper who let you perform login via facebook api
+ * and get back an access token. Following facebook's indication about how to
+ * implement a credential exchange by OAuth2 to obtain an access_token, this
+ * helper consists of two main methods:<br>
+ * - handleLogin who is responible to redirect users to facebook's login page,
+ * <br>
+ * - handleCallback who is responsible to get back facebook login feedback and
+ * use it to obtain an access_token.<br>
+ * Facebook's access_token, token_type and user's email are wrapped in a
+ * {@link Token} object.
+ *
+ * @author pezzati
+ */
 public class FacebookOAuth2Authenticator extends OAuth2Authenticator {
 
     public static final String FACEBOOK = "facebook";
@@ -164,4 +179,5 @@ public class FacebookOAuth2Authenticator extends OAuth2Authenticator {
 	return objM.readValue(getUserEmailResp.getEntity().getContent(), JsonNode.class);
 
     }
+
 }

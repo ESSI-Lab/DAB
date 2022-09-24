@@ -4,7 +4,7 @@ package eu.essi_lab.shared.driver.es.stats;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,8 +22,6 @@ package eu.essi_lab.shared.driver.es.stats;
  */
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -32,7 +30,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -40,24 +37,27 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.jena.sparql.function.library.localname;
 import org.json.JSONObject;
 
-import eu.essi_lab.jaxb.common.NameSpace;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.lib.servlet.RequestManager;
 import eu.essi_lab.lib.utils.ExpiringCache;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.model.RuntimeInfoElement;
+import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.rip.RuntimeInfoProvider;
 import eu.essi_lab.rip.RuntimeInfoPublisher;
 
 public class ElasticsearchInfoPublisher extends RuntimeInfoPublisher {
 
-    private static boolean enabled = true;
+    private static boolean enabled = false;
 
     public static final String RUNTIME_FOLDER = "runtime-info";
+    private static final String ELSEARCH_CLIENT_INIT_ERROR = "ELSEARCH_CLIENT_INIT_ERROR";
 
     private static ExpiringCache<TreeMap<String, List<Object>>> cache;
 
@@ -78,37 +78,81 @@ public class ElasticsearchInfoPublisher extends RuntimeInfoPublisher {
 	}
     });
 
-    private String dbname = null;
-
-    // private ESConnector connector;
-
     private ElasticsearchClient client;
+
+    /**
+     * @param context
+     * @throws GSException
+     */
+    public ElasticsearchInfoPublisher(String runtimeId, String context) throws GSException {
+
+	super(runtimeId, context);
+
+	if (enabled) {
+
+	    Optional<DatabaseSetting> setting = ConfigurationWrapper.getSystemSettings().getStatisticsSetting();
+
+	    //
+	    // it should be present if stats gathering is enabled!
+	    //
+	    if (setting.isPresent()) {
+
+		DatabaseSetting databaseSetting = setting.get();
+		String databaseName = databaseSetting.getDatabaseName();
+		String databasePassword = databaseSetting.getDatabasePassword();
+		String databaseUri = databaseSetting.getDatabaseUri();
+		String databaseUser = databaseSetting.getDatabaseUser();
+
+		init(databaseUri, databaseName, databaseUser, databasePassword, runtimeId, context);
+	    }
+	}
+    }
+
+    /**
+     * @param runtimeId
+     * @param context
+     * @throws GSException
+     */
     public ElasticsearchInfoPublisher(String endpoint, String dbname, String user, String password, String runtimeId, String context)
 	    throws GSException {
 
 	super(runtimeId, context);
 
-	this.dbname = dbname;
+	init(endpoint, dbname, user, password, runtimeId, context);
+    }
+
+    /**
+     * @param endpoint
+     * @param dbname
+     * @param user
+     * @param password
+     * @param runtimeId
+     * @param context
+     * @throws GSException
+     */
+    protected void init(String endpoint, String dbname, String user, String password, String runtimeId, String context) throws GSException {
 
 	if (enabled && endpoint != null && dbname != null && user != null && password != null) {
 
-	    
 	    this.client = new ElasticsearchClient(endpoint, user, password);
-	    client.setDbName(dbname);
+	    this.client.setDbName(dbname);
+
 	    try {
 		client.init();
+
 	    } catch (IOException e) {
+
 		e.printStackTrace();
-		throw new GSException();
+
+		throw GSException.createException(//
+			getClass(), //
+			e.getMessage(), //
+			null, //
+			ErrorInfo.ERRORTYPE_INTERNAL, //
+			ErrorInfo.SEVERITY_ERROR, //
+			ELSEARCH_CLIENT_INIT_ERROR, //
+			e);
 	    }
-
-	    // try {
-	    // connector.initializePersistentStorage();
-	    // } catch (GSException e) {
-	    // DefaultGSExceptionLogger.log(new DefaultGSExceptionHandler(new DefaultGSExceptionReader(e)));
-	    // e.printStackTrace();
-	    // }
-
 	}
     }
 
@@ -196,7 +240,12 @@ public class ElasticsearchInfoPublisher extends RuntimeInfoPublisher {
 	return ret;
     }
 
+    /**
+     * @param properties
+     * @return
+     */
     public static TreeMap<String, List<Object>> refineProperties(Map<String, List<Object>> properties) {
+
 	TreeMap<String, List<Object>> ret = new TreeMap<>();
 
 	String type = null;
@@ -252,8 +301,6 @@ public class ElasticsearchInfoPublisher extends RuntimeInfoPublisher {
 	String q = null;
 	for (String localName : properties.keySet()) {
 
-	    
-	    
 	    if (type == null) {
 		if (localName.startsWith("DISCOVERY_MESSAGE")) {
 		    type = "DiscoveryMessage";
@@ -283,8 +330,6 @@ public class ElasticsearchInfoPublisher extends RuntimeInfoPublisher {
 	    if (firstValue != null) {
 		String stringValue = firstValue.toString();
 
-		
-		
 		if (localName.equals("DISCOVERY_MESSAGE_tmpExtentBegin")) {
 		    System.out.println();
 		}
@@ -351,7 +396,7 @@ public class ElasticsearchInfoPublisher extends RuntimeInfoPublisher {
 
 	    }
 	    if (!refinedValues.isEmpty()) {
-		if (localName.equals("ACCESS_MESSAGE_TIME_STAMP_MILLIS")||localName.equals("BULK_DOWNLOAD_MESSAGE_TIME_STAMP_MILLIS")) {
+		if (localName.equals("ACCESS_MESSAGE_TIME_STAMP_MILLIS") || localName.equals("BULK_DOWNLOAD_MESSAGE_TIME_STAMP_MILLIS")) {
 		    String rv = refinedValues.get(0).toString();
 		    long l = Long.parseLong(rv);
 		    refinedValues.clear();
@@ -432,6 +477,10 @@ public class ElasticsearchInfoPublisher extends RuntimeInfoPublisher {
     }
 
     public void write() {
+
+	if (!enabled) {
+	    return;
+	}
 
 	THREAD_POOL.execute(new Runnable() {
 

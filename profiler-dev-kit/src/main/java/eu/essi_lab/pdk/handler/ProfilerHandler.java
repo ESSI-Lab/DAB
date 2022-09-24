@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.handler;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,12 +30,14 @@ import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 
-import eu.essi_lab.configuration.ConfigurationUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.MessageResponse;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.PerformanceLogger;
 import eu.essi_lab.messages.RequestMessage;
+import eu.essi_lab.messages.RequestMessage.IterationMode;
+import eu.essi_lab.messages.UserBondMessage;
+import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.count.AbstractCountResponse;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.GSException;
@@ -44,7 +46,79 @@ import eu.essi_lab.pdk.rsm.MessageResponseMapper;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
 import eu.essi_lab.request.executor.IRequestExecutor;
+import eu.essi_lab.rip.RuntimeInfoProvider;
 import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
+
+/**
+ * This {@link WebRequestHandler} is in charge to handle discovery or access requests, according to the type &ltM&gt of
+ * the received {@link
+ * RequestMessage}. This handler can be registered to a {@link DABPRofiler} with the {@link DABPRofiler#getSelector()}
+ * method
+ * <h3>The workflow</h3>
+ * When the {@link DABPRofiler} invokes the {@link #handle(WebRequest)} method (see
+ * {@link DABPRofiler#handle(WebRequest)}), the following
+ * workflow is executed:<br>
+ * <br>
+ * <ol>
+ * <li>the {@link WebRequest} is transformed in a {@link RequestMessage} of type &ltM&gt by the
+ * {@link #getRequestTransformer()}
+ * invoking the
+ * {@link WebRequestTransformer#transform(WebRequest)} method</li>
+ * <li>the transformed {@link RequestMessage} is checked according to the
+ * {@link IRequestExecutor#isAuthorized(RequestMessage, AnonymousUserPolicy)} method</li>
+ * <li>the discovery/access operation is executed by an internal implementation of {@link IDiscoveryExecutor} and the
+ * {@link MessageResponse} of type &ltI&gt is retrieved</li>
+ * <li>the {@link MessageResponse} of type &ltI&gt is mapped in to a {@link MessageResponse} of type &ltT&gt by the
+ * {@link #getMessageResponseMapper()} invoking the {@link MessageResponseMapper#map(RequestMessage, MessageResponse)}
+ * method</li>
+ * <li>the {@link MessageResponse} of type &ltT&gt is formatted in a {@link Response} entity by the
+ * {@link #getMessageResponseFormatter()} invoking the
+ * {@link MessageResponseFormatter#format(RequestMessage, MessageResponse)}
+ * method</li>
+ * </ol>
+ * The same workflow by including also the <code>on</code> methods (in bold):<br>
+ * <br>
+ * <ol>
+ * <li><b>the {@link #onHandlingStarted(WebRequest)} method is invoked</b></li>
+ * <li>the {@link WebRequest} is transformed in a {@link RequestMessage} of type &ltM&gt by the
+ * {@link #getRequestTransformer()}
+ * invoking the
+ * {@link WebRequestTransformer#transform(WebRequest)} method</li>
+ * <li><b>the {@link #onTransformedRequest(RequestMessage)} method is invoked</b></li>
+ * <li>the discovery/access operation is executed by an internal implementation of {@link IDiscoveryExecutor} and the
+ * {@link MessageResponse} of of type &ltI&gt is retrieved</li>
+ * <li><b>the {@link #onRetrievedMessageResponse(RequestMessage, MessageResponse)} method is invoked</b></li>
+ * <li>the {@link MessageResponse} of of type &ltI&gt is mapped in to a {@link MessageResponse} of type &ltT&gt by the
+ * {@link #getMessageResponseMapper()} invoking the {@link MessageResponseMapper#map(RequestMessage, MessageResponse)}
+ * method</li>
+ * <li><b>the {@link #onMappedMessageResponse(MessageResponse, MessageResponse)} method is invoked</b></li>
+ * <li>the {@link MessageResponse} of of type &ltT&gt is formatted in a {@link Response} entity by the
+ * {@link #getMessageResponseFormatter()} invoking the
+ * {@link MessageResponseFormatter#format(RequestMessage, MessageResponse)}
+ * method</li>
+ * <li><b>the {@link #onHandlingEnded(Response)} method is invoked</b></li>
+ * </ol>
+ * <h3>Usage Notes</h3>
+ * This handler is a <i>strong composition</i> of {@link IRequestExecutor}, {@link WebRequestTransformer},
+ * {@link MessageResponseMapper} and {@link MessageResponseFormatter}. According to the <i>strategy pattern</i>
+ * its behavior can be modified also at runtime using the the <code>set</code> methods. Because of this, in the most
+ * part of the cases,
+ * there is no need to extend this class. In some particular cases, for example if more control of the above
+ * workflow is needed, subclasses can provide an implementation of the <code>on</code> methods<br>
+ * <br>
+ *
+ * @param <M> the type of the incoming {@link RequestMessage}
+ * @param <I> the type of the resources provided by the {@link MessageResponse} <code>IN</code>
+ * @param <O> the type of the resources provided by the {@link MessageResponse} <code>OUT</code>
+ * @param <CR> the type of the {@link AbstractCountResponse} provided as parameter to <code>IN</code> and
+ *        <code>OUT</code>
+ * @param <IN> the type of {@link MessageResponse} provided as input to the {@link IRequestExecutor} and {@link
+ *        MessageResponseMapper}</code>
+ * @param <OUT> the type of the {@link MessageResponse} generated as result of the mapping by the
+ *        {@link MessageResponseMapper} and provided
+ *        as input for the {@link MessageResponseFormatter}
+ * @author Fabrizio
+ */
 public abstract class ProfilerHandler//
 <//
 	M extends RequestMessage, //
@@ -53,14 +127,19 @@ public abstract class ProfilerHandler//
 	CR extends AbstractCountResponse, //
 	IN extends MessageResponse<I, CR>, //
 	OUT extends MessageResponse<O, CR> //
-> implements WebRequestDelegatorHandler<M> {
+>   implements WebRequestHandler {
+
+    /**
+     * 
+     */
+    private static final int PARTIAL_MODE_PAGE_SIZE = 10;
 
     private IRequestExecutor<M, I, CR, IN> executor;
     private WebRequestTransformer<M> transformer;
     private MessageResponseMapper<M, I, O, CR, IN, OUT> mapper;
     private MessageResponseFormatter<M, O, CR, OUT> formatter;
 
-    private transient Logger logger = GSLoggerFactory.getLogger(getClass());
+    private Logger logger = GSLoggerFactory.getLogger(getClass());
 
     protected ProfilerHandler() {
 
@@ -76,7 +155,7 @@ public abstract class ProfilerHandler//
      *
      * @throws GSException if errors occurred during the workflow execution
      */
-    @Override
+     
     public final Response handle(WebRequest request) throws GSException {
 
 	M message = handleWebRequest(request);
@@ -97,7 +176,6 @@ public abstract class ProfilerHandler//
      *
      * @throws GSException if errors occurred during the workflow execution
      */
-    @Override
     public final M handleWebRequest(WebRequest request) throws GSException {
 
 	onHandlingStarted(request);
@@ -110,21 +188,7 @@ public abstract class ProfilerHandler//
 
 	onTransformedRequest(message);
 
-	try {
-	    ElasticsearchInfoPublisher publisher = new ElasticsearchInfoPublisher(//
-		    ConfigurationUtils.getGIStatsEndpoint(), //
-		    ConfigurationUtils.getGIStatsDbname(), //
-		    ConfigurationUtils.getGIStatsUser(), //
-		    ConfigurationUtils.getGIStatsPassword(), //
-		    message.getRequestId(), //
-		    message.getWebRequest().getRequestContext());
-	    //
-	    // publishes message info
-	    //
-	    publisher.publish(message);
-	} catch (Exception e) {
-	    GSLoggerFactory.getLogger(getClass()).error("Error initializing ElasticSearch: {}", e.getMessage());
-	}
+	publish(message, message);
 
 	return message;
     }
@@ -151,10 +215,7 @@ public abstract class ProfilerHandler//
      *
      * @throws GSException if errors occurred during the workflow execution
      */
-    @Override
     public Response handleMessageRequest(M message) throws GSException {
-
-	String context = message.getWebRequest().getRequestContext();
 
 	String rid = message.getWebRequest().getRequestId();
 
@@ -166,12 +227,7 @@ public abstract class ProfilerHandler//
 	PerformanceLogger pl = new PerformanceLogger(PerformanceLogger.PerformancePhase.MESSAGE_AUTHORIZATION, rid, owr);
 
 	boolean authorized = getExecutor().isAuthorized(message);
-	
-	if (message.getRequestAbsolutePath().startsWith("http://localhost")){
-	    // developer machine
-	    authorized = true;
-	}
-	
+
 	pl.logPerformance(logger);
 	logger.info("[2/5] Message authorization check ENDED");
 
@@ -182,8 +238,8 @@ public abstract class ProfilerHandler//
 	    return handleNotAuthorizedRequest(message);
 	}
 
-	boolean isIterated = message.isIteratedWorkflow();
-	if (isIterated) {
+	Optional<IterationMode> iterationMode = message.getIteratedWorkflow();
+	if (iterationMode.isPresent()) {
 
 	    return handleIteratedWorkflow(message);
 	}
@@ -203,24 +259,7 @@ public abstract class ProfilerHandler//
 
 	OUT mappedResponse = getMessageResponseMapper().map(message, executorResponse);
 
-	ElasticsearchInfoPublisher publisher = null;
-
-	try {
-	    publisher = new ElasticsearchInfoPublisher(//
-		    ConfigurationUtils.getGIStatsEndpoint(), //
-		    ConfigurationUtils.getGIStatsDbname(), //
-		    ConfigurationUtils.getGIStatsUser(), //
-		    ConfigurationUtils.getGIStatsPassword(), //
-		    message.getRequestId(), //
-		    context);
-
-	    //
-	    // publishes mapped response info
-	    //
-	    publisher.publish(mappedResponse);
-	} catch (Exception e) {
-	    GSLoggerFactory.getLogger(getClass()).error("Error initializing ElasticSearch: {}", e.getMessage());
-	}
+	publish(message, mappedResponse);
 
 	pl.logPerformance(logger);
 	logger.info("[4/5] Result set mapping ENDED");
@@ -246,8 +285,8 @@ public abstract class ProfilerHandler//
      * @throws GSException
      */
     private Response handleIteratedWorkflow(M message) throws GSException {
-
-	String context = message.getWebRequest().getRequestContext();
+	
+	IterationMode iterationMode = message.getIteratedWorkflow().get();
 
 	String rid = message.getWebRequest().getRequestId();
 
@@ -256,43 +295,80 @@ public abstract class ProfilerHandler//
 	IN executorResponse = null;
 	OUT mappedResponse = null;
 	ArrayList<O> completeList = new ArrayList<>();
-	int pageSize = message.getPage().getSize();
-	int maxIterations = -1;
-	int iterationsCounter = 1;
-	int responseCount = 0;
+
 	Page page = message.getPage();
 
-	logger.info("Handling of iterated workflow STARTED");
+	//
+	// this is OK for partial iteration mode, but it must be set
+	// to the total result set size in case of full iteration mode
+	//
+	int responseCount = page.getSize();
+
+	int pageSize = iterationMode == IterationMode.FULL_RESPONSE ? page.getSize() : PARTIAL_MODE_PAGE_SIZE;
+	page.setSize(pageSize);
+
+	int maxIterations = -1;
+	int iterationsCounter = 0;
+
+	logger.info("[" + message.getRequestId() + "] Handling of iterated workflow STARTED");
+
+	logger.info("[" + message.getRequestId() + "] Iteration mode: " + iterationMode);
+
 	PerformanceLogger workflowPl = new PerformanceLogger(PerformanceLogger.PerformancePhase.ITERATED_WORKFLOW, rid, owr);
+
+	Optional<Bond> userBond = Optional.empty();
+
+	if (message instanceof UserBondMessage) {
+
+	    userBond = ((UserBondMessage) message).getUserBond();
+	}
 
 	do {
 
-	    logger.info("Iteration [" + iterationsCounter + "/" + (maxIterations == -1 ? "X" : maxIterations) + "] STARTED");
+	    //
+	    // set the original user bond. this is required to avoid that QueryInitializer.initializeQuery at row 87 
+	    // recursively add user bond at each iteration generating extremely long queries
+	    //
+	    if (message instanceof UserBondMessage) {
 
-	    logger.info("[3/5] Result set retrieving STARTED");
+		((UserBondMessage) message).setUserBond(userBond.orElse(null));
+	    }
+
+	    logger.info("[" + message.getRequestId() + "] Iteration [" + (iterationsCounter + 1) + "/"
+		    + (maxIterations == -1 ? "X" : maxIterations) + "] STARTED");
+
+	    logger.info("[" + message.getRequestId() + "] [3/5] Result set retrieving STARTED");
 	    PerformanceLogger pl = new PerformanceLogger(PerformanceLogger.PerformancePhase.RESULT_SET_RETRIEVING, rid, owr);
 
 	    executorResponse = getExecutor().retrieve(message);
 
 	    pl.logPerformance(logger);
-	    logger.info("[3/5] Result set retrieving ENDED");
+	    logger.info("[" + message.getRequestId() + "] [3/5] Result set retrieving ENDED");
 
 	    onRetrievedMessageResponse(message, executorResponse);
 
 	    //
-	    // total number of resources to discover
+	    // for full iteration mode, the number of resources to handle
+	    // is set to the size of the result set
 	    //
-	    responseCount = executorResponse.getCountResponse().getCount();
+	    if (iterationMode == IterationMode.FULL_RESPONSE) {
+
+		int count = executorResponse.getCountResponse().getCount();
+
+		responseCount = count;
+	    }
+
 	    //
 	    // number of iterations to do
 	    //
 	    maxIterations = (int) (Math.ceil((double) responseCount / pageSize));
+
 	    //
 	    // updates the page start value
 	    //
 	    page.setStart(page.getStart() + pageSize);
 
-	    logger.info("[4/5] Result set mapping STARTED");
+	    logger.info("[" + message.getRequestId() + "] [4/5] Result set mapping STARTED");
 	    pl = new PerformanceLogger(PerformanceLogger.PerformancePhase.RESULT_SET_MAPPING, rid, owr);
 
 	    mappedResponse = getMessageResponseMapper().map(message, executorResponse);
@@ -304,38 +380,22 @@ public abstract class ProfilerHandler//
 	    //
 	    completeList.addAll(resultsList);
 
-	    try {
-		ElasticsearchInfoPublisher publisher = new ElasticsearchInfoPublisher(//
-			ConfigurationUtils.getGIStatsEndpoint(), //
-			ConfigurationUtils.getGIStatsDbname(), //
-			ConfigurationUtils.getGIStatsUser(), //
-			ConfigurationUtils.getGIStatsPassword(), //
-			message.getRequestId(), //
-			context);
-		//
-		// publishes mapped response info
-		//
-		publisher.publish(mappedResponse);
-	    } catch (Exception e) {
-		GSLoggerFactory.getLogger(getClass()).error("Error initializing ElasticSearch: {}", e.getMessage());
-	    }
-
 	    pl.logPerformance(logger);
 
-	    logger.info("[4/5] Result set mapping ENDED");
+	    logger.info("[" + message.getRequestId() + "] [4/5] Result set mapping ENDED");
 
 	    onMappedMessageResponse(executorResponse, mappedResponse);
 
-	    logger.info("Iteration [" + iterationsCounter + "/" + (maxIterations == -1 ? "X" : maxIterations) + "] ENDED");
+	    logger.info("[" + message.getRequestId() + "] Iteration [" + (iterationsCounter + 1) + "/" + maxIterations + "] ENDED");
 
 	    iterationsCounter++;
 
-	} while (responseCount > completeList.size());
+	} while (iterationsCounter < maxIterations);
 
-	logger.info("Handling of iterated workflow ENDED");
+	logger.info("[" + message.getRequestId() + "] Handling of iterated workflow ENDED");
 	workflowPl.logPerformance(logger);
 
-	logger.info("[5/5] Result set formatting STARTED");
+	logger.info("[" + message.getRequestId() + "] [5/5] Result set formatting STARTED");
 	PerformanceLogger pl = new PerformanceLogger(PerformanceLogger.PerformancePhase.RESULT_SET_FORMATTING, rid, owr);
 
 	//
@@ -346,7 +406,9 @@ public abstract class ProfilerHandler//
 	Response response = getMessageResponseFormatter().format(message, mappedResponse);
 
 	pl.logPerformance(logger);
-	logger.info("[5/5] Result set formatting ENDED");
+	logger.info("[" + message.getRequestId() + "] [5/5] Result set formatting ENDED");
+
+	publish(message, mappedResponse);
 
 	onHandlingEnded(response);
 
@@ -421,6 +483,24 @@ public abstract class ProfilerHandler//
     public void setMessageResponseFormatter(MessageResponseFormatter<M, O, CR, OUT> formatter) {
 
 	this.formatter = formatter;
+    }
+
+    /**
+     * @param message
+     * @param provider
+     */
+    private void publish(RequestMessage message, RuntimeInfoProvider provider) {
+
+	try {
+	    ElasticsearchInfoPublisher publisher = new ElasticsearchInfoPublisher(//
+		    message.getRequestId(), //
+		    message.getWebRequest().getRequestContext());
+
+	    publisher.publish(provider);
+
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error("Error initializing ElasticSearch: {}", e.getMessage());
+	}
     }
 
     /**

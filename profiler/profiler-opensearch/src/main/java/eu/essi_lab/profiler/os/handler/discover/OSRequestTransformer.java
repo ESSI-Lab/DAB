@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.os.handler.discover;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,9 +35,11 @@ import org.slf4j.Logger;
 
 import com.google.common.collect.Lists;
 
-import eu.essi_lab.configuration.ConfigurationUtils;
-import eu.essi_lab.jaxb.common.NameSpace;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.lib.odip.rosetta.RosettaStone;
+import eu.essi_lab.lib.odip.rosetta.RosettaStoneConnector;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.ResourceSelector;
@@ -52,7 +54,6 @@ import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
 import eu.essi_lab.messages.web.KeyValueParser;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.Queryable;
-import eu.essi_lab.model.SharedRepositoryInfo;
 import eu.essi_lab.model.StorageUri;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -66,6 +67,11 @@ import eu.essi_lab.profiler.os.OSParameter;
 import eu.essi_lab.profiler.os.OSParameters;
 import eu.essi_lab.profiler.os.OSProfiler;
 import eu.essi_lab.profiler.os.OSRequestParser;
+import eu.essi_lab.profiler.os.handler.srvinfo.OSGetSourcesFilter;
+
+/**
+ * @author Fabrizio
+ */
 public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
     /**
@@ -73,7 +79,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
      */
     private static final List<String> SUPPORTED_OUTPUT_FORMATS = new ArrayList<>();
     private static final String OS_PARAM_PARSING_ERROR = "OS_PARAM_PARSING_ERROR";
-    private transient Logger logger = GSLoggerFactory.getLogger(OSRequestTransformer.class);
+    private Logger logger = GSLoggerFactory.getLogger(OSRequestTransformer.class);
 
     // ---------------------------
     //
@@ -82,7 +88,6 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
     // variables will never change
     //
     private static StorageUri storageUri;
-    private static SharedRepositoryInfo sharedRepositoryInfo;
     private static StorageUri userJobStorageUri;
     //
     //
@@ -102,7 +107,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	//
 
 	DiscoveryMessage message = createMessage();
-	
+
 	message.setRequestId(request.getRequestId());
 
 	message.setRequestTimeout(10);
@@ -122,14 +127,14 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 	    if (Objects.isNull(userJobStorageUri)) {
 
-		userJobStorageUri = ConfigurationUtils.getUserJobStorageURI();
+		userJobStorageUri = ConfigurationWrapper.getDownloadSetting().getStorageUri();
 	    }
 
 	    message.setUserJobStorageURI(userJobStorageUri);
 
 	} else {
 
-	    message.setUserJobStorageURI(ConfigurationUtils.getUserJobStorageURI());
+	    message.setUserJobStorageURI(ConfigurationWrapper.getDownloadSetting().getStorageUri());
 	}
 
 	//
@@ -141,14 +146,14 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 	    if (Objects.isNull(storageUri)) {
 
-		storageUri = ConfigurationUtils.getStorageURI();
+		storageUri = ConfigurationWrapper.getDatabaseURI();
 	    }
 
 	    uri = storageUri;
 
 	} else {
 
-	    uri = ConfigurationUtils.getStorageURI();
+	    uri = ConfigurationWrapper.getDatabaseURI();
 	}
 
 	if (Objects.isNull(uri)) {
@@ -160,7 +165,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 		    ErrorInfo.SEVERITY_WARNING, //
 		    DB_STORAGE_URI_NOT_FOUND);
 
-	    message.getException().addInfo(exception.getErrorInfoList().get(0));
+	    message.getException().getErrorInfoList().add(exception.getErrorInfoList().get(0));
 
 	    GSLoggerFactory.getLogger(this.getClass()).warn("Data Base storage URI not found");
 	}
@@ -172,16 +177,8 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	//
 	if (viewId.orElse("").equals("geoss")) {
 
-	    if (Objects.isNull(sharedRepositoryInfo)) {
-
-		sharedRepositoryInfo = ConfigurationUtils.getSharedRepositoryInfo();
-	    }
-
-	    message.setSharedRepositoryInfo(sharedRepositoryInfo);
-
 	} else {
 
-	    message.setSharedRepositoryInfo(ConfigurationUtils.getSharedRepositoryInfo());
 	}
 
 	message = refineMessage(message);
@@ -203,7 +200,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	    KeyValueParser keyValueParser = new KeyValueParser(request.getFormData().get());
 	    OSRequestParser parser = new OSRequestParser(keyValueParser);
 
-	    if (isGetSourcesQuery(request)) {
+	    if (OSGetSourcesFilter.isGetSourcesQuery(request)) {
 
 		message.setRequestTimeout(30);
 		message.setDistinctValuesElement(ResourceProperty.SOURCE_ID);
@@ -259,6 +256,8 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 		    break;
 		case "origOrgDesc":
 		    list.add(MetadataElement.ORIGINATOR_ORGANISATION_DESCRIPTION);
+		case "themeCategory":
+		    list.add(MetadataElement.THEME_CATEGORY);
 		    break;
 		case "attributeTitle":
 		    list.add(MetadataElement.ATTRIBUTE_TITLE);
@@ -359,15 +358,15 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 		String[] split = value.split(",");
 
-		for (String id : split) {
-		    if (!ConfigurationUtils.checkSource(id)) {
+		List<String> checkSources = ConfigurationWrapper.checkSources(Arrays.asList(split));
 
-			GSLoggerFactory.getLogger(getClass()).error("Validation failed, the supplied source does not exist: " + id);
+		if (!checkSources.isEmpty()) {
 
-			message.setResult(ValidationResult.VALIDATION_FAILED);
-			message.setError("The supplied source does not exist: " + id);
-			return message;
-		    }
+		    GSLoggerFactory.getLogger(getClass()).error("Validation failed, the supplied sources does not exist: " + checkSources);
+
+		    message.setResult(ValidationResult.VALIDATION_FAILED);
+		    message.setError("The supplied source does not exist: " + checkSources);
+		    return message;
 		}
 
 		logger.trace("Completed sources check");
@@ -479,6 +478,36 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 		    osParameter.equals(OSParameters.PLATFORM_IDENTIFIER) || //
 		    osParameter.equals(OSParameters.ORIGINATOR_ORGANISATION_IDENTIFIER) || //
 		    osParameter.equals(OSParameters.ATTRIBUTE_IDENTIFIER)) {
+		if (rosetta != null && !rosetta.equals("false") && value != null) {
+		    RosettaStone rs = new RosettaStoneConnector();
+		    Set<String> terms = new TreeSet<>();
+		    terms.add(value);
+		    terms.addAll(rs.getTranslations(value));
+		    switch (rosetta) {
+		    case "narrow":
+			Set<String> narrowerTerms = rs.getNarrower(value);
+			if (narrowerTerms != null) {
+			    terms.addAll(narrowerTerms);
+			}
+			break;
+		    case "broad":
+			Set<String> broaderTerms = rs.getBroader(value);
+			if (broaderTerms != null) {
+			    terms.addAll(broaderTerms);
+			}
+			break;
+
+		    case "true":
+		    default:
+			// do nothing, because translations are always added
+			break;
+		    }
+		    if (terms != null && !terms.isEmpty()) {
+			value = createOrSearch(terms);
+		    } else {
+			value = null;
+		    }
+		}
 	    }
 
 	    Optional<Bond> bond = Optional.empty();
@@ -488,6 +517,11 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 		if (osParameter == OSParameters.BBOX || osParameter == OSParameters.W3W) {
 
 		    String spatialRelation = parser.parse(OSParameters.SPATIAL_RELATION);
+		    bond = osParameter.asBond(value, spatialRelation);
+
+		} else if (osParameter == OSParameters.TIME_START || osParameter == OSParameters.TIME_END) {
+
+		    String spatialRelation = parser.parse(OSParameters.TIME_RELATION);
 		    bond = osParameter.asBond(value, spatialRelation);
 
 		} else if (osParameter != OSParameters.VIEW_ID) {
@@ -540,7 +574,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	ResourceSelector selector = new ResourceSelector();
 	selector.setIndexesPolicy(IndexesPolicy.NONE);
 
-	if (isGetSourcesQuery(request)) {
+	if (OSGetSourcesFilter.isGetSourcesQuery(request)) {
 	    //
 	    // since in case of sources query
 	    // the message.setDistinctValuesElement(ResourceProperty.SOURCE_ID) is set,
@@ -762,24 +796,4 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	return null;
     }
 
-    /**
-     * @param request
-     * @return
-     */
-    private boolean isGetSourcesQuery(WebRequest request) {
-
-	KeyValueParser keyValueParser = new KeyValueParser(request.getFormData().get());
-	OSRequestParser parser = new OSRequestParser(keyValueParser);
-
-	OSParameter sources = WebRequestParameter.findParameter(OSParameters.PARENTS.getName(), OSParameters.class);
-
-	String sourcesValue = parser.parse(sources);
-	OSParameter id = WebRequestParameter.findParameter(OSParameters.ID.getName(), OSParameters.class);
-
-	String idValue = parser.parse(id);
-
-	return ((sourcesValue != null && sourcesValue.equals("ROOT"))
-		|| (request.getQueryString().toLowerCase().contains("getcontent") && idValue.equals("ROOT")));
-
-    }
 }

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<!--
+..........................................................
+GWIS Javascript API Sample:
+Using the GWIS Plot Service
+..........................................................
+U.S. Geological Survey, Texas Water Science Center, Austin
+https://txpub.usgs.gov/DSS/GWIS/
+..........................................................
+-->
+<html>
+    <!-- html head -->
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>GWIS JSAPI Sample</title>
+        
+        <!-- note: neither jQuery nor the GWIS API need to be loaded when creating plots using the GWIS plot service -->
+    </head>
+    
+    <!-- html body -->
+    <body style="background:#eee; font-family:arial; padding:20px;">
+        <h1>Sample: Using the GWIS Plot Service</h1>
+        
+        <!--
+        .......................
+        iFrames
+        .......................
+        -->
+        <h2>1. Embed Plots Using iFrames</h2>
+        
+        <!--
+        Single Series Usage:
+        Use the site, pcode, label, and color parameters to define the series to plot.
+        Additional API series options are not available with this usage.
+        -->
+        
+        <h3>1a. Single Series: Minimal URL Options</h3>
+        <iframe
+            src   = "https://txpub.usgs.gov/DSS/GWIS/0.0/services/plot?site=08158000&pcode=00060"
+            style = "width:800px; height:500px; border:1px solid black;"
+        ></iframe>
+        
+        <h3>1b. Single Series: Additional URL Options</h3>
+        <iframe
+            src   = "https://txpub.usgs.gov/DSS/GWIS/0.0/services/plot?site=08158000&pcode=00060&iv_or_dv=dv&period=p60d&date_window=25&color=red&label=Streamflow&title=Colorado River at Austin, TX&ylabel=Streamflow, in cubic feet per second&xlabel=Past 7 days&controls=full_range,y_logscale"
+            style = "width:800px; height:500px; border:1px solid black;"
+        ></iframe>
+        
+        <!--
+        Multiple Series Usage:
+        Use the series parameter to define the data series to plot as a json string.
+        The single series parameters (site, pcode, label, and color) above are not specified.
+        -->
+        
+        <h3>1c. Multiple Series: Single Axis</h3>
+        <iframe
+            src   = "https://txpub.usgs.gov/DSS/GWIS/0.0/services/plot?period=p7d&series=[ {site:'08032000', pcode:'00060'}, {site:'08033000', pcode:'00060'} ]&ylabel=Streamflow"
+            style = "width:800px; height:500px; border:1px solid black;"
+        ></iframe>
+        
+        <h3>1d. Multiple Series: Double Axis</h3>
+        <iframe
+            src   = "https://txpub.usgs.gov/DSS/GWIS/0.0/services/plot?period=p7d&series=[ { axis:'y1', site:'08048000', pcode:'00060', label:'Streamflow' }, { axis:'y2', site:'08048000', pcode:'00095', label:'Specific Conductance' } ]&ylabel=Streamflow&y2label=Specific Conductance"
+            style = "width:800px; height:500px; border:1px solid black;"
+        ></iframe>
+        
+        <!--
+        Generalized JSON Input:
+        Use the json parameter and set to a json string defining all plot and series options as would be input to the API GWIS.plot() method.
+        No other URL parameters are specified.
+        This usage is the most flexible and gives access to full API functionality. 
+        -->
+        
+        <h3>1e. Specifying Plot Options as a JSON Object</h3>
+        <iframe
+            src   = "https://txpub.usgs.gov/DSS/GWIS/0.0/services/plot?json={ series:[{ site:'07300000', pcode:'00060' }] }"
+            style = "width:800px; height:500px; border:1px solid black;"
+        ></iframe>
+        
+        <h3>1f. Using JavaScript to Build Complex URL's</h3>
+        <iframe id="plot_1f" style="width:800px; height:500px; border:1px solid black;"></iframe>
+        <script>
+            // define options as you would using the api
+            var opts = {
+                // ...data options...
+                iv_or_dv : "dv",
+                start_dt : "2011-01-01",
+                end_dt   : "2012-01-01",
+                // ...plot lines...
+                series : [
+                    // site 1
+                    { axis:"y1", site:"08032000", pcode:"00060", label:"08032000: Streamflow",  color:"#900" }, // solid line
+                    { axis:"y2", site:"08032000", pcode:"00065", label:"08032000: Gage Height", color:"#900", stroke_pattern:[3,3] }, // dashed line
+                    // site 2
+                    { axis:"y1", site:"08033000", pcode:"00060", label:"08033000: Streamflow",  color:"#090" },
+                    { axis:"y2", site:"08033000", pcode:"00065", label:"08033000: Gage Height", color:"#090", stroke_pattern:[3,3] },
+                    // site 3
+                    { axis:"y1", site:"08033500", pcode:"00060", label:"08033500: Streamflow",  color:"#009" },
+                    { axis:"y2", site:"08033500", pcode:"00065", label:"08033500: Gage Height", color:"#009", stroke_pattern:[3,3] }
+                ],
+                // ...plot options...
+                title          : "Neches River, TX",
+                xlabel         : "Time",
+                ylabel         : "Streamflow, cubic feet per second",
+                y2label        : "Gage Height, feet",
+                legend         : "always",
+                range_selector : false,
+                y_logscale     : false,
+                y_show0        : true,
+                x_grid         : false,
+                y_grid         : false,
+                controls       : [ "full_range", "y_logscale", "y_show0", "x_grid", "y_grid" ]
+            };
+            // set the url using encodeURIComponent() and JSON.stringify()
+            document.getElementById("plot_1f").setAttribute( "src", "https://txpub.usgs.gov/DSS/GWIS/0.0/services/plot?json="+encodeURIComponent(JSON.stringify(opts)) );
+        </script>
+        
+        <!--
+        .......................
+        links and buttons
+        .......................
+        -->
+        <h2>2. Links and Buttons to Open Plots</h2>
+        
+        <!--
+        A basic url used for demonstration purposes.
+        More complex url's as shown above can be used.
+        -->
+        
+        <h3>2a. Full Page Plots in New Browser Tab</h3>
+        <button onclick="window.open('https://txpub.usgs.gov/DSS/GWIS/0.0/services/plot?site=08158000&pcode=00060')"  type="button">Click to show plot in a new browser tab</button>&nbsp;&nbsp;
+        <a                      href="https://txpub.usgs.gov/DSS/GWIS/0.0/services/plot?site=08158000&pcode=00060", target="_blank">Click to do the same thing</a>
+        
+        <h3>2b. Pop-Up Plots</h3>
+        <button type="button" onclick="window.open('https://txpub.usgs.gov/DSS/GWIS/0.0/services/plot?site=08158000&pcode=00060','GWIS Plot','width=800,height=500')"          >Click to show a pop-up plot</button>&nbsp;&nbsp;
+        <a           href="javascript: window.open('https://txpub.usgs.gov/DSS/GWIS/0.0/services/plot?site=08158000&pcode=00060','GWIS Plot','width=800,height=500'); void(0);">Click to do the same thing</a>
+        
+    </body>
+</html>
+<!-- end GWIS JSAPI sample -->

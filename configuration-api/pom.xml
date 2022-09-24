@@ -1,0 +1,91 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>eu.essi_lab</groupId>
+		<artifactId>DAB</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>configuration-api</artifactId>
+	<name>ESSI-Lab Configuration API</name>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.cfg4j</groupId>
+			<artifactId>cfg4j-core</artifactId>
+			<version>4.4.1</version>
+		</dependency>
+
+		<!-- Git integration -->
+		<dependency>
+			<groupId>org.cfg4j</groupId>
+			<artifactId>cfg4j-git</artifactId>
+			<version>4.4.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>database-wrapper-marklogic</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>gs-lib-utils</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>core-datamodel</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>core-messages</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz</artifactId>
+			<version>${quartz.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz-jobs</artifactId>
+			<version>${quartz.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.jodah</groupId>
+			<artifactId>typetools</artifactId>
+			<version>0.6.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>${mysql.connecotr.version}</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.mybatis/mybatis -->
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis</artifactId>
+			<version>3.5.6</version>
+		</dependency>
+
+	</dependencies>
+
+</project>

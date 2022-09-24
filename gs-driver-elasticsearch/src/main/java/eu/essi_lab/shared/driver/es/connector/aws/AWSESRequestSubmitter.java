@@ -4,7 +4,7 @@ package eu.essi_lab.shared.driver.es.connector.aws;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,15 +21,19 @@ package eu.essi_lab.shared.driver.es.connector.aws;
  * #L%
  */
 
-import com.amazonaws.auth.AWS4Signer;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import eu.essi_lab.shared.driver.es.connector.ESRequestSubmitter;
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.protocol.HttpProcessor;
-import org.apache.http.protocol.HttpProcessorBuilder;
+
+import com.amazonaws.auth.AWS4Signer;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+
+import eu.essi_lab.shared.driver.es.connector.ESRequestSubmitter;
+
+/**
+ * @author ilsanto
+ */
 public class AWSESRequestSubmitter extends ESRequestSubmitter {
 
     private static final String ES_SERVICE_NAME = "es";

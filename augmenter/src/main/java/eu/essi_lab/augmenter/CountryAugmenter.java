@@ -4,7 +4,7 @@ package eu.essi_lab.augmenter;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,32 +23,22 @@ package eu.essi_lab.augmenter;
 
 import java.util.Optional;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.configuration.option.GSConfOption;
-import eu.essi_lab.model.configuration.option.GSConfOptionString;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.Country;
 import eu.essi_lab.model.resource.GSResource;
-public class CountryAugmenter extends ResourceAugmenter {
+
+/**
+ * sets the country metadata element
+ * 
+ * @author boldrini
+ */
+public class CountryAugmenter extends ResourceAugmenter<CountryNameSetting> {
 
     /**
      * 
      */
-    private static final long serialVersionUID = 7412866302816222900L;
-
-    @JsonIgnore
-    private static final String COUNTRY_AUGMENTER_TARGET_KEY = "COUNTRY_AUGMENTER_TARGET_KEY";
-
     public CountryAugmenter() {
-
-	setLabel("Country augmenter");
-
-	GSConfOptionString option = new GSConfOptionString();
-	option.setLabel("Organization Name");
-	option.setKey(COUNTRY_AUGMENTER_TARGET_KEY);
-	getSupportedOptions().put(COUNTRY_AUGMENTER_TARGET_KEY, option);
     }
 
     @Override
@@ -56,21 +46,33 @@ public class CountryAugmenter extends ResourceAugmenter {
 
 	GSLoggerFactory.getLogger(getClass()).warn("Metadata augmentation of current resource STARTED");
 
-	String country = getSupportedOptions().get(COUNTRY_AUGMENTER_TARGET_KEY).getValue().toString();
+	String country = getSetting().getCountryName().orElse(null);
 
-	resource.getExtensionHandler().setCountry(Country.decode(country).getShortName());
+	if (country != null) {
 
+	    resource.getExtensionHandler().setCountry(Country.decode(country).getShortName());
+	}
+	
 	GSLoggerFactory.getLogger(getClass()).warn("Metadata augmentation of current resource ENDED");
 
 	return Optional.of(resource);
     }
 
     @Override
-    public void onOptionSet(GSConfOption<?> option) throws GSException {
+    public String getType() {
 
+	return "CountryAugmenter";
     }
 
     @Override
-    public void onFlush() throws GSException {
+    protected CountryNameSetting initSetting() {
+
+	return new CountryNameSetting();
+    }
+
+    @Override
+    protected String initName() {
+
+	return "Country augmenter";
     }
 }

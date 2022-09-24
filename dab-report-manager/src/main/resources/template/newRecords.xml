@@ -1,0 +1,45 @@
+<csw:GetRecords xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+	xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ogc="http://www.opengis.net/ogc"
+	xmlns:dct="http://purl.org/dc/terms/" xmlns:ows="http://www.opengis.net/ows"
+	xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gml="http://www.opengis.net/gml"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" maxRecords="10"
+	outputSchema="http://www.isotc211.org/2005/gmd" resultType="hits"
+	service="CSW" startPosition="1" version="2.0.2"
+	xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-publication.xsd">
+	<csw:Query xmlns:gmd="http://www.isotc211.org/2005/gmd"
+		typeNames="gmd:MD_Metadata">
+		<csw:ElementSetName typeNames="gmd:MD_Metadata">full</csw:ElementSetName>
+		<csw:Constraint version="1.1.0">
+			<ogc:Filter>
+
+				<ogc:And>
+
+					<ogc:PropertyIsEqualTo>
+						<ogc:Function name="isChildOrSelf">
+							<ogc:Literal>IDENTIFIER</ogc:Literal>
+						</ogc:Function>
+						<ogc:Literal>true()</ogc:Literal>
+					</ogc:PropertyIsEqualTo>
+
+					<ogc:PropertyIsGreaterThanOrEqualTo>
+						<ogc:PropertyName>apiso:DateStamp</ogc:PropertyName>
+						<ogc:Literal>DATESTAMP</ogc:Literal>
+					</ogc:PropertyIsGreaterThanOrEqualTo>
+
+					<ogc:Or>
+						<ogc:PropertyIsEqualTo>
+							<ogc:PropertyName>apiso:IsDeleted</ogc:PropertyName>
+							<ogc:Literal>true</ogc:Literal>
+						</ogc:PropertyIsEqualTo>
+
+						<ogc:PropertyIsNull>
+							<ogc:PropertyName>apiso:IsDeleted</ogc:PropertyName>
+						</ogc:PropertyIsNull>
+					</ogc:Or>
+
+				</ogc:And>
+
+			</ogc:Filter>
+		</csw:Constraint>
+	</csw:Query>
+</csw:GetRecords>

@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.csw.handler.discover;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -20,6 +20,18 @@ package eu.essi_lab.profiler.csw.handler.discover;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.ValidationEvent;
+import javax.xml.namespace.QName;
+import javax.xml.xpath.XPathExpressionException;
+
+import org.xml.sax.SAXParseException;
 
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.jaxb.common.schemas.BooleanValidationHandler;
@@ -47,15 +59,10 @@ import eu.essi_lab.profiler.csw.CSWRequestMethodConverter.CSWRequest;
 import eu.essi_lab.profiler.csw.handler.srvinfo.CSWDescribeRecordHandler;
 import eu.essi_lab.profiler.csw.handler.srvinfo.CSWGetCapabilitiesHandler;
 import eu.essi_lab.profiler.csw.profile.CSWProfile;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.ValidationEvent;
-import javax.xml.namespace.QName;
-import javax.xml.xpath.XPathExpressionException;
-import org.xml.sax.SAXParseException;
+
+/**
+ * @author Fabrizio
+ */
 public class CSWRequestValidator implements WebRequestValidator {
 
     private static final String CSW_POST_REQUEST_VALIDATION_ERROR = "CSW_POST_REQUEST_VALIDATION_ERROR";

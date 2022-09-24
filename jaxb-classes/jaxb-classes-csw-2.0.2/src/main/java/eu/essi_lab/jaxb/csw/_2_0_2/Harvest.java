@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.csw._2_0_2;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -40,6 +40,49 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.Duration;
 
+
+/**
+ * 
+ *          Requests that the catalogue attempt to harvest a resource from some 
+ *          network location identified by the source URL.
+ * 
+ *          Source          - a URL from which the resource is retrieved
+ *          ResourceType    - normally a URI that specifies the type of the resource
+ *                            (DCMES v1.1) being harvested if it is known.
+ *          ResourceFormat  - a media type indicating the format of the 
+ *                            resource being harvested.  The default is 
+ *                            "application/xml".
+ *          ResponseHandler - a reference to some endpoint to which the 
+ *                            response shall be forwarded when the
+ *                            harvest operation has been completed
+ *          HarvestInterval - an interval expressed using the ISO 8601 syntax; 
+ *                            it specifies the interval between harvest 
+ *                            attempts (e.g., P6M indicates an interval of 
+ *                            six months).
+ *          
+ * 
+ * <p>Classe Java per HarvestType complex type.
+ * 
+ * <p>Il seguente frammento di schema specifica il contenuto previsto contenuto in questa classe.
+ * 
+ * <pre>
+ * &lt;complexType name="HarvestType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{http://www.opengis.net/cat/csw/2.0.2}RequestBaseType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="Source" type="{http://www.w3.org/2001/XMLSchema}anyURI"/&gt;
+ *         &lt;element name="ResourceType" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
+ *         &lt;element name="ResourceFormat" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
+ *         &lt;element name="HarvestInterval" type="{http://www.w3.org/2001/XMLSchema}duration" minOccurs="0"/&gt;
+ *         &lt;element name="ResponseHandler" type="{http://www.w3.org/2001/XMLSchema}anyURI" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "HarvestType", propOrder = {
     "source",

@@ -4,7 +4,7 @@ package eu.essi_lab.messages;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,6 +25,13 @@ import java.util.Optional;
 
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.model.GSProperty;
+
+/**
+ * Specialized type of {@link RequestMessage} which carries info about query parameters (provided as {@link Bond})
+ * and an optional list of distinct queryables selected by the user
+ * 
+ * @author Fabrizio
+ */
 public abstract class UserBondMessage extends RequestMessage {
 
     /**

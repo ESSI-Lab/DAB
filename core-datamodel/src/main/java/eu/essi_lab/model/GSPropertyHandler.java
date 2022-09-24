@@ -4,7 +4,7 @@ package eu.essi_lab.model;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,6 +26,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+/**
+ * @author Fabrizio
+ */
 public class GSPropertyHandler implements Serializable {
 
     /**
@@ -34,9 +38,28 @@ public class GSPropertyHandler implements Serializable {
     private static final long serialVersionUID = 2339129380818257424L;
     private Map<String, GSProperty<?>> properties;
 
+    /**
+     * 
+     */
     public GSPropertyHandler() {
 
 	properties = new HashMap<String, GSProperty<?>>();
+    }
+
+    /**
+     * @param properties
+     * @return
+     */
+    public static GSPropertyHandler of(GSProperty<?>... properties) {
+
+	GSPropertyHandler handler = new GSPropertyHandler();
+
+	for (GSProperty<?> property : properties) {
+
+	    handler.add(property);
+	}
+
+	return handler;
     }
 
     /**
@@ -48,19 +71,22 @@ public class GSPropertyHandler implements Serializable {
 
 	GSProperty<?> prop = properties.get(name);
 	if (prop != null) {
-	    return type.cast(prop.getValue());
+	    try {
+		return type.cast(prop.getValue());
+	    } catch (ClassCastException ex) {
+	    }
 	}
 
 	return null;
     }
 
     /**
-     * @param mp
+     * @param property
      * @return
      */
-    public boolean add(GSProperty<?> mp) {
+    public boolean add(GSProperty<?> property) {
 
-	return this.properties.put(mp.getName(), mp) == null;
+	return this.properties.put(property.getName(), property) == null;
     }
 
     /**
@@ -96,19 +122,12 @@ public class GSPropertyHandler implements Serializable {
     @Override
     public String toString() {
 	String ret = "[\n";
-	if (properties != null)
-	    for (String key : properties.keySet()) {
-		String value = "";
-		if (properties.get(key) != null) {
-		    GSProperty<?> k = properties.get(key);
-		    Object v = k.getValue();
-		    if (v != null) {
-			value = v.toString() + ";\n";
-		    }
-		}
-
-		ret += key + ":" + value;
+	for (String key : properties.keySet()) {
+	    if (properties.get(key) != null) {
+		GSProperty<?> k = properties.get(key);
+		ret += k.toString() + "\n";
 	    }
+	}
 	return ret + "]";
     }
 }

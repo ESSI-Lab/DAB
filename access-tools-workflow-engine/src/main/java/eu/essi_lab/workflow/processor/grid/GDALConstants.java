@@ -4,7 +4,7 @@ package eu.essi_lab.workflow.processor.grid;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,6 +30,13 @@ import org.gdal.gdal.gdal;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 public class GDALConstants {
+
+    /**
+     * It seems that the JNI implementation currently has a bug that is tested by
+     * {@link GDAL_NetCDF_CRS_Converter_ProcessorTest}
+     * So, it is safer to use the Runtime implementation. The gdal_translate and gdal_warp tools should be in the
+     * environment PATH (e.g. export PATH=/path/to/gdal/bin).
+     */
     public static Implementation IMPLEMENTATION = Implementation.RUNTIME;
 
     public enum Implementation {

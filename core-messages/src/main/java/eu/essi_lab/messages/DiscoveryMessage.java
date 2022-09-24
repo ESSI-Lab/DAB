@@ -4,7 +4,7 @@ package eu.essi_lab.messages;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -57,6 +57,11 @@ import eu.essi_lab.model.StorageUri;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.RankingStrategy;
+
+/**
+ * @author Fabrizio
+ */
 public class DiscoveryMessage extends QueryInitializerMessage {
     public static Double TOL = Math.pow(10, -8);
 
@@ -88,6 +93,11 @@ public class DiscoveryMessage extends QueryInitializerMessage {
      * 
      */
     public static final int DEFAULT_MAX_TERM_FREQUENCY_MAP_ITEMS = 50;
+
+    /**
+     * 
+     */
+    private static final int USER_SELECTION = 10;
 
     private List<GSResource> parents = new ArrayList<>();
 
@@ -136,7 +146,6 @@ public class DiscoveryMessage extends QueryInitializerMessage {
      */
     public DiscoveryMessage(AccessMessage accessMessage) {
 
-	setSharedRepositoryInfo(accessMessage.getSharedRepositoryInfo());
 	setSources(accessMessage.getSources());
 	setCurrentUser(accessMessage.getCurrentUser().orElse(null));
 	accessMessage.getView().ifPresent(view -> setView(view));
@@ -174,7 +183,6 @@ public class DiscoveryMessage extends QueryInitializerMessage {
      */
     public DiscoveryMessage(StatisticsMessage statMessage) {
 
-	setSharedRepositoryInfo(statMessage.getSharedRepositoryInfo());
 	setSources(statMessage.getSources());
 	setCurrentUser(statMessage.getCurrentUser().orElse(null));
 	statMessage.getView().ifPresent(view -> setView(view));
@@ -216,7 +224,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 
 	Optional<OrderingDirection> orderingDirection = getOrderingDirection();
 	orderingDirection
-		.ifPresent(d -> map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_ORDERING_DIRECTION.getName(), Arrays.asList(d.getName())));
+		.ifPresent(d -> map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_ORDERING_DIRECTION.getName(), Arrays.asList(d.getLabel())));
 
 	Optional<Queryable> orderingProperty = getOrderingProperty();
 	orderingProperty
@@ -233,10 +241,12 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 		scheduled == null ? Arrays.asList("false") : Arrays.asList(String.valueOf(scheduled)));
 
 	List<GSSource> sources = getSources();
-	map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_SOURCE_ID.getName(),
-		sources.stream().map(s -> s.getUniqueIdentifier()).collect(Collectors.toList()));
-	map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_SOURCE_LABEL.getName(),
-		sources.stream().map(s -> s.getLabel()).collect(Collectors.toList()));
+	if (sources.size() <= USER_SELECTION) {
+	    map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_SOURCE_ID.getName(),
+		    sources.stream().map(s -> s.getUniqueIdentifier()).collect(Collectors.toList()));
+	    map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_SOURCE_LABEL.getName(),
+		    sources.stream().map(s -> s.getLabel()).collect(Collectors.toList()));
+	}
 
 	Optional<GSUser> user = getCurrentUser();
 	if (user.isPresent()) {

@@ -4,7 +4,7 @@ package eu.essi_lab.shared.driver.es.connector;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,6 @@ import static com.amazonaws.util.StringUtils.UTF8;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
@@ -41,7 +40,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ContentType;
-import org.elasticsearch.client.IndicesAdminClient;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
@@ -49,11 +47,15 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.StorageUri;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.shared.SharedContent.SharedContentType;
 import eu.essi_lab.shared.driver.es.connector.aws.AWSESConstants;
-import eu.essi_lab.shared.model.SharedContentType;
+
+/**
+ * @author ilsanto
+ */
 public class ESConnector implements IESConnector {
 
-    private transient Logger logger = GSLoggerFactory.getLogger(ESConnector.class);
+    private Logger logger = GSLoggerFactory.getLogger(ESConnector.class);
 
     private StorageUri esStaorageUri;
     private static final String GS_SERVICE_INIT_INDEX = "gsserviceinitialized";
@@ -65,12 +67,19 @@ public class ESConnector implements IESConnector {
     private static final String SEARCH = "_search";
     private static final String INDEX_TYPE_SUFFIX = "estype";
     private static final String COUNT_SUFFIX = "_count";
+    private static final String MGET_PATH = "_mget";
 
-    public StorageUri getEsStaorageUri() {
+    /**
+     * 
+     */
+    public StorageUri getEsStorageUri() {
 	return esStaorageUri;
     }
 
-    public void setEsStaorageUri(StorageUri uri) {
+    /**
+     * 
+     */
+    public void setEsStorageUri(StorageUri uri) {
 
 	this.esStaorageUri = new StorageUri();
 
@@ -102,7 +111,7 @@ public class ESConnector implements IESConnector {
     @Override
     public boolean testConnection() {
 
-	String url = getEsStaorageUri().getUri() + "_cat/health?v";
+	String url = getEsStorageUri().getUri() + "_cat/health?v";
 	HttpGet get = new HttpGet(url);
 
 	try {
@@ -135,7 +144,7 @@ public class ESConnector implements IESConnector {
 
     private boolean isInitialized() {
 
-	String geturl = getEsStaorageUri().getUri() + initIndex() + "/" + GS_SERVICE_INIT_TYPE + "/" + SEARCH_PRETTY;
+	String geturl = getEsStorageUri().getUri() + initIndex() + "/" + GS_SERVICE_INIT_TYPE + "/" + SEARCH_PRETTY;
 
 	HttpGet get = new HttpGet(geturl);
 
@@ -175,12 +184,12 @@ public class ESConnector implements IESConnector {
     public void initializePersistentStorage() throws GSException {
 
 	if (isInitialized()) {
-	    logger.trace("Elasticsearch already initialized {}", getEsStaorageUri().getUri());
+	    logger.trace("Elasticsearch already initialized {}", getEsStorageUri().getUri());
 
 	    return;
 	}
 
-	String puturl = getEsStaorageUri().getUri() + initIndex() + "/" + GS_SERVICE_INIT_TYPE + "/" + UUID.randomUUID().toString();
+	String puturl = getEsStorageUri().getUri() + initIndex() + "/" + GS_SERVICE_INIT_TYPE + "/" + UUID.randomUUID().toString();
 
 	logger.trace("Initialize PUT {} @ {}", INITIALIZE_JSON, puturl);
 
@@ -194,9 +203,10 @@ public class ESConnector implements IESConnector {
     }
 
     public void write(String identifier, String index, String type, JSONObject object) throws GSException {
-	logger.debug("Requested to write {} of type {} to {}  {}", identifier, type, getEsStaorageUri().getUri(), index);
 
-	String puturl = getEsStaorageUri().getUri() + index + "/" + type + "/" + identifier;
+	logger.debug("Requested to write {} of type {} to {}  {}", identifier, type, getEsStorageUri().getUri(), index);
+
+	String puturl = getEsStorageUri().getUri() + index + "/" + type + "/" + identifier;
 
 	logger.trace("Write PUT {}", puturl);
 
@@ -215,14 +225,22 @@ public class ESConnector implements IESConnector {
 
     @Override
     public void write(String identifier, SharedContentType type, InputStream stream) throws GSException {
+
 	try {
 	    String text = IOUtils.toString(stream, UTF8);
 	    JSONObject object = new JSONObject(text);
 
 	    write(identifier, getIndex(esStaorageUri), getIndexType(type), object);
+
 	} catch (IOException e) {
-	    throw GSException.createException(getClass(), "Error converting stream to string", null, ErrorInfo.ERRORTYPE_SERVICE,
-		    ErrorInfo.SEVERITY_ERROR, ES_CONNECTOR_ERROR_EXECUTING, e);
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    null, //
+		    ErrorInfo.ERRORTYPE_SERVICE, ErrorInfo.SEVERITY_ERROR, ES_CONNECTOR_ERROR_EXECUTING, e);
 	}
 
     }
@@ -230,9 +248,9 @@ public class ESConnector implements IESConnector {
     @Override
     public Long count(SharedContentType type) throws GSException {
 
-	logger.debug("Counting documents of type {} from {}", type.getType(), getEsStaorageUri().getUri());
+	logger.debug("Counting documents of type {} from {}", type, getEsStorageUri().getUri());
 
-	String geturl = getEsStaorageUri().getUri() + getIndex(esStaorageUri) + "/" + getIndexType(type) + "/" + COUNT_SUFFIX;
+	String geturl = getEsStorageUri().getUri() + getIndex(esStaorageUri) + "/" + getIndexType(type) + "/" + COUNT_SUFFIX;
 
 	logger.trace("Count GET {}", geturl);
 
@@ -246,9 +264,9 @@ public class ESConnector implements IESConnector {
     @Override
     public Optional<InputStream> get(String identifier, SharedContentType type) throws GSException {
 
-	logger.debug("Getting document with id {} of type {} from {}", identifier, type.getType(), getEsStaorageUri().getUri());
+	logger.debug("Getting document with id {} of type {} from {} STARTED", identifier, type, getEsStorageUri().getUri());
 
-	String geturl = getEsStaorageUri().getUri() + getIndex(esStaorageUri) + "/" + getIndexType(type) + "/" + identifier;
+	String geturl = getEsStorageUri().getUri() + getIndex(esStaorageUri) + "/" + getIndexType(type) + "/" + identifier;
 
 	logger.trace("Get document GET {}", geturl);
 
@@ -256,16 +274,21 @@ public class ESConnector implements IESConnector {
 
 	GetDocumentParser response = submitRequestWithRetry(get, GetDocumentParser.class);
 
-	return response.getSource();
+	Optional<InputStream> source = response.getSource();
 
+	logger.debug("Getting document with id {} of type {} from {} ENDED", identifier, type, getEsStorageUri().getUri());
+
+	return source;
     }
 
     @Override
-    public List<InputStream> query(SharedContentType type, JSONObject query) throws GSException {
+    public List<InputStream> query(SharedContentType type, JSONObject query, boolean multiGet) throws GSException {
 
-	logger.debug("Querying of type {} from {}", type.getType(), getEsStaorageUri().getUri());
+	logger.debug("Querying of type {} from {}", type, getEsStorageUri().getUri());
+	
+	String path = multiGet ? MGET_PATH : SEARCH;
 
-	String posturl = getEsStaorageUri().getUri() + getIndex(esStaorageUri) + "/" + getIndexType(type) + "/" + SEARCH;
+	String posturl = getEsStorageUri().getUri() + getIndex(esStaorageUri) + "/" + getIndexType(type) + "/" + path;
 
 	logger.trace("Query POST url {}", posturl);
 
@@ -279,13 +302,12 @@ public class ESConnector implements IESConnector {
 
 	QueryDocumentParser response = submitRequestWithRetry(post, QueryDocumentParser.class);
 
-	return response.getSources();
-
+	return response.getSources(multiGet);
     }
 
     private <T extends JSONDocumentParser> T submitRequestWithRetry(HttpRequestBase request, Class<T> clazz) throws GSException {
 
-	String msg = "Error executing Elasticsearch request at " + getEsStaorageUri().getUri();
+	String msg = "Error executing Elasticsearch request at " + getEsStorageUri().getUri();
 	try {
 
 	    HttpResponse response = null;
@@ -310,23 +332,31 @@ public class ESConnector implements IESConnector {
 			    + wait + "ms";
 		    GSLoggerFactory.getLogger(getClass()).info(info);
 		    sleep(wait);
+
 		} else {
 
 		    checkCodeAndThrowEx(code, msg, null, responseString);
 
 		    Constructor<T> constructor = clazz.getConstructor(String.class);
 		    return constructor.newInstance(responseString);
-
 		}
-
 	    }
 
-	} catch (IOException | NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException
-		| IllegalArgumentException | InvocationTargetException e) {
+	} catch (GSException e) {
 
-	    throw GSException.createException(getClass(), msg, null, ErrorInfo.ERRORTYPE_SERVICE, ErrorInfo.SEVERITY_ERROR,
-		    ES_CONNECTOR_ERROR_EXECUTING, e);
+	    throw e;
 
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    null, //
+		    ErrorInfo.ERRORTYPE_SERVICE, //
+		    ErrorInfo.SEVERITY_ERROR, ES_CONNECTOR_ERROR_EXECUTING, //
+		    e);
 	}
     }
 
@@ -338,7 +368,12 @@ public class ESConnector implements IESConnector {
 		logger.warn("Invalid code returned with response {}", response);
 	    }
 
-	    throw GSException.createException(getClass(), errMsg, userErrMsg, ErrorInfo.ERRORTYPE_SERVICE, ErrorInfo.SEVERITY_ERROR,
+	    throw GSException.createException(//
+		    getClass(), //
+		    errMsg, //
+		    userErrMsg, //
+		    ErrorInfo.ERRORTYPE_SERVICE, //
+		    ErrorInfo.SEVERITY_ERROR, //
 		    ES_CONNECTOR_ERROR_EXECUTING);
 	}
 
@@ -355,7 +390,7 @@ public class ESConnector implements IESConnector {
     }
 
     private String getIndexType(SharedContentType type) {
-	return type.getType().toLowerCase() + INDEX_TYPE_SUFFIX;
+	return type.name().toLowerCase() + INDEX_TYPE_SUFFIX;
     }
 
     private String getIndex(StorageUri storageUri) {

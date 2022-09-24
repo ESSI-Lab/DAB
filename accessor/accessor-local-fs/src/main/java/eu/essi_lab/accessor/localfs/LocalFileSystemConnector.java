@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.localfs;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,57 +27,43 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import eu.essi_lab.cdk.harvest.AbstractHarvestedQueryConnector;
+import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.jaxb.common.NameSpace;
 import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
+import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
-import eu.essi_lab.model.Source;
+import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.OriginalMetadata;
-public class LocalFileSystemConnector extends AbstractHarvestedQueryConnector {
+
+/**
+ * @author Fabrizio
+ */
+public class LocalFileSystemConnector extends HarvestedQueryConnector<LocalFileSystemConnectorSetting> {
 
     /**
      * 
      */
-    private static final long serialVersionUID = -3290735249137667577L;
-    @JsonIgnore
-    private  transient ArrayList<LocalFile> files;
-    @JsonIgnore
-    private transient  int gmdCount;
-    @JsonIgnore
-    private transient  int gmiCount;
-    @JsonIgnore
-    private  transient int cswCount;
-    @JsonIgnore
-    private  transient int gsCount;
-    @JsonIgnore
-    private transient  int dirCount;
-    @JsonIgnore
-    private transient  int filesCount;
-    @JsonIgnore
-    private  transient int validFiles;
+    public static final String TYPE = "LocalFileSystemConnector";
 
+    private ArrayList<LocalFile> files;
+    private int gmdCount;
+    private int gmiCount;
+    private int cswCount;
+    private int gsCount;
+    private int dirCount;
+    private int filesCount;
+    private int validFiles;
+
+    /**
+     * 
+     */
     public LocalFileSystemConnector() {
-    }
-
-    @Override
-    public boolean enableMaxRecordsOption() {
-
-	return false;
-    }
-
-    @Override
-    public String getLabel() {
-
-	return "Local FileSystem Connector";
     }
 
     private class LocalFile {
@@ -353,7 +339,6 @@ public class LocalFileSystemConnector extends AbstractHarvestedQueryConnector {
 	GSLoggerFactory.getLogger(getClass()).debug("------------------------\n");
     }
 
-    @JsonIgnore
     @Override
     public List<String> listMetadataFormats() throws GSException {
 
@@ -368,7 +353,7 @@ public class LocalFileSystemConnector extends AbstractHarvestedQueryConnector {
     }
 
     @Override
-    public boolean supports(Source source) {
+    public boolean supports(GSSource source) {
 
 	return source.getEndpoint().startsWith("file");
     }
@@ -377,5 +362,17 @@ public class LocalFileSystemConnector extends AbstractHarvestedQueryConnector {
     public String getSourceURL() {
 
 	return super.getSourceURL().replace("file://", "");
+    }
+
+    @Override
+    public String getType() {
+
+	return TYPE;
+    }
+
+    @Override
+    protected LocalFileSystemConnectorSetting initSetting() {
+
+	return new LocalFileSystemConnectorSetting();
     }
 }

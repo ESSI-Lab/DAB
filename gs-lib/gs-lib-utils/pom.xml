@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -13,12 +12,15 @@
 	<name>ESSI-Lab GI-suite Library Utils</name>
 	<description>General utility Library</description>
 
-
-
 	<dependencies>
 
-		<!-- dependency> <groupId>org.apache.sis.core</groupId> <artifactId>sis-referencing</artifactId> 
-			</dependency -->
+		<!-- TO BE MOVED IN THE DEPENDENCIES MANAGEMENT OF GI-PROJECT -->
+		<!-- This version is currently used by vaadin-core:18.06/flow-server:5.0.3 -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
+			<version>1.19</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.json</groupId>
@@ -71,45 +73,5 @@
 			<artifactId>gdal</artifactId>
 		</dependency>
 	</dependencies>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>license-maven-plugin</artifactId>
-				<configuration>
-					<verbose>false</verbose>
-					<addSvnKeyWords>false</addSvnKeyWords>
-				</configuration>
-				<executions>
-					<execution>
-						<id>ufh</id>
-						<goals>
-							<goal>update-file-header</goal>
-						</goals>
-						<phase>process-sources</phase>
-						<configuration>
-							<licenseName>agpl_v3</licenseName>
-							<inceptionYear>2021</inceptionYear>
-							<organizationName><![CDATA[National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab]]></organizationName>
-							<projectName><![CDATA[Discovery and Access Broker (DAB) Community Edition (CE)]]></projectName>
-							<excludes>
-							<exclude>main/java/eu.essi_lab/lib/utils/csv/CSVParser.java</exclude>
-							<exclude>main/java/eu.essi_lab/lib/utils/csv/CSVReader.java</exclude>
-							<exclude>main/java/eu.essi_lab/lib/utils/UnicodeBOMInputStream.java</exclude>
-							</excludes>
-							<includes>
-					           <include>main/java/**/*.java</include>
-					        </includes>		
-							<canUpdateCopyright>true</canUpdateCopyright>
-							<canUpdateDescription>true</canUpdateDescription>
-							<canUpdateLicense>true</canUpdateLicense>							
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-
-	</build>
 
 </project>

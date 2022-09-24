@@ -21,8 +21,6 @@ package eu.essi_lab.gssrv.servlet;
  * #L%
  */
 
-import static eu.essi_lab.gssrv.rest.AbstractProfilerService.ERR_ID_PROFILER_ALIEN_ERROR;
-
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -32,24 +30,20 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.slf4j.Logger;
-
-import eu.essi_lab.gssrv.rest.AbstractProfilerService;
-import eu.essi_lab.gssrv.rest.exceptions.GSErrorMessage;
-import eu.essi_lab.gssrv.rest.exceptions.GSServiceGSExceptionHandler;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.exceptions.DefaultGSExceptionHandler;
-import eu.essi_lab.model.exceptions.DefaultGSExceptionLogger;
-import eu.essi_lab.model.exceptions.DefaultGSExceptionReader;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.profiler.pubsub.PubSubProfiler;
+
+/**
+ * @author Fabrizio
+ */
 public class PubSubService extends HttpServlet {
 
     private static final long serialVersionUID = -4044667892770599100L;
 
-    private final Logger logger = GSLoggerFactory.getLogger(PubSubService.class);
+    private static final String PUB_SUB_SERVICE_DO_POST_ERROR = "PUB_SUB_SERVICE_DO_POST_ERROR";
 
     @Override
     protected void doGet(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws ServletException {
@@ -59,13 +53,13 @@ public class PubSubService extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws ServletException {
 
-	GSServiceGSExceptionHandler exHandler = null;
+	GSException ex = null;
 
 	PubSubProfiler profiler = new PubSubProfiler();
 
 	WebRequest webRequest = new WebRequest();
 
-//	webRequest.setServicesPath(AbstractProfilerService.SERVICES_PATH);
+	// webRequest.setServicesPath(AbstractProfilerService.SERVICES_PATH);
 
 	String out = null;
 
@@ -79,46 +73,38 @@ public class PubSubService extends HttpServlet {
 	    if (response.getEntity() != null) {
 		out = response.getEntity().toString();
 	    }
-	} catch (GSException ex) {
+	} catch (GSException gsEx) {
 
-	    exHandler = new GSServiceGSExceptionHandler(new DefaultGSExceptionReader(ex));
+	    ex = gsEx;
 
 	} catch (Exception thr) {
 
-	    GSException ex = GSException.createException(//
+	    ex = GSException.createException(//
 		    getClass(), //
-		    thr.getMessage(), //
-		    thr.getMessage(), //
 		    ErrorInfo.ERRORTYPE_INTERNAL, //
-		    ErrorInfo.SEVERITY_FATAL, //
-		    ERR_ID_PROFILER_ALIEN_ERROR, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    PUB_SUB_SERVICE_DO_POST_ERROR, //
 		    thr);
-
-	    exHandler = new GSServiceGSExceptionHandler(new DefaultGSExceptionReader(ex));
 	}
 
-	if (exHandler != null) {
+	if (ex != null) {
 
-	    Response.Status status = exHandler.getStatus();
+	    ex.log();
 
-	    GSErrorMessage gsMessage = exHandler.getErrorMessageForUser();
-
-	    DefaultGSExceptionLogger.log(new DefaultGSExceptionHandler(exHandler.getReader()));
-
-	    Response response = profiler.createUncaughtError(webRequest, status, gsMessage.getMessage());
-
-	    //TODO we should create assign a proper json encoding of response to out, after the todo at PubSubProfiler.createUncaughtError is done
-	    out = gsMessage.getMessageAndCode();
+	    out = ex.getErrorInfoList().get(0).toJSONObject().toString(3);
 	}
 
 	if (out != null) {
+
 	    httpResponse.setContentType(MediaType.APPLICATION_JSON);
+
 	    try {
 		httpResponse.getWriter().write(out);
 
 		httpResponse.getWriter().flush();
+
 	    } catch (IOException e) {
-		logger.warn("IOException writing {}", out, e);
+		GSLoggerFactory.getLogger(PubSubService.class).error(e.getMessage(), e);
 		throw new ServletException(e);
 	    }
 	}

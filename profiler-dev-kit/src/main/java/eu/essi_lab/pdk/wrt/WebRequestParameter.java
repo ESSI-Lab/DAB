@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.wrt;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,6 +35,89 @@ import eu.essi_lab.messages.bond.QueryableBond;
 import eu.essi_lab.messages.web.KeyValueParser;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.resource.MetadataElement;
+
+/**
+ * Represents a parameter of a {@link WebRequest} with <i>GET</i> method and optionally provides
+ * a {@link Bond} representation of such parameter (see {@link #asBond(String)})
+ * <h3>Parameters declaration and usage</h3>
+ * If the parameters are declared as <i>static</i> fields in a container class, they can be retrieved in toto using
+ * {@link #findParameters(Class)} or by name using {@link #findParameter(String, Class)}.<br>
+ * <br>
+ * A possible {@link DiscoveryRequestTransformer#getUserBond(WebRequest)} implementation can be like this:<br>
+ * <br>
+ * <ol>
+ * <li>creates a {@link KeyValueParser} with {@link WebRequest#getQueryString()}</li>
+ * <li>find all the parameters using {@link #findParameters(Class)}</li>
+ * <li>for each parameter:
+ * <ul>
+ * <li>get its current value invoking {@link KeyValueParser#getValue(String)} with the parameter
+ * name ({@link WebRequestParameter#getName()}) as argument</li>
+ * <li>validate the parameter value according to an expected content or type (optional)</li>
+ * <li>invoke {@link WebRequestParameter#asBond(String)} with the parameter value</li>
+ * </ul>
+ * <li>in case of multiple {@link Bond}s (according to the declared {@link WebRequestParameter}s), they can be grouped
+ * in a single {@link LogicalBond}<br>
+ * </li>
+ * </ol>
+ * <b>Example code</b><br>
+ * 
+ * <pre>
+ * &#64;Override
+ * protected Optional&lt;Bond&gt; asBond(WebRequest request) throws GSException {
+ * 
+ *     // creates the parser
+ *     KeyValueParser parser = new KeyValueParser(request.getQueryString());
+ * 
+ *     // finds all the parameters declared in a container class
+ *     List&lt;WebRequestParameter&gt; parameters = WebRequestParameter.findParameters(MyParameters.class);
+ * 
+ *     // creates the bond list
+ *     ArrayList&lt;Bond&gt; bondList = new ArrayList&lt;&gt;();
+ * 
+ *     for (WebRequestParameter param : parameters) {
+ * 
+ * 	// get the current parameter value
+ * 	String value = parser.getValue(param.getName());
+ * 
+ * 	// if value is null, the current parameter is not used in the web request
+ * 	if (value == null) {
+ * 	    // using a default value
+ * 	    value = param.getDefaultValue();
+ * 	}
+ * 
+ * 	if (value != null) {
+ * 
+ * 	    // validates the value according to an expected content or type (optional)
+ * 	    // ....
+ * 
+ * 	    // get the bond representation of the parameter
+ * 	    Optional&lt;Bond&gt; bond = param.asBond(value);
+ * 
+ * 	    if (bond.isPresent()) {
+ * 		bondList.add(bond.get());
+ * 	    }
+ * 	}
+ *     }
+ * 
+ *     Bond bond = null;
+ *     if (bondList.size() > 1) {
+ * 	// groups all the bonds in a logical bond
+ * 	bond = BondFactory.createAndBond(bondList.toArray(new Bond[] {}));
+ *     } else if (bondList.size() == 1) {
+ * 	bond = bondList.get(0);
+ *     }
+ * 
+ *     return bond;
+ * }
+ * </pre>
+ * 
+ * @see DiscoveryRequestTransformer#getUserBond(WebRequest)
+ * @see DiscoveryRequestTransformer#validate(WebRequest)
+ * @see DiscoveryRequestTransformer#transform(WebRequest)
+ * @see #asBond(String)
+ * @see DiscoveryMessage#setUserBond(Bond)
+ * @author Fabrizio
+ */
 public abstract class WebRequestParameter {
 
     private String valueType;

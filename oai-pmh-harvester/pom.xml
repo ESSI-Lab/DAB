@@ -1,0 +1,76 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>eu.essi_lab</groupId>
+        <artifactId>DAB</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>oai-pmh-harvester</artifactId>
+    <packaging>jar</packaging>
+    <name>ESSI-Lab OAIPMH Harvester</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>accessor-oai-pmh</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-s3</artifactId>
+            <version>1.11.145</version>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>jar-with-dep</id>
+
+            <build>
+
+
+                <finalName>oph</finalName>
+
+                <plugins>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>eu.essi_lab.oaipmhharv.OAIPMHHarvester</mainClass>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </plugin>
+
+
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>assembly</goal>
+                                </goals>
+                                <configuration>
+                                    <archiverConfig>
+                                    </archiverConfig>
+                                    <descriptors>
+                                        <descriptor>${basedir}/src/assemble/bundle-descriptor.xml
+                                        </descriptor>
+                                    </descriptors>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+</project>

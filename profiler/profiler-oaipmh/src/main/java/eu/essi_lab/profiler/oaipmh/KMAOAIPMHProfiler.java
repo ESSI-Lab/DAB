@@ -1,10 +1,13 @@
+/**
+ * 
+ */
 package eu.essi_lab.profiler.oaipmh;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,7 +24,7 @@ package eu.essi_lab.profiler.oaipmh;
  * #L%
  */
 
-import eu.essi_lab.pdk.ProfilerInfo;
+import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.profiler.oaipmh.handler.discover.OAIPMHRequestTransformer;
 import eu.essi_lab.profiler.oaipmh.handler.discover.OAIPMHResultSetMapper;
 import eu.essi_lab.profiler.oaipmh.handler.kma.discover.KMAOAIPMHResultSetMapper;
@@ -39,7 +42,7 @@ public class KMAOAIPMHProfiler extends OAIPMHProfiler {
      */
     public static final String KMA_OAI_PMH_PROFILER_TYPE = "KMA-OAI-PMH";
 
-    public static final ProfilerInfo KMA_OAIPMH_SERVICE_INFO = new ProfilerInfo();
+    public static final ProfilerSetting KMA_OAIPMH_SERVICE_INFO = new ProfilerSetting();
     static {
 	KMA_OAIPMH_SERVICE_INFO.setServiceName("KMA-OAI-PMH");
 	KMA_OAIPMH_SERVICE_INFO.setServiceType(KMA_OAI_PMH_PROFILER_TYPE);
@@ -69,7 +72,7 @@ public class KMAOAIPMHProfiler extends OAIPMHProfiler {
     }
 
     @Override
-    public ProfilerInfo getProfilerInfo() {
+    protected ProfilerSetting initSetting() {
 
 	return KMA_OAIPMH_SERVICE_INFO;
     }

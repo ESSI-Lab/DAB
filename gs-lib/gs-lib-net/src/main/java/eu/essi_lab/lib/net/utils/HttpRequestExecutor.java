@@ -4,7 +4,7 @@ package eu.essi_lab.lib.net.utils;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,9 +22,11 @@ package eu.essi_lab.lib.net.utils;
  */
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.security.KeyManagementException;
+import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
@@ -59,6 +61,10 @@ import org.apache.http.ssl.SSLContextBuilder;
 import org.slf4j.Logger;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+
+/**
+ * @author ilsanto
+ */
 public class HttpRequestExecutor {
 
     public static final String ERR_ID_WRONG_ENDPOINT = "ERR_ID_WRONG_ENDPOINT";
@@ -69,7 +75,7 @@ public class HttpRequestExecutor {
     private Integer connectionTimeOut;
     private Integer connectionRequestTimeOut;
 
-    private transient Logger logger = GSLoggerFactory.getLogger(HttpRequestExecutor.class);
+    private Logger logger = GSLoggerFactory.getLogger(HttpRequestExecutor.class);
 
     public static boolean logEnabled = true;
 
@@ -155,6 +161,12 @@ public class HttpRequestExecutor {
      */
     public HttpResponse execute(HttpRequestBase request, String username, String password) throws ClientProtocolException, IOException {
 
+	return execute(request, username, password, null, null, null);
+    }
+
+    public HttpResponse execute(HttpRequestBase request, String username, String password, InputStream keystore, String keystorePassword,
+	    String certificatePassword) throws ClientProtocolException, IOException {
+
 	HttpClient client;
 
 	URI requestURI = request.getURI();
@@ -168,10 +180,12 @@ public class HttpRequestExecutor {
 	URL requestURL = requestURI.toURL();
 	if (requestURL.getProtocol().toLowerCase().equals("https")) {
 
-	    client = createHttpClient(true, requestURL.getHost(), requestURL.getPort(), username, password);
+	    client = createHttpClient(true, requestURL.getHost(), requestURL.getPort(), username, password, keystore, keystorePassword,
+		    certificatePassword);
 
 	} else {
-	    client = createHttpClient(false, requestURL.getHost(), requestURL.getPort(), username, password);
+	    client = createHttpClient(false, requestURL.getHost(), requestURL.getPort(), username, password, keystore, keystorePassword,
+		    certificatePassword);
 	}
 
 	HttpClientContext context = HttpClientContext.create();
@@ -202,6 +216,13 @@ public class HttpRequestExecutor {
 
     private HttpClient createHttpClient(boolean https, String hostname, int port, String username, String password) {
 
+	return createHttpClient(https, hostname, port, username, password, null, null, null);
+
+    }
+
+    private HttpClient createHttpClient(boolean https, String hostname, int port, String username, String password, InputStream keystore,
+	    String keystorePassword, String certificatePassword) {
+
 	CloseableHttpClient client = null;
 
 	HttpClientBuilder builder = HttpClientBuilder.create();
@@ -225,7 +246,20 @@ public class HttpRequestExecutor {
 			return true;
 		    }
 		};
-		sslContextBuilder.loadTrustMaterial(acceptingTrustStrategy);
+		sslContextBuilder = sslContextBuilder.loadTrustMaterial(acceptingTrustStrategy);
+		if (keystore != null) {
+		    if (certificatePassword == null) {
+			certificatePassword = "";
+		    }
+		    try {
+			sslContextBuilder = sslContextBuilder.loadKeyMaterial(readStore(keystore,keystorePassword),
+				certificatePassword.toCharArray());
+		    } catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		    }
+
+		}
 
 		sslContext = sslContextBuilder.build();
 
@@ -303,5 +337,17 @@ public class HttpRequestExecutor {
 	client = builder.build();
 
 	return client;
+    }
+
+    private KeyStore readStore(InputStream keyStoreStream, String keystorePassword) throws Exception {
+	if (keystorePassword == null) {
+	    keystorePassword = "";
+	}
+
+	KeyStore keyStore = KeyStore.getInstance("PKCS12"); // JKS or "PKCS12"
+	keyStore.load(keyStoreStream, keystorePassword.toCharArray());
+	keyStoreStream.close();
+	return keyStore;
+
     }
 }

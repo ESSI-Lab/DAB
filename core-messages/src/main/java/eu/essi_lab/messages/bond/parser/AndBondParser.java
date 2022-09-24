@@ -4,7 +4,7 @@ package eu.essi_lab.messages.bond.parser;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,6 +35,13 @@ import eu.essi_lab.messages.bond.SpatialBond;
 import eu.essi_lab.messages.bond.ViewBond;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
+
+/**
+ * Utility class that parses the given bond, extracting the bonds that are in AND. It expects that the bond to parse is
+ * a combination of bonds in AND, otherwise it will throw an exception.
+ * 
+ * @author boldrini
+ */
 public class AndBondParser {
 
     public class AndBondHandler implements DiscoveryBondHandler {
@@ -92,17 +99,16 @@ public class AndBondParser {
 	}
 
 	private void throwException() throws GSException {
-	    GSException gse = new GSException();
+	    
 	    ErrorInfo info = new ErrorInfo();
-	    info.setContextId(this.getClass().getName());
+	    info.setCaller(this.getClass());
 	    info.setErrorDescription(exceptionMessage);
 	    info.setErrorId(errorId);
 	    info.setErrorType(ErrorInfo.ERRORTYPE_INTERNAL);
 	    info.setErrorCorrection("Please provide valid arguments to the And Bond Parser");
 	    info.setSeverity(ErrorInfo.SEVERITY_ERROR);
-	    gse.addInfo(info);
-	    throw gse;
 
+	    throw GSException.createException(info);
 	}
 
 	@Override

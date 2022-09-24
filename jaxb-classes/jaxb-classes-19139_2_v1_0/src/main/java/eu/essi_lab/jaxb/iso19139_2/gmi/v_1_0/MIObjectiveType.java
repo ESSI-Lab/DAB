@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -61,6 +61,35 @@ import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;
 import net.opengis.iso19139.gmd.v_20060504.EXExtentPropertyType;
 import net.opengis.iso19139.gmd.v_20060504.MDIdentifierPropertyType;
 
+
+/**
+ * Description: Describes the characteristics, spatial and temporal extent of the intended object to be observed  - shortName: TargetId
+ * 
+ * <p>Java class for MI_Objective_Type complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="MI_Objective_Type"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{http://www.isotc211.org/2005/gco}AbstractObject_Type"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="identifier" type="{http://www.isotc211.org/2005/gmd}MD_Identifier_PropertyType" maxOccurs="unbounded"/&gt;
+ *         &lt;element name="priority" type="{http://www.isotc211.org/2005/gco}CharacterString_PropertyType" minOccurs="0"/&gt;
+ *         &lt;element name="type" type="{http://www.isotc211.org/2005/gmi}MI_ObjectiveTypeCode_PropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="function" type="{http://www.isotc211.org/2005/gco}CharacterString_PropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="extent" type="{http://www.isotc211.org/2005/gmd}EX_Extent_PropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="pass" type="{http://www.isotc211.org/2005/gmi}MI_PlatformPass_PropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="sensingInstrument" type="{http://www.isotc211.org/2005/gmi}MI_Instrument_PropertyType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="objectiveOccurrence" type="{http://www.isotc211.org/2005/gmi}MI_Event_PropertyType" maxOccurs="unbounded"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "MI_Objective_Type", propOrder = {
     "identifier",

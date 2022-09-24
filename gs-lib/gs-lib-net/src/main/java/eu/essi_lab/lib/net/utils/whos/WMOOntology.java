@@ -4,7 +4,7 @@ package eu.essi_lab.lib.net.utils.whos;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -339,6 +339,14 @@ public class WMOOntology {
 	refreshCaches();
 	return new HashSet<String>(unitCache.keySet());
     }
+
+    /**
+     * This is used to download a list of
+     * 
+     * @param type
+     * @param file
+     * @throws Exception
+     */
     public void downloadCodes(String type, File file) throws Exception {
 	Downloader d = new Downloader();
 	String url = "http://codes.wmo.int/system/query?output=json&format=application/json&timeout=0&query=";

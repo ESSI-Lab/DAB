@@ -1,0 +1,47 @@
+- Wrapped connectors
+
+1) Create a common super class (possibly abstract) for all the wrapped connectors which extends WrappedConnector (e.g: 	WFSConnector which extends WrappedConnector)
+1.a) Let all the wrapped connectors (e.g: WFS_1_1_0Connector) extend that common superclass
+1.b) Each wrapped connector should have a public static final field called TYPE used to implement the getType method. The value
+     should be human readable and it should provide info about the connector type/version. E.g: "WFS Connector 1.1.0" 
+1.c) Each wrapped connector MUST override the getType method using its own TYPE field 
+	 
+- Wrapper connector and related setting	 
+
+2) Creates a connector class which extends ConnectorWrapper (e.g: WFSConnectorWrapper) and, as for the ConnectorWrapperSetting,     
+   refers as generic type to the common wrapped connectors class (e.g: WFSConnector). The connector should 
+   have a public static final field called TYPE which can be set equals to the class name (e.g: 'WFSConnectorWrapper'). 
+   This static field will be referenced in the related wrapper setting, as explained in the next step 
+	 
+3) Creates a setting which extends ConnectorWrapperSetting, e.g: WFSConnectorWrapperSetting. 
+
+- Implementation example:
+
+    getDefaultConnectorType -> WFS_1_1_0Connector.TYPE
+    getConnectorsTypeOptionLabel -> "WFS Connector type"
+    getOptionKey -> "wfsConnectorType"
+    getWrappedConnectorClass ->  WFSConnector.class
+    initConnectorType -> WFSConnectorWrapper.TYPE
+    initSettingName -> "WFS Connector settings"
+
+3.a) The wrapper setting must refer as generic type, to the common wrapped connectors class (e.g: WFSConnector) 
+3.b) This setting is used to select which kind of wrapped connector will be used by the harvested accessor      
+     during harvesting and the values provide by the option are taken from the wrapped connector types as mentioned in (1.b 
+	 
+- Accessor
+	 
+4) Creates the accessor class which extends HarvestedAccessor and refers as generic type to the wrapper 
+   connector (e.g: WFSConnectorWrapper)
+   
+- Services registration
+
+1) Creates a file called "eu.essi_lab.cdk.harvest.IHarvestedQueryConnector" and put the wrapper connector class, 
+   e.g: WFSConnectorWrapper
+2) Creates a file having the name of the wrapped connector superclass, e.g: "eu.essi_lab.accessor.wfs.WFSConnector", and 
+   put all the wrapped connector subclasses (e.g: WFS_1_1_0Connector)
+3) Creates a file called "eu.essi_lab.adk.harvest.IHarvestedAccessor" and put the accessor class (e.g: WFSAccessor)
+4) Creates a file called "eu.essi_lab.cfga.Configurable" and put the wrapper connector class 
+   (e.g: WFSConnectorWrapper) and the accessor class (e.g: WFSAccessor)
+
+	 
+	 

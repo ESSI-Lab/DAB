@@ -1,10 +1,13 @@
+/**
+ * 
+ */
 package eu.essi_lab.pdk.rsm.impl.atom;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +28,7 @@ import java.util.Objects;
 
 import org.jdom2.Element;
 
-import eu.essi_lab.jaxb.common.NameSpace;
+import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.lib.xml.atom.CustomEntry;
 
 /**
@@ -151,6 +154,14 @@ public class GPEntry extends CustomEntry {
     }
 
     /**
+     * @param availableGranules
+     */
+    public void setAvailableGranules(String availableGranules) {
+
+	addSimpleElement("available-granules", availableGranules, NameSpace.GS_DATA_MODEL_SCHEMA_URI);
+    }
+
+    /**
      * @param collectionQueryables
      */
     public void setCollectionQueryables(String collectionQueryables) {
@@ -171,6 +182,20 @@ public class GPEntry extends CustomEntry {
 	    addAttributeTo(category, "term", term.trim());
 
 	    addElement(category);
+
+	}
+    }
+
+    /**
+     * @param id
+     * @param title
+     */
+    public void addSourceInfo(String id, String title) {
+
+	if (Objects.nonNull(id) && Objects.nonNull(title)) {
+
+	    addSimpleElement("sourceId", id.trim());
+	    addSimpleElement("sourceTitle", title.trim());
 
 	}
     }

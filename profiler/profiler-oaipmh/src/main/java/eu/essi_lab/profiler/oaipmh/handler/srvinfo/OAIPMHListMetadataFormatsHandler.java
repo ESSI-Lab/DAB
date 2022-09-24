@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.oaipmh.handler.srvinfo;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,6 +29,14 @@ import eu.essi_lab.jaxb.oaipmh.OAIPMHtype;
 import eu.essi_lab.jaxb.oaipmh.VerbType;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.profiler.oaipmh.profile.OAIPMHProfile;
+
+/**
+ * Specific handler for the OAIPMH ListMetadataFormats request; it is selected by the
+ * {@link OAIPMHListMetadataFormatsFilter}. Example URL: <a href=
+ * "http://localhost:8085/gs-service/services/essi/oaipmh?verb=ListMetadataFormats">http://localhost:8085/gs-service/services/essi/oaipmh?verb=ListMetadataFormats</a>
+ * 
+ * @author Fabrizio
+ */
 public class OAIPMHListMetadataFormatsHandler extends OAIPMHServiceInfoHandler {
 
     public static final String ISO19139_METADATA_PREFIX = "ISO19139";

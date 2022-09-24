@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -61,6 +61,29 @@ import net.opengis.iso19139.gco.v_20060504.IntegerPropertyType;
 import net.opengis.iso19139.gmd.v_20060504.DQDataQualityPropertyType;
 import net.opengis.iso19139.gmd.v_20060504.MDReferenceSystemPropertyType;
 
+
+/**
+ * <p>Java class for MI_GCPCollection_Type complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="MI_GCPCollection_Type"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{http://www.isotc211.org/2005/gmi}AbstractMI_GeolocationInformation_Type"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="collectionIdentification" type="{http://www.isotc211.org/2005/gco}Integer_PropertyType"/&gt;
+ *         &lt;element name="collectionName" type="{http://www.isotc211.org/2005/gco}CharacterString_PropertyType"/&gt;
+ *         &lt;element name="coordinateReferenceSystem" type="{http://www.isotc211.org/2005/gmd}MD_ReferenceSystem_PropertyType"/&gt;
+ *         &lt;element name="gcp" type="{http://www.isotc211.org/2005/gmi}MI_GCP_PropertyType" maxOccurs="unbounded"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "MI_GCPCollection_Type", propOrder = {
     "collectionIdentification",

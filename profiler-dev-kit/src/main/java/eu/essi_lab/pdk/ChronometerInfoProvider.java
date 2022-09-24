@@ -1,10 +1,13 @@
+/**
+ * 
+ */
 package eu.essi_lab.pdk;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,6 +25,7 @@ package eu.essi_lab.pdk;
  */
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -61,10 +65,10 @@ public class ChronometerInfoProvider extends Chronometer implements RuntimeInfoP
 	HashMap<String, List<String>> map = new HashMap<>();
 	map.put(//
 		RuntimeInfoElement.CHRONOMETER_TIME_STAMP.getName(), //
-		Arrays.asList(String.valueOf(ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds())));
+		Arrays.asList(ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds(new Date(startTime))));
 	map.put(//
 		RuntimeInfoElement.CHRONOMETER_TIME_STAMP_MILLIS.getName(), //
-		Arrays.asList(String.valueOf(System.currentTimeMillis())));
+		Arrays.asList(String.valueOf(startTime)));
 
 	map.put(//
 		RuntimeInfoElement.CHRONOMETER_ELAPSED_TIME_MILLIS.getName(), //

@@ -1,10 +1,13 @@
+/**
+ * 
+ */
 package eu.essi_lab.authorization.builder;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,8 +27,6 @@ package eu.essi_lab.authorization.builder;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.ow2.authzforce.core.pdp.impl.combining.StandardCombiningAlgorithm;
 
 import eu.essi_lab.jaxb.common.ObjectFactories;
 import oasis.names.tc.xacml._3_0.core.schema.wd_17.Policy;

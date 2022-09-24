@@ -4,7 +4,7 @@ package eu.essi_lab.iso.datamodel.classes;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -70,6 +70,12 @@ import net.opengis.iso19139.gmd.v_20060504.MDScopeCodePropertyType;
 import net.opengis.iso19139.gmd.v_20060504.MDSpatialRepresentationPropertyType;
 import net.opengis.iso19139.srv.v_20060504.SVServiceIdentificationPropertyType;
 import net.opengis.iso19139.srv.v_20060504.SVServiceIdentificationType;
+
+/**
+ * MD_Metadata
+ * 
+ * @author Fabrizio
+ */
 public class MDMetadata extends ISOMetadata<MDMetadataType> {
 
     @XmlElement(name = "MD_Metadata", namespace = CommonNameSpaceContext.GMD_NS_URI)

@@ -1,0 +1,9 @@
+eu.essi_lab.cfga.gs.setting.driver.SharedCacheDriverSetting
+eu.essi_lab.cfga.gs.setting.driver.SharedPersistentDriverSetting
+eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting
+eu.essi_lab.cfga.gs.setting.database.DatabaseSetting
+eu.essi_lab.cfga.gs.setting.SystemSetting
+eu.essi_lab.cfga.gs.setting.S3StorageSetting
+eu.essi_lab.cfga.gs.setting.DownloadSetting
+eu.essi_lab.cfga.gs.setting.CredentialsSetting
+eu.essi_lab.cfga.gs.setting.distribution.DistributionSetting

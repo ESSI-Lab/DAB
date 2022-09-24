@@ -4,7 +4,7 @@ package eu.essi_lab.api.database.marklogic;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,17 +22,24 @@ package eu.essi_lab.api.database.marklogic;
  */
 
 import java.util.List;
+import java.util.Optional;
 
-import eu.essi_lab.api.database.HarvestingStrategy;
 import eu.essi_lab.api.database.SourceStorage;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.database.SourceStorageSetting;
+import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.HarvestingProperties;
 import eu.essi_lab.model.GSSource;
+import eu.essi_lab.model.HarvestingStrategy;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 
 public class MarkLogicSourceStorage extends MarkLogicReader implements SourceStorage {
-    private static final long serialVersionUID = 631794288222442782L;
+
+    /**
+     *
+     */
     private static final String MARK_LOGIC_HARVESTING_STARTED_ERROR_ID = "MARK_LOGIC_HARVESTING_STARTED_ERROR";
     private static final String MARK_LOGIC_HARVESTING_ENDED_ERROR_ID = "MARK_LOGIC_HARVESTING_ENDED_ERROR";
     private static final String MARK_LOGIC_HARVESTING_PROPERTIES_READ_ERR_ID = "MARK_LOGIC_HARVESTING_PROPERTIES_READ_ERROR";
@@ -40,19 +47,34 @@ public class MarkLogicSourceStorage extends MarkLogicReader implements SourceSto
     private static final String MARK_LOGIC_GET_REPORT_ERR_ID = "MARK_LOGIC_GET_REPORT_ERROR";
     private static final String MARK_LOGIC_UPDATE_ERRORS_REPORT_ERR_ID = "MARK_LOGIC_UPDATE_ERRORS_REPORT_ERROR";
     private static final String MARK_LOGIC_GET_ERRORS_REPORT_ERR_ID = "MARK_LOGIC_GET_ERRORS_REPORT_ERROR";
+    private SourceStorageSetting setting;
 
     public MarkLogicSourceStorage() {
-	// Nothing to init
+
+	this.setting = ConfigurationWrapper.getSourceStorageSettings();
     }
 
     @Override
     public void harvestingStarted(GSSource source, HarvestingStrategy strategy, boolean recovery) throws GSException {
 
+	harvestingStarted(source, strategy, recovery, Optional.empty());
+    }
+
+    @Override
+    public void harvestingEnded(GSSource source, HarvestingStrategy strategy) throws GSException {
+
+	harvestingEnded(source, strategy, Optional.empty());
+    }
+
+    @Override
+    public void harvestingStarted(GSSource source, HarvestingStrategy strategy, boolean recovery, Optional<SchedulerJobStatus> status)
+	    throws GSException {
+
 	MarkLogicDatabase markLogicDB = getDatabase();
 	try {
 
 	    SourceStorageWorker worker = markLogicDB.getWorker(source.getUniqueIdentifier());
-	    worker.harvestingStarted(strategy, recovery);
+	    worker.harvestingStarted(strategy, recovery, status);
 
 	} catch (Exception e) {
 
@@ -66,6 +88,28 @@ public class MarkLogicSourceStorage extends MarkLogicReader implements SourceSto
 		    ErrorInfo.ERRORTYPE_INTERNAL, //
 		    ErrorInfo.SEVERITY_ERROR, //
 		    MARK_LOGIC_HARVESTING_STARTED_ERROR_ID, //
+		    e);
+	}
+    }
+
+    @Override
+    public void harvestingEnded(GSSource source, HarvestingStrategy strategy, Optional<SchedulerJobStatus> status) throws GSException {
+
+	MarkLogicDatabase markLogicDB = getDatabase();
+	try {
+
+	    SourceStorageWorker worker = markLogicDB.getWorker(source.getUniqueIdentifier());
+	    worker.harvestingEnded(this, strategy, status);
+
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    MARK_LOGIC_HARVESTING_ENDED_ERROR_ID, //
 		    e);
 	}
     }
@@ -91,28 +135,6 @@ public class MarkLogicSourceStorage extends MarkLogicReader implements SourceSto
 		    ErrorInfo.ERRORTYPE_INTERNAL, //
 		    ErrorInfo.SEVERITY_ERROR, //
 		    MARK_LOGIC_HARVESTING_PROPERTIES_STORE_ERROR_ID, //
-		    e);
-	}
-    }
-
-    @Override
-    public void harvestingEnded(GSSource source, HarvestingStrategy strategy) throws GSException {
-
-	MarkLogicDatabase markLogicDB = getDatabase();
-	try {
-
-	    SourceStorageWorker worker = markLogicDB.getWorker(source.getUniqueIdentifier());
-	    worker.harvestingEnded(this, strategy);
-
-	} catch (Exception e) {
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	    throw GSException.createException(//
-		    getClass(), //
-		    e.getMessage(), //
-		    null, //
-		    ErrorInfo.ERRORTYPE_INTERNAL, //
-		    ErrorInfo.SEVERITY_ERROR, //
-		    MARK_LOGIC_HARVESTING_ENDED_ERROR_ID, //
 		    e);
 	}
     }
@@ -245,4 +267,21 @@ public class MarkLogicSourceStorage extends MarkLogicReader implements SourceSto
 
     }
 
+    @Override
+    public SourceStorageSetting getSetting() {
+
+	return setting;
+    }
+
+    @Override
+    public void configure(SourceStorageSetting setting) {
+
+	this.setting = setting;
+    }
+
+    @Override
+    public String getType() {
+
+	return "MarkLogicSourceStorage";
+    }
 }

@@ -1,0 +1,13 @@
+:host{
+   padding-top: 0px !important;
+   padding-bottom: 0px !important;
+}
+
+
+:host([theme~="spacing"])  ::slotted(label){
+  margin-top: 0px !important;
+}
+
+:host([theme~="spacing"])  ::slotted(vaadin-vertical-layout){
+  margin-top: 0px !important;
+}

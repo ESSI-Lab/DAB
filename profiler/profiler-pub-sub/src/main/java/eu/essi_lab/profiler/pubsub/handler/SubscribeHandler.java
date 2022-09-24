@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.pubsub.handler;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -37,6 +37,10 @@ import eu.essi_lab.profiler.pubsub.PubSubRequestParser;
 import eu.essi_lab.profiler.pubsub.PubSubRequestParser.PubSubRequestParam;
 import eu.essi_lab.profiler.pubsub.PubSubWorker;
 import eu.essi_lab.profiler.pubsub.Subscription;
+
+/**
+ * @author Fabrizio
+ */
 public class SubscribeHandler extends DefaultRequestHandler {
 
     private static final long SLEEP_TIME = 5000;

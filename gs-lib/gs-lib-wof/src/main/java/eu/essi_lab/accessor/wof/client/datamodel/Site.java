@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof.client.datamodel;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -41,7 +41,7 @@ public class Site {
 	return reader;
     }
 
-    private transient Logger logger = GSLoggerFactory.getLogger(SiteInfo.class);
+    private Logger logger = GSLoggerFactory.getLogger(SiteInfo.class);
     private XMLNodeWriter writer;
 
     public Site(Node node) {

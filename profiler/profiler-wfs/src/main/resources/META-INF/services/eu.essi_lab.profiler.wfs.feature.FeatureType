@@ -1,0 +1,6 @@
+eu.essi_lab.profiler.wfs.feature.station.StationFeatureType
+eu.essi_lab.profiler.wfs.feature.emodpace.BathymetryThematicDataset
+eu.essi_lab.profiler.wfs.feature.emodpace.ChemistryThematicDataset
+eu.essi_lab.profiler.wfs.feature.emodpace.MeteorologyThematicDataset
+eu.essi_lab.profiler.wfs.feature.emodpace.PhysicsThematicDataset
+eu.essi_lab.profiler.wfs.feature.emodpace.BiologyThematicDataset

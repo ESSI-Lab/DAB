@@ -4,7 +4,7 @@ package eu.essi_lab.model.index.jaxb;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -38,8 +38,12 @@ import org.w3c.dom.Node;
 
 import eu.essi_lab.iso.datamodel.DOMSerializer;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.jaxb.common.NameSpace;
-import eu.essi_lab.model.QualifiedName;
+import eu.essi_lab.lib.xml.NameSpace;
+import eu.essi_lab.lib.xml.QualifiedName;
+
+/**
+ * @author Fabrizio
+ */
 @XmlRootElement(name = "bbox", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
 public class BoundingBox extends DOMSerializer {
 

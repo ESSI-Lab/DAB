@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.wml._2_0.gml._3_2_1;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -41,6 +41,32 @@ import eu.essi_lab.jaxb.wml._2_0.xlink.ActuateType;
 import eu.essi_lab.jaxb.wml._2_0.xlink.ShowType;
 import eu.essi_lab.jaxb.wml._2_0.xlink.TypeType;
 
+
+/**
+ * <p>Java class for DirectionPropertyType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="DirectionPropertyType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;choice minOccurs="0"&gt;
+ *         &lt;element name="DirectionVector" type="{http://www.opengis.net/gml/3.2}DirectionVectorType"/&gt;
+ *         &lt;element name="DirectionDescription" type="{http://www.opengis.net/gml/3.2}DirectionDescriptionType"/&gt;
+ *         &lt;element name="CompassPoint" type="{http://www.opengis.net/gml/3.2}CompassPointEnumeration"/&gt;
+ *         &lt;element name="DirectionKeyword" type="{http://www.opengis.net/gml/3.2}CodeType"/&gt;
+ *         &lt;element name="DirectionString" type="{http://www.opengis.net/gml/3.2}StringOrRefType"/&gt;
+ *       &lt;/choice&gt;
+ *       &lt;attGroup ref="{http://www.opengis.net/gml/3.2}OwnershipAttributeGroup"/&gt;
+ *       &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "DirectionPropertyType", propOrder = {
     "directionVector",

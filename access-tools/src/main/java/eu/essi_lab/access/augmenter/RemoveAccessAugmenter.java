@@ -4,7 +4,7 @@ package eu.essi_lab.access.augmenter;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,21 +25,43 @@ import java.util.Optional;
 
 import eu.essi_lab.access.compliance.wrapper.ReportsMetadataHandler;
 import eu.essi_lab.augmenter.ResourceAugmenter;
+import eu.essi_lab.cfga.gs.setting.augmenter.AugmenterSetting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.configuration.option.GSConfOption;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.ResourceProperty;
-public class RemoveAccessAugmenter extends ResourceAugmenter {
+
+/**
+ * Removes access information test reports from the resource
+ * 
+ * @author boldrini
+ */
+public class RemoveAccessAugmenter extends ResourceAugmenter<AugmenterSetting> {
 
     /**
-     *
+     * 
      */
-    private static final long serialVersionUID = 1925873267406623783L;
-
     public RemoveAccessAugmenter() {
+    }
 
-	setLabel("Remove access augmenter");
+    @Override
+    protected String initName() {
+
+	return "Remove access augmenter";
+    }
+
+    /**
+     * @param setting
+     */
+    public RemoveAccessAugmenter(AugmenterSetting setting) {
+
+	super(setting);
+    }
+
+    @Override
+    public String getType() {
+
+	return "RemoveAccessAugmenter";
     }
 
     public Optional<GSResource> augment(GSResource resource) throws GSException {
@@ -85,13 +107,8 @@ public class RemoveAccessAugmenter extends ResourceAugmenter {
     }
 
     @Override
-    public void onOptionSet(GSConfOption<?> opt) throws GSException {
-	// nothing to set
-    }
+    protected AugmenterSetting initSetting() {
 
-    @Override
-    public void onFlush() throws GSException {
-	// nothing to flush
+	return new AugmenterSetting();
     }
-
 }

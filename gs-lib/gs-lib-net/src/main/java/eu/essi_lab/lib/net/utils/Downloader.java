@@ -4,7 +4,7 @@ package eu.essi_lab.lib.net.utils;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,6 +21,8 @@ package eu.essi_lab.lib.net.utils;
  * #L%
  */
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -44,10 +46,13 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
-import org.apache.http.client.methods.HttpRequestBase;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.exceptions.GSException;
+
+/**
+ * @author Fabrizio
+ */
 public class Downloader implements Serializable {
 
     /**
@@ -63,6 +68,51 @@ public class Downloader implements Serializable {
     public void setTimeout(Integer milliseconds) {
 
 	this.timeOut = milliseconds;
+    }
+
+    public DownloaderResponse downloadResponse(String url) throws ClientProtocolException, IOException {
+	return downloadResponse(url, null);
+    }
+
+    public DownloaderResponse downloadResponse(String url, List<Header> headers) throws ClientProtocolException, IOException {
+
+	File file = new File(url);
+
+	if (file.exists()) {
+
+	    DownloaderResponse ret = new DownloaderResponse(200, new Header[] {}, new FileInputStream(file));
+
+	    return ret;
+	}
+
+	HttpGet httpGet = getHttpGetRequest(url);
+
+	if (headers != null) {
+	    for (Header header : headers) {
+		httpGet.addHeader(header);
+	    }
+	}
+
+	HttpRequestExecutor executor = getExecutor();
+
+	HttpResponse response = executor.execute(httpGet);
+
+	int statusCode = response.getStatusLine().getStatusCode();
+
+	GSLoggerFactory.getLogger(getClass()).trace("Obtained status code: {}", statusCode);
+
+	HttpEntity entity = response.getEntity();
+	InputStream body = null;
+	if (Objects.nonNull(entity)) {
+
+	    body = entity.getContent();
+	}
+
+	Header[] responseHeaders = response.getAllHeaders();
+
+	DownloaderResponse ret = new DownloaderResponse(statusCode, responseHeaders, body);
+
+	return ret;
     }
 
     /**
@@ -86,7 +136,7 @@ public class Downloader implements Serializable {
 
 	} catch (UnsupportedOperationException | IOException e) {
 
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	    GSLoggerFactory.getLogger(getClass()).error("Unable to download string: {}", e.getMessage());
 	}
 
 	return Optional.ofNullable(string);
@@ -156,6 +206,15 @@ public class Downloader implements Serializable {
     public Optional<SimpleEntry<Header[], InputStream>> downloadHeadersAndBodyWithException(String url, List<Header> headers)
 	    throws ClientProtocolException, IOException {
 
+	File file = new File(url);
+
+	if (file.exists()) {
+
+	    SimpleEntry<Header[], InputStream> ret = new SimpleEntry<>(new Header[] {}, new FileInputStream(file));
+
+	    return Optional.of(ret);
+	}
+
 	HttpGet httpGet = getHttpGetRequest(url);
 
 	if (headers != null) {
@@ -198,9 +257,9 @@ public class Downloader implements Serializable {
 	try {
 	    opt = downloadHeadersAndBodyWithException(url, headers);
 
-	} catch (UnsupportedOperationException | IOException e) {
+	} catch (Exception e) {
 
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	    GSLoggerFactory.getLogger(getClass()).error("Unable to download headers and body: {}", e.getMessage());
 	}
 
 	return opt;

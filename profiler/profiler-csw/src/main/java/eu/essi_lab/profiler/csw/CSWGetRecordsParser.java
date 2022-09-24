@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.csw;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -64,6 +64,10 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
 import net.opengis.gml.v_3_2_0.EnvelopeType;
+
+/**
+ * @author Fabrizio
+ */
 public class CSWGetRecordsParser {
 
     private static final String CSW_GET_RECORDS_PARSER_FILTER_CHECK_ERROR = "CSW_GET_RECORDS_PARSER_FILTER_CHECK_ERROR";

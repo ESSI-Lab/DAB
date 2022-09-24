@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof.info;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eu.essi_lab.accessor.wof.info.GetWaterOneFlowServiceInfoHandler.WOFGroup;
-import eu.essi_lab.configuration.ConfigurationUtils;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.stats.StatisticsMessage;
 import eu.essi_lab.messages.web.WebRequest;
@@ -52,8 +52,8 @@ public class StatisticsByView implements StatisticsGenerator {
 
 	    // set the required properties
 	    statisticsMessage.setSources(allSources);
-	    statisticsMessage.setDataBaseURI(ConfigurationUtils.getStorageURI());
-	    statisticsMessage.setSharedRepositoryInfo(ConfigurationUtils.getSharedRepositoryInfo());
+	    statisticsMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	    // statisticsMessage.setSharedRepositoryInfo(ConfigurationUtils.getSharedRepositoryInfo());
 	    statisticsMessage.setWebRequest(webRequest);
 
 	    WebRequestTransformer.setView(//

@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wps;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,7 +31,7 @@ import org.w3c.dom.Node;
 
 import eu.essi_lab.access.DataDownloader;
 import eu.essi_lab.access.DataDownloaderFactory;
-import eu.essi_lab.configuration.ConfigurationUtils;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.net.utils.Downloader;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.TaskListExecutor;
@@ -48,6 +48,7 @@ import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.model.resource.GSResource;
@@ -58,6 +59,15 @@ import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
 
 public class GWPSBulkDownloadRequestTransformer extends WebRequestTransformer<BulkDownloadMessage> {
+
+    /**
+     * 
+     */
+    private static final String GWPS_BULK_DOWNLOAD_EXECUTOR_VALIDATION_ERROR = "GWPS_BULK_DOWNLOAD_EXECUTOR_VALIDATION_ERROR";
+    /**
+     * 
+     */
+    private static final String GWPS_BULK_DOWNLOAD_EXECUTOR_REFINE_MESSAGE_ERROR = "GWPS_BULK_DOWNLOAD_EXECUTOR_REFINE_MESSAGE_ERROR";
 
     @Override
     public ValidationMessage validate(WebRequest request) throws GSException {
@@ -95,7 +105,7 @@ public class GWPSBulkDownloadRequestTransformer extends WebRequestTransformer<Bu
 
 			    message.setQueryRegistrationEnabled(false);
 
-			    message.setSources(ConfigurationUtils.getAllSources());
+			    message.setSources(ConfigurationWrapper.getAllSources());
 
 			    Page page = new Page(1, 1);
 			    message.setPage(page);
@@ -103,9 +113,8 @@ public class GWPSBulkDownloadRequestTransformer extends WebRequestTransformer<Bu
 			    message.getResourceSelector().setIndexesPolicy(IndexesPolicy.NONE);
 			    message.getResourceSelector().setSubset(ResourceSubset.FULL);
 
-			    message.setSources(ConfigurationUtils.getBrokeredSources());
-			    message.setDataBaseURI(ConfigurationUtils.getStorageURI());
-			    message.setSharedRepositoryInfo(ConfigurationUtils.getSharedRepositoryInfo());
+			    message.setSources(ConfigurationWrapper.getHarvestedSources());
+			    message.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
 
 			    GSLoggerFactory.getLogger(getClass()).info("Resource discovery STARTED");
 
@@ -147,7 +156,6 @@ public class GWPSBulkDownloadRequestTransformer extends WebRequestTransformer<Bu
 					ret.setResult(ValidationResult.VALIDATION_FAILED);
 				    }
 				}
-
 			    }
 
 			} else {
@@ -162,6 +170,7 @@ public class GWPSBulkDownloadRequestTransformer extends WebRequestTransformer<Bu
 				    return ret;
 				}
 			    }
+
 			    boolean result = d.checkConnectivity(linkage);
 			    if (!result) {
 				ValidationException exception = new ValidationException();
@@ -171,13 +180,11 @@ public class GWPSBulkDownloadRequestTransformer extends WebRequestTransformer<Bu
 				ret.addException(exception);
 				ret.setResult(ValidationResult.VALIDATION_FAILED);
 			    }
-
 			}
+
 			return ret;
 		    }
-
 		});
-
 	    }
 
 	    List<Future<ValidationMessage>> futures = barrier.executeAndWait(10); // waits maximum 10 seconds, because
@@ -214,9 +221,14 @@ public class GWPSBulkDownloadRequestTransformer extends WebRequestTransformer<Bu
 	    return ret;
 
 	} catch (Exception e) {
-	    throw new GSException();
-	}
 
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    GWPS_BULK_DOWNLOAD_EXECUTOR_VALIDATION_ERROR);
+	}
     }
 
     @Override
@@ -226,20 +238,25 @@ public class GWPSBulkDownloadRequestTransformer extends WebRequestTransformer<Bu
 
     @Override
     public String getProfilerType() {
-	// TODO Auto-generated method stub
+
 	return null;
     }
 
     @Override
     protected BulkDownloadMessage refineMessage(BulkDownloadMessage message) throws GSException {
+
 	DataReferences references = new DataReferences();
+
 	try {
 	    WebRequest request = message.getWebRequest();
 	    InputStream stream = request.getBodyStream().clone();
+
 	    XMLDocumentReader reader = new XMLDocumentReader(stream);
 	    stream.close();
 	    Node[] nodes = reader.evaluateNodes("//*:Input");
+
 	    for (Node node : nodes) {
+
 		DataReference reference = new DataReference();
 
 		String title = reader.evaluateString(node, "*:Title");
@@ -249,12 +266,23 @@ public class GWPSBulkDownloadRequestTransformer extends WebRequestTransformer<Bu
 
 		references.addReference(reference);
 	    }
+
 	    message.setDataReferences(references);
 	    message.setUserJobResultId("bulk-download-" + System.currentTimeMillis() + ".zip");
 
+	    Boolean storeExecResponse = reader.evaluateString("//*:ResponseDocument/@storeExecuteResponse").equals("true");
+	    message.setStoreExecuteResponse(storeExecResponse);
+
 	} catch (Exception e) {
-	    throw new GSException();
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    GWPS_BULK_DOWNLOAD_EXECUTOR_REFINE_MESSAGE_ERROR);
 	}
+
 	return message;
     }
 
@@ -268,8 +296,7 @@ public class GWPSBulkDownloadRequestTransformer extends WebRequestTransformer<Bu
 
     @Override
     protected Page getPage(WebRequest request) throws GSException {
-	// TODO Auto-generated method stub
+
 	return null;
     }
-
 }

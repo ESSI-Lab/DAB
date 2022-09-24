@@ -4,7 +4,7 @@ package eu.essi_lab.request.executor.access;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,14 +31,14 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.slf4j.Logger;
 
-import eu.essi_lab.configuration.ConfigurationUtils;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.DownloadSetting;
 import eu.essi_lab.lib.net.utils.Downloader;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.StorageUri;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.request.executor.schedule.AmazonResultStorage;
-import eu.essi_lab.request.executor.schedule.ResultStorage;
 import eu.essi_lab.request.executor.utils.MimeTypeConstants;
+import eu.essi_lab.shared.resultstorage.ResultStorage;
+import eu.essi_lab.shared.resultstorage.ResultStorageFactory;
 
 public class DirectDownloader {
 
@@ -91,26 +91,33 @@ public class DirectDownloader {
 	    throw new RuntimeException(msg);
 	}
 
-	String objectName = "unnamed-result-" + System.currentTimeMillis() + extension;
-
 	try {
-	    StorageUri resultStorageURI = ConfigurationUtils.getUserJobStorageURI();
 
-	    String get = resultStorageURI.getUri() + resultStorageURI.getStorageName() + "/" + objectName;
+	    String objectName = "unnamed-result-" + System.currentTimeMillis() + extension;
 
-	    logger.info("Storing to: {}", get);
+	    DownloadSetting downloadSetting = ConfigurationWrapper.getDownloadSetting();
 
 	    ResultStorage storage = null;
+	    StorageUri resultStorageURI = downloadSetting.getStorageUri();
 
-	    // AMAZON specific result storage
-	    if (resultStorageURI.getUri().contains("s3.amazonaws.com")) {
-		storage = new AmazonResultStorage(resultStorageURI);
+	    switch (downloadSetting.getDownloadStorage()) {
+
+	    case LOCAL_DOWNLOAD_STORAGE:
+
+		storage = ResultStorageFactory.createLocalResultStorage(resultStorageURI);
+
+	    case S3_DOWNLOAD_STORAGE:
+
+		storage = ResultStorageFactory.createAmazonS3ResultStorage(resultStorageURI);
 	    }
 
-	    if (storage == null) {
-		logger.error("Unable to connect to storage");
-		throw new GSException();
-	    }
+	    String get = storage.getStorageLocation(objectName);
+
+	    logger.info("Storing to {} STARTED", get);
+
+	    //
+	    //
+	    //
 
 	    File tmpFile = File.createTempFile(DirectDownloader.this.getClass().getSimpleName(), ".tmp");
 	    tmpFile.deleteOnExit();
@@ -120,17 +127,18 @@ public class DirectDownloader {
 	    storage.store(objectName, tmpFile);
 	    tmpFile.delete();
 
-	    logger.info("Result stored");
+	    logger.info("Storing to {} ENDED", get);
 
 	    return get;
+
 	} catch (Exception e) {
+	 
 	    String msg = "Failed trying to store direct downloaded file.";
 
 	    GSLoggerFactory.getLogger(getClass()).info(msg);
 
 	    throw new RuntimeException(msg);
 	}
-
     }
 
     private String guessExtension() {

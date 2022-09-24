@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.csw;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -32,28 +32,27 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
-import eu.essi_lab.model.Source;
+import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.OriginalMetadata;
 
 public class CSWBLUECLOUDConnector extends CSWConnector {
-    private static final long serialVersionUID = -6793827382032309877L;
-    
+
     private static final String CSWBLUECLOUDCONNECTOR_EXTRACTION_ERROR = "CSWBLUECLOUDCONNECTOR_EXTRACTION_ERROR";
 
-    public CSWBLUECLOUDConnector() {
-    }
+    /**
+     * 
+     */
+    public static final String TYPE = "CSW BLUECLOUD Connector";
 
     @Override
-    public String getLabel() {
+    public String getType() {
 
-	return "CSW BLUECLOUD Connector";
+	return TYPE;
     }
 
     /**
@@ -61,16 +60,15 @@ public class CSWBLUECLOUDConnector extends CSWConnector {
      */
 
     @Override
-    @JsonIgnore
     public void filterResults(ListRecordsResponse<OriginalMetadata> ret) {
-        // TODO Auto-generated method stub
+	// TODO Auto-generated method stub
 	List<OriginalMetadata> originalMetadataList = ret.getRecordsAsList();
-	for(OriginalMetadata om : originalMetadataList) {
+	for (OriginalMetadata om : originalMetadataList) {
 	    om.setSchemeURI(CommonNameSpaceContext.BLUECLOUD_NS_URI);
 	}
-        
+
     }
-    
+
     @Override
     public List<String> listMetadataFormats() {
 	List<String> toret = new ArrayList<>();
@@ -82,7 +80,7 @@ public class CSWBLUECLOUDConnector extends CSWConnector {
      * The CSW MCP connector applies only to the CSW AODN catalogue
      */
     @Override
-    public boolean supports(Source source) {
+    public boolean supports(GSSource source) {
 	String endpoint = source.getEndpoint();
 	if (endpoint.contains("csw-EMODNET_Chemistry") || endpoint.contains("csw-SEADATANET")) {
 	    boolean cswBaseSupport = super.supports(source);
@@ -92,7 +90,7 @@ public class CSWBLUECLOUDConnector extends CSWConnector {
 	}
 
     }
-    
+
     @Override
     protected File fixGetRecordsResponse(File file) throws GSException {
 	try {
@@ -103,14 +101,16 @@ public class CSWBLUECLOUDConnector extends CSWConnector {
 
 	    String str = new String(bytes, StandardCharsets.UTF_8);
 
-//	    str = str.replace("\"http://sdi.eurac.edu/metadata/iso19139-2/schema/gmi\"", "\"http://www.isotc211.org/2005/gmi\"");
-//
-//	    str = str.replace("\"http://sdi.eurac.edu/metadata/iso19139-2/schema/gmie\"", "\"http://www.isotc211.org/2005/gmi\"");
-//
-//	    str = str.replace("MIE_", "MI_");
-	    
+	    // str = str.replace("\"http://sdi.eurac.edu/metadata/iso19139-2/schema/gmi\"",
+	    // "\"http://www.isotc211.org/2005/gmi\"");
+	    //
+	    // str = str.replace("\"http://sdi.eurac.edu/metadata/iso19139-2/schema/gmie\"",
+	    // "\"http://www.isotc211.org/2005/gmi\"");
+	    //
+	    // str = str.replace("MIE_", "MI_");
+
 	    str = str.replace("\"http://www.opengis.net/gml/3.2\"", "\"http://www.opengis.net/gml\"");
-	    //xmlns:gml="http://www.opengis.net/gml/3.2"
+	    // xmlns:gml="http://www.opengis.net/gml/3.2"
 
 	    File ret = File.createTempFile(getClass().getSimpleName(), ".xml");
 

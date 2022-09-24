@@ -1,10 +1,13 @@
+/**
+ * 
+ */
 package eu.essi_lab.lib.net.dirlisting;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -44,6 +47,13 @@ public class HREFGrabberClient {
     protected URL url;
     protected String html;
     private String closingTag;
+
+    /**
+     * 
+     */
+    public HREFGrabberClient() {
+
+    }
 
     /**
      * @param url
@@ -93,7 +103,7 @@ public class HREFGrabberClient {
      */
     public List<String> grabLinks(String linkText) throws Exception {
 
-	return grabLinks_(this.url, linkText).//
+	return grabLinks(this.url, linkText).//
 		stream().//
 		map(l -> externalizeLink(url, l)).//
 		collect(Collectors.toList());
@@ -104,7 +114,7 @@ public class HREFGrabberClient {
      * @return
      * @throws Exception
      */
-    protected List<String> grabLinks_(URL url, String linkText) throws Exception {
+    public List<String> grabLinks(URL url, String linkText) throws Exception {
 
 	Downloader downloader = new Downloader();
 	ArrayList<String> list = Lists.newArrayList();
@@ -147,21 +157,40 @@ public class HREFGrabberClient {
     /**
      * @param url
      * @param link
+     * @param absolutePathReference
      * @return
      */
     protected String externalizeLink(URL url, String link) {
+
+	return externalizeLink(url, link, false);
+    }
+
+    /**
+     * @param url
+     * @param link
+     * @param absolutePathReference
+     * @return
+     */
+    protected String externalizeLink(URL url, String link, boolean absolutePathReference) {
 
 	if (url == null) {
 	    return link;
 	}
 
-	String externalForm = url.toExternalForm();
-	if (!externalForm.endsWith("/")) {
+	if (!absolutePathReference) {
 
-	    externalForm += "/";
+	    String externalForm = url.toExternalForm();
+	    if (!externalForm.endsWith("/")) {
+
+		externalForm += "/";
+	    }
+
+	    link = externalForm + link;
+
+	} else {
+
+	    link = url.toString().replace(url.getPath(), "/" + link);
 	}
-
-	link = externalForm + link;
 
 	return link;
     }

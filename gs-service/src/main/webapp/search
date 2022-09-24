@@ -66,7 +66,7 @@
 				width: 28px !important;
  			    height: 28px !important;			    
 				margin-left: -30px;
-	    		left: -225px;
+	    		left: -205px;
  			    margin-top: 57px !important;
 			    border-radius: 3px;
 			    padding: 0px !important;
@@ -350,15 +350,14 @@
 	         	
 	    	GIAPI.ui.mapTypeId = google.maps.MapTypeId.HYBRID;	        	
 	        GIAPI.search = {};
-	        
-	        var path = 'opensearch/query';
-	        
-	        var view = getUrlParameter('view');				        	        
-			if (typeof view !== 'undefined') {
-			  	path = 'view/'+view+'/'+path;
+	        	        
+	        var view = null;
+	        var viewParam = getUrlParameter('view');							        	        
+			if (typeof viewParam !== 'undefined') {
+			  	view = viewParam;
 			}
 				        	        
-            GIAPI.search.dab = GIAPI.DAB('./',null,'services/essi','csw',path);
+            GIAPI.search.dab = GIAPI.DAB('./', view, 'services/essi','csw');
         	                
 	        jQuery(function() {
 	        
@@ -722,7 +721,7 @@
                 GIAPI.search.sourcesWidget = GIAPI.SourcesWidget('sources-tab', GIAPI.search.dab,{
                  	'width':'none',    
                  	'height':'none',
-                 	'viewId': null,
+                 	'viewId': view,
                 	'include': function(source){                		
                 		// includes only harvested sources to speedup the initialization
                 		return source.contentType () === 'harvested';

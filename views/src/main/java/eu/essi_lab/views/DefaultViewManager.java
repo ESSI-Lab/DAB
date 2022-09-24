@@ -4,7 +4,7 @@ package eu.essi_lab.views;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.DatabaseWriter;
@@ -34,11 +35,21 @@ import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.DynamicView;
 import eu.essi_lab.messages.bond.LogicalBond;
-import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.bond.ViewBond;
 import eu.essi_lab.model.exceptions.GSException;
+
+/**
+ * The {@link DefaultViewManager} connects to the Database trough Database Reader and Database Writer, in order to
+ * implement the {@link
+ * IViewManager} interface.
+ *
+ * @author boldrini
+ */
 public class DefaultViewManager implements IViewManager {
+
+    private static final long CACHE_DURATION = TimeUnit.MINUTES.toMillis(30);
+    private static final int CACHE_SIZE = 10;
 
     private DatabaseWriter writer;
     private DatabaseReader reader;
@@ -64,11 +75,11 @@ public class DefaultViewManager implements IViewManager {
 
     static {
 	resolvedViewCache = new ExpiringCache<>();
-	resolvedViewCache.setDuration(120000);
-	resolvedViewCache.setMaxSize(10);
+	resolvedViewCache.setDuration(CACHE_DURATION);
+	resolvedViewCache.setMaxSize(CACHE_SIZE);
 	resolvedViewLocks = new ExpiringCache<>();
-	resolvedViewLocks.setDuration(120000);
-	resolvedViewLocks.setMaxSize(10);
+	resolvedViewLocks.setDuration(CACHE_DURATION);
+	resolvedViewLocks.setMaxSize(CACHE_SIZE);
     }
 
     /**
@@ -125,7 +136,7 @@ public class DefaultViewManager implements IViewManager {
      * @return
      */
     private void resolveViewBonds(View view) throws GSException {
-	Bond bond = view.getBond();	
+	Bond bond = view.getBond();
 	if (bond instanceof ViewBond) {
 
 	    ViewBond viewBond = (ViewBond) bond;
@@ -134,7 +145,7 @@ public class DefaultViewManager implements IViewManager {
 
 	    if (optionalResolved.isPresent()) {
 		bond = optionalResolved.get().getBond();
-		if (view.getCreator()==null) {
+		if (view.getCreator() == null) {
 		    view.setCreator(optionalResolved.get().getCreator());
 		}
 	    }
@@ -142,18 +153,18 @@ public class DefaultViewManager implements IViewManager {
 	} else if (bond instanceof LogicalBond) {
 	    LogicalBond logicalBond = (LogicalBond) bond;
 	    ArrayList<Bond> resolvedOperands = new ArrayList<Bond>();
-	    HashSet<String>creators = new HashSet<String>();
+	    HashSet<String> creators = new HashSet<String>();
 	    for (Bond operand : logicalBond.getOperands()) {
 		View childView = new View();
 		childView.setBond(operand);
 		resolveViewBonds(childView);
 		resolvedOperands.add(childView.getBond());
-		String creator =  childView.getCreator();
-		if (creator!=null) {
+		String creator = childView.getCreator();
+		if (creator != null) {
 		    creators.add(creator);
 		}
 	    }
-	    if (view.getCreator()==null && creators.size()==1) {
+	    if (view.getCreator() == null && creators.size() == 1) {
 		view.setCreator(creators.iterator().next());
 	    }
 	    bond = BondFactory.createLogicalBond(logicalBond.getLogicalOperator(), resolvedOperands);

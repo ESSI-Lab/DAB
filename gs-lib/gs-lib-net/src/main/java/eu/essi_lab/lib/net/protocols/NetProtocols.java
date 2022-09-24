@@ -4,7 +4,7 @@ package eu.essi_lab.lib.net.protocols;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -46,10 +46,12 @@ import eu.essi_lab.lib.net.protocols.impl.HYRAXProtocol;
 import eu.essi_lab.lib.net.protocols.impl.INUMETProtocol;
 import eu.essi_lab.lib.net.protocols.impl.ISOProtocol;
 import eu.essi_lab.lib.net.protocols.impl.KISTERSProtocol;
+import eu.essi_lab.lib.net.protocols.impl.MCHProtocol;
 import eu.essi_lab.lib.net.protocols.impl.NASAGSFCOZONEProtocol;
 import eu.essi_lab.lib.net.protocols.impl.NCMLProtocol;
 import eu.essi_lab.lib.net.protocols.impl.NERRSProtocol;
 import eu.essi_lab.lib.net.protocols.impl.NETCDFSubsetProtocol;
+import eu.essi_lab.lib.net.protocols.impl.NRFAProtocol;
 import eu.essi_lab.lib.net.protocols.impl.ODATA_SYKEProtocol;
 import eu.essi_lab.lib.net.protocols.impl.OPENDAPProtocol;
 import eu.essi_lab.lib.net.protocols.impl.OPENSEARCHProtocol;
@@ -84,6 +86,10 @@ import eu.essi_lab.lib.net.protocols.impl.WMS_1_1_1Protocol;
 import eu.essi_lab.lib.net.protocols.impl.WMS_1_3_0Protocol;
 import eu.essi_lab.lib.net.protocols.impl.WMS_Q_1_3_0Protocol;
 import eu.essi_lab.lib.net.protocols.impl.WMTS_1_0_0Protocol;
+
+/**
+ * @author Fabrizio
+ */
 public class NetProtocols {
     public static NetProtocol USGS_IV = new USGS_IV_Protocol();
     public static NetProtocol USGS_DV = new USGS_DV_Protocol();
@@ -103,11 +109,13 @@ public class NetProtocols {
     public static NetProtocol CUAHSI_WATER_ONE_FLOW_1_1 = new CUAHSI_WaterOneFlow_1_1Protocol();
     public static NetProtocol CEHQ = new CEHQProtocol();    
     public static NetProtocol DINAGUAWS = new DinaguawsProtocol();
+    public static NetProtocol MCH = new MCHProtocol();
     public static NetProtocol HYRAX = new HYRAXProtocol();
     public static NetProtocol ISO = new ISOProtocol();
     public static NetProtocol BNDMET = new BNDMETProtocol();
     public static NetProtocol APITEMPO = new APITEMPOProtocol();
     public static NetProtocol INUMET = new INUMETProtocol();
+    public static NetProtocol NRFA = new NRFAProtocol();
     public static NetProtocol DMH = new DMHProtocol();
     public static NetProtocol KISTERS = new KISTERSProtocol();
     public static NetProtocol NASAGSFCOZONE = new NASAGSFCOZONEProtocol();

@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.csw;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,16 +35,18 @@ import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 
 public class CSWSHMIConnector extends CSWGetConnector {
-    private static final long serialVersionUID = 1573998845610728764L;
+
     private static final String CSWSHMICONNECTOR_EXTRACTION_ERROR = "CSWSHMICONNECTOR_EXTRACTION_ERROR";
 
-    public CSWSHMIConnector() {
-    }
+    /**
+     * 
+     */
+    public static final String TYPE = "CSW SHMI Connector";
 
     @Override
-    public String getLabel() {
+    public String getType() {
 
-	return "CSW SHMI Connector";
+	return CSWSHMIConnector.TYPE;
     }
 
     /**

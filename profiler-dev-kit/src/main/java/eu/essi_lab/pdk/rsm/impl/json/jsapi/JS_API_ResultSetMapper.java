@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.rsm.impl.json.jsapi;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,6 +26,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.TreeSet;
 
 import javax.ws.rs.core.MediaType;
@@ -58,7 +59,7 @@ import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.ServiceIdentification;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
-import eu.essi_lab.jaxb.common.NameSpace;
+import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.model.BrokeringStrategy;
 import eu.essi_lab.model.GSSource;
@@ -70,6 +71,22 @@ import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.data.DataType;
 import eu.essi_lab.pdk.rsm.DiscoveryResultSetMapper;
 import eu.essi_lab.pdk.rsm.MappingSchema;
+
+/**
+ * Result set mapper implementation which maps the {@link GSResource}s according to a JSON schema encoding defined for
+ * the <a href="http://api.eurogeoss-broker.eu/docs/index.html">JavaScript API</a>. The {@link #JS_API_MAPPING_SCHEMA}
+ * has the following properties:
+ * <ul>
+ * <li>schema uri: {@link GSNameSpaceContext#GS_DATA_MODEL_SCHEMA_URI}</li>
+ * <li>schema name: {@link GSNameSpaceContext#GS_DATA_MODEL_SCHEMA_NAME}</li>
+ * <li>schema version: {@link NameSpace#GS_DATA_MODEL_SCHEMA_VERSION}</li>
+ * <li>encoding name: {@value #JS_API_DATA_MODEL_ENCODING_NAME}</li>
+ * <li>encoding version: {@value #JS_API_DATA_MODEL_ENCODING_NAME_VERSION}</li>
+ * <li>encoding media type: {@link MediaType#APPLICATION_JSON}</li>
+ * </ul>
+ * 
+ * @author Fabrizio
+ */
 public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 
     /**
@@ -113,15 +130,15 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
     private static final String SOS_TAHMO_PROXY_PATH = "sos-tahmo-proxy";
 
     private static final String SOS_TAHMO_URL = "http://hnapi.hydronet.com/api/service/sos";
-    
+
     private static final String SOS_TWIGA_URL = "http://hn4s.hydronet.com/api/service/TWIGA/sos";
 
     @Override
     public String map(DiscoveryMessage message, GSResource resource) {
 
-	if (message.isOutputSources()) {
+	GSSource gsSource = resource.getSource();
 
-	    GSSource gsSource = resource.getSource();
+	if (message.isOutputSources()) {
 
 	    BrokeringStrategy strategy = gsSource.getBrokeringStrategy();
 	    String endpoint = gsSource.getEndpoint();
@@ -211,6 +228,18 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	if (covDesc != null) {
 	    String coverageDescription = covDesc.getAttributeDescription();
 	    report.put("coverageDescription", coverageDescription);
+	}
+
+	if (gsSource != null) {
+
+	    String sourceLabel = gsSource.getLabel();
+	    String sourceId = gsSource.getUniqueIdentifier();
+
+	    JSONObject source = new JSONObject();
+	    source.put("id", sourceId);
+	    source.put("title", sourceLabel);
+
+	    report.put("source", source);
 	}
 
 	Distribution distribution = md_Metadata.getDistribution();
@@ -504,6 +533,12 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	if (jsonOriginatorOrganisationDescription.length() > 0) {
 	    report.put("origOrgDesc", jsonOriginatorOrganisationDescription);
 	}
+	Optional<String> themeCategoryOpt = handler.getThemeCategory();
+	
+	if(themeCategoryOpt.isPresent()) {
+	    report.put("themeCategory", themeCategoryOpt.get());
+	}
+
 
 	for (Identification identification : diList) {
 
@@ -822,7 +857,7 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	if (attributeDescription.length() > 0) {
 	    report.put("attributeDescription", attributeDescription);
 	}
-	
+
 	for (String sortedTitle : sortedAttributeTitles) {
 	    attributeTitle.put(sortedTitle);
 	}
@@ -866,7 +901,7 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	if (platformDescription.length() > 0) {
 	    report.put("platformDescription", platformDescription);
 	}
-	
+
 	JSONArray platformTitle = new JSONArray();
 	for (String sortedTitle : sortedPlatformTitles) {
 	    platformTitle.put(sortedTitle);
@@ -899,7 +934,7 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 		    sortedInstrumentDescriptions.add(iDesc);
 		}
 		String iTitle = instrument.getTitle();
-		if(iTitle != null) {
+		if (iTitle != null) {
 		    sortedInstrumentTitles.add(iTitle);
 		}
 		// String iId = instrument.getMDIdentifierCode();
@@ -915,7 +950,7 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    if (instrumentDescription.length() > 0) {
 		report.put("instrumentDescription", instrumentDescription);
 	    }
-	    
+
 	    for (String sortedTitle : sortedInstrumentTitles) {
 		instrumentTitle.put(sortedTitle);
 	    }
@@ -995,7 +1030,7 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 		}
 
 	    }
-	    
+
 	    // TWIGA use case: use proxy (should replace the TAHMO SOS)
 	    if (url.startsWith(SOS_TWIGA_URL)) {
 		try {

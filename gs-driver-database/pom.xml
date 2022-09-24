@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>DAB</artifactId>
+        <groupId>eu.essi_lab</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>gs-driver-database</artifactId>
+    <name>ESSI-Lab Driver MarkLogic Implementation</name>
+
+    <dependencies>
+    
+    	<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>configuration-api</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+    
+    	<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>configuration-api-gs</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+    
+        <dependency>
+            <groupId>eu.essi_lab</groupId>
+            <artifactId>database-api-marklogic-impl</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.essi_lab</groupId>
+            <artifactId>database-api-volatile-impl</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.essi_lab</groupId>
+            <artifactId>gs-shared-content</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>  
+    </dependencies>
+    
+    <profiles>
+		<profile>
+			<id>continuous-integration</id>
+			<build>
+				<finalName>gi-cat-latest-build</finalName>
+			</build>
+		</profile>
+		<profile>
+			<id>internaltest</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<groupId>io.fabric8</groupId>
+						<artifactId>docker-maven-plugin</artifactId>
+
+						<configuration>
+							<images>
+
+								<image>
+									<alias>gi-marklogic</alias>
+									<name>${marklogic.registry}</name>
+									<run>
+										<ports>
+											<port>gi-marklogic.rest-port:8000</port>
+											<port>gi-marklogic.xdbc-port:8006</port>
+											<port>healthcheck.port:7997</port>
+										</ports>
+										<wait>
+											<http>
+												<!--suppress MavenModelInspection -->
+												<url>http://${docker.host.address}:${healthcheck.port}</url>
+											</http>
+											<time>${fabric8-timeout}</time>
+										</wait>
+									</run>
+								</image>
+
+							</images>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>externaltest</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<groupId>io.fabric8</groupId>
+						<artifactId>docker-maven-plugin</artifactId>
+
+						<configuration>
+							<images>
+
+								<image>
+									<alias>gi-marklogic</alias>
+									<name>${marklogic.registry}</name>
+									<run>
+										<ports>
+											<port>gi-marklogic.rest-port:8000</port>
+											<port>gi-marklogic.xdbc-port:8006</port>
+											<port>healthcheck.port:7997</port>
+										</ports>
+										<wait>
+											<http>
+												<!--suppress MavenModelInspection -->
+												<url>http://${docker.host.address}:${healthcheck.port}</url>
+											</http>
+											<time>${fabric8-timeout}</time>
+										</wait>
+									</run>
+								</image>
+
+							</images>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+</project>

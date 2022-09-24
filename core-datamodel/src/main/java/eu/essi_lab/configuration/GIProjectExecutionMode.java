@@ -4,7 +4,7 @@ package eu.essi_lab.configuration;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,20 +22,42 @@ package eu.essi_lab.configuration;
  */
 
 import java.util.Optional;
+
+/**
+ * @author Fabrizio
+ */
 public class GIProjectExecutionMode {
 
     public static final String GIPROJECT_EXECUTION_MODE_KEY = "EU_FLORA_ESSI_GI_PROJECT_EXECUTION";
 
-    String readEnv() {
-	return System.getenv(GIPROJECT_EXECUTION_MODE_KEY);
+    /**
+     * 
+     */
+    private GIProjectExecutionMode() {
     }
 
-    public ExecutionMode getMode() {
+    /**
+     * @return
+     */
+    public static String readEnv() {
+
+	String execMode = System.getenv(GIPROJECT_EXECUTION_MODE_KEY);
+
+	if (execMode == null) {
+
+	    execMode = System.getProperty(GIPROJECT_EXECUTION_MODE_KEY);
+	}
+
+	return execMode;
+    }
+
+    /**
+     * @return
+     */
+    public static ExecutionMode getMode() {
 
 	Optional<ExecutionMode> execmode = ExecutionMode.decode(readEnv());
 
 	return execmode.orElse(ExecutionMode.MIXED);
-
     }
-
 }

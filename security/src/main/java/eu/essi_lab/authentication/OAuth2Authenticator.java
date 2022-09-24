@@ -4,7 +4,7 @@ package eu.essi_lab.authentication;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,16 +24,16 @@ package eu.essi_lab.authentication;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.slf4j.Logger;
-
 import com.fasterxml.jackson.databind.JsonNode;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 
-public abstract class OAuth2Authenticator implements OAuthAuthenticator {
+/**
+ * @author Fabrizio
+ */
+public abstract class OAuth2Authenticator extends OAuthAuthenticator {
 
     public static final String NULL_HTTP_RESPONSE_PROVIDED_ERR_ID = "NULL_HTTP_RESPONSE_PROVIDED_ERR_ID";
     public static final String REDIRECT_IOEXCEPTIO_ERR_ID = "REDIRECT_IOEXCEPTIO_ERR_ID";
@@ -46,21 +46,23 @@ public abstract class OAuth2Authenticator implements OAuthAuthenticator {
     public static final String IOEXCEPTION_EMAIL_ERR_ID = "IOEXCEPTION_EMAIL_ERR_ID";
     public static final String MISSING_OATH_CONF_FILE_ERR_ID = "MISSING_OATH_CONF_FILE_ERR_ID";
     public static final String INVALID_OAUTH_PARAM_VALUE_ERR_ID = "INVALID_OAUTH_PARAM_VALUE_ERR_ID";
-    protected URI redirectUri;
+
     protected String loginUrl;
     protected String tokenUrl;
     protected String userInfoUrl;
-    protected CloseableHttpClient httpClient;
-    private String clientId;
-    private String clientSecret;
-    private transient Logger logger = GSLoggerFactory.getLogger(OAuth2Authenticator.class);
 
     @Override
     public void initialize(JsonNode conf) throws GSException {
 
 	if (conf == null)
-	    throw GSException.createException(this.getClass(), "Missing configuraiton file", null, null, ErrorInfo.ERRORTYPE_INTERNAL,
-		    ErrorInfo.SEVERITY_ERROR, MISSING_OATH_CONF_FILE_ERR_ID);
+	    throw GSException.createException(//
+		    this.getClass(), //
+		    "Missing configuraiton file", //
+		    null, //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    MISSING_OATH_CONF_FILE_ERR_ID);
 
 	try {
 
@@ -68,41 +70,23 @@ public abstract class OAuth2Authenticator implements OAuthAuthenticator {
 
 	} catch (URISyntaxException e) {
 
-	    logger.error("Invalid redirect URI found {}", OAuthAuthenticator.getConfigurationValue("redirect-uri", conf));
+	    GSLoggerFactory.getLogger(OAuth2Authenticator.class).error("Invalid redirect URI found {}",
+		    OAuthAuthenticator.getConfigurationValue("redirect-uri", conf));
 
-	    throw GSException.createException(this.getClass(), "Invalid redirect URI found", null, null, ErrorInfo.ERRORTYPE_INTERNAL,
-		    ErrorInfo.SEVERITY_ERROR, INVALID_OAUTH_PARAM_VALUE_ERR_ID, e);
+	    throw GSException.createException(//
+		    this.getClass(), //
+		    "Invalid redirect URI found", //
+		    null, //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    INVALID_OAUTH_PARAM_VALUE_ERR_ID, //
+		    e);
 
 	}
 
 	loginUrl = OAuthAuthenticator.getConfigurationValue("login-url", conf);
 	tokenUrl = OAuthAuthenticator.getConfigurationValue("token-url", conf);
 	userInfoUrl = OAuthAuthenticator.getConfigurationValue("userinfo-url", conf);
-
-    }
-
-    @Override
-    public void setRedirectURI(URI uri) {
-	redirectUri = uri;
-    }
-
-    public void setHttpClient(CloseableHttpClient httpClient) {
-	this.httpClient = httpClient;
-    }
-
-    public String getClientId() {
-	return clientId;
-    }
-
-    public void setClientId(String clientId) {
-	this.clientId = clientId;
-    }
-
-    public String getClientSecret() {
-	return clientSecret;
-    }
-
-    public void setClientSecret(String clientSecret) {
-	this.clientSecret = clientSecret;
     }
 }

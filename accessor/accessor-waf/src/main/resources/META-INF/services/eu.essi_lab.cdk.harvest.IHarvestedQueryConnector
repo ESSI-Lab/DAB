@@ -1,4 +1,6 @@
-eu.essi_lab.accessor.waf.DirectoryListingConnector
-eu.essi_lab.accessor.waf.ECOPotentialVLabConnector
-eu.essi_lab.accessor.waf.S3BucketConnector
-eu.essi_lab.accessor.waf.HttpGetISOConnector
+eu.essi_lab.accessor.waf.dirlisting.DirectoryListingConnector
+eu.essi_lab.accessor.waf.ecovlab.ECOPotentialVLabConnector
+eu.essi_lab.accessor.waf.s3bucket.S3BucketConnector
+eu.essi_lab.accessor.waf.httpgetiso.HttpGetISOConnector
+eu.essi_lab.accessor.waf.onamet.ONAMETConnector
+eu.essi_lab.accessor.waf.onamet_stations.ONAMETStationsConnector

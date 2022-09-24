@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.csw;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,14 +35,12 @@ import javax.xml.bind.JAXBElement;
 
 import org.apache.commons.io.IOUtils;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import eu.essi_lab.iso.datamodel.ISOMetadata;
 import eu.essi_lab.jaxb.common.CommonContext;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
-import eu.essi_lab.model.Source;
+import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.OriginalMetadata;
@@ -51,30 +49,30 @@ import net.opengis.iso19139.gmd.v_20060504.MDKeywordsPropertyType;
 import net.opengis.iso19139.gmd.v_20060504.MDMetadataType;
 
 public class CSWCMRConnector extends CSWConnector {
-    private static final long serialVersionUID = -688271927338490225L;
+
     private static final String CSWCMRCONNECTOR_EXTRACTION_ERROR = "CSWCMRCONNECTOR_EXTRACTION_ERROR";
 
-    public CSWCMRConnector() {
-	// nothing to do here
-    }
+    /**
+     * 
+     */
+    public static final String TYPE = "CSW CMR Connector";
 
     @Override
-    public String getLabel() {
+    public String getType() {
 
-	return "CSW CMR Connector";
+	return TYPE;
     }
 
     /**
      * The CSW NODC always returns GMI Metadata according to the NODC profile (even if GMD Metadata is asked)
      */
-    @JsonIgnore
+
     @Override
     protected String getReturnedMetadataSchema() {
 
 	return CommonNameSpaceContext.CMR_NS_URI;
     }
 
-    @JsonIgnore
     @Override
     protected String getRequestedMetadataSchema() throws GSException {
 
@@ -85,7 +83,7 @@ public class CSWCMRConnector extends CSWConnector {
      * The CSW CMR connector applies only to the NASA CMR catalogue
      */
     @Override
-    public boolean supports(Source source) {
+    public boolean supports(GSSource source) {
 	String endpoint = source.getEndpoint();
 	if (endpoint.contains("cmr")) {
 	    return super.supports(source);
@@ -153,6 +151,7 @@ public class CSWCMRConnector extends CSWConnector {
 	    OriginalMetadata originalMetadata = (OriginalMetadata) iterator.next();
 	    String metadata = originalMetadata.getMetadata();
 	    try {
+		@SuppressWarnings("rawtypes")
 		JAXBElement je = CommonContext.unmarshal(metadata, JAXBElement.class);
 		Object obj = je.getValue();
 		if (obj instanceof MDMetadataType) {

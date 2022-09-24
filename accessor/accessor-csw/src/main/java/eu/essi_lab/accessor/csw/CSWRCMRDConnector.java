@@ -1,10 +1,13 @@
+/**
+ * 
+ */
 package eu.essi_lab.accessor.csw;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,7 +25,7 @@ package eu.essi_lab.accessor.csw;
  */
 
 import eu.essi_lab.jaxb.csw._2_0_2.GetRecords;
-import eu.essi_lab.model.Source;
+import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 
 /**
@@ -33,10 +36,10 @@ public class CSWRCMRDConnector extends CSWConnector {
     /**
      * 
      */
-    private static final long serialVersionUID = -1421212555178249262L;
+    public static final String TYPE = "CSW RCMRD Connector";
 
     @Override
-    public String getLabel() {
+    public String getType() {
 
 	return "CSW RCMRD Connector";
     }
@@ -53,7 +56,7 @@ public class CSWRCMRDConnector extends CSWConnector {
     }
 
     @Override
-    public boolean supports(Source source) {
+    public boolean supports(GSSource source) {
 	String endpoint = source.getEndpoint();
 	if (endpoint.contains("geoportal.rcmrd.org")) {
 	    return super.supports(source);

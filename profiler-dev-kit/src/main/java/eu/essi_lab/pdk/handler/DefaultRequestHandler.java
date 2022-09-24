@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.handler;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -34,6 +34,13 @@ import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.pdk.handler.selector.HandlerSelector;
 import eu.essi_lab.pdk.validation.WebRequestValidator;
+
+/**
+ * Default implementation of {@link WebRequestHandler}
+ *
+ * @see HandlerSelector#register(eu.essi_lab.pdk.handler.selector.WebRequestFilter, WebRequestHandler)
+ * @author Fabrizio
+ */
 public abstract class DefaultRequestHandler implements WebRequestHandler, WebRequestValidator {
 
     /**
@@ -56,6 +63,11 @@ public abstract class DefaultRequestHandler implements WebRequestHandler, WebReq
 	return builder.build();
     }
 
+    /**
+     * @param webRequest
+     * @return
+     * @throws GSException
+     */
     protected Object getEntity(WebRequest webRequest) throws GSException {
 	return getStringResponse(webRequest);
     }
@@ -68,7 +80,7 @@ public abstract class DefaultRequestHandler implements WebRequestHandler, WebReq
      * @throws GSException if errors occurred during the response creation
      */
     public abstract String getStringResponse(WebRequest webRequest) throws GSException;
-    
+
     /**
      * Returns the response
      * 
@@ -77,7 +89,7 @@ public abstract class DefaultRequestHandler implements WebRequestHandler, WebReq
      * @throws GSException if errors occurred during the response creation
      */
     @Deprecated
-    public String getResponse(WebRequest webRequest) throws GSException{
+    public String getResponse(WebRequest webRequest) throws GSException {
 	return getStringResponse(webRequest);
     }
 

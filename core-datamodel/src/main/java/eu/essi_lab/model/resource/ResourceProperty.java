@@ -4,7 +4,7 @@ package eu.essi_lab.model.resource;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,6 +26,16 @@ import java.util.NoSuchElementException;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.index.IndexedMetadataElement;
 import eu.essi_lab.model.index.IndexedResourceProperty;
+
+/**
+ * Enumeration of non-harmonized, queryable {@link GSResource} properties. Some properties are mandatory, and they must
+ * be set before to store the {@link GSResource} in a Database
+ * 
+ * @see GSResource#validate()
+ * @see IndexedResourceProperty
+ * @see MetadataElement
+ * @author Fabrizio
+ */
 public enum ResourceProperty implements Queryable {
     /**
      * Mandatory property

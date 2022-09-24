@@ -4,7 +4,7 @@ package eu.essi_lab.request.executor.discover;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,7 +30,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.logicng.formulas.Formula;
-import org.slf4j.Logger;
 
 import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.DatabaseWriter;
@@ -57,10 +56,29 @@ import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.request.executor.IQueryInitializer;
 import eu.essi_lab.views.DefaultViewManager;
 import eu.essi_lab.views.IViewManager;
+
+/**
+ * The default implementation of query initializer performs the following steps:
+ * <ol>
+ * <li>Asks the Request Authorization Converter to set the permitted bond, generated starting from the original query
+ * bond according to the user source discovery grants.</li>
+ * <li>normalizes the permitted bond by converting it to an equivalent bond expressed in normal form (<b>normalized
+ * bond</b>):</li>
+ * <ol>
+ * <li>converts bond in negation normal form with De Morgan's laws</li>
+ * <li>converts bond to disjunctive normal form by distributing AND over OR</li>
+ * <li>simplify conjunctions e.g. removing the ones that result in empty sets (such as conjunctions containing two
+ * sources, i.e. S1 AND S2 or also S1 AND NOT(S1))</li>
+ * <li>aggregates conjunctions containing the same source bond (e.g. (S1 AND B1) OR (S1 AND B2) -> S1 AND (B1 OR
+ * B2)</li>
+ * </ol>
+ * </ol>
+ *
+ * @author boldrini
+ * @see IQueryInitializer
+ */
 public class QueryInitializer implements IQueryInitializer {
 
-    public static final String VIEW_NOT_FOUND = "View not found";
-    private transient Logger logger = GSLoggerFactory.getLogger(getClass());
     private static final String NORMALIZATION_FAILED_IRREDUCIBLE_INPUT = "Normalization failed because irreducible input";
     private static final String NORMALIZATION_FAILED_UNEXPECTED_SYNTAX = "Normalization failed because unexpected error";
     private static final String UNEXPECTED_LOGICAL_OPERATOR_MESSAGE_PREFIX = "Not expected logical operator: ";
@@ -127,15 +145,15 @@ public class QueryInitializer implements IQueryInitializer {
 	message.setPermittedBond(permittedBond);
 
 	Bond bond = message.getPermittedBond();
-	logger.info("Bond normalization STARTED");
+	// GSLoggerFactory.getLogger(getClass()).info("Bond normalization STARTED");
 
 	PerformanceLogger pl = new PerformanceLogger(PerformanceLogger.PerformancePhase.BOND_NORMALIZATION, message.getRequestId(),
 		Optional.ofNullable(message.getWebRequest()));
 
 	Bond normalizedBond = normalizeBond(bond);
 
-	pl.logPerformance(logger);
-	logger.info("Bond normalization ENDED");
+	pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
+	// GSLoggerFactory.getLogger(getClass()).info("Bond normalization ENDED");
 
 	message.setNormalizedBond(normalizedBond);
 
@@ -288,27 +306,27 @@ public class QueryInitializer implements IQueryInitializer {
      * @throws GSException in case the normalization failed, for whatever reason
      */
     public Bond normalizeBond(Bond bond) throws GSException {
-	logger.trace("Normalization - preliminary simplification");
+	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - preliminary simplification");
 	Bond simpleAndsForm = getNestedConjunctionsSimplifiedForm(bond);
-	logger.trace("Normalization - sources simplification");
+	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - sources simplification");
 	Bond repeatedBondSimplification = getRepeatedBondSimplifiedForm(simpleAndsForm);
-	logger.trace("Normalization - repeated bond simplification");
+	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - repeated bond simplification");
 	Bond simplifiedForm = getSourcesSimplifiedForm(repeatedBondSimplification);
-	logger.trace("Normalization - negational form");
+	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - negational form");
 	Bond negationNormalForm = getNegationNormalForm(simplifiedForm);
-	logger.trace("Normalization - aggregating simple bonds");
+	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - aggregating simple bonds");
 	Bond aggregatedSimpleBonds = getAggregateSimpleBonds(negationNormalForm);
-	logger.trace("Normalization - disjunctive form");
+	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - disjunctive form");
 	// using the naive algorithm, as the library based algorithm seems to require more time!
 	Bond disjunctiveNormalForm = getDisjunctiveNormalFormNaive(aggregatedSimpleBonds);
-	logger.trace("Normalization - simplified conjunctions");
+	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - simplified conjunctions");
 	Bond cleanDisjunctiveNormalForm = simplifyConjunctions(disjunctiveNormalForm);
-	logger.trace("Normalization - aggregated conjunctions");
+	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - aggregated conjunctions");
 	Bond aggregatedConjunctions = aggregateConjunctions(cleanDisjunctiveNormalForm);
-	logger.trace("Normalization - cleanup");
+	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - cleanup");
 	// this seems not to be needed... already per source aggregated at this point!
 	// Bond ret = getPerSourceAggregation(aggregatedConjunctions);
-	// logger.trace("Normalization - done");
+	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - done");
 	return aggregatedConjunctions;
 
     }
@@ -674,8 +692,8 @@ public class QueryInitializer implements IQueryInitializer {
     }
 
     protected IViewManager createViewManager(StorageUri databaseURI) throws GSException {
-	DatabaseReader reader = new DatabaseConsumerFactory().createDataBaseReader(databaseURI);
-	DatabaseWriter writer = new DatabaseConsumerFactory().createDataBaseWriter(databaseURI);
+	DatabaseReader reader = DatabaseConsumerFactory.createDataBaseReader(databaseURI);
+	DatabaseWriter writer = DatabaseConsumerFactory.createDataBaseWriter(databaseURI);
 	DefaultViewManager ret = new DefaultViewManager();
 	ret.setDatabaseReader(reader);
 	ret.setDatabaseWriter(writer);
@@ -1193,16 +1211,14 @@ public class QueryInitializer implements IQueryInitializer {
 			    }
 			} else {
 			    // OR
-			    GSException gse = new GSException();
-			    ErrorInfo info = new ErrorInfo();
-			    info.setContextId(QueryInitializer.class.getName());
-			    info.setErrorId(NORMALIZATION_FAILED_IRREDUCIBLE_INPUT);
-			    info.setErrorDescription("Normalization failed because a nested OR was found in the disjunctive normal form");
-			    info.setUserErrorDescription("Query normalization failed unexpectedly.");
-			    info.setErrorType(ErrorInfo.ERRORTYPE_INTERNAL);
-			    info.setSeverity(ErrorInfo.SEVERITY_ERROR);
-			    gse.addInfo(info);
-			    throw gse;
+
+			    throw GSException.createException(//
+				    getClass(), //
+				    "Normalization failed because a nested OR was found in the disjunctive normal form", //
+				    "Query normalization failed unexpectedly", ErrorInfo.ERRORTYPE_INTERNAL, //
+				    ErrorInfo.SEVERITY_ERROR, //
+				    NORMALIZATION_FAILED_IRREDUCIBLE_INPUT);
+
 			}
 		    } else if (isSourceIdentifierBond(child)) {
 			sourceBond = (ResourcePropertyBond) child;
@@ -1295,30 +1311,34 @@ public class QueryInitializer implements IQueryInitializer {
 	}
     }
 
+    /**
+     * @throws GSException
+     */
     private void throwNegatedSourceException() throws GSException {
-	GSException gse = new GSException();
-	ErrorInfo info = new ErrorInfo();
-	info.setContextId(QueryInitializer.class.getName());
-	info.setErrorId(NORMALIZATION_FAILED_IRREDUCIBLE_INPUT);
-	info.setErrorDescription("Normalization failed because of negated source bond");
-	info.setUserErrorDescription("Query normalization failed, you could try to write a simpler query");
-	info.setErrorType(ErrorInfo.ERRORTYPE_CLIENT);
-	info.setSeverity(ErrorInfo.SEVERITY_ERROR);
-	gse.addInfo(info);
-	throw gse;
+
+	throw GSException.createException(//
+		getClass(), //
+		"Normalization failed because of negated source bond", //
+		"Query normalization failed, you could try to write a simpler query", //
+		ErrorInfo.ERRORTYPE_CLIENT, //
+		ErrorInfo.SEVERITY_ERROR, //
+		NORMALIZATION_FAILED_IRREDUCIBLE_INPUT);
+
     }
 
+    /**
+     * @param message
+     * @throws GSException
+     */
     private void throwUnexpectedSyntaxException(String message) throws GSException {
-	GSException gse = new GSException();
-	ErrorInfo info = new ErrorInfo();
-	info.setContextId(QueryInitializer.class.getName());
-	info.setErrorId(NORMALIZATION_FAILED_UNEXPECTED_SYNTAX);
-	info.setErrorDescription(message);
-	info.setUserErrorDescription("Query normalization failed, because of an internal error");
-	info.setErrorType(ErrorInfo.ERRORTYPE_INTERNAL);
-	info.setSeverity(ErrorInfo.SEVERITY_ERROR);
-	gse.addInfo(info);
-	throw gse;
+
+	throw GSException.createException(//
+		getClass(), //
+		message, //
+		"Query normalization failed, because of an internal error", //
+		ErrorInfo.ERRORTYPE_INTERNAL, //
+		ErrorInfo.SEVERITY_ERROR, //
+		NORMALIZATION_FAILED_UNEXPECTED_SYNTAX);
     }
 
     private boolean isSourceRelatedBond(Bond bond) {

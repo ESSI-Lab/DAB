@@ -1,10 +1,13 @@
+/**
+ * 
+ */
 package eu.essi_lab.profiler.csw;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,7 +24,7 @@ package eu.essi_lab.profiler.csw;
  * #L%
  */
 
-import eu.essi_lab.pdk.ProfilerInfo;
+import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 
 /**
  * Designed for the GEOSS Web Portal
@@ -30,16 +33,16 @@ import eu.essi_lab.pdk.ProfilerInfo;
  */
 public class CSWISOGeoProfiler extends CSWProfiler {
 
-    public static final ProfilerInfo CSW_ISO_GEO_SERVICE_INFO = new ProfilerInfo();
+    public static final ProfilerSetting CSW_ISO_GEO_SERVICE_INFO = new ProfilerSetting();
     static {
-	CSW_ISO_GEO_SERVICE_INFO.setServiceName("CSW");
+	CSW_ISO_GEO_SERVICE_INFO.setServiceName("CSW ISO-GEO");
 	CSW_ISO_GEO_SERVICE_INFO.setServiceType(CSW_PROFILER_TYPE);
 	CSW_ISO_GEO_SERVICE_INFO.setServicePath("cswisogeo");
 	CSW_ISO_GEO_SERVICE_INFO.setServiceVersion("2.0.2");
     }
 
     @Override
-    public ProfilerInfo getProfilerInfo() {
+    protected ProfilerSetting initSetting() {
 
 	return CSW_ISO_GEO_SERVICE_INFO;
     }

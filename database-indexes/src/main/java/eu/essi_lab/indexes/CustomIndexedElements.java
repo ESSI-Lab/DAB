@@ -4,7 +4,7 @@ package eu.essi_lab.indexes;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -33,6 +33,18 @@ import eu.essi_lab.model.index.IndexedElementInfo;
 import eu.essi_lab.model.index.IndexedMetadataElement;
 import eu.essi_lab.model.pluggable.Pluggable;
 import eu.essi_lab.model.pluggable.PluginsLoader;
+
+/**
+ * Implementations allow to provide custom indexed elements.<br>
+ * In order to be loaded, the plug-in must be installed. See {@link PluginsLoader} for more info.<br>
+ * <br>
+ * <b>Name conventions</b><br>
+ * <br>
+ * The names of the custom {@link IndexedMetadataElement}s MUST comply with the conventions specified
+ * in the {@link #checkName(String)} method
+ * 
+ * @author Fabrizio
+ */
 public abstract class CustomIndexedElements extends IndexedElementsGroup implements Pluggable {
 
     /**

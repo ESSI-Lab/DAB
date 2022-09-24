@@ -1,0 +1,792 @@
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1000;University of Rochester
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1002;Fordham University (FU)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1004;Environmental Sciences and Engineering, Inc. - Gainesville
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1005;New York City Department of Environmental Protection
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1006;Smithsonian Tropical Research Institute
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1007;Grays Harbor College
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1008;George Washington University (GWU)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1011;Science Applications International Corporation - Oak Ridge Tn
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1015;Geomar Institute
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1017;Institute of Oceanography
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1019;US NASA; Goddard Space Flight Center (GSFC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/101;St. Andrews Biological Station (SABS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1020;University of Massachusetts
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1022;Panama Canal Comission
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1023;City and County of Honolulu
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1024;Washington State Department of Fish and Wildlife; Shellfish Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1026;Russian Academy of Sciences; Zoological Institute
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1029;Broward County Department of Planning and Environmental Protection
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/102;Fisheries Research Board of Canada; Biological Station - Nanaimo
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1031;Washington State University (WSU)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1033;Hokkaido National Fisheries Research Institute
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/103;Quebec Department of Fisheries; Biological Center
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1042;Instituto de Fomento Pesquero
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/104;Bedford Institute of Oceanography (BIO)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1051;Max Planck Institute for Chemistry - Mainz (MPI)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1057;Florida State Department of Environmental Protection (FLADEP)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1058;Washington State Department of Ecology (WADOE)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1059;Florida Marine Research Institute (FMRI)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/105;Fisheries and Oceans Canada; Institute of Ocean Sciences
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1060;World Data Center-B, Oceanography - Obninsk (WDC-B, Obninsk)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1061;Leeward Community College
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1062;Oceanit Laboratories; Inc
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/106;Arctic Biological Station
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1071;Centre National Pour L'Exploitation Des Oceans (CNEXO)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1072;Carlsberg Foundation
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1073;International Council for Exploration of the Sea (ICES)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1074;US DOI; Fish and Wildlife Service; Pacific Islands Ecoregion
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1075;Northwest Atlantic Fisheries Center
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1077;US DOC; NOAA; OAR; Earth System Research Laboratory; Climate Monitoring and Diagnostics Laboratory (CMDL)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1078;University of Chicago
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/107;Department of Fisheries and Oceans; Institute of Ocean Sciences - Victoria
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1081;Japan Agency for Marine-Earth Science and Technology (JAMSTEC) (JAMSTEC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1085;Japan Hydrographic Association; Marine Information Research Center
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/108;LGL Ltd.
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/109;Atlantic Oceanographic Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/10;Northern Directorate of Fisheries (SRPR)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1107;Meteorological Research Institute
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1111;Miyazaki Fisheries High School
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1118;National Research Institute of Fisheries Science
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/113;Fisheries and Oceans Canada; Fisheries Management Resources Branch
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1141;National Environment Research Council; Institute of Oceanographic Sciences
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1142;Sir Alister Hardy Foundation for Ocean Science (SAHFOS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1143;National Oceanographic Data Center of the Peoples Republic of China (CNODC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1144;National Bureau of Oceanography
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1146;Chinese Academy of Sciences; Institute of Oceanology
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1147;Yugniro
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1148;Hydrometeorological Service
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1149;National Research Institute for Oceanology
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1155;Oceanic Institute (OI)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1156;University of California - San Diego; California Sea Grant College Program
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1157;Science Applications International Corporation - Bay St. Louis, Ms
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1159;Florida Institute of Technology (FIT)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1160;US DOC; NOAA; NOS; Office of Coast Survey
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1161;University of Nevada; University of Nevada - Reno; Desert Research Institute (DRI)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1162;Broward County Department of Planning and Environmental Protection
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1163;Center for Scientific Investigation and Higher Education, Ensenada, Mexico (CICESE)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1165;Sea Fisheries Research Institute (SFRI)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1166;Gothenburg University (GOTEBORG U)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1167;Universidad de Oviedo
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/116;Chilean Navy
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1170;National Oceanography Centre, Southampton (NOCS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1171;National Institute of Water and Atmospheric Research Limited (NIWA)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1174;Centro de Estudios Avanzados de Blanes (CEAB)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1176;Universidad Polytecnica de Catalunya (UPC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1179;University of Kiel; Institute for Polar Ecology (IFOKI)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/117;Ministry of Agriculture; Department Fish and Game; Fisheries Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1180;German Federal Research Center for Fisheries; Institute for Baltic Sea Fisheries (IOR)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1182;US DOC; NOAA; NMFS; Northwest Fisheries Science Center; Newport Research Station; Hatfield Marine Science Center
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1183;Kinnetic Laboratories Inc
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1185;University of Washington; Applied Physics Laboratory; Polar Science Center (UWPSC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1186;University of Copenhagen
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1189;Laboratoire D'Etudes En Geophysique et Oceanographie Spatiales (LEGOS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1190;Gulf of Maine Ocean Observing System (GoMOOS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1191;US DOC; NOAA; OAR; Office of Ocean Exploration and Research (OER)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1192;US DOI; US Geological Survey - Honolulu
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1193;National Institute of Water and Atmospheric Research; Centre for Chemical and Physical Oceanography
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1194;Flow Science, Inc.
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1195;Centro de Previsao de Tempo E Estudos Climaticos (CPTEC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1198;Japan Coast Guard; Hydrographic and Oceanographic Department
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1199;Windward Community College
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/11;Hydrometeorology Service of the Russian Navy (GSVMF)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1200;Scientific Information Systems for the Sea (SISMER)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1201;US DOC; NOAA; NWS; National Centers for Environmental Prediction (NCEP)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1202;National Estuarine Research Reserve System Centralized Data Management Office (NERRS CDMO)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1203;Natural Energy Laboratory of Hawaii Authority (NELHA)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1205;US DOC; NOAA; NMFS; Alaska Fisheries Science Center (NMFS/AFSC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1208;Cesar Environmental Economics Consulting
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1209;National Center for Ocean Research (NCOR)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/120;University of Chile; Marine Biological Station
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1210;Hawaii Natural Heritage Program
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1211;American Samoa Department of Marine and Wildlife Resources
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1212;University of Tasmania (UTAS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1213;Great Barrier Reef Marine Park Authority
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1215;Louisiana Universities Marine Consortium (LUMCON)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1216;Partnership for Interdisciplinary Studies of Coastal Oceans (PISCO)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1217;US DOC; NOAA; NOS; Office of National Marine Sanctuaries (ONMS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1219;Texas State Department of Health
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1220;US DOC; NOAA; NOS; National Centers for Coastal Ocean Science; Center for Coastal Fisheries and Habitat Research (NCCOS/CCFHR)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1222;US NASA; Jet Propulsion Laboratory; Physical Oceanography Distributed Active Archive Center (JPL PO.DAAC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1223;US DOC; NOAA; NESDIS; Center for Satellite Applications and Research (STAR)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1224;Johns Hopkins University; Applied Physics Laboratory (APL)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1227;Hawaii State Department of Land and Natural Resources (DLNR)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1228;University of Hawai'i at Hilo (UHH)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1229;University of Hawai'i at Manoa; Department of Zoology
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1230;Sea Education Association
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1232;Ocean and Sea Ice Satellite Application Facility (OSI SAF)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1239;Save Our Seas (SOS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1240;Barry A. Vittor and Associates, Inc.
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1241;University of Washington; Applied Physics Laboratory (APL)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1243;Leibniz Institut Fur Meereswissenschaften (IFM-GEOMAR)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1244;Institute of Biology of the Southern Seas - National Academy of Sciences of Ukraine (IBSS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1245;Providence College
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1247;US DOC; NOAA; NOS; ONMS; Monterey Bay National Marine Sanctuary (MBNMS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1248;University of Washington; Fisheries Research Institute (UW-FRI)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1249;Japan Oceanographic Data Center (JODC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/124;Servicio Hidrografico Y Oceanografico de la Armada de Chile (SHOA)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1257;US DOC; NOAA; NOS; ONMS; Florida Keys National Marine Sanctuary (FKNMS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1258;US DOC; NOAA; NESDIS; National Climatic Data Center (NCDC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1259;US DOC; NOAA; NESDIS; Office of Satellite Data Processing and Distribution (OSDPD)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1260;University of Georgia; School of Marine Programs
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1268;US DOC; NOAA; NMFS; Southeast Fisheries Science Center (NMFS/SEFSC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1269;US DOC; NOAA; NMFS; Pacific Islands Fisheries Science Center; Ecosystem Sciences Division; Coral Reef Ecosystem Program (CREP)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/126;National Taiwan University; Institute of Fishery Biology
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1271;Farallones Marine Sanctuary Association (FMSA)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1280;Centre de Recherches En Physique de L'Environnement Terrestre et Planetaire (CETP)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1281;URS Corporation (URS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1282;Centre D'Etudes Biologiques de Chize
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1284;Centre National de la Recherche Scientifique (CNRS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/128;Colombian Navy
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1298;Centre D'Oceanologie de Marseille (COM)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/12;Leningrad Hydrometeorological Institute (LGMI)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/130;Korea Central Fisheries Experimental Station
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1328;Laboratoire D'Oceanographie Physique
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/133;Republic of Korea (South Korean) Navy
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1347;US DOC; NOAA; NMFS; Pacific Islands Fisheries Science Center (NMFS/PIFSC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1348;Ministry of Defense; Admiralty Research Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/134;Korea Oceanographic Data Center (KODC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1350;Instituto Nacional de Investigacion y Desarrollo Pesquero (INIDEP)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1354;Finnish Institute of Marine Research (FIMR)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1355;Middle East Technical University; Institute of Marine Sciences
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1356;Banco Nacional de Dados Oceanograficos
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1358;Danish Meteorological Institute (DMI)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1359;US DOI; Fish and Wildlife Service - San Francisco Bay
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1361;Faroese Fisheries Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1366;Washington State Department of Health
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1368;University of Delaware; Department of Biological Sciences
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1369;US Navy; Naval Research Laboratory - Stennis MS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1370;Oil Spill Recovery Institute (OSRI)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1372;University of Wisconsin - Milwaukee
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1374;Korea; MIFAFF; National Fisheries Research and Development Institute (NFRDI)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1383;National Agencies for New Technologies; Energy and the Environment (ENEA)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1384;Indian National Centre for Ocean Information Services (INCOIS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1385;Michigan Technological University (MTU)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1386;Florida State University; Center for Ocean-Atmospheric Prediction Studies (COAPS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1388;Far Eastern Federal University (FEFU)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/138;Danish Institute for Fishery and Marine Research
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1394;Universidad de Las Palmas de Gran Canaria (ULPGC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1395;University of Arizona (UA)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1396;Chinese National Arctic and Antarctic Data Center (CN-AADC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1397;University of South Carolina (USC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1398;University of North Carolina - Wilmington (UNCW)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1399;Portland State University (PSU)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/13;Arhangelsk Scientific Research Observatory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1400;Hellenic Centre for Marine Research (HCMR)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1403;US Navy; Arctic Submarine Laboratory (ASL)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1405;US DOC; NOAA; Office of Marine and Aviation Operations (OMAO)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1407;CLIVAR and Carbon Hydrographic Data Office (CCHDO)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1411;Dauphin Island Sea Lab (DISL)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1412;Georgia Tech; School of Biology
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1415;Penn State University (PSU)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1416;Biological and Chemical Oceanography Data Management Office (BCO-DMO)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1417;Post, Buckley, Schuh and Jernigan, Inc. (PBS&J)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1418;US Environmental Protection Agency (US EPA)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1419;US EPA; National Health and Environmental Effects Research Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1420;US EPA; Western Ecology Division - Newport OR (US EPA; WED)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1421;US DOC; NOAA; NMFS; Northwest Fisheries Science Center (NMFS/NWFSC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1422;US DOC; NOAA; NMFS; Southeast Regional Office (NMFS/SERO)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1426;US DOC; NOAA; NMFS; Southeast Regional Office; Habitat Conservation Division; Atlantic Branch; West Palm Beach, FL Field Office
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1429;Universite Laval
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/142;Danish Meteorological Institute (DMI)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1430;Dynalysis of Princeton
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1431;Alaska Ocean Observing System (AOOS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1433;Northwest Research Associates (NWRA)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1434;Alaska State Department of Fish and Game - Juneau
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1435;US DOC; NOAA; NMFS; Pacific Islands Fisheries Science Center; Fishery Biology and Stock Assessment Division (NMFS/PIFSC/FBSAD)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1436;US DOC; NOAA; NOS; Office of Response and Restoration (OR&R)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1440;US DOC; NOAA; NOS; National Centers for Coastal Ocean Science; Center for Coastal Monitoring and Assessment (NCCOS/CCMA)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1441;US DOC; NOAA; NOS; Integrated Ocean Observing System Program (IOOS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1442;The Nature Conservancy; Indo-Pacific Resource Center
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1443;Continental Shelf Associates, Inc.; Csa International, Inc.
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1444;University of California - Santa Barbara (UCSB)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1452;US DOC; National Oceanic and Atmospheric Administration (NOAA)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1454;Tulane University; Department of Ecology and Evolutionary Biology
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1456;Evans-Hamilton, Inc (EHI)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1457;Vantuna Research Group
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1458;University of Colorado - Boulder (CU-B)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1459;Olympic College (OC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/145;Alexandria Institute of Hydrobiology
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1466;US DOC; NOAA; NOS; National Centers for Coastal Ocean Science (NCCOS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1470;Makai Ocean Engineering, Inc.
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1474;US DOI; Fish and Wildlife Service; Southern New England - New York Bight Coastal Program
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1476;Stanford University
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1480;University of Southern Mississippi, Department of Marine Science
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1482;Russian Federal Research Institute of Fisheries and Oceanography (VNIRO)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1497;Environmental Assessment, Llc
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/14;Florida Atlantic University; Harbor Branch Oceanographic Institution (HBOI)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1501;New Zealand Ministry of Fisheries
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1503;US DOI; NPS; Southeast Alaska Inventory and Monitoring Network (SEAN)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1508;University of Bergen; Bjerknes Center for Climate Research; Geophysical Institute
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/150;Ministry of Scientific Research; Oceanographic and Fisheries Research Center
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1511;Sakhalin State University (SSU)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1513;Korea Hydrographic and Oceanographic Administration (KHOA)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1515;Centro Nacional de Datos Oceanograficos de Chile [National Oceanographic Data Center of Chile] (CENDHOC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1517;University of Colorado - Boulder; Cooperative Institute for Research In Environmental Sciences (CIRES)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1518;US DOC; NOAA; NOS; National Center for Coastal Ocean Science; Center for Coastal Environmental Health and Biomolecular Research (CCEHBR)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/151;Instituto Nacional de Pesca
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1522;University of South Florida (USF)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1525;University of Quebec - Montreal (UQAM)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/152;Hydrographic Oceanographic Service
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1537;Center for Coastal and Ocean Mapping (CCOM)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/155;Institute for Fishery Research
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1576;University of Miami (UM)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/159;Spanish Institute of Oceanography
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/15;Murmansk Marine Biological Institute (MMBI)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1600;US DOC; NOAA; NOS; Special Projects Office (SPO)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1601;US DOC; NOAA; NMFS; Alaska Fisheries Science Center; National Marine Mammal Laboratory (NMFS/AFSC/NMML)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1603;University of Gothenburg
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1606;GEOMAR Helmholtz Centre for Ocean Research Kiel (GEOMAR)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1607;National Taiwan Ocean University
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1614;Olgoonik Fairweather LLC
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1626;USC Wrigley Institute for Environmental Studies (USC WIES)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1627;Hawaii Pacific University (HPU)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1643;US DOC; NOAA; NOS; Center for Operational Oceanographic Products and Services (CO-OPS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/164;Hydrographic Institute of the Spanish Navy
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1655;Ocean Biogeographic Information System USA (OBIS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/165;Instituto de Ciencias Del Mar - Madrid (ICM)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1663;Liquid Robotics, Inc
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1669;University of California - Santa Barbara; Ocean Physics Laboratory (OPL)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/166;US DOC; NOAA; Ocean Products Center (OPC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1670;US DOC; NOAA; NESDIS; NODC; NOAA Central Library
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1676;Leidos
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/167;US DOC; NOAA; NOS - La Jolla, CA
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1680;Southeast Coastal Ocean Observing Regional Association (SECOORA)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/169;Arthur D. Little, Inc - Cambridge
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/16;US Navy; Electronics Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1701;Hawaii Institute for Marine Biology (HIMB)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1702;US DOC; NOAA; NMFS; Northeast Fisheries Science Center; Milford Laboratory (NMFS/NEFSC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1704;US DOC; NOAA; OAR; Earth System Research Laboratory (ESRL)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/170;US DOC; NOAA; NMFS; Pacific Islands Fisheries Science Center; Honolulu Laboratory (PIFSC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1713;Australian National Facility for Ocean Gliders (ANFOG)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1716;US DOC; NOAA; NESDIS; National Oceanographic Data Center; National Coastal Data Development Center (NCDDC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1717;Great Lakes Observing System (GLOS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1719;Rutgers, The State University of New Jersey; Institute for Marine & Coastal Sciences (IMCS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/171;Battelle Memorial Institute - Ventura County
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1726;Oregon State University (OSU)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1727;Oregon State University; Hatfield Marine Science Center (HMSC OSU)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1730;US DOC; NOAA; NESDIS; National Centers for Environmental Information (NCEI)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1732;US DOC; NOAA; NESDIS; Office of Satellite and Product Operations (OSPO)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1734;Deepwater Horizon Oil Spill Water Column Technical Working Group (DWHOS-WCTWG)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1738;Texas A&M University; Texas A&M University - Corpus Christi (TAMU - Corpus Christi)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/173;Battelle Memorial Institute; Pacific Northwest National Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1740;University of California - San Diego; Scripps Institution of Oceanography; Climate, Atmospheric Science and Physical Oceanography Department (CASPO)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/174;Battelle Ocean Sciences Laboratory - New England
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1758;University of Otago
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/175;US DOI; Fish and Wildlife Service (FWS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1764;Nova Southeastern University (NSU)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1769;County Government Ploen
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/176;US National Museum
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/177;US Navy; Naval Postgraduate School
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/178;Continental Shelf Associates, Inc
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1796;Pacific Islands Ocean Observing System (PacIOOS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1798;Northwest Association of Networked Ocean Observing Systems (NANOOS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/179;Carbon Dioxide Information Analysis Center (CDIAC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/17;University of Oregon; Biology Department
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1801;Southern California Coastal Ocean Observing System (SCCOOS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1802;US DOC; NOAA; NMFS; Office of Habitat Conservation (NMFS/OHC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1803;Gulf of Mexico Research Initiative Information & Data Cooperative (GRIIDC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1806;Princeton University
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1807;Ocean Surveys, Inc. (OSI)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/180;University of Alaska - Fairbanks (UAF)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1813;University of Tokyo
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1814;Embassy of Japan
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1816;University of Vienna
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/181;University of California - Berkeley
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/182;University of Connecticut; Marine Research Laboratory (UC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/183;University of Delaware; College of Earth, Ocean, and Environment; School of Marine Science and Policy
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/184;University of Michigan
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/185;Deep Oil Technology, Inc. - Long Beach
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/186;University of Wisconsin - Madison
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/189;Ebasco Environmental
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/190;Edward K. Noda and Associates
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/192;US Navy; Fleet Numerical Oceanography Center (FNOC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/193;US DOI; US Geological Survey (USGS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/194;US Navy; Naval Research Laboratory - Washington DC (NRL)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/195;University of Southern California (USC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/196;Edgerton, Germeshausen and Grier, Inc. (EG&G)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/197;Florida Institute of Oceanography (FIO)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/199;US DOC; NOAA; NMFS; Northeast Fisheries Science Center (NMFS/NEFSC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/1;University of Colorado - Boulder; Colorado Center for Astrodynamics Research (CCAR)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/200;Smithsonian Oceanographic Sorting Center
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/201;US DOC; NOAA; National Ocean Service (NOS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/203;Johns Hopkins University (JHU)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/204;Alpine Geophysical Associates Inc
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/206;University of Alaska - Fairbanks; Institute of Marine Science (UAK/IMS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/207;US NASA; Jet Propulsion Laboratory (JPL)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/208;US National Aeronautic and Space Administration (NASA)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/209;US DOC; NOAA; NOS - Rockville, MD
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/210;Orange County Department of Education
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/211;Shell Development Co.
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/212;Lykes Brothers Lines
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/213;Sea Land Service Inc.
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/214;Massachusetts Institute of Technology (MIT)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/215;Moore-Mccormack Lines Inc.
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/216;US Navy; Missile Center
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/217;Humboldt State University (HSU)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/218;US Navy; Naval Oceanographic Research and Development Activity (NORDA)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/219;University of New Hampshire (UNH)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/21;Ppo Yugrybpoisk
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/220;US DOI; US Geological Survey; Western Region
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/221;US DOC; NOAA; NOS - Norfolk, VA
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/222;Ocean Science Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/223;Prudential Lines Inc.
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/224;University of Puerto Rico;Department of Marine Sciences - Mayaguez
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/225;Rutgers, the State University of New Jersey (Rutgers)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/226;Stony Brook University
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/227;Quantus, Inc.
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/228;US Army; Corps of Engineers; Engineering Division; NRPAC (USACE NRPAC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/229;University of Texas; University of Texas - Austin (UT - Austin)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/22;Russian Academy of Sciences
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/230;University of Maryland (UMD)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/231;University of Hawai'i at Mānoa (UHM)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/232;US Navy; Underwater Sound Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/233;University of California - San Diego (UCSD)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/234;Science Applications International Corporation - Bellevue, WA
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/236;Science Applications International Corporation; Maritime Services - San Diego, CA
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/237;San Diego State University
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/238;University of Southern Mississippi; Gulf Coast Research Laboratory (GCRL)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/239;Sea World Research Institute (SWRI)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/240;Lockheed Aircraft Corporation; California County Oceanics Division
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/241;Southern Maine Vocational Tech Institute
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/243;University of South Florida - St. Petersburg (USF)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/244;US DOC; NOAA; NOS - Seattle, WA
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/245;American Export Lines
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/246;Farrell Lines
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/248;Grumman Aerospace Corporation
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/249;Marine Resources Research Institute (MRRI)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/24;Pacific Oceanological Institute
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/250;US DOI; Fish and Wildlife Service - Anchorage
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/251;American President Lines
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/252;Woodward-Clyde Consultants
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/253;US DOC; NOAA; Marine Resources
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/254;US DOI; US Geological Survey; Woods Hole Science Center
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/255;Alaska State Department of Fish and Game - Fairbanks
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/256;US Merchant Ships of Opportunity
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/257;US Navy; Sonar School
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/258;University of Colorado - Boulder; National Snow and Ice Data Center (NSIDC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/25;Hydrometeorology Service of the Russian Navy
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/261;Energy Resources Co. Inc.
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/262;Science Applications International Corporation - La Jolla, CA
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/264;Brookhaven National Laboratory (BNL)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/265;US Navy; Naval Academy; Environmental Science Department
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/267;US Navy; Naval Oceanographic Office (NAVO)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/268;US DOC; NOAA; OAR; Atlantic Oceanographic and Meteorological Laboratory (AOML)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/269;Chevron Research Corporation
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/26;North Department of the Hydrometeorological Service
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/270;Grace Prudential Lines
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/272;US DOC; NOAA; NOS - Miami, FL
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/273;US DOC; NOAA; National Marine Fisheries Service (NMFS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/274;US Navy; Underwater Ordnance Station
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/275;University of Southern California; Hancock Foundation
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/276;Raytheon Company (RTN)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/277;Moody College
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/278;Southwest Research Institute - Houston
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/279;Science Applications International Corporation - Raleigh, NC
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/27;Murmansk Observation Center for Environmental Pollution
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/280;Dames and Moore, Inc. - Bethesda
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/281;Southwest Research Institute (SwRI)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/282;Nassau County Department of Health; Bureau of Water Surveillance
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/284;US Navy; Naval Ocean Systems Command
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/285;US Navy; Naval Undersea Warfare Center (NUWC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/286;Johns Hopkins University; Chesapeake Bay Institute
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/287;Hudson Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/288;National Science Foundation (NSF)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/289;US DOC; NOAA; NWS; National Data Buoy Center (NDBC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/28;US DOC; NOAA; NMFS; Southwest Fisheries Science Center; Pacific Fisheries Environmental Laboratory - Pacific Grove, CA
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/290;LGL Ltd.; Alaska Research Associates, Inc.
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/291;US DOC; NOAA; OAR; Geophysical Fluid Dynamics Laboratory (GFDL)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/292;Atlantic Refining Co.
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/293;Delta Steamship Co.
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/294;Coastal Ecosystems Management, Inc.
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/295;US DOC; NOAA; NESDIS; National Oceanographic Data Center (NODC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/296;Bermuda Institute of Ocean Sciences (BIOS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/297;William F. Clapp Laboratory, Inc.
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/298;Duke University
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/299;Harvard University (HU)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/2;University of California - Santa Barbara; Center for Remote Sensing and Environmental Optics (CRSEO)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/300;University of Hawaii; Marine Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/301;Inter-American Tropical Tuna Commission - La Jolla (IATTC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/302;International Pacific Halibut Commission (IPHC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/304;Louisiana State University (LSU)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/305;Massachusetts Institute of Technology; Department of Geology and Geophysics
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/306;Rutgers University; Oyster Research Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/307;New York University (NYU)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/309;US DOI; Fish and Wildlife Service - Eastern Pennsylvania Region
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/30;US Department of Agriculture; Agriculture Research Service (ARS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/310;Institute of Marine Research; Biological Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/313;University of Helsinki; Tvaerminne Zoological Station
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/314;Finnish Scientific Society
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/315;NATO SACLANT Anti-Submarine Warfare Research Center - France
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/324;Universite Pierre et Marie Curie (UMPC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/326;Institute of Oceanographic and Fisheries Research
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/329;University of Madras
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/32;National Institute for Environmental Studies (NIES)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/330;Andhra University; Department of Zoology; Field Marine Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/333;Central Marine Fisheries Research Station
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/33;US DOC; NOAA; Office of NOAA Corps Operations
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/340;National Institute of Oceanography - India
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/343;Naval Hydrographic Office
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/344;Institute for Marine Research
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/347;Institute for Nets and Gear Investigation
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/349;University College
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/34;US DOC; NOAA; NESDIS; National Oceanographic Data Center; Ocean Climate Laboratory (OCL)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/352;Icelandic Marine Research Institute (MRI)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/355;Sea Fisheries Research Station
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/356;Haifa Lab
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/357;NATO SACLANT Anti-Submarine Research Center - la Spezia, Italy
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/358;Central Hydrobiological Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/364;Messina Institute of Experimental Thalassography
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/367;Istituto Sperimentale Talassografico Trieste
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/369;University of Bologna; Fano Marine Biological Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/372;National Research Council (CNR)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/373;Italian National Institute of Oceanography and Experimental Geophysics; Experimental Geophysical Observatory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/374;Naval University College of Naples
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/375;Marine Hydrographic Institute
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/376;National Research Council
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/377;Unknown - Japan
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/378;Tokyo University of Fisheries
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/37;Oceanographic Institute of Algeria
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/380;Tokai Regional Fisheries Research Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/382;Hokkaido University; Faculty of Science; Institute of Algological Research
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/385;Hiroshima University; Faculty of Fish and Animal Husbandry
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/392;Meteorological Agency; Marine Division
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/394;Hiroshima University; Mukaishima Marine Biological Station
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/3;University of Minnesota - Duluth; Large Lakes Observatory (LLO)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/402;Tohoku Regional Fisheries Research Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/404;Tohoku University; Marine Biological Station
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/409;Fisheries Agency of Japan - Tokyo (JFA)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/413;Shimonoseki University of Fisheries
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/415;Tokai University; College of Marine Science and Technology
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/418;Maizuru Marine Observatory (MMO)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/419;Japan Coast Guard; Hydrographic Division (MSA)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/41;Cuban Institute of Technological Investigations
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/420;Japanese Maritime Self Defense Force
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/422;Hokkaido University; Faculty of Fisheries
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/42;Fish Research Center - Havana
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/434;Office de la Recherche Scientifique et Technique Outre Mer - Nossi Be; Malagasy Republic (ORSTOM)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/441;Universidad Nacional de Mexico; Instituto de Geofisica
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/442;National Institute of Fisheries
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/444;Southern Scientific Center (SSC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/445;Directorate of Fisheries Institute of Marine Research
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/453;University of Bergen; Geophysical Inst
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/454;Norwegian Hydrodynamic Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/455;University of Auckland; Institute of Marine Sciences; Leigh Marine Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/457;New Zealand Oceanographic Institute
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/459;Defence Scientific Establishment - Auckland
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/461;Defence Scientific Establishment - Auckland
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/462;National Institute of Water and Atmosphere - Lower Hutt
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/464;Zoological Survey Department; Marine Biological Research Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/465;Laboratory for Anti-Fouling Research
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/466;Royal Netherlands Institute for Sea Research (NIOZ)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/468;Royal Netherlands Meteorlogical Institute
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/469;Royal Netherlands Navy
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/46;University of Ghana; Department of Physics
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/474;Vening Meinesz Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/476;Peruvian Navy
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/478;Marine Resources Research Institute - Callao
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/488;Sea Fisheries Institute
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/489;Council for Overseas Investigation; Center for Fisheries Biology - Lisbon
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/48;Unknown - Ivory Coast
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/492;Commission for the Study of Biological Oceanography and Fgola
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/495;Ministry of the Navy; Instituto Hidrografico
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/496;University of Lisbon
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/497;NATO SACLANT Anti-Submarine Research Center - Great Britian
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/498;United Kingdom Hydrographic Office (UKHO)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/49;Ministry of Animal Production Center for Oceanographic Research
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/500;Fisheries Laboratory - Lowestoft
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/501;Radiobiological Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/503;National Institute of Oceanography - Uk
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/504;United Kingdom Marine Biology Association; Plymouth Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/50;Fisheries and Aquaculture Organization; UN Developmental Project; Regional Fisheries Survey In West Africa (FAO/UNDP)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/51;Office de la Recherche Scientifique et Technique Outre Mer - Ivory Coast (ORSTOM)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/522;Standard Telephone and Cables, Ltd.
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/523;Cable and Wireless Limited
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/525;Bermuda Biological Station for Research (BBSR)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/52;University of the West Indes
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/530;British Oceanographic Data Center; Proudman Oceanographic Laboratory (BODC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/531;Coral Cay Conservation
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/532;State Oceanic Administration; First Institute of Oceanography
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/533;Chinese Academy of Sciences; Institute of Atmospheric Physics (IAP)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/534;State Oceanic Administration; South China Sea Branch
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/53;Oceanographic Museum of Monaco
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/542;Kungliga Fisheristyrelsen
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/544;Thai Navy Hydrographic Office
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/545;Ministry of Agriculture; Department of Fisheries
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/547;Fisheries and Aquaculture Organization; UN Developmental Project; Fishery Survey and Developmental Project (FAO/UNDP)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/549;Turkish Navy Hydrographic Office
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/551;Academy of Science - Ukrainian SSR
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/554;Russian Academy of Sciences; P.P. Shirshov Institute of Oceanology
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/555;USSR Academy of Science; Institute of Zoology
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/558;Russian Federal Research Institute of Marine Fisheries and Oceanology - Arkhangelsk (VNIRO)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/560;Azov and Black Sea Research Institution of Marine Fisheries and Oceanology
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/564;Pacific Research Institute of Fisheries and Oceanography
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/565;Knipovich Polar Research Institute of Marine Fisheries and Oceanography (PINRO)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/567;Atlantic Research Institute of Fishing Economy and Oceanography (AtlantNIRO)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/569;Marine Hydrophysical Institute (MHI)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/571;Direction of the Hydrometservice - Murmansk
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/576;Far Eastern Hydrometeorological Institute of Scientific Research (FERHRI)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/580;Main Administration for Navigation and Oceanography
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/581;Department of the State Oceanographic Institute - Odessa
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/583;University of Natal; Oceanographic Research Institute
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/584;Department of Commerce and Industries; Division of Sea Fisheries
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/586;University of Cape Town
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/587;Oceanographic Research Institute
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/589;Council for Scientific and Industrial Research (CSIR)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/590;Ministry of Agriculture and Livestock; Division of Fish and Game; Fish Biology Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/591;Estacion de Investigaciones Marinas de Margarita (EDIMAR)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/592;University of Oriente; Oceanographic Institute
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/596;Biological Institute - Rovinj/Istra
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/597;Institute of Oceanography and Fisheries
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/598;University of Hamburg (UHH)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/599;Institute of Low Temperature Science
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/600;Federal Maritime Agency - Hamburg (BSH)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/601;State Oceanic Administration; Second Institute of Oceanography
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/603;Helgoland Biological Stations
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/605;Institute for Nets and Gear Investigation
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/607;German Merchant Navy
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/608;US DOC; NOAA; NMFS; Southwest Fisheries Science Center (NMFS/SWFSC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/609;US DOC; NOAA; NMFS; Southeast Fisheries Science Center; Miami, FL Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/610;US DOC; NOAA; NMFS; Cooperative Oxford Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/611;US DOC; NOAA; NMFS; Northwest Regional Office (NMFS/NWRO)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/612;US DOC; NOAA; NMFS - Stanford, CA Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/613;US DOC; NOAA; NMFS; Northeast Fisheries Science Center; Woods Hole Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/614;US DOC; NOAA; NMFS; Northeast Fisheries Science Center - Sandy Hook, NJ; J.J. Howard Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/615;US DOC; NOAA; NMFS - St. Petersburg, FL
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/616;US DOC; NOAA; NMFS; Southeast Fisheries Science Center; Pascagoula/Stennis, MS Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/617;US DOC; NOAA; NMFS - Ashland, WI
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/618;US DOC; NOAA; NMFS; Southeast Regional Office; Habitat Conservation Division; Atlantic Branch
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/619;US DOC; NOAA; NMFS; Southeast Fisheries Science Center; Bay St. Louis, MS Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/61;Office de la Recherche Scientifique et Technique Outre Mer; Oceanographic and Fisheries Center - Brazzaville; Congo (ORSTOM)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/621;Antarctic Climate & Ecosystems Cooperative Research Centre (ACE CRC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/622;University of East Anglia; School of Environmental Sciences
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/633;Akita Prefectural Fisheries Experimental Station
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/634;Far Sea Fisheries Research Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/641;Norwegian Polar Institute
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/642;British Antarctic Survey (BAS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/643;Unknown - No Country Designation Available
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/644;Chinese Academy of Sciences; South China Sea Institute of Oceanology
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/645;Philippines Fisheries Commission, DANR
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/647;Washington State Department of Natural Resources
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/648;Southern California Coastal Water Research Project Authority (SCCWRPA)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/649;University of Hamburg; Institute of Oceanography (IfM)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/650;All-Russian Research Institute of Hydrometeorological Information - World Data Centre B (WDC-B)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/651;Polar Marine Geological Prospective Expedition (PMGRE)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/652;Ukrainian Scientific Centre of the Ecology of Sea (UkrSCES)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/653;Commonwealth of the Northern Mariana Islands Division of Environmental Quality
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/654;Hawaii State Department of Health
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/655;Istituto Di Ricerche Sulla Pesca Marittima
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/656;University of Maine (UMO)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/657;Hawaiian Electric Company
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/658;Office de la Recherche Scientifique et Technique Outre Mer - Noumea; New Caledonia (ORSTOM)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/659;University of Guam
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/660;University of Bergen
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/661;Earth and Space Research (ESR)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/662;Agency for the Assessment and Application of Technology
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/663;City of Los Angeles Department of Public Works
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/665;Pacific International Center for High Technology Reaseach (PITCHR)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/666;US DOC; NOAA; NOS; Coastal Services Center (CSC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/667;Bernice Pauahi Bishop Museum
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/668;Washington State Department of Fish and Wildlife
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/669;Prince William Aquaculture Corporation
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/66;Ministry of Natural Resources; Fisheries Division
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/670;World Data Center-A, Oceanography - Washington Dc (WDC-A, WASHINGTON)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/672;San Francisco State University
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/674;Oregon Graduate Institute of Science and Technology (OGIST)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/676;Fisheries and Aquaculture Organization; UN Developmental Project; Pelagic Fishery Project (FAO/UNDP)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/679;Argentina Naval Ministry of Defense; Naval Hydrographic Service
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/681;Hafrannsoknastofnunin Reykjavik Oceanographic Institute
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/682;Israel Oceanographic and Limnological Research Ltd.
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/684;US Navy; Office of Naval Research (ONR)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/685;Indian Ocean Biological Center - Cochin
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/686;Nagasaki Marine Observatory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/687;Centro de Ciencias Del Mar Y Limnologia
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/689;Hydrometeorological Service
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/692;Instituto de Oceanologia de Cuba (IDO)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/694;Tokyo University; Ocean Research Institute
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/695;Fisheries Department of Pakistan
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/696;Fisheries Institute
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/697;Polish Academy of Science; Institute of Oceanology
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/698;Catholic University of Valparaiso
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/699;Institutefor Sea Fisheries
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/69;Argentina Antarctic Institute
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/701;Japanese Hydrographic Office
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/702;Unknown - USSR, Russia
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/703;Arctic and Antarctic Research Institute (AARI)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/704;Deutsche Akademe Der Wissenschaften Zu Berlin
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/705;Hydrographic Office
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/706;South African Data Centre for Oceanography
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/708;Meteorological Department
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/709;US DOC; NOAA; National Environmental Satellite Data and Information Service (NESDIS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/710;Columbia University
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/711;US Navy; Ships of Opportunity
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/712;Oregon State University; College of Earth, Ocean, and Atmospheric Sciences (OSU-CEOAS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/713;Stanford University; Hopkins Marine Station
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/714;US Army; Corps of Engineers (USACE)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/715;University of California - Davis; Bodega Marine Laboratory (BML)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/716;Nova Southeastern University; Physical Oceanography Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/717;Rosenstiel School of Marine and Atmospheric Science (RSMAS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/718;University of Maryland; Center for Environmental Science; Chesapeake Biological Laboratory (UMCES CBL)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/719;Florida State University (FSU)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/720;South Carolina State Wildlife and Marine Resources Department
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/721;Old Dominion University (ODU)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/722;New York City Board of Water Supply
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/723;Mcneese State University (MSU)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/724;Marathon Oil Company
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/725;US DOC; NOAA; NWS; National Centers for Environmental Prediction; Climate Prediction Center (NCEP/CPC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/726;United States Coast Guard (USCG)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/727;University of the Pacific - Dillon Beach
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/728;University of Maine; Darling Marine Center (DMC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/730;University of Rhode Island; Graduate School of Oceanography (URI)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/731;University of Washington; Friday Harbor Laboratories
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/733;University of Texas; University of Texas - Austin; Marine Science Institute
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/734;Duke University/University of North Carolina Oceanographic Consortium (DU/UNC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/735;University of Maryland; Center for Environmental Science; Horn Point Laboratory (UMCES HPL)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/736;North Carolina State University (NCSU)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/737;University of California - Santa Cruz; Institute of Marine Sciences
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/738;University of North Carolina - Chapel Hill (UNC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/739;Texas Christian University (TCU)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/73;National Institute for Natural Sciences Research; Hydrobiological Station
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/740;University of California - Irvine
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/741;US DOI; US Geological Survey; Marine Division - Corpus Christi
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/742;Woods Hole Oceanographic Institution (WHOI)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/743;California Maritime Academy - Vallejo (CMA)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/744;Palisades Geophysical Institute for Acoustical Research
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/745;US DOI; Minerals Management Service - Anchorage (MMS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/747;Commonwealth Scientific and Industrial Research Organization (CSIRO)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/748;Australian Oceanographic Data Center
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/749;Columbia Ministry of National Defense; Navy
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/74;Argentine Oceanographic Data Center
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/750;Centro de Investigaciones Oceanograficas e Hidrograficas del Caribe
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/751;Korean Ocean Research and Development Institute (KORDI)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/752;Hokkaido University; Faculty of Fisheries; Oshoro Marine Biological Station
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/755;Japan Meteorological Agency
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/756;Flinders University of South Australia; Horace Lamb Centre for Oceanographic Research
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/758;Hydro Department
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/759;University of Southampton; Department of Oceanography
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/75;Royal Australian Navy (RAN)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/761;Unknown - Canada
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/762;Fisheries Research and Development Agency
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/763;Hakodate Marine Observatory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/767;Instituto Del Mar Del Peru - Callao (IMARPE)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/769;Swedish Meteorological and Hydrological Institute
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/770;Arago Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/779;National Museum of Natural History
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/796;Institute of Marine Research - Norway (IMR)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/799;Office de la Recherche Scientifique et Technique Outre Mer - (Pre-Independence) New Caledonia (ORSTOM)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/79;University of Adelaide; Zoology Department
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/800;French Navy
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/803;Service Hydrographique de la Marine (SHOM)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/805;Office de la Recherche Scientifique et Technique Outre Mer - Abidjan; France (ORSTOM)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/806;Institut Francais de Recherche Pour L'Exploitation de la Mer (IFREMER)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/807;Office de la Recherche Scientifique et Technique Outre Mer - Brest; France (ORSTOM)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/80;University of New England; Zoology Department; Marine Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/810;Russian Federal Research Institute of Marine Fisheries and Oceanology - Moscow (VNIRO)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/811;Echoshelf
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/817;University of Kiel (CAU)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/818;Deutsches Hydrographische Institut
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/821;German Federal Research Center for Fisheries (BFA-FISH)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/822;Ozeanographische Forschungsanstalt Der Bundeswehr
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/823;Deutsches Ozeanographisches Datenzentrum (DOD)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/826;Alfred Wegener Institute for Polar and Marine Research (AWI)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/827;Institute for Deep Sea Fishery and Fish Processing (IfH)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/829;New Zealand Royal Navy
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/830;Unknown - Nigeria
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/832;Unknown - Costa Rica
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/833;Unknown - Cuba
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/834;Unknown - Ghana
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/840;Unknown - Congo
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/841;Unknown - Saudi Arabia
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/847;Unknown - Germany (Limited To Pre-Unification German Democratic Republic)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/848;Unknown - Argentina
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/849;Unknown - Australia
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/851;Unknown - Belgium
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/852;Unknown - Brazil
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/854;Unknown - Chile
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/855;Unknown - Taiwan
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/856;Unknown - Colombia
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/857;Unknown - Republic of Korea (South Korea)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/859;Unknown - Ecuador
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/85;Australian Defence Scientific Service; Weapons Research Establishment
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/860;Unknown - Spain
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/861;Unknown - USA
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/863;Unknown - France
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/865;Unknown - India
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/86;Australian Bureau of Meteorology (ABOM)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/870;Unknown - Italy
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/871;Unknown - Liberia
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/874;Unknown - Mexico
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/875;Unknown - Norway
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/878;Unknown - Netherlands
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/879;Unknown - Peru
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/87;Belgium Royal Institution for Natural Sciences
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/881;Unknown - Poland
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/883;Unknown - United Kingdom
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/884;Unknown - Peoples Republic of China
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/886;Unknown - Thailand
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/887;Unknown - Tunisia
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/889;Unknown - South Africa
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/88;National Station for Marine Fisheries
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/894;Unknown - Germany (Includes Pre-Reunification Federal Republic Germany)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/896;Canadian Centre for Inland Waters
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/904;Kumamoto Prefectural Fisheries Experimental Station
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/90;Belgian Navy
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/920;Osaka Prefectural Fisheries Experimental Station
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/925;US DOC; NOAA; EDIS CEAS
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/926;Columbus Line
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/928;National Taiwan University (NTU)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/931;Ichthyological Associates Inc.
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/932;NATO SACLANT Anti-Submarine Research Center - Norway
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/934;Peruvian Government
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/935;NATO SACLANT Anti-Submarine Research Center - Portugal
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/936;Swedish Coast Guard
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/938;University of Copenhagen; Institute of Physical Oceanography
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/939;Unknown - Denmark
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/93;University of Recife; Institute of Oceanography
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/943;Fisheries Research Board of Canada; Pacific Oceanographic Group
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/944;Fisheries Research Board of Canada; Atlantic Oceanographic Group
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/948;University of British Columbia
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/949;Fisheries Research Board of Canada; Pacific Environment Institute
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/94;University of Sao Paulo; Oceanographic Institute
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/951;Dalhousie University; Institute of Oceanography
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/953;Fisheries and Oceans Canada; Oceanography and Scientific Data (OSD)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/954;University of Alberta (UA)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/956;Mcgill University
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/958;Department of the Environment; Marine Sciences Branch - Pacific Region
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/959;Department of Mines and Technical Surveys; Division of Oceanographic Research
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/95;Directoria de Hidrografia E Navagacao (DHN)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/962;Fisheries and Oceans Canada (DFO)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/963;US DOC; NOAA; NMFS; Southeast Fisheries Science Center; Panama City, FL Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/964;US DOC; NOAA; NMFS; Alaska Regional Office (NMFS/ARO)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/965;US DOC; NOAA; NMFS; Northeast Fisheries Science Center; Narragansett Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/966;US DOC; NOAA; NMFS; Southwest Fisheries Science Center; Pacific Fisheries Environmental Laboratory - Monterey, CA
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/967;US DOC; NOAA; NMFS; Southwest Fisheries Science Center; Tiburon, CA Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/968;US DOC; NOAA; NMFS; Alaska Fisheries Science Center; Auke Bay Marine Station
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/969;US DOC; NOAA; NMFS; Southeast Fisheries Science Center; Beaufort, NC Laboratory (NMFS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/970;US DOC; NOAA; NMFS; Boothbay Harbor Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/971;US DOC; NOAA; NMFS; Southeast Fisheries Science Center; Galveston, TX Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/972;University of Alaska - Anchorage (UA)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/974;University of Tennessee
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/976;US DOC; NOAA; OAR; Pacific Marine Environmental Laboratory (PMEL)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/977;US EPA; Meteorology and Assessment Division - Triangle Park, NC (EPA - Triangle Park, NC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/979;City University of New York (CUNY)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/980;University of California - Santa Cruz (UCSC)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/981;Texas A&M University (TAMU)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/982;University of Alabama (UA)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/983;University of California - San Diego; Scripps Institution of Oceanography (SIO)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/984;University of Washington (UW)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/985;Columbia University; Lamont-Doherty Earth Observatory (LDEO)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/986;Yale University
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/987;California State Department of Fish and Game
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/988;Skidaway Institute of Oceanography (SKIO)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/989;Moss Landing Marine Laboratories (CALSTATE-MLML)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/98;Fisheries Research Board of Canada; Arctic Unit
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/990;Applied Science Associates, Inc.
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/991;Flow Research Co.
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/992;Monterey Bay Aquarium Research Institute (MBARI)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/993;Mote Marine Laboratory (MML)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/994;Bigelow Laboratory for Ocean Sciences
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/995;Fish Commission Research Laboratory
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/996;Virginia Institute of Marine Science (VIMS)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/997;Western Washington University (WWU)
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/999;San Juan Department of Public Works
+https://www.nodc.noaa.gov/cgi-bin/OAS/prd/institution/details/99;Nova Scotia Research Foundation

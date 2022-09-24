@@ -4,7 +4,7 @@ package ucar.nc2.ft.point.writer;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -36,6 +36,13 @@ import ucar.nc2.VariableSimpleIF;
 import ucar.nc2.ft.point.StationFeature;
 import ucar.nc2.ft.point.StationPointFeature;
 import ucar.nc2.units.DateUnit;
+
+/**
+ * Extends the WriterCFStationCollection from Unidata to fix a bug: the coordinates are always fixed, instead we want to
+ * modify them
+ * 
+ * @author boldrini
+ */
 public class ESSIWriterCFStationCollection extends WriterCFStationCollection {
 
     List<String> coords = new ArrayList<>();

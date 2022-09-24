@@ -4,7 +4,7 @@ package eu.essi_lab.model.resource;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -19,6 +19,15 @@ package eu.essi_lab.model.resource;
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
+ */
+
+/**
+ * An implementing class copies its own properties to a target adapter of the same class <code>T</code>, according to a
+ * supplied {@link AdaptPolicy}. The properties to handle entirely depend on the implementing class, with no
+ * restrictions
+ * 
+ * @author Fabrizio
+ * @param <T>
  */
 public interface PropertiesAdapter<T> {
 

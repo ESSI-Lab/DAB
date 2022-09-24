@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.handler;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,6 +27,17 @@ import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.pdk.Profiler;
 import eu.essi_lab.pdk.handler.selector.WebRequestFilter;
+
+/**
+ * This interface defines objects which are in charge to handle a {@link WebRequest}s
+ * 
+ * @see WebRequestFilter
+ * @see DiscoveryHandler
+ * @see DefaultRequestHandler
+ * @see Profiler
+ * @see Profiler#getSelector()
+ * @author Fabrizio
+ */
 public interface WebRequestHandler  {
 
     /**

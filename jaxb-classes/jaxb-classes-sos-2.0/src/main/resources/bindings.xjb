@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jaxb:bindings version="1.0" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+     xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+    xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" xmlns:ows="http://www.opengis.net/ows"
+    jxb:extensionBindingPrefixes="xjc">
+    <jaxb:bindings schemaLocation="schemas/sos.xsd">
+        <jaxb:schemaBindings>
+            <jaxb:package name="eu.essi_lab.jaxb.sos._2_0"/>
+        </jaxb:schemaBindings>
+    </jaxb:bindings>
+    <jaxb:bindings schemaLocation="schemas/gda.xsd">
+        <jaxb:schemaBindings>
+            <jaxb:package name="eu.essi_lab.jaxb.sos._2_0.gda"/>
+        </jaxb:schemaBindings>
+    </jaxb:bindings>
+    <jaxb:bindings schemaLocation="schemas/spatialSamplingFeature.xsd">
+        <jaxb:schemaBindings>
+            <jaxb:package name="eu.essi_lab.jaxb.sos._2_0.sams._2_0"/>
+        </jaxb:schemaBindings>
+    </jaxb:bindings>
+        <jaxb:bindings schemaLocation="http://schemas.opengis.net/sampling/2.0/samplingFeature.xsd">
+        <jaxb:schemaBindings>
+            <jaxb:package name="eu.essi_lab.jaxb.sos._2_0.sf._2_0"/>
+        </jaxb:schemaBindings>
+    </jaxb:bindings>
+    <jxb:bindings schemaLocation="http://schemas.opengis.net/gml/3.2.1/gml.xsd" node="/xs:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="eu.essi_lab.jaxb.sos._2_0.gml._3_2_1"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="http://schemas.opengis.net/iso/19139/20070417/gmd/gmd.xsd" node="/xs:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="eu.essi_lab.jaxb.sos._2_0.iso2005.gmd"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="http://schemas.opengis.net/iso/19139/20070417/gss/gss.xsd" node="/xs:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="eu.essi_lab.jaxb.sos._2_0.iso2005.gss"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="http://schemas.opengis.net/iso/19139/20070417/gsr/gsr.xsd" node="/xs:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="eu.essi_lab.jaxb.sos._2_0.iso2005.gsr"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="http://schemas.opengis.net/iso/19139/20070417/gco/gco.xsd" node="/xs:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="eu.essi_lab.jaxb.sos._2_0.iso2005.gco"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="http://schemas.opengis.net/iso/19139/20070417/gts/gts.xsd" node="/xs:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="eu.essi_lab.jaxb.sos._2_0.iso2005.gts"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="http://schemas.opengis.net/sweCommon/2.0/swe.xsd" node="/xs:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="eu.essi_lab.jaxb.sos._2_0.swe._2"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="http://schemas.opengis.net/ows/1.1.0/owsAll.xsd" node="/xs:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="eu.essi_lab.jaxb.sos._2_0.ows_1"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="http://schemas.opengis.net/om/2.0/observation.xsd" node="/xs:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="eu.essi_lab.jaxb.sos._2_0.om__2"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="http://schemas.opengis.net/swes/2.0/swes.xsd" node="/xs:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="eu.essi_lab.jaxb.sos._2_0.swes_2"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+        <jxb:bindings schemaLocation="http://docs.oasis-open.org/wsn/t-1.xsd" node="/xs:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="eu.essi_lab.jaxb.sos._2_0.wsnt._1"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+        <jxb:bindings schemaLocation="http://www.w3.org/2005/08/addressing/ws-addr.xsd" node="/xs:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="eu.essi_lab.jaxb.sos._2_0.addressing._2005"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>       
+        <jxb:bindings schemaLocation="http://schemas.opengis.net/filter/2.0/filterAll.xsd" node="/xs:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="eu.essi_lab.jaxb.sos._2_0.fes._2"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+    
+    
+    
+	<jxb:bindings schemaLocation="http://schemas.opengis.net/gml/3.2.1/geometryPrimitives.xsd">
+		<jxb:bindings node="//xs:element[@name='rows']">
+            <jxb:property name="PointGridRows"/>
+        </jxb:bindings>		
+    </jxb:bindings>   
+    <jxb:bindings schemaLocation="http://www.w3.org/1999/xlink.xsd">
+    <jxb:schemaBindings>
+            <jxb:package name="eu.essi_lab.jaxb.sos._2_0.xlink"/>
+        </jxb:schemaBindings>
+		<jxb:bindings node="//xs:element[@ref='xlink:title'][../../@name='locatorModel']">
+            <jxb:property name="LocatorModelTitle"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@ref='xlink:title'][../../@name='arcModel']">
+            <jxb:property name="LocatorModelTitle"/>
+        </jxb:bindings>		
+    </jxb:bindings>
+   <!--jxb:bindings schemaLocation="http://schemas.opengis.net/gml/3.2.1/gmlBase.xsd">
+        <jxb:bindings node="//xs:element[@ref='gml:member']">
+            <jxb:property name="SingleMember"/>
+        </jxb:bindings>
+    </jxb:bindings-->
+    <!--jxb:bindings schemaLocation="http://schemas.opengis.net/gml/3.2.1/feature.xsd">
+        <jxb:bindings node="//xs:element[@ref='gml:featureMember']">
+            <jxb:property name="FeatureMemberSingleMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@ref='gml:featureMembers']">
+            <jxb:property name="FeatureMemberMultipleMember"/>
+        </jxb:bindings>
+    </jxb:bindings-->
+
+    <jxb:bindings schemaLocation="http://schemas.opengis.net/gml/3.2.1/geometryAggregates.xsd">
+        <jxb:bindings node="//xs:element[@name='pointMember']">
+            <jxb:class name="SinglePointMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='pointMembers']">
+            <jxb:class name="MultiplePointMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@ref='gml:pointMember']">
+            <jxb:property name="SinglePointMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@ref='gml:pointMembers']">
+            <jxb:property name="MultiplePointMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='surfaceMembers']">
+            <jxb:class name="MultipleSurfaceMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@ref='gml:surfaceMember']">
+            <jxb:property name="SingleSurfaceMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@ref='gml:surfaceMembers']">
+            <jxb:property name="MultipleSurfaceMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@ref='gml:solidMembers']">
+            <jxb:property name="MultipleSolidMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@ref='gml:geometryMembers']">
+            <jxb:property name="MultipleGeometryMember"/>
+        </jxb:bindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="http://schemas.opengis.net/gml/3.2.1/grids.xsd">
+        <jxb:bindings node="//xs:element[@name='axisLabels']">
+            <jxb:property name="MultipleAxisLabels"/>
+        </jxb:bindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="http://schemas.opengis.net/gml/3.2.1/geometryPrimitives.xsd">
+        <jxb:bindings node="//xs:element[@name='surfaceMember']">
+            <jxb:class name="SingleSurfaceMember"/>
+        </jxb:bindings>
+        <!--jxb:bindings node="//xs:element[@name='rows']">
+            <jxb:property name="MultipleRows"/>
+        </jxb:bindings-->
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="http://schemas.opengis.net/gml/3.2.1/geometryAggregates.xsd">
+        <jxb:bindings node="//xs:element[@name='curveMembers']">
+            <jxb:property name="MultipleCurveMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='solidMember']">
+            <jxb:class name="SingleSolidMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='solidMembers']">
+            <jxb:class name="MultipleSolidMember"/>
+        </jxb:bindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="http://schemas.opengis.net/gml/3.2.1/valueObjects.xsd">
+        <jxb:bindings node="//xs:element[@ref='gml:valueComponents']">
+            <jxb:property name="MultipleValueComponent"/>
+        </jxb:bindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="http://schemas.opengis.net/gml/3.2.1/topology.xsd">
+        <jxb:bindings node="//xs:element[@ref='gml:topoPrimitiveMembers']">
+            <jxb:property name="MultipleTopoPrimitiveMember"/>
+        </jxb:bindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="http://schemas.opengis.net/gml/3.2.1/datums.xsd">
+        <jxb:bindings node="//xs:element[@name='secondDefiningParameter']">
+            <jxb:class name="SecondDefiningParameterProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='primeMeridian']">
+            <jxb:class name="PrimeMeridianProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='ellipsoid']">
+            <jxb:class name="EllipsoidProperty"/>
+        </jxb:bindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="http://schemas.opengis.net/gml/3.2.1/coordinateReferenceSystems.xsd">
+        <jxb:bindings node="//xs:element[@name='temporalDatum']">
+            <jxb:class name="TemporalDatumProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='ellipsoidalCS']">
+            <jxb:class name="EllipsoidalCSProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='timeCS']">
+            <jxb:class name="TimeCSProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='verticalDatum']">
+            <jxb:class name="VerticalDatumProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='conversion']">
+            <jxb:class name="ConversionProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='geodeticDatum']">
+            <jxb:class name="GeodeticDatumProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='affineCS']">
+            <jxb:class name="AffineCSProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='cartesianCS']">
+            <jxb:class name="CartesianCSProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='sphericalCS']">
+            <jxb:class name="SphericalCSProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='verticalCS']">
+            <jxb:class name="VerticalCSProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='engineeringDatum']">
+            <jxb:class name="EngineeringDatumProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='imageDatum']">
+            <jxb:class name="ImageDatumProperty"/>
+        </jxb:bindings>
+    </jxb:bindings>
+	 <jxb:bindings schemaLocation="http://schemas.opengis.net/gml/3.2.1/coordinateSystems.xsd">
+	    <jxb:bindings node="//xs:element[@name='CylindricalCS']">
+	        <jxb:class name="CylindricalCS1"/>
+	    </jxb:bindings>
+	    <jxb:bindings node="//xs:element[@name='LinearCS']">
+	        <jxb:class name="LinearCS1"/>
+	    </jxb:bindings>
+	    <jxb:bindings node="//xs:element[@name='PolarCS']">
+	        <jxb:class name="PolarCS1"/>
+	    </jxb:bindings>
+	    <jxb:bindings node="//xs:element[@name='UserDefinedCS']">
+	        <jxb:class name="UserDefinedCS1"/>
+	    </jxb:bindings>
+	 </jxb:bindings>
+    <jxb:bindings schemaLocation="http://schemas.opengis.net/gml/3.2.1/coordinateOperations.xsd">
+        <jxb:bindings node="//xs:element[@name='operationParameter']">
+            <jxb:class name="OperationParameterProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='parameterValue']">
+            <jxb:class name="ParameterValueProperty"/>
+        </jxb:bindings>
+    </jxb:bindings>
+   
+   
+   
+   
+   
+    <jxb:bindings schemaLocation="schemas/waterml2.xsd" node="/xs:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="eu.essi_lab.jaxb.sos._2_0.wml"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+   
+   
+    
+    
+
+   
+    <jaxb:globalBindings fixedAttributeAsConstantProperty="true">
+       
+    </jaxb:globalBindings>
+</jaxb:bindings>

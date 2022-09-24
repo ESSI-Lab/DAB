@@ -1,10 +1,13 @@
+/**
+ * 
+ */
 package eu.essi_lab.api.database.marklogic.search;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -65,7 +68,13 @@ public class DistinctQueryHandler {
 
 	String letSearch = "let $x := cts:search(doc()[gs:Dataset or gs:DatasetCollection or gs:Document or gs:Ontology or gs:Service or gs:Observation],\n";
 	letSearch += "cts:and-query((\n";
-	letSearch += " $query,\n";
+	//
+	//
+	//
+	letSearch += " $query,\n"; // unless problems occur, this is not required and without the query execution is much more fast
+	//
+	//
+	//
 	letSearch += "cts:element-range-query(fn:QName('" + CommonNameSpaceContext.GS_DATA_MODEL_SCHEMA_URI + "','" + queryable.getName()
 		+ "'),'=',$y,('score-function=linear'),0.0)\n";
 	letSearch += ")),('unfiltered','score-simple'),0)[1 to 1]\n\n";

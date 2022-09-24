@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.csw.parser;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -41,10 +41,11 @@ import eu.essi_lab.jaxb.ows._1_0_0.DomainType;
 import eu.essi_lab.jaxb.ows._1_0_0.Operation;
 import eu.essi_lab.jaxb.ows._1_0_0.RequestMethodType;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.exceptions.DefaultGSExceptionHandler;
-import eu.essi_lab.model.exceptions.DefaultGSExceptionLogger;
-import eu.essi_lab.model.exceptions.DefaultGSExceptionReader;
 import eu.essi_lab.model.exceptions.GSException;
+
+/**
+ * @author ilsanto
+ */
 public class CSWOperationParser {
 
     private final Operation operation;
@@ -54,7 +55,7 @@ public class CSWOperationParser {
     private List<String> supportedOutputSchemas = new ArrayList<>();
     private Map<String, QName> supportedTypesBySchema = new HashMap<>();
     private final CSWConnector connector;
-    private transient Logger logger = GSLoggerFactory.getLogger(CSWOperationParser.class);
+    private  Logger logger = GSLoggerFactory.getLogger(CSWOperationParser.class);
     private static final String OUTPUTSCHEMA_PARAMETER_NAME = "outputschema";
     private List<String> typenames = Arrays.asList("TypeName", "TypeNames");
 
@@ -262,7 +263,7 @@ public class CSWOperationParser {
 	    logger.error("Exception retrieving capabilities from connector", e);
 	} catch (GSException gse) {
 
-	    DefaultGSExceptionLogger.log(new DefaultGSExceptionHandler(new DefaultGSExceptionReader(gse)));
+	    gse.log();
 	}
 
 	return null;

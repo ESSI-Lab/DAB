@@ -4,7 +4,7 @@ package eu.essi_lab.request.executor.discover;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.w3c.dom.Node;
 
-import eu.essi_lab.adk.AccessorFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.count.CountSet;
@@ -37,6 +36,23 @@ import eu.essi_lab.request.executor.IDiscoveryNodeExecutor;
 import eu.essi_lab.request.executor.IDiscoveryStringExecutor;
 import eu.essi_lab.request.executor.IDistributor;
 import eu.essi_lab.request.executor.query.IQueryExecutor;
+
+/**
+ * The default implementation of IDiscoverExecutor uses two subcomponents to enable discovery of the resources matching
+ * the user discovery
+ * queries (both count and retrieval): the query initializer and the Distributor. The steps to be done are as in the
+ * following:
+ * <ol>
+ * <li>Query Initializer is called to initialize the query (e.g. to get a query in normal form)</li>
+ * <li>The Distributor is initialized with an ordered list of query submitters. These are initialized by the discovery
+ * executor from the ordered list of sources, found as a field of the discovery message. In general, there will be (at
+ * most) one database
+ * query submitter and (zero or more) distributed query submitters.</li>
+ * <li>Distributor: to execute the normalized query</li>
+ * </ol>
+ *
+ * @author boldrini
+ */
 public class DiscoveryExecutor extends AbstractAuthorizedExecutor implements IDiscoveryExecutor, IDiscoveryNodeExecutor, IDiscoveryStringExecutor {
 
     private static final String DISCOVERY_EXECUTOR_PDP_ENGINE_ERROR = "DISCOVERY_EXECUTOR_PDP_ENGINE_ERROR";
@@ -46,7 +62,6 @@ public class DiscoveryExecutor extends AbstractAuthorizedExecutor implements IDi
 
 	queryExecutorInitializer = new QueryExecutorInitializer();
 
-	queryExecutorInitializer.setAccessorFactory(new AccessorFactory());
     }
 
     @Override
@@ -86,7 +101,7 @@ public class DiscoveryExecutor extends AbstractAuthorizedExecutor implements IDi
 
 	return result;
     }
-    
+
     @Override
     public ResultSet<Node> retrieveNodes(DiscoveryMessage message) throws GSException {
 

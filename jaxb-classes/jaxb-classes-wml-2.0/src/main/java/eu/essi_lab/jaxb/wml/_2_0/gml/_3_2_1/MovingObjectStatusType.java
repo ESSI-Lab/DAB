@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.wml._2_0.gml._3_2_1;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,6 +35,38 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlType;
 
+
+/**
+ * <p>Java class for MovingObjectStatusType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="MovingObjectStatusType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{http://www.opengis.net/gml/3.2}AbstractTimeSliceType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;choice&gt;
+ *           &lt;element name="position" type="{http://www.opengis.net/gml/3.2}GeometryPropertyType"/&gt;
+ *           &lt;element ref="{http://www.opengis.net/gml/3.2}pos"/&gt;
+ *           &lt;element ref="{http://www.opengis.net/gml/3.2}locationName"/&gt;
+ *           &lt;element ref="{http://www.opengis.net/gml/3.2}locationReference"/&gt;
+ *           &lt;element ref="{http://www.opengis.net/gml/3.2}location"/&gt;
+ *         &lt;/choice&gt;
+ *         &lt;element name="speed" type="{http://www.opengis.net/gml/3.2}MeasureType" minOccurs="0"/&gt;
+ *         &lt;element name="bearing" type="{http://www.opengis.net/gml/3.2}DirectionPropertyType" minOccurs="0"/&gt;
+ *         &lt;element name="acceleration" type="{http://www.opengis.net/gml/3.2}MeasureType" minOccurs="0"/&gt;
+ *         &lt;element name="elevation" type="{http://www.opengis.net/gml/3.2}MeasureType" minOccurs="0"/&gt;
+ *         &lt;element ref="{http://www.opengis.net/gml/3.2}status" minOccurs="0"/&gt;
+ *         &lt;element ref="{http://www.opengis.net/gml/3.2}statusReference" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "MovingObjectStatusType", propOrder = {
     "position",

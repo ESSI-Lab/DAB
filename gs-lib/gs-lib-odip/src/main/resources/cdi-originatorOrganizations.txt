@@ -1,0 +1,607 @@
+http://www.seadatanet.org/urnurl/SDN:EDMO::100/;Baltic Sea Research Institute Warnemuende (IOW)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1001/;IFREMER / STATION D'ARCACHON
+http://www.seadatanet.org/urnurl/SDN:EDMO::1002/;Aquitaine Observatory of Sciences of the Universe (Bordeaux I University) / OSU
+http://www.seadatanet.org/urnurl/SDN:EDMO::1004/;Hellenic Navy Hydrographic Service (HNHS)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1006/;APAT of Venice - ex Istituto Idrografico e Mareografico di Venezia
+http://www.seadatanet.org/urnurl/SDN:EDMO::1007/;Comune di Venezia - Centro Previsioni e Segnalazioni Maree
+http://www.seadatanet.org/urnurl/SDN:EDMO::1008/;APAT - Agency for Environmental Protection and Technical Services
+http://www.seadatanet.org/urnurl/SDN:EDMO::1009/;CNR, Istituto per l'Ambiente Marino Costiero (Sezione di Oristano)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1010/;ARPA Friuli-Venezia Giulia - Alto Adriatico Observatory
+http://www.seadatanet.org/urnurl/SDN:EDMO::1015/;Oceanologic Observatory of Banyuls (University of Paris VI) / OSU
+http://www.seadatanet.org/urnurl/SDN:EDMO::1016/;IFREMER / DYNECO- Coastal Environment Dynamics department
+http://www.seadatanet.org/urnurl/SDN:EDMO::1017/;Societe ACRI S.A.
+http://www.seadatanet.org/urnurl/SDN:EDMO::1018/;CEA /  Service Mixte De Surveillance Radiologique Et Biologique
+http://www.seadatanet.org/urnurl/SDN:EDMO::1019/;Wimereux Marine Station (University of Sciences and Technologies of Lille 1)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1020/;CNRS / COM - Physical and Biogeochemical Oceanography Laboratory (Toulon)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1022/;BRGM / Office of Geological and Mining Resources
+http://www.seadatanet.org/urnurl/SDN:EDMO::1024/;IGN / Département des grands clients (Institut Geographique National)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1031/;IFREMER / CENTRE MANCHE - MER DU NORD
+http://www.seadatanet.org/urnurl/SDN:EDMO::1038/;CEA / DEPT DASE/ SERVICE TMG
+http://www.seadatanet.org/urnurl/SDN:EDMO::1039/;CEA / INSTITUT DE  RADIOPROTECTION ET DE SURETE NUCLEAIRE
+http://www.seadatanet.org/urnurl/SDN:EDMO::104/;State Office for Water Economy and Shore, Schleswig-Holstein, Kiel
+http://www.seadatanet.org/urnurl/SDN:EDMO::1040/;CETE / CETE AIX
+http://www.seadatanet.org/urnurl/SDN:EDMO::1041/;CNEVA / LAB. PATHOLOGIE ANIMAUX AQUATIQUES
+http://www.seadatanet.org/urnurl/SDN:EDMO::1042/;CNRS / ANTENNE DIVISION TECHNIQUE CNRS/INSU
+http://www.seadatanet.org/urnurl/SDN:EDMO::1043/;COM - Physical and Biogeochemical Oceanography Laboratory (Endoume)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1044/;CNRS / INST. DE GEODYNAMIQUE (SOPHIA ANTIPOLIS)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1045/;CNRS / INSTITUT PIERRE SIMON LAPLACE (IPSL)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1046/;LABORATORY OF SCIENCES OF MARINE ENVIRONMENT (LEMAR)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1047/;CREOCEAN / CREOCEAN
+http://www.seadatanet.org/urnurl/SDN:EDMO::1048/;DIR. DEPARTEMENTALE EQUIPEMENT FINISTERE
+http://www.seadatanet.org/urnurl/SDN:EDMO::1049/;DIR. DEPARTEMENTALE EQUIPEMENT MORBIHAN
+http://www.seadatanet.org/urnurl/SDN:EDMO::105/;Coastal Research Station (CRS) of the NLOE
+http://www.seadatanet.org/urnurl/SDN:EDMO::1050/;DIR. DEPARTEMENTALE EQUIPEMENT VENDEE
+http://www.seadatanet.org/urnurl/SDN:EDMO::1051/;UNKNOWN
+http://www.seadatanet.org/urnurl/SDN:EDMO::1052/;IFREMER / GENAVIR BREST
+http://www.seadatanet.org/urnurl/SDN:EDMO::1053/;IFREMER / GENAVIR LA SEYNE SUR MER
+http://www.seadatanet.org/urnurl/SDN:EDMO::1054/;IFREMER
+http://www.seadatanet.org/urnurl/SDN:EDMO::1056/;IFREMER / STATION DE LA TREMBLADE
+http://www.seadatanet.org/urnurl/SDN:EDMO::1057/;IFREMER / TSI/AS- ACOUSTIC SEISMIC
+http://www.seadatanet.org/urnurl/SDN:EDMO::1059/;INSTITUT FRANCAIS DU PETROLE (IFP)
+http://www.seadatanet.org/urnurl/SDN:EDMO::106/;Alfred Wegener Institute for Polar and Marine Research (AWI), Geophysics Department
+http://www.seadatanet.org/urnurl/SDN:EDMO::1060/;INSTITUT GEOGRAPHIQUE NATIONAL / ECOLE NATIONALE DES SCIENCES GEOGRAPHIQUES (ENSG) - IGN
+http://www.seadatanet.org/urnurl/SDN:EDMO::1061/;FUGRO FRANCE SA
+http://www.seadatanet.org/urnurl/SDN:EDMO::1062/;IRD / CENTRE DE CAYENNE- GUYANE
+http://www.seadatanet.org/urnurl/SDN:EDMO::1063/;IRD / CENTRE DE LA MARTINIQUE
+http://www.seadatanet.org/urnurl/SDN:EDMO::1064/;IRD / CENTRE DE LA REUNION
+http://www.seadatanet.org/urnurl/SDN:EDMO::1065/;IRD / CENTRE DE MONTPELLIER
+http://www.seadatanet.org/urnurl/SDN:EDMO::1066/;IRD / CENTRE DE PAPEETE
+http://www.seadatanet.org/urnurl/SDN:EDMO::1067/;IRD / CENTRE TOGA LE HAVRE
+http://www.seadatanet.org/urnurl/SDN:EDMO::1068/;ISTPM (IFREMER NANTES)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1069/;METEO FRANCE / Centre Meteorologique Nevers
+http://www.seadatanet.org/urnurl/SDN:EDMO::1070/;National Center for Meteorological Research (Paris)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1071/;SESAM / SESAM
+http://www.seadatanet.org/urnurl/SDN:EDMO::1072/;UNIV. SCIENCES et TECHNOLOGIES DE LILLE 1 / LABORATOIRE SEDIMENTOLOGIE ET GEOCHIMIE
+http://www.seadatanet.org/urnurl/SDN:EDMO::1073/;UNIVERSITE D'ORLEANS / LABORATOIRE GEOLOGIE DYNAMIQUE ORLEANS
+http://www.seadatanet.org/urnurl/SDN:EDMO::1074/;University of Bordeaux I / Center for study of tropical geography
+http://www.seadatanet.org/urnurl/SDN:EDMO::1075/;University of Bordeaux I / IGBA Talence
+http://www.seadatanet.org/urnurl/SDN:EDMO::1076/;University of Bordeaux I / Amenagement institute
+http://www.seadatanet.org/urnurl/SDN:EDMO::1077/;University of Bordeaux I / Marine Biology Institut
+http://www.seadatanet.org/urnurl/SDN:EDMO::1079/;UNIVERSITE DE BRETAGNE OCCIDENTALE (UBO) /UMR 6538 DU CNRS "DOMAINES OCEANIQUES"
+http://www.seadatanet.org/urnurl/SDN:EDMO::108/;CNR, Istituto di Scienze Marine (Sezione di Venezia - ex IBM)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1081/;UNIVERSITE DE BRETAGNE-SUD(UBS) / GEOSCIENCES / LAUBS
+http://www.seadatanet.org/urnurl/SDN:EDMO::1082/;UNIVERSITE DE CORSE / CEVAREN
+http://www.seadatanet.org/urnurl/SDN:EDMO::1083/;UNIVERSITE DE GRENOBLE 1 / LEGI
+http://www.seadatanet.org/urnurl/SDN:EDMO::1084/;UNIVERSITE DE LA MEDITERRANNEE (U2) / CENTRE D'OCEANOLOGIE DE MARSEILLE
+http://www.seadatanet.org/urnurl/SDN:EDMO::1085/;UNIVERSITE DE LA MEDITERRANNEE (U2) / EQUIPE INTEC, COM
+http://www.seadatanet.org/urnurl/SDN:EDMO::1086/;UNIVERSITE DE LA MEDITERRANNEE (U2) / LABORATOIRE D'HYDROBIOLOGIE MARINE
+http://www.seadatanet.org/urnurl/SDN:EDMO::1087/;UNIVERSITE DE MONTPELLIER II / LABORATOIRE DE GEOPHYSIQUE ET TECTONIQUE
+http://www.seadatanet.org/urnurl/SDN:EDMO::1088/;UNIVERSITY OF MONTPELLIER II / GEOSCIENCES MONTPELLIER UMR 5243 CNRS/UM2
+http://www.seadatanet.org/urnurl/SDN:EDMO::1089/;UNIVERSITE DE NANTES / LAB.DE GEOLOGIE MARINE ET APPLIQUEE
+http://www.seadatanet.org/urnurl/SDN:EDMO::1090/;UNIVERSITE DE NANTES / LABORATOIRE DE PETROLOGIE STRUCTURALE
+http://www.seadatanet.org/urnurl/SDN:EDMO::1092/;UNIVERSITE DE PARIS VI / LABORATOIRE DE GEOLOGIE DYNAMIQUE PARIS
+http://www.seadatanet.org/urnurl/SDN:EDMO::1094/;UNIVERSITE DE PAU / LAB.CHIMIE BIO INORGANIQUE & ENVIRONNEMENT
+http://www.seadatanet.org/urnurl/SDN:EDMO::1095/;UNIVERSITE DE RENNES I / LABORATOIRE DE GEOSCIENCES - UMR CNRS 6118
+http://www.seadatanet.org/urnurl/SDN:EDMO::1096/;UNIVERSITY OF ROUEN / Laboratory of Continental and Coastal Morphodynamics - UMR 6143 (MC2)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1097/;University of Strasbourg I (Louis Pasteur) / Earth Sciences School and Observatory
+http://www.seadatanet.org/urnurl/SDN:EDMO::110/;ENEA Centro Ricerche - Frascati
+http://www.seadatanet.org/urnurl/SDN:EDMO::1102/;Danish Institute for Fisheries Research, Dept. of Marine Fisheries
+http://www.seadatanet.org/urnurl/SDN:EDMO::1104/;Finnish Environment Institute
+http://www.seadatanet.org/urnurl/SDN:EDMO::1130/;ARPA Emilia-Romagna - Struttura Oceanografica Daphne
+http://www.seadatanet.org/urnurl/SDN:EDMO::1133/;General Office for Air Force Meteorology
+http://www.seadatanet.org/urnurl/SDN:EDMO::1144/;IRD / CENTRE OF MADAGASCAR
+http://www.seadatanet.org/urnurl/SDN:EDMO::1145/;IRD / CENTRE OF ABIDJAN
+http://www.seadatanet.org/urnurl/SDN:EDMO::1146/;IRD / CENTRE OF POINTE NOIRE
+http://www.seadatanet.org/urnurl/SDN:EDMO::1147/;IRD / CENTRE OF HANN
+http://www.seadatanet.org/urnurl/SDN:EDMO::1148/;IRD / CENTRE OF JAKARTA
+http://www.seadatanet.org/urnurl/SDN:EDMO::1156/;University of Hamburg, Institute of Oceanography
+http://www.seadatanet.org/urnurl/SDN:EDMO::1160/;Institute for Marine Science (IFM), University of Kiel
+http://www.seadatanet.org/urnurl/SDN:EDMO::1167/;Ukrainian scientific center of Ecology of Sea (UkrSCES)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1168/;Scientific Research Institute of Ecological Problems (USRIEP)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1169/;Odessa National I.I.Mechnikov University
+http://www.seadatanet.org/urnurl/SDN:EDMO::117/;Federal Maritime and Hydrographic Agency, Dept. Oceanography
+http://www.seadatanet.org/urnurl/SDN:EDMO::1178/;Waterways and Shipping Office Cuxhaven
+http://www.seadatanet.org/urnurl/SDN:EDMO::1181/;State Agency for Nature and Environment of Schleswig Holstein (LANU)
+http://www.seadatanet.org/urnurl/SDN:EDMO::119/;University of Trieste, Department of Geological, Environmental and Marine Sciences
+http://www.seadatanet.org/urnurl/SDN:EDMO::120/;OGS (Istituto Nazionale di Oceanografia e di Geofisica Sperimentale), Division of Oceanography
+http://www.seadatanet.org/urnurl/SDN:EDMO::1200/;Centre d'Etudes Techniques Maritimes et Fluviales (CETMEF)
+http://www.seadatanet.org/urnurl/SDN:EDMO::122/;ENEL SPA - Centro Ricerca Idraulica e Strutturale (CRIS), Servizio Idrologico
+http://www.seadatanet.org/urnurl/SDN:EDMO::1229/;National Institute of Biology - NIBMarine Biology Station
+http://www.seadatanet.org/urnurl/SDN:EDMO::1230/;National Center for Marines Sciences - NCMS
+http://www.seadatanet.org/urnurl/SDN:EDMO::1232/;Institut National des Sciences et Technologies de la Mer – INSTM
+http://www.seadatanet.org/urnurl/SDN:EDMO::124/;CNR, Istituto di Scienze Marine (Sezione di Lesina)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1254/;Sea Fisheries Institute in Gdynia (SFI) - Department of Fisheries Oceanography and Marine Ecology
+http://www.seadatanet.org/urnurl/SDN:EDMO::126/;SACLANT Undersea Research Centre (SACLANTCEN)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1265/;Scientific - Research Firm "GAMMA"
+http://www.seadatanet.org/urnurl/SDN:EDMO::127/;CNR, Istituto di Scienze Marine (Sezione di Trieste)
+http://www.seadatanet.org/urnurl/SDN:EDMO::128/;CNR, Istituto per lo Studio della Dinamica delle Grandi Masse
+http://www.seadatanet.org/urnurl/SDN:EDMO::13/;University of Plymouth, Institute of Marine Studies
+http://www.seadatanet.org/urnurl/SDN:EDMO::1324/;Senckenberg by the Sea, Wilhelmshaven
+http://www.seadatanet.org/urnurl/SDN:EDMO::1325/;GKSS Research Center
+http://www.seadatanet.org/urnurl/SDN:EDMO::1326/;Institute of Biochemistry and Food Chemistry, University Hamburg
+http://www.seadatanet.org/urnurl/SDN:EDMO::1327/;Lower Saxony Water Management, Coastal Defense and Nature Conservation Agency
+http://www.seadatanet.org/urnurl/SDN:EDMO::1328/;State Office of Ecology of Lower Saxony
+http://www.seadatanet.org/urnurl/SDN:EDMO::1329/;Weser River Management Bureau
+http://www.seadatanet.org/urnurl/SDN:EDMO::1334/;University of Gothenburg, Faculty of Science
+http://www.seadatanet.org/urnurl/SDN:EDMO::1338/;Italian Navy Hydrographic Office
+http://www.seadatanet.org/urnurl/SDN:EDMO::1339/;Commissione Permanente per lo Studio dell'Adriatico, Venezia
+http://www.seadatanet.org/urnurl/SDN:EDMO::134/;CNR, Institute of Marine Science U.O.S. of Pozzuolo di Lerici (SP)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1340/;IMARES, Wageningen UR, Institute for Marine Resources and Ecosystem Studies, IJmuiden
+http://www.seadatanet.org/urnurl/SDN:EDMO::1346/;National Institute of Fisheries
+http://www.seadatanet.org/urnurl/SDN:EDMO::1350/;Norwegian College of Fishery and Science,University of Tromsø
+http://www.seadatanet.org/urnurl/SDN:EDMO::1351/;Institute of Marine Research
+http://www.seadatanet.org/urnurl/SDN:EDMO::1353/;Swedish Environmental Protection Agency
+http://www.seadatanet.org/urnurl/SDN:EDMO::136/;ENEA Centro Ricerche Ambiente Marino - La Spezia
+http://www.seadatanet.org/urnurl/SDN:EDMO::1362/;IHPT, Hydrographic Institute - Hydrographic Surveying Vessel Task Group
+http://www.seadatanet.org/urnurl/SDN:EDMO::1363/;Institut polaire francais Paul-Emile Victor (IPEV)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1365/;German Research Foundation (DFG)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1367/;CNR, Consiglio Nazionale delle Ricerche
+http://www.seadatanet.org/urnurl/SDN:EDMO::1368/;Alfred-Wegener-Institute for Polar- and Marine Research
+http://www.seadatanet.org/urnurl/SDN:EDMO::1371/;Isle of Man Government Laboratory
+http://www.seadatanet.org/urnurl/SDN:EDMO::138/;University of Genova - Laboratory of Marine Geology and Sedimentology,  Dpt for the Study of the Territory and Resources
+http://www.seadatanet.org/urnurl/SDN:EDMO::1380/;Woods Hole Oceanographic Institution: Department of Physical Oceanography
+http://www.seadatanet.org/urnurl/SDN:EDMO::1381/;National Science Foundation (NSF)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1382/;Rosenstiel School of Marine and Atmospheric Science (RSMAS), University of Miami
+http://www.seadatanet.org/urnurl/SDN:EDMO::1384/;Lamont-Doherty Earth Observatory, Columbia University
+http://www.seadatanet.org/urnurl/SDN:EDMO::1385/;Agri-Food and Biosciences Institute
+http://www.seadatanet.org/urnurl/SDN:EDMO::1389/;School of Ocean and Earth Science and Technology, University of Hawai'i at Manoa
+http://www.seadatanet.org/urnurl/SDN:EDMO::1390/;Scripps Institution of Oceanography
+http://www.seadatanet.org/urnurl/SDN:EDMO::1392/;Barcelona University (UB), Department of Stratigraphy, Paleontology and Marine Geosciences
+http://www.seadatanet.org/urnurl/SDN:EDMO::1393/;Centre for Advanced Studies of Blanes (CEAB-CSIC)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1394/;University of Cadiz (UCA), Faculty of Marine and Environmental Science
+http://www.seadatanet.org/urnurl/SDN:EDMO::1395/;Malaga University (UMA). Applied Physics departament II
+http://www.seadatanet.org/urnurl/SDN:EDMO::1398/;Las Palmas University. Sciences of the Sea Faculty
+http://www.seadatanet.org/urnurl/SDN:EDMO::14/;University of Liverpool, Port Erin Marine Laboratory
+http://www.seadatanet.org/urnurl/SDN:EDMO::1400/;IEO/ Gijon Oceanographic Centre
+http://www.seadatanet.org/urnurl/SDN:EDMO::1401/;IEO/ Santander Oceanographic Centre
+http://www.seadatanet.org/urnurl/SDN:EDMO::1403/;IEO/ La Coruna Oceanographic Centre
+http://www.seadatanet.org/urnurl/SDN:EDMO::1404/;IEO/ Vigo Oeanographic Centre
+http://www.seadatanet.org/urnurl/SDN:EDMO::1405/;IEO/ Malaga Oceanographic Centre
+http://www.seadatanet.org/urnurl/SDN:EDMO::1406/;IEO/ Cadiz Oceanographic Centre
+http://www.seadatanet.org/urnurl/SDN:EDMO::1407/;IEO/  Murcia Oceanographic Centre
+http://www.seadatanet.org/urnurl/SDN:EDMO::1409/;IEO/ Balearic Islands Oceanographic Centre
+http://www.seadatanet.org/urnurl/SDN:EDMO::1410/;Akvaplan-niva AS
+http://www.seadatanet.org/urnurl/SDN:EDMO::1414/;National Institute of Nutrition and Seafood Research (NIFES)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1415/;Geological Survey of Norway (NGU)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1417/;Norwegian Institute of Water Research (NIVA)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1426/;LABORATOIRE de MORPHODYNAMIQUE CONTINENTALE ET COTIERE (M2C)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1427/;Queen's University Belfast School of Biological Sciences
+http://www.seadatanet.org/urnurl/SDN:EDMO::1428/;IMARES, Wageningen UR, Institute for Marine Resources and Ecosystem Studies, Texel
+http://www.seadatanet.org/urnurl/SDN:EDMO::1434/;University of Washington, School of Oceanography
+http://www.seadatanet.org/urnurl/SDN:EDMO::144/;Institute of Marine Science (ISMAR) - Ancona
+http://www.seadatanet.org/urnurl/SDN:EDMO::1448/;Texas A&M University, Department of Oceanography
+http://www.seadatanet.org/urnurl/SDN:EDMO::145/;Institute of Marine Science (ISMAR) - Bologna
+http://www.seadatanet.org/urnurl/SDN:EDMO::1461/;Hydrographic Institute of the Navy
+http://www.seadatanet.org/urnurl/SDN:EDMO::1471/;DIRECTION DE L'INDUSTRIE, DES MINES ET DE L'ENERGIE (DIMENC)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1472/;IFREMER/EEP/ DEEP SEA ENVIRONMENT DEPARTMENT
+http://www.seadatanet.org/urnurl/SDN:EDMO::1477/;STATION MARINE DE DINARD
+http://www.seadatanet.org/urnurl/SDN:EDMO::1478/;Institute for Agricultural and Fisheries Research, Animal Sciences Unit - Fisheries
+http://www.seadatanet.org/urnurl/SDN:EDMO::1480/;FPS Economy, Belgian Continental Shelf
+http://www.seadatanet.org/urnurl/SDN:EDMO::1484/;CSIRO Oceans & Atmosphere
+http://www.seadatanet.org/urnurl/SDN:EDMO::149/;ISAC - Institute of Atmospheric Sciences and Climate (Rome)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1490/;Antarctic Climate and Ecosystems Cooperative Research Centre (ACE CRC)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1495/;AWI - Biological Institute Helgoland
+http://www.seadatanet.org/urnurl/SDN:EDMO::1496/;Federal Institute for Geosciences and Natural Resources (BGR), Hannover.
+http://www.seadatanet.org/urnurl/SDN:EDMO::1498/;Institute of Geosciences (IfG), University of Kiel
+http://www.seadatanet.org/urnurl/SDN:EDMO::150/;OGS (Istituto Nazionale di Oceanografia e di Geofisica Sperimentale), Division of Geophysics
+http://www.seadatanet.org/urnurl/SDN:EDMO::1500/;Institute of Geophysics, University of Hamburg
+http://www.seadatanet.org/urnurl/SDN:EDMO::1503/;Institute of Biogeochemistry and Marine Chemistry (IfBM), University of Hamburg
+http://www.seadatanet.org/urnurl/SDN:EDMO::1507/;Carl von Ossietzky University of Oldenburg - Institute for Chemistry and Biology of the Marine Environment (ICBM)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1510/;Belgian Science Policy Office
+http://www.seadatanet.org/urnurl/SDN:EDMO::1511/;RF Forschungsschiffahrt GmbH
+http://www.seadatanet.org/urnurl/SDN:EDMO::1526/;Rijkswaterstaat Water, Traffic and Environment
+http://www.seadatanet.org/urnurl/SDN:EDMO::1527/;Rijkswaterstaat Centrale Informatievoorziening
+http://www.seadatanet.org/urnurl/SDN:EDMO::1543/;Geological Survey of Denmark and Greenland (GEUS)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1545/;Institute of Geology and Geography of Nature Research Centre
+http://www.seadatanet.org/urnurl/SDN:EDMO::1548/;Napier University School of Life Sciences
+http://www.seadatanet.org/urnurl/SDN:EDMO::1566/;U.S. Geological Survey
+http://www.seadatanet.org/urnurl/SDN:EDMO::1568/;Marum - Center for Marine Environmental Sciences, University of Bremen
+http://www.seadatanet.org/urnurl/SDN:EDMO::1569/;Briese Schiffahrt
+http://www.seadatanet.org/urnurl/SDN:EDMO::1570/;Thünen-Institute of Sea Fisheries (TI-SF)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1571/;Thünen-Institute of Fisheries Ecology (TI-FI)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1574/;Thünen-Institute of Baltic Sea Fisheries (TI-OF)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1575/;Federal Research Institute for Rural Areas, Forestry and Fisheries (VTI)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1576/;Institute of Fisheries Ecology - Cuxhaven (VTI-CUX)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1585/;Laboratory : GeosystemsTeam : Analytic and Marine Chemistry
+http://www.seadatanet.org/urnurl/SDN:EDMO::1609/;Geological Survey of Estonia
+http://www.seadatanet.org/urnurl/SDN:EDMO::1613/;Civil Protection, Friuli Venezia Giulia
+http://www.seadatanet.org/urnurl/SDN:EDMO::1623/;AZTI - Tecnalia, Headquarters Pasaia(Gipuzkoa)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1625/;IFREMER / STATION DE LORIENT
+http://www.seadatanet.org/urnurl/SDN:EDMO::1627/;Utrecht University, Faculty of Geosciences
+http://www.seadatanet.org/urnurl/SDN:EDMO::1636/;University of Tromsø
+http://www.seadatanet.org/urnurl/SDN:EDMO::164/;Hellenic Centre for Marine Research, Institute of Oceanography (HCMR/IO)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1680/;State Oceanographic Institute, Sebastopol Branch (SB SOI)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1694/;Las Palmas de Gran Canaria University(ULPGC), Chemistry Department
+http://www.seadatanet.org/urnurl/SDN:EDMO::17/;National Oceanography Centre, Southampton
+http://www.seadatanet.org/urnurl/SDN:EDMO::1710/;IAMC, Messina
+http://www.seadatanet.org/urnurl/SDN:EDMO::1715/;University of Rostock, Institute of Biosciences
+http://www.seadatanet.org/urnurl/SDN:EDMO::1725/;Finnish Meteorological Institute
+http://www.seadatanet.org/urnurl/SDN:EDMO::1770/;University of Liverpool Department of Earth and Ocean Sciences
+http://www.seadatanet.org/urnurl/SDN:EDMO::1771/;University of Liverpool Department of Earth Sciences
+http://www.seadatanet.org/urnurl/SDN:EDMO::1772/;University of Liverpool Department of Oceanography
+http://www.seadatanet.org/urnurl/SDN:EDMO::1773/;Institute of Oceanographic Sciences Taunton
+http://www.seadatanet.org/urnurl/SDN:EDMO::1778/;Japan Meteorological Agency
+http://www.seadatanet.org/urnurl/SDN:EDMO::1780/;Faroese Fisheries Laboratory
+http://www.seadatanet.org/urnurl/SDN:EDMO::1783/;Offshore Environmental Systems Ltd
+http://www.seadatanet.org/urnurl/SDN:EDMO::1786/;University of Wales Swansea Department of Geology and Oceanography
+http://www.seadatanet.org/urnurl/SDN:EDMO::1787/;University of Bristol Geology Department
+http://www.seadatanet.org/urnurl/SDN:EDMO::1788/;Institute of Marine Environmental Research
+http://www.seadatanet.org/urnurl/SDN:EDMO::179/;Malta Environment and Planning Authority - Environment Protection Directorate
+http://www.seadatanet.org/urnurl/SDN:EDMO::1790/;Amoco (UK) Exploration, Aberdeen
+http://www.seadatanet.org/urnurl/SDN:EDMO::1791/;Britoil
+http://www.seadatanet.org/urnurl/SDN:EDMO::1792/;University of Manchester School of Mechanical, Aerospace and Civil Engineering
+http://www.seadatanet.org/urnurl/SDN:EDMO::18/;Scott Polar Research Institute
+http://www.seadatanet.org/urnurl/SDN:EDMO::1800/;Forth River Purification Board
+http://www.seadatanet.org/urnurl/SDN:EDMO::1801/;University of Southampton School of Ocean and Earth Science
+http://www.seadatanet.org/urnurl/SDN:EDMO::1802/;University of Southampton School of Ocean and Earth Science
+http://www.seadatanet.org/urnurl/SDN:EDMO::1803/;University of Southampton Department of Oceanography
+http://www.seadatanet.org/urnurl/SDN:EDMO::1804/;University of Southampton Department of Oceanography
+http://www.seadatanet.org/urnurl/SDN:EDMO::1805/;ConocoPhillips Limited (Warwick)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1807/;Clyde River Purification Board
+http://www.seadatanet.org/urnurl/SDN:EDMO::1808/;Hydraulics Research Station
+http://www.seadatanet.org/urnurl/SDN:EDMO::1809/;National Rivers Authority
+http://www.seadatanet.org/urnurl/SDN:EDMO::1811/;Bedford Institute of Oceanography
+http://www.seadatanet.org/urnurl/SDN:EDMO::1812/;Land Information New Zealand (LINZ)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1815/;Wimpol Ltd
+http://www.seadatanet.org/urnurl/SDN:EDMO::1817/;METOCEAN Data Systems
+http://www.seadatanet.org/urnurl/SDN:EDMO::1818/;Imperial Chemical Industries, Brixham Lab
+http://www.seadatanet.org/urnurl/SDN:EDMO::1824/;Institute for Marine Science
+http://www.seadatanet.org/urnurl/SDN:EDMO::1825/;North of Scotland Hydro-Electric Board
+http://www.seadatanet.org/urnurl/SDN:EDMO::1827/;Permanent Service for Mean Sea Level
+http://www.seadatanet.org/urnurl/SDN:EDMO::1828/;Land & Marine Project Engineering Ltd
+http://www.seadatanet.org/urnurl/SDN:EDMO::1836/;IRD / Centre Of Sete
+http://www.seadatanet.org/urnurl/SDN:EDMO::1838/;Ifremer / Dyneco-Vigies
+http://www.seadatanet.org/urnurl/SDN:EDMO::184/;LABORATOIRE DE TECTONIQUE (UNIVERSITE DE PARIS VI)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1841/;University of Perpignan / Institut Of Modelisation And Analysis In Marine Geo-Environment
+http://www.seadatanet.org/urnurl/SDN:EDMO::1842/;IRDN / LERCM - Toulon
+http://www.seadatanet.org/urnurl/SDN:EDMO::1843/;Institute of Oceanology, Bulgarian Academy of Sciences (IO-BAS)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1848/;Coastal and Marine Research Centre (UCC)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1849/;German Hydrographic Institute
+http://www.seadatanet.org/urnurl/SDN:EDMO::1850/;Federal Maritime and Hydrographic Agency
+http://www.seadatanet.org/urnurl/SDN:EDMO::1868/;Ifremer / Tahiti Centre COP
+http://www.seadatanet.org/urnurl/SDN:EDMO::1872/;Secretariat General de la Communaute du Pacifique / Secretariat Of The Pacific Community SPC
+http://www.seadatanet.org/urnurl/SDN:EDMO::1873/;CNRS / Center for Particle physics of Marseilles - IN2P3/CPPM
+http://www.seadatanet.org/urnurl/SDN:EDMO::1876/;Universite de Provence d'Aix-Marseille 1 / Research Center of Geology of Carbonate Systems
+http://www.seadatanet.org/urnurl/SDN:EDMO::1879/;Universite de la Rochelle / Litoral Environnement et Societe (LIENSS) - UMR 7266
+http://www.seadatanet.org/urnurl/SDN:EDMO::188/;LABO ATMOSPHEREs, MILIEUX, OBSERVATIONS SPATIALES (LATMOS)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1880/;Ifremer / Crela
+http://www.seadatanet.org/urnurl/SDN:EDMO::1882/;Ifremer / Ifremer Station De Corse
+http://www.seadatanet.org/urnurl/SDN:EDMO::1883/;Universite de Corse / Ecosystemes Littoraux
+http://www.seadatanet.org/urnurl/SDN:EDMO::1884/;Universite de Corse / Geology Laboratory
+http://www.seadatanet.org/urnurl/SDN:EDMO::1888/;IFREMER / RBE / Biogeochimical end Ecotoxicological Resarch Unit (Brest)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1895/;Universite de Bretagne Occidentale (Ubo) / Geography Department
+http://www.seadatanet.org/urnurl/SDN:EDMO::1898/;Ifremer / Bibliotheque La Perouse
+http://www.seadatanet.org/urnurl/SDN:EDMO::1902/;University of Bordeaux I / Laboratory for Physical and Toxico Chemistry (ISM)
+http://www.seadatanet.org/urnurl/SDN:EDMO::191/;Institute of Fishery Resources (IFR)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1915/;Universite D'Angers / Laboratoire Des Bio-Indicateurs Actuels Et Fossiles (Biaf)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1919/;Universite du Littoral Cote d'Opale / Oceanology and Geosciences Laboratory - UMR 8187 (LOG)
+http://www.seadatanet.org/urnurl/SDN:EDMO::192/;Laboratory of Marine Ecology-Central Laboratory of General Ecology
+http://www.seadatanet.org/urnurl/SDN:EDMO::1923/;Elf - Snea / Elf Aquitaine Production
+http://www.seadatanet.org/urnurl/SDN:EDMO::1925/;Universite de Pau / IPREM multidisciplinary research institute for the environment and materials
+http://www.seadatanet.org/urnurl/SDN:EDMO::1926/;Universite de Perpignan / Centre Recherches Sedimentologie Marine
+http://www.seadatanet.org/urnurl/SDN:EDMO::193/;Institute of Meteorology and Water Management, Maritime Branch in Gdynia (IMWM MB)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1933/;IRD / Ird Siege
+http://www.seadatanet.org/urnurl/SDN:EDMO::1938/;Universite de Paris VI - UPMC / Systematique Adaptation Evolution (Sae)- Umr 7138
+http://www.seadatanet.org/urnurl/SDN:EDMO::1941/;CNRS / Center of Oceanology of Marseille (COM)  La-Seyne-Sur-Mer
+http://www.seadatanet.org/urnurl/SDN:EDMO::1942/;Universite de Toulon / Lab. De Sondages Electromagnetiques  (Lseet)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1946/;IFREMER / RBE Department / Biogeochimical end Ecotoxicological Resarch Unit (Toulon)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1949/;CEA / Dapnia Laboratory
+http://www.seadatanet.org/urnurl/SDN:EDMO::195/;Institute of Oceanology, Polish Academy of Sciences (IO PAS)
+http://www.seadatanet.org/urnurl/SDN:EDMO::1958/;EA4098 LaRGe - Laboratoire de Recherche en Géosciences
+http://www.seadatanet.org/urnurl/SDN:EDMO::1959/;TAAF / Siege Des Taaf - Ile De La Reunion
+http://www.seadatanet.org/urnurl/SDN:EDMO::1964/;University of Lisboa / Department of Geology
+http://www.seadatanet.org/urnurl/SDN:EDMO::1967/;Istanbul Technical University / Department of Geology
+http://www.seadatanet.org/urnurl/SDN:EDMO::1968/;Istanbul Technical University / Department of Geophysical Engineering
+http://www.seadatanet.org/urnurl/SDN:EDMO::1973/;Australian Geological Survey Orga. / Geoscience Australia
+http://www.seadatanet.org/urnurl/SDN:EDMO::1975/;Geological Survey of Japan (GSJ) / Geological Survey Of Japan
+http://www.seadatanet.org/urnurl/SDN:EDMO::1994/;Centre Recherche en Astronomie, Astrophysique et Géophysique
+http://www.seadatanet.org/urnurl/SDN:EDMO::2/;University of Cambridge Department of Earth Sciences
+http://www.seadatanet.org/urnurl/SDN:EDMO::20/;University of Wales, School of Ocean Sciences
+http://www.seadatanet.org/urnurl/SDN:EDMO::2000/;Open University Department of Earth and Environmental Sciences
+http://www.seadatanet.org/urnurl/SDN:EDMO::2001/;French Petrol Company
+http://www.seadatanet.org/urnurl/SDN:EDMO::2002/;Southampton Oceanography Centre
+http://www.seadatanet.org/urnurl/SDN:EDMO::2003/;Palmer Marine Surveys Ltd
+http://www.seadatanet.org/urnurl/SDN:EDMO::2090/;Scottish Office Agriculture Environment and Fisheries Department - Aberdeen Marine Laboratory
+http://www.seadatanet.org/urnurl/SDN:EDMO::2091/;Scottish Office Agriculture and Fisheries Department - Aberdeen Marine Laboratory
+http://www.seadatanet.org/urnurl/SDN:EDMO::2092/;Department of Agriculture and Fisheries for Scotland - Aberdeen Marine Laboratory
+http://www.seadatanet.org/urnurl/SDN:EDMO::2100/;Ministry of Agriculture, Fisheries and Food, Lowestoft Fisheries Laboratory
+http://www.seadatanet.org/urnurl/SDN:EDMO::2108/;Environmental Protection Agency (EPA)
+http://www.seadatanet.org/urnurl/SDN:EDMO::2116/;Ministry of the Environment and Rural and Marine Environs - General Secretariat of the Sea
+http://www.seadatanet.org/urnurl/SDN:EDMO::2117/;Institute of Oceanographic Sciences Deacon Laboratory
+http://www.seadatanet.org/urnurl/SDN:EDMO::2118/;Institute of Oceanographic Sciences Wormley Laboratory
+http://www.seadatanet.org/urnurl/SDN:EDMO::2119/;National Institute of Oceanography
+http://www.seadatanet.org/urnurl/SDN:EDMO::2120/;James Rennell Centre for Ocean Circulation
+http://www.seadatanet.org/urnurl/SDN:EDMO::2121/;Georgian Institute of Hydrometeorology of Georgian Technical University
+http://www.seadatanet.org/urnurl/SDN:EDMO::2122/;Georgian Institute of Water Management of Georgian Technical University
+http://www.seadatanet.org/urnurl/SDN:EDMO::2124/;National Laboratory of Energy and Geology
+http://www.seadatanet.org/urnurl/SDN:EDMO::2133/;Proudman Oceanographic Laboratory
+http://www.seadatanet.org/urnurl/SDN:EDMO::2134/;Institute of Oceanographic Sciences, Bidston Laboratory
+http://www.seadatanet.org/urnurl/SDN:EDMO::2135/;Marine Scotland Science
+http://www.seadatanet.org/urnurl/SDN:EDMO::2142/;IGME/Geological Survey of Spain. Geoscientific Researh and Propective Departement.
+http://www.seadatanet.org/urnurl/SDN:EDMO::2149/;Malaga University (UMA), Faculty of Sciences
+http://www.seadatanet.org/urnurl/SDN:EDMO::2156/;IGME/Geological Survey of Spain.Geophysics and Geology Department
+http://www.seadatanet.org/urnurl/SDN:EDMO::2157/;Institute of Marine Sciences. Mediterranean Marine and Environmental Research Centre (CMIMA-ICM-CSIC). Department of Marine Geology
+http://www.seadatanet.org/urnurl/SDN:EDMO::2176/;Ankara University
+http://www.seadatanet.org/urnurl/SDN:EDMO::2178/;Danube Delta Biosphere Reserve Authority
+http://www.seadatanet.org/urnurl/SDN:EDMO::2187/;Zoological Institute of the Russian Academy of Sciences
+http://www.seadatanet.org/urnurl/SDN:EDMO::2195/;DTU Aqua – National Institute of Aquatic Resources, Technical University of Denmark
+http://www.seadatanet.org/urnurl/SDN:EDMO::2222/;Agency for Maritime Services and Coast
+http://www.seadatanet.org/urnurl/SDN:EDMO::2227/;Taurida V.I. Vernadsky National University
+http://www.seadatanet.org/urnurl/SDN:EDMO::2228/;Institute of Geological Sciences - IGS
+http://www.seadatanet.org/urnurl/SDN:EDMO::2229/;Center Dynamics of the Nearshore Zone
+http://www.seadatanet.org/urnurl/SDN:EDMO::2230/;University of Mining and Geology - Saint Ivan Rilski
+http://www.seadatanet.org/urnurl/SDN:EDMO::2231/;Danube Hydro-meteorological Observatory
+http://www.seadatanet.org/urnurl/SDN:EDMO::2232/;CUGRI -"University Centre for the Prediction and Prevention of Major Hazards"-
+http://www.seadatanet.org/urnurl/SDN:EDMO::2243/;Flemish Ministry of Mobility and Public Works/; Agency for Maritime and Coastal Services/; Coastal Division
+http://www.seadatanet.org/urnurl/SDN:EDMO::2259/;ICRAM, Chioggia
+http://www.seadatanet.org/urnurl/SDN:EDMO::2264/;DISAT, Department of Structural, Water and Soil Engineering
+http://www.seadatanet.org/urnurl/SDN:EDMO::2267/;National Environmental Agency of the Ministry of Environment Protection and Natural Resources
+http://www.seadatanet.org/urnurl/SDN:EDMO::2275/;Geological Institute, Russian Academy of Sciences
+http://www.seadatanet.org/urnurl/SDN:EDMO::2276/;OGS (Istituto Nazionale di Oceanografia e di Geofisica Sperimentale),  Infrastructures Division
+http://www.seadatanet.org/urnurl/SDN:EDMO::2286/;New Zealand National Institute of Water & Atmospheric Research, University of Otago Centre for Chemical and Physical Oceanography
+http://www.seadatanet.org/urnurl/SDN:EDMO::2290/;Zoological Society of London, Institute of Zoology
+http://www.seadatanet.org/urnurl/SDN:EDMO::2299/;Research and Technology Centre (FTZ), Buesum
+http://www.seadatanet.org/urnurl/SDN:EDMO::230/;Ghent University, Renard Centre of Marine Geology
+http://www.seadatanet.org/urnurl/SDN:EDMO::2303/;Department of Safety and Quality of Milk and Fish Products (Max Rubner)
+http://www.seadatanet.org/urnurl/SDN:EDMO::2307/;State Office for Agriculture, Food safety and Fishery (LALLF M-V)
+http://www.seadatanet.org/urnurl/SDN:EDMO::2314/;Waterways and Shipping Authority Wilhelmshaven
+http://www.seadatanet.org/urnurl/SDN:EDMO::234/;Università degli Studi di Napoli 'Parthenope' - Istituto di Meteorologia e Oceanografia
+http://www.seadatanet.org/urnurl/SDN:EDMO::237/;Stazione Zoologica Anton Dohrn of Naples
+http://www.seadatanet.org/urnurl/SDN:EDMO::2377/;Centre for Agricultural Research/; Station for Fisheries
+http://www.seadatanet.org/urnurl/SDN:EDMO::238/;Marine Biology Laboratory of Trieste
+http://www.seadatanet.org/urnurl/SDN:EDMO::2391/;European Space Agency (ESA)
+http://www.seadatanet.org/urnurl/SDN:EDMO::2396/;Woods Hole Oceanographic Institution: Applied Ocean Physics & Engineering Department
+http://www.seadatanet.org/urnurl/SDN:EDMO::24/;Defence Evaluation Research Agency
+http://www.seadatanet.org/urnurl/SDN:EDMO::240/;Université Libre de Bruxelles, Laboratory of Chemical Oceanography and Water Geochemistry
+http://www.seadatanet.org/urnurl/SDN:EDMO::2410/;Gardline Geosurvey Limited
+http://www.seadatanet.org/urnurl/SDN:EDMO::2415/;Polytechnic South West Institute of Marine Studies
+http://www.seadatanet.org/urnurl/SDN:EDMO::2423/;IMARES, Wageningen UR, Institute for Marine Resources and Ecosystem Studies, Yerseke
+http://www.seadatanet.org/urnurl/SDN:EDMO::2424/;National Oceanography Centre, Liverpool
+http://www.seadatanet.org/urnurl/SDN:EDMO::2431/;OGS (Istituto Nazionale di Oceanografia e di Geofisica Sperimentale), Department of Biological Oceanography
+http://www.seadatanet.org/urnurl/SDN:EDMO::2432/;Institute of Marine Biology (IMBK)
+http://www.seadatanet.org/urnurl/SDN:EDMO::2445/;Sandia National Laboratories, New Mexico
+http://www.seadatanet.org/urnurl/SDN:EDMO::2446/;National University Of Mexico (Unam) /  Intituto De Geofisica
+http://www.seadatanet.org/urnurl/SDN:EDMO::2447/;Brown University - Dept of Geological Sciences
+http://www.seadatanet.org/urnurl/SDN:EDMO::2448/;Boise State University - Department of Geosciences
+http://www.seadatanet.org/urnurl/SDN:EDMO::2457/;University of Birmingham School of Geography, Earth and Environmental Sciences
+http://www.seadatanet.org/urnurl/SDN:EDMO::2489/;Marine Technology Unit. Mediterranean Marine and Environmental Research Centre
+http://www.seadatanet.org/urnurl/SDN:EDMO::2492/;Newcastle University Department of Marine Science and Coastal Management
+http://www.seadatanet.org/urnurl/SDN:EDMO::2513/;University of Patras, Department of Geology, Laboratory of Marine Geology and Physical Oceanography (ETHAGEPHO/UP)
+http://www.seadatanet.org/urnurl/SDN:EDMO::252/;CNR, Istituto per l'Ambiente Marino Costiero (Sezione di Napoli)
+http://www.seadatanet.org/urnurl/SDN:EDMO::2529/;Dunstaffnage Marine Laboratory
+http://www.seadatanet.org/urnurl/SDN:EDMO::2530/;Scottish Marine Biological Association
+http://www.seadatanet.org/urnurl/SDN:EDMO::2537/;State Office for Agriculture, Environment and Rural Areas of Schleswig Holstein (LLUR)
+http://www.seadatanet.org/urnurl/SDN:EDMO::2561/;National Marine Facilities Sea Systems
+http://www.seadatanet.org/urnurl/SDN:EDMO::26/;United Kingdom Hydrographic Office
+http://www.seadatanet.org/urnurl/SDN:EDMO::2609/;Latvian geology, Marine geological expedition (1953 – 1991)
+http://www.seadatanet.org/urnurl/SDN:EDMO::2621/;Rockall Consortium
+http://www.seadatanet.org/urnurl/SDN:EDMO::2628/;Offshore Survey and Engineering (OSAE)
+http://www.seadatanet.org/urnurl/SDN:EDMO::2629/;The Norwegian Petroleum Directorate (NPD)
+http://www.seadatanet.org/urnurl/SDN:EDMO::2654/;British National Oil Corporation
+http://www.seadatanet.org/urnurl/SDN:EDMO::268/;Institute of Geology and Mineral Exploration, Marine Geology Department (MGD/IGME)
+http://www.seadatanet.org/urnurl/SDN:EDMO::2714/;Le Havre Large Seaport
+http://www.seadatanet.org/urnurl/SDN:EDMO::272/;Hellenic Centre for Marine Research, Institute of Marine Biological Resources (HCMR/IMBR)
+http://www.seadatanet.org/urnurl/SDN:EDMO::2756/;Snamprogetti SPA
+http://www.seadatanet.org/urnurl/SDN:EDMO::2757/;Regione Calabria
+http://www.seadatanet.org/urnurl/SDN:EDMO::2761/;Specialized Center for Hydrometeorology and Monitoring of Environment of Black and Azov Seas (SC HME BAS)
+http://www.seadatanet.org/urnurl/SDN:EDMO::279/;Institute of Marine Research (IIM-CSIC)
+http://www.seadatanet.org/urnurl/SDN:EDMO::28/;Centre for Environment, Fisheries and Aquaculture Science, Lowestoft Laboratory
+http://www.seadatanet.org/urnurl/SDN:EDMO::280/;Institute of Marine Sciences. Mediterranean Marine and Environmental Research Centre (CMIMA-ICM-CSIC)
+http://www.seadatanet.org/urnurl/SDN:EDMO::2803/;Directorate for Coast and Sea Sustainability. Ministry of Agriculture, Food and Environment (MAGRAMA)
+http://www.seadatanet.org/urnurl/SDN:EDMO::2822/;Spanish Society for the Study of the fixed Comunication through the Strait of Gibratal,
+http://www.seadatanet.org/urnurl/SDN:EDMO::2859/;Consulting Geologist
+http://www.seadatanet.org/urnurl/SDN:EDMO::2868/;France Electricity Company
+http://www.seadatanet.org/urnurl/SDN:EDMO::29/;Met Office
+http://www.seadatanet.org/urnurl/SDN:EDMO::2917/;University of Rome /Earth Science Department
+http://www.seadatanet.org/urnurl/SDN:EDMO::2947/;GEOMAR Helmholtz Centre for Ocean Research Kiel
+http://www.seadatanet.org/urnurl/SDN:EDMO::2974/;IFREMER Station de Concarneau
+http://www.seadatanet.org/urnurl/SDN:EDMO::2975/;Mediterranean Institute of Oceanography - La Seyne sur Mer
+http://www.seadatanet.org/urnurl/SDN:EDMO::2979/;Task Group for the Extension of the Continental Shelf
+http://www.seadatanet.org/urnurl/SDN:EDMO::298/;IEO/ Oceanographic Centre of Canary Island
+http://www.seadatanet.org/urnurl/SDN:EDMO::3009/;ISPRA-Institute for Environmental Protection and Research
+http://www.seadatanet.org/urnurl/SDN:EDMO::302/;University of Athens, Department of Chemistry, Division of Inorganic and Environmental Chemistry, Environmental and Marine Chemistry Group (EMCG/UATH)
+http://www.seadatanet.org/urnurl/SDN:EDMO::3039/;University of Portsmouth School of Earth and Environmental Sciences
+http://www.seadatanet.org/urnurl/SDN:EDMO::3051/;Hellenic Centre for Marine Research (HCMR)
+http://www.seadatanet.org/urnurl/SDN:EDMO::3076/;Leibniz Institute for Baltic Sea Research, Warnemünde
+http://www.seadatanet.org/urnurl/SDN:EDMO::3078/;Mediterranean Institute of Oceanography - LUMINY (MIO) UMR 7294
+http://www.seadatanet.org/urnurl/SDN:EDMO::309/;Canary Institute of Marine Sciences
+http://www.seadatanet.org/urnurl/SDN:EDMO::3091/;Federaal Agentschap voor Nucleaire Controle
+http://www.seadatanet.org/urnurl/SDN:EDMO::310/;IGME/Geological Survey of Spain. Marine Geology Service
+http://www.seadatanet.org/urnurl/SDN:EDMO::3115/;Monterey Bay Aquarium Research Institute
+http://www.seadatanet.org/urnurl/SDN:EDMO::3149/;Institute of Coastal Oceanography and Tides
+http://www.seadatanet.org/urnurl/SDN:EDMO::3150/;University of Liverpool Tidal Institute and Observatory
+http://www.seadatanet.org/urnurl/SDN:EDMO::3151/;Liverpool Observatory and Tidal Institute
+http://www.seadatanet.org/urnurl/SDN:EDMO::3152/;Liverpool Observatory, Bidston
+http://www.seadatanet.org/urnurl/SDN:EDMO::3153/;Liverpool Observatory
+http://www.seadatanet.org/urnurl/SDN:EDMO::3167/;University of Alaska Anchorage Department of Biological Sciences
+http://www.seadatanet.org/urnurl/SDN:EDMO::32/;Environment Agency Head Office
+http://www.seadatanet.org/urnurl/SDN:EDMO::3244/;Oregon State University, College of Earth, Ocean, and Atmospheric Sciences
+http://www.seadatanet.org/urnurl/SDN:EDMO::3254/;Natural Resources Wales
+http://www.seadatanet.org/urnurl/SDN:EDMO::3288/;Portuguese Institute of Ocean and Atmosphere
+http://www.seadatanet.org/urnurl/SDN:EDMO::3327/;Royal Belgian Institute of Natural Sciences, Operational Directorate Natural Environment
+http://www.seadatanet.org/urnurl/SDN:EDMO::3339/;SC Marine Research SRL
+http://www.seadatanet.org/urnurl/SDN:EDMO::334/;Baleares Islands University. Environmental Biology Department. UIB
+http://www.seadatanet.org/urnurl/SDN:EDMO::3348/;Portuguese Envirnmoment Agency
+http://www.seadatanet.org/urnurl/SDN:EDMO::3376/;Australian National University, Department of Geological Sciences
+http://www.seadatanet.org/urnurl/SDN:EDMO::3393/;SOVON Dutch Centre for Field Ornithology
+http://www.seadatanet.org/urnurl/SDN:EDMO::344/;Complutense University of Madrid (UCM). Department of Zoology and physical Anthropology
+http://www.seadatanet.org/urnurl/SDN:EDMO::353/;IEO/Spanish Oceanographic Institute
+http://www.seadatanet.org/urnurl/SDN:EDMO::3639/;United States Coast Guard
+http://www.seadatanet.org/urnurl/SDN:EDMO::366/;Geological Survey of Ireland
+http://www.seadatanet.org/urnurl/SDN:EDMO::368/;Irish Hydrodata Limited
+http://www.seadatanet.org/urnurl/SDN:EDMO::3682/;Estonian Environmental board
+http://www.seadatanet.org/urnurl/SDN:EDMO::3739/;National Institute of Water and Atmospheric Research
+http://www.seadatanet.org/urnurl/SDN:EDMO::3781/;Polar Oceans Research Group
+http://www.seadatanet.org/urnurl/SDN:EDMO::38/;Fisheries Research Services, Aberdeen Marine Laboratory
+http://www.seadatanet.org/urnurl/SDN:EDMO::3844/;Woods Hole Oceanographic Institution
+http://www.seadatanet.org/urnurl/SDN:EDMO::385/;Applied Geophysics Unit, National University of Ireland, Galway
+http://www.seadatanet.org/urnurl/SDN:EDMO::388/;Department of Earth and Ocean Sciences, NUI Galway
+http://www.seadatanet.org/urnurl/SDN:EDMO::3928/;Oceanological Observatory of Villefranche sur Mer
+http://www.seadatanet.org/urnurl/SDN:EDMO::3945/;Commonwealth Scientific and Industrial Research Organisation (CSIRO)
+http://www.seadatanet.org/urnurl/SDN:EDMO::396/;Marine Institute
+http://www.seadatanet.org/urnurl/SDN:EDMO::4007/;State Research Institute for Agriculture and Fisheries Mecklenburg-Western Pomerania (LFA)
+http://www.seadatanet.org/urnurl/SDN:EDMO::4036/;Department of Geosciences, University of Malta
+http://www.seadatanet.org/urnurl/SDN:EDMO::41/;British Antarctic Survey
+http://www.seadatanet.org/urnurl/SDN:EDMO::42/;British Geological Survey, Edinburgh
+http://www.seadatanet.org/urnurl/SDN:EDMO::421/;University of Liege, Laboratory of Oceanology
+http://www.seadatanet.org/urnurl/SDN:EDMO::422/;Flanders Marine Institute
+http://www.seadatanet.org/urnurl/SDN:EDMO::426/;Royal Belgian Institute of Natural Sciences, Geological Survey of Belgium
+http://www.seadatanet.org/urnurl/SDN:EDMO::429/;Royal Belgian Institute of Natural Sciences, Management Unit of North Sea and Scheldt Estuary Mathematical Models, Ostend
+http://www.seadatanet.org/urnurl/SDN:EDMO::43/;British Oceanographic Data Centre
+http://www.seadatanet.org/urnurl/SDN:EDMO::430/;Vrije Universiteit Brussels, Faculty of Sciences, Department of Chemistry, Laboratory of Analytical and Environmental Chemistry
+http://www.seadatanet.org/urnurl/SDN:EDMO::431/;Royal Belgian Institute of Natural Sciences, Management Unit of North Sea and Scheldt Estuary Mathematical Models
+http://www.seadatanet.org/urnurl/SDN:EDMO::438/;Vrije Universiteit Brussel, Laboratory of Ecology and Systematics
+http://www.seadatanet.org/urnurl/SDN:EDMO::44/;Scottish Association for Marine Science
+http://www.seadatanet.org/urnurl/SDN:EDMO::440/;IRD /CENTRE DE BRETAGNE
+http://www.seadatanet.org/urnurl/SDN:EDMO::441/;IFREMER / DYNECO/PELAGOS-LABORATOIRE D'ECOLOGIE PELAGIQUE
+http://www.seadatanet.org/urnurl/SDN:EDMO::443/;Université Libre de Bruxelles, Ecology of Aquatic systems
+http://www.seadatanet.org/urnurl/SDN:EDMO::444/;Ghent University, Laboratory of Physical Geography - Research Unit of Marine and Coastal Geomorphology
+http://www.seadatanet.org/urnurl/SDN:EDMO::4444/;University of Toulouse III - Ecolab
+http://www.seadatanet.org/urnurl/SDN:EDMO::4483/;A.O. Kovalevsky Institute of Marine Biological Research - RAS
+http://www.seadatanet.org/urnurl/SDN:EDMO::4498/;Normand Littoral Monitoring Unit
+http://www.seadatanet.org/urnurl/SDN:EDMO::4499/;Agency For Research And Valorization Marines
+http://www.seadatanet.org/urnurl/SDN:EDMO::45/;Marine Biological Association of the United Kingdom
+http://www.seadatanet.org/urnurl/SDN:EDMO::4500/;IFREMER Resource Environment Laboratory Northern Brittany 
+http://www.seadatanet.org/urnurl/SDN:EDMO::4501/;Université De Liège / Underwater research and oceanographic station
+http://www.seadatanet.org/urnurl/SDN:EDMO::4503/;Université de Paris VI - UPMC / UMR 8222 - Eco laboratory geochemistry Benthic Environments
+http://www.seadatanet.org/urnurl/SDN:EDMO::4536/;IFREMER / Ocean Physics and Satellite Oceanography Lab
+http://www.seadatanet.org/urnurl/SDN:EDMO::4584/;Department of Labour Inspection, Ministry of Labour and Social Insurance
+http://www.seadatanet.org/urnurl/SDN:EDMO::4614/;ERIC Euro-Argo
+http://www.seadatanet.org/urnurl/SDN:EDMO::47/;Plymouth Marine Laboratory
+http://www.seadatanet.org/urnurl/SDN:EDMO::48/;Proudman Oceanographic Laboratory
+http://www.seadatanet.org/urnurl/SDN:EDMO::484/;IFREMER / EEP / LEP-DEEP ENVIRONMENT LABORATORY
+http://www.seadatanet.org/urnurl/SDN:EDMO::485/;IFREMER / GM-MARINE GEOSCIENCES
+http://www.seadatanet.org/urnurl/SDN:EDMO::486/;IFREMER / IDM / SISMER - Scientific Information Systems for the SEA
+http://www.seadatanet.org/urnurl/SDN:EDMO::487/;LABORATORY of PHYSICAL OCEANOGRAPHY (LPO) UMR 6523 CNRS-IFREMER-IRD-UBO
+http://www.seadatanet.org/urnurl/SDN:EDMO::490/;LABORATORY OF OCEANOGRAPHY of VILLEFRANCHE (LOV) / OOV
+http://www.seadatanet.org/urnurl/SDN:EDMO::493/;MUSEUM NATIONAL D'HISTOIRE NATURELLE / LABORATOIRE DE GEOLOGIE (MNHN)
+http://www.seadatanet.org/urnurl/SDN:EDMO::494/;Laboratory of Oceanography and Climate  : Experiments and numerical Approaches - UMR 7159
+http://www.seadatanet.org/urnurl/SDN:EDMO::496/;MUSEUM NATIONAL D'HISTOIRE NATURELLE / LAB. BIOLOGIE DES INVERTEBRES MARINS ET MALACOLOGIE
+http://www.seadatanet.org/urnurl/SDN:EDMO::499/;MUSEUM NATIONAL D'HISTOIRE NATURELLE / DEPARTEMENT MILIEUX PEUPLEMENTS AQUATIQUES
+http://www.seadatanet.org/urnurl/SDN:EDMO::501/;MUSEUM NATIONAL D'HISTOIRE NATURELLE / LABORATOIRE D'OCEANOGRAPHIE PHYSIQUE
+http://www.seadatanet.org/urnurl/SDN:EDMO::503/;IFREMER / EMP-DPT ENVIRONMENT, MICROBIOLOGY AND PHYCOTOXINES
+http://www.seadatanet.org/urnurl/SDN:EDMO::507/;CNRS / GEOSCIENCES AZUR -  Sophia Antipolis
+http://www.seadatanet.org/urnurl/SDN:EDMO::508/;IFREMER / DYNECO-LEBCO Laboratory of coastal Benthic Ecology
+http://www.seadatanet.org/urnurl/SDN:EDMO::509/;IFREMER / STATION PORT EN BESSIN
+http://www.seadatanet.org/urnurl/SDN:EDMO::510/;IFREMER / DYNECO / PHYSED -LABO PHYSIQUE HYDRODYNAMIQUE ET SEDIMENTAIRE
+http://www.seadatanet.org/urnurl/SDN:EDMO::511/;UNIVERSITE DE PARIS VI / GEOSCIENCES AZUR - SITE DE VILLEFRANCHE / OOV
+http://www.seadatanet.org/urnurl/SDN:EDMO::513/;COM - Physical and Biogeochemical Oceanography Laboratory (LUMINY)
+http://www.seadatanet.org/urnurl/SDN:EDMO::515/;UNIVERSITY OF PERPIGNAN / CEFREM
+http://www.seadatanet.org/urnurl/SDN:EDMO::516/;UNIVERSITE DE PARIS VI / LAB.PETROLOGIE-MAGMATOLOGIE-METALLOGENIE
+http://www.seadatanet.org/urnurl/SDN:EDMO::518/;IFREMER STATION DE LA ROCHELLE-L'HOUMEAU
+http://www.seadatanet.org/urnurl/SDN:EDMO::519/;Institute of Earth Physics of Paris
+http://www.seadatanet.org/urnurl/SDN:EDMO::520/;IRD CENTRE DE  NOUMEA
+http://www.seadatanet.org/urnurl/SDN:EDMO::521/;CNRS / Biological Station of  ROSCOFF/ OSU
+http://www.seadatanet.org/urnurl/SDN:EDMO::522/;ECOLE NORMALE SUPERIEURE / LABORATORY of GEOLOGY - ENS
+http://www.seadatanet.org/urnurl/SDN:EDMO::527/;IFREMER / RBE Department / Biogeochimical end Ecotoxicological Resarch Unit (Nantes)
+http://www.seadatanet.org/urnurl/SDN:EDMO::529/;Developmental Biology Research Laboratory
+http://www.seadatanet.org/urnurl/SDN:EDMO::53/;BP Exploration & Production
+http://www.seadatanet.org/urnurl/SDN:EDMO::532/;CNRS / Microbiology, Geochemistry and Marine Ecology Laboratory
+http://www.seadatanet.org/urnurl/SDN:EDMO::533/;IFREMER / STATION DE LA TRINITE
+http://www.seadatanet.org/urnurl/SDN:EDMO::534/;IFREMER / OPS / LOS-Laboratory of Spatial Oceanography
+http://www.seadatanet.org/urnurl/SDN:EDMO::537/;IFREMER / LERLR-LABO ENVIRONNEMENT RESSOURCES LANGUEDOC-ROUSSILLON
+http://www.seadatanet.org/urnurl/SDN:EDMO::539/;IFREMER / STH/LBP-LABORATOIRE BIOLOGIE DES PECHERIES
+http://www.seadatanet.org/urnurl/SDN:EDMO::540/;Shom
+http://www.seadatanet.org/urnurl/SDN:EDMO::541/;IFREMER / EMH-DEPARTEMENT ECOLOGIE ET MODELES POUR L'HALIEUTIQUE
+http://www.seadatanet.org/urnurl/SDN:EDMO::542/;IFREMER / HMMN-DEPARTEMENT HALIEUTIQUE DE MANCHE-MER DU NORD
+http://www.seadatanet.org/urnurl/SDN:EDMO::543/;Norwegian Hydrographic Service
+http://www.seadatanet.org/urnurl/SDN:EDMO::544/;University of Bergen
+http://www.seadatanet.org/urnurl/SDN:EDMO::545/;Swedish Meteorological and Hydrological Institute
+http://www.seadatanet.org/urnurl/SDN:EDMO::549/;CEA / Laboratory of climatolocical and environmental Sciences(LSCE)
+http://www.seadatanet.org/urnurl/SDN:EDMO::552/;CNRS / Laboratory of  of studies on Spatial Geophysics and Oceanography (LEGOS)
+http://www.seadatanet.org/urnurl/SDN:EDMO::556/;UNIVERSITE DE BRETAGNE OCCIDENTALE (UBO) / LAB. D'OCEANO. CHIMIQUE LOC - IUEM
+http://www.seadatanet.org/urnurl/SDN:EDMO::560/;CEREGE
+http://www.seadatanet.org/urnurl/SDN:EDMO::574/;Royal Netherlands Navy, Hydrographic Service
+http://www.seadatanet.org/urnurl/SDN:EDMO::583/;Marine Research Institute
+http://www.seadatanet.org/urnurl/SDN:EDMO::590/;IHPT, Hydrographic Institute
+http://www.seadatanet.org/urnurl/SDN:EDMO::597/;University of Algarve, Aquatic Resources Science and Technology Unit
+http://www.seadatanet.org/urnurl/SDN:EDMO::6/;University of East Anglia, School of Environmental Sciences
+http://www.seadatanet.org/urnurl/SDN:EDMO::609/;Polish Geological Institute - National Research Institute, Branch of Marine Geology (PGI BMG)
+http://www.seadatanet.org/urnurl/SDN:EDMO::614/;Swedish Museum of Natural History
+http://www.seadatanet.org/urnurl/SDN:EDMO::618/;Stockholm Marine Research Centre, SMF
+http://www.seadatanet.org/urnurl/SDN:EDMO::619/;Geological Survey of Sweden, SGU
+http://www.seadatanet.org/urnurl/SDN:EDMO::622/;Umea Marine Sciences Centre, UMF
+http://www.seadatanet.org/urnurl/SDN:EDMO::625/;IVL Swedish Environmental Research Institute - Stockholm
+http://www.seadatanet.org/urnurl/SDN:EDMO::628/;Finnish Institute of Marine Research (FIMR)
+http://www.seadatanet.org/urnurl/SDN:EDMO::630/;NIOZ Royal Netherlands Institute for Sea Research
+http://www.seadatanet.org/urnurl/SDN:EDMO::632/;Royal Netherlands Meteorological Institute
+http://www.seadatanet.org/urnurl/SDN:EDMO::633/;Netherlands Institute for Ecology, Centre for Estuarine and Marine Ecology
+http://www.seadatanet.org/urnurl/SDN:EDMO::635/;TNO Geological Survey of the Netherlands
+http://www.seadatanet.org/urnurl/SDN:EDMO::65/;Hamilton Oil Co Limited
+http://www.seadatanet.org/urnurl/SDN:EDMO::67/;Northern Ireland Environment Agency, Water Management Unit
+http://www.seadatanet.org/urnurl/SDN:EDMO::680/;Department of Marine Research of the Environmental Protection Agency
+http://www.seadatanet.org/urnurl/SDN:EDMO::682/;Atlantic Scientific Research Institute for Marine Fishery and Oceanography
+http://www.seadatanet.org/urnurl/SDN:EDMO::684/;Arctic and Antarctic Research Institute, Roshydromet (Saint-Petersburg)
+http://www.seadatanet.org/urnurl/SDN:EDMO::685/;P.P.Shirshov Institute of Oceanology, RAS
+http://www.seadatanet.org/urnurl/SDN:EDMO::688/;Southern Scientific Research Institute of Marine Fisheries and Oceanography
+http://www.seadatanet.org/urnurl/SDN:EDMO::691/;National Institute of Fisheries Research (INRH)
+http://www.seadatanet.org/urnurl/SDN:EDMO::692/;Bulgarian National Oceanographic Data Centre(BGODC), Institute of Oceanology
+http://www.seadatanet.org/urnurl/SDN:EDMO::693/;Iv.Javakhishvili Tbilisi State University, Centre of Relations with UNESCO Oceanological Research Centre and GeoDNA (UNESCO)
+http://www.seadatanet.org/urnurl/SDN:EDMO::696/;Institute of Marine Sciences, Middle East Technical University
+http://www.seadatanet.org/urnurl/SDN:EDMO::697/;National Institute for Marine Research and Development "Grigore Antipa"
+http://www.seadatanet.org/urnurl/SDN:EDMO::698/;Latvian Institute of Aquatic Ecology
+http://www.seadatanet.org/urnurl/SDN:EDMO::7/;University of Edinburgh, Department of Geology and Geophysics
+http://www.seadatanet.org/urnurl/SDN:EDMO::700/;Institute of Oceanography and Fisheries
+http://www.seadatanet.org/urnurl/SDN:EDMO::702/;Center for marine research - Rudjer Boskovic Institute
+http://www.seadatanet.org/urnurl/SDN:EDMO::708/;International Ocean Institute - Malta Operational Centre (University Of Malta) / Physical Oceanography Unit
+http://www.seadatanet.org/urnurl/SDN:EDMO::709/;Malta Centre for Fisheries Sciences
+http://www.seadatanet.org/urnurl/SDN:EDMO::711/;Cyprus Oceanography Center
+http://www.seadatanet.org/urnurl/SDN:EDMO::713/;Marine Systems Institute at Tallinn University of Technology
+http://www.seadatanet.org/urnurl/SDN:EDMO::714/;Estonian Marine Institute
+http://www.seadatanet.org/urnurl/SDN:EDMO::721/;IFREMER / STATION DE SETE
+http://www.seadatanet.org/urnurl/SDN:EDMO::723/;State Oceanographic Institute (SOI)
+http://www.seadatanet.org/urnurl/SDN:EDMO::725/;Hydrometeorological Center of Russia, Roshydromet
+http://www.seadatanet.org/urnurl/SDN:EDMO::727/;Marine Hydrophysical Institute
+http://www.seadatanet.org/urnurl/SDN:EDMO::729/;Aarhus University, Department of Bioscience, Marine Ecology Roskilde
+http://www.seadatanet.org/urnurl/SDN:EDMO::731/;Department of Navigation and Hydrography and Oceanography, Turkish Navy
+http://www.seadatanet.org/urnurl/SDN:EDMO::732/;Karadeniz Technical University, Faculty of Marine Sciences
+http://www.seadatanet.org/urnurl/SDN:EDMO::733/;Sinop University, Fisheries Faculty
+http://www.seadatanet.org/urnurl/SDN:EDMO::756/;Far Eastern Regional Hydrometeorological Research Institute
+http://www.seadatanet.org/urnurl/SDN:EDMO::766/;IRD ANTENNE DE TOULOUSE (IRD)
+http://www.seadatanet.org/urnurl/SDN:EDMO::774/;Ryan Institute, National University of Ireland, Galway
+http://www.seadatanet.org/urnurl/SDN:EDMO::78/;Shell UK Exploration and Production Limited
+http://www.seadatanet.org/urnurl/SDN:EDMO::783/;Natural Environment Research Council
+http://www.seadatanet.org/urnurl/SDN:EDMO::791/;IFREMER / STH-DEPARTEMENT SCIENCES ET TECHNOLOGIES HALIEUTIQUES
+http://www.seadatanet.org/urnurl/SDN:EDMO::793/;Aarhus University, Department of Bioscience, Arctic Environment
+http://www.seadatanet.org/urnurl/SDN:EDMO::795/;IFREMER / Dpt Technologicals Research and Development
+http://www.seadatanet.org/urnurl/SDN:EDMO::798/;IFREMER / NSE-DEPARTEMENT NAVIRES ET SYSTEMES EMBARQUES
+http://www.seadatanet.org/urnurl/SDN:EDMO::801/;Dokuz Eylul University, Institute of Marine Science and Technology
+http://www.seadatanet.org/urnurl/SDN:EDMO::802/;Istanbul University, Institute of Marine Science and Management
+http://www.seadatanet.org/urnurl/SDN:EDMO::819/;IFREMER / CENTRE DE TOULON
+http://www.seadatanet.org/urnurl/SDN:EDMO::82/;Total Oil Marine Plc
+http://www.seadatanet.org/urnurl/SDN:EDMO::83/;United Kingdom Offshore Operators Association
+http://www.seadatanet.org/urnurl/SDN:EDMO::836/;IRD ANTENNE INSTITUT OCEANOGRAPHIQUE (IRD)
+http://www.seadatanet.org/urnurl/SDN:EDMO::837/;Laboratory of Physical Oceanography/ UNIVERSITE DE BRETAGNE OCCIDENTALE (UBO)
+http://www.seadatanet.org/urnurl/SDN:EDMO::838/;EPOC - Geology and Oceanography Department
+http://www.seadatanet.org/urnurl/SDN:EDMO::840/;Institute of Biology of the Southern Seas, NAS of Ukraine
+http://www.seadatanet.org/urnurl/SDN:EDMO::841/;Ukrainian Hydrometeorological Institute - Marine Branch
+http://www.seadatanet.org/urnurl/SDN:EDMO::848/;IFREMER / CENTRE DE BRETAGNE
+http://www.seadatanet.org/urnurl/SDN:EDMO::850/;National Institute of Marine Geology and Geoecology
+http://www.seadatanet.org/urnurl/SDN:EDMO::867/;Baltic Research Institute of Fishery of Latvia (BaltNIIRH)
+http://www.seadatanet.org/urnurl/SDN:EDMO::87/;HR Wallingford Group Ltd.
+http://www.seadatanet.org/urnurl/SDN:EDMO::871/;Donskaya offing station North-Caucasus HMS
+http://www.seadatanet.org/urnurl/SDN:EDMO::890/;Krondshtadt Hydrometeorological Observatory, North-West HMS
+http://www.seadatanet.org/urnurl/SDN:EDMO::891/;Kuban offing station, North-Caucasus HMS
+http://www.seadatanet.org/urnurl/SDN:EDMO::894/;Lithuanian Hydrometeorological Service under the Ministry of Environment
+http://www.seadatanet.org/urnurl/SDN:EDMO::900/;Administration Of Fish Searching And Research Fleet for the Western Basin
+http://www.seadatanet.org/urnurl/SDN:EDMO::901/;Mariupol Marine Hydrometeorological Station, Ukrainian HMS
+http://www.seadatanet.org/urnurl/SDN:EDMO::902/;Moscow State University, Geography Department
+http://www.seadatanet.org/urnurl/SDN:EDMO::903/;Murmansk Hydrometeorological Administration of Roshydromet
+http://www.seadatanet.org/urnurl/SDN:EDMO::907/;Navy Main Administration of Navigation and Oceanography, Ministry of Defence
+http://www.seadatanet.org/urnurl/SDN:EDMO::91/;Scottish Environment Protection Agency, Stirling Office
+http://www.seadatanet.org/urnurl/SDN:EDMO::910/;North-Caucasus Regional Administration of Hydrometeorology of Roshydromet
+http://www.seadatanet.org/urnurl/SDN:EDMO::911/;North-Western Regional  Administration of Hydrometeorology of Roshydromet
+http://www.seadatanet.org/urnurl/SDN:EDMO::913/;Nothern Regional Administration of Hydrometeorology of Roshydromet
+http://www.seadatanet.org/urnurl/SDN:EDMO::914/;Odessa branch of IBSS (Institute of Biology of Southern Seas)
+http://www.seadatanet.org/urnurl/SDN:EDMO::916/;Administration Of Fish Searching And Research Fleet for the Northern Basin
+http://www.seadatanet.org/urnurl/SDN:EDMO::917/;Pacific Scientific Research Institute of Fishery and Oceanography
+http://www.seadatanet.org/urnurl/SDN:EDMO::919/;Polar Scientific Research Institute of Fishery and Oceanography
+http://www.seadatanet.org/urnurl/SDN:EDMO::920/;Primorsky Territorial Office on Hydrometeorology and Environmental Monitoring of Roshydromet
+http://www.seadatanet.org/urnurl/SDN:EDMO::924/;Russian State Hydrometeorological University, St-Petersburg
+http://www.seadatanet.org/urnurl/SDN:EDMO::931/;Odessa Branch of SOI (State Oceanographic Institute)
+http://www.seadatanet.org/urnurl/SDN:EDMO::94/;University of Bremen, Department of Tracer-Oceanography
+http://www.seadatanet.org/urnurl/SDN:EDMO::942/;Tuapse Hydrometeorological Bureau, North-Caucasus Centre
+http://www.seadatanet.org/urnurl/SDN:EDMO::946/;V.I. Il'ichevs Pacific Oceanological Institute, Far Eastern Branch, Russian Academy of Sciences
+http://www.seadatanet.org/urnurl/SDN:EDMO::949/;World Data Centre-B For Oceanography
+http://www.seadatanet.org/urnurl/SDN:EDMO::957/;Institute Mediterranean Of Advanced Studies (IMEDEA)
+http://www.seadatanet.org/urnurl/SDN:EDMO::961/;National Institute of Meteorology and Hydrology, Bulgarian Academy of Sciences
+http://www.seadatanet.org/urnurl/SDN:EDMO::962/;M. Nodia  Institute of Geophysics of Georgian Academy of Science
+http://www.seadatanet.org/urnurl/SDN:EDMO::963/;Israel Oceanographic and Limnological Research (IOLR)
+http://www.seadatanet.org/urnurl/SDN:EDMO::97/;German Climate Computer Centre, Max-Planck-Institute of Meteorology, Dept. Models and Data
+http://www.seadatanet.org/urnurl/SDN:EDMO::988/;Federal Institute of Hydrology (BFG)
+http://www.seadatanet.org/urnurl/SDN:EDMO::989/;Federal Research Centre for Fisheries (Cuxhaven)
+http://www.seadatanet.org/urnurl/SDN:EDMO::990/;Federal Research Centre for Fisheries (Hamburg)
+http://www.seadatanet.org/urnurl/SDN:EDMO::991/;Federal Research Centre for Fisheries Institute for Baltic Sea Fishery
+http://www.seadatanet.org/urnurl/SDN:EDMO::992/;The Leibniz Institute of Marine Sciences at the University of Kiel (IFM-GEOMAR)
+http://www.seadatanet.org/urnurl/SDN:EDMO::993/;State Agency for  Environment, Nature and Geology, Mecklenburg-Vorpommern
+http://www.seadatanet.org/urnurl/SDN:EDMO::994/;Elbe River Water Authority

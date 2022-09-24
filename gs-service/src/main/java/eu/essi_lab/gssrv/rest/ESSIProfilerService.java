@@ -35,7 +35,11 @@ import javax.ws.rs.core.UriInfo;
 import eu.essi_lab.pdk.Profiler;
 
 @WebService
-@Path("/")public class ESSIProfilerService extends AbstractProfilerService {
+@Path("/")
+/**
+ * @author Fabrizio
+ */
+public class ESSIProfilerService extends AbstractProfilerService {
 
     private class ESSIProfilerFilter implements ProfilerFilter {
 
@@ -54,7 +58,7 @@ import eu.essi_lab.pdk.Profiler;
 	@Override
 	public boolean accept(Profiler profiler) {
 
-	    String profilerPath = profiler.getProfilerInfo().getServicePath();
+	    String profilerPath = profiler.getSetting().getServicePath();
 
 	    return profilerPath.equals(requestPath);
 	}

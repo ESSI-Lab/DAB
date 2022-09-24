@@ -4,7 +4,7 @@ package eu.essi_lab.model;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,12 @@ import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import eu.essi_lab.jaxb.common.NameSpace;
+import eu.essi_lab.lib.xml.NameSpace;
+
+/**
+ * @author Fabrizio
+ * @param <T>
+ */
 @XmlRootElement(name = "property", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
 public class GSProperty<T> implements Serializable {
 
@@ -91,7 +96,7 @@ public class GSProperty<T> implements Serializable {
 	if (getValue() != null) {
 	    value = getValue().toString();
 	}
-	return getName() + ": " + value;
+	return getName() + ":" + value;
     }
 
     @Override

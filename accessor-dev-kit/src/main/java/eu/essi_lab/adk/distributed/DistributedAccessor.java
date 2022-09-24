@@ -4,7 +4,7 @@ package eu.essi_lab.adk.distributed;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,17 +22,13 @@ package eu.essi_lab.adk.distributed;
  */
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import eu.essi_lab.adk.configuration.ADKConfBuilder;
 import eu.essi_lab.cdk.query.IDistributedQueryConnector;
-import eu.essi_lab.configuration.GSSourceAccessor;
+import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
+import eu.essi_lab.cfga.gs.setting.connector.DistributedConnectorSetting;
 import eu.essi_lab.identifierdecorator.IdentifierDecorator;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.Page;
@@ -44,43 +40,80 @@ import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMapType;
 import eu.essi_lab.model.BrokeringStrategy;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.configuration.AbstractGSconfigurableComposed;
-import eu.essi_lab.model.configuration.Deserializer;
-import eu.essi_lab.model.configuration.option.GSConfOption;
-import eu.essi_lab.model.configuration.option.GSConfOptionSubcomponent;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.DatasetCollection;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.OriginalMetadata;
 import eu.essi_lab.ommdk.IResourceMapper;
 import eu.essi_lab.ommdk.ResourceMapperFactory;
-public class DistributedAccessor extends AbstractGSconfigurableComposed implements IDistributedAccessor {
 
-    public static final String PREFIX = "accessor:distributed:";
-    public static final String GS_CONNECTOR_OPTION_KEY = "GS_CONNECTOR_OPTION_KEY";
-    public static final String GS_MAPPER_OPTION_KEY = "GS_MAPPER_OPTION_KEY";
-    /**
-     *
-     */
-    private static final long serialVersionUID = -3019988278258566974L;
-    private Map<String, GSConfOption<?>> accessorOptions = new HashMap<>();
+/**
+ * @author ilsanto
+ */
+@SuppressWarnings("rawtypes")
+public abstract class DistributedAccessor<C extends IDistributedQueryConnector> implements IDistributedAccessor<C> {
 
-    private transient IDistributedQueryConnector connector;
-
-    @JsonIgnore
-    private  transient ADKConfBuilder adkBuilder = new ADKConfBuilder();
+    private AccessorSetting setting;
 
     public DistributedAccessor() {
 
-	super();
-
-	GSConfOptionSubcomponent connectorOption = new GSConfOptionSubcomponent();
-	connectorOption.setKey(GS_CONNECTOR_OPTION_KEY);
-	connectorOption.setLabel("Select Connector");
-	connectorOption.setMandatory(true);
-
-	getSupportedOptions().put(GS_CONNECTOR_OPTION_KEY, connectorOption);
+	configure();
     }
+
+    /**
+     * 
+     */
+    protected void configure() {
+
+	AccessorSetting setting = AccessorSetting.createDistributed( //
+
+		initAccessorType(), //
+		initDistributedConnectorSetting(), //
+		initSettingName());//
+
+	String srcLabel = initSourceLabel();
+	if (srcLabel != null) {
+	    setting.getGSSourceSetting().setSourceLabel(srcLabel);
+	}
+
+	String srcEndpoint = initSourceEndpoint();
+	if (srcEndpoint != null) {
+	    setting.getGSSourceSetting().setSourceEndpoint(srcEndpoint);
+	}
+
+	configure(setting);
+    }
+
+    /**
+     * 
+     */
+    protected String initSourceLabel() {
+
+	return null;
+    }
+
+    /**
+     * 
+     */
+    protected String initSourceEndpoint() {
+
+	return null;
+    }
+
+    /**
+     * 
+     */
+    protected abstract String initSettingName();
+
+    /**
+     * @return
+     */
+    protected abstract String initAccessorType();
+
+    /**
+     * @return
+     */
+    protected abstract DistributedConnectorSetting initDistributedConnectorSetting();
 
     /**
      * Implements the interface method returning a <code>ResultSet&lt;GSResource&gt;</code>
@@ -110,20 +143,21 @@ public class DistributedAccessor extends AbstractGSconfigurableComposed implemen
 	    DatasetCollection collection = new DatasetCollection();
 	    collection.setOriginalId(UUID.randomUUID().toString());
 	    collection.setSource(getSource());
-	    
+
 	    results.add(collection);
 
 	} else {
 
 	    IDistributedQueryConnector conn = getConnector();
 
+	    @SuppressWarnings("unchecked")
 	    ResultSet<OriginalMetadata> originalRS = conn.query(message, page);
 
-	    List<OriginalMetadata> originlas = originalRS.getResultsList();
+	    List<OriginalMetadata> originals = originalRS.getResultsList();
 
 	    IdentifierDecorator decorator = new IdentifierDecorator();
 
-	    for (OriginalMetadata o : originlas) {
+	    for (OriginalMetadata o : originals) {
 
 		try {
 
@@ -196,83 +230,59 @@ public class DistributedAccessor extends AbstractGSconfigurableComposed implemen
 	return countResult;
     }
 
-    @JsonIgnore
-    public IDistributedQueryConnector getConnector() throws GSException {
+    public C getConnector() {
 
-	if (connector == null) {
+	DistributedConnectorSetting connectorSetting = getSetting().getDistributedConnectorSetting();
 
-	    connector = adkBuilder.readConfiguredComponent(this, IDistributedQueryConnector.class);
+	C connector = null;
+
+	try {
+	    connector = connectorSetting.createConfigurable();
+
+	} catch (Exception e) {
+
+	    e.printStackTrace();
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
+
+	connector.setSourceURL(getSetting().getGSSourceSetting().getSourceEndpoint());
 
 	return connector;
     }
 
-    @JsonIgnore
     public IResourceMapper getMapper(String schemeUri) throws GSException {
 
 	return ResourceMapperFactory.getResourceMapper(schemeUri);
-
     }
 
-    @JsonIgnore
     @Override
     public GSSource getSource() {
 
-	return (GSSource) getInstantiableType();
+	return getSetting().getGSSourceSetting().asSource();
     }
 
     @Override
-    public Map<String, GSConfOption<?>> getSupportedOptions() {
+    public boolean isMixed() {
 
-	return accessorOptions;
+	return getSetting().getBrokeringStrategy() == BrokeringStrategy.MIXED;
     }
 
     @Override
-    public void onOptionSet(GSConfOption<?> opt) throws GSException {
+    public void configure(AccessorSetting setting) {
 
-	if (opt instanceof GSConfOptionSubcomponent) {
-
-	    GSConfOptionSubcomponent co = (GSConfOptionSubcomponent) opt;
-
-	    if (co.getKey().equalsIgnoreCase(GS_CONNECTOR_OPTION_KEY))
-
-		adkBuilder.onOptionSet(co, this, "setConnector", IDistributedQueryConnector.class);
-
-	    if (co.getKey().equalsIgnoreCase(GS_MAPPER_OPTION_KEY))
-
-		adkBuilder.onOptionSet(co, this, "setMapper", IResourceMapper.class);
-	}
+	this.setting = setting;
     }
 
     @Override
-    public void onFlush() throws GSException {
-	// Nothing to do on flush action
+    public AccessorSetting getSetting() {
+
+	return this.setting;
     }
 
-    public void setGSSource(GSSource source) throws GSException {
+    @Override
+    public String getType() {
 
-	GSSourceAccessor it = new Deserializer().deserialize(source.serialize(), GSSourceAccessor.class);
-
-	it.setBrokeringStrategy(BrokeringStrategy.DISTRIBUTED);
-
-	it.setConfigurableAccessor(this);
-	setInstantiableType(it);
-    }
-
-    public void setADKBuilder(ADKConfBuilder builder) {
-	this.adkBuilder = builder;
-    }
-
-    @JsonIgnore
-    public void setConnector(IDistributedQueryConnector c) {
-
-	c.setSourceURL(((GSSourceAccessor) getInstantiableType()).getEndpoint());
-
-	connector = c;
-    }
-
-    public void addConnector(IDistributedQueryConnector c) {
-
-	adkBuilder.addSubComponent(GS_CONNECTOR_OPTION_KEY, c.getLabel(), c.getClass().getName(), this);
+	return getSetting().getConfigurableType();
     }
 }

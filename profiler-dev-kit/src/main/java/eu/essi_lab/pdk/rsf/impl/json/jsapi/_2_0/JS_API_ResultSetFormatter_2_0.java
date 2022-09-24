@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.rsf.impl.json.jsapi._2_0;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -41,6 +41,28 @@ import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.pdk.rsf.FormattingEncoding;
 import eu.essi_lab.pdk.rsf.impl.json.jsapi._1_0.JS_API_ResultSetFormatter_1_0;
+
+/**
+ * This formatter encapsulates the resources in a JSON object according to an encoding defined for the
+ * <a href="http://api.eurogeoss-broker.eu/docs/index.html">JavaScript API</a>.<br>
+ * This version 2.0 has some differences:
+ * <ol>
+ * <li>the "termFrequencyMap" object is called "statistics"</li>
+ * <li>an "errors" array is added with the errors found in the {@link ResultSet} and in the
+ * {@link DiscoveryMessage}</li>
+ * <li>a "warnings" array is added with the warnings found in the {@link ResultSet} and in the
+ * {@link DiscoveryMessage}</li>
+ * </ol>
+ * The {@link #JS_API_FORMATTING_ENCODING}
+ * has the following properties:
+ * <ul>
+ * <li>media type is "application/json; charset=utf-8"</li>
+ * <li>encoding name is {@value #JS_API_FORMATTING_ENCODING_NAME}</li>
+ * <li>encoding version is {@value #JS_API_FORMATTING_ENCODING_VERSION}</li>
+ * </ul>
+ * 
+ * @author Fabrizio
+ */
 public class JS_API_ResultSetFormatter_2_0 extends JS_API_ResultSetFormatter_1_0 {
 
     /**
@@ -90,7 +112,8 @@ public class JS_API_ResultSetFormatter_2_0 extends JS_API_ResultSetFormatter_1_0
 		    ErrorInfo.ERRORTYPE_INTERNAL, //
 		    ErrorInfo.SEVERITY_WARNING, //
 		    TERM_FREQ_MAP_JSON_SERIALIZATION_ERROR);
-	    message.getException().addInfoList(exception.getErrorInfoList());
+	
+	    message.getException().getErrorInfoList().addAll(exception.getErrorInfoList());
 
 	    GSLoggerFactory.getLogger(getClass()).warn(e.getMessage(), e);
 	}

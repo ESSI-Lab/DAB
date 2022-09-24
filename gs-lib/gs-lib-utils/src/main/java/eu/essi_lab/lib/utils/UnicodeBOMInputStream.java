@@ -1,12 +1,17 @@
-// (‑●‑●)> released under the WTFPL v2 license, by Gregory Pakosz (@gpakosz)
-
+/* ____________________________________________________________________________
+ * 
+ * File:    UnicodeBOMInputStream.java
+ * Author:  Gregory Pakosz.
+ * Date:    02 - November - 2005    
+ * ____________________________________________________________________________
+ */
 package eu.essi_lab.lib.utils;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,10 +28,32 @@ package eu.essi_lab.lib.utils;
  * #L%
  */
 
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
+
+/**
+ * The <code>UnicodeBOMInputStream</code> class wraps any
+ * <code>InputStream</code> and detects the presence of any Unicode BOM
+ * (Byte Order Mark) at its beginning, as defined by
+ * <a href="http://www.faqs.org/rfcs/rfc3629.html">RFC 3629 - UTF-8, a transformation format of ISO 10646</a>
+ * 
+ * <p>The
+ * <a href="http://www.unicode.org/unicode/faq/utf_bom.html">Unicode FAQ</a>
+ * defines 5 types of BOMs:<ul>
+ * <li><pre>00 00 FE FF  = UTF-32, big-endian</pre></li>
+ * <li><pre>FF FE 00 00  = UTF-32, little-endian</pre></li>
+ * <li><pre>FE FF        = UTF-16, big-endian</pre></li>
+ * <li><pre>FF FE        = UTF-16, little-endian</pre></li>
+ * <li><pre>EF BB BF     = UTF-8</pre></li>
+ * </ul></p>
+ * 
+ * <p>Use the {@link #getBOM()} method to know whether a BOM has been detected
+ * or not.
+ * </p>
+ * <p>Use the {@link #skipBOM()} method to remove the detected BOM from the
+ * wrapped <code>InputStream</code> object.</p>
+ */
 public class UnicodeBOMInputStream extends InputStream
 {
   /**
@@ -38,7 +65,7 @@ public class UnicodeBOMInputStream extends InputStream
     /**
      * NONE.
      */
-    public static final BOM NONE = new BOM(new byte[]{}, "NONE");
+    public static final BOM NONE = new BOM(new byte[]{},"NONE");
 
     /**
      * UTF-8 BOM (EF BB BF).
@@ -97,8 +124,8 @@ public class UnicodeBOMInputStream extends InputStream
       final int     length = bytes.length;
       final byte[]  result = new byte[length];
 
-      // make a defensive copy
-      System.arraycopy(bytes, 0, result, 0, length);
+      // Make a defensive copy
+      System.arraycopy(bytes,0,result,0,length);
 
       return result;
     }
@@ -109,7 +136,7 @@ public class UnicodeBOMInputStream extends InputStream
       assert(description != null)       : "invalid description: null is not allowed";
       assert(description.length() != 0) : "invalid description: empty string is not allowed";
 
-      this.bytes        = bom;
+      this.bytes          = bom;
       this.description  = description;
     }
 
@@ -121,9 +148,9 @@ public class UnicodeBOMInputStream extends InputStream
   /**
    * Constructs a new <code>UnicodeBOMInputStream</code> that wraps the
    * specified <code>InputStream</code>.
-   *
+   * 
    * @param inputStream an <code>InputStream</code>.
-   *
+   * 
    * @throws NullPointerException when <code>inputStream</code> is
    * <code>null</code>.
    * @throws IOException on reading from the specified <code>InputStream</code>
@@ -136,7 +163,7 @@ public class UnicodeBOMInputStream extends InputStream
     if (inputStream == null)
       throw new NullPointerException("invalid input stream: null is not allowed");
 
-    in = new PushbackInputStream(inputStream, 4);
+    in = new PushbackInputStream(inputStream,4);
 
     final byte  bom[] = new byte[4];
     final int   read  = in.read(bom);
@@ -192,13 +219,13 @@ public class UnicodeBOMInputStream extends InputStream
     }
 
     if (read > 0)
-      in.unread(bom, 0, read);
+      in.unread(bom,0,read);
   }
 
   /**
    * Returns the <code>BOM</code> that was detected in the wrapped
    * <code>InputStream</code> object.
-   *
+   * 
    * @return a <code>BOM</code> value.
    */
   public final BOM getBOM()
@@ -210,9 +237,9 @@ public class UnicodeBOMInputStream extends InputStream
   /**
    * Skips the <code>BOM</code> that was found in the wrapped
    * <code>InputStream</code> object.
-   *
+   * 
    * @return this <code>UnicodeBOMInputStream</code>.
-   *
+   * 
    * @throws IOException when trying to skip the BOM from the wrapped
    * <code>InputStream</code> object.
    */
@@ -226,60 +253,78 @@ public class UnicodeBOMInputStream extends InputStream
     return this;
   }
 
-  @Override
+  /**
+   * {@inheritDoc}
+   */
   public int read() throws IOException
   {
     return in.read();
   }
 
-  @Override
+  /**
+   * {@inheritDoc}
+   */
   public int read(final byte b[]) throws  IOException,
                                           NullPointerException
   {
-    return in.read(b, 0, b.length);
+    return in.read(b,0,b.length);
   }
 
-  @Override
+  /**
+   * {@inheritDoc}
+   */
   public int read(final byte b[],
                   final int off,
                   final int len) throws IOException,
                                         NullPointerException
   {
-    return in.read(b, off, len);
+    return in.read(b,off,len);
   }
 
-  @Override
+  /**
+   * {@inheritDoc}
+   */
   public long skip(final long n) throws IOException
   {
     return in.skip(n);
   }
 
-  @Override
+  /**
+   * {@inheritDoc}
+   */
   public int available() throws IOException
   {
     return in.available();
   }
 
-  @Override
+  /**
+   * {@inheritDoc}
+   */
   public void close() throws IOException
   {
     in.close();
   }
 
-  @Override
+  /**
+   * {@inheritDoc}
+   */
   public synchronized void mark(final int readlimit)
   {
     in.mark(readlimit);
   }
 
-  @Override
+  /**
+   * {@inheritDoc}
+   */
   public synchronized void reset() throws IOException
   {
     in.reset();
   }
 
-  @Override
-  public boolean markSupported()
+  /**
+   * {@inheritDoc}
+   */
+  public boolean markSupported() 
   {
     return in.markSupported();
   }

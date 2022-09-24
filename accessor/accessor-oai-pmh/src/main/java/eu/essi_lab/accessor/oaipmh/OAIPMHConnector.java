@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.oaipmh;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,10 +35,9 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.w3c.dom.Node;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import eu.essi_lab.cdk.harvest.AbstractHarvestedQueryConnector;
+import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
+import eu.essi_lab.jaxb.oaipmh.OAIPMHerrorcodeType;
 import eu.essi_lab.lib.net.utils.HttpRequestExecutor;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
@@ -46,23 +45,19 @@ import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
 import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.Source;
-import eu.essi_lab.model.configuration.option.GSConfOption;
-import eu.essi_lab.model.configuration.option.GSConfOptionBoolean;
-import eu.essi_lab.model.configuration.option.GSConfOptionString;
+import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.OriginalMetadata;
-public class OAIPMHConnector extends AbstractHarvestedQueryConnector {
+
+/**
+ * @author Fabrizio
+ */
+public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSetting> {
 
     public static final String PREFERRED_PREFIX_KEY = "PREFERRED_PREFIX_KEY";
-    /**
-     *
-     */
-    private static final long serialVersionUID = -161607157535399027L;
-    private static final String OAIPMH_CONNECTOR_KEY = "OAI_PMH_CONNECTOR_KEY";
+
     public static final String SET_OPTION_KEY = "SET_OPTION_KEY";
-    private static final String ADV_OPTIONS_KEY = "ADV_OPTIONS_KEY";
 
     private static final String OAI_PMH_CONNECTOR_LIST_MD_FORMATS_ERROR = "OAI_PMH_CONNECTOR_LIST_MD_FORMATS_ERROR";
     private static final String OAI_PMH_CONNECTOR_LIST_RECORDS_ERROR = "OAI_PMH_CONNECTOR_LIST_RECORDS_ERROR";
@@ -72,44 +67,40 @@ public class OAIPMHConnector extends AbstractHarvestedQueryConnector {
     private static final String OAI_PMH_CONNECTOR_METADATA_NODE_AS_STRING_ERROR = "OAI_PMH_CONNECTOR_METADATA_NODE_AS_STRING_ERROR";
     private static final String OAI_PMH_CONNECTOR_IDENTIFY_ERROR = "OAI_PMH_CONNECTOR_IDENTIFY_ERROR";
     private static final String OAI_PMH_GET_GRANULARITY_ERROR = "OAI_PMH_GET_GRANULARITY_ERROR";
-    private static final String OAI_PMH_CONNECTOR_LIST_SETS_ERROR = "OAI_PMH_CONNECTOR_LIST_SETS_ERROR";
 
-    @JsonIgnore
-    public static transient String staticSetName;
-    @JsonIgnore
-    private transient String preferredPrefix;
-    @JsonIgnore
-    private transient int count;
-    @JsonIgnore
-    private transient List<SimpleEntry<String, String>> metadataFormatsNS;
-    @JsonIgnore
-    private transient String setName;
-    @JsonIgnore
-    private transient boolean isFirstRequest;
-    @JsonIgnore
+    public static String staticSetName;
+    private String preferredPrefix;
+    private int count;
+    private List<SimpleEntry<String, String>> metadataFormatsNS;
+    private String setName;
+    private boolean isFirstRequest;
     private int maximumAttemptsCount;
-    @JsonIgnore
     private boolean essiClientId;
+
     /**
      * 
      */
     private static final int DEFAULT_MAX_ATTEMPTS_COUNT = 3;
 
+    /**
+     * 
+     */
+    public static final String CONNECTOR_TYPE = "OAIPMHConnector";
+
+    /**
+     * 
+     */
     public OAIPMHConnector() {
 
-	setKey(OAIPMH_CONNECTOR_KEY);
-
-	GSConfOptionBoolean advOption = new GSConfOptionBoolean();
-	advOption.setLabel("Advanced options");
-	advOption.setKey(ADV_OPTIONS_KEY);
-	advOption.setValue(false);
-	getSupportedOptions().put(ADV_OPTIONS_KEY, advOption);
-
-	setSet(OAIPMHConnector.staticSetName);
-
 	setMaxAttemptsCount(DEFAULT_MAX_ATTEMPTS_COUNT);
+
+	count = 0;
+	isFirstRequest = true;
     }
 
+    /**
+     * @param setName
+     */
     public OAIPMHConnector(String setName) {
 
 	this();
@@ -120,16 +111,10 @@ public class OAIPMHConnector extends AbstractHarvestedQueryConnector {
     /**
      * @param preferredPrefix
      */
-    @JsonIgnore
+
     public void setPreferredPrefix(String preferredPrefix) {
 
 	this.preferredPrefix = preferredPrefix;
-    }
-
-    @Override
-    public String getLabel() {
-
-	return "OAIPMH Connector";
     }
 
     @Override
@@ -149,12 +134,9 @@ public class OAIPMHConnector extends AbstractHarvestedQueryConnector {
 	String until = null;
 	String set = null;
 
-	Optional<Integer> mr = getMaxRecords();
+	Optional<Integer> mr = getSetting().getMaxRecords();
 
 	if (token == null) {
-
-	    count = 0;
-	    isFirstRequest = true;
 
 	    /**
 	     * FIX FOR GEOSS EUMETSAT DATA CATALOGUE
@@ -217,12 +199,10 @@ public class OAIPMHConnector extends AbstractHarvestedQueryConnector {
 	    //
 	    // set
 	    //
-	    GSConfOption<?> setOption = getSupportedOptions().get(SET_OPTION_KEY);
-	    if (setOption != null) {
-		Object value = getSupportedOptions().get(SET_OPTION_KEY).getValue();
-		if (value != null) {
-		    set = value.toString();
-		}
+
+	    Optional<String> setName = getSetting().getSetName();
+	    if (setName.isPresent()) {
+		set = setName.get();
 	    }
 	}
 
@@ -280,7 +260,7 @@ public class OAIPMHConnector extends AbstractHarvestedQueryConnector {
 
 	    count++;
 
-	    if (!isMaxRecordsUnlimited() && mr.isPresent() && count == mr.get()) {
+	    if (mr.isPresent() && count == mr.get()) {
 		GSLoggerFactory.getLogger(getClass()).info("Reached max. records: {}", mr.get());
 		GSLoggerFactory.getLogger(getClass()).info("Setting null resumption token to stop the harvesting");
 
@@ -300,28 +280,17 @@ public class OAIPMHConnector extends AbstractHarvestedQueryConnector {
     @Override
     public List<String> listMetadataFormats() throws GSException {
 
-	try {
-	    List<String> ret = new ArrayList<>();
-
-	    List<SimpleEntry<String, String>> formatsNS = listMetadataFormatsNS(getSourceURL());
-	    for (SimpleEntry<String, String> entry : formatsNS) {
-		ret.add(entry.getKey());
-	    }
-	    return ret;
-	} catch (Exception e) {
-	    throw GSException.createException(//
-		    getClass(), //
-		    e.getMessage(), //
-		    null, //
-		    ErrorInfo.ERRORTYPE_INTERNAL, //
-		    ErrorInfo.SEVERITY_ERROR, //
-		    OAI_PMH_CONNECTOR_LIST_MD_FORMATS_ERROR, //
-		    e);
-	}
+	return listMetadataFormats(getSourceURL());
     }
 
     @Override
-    public boolean supports(Source source) {
+    public String getSourceURL() {
+
+	return super.getSourceURL().endsWith("?") ? super.getSourceURL() : super.getSourceURL() + "?";
+    }
+
+    @Override
+    public boolean supports(GSSource source) {
 
 	String endpoint = source.getEndpoint();
 
@@ -340,12 +309,6 @@ public class OAIPMHConnector extends AbstractHarvestedQueryConnector {
 	return false;
     }
 
-    @Override
-    public String getSourceURL() {
-
-	return super.getSourceURL().endsWith("?") ? super.getSourceURL() : super.getSourceURL() + "?";
-    }
-
     /**
      * @param setName
      */
@@ -353,11 +316,7 @@ public class OAIPMHConnector extends AbstractHarvestedQueryConnector {
 
 	this.setName = setName;
 
-	GSConfOptionString setOption = new GSConfOptionString();
-	setOption.setKey(SET_OPTION_KEY);
-	setOption.setLabel("Select set");
-	setOption.setValue(setName);
-	getSupportedOptions().put(SET_OPTION_KEY, setOption);
+	getSetting().setSetName(setName);
     }
 
     /**
@@ -368,59 +327,10 @@ public class OAIPMHConnector extends AbstractHarvestedQueryConnector {
 	return setName;
     }
 
-    @Override
-    public void onOptionSet(GSConfOption<?> opt) throws GSException {
-
-	if (opt instanceof GSConfOptionBoolean) {
-
-	    GSConfOptionBoolean advanced = (GSConfOptionBoolean) opt;
-
-	    if (advanced.getValue()) {
-
-		GSConfOptionString prefKeyOptionString = new GSConfOptionString();
-		prefKeyOptionString.setKey(PREFERRED_PREFIX_KEY);
-		prefKeyOptionString.setLabel("Select prefix");
-		getSupportedOptions().put(PREFERRED_PREFIX_KEY, prefKeyOptionString);
-
-		GSConfOptionString setOption = new GSConfOptionString();
-		setOption.setKey(SET_OPTION_KEY);
-		setOption.setLabel("Select set");
-		getSupportedOptions().put(SET_OPTION_KEY, setOption);
-
-		try {
-
-		    List<SimpleEntry<String, String>> nameSpaces = listMetadataFormatsNS(getSourceURL());
-
-		    List<String> allowed = new ArrayList<>();
-
-		    for (SimpleEntry<String, String> ns : nameSpaces) {
-
-			allowed.add(ns.getKey());
-		    }
-
-		    ((GSConfOptionString) getSupportedOptions().get(PREFERRED_PREFIX_KEY)).setAllowedValues(allowed);
-
-		    List<String> sets = getSets(getSourceURL());
-		    ((GSConfOptionString) getSupportedOptions().get(SET_OPTION_KEY)).setAllowedValues(sets);
-
-		} catch (Exception ex) {
-
-		    GSLoggerFactory.getLogger(getClass()).error(ex.getMessage(), ex);
-		}
-
-	    } else {
-
-		getSupportedOptions().remove(PREFERRED_PREFIX_KEY);
-		getSupportedOptions().remove(SET_OPTION_KEY);
-	    }
-	}
-
-    }
-
     /**
      * 
      */
-    @JsonIgnore
+
     public void setESSILabClientId() {
 
 	this.essiClientId = true;
@@ -431,7 +341,7 @@ public class OAIPMHConnector extends AbstractHarvestedQueryConnector {
      * 
      * @param count
      */
-    @JsonIgnore
+
     public void setMaxAttemptsCount(int count) {
 
 	this.maximumAttemptsCount = count;
@@ -439,12 +349,7 @@ public class OAIPMHConnector extends AbstractHarvestedQueryConnector {
 
     private String getConfiguredPrefix() {
 
-	GSConfOption<?> gsConfOption = getSupportedOptions().get(PREFERRED_PREFIX_KEY);
-	if (gsConfOption == null) {
-	    return null;
-	}
-
-	return gsConfOption.getValue() != null ? gsConfOption.getValue().toString() : null;
+	return getSetting().getPreferredPrefix().orElseGet(() -> getPreferredPrefix());
     }
 
     private List<Node> readRecords(XMLDocumentReader reader) throws GSException {
@@ -530,6 +435,14 @@ public class OAIPMHConnector extends AbstractHarvestedQueryConnector {
 		if (reader.evaluateBoolean("exists(//*:ListRecords)")) {
 		    GSLoggerFactory.getLogger(getClass()).debug("ListRecords successful");
 
+		    return reader;
+		}
+
+		String errorCode = OAIPMHerrorcodeType.NO_RECORDS_MATCH.value();
+		String error = reader.evaluateString("//*:error/@code");
+		if (error != null && error.equals(errorCode)) {
+
+		    GSLoggerFactory.getLogger(getClass()).debug("No records match");
 		    return reader;
 		}
 
@@ -623,14 +536,19 @@ public class OAIPMHConnector extends AbstractHarvestedQueryConnector {
 	return null;
     }
 
-    private List<String> getSets(String sourceURL) throws GSException {
+    /**
+     * @param sourceURL
+     * @return
+     * @throws GSException
+     */
+    static List<String> getSets(String sourceURL) throws Exception {
 
 	String listSets = sourceURL + "verb=ListSets";
 	HttpGet httpGet = new HttpGet(listSets);
 
 	try {
 
-	    GSLoggerFactory.getLogger(getClass()).debug("Serving GET: {}", listSets);
+	    GSLoggerFactory.getLogger(OAIPMHConnector.class).debug("Serving GET: {}", listSets);
 	    HttpResponse response = new HttpRequestExecutor().execute(httpGet);
 
 	    InputStream content = response.getEntity().getContent();
@@ -643,20 +561,45 @@ public class OAIPMHConnector extends AbstractHarvestedQueryConnector {
 
 	} catch (Exception e) {
 
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	    GSLoggerFactory.getLogger(OAIPMHConnector.class).error(e.getMessage(), e);
 
-	    throw GSException.createException( //
-		    getClass(), //
+	    throw e;
+	}
+    }
+
+    /**
+     * @param sourceURL
+     * @return
+     * @throws GSException
+     */
+    static List<String> listMetadataFormats(String sourceURL) throws GSException {
+
+	try {
+	    List<String> ret = new ArrayList<>();
+
+	    List<SimpleEntry<String, String>> formatsNS = listMetadataFormatsNS(sourceURL);
+	    for (SimpleEntry<String, String> entry : formatsNS) {
+		ret.add(entry.getKey());
+	    }
+	    return ret;
+	} catch (Exception e) {
+	    throw GSException.createException(//
+		    OAIPMHConnector.class, //
 		    e.getMessage(), //
 		    null, //
 		    ErrorInfo.ERRORTYPE_INTERNAL, //
 		    ErrorInfo.SEVERITY_ERROR, //
-		    OAI_PMH_CONNECTOR_LIST_SETS_ERROR, //
+		    OAI_PMH_CONNECTOR_LIST_MD_FORMATS_ERROR, //
 		    e);
 	}
     }
 
-    private List<SimpleEntry<String, String>> listMetadataFormatsNS(String sourceURL) throws GSException {
+    /**
+     * @param sourceURL
+     * @return
+     * @throws GSException
+     */
+    static List<SimpleEntry<String, String>> listMetadataFormatsNS(String sourceURL) throws GSException {
 
 	try {
 
@@ -684,10 +627,10 @@ public class OAIPMHConnector extends AbstractHarvestedQueryConnector {
 
 	} catch (Exception e) {
 
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	    GSLoggerFactory.getLogger(OAIPMHConnector.class).error(e.getMessage(), e);
 
 	    throw GSException.createException( //
-		    getClass(), //
+		    OAIPMHConnector.class, //
 		    e.getMessage(), //
 		    null, //
 		    ErrorInfo.ERRORTYPE_INTERNAL, //
@@ -758,5 +701,17 @@ public class OAIPMHConnector extends AbstractHarvestedQueryConnector {
 		    OAI_PMH_CONNECTOR_METADATA_NODE_AS_STRING_ERROR, //
 		    e);
 	}
+    }
+
+    @Override
+    public String getType() {
+
+	return CONNECTOR_TYPE;
+    }
+
+    @Override
+    protected OAIPMHConnectorSetting initSetting() {
+
+	return new OAIPMHConnectorSetting();
     }
 }

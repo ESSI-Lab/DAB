@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wms;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -32,8 +32,9 @@ import eu.essi_lab.accessor.wms.capabilities.WMSCapabilitiesFilter;
 import eu.essi_lab.accessor.wms.capabilities.WMSCapabilitiesHandler;
 import eu.essi_lab.accessor.wms.demo.WMSDemoFilter;
 import eu.essi_lab.accessor.wms.demo.WMSDemoHandler;
-import eu.essi_lab.accessor.wms.map.WMSMapTransformer;
 import eu.essi_lab.accessor.wms.map.WMSMapRequestFilter;
+import eu.essi_lab.accessor.wms.map.WMSMapTransformer;
+import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.jaxb.csw._2_0_2.ExceptionCode;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.web.WebRequest;
@@ -41,11 +42,16 @@ import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.model.resource.data.DataObject;
 import eu.essi_lab.pdk.Profiler;
-import eu.essi_lab.pdk.ProfilerInfo;
 import eu.essi_lab.pdk.handler.AccessHandler;
 import eu.essi_lab.pdk.handler.selector.HandlerSelector;
 import eu.essi_lab.pdk.rsf.AccessResultSetFormatterInline;
 import eu.essi_lab.pdk.rsm.access.DefaultAccessResultSetMapper;
+
+/**
+ * Profiler implementing WMS protocol
+ * 
+ * @author boldrini
+ */
 public class WMSProfiler extends Profiler {
 
     /**
@@ -53,7 +59,7 @@ public class WMSProfiler extends Profiler {
      */
     private static final String WMS_PROFILER_TYPE = "WMS";
 
-    public static final ProfilerInfo WMS_SERVICE_INFO = new ProfilerInfo();
+    public static final ProfilerSetting WMS_SERVICE_INFO = new ProfilerSetting();
     static {
 	WMS_SERVICE_INFO.setServiceName("WMS Profiler");
 	WMS_SERVICE_INFO.setServiceType(WMS_PROFILER_TYPE);
@@ -132,7 +138,7 @@ public class WMSProfiler extends Profiler {
     }
 
     @Override
-    public ProfilerInfo getProfilerInfo() {
+    protected ProfilerSetting initSetting() {
 
 	return WMS_SERVICE_INFO;
     }

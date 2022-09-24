@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.rsf;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,6 +24,14 @@ package eu.essi_lab.pdk.rsf;
 import eu.essi_lab.messages.AccessMessage;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.count.CountSet;
+
+/**
+ * Extends the super interface in order to receive an {@link AccessMessage} and to format a {@link ResultSet}
+ * with resources of type <code>T</code>
+ * 
+ * @author Fabrizio
+ * @param <T> the type of the resources provided by the {@link ResultSet} to format
+ */
 public abstract class AccessResultSetFormatter<T> implements MessageResponseFormatter<AccessMessage, T, CountSet, ResultSet<T>> {
 
 }

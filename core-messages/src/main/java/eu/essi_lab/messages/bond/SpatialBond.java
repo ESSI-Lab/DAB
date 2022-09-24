@@ -4,7 +4,7 @@ package eu.essi_lab.messages.bond;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,6 +25,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
 import eu.essi_lab.model.resource.MetadataElement;
+
+/**
+ * A bond applied on a {@link SpatialEntity}
+ * 
+ * @see SpatialEntity
+ * @author Fabrizio
+ */
 @XmlRootElement
 @XmlSeeAlso(SpatialExtent.class)
 public class SpatialBond extends MetadataElementBond<SpatialEntity> {

@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.csw.mapper;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,35 +22,21 @@ package eu.essi_lab.accessor.csw.mapper;
  */
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.transform.TransformerException;
-import javax.xml.xpath.XPathExpressionException;
-
-import org.slf4j.Logger;
 import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import eu.essi_lab.iso.datamodel.classes.Citation;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
 import eu.essi_lab.iso.datamodel.classes.MDMetadata;
-import eu.essi_lab.iso.datamodel.classes.MIInstrument;
 import eu.essi_lab.iso.datamodel.classes.MIMetadata;
-import eu.essi_lab.iso.datamodel.classes.MIPlatform;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.utils.ComparableEntry;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
-import eu.essi_lab.lib.xml.XMLDocumentWriter;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -60,10 +46,15 @@ import eu.essi_lab.model.resource.ExtensionHandler;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.OriginalMetadata;
 import eu.essi_lab.ommdk.FileIdentifierMapper;
+
+/**
+ * Mapper from SeaDataNet CDI data model
+ *
+ * @author boldrini
+ */
 public class BLUECLOUDMapper extends FileIdentifierMapper {
 
-    private transient Logger logger = GSLoggerFactory.getLogger(this.getClass());
-
+    private static final String BLUE_CLOUD_MAPPER_ERROR = "BLUE_CLOUD_MAPPER_ERROR";
     String HREF_ATTRIBUTE = "@*:href";
 
     public BLUECLOUDMapper() {
@@ -81,7 +72,6 @@ public class BLUECLOUDMapper extends FileIdentifierMapper {
 	return dataset;
     }
 
-    @JsonIgnore
     @Override
     public String getSupportedOriginalMetadataSchema() {
 	return CommonNameSpaceContext.BLUECLOUD_NS_URI;
@@ -110,7 +100,8 @@ public class BLUECLOUDMapper extends FileIdentifierMapper {
 		    String parameterIdentifier = reader.evaluateString(anchor, HREF_ATTRIBUTE);
 		    if (parameterIdentifier != null && !"".equals(parameterIdentifier)) {
 			String parameterLabel = reader.evaluateString(parameterNode, ".");
-			//parameterIdentifier = "http://www.seadatanet.org/urnurl/SDN:P02::" + parameterIdentifier + "/";
+			// parameterIdentifier = "http://www.seadatanet.org/urnurl/SDN:P02::" + parameterIdentifier +
+			// "/";
 			ComparableEntry<String, String> newEntry = new ComparableEntry<>(parameterIdentifier, parameterLabel);
 			parameters.add(newEntry);
 		    }
@@ -142,26 +133,28 @@ public class BLUECLOUDMapper extends FileIdentifierMapper {
 	    // }
 	    // }
 	    // ORIGINATOR ORGANIZATION IDENTIFIER
-//	    Set<ComparableEntry<String, String>> originatorOrganisations = new HashSet<>();
-//	    Node[] originatorNodes = reader.evaluateNodes("//*:SDN_EDMOCode[../../*:role/*:CI_RoleCode/@codeListValue='originator']");
-//	    for (Node originatorNode : originatorNodes) {
-//		String originatorIdentifier = reader.evaluateString(originatorNode, HREF_ATTRIBUTE);
-//		if (originatorIdentifier != null && !"".equals(originatorIdentifier)) {
-//		    String originatorLabel = reader.evaluateString(originatorNode, ".");
-//		    originatorIdentifier = "http://www.seadatanet.org/urnurl/SDN:EDMO::" + originatorIdentifier + "/";
-//		    ComparableEntry<String, String> newEntry = new ComparableEntry<>(originatorIdentifier, originatorLabel);
-//		    originatorOrganisations.add(newEntry);
-//		}
-//	    }
+	    // Set<ComparableEntry<String, String>> originatorOrganisations = new HashSet<>();
+	    // Node[] originatorNodes =
+	    // reader.evaluateNodes("//*:SDN_EDMOCode[../../*:role/*:CI_RoleCode/@codeListValue='originator']");
+	    // for (Node originatorNode : originatorNodes) {
+	    // String originatorIdentifier = reader.evaluateString(originatorNode, HREF_ATTRIBUTE);
+	    // if (originatorIdentifier != null && !"".equals(originatorIdentifier)) {
+	    // String originatorLabel = reader.evaluateString(originatorNode, ".");
+	    // originatorIdentifier = "http://www.seadatanet.org/urnurl/SDN:EDMO::" + originatorIdentifier + "/";
+	    // ComparableEntry<String, String> newEntry = new ComparableEntry<>(originatorIdentifier, originatorLabel);
+	    // originatorOrganisations.add(newEntry);
+	    // }
+	    // }
 	    reader.setNamespaceContext(new CommonNameSpaceContext());
-//	    XMLDocumentWriter writer = new XMLDocumentWriter(reader);
-//	    // Here the SeaDataNet identification section is converted to GMD core profile data identification section
-//	    writer.rename("//sdn:SDN_DataIdentification", "gmd:MD_DataIdentification");
-//	    // Here the profile codelists are converted to GMD core profile free text
-//	    writer.rename("//sdn:*[ends-with(name(), 'Code')]", "gco:CharacterString");
+	    // XMLDocumentWriter writer = new XMLDocumentWriter(reader);
+	    // // Here the SeaDataNet identification section is converted to GMD core profile data identification
+	    // section
+	    // writer.rename("//sdn:SDN_DataIdentification", "gmd:MD_DataIdentification");
+	    // // Here the profile codelists are converted to GMD core profile free text
+	    // writer.rename("//sdn:*[ends-with(name(), 'Code')]", "gco:CharacterString");
 	    MDMetadata metadata = new MDMetadata(reader.asStream());
 	    MIMetadata miMetadata = new MIMetadata(metadata.getElementType());
-	    
+
 	    metadata.getDataIdentification().setResourceIdentifier(metadata.getFileIdentifier());
 	    miMetadata.getDataIdentification().setResourceIdentifier(metadata.getFileIdentifier());
 
@@ -193,10 +186,10 @@ public class BLUECLOUDMapper extends FileIdentifierMapper {
 	    // miMetadata.addMIPlatform(platform);
 	    // }
 	    // ORIGINATOR ORGANIZATION IDENTIFIER
-//	    for (SimpleEntry<String, String> originatorOrganisation : originatorOrganisations) {
-//		extendedMetadataHandler.addOriginatorOrganisationIdentifier(originatorOrganisation.getKey());
-//		extendedMetadataHandler.addOriginatorOrganisationDescription(originatorOrganisation.getValue());
-//	    }
+	    // for (SimpleEntry<String, String> originatorOrganisation : originatorOrganisations) {
+	    // extendedMetadataHandler.addOriginatorOrganisationIdentifier(originatorOrganisation.getKey());
+	    // extendedMetadataHandler.addOriginatorOrganisationDescription(originatorOrganisation.getValue());
+	    // }
 
 	    // to generate the lists needed by BODC Rosetta Stone put parameter to true...
 	    // if (ODIPUtils.getInstance().isEnabled()) {
@@ -208,29 +201,16 @@ public class BLUECLOUDMapper extends FileIdentifierMapper {
 
 	    coreMetadata.setMIMetadata(miMetadata);
 
-	} catch (UnsupportedEncodingException e) {
-	    GSException gse = new GSException();
-	    ErrorInfo info = new ErrorInfo();
-	    info.setErrorDescription("This platform does not support UTF-8");
-	    gse.addInfo(info);
+	} catch (Exception e) {
 
-	    logger.error(info.getErrorDescription());
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 
-	    throw gse;
-	} catch (JAXBException | SAXException | IOException | TransformerException e) {
-	    GSException gse = new GSException();
-	    ErrorInfo info = new ErrorInfo();
-	    info.setErrorDescription("Unable to parse CDI: " + originalMetadata);
-	    gse.addInfo(info);
-	    logger.error(info.getErrorDescription());
-	    throw gse;
-	} catch (XPathExpressionException e) {
-	    GSException gse = new GSException();
-	    ErrorInfo info = new ErrorInfo();
-	    info.setErrorDescription("Unable to perform XPath on CDI: " + originalMetadata);
-	    gse.addInfo(info);
-	    logger.error(info.getErrorDescription());
-	    throw gse;
+	    throw GSException.createException(//
+		    getClass(), //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    BLUE_CLOUD_MAPPER_ERROR, //
+		    e);
 	}
     }
 

@@ -4,7 +4,7 @@ package eu.essi_lab.access.wml;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -57,6 +57,14 @@ import eu.essi_lab.model.resource.BNHSPropertyReader;
 import eu.essi_lab.model.resource.Country;
 import eu.essi_lab.model.resource.ExtensionHandler;
 import eu.essi_lab.model.resource.GSResource;
+
+/**
+ * Helper for downloaders in the hydrology domain. A subclass can useful call getTimeSeriesTemplate method to have a WML
+ * 1.1 template prefilled with metadata from the {@link GSResource}.
+ * Then it should only call addValue method to add the user requested data values.
+ * 
+ * @author Boldrini
+ */
 public abstract class WMLDataDownloader extends DataDownloader {
 
     public TimeSeriesResponseType getTimeSeriesTemplate() {

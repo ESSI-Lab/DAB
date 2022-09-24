@@ -4,6 +4,17 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://www.oracle.com/webfolder/technetwork/jsc/xml/ns/javaee/web-app_3_0.xsd">
 
 	<display-name>${project.name} ${project.version}</display-name>
+	
+	<context-param>
+	    
+	    <!-- See https://vaadin.com/docs/v14/guide/configuration for other properties   -->
+	    
+	    <!-- Set the Vaadin heartbeat interval to 30 seconds -->
+	    <!-- Used by SingleTabManager to detect if the tab with the configuration view has been closed -->
+	    
+    	<param-name>heartbeatInterval</param-name>
+    	<param-value>30</param-value>
+  	</context-param> 
 
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
@@ -53,17 +64,26 @@
 	<servlet-mapping>
 		<servlet-name>PubSubService</servlet-name>
 		<url-pattern>/services/essi/pubsub/*</url-pattern>
-	</servlet-mapping>	  
+	</servlet-mapping>	
+		
+	
+	<servlet>
+		<servlet-name>Vaadin</servlet-name>
+		<servlet-class>com.vaadin.flow.server.VaadinServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>Vaadin</servlet-name>
+		<url-pattern>/configuration/*</url-pattern>
+	</servlet-mapping>	
+		  
 
 	<filter>
 		<filter-name>user-finder-filter</filter-name>
 		<filter-class>eu.essi_lab.gssrv.servlet.UserFinderFilter</filter-class>
 	</filter>
-	<filter>
-		<filter-name>init-filter</filter-name>
-		<filter-class>eu.essi_lab.gssrv.servlet.InitializationFilter</filter-class>
-	</filter>
-
+ 
 	<filter>
 		<filter-name>exec-filter</filter-name>
 		<filter-class>eu.essi_lab.gssrv.servlet.ExecutionModeFilter</filter-class>
@@ -71,7 +91,7 @@
 		
 	<filter-mapping>
 		<filter-name>user-finder-filter</filter-name>
-		<url-pattern>/conf/*</url-pattern>
+		<url-pattern>/configuration/*</url-pattern>
 	</filter-mapping>
 	
 	<filter-mapping>
@@ -83,11 +103,12 @@
 		<filter-name>filter</filter-name>
 		<filter-class>eu.essi_lab.gssrv.servlet.ProfilerServiceFilter</filter-class>
 		<!-- remove comment to enable async support  -->
-		<!-- <async-supported>true</async-supported> -->	
+		<async-supported>true</async-supported>	
 	</filter>
 	<filter>
 		<filter-name>CorsFilter</filter-name>
 		<filter-class>eu.essi_lab.gssrv.servlet.CORSDelegatorFilter</filter-class>
+		<async-supported>true</async-supported>	
 		<init-param>
 			<param-name>cors.allowed.origins</param-name>
 			<param-value>*</param-value>
@@ -120,11 +141,6 @@
 	
 	<filter-mapping>
 		<filter-name>filter</filter-name>
-		<url-pattern>*</url-pattern>
-	</filter-mapping>
-
-	<filter-mapping>
-		<filter-name>init-filter</filter-name>
 		<url-pattern>*</url-pattern>
 	</filter-mapping>
 

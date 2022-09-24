@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof.discovery.series;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -32,6 +32,7 @@ import eu.essi_lab.messages.ResourceSelector;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.ValidationMessage;
+import eu.essi_lab.messages.RequestMessage.IterationMode;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
@@ -43,12 +44,18 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
+
+/**
+ * HIS Central request transformer
+ *
+ * @author boldrini
+ */
 public class GetSeriesCatalogForBoxTransformer extends DiscoveryRequestTransformer {
 
     /**
      * 
      */
-    private static final int DEFAULT_PAGE_SIZE = 100;
+    private static final int DEFAULT_PAGE_SIZE = 10;
 
     public static final String HIS_CENTRAL_GET_BOND_ERROR = "HIS_CENTRAL_GET_BOND_ERROR";
 
@@ -60,7 +67,7 @@ public class GetSeriesCatalogForBoxTransformer extends DiscoveryRequestTransform
     public DiscoveryMessage transform(WebRequest request) throws GSException {
 	
 	DiscoveryMessage message = super.transform(request);
-	message.setIteratedWorkflow();
+	    message.setIteratedWorkflow(IterationMode.FULL_RESPONSE);
 
 	return message;
     }

@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.wml._2_0;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,6 +35,28 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 
+
+/**
+ * gml:MeasureType supports recording an amount encoded as a value of XML Schema double, together with a units of measure indicated
+ *         by an attribute uom, short for "units Of measure". The value of the uom attribute identifies a reference system for the amount, usually a
+ *         ratio or interval scale. OGC WaterML2.0 alters this definition to make uom optional as this value is defaulted for a series.
+ * 
+ * <p>Java class for MeasureType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="MeasureType"&gt;
+ *   &lt;simpleContent&gt;
+ *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema&gt;double"&gt;
+ *       &lt;attribute name="uom" type="{http://www.opengis.net/swe/2.0}UomSymbol" /&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/simpleContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "MeasureType", propOrder = {
     "value"

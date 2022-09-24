@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<!--
+..........................................................
+GWIS Javascript API Sample:
+Plotting Multiple Data Series
+..........................................................
+U.S. Geological Survey, Texas Water Science Center, Austin
+https://txpub.usgs.gov/DSS/GWIS/
+..........................................................
+-->
+<html>
+    <!-- html head -->
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>GWIS JSAPI Sample</title>
+        
+        <!-- GWIS requires jQuery -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        
+        <!-- GWIS JSAPI 0.0 -->
+        <link rel="stylesheet" href="https://txpub.usgs.gov/DSS/GWIS/0.0/jsapi/gwis-plot-utils.css"/>
+        <script src="https://txpub.usgs.gov/DSS/GWIS/0.0/jsapi/gwis-plot-utils.min.js"></script>
+    </head>
+    
+    <!-- html body -->
+    <body style="background:#eee; font-family:arial;">
+        
+        <!-- title -->
+        <h1>Sample: Plotting Multiple Data Series</h1>
+        
+        <!-- create plot in document div -->
+        <h2>Daily Minimum, Mean, and Maximum Streamflow at a Site:</h2>
+        <div id="plot1" style="width:95%; height:500px;"></div>
+        <script>
+            GWIS.plot({
+                div_id      : "plot1",  // plot div
+                iv_or_dv    : "dv",     // daily values
+                period      : "p1000d", // past 1000 days
+                date_window : 25,       // startup showing last 25% of requested period
+                y_logscale  : true,     // startup using log y-axis
+                series : [              // add multiple data lines, in this order:
+                    { site:"08158000", pcode:"00060", dv_stat:"00001", label:"Daily Maximum", stroke_width:2, stroke_pattern:[7,3], color: "#900" }, // daily maximum streamflow
+                    { site:"08158000", pcode:"00060", dv_stat:"00003", label:"Daily Mean",    stroke_width:4, stroke_pattern:[],    color: "#58c" }, // daily mean    streamflow
+                    { site:"08158000", pcode:"00060", dv_stat:"00002", label:"Daily Minimum", stroke_width:2, stroke_pattern:[7,3], color: "#900" }  // daily minimum streamflow
+                ],
+                title    : "Colorado River at Austin, TX",      // plot title
+                ylabel   : "Streamflow, in ft<sup>3</sup>/sec", // y-axis label
+                controls : [       // add  these controls below plot, in this order:
+                    "full_screen", //   (button)   toggles full screen mode for enlarging plot
+                    "full_range",  //   (button)   zooms plot to full timespan
+                    "y_logscale",  //   (checkbox) toggles y-scale logscale
+                    "y_fixscale"   //   (checkbox) toggles whether the y-scale is fixed to the full y-range
+                ]
+            });
+        </script>
+        
+        <!-- create plot in document div -->
+        <h2>Dissolved Oxygen at Four Different Sites:</h2>
+        <div id="plot2" style="width:95%; height:500px;"></div>
+        <script>
+            GWIS.plot({
+                div_id      : "plot2", // plot div
+                iv_or_dv    : "iv",    // daily values
+                period      : "p10d",  // past 10 days
+                date_window : 25,      // startup showing last 25% of requested period
+                y_logscale  : false,   // startup using log y-axis
+                series : [             // add multiple data lines, in down-stream order:
+                    { site:"08371500", pcode:"00300", color:"#900", "label":"Above Rio Conchos near Presidio (Upstream)"   },
+                    { site:"08374200", pcode:"00300", color:"#f96", "label":"Below Rio Conchos near Presidio"              },
+                    { site:"08374510", pcode:"00300", color:"#090", "label":"Santa Elena Canyon"                           },
+                    { site:"08375300", pcode:"00300", color:"#009", "label":"At Rio Grande Village, Big Bend (Downstream)" }
+                ],
+                title    : "Gages Along the Rio Grande River, TX", // plot title
+                ylabel   : "Dissolved Oxygen, in mg/L",            // y-axis label
+                controls : "all"                                   // add all available controls below plot
+            });
+        </script>
+        
+    </body>
+</html>
+<!-- end GWIS JSAPI sample -->

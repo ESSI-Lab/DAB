@@ -12,7 +12,7 @@ package eu.essi_lab.ogc.pubsub._1_0;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -45,6 +45,34 @@ import eu.essi_lab.jaxb.ows._1_0_0.BoundingBoxType;
 import eu.essi_lab.jaxb.ows._1_0_0.DescriptionType;
 import eu.essi_lab.jaxb.ows._1_0_0.MetadataType;
 
+
+/**
+ * <p>Classe Java per PublicationType complex type.
+ * 
+ * <p>Il seguente frammento di schema specifica il contenuto previsto contenuto in questa classe.
+ * 
+ * <pre>
+ * &lt;complexType name="PublicationType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{http://www.opengis.net/ows/1.1}DescriptionType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="Identifier" type="{http://www.opengis.net/pubsub/1.0}PublicationIdentifierType"/&gt;
+ *         &lt;element name="ContentType" type="{http://www.opengis.net/ows/1.1}MimeType"/&gt;
+ *         &lt;element name="SupportedFilterLanguage" type="{http://www.w3.org/2001/XMLSchema}anyURI" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="SupportedDeliveryMethod" type="{http://www.w3.org/2001/XMLSchema}anyURI" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{http://www.opengis.net/ows/1.1}BoundingBox" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="FormalContentDefinitionLanguage" type="{http://www.w3.org/2001/XMLSchema}anyURI" minOccurs="0"/&gt;
+ *         &lt;element name="FormalContentDefinition" type="{http://www.w3.org/2001/XMLSchema}anyType" minOccurs="0"/&gt;
+ *         &lt;element ref="{http://www.opengis.net/ows/1.1}Metadata" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{http://www.opengis.net/pubsub/1.0}Extension" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "PublicationType", propOrder = {
     "identifier",

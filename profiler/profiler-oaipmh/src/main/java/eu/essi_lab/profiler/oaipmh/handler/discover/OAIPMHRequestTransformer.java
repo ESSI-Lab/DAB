@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.oaipmh.handler.discover;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,13 +29,12 @@ import java.util.Optional;
 
 import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.factory.DatabaseConsumerFactory;
-import eu.essi_lab.configuration.ConfigurationUtils;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.ResourceSelector;
-import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.ValidationMessage;
@@ -63,12 +62,19 @@ import eu.essi_lab.profiler.oaipmh.OAIPMHRequestReader;
 import eu.essi_lab.profiler.oaipmh.OAIPMHRequestValidator;
 import eu.essi_lab.profiler.oaipmh.OAIPMRequestFilter;
 import eu.essi_lab.profiler.oaipmh.token.ResumptionToken;
+
+/**
+ * @author Fabrizio
+ */
 public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
 
     /**
      *
      */
-    public static final int DEFAULT_ITEMS_PER_PAGE = 50;
+    public static final int DEFAULT_ITEMS_PER_PAGE = 10;
+    /**
+     * 
+     */
     private static final String OAI_PMH_POST_QUERY_EXTRACTION_ERROR = "OAI_PMH_POST_QUERY_EXTRACTION_ERROR";
 
     public OAIPMHRequestTransformer() {
@@ -246,10 +252,10 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
 	selector.addIndex(ResourceProperty.RESOURCE_TIME_STAMP);
 	message.setResourceSelector(selector);
 
-	StorageUri uri = ConfigurationUtils.getStorageURI();
+	StorageUri uri = ConfigurationWrapper.getDatabaseURI();
 	GSLoggerFactory.getLogger(OAIPMHRequestTransformer.class).debug("Storage uri: {}", uri);
 
-	DatabaseReader reader = new DatabaseConsumerFactory().createDataBaseReader(uri);
+	DatabaseReader reader = DatabaseConsumerFactory.createDataBaseReader(uri);
 
 	try {
 
@@ -328,7 +334,7 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
 
     private List<String> getHarvestedSourcesIds() throws GSException {
 
-	List<GSSource> allSources = ConfigurationUtils.getAllSources();
+	List<GSSource> allSources = ConfigurationWrapper.getAllSources();
 
 	ArrayList<String> ids = new ArrayList<>();
 	for (GSSource gsSource : allSources) {

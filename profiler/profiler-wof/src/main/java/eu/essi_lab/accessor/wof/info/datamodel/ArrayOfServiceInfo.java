@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof.info.datamodel;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,6 +27,10 @@ import javax.xml.transform.TransformerException;
 
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.lib.xml.XMLDocumentWriter;
+
+/**
+ * @author boldrini
+ */
 public class ArrayOfServiceInfo {
     private XMLDocumentReader reader;
     private XMLDocumentWriter writer;

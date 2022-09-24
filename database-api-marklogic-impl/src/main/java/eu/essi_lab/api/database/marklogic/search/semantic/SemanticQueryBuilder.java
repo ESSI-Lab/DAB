@@ -1,10 +1,13 @@
+/**
+ * 
+ */
 package eu.essi_lab.api.database.marklogic.search.semantic;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,17 +27,12 @@ package eu.essi_lab.api.database.marklogic.search.semantic;
 import java.util.List;
 import java.util.Optional;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.sem.SemanticBrowsing;
 import eu.essi_lab.messages.sem.SemanticBrowsing.BrowsingAction;
 import eu.essi_lab.messages.sem.SemanticMessage;
 import eu.essi_lab.messages.sem.SemanticSearch;
-import eu.essi_lab.model.exceptions.DefaultGSExceptionHandler;
-import eu.essi_lab.model.exceptions.DefaultGSExceptionLogger;
-import eu.essi_lab.model.exceptions.DefaultGSExceptionReader;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.ontology.GSKnowledgeScheme;
 import eu.essi_lab.model.ontology.GSPredicate;
@@ -45,7 +43,7 @@ import eu.essi_lab.model.ontology.d2k.D2KGSOntologyLoader;
  */
 public class SemanticQueryBuilder {
 
-    @JsonIgnore
+    
     private static String rootType;
 
     static {
@@ -53,7 +51,7 @@ public class SemanticQueryBuilder {
 	    rootType = new D2KGSOntologyLoader().getRootOWLClass().toString();
 	} catch (GSException e) {
 
-	    DefaultGSExceptionLogger.log(new DefaultGSExceptionHandler(new DefaultGSExceptionReader(e)));
+	    e.log();
 	}
     }
 

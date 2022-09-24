@@ -4,7 +4,7 @@ package eu.essi_lab.model;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,37 +21,48 @@ package eu.essi_lab.model;
  * #L%
  */
 
+import java.io.Serializable;
 import java.net.URI;
-import java.net.URISyntaxException;
-
-import org.slf4j.Logger;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.configuration.GSJSONSerializable;
-public class StorageUri extends GSJSONSerializable {
 
+/**
+ * A POJO which encapsulates information about a generic storage (for example a database)
+ *
+ * @author Fabrizio
+ */
+public class StorageUri implements Serializable {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 4119671755722377148L;
     private String storageUri;
     private String storageName;
     private String configFolder;
     private String password;
     private String user;
 
-    @JsonIgnore
-    private  transient Logger logger = GSLoggerFactory.getLogger(StorageUri.class);
-
     public StorageUri() {
     }
 
+    /**
+     * @param uri
+     */
     public StorageUri(String uri) {
-	storageUri = uri;
 
+	if (uri == null) {
+
+	    GSLoggerFactory.getLogger(getClass()).error("URI parameter cannot be null");
+	    throw new IllegalArgumentException("URI parameter cannot be null");
+	}
+
+	storageUri = uri;
 	parse();
     }
 
-    @JsonIgnore
     private void parse() {
+
 	URI url = null;
 
 	try {
@@ -59,96 +70,117 @@ public class StorageUri extends GSJSONSerializable {
 
 	    String scheme = url.getScheme();
 
-	    if (scheme != null && "file".equalsIgnoreCase(scheme))
+	    if (scheme != null && "file".equalsIgnoreCase(scheme)) {
+
 		return;
+	    }
 
 	    String userinfo = url.getUserInfo();
 
-	    if (userinfo != null && !"".equalsIgnoreCase(userinfo)) {
+	    if (userinfo != null && !userinfo.isEmpty()) {
+
 		String[] split = userinfo.split(":");
 
 		user = split[0];
 
-		if (split.length > 1)
+		if (split.length > 1) {
 		    password = split[1];
+		}
 
 		storageUri = storageUri.replace(userinfo + "@", "");
-
 	    }
 
 	    String path = url.getPath();
 
 	    if (path != null && !"".equalsIgnoreCase(path)) {
+
 		String[] split = path.split("/");
 
-		if (split.length < 2)
+		if (split.length < 2) {
 		    return;
+		}
 
 		storageName = split[1];
 
-		if (split.length > 2)
+		if (split.length > 2) {
 		    configFolder = split[2];
+		}
 
 		storageUri = storageUri.replace(path, "");
-
 	    }
 
-	} catch (URISyntaxException e) {
+	} catch (Exception e) {
 
-	    logger.debug("URISyntaxException parsing {} {}", storageUri, e);
-
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
-
     }
 
     public String getUri() {
+
+	if (storageUri != null && storageUri.startsWith("file://")) {
+
+	    String uri = new String(storageUri);
+	    return uri.replace("file://", "");
+	}
+
 	return storageUri;
     }
 
     public void setUri(String url) {
+
 	this.storageUri = url;
     }
 
     public String getStorageName() {
+
 	return storageName;
     }
 
     public void setStorageName(String dataBaseName) {
+
 	this.storageName = dataBaseName;
     }
 
     public String getConfigFolder() {
+
 	return configFolder;
     }
 
     public void setConfigFolder(String storageFolder) {
+
 	this.configFolder = storageFolder;
     }
 
     public String getPassword() {
+
 	return password;
     }
 
     public void setPassword(String password) {
+
 	this.password = password;
     }
 
     public void setUser(String user) {
+
 	this.user = user;
     }
 
     public String getUser() {
+
 	return user;
     }
 
     @Override
     public boolean equals(Object object) {
 
-	if (object == null)
+	if (object == null) {
 	    return false;
+	}
 
-	if (!(object instanceof StorageUri))
+	if (!(object instanceof StorageUri)) {
 	    return false;
+	}
 
 	StorageUri su = (StorageUri) object;
 
@@ -165,9 +197,9 @@ public class StorageUri extends GSJSONSerializable {
 
 	return "URI: " + this.storageUri + //
 		", folder: " + this.configFolder + //
-		", name: " + this.storageName ; //
-//		", user: " + this.user + //
-//		", password: " + this.password;
+		", name: " + this.storageName; //
+	// ", user: " + this.user + //
+	// ", password: " + this.password;
     }
 
     @Override
@@ -175,5 +207,4 @@ public class StorageUri extends GSJSONSerializable {
 
 	return toString().hashCode();
     }
-
 }

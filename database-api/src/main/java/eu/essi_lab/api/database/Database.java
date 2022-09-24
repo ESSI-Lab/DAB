@@ -4,7 +4,7 @@ package eu.essi_lab.api.database;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -20,7 +20,27 @@ package eu.essi_lab.api.database;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-public interface Database {
+
+import eu.essi_lab.cfga.Configurable;
+import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
+
+/**
+ * Marker interface for Database instances. A Database instance must be able to establish a single connection with a
+ * Database
+ * and to interact using different sessions<br>
+ * <br>
+ * <b>Implementation notes</b><br>
+ * <br>
+ * Implementation should publish a complete mid-level/low-level API to read and write
+ * the underlying system. This low-level API is published by {@link DatabaseConsumer} instances through
+ * high-level interfaces
+ * 
+ * @see DatabaseConsumer
+ * @see DatabaseReader
+ * @see DatabaseWriter
+ * @author Fabrizio
+ */
+public interface Database<T extends DatabaseSetting> extends Configurable<T> {
 
     /**
      * @author Fabrizio

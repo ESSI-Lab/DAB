@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.csw._2_0_2;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -38,6 +38,30 @@ import javax.xml.bind.annotation.XmlType;
 import eu.essi_lab.jaxb.filter._1_1_0.FilterCapabilities;
 import eu.essi_lab.jaxb.ows._1_0_0.CapabilitiesBaseType;
 
+
+/**
+ * This type extends ows:CapabilitiesBaseType defined in OGC-05-008 
+ *          to include information about supported OGC filter components. A 
+ *          profile may extend this type to describe additional capabilities.
+ * 
+ * <p>Classe Java per CapabilitiesType complex type.
+ * 
+ * <p>Il seguente frammento di schema specifica il contenuto previsto contenuto in questa classe.
+ * 
+ * <pre>
+ * &lt;complexType name="CapabilitiesType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{http://www.opengis.net/ows}CapabilitiesBaseType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element ref="{http://www.opengis.net/ogc}Filter_Capabilities"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "CapabilitiesType", propOrder = {
     "filterCapabilities"

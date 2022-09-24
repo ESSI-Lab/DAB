@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.csw;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -50,10 +50,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.w3c.dom.Node;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import eu.essi_lab.accessor.csw.parser.CSWOperationParser;
-import eu.essi_lab.cdk.harvest.AbstractHarvestedQueryConnector;
+import eu.essi_lab.cdk.harvest.wrapper.WrappedConnector;
 import eu.essi_lab.jaxb.common.CommonContext;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.jaxb.common.ObjectFactories;
@@ -75,16 +73,15 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
-import eu.essi_lab.model.Source;
-import eu.essi_lab.model.configuration.option.GSConfOption;
-import eu.essi_lab.model.configuration.option.GSConfOptionInteger;
-import eu.essi_lab.model.exceptions.DefaultGSExceptionHandler;
-import eu.essi_lab.model.exceptions.DefaultGSExceptionLogger;
-import eu.essi_lab.model.exceptions.DefaultGSExceptionReader;
+import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.OriginalMetadata;
-public class CSWConnector extends AbstractHarvestedQueryConnector {
+
+/**
+ * @author Fabrizio
+ */
+public class CSWConnector extends WrappedConnector {
 
     public static final String CSW_EXCEPTIO_REPORT_ERROR = "CSW_EXCEPTIO_REPORT_ERROR";
     public static final String CSW_GETRECORDS_UNMARSHALL_ERROR = "CSW_GETRECORDS_UNMARSHALL_ERROR";
@@ -93,16 +90,14 @@ public class CSWConnector extends AbstractHarvestedQueryConnector {
     String getRecordsURLGET;
     String getRecordsURLPOSTXML;
     String getRecordsURLPOSTSOAP;
-    protected transient Map<String, QName> supportedTypesBySchema = new HashMap<>();
-    @JsonIgnore
-    protected transient List<String> supportedOutputSchemas = new ArrayList<>();
+    protected Map<String, QName> supportedTypesBySchema = new HashMap<>();
+
+    protected List<String> supportedOutputSchemas = new ArrayList<>();
     protected static final String CSW_CONNECTOR_PAGESIZE_OPTION_KEY = "CSW_CONNECTOR_PAGESIZE_OPTION_KEY";
-    /**
-     *
-     */
-    private static final long serialVersionUID = -3882045719832526204L;
     private static final String CSW_CONNECTOR_CAPABILITIES_EXTRACTION_ERROR = "CSW_CONNECTOR_CAPABILITIES_EXTRACTION_ERROR";
     private static final String CSW_CONNECTOR_METADATA_NODE_AS_STRING_ERROR = "CSW_CONNECTOR_METADATA_NODE_AS_STRING_ERROR";
+    private static final String CSW_CONNECTOR_FIX_GET_RECORDS_RESPONSE_ERROR = "CSW_CONNECTOR_FIX_GET_RECORDS_RESPONSE_ERROR";
+
     // the source URL as input by the user
     private String sourceURL;
     private Binding getRecordsBinding = Binding.POST_XML;
@@ -110,8 +105,8 @@ public class CSWConnector extends AbstractHarvestedQueryConnector {
     // by default request is set to 10
     private int requestSizeDefault = 100;
     private static final String GET_RECORDS_OPERATION_NAME = "GetRecords";
-    @JsonIgnore
-    private transient Capabilities capabilitiesDocument;
+
+    private Capabilities capabilitiesDocument;
     private static final String PREFERRED_VERSION = "2.0.2";
     private static final String ACCEPTED_VERSION = "2.0.2";
     private static final String OUTPUT_FORMAT = "application/xml";
@@ -121,29 +116,30 @@ public class CSWConnector extends AbstractHarvestedQueryConnector {
 	GET, POST_XML, POST_SOAP
     }
 
+    /**
+     * 
+     */
+    public static final String TYPE = "CSW Connector";
+
+    /**
+     * 
+     */
     public CSWConnector() {
 
 	startIndex = 1;
 
-	GSConfOption<Integer> pageSizeOption = new GSConfOptionInteger();
-	pageSizeOption.setLabel("GetRecords page size");
-	pageSizeOption.setKey(CSW_CONNECTOR_PAGESIZE_OPTION_KEY);
-	pageSizeOption.setValue(requestSizeDefault);
-	getSupportedOptions().put(pageSizeOption.getKey(), pageSizeOption);
+	//
+	// default page size 100
+	//
+	getSetting().selectPageSize(requestSizeDefault);
     }
 
     /**
      * @return
      */
-    protected GSConfOptionInteger getPageSizeOption() {
+    protected int getPageSizeOption() {
 
-	return (GSConfOptionInteger) getSupportedOptions().get(CSW_CONNECTOR_PAGESIZE_OPTION_KEY);
-    }
-
-    @Override
-    public String getLabel() {
-
-	return "CSW Connector";
+	return getSetting().getSelectedPageSize();
     }
 
     public Binding getGetRecordsBinding() {
@@ -198,7 +194,8 @@ public class CSWConnector extends AbstractHarvestedQueryConnector {
 		    null, //
 		    ErrorInfo.ERRORTYPE_SERVICE, //
 		    ErrorInfo.SEVERITY_ERROR, //
-		    CSW_EXCEPTIO_REPORT_ERROR, e1);
+		    CSW_EXCEPTIO_REPORT_ERROR,//
+		    e1);
 	}
     }
 
@@ -213,7 +210,7 @@ public class CSWConnector extends AbstractHarvestedQueryConnector {
     }
 
     private int getRecordsLimit() {
-	Optional<Integer> op = getMaxRecords();
+	Optional<Integer> op = getSetting().getMaxRecords();
 
 	return op.isPresent() ? op.get() : -100;
     }
@@ -231,7 +228,7 @@ public class CSWConnector extends AbstractHarvestedQueryConnector {
 
 	int recordsLimit = getRecordsLimit();
 
-	if (!isMaxRecordsUnlimited() && startPosition >= recordsLimit) {
+	if (!getSetting().isMaxRecordsUnlimited() && startPosition >= recordsLimit) {
 	    // max records reached - collection of new records is stopped
 	    ret.setResumptionToken(null);
 
@@ -314,8 +311,12 @@ public class CSWConnector extends AbstractHarvestedQueryConnector {
 	    // all records have been returned
 	    ret.setResumptionToken(null);
 	}
-	if (!isMaxRecordsUnlimited() && currentPosition > recordsLimit) {
+	if (!getSetting().isMaxRecordsUnlimited() && currentPosition > recordsLimit) {
 	    ret.setResumptionToken(null);
+	}
+
+	if (ret.getResumptionToken() == null) {
+	    addExternalResources(ret);
 	}
 
 	return ret;
@@ -327,6 +328,16 @@ public class CSWConnector extends AbstractHarvestedQueryConnector {
      * @param ret
      */
     public void filterResults(ListRecordsResponse<OriginalMetadata> ret) {
+
+    }
+
+    /**
+     * Sub connectors might implement this method to add external datasets (e.g. adding an THREDDS server in the same
+     * GEONETWORK catalogue)
+     * 
+     * @param ret
+     */
+    public void addExternalResources(ListRecordsResponse<OriginalMetadata> ret) {
 
     }
 
@@ -496,7 +507,12 @@ public class CSWConnector extends AbstractHarvestedQueryConnector {
 	    file1.delete();
 	    return file2;
 	} catch (IOException e) {
-	    throw new GSException();
+	    throw GSException.createException(//
+		    getClass(), //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    CSW_CONNECTOR_FIX_GET_RECORDS_RESPONSE_ERROR, //
+		    e);
 	}
     }
 
@@ -561,10 +577,9 @@ public class CSWConnector extends AbstractHarvestedQueryConnector {
 
 	if (supportedOutputSchemas != null && !supportedOutputSchemas.isEmpty()) {
 
-	    GSLoggerFactory.getLogger(CSWConnector.class).debug("Capabilities already parsed, returning");
+	    // GSLoggerFactory.getLogger(CSWConnector.class).debug("Capabilities already parsed, returning");
 
 	    return;
-
 	}
 
 	GSLoggerFactory.getLogger(CSWConnector.class).trace("SupportedSchemas is null, getting capabilities document");
@@ -597,8 +612,8 @@ public class CSWConnector extends AbstractHarvestedQueryConnector {
 
 	if (supportedOutputSchemas == null || supportedOutputSchemas.isEmpty()) {
 
-	    GSLoggerFactory.getLogger(CSWConnector.class).error("No Supported Schemas where found in {} with url {}", getLabel(),
-		    sourceURL);
+	    GSLoggerFactory.getLogger(CSWConnector.class).error("No Supported Schemas where found in connector with url {}", //
+		    sourceURL);//
 
 	    throw GSException.createException( //
 		    getClass(), //
@@ -708,11 +723,9 @@ public class CSWConnector extends AbstractHarvestedQueryConnector {
      *
      * @return
      */
-    @JsonIgnore
     public int getRequestSize() {
 
-	return getPageSizeOption().getValue();
-
+	return getPageSizeOption();
     }
 
     @Override
@@ -753,7 +766,6 @@ public class CSWConnector extends AbstractHarvestedQueryConnector {
 
     }
 
-    @JsonIgnore
     public Capabilities getCapabilities(String sourceURL, boolean silent) throws GSException {
 
 	GSLoggerFactory.getLogger(CSWConnector.class).trace("Retrieving Capabilities Document");
@@ -831,7 +843,7 @@ public class CSWConnector extends AbstractHarvestedQueryConnector {
     }
 
     @Override
-    public boolean supports(Source source) {
+    public boolean supports(GSSource source) {
 	try {
 	    Capabilities capabilities = getCapabilities(source.getEndpoint(), true);
 	    if (capabilities != null) {
@@ -842,7 +854,7 @@ public class CSWConnector extends AbstractHarvestedQueryConnector {
 		GSLoggerFactory.getLogger(CSWConnector.class).trace("Exception testing support of {} with endpoint {}", source.getLabel(),
 			source.getEndpoint());
 
-	    DefaultGSExceptionLogger.log(new DefaultGSExceptionHandler(new DefaultGSExceptionReader(e)));
+	    e.log();
 	}
 
 	return false;
@@ -864,4 +876,9 @@ public class CSWConnector extends AbstractHarvestedQueryConnector {
 	this.startIndex = startIndex;
     }
 
+    @Override
+    public String getType() {
+
+	return TYPE;
+    }
 }

@@ -1,0 +1,250 @@
+<jxb:bindings xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/jaxb http://java.sun.com/xml/ns/jaxb/bindingschema_2_0.xsd"
+    version="2.0">
+    <jxb:bindings schemaLocation="schemas/wmdr.1.0.rc.6.xsd" node="/xs:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="eu.floraresearch.wigos._1_0.main"/>
+        </jxb:schemaBindings>
+        <jxb:bindings node="//xs:element[@name='description'][../../../../@name='AbstractEnvironmentalMonitoringFacilityType']">
+            <jxb:property name="FacilityDescription"/>
+        </jxb:bindings>	
+    </jxb:bindings>
+        <jxb:bindings schemaLocation="schemas/metce/1.0/metce.xsd" node="/xs:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="eu.floraresearch.wigos._1_0.metce"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="schemas/sampling/2.0/samplingFeature.xsd" node="/xs:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="eu.floraresearch.wigos._1_0.sampling"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="schemas/gml/3.3/extdEncRule.xsd" node="/xs:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="eu.floraresearch.wigos._1_0.gmlexr"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="schemas/iso/19139/20070417/gmd/gmd.xsd" node="/xs:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="eu.floraresearch.wigos._1_0.gmd"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="schemas/gml/3.2.1/geometryPrimitives.xsd">
+		<jxb:bindings node="//xs:element[@name='rows']">
+            <jxb:property name="PointGridRows"/>
+        </jxb:bindings>		
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="http://www.w3.org/1999/xlink.xsd">
+    <jxb:schemaBindings>
+            <jxb:package name="eu.floraresearch.wigos._1_0.xlink"/>
+        </jxb:schemaBindings>
+		<jxb:bindings node="//xs:element[@ref='xlink:title'][../../@name='locatorModel']">
+            <jxb:property name="LocatorModelTitle"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@ref='xlink:title'][../../@name='arcModel']">
+            <jxb:property name="LocatorModelTitle"/>
+        </jxb:bindings>		
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="schemas/opm/1.0/opm.xsd" node="/xs:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="eu.floraresearch.wigos._1_0.opm"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+        <jxb:bindings schemaLocation="schemas/om/2.0/observation.xsd" node="/xs:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="eu.floraresearch.wigos._1_0.om"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+            <jxb:bindings schemaLocation="schemas/samplingSpatial/2.0/spatialSamplingFeature.xsd" node="/xs:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="eu.floraresearch.wigos._1_0.ssf"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+                <jxb:bindings schemaLocation="schemas/iso/19139/20070417/gco/gco.xsd" node="/xs:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="eu.floraresearch.wigos._1_0.gco"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+                 <jxb:bindings schemaLocation="schemas/iso/19139/20070417/gsr/gsr.xsd" node="/xs:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="eu.floraresearch.wigos._1_0.gsr"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+                     <jxb:bindings schemaLocation="schemas/iso/19139/20070417/gss/gss.xsd" node="/xs:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="eu.floraresearch.wigos._1_0.gss"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+                     <jxb:bindings schemaLocation="schemas/iso/19139/20070417/gts/gts.xsd" node="/xs:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="eu.floraresearch.wigos._1_0.gts"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+    
+    
+    
+
+     
+ 
+    <!-- GML -->
+    <jxb:bindings schemaLocation="schemas/gml/3.2.1/gml.xsd" node="/xs:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="eu.floraresearch.wigos._1_0.gml._3_2_1"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+    <!--jxb:bindings schemaLocation="schemas/gml/3.2.1/gmlBase.xsd">
+        <jxb:bindings node="//xs:element[@ref='gml:member']">
+            <jxb:property name="SingleMember"/>
+        </jxb:bindings>
+    </jxb:bindings-->
+    <!--jxb:bindings schemaLocation="schemas/gml/3.2.1/feature.xsd">
+        <jxb:bindings node="//xs:element[@ref='gml:featureMember']">
+            <jxb:property name="FeatureMemberSingleMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@ref='gml:featureMembers']">
+            <jxb:property name="FeatureMemberMultipleMember"/>
+        </jxb:bindings>
+    </jxb:bindings-->
+
+    <jxb:bindings schemaLocation="schemas/gml/3.2.1/geometryAggregates.xsd">
+        <jxb:bindings node="//xs:element[@name='pointMember']">
+            <jxb:class name="SinglePointMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='pointMembers']">
+            <jxb:class name="MultiplePointMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@ref='gml:pointMember']">
+            <jxb:property name="SinglePointMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@ref='gml:pointMembers']">
+            <jxb:property name="MultiplePointMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='surfaceMembers']">
+            <jxb:class name="MultipleSurfaceMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@ref='gml:surfaceMember']">
+            <jxb:property name="SingleSurfaceMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@ref='gml:surfaceMembers']">
+            <jxb:property name="MultipleSurfaceMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@ref='gml:solidMembers']">
+            <jxb:property name="MultipleSolidMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@ref='gml:geometryMembers']">
+            <jxb:property name="MultipleGeometryMember"/>
+        </jxb:bindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="schemas/gml/3.2.1/grids.xsd">
+        <jxb:bindings node="//xs:element[@name='axisLabels']">
+            <jxb:property name="MultipleAxisLabels"/>
+        </jxb:bindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="schemas/gml/3.2.1/geometryPrimitives.xsd">
+        <jxb:bindings node="//xs:element[@name='surfaceMember']">
+            <jxb:class name="SingleSurfaceMember"/>
+        </jxb:bindings>
+        <!--jxb:bindings node="//xs:element[@name='rows']">
+            <jxb:property name="MultipleRows"/>
+        </jxb:bindings-->
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="schemas/gml/3.2.1/geometryAggregates.xsd">
+        <jxb:bindings node="//xs:element[@name='curveMembers']">
+            <jxb:property name="MultipleCurveMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='solidMember']">
+            <jxb:class name="SingleSolidMember"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='solidMembers']">
+            <jxb:class name="MultipleSolidMember"/>
+        </jxb:bindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="schemas/gml/3.2.1/valueObjects.xsd">
+        <jxb:bindings node="//xs:element[@ref='gml:valueComponents']">
+            <jxb:property name="MultipleValueComponent"/>
+        </jxb:bindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="schemas/gml/3.2.1/topology.xsd">
+        <jxb:bindings node="//xs:element[@ref='gml:topoPrimitiveMembers']">
+            <jxb:property name="MultipleTopoPrimitiveMember"/>
+        </jxb:bindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="schemas/gml/3.2.1/datums.xsd">
+        <jxb:bindings node="//xs:element[@name='secondDefiningParameter']">
+            <jxb:class name="SecondDefiningParameterProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='primeMeridian']">
+            <jxb:class name="PrimeMeridianProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='ellipsoid']">
+            <jxb:class name="EllipsoidProperty"/>
+        </jxb:bindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="schemas/gml/3.2.1/coordinateReferenceSystems.xsd">
+        <jxb:bindings node="//xs:element[@name='temporalDatum']">
+            <jxb:class name="TemporalDatumProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='ellipsoidalCS']">
+            <jxb:class name="EllipsoidalCSProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='timeCS']">
+            <jxb:class name="TimeCSProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='verticalDatum']">
+            <jxb:class name="VerticalDatumProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='conversion']">
+            <jxb:class name="ConversionProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='geodeticDatum']">
+            <jxb:class name="GeodeticDatumProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='affineCS']">
+            <jxb:class name="AffineCSProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='cartesianCS']">
+            <jxb:class name="CartesianCSProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='sphericalCS']">
+            <jxb:class name="SphericalCSProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='verticalCS']">
+            <jxb:class name="VerticalCSProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='engineeringDatum']">
+            <jxb:class name="EngineeringDatumProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='imageDatum']">
+            <jxb:class name="ImageDatumProperty"/>
+        </jxb:bindings>
+    </jxb:bindings>
+	 <jxb:bindings schemaLocation="schemas/gml/3.2.1/coordinateSystems.xsd">
+	    <jxb:bindings node="//xs:element[@name='CylindricalCS']">
+	        <jxb:class name="CylindricalCS1"/>
+	    </jxb:bindings>
+	    <jxb:bindings node="//xs:element[@name='LinearCS']">
+	        <jxb:class name="LinearCS1"/>
+	    </jxb:bindings>
+	    <jxb:bindings node="//xs:element[@name='PolarCS']">
+	        <jxb:class name="PolarCS1"/>
+	    </jxb:bindings>
+	    <jxb:bindings node="//xs:element[@name='UserDefinedCS']">
+	        <jxb:class name="UserDefinedCS1"/>
+	    </jxb:bindings>
+	 </jxb:bindings>
+    <jxb:bindings schemaLocation="schemas/gml/3.2.1/coordinateOperations.xsd">
+        <jxb:bindings node="//xs:element[@name='operationParameter']">
+            <jxb:class name="OperationParameterProperty"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='parameterValue']">
+            <jxb:class name="ParameterValueProperty"/>
+        </jxb:bindings>
+    </jxb:bindings>
+    
+    <jxb:globalBindings fixedAttributeAsConstantProperty="true"/>
+</jxb:bindings>
+
+ 

@@ -4,7 +4,7 @@ package eu.essi_lab.lib.utils;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,26 +21,22 @@ package eu.essi_lab.lib.utils;
  * #L%
  */
 
-import java.io.Serializable;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.io.PrintStream;
 
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
+
+import com.google.common.base.Charsets;
+
+/**
+ * @author Fabrizio
+ */
 public class GSLoggerFactory {
 
     static {
-	String hostname = "unknown";
-	try {
-	    hostname = InetAddress.getLocalHost().getHostName();
-	} catch (UnknownHostException e1) {
-	    e1.printStackTrace();
-	}
-	System.out.println("Setting hostname property: " + hostname);
-	System.setProperty("HostName", hostname);
-	PropertyConfigurator.configure(GSLoggerFactory.class.getClassLoader().getResource("log4j.properties"));
+	HostNamePropertyUtils.setHostNameProperty();
     }
 
     /**
@@ -344,6 +340,14 @@ public class GSLoggerFactory {
 	public void error(String msg, Throwable t) {
 
 	    logger.error(msg, t);
+	}
+
+	/**
+	 * @param t
+	 */
+	public void error(Throwable t) {
+
+	    logger.error(t.getMessage(), t);
 	}
 
 	@Override

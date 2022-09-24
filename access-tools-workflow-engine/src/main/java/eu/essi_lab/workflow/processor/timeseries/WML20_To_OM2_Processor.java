@@ -4,7 +4,7 @@ package eu.essi_lab.workflow.processor.timeseries;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -37,6 +37,8 @@ import eu.essi_lab.workflow.processor.TargetHandler;
 
 public class WML20_To_OM2_Processor extends DataProcessor {
 
+    private static final String WML_20_TO_OM2_PROCESSOR_ERROR = "WML_20_TO_OM2_PROCESSOR_ERROR";
+
     public WML20_To_OM2_Processor() {
     }
 
@@ -66,7 +68,7 @@ public class WML20_To_OM2_Processor extends DataProcessor {
 	try {
 
 	    OMObservationType observation = collection.getObservationMember().get(0).getOMObservation();
-	    
+
 	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	    JAXBWML2.getInstance().marshal(observation, baos);
 	    baos.close();
@@ -81,11 +83,13 @@ public class WML20_To_OM2_Processor extends DataProcessor {
     }
 
     private GSException getGSException(String message) {
-	GSException ret = new GSException();
-	ErrorInfo info = new ErrorInfo();
-	info.setErrorDescription(message);
-	ret.addInfo(info);
-	return ret;
+
+	return GSException.createException(//
+		getClass(), //
+		message, //
+		ErrorInfo.ERRORTYPE_INTERNAL, //
+		ErrorInfo.SEVERITY_ERROR, //
+		WML_20_TO_OM2_PROCESSOR_ERROR);
 
     }
 

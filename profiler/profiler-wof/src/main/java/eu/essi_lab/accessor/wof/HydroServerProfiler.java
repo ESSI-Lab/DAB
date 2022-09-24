@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -84,6 +84,7 @@ import eu.essi_lab.accessor.wof.discovery.variables.GetVariablesResultSetMapper;
 import eu.essi_lab.accessor.wof.discovery.variables.GetVariablesTransformer;
 import eu.essi_lab.accessor.wof.wsdl.HydroServerWSDLHandler;
 import eu.essi_lab.accessor.wof.wsdl.WSDLRequestFilter;
+import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.jaxb.csw._2_0_2.ExceptionCode;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.ValidationMessage;
@@ -93,12 +94,17 @@ import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.model.resource.data.DataObject;
 import eu.essi_lab.pdk.Profiler;
-import eu.essi_lab.pdk.ProfilerInfo;
 import eu.essi_lab.pdk.handler.AccessHandler;
 import eu.essi_lab.pdk.handler.DefaultRequestHandler;
 import eu.essi_lab.pdk.handler.DiscoveryHandler;
 import eu.essi_lab.pdk.handler.WebRequestHandler;
 import eu.essi_lab.pdk.handler.selector.HandlerSelector;
+
+/**
+ * Profiler implementing CUAHSI HIS Server protocol
+ * 
+ * @author boldrini
+ */
 public class HydroServerProfiler extends Profiler {
 
     /**
@@ -106,7 +112,7 @@ public class HydroServerProfiler extends Profiler {
      */
     private static final String HYDRO_SERVER_PROFILER_TYPE = "HYDRO-SERVER";
 
-    public static final ProfilerInfo HYDRO_SERVER_INFO = new ProfilerInfo();
+    public static final ProfilerSetting HYDRO_SERVER_INFO = new ProfilerSetting();
     static {
 	HYDRO_SERVER_INFO.setServiceName("CUAHSI Hydro Server");
 	HYDRO_SERVER_INFO.setServiceType(HYDRO_SERVER_PROFILER_TYPE);
@@ -362,7 +368,7 @@ public class HydroServerProfiler extends Profiler {
     }
 
     @Override
-    public ProfilerInfo getProfilerInfo() {
+    protected ProfilerSetting initSetting() {
 
 	return HYDRO_SERVER_INFO;
     }

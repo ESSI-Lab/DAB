@@ -21,10 +21,6 @@ package eu.essi_lab.gssrv.starter;
  * #L%
  */
 
-import java.util.ServiceConfigurationError;
-import java.util.ServiceLoader;
-
-import eu.essi_lab.api.configuration.storage.IGSConfigurationStorage;
 import eu.essi_lab.api.database.DatabaseProvider;
 import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.DatabaseWriter;
@@ -32,8 +28,6 @@ import eu.essi_lab.api.database.SourceStorage;
 import eu.essi_lab.cdk.IDriverConnector;
 import eu.essi_lab.cdk.harvest.IHarvestedQueryConnector;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.configuration.IGSMainConfigurable;
-import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.ommdk.IResourceMapper;
 import eu.essi_lab.pdk.Profiler;
@@ -47,11 +41,11 @@ public class ServiceLoaderChecker {
 
     public ServiceLoaderChecker() throws GSException {
 	GSLoggerFactory.getLogger(this.getClass()).info("Checking loading of common services.");
-	checkService(IGSMainConfigurable.class);
+//	checkService(IGSMainConfigurable.class);
 	checkService(IResourceMapper.class);
 	checkService(IHarvestedQueryConnector.class);
 	checkService(IDriverConnector.class);
-	checkService(IGSConfigurationStorage.class);
+//	checkService(IGSConfigurationStorage.class);
 	checkService(DatabaseProvider.class);
 	checkService(DatabaseReader.class);
 	checkService(DatabaseWriter.class);
@@ -66,18 +60,18 @@ public class ServiceLoaderChecker {
     }
 
     private void checkService(Class<?> clazz) throws GSException {
-	GSLoggerFactory.getLogger(this.getClass()).info("Checking service type: " + clazz.getCanonicalName());
-	ServiceLoader<?> services = ServiceLoader.load(clazz);
-	try {
-	    for (Object service : services) {
-		GSLoggerFactory.getLogger(this.getClass()).info(clazz.getSimpleName() + " " + service.getClass().getCanonicalName() + " loaded.");
-	    }
-	} catch (ServiceConfigurationError e) {
-	    System.err.println(e.getMessage());
-	    throw GSException.createException(this.getClass(), "Service Loader Checker", null, null, ErrorInfo.ERRORTYPE_INTERNAL,
-		    ErrorInfo.SEVERITY_FATAL, ERR_ID_SERVICE_LOADER_CHECKER, e);
-	}
-	GSLoggerFactory.getLogger(this.getClass()).info("");
+//	GSLoggerFactory.getLogger(this.getClass()).info("Checking service type: " + clazz.getCanonicalName());
+//	ServiceLoader<?> services = ServiceLoader.load(clazz);
+//	try {
+//	    for (Object service : services) {
+//		GSLoggerFactory.getLogger(this.getClass()).info(clazz.getSimpleName() + " " + service.getClass().getCanonicalName() + " loaded.");
+//	    }
+//	} catch (ServiceConfigurationError e) {
+//	    System.err.println(e.getMessage());
+//	    throw GSException.createException(this.getClass(), "Service Loader Checker", null, null, ErrorInfo.ERRORTYPE_INTERNAL,
+//		    ErrorInfo.SEVERITY_FATAL, ERR_ID_SERVICE_LOADER_CHECKER, e);
+//	}
+//	GSLoggerFactory.getLogger(this.getClass()).info("");
 
     }
 }

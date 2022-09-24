@@ -1,0 +1,4 @@
+eu.essi_lab.access.augmenter.AccessAugmenter
+eu.essi_lab.access.augmenter.EasyAccessAugmenter
+eu.essi_lab.access.augmenter.RemoveAccessAugmenter
+eu.essi_lab.access.augmenter.DownloadReportToSSCScoreAugmenter

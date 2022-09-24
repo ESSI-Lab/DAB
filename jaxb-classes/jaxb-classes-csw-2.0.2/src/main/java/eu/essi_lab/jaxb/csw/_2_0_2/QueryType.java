@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.csw._2_0_2;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -41,6 +41,42 @@ import javax.xml.namespace.QName;
 
 import eu.essi_lab.jaxb.filter._1_1_0.SortByType;
 
+
+/**
+ * Specifies a query to execute against instances of one or
+ *          more object types. A set of ElementName elements may be included 
+ *          to specify an adhoc view of the csw:Record instances in the result 
+ *          set. Otherwise, use ElementSetName to specify a predefined view. 
+ *          The Constraint element contains a query filter expressed in a 
+ *          supported query language. A sorting criterion that specifies a 
+ *          property to sort by may be included.
+ * 
+ *          typeNames - a list of object types to query.
+ * 
+ * <p>Classe Java per QueryType complex type.
+ * 
+ * <p>Il seguente frammento di schema specifica il contenuto previsto contenuto in questa classe.
+ * 
+ * <pre>
+ * &lt;complexType name="QueryType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{http://www.opengis.net/cat/csw/2.0.2}AbstractQueryType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;choice&gt;
+ *           &lt;element ref="{http://www.opengis.net/cat/csw/2.0.2}ElementSetName"/&gt;
+ *           &lt;element name="ElementName" type="{http://www.w3.org/2001/XMLSchema}QName" maxOccurs="unbounded"/&gt;
+ *         &lt;/choice&gt;
+ *         &lt;element ref="{http://www.opengis.net/cat/csw/2.0.2}Constraint" minOccurs="0"/&gt;
+ *         &lt;element ref="{http://www.opengis.net/ogc}SortBy" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attribute name="typeNames" use="required" type="{http://www.opengis.net/cat/csw/2.0.2}TypeNameListType" /&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "QueryType", propOrder = {
     "elementNames",

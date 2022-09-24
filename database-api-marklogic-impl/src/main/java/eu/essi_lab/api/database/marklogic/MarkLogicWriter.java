@@ -4,7 +4,7 @@ package eu.essi_lab.api.database.marklogic;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -50,7 +50,6 @@ import eu.essi_lab.model.resource.GSResource;
 
 public class MarkLogicWriter extends MarkLogicReader implements DatabaseWriter {
 
-    private static final long serialVersionUID = -3714745493434930747L;
     private static final String MARK_LOGIC_RESOURCE_STORAGE_ERROR = "MARK_LOGIC_RESOURCE_STORAGE_ERROR";
     private static final String MARK_LOGIC_RESOURCE_REMOVAL_ERROR = "MARK_LOGIC_RESOURCE_REMOVAL_ERROR";
     private static final String MARK_LOGIC_ONTOLOGY_OBJECT_STORAGE_ERROR = "MARK_LOGIC_ONTOLOGY_OBJECT_STORAGE_ERROR";
@@ -368,6 +367,10 @@ public class MarkLogicWriter extends MarkLogicReader implements DatabaseWriter {
 	}
 
     }
+
+    /**
+     * 
+     */
     protected Folder getProtectedFolder(String dirURI) throws RequestException {
 	MarkLogicDatabase markLogicDB = getDatabase();
 	Folder ret = markLogicDB.getFolder(dirURI);
@@ -405,7 +408,7 @@ public class MarkLogicWriter extends MarkLogicReader implements DatabaseWriter {
      */
     private Folder findWritingFolder(SourceStorageWorker worker) throws GSException, RequestException {
 
-	Folder folder = worker.getWritingFolder();
+	Folder folder = worker.getWritingFolder(Optional.empty());
 
 	if (folder == null) {
 

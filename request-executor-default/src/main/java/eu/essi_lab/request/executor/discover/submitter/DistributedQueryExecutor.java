@@ -4,7 +4,7 @@ package eu.essi_lab.request.executor.discover.submitter;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,8 +24,6 @@ package eu.essi_lab.request.executor.discover.submitter;
 import java.io.IOException;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -35,6 +33,8 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import eu.essi_lab.adk.distributed.IDistributedAccessor;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.driver.DriverSetting;
 import eu.essi_lab.identifierdecorator.IdentifierDecorator;
 import eu.essi_lab.lib.servlet.RequestManager;
 import eu.essi_lab.messages.Page;
@@ -47,21 +47,26 @@ import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
+import eu.essi_lab.model.shared.SharedContent;
+import eu.essi_lab.model.shared.SharedContent.SharedContentType;
 import eu.essi_lab.request.executor.query.IDistributedQueryExecutor;
-import eu.essi_lab.shared.messages.SharedContentReadResponse;
-import eu.essi_lab.shared.model.SharedContent;
-import eu.essi_lab.shared.yellowpage.GSYellowPage;
+import eu.essi_lab.shared.driver.DriverFactory;
+import eu.essi_lab.shared.driver.ISharedRepositoryDriver;
 
 public class DistributedQueryExecutor implements IDistributedQueryExecutor {
 
+    /**
+     * 
+     */
+    private static final String IDENTIFIER_DECORATOR_NOT_SET_ERROR = "IDENTIFIER_DECORATOR_NOT_SET";
+
     private IdentifierDecorator identifierDecorator = null;
 
+    @SuppressWarnings("rawtypes")
     private IDistributedAccessor accessor;
     private String sourceIdentifier;
-    private GSYellowPage yp;
 
-    private static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
-
+    @SuppressWarnings("rawtypes")
     public DistributedQueryExecutor(IDistributedAccessor accessor, String id) {
 	this.accessor = accessor;
 	this.sourceIdentifier = id;
@@ -75,16 +80,6 @@ public class DistributedQueryExecutor implements IDistributedQueryExecutor {
     @Override
     public void setIdentifierDecorator(IdentifierDecorator identifierDecorator) {
 	this.identifierDecorator = identifierDecorator;
-    }
-
-    @Override
-    public void setYp(GSYellowPage yp) {
-	this.yp = yp;
-    }
-
-    @Override
-    public GSYellowPage getYp() {
-	return this.yp;
     }
 
     @Override
@@ -155,25 +150,20 @@ public class DistributedQueryExecutor implements IDistributedQueryExecutor {
 	return ret;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public ResultSet<GSResource> retrieve(ReducedDiscoveryMessage message, Page page) throws GSException {
 
 	RequestManager.getInstance().addThreadName(message.getRequestId());
 
-	if (getYp() == null) {
-	    GSException gse = new GSException();
-	    ErrorInfo info = new ErrorInfo();
-	    info.setErrorDescription("Yellow pages not set in Distributed Query executor");
-	    gse.addInfo(info);
-	    throw gse;
-	}
-
 	if (getIdentifierDecorator() == null) {
-	    GSException gse = new GSException();
-	    ErrorInfo info = new ErrorInfo();
-	    info.setErrorDescription("Identifier decorator not set in Distributed Query executor");
-	    gse.addInfo(info);
-	    throw gse;
+	    
+	    throw GSException.createException(//
+		    getClass(), //
+		    "Identifier decorator not set in Distributed Query executor", //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    IDENTIFIER_DECORATOR_NOT_SET_ERROR);
 	}
 
 	ResultSet<GSResource> ret = new ResultSet<>();
@@ -184,7 +174,7 @@ public class DistributedQueryExecutor implements IDistributedQueryExecutor {
 
 	if (parser.isCanonicalQueryByIdentifiers()) {
 
-	    return retrieveFromYP(message);
+	    return retrieveCached(message);
 	}
 
 	ret = accessor.query(message, page);
@@ -195,17 +185,27 @@ public class DistributedQueryExecutor implements IDistributedQueryExecutor {
 
 	    getIdentifierDecorator().decorateDistributedIdentifier(result);
 
-	    EXECUTOR_SERVICE.execute(new Runnable() {
-		@Override
-		public void run() {
-		    getYp().store(result);
-		}
-	    });
+	    DriverSetting setting = ConfigurationWrapper.getSharedCacheDriverSetting();
+
+	    ISharedRepositoryDriver<?> driver = DriverFactory.getConfiguredDriver(setting, true);
+
+	    SharedContent<GSResource> sharedContent = new SharedContent<>();
+	    sharedContent.setType(SharedContentType.GS_RESOURCE_TYPE);
+	    sharedContent.setIdentifier(result.getPrivateId());
+	    sharedContent.setContent(result);
+
+	    driver.store(sharedContent);
 	}
 
 	return ret;
     }
-    private ResultSet<GSResource> retrieveFromYP(ReducedDiscoveryMessage message) throws GSException {
+
+    /**
+     * @param message
+     * @return
+     * @throws GSException
+     */
+    private ResultSet<GSResource> retrieveCached(ReducedDiscoveryMessage message) throws GSException {
 
 	Bond reducedBond = message.getReducedBond();
 
@@ -226,24 +226,31 @@ public class DistributedQueryExecutor implements IDistributedQueryExecutor {
 
 	for (String identifier : identifiers) {
 
-	    SharedContentReadResponse<GSResource> results = getYp().read(identifier);
+	    DriverSetting setting = ConfigurationWrapper.getSharedCacheDriverSetting();
 
-	    List<SharedContent<GSResource>> contents = results.getContents();
+	    ISharedRepositoryDriver<?> driver = DriverFactory.getConfiguredDriver(setting, true);
 
-	    for (SharedContent<GSResource> content : contents) {
+	    @SuppressWarnings("unchecked")
+	    SharedContent<GSResource> content = driver.read(identifier, SharedContentType.GS_RESOURCE_TYPE);
 
-		GSResource resource = content.getContent();
+	    if (content == null) {
 
-		String sourceId = null;
-		GSSource source = resource.getSource();
-		if (source != null) {
-		    sourceId = source.getUniqueIdentifier();
-		}
+		return ret;
+	    }
 
-		if (sourceId == null || (sourceIdentifier.equals(sourceId))) {
+	    GSResource resource = content.getContent();
 
-		    ret.getResultsList().add(resource);
-		}
+	    String sourceId = null;
+	    GSSource source = resource.getSource();
+
+	    if (source != null) {
+
+		sourceId = source.getUniqueIdentifier();
+	    }
+
+	    if (sourceId == null || (sourceIdentifier.equals(sourceId))) {
+
+		ret.getResultsList().add(resource);
 	    }
 	}
 
@@ -252,6 +259,7 @@ public class DistributedQueryExecutor implements IDistributedQueryExecutor {
 
     @Override
     public Type getType() {
+
 	return Type.DISTRIBUTED;
     }
 

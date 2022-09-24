@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.oaipmh;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -36,6 +36,35 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 
+
+/**
+ * Define requestType, indicating the protocol request that 
+ *       led to the response. Element content is BASE-URL, attributes are arguments 
+ *       of protocol request, attribute-values are values of arguments of protocol 
+ *       request
+ * 
+ * <p>Classe Java per requestType complex type.
+ * 
+ * <p>Il seguente frammento di schema specifica il contenuto previsto contenuto in questa classe.
+ * 
+ * <pre>
+ * &lt;complexType name="requestType"&gt;
+ *   &lt;simpleContent&gt;
+ *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema&gt;anyURI"&gt;
+ *       &lt;attribute name="verb" type="{http://www.openarchives.org/OAI/2.0/}verbType" /&gt;
+ *       &lt;attribute name="identifier" type="{http://www.openarchives.org/OAI/2.0/}identifierType" /&gt;
+ *       &lt;attribute name="metadataPrefix" type="{http://www.openarchives.org/OAI/2.0/}metadataPrefixType" /&gt;
+ *       &lt;attribute name="from" type="{http://www.openarchives.org/OAI/2.0/}UTCdatetimeType" /&gt;
+ *       &lt;attribute name="until" type="{http://www.openarchives.org/OAI/2.0/}UTCdatetimeType" /&gt;
+ *       &lt;attribute name="set" type="{http://www.openarchives.org/OAI/2.0/}setSpecType" /&gt;
+ *       &lt;attribute name="resumptionToken" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/simpleContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "requestType", propOrder = {
     "value"

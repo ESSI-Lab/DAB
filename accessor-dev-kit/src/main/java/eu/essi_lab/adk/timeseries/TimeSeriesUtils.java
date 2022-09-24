@@ -4,7 +4,7 @@ package eu.essi_lab.adk.timeseries;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -40,6 +40,13 @@ import org.cuahsi.waterml._1.VariableInfoType.VariableCode;
 import eu.essi_lab.model.resource.GSResource;
 
 public class TimeSeriesUtils {
+
+    /**
+     * Creates a template from the given resource, to be later filled with data by the caller
+     * 
+     * @param resource
+     * @return
+     */
     public static JAXBElement<TimeSeriesResponseType> createTimeSeriesTemplate(GSResource resource) {
 
 	String uniqueSiteCode = getUniqueSiteCode(resource);

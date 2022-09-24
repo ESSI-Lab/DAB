@@ -4,7 +4,7 @@ package eu.essi_lab.authentication.util;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -42,6 +42,19 @@ import eu.essi_lab.authentication.model.Token;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
+
+/**
+ * Build a JWT token by an existing {@link Token} object or by adding claims and
+ * encoding them.<br>
+ * Beware. Right now token is encoded using hard-coded configuration. This is not
+ * good and will be only temporary. We must change this as soon as possible.
+ * Parameters like:<br>
+ * - {@link TokenProvider#hMACSecretPassphrase},<br>
+ * - {@link TokenProvider#EXPIRATION_TIME} <br>
+ * must be turned into configurable parameters.
+ * 
+ * @author pezzati
+ */
 public class TokenProvider {
 
     /**

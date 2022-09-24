@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.oaipmh;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,8 +25,6 @@ import javax.xml.bind.JAXBElement;
 
 import org.w3c.dom.Element;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import eu.essi_lab.iso.datamodel.classes.MDMetadata;
 import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.jaxb.common.CommonContext;
@@ -43,9 +41,9 @@ import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.OriginalMetadata;
 import eu.essi_lab.ommdk.DublinCoreResourceMapper;
+import eu.essi_lab.ommdk.FileIdentifierMapper;
 import eu.essi_lab.ommdk.GMDResourceMapper;
 import eu.essi_lab.ommdk.GMIResourceMapper;
-import eu.essi_lab.ommdk.FileIdentifierMapper;
 import net.opengis.iso19139.gmd.v_20060504.MDMetadataType;
 
 public class OAIPMHResourceMapper extends FileIdentifierMapper {
@@ -117,6 +115,14 @@ public class OAIPMHResourceMapper extends FileIdentifierMapper {
 			originalMD.setMetadata(metadata);
 
 			dataset = gmiMapper.map(originalMD, source);
+
+		    } else if (metadataType instanceof eu.essi_lab.jaxb.csw._2_0_2.RecordType) {
+
+			eu.essi_lab.jaxb.csw._2_0_2.RecordType type = (eu.essi_lab.jaxb.csw._2_0_2.RecordType) metadataType;
+			String metadata = CommonContext.asString(type, false);
+			originalMD.setMetadata(metadata);
+
+			dataset = dcMapper.map(originalMD, source);
 		    }
 		}
 	    } catch (Exception ex) {
@@ -172,7 +178,7 @@ public class OAIPMHResourceMapper extends FileIdentifierMapper {
     }
 
     @Override
-    @JsonIgnore
+    
     public String getSupportedOriginalMetadataSchema() {
 
 	return CommonNameSpaceContext.OAI_NS_URI;

@@ -4,7 +4,7 @@ package eu.essi_lab.iso.datamodel.classes;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -55,6 +55,10 @@ public class ResponsibleParty extends ISOMetadata<CIResponsiblePartyType> {
 	JAXBElement<CIResponsiblePartyType> element = ObjectFactories.GMD().createCIResponsibleParty(type);
 	return element;
     }
+
+    /**
+     * @XPathDirective(target = "gmd:organisationName/*[1]")
+     */
     public String getOrganisationName() {
 	try {
 	    return ISOMetadata.getStringFromCharacterString(type.getOrganisationName());

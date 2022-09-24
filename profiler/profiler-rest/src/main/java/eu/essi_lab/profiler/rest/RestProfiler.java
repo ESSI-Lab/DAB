@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.rest;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,6 +28,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.json.JSONObject;
 
+import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.web.KeyValueParser;
 import eu.essi_lab.messages.web.WebRequest;
@@ -36,7 +37,6 @@ import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.model.resource.data.DataObject;
 import eu.essi_lab.pdk.Profiler;
-import eu.essi_lab.pdk.ProfilerInfo;
 import eu.essi_lab.pdk.handler.AccessHandler;
 import eu.essi_lab.pdk.handler.DiscoveryHandler;
 import eu.essi_lab.pdk.handler.SemanticHandler;
@@ -60,6 +60,10 @@ import eu.essi_lab.profiler.rest.handler.info.MessageFormat;
 import eu.essi_lab.profiler.rest.handler.info.RestParameter;
 import eu.essi_lab.profiler.rest.handler.info.ServiceInfoHandler;
 import eu.essi_lab.profiler.rest.handler.info.SourcesInfoHandler;
+
+/**
+ * @author Fabrizio
+ */
 public class RestProfiler extends Profiler {
 
     public static final String REST_PROFILER_TYPE = "Rest";
@@ -67,7 +71,7 @@ public class RestProfiler extends Profiler {
     public static final String REST_SEMANTIC_SEARCH_PATH = "rest/" + WebRequest.SEMANTIC_PATH + "/search/";
     private DiscoveryHandler<String> discoveryHandler;
 
-    public static final ProfilerInfo REST_SERVICE_INFO = new ProfilerInfo();
+    public static final ProfilerSetting REST_SERVICE_INFO = new ProfilerSetting();
     static {
 	REST_SERVICE_INFO.setServiceName("Rest");
 	REST_SERVICE_INFO.setServiceType(REST_PROFILER_TYPE);
@@ -147,35 +151,19 @@ public class RestProfiler extends Profiler {
 	selector.register(//
 		new GETRequestFilter("rest/discovery/info"), //
 		new DiscoveryInfoHandler());
-	
-	selector.register(//
-		new GETRequestFilter("rest/discovery/info",true), //
-		new DiscoveryInfoHandler());
-		
+			
 	selector.register(//
 		new GETRequestFilter("rest/sources/info"), //
 		new SourcesInfoHandler());
 	
 	selector.register(//
-		new GETRequestFilter("rest/sources/info", true), //
-		new SourcesInfoHandler());
-
-	selector.register(//
 		new GETRequestFilter("rest/access/info"), //
 		new AccessInfoHandler());
 	
 	selector.register(//
-		new GETRequestFilter("rest/access/info", true), //
-		new AccessInfoHandler());
-
-	selector.register(//
 		new GETRequestFilter("rest/service/info"), //
 		new ServiceInfoHandler());
 	
-	selector.register(//
-		new GETRequestFilter("rest/service/info", true), //
-		new ServiceInfoHandler());
-
 	// -------------------------
 	//
 	// Statistics
@@ -185,33 +173,17 @@ public class RestProfiler extends Profiler {
 		new FullStatisticsHandler());
 	
 	selector.register(//
-		new GETRequestFilter("rest/stats", true), //
-		new FullStatisticsHandler());
-
-	selector.register(//
 		new GETRequestFilter("rest/stats/gp"), //
 		new GWPStatisticsHandler());
 	
-	selector.register(//
-		new GETRequestFilter("rest/stats/gp", true), //
-		new GWPStatisticsHandler());
-
 	selector.register(//
 		new GETRequestFilter("rest/stats/gp/discovery"), //
 		new GWPStatisticsHandler());
 	
 	selector.register(//
-		new GETRequestFilter("rest/stats/gp/discovery", true), //
-		new GWPStatisticsHandler());
-
-	selector.register(//
 		new GETRequestFilter("rest/stats/gp/access"), //
 		new GWPStatisticsHandler());
 	
-	selector.register(//
-		new GETRequestFilter("rest/stats/gp/access", true), //
-		new GWPStatisticsHandler());
-
 	return selector;
     }
 
@@ -330,7 +302,7 @@ public class RestProfiler extends Profiler {
     }
 
     @Override
-    public ProfilerInfo getProfilerInfo() {
+    protected ProfilerSetting initSetting() {
 
 	return REST_SERVICE_INFO;
     }

@@ -4,7 +4,7 @@ package eu.essi_lab.request.executor.utils;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,7 +28,14 @@ public class MimeTypeConstants {
     
     protected static Map<String,String> mapContentTypes = null;
     
-        public static String getTypeExtension(String key)
+    
+    /**
+     * Method getting particular Content type (key) and return the extension (value)
+     * 
+     * @param key - key value Content Type
+     * @return String - extension
+     */
+    public static String getTypeExtension(String key)
     {
        String strMimeType = null;
 

@@ -4,7 +4,7 @@ package eu.essi_lab.workflow.processor;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -37,6 +37,12 @@ import eu.essi_lab.model.resource.data.dimension.DataDimension;
 import eu.essi_lab.model.resource.data.dimension.FiniteDimension;
 import eu.essi_lab.model.resource.data.dimension.ContinueDimension.LimitType;
 import eu.essi_lab.workflow.processor.CapabilityElement.PresenceType;
+
+/**
+ * Utility methods to create {@link DataDescriptor}s and {@link ProcessorCapabilities}
+ * 
+ * @author Fabrizio
+ */
 public class DescriptorUtils {
 
     /**

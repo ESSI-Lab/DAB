@@ -4,7 +4,7 @@ package eu.essi_lab.model.resource;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,6 +28,13 @@ import java.util.stream.Collectors;
 
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.index.IndexedElement;
+
+/**
+ * Enumeration of queryable {@link HarmonizedMetadata} element names
+ *
+ * @author Fabrizio
+ * @see ResourceProperty
+ */
 public enum MetadataElement implements Queryable {
 
     /**
@@ -195,7 +202,7 @@ public enum MetadataElement implements Queryable {
     /**
      *
      */
-    ONLINE_LINKAGE("onlineLinkage", false),
+    ONLINE_LINKAGE("onlineLinkage"),
 
     /**
      * 
@@ -457,6 +464,11 @@ public enum MetadataElement implements Queryable {
      * Extended
      */
     ORIGINATOR_ORGANISATION_DESCRIPTION("origOrgDesc", false, true, ContentType.TEXTUAL, true),
+    
+    /**
+     * Extended
+     */
+    THEME_CATEGORY("themeCategory", false, true, ContentType.TEXTUAL, true),
 
     // ----------------------------------------------------------
     //
@@ -547,6 +559,8 @@ public enum MetadataElement implements Queryable {
 
     public static final String ORIGINATOR_ORGANISATION_IDENTIFIER_EL_NAME = "origOrgId";
     public static final String ORIGINATOR_ORGANISATION_DESCRIPTION_EL_NAME = "origOrgDesc";
+    
+    public static final String THEME_CATEGORY_EL_NAME = "themeCategory";
 
     public static final String ATTRIBUTE_IDENTIFIER_EL_NAME = "attributeId";
     public static final String ATTRIBUTE_TITLE_EL_NAME = "attributeTitle";

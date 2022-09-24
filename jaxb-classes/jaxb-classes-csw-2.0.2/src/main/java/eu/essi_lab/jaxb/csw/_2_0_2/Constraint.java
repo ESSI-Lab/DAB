@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.csw._2_0_2;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -38,6 +38,32 @@ import javax.xml.bind.annotation.XmlType;
 
 import eu.essi_lab.jaxb.filter._1_1_0.FilterType;
 
+
+/**
+ * A search constraint that adheres to one of the following syntaxes:
+ *          Filter   - OGC filter expression
+ *          CqlText  - OGC CQL predicate
+ * 
+ * <p>Classe Java per QueryConstraintType complex type.
+ * 
+ * <p>Il seguente frammento di schema specifica il contenuto previsto contenuto in questa classe.
+ * 
+ * <pre>
+ * &lt;complexType name="QueryConstraintType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;choice&gt;
+ *         &lt;element ref="{http://www.opengis.net/ogc}Filter"/&gt;
+ *         &lt;element name="CqlText" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
+ *       &lt;/choice&gt;
+ *       &lt;attribute name="version" use="required" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "QueryConstraintType", propOrder = {
     "cqlText",

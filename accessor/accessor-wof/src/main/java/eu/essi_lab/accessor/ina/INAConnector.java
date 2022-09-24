@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.ina;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -33,10 +33,7 @@ import java.util.Optional;
 import java.util.TimeZone;
 
 import org.apache.http.Header;
-import org.slf4j.Logger;
 import org.xml.sax.SAXException;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import eu.essi_lab.accessor.wof.CUAHSIHISServerConnector;
 import eu.essi_lab.accessor.wof.client.CUAHSIHISServerClient;
@@ -51,54 +48,49 @@ import eu.essi_lab.lib.net.utils.Downloader;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
-import eu.essi_lab.model.Source;
+import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.OriginalMetadata;
 
-public class INAConnector extends CUAHSIHISServerConnector {
-    private static final long serialVersionUID = -6391000980239248161L;
+public class INAConnector extends CUAHSIHISServerConnector<INAConnectorSetting> {
 
-    @JsonIgnore
-    private transient Downloader downloader;
-    @JsonIgnore
-    private transient Logger logger = GSLoggerFactory.getLogger(this.getClass());
-    @JsonIgnore
-    private final static String INA_CONNECTOR_PAGESIZE_OPTION_KEY = "INA_CONNECTOR_PAGESIZE_OPTION_KEY";
-    @JsonIgnore
-    private static final String FIRST_SITE_ONLY_OPTION_KEY = "FIRST_SITE_ONLY_OPTION_KEY";
-    @JsonIgnore // RICHER (e.g. email address) but SLOWER
+    private Downloader downloader;
+
+    // RICHER (e.g. email address) but SLOWER
     private static final boolean ENRICH_TIME_SERIES = false;
-    @JsonIgnore
-    private transient CUAHSIHISServerClient client = new CUAHSIHISServerClient1_1(getSourceURL());
-    @JsonIgnore
-    private transient Iterator<SiteInfo> siteInfoIterator = null;
-    @JsonIgnore
-    private transient SiteInfo siteInfo = null;
-    @JsonIgnore
-    private transient Integer siteNumber = null;
-    @JsonIgnore
-    private transient SimpleDateFormat iso8601OutputFormat = null;
-    @JsonIgnore
-    private transient SimpleDateFormat iso8601InputFormat = null;
-    @JsonIgnore
-    private transient SitesResponseDocument richerSiteInfoDocument = null;
-    @JsonIgnore
-    private transient SitesResponseDocument INASiteInfoDocument = null;
-    @JsonIgnore
-    private transient List<String> sitesWithErrors = new ArrayList<>();
-    @JsonIgnore
-    static final transient String REMOTE_SERVER_ERROR = null;
 
-    @JsonIgnore
-    private transient Integer recordsReturned = 0;
+    private CUAHSIHISServerClient client = new CUAHSIHISServerClient1_1(getSourceURL());
 
-    @JsonIgnore
+    private Iterator<SiteInfo> siteInfoIterator = null;
+
+    private SiteInfo siteInfo = null;
+
+    private Integer siteNumber = null;
+
+    private SimpleDateFormat iso8601OutputFormat = null;
+
+    private SimpleDateFormat iso8601InputFormat = null;
+
+    private SitesResponseDocument richerSiteInfoDocument = null;
+
+    private SitesResponseDocument INASiteInfoDocument = null;
+
+    private List<String> sitesWithErrors = new ArrayList<>();
+
+    static final String INA_CONNECTOR_ERROR = "INA_CONNECTOR_ERROR";
+
+    /**
+     * 
+     */
+    public static final String TYPE = "INAConnector";
+
+    private Integer recordsReturned = 0;
+
     public Downloader getDownloader() {
 	return downloader == null ? new Downloader() : downloader;
     }
 
-    @JsonIgnore
     public void setDownloader(Downloader downloader) {
 	this.downloader = downloader;
     }
@@ -113,7 +105,7 @@ public class INAConnector extends CUAHSIHISServerConnector {
     }
 
     @Override
-    public boolean supports(Source source) {
+    public boolean supports(GSSource source) {
 	String baseEndpoint = source.getEndpoint();
 	if (baseEndpoint == null) {
 	    return false;
@@ -170,11 +162,15 @@ public class INAConnector extends CUAHSIHISServerConnector {
 		    this.siteInfo = siteInfoIterator.next();
 		    this.siteNumber++;
 		} else {
-		    GSException gse = new GSException();
-		    ErrorInfo info = new ErrorInfo();
-		    info.setErrorDescription("Unable to resume from resumption token: " + id);
-		    gse.addInfo(info);
-		    throw gse;
+		    ErrorInfo ei = new ErrorInfo();
+
+		    ei.setErrorDescription("Unable to resume from resumption token: " + id);
+		    ei.setCaller(this.getClass());
+		    ei.setErrorId(INA_CONNECTOR_ERROR);
+		    ei.setErrorType(ErrorInfo.ERRORTYPE_CLIENT);
+		    ei.setSeverity(ErrorInfo.SEVERITY_ERROR);
+
+		    throw GSException.createException(ei);
 		}
 	    }
 	}
@@ -249,10 +245,10 @@ public class INAConnector extends CUAHSIHISServerConnector {
 		    timeSeries = client.getAugmentedTimeSeries(siteInfo, variableCode, methodId, qualityControlLevelCode, sourceId);
 		} catch (GSException e) {
 		    // in case an exception occurred, no metadata is returned for this series
-		    logger.error("Remote server error augmenting time series. ");
-		    logger.error("URL: {}", getSourceURL());
-		    logger.error("Site: {}", siteInfo);
-		    logger.error("Variable: {}", variableCode);
+		    GSLoggerFactory.getLogger(this.getClass()).error("Remote server error augmenting time series. ");
+		    GSLoggerFactory.getLogger(this.getClass()).error("URL: {}", getSourceURL());
+		    GSLoggerFactory.getLogger(this.getClass()).error("Site: {}", siteInfo);
+		    GSLoggerFactory.getLogger(this.getClass()).error("Variable: {}", variableCode);
 		}
 	    }
 
@@ -272,7 +268,8 @@ public class INAConnector extends CUAHSIHISServerConnector {
 			// this is the case of a time series with duplicated variable code
 			if (nextSeriesVariableCode.equals(visitedVariableCode)) {
 			    duplicated = true;
-			    logger.warn("Found duplicated variable code, skipping: {}", visitedVariableCode);
+			    GSLoggerFactory.getLogger(this.getClass()).warn("Found duplicated variable code, skipping: {}",
+				    visitedVariableCode);
 			    break;
 			}
 		    }
@@ -297,11 +294,15 @@ public class INAConnector extends CUAHSIHISServerConnector {
 	    }
 
 	} else {
-	    GSException gse = new GSException();
-	    ErrorInfo info = new ErrorInfo();
-	    info.setErrorDescription("Unable to resume from resumption token: " + id);
-	    gse.addInfo(info);
-	    throw gse;
+	    ErrorInfo ei = new ErrorInfo();
+
+	    ei.setErrorDescription("Unable to resume from resumption token: " + id);
+	    ei.setCaller(this.getClass());
+	    ei.setErrorId(INA_CONNECTOR_ERROR);
+	    ei.setErrorType(ErrorInfo.ERRORTYPE_CLIENT);
+	    ei.setSeverity(ErrorInfo.SEVERITY_ERROR);
+
+	    throw GSException.createException(ei);
 	}
 
 	ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<OriginalMetadata>();
@@ -318,13 +319,13 @@ public class INAConnector extends CUAHSIHISServerConnector {
 	    ret.addRecord(metadataRecord);
 	    recordsReturned++;
 
-	    if (!isMaxRecordsUnlimited()) {
+	    if (!getSetting().isMaxRecordsUnlimited()) {
 
-		Optional<Integer> mr = getMaxRecords();
+		Optional<Integer> mr = getSetting().getMaxRecords();
 
 		if (mr.isPresent() && recordsReturned >= mr.get()) {
 
-		    logger.info("Reached max records of {}", mr.get());
+		    GSLoggerFactory.getLogger(this.getClass()).info("Reached max records of {}", mr.get());
 
 		    ret.setResumptionToken(null);
 
@@ -333,11 +334,18 @@ public class INAConnector extends CUAHSIHISServerConnector {
 		}
 	    }
 	} catch (Exception e) {
-	    GSException gse = new GSException();
-	    ErrorInfo info = new ErrorInfo();
-	    info.setErrorDescription("Error marshalling metadata for site: " + siteName + " variable name: " + seriesName);
-	    gse.addInfo(info);
-	    throw gse;
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+
+	    ErrorInfo ei = new ErrorInfo();
+	    
+	    ei.setErrorDescription("Error marshalling metadata for site: " + siteName + " variable name: " + seriesName);	    
+	    ei.setCaller(this.getClass());
+	    ei.setErrorId(INA_CONNECTOR_ERROR);
+	    ei.setErrorType(ErrorInfo.ERRORTYPE_CLIENT);
+	    ei.setSeverity(ErrorInfo.SEVERITY_ERROR);
+	    
+	    throw GSException.createException(ei);
 	}
 	ret.setResumptionToken(nextId);
 	return ret;
@@ -348,16 +356,16 @@ public class INAConnector extends CUAHSIHISServerConnector {
 	SitesResponseDocument sites = null;
 	String url = getSourceURL();
 	String request = url.endsWith("/") ? url + "GetSiteInfo?site=" + siteCode : url + "/GetSiteInfo?site=" + siteCode;
-	logger.info("Get SitesInfo for INA Accessor {}", request);
+	GSLoggerFactory.getLogger(this.getClass()).info("Get SitesInfo for INA Accessor {}", request);
 	try {
-	    Optional<SimpleEntry<Header[], InputStream>> response = getDownloader().downloadHeadersAndBody(request);	    
+	    Optional<SimpleEntry<Header[], InputStream>> response = getDownloader().downloadHeadersAndBody(request);
 	    if (response.isPresent()) {
 		sites = new SitesResponseDocument(response.get().getValue());
 	    }
 	} catch (SAXException | IOException e) {
 	    // in case an exception occurred, no metadata is returned for this series
-	    logger.error("Remote server error getting remote sites.");
-	    logger.error("URL: {}", request);
+	    GSLoggerFactory.getLogger(this.getClass()).error("Remote server error getting remote sites.");
+	    GSLoggerFactory.getLogger(this.getClass()).error("URL: {}", request);
 	    return null;
 	}
 
@@ -371,17 +379,11 @@ public class INAConnector extends CUAHSIHISServerConnector {
 	return ret;
     }
 
-    @Override
-    public String getLabel() {
-	return "INA Connector";
-    }
-
-    @JsonIgnore
     public SitesResponseDocument getSites() {
 	SitesResponseDocument sites = null;
 	String url = getSourceURL();
 	String request = url.endsWith("/") ? url + "GetSites?" : url + "/GetSites?";
-	logger.info("Get Sites for INA Accessor {}", request);
+	GSLoggerFactory.getLogger(this.getClass()).info("Get Sites for INA Accessor {}", request);
 	try {
 	    Optional<InputStream> stream = getDownloader().downloadStream(request);
 	    if (stream.isPresent()) {
@@ -389,8 +391,8 @@ public class INAConnector extends CUAHSIHISServerConnector {
 	    }
 	} catch (SAXException | IOException e) {
 	    // in case an exception occurred, no metadata is returned for this series
-	    logger.error("Remote server error getting remote sites.");
-	    logger.error("URL: {}", request);
+	    GSLoggerFactory.getLogger(this.getClass()).error("Remote server error getting remote sites.");
+	    GSLoggerFactory.getLogger(this.getClass()).error("URL: {}", request);
 	    return null;
 
 	}
@@ -399,7 +401,6 @@ public class INAConnector extends CUAHSIHISServerConnector {
 
     }
 
-    @JsonIgnore
     public TimeSeriesINAResponseDocument getValues(String networkName, String siteCode, String variableCode, String methodId,
 	    String qualityControlLevelCode, String sourceId, Date begin, Date end) throws GSException {
 
@@ -463,21 +464,16 @@ public class INAConnector extends CUAHSIHISServerConnector {
 	    return res;
 
 	} catch (Exception e) {
-	    GSException gse = new GSException();
 
 	    ErrorInfo ei = new ErrorInfo();
-	    ei.setContextId(this.getClass().getName());
+	    ei.setCaller(this.getClass());
 	    ei.setErrorDescription("Remote server fault: Time zone not available");
-	    ei.setErrorId(REMOTE_SERVER_ERROR);
+	    ei.setErrorId(INA_CONNECTOR_ERROR);
 	    ei.setErrorType(ErrorInfo.ERRORTYPE_CLIENT);
-	    ei.setErrorCorrection("Contact remote server administrator");
 	    ei.setSeverity(ErrorInfo.SEVERITY_ERROR);
 
-	    gse.addInfo(ei);
-
-	    throw gse;
+	    throw GSException.createException(ei);
 	}
-
     }
 
     private String getUTCTimeString(Date begin) {
@@ -491,4 +487,15 @@ public class INAConnector extends CUAHSIHISServerConnector {
 	return iso8601OutputFormat.format(new Date(newTime));
     }
 
+    @Override
+    public String getType() {
+
+	return TYPE;
+    }
+
+    @Override
+    protected INAConnectorSetting initSetting() {
+
+	return new INAConnectorSetting();
+    }
 }

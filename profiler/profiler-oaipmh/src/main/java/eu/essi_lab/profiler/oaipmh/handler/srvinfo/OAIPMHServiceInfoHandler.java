@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.oaipmh.handler.srvinfo;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -39,7 +39,13 @@ import eu.essi_lab.pdk.handler.DefaultRequestHandler;
 import eu.essi_lab.profiler.oaipmh.OAIPMHNameSpaceMapper;
 import eu.essi_lab.profiler.oaipmh.OAIPMHProfiler;
 import eu.essi_lab.profiler.oaipmh.OAIPMHRequestValidator;
-import eu.essi_lab.profiler.oaipmh.profile.OAIPMHProfile;
+
+/**
+ * Subclasses must provide implementation of the protected methods, while creation of the {@link Response} is handled by
+ * this class
+ * 
+ * @author Fabrizio
+ */
 public abstract class OAIPMHServiceInfoHandler extends DefaultRequestHandler {
 
     private static final String OAI_PMH_INFO_RESPONSE_MARSHALLING_ERROR = "OAI_PMH_RESPONSE_MARSHALLING_ERROR";

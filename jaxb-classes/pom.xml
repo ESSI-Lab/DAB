@@ -15,6 +15,7 @@
 	<description>ESSI-Lab JAXB Classes</description>
 
 	<modules>
+		<module>jaxb-classes-thredds</module>
 		<module>jaxb-classes-csw-2.0.2</module>
 		<module>jaxb-classes-filter-1.1.0</module>
 		<module>jaxb-classes-org-purl-dc-1</module>
@@ -25,16 +26,10 @@
 		<module>jaxb-classes-ogc-pubsub-1.0</module>
 		<module>jaxb-classes-wml-1.1</module>
 		<module>jaxb-classes-wms-1.3.0</module>
-	    <module>jaxb-classes-wml-2.0</module>
-	    <module>jaxb-classes-wms-1.1.1</module>
+		<module>jaxb-classes-wigos</module>
+    <module>jaxb-classes-sos-2.0</module>
+    <module>jaxb-classes-wml-2.0</module>
+    <module>jaxb-classes-wms-1.1.1</module>
 	</modules>
-		<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>license-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
 
 </project>

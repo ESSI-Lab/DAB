@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,7 +31,7 @@ import java.util.Set;
 
 import org.w3c.dom.Node;
 
-import eu.essi_lab.configuration.ConfigurationUtils;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.messages.bond.Bond;
@@ -44,9 +44,13 @@ import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
+
+/**
+ * @author boldrini
+ */
 public abstract class WOFRequest {
 
-    public enum Parameter {	
+    public enum Parameter {
 	REQUEST("request"), //
 	FORMAT("format"), //
 	CONCEPT_KEYWORD("conceptKeyword"), //
@@ -79,7 +83,6 @@ public abstract class WOFRequest {
     private HashMap<Parameter, String> map = new HashMap<>();
     private static TimeFormatConverter timeFormatConverter = null;
     private HashMap<String, String> actualParametersMap = new HashMap<>();
-
 
     public String getParameterValue(Parameter parameter) {
 	return map.get(parameter);
@@ -293,12 +296,7 @@ public abstract class WOFRequest {
 	    String networkIds = getParameterValue(Parameter.NETWORK_IDS);
 	    if (networkIds.length() > 0) {
 
-		List<GSSource> allSources = new ArrayList<>();
-		try {
-		    allSources.addAll(ConfigurationUtils.getAllSources());
-		} catch (GSException e) {
-		    GSLoggerFactory.getLogger(getClass()).warn("Unable to get all sources", e);
-		}
+		List<GSSource> allSources = ConfigurationWrapper.getAllSources();
 
 		List<Bond> operands = new ArrayList<>();
 		String[] networkIdArray = networkIds.split(",");

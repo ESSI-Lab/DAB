@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wps.status;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,28 +21,39 @@ package eu.essi_lab.accessor.wps.status;
  * #L%
  */
 
-import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.core.MediaType;
 
-import eu.essi_lab.configuration.ConfigurationUtils;
-import eu.essi_lab.jobs.GSJobStatus;
-import eu.essi_lab.jobs.report.GSJobEventCollectorFactory;
-import eu.essi_lab.jobs.report.GSJobStatusCollector;
+import org.json.JSONObject;
+
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.driver.SharedPersistentDriverSetting;
+import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.messages.JobStatus.JobPhase;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.SharedRepositoryInfo;
-import eu.essi_lab.model.StorageUri;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.shared.SharedContent;
+import eu.essi_lab.model.shared.SharedContent.SharedContentType;
 import eu.essi_lab.pdk.handler.DefaultRequestHandler;
-import eu.essi_lab.shared.messages.SharedContentReadResponse;
-import eu.essi_lab.shared.model.SharedContent;
+import eu.essi_lab.shared.driver.DriverFactory;
+import eu.essi_lab.shared.driver.ISharedRepositoryDriver;
 
+/**
+ * @author Fabrizio
+ */
 public class GWPSStatusHandler extends DefaultRequestHandler {
 
+    /**
+     * @param webRequest
+     * @return
+     */
     private String getId(WebRequest webRequest) {
+
 	if (webRequest.isGetRequest()) {
 
 	    String servletRequest = webRequest.getUriInfo().getAbsolutePath().toString();
@@ -64,13 +75,14 @@ public class GWPSStatusHandler extends DefaultRequestHandler {
 	    }
 
 	    return statusId;
-
 	}
+
 	return null;
     }
 
     @Override
     public ValidationMessage validate(WebRequest webRequest) throws GSException {
+
 	String id = getId(webRequest);
 
 	ValidationMessage ret = new ValidationMessage();
@@ -83,53 +95,72 @@ public class GWPSStatusHandler extends DefaultRequestHandler {
 	return ret;
     }
 
+    @SuppressWarnings("incomplete-switch")
     @Override
     public String getStringResponse(WebRequest webRequest) throws GSException {
 
- 	SharedRepositoryInfo repo = ConfigurationUtils.getSharedRepositoryInfo();
-	GSJobStatusCollector collector = GSJobEventCollectorFactory.getGSJobStatusCollector(repo);
+	SharedPersistentDriverSetting driverSetting = ConfigurationWrapper.getSharedPersistentDriverSetting();
 
-	StorageUri storageURI = ConfigurationUtils.getUserJobStorageURI();
+	@SuppressWarnings("rawtypes")
+	ISharedRepositoryDriver driver = DriverFactory.getConfiguredDriver(driverSetting, true);
 
 	String id = getId(webRequest);
 
-	SharedContentReadResponse<GSJobStatus> response;
-	try {
-	    response = collector.read(id);
-	} catch (Exception e) {
-	    return "{\"status\":\"ERROR\",\"message\":\"Error retrieving status of id: " + id + "\"}";
-	}
+	SharedContent<JSONObject> response = getResponse(driver, id);
 
-	List<SharedContent<GSJobStatus>> contents = response.getContents();
-	if (!contents.isEmpty()) {
-	    SharedContent<GSJobStatus> content = contents.get(0);
-	    GSJobStatus status = content.getContent();	    
-	    String result = status.getResult();
-	    if (result == null) {
-		return "{\"status\":\"DOWNLOADING DATA\",\"message\":\"Transformation request has started\"}";
-	    } else if (result.equals("PASS")) {
-		Date endDate = status.getEndDate();
-		if (storageURI != null && //
-			storageURI.getUri() != null && storageURI.getUri().length() > 0 && //
-			storageURI.getStorageName() != null && storageURI.getStorageName().length() > 0) {
-//		    String url = storageURI.getUri() + storageURI.getStorageName() + "/" + objectName;
-		    String url = status.getResultStorage();;
-		    return " {\"status\":\"COMPLETED\",\"message\":\"Completed\",\"data\":\"" + url + "\"}";
-		} else {
-		    return "{\"status\":\"ERROR\",\"message\":\"Processing is completed, however no info on which storage to use to retrieve the saved result\"}";
+	JSONObject output = new JSONObject();
+
+	if (response == null) {
+
+	    output.put("status", "DOWNLOADING DATA");
+	    output.put("message", "Transformation request has started");
+	} else {
+
+	    JSONObject content = response.getContent();
+
+	    SchedulerJobStatus status = new SchedulerJobStatus(content);
+	    JobPhase phase = status.getPhase();
+
+	    switch (phase) {
+	    case COMPLETED:
+
+		output.put("status", "COMPLETED");
+		output.put("message", phase.getLabel());
+		output.put("data", status.getDataUri().orElse("missing"));
+
+		break;
+
+	    case ERROR:
+
+		output.put("status", "ERROR");
+		List<String> errorMessages = status.getErrorMessages();
+		if (!errorMessages.isEmpty()) {
+		    output.put("message", errorMessages.stream().collect(Collectors.joining(",")));
 		}
-	    } else {
-		return "{\"status\":\"ERROR\",\"message\":\"" + result + "\"}";
+
+		break;
 	    }
 	}
 
-	return "{\"status\":\"ERROR\",\"message\":\"Error retrieving status of id: " + id + "\"}";
+	return output.toString();
+    }
 
+    @SuppressWarnings("unchecked")
+    private SharedContent<JSONObject> getResponse(@SuppressWarnings("rawtypes") ISharedRepositoryDriver driver, String id) {
+
+	try {
+	    return driver.read(id, SharedContentType.JSON_TYPE);
+	} catch (GSException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
+	}
+
+	return null;
     }
 
     @Override
     public MediaType getMediaType(WebRequest webRequest) {
+
 	return MediaType.APPLICATION_JSON_TYPE;
     }
-
 }

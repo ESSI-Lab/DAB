@@ -4,7 +4,7 @@ package eu.essi_lab.messages.web;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,6 +23,14 @@ package eu.essi_lab.messages.web;
 
 import java.io.InputStream;
 import java.util.Map;
+
+/**
+ * A strategy to parse an {@link InputStream} to a key/value map
+ * 
+ * @see KeyValueParser#KeyValueParser(StreamParser, InputStream)
+ * @see KeyValueParser#setStreamParser(StreamParser, InputStream)
+ * @author Fabrizio
+ */
 public interface StreamParser {
 
     /**

@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.wml._2_0.om__2;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -42,6 +42,38 @@ import eu.essi_lab.jaxb.wml._2_0.xlink.ShowType;
 import eu.essi_lab.jaxb.wml._2_0.xlink.TypeType;
 import org.w3c.dom.Element;
 
+
+/**
+ *  The purpose of an observation process is to generate an observation
+ * 				result. An instance is often an instrument or sensor, but may be a human observer, a
+ * 				simulator, or a process or algorithm applied to more primitive results used as
+ * 				inputs. The model for OM_Process is abstract, and has no attributes, operations, or
+ * 				associations. NOTE ISO 19115-2:2008 provides MI_Instrument, LE_Processing and
+ * 				LE_Algorithm, which could all be modelled as specializations of OM_Process. Any
+ * 				suitable XML may be used to describe the observation process in line, provided that
+ * 				it is contained in a single XML element. If reference to a schema is provided it
+ * 				must also be valid. OGC SensorML provides a model which is suitable for many
+ * 				observation procedures. 
+ * 
+ * <p>Java class for OM_ProcessPropertyType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="OM_ProcessPropertyType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence minOccurs="0"&gt;
+ *         &lt;any processContents='lax'/&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "OM_ProcessPropertyType", propOrder = {
     "any"
