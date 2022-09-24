@@ -38,14 +38,6 @@
 	<bean id="extProfiler" class="eu.essi_lab.gssrv.rest.EXTProfilerService" />
 	
 
-	<jaxrs:server id="supportService" address="/support">
-		<jaxrs:serviceBeans>
-			<ref bean="support" />
-		</jaxrs:serviceBeans>
-	</jaxrs:server>
-
-	<bean id="support" class="eu.essi_lab.gssrv.rest.SupportService" />
-	
 	<jaxrs:server id="essiUserServer" address="/user">
 		<jaxrs:serviceBeans>
 			<ref bean="essiUserService" />
