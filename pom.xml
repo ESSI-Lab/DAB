@@ -45,7 +45,7 @@
         <org.apache-commons.version>3.9</org.apache-commons.version>
         <org.apache-commons-text.version>1.6</org.apache-commons-text.version>
         <saxon-he.version>9.7.0-15</saxon-he.version>
-        <docker.plugin.version>0.20.1</docker.plugin.version>
+        <docker.plugin.version>0.40.2</docker.plugin.version>
         <sonar.plugin.version>3.9.0.2155</sonar.plugin.version>
         <drools.version>7.5.0.t018</drools.version>
         <jacoco.plugin.version>0.8.7</jacoco.plugin.version>

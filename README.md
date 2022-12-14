@@ -73,6 +73,18 @@ A demo portal to check that DAB is working as expected will be available at the 
 http://localhost:9090/gs-service/search
 
 In a more complex configuration the DAB can be deployed on a cloud service, where multiple containers can be responsible for different tasks (e.g. frontend, harvesting, access). The DAB Dockerhub repository is currently under construction.
+
+It's possible to create a docker image with the following commands from the gs-service project:
+
+mvn -o -B -Pvaadin-production -Dmaven.test.skip=true clean package
+
+mvn docker:build
+
+This it will create the same DAB image that is also available on Docker Hub.
+
+The docker container can readily be started for example with the following command:
+
+docker run -p 8080:8080 -e "JAVA_OPTS=-Dconfiguration.url=file:///tmp" essilab/dab:latest
 	
 </details>
 	

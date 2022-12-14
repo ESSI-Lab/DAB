@@ -45,7 +45,7 @@
 
 		<plugins>
 
-			
+
 
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
@@ -204,6 +204,33 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+
+				<configuration>
+					<verbose>true</verbose>
+					<images>
+						<image>
+							<name>essilab/dab</name>
+							<build>							
+         					    <dockerFile>${project.basedir}/src/main/docker/Dockerfile</dockerFile>
+         					    <contextDir>${project.basedir}</contextDir>
+								<tags>
+									<tag>latest</tag>
+									<tag>${project.version}</tag>
+								</tags>
+							</build>
+							<run>
+								<ports>
+									<port>8080:8080</port>
+								</ports>
+							</run>
+						</image>
+					</images>
+				</configuration>
 			</plugin>
 
 		</plugins>
@@ -365,7 +392,7 @@
 			<artifactId>profiler-semantic</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>profiler-bnhs</artifactId>
@@ -451,7 +478,7 @@
 			<artifactId>accessor-oai-pmh</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-	
+
 
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
@@ -501,8 +528,8 @@
 			<artifactId>accessor-local-fs</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-	
-	
+
+
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>security</artifactId>
@@ -600,7 +627,7 @@
 	<profiles>
 
 
-		<profile>
+	<profile>
 			<!-- Production mode is activated using -Pvaadin-production -->
 			<id>vaadin-production</id>
 			<properties>
