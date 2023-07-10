@@ -205,6 +205,29 @@ The DAB software has been developed in the context of numerous National, Europea
  </li>
  <li>European Union funded projects
  <ul>
+  <li>Horizon Europe
+  <ul>
+   <li><b>FAIR-EASE</b> (2022/2025)</li>
+   <li><b>Blue-Cloud 2026</b> (2023/2026)</li>
+   <li><b>TRIGGER</b> (2022/2027)</li>
+  </ul>
+  </li>	 
+	<li>Horizon 2020
+      <ul>
+      <li><b>ODIP 2</b> (2015/2018)</li>
+      <li><b>ERA-PLANET</b> (2016/2022)</li>
+      <li><b>SeaDataCloud</b> (2016/2021)</li>
+      <li><b>Blue-Cloud</b> (2019/2023)</li>
+      <li><b>I-CHANGE</b> (2021/2025)</li>
+      </ul>
+	</li>
+	<li>EASME
+	<ul>
+      <li><b>EMODNet Ingestion</b> (2016/2019)</li>
+      <li><b>EMODNet Ingestion II</b> (2019/2021)</li>
+      <li><b>EMODNet Ingestion III</b> (2022/2024)</li>
+      </ul>
+    </li>
   <li>FP7
   <ul>
    <li><b>EuroGEOSS</b> (2009/2012)</li>
@@ -213,21 +236,6 @@ The DAB software has been developed in the context of numerous National, Europea
    <li><b>ODIP</b> (2011/2015)</li>
   </ul>
   </li>
-	<li>Horizon 2020
-      <ul>
-      <li><b>ODIP 2</b> (2015/2018)</li>
-      <li><b>ERA-PLANET</b> (2016/-)</li>
-      <li><b>SeaDataCloud</b> (2016/2021)</li>
-      <li><b>Blue-Cloud</b> (2019-)</li>
-      <li><b>I-CHANGE</b> (2021-)</li>
-      </ul>
-	</li>
-	<li>EASME
-	<ul>
-      <li><b>EMODNet Ingestion</b> (2016/2019)</li>
-      <li><b>EMODNet Ingestion II</b> (2019-2021)</li>
-      </ul>
-    </li>
 	<li>European Space Agency (ESA)
       <ul>
       <li><b>HMA-T</b> (2008/2009)</li>
