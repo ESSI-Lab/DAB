@@ -328,6 +328,7 @@ Experts who contributed with valuable inputs and feedbacks representing signific
 - Wim Hugo
 - Siri Jodha Khalsa
 - Osamu Ochiai
+- Washington Otieno
 - Anthony Lehmann
 - Joan Masó
 - Francoise Pearlman
@@ -338,7 +339,7 @@ Experts who contributed with valuable inputs and feedbacks representing signific
 - Barbara Ryan
 - Dick Schaap
 - Richard Signell
-- Joost van Bemmelen
+- Joost Van Bemmelen
 
 
 Previous members of the development team:
