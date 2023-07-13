@@ -308,13 +308,13 @@ Many data scientists, computer scientists, information and software engineers ha
 [DAB development team (contact us)](https://www.uos-firenze.essi-lab.eu/personnel):
 
 - Stefano Nativi (DAB father)
-- Paolo Mazzetti (sofware design)
-- Enrico Boldrini (software design, developer)
+- Paolo Mazzetti (responsible)
+- Enrico Boldrini (software design, developer, coordinator of DAB activities with WMO)
 - Fabrizio Papeschi (developer)
 - Roberto Roncella (developer)
 - Massimiliano Olivieri (developer)
 - Lorenzo Bigagli (software design)
-- Mattia Santoro (software design, developer)
+- Mattia Santoro (software design, developer, coordinator of DAB activities with GEO)
 	
 Experts who contributed with valuable inputs and feedbacks representing significant data provider and user communities (in alphabetic order):
 	
