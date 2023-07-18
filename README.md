@@ -241,7 +241,7 @@ The DAB software has been developed in the context of numerous National, Europea
       <li><b>HMA-T</b> (2008/2009)</li>
       <li><b>Prod-Trees</b> (2012/2015)</li>
       <li><b>DAB4EDGE</b> (2018/2020)</li>
-      <li><b>GPP(GEOSS Platform Plus)</b> (2022/2025)</li>
+      <li><b>DAB4GPP</b> (2022/2025)</li>
       </ul>
       </li>
       </ul>
