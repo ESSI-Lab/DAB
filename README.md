@@ -287,8 +287,6 @@ The following papers provide a technical description of the DAB brokering framwe
 
 <code><a href="https://www.doi.org/10.1080/17538947.2022.2099591">Enrico Boldrini, Stefano Nativi, Silvano Pecora, Igor Chernov & Paolo Mazzetti (2022) Multi-scale hydrological system-of-systems realized through WHOS: the brokering framework, International Journal of Digital Earth, 15:1, 1259-1289, DOI: 10.1080/17538947.2022.2099591<a/></code>
 
-<code><a href="https://www.sciencedirect.com/science/article/pii/S1364815215000481">Stefano Nativi, Paolo Mazzetti, Mattia Santoro, Fabrizio Papeschi, Max Craglia, Osamu Ochiai, Big Data challenges in building the Global Earth Observation System of Systems, Environmental Modelling & Software, Volume 68, 2015,Pages 1-26, ISSN 1364-8152</a></code>
-
 <code><a href="https://www.igi-global.com/chapter/the-brokering-approach-for-enabling-collaborative-scientific-research/119828">Boldrini, Enrico,et al. "The Brokering Approach for Enabling Collaborative Scientific Research." Collaborative Knowledge in Scientific Research Networks, edited by Paolo Diviacco, et al., IGI Global, 2015, pp. 283-304.</a></code>
 
 <code><a href="https://www.sciencedirect.com/science/article/abs/pii/S1364815215000481">Stefano Nativi, Paolo Mazzetti, Mattia Santoro, Fabrizio Papeschi, Max Craglia, Osamu Ochiai, Big Data challenges in building the Global Earth Observation System of Systems, Environmental Modelling & Software, Volume 68, 2015, Pages 1-26.</a></code>
