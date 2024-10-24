@@ -30,7 +30,7 @@
 			<name>agpl_v3</name>
 		</license>
 	</licenses>
-	
+
 	<prerequisites>
 		<maven>3.0</maven>
 	</prerequisites>
@@ -1063,14 +1063,16 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
+				<version>3.2.2</version>
 				<configuration>
 					<filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
 				</configuration>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
 				<configuration>
 					<source>11</source>
 					<target>11</target>
@@ -1100,6 +1102,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-surefire-plugin</artifactId>
+						<version>3.0.0-M3</version>
 						<configuration>
 							<parallel>classes</parallel>
 							<threadCount>10</threadCount>
@@ -1552,7 +1555,6 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-		
 
 
 		<repository>
@@ -1641,7 +1643,6 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-
 
 
 		<repository>
