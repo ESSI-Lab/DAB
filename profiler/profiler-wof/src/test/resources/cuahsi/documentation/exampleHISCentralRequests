@@ -1,0 +1,78 @@
+Example requests to CUAHSI US HIS Central
+*****************************************
+
+http://hiscentral.cuahsi.org/webservices/hiscentral.asmx/GetSeriesCatalogForBox2?xmin=-112&xmax=-111&ymin=41&ymax=42&conceptKeyword=All&networkIDs=&beginDate=&endDate=
+
+http://hiscentral.cuahsi.org/webservices/hiscentral.asmx/GetSeriesCatalogForBox2?xmin=-180&xmax=-111&ymin=41&ymax=42&conceptKeyword=Battery%20voltage&networkIDs=&beginDate=&endDate=
+
+Example series record in the response.
+
+	<SeriesRecord>
+		<ServCode>LittleBearRiver</ServCode>
+		<ServURL>http://data.iutahepscor.org/littlebearriverwof/cuahsi_1_1.asmx
+		</ServURL>
+		<location>LittleBearRiver:USU-LBR-ParadiseWeather</location>
+		<VarCode>LBR:USU23</VarCode>
+		<VarName>Battery voltage</VarName>
+		<beginDate>2009-09-09T00:00:00Z</beginDate>
+		<endDate>2017-10-10T00:00:00Z</endDate>
+		<ValueCount>2900</ValueCount>
+		<Sitename>Little Bear River Paradise Weather Station near Paradise,
+			Utah</Sitename>
+		<latitude>41.5724</latitude>
+		<longitude>-111.8551</longitude>
+		<datatype>Minimum</datatype>
+		<valuetype>Field Observation</valuetype>
+		<samplemedium>Not Relevant</samplemedium>
+		<timeunits>day</timeunits>
+		<conceptKeyword>Battery voltage</conceptKeyword>
+		<genCategory>Instrumentation</genCategory>
+		<TimeSupport>1</TimeSupport>
+	</SeriesRecord>
+
+http://hiscentral.cuahsi.org/webservices/hiscentral.asmx/GetWaterOneFlowServiceInfo?
+
+Example service info record in the response. 
+
+	<ServiceInfo>
+		<servURL>http://icewater.usu.edu/littlebearriverwof/cuahsi_1_1.asmx?WSDL
+		</servURL>
+		<Title>Little Bear River Experimental Watershed, Northern Utah, USA
+		</Title>
+		<ServiceDescriptionURL>http://hiscentral.cuahsi.org/pub_network.aspx?n=52
+		</ServiceDescriptionURL>
+		<Email>jeff.horsburgh@usu.edu</Email>
+		<phone>435-797-2946</phone>
+		<organization>Utah Water Research Laboratory, Utah State University
+		</organization>
+		<orgwebsite>http://littlebearriver.usu.edu</orgwebsite>
+		<citation>Horsburgh, J. S., D. K. Stevens, D. G. Tarboton, N. O.
+			Mesner, A. Spackman Jones, and S. Gurrero (2009) Monitoring data
+			collected within the Little Bear River Experimental Watershed, Utah,
+			USA, Utah State University.</citation>
+		<aabstract>Utah State University is conducting continuous monitoring
+			within the Little Bear River watershed of northern Utah, USA to
+			investiage the use of surrogate measures such as turbidity in
+			creating high frequency load estimates for constituents that cannot
+			be measured continuously.</aabstract>
+		<valuecount>30153629</valuecount>
+		<variablecount>59</variablecount>
+		<sitecount>16</sitecount>
+		<ServiceID>52</ServiceID>
+		<NetworkName>LittleBearRiver</NetworkName>
+		<minx>-111.9464</minx>
+		<miny>41.49541</miny>
+		<maxx>-111.7993</maxx>
+		<maxy>41.71847</maxy>
+		<serviceStatus />
+	</ServiceInfo>
+
+Example requests to GI-suite (to be done after harvesting e.g. http://icewater.usu.edu/littlebearriverwof/cuahsi_1_1.asmx?WSDL)
+***********************************************************************************************************************************
+
+http://localhost:9090/gs-service/services/essi/hiscentral.asmx/GetSeriesCatalogForBox2?xmin=-112&xmax=-111&ymin=41&ymax=42&conceptKeyword=Battery%20voltage&networkIDs=&beginDate=&endDate=
+
+http://localhost:9090/gs-service/services/essi/hiscentral.asmx/GetSeriesCatalogForBox2?xmin=-112.750220849445&xmax=-111.750220849445&ymin=41.0484440290612&ymax=42.0484440290612&conceptKeyword=&networkIDs=1&beginDate=05%2F02%2F2016&endDate=06%2F02%2F2016
+
+http://localhost:9090/gs-service/services/essi/hiscentral.asmx/GetWaterOneFlowServiceInfo?
+

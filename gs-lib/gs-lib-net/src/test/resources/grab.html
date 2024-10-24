@@ -1,0 +1,165 @@
+<!DOCTYPE HTML PUBLIC "-W3CDTD HTML 4.01 TransitionalEN" " http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>EGASKRO web service</title>
+  
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+  <meta content="EGASKRO web service" name="title">
+  <meta content="egaskro,radiation,service,russia,typhoon" name="keywords">
+  <meta content="EGASKRO web service" name="description">  
+  
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+  <script type="text/javascript" src="js/script.js"></script>
+</head>
+<body>
+  <div id="container">
+  
+     <div id='header'>
+	   <div style='width: 100%'>
+		   <div style='float: left; padding-top: 10px;'>
+		      <a href='index.php'><img width='50' src='img/egaskro2.png'/></a>
+		   </div>
+		   <div>
+			   <div id='titleDiv1'>
+				Unified State Automated System for Monitoring Radiation Situation on the territory of 
+				the Russian Federation (EGASKRO)
+			   </div>
+			   <div id='titleDiv2'>
+				Data access service
+			   </div>
+		   </div>
+	   </div>
+	   <div clear='both'></div>
+	 </div>
+	 
+	 <div id='content'>
+	 
+		 <div id='leftSideBar'>
+		   <div id='leftMenuContent'>
+			   <div class='spot'>Menu</div>
+			   <ul class='leftMenuContent'>
+				 <li class='leftMenuContentLi'><a class='menuRef' href='about'>About</a></li>
+				 <li class='leftMenuContentLi'><a class='menuRef' href='data'>Data</a></li>
+			   </ul>	
+		   </div>
+		   <div class='spot'>Links</div>
+		   <ul class='refs'>
+			   <li class='refsLi1'><a href='http://www.meteorf.ru/'><img src='img/roshydromet.jpg'></a></li>
+			   <li class='refsLi2'><a href='http://www.typhoon.obninsk.ru/'><img src='img/typhoon.jpg'></a></li>
+			   <li class='refsLi2'><a href='http://egaskro.ru/'><img src='img/egaskro.png'></a></li>
+			   <li class='refsLi2'><a href='http://www.earthobservations.org/'><img src='img/geo.jpg'></a></li>
+			   <li class='refsLi2'><a href='http://www.geoportal.org/web/guest/geo_home'><img src='img/geosslogo.jpg'></a></li>
+		   
+		   </ul>	 
+		 </div>
+		 
+		 <div id='contentMain'>
+			 <script>
+  var reqSys = null, reqSubsys = null, reqObj = null, reqParam = null, reqDataRel = null, reqOut = null;
+  var accessMas, useMap = 0;
+  
+  $(".contentText").ready(function() {
+     reqSys = 1;reqSubsys = 1;reqParam = 1;reqDataRel = -1;reqOut = 2;	 
+     changeSystem(); 
+  });
+  
+  function updateEnd() {
+     if (reqSys != null) $("#system").attr("value",reqSys);
+     if (reqSubsys != null) $("#subsystem").attr("value", reqSubsys);
+     if (reqObj != null) $("#object").attr("value", reqObj);
+     if (reqParam != null) $("#param").attr("value",reqParam);
+     if (reqDataRel != null) $("#datarel").attr("value", reqDataRel);
+     if (reqOut != null) $("#outputfor").attr("value", reqOut);
+     if (reqSys != null) {
+	    reqSys = null;
+		reqSubsys = null;
+		reqObj = null;
+		reqParam = null;
+		reqDataRel = null;
+		reqOut = null;
+		setResultsRequest();
+	 }
+     if (accessMas[$("#param").index()] == 0) {
+        $("#request").attr('disabled', true);
+        $('#accessDiv').css({'display':'block'});
+     }
+     else {
+        $("#request").attr('disabled', false);
+        $('#accessDiv').css({'display':'none'});
+     }
+  }
+  
+  function setResultsRequest() {
+     var content = "";
+	 content = content + "System = "+$("#system :selected").text()+ "<br>";
+	 content = content + "Subsystem = "+$("#subsystem :selected").text()+ "<br>";
+	 if ($("#object").val() != undefined) content = content + "Object = "+$("#object :selected").text()+ "<br>";
+	 content = content + "Parameter = "+$("#param :selected").text()+ "<br>";
+	 content = content + "Data relevance = "+$("#datarel :selected").text()+ "<br>";
+	 content = content + "Output format = "+$("#outputfor :selected").text()+ "<br>";
+	 $("#results1").html(content);
+	 $("#results").css({'display':'block'});
+         if (useMap == 1) { initialize(); useMap = 0; }
+  }
+</script>
+<div class='contentText'>
+	<p>
+	<form action='' method='post'>
+	  <table id='paramForm'>
+	    <tr><td>System</td><td><select onchange='changeSystem();' id='system' name='system'><option value='1'>Departmental</option><option value='2'>Territorial</option><option value='3'>National</option></select></td></tr>
+	    <tr>
+	      <td>Subsystem</td>
+	      <td><select onchange='changeSubsystem();' id='subsystem' name='subsystem'></select></td>
+	    </tr>
+	    <tr>
+	      <td>Object</td>
+	      <td><select onchange='changeObject();' id='object' name='object'></select></td>
+	    </tr>
+	    <tr>
+	      <td>Parameter</td>
+	      <td><select name='param' id='param'></select></td>
+	    </tr>
+	    <tr>
+	      <td>Data relevance</td><td><select id='datarel' name='datarel'>
+					 <option value='24'>1 day</option>
+					 <option value='48'>2 days</option>
+					 <option value='72'>3 days</option>
+					 <option value='168'>1 week</option>
+					 <option value='720'>1 month</option>
+					 <option value='-1'>none</option>
+				   </select>
+		  </td>
+	    </tr>
+	    <tr>
+	      <td>Output format</td><td><select id='outputfor' name='outputfor'>
+					  <option value='1'>browser</option>
+					  <option value='2'>file</option>
+					  <option value='3'>map</option>
+				   </select>
+		  </td>
+	    </tr>
+	  </table>	
+	  <p><input type='submit' value='Request' id='request' name='request'/></p>	
+          <div id='accessDiv' style='display:none'>
+             <font color=red>To access to dataset please contact to Valery S. Kosykh <a href='mailto:vsk@feerc.ru'>vsk@feerc.ru</a></font>
+          </div>	   
+	</form>
+
+	<div id='results' style='display:none; text-indent: 0px; margin-top: 25px; margin-left: 5px;'>
+		<b>Results request...</b><br><br>
+		<div id='results1' style='border: 1px grey dotted; padding: 10px; border-bottom: none; text-indent: 0px;'></div>
+		<div id='results2' style='border: 1px grey dotted; padding: 20px; border-top: none; text-indent: 0px;'>
+		   558 results request<br><br><a href='temp/1532424367_72075.csv'>Download file</a>		</div>
+	</div>
+</div>		 </div>
+	  </div> 
+	  
+	  <div id="footer">
+	   Research Production Association "Typhoon"<br>
+	   Russian Participation in GEOSS
+	  </div>
+	 
+  </div>
+</body>
+</html>

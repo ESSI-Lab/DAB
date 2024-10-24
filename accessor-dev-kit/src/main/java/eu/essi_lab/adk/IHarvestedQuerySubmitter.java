@@ -4,7 +4,7 @@ package eu.essi_lab.adk;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -62,8 +62,37 @@ public interface IHarvestedQuerySubmitter<T> {
     public List<String> listMetadataFormats() throws GSException;
 
     /**
-     * @return true if this connector supports selective harvesting, false otherwise
+     * @return
+     * @throws GSException
      */
-    public boolean supportsIncrementalHarvesting() throws GSException;
+    public default boolean supportsIncrementalHarvesting() throws GSException {
 
+	return false;
+    }
+
+    /**
+     * @return
+     * @throws GSException
+     */
+    public default boolean supportsResumedHarvesting() throws GSException {
+
+	return true;
+    }
+
+    /**
+     * @return
+     * @throws GSException
+     */
+    public default boolean supportsRecovery() throws GSException {
+
+	return true;
+    }
+
+    /**
+     * @return
+     */
+    public default boolean supportsExpectedRecordsCount() {
+
+	return false;
+    }
 }

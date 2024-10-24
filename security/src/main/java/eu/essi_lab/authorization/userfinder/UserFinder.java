@@ -7,7 +7,7 @@ package eu.essi_lab.authorization.userfinder;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,20 +25,18 @@ package eu.essi_lab.authorization.userfinder;
  */
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
 import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.DatabaseWriter;
-import eu.essi_lab.api.database.factory.DatabaseConsumerFactory;
+import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.authentication.util.TokenProvider;
 import eu.essi_lab.authorization.BasicRole;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
@@ -50,9 +48,11 @@ import eu.essi_lab.messages.bond.DynamicViewAnd;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.bond.ViewBond;
 import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.GSProperty;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.auth.UserBaseClient;
+import eu.essi_lab.model.auth.UserIdentifierType;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 
@@ -129,7 +129,7 @@ public class UserFinder {
     private DatabaseReader reader;
     protected TokenProvider tokenProvider;
     private DatabaseWriter writer;
-    private StringBuilder builder;
+    private StringBuilder logBuilder;
 
     public UserFinder() {
 
@@ -144,10 +144,10 @@ public class UserFinder {
 
 	UserFinder finder = new UserFinder();
 
-	StorageUri storageUri = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo storageUri = ConfigurationWrapper.getDatabaseURI();
 
-	DatabaseReader reader = DatabaseConsumerFactory.createDataBaseReader(storageUri);
-	DatabaseWriter writer = DatabaseConsumerFactory.createDataBaseWriter(storageUri);
+	DatabaseReader reader = DatabaseProviderFactory.getDatabaseReader(storageUri);
+	DatabaseWriter writer = DatabaseProviderFactory.getDatabaseWriter(storageUri);
 
 	finder.setClient(reader);
 	finder.setDatabaseReader(reader);
@@ -189,7 +189,7 @@ public class UserFinder {
     /**
      * @param writer
      */
-    private void setDatabaseWriter(DatabaseWriter writer) {
+    public void setDatabaseWriter(DatabaseWriter writer) {
 
 	this.writer = writer;
     }
@@ -215,113 +215,18 @@ public class UserFinder {
 
 	USERS_UPDATER_TASK.setUserFinder(this);
 
-	List<String> identifiers = findIdentifiers(request);
+	List<GSProperty<String>> identifiers = findIdentifiers(request);
 
 	GSUser user = findUser(identifiers);
 
 	return user;
     }
 
-    protected List<String> findIdentifiers(HttpServletRequest request) throws Exception {
-	//
-	// find all the identifiers in the request according
-	// to different strategies
-	//
-	List<String> identifiers = new ArrayList<>();
-
-	//
-	// 1 - OAuth 2.0 identifier
-	//
-	email = tokenProvider.findOAuth2Attribute(request, true);
-	authProvider = tokenProvider.findOAuth2Attribute(request, false);
-
-	builder = new StringBuilder();
-
-	if (email.isPresent()) {
-
-	    builder.append("\n- OAuth 2.0 email: " + email.get());
-	    identifiers.add(email.get());
-	}
-
-	if (authProvider.isPresent()) {
-
-	    builder.append("\n- OAuth 2.0 provider: " + authProvider.get());
-	}
-
-	//
-	// 2 - remote host
-	//
-	String remoteHost = request.getRemoteHost();
-	builder.append("\n- Remote host: " + remoteHost);
-
-	identifiers.add(remoteHost);
-
-	//
-	// 3 - 'x-forwarded-for' header
-	//
-	List<String> xForwardedForHeaders = WebRequest.readXForwardedForHeaders(request);
-
-	identifiers.addAll(xForwardedForHeaders);
-
-	xForwardedForHeaders.forEach(ip -> builder.append("\n- Xforw: " + ip));
-
-	//
-	// 4 - 'Origin' header
-	//
-	Optional<String> originHeader = WebRequest.readOriginHeader(request);
-
-	if (originHeader.isPresent()) {
-
-	    identifiers.add(originHeader.get());
-
-	    builder.append("\n- " + WebRequest.ORIGIN_HEADER + ": " + originHeader.get());
-	}
-
-	//
-	// 5,6 - view identifier and creator
-	//
-	WebRequest webRequest = new WebRequest();
-	webRequest.setServletRequest(request, false);
-
-	Optional<String> viewId = webRequest.extractViewId();
-
-	viewId.ifPresent(id -> {
-
-	    builder.append("\n- View id: " + id);
-	    identifiers.add(id);
-
-	    String creator = getViewCreator(id);
-	    if (creator != null) {
-		builder.append("\n- View creator: " + creator);
-		identifiers.add(creator);
-	    }
-	});
-
-	//
-	// 7 - user token
-	//
-	Optional<String> userTokenId = webRequest.extractTokenId();
-	if (userTokenId.isPresent()) {
-
-	    builder.append("\n- User token: " + userTokenId.get());
-	    identifiers.add(userTokenId.get());
-	}
-
-	//
-	// 8 - client identifier
-	//
-	Optional<String> clientId = webRequest.readClientIdentifierHeader();
-
-	clientId.ifPresent(id -> {
-
-	    builder.append("\n- Client id: " + id);
-	    identifiers.add(id);
-	});
-
-	return identifiers;
-    }
-
-    public String getViewCreator(String id) {
+    /**
+     * @param id
+     * @return
+     */
+    private String getViewCreator(String id) {
 	Optional<View> view = getView(id);
 	if (view.isPresent()) {
 	    // we can extract the creator of the view
@@ -368,27 +273,21 @@ public class UserFinder {
 
 	if (user.isPresent()) {
 	    user.get().setEnabled(true);
-	    addUser(user.get());
+	    writer.store(user.get());
 	}
     }
 
     /**
-     * @param user
      * @throws Exception
      */
-    public void addUser(GSUser user) throws Exception {
+    public void updateUsersCache() throws Exception {
 
-	writer.store(user);
-    }
+	synchronized (USERS_UPDATER_TASK) {
 
-    /**
-     * @throws Exception
-     */
-    protected void updateUsersCache() throws Exception {
+	    if (Objects.nonNull(client)) {
 
-	if (Objects.nonNull(client)) {
-
-	    users = client.getUsers();
+		users = client.getUsers();
+	    }
 	}
     }
 
@@ -480,41 +379,148 @@ public class UserFinder {
     }
 
     /**
+     * @return the writer
+     */
+    public DatabaseWriter getWriter() {
+
+	return writer;
+    }
+
+    protected List<GSProperty<String>> findIdentifiers(HttpServletRequest request) throws Exception {
+	
+	//
+	// find all the identifiers in the request according
+	// to different strategies
+	//
+	List<GSProperty<String>> identifiers = new ArrayList<>();
+
+	//
+	// 1 - OAuth 2.0 identifier
+	//
+	email = tokenProvider.findOAuth2Attribute(request, true);
+	authProvider = tokenProvider.findOAuth2Attribute(request, false);
+
+	logBuilder = new StringBuilder();
+
+	if (email.isPresent()) {
+
+	    logBuilder.append("\n- OAuth 2.0 email: " + email.get());
+	    identifiers.add(new GSProperty<String>(UserIdentifierType.OAUTH_EMAIL.getType(), email.get()));
+	}
+
+	if (authProvider.isPresent()) {
+
+	    logBuilder.append("\n- OAuth 2.0 provider: " + authProvider.get());
+	}
+
+	//
+	// 2 - remote host
+	//
+	String remoteHost = request.getRemoteHost();
+	logBuilder.append("\n- Remote host: " + remoteHost);
+
+	identifiers.add(new GSProperty<String>(UserIdentifierType.HOST.getType(), remoteHost));
+
+	//
+	// 3 - 'x-forwarded-for' header
+	//
+	List<String> xForwardedForHeaders = WebRequest.readXForwardedForHeaders(request);
+
+	xForwardedForHeaders.forEach(x -> identifiers.add(new GSProperty<String>(UserIdentifierType.X_FORWARDER_FOR.getType(), x)));
+
+	xForwardedForHeaders.forEach(ip -> logBuilder.append("\n- Xforw: " + ip));
+
+	//
+	// 4 - 'Origin' header
+	//
+	Optional<String> originHeader = WebRequest.readOriginHeader(request);
+
+	if (originHeader.isPresent()) {
+
+	    identifiers.add(new GSProperty<>(UserIdentifierType.ORIGIN_HEADER.getType(), originHeader.get()));
+
+	    logBuilder.append("\n- " + WebRequest.ORIGIN_HEADER + ": " + originHeader.get());
+	}
+
+	WebRequest webRequest = new WebRequest();
+	webRequest.setServletRequest(request, false);
+
+	//
+	// 5 - user token
+	//
+	Optional<String> userTokenId = webRequest.extractTokenId();
+	if (userTokenId.isPresent()) {
+
+	    logBuilder.append("\n- User token: " + userTokenId.get());
+
+	    identifiers.add(new GSProperty<>(UserIdentifierType.USER_TOKEN.getType(), userTokenId.get()));
+	}
+
+	//
+	// 6,7 - view identifier and creator
+	//
+	if (!userTokenId.isPresent()) {
+
+	    //
+	    // see UserFinderProductionTokenCasesExternalTestIT comment
+	    //
+
+	    Optional<String> viewId = webRequest.extractViewId();
+
+	    viewId.ifPresent(id -> {
+
+		logBuilder.append("\n- View id: " + id);
+		identifiers.add(new GSProperty<>(UserIdentifierType.VIEW_IDENTIFIER.getType(), id));
+
+		String creator = getViewCreator(id);
+		if (creator != null) {
+
+		    logBuilder.append("\n- View creator: " + creator);
+
+		    identifiers.add(new GSProperty<>(UserIdentifierType.VIEW_CREATOR.getType(), creator));
+		}
+	    });
+	}
+
+	//
+	// 8 - client identifier
+	//
+	Optional<String> clientId = webRequest.readClientIdentifierHeader();
+
+	clientId.ifPresent(id -> {
+
+	    logBuilder.append("\n- Client id: " + id);
+	    identifiers.add(new GSProperty<>(UserIdentifierType.CLIENT_IDENTIFIER.getType(), id));
+	});
+
+	// removes verbose log when the requests come from the Vaadin internal server
+	if (request.getServletPath() != null && request.getServletPath().contains("configuration")) {
+
+	    logBuilder = null;
+	}
+
+	return identifiers;
+    }
+
+    /**
      * @param identifiers
      * @return
      * @throws Exception
      */
-    protected GSUser findUser(List<String> identifiers) throws Exception {
+    protected GSUser findUser(List<GSProperty<String>> identifiers) throws Exception {
 
 	List<GSUser> users = getUsers();
 
-	List<GSUser> matchedUsers = users.stream().filter(u -> //
+	Optional<GSUser> user = users.//
+		stream().//
 
-	// user must be enabled
-	u.isEnabled() && (
+		// user must be enabled
+		filter(u -> u.isEnabled()).//
 
-	//
-	// normal case, string equality comparison
-	//
-	identifiers.contains(u.getIdentifier())
-		//
-		// this case is useful for example when a user can be identified not only by
-		// a specific identifier (case covered by the above case)
-		// but from a partial identifier, for example a partial IP
-		// with less than 4 groups (e.g: 192.168.12)
-		//
-		|| identifiers.stream().anyMatch(id -> id.contains(u.getIdentifier())))
+		// the user properties contains one of the found properties identifiers
+		filter(u -> u.getProperties().stream().anyMatch(p -> identifiers.contains(p))).//
 
-	).collect(Collectors.toList());
-
-	Optional<GSUser> user = matchedUsers.stream().sorted(new Comparator<GSUser>() {
-
-	    @Override
-	    public int compare(GSUser o1, GSUser o2) {
-		return o1.getIdentifier().compareTo(o2.getIdentifier());
-	    }
-	}).findFirst(); // selects the matched user with the longer identifier. this is to select whos-34324 instead of
-			// general whos (to be deleted)
+		findFirst();
 
 	if (!user.isPresent()) {
 
@@ -534,7 +540,7 @@ public class UserFinder {
 
 		if (isAdmin(user.get())) {
 
-		    GSLoggerFactory.getLogger(getClass()).debug("Admin user registered in the configuration");
+		    // GSLoggerFactory.getLogger(getClass()).debug("Admin user registered in the configuration");
 
 		    user.get().setRole(BasicRole.ADMIN.getRole());
 		}
@@ -546,9 +552,12 @@ public class UserFinder {
 	    user.get().setAuthProvider(authProvider.get());
 	}
 
-	builder.append("\n- User found: " + user.get());
+	if (logBuilder != null) {
 
-	GSLoggerFactory.getLogger(getClass()).debug(builder.toString());
+	    logBuilder.append("\n- User found: " + user.get());
+
+	    GSLoggerFactory.getLogger(getClass()).debug(logBuilder.toString());
+	}
 
 	return user.get();
     }

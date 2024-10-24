@@ -1,0 +1,10 @@
+http://boldrini.essi-lab.eu:9090/gs-service/services/essi/view/arctic/sos?service=SOS&request=GetFeatureOfInterest&procedure=procedure-2b89a8b5-2617-31d4-a1c2-a9be589cc08c
+
+http://www.bom.gov.au/waterdata/services?service=SOS&request=GetFeatureOfInterest&procedure=http://bom.gov.au/waterdata/services/tstypes/Pat4_V_1
+
+http://www.bom.gov.au/waterdata/services?service=SOS&request=GetDataAvailability&version=2.0.0&featureOfInterest=http://bom.gov.au/waterdata/services/stations/144005A&procedure=http://bom.gov.au/waterdata/services/tstypes/Pat4_V_1
+
+http://www.bom.gov.au/waterdata/services?service=SOS&version=2.0&request=Getobservation&featureOfInterest=http://bom.gov.au/waterdata/services/stations/144005A&observedProperty=http://bom.gov.au/waterdata/services/parameters/Water Course Discharge&temporalFilter=om:phenomenonTime,2019-01-21T08:01:01.000+10:00/2019-02-21T08:01:01.000+10:00&procedure=http://bom.gov.au/waterdata/services/tstypes/Pat4_V_1
+
+
+

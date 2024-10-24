@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.os;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -491,10 +491,9 @@ public abstract class OSParameters {
 	    case BBOX: // same as not disjoint, as OGC filter encoding 09-026r2
 	    case INTERSECTS:
 		return Optional
-			.of(BondFactory.createSimpleValueBond(BondOperator.GREATER_OR_EQUAL, MetadataElement.TEMP_EXTENT_END, value));
-	    case CONTAINS:
-		return Optional
 			.of(BondFactory.createSimpleValueBond(BondOperator.GREATER_OR_EQUAL, MetadataElement.TEMP_EXTENT_BEGIN, value));
+	    case CONTAINS:
+		return Optional.of(BondFactory.createSimpleValueBond(BondOperator.GREATER, MetadataElement.TEMP_EXTENT_BEGIN, value));
 	    case DISJOINT:
 	    default:
 		throw new IllegalArgumentException("Operator not yet implemented: " + operator);
@@ -549,16 +548,16 @@ public abstract class OSParameters {
 	    if (relatedValues.length > 0) {
 		spatialRelation = relatedValues[0];
 	    }
-	    
+
 	    BondOperator operator = BondOperator.decode(spatialRelation);
 
 	    switch (operator) {
 	    case BBOX: // same as not disjoint, as OGC filter encoding 09-026r2
 	    case INTERSECTS:
-		return Optional.of(BondFactory.createSimpleValueBond(BondOperator.LESS_OR_EQUAL, MetadataElement.TEMP_EXTENT_BEGIN, value));
+		return Optional.of(BondFactory.createSimpleValueBond(BondOperator.LESS_OR_EQUAL, MetadataElement.TEMP_EXTENT_END, value));
 
 	    case CONTAINS:
-		return Optional.of(BondFactory.createSimpleValueBond(BondOperator.LESS_OR_EQUAL, MetadataElement.TEMP_EXTENT_END, value));
+		return Optional.of(BondFactory.createSimpleValueBond(BondOperator.LESS, MetadataElement.TEMP_EXTENT_END, value));
 
 	    case DISJOINT:
 	    default:
@@ -677,6 +676,21 @@ public abstract class OSParameters {
     /**
     *
     */
+    public static final OSParameter INSITU = new OSParameter("inSitu", "boolean", null, "{gs:inSitu}") {
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    if (value == null || value.equals("")) {
+		return Optional.empty();
+	    }
+
+	    return Optional.of(BondFactory.createSimpleValueBond(MetadataElement.IN_SITU, Boolean.valueOf(value)));
+	}
+    };
+
+    /**
+     * BondFactory.createSimpleValueBond(element, Boolean.valueOf(literal));
+     */
     public static final OSParameter TERM_FREQUENCY = new OSParameter("tf", "string", "", "{gs:tf}") {
 
 	@Override
@@ -887,6 +901,21 @@ public abstract class OSParameters {
     };
 
     /**
+    *
+    */
+    public static final OSParameter IS_VALIDATED = new OSParameter("isValidated", "string", null, "{gs:isValidated}") {
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    if (value == null || value.equals("")) {
+		return Optional.empty();
+	    }
+
+	    return Optional.of(BondFactory.createIsValidatedBond(Boolean.valueOf(value)));
+	}
+    };
+
+    /**
      *
      */
     public static final OSParameter BBOX = new OSParameter("bbox", "bbox", null, "{geo:box}") {
@@ -949,6 +978,195 @@ public abstract class OSParameters {
 	}
     };
 
+    public static final OSParameter CROP_TYPES = new OSParameter("cropTypes", "string", null, "{gs:cropTypes}") {
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    if (value == null || value.equals("")) {
+		return Optional.empty();
+	    }
+
+	    if (value.contains(",")) {
+		String[] split = value.split(",");
+		LogicalBond bond = BondFactory.createOrBond();
+		for (String s : split) {
+		    bond.getOperands().add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.CROP_TYPES, s.trim()));
+		}
+		return Optional.of(bond);
+	    }
+
+	    return Optional.of(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.CROP_TYPES, value));
+	}
+    };
+    
+    public static final OSParameter QUANTITY_TYPES = new OSParameter("quantityTypes", "string", null, "{gs:quantityTypes}") {
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    if (value == null || value.equals("")) {
+		return Optional.empty();
+	    }
+
+	    if (value.contains(",")) {
+		String[] split = value.split(",");
+		LogicalBond bond = BondFactory.createOrBond();
+		for (String s : split) {
+		    bond.getOperands().add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.QUANTITY_TYPES, s.trim()));
+		}
+		return Optional.of(bond);
+	    }
+
+	    return Optional.of(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.QUANTITY_TYPES, value));
+	}
+    };
+
+    public static final OSParameter LAND_COVER_TYPES = new OSParameter("landCoverTypes", "string", null, "{gs:landCoverTypes}") {
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    if (value == null || value.equals("")) {
+		return Optional.empty();
+	    }
+
+	    if (value.contains(",")) {
+		String[] split = value.split(",");
+		LogicalBond bond = BondFactory.createOrBond();
+		for (String s : split) {
+		    bond.getOperands()
+			    .add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.LAND_COVER_TYPES, s.trim()));
+		}
+		return Optional.of(bond);
+	    }
+
+	    return Optional.of(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.LAND_COVER_TYPES, value));
+	}
+    };
+
+    public static final OSParameter IRRIGATION_TYPES = new OSParameter("irrigationTypes", "string", null, "{gs:irrigationTypes}") {
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    if (value == null || value.equals("")) {
+		return Optional.empty();
+	    }
+
+	    if (value.contains(",")) {
+		String[] split = value.split(",");
+		LogicalBond bond = BondFactory.createOrBond();
+		for (String s : split) {
+		    bond.getOperands()
+			    .add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.IRRIGATION_TYPES, s.trim()));
+		}
+		return Optional.of(bond);
+	    }
+
+	    return Optional.of(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.IRRIGATION_TYPES, value));
+	}
+    };
+
+    /**
+    *
+    */
+    public static final OSParameter CROP_CONFIDENCE = new OSParameter("cropConfidence", "string", "", "{gs:cropConfidence}") {
+
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    // e.g: [0,20]
+	    if (!value.equals("")) {
+
+		String[] range = value.replace("[", "").replace("]", "").split(",");
+		LogicalBond andBond = BondFactory.createAndBond();
+		SimpleValueBond min = BondFactory.createSimpleValueBond(BondOperator.GREATER_OR_EQUAL, MetadataElement.CONFIDENCE_CROP_TYPE,
+			Double.valueOf(range[0]));
+		SimpleValueBond max = BondFactory.createSimpleValueBond(BondOperator.LESS_OR_EQUAL, MetadataElement.CONFIDENCE_CROP_TYPE,
+			Double.valueOf(range[1]));
+		andBond.getOperands().add(min);
+		andBond.getOperands().add(max);
+		return Optional.of(andBond);
+	    }
+
+	    return Optional.empty();
+	}
+    };
+
+    /**
+    *
+    */
+    public static final OSParameter LAND_COVER_CONFIDENCE = new OSParameter("landCoverConfidence", "string", "",
+	    "{gs:landCoverConfidence}") {
+
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    // e.g: [0,20]
+	    if (!value.equals("")) {
+
+		String[] range = value.replace("[", "").replace("]", "").split(",");
+		LogicalBond andBond = BondFactory.createAndBond();
+		SimpleValueBond min = BondFactory.createSimpleValueBond(BondOperator.GREATER_OR_EQUAL, MetadataElement.CONFIDENCE_LC_TYPE,
+			Double.valueOf(range[0]));
+		SimpleValueBond max = BondFactory.createSimpleValueBond(BondOperator.LESS_OR_EQUAL, MetadataElement.CONFIDENCE_LC_TYPE,
+			Double.valueOf(range[1]));
+		andBond.getOperands().add(min);
+		andBond.getOperands().add(max);
+		return Optional.of(andBond);
+	    }
+
+	    return Optional.empty();
+	}
+    };
+
+    /**
+    *
+    */
+    public static final OSParameter IRRIGATION_CONFIDENCE = new OSParameter("irrigationConfidence", "string", "",
+	    "{gs:irrigationConfidence}") {
+
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    // e.g: [0,20]
+	    if (!value.equals("")) {
+
+		String[] range = value.replace("[", "").replace("]", "").split(",");
+		LogicalBond andBond = BondFactory.createAndBond();
+		SimpleValueBond min = BondFactory.createSimpleValueBond(BondOperator.GREATER_OR_EQUAL, MetadataElement.CONFIDENCE_IRR_TYPE,
+			Double.valueOf(range[0]));
+		SimpleValueBond max = BondFactory.createSimpleValueBond(BondOperator.LESS_OR_EQUAL, MetadataElement.CONFIDENCE_IRR_TYPE,
+			Double.valueOf(range[1]));
+		andBond.getOperands().add(min);
+		andBond.getOperands().add(max);
+		return Optional.of(andBond);
+	    }
+
+	    return Optional.empty();
+	}
+    };
+
+    /**
+    *
+    */
+    public static final OSParameter EIFFEL_DISCOVERY = new OSParameter("eiffelDiscovery", "string", null, "{gs:eiffelDiscovery}");
+
+    /**
+    *
+    */
+    public static final OSParameter OUTPUT_VERSION = new OSParameter("outputVersion", "versionString", "1.0", "{gs:version}");
+
+    /**
+    *
+    */
+    public static final OSParameter OUTPUT_FORMAT = new OSParameter("outputFormat", "freeText", null, null);
+
+    /**
+     * @param south
+     * @param west
+     * @param north
+     * @param east
+     * @param relatedValues
+     * @return
+     */
     private static SpatialBond create(double south, double west, double north, double east, String... relatedValues) {
 
 	SpatialExtent spatialExtent = new SpatialExtent( //
@@ -963,6 +1181,13 @@ public abstract class OSParameters {
 	return BondFactory.createSpatialExtentBond(operator, spatialExtent);
     }
 
+    /**
+     * @param words
+     * @param additionalDegrees
+     * @param relatedValues
+     * @return
+     * @throws Exception
+     */
     private static SpatialBond from3Words(String words, double additionalDegrees, String... relatedValues) throws Exception {
 
 	String[] split = words.split("\\.");
@@ -979,6 +1204,13 @@ public abstract class OSParameters {
 		Double.valueOf(longitude) + additionalDegrees, relatedValues); // east
     }
 
+    /**
+     * @param words1
+     * @param words2
+     * @param relatedValues
+     * @return
+     * @throws Exception
+     */
     private static SpatialBond from3Words(String words1, String words2, String... relatedValues) throws Exception {
 
 	String[] split1 = words1.split("\\.");
@@ -1001,15 +1233,10 @@ public abstract class OSParameters {
     }
 
     /**
-     *
+     * @param value
+     * @param element
+     * @return
      */
-    public static final OSParameter OUTPUT_VERSION = new OSParameter("outputVersion", "versionString", "1.0", "{gs:version}");
-
-    /**
-     *
-     */
-    public static final OSParameter OUTPUT_FORMAT = new OSParameter("outputFormat", "freeText", null, null);
-
     private static Optional<Bond> createBond(String value, MetadataElement element) {
 
 	if (value == null || value.equals("")) {

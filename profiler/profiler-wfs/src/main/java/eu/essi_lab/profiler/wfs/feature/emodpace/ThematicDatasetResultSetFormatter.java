@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.wfs.feature.emodpace;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -165,23 +165,25 @@ public class ThematicDatasetResultSetFormatter extends DiscoveryResultSetFormatt
 			maxx = n;
 			maxy = e;
 		    }
-		    geometry = "<gml:MultiSurface srsName=\"urn:x-ogc:def:crs:EPSG:" + crs.getCode() + "\" srsDimension=\"2\">\n" + //
-			    "<gml:surfaceMember>\n" + //
-			    "<gml:Polygon>\n" + //
-			    "<gml:exterior>\n" + //
-			    "<gml:LinearRing>\n" + //
-			    "<gml:posList>" + //
-			    minx + " " + miny + " "//
-			    + minx + " " + maxy + " "//
-			    + maxx + " " + maxy + " "//
-			    + maxx + " " + miny + " "//
-			    + minx + " " + miny + //
-			    "</gml:posList>\n" + //
-			    "</gml:LinearRing>\n" + //
-			    "</gml:exterior>\n" + //
-			    "</gml:Polygon>\n" + //
-			    "</gml:surfaceMember>\n" + "</gml:MultiSurface>" //
-		    ;//
+		    if (Double.isFinite(minx) && Double.isFinite(miny) && Double.isFinite(maxx) && Double.isFinite(maxy)) {
+			geometry = "<gml:MultiSurface srsName=\"urn:x-ogc:def:crs:EPSG:" + crs.getCode() + "\" srsDimension=\"2\">\n" + //
+				"<gml:surfaceMember>\n" + //
+				"<gml:Polygon>\n" + //
+				"<gml:exterior>\n" + //
+				"<gml:LinearRing>\n" + //
+				"<gml:posList>" + //
+				minx + " " + miny + " "//
+				+ minx + " " + maxy + " "//
+				+ maxx + " " + maxy + " "//
+				+ maxx + " " + miny + " "//
+				+ minx + " " + miny + //
+				"</gml:posList>\n" + //
+				"</gml:LinearRing>\n" + //
+				"</gml:exterior>\n" + //
+				"</gml:Polygon>\n" + //
+				"</gml:surfaceMember>\n" + "</gml:MultiSurface>" //
+			;//
+		    }
 
 		}
 		String title = reader.evaluateString(
@@ -190,35 +192,52 @@ public class ThematicDatasetResultSetFormatter extends DiscoveryResultSetFormatt
 			"/*/*:harmonizedMetadata[1]/*:coreMetadata[1]/*:isoMetadata[1]/*:MI_Metadata[1]/*:identificationInfo[1]/*:MD_DataIdentification[1]/*:abstract[1]/*[1]");
 
 		String organization = "";
-		Node[] orgNodes = reader.evaluateNodes("//*:organisationName/*");
-		HashSet<String> orgs = new HashSet<>();
-		for (Node orgNode : orgNodes) {
-		    String org = reader.evaluateString(orgNode, ".");
-		    orgs.add(org.trim());
-		}
-		Iterator<String> orgIterator = orgs.iterator();
-		while (orgIterator.hasNext()) {
-		    String org = (String) orgIterator.next();
-		    organization += org + "|";
-		}
-		if (!organization.isEmpty()) {
-		    organization = organization.substring(0, organization.length() - 1);
+
+		organization = reader
+			.evaluateString("/*/*:harmonizedMetadata[1]/*:extendedMetadata[1]/*:extension/*:OriginatorOrganisationDescription");
+
+		if (organization == null || organization.isEmpty()) {
+
+		    Node[] orgNodes = reader.evaluateNodes("//*:organisationName/*");
+		    HashSet<String> orgs = new HashSet<>();
+		    for (Node orgNode : orgNodes) {
+			String org = reader.evaluateString(orgNode, ".");
+			orgs.add(org.trim());
+		    }
+		    Iterator<String> orgIterator = orgs.iterator();
+		    while (orgIterator.hasNext()) {
+			String org = (String) orgIterator.next();
+			organization += org + "|";
+		    }
+		    if (!organization.isEmpty()) {
+			organization = organization.substring(0, organization.length() - 1);
+		    }
 		}
 
 		String platformName = reader.evaluateString(
 			"/*/*:harmonizedMetadata[1]/*:coreMetadata[1]/*:isoMetadata[1]/*:MI_Metadata[1]/*:acquisitionInformation[1]/*:MI_AcquisitionInformation[1]/*:platform[1]/*:MI_Platform[1]/*:citation[1]/*:CI_Citation[1]/*:title[1]/*[1]");
 
 		String downloadURL = reader.evaluateString(
-			"/*/*:harmonizedMetadata[1]/*:coreMetadata[1]/*:isoMetadata[1]/*:MI_Metadata[1]/*:distributionInfo[1]/*:MD_Distribution[1]/*:transferOptions[2]/*:MD_DigitalTransferOptions[1]/*:onLine[1]/*:CI_OnlineResource[1]/*:linkage[1]/*[1]");
+			"/*/*:harmonizedMetadata[1]/*:coreMetadata[1]/*:isoMetadata[1]/*:MI_Metadata[1]/*:distributionInfo[1]/*:MD_Distribution[1]/*:transferOptions/*:MD_DigitalTransferOptions/*:onLine/*:CI_OnlineResource[*:function/*/@codeListValue='download']/*:linkage[1]/*[1]");
+
+		String fileIdentifier = reader.evaluateString(
+			"/*/*:harmonizedMetadata[1]/*:coreMetadata[1]/*:isoMetadata[1]/*:MI_Metadata[1]/*:fileIdentifier[1]/*[1]");
+
+		String metadataURL = null;
+		if (fileIdentifier != null) {
+		    metadataURL = "https://seadatanet.geodab.eu/gs-service/services/essi/view/emod-pace/csw?service=CSW&version=2.0.2&request=GetRecordById&id="
+			    + fileIdentifier + "&outputschema=http://www.isotc211.org/2005/gmi&elementSetName=full";
+		}
 
 		String parameter = reader.evaluateString(
 			"/*/*:harmonizedMetadata[1]/*:coreMetadata[1]/*:isoMetadata[1]/*:MI_Metadata[1]/*:contentInfo[1]/*:MD_CoverageDescription[1]/*:attributeDescription[1]/*:RecordType[1]");
 
 		QName root = thematicDataset.getQName();
+		String rootString = root.getLocalPart().contains(" ") ? root.getLocalPart().replace(" ", "-") : root.getLocalPart();
 		String xml = //
-			"<essi:" + root.getLocalPart() + " xmlns:essi=\"http://essi-lab.eu\" xmlns:gml=\"http://www.opengis.net/gml\" >" + //
-				"<essi:the_geom>\n" + geometry + //
-				"\n</essi:the_geom>\n" + //
+			"<essi:" + rootString + " xmlns:essi=\"http://essi-lab.eu\" xmlns:gml=\"http://www.opengis.net/gml\" >" + //
+				"<essi:the_geom>" + geometry + //
+				"</essi:the_geom>\n" + //
 				"<essi:title/>" + //
 				"<essi:abstract/>" + //
 				"<essi:theme/>" + //
@@ -226,7 +245,8 @@ public class ThematicDatasetResultSetFormatter extends DiscoveryResultSetFormatt
 				"<essi:platform/>" + //
 				"<essi:parameter/>" + //
 				"<essi:downloadURL/>" + //
-				"</essi:" + root.getLocalPart() + ">\n";//
+				"<essi:metadataURL/>" + //
+				"</essi:" + rootString + ">\n";//
 		XMLDocumentReader r = new XMLDocumentReader(xml);
 		XMLDocumentWriter writer = new XMLDocumentWriter(r);
 		if (title != null) {
@@ -247,6 +267,9 @@ public class ThematicDatasetResultSetFormatter extends DiscoveryResultSetFormatt
 		}
 		if (downloadURL != null) {
 		    writer.setText("/*/*:downloadURL", downloadURL);
+		}
+		if (metadataURL != null) {
+		    writer.setText("/*/*:metadataURL", metadataURL);
 		}
 		features.add(r.getDocument().getDocumentElement());
 

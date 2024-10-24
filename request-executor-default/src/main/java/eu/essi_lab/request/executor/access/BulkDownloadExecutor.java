@@ -4,7 +4,7 @@ package eu.essi_lab.request.executor.access;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,6 +22,7 @@ package eu.essi_lab.request.executor.access;
  */
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -34,9 +35,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import eu.essi_lab.lib.net.utils.Downloader;
+import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.BulkDownloadMessage;
 import eu.essi_lab.messages.ResultSet;
@@ -93,6 +95,8 @@ public class BulkDownloadExecutor extends AbstractAuthorizedExecutor implements 
 	    List<Callable<String>> tasks = new ArrayList<>();
 	    List<DataReference> refs = references.getReferences();
 
+	    // addReferences(refs);
+
 	    for (DataReference reference : refs) {
 
 		Callable<String> c = new Callable<String>() {
@@ -104,7 +108,9 @@ public class BulkDownloadExecutor extends AbstractAuthorizedExecutor implements 
 			String linkage = reference.getLinkage();
 
 			DirectDownloader d;
-			if (linkage.contains("gwps/dataset")) {
+			if (linkage.contains("worldcereal/query")) {
+			    d = new WorldCerealDownloader(linkage);
+			} else if (linkage.contains("gwps/dataset")) {
 			    d = new GWPSDownloader(linkage);
 			} else {
 			    d = new DirectDownloader(linkage);
@@ -162,14 +168,49 @@ public class BulkDownloadExecutor extends AbstractAuthorizedExecutor implements 
 			//
 			// adds entry to the ZIP
 			//
-			Optional<InputStream> optionalStream = downloader.downloadStream(split[1]);
+			Optional<InputStream> optionalStream = downloader.downloadOptionalStream(split[1]);
 
 			if (optionalStream.isPresent()) {
 
 			    InputStream stream = optionalStream.get();
-			    String extension = split[1].contains(".") ? split[1].substring(split[1].lastIndexOf('.')) : ".bin";
+			    // worldcereal-use-case (UNZIP Files)
+			    if (linkage.contains("worldcereal/query")) {
+				try (ZipInputStream zis = new ZipInputStream(stream)) {
+				    ZipEntry entry;
+				    while ((entry = zis.getNextEntry()) != null) {
+					if (!entry.isDirectory()) {
+					    // Read the zip entry's content into a ByteArrayOutputStream
+					    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					    byte[] buffer = new byte[1024];
+					    int len;
+					    while ((len = zis.read(buffer)) > 0) {
+						baos.write(buffer, 0, len);
+					    }
+					    baos.close();
 
-			    addEntry(zipStream, stream, title + extension);
+					    // Convert the ByteArrayOutputStream to a ByteArrayInputStream
+					    ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+					    String fileName = entry.getName();
+					    String extension = fileName.contains(".") ? fileName.substring(fileName.lastIndexOf('.'))
+						    : ".bin";
+
+					    // Store the ByteArrayInputStream in the ZIP file
+					    addEntry(zipStream, bais, title + extension);
+					}
+
+					// Close the current entry
+					zis.closeEntry();
+				    }
+				} finally {
+				    if (stream != null)
+					stream.close();
+				}
+			    } else {
+
+				String extension = split[1].contains(".") ? split[1].substring(split[1].lastIndexOf('.')) : ".bin";
+
+				addEntry(zipStream, stream, title + extension);
+			    }
 
 			} else {
 			    String msg = "Unable to download from the temporary result storage: " + split[1];

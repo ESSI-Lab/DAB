@@ -1,0 +1,33 @@
+working notebook to real hydro server
+
+DEBUG:suds.client:sending to (http://boldrini.essi-lab.eu:8084/hsl-ur/index.php/default/services/cuahsi_1_1.asmx)
+message:
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:ns0="http://www.cuahsi.org/his/1.1/ws/" xmlns:ns1="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+   <SOAP-ENV:Header/>
+   <ns1:Body>
+      <ns0:GetValues>
+         <ns0:location>hsl-ur:2657</ns0:location>
+         <ns0:variable>hsl-ur:Precipitation</ns0:variable>
+         <ns0:startDate>2006-05-01</ns0:startDate>
+         <ns0:endDate>2006-05-10</ns0:endDate>
+      </ns0:GetValues>
+   </ns1:Body>
+</SOAP-ENV:Envelope>
+DEBUG:suds.client:headers = {'SOAPAction': u'"http://www.cuahsi.org/his/1.1/ws/GetValues"', 'Content-Type': 'text/xml; charset=utf-8'}
+DEBUG:suds.client:http succeeded:
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <soap:Body>
+      <GetValuesResponse xmlns="http://www.cuahsi.org/his/1.1/ws/">
+         <GetValuesResult>&lt;timeSeriesResponse xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.cuahsi.org/waterML/1.1/"&gt;&lt;queryInfo&gt;&lt;creationTime&gt;2018-05-04T13:58:14+00:00&lt;/creationTime&gt;&lt;criteria MethodCalled="GetValues"&gt;&lt;parameter name="site" value="hsl-ur:2657" /&gt;&lt;parameter name="variable" value="hsl-ur:Precipitation" /&gt;&lt;parameter name="startDate" value="2006-05-01" /&gt;&lt;parameter name="endDate" value="2006-05-10" /&gt;&lt;/criteria&gt;&lt;/queryInfo&gt;&lt;timeSeries&gt;&lt;sourceInfo xsi:type="SiteInfoType"&gt;&lt;siteName&gt;Tarariras&lt;/siteName&gt;&lt;siteCode network="hsl-ur" siteID="137" &gt;2657&lt;/siteCode&gt;&lt;geoLocation&gt;&lt;geogLocation xsi:type="LatLonPointType"&gt;&lt;latitude&gt;-34.261&lt;/latitude&gt;&lt;longitude&gt;-57.611&lt;/longitude&gt;&lt;/geogLocation&gt;&lt;/geoLocation&gt;&lt;siteProperty name="County"&gt;Uruguay&lt;/siteProperty&gt;&lt;/sourceInfo&gt;&lt;variable&gt;&lt;variableCode vocabulary="hsl-ur" default="true" variableID="2" &gt;Precipitation&lt;/variableCode&gt;&lt;variableName&gt;Precipitation&lt;/variableName&gt;&lt;valueType&gt;Field Observation&lt;/valueType&gt;&lt;dataType&gt;Cumulative&lt;/dataType&gt;&lt;generalCategory&gt;Hydrology&lt;/generalCategory&gt;&lt;sampleMedium&gt;Precipitation&lt;/sampleMedium&gt;&lt;unit&gt;&lt;unitName&gt;millimeter&lt;/unitName&gt;&lt;unitType&gt;Length&lt;/unitType&gt;&lt;unitAbbreviation&gt;mm&lt;/unitAbbreviation&gt;&lt;unitCode&gt;54&lt;/unitCode&gt;&lt;/unit&gt;&lt;noDataValue&gt;-9999&lt;/noDataValue&gt;&lt;timeScale isRegular="false"&gt;&lt;unit&gt;&lt;unitName&gt;day&lt;/unitName&gt;&lt;unitType&gt;Time&lt;/unitType&gt;&lt;unitAbbreviation&gt;d&lt;/unitAbbreviation&gt;&lt;unitCode&gt;104&lt;/unitCode&gt;&lt;/unit&gt;&lt;timeSupport&gt;1&lt;/timeSupport&gt;&lt;/timeScale&gt;&lt;speciation&gt;Not Applicable&lt;/speciation&gt;&lt;/variable&gt;&lt;values /&gt;&lt;/timeSeries&gt;&lt;/timeSeriesResponse&gt;</GetValuesResult>
+      </GetValuesResponse>
+   </soap:Body>
+</soap:Envelope>
+
+
+
+parsing waterml data
+

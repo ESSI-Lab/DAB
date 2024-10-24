@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.servlet;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,15 +29,15 @@ import javax.ws.rs.ext.RuntimeDelegate;
 
 import org.quartz.SchedulerException;
 
-import eu.essi_lab.api.database.DatabaseProvider;
-import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
+import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting;
-import eu.essi_lab.gssrv.starter.GISuiteStarter;
+import eu.essi_lab.gssrv.starter.GIPStarter;
 import eu.essi_lab.lib.utils.Chronometer;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 
 /**
@@ -91,17 +91,17 @@ public class ServletListener implements ServletContextListener {
 	GSLoggerFactory.getLogger(ServletListener.class).info("Context destroyng STARTED");
 
 	try {
-	    StorageUri uri = ConfigurationWrapper.getDatabaseURI();
+	    StorageInfo uri = ConfigurationWrapper.getDatabaseURI();
 
 	    GSLoggerFactory.getLogger(getClass()).info("Releasing database resources");
 
-	    DatabaseProvider provider = DatabaseProviderFactory.create(uri);
+	    Database provider = DatabaseFactory.create(uri);
 	    if (provider != null) {
 		provider.release();
 	    }
 
 	    SchedulerSetting schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
-	    SchedulerFactory.getScheduler(schedulerSetting).shutdown();
+	    SchedulerFactory.getScheduler(schedulerSetting, false).shutdown();
 
 	} catch (GSException e) {
 
@@ -119,8 +119,8 @@ public class ServletListener implements ServletContextListener {
 	GSLoggerFactory.getLogger(ServletListener.class).info("Context destroyng ENDED");
     }
 
-    private GISuiteStarter getStarter() {
+    private GIPStarter getStarter() {
 
-	return new GISuiteStarter();
+	return new GIPStarter();
     }
 }

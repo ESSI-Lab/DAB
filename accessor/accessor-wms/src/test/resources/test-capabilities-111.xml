@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE WMT_MS_Capabilities SYSTEM "http://schemas.opengis.net/wms/1.1.1/WMS_MS_Capabilities.dtd"[]>
+<WMT_MS_Capabilities version="1.1.1">
+  <Service>
+    <Name>WMS</Name>
+    <Title>Geoscience Data - Données Géoscientifiques</Title>
+    <Abstract>Geoscience Data - Données Géoscientifiques</Abstract>
+    <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://wms.agg.nrcan.gc.ca/wms2/" />
+    <ContactInformation>
+      <ContactPersonPrimary>
+        <ContactPerson>D. Oneschuk</ContactPerson>
+        <ContactOrganization>Geophysical Data Centre - Centre de données géophysiques</ContactOrganization>
+      </ContactPersonPrimary>
+      <ContactPosition>
+      </ContactPosition>
+      <ContactAddress>
+        <AddressType>postal</AddressType>
+        <Address>615 Booth St</Address>
+        <City>Ottawa</City>
+        <StateOrProvince>ON</StateOrProvince>
+        <PostCode>K1A 0E9</PostCode>
+        <Country>Canada</Country>
+      </ContactAddress>
+      <ContactVoiceTelephone>+1 (613) 995-5326</ContactVoiceTelephone>
+      <ContactElectronicMailAddress />
+    </ContactInformation>
+    <Fees>none</Fees>
+    <AccessConstraints>none</AccessConstraints>
+  </Service>
+  <Capability>
+    <Request>
+      <GetCapabilities>
+        <Format>text/xml</Format>
+        <DCPType>
+          <HTTP>
+            <Get>
+              <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://wms.agg.nrcan.gc.ca/wms2/wms2.aspx?" />
+            </Get>
+          </HTTP>
+        </DCPType>
+      </GetCapabilities>
+      <GetMap>
+        <Format>image/png</Format>
+        <DCPType>
+          <HTTP>
+            <Get>
+              <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://wms.agg.nrcan.gc.ca/wms2/wms2.aspx?" />
+            </Get>
+          </HTTP>
+        </DCPType>
+      </GetMap>
+    </Request>
+    <Exception>
+      <Format>XML</Format>
+    </Exception>
+    <Layer queryable="0">
+      <Title>Geoscience Data - Données Géoscientifiques</Title>
+      <SRS>EPSG:4269</SRS>
+      <SRS>EPSG:4326</SRS>
+      <LatLonBoundingBox minx="-179.657692" miny="32.315631" maxx="-3.426856" maxy="85.296148" />
+      <BoundingBox SRS="EPSG:4269" minx="-179.657692" miny="32.315631" maxx="-3.426856" maxy="85.296148" />
+      <Layer queryable="0">
+        <Title>_Base Layers - Couches de base</Title>
+        <Layer queryable="0">
+          <Name>0</Name>
+          <Title>Major Roads-Routes principales</Title>
+          <SRS>EPSG:4269</SRS>
+          <SRS>EPSG:4326</SRS>
+          <LatLonBoundingBox minx="-141.000000" miny="41.683014" maxx="-52.783562" maxy="68.343269" />
+        </Layer>
+        <Layer queryable="0">
+          <Name>1</Name>
+          <Title>NTS 250K - SNRC 250K</Title>
+          <SRS>EPSG:4269</SRS>
+          <SRS>EPSG:4326</SRS>
+          <LatLonBoundingBox minx="-143.997504" miny="41.001356" maxx="-52.001344" maxy="84.181388" />
+        </Layer>
+      </Layer>
+    </Layer>
+  </Capability>
+</WMT_MS_Capabilities>

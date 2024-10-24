@@ -4,7 +4,7 @@ package eu.essi_lab.access.wml;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,7 +21,6 @@ package eu.essi_lab.access.wml;
  * #L%
  */
 
-import java.math.BigInteger;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Date;
 import java.util.HashSet;
@@ -31,9 +30,6 @@ import java.util.UUID;
 
 import javax.xml.bind.JAXBElement;
 
-import org.cuahsi.waterml._1.SourceType;
-import org.cuahsi.waterml._1.TimeSeriesResponseType;
-import org.cuahsi.waterml._1.ValueSingleVariable;
 import org.cuahsi.waterml._1.essi.JAXBWML.WML_SiteProperty;
 
 import eu.essi_lab.access.DataDownloader;
@@ -41,11 +37,11 @@ import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.jaxb.wml._2_0.CollectionType;
 import eu.essi_lab.jaxb.wml._2_0.MeasureTVPType;
 import eu.essi_lab.jaxb.wml._2_0.MeasurementTimeseriesType;
+import eu.essi_lab.jaxb.wml._2_0.MeasurementTimeseriesType.Point;
 import eu.essi_lab.jaxb.wml._2_0.MonitoringPointType;
 import eu.essi_lab.jaxb.wml._2_0.TVPDefaultMetadataPropertyType;
 import eu.essi_lab.jaxb.wml._2_0.TVPMeasurementMetadataType;
 import eu.essi_lab.jaxb.wml._2_0.TVPMetadataType;
-import eu.essi_lab.jaxb.wml._2_0.MeasurementTimeseriesType.Point;
 import eu.essi_lab.jaxb.wml._2_0.gml._3_2_1.AbstractFeatureType;
 import eu.essi_lab.jaxb.wml._2_0.gml._3_2_1.AbstractGeometryType;
 import eu.essi_lab.jaxb.wml._2_0.gml._3_2_1.CodeType;
@@ -68,6 +64,7 @@ import eu.essi_lab.jaxb.wml._2_0.sams._2_0.ShapeType;
 import eu.essi_lab.jaxb.wml._2_0.swe._2.UnitReference;
 import eu.essi_lab.lib.net.utils.whos.HydroOntology;
 import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
+import eu.essi_lab.lib.net.utils.whos.WHOSOntology;
 import eu.essi_lab.lib.net.utils.whos.WMOOntology;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.resource.BNHSProperty;
@@ -127,17 +124,17 @@ public abstract class WML2DataDownloader extends DataDownloader {
 		property = new ReferenceType();
 		observation.setObservedProperty(property);
 	    }
-	    Optional<String> attributeURI = extensions.getAttributeURI();
+	    Optional<String> attributeURI = extensions.getObservedPropertyURI();
 	    String label = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getCoverageDescription().getAttributeTitle();
 	    if (attributeURI.isPresent()) {
 		property.setHref(attributeURI.get());
 		String uri = attributeURI.get();
 		if (uri != null) {
-		    HydroOntology ontology = new HydroOntology();
+		    HydroOntology ontology = new WHOSOntology();
 		    SKOSConcept concept = ontology.getConcept(uri);
 		    if (concept != null) {
 			label = concept.getPreferredLabel().getKey();
-			List<String> closeMatches = concept.getCloseMatches();
+			HashSet<String> closeMatches = concept.getCloseMatches();
 			if (closeMatches != null && !closeMatches.isEmpty()) {
 			    try {
 				WMOOntology wmoOntology = new WMOOntology();
@@ -153,7 +150,6 @@ public abstract class WML2DataDownloader extends DataDownloader {
 			    } catch (Exception e) {
 				e.printStackTrace();
 			    }
-
 			}
 		    }
 		}

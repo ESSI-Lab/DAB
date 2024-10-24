@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pdp xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://authzforce.github.io/core/xmlns/pdp/6.0"
+	xsi:schemaLocation="http://authzforce.github.io/core/xmlns/pdp/6.0 https://raw.githubusercontent.com/authzforce/core/develop/pdp-engine/src/main/resources/pdp.xsd"
+	version="6.0.0">
+
+	<refPolicyProvider 
+		id="refPolicyProvider"
+		xsi:type="StaticRefPolicyProvider">
+		<policyLocation>F:\GIT\GI-project\authorization\src\test\resources\essi-rbac-test\rbac-root-policy-set.xml</policyLocation>
+	
+		<policyLocation>F:\GIT\GI-project\authorization\src\test\resources\essi-rbac-test\kma-pps.xml</policyLocation>
+		<policyLocation>F:\GIT\GI-project\authorization\src\test\resources\essi-rbac-test\admin-pps.xml</policyLocation>
+		<policyLocation>F:\GIT\GI-project\authorization\src\test\resources\essi-rbac-test\default-pps.xml</policyLocation>
+		<policyLocation>F:\GIT\GI-project\authorization\src\test\resources\essi-rbac-test\limited-pps.xml</policyLocation>
+	
+		<policyLocation>F:\GIT\GI-project\authorization\src\test\resources\essi-rbac-test\kma-rps.xml</policyLocation>
+		<policyLocation>F:\GIT\GI-project\authorization\src\test\resources\essi-rbac-test\admin-rps.xml</policyLocation>
+		<policyLocation>F:\GIT\GI-project\authorization\src\test\resources\essi-rbac-test\default-rps.xml</policyLocation>
+		<policyLocation>F:\GIT\GI-project\authorization\src\test\resources\essi-rbac-test\limited-rps.xml</policyLocation>
+		
+	</refPolicyProvider>
+
+	<rootPolicyProvider 
+		id="rootPolicyProvider"
+		xsi:type="StaticRefBasedRootPolicyProvider">
+		<policyRef>root</policyRef>
+	</rootPolicyProvider>
+
+</pdp>

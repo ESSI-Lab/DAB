@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof.access;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -61,7 +61,7 @@ import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
@@ -324,7 +324,7 @@ public class GetValuesTransformer extends AccessRequestTransformer {
     private DataDescriptor getDefaultDescriptor(String requestId, String onlineIdentifier) throws GSException {
 
 	List<GSSource> sources = ConfigurationWrapper.getHarvestedSources();
-	StorageUri databaseURI = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
 	ResultSet<GSResource> resultSet = AccessQueryUtils.findResource(requestId, sources, onlineIdentifier, databaseURI);
 
 	if (resultSet.getResultsList().isEmpty()) {

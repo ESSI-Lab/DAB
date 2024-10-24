@@ -4,7 +4,7 @@ package eu.essi_lab.api.database.vol;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,11 +31,11 @@ import java.util.Optional;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import eu.essi_lab.api.database.internal.Folder;
+import eu.essi_lab.api.database.DatabaseFolder;
 
 /**
  */
-public class VolatileFolder implements Folder {
+public class VolatileFolder implements DatabaseFolder {
 
     private String folderName;
     private HashMap<String, Document> documentsMap;

@@ -16,19 +16,19 @@
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>core-datamodel</artifactId>
-			<version>${project.version}</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>request-executor-default</artifactId>
-			<version>${project.version}</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>augmenter</artifactId>
-			<version>${project.version}</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 	 
 	</dependencies>

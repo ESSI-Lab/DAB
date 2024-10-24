@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof.discovery.sites;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -107,13 +107,13 @@ public class GetSiteInfoTransformer extends DiscoveryRequestTransformer {
 
 	    List<Bond> operands = new ArrayList<>();
 
-	    // we are interested only on downloadable datasets
-	    ResourcePropertyBond accessBond = BondFactory.createIsExecutableBond(true);
-	    operands.add(accessBond);
-
-	    // we are interested only on downloadable datasets
-	    ResourcePropertyBond downBond = BondFactory.createIsDownloadableBond(true);
-	    operands.add(downBond);
+//	    // we are interested only on downloadable datasets
+//	    ResourcePropertyBond accessBond = BondFactory.createIsExecutableBond(true);
+//	    operands.add(accessBond);
+//
+//	    // we are interested only on downloadable datasets
+//	    ResourcePropertyBond downBond = BondFactory.createIsDownloadableBond(true);
+//	    operands.add(downBond);
 
 	    // we are interested only on TIME SERIES datasets
 	    ResourcePropertyBond timeSeriesBond = BondFactory.createIsTimeSeriesBond(true);

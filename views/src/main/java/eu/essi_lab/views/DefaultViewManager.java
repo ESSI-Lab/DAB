@@ -4,7 +4,7 @@ package eu.essi_lab.views;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 
 import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.DatabaseWriter;
+import eu.essi_lab.api.database.GetViewIdentifiersRequest;
 import eu.essi_lab.lib.utils.ExpiringCache;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.bond.Bond;
@@ -230,7 +231,7 @@ public class DefaultViewManager implements IViewManager {
      * @throws GSException
      */
     public List<String> getViewIdentifiers(int start, int count) throws GSException {
-	return reader.getViewIdentifiers(start, count);
+	return reader.getViewIdentifiers(GetViewIdentifiersRequest.create(start, count));
 
     }
 

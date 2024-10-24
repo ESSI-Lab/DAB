@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wms.map;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -45,6 +45,7 @@ import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.ResultsPriority;
+import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
@@ -60,6 +61,9 @@ import eu.essi_lab.pdk.wrt.AccessRequestTransformer;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
 
 public class WMSMapTransformer extends AccessRequestTransformer {
+
+    private static final String WMS_MAP_TRANSFORMER_DATA_COMPLIANCE_REPORT_NOT_FOUND = "WMS_MAP_TRANSFORMER_DATA_COMPLIANCE_REPORT_NOT_FOUND";
+    private static final String WMS_MAP_TRANSFORMER_ONLINE_ID_NOT_FOUND = "WMS_MAP_TRANSFORMER_ONLINE_ID_NOT_FOUND";
 
     @Override
     public ValidationMessage validate(WebRequest request) throws GSException {
@@ -166,7 +170,6 @@ public class WMSMapTransformer extends AccessRequestTransformer {
 
 	discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
 	discoveryMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
-	
 
 	SimpleValueBond bond = BondFactory.createSimpleValueBond(//
 		BondOperator.EQUAL, //
@@ -182,8 +185,15 @@ public class WMSMapTransformer extends AccessRequestTransformer {
 	ResultSet<GSResource> resultSet = executor.retrieve(discoveryMessage);
 
 	if (resultSet.getResultsList().isEmpty()) {
-	    // TODO: error!
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    "Online id [" + onlineIdentifier + "] not found", //
+		    ErrorInfo.ERRORTYPE_SERVICE, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    WMS_MAP_TRANSFORMER_ONLINE_ID_NOT_FOUND);
 	}
+
 	GSResource result = resultSet.getResultsList().get(0);
 	ReportsMetadataHandler handler = new ReportsMetadataHandler(result);
 
@@ -191,9 +201,12 @@ public class WMSMapTransformer extends AccessRequestTransformer {
 	Optional<DataComplianceReport> optReport = reports.stream().filter(r -> r.getOnlineId().equals(onlineIdentifier)).findFirst();
 	if (!optReport.isPresent()) {
 
-	    // TODO: error
-
-	    return null;
+	    throw GSException.createException(//
+		    getClass(), //
+		    "Data compliance report for dataset with original id [" + result.getOriginalId() + "] not found", //
+		    ErrorInfo.ERRORTYPE_SERVICE, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    WMS_MAP_TRANSFORMER_DATA_COMPLIANCE_REPORT_NOT_FOUND);
 	}
 
 	DataComplianceReport report = optReport.get();
@@ -208,6 +221,11 @@ public class WMSMapTransformer extends AccessRequestTransformer {
 	try {
 
 	    WMSMapRequest mapRequest = new WMSMapRequest(request);
+
+	    if (request.getUriInfo() != null) {
+		GSLoggerFactory.getLogger(getClass())
+			.debug("Getting layers parameter from request: " + request.getUriInfo().getRequestUri());
+	    }
 
 	    String onlineId = mapRequest.getParameterValue(eu.essi_lab.accessor.wms.WMSRequest.Parameter.LAYERS);
 

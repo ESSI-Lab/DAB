@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entry xmlns="http://www.w3.org/2005/Atom"
+       xmlns:cwic="http://cwic.wgiss.ceos.org/opensearch/extensions/1.0/"
+       xmlns:geo="http://a9.com/-/opensearch/extensions/geo/1.0/"
+       xmlns:esipdiscover="http://commons.esipfed.org/ns/discovery/1.2/"
+       xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/"
+       xmlns:georss="http://www.georss.org/georss"
+       xmlns:time="http://a9.com/-/opensearch/extensions/time/1.0/"
+       xmlns:dc="http://purl.org/dc/terms/">
+    <title>ISLSCPII_GPCC_PRECIP.gpcc_numgauges_1deg.zip</title>
+    <id>http://cwic.wgiss.ceos.org/opensearch/granules.atom?uid=C179003487-ORNL_DAAC:G1422884702-ORNL_DAAC</id>
+    <dc:identifier>http://cwic.wgiss.ceos.org/opensearch/granules.atom?uid=C179003487-ORNL_DAAC:G1422884702-ORNL_DAAC</dc:identifier>
+    <updated>2011-02-25T00:00:00.000Z</updated>
+    <author>
+        <name>Jim Lay - user services - PO Box 2008 MS 6301; Bethel Valley Rd.; Oak Ridge, TN 37831-6301; UNITED STATES - Email: uso@daacuso.ornl.gov - Web: http://daac.ornl.gov - Phone: 865-574-8290</name>
+        <email>uso@daacuso.ornl.gov</email>
+    </author>
+    <georss:box>-90 -180 90 180</georss:box>
+    <dc:date>1986-01-01T00:00:00Z/1995-12-31T00:00:00Z</dc:date>
+    <link href="https://webmap.ornl.gov/sdat/pimg/995_21.png"
+          rel="icon"
+          title="Number of Rain Gauges Per Gridbox 1-Degree: 1986 (All Months) (BROWSE)"
+          type="image/png"/>
+    <link href="https://daac.ornl.gov/daacdata/islscp_ii/hydrology_soils/gpcc_precip_monthly_xdeg/data/gpcc_numgauges_1deg.zip"
+          rel="enclosure"
+          title="This link provides direct download access to the granule."/>
+    <link href="https://dx.doi.org/doi:10.3334/ORNLDAAC/995"
+          rel="via"
+          title="Data set Landing Page DOI URL (DATA SET LANDING PAGE)"/>
+    <link href="https:/daac.ornl.gov/daacdata/islscp_ii/hydrology_soils/gpcc_precip_monthly_xdeg/comp/0_gpcc_precip_month_readme.txt"
+          rel="via"
+          title="Data Set Documentation (GENERAL DOCUMENTATION)"/>
+    <link href="https:/daac.ornl.gov/daacdata/islscp_ii/hydrology_soils/gpcc_precip_monthly_xdeg/comp/1_gpcc_precip_monthly_doc.pdf"
+          rel="via"
+          title="Data Set Documentation (GENERAL DOCUMENTATION)"
+          type="application/pdf"/>
+    <link href="https://doi.org/10.3334/ORNLDAAC/995"
+          rel="via"
+          title="Granule metadata URL"/>
+    <link href="https://webmap.ornl.gov/wcsdown/dataset.jsp?ds_id=995"
+          rel="via"
+          title="Granule metadata URL"
+          type="application/gml+xml"/>
+    <link href="https://cmr.earthdata.nasa.gov/search/concepts/G1422884702-ORNL_DAAC.xml"
+          rel="via"
+          title="Product metadata"
+          type="application/xml"/>
+    <summary type="text">Granule metadata for ISLSCPII_GPCC_PRECIP.gpcc_numgauges_1deg.zip</summary>
+</entry>

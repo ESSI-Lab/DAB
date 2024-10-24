@@ -7,7 +7,7 @@ package eu.essi_lab.request.executor.schedule;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -42,7 +42,7 @@ import eu.essi_lab.messages.RequestMessage;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.count.AbstractCountResponse;
 import eu.essi_lab.messages.count.CountSet;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.ScheduleReport;
@@ -196,7 +196,7 @@ public class UserScheduledWorkerJobExecutor<M extends RequestMessage, I, CR exte
 	    throw createException(EXCEPTION_MISSING_CLASSES, "Needed classes (names) to be instantiated are missing: " + missing);
 	}
 
-	StorageUri resultStorageURI = message.getUserJobStorageURI();
+	StorageInfo resultStorageURI = message.getUserJobStorageURI();
 
 	if (resultStorageURI == null) {
 	    throw createException(EXCEPTION_MISSING_STORAGE_URI_COMPLEX, "Missing result storage URI object in the message");
@@ -204,7 +204,7 @@ public class UserScheduledWorkerJobExecutor<M extends RequestMessage, I, CR exte
 	if (resultStorageURI.getUri() == null || resultStorageURI.getUri().length() == 0) {
 	    throw createException(EXCEPTION_MISSING_STORAGE_URI, "Missing result storage URI in the message");
 	}
-	if (resultStorageURI.getStorageName() == null || resultStorageURI.getStorageName().length() == 0) {
+	if (resultStorageURI.getName() == null || resultStorageURI.getName().length() == 0) {
 	    throw createException(EXCEPTION_MISSING_STORAGE_NAME, "Missing result storage name in the message");
 	}
     }

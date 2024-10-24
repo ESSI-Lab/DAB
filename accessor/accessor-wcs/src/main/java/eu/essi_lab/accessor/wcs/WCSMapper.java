@@ -7,7 +7,7 @@ package eu.essi_lab.accessor.wcs;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,7 +24,9 @@ package eu.essi_lab.accessor.wcs;
  * #L%
  */
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -322,6 +324,11 @@ public abstract class WCSMapper extends OriginalIdentifierMapper {
 	Double north = boudingBox.get(2);
 	Double east = boudingBox.get(3);
 
+	south = BigDecimal.valueOf(south).setScale(3, RoundingMode.FLOOR).doubleValue();
+	west = BigDecimal.valueOf(west).setScale(3, RoundingMode.FLOOR).doubleValue();
+	north = BigDecimal.valueOf(north).setScale(3, RoundingMode.FLOOR).doubleValue();
+	east = BigDecimal.valueOf(east).setScale(3, RoundingMode.FLOOR).doubleValue();
+
 	if (east > 180) { // as TDS employs 0;359 notation
 	    west = west - 180.0;
 	    east = east - 180.0;
@@ -341,6 +348,18 @@ public abstract class WCSMapper extends OriginalIdentifierMapper {
 	}
 
 	return true;
+    }
+
+    public static void main(String[] args) {
+
+	Double toBeTruncated = -180.00000000000003;
+
+	Double halfUp = BigDecimal.valueOf(toBeTruncated).setScale(3, RoundingMode.HALF_UP).doubleValue();
+
+	Double halfDown = BigDecimal.valueOf(toBeTruncated).setScale(3, RoundingMode.HALF_DOWN).doubleValue();
+
+	System.out.println(halfUp);
+	System.out.println(halfDown);
     }
 
     /**

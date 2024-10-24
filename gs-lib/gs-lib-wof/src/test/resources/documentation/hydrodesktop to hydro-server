@@ -1,0 +1,149 @@
+working hydro desktop to real hydro server
+
+POST /ghcn/cuahsi_1_1.asmx HTTP/1.1
+SOAPAction: http://www.cuahsi.org/his/1.1/ws/GetValuesObject
+Content-Type: text/xml;charset="utf-8"
+Accept: text/xml
+Host: hydroportal.cuahsi.org
+Content-Length: 562
+Expect: 100-continue
+Connection: Keep-Alive
+
+...<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <GetValuesObject xmlns="http://www.cuahsi.org/his/1.1/ws/">
+      <location>GHCN:USC00425182</location>
+      <variable>GHCN:SNWD</variable>
+      <startDate>2006-05-03T00:00</startDate>
+      <endDate>2006-05-13T00:00</endDate>
+      <authToken>
+      </authToken>
+    </GetValuesObject>
+  </soap:Body>
+</soap:Envelope>HTTP/1.1 200 OK
+Cache-Control: private, max-age=0
+Content-Type: text/xml; charset=utf-8
+Server: Microsoft-IIS/8.5
+X-AspNet-Version: 4.0.30319
+X-Powered-By: ASP.NET
+Date: Fri, 04 May 2018 13:34:01 GMT
+Content-Length: 5355
+
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <soap:Body>
+      <TimeSeriesResponse xmlns="http://www.cuahsi.org/waterML/1.1/">
+         <timeSeriesResponse>
+            <queryInfo>
+               <creationTime>2018-05-04T13:34:01.9282499Z</creationTime>
+               <criteria>
+                  <locationParam>GHCN:USC00425182</locationParam>
+                  <variableParam>GHCN:SNWD</variableParam>
+                  <timeParam>
+                     <beginDateTime>2006-05-03T00:00</beginDateTime>
+                     <endDateTime>2006-05-13T00:00</endDateTime>
+                  </timeParam>
+               </criteria>
+            </queryInfo>
+            <timeSeries>
+               <sourceInfo xsi:type="SiteInfoType">
+                  <siteName>LOGAN RADIO KVNU</siteName>
+                  <siteCode network="GHCN" siteID="92291">USC00425182</siteCode>
+                  <geoLocation>
+                     <geogLocation xsi:type="LatLonPointType">
+                        <latitude>41.735</latitude>
+                        <longitude>-111.8564</longitude>
+                     </geogLocation>
+                  </geoLocation>
+                  <elevation_m>1364</elevation_m>
+                  <verticalDatum>MSL</verticalDatum>
+               </sourceInfo>
+               <variable>
+                  <variableCode vocabulary="GHCN" default="true">SNWD</variableCode>
+                  <variableName>Snow depth</variableName>
+                  <valueType>Field Observation</valueType>
+                  <dataType>Continuous</dataType>
+                  <generalCategory>Climate</generalCategory>
+                  <sampleMedium>Snow</sampleMedium>
+                  <unit unitID="47">
+                     <unitName>centimeter</unitName>
+                     <unitDescription>centimeter</unitDescription>
+                     <unitType>Length</unitType>
+                     <unitAbbreviation>cm</unitAbbreviation>
+                     <unitCode>47</unitCode>
+                  </unit>
+                  <noDataValue>-9999</noDataValue>
+                  <timeScale isRegular="true">
+                     <unit>
+                        <unitName>day</unitName>
+                        <unitType>Time</unitType>
+                        <unitAbbreviation>d</unitAbbreviation>
+                        <unitCode>104</unitCode>
+                     </unit>
+                     <timeSupport>1</timeSupport>
+                  </timeScale>
+                  <speciation>Not Applicable</speciation>
+               </variable>
+               <values>
+                  <value qualifiers="P_01" censorCode="nc" dateTime="2006-05-03T00:00:00" methodCode="0" sourceCode="1" qualityControlLevelCode="1">0</value>
+                  <value qualifiers="P_01" censorCode="nc" dateTime="2006-05-04T00:00:00" methodCode="0" sourceCode="1" qualityControlLevelCode="1">0</value>
+                  <value qualifiers="P_01" censorCode="nc" dateTime="2006-05-05T00:00:00" methodCode="0" sourceCode="1" qualityControlLevelCode="1">0</value>
+                  <value qualifiers="P_01" censorCode="nc" dateTime="2006-05-06T00:00:00" methodCode="0" sourceCode="1" qualityControlLevelCode="1">0</value>
+                  <value qualifiers="P_01" censorCode="nc" dateTime="2006-05-07T00:00:00" methodCode="0" sourceCode="1" qualityControlLevelCode="1">0</value>
+                  <value qualifiers="P_01" censorCode="nc" dateTime="2006-05-08T00:00:00" methodCode="0" sourceCode="1" qualityControlLevelCode="1">0</value>
+                  <value qualifiers="P_01" censorCode="nc" dateTime="2006-05-09T00:00:00" methodCode="0" sourceCode="1" qualityControlLevelCode="1">0</value>
+                  <value qualifiers="P_01" censorCode="nc" dateTime="2006-05-10T00:00:00" methodCode="0" sourceCode="1" qualityControlLevelCode="1">0</value>
+                  <value qualifiers="P_01" censorCode="nc" dateTime="2006-05-11T00:00:00" methodCode="0" sourceCode="1" qualityControlLevelCode="1">0</value>
+                  <value qualifiers="P_01" censorCode="nc" dateTime="2006-05-12T00:00:00" methodCode="0" sourceCode="1" qualityControlLevelCode="1">0</value>
+                  <value qualifiers="P_01" censorCode="nc" dateTime="2006-05-13T00:00:00" methodCode="0" sourceCode="1" qualityControlLevelCode="1">0</value>
+                  <units>
+                     <unitName>day</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>d</unitAbbreviation>
+                     <unitCode>104</unitCode>
+                  </units>
+                  <qualifier>
+                     <qualifierCode>P_01</qualifierCode>
+                     <qualifierDescription>identified as 'missing presumed zero' in DSI 3200 and 3206, did not fail any quality assurance check, U.S.Cooperative Summary of the Day (NCDC DSI - 3200)</qualifierDescription>
+                  </qualifier>
+                  <qualityControlLevel qualityControlLevelID="1">
+                     <qualityControlLevelCode>1</qualityControlLevelCode>
+                     <definition>Quality controlled data</definition>
+                     <explanation>Quality controlled data that have passed quality assurance procedures such as routine estimation of timing and sensor calibration or visual inspection and removal of obvious errors. An example is USGS published streamflow records following parsing through USGS quality control procedures.</explanation>
+                  </qualityControlLevel>
+                  <method>
+                     <methodCode>0</methodCode>
+                     <methodDescription>No method specified</methodDescription>
+                     <methodLink />
+                  </method>
+                  <source>
+                     <sourceCode>1</sourceCode>
+                     <organization>NOAA National Centers for Environmental Information</organization>
+                     <sourceDescription>Global Historical Climate Network - Daily (GHCN-Daily) Version 3</sourceDescription>
+                     <contactInformation>
+                        <contactName>John Leslie</contactName>
+                        <email>ncei.orders@noaa.gov</email>
+                        <phone>1-828-271-4876</phone>
+                        <address xsi:type="xsd:string">Federal Building, 151 Patton Avenue</address>
+                     </contactInformation>
+                     <sourceLink>ncdc.noaa.gov</sourceLink>
+                     <citation>Cite this dataset when used as a source: 
+Menne, Matthew J., Imke Durre, Bryant Korzeniewski, Shelley McNeal, Kristy Thomas, Xungang Yin, Steven Anthony, Ron Ray, Russell S. Vose, Byron E.Gleason, and Tamara G. Houston (2012): 
+Global Historical Climatology Network - Daily (GHCN-Daily), Version 3. [indicate subset used]. 
+NOAA National Climatic Data Center. doi:10.7289/V5D21VHZ [access date].</citation>
+                  </source>
+                  <censorCode censorCodeID="1">
+                     <censorCode>nc</censorCode>
+                     <censorCodeDescription>not censored</censorCodeDescription>
+                  </censorCode>
+               </values>
+            </timeSeries>
+         </timeSeriesResponse>
+      </TimeSeriesResponse>
+   </soap:Body>
+</soap:Envelope>
+
+

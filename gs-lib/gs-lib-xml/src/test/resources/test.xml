@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <GetValuesObject xmlns="http://www.cuahsi.org/his/1.1/ws/">
+      <location>LBR:USU-LBR-Mendon</location>
+      <variable>1ec3d510-1fac-4ad4-8d04-ac696a21e6cd</variable>
+      <startDate>2016-05-02T00:00</startDate>
+      <endDate>2016-06-02T00:00</endDate>
+      <authToken>
+      </authToken>
+    </GetValuesObject>
+  </soap:Body>
+</soap:Envelope>

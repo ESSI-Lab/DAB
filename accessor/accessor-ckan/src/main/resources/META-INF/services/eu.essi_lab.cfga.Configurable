@@ -1,0 +1,4 @@
+eu.essi_lab.accessor.ckan.CKANAccessor
+eu.essi_lab.accessor.ckan.CKANConnector
+eu.essi_lab.accessor.ckan.packagesearch.CKANPackageSearchAccessor
+eu.essi_lab.accessor.ckan.packagesearch.CKANPackageSearchConnector

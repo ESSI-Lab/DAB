@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<PolicySet xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" PolicySetId="PPS:whos:role" Version="1.0" PolicyCombiningAlgId="urn:oasis:names:tc:xacml:3.0:policy-combining-algorithm:permit-overrides">
+    <Target/>
+    <Policy PolicyId="PPS:whos:role:policy" Version="1.0" RuleCombiningAlgId="urn:oasis:names:tc:xacml:3.0:rule-combining-algorithm:permit-overrides">
+        <Target/>
+        <Rule RuleId="whos:allowed:permission:to:access" Effect="Permit">
+            <Target>
+                <AnyOf>
+                    <AllOf>
+                        <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">access</AttributeValue>
+                            <AttributeDesignator Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action" AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="true"/>
+                        </Match>
+                    </AllOf>
+                </AnyOf>
+            </Target>
+            <Condition>
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:and">
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of">
+                        <AttributeDesignator Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id" DataType="http://www.w3.org/2001/XMLSchema#string" Issuer="path" MustBePresent="true"/>
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">cuahsi_1_1.asmx</AttributeValue>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">rest</AttributeValue>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">hydrocsv</AttributeValue>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">thredds</AttributeValue>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">wms</AttributeValue>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">wfs</AttributeValue>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">sos</AttributeValue>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">gwps</AttributeValue>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">ArcGIS</AttributeValue>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">ArcGISProxy</AttributeValue>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">timeseries-api</AttributeValue>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">gwis</AttributeValue>
+                        </Apply>
+                    </Apply>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+                            <AttributeDesignator Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id" DataType="http://www.w3.org/2001/XMLSchema#string" Issuer="view_creator" MustBePresent="true"/>
+                        </Apply>
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">whos</AttributeValue>
+                    </Apply>
+                </Apply>
+            </Condition>
+        </Rule>
+        <Rule RuleId="whos:denied:permission:to:other:action" Effect="Permit">
+            <Target>
+                <AnyOf>
+                    <AllOf>
+                        <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">other</AttributeValue>
+                            <AttributeDesignator Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action" AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="true"/>
+                        </Match>
+                    </AllOf>
+                </AnyOf>
+                <AnyOf>
+                    <AllOf>
+                        <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:integer-greater-than-or-equal">
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#integer">-2147483648</AttributeValue>
+                            <AttributeDesignator Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource" AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id" DataType="http://www.w3.org/2001/XMLSchema#integer" Issuer="offset" MustBePresent="true"/>
+                        </Match>
+                    </AllOf>
+                </AnyOf>
+                <AnyOf>
+                    <AllOf>
+                        <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:integer-greater-than-or-equal">
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#integer">-2147483648</AttributeValue>
+                            <AttributeDesignator Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource" AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id" DataType="http://www.w3.org/2001/XMLSchema#integer" Issuer="max_records" MustBePresent="true"/>
+                        </Match>
+                    </AllOf>
+                </AnyOf>
+            </Target>
+            <Condition>
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:or">
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:not">
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of">
+                            <AttributeDesignator Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id" DataType="http://www.w3.org/2001/XMLSchema#string" Issuer="path" MustBePresent="true"/>
+                            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">cuahsi_1_1.asmx</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">rest</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">hydrocsv</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">thredds</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">wms</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">wfs</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">sos</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">gwps</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">ArcGIS</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">ArcGISProxy</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">timeseries-api</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">gwis</AttributeValue>
+                            </Apply>
+                        </Apply>
+                    </Apply>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:not">
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of">
+                            <AttributeDesignator Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id" DataType="http://www.w3.org/2001/XMLSchema#string" Issuer="path" MustBePresent="true"/>
+                            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">opensearch</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">bnhs</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">thredds</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">csw</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">cswisogeo</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">oaipmh</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">hiscentral.asmx</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">arpa-rest</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">cuahsi_1_1.asmx</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">rest</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">hydrocsv</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">sos</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">wfs</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">gwis</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">ArcGIS</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">ArcGISProxy</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">gwps</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">timeseries-api</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">semantic</AttributeValue>
+                            </Apply>
+                        </Apply>
+                    </Apply>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:not">
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+<AttributeDesignator Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id" DataType="http://www.w3.org/2001/XMLSchema#string" Issuer="view_creator" MustBePresent="true"/>
+                            </Apply>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">whos</AttributeValue>
+                        </Apply>
+                    </Apply>
+                </Apply>
+            </Condition>
+        </Rule>
+        <Rule RuleId="whos:allowed:permission:to:other:action" Effect="Permit">
+            <Target>
+                <AnyOf>
+                    <AllOf>
+                        <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">other</AttributeValue>
+                            <AttributeDesignator Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action" AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="true"/>
+                        </Match>
+                    </AllOf>
+                </AnyOf>
+            </Target>
+            <Condition>
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:and">
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:or">
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of">
+                            <AttributeDesignator Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id" DataType="http://www.w3.org/2001/XMLSchema#string" Issuer="path" MustBePresent="true"/>
+                            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">cuahsi_1_1.asmx</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">rest</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">hydrocsv</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">thredds</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">wms</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">wfs</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">sos</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">gwps</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">ArcGIS</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">ArcGISProxy</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">timeseries-api</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">gwis</AttributeValue>
+                            </Apply>
+                        </Apply>
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of">
+                            <AttributeDesignator Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id" DataType="http://www.w3.org/2001/XMLSchema#string" Issuer="path" MustBePresent="true"/>
+                            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">opensearch</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">bnhs</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">thredds</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">csw</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">cswisogeo</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">oaipmh</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">hiscentral.asmx</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">arpa-rest</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">cuahsi_1_1.asmx</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">rest</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">hydrocsv</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">sos</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">wfs</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">gwis</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">ArcGIS</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">ArcGISProxy</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">gwps</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">timeseries-api</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">semantic</AttributeValue>
+                            </Apply>
+                        </Apply>
+                    </Apply>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+                            <AttributeDesignator Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id" DataType="http://www.w3.org/2001/XMLSchema#string" Issuer="view_creator" MustBePresent="true"/>
+                        </Apply>
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">whos</AttributeValue>
+                    </Apply>
+                </Apply>
+            </Condition>
+        </Rule>
+        <Rule RuleId="whos:denied:permission:to:discover" Effect="Permit">
+            <Target>
+                <AnyOf>
+                    <AllOf>
+                        <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">discovery</AttributeValue>
+                            <AttributeDesignator Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action" AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="true"/>
+                        </Match>
+                    </AllOf>
+                </AnyOf>
+                <AnyOf>
+                    <AllOf>
+                        <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:integer-greater-than-or-equal">
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#integer">-2147483648</AttributeValue>
+                            <AttributeDesignator Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource" AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id" DataType="http://www.w3.org/2001/XMLSchema#integer" Issuer="offset" MustBePresent="true"/>
+                        </Match>
+                    </AllOf>
+                </AnyOf>
+                <AnyOf>
+                    <AllOf>
+                        <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:integer-greater-than-or-equal">
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#integer">-2147483648</AttributeValue>
+                            <AttributeDesignator Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource" AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id" DataType="http://www.w3.org/2001/XMLSchema#integer" Issuer="max_records" MustBePresent="true"/>
+                        </Match>
+                    </AllOf>
+                </AnyOf>
+            </Target>
+            <Condition>
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:or">
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:not">
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of">
+                            <AttributeDesignator Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id" DataType="http://www.w3.org/2001/XMLSchema#string" Issuer="path" MustBePresent="true"/>
+                            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">opensearch</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">bnhs</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">thredds</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">csw</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">cswisogeo</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">oaipmh</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">hiscentral.asmx</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">arpa-rest</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">cuahsi_1_1.asmx</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">rest</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">hydrocsv</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">sos</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">wfs</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">gwis</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">ArcGIS</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">ArcGISProxy</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">gwps</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">timeseries-api</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">semantic</AttributeValue>
+                            </Apply>
+                        </Apply>
+                    </Apply>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:not">
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+<AttributeDesignator Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id" DataType="http://www.w3.org/2001/XMLSchema#string" Issuer="view_creator" MustBePresent="true"/>
+                            </Apply>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">whos</AttributeValue>
+                        </Apply>
+                    </Apply>
+                </Apply>
+            </Condition>
+        </Rule>
+        <Rule RuleId="whos:denied:permission:to:access" Effect="Permit">
+            <Target>
+                <AnyOf>
+                    <AllOf>
+                        <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">access</AttributeValue>
+                            <AttributeDesignator Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action" AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="true"/>
+                        </Match>
+                    </AllOf>
+                </AnyOf>
+                <AnyOf>
+                    <AllOf>
+                        <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:integer-greater-than-or-equal">
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#integer">-2147483648</AttributeValue>
+                            <AttributeDesignator Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource" AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id" DataType="http://www.w3.org/2001/XMLSchema#integer" Issuer="offset" MustBePresent="true"/>
+                        </Match>
+                    </AllOf>
+                </AnyOf>
+                <AnyOf>
+                    <AllOf>
+                        <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:integer-greater-than-or-equal">
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#integer">-2147483648</AttributeValue>
+                            <AttributeDesignator Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource" AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id" DataType="http://www.w3.org/2001/XMLSchema#integer" Issuer="max_records" MustBePresent="true"/>
+                        </Match>
+                    </AllOf>
+                </AnyOf>
+            </Target>
+            <Condition>
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:or">
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:not">
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of">
+                            <AttributeDesignator Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id" DataType="http://www.w3.org/2001/XMLSchema#string" Issuer="path" MustBePresent="true"/>
+                            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">cuahsi_1_1.asmx</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">rest</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">hydrocsv</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">thredds</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">wms</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">wfs</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">sos</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">gwps</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">ArcGIS</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">ArcGISProxy</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">timeseries-api</AttributeValue>
+<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">gwis</AttributeValue>
+                            </Apply>
+                        </Apply>
+                    </Apply>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:not">
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+<AttributeDesignator Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id" DataType="http://www.w3.org/2001/XMLSchema#string" Issuer="view_creator" MustBePresent="true"/>
+                            </Apply>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">whos</AttributeValue>
+                        </Apply>
+                    </Apply>
+                </Apply>
+            </Condition>
+        </Rule>
+        <Rule RuleId="whos:allowed:permission:to:discover" Effect="Permit">
+            <Target>
+                <AnyOf>
+                    <AllOf>
+                        <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">discovery</AttributeValue>
+                            <AttributeDesignator Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action" AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="true"/>
+                        </Match>
+                    </AllOf>
+                </AnyOf>
+            </Target>
+            <Condition>
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:and">
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of">
+                        <AttributeDesignator Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id" DataType="http://www.w3.org/2001/XMLSchema#string" Issuer="path" MustBePresent="true"/>
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">opensearch</AttributeValue>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">bnhs</AttributeValue>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">thredds</AttributeValue>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">csw</AttributeValue>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">cswisogeo</AttributeValue>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">oaipmh</AttributeValue>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">hiscentral.asmx</AttributeValue>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">arpa-rest</AttributeValue>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">cuahsi_1_1.asmx</AttributeValue>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">rest</AttributeValue>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">hydrocsv</AttributeValue>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">sos</AttributeValue>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">wfs</AttributeValue>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">gwis</AttributeValue>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">ArcGIS</AttributeValue>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">ArcGISProxy</AttributeValue>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">gwps</AttributeValue>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">timeseries-api</AttributeValue>
+                            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">semantic</AttributeValue>
+                        </Apply>
+                    </Apply>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+                            <AttributeDesignator Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id" DataType="http://www.w3.org/2001/XMLSchema#string" Issuer="view_creator" MustBePresent="true"/>
+                        </Apply>
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">whos</AttributeValue>
+                    </Apply>
+                </Apply>
+            </Condition>
+        </Rule>
+    </Policy>
+</PolicySet>

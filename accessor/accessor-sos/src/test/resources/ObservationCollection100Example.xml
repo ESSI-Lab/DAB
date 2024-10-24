@@ -1,0 +1,76 @@
+<om:ObservationCollection
+	xmlns:sos="http://www.opengis.net/sos/1.0"
+	xmlns:om="http://www.opengis.net/om/1.0"
+	xmlns:swe="http://www.opengis.net/swe/1.0.1"
+	xmlns:gml="http://www.opengis.net/gml"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.opengis.net/om/1.0  http://schemas.opengis.net/om/1.0.0/om.xsd">
+	<gml:description>measurement</gml:description>
+	<gml:name>measurement</gml:name>
+	<om:member>
+		<om:Observation>
+			<gml:name>whostest123</gml:name>
+			<om:samplingTime>
+				<gml:TimePeriod>
+					<gml:beginPosition>2022-02-14T14:15:00+00:00</gml:beginPosition>
+					<gml:endPosition>2024-03-18T14:12:00+00:00</gml:endPosition>
+					<gml:duration>P762DT23H57M</gml:duration>
+				</gml:TimePeriod>
+			</om:samplingTime>
+			<om:procedure
+				xlink:href="urn:ogc:def:procedure:x-istsos:1.0:whostest123" />
+			<om:observedProperty>
+				<swe:CompositePhenomenon
+					gml:id="comp_387723" dimension="2">
+					<gml:name>timeSeriesOfObservations</gml:name>
+					<swe:component
+						xlink:href="urn:ogc:def:parameter:x-istsos:1.0:time:iso8601" />
+					<swe:component
+						xlink:href="urn:ogc:def:parameter:x-igrac:1.0:Level Measurement:Water depth [from the ground surface]" />
+				</swe:CompositePhenomenon>
+			</om:observedProperty>
+			<om:featureOfInterest
+				xlink:href="urn:ogc:def:feature:x-istsos:1.0:Water well:Test WHOS">
+				<gml:FeatureCollection>
+					<gml:location>
+						<gml:Point srsName="EPSG:4326">
+							<gml:coordinates>6.1386108,46.201791,754.86</gml:coordinates>
+						</gml:Point>
+					</gml:location>
+				</gml:FeatureCollection>
+			</om:featureOfInterest>
+			<om:result>
+				<swe:DataArray>
+					<swe:elementCount>
+						<swe:Count>
+							<swe:value>2</swe:value>
+						</swe:Count>
+					</swe:elementCount>
+					<swe:elementType name="SimpleDataArray">
+						<swe:DataRecord>
+							<swe:field name="Time">
+								<swe:Time
+									definition="urn:ogc:def:parameter:x-istsos:1.0:time:iso8601" />
+							</swe:field>
+							<swe:field name="Water depth [from the ground surface]">
+								<swe:Quantity
+									definition="urn:ogc:def:parameter:x-igrac:1.0:Level Measurement:Water depth [from the ground surface]">
+									<swe:uom code="m" />
+								</swe:Quantity>
+							</swe:field>
+						</swe:DataRecord>
+					</swe:elementType>
+					<swe:encoding>
+						<swe:TextBlock tokenSeparator="," blockSeparator="@"
+							decimalSeparator="." />
+					</swe:encoding>
+					<swe:values>
+						<swe:value dateTime="2023-10-09T14:12:00+00:00">4</swe:value>
+						<swe:value dateTime="2024-03-18T14:12:00+00:00">4.1</swe:value>
+					</swe:values>
+				</swe:DataArray>
+			</om:result>
+		</om:Observation>
+	</om:member>
+</om:ObservationCollection>

@@ -7,7 +7,7 @@ package eu.essi_lab.accessor.wcs;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -33,7 +33,7 @@ import java.util.Optional;
 import org.xml.sax.SAXException;
 
 import eu.essi_lab.cdk.harvest.wrapper.WrappedConnector;
-import eu.essi_lab.lib.net.utils.Downloader;
+import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.utils.ExpiringCache;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
@@ -86,7 +86,7 @@ public abstract class WCSConnector extends WrappedConnector {
 			null, //
 			ErrorInfo.ERRORTYPE_SERVICE, //
 			ErrorInfo.SEVERITY_ERROR, //
-			WCS_CONNECTOR_NO_CAPABILITIES_ERROR,//
+			WCS_CONNECTOR_NO_CAPABILITIES_ERROR, //
 			e);
 	    }
 
@@ -94,7 +94,7 @@ public abstract class WCSConnector extends WrappedConnector {
 
 		throw GSException.createException(//
 			getClass(), //
-			"Unable to retrieve capabilities document", //
+			"Unable to retrieve capabilities document from: " + getSourceURL(), //
 			null, //
 			ErrorInfo.ERRORTYPE_SERVICE, //
 			ErrorInfo.SEVERITY_ERROR, //
@@ -141,10 +141,10 @@ public abstract class WCSConnector extends WrappedConnector {
 	} else {
 	    GSLoggerFactory.getLogger(getClass()).error("Unexpected resumption token");
 	    throw GSException.createException(//
-		    getClass(),//
-		    "Unexpected resumption token",//
-		    ErrorInfo.ERRORTYPE_INTERNAL,//
-		    ErrorInfo.ERRORTYPE_SERVICE,//
+		    getClass(), //
+		    "Unexpected resumption token", //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.ERRORTYPE_SERVICE, //
 		    WCS_CONNECTOR_UNEXPECTED_RESUMPTION_TOKEN_ERROR);
 	}
 
@@ -242,7 +242,7 @@ public abstract class WCSConnector extends WrappedConnector {
 		+ getIdentifierParameter(id);
 
 	Downloader downloader = new Downloader();
-	Optional<InputStream> optional = downloader.downloadStream(url);
+	Optional<InputStream> optional = downloader.downloadOptionalStream(url);
 	if (optional.isPresent()) {
 
 	    InputStream stream = optional.get();
@@ -281,7 +281,7 @@ public abstract class WCSConnector extends WrappedConnector {
 	String url = normalizeURL(endpoint) + "request=GetCapabilities&service=WCS&version=" + version;
 
 	Downloader downloader = new Downloader();
-	Optional<InputStream> optional = downloader.downloadStream(url);
+	Optional<InputStream> optional = downloader.downloadOptionalStream(url);
 	if (optional.isPresent()) {
 
 	    InputStream stream = optional.get();

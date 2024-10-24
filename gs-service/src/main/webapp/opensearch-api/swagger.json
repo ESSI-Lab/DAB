@@ -1,0 +1,222 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "DAB OpenSearch interface test page",
+        "version": "1.0.0",
+        "title": "DAB OpenSearch interface test page"
+    },
+    "tags": [
+        {
+            "name": "opensearch",
+            "description": "OpenSearch interface",
+            "externalDocs": {
+                "description": "OpenSearch specification",
+                "url": "https://github.com/dewitt/opensearch"
+            }
+        }
+    ],
+    "paths": {
+        "/gs-service/services/essi/token/{token}/view/{view}/opensearch/query": {
+            "get": {
+                "tags": ["opensearch"],
+                "summary": "Opensearch query",
+                "description": "Executes an Opensearch query",
+                "parameters": [
+                 	{
+                        "name": "token",
+                        "in": "path",
+                        "required": true,
+                        "description": "Token identifying the user",
+                        "schema": {"type": "string"}
+                    },
+                    {
+                        "name": "view",
+                        "in": "path",
+                        "required": true,
+                        "description": "Identifier of the data subset interesting for the user",
+                        "schema": {"type": "string"}
+                    },
+                    {
+                        "name": "si",
+                        "in": "query",
+                        "description": "The start index of the first result set item, starting from 1",
+                        "default": 1,
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "ct",
+                        "in": "query",
+                        "description": "Maximum number of datasets in each page of the result set",
+                        "default": 10,
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "st",
+                        "in": "query",
+                        "description": "One or more search terms; in case of multiple search terms they must be separated by 'AND' or 'OR' ",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "sources",
+                        "in": "query",
+                        "description": "Comma separated list of DAB sources identifiers",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "parents",
+                        "in": "query",
+                        "description": "Comma separated list of datasets identifiers. The search will be constrained to the records having a parent record with the given identifiers",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "identifier",
+                        "in": "query",
+                        "description": "A dataset identifier. The search will be constrained to the record having the given identifier",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "keyword",
+                        "in": "query",
+                        "description": "A search keyword",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "format",
+                        "in": "query",
+                        "description": "A dataset format",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "protocol",
+                        "in": "query",
+                        "description": "A dataset protocol",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "searchFields",
+                        "in": "query",
+                        "description": "A single search field or a comma separated list of search fields in which to perform the terms search",
+                        "required": false,
+                        "default": "",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "title",
+                                "kwd",
+                                "abstract",
+                                "subject",
+                                "anyText"
+                            ]
+                        },
+                        "collectionFormat": "csv"
+                    },
+                    {
+                        "name": "ts",
+                        "in": "query",
+                        "description": "Time start. Date or datetime expressed in ISO8601 format (e.g.: '2015-01-01', '2015-01-01'T00:00:00Z )'",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "te",
+                        "in": "query",
+                        "description": "Time end. Date or datetime expressed in ISO8601 format (e.g.: '2015-01-01', '2015-01-01'T00:00:00Z )'",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "bbox",
+                        "in": "query",
+                        "description": "A bounding box (expressed in EPSG:4326) which includes the search results. Comma separated list of values: west,south,east,north",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "instrumentId",
+                        "in": "query",
+                        "description": "Instrument identifier",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "instrumentDesc",
+                        "in": "query",
+                        "description": "Instrument description",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "platformId",
+                        "in": "query",
+                        "description": "Platform identifier",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "platformDesc",
+                        "in": "query",
+                        "description": "Platform description",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "origOrgId",
+                        "in": "query",
+                        "description": "Originator organisation identifier",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "attributeId",
+                        "in": "query",
+                        "description": "Attribute identifier",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "attributeDesc",
+                        "in": "query",
+                        "description": "Attribute description",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "origOrgDesc",
+                        "in": "query",
+                        "description": "Originator organisation description",
+                        "required": false,
+                        "type": "string"
+                    },                   
+                    {
+                        "name": "outputFormat",
+                        "in": "query",
+                        "description": "The output format",
+                        "required": true,
+                        "type": "string",
+                        "enum": [
+                            "application/json",
+                            "application/gs-schema+xml"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {"description": "Successful operation"}
+                }
+            }
+        }
+    },
+    "externalDocs": {
+        "description": "Find out more about Swagger",
+        "url": "http://swagger.io"
+    }
+}

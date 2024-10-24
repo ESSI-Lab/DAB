@@ -4,7 +4,7 @@ package eu.essi_lab.lib.net.protocols;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,6 +24,7 @@ package eu.essi_lab.lib.net.protocols;
 import java.lang.reflect.Field;
 
 import eu.essi_lab.lib.net.protocols.impl.APITEMPOProtocol;
+import eu.essi_lab.lib.net.protocols.impl.ARPALombardiaProtocol;
 import eu.essi_lab.lib.net.protocols.impl.BCO_DMOProtocol;
 import eu.essi_lab.lib.net.protocols.impl.BNDMETProtocol;
 import eu.essi_lab.lib.net.protocols.impl.CEHQProtocol;
@@ -62,6 +63,11 @@ import eu.essi_lab.lib.net.protocols.impl.SOS_1_0_0Protocol;
 import eu.essi_lab.lib.net.protocols.impl.SOS_2_0_0Protocol;
 import eu.essi_lab.lib.net.protocols.impl.SOS_2_0_0_HydroProfileProtocol;
 import eu.essi_lab.lib.net.protocols.impl.SOS_2_0_0_TAHMOProtocol;
+import eu.essi_lab.lib.net.protocols.impl.SensorThings_1_0_BRGM_WQ_Protocol;
+import eu.essi_lab.lib.net.protocols.impl.SensorThings_1_1_CITIOBS_Protocol;
+import eu.essi_lab.lib.net.protocols.impl.SensorThings_1_1_FraunhoferAirQuality_Protocol;
+import eu.essi_lab.lib.net.protocols.impl.SensorThings_1_1_HydroServer2_Protocol;
+import eu.essi_lab.lib.net.protocols.impl.SensorThings_1_1_STA4Hydro_Protocol;
 import eu.essi_lab.lib.net.protocols.impl.TILED_SERVICEProtocol;
 import eu.essi_lab.lib.net.protocols.impl.TRAJECTORYProtocol;
 import eu.essi_lab.lib.net.protocols.impl.UDDCProtocol;
@@ -81,6 +87,7 @@ import eu.essi_lab.lib.net.protocols.impl.WFSProtocol;
 import eu.essi_lab.lib.net.protocols.impl.WFS_1_0_0Protocol;
 import eu.essi_lab.lib.net.protocols.impl.WFS_1_1_0Protocol;
 import eu.essi_lab.lib.net.protocols.impl.WFS_2_0_0Protocol;
+import eu.essi_lab.lib.net.protocols.impl.WISProtocol;
 import eu.essi_lab.lib.net.protocols.impl.WMSProtocol;
 import eu.essi_lab.lib.net.protocols.impl.WMS_1_1_1Protocol;
 import eu.essi_lab.lib.net.protocols.impl.WMS_1_3_0Protocol;
@@ -91,6 +98,7 @@ import eu.essi_lab.lib.net.protocols.impl.WMTS_1_0_0Protocol;
  * @author Fabrizio
  */
 public class NetProtocols {
+    public static NetProtocol HMFS = new HMFS_Protocol();
     public static NetProtocol USGS_IV = new USGS_IV_Protocol();
     public static NetProtocol USGS_DV = new USGS_DV_Protocol();
     public static NetProtocol BCO_DMO = new BCO_DMOProtocol();
@@ -107,8 +115,11 @@ public class NetProtocols {
     public static NetProtocol HTTP = new HTTPProtocol();
     public static NetProtocol HYDRO_DB = new HYDRO_DBProtocol();
     public static NetProtocol CUAHSI_WATER_ONE_FLOW_1_1 = new CUAHSI_WaterOneFlow_1_1Protocol();
-    public static NetProtocol CEHQ = new CEHQProtocol();    
+    public static NetProtocol CEHQ = new CEHQProtocol();
     public static NetProtocol DINAGUAWS = new DinaguawsProtocol();
+    public static NetProtocol NIWA = new NiwaProtocol();
+    public static NetProtocol ARPA_LOMBARDIA = new ARPALombardiaProtocol();
+    public static NetProtocol WIS = new WISProtocol();
     public static NetProtocol MCH = new MCHProtocol();
     public static NetProtocol HYRAX = new HYRAXProtocol();
     public static NetProtocol ISO = new ISOProtocol();
@@ -156,6 +167,12 @@ public class NetProtocols {
     public static NetProtocol WMS_Q_1_3_0 = new WMS_Q_1_3_0Protocol();
     public static NetProtocol WMS = new WMSProtocol();
     public static NetProtocol WMTS_1_0_0 = new WMTS_1_0_0Protocol();
+
+    public static NetProtocol SENSOR_THINGS_1_1_HYDRO_SERVER_2 = new SensorThings_1_1_HydroServer2_Protocol();
+    public static NetProtocol SENSOR_THINGS_1_1_STA_4_HYDRO = new SensorThings_1_1_STA4Hydro_Protocol();
+    public static NetProtocol SENSOR_THINGS_1_1_CITIOBS = new SensorThings_1_1_CITIOBS_Protocol();
+    public static NetProtocol SENSOR_THINGS_1_1_FRAUNHOFER_AIR_QUALITY = new SensorThings_1_1_FraunhoferAirQuality_Protocol();
+    public static NetProtocol SENSOR_THINGS_1_0_BRGM_WQ = new SensorThings_1_0_BRGM_WQ_Protocol();
 
     public static NetProtocol decodeFromIdentifier(String identifier) {
 	Field[] fields = NetProtocols.class.getFields();

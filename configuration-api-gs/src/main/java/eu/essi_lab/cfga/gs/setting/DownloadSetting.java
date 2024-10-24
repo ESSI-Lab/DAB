@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gs.setting;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,7 +30,7 @@ import eu.essi_lab.cfga.gui.extension.TabInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
 import eu.essi_lab.cfga.setting.ConfigurableSetting;
 import eu.essi_lab.lib.utils.LabeledEnum;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 
 /**
  * @author Fabrizio
@@ -119,8 +119,6 @@ public class DownloadSetting extends ConfigurableSetting implements EditableSett
      */
     public static class DownloadSettingComponentInfo extends ComponentInfo {
 
-	public static int tabIndex = 9;
-
 	/**
 	 * 
 	 */
@@ -129,7 +127,7 @@ public class DownloadSetting extends ConfigurableSetting implements EditableSett
 	    setComponentName(DownloadSetting.class.getName());
 
 	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(tabIndex).//
+		    withIndex(TabIndex.DOWNLOAD_SETTING.getIndex()).//
 		    withShowDirective("Download").//
 		    build();
 
@@ -211,7 +209,7 @@ public class DownloadSetting extends ConfigurableSetting implements EditableSett
     /**
      * @return
      */
-    public StorageUri getStorageUri() {
+    public StorageInfo getStorageUri() {
 
 	if (getSetting(S3_DOWNLOAD_SETTING_ID).get().isSelected()) {
 
@@ -222,8 +220,8 @@ public class DownloadSetting extends ConfigurableSetting implements EditableSett
 
 	folderPath = "file://" + folderPath;
 
-	StorageUri storageUri = new StorageUri(folderPath);
-	storageUri.setStorageName("localFS");
+	StorageInfo storageUri = new StorageInfo(folderPath);
+	storageUri.setName("localFS");
 
 	return storageUri;
     }

@@ -1,0 +1,15 @@
+{
+	"tables": [],
+	"layers": [
+		{
+			"name": "Stations",
+			"id": "0"
+		},
+		{
+			"name": "Stations (WHOS-Arctic)",
+			"id": "1"
+		}
+	],
+	"serviceDescription": "This service is powered by the Discovery and Access Broker (DAB). Contacts: http://essi-lab.eu",
+	"currentVersion": 10.05
+}

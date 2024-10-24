@@ -4,7 +4,7 @@ package eu.essi_lab.request.executor.semantic;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,12 +22,13 @@ package eu.essi_lab.request.executor.semantic;
  */
 
 import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.factory.DatabaseConsumerFactory;
+import eu.essi_lab.api.database.DatabaseSemanticsExecutor;
+import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.count.SemanticCountResponse;
 import eu.essi_lab.messages.sem.SemanticMessage;
 import eu.essi_lab.messages.sem.SemanticResponse;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.ontology.GSKnowledgeResourceDescription;
 import eu.essi_lab.request.executor.ISemanticExecutor;
@@ -40,13 +41,13 @@ public class SemanticExecutor implements ISemanticExecutor {
     @Override
     public SemanticCountResponse count(SemanticMessage message) throws GSException {
 
-	StorageUri uri = message.getDataBaseURI();
+	StorageInfo uri = message.getDataBaseURI();
 
-	DatabaseReader reader = DatabaseConsumerFactory.createDataBaseReader(uri);
+	DatabaseSemanticsExecutor executor = DatabaseProviderFactory.getDatabaseSemanticsExecutor(uri);
 
 	GSLoggerFactory.getLogger(getClass()).info("Count STARTED");
 
-	SemanticCountResponse count = reader.count(message);
+	SemanticCountResponse count = executor.count(message);
 
 	GSLoggerFactory.getLogger(getClass()).info("Count ENDED");
 
@@ -56,13 +57,13 @@ public class SemanticExecutor implements ISemanticExecutor {
     @Override
     public SemanticResponse<GSKnowledgeResourceDescription> retrieve(SemanticMessage message) throws GSException {
 
-	StorageUri uri = message.getDataBaseURI();
+	StorageInfo uri = message.getDataBaseURI();
 
-	DatabaseReader reader = DatabaseConsumerFactory.createDataBaseReader(uri);
+	DatabaseSemanticsExecutor executor = DatabaseProviderFactory.getDatabaseSemanticsExecutor(uri);
 
 	GSLoggerFactory.getLogger(getClass()).info("Retrieve STARTED");
 
-	SemanticResponse<GSKnowledgeResourceDescription> response = reader.execute(message);
+	SemanticResponse<GSKnowledgeResourceDescription> response = executor.execute(message);
 
 	GSLoggerFactory.getLogger(getClass()).info("Retrieve ENDED");
 

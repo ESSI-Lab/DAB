@@ -4,7 +4,7 @@ package eu.essi_lab.request.executor.access;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,7 +31,7 @@ import org.json.JSONObject;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.driver.SharedPersistentDriverSetting;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
-import eu.essi_lab.lib.net.utils.Downloader;
+import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.JobStatus.JobPhase;
 import eu.essi_lab.model.exceptions.GSException;
@@ -66,7 +66,7 @@ public class GWPSDownloader extends DirectDownloader {
 
 	GSLoggerFactory.getLogger(getClass()).trace("Downloading from {} STARTED", linkage);
 
-	Optional<String> optionalString = downloader.downloadString(linkage);
+	Optional<String> optionalString = downloader.downloadOptionalString(linkage);
 
 	GSLoggerFactory.getLogger(getClass()).trace("Downloading from {} ENDED", linkage);
 

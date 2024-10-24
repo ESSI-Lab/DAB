@@ -1,0 +1,2288 @@
+<gs:Dataset xmlns:gs="http://flora.eu/gi-suite/1.0/dataModel/schema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gml="http://www.opengis.net/gml" xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gco="http://www.isotc211.org/2005/gco">
+    <gs:source gs:orderingDirection="ASCENDING" gs:resultsPriority="UNSET" gs:strategy="HARVESTED" gs:uniqueIdentifier="seadatanet-open">
+        <gs:endpoint>https://cdi.seadatanet.org/report/aggregation/open</gs:endpoint>
+        <gs:label>SeaDataNet - Open datasets</gs:label>
+    </gs:source>
+    <gs:harmonizedMetadata>
+        <gs:coreMetadata>
+            <gs:isoMetadata>
+                <gmi:MI_Metadata>
+                    <gmd:fileIdentifier>
+                        <gco:CharacterString>sdn-open:urn:SDN:CDI:LOCAL:96-2537-96-ds01-4</gco:CharacterString>
+                    </gmd:fileIdentifier>
+                    <gmd:language>
+                        <gmd:LanguageCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#LanguageCode" codeListValue="eng" codeSpace="ISOTC211/19115">English</gmd:LanguageCode>
+                    </gmd:language>
+                    <gmd:characterSet>
+                        <gmd:MD_CharacterSetCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#MD_CharacterSetCode" codeListValue="utf8" codeSpace="ISOTC211/19115">utf8</gmd:MD_CharacterSetCode>
+                    </gmd:characterSet>
+                    <gmd:hierarchyLevel>
+                        <gmd:MD_ScopeCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#MD_ScopeCode" codeListValue="dataset" codeSpace="ISOTC211/19115">dataset</gmd:MD_ScopeCode>
+                    </gmd:hierarchyLevel>
+                    <gmd:hierarchyLevelName>
+                        <gmx:Anchor xlink:href="CDI">Common Data Index record</gmx:Anchor>
+                    </gmd:hierarchyLevelName>
+                    <gmd:contact>
+                        <gmd:CI_ResponsibleParty>
+                            <gmd:organisationName>
+<gmx:Anchor xlink:href="https://edmo.seadatanet.org/report/96">German Oceanographic Datacentre</gmx:Anchor>
+                            </gmd:organisationName>
+                            <gmd:contactInfo>
+<gmd:CI_Contact>
+    <gmd:phone>
+        <gmd:CI_Telephone>
+            <gmd:voice>
+                <gco:CharacterString>+49 40 3190 3410</gco:CharacterString>
+            </gmd:voice>
+            <gmd:facsimile>
+                <gco:CharacterString>+49 40 3190 5000</gco:CharacterString>
+            </gmd:facsimile>
+        </gmd:CI_Telephone>
+    </gmd:phone>
+    <gmd:address>
+        <gmd:CI_Address>
+            <gmd:deliveryPoint>
+                <gco:CharacterString>Bernhard-Nocht-Strasse 78</gco:CharacterString>
+            </gmd:deliveryPoint>
+            <gmd:city>
+                <gco:CharacterString>Hamburg</gco:CharacterString>
+            </gmd:city>
+            <gmd:postalCode>
+                <gco:CharacterString>20359</gco:CharacterString>
+            </gmd:postalCode>
+            <gmd:country>
+                <gmx:Anchor xlink:href="DE">Germany</gmx:Anchor>
+            </gmd:country>
+            <gmd:electronicMailAddress>
+                <gco:CharacterString>dod@bsh.de</gco:CharacterString>
+            </gmd:electronicMailAddress>
+        </gmd:CI_Address>
+    </gmd:address>
+    <gmd:onlineResource>
+        <gmd:CI_OnlineResource>
+            <gmd:linkage>
+                <gmd:URL>https://www.bsh.de/DE/DATEN/Ozeanographisches_Datenzentrum/ozeanographisches_datenzentrum_node.html</gmd:URL>
+            </gmd:linkage>
+        </gmd:CI_OnlineResource>
+    </gmd:onlineResource>
+</gmd:CI_Contact>
+                            </gmd:contactInfo>
+                            <gmd:role>
+<gmd:CI_RoleCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_RoleCode" codeListValue="pointOfContact" codeSpace="ISOTC211/19115">pointOfContact</gmd:CI_RoleCode>
+                            </gmd:role>
+                        </gmd:CI_ResponsibleParty>
+                    </gmd:contact>
+                    <gmd:dateStamp>
+                        <gco:Date>2024-06-14</gco:Date>
+                    </gmd:dateStamp>
+                    <gmd:metadataStandardName>
+                        <gco:CharacterString>ISO 19115/SeaDataNet profile</gco:CharacterString>
+                    </gmd:metadataStandardName>
+                    <gmd:metadataStandardVersion>
+                        <gco:CharacterString>1.0</gco:CharacterString>
+                    </gmd:metadataStandardVersion>
+                    <gmd:spatialRepresentationInfo>
+                        <gmd:MD_VectorSpatialRepresentation>
+                            <gmd:geometricObjects>
+<gmd:MD_GeometricObjects>
+    <gmd:geometricObjectType>
+        <gmd:MD_GeometricObjectTypeCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#MD_GeometricObjectTypeCode" codeListValue="point" codeSpace="ISOTC211/19115">point</gmd:MD_GeometricObjectTypeCode>
+    </gmd:geometricObjectType>
+</gmd:MD_GeometricObjects>
+                            </gmd:geometricObjects>
+                        </gmd:MD_VectorSpatialRepresentation>
+                    </gmd:spatialRepresentationInfo>
+                    <gmd:spatialRepresentationInfo>
+                        <gmd:MD_GridSpatialRepresentation>
+                            <gmd:numberOfDimensions>
+<gco:Integer>3</gco:Integer>
+                            </gmd:numberOfDimensions>
+                            <gmd:cellGeometry>
+<gmd:MD_CellGeometryCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#MD_CellGeometryCode" codeListValue="point" codeSpace="ISOTC211/19115">point</gmd:MD_CellGeometryCode>
+                            </gmd:cellGeometry>
+                            <gmd:transformationParameterAvailability>
+<gco:Boolean>false</gco:Boolean>
+                            </gmd:transformationParameterAvailability>
+                        </gmd:MD_GridSpatialRepresentation>
+                    </gmd:spatialRepresentationInfo>
+                    <gmd:referenceSystemInfo>
+                        <gmd:MD_ReferenceSystem>
+                            <gmd:referenceSystemIdentifier>
+<gmd:RS_Identifier>
+    <gmd:authority>
+        <gmd:CI_Citation>
+            <gmd:title>
+                <gco:CharacterString>SeaDataNet geographic co-ordinate reference frames</gco:CharacterString>
+            </gmd:title>
+            <gmd:alternateTitle>
+                <gco:CharacterString>SeaDataNet CRS</gco:CharacterString>
+            </gmd:alternateTitle>
+            <gmd:alternateTitle>
+                <gco:CharacterString>L10</gco:CharacterString>
+            </gmd:alternateTitle>
+            <gmd:date>
+                <gmd:CI_Date>
+                    <gmd:date>
+                        <gco:Date>2011-03-03</gco:Date>
+                    </gmd:date>
+                    <gmd:dateType>
+                        <gmd:CI_DateTypeCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_DateTypeCode" codeListValue="revision" codeSpace="ISOTC211/19115">revision</gmd:CI_DateTypeCode>
+                    </gmd:dateType>
+                </gmd:CI_Date>
+            </gmd:date>
+            <gmd:edition>
+                <gco:CharacterString>3</gco:CharacterString>
+            </gmd:edition>
+            <gmd:identifier>
+                <gmd:MD_Identifier>
+                    <gmd:code>
+                        <gco:CharacterString>https://www.seadatanet.org/urnurl/SDN:L10</gco:CharacterString>
+                    </gmd:code>
+                </gmd:MD_Identifier>
+            </gmd:identifier>
+        </gmd:CI_Citation>
+    </gmd:authority>
+    <gmd:code>
+        <gmx:Anchor xlink:href="4326">4326</gmx:Anchor>
+    </gmd:code>
+</gmd:RS_Identifier>
+                            </gmd:referenceSystemIdentifier>
+                        </gmd:MD_ReferenceSystem>
+                    </gmd:referenceSystemInfo>
+                    <gmd:metadataExtensionInfo xlink:href="https://schemas.seadatanet.org/Standards-Software/Metadata-formats/extensionInformation.xml"/>
+                    <gmd:identificationInfo>
+                        <gmd:MD_DataIdentification>
+                            <gmd:citation>
+<gmd:CI_Citation>
+    <gmd:title>
+        <gco:CharacterString>SeaDataNet - Biological oceanography from German Oceanographic Datacentre (PointOfContact; Data Distributor), State Office for Agriculture, Environment and Rural Areas of Schleswig Holstein  (Data Custodian), point observations</gco:CharacterString>
+    </gmd:title>
+    <gmd:alternateTitle>
+        <gco:CharacterString>SDN:CDI:LOCAL:96-2537-96-ds01-4</gco:CharacterString>
+    </gmd:alternateTitle>
+    <gmd:date>
+        <gmd:CI_Date>
+            <gmd:date>
+                <gco:Date>2024-06-14</gco:Date>
+            </gmd:date>
+            <gmd:dateType>
+                <gmd:CI_DateTypeCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_DateTypeCode" codeListValue="revision" codeSpace="ISOTC211/19115">revision</gmd:CI_DateTypeCode>
+            </gmd:dateType>
+        </gmd:CI_Date>
+    </gmd:date>
+    <gmd:identifier>
+        <gmd:MD_Identifier>
+            <gmd:code>
+                <gco:CharacterString>urn:SDN:CDI:LOCAL:96-2537-96-ds01-4</gco:CharacterString>
+            </gmd:code>
+        </gmd:MD_Identifier>
+    </gmd:identifier>
+    <gmd:citedResponsibleParty>
+        <gmd:CI_ResponsibleParty>
+            <gmd:organisationName>
+                <gmx:Anchor xlink:href="https://edmo.seadatanet.org/report/2537">State Office for Agriculture, Environment and Rural Areas of Schleswig Holstein </gmx:Anchor>
+            </gmd:organisationName>
+            <gmd:contactInfo>
+                <gmd:CI_Contact>
+                    <gmd:phone>
+                        <gmd:CI_Telephone>
+                            <gmd:voice>
+<gco:CharacterString>+49-4347 704-0</gco:CharacterString>
+                            </gmd:voice>
+                            <gmd:facsimile>
+<gco:CharacterString>+49-4347 704-102</gco:CharacterString>
+                            </gmd:facsimile>
+                        </gmd:CI_Telephone>
+                    </gmd:phone>
+                    <gmd:address>
+                        <gmd:CI_Address>
+                            <gmd:deliveryPoint>
+<gco:CharacterString>Hamburger Chaussee 25</gco:CharacterString>
+                            </gmd:deliveryPoint>
+                            <gmd:city>
+<gco:CharacterString>Flintbek</gco:CharacterString>
+                            </gmd:city>
+                            <gmd:postalCode>
+<gco:CharacterString>24220</gco:CharacterString>
+                            </gmd:postalCode>
+                            <gmd:country>
+<gmx:Anchor xlink:href="DE">Germany</gmx:Anchor>
+                            </gmd:country>
+                            <gmd:electronicMailAddress>
+<gco:CharacterString>poststelle@llur.landsh.de</gco:CharacterString>
+                            </gmd:electronicMailAddress>
+                        </gmd:CI_Address>
+                    </gmd:address>
+                </gmd:CI_Contact>
+            </gmd:contactInfo>
+            <gmd:role>
+                <gmd:CI_RoleCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_RoleCode" codeListValue="originator" codeSpace="ISOTC211/19115">originator</gmd:CI_RoleCode>
+            </gmd:role>
+        </gmd:CI_ResponsibleParty>
+    </gmd:citedResponsibleParty>
+    <gmd:citedResponsibleParty>
+        <gmd:CI_ResponsibleParty>
+            <gmd:organisationName>
+                <gmx:Anchor xlink:href="https://edmo.seadatanet.org/report/1181">State Agency for Nature and Environment of Schleswig Holstein </gmx:Anchor>
+            </gmd:organisationName>
+            <gmd:contactInfo>
+                <gmd:CI_Contact>
+                    <gmd:phone>
+                        <gmd:CI_Telephone>
+                            <gmd:voice>
+<gco:CharacterString>+49 4347 704-0</gco:CharacterString>
+                            </gmd:voice>
+                            <gmd:facsimile>
+<gco:CharacterString>+49 4347 704 102</gco:CharacterString>
+                            </gmd:facsimile>
+                        </gmd:CI_Telephone>
+                    </gmd:phone>
+                    <gmd:address>
+                        <gmd:CI_Address>
+                            <gmd:deliveryPoint>
+<gco:CharacterString>Hamburger Chaussee 25</gco:CharacterString>
+                            </gmd:deliveryPoint>
+                            <gmd:city>
+<gco:CharacterString>Flintbek</gco:CharacterString>
+                            </gmd:city>
+                            <gmd:postalCode>
+<gco:CharacterString>24220</gco:CharacterString>
+                            </gmd:postalCode>
+                            <gmd:country>
+<gmx:Anchor xlink:href="DE">Germany</gmx:Anchor>
+                            </gmd:country>
+                            <gmd:electronicMailAddress>
+<gco:CharacterString>infonet@lanu.landsh.de</gco:CharacterString>
+                            </gmd:electronicMailAddress>
+                        </gmd:CI_Address>
+                    </gmd:address>
+                    <gmd:onlineResource>
+                        <gmd:CI_OnlineResource>
+                            <gmd:linkage>
+<gmd:URL>http://www.umwelt.schleswig-holstein.de/servlet/is/1/</gmd:URL>
+                            </gmd:linkage>
+                        </gmd:CI_OnlineResource>
+                    </gmd:onlineResource>
+                </gmd:CI_Contact>
+            </gmd:contactInfo>
+            <gmd:role>
+                <gmd:CI_RoleCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_RoleCode" codeListValue="originator" codeSpace="ISOTC211/19115">originator</gmd:CI_RoleCode>
+            </gmd:role>
+        </gmd:CI_ResponsibleParty>
+    </gmd:citedResponsibleParty>
+</gmd:CI_Citation>
+                            </gmd:citation>
+                            <gmd:abstract>
+<gco:CharacterString>SeaDataNet is the Pan-European infrastructure for marine and ocean data management and delivery services. It is supported by the EU under its Research Infrastructures programme. It  connects 40 National Oceanographic Data Centres (NODC's) and 50 other data centres from 35 countries, bordering the European seas and Atlantic Ocean. The centres are mostly part of major marine management and research organisations that are acquiring and managing a large collection of marine and ocean data from various disciplines. This includes major international organisations, ICES and IOC-IODE. The overall objective is provide overview and access to marine and oceanographic data and data-products from government and research institutes in Europe. SeaDataNet contributes to the implementation of the EU INSPIRE and Marine Strategy Framework Directives. It also plays a key role in the development and operation of the EU EMODNet initiative. The SeaDataNet infrastructure is fully operational and INSPIRE compliant. It includes a versatile SeaDataNet portal (https://www.seadatanet.org) that provides users with a range of metadata, data and data product access services as well as standards, tools and guides for good marine data management. The Common Data Index (CDI) data discovery and access service provides harmonised access to the large volumes of datasets that are managed by the connected data centres. The CDI service contains already references and gives access to more than 1,5 milllion marine and oceanographic datasets as managed by 90 data centres. These numbers are increasing regularly because of further data population and more connected data centres as part of SeaDataNet II, EMODnet and other EU projects. For inclusion in the SeaDataNet INSPIRE compliant CSW service, the CDI records (at granule level) have been aggregated into CDI collections by a combination of Discipline, Data Centre, and geometric type. Each CSW XML record therefore represents a large collection of individual metadata records and associated datasets. By following the specified URL to the SeaDataNet portal users can evaluate these metadata in detail and request access by downloading of interesting datasets via the shopping cart transaction system that is integrated in the SeaDataNet portal.</gco:CharacterString>
+                            </gmd:abstract>
+                            <gmd:pointOfContact>
+<gmd:CI_ResponsibleParty>
+    <gmd:organisationName>
+        <gmx:Anchor xlink:href="https://edmo.seadatanet.org/report/2537">State Office for Agriculture, Environment and Rural Areas of Schleswig Holstein </gmx:Anchor>
+    </gmd:organisationName>
+    <gmd:contactInfo>
+        <gmd:CI_Contact>
+            <gmd:phone>
+                <gmd:CI_Telephone>
+                    <gmd:voice>
+                        <gco:CharacterString>+49-4347 704-0</gco:CharacterString>
+                    </gmd:voice>
+                    <gmd:facsimile>
+                        <gco:CharacterString>+49-4347 704-102</gco:CharacterString>
+                    </gmd:facsimile>
+                </gmd:CI_Telephone>
+            </gmd:phone>
+            <gmd:address>
+                <gmd:CI_Address>
+                    <gmd:deliveryPoint>
+                        <gco:CharacterString>Hamburger Chaussee 25</gco:CharacterString>
+                    </gmd:deliveryPoint>
+                    <gmd:city>
+                        <gco:CharacterString>Flintbek</gco:CharacterString>
+                    </gmd:city>
+                    <gmd:postalCode>
+                        <gco:CharacterString>24220</gco:CharacterString>
+                    </gmd:postalCode>
+                    <gmd:country>
+                        <gmx:Anchor xlink:href="DE">Germany</gmx:Anchor>
+                    </gmd:country>
+                    <gmd:electronicMailAddress>
+                        <gco:CharacterString>poststelle@llur.landsh.de</gco:CharacterString>
+                    </gmd:electronicMailAddress>
+                </gmd:CI_Address>
+            </gmd:address>
+        </gmd:CI_Contact>
+    </gmd:contactInfo>
+    <gmd:role>
+        <gmd:CI_RoleCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_RoleCode" codeListValue="custodian" codeSpace="ISOTC211/19115">custodian</gmd:CI_RoleCode>
+    </gmd:role>
+</gmd:CI_ResponsibleParty>
+                            </gmd:pointOfContact>
+                            <gmd:resourceMaintenance>
+<gmd:MD_MaintenanceInformation>
+    <gmd:maintenanceAndUpdateFrequency>
+        <gmd:MD_MaintenanceFrequencyCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#MD_MaintenanceFrequencyCode" codeListValue="continual">continual</gmd:MD_MaintenanceFrequencyCode>
+    </gmd:maintenanceAndUpdateFrequency>
+    <gmd:userDefinedMaintenanceFrequency>
+        <gts:TM_PeriodDuration>P35D</gts:TM_PeriodDuration>
+    </gmd:userDefinedMaintenanceFrequency>
+</gmd:MD_MaintenanceInformation>
+                            </gmd:resourceMaintenance>
+                            <gmd:descriptiveKeywords>
+<gmd:MD_Keywords>
+    <gmd:keyword>
+        <gmx:Anchor xlink:href="http://inspire.ec.europa.eu/theme/of">Oceanographic geographical features</gmx:Anchor>
+    </gmd:keyword>
+    <gmd:type>
+        <gmd:MD_KeywordTypeCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#MD_KeywordTypeCode" codeListValue="theme" codeSpace="SeaDataNet">theme</gmd:MD_KeywordTypeCode>
+    </gmd:type>
+    <gmd:thesaurusName>
+        <gmd:CI_Citation>
+            <gmd:title>
+                <gco:CharacterString>GEMET - INSPIRE themes, version 1.0</gco:CharacterString>
+            </gmd:title>
+            <gmd:date>
+                <gmd:CI_Date>
+                    <gmd:date>
+                        <gco:Date>2008-06-01</gco:Date>
+                    </gmd:date>
+                    <gmd:dateType>
+                        <gmd:CI_DateTypeCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_DateTypeCode" codeListValue="publication" codeSpace="ISOTC211/19115">publication</gmd:CI_DateTypeCode>
+                    </gmd:dateType>
+                </gmd:CI_Date>
+            </gmd:date>
+        </gmd:CI_Citation>
+    </gmd:thesaurusName>
+</gmd:MD_Keywords>
+                            </gmd:descriptiveKeywords>
+                            <gmd:descriptiveKeywords>
+<gmd:MD_Keywords>
+    <gmd:keyword>
+        <gmx:Anchor xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/ALKY/">Alkalinity, acidity and pH of the water column</gmx:Anchor>
+    </gmd:keyword>
+    <gmd:keyword>
+        <gmx:Anchor xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/CPWC/">Chlorophyll pigment concentrations in water bodies</gmx:Anchor>
+    </gmd:keyword>
+    <gmd:keyword>
+        <gmx:Anchor xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/PSAL/">Salinity of the water column</gmx:Anchor>
+    </gmd:keyword>
+    <gmd:keyword>
+        <gmx:Anchor xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/TEMP/">Temperature of the water column</gmx:Anchor>
+    </gmd:keyword>
+    <gmd:keyword>
+        <gmx:Anchor xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/NTRA/">Nitrate concentration parameters in the water column</gmx:Anchor>
+    </gmd:keyword>
+    <gmd:keyword>
+        <gmx:Anchor xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/NTRI/">Nitrite concentration parameters in the water column</gmx:Anchor>
+    </gmd:keyword>
+    <gmd:keyword>
+        <gmx:Anchor xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/PHOS/">Phosphate concentration parameters in the water column</gmx:Anchor>
+    </gmd:keyword>
+    <gmd:keyword>
+        <gmx:Anchor xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/TDPX/">Dissolved total or organic phosphorus concentration in the water column</gmx:Anchor>
+    </gmd:keyword>
+    <gmd:keyword>
+        <gmx:Anchor xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/AMON/">Ammonium and ammonia concentration parameters in water bodies</gmx:Anchor>
+    </gmd:keyword>
+    <gmd:keyword>
+        <gmx:Anchor xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/SLCA/">Silicate concentration parameters in the water column</gmx:Anchor>
+    </gmd:keyword>
+    <gmd:keyword>
+        <gmx:Anchor xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/TDNT/">Dissolved total and organic nitrogen concentrations in the water column</gmx:Anchor>
+    </gmd:keyword>
+    <gmd:keyword>
+        <gmx:Anchor xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/DOXY/">Dissolved oxygen parameters in the water column</gmx:Anchor>
+    </gmd:keyword>
+    <gmd:keyword>
+        <gmx:Anchor xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/SECC/">Secchi disk depth</gmx:Anchor>
+    </gmd:keyword>
+    <gmd:keyword>
+        <gmx:Anchor xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/NTOT/">Particulate total and organic nitrogen concentrations in the water column</gmx:Anchor>
+    </gmd:keyword>
+    <gmd:keyword>
+        <gmx:Anchor xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/MTWD/">Dissolved metal concentrations in the water column</gmx:Anchor>
+    </gmd:keyword>
+    <gmd:keyword>
+        <gmx:Anchor xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/PPWC/">Concentration of polychlorobiphenyls (PCBs) in the water column</gmx:Anchor>
+    </gmd:keyword>
+    <gmd:keyword>
+        <gmx:Anchor xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/PEWB/">Pesticide concentrations in water bodies</gmx:Anchor>
+    </gmd:keyword>
+    <gmd:keyword>
+        <gmx:Anchor xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/WCOC/">Concentration of other organic contaminants in the water column</gmx:Anchor>
+    </gmd:keyword>
+    <gmd:type>
+        <gmd:MD_KeywordTypeCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#MD_KeywordTypeCode" codeListValue="parameter" codeSpace="SeaDataNet">parameter</gmd:MD_KeywordTypeCode>
+    </gmd:type>
+    <gmd:thesaurusName>
+        <gmd:CI_Citation>
+            <gmd:title>
+                <gco:CharacterString>SeaDataNet Parameter Discovery Vocabulary</gco:CharacterString>
+            </gmd:title>
+            <gmd:alternateTitle>
+                <gco:CharacterString>SeaDataNet PDV</gco:CharacterString>
+            </gmd:alternateTitle>
+            <gmd:alternateTitle>
+                <gco:CharacterString>P02</gco:CharacterString>
+            </gmd:alternateTitle>
+            <gmd:date>
+                <gmd:CI_Date>
+                    <gmd:date>
+                        <gco:Date>2023-12-12</gco:Date>
+                    </gmd:date>
+                    <gmd:dateType>
+                        <gmd:CI_DateTypeCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_DateTypeCode" codeListValue="revision" codeSpace="ISOTC211/19115">revision</gmd:CI_DateTypeCode>
+                    </gmd:dateType>
+                </gmd:CI_Date>
+            </gmd:date>
+            <gmd:edition>
+                <gco:CharacterString>127</gco:CharacterString>
+            </gmd:edition>
+            <gmd:identifier>
+                <gmd:MD_Identifier>
+                    <gmd:code>
+                        <gco:CharacterString>https://www.seadatanet.org/urnurl/SDN:P02</gco:CharacterString>
+                    </gmd:code>
+                </gmd:MD_Identifier>
+            </gmd:identifier>
+        </gmd:CI_Citation>
+    </gmd:thesaurusName>
+</gmd:MD_Keywords>
+                            </gmd:descriptiveKeywords>
+                            <gmd:descriptiveKeywords>
+<gmd:MD_Keywords>
+    <gmd:keyword>
+        <gmx:Anchor xlink:href="http://vocab.nerc.ac.uk/collection/L05/current/30/">discrete water samplers</gmx:Anchor>
+    </gmd:keyword>
+    <gmd:keyword>
+        <gmx:Anchor xlink:href="http://vocab.nerc.ac.uk/collection/L05/current/124/">transmissometers</gmx:Anchor>
+    </gmd:keyword>
+    <gmd:keyword>
+        <gmx:Anchor xlink:href="http://vocab.nerc.ac.uk/collection/L05/current/130/">CTD</gmx:Anchor>
+    </gmd:keyword>
+    <gmd:type>
+        <gmd:MD_KeywordTypeCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#MD_KeywordTypeCode" codeListValue="instrument" codeSpace="SeaDataNet">instrument</gmd:MD_KeywordTypeCode>
+    </gmd:type>
+    <gmd:thesaurusName>
+        <gmd:CI_Citation>
+            <gmd:title>
+                <gco:CharacterString>SeaDataNet device categories</gco:CharacterString>
+            </gmd:title>
+            <gmd:alternateTitle>
+                <gco:CharacterString>SDN devices</gco:CharacterString>
+            </gmd:alternateTitle>
+            <gmd:alternateTitle>
+                <gco:CharacterString>L05</gco:CharacterString>
+            </gmd:alternateTitle>
+            <gmd:date>
+                <gmd:CI_Date>
+                    <gmd:date>
+                        <gco:Date>2024-02-02</gco:Date>
+                    </gmd:date>
+                    <gmd:dateType>
+                        <gmd:CI_DateTypeCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_DateTypeCode" codeListValue="revision" codeSpace="ISOTC211/19115">revision</gmd:CI_DateTypeCode>
+                    </gmd:dateType>
+                </gmd:CI_Date>
+            </gmd:date>
+            <gmd:edition>
+                <gco:CharacterString>91</gco:CharacterString>
+            </gmd:edition>
+            <gmd:identifier>
+                <gmd:MD_Identifier>
+                    <gmd:code>
+                        <gco:CharacterString>https://www.seadatanet.org/urnurl/SDN:L05</gco:CharacterString>
+                    </gmd:code>
+                </gmd:MD_Identifier>
+            </gmd:identifier>
+        </gmd:CI_Citation>
+    </gmd:thesaurusName>
+</gmd:MD_Keywords>
+                            </gmd:descriptiveKeywords>
+                            <gmd:descriptiveKeywords>
+<gmd:MD_Keywords>
+    <gmd:keyword>
+        <gmx:Anchor xlink:href="http://vocab.nerc.ac.uk/collection/L06/current/0/">unknown</gmx:Anchor>
+    </gmd:keyword>
+    <gmd:type>
+        <gmd:MD_KeywordTypeCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#MD_KeywordTypeCode" codeListValue="platform_class" codeSpace="SeaDataNet">platform_class</gmd:MD_KeywordTypeCode>
+    </gmd:type>
+    <gmd:thesaurusName>
+        <gmd:CI_Citation>
+            <gmd:title>
+                <gco:CharacterString>SeaVoX Platform Categories</gco:CharacterString>
+            </gmd:title>
+            <gmd:alternateTitle>
+                <gco:CharacterString>SeaVoX Platform Categories</gco:CharacterString>
+            </gmd:alternateTitle>
+            <gmd:alternateTitle>
+                <gco:CharacterString>L06</gco:CharacterString>
+            </gmd:alternateTitle>
+            <gmd:date>
+                <gmd:CI_Date>
+                    <gmd:date>
+                        <gco:Date>2021-03-25</gco:Date>
+                    </gmd:date>
+                    <gmd:dateType>
+                        <gmd:CI_DateTypeCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_DateTypeCode" codeListValue="revision" codeSpace="ISOTC211/19115">revision</gmd:CI_DateTypeCode>
+                    </gmd:dateType>
+                </gmd:CI_Date>
+            </gmd:date>
+            <gmd:edition>
+                <gco:CharacterString>17</gco:CharacterString>
+            </gmd:edition>
+            <gmd:identifier>
+                <gmd:MD_Identifier>
+                    <gmd:code>
+                        <gco:CharacterString>https://www.seadatanet.org/urnurl/SDN:L06</gco:CharacterString>
+                    </gmd:code>
+                </gmd:MD_Identifier>
+            </gmd:identifier>
+        </gmd:CI_Citation>
+    </gmd:thesaurusName>
+</gmd:MD_Keywords>
+                            </gmd:descriptiveKeywords>
+                            <gmd:resourceConstraints>
+<gmd:MD_Constraints>
+    <gmd:useLimitation>
+        <gco:CharacterString>Not applicable</gco:CharacterString>
+    </gmd:useLimitation>
+</gmd:MD_Constraints>
+                            </gmd:resourceConstraints>
+                            <gmd:resourceConstraints>
+<gmd:MD_LegalConstraints>
+    <gmd:accessConstraints>
+        <gmd:MD_RestrictionCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#MD_RestrictionCode" codeListValue="otherRestrictions">otherRestrictions</gmd:MD_RestrictionCode>
+    </gmd:accessConstraints>
+    <gmd:otherConstraints>
+        <gmx:Anchor xlink:href="https://www.seadatanet.org/urnurl/SDN:L08::CB">Creative Commons Attribution 4.0 International</gmx:Anchor>
+    </gmd:otherConstraints>
+</gmd:MD_LegalConstraints>
+                            </gmd:resourceConstraints>
+                            <gmd:aggregationInfo>
+<gmd:MD_AggregateInformation>
+    <gmd:aggregateDataSetName>
+        <gmd:CI_Citation>
+            <gmd:title>
+                <gco:CharacterString>Various</gco:CharacterString>
+            </gmd:title>
+            <gmd:alternateTitle>
+                <gco:CharacterString>Various</gco:CharacterString>
+            </gmd:alternateTitle>
+            <gmd:date>
+                <gmd:CI_Date>
+                    <gmd:date>
+                        <gco:Date>2024-06-14</gco:Date>
+                    </gmd:date>
+                    <gmd:dateType>
+                        <gmd:CI_DateTypeCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_DateTypeCode" codeListValue="revision" codeSpace="ISOTC211/19115">revision</gmd:CI_DateTypeCode>
+                    </gmd:dateType>
+                </gmd:CI_Date>
+            </gmd:date>
+        </gmd:CI_Citation>
+    </gmd:aggregateDataSetName>
+    <gmd:associationType>
+        <gmd:DS_AssociationTypeCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#DS_AssociationTypeCode" codeListValue="largerWorkCitation" codeSpace="ISOTC211/19115">largerWorkCitation</gmd:DS_AssociationTypeCode>
+    </gmd:associationType>
+    <gmd:initiativeType>
+        <gmd:DS_InitiativeTypeCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#DS_InitiativeTypeCode" codeListValue="campaign" codeSpace="ISOTC211/19115">campaign</gmd:DS_InitiativeTypeCode>
+    </gmd:initiativeType>
+</gmd:MD_AggregateInformation>
+                            </gmd:aggregationInfo>
+                            <gmd:aggregationInfo>
+<gmd:MD_AggregateInformation>
+    <gmd:aggregateDataSetName>
+        <gmd:CI_Citation>
+            <gmd:title>
+                <gco:CharacterString>Various</gco:CharacterString>
+            </gmd:title>
+            <gmd:alternateTitle>
+                <gco:CharacterString>Various</gco:CharacterString>
+            </gmd:alternateTitle>
+            <gmd:date>
+                <gmd:CI_Date>
+                    <gmd:date>
+                        <gco:Date>2024-06-14</gco:Date>
+                    </gmd:date>
+                    <gmd:dateType>
+                        <gmd:CI_DateTypeCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_DateTypeCode" codeListValue="revision" codeSpace="ISOTC211/19115">revision</gmd:CI_DateTypeCode>
+                    </gmd:dateType>
+                </gmd:CI_Date>
+            </gmd:date>
+        </gmd:CI_Citation>
+    </gmd:aggregateDataSetName>
+    <gmd:associationType>
+        <gmd:DS_AssociationTypeCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#DS_AssociationTypeCode" codeListValue="source" codeSpace="ISOTC211/19115">source</gmd:DS_AssociationTypeCode>
+    </gmd:associationType>
+    <gmd:initiativeType>
+        <gmd:DS_InitiativeTypeCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#DS_InitiativeTypeCode" codeListValue="operation" codeSpace="ISOTC211/19115">operation</gmd:DS_InitiativeTypeCode>
+    </gmd:initiativeType>
+</gmd:MD_AggregateInformation>
+                            </gmd:aggregationInfo>
+                            <gmd:spatialRepresentationType>
+<gmd:MD_SpatialRepresentationTypeCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#MD_SpatialRepresentationTypeCode" codeListValue="textTable">textTable</gmd:MD_SpatialRepresentationTypeCode>
+                            </gmd:spatialRepresentationType>
+                            <gmd:language>
+<gmd:LanguageCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#LanguageCode" codeListValue="eng">English</gmd:LanguageCode>
+                            </gmd:language>
+                            <gmd:characterSet>
+<gmd:MD_CharacterSetCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#MD_CharacterSetCode" codeListValue="utf8" codeSpace="ISOTC211/19115">utf8</gmd:MD_CharacterSetCode>
+                            </gmd:characterSet>
+                            <gmd:topicCategory>
+<gmd:MD_TopicCategoryCode>oceans</gmd:MD_TopicCategoryCode>
+                            </gmd:topicCategory>
+                            <gmd:extent>
+<gmd:EX_Extent>
+    <gmd:geographicElement>
+        <gmd:EX_GeographicBoundingBox>
+            <gmd:westBoundLongitude>
+                <gco:Decimal>8.1169996262</gco:Decimal>
+            </gmd:westBoundLongitude>
+            <gmd:eastBoundLongitude>
+                <gco:Decimal>11.5500001907</gco:Decimal>
+            </gmd:eastBoundLongitude>
+            <gmd:southBoundLatitude>
+                <gco:Decimal>53.8950004578</gco:Decimal>
+            </gmd:southBoundLatitude>
+            <gmd:northBoundLatitude>
+                <gco:Decimal>55.0850028992</gco:Decimal>
+            </gmd:northBoundLatitude>
+        </gmd:EX_GeographicBoundingBox>
+    </gmd:geographicElement>
+    <gmd:temporalElement>
+        <gmd:EX_TemporalExtent>
+            <gmd:extent>
+                <gml:TimePeriod gml:id="d1e1208">
+                    <gml:beginPosition>2009-01-13</gml:beginPosition>
+                    <gml:endPosition>2011-12-12</gml:endPosition>
+                </gml:TimePeriod>
+            </gmd:extent>
+        </gmd:EX_TemporalExtent>
+    </gmd:temporalElement>
+    <gmd:verticalElement>
+        <gmd:EX_VerticalExtent>
+            <gmd:minimumValue/>
+            <gmd:maximumValue/>
+            <gmd:verticalCRS>
+                <gml:VerticalCRS gml:id="vertical-crs-01">
+                    <gml:identifier codeSpace="SeaDataNet">vertical-crs-id-01</gml:identifier>
+                    <gml:scope>not known</gml:scope>
+                    <gml:verticalCS>
+                        <gml:VerticalCS gml:id="vertical-cs-01">
+                            <gml:identifier codeSpace="SeaDataNet">vertical-cs-id-01</gml:identifier>
+                            <gml:axis>
+<gml:CoordinateSystemAxis gml:id="coordsys-axis" gml:uom="metres">
+    <gml:identifier codeSpace="SeaDataNet">coordsys-axis0id</gml:identifier>
+    <gml:axisAbbrev>Z</gml:axisAbbrev>
+    <gml:axisDirection codeSpace="">up</gml:axisDirection>
+</gml:CoordinateSystemAxis>
+                            </gml:axis>
+                        </gml:VerticalCS>
+                    </gml:verticalCS>
+                    <gml:verticalDatum>
+                        <gml:VerticalDatum gml:id="vertical-datum">
+                            <gml:identifier codeSpace="SeaDataNet">https://www.seadatanet.org/urnurl/SDN:L11::D08</gml:identifier>
+                            <gml:name>sea level</gml:name>
+                            <gml:scope>not known</gml:scope>
+                        </gml:VerticalDatum>
+                    </gml:verticalDatum>
+                </gml:VerticalCRS>
+            </gmd:verticalCRS>
+        </gmd:EX_VerticalExtent>
+    </gmd:verticalElement>
+</gmd:EX_Extent>
+                            </gmd:extent>
+                        </gmd:MD_DataIdentification>
+                    </gmd:identificationInfo>
+                    <gmd:contentInfo>
+                        <gmd:MD_CoverageDescription>
+                            <gmd:attributeDescription>
+<gco:RecordType xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/ALKY/" xlink:title="Alkalinity, acidity and pH of the water column">Alkalinity, acidity and pH of the water column</gco:RecordType>
+                            </gmd:attributeDescription>
+                            <gmd:contentType>
+<gmd:MD_CoverageContentTypeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode" codeListValue="physicalMeasurement" codeSpace="ISOTC211/19115">physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+                            </gmd:contentType>
+                        </gmd:MD_CoverageDescription>
+                    </gmd:contentInfo>
+                    <gmd:contentInfo>
+                        <gmd:MD_CoverageDescription>
+                            <gmd:attributeDescription>
+<gco:RecordType xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/SLCA/" xlink:title="Silicate concentration parameters in the water column">Silicate concentration parameters in the water column</gco:RecordType>
+                            </gmd:attributeDescription>
+                            <gmd:contentType>
+<gmd:MD_CoverageContentTypeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode" codeListValue="physicalMeasurement" codeSpace="ISOTC211/19115">physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+                            </gmd:contentType>
+                        </gmd:MD_CoverageDescription>
+                    </gmd:contentInfo>
+                    <gmd:contentInfo>
+                        <gmd:MD_CoverageDescription>
+                            <gmd:attributeDescription>
+<gco:RecordType xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/PPWC/" xlink:title="Concentration of polychlorobiphenyls (PCBs) in the water column">Concentration of polychlorobiphenyls (PCBs) in the water column</gco:RecordType>
+                            </gmd:attributeDescription>
+                            <gmd:contentType>
+<gmd:MD_CoverageContentTypeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode" codeListValue="physicalMeasurement" codeSpace="ISOTC211/19115">physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+                            </gmd:contentType>
+                        </gmd:MD_CoverageDescription>
+                    </gmd:contentInfo>
+                    <gmd:contentInfo>
+                        <gmd:MD_CoverageDescription>
+                            <gmd:attributeDescription>
+<gco:RecordType xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/TDNT/" xlink:title="Dissolved total and organic nitrogen concentrations in the water column">Dissolved total and organic nitrogen concentrations in the water column</gco:RecordType>
+                            </gmd:attributeDescription>
+                            <gmd:contentType>
+<gmd:MD_CoverageContentTypeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode" codeListValue="physicalMeasurement" codeSpace="ISOTC211/19115">physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+                            </gmd:contentType>
+                        </gmd:MD_CoverageDescription>
+                    </gmd:contentInfo>
+                    <gmd:contentInfo>
+                        <gmd:MD_CoverageDescription>
+                            <gmd:attributeDescription>
+<gco:RecordType xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/DOXY/" xlink:title="Dissolved oxygen parameters in the water column">Dissolved oxygen parameters in the water column</gco:RecordType>
+                            </gmd:attributeDescription>
+                            <gmd:contentType>
+<gmd:MD_CoverageContentTypeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode" codeListValue="physicalMeasurement" codeSpace="ISOTC211/19115">physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+                            </gmd:contentType>
+                        </gmd:MD_CoverageDescription>
+                    </gmd:contentInfo>
+                    <gmd:contentInfo>
+                        <gmd:MD_CoverageDescription>
+                            <gmd:attributeDescription>
+<gco:RecordType xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/MTWD/" xlink:title="Dissolved metal concentrations in the water column">Dissolved metal concentrations in the water column</gco:RecordType>
+                            </gmd:attributeDescription>
+                            <gmd:contentType>
+<gmd:MD_CoverageContentTypeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode" codeListValue="physicalMeasurement" codeSpace="ISOTC211/19115">physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+                            </gmd:contentType>
+                        </gmd:MD_CoverageDescription>
+                    </gmd:contentInfo>
+                    <gmd:contentInfo>
+                        <gmd:MD_CoverageDescription>
+                            <gmd:attributeDescription>
+<gco:RecordType xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/TEMP/" xlink:title="Temperature of the water column">Temperature of the water column</gco:RecordType>
+                            </gmd:attributeDescription>
+                            <gmd:contentType>
+<gmd:MD_CoverageContentTypeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode" codeListValue="physicalMeasurement" codeSpace="ISOTC211/19115">physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+                            </gmd:contentType>
+                        </gmd:MD_CoverageDescription>
+                    </gmd:contentInfo>
+                    <gmd:contentInfo>
+                        <gmd:MD_CoverageDescription>
+                            <gmd:attributeDescription>
+<gco:RecordType xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/WCOC/" xlink:title="Concentration of other organic contaminants in the water column">Concentration of other organic contaminants in the water column</gco:RecordType>
+                            </gmd:attributeDescription>
+                            <gmd:contentType>
+<gmd:MD_CoverageContentTypeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode" codeListValue="physicalMeasurement" codeSpace="ISOTC211/19115">physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+                            </gmd:contentType>
+                        </gmd:MD_CoverageDescription>
+                    </gmd:contentInfo>
+                    <gmd:contentInfo>
+                        <gmd:MD_CoverageDescription>
+                            <gmd:attributeDescription>
+<gco:RecordType xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/PSAL/" xlink:title="Salinity of the water column">Salinity of the water column</gco:RecordType>
+                            </gmd:attributeDescription>
+                            <gmd:contentType>
+<gmd:MD_CoverageContentTypeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode" codeListValue="physicalMeasurement" codeSpace="ISOTC211/19115">physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+                            </gmd:contentType>
+                        </gmd:MD_CoverageDescription>
+                    </gmd:contentInfo>
+                    <gmd:contentInfo>
+                        <gmd:MD_CoverageDescription>
+                            <gmd:attributeDescription>
+<gco:RecordType xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/PHOS/" xlink:title="Phosphate concentration parameters in the water column">Phosphate concentration parameters in the water column</gco:RecordType>
+                            </gmd:attributeDescription>
+                            <gmd:contentType>
+<gmd:MD_CoverageContentTypeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode" codeListValue="physicalMeasurement" codeSpace="ISOTC211/19115">physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+                            </gmd:contentType>
+                        </gmd:MD_CoverageDescription>
+                    </gmd:contentInfo>
+                    <gmd:contentInfo>
+                        <gmd:MD_CoverageDescription>
+                            <gmd:attributeDescription>
+<gco:RecordType xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/NTRA/" xlink:title="Nitrate concentration parameters in the water column">Nitrate concentration parameters in the water column</gco:RecordType>
+                            </gmd:attributeDescription>
+                            <gmd:contentType>
+<gmd:MD_CoverageContentTypeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode" codeListValue="physicalMeasurement" codeSpace="ISOTC211/19115">physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+                            </gmd:contentType>
+                        </gmd:MD_CoverageDescription>
+                    </gmd:contentInfo>
+                    <gmd:contentInfo>
+                        <gmd:MD_CoverageDescription>
+                            <gmd:attributeDescription>
+<gco:RecordType xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/TDPX/" xlink:title="Dissolved total or organic phosphorus concentration in the water column">Dissolved total or organic phosphorus concentration in the water column</gco:RecordType>
+                            </gmd:attributeDescription>
+                            <gmd:contentType>
+<gmd:MD_CoverageContentTypeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode" codeListValue="physicalMeasurement" codeSpace="ISOTC211/19115">physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+                            </gmd:contentType>
+                        </gmd:MD_CoverageDescription>
+                    </gmd:contentInfo>
+                    <gmd:contentInfo>
+                        <gmd:MD_CoverageDescription>
+                            <gmd:attributeDescription>
+<gco:RecordType xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/SECC/" xlink:title="Secchi disk depth">Secchi disk depth</gco:RecordType>
+                            </gmd:attributeDescription>
+                            <gmd:contentType>
+<gmd:MD_CoverageContentTypeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode" codeListValue="physicalMeasurement" codeSpace="ISOTC211/19115">physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+                            </gmd:contentType>
+                        </gmd:MD_CoverageDescription>
+                    </gmd:contentInfo>
+                    <gmd:contentInfo>
+                        <gmd:MD_CoverageDescription>
+                            <gmd:attributeDescription>
+<gco:RecordType xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/NTRI/" xlink:title="Nitrite concentration parameters in the water column">Nitrite concentration parameters in the water column</gco:RecordType>
+                            </gmd:attributeDescription>
+                            <gmd:contentType>
+<gmd:MD_CoverageContentTypeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode" codeListValue="physicalMeasurement" codeSpace="ISOTC211/19115">physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+                            </gmd:contentType>
+                        </gmd:MD_CoverageDescription>
+                    </gmd:contentInfo>
+                    <gmd:contentInfo>
+                        <gmd:MD_CoverageDescription>
+                            <gmd:attributeDescription>
+<gco:RecordType xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/AMON/" xlink:title="Ammonium and ammonia concentration parameters in water bodies">Ammonium and ammonia concentration parameters in water bodies</gco:RecordType>
+                            </gmd:attributeDescription>
+                            <gmd:contentType>
+<gmd:MD_CoverageContentTypeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode" codeListValue="physicalMeasurement" codeSpace="ISOTC211/19115">physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+                            </gmd:contentType>
+                        </gmd:MD_CoverageDescription>
+                    </gmd:contentInfo>
+                    <gmd:contentInfo>
+                        <gmd:MD_CoverageDescription>
+                            <gmd:attributeDescription>
+<gco:RecordType xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/PEWB/" xlink:title="Pesticide concentrations in water bodies">Pesticide concentrations in water bodies</gco:RecordType>
+                            </gmd:attributeDescription>
+                            <gmd:contentType>
+<gmd:MD_CoverageContentTypeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode" codeListValue="physicalMeasurement" codeSpace="ISOTC211/19115">physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+                            </gmd:contentType>
+                        </gmd:MD_CoverageDescription>
+                    </gmd:contentInfo>
+                    <gmd:contentInfo>
+                        <gmd:MD_CoverageDescription>
+                            <gmd:attributeDescription>
+<gco:RecordType xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/NTOT/" xlink:title="Particulate total and organic nitrogen concentrations in the water column">Particulate total and organic nitrogen concentrations in the water column</gco:RecordType>
+                            </gmd:attributeDescription>
+                            <gmd:contentType>
+<gmd:MD_CoverageContentTypeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode" codeListValue="physicalMeasurement" codeSpace="ISOTC211/19115">physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+                            </gmd:contentType>
+                        </gmd:MD_CoverageDescription>
+                    </gmd:contentInfo>
+                    <gmd:contentInfo>
+                        <gmd:MD_CoverageDescription>
+                            <gmd:attributeDescription>
+<gco:RecordType xlink:href="http://vocab.nerc.ac.uk/collection/P02/current/CPWC/" xlink:title="Chlorophyll pigment concentrations in water bodies">Chlorophyll pigment concentrations in water bodies</gco:RecordType>
+                            </gmd:attributeDescription>
+                            <gmd:contentType>
+<gmd:MD_CoverageContentTypeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode" codeListValue="physicalMeasurement" codeSpace="ISOTC211/19115">physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+                            </gmd:contentType>
+                        </gmd:MD_CoverageDescription>
+                    </gmd:contentInfo>
+                    <gmd:distributionInfo>
+                        <gmd:MD_Distribution>
+                            <gmd:distributionFormat>
+<gmd:MD_Format>
+    <gmd:name>
+        <gmx:Anchor xlink:href="CFPOINT">Climate and Forecast Point Data NetCDF</gmx:Anchor>
+    </gmd:name>
+    <gmd:version>
+        <gco:CharacterString>unknown</gco:CharacterString>
+    </gmd:version>
+</gmd:MD_Format>
+                            </gmd:distributionFormat>
+                            <gmd:distributionFormat>
+<gmd:MD_Format>
+    <gmd:name>
+        <gmx:Anchor xlink:href="ODV">Ocean Data View ASCII input</gmx:Anchor>
+    </gmd:name>
+    <gmd:version>
+        <gco:CharacterString>unknown</gco:CharacterString>
+    </gmd:version>
+</gmd:MD_Format>
+                            </gmd:distributionFormat>
+                            <gmd:distributor>
+<gmd:MD_Distributor>
+    <gmd:distributorContact>
+        <gmd:CI_ResponsibleParty>
+            <gmd:organisationName>
+                <gmx:Anchor xlink:href="https://edmo.seadatanet.org/report/96">German Oceanographic Datacentre</gmx:Anchor>
+            </gmd:organisationName>
+            <gmd:contactInfo>
+                <gmd:CI_Contact>
+                    <gmd:phone>
+                        <gmd:CI_Telephone>
+                            <gmd:voice>
+<gco:CharacterString>+49 40 3190 3410</gco:CharacterString>
+                            </gmd:voice>
+                            <gmd:facsimile>
+<gco:CharacterString>+49 40 3190 5000</gco:CharacterString>
+                            </gmd:facsimile>
+                        </gmd:CI_Telephone>
+                    </gmd:phone>
+                    <gmd:address>
+                        <gmd:CI_Address>
+                            <gmd:deliveryPoint>
+<gco:CharacterString>Bernhard-Nocht-Strasse 78</gco:CharacterString>
+                            </gmd:deliveryPoint>
+                            <gmd:city>
+<gco:CharacterString>Hamburg</gco:CharacterString>
+                            </gmd:city>
+                            <gmd:postalCode>
+<gco:CharacterString>20359</gco:CharacterString>
+                            </gmd:postalCode>
+                            <gmd:country>
+<gmx:Anchor xlink:href="DE">Germany</gmx:Anchor>
+                            </gmd:country>
+                            <gmd:electronicMailAddress>
+<gco:CharacterString>dod@bsh.de</gco:CharacterString>
+                            </gmd:electronicMailAddress>
+                        </gmd:CI_Address>
+                    </gmd:address>
+                    <gmd:onlineResource>
+                        <gmd:CI_OnlineResource>
+                            <gmd:linkage>
+<gmd:URL>https://www.bsh.de/DE/DATEN/Ozeanographisches_Datenzentrum/ozeanographisches_datenzentrum_node.html</gmd:URL>
+                            </gmd:linkage>
+                        </gmd:CI_OnlineResource>
+                    </gmd:onlineResource>
+                </gmd:CI_Contact>
+            </gmd:contactInfo>
+            <gmd:role>
+                <gmd:CI_RoleCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_RoleCode" codeListValue="distributor" codeSpace="ISOTC211/19115">distributor</gmd:CI_RoleCode>
+            </gmd:role>
+        </gmd:CI_ResponsibleParty>
+    </gmd:distributorContact>
+</gmd:MD_Distributor>
+                            </gmd:distributor>
+                            <gmd:transferOptions>
+<gmd:MD_DigitalTransferOptions>
+    <gmd:onLine>
+        <gmd:CI_OnlineResource>
+            <gmd:linkage>
+                <gmd:URL>https://cdi.seadatanet.org/search?step=00896~0372537~04896~0114~020ds01~0610</gmd:URL>
+            </gmd:linkage>
+            <gmd:description>
+                <gco:CharacterString>Seadatanet CDI v5 portal website</gco:CharacterString>
+            </gmd:description>
+            <gmd:function>
+                <gmd:CI_OnLineFunctionCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_OnLineFunctionCode" codeListValue="downloadRegistration" codeSpace="SeaDataNet">manual interaction with an on-line system by registered users following successful authentication and authorisation</gmd:CI_OnLineFunctionCode>
+            </gmd:function>
+        </gmd:CI_OnlineResource>
+    </gmd:onLine>
+</gmd:MD_DigitalTransferOptions>
+                            </gmd:transferOptions>
+                            <gmd:transferOptions>
+<gmd:MD_DigitalTransferOptions>
+    <gmd:onLine>
+        <gmd:CI_OnlineResource>
+            <gmd:linkage>
+                <gmd:URL>https://geo-service.maris.nl/seadatanet/wms</gmd:URL>
+            </gmd:linkage>
+            <gmd:protocol>
+                <gco:CharacterString>urn:ogc:serviceType:WebMapService:1.1.1:HTTP</gco:CharacterString>
+            </gmd:protocol>
+            <gmd:description>
+                <gco:CharacterString>WMS example url</gco:CharacterString>
+            </gmd:description>
+            <gmd:function>
+                <gmd:CI_OnLineFunctionCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_OnLineFunctionCode" codeListValue="URL" codeSpace="SeaDataNet">online resource locator for accessing data using a specific web protocol</gmd:CI_OnLineFunctionCode>
+            </gmd:function>
+        </gmd:CI_OnlineResource>
+    </gmd:onLine>
+</gmd:MD_DigitalTransferOptions>
+                            </gmd:transferOptions>
+                        </gmd:MD_Distribution>
+                    </gmd:distributionInfo>
+                    <gmd:dataQualityInfo>
+                        <gmd:DQ_DataQuality>
+                            <gmd:scope>
+<gmd:DQ_Scope>
+    <gmd:level>
+        <gmd:MD_ScopeCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#MD_ScopeCode" codeListValue="dataset" codeSpace="ISOTC211/19115">dataset</gmd:MD_ScopeCode>
+    </gmd:level>
+</gmd:DQ_Scope>
+                            </gmd:scope>
+                            <gmd:report>
+<gmd:DQ_DomainConsistency>
+    <gmd:result>
+        <gmd:DQ_ConformanceResult>
+            <gmd:specification>
+                <gmd:CI_Citation>
+                    <gmd:title>
+                        <gco:CharacterString>COMMISSION REGULATION (EU) No 1089/2010 of 23 November 2010 implementing Directive 2007/2/EC of the European Parliament and of the Council as regards interoperability of spatial data sets and services</gco:CharacterString>
+                    </gmd:title>
+                    <gmd:date>
+                        <gmd:CI_Date>
+                            <gmd:date>
+<gco:Date>2010-12-08</gco:Date>
+                            </gmd:date>
+                            <gmd:dateType>
+<gmd:CI_DateTypeCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_DateTypeCode" codeListValue="publication" codeSpace="ISOTC211/19115">publication</gmd:CI_DateTypeCode>
+                            </gmd:dateType>
+                        </gmd:CI_Date>
+                    </gmd:date>
+                </gmd:CI_Citation>
+            </gmd:specification>
+            <gmd:explanation>
+                <gco:CharacterString>See the referenced specification</gco:CharacterString>
+            </gmd:explanation>
+            <gmd:pass>
+                <gco:Boolean>true</gco:Boolean>
+            </gmd:pass>
+        </gmd:DQ_ConformanceResult>
+    </gmd:result>
+</gmd:DQ_DomainConsistency>
+                            </gmd:report>
+                            <gmd:report>
+<gmd:DQ_DomainConsistency>
+    <gmd:result>
+        <gmd:DQ_ConformanceResult>
+            <gmd:specification>
+                <gmd:CI_Citation>
+                    <gmd:title>
+                        <gco:CharacterString>COMMISSION REGULATION (EC) No 1205/2008 of 3 December 2008 implementing Directive 2007/2/EC of the European Parliament and of the Council as regards metadata</gco:CharacterString>
+                    </gmd:title>
+                    <gmd:date>
+                        <gmd:CI_Date>
+                            <gmd:date>
+<gco:Date>2008-12-04</gco:Date>
+                            </gmd:date>
+                            <gmd:dateType>
+<gmd:CI_DateTypeCode codeList="https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_DateTypeCode" codeListValue="publication" codeSpace="ISOTC211/19115">publication</gmd:CI_DateTypeCode>
+                            </gmd:dateType>
+                        </gmd:CI_Date>
+                    </gmd:date>
+                </gmd:CI_Citation>
+            </gmd:specification>
+            <gmd:explanation>
+                <gco:CharacterString>See the referenced specification</gco:CharacterString>
+            </gmd:explanation>
+            <gmd:pass>
+                <gco:Boolean>true</gco:Boolean>
+            </gmd:pass>
+        </gmd:DQ_ConformanceResult>
+    </gmd:result>
+</gmd:DQ_DomainConsistency>
+                            </gmd:report>
+                            <gmd:lineage>
+<gmd:LI_Lineage>
+    <gmd:statement>
+        <gco:CharacterString>The data centres apply standard data quality control procedures on all data that the centres manage. Ask the data centre for details.</gco:CharacterString>
+    </gmd:statement>
+</gmd:LI_Lineage>
+                            </gmd:lineage>
+                        </gmd:DQ_DataQuality>
+                    </gmd:dataQualityInfo>
+                    <gmi:acquisitionInformation>
+                        <gmi:MI_AcquisitionInformation>
+                            <gmi:instrument>
+<gmi:MI_Instrument>
+    <gmi:citation>
+        <gmd:CI_Citation>
+            <gmd:title>
+                <gco:CharacterString>CTD</gco:CharacterString>
+            </gmd:title>
+        </gmd:CI_Citation>
+    </gmi:citation>
+    <gmi:identifier>
+        <gmd:MD_Identifier>
+            <gmd:code>
+                <gco:CharacterString>http://vocab.nerc.ac.uk/collection/L05/current/130/</gco:CharacterString>
+            </gmd:code>
+        </gmd:MD_Identifier>
+    </gmi:identifier>
+    <gmi:description>
+        <gco:CharacterString>CTD</gco:CharacterString>
+    </gmi:description>
+</gmi:MI_Instrument>
+                            </gmi:instrument>
+                            <gmi:instrument>
+<gmi:MI_Instrument>
+    <gmi:citation>
+        <gmd:CI_Citation>
+            <gmd:title>
+                <gco:CharacterString>transmissometers</gco:CharacterString>
+            </gmd:title>
+        </gmd:CI_Citation>
+    </gmi:citation>
+    <gmi:identifier>
+        <gmd:MD_Identifier>
+            <gmd:code>
+                <gco:CharacterString>http://vocab.nerc.ac.uk/collection/L05/current/124/</gco:CharacterString>
+            </gmd:code>
+        </gmd:MD_Identifier>
+    </gmi:identifier>
+    <gmi:description>
+        <gco:CharacterString>transmissometers</gco:CharacterString>
+    </gmi:description>
+</gmi:MI_Instrument>
+                            </gmi:instrument>
+                            <gmi:instrument>
+<gmi:MI_Instrument>
+    <gmi:citation>
+        <gmd:CI_Citation>
+            <gmd:title>
+                <gco:CharacterString>discrete water samplers</gco:CharacterString>
+            </gmd:title>
+        </gmd:CI_Citation>
+    </gmi:citation>
+    <gmi:identifier>
+        <gmd:MD_Identifier>
+            <gmd:code>
+                <gco:CharacterString>http://vocab.nerc.ac.uk/collection/L05/current/30/</gco:CharacterString>
+            </gmd:code>
+        </gmd:MD_Identifier>
+    </gmi:identifier>
+    <gmi:description>
+        <gco:CharacterString>discrete water samplers</gco:CharacterString>
+    </gmi:description>
+</gmi:MI_Instrument>
+                            </gmi:instrument>
+                            <gmi:platform>
+<gmi:MI_Platform>
+    <gmi:citation>
+        <gmd:CI_Citation>
+            <gmd:title>
+                <gco:CharacterString>unknown</gco:CharacterString>
+            </gmd:title>
+        </gmd:CI_Citation>
+    </gmi:citation>
+    <gmi:identifier>
+        <gmd:MD_Identifier>
+            <gmd:code>
+                <gco:CharacterString>http://vocab.nerc.ac.uk/collection/L06/current/0/</gco:CharacterString>
+            </gmd:code>
+        </gmd:MD_Identifier>
+    </gmi:identifier>
+    <gmi:description>
+        <gco:CharacterString>unknown</gco:CharacterString>
+    </gmi:description>
+</gmi:MI_Platform>
+                            </gmi:platform>
+                        </gmi:MI_AcquisitionInformation>
+                    </gmi:acquisitionInformation>
+                </gmi:MI_Metadata>
+            </gs:isoMetadata>
+        </gs:coreMetadata>
+        <gs:augmentedMetadata/>
+        <gs:extendedMetadata>
+            <gs:extension>
+                <gs:observedPropertyURI>http://vocab.nerc.ac.uk/collection/P02/current/ALKY/</gs:observedPropertyURI>
+                <gs:observedPropertyURI>http://vocab.nerc.ac.uk/collection/P02/current/SLCA/</gs:observedPropertyURI>
+                <gs:observedPropertyURI>http://vocab.nerc.ac.uk/collection/P02/current/PPWC/</gs:observedPropertyURI>
+                <gs:observedPropertyURI>http://vocab.nerc.ac.uk/collection/P02/current/TDNT/</gs:observedPropertyURI>
+                <gs:observedPropertyURI>http://vocab.nerc.ac.uk/collection/P02/current/DOXY/</gs:observedPropertyURI>
+                <gs:observedPropertyURI>http://vocab.nerc.ac.uk/collection/P02/current/MTWD/</gs:observedPropertyURI>
+                <gs:observedPropertyURI>http://vocab.nerc.ac.uk/collection/P02/current/TEMP/</gs:observedPropertyURI>
+                <gs:observedPropertyURI>http://vocab.nerc.ac.uk/collection/P02/current/WCOC/</gs:observedPropertyURI>
+                <gs:observedPropertyURI>http://vocab.nerc.ac.uk/collection/P02/current/PSAL/</gs:observedPropertyURI>
+                <gs:observedPropertyURI>http://vocab.nerc.ac.uk/collection/P02/current/PHOS/</gs:observedPropertyURI>
+                <gs:observedPropertyURI>http://vocab.nerc.ac.uk/collection/P02/current/NTRA/</gs:observedPropertyURI>
+                <gs:observedPropertyURI>http://vocab.nerc.ac.uk/collection/P02/current/TDPX/</gs:observedPropertyURI>
+                <gs:observedPropertyURI>http://vocab.nerc.ac.uk/collection/P02/current/SECC/</gs:observedPropertyURI>
+                <gs:observedPropertyURI>http://vocab.nerc.ac.uk/collection/P02/current/NTRI/</gs:observedPropertyURI>
+                <gs:observedPropertyURI>http://vocab.nerc.ac.uk/collection/P02/current/AMON/</gs:observedPropertyURI>
+                <gs:observedPropertyURI>http://vocab.nerc.ac.uk/collection/P02/current/PEWB/</gs:observedPropertyURI>
+                <gs:observedPropertyURI>http://vocab.nerc.ac.uk/collection/P02/current/NTOT/</gs:observedPropertyURI>
+                <gs:observedPropertyURI>http://vocab.nerc.ac.uk/collection/P02/current/CPWC/</gs:observedPropertyURI>
+                <gs:OriginatorOrganisationIdentifier>https://edmo.seadatanet.org/report/1181</gs:OriginatorOrganisationIdentifier>
+                <gs:OriginatorOrganisationDescription>State Agency for Nature and Environment of Schleswig Holstein </gs:OriginatorOrganisationDescription>
+                <gs:OriginatorOrganisationIdentifier>https://edmo.seadatanet.org/report/96</gs:OriginatorOrganisationIdentifier>
+                <gs:OriginatorOrganisationDescription>German Oceanographic Datacentre</gs:OriginatorOrganisationDescription>
+                <gs:OriginatorOrganisationIdentifier>https://edmo.seadatanet.org/report/2537</gs:OriginatorOrganisationIdentifier>
+                <gs:OriginatorOrganisationDescription>State Office for Agriculture, Environment and Rural Areas of Schleswig Holstein </gs:OriginatorOrganisationDescription>
+                <gs:uniquePlatformId>D0DB670EE9376BA9E9BC126A935116664D516BED</gs:uniquePlatformId>
+                <gs:uniqueInstrumentId>A3F899CC5A4602810CAB0CA7033E790E86D33ECA</gs:uniqueInstrumentId>
+                <gs:uniqueAttributeId>DC115DCD54CE8565244864042BFD0752F3500738</gs:uniqueAttributeId>
+            </gs:extension>
+        </gs:extendedMetadata>
+    </gs:harmonizedMetadata>
+    <gs:originalMetadata>
+        <gs:schemeURI>http://www.seadatanet.org</gs:schemeURI>
+        <gs:metadata>&lt;![CDATA[&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt;&#13;
+&amp;lt;?xml-model href=&amp;quot;https://schemas.seadatanet.org/Standards-Software/Metadata-formats/SDN_CDI_ISO19139_13.0.0.sch&amp;quot; type=&amp;quot;application/xml&amp;quot; schematypens=&amp;quot;http://purl.oclc.org/dsdl/schematron&amp;quot;?&amp;gt;&#13;
+&amp;lt;gmd:MD_Metadata xmlns:gmd=&amp;quot;http://www.isotc211.org/2005/gmd&amp;quot;&#13;
+   xmlns:gmi=&amp;quot;http://www.isotc211.org/2005/gmi&amp;quot; xmlns:srv=&amp;quot;http://www.isotc211.org/2005/srv&amp;quot;&#13;
+   xmlns:gco=&amp;quot;http://www.isotc211.org/2005/gco&amp;quot; xmlns:gts=&amp;quot;http://www.isotc211.org/2005/gts&amp;quot;&#13;
+   xmlns:gmx=&amp;quot;http://www.isotc211.org/2005/gmx&amp;quot; xmlns:xlink=&amp;quot;http://www.w3.org/1999/xlink&amp;quot;&#13;
+   xmlns:sdn=&amp;quot;http://www.seadatanet.org&amp;quot; xmlns:gml=&amp;quot;http://www.opengis.net/gml&amp;quot;&#13;
+   xmlns:xsi=&amp;quot;http://www.w3.org/2001/XMLSchema-instance&amp;quot;&#13;
+   xsi:schemaLocation=&amp;quot;http://www.seadatanet.org https://schemas.seadatanet.org/Standards-Software/Metadata-formats/SDN_CDI_ISO19139_13.0.0.xsd http://www.isotc211.org/2005/gmd http://schemas.opengis.net/iso/19139/20060504/gmd/gmd.xsd&amp;quot;&amp;gt;
+            &amp;lt;gmd:fileIdentifier&amp;gt;&#13;
+                &amp;lt;gco:CharacterString&amp;gt;urn:SDN:CDI:LOCAL:96-2537-96-ds01-4&amp;lt;/gco:CharacterString&amp;gt;&#13;
+            &amp;lt;/gmd:fileIdentifier&amp;gt;&#13;
+            &amp;lt;gmd:language&amp;gt;&#13;
+                &amp;lt;gmd:LanguageCode codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#LanguageCode&amp;quot; codeListValue=&amp;quot;eng&amp;quot; codeSpace=&amp;quot;ISOTC211/19115&amp;quot;&amp;gt;English&amp;lt;/gmd:LanguageCode&amp;gt;&#13;
+            &amp;lt;/gmd:language&amp;gt;&#13;
+            &amp;lt;gmd:characterSet&amp;gt;&#13;
+                &amp;lt;gmd:MD_CharacterSetCode codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#MD_CharacterSetCode&amp;quot; codeListValue=&amp;quot;utf8&amp;quot; codeSpace=&amp;quot;ISOTC211/19115&amp;quot;&amp;gt;utf8&amp;lt;/gmd:MD_CharacterSetCode&amp;gt;&#13;
+            &amp;lt;/gmd:characterSet&amp;gt;&#13;
+            &amp;lt;gmd:hierarchyLevel&amp;gt;&#13;
+            &amp;lt;gmd:MD_ScopeCode codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#MD_ScopeCode&amp;quot; codeListValue=&amp;quot;dataset&amp;quot; codeSpace=&amp;quot;ISOTC211/19115&amp;quot;&amp;gt;dataset&amp;lt;/gmd:MD_ScopeCode&amp;gt;&#13;
+                &amp;lt;/gmd:hierarchyLevel&amp;gt;&#13;
+            &amp;lt;gmd:hierarchyLevelName&amp;gt;&#13;
+
+               &amp;lt;sdn:SDN_HierarchyLevelNameCode codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/cdicsrCodeList.xml#SDN_HierarchyLevelNameCode&amp;quot; codeListValue=&amp;quot;CDI&amp;quot; codeSpace=&amp;quot;SeaDataNet&amp;quot;&amp;gt;Common Data Index record&amp;lt;/sdn:SDN_HierarchyLevelNameCode&amp;gt;
+            &amp;lt;/gmd:hierarchyLevelName&amp;gt;
+            &amp;lt;gmd:contact&amp;gt;
+               &amp;lt;gmd:CI_ResponsibleParty&amp;gt;
+                  &amp;lt;gmd:organisationName&amp;gt;
+                     &amp;lt;sdn:SDN_EDMOCode codeList=&amp;quot;https://edmo.seadatanet.org/isocodelists/edmo-edmerp-codelists.xml#SDN_EDMOCode&amp;quot; codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;96&amp;quot;&amp;gt;German Oceanographic Datacentre&amp;lt;/sdn:SDN_EDMOCode&amp;gt;
+                  &amp;lt;/gmd:organisationName&amp;gt;
+                  &amp;lt;gmd:contactInfo&amp;gt;
+                     &amp;lt;gmd:CI_Contact&amp;gt;
+                        &amp;lt;gmd:phone&amp;gt;
+                           &amp;lt;gmd:CI_Telephone&amp;gt;
+                              &amp;lt;gmd:voice&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;+49 40 3190 3410&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:voice&amp;gt;
+                              &amp;lt;gmd:facsimile&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;+49 40 3190 5000&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:facsimile&amp;gt;
+                            &amp;lt;/gmd:CI_Telephone&amp;gt;
+                        &amp;lt;/gmd:phone&amp;gt;
+                        &amp;lt;gmd:address&amp;gt;
+                           &amp;lt;gmd:CI_Address&amp;gt;
+                              &amp;lt;gmd:deliveryPoint&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;Bernhard-Nocht-Strasse 78&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:deliveryPoint&amp;gt;
+                              &amp;lt;gmd:city&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;Hamburg&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:city&amp;gt;
+                              &amp;lt;gmd:postalCode&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;20359&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:postalCode&amp;gt;
+                              &amp;lt;gmd:country&amp;gt;
+                                 &amp;lt;sdn:SDN_CountryCode codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;DE&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/cdicsrCodeList.xml#SDN_CountryCode&amp;quot;&amp;gt;Germany&amp;lt;/sdn:SDN_CountryCode&amp;gt;
+                              &amp;lt;/gmd:country&amp;gt;
+                              &amp;lt;gmd:electronicMailAddress&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;dod@bsh.de&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:electronicMailAddress&amp;gt;
+                           &amp;lt;/gmd:CI_Address&amp;gt;
+                        &amp;lt;/gmd:address&amp;gt;
+                        &amp;lt;gmd:onlineResource&amp;gt;
+                           &amp;lt;gmd:CI_OnlineResource&amp;gt;
+                              &amp;lt;gmd:linkage&amp;gt;
+                                 &amp;lt;gmd:URL&amp;gt;https://www.bsh.de/DE/DATEN/Ozeanographisches_Datenzentrum/ozeanographisches_datenzentrum_node.html&amp;lt;/gmd:URL&amp;gt;
+                              &amp;lt;/gmd:linkage&amp;gt;
+                           &amp;lt;/gmd:CI_OnlineResource&amp;gt;
+                        &amp;lt;/gmd:onlineResource&amp;gt;
+                     &amp;lt;/gmd:CI_Contact&amp;gt;
+                  &amp;lt;/gmd:contactInfo&amp;gt;
+                  &amp;lt;gmd:role&amp;gt;
+                     &amp;lt;gmd:CI_RoleCode codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_RoleCode&amp;quot; codeListValue=&amp;quot;pointOfContact&amp;quot; codeSpace=&amp;quot;ISOTC211/19115&amp;quot;&amp;gt;pointOfContact&amp;lt;/gmd:CI_RoleCode&amp;gt;
+                  &amp;lt;/gmd:role&amp;gt;
+               &amp;lt;/gmd:CI_ResponsibleParty&amp;gt;
+            &amp;lt;/gmd:contact&amp;gt;
+                            &amp;lt;gmd:dateStamp&amp;gt;&#13;
+                            &amp;lt;gco:Date&amp;gt;2024-06-14&amp;lt;/gco:Date&amp;gt;&#13;
+                            &amp;lt;/gmd:dateStamp&amp;gt;&#13;
+&#13;
+                            &amp;lt;gmd:metadataStandardName&amp;gt;&#13;
+                                &amp;lt;gco:CharacterString&amp;gt;ISO 19115/SeaDataNet profile&amp;lt;/gco:CharacterString&amp;gt;&#13;
+                            &amp;lt;/gmd:metadataStandardName&amp;gt;&#13;
+                            &amp;lt;gmd:metadataStandardVersion&amp;gt;&#13;
+                                &amp;lt;gco:CharacterString&amp;gt;1.0&amp;lt;/gco:CharacterString&amp;gt;&#13;
+                            &amp;lt;/gmd:metadataStandardVersion&amp;gt;&#13;
+                            &amp;lt;gmd:spatialRepresentationInfo&amp;gt;&#13;
+                                &amp;lt;gmd:MD_VectorSpatialRepresentation&amp;gt;&#13;
+                                    &amp;lt;gmd:geometricObjects&amp;gt;&#13;
+                                    &amp;lt;gmd:MD_GeometricObjects&amp;gt;&#13;
+                                        &amp;lt;gmd:geometricObjectType&amp;gt;
+                                            &amp;lt;gmd:MD_GeometricObjectTypeCode codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#MD_GeometricObjectTypeCode&amp;quot; codeListValue=&amp;quot;point&amp;quot; codeSpace=&amp;quot;ISOTC211/19115&amp;quot;&amp;gt;point&amp;lt;/gmd:MD_GeometricObjectTypeCode&amp;gt;&#13;
+                                        &amp;lt;/gmd:geometricObjectType&amp;gt;&#13;
+                                    &amp;lt;/gmd:MD_GeometricObjects&amp;gt;&#13;
+                                    &amp;lt;/gmd:geometricObjects&amp;gt;&#13;
+                                &amp;lt;/gmd:MD_VectorSpatialRepresentation&amp;gt;&#13;
+                            &amp;lt;/gmd:spatialRepresentationInfo&amp;gt;&#13;
+&#13;
+                                &amp;lt;gmd:spatialRepresentationInfo&amp;gt;&#13;
+                            &amp;lt;gmd:MD_GridSpatialRepresentation&amp;gt;&#13;
+                                    &amp;lt;gmd:numberOfDimensions&amp;gt;&#13;
+                                        &amp;lt;gco:Integer&amp;gt;3&amp;lt;/gco:Integer&amp;gt;&#13;
+                                    &amp;lt;/gmd:numberOfDimensions&amp;gt;
+                  &amp;lt;gmd:cellGeometry&amp;gt;
+                     &amp;lt;gmd:MD_CellGeometryCode codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#MD_CellGeometryCode&amp;quot; codeListValue=&amp;quot;point&amp;quot; codeSpace=&amp;quot;ISOTC211/19115&amp;quot;&amp;gt;point&amp;lt;/gmd:MD_CellGeometryCode&amp;gt;
+                  &amp;lt;/gmd:cellGeometry&amp;gt;
+                  &amp;lt;gmd:transformationParameterAvailability&amp;gt;
+                     &amp;lt;gco:Boolean&amp;gt;false&amp;lt;/gco:Boolean&amp;gt;
+                  &amp;lt;/gmd:transformationParameterAvailability&amp;gt;
+               &amp;lt;/gmd:MD_GridSpatialRepresentation&amp;gt;
+            &amp;lt;/gmd:spatialRepresentationInfo&amp;gt;
+            &amp;lt;gmd:referenceSystemInfo&amp;gt;
+               &amp;lt;gmd:MD_ReferenceSystem&amp;gt;
+                  &amp;lt;gmd:referenceSystemIdentifier&amp;gt;
+                  &amp;lt;gmd:RS_Identifier&amp;gt;
+                  	&amp;lt;gmd:authority&amp;gt;
+            	         	&amp;lt;gmd:CI_Citation&amp;gt;&#13;
+                	         	&amp;lt;gmd:title&amp;gt;&#13;
+                    	         	&amp;lt;gco:CharacterString&amp;gt;SeaDataNet geographic co-ordinate reference frames&amp;lt;/gco:CharacterString&amp;gt;&#13;
+                	         	&amp;lt;/gmd:title&amp;gt;&#13;
+                	         	&amp;lt;gmd:alternateTitle&amp;gt;&#13;
+                    	         	&amp;lt;gco:CharacterString&amp;gt;SeaDataNet CRS&amp;lt;/gco:CharacterString&amp;gt;&#13;
+                	         	&amp;lt;/gmd:alternateTitle&amp;gt;                    	         	&amp;lt;gmd:alternateTitle&amp;gt;&#13;
+                        	         	&amp;lt;gco:CharacterString&amp;gt;L10&amp;lt;/gco:CharacterString&amp;gt;&#13;
+                    	         	&amp;lt;/gmd:alternateTitle&amp;gt;                	         	&amp;lt;gmd:date&amp;gt;&#13;
+                    	         	&amp;lt;gmd:CI_Date&amp;gt;&#13;
+                        	         	&amp;lt;gmd:date&amp;gt;&#13;
+                            	         	&amp;lt;gco:Date&amp;gt;2011-03-03&amp;lt;/gco:Date&amp;gt;&#13;
+                        	         	&amp;lt;/gmd:date&amp;gt;&#13;
+                        	         	&amp;lt;gmd:dateType&amp;gt;&#13;
+                            	         	&amp;lt;gmd:CI_DateTypeCode codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_DateTypeCode&amp;quot; codeListValue=&amp;quot;revision&amp;quot; codeSpace=&amp;quot;ISOTC211/19115&amp;quot;&amp;gt;revision&amp;lt;/gmd:CI_DateTypeCode&amp;gt;&#13;
+                        	         	&amp;lt;/gmd:dateType&amp;gt;&#13;
+                    	         	&amp;lt;/gmd:CI_Date&amp;gt;&#13;
+                	         	&amp;lt;/gmd:date&amp;gt;&#13;
+                	         	&amp;lt;gmd:edition&amp;gt;&#13;
+                    	         	&amp;lt;gco:CharacterString&amp;gt;3&amp;lt;/gco:CharacterString&amp;gt;&#13;
+                	         	&amp;lt;/gmd:edition&amp;gt;&#13;
+                	         	&amp;lt;gmd:identifier&amp;gt;&#13;
+                    	         	&amp;lt;gmd:MD_Identifier&amp;gt;&#13;
+                        	         	&amp;lt;gmd:code&amp;gt;&#13;
+                            	         	&amp;lt;gco:CharacterString&amp;gt;https://www.seadatanet.org/urnurl/SDN:L10&amp;lt;/gco:CharacterString&amp;gt;&#13;
+                        	         	&amp;lt;/gmd:code&amp;gt;&#13;
+                    	         	&amp;lt;/gmd:MD_Identifier&amp;gt;&#13;
+                	         	&amp;lt;/gmd:identifier&amp;gt;&#13;
+            	         	&amp;lt;/gmd:CI_Citation&amp;gt;
+                  	&amp;lt;/gmd:authority&amp;gt;
+                        &amp;lt;gmd:code&amp;gt;
+                           &amp;lt;sdn:SDN_CRSCode codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/cdicsrCodeList.xml#SDN_CRSCode&amp;quot; codeListValue=&amp;quot;4326&amp;quot; codeSpace=&amp;quot;SeaDataNet&amp;quot;&amp;gt;4326&amp;lt;/sdn:SDN_CRSCode&amp;gt;
+                        &amp;lt;/gmd:code&amp;gt;
+                     &amp;lt;/gmd:RS_Identifier&amp;gt;
+                  &amp;lt;/gmd:referenceSystemIdentifier&amp;gt;
+               &amp;lt;/gmd:MD_ReferenceSystem&amp;gt;
+            &amp;lt;/gmd:referenceSystemInfo&amp;gt;
+         &amp;lt;gmd:metadataExtensionInfo xlink:href=&amp;quot;https://schemas.seadatanet.org/Standards-Software/Metadata-formats/extensionInformation.xml&amp;quot;/&amp;gt;
+            &amp;lt;gmd:identificationInfo&amp;gt;
+               &amp;lt;sdn:SDN_DataIdentification gco:isoType=&amp;quot;MD_DataIdentification_Type&amp;quot;&amp;gt;
+                  &amp;lt;gmd:citation&amp;gt;
+                     &amp;lt;gmd:CI_Citation&amp;gt;
+                        &amp;lt;gmd:title&amp;gt;
+                           &amp;lt;gco:CharacterString&amp;gt;SeaDataNet - Biological oceanography from German Oceanographic Datacentre (PointOfContact; Data Distributor), State Office for Agriculture, Environment and Rural Areas of Schleswig Holstein  (Data Custodian), point observations&amp;lt;/gco:CharacterString&amp;gt;
+                        &amp;lt;/gmd:title&amp;gt;
+                        &amp;lt;gmd:alternateTitle&amp;gt;
+                           &amp;lt;gco:CharacterString&amp;gt;SDN:CDI:LOCAL:96-2537-96-ds01-4&amp;lt;/gco:CharacterString&amp;gt;
+                        &amp;lt;/gmd:alternateTitle&amp;gt;
+                        &amp;lt;gmd:date&amp;gt;
+                           &amp;lt;gmd:CI_Date&amp;gt;
+                              &amp;lt;gmd:date&amp;gt;
+                                 &amp;lt;gco:Date&amp;gt;2024-06-14&amp;lt;/gco:Date&amp;gt;
+                              &amp;lt;/gmd:date&amp;gt;
+                              &amp;lt;gmd:dateType&amp;gt;
+                                 &amp;lt;gmd:CI_DateTypeCode codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_DateTypeCode&amp;quot; codeListValue=&amp;quot;revision&amp;quot; codeSpace=&amp;quot;ISOTC211/19115&amp;quot;&amp;gt;revision&amp;lt;/gmd:CI_DateTypeCode&amp;gt;
+                              &amp;lt;/gmd:dateType&amp;gt;
+                           &amp;lt;/gmd:CI_Date&amp;gt;
+                        &amp;lt;/gmd:date&amp;gt;
+                        &amp;lt;gmd:identifier&amp;gt;
+                           &amp;lt;gmd:MD_Identifier&amp;gt;
+                              &amp;lt;gmd:code&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;urn:SDN:CDI:LOCAL:SDN:CDI:LOCAL:96-2537-96-ds01-4&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:code&amp;gt;
+                           &amp;lt;/gmd:MD_Identifier&amp;gt;
+                        &amp;lt;/gmd:identifier&amp;gt;
+                        &amp;lt;gmd:citedResponsibleParty&amp;gt;
+               &amp;lt;gmd:CI_ResponsibleParty&amp;gt;
+                  &amp;lt;gmd:organisationName&amp;gt;
+                     &amp;lt;sdn:SDN_EDMOCode codeList=&amp;quot;https://edmo.seadatanet.org/isocodelists/edmo-edmerp-codelists.xml#SDN_EDMOCode&amp;quot; codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;2537&amp;quot;&amp;gt;State Office for Agriculture, Environment and Rural Areas of Schleswig Holstein &amp;lt;/sdn:SDN_EDMOCode&amp;gt;
+                  &amp;lt;/gmd:organisationName&amp;gt;
+                  &amp;lt;gmd:contactInfo&amp;gt;
+                     &amp;lt;gmd:CI_Contact&amp;gt;
+                        &amp;lt;gmd:phone&amp;gt;
+                           &amp;lt;gmd:CI_Telephone&amp;gt;
+                              &amp;lt;gmd:voice&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;+49-4347 704-0&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:voice&amp;gt;
+                              &amp;lt;gmd:facsimile&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;+49-4347 704-102&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:facsimile&amp;gt;
+                            &amp;lt;/gmd:CI_Telephone&amp;gt;
+                        &amp;lt;/gmd:phone&amp;gt;
+                        &amp;lt;gmd:address&amp;gt;
+                           &amp;lt;gmd:CI_Address&amp;gt;
+                              &amp;lt;gmd:deliveryPoint&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;Hamburger Chaussee 25&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:deliveryPoint&amp;gt;
+                              &amp;lt;gmd:city&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;Flintbek&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:city&amp;gt;
+                              &amp;lt;gmd:postalCode&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;24220&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:postalCode&amp;gt;
+                              &amp;lt;gmd:country&amp;gt;
+                                 &amp;lt;sdn:SDN_CountryCode codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;DE&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/cdicsrCodeList.xml#SDN_CountryCode&amp;quot;&amp;gt;Germany&amp;lt;/sdn:SDN_CountryCode&amp;gt;
+                              &amp;lt;/gmd:country&amp;gt;
+                              &amp;lt;gmd:electronicMailAddress&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;poststelle@llur.landsh.de&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:electronicMailAddress&amp;gt;
+                           &amp;lt;/gmd:CI_Address&amp;gt;
+                        &amp;lt;/gmd:address&amp;gt;
+                     &amp;lt;/gmd:CI_Contact&amp;gt;
+                  &amp;lt;/gmd:contactInfo&amp;gt;
+                  &amp;lt;gmd:role&amp;gt;
+                     &amp;lt;gmd:CI_RoleCode codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_RoleCode&amp;quot; codeListValue=&amp;quot;originator&amp;quot; codeSpace=&amp;quot;ISOTC211/19115&amp;quot;&amp;gt;originator&amp;lt;/gmd:CI_RoleCode&amp;gt;
+                  &amp;lt;/gmd:role&amp;gt;
+               &amp;lt;/gmd:CI_ResponsibleParty&amp;gt;
+                        &amp;lt;/gmd:citedResponsibleParty&amp;gt;
+                        &amp;lt;gmd:citedResponsibleParty&amp;gt;
+               &amp;lt;gmd:CI_ResponsibleParty&amp;gt;
+                  &amp;lt;gmd:organisationName&amp;gt;
+                     &amp;lt;sdn:SDN_EDMOCode codeList=&amp;quot;https://edmo.seadatanet.org/isocodelists/edmo-edmerp-codelists.xml#SDN_EDMOCode&amp;quot; codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;1181&amp;quot;&amp;gt;State Agency for Nature and Environment of Schleswig Holstein &amp;lt;/sdn:SDN_EDMOCode&amp;gt;
+                  &amp;lt;/gmd:organisationName&amp;gt;
+                  &amp;lt;gmd:contactInfo&amp;gt;
+                     &amp;lt;gmd:CI_Contact&amp;gt;
+                        &amp;lt;gmd:phone&amp;gt;
+                           &amp;lt;gmd:CI_Telephone&amp;gt;
+                              &amp;lt;gmd:voice&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;+49 4347 704-0&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:voice&amp;gt;
+                              &amp;lt;gmd:facsimile&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;+49 4347 704 102&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:facsimile&amp;gt;
+                            &amp;lt;/gmd:CI_Telephone&amp;gt;
+                        &amp;lt;/gmd:phone&amp;gt;
+                        &amp;lt;gmd:address&amp;gt;
+                           &amp;lt;gmd:CI_Address&amp;gt;
+                              &amp;lt;gmd:deliveryPoint&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;Hamburger Chaussee 25&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:deliveryPoint&amp;gt;
+                              &amp;lt;gmd:city&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;Flintbek&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:city&amp;gt;
+                              &amp;lt;gmd:postalCode&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;24220&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:postalCode&amp;gt;
+                              &amp;lt;gmd:country&amp;gt;
+                                 &amp;lt;sdn:SDN_CountryCode codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;DE&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/cdicsrCodeList.xml#SDN_CountryCode&amp;quot;&amp;gt;Germany&amp;lt;/sdn:SDN_CountryCode&amp;gt;
+                              &amp;lt;/gmd:country&amp;gt;
+                              &amp;lt;gmd:electronicMailAddress&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;infonet@lanu.landsh.de&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:electronicMailAddress&amp;gt;
+                           &amp;lt;/gmd:CI_Address&amp;gt;
+                        &amp;lt;/gmd:address&amp;gt;
+                        &amp;lt;gmd:onlineResource&amp;gt;
+                           &amp;lt;gmd:CI_OnlineResource&amp;gt;
+                              &amp;lt;gmd:linkage&amp;gt;
+                                 &amp;lt;gmd:URL&amp;gt;http://www.umwelt.schleswig-holstein.de/servlet/is/1/&amp;lt;/gmd:URL&amp;gt;
+                              &amp;lt;/gmd:linkage&amp;gt;
+                           &amp;lt;/gmd:CI_OnlineResource&amp;gt;
+                        &amp;lt;/gmd:onlineResource&amp;gt;
+                     &amp;lt;/gmd:CI_Contact&amp;gt;
+                  &amp;lt;/gmd:contactInfo&amp;gt;
+                  &amp;lt;gmd:role&amp;gt;
+                     &amp;lt;gmd:CI_RoleCode codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_RoleCode&amp;quot; codeListValue=&amp;quot;originator&amp;quot; codeSpace=&amp;quot;ISOTC211/19115&amp;quot;&amp;gt;originator&amp;lt;/gmd:CI_RoleCode&amp;gt;
+                  &amp;lt;/gmd:role&amp;gt;
+               &amp;lt;/gmd:CI_ResponsibleParty&amp;gt;
+                        &amp;lt;/gmd:citedResponsibleParty&amp;gt;
+                     &amp;lt;/gmd:CI_Citation&amp;gt;
+                  &amp;lt;/gmd:citation&amp;gt;
+                  &amp;lt;gmd:abstract&amp;gt;
+                     &amp;lt;gco:CharacterString&amp;gt;SeaDataNet is the Pan-European infrastructure for marine and ocean data management and delivery services. It is supported by the EU under its Research Infrastructures programme. It  connects 40 National Oceanographic Data Centres (NODC&amp;apos;s) and 50 other data centres from 35 countries, bordering the European seas and Atlantic Ocean. The centres are mostly part of major marine management and research organisations that are acquiring and managing a large collection of marine and ocean data from various disciplines. This includes major international organisations, ICES and IOC-IODE. The overall objective is provide overview and access to marine and oceanographic data and data-products from government and research institutes in Europe. SeaDataNet contributes to the implementation of the EU INSPIRE and Marine Strategy Framework Directives. It also plays a key role in the development and operation of the EU EMODNet initiative. The SeaDataNet infrastructure is fully operational and INSPIRE compliant. It includes a versatile SeaDataNet portal (https://www.seadatanet.org) that provides users with a range of metadata, data and data product access services as well as standards, tools and guides for good marine data management. The Common Data Index (CDI) data discovery and access service provides harmonised access to the large volumes of datasets that are managed by the connected data centres. The CDI service contains already references and gives access to more than 1,5 milllion marine and oceanographic datasets as managed by 90 data centres. These numbers are increasing regularly because of further data population and more connected data centres as part of SeaDataNet II, EMODnet and other EU projects. For inclusion in the SeaDataNet INSPIRE compliant CSW service, the CDI records (at granule level) have been aggregated into CDI collections by a combination of Discipline, Data Centre, and geometric type. Each CSW XML record therefore represents a large collection of individual metadata records and associated datasets. By following the specified URL to the SeaDataNet portal users can evaluate these metadata in detail and request access by downloading of interesting datasets via the shopping cart transaction system that is integrated in the SeaDataNet portal.&amp;lt;/gco:CharacterString&amp;gt;
+                  &amp;lt;/gmd:abstract&amp;gt;
+                  &amp;lt;gmd:pointOfContact&amp;gt;
+               &amp;lt;gmd:CI_ResponsibleParty&amp;gt;
+                  &amp;lt;gmd:organisationName&amp;gt;
+                     &amp;lt;sdn:SDN_EDMOCode codeList=&amp;quot;https://edmo.seadatanet.org/isocodelists/edmo-edmerp-codelists.xml#SDN_EDMOCode&amp;quot; codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;2537&amp;quot;&amp;gt;State Office for Agriculture, Environment and Rural Areas of Schleswig Holstein &amp;lt;/sdn:SDN_EDMOCode&amp;gt;
+                  &amp;lt;/gmd:organisationName&amp;gt;
+                  &amp;lt;gmd:contactInfo&amp;gt;
+                     &amp;lt;gmd:CI_Contact&amp;gt;
+                        &amp;lt;gmd:phone&amp;gt;
+                           &amp;lt;gmd:CI_Telephone&amp;gt;
+                              &amp;lt;gmd:voice&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;+49-4347 704-0&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:voice&amp;gt;
+                              &amp;lt;gmd:facsimile&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;+49-4347 704-102&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:facsimile&amp;gt;
+                            &amp;lt;/gmd:CI_Telephone&amp;gt;
+                        &amp;lt;/gmd:phone&amp;gt;
+                        &amp;lt;gmd:address&amp;gt;
+                           &amp;lt;gmd:CI_Address&amp;gt;
+                              &amp;lt;gmd:deliveryPoint&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;Hamburger Chaussee 25&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:deliveryPoint&amp;gt;
+                              &amp;lt;gmd:city&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;Flintbek&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:city&amp;gt;
+                              &amp;lt;gmd:postalCode&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;24220&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:postalCode&amp;gt;
+                              &amp;lt;gmd:country&amp;gt;
+                                 &amp;lt;sdn:SDN_CountryCode codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;DE&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/cdicsrCodeList.xml#SDN_CountryCode&amp;quot;&amp;gt;Germany&amp;lt;/sdn:SDN_CountryCode&amp;gt;
+                              &amp;lt;/gmd:country&amp;gt;
+                              &amp;lt;gmd:electronicMailAddress&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;poststelle@llur.landsh.de&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:electronicMailAddress&amp;gt;
+                           &amp;lt;/gmd:CI_Address&amp;gt;
+                        &amp;lt;/gmd:address&amp;gt;
+                     &amp;lt;/gmd:CI_Contact&amp;gt;
+                  &amp;lt;/gmd:contactInfo&amp;gt;
+                  &amp;lt;gmd:role&amp;gt;
+                     &amp;lt;gmd:CI_RoleCode codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_RoleCode&amp;quot; codeListValue=&amp;quot;custodian&amp;quot; codeSpace=&amp;quot;ISOTC211/19115&amp;quot;&amp;gt;custodian&amp;lt;/gmd:CI_RoleCode&amp;gt;
+                  &amp;lt;/gmd:role&amp;gt;
+               &amp;lt;/gmd:CI_ResponsibleParty&amp;gt;
+                  &amp;lt;/gmd:pointOfContact&amp;gt;
+                  &amp;lt;gmd:resourceMaintenance&amp;gt;
+                     &amp;lt;gmd:MD_MaintenanceInformation&amp;gt;
+                        &amp;lt;gmd:maintenanceAndUpdateFrequency&amp;gt;
+                           &amp;lt;gmd:MD_MaintenanceFrequencyCode codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#MD_MaintenanceFrequencyCode&amp;quot; codeListValue=&amp;quot;continual&amp;quot;&amp;gt;continual&amp;lt;/gmd:MD_MaintenanceFrequencyCode&amp;gt;
+                        &amp;lt;/gmd:maintenanceAndUpdateFrequency&amp;gt;
+                        &amp;lt;gmd:userDefinedMaintenanceFrequency&amp;gt;
+                           &amp;lt;gts:TM_PeriodDuration&amp;gt;P35D&amp;lt;/gts:TM_PeriodDuration&amp;gt;
+                        &amp;lt;/gmd:userDefinedMaintenanceFrequency&amp;gt;
+                     &amp;lt;/gmd:MD_MaintenanceInformation&amp;gt;
+                  &amp;lt;/gmd:resourceMaintenance&amp;gt;
+                  &amp;lt;gmd:descriptiveKeywords&amp;gt;
+                     &amp;lt;gmd:MD_Keywords&amp;gt;
+                        &amp;lt;gmd:keyword&amp;gt;
+                           &amp;lt;gco:CharacterString&amp;gt;Oceanographic geographical features&amp;lt;/gco:CharacterString&amp;gt;
+                        &amp;lt;/gmd:keyword&amp;gt;
+                        &amp;lt;gmd:type&amp;gt;
+                           &amp;lt;gmd:MD_KeywordTypeCode codeSpace=&amp;quot;SeaDataNet&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#MD_KeywordTypeCode&amp;quot; codeListValue=&amp;quot;theme&amp;quot;&amp;gt;theme&amp;lt;/gmd:MD_KeywordTypeCode&amp;gt;
+                        &amp;lt;/gmd:type&amp;gt;
+                        &amp;lt;gmd:thesaurusName&amp;gt;
+                           &amp;lt;gmd:CI_Citation&amp;gt;
+                              &amp;lt;gmd:title&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;GEMET - INSPIRE themes, version 1.0&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:title&amp;gt;
+                              &amp;lt;gmd:date&amp;gt;
+                                 &amp;lt;gmd:CI_Date&amp;gt;
+                                    &amp;lt;gmd:date&amp;gt;
+                                       &amp;lt;gco:Date&amp;gt;2008-06-01&amp;lt;/gco:Date&amp;gt;
+                                    &amp;lt;/gmd:date&amp;gt;
+                                    &amp;lt;gmd:dateType&amp;gt;
+                                       &amp;lt;gmd:CI_DateTypeCode codeSpace=&amp;quot;ISOTC211/19115&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_DateTypeCode&amp;quot; codeListValue=&amp;quot;publication&amp;quot;&amp;gt;publication&amp;lt;/gmd:CI_DateTypeCode&amp;gt;
+                                    &amp;lt;/gmd:dateType&amp;gt;
+                                 &amp;lt;/gmd:CI_Date&amp;gt;
+                              &amp;lt;/gmd:date&amp;gt;
+                           &amp;lt;/gmd:CI_Citation&amp;gt;
+                        &amp;lt;/gmd:thesaurusName&amp;gt;
+                     &amp;lt;/gmd:MD_Keywords&amp;gt;
+                  &amp;lt;/gmd:descriptiveKeywords&amp;gt;
+                  &amp;lt;gmd:descriptiveKeywords&amp;gt;
+                     &amp;lt;gmd:MD_Keywords&amp;gt;
+                        &amp;lt;gmd:keyword&amp;gt;
+                           &amp;lt;sdn:SDN_ParameterDiscoveryCode codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;ALKY&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/cdicsrCodeList.xml#SDN_ParameterDiscoveryCode&amp;quot;&amp;gt;Alkalinity, acidity and pH of the water column&amp;lt;/sdn:SDN_ParameterDiscoveryCode&amp;gt;
+                        &amp;lt;/gmd:keyword&amp;gt;
+                        &amp;lt;gmd:keyword&amp;gt;
+                           &amp;lt;sdn:SDN_ParameterDiscoveryCode codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;CPWC&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/cdicsrCodeList.xml#SDN_ParameterDiscoveryCode&amp;quot;&amp;gt;Chlorophyll pigment concentrations in water bodies&amp;lt;/sdn:SDN_ParameterDiscoveryCode&amp;gt;
+                        &amp;lt;/gmd:keyword&amp;gt;
+                        &amp;lt;gmd:keyword&amp;gt;
+                           &amp;lt;sdn:SDN_ParameterDiscoveryCode codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;PSAL&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/cdicsrCodeList.xml#SDN_ParameterDiscoveryCode&amp;quot;&amp;gt;Salinity of the water column&amp;lt;/sdn:SDN_ParameterDiscoveryCode&amp;gt;
+                        &amp;lt;/gmd:keyword&amp;gt;
+                        &amp;lt;gmd:keyword&amp;gt;
+                           &amp;lt;sdn:SDN_ParameterDiscoveryCode codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;TEMP&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/cdicsrCodeList.xml#SDN_ParameterDiscoveryCode&amp;quot;&amp;gt;Temperature of the water column&amp;lt;/sdn:SDN_ParameterDiscoveryCode&amp;gt;
+                        &amp;lt;/gmd:keyword&amp;gt;
+                        &amp;lt;gmd:keyword&amp;gt;
+                           &amp;lt;sdn:SDN_ParameterDiscoveryCode codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;NTRA&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/cdicsrCodeList.xml#SDN_ParameterDiscoveryCode&amp;quot;&amp;gt;Nitrate concentration parameters in the water column&amp;lt;/sdn:SDN_ParameterDiscoveryCode&amp;gt;
+                        &amp;lt;/gmd:keyword&amp;gt;
+                        &amp;lt;gmd:keyword&amp;gt;
+                           &amp;lt;sdn:SDN_ParameterDiscoveryCode codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;NTRI&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/cdicsrCodeList.xml#SDN_ParameterDiscoveryCode&amp;quot;&amp;gt;Nitrite concentration parameters in the water column&amp;lt;/sdn:SDN_ParameterDiscoveryCode&amp;gt;
+                        &amp;lt;/gmd:keyword&amp;gt;
+                        &amp;lt;gmd:keyword&amp;gt;
+                           &amp;lt;sdn:SDN_ParameterDiscoveryCode codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;PHOS&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/cdicsrCodeList.xml#SDN_ParameterDiscoveryCode&amp;quot;&amp;gt;Phosphate concentration parameters in the water column&amp;lt;/sdn:SDN_ParameterDiscoveryCode&amp;gt;
+                        &amp;lt;/gmd:keyword&amp;gt;
+                        &amp;lt;gmd:keyword&amp;gt;
+                           &amp;lt;sdn:SDN_ParameterDiscoveryCode codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;TDPX&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/cdicsrCodeList.xml#SDN_ParameterDiscoveryCode&amp;quot;&amp;gt;Dissolved total or organic phosphorus concentration in the water column&amp;lt;/sdn:SDN_ParameterDiscoveryCode&amp;gt;
+                        &amp;lt;/gmd:keyword&amp;gt;
+                        &amp;lt;gmd:keyword&amp;gt;
+                           &amp;lt;sdn:SDN_ParameterDiscoveryCode codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;AMON&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/cdicsrCodeList.xml#SDN_ParameterDiscoveryCode&amp;quot;&amp;gt;Ammonium and ammonia concentration parameters in water bodies&amp;lt;/sdn:SDN_ParameterDiscoveryCode&amp;gt;
+                        &amp;lt;/gmd:keyword&amp;gt;
+                        &amp;lt;gmd:keyword&amp;gt;
+                           &amp;lt;sdn:SDN_ParameterDiscoveryCode codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;SLCA&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/cdicsrCodeList.xml#SDN_ParameterDiscoveryCode&amp;quot;&amp;gt;Silicate concentration parameters in the water column&amp;lt;/sdn:SDN_ParameterDiscoveryCode&amp;gt;
+                        &amp;lt;/gmd:keyword&amp;gt;
+                        &amp;lt;gmd:keyword&amp;gt;
+                           &amp;lt;sdn:SDN_ParameterDiscoveryCode codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;TDNT&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/cdicsrCodeList.xml#SDN_ParameterDiscoveryCode&amp;quot;&amp;gt;Dissolved total and organic nitrogen concentrations in the water column&amp;lt;/sdn:SDN_ParameterDiscoveryCode&amp;gt;
+                        &amp;lt;/gmd:keyword&amp;gt;
+                        &amp;lt;gmd:keyword&amp;gt;
+                           &amp;lt;sdn:SDN_ParameterDiscoveryCode codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;DOXY&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/cdicsrCodeList.xml#SDN_ParameterDiscoveryCode&amp;quot;&amp;gt;Dissolved oxygen parameters in the water column&amp;lt;/sdn:SDN_ParameterDiscoveryCode&amp;gt;
+                        &amp;lt;/gmd:keyword&amp;gt;
+                        &amp;lt;gmd:keyword&amp;gt;
+                           &amp;lt;sdn:SDN_ParameterDiscoveryCode codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;SECC&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/cdicsrCodeList.xml#SDN_ParameterDiscoveryCode&amp;quot;&amp;gt;Secchi disk depth&amp;lt;/sdn:SDN_ParameterDiscoveryCode&amp;gt;
+                        &amp;lt;/gmd:keyword&amp;gt;
+                        &amp;lt;gmd:keyword&amp;gt;
+                           &amp;lt;sdn:SDN_ParameterDiscoveryCode codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;NTOT&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/cdicsrCodeList.xml#SDN_ParameterDiscoveryCode&amp;quot;&amp;gt;Particulate total and organic nitrogen concentrations in the water column&amp;lt;/sdn:SDN_ParameterDiscoveryCode&amp;gt;
+                        &amp;lt;/gmd:keyword&amp;gt;
+                        &amp;lt;gmd:keyword&amp;gt;
+                           &amp;lt;sdn:SDN_ParameterDiscoveryCode codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;MTWD&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/cdicsrCodeList.xml#SDN_ParameterDiscoveryCode&amp;quot;&amp;gt;Dissolved metal concentrations in the water column&amp;lt;/sdn:SDN_ParameterDiscoveryCode&amp;gt;
+                        &amp;lt;/gmd:keyword&amp;gt;
+                        &amp;lt;gmd:keyword&amp;gt;
+                           &amp;lt;sdn:SDN_ParameterDiscoveryCode codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;PPWC&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/cdicsrCodeList.xml#SDN_ParameterDiscoveryCode&amp;quot;&amp;gt;Concentration of polychlorobiphenyls (PCBs) in the water column&amp;lt;/sdn:SDN_ParameterDiscoveryCode&amp;gt;
+                        &amp;lt;/gmd:keyword&amp;gt;
+                        &amp;lt;gmd:keyword&amp;gt;
+                           &amp;lt;sdn:SDN_ParameterDiscoveryCode codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;PEWB&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/cdicsrCodeList.xml#SDN_ParameterDiscoveryCode&amp;quot;&amp;gt;Pesticide concentrations in water bodies&amp;lt;/sdn:SDN_ParameterDiscoveryCode&amp;gt;
+                        &amp;lt;/gmd:keyword&amp;gt;
+                        &amp;lt;gmd:keyword&amp;gt;
+                           &amp;lt;sdn:SDN_ParameterDiscoveryCode codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;WCOC&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/cdicsrCodeList.xml#SDN_ParameterDiscoveryCode&amp;quot;&amp;gt;Concentration of other organic contaminants in the water column&amp;lt;/sdn:SDN_ParameterDiscoveryCode&amp;gt;
+                        &amp;lt;/gmd:keyword&amp;gt;
+                        &amp;lt;gmd:type&amp;gt;
+                           &amp;lt;gmd:MD_KeywordTypeCode codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#MD_KeywordTypeCode&amp;quot; codeListValue=&amp;quot;parameter&amp;quot; codeSpace=&amp;quot;SeaDataNet&amp;quot;&amp;gt;parameter&amp;lt;/gmd:MD_KeywordTypeCode&amp;gt;
+                        &amp;lt;/gmd:type&amp;gt;
+                        &amp;lt;gmd:thesaurusName&amp;gt;
+            				&amp;lt;gmd:CI_Citation&amp;gt;&#13;
+                				&amp;lt;gmd:title&amp;gt;&#13;
+                    				&amp;lt;gco:CharacterString&amp;gt;SeaDataNet Parameter Discovery Vocabulary&amp;lt;/gco:CharacterString&amp;gt;&#13;
+                				&amp;lt;/gmd:title&amp;gt;&#13;
+                				&amp;lt;gmd:alternateTitle&amp;gt;&#13;
+                    				&amp;lt;gco:CharacterString&amp;gt;SeaDataNet PDV&amp;lt;/gco:CharacterString&amp;gt;&#13;
+                				&amp;lt;/gmd:alternateTitle&amp;gt;                    				&amp;lt;gmd:alternateTitle&amp;gt;&#13;
+                        				&amp;lt;gco:CharacterString&amp;gt;P02&amp;lt;/gco:CharacterString&amp;gt;&#13;
+                    				&amp;lt;/gmd:alternateTitle&amp;gt;                				&amp;lt;gmd:date&amp;gt;&#13;
+                    				&amp;lt;gmd:CI_Date&amp;gt;&#13;
+                        				&amp;lt;gmd:date&amp;gt;&#13;
+                            				&amp;lt;gco:Date&amp;gt;2023-12-12&amp;lt;/gco:Date&amp;gt;&#13;
+                        				&amp;lt;/gmd:date&amp;gt;&#13;
+                        				&amp;lt;gmd:dateType&amp;gt;&#13;
+                            				&amp;lt;gmd:CI_DateTypeCode codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_DateTypeCode&amp;quot; codeListValue=&amp;quot;revision&amp;quot; codeSpace=&amp;quot;ISOTC211/19115&amp;quot;&amp;gt;revision&amp;lt;/gmd:CI_DateTypeCode&amp;gt;&#13;
+                        				&amp;lt;/gmd:dateType&amp;gt;&#13;
+                    				&amp;lt;/gmd:CI_Date&amp;gt;&#13;
+                				&amp;lt;/gmd:date&amp;gt;&#13;
+                				&amp;lt;gmd:edition&amp;gt;&#13;
+                    				&amp;lt;gco:CharacterString&amp;gt;127&amp;lt;/gco:CharacterString&amp;gt;&#13;
+                				&amp;lt;/gmd:edition&amp;gt;&#13;
+                				&amp;lt;gmd:identifier&amp;gt;&#13;
+                    				&amp;lt;gmd:MD_Identifier&amp;gt;&#13;
+                        				&amp;lt;gmd:code&amp;gt;&#13;
+                            				&amp;lt;gco:CharacterString&amp;gt;https://www.seadatanet.org/urnurl/SDN:P02&amp;lt;/gco:CharacterString&amp;gt;&#13;
+                        				&amp;lt;/gmd:code&amp;gt;&#13;
+                    				&amp;lt;/gmd:MD_Identifier&amp;gt;&#13;
+                				&amp;lt;/gmd:identifier&amp;gt;&#13;
+            				&amp;lt;/gmd:CI_Citation&amp;gt;
+                        &amp;lt;/gmd:thesaurusName&amp;gt;
+                     &amp;lt;/gmd:MD_Keywords&amp;gt;
+                  &amp;lt;/gmd:descriptiveKeywords&amp;gt;
+                  &amp;lt;gmd:descriptiveKeywords&amp;gt;
+                     &amp;lt;gmd:MD_Keywords&amp;gt;
+                        &amp;lt;gmd:keyword&amp;gt;
+                           &amp;lt;sdn:SDN_DeviceCategoryCode codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;30&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/cdicsrCodeList.xml#SDN_DeviceCategoryCode&amp;quot;&amp;gt;discrete water samplers&amp;lt;/sdn:SDN_DeviceCategoryCode&amp;gt;
+                        &amp;lt;/gmd:keyword&amp;gt;
+                        &amp;lt;gmd:keyword&amp;gt;
+                           &amp;lt;sdn:SDN_DeviceCategoryCode codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;124&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/cdicsrCodeList.xml#SDN_DeviceCategoryCode&amp;quot;&amp;gt;transmissometers&amp;lt;/sdn:SDN_DeviceCategoryCode&amp;gt;
+                        &amp;lt;/gmd:keyword&amp;gt;
+                        &amp;lt;gmd:keyword&amp;gt;
+                           &amp;lt;sdn:SDN_DeviceCategoryCode codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;130&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/cdicsrCodeList.xml#SDN_DeviceCategoryCode&amp;quot;&amp;gt;CTD&amp;lt;/sdn:SDN_DeviceCategoryCode&amp;gt;
+                        &amp;lt;/gmd:keyword&amp;gt;
+                        &amp;lt;gmd:type&amp;gt;
+                           &amp;lt;gmd:MD_KeywordTypeCode codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#MD_KeywordTypeCode&amp;quot; codeListValue=&amp;quot;instrument&amp;quot; codeSpace=&amp;quot;SeaDataNet&amp;quot;&amp;gt;instrument&amp;lt;/gmd:MD_KeywordTypeCode&amp;gt;
+                        &amp;lt;/gmd:type&amp;gt;
+                        &amp;lt;gmd:thesaurusName&amp;gt;
+            							&amp;lt;gmd:CI_Citation&amp;gt;&#13;
+                							&amp;lt;gmd:title&amp;gt;&#13;
+                    							&amp;lt;gco:CharacterString&amp;gt;SeaDataNet device categories&amp;lt;/gco:CharacterString&amp;gt;&#13;
+                							&amp;lt;/gmd:title&amp;gt;&#13;
+                							&amp;lt;gmd:alternateTitle&amp;gt;&#13;
+                    							&amp;lt;gco:CharacterString&amp;gt;SDN devices&amp;lt;/gco:CharacterString&amp;gt;&#13;
+                							&amp;lt;/gmd:alternateTitle&amp;gt;                    							&amp;lt;gmd:alternateTitle&amp;gt;&#13;
+                        							&amp;lt;gco:CharacterString&amp;gt;L05&amp;lt;/gco:CharacterString&amp;gt;&#13;
+                    							&amp;lt;/gmd:alternateTitle&amp;gt;                							&amp;lt;gmd:date&amp;gt;&#13;
+                    							&amp;lt;gmd:CI_Date&amp;gt;&#13;
+                        							&amp;lt;gmd:date&amp;gt;&#13;
+                            							&amp;lt;gco:Date&amp;gt;2024-02-02&amp;lt;/gco:Date&amp;gt;&#13;
+                        							&amp;lt;/gmd:date&amp;gt;&#13;
+                        							&amp;lt;gmd:dateType&amp;gt;&#13;
+                            							&amp;lt;gmd:CI_DateTypeCode codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_DateTypeCode&amp;quot; codeListValue=&amp;quot;revision&amp;quot; codeSpace=&amp;quot;ISOTC211/19115&amp;quot;&amp;gt;revision&amp;lt;/gmd:CI_DateTypeCode&amp;gt;&#13;
+                        							&amp;lt;/gmd:dateType&amp;gt;&#13;
+                    							&amp;lt;/gmd:CI_Date&amp;gt;&#13;
+                							&amp;lt;/gmd:date&amp;gt;&#13;
+                							&amp;lt;gmd:edition&amp;gt;&#13;
+                    							&amp;lt;gco:CharacterString&amp;gt;91&amp;lt;/gco:CharacterString&amp;gt;&#13;
+                							&amp;lt;/gmd:edition&amp;gt;&#13;
+                							&amp;lt;gmd:identifier&amp;gt;&#13;
+                    							&amp;lt;gmd:MD_Identifier&amp;gt;&#13;
+                        							&amp;lt;gmd:code&amp;gt;&#13;
+                            							&amp;lt;gco:CharacterString&amp;gt;https://www.seadatanet.org/urnurl/SDN:L05&amp;lt;/gco:CharacterString&amp;gt;&#13;
+                        							&amp;lt;/gmd:code&amp;gt;&#13;
+                    							&amp;lt;/gmd:MD_Identifier&amp;gt;&#13;
+                							&amp;lt;/gmd:identifier&amp;gt;&#13;
+            							&amp;lt;/gmd:CI_Citation&amp;gt;
+                        &amp;lt;/gmd:thesaurusName&amp;gt;
+                     &amp;lt;/gmd:MD_Keywords&amp;gt;
+                  &amp;lt;/gmd:descriptiveKeywords&amp;gt;
+                  &amp;lt;gmd:descriptiveKeywords&amp;gt;
+                     &amp;lt;gmd:MD_Keywords&amp;gt;
+                        &amp;lt;gmd:keyword&amp;gt;
+                           &amp;lt;sdn:SDN_PlatformCategoryCode codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;0&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/cdicsrCodeList.xml#SDN_PlatformCategoryCode&amp;quot;&amp;gt;unknown&amp;lt;/sdn:SDN_PlatformCategoryCode&amp;gt;
+                        &amp;lt;/gmd:keyword&amp;gt;
+                        &amp;lt;gmd:type&amp;gt;
+                           &amp;lt;gmd:MD_KeywordTypeCode codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#MD_KeywordTypeCode&amp;quot; codeListValue=&amp;quot;platform_class&amp;quot; codeSpace=&amp;quot;SeaDataNet&amp;quot;&amp;gt;platform_class&amp;lt;/gmd:MD_KeywordTypeCode&amp;gt;
+                        &amp;lt;/gmd:type&amp;gt;
+                        &amp;lt;gmd:thesaurusName&amp;gt;
+            							&amp;lt;gmd:CI_Citation&amp;gt;&#13;
+                							&amp;lt;gmd:title&amp;gt;&#13;
+                    							&amp;lt;gco:CharacterString&amp;gt;SeaVoX Platform Categories&amp;lt;/gco:CharacterString&amp;gt;&#13;
+                							&amp;lt;/gmd:title&amp;gt;&#13;
+                							&amp;lt;gmd:alternateTitle&amp;gt;&#13;
+                    							&amp;lt;gco:CharacterString&amp;gt;SeaVoX Platform Categories&amp;lt;/gco:CharacterString&amp;gt;&#13;
+                							&amp;lt;/gmd:alternateTitle&amp;gt;                    							&amp;lt;gmd:alternateTitle&amp;gt;&#13;
+                        							&amp;lt;gco:CharacterString&amp;gt;L06&amp;lt;/gco:CharacterString&amp;gt;&#13;
+                    							&amp;lt;/gmd:alternateTitle&amp;gt;                							&amp;lt;gmd:date&amp;gt;&#13;
+                    							&amp;lt;gmd:CI_Date&amp;gt;&#13;
+                        							&amp;lt;gmd:date&amp;gt;&#13;
+                            							&amp;lt;gco:Date&amp;gt;2021-03-25&amp;lt;/gco:Date&amp;gt;&#13;
+                        							&amp;lt;/gmd:date&amp;gt;&#13;
+                        							&amp;lt;gmd:dateType&amp;gt;&#13;
+                            							&amp;lt;gmd:CI_DateTypeCode codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_DateTypeCode&amp;quot; codeListValue=&amp;quot;revision&amp;quot; codeSpace=&amp;quot;ISOTC211/19115&amp;quot;&amp;gt;revision&amp;lt;/gmd:CI_DateTypeCode&amp;gt;&#13;
+                        							&amp;lt;/gmd:dateType&amp;gt;&#13;
+                    							&amp;lt;/gmd:CI_Date&amp;gt;&#13;
+                							&amp;lt;/gmd:date&amp;gt;&#13;
+                							&amp;lt;gmd:edition&amp;gt;&#13;
+                    							&amp;lt;gco:CharacterString&amp;gt;17&amp;lt;/gco:CharacterString&amp;gt;&#13;
+                							&amp;lt;/gmd:edition&amp;gt;&#13;
+                							&amp;lt;gmd:identifier&amp;gt;&#13;
+                    							&amp;lt;gmd:MD_Identifier&amp;gt;&#13;
+                        							&amp;lt;gmd:code&amp;gt;&#13;
+                            							&amp;lt;gco:CharacterString&amp;gt;https://www.seadatanet.org/urnurl/SDN:L06&amp;lt;/gco:CharacterString&amp;gt;&#13;
+                        							&amp;lt;/gmd:code&amp;gt;&#13;
+                    							&amp;lt;/gmd:MD_Identifier&amp;gt;&#13;
+                							&amp;lt;/gmd:identifier&amp;gt;&#13;
+            							&amp;lt;/gmd:CI_Citation&amp;gt;
+                        &amp;lt;/gmd:thesaurusName&amp;gt;
+                     &amp;lt;/gmd:MD_Keywords&amp;gt;
+                  &amp;lt;/gmd:descriptiveKeywords&amp;gt;
+                  &amp;lt;gmd:resourceConstraints&amp;gt;
+                     &amp;lt;gmd:MD_Constraints&amp;gt;
+                        &amp;lt;gmd:useLimitation&amp;gt;
+                           &amp;lt;gco:CharacterString&amp;gt;Not applicable&amp;lt;/gco:CharacterString&amp;gt;
+                        &amp;lt;/gmd:useLimitation&amp;gt;
+                     &amp;lt;/gmd:MD_Constraints&amp;gt;
+                  &amp;lt;/gmd:resourceConstraints&amp;gt;
+                  &amp;lt;gmd:resourceConstraints&amp;gt;
+                     &amp;lt;gmd:MD_LegalConstraints&amp;gt;
+                        &amp;lt;gmd:accessConstraints&amp;gt;
+                           &amp;lt;gmd:MD_RestrictionCode codeListValue=&amp;quot;otherRestrictions&amp;quot;
+                                                   codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#MD_RestrictionCode&amp;quot;&amp;gt;otherRestrictions&amp;lt;/gmd:MD_RestrictionCode&amp;gt;
+                        &amp;lt;/gmd:accessConstraints&amp;gt;
+                        &amp;lt;gmd:otherConstraints&amp;gt;
+                           &amp;lt;gmx:Anchor xlink:href=&amp;quot;https://www.seadatanet.org/urnurl/SDN:L08::CB&amp;quot;&amp;gt;Creative Commons Attribution 4.0 International&amp;lt;/gmx:Anchor&amp;gt;
+                        &amp;lt;/gmd:otherConstraints&amp;gt;
+                     &amp;lt;/gmd:MD_LegalConstraints&amp;gt;
+                  &amp;lt;/gmd:resourceConstraints&amp;gt;
+                  &amp;lt;gmd:aggregationInfo&amp;gt;
+                     &amp;lt;gmd:MD_AggregateInformation&amp;gt;
+                        &amp;lt;gmd:aggregateDataSetName&amp;gt;
+                           &amp;lt;gmd:CI_Citation&amp;gt;
+                              &amp;lt;gmd:title&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;Various&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:title&amp;gt;
+                              &amp;lt;gmd:alternateTitle&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;Various&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:alternateTitle&amp;gt;
+                              &amp;lt;gmd:date&amp;gt;
+                                 &amp;lt;gmd:CI_Date&amp;gt;
+                                    &amp;lt;gmd:date&amp;gt;
+                                       &amp;lt;gco:Date&amp;gt;2024-06-14&amp;lt;/gco:Date&amp;gt;
+                                    &amp;lt;/gmd:date&amp;gt;
+                                    &amp;lt;gmd:dateType&amp;gt;
+                                       &amp;lt;gmd:CI_DateTypeCode codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_DateTypeCode&amp;quot; codeListValue=&amp;quot;revision&amp;quot; codeSpace=&amp;quot;ISOTC211/19115&amp;quot;&amp;gt;revision&amp;lt;/gmd:CI_DateTypeCode&amp;gt;
+                                    &amp;lt;/gmd:dateType&amp;gt;
+                                 &amp;lt;/gmd:CI_Date&amp;gt;
+                              &amp;lt;/gmd:date&amp;gt;
+                           &amp;lt;/gmd:CI_Citation&amp;gt;
+                        &amp;lt;/gmd:aggregateDataSetName&amp;gt;
+                        &amp;lt;gmd:associationType&amp;gt;
+                           &amp;lt;gmd:DS_AssociationTypeCode codeListValue=&amp;quot;largerWorkCitation&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#DS_AssociationTypeCode&amp;quot; codeSpace=&amp;quot;ISOTC211/19115&amp;quot;&amp;gt;largerWorkCitation&amp;lt;/gmd:DS_AssociationTypeCode&amp;gt;
+                        &amp;lt;/gmd:associationType&amp;gt;
+                        &amp;lt;gmd:initiativeType&amp;gt;
+                           &amp;lt;gmd:DS_InitiativeTypeCode codeListValue=&amp;quot;campaign&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#DS_InitiativeTypeCode&amp;quot; codeSpace=&amp;quot;ISOTC211/19115&amp;quot;&amp;gt;campaign&amp;lt;/gmd:DS_InitiativeTypeCode&amp;gt;
+                        &amp;lt;/gmd:initiativeType&amp;gt;
+                     &amp;lt;/gmd:MD_AggregateInformation&amp;gt;
+                  &amp;lt;/gmd:aggregationInfo&amp;gt;
+                  &amp;lt;gmd:aggregationInfo&amp;gt;
+                     &amp;lt;gmd:MD_AggregateInformation&amp;gt;
+                        &amp;lt;gmd:aggregateDataSetName&amp;gt;
+                           &amp;lt;gmd:CI_Citation&amp;gt;
+                              &amp;lt;gmd:title&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;Various&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:title&amp;gt;
+                              &amp;lt;gmd:alternateTitle&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;Various&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:alternateTitle&amp;gt;
+                              &amp;lt;gmd:date&amp;gt;
+                                 &amp;lt;gmd:CI_Date&amp;gt;
+                                    &amp;lt;gmd:date&amp;gt;
+                                       &amp;lt;gco:Date&amp;gt;2024-06-14&amp;lt;/gco:Date&amp;gt;
+                                    &amp;lt;/gmd:date&amp;gt;
+                                    &amp;lt;gmd:dateType&amp;gt;
+                                       &amp;lt;gmd:CI_DateTypeCode codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_DateTypeCode&amp;quot; codeListValue=&amp;quot;revision&amp;quot; codeSpace=&amp;quot;ISOTC211/19115&amp;quot;&amp;gt;revision&amp;lt;/gmd:CI_DateTypeCode&amp;gt;
+                                    &amp;lt;/gmd:dateType&amp;gt;
+                                 &amp;lt;/gmd:CI_Date&amp;gt;
+                              &amp;lt;/gmd:date&amp;gt;
+                           &amp;lt;/gmd:CI_Citation&amp;gt;
+                        &amp;lt;/gmd:aggregateDataSetName&amp;gt;
+                        &amp;lt;gmd:associationType&amp;gt;
+                           &amp;lt;gmd:DS_AssociationTypeCode codeListValue=&amp;quot;source&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#DS_AssociationTypeCode&amp;quot; codeSpace=&amp;quot;ISOTC211/19115&amp;quot;&amp;gt;source&amp;lt;/gmd:DS_AssociationTypeCode&amp;gt;
+                        &amp;lt;/gmd:associationType&amp;gt;
+                        &amp;lt;gmd:initiativeType&amp;gt;
+                           &amp;lt;gmd:DS_InitiativeTypeCode codeListValue=&amp;quot;operation&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#DS_InitiativeTypeCode&amp;quot; codeSpace=&amp;quot;ISOTC211/19115&amp;quot;&amp;gt;operation&amp;lt;/gmd:DS_InitiativeTypeCode&amp;gt;
+                        &amp;lt;/gmd:initiativeType&amp;gt;
+                     &amp;lt;/gmd:MD_AggregateInformation&amp;gt;
+                  &amp;lt;/gmd:aggregationInfo&amp;gt;
+                  &amp;lt;gmd:spatialRepresentationType&amp;gt;
+                    &amp;lt;gmd:MD_SpatialRepresentationTypeCode codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#MD_SpatialRepresentationTypeCode&amp;quot;  codeListValue=&amp;quot;textTable&amp;quot;&amp;gt;textTable&amp;lt;/gmd:MD_SpatialRepresentationTypeCode&amp;gt;
+                  &amp;lt;/gmd:spatialRepresentationType&amp;gt;
+                  &amp;lt;gmd:language&amp;gt;
+                     &amp;lt;gmd:LanguageCode codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#LanguageCode&amp;quot;
+                                       codeListValue=&amp;quot;eng&amp;quot;&amp;gt;English&amp;lt;/gmd:LanguageCode&amp;gt;
+                  &amp;lt;/gmd:language&amp;gt;
+                  &amp;lt;gmd:characterSet&amp;gt;
+                     &amp;lt;gmd:MD_CharacterSetCode codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#MD_CharacterSetCode&amp;quot; codeListValue=&amp;quot;utf8&amp;quot; codeSpace=&amp;quot;ISOTC211/19115&amp;quot;&amp;gt;utf8&amp;lt;/gmd:MD_CharacterSetCode&amp;gt;
+                  &amp;lt;/gmd:characterSet&amp;gt;
+                  &amp;lt;gmd:topicCategory&amp;gt;
+                     &amp;lt;gmd:MD_TopicCategoryCode&amp;gt;oceans&amp;lt;/gmd:MD_TopicCategoryCode&amp;gt;
+                  &amp;lt;/gmd:topicCategory&amp;gt;
+                  &amp;lt;gmd:extent&amp;gt;
+                     &amp;lt;gmd:EX_Extent&amp;gt;
+                        &amp;lt;gmd:geographicElement&amp;gt;
+                           &amp;lt;gmd:EX_GeographicBoundingBox&amp;gt;
+                              &amp;lt;gmd:westBoundLongitude&amp;gt;
+                                 &amp;lt;gco:Decimal&amp;gt;8.1169996262&amp;lt;/gco:Decimal&amp;gt;
+                              &amp;lt;/gmd:westBoundLongitude&amp;gt;
+                              &amp;lt;gmd:eastBoundLongitude&amp;gt;
+                                 &amp;lt;gco:Decimal&amp;gt;11.5500001907&amp;lt;/gco:Decimal&amp;gt;
+                              &amp;lt;/gmd:eastBoundLongitude&amp;gt;
+                              &amp;lt;gmd:southBoundLatitude&amp;gt;
+                                 &amp;lt;gco:Decimal&amp;gt;53.8950004578&amp;lt;/gco:Decimal&amp;gt;
+                              &amp;lt;/gmd:southBoundLatitude&amp;gt;
+                              &amp;lt;gmd:northBoundLatitude&amp;gt;
+                                 &amp;lt;gco:Decimal&amp;gt;55.0850028992&amp;lt;/gco:Decimal&amp;gt;
+                              &amp;lt;/gmd:northBoundLatitude&amp;gt;
+                           &amp;lt;/gmd:EX_GeographicBoundingBox&amp;gt;
+                        &amp;lt;/gmd:geographicElement&amp;gt;
+                        &amp;lt;gmd:temporalElement&amp;gt;
+                           &amp;lt;gmd:EX_TemporalExtent&amp;gt;
+                              &amp;lt;gmd:extent&amp;gt;
+                                 &amp;lt;gml:TimePeriod gml:id=&amp;quot;d1e1208&amp;quot;&amp;gt;
+                                    &amp;lt;gml:beginPosition&amp;gt;2009-01-13&amp;lt;/gml:beginPosition&amp;gt;
+                                    &amp;lt;gml:endPosition&amp;gt;2011-12-12&amp;lt;/gml:endPosition&amp;gt;
+                                 &amp;lt;/gml:TimePeriod&amp;gt;
+                              &amp;lt;/gmd:extent&amp;gt;
+                           &amp;lt;/gmd:EX_TemporalExtent&amp;gt;
+                        &amp;lt;/gmd:temporalElement&amp;gt;
+                        &amp;lt;gmd:verticalElement&amp;gt;
+                           &amp;lt;gmd:EX_VerticalExtent&amp;gt;
+                              &amp;lt;gmd:minimumValue&amp;gt;
+                              &amp;lt;/gmd:minimumValue&amp;gt;
+                              &amp;lt;gmd:maximumValue&amp;gt;
+                              &amp;lt;/gmd:maximumValue&amp;gt;
+                              &amp;lt;gmd:verticalCRS&amp;gt;
+                                 &amp;lt;gml:VerticalCRS gml:id=&amp;quot;vertical-crs-01&amp;quot;&amp;gt;
+                                    &amp;lt;gml:identifier codeSpace=&amp;quot;SeaDataNet&amp;quot;&amp;gt;vertical-crs-id-01&amp;lt;/gml:identifier&amp;gt;
+                                    &amp;lt;gml:scope&amp;gt;not known&amp;lt;/gml:scope&amp;gt;
+                                    &amp;lt;gml:verticalCS&amp;gt;
+                                       &amp;lt;gml:VerticalCS gml:id=&amp;quot;vertical-cs-01&amp;quot;&amp;gt;
+                                          &amp;lt;gml:identifier codeSpace=&amp;quot;SeaDataNet&amp;quot;&amp;gt;vertical-cs-id-01&amp;lt;/gml:identifier&amp;gt;
+                                          &amp;lt;gml:axis&amp;gt;
+                                             &amp;lt;gml:CoordinateSystemAxis gml:id=&amp;quot;coordsys-axis&amp;quot; gml:uom=&amp;quot;metres&amp;quot;&amp;gt;
+                                                &amp;lt;gml:identifier codeSpace=&amp;quot;SeaDataNet&amp;quot;&amp;gt;coordsys-axis0id&amp;lt;/gml:identifier&amp;gt;
+                                                &amp;lt;gml:axisAbbrev&amp;gt;Z&amp;lt;/gml:axisAbbrev&amp;gt;
+                                                &amp;lt;gml:axisDirection codeSpace=&amp;quot;&amp;quot;&amp;gt;up&amp;lt;/gml:axisDirection&amp;gt;
+                                             &amp;lt;/gml:CoordinateSystemAxis&amp;gt;
+                                          &amp;lt;/gml:axis&amp;gt;
+                                       &amp;lt;/gml:VerticalCS&amp;gt;
+                                    &amp;lt;/gml:verticalCS&amp;gt;
+                                    &amp;lt;gml:verticalDatum&amp;gt;
+                                       &amp;lt;gml:VerticalDatum gml:id=&amp;quot;vertical-datum&amp;quot;&amp;gt;
+                                          &amp;lt;gml:identifier codeSpace=&amp;quot;SeaDataNet&amp;quot;&amp;gt;https://www.seadatanet.org/urnurl/SDN:L11::D08&amp;lt;/gml:identifier&amp;gt;
+                                          &amp;lt;gml:name&amp;gt;sea level&amp;lt;/gml:name&amp;gt;
+                                          &amp;lt;gml:scope&amp;gt;not known&amp;lt;/gml:scope&amp;gt;
+                                       &amp;lt;/gml:VerticalDatum&amp;gt;
+                                    &amp;lt;/gml:verticalDatum&amp;gt;
+                                 &amp;lt;/gml:VerticalCRS&amp;gt;
+                              &amp;lt;/gmd:verticalCRS&amp;gt;
+                           &amp;lt;/gmd:EX_VerticalExtent&amp;gt;
+                        &amp;lt;/gmd:verticalElement&amp;gt;
+                     &amp;lt;/gmd:EX_Extent&amp;gt;
+                  &amp;lt;/gmd:extent&amp;gt;
+              &amp;lt;/sdn:SDN_DataIdentification&amp;gt;
+            &amp;lt;/gmd:identificationInfo&amp;gt;
+            &amp;lt;gmd:distributionInfo&amp;gt;
+               &amp;lt;gmd:MD_Distribution&amp;gt;
+                  &amp;lt;gmd:distributionFormat&amp;gt;
+                     &amp;lt;gmd:MD_Format&amp;gt;
+                        &amp;lt;gmd:name&amp;gt;
+                           &amp;lt;sdn:SDN_FormatNameCode codeSpace=&amp;quot;SeaDatanet&amp;quot; codeListValue=&amp;quot;CFPOINT&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/cdicsrCodeList.xml#SDN_FormatNameCode&amp;quot;&amp;gt;Climate and Forecast Point Data NetCDF&amp;lt;/sdn:SDN_FormatNameCode&amp;gt;
+                        &amp;lt;/gmd:name&amp;gt;
+                        &amp;lt;gmd:version&amp;gt;
+                           &amp;lt;gco:CharacterString&amp;gt;unknown&amp;lt;/gco:CharacterString&amp;gt;
+                        &amp;lt;/gmd:version&amp;gt;
+                     &amp;lt;/gmd:MD_Format&amp;gt;
+                  &amp;lt;/gmd:distributionFormat&amp;gt;
+                  &amp;lt;gmd:distributionFormat&amp;gt;
+                     &amp;lt;gmd:MD_Format&amp;gt;
+                        &amp;lt;gmd:name&amp;gt;
+                           &amp;lt;sdn:SDN_FormatNameCode codeSpace=&amp;quot;SeaDatanet&amp;quot; codeListValue=&amp;quot;ODV&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/cdicsrCodeList.xml#SDN_FormatNameCode&amp;quot;&amp;gt;Ocean Data View ASCII input&amp;lt;/sdn:SDN_FormatNameCode&amp;gt;
+                        &amp;lt;/gmd:name&amp;gt;
+                        &amp;lt;gmd:version&amp;gt;
+                           &amp;lt;gco:CharacterString&amp;gt;unknown&amp;lt;/gco:CharacterString&amp;gt;
+                        &amp;lt;/gmd:version&amp;gt;
+                     &amp;lt;/gmd:MD_Format&amp;gt;
+                  &amp;lt;/gmd:distributionFormat&amp;gt;
+                  &amp;lt;gmd:distributor&amp;gt;
+                     &amp;lt;gmd:MD_Distributor&amp;gt;
+                        &amp;lt;gmd:distributorContact&amp;gt;
+               &amp;lt;gmd:CI_ResponsibleParty&amp;gt;
+                  &amp;lt;gmd:organisationName&amp;gt;
+                     &amp;lt;sdn:SDN_EDMOCode codeList=&amp;quot;https://edmo.seadatanet.org/isocodelists/edmo-edmerp-codelists.xml#SDN_EDMOCode&amp;quot; codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;96&amp;quot;&amp;gt;German Oceanographic Datacentre&amp;lt;/sdn:SDN_EDMOCode&amp;gt;
+                  &amp;lt;/gmd:organisationName&amp;gt;
+                  &amp;lt;gmd:contactInfo&amp;gt;
+                     &amp;lt;gmd:CI_Contact&amp;gt;
+                        &amp;lt;gmd:phone&amp;gt;
+                           &amp;lt;gmd:CI_Telephone&amp;gt;
+                              &amp;lt;gmd:voice&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;+49 40 3190 3410&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:voice&amp;gt;
+                              &amp;lt;gmd:facsimile&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;+49 40 3190 5000&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:facsimile&amp;gt;
+                            &amp;lt;/gmd:CI_Telephone&amp;gt;
+                        &amp;lt;/gmd:phone&amp;gt;
+                        &amp;lt;gmd:address&amp;gt;
+                           &amp;lt;gmd:CI_Address&amp;gt;
+                              &amp;lt;gmd:deliveryPoint&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;Bernhard-Nocht-Strasse 78&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:deliveryPoint&amp;gt;
+                              &amp;lt;gmd:city&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;Hamburg&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:city&amp;gt;
+                              &amp;lt;gmd:postalCode&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;20359&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:postalCode&amp;gt;
+                              &amp;lt;gmd:country&amp;gt;
+                                 &amp;lt;sdn:SDN_CountryCode codeSpace=&amp;quot;SeaDataNet&amp;quot; codeListValue=&amp;quot;DE&amp;quot; codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/cdicsrCodeList.xml#SDN_CountryCode&amp;quot;&amp;gt;Germany&amp;lt;/sdn:SDN_CountryCode&amp;gt;
+                              &amp;lt;/gmd:country&amp;gt;
+                              &amp;lt;gmd:electronicMailAddress&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;dod@bsh.de&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:electronicMailAddress&amp;gt;
+                           &amp;lt;/gmd:CI_Address&amp;gt;
+                        &amp;lt;/gmd:address&amp;gt;
+                        &amp;lt;gmd:onlineResource&amp;gt;
+                           &amp;lt;gmd:CI_OnlineResource&amp;gt;
+                              &amp;lt;gmd:linkage&amp;gt;
+                                 &amp;lt;gmd:URL&amp;gt;https://www.bsh.de/DE/DATEN/Ozeanographisches_Datenzentrum/ozeanographisches_datenzentrum_node.html&amp;lt;/gmd:URL&amp;gt;
+                              &amp;lt;/gmd:linkage&amp;gt;
+                           &amp;lt;/gmd:CI_OnlineResource&amp;gt;
+                        &amp;lt;/gmd:onlineResource&amp;gt;
+                     &amp;lt;/gmd:CI_Contact&amp;gt;
+                  &amp;lt;/gmd:contactInfo&amp;gt;
+                  &amp;lt;gmd:role&amp;gt;
+                     &amp;lt;gmd:CI_RoleCode codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_RoleCode&amp;quot; codeListValue=&amp;quot;distributor&amp;quot; codeSpace=&amp;quot;ISOTC211/19115&amp;quot;&amp;gt;distributor&amp;lt;/gmd:CI_RoleCode&amp;gt;
+                  &amp;lt;/gmd:role&amp;gt;
+               &amp;lt;/gmd:CI_ResponsibleParty&amp;gt;
+                        &amp;lt;/gmd:distributorContact&amp;gt;
+                     &amp;lt;/gmd:MD_Distributor&amp;gt;
+                  &amp;lt;/gmd:distributor&amp;gt;
+                  &amp;lt;gmd:transferOptions&amp;gt;
+                     &amp;lt;gmd:MD_DigitalTransferOptions&amp;gt;
+                        &amp;lt;gmd:onLine&amp;gt;
+                           &amp;lt;gmd:CI_OnlineResource&amp;gt;
+                              &amp;lt;gmd:linkage&amp;gt;
+                                 &amp;lt;gmd:URL&amp;gt;https://cdi.seadatanet.org/search?step=00896~0372537~04896~0114~020ds01~0610&amp;lt;/gmd:URL&amp;gt;
+                              &amp;lt;/gmd:linkage&amp;gt;
+                              &amp;lt;gmd:description&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;Seadatanet CDI v5 portal website&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:description&amp;gt;
+                              &amp;lt;gmd:function&amp;gt;
+                                 &amp;lt;gmd:CI_OnLineFunctionCode codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_OnLineFunctionCode&amp;quot; codeListValue=&amp;quot;downloadRegistration&amp;quot; codeSpace=&amp;quot;SeaDataNet&amp;quot;&amp;gt;manual interaction with an on-line system by registered users following successful authentication and authorisation&amp;lt;/gmd:CI_OnLineFunctionCode&amp;gt;
+                              &amp;lt;/gmd:function&amp;gt;
+                           &amp;lt;/gmd:CI_OnlineResource&amp;gt;
+                        &amp;lt;/gmd:onLine&amp;gt;
+                     &amp;lt;/gmd:MD_DigitalTransferOptions&amp;gt;
+                  &amp;lt;/gmd:transferOptions&amp;gt;
+                      &amp;lt;gmd:transferOptions&amp;gt;
+                        &amp;lt;gmd:MD_DigitalTransferOptions&amp;gt;
+                            &amp;lt;gmd:onLine&amp;gt;
+                                &amp;lt;gmd:CI_OnlineResource&amp;gt;
+                                    &amp;lt;gmd:linkage&amp;gt;
+                                        &amp;lt;gmd:URL&amp;gt;https://geo-service.maris.nl/seadatanet/wms&amp;lt;/gmd:URL&amp;gt;
+                                    &amp;lt;/gmd:linkage&amp;gt;
+                                    &amp;lt;gmd:protocol&amp;gt;
+                                        &amp;lt;gco:CharacterString&amp;gt;urn:ogc:serviceType:WebMapService:1.1.1:HTTP&amp;lt;/gco:CharacterString&amp;gt;
+                                    &amp;lt;/gmd:protocol&amp;gt;
+                                    &amp;lt;gmd:description&amp;gt;
+                                        &amp;lt;gco:CharacterString&amp;gt;WMS example url&amp;lt;/gco:CharacterString&amp;gt;
+                                    &amp;lt;/gmd:description&amp;gt;
+                                    &amp;lt;gmd:function&amp;gt;
+                                        &amp;lt;gmd:CI_OnLineFunctionCode codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_OnLineFunctionCode&amp;quot; codeListValue=&amp;quot;URL&amp;quot; codeSpace=&amp;quot;SeaDataNet&amp;quot;&amp;gt;online resource locator for accessing data using a specific web protocol&amp;lt;/gmd:CI_OnLineFunctionCode&amp;gt;
+                                    &amp;lt;/gmd:function&amp;gt;
+                                &amp;lt;/gmd:CI_OnlineResource&amp;gt;
+                            &amp;lt;/gmd:onLine&amp;gt;
+                        &amp;lt;/gmd:MD_DigitalTransferOptions&amp;gt;
+                      &amp;lt;/gmd:transferOptions&amp;gt;
+               &amp;lt;/gmd:MD_Distribution&amp;gt;
+            &amp;lt;/gmd:distributionInfo&amp;gt;
+            &amp;lt;gmd:dataQualityInfo&amp;gt;
+               &amp;lt;gmd:DQ_DataQuality&amp;gt;
+                  &amp;lt;gmd:scope&amp;gt;
+                     &amp;lt;gmd:DQ_Scope&amp;gt;
+                        &amp;lt;gmd:level&amp;gt;
+                           &amp;lt;gmd:MD_ScopeCode codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#MD_ScopeCode&amp;quot; codeListValue=&amp;quot;dataset&amp;quot; codeSpace=&amp;quot;ISOTC211/19115&amp;quot;&amp;gt;dataset&amp;lt;/gmd:MD_ScopeCode&amp;gt;
+                        &amp;lt;/gmd:level&amp;gt;
+                     &amp;lt;/gmd:DQ_Scope&amp;gt;
+                  &amp;lt;/gmd:scope&amp;gt;
+                  &amp;lt;gmd:report&amp;gt;
+                     &amp;lt;gmd:DQ_DomainConsistency&amp;gt;
+                        &amp;lt;gmd:result&amp;gt;
+                           &amp;lt;gmd:DQ_ConformanceResult&amp;gt;
+                              &amp;lt;gmd:specification&amp;gt;
+                                 &amp;lt;gmd:CI_Citation&amp;gt;
+                                    &amp;lt;gmd:title&amp;gt;
+                                       &amp;lt;gco:CharacterString&amp;gt;COMMISSION REGULATION (EU) No 1089/2010 of 23 November 2010 implementing Directive 2007/2/EC of the European Parliament and of the Council as regards interoperability of spatial data sets and services&amp;lt;/gco:CharacterString&amp;gt;
+                                    &amp;lt;/gmd:title&amp;gt;
+                                    &amp;lt;gmd:date&amp;gt;
+                                       &amp;lt;gmd:CI_Date&amp;gt;
+                                          &amp;lt;gmd:date&amp;gt;
+                                             &amp;lt;gco:Date&amp;gt;2010-12-08&amp;lt;/gco:Date&amp;gt;
+                                          &amp;lt;/gmd:date&amp;gt;
+                                          &amp;lt;gmd:dateType&amp;gt;
+                                             &amp;lt;gmd:CI_DateTypeCode codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_DateTypeCode&amp;quot; codeListValue=&amp;quot;publication&amp;quot; codeSpace=&amp;quot;ISOTC211/19115&amp;quot;&amp;gt;publication&amp;lt;/gmd:CI_DateTypeCode&amp;gt;
+                                          &amp;lt;/gmd:dateType&amp;gt;
+                                       &amp;lt;/gmd:CI_Date&amp;gt;
+                                    &amp;lt;/gmd:date&amp;gt;
+                                 &amp;lt;/gmd:CI_Citation&amp;gt;
+                              &amp;lt;/gmd:specification&amp;gt;
+                              &amp;lt;gmd:explanation&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;See the referenced specification&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:explanation&amp;gt;
+                              &amp;lt;gmd:pass&amp;gt;
+                                 &amp;lt;gco:Boolean&amp;gt;true&amp;lt;/gco:Boolean&amp;gt;
+                              &amp;lt;/gmd:pass&amp;gt;
+                           &amp;lt;/gmd:DQ_ConformanceResult&amp;gt;
+                        &amp;lt;/gmd:result&amp;gt;
+                     &amp;lt;/gmd:DQ_DomainConsistency&amp;gt;
+                  &amp;lt;/gmd:report&amp;gt;
+                  &amp;lt;gmd:report&amp;gt;
+                     &amp;lt;gmd:DQ_DomainConsistency&amp;gt;
+                        &amp;lt;gmd:result&amp;gt;
+                           &amp;lt;gmd:DQ_ConformanceResult&amp;gt;
+                              &amp;lt;gmd:specification&amp;gt;
+                                 &amp;lt;gmd:CI_Citation&amp;gt;
+                                    &amp;lt;gmd:title&amp;gt;
+                                       &amp;lt;gco:CharacterString&amp;gt;COMMISSION REGULATION (EC) No 1205/2008 of 3 December 2008 implementing Directive 2007/2/EC of the European Parliament and of the Council as regards metadata&amp;lt;/gco:CharacterString&amp;gt;
+                                    &amp;lt;/gmd:title&amp;gt;
+                                    &amp;lt;gmd:date&amp;gt;
+                                       &amp;lt;gmd:CI_Date&amp;gt;
+                                          &amp;lt;gmd:date&amp;gt;
+                                             &amp;lt;gco:Date&amp;gt;2008-12-04&amp;lt;/gco:Date&amp;gt;
+                                          &amp;lt;/gmd:date&amp;gt;
+                                          &amp;lt;gmd:dateType&amp;gt;
+                                             &amp;lt;gmd:CI_DateTypeCode codeList=&amp;quot;https://vocab.nerc.ac.uk/isoCodelists/sdnCodelists/gmxCodeLists.xml#CI_DateTypeCode&amp;quot; codeListValue=&amp;quot;publication&amp;quot; codeSpace=&amp;quot;ISOTC211/19115&amp;quot;&amp;gt;publication&amp;lt;/gmd:CI_DateTypeCode&amp;gt;
+                                          &amp;lt;/gmd:dateType&amp;gt;
+                                       &amp;lt;/gmd:CI_Date&amp;gt;
+                                    &amp;lt;/gmd:date&amp;gt;
+                                 &amp;lt;/gmd:CI_Citation&amp;gt;
+                              &amp;lt;/gmd:specification&amp;gt;
+                              &amp;lt;gmd:explanation&amp;gt;
+                                 &amp;lt;gco:CharacterString&amp;gt;See the referenced specification&amp;lt;/gco:CharacterString&amp;gt;
+                              &amp;lt;/gmd:explanation&amp;gt;
+                              &amp;lt;gmd:pass&amp;gt;
+                                 &amp;lt;gco:Boolean&amp;gt;true&amp;lt;/gco:Boolean&amp;gt;
+                              &amp;lt;/gmd:pass&amp;gt;
+                           &amp;lt;/gmd:DQ_ConformanceResult&amp;gt;
+                        &amp;lt;/gmd:result&amp;gt;
+                     &amp;lt;/gmd:DQ_DomainConsistency&amp;gt;
+                  &amp;lt;/gmd:report&amp;gt;
+                  &amp;lt;gmd:lineage&amp;gt;
+                     &amp;lt;gmd:LI_Lineage&amp;gt;
+                        &amp;lt;gmd:statement&amp;gt;
+                           &amp;lt;gco:CharacterString&amp;gt;The data centres apply standard data quality control procedures on all data that the centres manage. Ask the data centre for details.&amp;lt;/gco:CharacterString&amp;gt;
+                        &amp;lt;/gmd:statement&amp;gt;
+                     &amp;lt;/gmd:LI_Lineage&amp;gt;
+                  &amp;lt;/gmd:lineage&amp;gt;
+               &amp;lt;/gmd:DQ_DataQuality&amp;gt;
+            &amp;lt;/gmd:dataQualityInfo&amp;gt;
+         &amp;lt;/gmd:MD_Metadata&amp;gt;
+&#13;
+]]&gt;</gs:metadata>
+    </gs:originalMetadata>
+    <gs:indexesMetadata>
+        <gs:resourceType>Dataset</gs:resourceType>
+        <gs:sourceId>seadatanet-open</gs:sourceId>
+        <gs:originalId>sdn-open:urn:SDN:CDI:LOCAL:96-2537-96-ds01-4</gs:originalId>
+        <gs:recoveryRemovalToken>f046386e-73d2-4435-b71c-12a1772fc282</gs:recoveryRemovalToken>
+        <gs:privateId>sdn-open%3Aurn%3ASDN%3ACDI%3ALOCAL%3A96-2537-96-ds01-4</gs:privateId>
+        <gs:resourceTimeStamp>2024-06-13T23:01:12.977Z</gs:resourceTimeStamp>
+        <gs:metadataQuality>4</gs:metadataQuality>
+        <gs:abstract>SeaDataNet is the Pan-European infrastructure for marine and ocean data management and delivery services. It is supported by the EU under its Research Infrastructures programme. It  connects 40 National Oceanographic Data Centres (NODC's) and 50 other data centres from 35 countries, bordering the European seas and Atlantic Ocean. The centres are mostly part of major marine management and research organisations that are acquiring and managing a large collection of marine and ocean data from various disciplines. This includes major international organisations, ICES and IOC-IODE. The overall objective is provide overview and access to marine and oceanographic data and data-products from government and research institutes in Europe. SeaDataNet contributes to the implementation of the EU INSPIRE and Marine Strategy Framework Directives. It also plays a key role in the development and operation of the EU EMODNet initiative. The SeaDataNet infrastructure is fully operational and INSPIRE compliant. It includes a versatile SeaDataNet portal (https://www.seadatanet.org) that provides users with a range of metadata, data and data product access services as well as standards, tools and guides for good marine data management. The Common Data Index (CDI) data discovery and access service provides harmonised access to the large volumes of datasets that are managed by the connected data centres. The CDI service contains already references and gives access to more than 1,5 milllion marine and oceanographic datasets as managed by 90 data centres. These numbers are increasing regularly because of further data population and more connected data centres as part of SeaDataNet II, EMODnet and other EU projects. For inclusion in the SeaDataNet INSPIRE compliant CSW service, the CDI records (at granule level) have been aggregated into CDI collections by a combination of Discipline, Data Centre, and geometric type. Each CSW XML record therefore represents a large collection of individual metadata records and associated datasets. By following the specified URL to the SeaDataNet portal users can evaluate these metadata in detail and request access by downloading of interesting datasets via the shopping cart transaction system that is integrated in the SeaDataNet portal.</gs:abstract>
+        <gs:alternateTitle>SDN:CDI:LOCAL:96-2537-96-ds01-4</gs:alternateTitle>
+        <gs:anyText>sdn-open:urn:SDN:CDI:LOCAL:96-2537-96-ds01-4 English utf8 dataset Common Data Index record German Oceanographic Datacentre +49 40 3190 3410 +49 40 3190 5000 Bernhard-Nocht-Strasse 78 Hamburg 20359 Germany dod@bsh.de https://www.bsh.de/DE/DATEN/Ozeanographisches_Datenzentrum/ozeanographisches_datenzentrum_node.html pointOfContact 2024-06-14 ISO 19115/SeaDataNet profile 1.0 point 3 point false SeaDataNet geographic co-ordinate reference frames SeaDataNet CRS L10 2011-03-03 revision 3 https://www.seadatanet.org/urnurl/SDN:L10 4326 SeaDataNet - Biological oceanography from German Oceanographic Datacentre (PointOfContact; Data Distributor), State Office for Agriculture, Environment and Rural Areas of Schleswig Holstein (Data Custodian), point observations SDN:CDI:LOCAL:96-2537-96-ds01-4 2024-06-14 revision urn:SDN:CDI:LOCAL:96-2537-96-ds01-4 State Office for Agriculture, Environment and Rural Areas of Schleswig Holstein +49-4347 704-0 +49-4347 704-102 Hamburger Chaussee 25 Flintbek 24220 Germany poststelle@llur.landsh.de originator State Agency for Nature and Environment of Schleswig Holstein +49 4347 704-0 +49 4347 704 102 Hamburger Chaussee 25 Flintbek 24220 Germany infonet@lanu.landsh.de http://www.umwelt.schleswig-holstein.de/servlet/is/1/ originator SeaDataNet is the Pan-European infrastructure for marine and ocean data management and delivery services. It is supported by the EU under its Research Infrastructures programme. It connects 40 National Oceanographic Data Centres (NODC's) and 50 other data centres from 35 countries, bordering the European seas and Atlantic Ocean. The centres are mostly part of major marine management and research organisations that are acquiring and managing a large collection of marine and ocean data from various disciplines. This includes major international organisations, ICES and IOC-IODE. The overall objective is provide overview and access to marine and oceanographic data and data-products from government and research institutes in Europe. SeaDataNet contributes to the implementation of the EU INSPIRE and Marine Strategy Framework Directives. It also plays a key role in the development and operation of the EU EMODNet initiative. The SeaDataNet infrastructure is fully operational and INSPIRE compliant. It includes a versatile SeaDataNet portal (https://www.seadatanet.org) that provides users with a range of metadata, data and data product access services as well as standards, tools and guides for good marine data management. The Common Data Index (CDI) data discovery and access service provides harmonised access to the large volumes of datasets that are managed by the connected data centres. The CDI service contains already references and gives access to more than 1,5 milllion marine and oceanographic datasets as managed by 90 data centres. These numbers are increasing regularly because of further data population and more connected data centres as part of SeaDataNet II, EMODnet and other EU projects. For inclusion in the SeaDataNet INSPIRE compliant CSW service, the CDI records (at granule level) have been aggregated into CDI collections by a combination of Discipline, Data Centre, and geometric type. Each CSW XML record therefore represents a large collection of individual metadata records and associated datasets. By following the specified URL to the SeaDataNet portal users can evaluate these metadata in detail and request access by downloading of interesting datasets via the shopping cart transaction system that is integrated in the SeaDataNet portal. State Office for Agriculture, Environment and Rural Areas of Schleswig Holstein +49-4347 704-0 +49-4347 704-102 Hamburger Chaussee 25 Flintbek 24220 Germany poststelle@llur.landsh.de custodian continual P35D Oceanographic geographical features theme GEMET - INSPIRE themes, version 1.0 2008-06-01 publication Alkalinity, acidity and pH of the water column Chlorophyll pigment concentrations in water bodies Salinity of the water column Temperature of the water column Nitrate concentration parameters in the water column Nitrite concentration parameters in the water column Phosphate concentration parameters in the water column Dissolved total or organic phosphorus concentration in the water column Ammonium and ammonia concentration parameters in water bodies Silicate concentration parameters in the water column Dissolved total and organic nitrogen concentrations in the water column Dissolved oxygen parameters in the water column Secchi disk depth Particulate total and organic nitrogen concentrations in the water column Dissolved metal concentrations in the water column Concentration of polychlorobiphenyls (PCBs) in the water column Pesticide concentrations in water bodies Concentration of other organic contaminants in the water column parameter SeaDataNet Parameter Discovery Vocabulary SeaDataNet PDV P02 2023-12-12 revision 127 https://www.seadatanet.org/urnurl/SDN:P02 discrete water samplers transmissometers CTD instrument SeaDataNet device categories SDN devices L05 2024-02-02 revision 91 https://www.seadatanet.org/urnurl/SDN:L05 unknown platform_class SeaVoX Platform Categories SeaVoX Platform Categories L06 2021-03-25 revision 17 https://www.seadatanet.org/urnurl/SDN:L06 Not applicable otherRestrictions Creative Commons Attribution 4.0 International Various Various 2024-06-14 revision largerWorkCitation campaign Various Various 2024-06-14 revision source operation textTable English utf8 oceans 8.1169996262 11.5500001907 53.8950004578 55.0850028992 2009-01-13 2011-12-12 vertical-crs-id-01 not known vertical-cs-id-01 coordsys-axis0id Z up https://www.seadatanet.org/urnurl/SDN:L11::D08 sea level not known Alkalinity, acidity and pH of the water column physicalMeasurement Silicate concentration parameters in the water column physicalMeasurement Concentration of polychlorobiphenyls (PCBs) in the water column physicalMeasurement Dissolved total and organic nitrogen concentrations in the water column physicalMeasurement Dissolved oxygen parameters in the water column physicalMeasurement Dissolved metal concentrations in the water column physicalMeasurement Temperature of the water column physicalMeasurement Concentration of other organic contaminants in the water column physicalMeasurement Salinity of the water column physicalMeasurement Phosphate concentration parameters in the water column physicalMeasurement Nitrate concentration parameters in the water column physicalMeasurement Dissolved total or organic phosphorus concentration in the water column physicalMeasurement Secchi disk depth physicalMeasurement Nitrite concentration parameters in the water column physicalMeasurement Ammonium and ammonia concentration parameters in water bodies physicalMeasurement Pesticide concentrations in water bodies physicalMeasurement Particulate total and organic nitrogen concentrations in the water column physicalMeasurement Chlorophyll pigment concentrations in water bodies physicalMeasurement Climate and Forecast Point Data NetCDF unknown Ocean Data View ASCII input unknown German Oceanographic Datacentre +49 40 3190 3410 +49 40 3190 5000 Bernhard-Nocht-Strasse 78 Hamburg 20359 Germany dod@bsh.de https://www.bsh.de/DE/DATEN/Ozeanographisches_Datenzentrum/ozeanographisches_datenzentrum_node.html distributor https://cdi.seadatanet.org/search?step=00896~0372537~04896~0114~020ds01~0610 Seadatanet CDI v5 portal website manual interaction with an on-line system by registered users following successful authentication and authorisation https://geo-service.maris.nl/seadatanet/wms urn:ogc:serviceType:WebMapService:1.1.1:HTTP WMS example url online resource locator for accessing data using a specific web protocol dataset COMMISSION REGULATION (EU) No 1089/2010 of 23 November 2010 implementing Directive 2007/2/EC of the European Parliament and of the Council as regards interoperability of spatial data sets and services 2010-12-08 publication See the referenced specification true COMMISSION REGULATION (EC) No 1205/2008 of 3 December 2008 implementing Directive 2007/2/EC of the European Parliament and of the Council as regards metadata 2008-12-04 publication See the referenced specification true The data centres apply standard data quality control procedures on all data that the centres manage. Ask the data centre for details. CTD http://vocab.nerc.ac.uk/collection/L05/current/130/ CTD transmissometers http://vocab.nerc.ac.uk/collection/L05/current/124/ transmissometers discrete water samplers http://vocab.nerc.ac.uk/collection/L05/current/30/ discrete water samplers unknown http://vocab.nerc.ac.uk/collection/L06/current/0/ unknown</gs:anyText>
+        <gs:attributeDesc>Alkalinity, acidity and pH of the water column</gs:attributeDesc>
+        <gs:attributeDesc>Silicate concentration parameters in the water column</gs:attributeDesc>
+        <gs:attributeDesc>Concentration of polychlorobiphenyls (PCBs) in the water column</gs:attributeDesc>
+        <gs:attributeDesc>Dissolved total and organic nitrogen concentrations in the water column</gs:attributeDesc>
+        <gs:attributeDesc>Dissolved oxygen parameters in the water column</gs:attributeDesc>
+        <gs:attributeDesc>Dissolved metal concentrations in the water column</gs:attributeDesc>
+        <gs:attributeDesc>Temperature of the water column</gs:attributeDesc>
+        <gs:attributeDesc>Concentration of other organic contaminants in the water column</gs:attributeDesc>
+        <gs:attributeDesc>Salinity of the water column</gs:attributeDesc>
+        <gs:attributeDesc>Phosphate concentration parameters in the water column</gs:attributeDesc>
+        <gs:attributeDesc>Nitrate concentration parameters in the water column</gs:attributeDesc>
+        <gs:attributeDesc>Dissolved total or organic phosphorus concentration in the water column</gs:attributeDesc>
+        <gs:attributeDesc>Secchi disk depth</gs:attributeDesc>
+        <gs:attributeDesc>Nitrite concentration parameters in the water column</gs:attributeDesc>
+        <gs:attributeDesc>Ammonium and ammonia concentration parameters in water bodies</gs:attributeDesc>
+        <gs:attributeDesc>Pesticide concentrations in water bodies</gs:attributeDesc>
+        <gs:attributeDesc>Particulate total and organic nitrogen concentrations in the water column</gs:attributeDesc>
+        <gs:attributeDesc>Chlorophyll pigment concentrations in water bodies</gs:attributeDesc>
+        <gs:attributeId>http://vocab.nerc.ac.uk/collection/P02/current/ALKY/</gs:attributeId>
+        <gs:attributeId>http://vocab.nerc.ac.uk/collection/P02/current/SLCA/</gs:attributeId>
+        <gs:attributeId>http://vocab.nerc.ac.uk/collection/P02/current/PPWC/</gs:attributeId>
+        <gs:attributeId>http://vocab.nerc.ac.uk/collection/P02/current/TDNT/</gs:attributeId>
+        <gs:attributeId>http://vocab.nerc.ac.uk/collection/P02/current/DOXY/</gs:attributeId>
+        <gs:attributeId>http://vocab.nerc.ac.uk/collection/P02/current/MTWD/</gs:attributeId>
+        <gs:attributeId>http://vocab.nerc.ac.uk/collection/P02/current/TEMP/</gs:attributeId>
+        <gs:attributeId>http://vocab.nerc.ac.uk/collection/P02/current/WCOC/</gs:attributeId>
+        <gs:attributeId>http://vocab.nerc.ac.uk/collection/P02/current/PSAL/</gs:attributeId>
+        <gs:attributeId>http://vocab.nerc.ac.uk/collection/P02/current/PHOS/</gs:attributeId>
+        <gs:attributeId>http://vocab.nerc.ac.uk/collection/P02/current/NTRA/</gs:attributeId>
+        <gs:attributeId>http://vocab.nerc.ac.uk/collection/P02/current/TDPX/</gs:attributeId>
+        <gs:attributeId>http://vocab.nerc.ac.uk/collection/P02/current/SECC/</gs:attributeId>
+        <gs:attributeId>http://vocab.nerc.ac.uk/collection/P02/current/NTRI/</gs:attributeId>
+        <gs:attributeId>http://vocab.nerc.ac.uk/collection/P02/current/AMON/</gs:attributeId>
+        <gs:attributeId>http://vocab.nerc.ac.uk/collection/P02/current/PEWB/</gs:attributeId>
+        <gs:attributeId>http://vocab.nerc.ac.uk/collection/P02/current/NTOT/</gs:attributeId>
+        <gs:attributeId>http://vocab.nerc.ac.uk/collection/P02/current/CPWC/</gs:attributeId>
+        <gs:attributeTitle>Alkalinity, acidity and pH of the water column</gs:attributeTitle>
+        <gs:attributeTitle>Silicate concentration parameters in the water column</gs:attributeTitle>
+        <gs:attributeTitle>Concentration of polychlorobiphenyls (PCBs) in the water column</gs:attributeTitle>
+        <gs:attributeTitle>Dissolved total and organic nitrogen concentrations in the water column</gs:attributeTitle>
+        <gs:attributeTitle>Dissolved oxygen parameters in the water column</gs:attributeTitle>
+        <gs:attributeTitle>Dissolved metal concentrations in the water column</gs:attributeTitle>
+        <gs:attributeTitle>Temperature of the water column</gs:attributeTitle>
+        <gs:attributeTitle>Concentration of other organic contaminants in the water column</gs:attributeTitle>
+        <gs:attributeTitle>Salinity of the water column</gs:attributeTitle>
+        <gs:attributeTitle>Phosphate concentration parameters in the water column</gs:attributeTitle>
+        <gs:attributeTitle>Nitrate concentration parameters in the water column</gs:attributeTitle>
+        <gs:attributeTitle>Dissolved total or organic phosphorus concentration in the water column</gs:attributeTitle>
+        <gs:attributeTitle>Secchi disk depth</gs:attributeTitle>
+        <gs:attributeTitle>Nitrite concentration parameters in the water column</gs:attributeTitle>
+        <gs:attributeTitle>Ammonium and ammonia concentration parameters in water bodies</gs:attributeTitle>
+        <gs:attributeTitle>Pesticide concentrations in water bodies</gs:attributeTitle>
+        <gs:attributeTitle>Particulate total and organic nitrogen concentrations in the water column</gs:attributeTitle>
+        <gs:attributeTitle>Chlorophyll pigment concentrations in water bodies</gs:attributeTitle>
+        <gs:crsId>4326</gs:crsId>
+        <gs:dataSize>1</gs:dataSize>
+        <gs:dateStamp>2024-06-14</gs:dateStamp>
+        <gs:fileId>sdn-open:urn:SDN:CDI:LOCAL:96-2537-96-ds01-4</gs:fileId>
+        <gs:format>Climate and Forecast Point Data NetCDF</gs:format>
+        <gs:format>Ocean Data View ASCII input</gs:format>
+        <gs:hLevelCodeValue>dataset</gs:hLevelCodeValue>
+        <gs:hasAccessLegalConst>true</gs:hasAccessLegalConst>
+        <gs:hasOtherLegalConst>true</gs:hasOtherLegalConst>
+        <gs:hasSecurityConst>false</gs:hasSecurityConst>
+        <gs:hasUseLegalConst>false</gs:hasUseLegalConst>
+        <gs:instrumentDesc>CTD</gs:instrumentDesc>
+        <gs:instrumentDesc>transmissometers</gs:instrumentDesc>
+        <gs:instrumentDesc>discrete water samplers</gs:instrumentDesc>
+        <gs:instrumentId>http://vocab.nerc.ac.uk/collection/L05/current/130/</gs:instrumentId>
+        <gs:instrumentId>http://vocab.nerc.ac.uk/collection/L05/current/124/</gs:instrumentId>
+        <gs:instrumentId>http://vocab.nerc.ac.uk/collection/L05/current/30/</gs:instrumentId>
+        <gs:instrumentTitle>CTD</gs:instrumentTitle>
+        <gs:instrumentTitle>transmissometers</gs:instrumentTitle>
+        <gs:instrumentTitle>discrete water samplers</gs:instrumentTitle>
+        <gs:instrumentURI>http://vocab.nerc.ac.uk/collection/L05/current/30/</gs:instrumentURI>
+        <gs:instrumentURI>http://vocab.nerc.ac.uk/collection/L05/current/124/</gs:instrumentURI>
+        <gs:instrumentURI>http://vocab.nerc.ac.uk/collection/L05/current/130/</gs:instrumentURI>
+        <gs:keyword>Oceanographic geographical features</gs:keyword>
+        <gs:keyword>Alkalinity, acidity and pH of the water column</gs:keyword>
+        <gs:keyword>Chlorophyll pigment concentrations in water bodies</gs:keyword>
+        <gs:keyword>Salinity of the water column</gs:keyword>
+        <gs:keyword>Temperature of the water column</gs:keyword>
+        <gs:keyword>Nitrate concentration parameters in the water column</gs:keyword>
+        <gs:keyword>Nitrite concentration parameters in the water column</gs:keyword>
+        <gs:keyword>Phosphate concentration parameters in the water column</gs:keyword>
+        <gs:keyword>Dissolved total or organic phosphorus concentration in the water column</gs:keyword>
+        <gs:keyword>Ammonium and ammonia concentration parameters in water bodies</gs:keyword>
+        <gs:keyword>Silicate concentration parameters in the water column</gs:keyword>
+        <gs:keyword>Dissolved total and organic nitrogen concentrations in the water column</gs:keyword>
+        <gs:keyword>Dissolved oxygen parameters in the water column</gs:keyword>
+        <gs:keyword>Secchi disk depth</gs:keyword>
+        <gs:keyword>Particulate total and organic nitrogen concentrations in the water column</gs:keyword>
+        <gs:keyword>Dissolved metal concentrations in the water column</gs:keyword>
+        <gs:keyword>Concentration of polychlorobiphenyls (PCBs) in the water column</gs:keyword>
+        <gs:keyword>Pesticide concentrations in water bodies</gs:keyword>
+        <gs:keyword>Concentration of other organic contaminants in the water column</gs:keyword>
+        <gs:keyword>discrete water samplers</gs:keyword>
+        <gs:keyword>transmissometers</gs:keyword>
+        <gs:keyword>CTD</gs:keyword>
+        <gs:keyword>unknown</gs:keyword>
+        <gs:keywordBlueCloud>Oceanographic geographical features</gs:keywordBlueCloud>
+        <gs:keywordType>theme</gs:keywordType>
+        <gs:keywordType>parameter</gs:keywordType>
+        <gs:keywordType>instrument</gs:keywordType>
+        <gs:keywordType>platform_class</gs:keywordType>
+        <gs:keywordURI>http://inspire.ec.europa.eu/theme/of</gs:keywordURI>
+        <gs:keywordURI>http://vocab.nerc.ac.uk/collection/P02/current/ALKY/</gs:keywordURI>
+        <gs:keywordURI>http://vocab.nerc.ac.uk/collection/P02/current/CPWC/</gs:keywordURI>
+        <gs:keywordURI>http://vocab.nerc.ac.uk/collection/P02/current/PSAL/</gs:keywordURI>
+        <gs:keywordURI>http://vocab.nerc.ac.uk/collection/P02/current/TEMP/</gs:keywordURI>
+        <gs:keywordURI>http://vocab.nerc.ac.uk/collection/P02/current/NTRA/</gs:keywordURI>
+        <gs:keywordURI>http://vocab.nerc.ac.uk/collection/P02/current/NTRI/</gs:keywordURI>
+        <gs:keywordURI>http://vocab.nerc.ac.uk/collection/P02/current/PHOS/</gs:keywordURI>
+        <gs:keywordURI>http://vocab.nerc.ac.uk/collection/P02/current/TDPX/</gs:keywordURI>
+        <gs:keywordURI>http://vocab.nerc.ac.uk/collection/P02/current/AMON/</gs:keywordURI>
+        <gs:keywordURI>http://vocab.nerc.ac.uk/collection/P02/current/SLCA/</gs:keywordURI>
+        <gs:keywordURI>http://vocab.nerc.ac.uk/collection/P02/current/TDNT/</gs:keywordURI>
+        <gs:keywordURI>http://vocab.nerc.ac.uk/collection/P02/current/DOXY/</gs:keywordURI>
+        <gs:keywordURI>http://vocab.nerc.ac.uk/collection/P02/current/SECC/</gs:keywordURI>
+        <gs:keywordURI>http://vocab.nerc.ac.uk/collection/P02/current/NTOT/</gs:keywordURI>
+        <gs:keywordURI>http://vocab.nerc.ac.uk/collection/P02/current/MTWD/</gs:keywordURI>
+        <gs:keywordURI>http://vocab.nerc.ac.uk/collection/P02/current/PPWC/</gs:keywordURI>
+        <gs:keywordURI>http://vocab.nerc.ac.uk/collection/P02/current/PEWB/</gs:keywordURI>
+        <gs:keywordURI>http://vocab.nerc.ac.uk/collection/P02/current/WCOC/</gs:keywordURI>
+        <gs:keywordURI>http://vocab.nerc.ac.uk/collection/L05/current/30/</gs:keywordURI>
+        <gs:keywordURI>http://vocab.nerc.ac.uk/collection/L05/current/124/</gs:keywordURI>
+        <gs:keywordURI>http://vocab.nerc.ac.uk/collection/L05/current/130/</gs:keywordURI>
+        <gs:keywordURI>http://vocab.nerc.ac.uk/collection/L06/current/0/</gs:keywordURI>
+        <gs:keywordURIBlueCloud>http://inspire.ec.europa.eu/theme/of</gs:keywordURIBlueCloud>
+        <gs:language>English</gs:language>
+        <gs:observedPropertyURI>http://vocab.nerc.ac.uk/collection/P02/current/ALKY/</gs:observedPropertyURI>
+        <gs:onlineLinkage>https://cdi.seadatanet.org/search?step=00896~0372537~04896~0114~020ds01~0610</gs:onlineLinkage>
+        <gs:onlineLinkage>https://geo-service.maris.nl/seadatanet/wms</gs:onlineLinkage>
+        <gs:organisationName>State Office for Agriculture, Environment and Rural Areas of Schleswig Holstein </gs:organisationName>
+        <gs:organisationName>State Office for Agriculture, Environment and Rural Areas of Schleswig Holstein </gs:organisationName>
+        <gs:organisationName>State Agency for Nature and Environment of Schleswig Holstein </gs:organisationName>
+        <gs:organisationRole>custodian</gs:organisationRole>
+        <gs:organisationRole>originator</gs:organisationRole>
+        <gs:organisationRole>originator</gs:organisationRole>
+        <gs:organisationURI>https://edmo.seadatanet.org/report/2537</gs:organisationURI>
+        <gs:organisationURI>https://edmo.seadatanet.org/report/2537</gs:organisationURI>
+        <gs:organisationURI>https://edmo.seadatanet.org/report/1181</gs:organisationURI>
+        <gs:origOrgDesc>State Agency for Nature and Environment of Schleswig Holstein </gs:origOrgDesc>
+        <gs:origOrgDesc>State Office for Agriculture, Environment and Rural Areas of Schleswig Holstein </gs:origOrgDesc>
+        <gs:origOrgDesc>German Oceanographic Datacentre</gs:origOrgDesc>
+        <gs:origOrgId>https://edmo.seadatanet.org/report/1181</gs:origOrgId>
+        <gs:origOrgId>https://edmo.seadatanet.org/report/96</gs:origOrgId>
+        <gs:origOrgId>https://edmo.seadatanet.org/report/2537</gs:origOrgId>
+        <gs:platformDesc>unknown</gs:platformDesc>
+        <gs:platformId>http://vocab.nerc.ac.uk/collection/L06/current/0/</gs:platformId>
+        <gs:platformTitle>unknown</gs:platformTitle>
+        <gs:platformURI>http://vocab.nerc.ac.uk/collection/L06/current/0/</gs:platformURI>
+        <gs:protocol>urn:ogc:serviceType:WebMapService:1.1.1:HTTP</gs:protocol>
+        <gs:resLanguage>English</gs:resLanguage>
+        <gs:resourceId>urn:SDN:CDI:LOCAL:96-2537-96-ds01-4</gs:resourceId>
+        <gs:revisionDate>2024-06-14</gs:revisionDate>
+        <gs:title>SeaDataNet - Biological oceanography from German Oceanographic Datacentre (PointOfContact; Data Distributor), State Office for Agriculture, Environment and Rural Areas of Schleswig Holstein  (Data Custodian), point observations</gs:title>
+        <gs:tmpExtentBegin>2009-01-13</gs:tmpExtentBegin>
+        <gs:tmpExtentEnd>2011-12-12</gs:tmpExtentEnd>
+        <gs:topicCategory>oceans</gs:topicCategory>
+        <gs:uniqueAttributeId>DC115DCD54CE8565244864042BFD0752F3500738</gs:uniqueAttributeId>
+        <gs:uniqueInstrumentId>A3F899CC5A4602810CAB0CA7033E790E86D33ECA</gs:uniqueInstrumentId>
+        <gs:uniquePlatformId>D0DB670EE9376BA9E9BC126A935116664D516BED</gs:uniquePlatformId>
+        <gs:bbox>
+            <gs:sw>53.8950004578 8.1169996262</gs:sw>
+            <gs:se>53.8950004578 11.5500001907</gs:se>
+            <gs:nw>55.0850028992 8.1169996262</gs:nw>
+            <gs:ne>55.0850028992 11.5500001907</gs:ne>
+            <gs:isCrossed>false</gs:isCrossed>
+            <gs:area>4.085</gs:area>
+            <gs:center>54.4900016785 9.833499908450001</gs:center>
+            <gs:disjValues>
+                <gs:disjSouth>53.8950004578</gs:disjSouth>
+                <gs:disjWest>8.1169996262</gs:disjWest>
+                <gs:disjNorth>55.0850028992</gs:disjNorth>
+                <gs:disjEast>11.5500001907</gs:disjEast>
+            </gs:disjValues>
+            <gs:cardinalValues>
+                <gs:values>
+                    <gs:south>53.8950004578</gs:south>
+                    <gs:west>8.1169996262</gs:west>
+                    <gs:east>11.5500001907</gs:east>
+                    <gs:north>55.0850028992</gs:north>
+                </gs:values>
+            </gs:cardinalValues>
+        </gs:bbox>
+    </gs:indexesMetadata>
+</gs:Dataset>

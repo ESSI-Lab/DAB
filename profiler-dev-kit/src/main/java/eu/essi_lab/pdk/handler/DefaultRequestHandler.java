@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.handler;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -43,6 +43,16 @@ import eu.essi_lab.pdk.validation.WebRequestValidator;
  */
 public abstract class DefaultRequestHandler implements WebRequestHandler, WebRequestValidator {
 
+    protected ResponseBuilder builder;
+
+    /**
+     * 
+     */
+    public DefaultRequestHandler() {
+
+	builder = Response.status(Status.OK);
+    }
+
     /**
      * Publishes the response returned by the {@link #getStringResponse(WebRequest)} method according to
      * the media type provided by the {@link #getMediaType()} method
@@ -52,14 +62,15 @@ public abstract class DefaultRequestHandler implements WebRequestHandler, WebReq
     @Override
     public Response handle(WebRequest webRequest) throws GSException {
 
-	ResponseBuilder builder = Response.status(Status.OK);
 	builder = builder.entity(getEntity(webRequest));
 	builder = builder.type(getMediaType(webRequest));
 
 	List<SimpleEntry<String, String>> customHeaders = getResponseHeaders(webRequest);
+	
 	for (SimpleEntry<String, String> customHeader : customHeaders) {
 	    builder.header(customHeader.getKey(), customHeader.getValue());
 	}
+	
 	return builder.build();
     }
 
@@ -80,18 +91,6 @@ public abstract class DefaultRequestHandler implements WebRequestHandler, WebReq
      * @throws GSException if errors occurred during the response creation
      */
     public abstract String getStringResponse(WebRequest webRequest) throws GSException;
-
-    /**
-     * Returns the response
-     * 
-     * @param webRequest the {@link WebRequest} handled by the {@link #handle(WebRequest)} method
-     * @return a non <code>null</code> string
-     * @throws GSException if errors occurred during the response creation
-     */
-    @Deprecated
-    public String getResponse(WebRequest webRequest) throws GSException {
-	return getStringResponse(webRequest);
-    }
 
     /**
      * Returns the {@link MediaType} of the response

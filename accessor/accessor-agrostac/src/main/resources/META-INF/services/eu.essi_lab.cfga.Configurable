@@ -1,0 +1,4 @@
+eu.essi_lab.accessor.agrostac.harvested.AgrostacConnector
+eu.essi_lab.accessor.agrostac.harvested.AgrostacAccessor
+eu.essi_lab.accessor.agrostac.distributed.AgrostacGranulesAccessor
+eu.essi_lab.accessor.agrostac.distributed.AgrostacGranulesConnector

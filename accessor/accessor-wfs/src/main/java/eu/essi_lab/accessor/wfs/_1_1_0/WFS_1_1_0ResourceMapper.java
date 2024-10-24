@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wfs._1_1_0;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -44,8 +44,9 @@ import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
+import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.protocols.NetProtocols;
-import eu.essi_lab.lib.net.utils.Downloader;
+import eu.essi_lab.lib.net.utils.HttpConnectionUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.ErrorInfo;
@@ -84,7 +85,6 @@ public class WFS_1_1_0ResourceMapper extends OriginalIdentifierMapper {
     }
 
     @XmlTransient
-    
     Downloader downloader = new Downloader();
 
     @Override
@@ -358,20 +358,20 @@ public class WFS_1_1_0ResourceMapper extends OriginalIdentifierMapper {
 	}
 
 	if (!useSourceEndpoint) {
-	    if (downloader != null) {
-		Optional<Integer> integer = downloader.getResponseCode(href);
-		if (integer.isPresent()) {
-		    String status = "" + integer;
-		    // in case of client error, such as 404 not found
-		    // we try to recover using the source endpoint
-		    if (status.startsWith("4")) {
-			useSourceEndpoint = true;
-		    }
-		} else {
-		    // or even if no response provided
+
+	    Optional<Integer> integer = HttpConnectionUtils.getOptionalResponseCode(href);
+	    if (integer.isPresent()) {
+		String status = "" + integer;
+		// in case of client error, such as 404 not found
+		// we try to recover using the source endpoint
+		if (status.startsWith("4")) {
 		    useSourceEndpoint = true;
 		}
+	    } else {
+		// or even if no response provided
+		useSourceEndpoint = true;
 	    }
+
 	}
 	if (useSourceEndpoint) {
 	    href = sourceEndpoint;

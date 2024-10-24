@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gs;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -180,6 +180,10 @@ public class QuartzDB_Manager {
      */
     public ArrayList<SchedulerWorkerSetting> getScheduledWorkerSettings() throws Exception {
 
+	System.out.println(setting.getSQLDatabaseUri() + "/" + setting.getSQLDatabaseName());
+	System.out.println(setting.getSQLDatabaseUser());
+	System.out.println(setting.getSQLDatabasePassword());
+	
 	Connection conn = DriverManager.getConnection(//
 		setting.getSQLDatabaseUri() + "/" + setting.getSQLDatabaseName(), //
 		setting.getSQLDatabaseUser(), //
@@ -328,8 +332,7 @@ public class QuartzDB_Manager {
 
 	QuartzDB_Manager quartzDB_Manager = new QuartzDB_Manager(setting);
 
-	Configuration configuration = new DefaultProdConfiguration();
-	// Configuration configuration_ = new DefaultPreProdConfiguration();
+	Configuration configuration = new DefaultConfiguration();
 
 	// if (!quartzManager.isInitialized()) {
 

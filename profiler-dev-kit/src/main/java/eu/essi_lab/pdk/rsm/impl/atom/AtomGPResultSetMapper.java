@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.rsm.impl.atom;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -45,6 +45,7 @@ import com.rometools.rome.io.FeedException;
 import eu.essi_lab.access.compliance.DataComplianceReport;
 import eu.essi_lab.access.compliance.DataComplianceTester.DataComplianceTest;
 import eu.essi_lab.access.compliance.wrapper.ReportsMetadataHandler;
+import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
 import eu.essi_lab.iso.datamodel.classes.DataIdentification;
 import eu.essi_lab.iso.datamodel.classes.Distribution;
 import eu.essi_lab.iso.datamodel.classes.Format;
@@ -75,6 +76,8 @@ import eu.essi_lab.model.resource.ExtensionHandler;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.SatelliteScene;
 import eu.essi_lab.model.resource.data.DataType;
+import eu.essi_lab.model.resource.worldcereal.WorldCerealItem;
+import eu.essi_lab.model.resource.worldcereal.WorldCerealMap;
 import eu.essi_lab.pdk.rsm.DiscoveryResultSetMapper;
 import eu.essi_lab.pdk.rsm.MappingSchema;
 
@@ -136,10 +139,12 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
 	//
 	// source
 	//
+	String sourceId = null;
 	if (source != null) {
+	    sourceId = source.getUniqueIdentifier();
 	    gpEntry.addSourceInfo(source.getUniqueIdentifier(), source.getLabel());
 	}
-	
+
 	//
 	// identifier
 	//
@@ -188,6 +193,7 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    if (gdc) {
 		gpEntry.setRights("geossdatacore");
 	    }
+
 	} catch (Exception ex) {
 	}
 
@@ -198,7 +204,7 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    String fileName = coreMetadata.getMIMetadata().getDataIdentification().getGraphicOverview().getFileName();
 	    if (fileName != null && !fileName.equals("")) {
 
-		gpEntry.setLogo(encodeEntities(fileName));
+		gpEntry.setLogo(fileName);
 	    }
 	} catch (NullPointerException ex) {
 	}
@@ -251,10 +257,9 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
 	} catch (NullPointerException ex) {
 	}
 
-	getDataIdsStream(coreMetadata)
-		.flatMap(//
-			di -> StreamUtils.iteratorToStream(//
-				di.getKeywordsValues()))
+	getDataIdsStream(coreMetadata).flatMap(//
+		di -> StreamUtils.iteratorToStream(//
+			di.getKeywordsValues()))
 		.map(kwd -> encodeEntities(kwd)).//
 		forEach(kwd -> gpEntry.addCategory(kwd, "keywords"));
 
@@ -320,16 +325,138 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
 
 	gpEntry.setHarvested(strategy == BrokeringStrategy.HARVESTED ? true : false);
 
+	ExtensionHandler handler = resource.getExtensionHandler();
+	
+	
+	
+	/**
+	 * IN SITU
+	 */
+	
+	
+	boolean isInSitu = handler.isInSitu();// resource.getPropertyHandler().isInSitu();
+	if(isInSitu) {
+	    gpEntry.addSimpleElement("inSitu", "true");
+	}
+	
+
+	/**
+	 * GEO MOUNTAINS
+	 */
+	if (sourceId != null && sourceId.equals("geomountains")) {
+	    // Parent network and / or other comment(s)
+	    List<String> parentNetworks = handler.getOriginatorOrganisationDescriptions();
+	    if (parentNetworks != null && !parentNetworks.isEmpty()) {
+		gpEntry.setGEOMountainsNetwork(parentNetworks.get(0));
+	    }
+	    // Operating Organisation
+	    List<String> opOrg = handler.getOriginatorOrganisationIdentifiers();
+	    if (opOrg != null && !opOrg.isEmpty()) {
+		gpEntry.setGEOMountainsOrg(opOrg.get(0));
+	    }
+	    String resourceIdentifier = coreMetadata.getDataIdentification().getResourceIdentifier();
+	    if (resourceIdentifier != null && !resourceIdentifier.isEmpty()) {
+		gpEntry.setGEOMountainsId(resourceIdentifier);
+	    }
+
+	    Optional<String> category = handler.getThemeCategory();
+	    if (category.isPresent()) {
+		gpEntry.setGEOMountainsCategory(category.get());
+	    }
+
+	    Iterator<CoverageDescription> coverageDescr = coreMetadata.getMIMetadata().getCoverageDescriptions();
+	    List<String> list = new ArrayList<String>();
+	    while (coverageDescr.hasNext()) {
+		String s = coverageDescr.next().getAttributeTitle();
+		list.add(s);
+	    }
+	    if (!list.isEmpty()) {
+		gpEntry.setGEOMountainsParameters(list);
+	    }
+
+	}
+
+	//
+	// country
+	//
+	Optional<String> country = handler.getCountry();
+	if (country.isPresent()) {
+	    gpEntry.setCountry(country.get());
+	}
+
 	//
 	// magnitude level
 	//
-	ExtensionHandler handler = resource.getExtensionHandler();
 	Optional<String> magnitudeLevel = handler.getMagnitudeLevel();
 	if (magnitudeLevel.isPresent()) {
 
 	    gpEntry.setMagnitude(magnitudeLevel.get());
 	}
 
+	//
+	// license
+	//
+	Iterator<LegalConstraints> lcIterator = coreMetadata.getMIMetadata().getDataIdentification().getLegalConstraints();
+	while (lcIterator.hasNext()) {
+	    LegalConstraints lc = lcIterator.next();//
+	    if (lc != null) {
+		// license type
+		String typeOfLicense = lc.getUseLimitation();
+		// license reference
+		String referenceURL = lc.getAccessConstraintCode();
+		gpEntry.addLicense(typeOfLicense, referenceURL);
+
+		// citation
+		String citation = lc.getOtherConstraint();
+		// add citation response
+		gpEntry.addCitation(citation);
+		break;
+	    }
+
+	}
+
+	//
+	// world cereal
+	//
+	String worldCerealQueryables = "";
+	Optional<WorldCerealMap> worldCereal = handler.getWorldCereal();
+	if (worldCereal.isPresent()) {
+	    WorldCerealMap map = worldCereal.get();
+	    List<WorldCerealItem> cropTypesList = map.getCropTypes();
+	    List<WorldCerealItem> lcList = map.getLandCoverTypes();
+	    List<WorldCerealItem> irrList = map.getIrrigationTypes();
+	    List<WorldCerealItem> quantityTypesList = map.getQuantityTypes();
+	    worldCerealQueryables = map.getWorldCerealQueryables();
+	    if (worldCerealQueryables != null && !worldCerealQueryables.isEmpty()) {
+		gpEntry.setWorldCerealQueryables(worldCerealQueryables);
+	    }
+
+	    Double cropConfidence = map.getCropTypeConfidence();
+	    Double irrConfidence = map.getIrrigationTypeConfidence();
+	    Double lcConfidence = map.getLcTypeConfidence();
+
+	    if (cropConfidence != null && !cropConfidence.isNaN()) {
+		gpEntry.setWorldCerealConfidence("cropConfidence", String.valueOf(cropConfidence));
+	    }
+
+	    if (irrConfidence != null && !irrConfidence.isNaN()) {
+		gpEntry.setWorldCerealConfidence("irrigationConfidence", String.valueOf(irrConfidence));
+	    }
+
+	    if (lcConfidence != null && !lcConfidence.isNaN()) {
+		gpEntry.setWorldCerealConfidence("landCoverConfidence", String.valueOf(lcConfidence));
+	    }
+
+	    gpEntry.addWorldCerealType(irrList, "irrigationTypes");
+	    gpEntry.addWorldCerealType(lcList, "landCoverTypes");
+	    gpEntry.addWorldCerealType(cropTypesList, "cropTypes");
+	    gpEntry.addWorldCerealType(quantityTypesList, "quantityTypes");
+
+	}
+
+	Optional<String> optionalCropType = resource.getExtensionHandler().getCropTypes();
+	// Optional<List<String>> optionalLandCoverType = resource.getExtensionHandler().getLandCoverTypes();
+	// Optional<List<String>> optionalIrrigationType = resource.getExtensionHandler().getIrrigationTypes();
 	//
 	// satellite
 	//
@@ -569,10 +696,18 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
 
 				break;
 			    }
-
-			    String wmsURL = url + "/wms?";
+			    String wmsURL;
+			    if (viewId.isPresent()) {
+				wmsURL = url + "/view/" + viewId.get() + "/wms?";
+			    } else {
+				wmsURL = url + "/wms?";
+			    }
 
 			    String name = mapNames.get(onlineId);
+
+			    if (name.startsWith("VEGETATION_INDEX@") || name.startsWith("NDWI@")) {
+				break;
+			    }
 
 			    Online onLineAdvance = addWMSInfo(onlineId, wmsURL);
 
@@ -771,7 +906,14 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
 		    }
 		}
 
-		String distString = getDistribution(dist);
+		boolean isOnlineResourcesLimited = false;
+		// GOS4M use-case (UUID-f0becf8d-fc72-4968-8bf3-ed52b53e6a01): limit the number of online resources
+		if (source != null) {
+		    isOnlineResourcesLimited = source.getUniqueIdentifier().equals("UUID-f0becf8d-fc72-4968-8bf3-ed52b53e6a01") ? true
+			    : false;
+		}
+
+		String distString = getDistribution(dist, isOnlineResourcesLimited);
 
 		if (!toAdd.isEmpty()) {
 
@@ -779,6 +921,9 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
 		}
 
 		try {
+
+		    // System.out.println(distString);
+
 		    Element distElement = CustomEntry.createElementFromString(encodeAnd(distString));
 		    gpEntry.addElement(distElement);
 
@@ -864,7 +1009,7 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
 	return StreamUtils.iteratorToStream(coreMetadata.getMIMetadata().getDataIdentifications());
     }
 
-    private String getDistribution(Distribution dist) {
+    private String getDistribution(Distribution dist, boolean isLimitedOnline) {
 
 	if (dist == null) {
 	    return null;
@@ -884,6 +1029,39 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    out += "xmlns:wrs=\"http://www.opengis.net/cat/wrs/1.0\" ";
 	    out += "xmlns:dc=\"http://purl.org/dc/elements/1.1/\"  ";
 	    out += "xmlns:xlink=\"http://www.w3.org/1999/xlink\"> ";
+
+	    if (isLimitedOnline) {
+
+		List<Online> list = StreamUtils.iteratorToStream(dist.getDistributionOnlines()).collect(Collectors.toList());
+
+		dist.clearDistributionOnlines();
+
+		HashMap<String, List<Online>> protocolToOnlineMap = new HashMap<>();
+
+		final int MAX_ONLINE_PER_PROTOCOL = 5;
+
+		for (Online online : list) {
+
+		    String protocol = online.getProtocol();
+		    if (protocol == null || protocol.isEmpty()) {
+			protocol = "NO_PROTOCOL";
+		    }
+
+		    List<Online> onList = protocolToOnlineMap.get(protocol);
+
+		    if (onList == null) {
+
+			onList = new ArrayList<Online>();
+			protocolToOnlineMap.put(protocol, onList);
+		    }
+
+		    if (onList.size() < MAX_ONLINE_PER_PROTOCOL) {
+			onList.add(online);
+		    }
+		}
+
+		protocolToOnlineMap.values().forEach(onlineList -> onlineList.forEach(online -> dist.addDistributionOnline(online)));
+	    }
 
 	    out += dist.asString(true);
 

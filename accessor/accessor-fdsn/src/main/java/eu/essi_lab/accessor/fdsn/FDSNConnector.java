@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.fdsn;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,13 +21,9 @@ package eu.essi_lab.accessor.fdsn;
  * #L%
  */
 
-import static eu.essi_lab.lib.net.utils.HttpRequestExecutor.ERR_ID_WRONG_ENDPOINT;
-
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.net.URI;
-import java.net.URL;
+import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,9 +35,6 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpRequestBase;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -50,7 +43,9 @@ import com.google.common.io.ByteStreams;
 import eu.essi_lab.accessor.fdsn.handler.FDSNBondHandler;
 import eu.essi_lab.accessor.fdsn.md.FDSNMetadataSchemas;
 import eu.essi_lab.cdk.query.DistributedQueryConnector;
-import eu.essi_lab.lib.net.utils.HttpRequestExecutor;
+import eu.essi_lab.lib.net.downloader.Downloader;
+import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
+import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodNoBody;
 import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.lib.xml.XMLFactories;
@@ -86,14 +81,14 @@ public class FDSNConnector extends DistributedQueryConnector<FDSNConnectorSettin
     @Override
     public DiscoveryCountResponse count(ReducedDiscoveryMessage message) throws GSException {
 
-	HttpRequestBase request = createFDSNRequest(message, GSMessageAction.DISCOVERY_COUNT, null);
+	String request = createFDSNRequest(message, GSMessageAction.DISCOVERY_COUNT, null);
 	DiscoveryCountResponse countResponse = new DiscoveryCountResponse();
 
 	try {
 
-	    HttpResponse response = new HttpRequestExecutor().execute(request);
+	    HttpResponse<InputStream> response = new Downloader().downloadResponse(HttpRequestUtils.build(MethodNoBody.GET, request));
 
-	    InputStream is = response.getEntity().getContent();
+	    InputStream is = response.body();
 
 	    ClonableInputStream clone = new ClonableInputStream(is);
 
@@ -103,7 +98,7 @@ public class FDSNConnector extends DistributedQueryConnector<FDSNConnectorSettin
 
 	    is.close();
 
-	} catch (IOException e) {
+	} catch (Exception e) {
 
 	    throw GSException.createException(//
 		    getClass(), //
@@ -123,12 +118,12 @@ public class FDSNConnector extends DistributedQueryConnector<FDSNConnectorSettin
 
 	List<OriginalMetadata> omList;
 
-	HttpRequestBase request = createFDSNRequest(message, GSMessageAction.DISCOVERY_RETRIEVE, page);
+	String request = createFDSNRequest(message, GSMessageAction.DISCOVERY_RETRIEVE, page);
 
-	HttpResponse response;
+	HttpResponse<InputStream> response;
 	try {
-	    response = new HttpRequestExecutor().execute(request);
-	} catch (IOException e) {
+	    response = new Downloader().downloadResponse(HttpRequestUtils.build(MethodNoBody.GET, request));
+	} catch (Exception e) {
 
 	    throw GSException.createException(//
 		    getClass(), //
@@ -150,15 +145,12 @@ public class FDSNConnector extends DistributedQueryConnector<FDSNConnectorSettin
 	return rSet;
     }
 
-    private HttpRequestBase createFDSNRequest(ReducedDiscoveryMessage reducedMessage, GSMessageAction action, Page page)
-	    throws GSException {
+    private String createFDSNRequest(ReducedDiscoveryMessage reducedMessage, GSMessageAction action, Page page) {
 
 	return convertBondToRequest(reducedMessage, action, page);
-
     }
 
-    private HttpRequestBase convertBondToRequest(ReducedDiscoveryMessage reducedMessage, GSMessageAction action, Page page)
-	    throws GSException {
+    private String convertBondToRequest(ReducedDiscoveryMessage reducedMessage, GSMessageAction action, Page page) {
 
 	boolean ignore = getSetting().isIgnoreComplexQueries();
 
@@ -196,18 +188,16 @@ public class FDSNConnector extends DistributedQueryConnector<FDSNConnectorSettin
 	    break;
 	}
 
-	URI uri = buildUri(sourceUrl, queryString);
-
-	return new HttpGet(uri);
+	return buildQuery(sourceUrl, queryString);
     }
 
-    private List<OriginalMetadata> convertResponseToOriginalMD(HttpResponse response) throws GSException {
+    private List<OriginalMetadata> convertResponseToOriginalMD(HttpResponse<InputStream> response) throws GSException {
 
 	List<OriginalMetadata> omList = new ArrayList<>();
 
 	try {
 
-	    InputStream is = response.getEntity().getContent();
+	    InputStream is = response.body();
 
 	    XMLDocumentReader xmlDocument = new XMLDocumentReader(is);
 
@@ -290,25 +280,9 @@ public class FDSNConnector extends DistributedQueryConnector<FDSNConnectorSettin
      *
      * @throws GSException when url is not well-formed
      */
-    public static URI buildUri(String baseUri, String queryParams) throws GSException {
+    private String buildQuery(String baseUri, String queryParams) {
 
-	try {
-
-	    URL url = new URL(baseUri + queryParams);
-
-	    return url.toURI();
-
-	} catch (Exception e) {
-
-	    throw GSException.createException(//
-		    FDSNConnector.class, //
-		    e.getMessage(), //
-		    null, //
-		    ErrorInfo.ERRORTYPE_CLIENT, //
-		    ErrorInfo.SEVERITY_ERROR, //
-		    ERR_ID_WRONG_ENDPOINT, //
-		    e);
-	}
+	return baseUri + queryParams;
     }
 
     @Override

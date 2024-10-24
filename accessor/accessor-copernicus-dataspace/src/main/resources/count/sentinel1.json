@@ -1,0 +1,44 @@
+{
+    "type": "FeatureCollection",
+    "properties": {
+        "id": "95175430-77b3-5c4e-b686-cf8d8a7608ad",
+        "totalResults": 12967112,
+        "exactCount": 1,
+        "startIndex": 1,
+        "itemsPerPage": 1,
+        "query": {
+            "originalFilters": {"collection": "SENTINEL-1"},
+            "appliedFilters": {"collection": "SENTINEL-1"},
+            "processingTime": 12.300848436
+        },
+        "links": [
+            {
+                "rel": "self",
+                "type": "application/json",
+                "title": "self",
+                "href": "https://catalogue.dataspace.copernicus.eu/resto/api/collections/Sentinel1/search.json?maxRecords=1&exactCount=true&sortParam=startDate&sortOrder=descending&"
+            },
+            {
+                "rel": "search",
+                "type": "application/opensearchdescription+xml",
+                "title": "OpenSearch Description Document",
+                "href": "https://catalogue.dataspace.copernicus.eu/resto/api/collections/Sentinel1/describe.xml"
+            },
+            {
+                "rel": "next",
+                "type": "application/json",
+                "title": "next",
+                "href": "https://catalogue.dataspace.copernicus.eu/resto/api/collections/Sentinel1/search.json?maxRecords=1&exactCount=true&sortParam=startDate&sortOrder=descending&page=2"
+            },
+            {
+                "rel": "last",
+                "type": "application/json",
+                "title": "last",
+                "href": "https://catalogue.dataspace.copernicus.eu/resto/api/collections/Sentinel1/search.json?maxRecords=1&exactCount=true&sortParam=startDate&sortOrder=descending&page=12967112"
+            }
+        ]
+    },
+    "features": [
+      
+    ]
+}

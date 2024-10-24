@@ -7,7 +7,7 @@ package eu.essi_lab.cfga.gs;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -42,11 +42,14 @@ import eu.essi_lab.cfga.gs.setting.augmenter.worker.AugmenterWorkerSetting;
 import eu.essi_lab.cfga.gs.setting.augmenter.worker.AugmenterWorkerSettingLoader;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.cfga.gs.setting.database.SourceStorageSetting;
+import eu.essi_lab.cfga.gs.setting.dc_connector.DataCacheConnectorSetting;
+import eu.essi_lab.cfga.gs.setting.dc_connector.DataCacheConnectorSettingLoader;
 import eu.essi_lab.cfga.gs.setting.distribution.DistributionSetting;
 import eu.essi_lab.cfga.gs.setting.driver.DriverSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSettingLoader;
 import eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting;
+import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting;
 import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.source.FileSource;
 import eu.essi_lab.lib.utils.LabeledEnum;
@@ -115,10 +118,21 @@ public class DefaultConfiguration extends Configuration {
 	 * 
 	 */
 	GDC_SOURCES_SETTINGS("gdcSourceSettings"), //
+
 	/**
 	 * 
 	 */
-	DOWNLOAD_SETTINGS("downloadSettings");
+	DATA_CACHE_CONNECTOR_SETTINGS("dataCacheConnectorSettings"), //
+
+	/**
+	 * 
+	 */
+	DOWNLOAD_SETTINGS("downloadSettings"),
+
+	/**
+	 * 
+	 */
+	RATE_LIMITER_SETTINGS("rateLimiterSettings");
 
 	private String label;
 
@@ -256,13 +270,27 @@ public class DefaultConfiguration extends Configuration {
 		select(s -> s.getName().equals("WCS Accessor"));
 
 	wcsSetting.getSelectedAccessorSetting().getGSSourceSetting().setSourceIdentifier("atlasSouth");
-	wcsSetting.getSelectedAccessorSetting().getGSSourceSetting().setSourceLabel("Atlas of the Cryosphere: Southern Hemisphere (WCS)	");
+	wcsSetting.getSelectedAccessorSetting().getGSSourceSetting().setSourceLabel("Atlas of the Cryosphere: Southern Hemisphere (WCS)");
 	wcsSetting.getSelectedAccessorSetting().getGSSourceSetting().setSourceEndpoint("http://nsidc.org/cgi-bin/atlas_south");
 
 	wcsSetting.getAugmentersSetting().select(s -> s.getName().equals("Access augmenter"));
 
 	put(wcsSetting);
 
+	//
+	// GBIF as default mixed harvester worker setting
+	//
+
+	HarvestingSetting gbifSetting = HarvestingSettingLoader.load();
+
+	gbifSetting.getAccessorsSetting().//
+		select(s -> s.getName().equals("GBIF Accessor"));
+
+	AccessorSetting gbifAccessorSetting = gbifSetting.getSelectedAccessorSetting();
+
+	gbifAccessorSetting.getGSSourceSetting().setSourceIdentifier("defaultGBIFMixedSource");
+
+	put(gbifSetting);
 
 	//
 	// --- Database - Volatile as default ---
@@ -324,6 +352,16 @@ public class DefaultConfiguration extends Configuration {
 	put(augmenterWorkerSetting);
 
 	//
+	// --- DataCacheConnectorSetting settings
+	//
+
+	DataCacheConnectorSetting dataCacheConnectorSetting = DataCacheConnectorSettingLoader.load();
+
+	dataCacheConnectorSetting.setIdentifier(MainSettingsIdentifier.DATA_CACHE_CONNECTOR_SETTINGS.getLabel());
+
+	put(dataCacheConnectorSetting);
+
+	//
 	// --- OAuth settings ----
 	//
 
@@ -374,7 +412,7 @@ public class DefaultConfiguration extends Configuration {
 	put(sourcePrioritySetting);
 
 	//
-	// --- Priority source setting
+	// --- GDC source setting
 	//
 
 	GDCSourcesSetting gdcSourcesSetting = new GDCSourcesSetting();
@@ -402,6 +440,16 @@ public class DefaultConfiguration extends Configuration {
 	customTaskSetting.setIdentifier(MainSettingsIdentifier.CUSTOM_TASK_SETTINGS.getLabel());
 
 	put(customTaskSetting);
+
+	//
+	// --- Rate Limiter settings ----
+	//
+
+	RateLimiterSetting rateLimiterSetting = new RateLimiterSetting();
+
+	rateLimiterSetting.setIdentifier(MainSettingsIdentifier.RATE_LIMITER_SETTINGS.getLabel());
+
+	put(rateLimiterSetting);
     }
 
     /**

@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wps.executor.asynch;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,7 +31,7 @@ import javax.ws.rs.core.Response.Status;
 
 import com.google.common.collect.Lists;
 
-import eu.essi_lab.lib.net.utils.Downloader;
+import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.messages.RequestMessage;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.count.CountSet;
@@ -70,7 +70,7 @@ public class GWPSExecuteFormatter implements MessageResponseFormatter<RequestMes
 	int i = 0;
 	while (flag && i < 5) {
 	    Downloader d = new Downloader();
-	    Optional<String> res = d.downloadString(endpoint + "/status/" + identifiers.get(0));
+	    Optional<String> res = d.downloadOptionalString(endpoint + "/status/" + identifiers.get(0));
 	    i++;
 	    if (res.isPresent()) {
 		String s = res.get();

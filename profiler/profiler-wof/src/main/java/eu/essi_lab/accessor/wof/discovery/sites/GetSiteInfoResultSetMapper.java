@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof.discovery.sites;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,6 +27,7 @@ import java.util.Optional;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.cuahsi.waterml._1.PropertyType;
 import org.cuahsi.waterml._1.SeriesCatalogType;
 import org.cuahsi.waterml._1.SeriesCatalogType.Series;
 import org.cuahsi.waterml._1.SeriesCatalogType.Series.ValueCount;
@@ -36,7 +37,9 @@ import org.cuahsi.waterml._1.TimePeriodType;
 import org.cuahsi.waterml._1.VariableInfoType;
 
 import eu.essi_lab.accessor.wof.discovery.variables.GetVariablesResultSetMapper;
+import eu.essi_lab.iso.datamodel.classes.Distribution;
 import eu.essi_lab.iso.datamodel.classes.MIMetadata;
+import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -170,9 +173,21 @@ public class GetSiteInfoResultSetMapper extends DiscoveryResultSetMapper<Site> {
 
 	    series.setVariable(variable);
 
-	    seriesCatalog.getSeries().add(series);
-
-	    site.getSeriesCatalog().add(seriesCatalog);
+	    Distribution distribution = metadata.getDistribution();
+	    if (distribution != null) {
+		Online online = distribution.getDistributionOnline();
+		if (online != null) {
+		    String onlineId = online.getIdentifier();
+		    if (onlineId != null) {
+			PropertyType idProperty = new PropertyType();
+			idProperty.setName("identifier");
+			idProperty.setValue(onlineId);
+			series.getSeriesProperty().add(idProperty);
+			seriesCatalog.getSeries().add(series);
+			site.getSeriesCatalog().add(seriesCatalog);
+		    }
+		}
+	    }
 
 	    return site;
 

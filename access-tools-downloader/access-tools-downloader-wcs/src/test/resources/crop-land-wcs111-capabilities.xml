@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Capabilities xmlns="http://www.opengis.net/wcs/1.1" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ogc="http://www.opengis.net/ogc" version="1.1.1" xsi:schemaLocation="http://www.opengis.net/wcs/1.1 http://schemas.opengis.net/wcs/1.1/wcsGetCapabilities.xsd http://www.opengis.net/ows/1.1 http://schemas.opengis.net/ows/1.1.0/owsAll.xsd">
+  <ows:ServiceIdentification>
+    <ows:Title/>
+    <!--WARNING: Optional metadata "ows_title" missing for ows:Title-->
+    <ows:Abstract/>
+    <!--WARNING: Optional metadata "ows_abstract" was missing for ows:Abstract-->
+    <ows:Keywords>
+      <ows:Keyword>WCS</ows:Keyword>
+      <ows:Keyword> CropScape</ows:Keyword>
+      <ows:Keyword> Cropland Data Layer</ows:Keyword>
+    </ows:Keywords>
+    <ows:ServiceType codeSpace="OGC">OGC WCS</ows:ServiceType>
+    <ows:ServiceTypeVersion>1.1.1</ows:ServiceTypeVersion>
+    <ows:Fees>none</ows:Fees>
+    <ows:AccessConstraints>none</ows:AccessConstraints>
+  </ows:ServiceIdentification>
+  <ows:ServiceProvider>
+    <ows:ProviderName>Center for Spatial Information Sceince and Systems</ows:ProviderName>
+    <ows:ProviderSite xlink:type="simple" xlink:href="http://gis.csiss.gmu.edu/cgi-bin/cdl_services?"/>
+    <ows:ServiceContact>
+      <ows:IndividualName>Dr. Weiguo Han</ows:IndividualName>
+      <ows:PositionName>Research Assistant Professor</ows:PositionName>
+      <ows:ContactInfo>
+        <ows:Phone>
+          <ows:Voice>703-993-6111</ows:Voice>
+          <ows:Facsimile/>
+          <!--WARNING: Optional metadata "ows_contactfacsimiletelephone" was missing for ows:Facsimile-->
+        </ows:Phone>
+        <ows:Address>
+          <ows:DeliveryPoint>4400 University Drive, MS 6E1</ows:DeliveryPoint>
+          <ows:City>Fairfax</ows:City>
+          <ows:AdministrativeArea>VA</ows:AdministrativeArea>
+          <ows:PostalCode>22030</ows:PostalCode>
+          <ows:Country>USA</ows:Country>
+          <ows:ElectronicMailAddress>whan@gmu.edu</ows:ElectronicMailAddress>
+        </ows:Address>
+        <ows:OnlineResource xlink:type="simple" xlink:href="http://gis.csiss.gmu.edu/cgi-bin/cdl_services?"/>
+        <ows:HoursOfService/>
+        <!--WARNING: Optional metadata "ows_hoursofservice" was missing for ows:HoursOfService-->
+        <ows:ContactInstructions/>
+        <!--WARNING: Optional metadata "ows_contactinstructions" was missing for ows:ContactInstructions-->
+      </ows:ContactInfo>
+      <ows:Role/>
+      <!--WARNING: Optional metadata "ows_role" was missing for ows:Role-->
+    </ows:ServiceContact>
+  </ows:ServiceProvider>
+  <ows:OperationsMetadata>
+    <ows:Operation name="GetCapabilities">
+      <ows:DCP>
+        <ows:HTTP>
+          <ows:Get xlink:type="simple" xlink:href="http://gis.csiss.gmu.edu/cgi-bin/cdl_services?"/>
+        </ows:HTTP>
+      </ows:DCP>
+      <ows:Parameter name="service">
+        <ows:AllowedValues>
+          <ows:Value>WCS</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+      <ows:Parameter name="version">
+        <ows:AllowedValues>
+          <ows:Value>1.1.1</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+    </ows:Operation>
+    <ows:Operation name="DescribeCoverage">
+      <ows:DCP>
+        <ows:HTTP>
+          <ows:Get xlink:type="simple" xlink:href="http://gis.csiss.gmu.edu/cgi-bin/cdl_services?"/>
+        </ows:HTTP>
+      </ows:DCP>
+      <ows:Parameter name="service">
+        <ows:AllowedValues>
+          <ows:Value>WCS</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+      <ows:Parameter name="version">
+        <ows:AllowedValues>
+          <ows:Value>1.1.1</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+      <ows:Parameter name="identifiers">
+        <ows:AllowedValues>
+          <ows:Value>cdl_2009</ows:Value>
+          <ows:Value>cdl_2014</ows:Value>
+          <ows:Value>cdl_2013</ows:Value>
+          <ows:Value>cdl_2012</ows:Value>
+          <ows:Value>cdl_2011</ows:Value>
+          <ows:Value>cdl_2010</ows:Value>
+          <ows:Value>cdl_2008</ows:Value>
+          <ows:Value>cdl_2007</ows:Value>
+          <ows:Value>cdl_2006</ows:Value>
+          <ows:Value>cdl_2005</ows:Value>
+          <ows:Value>cdl_2004</ows:Value>
+          <ows:Value>cdl_2003</ows:Value>
+          <ows:Value>cdl_2002</ows:Value>
+          <ows:Value>cdl_2001</ows:Value>
+          <ows:Value>cdl_2000</ows:Value>
+          <ows:Value>cdl_1999</ows:Value>
+          <ows:Value>cdl_1998</ows:Value>
+          <ows:Value>cdl_1997</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+    </ows:Operation>
+    <ows:Operation name="GetCoverage">
+      <ows:DCP>
+        <ows:HTTP>
+          <ows:Get xlink:type="simple" xlink:href="http://gis.csiss.gmu.edu/cgi-bin/cdl_services?"/>
+        </ows:HTTP>
+      </ows:DCP>
+      <ows:Parameter name="service">
+        <ows:AllowedValues>
+          <ows:Value>WCS</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+      <ows:Parameter name="version">
+        <ows:AllowedValues>
+          <ows:Value>1.1.1</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+      <ows:Parameter name="Identifier">
+        <ows:AllowedValues>
+          <ows:Value>cdl_2009</ows:Value>
+          <ows:Value>cdl_2014</ows:Value>
+          <ows:Value>cdl_2013</ows:Value>
+          <ows:Value>cdl_2012</ows:Value>
+          <ows:Value>cdl_2011</ows:Value>
+          <ows:Value>cdl_2010</ows:Value>
+          <ows:Value>cdl_2008</ows:Value>
+          <ows:Value>cdl_2007</ows:Value>
+          <ows:Value>cdl_2006</ows:Value>
+          <ows:Value>cdl_2005</ows:Value>
+          <ows:Value>cdl_2004</ows:Value>
+          <ows:Value>cdl_2003</ows:Value>
+          <ows:Value>cdl_2002</ows:Value>
+          <ows:Value>cdl_2001</ows:Value>
+          <ows:Value>cdl_2000</ows:Value>
+          <ows:Value>cdl_1999</ows:Value>
+          <ows:Value>cdl_1998</ows:Value>
+          <ows:Value>cdl_1997</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+      <ows:Parameter name="InterpolationType">
+        <ows:AllowedValues>
+          <ows:Value>NEAREST_NEIGHBOUR</ows:Value>
+          <ows:Value>BILINEAR</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+      <ows:Parameter name="format">
+        <ows:AllowedValues>
+          <ows:Value>image/tiff</ows:Value>
+          <ows:Value>image/gif</ows:Value>
+          <ows:Value>image/png</ows:Value>
+          <ows:Value>image/png; mode=24bit</ows:Value>
+          <ows:Value>image/jpeg</ows:Value>
+          <ows:Value>image/vnd.wap.wbmp</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+      <ows:Parameter name="store">
+        <ows:AllowedValues>
+          <ows:Value>false</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+      <ows:Parameter name="GridBaseCRS">
+        <ows:AllowedValues>
+          <ows:Value>urn:ogc:def:crs:epsg::4326</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+    </ows:Operation>
+  </ows:OperationsMetadata>
+  <Contents>
+    <CoverageSummary>
+      <ows:Title>cdl_2009</ows:Title>
+      <ows:Abstract/>
+      <ows:WGS84BoundingBox dimensions="2">
+        <ows:LowerCorner>-127.886599740259 22.9401450824376</ows:LowerCorner>
+        <ows:UpperCorner>-65.3455155736575 51.6050202016246</ows:UpperCorner>
+      </ows:WGS84BoundingBox>
+      <SupportedCRS>urn:ogc:def:crs:EPSG::102004</SupportedCRS>
+      <SupportedFormat>image/tiff</SupportedFormat>
+      <Identifier>cdl_2009</Identifier>
+    </CoverageSummary>
+    <CoverageSummary>
+      <ows:Title>cdl_2014</ows:Title>
+      <ows:Abstract/>
+      <ows:WGS84BoundingBox dimensions="2">
+        <ows:LowerCorner>-127.88721217969 22.9402704032552</ows:LowerCorner>
+        <ows:UpperCorner>-65.3455070126293 51.6051215683218</ows:UpperCorner>
+      </ows:WGS84BoundingBox>
+      <SupportedCRS>urn:ogc:def:crs:EPSG::102004</SupportedCRS>
+      <SupportedFormat>image/tiff</SupportedFormat>
+      <Identifier>cdl_2014</Identifier>
+    </CoverageSummary>
+    <CoverageSummary>
+      <ows:Title>cdl_2013</ows:Title>
+      <ows:Abstract/>
+      <ows:WGS84BoundingBox dimensions="2">
+        <ows:LowerCorner>-127.88721217969 22.9402704032552</ows:LowerCorner>
+        <ows:UpperCorner>-65.3455070126293 51.6051215683218</ows:UpperCorner>
+      </ows:WGS84BoundingBox>
+      <SupportedCRS>urn:ogc:def:crs:EPSG::102004</SupportedCRS>
+      <SupportedFormat>image/tiff</SupportedFormat>
+      <Identifier>cdl_2013</Identifier>
+    </CoverageSummary>
+    <CoverageSummary>
+      <ows:Title>cdl_2012</ows:Title>
+      <ows:Abstract/>
+      <ows:WGS84BoundingBox dimensions="2">
+        <ows:LowerCorner>-127.88721217969 22.9402704032552</ows:LowerCorner>
+        <ows:UpperCorner>-65.3455070126293 51.6051215683218</ows:UpperCorner>
+      </ows:WGS84BoundingBox>
+      <SupportedCRS>urn:ogc:def:crs:EPSG::102004</SupportedCRS>
+      <SupportedFormat>image/tiff</SupportedFormat>
+      <Identifier>cdl_2012</Identifier>
+    </CoverageSummary>
+    <CoverageSummary>
+      <ows:Title>cdl_2011</ows:Title>
+      <ows:Abstract/>
+      <ows:WGS84BoundingBox dimensions="2">
+        <ows:LowerCorner>-127.88721217969 22.9402704032552</ows:LowerCorner>
+        <ows:UpperCorner>-65.3455070126293 51.6051215683218</ows:UpperCorner>
+      </ows:WGS84BoundingBox>
+      <SupportedCRS>urn:ogc:def:crs:EPSG::102004</SupportedCRS>
+      <SupportedFormat>image/tiff</SupportedFormat>
+      <Identifier>cdl_2011</Identifier>
+    </CoverageSummary>
+    <CoverageSummary>
+      <ows:Title>cdl_2010</ows:Title>
+      <ows:Abstract/>
+      <ows:WGS84BoundingBox dimensions="2">
+        <ows:LowerCorner>-127.88721217969 22.9402704032552</ows:LowerCorner>
+        <ows:UpperCorner>-65.3455070126293 51.6051215683218</ows:UpperCorner>
+      </ows:WGS84BoundingBox>
+      <SupportedCRS>urn:ogc:def:crs:EPSG::102004</SupportedCRS>
+      <SupportedFormat>image/tiff</SupportedFormat>
+      <Identifier>cdl_2010</Identifier>
+    </CoverageSummary>
+    <CoverageSummary>
+      <ows:Title>cdl_2008</ows:Title>
+      <ows:Abstract/>
+      <ows:WGS84BoundingBox dimensions="2">
+        <ows:LowerCorner>-127.886599740259 22.9401450824376</ows:LowerCorner>
+        <ows:UpperCorner>-65.3455155736575 51.6050202016246</ows:UpperCorner>
+      </ows:WGS84BoundingBox>
+      <SupportedCRS>urn:ogc:def:crs:EPSG::102004</SupportedCRS>
+      <SupportedFormat>image/tiff</SupportedFormat>
+      <Identifier>cdl_2008</Identifier>
+    </CoverageSummary>
+    <CoverageSummary>
+      <ows:Title>cdl_2007</ows:Title>
+      <ows:Abstract/>
+      <ows:WGS84BoundingBox dimensions="2">
+        <ows:LowerCorner>-127.886599740259 26.4534667089505</ows:LowerCorner>
+        <ows:UpperCorner>-78.0337302974642 51.6048579215701</ows:UpperCorner>
+      </ows:WGS84BoundingBox>
+      <SupportedCRS>urn:ogc:def:crs:EPSG::102004</SupportedCRS>
+      <SupportedFormat>image/tiff</SupportedFormat>
+      <Identifier>cdl_2007</Identifier>
+    </CoverageSummary>
+    <CoverageSummary>
+      <ows:Title>cdl_2006</ows:Title>
+      <ows:Abstract/>
+      <ows:WGS84BoundingBox dimensions="2">
+        <ows:LowerCorner>-125.127113818695 26.9206826192966</ows:LowerCorner>
+        <ows:UpperCorner>-78.0337302974642 51.6049428455397</ows:UpperCorner>
+      </ows:WGS84BoundingBox>
+      <SupportedCRS>urn:ogc:def:crs:EPSG::102004</SupportedCRS>
+      <SupportedFormat>image/tiff</SupportedFormat>
+      <Identifier>cdl_2006</Identifier>
+    </CoverageSummary>
+    <CoverageSummary>
+      <ows:Title>cdl_2005</ows:Title>
+      <ows:Abstract/>
+      <ows:WGS84BoundingBox dimensions="2">
+        <ows:LowerCorner>-119.260492756672 27.7015031627212</ows:LowerCorner>
+        <ows:UpperCorner>-82.7805223555804 50.5682727904385</ows:UpperCorner>
+      </ows:WGS84BoundingBox>
+      <SupportedCRS>urn:ogc:def:crs:EPSG::102004</SupportedCRS>
+      <SupportedFormat>image/tiff</SupportedFormat>
+      <Identifier>cdl_2005</Identifier>
+    </CoverageSummary>
+    <CoverageSummary>
+      <ows:Title>cdl_2004</ows:Title>
+      <ows:Abstract/>
+      <ows:WGS84BoundingBox dimensions="2">
+        <ows:LowerCorner>-105.064706240309 24.3319681696842</ows:LowerCorner>
+        <ows:UpperCorner>-74.6823342644829 49.2298670967555</ows:UpperCorner>
+      </ows:WGS84BoundingBox>
+      <SupportedCRS>urn:ogc:def:crs:EPSG::102004</SupportedCRS>
+      <SupportedFormat>image/tiff</SupportedFormat>
+      <Identifier>cdl_2004</Identifier>
+    </CoverageSummary>
+    <CoverageSummary>
+      <ows:Title>cdl_2003</ows:Title>
+      <ows:Abstract/>
+      <ows:WGS84BoundingBox dimensions="2">
+        <ows:LowerCorner>-105.064706240309 29.9128968022315</ows:LowerCorner>
+        <ows:UpperCorner>-83.0529521951643 49.2299347501539</ows:UpperCorner>
+      </ows:WGS84BoundingBox>
+      <SupportedCRS>urn:ogc:def:crs:EPSG::102004</SupportedCRS>
+      <SupportedFormat>image/tiff</SupportedFormat>
+      <Identifier>cdl_2003</Identifier>
+    </CoverageSummary>
+    <CoverageSummary>
+      <ows:Title>cdl_2002</ows:Title>
+      <ows:Abstract/>
+      <ows:WGS84BoundingBox dimensions="2">
+        <ows:LowerCorner>-105.064706240309 28.3381118653676</ows:LowerCorner>
+        <ows:UpperCorner>-69.1322196324271 49.2299124863356</ows:UpperCorner>
+      </ows:WGS84BoundingBox>
+      <SupportedCRS>urn:ogc:def:crs:EPSG::102004</SupportedCRS>
+      <SupportedFormat>image/tiff</SupportedFormat>
+      <Identifier>cdl_2002</Identifier>
+    </CoverageSummary>
+    <CoverageSummary>
+      <ows:Title>cdl_2001</ows:Title>
+      <ows:Abstract/>
+      <ows:WGS84BoundingBox dimensions="2">
+        <ows:LowerCorner>-105.064706240309 29.9128968022315</ows:LowerCorner>
+        <ows:UpperCorner>-83.0529521951643 49.2299347501539</ows:UpperCorner>
+      </ows:WGS84BoundingBox>
+      <SupportedCRS>urn:ogc:def:crs:EPSG::102004</SupportedCRS>
+      <SupportedFormat>image/tiff</SupportedFormat>
+      <Identifier>cdl_2001</Identifier>
+    </CoverageSummary>
+    <CoverageSummary>
+      <ows:Title>cdl_2000</ows:Title>
+      <ows:Abstract/>
+      <ows:WGS84BoundingBox dimensions="2">
+        <ows:LowerCorner>-104.429250406229 29.9128968022315</ows:LowerCorner>
+        <ows:UpperCorner>-83.0529521951643 49.2299169643739</ows:UpperCorner>
+      </ows:WGS84BoundingBox>
+      <SupportedCRS>urn:ogc:def:crs:EPSG::102004</SupportedCRS>
+      <SupportedFormat>image/tiff</SupportedFormat>
+      <Identifier>cdl_2000</Identifier>
+    </CoverageSummary>
+    <CoverageSummary>
+      <ows:Title>cdl_1999</ows:Title>
+      <ows:Abstract/>
+      <ows:WGS84BoundingBox dimensions="2">
+        <ows:LowerCorner>-104.429250406229 30.1047964708739</ows:LowerCorner>
+        <ows:UpperCorner>-86.1289560191042 49.2299364770907</ows:UpperCorner>
+      </ows:WGS84BoundingBox>
+      <SupportedCRS>urn:ogc:def:crs:EPSG::102004</SupportedCRS>
+      <SupportedFormat>image/tiff</SupportedFormat>
+      <Identifier>cdl_1999</Identifier>
+    </CoverageSummary>
+    <CoverageSummary>
+      <ows:Title>cdl_1998</ows:Title>
+      <ows:Abstract/>
+      <ows:WGS84BoundingBox dimensions="2">
+        <ows:LowerCorner>-104.429250406229 45.6990882325956</ows:LowerCorner>
+        <ows:UpperCorner>-96.5530647927168 49.2287387423382</ows:UpperCorner>
+      </ows:WGS84BoundingBox>
+      <SupportedCRS>urn:ogc:def:crs:EPSG::102004</SupportedCRS>
+      <SupportedFormat>image/tiff</SupportedFormat>
+      <Identifier>cdl_1998</Identifier>
+    </CoverageSummary>
+    <CoverageSummary>
+      <ows:Title>cdl_1997</ows:Title>
+      <ows:Abstract/>
+      <ows:WGS84BoundingBox dimensions="2">
+        <ows:LowerCorner>-104.429250406229 45.6990882325956</ows:LowerCorner>
+        <ows:UpperCorner>-96.5530647927168 49.2287387423382</ows:UpperCorner>
+      </ows:WGS84BoundingBox>
+      <SupportedCRS>urn:ogc:def:crs:EPSG::102004</SupportedCRS>
+      <SupportedFormat>image/tiff</SupportedFormat>
+      <Identifier>cdl_1997</Identifier>
+    </CoverageSummary>
+  </Contents>
+</Capabilities>

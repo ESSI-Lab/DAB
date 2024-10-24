@@ -1,0 +1,415 @@
+{
+    "features": [
+        {
+            "geometry": {
+                "x": -1.1467796643465938E7,
+                "y": 6292200.017528929
+            },
+            "attributes": {
+                "country": "Canada",
+                "water_level_availability": "Yes",
+                "real_time": "No",
+                "grdc_id": "4214091",
+                "data_quality_open": "",
+                "datum_name": "ASSUMED DATUM",
+                "water_temperature_start_date": "",
+                "script_link_for_archived_data": "",
+                "regulation_start_date": "",
+                "longitude": "-100.9739",
+                "ice_on_off_availability": "",
+                "snow_depth_availability": "",
+                "station_name": "KAZAN RIVER AT OUTLET OF ENNADAI LAKE",
+                "script_link_for_real_time_data": "N/A",
+                "discharge_availability": "Yes",
+                "station_id": "06LA001",
+                "n_years": "56",
+                "datum_altitude": "",
+                "notes_for_archived_data": "MSC GeoMet Geospatial Web Services: https://github.com/ECCC-MSC/Wateroffice/blob/master/docs/MSC%20GeoMet2_UserGuide_English.pdf",
+                "land_use_change": "",
+                "notes_ice_on_off": "",
+                "flow_to_ocean": "No",
+                "regulation_end_date": "",
+                "notes_for_real_time_data": "",
+                "effective_drainage_area": "",
+                "institute": "Water Survey of Canada",
+                "wmo_region": "4",
+                "status": "A",
+                "station_notes": "",
+                "notes_snow_depth": "",
+                "lake_station": "",
+                "ice_thickness_availability": "",
+                "latitude": "61.2536",
+                "start_year": "1962",
+                "measurement_method_water_temperature": "",
+                "measurement_method_discharge": "",
+                "measurement_method_ice_on_off": "",
+                "hycosid": 63,
+                "data_quality_ice": "",
+                "surface_cover": "",
+                "drainage_area": 21400,
+                "water_temperature_end_date": "",
+                "grdc_ardb": "1",
+                "regulation": "No",
+                "water_temperature_availability": "No",
+                "notes_water_temperature": "",
+                "downstream_hycos_station": "",
+                "script_link_for_water_temperature_data": "",
+                "river": "KAZAN",
+                "drainage_shapefile": "Y",
+                "end_year": "",
+                "sampling_interval": ""
+            }
+        },
+        {
+            "geometry": {
+                "x": -1.0424080682516918E7,
+                "y": 7694372.673269194
+            },
+            "attributes": {
+                "country": "Canada",
+                "water_level_availability": "No",
+                "real_time": "Yes",
+                "grdc_id": "4213845",
+                "data_quality_open": "",
+                "datum_name": "ASSUMED DATUM",
+                "water_temperature_start_date": "",
+                "script_link_for_archived_data": "",
+                "regulation_start_date": "",
+                "longitude": "-93.64111",
+                "ice_on_off_availability": "",
+                "snow_depth_availability": "",
+                "station_name": "ANGLING RIVER NEAR BIRD",
+                "script_link_for_real_time_data": "http://dd.weather.gc.ca/hydrometric/csv/",
+                "discharge_availability": "Yes",
+                "station_id": "05UH001",
+                "n_years": "39",
+                "datum_altitude": "",
+                "notes_for_archived_data": "MSC GeoMet Geospatial Web Services: https://github.com/ECCC-MSC/Wateroffice/blob/master/docs/MSC%20GeoMet2_UserGuide_English.pdf",
+                "land_use_change": "",
+                "notes_ice_on_off": "",
+                "flow_to_ocean": "No",
+                "regulation_end_date": "",
+                "notes_for_real_time_data": "",
+                "effective_drainage_area": "",
+                "institute": "Water Survey of Canada",
+                "wmo_region": "4",
+                "whosPage": "https://localhost:9090/gs-service/services/bnhs/station/FFA414F86F7A7C5D6FA1874826A6342EC18677F1/",
+                "status": "A",
+                "station_notes": "Added station to HYCOS 2016-04-04",
+                "notes_snow_depth": "",
+                "lake_station": "",
+                "ice_thickness_availability": "",
+                "latitude": "56.67694",
+                "start_year": "1979",
+                "measurement_method_water_temperature": "",
+                "measurement_method_discharge": "",
+                "measurement_method_ice_on_off": "",
+                "hycosid": 693,
+                "data_quality_ice": "",
+                "surface_cover": "",
+                "drainage_area": 1560,
+                "water_temperature_end_date": "",
+                "grdc_ardb": "",
+                "regulation": "No",
+                "water_temperature_availability": "No",
+                "notes_water_temperature": "",
+                "downstream_hycos_station": "",
+                "script_link_for_water_temperature_data": "",
+                "river": "ANGLING",
+                "drainage_shapefile": "Y",
+                "end_year": "",
+                "sampling_interval": ""
+            }
+        }
+    ],
+    "globalIdFieldName": "",
+    "objectIdFieldName": "hycosid",
+    "spatialReference": {"wkid": 102100},
+    "fields": [
+        {
+            "name": "whosPage",
+            "alias": "WHOS page",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "hycosid",
+            "alias": "HYCOSID",
+            "type": "esriFieldTypeOID"
+        },
+        {
+            "name": "station_id",
+            "alias": "StationID",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "country",
+            "alias": "Country",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "institute",
+            "alias": "Institute",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "station_name",
+            "alias": "StationName",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "river",
+            "alias": "River",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "lake_station",
+            "alias": "Lake Station",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "grdc_id",
+            "alias": "GRDC ID",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "grdc_ardb",
+            "alias": "GRDC ARDB",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "wmo_region",
+            "alias": "WMO Region",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "latitude",
+            "alias": "Latitude",
+            "type": "esriFieldTypeDouble"
+        },
+        {
+            "name": "longitude",
+            "alias": "Longitude",
+            "type": "esriFieldTypeDouble"
+        },
+        {
+            "name": "latitude_of_discharge",
+            "alias": "Latitude of discharge",
+            "type": "esriFieldTypeDouble"
+        },
+        {
+            "name": "longitude_of_discharge",
+            "alias": "Longitude of discharge",
+            "type": "esriFieldTypeDouble"
+        },
+        {
+            "name": "status",
+            "alias": "Status",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "drainage_area",
+            "alias": "Drainage Area",
+            "type": "esriFieldTypeDouble"
+        },
+        {
+            "name": "effective_drainage_area",
+            "alias": "Effective Drainage Area",
+            "type": "esriFieldTypeDouble"
+        },
+        {
+            "name": "drainage_shapefile",
+            "alias": "Drainage Shapefile",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "datum_name",
+            "alias": "Datum Name",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "datum_altitude",
+            "alias": "Datum Altitude",
+            "type": "esriFieldTypeDouble"
+        },
+        {
+            "name": "flow_to_ocean",
+            "alias": "Flow to Ocean",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "downstream_hycos_station",
+            "alias": "Downstream HYCOS station",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "regulation",
+            "alias": "Regulation",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "regulation_start_date",
+            "alias": "Regulation Start Date",
+            "type": "esriFieldTypeDate"
+        },
+        {
+            "name": "regulation_end_date",
+            "alias": "Regulation End Date",
+            "type": "esriFieldTypeDate"
+        },
+        {
+            "name": "land_use_change",
+            "alias": "Land Use Change",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "surface_cover",
+            "alias": "Surface Cover",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "data_quality_ice",
+            "alias": "Data_quality_ice",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "data_quality_open",
+            "alias": "Data_quality_open",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "discharge_availability",
+            "alias": "Discharge Availability",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "water_level_availability",
+            "alias": "Water Level Availability",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "water_temperature_availability",
+            "alias": "Water Temperature Availability",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "ice_on_off_availability",
+            "alias": "Ice On / Off Dates Availability",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "ice_thickness_availability",
+            "alias": "Ice Thickness Availability",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "snow_depth_availability",
+            "alias": "Snow Depth Availability",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "measurement_method_discharge",
+            "alias": "Measurement Method - Discharge",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "measurement_method_water_temperature",
+            "alias": "Measurement Method - Water Temperature (computed vs. observed)",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "measurement_method_ice_on_off",
+            "alias": "Measurement Method - Ice On / Off Dates",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "equipment",
+            "alias": "Equipment",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "station_notes",
+            "alias": "Station Notes (INTERNAL USE ONLY from here on)",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "start_year",
+            "alias": "StartYear",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "end_year",
+            "alias": "EndYear",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "n_years",
+            "alias": "NYears",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "real_time",
+            "alias": "RealTime",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "water_temperature_start_date",
+            "alias": "Water Temp start date",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "water_temperature_end_date",
+            "alias": "Water Temp end date",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "sampling_interval",
+            "alias": "Sampling interval (temporal frequency)",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "script_link_for_archived_data",
+            "alias": "Script-link for Archived data",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "notes_for_archived_data",
+            "alias": "Notes for archived data",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "script_link_for_real_time_data",
+            "alias": "Script-link for Real-time data",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "notes_for_real_time_data",
+            "alias": "Notes for real-time data",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "script_link_for_water_temperature_data",
+            "alias": "Script-link for Water Temp data",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "notes_water_temperature",
+            "alias": "Notes for water temp data",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "notes_ice_on_off",
+            "alias": "Notes for ice on/off dates and thickness",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "name": "notes_snow_depth",
+            "alias": "Notes for snow depth",
+            "type": "esriFieldTypeString"
+        }
+    ],
+    "uniqueIdField": {
+        "isSystemMaintained": true,
+        "name": "hycosid"
+    },
+    "geometryType": "esriGeometryPoint"
+}

@@ -4,7 +4,7 @@ package eu.essi_lab.shared.driver.es.connector;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,7 @@ import java.util.Optional;
 
 import org.json.JSONObject;
 
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.shared.SharedContent.SharedContentType;
 
@@ -36,9 +36,9 @@ import eu.essi_lab.model.shared.SharedContent.SharedContentType;
  */
 public interface IESConnector {
 
-    StorageUri getEsStorageUri();
+    StorageInfo getEsStorageUri();
 
-    void setEsStorageUri(StorageUri esStaorageUri);
+    void setEsStorageUri(StorageInfo esStaorageUri);
 
     boolean testConnection();
 

@@ -1,11 +1,38 @@
 xquery version "1.0-ml";
- 
-let $uri := "/gs-modules/functions-module.xqy"
-let $node := <module><![CDATA[
 
-xquery version "1.0-ml";
 module namespace  gs = "http://flora.eu/gi-suite/1.0/dataModel/schema";
 declare default function namespace "http://www.w3.org/2005/xpath-functions";
+
+
+declare function gs:ewoq($indexName, $value, $weight) as cts:query
+{
+     cts:element-word-query(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema',$indexName),$value,("case-insensitive"),$weight)
+};
+
+declare function gs:andq($query) as cts:query
+{
+     cts:and-query(($query))
+};
+
+declare function gs:orq($query) as cts:query
+{
+     cts:or-query(($query))
+};
+
+declare function gs:notq($query) as cts:query
+{
+     cts:not-query(($query))
+};
+
+declare function gs:erq($indexName, $operator, $value, $weight)  as cts:query
+{
+    cts:element-range-query(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema',$indexName),$operator,$value,("score-function=linear"),$weight)
+};
+ 
+declare function gs:siq($sourceId as xs:string, $suiteId as xs:string) as cts:query
+{
+   gs:sourceId-query($sourceId, $suiteId)
+};
  
 declare function gs:sourceId-query($sourceId as xs:string, $suiteId as xs:string) as cts:query
 {
@@ -62,6 +89,53 @@ declare function gs:sourceId-query($sourceId as xs:string, $suiteId as xs:string
   ),"unfiltered")
   
   :)  
+};
+
+declare function gs:spcncrq($south, $west,$north,$east, 
+$p0, $w0,       
+$p1, $w1,       
+$p2, $w2,       
+$p3, $w3,       
+$p4, $w4,       
+$p5, $w5,       
+$p6, $w6,       
+$p7, $w7,       
+$p8, $w8,       
+$p9, $w9,       
+$p10, $w10,       
+$p11, $w11,       
+$p12, $w12,       
+$p13, $w13,       
+$p14, $w14,       
+$p15, $w15,       
+$p16, $w16,       
+$p17, $w17,       
+$p18, $w18,
+$p19, $w19
+) as cts:query
+{
+    gs:spatial-contains-ncr-query($south, $west,$north,$east, 
+     $p0, $w0,       
+     $p1, $w1,       
+     $p2, $w2,       
+     $p3, $w3,       
+     $p4, $w4,       
+     $p5, $w5,       
+     $p6, $w6,       
+     $p7, $w7,       
+     $p8, $w8,       
+     $p9, $w9,       
+     $p10, $w10,       
+     $p11, $w11,       
+     $p12, $w12,       
+     $p13, $w13,       
+     $p14, $w14,       
+     $p15, $w15,       
+     $p16, $w16,       
+     $p17, $w17,       
+     $p18, $w18,
+     $p19, $w19
+    )
 };
 
 declare function gs:spatial-contains-ncr-query($south, $west,$north,$east, 
@@ -135,6 +209,53 @@ $p19, $w19
   cts:and-query((
   cts:element-range-query(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema','area'),'>=',$p18,("score-function=linear"),$w18),
   cts:element-range-query(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema','area'),'<=',$p19,("score-function=linear"),$w19)))))))
+};
+
+declare function gs:spccrq($south, $west,$north,$east, 
+$p0, $w0,       
+$p1, $w1,       
+$p2, $w2,       
+$p3, $w3,       
+$p4, $w4,       
+$p5, $w5,       
+$p6, $w6,       
+$p7, $w7,       
+$p8, $w8,       
+$p9, $w9,       
+$p10, $w10,       
+$p11, $w11,       
+$p12, $w12,       
+$p13, $w13,       
+$p14, $w14,       
+$p15, $w15,       
+$p16, $w16,       
+$p17, $w17,       
+$p18, $w18,
+$p19, $w19
+) as cts:query
+{
+    gs:spatial-contains-cr-query($south, $west,$north,$east, 
+     $p0, $w0,       
+     $p1, $w1,       
+     $p2, $w2,       
+     $p3, $w3,       
+     $p4, $w4,       
+     $p5, $w5,       
+     $p6, $w6,       
+     $p7, $w7,       
+     $p8, $w8,       
+     $p9, $w9,       
+     $p10, $w10,       
+     $p11, $w11,       
+     $p12, $w12,       
+     $p13, $w13,       
+     $p14, $w14,       
+     $p15, $w15,       
+     $p16, $w16,       
+     $p17, $w17,       
+     $p18, $w18,
+     $p19, $w19
+    )
 };
 
 declare function gs:spatial-contains-cr-query($south, $west,$north,$east, 
@@ -224,6 +345,11 @@ $p19, $w19
   
 };
 
+declare function gs:spiq($south,$west,$north,$east) as cts:query
+{
+    gs:spatial-intersects-query($south,$west,$north,$east)
+};
+
 declare function gs:spatial-intersects-query($south,$west,$north,$east) as cts:query
 {
   cts:or-query((
@@ -264,9 +390,19 @@ declare function gs:spatial-intersects-query($south,$west,$north,$east) as cts:q
 
 };
 
+declare function gs:deq() as cts:query
+{
+    gs:deleted-excluded-query()
+};
+
 declare function gs:deleted-excluded-query() as cts:query
 {
     cts:not-query(cts:element-range-query(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema','isDeleted'),'!=','',("score-function=linear"),0.0))
+};
+
+declare function gs:wq($indexName,$w0,$w1,$w2,$w3,$w4,$w5,$w6,$w7,$w8,$w9) as cts:query
+{
+    gs:weight-query($indexName,$w0,$w1,$w2,$w3,$w4,$w5,$w6,$w7,$w8,$w9)
 };
 
 declare function gs:weight-query($indexName,$w0,$w1,$w2,$w3,$w4,$w5,$w6,$w7,$w8,$w9) as cts:query
@@ -284,6 +420,11 @@ declare function gs:weight-query($indexName,$w0,$w1,$w2,$w3,$w4,$w5,$w6,$w7,$w8,
   cts:element-range-query(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema',$indexName),'=',10,("score-function=linear"),$w9)))
 };
 
+declare function gs:gdcwq() as cts:query
+{
+    gs:gdc-weight-query()
+};
+
 declare function gs:gdc-weight-query() as cts:query
 {
   cts:or-query((
@@ -291,9 +432,19 @@ declare function gs:gdc-weight-query() as cts:query
   cts:element-word-query(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema','isGDC'),'true',("case-insensitive"),25)))
 };
 
+declare function gs:teq($element,$operator,$value) as cts:query
+{
+    gs:temp-extent-query($element,$operator,$value) 
+};
+
 declare function gs:temp-extent-query($element,$operator,$value) as cts:query
 {
    cts:element-range-query(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema',$element),$operator,$value,("score-function=linear"),0.0)
+};
+
+declare function gs:tenq($element)
+{
+    gs:temp-extent-now-query($element)
 };
 
 declare function gs:temp-extent-now-query($element) as cts:query
@@ -364,7 +515,7 @@ declare function gs:BboxUnion($query, $groupBy, $groupByVal, $groupByRange, $gro
 
 declare function gs:temporalExtentUnion($query, $groupBy, $groupByVal, $groupByRange, $groupByRangeTarget, $queryExtent) { 
 
-    <gs:TemporalExtentUnion target='tmpExtent'>  {
+      <gs:TemporalExtentUnion target='tmpExtent'>  {
          
              if (string-length ($groupBy) > 0 or string-length ($groupByRange) > 0) then (
              
@@ -388,9 +539,25 @@ declare function gs:temporalExtentUnion($query, $groupBy, $groupByVal, $groupByR
                    cts:max(cts:element-reference(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', 'DISCOVERY_MESSAGE_tmpExtentEnd')), (),  $innerQuery)                  
                 
                 )else(
-                
-                   cts:min(cts:element-reference(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', 'tmpExtentBegin')), (), $innerQuery),
-                   cts:max(cts:element-reference(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', 'tmpExtentEnd')), (),  $innerQuery)                                 
+                 
+                    let $iso8601DateTime := concat(format-dateTime(current-dateTime() , "[Y0001]-[M01]-[D01]T[h01]:[m01]:[s01]", (), (), ()) ,'Z')
+                    let $endNowQuery := cts:and-query((
+                        $innerQuery,
+                        cts:element-range-query(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema','tmpExtentEnd_Now'), '=','')
+                    ))
+                    
+                    let $exists := xdmp:estimate(cts:search(doc(),$endNowQuery,("unfiltered", "score-simple"),0))
+                  
+                    return if($exists > 0) then (
+                     
+                        cts:min(cts:element-reference(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', 'tmpExtentBegin')), (), $innerQuery),
+                        $iso8601DateTime                                 
+                                    
+                     ) else (
+                    
+                         cts:min(cts:element-reference(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', 'tmpExtentBegin')), (), $innerQuery),
+                         cts:max(cts:element-reference(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', 'tmpExtentEnd')), (),  $innerQuery)                                 
+                    )
                 )
             ) else if ($queryExtent = 'true') then(              
             
@@ -399,11 +566,27 @@ declare function gs:temporalExtentUnion($query, $groupBy, $groupByVal, $groupByR
             
             )else(
             
-                 cts:min(cts:element-reference(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', 'tmpExtentBegin')), (), $query ),
-                 cts:max(cts:element-reference(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', 'tmpExtentEnd')), (), $query )           
-            )
+                  let $iso8601DateTime := concat(format-dateTime(current-dateTime() , "[Y0001]-[M01]-[D01]T[h01]:[m01]:[s01]", (), (), ()) ,'Z')
+                  let $endNowQuery := cts:and-query((
+                        $query,
+                        cts:element-range-query(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema','tmpExtentEnd_Now'), '=','')
+                    ))
+                    
+                    let $exists := xdmp:estimate(cts:search(doc(),$endNowQuery,("unfiltered", "score-simple"),0))
+                  
+                    return if($exists > 0) then (
+                     
+                        cts:min(cts:element-reference(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', 'tmpExtentBegin')), (), $query),
+                        $iso8601DateTime                                 
+                                    
+                     ) else (
+                    
+                         cts:min(cts:element-reference(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', 'tmpExtentBegin')), (), $query),
+                         cts:max(cts:element-reference(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', 'tmpExtentEnd')), (),  $query)                                 
+                    )
+               )
         }     
-     </gs:TemporalExtentUnion> 
+     </gs:TemporalExtentUnion>
 };
 
 declare function gs:countDistinct($query, $target, $groupBy, $groupByVal, $groupByRange, $groupByRangeTarget){
@@ -442,6 +625,113 @@ declare function gs:countDistinct($query, $target, $groupBy, $groupByVal, $group
     </gs:CountDistinct>  
 };
 
+declare function gs:convert-to-dayTime-duration($duration as xs:string) as xs:dayTimeDuration {
+ 
+  if(contains($duration,'D')) then (xs:dayTimeDuration($duration)) else   (
+
+      let $asDuration := xs:yearMonthDuration($duration)
+
+      let $months := months-from-duration($asDuration)
+      let $years := years-from-duration($asDuration)
+
+      let $days := if (contains(string($asDuration), 'Y')) then ($years * 365) else ($months * 30)  
+
+      return xs:dayTimeDuration("P" || $days || "D")
+  )
+};
+
+declare function gs:find-longest-duration($durations as xs:string*) as xs:dayTimeDuration {
+  
+  let $durations-as-durations :=
+    for $duration in $durations        
+    return xs:dayTimeDuration(gs:convert-to-dayTime-duration($duration))
+
+  return fn:max($durations-as-durations)
+};
+
+declare function gs:find-shortest-duration($durations as xs:string*) as xs:dayTimeDuration {
+  
+  let $durations-as-durations :=
+    for $duration in $durations        
+    return xs:dayTimeDuration(gs:convert-to-dayTime-duration($duration))
+
+  return fn:min($durations-as-durations)
+};
+
+declare function gs:minMaxTempExtent($function, $query, $target){
+
+        if($function = 'MAX') then (
+           
+           (: Max END :)
+           if($target = 'tmpExtentEnd') then (
+
+                let $iso8601DateTime := concat(format-dateTime(current-dateTime() , "[Y0001]-[M01]-[D01]T[h01]:[m01]:[s01]", (), (), ()) ,'Z')
+                let $endNowQuery := cts:and-query((
+                    $query,
+                    cts:element-range-query(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema','tmpExtentEnd_Now'), '=','')
+                ))
+
+                let $existsEndNow := xdmp:estimate(cts:search(doc(),$endNowQuery,("unfiltered", "score-simple"),0))
+
+                return if($existsEndNow > 0) then ($iso8601DateTime) else (
+
+                    cts:max(
+                           cts:element-reference(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', 'tmpExtentEnd')), (),
+                           $query)                     
+                )                                      
+          
+           (: Max BEGIN :)
+           ) else (
+                            
+                 let $iso8601DateTime := concat(format-dateTime(current-dateTime() , "[Y0001]-[M01]-[D01]T[h01]:[m01]:[s01]", (), (), ()) ,'Z')
+
+                 let $beforeNowValues := cts:element-values(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema','tmpExtentBeginBeforeNow'), (), (), $query)
+
+                 let $iso8601DateTimeBeforeNow := if(exists($beforeNowValues) ) then (
+
+                     string(xs:dateTime($iso8601DateTime) - xs:dayTimeDuration(gs:find-shortest-duration($beforeNowValues))) 
+
+                 ) else ('missingBeforeNow')
+
+                 let $max := cts:max(
+                        cts:element-reference(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', 'tmpExtentBegin')), (),
+                        $query)
+
+
+                 return if($iso8601DateTimeBeforeNow != 'missingBeforeNow') then ( fn:max(($max, $iso8601DateTimeBeforeNow)) ) else( $max )                                      
+           )
+        
+        ) else (
+        
+            (: Min END :)
+            if($target = 'tmpExtentEnd') then (
+                                                   
+                  cts:min(cts:element-reference(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', 'tmpExtentEnd')), (),$query)                     
+                
+            (: Min BEGIN :)
+            )else(         
+                               
+                 let $iso8601DateTime := concat(format-dateTime(current-dateTime() , "[Y0001]-[M01]-[D01]T[h01]:[m01]:[s01]", (), (), ()) ,'Z') 
+
+                 let $beforeNowValues := cts:element-values(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema','tmpExtentBeginBeforeNow'), (), (), $query)
+
+                 let $iso8601DateTimeBeforeNow := if(exists($beforeNowValues) ) then (
+
+                     string(xs:dateTime($iso8601DateTime) - xs:dayTimeDuration(gs:find-longest-duration($beforeNowValues))) 
+
+                 ) else ('missingBeforeNow')
+
+                 let $min := cts:min(
+                        cts:element-reference(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', 'tmpExtentBegin')), (),
+                        $query)
+
+                 let $nonEmptyMin := if(not(exists($min))) then ($iso8601DateTime) else ($min)  
+
+                 return if($iso8601DateTimeBeforeNow != 'missingBeforeNow') then ( fn:min(($nonEmptyMin, $iso8601DateTimeBeforeNow)) ) else( $min )                                                                                
+            )     
+        )
+}; 
+
 declare function gs:statFunction($function, $query, $target, $groupBy, $groupByVal, $groupByRange, $groupByRangeTarget) {
 
     if($function = 'MAX') then (
@@ -454,7 +744,7 @@ declare function gs:statFunction($function, $query, $target, $groupBy, $groupByV
                          
                          cts:and-query(($query, cts:element-range-query(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', $groupBy), '=', $groupByVal)))
                     
-                    )else(
+                    ) else (
                     
                          cts:and-query((
                               cts:element-range-query(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema',$groupByRangeTarget),'>=',
@@ -463,19 +753,33 @@ declare function gs:statFunction($function, $query, $target, $groupBy, $groupByV
                                 xs:long(tokenize($groupByRange,'#')[2]),("score-function=linear"),0.0),                   
                               $query))                  
                    )
+                                   
+                   return if($target = 'tmpExtentEnd' or $target = 'tmpExtentBegin') then (
+                     
+                         gs:minMaxTempExtent($function, $innerQuery, $target)
+                   
+                   ) else (
                 
-                  return cts:max(
-                       cts:element-reference(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', $target)), (),
-                       $innerQuery
+                         cts:max(
+                          cts:element-reference(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', $target)), (),
+                          $innerQuery
+                      )
                    )
-           
+            
                 ) else (
+                
+                     if($target = 'tmpExtentEnd' or $target = 'tmpExtentBegin') then (
+                     
+                          gs:minMaxTempExtent($function, $query, $target)
+                
+                     )else(      
                
-                   cts:max(
-                         cts:element-reference(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', $target)), (),
-                         $query
-                   )             
-                )
+                         cts:max(
+                              cts:element-reference(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', $target)), (),
+                              $query
+                        )     
+                     )        
+                 )              
              }
         </gs:Max>
     
@@ -498,18 +802,32 @@ declare function gs:statFunction($function, $query, $target, $groupBy, $groupByV
                                 xs:long(tokenize($groupByRange,'#')[2]),("score-function=linear"),0.0),                   
                               $query))                  
                     )
+                    
+                    return if($target = 'tmpExtentEnd' or $target = 'tmpExtentBegin') then (
+                     
+                         gs:minMaxTempExtent($function, $innerQuery, $target)
+                   
+                    )else(
                               
-                   return cts:min(
-                       cts:element-reference(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', $target)), (),
-                       $innerQuery
+                          cts:min(
+                            cts:element-reference(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', $target)), (),
+                            $innerQuery
+                        )                   
                    )
            
                 ) else (
                
-                   cts:min(
-                         cts:element-reference(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', $target)), (),
-                         $query
-                   )             
+                   if($target = 'tmpExtentEnd' or $target = 'tmpExtentBegin') then (
+                     
+                         gs:minMaxTempExtent($function, $query, $target)
+                
+                     )else(      
+               
+                        cts:min(
+                              cts:element-reference(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', $target)), (),
+                              $query
+                        )     
+                     )             
                 )
              }
          </gs:Min>
@@ -764,10 +1082,25 @@ declare function gs:frequency($query, $target, $limit,  $groupBy, $groupByVal, $
      </gs:Frequency>
 };
 
-]]></module>/text()
- 
-return (     
-    xdmp:document-insert($uri, $node, 
-        xdmp:document-get-permissions($uri), 
-        xdmp:document-get-collections($uri))
-)
+declare function gs:tf($indexName, $query, $maxItems)
+{  
+    element{fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', $indexName) }{  
+      
+        let $x := cts:element-values(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema',$indexName),(), 
+            ("fragment-frequency","frequency-order","descending",concat('limit=',$maxItems),"eager"), 
+            $query)
+      
+        for $term in $x 
+        let $f := cts:frequency($term) 
+        where $term != ''
+        return 
+        (
+            <gs:result>
+              <gs:term>{xdmp:url-encode($term)}</gs:term>
+              <gs:decodedTerm>{xdmp:url-decode($term)}</gs:decodedTerm> 
+              <gs:freq>
+                {$f}
+              </gs:freq>
+            </gs:result>
+        )     
+}};

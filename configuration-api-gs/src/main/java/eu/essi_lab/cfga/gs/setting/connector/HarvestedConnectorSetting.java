@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gs.setting.connector;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,17 +22,17 @@ package eu.essi_lab.cfga.gs.setting.connector;
  */
 
 import java.util.Optional;
+import java.util.Properties;
 
 import org.json.JSONObject;
 
-import eu.essi_lab.cfga.option.IntegerOptionBuilder;
-import eu.essi_lab.cfga.option.Option;
+import eu.essi_lab.cfga.setting.KeyValueOptionDecorator;
 import eu.essi_lab.model.BrokeringStrategy;
 
 /**
  * @author Fabrizio
  */
-public abstract class HarvestedConnectorSetting extends ConnectorSetting {
+public abstract class HarvestedConnectorSetting extends ConnectorSetting implements KeyValueOptionDecorator {
 
     /**
      * 
@@ -44,36 +44,29 @@ public abstract class HarvestedConnectorSetting extends ConnectorSetting {
      */
     private static final String PAGE_SIZE_OPTION_KEY = "pageSize";
 
+    /**
+     * 
+     */
+    private static final int DEFAULT_MAX_RECORDS = 0;
+
+    /**
+     * 
+     */
+    private static final int DEFAULT_PAGE_SIZE = 50;
+
+    /**
+     * 
+     */
     public HarvestedConnectorSetting() {
 
 	setName(initSettingName());
 
 	setConfigurableType(initConnectorType());
 
-	{
+	addKeyValueOption();
 
-	    Option<Integer> option = IntegerOptionBuilder.get().//
-		    withLabel("Max records").//
-		    withKey(MAX_RECORDS_OPTION_KEY).//
-		    withDescription("Leave unset to harvest all available source records").//
-		    cannotBeDisabled().//
-		    build();
-
-	    addOption(option);
-	}
-
-	{
-
-	    Option<Integer> option = IntegerOptionBuilder.get().//
-		    withLabel("Page size").//
-		    withKey(PAGE_SIZE_OPTION_KEY).//
-		    withValue(50).//
-		    cannotBeDisabled().//
-		    build();
-
-	    addOption(option);
-	}
-
+	putKeyValue(MAX_RECORDS_OPTION_KEY, String.valueOf(DEFAULT_MAX_RECORDS));
+	putKeyValue(PAGE_SIZE_OPTION_KEY, String.valueOf(getDefaultPageSize()));
     }
 
     /**
@@ -126,18 +119,20 @@ public abstract class HarvestedConnectorSetting extends ConnectorSetting {
     /**
      * @return
      */
-    public int getSelectedPageSize() {
+    public int getPageSize() {
 
-	return getOption(PAGE_SIZE_OPTION_KEY, Integer.class).get().getValue();
+	return getKeyValueOptions().//
+		map(p -> Integer.valueOf(p.getOrDefault(PAGE_SIZE_OPTION_KEY, DEFAULT_PAGE_SIZE).toString())).//
+		orElse(DEFAULT_PAGE_SIZE);
 
     }
 
     /**
      * @param maxRecords
      */
-    public void selectPageSize(int pageSize) {
+    public void setPageSize(int pageSize) {
 
-	getOption(PAGE_SIZE_OPTION_KEY, Integer.class).get().setValue(pageSize);
+	putKeyValue(PAGE_SIZE_OPTION_KEY, String.valueOf(pageSize));
     }
 
     /**
@@ -145,7 +140,11 @@ public abstract class HarvestedConnectorSetting extends ConnectorSetting {
      */
     public Optional<Integer> getMaxRecords() {
 
-	return getOption(MAX_RECORDS_OPTION_KEY, Integer.class).get().getOptionalValue();
+	Integer max = getKeyValueOptions().//
+		map(p -> Integer.valueOf(p.getOrDefault(MAX_RECORDS_OPTION_KEY, DEFAULT_MAX_RECORDS).toString())).//
+		orElse(DEFAULT_MAX_RECORDS);
+
+	return max == 0 ? Optional.empty() : Optional.of(max);
     }
 
     /**
@@ -153,7 +152,7 @@ public abstract class HarvestedConnectorSetting extends ConnectorSetting {
      */
     public void setMaxRecords(int maxRecords) {
 
-	getOption(MAX_RECORDS_OPTION_KEY, Integer.class).get().setValue(maxRecords);
+	putKeyValue(MAX_RECORDS_OPTION_KEY, String.valueOf(maxRecords));
     }
 
     /**
@@ -161,7 +160,23 @@ public abstract class HarvestedConnectorSetting extends ConnectorSetting {
      */
     public boolean isMaxRecordsUnlimited() {
 
-	return !getMaxRecords().isPresent();
+	return getMaxRecords().isEmpty();
+    }
+
+    /**
+     * @return
+     */
+    public boolean preserveIdentifiers() {
+
+	Optional<Properties> keyValueOptions = getKeyValueOptions();
+
+	if (keyValueOptions.isPresent()) {
+	    
+	    return Boolean.valueOf(//
+		    keyValueOptions.get().getProperty("preserveIds", "false"));
+	}
+
+	return false;
     }
 
     /**
@@ -170,6 +185,14 @@ public abstract class HarvestedConnectorSetting extends ConnectorSetting {
     protected BrokeringStrategy getBrokeringStrategy() {
 
 	return BrokeringStrategy.HARVESTED;
+    }
+
+    /**
+     * @return
+     */
+    protected int getDefaultPageSize() {
+
+	return DEFAULT_PAGE_SIZE;
     }
 
 }

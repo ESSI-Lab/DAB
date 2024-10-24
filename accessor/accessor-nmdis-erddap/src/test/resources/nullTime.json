@@ -1,0 +1,43 @@
+{
+  "table": {
+    "columnNames": ["time"],
+    "columnTypes": ["String"],
+    "columnUnits": ["UTC"],
+    "rows": [
+      [null],
+      [null],
+      [null],
+      [null],
+      [null],
+      [null],
+      [null],
+      [null],
+      [null],
+      [null],
+      [null],
+      [null],
+      [null],
+      [null],
+      [null],
+      [null],
+      [null],
+      [null],
+      [null],
+      [null],
+      [null],
+      [null],
+      [null],
+      [null],
+      [null],
+      [null],
+      [null],
+      [null],
+      [null],
+      [null],
+      [null],
+      [null],
+      [null],
+      [null]
+    ]
+  }
+}

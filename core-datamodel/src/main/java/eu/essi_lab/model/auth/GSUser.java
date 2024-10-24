@@ -4,7 +4,7 @@ package eu.essi_lab.model.auth;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,6 +28,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -60,6 +61,11 @@ public class GSUser extends DOMSerializer implements Serializable {
      */
     private static final long serialVersionUID = 396389490559553620L;
 
+    /**
+     * 
+     */
+    public static final String IDENTIFIER_TYPE_ELEMENT_NAME = "identifierType";
+
     @NotNull
     @Email
     @Pattern(regexp = "^(?!.*(\\\\|\\/).*).*")
@@ -76,10 +82,7 @@ public class GSUser extends DOMSerializer implements Serializable {
     @SuppressWarnings("rawtypes")
     @XmlElement(name = "property")
     private List<GSProperty> properties;
-    @XmlElement(name = "encodeIdentifier")
-    private boolean encodeIdentifier;
 
-      
     private static JAXBContext context;
     static {
 	try {
@@ -113,30 +116,25 @@ public class GSUser extends DOMSerializer implements Serializable {
      * 
      */
     public GSUser() {
-	this(null, null);
+
+	this.properties = new ArrayList<>();
     }
 
     /**
-     * @param identifier
+     * @param userIdentifier
+     * @param identifierType
      * @param role
      */
-    public GSUser(String identifier, String role) {
+    public GSUser(String userIdentifier, UserIdentifierType identifierType, String role) {
 
-	this(identifier, role, false);
-    }
-
-    /**
-     * @param identifier
-     * @param role
-     * @param encodeIdentifier
-     */
-    public GSUser(String identifier, String role, boolean encodeIdentifier) {
-
-	this.encodeIdentifier = encodeIdentifier;
 	this.properties = new ArrayList<>();
 
-	setIdentifier(identifier);
+	setIdentifier(userIdentifier);
 	setRole(role);
+
+	getProperties().add(new GSProperty<String>(identifierType.getType(), userIdentifier));
+
+	getProperties().add(new GSProperty<String>(IDENTIFIER_TYPE_ELEMENT_NAME, identifierType.getType()));
     }
 
     @XmlTransient
@@ -145,35 +143,36 @@ public class GSUser extends DOMSerializer implements Serializable {
 	return identifier;
     }
 
-    @XmlTransient
-    public String getEncodedIdentifier() {
-
-	if (encodeIdentifier) {
-
-	    try {
-		return URLEncoder.encode(identifier, "UTF-8");
-	    } catch (UnsupportedEncodingException e) {
-	    }
-	}
-
-	return null;
-    }
-
     /**
-     * @return
+     * @param identifier
      */
-    public boolean encodeIdentifier() {
-
-	return encodeIdentifier;
-    }
-
     public void setIdentifier(String identifier) {
+
 	this.identifier = identifier;
     }
-   
+
+    @XmlTransient
+    public String getUri() {
+
+	return toURI(identifier);
+    }
+
+    @XmlTransient
+    public Optional<UserIdentifierType> getUserIdentifierType() {
+	
+	@SuppressWarnings("unchecked")
+	GSProperty<String> property = getProperty(IDENTIFIER_TYPE_ELEMENT_NAME);
+	if(property != null){
+	    
+	    return UserIdentifierType.fromType(property.getValue().toString());
+	}
+
+	return Optional.empty();
+    }
 
     @XmlTransient
     public String getAuthProvider() {
+
 	return authProvider;
     }
 
@@ -195,7 +194,7 @@ public class GSUser extends DOMSerializer implements Serializable {
     public void setRole(String role) {
 	this.role = role;
     }
-    
+
     /**
      * @return
      */
@@ -215,6 +214,16 @@ public class GSUser extends DOMSerializer implements Serializable {
     @XmlTransient
     public List<GSProperty> getProperties() {
 	return properties;
+    }
+
+    @SuppressWarnings("rawtypes")
+    public GSProperty getProperty(String name) {
+	for (GSProperty property : properties) {
+	    if (property.getName() != null && property.getName().equals(name)) {
+		return property;
+	    }
+	}
+	return null;
     }
 
     @SuppressWarnings("rawtypes")
@@ -259,8 +268,6 @@ public class GSUser extends DOMSerializer implements Serializable {
 	    }
 	} else if (!identifier.equals(other.identifier)) {
 	    return false;
-	} else if (encodeIdentifier != other.encodeIdentifier) {
-	    return false;
 	}
 	return true;
     }
@@ -285,6 +292,20 @@ public class GSUser extends DOMSerializer implements Serializable {
 	return (GSUser) unmarshaller.unmarshal(node);
     }
 
+    /**
+     * @param userIdentifier
+     * @return
+     */
+    public static String toURI(String userIdentifier) {
+
+	try {
+	    userIdentifier = URLEncoder.encode(userIdentifier, "UTF-8");
+	} catch (UnsupportedEncodingException e) {
+	}
+
+	return userIdentifier;
+    }
+
     @Override
     protected Unmarshaller createUnmarshaller() throws JAXBException {
 
@@ -296,7 +317,7 @@ public class GSUser extends DOMSerializer implements Serializable {
 
 	Marshaller marshaller = context.createMarshaller();
 	marshaller.setProperty("jaxb.formatted.output", true);
-	marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new CommonNameSpaceContext());
+	marshaller.setProperty(NameSpace.NAMESPACE_PREFIX_MAPPER_IMPL, new CommonNameSpaceContext());
 	return marshaller;
     }
 

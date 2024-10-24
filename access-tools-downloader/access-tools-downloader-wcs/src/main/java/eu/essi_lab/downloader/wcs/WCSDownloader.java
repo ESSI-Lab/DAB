@@ -4,7 +4,7 @@ package eu.essi_lab.downloader.wcs;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,6 +30,8 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.net.http.HttpHeaders;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -45,11 +47,10 @@ import org.apache.commons.fileupload.MultipartStream;
 import org.apache.commons.fileupload.ParameterParser;
 import org.apache.commons.fileupload.util.FileItemHeadersImpl;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.Header;
 
 import eu.essi_lab.access.DataDownloader;
 import eu.essi_lab.accessor.wcs.WCSConnector;
-import eu.essi_lab.lib.net.utils.Downloader;
+import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.model.exceptions.ErrorInfo;
@@ -422,11 +423,11 @@ public abstract class WCSDownloader extends DataDownloader {
 	    File file;
 	    URL url = getDownloadURL(descriptor);
 	    Downloader downloader = getHttpDownloader();
-	    Optional<SimpleEntry<Header[], InputStream>> ret = downloader.downloadHeadersAndBody(url.toString());
+	    Optional<HttpResponse<InputStream>> ret = downloader.downloadOptionalResponse(url.toString());
 	    if (ret.isPresent()) {
 		// possibly unpack the multipart
-		SimpleEntry<Header[], InputStream> headersAndBody = ret.get();
-		file = unpackFromMultipart(headersAndBody.getKey(), headersAndBody.getValue());
+		HttpResponse<InputStream> headersAndBody = ret.get();
+		file = unpackFromMultipart(headersAndBody.headers(), headersAndBody.body());
 		if (file == null) {
 		    throw GSException.createException( //
 			    getClass(), //
@@ -470,7 +471,7 @@ public abstract class WCSDownloader extends DataDownloader {
      * @param ret
      * @return
      */
-    protected File unpackFromMultipart(Header[] headers, InputStream body) {
+    protected File unpackFromMultipart(HttpHeaders headers, InputStream body) {
 
 	File tmpFile = null;
 	try {
@@ -486,16 +487,27 @@ public abstract class WCSDownloader extends DataDownloader {
 	}
 
 	String multipartBoundary = null;
-	for (Header header : headers) {
-	    if (header.getName().equals("Content-Type")) {
-		String parameter = header.getValue();
-		if (parameter.contains("multipart")) {
-		    ParameterParser parser = new ParameterParser();
-		    Map<String, String> result = parser.parse(parameter, ';');
-		    multipartBoundary = result.get("boundary");
-		}
+
+	Optional<String> cType = headers.firstValue("Content-Type");
+	if (cType.isPresent()) {
+	    String parameter = cType.get();
+	    if (parameter.contains("multipart")) {
+		ParameterParser parser = new ParameterParser();
+		Map<String, String> result = parser.parse(parameter, ';');
+		multipartBoundary = result.get("boundary");
 	    }
 	}
+
+	// for (Header header : headers) {
+	// if (header.getName().equals("Content-Type")) {
+	// String parameter = header.getValue();
+	// if (parameter.contains("multipart")) {
+	// ParameterParser parser = new ParameterParser();
+	// Map<String, String> result = parser.parse(parameter, ';');
+	// multipartBoundary = result.get("boundary");
+	// }
+	// }
+	// }
 
 	if (multipartBoundary == null) {
 	    return tmpFile;

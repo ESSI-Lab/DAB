@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.conf;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,7 +31,7 @@ import eu.essi_lab.cfga.gui.components.ComponentFactory;
 import eu.essi_lab.cfga.gui.components.listener.ButtonChangeListener;
 import eu.essi_lab.cfga.gui.dialog.ConfirmationDialog;
 import eu.essi_lab.cfga.gui.dialog.NotificationDialog;
-import eu.essi_lab.gssrv.starter.GISuiteStarter;
+import eu.essi_lab.gssrv.starter.GIPStarter;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
@@ -46,7 +46,7 @@ class SaveConfirmationDialog extends ConfirmationDialog {
      * 
      */
     public SaveConfirmationDialog(GSConfigurationView view) {
-	
+
 	addToCloseAll();
 
 	this.view = view;
@@ -92,12 +92,27 @@ class SaveConfirmationDialog extends ConfirmationDialog {
 
 	if (!GSConfigurationView.removedSettingList.isEmpty()) {
 
-	    Label label = ComponentFactory.createLabel("Removed settings", 15);
-	    label.getStyle().set("font-weight", "bold");
+	    {
 
-	    verticalLayout.add(label);
+		Label label = ComponentFactory.createLabel("Removed settings", 15);
+		label.getStyle().set("font-weight", "bold");
 
-	    GSConfigurationView.removedSettingList.forEach(s -> verticalLayout.add(ComponentFactory.createLabel(s.getName(), 14)));
+		verticalLayout.add(label);
+
+		GSConfigurationView.removedSettingList.forEach(s -> verticalLayout.add(ComponentFactory.createLabel(s.getName(), 14)));
+	    }
+
+	    {
+		if (!GSConfigurationView.additionalRemovalInfo.isEmpty()) {
+
+		    Label label = ComponentFactory.createLabel("Deselected settings", 15);
+		    label.getStyle().set("font-weight", "bold");
+
+		    verticalLayout.add(label);
+
+		    GSConfigurationView.additionalRemovalInfo.forEach(s -> verticalLayout.add(ComponentFactory.createLabel(s, 14)));
+		}
+	    }
 	}
 
 	if (!GSConfigurationView.newWorkerSettingList.isEmpty()) {
@@ -117,8 +132,7 @@ class SaveConfirmationDialog extends ConfirmationDialog {
 
 	    verticalLayout.add(label);
 
-	    GSConfigurationView.pausedWorkerSettingList
-		    .forEach(s -> verticalLayout.add(ComponentFactory.createLabel(s.getName(), 14)));
+	    GSConfigurationView.pausedWorkerSettingList.forEach(s -> verticalLayout.add(ComponentFactory.createLabel(s.getName(), 14)));
 	}
 
 	if (!GSConfigurationView.rescheduledWorkerSettingList.isEmpty()) {
@@ -156,11 +170,11 @@ class SaveConfirmationDialog extends ConfirmationDialog {
      */
     private void onConfigurationFlushConfirmed() {
 
-//	if (!LockManager.getInstance().isAcquired()) {
-//
-//	    NotificationDialog.getWarningDialog("Save permission not available").open();
-//	    return;
-//	}
+	// if (!LockManager.getInstance().isAcquired()) {
+	//
+	// NotificationDialog.getWarningDialog("Save permission not available").open();
+	// return;
+	// }
 
 	try {
 
@@ -171,7 +185,7 @@ class SaveConfirmationDialog extends ConfirmationDialog {
 	    // this node, the changes are already available without waiting for the autoreload
 	    // useful for testing purpose
 	    //
-	    GISuiteStarter.configuration.reload();
+	    GIPStarter.configuration.reload();
 
 	    view.updateScheduler();
 

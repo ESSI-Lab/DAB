@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gs.task;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -43,14 +43,14 @@ public class CustomTaskStarter extends TaskStarter {
     /**
      * 
      */
-    private String customTaskName;
+    private String settingId;
 
     @Override
     public void onClick(GridContextMenuItemClickEvent<HashMap<String, String>> event) {
 
 	Optional<HashMap<String, String>> item = event.getItem();
 
-	customTaskName = item.get().get("Name");
+	settingId = item.get().get("Id");
 
 	super.onClick(event);
     }
@@ -66,7 +66,7 @@ public class CustomTaskStarter extends TaskStarter {
 
 	CustomTaskSetting setting = ConfigurationWrapper.getCustomTaskSettings().//
 		stream().//
-		filter(s -> s.getTaskName().equals(customTaskName)).//
+		filter(s -> s.getIdentifier().equals(settingId)).//
 		findFirst().//
 		get();
 
@@ -83,12 +83,18 @@ public class CustomTaskStarter extends TaskStarter {
     protected String getTextAreaText(GridContextMenuItemClickEvent<HashMap<String, String>> event) {
 
 	final StringBuilder builder = new StringBuilder();
-	builder.append("- Selected task: " + customTaskName + "\n\n");
+	builder.append("- Selected task name: " + event.getItem().get().get("Name") + "\n\n");
+	String description = event.getItem().get().get("Description");
+	if (description != null && !description.isEmpty()) {
+
+	    builder.append("- Selected task decription: " + event.getItem().get().get("Description") + "\n\n");
+	}
+
 	builder.append("- Click \"Start\"  to execute now and once the selected task");
 
 	Optional<EmailSetting> optEmailSetting = ConfigurationWrapper.getSystemSettings().getEmailSetting();
 
-	CustomTaskSetting setting = (CustomTaskSetting) getSetting();
+	CustomTaskSetting setting = getSetting();
 
 	List<String> recipients = setting.getEmailRecipients();
 

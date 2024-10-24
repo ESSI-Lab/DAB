@@ -5,7 +5,7 @@
         "version": "1.0.0",
         "title": "GI-project discovery interfaces test page"
     },
-    "basePath": "/gs-service/services/essi",
+    "basePath": "/gs-service/services/essi/view/api-demo",
     "tags": [
         {
             "name": "oaipmh",

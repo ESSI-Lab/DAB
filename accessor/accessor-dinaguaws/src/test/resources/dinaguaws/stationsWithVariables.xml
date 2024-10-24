@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Estaciones>
+   <Estacion>
+      <Idestacion>0000000010</Idestacion>
+      <Descripcion>Villa Soriano</Descripcion>
+      <Latitud>-33.390555</Latitud>
+      <Longitud>-58.318055</Longitud>
+      <FechaInicio>1940-01-01 00:00:00.0</FechaInicio>
+      <FechaFin>2015-10-31 17:00:00.0</FechaFin>
+   </Estacion>
+   <Estacion>
+      <Idestacion>0000000010</Idestacion>
+      <Descripcion>Villa Soriano</Descripcion>
+      <Latitud>-33.390555</Latitud>
+      <Longitud>-58.318055</Longitud>
+      <FechaInicio>1940-01-01 00:00:00.0</FechaInicio>
+      <FechaFin>2015-10-31 17:00:00.0</FechaFin>
+      <Variables>
+         <Variable>
+            <Nombre>Nivel</Nombre>
+            <Codigo>1</Codigo>
+            <TipoDato>continuo</TipoDato>
+            <Unidad>metros</Unidad>
+            <Periodo>300</Periodo>
+         </Variable>
+      </Variables>
+   </Estacion>   
+</Estaciones>
+

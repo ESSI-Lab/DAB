@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gs;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,6 +22,7 @@ package eu.essi_lab.cfga.gs;
  */
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -77,8 +78,6 @@ public abstract class TaskStarter implements ContextMenuItem, ButtonChangeListen
 	dialog.getConfirmButton().getStyle().set("background-color", "white");
 
 	SchedulerWorkerSetting setting = getSetting();
-
-	setting.setIdentifier(UUID.randomUUID().toString());
 
 	setting.getScheduling().setEnabled(true);
 	setting.getScheduling().setRunOnce();
@@ -224,7 +223,12 @@ public abstract class TaskStarter implements ContextMenuItem, ButtonChangeListen
 	builder.append("- Start time: " + status.getStartTime().get() + "\n");
 	builder.append("- End time: " + status.getEndTime().orElse(ISO8601DateTimeUtils.getISO8601DateTime()) + "\n\n");
 
-	status.getMessagesList(false).forEach(m -> builder.append(m + "\n"));
+	List<String> messagesList = status.getMessagesList(false);
+
+	messagesList.forEach(m -> {
+
+	    builder.append(m + "\n");
+	});
 
 	return builder.toString();
     }
@@ -234,20 +238,19 @@ public abstract class TaskStarter implements ContextMenuItem, ButtonChangeListen
      */
     protected void updateText(final String text) {
 
-	try {
+	session.access(() -> {
 
-	    session.access(() -> {
-
-		Optional<UI> ui = textArea.getUI();
-
+	    Optional<UI> ui = textArea.getUI();
+	    try {
 		if (ui.isPresent()) {
 
 		    textArea.setValue(textArea.getValue() + "\n" + text);
 		    ui.get().push();
 		} // otherwise the dialog is closed
-	    });
-	} catch (com.vaadin.flow.component.UIDetachedException ex) {
-	    // the tab is closed
-	}
+	    } catch (com.vaadin.flow.component.UIDetachedException ex) {
+		// the tab is closed
+	    }
+	});
+
     }
 }

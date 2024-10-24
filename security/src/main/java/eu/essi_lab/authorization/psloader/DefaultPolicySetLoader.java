@@ -7,7 +7,7 @@ package eu.essi_lab.authorization.psloader;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -38,15 +38,40 @@ import eu.essi_lab.lib.utils.StreamUtils;
  */
 public class DefaultPolicySetLoader implements PolicySetLoader {
 
+    private PolicySetWrapper ppsToSet;
+
     @Override
     public List<PolicySetWrapper> loadRolePolicySets() {
-	
+
 	return StreamUtils.iteratorToStream(ServiceLoader.load(AbstractRolePolicySet.class).iterator()).collect(Collectors.toList());
     }
 
     @Override
     public List<PolicySetWrapper> loadPermissionPolicySets() {
 
-	return StreamUtils.iteratorToStream(ServiceLoader.load(AbstractPermissionPolicySet.class).iterator()).collect(Collectors.toList());
+	List<PolicySetWrapper> out = StreamUtils
+		.iteratorToStream(//
+			ServiceLoader.load(AbstractPermissionPolicySet.class).iterator())
+		.//
+		collect(Collectors.toList());
+
+	if (ppsToSet != null) {
+
+	    PolicySetWrapper policySet = out.stream().//
+		    filter(pps -> pps.getPolicySet().getPolicySetId().equals(ppsToSet.getPolicySet().getPolicySetId())).//
+		    findFirst().//
+		    get();
+
+	    out.remove(policySet);
+	    out.add(ppsToSet);
+	}
+
+	return out;
+    }
+
+    @Override
+    public void setPermissionPolicySet(PolicySetWrapper pps) {
+
+	this.ppsToSet = pps;
     }
 }

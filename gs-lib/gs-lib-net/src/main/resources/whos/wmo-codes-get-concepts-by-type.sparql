@@ -14,8 +14,25 @@
 	    prefix org: <http://www.w3.org/ns/org#>
 
 	    select ?a ?label ?description
-	    where {
-	      ?a reg:register <${TYPE}>.  
+	    where {	  
+		  {
+		  ?a reg:register <http://codes.wmo.int/wmdr/ObservedVariableEarth>
+		  }union
+		  {
+		  ?a reg:register <http://codes.wmo.int/wmdr/ObservedVariableOcean>
+		  }union
+		  {
+		  ?a reg:register <http://codes.wmo.int/wmdr/ObservedVariableOuterSpace>
+		  }union
+		  {
+		  ?a reg:register <http://codes.wmo.int/wmdr/ObservedVariableTerrestrial>
+		  }union
+		  {
+		  ?a reg:register <http://codes.wmo.int/wmdr/ObservedVariableAtmosphere>
+		  }union
+		  {
+		  ?a reg:register <http://codes.wmo.int/wmdr/ObservedVariableEarth>
+		  }
 	      ?a version:currentVersion ?cv.
 	      ?cv rdfs:label ?label.
 	      ?cv dct:description ?description.

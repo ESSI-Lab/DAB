@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.health.db;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,40 +28,32 @@ import java.util.Optional;
 import org.w3c.dom.Node;
 
 import eu.essi_lab.api.database.Database;
-import eu.essi_lab.api.database.DatabaseProvider;
+import eu.essi_lab.api.database.DatabaseFinder;
+import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.internal.Folder;
+import eu.essi_lab.api.database.GetViewIdentifiersRequest;
+import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.count.DiscoveryCountResponse;
-import eu.essi_lab.messages.count.SemanticCountResponse;
-import eu.essi_lab.messages.sem.SemanticMessage;
-import eu.essi_lab.messages.sem.SemanticResponse;
-import eu.essi_lab.messages.stats.StatisticsMessage;
-import eu.essi_lab.messages.stats.StatisticsResponse;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.ontology.GSKnowledgeResourceDescription;
-import eu.essi_lab.model.ontology.GSKnowledgeScheme;
 import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.GSResource;
 
 /**
  * @author Fabrizio
  */
-public class HCDatabaseReader implements DatabaseReader, DatabaseProvider {
+public class HCDatabaseReader implements DatabaseReader, DatabaseFinder, Database {
 
-    private static final String HC_DB_ID = "HC_DB_ID";
     private static final String BAD_HEALTH_CHECK_MESSAGE = "BAD_HEALTH_CHECK_MESSAGE";
 
     @Override
-    public String initialize(StorageUri dbUri, String suiteIdentifier) throws GSException {
-
-	return HC_DB_ID;
+    public void initialize(StorageInfo dbUri) throws GSException {
     }
 
     @Override
@@ -134,12 +126,7 @@ public class HCDatabaseReader implements DatabaseReader, DatabaseProvider {
     }
 
     @Override
-    public List<String> getViewIdentifiers(int start, int count) throws GSException {
-	return null;
-    }
-
-    @Override
-    public List<String> getViewIdentifiers(int start, int count, String creator) throws GSException {
+    public List<String> getViewIdentifiers(GetViewIdentifiersRequest request) throws GSException {
 	return null;
     }
 
@@ -164,45 +151,29 @@ public class HCDatabaseReader implements DatabaseReader, DatabaseProvider {
     }
 
     @Override
-    public SemanticCountResponse count(SemanticMessage message) throws GSException {
-	return null;
-    }
-
-    @Override
-    public StatisticsResponse compute(StatisticsMessage message) throws GSException {
-	return null;
-    }
-
-    @Override
-    public SemanticResponse<GSKnowledgeResourceDescription> execute(SemanticMessage message) throws GSException {
-	return null;
-    }
-
-    @Override
-    public Optional<GSKnowledgeResourceDescription> getKnowlegdeResource(GSKnowledgeScheme scheme, String subjectId) throws GSException {
-	return Optional.empty();
-    }
-
-    @SuppressWarnings("rawtypes")
-    @Override
     public void setDatabase(Database dataBase) {
 
     }
 
     @Override
-    public boolean supports(StorageUri dbUri) {
-	return dbUri instanceof HCDBStorageURI;
+    public boolean supports(StorageInfo dbInfo) {
+	return dbInfo instanceof HCStorageInfo;
     }
 
     @Override
-    public StorageUri getStorageUri() {
+    public StorageInfo getStorageInfo() {
 	return null;
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
     public Database getDatabase() {
 	return new HCDataBase();
+    }
+
+    @Override
+    public Optional<DatabaseFolder> getFolder(String folderName, boolean createIfNotExist) throws GSException {
+
+	return Optional.empty();
     }
 
     @Override
@@ -211,8 +182,25 @@ public class HCDatabaseReader implements DatabaseReader, DatabaseProvider {
     }
 
     @Override
-    public Optional<Folder> getFolder(String folderName, boolean createIfNotExist) throws GSException {
+    public void configure(DatabaseSetting setting) {
 
-	return Optional.empty();
+    }
+
+    @Override
+    public DatabaseSetting getSetting() {
+
+	return null;
+    }
+
+    @Override
+    public String getType() {
+
+	return null;
+    }
+
+    @Override
+    public String getIdentifier() {
+
+	return null;
     }
 }

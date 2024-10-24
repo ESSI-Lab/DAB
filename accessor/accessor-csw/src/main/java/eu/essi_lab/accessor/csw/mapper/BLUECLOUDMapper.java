@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.csw.mapper;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,13 +26,16 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.w3c.dom.Node;
 
+import eu.essi_lab.iso.datamodel.ISOMetadata;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
 import eu.essi_lab.iso.datamodel.classes.MDMetadata;
 import eu.essi_lab.iso.datamodel.classes.MIMetadata;
+import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.utils.ComparableEntry;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -46,6 +49,8 @@ import eu.essi_lab.model.resource.ExtensionHandler;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.OriginalMetadata;
 import eu.essi_lab.ommdk.FileIdentifierMapper;
+import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;
+import net.opengis.iso19139.gmd.v_20060504.CIResponsiblePartyType;
 
 /**
  * Mapper from SeaDataNet CDI data model
@@ -108,6 +113,7 @@ public class BLUECLOUDMapper extends FileIdentifierMapper {
 		}
 
 	    }
+
 	    // INSTRUMENT IDENTIFIERS
 	    // Set<ComparableEntry<String, String>> instruments = new HashSet<>();
 	    // Node[] instrumentNodes = reader.evaluateNodes("//*:SDN_DeviceCategoryCode");
@@ -167,6 +173,45 @@ public class BLUECLOUDMapper extends FileIdentifierMapper {
 		description.setAttributeTitle(parameter.getValue());
 		miMetadata.addCoverageDescription(description);
 	    }
+
+	    Iterator<ResponsibleParty> dataIdentificarionContacts = miMetadata.getDataIdentification().getPointOfContacts();
+	    while (dataIdentificarionContacts.hasNext()) {
+		ResponsibleParty r = dataIdentificarionContacts.next();
+		CIResponsiblePartyType type = r.getElementType();
+		String uuid = type.getUuid();
+		// Contact contact = r.getContact();
+		dataset.getExtensionHandler().addOriginatorOrganisationDescription(r.getOrganisationName());
+		if (uuid != null) {
+		    CharacterStringPropertyType value = ISOMetadata.createAnchorPropertyType(uuid, r.getOrganisationName());
+		    r.getElementType().setOrganisationName(value);
+		    dataset.getExtensionHandler().addOriginatorOrganisationIdentifier(uuid);
+		} else {
+		    CharacterStringPropertyType value = ISOMetadata.createAnchorPropertyType(null, r.getOrganisationName());
+		    r.getElementType().setOrganisationName(value);
+		}
+	    }
+
+	    Iterator<ResponsibleParty> contacts = miMetadata.getContacts();
+	    while (contacts.hasNext()) {
+		ResponsibleParty r = contacts.next();
+		CIResponsiblePartyType type = r.getElementType();
+		if (type != null) {
+		    String uuid = type.getUuid();
+		    // Contact contact = r.getContact();
+		    dataset.getExtensionHandler().addOriginatorOrganisationDescription(r.getOrganisationName());
+		    if (uuid != null) {
+			CharacterStringPropertyType value = ISOMetadata.createAnchorPropertyType(uuid, r.getOrganisationName());
+			r.getElementType().setOrganisationName(value);
+			dataset.getExtensionHandler().addOriginatorOrganisationIdentifier(uuid);
+		    } else {
+			CharacterStringPropertyType value = ISOMetadata.createAnchorPropertyType(null, r.getOrganisationName());
+			r.getElementType().setOrganisationName(value);
+		    }
+		} else {
+		    dataset.getExtensionHandler().addOriginatorOrganisationDescription(r.getOrganisationName());
+		}
+	    }
+
 	    // INSTRUMENT IDENTIFIERS
 	    // for (SimpleEntry<String, String> instrument : instruments) {
 	    // MIInstrument myInstrument = new MIInstrument();

@@ -7,7 +7,7 @@ package eu.essi_lab.authorization;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -43,7 +43,6 @@ import eu.essi_lab.authorization.authzforce.ext.IdListPolicyProvider;
 import eu.essi_lab.authorization.psloader.PolicySetLoader;
 import eu.essi_lab.authorization.xacml.XACML_JAXBUtils;
 import eu.essi_lab.jaxb.common.ObjectFactories;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
 import oasis.names.tc.xacml._3_0.core.schema.wd_17.IdReferenceType;
 import oasis.names.tc.xacml._3_0.core.schema.wd_17.PolicySet;
 
@@ -68,14 +67,14 @@ public class PdpEngineBuilder {
 	rpsList = new ArrayList<PolicySet>();
 	ppsList = new ArrayList<PolicySet>();
     }
-    
+
     /**
      * Adds all the policies loaded by the given <code>loader</code>
      * 
      * @param loader
      */
     public void addPolicies(PolicySetLoader loader) {
-	
+
 	List<PolicySetWrapper> rps = loader.loadRolePolicySets();
 	List<PolicySetWrapper> pps = loader.loadPermissionPolicySets();
 
@@ -107,7 +106,7 @@ public class PdpEngineBuilder {
      */
     public CloseablePdpEngine build() throws Exception {
 
-//	GSLoggerFactory.getLogger(getClass()).debug("Engine building STARTED");
+	// GSLoggerFactory.getLogger(getClass()).debug("Engine building STARTED");
 
 	//
 	// 1 ---
@@ -123,7 +122,7 @@ public class PdpEngineBuilder {
 
 	BasePdpEngine engine = new BasePdpEngine(pdpEngineConf);
 
-//	GSLoggerFactory.getLogger(getClass()).debug("Engine building ENDED");
+	// GSLoggerFactory.getLogger(getClass()).debug("Engine building ENDED");
 
 	return engine;
     }

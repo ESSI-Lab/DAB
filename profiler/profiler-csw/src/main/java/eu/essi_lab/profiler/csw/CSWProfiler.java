@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.csw;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -46,7 +46,6 @@ import eu.essi_lab.jaxb.csw._2_0_2.ResultType;
 import eu.essi_lab.jaxb.ows._1_0_0.ExceptionReport;
 import eu.essi_lab.jaxb.ows._1_0_0.ExceptionType;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.ValidationMessage;
@@ -112,28 +111,6 @@ public class CSWProfiler extends Profiler {
 
     private DiscoveryHandler<Element> discoveryHandler;
 
-    /**
-     * @param webRequest
-     * @return
-     * @throws Exception
-     */
-    public static GetRecords getGetRecord(WebRequest webRequest) throws Exception {
-
-	if (webRequest.isPostRequest()) {
-
-	    XMLDocumentReader reader = new XMLDocumentReader(webRequest.getBodyStream().clone());
-	    reader.setNamespaceContext(new CommonNameSpaceContext());
-
-	    if (reader.evaluateBoolean("exists(//csw:GetRecords)")) {
-
-		GetRecords getRecords = CommonContext.unmarshal(webRequest.getBodyStream().clone(), GetRecords.class);
-		return getRecords;
-	    }
-	}
-
-	return null;
-    }
-
     @Override
     public HandlerSelector getSelector(WebRequest request) {
 
@@ -143,20 +120,39 @@ public class CSWProfiler extends Profiler {
 	discoveryHandler.setRequestTransformer(new CSWRequestTransformer());
 	discoveryHandler.setMessageResponseFormatter(new CSWResultSetFormatter());
 
-	CSWRequestFilter filter = new CSWRequestFilter();
-	filter.addQueryCondition("GetRecordById", InspectionStrategy.IGNORE_CASE_LIKE_MATCH);
-	filter.addResultTypeCondition(ResultType.RESULTS);
-	filter.addResultTypeCondition(ResultType.HITS);
+	//
+	// GetRecord (GET and POST) and GetRecordById (GET)
+	//
 
-	selector.register(filter, discoveryHandler);
+	CSWRequestFilter getRecordFilter = new CSWRequestFilter();
+
+	getRecordFilter.addQueryCondition("GetRecord", InspectionStrategy.IGNORE_CASE_LIKE_MATCH);
+	getRecordFilter.addQueryCondition("GetRecordById", InspectionStrategy.IGNORE_CASE_LIKE_MATCH);
+
+	getRecordFilter.addResultTypeCondition(ResultType.RESULTS);
+	getRecordFilter.addResultTypeCondition(ResultType.HITS);
+
+	selector.register(getRecordFilter, discoveryHandler);
+
+	//
+	// DescribeRecord
+	//
 
 	selector.register(//
 		new CSWRequestFilter("DescribeRecord", InspectionStrategy.IGNORE_CASE_LIKE_MATCH), //
 		new CSWDescribeRecordHandler());
 
+	//
+	// GetCapabilities
+	//
+
 	selector.register(//
 		new CSWRequestFilter("GetCapabilities", InspectionStrategy.IGNORE_CASE_LIKE_MATCH), //
 		new CSWGetCapabilitiesHandler());
+
+	//
+	// Validate
+	//
 
 	selector.register(//
 		new CSWRequestFilter(ResultType.VALIDATE), //
@@ -206,7 +202,7 @@ public class CSWProfiler extends Profiler {
 
 	try {
 
-	    GetRecords getRecords = getGetRecord(webRequest);
+	    GetRecords getRecords = CSWRequestUtils.getGetRecordFromPOST(webRequest);
 
 	    // --------------------------------------------------------------------------
 	    //
@@ -224,7 +220,7 @@ public class CSWProfiler extends Profiler {
 	    if (getRecords == null) {
 		if (webRequest.isGetRequest()) {
 
-		    KeyValueParser parser = new KeyValueParser(webRequest.getQueryString());
+		    KeyValueParser parser = new KeyValueParser(webRequest.getURLDecodedQueryString());
 		    outputSchema = parser.getValue("outputSchema", true);
 		    String set = parser.getValue("ElementSetName", true);
 		    if (set != null) {
@@ -234,7 +230,10 @@ public class CSWProfiler extends Profiler {
 
 		    GetRecordById grBydId = CommonContext.unmarshal(webRequest.getBodyStream().clone(), GetRecordById.class);
 		    outputSchema = grBydId.getOutputSchema();
-		    setType = grBydId.getElementSetName().getValue();
+		    ElementSetName elementSetName = grBydId.getElementSetName();
+		    if (elementSetName != null) {
+			setType = elementSetName.getValue();
+		    }
 		}
 
 		if (setType == null) {
@@ -319,7 +318,7 @@ public class CSWProfiler extends Profiler {
     @Override
     protected Response onHandlerNotFound(WebRequest request) {
 
-	KeyValueParser parser = new KeyValueParser(request.getQueryString());
+	KeyValueParser parser = new KeyValueParser(request.getURLDecodedQueryString());
 	String req = parser.getValue("request", true);
 	ValidationMessage message = new ValidationMessage();
 

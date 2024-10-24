@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wps;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,6 +22,7 @@ package eu.essi_lab.accessor.wps;
  */
 
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.concurrent.Callable;
@@ -32,7 +33,8 @@ import org.w3c.dom.Node;
 import eu.essi_lab.access.DataDownloader;
 import eu.essi_lab.access.DataDownloaderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.lib.net.utils.Downloader;
+import eu.essi_lab.lib.net.downloader.Downloader;
+import eu.essi_lab.lib.net.utils.HttpConnectionUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.TaskListExecutor;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
@@ -68,6 +70,21 @@ public class GWPSBulkDownloadRequestTransformer extends WebRequestTransformer<Bu
      * 
      */
     private static final String GWPS_BULK_DOWNLOAD_EXECUTOR_REFINE_MESSAGE_ERROR = "GWPS_BULK_DOWNLOAD_EXECUTOR_REFINE_MESSAGE_ERROR";
+
+    /**
+     * @param url
+     * @return
+     */
+    private boolean canConnect(String url) {
+
+	try {
+	    return HttpConnectionUtils.checkConnectivity(url);
+	} catch (URISyntaxException e) {
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	}
+
+	return false;
+    }
 
     @Override
     public ValidationMessage validate(WebRequest request) throws GSException {
@@ -158,20 +175,22 @@ public class GWPSBulkDownloadRequestTransformer extends WebRequestTransformer<Bu
 				}
 			    }
 
+			 // worldcereal download
+			} else if(linkage.contains("worldcereal/query")){		    
+				return ret;
 			} else {
 			    // direct download
 
-			    Downloader d = new Downloader();
-
+			    Downloader d = new Downloader();			    
 			    if (linkage.contains("?")) {
 				String base = linkage.substring(0, linkage.indexOf('?') + 1);
-				boolean result = d.checkConnectivity(base);
+				boolean result = canConnect(base);
 				if (result) {
 				    return ret;
 				}
 			    }
 
-			    boolean result = d.checkConnectivity(linkage);
+			    boolean result = canConnect(linkage);
 			    if (!result) {
 				ValidationException exception = new ValidationException();
 				exception.setMessage("Unable to download resource: " + title);

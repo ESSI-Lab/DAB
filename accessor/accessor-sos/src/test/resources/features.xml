@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sos:GetFeatureOfInterestResponse
+    xsi:schemaLocation="http://www.opengis.net/sos/2.0 http://schemas.opengis.net/sos/2.0/sos.xsd http://www.opengis.net/samplingSpatial/2.0 http://schemas.opengis.net/samplingSpatial/2.0/spatialSamplingFeature.xsd http://www.opengis.net/waterml/2.0 http://schemas.opengis.net/waterml/2.0/waterml2.xsd"
+    xmlns:sos="http://www.opengis.net/sos/2.0" xmlns:gml="http://www.opengis.net/gml/3.2"
+    xmlns:fes="http://www.opengis.net/fes/2.0" xmlns:swe="http://www.opengis.net/swe/2.0"
+    xmlns:swes="http://www.opengis.net/swes/2.0"
+    xmlns:sams="http://www.opengis.net/samplingSpatial/2.0"
+    xmlns:sf="http://www.opengis.net/sampling/2.0" xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:wml2="http://www.opengis.net/waterml/2.0">
+    <sos:featureMember>
+        <wml2:MonitoringPoint gml:id="Ki.FM.0">
+            <gml:identifier codeSpace="http://www.opengis.net/def/nil/OGC/0/unknown"
+                >http://bom.gov.au/waterdata/services/stations/144005A</gml:identifier>
+            <gml:name>18 Mile Swamp HorseX</gml:name>
+            <sf:type
+                xlink:href="http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint"/>
+            <sf:sampledFeature xsi:nil="true"/>
+            <sams:shape>
+                <gml:Point gml:id="Ki.P.0">
+                    <gml:pos srsName="http://www.opengis.net/def/crs/EPSG/0/4326">-27.49561971
+                        153.50836409</gml:pos>
+                </gml:Point>
+            </sams:shape>
+        </wml2:MonitoringPoint>
+    </sos:featureMember>
+    <sos:featureMember>
+        <wml2:MonitoringPoint gml:id="Ki.FM.1">
+            <gml:identifier codeSpace="http://www.opengis.net/def/nil/OGC/0/unknown"
+                >http://bom.gov.au/waterdata/services/stations/912109A</gml:identifier>
+            <gml:name>5 Mile Hut</gml:name>
+            <sf:type
+                xlink:href="http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint"/>
+            <sf:sampledFeature xsi:nil="true"/>
+            <sams:shape>
+                <gml:Point gml:id="Ki.P.1">
+                    <gml:pos srsName="http://www.opengis.net/def/crs/EPSG/0/4326">-17.799611109999
+                        139.35955556</gml:pos>
+                </gml:Point>
+            </sams:shape>
+        </wml2:MonitoringPoint>
+    </sos:featureMember>
+</sos:GetFeatureOfInterestResponse>

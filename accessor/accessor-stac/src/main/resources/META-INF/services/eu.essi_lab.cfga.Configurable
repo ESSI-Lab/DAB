@@ -1,0 +1,4 @@
+eu.essi_lab.accessor.stac.distributed.STACMixedDistributedAccessor
+eu.essi_lab.accessor.stac.distributed.STACDEAGranulesConnector
+eu.essi_lab.accessor.stac.harvested.STACMixedHarvestedAccessor
+eu.essi_lab.accessor.stac.harvested.STACConnectorWrapper

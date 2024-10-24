@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof.discovery.series;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,29 +21,36 @@ package eu.essi_lab.accessor.wof.discovery.series;
  * #L%
  */
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import eu.essi_lab.accessor.wof.WOFRequest;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
+import eu.essi_lab.messages.RequestMessage.IterationMode;
 import eu.essi_lab.messages.ResourceSelector;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.ValidationMessage;
-import eu.essi_lab.messages.RequestMessage.IterationMode;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.SpatialBond;
+import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
+import eu.essi_lab.pdk.handler.selector.WebRequestFilter;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
+import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 
 /**
  * HIS Central request transformer
@@ -65,9 +72,9 @@ public class GetSeriesCatalogForBoxTransformer extends DiscoveryRequestTransform
 
     @Override
     public DiscoveryMessage transform(WebRequest request) throws GSException {
-	
+
 	DiscoveryMessage message = super.transform(request);
-	    message.setIteratedWorkflow(IterationMode.FULL_RESPONSE);
+	message.setIteratedWorkflow(IterationMode.FULL_RESPONSE);
 
 	return message;
     }
@@ -79,7 +86,7 @@ public class GetSeriesCatalogForBoxTransformer extends DiscoveryRequestTransform
 	selector.setSubset(ResourceSubset.CORE_EXTENDED);
 	selector.setIndexesPolicy(IndexesPolicy.NONE);
 	selector.setIncludeOriginal(false);
-	
+
 	return selector;
     }
 
@@ -129,8 +136,22 @@ public class GetSeriesCatalogForBoxTransformer extends DiscoveryRequestTransform
 	    }
 
 	    Optional<SimpleValueBond> keywordBond = request.getKeywordBond();
-	    if (keywordBond.isPresent()) {
-		operands.add(keywordBond.get());
+	    if (keywordBond.isPresent()) 
+	    {
+		String viewCreator = null;
+		Optional<String> viewId = webRequest.extractViewId();
+		if (viewId.isPresent()) {		    
+		    StorageInfo storageUri = ConfigurationWrapper.getDatabaseURI();
+		    Optional<View> view = WebRequestTransformer.findView(storageUri , viewId.get());
+		    if (view.isPresent()) {
+			viewCreator = view.get().getCreator();			
+		    }
+		}
+		List<SimpleValueBond> keywords = getKeywords(viewCreator, keywordBond.get());
+		for (SimpleValueBond keyword : keywords) {
+		    operands.add(keyword);
+		}
+
 	    }
 
 	    Optional<Bond> sourcesBond = request.getSourcesBond();
@@ -153,6 +174,12 @@ public class GetSeriesCatalogForBoxTransformer extends DiscoveryRequestTransform
 
 	}
 
+    }
+
+    public List<SimpleValueBond> getKeywords(String viewCreator, SimpleValueBond simpleValueBond) {
+	List<SimpleValueBond> ret = new ArrayList<>();
+	ret.add(simpleValueBond);
+	return ret;
     }
 
     private GSException getGSException(Exception e, String message) {

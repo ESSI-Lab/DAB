@@ -73,15 +73,9 @@
 		<dependency>
 			<groupId>org.jvnet.ogc</groupId>
 			<artifactId>wfs-v_1_1_0</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-impl</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-core</artifactId>
-		</dependency>
+		</dependency>		
+		
+	
 		<!-- here only the authzforce-ce-xacml-model is required but it has different version 
 			 so we make it easier
 		-->

@@ -1,1 +1,2 @@
 eu.essi_lab.accessor.waf.onamet_stations.ONAMETStationsDownloader
+eu.essi_lab.accessor.waf.netcdf.NetCDFDownloader

@@ -1,0 +1,5 @@
+eu.essi_lab.accessor.sensorthings._1_1.downloader.HydroServer2Downloader
+eu.essi_lab.accessor.sensorthings._1_1.downloader.STA4HydrometryDownloader
+eu.essi_lab.accessor.sensorthings._1_1.downloader.CITIOBSDownloader
+eu.essi_lab.accessor.sensorthings._1_1.downloader.FraunhoferAirQualityDownloader
+eu.essi_lab.accessor.sensorthings._1_1.downloader.BRGM_WQDownloader

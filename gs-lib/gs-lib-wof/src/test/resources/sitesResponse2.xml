@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitesResponse xmlns="http://www.cuahsi.org/waterML/1.1/"
+	xmlns:gml="http://www.opengis.net/gml"
+	xmlns:wtr="http://www.cuahsi.org/waterML/"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<queryInfo>
+		<creationTime>2018-01-10T07:59:55.1952838-07:00</creationTime>
+		<criteria MethodCalled="GetSiteInfo">
+			<parameter name="site" value="LBR:USU-LBR-Mendon" />
+		</criteria>
+	</queryInfo>
+	<site>
+		<seriesCatalog>
+		</seriesCatalog>
+	</site>
+</sitesResponse>

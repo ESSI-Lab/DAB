@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.waf.onamet_stations;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,13 +24,15 @@ package eu.essi_lab.accessor.waf.onamet_stations;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 
 import eu.essi_lab.access.DataDownloader;
-import eu.essi_lab.lib.net.utils.Downloader;
+import eu.essi_lab.lib.net.downloader.Downloader;
+import eu.essi_lab.lib.net.utils.HttpConnectionUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -57,8 +59,14 @@ public class ONAMETStationsDownloader extends DataDownloader {
     @Override
     public boolean canConnect() throws GSException {
 
-	Downloader d = new Downloader();
-	return d.checkConnectivity(online.getLinkage());
+	try {
+	    return HttpConnectionUtils.checkConnectivity(online.getLinkage());
+	} catch (URISyntaxException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	}
+
+	return false;
     }
 
     @Override
@@ -69,7 +77,7 @@ public class ONAMETStationsDownloader extends DataDownloader {
 	    String linkage = online.getLinkage();
 
 	    Downloader downloader = new Downloader();
-	    InputStream inputStream = downloader.downloadStream(linkage).get();
+	    InputStream inputStream = downloader.downloadOptionalStream(linkage).get();
 
 	    File tempFile = File.createTempFile(getClass().getSimpleName(), ".nc");
 
@@ -111,7 +119,7 @@ public class ONAMETStationsDownloader extends DataDownloader {
 	    String linkage = online.getLinkage();
 
 	    Downloader downloader = new Downloader();
-	    InputStream inputStream = downloader.downloadStream(linkage).get();
+	    InputStream inputStream = downloader.downloadOptionalStream(linkage).get();
 
 	    File tempFile = File.createTempFile(getClass().getSimpleName(), ".nc");
 

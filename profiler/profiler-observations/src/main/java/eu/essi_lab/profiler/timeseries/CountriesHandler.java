@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.timeseries;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.List;
-import java.util.ServiceLoader;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -49,27 +48,14 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.Country;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
-import eu.essi_lab.request.executor.IAccessExecutor;
-import eu.essi_lab.request.executor.IDiscoveryStringExecutor;
 
 public class CountriesHandler extends StreamingRequestHandler {
-
-    private static IDiscoveryStringExecutor executor;
-    private static IAccessExecutor accessExecutor;
 
     @Override
     public ValidationMessage validate(WebRequest request) throws GSException {
 	ValidationMessage ret = new ValidationMessage();
 	ret.setResult(ValidationResult.VALIDATION_SUCCESSFUL);
 	return ret;
-    }
-
-    static {
-	ServiceLoader<IDiscoveryStringExecutor> loader = ServiceLoader.load(IDiscoveryStringExecutor.class);
-	executor = loader.iterator().next();
-
-	ServiceLoader<IAccessExecutor> accessLoader = ServiceLoader.load(IAccessExecutor.class);
-	accessExecutor = accessLoader.iterator().next();
     }
 
     public CountriesHandler() {
@@ -119,7 +105,8 @@ public class CountriesHandler extends StreamingRequestHandler {
 		do {
 
 		    try {
-			resultSet = executor.retrieveStrings(discoveryMessage);
+			resultSet = exec(discoveryMessage);
+			
 			List<String> results = resultSet.getResultsList();
 			tempSize += pageSize;
 
@@ -166,20 +153,11 @@ public class CountriesHandler extends StreamingRequestHandler {
 		writer.flush();
 		writer.close();
 		output.close();
-
 	    }
-
 	};
-
     }
 
-    public void printErrorMessage(OutputStream output, String message) throws IOException {
-	OutputStreamWriter writer = new OutputStreamWriter(output);
-	JSONObject error = new JSONObject();
-	error.put("message", message);
-	writer.write(error.toString());
-	writer.close();
-    }
+   
 
     public String getObject() {
 	return "countries";

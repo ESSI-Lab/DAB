@@ -7,7 +7,7 @@ package eu.essi_lab.authorization.pps;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,18 +24,28 @@ package eu.essi_lab.authorization.pps;
  * #L%
  */
 
-import eu.essi_lab.authorization.xacml.XACML_JAXBUtils;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.ApplyType;
-
 /**
+ * Users having the "eiffel" role, are allowed to discovery if and only if:<br>
+ * <br>
+ * 1) the view creator is "eiffel"<br>
+ *
+ * 2) the discovery path is supported<br>
+ * <br>
+ * Users having this policy role, are allowed to access if and only if:<br>
+ * <br>
+ * 1) the view creator is "eiffel"<br>
+ * 
+ * 2) the access path is is supported<br>
+ * <br>
+ * Users having this policy role are also allowed to perform other actions if and only if:<br>
+ * <br>
+ * 1) the view creator is "eiffel"<br>
+ *
+ * 2) the discovery path is supported OR the access path is is supported<br>
+ * 
  * @author Fabrizio
  */
-public class EIFFELPermissionPolicySet extends AbstractPermissionPolicySet {
-
-    /**
-     * 
-     */
-    private static final String EIFFEL_VIEW_CREATOR = "eiffel";
+public class EIFFELPermissionPolicySet extends CreatorPermissionPolicySet {
 
     public EIFFELPermissionPolicySet() {
 
@@ -43,63 +53,8 @@ public class EIFFELPermissionPolicySet extends AbstractPermissionPolicySet {
     }
 
     @Override
-    protected void editPPSPolicy() {
+    protected String getCreator() {
 
-	//
-	// discovery rule for the non EIFFEL creator
-	//
-	{
-	    String ruleId = "Permission:to:discover:not:eiffel:creator";
-
-	    setDiscoveryAction(ruleId);
-
-	    setOffsetLimit(ruleId, DEFAULT_OFFSET_LIMIT);
-	    
-	    setMaxRecordsLimit(ruleId, DEFAULT_MAX_RECORDS_LIMIT);
-
-	    ApplyType notEIFFELCreatorApply = XACML_JAXBUtils.createNotApply(createViewCreatorApply(EIFFEL_VIEW_CREATOR));
-
-	    setAndCondition(ruleId, createDiscoveryPathApply(), notEIFFELCreatorApply);
-	}
-
-	//
-	// discovery rule for the EIFFEL creator
-	//
-	{
-	    String ruleId = "Permission:to:discover:eiffel:creator";
-
-	    setDiscoveryAction(ruleId);
-
-	    setAndCondition(ruleId, createDiscoveryPathApply(), createViewCreatorApply(EIFFEL_VIEW_CREATOR));
-	}
-
-	//
-	// access rule for the non EIFFEL creator
-	//
-	{
-	    String ruleId = "Permission:to:access:not:eiffel:creator";
-
-	    setAccessAction(ruleId);
-
-	    setOffsetLimit(ruleId, DEFAULT_OFFSET_LIMIT);
-	    
-	    setMaxRecordsLimit(ruleId, DEFAULT_MAX_RECORDS_LIMIT);
-
-	    ApplyType notEIFFELCreatorApply = XACML_JAXBUtils.createNotApply(createViewCreatorApply(EIFFEL_VIEW_CREATOR));
-
-	    setAndCondition(ruleId, createAccessPathApply(), notEIFFELCreatorApply);
-	}
-
-	//
-	// access rule for the EIFFEL creator
-	//
-	{
-	    String ruleId = "Permission:to:access:eiffel:creator";
-
-	    setAccessAction(ruleId);
-
-	    setAndCondition(ruleId, createAccessPathApply(), createViewCreatorApply(EIFFEL_VIEW_CREATOR));
-	}
+	return "eiffel";
     }
-
 }

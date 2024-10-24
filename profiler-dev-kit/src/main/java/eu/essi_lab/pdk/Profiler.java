@@ -4,7 +4,7 @@ package eu.essi_lab.pdk;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
-import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -36,9 +35,7 @@ import eu.essi_lab.cfga.Configurable;
 import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.lib.servlet.RequestManager;
 import eu.essi_lab.lib.utils.Chronometer.TimeFormat;
-import eu.essi_lab.lib.utils.ExpiringCache;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.HostNamePropertyUtils;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.PerformanceLogger;
@@ -247,36 +244,6 @@ public abstract class Profiler implements Configurable<ProfilerSetting>, WebRequ
     //
     //
 
-    private static final int MAX_SIMULTANEOUS_REQUESTS_PER_IP = 1;
-
-    public static final RequestBouncer bouncer = new RequestBouncer(MAX_SIMULTANEOUS_REQUESTS_PER_IP);
-
-    private static final String REQUEST_BOUNCER_INTERRUPTED_ERROR = "REQUEST_BOUNCER_INTERRUPTED_ERROR";
-
-    private static final String REQUEST_BOUNCER_EVERYTHING_BLOCKED_ERROR = "REQUEST_BOUNCER_EVERYTHING_BLOCKED_ERROR";
-
-    private static boolean everythingIsBlocked;
-    private static Integer concurrentRequests;
-    private static Integer executingRequests;
-
-    private static ExpiringCache<String> successRequests;
-    static {
-	successRequests = new ExpiringCache<String>();
-	successRequests.setDuration(1200000);
-    }
-
-    /**
-     * @return
-     */
-    public static boolean everythingIsBlocked() {
-
-	return everythingIsBlocked;
-    }
-
-    //
-    //
-    //
-
     /**
      * The type of the handled request
      *
@@ -306,10 +273,6 @@ public abstract class Profiler implements Configurable<ProfilerSetting>, WebRequ
      * Creates a new instance of <code>Profiler</code>
      */
     public Profiler() {
-
-	concurrentRequests = 0;
-	executingRequests = 0;
-
 	configure(initSetting());
     }
 
@@ -365,56 +328,31 @@ public abstract class Profiler implements Configurable<ProfilerSetting>, WebRequ
     @Override
     public final Response handle(WebRequest request) throws GSException {
 
-	GSLoggerFactory.getLogger(getClass()).traceFreeMemory(getRequestLogPrefix(request) + " FHSM STARTED: ");
-
-	String address = request.getRemoteAddress();
+	Optional<ElasticsearchInfoPublisher> publisher = null;
 
 	String rid = request.getRequestId();
 
-	RequestManager.getInstance().addThreadName(rid);
+	RequestManager.getInstance().updateThreadName(getClass(), rid);
 
-	synchronized (concurrentRequests) {
-	    concurrentRequests++;
-	    GSLoggerFactory.getLogger(getClass()).info("{} QUEUED Remote address: {} {} concurrent requests, {} executing",
-		    getRequestLogPrefix(request), address, concurrentRequests, executingRequests);
+	publisher = ElasticsearchInfoPublisher.create(request);
+	if (publisher.isPresent()) {
+	    publisher.get().publish(request);
 	}
 
-	boolean ret;
-	try {
-	    ret = bouncer.askForExecutionAndWait(address, rid, 10, TimeUnit.MINUTES);
-	} catch (InterruptedException e1) {
-
-	    GSLoggerFactory.getLogger(getClass()).info("{} INTERRUPTED Remote address: {}", getRequestLogPrefix(request), address);
-
-	    throw GSException.createException(//
-		    getClass(), //
-		    e1.getMessage(), //
-		    "Interrupted while waiting for other pending requests to complete from address: " + address, //
-		    ErrorInfo.ERRORTYPE_INTERNAL, //
-		    ErrorInfo.SEVERITY_ERROR, //
-		    REQUEST_BOUNCER_INTERRUPTED_ERROR);
+	Response cached = ProxyCache.getInstance().getCachedResponse(request);
+	if (cached != null) {
+	    ChronometerInfoProvider chronometer = new ChronometerInfoProvider(TimeFormat.MIN_SEC_MLS);
+	    chronometer.start();
+	    GSLoggerFactory.getLogger(getClass()).info("{} ENDED - handling time: {}", getRequestLogPrefix(request),
+		    chronometer.formatElapsedTime());
+	    publisher.get().publish(chronometer);
+	    publisher.get().publish(new ResponseInfoProvider(cached));
+	    publisher.get().publish(this);
+	    publisher.get().write();
+	    return cached;
 	}
 
-	if (!ret) {
-	    // if after 10 minutes waiting no free slot is made available (e.g. other two requests from this IP are
-	    // being executed)
-	    GSLoggerFactory.getLogger(getClass()).info("{} BLOCKED Remote address: {} {} concurrent requests, {} executing",
-		    getRequestLogPrefix(request), address, concurrentRequests, executingRequests);
-
-	    if (successRequests.size() == 0) {
-		everythingIsBlocked = true;
-	    }
-
-	    throw GSException.createException(//
-		    getClass(), //
-		    "Waiting for other pending requests to complete before accepting new requests on this node from address: " + address, //
-		    "Waiting for other pending requests to complete before accepting new requests on this node from address: " + address, //
-		    ErrorInfo.ERRORTYPE_INTERNAL, //
-		    ErrorInfo.SEVERITY_ERROR, //
-		    REQUEST_BOUNCER_EVERYTHING_BLOCKED_ERROR);
-	}
-
-	ElasticsearchInfoPublisher publisher = null;
+	GSLoggerFactory.getLogger(getClass()).traceMemoryUsage(getRequestLogPrefix(request) + " FHSM STARTED: ");
 
 	Response response = null;
 
@@ -425,12 +363,6 @@ public abstract class Profiler implements Configurable<ProfilerSetting>, WebRequ
 
 	try {
 
-	    synchronized (executingRequests) {
-		executingRequests++;
-		GSLoggerFactory.getLogger(getClass()).info("{} STARTED Remote address: {} {} concurrent requests, {} executing",
-			getRequestLogPrefix(request), address, concurrentRequests, executingRequests);
-	    }
-
 	    PerformanceLogger pl = new PerformanceLogger(PerformanceLogger.PerformancePhase.REQUEST_HANDLING, rid,
 		    Optional.ofNullable(request));
 
@@ -439,12 +371,6 @@ public abstract class Profiler implements Configurable<ProfilerSetting>, WebRequ
 	    GSLoggerFactory.getLogger(getClass()).debug("{} Remote host: {}", getRequestLogPrefix(request), remoteHost.orElse("n.a."));
 
 	    logRequest(request);
-
-	    publisher = createPublisher(rid, request);
-
-	    if (publisher != null) {
-		publisher.publish(request);
-	    }
 
 	    HandlerSelector selector = getSelector(request);
 	    Optional<WebRequestHandler> optHandler = selector.select(request);
@@ -516,77 +442,47 @@ public abstract class Profiler implements Configurable<ProfilerSetting>, WebRequ
 
 		pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
 
-		successRequests.put(rid, rid);
-
+		response = ProxyCache.getInstance().cache(request, response);
 		return response;
 	    }
 
 	} catch (Throwable e) {
-	    GSLoggerFactory.getLogger(getClass()).error("EXCEPTION {}", e.getMessage());
+	    
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
 
 	    throw e;
 
 	} finally {
 
-	    GSLoggerFactory.getLogger(getClass()).traceFreeMemory(getRequestLogPrefix(request) + " FHSM ENDED: ");
+	    GSLoggerFactory.getLogger(getClass()).traceMemoryUsage(getRequestLogPrefix(request) + " FHSM ENDED: ");
 
 	    GSLoggerFactory.getLogger(getClass()).info("{} ENDED - handling time: {}", getRequestLogPrefix(request),
 		    chronometer.formatElapsedTime());
 
-	    if (publisher != null) {
+	    if (publisher.isPresent()) {
 
-		publisher.publish(chronometer);
+		publisher.get().publish(chronometer);
 
 		if (validationMessage != null) {
-		    publisher.publish(validationMessage);
+		    publisher.get().publish(validationMessage);
 		}
 
 		if (response != null) {
-		    publisher.publish(new ResponseInfoProvider(response));
+		    publisher.get().publish(new ResponseInfoProvider(response));
 		}
-		publisher.publish(this);
+		publisher.get().publish(this);
 
-		publisher.write();
+		publisher.get().write();
 	    }
 
-	    synchronized (concurrentRequests) {
-		concurrentRequests--;
-	    }
-	    synchronized (executingRequests) {
-		executingRequests--;
-	    }
-
-	    RequestManager.getInstance().printRequestInfo(rid);
-	    RequestManager.getInstance().removeRequest(rid);
-
-	    bouncer.notifyExecutionEnded(address, rid);
 	}
 
 	GSLoggerFactory.getLogger(getClass()).warn("{} handler not found!", getRequestLogPrefix(request));
 	return onHandlerNotFound(request);
     }
 
-    /**
-     * @param rid
-     * @param request
-     * @return
-     */
-    private ElasticsearchInfoPublisher createPublisher(String rid, WebRequest request) {
-
-	try {
-
-	    return new ElasticsearchInfoPublisher(//
-		    rid, //
-		    request.getRequestContext());
-
-	} catch (Exception e) {
-	    GSLoggerFactory.getLogger(getClass()).error("Error initializing ElasticSearch: {}", e.getMessage());
-	}
-
-	return null;
-    }
-
     private String getRequestLogPrefix(WebRequest request) {
+
 	return "[Request handling] REQ# " + request.getRequestId();
     }
 
@@ -597,7 +493,6 @@ public abstract class Profiler implements Configurable<ProfilerSetting>, WebRequ
 	map.put(RuntimeInfoElement.PROFILER_NAME.getName(), Arrays.asList(getName()));
 	map.put(RuntimeInfoElement.PROFILER_TYPE.getName(), Arrays.asList(initSetting().getServiceType()));
 	map.put(RuntimeInfoElement.PROFILER_TIME_STAMP_MILLIS.getName(), Arrays.asList(String.valueOf(System.currentTimeMillis())));
-	map.put(RuntimeInfoElement.HOST_NAME.getName(), Arrays.asList(HostNamePropertyUtils.getHostNameProperty()));
 
 	return map;
     }
@@ -621,11 +516,6 @@ public abstract class Profiler implements Configurable<ProfilerSetting>, WebRequ
      * @return a non <code>null</code> {@link Response}
      */
     public abstract Response createUncaughtError(WebRequest request, Status status, String message);
-
-    @Override
-    public String getBaseType() {
-	return "profiler";
-    }
 
     /**
      * This method is called in case the {@link WebRequestHandler} validation failed.<br>
@@ -700,7 +590,7 @@ public abstract class Profiler implements Configurable<ProfilerSetting>, WebRequ
 
 	GSLoggerFactory.getLogger(getClass()).info("{} Serving {} request: {}", getRequestLogPrefix(request), method, fullRequest);
 
-	if (!request.isGetRequest()) {
+	if (request.isPostRequest() || request.isPutRequest()) {
 
 	    try {
 		String query = IOStreamUtils.asUTF8String(request.getBodyStream().clone());

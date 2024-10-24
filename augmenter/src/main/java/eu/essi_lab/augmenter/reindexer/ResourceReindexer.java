@@ -4,7 +4,7 @@ package eu.essi_lab.augmenter.reindexer;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,16 +21,11 @@ package eu.essi_lab.augmenter.reindexer;
  * #L%
  */
 
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import eu.essi_lab.augmenter.ResourceAugmenter;
-import eu.essi_lab.cfga.gs.setting.augmenter.AugmenterSetting;
-import eu.essi_lab.cfga.option.Option;
-import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.indexes.IndexedElementsWriter;
 import eu.essi_lab.indexes.IndexedMetadataElements;
 import eu.essi_lab.lib.utils.GSLoggerFactory;

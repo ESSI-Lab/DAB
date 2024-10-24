@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.ina;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,6 +23,8 @@ package eu.essi_lab.accessor.ina;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.http.HttpHeaders;
+import java.net.http.HttpResponse;
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -32,7 +34,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.TimeZone;
 
-import org.apache.http.Header;
 import org.xml.sax.SAXException;
 
 import eu.essi_lab.accessor.wof.CUAHSIHISServerConnector;
@@ -44,7 +45,7 @@ import eu.essi_lab.accessor.wof.client.datamodel.SitesResponseDocument;
 import eu.essi_lab.accessor.wof.client.datamodel.TimeSeries;
 import eu.essi_lab.accessor.wof.client.datamodel.TimeSeriesINAResponseDocument;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.net.utils.Downloader;
+import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
@@ -111,11 +112,23 @@ public class INAConnector extends CUAHSIHISServerConnector<INAConnectorSetting> 
 	    return false;
 	}
 	String request = baseEndpoint.endsWith("/") ? baseEndpoint + "/GetSites?" : baseEndpoint + "/GetSites?";
-	Optional<InputStream> res = getDownloader().downloadStream(request);
+	Optional<InputStream> res = getDownloader().downloadOptionalStream(request);
 	if (res.isPresent())
 	    return true;
 
 	return false;
+    }
+
+    protected SimpleEntry<Integer, Integer> decodeDoubleResumptionToken(String id) throws GSException {
+
+	String[] split = id.split(":");
+
+	Integer sites = Integer.parseInt(split[0]);
+	Integer series = Integer.parseInt(split[1]);
+
+	SimpleEntry<Integer, Integer> ret = new SimpleEntry<Integer, Integer>(sites, series);
+	return ret;
+
     }
 
     @Override
@@ -148,7 +161,7 @@ public class INAConnector extends CUAHSIHISServerConnector<INAConnectorSetting> 
 	    siteNumber = 0;
 	    seriesNumber = 0;
 	} else {
-	    SimpleEntry<Integer, Integer> decodedResumptionToken = decodeResumptionToken(id);
+	    SimpleEntry<Integer, Integer> decodedResumptionToken = decodeDoubleResumptionToken(id);
 	    siteNumber = decodedResumptionToken.getKey();
 	    seriesNumber = decodedResumptionToken.getValue();
 	}
@@ -338,13 +351,13 @@ public class INAConnector extends CUAHSIHISServerConnector<INAConnectorSetting> 
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 
 	    ErrorInfo ei = new ErrorInfo();
-	    
-	    ei.setErrorDescription("Error marshalling metadata for site: " + siteName + " variable name: " + seriesName);	    
+
+	    ei.setErrorDescription("Error marshalling metadata for site: " + siteName + " variable name: " + seriesName);
 	    ei.setCaller(this.getClass());
 	    ei.setErrorId(INA_CONNECTOR_ERROR);
 	    ei.setErrorType(ErrorInfo.ERRORTYPE_CLIENT);
 	    ei.setSeverity(ErrorInfo.SEVERITY_ERROR);
-	    
+
 	    throw GSException.createException(ei);
 	}
 	ret.setResumptionToken(nextId);
@@ -358,9 +371,9 @@ public class INAConnector extends CUAHSIHISServerConnector<INAConnectorSetting> 
 	String request = url.endsWith("/") ? url + "GetSiteInfo?site=" + siteCode : url + "/GetSiteInfo?site=" + siteCode;
 	GSLoggerFactory.getLogger(this.getClass()).info("Get SitesInfo for INA Accessor {}", request);
 	try {
-	    Optional<SimpleEntry<Header[], InputStream>> response = getDownloader().downloadHeadersAndBody(request);
+	    Optional<HttpResponse<InputStream>> response = getDownloader().downloadOptionalResponse(request);
 	    if (response.isPresent()) {
-		sites = new SitesResponseDocument(response.get().getValue());
+		sites = new SitesResponseDocument(response.get().body());
 	    }
 	} catch (SAXException | IOException e) {
 	    // in case an exception occurred, no metadata is returned for this series
@@ -385,7 +398,7 @@ public class INAConnector extends CUAHSIHISServerConnector<INAConnectorSetting> 
 	String request = url.endsWith("/") ? url + "GetSites?" : url + "/GetSites?";
 	GSLoggerFactory.getLogger(this.getClass()).info("Get Sites for INA Accessor {}", request);
 	try {
-	    Optional<InputStream> stream = getDownloader().downloadStream(request);
+	    Optional<InputStream> stream = getDownloader().downloadOptionalStream(request);
 	    if (stream.isPresent()) {
 		sites = new SitesResponseDocument(stream.get());
 	    }
@@ -406,6 +419,21 @@ public class INAConnector extends CUAHSIHISServerConnector<INAConnectorSetting> 
 
 	// first, we must retrieve timezone of the hydro server
 	SitesResponseDocument siteInfo = getSiteInfo(siteCode);
+
+	if (siteInfo == null) {
+
+	    GSLoggerFactory.getLogger(getClass()).error("Siteinfo null for siteCode: {}", siteCode);
+
+	    ErrorInfo ei = new ErrorInfo();
+	    ei.setCaller(this.getClass());
+	    ei.setErrorDescription("Siteinfo null for siteCode: " + siteCode);
+	    ei.setErrorId(INA_CONNECTOR_ERROR);
+	    ei.setErrorType(ErrorInfo.ERRORTYPE_CLIENT);
+	    ei.setSeverity(ErrorInfo.SEVERITY_ERROR);
+
+	    throw GSException.createException(ei);
+	}
+
 	TimeSeries variable = siteInfo.getSitesInfo().get(0).getSeries(variableCode, methodId, qualityControlLevelCode, sourceId);
 	String t1 = variable.getBeginTimePosition();
 	String t1UTC = variable.getBeginTimePositionUTC();
@@ -454,7 +482,7 @@ public class INAConnector extends CUAHSIHISServerConnector<INAConnectorSetting> 
 		request += "&endDate=" + timeEndString;
 	    }
 
-	    Optional<InputStream> inputRes = getDownloader().downloadStream(request);
+	    Optional<InputStream> inputRes = getDownloader().downloadOptionalStream(request);
 	    if (inputRes.isPresent()) {
 		res = new TimeSeriesINAResponseDocument(inputRes.get());
 	    }

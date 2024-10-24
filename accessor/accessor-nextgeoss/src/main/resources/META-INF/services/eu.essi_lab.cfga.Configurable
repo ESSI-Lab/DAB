@@ -1,0 +1,4 @@
+eu.essi_lab.accessor.nextgeoss.harvested.NextGEOSSOpensearchConnector
+eu.essi_lab.accessor.nextgeoss.harvested.NextGEOSSOpenSearchAccessor
+eu.essi_lab.accessor.nextgeoss.distributed.NextGEOSSGranulesAccessor
+eu.essi_lab.accessor.nextgeoss.distributed.NextGEOSSGranulesConnector

@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof.access;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,14 +25,15 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.TimeZone;
-import java.util.AbstractMap.SimpleEntry;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConstants;
@@ -67,6 +68,7 @@ import eu.essi_lab.accessor.wof.WOFRequest;
 import eu.essi_lab.accessor.wof.WOFRequest.Parameter;
 import eu.essi_lab.lib.net.utils.whos.HydroOntology;
 import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
+import eu.essi_lab.lib.net.utils.whos.WHOSOntology;
 import eu.essi_lab.lib.net.utils.whos.WMOOntology;
 import eu.essi_lab.lib.net.utils.whos.WMOUnit;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
@@ -227,15 +229,15 @@ public class GetValuesResultSetMapper extends DefaultAccessResultSetMapper {
 			GSResource res = optionalResource.get();
 			// SEMANTIC_HARMONIZATION if attribute URI is present, is preferred, to have an harmonized set
 			// of attributes
-			Optional<String> optionalAttributeURI = res.getExtensionHandler().getAttributeURI();
+			Optional<String> optionalAttributeURI = res.getExtensionHandler().getObservedPropertyURI();
 			if (optionalAttributeURI.isPresent()) {
 			    String uri = optionalAttributeURI.get();
 			    if (uri != null) {
-				HydroOntology ontology = new HydroOntology();
+				HydroOntology ontology = new WHOSOntology();
 				SKOSConcept concept = ontology.getConcept(uri);
 				if (concept != null) {
 				    variableName = concept.getPreferredLabel().getKey();
-				    List<String> closeMatches = concept.getCloseMatches();
+				    HashSet<String> closeMatches = concept.getCloseMatches();
 				    if (closeMatches != null && !closeMatches.isEmpty()) {
 					try {
 					    WMOOntology wmoOntology = new WMOOntology();

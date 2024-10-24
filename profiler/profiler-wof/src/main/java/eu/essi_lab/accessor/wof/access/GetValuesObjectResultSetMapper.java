@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof.access;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,6 +31,7 @@ import eu.essi_lab.access.wml.WML2DataDownloader;
 import eu.essi_lab.accessor.wof.WOFRequest;
 import eu.essi_lab.accessor.wof.WOFRequest.Parameter;
 import eu.essi_lab.jaxb.wml._2_0.CollectionType;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.lib.xml.XMLDocumentWriter;
 import eu.essi_lab.messages.AccessMessage;
@@ -94,19 +95,27 @@ public class GetValuesObjectResultSetMapper extends GetValuesResultSetMapper {
 
 	try {
 
+	    GSLoggerFactory.getLogger(getClass()).info("Get base response");
 	    XMLDocumentReader reader = getBaseResponse(message.getWebRequest(), resource);
+	    GSLoggerFactory.getLogger(getClass()).info("Got base response");
 	    XMLDocumentWriter writer = new XMLDocumentWriter(reader);
+	    
 	    writer.removePrefixes();
-
+	    
 	    XMLDocumentReader reader2 = getResponseTemplate();
+	    
 	    XMLDocumentWriter writer2 = new XMLDocumentWriter(reader2);
+	    
 	    writer2.addNode("//*:TimeSeriesResponse[1]", reader.evaluateNode("//*:timeSeriesResponse[1]"));
-
+	    
 	    File tmpFile = File.createTempFile("GetValuesObjectResultSetMapper", ".xml");
+	    
 	    tmpFile.deleteOnExit();
 
 	    FileOutputStream fos = new FileOutputStream(tmpFile);
+	    
 	    IOUtils.copy(reader2.asStream(), fos);
+	    GSLoggerFactory.getLogger(getClass()).info("Finalizing");
 	    fos.close();
 	    if (reader2.asStream() != null)
 		reader2.asStream().close();
@@ -130,7 +139,7 @@ public class GetValuesObjectResultSetMapper extends GetValuesResultSetMapper {
 	} catch (Exception e) {
 	    e.printStackTrace();
 	}
-
+	GSLoggerFactory.getLogger(getClass()).info("Finalized");
 	return resource;
     }
 

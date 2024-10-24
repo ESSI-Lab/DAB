@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.waf.onamet_stations;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,7 +29,7 @@ import java.util.Optional;
 import eu.essi_lab.accessor.waf.onamet.ONAMETConnector;
 import eu.essi_lab.accessor.waf.onamet_stations.ONAMETParameter.ONAMETParameterId;
 import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
-import eu.essi_lab.lib.net.utils.Downloader;
+import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.csv.CSVReader;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
@@ -118,7 +118,7 @@ public class ONAMETStationsConnector extends HarvestedQueryConnector<ONAMETStati
 	String csvURL = getSourceURL().endsWith("/") ? getSourceURL() + filePath : getSourceURL() + "/" + filePath;
 
 	Downloader downloader = new Downloader();
-	Optional<InputStream> csvStream = downloader.downloadStream(csvURL);
+	Optional<InputStream> csvStream = downloader.downloadOptionalStream(csvURL);
 
 	if (!csvStream.isPresent()) {
 

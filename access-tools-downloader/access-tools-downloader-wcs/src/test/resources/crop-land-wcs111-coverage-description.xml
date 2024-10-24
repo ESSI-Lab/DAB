@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<CoverageDescriptions xmlns="http://www.opengis.net/wcs/1.1" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ogc="http://www.opengis.net/ogc" xsi:schemaLocation="http://www.opengis.net/wcs/1.1 http://schemas.opengis.net/wcs/1.1/wcsDescribeCoverage.xsd http://www.opengis.net/ows/1.1 http://schemas.opengis.net/ows/1.1.0/owsAll.xsd">
+  <CoverageDescription>
+    <ows:Title>cdl_2009</ows:Title>
+    <ows:Abstract/>
+    <Identifier>cdl_2009</Identifier>
+    <Domain>
+      <SpatialDomain>
+        <ows:BoundingBox crs="urn:ogc:def:crs:OGC::imageCRS" dimensions="2">
+          <ows:LowerCorner>0 0</ows:LowerCorner>
+          <ows:UpperCorner>82397 51708</ows:UpperCorner>
+        </ows:BoundingBox>
+        <ows:BoundingBox crs="urn:ogc:def:crs:EPSG::102004" dimensions="2">
+          <ows:LowerCorner>-2356050 276890</ows:LowerCorner>
+          <ows:UpperCorner>2258238 3172594</ows:UpperCorner>
+        </ows:BoundingBox>
+        <ows:WGS84BoundingBox dimensions="2">
+          <ows:LowerCorner>-127.886599740259 22.9401450824376</ows:LowerCorner>
+          <ows:UpperCorner>-65.3455155736575 51.6050202016246</ows:UpperCorner>
+        </ows:WGS84BoundingBox>
+        <GridCRS>
+          <GridBaseCRS>urn:ogc:def:crs:EPSG::102004</GridBaseCRS>
+          <GridType>urn:ogc:def:method:WCS:1.1:2dSimpleGrid</GridType>
+          <GridOrigin>-2356022 3172566</GridOrigin>
+          <GridOffsets>56 -56</GridOffsets>
+          <GridCS>urn:ogc:def:cs:OGC:0.0:Grid2dSquareCS</GridCS>
+        </GridCRS>
+      </SpatialDomain>
+    </Domain>
+    <Range>
+      <Field>
+        <ows:Title>NASS</ows:Title>
+        <Identifier>2009 CDL</Identifier>
+        <Definition>
+          <ows:AnyValue/>
+        </Definition>
+        <InterpolationMethods>
+          <InterpolationMethod>bilinear</InterpolationMethod>
+          <Default>nearest neighbor</Default>
+        </InterpolationMethods>
+        <Axis identifier="bands">
+          <AvailableKeys>
+            <Key>1</Key>
+          </AvailableKeys>
+        </Axis>
+      </Field>
+    </Range>
+    <SupportedCRS>urn:ogc:def:crs:EPSG::102004</SupportedCRS>
+    <SupportedFormat>image/tiff</SupportedFormat>
+  </CoverageDescription>
+</CoverageDescriptions>

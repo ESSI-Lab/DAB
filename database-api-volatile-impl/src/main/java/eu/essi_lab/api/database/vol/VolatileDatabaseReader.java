@@ -7,7 +7,7 @@ package eu.essi_lab.api.database.vol;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,6 +27,7 @@ package eu.essi_lab.api.database.vol;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -42,8 +43,9 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.internal.Folder;
+import eu.essi_lab.api.database.GetViewIdentifiersRequest;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StreamUtils;
@@ -56,20 +58,13 @@ import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.bond.parser.IdentifierBondHandler;
 import eu.essi_lab.messages.count.CountSet;
 import eu.essi_lab.messages.count.DiscoveryCountResponse;
-import eu.essi_lab.messages.count.SemanticCountResponse;
-import eu.essi_lab.messages.sem.SemanticMessage;
-import eu.essi_lab.messages.sem.SemanticResponse;
-import eu.essi_lab.messages.stats.StatisticsMessage;
-import eu.essi_lab.messages.stats.StatisticsResponse;
 import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMapType;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.ontology.GSKnowledgeResourceDescription;
-import eu.essi_lab.model.ontology.GSKnowledgeScheme;
 import eu.essi_lab.model.resource.GSResource;
 
 /**
@@ -78,28 +73,21 @@ import eu.essi_lab.model.resource.GSResource;
 public class VolatileDatabaseReader implements DatabaseReader {
 
     private VolatileDatabase database;
-    private StorageUri dbUri;
+    private StorageInfo dbUri;
 
-    @SuppressWarnings("rawtypes")
+    @Override
+    public boolean supports(StorageInfo dbUri) {
+
+	this.dbUri = dbUri;
+
+	return dbUri.getName() != null && //
+		dbUri.getName().equals(DatabaseSetting.VOLATILE_DB_STORAGE_NAME);
+    }
+
     @Override
     public void setDatabase(Database db) {
 
 	this.database = (VolatileDatabase) db;
-    }
-
-    @Override
-    public boolean supports(StorageUri dbUri) {
-
-	this.dbUri = dbUri;
-
-	return dbUri.getStorageName() != null && //
-		dbUri.getStorageName().equals(DatabaseSetting.VOLATILE_DB_STORAGE_NAME);
-    }
-
-    @Override
-    public StorageUri getStorageUri() {
-
-	return null;
     }
 
     @Override
@@ -135,29 +123,27 @@ public class VolatileDatabaseReader implements DatabaseReader {
     }
 
     @Override
-    public List<String> getViewIdentifiers(int start, int count) throws GSException {
+    public List<String> getViewIdentifiers(GetViewIdentifiersRequest request) throws GSException {
+
+	if (getDatabase().getViewsList().isEmpty()) {
+
+	    return Arrays.asList();
+	}
 
 	return getDatabase().//
 		getViewsList().//
-		subList(0, count).//
+		subList(request.getStart(), request.getCount()).//
 		stream().//
+		filter(v -> request.getCreator().isPresent() ? v.getCreator().equals(request.getCreator().get()) : false).//
 		map(v -> v.getId()).//
 		collect(Collectors.toList());
     }
 
-    @Override
-    public List<String> getViewIdentifiers(int start, int count, String creator) throws GSException {
-
-	return getDatabase().//
-		getViewsList().//
-		subList(0, count).//
-		stream().//
-		filter(v -> v.getCreator().equals(creator)).//
-		map(v -> v.getId()).//
-		collect(Collectors.toList());
-    }
-
-    @Override
+    /**
+     * @param message
+     * @return
+     * @throws GSException
+     */
     public DiscoveryCountResponse count(DiscoveryMessage message) throws GSException {
 
 	List<GSResource> resourcesList = createResourcesList(message);
@@ -204,7 +190,11 @@ public class VolatileDatabaseReader implements DatabaseReader {
 	return response;
     }
 
-    @Override
+    /**
+     * @param message
+     * @return
+     * @throws GSException
+     */
     public ResultSet<GSResource> discover(DiscoveryMessage message) throws GSException {
 
 	ResultSet<GSResource> resultSet = new ResultSet<>();
@@ -302,7 +292,11 @@ public class VolatileDatabaseReader implements DatabaseReader {
 	return resourcesList;
     }
 
-    @Override
+    /**
+     * @param message
+     * @return
+     * @throws GSException
+     */
     public ResultSet<Node> discoverNodes(DiscoveryMessage message) throws GSException {
 
 	ResultSet<GSResource> resultSet = discover(message);
@@ -320,7 +314,11 @@ public class VolatileDatabaseReader implements DatabaseReader {
 	return nodesSet;
     }
 
-    @Override
+    /**
+     * @param message
+     * @return
+     * @throws GSException
+     */
     public ResultSet<String> discoverStrings(DiscoveryMessage message) throws GSException {
 
 	ResultSet<Node> resultSet = discoverNodes(message);
@@ -416,7 +414,7 @@ public class VolatileDatabaseReader implements DatabaseReader {
     }
 
     @Override
-    public Optional<Folder> getFolder(String folderName, boolean createIfNotExist) throws GSException {
+    public Optional<DatabaseFolder> getFolder(String folderName, boolean createIfNotExist) throws GSException {
 
 	Optional<VolatileFolder> opt = getDatabase().getFodersList().stream().filter(f -> f.getSimpleName().equals(folderName)).findFirst();
 
@@ -434,34 +432,6 @@ public class VolatileDatabaseReader implements DatabaseReader {
 	}
 
 	return Optional.empty();
-    }
-
-    //
-    // ---- NOT IMPL. -----
-    //
-
-    @Override
-    public SemanticCountResponse count(SemanticMessage message) throws GSException {
-
-	return null;
-    }
-
-    @Override
-    public StatisticsResponse compute(StatisticsMessage message) throws GSException {
-
-	return null;
-    }
-
-    @Override
-    public SemanticResponse<GSKnowledgeResourceDescription> execute(SemanticMessage message) throws GSException {
-
-	return null;
-    }
-
-    @Override
-    public Optional<GSKnowledgeResourceDescription> getKnowlegdeResource(GSKnowledgeScheme scheme, String subjectId) throws GSException {
-
-	return null;
     }
 
 }

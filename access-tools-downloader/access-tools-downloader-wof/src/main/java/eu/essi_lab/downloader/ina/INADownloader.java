@@ -4,7 +4,7 @@ package eu.essi_lab.downloader.ina;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,14 +23,18 @@ package eu.essi_lab.downloader.ina;
 
 import java.io.File;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.xml.transform.TransformerException;
+import javax.xml.bind.JAXBElement;
 
-import eu.essi_lab.access.DataDownloader;
+import org.cuahsi.waterml._1.ObjectFactory;
+import org.cuahsi.waterml._1.TimeSeriesResponseType;
+import org.cuahsi.waterml._1.ValueSingleVariable;
+import org.cuahsi.waterml._1.essi.JAXBWML;
+
+import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.accessor.ina.INAConnector;
 import eu.essi_lab.accessor.wof.client.datamodel.SiteInfo;
 import eu.essi_lab.accessor.wof.client.datamodel.SitesResponseDocument;
@@ -38,9 +42,7 @@ import eu.essi_lab.accessor.wof.client.datamodel.TimeSeries;
 import eu.essi_lab.accessor.wof.client.datamodel.TimeSeriesINAResponseDocument;
 import eu.essi_lab.accessor.wof.utils.WOFIdentifierMangler;
 import eu.essi_lab.lib.net.protocols.NetProtocols;
-import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.lib.xml.XMLDocumentWriter;
 import eu.essi_lab.model.exceptions.ErrorInfo;
@@ -55,12 +57,13 @@ import eu.essi_lab.model.resource.data.Unit;
 import eu.essi_lab.model.resource.data.dimension.ContinueDimension;
 import eu.essi_lab.model.resource.data.dimension.DataDimension;
 
-public class INADownloader extends DataDownloader {
+public class INADownloader extends WMLDataDownloader {
 
     private INAConnector connector;
 
     private static final String INA_READER_AS_STREAM_ERROR = "INA_READER_AS_STREAM_ERROR";
     private static final String INA_DOWNLOAD_ERROR = "INA_DOWNLOAD_ERROR";
+    private static final String INA_DOWNLOADER_UNABLE_TO_FIND_TIME_SERIES_INFO_ERROR = "INA_DOWNLOADER_UNABLE_TO_FIND_TIME_SERIES_INFO";
 
     @Override
     public boolean canConnect() throws GSException {
@@ -111,21 +114,10 @@ public class INADownloader extends DataDownloader {
 		}
 		List<SiteInfo> sitesInfo = siteInfo.getSitesInfo();
 
-		if (sitesInfo == null) {
-		    try {
-			GSLoggerFactory.getLogger(getClass()).error("XINA no sites info " + siteInfo.getReader().asString());
-		    } catch (Exception e) {
-			e.printStackTrace();
-		    }
-		    return ret;
-		}
+		if (sitesInfo == null || sitesInfo.isEmpty()) {
 
-		if (sitesInfo.isEmpty()) {
-		    try {
-			GSLoggerFactory.getLogger(getClass()).error("XINA Empty sites info " + siteInfo.getReader().asString());
-		    } catch (UnsupportedEncodingException | TransformerException e) {
-			e.printStackTrace();
-		    }
+		    GSLoggerFactory.getLogger(getClass()).error("XINA empty site info: {}", siteCode);
+
 		    return ret;
 		}
 
@@ -139,7 +131,19 @@ public class INADownloader extends DataDownloader {
 		String methodId = mangler.getMethodIdentifier();
 		String qualityControlLevelCode = mangler.getQualityIdentifier();
 		String sourceId = mangler.getSourceIdentifier();
+
 		TimeSeries timeSeries = mySite.getSeries(variableCode, methodId, qualityControlLevelCode, sourceId);
+
+		if (timeSeries == null) {
+
+		    throw GSException.createException(//
+			    getClass(), //
+			    "Unable to find time series from: " + siteCode + ",\n " + mySite.toString(), //
+			    ErrorInfo.ERRORTYPE_INTERNAL, //
+			    ErrorInfo.SEVERITY_ERROR, //
+			    INA_DOWNLOADER_UNABLE_TO_FIND_TIME_SERIES_INFO_ERROR);
+		}
+
 		Date begin = timeSeries.getBeginTimePositionDate();
 		Date end = timeSeries.getEndTimePositionDate();
 
@@ -286,12 +290,32 @@ public class INADownloader extends DataDownloader {
 			writer.addAttributes("//*:sourceInfo", pairs);
 			InputStream input = reader.asStream();
 
-			ClonableInputStream cloneInputStream = new ClonableInputStream(input);
-			// file to check if download is ok
-			// File tmpFile = File.createTempFile("TEST-INA-downloader", ".wml");
-			// FileUtils.copyInputStreamToFile(cloneInputStream.clone(), tmpFile);
+			Object obj = JAXBWML.getInstance().getUnmarshaller().unmarshal(input);
+			TimeSeriesResponseType tsrtINA = null;
+			if (obj instanceof JAXBElement) {
+			    JAXBElement jax = (JAXBElement) obj;
+			    obj = jax.getValue();
+			}
+			if (obj instanceof TimeSeriesResponseType) {
+			    tsrtINA = (TimeSeriesResponseType) obj;			    
+			}
+			TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
+			if (tsrtINA!=null) {
+			    List<ValueSingleVariable> inaValues = tsrtINA.getTimeSeries().get(0).getValues().get(0).getValue();
+			    for (ValueSingleVariable inaValue : inaValues) {
+				addValue(tsrt, inaValue);
+			    }			    
+			}
+			
+			
+			ObjectFactory factory = new ObjectFactory();
 
-			return IOStreamUtils.tempFilefromStream(cloneInputStream.clone(), "INA-downloader", ".wml");
+			JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);
+			File tmpFile = File.createTempFile(getClass().getSimpleName(), ".wml");
+			tmpFile.deleteOnExit();
+			JAXBWML.getInstance().marshal(response, tmpFile);
+
+			return tmpFile;
 		    }
 
 		} catch (Exception e) {

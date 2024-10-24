@@ -1,0 +1,109 @@
+{
+    "parent": {"id": "mbwrf-vfh73"},
+    "metadata": {
+        "languages": [
+            {
+                "id": "eng",
+                "title": {"en": "English"}
+            }
+        ],
+        "creators": [
+            {
+                "person_or_org": {
+                    "name": "Thornton, James",
+                    "given_name": "James",
+                    "type": "personal",
+                    "family_name": "Thornton"
+                }
+            }
+        ],
+        "related_identifiers": [
+            {
+                "identifier": "10.5072/1www7-cbf79",
+                "scheme": "doi",
+                "resource_type": {
+                    "id": "knowledge",
+                    "title": {"en": "Knowledge Package"}
+                },
+                "relation_type": {
+                    "id": "ispartof",
+                    "title": {"en": "Is part of"}
+                }
+            }
+        ],
+        "subjects": [
+            {"subject": "Mountains"},
+            {"subject": "Human population"}
+        ],
+        "rights": [
+            {
+                "description": {"en": "The Creative Commons Attribution license allows re-distribution and re-use of a licensed work on the condition that the creator is appropriately credited."},
+                "id": "cc-by-4.0",
+                "title": {"en": "Creative Commons Attribution 4.0 International"},
+                "props": {
+                    "scheme": "spdx",
+                    "url": "https://creativecommons.org/licenses/by/4.0/legalcode"
+                }
+            }
+        ],
+        "resource_type": {
+            "id": "dataset",
+            "title": {"en": "Dataset"}
+        },
+        "description": "<p>Output data for Human populations in the world's mountains: spatio-temporal patterns and potential controls (Thornton et al.)<\/p>",
+        "publication_date": "2021-10-27",
+        "publisher": "GEO Knowledge Hub",
+        "dates": [
+            {
+                "date": "2021-01-28",
+                "type": {
+                    "id": "submitted",
+                    "title": {"en": "Submitted"}
+                }
+            }
+        ],
+        "title": "Human populations in the world's mountains: spatio-temporal patterns and potential controls (output data)",
+        "version": "v1"
+    },
+    "access": {
+        "record": "public",
+        "files": "public",
+        "embargo": {
+            "reason": null,
+            "active": false
+        },
+        "status": "open"
+    },
+    "versions": {
+        "index": 1,
+        "is_latest": true
+    },
+    "is_published": true,
+    "created": "2021-10-27T22:59:04.645818+00:00",
+    "files": {
+        "enabled": true,
+        "order": []
+    },
+    "links": {
+        "self_html": "https://35.166.90.189:443/records/6p7f6-m5993",
+        "latest_html": "https://35.166.90.189:443/records/6p7f6-m5993/latest",
+        "access_links": "https://35.166.90.189:443/api/records/6p7f6-m5993/access/links",
+        "versions": "https://35.166.90.189:443/api/records/6p7f6-m5993/versions",
+        "draft": "https://35.166.90.189:443/api/records/6p7f6-m5993/draft",
+        "self": "https://35.166.90.189:443/api/records/6p7f6-m5993",
+        "files": "https://35.166.90.189:443/api/records/6p7f6-m5993/files",
+        "self_doi": "https://35.166.90.189:443/doi/10.5072%2F6p7f6-m5993",
+        "latest": "https://35.166.90.189:443/api/records/6p7f6-m5993/versions/latest",
+        "reserve_doi": "https://35.166.90.189:443/api/records/6p7f6-m5993/draft/pids/doi"
+    },
+    "id": "6p7f6-m5993",
+    "pids": {
+        "doi": {
+            "identifier": "10.5072/6p7f6-m5993",
+            "provider": "datacite",
+            "client": "datacite"
+        }
+    },
+    "updated": "2021-10-28T12:06:54.706441+00:00",
+    "revision_id": 5
+}

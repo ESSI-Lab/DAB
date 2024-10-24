@@ -1,0 +1,197 @@
+{
+	"help": "http://datasets.wri.org/api/3/action/help_show?name=package_show",
+	"success": true,
+	"result": {
+		"cautions": "",
+		"license_title": "",
+		"maintainer": null,
+		"wri_main_contact_email": "mailto:gfw@wri.org",
+		"wri_update_frequency": "",
+		"relationships_as_object": [
+		],
+		"citation": "",
+		"private": false,
+		"maintainer_email": null,
+		"num_tags": 12,
+		"wri_temporal_coverage": "",
+		"wri_featured_dataset": "false",
+		"id": "49c8e8fa-61b1-4334-81e2-7abd47e51814",
+		"metadata_created": "2016-03-01T02:55:16.630836",
+		"wri_topics": "Forests",
+		"metadata_modified": "2017-07-25T00:15:56.264752",
+		"author": null,
+		"author_email": null,
+		"wri_main_contact": "Global Forest Watch (GFW)",
+		"state": "active",
+		"version": null,
+		"license_id": "",
+		"dataset_last_updated": "",
+		"type": "dataset",
+		"resources": [
+			{
+				"mimetype": null,
+				"cache_url": null,
+				"hash": "",
+				"description": "",
+				"name": "thumbnail",
+				"format": "JPEG",
+				"url": "http://www.arcgis.com/sharing/rest/content/items/079feba589a34c5caed11dc4a5c03a47/info/thumbnail/tcextent_thumb.jpg",
+				"cache_last_updated": null,
+				"package_id": "49c8e8fa-61b1-4334-81e2-7abd47e51814",
+				"created": "2017-07-25T00:15:55.581852",
+				"state": "active",
+				"mimetype_inner": null,
+				"webstore_last_updated": null,
+				"last_modified": null,
+				"position": 0,
+				"revision_id": "f07ff025-ecb7-4db4-9189-f801be4e519f",
+				"webstore_url": null,
+				"url_type": null,
+				"id": "e400e6de-2768-431f-b57f-597804f8f264",
+				"resource_type": null,
+				"size": null
+			},
+			{
+				"mimetype": null,
+				"cache_url": null,
+				"hash": "",
+				"description": "",
+				"name": "Web Page",
+				"format": "HTML",
+				"url": "http://gfw2-data.s3.amazonaws.com/country/rou/zip/rou_tree_cover.zip",
+				"cache_last_updated": null,
+				"package_id": "49c8e8fa-61b1-4334-81e2-7abd47e51814",
+				"created": "2017-07-25T00:15:56.681684",
+				"state": "active",
+				"mimetype_inner": null,
+				"webstore_last_updated": null,
+				"last_modified": null,
+				"position": 1,
+				"revision_id": "50adeb10-5a24-466c-b62e-041ef932b3a5",
+				"webstore_url": null,
+				"url_type": null,
+				"id": "3bfb97ea-5c46-480b-927a-0a29c29922a0",
+				"resource_type": null,
+				"size": null
+			}
+		],
+		"wri_geography": "",
+		"num_resources": 2,
+		"tags": [
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "2000",
+				"id": "20a3c635-a484-436c-b482-66c9dcacdaff",
+				"name": "2000"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "Commodities",
+				"id": "f3216aa3-74c0-42b2-b562-7073cbbe5c22",
+				"name": "Commodities"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "Fires",
+				"id": "3862bf1e-dd52-4714-8caa-4d2e037342e5",
+				"name": "Fires"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "Global Forest Watch",
+				"id": "302f354d-6a93-4f34-b11e-04ba6511fae2",
+				"name": "Global Forest Watch"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "Hansen",
+				"id": "0141f385-ac8e-4071-8a1f-fd4459a9c78c",
+				"name": "Hansen"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "UMD",
+				"id": "abf678b7-1b34-48e5-9f78-7eaccb993c09",
+				"name": "UMD"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "canopy",
+				"id": "d09ac0b7-cbdb-4405-a74f-a586a2988ff6",
+				"name": "canopy"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "country_ROU",
+				"id": "5d55a4ac-7b3e-4e0f-8c3c-3438a0cb792d",
+				"name": "country_ROU"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "forest cover",
+				"id": "aa8e7475-a223-48d3-adb1-00ad58b18dbf",
+				"name": "forest cover"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "forests",
+				"id": "ae9fa7d6-f879-441b-88c2-387ef08f8ca1",
+				"name": "forests"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "global",
+				"id": "5cc041cc-0511-4f0d-a0e4-94d13bf97134",
+				"name": "global"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "google",
+				"id": "bc7da540-e3ee-4669-899b-6ac4681c1ee9",
+				"name": "google"
+			}
+		],
+		"wri_projects": "",
+		"groups": [
+		],
+		"creator_user_id": "fd7c5cdf-8084-466d-8777-118d70157e97",
+		"wri_spatial_resolution": "",
+		"relationships_as_subject": [
+		],
+		"organization": {
+			"description": "",
+			"created": "2016-01-22T20:05:39.630525",
+			"title": "Global Forest Watch",
+			"name": "global-forest-watch",
+			"is_organization": true,
+			"state": "active",
+			"image_url": "",
+			"revision_id": "66fcc71a-3346-4d82-a531-321d0c2e5654",
+			"type": "organization",
+			"id": "fe12e3d4-8435-4cd0-9d80-96412e9b10c0",
+			"approval_status": "approved"
+		},
+		"name": "079feba589a34c5caed11dc4a5c03a47",
+		"isopen": false,
+		"url": null,
+		"notes": "Retrieved from \r\nGlobal\u00a0tree\u00a0cover loss data from GFW. Displays tree cover loss in the \r\ncountry from 2001 to 2013, represented by pixel values 1-13, \r\nrespectively.",
+		"owner_org": "fe12e3d4-8435-4cd0-9d80-96412e9b10c0",
+		"summary": "No Summary",
+		"is_opendata": "true",
+		"title": "Romania tree cover",
+		"revision_id": "817ff0cb-1f89-4c65-9e7b-ee68327149e8",
+		"wri_spatial_extent": "21.487,28.513,42.487,49.513"
+	}
+}

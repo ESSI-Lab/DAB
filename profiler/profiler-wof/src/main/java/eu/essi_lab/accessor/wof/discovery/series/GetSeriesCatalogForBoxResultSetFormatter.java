@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof.discovery.series;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -107,6 +107,47 @@ public class GetSeriesCatalogForBoxResultSetFormatter extends DiscoveryResultSet
 		builder.append(seriesRecord);
 	    }
 
+//	    builder.append("<SeriesRecord>\n"
+//	    	+ "<ServCode>CocoRaHs</ServCode>\n"
+//	    	+ "<ServURL>https://hydroportal.cuahsi.org/CocoRaHs/cuahsi_1_1.asmx</ServURL>\n"
+//	    	+ "<location>CocoRaHs:US1COJF0548</location>\n"
+//	    	+ "<VarCode>COCORAHS:PRCP</VarCode>\n"
+//	    	+ "<VarName>Precipitation</VarName>\n"
+//	    	+ "<beginDate>2021-01-01T00:00:00Z</beginDate>\n"
+//	    	+ "<endDate>2023-12-31T00:00:00Z</endDate>\n"
+//	    	+ "<ValueCount>1094</ValueCount>\n"
+//	    	+ "<Sitename>WHEAT RIDGE 2.3 ESE</Sitename>\n"
+//	    	+ "<latitude>39.759601593017578</latitude>\n"
+//	    	+ "<longitude>-105.05899810791016</longitude>\n"
+//	    	+ "<datatype>Incremental</datatype>\n"
+//	    	+ "<valuetype>Field Observation</valuetype>\n"
+//	    	+ "<samplemedium>Precipitation</samplemedium>\n"
+//	    	+ "<timeunits>day</timeunits>\n"
+//	    	+ "<conceptKeyword>Precipitation</conceptKeyword>\n"
+//	    	+ "<genCategory>Climate</genCategory>\n"
+//	    	+ "<TimeSupport>1</TimeSupport>\n"
+//	    	+ "</SeriesRecord>\n"
+//	    	+ "<SeriesRecord>\n"
+//	    	+ "<ServCode>CocoRaHs</ServCode>\n"
+//	    	+ "<ServURL>https://hydroportal.cuahsi.org/CocoRaHs/cuahsi_1_1.asmx</ServURL>\n"
+//	    	+ "<location>CocoRaHs:US1COJF0471</location>\n"
+//	    	+ "<VarCode>COCORAHS:PRCP</VarCode>\n"
+//	    	+ "<VarName>Precipitation</VarName>\n"
+//	    	+ "<beginDate>2018-01-01T00:00:00Z</beginDate>\n"
+//	    	+ "<endDate>2023-12-31T00:00:00Z</endDate>\n"
+//	    	+ "<ValueCount>2190</ValueCount>\n"
+//	    	+ "<Sitename>ARVADA 1.8 NE</Sitename>\n"
+//	    	+ "<latitude>39.83599853515625</latitude>\n"
+//	    	+ "<longitude>-105.07920074462891</longitude>\n"
+//	    	+ "<datatype>Incremental</datatype>\n"
+//	    	+ "<valuetype>Field Observation</valuetype>\n"
+//	    	+ "<samplemedium>Precipitation</samplemedium>\n"
+//	    	+ "<timeunits>day</timeunits>\n"
+//	    	+ "<conceptKeyword>Precipitation</conceptKeyword>\n"
+//	    	+ "<genCategory>Climate</genCategory>\n"
+//	    	+ "<TimeSupport>1</TimeSupport>\n"
+//	    	+ "</SeriesRecord>");
+	    
 	    builder.append(END_RESPONSE);
 
 	    return buildResponse(builder.toString());

@@ -2,7 +2,7 @@
     "openapi": "3.0.1",
     "info": {
         "title": "Timeseries DAB REST API",
-        "description": "The timeseries DAB REST API eases the discovery and access of timeseries data. It has been designed to be compliant with GeoJSON and OM-JSON OGC DP 15-100r1",
+        "description": "The timeseries DAB REST API eases the discovery and access of timeseries data. It has been designed to be compliant with OM-JSON OGC DP 15-100r1 and GeoJSON",
         "version": "1.0"
     },
     "servers": [
@@ -25,46 +25,39 @@
                         "in": "path",
                         "required": true,
                         "description": "Identifier of the data subset interesting for the user",
-                        "schema": {"type": "string"},
-                        "example": "his-central"
+                        "schema": {"type": "string"}
                     },
                     {
                         "name": "west",
                         "in": "query",
-                        "schema": {"type": "string"},
-                        "example": "11.22"
+                        "schema": {"type": "string"}                        
                     },
                     {
                         "name": "south",
                         "in": "query",
-                        "schema": {"type": "string"},
-                        "example": "44.03"
+                        "schema": {"type": "string"}                       
                     },
                     {
                         "name": "east",
                         "in": "query",
-                        "schema": {"type": "string"},
-                        "example": "11.77"
+                        "schema": {"type": "string"}                     
                     },
                     {
                         "name": "north",
                         "in": "query",
-                        "schema": {"type": "string"},
-                        "example": "44.20"
+                        "schema": {"type": "string"}                        
                     },
                     {
                         "name": "country",
                         "in": "query",
                         "description": "Country code (ISO3)",
-                        "schema": {"type": "string"},
-                        "example": "ITA"
+                        "schema": {"type": "string"}                        
                     },
                     {
                         "name": "provider",
                         "in": "query",
                         "description": "Data provider identifier",
-                        "schema": {"type": "string"},
-                        "example": ""
+                        "schema": {"type": "string"}                        
                     },
                     {
                         "name": "offset",
@@ -83,64 +76,11 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "GeoJSON feature collection made of matching timeseries encoded according to OM-JSON OGC DP 15-100r1",
+                        "description": "Monitoring points encoded according to OM-JSON OGC DP 15-100r1",
                         "content": {
                             "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "features": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "object",
-                                                "properties": {
-                                                    "geometry": {
-                                                        "type": "object",
-                                                        "properties": {
-                                                            "coordinates": {
-                                                                "type": "array",
-                                                                "items": {"type": "number"}
-                                                            },
-                                                            "type": {"type": "string"}
-                                                        }
-                                                    },
-                                                    "type": {"type": "string"},
-                                                    "properties": {
-                                                        "type": "object",
-                                                        "properties": {
-                                                            "monitoring-point": {
-                                                                "type": "object",
-                                                                "properties": {
-                                                                    "sampledFeature": {
-                                                                        "type": "object",
-                                                                        "properties": {
-                                                                            "href": {"type": "string"},
-                                                                            "title": {"type": "string"}
-                                                                        }
-                                                                    },
-                                                                    "type": {"type": "string"},
-                                                                    "parameters": {
-                                                                        "type": "array",
-                                                                        "items": {
-                                                                            "type": "object",
-                                                                            "properties": {
-                                                                                "name": {"type": "string"},
-                                                                                "value": {"type": "string"}
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        },
-                                        "type": {"type": "string"}
-                                    }
-                                },
                                 "examples": {
-                                    "0": {"value": "{\"type\":\"FeatureCollection\",\"features\":[{\"geometry\":{\"coordinates\":[11.3920000556,44.0541666844],\"type\":\"Point\"},\"type\":\"Feature\",\"properties\":{\"monitoring-point\":{\"sampledFeature\":{\"href\":\"002ECC68A36577F9BAC04296703CB5512CD1C1F6\",\"title\":\"Barco\"},\"type\":\"MonitoringPoint\",\"parameters\":[{\"name\":\"country\",\"value\":\"Firenzuola\"}]}}},{\"geometry\":{\"coordinates\":[11.2808454036713,44.0796316157846],\"type\":\"Point\"},\"type\":\"Feature\",\"properties\":{\"monitoring-point\":{\"sampledFeature\":{\"href\":\"04ADAA8478D77B526F625A0FA0AD3E075CAF9975\",\"title\":\"Monte di FÃ²\"},\"type\":\"MonitoringPoint\",\"parameters\":[{\"name\":\"country\",\"value\":\"Barberino di Mugello\"}]}}},{\"geometry\":{\"coordinates\":[11.3048246514,44.0544206678],\"type\":\"Point\"},\"type\":\"Feature\",\"properties\":{\"monitoring-point\":{\"sampledFeature\":{\"href\":\"158EF91106989B4EFE2BCC3C630DE32DA16B1557\",\"title\":\"Marcoiano\"},\"type\":\"MonitoringPoint\",\"parameters\":[{\"name\":\"country\",\"value\":\"Scarperia e San Piero\"}]}}},{\"geometry\":{\"coordinates\":[11.4686135013,44.0333961042],\"type\":\"Point\"},\"type\":\"Feature\",\"properties\":{\"monitoring-point\":{\"sampledFeature\":{\"href\":\"2ED4512E8DC5DDD0C48F3A24A6058215ADF4C101\",\"title\":\"Razzuolo\"},\"type\":\"MonitoringPoint\",\"parameters\":[{\"name\":\"country\",\"value\":\"Borgo San Lorenzo\"}]}}},{\"geometry\":{\"coordinates\":[11.2817900866,44.0787416352],\"type\":\"Point\"},\"type\":\"Feature\",\"properties\":{\"monitoring-point\":{\"sampledFeature\":{\"href\":\"3BE5E2FDBF0F20C490F2BE88EB6D1810A7CC1B09\",\"title\":\"Monte di Fo'\"},\"type\":\"MonitoringPoint\",\"parameters\":[{\"name\":\"country\",\"value\":\"Barberino di Mugello\"}]}}},{\"geometry\":{\"coordinates\":[11.2784288366,44.0952844875],\"type\":\"Point\"},\"type\":\"Feature\",\"properties\":{\"monitoring-point\":{\"sampledFeature\":{\"href\":\"3E1FCA9524764CCDB378B8147539F0CC43259798\",\"title\":\"Passo della Futa\"},\"type\":\"MonitoringPoint\",\"parameters\":[{\"name\":\"country\",\"value\":\"Firenzuola\"}]}}},{\"geometry\":{\"coordinates\":[11.3717930358,44.097659878],\"type\":\"Point\"},\"type\":\"Feature\",\"properties\":{\"monitoring-point\":{\"sampledFeature\":{\"href\":\"4B49B7B581EFC0DF6F030B29CF161BDC9F5D9EE8\",\"title\":\"Firenzuola Vanella\"},\"type\":\"MonitoringPoint\",\"parameters\":[{\"name\":\"country\",\"value\":\"Firenzuola\"}]}}},{\"geometry\":{\"coordinates\":[11.45427,44.152128],\"type\":\"Point\"},\"type\":\"Feature\",\"properties\":{\"monitoring-point\":{\"sampledFeature\":{\"href\":\"69B339B826859B46A9DB5F15784AF5F3201EAF5C\",\"title\":\"Firenzuola Coniale\"},\"type\":\"MonitoringPoint\",\"parameters\":[{\"name\":\"country\",\"value\":\"Firenzuola\"}]}}},{\"geometry\":{\"coordinates\":[11.3044059276581,44.0491644742928],\"type\":\"Point\"},\"type\":\"Feature\",\"properties\":{\"monitoring-point\":{\"sampledFeature\":{\"href\":\"78D0B5B845990471C4C1658628EE5129A226D7D3\",\"title\":\"Ponte a Olmo\"},\"type\":\"MonitoringPoint\",\"parameters\":[{\"name\":\"country\",\"value\":\"Scarperia e San Piero\"}]}}},{\"geometry\":{\"coordinates\":[11.5076667029,44.1241666782],\"type\":\"Point\"},\"type\":\"Feature\",\"properties\":{\"monitoring-point\":{\"sampledFeature\":{\"href\":\"7C5E192F8965FC1B626F7D80701E41A2F99683C4\",\"title\":\"Bibbiana\"},\"type\":\"MonitoringPoint\",\"parameters\":[{\"name\":\"country\",\"value\":\"Bibbiana\"}]}}}]}"}
+                                    "0": {"value": "{\"results\": [{\"shape\": {\"coordinates\": [-54.6831,-27.5781],\"type\": \"Point\"},\"parameter\": [{\"name\": \"country\",\"value\": \"Brazil\"},{\"name\": \"identifier\",\"value\": \"74720000\"}],\"name\": \"PORTO MAUÁ\",\"id\": \"000BE3CB65DF1F7D571EF045272E048FCD0072BD\",\"relatedParty\": [{\"organisationName\": \"National Water Agency of Brazil\",\"role\": \"author\",\"URL\": \"https://www.ana.gov.br/\"}]}]}"}
                                 }
                             }
                         }
@@ -170,61 +110,75 @@
                         "in": "path",
                         "required": true,
                         "description": "Identifier of the data subset interesting for the user",
-                        "schema": {"type": "string"},
-                        "example": "his-central"
+                        "schema": {"type": "string"}                     
                     },
                     {
                         "name": "monitoringPoint",
                         "in": "query",
                         "description": "Identifier of the monitoring point",
-                        "schema": {"type": "string"},
-                        "example": "002ECC68A36577F9BAC04296703CB5512CD1C1F6"
+                        "schema": {"type": "string"}                        
                     },
+
                     {
-                        "name": "observedProperty",
+                        "name": "timeseriesIdentifier",
                         "in": "query",
-                        "description": "Identifier of the observed property",
-                        "schema": {"type": "string"},
-                        "example": "636013A221AE8D24E9C2EFCD51ADC025A57429B4"
+                        "description": "Identifier of the time series",
+                        "schema": {"type": "string"}                       
                     },
                     {
                         "name": "beginPosition",
                         "in": "query",
                         "description": "Temporal interval begin position",
-                        "schema": {"type": "string"},
-                        "example": "2022-01-13T09:00:00Z"
+                        "schema": {"type": "string"}                        
                     },
                     {
                         "name": "endPosition",
                         "in": "query",
                         "description": "Temporal interval end position",
-                        "schema": {"type": "string"},
-                        "example": "2022-03-13T09:00:00Z"
+                        "schema": {"type": "string"}                        
                     },
                     {
                         "name": "includeData",
                         "in": "query",
                         "description": "Include data in the response. Not needed if a temporal period is specified",
-                        "schema": {"type": "string"},
-                        "example": "yes"
+                        "schema": {"type": "string"}                       
+                    },
+                    {
+                        "name": "useCache",
+                        "in": "query",
+                        "description": "Use the broker cache to retrieve the data, avoiding to contact the remote data providers",
+                        "schema": {"type": "string"}                        
                     },
                     {
                         "name": "offset",
                         "in": "query",
                         "description": "Start position of matched records",
-                        "schema": {"type": "string"},
-                        "example": "1"
+                        "schema": {"type": "string"}                       
                     },
                     {
                         "name": "limit",
                         "in": "query",
                         "description": "Maximum number of matched records",
-                        "schema": {"type": "string"},
-                        "example": "1"
+                        "schema": {"type": "string"}                        
+                    },
+                    {
+                        "name": "format",
+                        "in": "query",
+                        "description": "Response format (JSON or CSV)",
+                        "schema": {"type": "string"}                        
                     }
                 ],
                 "responses": {
-                    "200": {"description": "GeoJSON feature collection made of matching monitoring points encoded according to OM-JSON OGC DP 15-100r1"}
+                    "200": {
+                        "description": "Timeseries observations encoded according to OM-JSON OGC DP 15-100r1",
+                        "content": {
+                            "application/json": {
+                                "examples": {
+                                    "0": {"value": "{\"id\": \"observation collection\",\"member\": [{\"result\": {\"metadata\": {\"intendedObservationSpacing\": \"PT5M\"},\"defaultPointMetadata\": {\"uom\": \"cms\"},\"points\": []},\"observedProperty\": {\"href\": \"http://hydro.geodab.eu/hydro-ontology/concept/78\",\"title\": \"Discharge\"},\"phenomenonTime\": {\"end\": \"2023-04-06T08:25:36Z\",\"begin\": \"2023-03-07T08:25:36Z\"},\"featureOfInterest\": {\"href\": \"001231BBB7723B5A04EDB2D4E2F8D8C2E0C1F697\"},\"id\": \"urn:uuid:5b610264-0244-4f4c-86eb-634dbcf3927c\",\"type\": \"TimeSeriesObservation\"},{\"result\": {\"metadata\": {\"intendedObservationSpacing\": \"PT5M\"},\"defaultPointMetadata\": {\"uom\": \"m\"},\"points\": []},\"observedProperty\": {\"href\": \"http://hydro.geodab.eu/hydro-ontology/concept/11\",\"title\": \"Water Level\"},\"phenomenonTime\": {\"end\": \"2023-04-06T08:25:36Z\",\"begin\": \"2023-04-04T08:25:36Z\"},\"featureOfInterest\": {\"href\": \"001231BBB7723B5A04EDB2D4E2F8D8C2E0C1F697\"},\"id\": \"urn:uuid:c0ab2300-5d7b-4a6b-85ef-9e64076cfb59\",\"type\": \"TimeSeriesObservation\"},{\"result\": {\"metadata\": {\"intendedObservationSpacing\": \"PT5M\"},\"defaultPointMetadata\": {\"uom\": \"m\"},\"points\": []},\"observedProperty\": {\"href\": \"http://hydro.geodab.eu/hydro-ontology/concept/11\",\"title\": \"Water Level\"},\"phenomenonTime\": {\"end\": \"2023-04-06T08:25:36Z\",\"begin\": \"2023-03-07T08:25:36Z\"},\"featureOfInterest\": {\"href\": \"001231BBB7723B5A04EDB2D4E2F8D8C2E0C1F697\"},\"id\": \"urn:uuid:db6256a9-3f2d-43c9-a672-c16bad35a238\",\"type\": \"TimeSeriesObservation\"},{\"result\": {\"metadata\": {\"intendedObservationSpacing\": \"PT5M\"},\"defaultPointMetadata\": {\"uom\": \"cms\"},\"points\": []},\"observedProperty\": {\"href\": \"http://hydro.geodab.eu/hydro-ontology/concept/78\",\"title\": \"Discharge\"},\"phenomenonTime\": {\"end\": \"2023-04-06T08:25:37Z\",\"begin\": \"2023-04-04T08:25:37Z\"},\"featureOfInterest\": {\"href\": \"001231BBB7723B5A04EDB2D4E2F8D8C2E0C1F697\"},\"id\": \"urn:uuid:eb397645-ff06-4aac-a535-1dfe998a364c\",\"type\": \"TimeSeriesObservation\"}]}"}
+                                }
+                            }
+                        }
+                    }
                 },
                 "servers": [
                     {"url": "https://gs-service-preproduction.geodab.eu"}

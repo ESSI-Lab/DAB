@@ -4,7 +4,7 @@ package eu.essi_lab.netcdf.timeseries;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,6 +22,7 @@ package eu.essi_lab.netcdf.timeseries;
  */
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.List;
@@ -209,7 +210,10 @@ public class H4SingleTimeSeriesWriter extends TimeSeriesWriter {
 	}
 
 	if (station.getName() != null) {
-	    stationNamesArray.setString(station.getName());
+	    byte[] bytes = station.getName().getBytes(StandardCharsets.UTF_8);
+	    for (int i = 0; i < bytes.length; i++) {
+		stationNamesArray.setByte(i, bytes[i]);
+	    }
 	}
 
 	Array[] arrays = new Array[variables.length];

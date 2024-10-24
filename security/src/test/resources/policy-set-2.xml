@@ -1,0 +1,49 @@
+<PolicySet xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 https://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd"	
+    
+    PolicySetId="policySet2" 
+    Version="1.0"
+    PolicyCombiningAlgId="urn:oasis:names:tc:xacml:3.0:policy-combining-algorithm:deny-overrides">
+    
+    <Target></Target>
+       
+    <Policy 
+    	PolicyId="testPolicy2"
+        Version="1.0"
+        RuleCombiningAlgId="urn:oasis:names:tc:xacml:3.0:rule-combining-algorithm:deny-overrides">
+        
+        <Description></Description>
+        
+        <Target />
+        <Rule  
+            Effect="Permit" 
+            RuleId="testRule2">
+            
+            <Description>Any subject with an e-mail name in the med.example.com domain can perform any action on any resource. </Description>
+            
+            <Target>
+                <AnyOf>
+                    <AllOf>
+                        <Match
+                            MatchId="urn:oasis:names:tc:xacml:1.0:function:rfc822Name-match">
+                            
+                            <AttributeValue
+                                DataType="http://www.w3.org/2001/XMLSchema#string">med.example.com</AttributeValue>
+                            
+                            <AttributeDesignator 
+                                Issuer="test2"
+                                MustBePresent="false"
+                                AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id"						 
+                                Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+                                DataType="urn:oasis:names:tc:xacml:1.0:data-type:rfc822Name" />
+                            
+                        </Match>
+                    </AllOf>
+                </AnyOf>
+            </Target>
+        </Rule>
+    </Policy>
+    
+</PolicySet>
+

@@ -4,7 +4,7 @@ package eu.essi_lab.request.executor.access;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,6 +23,7 @@ package eu.essi_lab.request.executor.access;
 
 import java.io.File;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -41,7 +42,7 @@ import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.count.CountSet;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
@@ -72,6 +73,9 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
     private static final String ACCESS_EXECUTOR_NO_AVAILABLE_WORKFLOW = "ACCESS_EXECUTOR_NO_AVAILABLE_WORKFLOW";
     private static final String ACCESS_EXECUTOR_WORKFLOW_EXECUTION_ERROR = "ACCESS_EXECUTOR_WORKFLOW_EXECUTION_ERROR";
     private static final String ACCESS_EXECUTOR_PDP_ENGINE_ERROR = "ACCESS_EXECUTOR_PDP_ENGINE_ERROR";
+    private static final String ACCESS_EXECUTOR_UNABLE_TO_RETRIEVE_DATA_OBJECT = "ACCESS_EXECUTOR_UNABLE_TO_RETRIEVE_DATA_OBJECT_ERROR";
+    private static final String ACCESS_EXECUTOR_UNABLE_TO_FIND_DATA_DOWNLOADER = "ACCESS_EXECUTOR_UNABLE_TO_FIND_DATA_DOWNLOADER";
+
     private static final Double TOL = Math.pow(10, -8);
 
     @Override
@@ -104,7 +108,6 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
     public ResultSet<DataObject> retrieve(AccessMessage accessMessage) throws GSException {
 
 	String onlineId = accessMessage.getOnlineId();
-
 	GSLoggerFactory.getLogger(getClass()).debug("[ACCESS] Accessing online with id " + onlineId + " STARTED");
 
 	// ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
@@ -115,7 +118,7 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 	// GSLoggerFactory.getLogger(getClass()).info("Resource discovery STARTED");
 
 	List<GSSource> sources = accessMessage.getSources();
-	StorageUri databaseURI = accessMessage.getDataBaseURI();
+	StorageInfo databaseURI = accessMessage.getDataBaseURI();
 	ResultSet<GSResource> resultSet = AccessQueryUtils.findResource(accessMessage.getRequestId(), sources, onlineId, databaseURI);
 
 	if (resultSet.getResultsList().isEmpty()) {
@@ -151,11 +154,20 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 		    ACCESS_EXECUTOR_TOO_MANY_RESOURCES);
 	}
 
-	// GSLoggerFactory.getLogger(getClass()).info("Resource discovery ENDED");
-
-	// GSLoggerFactory.getLogger(getClass()).info("Retrieving data compliance report STARTED");
-
 	GSResource resource = resultSet.getResultsList().get(0);
+	DataDescriptor targetDescriptor = accessMessage.getTargetDataDescriptor();
+
+	return retrieve(resource, onlineId, targetDescriptor);
+    }
+
+    /**
+     * @param accessMessage
+     * @return
+     * @throws GSException
+     */
+    @Override
+    public ResultSet<DataObject> retrieve(GSResource resource, String onlineId, DataDescriptor targetDescriptor) throws GSException {
+
 	ReportsMetadataHandler handler = new ReportsMetadataHandler(resource);
 
 	List<DataComplianceReport> reports = handler.getReports();
@@ -179,13 +191,34 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 	DataComplianceReport report = optReport.get();
 
 	DataDownloader downloader = DataDownloaderFactory.getDataDownloader(resource, onlineId);
-	DataDescriptor targetDescriptor = accessMessage.getTargetDataDescriptor();
 
 	// GSLoggerFactory.getLogger(getClass()).info("Retrieving data compliance report ENDED");
 
+	if (downloader == null) {
+
+	    throw GSException.createException(getClass(), //
+		    "Data downloader not found for resource [" + resource.getPrivateId() + "] and online resource [" + onlineId + "]", //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    ACCESS_EXECUTOR_UNABLE_TO_FIND_DATA_DOWNLOADER);
+	}
+
 	DataObject dataObject = retrieveDataObject(downloader, report.getFullDataDescriptor(), targetDescriptor);
+
+	if (dataObject == null) {
+
+	    throw GSException.createException(getClass(), //
+		    "Unable to retrieve data object", //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    ACCESS_EXECUTOR_UNABLE_TO_RETRIEVE_DATA_OBJECT);
+	}
+
 	dataObject.setResource(resource);
 
+	List<GSResource> list = new ArrayList<>();
+	list.add(resource);
+	ResultSet<GSResource> resultSet = new ResultSet<>(list);
 	ResultSet<DataObject> out = createResultSet(resultSet, dataObject);
 
 	GSLoggerFactory.getLogger(getClass()).debug("[ACCESS] Accessing online with id " + onlineId + " ENDED");
@@ -220,6 +253,11 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 	// hence, among the obtained remote descriptors, we choose the one that is most similar to the report descriptor
 	// that we know it can be safely used for access, as it has been passed the execution tests
 	DataDescriptor remoteDescriptor = chooseDescriptor(remoteDescriptors, reportDescriptor);
+
+	if (remoteDescriptor == null) {
+
+	    return null;
+	}
 
 	// GSLoggerFactory.getLogger(getClass()).debug("Data download STARTED");
 
@@ -386,6 +424,12 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 		return dataDescriptor;
 	    }
 	}
+
+	if (remoteDescriptors.isEmpty()) {
+
+	    return null;
+	}
+
 	return remoteDescriptors.get(0);
     }
 

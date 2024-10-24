@@ -4,7 +4,7 @@ package eu.essi_lab.model.ontology;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -60,7 +60,7 @@ import com.google.common.collect.Lists;
          {  
             "object":{  
                "type":"uri",
-               "value":"http://eu.floraresearch.essi.core/test/target2"
+               "value":"http://eu.essi_lab.essi.core/test/target2"
             },
             "type":{  
                "type":"uri",
@@ -68,7 +68,7 @@ import com.google.common.collect.Lists;
             },
             "ontology":{  
                "type":"uri",
-               "value":"http://eu.floraresearch.essi.core/test/unontology"
+               "value":"http://eu.essi_lab.essi.core/test/unontology"
             },
             "label":{  
                "type":"literal",
@@ -137,7 +137,7 @@ import com.google.common.collect.Lists;
  * {
     "object": {
         "type": "uri",
-        "value": "http://eu.floraresearch.essi.core/test/target2"
+        "value": "http://eu.essi_lab.essi.core/test/target2"
     },
     "type": {
         "type": "uri",
@@ -145,7 +145,7 @@ import com.google.common.collect.Lists;
     },
     "ontology": {
         "type": "uri",
-        "value": "http://eu.floraresearch.essi.core/test/unontology"
+        "value": "http://eu.essi_lab.essi.core/test/unontology"
     },
     "label": [
         {
@@ -289,7 +289,7 @@ public class JSONBindingWrapper {
 
     /**
      * Reads the value of the binding element with the provided key at the provided index (e.g:
-     * "http://eu.floraresearch.essi.core/test/target2", "Target 1.2");
+     * "http://eu.essi_lab.essi.core/test/target2", "Target 1.2");
      * 
      * @param key
      * @param index
@@ -327,7 +327,7 @@ public class JSONBindingWrapper {
 
     /**
      * Reads the value of the first binding element with the provided key (e.g:
-     * "http://eu.floraresearch.essi.core/test/target2", "Target 1.2");
+     * "http://eu.essi_lab.essi.core/test/target2", "Target 1.2");
      * 
      * @param key
      * @return

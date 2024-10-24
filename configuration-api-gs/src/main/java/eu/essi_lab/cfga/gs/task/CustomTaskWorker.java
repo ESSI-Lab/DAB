@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gs.task;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -91,6 +91,11 @@ public class CustomTaskWorker extends SchedulerWorker<CustomTaskSetting> {
 
 	    GSLoggerFactory.getLogger(getClass()).warn("Unable to send email, system email settings not configured");
 	}
+
+	if (task.clearMessagesBeforeStoreStatus()) {
+
+	    status.clearMessages();
+	}
     }
 
     @Override
@@ -112,7 +117,7 @@ public class CustomTaskWorker extends SchedulerWorker<CustomTaskSetting> {
 	} catch (SQLException e) {
 
 	    GSLoggerFactory.getLogger(getClass()).error("Unable to store status");
-
+	    GSLoggerFactory.getLogger(getClass()).error(status.toString());
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
     }

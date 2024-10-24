@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.oaipmh;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,6 +22,7 @@ package eu.essi_lab.accessor.oaipmh;
  */
 
 import java.io.InputStream;
+import java.net.http.HttpHeaders;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,14 +32,13 @@ import java.util.stream.Collectors;
 
 import javax.xml.xpath.XPathExpressionException;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.w3c.dom.Node;
 
 import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.jaxb.oaipmh.OAIPMHerrorcodeType;
-import eu.essi_lab.lib.net.utils.HttpRequestExecutor;
+import eu.essi_lab.lib.net.downloader.Downloader;
+import eu.essi_lab.lib.net.downloader.HttpHeaderUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
@@ -73,7 +73,9 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
     private int count;
     private List<SimpleEntry<String, String>> metadataFormatsNS;
     private String setName;
-    private boolean isFirstRequest;
+
+    // replace this variable with a Setting value
+    // private boolean isFirstRequest;
     private int maximumAttemptsCount;
     private boolean essiClientId;
 
@@ -95,7 +97,7 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
 	setMaxAttemptsCount(DEFAULT_MAX_ATTEMPTS_COUNT);
 
 	count = 0;
-	isFirstRequest = true;
+	// isFirstRequest = true;
     }
 
     /**
@@ -126,7 +128,7 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
 	//
 	// most OAI-PMH services provide a temporary resumption token, so it cannot be reused
 	//
-	if (request.getRecovering()) {
+	if (request.isRecovered()) {
 	    token = null;
 	}
 
@@ -228,15 +230,15 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
 	List<Node> records = readRecords(reader);
 
 	// try removing from and until to get some results
-	if (isFirstRequest && records.isEmpty()) {
-	    isFirstRequest = false;
-	    String listRecordsNoTime = createListRecordsRequest(preferredPrefix, null, null, token, set);
-	    reader = execListRecords(listRecordsNoTime);
-	    // set the resumption token to the response
-	    setResumptionToken(reader, ret);
-	    records = readRecords(reader);
-
-	}
+	// if (isFirst && records.isEmpty()) {
+	// isFirstRequest = false;
+	// String listRecordsNoTime = createListRecordsRequest(preferredPrefix, null, null, token, set);
+	// reader = execListRecords(listRecordsNoTime);
+	// // set the resumption token to the response
+	// setResumptionToken(reader, ret);
+	// records = readRecords(reader);
+	//
+	// }
 
 	for (Node record : records) {
 
@@ -247,6 +249,13 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
 	    // set the OAI ns URI
 	    //
 	    metadataRecord.setSchemeURI(CommonNameSpaceContext.OAI_NS_URI);
+	    if (preferredPrefix.contains("datacite")) {
+		metadataRecord.setSchemeURI(CommonNameSpaceContext.OAI_DATACITE_NS_URI);
+	    } else if (preferredPrefix.contains("eml")) {
+		metadataRecord.setSchemeURI(CommonNameSpaceContext.EUROBIS_NS_URI);
+	    } else if (preferredPrefix.contains("dif")) {
+		metadataRecord.setSchemeURI(CommonNameSpaceContext.DIF_URI);
+	    }
 
 	    // ------------------------------------
 	    //
@@ -265,6 +274,7 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
 		GSLoggerFactory.getLogger(getClass()).info("Setting null resumption token to stop the harvesting");
 
 		ret.setResumptionToken(null);
+		break;
 	    }
 	}
 
@@ -277,6 +287,26 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
 	return true;
     }
 
+    /**
+     * Usually the duration of an OAI-PMH resumption token is temporary. In case of resuming, reusing an expired
+     * resumption token, causes an error and the failing of the request
+     */
+    @Override
+    public boolean supportsResumedHarvesting() throws GSException {
+
+	return false;
+    }
+
+    /**
+     * Usually the duration of an OAI-PMH resumption token is temporary. In case of recovery, reusing an expired
+     * resumption token, causes an error and the failing of the request
+     */
+    @Override
+    public boolean supportsRecovery() throws GSException {
+
+	return false;
+    }
+
     @Override
     public List<String> listMetadataFormats() throws GSException {
 
@@ -286,19 +316,21 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
     @Override
     public String getSourceURL() {
 
+	if (super.getSourceURL().contains("sios.csw.met.no")) {
+	    return super.getSourceURL().endsWith("mode=oaipmh&") ? super.getSourceURL() : super.getSourceURL() + "&";
+	} else if(super.getSourceURL().contains("www.vliz.be/projects/mission-atlantic")) {
+	    return super.getSourceURL().endsWith("module=dataset&") ? super.getSourceURL() : super.getSourceURL() + "&";
+	} 
 	return super.getSourceURL().endsWith("?") ? super.getSourceURL() : super.getSourceURL() + "?";
     }
 
     @Override
     public boolean supports(GSSource source) {
 
-	String endpoint = source.getEndpoint();
+	String endpoint = getSourceURL();
 
 	try {
 
-	    if (!endpoint.endsWith("?")) {
-		endpoint += "?";
-	    }
 	    XMLDocumentReader response = getIdentifyResponse(endpoint);
 	    return response.evaluateBoolean("exists(//*:Identify)");
 
@@ -413,10 +445,10 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
 
 	GSLoggerFactory.getLogger(getClass()).debug("Serving listRecords: {}", listRecords);
 
-	HttpGet httpGet = new HttpGet(listRecords);
+	HttpHeaders headers = HttpHeaderUtils.buildEmpty();
 
 	if (essiClientId) {
-	    httpGet.addHeader(WebRequest.CLIENT_IDENTIFIER_HEADER, WebRequest.ESSI_LAB_CLIENT_IDENTIFIER);
+	    headers = HttpHeaderUtils.build(WebRequest.CLIENT_IDENTIFIER_HEADER, WebRequest.ESSI_LAB_CLIENT_IDENTIFIER);
 	}
 
 	int attempt = 0;
@@ -426,9 +458,7 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
 
 		GSLoggerFactory.getLogger(getClass()).debug("Attempt #{} in progress", attempt + 1);
 
-		HttpResponse response = new HttpRequestExecutor().execute(httpGet);
-
-		InputStream content = response.getEntity().getContent();
+		InputStream content = new Downloader().downloadOptionalStream(listRecords, headers).get();
 
 		XMLDocumentReader reader = new XMLDocumentReader(content);
 
@@ -487,6 +517,9 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
 
 	if (token != null) {
 	    listRecords += "&resumptionToken=" + token;
+	    if ((listRecords.contains("sios.csw.met.no") || listRecords.contains("www.vliz.be/projects/mission-atlantic")) && !listRecords.contains("metadataPrefix")) {
+		listRecords += "&metadataPrefix=" + preferredPrefix;
+	    }
 	} else {
 	    listRecords += "&metadataPrefix=" + preferredPrefix;
 
@@ -510,6 +543,9 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
 
 	String gmdPrefix = null;
 	String dcPrefix = null;
+	String datacitePrefix = null;
+	String emlPrefix = null;
+	String difPrefix = null;
 
 	for (SimpleEntry<String, String> entry : metadataFormatsNS) {
 
@@ -517,6 +553,15 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
 	    case CommonNameSpaceContext.GMD_NS_URI:
 	    case CommonNameSpaceContext.GMI_NS_URI:
 		gmdPrefix = entry.getKey();
+		break;
+	    case CommonNameSpaceContext.OAI_DATACITE_NS_URI:
+		datacitePrefix = entry.getKey();
+		break;
+	    case CommonNameSpaceContext.DIF_URI:
+		difPrefix = entry.getKey();
+		break;
+	    case "http://ecoinformatics.org/eml-2.1.1":
+		emlPrefix = entry.getKey();
 		break;
 	    case CommonNameSpaceContext.OAI_DC_NS_URI:
 	    default:
@@ -529,8 +574,19 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
 	    return gmdPrefix;
 	}
 
+	if (datacitePrefix != null) {
+	    return datacitePrefix;
+	}
+
 	if (dcPrefix != null) {
 	    return dcPrefix;
+	}
+
+	if (emlPrefix != null) {
+	    return emlPrefix;
+	}
+	if (difPrefix != null) {
+	    return difPrefix;
 	}
 
 	return null;
@@ -542,16 +598,21 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
      * @throws GSException
      */
     static List<String> getSets(String sourceURL) throws Exception {
+	// seanoe use-case
+	if (sourceURL.startsWith("https://oai.datacite.org/oai")) {
+	    List<String> seanoeSet = new ArrayList<String>();
+	    seanoeSet.add("EUVI.SEANOE");
+	    return seanoeSet;
+	}
 
 	String listSets = sourceURL + "verb=ListSets";
-	HttpGet httpGet = new HttpGet(listSets);
 
 	try {
 
 	    GSLoggerFactory.getLogger(OAIPMHConnector.class).debug("Serving GET: {}", listSets);
-	    HttpResponse response = new HttpRequestExecutor().execute(httpGet);
 
-	    InputStream content = response.getEntity().getContent();
+	    InputStream content = new Downloader().downloadOptionalStream(listSets).get();
+
 	    XMLDocumentReader reader = new XMLDocumentReader(content);
 
 	    return Arrays.asList(reader.evaluateNodes("//*:setSpec")).//
@@ -608,9 +669,8 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
 	    String listMdFormats = sourceURL + "verb=ListMetadataFormats";
 	    GSLoggerFactory.getLogger(OAIPMHConnector.class).trace("Requesting Metadata formats {}", listMdFormats);
 
-	    HttpGet httpGet = new HttpGet(listMdFormats);
-	    HttpResponse response = new HttpRequestExecutor().execute(httpGet);
-	    InputStream content = response.getEntity().getContent();
+	    InputStream content = new Downloader().downloadOptionalStream(listMdFormats).get();
+
 	    XMLDocumentReader reader = new XMLDocumentReader(content);
 
 	    Node[] nodes = reader.evaluateNodes("//*:metadataFormat");
@@ -663,12 +723,11 @@ public class OAIPMHConnector extends HarvestedQueryConnector<OAIPMHConnectorSett
 	try {
 
 	    String identify = sourceURL + "verb=Identify";
-	    HttpGet httpGet = new HttpGet(identify);
 
 	    GSLoggerFactory.getLogger(getClass()).debug("Serving GET: {}", identify);
-	    HttpResponse response = new HttpRequestExecutor().execute(httpGet);
 
-	    InputStream content = response.getEntity().getContent();
+	    InputStream content = new Downloader().downloadOptionalStream(identify).get();
+
 	    return new XMLDocumentReader(content);
 
 	} catch (Exception e) {

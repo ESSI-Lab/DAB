@@ -7,7 +7,7 @@ package eu.essi_lab.pdk.rsf.impl.atom;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -114,7 +114,11 @@ public class AtomGPResultSetFormatter extends DiscoveryResultSetFormatter<String
 			    map(s -> s.getLabel()).//
 			    findFirst();
 		    if (firstTF.isPresent())
-			termFrequencyItem.setDecodedTerm(XML.escape(firstTF.get()));
+			if(firstTF.get().contains("PANGAEA ‒ Data Publisher for Earth")) {
+			    termFrequencyItem.setDecodedTerm(firstTF.get());
+			}else {
+			    termFrequencyItem.setDecodedTerm(XML.escape(firstTF.get()));
+			}
 		}
 
 		try {
@@ -147,7 +151,7 @@ public class AtomGPResultSetFormatter extends DiscoveryResultSetFormatter<String
 
 		    out.append(mapString);
 
-		} catch (UnsupportedEncodingException | JAXBException e) {
+		} catch (Exception e) {
 
 		    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 		}

@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DataSet xmlns="http://MRCS/">
+  <xs:schema id="Estacoes" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xs:element name="Estacoes" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="Table">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="BaciaCodigo" type="xs:string" minOccurs="0" />
+                <xs:element name="SubBaciaCodigo" type="xs:string" minOccurs="0" />
+                <xs:element name="RioCodigo" type="xs:string" minOccurs="0" />
+                <xs:element name="RioNome" type="xs:string" minOccurs="0" />
+                <xs:element name="EstadoCodigo" type="xs:string" minOccurs="0" />
+                <xs:element name="nmEstado" type="xs:string" minOccurs="0" />
+                <xs:element name="MunicipioCodigo" type="xs:string" minOccurs="0" />
+                <xs:element name="nmMunicipio" type="xs:string" minOccurs="0" />
+                <xs:element name="ResponsavelCodigo" type="xs:string" minOccurs="0" />
+                <xs:element name="ResponsavelSigla" type="xs:string" minOccurs="0" />
+                <xs:element name="ResponsavelUnidade" type="xs:string" minOccurs="0" />
+                <xs:element name="ResponsavelJurisdicao" type="xs:string" minOccurs="0" />
+                <xs:element name="OperadoraCodigo" type="xs:string" minOccurs="0" />
+                <xs:element name="OperadoraSigla" type="xs:string" minOccurs="0" />
+                <xs:element name="OperadoraUnidade" type="xs:string" minOccurs="0" />
+                <xs:element name="OperadoraSubUnidade" type="xs:string" minOccurs="0" />
+                <xs:element name="TipoEstacao" type="xs:string" minOccurs="0" />
+                <xs:element name="Codigo" type="xs:string" minOccurs="0" />
+                <xs:element name="Nome" type="xs:string" minOccurs="0" />
+                <xs:element name="CodigoAdicional" type="xs:string" minOccurs="0" />
+                <xs:element name="Latitude" type="xs:string" minOccurs="0" />
+                <xs:element name="Longitude" type="xs:string" minOccurs="0" />
+                <xs:element name="Altitude" type="xs:string" minOccurs="0" />
+                <xs:element name="AreaDrenagem" type="xs:string" minOccurs="0" />
+                <xs:element name="TipoEstacaoEscala" type="xs:string" minOccurs="0" />
+                <xs:element name="TipoEstacaoRegistradorNivel" type="xs:string" minOccurs="0" />
+                <xs:element name="TipoEstacaoDescLiquida" type="xs:string" minOccurs="0" />
+                <xs:element name="TipoEstacaoSedimentos" type="xs:string" minOccurs="0" />
+                <xs:element name="TipoEstacaoQualAgua" type="xs:string" minOccurs="0" />
+                <xs:element name="TipoEstacaoPluviometro" type="xs:string" minOccurs="0" />
+                <xs:element name="TipoEstacaoRegistradorChuva" type="xs:string" minOccurs="0" />
+                <xs:element name="TipoEstacaoTanqueEvapo" type="xs:string" minOccurs="0" />
+                <xs:element name="TipoEstacaoClimatologica" type="xs:string" minOccurs="0" />
+                <xs:element name="TipoEstacaoPiezometria" type="xs:string" minOccurs="0" />
+                <xs:element name="TipoEstacaoTelemetrica" type="xs:string" minOccurs="0" />
+                <xs:element name="PeriodoEscalaInicio" type="xs:string" minOccurs="0" />
+                <xs:element name="PeriodoEscalaFim" type="xs:string" minOccurs="0" />
+                <xs:element name="PeriodoRegistradorNivelInicio" type="xs:string" minOccurs="0" />
+                <xs:element name="PeriodoRegistradorNivelFim" type="xs:string" minOccurs="0" />
+                <xs:element name="PeriodoDescLiquidaInicio" type="xs:string" minOccurs="0" />
+                <xs:element name="PeriodoDescLiquidaFim" type="xs:string" minOccurs="0" />
+                <xs:element name="PeriodoSedimentosInicio" type="xs:string" minOccurs="0" />
+                <xs:element name="PeriodoSedimentosFim" type="xs:string" minOccurs="0" />
+                <xs:element name="PeriodoQualAguaInicio" type="xs:string" minOccurs="0" />
+                <xs:element name="PeriodoQualAguaFim" type="xs:string" minOccurs="0" />
+                <xs:element name="PeriodoPluviometroInicio" type="xs:string" minOccurs="0" />
+                <xs:element name="PeriodoPluviometroFim" type="xs:string" minOccurs="0" />
+                <xs:element name="PeriodoRegistradorChuvaInicio" type="xs:string" minOccurs="0" />
+                <xs:element name="PeriodoRegistradorChuvaFim" type="xs:string" minOccurs="0" />
+                <xs:element name="PeriodoTanqueEvapoInicio" type="xs:string" minOccurs="0" />
+                <xs:element name="PeriodoTanqueEvapoFim" type="xs:string" minOccurs="0" />
+                <xs:element name="PeriodoClimatologicaInicio" type="xs:string" minOccurs="0" />
+                <xs:element name="PeriodoClimatologicaFim" type="xs:string" minOccurs="0" />
+                <xs:element name="PeriodoPiezometriaInicio" type="xs:string" minOccurs="0" />
+                <xs:element name="PeriodoPiezometriaFim" type="xs:string" minOccurs="0" />
+                <xs:element name="PeriodoTelemetricaInicio" type="xs:string" minOccurs="0" />
+                <xs:element name="PeriodoTelemetricaFim" type="xs:string" minOccurs="0" />
+                <xs:element name="TipoRedeBasica" type="xs:string" minOccurs="0" />
+                <xs:element name="TipoRedeEnergetica" type="xs:string" minOccurs="0" />
+                <xs:element name="TipoRedeNavegacao" type="xs:string" minOccurs="0" />
+                <xs:element name="TipoRedeCursoDagua" type="xs:string" minOccurs="0" />
+                <xs:element name="TipoRedeEstrategica" type="xs:string" minOccurs="0" />
+                <xs:element name="TipoRedeCaptacao" type="xs:string" minOccurs="0" />
+                <xs:element name="TipoRedeSedimentos" type="xs:string" minOccurs="0" />
+                <xs:element name="TipoRedeQualAgua" type="xs:string" minOccurs="0" />
+                <xs:element name="TipoRedeClasseVazao" type="xs:string" minOccurs="0" />
+                <xs:element name="UltimaAtualizacao" type="xs:string" minOccurs="0" />
+                <xs:element name="Operando" type="xs:string" minOccurs="0" />
+                <xs:element name="Descricao" type="xs:string" minOccurs="0" />
+                <xs:element name="NumImagens" type="xs:string" minOccurs="0" />
+                <xs:element name="DataIns" type="xs:string" minOccurs="0" />
+                <xs:element name="DataAlt" type="xs:string" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <diffgr:diffgram xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:diffgr="urn:schemas-microsoft-com:xml-diffgram-v1">
+    <Estacoes xmlns="">
+      <Table diffgr:id="Table1" msdata:rowOrder="0">
+        <BaciaCodigo>3</BaciaCodigo>
+        <SubBaciaCodigo>32</SubBaciaCodigo>
+        <RioCodigo />
+        <RioNome />
+        <EstadoCodigo>5</EstadoCodigo>
+        <nmEstado>PARÁ</nmEstado>
+        <MunicipioCodigo>5063000</MunicipioCodigo>
+        <nmMunicipio>SALINÓPOLIS</nmMunicipio>
+        <ResponsavelCodigo>1</ResponsavelCodigo>
+        <ResponsavelSigla>ANA</ResponsavelSigla>
+        <ResponsavelUnidade>27</ResponsavelUnidade>
+        <ResponsavelJurisdicao>1</ResponsavelJurisdicao>
+        <OperadoraCodigo>82</OperadoraCodigo>
+        <OperadoraSigla>CPRM</OperadoraSigla>
+        <OperadoraUnidade>5</OperadoraUnidade>
+        <OperadoraSubUnidade>2</OperadoraSubUnidade>
+        <TipoEstacao>2</TipoEstacao>
+        <Codigo>47002</Codigo>
+        <Nome>SALINÓPOLIS</Nome>
+        <CodigoAdicional>ANA</CodigoAdicional>
+        <Latitude>-0.6231</Latitude>
+        <Longitude>-47.3536</Longitude>
+        <Altitude />
+        <AreaDrenagem />
+        <TipoEstacaoEscala>0</TipoEstacaoEscala>
+        <TipoEstacaoRegistradorNivel>0</TipoEstacaoRegistradorNivel>
+        <TipoEstacaoDescLiquida>0</TipoEstacaoDescLiquida>
+        <TipoEstacaoSedimentos>0</TipoEstacaoSedimentos>
+        <TipoEstacaoQualAgua>0</TipoEstacaoQualAgua>
+        <TipoEstacaoPluviometro>1</TipoEstacaoPluviometro>
+        <TipoEstacaoRegistradorChuva>0</TipoEstacaoRegistradorChuva>
+        <TipoEstacaoTanqueEvapo>0</TipoEstacaoTanqueEvapo>
+        <TipoEstacaoClimatologica>0</TipoEstacaoClimatologica>
+        <TipoEstacaoPiezometria>0</TipoEstacaoPiezometria>
+        <TipoEstacaoTelemetrica>1</TipoEstacaoTelemetrica>
+        <PeriodoEscalaInicio />
+        <PeriodoEscalaFim />
+        <PeriodoRegistradorNivelInicio />
+        <PeriodoRegistradorNivelFim />
+        <PeriodoDescLiquidaInicio />
+        <PeriodoDescLiquidaFim />
+        <PeriodoSedimentosInicio />
+        <PeriodoSedimentosFim />
+        <PeriodoQualAguaInicio />
+        <PeriodoQualAguaFim />
+        <PeriodoPluviometroInicio>1977-12-01 00:00:00</PeriodoPluviometroInicio>
+        <PeriodoPluviometroFim />
+        <PeriodoRegistradorChuvaInicio>1977-12-01 00:00:00</PeriodoRegistradorChuvaInicio>
+        <PeriodoRegistradorChuvaFim>2013-12-01 00:00:00</PeriodoRegistradorChuvaFim>
+        <PeriodoTanqueEvapoInicio>1977-12-01 00:00:00</PeriodoTanqueEvapoInicio>
+        <PeriodoTanqueEvapoFim>2015-10-01 00:00:00</PeriodoTanqueEvapoFim>
+        <PeriodoClimatologicaInicio />
+        <PeriodoClimatologicaFim />
+        <PeriodoPiezometriaInicio />
+        <PeriodoPiezometriaFim />
+        <PeriodoTelemetricaInicio>2010-08-01 00:00:00</PeriodoTelemetricaInicio>
+        <PeriodoTelemetricaFim />
+        <TipoRedeBasica>1</TipoRedeBasica>
+        <TipoRedeEnergetica>0</TipoRedeEnergetica>
+        <TipoRedeNavegacao>0</TipoRedeNavegacao>
+        <TipoRedeCursoDagua>0</TipoRedeCursoDagua>
+        <TipoRedeEstrategica>0</TipoRedeEstrategica>
+        <TipoRedeCaptacao>7</TipoRedeCaptacao>
+        <TipoRedeSedimentos>0</TipoRedeSedimentos>
+        <TipoRedeQualAgua>0</TipoRedeQualAgua>
+        <TipoRedeClasseVazao>0</TipoRedeClasseVazao>
+        <UltimaAtualizacao>2018-06-18 00:00:00</UltimaAtualizacao>
+        <Operando>1</Operando>
+        <Descricao>AUTOMÁTICA - IRIS-1</Descricao>
+        <NumImagens>1</NumImagens>
+        <DataIns />
+        <DataAlt>2018-06-18 00:00:00</DataAlt>
+      </Table>
+      <Table diffgr:id="Table2" msdata:rowOrder="1">
+        <BaciaCodigo>3</BaciaCodigo>
+        <SubBaciaCodigo>32</SubBaciaCodigo>
+        <RioCodigo />
+        <RioNome />
+        <EstadoCodigo>5</EstadoCodigo>
+        <nmEstado>PARÁ</nmEstado>
+        <MunicipioCodigo>5029000</MunicipioCodigo>
+        <nmMunicipio>CURUÇA</nmMunicipio>
+        <ResponsavelCodigo>1</ResponsavelCodigo>
+        <ResponsavelSigla>ANA</ResponsavelSigla>
+        <ResponsavelUnidade>27</ResponsavelUnidade>
+        <ResponsavelJurisdicao>1</ResponsavelJurisdicao>
+        <OperadoraCodigo>82</OperadoraCodigo>
+        <OperadoraSigla>CPRM</OperadoraSigla>
+        <OperadoraUnidade>5</OperadoraUnidade>
+        <OperadoraSubUnidade>2</OperadoraSubUnidade>
+        <TipoEstacao>2</TipoEstacao>
+        <Codigo>47003</Codigo>
+        <Nome>CURUÇA</Nome>
+        <CodigoAdicional>ANA</CodigoAdicional>
+        <Latitude>-0.7375</Latitude>
+        <Longitude>-47.8536</Longitude>
+        <Altitude />
+        <AreaDrenagem />
+        <TipoEstacaoEscala>0</TipoEstacaoEscala>
+        <TipoEstacaoRegistradorNivel>0</TipoEstacaoRegistradorNivel>
+        <TipoEstacaoDescLiquida>0</TipoEstacaoDescLiquida>
+        <TipoEstacaoSedimentos>0</TipoEstacaoSedimentos>
+        <TipoEstacaoQualAgua>0</TipoEstacaoQualAgua>
+        <TipoEstacaoPluviometro>1</TipoEstacaoPluviometro>
+        <TipoEstacaoRegistradorChuva>0</TipoEstacaoRegistradorChuva>
+        <TipoEstacaoTanqueEvapo>0</TipoEstacaoTanqueEvapo>
+        <TipoEstacaoClimatologica>0</TipoEstacaoClimatologica>
+        <TipoEstacaoPiezometria>0</TipoEstacaoPiezometria>
+        <TipoEstacaoTelemetrica>1</TipoEstacaoTelemetrica>
+        <PeriodoEscalaInicio />
+        <PeriodoEscalaFim />
+        <PeriodoRegistradorNivelInicio />
+        <PeriodoRegistradorNivelFim />
+        <PeriodoDescLiquidaInicio />
+        <PeriodoDescLiquidaFim />
+        <PeriodoSedimentosInicio />
+        <PeriodoSedimentosFim />
+        <PeriodoQualAguaInicio />
+        <PeriodoQualAguaFim />
+        <PeriodoPluviometroInicio>1981-03-01 00:00:00</PeriodoPluviometroInicio>
+        <PeriodoPluviometroFim />
+        <PeriodoRegistradorChuvaInicio>1987-08-01 00:00:00</PeriodoRegistradorChuvaInicio>
+        <PeriodoRegistradorChuvaFim>1999-01-01 00:00:00</PeriodoRegistradorChuvaFim>
+        <PeriodoTanqueEvapoInicio />
+        <PeriodoTanqueEvapoFim />
+        <PeriodoClimatologicaInicio />
+        <PeriodoClimatologicaFim />
+        <PeriodoPiezometriaInicio />
+        <PeriodoPiezometriaFim />
+        <PeriodoTelemetricaInicio>2010-08-01 00:00:00</PeriodoTelemetricaInicio>
+        <PeriodoTelemetricaFim />
+        <TipoRedeBasica>1</TipoRedeBasica>
+        <TipoRedeEnergetica>0</TipoRedeEnergetica>
+        <TipoRedeNavegacao>0</TipoRedeNavegacao>
+        <TipoRedeCursoDagua>0</TipoRedeCursoDagua>
+        <TipoRedeEstrategica>0</TipoRedeEstrategica>
+        <TipoRedeCaptacao>7</TipoRedeCaptacao>
+        <TipoRedeSedimentos>0</TipoRedeSedimentos>
+        <TipoRedeQualAgua>0</TipoRedeQualAgua>
+        <TipoRedeClasseVazao>0</TipoRedeClasseVazao>
+        <UltimaAtualizacao>2018-06-18 00:00:00</UltimaAtualizacao>
+        <Operando>1</Operando>
+        <Descricao>AUTOMÁTICA - AGSOLV</Descricao>
+        <NumImagens>2</NumImagens>
+        <DataIns />
+        <DataAlt>2018-06-18 00:00:00</DataAlt>
+      </Table>   
+    </Estacoes>
+  </diffgr:diffgram>
+</DataSet>

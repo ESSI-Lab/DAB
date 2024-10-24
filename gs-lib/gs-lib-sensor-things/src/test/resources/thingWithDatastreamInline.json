@@ -1,0 +1,61 @@
+{
+    "@iot.id": "085f0912-ceaf-4334-9cb9-e2d7219091c5",
+    "@iot.selfLink": "https://beta.hydroserver2.org/api/sensorthings/v1.1/Things('085f0912-ceaf-4334-9cb9-e2d7219091c5')",
+    "name": "Great Salt Lake",
+    "description": "Buoy in the GSL",
+    "properties": {
+        "samplingFeatureType": "Site",
+        "samplingFeatureCode": "USU-GSL",
+        "siteType": "Lake, Reservoir, Impoundment",
+        "contactPeople": [
+            {
+                "firstName": "Jeffery",
+                "lastName": "Horsburgh",
+                "email": "jeff.horsburgh@usu.edu"
+            }
+        ]
+    },
+    "Locations@iot.navigationLink": "https://beta.hydroserver2.org/api/sensorthings/v1.1/Things('085f0912-ceaf-4334-9cb9-e2d7219091c5')/Locations",
+    "HistoricalLocations@iot.navigationLink": "https://beta.hydroserver2.org/api/sensorthings/v1.1/Things('085f0912-ceaf-4334-9cb9-e2d7219091c5')/HistoricalLocations",
+    "Datastreams": [
+        {
+            "Sensor@iot.navigationLink": null,
+            "name": "14588031-8a0d-4b69-aed6-4a36f4dd33cf",
+            "observationType": "OM_Measurement",
+            "ObservedProperty@iot.navigationLink": null,
+            "phenomenonTime": null,
+            "resultTime": null,
+            "@iot.id": "14588031-8a0d-4b69-aed6-4a36f4dd33cf",
+            "Observations@iot.navigationLink": null,
+            "properties": {
+                "resultType": "Time Series Coverage",
+                "status": "Ongoing",
+                "sampledMedium": "Liquid aqueous",
+                "valueCount": null,
+                "noDataValue": -9999.0,
+                "processingLevelCode": "0",
+                "intendedTimeSpacing": 15.0,
+                "intendedTimeSpacingUnitOfMeasurement": {
+                    "name": "Minute",
+                    "symbol": "min",
+                    "definition": "http://qudt.org/vocab/unit#MinuteTime"
+                },
+                "aggregationStatistic": "Continuous",
+                "timeAggregationInterval": 0.0,
+                "timeAggregationIntervalUnitOfMeasurement": {
+                    "name": "Minute",
+                    "symbol": "min",
+                    "definition": "http://qudt.org/vocab/unit#MinuteTime"
+                }
+            },
+            "description": "Specific conductance at Great Salt Lake - 0",
+            "Thing@iot.navigationLink": null,
+            "unitOfMeasurement": {
+                "name": "Microsiemen per Centimeter",
+                "symbol": "uS/cm",
+                "definition": "http://his.cuahsi.org/mastercvreg/edit_cv11.aspx?tbl=Units&id=1125579048"
+            },
+            "@iot.selfLink": "https://beta.hydroserver2.org/api/sensorthings/v1.1/Datastreams('14588031-8a0d-4b69-aed6-4a36f4dd33cf')"
+        }
+    ]
+}

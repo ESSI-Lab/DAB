@@ -1,0 +1,16 @@
+{
+
+  "website": "http://ipt.iobis.org/afrobis/resource?r=echinoderms_bangor_watamu_expedition_1969",
+  "ron_name": "AfrOBIS",
+  "coml_project": null,
+  "num_records": "223",
+  "created": "2017-10-11 12:25:03",
+  "ron_id": "2",
+  "num_species": "105",
+  "provider_id": "1567",
+  "resource_id": "4656",
+  "resource_name": "Abundance and habitat of echinoderms collected during the Bangor-Watamu Expedition in 1969",
+  "provider_name": "Western Australia Museum",
+  "bbox_str": "39.1499977111816,-6.18333005905151,41.0538215637207,-2.11724996566772",
+  "nodeId": "2"
+}

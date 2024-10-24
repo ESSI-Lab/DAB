@@ -4,7 +4,7 @@ package eu.essi_lab.model.resource.data;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,6 +21,9 @@ package eu.essi_lab.model.resource.data;
  * #L%
  */
 
+/**
+ * CF feature types + vectors
+ */
 public enum DataType {
     GRID, // regular grid along the provided dimensions, including spatial dimensions
     POINT, // data at scattered locations and times with no implied relationship among of coordinate positions
@@ -30,5 +33,5 @@ public enum DataType {
     PROFILE, // a series of connected observations along a vertical line, like an atmospheric or ocean sounding
     TIME_SERIES_PROFILE, // when profiles are taken repeatedly at a station, one gets a time series of profiles
     TRAJECTORY_PROFILE, // when profiles are taken repeatedly at a station, one gets a time series of profiles
-    GML_FEATURE // other general and complex features that can be encoded by GML (e.g. including circles, polygons etc.)
+    VECTOR // vector features that can be encoded by GML (e.g. including circles, polygons etc.)
 }

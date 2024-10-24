@@ -4,7 +4,7 @@ package eu.essi_lab.iso.datamodel;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,11 +27,13 @@ import java.io.InputStream;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.UnmarshalException;
 import javax.xml.bind.Unmarshaller;
-
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
+
 import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 import eu.essi_lab.jaxb.common.CommonContext;
 import eu.essi_lab.jaxb.common.ObjectFactories;
@@ -39,7 +41,6 @@ import eu.essi_lab.lib.xml.XMLDocumentReader;
 import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;
 import net.opengis.iso19139.gco.v_20060504.CodeListValueType;
 import net.opengis.iso19139.gmx.v_20060504.AnchorType;
-import org.xml.sax.SAXException;
 
 /**
  * @author Fabrizio
@@ -130,7 +131,31 @@ public class ISOMetadata<T> extends DOMSerializer {
     public T fromNode(Node node) throws JAXBException {
 
 	Unmarshaller unmarshaller = CommonContext.createUnmarshaller();
-	return ((JAXBElement<T>) unmarshaller.unmarshal(node)).getValue();
+	T value = null;
+	try {
+	    value = ((JAXBElement<T>) unmarshaller.unmarshal(node)).getValue();
+
+	} catch (JAXBException ex) {
+
+	    if (ex instanceof UnmarshalException) {
+
+		StackTraceElement[] stackTrace = ex.getStackTrace();
+		
+		String message = ex.getMessage();
+
+		if (message != null && message.contains("unexpected element")) {
+
+		    message = message.substring(0, message.indexOf(")") + 1);
+
+		    ex = new UnmarshalException(message);
+		    ex.setStackTrace(stackTrace);
+		}
+	    }
+
+	    throw ex;
+	}
+
+	return value;
     }
 
     public T getElementType() {
@@ -194,6 +219,7 @@ public class ISOMetadata<T> extends DOMSerializer {
 	AnchorType anchorType = new AnchorType();
 	anchorType.setHref(value);
 	anchorType.setTitle(title);
+	anchorType.setValue(title);
 
 	JAXBElement<AnchorType> anchor = ObjectFactories.GMX().createAnchor(anchorType);
 
@@ -220,6 +246,24 @@ public class ISOMetadata<T> extends DOMSerializer {
 	    if (value instanceof AnchorType) {
 		AnchorType anchor = (AnchorType) value;
 		return anchor.getValue();
+	    } else if (value instanceof CodeListValueType) {
+		CodeListValueType clvt = (CodeListValueType) value;
+		return clvt.getValue();
+	    } else {
+		return value.toString();
+	    }
+	}
+	return null;
+    }
+    
+    public static String getHREFStringFromCharacterString(CharacterStringPropertyType characterStringPropertyType) {
+	if (characterStringPropertyType != null && //
+		characterStringPropertyType.isSetCharacterString() && //
+		characterStringPropertyType.getCharacterString().getValue() != null) {
+	    Object value = characterStringPropertyType.getCharacterString().getValue();
+	    if (value instanceof AnchorType) {
+		AnchorType anchor = (AnchorType) value;
+		return anchor.getHref();
 	    } else if (value instanceof CodeListValueType) {
 		CodeListValueType clvt = (CodeListValueType) value;
 		return clvt.getValue();

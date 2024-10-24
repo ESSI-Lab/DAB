@@ -11,30 +11,25 @@
 	<name>ESSI-Lab JAXB Classes WML 2.0</name>
 
 	<dependencies>
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-impl</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-core</artifactId>
-		</dependency>
+		
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>gs-lib-xml</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+			
 	</dependencies>
-	<build>
+	
+	<!--<build>
 
 		<plugins>
 			<plugin>
-				<groupId>org.jvnet.jaxb2.maven2</groupId>
+				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>maven-jaxb2-plugin</artifactId>
 				<executions>
 					<execution>
 						<id>some-id</id>
-						<!-- Comment the following line to generate/update the classes! -->
+						 Comment the following line to generate/update the classes! 
 						<phase>none</phase>
 						<goals>
 							<goal>generate</goal>
@@ -56,5 +51,5 @@
 
 		</plugins>
 
-	</build>
+	</build>-->
 </project>

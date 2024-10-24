@@ -4,7 +4,7 @@ package eu.essi_lab.api.database.marklogic;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,11 +24,13 @@ package eu.essi_lab.api.database.marklogic;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBException;
@@ -40,11 +42,11 @@ import com.marklogic.xcc.ResultSequence;
 import com.marklogic.xcc.exceptions.RequestException;
 
 import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.internal.Folder;
+import eu.essi_lab.api.database.GetViewIdentifiersRequest;
 import eu.essi_lab.api.database.marklogic.search.DistinctQueryHandler;
 import eu.essi_lab.api.database.marklogic.search.MarkLogicDiscoveryBondHandler;
-import eu.essi_lab.api.database.marklogic.search.semantic.MarkLogicSemanticReader;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StreamUtils;
 import eu.essi_lab.lib.xml.NameSpace;
@@ -61,20 +63,13 @@ import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.bond.jaxb.ViewFactory;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
 import eu.essi_lab.messages.count.DiscoveryCountResponse;
-import eu.essi_lab.messages.count.SemanticCountResponse;
-import eu.essi_lab.messages.sem.SemanticMessage;
-import eu.essi_lab.messages.sem.SemanticResponse;
-import eu.essi_lab.messages.stats.StatisticsMessage;
-import eu.essi_lab.messages.stats.StatisticsResponse;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.Queryable;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.ontology.GSKnowledgeResourceDescription;
-import eu.essi_lab.model.ontology.GSKnowledgeScheme;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
@@ -107,14 +102,18 @@ public class MarkLogicReader implements DatabaseReader {
     private static final String MARKLOGIC_READER_STATS_COMPUTING_ENDED = "Marklogic Reader Stats computing ENDED";
 
     private MarkLogicDatabase markLogicDB;
-    private StorageUri dbUri;
-    private Folder viewFolder;
+    private StorageInfo dbUri;
+    private DatabaseFolder viewFolder;
+
+    private HashMap<String, String> viewsByCreatorMap;
 
     public MarkLogicReader() {
+
+	viewsByCreatorMap = new HashMap<>();
     }
 
     @Override
-    public void setDatabase(@SuppressWarnings("rawtypes") Database dataBase) {
+    public void setDatabase(Database dataBase) {
 
 	this.markLogicDB = (MarkLogicDatabase) dataBase;
     }
@@ -122,7 +121,19 @@ public class MarkLogicReader implements DatabaseReader {
     @Override
     public MarkLogicDatabase getDatabase() {
 
-	return (MarkLogicDatabase) this.markLogicDB;
+	return this.markLogicDB;
+    }
+
+    @Override
+    public boolean supports(StorageInfo dbUri) {
+
+	if (MarkLogicDatabase.isSupported(dbUri)) {
+
+	    this.dbUri = dbUri;
+	    return true;
+	}
+
+	return false;
     }
 
     @Override
@@ -195,8 +206,8 @@ public class MarkLogicReader implements DatabaseReader {
 		//
 		// privateId is not indexed
 		//
-		Folder[] folders = markLogicDB.getDataFolders();
-		for (Folder folder : folders) {
+		DatabaseFolder[] folders = markLogicDB.getDataFolders();
+		for (DatabaseFolder folder : folders) {
 
 		    Node node = folder.get(identifier);
 		    if (Objects.nonNull(node)) {
@@ -209,6 +220,9 @@ public class MarkLogicReader implements DatabaseReader {
 		break;
 	    case PUBLIC:
 		bond = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.IDENTIFIER, identifier);
+		break;
+	    case OAI_HEADER:
+		bond = BondFactory.createResourcePropertyBond(BondOperator.EQUAL, ResourceProperty.OAI_PMH_HEADER_ID, identifier);
 		break;
 	    }
 
@@ -315,26 +329,11 @@ public class MarkLogicReader implements DatabaseReader {
 	return resultSet.getResultsList();
     }
 
-    @Override
-    public StatisticsResponse compute(StatisticsMessage message) throws GSException {
-
-	try {
-
-	    // GSLoggerFactory.getLogger(MarkLogicReader.class).trace(MARKLOGIC_READER_STATS_COMPUTING_STARTED);
-
-	    StatisticsResponse response = markLogicDB.compute(message);
-
-	    // GSLoggerFactory.getLogger(MarkLogicReader.class).trace(MARKLOGIC_READER_STATS_COMPUTING_ENDED);
-
-	    return response;
-
-	} catch (GSException e) {
-
-	    throw e;
-	}
-    }
-
-    @Override
+    /**
+     * @param message
+     * @return
+     * @throws GSException
+     */
     public DiscoveryCountResponse count(DiscoveryMessage message) throws GSException {
 
 	// GSLoggerFactory.getLogger(MarkLogicReader.class).trace(MARKLOGIC_READER_COUNT_STARTED);
@@ -372,7 +371,11 @@ public class MarkLogicReader implements DatabaseReader {
 	return estimate;
     }
 
-    @Override
+    /**
+     * @param message
+     * @return
+     * @throws GSException
+     */
     public ResultSet<GSResource> discover(DiscoveryMessage message) throws GSException {
 
 	ResultSet<Node> nodes = discoverNodes(message);
@@ -418,7 +421,11 @@ public class MarkLogicReader implements DatabaseReader {
 	return resultSet;
     }
 
-    @Override
+    /**
+     * @param message
+     * @return
+     * @throws GSException
+     */
     public ResultSet<Node> discoverNodes(DiscoveryMessage message) throws GSException {
 
 	// GSLoggerFactory.getLogger(MarkLogicReader.class).trace(MARKLOGIC_READER_DISCOVER_STARTED);
@@ -438,7 +445,11 @@ public class MarkLogicReader implements DatabaseReader {
 	return resultSet;
     }
 
-    @Override
+    /**
+     * @param message
+     * @return
+     * @throws GSException
+     */
     public ResultSet<String> discoverStrings(DiscoveryMessage message) throws GSException {
 
 	// GSLoggerFactory.getLogger(MarkLogicReader.class).trace(MARKLOGIC_READER_DISCOVER_STARTED);
@@ -456,45 +467,6 @@ public class MarkLogicReader implements DatabaseReader {
 	// GSLoggerFactory.getLogger(MarkLogicReader.class).trace(MARKLOGIC_READER_DISCOVER_COMPLETED);
 
 	return resultSet;
-    }
-
-    @Override
-    public SemanticCountResponse count(SemanticMessage message) throws GSException {
-
-	MarkLogicSemanticReader semanticReader = new MarkLogicSemanticReader(markLogicDB);
-	return semanticReader.count(message);
-    }
-
-    @Override
-    public SemanticResponse<GSKnowledgeResourceDescription> execute(SemanticMessage message) throws GSException {
-
-	MarkLogicSemanticReader semanticReader = new MarkLogicSemanticReader(markLogicDB);
-	return semanticReader.execute(message);
-    }
-
-    @Override
-    public Optional<GSKnowledgeResourceDescription> getKnowlegdeResource(GSKnowledgeScheme scheme, String subjectid) throws GSException {
-
-	MarkLogicSemanticReader semanticReader = new MarkLogicSemanticReader(markLogicDB);
-	return semanticReader.getKnowlegdeResource(scheme, subjectid);
-    }
-
-    @Override
-    public boolean supports(StorageUri dbUri) {
-
-	if (dbUri != null && dbUri.getUri() != null && dbUri.getUri().startsWith("xdbc")) {
-	    this.dbUri = dbUri;
-	    return true;
-	}
-
-	return false;
-    }
-
-    @Override
-
-    public StorageUri getStorageUri() {
-
-	return dbUri;
     }
 
     @Override
@@ -526,9 +498,9 @@ public class MarkLogicReader implements DatabaseReader {
 
 	    // GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Getting users STARTED");
 
-	    String suiteId = getDatabase().getSuiteIdentifier();
+	    String suiteId = getDatabase().getIdentifier();
 
-	    String query = "cts:search(doc(),cts:directory-query('/" + suiteId + "_" + MarkLogicDatabase.USERS_PROTECTED_FOLDER
+	    String query = "cts:search(doc(),cts:directory-query('/" + suiteId + "_" + MarkLogicDatabase.USERS_FOLDER
 		    + "/'),('unfiltered','score-simple'),0)";
 
 	    List<GSUser> users = StreamUtils.iteratorToStream(getDatabase().execXQuery(query).iterator()).//
@@ -645,11 +617,31 @@ public class MarkLogicReader implements DatabaseReader {
 	}
     }
 
+    @Override
+    public Optional<DatabaseFolder> getFolder(String folderName, boolean createIfNotExist) throws GSException {
+
+	try {
+	    return getDatabase().getFolder(folderName, createIfNotExist);
+	} catch (RequestException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    "MARK_LOGIC_GET_FOLDER_ERROR", //
+		    e);
+	}
+    }
+
     /**
      * @param viewId
      * @return
      */
-    private String getViewQuery(Folder viewFolder, String viewId) {
+    private String getViewQuery(DatabaseFolder viewFolder, String viewId) {
 
 	String query = "xquery version \"1.0-ml\"; \n";
 	query += "declare namespace html = \"http://www.w3.org/1999/xhtml\"; \n";
@@ -664,22 +656,17 @@ public class MarkLogicReader implements DatabaseReader {
 
 	query += "let $xml := if ($doc/node() instance of binary()) then (xdmp:binary-decode(fn:doc($uris)/node(), \"UTF-8\")) else $doc \n";
 
-	query += "where (fn:contains($xml,fn:concat('<id>',$id,'</id>')) or $doc//id = $id) return $xml \n";
+	query += "where (fn:contains($xml,fn:concat('<id>',$id,'</id>')) or $doc//id = $id) return $xml";
 
 	return query;
     }
 
     @Override
-    public List<String> getViewIdentifiers(int start, int count) throws GSException {
-	return getViewIdentifiers(start, count, null);
-    }
-
-    @Override
-    public List<String> getViewIdentifiers(int start, int count, String creator) throws GSException {
+    public List<String> getViewIdentifiers(GetViewIdentifiersRequest request) throws GSException {
 
 	try {
 
-	    Folder folder = getViewFolder();
+	    DatabaseFolder folder = getViewFolder();
 
 	    if (folder == null) {
 		return new ArrayList<>();
@@ -687,32 +674,46 @@ public class MarkLogicReader implements DatabaseReader {
 
 	    String[] ret = folder.listKeys();
 
-	    List<String> list = new ArrayList<>(Arrays.asList(ret));
+	    List<String> idsList = new ArrayList<>(Arrays.asList(ret));
 
-	    if (creator != null) {
-		Iterator<String> it = list.iterator();
-		while (it.hasNext()) {
-		    String id = (String) it.next();
-		    Optional<View> optionalView = getView(id);
-		    if (optionalView.isPresent()) {
-			View view = optionalView.get();
-			if (view.getCreator() == null || !view.getCreator().equals(creator)) {
-			    it.remove();
-			}
-		    } else {
-			it.remove();
+	    if (request.getCreator().isPresent() || request.getOwner().isPresent()) {
+
+		if (viewFolder == null) {
+
+		    GSLoggerFactory.getLogger(getClass()).info("Get view folder STARTED");
+
+		    viewFolder = getViewFolder();
+
+		    GSLoggerFactory.getLogger(getClass()).info("Get view folder ENDED");
+
+		    if (viewFolder == null) {
+
+			GSLoggerFactory.getLogger(getClass()).warn("View folder missing");
+
+			return new ArrayList<>();
 		    }
 		}
+
+		String viewQuery = ListViewIdsQueryHandler.getListViewIdsQuery(folder, request);
+
+		MarkLogicWrapper wrapper = getDatabase().getWrapper();
+
+		ResultSequence resultSequence = wrapper.submit(viewQuery);
+
+		idsList = Arrays.asList(resultSequence.asStrings());
 	    }
 
-	    int fromIndex = Math.min(list.size(), start);
-	    int toIndex = Math.min(list.size(), start + count);
-	    list = list.subList(fromIndex, toIndex);
-	    return list;
+	    int fromIndex = Math.min(idsList.size(), request.getStart());
+	    int toIndex = Math.min(idsList.size(), request.getStart() + request.getCount());
+
+	    idsList = idsList.subList(fromIndex, toIndex);
+
+	    return idsList;
 
 	} catch (Exception e) {
 
-	    GSLoggerFactory.getLogger(MarkLogicReader.class).error("Exception requesting views from {} to {}", start, count);
+	    GSLoggerFactory.getLogger(MarkLogicReader.class).error("Exception requesting views from {} to {}", request.getStart(),
+		    request.getCount());
 
 	    throw GSException.createException(//
 		    getClass(), //
@@ -723,43 +724,52 @@ public class MarkLogicReader implements DatabaseReader {
 		    MARK_LOGIC_LIST_KEYS_ERROR, //
 		    e);
 	}
+
     }
 
-    /**
-     * 
-     */
-    public Optional<Folder> getFolder(String folderName, boolean createIfNotExist) throws GSException {
+    protected DatabaseFolder getViewFolder() throws RequestException {
 
-	try {
-	    return getDatabase().getFolder(folderName, createIfNotExist);
-	} catch (RequestException e) {
-
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-
-	    throw GSException.createException(//
-		    getClass(), //
-		    e.getMessage(), //
-		    null, //
-		    ErrorInfo.ERRORTYPE_INTERNAL, //
-		    ErrorInfo.SEVERITY_ERROR, //
-		    MARK_LOGIC_GET_FOLDER_ERROR, //
-		    e);
-	}
+	return getProtectedFolder(MarkLogicDatabase.VIEWS_FOLDER);
     }
 
-    protected Folder getViewFolder() throws RequestException {
+    protected DatabaseFolder getUsersFolder() throws RequestException {
 
-	return getProtectedFolder(MarkLogicDatabase.VIEWS_PROTECTED_FOLDER);
+	return getProtectedFolder(MarkLogicDatabase.USERS_FOLDER);
     }
 
-    protected Folder getUsersFolder() throws RequestException {
-
-	return getProtectedFolder(MarkLogicDatabase.USERS_PROTECTED_FOLDER);
-    }
-
-    protected Folder getProtectedFolder(String dirURI) throws RequestException {
+    protected DatabaseFolder getProtectedFolder(String dirURI) throws RequestException {
 
 	MarkLogicDatabase mldb = getDatabase();
 	return mldb.getFolder(dirURI);
     }
+
+    public static void main(String[] args) {
+
+	String s = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
+	s += "<view>";
+	s += "<viewBond>";
+	s += "   <viewIdentifier>view3</viewIdentifier>";
+	s += "</viewBond>";
+	s += "<creationTime>2022-10-13T11:42:46.485+02:00</creationTime>";
+	s += " <creator>creator1</creator>";
+	s += " <id>id3</id>";
+	s += "</view>";
+
+	s += "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
+	s += "<view>";
+	s += "<viewBond>";
+	s += "  <viewIdentifier>view4</viewIdentifier>";
+	s += "</viewBond>";
+	s += "<creationTime>2022-10-13T11:42:46.580+02:00</creationTime>";
+	s += "<creator>creator1</creator>";
+	s += "<id>id4</id>";
+	s += "</view>";
+
+	Pattern pattern = Pattern.compile("<id>(.*?)</id>");
+	Matcher matcher = pattern.matcher(s);
+	while (matcher.find()) {
+	    System.out.println(matcher.group(1));
+	}
+    }
+
 }

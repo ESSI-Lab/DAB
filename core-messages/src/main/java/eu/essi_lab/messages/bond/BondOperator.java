@@ -7,7 +7,7 @@ package eu.essi_lab.messages.bond;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,13 +35,21 @@ public enum BondOperator {
     LESS_OR_EQUAL("<="), //
 
     NULL, //
+    NOT_NULL, //
+    
     MIN, //
     MAX, //
 
     INTERSECTS, // Intersection
     DISJOINT, // Disjoint
     BBOX, // BBOX is "NOT DISJOINT"
-    CONTAINS; // resource inside requested
+    CONTAINS, // target bbox contains resources bbox
+    CONTAINED, // resources bbox contains target bbox
+    /**
+     * Target bbox intersects resources bboxes only with at least one corner (south, west, east or north) of the
+     * resource bboxes, which are not entirely contained in the requested bbox
+     */
+    INTERSECTS_ANY_POINT_NOT_CONTAINS;
 
     private String shortRepresentation;
 
@@ -78,10 +86,20 @@ public enum BondOperator {
 	if (operation.matches("(?i).*Contains.*")) {
 	    return CONTAINS;
 	}
+	if (operation.matches("(?i).*Contained.*")) {
+	    return CONTAINED;
+	}
+	if (operation.matches("(?i).*IntersectsAnyPointNotContains.*")) {
+	    return INTERSECTS_ANY_POINT_NOT_CONTAINS;
+	}
 
 	throw new IllegalArgumentException("Operation not supported: " + operation);
     }
 
+    /**
+     * @param operator
+     * @return
+     */
     public static BondOperator negate(BondOperator operator) {
 	switch (operator) {
 	case EQUAL:

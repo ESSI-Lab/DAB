@@ -4,7 +4,7 @@ package eu.essi_lab.wrapper.marklogic;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -67,7 +67,7 @@ import com.marklogic.xcc.types.XdmNode;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.XMLFactories;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 
 /**
  * @author Fabrizio
@@ -104,7 +104,7 @@ public class MarkLogicWrapper {
      * @param xdbc
      * @return
      */
-    public static StorageUri fromXDBC(String xdbc) {
+    public static StorageInfo fromXDBC(String xdbc) {
 
 	//
 	// xdbc://user:password@hostname:8000,8004/dbName/folder/
@@ -121,12 +121,12 @@ public class MarkLogicWrapper {
 	String dbName = xdbc.substring(0, xdbc.indexOf("/"));
 	String folder = xdbc.substring(xdbc.indexOf("/") + 1, xdbc.lastIndexOf("/"));
 
-	StorageUri storageUri = new StorageUri();
+	StorageInfo storageUri = new StorageInfo();
 	storageUri.setUri(uri);
 	storageUri.setUser(user);
 	storageUri.setPassword(password);
-	storageUri.setConfigFolder(folder);
-	storageUri.setStorageName(dbName);
+	storageUri.setIdentifier(folder);
+	storageUri.setName(dbName);
 
 	return storageUri;
     }
@@ -148,9 +148,9 @@ public class MarkLogicWrapper {
      * @throws URISyntaxException
      * @throws XccConfigException
      */
-    public MarkLogicWrapper(StorageUri uri) throws URISyntaxException, XccConfigException {
+    public MarkLogicWrapper(StorageInfo uri) throws URISyntaxException, XccConfigException {
 
-	this(uri.getUri(), uri.getUser(), uri.getPassword(), uri.getStorageName());
+	this(uri.getUri(), uri.getUser(), uri.getPassword(), uri.getName());
     }
 
     /**

@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.csw.handler.srvinfo;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -38,8 +38,8 @@ import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.pdk.handler.DefaultRequestHandler;
-import eu.essi_lab.profiler.csw.CSWRequestMethodConverter;
-import eu.essi_lab.profiler.csw.CSWRequestMethodConverter.CSWRequest;
+import eu.essi_lab.profiler.csw.CSWRequestConverter;
+import eu.essi_lab.profiler.csw.CSWRequestConverter.CSWRequest;
 import eu.essi_lab.profiler.csw.handler.discover.CSWRequestValidator;
 import eu.essi_lab.profiler.csw.profile.CSWProfile;
 
@@ -88,14 +88,14 @@ public class CSWDescribeRecordHandler extends DefaultRequestHandler {
 
 	    String queryString = null;
 	    if (webRequest.isGetRequest()) {
-		queryString = webRequest.getQueryString();
+		queryString = webRequest.getURLDecodedQueryString();
 	    } else {
-		CSWRequestMethodConverter converter = new CSWRequestMethodConverter();
+		CSWRequestConverter converter = new CSWRequestConverter();
 		queryString = converter.convert(CSWRequest.DESCRIBE_RECORD, webRequest.getBodyStream());
 	    }
 
 	    KeyValueParser parser = new KeyValueParser(queryString);
-	    String typeName = parser.getDecodedValue("TypeName");
+	    String typeName = parser.getDecodedValue("TypeName", true);
 
 	    DescribeRecordResponse response = CommonContext.unmarshal(docStream.clone(), DescribeRecordResponse.class);
 	    List<SchemaComponentType> schemaComponents = response.getSchemaComponents();

@@ -4,7 +4,7 @@ package eu.essi_lab.api.database.marklogic.search.def;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -70,6 +70,10 @@ public class DefaultMarkLogicSpatialQueryBuilder implements MarkLogicSpatialQuer
 
 	    return buildIntersetcsQuery(bond);
 
+	case INTERSECTS_ANY_POINT_NOT_CONTAINS:
+
+	    return buildIntersectsAnyPointNotContainsQuery(bond);
+
 	case DISJOINT:
 
 	    String c1 = buildDMDisjCardinalRangeQuery(CardinalPoint.SOUTH, ">", north);
@@ -82,6 +86,10 @@ public class DefaultMarkLogicSpatialQueryBuilder implements MarkLogicSpatialQuer
 	case CONTAINS:
 
 	    return buildContainsQuery(bond);
+
+	case CONTAINED:
+
+	    return buildContainedQuery(bond);
 
 	default:
 	    throw new IllegalArgumentException("Unknown area operation: " + op);
@@ -106,72 +114,72 @@ public class DefaultMarkLogicSpatialQueryBuilder implements MarkLogicSpatialQuer
 	String west = String.valueOf(w);
 
 	double area = SpatialIndexHelper.computeArea(//
-		Double.valueOf(west),//
-		Double.valueOf(east),//
-		Double.valueOf(south),
+		Double.valueOf(west), //
+		Double.valueOf(east), //
+		Double.valueOf(south), //
 		Double.valueOf(north));
 
 	String weightQuery = builder.buildCTSLogicQuery(CTSLogicOperator.OR,
 
 		builder.buildCTSLogicQuery(CTSLogicOperator.AND,
-			
+
 			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, ">=", "0",
 				ranking.computeBoundingBoxWeight(area, 10), false),
-			
-			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, "<",
-				String.valueOf(percent(area, 10)), ranking.computeBoundingBoxWeight(area, 10), false)),
+
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, "<", String.valueOf(percent(area, 10)),
+				ranking.computeBoundingBoxWeight(area, 10), false)),
 
 		builder.buildCTSLogicQuery(CTSLogicOperator.AND,
-			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, ">=",
-				String.valueOf(percent(area, 10)), ranking.computeBoundingBoxWeight(area, 20), false),
-			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, "<",
-				String.valueOf(percent(area, 20)), ranking.computeBoundingBoxWeight(area, 20), false)),
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, ">=", String.valueOf(percent(area, 10)),
+				ranking.computeBoundingBoxWeight(area, 20), false),
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, "<", String.valueOf(percent(area, 20)),
+				ranking.computeBoundingBoxWeight(area, 20), false)),
 
 		builder.buildCTSLogicQuery(CTSLogicOperator.AND,
-			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, ">=",
-				String.valueOf(percent(area, 20)), ranking.computeBoundingBoxWeight(area, 30), false),
-			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, "<",
-				String.valueOf(percent(area, 30)), ranking.computeBoundingBoxWeight(area, 30), false)),
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, ">=", String.valueOf(percent(area, 20)),
+				ranking.computeBoundingBoxWeight(area, 30), false),
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, "<", String.valueOf(percent(area, 30)),
+				ranking.computeBoundingBoxWeight(area, 30), false)),
 
 		builder.buildCTSLogicQuery(CTSLogicOperator.AND,
-			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, ">=",
-				String.valueOf(percent(area, 30)), ranking.computeBoundingBoxWeight(area, 40), false),
-			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, "<",
-				String.valueOf(percent(area, 40)), ranking.computeBoundingBoxWeight(area, 40), false)),
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, ">=", String.valueOf(percent(area, 30)),
+				ranking.computeBoundingBoxWeight(area, 40), false),
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, "<", String.valueOf(percent(area, 40)),
+				ranking.computeBoundingBoxWeight(area, 40), false)),
 
 		builder.buildCTSLogicQuery(CTSLogicOperator.AND,
-			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, ">=",
-				String.valueOf(percent(area, 40)), ranking.computeBoundingBoxWeight(area, 50), false),
-			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, "<",
-				String.valueOf(percent(area, 50)), ranking.computeBoundingBoxWeight(area, 50), false)),
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, ">=", String.valueOf(percent(area, 40)),
+				ranking.computeBoundingBoxWeight(area, 50), false),
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, "<", String.valueOf(percent(area, 50)),
+				ranking.computeBoundingBoxWeight(area, 50), false)),
 
 		builder.buildCTSLogicQuery(CTSLogicOperator.AND,
-			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, ">=",
-				String.valueOf(percent(area, 50)), ranking.computeBoundingBoxWeight(area, 60), false),
-			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, "<",
-				String.valueOf(percent(area, 60)), ranking.computeBoundingBoxWeight(area, 60), false)),
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, ">=", String.valueOf(percent(area, 50)),
+				ranking.computeBoundingBoxWeight(area, 60), false),
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, "<", String.valueOf(percent(area, 60)),
+				ranking.computeBoundingBoxWeight(area, 60), false)),
 
 		builder.buildCTSLogicQuery(CTSLogicOperator.AND,
-			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, ">=",
-				String.valueOf(percent(area, 60)), ranking.computeBoundingBoxWeight(area, 70), false),
-			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, "<",
-				String.valueOf(percent(area, 70)), ranking.computeBoundingBoxWeight(area, 70), false)),
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, ">=", String.valueOf(percent(area, 60)),
+				ranking.computeBoundingBoxWeight(area, 70), false),
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, "<", String.valueOf(percent(area, 70)),
+				ranking.computeBoundingBoxWeight(area, 70), false)),
 
 		builder.buildCTSLogicQuery(CTSLogicOperator.AND,
-			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, ">=",
-				String.valueOf(percent(area, 70)), ranking.computeBoundingBoxWeight(area, 80), false),
-			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, "<",
-				String.valueOf(percent(area, 80)), ranking.computeBoundingBoxWeight(area, 80), false)),
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, ">=", String.valueOf(percent(area, 70)),
+				ranking.computeBoundingBoxWeight(area, 80), false),
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, "<", String.valueOf(percent(area, 80)),
+				ranking.computeBoundingBoxWeight(area, 80), false)),
 
 		builder.buildCTSLogicQuery(CTSLogicOperator.AND,
-			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, ">=",
-				String.valueOf(percent(area, 80)), ranking.computeBoundingBoxWeight(area, 90), false),
-			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, "<=",
-				String.valueOf(percent(area, 90)), ranking.computeBoundingBoxWeight(area, 90), false)),
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, ">=", String.valueOf(percent(area, 80)),
+				ranking.computeBoundingBoxWeight(area, 90), false),
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, "<=", String.valueOf(percent(area, 90)),
+				ranking.computeBoundingBoxWeight(area, 90), false)),
 
 		builder.buildCTSLogicQuery(CTSLogicOperator.AND,
-			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, ">=",
-				String.valueOf(percent(area, 90)), ranking.computeBoundingBoxWeight(area, 100), false),
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, ">=", String.valueOf(percent(area, 90)),
+				ranking.computeBoundingBoxWeight(area, 100), false),
 			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, "<=", String.valueOf(area),
 				ranking.computeBoundingBoxWeight(area, 100), false)));
 
@@ -182,8 +190,7 @@ public class DefaultMarkLogicSpatialQueryBuilder implements MarkLogicSpatialQuer
 	    String nw = buildCTSElementGeoQuery(west, south, east, north, CardinalPoint.NW);
 	    String ne = buildCTSElementGeoQuery(west, south, east, north, CardinalPoint.NE);
 
-	    String notCrossed = builder.buildCTSElementRangeQuery(BoundingBox.IS_CROSSED_QUALIFIED_NAME, "=", "false",
-		    true);
+	    String notCrossed = builder.buildCTSElementRangeQuery(BoundingBox.IS_CROSSED_QUALIFIED_NAME, "=", "false", true);
 
 	    return builder.buildCTSLogicQuery(CTSLogicOperator.AND, sw, se, nw, ne, notCrossed, weightQuery);
 	}
@@ -204,6 +211,86 @@ public class DefaultMarkLogicSpatialQueryBuilder implements MarkLogicSpatialQuer
 
 	return builder.buildCTSLogicQuery(CTSLogicOperator.AND, q1, weightQuery,
 		builder.buildCTSLogicQuery(CTSLogicOperator.OR, q2, q3, q4));
+    }
+
+    /**
+     * This implementation considers only resource bboxes which having an area between 100 and 200 percent of the target
+     * box. The smaller the area of the resource bbox, the greater the ranking
+     * 
+     * @param bond
+     * @return
+     */
+    private String buildContainedQuery(SpatialBond bond) {
+
+	SpatialExtent extent = (SpatialExtent) bond.getPropertyValue();
+
+	double w = extent.getWest();
+	double e = extent.getEast();
+
+	String north = String.valueOf(extent.getNorth());
+	String south = String.valueOf(extent.getSouth());
+	String east = String.valueOf(e);
+	String west = String.valueOf(w);
+
+	double area = SpatialIndexHelper.computeArea(//
+		Double.valueOf(west), //
+		Double.valueOf(east), //
+		Double.valueOf(south), //
+		Double.valueOf(north));
+
+	String weightQuery = buildContainedWeightQuery(area, 500);
+
+	String containedQuery = builder.buildCTSLogicQuery(CTSLogicOperator.AND,
+
+		buildDMCardinalRangeQuery(CardinalPoint.NORTH, ">", north),
+
+		buildDMCardinalRangeQuery(CardinalPoint.SOUTH, "<", south),
+
+		buildDMCardinalRangeQuery(CardinalPoint.WEST, "<", west),
+
+		buildDMCardinalRangeQuery(CardinalPoint.EAST, ">", east), //
+		
+		weightQuery);
+
+	return containedQuery;
+    }
+
+    /**
+     * @param area
+     * @param areaMultiplier how many times the resource area can be bigger than the target <code>area</code>
+     * @return
+     */
+    private String buildContainedWeightQuery(double area, int areaMultiplier) {
+
+	int maxArea = areaMultiplier * 100;
+	int steps = maxArea / 11;
+
+	String innerQuery = "";
+
+	int areaPercent = 1;
+
+	for (int weight = 0; weight <= 100; weight += 10) {
+
+	    innerQuery += builder.buildCTSLogicQuery(CTSLogicOperator.AND,
+
+		    builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, ">=", String.valueOf(percent(area, areaPercent)),
+
+			    ranking.computeBoundingBoxWeight(area, weight), false),
+
+		    builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, "<",
+			    String.valueOf(percent(area, areaPercent + steps)),
+
+			    ranking.computeBoundingBoxWeight(area, weight), false))
+		    + ",";
+
+	    areaPercent += steps;
+	}
+
+	innerQuery = innerQuery.substring(0, innerQuery.length() - 1); // removed the last ','
+
+	String weightQuery = builder.buildCTSLogicQuery(CTSLogicOperator.OR, innerQuery);
+
+	return weightQuery;
     }
 
     /**
@@ -272,6 +359,111 @@ public class DefaultMarkLogicSpatialQueryBuilder implements MarkLogicSpatialQuer
 		buildDMCardinalRangeQuery(CardinalPoint.EAST, ">=", east));
 
 	String out = builder.buildCTSLogicQuery(CTSLogicOperator.OR, anyPoint, c1, c2, c3, c4, innerAnd);
+
+	return out;
+    }
+
+    /**
+     * @param bond
+     * @return
+     */
+    private String buildIntersectsAnyPointNotContainsQuery(SpatialBond bond) {
+
+	SpatialExtent extent = (SpatialExtent) bond.getPropertyValue();
+
+	double w = extent.getWest();
+	double e = extent.getEast();
+
+	String north = String.valueOf(extent.getNorth());
+	String south = String.valueOf(extent.getSouth());
+	String east = String.valueOf(e);
+	String west = String.valueOf(w);
+
+	double area = SpatialIndexHelper.computeArea(//
+		Double.valueOf(west), //
+		Double.valueOf(east), //
+		Double.valueOf(south), //
+		Double.valueOf(north));
+
+	String weightQuery = builder.buildCTSLogicQuery(CTSLogicOperator.OR,
+
+		builder.buildCTSLogicQuery(CTSLogicOperator.AND,
+
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, ">=", "0",
+				ranking.computeBoundingBoxWeight(area, 10), false),
+
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, "<", String.valueOf(percent(area, 10)),
+				ranking.computeBoundingBoxWeight(area, 10), false)),
+
+		builder.buildCTSLogicQuery(CTSLogicOperator.AND,
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, ">=", String.valueOf(percent(area, 10)),
+				ranking.computeBoundingBoxWeight(area, 20), false),
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, "<", String.valueOf(percent(area, 20)),
+				ranking.computeBoundingBoxWeight(area, 20), false)),
+
+		builder.buildCTSLogicQuery(CTSLogicOperator.AND,
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, ">=", String.valueOf(percent(area, 20)),
+				ranking.computeBoundingBoxWeight(area, 30), false),
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, "<", String.valueOf(percent(area, 30)),
+				ranking.computeBoundingBoxWeight(area, 30), false)),
+
+		builder.buildCTSLogicQuery(CTSLogicOperator.AND,
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, ">=", String.valueOf(percent(area, 30)),
+				ranking.computeBoundingBoxWeight(area, 40), false),
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, "<", String.valueOf(percent(area, 40)),
+				ranking.computeBoundingBoxWeight(area, 40), false)),
+
+		builder.buildCTSLogicQuery(CTSLogicOperator.AND,
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, ">=", String.valueOf(percent(area, 40)),
+				ranking.computeBoundingBoxWeight(area, 50), false),
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, "<", String.valueOf(percent(area, 50)),
+				ranking.computeBoundingBoxWeight(area, 50), false)),
+
+		builder.buildCTSLogicQuery(CTSLogicOperator.AND,
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, ">=", String.valueOf(percent(area, 50)),
+				ranking.computeBoundingBoxWeight(area, 60), false),
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, "<", String.valueOf(percent(area, 60)),
+				ranking.computeBoundingBoxWeight(area, 60), false)),
+
+		builder.buildCTSLogicQuery(CTSLogicOperator.AND,
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, ">=", String.valueOf(percent(area, 60)),
+				ranking.computeBoundingBoxWeight(area, 70), false),
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, "<", String.valueOf(percent(area, 70)),
+				ranking.computeBoundingBoxWeight(area, 70), false)),
+
+		builder.buildCTSLogicQuery(CTSLogicOperator.AND,
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, ">=", String.valueOf(percent(area, 70)),
+				ranking.computeBoundingBoxWeight(area, 80), false),
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, "<", String.valueOf(percent(area, 80)),
+				ranking.computeBoundingBoxWeight(area, 80), false)),
+
+		builder.buildCTSLogicQuery(CTSLogicOperator.AND,
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, ">=", String.valueOf(percent(area, 80)),
+				ranking.computeBoundingBoxWeight(area, 90), false),
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, "<=", String.valueOf(percent(area, 90)),
+				ranking.computeBoundingBoxWeight(area, 90), false)),
+
+		builder.buildCTSLogicQuery(CTSLogicOperator.AND,
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, ">=", String.valueOf(percent(area, 90)),
+				ranking.computeBoundingBoxWeight(area, 100), false),
+			builder.buildCTSElementRangeQuery(BoundingBox.AREA_QUALIFIED_NAME, "<=", String.valueOf(area),
+				ranking.computeBoundingBoxWeight(area, 100), false)));
+
+	// query bbox contains sw or se or nw or ne
+	String anyPoint = buildCTSElementGeoQuery(//
+		west, //
+		south, //
+		east, //
+		north, //
+		CardinalPoint.SW, //
+		CardinalPoint.SE, //
+		CardinalPoint.NW, //
+		CardinalPoint.NE);
+
+	String containsQuery = buildContainsQuery(bond);
+	String notContainsQuery = "cts:not-query((" + containsQuery + "))";
+
+	String out = builder.buildCTSLogicQuery(CTSLogicOperator.AND, anyPoint, notContainsQuery, weightQuery);
 
 	return out;
     }

@@ -1,0 +1,389 @@
+[
+	{
+		"@id": "_:b0",
+		"@type": [
+			"http://purl.org/dc/terms/PeriodOfTime"
+		],
+		"http://www.w3.org/ns/dcat#startDate": [
+			{
+				"@value": "1937-1-1",
+				"@type": "http://www.w3.org/2001/XMLSchema#date"
+			}
+		],
+		"http://www.w3.org/ns/dcat#endDate": [
+			{
+				"@value": "1970-1-1",
+				"@type": "http://www.w3.org/2001/XMLSchema#date"
+			}
+		],
+		"http://www.marineinfo.org/ns/ontology#progress": [
+			{
+				"@value": "In Progress"
+			}
+		]
+	},
+	{
+		"@id": "_:b1",
+		"@type": [
+			"http://purl.org/dc/terms/Location"
+		],
+		"http://www.w3.org/ns/dcat#bbox": [
+			{
+				"@value": "POLYGON((\n            99.45 -10.81 , 134.8983 -10.81 ,\n            134.8983 6.1333 , 99.45 6.1333 ,\n            99.45 -10.81\n        ))",
+				"@type": "http://www.opengis.net/ont/geosparql#wktLiteral"
+			}
+		]
+	},
+	{
+		"@id": "_:b10",
+		"https://schema.org/name": [
+			{
+				"@value": "Taxonomic terms"
+			}
+		]
+	},
+	{
+		"@id": "_:b2",
+		"@type": [
+			"http://purl.org/dc/terms/Location"
+		],
+		"http://purl.org/dc/terms/isPartOf": [
+			{
+				"@id": "http://www.marineregions.org/mrgid/2127"
+			}
+		]
+	},
+	{
+		"@id": "_:b3",
+		"@type": [
+			"https://schema.org/DefinedTerm"
+		],
+		"https://schema.org/inDefinedTermSet": [
+			{
+				"@id": "_:b9"
+			}
+		],
+		"https://schema.org/name": [
+			{
+				"@value": "Foraminifera"
+			}
+		],
+		"https://schema.org/identifier": [
+			{
+				"@id": "https://www.marinespecies.org/aphia.php?p=taxdetails&id=1410"
+			}
+		]
+	},
+	{
+		"@id": "_:b4",
+		"@type": [
+			"https://schema.org/DefinedTerm"
+		],
+		"https://schema.org/inDefinedTermSet": [
+			{
+				"@id": "_:b10"
+			}
+		],
+		"https://schema.org/name": [
+			{
+				"@value": "Protozoa"
+			}
+		],
+		"https://schema.org/identifier": [
+			{
+				"@id": "https://www.marinespecies.org/aphia.php?p=taxdetails&id=5"
+			}
+		]
+	},
+	{
+		"@id": "_:b5",
+		"@type": [
+			"http://www.w3.org/ns/dcat#Distribution"
+		],
+		"http://www.w3.org/ns/dcat#accessURL": [
+			{
+				"@id": "https://www.emodnet-biology.eu/portal/index.php?dasid=2775"
+			}
+		],
+		"http://purl.org/dc/terms/type": [
+			{
+				"@value": "Online dataset"
+			}
+		]
+	},
+	{
+		"@id": "_:b6",
+		"@type": [
+			"http://www.w3.org/ns/dcat#Distribution"
+		],
+		"http://www.w3.org/ns/dcat#accessURL": [
+			{
+				"@id": "https://www.eurobis.org/toolbox/en/download/occurrence/dataset/2775"
+			}
+		],
+		"http://purl.org/dc/terms/type": [
+			{
+				"@value": "Online dataset"
+			}
+		]
+	},
+	{
+		"@id": "_:b7",
+		"@type": [
+			"http://www.w3.org/ns/dcat#Distribution"
+		],
+		"http://www.w3.org/ns/dcat#accessURL": [
+			{
+				"@id": "https://www.gbif.org/dataset/f2836770-6166-11de-84bf-b8a03c50a862"
+			}
+		],
+		"http://purl.org/dc/terms/type": [
+			{
+				"@value": "GBIF dataset"
+			}
+		]
+	},
+	{
+		"@id": "_:b8",
+		"@type": [
+			"http://www.w3.org/ns/dcat#Distribution"
+		],
+		"http://www.w3.org/ns/dcat#accessURL": [
+			{
+				"@id": "https://obis.org/dataset/319a6a7f-2a86-4aec-bb66-1d5cb94473d9"
+			}
+		],
+		"http://purl.org/dc/terms/type": [
+			{
+				"@value": "Online dataset"
+			}
+		]
+	},
+	{
+		"@id": "_:b9",
+		"https://schema.org/name": [
+			{
+				"@value": "Taxonomic terms"
+			}
+		]
+	},
+	{
+		"@id": "http://purl.org/dc/dcmitype/#Collection"
+	},
+	{
+		"@id": "http://purl.org/dc/terms/Location"
+	},
+	{
+		"@id": "http://purl.org/dc/terms/PeriodOfTime"
+	},
+	{
+		"@id": "http://www.marineregions.org/mrgid/2127"
+	},
+	{
+		"@id": "http://www.w3.org/ns/dcat#Dataset"
+	},
+	{
+		"@id": "http://www.w3.org/ns/dcat#Distribution"
+	},
+	{
+		"@id": "https://marineinfo.org/id/collection/552",
+		"http://purl.org/dc/terms/type": [
+			{
+				"@id": "http://purl.org/dc/dcmitype/#Collection"
+			}
+		],
+		"http://purl.org/dc/terms/title": [
+			{
+				"@value": "EMODNET"
+			}
+		],
+		"http://purl.org/dc/terms/identifier": [
+			{
+				"@value": "552"
+			}
+		]
+	},
+	{
+		"@id": "https://marineinfo.org/id/collection/619",
+		"http://purl.org/dc/terms/type": [
+			{
+				"@id": "http://purl.org/dc/dcmitype/#Collection"
+			}
+		],
+		"http://purl.org/dc/terms/title": [
+			{
+				"@value": "available through EurOBIS"
+			}
+		],
+		"http://purl.org/dc/terms/identifier": [
+			{
+				"@value": "619"
+			}
+		]
+	},
+	{
+		"@id": "https://marineinfo.org/id/dataset/1510",
+		"http://www.w3.org/ns/dcat#record": [
+			{
+				"@id": "https://marineinfo.org/id/dataset/2775"
+			}
+		]
+	},
+	{
+		"@id": "https://marineinfo.org/id/dataset/2775",
+		"@type": [
+			"http://www.w3.org/ns/dcat#Dataset",
+			"https://schema.org/Dataset"
+		],
+		"http://purl.org/dc/terms/title": [
+			{
+				"@value": "Zoological Museum Amsterdam, University of Amsterdam (NL) - Protozoa",
+				"@language": "en"
+			}
+		],
+		"http://purl.org/dc/terms/abstract": [
+			{
+				"@value": "The Protozoa collection of the Zoological Museum Amsterdam is modest in size (ca. 100 registered samples) and modest in importance (no nominal types). Its main contents are dry Foraminifera. Approximately half of the specimens are collected in Indonesia during the Siboga Expedition in 1899-1900.",
+				"@language": "en"
+			}
+		],
+		"http://purl.org/dc/terms/created": [
+			{
+				"@value": "2011-02-14",
+				"@type": "http://www.w3.org/2001/XMLSchema#date"
+			}
+		],
+		"http://purl.org/dc/terms/modified": [
+			{
+				"@value": "2022-07-20",
+				"@type": "http://www.w3.org/2001/XMLSchema#date"
+			}
+		],
+		"http://purl.org/dc/terms/license": [
+			{
+				"@id": "https://spdx.org/licenses/CC-BY-4.0.html"
+			}
+		],
+		"http://purl.org/dc/elements/1.1/bibliographicCitation": [
+			{
+				"@value": "NLBIF, Zoological Museum Amsterdam, University of Amsterdam (NL) - Protozoa."
+			}
+		],
+		"http://www.w3.org/2000/01/rdf-schema#comment": [
+			{
+				"@value": "GBIF Portal ID 8423"
+			}
+		],
+		"http://purl.org/dc/terms/temporal": [
+			{
+				"@id": "_:b0"
+			}
+		],
+		"http://purl.org/dc/terms/spatial": [
+			{
+				"@id": "_:b1"
+			},
+			{
+				"@id": "_:b2"
+			}
+		],
+		"http://purl.org/dc/terms/isPartOf": [
+			{
+				"@id": "https://marineinfo.org/id/collection/619"
+			},
+			{
+				"@id": "https://marineinfo.org/id/collection/552"
+			}
+		],
+		"https://schema.org/keywords": [
+			{
+				"@value": "Museum collections"
+			},
+			{
+				"@id": "_:b3"
+			},
+			{
+				"@id": "_:b4"
+			}
+		],
+		"http://www.w3.org/ns/dcat#theme": [
+			{
+				"@value": "Biology"
+			},
+			{
+				"@value": "Biology > Ecology - biodiversity"
+			}
+		],
+		"http://www.w3.org/ns/dcat#distribution": [
+			{
+				"@id": "_:b5"
+			},
+			{
+				"@id": "_:b6"
+			},
+			{
+				"@id": "_:b7"
+			},
+			{
+				"@id": "_:b8"
+			}
+		],
+		"http://purl.org/dc/terms/contributor": [
+			{
+				"@id": "https://marineinfo.org/id/institute/3065"
+			},
+			{
+				"@id": "https://marineinfo.org/id/person/19449"
+			}
+		],
+		"http://www.w3.org/ns/dcat#contactPoint": [
+			{
+				"@id": "https://marineinfo.org/id/person/4999"
+			},
+			{
+				"@id": "https://marineinfo.org/id/institute/3065"
+			}
+		],
+		"http://purl.org/dc/terms/creator": [
+			{
+				"@id": "https://marineinfo.org/id/institute/3065"
+			}
+		]
+	},
+	{
+		"@id": "https://marineinfo.org/id/institute/3065"
+	},
+	{
+		"@id": "https://marineinfo.org/id/person/19449"
+	},
+	{
+		"@id": "https://marineinfo.org/id/person/4999"
+	},
+	{
+		"@id": "https://obis.org/dataset/319a6a7f-2a86-4aec-bb66-1d5cb94473d9"
+	},
+	{
+		"@id": "https://schema.org/Dataset"
+	},
+	{
+		"@id": "https://schema.org/DefinedTerm"
+	},
+	{
+		"@id": "https://spdx.org/licenses/CC-BY-4.0.html"
+	},
+	{
+		"@id": "https://www.emodnet-biology.eu/portal/index.php?dasid=2775"
+	},
+	{
+		"@id": "https://www.eurobis.org/toolbox/en/download/occurrence/dataset/2775"
+	},
+	{
+		"@id": "https://www.gbif.org/dataset/f2836770-6166-11de-84bf-b8a03c50a862"
+	},
+	{
+		"@id": "https://www.marinespecies.org/aphia.php?p=taxdetails&id=1410"
+	},
+	{
+		"@id": "https://www.marinespecies.org/aphia.php?p=taxdetails&id=5"
+	}
+]

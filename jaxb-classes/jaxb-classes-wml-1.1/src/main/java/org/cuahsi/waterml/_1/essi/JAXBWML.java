@@ -4,7 +4,7 @@ package org.cuahsi.waterml._1.essi;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -44,11 +44,14 @@ import org.cuahsi.waterml._1.SiteInfoType;
 import org.cuahsi.waterml._1.TimeSeriesResponseType;
 import org.cuahsi.waterml._1.TimeSeriesType;
 import org.cuahsi.waterml._1.TsValuesSingleVariableType;
+import org.cuahsi.waterml._1.VariableInfoType;
+import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
+import eu.essi_lab.lib.xml.NameSpace;
+ 
 public class JAXBWML {
     private ObjectFactory factory;
     private JAXBContext context;
@@ -121,7 +124,7 @@ public class JAXBWML {
 
     public Marshaller getMarshaller() throws JAXBException {
 	Marshaller marshaller = context.createMarshaller();
-	marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", getNamespacePrefixMapper());
+	marshaller.setProperty(NameSpace.NAMESPACE_PREFIX_MAPPER_IMPL, getNamespacePrefixMapper());
 	marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 	return marshaller;
     }
@@ -134,8 +137,8 @@ public class JAXBWML {
 	return new NamespacePrefixMapper() {
 
 	    @Override
-	    public String getPreferredPrefix(String namespaceUri, String suggestion, boolean requirePrefix) {		
-		if (namespaceUri == null|| namespaceUri.isEmpty()) {
+	    public String getPreferredPrefix(String namespaceUri, String suggestion, boolean requirePrefix) {
+		if (namespaceUri == null || namespaceUri.isEmpty()) {
 		    return suggestion;
 		}
 		return namespacePrefixMapper.get(namespaceUri);
@@ -358,5 +361,29 @@ public class JAXBWML {
 	newProperty.setValue(propertyValue);
 	siteInfo.getSiteProperty().add(newProperty);
     }
+
+    public String getVariableURI(VariableInfoType variableInfo) {
+	List<PropertyType> properties = variableInfo.getVariableProperty();
+	for (PropertyType property : properties) {
+	    if (property.getName().equals(VARIABLE_URI)) {
+		return property.getValue();
+	    }
+	}
+	return null;
+    }
+
+    public void addVariableURI(VariableInfoType variableInfo, String uri) {
+	variableInfo.getVariableProperty().add(getVariableURIProperty(uri));
+    }
+
+    protected PropertyType getVariableURIProperty(String uri) {
+	PropertyType ret = new PropertyType();
+	ret.setName(VARIABLE_URI);
+	ret.setValue(uri);
+	ret.setUri(uri);
+	return ret;
+    }
+
+    private static final String VARIABLE_URI = "variableURI";
 
 }

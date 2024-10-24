@@ -1,0 +1,1948 @@
+{
+  "stac_version": "1.0.0",
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "stac_version": "1.0.0",
+      "id": "002acef8-727a-5e3f-bce7-50a4a7d5ec6f",
+      "properties": {
+        "title": "crop_mask_central_x186y075_2019--P1Y.stac-item",
+        "proj:epsg": 6933,
+        "proj:shape": [
+          9600,
+          9600
+        ],
+        "odc:product": "crop_mask_central",
+        "odc:producer": "digitalearthafrica.org",
+        "proj:transform": [
+          10.0,
+          0.0,
+          480000.0,
+          0.0,
+          -10.0,
+          -96000.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "odc:file_format": "GeoTIFF",
+        "odc:region_code": "x186y075",
+        "end_datetime": "2019-12-31T23:59:59.999999Z",
+        "start_datetime": "2019-01-01T00:00:00Z",
+        "odc:product_family": "geomedian",
+        "odc:dataset_version": "1.0.0",
+        "created": "2022-03-07T02:29:06Z",
+        "datetime": "2019-01-01T00:00:00Z",
+        "cubedash:region_code": "x186y075"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              4.97480054938215,
+              -0.7525296804300243
+            ],
+            [
+              4.97480054938215,
+              -1.5051857382785072
+            ],
+            [
+              5.969760659258578,
+              -1.5051857382785072
+            ],
+            [
+              5.969760659258578,
+              -0.7525296804300243
+            ],
+            [
+              4.97480054938215,
+              -0.7525296804300243
+            ]
+          ]
+        ]
+      },
+      "links": [
+        {
+          "rel": "self",
+          "href": "https://explorer.digitalearth.africa/stac/collections/crop_mask_central/items/002acef8-727a-5e3f-bce7-50a4a7d5ec6f",
+          "type": "application/json"
+        },
+        {
+          "rel": "odc_yaml",
+          "href": "https://explorer.digitalearth.africa/dataset/002acef8-727a-5e3f-bce7-50a4a7d5ec6f.odc-metadata.yaml",
+          "type": "text/yaml",
+          "title": "ODC Dataset YAML"
+        },
+        {
+          "rel": "collection",
+          "href": "https://explorer.digitalearth.africa/stac/collections/crop_mask_central"
+        },
+        {
+          "rel": "product_overview",
+          "href": "https://explorer.digitalearth.africa/product/crop_mask_central",
+          "type": "text/html",
+          "title": "ODC Product Overview"
+        },
+        {
+          "rel": "alternative",
+          "href": "https://explorer.digitalearth.africa/dataset/002acef8-727a-5e3f-bce7-50a4a7d5ec6f",
+          "type": "text/html",
+          "title": "ODC Dataset Overview"
+        }
+      ],
+      "assets": {
+        "mask": {
+          "href": "s3://deafrica-services/crop_mask_central/1-0-0/x186/y075/2019--P1Y/crop_mask_central_x186y075_2019--P1Y_mask.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "mask",
+          "eo:bands": [
+            {
+              "name": "mask"
+            }
+          ],
+          "proj:epsg": 6933,
+          "proj:shape": [
+            9600,
+            9600
+          ],
+          "proj:transform": [
+            10.0,
+            0.0,
+            480000.0,
+            0.0,
+            -10.0,
+            -96000.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "roles": [
+            "data"
+          ]
+        },
+        "prob": {
+          "href": "s3://deafrica-services/crop_mask_central/1-0-0/x186/y075/2019--P1Y/crop_mask_central_x186y075_2019--P1Y_prob.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "prob",
+          "eo:bands": [
+            {
+              "name": "prob"
+            }
+          ],
+          "proj:epsg": 6933,
+          "proj:shape": [
+            9600,
+            9600
+          ],
+          "proj:transform": [
+            10.0,
+            0.0,
+            480000.0,
+            0.0,
+            -10.0,
+            -96000.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "roles": [
+            "data"
+          ]
+        },
+        "filtered": {
+          "href": "s3://deafrica-services/crop_mask_central/1-0-0/x186/y075/2019--P1Y/crop_mask_central_x186y075_2019--P1Y_filtered.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "filtered",
+          "eo:bands": [
+            {
+              "name": "filtered"
+            }
+          ],
+          "proj:epsg": 6933,
+          "proj:shape": [
+            9600,
+            9600
+          ],
+          "proj:transform": [
+            10.0,
+            0.0,
+            480000.0,
+            0.0,
+            -10.0,
+            -96000.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "roles": [
+            "data"
+          ]
+        }
+      },
+      "bbox": [
+        4.97480054938215,
+        -1.5051857382785072,
+        5.969760659258578,
+        -0.7525296804300243
+      ],
+      "stac_extensions": [
+        "https://stac-extensions.github.io/eo/v1.0.0/schema.json",
+        "https://stac-extensions.github.io/projection/v1.0.0/schema.json"
+      ],
+      "collection": "crop_mask_central"
+    },
+    {
+      "type": "Feature",
+      "stac_version": "1.0.0",
+      "id": "00667fd1-e07b-5839-b8f9-05c044d1dfb4",
+      "properties": {
+        "title": "crop_mask_central_x190y079_2019--P1Y.stac-item",
+        "proj:epsg": 6933,
+        "proj:shape": [
+          9600,
+          9600
+        ],
+        "odc:product": "crop_mask_central",
+        "odc:producer": "digitalearthafrica.org",
+        "proj:transform": [
+          10.0,
+          0.0,
+          864000.0,
+          0.0,
+          -10.0,
+          288000.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "odc:file_format": "GeoTIFF",
+        "odc:region_code": "x190y079",
+        "end_datetime": "2019-12-31T23:59:59.999999Z",
+        "start_datetime": "2019-01-01T00:00:00Z",
+        "odc:product_family": "geomedian",
+        "odc:dataset_version": "1.0.0",
+        "created": "2022-03-07T02:29:10Z",
+        "datetime": "2019-01-01T00:00:00Z",
+        "cubedash:region_code": "x190y079"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              8.954640988887869,
+              2.2580947468517882
+            ],
+            [
+              8.954640988887869,
+              1.5051857382785072
+            ],
+            [
+              9.9496010987643,
+              1.5051857382785072
+            ],
+            [
+              9.9496010987643,
+              2.2580947468517882
+            ],
+            [
+              8.954640988887869,
+              2.2580947468517882
+            ]
+          ]
+        ]
+      },
+      "links": [
+        {
+          "rel": "self",
+          "href": "https://explorer.digitalearth.africa/stac/collections/crop_mask_central/items/00667fd1-e07b-5839-b8f9-05c044d1dfb4",
+          "type": "application/json"
+        },
+        {
+          "rel": "odc_yaml",
+          "href": "https://explorer.digitalearth.africa/dataset/00667fd1-e07b-5839-b8f9-05c044d1dfb4.odc-metadata.yaml",
+          "type": "text/yaml",
+          "title": "ODC Dataset YAML"
+        },
+        {
+          "rel": "collection",
+          "href": "https://explorer.digitalearth.africa/stac/collections/crop_mask_central"
+        },
+        {
+          "rel": "product_overview",
+          "href": "https://explorer.digitalearth.africa/product/crop_mask_central",
+          "type": "text/html",
+          "title": "ODC Product Overview"
+        },
+        {
+          "rel": "alternative",
+          "href": "https://explorer.digitalearth.africa/dataset/00667fd1-e07b-5839-b8f9-05c044d1dfb4",
+          "type": "text/html",
+          "title": "ODC Dataset Overview"
+        }
+      ],
+      "assets": {
+        "mask": {
+          "href": "s3://deafrica-services/crop_mask_central/1-0-0/x190/y079/2019--P1Y/crop_mask_central_x190y079_2019--P1Y_mask.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "mask",
+          "eo:bands": [
+            {
+              "name": "mask"
+            }
+          ],
+          "proj:epsg": 6933,
+          "proj:shape": [
+            9600,
+            9600
+          ],
+          "proj:transform": [
+            10.0,
+            0.0,
+            864000.0,
+            0.0,
+            -10.0,
+            288000.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "roles": [
+            "data"
+          ]
+        },
+        "prob": {
+          "href": "s3://deafrica-services/crop_mask_central/1-0-0/x190/y079/2019--P1Y/crop_mask_central_x190y079_2019--P1Y_prob.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "prob",
+          "eo:bands": [
+            {
+              "name": "prob"
+            }
+          ],
+          "proj:epsg": 6933,
+          "proj:shape": [
+            9600,
+            9600
+          ],
+          "proj:transform": [
+            10.0,
+            0.0,
+            864000.0,
+            0.0,
+            -10.0,
+            288000.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "roles": [
+            "data"
+          ]
+        },
+        "filtered": {
+          "href": "s3://deafrica-services/crop_mask_central/1-0-0/x190/y079/2019--P1Y/crop_mask_central_x190y079_2019--P1Y_filtered.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "filtered",
+          "eo:bands": [
+            {
+              "name": "filtered"
+            }
+          ],
+          "proj:epsg": 6933,
+          "proj:shape": [
+            9600,
+            9600
+          ],
+          "proj:transform": [
+            10.0,
+            0.0,
+            864000.0,
+            0.0,
+            -10.0,
+            288000.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "roles": [
+            "data"
+          ]
+        }
+      },
+      "bbox": [
+        8.954640988887869,
+        1.5051857382785072,
+        9.9496010987643,
+        2.2580947468517882
+      ],
+      "stac_extensions": [
+        "https://stac-extensions.github.io/eo/v1.0.0/schema.json",
+        "https://stac-extensions.github.io/projection/v1.0.0/schema.json"
+      ],
+      "collection": "crop_mask_central"
+    },
+    {
+      "type": "Feature",
+      "stac_version": "1.0.0",
+      "id": "01277834-d68a-5c75-8aa1-e39c2ba144e4",
+      "properties": {
+        "title": "crop_mask_central_x208y063_2019--P1Y.stac-item",
+        "proj:epsg": 6933,
+        "proj:shape": [
+          9600,
+          9600
+        ],
+        "odc:product": "crop_mask_central",
+        "odc:producer": "digitalearthafrica.org",
+        "proj:transform": [
+          10.0,
+          0.0,
+          2592000.0,
+          0.0,
+          -10.0,
+          -1248000.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "odc:file_format": "GeoTIFF",
+        "odc:region_code": "x208y063",
+        "end_datetime": "2019-12-31T23:59:59.999999Z",
+        "start_datetime": "2019-01-01T00:00:00Z",
+        "odc:product_family": "geomedian",
+        "odc:dataset_version": "1.0.0",
+        "created": "2022-03-07T03:42:15Z",
+        "datetime": "2019-01-01T00:00:00Z",
+        "cubedash:region_code": "x208y063"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              26.863922966663605,
+              -9.829485260285134
+            ],
+            [
+              26.863922966663605,
+              -10.593789574592266
+            ],
+            [
+              27.858883076540035,
+              -10.593789574592266
+            ],
+            [
+              27.858883076540035,
+              -9.829485260285134
+            ],
+            [
+              26.863922966663605,
+              -9.829485260285134
+            ]
+          ]
+        ]
+      },
+      "links": [
+        {
+          "rel": "self",
+          "href": "https://explorer.digitalearth.africa/stac/collections/crop_mask_central/items/01277834-d68a-5c75-8aa1-e39c2ba144e4",
+          "type": "application/json"
+        },
+        {
+          "rel": "odc_yaml",
+          "href": "https://explorer.digitalearth.africa/dataset/01277834-d68a-5c75-8aa1-e39c2ba144e4.odc-metadata.yaml",
+          "type": "text/yaml",
+          "title": "ODC Dataset YAML"
+        },
+        {
+          "rel": "collection",
+          "href": "https://explorer.digitalearth.africa/stac/collections/crop_mask_central"
+        },
+        {
+          "rel": "product_overview",
+          "href": "https://explorer.digitalearth.africa/product/crop_mask_central",
+          "type": "text/html",
+          "title": "ODC Product Overview"
+        },
+        {
+          "rel": "alternative",
+          "href": "https://explorer.digitalearth.africa/dataset/01277834-d68a-5c75-8aa1-e39c2ba144e4",
+          "type": "text/html",
+          "title": "ODC Dataset Overview"
+        }
+      ],
+      "assets": {
+        "mask": {
+          "href": "s3://deafrica-services/crop_mask_central/1-0-0/x208/y063/2019--P1Y/crop_mask_central_x208y063_2019--P1Y_mask.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "mask",
+          "eo:bands": [
+            {
+              "name": "mask"
+            }
+          ],
+          "proj:epsg": 6933,
+          "proj:shape": [
+            9600,
+            9600
+          ],
+          "proj:transform": [
+            10.0,
+            0.0,
+            2592000.0,
+            0.0,
+            -10.0,
+            -1248000.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "roles": [
+            "data"
+          ]
+        },
+        "prob": {
+          "href": "s3://deafrica-services/crop_mask_central/1-0-0/x208/y063/2019--P1Y/crop_mask_central_x208y063_2019--P1Y_prob.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "prob",
+          "eo:bands": [
+            {
+              "name": "prob"
+            }
+          ],
+          "proj:epsg": 6933,
+          "proj:shape": [
+            9600,
+            9600
+          ],
+          "proj:transform": [
+            10.0,
+            0.0,
+            2592000.0,
+            0.0,
+            -10.0,
+            -1248000.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "roles": [
+            "data"
+          ]
+        },
+        "filtered": {
+          "href": "s3://deafrica-services/crop_mask_central/1-0-0/x208/y063/2019--P1Y/crop_mask_central_x208y063_2019--P1Y_filtered.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "filtered",
+          "eo:bands": [
+            {
+              "name": "filtered"
+            }
+          ],
+          "proj:epsg": 6933,
+          "proj:shape": [
+            9600,
+            9600
+          ],
+          "proj:transform": [
+            10.0,
+            0.0,
+            2592000.0,
+            0.0,
+            -10.0,
+            -1248000.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "roles": [
+            "data"
+          ]
+        }
+      },
+      "bbox": [
+        26.863922966663605,
+        -10.593789574592266,
+        27.858883076540035,
+        -9.829485260285134
+      ],
+      "stac_extensions": [
+        "https://stac-extensions.github.io/eo/v1.0.0/schema.json",
+        "https://stac-extensions.github.io/projection/v1.0.0/schema.json"
+      ],
+      "collection": "crop_mask_central"
+    },
+    {
+      "type": "Feature",
+      "stac_version": "1.0.0",
+      "id": "01335eaa-9a16-5f16-824f-d4f44ff3555f",
+      "properties": {
+        "title": "crop_mask_central_x196y055_2019--P1Y.stac-item",
+        "proj:epsg": 6933,
+        "proj:shape": [
+          9600,
+          9600
+        ],
+        "odc:product": "crop_mask_central",
+        "odc:producer": "digitalearthafrica.org",
+        "proj:transform": [
+          10.0,
+          0.0,
+          1440000.0,
+          0.0,
+          -10.0,
+          -2016000.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "odc:file_format": "GeoTIFF",
+        "odc:region_code": "x196y055",
+        "end_datetime": "2019-12-31T23:59:59.999999Z",
+        "start_datetime": "2019-01-01T00:00:00Z",
+        "odc:product_family": "geomedian",
+        "odc:dataset_version": "1.0.0",
+        "created": "2022-03-07T02:44:41Z",
+        "datetime": "2019-01-01T00:00:00Z",
+        "cubedash:region_code": "x196y055"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              14.924401648146446,
+              -16.004641862438543
+            ],
+            [
+              14.924401648146446,
+              -16.788220557647854
+            ],
+            [
+              15.919361758022877,
+              -16.788220557647854
+            ],
+            [
+              15.919361758022877,
+              -16.004641862438543
+            ],
+            [
+              14.924401648146446,
+              -16.004641862438543
+            ]
+          ]
+        ]
+      },
+      "links": [
+        {
+          "rel": "self",
+          "href": "https://explorer.digitalearth.africa/stac/collections/crop_mask_central/items/01335eaa-9a16-5f16-824f-d4f44ff3555f",
+          "type": "application/json"
+        },
+        {
+          "rel": "odc_yaml",
+          "href": "https://explorer.digitalearth.africa/dataset/01335eaa-9a16-5f16-824f-d4f44ff3555f.odc-metadata.yaml",
+          "type": "text/yaml",
+          "title": "ODC Dataset YAML"
+        },
+        {
+          "rel": "collection",
+          "href": "https://explorer.digitalearth.africa/stac/collections/crop_mask_central"
+        },
+        {
+          "rel": "product_overview",
+          "href": "https://explorer.digitalearth.africa/product/crop_mask_central",
+          "type": "text/html",
+          "title": "ODC Product Overview"
+        },
+        {
+          "rel": "alternative",
+          "href": "https://explorer.digitalearth.africa/dataset/01335eaa-9a16-5f16-824f-d4f44ff3555f",
+          "type": "text/html",
+          "title": "ODC Dataset Overview"
+        }
+      ],
+      "assets": {
+        "mask": {
+          "href": "s3://deafrica-services/crop_mask_central/1-0-0/x196/y055/2019--P1Y/crop_mask_central_x196y055_2019--P1Y_mask.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "mask",
+          "eo:bands": [
+            {
+              "name": "mask"
+            }
+          ],
+          "proj:epsg": 6933,
+          "proj:shape": [
+            9600,
+            9600
+          ],
+          "proj:transform": [
+            10.0,
+            0.0,
+            1440000.0,
+            0.0,
+            -10.0,
+            -2016000.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "roles": [
+            "data"
+          ]
+        },
+        "prob": {
+          "href": "s3://deafrica-services/crop_mask_central/1-0-0/x196/y055/2019--P1Y/crop_mask_central_x196y055_2019--P1Y_prob.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "prob",
+          "eo:bands": [
+            {
+              "name": "prob"
+            }
+          ],
+          "proj:epsg": 6933,
+          "proj:shape": [
+            9600,
+            9600
+          ],
+          "proj:transform": [
+            10.0,
+            0.0,
+            1440000.0,
+            0.0,
+            -10.0,
+            -2016000.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "roles": [
+            "data"
+          ]
+        },
+        "filtered": {
+          "href": "s3://deafrica-services/crop_mask_central/1-0-0/x196/y055/2019--P1Y/crop_mask_central_x196y055_2019--P1Y_filtered.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "filtered",
+          "eo:bands": [
+            {
+              "name": "filtered"
+            }
+          ],
+          "proj:epsg": 6933,
+          "proj:shape": [
+            9600,
+            9600
+          ],
+          "proj:transform": [
+            10.0,
+            0.0,
+            1440000.0,
+            0.0,
+            -10.0,
+            -2016000.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "roles": [
+            "data"
+          ]
+        }
+      },
+      "bbox": [
+        14.924401648146446,
+        -16.788220557647854,
+        15.919361758022877,
+        -16.004641862438543
+      ],
+      "stac_extensions": [
+        "https://stac-extensions.github.io/eo/v1.0.0/schema.json",
+        "https://stac-extensions.github.io/projection/v1.0.0/schema.json"
+      ],
+      "collection": "crop_mask_central"
+    },
+    {
+      "type": "Feature",
+      "stac_version": "1.0.0",
+      "id": "015603e7-2cd0-5e21-a1d7-dfe4a864f309",
+      "properties": {
+        "title": "crop_mask_central_x209y066_2019--P1Y.stac-item",
+        "proj:epsg": 6933,
+        "proj:shape": [
+          9600,
+          9600
+        ],
+        "odc:product": "crop_mask_central",
+        "odc:producer": "digitalearthafrica.org",
+        "proj:transform": [
+          10.0,
+          0.0,
+          2688000.0,
+          0.0,
+          -10.0,
+          -960000.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "odc:file_format": "GeoTIFF",
+        "odc:region_code": "x209y066",
+        "end_datetime": "2019-12-31T23:59:59.999999Z",
+        "start_datetime": "2019-01-01T00:00:00Z",
+        "odc:product_family": "geomedian",
+        "odc:dataset_version": "1.0.0",
+        "created": "2022-03-07T03:40:28Z",
+        "datetime": "2019-01-01T00:00:00Z",
+        "cubedash:region_code": "x209y066"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              27.858883076540035,
+              -7.546305677049881
+            ],
+            [
+              27.858883076540035,
+              -8.30588454273253
+            ],
+            [
+              28.85384318641647,
+              -8.30588454273253
+            ],
+            [
+              28.85384318641647,
+              -7.546305677049881
+            ],
+            [
+              27.858883076540035,
+              -7.546305677049881
+            ]
+          ]
+        ]
+      },
+      "links": [
+        {
+          "rel": "self",
+          "href": "https://explorer.digitalearth.africa/stac/collections/crop_mask_central/items/015603e7-2cd0-5e21-a1d7-dfe4a864f309",
+          "type": "application/json"
+        },
+        {
+          "rel": "odc_yaml",
+          "href": "https://explorer.digitalearth.africa/dataset/015603e7-2cd0-5e21-a1d7-dfe4a864f309.odc-metadata.yaml",
+          "type": "text/yaml",
+          "title": "ODC Dataset YAML"
+        },
+        {
+          "rel": "collection",
+          "href": "https://explorer.digitalearth.africa/stac/collections/crop_mask_central"
+        },
+        {
+          "rel": "product_overview",
+          "href": "https://explorer.digitalearth.africa/product/crop_mask_central",
+          "type": "text/html",
+          "title": "ODC Product Overview"
+        },
+        {
+          "rel": "alternative",
+          "href": "https://explorer.digitalearth.africa/dataset/015603e7-2cd0-5e21-a1d7-dfe4a864f309",
+          "type": "text/html",
+          "title": "ODC Dataset Overview"
+        }
+      ],
+      "assets": {
+        "mask": {
+          "href": "s3://deafrica-services/crop_mask_central/1-0-0/x209/y066/2019--P1Y/crop_mask_central_x209y066_2019--P1Y_mask.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "mask",
+          "eo:bands": [
+            {
+              "name": "mask"
+            }
+          ],
+          "proj:epsg": 6933,
+          "proj:shape": [
+            9600,
+            9600
+          ],
+          "proj:transform": [
+            10.0,
+            0.0,
+            2688000.0,
+            0.0,
+            -10.0,
+            -960000.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "roles": [
+            "data"
+          ]
+        },
+        "prob": {
+          "href": "s3://deafrica-services/crop_mask_central/1-0-0/x209/y066/2019--P1Y/crop_mask_central_x209y066_2019--P1Y_prob.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "prob",
+          "eo:bands": [
+            {
+              "name": "prob"
+            }
+          ],
+          "proj:epsg": 6933,
+          "proj:shape": [
+            9600,
+            9600
+          ],
+          "proj:transform": [
+            10.0,
+            0.0,
+            2688000.0,
+            0.0,
+            -10.0,
+            -960000.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "roles": [
+            "data"
+          ]
+        },
+        "filtered": {
+          "href": "s3://deafrica-services/crop_mask_central/1-0-0/x209/y066/2019--P1Y/crop_mask_central_x209y066_2019--P1Y_filtered.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "filtered",
+          "eo:bands": [
+            {
+              "name": "filtered"
+            }
+          ],
+          "proj:epsg": 6933,
+          "proj:shape": [
+            9600,
+            9600
+          ],
+          "proj:transform": [
+            10.0,
+            0.0,
+            2688000.0,
+            0.0,
+            -10.0,
+            -960000.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "roles": [
+            "data"
+          ]
+        }
+      },
+      "bbox": [
+        27.858883076540035,
+        -8.30588454273253,
+        28.85384318641647,
+        -7.546305677049881
+      ],
+      "stac_extensions": [
+        "https://stac-extensions.github.io/eo/v1.0.0/schema.json",
+        "https://stac-extensions.github.io/projection/v1.0.0/schema.json"
+      ],
+      "collection": "crop_mask_central"
+    },
+    {
+      "type": "Feature",
+      "stac_version": "1.0.0",
+      "id": "015e2ccb-8868-576c-ad05-5809e9753967",
+      "properties": {
+        "title": "crop_mask_central_x201y059_2019--P1Y.stac-item",
+        "proj:epsg": 6933,
+        "proj:shape": [
+          9600,
+          9600
+        ],
+        "odc:product": "crop_mask_central",
+        "odc:producer": "digitalearthafrica.org",
+        "proj:transform": [
+          10.0,
+          0.0,
+          1920000.0,
+          0.0,
+          -10.0,
+          -1632000.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "odc:file_format": "GeoTIFF",
+        "odc:region_code": "x201y059",
+        "end_datetime": "2019-12-31T23:59:59.999999Z",
+        "start_datetime": "2019-01-01T00:00:00Z",
+        "odc:product_family": "geomedian",
+        "odc:dataset_version": "1.0.0",
+        "created": "2022-03-07T03:18:49Z",
+        "datetime": "2019-01-01T00:00:00Z",
+        "cubedash:region_code": "x201y059"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              19.8992021975286,
+              -12.898473580108792
+            ],
+            [
+              19.8992021975286,
+              -13.67113232435783
+            ],
+            [
+              20.894162307405026,
+              -13.67113232435783
+            ],
+            [
+              20.894162307405026,
+              -12.898473580108792
+            ],
+            [
+              19.8992021975286,
+              -12.898473580108792
+            ]
+          ]
+        ]
+      },
+      "links": [
+        {
+          "rel": "self",
+          "href": "https://explorer.digitalearth.africa/stac/collections/crop_mask_central/items/015e2ccb-8868-576c-ad05-5809e9753967",
+          "type": "application/json"
+        },
+        {
+          "rel": "odc_yaml",
+          "href": "https://explorer.digitalearth.africa/dataset/015e2ccb-8868-576c-ad05-5809e9753967.odc-metadata.yaml",
+          "type": "text/yaml",
+          "title": "ODC Dataset YAML"
+        },
+        {
+          "rel": "collection",
+          "href": "https://explorer.digitalearth.africa/stac/collections/crop_mask_central"
+        },
+        {
+          "rel": "product_overview",
+          "href": "https://explorer.digitalearth.africa/product/crop_mask_central",
+          "type": "text/html",
+          "title": "ODC Product Overview"
+        },
+        {
+          "rel": "alternative",
+          "href": "https://explorer.digitalearth.africa/dataset/015e2ccb-8868-576c-ad05-5809e9753967",
+          "type": "text/html",
+          "title": "ODC Dataset Overview"
+        }
+      ],
+      "assets": {
+        "mask": {
+          "href": "s3://deafrica-services/crop_mask_central/1-0-0/x201/y059/2019--P1Y/crop_mask_central_x201y059_2019--P1Y_mask.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "mask",
+          "eo:bands": [
+            {
+              "name": "mask"
+            }
+          ],
+          "proj:epsg": 6933,
+          "proj:shape": [
+            9600,
+            9600
+          ],
+          "proj:transform": [
+            10.0,
+            0.0,
+            1920000.0,
+            0.0,
+            -10.0,
+            -1632000.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "roles": [
+            "data"
+          ]
+        },
+        "prob": {
+          "href": "s3://deafrica-services/crop_mask_central/1-0-0/x201/y059/2019--P1Y/crop_mask_central_x201y059_2019--P1Y_prob.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "prob",
+          "eo:bands": [
+            {
+              "name": "prob"
+            }
+          ],
+          "proj:epsg": 6933,
+          "proj:shape": [
+            9600,
+            9600
+          ],
+          "proj:transform": [
+            10.0,
+            0.0,
+            1920000.0,
+            0.0,
+            -10.0,
+            -1632000.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "roles": [
+            "data"
+          ]
+        },
+        "filtered": {
+          "href": "s3://deafrica-services/crop_mask_central/1-0-0/x201/y059/2019--P1Y/crop_mask_central_x201y059_2019--P1Y_filtered.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "filtered",
+          "eo:bands": [
+            {
+              "name": "filtered"
+            }
+          ],
+          "proj:epsg": 6933,
+          "proj:shape": [
+            9600,
+            9600
+          ],
+          "proj:transform": [
+            10.0,
+            0.0,
+            1920000.0,
+            0.0,
+            -10.0,
+            -1632000.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "roles": [
+            "data"
+          ]
+        }
+      },
+      "bbox": [
+        19.8992021975286,
+        -13.67113232435783,
+        20.894162307405026,
+        -12.898473580108792
+      ],
+      "stac_extensions": [
+        "https://stac-extensions.github.io/eo/v1.0.0/schema.json",
+        "https://stac-extensions.github.io/projection/v1.0.0/schema.json"
+      ],
+      "collection": "crop_mask_central"
+    },
+    {
+      "type": "Feature",
+      "stac_version": "1.0.0",
+      "id": "0190080c-c31f-52af-9717-003b13800cca",
+      "properties": {
+        "title": "crop_mask_central_x194y085_2019--P1Y.stac-item",
+        "proj:epsg": 6933,
+        "proj:shape": [
+          9600,
+          9600
+        ],
+        "odc:product": "crop_mask_central",
+        "odc:producer": "digitalearthafrica.org",
+        "proj:transform": [
+          10.0,
+          0.0,
+          1248000.0,
+          0.0,
+          -10.0,
+          864000.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "odc:file_format": "GeoTIFF",
+        "odc:region_code": "x194y085",
+        "end_datetime": "2019-12-31T23:59:59.999999Z",
+        "start_datetime": "2019-01-01T00:00:00Z",
+        "odc:product_family": "geomedian",
+        "odc:dataset_version": "1.0.0",
+        "created": "2022-03-07T02:42:20Z",
+        "datetime": "2019-01-01T00:00:00Z",
+        "cubedash:region_code": "x194y085"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.934481428393587,
+              6.788023584553813
+            ],
+            [
+              12.934481428393587,
+              6.030902789057211
+            ],
+            [
+              13.929441538270018,
+              6.030902789057211
+            ],
+            [
+              13.929441538270018,
+              6.788023584553813
+            ],
+            [
+              12.934481428393587,
+              6.788023584553813
+            ]
+          ]
+        ]
+      },
+      "links": [
+        {
+          "rel": "self",
+          "href": "https://explorer.digitalearth.africa/stac/collections/crop_mask_central/items/0190080c-c31f-52af-9717-003b13800cca",
+          "type": "application/json"
+        },
+        {
+          "rel": "odc_yaml",
+          "href": "https://explorer.digitalearth.africa/dataset/0190080c-c31f-52af-9717-003b13800cca.odc-metadata.yaml",
+          "type": "text/yaml",
+          "title": "ODC Dataset YAML"
+        },
+        {
+          "rel": "collection",
+          "href": "https://explorer.digitalearth.africa/stac/collections/crop_mask_central"
+        },
+        {
+          "rel": "product_overview",
+          "href": "https://explorer.digitalearth.africa/product/crop_mask_central",
+          "type": "text/html",
+          "title": "ODC Product Overview"
+        },
+        {
+          "rel": "alternative",
+          "href": "https://explorer.digitalearth.africa/dataset/0190080c-c31f-52af-9717-003b13800cca",
+          "type": "text/html",
+          "title": "ODC Dataset Overview"
+        }
+      ],
+      "assets": {
+        "mask": {
+          "href": "s3://deafrica-services/crop_mask_central/1-0-0/x194/y085/2019--P1Y/crop_mask_central_x194y085_2019--P1Y_mask.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "mask",
+          "eo:bands": [
+            {
+              "name": "mask"
+            }
+          ],
+          "proj:epsg": 6933,
+          "proj:shape": [
+            9600,
+            9600
+          ],
+          "proj:transform": [
+            10.0,
+            0.0,
+            1248000.0,
+            0.0,
+            -10.0,
+            864000.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "roles": [
+            "data"
+          ]
+        },
+        "prob": {
+          "href": "s3://deafrica-services/crop_mask_central/1-0-0/x194/y085/2019--P1Y/crop_mask_central_x194y085_2019--P1Y_prob.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "prob",
+          "eo:bands": [
+            {
+              "name": "prob"
+            }
+          ],
+          "proj:epsg": 6933,
+          "proj:shape": [
+            9600,
+            9600
+          ],
+          "proj:transform": [
+            10.0,
+            0.0,
+            1248000.0,
+            0.0,
+            -10.0,
+            864000.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "roles": [
+            "data"
+          ]
+        },
+        "filtered": {
+          "href": "s3://deafrica-services/crop_mask_central/1-0-0/x194/y085/2019--P1Y/crop_mask_central_x194y085_2019--P1Y_filtered.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "filtered",
+          "eo:bands": [
+            {
+              "name": "filtered"
+            }
+          ],
+          "proj:epsg": 6933,
+          "proj:shape": [
+            9600,
+            9600
+          ],
+          "proj:transform": [
+            10.0,
+            0.0,
+            1248000.0,
+            0.0,
+            -10.0,
+            864000.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "roles": [
+            "data"
+          ]
+        }
+      },
+      "bbox": [
+        12.934481428393587,
+        6.030902789057211,
+        13.929441538270018,
+        6.788023584553813
+      ],
+      "stac_extensions": [
+        "https://stac-extensions.github.io/eo/v1.0.0/schema.json",
+        "https://stac-extensions.github.io/projection/v1.0.0/schema.json"
+      ],
+      "collection": "crop_mask_central"
+    },
+    {
+      "type": "Feature",
+      "stac_version": "1.0.0",
+      "id": "02509ffd-8c3c-5626-ae1a-30f9d7637f84",
+      "properties": {
+        "title": "crop_mask_central_x204y080_2019--P1Y.stac-item",
+        "proj:epsg": 6933,
+        "proj:shape": [
+          9600,
+          9600
+        ],
+        "odc:product": "crop_mask_central",
+        "odc:producer": "digitalearthafrica.org",
+        "proj:transform": [
+          10.0,
+          0.0,
+          2208000.0,
+          0.0,
+          -10.0,
+          384000.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "odc:file_format": "GeoTIFF",
+        "odc:region_code": "x204y080",
+        "end_datetime": "2019-12-31T23:59:59.999999Z",
+        "start_datetime": "2019-01-01T00:00:00Z",
+        "odc:product_family": "geomedian",
+        "odc:dataset_version": "1.0.0",
+        "created": "2022-03-07T03:40:06Z",
+        "datetime": "2019-01-01T00:00:00Z",
+        "cubedash:region_code": "x204y080"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              22.884082527157883,
+              3.011383672071844
+            ],
+            [
+              22.884082527157883,
+              2.2580947468517882
+            ],
+            [
+              23.879042637034313,
+              2.2580947468517882
+            ],
+            [
+              23.879042637034313,
+              3.011383672071844
+            ],
+            [
+              22.884082527157883,
+              3.011383672071844
+            ]
+          ]
+        ]
+      },
+      "links": [
+        {
+          "rel": "self",
+          "href": "https://explorer.digitalearth.africa/stac/collections/crop_mask_central/items/02509ffd-8c3c-5626-ae1a-30f9d7637f84",
+          "type": "application/json"
+        },
+        {
+          "rel": "odc_yaml",
+          "href": "https://explorer.digitalearth.africa/dataset/02509ffd-8c3c-5626-ae1a-30f9d7637f84.odc-metadata.yaml",
+          "type": "text/yaml",
+          "title": "ODC Dataset YAML"
+        },
+        {
+          "rel": "collection",
+          "href": "https://explorer.digitalearth.africa/stac/collections/crop_mask_central"
+        },
+        {
+          "rel": "product_overview",
+          "href": "https://explorer.digitalearth.africa/product/crop_mask_central",
+          "type": "text/html",
+          "title": "ODC Product Overview"
+        },
+        {
+          "rel": "alternative",
+          "href": "https://explorer.digitalearth.africa/dataset/02509ffd-8c3c-5626-ae1a-30f9d7637f84",
+          "type": "text/html",
+          "title": "ODC Dataset Overview"
+        }
+      ],
+      "assets": {
+        "mask": {
+          "href": "s3://deafrica-services/crop_mask_central/1-0-0/x204/y080/2019--P1Y/crop_mask_central_x204y080_2019--P1Y_mask.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "mask",
+          "eo:bands": [
+            {
+              "name": "mask"
+            }
+          ],
+          "proj:epsg": 6933,
+          "proj:shape": [
+            9600,
+            9600
+          ],
+          "proj:transform": [
+            10.0,
+            0.0,
+            2208000.0,
+            0.0,
+            -10.0,
+            384000.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "roles": [
+            "data"
+          ]
+        },
+        "prob": {
+          "href": "s3://deafrica-services/crop_mask_central/1-0-0/x204/y080/2019--P1Y/crop_mask_central_x204y080_2019--P1Y_prob.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "prob",
+          "eo:bands": [
+            {
+              "name": "prob"
+            }
+          ],
+          "proj:epsg": 6933,
+          "proj:shape": [
+            9600,
+            9600
+          ],
+          "proj:transform": [
+            10.0,
+            0.0,
+            2208000.0,
+            0.0,
+            -10.0,
+            384000.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "roles": [
+            "data"
+          ]
+        },
+        "filtered": {
+          "href": "s3://deafrica-services/crop_mask_central/1-0-0/x204/y080/2019--P1Y/crop_mask_central_x204y080_2019--P1Y_filtered.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "filtered",
+          "eo:bands": [
+            {
+              "name": "filtered"
+            }
+          ],
+          "proj:epsg": 6933,
+          "proj:shape": [
+            9600,
+            9600
+          ],
+          "proj:transform": [
+            10.0,
+            0.0,
+            2208000.0,
+            0.0,
+            -10.0,
+            384000.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "roles": [
+            "data"
+          ]
+        }
+      },
+      "bbox": [
+        22.884082527157883,
+        2.2580947468517882,
+        23.879042637034313,
+        3.011383672071844
+      ],
+      "stac_extensions": [
+        "https://stac-extensions.github.io/eo/v1.0.0/schema.json",
+        "https://stac-extensions.github.io/projection/v1.0.0/schema.json"
+      ],
+      "collection": "crop_mask_central"
+    },
+    {
+      "type": "Feature",
+      "stac_version": "1.0.0",
+      "id": "0265922e-177d-5b07-93dd-5f20876ba89f",
+      "properties": {
+        "title": "crop_mask_central_x193y074_2019--P1Y.stac-item",
+        "proj:epsg": 6933,
+        "proj:shape": [
+          9600,
+          9600
+        ],
+        "odc:product": "crop_mask_central",
+        "odc:producer": "digitalearthafrica.org",
+        "proj:transform": [
+          10.0,
+          0.0,
+          1152000.0,
+          0.0,
+          -10.0,
+          -192000.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "odc:file_format": "GeoTIFF",
+        "odc:region_code": "x193y074",
+        "end_datetime": "2019-12-31T23:59:59.999999Z",
+        "start_datetime": "2019-01-01T00:00:00Z",
+        "odc:product_family": "geomedian",
+        "odc:dataset_version": "1.0.0",
+        "created": "2022-03-07T02:30:14Z",
+        "datetime": "2019-01-01T00:00:00Z",
+        "cubedash:region_code": "x193y074"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              11.939521318517157,
+              -1.5051857382785072
+            ],
+            [
+              11.939521318517157,
+              -2.2580947468517882
+            ],
+            [
+              12.934481428393587,
+              -2.2580947468517882
+            ],
+            [
+              12.934481428393587,
+              -1.5051857382785072
+            ],
+            [
+              11.939521318517157,
+              -1.5051857382785072
+            ]
+          ]
+        ]
+      },
+      "links": [
+        {
+          "rel": "self",
+          "href": "https://explorer.digitalearth.africa/stac/collections/crop_mask_central/items/0265922e-177d-5b07-93dd-5f20876ba89f",
+          "type": "application/json"
+        },
+        {
+          "rel": "odc_yaml",
+          "href": "https://explorer.digitalearth.africa/dataset/0265922e-177d-5b07-93dd-5f20876ba89f.odc-metadata.yaml",
+          "type": "text/yaml",
+          "title": "ODC Dataset YAML"
+        },
+        {
+          "rel": "collection",
+          "href": "https://explorer.digitalearth.africa/stac/collections/crop_mask_central"
+        },
+        {
+          "rel": "product_overview",
+          "href": "https://explorer.digitalearth.africa/product/crop_mask_central",
+          "type": "text/html",
+          "title": "ODC Product Overview"
+        },
+        {
+          "rel": "alternative",
+          "href": "https://explorer.digitalearth.africa/dataset/0265922e-177d-5b07-93dd-5f20876ba89f",
+          "type": "text/html",
+          "title": "ODC Dataset Overview"
+        }
+      ],
+      "assets": {
+        "mask": {
+          "href": "s3://deafrica-services/crop_mask_central/1-0-0/x193/y074/2019--P1Y/crop_mask_central_x193y074_2019--P1Y_mask.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "mask",
+          "eo:bands": [
+            {
+              "name": "mask"
+            }
+          ],
+          "proj:epsg": 6933,
+          "proj:shape": [
+            9600,
+            9600
+          ],
+          "proj:transform": [
+            10.0,
+            0.0,
+            1152000.0,
+            0.0,
+            -10.0,
+            -192000.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "roles": [
+            "data"
+          ]
+        },
+        "prob": {
+          "href": "s3://deafrica-services/crop_mask_central/1-0-0/x193/y074/2019--P1Y/crop_mask_central_x193y074_2019--P1Y_prob.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "prob",
+          "eo:bands": [
+            {
+              "name": "prob"
+            }
+          ],
+          "proj:epsg": 6933,
+          "proj:shape": [
+            9600,
+            9600
+          ],
+          "proj:transform": [
+            10.0,
+            0.0,
+            1152000.0,
+            0.0,
+            -10.0,
+            -192000.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "roles": [
+            "data"
+          ]
+        },
+        "filtered": {
+          "href": "s3://deafrica-services/crop_mask_central/1-0-0/x193/y074/2019--P1Y/crop_mask_central_x193y074_2019--P1Y_filtered.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "filtered",
+          "eo:bands": [
+            {
+              "name": "filtered"
+            }
+          ],
+          "proj:epsg": 6933,
+          "proj:shape": [
+            9600,
+            9600
+          ],
+          "proj:transform": [
+            10.0,
+            0.0,
+            1152000.0,
+            0.0,
+            -10.0,
+            -192000.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "roles": [
+            "data"
+          ]
+        }
+      },
+      "bbox": [
+        11.939521318517157,
+        -2.2580947468517882,
+        12.934481428393587,
+        -1.5051857382785072
+      ],
+      "stac_extensions": [
+        "https://stac-extensions.github.io/eo/v1.0.0/schema.json",
+        "https://stac-extensions.github.io/projection/v1.0.0/schema.json"
+      ],
+      "collection": "crop_mask_central"
+    },
+    {
+      "type": "Feature",
+      "stac_version": "1.0.0",
+      "id": "028f7ba7-b635-5cd4-8197-3a5d8bbe6db1",
+      "properties": {
+        "title": "crop_mask_central_x193y079_2019--P1Y.stac-item",
+        "proj:epsg": 6933,
+        "proj:shape": [
+          9600,
+          9600
+        ],
+        "odc:product": "crop_mask_central",
+        "odc:producer": "digitalearthafrica.org",
+        "proj:transform": [
+          10.0,
+          0.0,
+          1152000.0,
+          0.0,
+          -10.0,
+          288000.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "odc:file_format": "GeoTIFF",
+        "odc:region_code": "x193y079",
+        "end_datetime": "2019-12-31T23:59:59.999999Z",
+        "start_datetime": "2019-01-01T00:00:00Z",
+        "odc:product_family": "geomedian",
+        "odc:dataset_version": "1.0.0",
+        "created": "2022-03-07T02:42:06Z",
+        "datetime": "2019-01-01T00:00:00Z",
+        "cubedash:region_code": "x193y079"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              11.939521318517157,
+              2.2580947468517882
+            ],
+            [
+              11.939521318517157,
+              1.5051857382785072
+            ],
+            [
+              12.934481428393587,
+              1.5051857382785072
+            ],
+            [
+              12.934481428393587,
+              2.2580947468517882
+            ],
+            [
+              11.939521318517157,
+              2.2580947468517882
+            ]
+          ]
+        ]
+      },
+      "links": [
+        {
+          "rel": "self",
+          "href": "https://explorer.digitalearth.africa/stac/collections/crop_mask_central/items/028f7ba7-b635-5cd4-8197-3a5d8bbe6db1",
+          "type": "application/json"
+        },
+        {
+          "rel": "odc_yaml",
+          "href": "https://explorer.digitalearth.africa/dataset/028f7ba7-b635-5cd4-8197-3a5d8bbe6db1.odc-metadata.yaml",
+          "type": "text/yaml",
+          "title": "ODC Dataset YAML"
+        },
+        {
+          "rel": "collection",
+          "href": "https://explorer.digitalearth.africa/stac/collections/crop_mask_central"
+        },
+        {
+          "rel": "product_overview",
+          "href": "https://explorer.digitalearth.africa/product/crop_mask_central",
+          "type": "text/html",
+          "title": "ODC Product Overview"
+        },
+        {
+          "rel": "alternative",
+          "href": "https://explorer.digitalearth.africa/dataset/028f7ba7-b635-5cd4-8197-3a5d8bbe6db1",
+          "type": "text/html",
+          "title": "ODC Dataset Overview"
+        }
+      ],
+      "assets": {
+        "mask": {
+          "href": "s3://deafrica-services/crop_mask_central/1-0-0/x193/y079/2019--P1Y/crop_mask_central_x193y079_2019--P1Y_mask.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "mask",
+          "eo:bands": [
+            {
+              "name": "mask"
+            }
+          ],
+          "proj:epsg": 6933,
+          "proj:shape": [
+            9600,
+            9600
+          ],
+          "proj:transform": [
+            10.0,
+            0.0,
+            1152000.0,
+            0.0,
+            -10.0,
+            288000.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "roles": [
+            "data"
+          ]
+        },
+        "prob": {
+          "href": "s3://deafrica-services/crop_mask_central/1-0-0/x193/y079/2019--P1Y/crop_mask_central_x193y079_2019--P1Y_prob.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "prob",
+          "eo:bands": [
+            {
+              "name": "prob"
+            }
+          ],
+          "proj:epsg": 6933,
+          "proj:shape": [
+            9600,
+            9600
+          ],
+          "proj:transform": [
+            10.0,
+            0.0,
+            1152000.0,
+            0.0,
+            -10.0,
+            288000.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "roles": [
+            "data"
+          ]
+        },
+        "filtered": {
+          "href": "s3://deafrica-services/crop_mask_central/1-0-0/x193/y079/2019--P1Y/crop_mask_central_x193y079_2019--P1Y_filtered.tif",
+          "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+          "title": "filtered",
+          "eo:bands": [
+            {
+              "name": "filtered"
+            }
+          ],
+          "proj:epsg": 6933,
+          "proj:shape": [
+            9600,
+            9600
+          ],
+          "proj:transform": [
+            10.0,
+            0.0,
+            1152000.0,
+            0.0,
+            -10.0,
+            288000.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "roles": [
+            "data"
+          ]
+        }
+      },
+      "bbox": [
+        11.939521318517157,
+        1.5051857382785072,
+        12.934481428393587,
+        2.2580947468517882
+      ],
+      "stac_extensions": [
+        "https://stac-extensions.github.io/eo/v1.0.0/schema.json",
+        "https://stac-extensions.github.io/projection/v1.0.0/schema.json"
+      ],
+      "collection": "crop_mask_central"
+    }
+  ],
+  "links": [
+    {
+      "rel": "next",
+      "href": "https://explorer.digitalearth.africa/stac/search?collections=crop_mask_central&limit=10&_o=10&_full=True"
+    },
+    {
+      "href": "https://explorer.digitalearth.africa/stac/search",
+      "rel": "search",
+      "title": "Search",
+      "type": "application/geo+json",
+      "method": "GET"
+    },
+    {
+      "href": "https://explorer.digitalearth.africa/stac/search",
+      "rel": "search",
+      "title": "Search",
+      "type": "application/geo+json",
+      "method": "POST"
+    },
+    {
+      "rel": "root",
+      "href": "https://explorer.digitalearth.africa/stac"
+    }
+  ],
+  "numberReturned": 10,
+  "context": {
+    "page": 0,
+    "limit": 10,
+    "returned": 10,
+    "matched": 663
+  },
+  "numberMatched": 663
+}

@@ -1,0 +1,4 @@
+eu.essi_lab.accessor.fedeo.distributed.FEDEOGranulesConnector
+eu.essi_lab.accessor.fedeo.distributed.FEDEOMixedDistributedAccessor
+eu.essi_lab.accessor.fedeo.harvested.FEDEOCollectionConnector
+eu.essi_lab.accessor.fedeo.harvested.FEDEOMixedHarvestedAccessor

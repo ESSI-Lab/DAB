@@ -4,7 +4,7 @@ package eu.essi_lab.lib.servlet;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,8 +21,6 @@ package eu.essi_lab.lib.servlet;
  * #L%
  */
 
-import java.util.concurrent.ConcurrentHashMap;
-
 public class RequestManager {
 
     private static RequestManager instance = new RequestManager();
@@ -30,49 +28,26 @@ public class RequestManager {
     private RequestManager() {
     }
 
+    /**
+     * @return
+     */
     public static RequestManager getInstance() {
 	return instance;
     }
 
-    private ConcurrentHashMap<String, RequestInfo> infos = new ConcurrentHashMap<>();
+    /**
+     * @param callerClass
+     * @param requestId
+     */
+    public void updateThreadName(Class<?> callerClass, String requestId) {
 
-    public RequestInfo getRequestInfo(String requestId) {
-	return infos.get(requestId);
-    }
+	if (requestId.contains("@")) {
 
-    private RequestInfo retrieveRequestInfo(String requestId) {
-	RequestInfo info;
-	synchronized (infos) {
-	    info = infos.get(requestId);
-	    if (info == null) {
-		info = new RequestInfo(requestId);
-		infos.put(requestId, info);
-	    }
+	    requestId = requestId.substring(requestId.indexOf("@") + 1, requestId.length());
 	}
-	return info;
-    }
 
-    public void addThreadName(String requestId) {
-	RequestInfo info = retrieveRequestInfo(requestId);
-	info.addThreadName();
-    }
+	String name = callerClass.getSimpleName() + "@" + requestId;
 
-    public void addThreadName(String requestId, String threadName) {
-	RequestInfo info = retrieveRequestInfo(requestId);
-	info.addThreadName(threadName);
+	Thread.currentThread().setName(name);
     }
-
-    public void removeRequest(String requestId) {
-	synchronized (infos) {
-	    infos.remove(requestId);
-	}
-    }
-
-    public void printRequestInfo(String requestId) {
-	RequestInfo info = infos.get(requestId);
-	if (info != null) {
-	    info.printLogQuery();
-	}
-    }
-
 }

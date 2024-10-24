@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.timeseries;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,11 +27,11 @@ import java.util.Set;
 
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
+import eu.essi_lab.messages.RequestMessage.IterationMode;
 import eu.essi_lab.messages.ResourceSelector;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.ValidationMessage;
-import eu.essi_lab.messages.RequestMessage.IterationMode;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
@@ -44,7 +44,6 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.validation.WebRequestValidator;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import eu.essi_lab.profiler.timeseries.TimeseriesRequest.APIParameters;
@@ -144,9 +143,23 @@ public class TimeseriesTransformer extends DiscoveryRequestTransformer {
 	    operands.add(endBond.get());
 	}
 
+	// this is a hidden from swagger, deprecated functionality
 	String variableCode = request.getParameterValue(APIParameters.VARIABLE);
 	if (variableCode != null) {
 	    operands.add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER, variableCode));
+	}
+	
+	String observedProperty = request.getParameterValue(APIParameters.OBSERVED_PROPERTY);
+	if (observedProperty != null) {
+	    SimpleValueBond b1 = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER, observedProperty);
+//	    SimpleValueBond b2 = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.ATTRIBUTE_URI, observedProperty);	    
+//	    operands.add(BondFactory.createOrBond(b1,b2));
+	    operands.add(b1);
+	}
+	
+	String timeseriesCode = request.getParameterValue(APIParameters.TIMESERIES);
+	if (timeseriesCode != null) {
+	    operands.add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.ONLINE_ID, timeseriesCode));
 	}
 
 	String siteCode = request.getParameterValue(APIParameters.PLATFORM_CODE);

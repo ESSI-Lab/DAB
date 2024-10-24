@@ -1,0 +1,47 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>eu.essi_lab</groupId>
+		<artifactId>accessor</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>accessor-acronet</artifactId>
+	<name>ESSI-Lab Accessor Acronet</name>
+
+	<dependencies>
+	
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>gs-lib-xml</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		
+	</dependencies>
+
+	<build>
+		<plugins>
+
+			<plugin>
+				<groupId>com.helger.maven</groupId>
+				<artifactId>ph-sch2xslt-maven-plugin</artifactId>
+				<version>${com.helger-ph-schematron-validator.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<!-- decomment the following line to generate the xslt from the schematron -->
+							<!-- <goal>convert</goal> -->
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<schematronDirectory>src/test/schematron</schematronDirectory>
+					<xsltDirectory>src/test/resources/xslt</xsltDirectory>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

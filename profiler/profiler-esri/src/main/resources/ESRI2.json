@@ -1,0 +1,550 @@
+{
+    "currentVersion": 11,
+    "id": 1,
+	"name": "Stations (WHOS-Arctic)",
+    "type": "Feature Layer",
+    "cacheMaxAge": 30,
+    "displayField": "",
+    "description": "",
+    "copyrightText": "",
+    "defaultVisibility": true,
+    "editingInfo": {
+        "lastEditDate": 1681396611586,
+        "schemaLastEditDate": 1672917342329,
+        "dataLastEditDate": 1672917342329
+    },
+    "relationships": [],
+    "isDataVersioned": false,
+    "hasContingentValuesDefinition": false,
+    "supportsAppend": true,
+    "supportsCalculate": true,
+    "supportsASyncCalculate": true,
+    "supportsTruncate": true,
+    "supportsAttachmentsByUploadId": true,
+    "supportsAttachmentsResizing": true,
+    "supportsRollbackOnFailureParameter": true,
+    "supportsStatistics": true,
+    "supportsExceedsLimitStatistics": true,
+    "supportsAdvancedQueries": true,
+    "supportsValidateSql": true,
+    "supportsCoordinatesQuantization": true,
+    "supportsLayerOverrides": true,
+    "supportsTilesAndBasicQueriesMode": true,
+    "supportsFieldDescriptionProperty": true,
+    "supportsQuantizationEditMode": true,
+    "supportsApplyEditsWithGlobalIds": false,
+    "supportsReturningQueryGeometry": true,
+    "advancedQueryCapabilities": {
+        "supportsPagination": true,
+        "supportsQueryAttachmentsCountOnly": true,
+        "supportsPaginationOnAggregatedQueries": true,
+        "supportsQueryRelatedPagination": true,
+        "supportsQueryWithDistance": true,
+        "supportsReturningQueryExtent": true,
+        "supportsStatistics": true,
+        "supportsOrderBy": true,
+        "supportsDistinct": true,
+        "supportsQueryWithResultType": true,
+        "supportsSqlExpression": true,
+        "supportsAdvancedQueryRelated": true,
+        "supportsCountDistinct": true,
+        "supportsPercentileStatistics": true,
+        "supportsSpatialAggregationStatistics": true,
+        "supportedSpatialAggregationStatistics": [
+            "EnvelopeAggregate",
+            "CentroidAggregate",
+            "ConvexHullAggregate"
+        ],
+        "supportsLod": true,
+        "supportsQueryWithLodSR": false,
+        "supportedLodTypes": ["geohash"],
+        "supportsReturningGeometryCentroid": false,
+        "supportsQueryWithDatumTransformation": true,
+        "supportsHavingClause": true,
+        "supportsOutFieldSQLExpression": true,
+        "supportsMaxRecordCountFactor": true,
+        "supportsTopFeaturesQuery": true,
+        "supportsDisjointSpatialRel": true,
+        "supportsQueryWithCacheHint": true,
+        "supportedOperationsWithCacheHint": [
+            "query",
+            "queryTopFilter",
+            "queryAnalytics",
+            "queryAttachments",
+            "queryRelated"
+        ],
+        "supportsQueryAnalytic": true,
+        "supportsDefaultSR": true,
+        "supportsFullTextSearch": true
+    },
+    "advancedQueryAnalyticCapabilities": {
+        "supportsLinearRegression": true,
+        "supportsAsync": true,
+        "supportsPercentileAnalytic": true
+    },
+    "advancedEditingCapabilities": {
+        "supportedSqlFormatsInCalculate": ["standard"],
+        "supportsAsyncApplyEdits": true,
+        "supportsReturnEditResults": true,
+        "supportsApplyEditsbyUploadID": true,
+        "supportedApplyEditsUploadIDFormats": "JSON"
+    },
+    "infoInEstimates": [
+        "extent",
+        "count"
+    ],
+    "useStandardizedQueries": true,
+    "geometryType": "esriGeometryPoint",
+    "minScale": 36978596,
+    "maxScale": 0,
+    "extent": {
+        "xmin": -900560.899609901,
+        "ymin": 6303636.4812084306,
+        "xmax": 195130.7474099235,
+        "ymax": 8488536.2040848285,
+        "spatialReference": {
+            "wkid": 102100,
+            "latestWkid": 3857
+        }
+    },
+"drawingInfo": {
+		"renderer": {
+			"symbol": {
+				"outline": {
+					"color": [
+						0,
+						0,
+						0,
+						255
+					],
+					"width": 1
+				},
+				"color": [
+					255,
+					0,
+					0,
+					255
+				],
+				"size": 4,
+				"yoffset": 0,
+				"xoffset": 0,
+				"angle": 0,
+				"style": "esriSMSCircle",
+				"type": "esriSMS"
+			},
+			"description": "",
+			"label": "",
+			"type": "simple"
+		},
+		"transparency": 0,
+		"labelingInfo": null
+	},
+    "allowGeometryUpdates": true,
+    "hasAttachments": false,
+    "htmlPopupType": "esriServerHTMLPopupTypeNone",
+    "hasM": false,
+    "hasZ": false,
+    "objectIdField": "ObjectId",
+    "uniqueIdField": {
+        "name": "ObjectId",
+        "isSystemMaintained": true
+    },
+    "globalIdField": "",
+    "typeIdField": "",
+    "fields": [
+        {
+            "name": "id",
+            "type": "esriFieldTypeInteger",
+            "actualType": "int",
+            "alias": "id",
+            "sqlType": "sqlTypeInteger",
+            "nullable": true,
+            "editable": true,
+            "domain": null,
+            "defaultValue": null
+        },
+		{
+			"editable": false,
+			"name": "whosPage",
+			"alias": "WHOS page",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "hycosid",
+			"alias": "HYCOSID",
+			"type": "esriFieldTypeOID"
+		},
+		{
+			"editable": false,
+			"name": "station_id",
+			"alias": "StationID",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "country",
+			"alias": "Country",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "institute",
+			"alias": "Institute",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "station_name",
+			"alias": "StationName",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "river",
+			"alias": "River",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "lake_station",
+			"alias": "Lake Station",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "grdc_id",
+			"alias": "GRDC ID",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "grdc_ardb",
+			"alias": "GRDC ARDB",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "wmo_region",
+			"alias": "WMO Region",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "latitude",
+			"alias": "Latitude",
+			"type": "esriFieldTypeDouble"
+		},
+		{
+			"editable": false,
+			"name": "longitude",
+			"alias": "Longitude",
+			"type": "esriFieldTypeDouble"
+		},
+		{
+			"editable": false,
+			"name": "latitude_of_discharge",
+			"alias": "Latitude of discharge",
+			"type": "esriFieldTypeDouble"
+		},
+		{
+			"editable": false,
+			"name": "longitude_of_discharge",
+			"alias": "Longitude of discharge",
+			"type": "esriFieldTypeDouble"
+		},
+		{
+			"editable": false,
+			"name": "status",
+			"alias": "Status",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "drainage_area",
+			"alias": "Drainage Area",
+			"type": "esriFieldTypeDouble"
+		},
+		{
+			"editable": false,
+			"name": "effective_drainage_area",
+			"alias": "Effective Drainage Area",
+			"type": "esriFieldTypeDouble"
+		},
+		{
+			"editable": false,
+			"name": "drainage_shapefile",
+			"alias": "Drainage Shapefile",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "datum_name",
+			"alias": "Datum Name",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "datum_altitude",
+			"alias": "Datum Altitude",
+			"type": "esriFieldTypeDouble"
+		},
+		{
+			"editable": false,
+			"name": "flow_to_ocean",
+			"alias": "Flow to Ocean",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "downstream_hycos_station",
+			"alias": "Downstream HYCOS station",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "regulation",
+			"alias": "Regulation",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "regulation_start_date",
+			"alias": "Regulation Start Date",
+			"type": "esriFieldTypeDate"
+		},
+		{
+			"editable": false,
+			"name": "regulation_end_date",
+			"alias": "Regulation End Date",
+			"type": "esriFieldTypeDate"
+		},
+		{
+			"editable": false,
+			"name": "land_use_change",
+			"alias": "Land Use Change",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "surface_cover",
+			"alias": "Surface Cover",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "data_quality_ice",
+			"alias": "Data_quality_ice",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "data_quality_open",
+			"alias": "Data_quality_open",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "discharge_availability",
+			"alias": "Discharge Availability",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "water_level_availability",
+			"alias": "Water Level Availability",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "water_temperature_availability",
+			"alias": "Water Temperature Availability",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "ice_on_off_availability",
+			"alias": "Ice On / Off Dates Availability",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "ice_thickness_availability",
+			"alias": "Ice Thickness Availability",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "snow_depth_availability",
+			"alias": "Snow Depth Availability",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "measurement_method_discharge",
+			"alias": "Measurement Method - Discharge",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "measurement_method_water_temperature",
+			"alias": "Measurement Method - Water Temperature (computed vs. observed)",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "measurement_method_ice_on_off",
+			"alias": "Measurement Method - Ice On / Off Dates",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "equipment",
+			"alias": "Equipment",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "station_notes",
+			"alias": "Station Notes (INTERNAL USE ONLY from here on)",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "start_year",
+			"alias": "StartYear",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "end_year",
+			"alias": "EndYear",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "n_years",
+			"alias": "NYears",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "real_time",
+			"alias": "RealTime",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "water_temperature_start_date",
+			"alias": "Water Temp start date",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "water_temperature_end_date",
+			"alias": "Water Temp end date",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "sampling_interval",
+			"alias": "Sampling interval (temporal frequency)",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "script_link_for_archived_data",
+			"alias": "Script-link for Archived data",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "notes_for_archived_data",
+			"alias": "Notes for archived data",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "script_link_for_real_time_data",
+			"alias": "Script-link for Real-time data",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "notes_for_real_time_data",
+			"alias": "Notes for real-time data",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "script_link_for_water_temperature_data",
+			"alias": "Script-link for Water Temp data",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "notes_water_temperature",
+			"alias": "Notes for water temp data",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "notes_ice_on_off",
+			"alias": "Notes for ice on/off dates and thickness",
+			"type": "esriFieldTypeString"
+		},
+		{
+			"editable": false,
+			"name": "notes_snow_depth",
+			"alias": "Notes for snow depth",
+			"type": "esriFieldTypeString"
+		}
+	],
+    "indexes": [
+        {
+            "name": "PK__GEOLYTIX__9A619291BA12D3E5",
+            "fields": "ObjectId",
+            "isAscending": true,
+            "isUnique": true,
+            "description": "clustered, unique, primary key"
+        },
+        {
+            "name": "user_11320.GEOLYTIX_RETAILPOINTS_V26_202211_GEOLYTIX_RETAILPOINTS_V26_202211_Shape_sidx",
+            "fields": "Shape",
+            "isAscending": false,
+            "isUnique": false,
+            "description": "Shape Index"
+        }
+    ],
+    "dateFieldsTimeReference": {
+        "timeZone": "UTC",
+        "respectsDaylightSaving": false
+    },
+    "preferredTimeReference": null,
+    "types": [],
+    "templates": [],
+    "supportedQueryFormats": "JSON, geoJSON",
+    "supportedAppendFormats": "sqlite,geoPackage,shapefile,filegdb,featureCollection,geojson,csv,excel",
+    "supportedExportFormats": "csv,shapefile,sqlite,geoPackage,filegdb,featureCollection,geojson,excel",
+    "supportedSpatialRelationships": [
+        "esriSpatialRelIntersects",
+        "esriSpatialRelContains",
+        "esriSpatialRelCrosses",
+        "esriSpatialRelEnvelopeIntersects",
+        "esriSpatialRelIndexIntersects",
+        "esriSpatialRelOverlaps",
+        "esriSpatialRelTouches",
+        "esriSpatialRelWithin",
+        "esriSpatialRelDisjoint",
+        "esriSpatialRelRelation"
+    ],
+    "supportedContingentValuesFormats": "JSON",
+    "supportedSyncDataOptions": 4,
+    "hasStaticData": true,
+    "maxRecordCount": 1000,
+    "standardMaxRecordCount": 32000,
+    "standardMaxRecordCountNoGeometry": 32000,
+    "tileMaxRecordCount": 8000,
+    "maxRecordCountFactor": 1,
+    "capabilities": "Query"
+}

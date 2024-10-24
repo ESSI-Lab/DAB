@@ -4,7 +4,7 @@ package eu.essi_lab.cfga;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -104,18 +104,17 @@ public class SelectionUtils {
     }
 
     /**
-     * Creates a setting which is a reset clone of the given <code>originalSetting</code> (so it has all the original
-     * settings
-     * and values according the {@link Setting#reset()} method),
-     * but with the same selected settings and options values of the given <code>originalSetting</code>.<br>
-     * This utility method can be used by the client when the user wants to edit a given setting
+     * Creates a new setting which is a <i>reset</i> clone of
+     * <code>targetSetting</code>, then recursively applies all the selections (settings and options values) of
+     * <code>targetSetting</code>. The resulting setting is not {@link Selectable#clean()} <br>
      * 
      * @param targetSetting
+     * @param check
      * @return
      */
-    public static Setting resetAndSelect(Setting targetSetting) {
+    public static Setting resetAndSelect(Setting targetSetting, boolean check) {
 
-	if (!EditableSetting.isEditable(targetSetting)) {
+	if (check && !EditableSetting.isEditable(targetSetting)) {
 
 	    throw new IllegalArgumentException("Target setting is not valid according to the EditableSetting.isValid test");
 	}
@@ -124,16 +123,16 @@ public class SelectionUtils {
 	// Step 1: makes a reset clone of the original setting
 	//
 
-	Setting outSetting = targetSetting.clone();
-	outSetting.reset();
+	Setting resetSetting = targetSetting.clone();
+	resetSetting.reset();
 
-	outSetting.setIdentifier(targetSetting.getIdentifier());
+	resetSetting.setIdentifier(targetSetting.getIdentifier());
 
 	//
 	// Step 2:
 	//
 
-	applySettingAndOptionsState(targetSetting, outSetting);
+	applySettingAndOptionsState(targetSetting, resetSetting);
 
 	//
 	// Step 3: selected settings
@@ -143,7 +142,7 @@ public class SelectionUtils {
 
 	findSelectedSettings(targetSetting, selectedSettingsIds);
 
-	setSelectedSettings(outSetting, selectedSettingsIds);
+	setSelectedSettings(resetSetting, selectedSettingsIds);
 
 	//
 	// Step 4: option values
@@ -151,9 +150,9 @@ public class SelectionUtils {
 
 	HashMap<String, JSONArray> valuesMap = new HashMap<>();
 
-	findUnsetSelectionModeOptionsValues(targetSetting, outSetting, valuesMap);
+	findUnsetSelectionModeOptionsValues(targetSetting, resetSetting, valuesMap);
 
-	setUnsetUnsetSelectionModeOptionsValues(outSetting, valuesMap);
+	setUnsetSelectionModeOptionsValues(resetSetting, valuesMap);
 
 	//
 	// Step 5: option selection
@@ -163,9 +162,9 @@ public class SelectionUtils {
 
 	findSelectedValues(targetSetting, selectedValuesMap);
 
-	setSelectedValues(outSetting, selectedValuesMap);
+	setSelectedValues(resetSetting, selectedValuesMap);
 
-	return outSetting;
+	return resetSetting;
     }
 
     /**
@@ -179,14 +178,20 @@ public class SelectionUtils {
 
 	originalSetting.getOptions().forEach(targetOption -> {
 
-	    Option<?> outOption = outSetting.//
-	    getOptions().//
-	    stream().//
-	    filter(opt -> opt.getKey().equals(targetOption.getKey())).//
-	    findFirst().//
-	    get();
+	    Optional<Option<?>> outOption = outSetting.//
+		    getOptions().//
+		    stream().//
+		    filter(opt -> opt.getKey().equals(targetOption.getKey())).//
+		    findFirst();
 
-	    outOption.setEnabled(targetOption.isEnabled());
+	    //
+	    // it can be empty in a synch case where the option is missing from the
+	    // current setting version
+	    //
+	    if (outOption.isPresent()) {
+
+		outOption.get().setEnabled(targetOption.isEnabled());
+	    }
 	});
 
 	originalSetting.getSettings().forEach(originalChild -> {
@@ -194,7 +199,10 @@ public class SelectionUtils {
 	    ArrayList<Setting> list = new ArrayList<Setting>();
 	    SettingUtils.deepFind(outSetting, set -> set.getIdentifier().equals(originalChild.getIdentifier()), list);
 
-	    applySettingAndOptionsState(originalChild, list.get(0));
+	    if (!list.isEmpty()) {
+
+		applySettingAndOptionsState(originalChild, list.get(0));
+	    }
 	});
     }
 
@@ -203,7 +211,9 @@ public class SelectionUtils {
      * @param outSetting
      * @param valuesMap
      */
-    private static void findUnsetSelectionModeOptionsValues(Setting originalSetting, Setting outSetting,
+    private static void findUnsetSelectionModeOptionsValues(//
+	    Setting originalSetting, //
+	    Setting outSetting, //
 	    HashMap<String, JSONArray> valuesMap) {
 
 	originalSetting.getOptions().forEach(targetOption -> {
@@ -211,16 +221,26 @@ public class SelectionUtils {
 	    ArrayList<Setting> list = new ArrayList<Setting>();
 	    SettingUtils.deepFind(outSetting, set -> set.getIdentifier().equals(originalSetting.getIdentifier()), list);
 
-	    Optional<Option<?>> resetOption = list.//
-	    get(0).//
-	    getOptions().//
-	    stream().//
-	    filter(opt -> opt.getKey().equals(targetOption.getKey())).//
-	    findFirst();//
+	    if (!list.isEmpty()) {
 
-	    if (resetOption.get().getSelectionMode() == SelectionMode.UNSET && !targetOption.getValues().isEmpty()) {
+		Optional<Option<?>> resetOption = list.//
+			get(0).//
+			getOptions().//
+			stream().//
+			filter(opt -> opt.getKey().equals(targetOption.getKey())).//
+			findFirst();//
 
-		valuesMap.put(composeMapKey(originalSetting, targetOption), targetOption.getObject().getJSONArray("values"));
+		//
+		// it can be empty in a synch case where the option is missing from the
+		// current setting version
+		//
+		if (resetOption.isPresent()) {
+
+		    if (resetOption.get().getSelectionMode() == SelectionMode.UNSET && !targetOption.getValues().isEmpty()) {
+
+			valuesMap.put(composeMapKey(originalSetting, targetOption), targetOption.getObject().getJSONArray("values"));
+		    }
+		}
 	    }
 	});
 
@@ -231,7 +251,7 @@ public class SelectionUtils {
      * @param outSetting
      * @param valuesMap
      */
-    private static void setUnsetUnsetSelectionModeOptionsValues(Setting outSetting, HashMap<String, JSONArray> valuesMap) {
+    private static void setUnsetSelectionModeOptionsValues(Setting outSetting, HashMap<String, JSONArray> valuesMap) {
 
 	outSetting.getOptions().forEach(outOption -> {
 
@@ -248,7 +268,7 @@ public class SelectionUtils {
 	    });
 	});
 
-	outSetting.getSettings().forEach(s -> setUnsetUnsetSelectionModeOptionsValues(s, valuesMap));
+	outSetting.getSettings().forEach(s -> setUnsetSelectionModeOptionsValues(s, valuesMap));
     }
 
     /**
@@ -285,15 +305,15 @@ public class SelectionUtils {
 		//
 		// special case: the option has no values at init time since they are optionally loaded with a loader,
 		// so now after the reset, it has no value and the selection would fail. In order to allow the selection
-		// to work, the selected values are first added as the option values. At the end, the option will have 
+		// to work, the selected values are first added as the option values. At the end, the option will have
 		// as values exactly the selected values
 		//
-		if(outOption.getLoader().isPresent()){
-		    
+		if (outOption.getLoader().isPresent()) {
+
 		    outOption.setObjectValues(list);
 		}
-		
-		list.forEach(value -> outOption.select(v -> v.equals(value)));
+
+		outOption.select(v -> list.contains(v));
 	    }
 	});
 

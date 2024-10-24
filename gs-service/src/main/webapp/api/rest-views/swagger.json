@@ -1,0 +1,633 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.1.0-BETA",
+        "termsOfService": "http://swagger.io/terms/"
+    },
+    "basePath": "/gs-service/services/essi/rest-views",
+    "tags": [
+        {
+            "name": "Sources",
+            "description": "Retrieves the DAB sources"
+        },
+        {
+            "name": "Views",
+            "description": "Manages the DAB views"
+        }
+    ],
+    "schemes": ["http","https"],
+    "paths": {
+        "/sources": {"get": {
+            "tags": ["Sources"],
+            "summary": "Retrieves all the DAB sources",
+            "description": "Retrieves the sources brokered by this DAB instance.",
+            "operationId": "getSources",
+            "produces": ["application/json"],
+             "parameters": [{
+                    "name": "token",
+                    "in": "query",
+                    "description": "The user client token obtained during the registration procedure.",
+                    "required": true,
+                    "type": "string",
+                    "format": "password"
+                }],
+                "responses": {"200": {
+                    "description": "successful operation"
+                },
+                "400": {
+	 				"description": "Bad request."},
+	 			"403": {
+	 				"description": "Authorization information is missing or invalid."},
+	 			"5xx": {
+	 				"description": "Unexpected error."}},
+            "security": [{"token": []}]
+        }},
+        "/views": {
+            "get": {
+                "tags": ["View"],
+                "summary": "Retrieves all the DAB views",
+                "description": "Retrieves the DAB views associated to the given <code>token<\/code>",
+                "operationId": "getViews",
+                "produces": ["application/json"],
+             "parameters": [{
+                    "name": "token",
+                    "in": "query",
+                    "description": "The user client token obtained during the registration procedure.",
+                    "required": true,
+                    "type": "string",
+                    "format": "password"
+                }, 
+                 {
+                    	"name": "start",
+                        "in": "query",
+                        "description": "The start index of the first view item, starting from 1",
+                        "default": 1,
+                        "required": false,
+                        "type": "number"
+                    },
+                   {
+                        "name": "count",
+                        "in": "query",
+                        "description": "Maximum number of views in each page of the result",
+                        "required": false,
+                        "type": "number",
+                        "default": 10
+                    }],
+                "responses": {"200": {
+                    "description": "successful operation"
+                },
+                "400": {
+	 				"description": "Bad request."},
+	 			"403": {
+	 				"description": "Authorization information is missing or invalid."},
+	 			"5xx": {
+	 				"description": "Unexpected error."},
+	 					 			"schema":{
+    "type": "object",
+    "properties": {
+        "size": {
+            "description": "Number of returned views",
+            "required": true,
+            "type": "number"
+        },
+        "start": {
+            "description": "Corresponds to the start value in the request",
+            "required": true,
+            "type": "number"
+        },
+        "count": {
+            "description": "Corresponds to the count value in the request",
+            "required": true,
+            "type": "number"
+        },
+        "views": {
+            "description": "The required views",
+            "required": true,
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "description": "The view identifier. Only letters, numbers and underscores are allowed",
+                        "required": true,
+                        "type": "string"
+                    },
+                    "label": {
+                        "description": "A descriptive label for this view",
+                        "required": true,
+                        "type": "string"
+                    },
+                    "visible": {
+                        "description": "If the view is publicly visible.",
+                        "required": false,
+                        "default": false,
+                        "type": "boolean"
+                    },
+                    "sources": {
+                        "description": "Array of sources identifiers. Only the content of the correspondent sources (matching the other view constraints if any) is included in the <code>ResultSet</code>",
+                        "required": false,
+                        "type": "array",
+                        "default": [],
+                        "items": {"type": "string"}
+                    },
+                    "keywords": {
+                        "description": "Array of keywords",
+                        "required": false,
+                        "type": "array",
+                        "default": [],
+                        "items": {"type": "string"}
+                    },
+                    "parentView": {
+                        "description": "The view identifier of an existing view of whose this view is a child",
+                        "required": false,
+                        "type": "string"
+                    },
+                    "where": {
+                        "type": "object",
+                        "required": false,
+                        "description": "A bounding box (expressed in EPSG:4326) over the search results",
+                        "properties": {
+                            "south": {
+                                "description": "The minimum latitute. Must be less than or equal to north",
+                                "type": "number",
+                                "minimum": -90,
+                                "maximum": 90,
+                                "default": -90
+                            },
+                            "west": {
+                                "description": "The minimum longitude. Must be less than or equal to east",
+                                "type": "number",
+                                "minimum": -180,
+                                "maximum": 180,
+                                "default": -180
+                            },
+                            "north": {
+                                "description": "The maximum latitute. Must be greather than or equal to south",
+                                "type": "number",
+                                "minimum": -90,
+                                "maximum": 90,
+                                "default": 90
+                            },
+                            "east": {
+                                "description": "The maximum longitude. Must be greather than or equal to west",
+                                "type": "number",
+                                "minimum": -180,
+                                "maximum": 180,
+                                "default": 180
+                            }
+                        }
+                    },
+                    "when": {
+                        "description": "A time period over the discover results. Date or datetime expressed in ISO8601 format",
+                        "required": false,
+                        "type": "object",
+                        "properties": {
+                            "from": {
+                                "required": false,
+                                "description": "Start time. If omitted the end time must be set",
+                                "type": "string",
+                                "default": "2004-01-01"
+                            },
+                            "to": {
+                                "required": false,
+                                "description": "End time. If omitted the start time must be set",
+                                "type": "string",
+                                "default": "2016-12-31"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+		
+		},
+                "security": [{"token": []}]
+            },
+            "post": {
+                "tags": ["View"],
+                "summary": "Creates a DAB view",
+                "description": "Creates a DAB view. A view defines a <code>ResultSet</code> by means of a set of constraints. At least one of 'sources', 'keywords', 'where' or 'when' contraint must be set",
+                "operationId": "createView",
+                "produces": ["application/json"],
+             "parameters": [{
+                    "name": "token",
+                    "in": "query",
+                    "description": "The user client token obtained during the registration procedure.",
+                    "required": true,
+                    "type": "string",
+                    "format": "password"
+                },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "type": "object",
+                            "required": ["label","id"],
+                            "properties": {
+                                "id": {
+                                    "description": "The view identifier. Only letters, numbers and underscores are allowed",
+                                    "required": true,
+                                    "type": "string"
+                                },
+                                "label": {
+                                    "description": "A descriptive label for this view",
+                                    "required": true,                                    
+                                    "type": "string"
+                                },
+                                "visible": {
+                                    "description": "If the view is publicly visible",
+                                    "required": false,
+                                    "default": false,
+                                    "type": "boolean"
+                                },
+                                "sources": {
+                                    "description": "Array of sources identifiers. Only the content of the correspondent sources (matching the other view constraints if any) is included in the <code>ResultSet</code>",
+                                    "required": false,
+                                    "type": "array",
+                                    "default": [],
+                                    "items": {"type": "string"}
+                                },
+                                "keywords": {
+                                    "description": "Array of keywords",
+                                    "required": false,
+                                    "type": "array",
+                                    "default": [],
+                                    "items": {"type": "string"}
+                                },
+                                "parentView": {
+                                    "description": "The view identifier of an existing view of whose this view is a child",
+                                    "required": false,
+                                    "type": "string"
+                                },
+                                "where": {
+                                    "type": "object",                                    
+                                    "required": false,
+                                    "description": "A bounding box (expressed in EPSG:4326) over the search results",
+                                    "properties": {
+                                        "south": {
+                                            "description": "The minimum latitute. Must be less than or equal to north",
+                                            "type": "number",
+                                            "minimum": -90,
+                                            "maximum": 90,
+                                            "default": -90
+                                        },
+                                        "west": {
+                                            "description": "The minimum longitude. Must be less than or equal to east",
+                                            "type": "number",
+                                            "minimum": -180,
+                                            "maximum": 180,
+                                            "default": -180
+                                        },
+                                        "north": {
+                                            "description": "The maximum latitute. Must be greather than or equal to south",
+                                            "type": "number",
+                                            "minimum": -90,
+                                            "maximum": 90,
+                                            "default": 90
+                                        },
+                                        "east": {
+                                            "description": "The maximum longitude. Must be greather than or equal to west",
+                                            "type": "number",
+                                            "minimum": -180,
+                                            "maximum": 180,
+                                            "default": 180
+                                        }
+                                    }
+                                },
+                                "when": {
+                                    "description": "A time period over the discover results. Date or datetime expressed in ISO8601 format",
+                                    "required": false,
+                                    "type": "object",
+                                    "properties": {
+                                        "from": {
+                                            "required": false,
+                                            "description": "Start time. If omitted the end time must be set",
+                                            "type": "string",
+                                            "default": "2004-01-01"
+                                        },
+                                        "to": {
+                                            "required": false,
+                                            "description": "End time. If omitted the start time must be set",
+                                            "type": "string",
+                                            "default": "2016-12-31"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {"200": {
+                    "description": "successful operation"
+                },
+                "400": {
+	 				"description": "Bad request."},
+	 			"403": {
+	 				"description": "Authorization information is missing or invalid."},
+	 			"5xx": {
+	 				"description": "Unexpected error."}},
+                "security": [{"token": []}]
+            }
+        },
+        "/views/{viewId}": {
+        "get": {
+                "tags": ["View"],
+                "summary": "Retrieves a DAB view",
+                "description": "Retrieves the DAB views associated to the given <code>token<\/code> and <code>viewId</code>",
+                "operationId": "getView",
+                "produces": ["application/json"],
+             "parameters": [{
+                    "name": "token",
+                    "in": "query",
+                    "description": "The user client token obtained during the registration procedure.",
+                    "required": true,
+                    "type": "string",
+                    "format": "password"
+                },
+                {
+                    "name": "viewId",
+                    "in": "path",
+                    "description": "The view identifier",
+                    "required": true,
+                    "type": "string"
+                }
+                ],
+                "responses": {"200": {
+                    "description": "successful operation"
+                },
+                "400": {
+	 				"description": "Bad request."},
+	 			"403": {
+	 				"description": "Authorization information is missing or invalid."},
+	 			"5xx": {
+	 				"description": "Unexpected error."},
+	 					 			"schema":{
+				"$ref": "#/definitions/ViewModel"
+		}},
+                "security": [{"token": []}]
+            },
+            "put": {
+                "tags": ["View"],
+                "summary": "Updates a DAB view",
+                "description": "Updates a DAB view. A view defines a <code>ResultSet</code> by means of a set of constraints. At least one of 'sources', 'keywords', 'where' or 'when' contraint must be set",
+                "operationId": "updateView",
+                "produces": ["application/json"],
+             "parameters": [{
+                    "name": "token",
+                    "in": "query",
+                    "description": "The user client token obtained during the registration procedure.",
+                    "required": true,
+                    "type": "string",
+                    "format": "password"
+                },
+                {
+                    "name": "viewId",
+                    "in": "path",
+                    "description": "The view identifier",
+                    "required": true,
+                    "type": "string"
+                },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "type": "object",
+                            "required": ["label","id"],
+                            "properties": {
+                                "id": {
+                                    "description": "The view identifier. Only letters, numbers and underscores are allowed",
+                                    "required": true,
+                                    "type": "string"
+                                },
+                                "label": {
+                                    "description": "A descriptive label for this view",
+                                    "required": true,                                    
+                                    "type": "string"
+                                },
+                                "visible": {
+                                    "description": "If the view is publicly visible.",
+                                    "required": false,
+                                    "default": false,
+                                    "type": "boolean"
+                                },
+                                "sources": {
+                                    "description": "Array of sources identifiers. Only the content of the correspondent sources (matching the other view constraints if any) is included in the <code>ResultSet</code>",
+                                    "required": false,
+                                    "type": "array",
+                                    "default": [],
+                                    "items": {"type": "string"}
+                                },
+                                "keywords": {
+                                    "description": "Array of keywords",
+                                    "required": false,
+                                    "type": "array",
+                                    "default": [],
+                                    "items": {"type": "string"}
+                                },
+                                "parentView": {
+                                    "description": "The view identifier of an existing view of whose this view is a child",
+                                    "required": false,
+                                    "type": "string"
+                                },
+                                "where": {
+                                    "type": "object",                                    
+                                    "required": false,
+                                    "description": "A bounding box (expressed in EPSG:4326) over the search results",
+                                    "properties": {
+                                        "south": {
+                                            "description": "The minimum latitute. Must be less than or equal to north",
+                                            "type": "number",
+                                            "minimum": -90,
+                                            "maximum": 90,
+                                            "default": -90
+                                        },
+                                        "west": {
+                                            "description": "The minimum longitude. Must be less than or equal to east",
+                                            "type": "number",
+                                            "minimum": -180,
+                                            "maximum": 180,
+                                            "default": -180
+                                        },
+                                        "north": {
+                                            "description": "The maximum latitute. Must be greather than or equal to south",
+                                            "type": "number",
+                                            "minimum": -90,
+                                            "maximum": 90,
+                                            "default": 90
+                                        },
+                                        "east": {
+                                            "description": "The maximum longitude. Must be greather than or equal to west",
+                                            "type": "number",
+                                            "minimum": -180,
+                                            "maximum": 180,
+                                            "default": 180
+                                        }
+                                    }
+                                },
+                                "when": {
+                                    "description": "A time period over the discover results. Date or datetime expressed in ISO8601 format",
+                                    "required": false,
+                                    "type": "object",
+                                    "properties": {
+                                        "from": {
+                                            "required": false,
+                                            "description": "Start time. If omitted the end time must be set",
+                                            "type": "string",
+                                            "default": "2004-01-01"
+                                        },
+                                        "to": {
+                                            "required": false,
+                                            "description": "End time. If omitted the start time must be set",
+                                            "type": "string",
+                                            "default": "2016-12-31"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {"200": {
+                    "description": "successful operation"
+                },
+                "400": {
+	 				"description": "Bad request."},
+	 			"403": {
+	 				"description": "Authorization information is missing or invalid."},
+	 			"5xx": {
+	 				"description": "Unexpected error."}},
+                "security": [{"token": []}]
+            },
+        "delete": {
+            "tags": ["View"],
+            "summary": "Deletes the given DAB view",
+            "description": "Deletes the DAB view with the the given <code>viewId<\/code>",
+            "operationId": "deleteView",
+            "produces": ["application/json"],
+             "parameters": [{
+                    "name": "token",
+                    "in": "query",
+                    "description": "The user client token obtained during the registration procedure.",
+                    "required": true,
+                    "type": "string",
+                    "format": "password"
+                },
+                {
+                    "name": "viewId",
+                    "in": "path",
+                    "description": "The view identifier",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+                "responses": {"200": {
+                    "description": "successful operation"
+                },
+                "400": {
+	 				"description": "Bad request."},
+	 			"403": {
+	 				"description": "Authorization information is missing or invalid."},
+	 			"5xx": {
+	 				"description": "Unexpected error."}},
+            "security": [{"token": []}]
+        }}
+    },
+    "definitions": {
+      "ViewModel":      {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "description": "The view identifier. Only letters, numbers and underscores are allowed",
+                                    "required": true,
+                                    "type": "string"
+                                },
+                                "label": {
+                                    "description": "A descriptive label for this view",
+                                    "required": true,                                    
+                                    "type": "string"
+                                },
+                                "visible": {
+                                    "description": "If the view is publicly visible.",
+                                    "required": false,
+                                    "default": false,
+                                    "type": "boolean"
+                                },
+                                "sources": {
+                                    "description": "Array of sources identifiers. Only the content of the correspondent sources (matching the other view constraints if any) is included in the <code>ResultSet</code>",
+                                    "required": false,
+                                    "type": "array",
+                                    "default": [],
+                                    "items": {"type": "string"}
+                                },
+                                "keywords": {
+                                    "description": "Array of keywords",
+                                    "required": false,
+                                    "type": "array",
+                                    "default": [],
+                                    "items": {"type": "string"}
+                                },
+                                "parentView": {
+                                    "description": "The view identifier of an existing view of whose this view is a child",
+                                    "required": false,
+                                    "type": "string"
+                                },
+                                "where": {
+                                    "type": "object",                                    
+                                    "required": false,
+                                    "description": "A bounding box (expressed in EPSG:4326) over the search results",
+                                    "properties": {
+                                        "south": {
+                                            "description": "The minimum latitute. Must be less than or equal to north",
+                                            "type": "number",
+                                            "minimum": -90,
+                                            "maximum": 90,
+                                            "default": -90
+                                        },
+                                        "west": {
+                                            "description": "The minimum longitude. Must be less than or equal to east",
+                                            "type": "number",
+                                            "minimum": -180,
+                                            "maximum": 180,
+                                            "default": -180
+                                        },
+                                        "north": {
+                                            "description": "The maximum latitute. Must be greather than or equal to south",
+                                            "type": "number",
+                                            "minimum": -90,
+                                            "maximum": 90,
+                                            "default": 90
+                                        },
+                                        "east": {
+                                            "description": "The maximum longitude. Must be greather than or equal to west",
+                                            "type": "number",
+                                            "minimum": -180,
+                                            "maximum": 180,
+                                            "default": 180
+                                        }
+                                    }
+                                },
+                                "when": {
+                                    "description": "A time period over the discover results. Date or datetime expressed in ISO8601 format",
+                                    "required": false,
+                                    "type": "object",
+                                    "properties": {
+                                        "from": {
+                                            "required": false,
+                                            "description": "Start time. If omitted the end time must be set",
+                                            "type": "string",
+                                            "default": "2004-01-01"
+                                        },
+                                        "to": {
+                                            "required": false,
+                                            "description": "End time. If omitted the start time must be set",
+                                            "type": "string",
+                                            "default": "2016-12-31"
+                                        }
+                                    }
+                                }
+                            }
+                        }      
+    }
+}

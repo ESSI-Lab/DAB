@@ -1,0 +1,4 @@
+eu.essi_lab.accessor.obis.distributed.OBISMixedDistributedAccessor
+eu.essi_lab.accessor.obis.distributed.OBISGranulesConnector
+eu.essi_lab.accessor.obis.harvested.OBISMixedHarvestedAccessor
+eu.essi_lab.accessor.obis.harvested.OBISConnector

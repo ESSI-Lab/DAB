@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.conf;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,8 +21,11 @@ package eu.essi_lab.gssrv.conf;
  * #L%
  */
 
+import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -41,10 +44,18 @@ import eu.essi_lab.authorization.userfinder.UserFinder;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.SelectionUtils;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.GDCSourcesSetting;
+import eu.essi_lab.cfga.gs.setting.GSSourceSetting;
+import eu.essi_lab.cfga.gs.setting.SourcePrioritySetting;
+import eu.essi_lab.cfga.gs.setting.SystemSetting;
+import eu.essi_lab.cfga.gs.setting.database.SourceStorageSetting;
+import eu.essi_lab.cfga.gs.setting.distribution.DistributionSetting.DistributionSettingComponentInfo;
+import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting;
 import eu.essi_lab.cfga.gui.ConfigurationView;
 import eu.essi_lab.cfga.gui.LogOutButtonListener;
 import eu.essi_lab.cfga.gui.dialog.NotificationDialog;
+import eu.essi_lab.cfga.gui.extension.ComponentInfo;
 import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.cfga.setting.Setting;
@@ -53,7 +64,9 @@ import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting;
 import eu.essi_lab.cfga.setting.validation.ValidationContext;
 import eu.essi_lab.cfga.setting.validation.ValidationResponse;
 import eu.essi_lab.cfga.setting.validation.ValidationResponse.ValidationResult;
-import eu.essi_lab.gssrv.starter.GISuiteStarter;
+import eu.essi_lab.configuration.ExecutionMode;
+import eu.essi_lab.gssrv.starter.GIPStarter;
+import eu.essi_lab.harvester.worker.HarvestingSettingImpl;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.exceptions.GSException;
@@ -84,6 +97,7 @@ public class GSConfigurationView extends ConfigurationView {
     static SettingLinkedList<Setting> putSettingList;
     static SettingLinkedList<Setting> removedSettingList;
     static SettingLinkedList<Setting> editedSettingList;
+    static LinkedList<String> additionalRemovalInfo;
 
     /**
      * 
@@ -92,7 +106,7 @@ public class GSConfigurationView extends ConfigurationView {
 
 	setHeaderText("DAB configuration GUI");
 
-	setHeaderImage(getClass().getClassLoader().getResourceAsStream("ESSI.png"));
+	setHeaderImage(getClass().getClassLoader().getResourceAsStream("ESSI.png"), 44);
 
 	// removeDrawerToggle();
 
@@ -116,9 +130,14 @@ public class GSConfigurationView extends ConfigurationView {
     @Override
     protected boolean isInitialized() {
 
+	if (ExecutionMode.skipAuthorization()) {
+	    GSLoggerFactory.getLogger(getClass()).info("Authorization turned off by administrator");
+	    return true;
+	}
+
 	OAuthSetting setting = ConfigurationWrapper.getOAuthSetting();
 	ValidationResponse response = setting.getValidator().get().validate(//
-		GISuiteStarter.configuration, //
+		GIPStarter.configuration, //
 		setting, //
 		ValidationContext.edit());
 
@@ -140,7 +159,7 @@ public class GSConfigurationView extends ConfigurationView {
 		    //
 		    // at this point we use the original configuration, not the clone
 		    //
-		    GISuiteStarter.configuration, oAuthSetting, //
+		    GIPStarter.configuration, oAuthSetting, //
 		    requestURL);
 
 	    editDialog.open();
@@ -153,6 +172,11 @@ public class GSConfigurationView extends ConfigurationView {
 
     @Override
     protected boolean isAuthorized() {
+
+	if (ExecutionMode.skipAuthorization()) {
+	    GSLoggerFactory.getLogger(getClass()).info("Authorization turned off by administrator");
+	    return true;
+	}
 
 	VaadinRequest request = VaadinService.getCurrentRequest();
 
@@ -210,14 +234,31 @@ public class GSConfigurationView extends ConfigurationView {
 
 	return new GSLogoutButtonListener(this);
     }
-    
+
     /**
-     * 
      * @return
      */
-    protected boolean logOutAfterInactivity(){
-	
-	return true;
+    protected boolean logOutAfterInactivity() {
+
+	return ExecutionMode.get() != ExecutionMode.MIXED && ExecutionMode.get() != ExecutionMode.LOCAL_PRODUCTION;
+    }
+
+    /**
+     * @return
+     */
+    protected boolean enableMultipleTabs() {
+
+	SystemSetting systemSettings = ConfigurationWrapper.getSystemSettings();
+
+	Optional<Properties> keyValueOption = systemSettings.getKeyValueOptions();
+
+	if (keyValueOption.isPresent()) {
+
+	    String multipleTabs = keyValueOption.get().getOrDefault("multipleConfigurationTabs", "false").toString();
+	    return Boolean.parseBoolean(multipleTabs);
+	}
+
+	return false;
     }
 
     @Override
@@ -251,7 +292,7 @@ public class GSConfigurationView extends ConfigurationView {
 
 	    SelectionUtils.deepClean(clone);
 
-	    boolean changes = !GISuiteStarter.configuration.equals(clone);
+	    boolean changes = !GIPStarter.configuration.equals(clone);
 
 	    getSaveButton().setEnabled(changes);
 	}
@@ -315,6 +356,112 @@ public class GSConfigurationView extends ConfigurationView {
 
 	removedSettingList.add(setting);
 
+	if (HarvestingSetting.class.isAssignableFrom(setting.getSettingClass())) {
+
+	    HarvestingSetting harvSetting = SettingUtils.downCast(setting, HarvestingSettingImpl.class);
+
+	    GSSourceSetting sourceSetting = harvSetting.getSelectedAccessorSetting().getGSSourceSetting();
+
+	    String sourceIdentifier = sourceSetting.getSourceIdentifier();
+
+	    //
+	    // GDCSourcesSetting
+	    //
+
+	    GDCSourcesSetting gdcSourceSetting = ConfigurationWrapper.getGDCSourceSetting(getConfiguration());
+
+	    if (gdcSourceSetting.isGDCSource(sourceSetting.asSource())) {
+
+		boolean deselected = gdcSourceSetting.deselectSource(sourceIdentifier);
+		boolean replaced = getConfiguration().replace(gdcSourceSetting);
+
+		if (deselected && replaced) {
+
+		    additionalRemovalInfo.add("Source " + sourceSetting.asSource().getLabel() + " deselected from GDC list");
+
+		} else {
+
+		    GSLoggerFactory.getLogger(getClass()).error("Unable to deselect source " + sourceIdentifier + " from GDC list");
+		}
+	    }
+
+	    //
+	    // SourcePrioritySetting
+	    //
+
+	    SourcePrioritySetting sourcePrioritySetting = ConfigurationWrapper.getSourcePrioritySetting(getConfiguration());
+
+	    if (sourcePrioritySetting.isPrioritySource(sourceSetting.asSource())) {
+
+		boolean deselected = sourcePrioritySetting.deselectSource(sourceIdentifier);
+		boolean replaced = getConfiguration().replace(sourcePrioritySetting);
+
+		if (deselected && replaced) {
+
+		    additionalRemovalInfo.add("Source " + sourceSetting.asSource().getLabel() + " deselected from source priority list");
+
+		} else {
+
+		    GSLoggerFactory.getLogger(getClass())
+			    .error("Unable to deselect source " + sourceIdentifier + " from source priority list");
+		}
+	    }
+
+	    //
+	    // SourceStorageSetting
+	    //
+
+	    SourceStorageSetting sourceStorageSetting = ConfigurationWrapper.getSourceStorageSettings(getConfiguration());
+
+	    boolean sourceStorageSettingChanged = false;
+
+	    if (sourceStorageSetting.isISOComplianceTestSet(sourceIdentifier)) {
+
+		sourceStorageSetting.removeTestISOCompliance(sourceIdentifier);
+
+		additionalRemovalInfo.add("Source " + sourceSetting.asSource().getLabel() + " deselected from ISO compliance test list");
+
+		sourceStorageSettingChanged = true;
+	    }
+
+	    if (sourceStorageSetting.isMarkDeletedOption(sourceIdentifier)) {
+
+		sourceStorageSetting.removeMarkDeleted(sourceIdentifier);
+
+		additionalRemovalInfo.add("Source " + sourceSetting.asSource().getLabel() + " deselected from mark deleted list");
+
+		sourceStorageSettingChanged = true;
+	    }
+
+	    if (sourceStorageSetting.isRecoverResourceTagsSet(sourceIdentifier)) {
+
+		sourceStorageSetting.removeRecoverResourceTags(sourceIdentifier);
+
+		additionalRemovalInfo.add("Source " + sourceSetting.asSource().getLabel() + " deselected from recovery resource tags list");
+
+		sourceStorageSettingChanged = true;
+	    }
+
+	    if (sourceStorageSetting.isSmartStorageDisabledSet(sourceIdentifier)) {
+
+		sourceStorageSetting.removeSmartStorageDisabledSet(sourceIdentifier);
+
+		additionalRemovalInfo.add("Source " + sourceSetting.asSource().getLabel() + " deselected from smart storage list");
+
+		sourceStorageSettingChanged = true;
+	    }
+
+	    if (sourceStorageSettingChanged) {
+
+		boolean replaced = getConfiguration().replace(sourceStorageSetting);
+
+		if (!replaced) {
+
+		    GSLoggerFactory.getLogger(getClass()).error("Unable to replace SourceStorageSetting");
+		}
+	    }
+	}
+
 	if (SchedulerWorkerSetting.class.isAssignableFrom(setting.getSettingClass())) {
 
 	    SchedulerWorkerSetting workerSetting = SettingUtils.downCast(setting, SchedulerWorkerSetting.class);
@@ -325,7 +472,7 @@ public class GSConfigurationView extends ConfigurationView {
 
     /**
      * This method is called every time the client window is loaded.<br>
-     * Returns a clone with disabled autoreload of the {@link GISuiteStarter#configuration}. Changes applied to this
+     * Returns a clone with disabled autoreload of the {@link GIPStarter#configuration}. Changes applied to this
      * configuration instance are
      * not applied to the source configuration until this configuration is flushed and the source configuration performs
      * the autoreload.<br>
@@ -343,11 +490,19 @@ public class GSConfigurationView extends ConfigurationView {
     @Override
     protected Configuration initConfiguration() {
 
-	// GISuiteStarter.configuration.addChangeEventListener(this);
+	// GIPStarter.configuration.addChangeEventListener(this);
 
-	Configuration clone = GISuiteStarter.configuration.clone();
+	Configuration clone = GIPStarter.configuration.clone();
 
 	return clone;
+    }
+
+    @Override
+    protected List<ComponentInfo> getAdditionalsComponentInfo() {
+
+	return Arrays.asList(//
+		new DistributionSettingComponentInfo(), //
+		new HarvestingSetting.HarvestingSettingComponentInfo());
     }
 
     /**
@@ -447,7 +602,7 @@ public class GSConfigurationView extends ConfigurationView {
      */
     void initLists() {
 
-	GSLoggerFactory.getLogger(getClass()).debug("Initializing settings list");
+	// GSLoggerFactory.getLogger(getClass()).debug("Initializing settings list");
 
 	newWorkerSettingList = new SettingLinkedList<>();
 	pausedWorkerSettingList = new SettingLinkedList<>();
@@ -457,6 +612,8 @@ public class GSConfigurationView extends ConfigurationView {
 	putSettingList = new SettingLinkedList<>();
 	removedSettingList = new SettingLinkedList<>();
 	editedSettingList = new SettingLinkedList<>();
+
+	additionalRemovalInfo = new LinkedList<String>();
     }
 
     /**

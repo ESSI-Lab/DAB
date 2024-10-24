@@ -4,7 +4,7 @@ package eu.essi_lab.messages;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,24 +35,18 @@ import eu.essi_lab.model.resource.data.DataReferences;
  */
 public class BulkDownloadMessage extends RequestMessage {
 
-
-    @Override
-    public String getBaseType() {
-	return "bulk-download-message";
-    }
-    
     /**
      * 
      */
     private static final long serialVersionUID = 57092734370735768L;
     private static final String DATA_REFERENCES = "DATA_REFERENCES";
     private static final String STORE_EXEC_RESPONSE = "STORE_EXEC_RESPONSE";
-    
+
     /**
      * 
      */
     public BulkDownloadMessage() {
-	
+
 	setStoreExecuteResponse(true);
     }
 
@@ -82,7 +76,7 @@ public class BulkDownloadMessage extends RequestMessage {
     }
 
     /**
-     * @param  
+     * @param
      */
     public void setStoreExecuteResponse(boolean store) {
 
@@ -96,7 +90,7 @@ public class BulkDownloadMessage extends RequestMessage {
 
 	return getPayload().get(STORE_EXEC_RESPONSE, Boolean.class);
     }
-    
+
     /**
      * @param data references
      */

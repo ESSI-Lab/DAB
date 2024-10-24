@@ -4,7 +4,7 @@ package eu.essi_lab.lib.utils;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,9 +22,11 @@ package eu.essi_lab.lib.utils;
  */
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -39,7 +41,6 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.Period;
 import org.joda.time.chrono.ISOChronology;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -49,6 +50,19 @@ public class ISO8601DateTimeUtils {
     private static final String ISO_WITH_MILLIS = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
     private static final String NOT_STANDARD = "yyyyMMdd";
+
+    private static final String NOT_STANDARD2 = "yyyyMMddHHmm";
+
+    private static DatatypeFactory df = null;
+
+    static {
+
+	try {
+	    df = DatatypeFactory.newInstance();
+	} catch (javax.xml.datatype.DatatypeConfigurationException e) {
+	    GSLoggerFactory.getLogger(ISO8601DateTimeUtils.class).error(e);
+	}
+    }
 
     private ISO8601DateTimeUtils() {
 	// force static usage
@@ -235,45 +249,66 @@ public class ISO8601DateTimeUtils {
 
     public static Duration getDuration(BigDecimal value, String timeUnits) {
 
-	switch (timeUnits) {
+	BigInteger bigIntegerExact = null;
+	try {
+	    bigIntegerExact = value.toBigIntegerExact();
+
+	} catch (ArithmeticException ex) {
+
+	    GSLoggerFactory.getLogger(ISO8601DateTimeUtils.class).error(ex);
+	    return null;
+	}
+
+	switch (timeUnits.toLowerCase()) {
+	case "seconds":
 	case "second":
+	case "secs":
+	case "sec":
 	    return getDuration("PT" + value + "S");
+	case "milliseconds":
 	case "millisecond":
+	case "millisec":
+	case "millisecs":
 	    return getDuration("PT" + value.divide(new BigDecimal("1000")).toString() + "S");
+	case "m":
+	case "min":
+	case "mins":
 	case "minute":
-	    return getDuration("PT" + value + "M");
+	case "minutes":
+	    return getDuration("PT" + bigIntegerExact + "M");
+	case "hours":
 	case "hour":
-	    return getDuration("PT" + value + "H");
+	case "h":
+	    return getDuration("PT" + bigIntegerExact + "H");
+	case "days":
 	case "day":
-	    return getDuration("P" + value + "D");
+	case "d":
+	    return getDuration("P" + bigIntegerExact + "D");
+	case "weeks":
 	case "week":
-	    return getDuration("P" + value + "W");
+	    return getDuration("P" + bigIntegerExact + "W");
+	case "months":
 	case "month":
-	    return getDuration("P" + value + "M");
+	    return getDuration("P" + bigIntegerExact + "M");
+	case "y":
+	case "years":
 	case "year":
 	case "common year":
-	    return getDuration("P" + value + "Y");
+	case "common years":
+	    return getDuration("P" + bigIntegerExact + "Y");
 	default:
 	    break;
 	}
 	return null;
     }
 
-    public static Duration getDuration(String lexicalRepresentation) {
-	DatatypeFactory df = null;
-	try {
-	    df = DatatypeFactory.newInstance();
-	} catch (javax.xml.datatype.DatatypeConfigurationException e) {
+    public synchronized static Duration getDuration(String lexicalRepresentation) {
 
-	    GSLoggerFactory.getLogger(ISO8601DateTimeUtils.class).warn("Can't instantiate DatatypeFactory", e);
-
-	    return null;
-	}
 	return df.newDuration(lexicalRepresentation.trim());
-
     }
 
     public static Date subtractDuration(Date date, Duration duration) {
+
 	return addDuration(date, duration.negate());
     }
 
@@ -303,6 +338,25 @@ public class ISO8601DateTimeUtils {
 
 	try {
 	    SimpleDateFormat dateFormat = new SimpleDateFormat(NOT_STANDARD);
+	    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+	    Date date = dateFormat.parse(dateTimeString);
+
+	    return Optional.of(date);
+
+	} catch (RuntimeException e) {
+	    GSLoggerFactory.getLogger(ISO8601DateTimeUtils.class).warn("Unparsable Date: {}", dateTimeString, e);
+	}
+
+	return Optional.empty();
+    }
+
+    // parse date in format yyyyMMddHHmm
+    // return the ISO Date
+    public static Optional<Date> parseNotStandard2ToDate(String dateTimeString) throws ParseException {
+
+	try {
+	    SimpleDateFormat dateFormat = new SimpleDateFormat(NOT_STANDARD2);
 	    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
 	    Date date = dateFormat.parse(dateTimeString);
@@ -372,6 +426,90 @@ public class ISO8601DateTimeUtils {
 
 	System.out.println(toDateTime(new Date(), DateTimeZone.forID("Europe/Berlin")));
 
+    }
+
+    public static SimpleEntry<BigDecimal, String> getUnitsValueFromDuration(Duration duration) {
+	if (duration==null) {
+	    return null;
+	}
+	BigDecimal decimal = null;
+	String units = null;
+	int seconds = duration.getSeconds();
+	int minutes = duration.getMinutes();
+	int hours = duration.getHours();
+	int days = duration.getDays();
+	int months = duration.getMonths();
+	int years = duration.getYears();
+
+	if (seconds > 0) {
+	    units = "seconds";
+	    decimal = new BigDecimal(seconds);
+	} else if (minutes > 0) {
+	    units = "minutes";
+	    decimal = new BigDecimal(minutes);
+	} else if (hours > 0) {
+	    units = "hours";
+	    decimal = new BigDecimal(hours);
+	} else if (days > 0) {
+	    units = "days";
+	    decimal = new BigDecimal(days);
+	} else if (months > 0) {
+	    units = "months";
+	    decimal = new BigDecimal(months);
+	} else if (years > 0) {
+	    units = "years";
+	    decimal = new BigDecimal(years);
+	}
+
+	SimpleEntry<BigDecimal, String> ret = new SimpleEntry<>(decimal, units);
+	return ret;
+    }
+
+    public static String getTimeUnitsAbbreviation(String timeUnits) {
+	if (timeUnits==null) {
+	    return null;
+	}
+	switch (timeUnits.toLowerCase()) {
+	case "seconds":
+	case "second":
+	case "secs":
+	case "sec":
+	    return "sec";
+	case "milliseconds":
+	case "millisecond":
+	case "millisec":
+	case "millisecs":
+	    return "ms";
+	case "m":
+	case "min":
+	case "mins":
+	case "minute":
+	case "minutes":
+	    return "min";
+	case "hours":
+	case "hour":
+	case "h":
+	    return "h";
+	case "days":
+	case "day":
+	case "d":
+	    return "d";
+	case "weeks":
+	case "week":
+	    return "w";
+	case "months":
+	case "month":
+	    return "months";
+	case "y":
+	case "years":
+	case "year":
+	case "common year":
+	case "common years":
+	    return "years";
+	default:
+	    break;
+	}
+	return null;
     }
 
 }

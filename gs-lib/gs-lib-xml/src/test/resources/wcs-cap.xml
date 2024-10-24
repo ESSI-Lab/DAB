@@ -1,0 +1,107 @@
+<?xml version='1.0' encoding="UTF-8" standalone="no" ?>
+<WCS_Capabilities
+   version="1.0.0" 
+   updateSequence="0" 
+   xmlns="http://www.opengis.net/wcs" 
+   xmlns:xlink="http://www.w3.org/1999/xlink" 
+   xmlns:gml="http://www.opengis.net/gml" 
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.opengis.net/wcs http://schemas.opengis.net/wcs/1.0.0/wcsCapabilities.xsd">
+<Service>
+  <description>The ORNL DAAC provides access to various geospatial data, including ORNL DAAC archived data through Open Geospatial Consortium (OGC) standards-based Web Coverage Service version 1.0.0.</description>
+  <name>MapServer WCS</name>
+  <label>ORNL DAAC WCS Server</label>
+  <keywords>
+    <keyword>WCS</keyword>
+    <keyword>ORNL</keyword>
+    <keyword>DAAC</keyword>
+  </keywords>
+<responsibleParty>
+    <individualName>User Services</individualName>
+    <organisationName>ORNL DAAC</organisationName>
+  <contactInfo>
+    <phone>
+    <voice>1-865-241-3952</voice>
+    <facsimile>1-865-574-4665</facsimile>
+    </phone>
+    <address>
+    <deliveryPoint>P.O. Box 2008, MS 6407</deliveryPoint>
+    <city>Oak Ridge</city>
+    <administrativeArea>TN</administrativeArea>
+    <postalCode>37831</postalCode>
+    <country>US</country>
+    <electronicMailAddress>uso@daac.ornl.gov</electronicMailAddress>
+    </address>
+  </contactInfo>
+</responsibleParty>
+  <fees>none</fees>
+  <accessConstraints>
+    NONE
+  </accessConstraints>
+</Service>
+<Capability>
+  <Request>
+    <GetCapabilities>
+      <DCPType>
+        <HTTP>
+          <Get><OnlineResource xlink:type="simple" xlink:href="https://webmap.ornl.gov/ogcbroker/wcs?" /></Get>
+        </HTTP>
+      </DCPType>
+      <DCPType>
+        <HTTP>
+          <Post><OnlineResource xlink:type="simple" xlink:href="https://webmap.ornl.gov/ogcbroker/wcs?" /></Post>
+        </HTTP>
+      </DCPType>
+    </GetCapabilities>
+    <DescribeCoverage>
+      <DCPType>
+        <HTTP>
+          <Get><OnlineResource xlink:type="simple" xlink:href="https://webmap.ornl.gov/ogcbroker/wcs?" /></Get>
+        </HTTP>
+      </DCPType>
+      <DCPType>
+        <HTTP>
+          <Post><OnlineResource xlink:type="simple" xlink:href="https://webmap.ornl.gov/ogcbroker/wcs?" /></Post>
+        </HTTP>
+      </DCPType>
+    </DescribeCoverage>
+    <GetCoverage>
+      <DCPType>
+        <HTTP>
+          <Get><OnlineResource xlink:type="simple" xlink:href="https://webmap.ornl.gov/ogcbroker/wcs?" /></Get>
+        </HTTP>
+      </DCPType>
+      <DCPType>
+        <HTTP>
+          <Post><OnlineResource xlink:type="simple" xlink:href="https://webmap.ornl.gov/ogcbroker/wcs?" /></Post>
+        </HTTP>
+      </DCPType>
+    </GetCoverage>
+  </Request>
+  <Exception>
+    <Format>application/vnd.ogc.se_xml</Format>
+  </Exception>
+</Capability>
+<ContentMetadata>
+  <CoverageOfferingBrief>
+    <name>1000_1</name>
+    <label>Modelled Chlorophyll-a Concentration, June 2002 - December 2003</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-57 -3.00025</gml:pos>
+      <gml:pos>-52.9995 -1</gml:pos>
+      <gml:timePosition>2002-06</gml:timePosition>
+      <gml:timePosition>2002-07</gml:timePosition>
+    </lonLatEnvelope>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+    <name>1000_2</name>
+    <label>Actual Chlorophyll-a Concentration, June 2002 - December 2003</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-57 -3.00025</gml:pos>
+      <gml:pos>-52.9995 -1</gml:pos>
+      <gml:timePosition>2002-06</gml:timePosition>
+      <gml:timePosition>2002-07</gml:timePosition>      
+    </lonLatEnvelope>
+  </CoverageOfferingBrief>  
+</ContentMetadata>
+</WCS_Capabilities>

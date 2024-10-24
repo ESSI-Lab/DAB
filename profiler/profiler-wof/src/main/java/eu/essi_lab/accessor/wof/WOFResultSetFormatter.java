@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,19 +25,17 @@ import java.io.ByteArrayOutputStream;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.cuahsi.waterml._1.VariablesResponseType;
 import org.cuahsi.waterml._1.essi.JAXBWML;
-
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
+import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.lib.xml.XMLStreamWriterUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.ResultSet;
@@ -84,7 +82,7 @@ public abstract class WOFResultSetFormatter<T> extends DiscoveryResultSetFormatt
 	    final NamespacePrefixMapper mapper = JAXBWML.getInstance()
 		    .getNamespacePrefixMapper(new String[] { "xsi", "http://www.w3.org/2001/XMLSchema-instance" });
 
-	    marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", mapper);
+	    marshaller.setProperty(NameSpace.NAMESPACE_PREFIX_MAPPER_IMPL, mapper);
 
 	    if (req.getClass().getSimpleName().toLowerCase().contains("object")) {
 		marshaller.marshal(jaxbElement, writer);

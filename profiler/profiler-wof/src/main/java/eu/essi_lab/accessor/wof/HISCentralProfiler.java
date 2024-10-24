@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,8 +31,8 @@ import javax.ws.rs.core.Response.Status;
 import eu.essi_lab.accessor.wof.discovery.series.GetSeriesCatalogForBoxRequestFilter;
 import eu.essi_lab.accessor.wof.discovery.series.GetSeriesCatalogForBoxResultSetFormatter;
 import eu.essi_lab.accessor.wof.discovery.series.GetSeriesCatalogForBoxResultSetMapper;
+import eu.essi_lab.accessor.wof.discovery.series.GetSeriesCatalogForBoxSemanticTransformer;
 import eu.essi_lab.accessor.wof.discovery.series.GetSeriesCatalogForBoxTransformer;
-import eu.essi_lab.accessor.wof.discovery.series.SemanticGetSeriesCatalogForBoxTransformer;
 import eu.essi_lab.accessor.wof.discovery.sites.GetSitesFormatter;
 import eu.essi_lab.accessor.wof.discovery.sites.GetSitesMapper;
 import eu.essi_lab.accessor.wof.discovery.sites.GetSitesRequest;
@@ -110,23 +110,17 @@ public class HISCentralProfiler extends Profiler {
 	HISCentralWSDLHandler hisCentralWSDLHandler = new HISCentralWSDLHandler();
 	selector.register(new WSDLRequestFilter(), hisCentralWSDLHandler);
 
+	DiscoveryHandler<String> getSeriesCatalogForBoxHandler = new DiscoveryHandler<>();
+	getSeriesCatalogForBoxHandler.setMessageResponseMapper(new GetSeriesCatalogForBoxResultSetMapper());
 	// get series
 	if (request.hasSemanticPath()) {
-
-	    DiscoverySemanticHandler<String> getSeriesCatalogForBoxHandler = new DiscoverySemanticHandler<>();
-	    getSeriesCatalogForBoxHandler.setMessageResponseMapper(new GetSeriesCatalogForBoxResultSetMapper());
-	    getSeriesCatalogForBoxHandler.setRequestTransformer(new SemanticGetSeriesCatalogForBoxTransformer());
-	    getSeriesCatalogForBoxHandler.setMessageResponseFormatter(new GetSeriesCatalogForBoxResultSetFormatter());
-	    selector.register(new GetSeriesCatalogForBoxRequestFilter(), getSeriesCatalogForBoxHandler);
-
+	    getSeriesCatalogForBoxHandler.setRequestTransformer(new GetSeriesCatalogForBoxSemanticTransformer());
 	} else {
-
-	    DiscoveryHandler<String> getSeriesCatalogForBoxHandler = new DiscoveryHandler<>();
-	    getSeriesCatalogForBoxHandler.setMessageResponseMapper(new GetSeriesCatalogForBoxResultSetMapper());
 	    getSeriesCatalogForBoxHandler.setRequestTransformer(new GetSeriesCatalogForBoxTransformer());
-	    getSeriesCatalogForBoxHandler.setMessageResponseFormatter(new GetSeriesCatalogForBoxResultSetFormatter());
-	    selector.register(new GetSeriesCatalogForBoxRequestFilter(), getSeriesCatalogForBoxHandler);
 	}
+
+	getSeriesCatalogForBoxHandler.setMessageResponseFormatter(new GetSeriesCatalogForBoxResultSetFormatter());
+	selector.register(new GetSeriesCatalogForBoxRequestFilter(), getSeriesCatalogForBoxHandler);
 
 	// get water one flow service info
 
@@ -134,7 +128,7 @@ public class HISCentralProfiler extends Profiler {
 	selector.register(new GetWaterOneFlowServiceInfoFilter(), getWaterOneFlowServiceInfoHandler);
 
 	// get sites
-	
+
 	DiscoveryHandler<String> getSitesHandler = new DiscoveryHandler<>();
 	getSitesHandler.setRequestTransformer(new GetSitesTransformer());
 	getSitesHandler.setMessageResponseMapper(new GetSitesMapper());

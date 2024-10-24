@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.wfs.description;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,34 +21,19 @@ package eu.essi_lab.profiler.wfs.description;
  * #L%
  */
 
-import java.util.Optional;
-import java.util.ServiceLoader;
-
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
-import org.w3c.dom.Node;
-
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.Page;
-import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.StorageUri;
 import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.pdk.rsf.DiscoveryResultSetFormatter;
-import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
-import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.profiler.wfs.WFSProfiler;
 import eu.essi_lab.profiler.wfs.WFSQueryHandler;
 import eu.essi_lab.profiler.wfs.WFSRequest.Parameter;
 import eu.essi_lab.profiler.wfs.feature.FeatureType;
-import eu.essi_lab.profiler.wfs.feature.WFSGetFeatureRequest;
-import eu.essi_lab.request.executor.IDiscoveryNodeExecutor;
 
 public class DescribeFeatureQueryHandler extends WFSQueryHandler {
 

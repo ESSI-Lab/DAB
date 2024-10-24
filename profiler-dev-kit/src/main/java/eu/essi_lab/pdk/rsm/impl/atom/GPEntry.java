@@ -7,7 +7,7 @@ package eu.essi_lab.pdk.rsm.impl.atom;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,12 +24,15 @@ package eu.essi_lab.pdk.rsm.impl.atom;
  * #L%
  */
 
+import java.util.List;
 import java.util.Objects;
 
+import org.jdom2.Attribute;
 import org.jdom2.Element;
 
 import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.lib.xml.atom.CustomEntry;
+import eu.essi_lab.model.resource.worldcereal.WorldCerealItem;
 
 /**
  * @author Fabrizio
@@ -154,6 +157,14 @@ public class GPEntry extends CustomEntry {
     }
 
     /**
+     * @param country
+     */
+    public void setCountry(String country) {
+
+	addSimpleElement("poi-country", country, NameSpace.GS_DATA_MODEL_SCHEMA_URI);
+    }
+
+    /**
      * @param availableGranules
      */
     public void setAvailableGranules(String availableGranules) {
@@ -170,6 +181,46 @@ public class GPEntry extends CustomEntry {
     }
 
     /**
+     * @param worldCerealQueryables
+     */
+    public void setWorldCerealQueryables(String collectionQueryables) {
+
+	addSimpleElement("worldCerealCollectionQueryables", collectionQueryables, NameSpace.GS_DATA_MODEL_SCHEMA_URI);
+    }
+
+    /**
+     * @param worldCerealQueryables
+     */
+    public void setWorldCerealConfidence(String type, String value) {
+
+	addSimpleElement(type, value, NameSpace.GS_DATA_MODEL_SCHEMA_URI);
+    }
+
+    /**
+     * @param label
+     * @param code
+     */
+    public void addWorldCerealType(List<WorldCerealItem> list, String type) {
+
+	if (Objects.nonNull(type) && list != null) {
+
+	    Element worldCerealElement = createElement(type);
+	    for (WorldCerealItem item : list) {
+
+		Attribute attr = new Attribute("code", item.getCode());
+		Element el = createSimpleElement("label", item.getLabel(), attr);
+		addContentTo(worldCerealElement, el);
+		// Element labelElement = createElement("label");
+		// addContentTo(worldCerealElement, labelElement, item.getLabel());
+		// addContentTo(worldCerealElement, "code", item.getTerm());
+	    }
+
+	    addElement(worldCerealElement);
+
+	}
+    }
+
+    /**
      * @param label
      * @param term
      */
@@ -183,6 +234,39 @@ public class GPEntry extends CustomEntry {
 
 	    addElement(category);
 
+	}
+    }
+
+    /**
+     * @param label
+     * @param href
+     */
+    public void addLicense(String label, String href) {
+
+	if (Objects.nonNull(label) && Objects.nonNull(href)) {
+
+	    Element el = createElement("license");
+	    if (Objects.nonNull(label)) {
+		addContentTo(el, "type", label);
+	    }
+
+	    if (Objects.nonNull(href)) {
+		addContentTo(el, "reference", href);
+	    }
+
+	    addElement(el);
+
+	}
+    }
+
+    /**
+     * @param citation
+     */
+    public void addCitation(String citation) {
+
+	if (Objects.nonNull(citation)) {
+
+	    addSimpleElement("citation", citation);
 	}
     }
 
@@ -256,4 +340,45 @@ public class GPEntry extends CustomEntry {
 
 	addElement(tag.getAcquisitionElement());
     }
+    
+    /**
+     * @param insitu
+     */
+    public void setInSitu(Boolean isInSitu) {
+
+	addSimpleElement("inSitu", isInSitu.toString(), NameSpace.GS_DATA_MODEL_SCHEMA_URI);
+    }
+
+    /**
+     * GEO Mountains
+     */
+
+    /**
+     * @param GEO Mountain id
+     */
+    public void setGEOMountainsId(String id) {
+
+	addSimpleElement("poi-id", id, NameSpace.GS_DATA_MODEL_SCHEMA_URI);
+    }
+
+    public void setGEOMountainsOrg(String org) {
+
+	addSimpleElement("poi-organization", org, NameSpace.GS_DATA_MODEL_SCHEMA_URI);
+    }
+
+    public void setGEOMountainsNetwork(String network) {
+
+	addSimpleElement("poi-network", network, NameSpace.GS_DATA_MODEL_SCHEMA_URI);
+    }
+
+    public void setGEOMountainsCategory(String cat) {
+
+	addSimpleElement("poi-category", cat, NameSpace.GS_DATA_MODEL_SCHEMA_URI);
+    }
+
+    public void setGEOMountainsParameters(List<String> list) {
+	String stringList = String.join(",", list);
+	addSimpleElement("poi-parameters", stringList, NameSpace.GS_DATA_MODEL_SCHEMA_URI);
+    }
+
 }

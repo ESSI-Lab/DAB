@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.oaipmh.handler.discover;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,9 +26,11 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 
+import eu.essi_lab.api.database.DatabaseFinder;
 import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.factory.DatabaseConsumerFactory;
+import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
@@ -48,7 +50,7 @@ import eu.essi_lab.messages.web.KeyValueParser;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.BrokeringStrategy;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
@@ -69,10 +71,6 @@ import eu.essi_lab.profiler.oaipmh.token.ResumptionToken;
 public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
 
     /**
-     *
-     */
-    public static final int DEFAULT_ITEMS_PER_PAGE = 10;
-    /**
      * 
      */
     private static final String OAI_PMH_POST_QUERY_EXTRACTION_ERROR = "OAI_PMH_POST_QUERY_EXTRACTION_ERROR";
@@ -83,10 +81,33 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
 
     /**
      * @return
-     */
+     */   
     protected int getPageSize() {
 
-	return DEFAULT_ITEMS_PER_PAGE;
+	Optional<Properties> properties = ConfigurationWrapper.getSystemSettings().getKeyValueOptions();
+	int pageSize = getDefaultPageSize();
+	if (properties.isPresent()) {
+
+	    pageSize = Integer.valueOf(properties.get().getProperty(getPageSizeOptionKey(), String.valueOf(getDefaultPageSize())));
+	}
+
+	return pageSize;
+    }
+
+    /**
+     * @return
+     */
+    protected String getPageSizeOptionKey() {
+
+	return "oaiPmhPageSize";
+    }
+
+    /**
+     * @return
+     */
+    protected int getDefaultPageSize() {
+
+	return 50;
     }
 
     @Override
@@ -252,16 +273,16 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
 	selector.addIndex(ResourceProperty.RESOURCE_TIME_STAMP);
 	message.setResourceSelector(selector);
 
-	StorageUri uri = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo uri = ConfigurationWrapper.getDatabaseURI();
 	GSLoggerFactory.getLogger(OAIPMHRequestTransformer.class).debug("Storage uri: {}", uri);
 
-	DatabaseReader reader = DatabaseConsumerFactory.createDataBaseReader(uri);
+ 	DatabaseFinder finder = DatabaseProviderFactory.getDatabaseFinder(uri);
 
 	try {
 
 	    GSLoggerFactory.getLogger(OAIPMHRequestTransformer.class).debug("Discovering of " + operator + " resource time stamp STARTED");
 
-	    ResultSet<GSResource> resultSet = reader.discover(message);
+	    ResultSet<GSResource> resultSet = finder.discover(message);
 
 	    GSLoggerFactory.getLogger(OAIPMHRequestTransformer.class).debug("Discovering of " + operator + " resource time stamp ENDED");
 

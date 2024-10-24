@@ -4,7 +4,7 @@ package eu.essi_lab.jaxb.wms.extension;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,14 +31,18 @@ public class JAXBWMSPrefixMapper extends NamespacePrefixMapper {
 	    return null;
 	}
 	if (namespaceUri.equals("http://www.opengis.net/wms")) {
-	    return "wms";
+	    return "";
 	} else if (namespaceUri.equals("http://www.opengis.net/sld")) {
 	    return "sld";
+	}else if (namespaceUri.equals("http://www.opengis.net/ogc")) {
+	    return "ogc";
+	} else if (namespaceUri.equals("http://www.w3.org/1999/xlink")) {
+	    return "xlink";
 	} else if (namespaceUri.equals("http://www.w3.org/2001/XMLSchema-instance")) {
 	    return "xsi";
 	}
 
-	return null;
+	return suggestion;
     }
 
 }

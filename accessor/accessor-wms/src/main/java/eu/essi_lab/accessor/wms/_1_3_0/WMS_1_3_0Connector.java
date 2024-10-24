@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wms._1_3_0;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,6 +29,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -40,10 +41,12 @@ import eu.essi_lab.accessor.wms.WMSConnector;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.jaxb.wms._1_3_0.Layer;
 import eu.essi_lab.jaxb.wms._1_3_0.WMSCapabilities;
-import eu.essi_lab.lib.net.utils.Downloader;
+import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
+import eu.essi_lab.model.GSProperty;
+import eu.essi_lab.model.GSPropertyHandler;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -198,6 +201,9 @@ public class WMS_1_3_0Connector extends WMSConnector {
 		    if (getSourceURL().contains("147.102.5.93") && isApprovedNamespace(last.getName())) {
 			skip = true;
 		    }
+		    if (getSourceURL().contains("cds.climate.copernicus.eu") && !last.getName().equals("t2m")) {
+			skip = true;
+		    }
 		    last.getLayers().clear();
 		}
 
@@ -214,6 +220,22 @@ public class WMS_1_3_0Connector extends WMSConnector {
 		    metadataRecord.setMetadata(metadata);
 
 		    metadataRecord.setSchemeURI(CommonNameSpaceContext.WMS_1_3_0_NS_URI);
+		    //WQeMS use-case
+		    if (getSourceURL().contains("wqems.opsi.lecce.it")) {
+			metadataRecord.setSchemeURI(CommonNameSpaceContext.WMS_1_3_0_QWeMS_NS_URI);
+			String parentId = UUID.randomUUID().toString();
+			List<OriginalMetadata> om = WMS_1_3_0WQeMSResourceMapper.create(metadata, parentId);
+			for (OriginalMetadata o : om) {
+			    response.addRecord(o);
+			}
+			GSPropertyHandler handler = new GSPropertyHandler();
+			GSProperty<String> property = new GSProperty<String>();
+			property.setName("parentId");
+			// String parentId = UUID.randomUUID().toString();
+			property.setValue(parentId);
+			handler.add(property);
+			metadataRecord.setAdditionalInfo(handler);
+		    }
 
 		    response.addRecord(metadataRecord);
 		}
@@ -302,6 +324,7 @@ public class WMS_1_3_0Connector extends WMSConnector {
 	List<String> ret = new ArrayList<>();
 
 	ret.add(CommonNameSpaceContext.WMS_1_3_0_NS_URI);
+	// ret.add(CommonNameSpaceContext.WMS_1_3_0_QWeMS_NS_URI);
 
 	return ret;
     }
@@ -334,7 +357,7 @@ public class WMS_1_3_0Connector extends WMSConnector {
 
 	    InputStream content = null;
 
-	    Optional<InputStream> ret = downloader.downloadStream(url.toString());
+	    Optional<InputStream> ret = downloader.downloadOptionalStream(url.toString());
 
 	    if (ret.isPresent()) {
 		content = ret.get();

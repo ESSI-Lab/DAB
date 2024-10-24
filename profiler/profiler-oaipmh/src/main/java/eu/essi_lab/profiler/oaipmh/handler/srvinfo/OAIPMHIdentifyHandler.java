@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.oaipmh.handler.srvinfo;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -50,7 +50,7 @@ public class OAIPMHIdentifyHandler extends OAIPMHServiceInfoHandler {
 	type.setDeletedRecord(DeletedRecordType.TRANSIENT);
 	type.setGranularity(GranularityType.YYYY_MM_DD_THH_MM_SS_Z);
 	type.setProtocolVersion("2.0");
-	type.getAdminEmail().add("fabrizio.papeschi@cnr.it");
+	type.getAdminEmail().add("test@my-org.com");
 	String dateStamp = null;
 	try {
 	    dateStamp = OAIPMHRequestTransformer.getMinMaxDateStamp(webRequest.getRequestId(), BondOperator.MIN);

@@ -4,7 +4,7 @@ package eu.essi_lab.ommdk;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
 import eu.essi_lab.iso.datamodel.classes.MIInstrument;
@@ -53,7 +54,6 @@ import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
 public abstract class AbstractResourceMapper implements IResourceMapper {
 
     private static final String ORIGINAL_METADATA_MISSING_ERROR = "ORIGINAL_METADATA_MISSING_ERROR";
-    private static long oneWeekInMilliseconds = 1000 * 60 * 60 * 24 * 7l; // the last week
 
     @Override
     public GSResource map(OriginalMetadata originalMD, GSSource source) throws GSException {
@@ -128,7 +128,7 @@ public abstract class AbstractResourceMapper implements IResourceMapper {
     protected abstract GSResource execMapping(OriginalMetadata originalMD, GSSource source) throws GSException;
 
     public static void setIndeterminatePosition(GSResource gsResource) {
-	setIndeterminatePosition(gsResource, oneWeekInMilliseconds);
+	setIndeterminatePosition(gsResource, TimeUnit.DAYS.toMillis(30));
     }
 
     public static void setIndeterminatePosition(GSResource gsResource, long allowedGap) {
@@ -226,17 +226,17 @@ public abstract class AbstractResourceMapper implements IResourceMapper {
 
     /**
      * @param gsResource
-     * @param indentifier
+     * @param identifier
      * @return
      */
-    private String generateCode(GSResource gsResource, String indentifier) {
+    public static String generateCode(GSResource gsResource, String identifier) {
 
-	String out = gsResource.getSource().getUniqueIdentifier() + indentifier;
+	String out = gsResource.getSource().getUniqueIdentifier() + identifier;
 
 	try {
-	    out = StringUtils.hashSHA1messageDigest(indentifier);
+	    out = StringUtils.hashSHA1messageDigest(identifier);
 	} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-	    e.printStackTrace();
+	   GSLoggerFactory.getLogger(AbstractResourceMapper.class).error(e);
 	}
 
 	return out;

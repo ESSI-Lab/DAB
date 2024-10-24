@@ -31,11 +31,7 @@
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>core-datamodel</artifactId>
 			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-		</dependency>
+		</dependency>	
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>jaxb-classes-wml-1.1</artifactId>

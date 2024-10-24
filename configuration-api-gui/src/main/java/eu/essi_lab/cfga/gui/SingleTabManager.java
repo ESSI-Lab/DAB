@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gui;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -106,6 +106,8 @@ public class SingleTabManager extends UITask {
 
 	    this.open = false;
 
+//	    GSLoggerFactory.getLogger(getClass()).info("----- UI no longer active -----");
+
 	    return;
 	}
 
@@ -116,6 +118,22 @@ public class SingleTabManager extends UITask {
 		executeTask();
 	    }
 	});
+    }
+
+    /**
+     * 
+     */
+    public String getRemainingSessionTime() {
+
+	long lastHeartbeatTimestamp = getUI().getInternals().getLastHeartbeatTimestamp();
+
+	long currentTimeMillis = System.currentTimeMillis();
+
+	long elapsedTimeFromLastHeartbeat = TimeUnit.MILLISECONDS.toSeconds(currentTimeMillis - lastHeartbeatTimestamp);
+
+	long remaining = LAST_HEARTBEAT_INTERVAL_DELAY - elapsedTimeFromLastHeartbeat;
+
+	return String.valueOf(remaining);
     }
 
     @Override
@@ -130,14 +148,12 @@ public class SingleTabManager extends UITask {
 
 	long currentTimeMillis = System.currentTimeMillis();
 
-	long elapsedTimeFromLastHeartbeat = currentTimeMillis - lastHeartbeatTimestamp;
-
-	long seconds = TimeUnit.MILLISECONDS.toSeconds(elapsedTimeFromLastHeartbeat);
+	long elapsedTimeFromLastHeartbeat = TimeUnit.MILLISECONDS.toSeconds(currentTimeMillis - lastHeartbeatTimestamp);
 
 	if (elapsedTimeFromLastHeartbeat > TimeUnit.SECONDS.toMillis(LAST_HEARTBEAT_INTERVAL_DELAY)) {
 
 	    GSLoggerFactory.getLogger(getClass()).info("----- Tab expired -----");
-	    GSLoggerFactory.getLogger(getClass()).info("Elapsed time from last heartbeat {} seconds ", seconds);
+	    GSLoggerFactory.getLogger(getClass()).info("Elapsed time from last heartbeat {} seconds ", elapsedTimeFromLastHeartbeat);
 
 	    this.open = false;
 

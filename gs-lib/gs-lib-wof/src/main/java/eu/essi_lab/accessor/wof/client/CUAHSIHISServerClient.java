@@ -5,7 +5,7 @@ package eu.essi_lab.accessor.wof.client;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,8 +29,10 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.time.ZoneOffset;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 
@@ -39,6 +41,7 @@ import eu.essi_lab.accessor.wof.client.datamodel.SiteInfo;
 import eu.essi_lab.accessor.wof.client.datamodel.SitesResponseDocument;
 import eu.essi_lab.accessor.wof.client.datamodel.TimeSeries;
 import eu.essi_lab.accessor.wof.client.datamodel.TimeSeriesResponseDocument;
+import eu.essi_lab.lib.utils.ExpiringCache;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.lib.xml.XMLDocumentWriter;
@@ -275,6 +278,14 @@ public abstract class CUAHSIHISServerClient {
      */
     public SitesResponseDocument getSiteInfo(String networkName, String siteCode) throws GSException {
 
+	String fullSiteCode = networkName+":"+siteCode;
+	synchronized (siteInfoCache) {
+	    SitesResponseDocument ret = siteInfoCache.get(fullSiteCode);
+	    if (ret!=null) {
+		return ret;
+	    }
+	}
+	
 	SOAPExecutorDOM executor = new SOAPExecutorDOM(endpoint);
 
 	executor.setSOAPAction(getGetSiteInfoSOAPAction());
@@ -303,9 +314,18 @@ public abstract class CUAHSIHISServerClient {
 	XMLDocumentReader reader = executor.execute();
 
 	SitesResponseDocument srd = new SitesResponseDocument(reader.getDocument());
-
+	synchronized (siteInfoCache) {
+	    siteInfoCache.put(fullSiteCode, srd);
+	}
 	return srd;
 
+    }
+    
+    private static ExpiringCache<SitesResponseDocument>siteInfoCache;
+    static {	
+	siteInfoCache = new ExpiringCache<SitesResponseDocument>();
+	siteInfoCache.setMaxSize(50);
+	siteInfoCache.setDuration(TimeUnit.MINUTES.toMillis(5));
     }
 
     /**
@@ -363,6 +383,7 @@ public abstract class CUAHSIHISServerClient {
 	    }
 
 	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
 
 	throw GSException.createException(//

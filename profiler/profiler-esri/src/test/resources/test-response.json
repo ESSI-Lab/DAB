@@ -1,0 +1,36 @@
+{
+    "features": [
+        {
+            "geometry": {
+                "x": -1.1467796643465938E7,
+                "y": 6292200.017528929
+            },
+            "attributes": {"hycosid": 13}
+        },
+        {
+            "geometry": {
+                "x": -1.0424080682516918E7,
+                "y": 7694372.673269194
+            },
+            "attributes": {"hycosid": 693}
+        }
+    ],
+    "globalIdFieldName": "",
+    "objectIdFieldName": "hycosid",
+    "spatialReference": {
+        "latestWkid": 3857,
+        "wkid": 102100
+    },
+    "fields": [
+        {
+            "name": "hycosid",
+            "alias": "HYCOSID",
+            "type": "esriFieldTypeOID"
+        }
+    ],
+    "uniqueIdField": {
+        "isSystemMaintained": true,
+        "name": "hycosid"
+    },
+    "geometryType": "esriGeometryPoint"
+}

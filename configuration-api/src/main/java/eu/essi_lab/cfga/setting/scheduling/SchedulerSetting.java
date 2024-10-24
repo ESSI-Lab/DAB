@@ -7,7 +7,7 @@ package eu.essi_lab.cfga.setting.scheduling;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -32,6 +32,7 @@ import org.json.JSONObject;
 
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.option.InputPattern;
+import eu.essi_lab.cfga.option.IntegerOptionBuilder;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.Setting;
@@ -46,6 +47,7 @@ public class SchedulerSetting extends Setting implements EditableSetting {
      * 
      */
     private static final String USER_DATE_TIME_OPTION_KEY = "userDateTime";
+    private static final String SLOTS_COUNT_KEY = "slotsCount";
 
     private static final String PERSISTENT_SCHEDULER_SETTING_ID = "persistentScheduler";
     private static final String VOLATILE_SCHEDULER_SETTING_ID = "volatileScheduler";
@@ -83,6 +85,17 @@ public class SchedulerSetting extends Setting implements EditableSetting {
 
 	// only one scheduler type can be selected
 	setSelectionMode(SelectionMode.SINGLE);
+
+	Option<Integer> slotsCount = IntegerOptionBuilder.get().//
+		withKey(SLOTS_COUNT_KEY).//
+		withLabel("Number of slots for scheduler tasks").//
+		withSingleSelection().//
+		withValues(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)).//
+		withSelectedValue(2).//
+		cannotBeDisabled().//
+		build();
+
+	addOption(slotsCount);
 
 	//
 	// User date time zone
@@ -182,6 +195,27 @@ public class SchedulerSetting extends Setting implements EditableSetting {
     public SchedulerSetting(String object) {
 
 	super(object);
+    }
+
+    /**
+     * @param count
+     */
+    public void setSlotsCount(int count) {
+
+	if (count < 1 || count > 10) {
+
+	    throw new IllegalArgumentException("Count value must be >= 1 and <= 10");
+	}
+
+	getOption(SLOTS_COUNT_KEY, Integer.class).get().select(v -> v == count);
+    }
+
+    /**
+     * @return
+     */
+    public int getSlotsCout() {
+
+	return getOption(SLOTS_COUNT_KEY, Integer.class).get().getValue();
     }
 
     /**

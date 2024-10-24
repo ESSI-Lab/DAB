@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><ns0:SensorML xmlns:ns0="http://www.opengis.net/sensorML/1.0.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/sensorML/1.0.1 http://schemas.opengis.net/sensorML/1.0.1/sensorML.xsd" version="1.0.1" xmlns="http://www.opengis.net/sensorML/1.0.1">
+    <ns0:member>
+        <ns0:System xmlns:gml="http://www.opengis.net/gml" gml:id="AAA">
+            <!--System Description-->
+            <gml:name>1000609756</gml:name>
+            <!--System License-->
+            <gml:License/>
+            <!--System Restriction-->
+            <gml:Restriction/>
+            <!--System Identifiers-->
+            <ns0:identification>
+                <ns0:IdentifierList>
+                    <ns0:identifier name="uniqueID">
+                        <ns0:Term definition="urn:ogc:def:identifier:OGC:uniqueID">
+                            <ns0:value>Provisional-1000609756</ns0:value>
+                        </ns0:Term>
+                    </ns0:identifier>
+                </ns0:IdentifierList>
+            </ns0:identification><!--System Classifiers-->
+            <ns0:classification>
+                <ns0:ClassifierList>
+                    <ns0:classifier name="System Type">
+                        <ns0:Term definition="urn:ogc:def:classifier:x-istsos:1.0:systemType">
+                            <ns0:value>insitu-fixed-point</ns0:value>
+                        </ns0:Term>
+                    </ns0:classifier>
+                    <ns0:classifier name="Sensor Type">
+                        <ns0:Term definition="urn:ogc:def:classifier:x-istsos:1.0:sensorType">
+                            <ns0:value>measurement</ns0:value>
+                        </ns0:Term>
+                    </ns0:classifier>
+                </ns0:ClassifierList>
+            </ns0:classification><!--System Capabilities-->
+            <ns0:capabilities>
+                <swe:DataRecord xmlns:swe="http://www.opengis.net/swe/1.0.1"/>
+            </ns0:capabilities><!--System Location-->
+            <ns0:location>
+                <gml:Point gml:id="1000609756" srsName="EPSG:4326">
+                    <gml:coordinates><gml:latitude>39.0009</gml:latitude><gml:longitude>-74.91317</gml:longitude><gml:elevation><gml:value></gml:value><gml:unit></gml:unit></gml:elevation></gml:coordinates>
+                </gml:Point>
+            <gml:country>United States</gml:country></ns0:location><!--System Outputs-->
+            <ns0:outputs>
+                <ns0:OutputList>
+                    <ns0:output name="output data">
+                        <swe:DataRecord xmlns:swe="http://www.opengis.net/swe/1.0.1" definition="urn:ogc:def:dataType:x-istsos:1.0:timeSeries"><swe:field name="Time"><swe:Time definition="urn:ogc:def:parameter:x-istsos:1.0:time:iso8601"><swe:constraint><swe:AllowedTimes><swe:interval><swe:begin>2008-01-01T00:00:00.000000Z</swe:begin><swe:end>2018-01-01T00:00:00.000000Z</swe:end></swe:interval></swe:AllowedTimes></swe:constraint></swe:Time></swe:field><swe:field name="T"><swe:Quantity definition="urn:ogc:def:parameter:x-igrac:1.0:Quality Measurement:T"><swe:uom code="&#176;C"/></swe:Quantity></swe:field><swe:field name="NO&#8323;"><swe:Quantity definition="urn:ogc:def:parameter:x-igrac:1.0:Quality Measurement:NO&#8323;"><swe:uom code="mg/L"/></swe:Quantity></swe:field><swe:field name="Cl"><swe:Quantity definition="urn:ogc:def:parameter:x-igrac:1.0:Quality Measurement:Cl"><swe:uom code="mg/L"/></swe:Quantity></swe:field><swe:field name="Ca"><swe:Quantity definition="urn:ogc:def:parameter:x-igrac:1.0:Quality Measurement:Ca"><swe:uom code="mg/L"/></swe:Quantity></swe:field><swe:field name="Mg"><swe:Quantity definition="urn:ogc:def:parameter:x-igrac:1.0:Quality Measurement:Mg"><swe:uom code="mg/L"/></swe:Quantity></swe:field><swe:field name="Na"><swe:Quantity definition="urn:ogc:def:parameter:x-igrac:1.0:Quality Measurement:Na"><swe:uom code="mg/L"/></swe:Quantity></swe:field><swe:field name="K"><swe:Quantity definition="urn:ogc:def:parameter:x-igrac:1.0:Quality Measurement:K"><swe:uom code="mg/L"/></swe:Quantity></swe:field><swe:field name="HCO&#8323;"><swe:Quantity definition="urn:ogc:def:parameter:x-igrac:1.0:Quality Measurement:HCO&#8323;"><swe:uom code="mg/L"/></swe:Quantity></swe:field><swe:field name="SO&#8324;"><swe:Quantity definition="urn:ogc:def:parameter:x-igrac:1.0:Quality Measurement:SO&#8324;"><swe:uom code="mg/L"/></swe:Quantity></swe:field><swe:field name="TDS"><swe:Quantity definition="urn:ogc:def:parameter:x-igrac:1.0:Quality Measurement:TDS"><swe:uom code="mg/L"/></swe:Quantity></swe:field><swe:field name="FC"><swe:Quantity definition="urn:ogc:def:parameter:x-igrac:1.0:Quality Measurement:FC"><swe:uom code="cfu per mL"/></swe:Quantity></swe:field><swe:field name="FS"><swe:Quantity definition="urn:ogc:def:parameter:x-igrac:1.0:Quality Measurement:FS"><swe:uom code="cfu per mL"/></swe:Quantity></swe:field><swe:field name="E Coli"><swe:Quantity definition="urn:ogc:def:parameter:x-igrac:1.0:Quality Measurement:E Coli"><swe:uom code="cfu per mL"/></swe:Quantity></swe:field><swe:field name="F"><swe:Quantity definition="urn:ogc:def:parameter:x-igrac:1.0:Quality Measurement:F"><swe:uom code="mg/L"/></swe:Quantity></swe:field><swe:field name="As"><swe:Quantity definition="urn:ogc:def:parameter:x-igrac:1.0:Quality Measurement:As"><swe:uom code="mg/L"/></swe:Quantity></swe:field><swe:field name="U"><swe:Quantity definition="urn:ogc:def:parameter:x-igrac:1.0:Quality Measurement:U"><swe:uom code="mg/L"/></swe:Quantity></swe:field><swe:field name="NH&#8324;"><swe:Quantity definition="urn:ogc:def:parameter:x-igrac:1.0:Quality Measurement:NH&#8324;"><swe:uom code="mg/L"/></swe:Quantity></swe:field><swe:field name="Fe"><swe:Quantity definition="urn:ogc:def:parameter:x-igrac:1.0:Quality Measurement:Fe"><swe:uom code="mg/L"/></swe:Quantity></swe:field><swe:field name="Mn"><swe:Quantity definition="urn:ogc:def:parameter:x-igrac:1.0:Quality Measurement:Mn"><swe:uom code="mg/L"/></swe:Quantity></swe:field><swe:field name="P"><swe:Quantity definition="urn:ogc:def:parameter:x-igrac:1.0:Quality Measurement:P"><swe:uom code="mg/L"/></swe:Quantity></swe:field><swe:field name="Abstraction"><swe:Quantity definition="urn:ogc:def:parameter:x-igrac:1.0:Yield Measurement:Abstraction"><swe:uom code="m&#179;/day"/></swe:Quantity></swe:field><swe:field name="Spring discharge"><swe:Quantity definition="urn:ogc:def:parameter:x-igrac:1.0:Yield Measurement:Spring discharge"><swe:uom code="m&#179;/day"/></swe:Quantity></swe:field><swe:field name="Yield"><swe:Quantity definition="urn:ogc:def:parameter:x-igrac:1.0:Yield Measurement:Yield"><swe:uom code="m&#179;/day"/></swe:Quantity></swe:field><swe:field name="GWAm [Groundwater anomaly]"><swe:Quantity definition="urn:ogc:def:parameter:x-igrac:1.0:Level Measurement:GWAm [Groundwater anomaly]"><swe:uom code="m"/></swe:Quantity></swe:field><swe:field name="Salinity"><swe:Quantity definition="urn:ogc:def:parameter:x-igrac:1.0:Quality Measurement:Salinity"><swe:uom code="g/L"/></swe:Quantity></swe:field><swe:field name="Water depth [from the ground surface]"><swe:Quantity definition="urn:ogc:def:parameter:x-igrac:1.0:Level Measurement:Water depth [from the ground surface]"><swe:uom code="m"/></swe:Quantity></swe:field><swe:field name="Water depth [from the top of the well]"><swe:Quantity definition="urn:ogc:def:parameter:x-igrac:1.0:Level Measurement:Water depth [from the top of the well]"><swe:uom code="m"/></swe:Quantity></swe:field><swe:field name="Water level elevation a.m.s.l."><swe:Quantity definition="urn:ogc:def:parameter:x-igrac:1.0:Level Measurement:Water level elevation a.m.s.l."><swe:uom code="m"/></swe:Quantity></swe:field><swe:field name="EC"><swe:Quantity definition="urn:ogc:def:parameter:x-igrac:1.0:Quality Measurement:EC"><swe:uom code="S/m"/></swe:Quantity></swe:field></swe:DataRecord></ns0:output>
+                </ns0:OutputList>
+            </ns0:outputs>
+        </ns0:System>
+    </ns0:member>
+</ns0:SensorML>

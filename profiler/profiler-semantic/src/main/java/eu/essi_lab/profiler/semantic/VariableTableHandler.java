@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.semantic;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,8 +29,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
@@ -40,7 +40,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
@@ -51,7 +50,8 @@ import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.GSSource;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
@@ -83,27 +83,8 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 	discoveryMessage.setPage(new Page(1, DEFAULT_PAGE_SIZE));
 	discoveryMessage.setIteratedWorkflow(IterationMode.FULL_RESPONSE);
 	discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
-	StorageUri uri = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo uri = ConfigurationWrapper.getDatabaseURI();
 	discoveryMessage.setDataBaseURI(uri);
-	// discoveryMessage.setSharedRepositoryInfo(ConfigurationUtils.getSharedRepositoryInfo());
-
-	// Set<Bond> operands = new HashSet<>();
-	//
-	// // we are interested only on downloadable datasets
-	// ResourcePropertyBond accessBond = BondFactory.createIsExecutableBond(true);
-	// operands.add(accessBond);
-	//
-	// // we are interested only on downloadable datasets
-	// ResourcePropertyBond downBond = BondFactory.createIsDownloadableBond(true);
-	// operands.add(downBond);
-	//
-	// // we are interested only on TIME SERIES datasets
-	// ResourcePropertyBond timeSeriesBond = BondFactory.createIsTimeSeriesBond(true);
-	// operands.add(timeSeriesBond);
-	//
-	// // we are interested only on datasets from a specific platform
-	//
-	// LogicalBond bond = BondFactory.createAndBond(operands);
 
 	String viewId = null;
 	Optional<String> optionalView = webRequest.extractViewId();
@@ -115,21 +96,20 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 	    ByteArrayInputStream stream = new ByteArrayInputStream("<html><body>No view provided!</body></html>".getBytes());
 	    return Response.status(Status.INTERNAL_SERVER_ERROR).type(MediaType.TEXT_HTML).entity(stream).build();
 	}
-
-	// discoveryMessage.setPermittedBond(bond);
-	// discoveryMessage.setUserBond(bond);
-	// discoveryMessage.setNormalizedBond(bond);
-
 	discoveryMessage.setDistinctValuesElement(MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER);
 
 	ResultSet<GSResource> resultSet = executor.retrieve(discoveryMessage);
 
 	List<GSResource> resources = resultSet.getResultsList();
 
-	HashMap<String, List<SimpleEntry<String, String>>> rowsByProtocol = new HashMap<>();
+	HashMap<String, List<SimpleEntry<RowInfo, String>>> rowsBySource = new HashMap<>();
+	HashMap<String, String> sourcesMap = new HashMap<>();
 	for (int i = 0; i < resources.size(); i++) {
 
 	    GSResource resource = resources.get(i);
+	    GSSource s = resource.getSource();
+	    sourcesMap.put(s.getLabel(), s.getUniqueIdentifier());
+	    String source = s.getLabel();
 	    String protocol = null;
 	    String uniqueVariableCode = null;
 	    String variableCode = null;
@@ -140,7 +120,9 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 	    String variableUnitsURI = null;
 	    String interpolation = null;
 	    String interpolationSupport = null;
+	    String aggregationPeriod = null;
 	    String interval = null;
+	    String intendedObservationSpacing = null;
 	    String interpolationSupportUnits = null;
 	    String realtime = null;
 	    String country = "";
@@ -160,8 +142,8 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 			.getAttributeTitle();
 		variableDescription = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getCoverageDescription()
 			.getAttributeDescription();
-		if (resource.getExtensionHandler().getAttributeURI().isPresent()) {
-		    variableURI = resource.getExtensionHandler().getAttributeURI().get();
+		if (resource.getExtensionHandler().getObservedPropertyURI().isPresent()) {
+		    variableURI = resource.getExtensionHandler().getObservedPropertyURI().get();
 		}
 		variableCode = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getCoverageDescription()
 			.getAttributeIdentifier();
@@ -177,8 +159,14 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 		if (resource.getExtensionHandler().getTimeSupport().isPresent()) {
 		    interpolationSupport = resource.getExtensionHandler().getTimeSupport().get();
 		}
+		if (resource.getExtensionHandler().getTimeAggregationDuration8601().isPresent()) {
+		    aggregationPeriod = resource.getExtensionHandler().getTimeAggregationDuration8601().get();
+		}
 		if (resource.getExtensionHandler().getTimeResolution().isPresent()) {
 		    interval = resource.getExtensionHandler().getTimeResolution().get();
+		}
+		if (resource.getExtensionHandler().getTimeResolutionDuration8601().isPresent()) {
+		    intendedObservationSpacing = resource.getExtensionHandler().getTimeResolutionDuration8601().get();
 		}
 		if (resource.getExtensionHandler().getTimeUnits().isPresent()) {
 		    interpolationSupportUnits = resource.getExtensionHandler().getTimeUnits().get();
@@ -190,22 +178,11 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 		    countryISO3 = resource.getExtensionHandler().getCountryISO3().get();
 		}
 
-		Iterator<Online> onlinesIterator = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getDistribution()
-			.getDistributionOnlines();
-		while (onlinesIterator.hasNext()) {
-		    Online online = (Online) onlinesIterator.next();
-		    protocol = online.getLinkage();
-		    if (resource.getHarmonizedMetadata().getCoreMetadata().getOnline().getFunctionCode().equals("download")) {
-			break;
-		    }
-		}
-
 	    } catch (Exception e) {
-		// TODO: handle exception
 	    }
-	    List<SimpleEntry<String, String>> rows = rowsByProtocol.get(protocol);
+	    List<SimpleEntry<RowInfo, String>> rows = rowsBySource.get(source);
 	    if (rows == null) {
-		rows = new ArrayList<SimpleEntry<String, String>>();
+		rows = new ArrayList<SimpleEntry<RowInfo, String>>();
 	    }
 	    String lb = "%0D%0A";
 	    String body = "Dear Hydrology-ontology admin,\n\n" + lb + lb + //
@@ -215,7 +192,7 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 		    "Variable Description: " + variableDescription + "\n" + lb + //
 		    "Identifier at data provider web service: " + variableCode + "\n" + lb + //
 		    "WHOS identifier: " + uniqueVariableCode + "\n" + lb + //
-		    "From service: " + protocol + "\n\n" + lb + lb + //
+		    "From service: " + source + "\n\n" + lb + lb + //
 
 		    "Reporter: -YOUR NAME HERE-\n" + lb + //
 		    "Contact e-mail: -YOUR EMAIL HERE-\n" + lb + //
@@ -226,26 +203,30 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 		    "WMO Concept URI: (e.g. <http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/_171>)\n" + lb + //
 		    "WMO Concept label: (e.g. River discharge)\n" + lb + //
 		    "WMO Concept description: (e.g. Volume of water flowing through a river per unit of time)\n\n" + lb + lb; //
-	    // "Mapping #2 (to CUAHSI ontology):\n" + lb + //
-	    // "Concept URI: (e.g.
-	    // <https://hiscentral.cuahsi.org/webservices/hiscentral.asmx/getOntologyTree?conceptKeyword=Discharge,%20stream>)\n"
-	    // + lb + //
-	    // "Concept label: (e.g. Discharge, stream)\n" + lb + //
-	    // "Concept description: (e.g. Discharge, stream)\n\n"//
 
-	    ;
-	    String row = "<tr><td>" + uniqueVariableCode + "</td><td>" + variableCode + "</td><td>" + variableName + "</td><td><a href='"
-		    + variableURI + "'>" + variableURI + "</a></td><td>" + variableDescription + "</td><td>" + variableUnits
-		    + "</td><td><a href='" + variableUnitsURI + "'>" + variableUnitsURI + "</a></td><td>" + interpolation + "</td><td>"
-		    + interpolationSupport + "</td><td>" + interval + "</td><td>" + interpolationSupportUnits + "</td><td>" + realtime
-		    + "</td><td>" + country + "</td><td>" + countryISO3
-		    + "</td><td><a href=\"mailto:admin-hydro-ontology@wmo.int?cc=ichernov@wmo.int,nravalitera@wmo.int,dberod@wmo.int,chy.vicepresident@gmail.com,francesco.delbuono@unimore.it,enrico.boldrini@cnr.it&subject=Mapping suggestion&body="
-		    + body + "\">Suggest a mapping</a></td></tr>";
+	    RowInfo info = new RowInfo();
+	    info.setUniqueVariableCode(uniqueVariableCode);
+	    info.setVariableCode(variableCode);
+	    info.setVariableName(variableName);
+	    info.setVariableURI(variableURI);
+	    info.setVariableDescription(variableDescription);
+	    info.setVariableUnits(variableUnits);
+	    info.setVariableUnitsURI(variableUnitsURI);
+	    info.setInterpolation(interpolation);
+	    info.setInterpolationSupport(interpolationSupport);
+	    info.setAggregationPeriod(aggregationPeriod);
+	    info.setInterval(interval);
+	    info.setIntendedObservationSpacing(intendedObservationSpacing);
+	    info.setInterpolationSupportUnits(interpolationSupportUnits);
+	    info.setRealtime(realtime);
+	    info.setCountry(country);
+	    info.setCountryISO3(countryISO3);
+
 	    String csv = uniqueVariableCode + "\t" + protocol + "\t" + variableCode + "\t" + variableName + "\t" + variableDescription
 		    + "\t\n";
-	    rows.add(new SimpleEntry<String, String>(row, csv));
+	    rows.add(new SimpleEntry<RowInfo, String>(info, csv));
 
-	    rowsByProtocol.put(protocol, rows);
+	    rowsBySource.put(source, rows);
 
 	}
 
@@ -268,13 +249,108 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 	    }
 	}
 
-	for (String protocol : rowsByProtocol.keySet()) {
-	    List<SimpleEntry<String, String>> rows = rowsByProtocol.get(protocol);
+	for (String source : rowsBySource.keySet()) {
+	    String sourceId = sourcesMap.get(source);
 
-	    content += "<tr><td colspan='15'><br/>From service at: " + protocol + "<br/></td></tr>" + "" //
-		    + "<tr><th>Variable WHOS identifier</th><th>Variable identifier at data provider web service</th><th>Variable name</th><th>Variable URI</th><th>Variable description</th><th>Variable units</th><th>Variable units URI</th><th>Interpolation type</th><th>Interpolation time support</th><th>Time interval</th><th>Time units</th><th>Real time</th><th>Country</th><th>Country ISO3</th><th>Mappings</th></tr>";
-	    for (SimpleEntry<String, String> row : rows) {
-		content += row.getKey();
+	    // STATISTICS
+	    SourceStatistics sourceStats = null;
+	    try {
+		sourceStats = new SourceStatistics(sourceId, webRequest.extractViewId(), null);
+	    } catch (Exception e1) {
+		e1.printStackTrace();
+	    }
+	    Stats stats = sourceStats.getStatistics().get(null);
+	    content += "<tr><td colspan='15'><br/>"//
+		    + "Data provider: <b>" + source + "</b><br/>"//
+		    + "#Platforms: " + stats.getSiteCount() + "<br/>"//
+		    + "#Variables:" + stats.getAttributeCount() + "<br/>"//
+		    + "#Timeseries:" + stats.getTimeSeriesCount() + "<br/>"//
+		    + "Begin:" + stats.getBegin() + "<br/>"//
+		    + "End:" + stats.getEnd() + "<br/>"//
+		    + "BBOX(w,s,e,n): " + stats.getWest() + "," + stats.getSouth() + "," + stats.getEast() + "," + stats.getNorth()+"<br/>" //
+		    + "Altitude:" + stats.getMinimumAltitude()+"/"+stats.getMaximumAltitude() + "<br/>"//		    
+		    + "</td></tr>" + "" //
+		    + "<tr>" + //
+		    getHeader("#Platforms") + //
+		    getHeader("#Variables") + // 1
+		    getHeader("#Timeseries") + // 1
+		    getHeader("Begin") + //
+		    getHeader("End") + //
+		    getHeader("BBOX(w,s,e,n)") + // 1
+		    getHeader("DAB generated variable identifier") + //
+		    getHeader("Data provider variable identifier") + //
+		    getHeader("Variable name") + //
+		    getHeader("Variable URI") + //
+		    getHeader("Variable description") + //
+		    getHeader("Variable units") + //
+		    getHeader("Variable units URI") + //
+		    getHeader("Interpolation type") + //
+		    getHeader("Interpolation time support") + //
+		    getHeader("Aggregation period") + //
+		    getHeader("Time interval") + //
+		    getHeader("Intended observation spacing") + //
+		    getHeader("Time units") + //
+		    getHeader("Real time") + //
+		    getHeader("Country") + //
+		    getHeader("Country ISO3") + //
+		    "</tr>";
+	    try {
+		sourceStats = new SourceStatistics(sourceId, webRequest.extractViewId(), MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER);
+	    } catch (Exception e1) {
+		e1.printStackTrace();
+	    }
+	    List<SimpleEntry<RowInfo, String>> rows = rowsBySource.get(source);
+	    // rows.sort(new Comparator<T>() {
+	    // })
+	    for (SimpleEntry<RowInfo, String> row : rows) {
+		RowInfo ri = row.getKey();
+		Stats vs = sourceStats.getStatistics().get(ri.getUniqueVariableCode());
+		ri.setSiteCount(vs.getSiteCount());
+		ri.setAttributeCount(vs.getAttributeCount());
+		ri.setTimeseriesCount(vs.getTimeSeriesCount());
+		ri.setBegin(vs.getBegin());
+		ri.setEnd(vs.getEnd());
+		ri.setWest(vs.getWest());
+		ri.setEast(vs.getEast());
+		ri.setSouth(vs.getSouth());
+		ri.setNorth(vs.getNorth());
+
+	    }
+	    rows.sort(new Comparator<SimpleEntry<RowInfo, String>>() {
+
+		@Override
+		public int compare(SimpleEntry<RowInfo, String> o1, SimpleEntry<RowInfo, String> o2) {
+		    String t1 = o1.getKey().getTimeseriesCount();
+		    String t2 = o2.getKey().getTimeseriesCount();
+		    return new Integer(Integer.parseInt(t2)).compareTo(Integer.parseInt(t1));
+		}
+	    });
+	    for (SimpleEntry<RowInfo, String> row : rows) {
+		RowInfo ri = row.getKey();
+		content += "<tr>" + //
+			getRow(ri.getSiteCount()) + //
+			getRow(ri.getAttributeCount()) + // 1
+			getRow(ri.getTimeseriesCount()) + // 1
+			getRow(ri.getBegin()) + //
+			getRow(ri.getEnd()) + //
+			getRow(ri.getWest() + "," + ri.getSouth() + "," + ri.getEast() + "," + ri.getNorth()) + // 1
+			getRow(ri.getUniqueVariableCode()) + //
+			getRow(ri.getVariableCode()) + //
+			getRow(ri.getVariableName()) + //
+			getRow(ri.getVariableURI(), ri.getVariableURI()) + //
+			getRow(ri.getVariableDescription()) + //
+			getRow(ri.getVariableUnits()) + //
+			getRow(ri.getVariableUnitsURI(), ri.getVariableUnitsURI()) + //
+			getRow(ri.getInterpolation()) + //
+			getRow(ri.getInterpolationSupport()) + //
+			getRow(ri.getAggregationPeriod()) + //
+			getRow(ri.getInterval()) + //
+			getRow(ri.getIntendedObservationSpacing()) + //
+			getRow(ri.getInterpolationSupportUnits()) + //
+			getRow(ri.getRealtime()) + //
+			getRow(ri.getCountry()) + //
+			getRow(ri.getCountryISO3()) + //
+			"</tr>";
 		if (writer != null) {
 		    try {
 			writer.write(row.getValue());
@@ -291,12 +367,28 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 		e.printStackTrace();
 	    }
 	}
-	String str = "<html><head><meta charset=\"UTF-8\"></head><body><h1>Variables available for view: " + viewId + "</h1>" //
+	String str = "<html><head><meta charset=\"UTF-8\"></head><body><h1>Metadata content analysis for view: " + viewId + "</h1>" //
 		+ content + "</table></body></html>";
 
 	ByteArrayInputStream stream = new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8));
 	return Response.status(Status.OK).type(MediaType.TEXT_HTML).entity(stream).build();
 
+    }
+
+    private String getHeader(String header) {
+	return "<th>" + header + "</th>";
+    }
+
+    private String getRow(String value) {
+	return getRow(value, null);
+    }
+
+    private String getRow(String value, String href) {
+	if (href == null) {
+	    return "<td>" + value + "</td>";
+	} else {
+	    return "<td><a href='" + href + "'>" + value + "</a></td>";
+	}
     }
 
     @Override

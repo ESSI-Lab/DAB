@@ -4,7 +4,7 @@ package eu.essi_lab.model.resource;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -45,7 +45,8 @@ public enum Country {
     BOLIVIA_PLURINATIONAL_STATE_OF("Bolivia (Plurinational State of)", "the Plurinational State of Bolivia", "BOL", "BO"), //
     BOSNIA_AND_HERZEGOVINA("Bosnia and Herzegovina", "Bosnia and Herzegovina", "BIH", "BA"), //
     BOTSWANA("Botswana", "the Republic of Botswana", "BWA", "BW"), //
-    BRAZIL("Brazil", "the Federative Republic of Brazil", "BRA", "BR"), //
+    BRAZIL("Brazil", "the Federative Republic of Brazil", "BRA", "BR","Brasil" //@pt
+	    ), //
     BRUNEI_DARUSSALAM("Brunei Darussalam", "Brunei Darussalam", "BRN", "BN"), //
     BULGARIA("Bulgaria", "the Republic of Bulgaria", "BGR", "BG"), //
     BURKINA_FASO("Burkina Faso", "Burkina Faso", "BFA", "BF"), //
@@ -210,7 +211,7 @@ public enum Country {
     UNITED_KINGDOM_OF_GREAT_BRITAIN_AND_NORTHERN_IRELAND("United Kingdom of Great Britain and Northern Ireland",
 	    "the United Kingdom of Great Britain and Northern Ireland", "GBR", "GB","United Kingdom"), //
     UNITED_REPUBLIC_OF_TANZANIA("United Republic of Tanzania", "the United Republic of Tanzania", "TZA", "TZ"), //
-    UNITED_STATES_OF_AMERICA("United States of America", "the United States of America", "USA", "US"), //
+    UNITED_STATES_OF_AMERICA("United States of America", "the United States of America", "United States", "USA", "US"), //
     URUGUAY("Uruguay", "the Eastern Republic of Uruguay", "URY", "UY"), //
     UZBEKISTAN("Uzbekistan", "the Republic of Uzbekistan", "UZB", "UZ"), //
     VANUATU("Vanuatu", "the Republic of Vanuatu", "VUT", "VU"), //

@@ -4,7 +4,7 @@ package eu.essi_lab.messages.bond.jaxb;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -32,6 +32,7 @@ import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.SpatialBond;
 import eu.essi_lab.messages.bond.View;
+import eu.essi_lab.messages.bond.View.ViewVisibility;
 import eu.essi_lab.messages.bond.ViewBond;
 
 public class ViewFactory {
@@ -68,11 +69,49 @@ public class ViewFactory {
 		SpatialBond.class);
     }
 
+    /**
+     * @param id
+     * @param label
+     * @param bond
+     * @return
+     */
     public View createView(String id, String label, Bond bond) {
+
+	return createView(id, label, bond, null, null, null);
+    }
+
+    /**
+     * @param id
+     * @param label
+     * @param creator
+     * @param bond
+     * @return
+     */
+    public View createView(String id, String label, String creator, Bond bond) {
+
+	return createView(id, label, bond, creator, null, null);
+    }
+
+    /**
+     * @param id
+     * @param label
+     * @param bond
+     * @param creator
+     * @param owner
+     * @param viewVisibility
+     * @return
+     */
+    public View createView(String id, String label, Bond bond, String creator, String owner, ViewVisibility viewVisibility) {
+
 	View ret = new View();
 	ret.setId(id);
 	ret.setLabel(label);
 	ret.setBond(bond);
+	ret.setCreator(creator);
+	ret.setOwner(owner);
+	if (viewVisibility != null) {
+	    ret.setVisibility(viewVisibility);
+	}
 	return ret;
     }
 

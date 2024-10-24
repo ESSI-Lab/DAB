@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.rsm.impl.json.jsapi;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -288,7 +288,12 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 				jsonOnline.put("protocol", "GWIS");
 				jsonOnline.put("function", "info");
 				URL base = new URL(message.getRequestAbsolutePath());
-				URL url = new URL(base, "../gwis?request=plot&onlineId=" + onlineId);
+				Optional<String> token = message.getWebRequest().extractTokenId();
+				String tokenString = "";
+				if (token.isPresent()) {
+				    tokenString = "&token=" + token.get();
+				}
+				URL url = new URL(base, "../gwis?request=plot&onlineId=" + onlineId + tokenString);
 				jsonOnline.put("url", url.toExternalForm());
 				online.put(jsonOnline);
 			    } catch (MalformedURLException e) {
@@ -534,11 +539,10 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    report.put("origOrgDesc", jsonOriginatorOrganisationDescription);
 	}
 	Optional<String> themeCategoryOpt = handler.getThemeCategory();
-	
-	if(themeCategoryOpt.isPresent()) {
+
+	if (themeCategoryOpt.isPresent()) {
 	    report.put("themeCategory", themeCategoryOpt.get());
 	}
-
 
 	for (Identification identification : diList) {
 

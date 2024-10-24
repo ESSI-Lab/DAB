@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wms._1_1_1;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -44,7 +44,7 @@ import eu.essi_lab.accessor.wms.WMSConnector;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.jaxb.wms._1_1_1.Layer;
 import eu.essi_lab.jaxb.wms._1_1_1.WMTMSCapabilities;
-import eu.essi_lab.lib.net.utils.Downloader;
+import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
@@ -358,16 +358,16 @@ public class WMS_1_1_1Connector extends WMSConnector {
 
 	for (URL url : urlsList) {
 
-	    GSLoggerFactory.getLogger(getClass()).debug("Getting capabilities with URL: {}", url);
+	    GSLoggerFactory.getLogger(getClass()).debug("Getting capabilities from: {}", url);
 
 	    InputStream content = null;
 
-	    Optional<InputStream> ret = downloader.downloadStream(url.toString());
+	    Optional<InputStream> ret = downloader.downloadOptionalStream(url.toString());
 
 	    if (ret.isPresent()) {
 		content = ret.get();
 	    } else {
-		GSLoggerFactory.getLogger(getClass()).warn("No stream from WMS 1.1.1 Connector");
+		GSLoggerFactory.getLogger(getClass()).warn("No stream from WMS 1.1.1 Connector from: {}", url);
 
 	    }
 
@@ -392,18 +392,16 @@ public class WMS_1_1_1Connector extends WMSConnector {
 
 		    if (!silent) {
 
-			GSLoggerFactory.getLogger(getClass()).warn("Invalid capabilities document");
+			GSLoggerFactory.getLogger(getClass()).warn("Invalid capabilities document from: {}", url);
 			GSLoggerFactory.getLogger(getClass()).warn(ex.getMessage(), ex);
 		    }
 		}
 	    }
 	}
 
-	GSLoggerFactory.getLogger(getClass()).error("Unable to get Capabilities document");
-
 	throw GSException.createException( //
 		getClass(), //
-		"Unable to retrieve WMS 1.1.1 GetCapabilities", //
+		"Unable to retrieve WMS 1.1.1 GetCapabilities from: " + sourceURL, //
 		null, //
 		ErrorInfo.ERRORTYPE_SERVICE, //
 		ErrorInfo.SEVERITY_ERROR, //

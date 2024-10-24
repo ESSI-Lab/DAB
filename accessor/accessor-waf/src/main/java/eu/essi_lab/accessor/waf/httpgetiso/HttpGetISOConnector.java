@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.waf.httpgetiso;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,7 +30,7 @@ import org.w3c.dom.Node;
 
 import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.net.utils.Downloader;
+import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.lib.xml.XMLNodeReader;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
@@ -54,7 +54,7 @@ public class HttpGetISOConnector extends HarvestedQueryConnector<HttpGetISOConne
 	try {
 	    String endpoint = source.getEndpoint();
 	    Downloader d = new Downloader();
-	    Optional<InputStream> result = d.downloadStream(endpoint);
+	    Optional<InputStream> result = d.downloadOptionalStream(endpoint);
 	    if (result.isPresent()) {
 		XMLDocumentReader reader = new XMLDocumentReader(result.get());
 		Boolean present = reader.evaluateBoolean("count(//*:MD_Metadata>0)");
@@ -78,7 +78,7 @@ public class HttpGetISOConnector extends HarvestedQueryConnector<HttpGetISOConne
 	try {
 	    String endpoint = getSourceURL();
 	    Downloader d = new Downloader();
-	    Optional<InputStream> result = d.downloadStream(endpoint);
+	    Optional<InputStream> result = d.downloadOptionalStream(endpoint);
 	    if (result.isPresent()) {
 		XMLDocumentReader reader = new XMLDocumentReader(result.get());
 		Node node = reader.evaluateNode("//*:MD_Metadata[1]");
@@ -110,7 +110,7 @@ public class HttpGetISOConnector extends HarvestedQueryConnector<HttpGetISOConne
 	try {
 	    String endpoint = getSourceURL();
 	    Downloader d = new Downloader();
-	    Optional<InputStream> result = d.downloadStream(endpoint);
+	    Optional<InputStream> result = d.downloadOptionalStream(endpoint);
 	    if (result.isPresent()) {
 		XMLDocumentReader reader = new XMLDocumentReader(result.get());
 		String name = reader.evaluateString("localname(/*[1])");

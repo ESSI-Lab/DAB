@@ -1,0 +1,3 @@
+* example51.tif and example57.tif have been created with:
+$ gdal_translate example51.nc example51.tif
+* example51-bad.tif has been created corrupting example51.tif

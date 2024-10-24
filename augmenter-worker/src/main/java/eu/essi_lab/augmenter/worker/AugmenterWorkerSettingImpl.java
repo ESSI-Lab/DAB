@@ -7,7 +7,7 @@ package eu.essi_lab.augmenter.worker;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,16 +24,29 @@ package eu.essi_lab.augmenter.worker;
  * #L%
  */
 
+import java.util.List;
+import java.util.Optional;
+
 import org.json.JSONObject;
 
+import eu.essi_lab.api.database.DatabaseReader;
+import eu.essi_lab.api.database.GetViewIdentifiersRequest;
+import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.augmenter.AugmentersSetting;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.augmenter.worker.AugmenterWorkerSetting;
+import eu.essi_lab.cfga.option.ValuesLoader;
 import eu.essi_lab.cfga.setting.Setting;
 
 /**
  * @author Fabrizio
  */
 public class AugmenterWorkerSettingImpl extends AugmenterWorkerSetting {
+    
+    public static void main(String[] args) {
+	
+	System.out.println(new AugmenterWorkerSettingImpl());
+    }
 
     public AugmenterWorkerSettingImpl() {
     }
@@ -70,5 +83,25 @@ public class AugmenterWorkerSettingImpl extends AugmenterWorkerSetting {
     protected String getAugmentersSettingIdentifier() {
 
 	return AugmentersSetting.IDENTIFIER;
+    }
+
+    /**
+     * @author Fabrizio
+     */
+    public static class ViewIdentifiersLoader extends ValuesLoader<String> {
+
+	@Override
+	protected List<String> loadValues(Optional<String> input) throws Exception {
+
+	    DatabaseReader reader = DatabaseProviderFactory.getDatabaseReader(ConfigurationWrapper.getDatabaseURI());
+
+	    return reader.getViewIdentifiers(GetViewIdentifiersRequest.create());
+	}
+    }
+
+    @Override
+    protected ValuesLoader<String> getViewIdentifiersLoader() {
+
+	return new ViewIdentifiersLoader();
     }
 }

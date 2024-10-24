@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wfs._1_1_0;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -40,7 +40,7 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 import eu.essi_lab.accessor.wfs.WFSConnector;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.jaxb.common.ObjectFactories;
-import eu.essi_lab.lib.net.utils.Downloader;
+import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
@@ -297,7 +297,7 @@ public class WFS_1_1_0Connector extends WFSConnector {
 	    InputStream content = null;
 	    try {
 
-		Optional<InputStream> ret = downloader.downloadStream(url.toString());
+		Optional<InputStream> ret = downloader.downloadOptionalStream(url.toString());
 		if (ret.isPresent()) {
 		    content = ret.get();
 		} else {
@@ -325,14 +325,14 @@ public class WFS_1_1_0Connector extends WFSConnector {
 
 		    if (!silent) {
 
-			GSLoggerFactory.getLogger(getClass()).warn("Invalid capabilities document");
+			GSLoggerFactory.getLogger(getClass()).warn("Invalid capabilities document from: {}", sourceURL);
 			GSLoggerFactory.getLogger(getClass()).warn(ex.getMessage(), ex);
 		    }
 		}
 	    }
 	}
 
-	GSLoggerFactory.getLogger(getClass()).error("Unable to get Capabilities document");
+	GSLoggerFactory.getLogger(getClass()).error("Unable to get Capabilities document from: {}", sourceURL);
 	return null;
     }
 

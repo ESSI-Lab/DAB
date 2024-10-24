@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.health.methods;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,9 +21,13 @@ package eu.essi_lab.gssrv.health.methods;
  * #L%
  */
 
+import java.util.Optional;
+import java.util.Properties;
+
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.gssrv.health.GSPingMethod;
-import eu.essi_lab.pdk.Profiler;
+import eu.essi_lab.gssrv.servlet.RateLimiterFilter;
 
 /**
  * @author Fabrizio
@@ -33,8 +37,16 @@ public class ProfilerMethod implements GSPingMethod {
     @Override
     public void ping() throws Exception {
 
-	if (Profiler.everythingIsBlocked()) {
-	    
+	boolean ping = true;
+
+	Optional<Properties> keyValueOption = ConfigurationWrapper.getSystemSettings().getKeyValueOptions();
+	if (keyValueOption.isPresent()) {
+
+	    ping = Boolean.valueOf(keyValueOption.get().getOrDefault("profilerHealthCheckMethodEnabled", "true").toString());
+	}
+
+	if (RateLimiterFilter.everythingIsBlocked() && ping) {
+
 	    throw new Exception("Profilers are blocked!");
 	}
     }
@@ -56,6 +68,7 @@ public class ProfilerMethod implements GSPingMethod {
 	case MIXED:
 	case FRONTEND:
 	case ACCESS:
+	case INTENSIVE:
 	default:
 	    return true;
 	}

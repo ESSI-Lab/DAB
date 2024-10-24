@@ -1,0 +1,87 @@
+{
+    "variable": "tempn",
+    "startTime": "200401020000",
+    "linkage": "https://aws.arpal.liguria.it/ords/ws/HIS_CENTRAL/ANAGRAFICA?code=AMERE",
+    "sensor-info": {
+        "code": "AMERE",
+        "name": "Merelli",
+        "lat": 4388137,
+        "lon": 784759,
+        "elev": 70,
+        "muni": "Taggia",
+        "prov": "IM",
+        "region": "LIGURIA",
+        "nation": "ITALIA"
+    },
+    "var-info": {
+        "offset": 0,
+        "hasMore": false,
+        "limit": 1000,
+        "count": 7,
+        "links": [
+            {
+                "rel": "self",
+                "href": "https://aws.arpal.liguria.it/ords/ws/HIS_CENTRAL/DESCRIZIONE"
+            },
+            {
+                "rel": "describedby",
+                "href": "https://aws.arpal.liguria.it/ords/ws/metadata-catalog/HIS_CENTRAL/item"
+            },
+            {
+                "rel": "first",
+                "href": "https://aws.arpal.liguria.it/ords/ws/HIS_CENTRAL/DESCRIZIONE"
+            }
+        ],
+        "items": [
+            {
+                "unit": "°C/10",
+                "obs_interval": "PT1H",
+                "measure": "Air temperature (near surface)",
+                "type": "AVERAGE",
+                "field_name": "TEMPM"
+            },
+            {
+                "unit": "°C/10",
+                "obs_interval": "PT1H",
+                "measure": "Air temperature (near surface)",
+                "type": "MINIMUM",
+                "field_name": "TEMPN"
+            },
+            {
+                "unit": "°C/10",
+                "obs_interval": "PT1H",
+                "measure": "Air temperature (near surface)",
+                "type": "MAXIMUM",
+                "field_name": "TEMPX"
+            },
+            {
+                "unit": "%",
+                "obs_interval": "PT1H",
+                "measure": "Relative Humidity (near surface)",
+                "type": "AVERAGE",
+                "field_name": "REHUM"
+            },
+            {
+                "unit": "m/100",
+                "obs_interval": "PT1H",
+                "measure": "Creek level",
+                "type": "AVERAGE",
+                "field_name": "CRLVM"
+            },
+            {
+                "unit": "m/s/10",
+                "obs_interval": "PT1H",
+                "measure": "Wind Speed (near surface)",
+                "type": "AVERAGE",
+                "field_name": "WSPDM"
+            },
+            {
+                "unit": "m/s/10",
+                "obs_interval": "PT1H",
+                "measure": "Wind Speed (near surface)",
+                "type": "MAXIMUM",
+                "field_name": "WSPDX"
+            }
+        ]
+    }
+}

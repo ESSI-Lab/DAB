@@ -16,17 +16,23 @@
 
 	<properties>
 		<hostname>localhost</hostname>
+
+		<!-- To override this port value when starting jetty:run: - open the
+		jetty:run 
+			Maven Build in the Eclipse "Debug Configurations" menu - in the Main tab 
+			add "Parameter name": jetty.port with the number of the desired port -->
 		<jetty.stop_port>9091</jetty.stop_port>
 		<contextPath>gs-service</contextPath>
+
+		<!-- baseAppServerURL is used in the generate profile, to hack the
+		client stubs so that the default constructors address the expected URLs -->
 		<baseAppServerURL>http://${hostname}:${jetty.port}/${contextPath}/</baseAppServerURL>
 		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
 		<timestamp>${maven.build.timestamp}</timestamp>
-		<jetty.version>9.4.9.v20180320</jetty.version>
+		<jetty.version>9.4.54.v20240208</jetty.version>
 		<configuration.url />
 
 	</properties>
-
-
 
 	<build>
 		<finalName>${contextPath}</finalName>
@@ -35,17 +41,40 @@
 			<resource>
 				<directory>src/main/resources/</directory>
 				<filtering>false</filtering>
+				<excludes>
+					<exclude>docker/**</exclude>
+					<exclude>deploy/**</exclude>
+					<exclude>**/*.xml</exclude>
+					<exclude>**/*.jsp</exclude>
+					<exclude>**/*.properties</exclude>
+				</excludes>
 			</resource>
 
 			<resource>
 				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
+				<includes>
+					<include>**/*.xml</include>
+					<include>**/*.jsp</include>
+					<include>**/*.properties</include>
+				</includes>
 			</resource>
 		</resources>
 
 		<plugins>
 
-
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
@@ -85,25 +114,23 @@
 				<artifactId>cargo-maven2-plugin</artifactId>
 			</plugin>
 
+
 			<!-- Jetty Plugin -->
-
-
 			<plugin>
 				<groupId>org.eclipse.jetty</groupId>
 				<artifactId>jetty-maven-plugin</artifactId>
 				<version>${jetty.version}</version>
-				<!-- Updated, because version 9.4.8.v20171121 has an important bugfix: 
-					on HTTP-GET with request header Connection: close it truncates the responses. -->
-				<!-- example request to reproduce, on a machine different from localhost: 
-					wget header="Connection: close" -O result.txt "http://boldrini.essi-lab.eu:9090/gs-service/services/essi/cuahsi_1_1.asmx?wsdl" -->
 				<configuration>
+
 					<stopPort>${jetty.stop_port}</stopPort>
 					<stopKey>stop</stopKey>
 					<webAppConfig>
 						<contextPath>/${contextPath}</contextPath>
 
-						<webInfIncludeJarPattern>.*/spring-[^/]*\.jar$|.*vaadin-[^/]*\.jar$|.*flow-[^/]*\.jar$|.*/togglebutton-[^/]*\.jar$|.*/multiselect-combo-box-flow-[^/]*\.jar$</webInfIncludeJarPattern>
-						<containerIncludeJarPattern>.*/spring-[^/]*\.jar$|.*vaadin-[^/]*\.jar$|.*flow-[^/]*\.jar$|.*/togglebutton-[^/]*\.jar$|.*/multiselect-combo-box-flow-[^/]*\.jar$</containerIncludeJarPattern>
+						<webInfIncludeJarPattern>
+							.*/spring-[^/]*\.jar$|.*vaadin-[^/]*\.jar$|.*flow-[^/]*\.jar$|.*/togglebutton-[^/]*\.jar$|.*/multiselect-combo-box-flow-[^/]*\.jar$</webInfIncludeJarPattern>
+						<containerIncludeJarPattern>
+							.*/spring-[^/]*\.jar$|.*vaadin-[^/]*\.jar$|.*flow-[^/]*\.jar$|.*/togglebutton-[^/]*\.jar$|.*/multiselect-combo-box-flow-[^/]*\.jar$</containerIncludeJarPattern>
 
 						<!-- Use war output directory to get the webpack files -->
 						<allowDuplicateFragmentNames>true</allowDuplicateFragmentNames>
@@ -114,14 +141,15 @@
 					<dumpOnStart>false</dumpOnStart>
 
 					<scanIntervalSeconds>0</scanIntervalSeconds>
-					<jettyXml>${project.basedir}/src/main/webapp/WEB-INF/jetty.xml,
-						${project.basedir}/src/main/webapp/WEB-INF/jetty-http.xml,
-						${project.basedir}/src/main/webapp/WEB-INF/jetty-ssl.xml,
-						${project.basedir}/src/main/webapp/WEB-INF/jetty-https.xml</jettyXml>
+					<jettyXml>
+						${project.basedir}/src/main/webapp/WEB-INF/jetty.xml,
+						${project.basedir}/src/main/webapp/WEB-INF/jetty-http.xml</jettyXml>
 
 				</configuration>
-			</plugin>
+				<dependencies>
 
+				</dependencies>
+			</plugin>
 
 
 			<!-- War plugin -->
@@ -137,7 +165,6 @@
 							<includes>
 								<include>**/*.xml</include>
 								<include>**/*.properties</include>
-								<!-- include>GetRecordsTemplate.xml</include> <include>DescribeRecordTemplate.xml</include -->
 							</includes>
 							<excludes>
 
@@ -161,12 +188,7 @@
 							<directory>target/frontend</directory>
 							<targetPath>frontend</targetPath>
 						</resource>
-
-						<resource>
-							<directory>target/flow-frontend</directory>
-							<targetPath>flow-frontend</targetPath>
-						</resource>
-
+				
 					</webResources>
 				</configuration>
 			</plugin>
@@ -191,8 +213,8 @@
 				</executions>
 			</plugin>
 
-			<!-- Take care of synchronizing java dependencies and imports in package.json 
-				and main.js files. It also creates webpack.config.js if not exists yet. -->
+			<!-- Take care of synchronizing java dependencies and imports in
+			package.json and main.js files. It also creates webpack.config.js if not exists yet. -->
 			<plugin>
 				<groupId>com.vaadin</groupId>
 				<artifactId>vaadin-maven-plugin</artifactId>
@@ -204,33 +226,6 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>io.fabric8</groupId>
-				<artifactId>docker-maven-plugin</artifactId>
-
-				<configuration>
-					<verbose>true</verbose>
-					<images>
-						<image>
-							<name>essilab/dab</name>
-							<build>							
-         					    <dockerFile>${project.basedir}/src/main/docker/Dockerfile</dockerFile>
-         					    <contextDir>${project.basedir}</contextDir>
-								<tags>
-									<tag>latest</tag>
-									<tag>${project.version}</tag>
-								</tags>
-							</build>
-							<run>
-								<ports>
-									<port>8080:8080</port>
-								</ports>
-							</run>
-						</image>
-					</images>
-				</configuration>
 			</plugin>
 
 		</plugins>
@@ -294,21 +289,58 @@
 
 
 	<dependencies>
+	
+	
+
+		<dependency>
+		    <groupId>org.apache.jena</groupId>
+		    <artifactId>jena-shacl</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.ws.rs</groupId>
+			<artifactId>javax.ws.rs-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.jaxrs</groupId>
+			<artifactId>jackson-jaxrs-json-provider</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-servlets</artifactId>
-			<version>${jetty.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.indeed</groupId>
 			<artifactId>status-core</artifactId>
 		</dependency>
+
 		<!-- spring -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-beans</artifactId>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-core</artifactId>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-context</artifactId>
 		</dependency>
 
 		<!-- generates the wadl -->
@@ -347,6 +379,11 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>database-api-elasticsearch-impl</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>eu.essi_lab</groupId>
 			<artifactId>database-api-volatile-impl</artifactId>
 			<version>${project.parent.version}</version>
@@ -371,10 +408,22 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 
+		<!-- report manager -->
+		<!--dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>report-manager</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency-->
+
 		<!-- profilers -->
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>profiler-dev-kit</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-wis</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
@@ -389,10 +438,24 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-terms</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>		
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-esri</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>profiler-semantic</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-thredds</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>profiler-bnhs</artifactId>
@@ -401,6 +464,16 @@
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>profiler-sos</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-arpa-hydrocsv</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-arpa-rest</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
@@ -420,6 +493,11 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-wms-extent</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>profiler-wfs</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
@@ -433,7 +511,11 @@
 			<artifactId>profiler-csw</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-cdi</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>profiler-pub-sub</artifactId>
@@ -449,7 +531,21 @@
 			<artifactId>profiler-rest</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-rest-views</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-ssc-feed</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-worldcereal</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>		
 
 		<!-- shared content -->
 		<dependency>
@@ -471,18 +567,62 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-niwa</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-s3-shapefile</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-hmfs</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
 
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-nrfa</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-south-africa</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-smhi</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-mch</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-cehq</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-wis</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>accessor-oai-pmh</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-
-
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>accessor-wcs</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 
@@ -492,6 +632,23 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-fedeo</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-gbif</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-wcs</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
@@ -525,10 +682,406 @@
 
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-iris-station</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-emodnet-physics</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-egaskro</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>accessor-local-fs</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-sos</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-ana</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-ckan</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-cdi</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-elixir-ena</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-eurobis</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-arcgis-online</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-argo</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-aviso</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-bnhs</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-hydro-nve</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-hydro-paraguay</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-imo-hydro</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-canada-msc</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-odata-hidrology</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-rihmi-wdc-hydro</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-usgs-waterservices</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-digital-globe</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-dinaguaws</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-ecv-inventory</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-health-sites</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-rasaqm</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-thunder</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-oam</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-icos</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-wod</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-wekeo</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-obis</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-nodc</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-mcp</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-inumet</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-socat</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-thredds</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-inpe</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-landsat8</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-sentinel</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-china-geoss</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-nextgeoss</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-sava-his</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-nasa-gsfc</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-hydroshare</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-prisma</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-inmet</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-cmr</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-invenio</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-his-central</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-saeon</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-stac</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-nmdis-erddap</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-polytope</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-bluecloud</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-whos-paraguay</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-sensor-things</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-meteotracker</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-kisters</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-worldcereal</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-seanoe</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-eiffel-s3</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-copernicus-dataspace</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>		
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-trigger</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>	
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-smartcitizenkit</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-acronet</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>					
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-geo-mountain</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-agrostac</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>				
+					
+		<!-- odip utils -->
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>gs-lib-odip</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
@@ -564,6 +1117,12 @@
 
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>access-tools-downloader-s3</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>access-tools-downloader-wof</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
@@ -571,6 +1130,12 @@
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>access-tools-downloader-wcs</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>access-tools-downloader-usgs</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 
@@ -586,11 +1151,9 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>com.github.stefanbirkner</groupId>
-			<artifactId>system-rules</artifactId>
-			<scope>test</scope>
-		</dependency>
+		<!-- <dependency> <groupId>com.github.stefanbirkner</groupId>
+		<artifactId>system-rules</artifactId> 
+			<scope>test</scope> </dependency> -->
 
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
@@ -626,8 +1189,191 @@
 
 	<profiles>
 
+		<profile>
+			<id>continuous-integration</id>
+			<build>
+				<finalName>gi-cat-latest-build</finalName>
+			</build>
+		</profile>
 
-	<profile>
+		<profile>
+			<id>internaltest</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<groupId>io.fabric8</groupId>
+						<artifactId>docker-maven-plugin</artifactId>
+
+						<configuration>
+							<images>
+
+								
+
+								<image>
+									<alias>gi-elasticsearch</alias>
+									<name>${docker.elasticsearch}</name>
+									<run>
+										<ports>
+											<port>gi-elasticsearch.port:9200</port>
+										</ports>
+										<wait>
+											<http>
+												<!--suppress MavenModelInspection -->
+												<url>
+													http://admin:admin@${docker.host.address}:${gi-elasticsearch.port}</url><!--/_cat/health?v -->
+											</http>
+											<time>${fabric8-timeout}</time>
+										</wait>
+										<env>
+											<discovery.type>single-node</discovery.type>
+											<bootstrap.memory_lock>true</bootstrap.memory_lock>
+											<OPENSEARCH_JAVA_OPTS>-Xms512m
+												-Xmx512m</OPENSEARCH_JAVA_OPTS>
+											<DISABLE_INSTALL_DEMO_CONFIG>true</DISABLE_INSTALL_DEMO_CONFIG>
+											<DISABLE_SECURITY_PLUGIN>true</DISABLE_SECURITY_PLUGIN>
+										</env>
+									</run>
+								</image>
+
+								<image>
+									<alias>gi-mysql</alias>
+									<name>${mySQLDocker.registry}</name>
+									<run>
+										<ports>
+											<port>mysql.port:3306</port>
+										</ports>
+										<wait>
+											<time>${fabric8-no-ping-timeout}</time>
+										</wait>
+										<env>
+											<MYSQL_ROOT_PASSWORD>pdw</MYSQL_ROOT_PASSWORD>
+										</env>
+									</run>
+								</image>
+
+							</images>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<id>externaltest</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<groupId>io.fabric8</groupId>
+						<artifactId>docker-maven-plugin</artifactId>
+
+						<configuration>
+							<images>
+
+
+
+								<image>
+									<alias>gi-elasticsearch</alias>
+									<name>${docker.elasticsearch}</name>
+									<run>
+										<ports>
+											<port>gi-elasticsearch.port:9200</port>
+										</ports>
+										<wait>
+											<http>
+												<!--suppress MavenModelInspection -->
+												<url>
+													http://admin:admin@${docker.host.address}:${gi-elasticsearch.port}</url><!--/_cat/health?v -->
+											</http>
+											<time>${fabric8-timeout}</time>
+										</wait>
+										<env>
+											<discovery.type>single-node</discovery.type>
+											<bootstrap.memory_lock>true</bootstrap.memory_lock>
+											<OPENSEARCH_JAVA_OPTS>-Xms512m
+												-Xmx512m</OPENSEARCH_JAVA_OPTS>
+											<DISABLE_INSTALL_DEMO_CONFIG>true</DISABLE_INSTALL_DEMO_CONFIG>
+											<DISABLE_SECURITY_PLUGIN>true</DISABLE_SECURITY_PLUGIN>
+										</env>
+									</run>
+								</image>
+
+								<image>
+									<alias>gi-mysql</alias>
+									<name>${mySQLDocker.registry}</name>
+									<run>
+										<ports>
+											<port>mysql.port:3306</port>
+										</ports>
+										<wait>
+											<time>${fabric8-no-ping-timeout}</time>
+										</wait>
+										<env>
+											<MYSQL_ROOT_PASSWORD>pdw</MYSQL_ROOT_PASSWORD>
+										</env>
+									</run>
+								</image>
+
+							</images>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<id>createdockerimage</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<!-- This plugin enables creation of a docker image of
+						gs-service calling: -->
+						<!-- mvn -Pcreatedockerimage clean package -->
+						<!-- Optionally, add a configuration file from a
+						profile, e.g. -Pwcs -->
+						<groupId>com.spotify</groupId>
+						<artifactId>dockerfile-maven-plugin</artifactId>
+						<version>1.4.10</version>
+						<executions>
+							<execution>
+								<id>default</id>
+								<goals>
+									<goal>build</goal>
+									<goal>push</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<dockerfile>
+								${project.basedir}/src/main/resources/docker/run-configured.Dockerfile</dockerfile>
+							<tag>1</tag>
+							<repository>localhost/gi-suite</repository>
+							<buildArgs>
+								<WAR_FILE>target/${project.build.finalName}.war</WAR_FILE>
+							</buildArgs>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
 			<!-- Production mode is activated using -Pvaadin-production -->
 			<id>vaadin-production</id>
 			<properties>

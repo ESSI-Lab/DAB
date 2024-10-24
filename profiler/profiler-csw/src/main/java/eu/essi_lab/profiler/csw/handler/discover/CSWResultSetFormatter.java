@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.csw.handler.discover;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -64,6 +66,7 @@ import eu.essi_lab.messages.MessageResponse;
 import eu.essi_lab.messages.RequestMessage;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.ValidationMessage;
+import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.count.CountSet;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.ErrorInfo;
@@ -73,6 +76,8 @@ import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.pdk.rsf.DiscoveryResultSetFormatter;
 import eu.essi_lab.pdk.rsf.FormattingEncoding;
 import eu.essi_lab.profiler.csw.CSWProfiler;
+import eu.essi_lab.profiler.csw.CSWRequestConverter;
+import eu.essi_lab.profiler.csw.CSWRequestUtils;
 
 /**
  * @author Fabrizio
@@ -94,6 +99,11 @@ public class CSWResultSetFormatter extends DiscoveryResultSetFormatter<Element> 
     public static final FormattingEncoding CSW_FORMATTING_ENCODING = new FormattingEncoding();
     private static final String CSW_RESULT_SET_FORMATTER_ERROR = "CSW_RESULT_SET_FORMATTER_ERROR";
 
+    /**
+     * 
+     */
+    private static final String CSS_VIEW_IDENTIFIER = "emod-pace";
+
     static {
 	CSW_FORMATTING_ENCODING.setEncoding(CSW_FORMATTING_ENCODING_NAME);
 	CSW_FORMATTING_ENCODING.setEncodingVersion(CSW_FORMATTING_ENCODING_VERSION);
@@ -101,7 +111,8 @@ public class CSWResultSetFormatter extends DiscoveryResultSetFormatter<Element> 
     }
 
     /**
-     * http://reference1.mapinfo.com/software/spatial_server/english/1_0/csw/postget/postgetgetrecords.html Ignored parameters: HOPCOUNT
+     * http://reference1.mapinfo.com/software/spatial_server/english/1_0/csw/postget/postgetgetrecords.html Ignored
+     * parameters: HOPCOUNT
      * RESPONSEHANDLER DISTRIBUTEDSEARCH
      */
     @Override
@@ -110,11 +121,19 @@ public class CSWResultSetFormatter extends DiscoveryResultSetFormatter<Element> 
 	WebRequest webRequest = message.getWebRequest();
 
 	try {
-	    GetRecords getRecords = CSWProfiler.getGetRecord(webRequest);
 
-	    DocumentBuilderFactory factory = XMLFactories.newDocumentBuilderFactory();
-	    factory.setNamespaceAware(true);
-	    DocumentBuilder builder = factory.newDocumentBuilder();
+	    GetRecords getRecords = null;
+
+	    boolean getRecordsFromGET = CSWRequestUtils.isGetRecordsFromGET(webRequest);
+	    if (getRecordsFromGET) {
+
+		CSWRequestConverter converter = new CSWRequestConverter();
+		getRecords = converter.convert(webRequest);
+
+	    } else if (CSWRequestUtils.isGetRecordsFromPOST(webRequest)) {
+
+		getRecords = CSWRequestUtils.getGetRecordFromPOST(webRequest);
+	    }
 
 	    List<Element> resultsList = mappedResultSet.getResultsList();
 
@@ -124,8 +143,17 @@ public class CSWResultSetFormatter extends DiscoveryResultSetFormatter<Element> 
 	    //
 	    if (getRecords == null) {
 
-		return formatGetRecordById(resultsList);
+		return formatGetRecordById(resultsList, message.getView());
 	    }
+
+	    // ---------------------
+	    //
+	    // GetRecords
+	    //
+
+	    DocumentBuilderFactory factory = XMLFactories.newDocumentBuilderFactory();
+	    factory.setNamespaceAware(true);
+	    DocumentBuilder builder = factory.newDocumentBuilder();
 
 	    GetRecordsResponse recordsResponse = new GetRecordsResponse();
 
@@ -137,13 +165,16 @@ public class CSWResultSetFormatter extends DiscoveryResultSetFormatter<Element> 
 	    // creates the search results
 	    SearchResultsType searchResultsType = new SearchResultsType();
 
-	    // in case of errors, they are handled
+	    // in case of errors, the error elements are added to the response
+	    List<Element> errorElements = null;
+
 	    if (!mappedResultSet.getException().getErrorInfoList().isEmpty() || //
 		    !message.getException().getErrorInfoList().isEmpty()) { //
 
-		handleErrorResponse(searchResultsType, message, mappedResultSet, builder, recordsResponse);
-
-		return buildResponse(recordsResponse);
+		errorElements = handleErrorResponse(//
+			message, //
+			mappedResultSet, //
+			builder);
 	    }
 
 	    int matched = mappedResultSet.getCountResponse().getCount();
@@ -202,7 +233,7 @@ public class CSWResultSetFormatter extends DiscoveryResultSetFormatter<Element> 
 		//
 		// Adding results
 		//
-		addResults(resultsList, searchResultsType);
+		addResults(resultsList, errorElements, searchResultsType);
 	    }
 
 	    return buildResponse(recordsResponse);
@@ -233,7 +264,7 @@ public class CSWResultSetFormatter extends DiscoveryResultSetFormatter<Element> 
 	return new ESSILabProvider();
     }
 
-    private Response formatGetRecordById(List<Element> resultsList) throws Exception {
+    private Response formatGetRecordById(List<Element> resultsList, Optional<View> view) throws Exception {
 
 	GetRecordByIdResponse response = new GetRecordByIdResponse();
 
@@ -242,23 +273,31 @@ public class CSWResultSetFormatter extends DiscoveryResultSetFormatter<Element> 
 	    response.getAnies().add(result);
 	}
 
-	return buildResponse(response);
+	boolean insertXSLT = view.isPresent() && view.get().getId().equals(CSS_VIEW_IDENTIFIER);
+
+	return buildResponse(response, insertXSLT);
     }
 
-    private void handleErrorResponse(//
-	    SearchResultsType searchResultsType, //
+    /**
+     * @param searchResultsType
+     * @param message
+     * @param mappedResultSet
+     * @param builder
+     * @param recordsResponse
+     * @return
+     * @throws Exception
+     */
+    private List<Element> handleErrorResponse(//
 	    RequestMessage message, //
 	    MessageResponse<Element, CountSet> mappedResultSet, //
-	    DocumentBuilder builder, //
-	    GetRecordsResponse recordsResponse) throws Exception {
+	    DocumentBuilder builder) throws Exception {
 
-	searchResultsType.setNextRecord(new BigInteger("0"));
-	searchResultsType.setNumberOfRecordsReturned(new BigInteger("0"));
-	searchResultsType.setNumberOfRecordsMatched(new BigInteger("0"));
+	ArrayList<Element> out = new ArrayList<>();
 
 	mappedResultSet.getException().getErrorInfoList().addAll(message.getException().getErrorInfoList());
 
 	List<ErrorInfo> errorInfoList = mappedResultSet.getException().getErrorInfoList();
+
 	for (ErrorInfo errorInfo : errorInfoList) {
 
 	    ValidationMessage validationMessage = new ValidationMessage();
@@ -273,10 +312,10 @@ public class CSWResultSetFormatter extends DiscoveryResultSetFormatter<Element> 
 
 	    Document doc = builder.parse(new ByteArrayInputStream(outputStream.toString("UTF-8").getBytes(StandardCharsets.UTF_8)));
 
-	    searchResultsType.getAnies().add(doc.getDocumentElement());
+	    out.add(doc.getDocumentElement());
 	}
 
-	recordsResponse.setSearchResults(searchResultsType);
+	return out;
     }
 
     private void sort(SortByType sortBy, List<Element> resultsList) {
@@ -341,20 +380,47 @@ public class CSWResultSetFormatter extends DiscoveryResultSetFormatter<Element> 
 	}
     }
 
-    private void addResults(List<Element> resultsList, SearchResultsType searchResultsType) {
+    /**
+     * @param resultsList
+     * @param errorElements
+     * @param searchResultsType
+     */
+    private void addResults(//
+	    List<Element> resultsList, //
+	    List<Element> errorElements, //
+	    SearchResultsType searchResultsType) {
 
 	for (Element result : resultsList) {
 
 	    searchResultsType.getAnies().add(result);
 	}
+
+	if (errorElements != null) {
+	    
+	    errorElements.forEach(el -> searchResultsType.getAnies().add(el));
+	}
     }
 
     private Response buildResponse(Object response) throws Exception {
 
+	return buildResponse(response, false);
+    }
+
+    private Response buildResponse(Object response, boolean insertXSLtag) throws Exception {
+
 	ResponseBuilder builder = Response.status(Status.OK);
 
-	builder = builder.entity(CommonContext.asString(response, false));
-	builder = builder.type(MediaType.APPLICATION_XML);
+	String stringValue = CommonContext.asString(response, false);
+
+	String type = MediaType.APPLICATION_XML;
+
+	if (insertXSLtag) {
+
+	    stringValue = "<?xml-stylesheet type=\"text/xsl\" href=\"/gs-service/iso-xslt/style.xsl\">\n" + stringValue;
+	}
+
+	builder = builder.entity(stringValue);
+	builder = builder.type(type);
 
 	return builder.build();
     }

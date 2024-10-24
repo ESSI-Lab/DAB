@@ -13,11 +13,7 @@
 	<packaging>pom</packaging>
 
 
-	<dependencies>
-		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-		</dependency>
+	<dependencies>		
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>access-tools</artifactId>
@@ -27,8 +23,10 @@
 	</dependencies>
 
 	<modules>
-		<module>access-tools-downloader-wof</module>
+		<module>access-tools-downloader-s3</module>
+		<module>access-tools-downloader-usgs</module>		
 		<module>access-tools-downloader-wcs</module>
+		<module>access-tools-downloader-wof</module>
 	</modules>
 
 </project>

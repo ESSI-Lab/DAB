@@ -1,0 +1,464 @@
+{
+	"currentVersion": 11,
+	"id": 0,
+	"name": "my_name",
+	"type": "Feature Layer",
+	"serviceItemId": "1010101010101010",
+	"cacheMaxAge": 30,
+	"displayField": "",
+	"description": "my description",
+	"copyrightText": "",
+	"defaultVisibility": true,
+	"editingInfo": {
+		"lastEditDate": $EDITMS,
+		"schemaLastEditDate": $EDITMS,
+		"dataLastEditDate": $EDITMS
+	},
+	"relationships": [],
+	"isDataVersioned": false,
+	"hasContingentValuesDefinition": false,
+	"supportsAppend": true,
+	"supportsCalculate": true,
+	"supportsASyncCalculate": true,
+	"supportsTruncate": true,
+	"supportsAttachmentsByUploadId": true,
+	"supportsAttachmentsResizing": true,
+	"supportsRollbackOnFailureParameter": true,
+	"supportsStatistics": true,
+	"supportsExceedsLimitStatistics": true,
+	"supportsAdvancedQueries": true,
+	"supportsValidateSql": true,
+	"supportsCoordinatesQuantization": false,
+	"supportsLayerOverrides": true,
+	"supportsTilesAndBasicQueriesMode": true,
+	"supportsFieldDescriptionProperty": true,
+	"supportsQuantizationEditMode": true,
+	"supportsApplyEditsWithGlobalIds": false,
+	"supportsReturningQueryGeometry": true,
+	"advancedQueryCapabilities": {
+		"supportsPagination": true,
+		"supportsQueryAttachmentsCountOnly": true,
+		"supportsPaginationOnAggregatedQueries": true,
+		"supportsQueryRelatedPagination": true,
+		"supportsQueryWithDistance": true,
+		"supportsReturningQueryExtent": true,
+		"supportsStatistics": true,
+		"supportsOrderBy": true,
+		"supportsDistinct": true,
+		"supportsQueryWithResultType": true,
+		"supportsSqlExpression": true,
+		"supportsAdvancedQueryRelated": true,
+		"supportsCountDistinct": true,
+		"supportsPercentileStatistics": true,
+		"supportsSpatialAggregationStatistics": true,
+		"supportedSpatialAggregationStatistics": [
+			"EnvelopeAggregate",
+			"CentroidAggregate",
+			"ConvexHullAggregate"
+		],
+		"supportsLod": true,
+		"supportsQueryWithLodSR": false,
+		"supportedLodTypes": [
+			"geohash"
+		],
+		"supportsReturningGeometryCentroid": false,
+		"supportsQueryWithDatumTransformation": true,
+		"supportsHavingClause": true,
+		"supportsOutFieldSQLExpression": true,
+		"supportsMaxRecordCountFactor": true,
+		"supportsTopFeaturesQuery": true,
+		"supportsDisjointSpatialRel": true,
+		"supportsQueryWithCacheHint": true,
+		"supportedOperationsWithCacheHint": [
+			"query",
+			"queryTopFilter",
+			"queryAnalytics",
+			"queryAttachments",
+			"queryRelated"
+		],
+		"supportsQueryAnalytic": true,
+		"supportsDefaultSR": true,
+		"supportsFullTextSearch": true
+	},
+	"advancedQueryAnalyticCapabilities": {
+		"supportsLinearRegression": true,
+		"supportsAsync": true,
+		"supportsPercentileAnalytic": true
+	},
+	"advancedEditingCapabilities": {
+		"supportedSqlFormatsInCalculate": [
+			"standard"
+		],
+		"supportsAsyncApplyEdits": true,
+		"supportsReturnEditResults": true,
+		"supportsApplyEditsbyUploadID": true,
+		"supportedApplyEditsUploadIDFormats": "JSON"
+	},
+	"infoInEstimates": [
+		"extent",
+		"count"
+	],
+	"useStandardizedQueries": true,
+	"geometryType": "esriGeometryPoint",
+	"minScale": 0,
+	"maxScale": 0,
+	"drawingInfo": {
+		"renderer": {
+			"type": "uniqueValue",
+			"field1": "whosPage",
+			"field2": null,
+			"field3": null,
+			"defaultSymbol": {
+				"type": "esriSMS",
+				"style": "esriSMSCircle",
+				"color": [
+					0,
+					255,
+					0,
+					255
+				],
+				"size": 4,
+				"angle": 0,
+				"xoffset": 0,
+				"yoffset": 0,
+				"outline": {
+					"color": [
+						0,
+						0,
+						0,
+						255
+					],
+					"width": 1
+				}
+			},
+			"defaultLabel": "Time series data available",
+			"uniqueValueInfos": [
+				{
+					"value": "not available",
+					"label": "Time series data not available",
+					"description": "",
+					"symbol": {
+						"type": "esriSMS",
+						"style": "esriSMSCircle",
+						"color": [
+							0,
+							0,
+							255,
+							255
+						],
+						"size": 4,
+						"angle": 0,
+						"xoffset": 0,
+						"yoffset": 0,
+						"outline": {
+							"color": [
+								0,
+								0,
+								0,
+								255
+							],
+							"width": 1
+						}
+					}
+				}
+			],
+			"label": "",
+			"description": ""
+		},
+		"transparency": 0,
+		"labelingInfo": null
+	},
+	"allowGeometryUpdates": true,
+	"hasAttachments": false,
+	"htmlPopupType": "esriServerHTMLPopupTypeNone",
+	"hasM": false,
+	"hasZ": false,
+	"objectIdField": "ObjectId",
+	"globalIdField": "",
+	"typeIdField": "",
+	"fields": [
+		{
+			"name": "OBJECTID",
+			"type": "esriFieldTypeOID",
+			"alias": "OBJECTID",
+			"sqlType": "sqlTypeOther",
+			"nullable": false,
+			"editable": false,
+			"domain": null,
+			"defaultValue": null
+		},
+		{
+			"name": "date",
+			"type": "esriFieldTypeDate",
+			"alias": "date",
+			"sqlType": "sqlTypeOther",
+			"length": 8,
+			"nullable": true,
+			"editable": true,
+			"domain": null,
+			"defaultValue": null
+		},
+		{
+			"name": "time",
+			"type": "esriFieldTypeString",
+			"alias": "time",
+			"sqlType": "sqlTypeOther",
+			"length": 8000,
+			"nullable": true,
+			"editable": true,
+			"domain": null,
+			"defaultValue": null
+		},
+		{
+			"name": "latitude",
+			"type": "esriFieldTypeDouble",
+			"alias": "latitude",
+			"sqlType": "sqlTypeOther",
+			"nullable": true,
+			"editable": true,
+			"domain": null,
+			"defaultValue": null
+		},
+		{
+			"name": "longitude",
+			"type": "esriFieldTypeDouble",
+			"alias": "longitude",
+			"sqlType": "sqlTypeOther",
+			"nullable": true,
+			"editable": true,
+			"domain": null,
+			"defaultValue": null
+		},
+		{
+			"name": "depth",
+			"type": "esriFieldTypeDouble",
+			"alias": "depth",
+			"sqlType": "sqlTypeOther",
+			"nullable": true,
+			"editable": true,
+			"domain": null,
+			"defaultValue": null
+		},
+		{
+			"name": "mag",
+			"type": "esriFieldTypeDouble",
+			"alias": "mag",
+			"sqlType": "sqlTypeOther",
+			"nullable": true,
+			"editable": true,
+			"domain": null,
+			"defaultValue": null
+		},
+		{
+			"name": "magType",
+			"type": "esriFieldTypeString",
+			"alias": "magType",
+			"sqlType": "sqlTypeOther",
+			"length": 8000,
+			"nullable": true,
+			"editable": true,
+			"domain": null,
+			"defaultValue": null
+		},
+		{
+			"name": "nst",
+			"type": "esriFieldTypeInteger",
+			"alias": "nst",
+			"sqlType": "sqlTypeOther",
+			"nullable": true,
+			"editable": true,
+			"domain": null,
+			"defaultValue": null
+		},
+		{
+			"name": "gap",
+			"type": "esriFieldTypeDouble",
+			"alias": "gap",
+			"sqlType": "sqlTypeOther",
+			"nullable": true,
+			"editable": true,
+			"domain": null,
+			"defaultValue": null
+		},
+		{
+			"name": "dmin",
+			"type": "esriFieldTypeDouble",
+			"alias": "dmin",
+			"sqlType": "sqlTypeOther",
+			"nullable": true,
+			"editable": true,
+			"domain": null,
+			"defaultValue": null
+		},
+		{
+			"name": "rms",
+			"type": "esriFieldTypeDouble",
+			"alias": "rms",
+			"sqlType": "sqlTypeOther",
+			"nullable": true,
+			"editable": true,
+			"domain": null,
+			"defaultValue": null
+		},
+		{
+			"name": "net",
+			"type": "esriFieldTypeString",
+			"alias": "net",
+			"sqlType": "sqlTypeOther",
+			"length": 8000,
+			"nullable": true,
+			"editable": true,
+			"domain": null,
+			"defaultValue": null
+		},
+		{
+			"name": "id",
+			"type": "esriFieldTypeString",
+			"alias": "id",
+			"sqlType": "sqlTypeOther",
+			"length": 8000,
+			"nullable": true,
+			"editable": true,
+			"domain": null,
+			"defaultValue": null
+		},
+		{
+			"name": "updated",
+			"type": "esriFieldTypeString",
+			"alias": "updated",
+			"sqlType": "sqlTypeOther",
+			"length": 8000,
+			"nullable": true,
+			"editable": true,
+			"domain": null,
+			"defaultValue": null
+		},
+		{
+			"name": "place",
+			"type": "esriFieldTypeString",
+			"alias": "place",
+			"sqlType": "sqlTypeOther",
+			"length": 8000,
+			"nullable": true,
+			"editable": true,
+			"domain": null,
+			"defaultValue": null
+		},
+		{
+			"name": "type",
+			"type": "esriFieldTypeString",
+			"alias": "type",
+			"sqlType": "sqlTypeOther",
+			"length": 8000,
+			"nullable": true,
+			"editable": true,
+			"domain": null,
+			"defaultValue": null
+		},
+		{
+			"name": "horizontalError",
+			"type": "esriFieldTypeDouble",
+			"alias": "horizontalError",
+			"sqlType": "sqlTypeOther",
+			"nullable": true,
+			"editable": true,
+			"domain": null,
+			"defaultValue": null
+		},
+		{
+			"name": "depthError",
+			"type": "esriFieldTypeDouble",
+			"alias": "depthError",
+			"sqlType": "sqlTypeOther",
+			"nullable": true,
+			"editable": true,
+			"domain": null,
+			"defaultValue": null
+		},
+		{
+			"name": "magError",
+			"type": "esriFieldTypeDouble",
+			"alias": "magError",
+			"sqlType": "sqlTypeOther",
+			"nullable": true,
+			"editable": true,
+			"domain": null,
+			"defaultValue": null
+		},
+		{
+			"name": "magNst",
+			"type": "esriFieldTypeInteger",
+			"alias": "magNst",
+			"sqlType": "sqlTypeOther",
+			"nullable": true,
+			"editable": true,
+			"domain": null,
+			"defaultValue": null
+		},
+		{
+			"name": "status",
+			"type": "esriFieldTypeString",
+			"alias": "status",
+			"sqlType": "sqlTypeOther",
+			"length": 8000,
+			"nullable": true,
+			"editable": true,
+			"domain": null,
+			"defaultValue": null
+		},
+		{
+			"name": "locationSource",
+			"type": "esriFieldTypeString",
+			"alias": "locationSource",
+			"sqlType": "sqlTypeOther",
+			"length": 8000,
+			"nullable": true,
+			"editable": true,
+			"domain": null,
+			"defaultValue": null
+		},
+		{
+			"name": "magSource",
+			"type": "esriFieldTypeString",
+			"alias": "magSource",
+			"sqlType": "sqlTypeOther",
+			"length": 8000,
+			"nullable": true,
+			"editable": true,
+			"domain": null,
+			"defaultValue": null
+		}
+	],
+	"indexes": [],
+	"dateFieldsTimeReference": {
+		"timeZone": "UTC",
+		"respectsDaylightSaving": false
+	},
+	"preferredTimeReference": null,
+	"types": [],
+	"templates": [],
+	"supportedQueryFormats": "JSON, geoJSON",
+	"supportedAppendFormats": "sqlite,geoPackage,shapefile,filegdb,featureCollection,geojson,csv,excel",
+	"supportedExportFormats": "csv,shapefile,sqlite,geoPackage,filegdb,featureCollection,geojson,excel",
+	"supportedSpatialRelationships": [
+		"esriSpatialRelIntersects",
+		"esriSpatialRelContains",
+		"esriSpatialRelCrosses",
+		"esriSpatialRelEnvelopeIntersects",
+		"esriSpatialRelIndexIntersects",
+		"esriSpatialRelOverlaps",
+		"esriSpatialRelTouches",
+		"esriSpatialRelWithin",
+		"esriSpatialRelDisjoint",
+		"esriSpatialRelRelation"
+	],
+	"supportedContingentValuesFormats": "JSON",
+	"supportedSyncDataOptions": 4,
+	"hasStaticData": true,
+	"maxRecordCount": 1000,
+	"standardMaxRecordCount": 32000,
+	"standardMaxRecordCountNoGeometry": 32000,
+	"tileMaxRecordCount": 8000,
+	"maxRecordCountFactor": 1,
+	"capabilities": "Query"
+}

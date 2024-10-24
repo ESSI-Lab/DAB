@@ -7,7 +7,7 @@ package eu.essi_lab.cfga.gs.setting.driver;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,6 +29,7 @@ import java.util.List;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.EditableSetting;
+import eu.essi_lab.cfga.gs.setting.TabIndex;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
@@ -66,7 +67,7 @@ public abstract class DriverSetting extends Setting implements EditableSetting {
 	    setComponentName(DriverSetting.class.getName());
 
 	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(6).//
+		    withIndex(TabIndex.DRIVER_SETTING.getIndex()).//
 		    withShowDirective("Repository").//
 		    build();
 

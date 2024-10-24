@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gs.task;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -36,6 +36,7 @@ import com.vaadin.flow.data.provider.SortDirection;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.TabIndex;
 import eu.essi_lab.cfga.gs.setting.harvesting.SchedulerSupport;
 import eu.essi_lab.cfga.gs.setting.menuitems.RowValuesFormatterMenuItem;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
@@ -72,6 +73,11 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
      * 
      */
     private static final String TASK_NAME_OPTION_KEY = "taskNameOption";
+
+    /**
+     * 
+     */
+    private static final String TASK_DESCRIPTION_OPTION_KEY = "taskDescription";
 
     /**
      * 
@@ -122,10 +128,22 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 		cannotBeDisabled().//
 		withSingleSelection().//
 		withValuesLoader(new CustomTaskValuesLoader()).//
+		withValues(CustomTaskValuesLoader.getValues()).//
+		withSelectedValue(DefaultCustomTask.getTaskName()).//
 		required().//
 		build();
 
 	addOption(taskNameOption);
+
+	Option<String> taskDescriptionOption = StringOptionBuilder.get().//
+		withKey(TASK_DESCRIPTION_OPTION_KEY).//
+		withLabel("Task description").//
+		withValue("No description provided").//
+		cannotBeDisabled().//
+		required().//
+		build();
+
+	addOption(taskDescriptionOption);
 
 	Option<String> taskOptionsOption = StringOptionBuilder.get().//
 		withKey(TASK_OPTIONS_OPTION_KEY).//
@@ -167,19 +185,20 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
      */
     public static class CustomTaskValuesLoader extends ValuesLoader<String> {
 
+	public static List<String> getValues() {
+
+	    ServiceLoader<CustomTask> loader = ServiceLoader.load(CustomTask.class);
+
+	    return StreamUtils.iteratorToStream(loader.iterator()).//
+		    map(t -> t.getName()).//
+		    sorted().//
+		    collect(Collectors.toList());
+	}
+
 	@Override
 	protected List<String> loadValues(Optional<String> input) throws Exception {
 
-	    ServiceLoader<CustomTask> loader = ServiceLoader.load(CustomTask.class);
-
-	    return StreamUtils.iteratorToStream(loader.iterator()).map(t -> t.getName()).collect(Collectors.toList());
-	}
-
-	static String getFirstValue() {
-
-	    ServiceLoader<CustomTask> loader = ServiceLoader.load(CustomTask.class);
-
-	    return StreamUtils.iteratorToStream(loader.iterator()).map(t -> t.getName()).findFirst().get();
+	    return getValues();
 	}
     }
 
@@ -196,7 +215,7 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 	    setComponentName(CustomTaskSetting.class.getName());
 
 	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(13).//
+		    withIndex(TabIndex.CUSTOM_TASKS_SETTING.getIndex()).//
 		    withShowDirective("Custom tasks", SortDirection.ASCENDING).//
 
 		    withAddDirective(//
@@ -207,10 +226,16 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 		    withEditDirective("Edit task", ConfirmationPolicy.ON_WARNINGS).//
 
 		    withGridInfo(Arrays.asList(//
+			    
+			    ColumnDescriptor.create("Id", true, true, false, (s) -> s.getIdentifier()),//
 
 			    ColumnDescriptor.create("Name", true, true, (s) -> getName(s)), //
 
-			    ColumnDescriptor.create("Repeat (D-h)", 130, true, true,
+			    ColumnDescriptor.create("Description", true, true, (s) -> getDescription(s)), //
+
+			    ColumnDescriptor.create("Repeat count", 50, true, true, (s) -> SchedulerSupport.getInstance().getRepeatCount(s)), //
+
+			    ColumnDescriptor.create("Repeat interval", 50, true, true,
 				    (s) -> SchedulerSupport.getInstance().getRepeatInterval(s)), //
 
 			    ColumnDescriptor.create("Status", 100, true, true, (s) -> SchedulerSupport.getInstance().getJobPhase(s)), //
@@ -241,6 +266,7 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 	private List<ContextMenuItem> getItemsList() {
 
 	    ArrayList<ContextMenuItem> list = new ArrayList<>();
+//	    list.add(new CustomTaskSettingEditorMenuItem());
 	    list.add(new RowValuesFormatterMenuItem());
 	    list.add(new CustomTaskStarter());
 
@@ -251,9 +277,18 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 	 * @param setting
 	 * @return
 	 */
+	private String getDescription(Setting setting) {
+
+	    return setting.getObject().getJSONObject(TASK_DESCRIPTION_OPTION_KEY).getJSONArray("values").getString(0);
+	}
+
+	/**
+	 * @param setting
+	 * @return
+	 */
 	private String getName(Setting setting) {
 
-	    return setting.getObject().getJSONObject("taskNameOption").getJSONArray("values").getString(0);
+	    return setting.getObject().getJSONObject(TASK_NAME_OPTION_KEY).getJSONArray("values").getString(0);
 	}
     }
 
@@ -302,6 +337,18 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 	    //
 	    //
 
+	    String taskDescription = thisSetting.getTaskDescription();
+
+	    if (taskDescription == null || taskDescription.trim().isEmpty()) {
+
+		validationResponse.getErrors().add("Task description missing");
+		validationResponse.setResult(ValidationResult.VALIDATION_FAILED);
+	    }
+
+	    //
+	    //
+	    //
+
 	    Scheduling scheduling = thisSetting.getScheduling();
 
 	    DateTimeZone userDateTimeZone = ConfigurationWrapper.getSchedulerSetting().getUserDateTimeZone();
@@ -326,6 +373,22 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
     public void setTaskOptions(String options) {
 
 	getOption(TASK_OPTIONS_OPTION_KEY, String.class).get().setValue(options);
+    }
+
+    /**
+     * @return
+     */
+    public String getTaskDescription() {
+
+	return getOption(TASK_DESCRIPTION_OPTION_KEY, String.class).get().getValue();
+    }
+
+    /**
+     * @param desc
+     */
+    public void setTaskDescription(String desc) {
+
+	getOption(TASK_DESCRIPTION_OPTION_KEY, String.class).get().setValue(desc);
     }
 
     /**
@@ -366,17 +429,17 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
     /**
      * @return
      */
-    public void setTaskName(String name) {
+    public void selectTaskName(String name) {
 
-	getOption(TASK_NAME_OPTION_KEY, String.class).get().setValue(name);
+	getOption(TASK_NAME_OPTION_KEY, String.class).get().select(n -> n.equals(name));
     }
 
     /**
      * @return
      */
-    public String getTaskName() {
+    public String getSelectedTaskName() {
 
-	return getOption(TASK_NAME_OPTION_KEY, String.class).get().getValue();
+	return getOption(TASK_NAME_OPTION_KEY, String.class).get().getSelectedValue();
     }
 
     /**
@@ -386,7 +449,7 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 
 	ServiceLoader<CustomTask> loader = ServiceLoader.load(CustomTask.class);
 
-	String taskName = getTaskName();
+	String taskName = getSelectedTaskName();
 
 	if (taskName != null) {
 
@@ -406,6 +469,15 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
     }
 
     /**
+     * @return
+     */
+    @Override
+    public String getWorkerName() {
+
+	return getSelectedTaskName();
+    }
+
+    /**
      * @param object
      */
     public CustomTaskSetting(JSONObject object) {
@@ -420,5 +492,9 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 
 	super(object);
     }
-
+    
+    public static void main(String[] args) {
+	
+	System.out.println(new CustomTaskSetting());
+    }
 }

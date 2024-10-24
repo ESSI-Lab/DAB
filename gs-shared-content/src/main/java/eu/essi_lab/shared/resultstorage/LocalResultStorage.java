@@ -4,7 +4,7 @@ package eu.essi_lab.shared.resultstorage;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,7 @@ package eu.essi_lab.shared.resultstorage;
 
 import java.io.File;
 
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.shared.SharedContent;
 import eu.essi_lab.model.shared.SharedContent.SharedContentCategory;
 import eu.essi_lab.model.shared.SharedContent.SharedContentType;
@@ -44,7 +44,7 @@ public class LocalResultStorage extends ResultStorage {
     /**
      * @param resultStorageURI
      */
-    public LocalResultStorage(StorageUri storageURI) {
+    public LocalResultStorage(StorageInfo storageURI) {
 
 	super(storageURI);
     }

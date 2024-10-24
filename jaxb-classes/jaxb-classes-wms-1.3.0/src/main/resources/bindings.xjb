@@ -8,6 +8,11 @@
         <jaxb:schemaBindings>
             <jaxb:package name="eu.essi_lab.jaxb.wms._1_3_0"/>
         </jaxb:schemaBindings>
+    </jaxb:bindings>
+    <jaxb:bindings schemaLocation="schemas/exceptions_1_3_0.xsd">
+        <jaxb:schemaBindings>
+            <jaxb:package name="eu.essi_lab.jaxb.wms.exceptions._1_3_0"/>
+        </jaxb:schemaBindings>
     </jaxb:bindings>   
     <jaxb:bindings schemaLocation="schemas/xlink.xsd">
         <jaxb:schemaBindings>

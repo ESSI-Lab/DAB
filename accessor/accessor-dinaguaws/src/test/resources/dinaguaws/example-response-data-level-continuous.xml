@@ -1,0 +1,979 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:getNivelesEstacionResponse xmlns:ns="http://services.com" xmlns:ax21="http://entity.com/xsd">
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-19 21:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-19 21:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-19 22:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-19 22:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-19 23:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-19 23:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 00:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 00:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 01:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 01:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 02:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 02:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 03:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 03:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 04:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 04:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 05:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 05:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 06:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 06:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 07:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 07:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 08:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.38</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 08:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.36</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 09:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.36</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 09:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.36</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 10:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.36</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 10:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.36</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 11:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.35</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 11:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.36</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 12:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.36</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 12:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.36</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 13:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.36</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 13:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.36</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 14:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.37</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 14:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.36</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 15:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.36</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 15:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.37</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 16:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.37</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 16:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.37</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 17:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.4</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 17:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.4</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 18:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.4</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 18:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 19:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 19:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 20:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 20:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 21:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 21:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 22:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.4</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 22:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 23:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 23:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 00:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 00:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 01:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 01:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 02:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 02:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 03:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 03:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.38</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 04:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 04:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 05:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 05:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 06:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 06:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.38</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 07:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.37</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 07:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.37</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 08:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.36</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 08:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.36</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 09:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.35</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 09:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.36</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 10:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.36</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 10:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.36</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 11:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.36</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 11:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.36</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 12:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.36</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 12:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.36</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 13:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.36</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 13:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.37</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 14:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.36</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 14:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.37</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 15:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.36</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 15:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.4</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 16:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 16:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 17:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.36</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 17:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.4</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 18:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 18:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 19:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 19:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 20:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 20:30:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 21:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Ingresado</ax21:tipo_de_calculo>
+            <ax21:valor>0.39</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+      </ns:getNivelesEstacionResponse>
+   </soapenv:Body>
+</soapenv:Envelope>
+

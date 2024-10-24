@@ -4,7 +4,7 @@ package eu.essi_lab.api.database.vol;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,15 +26,17 @@ import java.util.List;
 import java.util.Optional;
 
 import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.SourceStorage;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.cfga.gs.setting.database.SourceStorageSetting;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.HarvestingProperties;
+import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.HarvestingStrategy;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 
 /**
@@ -44,29 +46,22 @@ public class VolatileSourceStorage implements SourceStorage {
 
     private VolatileDatabase database;
     private SourceStorageSetting setting;
-    private StorageUri dbUri;
+    private StorageInfo dbUri;
     private String startTimeStamp;
 
-    @SuppressWarnings("rawtypes")
+    @Override
+    public boolean supports(StorageInfo dbUri) {
+
+	this.dbUri = dbUri;
+
+	return dbUri.getName() != null && //
+		dbUri.getName().equals(DatabaseSetting.VOLATILE_DB_STORAGE_NAME);
+    }
+
     @Override
     public void setDatabase(Database db) {
 
 	this.database = (VolatileDatabase) db;
-    }
-
-    @Override
-    public boolean supports(StorageUri dbUri) {
-
-	this.dbUri = dbUri;
-
-	return dbUri.getStorageName() != null && //
-		dbUri.getStorageName().equals(DatabaseSetting.VOLATILE_DB_STORAGE_NAME);
-    }
-
-    @Override
-    public StorageUri getStorageUri() {
-
-	return this.dbUri;
     }
 
     @Override
@@ -88,34 +83,29 @@ public class VolatileSourceStorage implements SourceStorage {
     }
 
     @Override
-    public void harvestingStarted(GSSource source, HarvestingStrategy strategy, boolean recovery) throws GSException {
-
-	harvestingStarted(source, strategy, recovery, null);
-    }
-
-    @Override
-    public void harvestingEnded(GSSource source, HarvestingStrategy strategy) throws GSException {
-
-	harvestingEnded(source, strategy, null);
-    }
-
-    @Override
-    public void harvestingStarted(GSSource source, HarvestingStrategy strategy, boolean recovery, Optional<SchedulerJobStatus> status)
-	    throws GSException {
+    public void harvestingStarted(//
+	    GSSource source, //
+	    HarvestingStrategy strategy, //
+	    boolean recovery, //
+	    boolean resume, //
+	    Optional<SchedulerJobStatus> status) throws GSException {
 
 	startTimeStamp = ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds();
     }
 
     @Override
-    public void harvestingEnded(GSSource source, HarvestingStrategy strategy, Optional<SchedulerJobStatus> status) throws GSException {
+    public void harvestingEnded(//
+	    GSSource source, //
+	    Optional<HarvestingProperties> optProperties, //
+	    HarvestingStrategy strategy, //
+	    Optional<SchedulerJobStatus> status, //
+	    Optional<ListRecordsRequest> request) throws GSException {
 
-	HarvestingProperties properties = new HarvestingProperties();
+	HarvestingProperties properties = optProperties.orElse(new HarvestingProperties());
 
 	properties = retrieveHarvestingProperties(source);
 
-	int harvCount = properties.getHarvestingCount();
-
-	properties.setHarvestingCount(harvCount == -1 ? 1 : harvCount++);
+	properties.incrementHarvestingCount();
 
 	int size = (int) getDatabase().//
 		getResourcesList().//
@@ -173,5 +163,11 @@ public class VolatileSourceStorage implements SourceStorage {
     public SourceStorageSetting getSetting() {
 
 	return this.setting;
+    }
+
+    @Override
+    public Optional<DatabaseFolder> getDataFolder(String sourceIdentifier, boolean writingFolder) throws GSException {
+
+	return Optional.empty();
     }
 }

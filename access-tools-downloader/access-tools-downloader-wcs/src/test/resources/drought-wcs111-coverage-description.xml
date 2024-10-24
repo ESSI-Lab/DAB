@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<CoverageDescriptions xmlns="http://www.opengis.net/wcs/1.1" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ogc="http://www.opengis.net/ogc" xsi:schemaLocation="http://www.opengis.net/wcs/1.1 http://schemas.opengis.net/wcs/1.1/wcsDescribeCoverage.xsd http://www.opengis.net/ows/1.1 http://schemas.opengis.net/ows/1.1.0/owsAll.xsd">
+  <CoverageDescription>
+    <ows:Title>drought.2012.065</ows:Title>
+    <ows:Abstract/>
+    <Identifier>drought.2012.065</Identifier>
+    <Domain>
+      <SpatialDomain>
+        <ows:BoundingBox crs="urn:ogc:def:crs:OGC::imageCRS" dimensions="2">
+          <ows:LowerCorner>0 0</ows:LowerCorner>
+          <ows:UpperCorner>172799 67199</ows:UpperCorner>
+        </ows:BoundingBox>
+        <ows:BoundingBox crs="" dimensions="2">
+          <ows:LowerCorner>-20015109.354 -6671703.118005</ows:LowerCorner>
+          <ows:UpperCorner>20015109.354012 8895604.157333</ows:UpperCorner>
+        </ows:BoundingBox>
+        <ows:WGS84BoundingBox dimensions="2">
+          <ows:LowerCorner>-179.999999954707 -59.9999999946568</ows:LowerCorner>
+          <ows:UpperCorner>179.999999954923 79.9999999928128</ows:UpperCorner>
+        </ows:WGS84BoundingBox>
+        <GridCRS>
+          <GridBaseCRS/>
+          <GridType>urn:ogc:def:method:WCS:1.1:2dSimpleGrid</GridType>
+          <GridOrigin>-20014993.5258209 8895488.32915387</GridOrigin>
+          <GridOffsets>231.656358263958 -231.656358263958</GridOffsets>
+          <GridCS>urn:ogc:def:cs:OGC:0.0:Grid2dSquareCS</GridCS>
+        </GridCRS>
+      </SpatialDomain>
+    </Domain>
+    <Range>
+      <Field>
+        <ows:Title>drought</ows:Title>
+        <Identifier>drought 2012</Identifier>
+        <Definition>
+          <ows:AnyValue/>
+        </Definition>
+        <InterpolationMethods>
+          <InterpolationMethod>bilinear</InterpolationMethod>
+          <Default>nearest neighbor</Default>
+        </InterpolationMethods>
+        <Axis identifier="bands">
+          <AvailableKeys>
+            <Key>1</Key>
+          </AvailableKeys>
+        </Axis>
+      </Field>
+    </Range>
+    <SupportedFormat>image/tiff</SupportedFormat>
+  </CoverageDescription>
+</CoverageDescriptions>

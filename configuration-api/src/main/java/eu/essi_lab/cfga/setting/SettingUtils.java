@@ -7,7 +7,7 @@ package eu.essi_lab.cfga.setting;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,6 +28,7 @@ import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Semaphore;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -35,6 +36,7 @@ import java.util.stream.Collectors;
 
 import org.json.JSONException;
 
+import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
@@ -296,5 +298,31 @@ public class SettingUtils {
 	action.accept(setting);
 
 	setting.getSettings().forEach(s -> deepPerform(s, action));
+    }
+
+    /**
+     * @param option
+     * @param input
+     */
+    public static <T> void loadValues(Option<T> option, Optional<String> input) {
+
+	option.getLoader().ifPresent(loader -> {
+
+	    Semaphore semaphore = new Semaphore(0);
+
+	    loader = option.getLoader().get();
+	    loader.load((val, exception) -> {
+
+		option.setValues(val);
+
+		semaphore.release();
+
+	    }, input);
+
+	    try {
+		semaphore.acquire();
+	    } catch (InterruptedException e) {
+	    }
+	});
     }
 }

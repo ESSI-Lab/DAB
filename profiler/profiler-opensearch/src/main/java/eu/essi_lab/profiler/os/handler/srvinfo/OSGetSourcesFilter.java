@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.os.handler.srvinfo;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -48,14 +48,14 @@ public class OSGetSourcesFilter implements WebRequestFilter {
      * @return
      */
     public static boolean isGetSourcesQuery(WebRequest request) {
-	
+
 	Optional<String> formData = request.getFormData();
-	
-	if(!formData.isPresent()){
-	    
+
+	if (!formData.isPresent()) {
+
 	    return false;
 	}
-	
+
 	KeyValueParser keyValueParser = new KeyValueParser(formData.get());
 	OSRequestParser parser = new OSRequestParser(keyValueParser);
 
@@ -65,9 +65,10 @@ public class OSGetSourcesFilter implements WebRequestFilter {
 	OSParameter id = WebRequestParameter.findParameter(OSParameters.ID.getName(), OSParameters.class);
 
 	String idValue = parser.parse(id);
+	String queryString = request.getQueryString();
 
-	return ((sourcesValue != null && sourcesValue.equals("ROOT"))
-		|| (request.getQueryString().toLowerCase().contains("getcontent") && idValue.equals("ROOT")));
+	return ((sourcesValue != null && sourcesValue.equals("ROOT")) || //
+		(queryString != null && queryString.toLowerCase().contains("getcontent") && idValue.equals("ROOT")));
 
     }
 }

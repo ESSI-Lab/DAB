@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gs.setting.distribution;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,6 +28,7 @@ import org.json.JSONObject;
 import com.vaadin.flow.data.provider.SortDirection;
 
 import eu.essi_lab.cfga.gs.setting.BrokeringSetting;
+import eu.essi_lab.cfga.gs.setting.TabIndex;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSettingLoader;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
@@ -127,10 +128,10 @@ public class DistributionSetting extends Setting implements BrokeringSetting {
 	    setComponentName(AccessorSetting.class.getName());
 
 	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(1).//
+		    withIndex(TabIndex.DISTRIBUTION_SETTING.getIndex()).//
 		    withShowDirective("Distribution", SortDirection.ASCENDING).//
 		    withAddDirective("Add distributed accessor", DistributionSetting.class).//
-		    withRemoveDirective("Remove accessor", false, DistributionSetting.class).//
+		    withRemoveDirective("Remove accessor", true, DistributionSetting.class).//
 		    withEditDirective("Edit accessor", ConfirmationPolicy.ON_WARNINGS).//
 		    build();
 

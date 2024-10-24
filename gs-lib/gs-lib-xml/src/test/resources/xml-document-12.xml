@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Capabilities xmlns:gml="http://www.opengis.net/gml" xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:swe="http://www.opengis.net/swe/1.0.1" xmlns:om="http://www.opengis.net/om/1.0"
+  xmlns="http://www.opengis.net/sos/1.0" xmlns:sos="http://www.opengis.net/sos/1.0"
+  xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:ogc="http://www.opengis.net/ogc"
+  xmlns:tml="http://www.opengis.net/tml" xmlns:sml="http://www.opengis.net/sensorML/1.0.1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.opengis.net/sos/1.0 http://schemas.opengis.net/sos/1.0.0/sosGetCapabilities.xsd"
+  version="1.0.0">
+  <ows:ServiceIdentification>
+    <ows:Title>IST Sensor Observation Service</ows:Title>
+    <ows:Abstract>monitoring network</ows:Abstract>
+    <ows:Keywords>
+      <ows:Keyword>SOS</ows:Keyword>
+      <ows:Keyword>SENSOR</ows:Keyword>
+      <ows:Keyword>NETWORK</ows:Keyword>
+    </ows:Keywords>
+    <ows:ServiceType codeSpace="http://opengeospatial.net">OGC:SOS</ows:ServiceType>
+    <ows:ServiceTypeVersion>1.0.0</ows:ServiceTypeVersion>
+    <ows:Fees>NONE</ows:Fees>
+    <ows:AccessConstraints>NONE</ows:AccessConstraints>
+  </ows:ServiceIdentification>
+  <ows:ServiceProvider>
+    <ows:ProviderName>IGRAC</ows:ProviderName>
+    <ows:ProviderSite xlink:href="https://www.un-igrac.org/"/>
+    <ows:ServiceContact>
+      <ows:IndividualName>IGRAC</ows:IndividualName>
+      <ows:PositionName/>
+      <ows:ContactInfo>
+        <ows:Phone>
+          <ows:Voice>+31 152152325</ows:Voice>
+          <ows:Facsimile/>
+        </ows:Phone>
+        <ows:Address>
+          <ows:DeliveryPoint>Westvest 7</ows:DeliveryPoint>
+          <ows:City>DELFT</ows:City>
+          <ows:AdministrativeArea/>
+          <ows:PostalCode>2611AX</ows:PostalCode>
+          <ows:Country>Netherlands</ows:Country>
+          <ows:ElectronicMailAddress>info@un-igrac.org</ows:ElectronicMailAddress>
+        </ows:Address>
+      </ows:ContactInfo>
+    </ows:ServiceContact>
+  </ows:ServiceProvider>
+  <ows:OperationsMetadata>
+    <ows:Operation name="GetCapabilities">
+      <ows:DCP>
+        <ows:HTTP>
+          <ows:Get xlink:href="http://127.0.0.1/istsos/istsos"/>
+          <ows:Post xlink:href="http://127.0.0.1/istsos/istsos"/>
+        </ows:HTTP>
+      </ows:DCP>
+      <ows:Parameter name="service">
+        <ows:AllowedValues>
+          <ows:Value>SOS</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+      <ows:Parameter name="acceptversions">
+        <ows:AllowedValues>
+          <ows:Value>1.0.0</ows:Value>
+          <ows:Value>1.0.1</ows:Value>
+          <ows:Value>2.0.0</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+      <ows:Parameter name="section">
+        <ows:AllowedValues>
+          <ows:Value>serviceidentification</ows:Value>
+          <ows:Value>serviceprovider</ows:Value>
+          <ows:Value>operationsmetadata</ows:Value>
+          <ows:Value>contents</ows:Value>
+          <ows:Value>all</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+    </ows:Operation>
+    <ows:Operation name="DescribeSensor">
+      <ows:DCP>
+        <ows:HTTP>
+          <ows:Get xlink:href="http://127.0.0.1/istsos/istsos"/>
+          <ows:Post xlink:href="http://127.0.0.1/istsos/istsos"/>
+        </ows:HTTP>
+      </ows:DCP>
+      <ows:Parameter name="service">
+        <ows:AllowedValues>
+          <ows:Value>SOS</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+      <ows:Parameter name="version">
+        <ows:AllowedValues>
+          <ows:Value>1.0.0</ows:Value>
+          <ows:Value>1.0.1</ows:Value>
+          <ows:Value>2.0.0</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+      <ows:Parameter name="procedure">
+        <ows:AllowedValues>
+          <ows:Value>urn:ogc:def:procedure:x-istsos:1.0:00026X0040/P1</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+      <ows:Parameter name="outputFormat">
+        <ows:AllowedValues>
+          <ows:Value>text/xml;subtype=&quot;sensorML/1.0.1&quot;</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+    </ows:Operation>
+    <ows:Operation name="GetObservation">
+      <ows:DCP>
+        <ows:HTTP>
+          <ows:Get xlink:href="http://127.0.0.1/istsos/istsos"/>
+          <ows:Post xlink:href="http://127.0.0.1/istsos/istsos"/>
+        </ows:HTTP>
+      </ows:DCP>
+      <ows:Parameter name="service">
+        <ows:AllowedValues>
+          <ows:Value>SOS</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+      <ows:Parameter name="version">
+        <ows:AllowedValues>
+          <ows:Value>1.0.0</ows:Value>
+          <ows:Value>1.0.1</ows:Value>
+          <ows:Value>2.0.0</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+      <ows:Parameter name="srsName">
+        <ows:AllowedValues>
+          <ows:Value>urn:ogc:crs:EPSG:4326</ows:Value>
+          <ows:Value>urn:ogc:crs:EPSG:3857</ows:Value>
+          <ows:Value>urn:ogc:crs:EPSG:2056</ows:Value>
+          <ows:Value>urn:ogc:crs:EPSG:21781</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+      <ows:Parameter name="offering">
+        <ows:AllowedValues>
+          <ows:Value>urn:ogc:def:offering:x-istsos:1.0:measurement</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+      <ows:Parameter name="eventTime">
+        <ows:AllowedValues>
+          <ows:Range>
+            <ows:MinimumValue>1836-02-29 00:00:00+00:00</ows:MinimumValue>
+            <ows:MaximumValue>2024-12-14 14:15:00+00:00</ows:MaximumValue>
+          </ows:Range>
+        </ows:AllowedValues>
+      </ows:Parameter>
+      <ows:Parameter name="procedure">
+        <ows:AllowedValues>
+          <ows:Value>urn:ogc:def:feature:x-istsos:1.0:Water well:WRK959783</ows:Value>
+       </ows:AllowedValues>
+      </ows:Parameter>
+      <ows:Parameter name="srsName">
+        <ows:AllowedValues>
+          <ows:Value>urn:ogc:crs:EPSG:4326</ows:Value>
+          <ows:Value>urn:ogc:crs:EPSG:3857</ows:Value>
+          <ows:Value>urn:ogc:crs:EPSG:2056</ows:Value>
+          <ows:Value>urn:ogc:crs:EPSG:21781</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+    </ows:Operation>
+    <ows:Operation name="RegisterSensor">
+      <ows:DCP>
+        <ows:HTTP>
+          <ows:Post xlink:href="http://127.0.0.1/istsos/istsos"/>
+        </ows:HTTP>
+      </ows:DCP>
+      <ows:Parameter name="service">
+        <ows:AllowedValues>
+          <ows:Value>SOS</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+      <ows:Parameter name="version">
+        <ows:AllowedValues>
+          <ows:Value>1.0.0</ows:Value>
+          <ows:Value>1.0.1</ows:Value>
+          <ows:Value>2.0.0</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+      <ows:Parameter name="SensorDescription">
+        <ows:AllowedValues>
+          <ows:Value>Any SensorML</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+      <ows:Parameter name="ObservationTemplate">
+        <ows:AllowedValues>
+          <ows:Value>Any om:Observation</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+    </ows:Operation>
+    <ows:Operation name="InsertObservation">
+      <ows:DCP>
+        <ows:HTTP>
+          <ows:Post xlink:href="http://127.0.0.1/istsos/istsos"/>
+        </ows:HTTP>
+      </ows:DCP>
+      <ows:Parameter name="service">
+        <ows:AllowedValues>
+          <ows:Value>SOS</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+      <ows:Parameter name="version">
+        <ows:AllowedValues>
+          <ows:Value>1.0.0</ows:Value>
+          <ows:Value>1.0.1</ows:Value>
+          <ows:Value>2.0.0</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+      <ows:Parameter name="AssignedSensorId">
+        <ows:AllowedValues>
+          <ows:Value>Any registered sensorID</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+      <ows:Parameter name="Observation">
+        <ows:AllowedValues>
+          <ows:Value>Any om:Observation</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+    </ows:Operation>
+  </ows:OperationsMetadata>
+  <Contents>
+    <ObservationOfferingList>
+      <ObservationOffering gml:id="measurement">
+        
+        <gml:description>OFFERING-DESC</gml:description>
+        <gml:name>OFFERING-NAME</gml:name>
+        
+        <gml:boundedBy>
+          <gml:Envelope>
+            <gml:coordinates>140.555948,-34.595664</gml:coordinates>
+          </gml:Envelope>
+        </gml:boundedBy>
+      
+        <time>
+          <gml:TimePeriod>
+            <gml:beginPosition>1836-02-29T00:00:00Z</gml:beginPosition>
+            <gml:endPosition>2024-12-14T14:15:00Z</gml:endPosition>
+          </gml:TimePeriod>
+        </time>
+        
+        <sos:procedure xlink:href="urn:ogc:def:procedure:x-istsos:1.0:29"/>
+        
+        <sos:procedure xlink:href="urn:ogc:def:procedure:x-istsos:1.0:gujarat_Jaska(Sy_4&quot;)Pz_II" />
+         
+       	<sos:observedProperty xlink:href="urn:ogc:def:parameter:x-igrac:1.0:Level Measurement:GWAm [Groundwater anomaly]"/>
+        <sos:featureOfInterest xlink:href="urn:ogc:def:feature:x-istsos:1.0:Water well:龍田(2)"/>
+
+        <sos:responseFormat>text/xml;subtype="om/1.0.0"</sos:responseFormat>
+        <sos:responseFormat>application/json</sos:responseFormat>
+        <sos:responseFormat>text/plain</sos:responseFormat>
+        <sos:responseFormat>text/xml</sos:responseFormat>
+        <sos:responseFormat>text/x-json</sos:responseFormat>
+        <sos:resultModel>om:Observation</sos:resultModel>
+        <sos:responseMode>inline</sos:responseMode>
+        
+      </ObservationOffering>
+    </ObservationOfferingList>
+  </Contents>
+</Capabilities>

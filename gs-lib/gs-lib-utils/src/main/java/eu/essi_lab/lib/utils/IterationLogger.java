@@ -4,7 +4,7 @@ package eu.essi_lab.lib.utils;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,8 +21,6 @@ package eu.essi_lab.lib.utils;
  * #L%
  */
 
-import java.text.DecimalFormat;
-
 /**
  * Logs the progress of an iteration by showing a percentage of the overall process
  * 
@@ -32,9 +30,8 @@ public class IterationLogger {
 
     private String message;
     private Object caller;
-    private float iterationsToReach;
-    private float iterations;
-    private DecimalFormat format;
+    private float targetIterationsCount;
+    private float iterationsCount;
 
     /**
      * Creates a new instance of <code>IterationLogger</code>
@@ -52,14 +49,30 @@ public class IterationLogger {
      * 
      * @param caller a reference to the caller (typically <code>this</code>)
      * @param itemsCount total number of items to iterate
-     * @param step the iterations step
+     * @param step the iterationsCount step
      */
     public IterationLogger(Object caller, int itemsCount, int step) {
 
 	this.caller = caller;
-	this.iterationsToReach = itemsCount / step;
-	this.format = new DecimalFormat();
-	this.format.setMaximumFractionDigits(3);
+	this.targetIterationsCount = (float) Math.ceil(((double) itemsCount / step));
+	this.iterationsCount = 1;
+
+	message = "";
+    }
+    
+    /**
+     * Creates a new instance of <code>IterationLogger</code>
+     * 
+     * @param caller a reference to the caller (typically <code>this</code>)
+     * @param iterationsCount
+     * @param itemsCount total number of items to iterate
+     * @param step the iterationsCount step
+     */
+    public IterationLogger(Object caller, int iterationsCount, int itemsCount, int step) {
+
+	this.caller = caller;
+	this.targetIterationsCount = (float) Math.ceil(((double) itemsCount / step));
+	this.iterationsCount = iterationsCount;
 
 	message = "";
     }
@@ -67,11 +80,19 @@ public class IterationLogger {
     /**
      * Set a message to show before the current percentage
      * 
-     * @see #iterationDone()
+     * @see #iterationEnded()
      */
     public void setMessage(String message) {
 
 	this.message = message;
+    }
+
+    /**
+     * 
+     */
+    public void iterationStarted() {
+
+	GSLoggerFactory.getLogger(caller.getClass()).debug("Iteration [{}/{}] STARTED", (int) iterationsCount, getTargetIterations());
     }
 
     /**
@@ -81,27 +102,46 @@ public class IterationLogger {
      * 
      * @see #setMessage(String)
      */
-    public void iterationDone() {
+    public void iterationEnded() {
 
-	double percent = 100f / (iterationsToReach / iterations);
-
-	String formattedPercent = this.format.format(percent);
-
-	GSLoggerFactory.getLogger(caller.getClass()).debug(message + formattedPercent + "%");
-
-	iterations++;
-
-	if (iterations == iterationsToReach) {
+	if (iterationsCount == targetIterationsCount) {
 
 	    GSLoggerFactory.getLogger(caller.getClass()).debug(message + "100%");
+
+	} else {
+
+	    GSLoggerFactory.getLogger(caller.getClass()).debug(message + getProgress() + "%");
 	}
+
+	GSLoggerFactory.getLogger(caller.getClass()).debug("Iteration [{}/{}] ENDED", (int) iterationsCount, getTargetIterations());
+
+	iterationsCount++;
     }
 
-    public static void main(String[] args) {
+    /**
+     * @return
+     */
+    public int getTargetIterations() {
 
-	IterationLogger iterationLogger = new IterationLogger(IterationLogger.class, 10000000, 200);
-	for (int i = 0; i < 10000000; i += 200) {
-	    iterationLogger.iterationDone();
-	}
+	return (int) targetIterationsCount;
     }
+
+    /**
+     * @return
+     */
+    public int getIterationsCount() {
+
+	return (int) iterationsCount;
+    }
+
+    /**
+     * @return
+     */
+    public String getProgress() {
+
+	double percent = 100f / (targetIterationsCount / iterationsCount);
+
+	return StringUtils.format(percent);
+    }
+
 }

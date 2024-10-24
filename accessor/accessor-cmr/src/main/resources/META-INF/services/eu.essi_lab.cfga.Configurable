@@ -1,0 +1,8 @@
+eu.essi_lab.accessor.cmr.distributed.CMRIDNAccessor
+eu.essi_lab.accessor.cmr.distributed.CMRIDNGranulesConnector
+eu.essi_lab.accessor.cmr.harvested.CMRIDNOpensearchAccessor
+eu.essi_lab.accessor.cmr.harvested.CMRIDNOpensearchConnector
+eu.essi_lab.accessor.cmr.cwic.distributed.CWICCMRGranulesAccessor
+eu.essi_lab.accessor.cmr.cwic.distributed.CWICCMRGranulesConnector
+eu.essi_lab.accessor.cmr.cwic.harvested.CWICCMROpensearchAccessor
+eu.essi_lab.accessor.cmr.cwic.harvested.CWICCMROpensearchConnector

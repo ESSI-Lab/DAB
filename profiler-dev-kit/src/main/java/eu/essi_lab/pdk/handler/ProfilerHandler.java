@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.handler;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -127,7 +127,7 @@ public abstract class ProfilerHandler//
 	CR extends AbstractCountResponse, //
 	IN extends MessageResponse<I, CR>, //
 	OUT extends MessageResponse<O, CR> //
->   implements WebRequestHandler {
+> implements WebRequestHandler {
 
     /**
      * 
@@ -155,7 +155,7 @@ public abstract class ProfilerHandler//
      *
      * @throws GSException if errors occurred during the workflow execution
      */
-     
+
     public final Response handle(WebRequest request) throws GSException {
 
 	M message = handleWebRequest(request);
@@ -259,6 +259,8 @@ public abstract class ProfilerHandler//
 
 	OUT mappedResponse = getMessageResponseMapper().map(message, executorResponse);
 
+	message.getProfilerName().ifPresent(name -> mappedResponse.setProfilerName(name));
+
 	publish(message, mappedResponse);
 
 	pl.logPerformance(logger);
@@ -285,7 +287,7 @@ public abstract class ProfilerHandler//
      * @throws GSException
      */
     private Response handleIteratedWorkflow(M message) throws GSException {
-	
+
 	IterationMode iterationMode = message.getIteratedWorkflow().get();
 
 	String rid = message.getWebRequest().getRequestId();
@@ -326,7 +328,7 @@ public abstract class ProfilerHandler//
 	do {
 
 	    //
-	    // set the original user bond. this is required to avoid that QueryInitializer.initializeQuery at row 87 
+	    // set the original user bond. this is required to avoid that QueryInitializer.initializeQuery at row 87
 	    // recursively add user bond at each iteration generating extremely long queries
 	    //
 	    if (message instanceof UserBondMessage) {
@@ -489,17 +491,19 @@ public abstract class ProfilerHandler//
      * @param message
      * @param provider
      */
-    private void publish(RequestMessage message, RuntimeInfoProvider provider) {
+    protected void publish(RequestMessage message, RuntimeInfoProvider provider) {
 
-	try {
-	    ElasticsearchInfoPublisher publisher = new ElasticsearchInfoPublisher(//
-		    message.getRequestId(), //
-		    message.getWebRequest().getRequestContext());
+	Optional<ElasticsearchInfoPublisher> publisher = ElasticsearchInfoPublisher.create(message.getWebRequest());
 
-	    publisher.publish(provider);
+	if (publisher.isPresent()) {
 
-	} catch (Exception e) {
-	    GSLoggerFactory.getLogger(getClass()).error("Error initializing ElasticSearch: {}", e.getMessage());
+	    try {
+
+		publisher.get().publish(provider);
+
+	    } catch (Exception e) {
+		GSLoggerFactory.getLogger(getClass()).error("Error initializing ElasticSearch: {}", e.getMessage());
+	    }
 	}
     }
 

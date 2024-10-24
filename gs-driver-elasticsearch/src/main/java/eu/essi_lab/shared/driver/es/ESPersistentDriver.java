@@ -4,7 +4,7 @@ package eu.essi_lab.shared.driver.es;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,7 +31,7 @@ import org.json.JSONObject;
 
 import eu.essi_lab.cfga.gs.setting.driver.SharedPersistentDriverSetting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.shared.SharedContent;
@@ -246,7 +246,7 @@ public class ESPersistentDriver implements ISharedRepositoryDriver<SharedPersist
 	return Optional.ofNullable(SharedContentSerializers.getSerializer(type));
     }
 
-    Optional<IESConnector> getConnector(StorageUri uri) {
+    Optional<IESConnector> getConnector(StorageInfo uri) {
 
 	return Optional.ofNullable(ESConnectorFactory.getConnector(uri));
     }

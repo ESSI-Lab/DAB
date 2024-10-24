@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding="ISO-8859-1" standalone="no" ?>
+<WCS_Capabilities
+   version="1.0.0" 
+   updateSequence="0" 
+   xmlns="http://www.opengis.net/wcs" 
+   xmlns:xlink="http://www.w3.org/1999/xlink" 
+   xmlns:gml="http://www.opengis.net/gml" 
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.opengis.net/wcs http://schemas.opengis.net/wcs/1.0.0/wcsCapabilities.xsd">
+<Service>
+  <name>MapServer WCS</name>
+  <label>drought WCS Server</label>
+  <fees>NONE</fees>
+  <accessConstraints>
+    NONE
+  </accessConstraints>
+</Service>
+<Capability>
+  <Request>
+    <GetCapabilities>
+      <DCPType>
+        <HTTP>
+          <Get><OnlineResource xlink:type="simple" xlink:href="http://gis.csiss.gmu.edu/cgi-bin/mapserv?map=/media/gisiv01/mapfiles/drought/16days/2012/drought.2012.065.map&amp;" /></Get>
+        </HTTP>
+      </DCPType>
+      <DCPType>
+        <HTTP>
+          <Post><OnlineResource xlink:type="simple" xlink:href="http://gis.csiss.gmu.edu/cgi-bin/mapserv?map=/media/gisiv01/mapfiles/drought/16days/2012/drought.2012.065.map&amp;" /></Post>
+        </HTTP>
+      </DCPType>
+    </GetCapabilities>
+    <DescribeCoverage>
+      <DCPType>
+        <HTTP>
+          <Get><OnlineResource xlink:type="simple" xlink:href="http://gis.csiss.gmu.edu/cgi-bin/mapserv?map=/media/gisiv01/mapfiles/drought/16days/2012/drought.2012.065.map&amp;" /></Get>
+        </HTTP>
+      </DCPType>
+      <DCPType>
+        <HTTP>
+          <Post><OnlineResource xlink:type="simple" xlink:href="http://gis.csiss.gmu.edu/cgi-bin/mapserv?map=/media/gisiv01/mapfiles/drought/16days/2012/drought.2012.065.map&amp;" /></Post>
+        </HTTP>
+      </DCPType>
+    </DescribeCoverage>
+    <GetCoverage>
+      <DCPType>
+        <HTTP>
+          <Get><OnlineResource xlink:type="simple" xlink:href="http://gis.csiss.gmu.edu/cgi-bin/mapserv?map=/media/gisiv01/mapfiles/drought/16days/2012/drought.2012.065.map&amp;" /></Get>
+        </HTTP>
+      </DCPType>
+      <DCPType>
+        <HTTP>
+          <Post><OnlineResource xlink:type="simple" xlink:href="http://gis.csiss.gmu.edu/cgi-bin/mapserv?map=/media/gisiv01/mapfiles/drought/16days/2012/drought.2012.065.map&amp;" /></Post>
+        </HTTP>
+      </DCPType>
+    </GetCoverage>
+  </Request>
+  <Exception>
+    <Format>application/vnd.ogc.se_xml</Format>
+  </Exception>
+</Capability>
+<ContentMetadata>
+  <CoverageOfferingBrief>
+  <name>drought.2012.065</name>
+  <label>drought.2012.065</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.999999954707 -59.9999999946568</gml:pos>
+      <gml:pos>179.999999954923 79.9999999928128</gml:pos>
+    </lonLatEnvelope>
+  </CoverageOfferingBrief>
+</ContentMetadata>
+</WCS_Capabilities>

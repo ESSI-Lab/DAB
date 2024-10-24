@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gs.setting;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,6 +22,7 @@ package eu.essi_lab.cfga.gs.setting;
  */
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.json.JSONObject;
@@ -43,11 +44,6 @@ public class GDCSourcesSetting extends Setting implements EditableSetting {
      * 
      */
     private static final String SOURCES_SETTING_IDENTIFIER = "availableSources";
-    
-    public static void main(String[] args) {
-	
-	System.out.println(new GDCSourcesSetting());
-    }
 
     /**
      * 
@@ -124,7 +120,7 @@ public class GDCSourcesSetting extends Setting implements EditableSetting {
 	    setComponentName(GDCSettingComponentInfo.class.getName());
 
 	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(12).//
+		    withIndex(TabIndex.GDC_SOURCES_SETTING.getIndex()).//
 		    withShowDirective("GDC sources").//
 		    build();
 
@@ -135,9 +131,30 @@ public class GDCSourcesSetting extends Setting implements EditableSetting {
     /**
      * @param sourceIdentifier
      */
-    public void addGDCSource(String sourceIdentifier) {
+    public boolean deselectSource(String sourceIdentifier) {
 
-	getSetting(SOURCES_SETTING_IDENTIFIER).get().select(s -> s.getIdentifier().equals(sourceIdentifier));
+	Optional<Setting> optSetting = getSetting(SOURCES_SETTING_IDENTIFIER).//
+		get().//
+		getSettings().//
+		stream().//
+		filter(s -> s.isSelected() && s.getIdentifier().equals(sourceIdentifier)).//
+		findFirst();
+
+	if (optSetting.isPresent()) {
+
+	    return getSetting(SOURCES_SETTING_IDENTIFIER).//
+		    get().removeSetting(optSetting.get());
+	}
+
+	return false;
+    }
+
+    /**
+     * @param sourceIdentifiers
+     */
+    public void selectGDCSources(List<String> sourceIdentifiers) {
+
+	getSetting(SOURCES_SETTING_IDENTIFIER).get().select(s -> sourceIdentifiers.contains(s.getIdentifier()));
     }
 
     /**

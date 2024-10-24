@@ -7,7 +7,7 @@ package eu.essi_lab.accessor.waf.ecovlab;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -37,7 +37,7 @@ import org.xml.sax.SAXException;
 
 import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.net.utils.Downloader;
+import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
@@ -63,7 +63,7 @@ public class ECOPotentialVLabConnector extends HarvestedQueryConnector<ECOPotent
 	ListRecordsResponse<OriginalMetadata> response = new ListRecordsResponse<OriginalMetadata>();
 
 	Downloader downloader = new Downloader();
-	Optional<InputStream> stream = downloader.downloadStream(getSourceURL());
+	Optional<InputStream> stream = downloader.downloadOptionalStream(getSourceURL());
 
 	if (stream.isPresent()) {
 
@@ -82,7 +82,7 @@ public class ECOPotentialVLabConnector extends HarvestedQueryConnector<ECOPotent
 
 			    String u = url + n.getNodeValue();
 			    Downloader down = new Downloader();
-			    Optional<InputStream> xml = down.downloadStream(u);
+			    Optional<InputStream> xml = down.downloadOptionalStream(u);
 
 			    if (xml.isPresent()) {
 

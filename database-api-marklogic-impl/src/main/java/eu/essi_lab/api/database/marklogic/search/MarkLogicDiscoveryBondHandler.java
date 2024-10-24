@@ -4,7 +4,7 @@ package eu.essi_lab.api.database.marklogic.search;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,6 +25,7 @@ import eu.essi_lab.api.database.marklogic.MarkLogicDatabase;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.LogicalBond;
+import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
 import eu.essi_lab.messages.bond.QueryableBond;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.RuntimeInfoElementBond;
@@ -38,13 +39,18 @@ import eu.essi_lab.messages.bond.parser.DiscoveryBondHandler;
  */
 public class MarkLogicDiscoveryBondHandler implements DiscoveryBondHandler {
 
-    private String query;
-    private MarkLogicSearchBuilder queryBuilder;
+    protected StringBuilder stringBuilder;
+    protected MarkLogicSearchBuilder queryBuilder;
 
+    /**
+     * @param message
+     * @param markLogicDB
+     */
     public MarkLogicDiscoveryBondHandler(DiscoveryMessage message, MarkLogicDatabase markLogicDB) {
 
-	query = "";
 	queryBuilder = MarkLogicSearchBuilderFactory.createBuilder(message, markLogicDB);
+
+	stringBuilder = new StringBuilder();
     }
 
     /**
@@ -52,12 +58,12 @@ public class MarkLogicDiscoveryBondHandler implements DiscoveryBondHandler {
      */
     public String getCTSSearch(boolean estimate) {
 
-	if (query.isEmpty()) {
+	if (stringBuilder.toString().isEmpty()) {
 
 	    return queryBuilder.buildNoConstraintsCTSSearch(estimate);
 	}
 
-	return queryBuilder.buildCTSSearch(query, estimate);
+	return queryBuilder.buildCTSSearch(stringBuilder.toString(), estimate);
     }
 
     /**
@@ -66,77 +72,71 @@ public class MarkLogicDiscoveryBondHandler implements DiscoveryBondHandler {
      */
     public String getCTSSearchQuery(boolean estimate) {
 
-	if (query.isEmpty()) {
+	if (stringBuilder.toString().isEmpty()) {
 
 	    return queryBuilder.buildNoConstraintsCTSSearchQuery(estimate);
 	}
 
-	return queryBuilder.buildCTSSearchQuery(query, estimate);
+	return queryBuilder.buildCTSSearchQuery(stringBuilder.toString(), estimate);
     }
 
     @Override
     public void customBond(QueryableBond<String> bond) {
 
-	query += queryBuilder.buildQuery(bond);
+	stringBuilder.append(queryBuilder.buildQuery(bond));
     }
 
     @Override
     public void simpleValueBond(SimpleValueBond bond) {
 
-	query += queryBuilder.buildQuery(bond);
+	stringBuilder.append(queryBuilder.buildQuery(bond));
     }
 
     @Override
     public void runtimeInfoElementBond(RuntimeInfoElementBond bond) {
 
-	query += queryBuilder.buildQuery(bond);
+	stringBuilder.append(queryBuilder.buildQuery(bond));
     }
 
     @Override
     public void spatialBond(SpatialBond bond) {
 
-	query += queryBuilder.buildQuery(bond);
+	stringBuilder.append(queryBuilder.buildQuery(bond));
     }
 
     @Override
     public void resourcePropertyBond(ResourcePropertyBond bond) {
 
-	query += queryBuilder.buildQuery(bond);
+	stringBuilder.append(queryBuilder.buildQuery(bond));
     }
 
     @Override
     public void startLogicalBond(LogicalBond bond) {
-	switch (bond.getLogicalOperator()) {
-	case AND:
-	    query += "cts:and-query((\n";
-	    break;
-	case OR:
-	    query += "cts:or-query((\n";
-	    break;
-	case NOT:
-	    query += "cts:not-query(\n";
-	    break;
-	}
+
+	String name = queryBuilder.getCTSLogicQueryName(bond.getLogicalOperator());
+
+	stringBuilder.append(name);
+	stringBuilder.append(bond.getLogicalOperator() == LogicalOperator.NOT ? "(\n" : "((\n");
     }
 
     @Override
     public void endLogicalBond(LogicalBond bond) {
 	switch (bond.getLogicalOperator()) {
 	case AND:
-	    query += "))";
+	    stringBuilder.append("))");
 	    break;
 	case OR:
-	    query += "))";
+	    stringBuilder.append("))");
 	    break;
 	case NOT:
-	    query += ")";
+	    stringBuilder.append(")");
 	    break;
 	}
     }
 
     @Override
     public void separator() {
-	query += ", \n";
+	stringBuilder.append(", \n");
     }
 
     @Override

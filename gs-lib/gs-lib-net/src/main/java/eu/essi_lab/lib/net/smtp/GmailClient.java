@@ -7,7 +7,7 @@ package eu.essi_lab.lib.net.smtp;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -42,59 +42,74 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
  */
 public class GmailClient {
 
-    private String user;
-    private String password;
-    private Properties properties;
+	private String user;
+	private String password;
+	private Properties properties;
 
-    /**
-     * 
-     */
-    public GmailClient(String host, String port, String user, String password) {
-
-	this.user = user;
-	this.password = password;
-
-	properties = System.getProperties();
-	properties.put("mail.smtp.host", host);
-	properties.put("mail.smtp.port", port);
-	properties.put("mail.smtp.ssl.enable", "true");
-	properties.put("mail.smtp.auth", "true");
-    }
-
-    /**
-     * @throws AddressException
-     * @throws MessagingException
-     */
-    public void send(String subject, String message, String... recipients) throws AddressException, MessagingException {
-
-	for (String recipient : recipients) {
-
-	    Session session = Session.getInstance(properties, new javax.mail.Authenticator() {
-
-		protected PasswordAuthentication getPasswordAuthentication() {
-
-		    return new PasswordAuthentication(user, password);
-		}
-	    });
-
-	    session.setDebug(false);
-
-	    MimeMessage mimeMessage = new MimeMessage(session);
-
-	    mimeMessage.setFrom(new InternetAddress(user));
-
-	    mimeMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
-
-	    mimeMessage.setSubject(subject);
-
-	    mimeMessage.setText(message);
-
-	    GSLoggerFactory.getLogger(getClass()).trace("Sending email STARTED");
-
-	    Transport.send(mimeMessage);
-
-	    GSLoggerFactory.getLogger(getClass()).trace("Sending email ENDED");
+	/**
+	 * The default constructor initializes the gmail client from system properties
+	 */
+	public GmailClient() {
+		this(//
+				System.getProperty("smtpHost"), //
+				System.getProperty("smtpPort"), //
+				System.getProperty("smtpUser"), //
+				System.getProperty("smtpPassword"));
 	}
-    }
+
+	/**
+	 * 
+	 */
+	public GmailClient(String host, String port, String user, String password) {
+
+		if (host==null || port==null) {
+			throw new IllegalArgumentException("SMTP host and port should be specified at least");
+		}
+		
+		this.user = user;
+		this.password = password;
+
+		properties = System.getProperties();
+		properties.put("mail.smtp.host", host);
+		properties.put("mail.smtp.port", port);
+		properties.put("mail.smtp.ssl.enable", "true");
+		properties.put("mail.smtp.auth", "true");
+	}
+
+	/**
+	 * @throws AddressException
+	 * @throws MessagingException
+	 */
+	public void send(String subject, String message, String... recipients) throws AddressException, MessagingException {
+
+		for (String recipient : recipients) {
+
+			Session session = Session.getInstance(properties, new javax.mail.Authenticator() {
+
+				protected PasswordAuthentication getPasswordAuthentication() {
+
+					return new PasswordAuthentication(user, password);
+				}
+			});
+
+			session.setDebug(false);
+
+			MimeMessage mimeMessage = new MimeMessage(session);
+
+			mimeMessage.setFrom(new InternetAddress(user));
+
+			mimeMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
+
+			mimeMessage.setSubject(subject);
+
+			mimeMessage.setText(message);
+
+			GSLoggerFactory.getLogger(getClass()).trace("Sending email STARTED");
+
+			Transport.send(mimeMessage);
+
+			GSLoggerFactory.getLogger(getClass()).trace("Sending email ENDED");
+		}
+	}
 
 }

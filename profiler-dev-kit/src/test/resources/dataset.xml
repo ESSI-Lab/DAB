@@ -1,0 +1,676 @@
+<gs:Dataset xmlns:gs="http://flora.eu/gi-suite/1.0/dataModel/schema"
+    xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmx="http://www.isotc211.org/2005/gmx"
+    xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gmd="http://www.isotc211.org/2005/gmd"
+    xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:gml="http://www.opengis.net/gml"
+    xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:gmi="http://www.isotc211.org/2005/gmi">
+    <gs:harmonizedMetadata gs:originalId="ak15605122">
+        <gs:coreMetadata>
+            <gs:isoMetadata>
+                <gmi:MI_Metadata id="de.pangaea.dataset712421"
+                    xmlns="http://www.isotc211.org/2005/gmd"                 
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+                    <fileIdentifier>
+                        <gco:CharacterString>de.pangaea.dataset712421</gco:CharacterString>
+                    </fileIdentifier>
+                    <contact>
+                        <CI_ResponsibleParty>
+                            <organisationName>
+                                <gco:CharacterString>PANGAEA</gco:CharacterString>
+                            </organisationName>
+                            <contactInfo>
+                                <CI_Contact>
+                                    <address>
+                        <CI_Address>
+                            <electronicMailAddress>
+                                <gco:CharacterString>info@pangaea.de</gco:CharacterString>
+                            </electronicMailAddress>
+                        </CI_Address>
+                    </address>
+                                    <onlineResource>
+                                        <CI_OnlineResource>
+                                            <linkage>
+                                                <URL>http://www.pangaea.de/</URL>
+                                            </linkage>
+                                            <function>
+                                                <CI_OnLineFunctionCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode_information"
+                                                  >information</CI_OnLineFunctionCode>
+                                            </function>
+                                        </CI_OnlineResource>
+                                    </onlineResource>
+                                </CI_Contact>
+                            </contactInfo>
+                            <role>
+                                <CI_RoleCode
+                                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode"
+                                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode_pointOfContact"
+                                    >pointOfContact</CI_RoleCode>
+                            </role>
+                        </CI_ResponsibleParty>
+                    </contact>
+                    <dateStamp>
+                        <gco:DateTime>2012-03-22T11:52:16+01:00</gco:DateTime>
+                    </dateStamp>
+                    <dataSetURI>
+                        <gco:CharacterString>http://doi.pangaea.de/10.1594/PANGAEA.712421</gco:CharacterString>
+                    </dataSetURI>
+                    <identificationInfo>
+                        <MD_DataIdentification>
+                            <citation>
+                                <CI_Citation>
+                                    <title>
+                                        <gco:CharacterString>The Global Plankton Database: an
+                                            inventory and data from the Former Soviet Union
+                                            expeditions</gco:CharacterString>
+                                    </title>
+                                    <date>
+                                        <CI_Date>
+                                            <date>
+                                                <gco:DateTime>2002-02-17T15:56:58</gco:DateTime>
+                                            </date>
+                                            <dateType>
+                                                <CI_DateTypeCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode_publication"
+                                                  >publication</CI_DateTypeCode>
+                                            </dateType>
+                                        </CI_Date>
+                                    </date>
+                                    <identifier>
+                                        <MD_Identifier>
+                                            <code>
+                                                <gco:CharacterString>doi:10.1594/PANGAEA.712421</gco:CharacterString>
+                                            </code>
+                                        </MD_Identifier>
+                                    </identifier>
+                                    <citedResponsibleParty>
+                                        <CI_ResponsibleParty id="dataset.author30133">
+                                            <individualName>
+                                                <gco:CharacterString>Piontkovski,
+                                                  Sergey</gco:CharacterString>
+                                            </individualName>
+                                            <contactInfo>
+                                                <CI_Contact>
+                                                  <address>
+                                        <CI_Address>
+                                            <electronicMailAddress>
+                                                <gco:CharacterString>spiontkovski@gmail.com</gco:CharacterString>
+                                            </electronicMailAddress>
+                                        </CI_Address>
+                                    </address>
+                                                </CI_Contact>
+                                            </contactInfo>
+                                            <role>
+                                                <CI_RoleCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode_author"
+                                                  >author</CI_RoleCode>
+                                            </role>
+                                        </CI_ResponsibleParty>
+                                    </citedResponsibleParty>
+                                    <citedResponsibleParty>
+                                        <CI_ResponsibleParty id="dataset.author31152">
+                                            <individualName>
+                                                <gco:CharacterString>Agafonov, E
+                                                  A</gco:CharacterString>
+                                            </individualName>
+                                            <role>
+                                                <CI_RoleCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode_author"
+                                                  >author</CI_RoleCode>
+                                            </role>
+                                        </CI_ResponsibleParty>
+                                    </citedResponsibleParty>
+
+                                    <citedResponsibleParty>
+                                        <CI_ResponsibleParty>
+                                            <organisationName>
+                                                <gco:CharacterString>PANGAEA</gco:CharacterString>
+                                            </organisationName>
+                                            <contactInfo>
+                                                <CI_Contact>
+                                                  <address>
+                                        <CI_Address>
+                                            <electronicMailAddress>
+                                                <gco:CharacterString>info@pangaea.de</gco:CharacterString>
+                                            </electronicMailAddress>
+                                        </CI_Address>
+                                    </address>
+                                                  <onlineResource>
+                                                  <CI_OnlineResource>
+                                                  <linkage>
+                                                  <URL>http://www.pangaea.de/</URL>
+                                                  </linkage>
+                                                  <function>
+                                                  <CI_OnLineFunctionCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode_information"
+                                                  >information</CI_OnLineFunctionCode>
+                                                  </function>
+                                                  </CI_OnlineResource>
+                                                  </onlineResource>
+                                                </CI_Contact>
+                                            </contactInfo>
+                                            <role>
+                                                <CI_RoleCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode_publisher"
+                                                  >publisher</CI_RoleCode>
+                                            </role>
+                                        </CI_ResponsibleParty>
+                                    </citedResponsibleParty>
+                                    <presentationForm>
+                                        <CI_PresentationFormCode
+                                            codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_PresentationFormCode"
+                                            codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_PresentationFormCode_tableDigital"
+                                            >tableDigital</CI_PresentationFormCode>
+                                    </presentationForm>
+                                </CI_Citation>
+                            </citation>
+                            <abstract>
+                                <gco:CharacterString>At present time, there is a lack of knowledge
+                                    on the interannual climate-related variability of zooplankton
+                                    communities of the tropical Atlantic, central Mediterranean Sea,
+                                    Caspian Sea, and Aral Sea, due to the absence of appropriate
+                                    databases. In the mid latitudes, the North Atlantic Oscillation
+                                    (NAO) is the dominant mode of atmospheric fluctuations over
+                                    eastern North America, the northern Atlantic Ocean and Europe.
+                                    Therefore, one of the issues that need to be addressed through
+                                    data synthesis is the evaluation of interannual patterns in
+                                    species abundance and species diversity over these regions in
+                                    regard to the NAO. The database has been used to investigate the
+                                    ecological role of the NAO in interannual variations of
+                                    mesozooplankton abundance and biomass along the zonal array of
+                                    the NAO influence. Basic approach to the proposed research
+                                    involved: (1) development of co-operation between experts and
+                                    data holders in Ukraine, Russia, Kazakhstan, Azerbaijan, UK, and
+                                    USA to rescue and compile the oceanographic data sets and
+                                    release them on CD-ROM, (2) organization and compilation of a
+                                    database based on FSU cruises to the above regions, (3) analysis
+                                    of the basin-scale interannual variability of the zooplankton
+                                    species abundance, biomass, and species
+                                    diversity.</gco:CharacterString>
+                            </abstract>
+                            <status>
+                                <MD_ProgressCode
+                                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ProgressCode"
+                                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ProgressCode_completed"
+                                    >completed</MD_ProgressCode>
+                            </status>
+                            <descriptiveKeywords>
+                                <MD_Keywords>
+                                    <keyword>
+                                        <gco:CharacterString>(Bathysonde,
+                                            ISTOK)</gco:CharacterString>
+                                    </keyword>
+                                    <keyword>
+                                        <gco:CharacterString>(Counting, light microscope - Species
+                                            questionable)</gco:CharacterString>
+                                    </keyword>
+                                    <keyword>
+                                        <gco:CharacterString>(Counting, light
+                                            microscope)</gco:CharacterString>
+                                    </keyword>
+
+                                    <type>
+                                        <MD_KeywordTypeCode
+                                            codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode"
+                                            codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode_theme"
+                                            >theme</MD_KeywordTypeCode>
+                                    </type>
+                                    <thesaurusName>
+                                        <CI_Citation>
+                                            <title>
+                                                <gco:CharacterString>PANGAEA Keyword
+                                                  List</gco:CharacterString>
+                                            </title>
+                                            <date>
+                                                <CI_Date>
+                                                  <date>
+                                                  <gco:Date>1995-01-01</gco:Date>
+                                                  </date>
+                                                  <dateType>
+                                                  <CI_DateTypeCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode_creation"
+                                                  >creation</CI_DateTypeCode>
+                                                  </dateType>
+                                                </CI_Date>
+                                            </date>
+                                            <citedResponsibleParty>
+                                                <CI_ResponsibleParty>
+                                                  <organisationName>
+                                                  <gco:CharacterString>PANGAEA</gco:CharacterString>
+                                                  </organisationName>
+                                                  <contactInfo>
+                                                  <CI_Contact>
+                                                  <address>
+                                                <CI_Address>
+                                                    <electronicMailAddress>
+                                                        <gco:CharacterString>info@pangaea.de</gco:CharacterString>
+                                                    </electronicMailAddress>
+                                                </CI_Address>
+                                            </address>
+                                                  <onlineResource>
+                                                  <CI_OnlineResource>
+                                                  <linkage>
+                                                  <URL>http://www.pangaea.de/</URL>
+                                                  </linkage>
+                                                  <function>
+                                                  <CI_OnLineFunctionCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode_information"
+                                                  >information</CI_OnLineFunctionCode>
+                                                  </function>
+                                                  </CI_OnlineResource>
+                                                  </onlineResource>
+                                                  </CI_Contact>
+                                                  </contactInfo>
+                                                  <role>
+                                                  <CI_RoleCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode_pointOfContact"
+                                                  >pointOfContact</CI_RoleCode>
+                                                  </role>
+                                                </CI_ResponsibleParty>
+                                            </citedResponsibleParty>
+                                        </CI_Citation>
+                                    </thesaurusName>
+                                </MD_Keywords>
+                            </descriptiveKeywords>
+                            <descriptiveKeywords>
+                                <MD_Keywords>
+                                    <keyword>
+                                        <gco:CharacterString>GLOBEC</gco:CharacterString>
+                                    </keyword>
+                                    <keyword>
+                                        <gco:CharacterString>Global Ocean Ecosystem
+                                            Dynamics</gco:CharacterString>
+                                    </keyword>
+                                    <type>
+                                        <MD_KeywordTypeCode
+                                            codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode"
+                                            codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode_theme"
+                                            >theme</MD_KeywordTypeCode>
+                                    </type>
+                                    <thesaurusName>
+                                        <CI_Citation>
+                                            <title>
+                                                <gco:CharacterString>PANGAEA Project
+                                                  List</gco:CharacterString>
+                                            </title>
+                                            <date>
+                                                <CI_Date>
+                                                  <date>
+                                                  <gco:Date>1995-01-01</gco:Date>
+                                                  </date>
+                                                  <dateType>
+                                                  <CI_DateTypeCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode_creation"
+                                                  >creation</CI_DateTypeCode>
+                                                  </dateType>
+                                                </CI_Date>
+                                            </date>
+                                            <citedResponsibleParty>
+                                                <CI_ResponsibleParty>
+                                                  <organisationName>
+                                                  <gco:CharacterString>PANGAEA</gco:CharacterString>
+                                                  </organisationName>
+                                                  <contactInfo>
+                                                  <CI_Contact>
+                                                  <address>
+                                                <CI_Address>
+                                                    <electronicMailAddress>
+                                                        <gco:CharacterString>info@pangaea.de</gco:CharacterString>
+                                                    </electronicMailAddress>
+                                                </CI_Address>
+                                            </address>
+                                                  <onlineResource>
+                                                  <CI_OnlineResource>
+                                                  <linkage>
+                                                  <URL>http://www.pangaea.de/</URL>
+                                                  </linkage>
+                                                  <function>
+                                                  <CI_OnLineFunctionCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode_information"
+                                                  >information</CI_OnLineFunctionCode>
+                                                  </function>
+                                                  </CI_OnlineResource>
+                                                  </onlineResource>
+                                                  </CI_Contact>
+                                                  </contactInfo>
+                                                  <role>
+                                                  <CI_RoleCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode_pointOfContact"
+                                                  >pointOfContact</CI_RoleCode>
+                                                  </role>
+                                                </CI_ResponsibleParty>
+                                            </citedResponsibleParty>
+                                        </CI_Citation>
+                                    </thesaurusName>
+                                </MD_Keywords>
+                            </descriptiveKeywords>
+                            <resourceConstraints>
+                                <MD_LegalConstraints>
+                                    <accessConstraints>
+                                        <MD_RestrictionCode
+                                            codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode"
+                                            codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode_copyright"
+                                            >copyright</MD_RestrictionCode>
+                                    </accessConstraints>
+                                    <useConstraints>
+                                        <MD_RestrictionCode
+                                            codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode"
+                                            codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode_copyright"
+                                            >copyright</MD_RestrictionCode>
+                                    </useConstraints>
+                                    <otherConstraints>
+                                        <gco:CharacterString>CC-BY: Creative Commons Attribution 3.0
+                                            Unported</gco:CharacterString>
+                                    </otherConstraints>
+                                </MD_LegalConstraints>
+                            </resourceConstraints>
+                            <spatialRepresentationType>
+                                <MD_SpatialRepresentationTypeCode
+                                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_SpatialRepresentationTypeCode"
+                                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_SpatialRepresentationTypeCode_textTable"
+                                    >textTable</MD_SpatialRepresentationTypeCode>
+                            </spatialRepresentationType>
+                            <language>
+                                <LanguageCode
+                                    codeList="http://www.isotc211.org/2005/resources/Codelist/ML_gmxCodelists.xml#LanguageCode"
+                                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/ML_gmxCodelists.xml#LanguageCode_eng"
+                                    >eng</LanguageCode>
+                            </language>
+                            <topicCategory>
+                                <MD_TopicCategoryCode>geoscientificInformation</MD_TopicCategoryCode>
+                            </topicCategory>
+                            <extent>
+                                <EX_Extent>
+                                    <geographicElement>
+                                        <EX_GeographicBoundingBox>
+                                            <gmd:westBoundLongitude>
+                                                <gco:Decimal>-97.44999999999999</gco:Decimal>
+                                            </gmd:westBoundLongitude>
+                                            <gmd:eastBoundLongitude>
+                                                <gco:Decimal>109.05333</gco:Decimal>
+                                            </gmd:eastBoundLongitude>
+                                            <gmd:southBoundLatitude>
+                                                <gco:Decimal>-46.0</gco:Decimal>
+                                            </gmd:southBoundLatitude>
+                                            <gmd:northBoundLatitude>
+                                                <gco:Decimal>60.81666666999999</gco:Decimal>
+                                            </gmd:northBoundLatitude>
+                                        </EX_GeographicBoundingBox>
+                                    </geographicElement>
+                                    <geographicElement>
+                                        <EX_GeographicBoundingBox>
+                                            <gmd:westBoundLongitude>
+                                                <gco:Decimal>1</gco:Decimal>
+                                            </gmd:westBoundLongitude>
+                                            <gmd:eastBoundLongitude>
+                                                <gco:Decimal>1</gco:Decimal>
+                                            </gmd:eastBoundLongitude>
+                                            <gmd:southBoundLatitude>
+                                                <gco:Decimal>1</gco:Decimal>
+                                            </gmd:southBoundLatitude>
+                                            <gmd:northBoundLatitude>
+                                                <gco:Decimal>1</gco:Decimal>
+                                            </gmd:northBoundLatitude>
+                                        </EX_GeographicBoundingBox>
+                                    </geographicElement>
+
+                                    <temporalElement>
+                                        <EX_TemporalExtent>
+                                            <extent>
+                                                <gml:TimePeriod gml:id="timePeriod">
+                                                  <gml:beginPosition>1934-08-31T12:00:00</gml:beginPosition>
+                                                  <gml:endPosition>2002-08-13T00:00:00</gml:endPosition>
+                                                </gml:TimePeriod>
+                                            </extent>
+                                        </EX_TemporalExtent>
+                                    </temporalElement>
+                                </EX_Extent>
+                            </extent>
+                            <supplementalInformation>
+                                <gco:CharacterString>Core international projects dealing with the
+                                    ocean, as well as the UNEP Biodiversity and Climate Change
+                                    Program, have emphasised an urgent need for information on the
+                                    impact of climate change on species diversity and on the
+                                    development of efforts to deal with this impact. In order to
+                                    assess this impact, a global database of historical plankton
+                                    community composition was needed. A team of scientists from IBSS
+                                    and MSRC developed a plankton database of oceanographic stations
+                                    sampled during the Former Soviet Union (FSU) expeditions to the
+                                    World Ocean. This database contains over 50 expeditions to the
+                                    Atlantic Ocean, the Mediterranean Sea, the Black Sea, the
+                                    Caspian Sea, the Aral Sea, and the Indian Ocean. The Database
+                                    was created with the assistance of the following institutions: *
+                                    Institute of Biology of the Southern Seas, Ukrainain National
+                                    Academy of Sciences, Sevastopol, Ukraine * Marine Hydrophysical
+                                    Institute, Ukrainain National Academy of Sciences, Sevastopol,
+                                    Ukraine * Caspian Biological Station, Institute of Zoology of
+                                    Azerbaijan Academy of Sciences, Baku, Azerbaijan * Institute of
+                                    Zoology and NGO "Tethys", Almaty, Kazakhstan * Marine Sciences
+                                    Research Center, Stony Brook University, Stony Brook, USA *
+                                    Plymouth Marine Laboratory, Plymouth, United Kingdom The
+                                    database was published on CD and was online accessible from the
+                                    GLOBEC web page at http://www.globec.org/index.php?id=245 until
+                                    2009. This is the online version as persistently archived in
+                                    2008 by Pangaea following the GLOBEC data
+                                    policy.</gco:CharacterString>
+                            </supplementalInformation>
+                        </MD_DataIdentification>
+                    </identificationInfo>
+                    <distributionInfo>
+                        <MD_Distribution>
+                            <distributionFormat>
+                                <MD_Format>
+                                    <name>
+                                        <gco:CharacterString>application/zip</gco:CharacterString>
+                                    </name>
+                                    <version>
+                                        <gco:CharacterString>unknown</gco:CharacterString>
+                                    </version>
+                                </MD_Format>
+                            </distributionFormat>
+                            <distributionFormat>
+                                <MD_Format>
+                                    <name>
+                                        <gco:CharacterString>png</gco:CharacterString>
+                                    </name>
+                                    <version>
+                                        <gco:CharacterString>unknown</gco:CharacterString>
+                                    </version>
+                                </MD_Format>
+                            </distributionFormat>
+                            <transferOptions>
+                                <MD_DigitalTransferOptions>
+                                    <onLine>
+                                        <CI_OnlineResource>
+                                            <linkage>
+                                                <URL>http://doi.pangaea.de/10.1594/PANGAEA.712421?format=zip</URL>
+                                            </linkage>
+                                            <function>
+                                                <CI_OnLineFunctionCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode_download"
+                                                  >download</CI_OnLineFunctionCode>
+                                            </function>
+                                        </CI_OnlineResource>
+                                    </onLine>
+                                    <onLine>
+                                        <CI_OnlineResource>
+                                            <linkage>
+                                                <URL>http://doi.pangaea.de/10.1597/PANGAEA.712421?format=zip</URL>
+                                            </linkage>
+                                            <function>
+                                                <CI_OnLineFunctionCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode" codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode_download">download</CI_OnLineFunctionCode>
+                                            </function>
+                                        </CI_OnlineResource>
+                                    </onLine>
+                                </MD_DigitalTransferOptions>
+                            </transferOptions>
+                        </MD_Distribution>
+                    </distributionInfo>
+                    <dataQualityInfo>
+                        <DQ_DataQuality>
+                            <scope>
+                                <DQ_Scope>
+                                    <level>
+                                        <MD_ScopeCode
+                                            codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ScopeCode"
+                                            codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ScopeCode_dataset"
+                                            >dataset</MD_ScopeCode>
+                                    </level>
+                                </DQ_Scope>
+                            </scope>
+                            <lineage>
+                                <LI_Lineage>
+                                    <statement>
+                                        <gco:CharacterString>The data set was checked for
+                                            completeness, correctness, and consistency of
+                                            metainformation. Validity of used methods was checked
+                                            and - if applicable - precision and range of
+                                            data.</gco:CharacterString>
+                                    </statement>
+                                    <processStep>
+                                        <LI_ProcessStep id="event2552163">
+                                            <description>
+                                                <gco:CharacterString>EVENT LABEL: * LATITUDE START:
+                                                  44.786700 * LONGITUDE START: 35.290000 * LATITUDE
+                                                  END: 44.731700 * LONGITUDE END: 35.018300 *
+                                                  DATE/TIME START: 1987-08-08T00:00:00 * DATE/TIME
+                                                  END: 1987-08-18T00:00:00 * LOCATION: Black Sea *
+                                                  CAMPAIGN: AAK106 * BASIS: Akademik A Kovalyevskiy
+                                                  * DEVICE: Underway cruise track
+                                                  measurements</gco:CharacterString>
+                                            </description>
+                                            <dateTime>
+                                                <gco:DateTime>1987-08-08T00:00:00</gco:DateTime>
+                                            </dateTime>
+                                        </LI_ProcessStep>
+                                    </processStep>
+                                    <processStep>
+                                        <LI_ProcessStep id="event2551554">
+                                            <description>
+                                                <gco:CharacterString>EVENT LABEL: * LATITUDE START:
+                                                  36.933300 * LONGITUDE START: 19.230000 * LATITUDE
+                                                  END: 37.033300 * LONGITUDE END: 19.500000 *
+                                                  DATE/TIME START: 1968-05-07T00:00:00 * DATE/TIME
+                                                  END: 1968-05-08T00:00:00 * ELEVATION START:
+                                                  -3615.0 m * ELEVATION END: -3600.0 m * LOCATION:
+                                                  Ionian Sea * CAMPAIGN: AAK62 * BASIS: Akademik A
+                                                  Kovalyevskiy * DEVICE: Underway cruise track
+                                                  measurements</gco:CharacterString>
+                                            </description>
+                                            <dateTime>
+                                                <gco:DateTime>1968-05-07T00:00:00</gco:DateTime>
+                                            </dateTime>
+                                        </LI_ProcessStep>
+                                    </processStep>
+                                    <source>
+                                        <LI_Source id="ref27206">
+                                            <description>
+                                                <gco:CharacterString>associated
+                                                  reference</gco:CharacterString>
+                                            </description>
+                                            <sourceCitation>
+                                                <CI_Citation>
+                                                  <title>
+                                                  <gco:CharacterString>The Global Plankton Database:
+                                                  an inventory and data from the former Soviet Union
+                                                  expeditions</gco:CharacterString>
+                                                  </title>
+                                                  <date>
+                                                  <CI_Date>
+                                                  <date>
+                                                  <gco:Date>2002-01-01</gco:Date>
+                                                  </date>
+                                                  <dateType>
+                                                  <CI_DateTypeCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode_publication"
+                                                  >publication</CI_DateTypeCode>
+                                                  </dateType>
+                                                  </CI_Date>
+                                                  </date>
+                                                  <citedResponsibleParty>
+                                                  <CI_ResponsibleParty id="ref27206.author30133">
+                                                  <individualName>
+                                                  <gco:CharacterString>Piontkovski,
+                                                  Sergey</gco:CharacterString>
+                                                  </individualName>
+                                                  <contactInfo>
+                                                  <CI_Contact>
+                                                  <address>
+                                                        <CI_Address>
+                                                            <electronicMailAddress>
+                                                                <gco:CharacterString>spiontkovski@gmail.com</gco:CharacterString>
+                                                            </electronicMailAddress>
+                                                        </CI_Address>
+                                                    </address>
+                                                  </CI_Contact>
+                                                  </contactInfo>
+                                                  <role>
+                                                  <CI_RoleCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode_author"
+                                                  >author</CI_RoleCode>
+                                                  </role>
+                                                  </CI_ResponsibleParty>
+                                                  </citedResponsibleParty>
+                                                  <presentationForm>
+                                                  <CI_PresentationFormCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_PresentationFormCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_PresentationFormCode_documentHardcopy"
+                                                  >documentHardcopy</CI_PresentationFormCode>
+                                                  </presentationForm>
+                                                  <series>
+                                                  <CI_Series>
+                                                  <name>
+                                                  <gco:CharacterString>Darwin Initiative for the
+                                                  Survival of Species (Intas INFO 00-059), NATO
+                                                  Science for Stability TU-Black Sea project
+                                                  (1994-1997), NATO Science for Peace project
+                                                  (1999-2002); Plymouth Marine Laboratory, United
+                                                  Kingdom; Institute of Biology of the Southern Seas
+                                                  &amp; Marine Hydrophysical Institute, Sevastopol,
+                                                  Ukraine; Institute of Zoology of Azerbaijan
+                                                  Academy of Sciences, Baku, Azerbaijan; Institute
+                                                  of Zoology, Almaty,
+                                                  Kazakhstan</gco:CharacterString>
+                                                  </name>
+                                                  <page>
+                                                  <gco:CharacterString>CD-ROM</gco:CharacterString>
+                                                  </page>
+                                                  </CI_Series>
+                                                  </series>
+                                                </CI_Citation>
+                                            </sourceCitation>
+                                        </LI_Source>
+                                    </source>
+                                </LI_Lineage>
+                            </lineage>
+                        </DQ_DataQuality>
+                    </dataQualityInfo>
+                </gmi:MI_Metadata>
+
+            </gs:isoMetadata>
+        </gs:coreMetadata>
+        <gs:augmentedMetadata>
+            <gs:keywordSet/>
+        </gs:augmentedMetadata>
+    </gs:harmonizedMetadata>
+    <gs:originalMetadata
+        gs:originalId="quakeml:earthquake.usgs.gov/fdsnws/event/1/query?eventid=ak15605122&amp;format=quakeml">
+        <gs:schemeURI>QUAKEML</gs:schemeURI>
+        <gs:metadata><![CDATA[<q:quakeml xmlns:q="http://quakeml.org/xmlns/quakeml/1.2" xmlns="http://quakeml.org/xmlns/bed/1.2" xmlns:anss="http://anss.org/xmlns/event/0.1" xmlns:catalog="http://anss.org/xmlns/catalog/0.1"><eventParameters publicID="quakeml:earthquake.usgs.gov/fdsnws/event/1/query?&amp;offset=1&amp;limit=8&amp;offset=1&amp;limit=1"><event catalog:datasource="ak" catalog:eventid="15605122" catalog:eventsource="ak" publicID="quakeml:earthquake.usgs.gov/fdsnws/event/1/query?eventid=ak15605122&amp;format=quakeml"><description><type>earthquake name</type><text>10km N of Meadow Lakes, Alaska</text></description><origin catalog:dataid="AK15605122" catalog:datasource="ak" catalog:eventid="15605122" catalog:eventsource="ak" publicID="quakeml:earthquake.usgs.gov/archive/product/origin/AK15605122/ak/1490269781644/product.xml"><time><value>2017-03-23T11:41:43.957Z</value></time><longitude><value>-149.5917</value></longitude><latitude><value>61.7225</value></latitude><depth><value>29700</value><uncertainty>200</uncertainty></depth><originUncertainty><horizontalUncertainty>0</horizontalUncertainty><preferredDescription>horizontal uncertainty</preferredDescription></originUncertainty><quality><usedPhaseCount>27</usedPhaseCount><standardError>0.68</standardError></quality><evaluationMode>automatic</evaluationMode><creationInfo><creationTime>2017-03-23T11:49:41.644Z</creationTime><version>1</version></creationInfo></origin><magnitude catalog:dataid="AK15605122" catalog:datasource="ak" catalog:eventid="15605122" catalog:eventsource="ak" publicID="quakeml:earthquake.usgs.gov/archive/product/origin/AK15605122/ak/1490269781644/product.xml#magnitude"><mag><value>1.8</value></mag><type>ml</type><originID>quakeml:earthquake.usgs.gov/archive/product/origin/AK15605122/ak/1490269781644/product.xml</originID><evaluationMode>automatic</evaluationMode><creationInfo><creationTime>2017-03-23T11:49:41.644Z</creationTime></creationInfo></magnitude><preferredOriginID>quakeml:earthquake.usgs.gov/archive/product/origin/AK15605122/ak/1490269781644/product.xml</preferredOriginID><preferredMagnitudeID>quakeml:earthquake.usgs.gov/archive/product/origin/AK15605122/ak/1490269781644/product.xml#magnitude</preferredMagnitudeID><type>earthquake</type><creationInfo><agencyID>ak</agencyID><creationTime>2017-03-23T11:49:41.644Z</creationTime><version>1</version></creationInfo></event></eventParameters></q:quakeml>]]></gs:metadata>
+    </gs:originalMetadata>
+</gs:Dataset>

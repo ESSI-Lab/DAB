@@ -4,7 +4,7 @@ package eu.essi_lab.shared.driver;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,14 +28,13 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import eu.essi_lab.api.database.DatabaseProvider;
+import eu.essi_lab.api.database.DatabaseExecutor;
 import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.factory.DatabaseConsumerFactory;
+import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
-import eu.essi_lab.api.database.internal.Folder;
 import eu.essi_lab.cfga.gs.setting.driver.SharedCacheDriverSetting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.shared.SharedContent;
@@ -104,9 +103,9 @@ public class DatabaseCacheDriver implements ISharedRepositoryDriver<SharedCacheD
 
 	try {
 
-	    DatabaseReader dbReader = getDatabaseReader();
+	    DatabaseReader reader = getDatabaseReader();
 
-	    Optional<Folder> optFolder = dbReader.getFolder(CACHE_FOLDER_NAME, true);
+	    Optional<DatabaseFolder> optFolder = reader.getFolder(CACHE_FOLDER_NAME, true);
 
 	    if (optFolder.isPresent()) {
 
@@ -174,9 +173,9 @@ public class DatabaseCacheDriver implements ISharedRepositoryDriver<SharedCacheD
 
 	try {
 
-	    DatabaseReader dbReader = getDatabaseReader();
+	    DatabaseReader reader = getDatabaseReader();
 
-	    Optional<Folder> optFolder = dbReader.getFolder(CACHE_FOLDER_NAME, true);
+	    Optional<DatabaseFolder> optFolder = reader.getFolder(CACHE_FOLDER_NAME, true);
 
 	    if (optFolder.isPresent()) {
 
@@ -210,7 +209,7 @@ public class DatabaseCacheDriver implements ISharedRepositoryDriver<SharedCacheD
     }
 
     @SuppressWarnings("rawtypes")
-    private synchronized void store(SharedContent sharedContent, Optional<Folder> optFolder, SharedContentSerializer serializer) {
+    private synchronized void store(SharedContent sharedContent, Optional<DatabaseFolder> optFolder, SharedContentSerializer serializer) {
 
 	try {
 
@@ -260,15 +259,20 @@ public class DatabaseCacheDriver implements ISharedRepositoryDriver<SharedCacheD
 
     private DatabaseReader getDatabaseReader() throws GSException {
 
-	StorageUri uri = setting.getDatabaseCacheSetting().get().asStorageUri();
+	StorageInfo uri = setting.getDatabaseCacheSetting().get().asStorageUri();
 
-	DatabaseProvider provider = DatabaseProviderFactory.create(uri);
-
-	provider.initialize(uri, uri.getConfigFolder());
-
-	DatabaseReader reader = DatabaseConsumerFactory.createDataBaseReader(uri);
+	DatabaseReader reader = DatabaseProviderFactory.getDatabaseReader(uri);
 
 	return reader;
+    }
+
+    private DatabaseExecutor getDatabaseExecutor() throws GSException {
+
+	StorageInfo uri = setting.getDatabaseCacheSetting().get().asStorageUri();
+
+	DatabaseExecutor executor = DatabaseProviderFactory.getDatabaseExecutor(uri);
+
+	return executor;
     }
 
     private SharedContentSerializer getSerializerOrThrowEx(SharedContentType type) throws GSException {

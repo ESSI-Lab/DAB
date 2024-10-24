@@ -4,7 +4,7 @@ package eu.essi_lab.augmenter;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,7 +29,7 @@ import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
 
 /**
  * This augmenter will call the parent augmenter, and will replace found general concepts with concepts related to
- * rivers.
+ * rivers. Moreover temperature is changed into air temperature, as intended for data providers in the La Plata river basin.
  * 
  * @author boldrini
  */
@@ -64,13 +64,17 @@ public class WHOSRiverVariableAugmenter extends WHOSVariableAugmenter {
 	List<SKOSConcept> toAdd = new ArrayList<SKOSConcept>();
 	for (SKOSConcept concept : ret) {
 	    switch (concept.getURI()) {
-	    case "http://hydro.geodab.eu/hydro-ontology/concept/76":
+	    case "http://hydro.geodab.eu/hydro-ontology/concept/76": // discharge
 		toRemove.add(concept);
-		toAdd.add(new SKOSConcept("http://hydro.geodab.eu/hydro-ontology/concept/78"));
+		toAdd.add(new SKOSConcept("http://hydro.geodab.eu/hydro-ontology/concept/78")); // discharge, stream
 		break;
-	    case "http://hydro.geodab.eu/hydro-ontology/concept/3":
+	    case "http://hydro.geodab.eu/hydro-ontology/concept/3": // level
 		toRemove.add(concept);
-		toAdd.add(new SKOSConcept("http://hydro.geodab.eu/hydro-ontology/concept/11"));
+		toAdd.add(new SKOSConcept("http://hydro.geodab.eu/hydro-ontology/concept/11")); // level, stream 
+		break;
+	    case "http://hydro.geodab.eu/hydro-ontology/concept/40": // temperature
+		toRemove.add(concept);
+		toAdd.add(new SKOSConcept("http://hydro.geodab.eu/hydro-ontology/concept/49")); // temperature, air 
 		break;
 	    default:
 		break;

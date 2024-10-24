@@ -7,7 +7,7 @@ package eu.essi_lab.authorization.xacml;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,19 +31,41 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 import org.ow2.authzforce.core.pdp.api.CloseablePdpEngine;
 
 import eu.essi_lab.authorization.BasicRole;
+import eu.essi_lab.authorization.DefaultPdpEngineBuilder;
 import eu.essi_lab.authorization.MessageAuthorizer;
+import eu.essi_lab.authorization.PdpEngineBuilder;
 import eu.essi_lab.authorization.PolicySetWrapper.Action;
+import eu.essi_lab.authorization.authzforce.ext.IdListRefPolicyProvider;
+import eu.essi_lab.authorization.pps.AbstractGEOSSViewPermissionPolicySet;
+import eu.essi_lab.authorization.pps.AbstractPermissionPolicySet;
+import eu.essi_lab.authorization.pps.GEOSSPrivateWritePermissionPolicySet;
+import eu.essi_lab.authorization.pps.GEOSSReadPermissionPolicySet;
+import eu.essi_lab.authorization.pps.GEOSSWritePermissionPolicySet;
+import eu.essi_lab.authorization.psloader.DefaultPolicySetLoader;
+import eu.essi_lab.authorization.psloader.PolicySetLoader;
+import eu.essi_lab.authorization.rps.GEOSSPrivateWriteRolePolicySet;
+import eu.essi_lab.authorization.rps.GEOSSReadRolePolicySet;
+import eu.essi_lab.authorization.rps.GEOSSWriteRolePolicySet;
+import eu.essi_lab.cfga.Configuration;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.AccessMessage;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.RequestMessage;
 import eu.essi_lab.messages.bond.View;
+import eu.essi_lab.messages.bond.View.ViewVisibility;
+import eu.essi_lab.messages.view.CreateViewMessage;
+import eu.essi_lab.messages.view.DeleteViewMessage;
+import eu.essi_lab.messages.view.ReadViewMessage;
+import eu.essi_lab.messages.view.UpdateViewMessage;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.exceptions.GSException;
 import oasis.names.tc.xacml._3_0.core.schema.wd_17.DecisionType;
@@ -55,15 +77,25 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
 
     private PdpEngineWrapper wrapper;
     private StringBuilder logBuilder;
+    private PdpEngineBuilder builder;
 
     /**
-     * 
+     * @throws Exception
      */
-    public XACMLAuthorizer() {
+    public XACMLAuthorizer() throws Exception {
+
+	builder = new DefaultPdpEngineBuilder();
+
+	setPdpEngine(builder.build());
     }
 
     @Override
     public boolean isAuthorized(RequestMessage message) throws GSException {
+
+	if (ExecutionMode.skipAuthorization()) {
+
+	    return true;
+	}
 
 	logBuilder = new StringBuilder();
 
@@ -72,10 +104,21 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
 	//
 	// developer machine
 	//
-	if (isLocalHost(message)) {
+	boolean devMachineAuth = true;
+
+	Optional<Configuration> configuration = ConfigurationWrapper.getConfiguration();
+
+	Optional<Properties> keyValueOption = configuration.isPresent() ? ConfigurationWrapper.getSystemSettings().getKeyValueOptions()
+		: Optional.empty();
+	
+	if (keyValueOption.isPresent()) {
+	    devMachineAuth = keyValueOption.get().getProperty("dev-machine-auth", "yes").equals("yes") ? true : false;
+	}
+
+	if (isLocalHost(message) && devMachineAuth) {
 
 	    GSLoggerFactory.getLogger(getClass()).debug("Dev. machine authorized");
-
+	    //
 	    return true;
 	}
 
@@ -96,14 +139,21 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
 	    role = BasicRole.ANONYMOUS.getRole();
 	}
 
-	logBuilder.append("\n- Identifier: " + identifier);
+	logBuilder.append("\n- User identifier: " + identifier);
 
-	logBuilder.append("\n- Role: " + role);
+	logBuilder.append("\n- User role: " + role);
 
 	if (message instanceof DiscoveryMessage) {
+
 	    mapMessage(role, (DiscoveryMessage) message);
-	} else {
+
+	} else if (message instanceof AccessMessage) {
+
 	    mapMessage(role, (AccessMessage) message);
+
+	} else {
+
+	    mapMessage_(role, message);
 	}
 
 	// GSLoggerFactory.getLogger(getClass()).debug("Evaluating request STARTED");
@@ -112,7 +162,12 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
 
 	logBuilder.append("\n- Evaluation result: " + (!result ? "denied" : "authorized"));
 
-	GSLoggerFactory.getLogger(getClass()).info(logBuilder.toString());
+	try {
+	    GSLoggerFactory.getLogger(getClass()).info(logBuilder.toString());
+	} catch (Exception ex) {
+	    // sometimes a StringIndexOutOfBoundsException occur during the logBuilder.toString() call
+	    GSLoggerFactory.getLogger(getClass()).error(ex);
+	}
 
 	// GSLoggerFactory.getLogger(getClass()).debug("Evaluating request ENDED");
 
@@ -148,15 +203,60 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
 
 	wrapper.reset();
 
+	Action action = null;
+
+	if (role.equals(GEOSSReadRolePolicySet.ROLE)) {
+
+	    GEOSSReadPermissionPolicySet pps = new GEOSSReadPermissionPolicySet();
+
+	    reinitWrapper(message, pps);
+	}
+
+	if (role.equals(GEOSSPrivateWriteRolePolicySet.ROLE)) {
+
+	    GEOSSPrivateWritePermissionPolicySet pps = new GEOSSPrivateWritePermissionPolicySet();
+
+	    reinitWrapper(message, pps);
+	}
+
+	if (role.equals(GEOSSWriteRolePolicySet.ROLE)) {
+
+	    GEOSSWritePermissionPolicySet pps = new GEOSSWritePermissionPolicySet();
+
+	    reinitWrapper(message, pps);
+	}
+
 	if (message instanceof DiscoveryMessage) {
 
-	    wrapper.setAction(Action.DISCOVERY.getId());
-	    logBuilder.append("\n- Action: " + Action.DISCOVERY.getId());
+	    action = Action.DISCOVERY;
+
+	} else if (message instanceof AccessMessage) {
+
+	    action = Action.ACCESS;
+
+	} else if (message instanceof ReadViewMessage) {
+
+	    action = Action.READ_VIEW;
+
+	} else if (message instanceof CreateViewMessage) {
+
+	    action = Action.CREATE_VIEW;
+
+	} else if (message instanceof UpdateViewMessage) {
+
+	    action = Action.UPDATE_VIEW;
+
+	} else if (message instanceof DeleteViewMessage) {
+
+	    action = Action.DELETE_VIEW;
 
 	} else {
-	    logBuilder.append("\n- Action: " + Action.ACCESS.getId());
-	    wrapper.setAction(Action.ACCESS.getId());
+
+	    action = Action.OTHER;
 	}
+
+	logBuilder.append("\n- Action: " + action.getId());
+	wrapper.setAction(action.getId());
 
 	wrapper.setUserRole(role);
 
@@ -183,11 +283,35 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
 	    logBuilder.append("\n- View id: " + view.get().getId());
 
 	    String creator = view.get().getCreator();
+
 	    if (creator != null) {
 		wrapper.setViewCreator(creator);
 
 		logBuilder.append("\n- View creator: " + creator);
 	    }
+
+	    String owner = view.get().getOwner();
+
+	    if (owner != null) {
+
+		wrapper.setViewOwner(owner);
+
+		logBuilder.append("\n- View owner: " + owner);
+	    }
+
+	    ViewVisibility visibility = view.get().getVisibility();
+
+	    if (visibility != null) {
+
+		wrapper.setViewVisibility(visibility);
+
+		logBuilder.append("\n- View visibility: " + visibility);
+	    }
+
+	} else {
+
+	    wrapper.setViewCreator(AbstractPermissionPolicySet.VIEW_CREATOR_MISSING_VALUE);
+	    wrapper.setViewIdentifier(AbstractPermissionPolicySet.VIEW_ID_MISSING_VALUE);
 	}
 
 	Optional<String> originHeader = message.getWebRequest().readOriginHeader();
@@ -286,6 +410,30 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
 	    GSLoggerFactory.getLogger(getClass()).info("Download count: " + count.get());
 
 	    wrapper.setDownloadCount(count.get());
+	}
+    }
+
+    /**
+     * @param loader
+     */
+    private void reinitWrapper(RequestMessage message, AbstractGEOSSViewPermissionPolicySet pps) {
+
+	pps.setUserIdentifier(message.getCurrentUser().get().getIdentifier());
+
+	PolicySetLoader loader = new DefaultPolicySetLoader();
+
+	loader.setPermissionPolicySet(pps);
+
+	IdListRefPolicyProvider.setPolicySetLoader(loader);
+
+	builder = new PdpEngineBuilder();
+
+	builder.addPolicies(loader);
+
+	try {
+	    wrapper = new PdpEngineWrapper(builder.build());
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
 	}
     }
 

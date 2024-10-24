@@ -1,0 +1,774 @@
+<gs:Dataset gs:resourceType="dataset" xmlns:gs="http://flora.eu/gi-suite/1.0/dataModel/schema"
+    xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd"
+    xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml"
+    xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gts="http://www.isotc211.org/2005/gts"
+    xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <gs:source gs:resultsPriority="UNSET" gs:strategy="HARVESTED"
+        gs:uniqueIdentifier="UUID-481e6892-5874-44dc-aafd-2914b58f67ba">
+        <gs:endpoint>http://oai.dwd.de/oai/provider</gs:endpoint>
+        <gs:label>WIS GISC DWD</gs:label>
+    </gs:source>
+    <gs:harmonizedMetadata>
+        <gs:coreMetadata>
+            <gs:isoMetadata>
+                <gmi:MI_Metadata id="de.pangaea.dataset776358">
+                    <gmd:fileIdentifier>
+                        <gco:CharacterString>86af36f8-472a-4f08-bb83-c64b63b079d3</gco:CharacterString>
+                    </gmd:fileIdentifier>
+                    <gmd:contact>
+                        <gmd:CI_ResponsibleParty>
+                            <gmd:organisationName>
+                                <gco:CharacterString>PANGAEA</gco:CharacterString>
+                            </gmd:organisationName>
+                            <gmd:contactInfo>
+                                <gmd:CI_Contact>
+                                    <gmd:address>
+                                        <gmd:CI_Address>
+                                            <gmd:electronicMailAddress>
+                                                <gco:CharacterString>info@pangaea.de</gco:CharacterString>
+                                            </gmd:electronicMailAddress>
+                                        </gmd:CI_Address>
+                                    </gmd:address>
+                                    <gmd:onlineResource>
+                                        <gmd:CI_OnlineResource>
+                                            <gmd:linkage>
+                                                <gmd:URL>https://www.pangaea.de/</gmd:URL>
+                                            </gmd:linkage>
+                                            <gmd:function>
+                                                <gmd:CI_OnLineFunctionCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode_information"
+                                                  >information</gmd:CI_OnLineFunctionCode>
+                                            </gmd:function>
+                                        </gmd:CI_OnlineResource>
+                                    </gmd:onlineResource>
+                                </gmd:CI_Contact>
+                            </gmd:contactInfo>
+                            <gmd:role>
+                                <gmd:CI_RoleCode
+                                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode"
+                                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode_pointOfContact"
+                                    >pointOfContact</gmd:CI_RoleCode>
+                            </gmd:role>
+                        </gmd:CI_ResponsibleParty>
+                    </gmd:contact>
+                    <gmd:dateStamp>
+                        <gco:Date xsi:nil="true"/>
+                        <gco:DateTime>2018-10-29T17:31:43Z</gco:DateTime>
+                    </gmd:dateStamp>
+                    <gmd:dataSetURI>
+                        <gco:CharacterString>https://doi.pangaea.de/10.1594/PANGAEA.776358</gco:CharacterString>
+                    </gmd:dataSetURI>
+                    <gmd:identificationInfo>
+                        <gmd:MD_DataIdentification>
+                            <gmd:citation>
+                                <gmd:CI_Citation>
+                                    <gmd:title>
+                                        <gco:CharacterString>Radiosonde measurements from station
+                                            Tateno (2011-12)</gco:CharacterString>
+                                    </gmd:title>
+                                    <gmd:date>
+                                        <gmd:CI_Date>
+                                            <gmd:date>
+                                                <gco:Date xsi:nil="true"/>
+                                                <gco:DateTime>2012-02-20T22:07:38</gco:DateTime>
+                                            </gmd:date>
+                                            <gmd:dateType>
+                                                <gmd:CI_DateTypeCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode_publication"
+                                                  >publication</gmd:CI_DateTypeCode>
+                                            </gmd:dateType>
+                                        </gmd:CI_Date>
+                                    </gmd:date>
+                                    <gmd:identifier>
+                                        <gmd:MD_Identifier>
+                                            <gmd:code>
+                                                <gco:CharacterString>https://doi.org/10.1594/PANGAEA.776358</gco:CharacterString>
+                                            </gmd:code>
+                                        </gmd:MD_Identifier>
+                                    </gmd:identifier>
+                                    <gmd:citedResponsibleParty>
+                                        <gmd:CI_ResponsibleParty id="dataset.author36545">
+                                            <gmd:individualName>
+                                                <gco:CharacterString>Ijima,
+                                                  Osamu</gco:CharacterString>
+                                            </gmd:individualName>
+                                            <gmd:contactInfo>
+                                                <gmd:CI_Contact>
+                                                  <gmd:address>
+                                                  <gmd:CI_Address>
+                                                  <gmd:electronicMailAddress>
+                                                  <gco:CharacterString>ijima@met.kishou.go.jp</gco:CharacterString>
+                                                  </gmd:electronicMailAddress>
+                                                  </gmd:CI_Address>
+                                                  </gmd:address>
+                                                </gmd:CI_Contact>
+                                            </gmd:contactInfo>
+                                            <gmd:role>
+                                                <gmd:CI_RoleCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode_author"
+                                                  >author</gmd:CI_RoleCode>
+                                            </gmd:role>
+                                        </gmd:CI_ResponsibleParty>
+                                    </gmd:citedResponsibleParty>
+                                    <gmd:citedResponsibleParty>
+                                        <gmd:CI_ResponsibleParty>
+                                            <gmd:organisationName>
+                                                <gco:CharacterString>PANGAEA</gco:CharacterString>
+                                            </gmd:organisationName>
+                                            <gmd:contactInfo>
+                                                <gmd:CI_Contact>
+                                                  <gmd:address>
+                                                  <gmd:CI_Address>
+                                                  <gmd:electronicMailAddress>
+                                                  <gco:CharacterString>info@pangaea.de</gco:CharacterString>
+                                                  </gmd:electronicMailAddress>
+                                                  </gmd:CI_Address>
+                                                  </gmd:address>
+                                                  <gmd:onlineResource>
+                                                  <gmd:CI_OnlineResource>
+                                                  <gmd:linkage>
+                                                  <gmd:URL>https://www.pangaea.de/</gmd:URL>
+                                                  </gmd:linkage>
+                                                  <gmd:function>
+                                                  <gmd:CI_OnLineFunctionCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode_information"
+                                                  >information</gmd:CI_OnLineFunctionCode>
+                                                  </gmd:function>
+                                                  </gmd:CI_OnlineResource>
+                                                  </gmd:onlineResource>
+                                                </gmd:CI_Contact>
+                                            </gmd:contactInfo>
+                                            <gmd:role>
+                                                <gmd:CI_RoleCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode_publisher"
+                                                  >publisher</gmd:CI_RoleCode>
+                                            </gmd:role>
+                                        </gmd:CI_ResponsibleParty>
+                                    </gmd:citedResponsibleParty>
+                                    <gmd:citedResponsibleParty>
+                                        <gmd:CI_ResponsibleParty>
+                                            <gmd:organisationName>
+                                                <gco:CharacterString>Aerological Observatory, Japan
+                                                  Meteorological Agency</gco:CharacterString>
+                                            </gmd:organisationName>
+                                            <gmd:role>
+                                                <gmd:CI_RoleCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode_originator"
+                                                  >originator</gmd:CI_RoleCode>
+                                            </gmd:role>
+                                        </gmd:CI_ResponsibleParty>
+                                    </gmd:citedResponsibleParty>
+                                    <gmd:presentationForm>
+                                        <gmd:CI_PresentationFormCode
+                                            codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_PresentationFormCode"
+                                            codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_PresentationFormCode_tableDigital"
+                                            >tableDigital</gmd:CI_PresentationFormCode>
+                                    </gmd:presentationForm>
+                                </gmd:CI_Citation>
+                            </gmd:citation>
+                            <gmd:abstract gco:nilReason="missing"/>
+                            <gmd:status>
+                                <gmd:MD_ProgressCode
+                                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ProgressCode"
+                                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ProgressCode_completed"
+                                    >completed</gmd:MD_ProgressCode>
+                            </gmd:status>
+                            <gmd:pointOfContact>
+                                <gmd:CI_ResponsibleParty id="pi36545">
+                                    <gmd:individualName>
+                                        <gco:CharacterString>Ijima, Osamu</gco:CharacterString>
+                                    </gmd:individualName>
+                                    <gmd:contactInfo>
+                                        <gmd:CI_Contact>
+                                            <gmd:address>
+                                                <gmd:CI_Address>
+                                                  <gmd:electronicMailAddress>
+                                                  <gco:CharacterString>ijima@met.kishou.go.jp</gco:CharacterString>
+                                                  </gmd:electronicMailAddress>
+                                                </gmd:CI_Address>
+                                            </gmd:address>
+                                        </gmd:CI_Contact>
+                                    </gmd:contactInfo>
+                                    <gmd:role>
+                                        <gmd:CI_RoleCode
+                                            codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode"
+                                            codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode_principalInvestigator"
+                                            >principalInvestigator</gmd:CI_RoleCode>
+                                    </gmd:role>
+                                </gmd:CI_ResponsibleParty>
+                            </gmd:pointOfContact>
+                            <gmd:descriptiveKeywords>
+                                <gmd:MD_Keywords>
+                                    <gmd:keyword>
+                                        <gco:CharacterString>BSRN</gco:CharacterString>
+                                    </gmd:keyword>
+                                    <gmd:keyword>
+                                        <gco:CharacterString>Baseline Surface Radiation
+                                            Network</gco:CharacterString>
+                                    </gmd:keyword>
+                                    <gmd:type>
+                                        <gmd:MD_KeywordTypeCode
+                                            codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode"
+                                            codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode_theme"
+                                            >theme</gmd:MD_KeywordTypeCode>
+                                    </gmd:type>
+                                    <gmd:thesaurusName>
+                                        <gmd:CI_Citation>
+                                            <gmd:title>
+                                                <gco:CharacterString>PANGAEA Project
+                                                  List</gco:CharacterString>
+                                            </gmd:title>
+                                            <gmd:date>
+                                                <gmd:CI_Date>
+                                                  <gmd:date>
+                                                  <gco:Date>1995-01-01</gco:Date>
+                                                  </gmd:date>
+                                                  <gmd:dateType>
+                                                  <gmd:CI_DateTypeCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode_creation"
+                                                  >creation</gmd:CI_DateTypeCode>
+                                                  </gmd:dateType>
+                                                </gmd:CI_Date>
+                                            </gmd:date>
+                                            <gmd:citedResponsibleParty>
+                                                <gmd:CI_ResponsibleParty>
+                                                  <gmd:organisationName>
+                                                  <gco:CharacterString>PANGAEA</gco:CharacterString>
+                                                  </gmd:organisationName>
+                                                  <gmd:contactInfo>
+                                                  <gmd:CI_Contact>
+                                                  <gmd:address>
+                                                  <gmd:CI_Address>
+                                                  <gmd:electronicMailAddress>
+                                                  <gco:CharacterString>info@pangaea.de</gco:CharacterString>
+                                                  </gmd:electronicMailAddress>
+                                                  </gmd:CI_Address>
+                                                  </gmd:address>
+                                                  <gmd:onlineResource>
+                                                  <gmd:CI_OnlineResource>
+                                                  <gmd:linkage>
+                                                  <gmd:URL>https://www.pangaea.de/</gmd:URL>
+                                                  </gmd:linkage>
+                                                  <gmd:function>
+                                                  <gmd:CI_OnLineFunctionCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode_information"
+                                                  >information</gmd:CI_OnLineFunctionCode>
+                                                  </gmd:function>
+                                                  </gmd:CI_OnlineResource>
+                                                  </gmd:onlineResource>
+                                                  </gmd:CI_Contact>
+                                                  </gmd:contactInfo>
+                                                  <gmd:role>
+                                                  <gmd:CI_RoleCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode_pointOfContact"
+                                                  >pointOfContact</gmd:CI_RoleCode>
+                                                  </gmd:role>
+                                                </gmd:CI_ResponsibleParty>
+                                            </gmd:citedResponsibleParty>
+                                        </gmd:CI_Citation>
+                                    </gmd:thesaurusName>
+                                </gmd:MD_Keywords>
+                            </gmd:descriptiveKeywords>
+                            <gmd:resourceConstraints>
+                                <gmd:MD_LegalConstraints>
+                                    <gmd:accessConstraints>
+                                        <gmd:MD_RestrictionCode
+                                            codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode"
+                                            codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode_copyright"
+                                            >copyright</gmd:MD_RestrictionCode>
+                                    </gmd:accessConstraints>
+                                    <gmd:accessConstraints>
+                                        <gmd:MD_RestrictionCode
+                                            codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode"
+                                            codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode_restricted"
+                                            >restricted</gmd:MD_RestrictionCode>
+                                    </gmd:accessConstraints>
+                                    <gmd:useConstraints>
+                                        <gmd:MD_RestrictionCode
+                                            codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode"
+                                            codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode_copyright"
+                                            >copyright</gmd:MD_RestrictionCode>
+                                    </gmd:useConstraints>
+                                </gmd:MD_LegalConstraints>
+                            </gmd:resourceConstraints>
+                            <gmd:spatialRepresentationType>
+                                <gmd:MD_SpatialRepresentationTypeCode
+                                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_SpatialRepresentationTypeCode"
+                                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_SpatialRepresentationTypeCode_textTable"
+                                    >textTable</gmd:MD_SpatialRepresentationTypeCode>
+                            </gmd:spatialRepresentationType>
+                            <gmd:language>
+                                <gmd:LanguageCode
+                                    codeList="http://www.isotc211.org/2005/resources/Codelist/ML_gmxCodelists.xml#LanguageCode"
+                                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/ML_gmxCodelists.xml#LanguageCode_eng"
+                                    >eng</gmd:LanguageCode>
+                            </gmd:language>
+                            <gmd:topicCategory>
+                                <gmd:MD_TopicCategoryCode>geoscientificInformation</gmd:MD_TopicCategoryCode>
+                            </gmd:topicCategory>
+                            <gmd:extent>
+                                <gmd:EX_Extent>
+                                    <gmd:geographicElement>
+                                        <gmd:EX_GeographicBoundingBox>
+                                            <gmd:westBoundLongitude>
+                                                <gco:Decimal>140.1258</gco:Decimal>
+                                            </gmd:westBoundLongitude>
+                                            <gmd:eastBoundLongitude>
+                                                <gco:Decimal>140.1258</gco:Decimal>
+                                            </gmd:eastBoundLongitude>
+                                            <gmd:southBoundLatitude>
+                                                <gco:Decimal>36.0581</gco:Decimal>
+                                            </gmd:southBoundLatitude>
+                                            <gmd:northBoundLatitude>
+                                                <gco:Decimal>36.0581</gco:Decimal>
+                                            </gmd:northBoundLatitude>
+                                        </gmd:EX_GeographicBoundingBox>
+                                    </gmd:geographicElement>
+                                    <gmd:temporalElement>
+                                        <gmd:EX_TemporalExtent>
+                                            <gmd:extent>
+                                                <gml:TimePeriod gml:id="timePeriod">
+                                                  <gml:beginPosition>2011-12-01T00:02:00</gml:beginPosition>
+                                                  <gml:endPosition>2011-12-31T23:59:00</gml:endPosition>
+                                                </gml:TimePeriod>
+                                            </gmd:extent>
+                                        </gmd:EX_TemporalExtent>
+                                    </gmd:temporalElement>
+                                    <gmd:verticalElement>
+                                        <gmd:EX_VerticalExtent>
+                                            <gmd:minimumValue>
+                                                <gco:Real>26.0</gco:Real>
+                                            </gmd:minimumValue>
+                                            <gmd:maximumValue>
+                                                <gco:Real>37139.0</gco:Real>
+                                            </gmd:maximumValue>
+                                            <gmd:verticalCRS
+                                                xlink:href="http://ws.pangaea.de/schemas/iso19139/pangaea-crs-dict.xml#xpointer(//*[@gml:id='vertCRS.geocode4607'])"
+                                                xlink:title="Definition of geocode: ALTITUDE"/>
+                                        </gmd:EX_VerticalExtent>
+                                    </gmd:verticalElement>
+                                </gmd:EX_Extent>
+                            </gmd:extent>
+                        </gmd:MD_DataIdentification>
+                    </gmd:identificationInfo>
+                    <gmd:contentInfo>
+                        <gmd:MD_CoverageDescription id="col0.ds1426863">
+                            <gmd:attributeDescription>
+                                <gco:RecordType>DATE/TIME</gco:RecordType>
+                            </gmd:attributeDescription>
+                            <gmd:contentType>
+                                <gmd:MD_CoverageContentTypeCode
+                                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CoverageContentTypeCode"
+                                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CoverageContentTypeCode_thematicClassification"
+                                    >thematicClassification</gmd:MD_CoverageContentTypeCode>
+                            </gmd:contentType>
+                        </gmd:MD_CoverageDescription>
+                    </gmd:contentInfo>
+                    <gmd:contentInfo>
+                        <gmd:MD_CoverageDescription id="col1.ds1426862">
+                            <gmd:attributeDescription>
+                                <gco:RecordType>ALTITUDE</gco:RecordType>
+                            </gmd:attributeDescription>
+                            <gmd:contentType>
+                                <gmd:MD_CoverageContentTypeCode
+                                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CoverageContentTypeCode"
+                                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CoverageContentTypeCode_physicalMeasurement"
+                                    >physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+                            </gmd:contentType>
+                            <gmd:dimension>
+                                <gmd:MD_Band id="col1.ds1426862.band">
+                                    <gmd:units>
+                                        <gml:UnitDefinition gml:id="col1.ds1426862.band.unit">
+                                            <gml:identifier codeSpace="PANGAEA">m</gml:identifier>
+                                            <gml:name>m</gml:name>
+                                        </gml:UnitDefinition>
+                                    </gmd:units>
+                                </gmd:MD_Band>
+                            </gmd:dimension>
+                        </gmd:MD_CoverageDescription>
+                    </gmd:contentInfo>
+                    <gmd:contentInfo>
+                        <gmd:MD_CoverageDescription id="col2.ds11621615">
+                            <gmd:attributeDescription>
+                                <gco:RecordType>Pressure, at given altitude</gco:RecordType>
+                            </gmd:attributeDescription>
+                            <gmd:contentType>
+                                <gmd:MD_CoverageContentTypeCode
+                                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CoverageContentTypeCode"
+                                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CoverageContentTypeCode_physicalMeasurement"
+                                    >physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+                            </gmd:contentType>
+                            <gmd:dimension>
+                                <gmd:MD_Band id="col2.ds11621615.band">
+                                    <gmd:descriptor>
+                                        <gco:CharacterString>Radiosonde, Vaisala,
+                                            RS92</gco:CharacterString>
+                                    </gmd:descriptor>
+                                    <gmd:units>
+                                        <gml:UnitDefinition gml:id="col2.ds11621615.band.unit">
+                                            <gml:identifier codeSpace="PANGAEA">hPa</gml:identifier>
+                                            <gml:name>hPa</gml:name>
+                                        </gml:UnitDefinition>
+                                    </gmd:units>
+                                </gmd:MD_Band>
+                            </gmd:dimension>
+                        </gmd:MD_CoverageDescription>
+                    </gmd:contentInfo>
+                    <gmd:contentInfo>
+                        <gmd:MD_CoverageDescription id="col3.ds11621616">
+                            <gmd:attributeDescription>
+                                <gco:RecordType>Temperature, air</gco:RecordType>
+                            </gmd:attributeDescription>
+                            <gmd:contentType>
+                                <gmd:MD_CoverageContentTypeCode
+                                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CoverageContentTypeCode"
+                                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CoverageContentTypeCode_physicalMeasurement"
+                                    >physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+                            </gmd:contentType>
+                            <gmd:dimension>
+                                <gmd:MD_Band id="col3.ds11621616.band">
+                                    <gmd:descriptor>
+                                        <gco:CharacterString>Radiosonde, Vaisala,
+                                            RS92</gco:CharacterString>
+                                    </gmd:descriptor>
+                                    <gmd:units>
+                                        <gml:UnitDefinition gml:id="col3.ds11621616.band.unit">
+                                            <gml:identifier codeSpace="PANGAEA">°C</gml:identifier>
+                                            <gml:name>°C</gml:name>
+                                        </gml:UnitDefinition>
+                                    </gmd:units>
+                                </gmd:MD_Band>
+                            </gmd:dimension>
+                        </gmd:MD_CoverageDescription>
+                    </gmd:contentInfo>
+                    <gmd:contentInfo>
+                        <gmd:MD_CoverageDescription id="col4.ds11621617">
+                            <gmd:attributeDescription>
+                                <gco:RecordType>Dew/frost point</gco:RecordType>
+                            </gmd:attributeDescription>
+                            <gmd:contentType>
+                                <gmd:MD_CoverageContentTypeCode
+                                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CoverageContentTypeCode"
+                                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CoverageContentTypeCode_physicalMeasurement"
+                                    >physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+                            </gmd:contentType>
+                            <gmd:dimension>
+                                <gmd:MD_Band id="col4.ds11621617.band">
+                                    <gmd:descriptor>
+                                        <gco:CharacterString>Radiosonde, Vaisala,
+                                            RS92</gco:CharacterString>
+                                    </gmd:descriptor>
+                                    <gmd:units>
+                                        <gml:UnitDefinition gml:id="col4.ds11621617.band.unit">
+                                            <gml:identifier codeSpace="PANGAEA">°C</gml:identifier>
+                                            <gml:name>°C</gml:name>
+                                        </gml:UnitDefinition>
+                                    </gmd:units>
+                                </gmd:MD_Band>
+                            </gmd:dimension>
+                        </gmd:MD_CoverageDescription>
+                    </gmd:contentInfo>
+                    <gmd:contentInfo>
+                        <gmd:MD_CoverageDescription id="col5.ds11621618">
+                            <gmd:attributeDescription>
+                                <gco:RecordType>Wind direction</gco:RecordType>
+                            </gmd:attributeDescription>
+                            <gmd:contentType>
+                                <gmd:MD_CoverageContentTypeCode
+                                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CoverageContentTypeCode"
+                                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CoverageContentTypeCode_physicalMeasurement"
+                                    >physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+                            </gmd:contentType>
+                            <gmd:dimension>
+                                <gmd:MD_Band id="col5.ds11621618.band">
+                                    <gmd:descriptor>
+                                        <gco:CharacterString>Radiosonde, Vaisala,
+                                            RS92</gco:CharacterString>
+                                    </gmd:descriptor>
+                                    <gmd:units>
+                                        <gml:UnitDefinition gml:id="col5.ds11621618.band.unit">
+                                            <gml:identifier codeSpace="PANGAEA">deg</gml:identifier>
+                                            <gml:name>deg</gml:name>
+                                        </gml:UnitDefinition>
+                                    </gmd:units>
+                                </gmd:MD_Band>
+                            </gmd:dimension>
+                        </gmd:MD_CoverageDescription>
+                    </gmd:contentInfo>
+                    <gmd:contentInfo>
+                        <gmd:MD_CoverageDescription id="col6.ds11621619">
+                            <gmd:attributeDescription>
+                                <gco:RecordType>Wind speed</gco:RecordType>
+                            </gmd:attributeDescription>
+                            <gmd:contentType>
+                                <gmd:MD_CoverageContentTypeCode
+                                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CoverageContentTypeCode"
+                                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CoverageContentTypeCode_physicalMeasurement"
+                                    >physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+                            </gmd:contentType>
+                            <gmd:dimension>
+                                <gmd:MD_Band id="col6.ds11621619.band">
+                                    <gmd:descriptor>
+                                        <gco:CharacterString>Radiosonde, Vaisala,
+                                            RS92</gco:CharacterString>
+                                    </gmd:descriptor>
+                                    <gmd:units>
+                                        <gml:UnitDefinition gml:id="col6.ds11621619.band.unit">
+                                            <gml:identifier codeSpace="PANGAEA">m/s</gml:identifier>
+                                            <gml:name>m/s</gml:name>
+                                        </gml:UnitDefinition>
+                                    </gmd:units>
+                                </gmd:MD_Band>
+                            </gmd:dimension>
+                        </gmd:MD_CoverageDescription>
+                    </gmd:contentInfo>
+                    <gmd:distributionInfo>
+                        <gmd:MD_Distribution>
+                            <gmd:distributionFormat>
+                                <gmd:MD_Format>
+                                    <gmd:name>
+                                        <gco:CharacterString>text/tab-separated-values</gco:CharacterString>
+                                    </gmd:name>
+                                    <gmd:version>
+                                        <gco:CharacterString>unknown</gco:CharacterString>
+                                    </gmd:version>
+                                </gmd:MD_Format>
+                            </gmd:distributionFormat>
+                            <gmd:transferOptions>
+                                <gmd:MD_DigitalTransferOptions>
+                                    <gmd:onLine>
+                                        <gmd:CI_OnlineResource>
+                                            <gmd:linkage>
+                                                <gmd:URL>https://doi.pangaea.de/10.1594/PANGAEA.776358?format=textfile</gmd:URL>
+                                            </gmd:linkage>
+                                            <gmd:function>
+                                                <gmd:CI_OnLineFunctionCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode_download"
+                                                  >download</gmd:CI_OnLineFunctionCode>
+                                            </gmd:function>
+                                        </gmd:CI_OnlineResource>
+                                    </gmd:onLine>
+                                </gmd:MD_DigitalTransferOptions>
+                            </gmd:transferOptions>
+                        </gmd:MD_Distribution>
+                    </gmd:distributionInfo>
+                    <gmd:dataQualityInfo>
+                        <gmd:DQ_DataQuality>
+                            <gmd:scope>
+                                <gmd:DQ_Scope>
+                                    <gmd:level>
+                                        <gmd:MD_ScopeCode
+                                            codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ScopeCode"
+                                            codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ScopeCode_dataset"
+                                            >dataset</gmd:MD_ScopeCode>
+                                    </gmd:level>
+                                </gmd:DQ_Scope>
+                            </gmd:scope>
+                            <gmd:lineage>
+                                <gmd:LI_Lineage>
+                                    <gmd:statement>
+                                        <gco:CharacterString>The data set was checked for
+                                            completeness, correctness, and consistency of
+                                            metainformation. Validity of used methods was checked
+                                            and - if applicable - precision and range of
+                                            data.</gco:CharacterString>
+                                    </gmd:statement>
+                                    <gmd:processStep>
+                                        <gmd:LI_ProcessStep id="event2536901">
+                                            <gmd:description>
+                                                <gco:CharacterString>EVENT LABEL: (Tateno) *
+                                                  LATITUDE: 36.058100 * LONGITUDE: 140.125800 *
+                                                  DATE/TIME: 1996-02-01T00:00:00 * ELEVATION: 25.0 m
+                                                  * LOCATION: Japan * CAMPAIGN: WCRP/GEWEX * DEVICE:
+                                                  Monitoring station</gco:CharacterString>
+                                            </gmd:description>
+                                            <gmd:rationale>
+                                                <gco:CharacterString>BSRN station no: 16; Surface
+                                                  type: grass; Topography type: flat, urban;
+                                                  Horizon: doi:10.1594/PANGAEA.669527; Station
+                                                  scientist: Osamu Ijima
+                                                  (ijima@met.kishou.go.jp)</gco:CharacterString>
+                                            </gmd:rationale>
+                                            <gmd:dateTime>
+                                                <gco:DateTime>1996-02-01T00:00:00</gco:DateTime>
+                                            </gmd:dateTime>
+                                        </gmd:LI_ProcessStep>
+                                    </gmd:processStep>
+                                    <gmd:source>
+                                        <gmd:LI_Source id="ref49969">
+                                            <gmd:description>
+                                                <gco:CharacterString>Other
+                                                  version</gco:CharacterString>
+                                            </gmd:description>
+                                            <gmd:sourceCitation>
+                                                <gmd:CI_Citation>
+                                                  <gmd:title>
+                                                  <gco:CharacterString>BSRN Station-to-archive file
+                                                  for station Tateno (2011-12)</gco:CharacterString>
+                                                  </gmd:title>
+                                                  <gmd:date>
+                                                  <gmd:CI_Date>
+                                                  <gmd:date>
+                                                  <gco:Date>2012-01-01</gco:Date>
+                                                  </gmd:date>
+                                                  <gmd:dateType>
+                                                  <gmd:CI_DateTypeCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode_publication"
+                                                  >publication</gmd:CI_DateTypeCode>
+                                                  </gmd:dateType>
+                                                  </gmd:CI_Date>
+                                                  </gmd:date>
+                                                  <gmd:identifier>
+                                                  <gmd:MD_Identifier>
+                                                  <gmd:code>
+                                                  <gco:CharacterString>ftp://ftp.bsrn.awi.de/tat/tat1211.dat.gz</gco:CharacterString>
+                                                  </gmd:code>
+                                                  </gmd:MD_Identifier>
+                                                  </gmd:identifier>
+                                                  <gmd:citedResponsibleParty>
+                                                  <gmd:CI_ResponsibleParty id="ref49969.author36545">
+                                                  <gmd:individualName>
+                                                  <gco:CharacterString>Ijima,
+                                                  Osamu</gco:CharacterString>
+                                                  </gmd:individualName>
+                                                  <gmd:contactInfo>
+                                                  <gmd:CI_Contact>
+                                                  <gmd:address>
+                                                  <gmd:CI_Address>
+                                                  <gmd:electronicMailAddress>
+                                                  <gco:CharacterString>ijima@met.kishou.go.jp</gco:CharacterString>
+                                                  </gmd:electronicMailAddress>
+                                                  </gmd:CI_Address>
+                                                  </gmd:address>
+                                                  </gmd:CI_Contact>
+                                                  </gmd:contactInfo>
+                                                  <gmd:role>
+                                                  <gmd:CI_RoleCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode_author"
+                                                  >author</gmd:CI_RoleCode>
+                                                  </gmd:role>
+                                                  </gmd:CI_ResponsibleParty>
+                                                  </gmd:citedResponsibleParty>
+                                                  <gmd:presentationForm>
+                                                  <gmd:CI_PresentationFormCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_PresentationFormCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_PresentationFormCode_documentDigital"
+                                                  >documentDigital</gmd:CI_PresentationFormCode>
+                                                  </gmd:presentationForm>
+                                                </gmd:CI_Citation>
+                                            </gmd:sourceCitation>
+                                        </gmd:LI_Source>
+                                    </gmd:source>
+                                </gmd:LI_Lineage>
+                            </gmd:lineage>
+                        </gmd:DQ_DataQuality>
+                    </gmd:dataQualityInfo>
+                </gmi:MI_Metadata>
+            </gs:isoMetadata>
+        </gs:coreMetadata>
+        <gs:augmentedMetadata/>
+        <gs:extendedMetadata/>
+    </gs:harmonizedMetadata>
+    <gs:originalMetadata/>
+    <gs:indexesMetadata>
+        <gs:resourceType>Dataset</gs:resourceType>
+        <gs:sourceId>UUID-481e6892-5874-44dc-aafd-2914b58f67ba</gs:sourceId>
+        <gs:originalId>de.pangaea.dataset776358</gs:originalId>
+        <gs:oaiHeaderId>de.pangaea.dataset776358</gs:oaiHeaderId>
+        <gs:privateId>86af36f8-472a-4f08-bb83-c64b63b079d3</gs:privateId>
+        <gs:resourceTimeStamp>2018-11-22T16:53:09.728Z</gs:resourceTimeStamp>
+        <gs:metadataQuality>3</gs:metadataQuality>
+        <gs:anyText>86af36f8-472a-4f08-bb83-c64b63b079d3 PANGAEA info@pangaea.de
+            https://www.pangaea.de/ information pointOfContact 2018-10-29T17:31:43Z
+            https://doi.pangaea.de/10.1594/PANGAEA.776358 Radiosonde measurements from station
+            Tateno (2011-12) 2012-02-20T22:07:38 publication https://doi.org/10.1594/PANGAEA.776358
+            Ijima, Osamu ijima@met.kishou.go.jp author PANGAEA info@pangaea.de
+            https://www.pangaea.de/ information publisher Aerological Observatory, Japan
+            Meteorological Agency originator tableDigital completed Ijima, Osamu
+            ijima@met.kishou.go.jp principalInvestigator BSRN Baseline Surface Radiation Network
+            theme PANGAEA Project List 1995-01-01 creation PANGAEA info@pangaea.de
+            https://www.pangaea.de/ information pointOfContact copyright restricted copyright
+            textTable eng geoscientificInformation 140.1258 140.1258 36.0581 36.0581
+            2011-12-01T00:02:00 2011-12-31T23:59:00 26.0 37139.0 DATE/TIME thematicClassification
+            ALTITUDE physicalMeasurement m m Pressure, at given altitude physicalMeasurement
+            Radiosonde, Vaisala, RS92 hPa hPa Temperature, air physicalMeasurement Radiosonde,
+            Vaisala, RS92 °C °C Dew/frost point physicalMeasurement Radiosonde, Vaisala, RS92 °C °C
+            Wind direction physicalMeasurement Radiosonde, Vaisala, RS92 deg deg Wind speed
+            physicalMeasurement Radiosonde, Vaisala, RS92 m/s m/s text/tab-separated-values unknown
+            https://doi.pangaea.de/10.1594/PANGAEA.776358?format=textfile download dataset The data
+            set was checked for completeness, correctness, and consistency of metainformation.
+            Validity of used methods was checked and - if applicable - precision and range of data.
+            EVENT LABEL: (Tateno) * LATITUDE: 36.058100 * LONGITUDE: 140.125800 * DATE/TIME:
+            1996-02-01T00:00:00 * ELEVATION: 25.0 m * LOCATION: Japan * CAMPAIGN: WCRP/GEWEX *
+            DEVICE: Monitoring station BSRN station no: 16; Surface type: grass; Topography type:
+            flat, urban; Horizon: doi:10.1594/PANGAEA.669527; Station scientist: Osamu Ijima
+            (ijima@met.kishou.go.jp) 1996-02-01T00:00:00 Other version BSRN Station-to-archive file
+            for station Tateno (2011-12) 2012-01-01 publication
+            ftp://ftp.bsrn.awi.de/tat/tat1211.dat.gz Ijima, Osamu ijima@met.kishou.go.jp author
+            documentDigital</gs:anyText>
+        <gs:attributeDesc>DATE/TIME</gs:attributeDesc>
+        <gs:attributeDesc>ALTITUDE</gs:attributeDesc>
+        <gs:attributeDesc>Pressure, at given altitude</gs:attributeDesc>
+        <gs:attributeDesc>Temperature, air</gs:attributeDesc>
+        <gs:attributeDesc>Dew/frost point</gs:attributeDesc>
+        <gs:attributeDesc>Wind direction</gs:attributeDesc>
+        <gs:attributeDesc>Wind speed</gs:attributeDesc>
+        <gs:dateStamp>2018-10-29T17:31:43Z</gs:dateStamp>
+        <gs:fileId>86af36f8-472a-4f08-bb83-c64b63b079d3</gs:fileId>
+        <gs:format>text/tab-separated-values</gs:format>
+        <gs:hasAccessLegalConst>true</gs:hasAccessLegalConst>
+        <gs:hasOtherLegalConst>false</gs:hasOtherLegalConst>
+        <gs:hasSecurityConst>false</gs:hasSecurityConst>
+        <gs:hasUseLegalConst>true</gs:hasUseLegalConst>
+        <gs:keyword>BSRN</gs:keyword>
+        <gs:keyword>Baseline Surface Radiation Network</gs:keyword>
+        <gs:keywordType>http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode_theme</gs:keywordType>
+        <gs:onlineLinkage>https://doi.pangaea.de/10.1594/PANGAEA.776358?format=textfile</gs:onlineLinkage>
+        <gs:resLanguage>net.opengis.iso19139.gco.v_20060504.CodeListValueType@100af9c[value=eng,
+            codeList=http://www.isotc211.org/2005/resources/Codelist/ML_gmxCodelists.xml#LanguageCode,
+            codeListValue=http://www.isotc211.org/2005/resources/Codelist/ML_gmxCodelists.xml#LanguageCode_eng,
+            codeSpace=&lt;null&gt;(default)]</gs:resLanguage>
+        <gs:resourceId>https://doi.org/10.1594/PANGAEA.776358</gs:resourceId>
+        <gs:title>Radiosonde measurements from station Tateno (2011-12)</gs:title>
+        <gs:tmpExtentBegin>2011-12-01T00:02:00</gs:tmpExtentBegin>
+        <gs:tmpExtentEnd>2011-12-31T23:59:00</gs:tmpExtentEnd>
+        <gs:topicCategory>geoscientificInformation</gs:topicCategory>
+        <gs:bbox>
+            <gs:sw>36.0581 140.1258</gs:sw>
+            <gs:se>36.0581 140.1258</gs:se>
+            <gs:nw>36.0581 140.1258</gs:nw>
+            <gs:ne>36.0581 140.1258</gs:ne>
+            <gs:isCrossed>false</gs:isCrossed>
+            <gs:area>0</gs:area>
+            <gs:center>36.0581 140.1258</gs:center>
+            <gs:disjValues>
+                <gs:disjSouth>36.0581</gs:disjSouth>
+                <gs:disjWest>140.1258</gs:disjWest>
+                <gs:disjNorth>36.0581</gs:disjNorth>
+                <gs:disjEast>140.1258</gs:disjEast>
+            </gs:disjValues>
+            <gs:cardinalValues>
+                <gs:values>
+                    <gs:south>36.0581</gs:south>
+                    <gs:west>140.1258</gs:west>
+                    <gs:east>140.1258</gs:east>
+                    <gs:north>36.0581</gs:north>
+                </gs:values>
+            </gs:cardinalValues>
+        </gs:bbox>
+    </gs:indexesMetadata>
+</gs:Dataset>

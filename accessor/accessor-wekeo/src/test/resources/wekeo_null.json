@@ -1,0 +1,30 @@
+{
+    "abstract": "<b>ERA5</b> provides estimates of the state of the atmosphere covering the period <b>1950</b> to the present and is produced at the European Centre for Medium-Range Weather Forecasts ( <a>ECMWF</a> ) by the <a>EU Copernicus Climate Change Service ( C3S ).</a> <b>ERA5 is the fifth generation ECMWF atmospheric reanalysis of the global climate</b>. The first was the FGGE reanalysis, followed by ERA-15, ERA-40 and more recently, ERA-Interim.\n\nIn addition to the hourly estimates of meteorological variables with a horizontal resolution of <b>31 Km on 137 vertical levels</b>, from the surface up to 1 Pa, ERA5 provides a measure of the uncertainty of these estimates too. The estimates are produced with a procedure known as “Reanalysis”, which creates an optimal combination of measurements of natural variables with information from a numerical weather forecast model, which predicts variables in space and time according to physical laws, taking into account the expected error characteristics of both.\n\nVariables are produced at the surface and on model levels but are also interpolated to three other level types: <b>pressure levels, potential temperature levels and one potential vorticity level</b>. The estimates are available on hourly and monthly time scales. The size of the complete dataset is about <b>9 Petabytes</b>.\n\nIn order to make data access more manageable, the <b>ERA5</b> dataset has been split into 15 records. The present record is the “ERA5 hourly estimates of variables on pressure levels”.\n\nMore detailed information about this dataset can be found under the \"Documentation\" tab.\n\n\n\n<font color=\"#7A7A7A\">\n<TABLE width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" border=\"1\" align=\"center\">\n\n<TR bgcolor=\"#F3F3F3\"><TH colspan=\"2\">METADATA</TH>\n<TR><TH>Horizontal coverage:</TH><TD>Global</TD></TR>\n<TR><TH>Horizontal resolution:</TH><TD>31 $km$ for the best estimate and 62 $km$ for the other values </TD></TR>\n<TR><TH>Vertical coverage:</TH><TD>1000 $hPa$ to 1 $hPa$</TD></TR>\n<TR><TH>Vertical resolution:</TH><TD>37 levels</TD></TR>\n<TR><TH>Temporal coverage:</TH><TD>1950 to present</TD></TR>\n<TR><TH>Temporal resolution:</TH><TD>Hourly for the best estimate and 3-hourly for the other values</TD></TR>\n<TR><TH>Number of variables:</TH><TD>16</TD></TR>\n<TR><TH>Total volume:</TH><TD>1 Tb</TD></TR>\n<TR><TH>Output file format:</TH><TD>NetCDF or GRIB1</TD></TR>\n</TABLE>\n</font>",
+    "contact": {
+        "contactEmail": null,
+        "contactIndividualName": null,
+        "contactOrganizationName": null,
+        "contactPhone": null,
+        "contactUrl": null
+    },
+    "created": "2018-02-08T00:00:00Z",
+    "datasetId": "EO:ECMWF:DAT:ERA5_HOURLY_VARIABLES_ON_PRESSURE_LEVELS",
+    "details": {
+        "instrumentId": null,
+        "instrumentName": null,
+        "instrumentType": null,
+        "orbitType": null,
+        "platformDescription": null,
+        "platformId": null
+    },
+    "extent": {
+        "bbox": "POLYGON((-180.0 90.0, 180.0 90.0, 180.0 -90.0, -180.0 -90.0, -180.0 90.0))",
+        "endDate": null,
+        "geoDescription": null,
+        "startDate": null
+    },
+    "parameters": "World, Temporal coverage: Past, Spatial coverage: Global, Product type: Reanalysis, Variable domain: Atmosphere (upper air)",
+    "previewImage": "https://wekeo-broker.apps.mercator.dpi.wekeo.eu/previews/EO_ECMWF_DAT_ERA5_HOURLY_VARIABLES_ON_PRESSURE_LEVELS.jpg",
+    "status": "onGoing",
+    "title": "ERA5 hourly variables on pressure levels"
+}

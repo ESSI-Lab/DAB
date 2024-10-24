@@ -17,18 +17,29 @@
 	<modules>
 		<module>profiler-oaipmh</module>
 		<module>profiler-opensearch</module>
+		<module>profiler-esri</module>
 		<module>profiler-bnhs</module>
 		<module>profiler-csw</module>
 		<module>profiler-semantic</module>
+		<module>profiler-cdi</module>
 		<module>profiler-pub-sub</module>
 		<module>profiler-wof</module>
 		<module>profiler-wps</module>
 		<module>profiler-wfs</module>
 		<module>profiler-rest</module>
+		<module>profiler-rest-views</module>
+		<module>profiler-arpa-rest</module>
 		<module>profiler-observations</module>
+		<module>profiler-arpa-hydrocsv</module>
 		<module>profiler-sos</module>
+		<module>profiler-terms</module>
+		<module>profiler-wis</module>
 		<module>profiler-wms</module>
+		<module>profiler-wms-extent</module>
+		<module>profiler-thredds</module>
 		<module>profiler-gwis</module>
+		<module>profiler-ssc-feed</module>
+		<module>profiler-worldcereal</module>
 	</modules>
 
 	<dependencies>
@@ -71,6 +82,11 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
 		</dependency>
 
 		<dependency>

@@ -1,0 +1,8 @@
+{
+	"currentVersion": 10.05,
+	"soapUrl": "http://whos.geodab.eu/gs-service/services/essi/view/whos-arctic/ArcGIS/services",
+	"secureSoapUrl": "https://whos.geodab.eu/gs-service/services/essi/view/whos-arctic/ArcGIS/services",
+	"authInfo": {
+		"isTokenBasedSecurity": false
+	}
+}

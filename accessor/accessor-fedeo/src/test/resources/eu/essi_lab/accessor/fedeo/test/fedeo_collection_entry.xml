@@ -1,0 +1,467 @@
+	<entry>
+		<category
+			label="Science Keywords &gt; Earth Science &gt; Spectral/Engineering &gt; Radar &gt; Radar Imagery"
+			term="http://gcmdservices.gsfc.nasa.gov/kms/concept/53f69037-ff05-4b09-a95d-e65ff42da595" />
+		<category label="ALOS"
+			term="http://gcmdservices.gsfc.nasa.gov/kms/concept/0bf5fb56-9d29-438a-a84f-a60296a2e503" />
+		<category label="FedEO" term="FedEO" />
+		<category label="SSARA" term="SSARA" />
+		<id>https://fedeo.ceos.org:443/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ASSARA%3AALOS&amp;recordSchema=iso19115
+		</id>
+		<link
+			href="https://fedeo.ceos.org:443/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ASSARA%3AALOS&amp;recordSchema=iso19115"
+			rel="alternate" title="Atom format" type="application/atom+xml" />
+		<link
+			href="https://fedeo.ceos.org:443/opensearch/description.xml?parentIdentifier=EOP:SSARA&amp;sensorType=RADAR&amp;platform=ALOS&amp;startDate=2006-01-01&amp;endDate=2011-12-31"
+			hreflang="en" rel="search" type="application/opensearchdescription+xml" />
+		<link href="http://www.unavco.org/projects/other-projects/ssara/ssara.html"
+			rel="describedby" type="text/html" />
+		<link href="http://131.176.197.12/opensearch/images/unavco.png"
+			rel="icon" type="image/png" />
+		<link
+			href="https://fedeo.ceos.org:443/opensearch/request/?httpAccept=application/vnd.iso.19139%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ASSARA%3AALOS&amp;recordSchema=iso"
+			rel="alternate" title="ISO 19139 metadata" type="application/vnd.iso.19139+xml" />
+		<link
+			href="https://fedeo.ceos.org:443/opensearch/request/?httpAccept=application/vnd.iso.19139-2%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ASSARA%3AALOS&amp;recordSchema=iso19139-2"
+			rel="alternate" title="ISO 19139-2 metadata" type="application/vnd.iso.19139-2+xml" />
+		<link
+			href="https://fedeo.ceos.org:443/opensearch/request/?httpAccept=application/iso19115%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ASSARA%3AALOS&amp;recordSchema=iso19115"
+			rel="alternate" title="ISO MENDS metadata" type="application/iso19115+xml" />
+		<link
+			href="https://fedeo.ceos.org:443/opensearch/request/?httpAccept=application/vnd.iso.19115-3%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ASSARA%3AALOS&amp;recordSchema=iso19115-3"
+			rel="alternate" title="ISO 19115-3 metadata" type="application/vnd.iso.19115-3+xml" />
+		<link
+			href="https://fedeo.ceos.org:443/opensearch/request/?httpAccept=application/dif10%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ASSARA%3AALOS&amp;recordSchema=dif10"
+			rel="alternate" title="DIF-10 metadata" type="application/dif10+xml" />
+		<link
+			href="https://fedeo.ceos.org:443/opensearch/request/?httpAccept=application/xml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ASSARA%3AALOS&amp;recordSchema=dc"
+			rel="alternate" title="Dublin Core metadata" type="application/xml" />
+		<link
+			href="https://fedeo.ceos.org:443/opensearch/request/?httpAccept=application/rdf%2Bxml&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:SSARA:ALOS&amp;recordSchema=iso"
+			rel="alternate" title="RDF/XML format" type="application/rdf+xml" />
+		<link
+			href="https://fedeo.ceos.org:443/opensearch/request/?httpAccept=application/ld%2Bjson&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:SSARA:ALOS&amp;recordSchema=iso"
+			rel="alternate" title="JSON-LD format" type="application/ld+json" />
+		<link
+			href="https://fedeo.ceos.org:443/opensearch/request/?httpAccept=text/turtle&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:SSARA:ALOS&amp;recordSchema=iso"
+			rel="alternate" title="Turtle format" type="text/turtle" />
+		<summary type="html"><![CDATA[<table xmlns="">
+<tr valign="top">
+<td>
+<b>Title</b>
+</td>
+<td>Seamless SAR Archive (SSARA) Provided Collections for ALOS platform</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Description</b>
+</td>
+<td> This collection represents the ALOS collections provided by the SSARA - Seamless SAR Archive that are available through the FedEO Opensearch Gateway. SSARA will provide users with simple browser and web service API access tools to view and retrieve SAR data from multiple archives, to place their tasking requests, to order data, and to report results back to data providers; to make a larger pool of data available to scientific data users; and to encourage broader national and international use of SAR data. The new ACCESS-developed tools will help overcome current obstacles including heterogeneous archive access protocols and data/product formats, data provider access policy constraints, and an increasingly broad and diverse selection of SAR data that now includes ALOS SAR data.(Information from http://www.unavco.org/projects/other-projects/ssara/ssara.html).	</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Type</b>
+</td>
+<td>Collection</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Date</b>
+</td>
+<td/>
+</tr>
+<tr valign="top">
+<td>
+<b>Media Type</b>
+</td>
+<td>
+<a href="https://fedeo.ceos.org:443/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ASSARA%3AALOS&amp;recordSchema=iso19115" title="ATOM format">ATOM</a>   |   <a href="https://fedeo.ceos.org:443/opensearch/request/?httpAccept=application/sru%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ASSARA%3AALOS&amp;recordSchema=server-choice" title="SRU format">SRU</a>
+</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Metadata</b>
+</td>
+<td>
+<a href="https://fedeo.ceos.org:443/opensearch/request/?httpAccept=application/vnd.iso.19139%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ASSARA%3AALOS&amp;recordSchema=iso" title="ISO format">ISO 19139</a>   |   <a href="https://fedeo.ceos.org:443/opensearch/request/?httpAccept=application/vnd.iso.19139-2%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ASSARA%3AALOS&amp;recordSchema=iso19139-2" title="ISO format">ISO 19139-2</a> |   <a href="https://fedeo.ceos.org:443/opensearch/request/?httpAccept=application/dif10%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ASSARA%3AALOS&amp;recordSchema=dif10" title="ISO format">DIF-10</a>
+</td>
+</tr>
+</table>]]></summary>
+		<title>Seamless SAR Archive (SSARA) Provided Collections for ALOS
+			platform</title>
+		<updated>2018-12-12T16:07:09Z</updated>
+		<dc:identifier>EOP:SSARA:ALOS</dc:identifier>
+		<georss:polygon>-90 -180 -90 180 90 180 90 -180 -90 -180
+		</georss:polygon>
+		<gmi:MI_Metadata xmlns:gmi="http://www.isotc211.org/2005/gmi"
+			xmlns:eos="http://earthdata.nasa.gov/schema/eos" xmlns:gco="http://www.isotc211.org/2005/gco"
+			xmlns:gml32="http://www.opengis.net/gml/3.2" xmlns:gmx="http://www.isotc211.org/2005/gmx"
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gml="http://www.opengis.net/gml"
+			xsi:schemaLocation="http://www.isotc211.org/2005/gmi https://cdn.earthdata.nasa.gov/iso/gmi/1.0/gmi.xsd">
+			<gmd:fileIdentifier xmlns:gmd="http://www.isotc211.org/2005/gmd">
+				<gco:CharacterString>EOP:SSARA:ALOS</gco:CharacterString>
+			</gmd:fileIdentifier>
+			<gmd:language xmlns:gmd="http://www.isotc211.org/2005/gmd">
+				<gmd:LanguageCode
+					codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#LanguageCode"
+					codeListValue="eng">eng</gmd:LanguageCode>
+			</gmd:language>
+			<gmd:hierarchyLevel xmlns:gmd="http://www.isotc211.org/2005/gmd">
+				<gmd:MD_ScopeCode
+					codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#MD_ScopeCode"
+					codeListValue="series">series</gmd:MD_ScopeCode>
+			</gmd:hierarchyLevel>
+			<gmd:contact xmlns:gmd="http://www.isotc211.org/2005/gmd">
+				<gmd:CI_ResponsibleParty>
+					<gmd:organisationName>
+						<gco:CharacterString>UNAVCO</gco:CharacterString>
+					</gmd:organisationName>
+					<gmd:positionName>
+						<gco:CharacterString>helpdesk</gco:CharacterString>
+					</gmd:positionName>
+					<gmd:contactInfo>
+						<gmd:CI_Contact>
+							<gmd:address>
+								<gmd:CI_Address>
+									<gmd:electronicMailAddress>
+										<gco:CharacterString>archive-sar@unavco.org
+										</gco:CharacterString>
+									</gmd:electronicMailAddress>
+								</gmd:CI_Address>
+							</gmd:address>
+						</gmd:CI_Contact>
+					</gmd:contactInfo>
+					<gmd:role>
+						<gmd:CI_RoleCode
+							codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#CI_RoleCode"
+							codeListValue="pointOfContact">pointOfContact</gmd:CI_RoleCode>
+					</gmd:role>
+				</gmd:CI_ResponsibleParty>
+			</gmd:contact>
+			<gmd:dateStamp xmlns:gmd="http://www.isotc211.org/2005/gmd">
+				<gco:Date>2017-04-30</gco:Date>
+			</gmd:dateStamp>
+			<gmd:metadataStandardName xmlns:gmd="http://www.isotc211.org/2005/gmd">
+				<gco:CharacterString>ISO19115</gco:CharacterString>
+			</gmd:metadataStandardName>
+			<gmd:metadataStandardVersion xmlns:gmd="http://www.isotc211.org/2005/gmd">
+				<gco:CharacterString>2005/Cor.1:2006</gco:CharacterString>
+			</gmd:metadataStandardVersion>
+			<gmd:identificationInfo xmlns:gmd="http://www.isotc211.org/2005/gmd">
+				<gmd:MD_DataIdentification>
+					<gmd:citation>
+						<gmd:CI_Citation>
+							<gmd:title>
+								<gco:CharacterString>Seamless SAR Archive (SSARA) Provided
+									Collections for ALOS platform</gco:CharacterString>
+							</gmd:title>
+							<gmd:date>
+								<gmd:CI_Date>
+									<gmd:date>
+										<gco:Date>2006-01-01</gco:Date>
+									</gmd:date>
+									<gmd:dateType>
+										<gmd:CI_DateTypeCode
+											codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_DateTypeCode"
+											codeListValue="creation" />
+									</gmd:dateType>
+								</gmd:CI_Date>
+							</gmd:date>
+							<gmd:edition>
+								<gco:CharacterString>Latest Version</gco:CharacterString>
+							</gmd:edition>
+							<gmd:identifier>
+								<gmd:MD_Identifier>
+									<gmd:code>
+										<gco:CharacterString>EOP:SSARA:ALOS</gco:CharacterString>
+									</gmd:code>
+									<gmd:codeSpace>
+										<gco:CharacterString />
+									</gmd:codeSpace>
+								</gmd:MD_Identifier>
+							</gmd:identifier>
+						</gmd:CI_Citation>
+					</gmd:citation>
+					<gmd:abstract>
+						<gco:CharacterString> This collection represents the ALOS
+							collections provided by the SSARA - Seamless SAR Archive that are
+							available through the FedEO Opensearch Gateway. SSARA will
+							provide users with simple browser and web service API access
+							tools to view and retrieve SAR data from multiple archives, to
+							place their tasking requests, to order data, and to report
+							results back to data providers; to make a larger pool of data
+							available to scientific data users; and to encourage broader
+							national and international use of SAR data. The new
+							ACCESS-developed tools will help overcome current obstacles
+							including heterogeneous archive access protocols and data/product
+							formats, data provider access policy constraints, and an
+							increasingly broad and diverse selection of SAR data that now
+							includes ALOS SAR data.(Information from
+							http://www.unavco.org/projects/other-projects/ssara/ssara.html).
+						</gco:CharacterString>
+					</gmd:abstract>
+					<gmd:descriptiveKeywords>
+						<gmd:MD_Keywords>
+							<gmd:keyword>
+								<gco:CharacterString>FedEO</gco:CharacterString>
+							</gmd:keyword>
+							<gmd:keyword>
+								<gco:CharacterString>SSARA</gco:CharacterString>
+							</gmd:keyword>
+						</gmd:MD_Keywords>
+					</gmd:descriptiveKeywords>
+					<gmd:descriptiveKeywords>
+						<gmd:MD_Keywords>
+							<gmd:keyword>
+								<gmx:Anchor
+									xlink:href="http://gcmdservices.gsfc.nasa.gov/kms/concept/53f69037-ff05-4b09-a95d-e65ff42da595"
+									xmlns:xlink="http://www.w3.org/1999/xlink">Science Keywords &gt; Earth Science &gt;
+									Spectral/Engineering &gt; Radar &gt; Radar Imagery</gmx:Anchor>
+							</gmd:keyword>
+							<gmd:type>
+								<gmd:MD_KeywordTypeCode
+									codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_KeywordTypeCode"
+									codeListValue="theme" />
+							</gmd:type>
+							<gmd:thesaurusName>
+								<gmd:CI_Citation>
+									<gmd:title>
+										<gmx:Anchor xlink:href="http://gcmd.gsfc.nasa.gov/skos/"
+											xmlns:xlink="http://www.w3.org/1999/xlink">NASA/Global Change Master Directory (GCMD) Earth
+											Science Keywords. Version 8.0.0.0.0</gmx:Anchor>
+									</gmd:title>
+									<gmd:date>
+										<gmd:CI_Date>
+											<gmd:date>
+												<gco:Date>2013</gco:Date>
+											</gmd:date>
+											<gmd:dateType>
+												<gmd:CI_DateTypeCode
+													codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#CI_DateTypeCode"
+													codeListValue="publication">publication</gmd:CI_DateTypeCode>
+											</gmd:dateType>
+										</gmd:CI_Date>
+									</gmd:date>
+									<gmd:identifier>
+										<gmd:MD_Identifier>
+											<gmd:code>
+												<gco:CharacterString>http://idn.ceos.org/
+												</gco:CharacterString>
+											</gmd:code>
+										</gmd:MD_Identifier>
+									</gmd:identifier>
+								</gmd:CI_Citation>
+							</gmd:thesaurusName>
+						</gmd:MD_Keywords>
+					</gmd:descriptiveKeywords>
+					<gmd:descriptiveKeywords>
+						<gmd:MD_Keywords>
+							<gmd:keyword>
+								<gco:CharacterString>ALOS</gco:CharacterString>
+							</gmd:keyword>
+							<gmd:type>
+								<gmd:MD_KeywordTypeCode
+									codeList="http://www.ngdc.noaa.gov/metadata/published/xsd/schema/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode"
+									codeListValue="platform">platform</gmd:MD_KeywordTypeCode>
+							</gmd:type>
+						</gmd:MD_Keywords>
+					</gmd:descriptiveKeywords>
+					<gmd:descriptiveKeywords>
+						<gmd:MD_Keywords>
+							<gmd:keyword>
+								<gco:CharacterString>PALSAR</gco:CharacterString>
+							</gmd:keyword>
+							<gmd:type>
+								<gmd:MD_KeywordTypeCode
+									codeList="http://www.ngdc.noaa.gov/metadata/published/xsd/schema/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode"
+									codeListValue="instrument">instrument</gmd:MD_KeywordTypeCode>
+							</gmd:type>
+						</gmd:MD_Keywords>
+					</gmd:descriptiveKeywords>
+					<gmd:resourceConstraints>
+						<gmd:MD_Constraints>
+							<gmd:useLimitation>
+								<gco:CharacterString>See
+									http://www.unavco.org/community/policies_forms/data-policy/data-policy.html
+								</gco:CharacterString>
+							</gmd:useLimitation>
+						</gmd:MD_Constraints>
+					</gmd:resourceConstraints>
+					<gmd:resourceConstraints>
+						<gmd:MD_LegalConstraints>
+							<gmd:accessConstraints>
+								<gmd:MD_RestrictionCode
+									codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#MD_RestrictionCode"
+									codeListValue="otherRestrictions">otherRestrictions</gmd:MD_RestrictionCode>
+							</gmd:accessConstraints>
+							<gmd:otherConstraints>
+								<gco:CharacterString>See http://www.unavco.org/data/data.html
+								</gco:CharacterString>
+							</gmd:otherConstraints>
+						</gmd:MD_LegalConstraints>
+					</gmd:resourceConstraints>
+					<gmd:language>
+						<gmd:LanguageCode
+							codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#LanguageCode"
+							codeListValue="eng">eng</gmd:LanguageCode>
+					</gmd:language>
+					<gmd:topicCategory>
+						<gmd:MD_TopicCategoryCode>geoscientificInformation
+						</gmd:MD_TopicCategoryCode>
+					</gmd:topicCategory>
+					<gmd:extent>
+						<gmd:EX_Extent>
+							<gmd:temporalElement>
+								<gmd:EX_TemporalExtent>
+									<gmd:extent>
+										<gml:TimePeriod xmlns:gml="http://www.opengis.net/gml/3.2"
+											gml:id="timeperiod1">
+											<gml:beginPosition>2006-01-01</gml:beginPosition>
+											<gml:endPosition>2011-12-31</gml:endPosition>
+										</gml:TimePeriod>
+									</gmd:extent>
+								</gmd:EX_TemporalExtent>
+							</gmd:temporalElement>
+						</gmd:EX_Extent>
+					</gmd:extent>
+					<gmd:extent>
+						<gmd:EX_Extent>
+							<gmd:geographicElement>
+								<gmd:EX_GeographicBoundingBox>
+									<gmd:westBoundLongitude>
+										<gco:Decimal>-180</gco:Decimal>
+									</gmd:westBoundLongitude>
+									<gmd:eastBoundLongitude>
+										<gco:Decimal>180</gco:Decimal>
+									</gmd:eastBoundLongitude>
+									<gmd:southBoundLatitude>
+										<gco:Decimal>-90</gco:Decimal>
+									</gmd:southBoundLatitude>
+									<gmd:northBoundLatitude>
+										<gco:Decimal>90</gco:Decimal>
+									</gmd:northBoundLatitude>
+								</gmd:EX_GeographicBoundingBox>
+							</gmd:geographicElement>
+						</gmd:EX_Extent>
+					</gmd:extent>
+				</gmd:MD_DataIdentification>
+			</gmd:identificationInfo>
+			<gmd:distributionInfo xmlns:gmd="http://www.isotc211.org/2005/gmd">
+				<gmd:MD_Distribution>
+					<gmd:distributionFormat>
+						<gmd:MD_Format>
+							<gmd:name gco:nilReason="inapplicable" />
+							<gmd:version gco:nilReason="inapplicable" />
+						</gmd:MD_Format>
+					</gmd:distributionFormat>
+					<gmd:transferOptions>
+						<gmd:MD_DigitalTransferOptions>
+							<gmd:onLine>
+								<gmd:CI_OnlineResource>
+									<gmd:linkage>
+										<gmd:URL>http://www.unavco.org/projects/other-projects/ssara/ssara.html
+										</gmd:URL>
+									</gmd:linkage>
+									<gmd:function>
+										<gmd:CI_OnLineFunctionCode
+											codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#CI_OnLineFunctionCode"
+											codeListValue="information" />
+									</gmd:function>
+								</gmd:CI_OnlineResource>
+							</gmd:onLine>
+							<gmd:onLine>
+								<gmd:CI_OnlineResource>
+									<gmd:linkage>
+										<gmd:URL>http://fedeo.ceos.org/opensearch/description.xml?parentIdentifier=EOP:SSARA&amp;sensorType=RADAR&amp;platform=ALOS
+										</gmd:URL>
+									</gmd:linkage>
+									<gmd:name>
+										<gco:CharacterString>FedEO Clearinghouse</gco:CharacterString>
+									</gmd:name>
+									<gmd:description>
+										<gco:CharacterString>FedEO Clearinghouse</gco:CharacterString>
+									</gmd:description>
+									<gmd:function>
+										<gmd:CI_OnLineFunctionCode
+											codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#CI_OnLineFunctionCode"
+											codeListValue="search" />
+									</gmd:function>
+								</gmd:CI_OnlineResource>
+							</gmd:onLine>
+						</gmd:MD_DigitalTransferOptions>
+					</gmd:transferOptions>
+				</gmd:MD_Distribution>
+			</gmd:distributionInfo>
+			<gmd:dataQualityInfo xmlns:gmd="http://www.isotc211.org/2005/gmd">
+				<gmd:DQ_DataQuality>
+					<gmd:scope>
+						<gmd:DQ_Scope>
+							<gmd:level>
+								<gmd:MD_ScopeCode
+									codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#MD_ScopeCode"
+									codeListValue="series">series</gmd:MD_ScopeCode>
+							</gmd:level>
+						</gmd:DQ_Scope>
+					</gmd:scope>
+				</gmd:DQ_DataQuality>
+			</gmd:dataQualityInfo>
+			<gmi:acquisitionInformation>
+				<gmi:MI_AcquisitionInformation>
+					<gmi:instrument>
+						<gmi:MI_Instrument id="w31aac49c25c21b1b1b1b5b1">
+							<gmi:citation>
+								<gmd:CI_Citation xmlns:gmd="http://www.isotc211.org/2005/gmd">
+									<gmd:title>
+										<gco:CharacterString>PALSAR</gco:CharacterString>
+									</gmd:title>
+									<gmd:date gco:nilReason="unknown" />
+								</gmd:CI_Citation>
+							</gmi:citation>
+							<gmi:identifier>
+								<gmd:MD_Identifier xmlns:gmd="http://www.isotc211.org/2005/gmd">
+									<gmd:code>
+										<gco:CharacterString>PALSAR</gco:CharacterString>
+									</gmd:code>
+									<gmd:description>
+										<gco:CharacterString>PALSAR</gco:CharacterString>
+									</gmd:description>
+								</gmd:MD_Identifier>
+							</gmi:identifier>
+							<gmi:type>
+								<gco:CharacterString />
+							</gmi:type>
+						</gmi:MI_Instrument>
+					</gmi:instrument>
+					<gmi:platform>
+						<eos:EOS_Platform id="w31aac49c25c21b1b1b1">
+							<gmi:identifier>
+								<gmd:MD_Identifier xmlns:gmd="http://www.isotc211.org/2005/gmd">
+									<gmd:code>
+										<gco:CharacterString>ALOS</gco:CharacterString>
+									</gmd:code>
+									<gmd:description>
+										<gco:CharacterString />
+									</gmd:description>
+								</gmd:MD_Identifier>
+							</gmi:identifier>
+							<gmi:description>
+								<gco:CharacterString>ALOS Satellite</gco:CharacterString>
+							</gmi:description>
+							<gmi:instrument gco:nilReason="inapplicable" />
+						</eos:EOS_Platform>
+					</gmi:platform>
+				</gmi:MI_AcquisitionInformation>
+			</gmi:acquisitionInformation>
+		</gmi:MI_Metadata>
+		<dqv:hasQualityMeasure xmlns:dqv="http://www.w3.org/ns/dqv#">
+			<dqv:QualityMeasure>
+				<dqv:hasMetric>http://www.icinga.org/state</dqv:hasMetric>
+				<dqv:value>0</dqv:value>
+			</dqv:QualityMeasure>
+			<dqv:QualityMeasure>
+				<dqv:hasMetric>http://www.icinga.org/last_state_change
+				</dqv:hasMetric>
+				<dqv:value>302.92</dqv:value>
+			</dqv:QualityMeasure>
+		</dqv:hasQualityMeasure>
+	</entry>

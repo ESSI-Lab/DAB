@@ -1,0 +1,169 @@
+{
+    "id": "034fe4fe-979f-4b17-9816-f6f4ca91a2b9",
+    "doi": "10.15493/SAEON.EGAGASINI.10000056",
+    "sid": "SAEON-Historical:516cd5e8344956d5c84db8bc51e67223",
+    "collection_key": "SAEON-Egagasini",
+    "collection_name": "SAEON Egagasini Node",
+    "provider_key": "SAEON-Egagasini",
+    "provider_name": "SAEON Egagasini Node",
+    "metadata_records": [
+        {
+            "schema_id": "SAEON.DataCite4",
+            "schema_uri": "https://odp.saeon.ac.za/schema/metadata/saeon/datacite4",
+            "metadata": {
+                "doi": "10.15493/SAEON.EGAGASINI.10000056",
+                "dates": [
+                    {
+                        "date": "2018-05-31/2018-06-13",
+                        "dateType": "Valid"
+                    }
+                ],
+                "types": {
+                    "resourceType": "on",
+                    "resourceTypeGeneral": "Dataset"
+                },
+                "titles": [
+                    {"title": "The ASCA June 2018 raw current meter data collected at Mooring E for all depths"}
+                ],
+                "creators": [
+                    {
+                        "name": "Juliet Hermes",
+                        "affiliation": [
+                            {"affiliation": "South African Environmental Observation Network Egagasini Node, 5th Floor, Foretrust Building, Martin Hammerschlag Way, Foreshore, Cape Town, 8001, Private Bag X2, Roggebaai, 8012, South Africa, Cell: 0834729159, Email: juliet@saeon.ac.za"}
+                        ]
+                    },
+                    {
+                        "name": "Lisa Beal",
+                        "affiliation": [
+                            {"affiliation": "University of Miami`s Rosential School of Marine and Atmospheric Science, 4600 Rickerbacker Causeway, Miami, FL 33149, United States of America, Email: lbeal@rsmas.miami.edu"}
+                        ]
+                    },
+                    {
+                        "name": "Shane Elipot",
+                        "affiliation": [
+                            {"affiliation": "University of Miami`s Rosential School of Marine and Atmospheric Science, 4600 Rickerbacker Causeway, Miami, FL 33149, United States of America, Email:selipot@rsmas.miami.edu"}
+                        ]
+                    },
+                    {
+                        "name": "Deirdre Byrne",
+                        "affiliation": [
+                            {"affiliation": "Department of Environmental Affairs, 2nd Floor, Foretrust Building, Martin Hammerschlag Way, Foreshore, Cape Town, 8001, Private Bag X2, Roggebaai, 8012, South Africa, Email: dbyrne.dea@gmail.com"}
+                        ]
+                    },
+                    {
+                        "name": "RHI",
+                        "affiliation": [
+                            {"affiliation": "Royal Netherlands Institute for Sea Research, Landsdiep 4 1797 SZ `t Horntje (Texel)"}
+                        ]
+                    }
+                ],
+                "language": "en-US",
+                "subjects": [
+                    {"subject": "ASCA"},
+                    {"subject": " Agulhas Current"},
+                    {"subject": " mooring"},
+                    {"subject": " volume"},
+                    {"subject": " heat"},
+                    {"subject": " salt"},
+                    {"subject": " transport"},
+                    {"subject": " offshore"},
+                    {"subject": " long-term"},
+                    {"subject": " moored instrumentation"},
+                    {"subject": " Current meter"},
+                    {"subject": " raw data"}
+                ],
+                "publisher": "South African Environmental Observation Network",
+                "rightsList": [
+                    {
+                        "rights": "Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)",
+                        "rightsURI": "https://creativecommons.org/licenses/by-sa/4.0/legalcode"
+                    }
+                ],
+                "identifiers": [
+                    {
+                        "identifier": "516cd5e8344956d5c84db8bc51e67223",
+                        "identifierType": "Plone"
+                    }
+                ],
+                "contributors": [
+                    {
+                        "name": "Juliet Hermes",
+                        "affiliation": [
+                            {"affiliation": "South African Environmental Observation Network Egagasini Node, 5th Floor, Foretrust Building, Martin Hammerschlag Way, Foreshore, Cape Town, 8001, Private Bag X2, Roggebaai, 8012, South Africa, Tel: (0)21 402 3118, Email: juliet@saeon.ac.za"}
+                        ],
+                        "contributorType": "ContactPerson"
+                    },
+                    {
+                        "name": "Juliet Hermes",
+                        "affiliation": [
+                            {"affiliation": "South African Environmental Observation Network Egagasini Node, 5th Floor, Foretrust Building, Martin Hammerschlag Way, Foreshore, Cape Town, 8001, Private Bag X2, Roggebaai, 8012, South Africa, Tel: (0)21 402 3118, Email: juliet@saeon.ac.za"}
+                        ],
+                        "contributorType": "DataCurator"
+                    },
+                    {
+                        "name": "Tamaryn Morris",
+                        "affiliation": [
+                            {"affiliation": "South African Weather Service, Tel: +27 (0)21 935 5700, Email: Tamaryn.Morris@weathersa.co.za"}
+                        ],
+                        "contributorType": "ProjectManager"
+                    },
+                    {
+                        "name": "Adam Houk",
+                        "affiliation": [
+                            {"affiliation": "University of Miami`s Rosential School of Marine and Atmospheric Science, 4600 Rickerbacker Causeway, Miami, FL 33149, United States of America, Email: ahouk@rsmas.miami.edu"}
+                        ],
+                        "contributorType": "DataCollector"
+                    }
+                ],
+                "descriptions": [
+                    {
+                        "description": "The Agulhas System Climate Array (ACSA) is a mooring array and is designed to provide long-term observations of the Agulhas Current`s volume, heat and salt transport and its variability from mesoscale (eddies), through seasonal to interannual timescales. The ASCA shelf and tall moorings extend 200 km offshore along decending TOPEX/Jason satellite ground track # 96, through the core of the Agulhas Current, with CPIES measurements extending the array to 300 km offshore of Port Elizabeth. The data collected during this project have been obtained from various oceanographic instrumentation fixed to each mooring. This raw data was collected by Current Meters at Mooring E deployed at the following depths: 1000m, 1500m, 2000m and 3000m.",
+                        "descriptionType": "Abstract"
+                    }
+                ],
+                "geoLocations": [
+                    {
+                        "geoLocationBox": {
+                            "eastBoundLongitude": 28.85083,
+                            "northBoundLatitude": -33.4278,
+                            "southBoundLatitude": -35.6514,
+                            "westBoundLongitude": 27.53361
+                        }
+                    }
+                ],
+                "schemaVersion": "http://datacite.org/schema/kernel-4",
+                "publicationYear": 2019,
+                "immutableResource": {
+                    "resourceDownload": {
+                        "archive": true,
+                        "downloadURL": "http://media.dirisa.org/inventory/archive/multi/asca/june-2018/mooring-e/raw/current-meter/mooring_e_raw_current_meters_all_depths.zip",
+                        "archivedFormats": [
+                            "dat",
+                            "hdr"
+                        ]
+                    },
+                    "resourceDescription": "The ASCA June 2018 raw current meter data collected at Mooring E for all depths"
+                },
+                "relatedIdentifiers": [
+                    {
+                        "schemeType": "http://datacite.org/schema/kernel-3",
+                        "relationType": "HasMetadata",
+                        "relatedIdentifier": "http://datacite.org/schema/kernel-3",
+                        "relatedIdentifierType": "URL"
+                    }
+                ]
+            }
+        }
+    ],
+    "tags": [],
+    "keywords": [],
+    "spatial_north": -33.4278,
+    "spatial_east": 28.85083,
+    "spatial_south": -35.6514,
+    "spatial_west": 27.53361,
+    "temporal_start": "2018-05-31T00:00:00+02:00",
+    "temporal_end": "2018-06-13T00:00:00+02:00",
+    "timestamp": "2023-02-14T18:52:39.326775+02:00",
+    "published": true,
+    "searchable": true
+}

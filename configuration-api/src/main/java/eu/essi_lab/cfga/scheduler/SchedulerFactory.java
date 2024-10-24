@@ -7,7 +7,7 @@ package eu.essi_lab.cfga.scheduler;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -37,6 +37,7 @@ import eu.essi_lab.cfga.scheduler.impl.PersistentJobStoreScheduler;
 import eu.essi_lab.cfga.scheduler.impl.VolatileJobStoreScheduler;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting.JobStoreType;
+import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
@@ -45,6 +46,8 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 public class SchedulerFactory {
 
     private static final StdSchedulerFactory FACTORY = new StdSchedulerFactory();
+
+    private static final String AUGMENTER_BATCH_THREAD_COUNT = "20";
 
     /**
      * 
@@ -57,17 +60,27 @@ public class SchedulerFactory {
      */
     public synchronized static Scheduler getScheduler(SchedulerSetting setting) {
 
+	return getScheduler(setting, true);
+    }
+
+    /**
+     * @param setting
+     * @param start
+     * @return
+     */
+    public synchronized static Scheduler getScheduler(SchedulerSetting setting, boolean start) {
+
 	JobStoreType jobStoreType = setting.getJobStoreType();
 
 	Scheduler scheduler = null;
 
 	switch (jobStoreType) {
 	case VOLATILE:
-	    scheduler = getVolatileScheduler(setting);
+	    scheduler = getVolatileScheduler(setting, start);
 	    break;
 	case PERSISTENT:
 	    try {
-		scheduler = getPersistentScheduler(setting);
+		scheduler = getPersistentScheduler(setting, start);
 		break;
 	    } catch (SQLException e) {
 
@@ -87,9 +100,20 @@ public class SchedulerFactory {
     }
 
     /**
+     * @param setting
      * @return
      */
     public synchronized static Scheduler getVolatileScheduler(SchedulerSetting setting) {
+
+	return getVolatileScheduler(setting, true);
+    }
+
+    /**
+     * @param setting
+     * @param start
+     * @return
+     */
+    public synchronized static Scheduler getVolatileScheduler(SchedulerSetting setting, boolean start) {
 
 	try {
 
@@ -129,10 +153,21 @@ public class SchedulerFactory {
 
     /**
      * @param setting
+     * @param start
      * @return
      * @throws SQLException
      */
     public synchronized static Scheduler getPersistentScheduler(SchedulerSetting setting) throws SQLException {
+
+	return getPersistentScheduler(setting, true);
+    }
+
+    /**
+     * @param setting
+     * @return
+     * @throws SQLException
+     */
+    public synchronized static Scheduler getPersistentScheduler(SchedulerSetting setting, boolean start) throws SQLException {
 
 	try {
 
@@ -142,7 +177,9 @@ public class SchedulerFactory {
 
 		scheduler = createPersistentScheduler(setting);
 
-		scheduler.start();
+		if (start) {
+		    scheduler.start();
+		}
 
 	    } else if (scheduler != null && scheduler instanceof VolatileJobStoreScheduler) {
 
@@ -154,7 +191,9 @@ public class SchedulerFactory {
 
 		scheduler = createPersistentScheduler(setting);
 
-		scheduler.start();
+		if (start) {
+		    scheduler.start();
+		}
 
 	    } else if (scheduler != null && scheduler instanceof PersistentJobStoreScheduler) {
 
@@ -172,7 +211,9 @@ public class SchedulerFactory {
 
 		    scheduler = createPersistentScheduler(setting);
 
-		    scheduler.start();
+		    if (start) {
+			scheduler.start();
+		    }
 		}
 
 	    }
@@ -243,6 +284,19 @@ public class SchedulerFactory {
 	    properties.setProperty("org.quartz.dataSource.myDS.user", user);
 	    properties.setProperty("org.quartz.dataSource.myDS.password", password);
 	    properties.setProperty("org.quartz.dataSource.myDS.URL", quartzDSURL);
+
+	    String slotsCout = String.valueOf(setting.getSlotsCout());
+	    GSLoggerFactory.getLogger(SchedulerFactory.class).debug("Default thread pool count set to: {}", slotsCout);
+
+	    if (ExecutionMode.get() == ExecutionMode.AUGMENTER) {
+
+		GSLoggerFactory.getLogger(SchedulerFactory.class).debug("Thread pool count for augmenter execution mode set to {}",
+			AUGMENTER_BATCH_THREAD_COUNT);
+
+		slotsCout = AUGMENTER_BATCH_THREAD_COUNT;
+	    }
+
+	    properties.setProperty("org.quartz.threadPool.threadCount", slotsCout);
 
 	    break;
 	}

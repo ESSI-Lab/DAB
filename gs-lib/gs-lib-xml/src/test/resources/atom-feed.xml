@@ -1,0 +1,1488 @@
+
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+ xsi:schemaLocation="http://www.w3.org/2005/Atom http://essi-lab.eu/schemas/geo-rss/atom_1.0_specification.xsd  
+http://www.georss.org/georss http://essi-lab.eu/schemas/geo-rss/geo_rss_1.1_specification.xsd  
+http://www.opengis.net/gml http://schemas.opengis.net/gml/3.1.1/base/gml.xsd">  
+<title>Search results</title>  
+<id>de27a995-cb84-4f32-b194-39ecccc96f79</id>  
+<link href="https://gs-service-preproduction.geodab.eu/gs-service/services/essi/view/geoss/opensearch/query?si=1&amp;ct=10&amp;st=&amp;kwd=&amp;frmt=&amp;prot=&amp;kwdOrBbox=&amp;sscScore=&amp;instrumentTitle=&amp;platformTitle=&amp;attributeTitle=&amp;organisationName=&amp;searchFields=&amp;bbox=&amp;rel=CONTAINS&amp;tf=providerID,keyword,format,protocol&amp;ts=&amp;te=&amp;targetId=&amp;from=&amp;until=&amp;sources=&amp;format=atom+xml"  
+ rel="search" title="Content Search" type="application/atom+xml"/>  
+<totalResults xmlns="http://a9.com/-/spec/opensearch/1.1/">13096255</totalResults>  
+<startIndex xmlns="http://a9.com/-/spec/opensearch/1.1/">1</startIndex>  
+<itemsPerPage xmlns="http://a9.com/-/spec/opensearch/1.1/">10</itemsPerPage>  
+<entry xmlns="http://www.w3.org/2005/Atom">
+  <title>Sentinel 1A</title>
+  <id>satellitescene_collection_prefix_SENTINEL_1A</id>
+  <sourceId>sentinelscihudtest</sourceId>
+  <sourceTitle>Sentinel</sourceTitle>
+  <summary>The SENTINEL-1 mission comprises a constellation of two polar-orbiting satellites, operating day and night performing C-band synthetic aperture radar imaging, enabling them to acquire imagery regardless of the weather. SENTINEL-1 will work in a pre-programmed operation mode to avoid conflicts and to produce a consistent long-term data archive built for applications based on long time series. SENTINEL-1 is the first of the five missions that ESA is developing for the Copernicus initiative.</summary>
+  <box xmlns="http://www.georss.org/georss">-90.0 -180.0 90.0 180.0</box>
+  <rights>geossdatacore</rights>
+  <logo>https://s3.amazonaws.com/dabsatimages/s1a.jpg</logo>
+  <category label="series" term="hlevel" />
+  <category label="Copernicus" term="keywords" />
+  <category label="Satellite" term="keywords" />
+  <dtstart xmlns="http://www.w3.org/2002/12/cal/ical#">2014-06-15T00:00:00Z</dtstart>
+  <start xmlns="http://a9.com/-/opensearch/extensions/time/1.0/">2014-06-15T00:00:00Z</start>
+  <dtend xmlns="http://www.w3.org/2002/12/cal/ical#">2022-05-10T08:49:45Z</dtend>
+  <stop xmlns="http://a9.com/-/opensearch/extensions/time/1.0/">2022-05-10T08:49:45Z</stop>
+  <contributor>
+    <orgName>European Commission</orgName>
+    <role>originator</role>
+  </contributor>
+  <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+  <satelliteCollectionQueryable xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">prodType,pubDatefrom,pubDateuntil,sensorOpMode,sensorSwath,relOrbit,sarPolCh</satelliteCollectionQueryable>
+</entry><entry xmlns="http://www.w3.org/2005/Atom">
+  <title>Sentinel 1B</title>
+  <id>satellitescene_collection_prefix_SENTINEL_1B</id>
+  <sourceId>sentinelscihudtest</sourceId>
+  <sourceTitle>Sentinel</sourceTitle>
+  <summary>The SENTINEL-1 mission comprises a constellation of two polar-orbiting satellites, operating day and night performing C-band synthetic aperture radar imaging, enabling them to acquire imagery regardless of the weather. SENTINEL-1 will work in a pre-programmed operation mode to avoid conflicts and to produce a consistent long-term data archive built for applications based on long time series. SENTINEL-1 is the first of the five missions that ESA is developing for the Copernicus initiative.</summary>
+  <box xmlns="http://www.georss.org/georss">-90.0 -180.0 90.0 180.0</box>
+  <rights>geossdatacore</rights>
+  <logo>https://s3.amazonaws.com/dabsatimages/s1b.jpg</logo>
+  <category label="series" term="hlevel" />
+  <category label="Copernicus" term="keywords" />
+  <category label="Satellite" term="keywords" />
+  <dtstart xmlns="http://www.w3.org/2002/12/cal/ical#">2016-08-20T00:00:00Z</dtstart>
+  <start xmlns="http://a9.com/-/opensearch/extensions/time/1.0/">2016-08-20T00:00:00Z</start>
+  <dtend xmlns="http://www.w3.org/2002/12/cal/ical#">2022-05-10T08:49:45Z</dtend>
+  <stop xmlns="http://a9.com/-/opensearch/extensions/time/1.0/">2022-05-10T08:49:45Z</stop>
+  <contributor>
+    <orgName>European Commission</orgName>
+    <role>originator</role>
+  </contributor>
+  <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+  <satelliteCollectionQueryable xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">prodType,pubDatefrom,pubDateuntil,sensorOpMode,sensorSwath,relOrbit,sarPolCh</satelliteCollectionQueryable>
+</entry><entry xmlns="http://www.w3.org/2005/Atom">
+  <title>Sentinel 2A</title>
+  <id>satellitescene_collection_prefix_SENTINEL_2A</id>
+  <sourceId>sentinelscihudtest</sourceId>
+  <sourceTitle>Sentinel</sourceTitle>
+  <summary>The full SENTINEL-2 mission comprises twin polar-orbiting satellites in the same orbit, phased at 180 degrees to each other. The mission will monitor variability in land surface conditions, and its wide swath width and high revisit time (10 days at the equator with one satellite, and 5 days with 2 satellites  under cloud-free conditions which results in 2-3 days at mid-latitudes) will support monitoring of changes to vegetation within the growing season. The coverage limits are from between latitudes 56 degrees south and 84 degress north.</summary>
+  <box xmlns="http://www.georss.org/georss">-90.0 -180.0 90.0 180.0</box>
+  <rights>geossdatacore</rights>
+  <logo>https://s3.amazonaws.com/dabsatimages/s2a.jpg</logo>
+  <category label="series" term="hlevel" />
+  <category label="Copernicus" term="keywords" />
+  <category label="Satellite" term="keywords" />
+  <dtstart xmlns="http://www.w3.org/2002/12/cal/ical#">2015-06-27T00:00:00Z</dtstart>
+  <start xmlns="http://a9.com/-/opensearch/extensions/time/1.0/">2015-06-27T00:00:00Z</start>
+  <dtend xmlns="http://www.w3.org/2002/12/cal/ical#">2022-05-10T08:49:45Z</dtend>
+  <stop xmlns="http://a9.com/-/opensearch/extensions/time/1.0/">2022-05-10T08:49:45Z</stop>
+  <contributor>
+    <orgName>European Commission</orgName>
+    <role>originator</role>
+  </contributor>
+  <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+  <satelliteCollectionQueryable xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">prodType,pubDatefrom,pubDateuntil,prodType,sensorOpMode,relOrbit,cloudcp</satelliteCollectionQueryable>
+</entry><entry xmlns="http://www.w3.org/2005/Atom">
+  <title>Sentinel 2B</title>
+  <id>satellitescene_collection_prefix_SENTINEL_2B</id>
+  <sourceId>sentinelscihudtest</sourceId>
+  <sourceTitle>Sentinel</sourceTitle>
+  <summary>The full SENTINEL-2 mission comprises twin polar-orbiting satellites in the same orbit, phased at 180 degrees to each other. The mission will monitor variability in land surface conditions, and its wide swath width and high revisit time (10 days at the equator with one satellite, and 5 days with 2 satellites  under cloud-free conditions which results in 2-3 days at mid-latitudes) will support monitoring of changes to vegetation within the growing season. The coverage limits are from between latitudes 56 degrees south and 84 degress north.</summary>
+  <box xmlns="http://www.georss.org/georss">-90.0 -180.0 90.0 180.0</box>
+  <rights>geossdatacore</rights>
+  <logo>https://s3.amazonaws.com/dabsatimages/s2a.jpg</logo>
+  <category label="series" term="hlevel" />
+  <category label="Copernicus" term="keywords" />
+  <category label="Satellite" term="keywords" />
+  <dtstart xmlns="http://www.w3.org/2002/12/cal/ical#">2017-05-30T00:00:00Z</dtstart>
+  <start xmlns="http://a9.com/-/opensearch/extensions/time/1.0/">2017-05-30T00:00:00Z</start>
+  <dtend xmlns="http://www.w3.org/2002/12/cal/ical#">2022-05-10T08:49:45Z</dtend>
+  <stop xmlns="http://a9.com/-/opensearch/extensions/time/1.0/">2022-05-10T08:49:45Z</stop>
+  <contributor>
+    <orgName>European Commission</orgName>
+    <role>originator</role>
+  </contributor>
+  <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+  <satelliteCollectionQueryable xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">prodType,pubDatefrom,pubDateuntil,prodType,sensorOpMode,relOrbit,cloudcp</satelliteCollectionQueryable>
+</entry><entry xmlns="http://www.w3.org/2005/Atom">
+  <title>Sentinel 3A</title>
+  <id>satellitescene_collection_prefix_SENTINEL_3A</id>
+  <sourceId>sentinelscihudtest</sourceId>
+  <sourceTitle>Sentinel</sourceTitle>
+  <summary>Sentinel-3 is primarily an ocean mission, however, the mission is also able to provide atmospheric and land applications. The mission provides data continuity for the ERS, Envisat and SPOT satellites. Sentinel-3 makes use of multiple sensing instruments to accomplish its objectives; SLSTR (Sea and Land Surface Temperature Radiometer), OLCI (Ocean and Land Colour Instrument), SRAL (SAR Altimeter), DORIS, and MWR (Microwave Radiometer).</summary>
+  <box xmlns="http://www.georss.org/georss">-90.0 -180.0 90.0 180.0</box>
+  <rights>geossdatacore</rights>
+  <logo>https://s3.amazonaws.com/dabsatimages/s3a.jpg</logo>
+  <category label="series" term="hlevel" />
+  <category label="Copernicus" term="keywords" />
+  <category label="Satellite" term="keywords" />
+  <dtstart xmlns="http://www.w3.org/2002/12/cal/ical#">2017-04-16T00:00:00Z</dtstart>
+  <start xmlns="http://a9.com/-/opensearch/extensions/time/1.0/">2017-04-16T00:00:00Z</start>
+  <dtend xmlns="http://www.w3.org/2002/12/cal/ical#">2022-05-10T08:49:45Z</dtend>
+  <stop xmlns="http://a9.com/-/opensearch/extensions/time/1.0/">2022-05-10T08:49:45Z</stop>
+  <contributor>
+    <orgName>European Commission</orgName>
+    <role>originator</role>
+  </contributor>
+  <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+  <satelliteCollectionQueryable xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">prodType,pubDatefrom,pubDateuntil,prodType,s3InstrumentIdx,s3ProductLevel,s3Timeliness,relOrbit</satelliteCollectionQueryable>
+</entry><entry xmlns="http://www.w3.org/2005/Atom">
+  <title>USGS Landsat 8 OLI/TIRS</title>
+  <id>USGS_LANDSAT_8</id>
+  <sourceId>landsat8dbidawstest</sourceId>
+  <sourceTitle>USGS Landsat 8</sourceTitle>
+  <summary>Landsat 8 carries two instruments: The Operational Land Imager (OLI) sensor includes refined heritage bands, along with three new bands: a deep blue band for coastal/aerosol studies, a shortwave infrared band for cirrus detection, and a Quality Assessment band. The Thermal Infrared Sensor (TIRS) provides two thermal bands. These sensors both provide improved signal-to-noise (SNR) radiometric performance quantized over a 12-bit dynamic range. (This translates into 4096 potential grey levels in an image compared with only 256 grey levels in previous 8-bit instruments.) Improved signal to noise performance enable better characterization of land cover state and condition. Products are delivered as 16-bit images (scaled to 55,000 grey levels).</summary>
+  <box xmlns="http://www.georss.org/georss">-90.0 -180.0 90.0 180.0</box>
+  <rights>geossdatacore</rights>
+  <logo>https://s3.amazonaws.com/dabsatimages/landsat8.jpg</logo>
+  <category label="series" term="hlevel" />
+  <category label="Landsat" term="keywords" />
+  <category label="Satellite" term="keywords" />
+  <dtstart xmlns="http://www.w3.org/2002/12/cal/ical#">2013-04-11T00:00:00Z</dtstart>
+  <start xmlns="http://a9.com/-/opensearch/extensions/time/1.0/">2013-04-11T00:00:00Z</start>
+  <dtend xmlns="http://www.w3.org/2002/12/cal/ical#">2022-05-10T08:49:45Z</dtend>
+  <stop xmlns="http://a9.com/-/opensearch/extensions/time/1.0/">2022-05-10T08:49:45Z</stop>
+  <contributor>
+    <orgName>United States Geological Survey</orgName>
+    <role>originator</role>
+  </contributor>
+  <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+  <satelliteCollectionQueryable xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">prodType,cloudcp,pubDatefrom,pubDateuntil,row,path</satelliteCollectionQueryable>
+</entry>
+
+
+<entry xmlns="http://www.w3.org/2005/Atom">
+  <title>Residual Water Content at 0-150 cm of Depth</title>
+  <id>0e4cbc73-627f-491a-af55-a6f74c8b31ff</id>
+  <sourceId>FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--42cd3b6a-3f70-4adc-b4c0-5991f55c083a</sourceId>
+  <sourceTitle>Oak Ridge National Laboratory Distributed Active Archive Center (ORNL DAAC -WCS)</sourceTitle>
+  <summary />
+  <box xmlns="http://www.georss.org/georss">-90.0 -180.0 90.0 180.0</box>
+  <content>AAIGrid_FLOAT32 GeoTIFF_FLOAT32 HFA_FLOAT32 netCDF_FLOAT32 NITF_FLOAT32</content>
+  <category label="dataset" term="hlevel" />
+  <contributor>
+    <orgName>Oak Ridge National Laboratory Distributed Active Archive Center (ORNL DAAC -WCS)</orgName>
+  </contributor>
+  <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+  
+  
+  <gmd:distributionInfo xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml" xmlns:ns4="http://quakeml.org/xmlns/bed/1.2" xmlns:ogc="http://www.opengis.net/ogc" xmlns:ows="http://www.opengis.net/ows" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <gmd:MD_Distribution>
+      <gmd:distributionFormat>
+        <gmd:MD_Format xmlns:dcterms="http://purl.org/dc/terms/" xmlns:gml32="http://www.opengis.net/gml/3.2" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:oai="http://www.openarchives.org/OAI/2.0/" xmlns:ows11="http://www.opengis.net/ows/1.1" xmlns:pubSub="http://www.opengis.net/pubsub/1.0" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+          <gmd:name>
+            <gco:CharacterString>AAIGrid_FLOAT32</gco:CharacterString>
+          </gmd:name>
+        </gmd:MD_Format>
+      </gmd:distributionFormat>
+      <gmd:transferOptions>
+        <gmd:MD_DigitalTransferOptions>
+          <gmd:onLine>
+            <gmd:CI_OnlineResource xmlns:dcterms="http://purl.org/dc/terms/" xmlns:gml32="http://www.opengis.net/gml/3.2" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:oai="http://www.openarchives.org/OAI/2.0/" xmlns:ows11="http://www.opengis.net/ows/1.1" xmlns:pubSub="http://www.opengis.net/pubsub/1.0" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="urn:uuid:a4c6f6fd-f9a2-4e18-b938-cb4b608188fe" xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+              <gmd:linkage>
+                <gmd:URL>http://webmap.ornl.gov/ogcbroker/wcs?</gmd:URL>
+              </gmd:linkage>
+              <gmd:protocol>
+                <gco:CharacterString>urn:ogc:serviceType:WebCoverageService:1.0.0:HTTP</gco:CharacterString>
+              </gmd:protocol>
+              <gmd:name>
+                <gco:CharacterString>1004_17</gco:CharacterString>
+              </gmd:name>
+              <gmd:function>
+                <gmd:CI_OnLineFunctionCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode" codeListValue="download" codeSpace="ISOTC211/19115">download</gmd:CI_OnLineFunctionCode>
+              </gmd:function>
+              <gmd:advancedAccessLink>https://gs-service-preproduction.geodab.eu/gs-service/services/essi/view/geoss/gwps/dataset/urn:uuid:a4c6f6fd-f9a2-4e18-b938-cb4b608188fe</gmd:advancedAccessLink>
+            </gmd:CI_OnlineResource>
+          </gmd:onLine>
+          <gmd:onLine>
+            <gmd:CI_OnlineResource xmlns:dcterms="http://purl.org/dc/terms/" xmlns:gml32="http://www.opengis.net/gml/3.2" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:oai="http://www.openarchives.org/OAI/2.0/" xmlns:ows11="http://www.opengis.net/ows/1.1" xmlns:pubSub="http://www.opengis.net/pubsub/1.0" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+              <gmd:linkage>
+                <gmd:URL>https://gs-service-preproduction.geodab.eu/gs-service/services/essi/wms?</gmd:URL>
+              </gmd:linkage>
+              <gmd:protocol>
+                <gco:CharacterString>urn:ogc:serviceType:WebMapService:1.3.0:HTTP</gco:CharacterString>
+              </gmd:protocol>
+              <gmd:name>
+                <gco:CharacterString>urn:uuid:a4c6f6fd-f9a2-4e18-b938-cb4b608188fe</gco:CharacterString>
+              </gmd:name>
+              <gmd:description>
+                <gmx:Anchor xlink:href="http://www.essi-lab.eu/broker/accesstypes/complex" />
+                <gco:CharacterString>1004_17</gco:CharacterString>
+              </gmd:description>
+              <gmd:function>
+                <gmd:CI_OnLineFunctionCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode" codeListValue="download" codeSpace="ISOTC211/19115">download</gmd:CI_OnLineFunctionCode>
+              </gmd:function>
+            </gmd:CI_OnlineResource>
+          </gmd:onLine>
+        </gmd:MD_DigitalTransferOptions>
+      </gmd:transferOptions>
+    </gmd:MD_Distribution>
+  </gmd:distributionInfo>
+</entry><entry xmlns="http://www.w3.org/2005/Atom">
+  <title>ABoVE Fire Weather Index 2010203</title>
+  <id>b7b9edf1-c0da-4668-8622-e2d907f3e211</id>
+  <sourceId>FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--9df37a70-efd0-4fb7-9ffd-9965115f47b0</sourceId>
+  <sourceTitle>Oak Ridge National Laboratory Distributed Active Archive Center (ORNL DAAC -WMS)</sourceTitle>
+  <summary>The ORNL DAAC provides access to various geospatial data, including ORNL DAAC archived data through Open Geospatial Consortium (OGC) standards-based Web Map Service (WMS) version 1.1.1.</summary>
+  <box xmlns="http://www.georss.org/georss">56.6251 -171.585 73.6632 -131.805</box>
+  <logo>https://webmap.ornl.gov/ogcbroker/wms?SERVICE=WMS&amp;amp;REQUEST=GetMap&amp;amp;LAYERS=1509_5842&amp;amp;VERSION=1.1.1&amp;amp;STYLES=default&amp;amp;SRS=epsg:4326&amp;amp;FORMAT=image%2Fpng&amp;amp;TRANSPARENT=TRUE&amp;amp;WIDTH=300&amp;amp;HEIGHT=128&amp;amp;BBOX=-171.585,56.6251,-131.805,73.6632</logo>
+  <category label="dataset" term="hlevel" />
+  <category label="DAAC" term="keywords" />
+  <category label="ORNL" term="keywords" />
+  <category label="WMS" term="keywords" />
+  <contributor>
+    <orgName>Oak Ridge National Laboratory Distributed Active Archive Center (ORNL DAAC -WMS)</orgName>
+  </contributor>
+  <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+  <gmd:distributionInfo xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml" xmlns:ns4="http://quakeml.org/xmlns/bed/1.2" xmlns:ogc="http://www.opengis.net/ogc" xmlns:ows="http://www.opengis.net/ows" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <gmd:MD_Distribution>
+      <gmd:transferOptions>
+        <gmd:MD_DigitalTransferOptions>
+          <gmd:onLine>
+            <gmd:CI_OnlineResource xmlns:dcterms="http://purl.org/dc/terms/" xmlns:gml32="http://www.opengis.net/gml/3.2" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:oai="http://www.openarchives.org/OAI/2.0/" xmlns:ows11="http://www.opengis.net/ows/1.1" xmlns:pubSub="http://www.opengis.net/pubsub/1.0" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="d189198a-ed3c-4d55-9ecd-91476732e7de" xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+              <gmd:linkage>
+                <gmd:URL>https://webmap.ornl.gov/ogcbroker/wms?</gmd:URL>
+              </gmd:linkage>
+              <gmd:protocol>
+                <gco:CharacterString>urn:ogc:serviceType:WebMapService:1.1.1:HTTP</gco:CharacterString>
+              </gmd:protocol>
+              <gmd:name>
+                <gco:CharacterString>1509_5842</gco:CharacterString>
+              </gmd:name>
+              <gmd:function>
+                <gmd:CI_OnLineFunctionCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode" codeListValue="download" codeSpace="ISOTC211/19115">download</gmd:CI_OnLineFunctionCode>
+              </gmd:function>
+              <gmd:advancedAccessLink>https://gs-service-preproduction.geodab.eu/gs-service/services/essi/view/geoss/gwps/dataset/d189198a-ed3c-4d55-9ecd-91476732e7de</gmd:advancedAccessLink>
+            </gmd:CI_OnlineResource>
+          </gmd:onLine>
+          <gmd:onLine>
+            <gmd:CI_OnlineResource xmlns:dcterms="http://purl.org/dc/terms/" xmlns:gml32="http://www.opengis.net/gml/3.2" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:oai="http://www.openarchives.org/OAI/2.0/" xmlns:ows11="http://www.opengis.net/ows/1.1" xmlns:pubSub="http://www.opengis.net/pubsub/1.0" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+              <gmd:linkage>
+                <gmd:URL>https://gs-service-preproduction.geodab.eu/gs-service/services/essi/wms?</gmd:URL>
+              </gmd:linkage>
+              <gmd:protocol>
+                <gco:CharacterString>urn:ogc:serviceType:WebMapService:1.3.0:HTTP</gco:CharacterString>
+              </gmd:protocol>
+              <gmd:name>
+                <gco:CharacterString>d189198a-ed3c-4d55-9ecd-91476732e7de</gco:CharacterString>
+              </gmd:name>
+              <gmd:description>
+                <gmx:Anchor xlink:href="http://www.essi-lab.eu/broker/accesstypes/complex" />
+                <gco:CharacterString>1509_5842</gco:CharacterString>
+              </gmd:description>
+              <gmd:function>
+                <gmd:CI_OnLineFunctionCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode" codeListValue="download" codeSpace="ISOTC211/19115">download</gmd:CI_OnLineFunctionCode>
+              </gmd:function>
+            </gmd:CI_OnlineResource>
+          </gmd:onLine>
+        </gmd:MD_DigitalTransferOptions>
+      </gmd:transferOptions>
+    </gmd:MD_Distribution>
+  </gmd:distributionInfo>
+</entry><entry xmlns="http://www.w3.org/2005/Atom">
+  <title>ABoVE Drought Code 2004157</title>
+  <id>6c0ad373-cf97-462d-9254-d411d8d135d8</id>
+  <sourceId>FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--9df37a70-efd0-4fb7-9ffd-9965115f47b0</sourceId>
+  <sourceTitle>Oak Ridge National Laboratory Distributed Active Archive Center (ORNL DAAC -WMS)</sourceTitle>
+  <summary>The ORNL DAAC provides access to various geospatial data, including ORNL DAAC archived data through Open Geospatial Consortium (OGC) standards-based Web Map Service (WMS) version 1.1.1.</summary>
+  <box xmlns="http://www.georss.org/georss">56.6251 -171.585 73.6632 -131.805</box>
+  <logo>https://webmap.ornl.gov/ogcbroker/wms?SERVICE=WMS&amp;amp;REQUEST=GetMap&amp;amp;LAYERS=1509_1548&amp;amp;VERSION=1.1.1&amp;amp;STYLES=default&amp;amp;SRS=epsg:4326&amp;amp;FORMAT=image%2Fpng&amp;amp;TRANSPARENT=TRUE&amp;amp;WIDTH=300&amp;amp;HEIGHT=128&amp;amp;BBOX=-171.585,56.6251,-131.805,73.6632</logo>
+  <category label="dataset" term="hlevel" />
+  <category label="DAAC" term="keywords" />
+  <category label="ORNL" term="keywords" />
+  <category label="WMS" term="keywords" />
+  <contributor>
+    <orgName>Oak Ridge National Laboratory Distributed Active Archive Center (ORNL DAAC -WMS)</orgName>
+  </contributor>
+  <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+  <gmd:distributionInfo xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml" xmlns:ns4="http://quakeml.org/xmlns/bed/1.2" xmlns:ogc="http://www.opengis.net/ogc" xmlns:ows="http://www.opengis.net/ows" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <gmd:MD_Distribution>
+      <gmd:transferOptions>
+        <gmd:MD_DigitalTransferOptions>
+          <gmd:onLine>
+            <gmd:CI_OnlineResource xmlns:dcterms="http://purl.org/dc/terms/" xmlns:gml32="http://www.opengis.net/gml/3.2" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:oai="http://www.openarchives.org/OAI/2.0/" xmlns:ows11="http://www.opengis.net/ows/1.1" xmlns:pubSub="http://www.opengis.net/pubsub/1.0" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="20dbfb96-fa3e-4b00-ba56-be004ab7f355" xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+              <gmd:linkage>
+                <gmd:URL>https://webmap.ornl.gov/ogcbroker/wms?</gmd:URL>
+              </gmd:linkage>
+              <gmd:protocol>
+                <gco:CharacterString>urn:ogc:serviceType:WebMapService:1.1.1:HTTP</gco:CharacterString>
+              </gmd:protocol>
+              <gmd:name>
+                <gco:CharacterString>1509_1548</gco:CharacterString>
+              </gmd:name>
+              <gmd:function>
+                <gmd:CI_OnLineFunctionCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode" codeListValue="download" codeSpace="ISOTC211/19115">download</gmd:CI_OnLineFunctionCode>
+              </gmd:function>
+              <gmd:advancedAccessLink>https://gs-service-preproduction.geodab.eu/gs-service/services/essi/view/geoss/gwps/dataset/20dbfb96-fa3e-4b00-ba56-be004ab7f355</gmd:advancedAccessLink>
+            </gmd:CI_OnlineResource>
+          </gmd:onLine>
+          <gmd:onLine>
+            <gmd:CI_OnlineResource xmlns:dcterms="http://purl.org/dc/terms/" xmlns:gml32="http://www.opengis.net/gml/3.2" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:oai="http://www.openarchives.org/OAI/2.0/" xmlns:ows11="http://www.opengis.net/ows/1.1" xmlns:pubSub="http://www.opengis.net/pubsub/1.0" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+              <gmd:linkage>
+                <gmd:URL>https://gs-service-preproduction.geodab.eu/gs-service/services/essi/wms?</gmd:URL>
+              </gmd:linkage>
+              <gmd:protocol>
+                <gco:CharacterString>urn:ogc:serviceType:WebMapService:1.3.0:HTTP</gco:CharacterString>
+              </gmd:protocol>
+              <gmd:name>
+                <gco:CharacterString>20dbfb96-fa3e-4b00-ba56-be004ab7f355</gco:CharacterString>
+              </gmd:name>
+              <gmd:description>
+                <gmx:Anchor xlink:href="http://www.essi-lab.eu/broker/accesstypes/complex" />
+                <gco:CharacterString>1509_1548</gco:CharacterString>
+              </gmd:description>
+              <gmd:function>
+                <gmd:CI_OnLineFunctionCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode" codeListValue="download" codeSpace="ISOTC211/19115">download</gmd:CI_OnLineFunctionCode>
+              </gmd:function>
+            </gmd:CI_OnlineResource>
+          </gmd:onLine>
+        </gmd:MD_DigitalTransferOptions>
+      </gmd:transferOptions>
+    </gmd:MD_Distribution>
+  </gmd:distributionInfo>
+</entry><entry xmlns="http://www.w3.org/2005/Atom">
+  <title>NLCD 2001: Percent Tree Canopy (Puerto Rico)</title>
+  <id>4e9c9ea3-5fa3-4f1c-90f9-98e07a6b436d</id>
+  <sourceId>FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--9df37a70-efd0-4fb7-9ffd-9965115f47b0</sourceId>
+  <sourceTitle>Oak Ridge National Laboratory Distributed Active Archive Center (ORNL DAAC -WMS)</sourceTitle>
+  <summary>The ORNL DAAC provides access to various geospatial data, including ORNL DAAC archived data through Open Geospatial Consortium (OGC) standards-based Web Map Service (WMS) version 1.1.1.</summary>
+  <box xmlns="http://www.georss.org/georss">17.1967 -67.5195 19.164 -64.9439</box>
+  <logo>https://webmap.ornl.gov/ogcbroker/wms?SERVICE=WMS&amp;amp;REQUEST=GetMap&amp;amp;LAYERS=10009_17&amp;amp;VERSION=1.1.1&amp;amp;STYLES=default&amp;amp;SRS=epsg:4326&amp;amp;FORMAT=image%2Fpng&amp;amp;TRANSPARENT=TRUE&amp;amp;WIDTH=300&amp;amp;HEIGHT=229&amp;amp;BBOX=-67.5195,17.1967,-64.9439,19.164</logo>
+  <category label="dataset" term="hlevel" />
+  <category label="DAAC" term="keywords" />
+  <category label="ORNL" term="keywords" />
+  <category label="WMS" term="keywords" />
+  <contributor>
+    <orgName>Oak Ridge National Laboratory Distributed Active Archive Center (ORNL DAAC -WMS)</orgName>
+  </contributor>
+  <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+  <gmd:distributionInfo xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml" xmlns:ns4="http://quakeml.org/xmlns/bed/1.2" xmlns:ogc="http://www.opengis.net/ogc" xmlns:ows="http://www.opengis.net/ows" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <gmd:MD_Distribution>
+      <gmd:transferOptions>
+        <gmd:MD_DigitalTransferOptions>
+          <gmd:onLine>
+            <gmd:CI_OnlineResource xmlns:dcterms="http://purl.org/dc/terms/" xmlns:gml32="http://www.opengis.net/gml/3.2" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:oai="http://www.openarchives.org/OAI/2.0/" xmlns:ows11="http://www.opengis.net/ows/1.1" xmlns:pubSub="http://www.opengis.net/pubsub/1.0" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="048b56e0-a170-426c-8ca8-c57ac34248f0" xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+              <gmd:linkage>
+                <gmd:URL>https://webmap.ornl.gov/ogcbroker/wms?</gmd:URL>
+              </gmd:linkage>
+              <gmd:protocol>
+                <gco:CharacterString>urn:ogc:serviceType:WebMapService:1.1.1:HTTP</gco:CharacterString>
+              </gmd:protocol>
+              <gmd:name>
+                <gco:CharacterString>10009_17</gco:CharacterString>
+              </gmd:name>
+              <gmd:function>
+                <gmd:CI_OnLineFunctionCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode" codeListValue="download" codeSpace="ISOTC211/19115">download</gmd:CI_OnLineFunctionCode>
+              </gmd:function>
+              <gmd:advancedAccessLink>https://gs-service-preproduction.geodab.eu/gs-service/services/essi/view/geoss/gwps/dataset/048b56e0-a170-426c-8ca8-c57ac34248f0</gmd:advancedAccessLink>
+            </gmd:CI_OnlineResource>
+          </gmd:onLine>
+          <gmd:onLine>
+            <gmd:CI_OnlineResource xmlns:dcterms="http://purl.org/dc/terms/" xmlns:gml32="http://www.opengis.net/gml/3.2" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:oai="http://www.openarchives.org/OAI/2.0/" xmlns:ows11="http://www.opengis.net/ows/1.1" xmlns:pubSub="http://www.opengis.net/pubsub/1.0" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+              <gmd:linkage>
+                <gmd:URL>https://gs-service-preproduction.geodab.eu/gs-service/services/essi/wms?</gmd:URL>
+              </gmd:linkage>
+              <gmd:protocol>
+                <gco:CharacterString>urn:ogc:serviceType:WebMapService:1.3.0:HTTP</gco:CharacterString>
+              </gmd:protocol>
+              <gmd:name>
+                <gco:CharacterString>048b56e0-a170-426c-8ca8-c57ac34248f0</gco:CharacterString>
+              </gmd:name>
+              <gmd:description>
+                <gmx:Anchor xlink:href="http://www.essi-lab.eu/broker/accesstypes/complex" />
+                <gco:CharacterString>10009_17</gco:CharacterString>
+              </gmd:description>
+              <gmd:function>
+                <gmd:CI_OnLineFunctionCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode" codeListValue="download" codeSpace="ISOTC211/19115">download</gmd:CI_OnLineFunctionCode>
+              </gmd:function>
+            </gmd:CI_OnlineResource>
+          </gmd:onLine>
+        </gmd:MD_DigitalTransferOptions>
+      </gmd:transferOptions>
+    </gmd:MD_Distribution>
+  </gmd:distributionInfo>
+</entry><dm:termFrequency xmlns:dm="http://floraresearch.eu/sdi/services/7.0/dataModel/schema" >
+    <dm:source>
+        <dm:item>
+            <dm:sourceId>UUID-481e6892-5874-44dc-aafd-2914b58f67ba</dm:sourceId>
+<dm:term>WIS GISC DWD</dm:term>
+            <dm:decodedTerm>WIS GISC DWD</dm:decodedTerm>
+            <dm:freq>5917377</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>UUID-4ee7d41f-837e-4d4b-9674-d7bb0b84a891</dm:sourceId>
+<dm:term>Hydrologic Information System (CUAHSI-HIS)</dm:term>
+            <dm:decodedTerm>Hydrologic Information System (CUAHSI-HIS)</dm:decodedTerm>
+            <dm:freq>2971492</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>UUID-9b102191-5ab1-48ac-9acb-7c66f5873c4a</dm:sourceId>
+<dm:term>IRIS Seismo Archive by Stations</dm:term>
+            <dm:decodedTerm>IRIS Seismo Archive by Stations</dm:decodedTerm>
+            <dm:freq>1139352</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>healthsitesID</dm:sourceId>
+<dm:term>Healthsites</dm:term>
+            <dm:decodedTerm>Healthsites</dm:decodedTerm>
+            <dm:freq>870003</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>geodatenkatalogID</dm:sourceId>
+<dm:term>Geodatenkatalog-DE</dm:term>
+            <dm:decodedTerm>Geodatenkatalog-DE</dm:decodedTerm>
+            <dm:freq>506216</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>UUID-2dc3a01b-934e-4c3d-9311-527ac93ec058</dm:sourceId>
+<dm:term>PANGAEA</dm:term>
+            <dm:decodedTerm>PANGAEA</dm:decodedTerm>
+            <dm:freq>411545</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>UUID-18fd7338-be67-488d-8925-afafa65869b6</dm:sourceId>
+<dm:term>US Data Gov</dm:term>
+            <dm:decodedTerm>US Data Gov</dm:decodedTerm>
+            <dm:freq>247302</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>geodabgbifid</dm:sourceId>
+<dm:term>GBIF</dm:term>
+            <dm:decodedTerm>GBIF</dm:decodedTerm>
+            <dm:freq>210002</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>unsdgID</dm:sourceId>
+<dm:term>United Nations Sustainable Development Goals (UN-SDG)</dm:term>
+            <dm:decodedTerm>United Nations Sustainable Development Goals (UN-SDG)</dm:decodedTerm>
+            <dm:freq>152341</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--a4731dec-1602-403d-9c94-5a8f75dbd50b</dm:sourceId>
+<dm:term>United States Geoscience Information Network Metadata Catalog</dm:term>
+            <dm:decodedTerm>United States Geoscience Information Network Metadata Catalog</dm:decodedTerm>
+            <dm:freq>48770</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>usnodcdbid</dm:sourceId>
+<dm:term>US NODC Collections</dm:term>
+            <dm:decodedTerm>US NODC Collections</dm:decodedTerm>
+            <dm:freq>45210</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>UUID-c1932a12-5c08-48c1-9e1c-e90261b70ae3</dm:sourceId>
+<dm:term>CEOS International Directory Network (IDN)</dm:term>
+            <dm:decodedTerm>CEOS International Directory Network (IDN)</dm:decodedTerm>
+            <dm:freq>44887</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--9df37a70-efd0-4fb7-9ffd-9965115f47b0</dm:sourceId>
+<dm:term>Oak Ridge National Laboratory Distributed Active Archive Center (ORNL DAAC -WMS)</dm:term>
+            <dm:decodedTerm>Oak Ridge National Laboratory Distributed Active Archive Center (ORNL DAAC -WMS)</dm:decodedTerm>
+            <dm:freq>38078</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>growsosID</dm:sourceId>
+<dm:term>GROW Observatory</dm:term>
+            <dm:decodedTerm>GROW Observatory</dm:decodedTerm>
+            <dm:freq>33300</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>ochadbid</dm:sourceId>
+<dm:term>The Humanitarian Data Exchange</dm:term>
+            <dm:decodedTerm>The Humanitarian Data Exchange</dm:decodedTerm>
+            <dm:freq>31805</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--42cd3b6a-3f70-4adc-b4c0-5991f55c083a</dm:sourceId>
+<dm:term>Oak Ridge National Laboratory Distributed Active Archive Center (ORNL DAAC -WCS)</dm:term>
+            <dm:decodedTerm>Oak Ridge National Laboratory Distributed Active Archive Center (ORNL DAAC -WCS)</dm:decodedTerm>
+            <dm:freq>30002</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--4f17e4df-acd1-4bda-a8b3-2ce07b850767</dm:sourceId>
+<dm:term>Esri GEOSS Portal</dm:term>
+            <dm:decodedTerm>Esri GEOSS Portal</dm:decodedTerm>
+            <dm:freq>27238</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>UUID-9056c936-ecd2-4b82-b448-f9619b9ede1c</dm:sourceId>
+<dm:term>Federated EO Gateway (FedEO) - CEOS</dm:term>
+            <dm:decodedTerm>Federated EO Gateway (FedEO) - CEOS</dm:decodedTerm>
+            <dm:freq>26898</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>geodabgeoscienceausid</dm:sourceId>
+<dm:term>Geoscience Australia</dm:term>
+            <dm:decodedTerm>Geoscience Australia</dm:decodedTerm>
+            <dm:freq>26615</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>icimoddbid</dm:sourceId>
+<dm:term>ICIMOD Regional Database System</dm:term>
+            <dm:decodedTerm>ICIMOD Regional Database System</dm:decodedTerm>
+            <dm:freq>26612</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>thunderftpID</dm:sourceId>
+<dm:term>Thunder FTP Database</dm:term>
+            <dm:decodedTerm>Thunder FTP Database</dm:decodedTerm>
+            <dm:freq>26024</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>UUID-0fc9f443-98f5-414d-bd65-b083e4861ae1</dm:sourceId>
+<dm:term>Global River Discharge Datasets (GRDC/GEOWOW)</dm:term>
+            <dm:decodedTerm>Global River Discharge Datasets (GRDC/GEOWOW)</dm:decodedTerm>
+            <dm:freq>25347</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>ukdatagovid</dm:sourceId>
+<dm:term>UK Data.Gov</dm:term>
+            <dm:decodedTerm>UK Data.Gov</dm:decodedTerm>
+            <dm:freq>21094</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--2dbf0301-89ef-46bc-afbc-eaa3286cf8ee</dm:sourceId>
+<dm:term>GEO SUR</dm:term>
+            <dm:decodedTerm>GEO SUR</dm:decodedTerm>
+            <dm:freq>17804</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>UUID-176236f4-aedb-4c81-b9ab-8e7ee793e734</dm:sourceId>
+<dm:term>NOAA UNIFIED Access Framework Catalog</dm:term>
+            <dm:decodedTerm>NOAA UNIFIED Access Framework Catalog</dm:decodedTerm>
+            <dm:freq>14785</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--27d899ff-7ec1-470b-b471-b00e5a26b0ec</dm:sourceId>
+<dm:term>ISPRA, Italian Environment Protection and Technical Services Agency - Data</dm:term>
+            <dm:decodedTerm>ISPRA, Italian Environment Protection and Technical Services Agency - Data</dm:decodedTerm>
+            <dm:freq>14252</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>idechile</dm:sourceId>
+<dm:term>Chile GEO Portal</dm:term>
+            <dm:decodedTerm>Chile GEO Portal</dm:decodedTerm>
+            <dm:freq>11672</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>openamap</dm:sourceId>
+<dm:term>OpenAerialMap</dm:term>
+            <dm:decodedTerm>OpenAerialMap</dm:decodedTerm>
+            <dm:freq>11186</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--550a117c-f833-438b-8b90-0c1db4e3b9ed</dm:sourceId>
+<dm:term>Geoscience Data - Northern America</dm:term>
+            <dm:decodedTerm>Geoscience Data - Northern America</dm:decodedTerm>
+            <dm:freq>10909</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>UUID-a4002f3f-862b-411c-b617-71349b711742</dm:sourceId>
+<dm:term>IspRA, Italian Environment Protection and Technical Services Agency - Monitoring Network</dm:term>
+            <dm:decodedTerm>IspRA, Italian Environment Protection and Technical Services Agency - Monitoring Network</dm:decodedTerm>
+            <dm:freq>10413</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>UUID-e88c1b5e-9bd6-4d62-bd87-be23beb77ed3</dm:sourceId>
+<dm:term>New Zealand government geodata catalog</dm:term>
+            <dm:decodedTerm>New Zealand government geodata catalog</dm:decodedTerm>
+            <dm:freq>10283</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>danubeODP</dm:sourceId>
+<dm:term>Danube Open Data Portal</dm:term>
+            <dm:decodedTerm>Danube Open Data Portal</dm:decodedTerm>
+            <dm:freq>10210</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>UUID-d846e020-f09d-4a7d-9963-874d8b728657</dm:sourceId>
+<dm:term>ArcGIS Online ESRI</dm:term>
+            <dm:decodedTerm>ArcGIS Online ESRI</dm:decodedTerm>
+            <dm:freq>10000</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>UUID-e101622c-6ae1-4b68-bfea-8acf067e31dd</dm:sourceId>
+<dm:term>USGS Earthquake Events</dm:term>
+            <dm:decodedTerm>USGS Earthquake Events</dm:decodedTerm>
+            <dm:freq>9251</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>faoID</dm:sourceId>
+<dm:term>Food and Agriculture Organization (FAO)</dm:term>
+            <dm:decodedTerm>Food and Agriculture Organization (FAO)</dm:decodedTerm>
+            <dm:freq>7120</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>twigaID</dm:sourceId>
+<dm:term>TWIGA</dm:term>
+            <dm:decodedTerm>TWIGA</dm:decodedTerm>
+            <dm:freq>6633</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>UUID-d9a3ab80-f5e1-43c3-92cd-fbbbf005aded</dm:sourceId>
+<dm:term>CEOS WGISS Integrated Catalog (CWIC)</dm:term>
+            <dm:decodedTerm>CEOS WGISS Integrated Catalog (CWIC)</dm:decodedTerm>
+            <dm:freq>6520</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>hydroshareid</dm:sourceId>
+<dm:term>HydroShare</dm:term>
+            <dm:decodedTerm>HydroShare</dm:decodedTerm>
+            <dm:freq>5482</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>obisid</dm:sourceId>
+<dm:term>Ocean Biogeographic Information System</dm:term>
+            <dm:decodedTerm>Ocean Biogeographic Information System</dm:decodedTerm>
+            <dm:freq>4298</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>ecopotentialID</dm:sourceId>
+<dm:term>ECOPOTENTIAL Catalogue</dm:term>
+            <dm:decodedTerm>ECOPOTENTIAL Catalogue</dm:decodedTerm>
+            <dm:freq>3177</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>geonetworkDEIMS</dm:sourceId>
+<dm:term>DEIMS-DIP</dm:term>
+            <dm:decodedTerm>DEIMS-DIP</dm:decodedTerm>
+            <dm:freq>3069</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--0bd2c3f4-96a3-4204-8d5d-01bd3b70fb23</dm:sourceId>
+<dm:term>Polar Data Catalogue</dm:term>
+            <dm:decodedTerm>Polar Data Catalogue</dm:decodedTerm>
+            <dm:freq>3040</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>H01431827904</dm:sourceId>
+<dm:term>World Bank Development Data Hub (WB-DDH)</dm:term>
+            <dm:decodedTerm>World Bank Development Data Hub (WB-DDH)</dm:decodedTerm>
+            <dm:freq>3025</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>jrcdatacatalogdbid</dm:sourceId>
+<dm:term>Joint Research Centre Data Catalog</dm:term>
+            <dm:decodedTerm>Joint Research Centre Data Catalog</dm:decodedTerm>
+            <dm:freq>2908</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>oaipmhEUMETSATid</dm:sourceId>
+<dm:term>Eumetsat Product Navigator</dm:term>
+            <dm:decodedTerm>Eumetsat Product Navigator</dm:decodedTerm>
+            <dm:freq>2844</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--8885d85f-e0aa-4df0-9430-1b598b95fc24</dm:sourceId>
+<dm:term>Polar Data / Canada</dm:term>
+            <dm:decodedTerm>Polar Data / Canada</dm:decodedTerm>
+            <dm:freq>2457</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>cccaID</dm:sourceId>
+<dm:term>Climate Change Centre Austria (CCCA)</dm:term>
+            <dm:decodedTerm>Climate Change Centre Austria (CCCA)</dm:decodedTerm>
+            <dm:freq>2396</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--51fcf52f-c9a7-4c08-b6fd-951b9f93a010</dm:sourceId>
+<dm:term>UNEP Environmental Data Explorer (WCS)</dm:term>
+            <dm:decodedTerm>UNEP Environmental Data Explorer (WCS)</dm:decodedTerm>
+            <dm:freq>2322</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>digitalglobeid</dm:sourceId>
+<dm:term>Digital Globe</dm:term>
+            <dm:decodedTerm>Digital Globe</dm:decodedTerm>
+            <dm:freq>1931</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>aodnaustraliadbid</dm:sourceId>
+<dm:term>Australia Ocean Data Network</dm:term>
+            <dm:decodedTerm>Australia Ocean Data Network</dm:decodedTerm>
+            <dm:freq>1555</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>finnishODP</dm:sourceId>
+<dm:term>Finnish Open Data</dm:term>
+            <dm:decodedTerm>Finnish Open Data</dm:decodedTerm>
+            <dm:freq>1507</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:sourceId>FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--1f57a10e-41e8-46f1-a2b8-346e51f4b6c0</dm:sourceId>
+<dm:term>SWISS Federal Spatial Data Infrastructure</dm:term>
+            <dm:decodedTerm>SWISS Federal Spatial Data Infrastructure</dm:decodedTerm>
+            <dm:freq>1312</dm:freq>
+        </dm:item>
+    </dm:source>
+    <dm:keyword>
+        <dm:item>
+            <dm:term>Baseline+Surface+Radiation+Network</dm:term>
+            <dm:decodedTerm>Baseline Surface Radiation Network</dm:decodedTerm>
+            <dm:freq>2620813</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>BSRN</dm:term>
+            <dm:decodedTerm>BSRN</dm:decodedTerm>
+            <dm:freq>2620813</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>Hydrology</dm:term>
+            <dm:decodedTerm>Hydrology</dm:decodedTerm>
+            <dm:freq>1646630</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>Field+Observation</dm:term>
+            <dm:decodedTerm>Field Observation</dm:decodedTerm>
+            <dm:freq>1387668</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>Unknown</dm:term>
+            <dm:decodedTerm>Unknown</dm:decodedTerm>
+            <dm:freq>1250180</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>Groundwater</dm:term>
+            <dm:decodedTerm>Groundwater</dm:decodedTerm>
+            <dm:freq>1205908</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>time</dm:term>
+            <dm:decodedTerm>time</dm:decodedTerm>
+            <dm:freq>1068331</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>NILU+-+Norwegian+Institute+for+Air+Research,+ATMOS,+EBAS</dm:term>
+            <dm:decodedTerm>NILU - Norwegian Institute for Air Research, ATMOS, EBAS</dm:decodedTerm>
+            <dm:freq>1062221</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>status_flag</dm:term>
+            <dm:decodedTerm>status_flag</dm:decodedTerm>
+            <dm:freq>1046065</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>Sporadic</dm:term>
+            <dm:decodedTerm>Sporadic</dm:decodedTerm>
+            <dm:freq>882133</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>HEALTH</dm:term>
+            <dm:decodedTerm>HEALTH</dm:decodedTerm>
+            <dm:freq>870004</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>HEALTHSITES</dm:term>
+            <dm:decodedTerm>HEALTHSITES</dm:decodedTerm>
+            <dm:freq>870003</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>unknown</dm:term>
+            <dm:decodedTerm>unknown</dm:decodedTerm>
+            <dm:freq>802820</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>Soil</dm:term>
+            <dm:decodedTerm>Soil</dm:decodedTerm>
+            <dm:freq>786831</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>Sample</dm:term>
+            <dm:decodedTerm>Sample</dm:decodedTerm>
+            <dm:freq>772774</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>Meteorological+geographical+features</dm:term>
+            <dm:decodedTerm>Meteorological geographical features</dm:decodedTerm>
+            <dm:freq>649862</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>meteorology</dm:term>
+            <dm:decodedTerm>meteorology</dm:decodedTerm>
+            <dm:freq>634398</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>Quality+controlled+data</dm:term>
+            <dm:decodedTerm>Quality controlled data</dm:decodedTerm>
+            <dm:freq>633331</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>+EMEP</dm:term>
+            <dm:decodedTerm> EMEP</dm:decodedTerm>
+            <dm:freq>626455</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>12%3a00%3a00Z</dm:term>
+            <dm:decodedTerm>12:00:00Z</dm:decodedTerm>
+            <dm:freq>605748</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>NWP</dm:term>
+            <dm:decodedTerm>NWP</dm:decodedTerm>
+            <dm:freq>602159</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>GPV</dm:term>
+            <dm:decodedTerm>GPV</dm:decodedTerm>
+            <dm:freq>598442</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>Global+Spectral+Model</dm:term>
+            <dm:decodedTerm>Global Spectral Model</dm:decodedTerm>
+            <dm:freq>586652</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>Incremental</dm:term>
+            <dm:decodedTerm>Incremental</dm:decodedTerm>
+            <dm:freq>573555</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>Water+Quality</dm:term>
+            <dm:decodedTerm>Water Quality</dm:decodedTerm>
+            <dm:freq>564899</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>Temperature</dm:term>
+            <dm:decodedTerm>Temperature</dm:decodedTerm>
+            <dm:freq>486194</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>Precipitation</dm:term>
+            <dm:decodedTerm>Precipitation</dm:decodedTerm>
+            <dm:freq>472089</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>Derived+Value</dm:term>
+            <dm:decodedTerm>Derived Value</dm:decodedTerm>
+            <dm:freq>463474</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>Concentration</dm:term>
+            <dm:decodedTerm>Concentration</dm:decodedTerm>
+            <dm:freq>453833</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>Pennsylvania</dm:term>
+            <dm:decodedTerm>Pennsylvania</dm:decodedTerm>
+            <dm:freq>432267</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>GlobalExchange</dm:term>
+            <dm:decodedTerm>GlobalExchange</dm:decodedTerm>
+            <dm:freq>427087</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>milligrams+per+liter</dm:term>
+            <dm:decodedTerm>milligrams per liter</dm:decodedTerm>
+            <dm:freq>416557</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>atmospheric+conditions</dm:term>
+            <dm:decodedTerm>atmospheric conditions</dm:decodedTerm>
+            <dm:freq>410349</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>Dimensionless</dm:term>
+            <dm:decodedTerm>Dimensionless</dm:decodedTerm>
+            <dm:freq>398704</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>EMEP</dm:term>
+            <dm:decodedTerm>EMEP</dm:decodedTerm>
+            <dm:freq>390432</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>00%3a00%3a00Z</dm:term>
+            <dm:decodedTerm>00:00:00Z</dm:decodedTerm>
+            <dm:freq>386116</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>Forecast</dm:term>
+            <dm:decodedTerm>Forecast</dm:decodedTerm>
+            <dm:freq>375870</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>Bradford</dm:term>
+            <dm:decodedTerm>Bradford</dm:decodedTerm>
+            <dm:freq>374149</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>06%3a00%3a00Z</dm:term>
+            <dm:decodedTerm>06:00:00Z</dm:decodedTerm>
+            <dm:freq>359404</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>18%3a00%3a00Z</dm:term>
+            <dm:decodedTerm>18:00:00Z</dm:decodedTerm>
+            <dm:freq>359404</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>Length</dm:term>
+            <dm:decodedTerm>Length</dm:decodedTerm>
+            <dm:freq>356985</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>percent</dm:term>
+            <dm:decodedTerm>percent</dm:decodedTerm>
+            <dm:freq>356683</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>Climate</dm:term>
+            <dm:decodedTerm>Climate</dm:decodedTerm>
+            <dm:freq>355936</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>Air</dm:term>
+            <dm:decodedTerm>Air</dm:decodedTerm>
+            <dm:freq>347916</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>Average</dm:term>
+            <dm:decodedTerm>Average</dm:decodedTerm>
+            <dm:freq>338225</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>Quality+Controlled+Data</dm:term>
+            <dm:decodedTerm>Quality Controlled Data</dm:decodedTerm>
+            <dm:freq>337764</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>Model+Simulation+Result</dm:term>
+            <dm:decodedTerm>Model Simulation Result</dm:decodedTerm>
+            <dm:freq>304393</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>+air</dm:term>
+            <dm:decodedTerm> air</dm:decodedTerm>
+            <dm:freq>293011</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>Bodennutzung</dm:term>
+            <dm:decodedTerm>Bodennutzung</dm:decodedTerm>
+            <dm:freq>281058</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>Bebauungsplan</dm:term>
+            <dm:decodedTerm>Bebauungsplan</dm:decodedTerm>
+            <dm:freq>274899</dm:freq>
+        </dm:item>
+    </dm:keyword>
+    <dm:format>
+        <dm:item>
+            <dm:term>text/tab-separated-values</dm:term>
+            <dm:decodedTerm>text/tab-separated-values</dm:decodedTerm>
+            <dm:freq>3007519</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>WaterML+1.1</dm:term>
+            <dm:decodedTerm>WaterML 1.1</dm:decodedTerm>
+            <dm:freq>2981929</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>MiniSEED</dm:term>
+            <dm:decodedTerm>MiniSEED</dm:decodedTerm>
+            <dm:freq>1139352</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>GRIB1</dm:term>
+            <dm:decodedTerm>GRIB1</dm:decodedTerm>
+            <dm:freq>598384</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>GRIB</dm:term>
+            <dm:decodedTerm>GRIB</dm:decodedTerm>
+            <dm:freq>488354</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>kmz</dm:term>
+            <dm:decodedTerm>kmz</dm:decodedTerm>
+            <dm:freq>231349</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>EML</dm:term>
+            <dm:decodedTerm>EML</dm:decodedTerm>
+            <dm:freq>210002</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>GBIF+annotated+archive</dm:term>
+            <dm:decodedTerm>GBIF annotated archive</dm:decodedTerm>
+            <dm:freq>210002</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>application/dwca%2bzip</dm:term>
+            <dm:decodedTerm>application/dwca+zip</dm:decodedTerm>
+            <dm:freq>210002</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>FM+92</dm:term>
+            <dm:decodedTerm>FM 92</dm:decodedTerm>
+            <dm:freq>147317</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>text/html</dm:term>
+            <dm:decodedTerm>text/html</dm:decodedTerm>
+            <dm:freq>98813</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>NetCDF</dm:term>
+            <dm:decodedTerm>NetCDF</dm:decodedTerm>
+            <dm:freq>97673</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>JSON</dm:term>
+            <dm:decodedTerm>JSON</dm:decodedTerm>
+            <dm:freq>94769</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>TIFF</dm:term>
+            <dm:decodedTerm>TIFF</dm:decodedTerm>
+            <dm:freq>92169</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>PNG</dm:term>
+            <dm:decodedTerm>PNG</dm:decodedTerm>
+            <dm:freq>89257</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>BUFR</dm:term>
+            <dm:decodedTerm>BUFR</dm:decodedTerm>
+            <dm:freq>87545</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>JPEG</dm:term>
+            <dm:decodedTerm>JPEG</dm:decodedTerm>
+            <dm:freq>84331</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>GML</dm:term>
+            <dm:decodedTerm>GML</dm:decodedTerm>
+            <dm:freq>82337</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>GIF</dm:term>
+            <dm:decodedTerm>GIF</dm:decodedTerm>
+            <dm:freq>82258</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>onLine</dm:term>
+            <dm:decodedTerm>onLine</dm:decodedTerm>
+            <dm:freq>77415</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>WaterML+2.0</dm:term>
+            <dm:decodedTerm>WaterML 2.0</dm:decodedTerm>
+            <dm:freq>65584</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>application/x-pdf</dm:term>
+            <dm:decodedTerm>application/x-pdf</dm:decodedTerm>
+            <dm:freq>50420</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>application/zip</dm:term>
+            <dm:decodedTerm>application/zip</dm:decodedTerm>
+            <dm:freq>42001</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>NASA+Ames+1001</dm:term>
+            <dm:decodedTerm>NASA Ames 1001</dm:decodedTerm>
+            <dm:freq>38137</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>application/xml</dm:term>
+            <dm:decodedTerm>application/xml</dm:decodedTerm>
+            <dm:freq>38009</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>FM+94</dm:term>
+            <dm:decodedTerm>FM 94</dm:decodedTerm>
+            <dm:freq>32165</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>WMO+GAW+formatted+text</dm:term>
+            <dm:decodedTerm>WMO GAW formatted text</dm:decodedTerm>
+            <dm:freq>31325</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>TEXT</dm:term>
+            <dm:decodedTerm>TEXT</dm:decodedTerm>
+            <dm:freq>30143</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>netCDF_FLOAT32</dm:term>
+            <dm:decodedTerm>netCDF_FLOAT32</dm:decodedTerm>
+            <dm:freq>30002</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>NITF_FLOAT32</dm:term>
+            <dm:decodedTerm>NITF_FLOAT32</dm:decodedTerm>
+            <dm:freq>30002</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>GeoTIFF_FLOAT32</dm:term>
+            <dm:decodedTerm>GeoTIFF_FLOAT32</dm:decodedTerm>
+            <dm:freq>30002</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>HFA_FLOAT32</dm:term>
+            <dm:decodedTerm>HFA_FLOAT32</dm:decodedTerm>
+            <dm:freq>30002</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>AAIGrid_FLOAT32</dm:term>
+            <dm:decodedTerm>AAIGrid_FLOAT32</dm:decodedTerm>
+            <dm:freq>30002</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>%0a%09WMO+GAW+formatted+text%0a%09</dm:term>
+            <dm:decodedTerm>
+	WMO GAW formatted text
+	</dm:decodedTerm>
+            <dm:freq>29155</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>FM13</dm:term>
+            <dm:decodedTerm>FM13</dm:decodedTerm>
+            <dm:freq>27038</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>pdf</dm:term>
+            <dm:decodedTerm>pdf</dm:decodedTerm>
+            <dm:freq>22562</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>text/csv</dm:term>
+            <dm:decodedTerm>text/csv</dm:decodedTerm>
+            <dm:freq>22544</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>XYZ+in+ASCII</dm:term>
+            <dm:decodedTerm>XYZ in ASCII</dm:decodedTerm>
+            <dm:freq>21684</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>application/x-netcdf</dm:term>
+            <dm:decodedTerm>application/x-netcdf</dm:decodedTerm>
+            <dm:freq>21483</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>GeoTIFF,+analog+als+Plot+(gro%c3%9fformatiger+Ausdruck)</dm:term>
+            <dm:decodedTerm>GeoTIFF, analog als Plot (großformatiger Ausdruck)</dm:decodedTerm>
+            <dm:freq>21472</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>image/tiff</dm:term>
+            <dm:decodedTerm>image/tiff</dm:decodedTerm>
+            <dm:freq>19693</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>png</dm:term>
+            <dm:decodedTerm>png</dm:decodedTerm>
+            <dm:freq>19122</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>TEMP</dm:term>
+            <dm:decodedTerm>TEMP</dm:decodedTerm>
+            <dm:freq>17293</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>FM94+BUFR</dm:term>
+            <dm:decodedTerm>FM94 BUFR</dm:decodedTerm>
+            <dm:freq>16895</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>GeoTIFF_INT16</dm:term>
+            <dm:decodedTerm>GeoTIFF_INT16</dm:decodedTerm>
+            <dm:freq>16655</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>netCDF_INT16</dm:term>
+            <dm:decodedTerm>netCDF_INT16</dm:decodedTerm>
+            <dm:freq>16655</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>NITF_INT16</dm:term>
+            <dm:decodedTerm>NITF_INT16</dm:decodedTerm>
+            <dm:freq>16655</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>HFA_INT16</dm:term>
+            <dm:decodedTerm>HFA_INT16</dm:decodedTerm>
+            <dm:freq>16655</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>AAIGrid_INT16</dm:term>
+            <dm:decodedTerm>AAIGrid_INT16</dm:decodedTerm>
+            <dm:freq>16655</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>application/json</dm:term>
+            <dm:decodedTerm>application/json</dm:decodedTerm>
+            <dm:freq>15563</dm:freq>
+        </dm:item>
+    </dm:format>
+    <dm:protocol>
+        <dm:item>
+            <dm:term>CUAHSI+HIS+Server</dm:term>
+            <dm:decodedTerm>CUAHSI HIS Server</dm:decodedTerm>
+            <dm:freq>2971515</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>HTTP</dm:term>
+            <dm:decodedTerm>HTTP</dm:decodedTerm>
+            <dm:freq>1277142</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>HTTP_GET</dm:term>
+            <dm:decodedTerm>HTTP_GET</dm:decodedTerm>
+            <dm:freq>1139352</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>WWW%3aLINK-1.0-http--link</dm:term>
+            <dm:decodedTerm>WWW:LINK-1.0-http--link</dm:decodedTerm>
+            <dm:freq>677169</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>http</dm:term>
+            <dm:decodedTerm>http</dm:decodedTerm>
+            <dm:freq>441683</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>WWW%3aLINK-1..0-http-link</dm:term>
+            <dm:decodedTerm>WWW:LINK-1..0-http-link</dm:decodedTerm>
+            <dm:freq>94176</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>urn%3aogc%3aserviceType%3aWebMapService%3a1.1.1%3aHTTP</dm:term>
+            <dm:decodedTerm>urn:ogc:serviceType:WebMapService:1.1.1:HTTP</dm:decodedTerm>
+            <dm:freq>81393</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>FTP</dm:term>
+            <dm:decodedTerm>FTP</dm:decodedTerm>
+            <dm:freq>67768</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>gi-axe</dm:term>
+            <dm:decodedTerm>gi-axe</dm:decodedTerm>
+            <dm:freq>52291</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>WWW%3aDOWNLOAD-1.0-ftp--download</dm:term>
+            <dm:decodedTerm>WWW:DOWNLOAD-1.0-ftp--download</dm:decodedTerm>
+            <dm:freq>52197</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>OGC%3aWMS-1.1.1-http-get-map</dm:term>
+            <dm:decodedTerm>OGC:WMS-1.1.1-http-get-map</dm:decodedTerm>
+            <dm:freq>48579</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>urn%3aogc%3aserviceType%3aWebCoverageService%3a1.0.0%3aHTTP</dm:term>
+            <dm:decodedTerm>urn:ogc:serviceType:WebCoverageService:1.0.0:HTTP</dm:decodedTerm>
+            <dm:freq>42007</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>urn%3aogc%3aserviceType%3aSensorObservationService%3a2.0.0%3aTAHMO%3aHTTP</dm:term>
+            <dm:decodedTerm>urn:ogc:serviceType:SensorObservationService:2.0.0:TAHMO:HTTP</dm:decodedTerm>
+            <dm:freq>39933</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>WWW%3aDOWNLOAD-1.0-http--download</dm:term>
+            <dm:decodedTerm>WWW:DOWNLOAD-1.0-http--download</dm:decodedTerm>
+            <dm:freq>28975</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>urn%3aogc%3aserviceType%3aSensorObservationService%3a2.0.0%3aHTTP</dm:term>
+            <dm:decodedTerm>urn:ogc:serviceType:SensorObservationService:2.0.0:HTTP</dm:decodedTerm>
+            <dm:freq>25692</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>OPeNDAP</dm:term>
+            <dm:decodedTerm>OPeNDAP</dm:decodedTerm>
+            <dm:freq>16304</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>http-get</dm:term>
+            <dm:decodedTerm>http-get</dm:decodedTerm>
+            <dm:freq>13244</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>CSV</dm:term>
+            <dm:decodedTerm>CSV</dm:decodedTerm>
+            <dm:freq>12173</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>urn%3aogc%3aserviceType%3aWebMapService%3a1.3.0%3aHTTP</dm:term>
+            <dm:decodedTerm>urn:ogc:serviceType:WebMapService:1.3.0:HTTP</dm:decodedTerm>
+            <dm:freq>10773</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>HTML</dm:term>
+            <dm:decodedTerm>HTML</dm:decodedTerm>
+            <dm:freq>10624</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>urn%3aogc%3aserviceType%3aWaterOneFlow%3a1.1%3aHTTP</dm:term>
+            <dm:decodedTerm>urn:ogc:serviceType:WaterOneFlow:1.1:HTTP</dm:decodedTerm>
+            <dm:freq>10413</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>urn%3ax-esri%3aspecification%3aServiceType%3aArcGIS%3a10.0.0</dm:term>
+            <dm:decodedTerm>urn:x-esri:specification:ServiceType:ArcGIS:10.0.0</dm:decodedTerm>
+            <dm:freq>7524</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>SHP</dm:term>
+            <dm:decodedTerm>SHP</dm:decodedTerm>
+            <dm:freq>7404</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>OGC%3aWMS-1.3.0-http-get-map</dm:term>
+            <dm:decodedTerm>OGC:WMS-1.3.0-http-get-map</dm:decodedTerm>
+            <dm:freq>6743</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>HTTPS</dm:term>
+            <dm:decodedTerm>HTTPS</dm:decodedTerm>
+            <dm:freq>5291</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>urn%3aogc%3aserviceType%3aSensorObservationService%3a1.0.0%3aHTTP</dm:term>
+            <dm:decodedTerm>urn:ogc:serviceType:SensorObservationService:1.0.0:HTTP</dm:decodedTerm>
+            <dm:freq>4920</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>OGC%3aWMS</dm:term>
+            <dm:decodedTerm>OGC:WMS</dm:decodedTerm>
+            <dm:freq>4916</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>KML</dm:term>
+            <dm:decodedTerm>KML</dm:decodedTerm>
+            <dm:freq>4883</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>urn%3aogc%3aserviceType%3aWebMapService%3aHTTP</dm:term>
+            <dm:decodedTerm>urn:ogc:serviceType:WebMapService:HTTP</dm:decodedTerm>
+            <dm:freq>4674</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>Geopackage</dm:term>
+            <dm:decodedTerm>Geopackage</dm:decodedTerm>
+            <dm:freq>4314</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>WMS</dm:term>
+            <dm:decodedTerm>WMS</dm:decodedTerm>
+            <dm:freq>4034</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>Garmin+IMG</dm:term>
+            <dm:decodedTerm>Garmin IMG</dm:decodedTerm>
+            <dm:freq>3797</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>OGC%3aWFS-2.0.0-http-get-map</dm:term>
+            <dm:decodedTerm>OGC:WFS-2.0.0-http-get-map</dm:decodedTerm>
+            <dm:freq>3453</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>urn%3aogc%3aserviceType%3aWebFeatureService%3a1.0.0%3aHTTP</dm:term>
+            <dm:decodedTerm>urn:ogc:serviceType:WebFeatureService:1.0.0:HTTP</dm:decodedTerm>
+            <dm:freq>3040</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>OGC%3aWMS-1.3.0-http-get-capabilities</dm:term>
+            <dm:decodedTerm>OGC:WMS-1.3.0-http-get-capabilities</dm:decodedTerm>
+            <dm:freq>3025</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>OGC%3aWMS-1.1.1-http-get-capabilities</dm:term>
+            <dm:decodedTerm>OGC:WMS-1.1.1-http-get-capabilities</dm:decodedTerm>
+            <dm:freq>3018</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>image/png</dm:term>
+            <dm:decodedTerm>image/png</dm:decodedTerm>
+            <dm:freq>2968</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>OGC%3aWFS-1.0.0-http-get-capabilities</dm:term>
+            <dm:decodedTerm>OGC:WFS-1.0.0-http-get-capabilities</dm:decodedTerm>
+            <dm:freq>2910</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>XLSX</dm:term>
+            <dm:decodedTerm>XLSX</dm:decodedTerm>
+            <dm:freq>2837</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>OGC%3aWFS</dm:term>
+            <dm:decodedTerm>OGC:WFS</dm:decodedTerm>
+            <dm:freq>2702</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>N/A</dm:term>
+            <dm:decodedTerm>N/A</dm:decodedTerm>
+            <dm:freq>2651</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>WWW%3aLINK%3aWEBAPP-http-get-open</dm:term>
+            <dm:decodedTerm>WWW:LINK:WEBAPP-http-get-open</dm:decodedTerm>
+            <dm:freq>2373</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>NetCDF</dm:term>
+            <dm:decodedTerm>NetCDF</dm:decodedTerm>
+            <dm:freq>2231</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>PDF</dm:term>
+            <dm:decodedTerm>PDF</dm:decodedTerm>
+            <dm:freq>1959</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>HTTP-GET</dm:term>
+            <dm:decodedTerm>HTTP-GET</dm:decodedTerm>
+            <dm:freq>1931</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>urn%3aogc%3aserviceType%3aWebFeatureService%3a1.1.0%3aHTTP</dm:term>
+            <dm:decodedTerm>urn:ogc:serviceType:WebFeatureService:1.1.0:HTTP</dm:decodedTerm>
+            <dm:freq>1907</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>ZIP</dm:term>
+            <dm:decodedTerm>ZIP</dm:decodedTerm>
+            <dm:freq>1649</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>XML</dm:term>
+            <dm:decodedTerm>XML</dm:decodedTerm>
+            <dm:freq>1609</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>urn%3aogc%3aserviceType%3aWebCoverageService%3a1.1.2%3aHTTP</dm:term>
+            <dm:decodedTerm>urn:ogc:serviceType:WebCoverageService:1.1.2:HTTP</dm:decodedTerm>
+            <dm:freq>1542</dm:freq>
+        </dm:item>
+        <dm:item>
+            <dm:term>GeoJSON</dm:term>
+            <dm:decodedTerm>GeoJSON</dm:decodedTerm>
+            <dm:freq>1503</dm:freq>
+        </dm:item>
+    </dm:protocol>
+    
+    <dm:instrumentTitle/>
+    
+    <dm:platformTitle/>
+    
+    <dm:origOrgDesc/>
+    
+    <dm:attributeTitle/>
+    <dm:organisationName/>
+    <dm:prodType/>
+    <dm:sensorOpMode/>
+    <dm:sensorSwath/>
+    <dm:sarPolCh/>
+    <dm:s3InstrumentIdx/>
+    <dm:s3ProductLevel/>
+    <dm:s3Timeliness/>
+    <dm:sscScore/>
+</dm:termFrequency></feed> 

@@ -4,7 +4,7 @@ package eu.essi_lab.harvester.component;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,6 +22,7 @@ package eu.essi_lab.harvester.component;
  */
 
 import eu.essi_lab.augmenter.Augmenter;
+import eu.essi_lab.harvester.HarvestingComponentException;
 import eu.essi_lab.harvester.HarvestingComponent;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
@@ -29,6 +30,7 @@ import eu.essi_lab.model.resource.GSResource;
 /**
  * @author Fabrizio
  */
+@SuppressWarnings("rawtypes")
 public class AugmenterComponent extends HarvestingComponent {
 
     /**
@@ -56,14 +58,14 @@ public class AugmenterComponent extends HarvestingComponent {
     }
 
     @Override
-    public void apply(GSResource resource) throws HarvesterComponentException {
+    public void apply(GSResource resource) throws HarvestingComponentException {
 
 	try {
 	    augmenter.augment(resource);
 
 	} catch (GSException e) {
 
-	    throw new HarvesterComponentException(e);
+	    throw new HarvestingComponentException(e);
 	}
     }
 }

@@ -1,0 +1,117 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "DAB Terms REST API",
+        "description": "The DAB Terms REST API eases the metadata analyisis.",
+        "version": "1.0"
+    },
+    "servers": [
+        {"url": "https://gs-service-preproduction.geodab.eu"},{"url": "http://localhost:9090"}
+    ],
+    "paths": {
+        "/gs-service/services/essi/token/{token}/view/{view}/terms-api/terms": {
+            "get": {
+                "description": "Used to filter and list available terms",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "path",
+                        "required": true,
+                        "description": "Token identifying the user",
+                        "schema": {"type": "string"}
+                    },
+                    {
+                        "name": "view",
+                        "in": "path",
+                        "required": true,
+                        "description": "Identifier of the data subset interesting for the user",
+                        "schema": {"type": "string"}
+                    },
+					{
+                        "name": "type",                        
+                        "in": "query",
+                        "required": true,
+                        "description": "Type of the term, e.g.: keyword, keyword_uri, observed_property, observed_property_uri, instrument, instrument_uri, platform, platform_uri, organization, organization_uri, cruise, cruise_uri, project, project_uri",
+                        "schema": {"type": "string"}                        
+                    },
+                    {
+                        "name": "source",
+                        "in": "query",
+                        "description": "Identifier of the source, e.g.: elixir-ena, seadatanet-open, ...",
+                        "schema": {"type": "string"}                       
+                    },
+                    {
+                        "name": "beginPosition",
+                        "in": "query",
+                        "description": "Temporal interval begin position",
+                        "schema": {"type": "string"}                        
+                    },
+                    {
+                        "name": "endPosition",
+                        "in": "query",
+                        "description": "Temporal interval end position",
+                        "schema": {"type": "string"}                        
+                    },                                        
+                    {
+                        "name": "west",
+                        "in": "query",
+                        "schema": {"type": "string"}                        
+                    },
+                    {
+                        "name": "south",
+                        "in": "query",
+                        "schema": {"type": "string"}                       
+                    },
+                    {
+                        "name": "east",
+                        "in": "query",
+                        "schema": {"type": "string"}                     
+                    },
+                    {
+                        "name": "north",
+                        "in": "query",
+                        "schema": {"type": "string"}                        
+                    },
+                    {
+                        "name": "observedProperty",
+                        "in": "query",
+                        "description":"observed property name or URI",
+                        "schema": {"type": "string"}                        
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "description": "Start position of matched records",
+                        "schema": {"type": "string"},
+                        "example": "1"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Maximum number of matched records",
+                        "schema": {"type": "string"},
+                        "example": "10"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Terms",
+                        "content": {
+                            "application/json": {
+                                "examples": {
+                                    "0": {"value": ""}
+                                }
+                            }
+                        }
+                    }
+                },
+                "servers": [
+                    {"url": "https://gs-service-preproduction.geodab.eu"},{"url": "http://localhost:9090"}
+                ]
+            },
+            "servers": [
+                {"url": "https://gs-service-preproduction.geodab.eu"},{"url": "http://localhost:9090"}
+            ]
+        }
+    }
+}

@@ -7,7 +7,7 @@ package eu.essi_lab.profiler.rest.handler.info;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,8 +35,9 @@ import javax.ws.rs.core.MediaType;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import eu.essi_lab.api.database.DatabaseExecutor;
 import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.factory.DatabaseConsumerFactory;
+import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -55,7 +56,7 @@ import eu.essi_lab.messages.stats.StatisticsResponse;
 import eu.essi_lab.messages.web.KeyValueParser;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.RuntimeInfoElement;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.pdk.handler.DefaultRequestHandler;
 import eu.essi_lab.shared.driver.es.stats.ElasticsearchClient;
@@ -243,12 +244,12 @@ public class GWPStatisticsHandler extends DefaultRequestHandler {
 	} else {
 	    // marklogic implementation
 
-	    StorageUri uri = ConfigurationWrapper.getDatabaseURI();
+	    StorageInfo uri = ConfigurationWrapper.getDatabaseURI();
 	    GSLoggerFactory.getLogger(FullStatisticsHandler.class).debug("Storage uri: {}", uri);
 
-	    DatabaseReader reader = DatabaseConsumerFactory.createDataBaseReader(uri);
+	    DatabaseExecutor executor = DatabaseProviderFactory.getDatabaseExecutor(uri);
 
-	    response = reader.compute(message);
+	    response = executor.compute(message);
 	}
 
 	response.convertGroupedByMillisToISODataTime();
@@ -488,11 +489,11 @@ public class GWPStatisticsHandler extends DefaultRequestHandler {
 
 			forEach(hostName ->
 
-		orBond.getOperands().add(//
-			BondFactory.createRuntimeInfoElementBond(//
-				BondOperator.EQUAL, //
-				RuntimeInfoElement.RUNTIME_CONTEXT, //
-				hostName)));
+			orBond.getOperands().add(//
+				BondFactory.createRuntimeInfoElementBond(//
+					BondOperator.EQUAL, //
+					RuntimeInfoElement.RUNTIME_CONTEXT, //
+					hostName)));
 
 		andBond.getOperands().add(orBond);
 	    }
@@ -773,11 +774,10 @@ public class GWPStatisticsHandler extends DefaultRequestHandler {
 	    timeConstraint = RuntimeInfoElement.DISCOVERY_MESSAGE_TIME_STAMP_MILLIS;
 	}
 
-	andBond.getOperands()
-		.add(BondFactory.createRuntimeInfoElementBond(//
-			BondOperator.GREATER_OR_EQUAL, //
-			timeConstraint, //
-			startTime));
+	andBond.getOperands().add(BondFactory.createRuntimeInfoElementBond(//
+		BondOperator.GREATER_OR_EQUAL, //
+		timeConstraint, //
+		startTime));
 
 	if (endTime.isPresent()) {
 	    andBond.getOperands()

@@ -7,3 +7,4 @@ eu.essi_lab.cfga.gs.setting.S3StorageSetting
 eu.essi_lab.cfga.gs.setting.DownloadSetting
 eu.essi_lab.cfga.gs.setting.CredentialsSetting
 eu.essi_lab.cfga.gs.setting.distribution.DistributionSetting
+eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting

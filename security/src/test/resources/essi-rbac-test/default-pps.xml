@@ -1,0 +1,173 @@
+<PolicySet
+	xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 https://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd"
+	PolicySetId="PPS:default:role" Version="1.0"
+	PolicyCombiningAlgId="urn:oasis:names:tc:xacml:3.0:policy-combining-algorithm:permit-overrides">
+
+	<Target />
+
+	<Policy PolicyId="Permissions:specifically:for:the:default:role"
+
+		Version="1.0"
+		RuleCombiningAlgId="urn:oasis:names:tc:xacml:3.0:rule-combining-algorithm:permit-overrides">
+
+		<Target />
+
+		<!-- 		
+			Discovery is limited to views default and distributed with a max offset of 200, max records of 50 and on csw and opensearch path
+		-->
+
+		<Rule RuleId="Permission:to:discover" Effect="Permit">
+
+			<Target>
+
+				<AnyOf>
+					<AllOf>
+						<Match
+							MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+
+							<AttributeValue
+								DataType="http://www.w3.org/2001/XMLSchema#string">discover</AttributeValue>
+
+							<AttributeDesignator 
+								MustBePresent="true"
+								Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action"
+								AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+								DataType="http://www.w3.org/2001/XMLSchema#string" />
+
+						</Match>
+					</AllOf>
+				</AnyOf>
+			 			 		
+				<AnyOf>
+					<AllOf>
+						<Match MatchId="urn:oasis:names:tc:xacml:1.0:function:integer-greater-than-or-equal">
+							
+							<AttributeValue
+								DataType="http://www.w3.org/2001/XMLSchema#integer">200</AttributeValue>
+
+							<AttributeDesignator 
+								MustBePresent="true"
+								Issuer="offset"
+								AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id"
+								Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+								DataType="http://www.w3.org/2001/XMLSchema#integer" />
+						</Match>
+					</AllOf>
+				</AnyOf>
+				
+				<AnyOf>
+					<AllOf>
+						<Match MatchId="urn:oasis:names:tc:xacml:1.0:function:integer-greater-than-or-equal">
+							
+							<AttributeValue
+								DataType="http://www.w3.org/2001/XMLSchema#integer">50</AttributeValue>
+
+							<AttributeDesignator 
+								MustBePresent="true"
+								Issuer="max_records"
+								AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id"
+								Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+								DataType="http://www.w3.org/2001/XMLSchema#integer" />
+						</Match>
+					</AllOf>
+				</AnyOf>
+
+			</Target>
+
+			<Condition>
+								
+				<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:and">
+				
+					<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of">
+						
+						<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+	
+							<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">csw</AttributeValue>
+							<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">opensearch</AttributeValue>
+	
+						</Apply>
+						
+						<AttributeDesignator 
+								MustBePresent="true"
+								Issuer="path"
+								AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id"
+								Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+								DataType="http://www.w3.org/2001/XMLSchema#string" />
+					</Apply>
+					
+					<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of">
+						
+							<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+		
+								<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">default</AttributeValue>
+								<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">distributed</AttributeValue>
+		
+							</Apply>
+							
+							<AttributeDesignator 
+								MustBePresent="true"
+								Issuer="view"
+		 						AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id"
+								Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+								DataType="http://www.w3.org/2001/XMLSchema#string" />
+					</Apply>
+									
+				</Apply>
+				
+			</Condition>
+			
+		</Rule>
+		
+		<!-- 		
+			Access is limited to a max of 10 downloaded resources
+		-->
+		
+		<Rule RuleId="Permission:to:access" Effect="Permit">
+
+			<Target>
+
+				<AnyOf>
+					<AllOf>
+						<Match
+							MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+
+							<AttributeValue
+								DataType="http://www.w3.org/2001/XMLSchema#string">access</AttributeValue>
+
+							<AttributeDesignator 
+								MustBePresent="true"
+								Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action"
+								AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+								DataType="http://www.w3.org/2001/XMLSchema#string" />
+
+						</Match>
+					</AllOf>
+			
+				</AnyOf>
+				
+				<AnyOf>
+					<AllOf>
+						<Match MatchId="urn:oasis:names:tc:xacml:1.0:function:integer-greater-than-or-equal">
+							
+							<AttributeValue
+								DataType="http://www.w3.org/2001/XMLSchema#integer">10</AttributeValue>
+
+							<AttributeDesignator 
+								MustBePresent="true"
+								Issuer="download"
+								AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id"
+								Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+								DataType="http://www.w3.org/2001/XMLSchema#integer" />
+						</Match>
+					</AllOf>
+				</AnyOf>
+	 		 
+			</Target>
+
+		</Rule>
+
+	</Policy>
+
+</PolicySet>

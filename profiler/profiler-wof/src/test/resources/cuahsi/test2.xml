@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ArrayOfServiceInfo xmlns="http://hiscentral.cuahsi.org/20100205/"
+                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <ServiceInfo>
+      <servURL>http://his-server</servURL>
+      <Title>my series</Title>
+      <ServiceDescriptionURL>http://his-server</ServiceDescriptionURL>
+      <Email>email@email.com</Email>
+      <phone>3472398</phone>
+      <organization>University of Utah</organization>
+      <orgwebsite>http://utah.edu</orgwebsite>
+      <citation>my Acquisition</citation>
+      <aabstract>bla bla bla</aabstract>
+      <valuecount>9348</valuecount>
+      <variablecount>34</variablecount>
+      <sitecount>3</sitecount>
+      <ServiceID>1</ServiceID>
+      <NetworkName>LBR</NetworkName>
+      <minx>0</minx>
+      <miny>1</miny>
+      <maxx>2</maxx>
+      <maxy>3</maxy>
+      <serviceStatus/>
+   </ServiceInfo>
+</ArrayOfServiceInfo>
+

@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.wrt;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,7 +24,7 @@ package eu.essi_lab.pdk.wrt;
 import java.util.Optional;
 
 import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.factory.DatabaseConsumerFactory;
+import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.DownloadSetting;
 import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
@@ -34,7 +34,7 @@ import eu.essi_lab.messages.RequestMessage;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -57,7 +57,7 @@ public abstract class WebRequestTransformer<M extends RequestMessage> implements
 
     /**
      * Transforms the supplied <code>request</code> in the correspondent {@link RequestMessage}. This partial
-     * implementation initialize the
+     * implementation initialise the
      * {@link RequestMessage} created with {@link #createMessage()} by setting the following common properties and
      * invokes the {@link
      * #refineMessage(RequestMessage)} method
@@ -67,13 +67,15 @@ public abstract class WebRequestTransformer<M extends RequestMessage> implements
      * <li>the {@link WebRequest} (see {@link RequestMessage#setWebRequest(WebRequest)})</li>
      * <li>the view identifier (see {@link RequestMessage#getViewId()}) read from the {@link WebRequest})</li>
      * <li>the {@link GSUser} (see {@link RequestMessage#getCurrentUser()}) created from the {@link WebRequest})</li>
-     * <li>the {@link StorageUri} (see {@link RequestMessage#setDataBaseURI(StorageUri)})</li>
+     * <li>the {@link StorageInfo} (see {@link RequestMessage#setDataBaseURI(StorageInfo)})</li>
      * <li>the {@link Page} (see {@link RequestMessage#setPage(Page)})</li>
      * </ul>
      */
     public M transform(WebRequest request) throws GSException {
 
 	M message = createMessage();
+
+	message.setProfilerName(request.getProfilerName());
 
 	message.setRequestId(request.getRequestId());
 
@@ -86,7 +88,27 @@ public abstract class WebRequestTransformer<M extends RequestMessage> implements
 	DownloadSetting downloadSetting = ConfigurationWrapper.getDownloadSetting();
 	message.setUserJobStorageURI(downloadSetting.getStorageUri());
 
-	StorageUri storageUri = getStorageURI(message);
+	StorageInfo storageUri = ConfigurationWrapper.getDatabaseURI();
+
+	message.setDataBaseURI(storageUri);
+
+	handleView(request, storageUri, message);
+
+	return refineMessage(message);
+    }
+
+    /**
+     * Extracts the view identifier from the <code>request</code> and, if present, tries to retrieve the related view
+     * and sets it to the <code>message</code>.<br>
+     * This method is called at last in the {@link #transform(WebRequest)} method, just before
+     * {@link #refineMessage(RequestMessage)}
+     * 
+     * @param request
+     * @param storageUri
+     * @param message
+     * @throws GSException
+     */
+    protected void handleView(WebRequest request, StorageInfo storageUri, RequestMessage message) throws GSException {
 
 	Optional<String> viewId = request.extractViewId();
 
@@ -94,30 +116,6 @@ public abstract class WebRequestTransformer<M extends RequestMessage> implements
 
 	    setView(viewId.get(), storageUri, message);
 	}
-
-	return refineMessage(message);
-    }
-
-    protected StorageUri getStorageURI(M message) throws GSException {
-	StorageUri storageUri = ConfigurationWrapper.getDatabaseURI();
-	if (storageUri != null) {
-
-	    message.setDataBaseURI(storageUri);
-
-	} else {
-
-	    GSException exception = GSException.createException(getClass(), //
-		    "Data Base storage URI not found", //
-		    null, //
-		    ErrorInfo.ERRORTYPE_INTERNAL, //
-		    ErrorInfo.SEVERITY_WARNING, //
-		    DB_STORAGE_URI_NOT_FOUND);
-
-	    message.getException().getErrorInfoList().add(exception.getErrorInfoList().get(0));
-
-	    GSLoggerFactory.getLogger(this.getClass()).warn("Data Base storage URI not found");
-	}
-	return storageUri;
     }
 
     /**
@@ -155,7 +153,7 @@ public abstract class WebRequestTransformer<M extends RequestMessage> implements
      * @param message
      * @throws GSException
      */
-    public static void setView(String viewId, StorageUri storageUri, RequestMessage message) throws GSException {
+    public static void setView(String viewId, StorageInfo storageUri, RequestMessage message) throws GSException {
 
 	GSLoggerFactory.getLogger(WebRequestTransformer.class).debug("Finding view {} STARTED", viewId);
 
@@ -185,11 +183,11 @@ public abstract class WebRequestTransformer<M extends RequestMessage> implements
      * @return
      * @throws GSException
      */
-    public static Optional<View> findView(StorageUri databaseURI, String viewIdentifier) throws GSException {
+    public static Optional<View> findView(StorageInfo databaseURI, String viewIdentifier) throws GSException {
 
 	try {
 
-	    DatabaseReader reader = DatabaseConsumerFactory.createDataBaseReader(databaseURI);
+	    DatabaseReader reader = DatabaseProviderFactory.getDatabaseReader(databaseURI);
 
 	    DefaultViewManager manager = new DefaultViewManager();
 	    manager.setDatabaseReader(reader);

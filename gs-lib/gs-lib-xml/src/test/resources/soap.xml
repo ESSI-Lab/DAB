@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <soap:Body>
+        <TimeSeriesResponse xmlns="http://www.cuahsi.org/waterML/1.1/">
+            <timeSeriesResponse>
+                <queryInfo>
+                    <creationTime>2018-04-13T06:14:03.715821-06:00</creationTime>
+                    <criteria MethodCalled="GetValues">
+                        <parameter name="site" value="LBR:USU-LBR-Mendon"/>
+                        <parameter name="variable" value="LBR:USU4"/>
+                        <parameter name="startDate" value="2005-08-04T11:30:00"/>
+                        <parameter name="endDate" value="2005-08-04T11:30:00"/>
+                    </criteria>
+                </queryInfo>
+                <timeSeries>
+                    <sourceInfo xsi:type="SiteInfoType">
+                        <siteName>Little Bear River at Mendon Road near Mendon, Utah</siteName>
+                        <siteCode network="LBR" siteID="1">USU-LBR-Mendon</siteCode>
+                        <geoLocation>
+                            <geogLocation srs="EPSG:4269" xsi:type="LatLonPointType">
+                                <latitude>41.718473</latitude>
+                                <longitude>-111.946402</longitude>
+                            </geogLocation>
+                            <localSiteXY projectionInformation="NAD83 / UTM zone 12N">
+                                <X>421276.323</X>
+                                <Y>4618952.04</Y>
+                            </localSiteXY>
+                        </geoLocation>
+                        <elevation_m>1345</elevation_m>
+                        <verticalDatum>NGVD29</verticalDatum>
+                        <siteProperty name="County">Cache</siteProperty>
+                        <siteProperty name="State">Utah</siteProperty>
+                        <siteProperty name="Site Comments">Located below county road bridge at
+                            Mendon Road crossing</siteProperty>
+                        <siteProperty name="PosAccuracy_m">10</siteProperty>
+                        <siteProperty name="Site Type">Stream</siteProperty>
+                    </sourceInfo>
+                    <variable>
+                        <variableCode default="true" variableID="4" vocabulary="LBR"
+                            >USU4</variableCode>
+                        <variableName>Turbidity</variableName>
+                        <valueType>Field Observation</valueType>
+                        <dataType>Average</dataType>
+                        <generalCategory>Water Quality</generalCategory>
+                        <sampleMedium>Surface Water</sampleMedium>
+                        <unit>
+                            <unitName>nephelometric turbidity units</unitName>
+                            <unitType>Turbidity</unitType>
+                            <unitAbbreviation>NTU</unitAbbreviation>
+                            <unitCode>221</unitCode>
+                        </unit>
+                        <noDataValue>-9999</noDataValue>
+                        <timeScale isRegular="true">
+                            <unit>
+                                <unitName>second</unitName>
+                                <unitType>Time</unitType>
+                                <unitAbbreviation>s</unitAbbreviation>
+                                <unitCode>100</unitCode>
+                            </unit>
+                            <timeSupport>5</timeSupport>
+                        </timeScale>
+                        <speciation>Not Applicable</speciation>
+                    </variable>
+                    <values>
+                        <value censorCode="nc" dateTime="2005-08-04T11:30:00"
+                            dateTimeUTC="2005-08-04T18:30:00" methodCode="2"
+                            qualityControlLevelCode="0" sourceCode="1" timeOffset="-07:00"
+                            >30.99</value>
+                        <qualityControlLevel qualityControlLevelID="0">
+                            <qualityControlLevelCode>0</qualityControlLevelCode>
+                            <definition>Raw data</definition>
+                            <explanation>Raw and unprocessed data and data products that have not
+                                undergone quality control. Depending on the variable, data type, and
+                                data transmission system, raw data may be available within seconds
+                                or minutes after the measurements have been made. Examples include
+                                real time precipitation, streamflow and water quality
+                                measurements.</explanation>
+                        </qualityControlLevel>
+                        <method methodID="2">
+                            <methodCode>2</methodCode>
+                            <methodDescription>Turbidity measured using a Forest Technology Systems
+                                DTS-12 turbidity sensor.</methodDescription>
+                            <methodLink>http://www.ftsinc.com/</methodLink>
+                        </method>
+                        <source sourceID="1">
+                            <sourceCode>1</sourceCode>
+                            <organization>Utah State University Utah Water Research
+                                Laboratory</organization>
+                            <sourceDescription>Continuous water quality monitoring by Utah State
+                                University as part of the USDA CEAP Grant</sourceDescription>
+                            <metadata>
+                                <topicCategory>inlandWaters</topicCategory>
+                                <title>Little Bear River Conservation Effects Assessment Project
+                                    Water Quality Data</title>
+                                <abstract>Under funding from the United States Department of
+                                    Agricultures Conservations Effects Assessment program, USU is
+                                    conducting continuous water quality monitoring of the Little
+                                    Bear River to demonstrate and compare the use of alternative
+                                    monitoring approaches in estimating pollutant concentrations and
+                                    loads.</abstract>
+                                <profileVersion>Unknown</profileVersion>
+                            </metadata>
+                            <contactInformation>
+                                <contactName>Jeff Horsburgh</contactName>
+                                <typeOfContact>main</typeOfContact>
+                                <email>jeff.horsburgh@usu.edu</email>
+                                <phone>1-435-797-2946</phone>
+                                <address xsi:type="xsd:string">8200 Old Main Hill
+,Logan, UT 84322-8200</address>
+                            </contactInformation>
+                            <sourceLink>http://littlebearriver.usu.edu</sourceLink>
+                            <citation>Continuous water quality monitoring by Jeff Horsburgh, David
+                                Stevens, Nancy Mesner and others from Utah State University as part
+                                of the USDA Conservation Effects Assessment Grant</citation>
+                        </source>
+                        <censorCode>
+                            <censorCode>nc</censorCode>
+                            <censorCodeDescription>not censored</censorCodeDescription>
+                        </censorCode>
+                    </values>
+                </timeSeries>
+            </timeSeriesResponse>
+        </TimeSeriesResponse>
+    </soap:Body>
+</soap:Envelope>

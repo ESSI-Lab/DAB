@@ -4,7 +4,7 @@ package eu.essi_lab.iso.datamodel.classes;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -56,7 +56,7 @@ public class TransferOptions extends ISOMetadata<MDDigitalTransferOptionsType> {
 
 	super(new MDDigitalTransferOptionsType());
     }
-    
+
     @Override
     public JAXBElement<MDDigitalTransferOptionsType> getElement() {
 
@@ -97,8 +97,8 @@ public class TransferOptions extends ISOMetadata<MDDigitalTransferOptionsType> {
     }
 
     /**
-    *    @XPathDirective(clear = "gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine")
-    */
+     * @XPathDirective(clear = "gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine")
+     */
     public void clearOnlines() {
 
 	type.unsetOnLine();
@@ -109,9 +109,11 @@ public class TransferOptions extends ISOMetadata<MDDigitalTransferOptionsType> {
      */
     public Iterator<Online> getOnlines() {
 	ArrayList<Online> ret = new ArrayList<>();
-	List<CIOnlineResourcePropertyType> onlines = type.getOnLine();
-	for (CIOnlineResourcePropertyType online : onlines) {
-	    ret.add(new Online(online.getCIOnlineResource()));
+	if (type != null) {
+	    List<CIOnlineResourcePropertyType> onlines = type.getOnLine();
+	    for (CIOnlineResourcePropertyType online : onlines) {
+		ret.add(new Online(online.getCIOnlineResource()));
+	    }
 	}
 	return ret.iterator();
 

@@ -7,7 +7,7 @@ package eu.essi_lab.model;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -37,7 +37,16 @@ public enum RuntimeInfoElement implements Queryable {
     RUNTIME_ID("runtimeId"), //
     RUNTIME_CONTEXT("runtimeContext"), //
 
+    PROVIDER_NAME("providerName"), //
+
     HOST_NAME("HOST_NAME"), //
+
+    FREE_MEMORY("FREE_MEMORY"), //
+    TOTAL_MEMORY("TOTAL_MEMORY"), //
+    USED_MEMORY("USED_MEMORY"), //
+
+    EXECUTION_MODE("EXECUTION_MODE"), //
+
     VIEW_ID("VIEW_ID"), //
     MESSAGE_TYPE("MESSAGE_TYPE"), //
 
@@ -46,7 +55,8 @@ public enum RuntimeInfoElement implements Queryable {
 
     CHRONOMETER_TIME_STAMP("CHRONOMETER_TIME_STAMP"), //
     CHRONOMETER_TIME_STAMP_MILLIS("CHRONOMETER_TIME_STAMP_MILLIS", ContentType.LONG), //
-    CHRONOMETER_ELAPSED_TIME_MILLIS("CHRONOMETER_ELAPSED_TIME_MILLIS", ContentType.LONG),
+    CHRONOMETER_ELAPSED_TIME_MILLIS("CHRONOMETER_ELAPSED_TIME_MILLIS", ContentType.LONG), //
+    CHRONOMETER_FORMATTED_ELAPSED_TIME("CHRONOMETER_FORMATTED_ELAPSED_TIME"),
 
     VALIDATION_MESSAGE_RESULT("VALIDATION_MESSAGE_RESULT"), //
     VALIDATION_MESSAGE_ERROR_MESSAGE("VALIDATION_MESSAGE_ERROR_MESSAGE"), //
@@ -113,8 +123,6 @@ public enum RuntimeInfoElement implements Queryable {
     DISCOVERY_MESSAGE_MAX_FREQUENCY_MAP_ITEMS("DISCOVERY_MESSAGE_MAX_FREQUENCY_MAP_ITEMS"), //
     DISCOVERY_MESSAGE_ORDERING_DIRECTION("DISCOVERY_MESSAGE_ORDERING_DIRECTION"), //
     DISCOVERY_MESSAGE_ORDERING_PROPERTY("DISCOVERY_MESSAGE_ORDERING_PROPERTY"), //
-    DISCOVERY_MESSAGE_GS_USER_AUTH_PROVIDER("DISCOVERY_MESSAGE_GS_USER_AUTH_PROVIDER"), //
-    DISCOVERY_MESSAGE_GS_USER_EMAIL("DISCOVERY_MESSAGE_GS_USER_EMAIL"), //
     DISCOVERY_MESSAGE_TERM_FREQUENCY_BOND("DISCOVERY_MESSAGE_TERM_FREQUENCY_BOND"),
 
     ACCESS_MESSAGE_VIEW_ID("ACCESS_MESSAGE_VIEW_ID"), //
@@ -153,7 +161,12 @@ public enum RuntimeInfoElement implements Queryable {
 
     RESPONSE_LENGTH("RESPONSE_LENGTH"), //
     RESPONSE_MEDIA_TYPE("RESPONSE_MEDIA_TYPE"), //
-    RESPONSE_STATUS("RESPONSE_STATUS"); //
+    RESPONSE_STATUS("RESPONSE_STATUS"),
+
+    USER_AUTH_PROVIDER("USER_AUTH_PROVIDER"), //
+    USER_IDENTIFIER("USER_IDENTIFIER"), //
+    USER_ROLE("USER_ROLE"), //
+    USER_URI("USER_URI"); //
 
     private String name;
     private ContentType type;

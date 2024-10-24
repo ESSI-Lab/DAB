@@ -1,0 +1,4 @@
+eu.essi_lab.accessor.worldcereal.harvested.WorldCerealConnector
+eu.essi_lab.accessor.worldcereal.harvested.WorldCerealAccessor
+eu.essi_lab.accessor.worldcereal.distributed.WorldCerealGranulesAccessor
+eu.essi_lab.accessor.worldcereal.distributed.WorldCerealGranulesConnector

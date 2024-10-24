@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"
+	xmlns:moz="http://www.mozilla.org/2006/browser/search/" xmlns:time="http://a9.com/-/opensearch/extensions/time/1.0/"
+	xmlns:geo="http://a9.com/-/opensearch/extensions/geo/1.0/" xmlns:essi="http://essi-lab.eu">
+	<ShortName>...</ShortName>
+	<LongName>....</LongName>
+	<Description>...</Description>
+	<Contact>test@my-org.com</Contact>
+	<Image height="16" width="16" type="image/x-icon">http://essi-lab.eu/projects/gi-cat-favicon/favicon.ico</Image>
+
+	<Url xmlns:parameters="http://a9.com/-/spec/opensearch/extensions/parameters/1.0/" 
+		type="application/json"
+		template="/services/essi/opensearch?" 
+		parameters:method="GET">
+		<parameters:Parameter name="ct" value="{count}"/>
+   		<parameters:Parameter name="si" value="{startIndex}"/>
+   		<parameters:Parameter name="st" value="{searchTerms}"/>
+   		<parameters:Parameter name="bbox" value="{geo:box}"/>
+   		<parameters:Parameter name="ts" value="{time:start}"/>
+   		<parameters:Parameter name="te" value="{time:end}"/>
+   		<parameters:Parameter name="outputFormat" value="application/json"/>
+	</Url>
+	
+	<Url xmlns:parameters="http://a9.com/-/spec/opensearch/extensions/parameters/1.0/" 
+		type="application/atom+xml"
+		template="/services/essi/opensearch?" 
+		parameters:method="GET">
+		<parameters:Parameter name="ct" value="{count}"/>
+   		<parameters:Parameter name="si" value="{startIndex}"/>
+   		<parameters:Parameter name="st" value="{searchTerms}"/>
+   		<parameters:Parameter name="bbox" value="{geo:box}"/>
+   		<parameters:Parameter name="ts" value="{time:start}"/>
+   		<parameters:Parameter name="te" value="{time:end}"/>
+   		<parameters:Parameter name="outputFormat" value="application/atom+xml"/>
+	</Url>
+
+	<Query role="example" geo:box="-180,-90,180,90" />
+	<Query role="example" geo:box="-20,-10,10,20" geo:relation="overlaps" />
+	<Query role="example" geo:box="-20,-10,10,20" geo:relation="contains" />
+	<Query role="example" geo:box="-20,-10,10,20" geo:relation="disjoint" />
+	<Query role="example" time:start="1990-01-01T00:00:00" time:end="2010-01-01T23:39:59" />
+
+	<Developer>test@my-org.com</Developer>
+	<SyndicationRight>open</SyndicationRight>
+	<AdultContent>false</AdultContent>
+	<Language>en-us</Language>
+	<OutputEncoding>UTF-8</OutputEncoding>
+	<InputEncoding>UTF-8</InputEncoding>
+
+</OpenSearchDescription>

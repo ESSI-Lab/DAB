@@ -1,0 +1,540 @@
+{
+	"objectIdFieldName": "objectid",
+	"globalIdFieldName": "",
+	"geometryType": "esriGeometryPoint",
+	"spatialReference": {
+		"wkid": 102100,
+		"latestWkid": 3857
+	},
+	"fields": [
+		{
+			"name": "objectid",
+			"alias": "OBJECTID",
+			"type": "esriFieldTypeOID"
+		},
+		{
+			"name": "rotation",
+			"alias": "Rotation",
+			"type": "esriFieldTypeSmallInteger"
+		},
+		{
+			"name": "description",
+			"alias": "Description",
+			"type": "esriFieldTypeString",
+			"length": 75
+		},
+		{
+			"name": "eventdate",
+			"alias": "Date",
+			"type": "esriFieldTypeDate",
+			"length": 8
+		},
+		{
+			"name": "eventtype",
+			"alias": "Type",
+			"type": "esriFieldTypeInteger"
+		},
+		{
+			"name": "created_user",
+			"alias": "created_user",
+			"type": "esriFieldTypeString",
+			"length": 255
+		},
+		{
+			"name": "created_date",
+			"alias": "created_date",
+			"type": "esriFieldTypeDate",
+			"length": 8
+		},
+		{
+			"name": "last_edited_user",
+			"alias": "last_edited_user",
+			"type": "esriFieldTypeString",
+			"length": 255
+		},
+		{
+			"name": "last_edited_date",
+			"alias": "last_edited_date",
+			"type": "esriFieldTypeDate",
+			"length": 8
+		}
+	],
+	"features": [
+		{
+			"attributes": {
+				"objectid": 4088899,
+				"rotation": null,
+				"description": null,
+				"eventdate": null,
+				"eventtype": 12,
+				"created_user": "USER3",
+				"created_date": 1679368318000,
+				"last_edited_user": "USER3",
+				"last_edited_date": 1679368318000
+			},
+			"geometry": {
+				"x": -12983790,
+				"y": 4081880
+			}
+		},
+		{
+			"attributes": {
+				"objectid": 4088901,
+				"rotation": null,
+				"description": null,
+				"eventdate": null,
+				"eventtype": 12,
+				"created_user": "USER3",
+				"created_date": 1679368318000,
+				"last_edited_user": "USER3",
+				"last_edited_date": 1679368318000
+			},
+			"geometry": {
+				"x": -12940927,
+				"y": 4092992
+			}
+		},
+		{
+			"attributes": {
+				"objectid": 4088902,
+				"rotation": null,
+				"description": null,
+				"eventdate": null,
+				"eventtype": 7,
+				"created_user": "USER3",
+				"created_date": 1679368318000,
+				"last_edited_user": "USER3",
+				"last_edited_date": 1679368318000
+			},
+			"geometry": {
+				"x": -12963152,
+				"y": 4086642
+			}
+		},
+		{
+			"attributes": {
+				"objectid": 4088900,
+				"rotation": null,
+				"description": "Updated description.",
+				"eventdate": null,
+				"eventtype": 12,
+				"created_user": "USER3",
+				"created_date": 1679368318000,
+				"last_edited_user": "",
+				"last_edited_date": 1679405316000
+			},
+			"geometry": {
+				"x": -12963152,
+				"y": 4086642
+			}
+		},
+		{
+			"attributes": {
+				"objectid": 4088504,
+				"rotation": null,
+				"description": "TestFeature",
+				"eventdate": null,
+				"eventtype": 1,
+				"created_user": "user1",
+				"created_date": 1679376720000,
+				"last_edited_user": "user1",
+				"last_edited_date": 1679376720000
+			},
+			"geometry": {
+				"x": -13653981,
+				"y": 5700288
+			}
+		},
+		{
+			"attributes": {
+				"objectid": 4084858,
+				"rotation": null,
+				"description": null,
+				"eventdate": null,
+				"eventtype": 25,
+				"created_user": "",
+				"created_date": 1679396079000,
+				"last_edited_user": "",
+				"last_edited_date": 1679396079000
+			},
+			"geometry": {
+				"x": -10750500,
+				"y": 4629897
+			}
+		},
+		{
+			"attributes": {
+				"objectid": 4084859,
+				"rotation": null,
+				"description": null,
+				"eventdate": null,
+				"eventtype": 25,
+				"created_user": "",
+				"created_date": 1679396079000,
+				"last_edited_user": "",
+				"last_edited_date": 1679396079000
+			},
+			"geometry": {
+				"x": -10750500,
+				"y": 4629897
+			}
+		},
+		{
+			"attributes": {
+				"objectid": 4086139,
+				"rotation": null,
+				"description": null,
+				"eventdate": null,
+				"eventtype": 12,
+				"created_user": "USER1",
+				"created_date": 1679368305000,
+				"last_edited_user": "USER1",
+				"last_edited_date": 1679368305000
+			},
+			"geometry": {
+				"x": -13533066,
+				"y": 5285207
+			}
+		},
+		{
+			"attributes": {
+				"objectid": 4086140,
+				"rotation": null,
+				"description": null,
+				"eventdate": null,
+				"eventtype": 7,
+				"created_user": "USER1",
+				"created_date": 1679368305000,
+				"last_edited_user": "USER1",
+				"last_edited_date": 1679368305000
+			},
+			"geometry": {
+				"x": -13548941,
+				"y": 5313782
+			}
+		},
+		{
+			"attributes": {
+				"objectid": 4086141,
+				"rotation": null,
+				"description": null,
+				"eventdate": null,
+				"eventtype": 12,
+				"created_user": "USER1",
+				"created_date": 1679368305000,
+				"last_edited_user": "USER1",
+				"last_edited_date": 1679368305000
+			},
+			"geometry": {
+				"x": -13501316,
+				"y": 5305845
+			}
+		},
+		{
+			"attributes": {
+				"objectid": 4086142,
+				"rotation": null,
+				"description": null,
+				"eventdate": null,
+				"eventtype": 12,
+				"created_user": "USER1",
+				"created_date": 1679368305000,
+				"last_edited_user": "USER1",
+				"last_edited_date": 1679368305000
+			},
+			"geometry": {
+				"x": -13520366,
+				"y": 5332832
+			}
+		},
+		{
+			"attributes": {
+				"objectid": 4086143,
+				"rotation": null,
+				"description": null,
+				"eventdate": null,
+				"eventtype": 12,
+				"created_user": "USER1",
+				"created_date": 1679368305000,
+				"last_edited_user": "USER1",
+				"last_edited_date": 1679368305000
+			},
+			"geometry": {
+				"x": -13531478,
+				"y": 5358232
+			}
+		},
+		{
+			"attributes": {
+				"objectid": 4086144,
+				"rotation": null,
+				"description": null,
+				"eventdate": null,
+				"eventtype": 12,
+				"created_user": "USER1",
+				"created_date": 1679368305000,
+				"last_edited_user": "USER1",
+				"last_edited_date": 1679368305000
+			},
+			"geometry": {
+				"x": -13539416,
+				"y": 5382045
+			}
+		},
+		{
+			"attributes": {
+				"objectid": 4086145,
+				"rotation": null,
+				"description": null,
+				"eventdate": null,
+				"eventtype": 12,
+				"created_user": "USER1",
+				"created_date": 1679368305000,
+				"last_edited_user": "USER1",
+				"last_edited_date": 1679368305000
+			},
+			"geometry": {
+				"x": -13552116,
+				"y": 5343945
+			}
+		},
+		{
+			"attributes": {
+				"objectid": 4086146,
+				"rotation": null,
+				"description": null,
+				"eventdate": null,
+				"eventtype": 12,
+				"created_user": "USER1",
+				"created_date": 1679368305000,
+				"last_edited_user": "USER1",
+				"last_edited_date": 1679368305000
+			},
+			"geometry": {
+				"x": -13560053,
+				"y": 5359820
+			}
+		},
+		{
+			"attributes": {
+				"objectid": 4086147,
+				"rotation": null,
+				"description": null,
+				"eventdate": null,
+				"eventtype": 12,
+				"created_user": "USER1",
+				"created_date": 1679368305000,
+				"last_edited_user": "USER1",
+				"last_edited_date": 1679368305000
+			},
+			"geometry": {
+				"x": -13575928,
+				"y": 5336007
+			}
+		},
+		{
+			"attributes": {
+				"objectid": 4086148,
+				"rotation": null,
+				"description": null,
+				"eventdate": null,
+				"eventtype": 12,
+				"created_user": "USER1",
+				"created_date": 1679368305000,
+				"last_edited_user": "USER1",
+				"last_edited_date": 1679368305000
+			},
+			"geometry": {
+				"x": -13571166,
+				"y": 5396333
+			}
+		},
+		{
+			"attributes": {
+				"objectid": 4086149,
+				"rotation": null,
+				"description": null,
+				"eventdate": null,
+				"eventtype": 12,
+				"created_user": "USER1",
+				"created_date": 1679368305000,
+				"last_edited_user": "USER1",
+				"last_edited_date": 1679368305000
+			},
+			"geometry": {
+				"x": -13542591,
+				"y": 5455070
+			}
+		},
+		{
+			"attributes": {
+				"objectid": 4086150,
+				"rotation": null,
+				"description": null,
+				"eventdate": null,
+				"eventtype": 25,
+				"created_user": "USER1",
+				"created_date": 1679368305000,
+				"last_edited_user": "USER1",
+				"last_edited_date": 1679368305000
+			},
+			"geometry": {
+				"x": -13494966,
+				"y": 5370932
+			}
+		},
+		{
+			"attributes": {
+				"objectid": 4084861,
+				"rotation": 12,
+				"description": "waww",
+				"eventdate": 1679004000000,
+				"eventtype": 1,
+				"created_user": "",
+				"created_date": 1679396885000,
+				"last_edited_user": "",
+				"last_edited_date": 1679396908000
+			},
+			"geometry": {
+				"x": -10744841,
+				"y": 4629512
+			}
+		},
+		{
+			"attributes": {
+				"objectid": 4084862,
+				"rotation": null,
+				"description": null,
+				"eventdate": null,
+				"eventtype": 4,
+				"created_user": "",
+				"created_date": 1679402561000,
+				"last_edited_user": "",
+				"last_edited_date": 1679402561000
+			},
+			"geometry": {
+				"x": -10749890,
+				"y": 4630883
+			}
+		},
+		{
+			"attributes": {
+				"objectid": 4084865,
+				"rotation": 90,
+				"description": "6419c38fbbe73b46a7e4050d-1",
+				"eventdate": 1667922444000,
+				"eventtype": 22,
+				"created_user": "",
+				"created_date": 1679410082000,
+				"last_edited_user": "",
+				"last_edited_date": 1679410082000
+			},
+			"geometry": {
+				"x": -11600154,
+				"y": 4782228
+			}
+		},
+		{
+			"attributes": {
+				"objectid": 4084864,
+				"rotation": 270,
+				"description": "6419c355bbe73b46a7e404a2-1",
+				"eventdate": 1667922371000,
+				"eventtype": 22,
+				"created_user": "",
+				"created_date": 1679410022000,
+				"last_edited_user": "",
+				"last_edited_date": 1679410383000
+			},
+			"geometry": {
+				"x": -11600030,
+				"y": 4782101
+			}
+		},
+		{
+			"attributes": {
+				"objectid": 4088499,
+				"rotation": null,
+				"description": null,
+				"eventdate": null,
+				"eventtype": 12,
+				"created_user": "USER2",
+				"created_date": 1679368311000,
+				"last_edited_user": "USER2",
+				"last_edited_date": 1679368311000
+			},
+			"geometry": {
+				"x": -13596566,
+				"y": 4883569
+			}
+		},
+		{
+			"attributes": {
+				"objectid": 4088500,
+				"rotation": null,
+				"description": null,
+				"eventdate": null,
+				"eventtype": 12,
+				"created_user": "USER2",
+				"created_date": 1679368311000,
+				"last_edited_user": "USER2",
+				"last_edited_date": 1679368311000
+			},
+			"geometry": {
+				"x": -13596566,
+				"y": 4883569
+			}
+		},
+		{
+			"attributes": {
+				"objectid": 4088501,
+				"rotation": null,
+				"description": null,
+				"eventdate": null,
+				"eventtype": 12,
+				"created_user": "USER2",
+				"created_date": 1679368311000,
+				"last_edited_user": "USER2",
+				"last_edited_date": 1679368311000
+			},
+			"geometry": {
+				"x": -13567991,
+				"y": 4889919
+			}
+		},
+		{
+			"attributes": {
+				"objectid": 4088502,
+				"rotation": null,
+				"description": null,
+				"eventdate": null,
+				"eventtype": 7,
+				"created_user": "USER2",
+				"created_date": 1679368311000,
+				"last_edited_user": "USER2",
+				"last_edited_date": 1679368311000
+			},
+			"geometry": {
+				"x": -13590216,
+				"y": 4910557
+			}
+		},
+		{
+			"attributes": {
+				"objectid": 4088503,
+				"rotation": null,
+				"description": null,
+				"eventdate": null,
+				"eventtype": 17,
+				"created_user": "USER2",
+				"created_date": 1679368311000,
+				"last_edited_user": "USER2",
+				"last_edited_date": 1679368311000
+			},
+			"geometry": {
+				"x": -13555291,
+				"y": 4923257
+			}
+		}
+	]
+}

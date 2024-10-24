@@ -4,7 +4,7 @@ package eu.essi_lab.lib.net.protocols.impl;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,6 +24,9 @@ package eu.essi_lab.lib.net.protocols.impl;
 import eu.essi_lab.lib.net.protocols.AbstractNetProtocol;
 import eu.essi_lab.lib.net.protocols.NetProtocol;
 
+/**
+ * @author Fabrizio
+ */
 public class KISTERSProtocol extends AbstractNetProtocol implements NetProtocol {
 
     @Override
@@ -35,7 +38,7 @@ public class KISTERSProtocol extends AbstractNetProtocol implements NetProtocol 
     @Override
     public String[] getURNs() {
 
-	return new String[] { "KISTERS" };
+	return new String[] { "https://portal.grdc.bafg.de/KiWIS/KiWIS" };
     }
 
     @Override
@@ -46,8 +49,7 @@ public class KISTERSProtocol extends AbstractNetProtocol implements NetProtocol 
 
     @Override
     public String getSrvVersion() {
-	// TODO Auto-generated method stub
-	return null;
-    }
 
+	return "1.9.3.1";
+    }
 }

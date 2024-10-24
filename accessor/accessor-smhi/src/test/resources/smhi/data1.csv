@@ -1,0 +1,50 @@
+Stationsnamn;StationsId;Stationsnät;Stationens latitud;Stationens longitud
+AAPUAJÄRVI;70585;SMHIs stationsnät;66.8559;23.5014
+
+Parameternamn;Enhet
+Islossning;-
+
+Säsong;Islossning;Kvalitet;;
+1914-1915;1915-05-22;O;;;Tidsperiod (fr.o.m.) = 1915-05-21
+1915-1916;1916-05-12;O;;;Tidsperiod (t.o.m.) = 1956-05-10
+1916-1917;1917-06-03;O;;;
+1917-1918;1918-05-16;O;;;Värdet anger det datum under säsongen då händelsen inträffade.
+1918-1919;1919-05-17;O;;;
+1919-1920;1920-05-12;O;;;Kvalitetskoderna:
+1920-1921;1921-04-24;O;;;Grön (G) = Kontrollerade och godkända värden.
+1921-1922;1922-05-15;O;;;Gul (Y) = Grovt kontrollerade värden.
+1922-1923;1923-05-21;O;;;Orange (O) = Okontrollerade värden.
+1923-1924;1924-05-11;O;;;
+1924-1925;1925-05-10;O;;;Nätinformation:
+1925-1926;1926-05-23;O;;;SMHIs stationsnät: Data samlas in och lagras i SMHIs databaser. Data rimlighetskontrolleras vilket innebär att felaktiga data korrigeras och att databortfall kompletteras utifrån expertbedömning där det är möjligt. Fysiska stationer övervakas, inspekteras och underhålls löpande av SMHI.
+1926-1927;1927-05-28;O;;;Övriga stationer: Stationerna ingår ej i SMHIs stationsnät men data samlas in och lagras i SMHIs databaser genom avtal med en tredje part.
+1927-1928;1928-05-12;O;;;
+1928-1929;1929-05-10;O;;;Orsaker till saknade data:
+1929-1930;1930-05-18;O;;;  stationen eller givaren har varit ur funktion.
+1930-1931;1931-05-13;O;;;  kvalitetskontrollerna har felmarkerat data (röd kvalitetskod). Efterföljande manuell granskning godkänner, rättar eller underkänner data.
+1931-1932;1932-05-29;O;
+1932-1933;1933-05-16;O;
+1933-1934;1934-05-05;O;
+1934-1935;1935-05-26;O;
+1935-1936;1936-05-03;O;
+1936-1937;1937-04-27;O;
+1937-1938;1938-05-07;O;
+1938-1939;1939-05-19;O;
+1939-1940;1940-05-10;O;
+1940-1941;1941-05-19;O;
+1941-1942;1942-05-25;O;
+1942-1943;1943-05-06;O;
+1943-1944;1944-05-26;O;
+1944-1945;1945-05-18;O;
+1945-1946;1946-05-15;O;
+1946-1947;1947-05-11;O;
+1947-1948;1948-05-09;O;
+1948-1949;1949-05-05;O;
+1949-1950;1950-04-24;O;
+1950-1951;1951-05-12;O;
+1951-1952;1952-05-04;O;
+1952-1953;1953-04-28;O;
+1953-1954;1954-05-06;O;
+1954-1955;1955-05-20;O;
+1955-1956;1956-05-11;O;
+

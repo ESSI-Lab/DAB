@@ -4,7 +4,7 @@ package eu.essi_lab.adk.harvest;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -137,8 +137,6 @@ public abstract class HarvestedAccessor<C extends IHarvestedQueryConnector> impl
 
 	this.tries = 0;
 
-	int numberOfTriesInOneDay = 0;
-
 	ListRecordsResponse<OriginalMetadata> driverResponse = null;
 
 	GSLoggerFactory.getLogger(getClass()).debug("List records execution STARTED");
@@ -163,49 +161,22 @@ public abstract class HarvestedAccessor<C extends IHarvestedQueryConnector> impl
 		    break;
 		}
 
-	    } catch (GSException gse) {
-
-		String warning = "GS error occurred on try n. " + tries;
-
-		listRecords.getStatus().ifPresent(s -> s.addWarningMessage(warning));
-
-		GSLoggerFactory.getLogger(getClass()).warn(warning, tries);
-
-		gse.log();
-
 	    } catch (Exception e) {
 
-		String warning = "GS error occurred on try n. " + tries;
+		String warning = "Error occurred on try n. " + tries + ": " + e.getMessage();
+
 		listRecords.getStatus().ifPresent(s -> s.addWarningMessage(warning));
-		listRecords.getStatus().ifPresent(s -> s.addWarningMessage(e.getMessage()));
 
 		GSLoggerFactory.getLogger(getClass()).warn(warning);
-
-		GSLoggerFactory.getLogger(getClass()).warn(e.getMessage(), e);
 	    }
 
 	    if (tries < maxAttemptsCount) {
 		try {
-		    // it seems that if US Data Gov has a failure, it requires about 15 minutes to restore the service
-		    if (getConnector().getSourceURL().contains("catalog.data.gov")) {
-			numberOfTriesInOneDay++;
-			// try for 24 hours
-			if (numberOfTriesInOneDay < 96) {
-			    tries = 0;
-			} else {
-			    tries = maxAttemptsCount;
-			}
-			GSLoggerFactory.getLogger(getClass()).debug("Waiting  15 minutes for a new attempt... {}/{}", numberOfTriesInOneDay,
-				96);
-			Thread.sleep(15 * 60 * 1000);
 
-		    } else {
+		    GSLoggerFactory.getLogger(getClass()).debug("Waiting 60 seconds for a new attempt... {}/{}", (tries + 1),
+			    maxAttemptsCount);
 
-			GSLoggerFactory.getLogger(getClass()).debug("Waiting 60 seconds for a new attempt... {}/{}", (tries + 1),
-				maxAttemptsCount);
-
-			Thread.sleep(SLEEP_TIME);
-		    }
+		    Thread.sleep(SLEEP_TIME);
 
 		} catch (InterruptedException ex) {
 
@@ -265,9 +236,9 @@ public abstract class HarvestedAccessor<C extends IHarvestedQueryConnector> impl
 
 		    GSLoggerFactory.getLogger(getClass()).warn("Mapped resource is null");
 		}
-	    } catch (GSException ex) {
+	    } catch (Exception e) {
 
-		ex.log();
+		GSLoggerFactory.getLogger(getClass()).error(e);
 	    }
 	});
 
@@ -319,6 +290,18 @@ public abstract class HarvestedAccessor<C extends IHarvestedQueryConnector> impl
     public boolean supportsIncrementalHarvesting() throws GSException {
 
 	return getConnector().supportsIncrementalHarvesting();
+    }
+
+    @Override
+    public boolean supportsResumedHarvesting() throws GSException {
+
+	return getConnector().supportsResumedHarvesting();
+    }
+
+    @Override
+    public boolean supportsRecovery() throws GSException {
+
+	return getConnector().supportsRecovery();
     }
 
     /**

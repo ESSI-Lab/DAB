@@ -16,11 +16,6 @@
 			<artifactId>access-tools-validator-geotiff</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-
-		<dependency>
-			<groupId>commons-fileupload</groupId>
-			<artifactId>commons-fileupload</artifactId>
-		</dependency>
 	</dependencies>
 
 </project>

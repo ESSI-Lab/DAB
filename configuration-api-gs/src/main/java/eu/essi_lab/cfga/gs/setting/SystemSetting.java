@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gs.setting;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,12 +35,13 @@ import eu.essi_lab.cfga.option.BooleanChoiceOptionBuilder;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.ConfigurableSetting;
+import eu.essi_lab.cfga.setting.KeyValueOptionDecorator;
 import eu.essi_lab.lib.utils.LabeledEnum;
 
 /**
  * @author Fabrizio
  */
-public class SystemSetting extends ConfigurableSetting implements EditableSetting {
+public class SystemSetting extends ConfigurableSetting implements EditableSetting, KeyValueOptionDecorator {
 
     private static final String DATABASE_STATISTICS_SETTING_KEY = "databaseStatistics";
 
@@ -49,6 +50,10 @@ public class SystemSetting extends ConfigurableSetting implements EditableSettin
     private static final String ENABLE_HARVESTING_MAIL_REPORTS_OPTION_KEY = "enableMailHarvestingReport";
 
     private static final String ENABLE_AUGMENTION_MAIL_REPORTS_OPTION_KEY = "enableMailAugmentationReport";
+
+    private static final String ENABLE_DOWNLOAD_MAIL_REPORTS_OPTION_KEY = "enableMailDownloadReport";
+
+    private static final String ENABLE_ERROR_LOGS_MAIL_REPORTS_OPTION_KEY = "enableErrorLogsReport";
 
     private static final String EMAIL_SETTING_ID = "emailSetting";
 
@@ -94,6 +99,38 @@ public class SystemSetting extends ConfigurableSetting implements EditableSettin
 	addOption(augmentationMailOption);
 
 	//
+	// Email download report
+	//
+
+	Option<BooleanChoice> downloadMailOption = BooleanChoiceOptionBuilder.get().//
+		withKey(ENABLE_DOWNLOAD_MAIL_REPORTS_OPTION_KEY).//
+		withLabel("Send download reports email").//
+		withDescription("System restart required. This feature also require that E-mail settings are correctly compiled").//
+		withSingleSelection().//
+		withValues(LabeledEnum.values(BooleanChoice.class)).//
+		withSelectedValue(BooleanChoice.FALSE).//
+		cannotBeDisabled().//
+		build();
+
+	addOption(downloadMailOption);
+
+	//
+	// Error logs report
+	//
+
+	Option<BooleanChoice> errorLogsMailOption = BooleanChoiceOptionBuilder.get().//
+		withKey(ENABLE_ERROR_LOGS_MAIL_REPORTS_OPTION_KEY).//
+		withLabel("Send error logs reports email (the related custom task must be enabled)").//
+		withDescription("System restart required. This feature also require that E-mail settings are correctly compiled").//
+		withSingleSelection().//
+		withValues(LabeledEnum.values(BooleanChoice.class)).//
+		withSelectedValue(BooleanChoice.FALSE).//
+		cannotBeDisabled().//
+		build();
+
+	addOption(errorLogsMailOption);
+
+	//
 	// Proxy
 	//
 
@@ -105,6 +142,12 @@ public class SystemSetting extends ConfigurableSetting implements EditableSettin
 		build();
 
 	addOption(proxyEndpoint);
+
+	//
+	// Key-value options
+	//
+
+	addKeyValueOption();
 
 	//
 	// E-mail settings
@@ -162,8 +205,6 @@ public class SystemSetting extends ConfigurableSetting implements EditableSettin
      */
     public static class SystemSettingComponentInfo extends ComponentInfo {
 
-	public static int tabIndex = 14;
-
 	/**
 	 * 
 	 */
@@ -172,12 +213,21 @@ public class SystemSetting extends ConfigurableSetting implements EditableSettin
 	    setComponentName(SystemSetting.class.getName());
 
 	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(tabIndex).//
+		    withIndex(TabIndex.SYSTEM_SETTING.getIndex()).//
 		    withShowDirective("System").//
 		    build();
 
 	    setTabInfo(tabInfo);
 	}
+    }
+
+    /**
+     * @param enable
+     */
+    public void enableHarvestingReportEmail(boolean enable) {
+
+	Option<BooleanChoice> option = getOption(ENABLE_HARVESTING_MAIL_REPORTS_OPTION_KEY, BooleanChoice.class).get();
+	option.select(v -> BooleanChoice.toBoolean(v) == enable);
     }
 
     /**
@@ -190,12 +240,48 @@ public class SystemSetting extends ConfigurableSetting implements EditableSettin
     }
 
     /**
+     * @param enable
+     */
+    public void enableAugmentationReportMail(boolean enable) {
+
+	Option<BooleanChoice> option = getOption(ENABLE_AUGMENTION_MAIL_REPORTS_OPTION_KEY, BooleanChoice.class).get();
+	option.select(v -> BooleanChoice.toBoolean(v) == enable);
+    }
+
+    /**
      * 
      */
     public boolean isAugmentationReportMailEnabled() {
 
 	return BooleanChoice.toBoolean(//
 		getOption(ENABLE_AUGMENTION_MAIL_REPORTS_OPTION_KEY, BooleanChoice.class).get().getSelectedValue());
+    }
+
+    /**
+     * 
+     */
+    public boolean isDownloadReportMailEnabled() {
+
+	return BooleanChoice.toBoolean(//
+		getOption(ENABLE_DOWNLOAD_MAIL_REPORTS_OPTION_KEY, BooleanChoice.class).get().getSelectedValue());
+    }
+
+    /**
+     * @param enable
+     */
+    public void enableErrorLogsReportEmail(boolean enable) {
+
+	Option<BooleanChoice> option = getOption(ENABLE_ERROR_LOGS_MAIL_REPORTS_OPTION_KEY, BooleanChoice.class).get();
+	option.select(v -> BooleanChoice.toBoolean(v) == enable);
+    }
+
+    /**
+     * 
+     */
+    public boolean isErrorLogsReportEnabled() {
+
+	return BooleanChoice.toBoolean(//
+		getOption(ENABLE_ERROR_LOGS_MAIL_REPORTS_OPTION_KEY, BooleanChoice.class).get().getSelectedValue());
     }
 
     //

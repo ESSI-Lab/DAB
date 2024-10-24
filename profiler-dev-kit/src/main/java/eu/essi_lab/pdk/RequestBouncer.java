@@ -4,7 +4,7 @@ package eu.essi_lab.pdk;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,8 +21,10 @@ package eu.essi_lab.pdk;
  * #L%
  */
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -38,31 +40,45 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
  */
 public class RequestBouncer {
 
-    private int maximumSimultaneousRequestsByIP = 3;
+    // private int maximumSimultaneousRequests = 1;
+    //
+    // private int maximumSimultaneousRequestsByIP = 1;
 
     Logger logger = GSLoggerFactory.getLogger(RequestBouncer.class);
 
-    public int getMaximumSimultaneousRequestsByIP() {
-	return maximumSimultaneousRequestsByIP;
+    public int getMaximumTotalRequests() {
+	return maxTotalRequests;
     }
 
-    private ConcurrentHashMap<String, ArrayBlockingQueue<String>> queues = new ConcurrentHashMap<>();
-
-    public RequestBouncer() {
+    public int getMaximumTotalRequestsByIP() {
+	return maxRequestsPerIP;
     }
 
-    /**
-     * Constructs a new request bouncer, with the given maximum number of allowed requests per IP.
-     * 
-     * @param maximumSimultaneousRequestsByIP
-     */
-    public RequestBouncer(int maximumSimultaneousRequestsByIP) {
-	this.maximumSimultaneousRequestsByIP = maximumSimultaneousRequestsByIP;
+    private int maxTotalRequests;
+
+    private int maxRequestsPerIP;
+
+    // a semaphore on the max total requests
+    private int currentRequests = 0;
+    // a semaphore for each IP address
+    private final Map<String, Integer> currentRequestsPerIP = new HashMap<>();
+    // here the next ip will be the first element
+    private final LinkedList<SimpleEntry<String, Integer>> ipQueue = new LinkedList();
+    // by default it waits one second
+    private int waitTime = 1000;
+
+    public RequestBouncer(int maxTotalRequests, int maxTotalRequestsPerIP) {
+	if (maxTotalRequestsPerIP > maxTotalRequests) {
+	    GSLoggerFactory.getLogger(getClass()).error("maximum total requests per IP can't exceed the maximum total requests, reducing");
+	    maxTotalRequestsPerIP = maxTotalRequests;
+	}
+	this.maxTotalRequests = maxTotalRequests;
+	this.maxRequestsPerIP = maxTotalRequestsPerIP;
     }
 
     /**
      * Asks the bouncer the permission to execute and will FIFO wait (for the specified time) in case too many requests
-     * are being executed until a free slot will become available. Then the calling threadwill start executing the
+     * are being executed until a free slot will become available. Then the calling thread will start executing the
      * request and at execution end will notify using notifyExecutionEnded method.
      * 
      * @param ipAddress
@@ -75,21 +91,76 @@ public class RequestBouncer {
     public boolean askForExecutionAndWait(String ipAddress, String requestId, long timeout, TimeUnit unit) throws InterruptedException {
 	ipAddress = validate(ipAddress);
 	requestId = validate(requestId);
-	synchronized (queues) {
-	    ArrayBlockingQueue<String> queue = queues.get(ipAddress);
-	    if (queue == null) {
-		queues.put(ipAddress, new ArrayBlockingQueue<String>(maximumSimultaneousRequestsByIP, true));
+
+	logger.trace("REQUEST BOUNCER WAIT {} {}", ipAddress, requestId);
+
+	synchronized (ipQueue) {
+	    boolean found = false;
+	    for (SimpleEntry<String, Integer> ipEntry : ipQueue) {
+		if (ipEntry.getKey().equals(ipAddress)) {
+		    ipEntry.setValue(ipEntry.getValue() + 1);
+		    found = true;
+		}
+	    }
+	    if (!found) {
+		ipQueue.add(new SimpleEntry<>(ipAddress, 1));
 	    }
 	}
-	ArrayBlockingQueue<String> queue = queues.get(ipAddress);
-	logger.trace("REQUEST BOUNCER WAIT {} {}", ipAddress, requestId);
-	boolean ret = queue.offer(requestId, timeout, unit);
-	if (ret) {
-	    logger.trace("REQUEST BOUNCER START {} {}", ipAddress, requestId);
-	} else {
-	    logger.trace("REQUEST BOUNCER BLOCKED {} {}", ipAddress, requestId);
+
+	long maximum = System.currentTimeMillis() + unit.toMillis(timeout);
+	while (System.currentTimeMillis() < maximum) {
+	    Thread.sleep(waitTime);
+
+	    synchronized (ipQueue) {
+		// if it's the turn of this ip address
+		SimpleEntry<String, Integer> first = ipQueue.getFirst();
+		;
+		if (first.getKey().equals(ipAddress)) {
+		    // if the maximum requests constraint is not met
+		    if (currentRequests < maxTotalRequests) {
+			// if the maximum requests per IP constraint is not met
+			currentRequestsPerIP.putIfAbsent(ipAddress, 0);
+			Integer current = currentRequestsPerIP.get(ipAddress);
+			if (current < maxRequestsPerIP) {
+			    // it's your turn!
+			    Integer currentWaiting = first.getValue();
+			    if (currentWaiting.equals(1)) {
+				// was the last
+				ipQueue.removeFirst();
+			    } else {
+				// we put the others at the end, to let other ip addresses to execute
+				ipQueue.removeFirst();
+				first.setValue(--currentWaiting);
+				ipQueue.add(first);
+			    }
+			    currentRequestsPerIP.put(ipAddress, ++current);
+			    currentRequests++;
+			    logger.trace("REQUEST BOUNCER START {} {}", ipAddress, requestId);
+			    return true;
+			}
+		    }
+		}
+	    }
 	}
-	return ret;
+	logger.trace("REQUEST BOUNCER BLOCKED {} {}", ipAddress, requestId);
+
+	synchronized (ipQueue) {
+	    for (SimpleEntry<String, Integer> ipEntry : ipQueue) {
+		if (ipEntry.getKey().equals(ipAddress)) {
+		    Integer value = ipEntry.getValue() ;
+		    value = value-1;
+		    if (value.equals(0)) {
+			ipQueue.remove(ipEntry);			
+		    }else {
+			ipEntry.setValue(value);
+		    }
+		    break;
+		}
+	    }
+	}
+
+	return false;
+
     }
 
     /**
@@ -102,14 +173,24 @@ public class RequestBouncer {
     public boolean notifyExecutionEnded(String ipAddress, String requestId) {
 	ipAddress = validate(ipAddress);
 	requestId = validate(requestId);
-	ArrayBlockingQueue<String> queue = queues.get(ipAddress);
-	if (queue != null) {
-	    boolean ret = queue.remove(requestId);
-	    logger.trace("REQUEST BOUNCER REMOVE {} {}", ipAddress, requestId);
-	    return ret;
+
+	logger.trace("REQUEST BOUNCER REMOVE {} {}", ipAddress, requestId);
+	synchronized (ipQueue) {
+	    currentRequests--;
+	    Integer current = currentRequestsPerIP.get(ipAddress);
+	    if (current == null) {
+		logger.trace("REQUEST BOUNCER REQUEST NOT FOUND {} {}", ipAddress, requestId);
+		return false;
+	    }
+	    current--;
+	    if (current == 0) {
+		currentRequestsPerIP.remove(ipAddress);
+	    } else {
+		currentRequestsPerIP.put(ipAddress, current);
+	    }
+	    return true;
 	}
-	logger.trace("REQUEST BOUNCER REQUEST NOT FOUND {} {}", ipAddress, requestId);
-	return false;
+
     }
 
     private String validate(String ipAddress) {
@@ -118,6 +199,11 @@ public class RequestBouncer {
 	} else {
 	    return ipAddress;
 	}
+    }
+
+    public void setWaitTime(int ms) {
+	this.waitTime = ms;
+
     }
 
 }

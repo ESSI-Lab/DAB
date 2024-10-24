@@ -1,0 +1,17 @@
+https://hydrowebportal.niwa.co.nz/Export/DataSet?
+DataSet=DATASET_IDENTIFIER&
+Calendar=CALENDARYEAR&
+StartTime=START_TIME&
+EndTime=END_TIME&
+DateRange=Custom&
+Conversion=Instantaneous&
+IntervalPoints=PointsAsRecorded&
+ApprovalLevels=False&
+Qualifiers=undefined&
+Step=1&
+ExportFormat=csv&
+Compressed=false&
+RoundData=False&
+GradeCodes=False&
+InterpolationTypes=False&
+Timezone=0

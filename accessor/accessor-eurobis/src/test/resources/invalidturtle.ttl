@@ -1,0 +1,263 @@
+@prefix bibo: <http://purl.org/ontology/bibo/#> .
+@prefix cld: <http://purl.org/cld/terms/> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix dcmitype: <http://purl.org/dc/dcmitype/#> .
+@prefix dbo: <http://dbpedia.org/ontology/#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix freq: <http://purl.org/cld/freq/> .
+@prefix locn: <http://www.w3.org/ns/locn#> .
+@prefix org: <http://www.w3.org/ns/org#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <https://schema.org/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix time: <http://www.w3.org/2006/time#> .
+@prefix unit: <http://qudt.org/vocab/unit/#> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix mi: <http://www.marineinfo.org/ns/ontology#> .
+@prefix mibc: <http://marineinfo.org/ns/library/bibcodes#> .
+@prefix mibt: <http://marineinfo.org/ns/library/bibtypes#> . 
+@prefix mir: <http://marineinfo.org/ns/person/roles#> .
+@prefix miprog: <http://marineinfo.org/ns/progress#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ssn: <http://www.w3.org/ns/ssn/> . 
+@prefix sosa: <http://www.w3.org/ns/sosa/> . 
+@prefix geosparql: <http://www.opengis.net/ont/geosparql#> .
+
+@base <https://marineinfo.org/id/dataset/5976> .
+
+
+<>
+     a dcat:Dataset, schema:Dataset ;
+    dct:title 'Advanced Modelling & Research on Eutrophication & the Structure of Coastal Planktonic Food-webs: Mechanisms & Modelling (AMORE)'@en ;
+
+    schema:alternateName 'AMORE'^^xsd:string ;
+
+
+    dct:abstract 'The AMORE project contributes to the implementation of an integrated land-coastal zone research methodology to assess and predict the eutrophication level of the coastal North Sea and the associated undesirable effects.  The ultimate aim is to reduce the current context of uncertainty in which decisions to counteract the eutrophication of the NS and protect its natural resources are made. Process-level field and laboratory-scale experiments were conducted to improve the basic knowledge on mechanisms through which a change in nutrients (in terms of N:P:Si NO3:NH4 inorganic:organic N ratios) induced modification in the phytoplanktonic community structure and hence the functioning of the whole planktonic food-web. For this the MUMM station 330_a has been monitored for a period of three years.'@en ;
+
+
+    dct:created '2018-07-18'^^xsd:date ;
+    dct:modified '2019-08-06'^^xsd:date ;
+
+    dct:license <https://spdx.org/licenses/CC-BY-4.0.html> ;
+
+    dc:bibliographicCitation 'Daro, M. H. & Lancelot, C. (2019) Occurrences from Advanced Modelling & Research on Eutrophication & the Structure of coastal planktonic food-webs: mechanisms &modelling (AMORE).'^^xsd:string ;
+
+
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1997-1-28'^^xsd:date ;
+        dcat:endDate '2000-12-7'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+
+    dct:spatial [
+        a dct:Location ;         dct:isPartOf <http://www.marineregions.org/mrgid/3293> ; 
+    ];
+    dct:spatial [
+        a dct:Location ;         dcat:bbox """POLYGON((
+            2.808333333 51.43333333 , 2.808333333 51.43333333 ,
+            2.808333333 51.43333333 , 2.808333333 51.43333333 ,
+            2.808333333 51.43333333
+        ))"""^^geosparql:wktLiteral; 
+    ];
+
+    dct:isPartOf </id/collection/619> ;
+    dct:isPartOf </id/collection/552> ;
+
+    schema:keywords 'Algae Diatoms'^^xsd:string ;
+    schema:keywords 'Belgian part of the North Sea'^^xsd:string ;
+    schema:keywords 'Belgium coast'^^xsd:string ;
+    schema:keywords 'Ecological modelling'^^xsd:string ;
+    schema:keywords 'Nao'^^xsd:string ;
+    schema:keywords 'Phaeocystis spp.'^^xsd:string ;
+    schema:keywords 'Phytoplankton blooms'^^xsd:string ;
+    schema:keywords 'Total nutrients'^^xsd:string ;
+    schema:keywords 'Zooplankton abundance'^^xsd:string ;
+
+    dcat:theme 'Biology > Plankton > Phytoplankton'^^xsd:string ;
+
+    schema:keywords [
+        a schema:DefinedTerm ; 
+        schema:inDefinedTermSet [
+            schema:name "Taxonomic terms"^^xsd:string ; 
+        ] ;        schema:name 'Calanoida'^^xsd:string ;        schema:identifier <https://www.marinespecies.org/aphia.php?p=taxdetails&id=1100> ;    ];
+    schema:keywords [
+        a schema:DefinedTerm ; 
+        schema:inDefinedTermSet [
+            schema:name "Taxonomic terms"^^xsd:string ; 
+        ] ;        schema:name 'Fragilariales'^^xsd:string ;        schema:identifier <https://www.marinespecies.org/aphia.php?p=taxdetails&id=148951> ;    ];
+    schema:keywords [
+        a schema:DefinedTerm ; 
+        schema:inDefinedTermSet [
+            schema:name "Taxonomic terms"^^xsd:string ; 
+        ] ;        schema:name 'Prymnesiales'^^xsd:string ;        schema:identifier <https://www.marinespecies.org/aphia.php?p=taxdetails&id=115061> ;    ];
+
+    schema:variableMeasured    [
+            a schema:PropertyValue ;            schema:name 'Abundance of biological entity specified elsewhere per unit volume of the water body'^^xsd:string ;            schema:identifier 'http://vocab.nerc.ac.uk/collection/P01/current/SDBIOL01/'^^xsd:anyURI ;        ] ;    schema:variableMeasured    [
+            a schema:PropertyValue ;            schema:name 'Ammonium (NH<sub>4</sub><sup>+</sup>)'^^xsd:string ;        ] ;    schema:variableMeasured    [
+            a schema:PropertyValue ;            schema:name 'Ammonium (NH<sub>4</sub><sup>+</sup>)'^^xsd:string ;        ] ;    schema:variableMeasured    [
+            a schema:PropertyValue ;            schema:name 'Development stage of biological entity specified elsewhere'^^xsd:string ;            schema:identifier 'http://vocab.nerc.ac.uk/collection/P01/current/LSTAGE01/'^^xsd:anyURI ;        ] ;    schema:variableMeasured    [
+            a schema:PropertyValue ;            schema:name 'Gender of biological entity specified elsewhere'^^xsd:string ;            schema:identifier 'http://vocab.nerc.ac.uk/collection/P01/current/ENTSEX01/'^^xsd:anyURI ;        ] ;    schema:variableMeasured    [
+            a schema:PropertyValue ;            schema:name 'Nitrate (NO<sub>3</sub><sup>-</sup>)'^^xsd:string ;            schema:description 'PO<sub>4</sub><sup>3-</sup>)'^^xsd:string ;        ] ;    schema:variableMeasured    [
+            a schema:PropertyValue ;            schema:name 'Nitrate (NO<sub>3</sub><sup>-</sup>)'^^xsd:string ;            schema:description 'PO<sub>4</sub><sup>3-</sup>)'^^xsd:string ;        ] ;    schema:variableMeasured    [
+            a schema:PropertyValue ;            schema:name 'Nitrogen (N)'^^xsd:string ;        ] ;    schema:variableMeasured    [
+            a schema:PropertyValue ;            schema:name 'Nitrogen (N)'^^xsd:string ;        ] ;    schema:variableMeasured    [
+            a schema:PropertyValue ;            schema:name 'Phosphorus (P) concentration'^^xsd:string ;        ] ;    schema:variableMeasured    [
+            a schema:PropertyValue ;            schema:name 'Phytoplankton abundance'^^xsd:string ;        ] ;    schema:variableMeasured    [
+            a schema:PropertyValue ;            schema:name 'Phytoplankton abundance'^^xsd:string ;        ] ;    schema:variableMeasured    [
+            a schema:PropertyValue ;            schema:name 'Silicon (Si) concentration'^^xsd:string ;        ] ;    schema:variableMeasured    [
+            a schema:PropertyValue ;            schema:name 'Volume of sample'^^xsd:string ;            schema:identifier 'http://vocab.nerc.ac.uk/collection/P01/current/VOLXXXXX/'^^xsd:anyURI ;        ] ;    prov:wasGeneratedBy [
+        a prov:Activity, sosa:Observation ; 
+        
+        sosa:observedProperty [
+            a sosa:ObservableProperty ;        ] ; 
+
+        sosa:hasFeatureOfInterest            ""^^xsd:string ;    ] ;    prov:wasGeneratedBy [
+        a prov:Activity, sosa:Observation ; 
+        
+        sosa:observedProperty [
+            a sosa:ObservableProperty ;        ] ; 
+
+        sosa:hasFeatureOfInterest            ""^^xsd:string ;    ] ;    prov:wasGeneratedBy [
+        a prov:Activity, sosa:Observation ; 
+        
+        sosa:observedProperty [
+            a sosa:ObservableProperty ;            dct:title 'Abundance of biological entity specified elsewhere per unit volume of the water body'^^xsd:string ;            dct:identifier 'http://vocab.nerc.ac.uk/collection/P01/current/SDBIOL01/'^^xsd:anyURI ;        ] ; 
+
+        sosa:hasFeatureOfInterest            'http://vocab.nerc.ac.uk/collection/P02/current/BPRP'^^xsd:anyURI ;    ] ;    prov:wasGeneratedBy [
+        a prov:Activity, sosa:Observation ; 
+        
+        sosa:observedProperty [
+            a sosa:ObservableProperty ;            dct:title 'Ammonium (NH<sub>4</sub><sup>+</sup>)'^^xsd:string ;        ] ; 
+
+        sosa:hasFeatureOfInterest            ""^^xsd:string ;    ] ;    prov:wasGeneratedBy [
+        a prov:Activity, sosa:Observation ; 
+        
+        sosa:observedProperty [
+            a sosa:ObservableProperty ;            dct:title 'Ammonium (NH<sub>4</sub><sup>+</sup>)'^^xsd:string ;        ] ; 
+
+        sosa:hasFeatureOfInterest            ""^^xsd:string ;    ] ;    prov:wasGeneratedBy [
+        a prov:Activity, sosa:Observation ; 
+        
+        sosa:observedProperty [
+            a sosa:ObservableProperty ;            dct:title 'Development stage of biological entity specified elsewhere'^^xsd:string ;            dct:identifier 'http://vocab.nerc.ac.uk/collection/P01/current/LSTAGE01/'^^xsd:anyURI ;        ] ; 
+
+        sosa:hasFeatureOfInterest            'http://vocab.nerc.ac.uk/collection/P02/current/BPRP'^^xsd:anyURI ;    ] ;    prov:wasGeneratedBy [
+        a prov:Activity, sosa:Observation ; 
+        
+        sosa:observedProperty [
+            a sosa:ObservableProperty ;            dct:title 'Gender of biological entity specified elsewhere'^^xsd:string ;            dct:identifier 'http://vocab.nerc.ac.uk/collection/P01/current/ENTSEX01/'^^xsd:anyURI ;        ] ; 
+
+        sosa:hasFeatureOfInterest            'http://vocab.nerc.ac.uk/collection/P02/current/BPRP'^^xsd:anyURI ;    ] ;    prov:wasGeneratedBy [
+        a prov:Activity, sosa:Observation ; 
+        
+        sosa:observedProperty [
+            a sosa:ObservableProperty ;            dct:title 'Nitrate (NO<sub>3</sub><sup>-</sup>)'^^xsd:string ;            dct:description 'PO<sub>4</sub><sup>3-</sup>)'^^xsd:string ;        ] ; 
+
+        sosa:hasFeatureOfInterest            ""^^xsd:string ;    ] ;    prov:wasGeneratedBy [
+        a prov:Activity, sosa:Observation ; 
+        
+        sosa:observedProperty [
+            a sosa:ObservableProperty ;            dct:title 'Nitrate (NO<sub>3</sub><sup>-</sup>)'^^xsd:string ;            dct:description 'PO<sub>4</sub><sup>3-</sup>)'^^xsd:string ;        ] ; 
+
+        sosa:hasFeatureOfInterest            ""^^xsd:string ;    ] ;    prov:wasGeneratedBy [
+        a prov:Activity, sosa:Observation ; 
+        
+        sosa:observedProperty [
+            a sosa:ObservableProperty ;            dct:title 'Nitrogen (N)'^^xsd:string ;        ] ; 
+
+        sosa:hasFeatureOfInterest            ""^^xsd:string ;    ] ;    prov:wasGeneratedBy [
+        a prov:Activity, sosa:Observation ; 
+        
+        sosa:observedProperty [
+            a sosa:ObservableProperty ;            dct:title 'Nitrogen (N)'^^xsd:string ;        ] ; 
+
+        sosa:hasFeatureOfInterest            ""^^xsd:string ;    ] ;    prov:wasGeneratedBy [
+        a prov:Activity, sosa:Observation ; 
+        
+        sosa:observedProperty [
+            a sosa:ObservableProperty ;            dct:title 'Phosphorus (P) concentration'^^xsd:string ;        ] ; 
+
+        sosa:hasFeatureOfInterest            ""^^xsd:string ;    ] ;    prov:wasGeneratedBy [
+        a prov:Activity, sosa:Observation ; 
+        
+        sosa:observedProperty [
+            a sosa:ObservableProperty ;            dct:title 'Phytoplankton abundance'^^xsd:string ;        ] ; 
+
+        sosa:hasFeatureOfInterest            ""^^xsd:string ;    ] ;    prov:wasGeneratedBy [
+        a prov:Activity, sosa:Observation ; 
+        
+        sosa:observedProperty [
+            a sosa:ObservableProperty ;            dct:title 'Phytoplankton abundance'^^xsd:string ;        ] ; 
+
+        sosa:hasFeatureOfInterest            ""^^xsd:string ;    ] ;    prov:wasGeneratedBy [
+        a prov:Activity, sosa:Observation ; 
+        
+        sosa:observedProperty [
+            a sosa:ObservableProperty ;            dct:title 'Silicon (Si) concentration'^^xsd:string ;        ] ; 
+
+        sosa:hasFeatureOfInterest            ""^^xsd:string ;    ] ;    prov:wasGeneratedBy [
+        a prov:Activity, sosa:Observation ; 
+        
+        sosa:observedProperty [
+            a sosa:ObservableProperty ;            dct:title 'Volume of sample'^^xsd:string ;            dct:identifier 'http://vocab.nerc.ac.uk/collection/P01/current/VOLXXXXX/'^^xsd:anyURI ;        ] ; 
+
+        sosa:hasFeatureOfInterest            'http://vocab.nerc.ac.uk/collection/P02/current/SAMP'^^xsd:anyURI ;    ] ;
+        schema:instrument [
+        a schema:Thing ; 
+        schema:name 'Bucket'^^xsd:string ;        schema:identifier 'http://vocab.nerc.ac.uk/collection/L22/current/TOOL0536/'^^xsd:anyURI ;    ] ;    schema:instrument [
+        a schema:Thing ; 
+        schema:name 'plankton nets'^^xsd:string ;        schema:identifier 'http://vocab.nerc.ac.uk/collection/L05/current/22/'^^xsd:anyURI ;    ] ;
+    dcat:distribution [
+        a dcat:Distribution ; 
+        dcat:accessURL <https://www.emodnet-biology.eu/portal/index.php?dasid=5976> ;
+        dct:type 'Online dataset'^^xsd:string ;
+    ] ;
+    dcat:distribution [
+        a dcat:Distribution ; 
+        dcat:accessURL <https://www.eurobis.org/toolbox/en/download/occurrence/dataset/5976> ;
+        dct:type 'Online dataset'^^xsd:string ;
+    ] ;
+    dcat:distribution [
+        a dcat:Distribution ; 
+        dcat:accessURL <http://ipt.naturalsciences.be/resource?r=idod_amore_1> ;
+        dct:type 'IPT'^^xsd:string ;
+    ] ;
+    dcat:distribution [
+        a dcat:Distribution ; 
+        dcat:accessURL <https://obis.org/dataset/409ce59b-e26f-4196-be98-d79a52c8bf76> ;
+        dct:type 'Online dataset'^^xsd:string ;
+    ] ;
+
+
+    dct:creator </id/person/51> ;
+    dct:creator </id/institute/2956> ;
+    dct:creator </id/person/197> ;
+    dct:creator </id/institute/4535> ;
+
+
+
+
+
+    dct:replaces <5977> ;
+
+
+.
+
+    </id/collection/619>
+    dct:type dcmitype:Collection ;
+    dct:title 'available through EurOBIS'^^xsd:string ;
+    dct:identifier '619'^^xsd:string ;
+    .
+    </id/collection/552>
+    dct:type dcmitype:Collection ;
+    dct:title 'EMODNET'^^xsd:string ;
+    dct:identifier '552'^^xsd:string ;
+    .
+
+

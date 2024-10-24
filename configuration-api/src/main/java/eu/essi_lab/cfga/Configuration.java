@@ -4,7 +4,7 @@ package eu.essi_lab.cfga;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -336,7 +336,7 @@ public class Configuration {
      * Read-only method. Changes applied to the returned {@link Setting} will not alter
      * the configuration status. Use write methods to change the configuration status.<br>
      * <br>
-     * For performanche reasons, using this list method instead of {@link #list()} with a possible stream is recommended
+     * For performance reasons, using this list method instead of {@link #list()} with a possible stream is recommended
      * since the {@link #list()} method returns a clone of the <i>entire</i> list while this method creates a stream of
      * the original list and then clones only the resulting items
      *
@@ -361,9 +361,9 @@ public class Configuration {
      * The resulting stream is filtered with {@link Objects#nonNull(Object)}, so if a mapping is not available,
      * the <code>mapper</code> should return a <code>null</code> value.<br>
      * <br>
-     * For performanche reasons, using this list method instead of {@link #list()} with a possible stream is recommended
+     * For performance reasons, using this list method instead of {@link #list()} with a possible stream is recommended
      * since the {@link #list()} method returns a clone of the <i>entire</i> list while this method creates a stream of
-     * the original list. It is responsability of the given <code>mapper</code> to clone the the resulting items
+     * the original list. It is responsibility of the given <code>mapper</code> to clone the the resulting items
      * 
      * @param settingClass
      * @param mapper
@@ -387,7 +387,7 @@ public class Configuration {
      * Read-only method. Changes applied to the returned {@link Setting} will not alter
      * the configuration status. Use write methods to change the configuration status.<br>
      * <br>
-     * For performanche reasons, using this list method instead of {@link #list()} with a possible stream is recommended
+     * For performance reasons, using this list method instead of {@link #list()} with a possible stream is recommended
      * since the {@link #list()} method returns a clone of the <i>entire</i> list while this method creates a stream of
      * the original list and then clones only the resulting items
      *

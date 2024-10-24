@@ -4,7 +4,7 @@ package eu.essi_lab.workflow.processor.timeseries;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -85,7 +85,7 @@ public class WML11_Subset_Processor extends AbstractTimeSubsetProcessor {
 		    Date date = null;
 		    if (utcTime != null) {
 			date = utcTime.toGregorianCalendar(TimeZone.getTimeZone("GMT"), null, null).getTime();
-		    } else {
+		    } else if(defaultTime != null){
 			date = defaultTime.toGregorianCalendar(timeZone, null, null).getTime();
 		    }
 		    if (date != null) {

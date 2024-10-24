@@ -1,0 +1,23 @@
+<PolicySet
+	xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 https://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd"
+
+	PolicySetId="root" Version="1.0"
+	PolicyCombiningAlgId="urn:oasis:names:tc:xacml:3.0:policy-combining-algorithm:deny-overrides">
+
+	<Target></Target>
+	
+	<PolicySet PolicySetId="WrapperSet" Version="1.0"
+		PolicyCombiningAlgId="urn:oasis:names:tc:xacml:3.0:policy-combining-algorithm:deny-unless-permit">
+		<Target></Target>
+		<!--
+			Note: PPS must not be referenced here since it causes unexpected behavior
+		-->
+		<PolicySetIdReference>RPS:employee:role</PolicySetIdReference>
+		<PolicySetIdReference>RPS:manager:role</PolicySetIdReference>
+
+	</PolicySet>
+
+</PolicySet>
+

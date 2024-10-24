@@ -1,0 +1,1254 @@
+{
+	"currentVersion": 10.91,
+	"cimVersion": "2.9.0",
+	"id": 0,
+	"name": "Wildfire Response Points",
+	"type": "Feature Layer",
+	"parentLayer": null,
+	"defaultVisibility": true,
+	"minScale": 0,
+	"maxScale": 0,
+	"canScaleSymbols": false,
+	"geometryType": "esriGeometryPoint",
+	"description": "This layer contains information detailing wildfire response events and suppression efforts.",
+	"copyrightText": "",
+	"editFieldsInfo": {
+		"creationDateField": "created_date",
+		"creatorField": "created_user",
+		"editDateField": "last_edited_date",
+		"editorField": "last_edited_user"
+	},
+	"ownershipBasedAccessControlForFeatures": null,
+	"syncCanReturnChanges": false,
+	"relationships": [],
+	"isDataVersioned": false,
+	"isDataArchived": false,
+	"infoInEstimates": [
+		"extent",
+		"count"
+	],
+	"isDataBranchVersioned": false,
+	"isDataReplicaTracked": false,
+	"isCoGoEnabled": false,
+	"supportsRollbackOnFailureParameter": false,
+	"archivingInfo": {
+		"supportsQueryWithHistoricMoment": false,
+		"startArchivingMoment": -1
+	},
+	"supportsStatistics": true,
+	"supportsExceedsLimitStatistics": true,
+	"supportsAdvancedQueries": true,
+	"supportsValidateSQL": true,
+	"supportsCoordinatesQuantization": true,
+	"supportsQuantizationEditMode": true,
+	"supportsCalculate": true,
+	"supportsASyncCalculate": true,
+	"supportsDatumTransformation": true,
+	"advancedQueryCapabilities": {
+		"supportsPagination": true,
+		"supportsTrueCurve": true,
+		"supportsQueryWithDistance": true,
+		"supportsReturningQueryExtent": true,
+		"supportsStatistics": true,
+		"supportsPercentileStatistics": true,
+		"supportsHavingClause": true,
+		"supportsOrderBy": true,
+		"supportsDistinct": true,
+		"supportsCountDistinct": true,
+		"supportsQueryAttachments": true,
+		"supportsQueryAttachmentsWithReturnUrl": true,
+		"supportsQueryWithResultType": true,
+		"supportsReturningGeometryCentroid": false,
+		"supportsSqlExpression": true,
+		"supportsQueryWithDatumTransformation": true,
+		"supportsLod": false,
+		"supportsQueryWithLodSR": false,
+		"supportsQueryAnalytic": true
+	},
+	"advancedQueryAnalyticCapabilities": {
+		"supportsLinearRegression": true,
+		"supportsAsync": false,
+		"supportsPercentileAnalytic": false
+	},
+	"advancedEditingCapabilities": {
+		"supportedSqlFormatsInCalculate": [
+			"standard"
+		],
+		"supportsAsyncApplyEdits": true
+	},
+	"hasMetadata": false,
+	"extent": {
+		"xmin": -2.0037507067161843E7,
+		"ymin": -7160112.067265503,
+		"xmax": 2.003750834278924E7,
+		"ymax": 1.3841422469070472E7,
+		"spatialReference": {
+			"wkid": 102100,
+			"latestWkid": 3857,
+			"xyTolerance": 0.001,
+			"zTolerance": 0.001,
+			"mTolerance": 0.001,
+			"falseX": -2.3788626876457542E7,
+			"falseY": -3.300474221159024E7,
+			"xyUnits": 1.3929912856294206E8,
+			"falseZ": -100000,
+			"zUnits": 10000,
+			"falseM": -100000,
+			"mUnits": 10000
+		}
+	},
+	"sourceSpatialReference": {
+		"wkid": 102100,
+		"latestWkid": 3857,
+		"xyTolerance": 0.001,
+		"zTolerance": 0.001,
+		"mTolerance": 0.001,
+		"falseX": -2.20412591770657E7,
+		"falseY": -30241100,
+		"xyUnits": 1.42980504007554E8,
+		"falseZ": -100000,
+		"zUnits": 10000,
+		"falseM": -100000,
+		"mUnits": 10000
+	},
+	"drawingInfo": {
+		"renderer": {
+			"type": "uniqueValue",
+			"field1": "eventtype",
+			"defaultSymbol": {
+				"type": "esriSMS",
+				"style": "esriSMSCircle",
+				"color": [
+					0,
+					103,
+					176,
+					255
+				],
+				"size": 4,
+				"angle": 0,
+				"xoffset": 0,
+				"yoffset": 0,
+				"outline": {
+					"color": [
+						0,
+						0,
+						0,
+						255
+					],
+					"width": 1
+				}
+			},
+			"defaultLabel": "<all other values>",
+			"uniqueValueInfos": [
+				{
+					"symbol": {
+						"type": "esriPMS",
+						"url": "04d1906aec78e2a40c500b30a32fe2cc",
+						"imageData": "iVBORw0KGgoAAAANSUhEUgAAABcAAAAXCAYAAADgKtSgAAAACXBIWXMAAA7EAAAOxAGVKw4bAAACm0lEQVRIid3VXUiTURgH8P/ej7lszRRcJhpqvCu/AhEt6kIFF0E2koipM72IJWJEBqO8MIZeeGFlBZImXVhuc0RYZghJZEVIaig5PzCaWiJLSVOn7uvd203Ipr5TF13Uc3nOc37nPOfAcyj8xaD+UzxdSyVGyM6JaKqQJAV7KJKgHU7WLhBgfN7quDdizG/zCz+Urz9DEMSd4uyEvafTYghp8I7VubGphbjmjs/yxyLDuN0O5VBzbt+W8aQCY0XC/pDShrIMcQBNrpuPDpegrDCZLsqOZ3LLX74KLDSqexuVTzbF4/J0qpTY0NL6axniLpMFg+ZZvuJw4sg+vLiVFXzySltDXI7BvLYCbzy5PnBXoLC6VpMmBoCvlkX0Dk8DAH5a7WjvmkCuXLaafjQxDBFSMQyVx4MzLz01ApB5cl544kFxmfZ8ahhFEgAAZSYDZSYDABiZmEPv8DTqrqavqyBEIsLZDCZqxdaU5fnIXjhNkQp5aqSA9x58RI6coZ+9MxcD2BgPkYiCSMIvG9HhEnAcojzH1p5c6Jf8O4Q0GcCLu1i380/wteu98HmrbclfeHpuBSzLfefFHS7ufd/oTGySLHTbeEun2W1zuhp58f7hH+XX739QPL+RJd0ObHeyqGsZmBqYHH3Ei6OnxDLO6B42tA5eVCviRVvF1VWvrW6Ou4xOrYsfB2DSqzS3Od0BAHLPDWLCJWivOeWV62LdKKl+YzV9ma351JS3eW8BgCGDSnFXoKtufTtWUHHhsDRJFgohTYKJ3A0AYN0cOrq/cdoH3ZbFZYdmSK/SbeTwtlyTXqUxpdTenJxZqhRSgmNBYtFOiiRop4t1zC7Y5p0utnVgxFqFj0XLfIbvz6KnxNLfA7XPHB/x7/6hvwBrLe9X8H8bAwAAAABJRU5ErkJggg==",
+						"contentType": "image/png",
+						"width": 17,
+						"height": 17,
+						"angle": 0,
+						"xoffset": 0,
+						"yoffset": 0
+					},
+					"value": "17",
+					"label": "Telephone"
+				},
+				{
+					"symbol": {
+						"type": "esriPMS",
+						"url": "deee25aaebe13ba0487f915325c0dffe",
+						"imageData": "iVBORw0KGgoAAAANSUhEUgAAACQAAAAnCAYAAABnlOo2AAAACXBIWXMAAA7EAAAOxAGVKw4bAAADHUlEQVRYhe3YSWgTYRTA8f83GUvFi1XUZmoVxWrFiysoWBdcCvXmksQWi8UVPLkh2laqtaK44UHQUje0aTIuBw+Cl/bUix4URdwRtJlpexMVXNp5How0hqQJSZoU8UHI8N73vfxmMsz3MTrDLPRcA6LjPyhRZATUgGi/v5WTbq+MgErpnqeBAh6m2ysjIIWUg9IYLiCgXHB04Gi6jdIG3aV7/E+cRaBUGx+MjUyycgrqQ9YBLgAX+gbgfE5BgngHjpU3pyATa5JA2UBGFpp8nOah+G1OQAI7AC0ipQTXTmBf1kEmz/MEtsQo1VzlfV0NU75lFeRQsEHBhBilMaPIqwIuZw1kIi4Huy5e3UEd6kCuL0f1ZQUEdqWC0nhVBVN7sDcDLUMOuoSMcLDrVeKhdfd5c6OCku9DChqNvR8oSTROweTPjKoFDg8Z6A49U/voj753fgDPwsezgPyI2gGTUKuHolcZBwmiTOyLwMi/8+zyYbQAmFiVAq0R5TxBNTcgy5PdKyUNMrFrgVVRmLN/MAAeDH8QuwSkIWLYkpnYDST51yUFChJaCRyJwpzwYRyMHuvFfSSI1Q80RqRrg1idXowHaYNMQjME5WdgifgkqG0+3LfizfFiHDMJPRXUNaAgPLc1gFXmw3iRMihA13RBdQDjAAEV1NH3rGOcnehEPBTdu0t36U+cM0AlMFZBu0lo2WA3eVzQ7yujtYOMBXVFkNM+3IOeXXSspbAX2BSgq1Gh7QOqBa39NtaK9RgvkwYFsKqAvUCzzojmZK7IYOFj4mtgu5+eep3+rQ7cMLHOeTD8CUFthOaA9s5D4dxEP9TGB0NDPwksBT4DN8fjPhVvDatkQg/QBDQFsBeYdM32MPHJoKCNFD1OBAnDizXUE2BMRPp4L/ZiYE2i+T7cj2LlU95+uFBn5G/Mn6gIYnu8uM1U+qYMElgRvyargeyCQH0DiV1BUtotQlogCQK7YxWAtlS7pgz6jlafj1MmMD+q1OSlqDProGoKv3Ygi3rp3gEsBvkCyu/F3ZFqz7RAAOHnzYXwJyPxb76wymQMO9AvHZbzoVydhmkAAAAASUVORK5CYII=",
+						"contentType": "image/png",
+						"width": 27,
+						"height": 29,
+						"angle": 0,
+						"xoffset": 0,
+						"yoffset": 0
+					},
+					"value": "1",
+					"label": "Aerial Hazard"
+				},
+				{
+					"symbol": {
+						"type": "esriPMS",
+						"url": "fae82d0cf62a4a1c49f1fe3c543ab927",
+						"imageData": "iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAEYUlEQVRIie2Wf0xVZRjHP+8F5GfgRbhy7sUAUxIHCoJOwEGKuiEXnYYaNdM1p6LNLTPn0OTS0jm21tJawqqZ9UdzpjNMh4RL04wF/thIm5Ygeu8l4IKQIIHy9ofn3HnlXi9Ot9rq+eec87zv83zO93nOOc/x5R8y3//B/zqwlDIVSAXyAUU9B7ADleqxQghhe2pgKeUqoNzDsgKsUs9LpJSlQgjLE4FVlRbArPl+u9lFTd0Nbvxxm78G7hEVHsT0xCimJ0bhoxMa3AzMf5R6j2AVWqkqou5yK+/u/ZmxxjBy02PISRtDwAgf7I5eTp6zsuPzOhbPGseKvAS43warlDJNCFH/uIotGvSTby5x6oKVT4tzGBUW4LIp2hDC1AQDGwqT2XOogde21/Dxphfw9/NBvXHjsMFqT80AX1Vf5VJjB/u2zVHX4OR5K8drm2m7dQdjRDALssYy5flI1r6YxIm6mxSVfc9nW3IAFCmlxV3Ph4DVEpcD2Nt72F9zlQM7cgFov9VH4bYq7I4eCufEM9YUxi/XHGQXHWRdQRI712YwKy2aX693svfby1rZS6SUlQ+X3J1i7TWh7MtzbF+Tjk4nkBIKt1UR6O/LhX0v4eujcwYUzo1nxuqvyU4xkZsew5qFieS/dYRluRO0By4V8ArO10pqbeshIVYPwOmLNmrqbvD7gVddoADTJo7GsnIajq4+AHQ6wcwp0fzU0ELmJEXLWeENrAA02buJf3ak01lV28zEuHDijKFuQqB4eZrLdfYUE6fOWzWw8vB+j6Vu7bxD1Kggp9PW3kOc4h7qzpRRQbR09Lrk9AYGwM9XR//AoMv13XuDnrYPsb7+e9or5dbcge2AEm0Iocne7XSOiw7j5DnPn+Emezf9A4PO9jTauhkzOuTBnF7B9YDZoA/E1t7jdJoz49j04Y9cauxgYlz4kKCt5bX82dvP4bI8AI6dvc66giRtuXI4YKesrGQjR840Yc6MJSFWz8tz41m54wRH389nZIi/M+B4bTP7a65SvWsBAI6uPq7ZunjOFPZYiktRp83qhYks2nyUzEkK+mf8Kd88k1dKjjN+8RcUzByHQR9Iw7UOqmqb2bUhi+wUEwBvfPADW1dMfTCnd8VCCJuUshQo8ffz4b31M1j+znfsfTuH8NAADpflcf5KG6cv2nF09TEvI4bdb2ZhjAhmcFCycfcZspJNpCUYtJQV7gaF26daCGFRR1vqhBg9Za9nsKy0mqJFSZgzY0mJjyQlPtIl5nJTJ1v2nGXp7PEsnT1ec9cLIVa7YzxqOs0HrAATYvQc3DmP8kMNFBQfwxgRTKwSygg/HS2OXq4038IUGcxHG7NRIoKdUO63za15BKslT0Odyf5+PqxfMpn1SybT2nmHm623Gbg7iEEfSKwSihAu4fVAqRBiSG+Hoxi1N0YppQUo0fwGfSAGfaCnsApP5R02+IEbsEgpK/H+szdk/D0RWIXXc7+EFd72PlXw07b/HvhvWPiAHw9ytNIAAAAASUVORK5CYII=",
+						"contentType": "image/png",
+						"width": 22,
+						"height": 22,
+						"angle": 0,
+						"xoffset": 0,
+						"yoffset": 0
+					},
+					"value": "4",
+					"label": "Camp"
+				},
+				{
+					"symbol": {
+						"type": "esriPMS",
+						"url": "fafd482dc64c021005ecbe90bb7e62ad",
+						"imageData": "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",
+						"contentType": "image/png",
+						"width": 51,
+						"height": 40,
+						"angle": 0,
+						"xoffset": 0,
+						"yoffset": 0
+					},
+					"value": "0",
+					"label": "Division Break"
+				},
+				{
+					"symbol": {
+						"type": "esriPMS",
+						"url": "e5e534241f2894bf787204d7ddba2cf3",
+						"imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABtElEQVQ4jdWUsYoiQRCGv8JlQNDIaDYyMzEQ3EcYjObOVFAw88BHMPIydQQNTNbU0HAvMRY1EkTwCeRWEEUE06Eu2Jk9nRvdFTa5irr/mv6orr96HvjiePh/gaqaBb4BNvDoyXNgLiL1u4CqWgHqgBlI2YCtqjbwXURePwR6sOdz7Xg8Eo1GMQzDl7LAb1V9EpH5VaB3zWdvTa/Xw3Ec1us1kUgEy7Jot9uk02n/yAt/2xFaYd1f1Go1Go3Ge8J1XUajEZPJhPF4TCaTATBVtSIi/WvALMBiscBxnGA3ADidTlSrVabTqS9VgH+BqvqIZ8JwOMR13VAgwGw2Y7PZYJpBz664vNvtrsL82O/3PjC8hyLyqqoApFKpmzDDMEgmk/72usvAL8Aul8s0m022220osFQqEYvF/O3FLIa5bCcSCQaDAYVCgcPhcPGBZVl0u93z6vrn+QugiMxVtQ9Ucrkcq9WKTqfDcrkkHo+Tz+cpFouIiH/k583B9qA/vF5WTNOk1WqFXtuDvQTFUJc9aJ+3V5M9S214ex39YGU3gR50DjzB+4wS9jP4NDAA/xB0F/Ce+ANxdppPopV65wAAAABJRU5ErkJggg==",
+						"contentType": "image/png",
+						"width": 15,
+						"height": 15,
+						"angle": 0,
+						"xoffset": 0,
+						"yoffset": 0
+					},
+					"value": "6",
+					"label": "Drop Point"
+				},
+				{
+					"symbol": {
+						"type": "esriPMS",
+						"url": "8e2862dfd1a9519dc188f41dba4ce340",
+						"imageData": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAE9ElEQVRYhe2XW1CUVRzAf2d3+VZYdxdYBBcfuOr44EwXKAvQmZqaSQfNfDPKnEkXFQ0R84JjomkgjREmMWBNF7VpcrSZoMuzQjMVm1PjSyGwlbLorK6ghSwLp4f9vo8FdkHS6sUzs7P7ne+c//md/31N/M/DdB/gbjZLKVMBpxDC/Z8ASCldQCpQCOSEzQN4gWbAK4SovKcAUsocoFI9ONpwAq4w0GIhRPNdA6jCGvXnoSFu/XieW+1uhnw+RgYHMSUmEpuViW1RATFJSRrMF1LKJiFE8T8GkFI2o95aDg/j++wU17/8Cvvixdjy81CcsxHmGQT9fv66cIE/DlZhiI0ltWQDypw5AC4pZY4QInfaAOrNCwGCfX14dlZgy8tj3kcfIIzGsULi7czISCdxWSEDv3bg2b2H2evWYsvPA8iRUjZG00REgDCbMzIwQMe6YpSUFJKLVoHBEL7US0jd+oidN5fkoufp3PQKWUePaBAu1RwToiWaBio1wb/vP0DKmpe4evwEntcqSd9fGQ6xTP1u1tb3nWvlt737yKippvfYe8xIT9PM0UwogiYHUG9fCPDnTz9jiIsjcekS7IsK6CjeiGf3HtIOvo4IQbSHa6HvXCueHbtIP1SFfVEB5rQ0euobSH/jAIBTSukSQjRNpQE9vq+e/IQ5ZaUAGK1W5jY1cHH9Rjw7K0ivOqj5ghOgv7UNz84KMmqqsRXkAyFzjAwMMOTzadGxDJgSIBVABoME/X4U56iJjTNnkt3YwMUNJXTv2EXGoSqE0Uh/27eh55pqzeb6iH/yCfrPteJ4boUOOxVAIUDA24s5LW3CS6PFQnZDPZ0lm+neth3Hs8vx7N4z/nC3psm4BQvwnT6jzeeMlxfVBEG/n5iEhPD5XEIJKcdosZD97lF+WfMynaVlZNXVhh/uBfapa52mhASC16/rQtS8oEdD1DxgMCuMBALjwXQvvul2E7h0ibj58/Gd+Rxbfh4iJgZCatZVLQdvIxQl2jERAVqAQlNSEoErV8Ln9XQc8vYK0g9VYX0kl85NpXSVbSPzrTe1w/S1AW8vyqxZupDxuSASQA9AjMNB0Hdtwsv+1jY8msOp3p5Vf4TOzaV0lpWTVXt4zI1v/tCO5eEHtUfvnWhAJ7Q89AD9rW36Qf2tbaPers4BGMxmst45QldpGZ2lZWS+XYvBrCCHh+k7e5bk1S9qSydUx2gmACD5hSK6y7djfWwhN7/7PlKouQn5hdNgVsisq6VrazldpVvIrKvFd+o08U8/hcGsTJAdFUAI0SOlbAJcJrsdx8oVdG0p59b585HivIVQYmnXILJqD9O19VU61rowxMaS3VCvw0bqDyJGgRCiWE3JOYlLlxC4dBkA68JHxy/dq35G9yoKjpUruFxbx9ya6vDKeefVMGxDO8Bs11r8X3/DxfUlpKxZPcb+4SPg9dJ77H2CN24w/9OTGC0W7VXESjgpgBDCLaUsRg2phCXPYM17nKvHT3Dlw48xJTlQUlIwKApDfj+3u7sx2WzMKlqFNXdM/9EyWVc0aUckhGiSUrpRy63Jbid1UwkAQ9euEfT5GBkMYIqPR0l1IkxjxHmByvHVb1oAKoQbSJVSNqI2nRDKEzEOR7RtLerhU7brd9yWq465j1CxCm/NvYSSl1v93Tyd/wnT+l8ghOhhtJ5XTmfvPQH4N8Z9gL8B6ca/W+m/QGwAAAAASUVORK5CYII=",
+						"contentType": "image/png",
+						"width": 24,
+						"height": 24,
+						"angle": 0,
+						"xoffset": 0,
+						"yoffset": 0
+					},
+					"value": "7",
+					"label": "Fire Origin"
+				},
+				{
+					"symbol": {
+						"type": "esriPMS",
+						"url": "4f85abc777372fa0bbb1ae8ec9969e62",
+						"imageData": "iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAACXBIWXMAAA7EAAAOxAGVKw4bAAADnklEQVRIie2WX2xTVRzHP6dd13WrzDK87LbDLShmDR0sWxeHM4AMY4YdyQBBH4jEBzbULMGgMSCuVSBmiQ/GGFmjZhofiDGSUJQYmFGUYMKKPizMiJHh1nZOxtxkGzDW40PvXTZ6u3ZhiSb6e7n3/M6fz/n+fufc383iH7Ks/8H/OrCUshKoBOoBVXsHiAEh7RkUQkTnDSyl3Am0pehWgZ3ae4uUMiCE8N8RWFPpB3y675e+YTo6e+n9/Ro3JiYpXJhLtaeQak8hZpPQ4T5g42zqU4I1aEhTRGf3AAfaz7HUmU/dqmJqvUvIyTYTGxzjm/MRDn3YyRPr7mfH425IpCEipfQKIcJzVezXoe8du8DpHyO8v7eWgvycGYOKFDtVboUXnirn8NEunjnYwbsvrcVqMaNt3JkxWMupD+DIyYtcuHSVj159lMm45NS5XsNd5tutPLu5jK86+9jV+jUf7KsFUKWUfqOcJ4G1ELcBxK6M8knHRT49VAfA+I1b1O0O8eDyxUng5UsXUuVWWOct4qfLQ7R/3q2HvUVKGbo95EaK9WtC68fnOdi0ClPi0GjKsvmubbOhat2aGjzUv3ic7XWl+oGrBNKC6xPKIfLHKO4Sx6wQIzOZBI9UFPF9Vz81K1R9zWA6sArQExvhgXvvnjNUtzUVLk7/ENHB6u39KUM9MDROYUFuUudfYxM8uf/LJP+R1x+b0VYLcum/OjZjzXRgACxZJm5OxA39aytcqaZN2fWbk/qVMjQjcAxQixQ7PbGRpM6cbDNNDZ604EvREZYstk9fMy04DPgUh43oldG0gFR24uxlnttSpjdDmYCnvq+ry50cP9ODr6ZkTtDB4ev8Gh3mPle+7spIcQCt2jQ2eNj08hfUrFBx3GXNGLz7rW95ZUfVdFd6xUKIqJQyALRYLWbebH6Yp187Rfv+Wuw2y6z5jccle94+w+pyF163oruDRoXC8FQLIfxaaassLXbQ+vxDbA+cZNemMg40VhtCu3uG2Hf4LNvWL2Pb+mW6OyyEaDQaP1t12ghEAEqLHXz2xgbajnaxZe8JnIvyKFEXkG0x0T84xs+//Ynrnjze2bMGdVHeFJRE2gwtJVgLuRetJlstZpq3rqR560oGhsbpG7jGxK04isNGiboAIWZMDwMBIURSbjNRjJYbp5TSD7TofsVhQ3HYUk0LpgpvxuBpG/BLKUOk/9lLKn93BNbgYRIhDKYbO6/g+bb/HvhvTI4nFSo1BiIAAAAASUVORK5CYII=",
+						"contentType": "image/png",
+						"width": 22,
+						"height": 22,
+						"angle": 0,
+						"xoffset": 0,
+						"yoffset": 0
+					},
+					"value": "8",
+					"label": "Fire Station"
+				},
+				{
+					"symbol": {
+						"type": "esriPMS",
+						"url": "33e040fe6cb70659a104ab11a7b2543c",
+						"imageData": "iVBORw0KGgoAAAANSUhEUgAAABsAAAAcCAYAAACQ0cTtAAAACXBIWXMAAA7EAAAOxAGVKw4bAAACTElEQVRIieWWTWgTQRiGn0ki1YNYhIobfzCtRlMPoU2kh5aQo9JEQw/eAhYlHgq99tKDogUP9eYli6KIeC7qQUSFCkKgzUlSafEHa0lqIVSxtmmNjIdulkyySRYTRPCFhZ353u97GGbm23XxF+X6v2FSygAQBbQaFl0IkW4aZoBmG9gSUspgI6CdlUUBxpMppl59qArGT59gLN5b8jUN0wCWVtbo695P/MxxM3Dn8Ry5/A/F1yzMlMe9m3DvAXP8fOYzaxs/bedbwox9Kslts5a7PM9q/xSYYU4CgUqjDUWMp1QrB0TLoZUriwKBh88WWFz+rgTevM9z9OCeKsLs2xVu3FcX4T3czlC4S6Pi0FTCAgD6VAYpJccOtZuBHm8HPd4OxRz07WM5v867pW/m3PziKqnMTobCXWa9WjBTwxEfFwZ9tcKXgWQs1Eks1KkEbj+a48nrj5ZJdk5jDsiWvaeFELqUEiBR5nPT4Pi3sjdm/xi2XijydW0To4AGsKvNRdsOZ0RKmQWSha1fFLaKSt7GZrGqVkPYyOQ0I5PTyty1RB/jw6dg+3pw/e4ME/eq2+a5kMcWLAvw4lYMY09MXZx4aVlg9Lyfm6P9ypxDCKVeLdhVIOp0CA2EEhACSwkBLqfDKpQG9JowIUSWirYDXKGsM9SRXl68YbuyMhqHwZZa8T0z9eDpAqnMF3M8/2mVwf4jtvNtwy6dPal8Xkrq9uxtKUwHEgN+jQF/3Tur1wvaggkh0lLKIGprqgK15IenBGS7+Talf++/sVX6Da3aspMURuRCAAAAAElFTkSuQmCC",
+						"contentType": "image/png",
+						"width": 20,
+						"height": 21,
+						"angle": 0,
+						"xoffset": 3,
+						"yoffset": 0
+					},
+					"value": "9",
+					"label": "First Aid Station"
+				},
+				{
+					"symbol": {
+						"type": "esriPMS",
+						"url": "bdfab1a8b867da76f3fd8c47dd3f3dbb",
+						"imageData": "iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAACXBIWXMAAA7EAAAOxAGVKw4bAAADm0lEQVRIie2WXWxURRSAv9ntUvojdWlderetbVBIN2lLZZekUFOUxYfilgQsEB9Q4gMFxCaiGFN/umuAmCY8EGOkGzXV+ECMsYkL9gFqtEI0sYvGNGBEpUj3x8pS29Dlp7TjQ+9t2u693G1ooomelztzzsx8c86ZmXMz+Ick43/wvw4spXQDbqABUNQ2QAwIqd+gECI6b2Ap5U6g3cCsADvVdquUMiCE8N8VWPXSD/g03S8Dw3T3XubyH9e4OTZO4eJsaioKqakoxGoRGtwHbLyT94ZgFRpSPaL3/CAHOr5jqTOP+tWleD0lLFxgJZZI8tXZCIc+6GXLugfZ8bgLJtMQkVJ6hBDhuXrs16DvfnaOnh8ivNfiJT9v4YxBxY5cVrkc7HuymqOdfTxzsJt3XnqETJsVdePOtMFqTn0Ax05e4NzFq3z4+mPEE0niiSSF+dkpc378NcGeJyr5oneA3W1f8v4rXgBFSunXy3kKWA1xO0Dsyigfd1/gk0P1ABzt7OP2+AQHmmpSwA89dYyx03tY5ynmp0tDdJw4r4W9VUoZmh1yPY+1a0LbR2c5uGs1lslDk7bs2lRBw/7jbK8v1w6cGzAFNwBICZE/R3GV2ecEBbBYBI+uLObbvji1VYq2ZtAMrAD0x0ZYfv+9c4ZqsnZlET3fRzSwMttuGOrBoeu6h+jEmX7iiaQpWMnPJn51apx7tt3wOtkyLNwam0jRL1mcTfXyAlPwjVvj2pXSFT1wDFCKHbn0x0ZSjB6Xg72NVSn65w73zOhfjI5QsiR3+pqm4DDgc9iziF4ZNdyxmXR9c4lnGyu1bigd8NT7Wlft5PiZfny1ZXOCJoZv8Ft0mAeK8jRVWh4HUKtN06YKNr/8ObVVCvZ7MtMGP3/ka17dsWq6ytxjIURUShkAWjNtVg43P8zTb5yi4zUvG9aUIqU+7K0X6hBCsO/Iaeqqi/C4HJopqFcodE+1EMKvljZ3eamdtr1r2B44ye7NlYZh93pK2NLSxbb1y9i2fpmmDgshmvTG36k6bQQiAOWldj59cwPtnX00tnThLMihTFnEApuFeCLJz7//RdF9Obz94lqUgpwpKJNp0xVDsBpyD2pNzrRZad66guatKxgcus7A4DXGbk/gsGdRpixCzHzOw0BACJGS23Q8Rs2NU0rpB1o1vcOehcOeZTQtaBTetMHTNuCXUoYw/9lLKX93BVbhYSZDGDQbO6/g+Zb/HvhvEu8qiWmyPYsAAAAASUVORK5CYII=",
+						"contentType": "image/png",
+						"width": 22,
+						"height": 22,
+						"angle": 0,
+						"xoffset": 0,
+						"yoffset": 0
+					},
+					"value": "10",
+					"label": "Helibase"
+				},
+				{
+					"symbol": {
+						"type": "esriPMS",
+						"url": "5d73c2e2d3598621a3e0a62d0abfa2a9",
+						"imageData": "iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAYAAAByUDbMAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABsklEQVQ4jb3UT0gUYRzG8e9vZq9iEbXsBFFSHbwYTAR5877uNaPoYNEaHTwFdQhED3utEHK9mXjqEGxIhwhvHoIX0kNdPEjgikWl2LGZp0OzOu6MrcHSc5t/n3nmnfd9C3Qxhf+GSQqAECgBDsDM3D9hkkJgAiir+Rm+bkFPL3b2PJIcUDGzZkdM0jBQ1/JSKZquofW1/YvHjuPfHAu9kdsbkipm9vpQLGnUiF/OET2ZBOngm7Z/EE3X0KdV/MlnDUmn0w3bm03o4wrR06kslEr8bhHrH8C7fqcODGewZLDL8cIsxPGhUCvR/AzetdGypKDVLt0sBIg/vO8IAbD9Ha2vYX0XQyCDlQDY3Tkatn9vqXWYxv7MoxOn0Fbmr+fnZHHvuXYMABscQq8WOjp27gIWnDlwbg8zMyfJebfuhfHbBvzc/Ytk+PcfArj0imhvVrFisFGozfDr0Vg+6Hn444+xwaFNoJrbLGnXlFS18Gq9MP+G+MVztLyEvn2Bnl68S1fwbtzF+gc2gWr7Os2OmdmsJGfFoO4/mApzPtLlQblYAjrgcld2jRTaJJmQR0lXN8ffkx6i8wNIOD0AAAAASUVORK5CYII=",
+						"contentType": "image/png",
+						"width": 14,
+						"height": 14,
+						"angle": 0,
+						"xoffset": 0,
+						"yoffset": 0
+					},
+					"value": "12",
+					"label": "Hot Spot"
+				},
+				{
+					"symbol": {
+						"type": "esriPMS",
+						"url": "44f07bfa11bc2b127280a0e28f0640a5",
+						"imageData": "iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABa0lEQVRIie2WMU7DMBSGv1d1AYSEYKFlZWNBSg/AAdoeoxXiEDQbQmJG5BikIxIsbPgITEhlYeAGjyEuMsFOmrRRpaq/ZMl2/N5nO7bfa7MmtbfgtYFVNQJGthTJAGMRMQEfE6APJEAsIrNCsGNQpgh4A6TEx8iO7QXBqtqdG7x/wf1rmHo7hJaAqo5EJPH5cCepql131cF//PENdy9h8M0gAwNdt19EZqpqyFY5l1lkq1ehGHgAOmRnIc4PaAQsIimQ5re3cbAzAS+0cXCRSsFPl3C05zFs/VaDq1oKfNaB4/3g50/3Kq0UXKAp2atUS1XAsYhM6oKWAa9UW/BmgFU18sXrxsCqOgCuycKhIbsRaePgOdTWI9sOg20sBeD8BJ6v4HC3FjjKtxdJBKZA/2AHLk7/9KeesSHlE4FkkURgDDw6hsYaeg9JQEPHR4Lnaf0HtjPr2dypMKaG5PqonAjUAVbxsZkPSJF+AIJrbGBeQwPiAAAAAElFTkSuQmCC",
+						"contentType": "image/png",
+						"width": 22,
+						"height": 22,
+						"angle": 0,
+						"xoffset": 6,
+						"yoffset": 0
+					},
+					"value": "16",
+					"label": "Lookout"
+				},
+				{
+					"symbol": {
+						"type": "esriPMS",
+						"url": "752c85371beff20d7809314af7504822",
+						"imageData": "iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAEVUlEQVRIie2WfUyVVRjAf+eFy5coXdELF65JiQ0cX4OrQTRBMBd1cWkIuuaij6Fm2TR1TlQuGeLc+ENLE5ZOzVwrlRkYkYFlGi4B2yLNdAHKV/hBMFDT5PTHfV8C78WLk622ev55z3ue5zy/8zzPOe/zuvIPiev/4H8dWEoZA8QAqYBRHQO0AiXqs0gI0TJsYCllFlA4iNoIZKnjHCllrhDC+kBgNUorYNHmLjR1UlF9iUu/dfPH7Tv4j/YiNsyf2DB/XBShwS3AzHtFPyhYhZaoEVF9tp13dp3i0QAfUuLGk2weh4ebC61Xr/NNbTMbdlczJymYzGdDwVaGZimlWQhRc78RWzXoB5+d4dgPzexYnYyvj8cAI5PBm8mhBpbNi2J7cR0v51Xw/spE3HUuqBsPGDJYrakF4OMj5zlTf4096566xx5BUQSvPR9OZXUTizZ9zc7sZACjlNLqqOZ2YDXFhQCtV3r4pOI8+zekALBxTw1ffn+JwwUWPN3/XrrtwI+UVTVyID+FJLOJnxs72HX4rJb2HCllyd0pdxSxdk3YtLeWvIVxKLZDw+K0cIoO/cTyd0+wdXkCAFV1bazc+h2V7z2Hmy29LJwVRuqKUuanhGgHLgZwCk61RQ7Nl3sIDdL3KUZ6ufFR7gymLjyIJT6IKZP8SM/+gvVZjzNlkl+fnaIIpkWbOFnXRnyEUfNZ5AxsBGho7eKxhx+yU8aF+ZOdaeaVDZWYQwzEhIxl6dwoO7uE6ECOnW7WwMa79YOmur3jBv6+Xg7UsOYlM/uPXrDd50OZDm2Mvl60Xbs+wKczMAA6V4Vbt3sd6mrPXaa+pQsXReHDsnO8mRFpZ3Pz1h3tSjkUR+BWwGgyeNPQ2mWn7Oy+xdy15bwxJ4JJj4wmK/8oSWYT4RN8B9jVt3Qxzs+7v0+n4BrAYtB70nKlx075an4lvj4erM+KReeqUHq8gXnryjm1M33AFSuramRxWrj2WjIUcN/3dWpUAKUnGrDEBwGwvbiO8pMXqd2dgc5VAaBw1TTCX9jHW1uOs21FIgBXO2/ya0snEwJ97iviXNRus2BWGLNXfU58hBFFCCqqm9iRnUSwqc8h+pHu7LXOoGDfaS40dRJs8mHp5m9Zkzm5v0/nEQshWqSUuUCOu86FgiVP8uLbX7FrbTKf5j3tYJ+QGB1IYnQgvb2SZZuPMzUqEHOoQVMXOWoUDk+1EMKqtraYkPF6Nr3+BPNzj7Bodnhf2u+Wsw0dZG+vImP6RDKmT9Sma4QQCxzZ36s7zQSaAULG6zm48RkKi+tIW11GwJgRBBlH4aZTaLt6nV8u/k7g2BFsXZ6AccyIPii2sjmUQcFqys2oPdld58KS9EiWpEfS3nGDpvZubv/Zi0HvSZBxFEIMWF4D5Aoh7Go7lIhRaxMgpbQCOdq8Qe+JQe852LKiwdI7ZHC/DVillCU4/9mza38PBFbhNdhSWOTMdljBwy3/PfBftABvqx4ytZkAAAAASUVORK5CYII=",
+						"contentType": "image/png",
+						"width": 22,
+						"height": 22,
+						"angle": 0,
+						"xoffset": 0,
+						"yoffset": 0
+					},
+					"value": "18",
+					"label": "Mobile Weather Unit"
+				},
+				{
+					"symbol": {
+						"type": "esriPMS",
+						"url": "eba14cd435ee1c4f03ad98604fc06cf1",
+						"imageData": "iVBORw0KGgoAAAANSUhEUgAAAB4AAAAaCAYAAACgoey0AAAACXBIWXMAAA7EAAAOxAGVKw4bAAACOElEQVRIie3WT0iTcRzH8fdvbuUSraj1h4rRwRJK3NZA0C5B0Ppz8NBhYIdKUIJRsIqoVkNIo8yG2R+oU5aX/kBgp8JOISbLZ0OCiIqiv0JBEUsw2bfDw9iW82m2Z0bQ5/b9fp/f9/U7/A6Plb8U638430iM9SRxKw/dMwbLAHaE6yicEkNTLh7OCEwpBwGnfgvOieBVimRRYYmznCSHMlpuYjQBV4oKv3xLd3Mrc1J1wwYI+GmTKDeUl69FgUWj/tV7GvqH0r2qlQA4KCEMBE2HRbAQp8vgk4BEuay8PDUVRmMXinXPXme3HwxBYgzK7NiwEgE2mwbLIBUo2gGCnb/MBEIXIHIAEHwSY5tycdcUmFKOIywC+PINbFb4MaGP/D6orc68CWflCffUGsYLgkWjEmFvqj4ThB1H0vOlC8FXl3WkknH2AR0FwUAEsKUK/ya4dR9u9+v10fPw4ROEW7LOhGSEHlXN6B/B8hgfsDVVv/kIV/ugZrUOO+bDYA+s3T4JrmCCk8DuacMSxUYJESTdm1cOndegdQ80boFVThh5DiuW5FyxU4a5qDxEpwVjJYBQldkqL4ObHdByAr6PwUAc7LOhtz3nBoWiC6jPG5ZhHAjhXLONtfCiD0Y/Q1L0x2WQOtFoVG5684JRtAFzjTYuXmAIZuaUxLmjakgYwqLhApryXvv7LCPJYSBkCAOnAYuJMCj2S4xLysW7qWHhEYpZpsJCAgsqszUJVh6OmYpOkX/vL7PQ/ASKl6CsiR62nwAAAABJRU5ErkJggg==",
+						"contentType": "image/png",
+						"width": 22,
+						"height": 19,
+						"angle": 0,
+						"xoffset": 0,
+						"yoffset": 0
+					},
+					"value": "20",
+					"label": "Safety Zone"
+				},
+				{
+					"symbol": {
+						"type": "esriPMS",
+						"url": "3df94a8ff622d17b37d87f3a9dcd500f",
+						"imageData": "iVBORw0KGgoAAAANSUhEUgAAAB8AAAAgCAYAAADqgqNBAAAACXBIWXMAAA7EAAAOxAGVKw4bAAADuElEQVRIie2WTWhcVRTHf+e+yXcI0i+YUmtTYmtKNdKhihQVC7UYJqnSBjRSGoqdERNCWooEFTupFG1XIYVaUzdqKe78mG6y0S6qFttBXbiQ4gdIk4aISUHDtH3vHRfvvsxLO5NMMEVEDwxv5t57zu+ec//v3InxD1rsf/i/Hq6qK4EEEAfa7HMlMAq0i8joosNVNQG8Y8HFLA5cshtZPLjNNmsBBbtxHf3pMty8gdy/CSCuqm0ikl00OIUyo19+jj/yMfrjD+jvEzA1ienqxgngEJR/xhYDPhNQNm/BLFsBNXV4B/ei+TzS1FzScUFwW+I4gIjkwqeqjgFxKirhrqV4Pc8hjeuQ5geQpvtC97HQp2y4FVPGQhORcYAwWFD28bEA3NSM88Zx3JeeRVatCV1mgeeFq2qKQMWlrLCZ8VG87k5kXTPO4eMQiyEPPgTGhEtGb3UuCVfVLJAEwPfxv/gMvXgefhuH+gakZTNmayvU1KJXr+D1dCLrN+IcHgLHAcB58WA0ZHmZq2omBOvPl/Fe70WnJjGPbUM2tKDXpvDPnMIbOoKzO43/0RlkQwtOZnAGDESzzgFn54XbMz4Ugt30LszTncRe6IPKqsLC7n78kU/wjr2KrF6LMzAIZgY8QFDmNvs7fWt3K5V5BgDfw3utB9PRhbNvf7ECYbbvQJavwO3bg37/XdhMALJW2cNFHeeAJwH8cyPg3sTZ2xudGyYoXxwrRNn0CKZ1J/7pkzhHZ1gJipzxnHBb8uD7V+cwT+6InuGwiKQja88CVwBMsgO3bw+R0y7V40vDiTR+nbiKPPxodG5WCUVkVFVzQELWNMH0n3A9D1XVs+IsBF5oldW1kM+XEwOdnoZYLCrI28RVDrxga+9Fv/0akh3hSIaCesPXMQGg31wI2qhIOD22YLjt0wCYx7fjpnZhunqQVfcAJFX1EoGQEiEY18X/4CSmdWc0VJYyrFjmw0BK1m/EbNmK158mNnQalixjFhTA8/COvAz5POaZ58PR2y6QhcAHgBSA88pbuL27cbvaMKkDmCeegrp6cF304nm8dwdhYhxn8D2oqQ39M+WAi8KtigeAQ9Q3EDvxId77b+OdOIr3Zj/UN8D0H1BZhdnWjnPsFCxdHrrnRGTOxjJf5ohIRlXjQIrqGpzUAZx9+9Fff4Frk1BXj9zdCBUVUbcc0F4uuCTcbiBtG8mndgBZ3Qg0Fls+qwH9bbjdQBYQe6+Hf4UTBK9Szn6y5QpsQfDIJoaZ55K4Y/A7Zf9d+F8NTkN2WC+6TwAAAABJRU5ErkJggg==",
+						"contentType": "image/png",
+						"width": 23,
+						"height": 24,
+						"angle": 0,
+						"xoffset": 2,
+						"yoffset": 2
+					},
+					"value": "22",
+					"label": "Spot Fire"
+				},
+				{
+					"symbol": {
+						"type": "esriPMS",
+						"url": "d999c79afdc0b4d47327391437b2d626",
+						"imageData": "iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAEe0lEQVRIie2Wf0xVZRjHP++FKz/9cQWvnAsXSMWJAyHhiog/SkDD0KYZ5h+W/ZimNraataYpl5ausWxzrVJWDas/nKvcgjKnJqBOmvyQInEZisi9FwnkR6CEydsfnHNEuXBxutVWzz/nvM/7nPfzfp/nPec53vxD5v0/+F8HllImAAnAUkBR7wFcQKF6zRdCOB8YWEq5Dtg7xLQCrFPvc6SUuUII+32BVZV2IFPz/dbYwbHyK1y52sWfN28RMt6f2TEhzI4JwcsgNHgmsGw49UOCVWihqojy2mbeLjjDJMtYMpIjSE204jvKC1frdUoqHezcV85TC6ew9vFo6C+DQ0qZKISouFfFdg368TfnKD3r4JMtqQSN9b0jKMwciC3azKur49lzsIbndxzjo9cfwcfohbpxy4jBak0zAfYfucC5S9f4bHv6MHsEg0Gw8clYfihvZENeMZ9uTQVQpJR2dzUfBFZTvBfA1dLNgWMX+HJnxrDQgbYwMYzzl9so+LZWS3uOlLLw7pS7U6y9JuR9UcmOl5I5Ue0k+71Sqj9frQc9/Mx+6hyduIqeI8DPCMCOgnJa2m+wK3suS18rYk3GNO3AJQAewUv7lYPj926iI01EhIzm/OV2Gpu7CDMH0tLew891rcRMDuJ4pYPMlEgADv/YwMYVsRgMgkdnhlFW00TKDEVbM98TWAGod3UyNXwcAP6+3iTHhHCy2sXT6VGUnnUQP3UCWalTOFzWQGZKJD29tyivbSbNZgVgwcxQSqscGli5GzJkqpvbbhAS5K8702xhnPzJqYKdpM+ysigpnKyt3wNQVtPE9IfGEzyu/9QrQf40Xbt+x5qewAAYvQ303uzTx6k2KxvyigEorXKyKzuFuCnBdHb3Uu/qpKTKweKkcD2+p/eW9kq5NXdgF6CEmQOpd3XqzlnTJ9LQ9AdXrnZR5+ggZYaCELAoyUpxpYOSKic5L9j0+EvOTqwTAweu6RFcAWSaTX44W7p1p5dBMC/ewu4D1cyNUxilqlmcFM7RM438crGVObG3S3no9GU2rYzVhoUjAevf1/nxFopO1eunNs1mZVt+GbkvJunB6bPC2fRuCfPiLBi9DQC0dvRw0dnB5NCx96Q4F7XbrF8ew4o3viNlhoJptA+PzQ7nq+N1LJkToQebTX48MW8SGcm3fa/sPsGba20D1/SsWAjhlFLmAjk+Ri92Zc/l2beOUrAtlSjrOIo/XD5op/u2pwHQ1yfZ/P4p5seHkhht1qbz3TUKt6daCGFXW1vCtAgTeS/PYU3uETasiNXTfrfV1rexdc9pVqVFsSotSnNXCCHWu4sfrjstAxwA0yJMfP3OEvYerGHllkNYggOIVMYwymigqfU6vza0EzohgA82L0AJDtCh9JfNrQ0JVlOeiNqTfYxeZGfFkZ0VR3PbDRqbu7j5Vx9mkx+RyhiEuOPxCiBXCDGotiNRjFobi5TSDuRofrPJD7PJb6jH8odK74jBAzZgl1IW4vlnb1D7uy+wCq+gP4X5nmIfKPhB238P/DedIYgDawTL4QAAAABJRU5ErkJggg==",
+						"contentType": "image/png",
+						"width": 22,
+						"height": 22,
+						"angle": 0,
+						"xoffset": 0,
+						"yoffset": 0
+					},
+					"value": "25",
+					"label": "Water Source"
+				},
+				{
+					"symbol": {
+						"type": "esriPMS",
+						"url": "19f1c28841aed80c28d46192c0f25288",
+						"imageData": "iVBORw0KGgoAAAANSUhEUgAAAEYAAAAiCAYAAADiS6/IAAAACXBIWXMAAA7EAAAOxAGVKw4bAAADB0lEQVRoge2ZT0iTcRjHP8/LhtChCA8hSO4g2s2BHjwkaQdlDQnEw9C2oA7iCoT01OwPouCWerPs4CGLmGJdZA06zfQiSNNCqECi8BJ1qUORyp4OIsy1mbpp/XLf4+953uf7ez+8z/t7f7/XRl5pZfvbE/hXlQeTQXkwGWQkGFU9JyLP9tPDSDDAA1WNAldF5Nt+GJgKRgAvUKOqXhGZzbWBSWAKACcwlzTmAKZVtR+4LSJruTIzCUw98AToSSQSWJa1OW4B14F6VW0VkXe5MDMJzBRwHnhYV1d3NBwOU1RUlByvAuKqek1E7mdrZhIYgCjgXF1dfe90OhkbG6OhoSE5fgQYUVU3cFlEPu/VyDQwACszMzNfA4FAodvtpquri97eXmy2LbfSCLxW1Ut7XdZNBIPNZiMYDFJbW4vX62V6eppwOExJSUly2gkgoqp3gS4R+bErj1xO+KDlcrlYWFjA4/HgdDoZHR2lqakpNc0PnFXVFhGJ77S20WAAiouLicViBAIBmpub8fv9DA4OUlBQkJx2CphT1RvAHRFJ/Kmu8WDg99aanZ1lYmKCsrKy5DQ70A+4VNUnIh+3rbldUFXnM8VaWlpO7mbyuVRbW9txEUkbq66uJhKJUFlZyfDwMD6fLzXlDPBKVf0i8jiTx3/xxKSTqmZ1/bZgRKQqq+r7JFX9AhSmjkejUXw+HxUVFYyPj1NeXp7u8heAN6tWMkXr6+t0d3cTCoVob29naGgo9eULsAbcBEKH4uW7srKCx+NhaWmJycnJdMs1wBugVURe7rSu0WA2W6e0tJR4PI7D4UiXdg/oPBQfeJutMzAwQGdnJ319falbAoBPbOyXInvxMBFMcU1NzbHl5WUikUjqJnJTUxyyTaQLGLPb7bq4uJh67ADwnY22GcnWyCQwjcBToCcWi3VYlpW6XM8DF0TkbS7MTALzHDgNzFmW1ZE0ngCCwK3DerT5k63nvQAf2PhYm8m1mUlgkqXAI+BK/vfJVl3M/3BLo/2GAoaCOQjlwWRQHkwG/QKCF+mpTNiu1QAAAABJRU5ErkJggg==",
+						"contentType": "image/png",
+						"width": 52,
+						"height": 25,
+						"angle": 0,
+						"xoffset": 0,
+						"yoffset": 0
+					},
+					"value": "26",
+					"label": "Wind Speed Direction"
+				}
+			],
+			"fieldDelimiter": ",",
+			"authoringInfo": {
+				"colorRamp": {
+					"type": "multipart",
+					"colorRamps": [
+						{
+							"type": "algorithmic",
+							"algorithm": "esriCIELabAlgorithm",
+							"fromColor": [
+								242,
+								252,
+								204,
+								255
+							],
+							"toColor": [
+								242,
+								252,
+								204,
+								255
+							]
+						},
+						{
+							"type": "algorithmic",
+							"algorithm": "esriCIELabAlgorithm",
+							"fromColor": [
+								245,
+								179,
+								252,
+								255
+							],
+							"toColor": [
+								245,
+								179,
+								252,
+								255
+							]
+						},
+						{
+							"type": "algorithmic",
+							"algorithm": "esriCIELabAlgorithm",
+							"fromColor": [
+								179,
+								223,
+								252,
+								255
+							],
+							"toColor": [
+								179,
+								223,
+								252,
+								255
+							]
+						},
+						{
+							"type": "algorithmic",
+							"algorithm": "esriCIELabAlgorithm",
+							"fromColor": [
+								252,
+								189,
+								190,
+								255
+							],
+							"toColor": [
+								252,
+								189,
+								190,
+								255
+							]
+						},
+						{
+							"type": "algorithmic",
+							"algorithm": "esriCIELabAlgorithm",
+							"fromColor": [
+								179,
+								252,
+								235,
+								255
+							],
+							"toColor": [
+								179,
+								252,
+								235,
+								255
+							]
+						},
+						{
+							"type": "algorithmic",
+							"algorithm": "esriCIELabAlgorithm",
+							"fromColor": [
+								233,
+								212,
+								252,
+								255
+							],
+							"toColor": [
+								233,
+								212,
+								252,
+								255
+							]
+						},
+						{
+							"type": "algorithmic",
+							"algorithm": "esriCIELabAlgorithm",
+							"fromColor": [
+								190,
+								252,
+								187,
+								255
+							],
+							"toColor": [
+								190,
+								252,
+								187,
+								255
+							]
+						},
+						{
+							"type": "algorithmic",
+							"algorithm": "esriCIELabAlgorithm",
+							"fromColor": [
+								188,
+								179,
+								252,
+								255
+							],
+							"toColor": [
+								188,
+								179,
+								252,
+								255
+							]
+						},
+						{
+							"type": "algorithmic",
+							"algorithm": "esriCIELabAlgorithm",
+							"fromColor": [
+								252,
+								216,
+								182,
+								255
+							],
+							"toColor": [
+								252,
+								216,
+								182,
+								255
+							]
+						},
+						{
+							"type": "algorithmic",
+							"algorithm": "esriCIELabAlgorithm",
+							"fromColor": [
+								252,
+								184,
+								218,
+								255
+							],
+							"toColor": [
+								252,
+								184,
+								218,
+								255
+							]
+						},
+						{
+							"type": "algorithmic",
+							"algorithm": "esriCIELabAlgorithm",
+							"fromColor": [
+								210,
+								247,
+								252,
+								255
+							],
+							"toColor": [
+								210,
+								247,
+								252,
+								255
+							]
+						},
+						{
+							"type": "algorithmic",
+							"algorithm": "esriCIELabAlgorithm",
+							"fromColor": [
+								210,
+								252,
+								217,
+								255
+							],
+							"toColor": [
+								210,
+								252,
+								217,
+								255
+							]
+						},
+						{
+							"type": "algorithmic",
+							"algorithm": "esriCIELabAlgorithm",
+							"fromColor": [
+								252,
+								220,
+								215,
+								255
+							],
+							"toColor": [
+								252,
+								220,
+								215,
+								255
+							]
+						},
+						{
+							"type": "algorithmic",
+							"algorithm": "esriCIELabAlgorithm",
+							"fromColor": [
+								252,
+								212,
+								233,
+								255
+							],
+							"toColor": [
+								252,
+								212,
+								233,
+								255
+							]
+						},
+						{
+							"type": "algorithmic",
+							"algorithm": "esriCIELabAlgorithm",
+							"fromColor": [
+								233,
+								252,
+								179,
+								255
+							],
+							"toColor": [
+								233,
+								252,
+								179,
+								255
+							]
+						},
+						{
+							"type": "algorithmic",
+							"algorithm": "esriCIELabAlgorithm",
+							"fromColor": [
+								189,
+								202,
+								252,
+								255
+							],
+							"toColor": [
+								189,
+								202,
+								252,
+								255
+							]
+						}
+					]
+				}
+			},
+			"visualVariables": [
+				{
+					"type": "rotationInfo",
+					"field": "rotation",
+					"rotationType": "geographic"
+				}
+			]
+		},
+		"scaleSymbols": true,
+		"transparency": 0,
+		"labelingInfo": [
+			{
+				"labelExpression": "[Description]",
+				"labelPlacement": "esriServerPointLabelPlacementAboveRight",
+				"deconflictionStrategy": "dynamic",
+				"removeDuplicates": "none",
+				"stackLabel": false,
+				"useCodedValues": true,
+				"maxScale": 0,
+				"minScale": 0,
+				"name": "Default",
+				"priority": 3,
+				"symbol": {
+					"type": "esriTS",
+					"color": [
+						0,
+						0,
+						0,
+						255
+					],
+					"backgroundColor": null,
+					"borderLineColor": null,
+					"borderLineSize": null,
+					"verticalAlignment": "bottom",
+					"horizontalAlignment": "center",
+					"rightToLeft": false,
+					"angle": 0,
+					"xoffset": 0,
+					"yoffset": 0,
+					"kerning": true,
+					"haloColor": [
+						255,
+						255,
+						255,
+						255
+					],
+					"haloSize": 2,
+					"font": {
+						"family": "Arial",
+						"size": 10,
+						"style": "normal",
+						"weight": "normal",
+						"decoration": "none"
+					}
+				}
+			}
+		]
+	},
+	"hasM": false,
+	"hasZ": false,
+	"allowGeometryUpdates": true,
+	"allowTrueCurvesUpdates": false,
+	"onlyAllowTrueCurveUpdatesByTrueCurveClients": true,
+	"hasAttachments": true,
+	"supportsAttachmentsByUploadId": true,
+	"supportsApplyEditsWithGlobalIds": false,
+	"htmlPopupType": "esriServerHTMLPopupTypeAsHTMLText",
+	"objectIdField": "objectid",
+	"globalIdField": "",
+	"displayField": "description",
+	"typeIdField": "eventtype",
+	"subtypeField": "",
+	"fields": [
+		{
+			"name": "objectid",
+			"type": "esriFieldTypeOID",
+			"alias": "OBJECTID",
+			"domain": null,
+			"editable": false,
+			"nullable": false,
+			"defaultValue": null,
+			"modelName": "OBJECTID"
+		},
+		{
+			"name": "rotation",
+			"type": "esriFieldTypeSmallInteger",
+			"alias": "Rotation",
+			"domain": null,
+			"editable": true,
+			"nullable": true,
+			"defaultValue": null,
+			"modelName": "Rotation"
+		},
+		{
+			"name": "description",
+			"type": "esriFieldTypeString",
+			"alias": "Description",
+			"domain": null,
+			"editable": true,
+			"nullable": true,
+			"length": 75,
+			"defaultValue": null,
+			"modelName": "Description"
+		},
+		{
+			"name": "eventdate",
+			"type": "esriFieldTypeDate",
+			"alias": "Date",
+			"domain": null,
+			"editable": true,
+			"nullable": true,
+			"length": 8,
+			"defaultValue": null,
+			"modelName": "EventDate"
+		},
+		{
+			"name": "eventtype",
+			"type": "esriFieldTypeInteger",
+			"alias": "Type",
+			"domain": null,
+			"editable": true,
+			"nullable": true,
+			"defaultValue": null,
+			"modelName": "EventType"
+		},
+		{
+			"name": "created_user",
+			"type": "esriFieldTypeString",
+			"alias": "created_user",
+			"domain": null,
+			"editable": false,
+			"nullable": true,
+			"length": 255,
+			"defaultValue": null,
+			"modelName": "created_user"
+		},
+		{
+			"name": "created_date",
+			"type": "esriFieldTypeDate",
+			"alias": "created_date",
+			"domain": null,
+			"editable": false,
+			"nullable": true,
+			"length": 8,
+			"defaultValue": null,
+			"modelName": "created_date"
+		},
+		{
+			"name": "last_edited_user",
+			"type": "esriFieldTypeString",
+			"alias": "last_edited_user",
+			"domain": null,
+			"editable": false,
+			"nullable": true,
+			"length": 255,
+			"defaultValue": null,
+			"modelName": "last_edited_user"
+		},
+		{
+			"name": "last_edited_date",
+			"type": "esriFieldTypeDate",
+			"alias": "last_edited_date",
+			"domain": null,
+			"editable": false,
+			"nullable": true,
+			"length": 8,
+			"defaultValue": null,
+			"modelName": "last_edited_date"
+		}
+	],
+	"geometryField": {
+		"name": "shape",
+		"type": "esriFieldTypeGeometry",
+		"alias": "Shape",
+		"domain": null,
+		"editable": true,
+		"nullable": true,
+		"defaultValue": null,
+		"modelName": "Shape"
+	},
+	"indexes": [
+		{
+			"name": "r147_sde_rowid_uk",
+			"fields": "objectid",
+			"isAscending": true,
+			"isUnique": true,
+			"description": ""
+		},
+		{
+			"name": "a92_ix1",
+			"fields": "shape",
+			"isAscending": true,
+			"isUnique": true,
+			"description": ""
+		}
+	],
+	"datesInUnknownTimezone": false,
+	"dateFieldsTimeReference": {
+		"timeZone": "UTC",
+		"respectsDaylightSaving": false
+	},
+	"preferredTimeReference": null,
+	"types": [
+		{
+			"id": 17,
+			"name": "Telephone",
+			"domains": {
+				
+			},
+			"templates": [
+				{
+					"name": "MediVac Site",
+					"description": "",
+					"prototype": {
+						"attributes": {
+							"eventtype": 17
+						}
+					},
+					"drawingTool": "esriFeatureEditToolPoint"
+				}
+			]
+		},
+		{
+			"id": 1,
+			"name": "Aerial Hazard",
+			"domains": {
+				
+			},
+			"templates": [
+				{
+					"name": "Aerial Hazard",
+					"description": "",
+					"prototype": {
+						"attributes": {
+							"eventtype": 1
+						}
+					},
+					"drawingTool": "esriFeatureEditToolPoint"
+				}
+			]
+		},
+		{
+			"id": 4,
+			"name": "Camp",
+			"domains": {
+				
+			},
+			"templates": [
+				{
+					"name": "Camp",
+					"description": "",
+					"prototype": {
+						"attributes": {
+							"eventtype": 4
+						}
+					},
+					"drawingTool": "esriFeatureEditToolPoint"
+				}
+			]
+		},
+		{
+			"id": 0,
+			"name": "Division Break",
+			"domains": {
+				
+			},
+			"templates": [
+				{
+					"name": "Division Break",
+					"description": "",
+					"prototype": {
+						"attributes": {
+							"eventtype": 0
+						}
+					},
+					"drawingTool": "esriFeatureEditToolPoint"
+				}
+			]
+		},
+		{
+			"id": 6,
+			"name": "Drop Point",
+			"domains": {
+				
+			},
+			"templates": [
+				{
+					"name": "Drop Point",
+					"description": "",
+					"prototype": {
+						"attributes": {
+							"eventtype": 6
+						}
+					},
+					"drawingTool": "esriFeatureEditToolPoint"
+				}
+			]
+		},
+		{
+			"id": 7,
+			"name": "Fire Origin",
+			"domains": {
+				
+			},
+			"templates": [
+				{
+					"name": "Fire Origin",
+					"description": "",
+					"prototype": {
+						"attributes": {
+							"eventtype": 7
+						}
+					},
+					"drawingTool": "esriFeatureEditToolPoint"
+				}
+			]
+		},
+		{
+			"id": 8,
+			"name": "Fire Station",
+			"domains": {
+				
+			},
+			"templates": [
+				{
+					"name": "Fire Station",
+					"description": "",
+					"prototype": {
+						"attributes": {
+							"eventtype": 8
+						}
+					},
+					"drawingTool": "esriFeatureEditToolPoint"
+				}
+			]
+		},
+		{
+			"id": 9,
+			"name": "First Aid Station",
+			"domains": {
+				
+			},
+			"templates": [
+				{
+					"name": "First Aid Station",
+					"description": "",
+					"prototype": {
+						"attributes": {
+							"eventtype": 9
+						}
+					},
+					"drawingTool": "esriFeatureEditToolPoint"
+				}
+			]
+		},
+		{
+			"id": 10,
+			"name": "Helibase",
+			"domains": {
+				
+			},
+			"templates": [
+				{
+					"name": "Helibase",
+					"description": "",
+					"prototype": {
+						"attributes": {
+							"eventtype": 10
+						}
+					},
+					"drawingTool": "esriFeatureEditToolPoint"
+				}
+			]
+		},
+		{
+			"id": 12,
+			"name": "Hot Spot",
+			"domains": {
+				
+			},
+			"templates": [
+				{
+					"name": "Hot Spot",
+					"description": "",
+					"prototype": {
+						"attributes": {
+							"eventtype": 12
+						}
+					},
+					"drawingTool": "esriFeatureEditToolPoint"
+				}
+			]
+		},
+		{
+			"id": 16,
+			"name": "Lookout",
+			"domains": {
+				
+			},
+			"templates": [
+				{
+					"name": "Lookout",
+					"description": "",
+					"prototype": {
+						"attributes": {
+							"eventtype": 16
+						}
+					},
+					"drawingTool": "esriFeatureEditToolPoint"
+				}
+			]
+		},
+		{
+			"id": 18,
+			"name": "Mobile Weather Unit",
+			"domains": {
+				
+			},
+			"templates": [
+				{
+					"name": "Mobile Weather Unit",
+					"description": "",
+					"prototype": {
+						"attributes": {
+							"eventtype": 18
+						}
+					},
+					"drawingTool": "esriFeatureEditToolPoint"
+				}
+			]
+		},
+		{
+			"id": 20,
+			"name": "Safety Zone",
+			"domains": {
+				
+			},
+			"templates": [
+				{
+					"name": "Safety Zone",
+					"description": "",
+					"prototype": {
+						"attributes": {
+							"eventtype": 20
+						}
+					},
+					"drawingTool": "esriFeatureEditToolPoint"
+				}
+			]
+		},
+		{
+			"id": 22,
+			"name": "Spot Fire",
+			"domains": {
+				
+			},
+			"templates": [
+				{
+					"name": "Spot Fire",
+					"description": "",
+					"prototype": {
+						"attributes": {
+							"eventtype": 22
+						}
+					},
+					"drawingTool": "esriFeatureEditToolPoint"
+				}
+			]
+		},
+		{
+			"id": 25,
+			"name": "Water Source",
+			"domains": {
+				
+			},
+			"templates": [
+				{
+					"name": "Water Source",
+					"description": "",
+					"prototype": {
+						"attributes": {
+							"eventtype": 25
+						}
+					},
+					"drawingTool": "esriFeatureEditToolPoint"
+				}
+			]
+		},
+		{
+			"id": 26,
+			"name": "Wind Speed Direction",
+			"domains": {
+				
+			},
+			"templates": [
+				{
+					"name": "Wind Speed Direction",
+					"description": "",
+					"prototype": {
+						"attributes": {
+							"eventtype": 26
+						}
+					},
+					"drawingTool": "esriFeatureEditToolPoint"
+				}
+			]
+		}
+	],
+	"templates": [],
+	"maxRecordCount": 1000,
+	"supportedQueryFormats": "JSON, geoJSON, PBF",
+	"supportedExportFormats": "sqlite,filegdb",
+	"capabilities": "Query,Create,Update,Delete,Uploads,Editing",
+	"useStandardizedQueries": true,
+	"supportedSpatialRelationships": [
+		"esriSpatialRelIntersects",
+		"esriSpatialRelContains",
+		"esriSpatialRelCrosses",
+		"esriSpatialRelEnvelopeIntersects",
+		"esriSpatialRelIndexIntersects",
+		"esriSpatialRelOverlaps",
+		"esriSpatialRelTouches",
+		"esriSpatialRelWithin",
+		"esriSpatialRelRelation"
+	],
+	"attachmentProperties": [
+		{
+			"name": "id",
+			"fieldName": "attachmentid",
+			"isEnabled": true
+		},
+		{
+			"name": "globalId",
+			"fieldName": "GLOBALID",
+			"isEnabled": false
+		},
+		{
+			"name": "name",
+			"fieldName": "att_name",
+			"isEnabled": true
+		},
+		{
+			"name": "size",
+			"fieldName": "data_size",
+			"isEnabled": true
+		},
+		{
+			"name": "contentType",
+			"fieldName": "content_type",
+			"isEnabled": true
+		},
+		{
+			"name": "keywords",
+			"fieldName": "KEYWORDS",
+			"isEnabled": false
+		},
+		{
+			"name": "exifInfo",
+			"fieldName": "EXIFINFO",
+			"isEnabled": false
+		}
+	],
+	"attachmentFields": [
+		{
+			"name": "attachmentid",
+			"type": "esriFieldTypeOID",
+			"alias": "attachmentid",
+			"domain": null,
+			"editable": false,
+			"nullable": false,
+			"defaultValue": null
+		},
+		{
+			"name": "att_name",
+			"type": "esriFieldTypeString",
+			"alias": "att_name",
+			"domain": null,
+			"editable": true,
+			"nullable": false,
+			"length": 250,
+			"defaultValue": null
+		},
+		{
+			"name": "data_size",
+			"type": "esriFieldTypeInteger",
+			"alias": "data_size",
+			"domain": null,
+			"editable": true,
+			"nullable": false,
+			"defaultValue": null
+		},
+		{
+			"name": "content_type",
+			"type": "esriFieldTypeString",
+			"alias": "content_type",
+			"domain": null,
+			"editable": true,
+			"nullable": false,
+			"length": 150,
+			"defaultValue": null
+		}
+	],
+	"standardMaxRecordCount": 32000,
+	"tileMaxRecordCount": 8000,
+	"standardMaxRecordCountNoGeometry": 32000,
+	"maxRecordCountFactor": 1
+}

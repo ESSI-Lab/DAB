@@ -22,30 +22,20 @@
 
 		<dependency>
 			<groupId>edu.ucar</groupId>
-			<artifactId>cdm</artifactId>
-			<!-- this CDM version imports Quartz 2.2.0 while we are using the 2.3.0 -->
-			<exclusions>
-				<exclusion>
-					<groupId>org.quartz-scheduler</groupId>
-					<artifactId>quartz</artifactId>
-				</exclusion>
-			</exclusions>
+			<artifactId>cdm</artifactId>			
 		</dependency>
 
 		<dependency>
 			<groupId>edu.ucar</groupId>
 			<artifactId>netcdf4</artifactId>
 		</dependency>
+		
+		<dependency>
+			<groupId>edu.ucar</groupId>
+			<artifactId>opendap</artifactId>
+		</dependency>
 
 	</dependencies>
-
-	<repositories>
-		<repository>
-			<id>unidata</id>
-			<name>Unidata</name>
-			<url>https://artifacts.unidata.ucar.edu/content/repositories/unidata-releases/</url>
-		</repository>
-	</repositories>
 
 	<profiles>
 		<profile>

@@ -1,0 +1,45 @@
+{
+    "dataset-info": {
+      "abstract": null,
+      "site-information": "Chamençon,Dora di Valgrisenche,A",
+      "spatial-extent": "45.6783,7.10742,1238",
+      "station-id": 1000,
+      "station-name": "Arvier - Chamençon",
+      "temporal-extent": "2001-09-21T13:00:00Z/2023-03-02T11:28:21Z",
+      "territory-of-origin-of-data": "Valle d'Aosta,Aosta,Arvier",
+      "topic-category": "Meteo"
+    },
+    "sensor-info": {
+        "observed-property": "Portata",
+        "temporal-extent": "2023-03-02T14:14:29Z",
+        "time-series-id": 672,
+        "units-of-measure": "m³/sec"
+    },
+    "organization-info":  {
+    "organization": {
+    "conditions-for-access-and-use": "URI: https://creativecommons.org/licenses/by/4.0/legalcode",
+    "creator-organization": "Centro Funzionale regionale - Centre fonctionnel régional. Email: u-idrografico@regione.vda.it",
+    "limitations-on-public-access": "No limitations to public access. URI: https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/noLimitations",
+    "point-of-contact-organization": "Regione autonoma Valle d'Aosta - Région autonome Vallée d'Aoste. Presidenza della Regione - Présidence de la Région. Dipartimento protezione civile e vigili del fuoco -  Département de la protection civile et des sapeurs-pompiers. Centro Funzionale regionale - Centre fonctionnel régional. Via Promis, 2/a - 11100 Aosta (AO). Tel./Tél. +39 0165 272283-2749 - Fax/Télécopie +39 0165 272291"
+  }
+},
+"parameter-info": {
+  "parameters": [
+    {
+      "keywords": "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/224",
+      "numerical-resolution": 1,
+      "observed-property": "Temperatura",
+      "parameter-id": 1,
+      "units-of-measure": "°C"
+    },
+    {
+      "keywords": null,
+      "numerical-resolution": 1,
+      "observed-property": "Portata",
+      "parameter-id": 30,
+      "units-of-measure": "m³/sec"
+    }
+  ]
+}
+    
+}

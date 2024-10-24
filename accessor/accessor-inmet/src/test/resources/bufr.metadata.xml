@@ -1,0 +1,2836 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<collection>
+    <record>
+        <element>
+            <name>WMO_block_number</name>
+            <value>85</value>
+        </element>
+        <element>
+            <name>WMO_station_number</name>
+            <value>195</value>
+        </element>
+        <element>
+            <name>Type_of_station</name>
+            <units>CodeTable 0-2-1</units>
+            <value>Manned</value>
+        </element>
+        <element>
+            <name>Year</name>
+            <units>a</units>
+            <value>2019</value>
+        </element>
+        <element>
+            <name>Month</name>
+            <units>mon</units>
+            <value>11</value>
+        </element>
+        <element>
+            <name>Day</name>
+            <units>d</units>
+            <value>5</value>
+        </element>
+        <element>
+            <name>Hour</name>
+            <units>h</units>
+            <value>12</value>
+        </element>
+        <element>
+            <name>Minute</name>
+            <units>min</units>
+            <value>0</value>
+        </element>
+        <element>
+            <name>Latitude_high_accuracy</name>
+            <units>degrees_north</units>
+            <value>-16.600002</value>
+        </element>
+        <element>
+            <name>Longitude_high_accuracy</name>
+            <units>degrees_east</units>
+            <value>-62.450005</value>
+        </element>
+        <element>
+            <name>Height_of_station_ground_above_mean_sea_level</name>
+            <units>m</units>
+            <value>534.0</value>
+        </element>
+        <element>
+            <name>Characteristic_of_pressure_tendency</name>
+            <units>CodeTable 0-10-63</units>
+            <value>Increasing (steadily or unsteadily)</value>
+        </element>
+        <element>
+            <name>Horizontal_visibility</name>
+            <units>m</units>
+            <value>20000.0</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Value not applicable</value>
+        </element>
+        <element>
+            <name>Cloud_type</name>
+            <units>CodeTable 0-20-12</units>
+            <value>No CL clouds</value>
+        </element>
+        <element>
+            <name>Cloud_type-2</name>
+            <units>CodeTable 0-20-12</units>
+            <value>No CM clouds</value>
+        </element>
+        <element>
+            <name>Cloud_type-3</name>
+            <units>CodeTable 0-20-12</units>
+            <value>No CH clouds</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Low cloud</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Middle cloud</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>High cloud</value>
+        </element>
+        <element>
+            <name>State_of_the_ground_with_or_without_snow</name>
+            <units>CodeTable 0-20-62</units>
+            <value>Surface of ground dry (without cracks and no appreciable amount of dust or loose sand)</value>
+        </element>
+        <element>
+            <name>Present_weather</name>
+            <units>CodeTable 0-20-3</units>
+            <value>No significant phenomenon to report, present and past weather omitted</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement</name>
+            <units>h</units>
+            <value>-6.0</value>
+        </element>
+        <element>
+            <name>Past_weather_1</name>
+            <units>CodeTable 0-20-4</units>
+            <value>No significant weather observed</value>
+        </element>
+        <element>
+            <name>Past_weather_2</name>
+            <units>CodeTable 0-20-5</units>
+            <value>No significant weather observed</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-2</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-2</name>
+            <units>h</units>
+            <value>-1.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-3</name>
+            <units>h</units>
+            <value>-1.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-4</name>
+            <units>h</units>
+            <value>-12.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-5</name>
+            <units>h</units>
+            <value>0.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-6</name>
+            <units>h</units>
+            <value>-12.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-7</name>
+            <units>h</units>
+            <value>0.0</value>
+        </element>
+        <element>
+            <name>Time_significance</name>
+            <units>CodeTable 0-8-21</units>
+            <value>Time averaged (see Note 1)</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-8</name>
+            <units>min</units>
+            <value>-10.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-9</name>
+            <units>min</units>
+            <value>-10.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-9</name>
+            <units>min</units>
+            <value>-360.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-10</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-11</name>
+            <units>h</units>
+            <value>-1.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-11</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>history</name>
+            <value>Read using CDM BufrIosp2</value>
+        </element>
+        <element>
+            <name>location</name>
+            <value>/tmp/eu.essi_lab.bufr.MockedBUFRDownloader6234989481850314606/A_IS_MI_03_SLLP_051200-xxx_C_SBBR_20191107T16_0011_693.bfr</value>
+        </element>
+        <element>
+            <name>BUFR:categoryName</name>
+            <value>Surface data - land</value>
+        </element>
+        <element>
+            <name>BUFR:subCategoryName</name>
+            <value>Main synoptic observations from fixed-land stations (SYNOP)</value>
+        </element>
+        <element>
+            <name>BUFR:centerName</name>
+            <value>255.0 (Not to be used)</value>
+        </element>
+        <element>
+            <name>BUFR:category</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:subCategory</name>
+            <value>2</value>
+        </element>
+        <element>
+            <name>BUFR:localSubCategory</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:centerId</name>
+            <value>255</value>
+        </element>
+        <element>
+            <name>BUFR:subCenter</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:table</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:tableVersion</name>
+            <value>22</value>
+        </element>
+        <element>
+            <name>BUFR:localTableVersion</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>Conventions</name>
+            <value>BUFR/CDM</value>
+        </element>
+        <element>
+            <name>BUFR:edition</name>
+            <value>4</value>
+        </element>
+        <element>
+            <name>WMO_Header</name>
+            <value>59692ISMI03 SLLP 051200</value>
+        </element>
+        <element>
+            <name>_CoordSysBuilder</name>
+            <value>ucar.nc2.dataset.conv.DefaultConvention</value>
+        </element>
+    </record>
+    <record>
+        <element>
+            <name>WMO_block_number</name>
+            <value>85</value>
+        </element>
+        <element>
+            <name>WMO_station_number</name>
+            <value>195</value>
+        </element>
+        <element>
+            <name>Type_of_station</name>
+            <units>CodeTable 0-2-1</units>
+            <value>Manned</value>
+        </element>
+        <element>
+            <name>Year</name>
+            <units>a</units>
+            <value>2019</value>
+        </element>
+        <element>
+            <name>Month</name>
+            <units>mon</units>
+            <value>11</value>
+        </element>
+        <element>
+            <name>Day</name>
+            <units>d</units>
+            <value>5</value>
+        </element>
+        <element>
+            <name>Hour</name>
+            <units>h</units>
+            <value>15</value>
+        </element>
+        <element>
+            <name>Minute</name>
+            <units>min</units>
+            <value>0</value>
+        </element>
+        <element>
+            <name>Latitude_high_accuracy</name>
+            <units>degrees_north</units>
+            <value>-16.600002</value>
+        </element>
+        <element>
+            <name>Longitude_high_accuracy</name>
+            <units>degrees_east</units>
+            <value>-62.450005</value>
+        </element>
+        <element>
+            <name>Height_of_station_ground_above_mean_sea_level</name>
+            <units>m</units>
+            <value>534.0</value>
+        </element>
+        <element>
+            <name>Characteristic_of_pressure_tendency</name>
+            <units>CodeTable 0-10-63</units>
+            <value>Increasing, then steady; or increasing, then increasing more slowly</value>
+        </element>
+        <element>
+            <name>Horizontal_visibility</name>
+            <units>m</units>
+            <value>20000.0</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Low cloud</value>
+        </element>
+        <element>
+            <name>Cloud_type</name>
+            <units>CodeTable 0-20-12</units>
+            <value>Cumulus humilis or Cumulus fractus other than of bad weather,* or both</value>
+        </element>
+        <element>
+            <name>Cloud_type-2</name>
+            <units>CodeTable 0-20-12</units>
+            <value>No CM clouds</value>
+        </element>
+        <element>
+            <name>Cloud_type-3</name>
+            <units>CodeTable 0-20-12</units>
+            <value>No CH clouds</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Low cloud</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Middle cloud</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>High cloud</value>
+        </element>
+        <element>
+            <name>Present_weather</name>
+            <units>CodeTable 0-20-3</units>
+            <value>No significant phenomenon to report, present and past weather omitted</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement</name>
+            <units>h</units>
+            <value>-3.0</value>
+        </element>
+        <element>
+            <name>Past_weather_1</name>
+            <units>CodeTable 0-20-4</units>
+            <value>No significant weather observed</value>
+        </element>
+        <element>
+            <name>Past_weather_2</name>
+            <units>CodeTable 0-20-5</units>
+            <value>No significant weather observed</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-2</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-2</name>
+            <units>h</units>
+            <value>-1.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-4</name>
+            <units>h</units>
+            <value>-12.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-5</name>
+            <units>h</units>
+            <value>0.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-6</name>
+            <units>h</units>
+            <value>-12.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-7</name>
+            <units>h</units>
+            <value>0.0</value>
+        </element>
+        <element>
+            <name>Time_significance</name>
+            <units>CodeTable 0-8-21</units>
+            <value>Time averaged (see Note 1)</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-8</name>
+            <units>min</units>
+            <value>-10.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-9</name>
+            <units>min</units>
+            <value>-10.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-9</name>
+            <units>min</units>
+            <value>-180.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-10</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-11</name>
+            <units>h</units>
+            <value>-1.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-11</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>history</name>
+            <value>Read using CDM BufrIosp2</value>
+        </element>
+        <element>
+            <name>location</name>
+            <value>/tmp/eu.essi_lab.bufr.MockedBUFRDownloader6234989481850314606/A_IS_MI_02_SLLP_051500-xxx_C_SBBR_20191107T16_0011_701.bfr</value>
+        </element>
+        <element>
+            <name>BUFR:categoryName</name>
+            <value>Surface data - land</value>
+        </element>
+        <element>
+            <name>BUFR:subCategoryName</name>
+            <value>Intermediate synoptic observations from fixed-land stations (SYNOP)</value>
+        </element>
+        <element>
+            <name>BUFR:centerName</name>
+            <value>255.0 (Not to be used)</value>
+        </element>
+        <element>
+            <name>BUFR:category</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:subCategory</name>
+            <value>1</value>
+        </element>
+        <element>
+            <name>BUFR:localSubCategory</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:centerId</name>
+            <value>255</value>
+        </element>
+        <element>
+            <name>BUFR:subCenter</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:table</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:tableVersion</name>
+            <value>22</value>
+        </element>
+        <element>
+            <name>BUFR:localTableVersion</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>Conventions</name>
+            <value>BUFR/CDM</value>
+        </element>
+        <element>
+            <name>BUFR:edition</name>
+            <value>4</value>
+        </element>
+        <element>
+            <name>WMO_Header</name>
+            <value>59700ISMI02 SLLP 051500</value>
+        </element>
+        <element>
+            <name>_CoordSysBuilder</name>
+            <value>ucar.nc2.dataset.conv.DefaultConvention</value>
+        </element>
+    </record>
+    <record>
+        <element>
+            <name>WMO_block_number</name>
+            <value>85</value>
+        </element>
+        <element>
+            <name>WMO_station_number</name>
+            <value>195</value>
+        </element>
+        <element>
+            <name>Type_of_station</name>
+            <units>CodeTable 0-2-1</units>
+            <value>Manned</value>
+        </element>
+        <element>
+            <name>Year</name>
+            <units>a</units>
+            <value>2019</value>
+        </element>
+        <element>
+            <name>Month</name>
+            <units>mon</units>
+            <value>11</value>
+        </element>
+        <element>
+            <name>Day</name>
+            <units>d</units>
+            <value>5</value>
+        </element>
+        <element>
+            <name>Hour</name>
+            <units>h</units>
+            <value>18</value>
+        </element>
+        <element>
+            <name>Minute</name>
+            <units>min</units>
+            <value>0</value>
+        </element>
+        <element>
+            <name>Latitude_high_accuracy</name>
+            <units>degrees_north</units>
+            <value>-16.600002</value>
+        </element>
+        <element>
+            <name>Longitude_high_accuracy</name>
+            <units>degrees_east</units>
+            <value>-62.450005</value>
+        </element>
+        <element>
+            <name>Height_of_station_ground_above_mean_sea_level</name>
+            <units>m</units>
+            <value>534.0</value>
+        </element>
+        <element>
+            <name>Characteristic_of_pressure_tendency</name>
+            <units>CodeTable 0-10-63</units>
+            <value>Decreasing (steadily or unsteadily)</value>
+        </element>
+        <element>
+            <name>Horizontal_visibility</name>
+            <units>m</units>
+            <value>20000.0</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Low cloud</value>
+        </element>
+        <element>
+            <name>Cloud_type</name>
+            <units>CodeTable 0-20-12</units>
+            <value>Cumulus mediocris or congestus, Towering cumulus (TCU), with or without Cumulus of species fractus or humilis or Stratocumulus, all having their bases at the same level</value>
+        </element>
+        <element>
+            <name>Cloud_type-2</name>
+            <units>CodeTable 0-20-12</units>
+            <value>No CM clouds</value>
+        </element>
+        <element>
+            <name>Cloud_type-3</name>
+            <units>CodeTable 0-20-12</units>
+            <value>No CH clouds</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Low cloud</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Middle cloud</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>High cloud</value>
+        </element>
+        <element>
+            <name>Present_weather</name>
+            <units>CodeTable 0-20-3</units>
+            <value>No significant phenomenon to report, present and past weather omitted</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement</name>
+            <units>h</units>
+            <value>-6.0</value>
+        </element>
+        <element>
+            <name>Past_weather_1</name>
+            <units>CodeTable 0-20-4</units>
+            <value>No significant weather observed</value>
+        </element>
+        <element>
+            <name>Past_weather_2</name>
+            <units>CodeTable 0-20-5</units>
+            <value>No significant weather observed</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-2</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-2</name>
+            <units>h</units>
+            <value>-1.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-3</name>
+            <units>h</units>
+            <value>-1.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-4</name>
+            <units>h</units>
+            <value>-12.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-5</name>
+            <units>h</units>
+            <value>0.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-6</name>
+            <units>h</units>
+            <value>-12.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-7</name>
+            <units>h</units>
+            <value>0.0</value>
+        </element>
+        <element>
+            <name>Time_significance</name>
+            <units>CodeTable 0-8-21</units>
+            <value>Time averaged (see Note 1)</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-8</name>
+            <units>min</units>
+            <value>-10.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-9</name>
+            <units>min</units>
+            <value>-10.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-9</name>
+            <units>min</units>
+            <value>-360.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-10</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-11</name>
+            <units>h</units>
+            <value>-1.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-11</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>history</name>
+            <value>Read using CDM BufrIosp2</value>
+        </element>
+        <element>
+            <name>location</name>
+            <value>/tmp/eu.essi_lab.bufr.MockedBUFRDownloader6234989481850314606/A_IS_MI_03_SLLP_051800-xxx_C_SBBR_20191107T16_0011_710.bfr</value>
+        </element>
+        <element>
+            <name>BUFR:categoryName</name>
+            <value>Surface data - land</value>
+        </element>
+        <element>
+            <name>BUFR:subCategoryName</name>
+            <value>Main synoptic observations from fixed-land stations (SYNOP)</value>
+        </element>
+        <element>
+            <name>BUFR:centerName</name>
+            <value>255.0 (Not to be used)</value>
+        </element>
+        <element>
+            <name>BUFR:category</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:subCategory</name>
+            <value>2</value>
+        </element>
+        <element>
+            <name>BUFR:localSubCategory</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:centerId</name>
+            <value>255</value>
+        </element>
+        <element>
+            <name>BUFR:subCenter</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:table</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:tableVersion</name>
+            <value>22</value>
+        </element>
+        <element>
+            <name>BUFR:localTableVersion</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>Conventions</name>
+            <value>BUFR/CDM</value>
+        </element>
+        <element>
+            <name>BUFR:edition</name>
+            <value>4</value>
+        </element>
+        <element>
+            <name>WMO_Header</name>
+            <value>59709ISMI03 SLLP 051800</value>
+        </element>
+        <element>
+            <name>_CoordSysBuilder</name>
+            <value>ucar.nc2.dataset.conv.DefaultConvention</value>
+        </element>
+    </record>
+    <record>
+        <element>
+            <name>WMO_block_number</name>
+            <value>85</value>
+        </element>
+        <element>
+            <name>WMO_station_number</name>
+            <value>195</value>
+        </element>
+        <element>
+            <name>Type_of_station</name>
+            <units>CodeTable 0-2-1</units>
+            <value>Manned</value>
+        </element>
+        <element>
+            <name>Year</name>
+            <units>a</units>
+            <value>2019</value>
+        </element>
+        <element>
+            <name>Month</name>
+            <units>mon</units>
+            <value>11</value>
+        </element>
+        <element>
+            <name>Day</name>
+            <units>d</units>
+            <value>5</value>
+        </element>
+        <element>
+            <name>Hour</name>
+            <units>h</units>
+            <value>21</value>
+        </element>
+        <element>
+            <name>Minute</name>
+            <units>min</units>
+            <value>0</value>
+        </element>
+        <element>
+            <name>Latitude_high_accuracy</name>
+            <units>degrees_north</units>
+            <value>-16.600002</value>
+        </element>
+        <element>
+            <name>Longitude_high_accuracy</name>
+            <units>degrees_east</units>
+            <value>-62.450005</value>
+        </element>
+        <element>
+            <name>Height_of_station_ground_above_mean_sea_level</name>
+            <units>m</units>
+            <value>534.0</value>
+        </element>
+        <element>
+            <name>Characteristic_of_pressure_tendency</name>
+            <units>CodeTable 0-10-63</units>
+            <value>Decreasing (steadily or unsteadily)</value>
+        </element>
+        <element>
+            <name>Horizontal_visibility</name>
+            <units>m</units>
+            <value>20000.0</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Low cloud</value>
+        </element>
+        <element>
+            <name>Cloud_type</name>
+            <units>CodeTable 0-20-12</units>
+            <value>Cumulus mediocris or congestus, Towering cumulus (TCU), with or without Cumulus of species fractus or humilis or Stratocumulus, all having their bases at the same level</value>
+        </element>
+        <element>
+            <name>Cloud_type-2</name>
+            <units>CodeTable 0-20-12</units>
+            <value>No CM clouds</value>
+        </element>
+        <element>
+            <name>Cloud_type-3</name>
+            <units>CodeTable 0-20-12</units>
+            <value>No CH clouds</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Low cloud</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Middle cloud</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>High cloud</value>
+        </element>
+        <element>
+            <name>Present_weather</name>
+            <units>CodeTable 0-20-3</units>
+            <value>No significant phenomenon to report, present and past weather omitted</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement</name>
+            <units>h</units>
+            <value>-3.0</value>
+        </element>
+        <element>
+            <name>Past_weather_1</name>
+            <units>CodeTable 0-20-4</units>
+            <value>No significant weather observed</value>
+        </element>
+        <element>
+            <name>Past_weather_2</name>
+            <units>CodeTable 0-20-5</units>
+            <value>No significant weather observed</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-2</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-2</name>
+            <units>h</units>
+            <value>-1.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-4</name>
+            <units>h</units>
+            <value>-12.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-5</name>
+            <units>h</units>
+            <value>0.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-6</name>
+            <units>h</units>
+            <value>-12.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-7</name>
+            <units>h</units>
+            <value>0.0</value>
+        </element>
+        <element>
+            <name>Time_significance</name>
+            <units>CodeTable 0-8-21</units>
+            <value>Time averaged (see Note 1)</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-8</name>
+            <units>min</units>
+            <value>-10.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-9</name>
+            <units>min</units>
+            <value>-10.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-9</name>
+            <units>min</units>
+            <value>-180.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-10</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-11</name>
+            <units>h</units>
+            <value>-1.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-11</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>history</name>
+            <value>Read using CDM BufrIosp2</value>
+        </element>
+        <element>
+            <name>location</name>
+            <value>/tmp/eu.essi_lab.bufr.MockedBUFRDownloader6234989481850314606/A_IS_MI_02_SLLP_052100-RRA_C_SBBR_20191107T16_0011_718.bfr</value>
+        </element>
+        <element>
+            <name>BUFR:categoryName</name>
+            <value>Surface data - land</value>
+        </element>
+        <element>
+            <name>BUFR:subCategoryName</name>
+            <value>Intermediate synoptic observations from fixed-land stations (SYNOP)</value>
+        </element>
+        <element>
+            <name>BUFR:centerName</name>
+            <value>255.0 (Not to be used)</value>
+        </element>
+        <element>
+            <name>BUFR:category</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:subCategory</name>
+            <value>1</value>
+        </element>
+        <element>
+            <name>BUFR:localSubCategory</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:centerId</name>
+            <value>255</value>
+        </element>
+        <element>
+            <name>BUFR:subCenter</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:table</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:tableVersion</name>
+            <value>22</value>
+        </element>
+        <element>
+            <name>BUFR:localTableVersion</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>Conventions</name>
+            <value>BUFR/CDM</value>
+        </element>
+        <element>
+            <name>BUFR:edition</name>
+            <value>4</value>
+        </element>
+        <element>
+            <name>WMO_Header</name>
+            <value>17ISMI02 SLLP 052100 RRA</value>
+        </element>
+        <element>
+            <name>_CoordSysBuilder</name>
+            <value>ucar.nc2.dataset.conv.DefaultConvention</value>
+        </element>
+    </record>
+    <record>
+        <element>
+            <name>WMO_block_number</name>
+            <value>85</value>
+        </element>
+        <element>
+            <name>WMO_station_number</name>
+            <value>195</value>
+        </element>
+        <element>
+            <name>Type_of_station</name>
+            <units>CodeTable 0-2-1</units>
+            <value>Manned</value>
+        </element>
+        <element>
+            <name>Year</name>
+            <units>a</units>
+            <value>2019</value>
+        </element>
+        <element>
+            <name>Month</name>
+            <units>mon</units>
+            <value>11</value>
+        </element>
+        <element>
+            <name>Day</name>
+            <units>d</units>
+            <value>6</value>
+        </element>
+        <element>
+            <name>Hour</name>
+            <units>h</units>
+            <value>12</value>
+        </element>
+        <element>
+            <name>Minute</name>
+            <units>min</units>
+            <value>0</value>
+        </element>
+        <element>
+            <name>Latitude_high_accuracy</name>
+            <units>degrees_north</units>
+            <value>-16.600002</value>
+        </element>
+        <element>
+            <name>Longitude_high_accuracy</name>
+            <units>degrees_east</units>
+            <value>-62.450005</value>
+        </element>
+        <element>
+            <name>Height_of_station_ground_above_mean_sea_level</name>
+            <units>m</units>
+            <value>534.0</value>
+        </element>
+        <element>
+            <name>Characteristic_of_pressure_tendency</name>
+            <units>CodeTable 0-10-63</units>
+            <value>Increasing (steadily or unsteadily)</value>
+        </element>
+        <element>
+            <name>Horizontal_visibility</name>
+            <units>m</units>
+            <value>2000.0</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Low cloud</value>
+        </element>
+        <element>
+            <name>Cloud_type</name>
+            <units>CodeTable 0-20-12</units>
+            <value>Stratocumulus other than Stratocumulus cumulogenitus</value>
+        </element>
+        <element>
+            <name>Cloud_type-2</name>
+            <units>CodeTable 0-20-12</units>
+            <value>Altostratus opacus or Nimbostratus</value>
+        </element>
+        <element>
+            <name>Cloud_type-3</name>
+            <units>CodeTable 0-20-12</units>
+            <value>CH clouds invisible owing to darkness, fog, blowing dust or sand, or other similar phenomena, or because of a continuous layer of lower clouds</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Low cloud</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Middle cloud</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>High cloud</value>
+        </element>
+        <element>
+            <name>State_of_the_ground_with_or_without_snow</name>
+            <units>CodeTable 0-20-62</units>
+            <value>Surface of ground dry (without cracks and no appreciable amount of dust or loose sand)</value>
+        </element>
+        <element>
+            <name>Present_weather</name>
+            <units>CodeTable 0-20-3</units>
+            <value>Visibility reduced by smoke, e.g. veldt or forest fires, industrial smoke or volcanic ashes</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement</name>
+            <units>h</units>
+            <value>-6.0</value>
+        </element>
+        <element>
+            <name>Past_weather_1</name>
+            <units>CodeTable 0-20-4</units>
+            <value>Cloud covering more than 1/2 of the sky throughout the appropriate period</value>
+        </element>
+        <element>
+            <name>Past_weather_2</name>
+            <units>CodeTable 0-20-5</units>
+            <value>Cloud covering more than 1/2 of the sky throughout the appropriate period</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-2</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-2</name>
+            <units>h</units>
+            <value>-1.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-3</name>
+            <units>h</units>
+            <value>-1.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-4</name>
+            <units>h</units>
+            <value>-12.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-5</name>
+            <units>h</units>
+            <value>0.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-6</name>
+            <units>h</units>
+            <value>-12.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-7</name>
+            <units>h</units>
+            <value>0.0</value>
+        </element>
+        <element>
+            <name>Time_significance</name>
+            <units>CodeTable 0-8-21</units>
+            <value>Time averaged (see Note 1)</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-8</name>
+            <units>min</units>
+            <value>-10.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-9</name>
+            <units>min</units>
+            <value>-10.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-9</name>
+            <units>min</units>
+            <value>-360.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-10</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-11</name>
+            <units>h</units>
+            <value>-1.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-11</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>history</name>
+            <value>Read using CDM BufrIosp2</value>
+        </element>
+        <element>
+            <name>location</name>
+            <value>/tmp/eu.essi_lab.bufr.MockedBUFRDownloader6234989481850314606/A_IS_MI_03_SLLP_061200-xxx_C_SBBR_20191107T16_0011_738.bfr</value>
+        </element>
+        <element>
+            <name>BUFR:categoryName</name>
+            <value>Surface data - land</value>
+        </element>
+        <element>
+            <name>BUFR:subCategoryName</name>
+            <value>Main synoptic observations from fixed-land stations (SYNOP)</value>
+        </element>
+        <element>
+            <name>BUFR:centerName</name>
+            <value>255.0 (Not to be used)</value>
+        </element>
+        <element>
+            <name>BUFR:category</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:subCategory</name>
+            <value>2</value>
+        </element>
+        <element>
+            <name>BUFR:localSubCategory</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:centerId</name>
+            <value>255</value>
+        </element>
+        <element>
+            <name>BUFR:subCenter</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:table</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:tableVersion</name>
+            <value>22</value>
+        </element>
+        <element>
+            <name>BUFR:localTableVersion</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>Conventions</name>
+            <value>BUFR/CDM</value>
+        </element>
+        <element>
+            <name>BUFR:edition</name>
+            <value>4</value>
+        </element>
+        <element>
+            <name>WMO_Header</name>
+            <value>59737ISMI03 SLLP 061200</value>
+        </element>
+        <element>
+            <name>_CoordSysBuilder</name>
+            <value>ucar.nc2.dataset.conv.DefaultConvention</value>
+        </element>
+    </record>
+    <record>
+        <element>
+            <name>WMO_block_number</name>
+            <value>85</value>
+        </element>
+        <element>
+            <name>WMO_station_number</name>
+            <value>195</value>
+        </element>
+        <element>
+            <name>Type_of_station</name>
+            <units>CodeTable 0-2-1</units>
+            <value>Manned</value>
+        </element>
+        <element>
+            <name>Year</name>
+            <units>a</units>
+            <value>2019</value>
+        </element>
+        <element>
+            <name>Month</name>
+            <units>mon</units>
+            <value>11</value>
+        </element>
+        <element>
+            <name>Day</name>
+            <units>d</units>
+            <value>6</value>
+        </element>
+        <element>
+            <name>Hour</name>
+            <units>h</units>
+            <value>15</value>
+        </element>
+        <element>
+            <name>Minute</name>
+            <units>min</units>
+            <value>0</value>
+        </element>
+        <element>
+            <name>Latitude_high_accuracy</name>
+            <units>degrees_north</units>
+            <value>-16.600002</value>
+        </element>
+        <element>
+            <name>Longitude_high_accuracy</name>
+            <units>degrees_east</units>
+            <value>-62.450005</value>
+        </element>
+        <element>
+            <name>Height_of_station_ground_above_mean_sea_level</name>
+            <units>m</units>
+            <value>534.0</value>
+        </element>
+        <element>
+            <name>Characteristic_of_pressure_tendency</name>
+            <units>CodeTable 0-10-63</units>
+            <value>Increasing (steadily or unsteadily)</value>
+        </element>
+        <element>
+            <name>Horizontal_visibility</name>
+            <units>m</units>
+            <value>3000.0</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Low cloud</value>
+        </element>
+        <element>
+            <name>Cloud_type</name>
+            <units>CodeTable 0-20-12</units>
+            <value>Stratocumulus other than Stratocumulus cumulogenitus</value>
+        </element>
+        <element>
+            <name>Cloud_type-2</name>
+            <units>CodeTable 0-20-12</units>
+            <value>Altostratus opacus or Nimbostratus</value>
+        </element>
+        <element>
+            <name>Cloud_type-3</name>
+            <units>CodeTable 0-20-12</units>
+            <value>CH clouds invisible owing to darkness, fog, blowing dust or sand, or other similar phenomena, or because of a continuous layer of lower clouds</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Low cloud</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Middle cloud</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>High cloud</value>
+        </element>
+        <element>
+            <name>Present_weather</name>
+            <units>CodeTable 0-20-3</units>
+            <value>Visibility reduced by smoke, e.g. veldt or forest fires, industrial smoke or volcanic ashes</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement</name>
+            <units>h</units>
+            <value>-3.0</value>
+        </element>
+        <element>
+            <name>Past_weather_1</name>
+            <units>CodeTable 0-20-4</units>
+            <value>Shower(s)</value>
+        </element>
+        <element>
+            <name>Past_weather_2</name>
+            <units>CodeTable 0-20-5</units>
+            <value>Cloud covering more than 1/2 of the sky throughout the appropriate period</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-2</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-2</name>
+            <units>h</units>
+            <value>-1.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-4</name>
+            <units>h</units>
+            <value>-12.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-5</name>
+            <units>h</units>
+            <value>0.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-6</name>
+            <units>h</units>
+            <value>-12.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-7</name>
+            <units>h</units>
+            <value>0.0</value>
+        </element>
+        <element>
+            <name>Time_significance</name>
+            <units>CodeTable 0-8-21</units>
+            <value>Time averaged (see Note 1)</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-8</name>
+            <units>min</units>
+            <value>-10.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-9</name>
+            <units>min</units>
+            <value>-10.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-9</name>
+            <units>min</units>
+            <value>-180.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-10</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-11</name>
+            <units>h</units>
+            <value>-1.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-11</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>history</name>
+            <value>Read using CDM BufrIosp2</value>
+        </element>
+        <element>
+            <name>location</name>
+            <value>/tmp/eu.essi_lab.bufr.MockedBUFRDownloader6234989481850314606/A_IS_MI_02_SLLP_061500-xxx_C_SBBR_20191107T16_0011_752.bfr</value>
+        </element>
+        <element>
+            <name>BUFR:categoryName</name>
+            <value>Surface data - land</value>
+        </element>
+        <element>
+            <name>BUFR:subCategoryName</name>
+            <value>Intermediate synoptic observations from fixed-land stations (SYNOP)</value>
+        </element>
+        <element>
+            <name>BUFR:centerName</name>
+            <value>255.0 (Not to be used)</value>
+        </element>
+        <element>
+            <name>BUFR:category</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:subCategory</name>
+            <value>1</value>
+        </element>
+        <element>
+            <name>BUFR:localSubCategory</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:centerId</name>
+            <value>255</value>
+        </element>
+        <element>
+            <name>BUFR:subCenter</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:table</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:tableVersion</name>
+            <value>22</value>
+        </element>
+        <element>
+            <name>BUFR:localTableVersion</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>Conventions</name>
+            <value>BUFR/CDM</value>
+        </element>
+        <element>
+            <name>BUFR:edition</name>
+            <value>4</value>
+        </element>
+        <element>
+            <name>WMO_Header</name>
+            <value>59751ISMI02 SLLP 061500</value>
+        </element>
+        <element>
+            <name>_CoordSysBuilder</name>
+            <value>ucar.nc2.dataset.conv.DefaultConvention</value>
+        </element>
+    </record>
+    <record>
+        <element>
+            <name>WMO_block_number</name>
+            <value>85</value>
+        </element>
+        <element>
+            <name>WMO_station_number</name>
+            <value>195</value>
+        </element>
+        <element>
+            <name>Type_of_station</name>
+            <units>CodeTable 0-2-1</units>
+            <value>Manned</value>
+        </element>
+        <element>
+            <name>Year</name>
+            <units>a</units>
+            <value>2019</value>
+        </element>
+        <element>
+            <name>Month</name>
+            <units>mon</units>
+            <value>11</value>
+        </element>
+        <element>
+            <name>Day</name>
+            <units>d</units>
+            <value>6</value>
+        </element>
+        <element>
+            <name>Hour</name>
+            <units>h</units>
+            <value>18</value>
+        </element>
+        <element>
+            <name>Minute</name>
+            <units>min</units>
+            <value>0</value>
+        </element>
+        <element>
+            <name>Latitude_high_accuracy</name>
+            <units>degrees_north</units>
+            <value>-16.600002</value>
+        </element>
+        <element>
+            <name>Longitude_high_accuracy</name>
+            <units>degrees_east</units>
+            <value>-62.450005</value>
+        </element>
+        <element>
+            <name>Height_of_station_ground_above_mean_sea_level</name>
+            <units>m</units>
+            <value>534.0</value>
+        </element>
+        <element>
+            <name>Characteristic_of_pressure_tendency</name>
+            <units>CodeTable 0-10-63</units>
+            <value>Decreasing (steadily or unsteadily)</value>
+        </element>
+        <element>
+            <name>Horizontal_visibility</name>
+            <units>m</units>
+            <value>20000.0</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Low cloud</value>
+        </element>
+        <element>
+            <name>Cloud_type</name>
+            <units>CodeTable 0-20-12</units>
+            <value>Stratocumulus other than Stratocumulus cumulogenitus</value>
+        </element>
+        <element>
+            <name>Cloud_type-2</name>
+            <units>CodeTable 0-20-12</units>
+            <value>No CM clouds</value>
+        </element>
+        <element>
+            <name>Cloud_type-3</name>
+            <units>CodeTable 0-20-12</units>
+            <value>No CH clouds</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Low cloud</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Middle cloud</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>High cloud</value>
+        </element>
+        <element>
+            <name>Present_weather</name>
+            <units>CodeTable 0-20-3</units>
+            <value>Visibility reduced by smoke, e.g. veldt or forest fires, industrial smoke or volcanic ashes</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement</name>
+            <units>h</units>
+            <value>-6.0</value>
+        </element>
+        <element>
+            <name>Past_weather_1</name>
+            <units>CodeTable 0-20-4</units>
+            <value>Cloud covering more than 1/2 of the sky throughout the appropriate period</value>
+        </element>
+        <element>
+            <name>Past_weather_2</name>
+            <units>CodeTable 0-20-5</units>
+            <value>Cloud covering more than 1/2 of the sky throughout the appropriate period</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-2</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-2</name>
+            <units>h</units>
+            <value>-1.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-3</name>
+            <units>h</units>
+            <value>-6.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-4</name>
+            <units>h</units>
+            <value>-12.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-5</name>
+            <units>h</units>
+            <value>0.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-6</name>
+            <units>h</units>
+            <value>-12.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-7</name>
+            <units>h</units>
+            <value>0.0</value>
+        </element>
+        <element>
+            <name>Time_significance</name>
+            <units>CodeTable 0-8-21</units>
+            <value>Time averaged (see Note 1)</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-8</name>
+            <units>min</units>
+            <value>-10.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-9</name>
+            <units>min</units>
+            <value>-10.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-9</name>
+            <units>min</units>
+            <value>-360.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-10</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-11</name>
+            <units>h</units>
+            <value>-1.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-11</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>history</name>
+            <value>Read using CDM BufrIosp2</value>
+        </element>
+        <element>
+            <name>location</name>
+            <value>/tmp/eu.essi_lab.bufr.MockedBUFRDownloader6234989481850314606/A_IS_MI_03_SLLP_061800-xxx_C_SBBR_20191107T16_0011_763.bfr</value>
+        </element>
+        <element>
+            <name>BUFR:categoryName</name>
+            <value>Surface data - land</value>
+        </element>
+        <element>
+            <name>BUFR:subCategoryName</name>
+            <value>Main synoptic observations from fixed-land stations (SYNOP)</value>
+        </element>
+        <element>
+            <name>BUFR:centerName</name>
+            <value>255.0 (Not to be used)</value>
+        </element>
+        <element>
+            <name>BUFR:category</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:subCategory</name>
+            <value>2</value>
+        </element>
+        <element>
+            <name>BUFR:localSubCategory</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:centerId</name>
+            <value>255</value>
+        </element>
+        <element>
+            <name>BUFR:subCenter</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:table</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:tableVersion</name>
+            <value>22</value>
+        </element>
+        <element>
+            <name>BUFR:localTableVersion</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>Conventions</name>
+            <value>BUFR/CDM</value>
+        </element>
+        <element>
+            <name>BUFR:edition</name>
+            <value>4</value>
+        </element>
+        <element>
+            <name>WMO_Header</name>
+            <value>59762ISMI03 SLLP 061800</value>
+        </element>
+        <element>
+            <name>_CoordSysBuilder</name>
+            <value>ucar.nc2.dataset.conv.DefaultConvention</value>
+        </element>
+    </record>
+    <record>
+        <element>
+            <name>WMO_block_number</name>
+            <value>85</value>
+        </element>
+        <element>
+            <name>WMO_station_number</name>
+            <value>195</value>
+        </element>
+        <element>
+            <name>Type_of_station</name>
+            <units>CodeTable 0-2-1</units>
+            <value>Manned</value>
+        </element>
+        <element>
+            <name>Year</name>
+            <units>a</units>
+            <value>2019</value>
+        </element>
+        <element>
+            <name>Month</name>
+            <units>mon</units>
+            <value>11</value>
+        </element>
+        <element>
+            <name>Day</name>
+            <units>d</units>
+            <value>6</value>
+        </element>
+        <element>
+            <name>Hour</name>
+            <units>h</units>
+            <value>21</value>
+        </element>
+        <element>
+            <name>Minute</name>
+            <units>min</units>
+            <value>0</value>
+        </element>
+        <element>
+            <name>Latitude_high_accuracy</name>
+            <units>degrees_north</units>
+            <value>-16.600002</value>
+        </element>
+        <element>
+            <name>Longitude_high_accuracy</name>
+            <units>degrees_east</units>
+            <value>-62.450005</value>
+        </element>
+        <element>
+            <name>Height_of_station_ground_above_mean_sea_level</name>
+            <units>m</units>
+            <value>534.0</value>
+        </element>
+        <element>
+            <name>Characteristic_of_pressure_tendency</name>
+            <units>CodeTable 0-10-63</units>
+            <value>Decreasing (steadily or unsteadily)</value>
+        </element>
+        <element>
+            <name>Horizontal_visibility</name>
+            <units>m</units>
+            <value>20000.0</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Observing rules for base of lowest cloud and cloud types of FM 12 SYNOP and FM 13 SHIP apply</value>
+        </element>
+        <element>
+            <name>Cloud_type</name>
+            <units>CodeTable 0-20-12</units>
+            <value>No CL clouds</value>
+        </element>
+        <element>
+            <name>Cloud_type-2</name>
+            <units>CodeTable 0-20-12</units>
+            <value>No CM clouds</value>
+        </element>
+        <element>
+            <name>Cloud_type-3</name>
+            <units>CodeTable 0-20-12</units>
+            <value>Cirrus uncinus or fibratus, or both, progressively invading the sky; they generally thicken as a whole</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Low cloud</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Middle cloud</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>High cloud</value>
+        </element>
+        <element>
+            <name>Present_weather</name>
+            <units>CodeTable 0-20-3</units>
+            <value>Visibility reduced by smoke, e.g. veldt or forest fires, industrial smoke or volcanic ashes</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement</name>
+            <units>h</units>
+            <value>-3.0</value>
+        </element>
+        <element>
+            <name>Past_weather_1</name>
+            <units>CodeTable 0-20-4</units>
+            <value>Cloud covering more than 1/2 of the sky throughout the appropriate period</value>
+        </element>
+        <element>
+            <name>Past_weather_2</name>
+            <units>CodeTable 0-20-5</units>
+            <value>Cloud covering more than 1/2 of the sky throughout the appropriate period</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-2</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-2</name>
+            <units>h</units>
+            <value>-1.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-4</name>
+            <units>h</units>
+            <value>-12.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-5</name>
+            <units>h</units>
+            <value>0.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-6</name>
+            <units>h</units>
+            <value>-12.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-7</name>
+            <units>h</units>
+            <value>0.0</value>
+        </element>
+        <element>
+            <name>Time_significance</name>
+            <units>CodeTable 0-8-21</units>
+            <value>Time averaged (see Note 1)</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-8</name>
+            <units>min</units>
+            <value>-10.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-9</name>
+            <units>min</units>
+            <value>-10.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-9</name>
+            <units>min</units>
+            <value>-180.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-10</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-11</name>
+            <units>h</units>
+            <value>-1.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-11</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>history</name>
+            <value>Read using CDM BufrIosp2</value>
+        </element>
+        <element>
+            <name>location</name>
+            <value>/tmp/eu.essi_lab.bufr.MockedBUFRDownloader6234989481850314606/A_IS_MI_02_SLLP_062100-xxx_C_SBBR_20191107T16_0011_771.bfr</value>
+        </element>
+        <element>
+            <name>BUFR:categoryName</name>
+            <value>Surface data - land</value>
+        </element>
+        <element>
+            <name>BUFR:subCategoryName</name>
+            <value>Intermediate synoptic observations from fixed-land stations (SYNOP)</value>
+        </element>
+        <element>
+            <name>BUFR:centerName</name>
+            <value>255.0 (Not to be used)</value>
+        </element>
+        <element>
+            <name>BUFR:category</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:subCategory</name>
+            <value>1</value>
+        </element>
+        <element>
+            <name>BUFR:localSubCategory</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:centerId</name>
+            <value>255</value>
+        </element>
+        <element>
+            <name>BUFR:subCenter</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:table</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:tableVersion</name>
+            <value>22</value>
+        </element>
+        <element>
+            <name>BUFR:localTableVersion</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>Conventions</name>
+            <value>BUFR/CDM</value>
+        </element>
+        <element>
+            <name>BUFR:edition</name>
+            <value>4</value>
+        </element>
+        <element>
+            <name>WMO_Header</name>
+            <value>59770ISMI02 SLLP 062100</value>
+        </element>
+        <element>
+            <name>_CoordSysBuilder</name>
+            <value>ucar.nc2.dataset.conv.DefaultConvention</value>
+        </element>
+    </record>
+    <record>
+        <element>
+            <name>WMO_block_number</name>
+            <value>85</value>
+        </element>
+        <element>
+            <name>WMO_station_number</name>
+            <value>195</value>
+        </element>
+        <element>
+            <name>Type_of_station</name>
+            <units>CodeTable 0-2-1</units>
+            <value>Manned</value>
+        </element>
+        <element>
+            <name>Year</name>
+            <units>a</units>
+            <value>2019</value>
+        </element>
+        <element>
+            <name>Month</name>
+            <units>mon</units>
+            <value>11</value>
+        </element>
+        <element>
+            <name>Day</name>
+            <units>d</units>
+            <value>7</value>
+        </element>
+        <element>
+            <name>Hour</name>
+            <units>h</units>
+            <value>12</value>
+        </element>
+        <element>
+            <name>Minute</name>
+            <units>min</units>
+            <value>0</value>
+        </element>
+        <element>
+            <name>Latitude_high_accuracy</name>
+            <units>degrees_north</units>
+            <value>-16.600002</value>
+        </element>
+        <element>
+            <name>Longitude_high_accuracy</name>
+            <units>degrees_east</units>
+            <value>-62.450005</value>
+        </element>
+        <element>
+            <name>Height_of_station_ground_above_mean_sea_level</name>
+            <units>m</units>
+            <value>534.0</value>
+        </element>
+        <element>
+            <name>Characteristic_of_pressure_tendency</name>
+            <units>CodeTable 0-10-63</units>
+            <value>Increasing (steadily or unsteadily)</value>
+        </element>
+        <element>
+            <name>Horizontal_visibility</name>
+            <units>m</units>
+            <value>20000.0</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Middle cloud</value>
+        </element>
+        <element>
+            <name>Cloud_type</name>
+            <units>CodeTable 0-20-12</units>
+            <value>No CL clouds</value>
+        </element>
+        <element>
+            <name>Cloud_type-2</name>
+            <units>CodeTable 0-20-12</units>
+            <value>Altostratus opacus or Nimbostratus</value>
+        </element>
+        <element>
+            <name>Cloud_type-3</name>
+            <units>CodeTable 0-20-12</units>
+            <value>CH clouds invisible owing to darkness, fog, blowing dust or sand, or other similar phenomena, or because of a continuous layer of lower clouds</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Low cloud</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Middle cloud</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>High cloud</value>
+        </element>
+        <element>
+            <name>State_of_the_ground_with_or_without_snow</name>
+            <units>CodeTable 0-20-62</units>
+            <value>Surface of ground dry (without cracks and no appreciable amount of dust or loose sand)</value>
+        </element>
+        <element>
+            <name>Present_weather</name>
+            <units>CodeTable 0-20-3</units>
+            <value>Visibility reduced by smoke, e.g. veldt or forest fires, industrial smoke or volcanic ashes</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement</name>
+            <units>h</units>
+            <value>-6.0</value>
+        </element>
+        <element>
+            <name>Past_weather_1</name>
+            <units>CodeTable 0-20-4</units>
+            <value>Cloud covering more than 1/2 of the sky throughout the appropriate period</value>
+        </element>
+        <element>
+            <name>Past_weather_2</name>
+            <units>CodeTable 0-20-5</units>
+            <value>Cloud covering more than 1/2 of the sky throughout the appropriate period</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-2</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-2</name>
+            <units>h</units>
+            <value>-1.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-3</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-4</name>
+            <units>h</units>
+            <value>-12.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-5</name>
+            <units>h</units>
+            <value>0.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-6</name>
+            <units>h</units>
+            <value>-12.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-7</name>
+            <units>h</units>
+            <value>0.0</value>
+        </element>
+        <element>
+            <name>Time_significance</name>
+            <units>CodeTable 0-8-21</units>
+            <value>Time averaged (see Note 1)</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-8</name>
+            <units>min</units>
+            <value>-10.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-9</name>
+            <units>min</units>
+            <value>-10.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-9</name>
+            <units>min</units>
+            <value>-360.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-10</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-11</name>
+            <units>h</units>
+            <value>-1.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-11</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>history</name>
+            <value>Read using CDM BufrIosp2</value>
+        </element>
+        <element>
+            <name>location</name>
+            <value>/tmp/eu.essi_lab.bufr.MockedBUFRDownloader6234989481850314606/A_IS_MI_03_SLLP_071200-xxx_C_SBBR_20191107T16_0011_786.bfr</value>
+        </element>
+        <element>
+            <name>BUFR:categoryName</name>
+            <value>Surface data - land</value>
+        </element>
+        <element>
+            <name>BUFR:subCategoryName</name>
+            <value>Main synoptic observations from fixed-land stations (SYNOP)</value>
+        </element>
+        <element>
+            <name>BUFR:centerName</name>
+            <value>255.0 (Not to be used)</value>
+        </element>
+        <element>
+            <name>BUFR:category</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:subCategory</name>
+            <value>2</value>
+        </element>
+        <element>
+            <name>BUFR:localSubCategory</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:centerId</name>
+            <value>255</value>
+        </element>
+        <element>
+            <name>BUFR:subCenter</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:table</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:tableVersion</name>
+            <value>22</value>
+        </element>
+        <element>
+            <name>BUFR:localTableVersion</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>Conventions</name>
+            <value>BUFR/CDM</value>
+        </element>
+        <element>
+            <name>BUFR:edition</name>
+            <value>4</value>
+        </element>
+        <element>
+            <name>WMO_Header</name>
+            <value>59785ISMI03 SLLP 071200</value>
+        </element>
+        <element>
+            <name>_CoordSysBuilder</name>
+            <value>ucar.nc2.dataset.conv.DefaultConvention</value>
+        </element>
+    </record>
+    <record>
+        <element>
+            <name>WMO_block_number</name>
+            <value>85</value>
+        </element>
+        <element>
+            <name>WMO_station_number</name>
+            <value>195</value>
+        </element>
+        <element>
+            <name>Type_of_station</name>
+            <units>CodeTable 0-2-1</units>
+            <value>Manned</value>
+        </element>
+        <element>
+            <name>Year</name>
+            <units>a</units>
+            <value>2019</value>
+        </element>
+        <element>
+            <name>Month</name>
+            <units>mon</units>
+            <value>11</value>
+        </element>
+        <element>
+            <name>Day</name>
+            <units>d</units>
+            <value>13</value>
+        </element>
+        <element>
+            <name>Hour</name>
+            <units>h</units>
+            <value>12</value>
+        </element>
+        <element>
+            <name>Minute</name>
+            <units>min</units>
+            <value>0</value>
+        </element>
+        <element>
+            <name>Latitude_high_accuracy</name>
+            <units>degrees_north</units>
+            <value>-16.600002</value>
+        </element>
+        <element>
+            <name>Longitude_high_accuracy</name>
+            <units>degrees_east</units>
+            <value>-62.450005</value>
+        </element>
+        <element>
+            <name>Height_of_station_ground_above_mean_sea_level</name>
+            <units>m</units>
+            <value>534.0</value>
+        </element>
+        <element>
+            <name>Characteristic_of_pressure_tendency</name>
+            <units>CodeTable 0-10-63</units>
+            <value>Increasing (steadily or unsteadily)</value>
+        </element>
+        <element>
+            <name>Horizontal_visibility</name>
+            <units>m</units>
+            <value>30000.0</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Observing rules for base of lowest cloud and cloud types of FM 12 SYNOP and FM 13 SHIP apply</value>
+        </element>
+        <element>
+            <name>Cloud_type</name>
+            <units>CodeTable 0-20-12</units>
+            <value>No CL clouds</value>
+        </element>
+        <element>
+            <name>Cloud_type-2</name>
+            <units>CodeTable 0-20-12</units>
+            <value>No CM clouds</value>
+        </element>
+        <element>
+            <name>Cloud_type-3</name>
+            <units>CodeTable 0-20-12</units>
+            <value>Cirrus fibratus, sometimes uncinus, not progressively invading the sky</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Low cloud</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Middle cloud</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>High cloud</value>
+        </element>
+        <element>
+            <name>State_of_the_ground_with_or_without_snow</name>
+            <units>CodeTable 0-20-62</units>
+            <value>Surface of ground dry (without cracks and no appreciable amount of dust or loose sand)</value>
+        </element>
+        <element>
+            <name>Present_weather</name>
+            <units>CodeTable 0-20-3</units>
+            <value>No significant phenomenon to report, present and past weather omitted</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement</name>
+            <units>h</units>
+            <value>-6.0</value>
+        </element>
+        <element>
+            <name>Past_weather_1</name>
+            <units>CodeTable 0-20-4</units>
+            <value>No significant weather observed</value>
+        </element>
+        <element>
+            <name>Past_weather_2</name>
+            <units>CodeTable 0-20-5</units>
+            <value>No significant weather observed</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-2</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-2</name>
+            <units>h</units>
+            <value>-1.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-3</name>
+            <units>h</units>
+            <value>-1.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-4</name>
+            <units>h</units>
+            <value>-12.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-5</name>
+            <units>h</units>
+            <value>0.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-6</name>
+            <units>h</units>
+            <value>-12.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-7</name>
+            <units>h</units>
+            <value>0.0</value>
+        </element>
+        <element>
+            <name>Time_significance</name>
+            <units>CodeTable 0-8-21</units>
+            <value>Time averaged (see Note 1)</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-8</name>
+            <units>min</units>
+            <value>-10.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-9</name>
+            <units>min</units>
+            <value>-10.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-9</name>
+            <units>min</units>
+            <value>-360.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-10</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-11</name>
+            <units>h</units>
+            <value>-1.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-11</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>history</name>
+            <value>Read using CDM BufrIosp2</value>
+        </element>
+        <element>
+            <name>location</name>
+            <value>/tmp/eu.essi_lab.bufr.MockedBUFRDownloader6234989481850314606/A_IS_MI_03_SLLP_131200-xxx_C_SBBR_20191113T18_1610_927.bfr</value>
+        </element>
+        <element>
+            <name>BUFR:categoryName</name>
+            <value>Surface data - land</value>
+        </element>
+        <element>
+            <name>BUFR:subCategoryName</name>
+            <value>Main synoptic observations from fixed-land stations (SYNOP)</value>
+        </element>
+        <element>
+            <name>BUFR:centerName</name>
+            <value>255.0 (Not to be used)</value>
+        </element>
+        <element>
+            <name>BUFR:category</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:subCategory</name>
+            <value>2</value>
+        </element>
+        <element>
+            <name>BUFR:localSubCategory</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:centerId</name>
+            <value>255</value>
+        </element>
+        <element>
+            <name>BUFR:subCenter</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:table</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:tableVersion</name>
+            <value>22</value>
+        </element>
+        <element>
+            <name>BUFR:localTableVersion</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>Conventions</name>
+            <value>BUFR/CDM</value>
+        </element>
+        <element>
+            <name>BUFR:edition</name>
+            <value>4</value>
+        </element>
+        <element>
+            <name>WMO_Header</name>
+            <value>69926ISMI03 SLLP 131200</value>
+        </element>
+        <element>
+            <name>_CoordSysBuilder</name>
+            <value>ucar.nc2.dataset.conv.DefaultConvention</value>
+        </element>
+    </record>
+    <record>
+        <element>
+            <name>WMO_block_number</name>
+            <value>85</value>
+        </element>
+        <element>
+            <name>WMO_station_number</name>
+            <value>195</value>
+        </element>
+        <element>
+            <name>Type_of_station</name>
+            <units>CodeTable 0-2-1</units>
+            <value>Manned</value>
+        </element>
+        <element>
+            <name>Year</name>
+            <units>a</units>
+            <value>2019</value>
+        </element>
+        <element>
+            <name>Month</name>
+            <units>mon</units>
+            <value>11</value>
+        </element>
+        <element>
+            <name>Day</name>
+            <units>d</units>
+            <value>13</value>
+        </element>
+        <element>
+            <name>Hour</name>
+            <units>h</units>
+            <value>15</value>
+        </element>
+        <element>
+            <name>Minute</name>
+            <units>min</units>
+            <value>0</value>
+        </element>
+        <element>
+            <name>Latitude_high_accuracy</name>
+            <units>degrees_north</units>
+            <value>-16.600002</value>
+        </element>
+        <element>
+            <name>Longitude_high_accuracy</name>
+            <units>degrees_east</units>
+            <value>-62.450005</value>
+        </element>
+        <element>
+            <name>Height_of_station_ground_above_mean_sea_level</name>
+            <units>m</units>
+            <value>534.0</value>
+        </element>
+        <element>
+            <name>Characteristic_of_pressure_tendency</name>
+            <units>CodeTable 0-10-63</units>
+            <value>Increasing, then decreasing; atmospheric pressure the same or higher than three hours ago</value>
+        </element>
+        <element>
+            <name>Horizontal_visibility</name>
+            <units>m</units>
+            <value>20000.0</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Low cloud</value>
+        </element>
+        <element>
+            <name>Cloud_type</name>
+            <units>CodeTable 0-20-12</units>
+            <value>Cumulus mediocris or congestus, Towering cumulus (TCU), with or without Cumulus of species fractus or humilis or Stratocumulus, all having their bases at the same level</value>
+        </element>
+        <element>
+            <name>Cloud_type-2</name>
+            <units>CodeTable 0-20-12</units>
+            <value>No CM clouds</value>
+        </element>
+        <element>
+            <name>Cloud_type-3</name>
+            <units>CodeTable 0-20-12</units>
+            <value>Cirrus fibratus, sometimes uncinus, not progressively invading the sky</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Low cloud</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>Middle cloud</value>
+        </element>
+        <element>
+            <name>Vertical_significance_surface_observations-4</name>
+            <units>CodeTable 0-8-2</units>
+            <value>High cloud</value>
+        </element>
+        <element>
+            <name>Present_weather</name>
+            <units>CodeTable 0-20-3</units>
+            <value>No significant phenomenon to report, present and past weather omitted</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement</name>
+            <units>h</units>
+            <value>-3.0</value>
+        </element>
+        <element>
+            <name>Past_weather_1</name>
+            <units>CodeTable 0-20-4</units>
+            <value>No significant weather observed</value>
+        </element>
+        <element>
+            <name>Past_weather_2</name>
+            <units>CodeTable 0-20-5</units>
+            <value>No significant weather observed</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-2</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-2</name>
+            <units>h</units>
+            <value>-1.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-4</name>
+            <units>h</units>
+            <value>-12.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-5</name>
+            <units>h</units>
+            <value>0.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-6</name>
+            <units>h</units>
+            <value>-12.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-7</name>
+            <units>h</units>
+            <value>0.0</value>
+        </element>
+        <element>
+            <name>Time_significance</name>
+            <units>CodeTable 0-8-21</units>
+            <value>Time averaged (see Note 1)</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-8</name>
+            <units>min</units>
+            <value>-10.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-9</name>
+            <units>min</units>
+            <value>-10.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-9</name>
+            <units>min</units>
+            <value>-180.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-10</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-11</name>
+            <units>h</units>
+            <value>-1.0</value>
+        </element>
+        <element>
+            <name>Time_period_or_displacement-11</name>
+            <units>h</units>
+            <value>-24.0</value>
+        </element>
+        <element>
+            <name>history</name>
+            <value>Read using CDM BufrIosp2</value>
+        </element>
+        <element>
+            <name>location</name>
+            <value>/tmp/eu.essi_lab.bufr.MockedBUFRDownloader6234989481850314606/A_IS_MI_02_SLLP_131500-xxx_C_SBBR_20191113T18_1610_921.bfr</value>
+        </element>
+        <element>
+            <name>BUFR:categoryName</name>
+            <value>Surface data - land</value>
+        </element>
+        <element>
+            <name>BUFR:subCategoryName</name>
+            <value>Intermediate synoptic observations from fixed-land stations (SYNOP)</value>
+        </element>
+        <element>
+            <name>BUFR:centerName</name>
+            <value>255.0 (Not to be used)</value>
+        </element>
+        <element>
+            <name>BUFR:category</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:subCategory</name>
+            <value>1</value>
+        </element>
+        <element>
+            <name>BUFR:localSubCategory</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:centerId</name>
+            <value>255</value>
+        </element>
+        <element>
+            <name>BUFR:subCenter</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:table</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>BUFR:tableVersion</name>
+            <value>22</value>
+        </element>
+        <element>
+            <name>BUFR:localTableVersion</name>
+            <value>0</value>
+        </element>
+        <element>
+            <name>Conventions</name>
+            <value>BUFR/CDM</value>
+        </element>
+        <element>
+            <name>BUFR:edition</name>
+            <value>4</value>
+        </element>
+        <element>
+            <name>WMO_Header</name>
+            <value>69920ISMI02 SLLP 131500</value>
+        </element>
+        <element>
+            <name>_CoordSysBuilder</name>
+            <value>ucar.nc2.dataset.conv.DefaultConvention</value>
+        </element>
+    </record>
+</collection>

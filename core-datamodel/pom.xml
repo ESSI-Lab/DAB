@@ -31,30 +31,30 @@
             <artifactId>gs-lib-xml</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+        
         <dependency>
-            <groupId>com.fasterxml.jackson.jaxrs</groupId>
-            <artifactId>jackson-jaxrs-json-provider</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-validator</groupId>
-            <artifactId>commons-validator</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.migesok</groupId>
-            <artifactId>jaxb-java-time-adapters</artifactId>
-        </dependency>
-        <dependency>
+			<groupId>org.jvnet.ogc</groupId>
+			<artifactId>iso19139-v_20060504</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jvnet.ogc</groupId>
+			<artifactId>gml-v_3_2_0</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jvnet.ogc</groupId>
+			<artifactId>wfs-v_1_1_0</artifactId>
+		</dependency>	
+            
+      	<dependency>
             <groupId>org.openrdf.sesame</groupId>
             <artifactId>sesame-rio-api</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.openrdf.sesame</groupId>
-            <artifactId>sesame-rio-rdfxml</artifactId>
-        </dependency>
-        <dependency>
+               
+       <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-tdb</artifactId>
-        </dependency>
+        </dependency> 
+        
     </dependencies>
 
 </project>

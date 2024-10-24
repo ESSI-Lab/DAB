@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wms._1_1_1;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -56,7 +56,7 @@ import eu.essi_lab.jaxb.wms._1_1_1.KeywordList;
 import eu.essi_lab.jaxb.wms._1_1_1.Layer;
 import eu.essi_lab.jaxb.wms._1_1_1.WMTMSCapabilities;
 import eu.essi_lab.lib.net.protocols.NetProtocols;
-import eu.essi_lab.lib.net.utils.Downloader;
+import eu.essi_lab.lib.net.utils.HttpConnectionUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.GSSource;
@@ -390,11 +390,11 @@ public class WMS_1_1_1ResourceMapper extends OriginalIdentifierMapper {
 	    if (mapURL == null) {
 		mapURL = sourceEndpoint;
 	    }
-	    
-	    if(sourceEndpoint.contains("webmap.ornl.gov/ogcbroker/wms")) {
+
+	    if (sourceEndpoint.contains("webmap.ornl.gov/ogcbroker/wms")) {
 		mapURL = mapURL.startsWith("https") ? mapURL : mapURL.replace("http", "https");
 	    }
-	    
+
 	    boolean useSourceEndpoint = false;
 	    try {
 		new URL(mapURL);
@@ -407,8 +407,8 @@ public class WMS_1_1_1ResourceMapper extends OriginalIdentifierMapper {
 	    }
 
 	    if (!useSourceEndpoint) {
-		Downloader d = new Downloader();
-		Optional<Integer> integer = d.getResponseCode(mapURL);
+
+		Optional<Integer> integer = HttpConnectionUtils.getOptionalResponseCode(mapURL);
 		if (integer.isPresent()) {
 		    String status = "" + integer;
 		    // in case of client error, such as 404 not found
@@ -437,6 +437,7 @@ public class WMS_1_1_1ResourceMapper extends OriginalIdentifierMapper {
 	    online.setProtocol(NetProtocols.WMS_1_1_1.getCommonURN());
 	    online.setLinkage(mapURL);
 	    online.setName(wmsLayer.getName());
+	    online.setDescription(wmsLayer.getTitle());
 	    online.setFunctionCode("download");
 	    online.setIdentifier(uuid);
 

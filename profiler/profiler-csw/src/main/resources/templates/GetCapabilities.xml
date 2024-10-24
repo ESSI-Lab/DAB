@@ -34,7 +34,7 @@
 		<ows:ProviderName>ESSI Lab</ows:ProviderName>
 		<ows:ProviderSite xlink:href="http://essi-lab.eu" />
 		<ows:ServiceContact>
-			<ows:IndividualName>The DAB team</ows:IndividualName>
+			<ows:IndividualName>The GI-project team</ows:IndividualName>
 			<ows:PositionName>provider</ows:PositionName>
 			<ows:ContactInfo>
 				<ows:Address>
@@ -96,6 +96,7 @@
 		<ows:Operation name="GetRecords">
 			<ows:DCP>
 				<ows:HTTP>
+					<ows:Get xlink:href="BASE_URL"/>											
 					<ows:Post xlink:href="BASE_URL">
 						<ows:Constraint name="PostEncoding">
 							<ows:Value>XML</ows:Value>

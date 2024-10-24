@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.source;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -36,9 +36,11 @@ import com.marklogic.xcc.exceptions.XccConfigException;
 
 import eu.essi_lab.cfga.ConfigurationSource;
 import eu.essi_lab.cfga.setting.Setting;
+import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.wrapper.marklogic.MarkLogicWrapper;
 
 /**
@@ -50,6 +52,7 @@ public class MarkLogicSource implements ConfigurationSource {
     private String configUri;
     private String lockUri;
     private String configFolder;
+    private String configName;
 
     /**
      * xdbc://user:password@hostname:8000,8004/dbName/defaultConf/
@@ -61,7 +64,7 @@ public class MarkLogicSource implements ConfigurationSource {
      */
     public MarkLogicSource(String xdbc, String configName) throws XccConfigException, URISyntaxException {
 
-	StorageUri uri = MarkLogicWrapper.fromXDBC(xdbc);
+	StorageInfo uri = MarkLogicWrapper.fromXDBC(xdbc);
 
 	this.wrapper = new MarkLogicWrapper(uri);
 
@@ -73,24 +76,41 @@ public class MarkLogicSource implements ConfigurationSource {
      * @throws XccConfigException
      * @throws URISyntaxException
      */
-    public MarkLogicSource(StorageUri uri, String configName) throws XccConfigException, URISyntaxException {
+    public MarkLogicSource(StorageInfo uri, String configName) throws XccConfigException, URISyntaxException {
 
-	this.wrapper = new MarkLogicWrapper(uri.getUri(), uri.getUser(), uri.getPassword(), uri.getStorageName());
+	this.wrapper = new MarkLogicWrapper(uri.getUri(), uri.getUser(), uri.getPassword(), uri.getName());
 
 	init(uri, configName);
+    }
+
+    /**
+     * 
+     */
+    private MarkLogicSource() {
+
     }
 
     /**
      * @param uri
      * @param configName
      */
-    private void init(StorageUri uri, String configName) {
+    private void init(StorageInfo uri, String configName) {
 
-	this.configFolder = uri.getConfigFolder();
+	this.configName = configName;
+
+	this.configFolder = uri.getIdentifier();
 
 	this.configUri = "/" + configFolder + "/" + configName + ".json";
 
 	this.lockUri = "/" + configFolder + "/lock.json";
+    }
+
+    /**
+     * @return the wrapper
+     */
+    public MarkLogicWrapper getWrapper() {
+
+	return wrapper;
     }
 
     @Override
@@ -298,13 +318,10 @@ public class MarkLogicSource implements ConfigurationSource {
 
 	query += "declare namespace html = \"http://www.w3.org/1999/xhtml\";  \n";
 
-	query += "import module namespace gs=\"http://flora.eu/gi-suite/1.0/dataModel/schema\" at \"/gs-modules/functions-module.xqy\";  \n";
+	// query += "import module namespace gs=\"http://flora.eu/gi-suite/1.0/dataModel/schema\" at
+	// \"/gs-modules/functions-module.xqy\"; \n";
 
-	query += "let $configFolder := '/" + this.configFolder + "/'  \n";
-
-	query += "for $uris in cts:uris((),(), cts:directory-query($configFolder, \"infinity\")   )  \n";
-
-	query += "return fn:document($uris)  \n";
+	query += "fn:document('" + this.configUri + "')\n";
 
 	return query;
     }
@@ -367,4 +384,42 @@ public class MarkLogicSource implements ConfigurationSource {
 	return Optional.empty();
     }
 
+    @Override
+    public MarkLogicSource backup() throws Exception {
+
+	String date = ISO8601DateTimeUtils.getISO8601DateTime().//
+		replace("-", "_").//
+		replace(":", "_").//
+		replace(".", "");
+
+	InputStream clone = new ClonableInputStream(getBinaryConfig()).clone();
+
+	String backupName = configName + "_" + date;
+
+	String backupUri = "/" + this.configFolder + "/" + backupName + ".json.backup";
+
+	boolean stored = wrapper.storeBinary(backupUri, clone);
+
+	GSLoggerFactory.getLogger(getClass()).trace("Source stored: " + stored);
+
+	if (!stored) {
+	    throw new RuntimeException("Source backup not stored");
+	}
+
+	MarkLogicSource backupSource = new MarkLogicSource();
+
+	backupSource.wrapper = this.wrapper;
+	backupSource.configName = backupName;
+	backupSource.configUri = backupUri;
+	backupSource.configFolder = this.configFolder;
+	backupSource.lockUri = this.lockUri;
+
+	return backupSource;
+    }
+
+    @Override
+    public String getLocation() {
+
+	return this.configUri;
+    }
 }

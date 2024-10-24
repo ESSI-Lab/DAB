@@ -1,0 +1,355 @@
+{
+	"help": "http://data.gov.uk/api/3/action/help_show?name=package_show",
+	"success": true,
+	"result": {
+		"license_title": "License not specified",
+		"maintainer": "NYC OpenData",
+		"relationships_as_object": [
+		],
+		"private": false,
+		"maintainer_email": "",
+		"num_tags": 13,
+		"id": "8a311c18-3060-438e-a8c7-9e37bcde6529",
+		"metadata_created": "2015-02-04T19:05:15.432951",
+		"metadata_modified": "2018-04-04T15:52:12.642133",
+		"author": null,
+		"author_email": null,
+		"state": "active",
+		"version": null,
+		"creator_user_id": "47303a9e-1187-4290-85a3-1fc02dc49e4a",
+		"type": "dataset",
+		"resources": [
+			{
+				"cache_last_updated": null,
+				"package_id": "8a311c18-3060-438e-a8c7-9e37bcde6529",
+				"webstore_last_updated": null,
+				"id": "e43f1938-3c4a-4501-9aaf-46891bb21553",
+				"size": null,
+				"state": "active",
+				"hash": "",
+				"description": "",
+				"format": "CSV",
+				"tracking_summary": {
+					"total": 14883,
+					"recent": 240
+				},
+				"last_modified": null,
+				"url_type": null,
+				"no_real_name": "True",
+				"mimetype": "text/csv",
+				"cache_url": null,
+				"name": "Comma Separated Values File",
+				"created": "2015-02-04T14:05:16.060336",
+				"url": "https://data.cityofnewyork.us/api/views/kku6-nxdu/rows.csv?accessType=DOWNLOAD",
+				"webstore_url": null,
+				"mimetype_inner": null,
+				"position": 0,
+				"revision_id": "69085cd5-85cb-4941-a36a-d0959ca375cc",
+				"resource_type": null
+			},
+			{
+				"cache_last_updated": null,
+				"package_id": "8a311c18-3060-438e-a8c7-9e37bcde6529",
+				"webstore_last_updated": null,
+				"id": "06744803-6874-4e29-8b91-28f985fdd048",
+				"size": null,
+				"state": "active",
+				"hash": "",
+				"description": "",
+				"format": "RDF",
+				"tracking_summary": {
+					"total": 781,
+					"recent": 10
+				},
+				"last_modified": null,
+				"url_type": null,
+				"no_real_name": "True",
+				"mimetype": "application/rdf+xml",
+				"cache_url": null,
+				"name": "RDF File",
+				"created": "2015-02-04T14:05:16.060364",
+				"url": "https://data.cityofnewyork.us/api/views/kku6-nxdu/rows.rdf?accessType=DOWNLOAD",
+				"webstore_url": null,
+				"mimetype_inner": null,
+				"position": 1,
+				"revision_id": "69085cd5-85cb-4941-a36a-d0959ca375cc",
+				"resource_type": null
+			},
+			{
+				"cache_last_updated": null,
+				"package_id": "8a311c18-3060-438e-a8c7-9e37bcde6529",
+				"webstore_last_updated": null,
+				"id": "8eb13be0-5573-4190-ae14-a03afeb0c033",
+				"size": null,
+				"state": "active",
+				"hash": "",
+				"description": "",
+				"format": "JSON",
+				"tracking_summary": {
+					"total": 1816,
+					"recent": 46
+				},
+				"last_modified": null,
+				"url_type": null,
+				"no_real_name": "True",
+				"mimetype": "application/json",
+				"cache_url": null,
+				"name": "JSON File",
+				"created": "2015-02-04T14:05:16.060372",
+				"url": "https://data.cityofnewyork.us/api/views/kku6-nxdu/rows.json?accessType=DOWNLOAD",
+				"webstore_url": null,
+				"mimetype_inner": null,
+				"position": 2,
+				"revision_id": "69085cd5-85cb-4941-a36a-d0959ca375cc",
+				"resource_type": null
+			},
+			{
+				"cache_last_updated": null,
+				"package_id": "8a311c18-3060-438e-a8c7-9e37bcde6529",
+				"webstore_last_updated": null,
+				"id": "11ce020f-e834-4c7e-995b-8f2a712ff6d0",
+				"size": null,
+				"state": "active",
+				"hash": "",
+				"description": "",
+				"format": "XML",
+				"tracking_summary": {
+					"total": 2479,
+					"recent": 41
+				},
+				"last_modified": null,
+				"url_type": null,
+				"no_real_name": "True",
+				"mimetype": "application/xml",
+				"cache_url": null,
+				"name": "XML File",
+				"created": "2015-02-04T14:05:16.060378",
+				"url": "https://data.cityofnewyork.us/api/views/kku6-nxdu/rows.xml?accessType=DOWNLOAD",
+				"webstore_url": null,
+				"mimetype_inner": null,
+				"position": 3,
+				"revision_id": "69085cd5-85cb-4941-a36a-d0959ca375cc",
+				"resource_type": null
+			}
+		],
+		"num_resources": 4,
+		"tags": [
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "area",
+				"id": "3da10f32-6dd5-4db7-8d3e-a7b231c4b1d3",
+				"name": "area"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "boundary",
+				"id": "1a1eecd6-364d-459a-b03b-9dabce1d3dd8",
+				"name": "boundary"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "code",
+				"id": "eb092f1f-d519-41ec-a1a5-ebfe59bafc55",
+				"name": "code"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "community",
+				"id": "5c4df8ee-568f-4454-b76f-4580261ef5a9",
+				"name": "community"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "demographic",
+				"id": "ff1151c2-c5f0-4bea-98e1-e92aec259cc9",
+				"name": "demographic"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "demography",
+				"id": "e9837254-758e-437a-9a18-e2e9fea1c800",
+				"name": "demography"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "development",
+				"id": "3c4eb621-cbab-463a-94a1-0fbee3ca506e",
+				"name": "development"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "district",
+				"id": "173395db-6165-4848-afba-f4140dc7cea1",
+				"name": "district"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "lifelong-learning",
+				"id": "681fc454-9a6f-4b8b-adbb-a4a1b60f5226",
+				"name": "lifelong-learning"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "statistic",
+				"id": "0e8ac185-7ea4-4d72-8ef7-95ec619ec46e",
+				"name": "statistic"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "youth",
+				"id": "d54cd1d0-b9fe-4ef0-922c-d49dcbba636c",
+				"name": "youth"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "zip",
+				"id": "ccd666da-2317-4774-851c-e83792c1c3d9",
+				"name": "zip"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "zip-code",
+				"id": "47a6f7be-7a59-458e-b9d0-99601a6cc6b3",
+				"name": "zip-code"
+			}
+		],
+		"tracking_summary": {
+			"total": 59776,
+			"recent": 938
+		},
+		"groups": [
+			{
+				"display_name": "Local Government",
+				"description": "Local Government Topic - for all datasets with state, local, county organizations",
+				"image_display_url": "",
+				"title": "Local Government",
+				"id": "ccc6c266-eee8-44bd-89aa-7cd8c4c6bf46",
+				"name": "local"
+			}
+		],
+		"license_id": "notspecified",
+		"relationships_as_subject": [
+		],
+		"organization": {
+			"description": "",
+			"created": "2014-04-16T13:28:34.570999",
+			"title": "City of New York",
+			"name": "city-of-new-york",
+			"is_organization": true,
+			"state": "active",
+			"image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Seal_of_New_York.svg/175px-Seal_of_New_York.svg.png",
+			"revision_id": "f73ec199-3c82-4652-bd9e-0040331da2eb",
+			"type": "organization",
+			"id": "2cc8e4b4-0c38-4590-a002-bd0d74002dec",
+			"approval_status": "approved"
+		},
+		"name": "demographic-statistics-by-zip-code-acfc9",
+		"isopen": false,
+		"url": null,
+		"notes": "Demographic statistics broken down by zip code",
+		"owner_org": "2cc8e4b4-0c38-4590-a002-bd0d74002dec",
+		"extras": [
+			{
+				"key": "publisher",
+				"value": "data.cityofnewyork.us"
+			},
+			{
+				"key": "accessLevel",
+				"value": "public"
+			},
+			{
+				"key": "catalog_describedBy",
+				"value": "https://project-open-data.cio.gov/v1.1/schema/catalog.json"
+			},
+			{
+				"key": "harvest_source_id",
+				"value": "50104281-92a3-4534-9d38-141bc82276c5"
+			},
+			{
+				"key": "catalog_@context",
+				"value": "https://project-open-data.cio.gov/v1.1/schema/catalog.jsonld"
+			},
+			{
+				"key": "issued",
+				"value": "2013-06-26"
+			},
+			{
+				"key": "resource-type",
+				"value": "Dataset"
+			},
+			{
+				"key": "modified",
+				"value": "2018-03-29"
+			},
+			{
+				"key": "harvest_source_title",
+				"value": "NYC JSON"
+			},
+			{
+				"key": "source_schema_version",
+				"value": "1.1"
+			},
+			{
+				"key": "source_datajson_identifier",
+				"value": true
+			},
+			{
+				"key": "theme",
+				"value": [
+					"City Government"
+				]
+			},
+			{
+				"key": "catalog_@id",
+				"value": "https://data.cityofnewyork.us/data.json"
+			},
+			{
+				"key": "catalog_conformsTo",
+				"value": "https://project-open-data.cio.gov/v1.1/schema"
+			},
+			{
+				"key": "identifier",
+				"value": "https://data.cityofnewyork.us/api/views/kku6-nxdu"
+			},
+			{
+				"key": "landingPage",
+				"value": "https://data.cityofnewyork.us/d/kku6-nxdu"
+			},
+			{
+				"key": "harvest_object_id",
+				"value": "309c10dd-514a-4a39-bcf3-bf85a42a08af"
+			},
+			{
+				"key": "source_hash",
+				"value": "fa6542338777c571a785415f6c57bbcd40a8753e"
+			},
+			{
+				"key": "harvest_object_id",
+				"value": "309c10dd-514a-4a39-bcf3-bf85a42a08af"
+			},
+			{
+				"key": "harvest_source_id",
+				"value": "50104281-92a3-4534-9d38-141bc82276c5"
+			},
+			{
+				"key": "harvest_source_title",
+				"value": "NYC JSON"
+			}
+		],
+		"title": "Demographic Statistics By Zip Code",
+		"revision_id": "43e90490-9d6d-4e78-a6c5-715ba7da98c7"
+	}
+}

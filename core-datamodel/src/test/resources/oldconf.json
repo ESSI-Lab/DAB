@@ -1,0 +1,21 @@
+{
+  "key": "d5289699-3209-4a35-b8fa-c0602cc3afd7",
+  "timeStamp": 0,
+  "supportedOptions": {},
+  "configurableComponents": {
+    "comp1": {
+      "configurableComponentConcrete": "eu.essi_lab.configuration.test.UpdatedConfigurable",
+      "key": "633f3da2-7f7c-4813-9dd4-ccbbdbd35cbd",
+      "supportedOptions": {
+        "op1": {
+          "concrete": "eu.essi_lab.model.configuration.option.GSConfOptionString",
+          "key": "op1",
+          "mandatory": false,
+          "value": "value1",
+          "allowedValues": [],
+          "type": "java.lang.String"
+        }
+      }
+    }
+  }
+}

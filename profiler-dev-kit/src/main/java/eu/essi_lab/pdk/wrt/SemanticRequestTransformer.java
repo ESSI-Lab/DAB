@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.wrt;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -127,14 +127,19 @@ public abstract class SemanticRequestTransformer extends WebRequestTransformer<S
 	    message.setUserBond(bond.get());
 	}
 
+	Optional<ElasticsearchInfoPublisher> publisher = ElasticsearchInfoPublisher.create(message.getWebRequest());
+
 	try {
-	    ElasticsearchInfoPublisher publisher = new ElasticsearchInfoPublisher(//
-		    message.getRequestId(), //
-		    message.getWebRequest().getRequestContext());
+
 	    //
 	    // logs message info
 	    //
-	    publisher.publish(message);
+
+	    if (publisher.isPresent()) {
+
+		publisher.get().publish(message);
+	    }
+
 	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).error("Error initializing ElasticSearch: {}", e.getMessage());
 	}

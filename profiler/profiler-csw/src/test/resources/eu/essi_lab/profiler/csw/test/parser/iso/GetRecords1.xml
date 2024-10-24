@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<csw:GetRecords xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+	xmlns:ogc="http://www.opengis.net/ogc" xmlns:gmd="http://www.isotc211.org/2005/gmd"
+	xmlns:apiso="http://www.opengis.net/cat/csw/apiso/1.0" xmlns:ows="http://www.opengis.net/ows"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="CSW"
+	version="2.0.2" resultType="results" outputFormat="application/xml"
+	xsi:schemaLocation="http://www.opengis.net/gml http://schemas.opengis.net/gml/3.2.1/gml.xsd 
+    http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-discovery.xsd"
+	outputSchema="http://www.isotc211.org/2005/gmd" startPosition="1"
+	maxRecords="5">
+	<csw:Query typeNames="gmd:MD_Metadata">
+		<csw:ElementSetName typeNames="gmd:MD_Metadata">full</csw:ElementSetName>
+
+		<csw:Constraint version="1.1.0">
+			<ogc:Filter>
+
+				<ogc:And>
+
+					<ogc:PropertyIsEqualTo>
+						<ogc:PropertyName>apiso:RevisionDate</ogc:PropertyName>
+						<ogc:Literal>C</ogc:Literal>
+					</ogc:PropertyIsEqualTo>
+					
+					<ogc:PropertyIsEqualTo>
+						<ogc:PropertyName>apiso:ReViSIonDate</ogc:PropertyName>
+						<ogc:Literal>C</ogc:Literal>
+					</ogc:PropertyIsEqualTo>
+					
+
+					<ogc:PropertyIsEqualTo>
+						<ogc:PropertyName>apiso:AlternateTitle</ogc:PropertyName>
+						<ogc:Literal>C</ogc:Literal>
+					</ogc:PropertyIsEqualTo>
+
+					<ogc:PropertyIsEqualTo>
+						<ogc:PropertyName>apiso:CreationDate</ogc:PropertyName>
+						<ogc:Literal>C</ogc:Literal>
+					</ogc:PropertyIsEqualTo>
+
+					<ogc:PropertyIsEqualTo>
+						<ogc:PropertyName>apiso:PublicationDate</ogc:PropertyName>
+						<ogc:Literal>C</ogc:Literal>
+					</ogc:PropertyIsEqualTo>
+					
+					<ogc:PropertyIsEqualTo>
+						<ogc:PropertyName>apiso:OrganisationName</ogc:PropertyName>
+						<ogc:Literal>C</ogc:Literal>
+					</ogc:PropertyIsEqualTo>
+
+					<ogc:PropertyIsEqualTo>
+						<ogc:PropertyName>apiso:HasSecurityConstraints</ogc:PropertyName>
+						<ogc:Literal>true</ogc:Literal>
+					</ogc:PropertyIsEqualTo>
+
+					<ogc:PropertyIsEqualTo>
+						<ogc:PropertyName>apiso:Language</ogc:PropertyName>
+						<ogc:Literal>C</ogc:Literal>
+					</ogc:PropertyIsEqualTo>
+
+					<ogc:PropertyIsEqualTo>
+						<ogc:PropertyName>apiso:ResourceIdentifier</ogc:PropertyName>
+						<ogc:Literal>C</ogc:Literal>
+					</ogc:PropertyIsEqualTo>
+
+					<ogc:PropertyIsEqualTo>
+						<ogc:PropertyName>apiso:ParentIdentifier</ogc:PropertyName>
+						<ogc:Literal>C</ogc:Literal>
+					</ogc:PropertyIsEqualTo>
+
+					<ogc:PropertyIsEqualTo>
+						<ogc:PropertyName>apiso:KeywordType</ogc:PropertyName>
+						<ogc:Literal>C</ogc:Literal>
+					</ogc:PropertyIsEqualTo>
+
+					<ogc:PropertyIsEqualTo>
+						<ogc:PropertyName>apiso:TopicCategory</ogc:PropertyName>
+						<ogc:Literal>C</ogc:Literal>
+					</ogc:PropertyIsEqualTo>
+
+					<ogc:PropertyIsEqualTo>
+						<ogc:PropertyName>apiso:ResourceLanguage</ogc:PropertyName>
+						<ogc:Literal>C</ogc:Literal>
+					</ogc:PropertyIsEqualTo>
+
+					<ogc:PropertyIsEqualTo>
+						<ogc:PropertyName>apiso:GeographicDescriptionCode</ogc:PropertyName>
+						<ogc:Literal>C</ogc:Literal>
+					</ogc:PropertyIsEqualTo>
+
+					<ogc:PropertyIsEqualTo>
+						<ogc:PropertyName>apiso:Denominator</ogc:PropertyName>
+						<ogc:Literal>10</ogc:Literal>
+					</ogc:PropertyIsEqualTo>
+
+					<ogc:PropertyIsEqualTo>
+						<ogc:PropertyName>apiso:DistanceValue</ogc:PropertyName>
+						<ogc:Literal>1.7</ogc:Literal>
+					</ogc:PropertyIsEqualTo>
+
+					<ogc:PropertyIsEqualTo>
+						<ogc:PropertyName>apiso:DistanceUOM</ogc:PropertyName>
+						<ogc:Literal>C</ogc:Literal>
+					</ogc:PropertyIsEqualTo>
+
+					<ogc:PropertyIsEqualTo>
+						<ogc:PropertyName>apiso:TempExtent_begin</ogc:PropertyName>
+						<ogc:Literal>C</ogc:Literal>
+					</ogc:PropertyIsEqualTo>
+
+					<ogc:PropertyIsEqualTo>
+						<ogc:PropertyName>apiso:TempExtent_end</ogc:PropertyName>
+						<ogc:Literal>C</ogc:Literal>
+					</ogc:PropertyIsEqualTo>
+
+					<ogc:PropertyIsEqualTo>
+						<ogc:PropertyName>apiso:ServiceType</ogc:PropertyName>
+						<ogc:Literal>C</ogc:Literal>
+					</ogc:PropertyIsEqualTo>
+
+					<ogc:PropertyIsEqualTo>
+						<ogc:PropertyName>apiso:ServiceTypeVersion</ogc:PropertyName>
+						<ogc:Literal>C</ogc:Literal>
+					</ogc:PropertyIsEqualTo>
+
+					<ogc:PropertyIsEqualTo>
+						<ogc:PropertyName>apiso:Operation</ogc:PropertyName>
+						<ogc:Literal>C</ogc:Literal>
+					</ogc:PropertyIsEqualTo>
+
+					<ogc:PropertyIsEqualTo>
+						<ogc:PropertyName>apiso:CouplingType</ogc:PropertyName>
+						<ogc:Literal>C</ogc:Literal>
+					</ogc:PropertyIsEqualTo>
+
+					<ogc:PropertyIsEqualTo>
+						<ogc:PropertyName>apiso:OperatesOn</ogc:PropertyName>
+						<ogc:Literal>C</ogc:Literal>
+					</ogc:PropertyIsEqualTo>
+
+					<ogc:PropertyIsEqualTo>
+						<ogc:PropertyName>apiso:OperatesOnIdentifier</ogc:PropertyName>
+						<ogc:Literal>C</ogc:Literal>
+					</ogc:PropertyIsEqualTo>
+
+					<ogc:PropertyIsEqualTo>
+						<ogc:PropertyName>apiso:OperatesOnName</ogc:PropertyName>
+						<ogc:Literal>C</ogc:Literal>
+					</ogc:PropertyIsEqualTo>
+
+				</ogc:And>
+
+			</ogc:Filter>
+		</csw:Constraint>
+	</csw:Query>
+</csw:GetRecords>

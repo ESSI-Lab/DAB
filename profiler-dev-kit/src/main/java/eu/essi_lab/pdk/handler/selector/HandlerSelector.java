@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.handler.selector;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.pdk.Profiler;
@@ -75,13 +74,24 @@ public class HandlerSelector {
      */
     public Optional<WebRequestHandler> select(WebRequest request) throws GSException {
 
-	return list.stream().//
-		filter(entry -> filterAccept(entry.getKey(), request)).//
-		map(SimpleEntry::getValue).//
-		findFirst();
+	for (SimpleEntry<WebRequestFilter, WebRequestHandler> entry : list) {
+
+	    if (filterAccept(entry.getKey(), request)) {
+
+		return Optional.of(entry.getValue());
+	    }
+	}
+
+	return Optional.empty();
     }
 
-    private boolean filterAccept(WebRequestFilter filter, WebRequest request) {
+    /**
+     * @param filter
+     * @param request
+     * @return
+     * @throws GSException
+     */
+    private boolean filterAccept(WebRequestFilter filter, WebRequest request) throws GSException {
 	try {
 
 	    boolean accept = filter.accept(request);
@@ -90,13 +100,9 @@ public class HandlerSelector {
 		return true;
 	    }
 	} catch (GSException e) {
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(getClass()).error("Error occurred during request acceptance");
-	    GSLoggerFactory.getLogger(getClass()).error(e.getErrorInfoList().toString(), e);
-	}catch (Exception e) {
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(getClass()).error("Unexpected error occurred during request acceptance");
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	    throw e;
+	} catch (Exception e) {
+	    throw GSException.createException(getClass(), "HandlerSelector_FilterAcceptError", e);
 	}
 
 	return false;

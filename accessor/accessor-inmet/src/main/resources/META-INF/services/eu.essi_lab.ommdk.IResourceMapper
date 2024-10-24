@@ -1,0 +1,4 @@
+eu.essi_lab.accessor.inmet.INMETMapper
+eu.essi_lab.accessor.bndmet.BNDMETMapper
+eu.essi_lab.accessor.apitempo.APITempoMapper
+eu.essi_lab.bufr.BUFRMapper

@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.conf.task;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,15 +23,12 @@ package eu.essi_lab.gssrv.conf.task;
 
 import org.quartz.JobExecutionContext;
 
-import com.marklogic.xcc.ResultSequence;
-
-import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.factory.DatabaseConsumerFactory;
-import eu.essi_lab.api.database.marklogic.MarkLogicDatabase;
+import eu.essi_lab.api.database.DatabaseExecutor;
+import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
-import eu.essi_lab.model.StorageUri;
-import eu.essi_lab.wrapper.marklogic.MarkLogicWrapper;
+import eu.essi_lab.model.StorageInfo;
 
 /**
  * @author Fabrizio
@@ -43,16 +40,13 @@ public class DeletedRecordsRemovalTask extends AbstractCustomTask {
 
 	log(status, "Deleted records removal task STARTED");
 
-	StorageUri databaseURI = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
 
-	DatabaseReader dbReader = DatabaseConsumerFactory.createDataBaseReader(databaseURI);
-	MarkLogicWrapper wrapper = ((MarkLogicDatabase) dbReader.getDatabase()).getWrapper();
+	DatabaseExecutor executor = DatabaseProviderFactory.getDatabaseExecutor(databaseURI);
 
 	log(status, "Count deleted records STARTED");
 
-	ResultSequence resultSequence = wrapper.submit(getCountDeletedQuery());
-
-	int count = Integer.valueOf(resultSequence.asString());
+	int count = executor.countDeletedRecords();
 
 	log(status, "Found " + count + " deleted records to remove");
 
@@ -62,7 +56,7 @@ public class DeletedRecordsRemovalTask extends AbstractCustomTask {
 
 	    log(status, "Removing deleted records STARTED");
 
-	    wrapper.submit(getRemoveDeletedQuery(count));
+	    executor.clearDeletedRecords();
 
 	    log(status, "Removing deleted records ENDED");
 	}
@@ -75,40 +69,5 @@ public class DeletedRecordsRemovalTask extends AbstractCustomTask {
 
 	return "Deleted records removal";
     }
-   
-    /**
-     * @return
-     */
-    private String getCountDeletedQuery() {
 
-	String query = "xquery version \"1.0-ml\";\n";
-
-	query += "import module namespace gs=\"http://flora.eu/gi-suite/1.0/dataModel/schema\" at \"/gs-modules/functions-module.xqy\";\n";
-
-	query += "xdmp:estimate(cts:search(doc(),cts:element-range-query(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema','isDeleted'),'=','true',";
-
-	query += "(\"score-function=linear\"),0.0),(\"unfiltered\", \"score-simple\"),0))\n";
-
-	return query;
-    }
-
-    /**
-     * @param count
-     * @return
-     */
-    private String getRemoveDeletedQuery(int count) {
-
-	String query = "xquery version \"1.0-ml\";\n";
-	query += "import module namespace gs=\"http://flora.eu/gi-suite/1.0/dataModel/schema\" at \"/gs-modules/functions-module.xqy\";\n";
-
-	query += "for $doc in cts:search(doc()[gs:Dataset or gs:DatasetCollection or gs:Document or gs:Ontology or gs:Service or gs:Observation],\n";
-
-	query += "cts:element-range-query(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema','isDeleted'),'=','true',(\"score-function=linear\"),0.0) \n";
-
-	query += ",(\"unfiltered\",\"score-simple\"),0)[0 to " + count + "]\n";
-
-	query += "return xdmp:document-delete(fn:document-uri($doc))";
-
-	return query;
-    }
 }

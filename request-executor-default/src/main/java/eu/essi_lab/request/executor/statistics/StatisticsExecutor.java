@@ -7,7 +7,7 @@ package eu.essi_lab.request.executor.statistics;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,12 +24,12 @@ package eu.essi_lab.request.executor.statistics;
  * #L%
  */
 
-import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.factory.DatabaseConsumerFactory;
+import eu.essi_lab.api.database.DatabaseExecutor;
+import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.stats.StatisticsMessage;
 import eu.essi_lab.messages.stats.StatisticsResponse;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.request.executor.IStatisticsExecutor;
 import eu.essi_lab.request.executor.discover.QueryInitializer;
@@ -50,13 +50,13 @@ public class StatisticsExecutor implements IStatisticsExecutor {
 	//
 	message.setNormalizedBond(message.getPermittedBond());
 
-	StorageUri uri = message.getDataBaseURI();
+	StorageInfo uri = message.getDataBaseURI();
 
-	DatabaseReader reader = DatabaseConsumerFactory.createDataBaseReader(uri);
+	DatabaseExecutor executor = DatabaseProviderFactory.getDatabaseExecutor(uri);
 
 	GSLoggerFactory.getLogger(getClass()).info("Computation STARTED");
 
-	StatisticsResponse response = reader.compute(message);
+	StatisticsResponse response = executor.compute(message);
 
 	GSLoggerFactory.getLogger(getClass()).info("Computation ENDED");
 

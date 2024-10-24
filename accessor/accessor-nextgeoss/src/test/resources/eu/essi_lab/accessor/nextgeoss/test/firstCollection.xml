@@ -1,0 +1,17 @@
+<atom:feed xmlns:atom="http://www.w3.org/2005/Atom" xmlns:custom="http://example.com/opensearchextensions/1.0/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:eo="http://a9.com/-/opensearch/extensions/eo/1.0/" xmlns:eop="http://www.opengis.net/eop/2.1" xmlns:esipdiscovery="http://commons.esipfed.org/ns/discovery/1.2/" xmlns:geo="http://a9.com/-/opensearch/extensions/geo/1.0/" xmlns:georss="http://www.georss.org/georss" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:om="http://www.opengis.net/om/2.0" xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:param="http://a9.com/-/opensearch/extensions/param/1.0/" xmlns:referrer="http://www.opensearch.org/Specifications/OpenSearch/Extensions/Referrer/1.0" xmlns:time="http://a9.com/-/opensearch/extensions/time/1.0/" esipdiscovery:version="1.2">
+<atom:entry>
+<atom:title>CGS S1 GRD L1</atom:title>
+<atom:id>https://catalogue-7.nextgeoss.eu//opensearch/search.atom?productType=CGS_S1_GRD_L1</atom:id>
+<dc:identifier>CGS_S1_GRD_L1</dc:identifier>
+<atom:published>2018-01-16T00:00:00Z</atom:published>
+<atom:updated>2020-12-03T08:50:39Z</atom:updated>
+<dc:date>1900-01-01T00:00:00.000Z/2020-12-03T08:50:39Z</dc:date>
+<georss:box>-90.0 -180.0 90.0 180.0</georss:box>
+<georss:polygon>-180 -90 -180 90 180 90 180 -90 -180 90</georss:polygon>
+<atom:summary>7708 matching products found in the CGS S1 GRD L1 collection. }}|safe</atom:summary>
+<atom:content type="text">Level-1 Ground Range Detected (GRD) products consist of focused SAR data that has been detected, multi-looked and projected to ground range using the Earth ellipsoid model WGS84. The ellipsoid projection of the GRD products is corrected using the terrain height specified in the product general annotation. The terrain height used varies in azimuth but is constant in range (but can be different for each IW/EW sub-swath).</atom:content>
+<atom:link href="https://catalogue-7.nextgeoss.eu//opensearch/description.xml?osdd=CGS_S1_GRD_L1" rel="search" type="application/opensearchdescription+xml"/>
+<atom:link href="http://example.com" rel="via" type="text/html"/>
+<atom:link href="https://catalogue-7.nextgeoss.eu//opensearch/collection_search.atom?" rel="up" type="application/atom+xml"/>
+</atom:entry>
+</atom:feed>

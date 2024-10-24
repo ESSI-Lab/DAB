@@ -7,7 +7,7 @@ package eu.essi_lab.accessor.wcs_1_1_0;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -56,7 +56,7 @@ public class WCSMapper_110 extends WCSMapper {
 
 	String out = null;
 	try {
-	    out = coverageDescription.evaluateString("/*:CoverageDescription/*:Identifier");
+	    out = coverageDescription.evaluateString("(/*:CoverageDescription | /*:CoverageDescriptions/*:CoverageDescription)/*:Identifier");
 	} catch (XPathExpressionException e) {
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
@@ -82,7 +82,7 @@ public class WCSMapper_110 extends WCSMapper {
 
 	List<String> out = null;
 	try {
-	    out = description.evaluateTextContent("/*:CoverageDescription/*:SupportedFormat/text()");
+	    out = description.evaluateTextContent("(/*:CoverageDescription | /*:CoverageDescriptions/*:CoverageDescription)/*:SupportedFormat/text()");
 	} catch (XPathExpressionException e) {
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
@@ -95,7 +95,7 @@ public class WCSMapper_110 extends WCSMapper {
 
 	String out = null;
 	try {
-	    out = description.evaluateString("/*:CoverageDescription/*:Title");
+	    out = description.evaluateString("(/*:CoverageDescription | /*:CoverageDescriptions/*:CoverageDescription)/*:Title");
 	} catch (XPathExpressionException e) {
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
@@ -108,7 +108,7 @@ public class WCSMapper_110 extends WCSMapper {
 
 	String out = null;
 	try {
-	    out = reader.evaluateString("/*:CoverageDescription/*:Abstract");
+	    out = reader.evaluateString("(/*:CoverageDescription | /*:CoverageDescriptions/*:CoverageDescription)/*:Abstract");
 	} catch (XPathExpressionException e) {
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
@@ -141,7 +141,7 @@ public class WCSMapper_110 extends WCSMapper {
     protected List<Double> getBboxFromDescription(XMLDocumentReader coverageDescription) {
 
 	try {
-	    Node[] bboxes = coverageDescription.evaluateNodes("/*:CoverageDescription/*:Domain/*:SpatialDomain/*:BoundingBox");
+	    Node[] bboxes = coverageDescription.evaluateNodes("(/*:CoverageDescription | /*:CoverageDescriptions/*:CoverageDescription)/*:Domain/*:SpatialDomain/*:BoundingBox");
 
 	    for (int i = 0; i < bboxes.length; i++) {
 
@@ -186,7 +186,7 @@ public class WCSMapper_110 extends WCSMapper {
     protected String getGridBoudingBoxCRS(XMLDocumentReader coverageDescription) {
 
 	try {
-	    String crs = coverageDescription.evaluateString("/*:CoverageDescription/*:Domain/*:SpatialDomain/*:GridCRS/*:GridBaseCRS");
+	    String crs = coverageDescription.evaluateString("(/*:CoverageDescription | /*:CoverageDescriptions/*:CoverageDescription)/*:Domain/*:SpatialDomain/*:GridCRS/*:GridBaseCRS");
 
 	    if (checkString(crs)) {
 		return crs;
@@ -209,7 +209,7 @@ public class WCSMapper_110 extends WCSMapper {
 		return new ArrayList<>();
 	    }
 
-	    Node[] bboxes = coverageDescription.evaluateNodes("/*:CoverageDescription/*:Domain/*:SpatialDomain/*:BoundingBox");
+	    Node[] bboxes = coverageDescription.evaluateNodes("(/*:CoverageDescription | /*:CoverageDescriptions/*:CoverageDescription)/*:Domain/*:SpatialDomain/*:BoundingBox");
 
 	    for (int i = 0; i < bboxes.length; i++) {
 
@@ -244,9 +244,9 @@ public class WCSMapper_110 extends WCSMapper {
 
 	try {
 	    String beginPosition = coverageDescription
-		    .evaluateString("/*:CoverageDescription/*:Domain/*:TemporalDomain/*:TimePeriod/*:BeginPosition");
+		    .evaluateString("(/*:CoverageDescription | /*:CoverageDescriptions/*:CoverageDescription)/*:Domain/*:TemporalDomain/*:TimePeriod/*:BeginPosition");
 	    String endPosition = coverageDescription
-		    .evaluateString("/*:CoverageDescription/*:Domain/*:TemporalDomain/*:TimePeriod/*:EndPosition");
+		    .evaluateString("(/*:CoverageDescription | /*:CoverageDescriptions/*:CoverageDescription)/*:Domain/*:TemporalDomain/*:TimePeriod/*:EndPosition");
 
 	    if (checkString(beginPosition) && checkString(endPosition)) {
 
@@ -268,7 +268,7 @@ public class WCSMapper_110 extends WCSMapper {
     protected List<String> getSupportedCRS(XMLDocumentReader coverageDescription) {
 
 	try {
-	    return coverageDescription.evaluateTextContent("/*:CoverageDescription/*:SupportedCRS");
+	    return coverageDescription.evaluateTextContent("(/*:CoverageDescription | /*:CoverageDescriptions/*:CoverageDescription)/*:SupportedCRS");
 	} catch (XPathExpressionException e) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
@@ -379,7 +379,7 @@ public class WCSMapper_110 extends WCSMapper {
     protected int getDimensionsCount(XMLDocumentReader coverageDescription) throws XPathExpressionException {
 
 	String dimensions = coverageDescription
-		.evaluateString("/*:CoverageDescriptions/*:CoverageDescription/*:Domain/*:SpatialDomain/*:BoundingBox/@dimensions");
+		.evaluateString("(/*:CoverageDescription | /*:CoverageDescriptions/*:CoverageDescription)/*:Domain/*:SpatialDomain/*:BoundingBox/@dimensions");
 	return Integer.valueOf(dimensions);
     }
 
@@ -388,7 +388,7 @@ public class WCSMapper_110 extends WCSMapper {
 	return Arrays.asList(//
 		coverageDescription
 			.evaluateString(
-				"/*:CoverageDescriptions/*:CoverageDescription/*:Domain/*:SpatialDomain/*:GridCRS/*:GridOffsets/text()")
+				"(/*:CoverageDescription | /*:CoverageDescriptions/*:CoverageDescription)/*:Domain/*:SpatialDomain/*:GridCRS/*:GridOffsets/text()")
 			.split(" "))
 		.//
 		stream().//

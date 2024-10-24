@@ -7,7 +7,7 @@ package eu.essi_lab.cfga.gs.setting.augmenter.worker;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -39,6 +39,7 @@ import com.vaadin.flow.data.provider.SortDirection;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.TabIndex;
 import eu.essi_lab.cfga.gs.setting.augmenter.AugmenterSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.SchedulerSupport;
 import eu.essi_lab.cfga.gs.setting.menuitems.RowValuesFormatterMenuItem;
@@ -100,6 +101,11 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
     /**
      * 
      */
+    private static final String VIEW_OPTION_KEY = "viewOption";
+
+    /**
+     * 
+     */
     public AugmenterWorkerSetting() {
 
 	setCanBeRemoved(true);
@@ -138,6 +144,16 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 
 	addOption(nameOption);
 
+	Option<String> viewOption = StringOptionBuilder.get().//
+		withKey(VIEW_OPTION_KEY).//
+		withLabel("Identifier of an existing view").//
+		withSingleSelection().//
+		withValuesLoader(getViewIdentifiersLoader()).//
+		cannotBeDisabled().//
+		build();
+
+	addOption(viewOption);
+
 	Option<Integer> maxRecordsOption = IntegerOptionBuilder.get().//
 		required().//
 		withKey(MAX_RECORDS_KEY).//
@@ -165,7 +181,7 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 		required().//
 		withKey(TIME_BACK_OPTION_KEY).//
 		withLabel(
-			"Elaborates only records with resource time stamp >= (cur.time - time back) ( in milliseconds ). 0 = no time back)")
+			"Elaborates only records created since the given amount of minutes. 0 to elaborates all records")
 		.//
 		withValue(0).//
 		withMinValue(0).//
@@ -180,6 +196,7 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 		withDescription("Leave unset to augment all the available sources").//
 		withMultiSelection().//
 		withValuesLoader(new SourcesLoader()).//
+		withTextArea().//
 		cannotBeDisabled().//
 		build();
 
@@ -203,6 +220,11 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 	//
 	setValidator(new AugmenterWorkerSettingValidator());
     }
+
+    /**
+     * @return
+     */
+    protected abstract ValuesLoader<String> getViewIdentifiersLoader();
 
     /**
      * @author Fabrizio
@@ -229,7 +251,7 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 	    setComponentName(AugmenterWorkerSetting.class.getName());
 
 	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(5).//
+		    withIndex(TabIndex.AUGMENTER_WORKER_SETTING.getIndex()).//
 		    withShowDirective("Augmenters", SortDirection.ASCENDING).//
 
 		    withAddDirective(//
@@ -243,7 +265,9 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 
 			    ColumnDescriptor.create("Name", true, true, (s) -> getName(s)), //
 
-			    ColumnDescriptor.create("Repeat (D-h)", 130, true, true,
+			    ColumnDescriptor.create("Repeat count", 50, true, true, (s) -> SchedulerSupport.getInstance().getRepeatCount(s)), //
+
+			    ColumnDescriptor.create("Repeat interval", 50, true, true,
 				    (s) -> SchedulerSupport.getInstance().getRepeatInterval(s)), //
 
 			    ColumnDescriptor.create("Status", 100, true, true, (s) -> SchedulerSupport.getInstance().getJobPhase(s)), //
@@ -390,6 +414,22 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
     protected abstract String getAugmentersSettingIdentifier();
 
     /**
+     * @return
+     */
+    public void setViewIdentifier(String viewId) {
+
+	getOption(VIEW_OPTION_KEY, String.class).get().setValue(viewId);
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getViewIdentifier() {
+
+	return getOption(VIEW_OPTION_KEY, String.class).get().getOptionalValue();
+    }
+
+    /**
      * @param maxRecords
      */
     public void setMaxRecords(int maxRecords) {
@@ -422,17 +462,17 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
     }
 
     /**
-     * @param timeBack
+     * @param maxAge
      */
-    public void setTimeBack(int timeBack) {
+    public void setMaxAge(int maxAge) {
 
-	getOption(TIME_BACK_OPTION_KEY, Integer.class).get().setValue(timeBack);
+	getOption(TIME_BACK_OPTION_KEY, Integer.class).get().setValue(maxAge);
     }
 
     /**
      * @return
      */
-    public int getTimeBack() {
+    public int getMaxAge() {
 
 	return getOption(TIME_BACK_OPTION_KEY, Integer.class).get().getValue();
     }
@@ -471,8 +511,6 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 		getSelectedValues();
 
 	if (selectedValues.isEmpty()) {
-
-	    GSLoggerFactory.getLogger(getClass()).debug("No source selected, augmenting all the sources");
 
 	    return ConfigurationWrapper.//
 		    getHarvestedAndMixedSources().//
@@ -526,6 +564,14 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 	}
 
 	return sourcesBond;
+    }
+
+    /**
+     * @return
+     */
+    public String getWorkerName() {
+
+	return getAugmentationJobName();
     }
 
     /**

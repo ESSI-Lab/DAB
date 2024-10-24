@@ -4,7 +4,7 @@ package eu.essi_lab.ommdk;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -51,16 +51,22 @@ public class GMDResourceMapper extends FileIdentifierMapper {
 	MIMetadata miMetadata = null;
 	try {
 	    miMetadata = createMIMetatata(originalMD.getMetadata());
-	} catch (UnsupportedEncodingException | JAXBException e) {
+	} catch (Exception e) {
+
+	    String message = e.getMessage();
+	    if (message.contains("Expected elements are")) {
+
+		message = message.substring(0, message.indexOf("Expected elements are"));
+	    }
 
 	    throw GSException.createException( //
 		    getClass(), //
-		    e.getMessage(), //
+		    message, //
 		    null, //
 		    ErrorInfo.ERRORTYPE_INTERNAL, //
 		    ErrorInfo.SEVERITY_FATAL, //
-		    GMD_RESOURCE_MAPPER_MAP_ERROR, //
-		    e);
+		    GMD_RESOURCE_MAPPER_MAP_ERROR //
+	    );
 	}
 
 	GSResource resource = null;

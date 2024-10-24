@@ -58,19 +58,25 @@
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>augmenter</artifactId>
-			<version>${project.version}</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>gs-lib-utils</artifactId>
-			<version>${project.version}</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>gs-lib-xml</artifactId>
-			<version>${project.version}</version>
+			<version>${project.parent.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>gs-lib-mqtt</artifactId>
+			<version>${project.parent.version}</version>
 		</dependency>
 		
 		<dependency>
@@ -78,7 +84,69 @@
 			<artifactId>access-tools-validator-common</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-	
+		
+		<dependency>
+		  <groupId>org.opensearch.client</groupId>
+		  <artifactId>opensearch-rest-high-level-client</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-elasticsearch</artifactId>
+		</dependency>
+
+		
 	</dependencies>
+	
+	<profiles>
+		<profile>
+			<id>internaltest</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<groupId>io.fabric8</groupId>
+						<artifactId>docker-maven-plugin</artifactId>
+
+						<configuration>
+							<images>
+
+								<image>
+									<alias>gi-elasticsearch</alias>
+									<name>${docker.elasticsearch}</name>
+									<run>
+										<ports>
+											<port>gi-elasticsearch.port:9200</port>
+										</ports>
+										<wait>
+											<http>
+												<!--suppress MavenModelInspection -->
+												<url>http://admin:admin@${docker.host.address}:${gi-elasticsearch.port}</url><!--/_cat/health?v -->
+											</http>
+											<time>${fabric8-timeout}</time>
+										</wait>
+										<env>
+											<discovery.type>single-node</discovery.type>
+											<bootstrap.memory_lock>true</bootstrap.memory_lock>
+											<OPENSEARCH_JAVA_OPTS>-Xms512m -Xmx512m</OPENSEARCH_JAVA_OPTS>
+										    <DISABLE_INSTALL_DEMO_CONFIG>true</DISABLE_INSTALL_DEMO_CONFIG>
+										    <DISABLE_SECURITY_PLUGIN>true</DISABLE_SECURITY_PLUGIN>
+										</env>
+									</run>
+								</image>
+
+							</images>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		</profiles>
 
 </project>

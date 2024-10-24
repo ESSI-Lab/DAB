@@ -7,7 +7,7 @@ package eu.essi_lab.profiler.rest.handler.info;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -32,8 +32,9 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.MediaType;
 
+import eu.essi_lab.api.database.DatabaseExecutor;
 import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.factory.DatabaseConsumerFactory;
+import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StringUtils;
@@ -51,7 +52,7 @@ import eu.essi_lab.messages.web.KeyValueParser;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.RuntimeInfoElement;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
@@ -94,14 +95,14 @@ public class FullStatisticsHandler extends DefaultRequestHandler {
     @Override
     public String getStringResponse(WebRequest webRequest) throws GSException {
 
-	StorageUri uri = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo uri = ConfigurationWrapper.getDatabaseURI();
 	GSLoggerFactory.getLogger(FullStatisticsHandler.class).debug("Storage uri: {}", uri);
 
-	DatabaseReader reader = DatabaseConsumerFactory.createDataBaseReader(uri);
+	DatabaseExecutor executor = DatabaseProviderFactory.getDatabaseExecutor(uri);
 
 	StatisticsMessage message = createMessage(webRequest);
 
-	StatisticsResponse response = reader.compute(message);
+	StatisticsResponse response = executor.compute(message);
 
 	String out = "<out></out>";
 
@@ -257,7 +258,7 @@ public class FullStatisticsHandler extends DefaultRequestHandler {
 
 	List<Bond> operands = new ArrayList<Bond>();
 
-	StorageUri storageUri = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo storageUri = ConfigurationWrapper.getDatabaseURI();
 
 	Optional<String> viewId = webRequest.extractViewId();
 

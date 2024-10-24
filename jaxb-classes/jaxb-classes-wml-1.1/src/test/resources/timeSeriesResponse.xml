@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<timeSeriesResponse xmlns="http://www.cuahsi.org/waterML/1.1/"
+                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                    xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://www.cuahsi.org/waterML/1.1/ ../../../src/main/resources/schemas/cuahsiTimeSeries_v1_1.xsd">
+      <queryInfo>
+         <creationTime>2018-01-11T06:32:53.6327221-07:00</creationTime>
+         <criteria MethodCalled="GetValues">
+            <parameter name="site" value="LBR:USU-LBR-Mendon"/>
+            <parameter name="variable" value="LBR:USU3"/>
+            <parameter name="startDate" value="2005-08-04T11:30:00"/>
+            <parameter name="endDate" value="2005-08-05T11:30:00"/>
+         </criteria>
+      </queryInfo>
+      <timeSeries>
+         <sourceInfo xsi:type="SiteInfoType">
+            <siteName>Little Bear River at Mendon Road near Mendon, Utah</siteName>
+            <siteCode network="LBR" siteID="1">USU-LBR-Mendon</siteCode>
+            <geoLocation>
+               <geogLocation srs="EPSG:4269" xsi:type="LatLonPointType">
+                  <latitude>41.718473</latitude>
+                  <longitude>-111.946402</longitude>
+               </geogLocation>
+               <localSiteXY projectionInformation="NAD83 / UTM zone 12N">
+                  <X>421276.323</X>
+                  <Y>4618952.04</Y>
+               </localSiteXY>
+            </geoLocation>
+            <elevation_m>1345</elevation_m>
+            <verticalDatum>NGVD29</verticalDatum>
+            <siteProperty name="County">Cache</siteProperty>
+            <siteProperty name="State">Utah</siteProperty>
+            <siteProperty name="Site Comments">Located below county road bridge at Mendon Road crossing</siteProperty>
+            <siteProperty name="PosAccuracy_m">10</siteProperty>
+            <siteProperty name="Site Type">Stream</siteProperty>
+         </sourceInfo>
+         <variable>
+            <variableCode default="true" variableID="3" vocabulary="LBR">USU3</variableCode>
+            <variableName>Battery voltage</variableName>
+            <valueType>Field Observation</valueType>
+            <dataType>Minimum</dataType>
+            <generalCategory>Instrumentation</generalCategory>
+            <sampleMedium>Not Relevant</sampleMedium>
+            <unit>
+               <unitName>volts</unitName>
+               <unitType>Potential Difference</unitType>
+               <unitAbbreviation>V</unitAbbreviation>
+               <unitCode>168</unitCode>
+            </unit>
+            <noDataValue>-9999</noDataValue>
+            <timeScale isRegular="true">
+               <unit>
+                  <unitName>minute</unitName>
+                  <unitType>Time</unitType>
+                  <unitAbbreviation>min</unitAbbreviation>
+                  <unitCode>102</unitCode>
+               </unit>
+               <timeSupport>30</timeSupport>
+            </timeScale>
+            <speciation>Not Applicable</speciation>
+         </variable>
+         <values>
+            <value censorCode="nc"
+                   dateTime="2005-08-04T11:30:00"
+                   dateTimeUTC="2005-08-04T18:30:00"
+                   methodCode="4"
+                   qualityControlLevelCode="0"
+                   sourceCode="1">13.24467</value>
+            <qualityControlLevel qualityControlLevelID="0">
+               <qualityControlLevelCode>0</qualityControlLevelCode>
+               <definition>Raw data</definition>
+               <explanation>Raw and unprocessed data and data products that have not undergone quality control.  Depending on the variable, data type, and data transmission system, raw data may be available within seconds or minutes after the measurements have been made. Examples include real time precipitation, streamflow and water quality measurements.</explanation>
+            </qualityControlLevel>
+            <method methodID="4">
+               <methodCode>4</methodCode>
+               <methodDescription>Battery voltage measured by Campbell Scientific CR206 datalogger.</methodDescription>
+               <methodLink>http://www.campbellsci.com</methodLink>
+            </method>
+            <source sourceID="1">
+               <sourceCode>1</sourceCode>
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Continuous water quality monitoring by Utah State University as part of the USDA CEAP Grant</sourceDescription>
+               <metadata>
+                  <topicCategory>inlandWaters</topicCategory>
+                  <title>Little Bear River Conservation Effects Assessment Project Water Quality Data</title>
+                  <abstract>Under funding from the United States Department of Agricultures Conservations Effects Assessment program, USU is conducting continuous water quality monitoring of the Little Bear River to demonstrate and compare the use of alternative monitoring approaches in estimating pollutant concentrations and loads.</abstract>
+                  <profileVersion>Unknown</profileVersion>
+               </metadata>
+               <contactInformation>
+                  <contactName>Jeff Horsburgh</contactName>
+                  <typeOfContact>main</typeOfContact>
+                  <email>jeff.horsburgh@usu.edu</email>
+                  <phone>1-435-797-2946</phone>
+                  <address xsi:type="xsd:string">8200 Old Main Hill
+,Logan, UT 84322-8200</address>
+               </contactInformation>
+               <sourceLink>http://littlebearriver.usu.edu</sourceLink>
+               <citation>Continuous water quality monitoring by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <censorCode>
+               <censorCode>nc</censorCode>
+               <censorCodeDescription>not censored</censorCodeDescription>
+            </censorCode>
+         </values>
+      </timeSeries>
+   </timeSeriesResponse>

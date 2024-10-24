@@ -1,0 +1,23 @@
+<doc>
+	<aaa>
+		<a1 attr="attr1">text1</a1>
+	</aaa>
+	<bbb>
+		<a>ba</a>
+		<b1>b1</b1>
+		<b2>b2</b2>
+		<b3>b3</b3>
+		<aaa>
+			<a2 attr="attr2">text2</a2>
+		</aaa>
+	</bbb>
+	<aaa>
+		<a3 attr="attr3">text3</a3>
+	</aaa>
+	<c>C</c>
+	<d>
+		<aaa>
+			<a4 attr="attr4">text4</a4>
+		</aaa>
+	</d>
+</doc>

@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.csw;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,9 +21,35 @@ package eu.essi_lab.accessor.csw;
  * #L%
  */
 
+import java.io.File;
+import java.io.InputStream;
+import java.net.URLEncoder;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.parsers.DocumentBuilder;
+
+import org.w3c.dom.Document;
+
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
+import eu.essi_lab.jaxb.csw._2_0_2.AbstractRecordType;
+import eu.essi_lab.jaxb.csw._2_0_2.BriefRecordType;
+import eu.essi_lab.jaxb.csw._2_0_2.Capabilities;
+import eu.essi_lab.jaxb.csw._2_0_2.ElementSetType;
+import eu.essi_lab.lib.net.downloader.Downloader;
+import eu.essi_lab.lib.net.s3.S3TransferWrapper;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.IOStreamUtils;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.lib.xml.XMLFactories;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.resource.OriginalMetadata;
 
 /**
  * CSW service endpoint: https://www.nodc.noaa.gov/archivesearch/csw?
@@ -43,9 +69,25 @@ public class CSWNODCConnector extends CSWGetConnector {
     /**
      * 
      */
+    private ArrayList<String> globalList;
+
+    /**
+     * 
+     */
+    private String globalFileName;
+
+    /**
+     * 
+     */
     public CSWNODCConnector() {
 
-	getSetting().selectPageSize(20);
+	getSetting().setPageSize(50);
+
+	setSelectedSchema(CommonNameSpaceContext.CSW_NS_URI);
+
+	setElementeSetType(ElementSetType.BRIEF);
+
+	globalList = new ArrayList<>();
     }
 
     /**
@@ -60,8 +102,118 @@ public class CSWNODCConnector extends CSWGetConnector {
     }
 
     /**
-     * The CSW NODC always returns GMI Metadata according to the NODC profile (even if GMD Metadata is asked)
+     * @param content
+     * @param silent
+     * @return
+     * @throws JAXBException
      */
+    @Override
+    protected Capabilities doUnmarshallCapabiliesStream(InputStream content, boolean silent) throws Exception {
+
+	String capString = IOStreamUtils.asUTF8String(content);
+
+	capString = capString.replace("<ows:AllowedValues>", "");
+	capString = capString.replace("</ows:AllowedValues>", "");
+
+	content = IOStreamUtils.asStream(capString);
+
+	return super.doUnmarshallCapabiliesStream(content, silent);
+    }
+
+    /**
+     * @param record
+     * @return
+     */
+    @Override
+    protected OriginalMetadata recordToOriginalMetadata(AbstractRecordType record) {
+
+	OriginalMetadata out = null;
+
+	int maxTries = 10;
+
+	int tries = 1;
+
+	String identifier = null;
+
+	while (out == null && tries < maxTries) {
+
+	    try {
+
+		BriefRecordType brief = (BriefRecordType) record;
+
+		identifier = URLEncoder.encode(brief.getIdentifiers().get(0).getValue().getContent().get(0), "UTF-8");
+
+		String requestURL = "https://www.ncei.noaa.gov/metadata/geoportal/rest/metadata/item/" + identifier + "/xml";
+
+		if (identifier.contains("GLOB")) {
+
+		    GSLoggerFactory.getLogger(getClass()).info("Global metadata found: {}", requestURL);
+
+		    Optional<S3TransferWrapper> optS3TransferManager = ConfigurationWrapper.getS3TransferManager();
+
+		    if (optS3TransferManager.isPresent()) {
+
+			GSLoggerFactory.getLogger(getClass()).info("Transfer of global list to S3 STARTED");
+
+			if (globalFileName == null) {
+
+			    globalFileName = "globalList_" + ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds();
+			    globalFileName = globalFileName.replace(":", "_");
+			    globalFileName = globalFileName.replace(".", "_");
+			}
+
+			File tempFile = File.createTempFile(globalFileName, ".txt");
+
+			globalList.add(requestURL.toString());
+
+			String text = globalList.toString().replace("[", "").replace("]", "").replace(",", "\n").replace(" ", "");
+
+			Files.copy(IOStreamUtils.asStream(text), tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+			optS3TransferManager.get().uploadFile(tempFile.getAbsolutePath(), "nodcglobal", globalFileName);
+
+			tempFile.delete();
+
+			GSLoggerFactory.getLogger(getClass()).info("Transfer of global list to S3 ENDED");
+		    }
+
+		    return null;
+		}
+
+		GSLoggerFactory.getLogger(getClass())
+			.debug("Attempt #" + tries + " to retrieve GMI metadata with id " + identifier + " STARTED");
+
+		Downloader downloader = new Downloader();
+
+		InputStream gmiStream = downloader.downloadOptionalStream(requestURL).get();
+
+		DocumentBuilder builder = XMLFactories.newDocumentBuilderFactory().newDocumentBuilder();
+
+		Document node = builder.parse(gmiStream);
+
+		out = createMetadata(node);
+
+		GSLoggerFactory.getLogger(getClass())
+			.debug("Attempt #" + tries + " to retrieve GMI metadata with id " + identifier + " SUCCEEDED");
+
+	    } catch (Exception e) {
+
+		GSLoggerFactory.getLogger(getClass())
+			.debug("Attempt #" + tries + " to retrieve GMI metadata with id " + identifier + " FAILED");
+
+		tries++;
+
+		GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
+
+		try {
+		    Thread.sleep(TimeUnit.SECONDS.toMillis(5));
+		} catch (InterruptedException e1) {
+		}
+	    }
+	}
+
+	return out;
+    }
 
     @Override
     protected String getReturnedMetadataSchema() {
@@ -72,7 +224,7 @@ public class CSWNODCConnector extends CSWGetConnector {
     @Override
     protected String getRequestedMetadataSchema() throws GSException {
 
-	return CommonNameSpaceContext.GMD_NS_URI;
+	return CommonNameSpaceContext.CSW_NS_URI;
     }
 
     @Override

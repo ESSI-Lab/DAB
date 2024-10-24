@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.scheduler;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,8 +23,8 @@ package eu.essi_lab.cfga.scheduler;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import org.quartz.DateBuilder;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
@@ -32,13 +32,11 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 
-import eu.essi_lab.cfga.setting.Setting;
+import eu.essi_lab.cfga.setting.SettingUtils;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting.SchedulingGroup;
 import eu.essi_lab.configuration.ExecutionMode;
-import eu.essi_lab.configuration.GIProjectExecutionMode;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 
 /**
  * @author Fabrizio
@@ -55,39 +53,19 @@ public class JobRescheduler {
      */
     public boolean isRescheduled(SchedulerWorkerSetting setting, JobExecutionContext context) {
 
-	ExecutionMode executionMode = GIProjectExecutionMode.getMode();
+	ExecutionMode executionMode = ExecutionMode.get();
 
 	SchedulingGroup group = setting.getGroup();
 
 	switch (executionMode) {
 
 	//
-	// Access nodes executes only asynch downloads jobs
+	// Batch nodes executes all these jobs
 	//
-	case ACCESS:
-
-	    switch (group) {
-	    case ASYNCH_ACCESS:
-		
-		logJobExecuting(setting, executionMode, group);
-
-		return false;
-	    default:
-
-		logJobRescheduled(setting, executionMode, group);
-
-		rescheduleJob(setting, context);
-		return true;
-	    }
-
-	    //
-	    // Batch nodes executes all these jobs
-	    //
 	case BATCH:
 
 	    switch (group) {
 	    case HARVESTING:
-	    case AUGMENTING:
 	    case BULK_DOWNLOAD:
 	    case DEFAULT:
 
@@ -104,16 +82,37 @@ public class JobRescheduler {
 	    }
 
 	    //
-	    // Custom tasks are executed directly by the configuration node
+	    //
 	    //
 	case CONFIGURATION:
 
 	    switch (group) {
-	    case CUSTOM_TASK:
-		
+	    case BULK_DOWNLOAD:
+
 		logJobExecuting(setting, executionMode, group);
 
 		return false;
+
+	    case DEFAULT:
+	    default:
+
+		logJobRescheduled(setting, executionMode, group);
+
+		rescheduleJob(setting, context);
+		return true;
+	    }
+
+	case AUGMENTER:
+
+	    switch (group) {
+	    case AUGMENTING:
+	    case ASYNCH_ACCESS:
+	    case CUSTOM_TASK:
+
+		logJobExecuting(setting, executionMode, group);
+
+		return false;
+
 	    default:
 
 		logJobRescheduled(setting, executionMode, group);
@@ -123,14 +122,17 @@ public class JobRescheduler {
 	    }
 
 	    //
-	    // This should never happen since in frontend execution mode the scheduler is not started
+	    // no job executed
 	    //
+	case INTENSIVE:
 	case FRONTEND:
+	case ACCESS:
 
 	    logJobRescheduled(setting, executionMode, group);
 
 	    rescheduleJob(setting, context);
 	    return true;
+
 	//
 	// in MIXED and LOCAL_PRODUCTION mode all jobs are executed
 	//
@@ -152,7 +154,7 @@ public class JobRescheduler {
 
 	try {
 
-	    GSLoggerFactory.getLogger(getClass()).info("Rescheduling of worker {} STARTED", setting.getName());
+	    GSLoggerFactory.getLogger(getClass()).info("Automatic rescheduling of worker {} STARTED", setting.getName());
 
 	    Scheduler scheduler = context.getScheduler();
 
@@ -169,28 +171,28 @@ public class JobRescheduler {
 
 		for (Trigger trigger : triggers) {
 
-		    TriggerBuilder<? extends Trigger> triggerBuilder = trigger.getTriggerBuilder();
+		    @SuppressWarnings("unchecked")
+		    TriggerBuilder<Trigger> triggerBuilder = (TriggerBuilder<Trigger>) trigger.getTriggerBuilder();
 
-		    //
-		    // rescheduled in 2 minutes
-		    //
-		    Trigger newTrigger = triggerBuilder.startAt(DateBuilder.nextGivenMinuteDate(new Date(), 2)).build();
+		    Trigger newTrigger = triggerBuilder//
+			    // .withSchedule(SimpleScheduleBuilder.simpleSchedule()//
+			    // .withMisfireHandlingInstructionIgnoreMisfires())//
+			    .startAt(new Date(System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(1)))//
+			    .build();
 
-		    Date date = scheduler.rescheduleJob(trigger.getKey(), newTrigger);
+		    GSLoggerFactory.getLogger(getClass()).info("Job rescheduled to be fired as soon as possible");
 
-		    GSLoggerFactory.getLogger(getClass()).info("Job rescheduled: {}", ISO8601DateTimeUtils.getISO8601DateTime(date));
+		    scheduler.rescheduleJob(trigger.getKey(), newTrigger);
 		}
 	    }
 
-	    GSLoggerFactory.getLogger(getClass()).info("Rescheduling of worker {} ENDED", setting.getName());
+	    GSLoggerFactory.getLogger(getClass()).info("Automatic rescheduling of worker {} ENDED", setting.getName());
 
 	} catch (SchedulerException e) {
 
-	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error("Automatic rescheduling of worker {} FAILED", setting.getName());
 
-	    GSLoggerFactory.getLogger(getClass()).error("Rescheduling of worker {} FAILED", setting.getName());
-
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
     }
 
@@ -199,10 +201,12 @@ public class JobRescheduler {
      * @param executionMode
      * @param group
      */
-    private void logJobExecuting(Setting setting, ExecutionMode executionMode, SchedulingGroup group) {
+    private void logJobExecuting(SchedulerWorkerSetting setting, ExecutionMode executionMode, SchedulingGroup group) {
 
-	GSLoggerFactory.getLogger(getClass()).debug("Job '{}' is executable by this worker (execMode={}, schedulingGroup={})",
-		setting.getName() + "_" + setting.getIdentifier(), executionMode, group.name());
+	SchedulerWorkerSetting downCast = (SchedulerWorkerSetting) SettingUtils.downCast(setting, setting.getSettingClass());
+
+	GSLoggerFactory.getLogger(getClass()).debug("Worker '{}' is executable by this job (execMode={}, schedulingGroup={})",
+		downCast.getWorkerName() + " (" + setting.getIdentifier() + ")", executionMode, group.name());
 
     }
 
@@ -211,11 +215,13 @@ public class JobRescheduler {
      * @param executionMode
      * @param group
      */
-    private void logJobRescheduled(Setting setting, ExecutionMode executionMode, SchedulingGroup group) {
+    private void logJobRescheduled(SchedulerWorkerSetting setting, ExecutionMode executionMode, SchedulingGroup group) {
+
+	SchedulerWorkerSetting downCast = (SchedulerWorkerSetting) SettingUtils.downCast(setting, setting.getSettingClass());
 
 	GSLoggerFactory.getLogger(getClass()).warn(
-		"Job '{}' is NOT executable by this worker (execMode={}, schedulingGroup={}). Rescheduling",
-		setting.getName() + "_" + setting.getIdentifier(), executionMode, group.name());
+		"Worker '{}' is NOT executable by this job (execMode={}, schedulingGroup={}). Rescheduling",
+		downCast.getWorkerName() + " (" + setting.getIdentifier() + ")", executionMode, group.name());
 
     }
 }

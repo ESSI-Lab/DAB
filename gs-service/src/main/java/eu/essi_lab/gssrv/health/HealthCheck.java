@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.health;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,7 +24,10 @@ package eu.essi_lab.gssrv.health;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Optional;
+import java.util.Properties;
 
+import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonFactory;
@@ -34,6 +37,10 @@ import com.indeed.status.core.CheckResultSet;
 import com.indeed.status.core.CheckResultSystemReport;
 import com.indeed.status.core.CheckStatus;
 
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.ConfiguredGmailClient;
+import eu.essi_lab.configuration.ExecutionMode;
+import eu.essi_lab.gssrv.starter.GIPStarter;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
@@ -52,6 +59,7 @@ public class HealthCheck {
      * 
      */
     public HealthCheck() {
+
     }
 
     /**
@@ -68,8 +76,17 @@ public class HealthCheck {
 
 		LoggerFactory.getLogger(getClass()).warn("System status: {}", resultSet.getSystemStatus());
 		LoggerFactory.getLogger(getClass()).warn("Health check report:\n {}", printResultSet(true));
-	    }
 
+		Optional<Properties> keyValueOption = ConfigurationWrapper.getSystemSettings().getKeyValueOptions();
+		if (keyValueOption.isPresent()) {
+
+		    Boolean sendEmail = Boolean.valueOf(keyValueOption.get().getOrDefault("sendHealthCheckReport", "true").toString());
+		    if (sendEmail) {
+
+			ConfiguredGmailClient.sendEmail("[GS-REPORT][HEALTH-CHECK-REPORT]", printResultSet(true));
+		    }
+		}
+	    }
 	} catch (IOException e) {
 	    LoggerFactory.getLogger(getClass()).warn("Exception printing Health check status report");
 	    LoggerFactory.getLogger(getClass()).warn(e.getMessage());
@@ -117,7 +134,7 @@ public class HealthCheck {
 	    try {
 		return printResultSet(detail);
 	    } catch (IOException e) {
-		LoggerFactory.getLogger(getClass()).warn("Can't parse Check Result System Report", e);
+		GSLoggerFactory.getLogger(getClass()).error(e);
 	    }
 	}
 
@@ -141,6 +158,10 @@ public class HealthCheck {
 
 	jsonGenerator.flush();
 
-	return jsonWriter.toString();
+	JSONObject jsonReport = new JSONObject(jsonWriter.toString());
+	jsonReport.put("cluster", GIPStarter.getCluster());
+	jsonReport.put("executionMode", ExecutionMode.get());
+
+	return jsonReport.toString(3);
     }
 }

@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof.client;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,16 +25,18 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.HashMap;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ByteArrayEntity;
 import org.slf4j.Logger;
 import org.w3c.dom.Node;
 
-import eu.essi_lab.lib.net.utils.HttpRequestExecutor;
+import eu.essi_lab.lib.net.downloader.Downloader;
+import eu.essi_lab.lib.net.downloader.HttpHeaderUtils;
+import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
+import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodWithBody;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.lib.xml.XMLNodeReader;
@@ -63,21 +65,23 @@ class SOAPExecutorDOM {
     }
 
     public XMLDocumentReader execute() throws GSException {
-	HttpPost post = new HttpPost(endpoint.trim());
-	post.addHeader("SOAPAction", action);
-	post.addHeader("Content-Type", "text/xml;charset=UTF-8");
-
-	ByteArrayEntity inputEntity = new ByteArrayEntity(input);
-	inputEntity.setChunked(false);
-	post.setEntity(inputEntity);
-
-	logger.info("Sending SOAP Request (" + action + ") to: " + endpoint);
 
 	try {
 
-	    HttpResponse response = new HttpRequestExecutor().execute(post);
+	    HashMap<String, String> headers = new HashMap<String, String>();
+	    headers.put("SOAPAction", action);
+	    headers.put("Content-Type", "text/xml;charset=UTF-8");
 
-	    InputStream output = response.getEntity().getContent();
+	    HttpRequest postRequest = HttpRequestUtils.build(MethodWithBody.POST, //
+		    endpoint.trim(), //
+		    input, //
+		    HttpHeaderUtils.build(headers));
+
+	    logger.info("Sending SOAP Request (" + action + ") to: " + endpoint);
+
+	    HttpResponse<InputStream> response = new Downloader().downloadResponse(postRequest);
+
+	    InputStream output = response.body();
 
 	    File tmpFile = File.createTempFile("SOAPExecutorDOM", ".xml");
 	    logger.info("Downloading document to : " + tmpFile.getAbsolutePath());

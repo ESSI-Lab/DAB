@@ -4,7 +4,7 @@ package eu.essi_lab.lib.utils;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,6 +23,10 @@ package eu.essi_lab.lib.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,8 +36,21 @@ import org.json.JSONObject;
 
 /**
  * @author Fabrizio
+ * @author boldrini
  */
 public class JSONUtils {
+
+    /**
+     * @param array
+     * @return
+     */
+    public static List<JSONObject> map(JSONArray array) {
+
+	return array.toList().//
+		stream().//
+		map(v -> new JSONObject((HashMap<String, String>) v)).//
+		collect(Collectors.toList());
+    }
 
     /**
      * @param stream
@@ -99,18 +116,152 @@ public class JSONUtils {
     /**
      * Returns the value held by the given key as sting, if present and not null, else null
      * 
-     * @param json
+     * @param json JsonPath. array of arrays are not supported
      * @param key
      * @return
      */
-    public static String getValue(JSONObject json, String key) {
-	if (!json.has(key)) {
-	    return null;
+    public static <T> T getValue(JSONObject json, Class<T> clazz, String path) {
+	if (path.contains("/")) {
+	    String[] split = path.split("/");
+	    String firstPart = split[0];
+	    String childPath = path.substring(path.indexOf("/") + 1);
+	    JSONObject child;
+	    if (firstPart.contains("[")) {
+		String arrayName = firstPart.substring(0, firstPart.indexOf("["));
+		if (!json.has(arrayName)) {
+		    return null;
+		}
+		String posString = firstPart.substring(firstPart.indexOf("[")).replace("[", "").replace("]", "");
+		Integer pos = Integer.parseInt(posString);
+		JSONArray array = json.getJSONArray(arrayName);
+		child = array.getJSONObject(pos);
+	    } else {
+		if (!json.has(firstPart)) {
+		    return null;
+		}
+		child = json.getJSONObject(firstPart);
+	    }
+	    return getValue(child, clazz, childPath);
+	} else {
+	    if (path.contains("[")) {
+		String arrayName = path.substring(0, path.indexOf("["));
+		if (!json.has(arrayName)) {
+		    return null;
+		}
+		String posString = path.substring(path.indexOf("[")).replace("[", "").replace("]", "");
+		Integer pos = Integer.parseInt(posString);
+		JSONArray array = json.getJSONArray(arrayName);
+		if (array.isNull(pos)) {
+		    return null;
+		}
+		if (clazz.equals(BigDecimal.class)) {
+		    return (T) array.getBigDecimal(pos);
+		} else if (clazz.equals(Integer.class)) {
+		    return (T) new Integer(array.getInt(pos));
+		} else if (clazz.equals(String.class)) {
+		    return (T) array.getString(pos);
+		} else if (clazz.equals(Double.class)) {
+		    return (T) new Double(array.getDouble(pos));
+		} else if (clazz.equals(BigInteger.class)) {
+		    return (T) array.getBigInteger(pos);
+		} else if (clazz.equals(Long.class)) {
+		    return (T) new Long(array.getLong(pos));
+		} else if (clazz.equals(Boolean.class)) {
+		    return (T) new Boolean(array.getBoolean(pos));
+		} else if (clazz.equals(JSONObject.class)) {
+		    return (T) array.getJSONObject(pos);
+		} else if (clazz.equals(JSONArray.class)) {
+		    return (T) array.getJSONArray(pos);
+		}
+	    } else {
+		if (json.isNull(path)) {
+		    return null;
+		}
+		if (clazz.equals(BigDecimal.class)) {
+		    return (T) json.getBigDecimal(path);
+		} else if (clazz.equals(Integer.class)) {
+		    return (T) new Integer(json.getInt(path));
+		} else if (clazz.equals(String.class)) {
+		    return (T) json.getString(path);
+		} else if (clazz.equals(Double.class)) {
+		    return (T) new Double(json.getDouble(path));
+		} else if (clazz.equals(BigInteger.class)) {
+		    return (T) json.getBigInteger(path);
+		} else if (clazz.equals(Long.class)) {
+		    return (T) new Long(json.getLong(path));
+		} else if (clazz.equals(Boolean.class)) {
+		    return (T) new Boolean(json.getBoolean(path));
+		} else if (clazz.equals(JSONObject.class)) {
+		    return (T) json.getJSONObject(path);
+		} else if (clazz.equals(JSONArray.class)) {
+		    return (T) json.getJSONArray(path);
+		}
+	    }
+
 	}
-	String value = json.get(key).toString().trim();
-	if (value.equals("null")) {
-	    return null;
-	}
-	return value;
+
+	return null;
+
     }
+
+    /**
+     * Returns the JSON object at the given JsonPath, otherwise null
+     * 
+     * @param json
+     * @param path
+     * @return
+     */
+    public static JSONObject getJSONObject(JSONObject json, String path) {
+	return getValue(json, JSONObject.class, path);
+    }
+
+    /**
+     * Returns the big decimal at the given JsonPath, otherwise null
+     * 
+     * @param json
+     * @param path
+     * @return
+     */
+    public static BigDecimal getBigDecimal(JSONObject json, String path) {
+	return getValue(json, BigDecimal.class, path);
+    }
+
+    /**
+     * Returns the integer at the given JsonPath, otherwise null
+     * 
+     * @param json
+     * @param path
+     * @return
+     */
+    public static Integer getInteger(JSONObject json, String path) {
+	return getValue(json, Integer.class, path);
+    }
+
+    public static Boolean getBoolean(JSONObject json, String path) {
+	return getValue(json, Boolean.class, path);
+    }
+
+    /**
+     * Returns the string at the given JsonPath, otherwise null
+     * 
+     * @param json
+     * @param path
+     * @return
+     */
+    public static String getString(JSONObject json, String path) {
+	return getValue(json, String.class, path);
+    }
+
+    public static List<String> getStrings(JSONObject json, String path) {
+	JSONArray array = getValue(json, JSONArray.class, path);
+	List<String> ret = new ArrayList<>();
+	if (array == null) {
+	    return ret;
+	}
+	for (int i = 0; i < array.length(); i++) {
+	    ret.add(array.getString(i));
+	}
+	return ret;
+    }
+
 }

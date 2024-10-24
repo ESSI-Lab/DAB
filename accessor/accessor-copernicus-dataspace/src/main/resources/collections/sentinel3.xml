@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<gmd:MD_Metadata xmlns:gmi="http://www.isotc211.org/2005/gmi"
+    xmlns:ns4="http://quakeml.org/xmlns/bed/1.2" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0"
+    xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gco="http://www.isotc211.org/2005/gco"
+    xmlns:dm="http://floraresearch.eu/sdi/services/7.0/dataModel/schema"
+    xmlns:srv="http://www.isotc211.org/2005/srv"
+    xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/4.0"
+    xmlns:rim="urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0" xmlns:gmx="http://www.opengis.net/gmx"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gml="http://www.opengis.net/gml"
+    xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/iso/19139/20060504/gmd/gmd.xsd">
+    <gmd:fileIdentifier>
+        <gco:CharacterString>satellitescene_collection_prefix_SENTINEL_3</gco:CharacterString>
+    </gmd:fileIdentifier>
+    <gmd:language>
+        <gco:CharacterString>en</gco:CharacterString>
+    </gmd:language>
+    <gmd:characterSet>
+        <gmd:MD_CharacterSetCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode" codeListValue="MD_CharacterSetCode_utf8" codeSpace="ISOTC211/19115">MD_CharacterSetCode_utf8</gmd:MD_CharacterSetCode>
+    </gmd:characterSet>
+<!--     <gmd:parentIdentifier>
+        <gco:CharacterString>sentinel</gco:CharacterString>
+    </gmd:parentIdentifier>
+-->
+    <gmd:hierarchyLevel>
+        <gmd:MD_ScopeCode codeList="" codeListValue="series"/>
+    </gmd:hierarchyLevel>
+    <gmd:contact/>
+    <gmd:dateStamp>
+        <gco:Date>2018-03-15</gco:Date>
+    </gmd:dateStamp>
+
+    <gmd:identificationInfo>
+        <gmd:MD_DataIdentification
+            xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://essi-lab.eu/schemas/mirrors/schemas.opengis.net/csw/2.0.2/profiles/apiso/1.0.0/apiso.xsd">
+
+            <gmd:citation>
+                <gmd:CI_Citation>
+                    <gmd:title>
+                        <gco:CharacterString>Sentinel 3</gco:CharacterString>
+                    </gmd:title>
+                    <gmd:date/>
+                </gmd:CI_Citation>
+            </gmd:citation>
+            <gmd:abstract>
+                <gco:CharacterString>Sentinel-3 is primarily an ocean mission, however, the mission is also able to provide atmospheric and land applications. The mission provides data continuity for the ERS, Envisat and SPOT satellites. Sentinel-3 makes use of multiple sensing instruments to accomplish its objectives; SLSTR (Sea and Land Surface Temperature Radiometer), OLCI (Ocean and Land Colour Instrument), SRAL (SAR Altimeter), DORIS, and MWR (Microwave Radiometer).</gco:CharacterString>
+            </gmd:abstract>
+            <gmd:descriptiveKeywords>
+                <gmd:MD_Keywords>
+                    <gmd:keyword>
+                        <gco:CharacterString>Copernicus</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:keyword>
+                        <gco:CharacterString>Satellite</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:keyword>
+                        <gco:CharacterString>sentinel</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:keyword>
+                        <gco:CharacterString>sentinel3</gco:CharacterString>
+                    </gmd:keyword>
+                </gmd:MD_Keywords>
+            </gmd:descriptiveKeywords>
+            <gmd:pointOfContact>
+                <gmd:CI_ResponsibleParty>
+                    <gmd:organisationName>
+                        <gco:CharacterString>European Commission</gco:CharacterString>
+                    </gmd:organisationName>
+                    <gmd:role>
+                        <gmd:CI_RoleCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="originator">originator</gmd:CI_RoleCode>
+                    </gmd:role>
+                </gmd:CI_ResponsibleParty>
+            </gmd:pointOfContact>
+            <gmd:graphicOverview>
+                <gmd:MD_BrowseGraphic>
+                    <gmd:fileName>
+                        <gco:CharacterString>https://s3.amazonaws.com/dabsatimages/s3a.jpg</gco:CharacterString>
+                    </gmd:fileName>
+                    <gmd:fileDescription>
+                        <gco:CharacterString/>
+                    </gmd:fileDescription>
+                    <gmd:fileType> </gmd:fileType>
+                </gmd:MD_BrowseGraphic>
+            </gmd:graphicOverview>
+            <gmd:spatialRepresentationType>
+                <gmd:MD_SpatialRepresentationTypeCode codeList="" codeListValue="GRID"/>
+            </gmd:spatialRepresentationType>
+            <gmd:language/>
+            <gmd:extent>
+                <gmd:EX_Extent>
+                    <gmd:geographicElement>
+                        <gmd:EX_GeographicBoundingBox>
+                            <gmd:westBoundLongitude>
+                                <gco:Decimal>-180.0</gco:Decimal>
+                            </gmd:westBoundLongitude>
+                            <gmd:eastBoundLongitude>
+                                <gco:Decimal>180.0</gco:Decimal>
+                            </gmd:eastBoundLongitude>
+                            <gmd:southBoundLatitude>
+                                <gco:Decimal>-90.0</gco:Decimal>
+                            </gmd:southBoundLatitude>
+                            <gmd:northBoundLatitude>
+                                <gco:Decimal>90.0</gco:Decimal>
+                            </gmd:northBoundLatitude>
+                        </gmd:EX_GeographicBoundingBox>
+                    </gmd:geographicElement>
+                    <gmd:temporalElement>
+                        <gmd:EX_TemporalExtent>
+                            <gmd:extent>
+                                <gml:TimePeriod gml:id="x32f2e80f-ce31-4f47-9603-91d8c3f112fe">
+                                    <gml:beginPosition>2017-04-16T00:00:00Z</gml:beginPosition>
+                                    <gml:endPosition indeterminatePosition="now"/>
+                                </gml:TimePeriod>
+                            </gmd:extent>
+                        </gmd:EX_TemporalExtent>
+                    </gmd:temporalElement>
+                </gmd:EX_Extent>
+            </gmd:extent>
+        </gmd:MD_DataIdentification>
+    </gmd:identificationInfo>
+
+</gmd:MD_Metadata>

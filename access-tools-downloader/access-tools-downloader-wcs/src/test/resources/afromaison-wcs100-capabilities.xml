@@ -1,0 +1,758 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wcs:WCS_Capabilities version="1.0.0"
+	xmlns:wcs="http://www.opengis.net/wcs"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xmlns:ogc="http://www.opengis.net/ogc"
+	xmlns:ows="http://www.opengis.net/ows/1.1"
+	xmlns:gml="http://www.opengis.net/gml"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.opengis.net/wcs http://afromaison.grid.unep.ch:8080/geoserver/schemas/wcs/1.0.0/wcsCapabilities.xsd"
+	updateSequence="1352">
+	<wcs:Service>
+		<wcs:metadataLink
+			about="http://geoserver.sourceforge.net/html/index.php"
+			metadataType="other" />
+		<wcs:description>This server implements the WCS specification 1.0 and 1.1.1, it's reference implementation of WCS 1.1.1. All layers published by this service are available on WMS also.
+     </wcs:description>
+		<wcs:name>WCS</wcs:name>
+		<wcs:label>Web Coverage Service</wcs:label>
+		<wcs:keywords>
+			<wcs:keyword>WCS</wcs:keyword>
+			<wcs:keyword>WMS</wcs:keyword>
+			<wcs:keyword>GEOSERVER</wcs:keyword>
+		</wcs:keywords>
+		<wcs:responsibleParty>
+			<wcs:individualName>OpenGeo</wcs:individualName>
+			<wcs:organisationName>OpenGeo</wcs:organisationName>
+			<wcs:positionName>Outreach</wcs:positionName>
+			<wcs:contactInfo>
+				<wcs:phone />
+				<wcs:address>
+					<wcs:city>New York</wcs:city>
+					<wcs:country>USA</wcs:country>
+					<wcs:electronicMailAddress>inquiry@opengeo.org</wcs:electronicMailAddress>
+				</wcs:address>
+			</wcs:contactInfo>
+		</wcs:responsibleParty>
+		<wcs:fees>NONE</wcs:fees>
+		<wcs:accessConstraints>NONE</wcs:accessConstraints>
+	</wcs:Service>
+	<wcs:Capability>
+		<wcs:Request>
+			<wcs:GetCapabilities>
+				<wcs:DCPType>
+					<wcs:HTTP>
+						<wcs:Get>
+							<wcs:OnlineResource
+								xlink:href="http://afromaison.grid.unep.ch:8080/geoserver/wcs?" />
+						</wcs:Get>
+					</wcs:HTTP>
+				</wcs:DCPType>
+				<wcs:DCPType>
+					<wcs:HTTP>
+						<wcs:Post>
+							<wcs:OnlineResource
+								xlink:href="http://afromaison.grid.unep.ch:8080/geoserver/wcs?" />
+						</wcs:Post>
+					</wcs:HTTP>
+				</wcs:DCPType>
+			</wcs:GetCapabilities>
+			<wcs:DescribeCoverage>
+				<wcs:DCPType>
+					<wcs:HTTP>
+						<wcs:Get>
+							<wcs:OnlineResource
+								xlink:href="http://afromaison.grid.unep.ch:8080/geoserver/wcs?" />
+						</wcs:Get>
+					</wcs:HTTP>
+				</wcs:DCPType>
+				<wcs:DCPType>
+					<wcs:HTTP>
+						<wcs:Post>
+							<wcs:OnlineResource
+								xlink:href="http://afromaison.grid.unep.ch:8080/geoserver/wcs?" />
+						</wcs:Post>
+					</wcs:HTTP>
+				</wcs:DCPType>
+			</wcs:DescribeCoverage>
+			<wcs:GetCoverage>
+				<wcs:DCPType>
+					<wcs:HTTP>
+						<wcs:Get>
+							<wcs:OnlineResource
+								xlink:href="http://afromaison.grid.unep.ch:8080/geoserver/wcs?" />
+						</wcs:Get>
+					</wcs:HTTP>
+				</wcs:DCPType>
+				<wcs:DCPType>
+					<wcs:HTTP>
+						<wcs:Post>
+							<wcs:OnlineResource
+								xlink:href="http://afromaison.grid.unep.ch:8080/geoserver/wcs?" />
+						</wcs:Post>
+					</wcs:HTTP>
+				</wcs:DCPType>
+			</wcs:GetCoverage>
+		</wcs:Request>
+		<wcs:Exception>
+			<wcs:Format>application/vnd.ogc.se_xml</wcs:Format>
+		</wcs:Exception>
+	</wcs:Capability>
+	<wcs:ContentMetadata>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>ethiopia:ETH_Aster</wcs:name>
+			<wcs:label>ETH_Aster</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>37.447 11.6</gml:pos>
+				<gml:pos>38.049 12.127</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>ETH_Aster</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>ethiopia:ETH_CRU_pre_1980_01</wcs:name>
+			<wcs:label>ETH_CRU_pre_1980_01</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>37.0 11.5</gml:pos>
+				<gml:pos>38.5 12.5</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>ETH_CRU_pre_1980_01</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>ethiopia:ETH_CRU_tmp_1980_01</wcs:name>
+			<wcs:label>ETH_CRU_tmp_1980_01</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>37.0 11.5</gml:pos>
+				<gml:pos>38.5 12.5</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>ETH_CRU_tmp_1980_01</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>ethiopia:ETH_GlobCover2005-2006</wcs:name>
+			<wcs:label>ETH_GlobCover2005-2006</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>37.446 11.599</gml:pos>
+				<gml:pos>38.051 12.129</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>ETH_GlobCover2005-2006</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>ethiopia:ETH_GlobCover2009</wcs:name>
+			<wcs:label>ETH_GlobCover2009</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>37.446 11.599</gml:pos>
+				<gml:pos>38.051 12.129</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>ETH_GlobCover2009</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>ethiopia:ETH_afripop_bb</wcs:name>
+			<wcs:label>ETH_afripop_bb</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>37.447 11.599</gml:pos>
+				<gml:pos>38.049 12.127</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>ETH_afripop_bb</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>ethiopia:ETH_etopo1</wcs:name>
+			<wcs:label>ETH_etopo1</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>37.442 11.592</gml:pos>
+				<gml:pos>38.058 12.142</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>ETH_etopo1</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="FGDC" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>ethiopia:ETH_srtm</wcs:name>
+			<wcs:label>ETH_srtm</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>37.442 11.592</gml:pos>
+				<gml:pos>38.05 12.133</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>ETH_srtm</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>mali:MLI_CRU_pre_1980_01</wcs:name>
+			<wcs:label>MLI_CRU_precipitations_1980_01</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>-6.0 13.5</gml:pos>
+				<gml:pos>-3.0 16.0</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>MLI_CRU_pre_1980_01</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>mali:MLI_CRU_tmp_1980_01</wcs:name>
+			<wcs:label>MLI_CRU_temperature_1980_01</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>-6.0 13.5</gml:pos>
+				<gml:pos>-3.0 16.0</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>MLI_CRU_tmp_1980_01</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>mali:MLI_Aster</wcs:name>
+			<wcs:label>MLI_DEM_Aster</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>-5.761 13.625</gml:pos>
+				<gml:pos>-3.499 15.732</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>MLI_Aster</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>mali:MLI_srtm</wcs:name>
+			<wcs:label>MLI_DEM_SRTM</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>-5.767 13.625</gml:pos>
+				<gml:pos>-3.492 15.733</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>MLI_srtm</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>mali:MLI_etopo1</wcs:name>
+			<wcs:label>MLI_DEM_etopo1</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>-5.775 13.625</gml:pos>
+				<gml:pos>-3.492 15.742</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>MLI_etopo1</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>mali:glc2000_niger1</wcs:name>
+			<wcs:label>MLI_land_cover_glc2000</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>-11.582 4.171</gml:pos>
+				<gml:pos>15.302 24.081</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>glc2000_niger1</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>mali:MLI_GlobCover2005-2006</wcs:name>
+			<wcs:label>MLI_landcover_GlobCover2005-2006</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>-5.762 13.624</gml:pos>
+				<gml:pos>-3.499 15.735</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>MLI_GlobCover2005-2006</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>mali:MLI_GlobCover2009</wcs:name>
+			<wcs:label>MLI_landcover_GlobCover2009</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>-5.762 13.624</gml:pos>
+				<gml:pos>-3.499 15.735</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>MLI_GlobCover2009</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>mali:MLI_afripop_bb</wcs:name>
+			<wcs:label>MLI_population_afripop</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>-5.762 13.625</gml:pos>
+				<gml:pos>-3.498 15.732</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>MLI_afripop_bb</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>tunisia:TUN_Aster</wcs:name>
+			<wcs:label>TUN_Aster</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>10.013 33.201</gml:pos>
+				<gml:pos>10.561 33.695</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>TUN_Aster</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>tunisia:TUN_CRU_pre_1980_01</wcs:name>
+			<wcs:label>TUN_CRU_pre_1980_01</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>10.0 33.0</gml:pos>
+				<gml:pos>11.0 34.0</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>TUN_CRU_pre_1980_01</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>tunisia:TUN_CRU_tmp_1980_01</wcs:name>
+			<wcs:label>TUN_CRU_tmp_1980_01</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>10.0 33.0</gml:pos>
+				<gml:pos>11.0 34.0</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>TUN_CRU_tmp_1980_01</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>tunisia:TUN_GlobCover2005-2006</wcs:name>
+			<wcs:label>TUN_GlobCover2005-2006</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>10.013 33.199</gml:pos>
+				<gml:pos>10.563 33.696</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>TUN_GlobCover2005-2006</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>tunisia:TUN_GlobCover2009</wcs:name>
+			<wcs:label>TUN_GlobCover2009</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>10.012 33.199</gml:pos>
+				<gml:pos>10.562 33.696</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>TUN_GlobCover2009</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>tunisia:TUN_afripop_bb</wcs:name>
+			<wcs:label>TUN_afripop_bb</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>10.013 33.201</gml:pos>
+				<gml:pos>10.561 33.695</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>TUN_afripop_bb</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>tunisia:TUN_etopo1</wcs:name>
+			<wcs:label>TUN_etopo1</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>10.008 33.192</gml:pos>
+				<gml:pos>10.575 33.708</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>TUN_etopo1</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>tunisia:TUN_srtm</wcs:name>
+			<wcs:label>TUN_srtm</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>10.008 33.2</gml:pos>
+				<gml:pos>10.567 33.7</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>TUN_srtm</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>uganda:UGA_Aster</wcs:name>
+			<wcs:label>UGA_Aster</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>29.735 -0.515</gml:pos>
+				<gml:pos>31.097 0.799</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>UGA_Aster</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>uganda:UGA_CRU_pre_1980_01</wcs:name>
+			<wcs:label>UGA_CRU_pre_1980_01</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>29.5 -1.0</gml:pos>
+				<gml:pos>31.5 1.0</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>UGA_CRU_pre_1980_01</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>uganda:UGA_CRU_tmp_1980_01</wcs:name>
+			<wcs:label>UGA_CRU_tmp_1980_01</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>29.5 -1.0</gml:pos>
+				<gml:pos>31.5 1.0</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>UGA_CRU_tmp_1980_01</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>uganda:UGA_GlobCover2005-2006</wcs:name>
+			<wcs:label>UGA_GlobCover2005-2006</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>29.735 -0.515</gml:pos>
+				<gml:pos>31.099 0.801</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>UGA_GlobCover2005-2006</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>uganda:UGA_GlobCover2009</wcs:name>
+			<wcs:label>UGA_GlobCover2009</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>29.735 -0.515</gml:pos>
+				<gml:pos>31.099 0.801</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>UGA_GlobCover2009</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>uganda:UGA_afripop_bb</wcs:name>
+			<wcs:label>UGA_afripop_bb</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>29.735 -0.516</gml:pos>
+				<gml:pos>31.098 0.799</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>UGA_afripop_bb</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>uganda:UGA_etopo1</wcs:name>
+			<wcs:label>UGA_etopo1</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>29.725 -0.525</gml:pos>
+				<gml:pos>31.108 0.808</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>UGA_etopo1</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>uganda:UGA_srtm</wcs:name>
+			<wcs:label>UGA_srtm</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>29.733 -0.517</gml:pos>
+				<gml:pos>31.1 0.8</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>UGA_srtm</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>south_africa:ZAF_Aster</wcs:name>
+			<wcs:label>ZAF_Aster</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>28.608 -29.581</gml:pos>
+				<gml:pos>30.614 -27.765</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>ZAF_Aster</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>south_africa:ZAF_CRU_pre_1980_01</wcs:name>
+			<wcs:label>ZAF_CRU_pre_1980_01</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>28.5 -30.0</gml:pos>
+				<gml:pos>31.0 -27.5</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>ZAF_CRU_pre_1980_01</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>south_africa:ZAF_CRU_tmp_1980_01</wcs:name>
+			<wcs:label>ZAF_CRU_tmp_1980_01</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>28.5 -30.0</gml:pos>
+				<gml:pos>31.0 -27.5</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>ZAF_CRU_tmp_1980_01</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>south_africa:ZAF_GlobCover2005-2006</wcs:name>
+			<wcs:label>ZAF_GlobCover2005-2006</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>28.607 -29.582</gml:pos>
+				<gml:pos>30.615 -27.763</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>ZAF_GlobCover2005-2006</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>south_africa:ZAF_GlobCover2009</wcs:name>
+			<wcs:label>ZAF_GlobCover2009</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>28.607 -29.582</gml:pos>
+				<gml:pos>30.615 -27.763</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>ZAF_GlobCover2009</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>south_africa:ZAF_afripop_bb</wcs:name>
+			<wcs:label>ZAF_afripop_bb</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>28.608 -29.581</gml:pos>
+				<gml:pos>30.615 -27.765</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>ZAF_afripop_bb</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>south_africa:ZAF_etopo1</wcs:name>
+			<wcs:label>ZAF_etopo1</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>28.592 -29.592</gml:pos>
+				<gml:pos>30.625 -27.758</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>ZAF_etopo1</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+		<wcs:CoverageOfferingBrief>
+			<wcs:metadataLink metadataType="other" />
+			<wcs:description>Generated from GeoTIFF</wcs:description>
+			<wcs:name>south_africa:ZAF_srtm</wcs:name>
+			<wcs:label>ZAF_srtm</wcs:label>
+			<wcs:lonLatEnvelope
+				srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+				<gml:pos>28.6 -29.583</gml:pos>
+				<gml:pos>30.617 -27.758</gml:pos>
+			</wcs:lonLatEnvelope>
+			<wcs:keywords>
+				<wcs:keyword>WCS</wcs:keyword>
+				<wcs:keyword>GeoTIFF</wcs:keyword>
+				<wcs:keyword>ZAF_srtm</wcs:keyword>
+			</wcs:keywords>
+		</wcs:CoverageOfferingBrief>
+	</wcs:ContentMetadata>
+</wcs:WCS_Capabilities>

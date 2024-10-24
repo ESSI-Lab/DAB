@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.csw.handler.discover;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -49,7 +49,8 @@ import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import eu.essi_lab.profiler.csw.CSWGetRecordsParser;
-import eu.essi_lab.profiler.csw.CSWProfiler;
+import eu.essi_lab.profiler.csw.CSWRequestConverter;
+import eu.essi_lab.profiler.csw.CSWRequestUtils;
 
 /**
  * @author Fabrizio
@@ -96,38 +97,55 @@ public class CSWRequestTransformer extends DiscoveryRequestTransformer {
 
 	try {
 
-	    // -----------------------
-	    //
-	    // GetRecordById
-	    //
-	    if (webRequest.isGetRequest() || CSWProfiler.getGetRecord(webRequest) == null) {
-
-		List<String> identifiers = getIdentifiers(webRequest);
-		LogicalBond orBond = BondFactory.createOrBond();
-
-		if (identifiers.size() == 1) {
-		    return BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.IDENTIFIER, identifiers.get(0));
-		}
-
-		for (String id : identifiers) {
-
-		    SimpleValueBond bond = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.IDENTIFIER, id);
-		    orBond.getOperands().add(bond);
-		}
-
-		return orBond;
-	    }
+	    boolean getRecordsFromPOST = CSWRequestUtils.isGetRecordsFromPOST(webRequest);
+	    boolean getRecordsFromGET = CSWRequestUtils.isGetRecordsFromGET(webRequest);
 
 	    // -----------------------
 	    //
 	    // GetRecords
 	    //
-	    CSWGetRecordsParser parser = new CSWGetRecordsParser(webRequest.getBodyStream().clone());
-	    return parser.parseFilter();
+
+	    if (getRecordsFromPOST || getRecordsFromGET) {
+
+		CSWGetRecordsParser parser = null;
+
+		if (getRecordsFromGET) {
+
+		    CSWRequestConverter converter = new CSWRequestConverter();
+		    GetRecords getRecords = converter.convert(webRequest);
+
+		    parser = new CSWGetRecordsParser(getRecords);
+
+		} else {
+
+		    parser = new CSWGetRecordsParser(webRequest.getBodyStream().clone());
+		}
+
+		return parser.parseFilter();
+	    }
+
+	    // -----------------------
+	    //
+	    // GetRecordById
+	    //
+
+	    List<String> identifiers = getIdentifiersFromGetRecordById(webRequest);
+	    LogicalBond orBond = BondFactory.createOrBond();
+
+	    if (identifiers.size() == 1) {
+		return BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.IDENTIFIER, identifiers.get(0));
+	    }
+
+	    for (String id : identifiers) {
+
+		SimpleValueBond bond = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.IDENTIFIER, id);
+		orBond.getOperands().add(bond);
+	    }
+
+	    return orBond;
 
 	} catch (Exception e) {
 
-	    e.printStackTrace();
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 
 	    throw GSException.createException(//
@@ -154,29 +172,46 @@ public class CSWRequestTransformer extends DiscoveryRequestTransformer {
     protected Page getPage(WebRequest webRequest) throws GSException {
 
 	try {
-	    // -----------------------
-	    //
-	    // GetRecordById
-	    //
-	    if (webRequest.isGetRequest() || CSWProfiler.getGetRecord(webRequest) == null) {
 
-		List<String> identifiers = getIdentifiers(webRequest);
-		return new Page(1, identifiers.size());
-	    }
+	    boolean getRecordsFromPOST = CSWRequestUtils.isGetRecordsFromPOST(webRequest);
+	    boolean getRecordsFromGET = CSWRequestUtils.isGetRecordsFromGET(webRequest);
 
 	    // -----------------------
 	    //
 	    // GetRecords
 	    //
-	    GetRecords getRecords = CSWProfiler.getGetRecord(webRequest);
 
-	    int maxRecords = getRecords.getMaxRecords().intValue();
-	    int startPosition = getRecords.getStartPosition().intValue();
-	    if (startPosition == 0) {
-		startPosition = 1;
+	    if (getRecordsFromPOST || getRecordsFromGET) {
+
+		GetRecords getRecords = null;
+
+		if (getRecordsFromGET) {
+
+		    CSWRequestConverter converter = new CSWRequestConverter();
+		    getRecords = converter.convert(webRequest);
+
+		} else {
+
+		    getRecords = CommonContext.unmarshal(webRequest.getBodyStream().clone(), GetRecords.class);
+		}
+
+		int maxRecords = getRecords.getMaxRecords().intValue();
+		int startPosition = getRecords.getStartPosition().intValue();
+		if (startPosition == 0) {
+		    startPosition = 1;
+		}
+
+		return new Page(startPosition, maxRecords);
 	    }
 
-	    return new Page(startPosition, maxRecords);
+	    // -----------------------
+	    //
+	    // GetRecordById
+	    //
+
+	    List<String> identifiers = getIdentifiersFromGetRecordById(webRequest);
+
+	    return new Page(1, identifiers.size());
 
 	} catch (Exception e) {
 
@@ -202,16 +237,24 @@ public class CSWRequestTransformer extends DiscoveryRequestTransformer {
 	return "CSW";
     }
 
-    private List<String> getIdentifiers(WebRequest webRequest) throws Exception {
+    /**
+     * @param webRequest
+     * @return
+     * @throws Exception
+     */
+    private List<String> getIdentifiersFromGetRecordById(WebRequest webRequest) throws Exception {
 
 	if (webRequest.isGetRequest()) {
 
-	    KeyValueParser parser = new KeyValueParser(webRequest.getQueryString());
+	    KeyValueParser parser = new KeyValueParser(webRequest.getURLDecodedQueryString());
 	    String ids = parser.getValue("id", true);
 	    return Arrays.asList(ids.split(","));
 	}
 
-	GetRecordById getRecords = CommonContext.unmarshal(webRequest.getBodyStream().clone(), GetRecordById.class);
+	GetRecordById getRecords = CommonContext.unmarshal(//
+		webRequest.getBodyStream().clone(), //
+		GetRecordById.class);
+
 	return getRecords.getIds();
     }
 }

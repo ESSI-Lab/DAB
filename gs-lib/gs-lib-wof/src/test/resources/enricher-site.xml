@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<siteInfo xmlns="http://www.cuahsi.org/waterML/1.1/"
+          xmlns:wtr="http://www.cuahsi.org/waterML/"
+          xmlns:gml="http://www.opengis.net/gml"
+          xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <siteName>Little Bear River at Mendon Road near Mendon, Utah</siteName>
+   <siteCode network="LBR" siteID="1">USU-LBR-Mendon</siteCode>
+   <geoLocation>
+      <geogLocation srs="EPSG:4269" xsi:type="LatLonPointType">
+         <latitude>41.718473</latitude>
+         <longitude>-111.946402</longitude>
+      </geogLocation>
+      <localSiteXY projectionInformation="NAD83 / UTM zone 12N">
+         <X>421276.323</X>
+         <Y>4618952.04</Y>
+      </localSiteXY>
+   </geoLocation>
+   <elevation_m>1345</elevation_m>
+   <verticalDatum>NGVD29</verticalDatum>
+   <siteProperty name="County">Cache</siteProperty>
+   <siteProperty name="State">Utah</siteProperty>
+   <siteProperty name="Site Comments">Located below county road bridge at Mendon Road crossing</siteProperty>
+   <siteProperty name="PosAccuracy_m">10</siteProperty>
+   <siteProperty name="Site Type">Stream</siteProperty>
+</siteInfo>

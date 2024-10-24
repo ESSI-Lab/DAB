@@ -1,0 +1,149 @@
+{
+    "Crops": [
+        {
+            "crop_code": "SBN",
+            "crop_name": "Soy bean (Glycine max)",
+            "dataset_access": "OPEN"
+        },
+        {
+            "crop_code": "CBN",
+            "crop_name": "Climbing beans (Phaseolus vulgaris)",
+            "dataset_access": "OPEN"
+        },
+        {
+            "crop_code": "COT",
+            "crop_name": "Cotton (Gossypium hirsutum)",
+            "dataset_access": "OPEN"
+        },
+        {
+            "crop_code": "RYEW",
+            "crop_name": "Winter rye (Secale cereale)",
+            "dataset_access": "OPEN"
+        },
+        {
+            "crop_code": "SUN",
+            "crop_name": "Sunflower (Helianthus annuus)",
+            "dataset_access": "OPEN"
+        },
+        {
+            "crop_code": "WHBW",
+            "crop_name": "Winter bread wheat (Triticum aestivum)",
+            "dataset_access": "OPEN"
+        },
+        {
+            "crop_code": "TRO",
+            "crop_name": "Tritordeum (Hordeum chilense × Triticum durum)",
+            "dataset_access": "OPEN"
+        },
+        {
+            "crop_code": "SGG",
+            "crop_name": "Sorghum (Sorghum bicolor)",
+            "dataset_access": "OPEN"
+        },
+        {
+            "crop_code": "PML",
+            "crop_name": "Pearl millet (Pennisetum glaucum)",
+            "dataset_access": "OPEN"
+        },
+        {
+            "crop_code": "RIC",
+            "crop_name": "Rice (Oryza sativa)",
+            "dataset_access": "OPEN"
+        },
+        {
+            "crop_code": "GRS",
+            "crop_name": "Grass (possible mix of species)",
+            "dataset_access": "OPEN"
+        },
+        {
+            "crop_code": "RAP",
+            "crop_name": "Rapeseed (Brassica napus)",
+            "dataset_access": "OPEN"
+        },
+        {
+            "crop_code": "RAPW",
+            "crop_name": "Winter rapeseed (Brassica napus)",
+            "dataset_access": "OPEN"
+        },
+        {
+            "crop_code": "POT",
+            "crop_name": "Potato (Solanum tuberosum)",
+            "dataset_access": "OPEN"
+        },
+        {
+            "crop_code": "FAB",
+            "crop_name": "Faba bean (Vicia faba)",
+            "dataset_access": "OPEN"
+        },
+        {
+            "crop_code": "RYE",
+            "crop_name": "Rye (Secale cereale)",
+            "dataset_access": "OPEN"
+        },
+        {
+            "crop_code": "OAT",
+            "crop_name": "Oats (Avena sativa)",
+            "dataset_access": "OPEN"
+        },
+        {
+            "crop_code": "LABL",
+            "crop_name": "Lablab (Lablab purpureus)",
+            "dataset_access": "OPEN"
+        },
+        {
+            "crop_code": "MAZ",
+            "crop_name": "Maize (Zea mays)",
+            "dataset_access": "OPEN"
+        },
+        {
+            "crop_code": "RAPI",
+            "crop_name": "Indian mustard (Brassica juncea)",
+            "dataset_access": "OPEN"
+        },
+        {
+            "crop_code": "BAR",
+            "crop_name": "Barley (Hordeum vulgare)",
+            "dataset_access": "OPEN"
+        },
+        {
+            "crop_code": "PEA",
+            "crop_name": "Pea (Pisum sativum)",
+            "dataset_access": "OPEN"
+        },
+        {
+            "crop_code": "WHB",
+            "crop_name": "Bread wheat (Triticum aestivum)",
+            "dataset_access": "OPEN"
+        },
+        {
+            "crop_code": "BBN",
+            "crop_name": "Bush beans (Phaseolus vulgaris)",
+            "dataset_access": "OPEN"
+        },
+        {
+            "crop_code": "FBT",
+            "crop_name": "Fodder beet (Beta vulgaris)",
+            "dataset_access": "OPEN"
+        },
+        {
+            "crop_code": "FLAX",
+            "crop_name": "Linseed flax (Linum usitatissimum)",
+            "dataset_access": "OPEN"
+        },
+        {
+            "crop_code": "BARW",
+            "crop_name": "Winter barley (Hordeum vulgare)",
+            "dataset_access": "OPEN"
+        },
+        {
+            "crop_code": "SBT",
+            "crop_name": "Sugar beet (Beta vulgaris)",
+            "dataset_access": "OPEN"
+        },
+        {
+            "crop_code": "BARS",
+            "crop_name": "Spring barley (Hordeum vulgare)",
+            "dataset_access": "OPEN"
+        }
+    ]
+}

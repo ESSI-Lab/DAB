@@ -4,7 +4,7 @@ package eu.essi_lab.shared.driver.es.stats;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -41,11 +41,15 @@ import org.json.JSONObject;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
+import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.lib.servlet.RequestManager;
 import eu.essi_lab.lib.utils.ExpiringCache;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.GSLoggerFactory.GSLogger;
+import eu.essi_lab.lib.utils.HostNamePropertyUtils;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.NameSpace;
+import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.RuntimeInfoElement;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -79,6 +83,26 @@ public class ElasticsearchInfoPublisher extends RuntimeInfoPublisher {
     });
 
     private ElasticsearchClient client;
+
+    /**
+     * @param request
+     * @return
+     */
+    public static Optional<ElasticsearchInfoPublisher> create(WebRequest request) {
+
+	try {
+
+	    return Optional.of(new ElasticsearchInfoPublisher(//
+		    request.getRequestId(), //
+		    request.getRequestContext()));
+
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(ElasticsearchInfoPublisher.class).error(e);
+	}
+
+	return Optional.empty();
+    }
 
     /**
      * @param context
@@ -182,8 +206,15 @@ public class ElasticsearchInfoPublisher extends RuntimeInfoPublisher {
 
 	HashMap<String, List<String>> map = provider.provideInfo();
 
+	map.put(RuntimeInfoElement.PROVIDER_NAME.getName(), Arrays.asList(provider.getBaseType()));
 	map.put(RuntimeInfoElement.RUNTIME_ID.getName(), Arrays.asList(id));
 	map.put(RuntimeInfoElement.RUNTIME_CONTEXT.getName(), Arrays.asList(getContext()));
+
+	map.put(RuntimeInfoElement.HOST_NAME.getName(), Arrays.asList(HostNamePropertyUtils.getHostNameProperty()));
+	map.put(RuntimeInfoElement.EXECUTION_MODE.getName(), Arrays.asList(ExecutionMode.get().name()));
+	map.put(RuntimeInfoElement.FREE_MEMORY.getName(), Arrays.asList(String.valueOf(GSLogger.getFreeMemory())));
+	map.put(RuntimeInfoElement.TOTAL_MEMORY.getName(), Arrays.asList(String.valueOf(GSLogger.getTotalMemory())));
+	map.put(RuntimeInfoElement.USED_MEMORY.getName(), Arrays.asList(String.valueOf(GSLogger.getUsedMemory())));
 
 	TreeMap<String, List<Object>> newMap = convertMap(map);
 
@@ -196,7 +227,71 @@ public class ElasticsearchInfoPublisher extends RuntimeInfoPublisher {
 	    }
 	    values.addAll(newValues);
 	}
+    }
 
+    public void write() {
+
+	if (!enabled) {
+	    return;
+	}
+
+	THREAD_POOL.execute(new Runnable() {
+
+	    @Override
+	    public void run() {
+
+		RequestManager.getInstance().updateThreadName(getClass(), ElasticsearchInfoPublisher.this.getRuntimeId());
+
+		String id = getRuntimeId();
+
+		int size1 = getSize(id);
+
+		try {
+		    // let's sleep a bit before writing, in order to be sure that all the info have been published
+		    // this is for extra safety, as they should be sent in a synchronous way
+		    Thread.sleep(5000);
+		} catch (InterruptedException e) {
+		    e.printStackTrace();
+		}
+
+		int size2 = getSize(id);
+
+		if (size2 > size1) {
+		    GSLoggerFactory.getLogger(getClass()).error("STATISTICS LOGGER GOT UNEXPECTED RESULTS: CHECK AS SOON AS POSSIBLE!");
+		}
+
+		TreeMap<String, List<Object>> properties = null;
+
+		properties = cache.get(id);
+
+		if (properties == null) {
+		    GSLoggerFactory.getLogger(getClass()).error("No statistics found for request id: {}", id);
+		}
+
+		TreeMap<String, List<Object>> refinedProperties = refineProperties(properties);
+
+		JSONObject json = createJsonObject(refinedProperties);
+
+		if (enabled && client != null) {
+
+		    String index = "request";
+
+		    client.write(index, json);
+		}
+
+		cache.remove(id);
+	    }
+
+	    private int getSize(String id) {
+
+		TreeMap<String, List<Object>> ret = cache.get(id);
+
+		if (ret == null) {
+		    return 0;
+		}
+		return ret.size();
+	    }
+	});
     }
 
     private TreeMap<String, List<Object>> convertMap(HashMap<String, List<String>> map) {
@@ -273,6 +368,7 @@ public class ElasticsearchInfoPublisher extends RuntimeInfoPublisher {
 	toDelete.add("CHRONOMETER_TIME_STAMP_MILLIS");
 	toDelete.add("PROFILER_TIME_STAMP_MILLIS");
 	toDelete.add("RESPONSE_Date");
+	toDelete.add("RESPONSE_ETag");
 
 	List<String> dates = new ArrayList<>();
 	dates.add("CHRONOMETER_TIME_STAMP");
@@ -282,18 +378,8 @@ public class ElasticsearchInfoPublisher extends RuntimeInfoPublisher {
 	// toDelete.add("runtimeContext");
 
 	List<String> unique = new ArrayList<>();
-	unique.add("runtimeId");
-	unique.add("runtimeContext");
-	unique.add("RESULT_SET_DATA_type");
-	unique.add("RESULT_SET_crs");
-	unique.add("RESULT_SET_RETURNED");
-	unique.add("ACCESS_MESSAGE_SPATIAL_DIMENSION_name");
-	unique.add("RESULT_SET_SPATIAL_DIMENSION_name");
-	unique.add("RESULT_SET_MATCHED");
-	unique.add("RESULT_SET_SPATIAL_DIMENSION_id");
-	unique.add("RESULT_SET_TEMPORAL_DIMENSION_name");
-	unique.add("RESULT_SET_TEMPORAL_DIMENSION_id");
-	unique.add("RESULT_SET_DATA_format");
+	properties.keySet().forEach(key -> unique.add(key));
+
 	String s = null;
 	String e = null;
 	String n = null;
@@ -474,66 +560,5 @@ public class ElasticsearchInfoPublisher extends RuntimeInfoPublisher {
     private String createTextNode(String name, String value) {
 
 	return createDocument(name, value, true);
-    }
-
-    public void write() {
-
-	if (!enabled) {
-	    return;
-	}
-
-	THREAD_POOL.execute(new Runnable() {
-
-	    @Override
-	    public void run() {
-		RequestManager.getInstance().addThreadName(ElasticsearchInfoPublisher.this.getRuntimeId());
-
-		String id = getRuntimeId();
-
-		int size1 = getSize(id);
-
-		try {
-		    // let's sleep a bit before writing, in order to be sure that all the info have been published
-		    // this is for extra safety, as they should be sent in a synchronous way
-		    Thread.sleep(5000);
-		} catch (InterruptedException e) {
-		    e.printStackTrace();
-		}
-
-		int size2 = getSize(id);
-
-		if (size2 > size1) {
-		    GSLoggerFactory.getLogger(getClass()).error("STATISTICS LOGGER GOT UNEXPECTED RESULTS: CHECK AS SOON AS POSSIBLE!");
-		}
-
-		TreeMap<String, List<Object>> properties = cache.get(id);
-
-		if (properties == null) {
-		    GSLoggerFactory.getLogger(getClass()).error("No statistics found for request id: {}", id);
-		}
-
-		TreeMap<String, List<Object>> refinedProperties = refineProperties(properties);
-
-		JSONObject json = createJsonObject(refinedProperties);
-
-		if (enabled && client != null) {
-
-		    String index = "request";
-
-		    client.write(index, json);
-
-		}
-
-		cache.remove(id);
-	    }
-
-	    private int getSize(String id) {
-		TreeMap<String, List<Object>> ret = cache.get(id);
-		if (ret == null) {
-		    return 0;
-		}
-		return ret.size();
-	    }
-	});
     }
 }

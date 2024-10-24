@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gs.setting.harvesting;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -32,6 +32,7 @@ import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTimeZone;
 import org.json.JSONObject;
 
@@ -219,6 +220,11 @@ public class SchedulerSupport {
      */
     public synchronized String getFiredTime(Setting setting) {
 
+	if (schedulingDisabled(setting)) {
+
+	    return "";
+	}
+
 	Optional<String> time = executingSettings.//
 		stream().//
 		filter(s -> retrieveIdentifier(s).equals(setting.getIdentifier())).//
@@ -232,7 +238,7 @@ public class SchedulerSupport {
 
 	Optional<SchedulerJobStatus> jobStatus = getJobStatus(setting);
 
-	if (jobStatus.isPresent()) {
+	if (jobStatus.isPresent() && jobStatus.get().getPhase() != JobPhase.RESCHEDULED) {
 
 	    Optional<String> startTime = jobStatus.get().getStartTime();
 
@@ -251,6 +257,16 @@ public class SchedulerSupport {
      */
     public synchronized String getNextFireTime(Setting setting) {
 
+	if (schedulingDisabled(setting)) {
+
+	    return "";
+	}
+
+	if (getRepeatCount(setting).equals("Once") && getIsRunning(setting).equals("Yes")) {
+
+	    return "";
+	}
+
 	return nextFireTimeMap.getOrDefault(setting.getIdentifier(), "");
     }
 
@@ -259,6 +275,11 @@ public class SchedulerSupport {
      * @return
      */
     public synchronized String getEndTime(Setting setting) {
+
+	if (schedulingDisabled(setting)) {
+
+	    return "";
+	}
 
 	Optional<SchedulerJobStatus> jobStatus = getJobStatus(setting);
 
@@ -348,6 +369,11 @@ public class SchedulerSupport {
      */
     public synchronized String getElapsedTime(Setting setting) {
 
+	if (schedulingDisabled(setting)) {
+
+	    return "";
+	}
+
 	Optional<SchedulerJobStatus> jobStatus = getJobStatus(setting);
 
 	if (jobStatus.isPresent()) {
@@ -387,11 +413,48 @@ public class SchedulerSupport {
      * @param setting
      * @return
      */
-    public String getRepeatInterval(Setting setting) {
+    public String getRepeatCount(Setting setting) {
+
+	if (schedulingDisabled(setting)) {
+
+	    return "";
+	}
 
 	JSONObject scheduling = setting.getObject().getJSONObject("scheduling");
 
-	if (scheduling.has("enabled") && !scheduling.getBoolean("enabled")) {
+	if (!scheduling.getJSONObject("repeatCount").has("enabled") || scheduling.getJSONObject("repeatCount").getBoolean("enabled")) {
+
+	    if (!scheduling.getJSONObject("repeatCount").has("values")) {
+
+		return "Indefinitely";
+	    }
+
+	    return String.valueOf(scheduling.getJSONObject("repeatCount").getJSONArray("values").getInt(0)) + " times";
+	}
+
+	return "Once";
+    }
+
+    public static void main(String[] args) {
+
+	String formatted = String.format("% 4d", 4);
+	System.out.println(formatted);
+    }
+
+    /**
+     * @param setting
+     * @return
+     */
+    public String getRepeatInterval(Setting setting) {
+
+	if (schedulingDisabled(setting)) {
+
+	    return "";
+	}
+
+	JSONObject scheduling = setting.getObject().getJSONObject("scheduling");
+
+	if (scheduling.getJSONObject("repeatCount").has("enabled") && !scheduling.getJSONObject("repeatCount").getBoolean("enabled")) {
 
 	    return "";
 	}
@@ -400,20 +463,36 @@ public class SchedulerSupport {
 	if (interval.has("values")) {
 
 	    String intervalValue = interval.getJSONArray("values").get(0).toString();
-	    if (intervalValue.length() == 1) {
-		intervalValue = "0" + intervalValue;
-	    }
+	    intervalValue = StringUtils.leftPad(intervalValue, 4, "0");
+
 	    String unit = scheduling.getJSONObject("repeatIntervalUnit").getJSONArray("values").get(0).toString().toLowerCase();
-	    if (unit.equals("hours")) {
-		intervalValue = "00-" + intervalValue;
-	    } else {
-		intervalValue = intervalValue + "-00";
+	    switch (unit) {
+	    case "days":
+		intervalValue = intervalValue + " day/s";
+		break;
+	    case "hours":
+		intervalValue = intervalValue + " hour/s";
+		break;
+	    case "minutes":
+		intervalValue = intervalValue + " minute/s";
+		break;
 	    }
 
 	    return intervalValue;
 	}
 
 	return "";
+    }
+
+    /**
+     * @param setting
+     * @return
+     */
+    private boolean schedulingDisabled(Setting setting) {
+
+	JSONObject scheduling = setting.getObject().getJSONObject("scheduling");
+
+	return scheduling.has("enabled") && !scheduling.getBoolean("enabled");
     }
 
     /**

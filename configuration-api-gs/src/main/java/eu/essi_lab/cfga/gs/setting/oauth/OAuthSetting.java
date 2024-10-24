@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gs.setting.oauth;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,6 +27,7 @@ import org.json.JSONObject;
 
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.EditableSetting;
+import eu.essi_lab.cfga.gs.setting.TabIndex;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
@@ -204,8 +205,6 @@ public class OAuthSetting extends ConfigurableSetting implements EditableSetting
      */
     public static class OAuthSettingComponentInfo extends ComponentInfo {
 
-	public static int tabIndex = 7;
-
 	/**
 	 * 
 	 */
@@ -214,7 +213,7 @@ public class OAuthSetting extends ConfigurableSetting implements EditableSetting
 	    setComponentName(OAuthSetting.class.getName());
 
 	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(tabIndex).//
+		    withIndex(TabIndex.OAUTH_SETTING.getIndex()).//
 		    withShowDirective("Authorization").//
 		    build();
 

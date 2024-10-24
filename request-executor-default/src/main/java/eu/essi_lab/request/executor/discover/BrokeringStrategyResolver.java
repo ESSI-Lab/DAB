@@ -4,7 +4,7 @@ package eu.essi_lab.request.executor.discover;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,15 +23,11 @@ package eu.essi_lab.request.executor.discover;
 
 import java.util.Arrays;
 
-import org.slf4j.Logger;
-
+import eu.essi_lab.api.database.DatabaseFinder;
 import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.factory.DatabaseConsumerFactory;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
-import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
-import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
@@ -46,6 +42,7 @@ import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.ResourceProperty;
 
 /**
  * This class resolves the {@link BrokeringStrategy} of a {@link GSSource} in the context of current query. I.e. for
@@ -126,9 +123,9 @@ public class BrokeringStrategyResolver {
 	    discoveryMessage.setUserBond(bond);
 	    discoveryMessage.setNormalizedBond(bond);
 
-	    DatabaseReader reader = DatabaseConsumerFactory.createDataBaseReader(message.getDataBaseURI());
+	    DatabaseFinder finder = DatabaseProviderFactory.getDatabaseFinder(message.getDataBaseURI());
 
-	    DiscoveryCountResponse countResponse = reader.count(message);
+	    DiscoveryCountResponse countResponse = finder.count(message);
 
 	    if (countResponse.getCount() == 0) {
 
@@ -186,12 +183,12 @@ public class BrokeringStrategyResolver {
 	    discoveryMessage.setUserBond(bond);
 	    discoveryMessage.setNormalizedBond(bond);
 
-	    discoveryMessage.getResourceSelector().setIndexesPolicy(IndexesPolicy.NONE);
-	    discoveryMessage.getResourceSelector().setSubset(ResourceSubset.SOURCE);
+	    // discoveryMessage.getResourceSelector().setIndexesPolicy(IndexesPolicy.NONE);
+	    discoveryMessage.getResourceSelector().addIndex(ResourceProperty.ORIGINAL_ID);
 
-	    DatabaseReader reader = DatabaseConsumerFactory.createDataBaseReader(message.getDataBaseURI());
+	    DatabaseFinder finder = DatabaseProviderFactory.getDatabaseFinder(message.getDataBaseURI());
 
-	    ResultSet<GSResource> results = reader.discover(discoveryMessage);
+	    ResultSet<GSResource> results = finder.discover(discoveryMessage);
 
 	    if (!results.getResultsList().isEmpty()) {
 

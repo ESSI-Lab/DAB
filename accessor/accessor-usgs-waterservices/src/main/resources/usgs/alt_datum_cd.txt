@@ -1,0 +1,21 @@
+#
+# National Water Information System
+# 2018/03/05
+#
+#
+# Date Retrieved: USGS Water Data for the Nation Help System
+#
+Code	Description
+10s	47s
+ASVD02	American Samoa Vertical Datum of 2002
+BARGECANAL	New York State Barge Canal datum
+COE1912	U.S. Corps of Engineers datum adjustment 1912
+GUVD04	Guam Vertical Datum of 2004
+IGLD	International Great Lakes Datum
+LMSL	Local Mean Sea Level
+NAVD88	North American Vertical Datum of 1988
+NGVD29	National Geodetic Vertical Datum of 1929
+NMVD03	Northern Marianas Vertical Datum of 2003
+OLDAK	Old Alaska (Mainland) and Aleutian Island Datum
+OLDPR	Old Puerto Rico and Virgin Island Datum
+PRVD02	Puerto Rico Vertical Datum of 2002

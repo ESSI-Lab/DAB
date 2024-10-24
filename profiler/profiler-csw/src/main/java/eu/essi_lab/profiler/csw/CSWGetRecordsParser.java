@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.csw;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -75,18 +75,29 @@ public class CSWGetRecordsParser {
     private FilterType filter;
     private GetRecords getRecords;
 
+    /**
+     * @param getRecordsStream
+     * @throws JAXBException
+     */
     public CSWGetRecordsParser(InputStream getRecordsStream) throws JAXBException {
 
 	this.getRecords = CommonContext.unmarshal(getRecordsStream, GetRecords.class);
 	initFilter(getRecords);
     }
 
+    /**
+     * @param getRecords
+     */
     public CSWGetRecordsParser(GetRecords getRecords) {
 
 	this.getRecords = getRecords;
 	initFilter(getRecords);
     }
 
+    /**
+     * @return
+     * @throws GSException
+     */
     public Bond parseFilter() throws GSException {
 
 	if (filter != null) {
@@ -125,10 +136,16 @@ public class CSWGetRecordsParser {
 	return null;
     }
 
+    /**
+     * @return
+     */
     public GetRecords getGetRecords() {
 	return getRecords;
     }
 
+    /**
+     * @param getRecords
+     */
     private void initFilter(GetRecords getRecords) {
 
 	JAXBElement<? extends AbstractQueryType> query = getRecords.getAbstractQuery();
@@ -147,6 +164,10 @@ public class CSWGetRecordsParser {
 	}
     }
 
+    /**
+     * @param filter
+     * @throws GSException
+     */
     private void checkFilter(FilterType filter) throws GSException {
 	Boolean check = false;
 	try {
@@ -191,6 +212,11 @@ public class CSWGetRecordsParser {
 	throw new IllegalArgumentException("Unsupported operator type: " + element);
     }
 
+    /**
+     * @param lo
+     * @return
+     * @throws JAXBException
+     */
     private Bond parseLogicalOps(JAXBElement<? extends LogicOpsType> lo) throws JAXBException {
 
 	// ----------------
@@ -414,6 +440,11 @@ public class CSWGetRecordsParser {
 	throw new IllegalArgumentException("PropertyIsBetween operator not supported");
     }
 
+    /**
+     * @param sops
+     * @return
+     * @throws JAXBException
+     */
     private Bond parseSpatialOps(JAXBElement<? extends SpatialOpsType> sops) throws JAXBException {
 
 	SpatialOpsType value = sops.getValue();
@@ -541,19 +572,35 @@ public class CSWGetRecordsParser {
 	return BondFactory.createSpatialExtentBond(areaOperator, spatialExtent);
     }
 
+    /**
+     * @param lo
+     * @return
+     */
     private boolean isOr(JAXBElement<? extends LogicOpsType> lo) {
 	return (lo.getName().getLocalPart().equalsIgnoreCase("or"));
 
     }
 
+    /**
+     * @param lo
+     * @return
+     */
     private boolean isAnd(JAXBElement<? extends LogicOpsType> lo) {
 	return (lo.getName().getLocalPart().equalsIgnoreCase("and"));
     }
 
+    /**
+     * @param element
+     * @return
+     */
     private boolean isEnvelope(Element element) {
 	return element.getLocalName().equalsIgnoreCase("envelope");
     }
 
+    /**
+     * @param operator
+     * @return
+     */
     private BondOperator decode(String operator) {
 
 	if (operator.matches("(?i).*PropertyIsLike.*")) {
@@ -584,6 +631,12 @@ public class CSWGetRecordsParser {
 	throw new IllegalArgumentException("No operator found for: " + operator);
     }
 
+    /**
+     * @param bondOperator
+     * @param propertyName
+     * @param literal
+     * @return
+     */
     @SuppressWarnings("incomplete-switch")
     private Bond createBond(BondOperator bondOperator, String propertyName, String literal) {
 
@@ -652,6 +705,11 @@ public class CSWGetRecordsParser {
 	    return BondFactory.createIsDeletedBond(Boolean.valueOf(literal));
 	}
 
+	if (propertyName.equalsIgnoreCase(ResourceProperty.IS_VALIDATED.getName())) {
+
+	    return BondFactory.createIsValidatedBond(Boolean.valueOf(literal));
+	}
+
 	if (propertyName.equalsIgnoreCase(ResourceProperty.IS_GEOSS_DATA_CORE.getName())) {
 
 	    return BondFactory.createIsGEOSSDataCoreBond(Boolean.valueOf(literal));
@@ -660,6 +718,10 @@ public class CSWGetRecordsParser {
 	throw new IllegalArgumentException("Unsupported property name: " + propertyName);
     }
 
+    /**
+     * @param propertyName
+     * @return
+     */
     private MetadataElement getElement(String propertyName) {
 
 	propertyName = removePrefix(propertyName);
@@ -854,6 +916,10 @@ public class CSWGetRecordsParser {
 	return null;
     }
 
+    /**
+     * @param propertyName
+     * @return
+     */
     private String removePrefix(String propertyName) {
 
 	if (propertyName.contains(":")) {
@@ -864,6 +930,10 @@ public class CSWGetRecordsParser {
 	return propertyName;
     }
 
+    /**
+     * @param literal
+     * @return
+     */
     private String removeStars(String literal) {
 	if (literal.startsWith("*")) {
 	    literal = literal.substring(1, literal.length());

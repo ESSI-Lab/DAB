@@ -4,7 +4,7 @@ package eu.essi_lab.messages;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -53,7 +53,7 @@ import eu.essi_lab.model.OrderingDirection;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.ResultsPriority;
 import eu.essi_lab.model.RuntimeInfoElement;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
@@ -63,11 +63,56 @@ import eu.essi_lab.model.resource.RankingStrategy;
  * @author Fabrizio
  */
 public class DiscoveryMessage extends QueryInitializerMessage {
-    public static Double TOL = Math.pow(10, -8);
 
-    @Override
-    public String getBaseType() {
-	return "discovery-message";
+    /**
+     * forceEiffelAPIDiscoveryOption=disabled
+     * eiffelUseFilterAPICache=true
+     * eiffelUseMergedIdsCache=true
+     * eiffelSortAndFilterAPI=FILTER
+     * eiffelAPISearchMinScore=0.7
+     * eiffelAPISearchQueryMethod=semantic
+     * eiffelAPISearchTermsSignificance=none
+     * eiffelAPIFilterTreshold=0.7
+     * eiffelAPIMaxSortIdentifiers=10000
+     * eiffelSortAndFilterPartitionSize=10000
+     * eiffelFilterAndSortSplitTreshold=3
+     * 
+     * @author Fabrizio
+     */
+    public enum EiffelAPIDiscoveryOption {
+
+	/**
+	 * 
+	 */
+	SORT_AND_FILTER,
+	/**
+	 * 
+	 */
+	FILTER_AND_SORT;
+
+	/**
+	 * 
+	 */
+	public static final String EIFFEL_S3_VIEW_ID = "eiffels3";
+
+	/**
+	 * @param value
+	 * @return
+	 */
+	public static Optional<EiffelAPIDiscoveryOption> fromValue(String value) {
+
+	    if (value.equals(SORT_AND_FILTER.name())) {
+
+		return Optional.of(SORT_AND_FILTER);
+	    }
+
+	    if (value.equals(FILTER_AND_SORT.name())) {
+
+		return Optional.of(FILTER_AND_SORT);
+	    }
+
+	    return Optional.empty();
+	}
     }
 
     /**
@@ -88,6 +133,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     private static final String QUERY_REGISTRATION = "QUERY_REGISTRATION";
     private static final String RESULTS_PRIORITY = "RESULTS_PRIORITY"; // UNSET, DATASET, COLLECTION,
     private static final String TF_TARGETS = "TF_TARGETS";
+    private static final String EIFFEL_DISCOVERY_OPTION = "EIFFEL_DISCOVERY_OPTION";
 
     /**
      * 
@@ -99,9 +145,14 @@ public class DiscoveryMessage extends QueryInitializerMessage {
      */
     private static final int USER_SELECTION = 10;
 
-    private List<GSResource> parents = new ArrayList<>();
+    private List<GSResource> parents;
 
+    /**
+     * 
+     */
     public DiscoveryMessage() {
+
+	parents = new ArrayList<>();
 
 	setIncludeDeleted(false);
 	setMaxFrequencyMapItems(DEFAULT_MAX_TERM_FREQUENCY_MAP_ITEMS);
@@ -212,7 +263,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 
 	getView().ifPresent(v -> map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_VIEW_ID.getName(), Arrays.asList(v.getId())));
 
-	StorageUri dataBaseURI = getDataBaseURI();
+	StorageInfo dataBaseURI = getDataBaseURI();
 	map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_STORAGE_URI.getName(), Arrays.asList(dataBaseURI.getUri()));
 
 	Optional<Queryable> element = getDistinctValuesElement();
@@ -248,18 +299,6 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 		    sources.stream().map(s -> s.getLabel()).collect(Collectors.toList()));
 	}
 
-	Optional<GSUser> user = getCurrentUser();
-	if (user.isPresent()) {
-
-	    if (Objects.nonNull(user.get().getAuthProvider())) {
-		map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_GS_USER_AUTH_PROVIDER.getName(), Arrays.asList(user.get().getAuthProvider()));
-	    }
-
-	    if (Objects.nonNull(user.get().getIdentifier())) {
-		map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_GS_USER_EMAIL.getName(), Arrays.asList(user.get().getIdentifier()));
-	    }
-	}
-
 	Optional<Bond> userBond = getUserBond();
 	userBond.ifPresent(b -> provideUserBondInfo(map));
 
@@ -273,118 +312,6 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     public String getName() {
 
 	return "DISCOVERY_MESSAGE";
-    }
-
-    private void provideUserBondInfo(HashMap<String, List<String>> map) {
-
-	DiscoveryBondHandler handler = new DiscoveryBondHandler() {
-
-	    @Override
-	    public void startLogicalBond(LogicalBond bond) {
-	    }
-
-	    @Override
-	    public void separator() {
-	    }
-
-	    @Override
-	    public void nonLogicalBond(Bond bond) {
-
-		if (bond instanceof QueryableBond) {
-
-		    QueryableBond<?> b = (QueryableBond<?>) bond;
-
-		    if (b.getProperty() == MetadataElement.BOUNDING_BOX) {
-
-			SpatialExtent extent = (SpatialExtent) b.getPropertyValue();
-
-			double e = extent.getEast();
-			double w = extent.getWest();
-			double n = extent.getNorth();
-			double s = extent.getSouth();
-
-			map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_BBOX_EAST.getName(), Arrays.asList(String.valueOf(extent.getEast())));
-			map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_BBOX_WEST.getName(), Arrays.asList(String.valueOf(extent.getWest())));
-			map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_BBOX_SOUTH.getName(),
-				Arrays.asList(String.valueOf(extent.getSouth())));
-			map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_BBOX_NORTH.getName(),
-				Arrays.asList(String.valueOf(extent.getNorth())));
-
-			String se = extent.getSouth() + " " + extent.getEast();
-			String sw = extent.getSouth() + " " + extent.getWest();
-			String ne = extent.getNorth() + " " + extent.getEast();
-			String nw = extent.getNorth() + " " + extent.getWest();
-
-			map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_BBOX_SW.getName(), Arrays.asList(sw));
-			map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_BBOX_SE.getName(), Arrays.asList(se));
-			map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_BBOX_NE.getName(), Arrays.asList(ne));
-			map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_BBOX_NW.getName(), Arrays.asList(nw));
-
-			String shape = getShape("" + s, "" + e, "" + w, "" + n);
-			if (shape != null) {
-			    map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_SHAPE.getName(), Arrays.asList(shape));
-			}
-
-		    } else {
-			//
-			//
-			// these properties have at the moment no related statistical element
-			//
-			//
-			String name = b.getProperty().getName();
-
-			List<String> list = null;
-
-			if (map.get(name) == null) {
-			    list = new ArrayList<>();
-			} else {
-			    list = map.get(name);
-			}
-
-			list.add(b.getPropertyValue().toString());
-
-			map.put(getName() + RuntimeInfoElement.NAME_SEPARATOR + b.getProperty().getName(), list);
-		    }
-		}
-
-		else if (bond instanceof QueryableBond<?>) {
-
-		} else if (bond instanceof ViewBond) {
-
-		}
-	    }
-
-	    @Override
-	    public void endLogicalBond(LogicalBond bond) {
-	    }
-
-	    @Override
-	    public void viewBond(ViewBond bond) {
-	    }
-
-	    @Override
-	    public void spatialBond(SpatialBond bond) {
-	    }
-
-	    @Override
-	    public void simpleValueBond(SimpleValueBond bond) {
-	    }
-
-	    @Override
-	    public void resourcePropertyBond(ResourcePropertyBond bond) {
-	    }
-
-	    @Override
-	    public void customBond(QueryableBond<String> bond) {
-	    }
-
-	    @Override
-	    public void runtimeInfoElementBond(RuntimeInfoElementBond bond) {
-	    }
-	};
-
-	DiscoveryBondParser parser = new DiscoveryBondParser(getUserBond().get());
-	parser.parse(handler);
     }
 
     /**
@@ -446,65 +373,6 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     public void setRankingStrategy(RankingStrategy strategy) {
 
 	getHeader().add(new GSProperty<RankingStrategy>(RANKING, strategy));
-    }
-
-    public static String getShape(String sString, String eString, String wString, String nString) {
-	if (wString != null && sString != null && nString != null && eString != null) {
-
-	    double e;
-	    double w;
-	    double s;
-	    double n;
-	    try {
-		e = Double.parseDouble(eString);
-		w = Double.parseDouble(wString);
-		s = Double.parseDouble(sString);
-		n = Double.parseDouble(nString);
-		if (!Double.isFinite(e)) {
-		    return null;
-		}
-		if (!Double.isFinite(w)) {
-		    return null;
-		}
-		if (!Double.isFinite(s)) {
-		    return null;
-		}
-		if (!Double.isFinite(n)) {
-		    return null;
-		}
-	    } catch (Exception ex) {
-		return null;
-	    }
-
-	    String es = e + " " + s;
-	    String ws = w + " " + s;
-	    String en = e + " " + n;
-	    String wn = w + " " + n;
-
-	    if (n <= 90 && s >= -90 && e >= -180 && e <= 180 && w <= 180 && w >= -180) {
-
-		if (n >= s) {
-
-		    boolean snEqual = (Math.abs(n - s) < TOL);
-		    boolean weEqual = (Math.abs(w - e) < TOL);
-
-		    if (snEqual && weEqual) {
-			String shape = "POINT (" + ws + ")";
-			return shape;
-		    } else if (!snEqual && !weEqual) {
-			String shape = "POLYGON ((" + ws + "," + wn + "," + en + "," + es + "," + ws + "))";
-			return shape;
-		    } else {
-			GSLoggerFactory.getLogger(DiscoveryMessage.class).warn("Not valid bbox {} {} {} {}", w, s, e, n);
-		    }
-		} else {
-		    GSLoggerFactory.getLogger(DiscoveryMessage.class).warn("Not valid bbox {} {} {} {}", w, s, e, n);
-		}
-	    } else {
-		GSLoggerFactory.getLogger(DiscoveryMessage.class).warn("Not valid bbox {} {} {} {}", w, s, e, n);
-	    }
-	}
-	return null;
     }
 
     /**
@@ -659,4 +527,201 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 	getHeader().add(new GSProperty<Boolean>(DATA_FOLDER_CHECK, true));
     }
 
+    /**
+     * @param option
+     */
+    public void enableEiffelAPIDiscoveryOption(EiffelAPIDiscoveryOption option) {
+
+	getHeader().add(new GSProperty<EiffelAPIDiscoveryOption>(EIFFEL_DISCOVERY_OPTION, option));
+    }
+
+    /**
+     * @param
+     */
+    public Optional<EiffelAPIDiscoveryOption> getEiffelAPIDiscoveryOption() {
+
+	return Optional.ofNullable(getHeader().get(EIFFEL_DISCOVERY_OPTION, EiffelAPIDiscoveryOption.class));
+    }
+
+    private void provideUserBondInfo(HashMap<String, List<String>> map) {
+
+	DiscoveryBondHandler handler = new DiscoveryBondHandler() {
+
+	    @Override
+	    public void startLogicalBond(LogicalBond bond) {
+	    }
+
+	    @Override
+	    public void separator() {
+	    }
+
+	    @Override
+	    public void nonLogicalBond(Bond bond) {
+
+		if (bond instanceof QueryableBond) {
+
+		    QueryableBond<?> b = (QueryableBond<?>) bond;
+
+		    if (b.getProperty() == MetadataElement.BOUNDING_BOX) {
+
+			SpatialExtent extent = (SpatialExtent) b.getPropertyValue();
+
+			double e = extent.getEast();
+			double w = extent.getWest();
+			double n = extent.getNorth();
+			double s = extent.getSouth();
+
+			map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_BBOX_EAST.getName(), Arrays.asList(String.valueOf(extent.getEast())));
+			map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_BBOX_WEST.getName(), Arrays.asList(String.valueOf(extent.getWest())));
+			map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_BBOX_SOUTH.getName(),
+				Arrays.asList(String.valueOf(extent.getSouth())));
+			map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_BBOX_NORTH.getName(),
+				Arrays.asList(String.valueOf(extent.getNorth())));
+
+			String se = extent.getSouth() + " " + extent.getEast();
+			String sw = extent.getSouth() + " " + extent.getWest();
+			String ne = extent.getNorth() + " " + extent.getEast();
+			String nw = extent.getNorth() + " " + extent.getWest();
+
+			map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_BBOX_SW.getName(), Arrays.asList(sw));
+			map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_BBOX_SE.getName(), Arrays.asList(se));
+			map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_BBOX_NE.getName(), Arrays.asList(ne));
+			map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_BBOX_NW.getName(), Arrays.asList(nw));
+
+			String shape = getShape("" + s, "" + e, "" + w, "" + n);
+			if (shape != null) {
+			    map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_SHAPE.getName(), Arrays.asList(shape));
+			}
+
+		    } else {
+			//
+			//
+			// these properties have at the moment no related statistical element
+			//
+			//
+			String name = b.getProperty().getName();
+
+			List<String> list = null;
+
+			if (map.get(name) == null) {
+			    list = new ArrayList<>();
+			} else {
+			    list = map.get(name);
+			}
+
+			list.add(b.getPropertyValue().toString());
+
+			map.put(getName() + RuntimeInfoElement.NAME_SEPARATOR + b.getProperty().getName(), list);
+		    }
+		}
+
+		else if (bond instanceof QueryableBond<?>) {
+
+		} else if (bond instanceof ViewBond) {
+
+		}
+	    }
+
+	    @Override
+	    public void endLogicalBond(LogicalBond bond) {
+	    }
+
+	    @Override
+	    public void viewBond(ViewBond bond) {
+	    }
+
+	    @Override
+	    public void spatialBond(SpatialBond bond) {
+	    }
+
+	    @Override
+	    public void simpleValueBond(SimpleValueBond bond) {
+	    }
+
+	    @Override
+	    public void resourcePropertyBond(ResourcePropertyBond bond) {
+	    }
+
+	    @Override
+	    public void customBond(QueryableBond<String> bond) {
+	    }
+
+	    @Override
+	    public void runtimeInfoElementBond(RuntimeInfoElementBond bond) {
+	    }
+	};
+
+	DiscoveryBondParser parser = new DiscoveryBondParser(getUserBond().get());
+	parser.parse(handler);
+    }
+
+    /**
+     * @param sString
+     * @param eString
+     * @param wString
+     * @param nString
+     * @return
+     */
+    public static String getShape(String sString, String eString, String wString, String nString) {
+
+	final Double TOL = Math.pow(10, -8);
+
+	if (wString != null && sString != null && nString != null && eString != null) {
+
+	    double e;
+	    double w;
+	    double s;
+	    double n;
+	    try {
+		e = Double.parseDouble(eString);
+		w = Double.parseDouble(wString);
+		s = Double.parseDouble(sString);
+		n = Double.parseDouble(nString);
+		if (!Double.isFinite(e)) {
+		    return null;
+		}
+		if (!Double.isFinite(w)) {
+		    return null;
+		}
+		if (!Double.isFinite(s)) {
+		    return null;
+		}
+		if (!Double.isFinite(n)) {
+		    return null;
+		}
+	    } catch (Exception ex) {
+		return null;
+	    }
+
+	    String es = e + " " + s;
+	    String ws = w + " " + s;
+	    String en = e + " " + n;
+	    String wn = w + " " + n;
+
+	    if (n <= 90 && s >= -90 && e >= -180 && e <= 180 && w <= 180 && w >= -180) {
+
+		if (n >= s) {
+
+		    boolean snEqual = (Math.abs(n - s) < TOL);
+		    boolean weEqual = (Math.abs(w - e) < TOL);
+
+		    if (snEqual && weEqual) {
+			String shape = "POINT (" + ws + ")";
+			return shape;
+		    } else if (!snEqual && !weEqual) {
+			String shape = "POLYGON ((" + ws + "," + wn + "," + en + "," + es + "," + ws + "))";
+			return shape;
+		    } else {
+			GSLoggerFactory.getLogger(DiscoveryMessage.class).warn("Not valid bbox {} {} {} {}", w, s, e, n);
+		    }
+		} else {
+		    GSLoggerFactory.getLogger(DiscoveryMessage.class).warn("Not valid bbox {} {} {} {}", w, s, e, n);
+		}
+	    } else {
+		GSLoggerFactory.getLogger(DiscoveryMessage.class).warn("Not valid bbox {} {} {} {}", w, s, e, n);
+	    }
+	}
+
+	return null;
+    }
 }

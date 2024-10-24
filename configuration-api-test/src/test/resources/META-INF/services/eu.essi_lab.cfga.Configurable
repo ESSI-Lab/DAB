@@ -1,0 +1,4 @@
+eu.essi_lab.cfga.test.ConfigurableTest
+eu.essi_lab.cfga.scheduler.test.TestWorker
+eu.essi_lab.cfga.augmenter.worker.test.TestAugmenterWorker
+eu.essi_lab.cfga.request.executor.worker.schedule.test.UserSchedulerWorkerTest

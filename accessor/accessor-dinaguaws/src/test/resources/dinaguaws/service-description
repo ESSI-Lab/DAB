@@ -1,0 +1,14 @@
+
+There is no "get series info" method, so I am asking if one can assume that both "nivel" (gage height) and "caudal" (discharge) series exist for each station and have the end date specified by attribute ultima_fecha. Another possible issue I find is that there is no begin date informed in the getEstaciones request, so I am asking if that can be queried in another way or a default date may be assumed for all series. Actual data request is made through different methods according to the variable:
+
+- getNivelesEstacion -> instantaneous gage height (apparently even-spaced at a 30 minutes interval)
+
+- getDiariosEstacion -> daily average, maximum and minimum gage height
+
+- getCaudalesEstacion -> instananeous discharge (apparently even-spaced at a 30 minutes interval)
+
+There is a limitation of maximum 15 days period for each request. Otherwise it returns an error.
+
+I am also asking if the dates are local or UTC.
+
+

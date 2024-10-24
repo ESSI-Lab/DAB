@@ -4,7 +4,7 @@ package eu.essi_lab.identifierdecorator;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,6 +31,7 @@ import eu.essi_lab.api.database.DatabaseReader.IdentifierType;
 import eu.essi_lab.api.database.SourceStorage;
 import eu.essi_lab.cfga.gs.setting.SourcePrioritySetting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.messages.HarvestingProperties;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.ResultsPriority;
@@ -45,29 +46,46 @@ public class IdentifierDecorator {
 
     private DatabaseReader dbReader;
     private SourcePrioritySetting sourcePrioritySetting;
+    private Boolean preserveIds;
 
     /**
      * 
      */
     public IdentifierDecorator() {
-	this.sourcePrioritySetting = new SourcePrioritySetting();
     }
 
     /**
      * @param sourcePrioritySetting
-     * @param dbReader
+     * @param dataBaseReader
      */
-    public IdentifierDecorator(SourcePrioritySetting sourcePrioritySetting, DatabaseReader dbReader) {
-	this.sourcePrioritySetting = sourcePrioritySetting;
-	this.dbReader = dbReader;
+    public IdentifierDecorator(//
+	    SourcePrioritySetting sourcePrioritySetting, //
+	    DatabaseReader dataBaseReader) {
+
+	this(sourcePrioritySetting, false, dataBaseReader);
     }
 
     /**
+     * @param dataBaseReader
+     * @param preserveIds
+     * @param sourcePrioritySetting
+     */
+    public IdentifierDecorator(//
+	    SourcePrioritySetting sourcePrioritySetting, //
+	    Boolean preserveIds, //
+	    DatabaseReader dataBaseReader) {
+
+	this.preserveIds = preserveIds;
+	this.dbReader = dataBaseReader;
+	this.sourcePrioritySetting = sourcePrioritySetting;
+    }
+
+    /**
+     * @param resource
      */
     public void decorateDistributedIdentifier(GSResource resource) {
 
-	resource.setPrivateId(generateUniqueIdentifier());
-	resource.setPublicId(resource.getPrivateId());
+	decorateIdentifier(resource);
     }
 
     /**
@@ -129,7 +147,7 @@ public class IdentifierDecorator {
 			//
 			throw new DuplicatedResourceException(incomingResource, existingResource, originalId, duplicationCase);
 
-		    } else if (isConflictingResource(storage, existingResource, incomingResource.getSource())) {
+		    } else if (isConflictingResource(existingResource, incomingResource.getSource())) {
 			//
 			// in the consolidated folders of the whole DB several records with same original id can exist.
 			// this exception gathers all the triples (originalId, source, existing source)
@@ -146,7 +164,7 @@ public class IdentifierDecorator {
 			//
 			// using original identifier
 			//
-			incomingResource.setPrivateId(originalId);
+			incomingResource.setPrivateId(StringUtils.URLEncodeUTF8(originalId));
 			incomingResource.setPublicId(originalId);
 		    }
 		}
@@ -163,14 +181,35 @@ public class IdentifierDecorator {
 		//
 		// using original identifier
 		//
-		incomingResource.setPrivateId(originalId);
+		incomingResource.setPrivateId(StringUtils.URLEncodeUTF8(originalId));
 		incomingResource.setPublicId(originalId);
 	    }
+	} else if (preserveIds) {
+
+	    Optional<String> opOrig = incomingResource.getOriginalId();
+
+	    if (opOrig.isPresent()) {// to preserve ids, it must be present!
+
+		String originalId = opOrig.get();
+
+		GSResource existingResource = getDatabaseReader().getResource(originalId, incomingResource.getSource());
+
+		if (existingResource != null) {
+
+		    // successive harvesting
+		    incomingResource.setPrivateId(existingResource.getPrivateId());
+		    incomingResource.setPublicId(existingResource.getPublicId());
+
+		} else {
+
+		    // first harvesting
+		    decorateIdentifier(incomingResource);
+		}
+	    }
+
 	} else {
 
-	    // GSLoggerFactory.getLogger(getClass()).debug("Using random identifier");
-
-	    decorateDistributedIdentifier(incomingResource);
+	    decorateIdentifier(incomingResource);
 	}
     }
 
@@ -183,8 +222,17 @@ public class IdentifierDecorator {
     }
 
     /**
+     * @param resource
+     */
+    private void decorateIdentifier(GSResource resource) {
+
+	resource.setPrivateId(UUID.randomUUID().toString());
+	resource.setPublicId(resource.getPrivateId());
+    }
+
+    /**
      * See diagram https://confluence.geodab.eu/display/GPD/Identifier+Decorator
-     * 
+     *
      * @param existingResource
      * @param incomingResource
      * @param properties
@@ -283,20 +331,29 @@ public class IdentifierDecorator {
     }
 
     /**
-     * @param storage no longer used
+     * Two datasets (existing and incoming) conflict if all the following conditions apply:<ol>
+     * <li>they have the same original id</li>
+     * <li>they come from different sources</li>
+     * <li>the existing resource uses the original id as public id</li>
+     * </ul>
+     * 
      * @param existingResource
      * @param incomingSource
      * @return
      * @throws GSException
      */
-    private boolean isConflictingResource(SourceStorage storage, GSResource existingResource, GSSource incomingSource) throws GSException {
+    private boolean isConflictingResource(GSResource existingResource, GSSource incomingSource) throws GSException {
 
-	boolean sameSource = existingResource.getSource().getUniqueIdentifier().//
+	boolean originalAsPublic = existingResource.getPublicId().equals(existingResource.getOriginalId().get());
+
+	boolean differentSource = !existingResource.getSource().getUniqueIdentifier().//
 		equals(incomingSource.getUniqueIdentifier());
 
-	GSLoggerFactory.getLogger(getClass()).warn("Existing resource is conflicting: {}", !sameSource);
+	boolean conflicting = differentSource && originalAsPublic;
 
-	return !sameSource;
+	GSLoggerFactory.getLogger(getClass()).warn("Existing resource is conflicting: {}", conflicting);
+
+	return conflicting;
     }
 
     /**
@@ -306,7 +363,7 @@ public class IdentifierDecorator {
      * <li>The source is configured as priority source</li>
      * <li>The original id is an UUID</li>
      * </ol>
-     * 
+     *
      * @param resource
      * @return
      */
@@ -326,27 +383,9 @@ public class IdentifierDecorator {
 
 	return originalId.isPresent() && (//
 	(collection && hasCollectionPriority) || //
-		isUUID(originalId.get()) || //
+		StringUtils.isUUID(originalId.get()) || //
 		isPrioritySource//
 	);
     }
 
-    /**
-     * @param id
-     * @return
-     */
-    private boolean isUUID(String id) {
-	// REGULAR EXPRESSION
-	// ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
-	try {
-	    UUID.fromString(id);
-	    return true;
-	} catch (IllegalArgumentException e) {
-	    return false;
-	}
-    }
-
-    String generateUniqueIdentifier() {
-	return UUID.randomUUID().toString();
-    }
 }

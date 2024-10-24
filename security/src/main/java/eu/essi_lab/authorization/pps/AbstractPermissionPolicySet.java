@@ -7,7 +7,7 @@ package eu.essi_lab.authorization.pps;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -41,6 +41,7 @@ import eu.essi_lab.authorization.builder.PPSPolicyBuilder;
 import eu.essi_lab.authorization.builder.PPSRuleBuilder;
 import eu.essi_lab.authorization.xacml.XACML_JAXBUtils;
 import eu.essi_lab.jaxb.common.ObjectFactories;
+import eu.essi_lab.messages.bond.View.ViewVisibility;
 import oasis.names.tc.xacml._3_0.core.schema.wd_17.AnyOf;
 import oasis.names.tc.xacml._3_0.core.schema.wd_17.ApplyType;
 import oasis.names.tc.xacml._3_0.core.schema.wd_17.AttributeDesignatorType;
@@ -61,9 +62,27 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
     /**
      * 
      */
-    protected static final int DEFAULT_OFFSET_LIMIT = 200;
-    
-    protected static final int DEFAULT_MAX_RECORDS_LIMIT = 50;
+    public static final int DEFAULT_OFFSET_LIMIT = 200;
+
+    /**
+     * 
+     */
+    public static final int DEFAULT_MAX_RECORDS_LIMIT = 50;
+
+    /**
+     * 
+     */
+    public static final int ANONYMOUS_MAX_RECORDS_LIMIT = 10;
+
+    /**
+     * 
+     */
+    public static final String VIEW_ID_MISSING_VALUE = "viewMissing";
+
+    /**
+     * 
+     */
+    public static final String VIEW_CREATOR_MISSING_VALUE = "viewCreatorMissing";
 
     /**
      * @param role
@@ -123,13 +142,14 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
     protected abstract void editPPSPolicy();
 
     /**
-     * 
+     * @param action
+     * @param ruleId
      */
-    protected void setDiscoveryAction(String ruleId) {
+    private void setAction(Action action, String ruleId) {
 
-	AnyOf discoverAnyOf = XACML_JAXBUtils.createAnyOfAllOfMatch(//
+	AnyOf accessAnyOf = XACML_JAXBUtils.createAnyOfAllOfMatch(//
 		StandardFunction.STRING_EQUAL.getId(), //
-		Action.DISCOVERY.getId(), //
+		action.getId(), //
 		StandardDatatypes.STRING.getId(),
 
 		null, //
@@ -138,7 +158,63 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
 		StandardDatatypes.STRING.getId(), //
 		true);
 
-	addRule(ruleId, discoverAnyOf);
+	addRule(ruleId, accessAnyOf);
+    }
+
+    /**
+     * 
+     */
+    protected void setAccessAction(String ruleId) {
+
+	setAction(Action.ACCESS, ruleId);
+    }
+
+    /**
+     * 
+     */
+    protected void setDiscoveryAction(String ruleId) {
+
+	setAction(Action.DISCOVERY, ruleId);
+    }
+
+    /**
+     * 
+     */
+    protected void setReadViewAction(String ruleId) {
+
+	setAction(Action.READ_VIEW, ruleId);
+    }
+
+    /**
+     * 
+     */
+    protected void setCreateViewAction(String ruleId) {
+
+	setAction(Action.CREATE_VIEW, ruleId);
+    }
+
+    /**
+     * 
+     */
+    protected void setUpdateViewAction(String ruleId) {
+
+	setAction(Action.UPDATE_VIEW, ruleId);
+    }
+
+    /**
+     * 
+     */
+    protected void setDeleteViewAction(String ruleId) {
+
+	setAction(Action.DELETE_VIEW, ruleId);
+    }
+
+    /**
+     * 
+     */
+    protected void setOtherAction(String ruleId) {
+
+	setAction(Action.OTHER, ruleId);
     }
 
     /**
@@ -163,20 +239,10 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
     /**
      * 
      */
-    protected void setAccessAction(String ruleId) {
+    protected void setUnapplicableRule(String ruleId) {
 
-	AnyOf accessAnyOf = XACML_JAXBUtils.createAnyOfAllOfMatch(//
-		StandardFunction.STRING_EQUAL.getId(), //
-		Action.ACCESS.getId(), //
-		StandardDatatypes.STRING.getId(),
-
-		null, //
-		XacmlAttributeCategory.XACML_3_0_ACTION.value(), //
-		XacmlAttributeId.XACML_1_0_ACTION_ID.value(), //
-		StandardDatatypes.STRING.getId(), //
-		true);
-
-	addRule(ruleId, accessAnyOf);
+	setOffsetLimit(ruleId, Integer.MIN_VALUE);
+	setMaxRecordsLimit(ruleId, Integer.MIN_VALUE);
     }
 
     /**
@@ -198,7 +264,7 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
 
 	addRule(ruleId, offsetAnyOf);
     }
-    
+
     /**
      * @param maxRecords
      */
@@ -246,7 +312,7 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
     protected ApplyType createPathApply(String... paths) {
 
 	//
-	// creates the and condition
+	// creates condition
 	//
 	AttributeDesignatorType pathType = new AttributeDesignatorType(//
 		XacmlAttributeCategory.XACML_1_0_ACCESS_SUBJECT.value(), //
@@ -256,6 +322,41 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
 		true);//
 
 	return XACML_JAXBUtils.createAtLeastAnyOfApply(Arrays.asList(paths), pathType);
+    }
+
+    /**
+     * @param paths
+     * @return
+     */
+    protected ApplyType createViewVisibilityApply(ViewVisibility viewVisibility) {
+
+	//
+	// creates condition
+	//
+	AttributeDesignatorType type = new AttributeDesignatorType(//
+		XacmlAttributeCategory.XACML_1_0_ACCESS_SUBJECT.value(), //
+		XacmlAttributeId.XACML_1_0_SUBJECT_ID.value(), //
+		StandardDatatypes.STRING.getId(), //
+		Issuer.VIEW_VISIBILITY.getId(), //
+		true);//
+
+	return XACML_JAXBUtils.createStringEqualApply(viewVisibility.name(), type);
+    }
+
+    /**
+     * @param viewIds
+     * @return
+     */
+    protected ApplyType createViewOwnerApply(String viewOwner) {
+
+	AttributeDesignatorType type = new AttributeDesignatorType(//
+		XacmlAttributeCategory.XACML_1_0_ACCESS_SUBJECT.value(), //
+		XacmlAttributeId.XACML_1_0_SUBJECT_ID.value(), //
+		StandardDatatypes.STRING.getId(), //
+		Issuer.VIEW_OWNER.getId(), //
+		true);//
+
+	return XACML_JAXBUtils.createStringEqualApply(viewOwner, type);
     }
 
     /**
@@ -275,19 +376,49 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
     }
 
     /**
+     * @return
+     */
+    protected ApplyType createNoViewIdentifiersApply() {
+
+	AttributeDesignatorType viewType = new AttributeDesignatorType(//
+		XacmlAttributeCategory.XACML_1_0_ACCESS_SUBJECT.value(), //
+		XacmlAttributeId.XACML_1_0_SUBJECT_ID.value(), //
+		StandardDatatypes.STRING.getId(), //
+		Issuer.VIEW_ID.getId(), //
+		true);//
+
+	return XACML_JAXBUtils.createAtLeastAnyOfApply(Arrays.asList(VIEW_ID_MISSING_VALUE), viewType);
+    }
+
+    /**
+     * @return
+     */
+    protected ApplyType createNoCreatorIdentifiersApply() {
+
+	AttributeDesignatorType viewType = new AttributeDesignatorType(//
+		XacmlAttributeCategory.XACML_1_0_ACCESS_SUBJECT.value(), //
+		XacmlAttributeId.XACML_1_0_SUBJECT_ID.value(), //
+		StandardDatatypes.STRING.getId(), //
+		Issuer.VIEW_CREATOR.getId(), //
+		true);//
+
+	return XACML_JAXBUtils.createAtLeastAnyOfApply(Arrays.asList(VIEW_ID_MISSING_VALUE), viewType);
+    }
+
+    /**
      * @param origin
      * @return
      */
-    protected ApplyType createOriginHeaderApply(String ...origin) {
-    
-        AttributeDesignatorType viewCreatorType = new AttributeDesignatorType(//
-        	XacmlAttributeCategory.XACML_1_0_ACCESS_SUBJECT.value(), //
-        	XacmlAttributeId.XACML_1_0_SUBJECT_ID.value(), //
-        	StandardDatatypes.STRING.getId(), //
-        	Issuer.ORIGIN.getId(), //
-        	true);//
-    
-	return XACML_JAXBUtils.createAtLeastAnyOfApply(Arrays.asList(origin), viewCreatorType);       
+    protected ApplyType createOriginHeaderApply(String... origin) {
+
+	AttributeDesignatorType viewCreatorType = new AttributeDesignatorType(//
+		XacmlAttributeCategory.XACML_1_0_ACCESS_SUBJECT.value(), //
+		XacmlAttributeId.XACML_1_0_SUBJECT_ID.value(), //
+		StandardDatatypes.STRING.getId(), //
+		Issuer.ORIGIN.getId(), //
+		true);//
+
+	return XACML_JAXBUtils.createAtLeastAnyOfApply(Arrays.asList(origin), viewCreatorType);
     }
 
     /**
@@ -305,7 +436,7 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
 
 	return XACML_JAXBUtils.createStringEqualApply(viewCreator, viewCreatorType);
     }
-    
+
     /**
      * @param allowedIPs
      * @return
@@ -360,6 +491,65 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
     }
 
     /**
+     * @param applyTypes
+     */
+    protected void setOrCondition(String ruleId, ApplyType... applyTypes) {
+
+	ApplyType toApply = null;
+
+	if (applyTypes.length == 1) {
+
+	    toApply = applyTypes[0];
+
+	} else {
+
+	    toApply = XACML_JAXBUtils.createLogicalApplyType(StandardFunction.OR, Arrays.asList(applyTypes));
+	}
+
+	Condition condition = new Condition(ObjectFactories.XACML().createApply(toApply));
+
+	getBuilder(ruleId).setCondition(condition);
+    }
+
+    /**
+     * @param applyTypes
+     */
+    protected ApplyType createORApply(ApplyType... applyTypes) {
+
+	ApplyType toApply = null;
+
+	if (applyTypes.length == 1) {
+
+	    toApply = applyTypes[0];
+
+	} else {
+
+	    toApply = XACML_JAXBUtils.createLogicalApplyType(StandardFunction.OR, Arrays.asList(applyTypes));
+	}
+
+	return toApply;
+    }
+
+    /**
+     * @param applyTypes
+     */
+    protected ApplyType createANDApply(ApplyType... applyTypes) {
+
+	ApplyType toApply = null;
+
+	if (applyTypes.length == 1) {
+
+	    toApply = applyTypes[0];
+
+	} else {
+
+	    toApply = XACML_JAXBUtils.createLogicalApplyType(StandardFunction.AND, Arrays.asList(applyTypes));
+	}
+
+	return toApply;
+    }
+
+    /**
      * @return
      */
     protected ApplyType createDiscoveryPathApply() {
@@ -372,15 +562,23 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
 		"cswisogeo", //
 		"oaipmh", //
 		"hiscentral.asmx", //
+		"hiscentralitaly.asmx", //
 		"arpa-rest", //
 		"cuahsi_1_1.asmx", //
 		"rest", //
 		"hydrocsv", //
 		"sos", //
+		"wfs", //
+		"wms-extent", //
+		"oapi", //
 		"gwis", //
-		"ArcGIS",//
-		"ArcGISProxy",//
-		"gwps", "semantic");
+		"ArcGIS", //
+		"ArcGISProxy", //
+		"gwps", //
+		"timeseries-api", //"timeseries-api", //
+		"om-api", //
+		"terms-api", //
+		"semantic", "rest-views");
     }
 
     /**
@@ -394,10 +592,16 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
 		"hydrocsv", //
 		"thredds", //
 		"wms", //
+		"wms-extent", //
+		"oapi", //
+		"wfs", //
 		"sos", //
 		"gwps", //
 		"ArcGIS", //
 		"ArcGISProxy", //
+		"timeseries-api", //
+		"om-api", //
+		"terms-api", //
 		"gwis");
     }
 

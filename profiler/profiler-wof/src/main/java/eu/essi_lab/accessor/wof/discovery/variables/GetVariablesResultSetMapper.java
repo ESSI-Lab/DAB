@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof.discovery.variables;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,9 +21,10 @@ package eu.essi_lab.accessor.wof.discovery.variables;
  * #L%
  */
 
-import java.util.List;
-import java.util.Optional;
+import java.math.BigDecimal;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.HashSet;
+import java.util.Optional;
 
 import javax.xml.bind.JAXBElement;
 
@@ -37,8 +38,11 @@ import eu.essi_lab.accessor.wof.WOFQueryUtils;
 import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.lib.net.utils.whos.HydroOntology;
 import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
+import eu.essi_lab.lib.net.utils.whos.WHOSOntology;
 import eu.essi_lab.lib.net.utils.whos.WMOOntology;
 import eu.essi_lab.lib.net.utils.whos.WMOUnit;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -109,15 +113,15 @@ public class GetVariablesResultSetMapper extends DiscoveryResultSetMapper<Variab
 	    }
 
 	    // SEMANTIC_HARMONIZATION if attribute URI is present, is preferred, to have an harmonized set of attributes
-	    Optional<String> optionalAttributeURI = res.getExtensionHandler().getAttributeURI();
+	    Optional<String> optionalAttributeURI = res.getExtensionHandler().getObservedPropertyURI();
 	    if (WOFQueryUtils.isSemanticHarmonizationEnabled(message.getWebRequest()) && optionalAttributeURI.isPresent()) {
 		String uri = optionalAttributeURI.get();
 		if (uri != null) {
-		    HydroOntology ontology = new HydroOntology();
+		    HydroOntology ontology = new WHOSOntology();
 		    SKOSConcept concept = ontology.getConcept(uri);
 		    if (concept != null) {
 			varName = concept.getPreferredLabel().getKey();
-			List<String> closeMatches = concept.getCloseMatches();
+			HashSet<String> closeMatches = concept.getCloseMatches();
 			if (closeMatches != null && !closeMatches.isEmpty()) {
 			    try {
 				WMOOntology wmoOntology = new WMOOntology();
@@ -230,28 +234,55 @@ public class GetVariablesResultSetMapper extends DiscoveryResultSetMapper<Variab
 		    dataType = timeInterpolation.name();
 		    break;
 		}
+	    } else {
+		Optional<String> opt = res.getExtensionHandler().getTimeInterpolationString();
+		if (opt.isPresent()) {
+		    dataType = opt.get();
+		}
+
 	    }
 
-	    String timeUnitName = "";
-	    Optional<String> optionalTimeUnit = res.getExtensionHandler().getTimeUnits();
-	    if (optionalTimeUnit.isPresent()) {
-		timeUnitName = optionalTimeUnit.get();
+	    Optional<String> aggregationPeriod = res.getExtensionHandler().getTimeAggregationDuration8601();
+	    Optional<String> resolutionPeriod = res.getExtensionHandler().getTimeResolutionDuration8601();
+	    String aggregationTimeUnits = null;
+	    String resolutionTimeUnits = null;
+	    BigDecimal aggregationPeriodValue = null;
+	    BigDecimal resolutionPeriodValue = null;
+
+	    if (aggregationPeriod.isPresent()) {
+		try {
+		    javax.xml.datatype.Duration duration = ISO8601DateTimeUtils.getDuration(aggregationPeriod.get());
+		    SimpleEntry<BigDecimal, String> unitsValue = ISO8601DateTimeUtils.getUnitsValueFromDuration(duration);
+		    aggregationTimeUnits = unitsValue.getValue();
+		    aggregationPeriodValue = unitsValue.getKey();
+		} catch (Exception e) {
+		    GSLoggerFactory.getLogger(getClass()).error(e);
+		}
 	    }
-	    String timeUnitAbbreviation = "";
-	    Optional<String> optionalTimeUnitAbbreviation = res.getExtensionHandler().getTimeUnitsAbbreviation();
-	    if (optionalTimeUnitAbbreviation.isPresent()) {
-		timeUnitAbbreviation = optionalTimeUnitAbbreviation.get();
+	    if (resolutionPeriod.isPresent()) {
+		try {
+		    javax.xml.datatype.Duration duration = ISO8601DateTimeUtils.getDuration(resolutionPeriod.get());
+		    SimpleEntry<BigDecimal, String> unitsValue = ISO8601DateTimeUtils.getUnitsValueFromDuration(duration);
+		    resolutionTimeUnits = unitsValue.getValue();
+		    resolutionPeriodValue = unitsValue.getKey();
+		} catch (Exception e) {
+		    GSLoggerFactory.getLogger(getClass()).error(e);
+		}
 	    }
-	    if (timeUnitAbbreviation.equals("")) {
-		timeUnitAbbreviation = timeUnitName;
+	    if (aggregationTimeUnits != null && resolutionTimeUnits != null && !aggregationTimeUnits.equals(resolutionTimeUnits)) {
+		GSLoggerFactory.getLogger(getClass()).error("Different time units in WOF profiler!");
+	    }
+
+	    String timeUnits = aggregationTimeUnits;
+	    if (timeUnits == null) {
+		timeUnits = resolutionTimeUnits;
 	    }
 
 	    boolean regularTime = false;
 	    String timeSpacing = null;
 
-	    Optional<String> optionalTimeResolution = res.getExtensionHandler().getTimeResolution();
-	    if (optionalTimeResolution.isPresent()) {
-		timeSpacing = optionalTimeResolution.get();
+	    if (resolutionPeriodValue != null) {
+		timeSpacing = resolutionPeriodValue.toString();
 		if (!timeSpacing.isEmpty() && !timeSpacing.equals("0")) {
 		    regularTime = true;
 		}
@@ -284,16 +315,18 @@ public class GetVariablesResultSetMapper extends DiscoveryResultSetMapper<Variab
 
 	    TimeScale ts = new TimeScale();
 	    ts.setIsRegular(regularTime);
-	    UnitsType timeUnits = new UnitsType();
-	    timeUnits.setUnitName(timeUnitName);
-	    timeUnits.setUnitAbbreviation(timeUnitAbbreviation);
-	    timeUnits.setUnitType("");
-	    timeUnits.setUnitCode("");
-	    ts.setUnit(timeUnits);
+	    UnitsType tu = new UnitsType();
+	    tu.setUnitName(timeUnits);
+	    if (timeUnits != null) {
+		tu.setUnitAbbreviation(ISO8601DateTimeUtils.getTimeUnitsAbbreviation(timeUnits));
+	    }
+	    tu.setUnitType("");
+	    tu.setUnitCode("");
+	    ts.setUnit(tu);
 
-	    Optional<String> optionalTimeSupport = res.getExtensionHandler().getTimeSupport();
-	    if (optionalTimeSupport.isPresent()) {
-		Float timeSupport = Float.parseFloat(optionalTimeSupport.get());
+	    // Optional<String> optionalTimeSupport = res.getExtensionHandler().getTimeSupport();
+	    if (aggregationPeriodValue != null) {
+		Float timeSupport = aggregationPeriodValue.floatValue();
 
 		// this is to remove the sign to negative time supports, as WML 1.1 expects always positive time
 		// supports.
@@ -303,7 +336,11 @@ public class GetVariablesResultSetMapper extends DiscoveryResultSetMapper<Variab
 		ts.setTimeSupport(timeSupport);
 	    }
 	    if (timeSpacing != null) {
-		ts.setTimeSpacing(Float.parseFloat(timeSpacing));
+		try {
+		    ts.setTimeSpacing(Float.parseFloat(timeSpacing));
+		} catch (NumberFormatException ex) {
+		    GSLoggerFactory.getLogger(getClass()).error(ex.getMessage());
+		}
 	    }
 	    JAXBElement<TimeScale> timeScale = JAXBWML.getInstance().getFactory().createVariableInfoTypeTimeScale(ts);
 

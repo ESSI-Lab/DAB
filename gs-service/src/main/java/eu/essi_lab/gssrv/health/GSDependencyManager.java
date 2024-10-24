@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.health;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,10 +25,10 @@ import java.util.Iterator;
 import java.util.ServiceLoader;
 
 import com.indeed.status.core.AbstractDependencyManager;
+import com.indeed.status.core.ImmutableDependencyManagerParams;
 import com.indeed.status.core.SimplePingableDependency;
 
 import eu.essi_lab.configuration.ExecutionMode;
-import eu.essi_lab.configuration.GIProjectExecutionMode;
 
 /**
  * @author Fabrizio
@@ -41,10 +41,10 @@ public class GSDependencyManager extends AbstractDependencyManager {
      * 
      */
     private GSDependencyManager() {
+	
+	super(ImmutableDependencyManagerParams.builder().appName("ESSI Lab GS-Service").build());
 
-	super("ESSI Lab GS-Service");
-
-	ExecutionMode mode = GIProjectExecutionMode.getMode();
+	ExecutionMode mode = ExecutionMode.get();
 
 	Iterator<GSPingMethod> methods = ServiceLoader.load(GSPingMethod.class).iterator();
 

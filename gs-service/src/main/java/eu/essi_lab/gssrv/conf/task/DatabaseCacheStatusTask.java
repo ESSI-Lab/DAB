@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.conf.task;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,12 +29,13 @@ import org.quartz.JobExecutionContext;
 import com.marklogic.xcc.ResultSequence;
 
 import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.factory.DatabaseConsumerFactory;
+import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.api.database.marklogic.MarkLogicDatabase;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
 import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.wrapper.marklogic.MarkLogicWrapper;
 
 /**
@@ -58,9 +59,9 @@ public class DatabaseCacheStatusTask extends AbstractCustomTask {
 
 	    log(status, "\nProvided hosts: " + Arrays.asList(hosts));
 
-	    StorageUri databaseURI = ConfigurationWrapper.getDatabaseURI();
+	    StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
 
-	    DatabaseReader dbReader = DatabaseConsumerFactory.createDataBaseReader(databaseURI);
+	    DatabaseReader dbReader = DatabaseProviderFactory.getDatabaseReader(databaseURI);
 	    MarkLogicWrapper wrapper = ((MarkLogicDatabase) dbReader.getDatabase()).getWrapper();
 
 	    ResultSequence resultSequence = wrapper.submit(getQuery(hosts));

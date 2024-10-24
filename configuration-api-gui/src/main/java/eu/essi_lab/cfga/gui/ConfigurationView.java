@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gui;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -190,8 +190,8 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 	});
 
 	headerImage = new Image();
-	headerImage.setSrc("https://i.imgur.com/GPpnszs.png");
-	headerImage.setHeight("44px");
+	// headerImage.setSrc("https://i.imgur.com/GPpnszs.png");
+	// headerImage.setHeight("44px");
 
 	headerLabel = new Label();
 	headerLabel.getStyle().set("font-size", "35px");
@@ -227,8 +227,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	navbarContent = ConfigurationViewFactory.createConfigurationViewNavBarContentLayout();
 
-	navbarContent.add(drawerToggle, headerImage, headerLabel, infoLabel, saveButton);
-	// navbarContent.add(drawerToggle, headerImage, headerLabel, saveButton);
+	navbarContent.add(drawerToggle, headerImage, headerLabel, saveButton);
 
 	addToNavbar(navbarContent);
 
@@ -244,7 +243,6 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	    return;
 	}
-	
 
 	// if (ownerBrowserAdress == null || ownerBrowserAdress != null && ownerBrowserAdress.equals(address)) {
 	//
@@ -252,7 +250,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 	//
 	// } else
 
-	if (SingleTabManager.getInstance().isTabOpen()) {
+	if (!enableMultipleTabs() && SingleTabManager.getInstance().isTabOpen()) {
 
 	    GSLoggerFactory.getLogger(getClass()).warn("Tab already opened");
 
@@ -262,7 +260,13 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	    // infoLabel.setVisible(false);
 
-	    NotificationDialog dialog = NotificationDialog.getWarningDialog("Another session is already active");
+	    String msg = "If the configuration tab has been closed a little while ago,";
+	    msg += " the related session will expire in a few seconds and you will";
+	    msg += " be able to start a new one by refreshing this tab or by opening a new configuration tab. If the configuration tab is still open, no other configuration tabs can be opened ";
+	    msg += " until it is closed or the 'Logout' button is pressed";
+
+	    NotificationDialog dialog = NotificationDialog.getNotificationDialog("Another session is already active", msg, 700);
+
 	    dialog.getCancelButton().getStyle().set("display", "none");
 	    dialog.getCloseButton().getStyle().set("display", "none");
 	    dialog.open();
@@ -310,6 +314,8 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 	//
 
 	configuration = retrieveConfiguration();
+
+	configuration.addChangeEventListener(tabs);
 
 	initContent(configuration);
 
@@ -505,6 +511,32 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 	return false;
     }
 
+    /**
+     * @return
+     */
+    protected boolean enableMultipleTabs() {
+
+	return false;
+    }
+
+    /**
+     * By design {@link ComponentInfo} instances and the related {@link TabInfo} are tightly coupled with at least one
+     * {@link Setting}. If the {@link RemoveDirective} of the {@link TabInfo} allows the removal of
+     * all settings, when the view is initialized and there is no settings coupled with the {@link ComponentInfo},
+     * the {@link ComponentInfo} and its {@link TabInfo} cannot be found and as consequence, the related tab cannot be
+     * rendered. In this case, it will no longer be possible to add or remove that kind of settings just because there
+     * is no tab with the required {@link AddDirective}.<br>
+     * To avoid this issue, this method can be used to register a list of {@link ComponentInfo} that must be
+     * <i>always rendered</i> (typically tabs with {@link RemoveDirective}s and {@link AddDirective}), even if the
+     * related settings are missing
+     * 
+     * @return
+     */
+    protected List<ComponentInfo> getAdditionalsComponentInfo() {
+
+	return new ArrayList<>();
+    }
+
     @Override
     public void configurationChanged(ConfigurationChangeEvent event) {
 
@@ -624,8 +656,10 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
     /**
      * @param source
+     * @param width
+     * @param height
      */
-    public void setHeaderImage(InputStream source) {
+    public void setHeaderImage(InputStream source, int width, int height) {
 
 	StreamResource resource = new StreamResource("icon", new InputStreamFactory() {
 
@@ -637,6 +671,31 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 	});
 
 	headerImage.setSrc(resource);
+
+	if (height > 0) {
+	    headerImage.setHeight(String.valueOf(height) + "px");
+	}
+
+	if (width > 0) {
+	    headerImage.setWidth(String.valueOf(width) + "px");
+	}
+    }
+
+    /**
+     * @param source
+     * @param height
+     */
+    public void setHeaderImage(InputStream source, int height) {
+
+	setHeaderImage(source, -1, height);
+    }
+
+    /**
+     * @param source
+     */
+    public void setHeaderImage(InputStream source) {
+
+	setHeaderImage(source, -1, -1);
     }
 
     /**
@@ -675,7 +734,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	HashMap<TabInfo, List<Setting>> tabInfoMap = createTabInfoMap(allSetting);
 
-	return tabInfoMap.get(tabInfo);
+	return tabInfoMap.getOrDefault(tabInfo, new ArrayList<Setting>());
     }
 
     /**
@@ -735,17 +794,53 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	HashMap<TabInfo, List<Setting>> tabInfoMap = createTabInfoMap(allSetting);
 
-	List<TabInfo> sorted = tabInfoMap.//
-		keySet().//
+	List<TabInfo> tabInfoList = new ArrayList<>(tabInfoMap.keySet());
+
+	//
+	//
+	//
+
+	List<ComponentInfo> additionalComps = getAdditionalsComponentInfo();
+
+	for (ComponentInfo componentInfo : additionalComps) {
+
+	    Optional<TabInfo> tabInfo = componentInfo.getTabInfo();
+
+	    if (tabInfo.isPresent()) {
+
+		int index = tabInfo.get().getIndex();
+
+		boolean missing = tabInfoList.//
+			stream().//
+			filter(tab -> tab.getIndex() == index).//
+			findFirst().//
+			isEmpty();
+
+		if (missing) {
+
+		    tabInfoList.add(tabInfo.get());
+		}
+	    }
+	}
+
+	//
+	//
+	//
+
+	tabInfoList = tabInfoList.//
 		stream().//
 		sorted((i1, i2) -> Integer.compare(i1.getIndex(), i2.getIndex())).//
 		collect(Collectors.toList());
 
-	for (TabInfo tabInfo : sorted) {
+	//
+	//
+	//
+
+	for (TabInfo tabInfo : tabInfoList) {
 
 	    if (oneTab >= 0 && tabInfo.getIndex() == oneTab || oneTab < 0) {
 
-		List<Setting> settings = tabInfoMap.get(tabInfo);
+		List<Setting> settings = tabInfoMap.getOrDefault(tabInfo, new ArrayList<Setting>());
 
 		//
 		//
@@ -784,7 +879,14 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 		//
 		//
 
-		ComponentInfo componentInfo = settings.get(0).getExtension(ComponentInfo.class).get();
+		Optional<ComponentInfo> additionalComp = additionalComps.//
+			stream().//
+			filter(c -> c.getTabInfo().isPresent()).//
+			filter(c -> c.getTabInfo().get().getIndex() == tabInfo.getIndex()).//
+			findFirst();
+
+		ComponentInfo componentInfo = additionalComp.isPresent() ? additionalComp.get()
+			: settings.get(0).getExtension(ComponentInfo.class).get();
 
 		Orientation orientation = componentInfo.getOrientation();
 

@@ -4,7 +4,7 @@ package eu.essi_lab.workflow.blocks.grid;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,9 +31,9 @@ import eu.essi_lab.workflow.processor.BooleanCapabilityElement;
 import eu.essi_lab.workflow.processor.CapabilityElement;
 import eu.essi_lab.workflow.processor.CapabilityElement.PresenceType;
 import eu.essi_lab.workflow.processor.DataProcessor;
+import eu.essi_lab.workflow.processor.IdentityProcessor;
 import eu.essi_lab.workflow.processor.ResamplingCapability;
 import eu.essi_lab.workflow.processor.SubsettingCapability;
-import eu.essi_lab.workflow.processor.grid.GDAL_NetCDF_CRS_Converter_Processor;
 
 public class NetCDFReprojector extends WorkblockBuilder {
 
@@ -87,7 +87,7 @@ public class NetCDFReprojector extends WorkblockBuilder {
 
     @Override
     protected DataProcessor createProcessor() {
-	return new GDAL_NetCDF_CRS_Converter_Processor();
+	return new IdentityProcessor();
     }
 
 }

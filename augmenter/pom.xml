@@ -16,7 +16,7 @@
 			<artifactId>core-datamodel</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>eu.essi_lab</groupId>
 			<artifactId>database-api</artifactId>

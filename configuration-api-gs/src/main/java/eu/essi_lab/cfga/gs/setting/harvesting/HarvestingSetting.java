@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gs.setting.harvesting;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,6 +24,8 @@ package eu.essi_lab.cfga.gs.setting.harvesting;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.json.JSONObject;
@@ -31,11 +33,12 @@ import org.json.JSONObject;
 import com.vaadin.flow.data.provider.SortDirection;
 
 import eu.essi_lab.cfga.gs.setting.BrokeringSetting;
+import eu.essi_lab.cfga.gs.setting.TabIndex;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
 import eu.essi_lab.cfga.gs.setting.augmenter.AugmenterSetting;
-import eu.essi_lab.cfga.gs.setting.harvesting.menuitems.HarvestingSettingEditorMenuItem;
 import eu.essi_lab.cfga.gs.setting.harvesting.menuitems.HarvestingStatsProviderMenuItem;
 import eu.essi_lab.cfga.gs.setting.menuitems.RowValuesFormatterMenuItem;
+import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.ContextMenuItem;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
@@ -48,12 +51,13 @@ import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.SettingUtils;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting;
 import eu.essi_lab.configuration.ExecutionMode;
-import eu.essi_lab.configuration.GIProjectExecutionMode;
 
 /**
  * @author Fabrizio
  */
 public abstract class HarvestingSetting extends SchedulerWorkerSetting implements BrokeringSetting {
+
+    private static final String CUSTOM_TASK_SETTING_IDENTIFIER = "customTaskSetting";
 
     /**
      * 
@@ -97,6 +101,32 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 	Setting augmentersSetting = initAugmentersSetting();
 
 	addSetting(augmentersSetting);
+
+	//
+	// Custom task setting
+	//
+
+	CustomTaskSetting customTaskSetting = new CustomTaskSetting();
+
+	customTaskSetting.setDescription(
+		"A customizable, schedulable task which executes the code provided by an implementation of the 'Task' interface. If "
+			+ " enabled, it will be executed at harvesting end");
+
+	customTaskSetting.setCanBeDisabled(true);
+
+	customTaskSetting.setEditable(false);
+
+	customTaskSetting.setCanBeRemoved(false);
+
+	customTaskSetting.setIdentifier(CUSTOM_TASK_SETTING_IDENTIFIER);
+
+	customTaskSetting.removeSetting("scheduling");
+
+	customTaskSetting.removeOption("emailRecipients");
+
+	customTaskSetting.setEnabled(false);
+
+	addSetting(customTaskSetting);
 
 	//
 	// set the component extension
@@ -157,29 +187,35 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 	    setComponentName(HarvestingSetting.class.getName());
 
 	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(2).//
+		    withIndex(TabIndex.HARVESTING_SETTING.getIndex()).//
 		    withShowDirective("Harvesting", SortDirection.ASCENDING).//
 
 		    withAddDirective(//
 			    "Add harvested/mixed accessor", //
 			    "eu.essi_lab.harvester.worker.HarvestingSettingImpl")
 		    .//
-		    withRemoveDirective("Remove accessor", false, "eu.essi_lab.harvester.worker.HarvestingSettingImpl").//
+		    withRemoveDirective("Remove accessor", true, "eu.essi_lab.harvester.worker.HarvestingSettingImpl").//
 		    withEditDirective("Edit accessor", ConfirmationPolicy.ON_WARNINGS).//
 
 		    withGridInfo(Arrays.asList(//
 
 			    ColumnDescriptor.createPositionalDescriptor(), //
 
+
 			    ColumnDescriptor.create("Name", true, true, (s) -> s.getName()), //
 
 			    ColumnDescriptor.create("Type", 150, true, true, (s) -> getSelectedAccessorType(s)), //
 
-			    ColumnDescriptor.create("Id", 150, true, true, (s) -> getId(s)), //
+			    ColumnDescriptor.create("Source id", 150, true, true, (s) -> getSourceId(s)), //
+			    
+			    ColumnDescriptor.create("Setting id", true, true, true, (s) -> s.getIdentifier()), //
 
 			    ColumnDescriptor.create("Comment", 150, true, true, (s) -> getComment(s)), //
 
-			    ColumnDescriptor.create("Repeat (D-h)", 130, true, true,
+			    ColumnDescriptor.create("Repeat count", 50, true, true,
+				    (s) -> SchedulerSupport.getInstance().getRepeatCount(s)), //
+
+			    ColumnDescriptor.create("Repeat interval", 50, true, true,
 				    (s) -> SchedulerSupport.getInstance().getRepeatInterval(s)), //
 
 			    ColumnDescriptor.create("Status", 100, true, true, (s) -> SchedulerSupport.getInstance().getJobPhase(s)), //
@@ -223,12 +259,12 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 
 	    ArrayList<ContextMenuItem> list = new ArrayList<>();
 
-	    list.add(new HarvestingSettingEditorMenuItem());
+	    // list.add(new HarvestingSettingEditorMenuItem());
 	    list.add(new RowValuesFormatterMenuItem());
 	    list.add(new HarvestingStatsProviderMenuItem());
 
-	    if (GIProjectExecutionMode.getMode() == ExecutionMode.MIXED || //
-		    GIProjectExecutionMode.getMode() == ExecutionMode.LOCAL_PRODUCTION) {
+	    if (ExecutionMode.get() == ExecutionMode.MIXED || //
+		    ExecutionMode.get() == ExecutionMode.LOCAL_PRODUCTION) {
 
 		list.add(new HarvestingStarter());
 	    }
@@ -240,7 +276,7 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 	 * @param setting
 	 * @return
 	 */
-	private String getId(Setting setting) {
+	private String getSourceId(Setting setting) {
 
 	    JSONObject object = setting.getObject().getJSONObject("harvestedAccessorsSetting");
 
@@ -249,7 +285,9 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 		    filter(key -> isJSONObject(object, key) && object.getJSONObject(key).has("sourceSetting")).//
 		    map(key -> object.getJSONObject(key).getJSONObject("sourceSetting").getJSONObject("identifier")).//
 		    findFirst().//
-		    get().getJSONArray("values").getString(0);
+		    get().//
+		    getJSONArray("values").//
+		    getString(0);
 	}
 
 	/**
@@ -327,10 +365,33 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
     /**
      * @return
      */
+    public Optional<CustomTaskSetting> getCustomTaskSetting() {
+
+	Optional<Setting> setting = getSetting(CUSTOM_TASK_SETTING_IDENTIFIER);
+
+	if (setting.isPresent()) {
+
+	    return Optional.of(SettingUtils.downCast(setting.get(), CustomTaskSetting.class));
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @param predicate
+     */
+    public void selectAccessorSetting(Predicate<AccessorSetting> predicate) {
+
+	getAccessorsSetting().//
+		select(s -> predicate.test(SettingUtils.downCast(s, AccessorSetting.class)));
+    }
+
+    /**
+     * @return
+     */
     public Setting getAccessorsSetting() {
 
 	return getSetting(getAccessorsSettingIdentifier()).get();
-
     }
 
     /**
@@ -359,6 +420,15 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
     public void setObject(JSONObject object) {
 
 	super.setObject(object);
+    }
+
+    /**
+     * @return
+     */
+    @Override
+    public String getWorkerName() {
+
+	return getSelectedAccessorSetting().getGSSourceSetting().getSourceLabel();
     }
 
     /**

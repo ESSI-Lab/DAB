@@ -2,3 +2,7 @@ eu.essi_lab.access.augmenter.AccessAugmenter
 eu.essi_lab.access.augmenter.EasyAccessAugmenter
 eu.essi_lab.access.augmenter.RemoveAccessAugmenter
 eu.essi_lab.access.augmenter.DownloadReportToSSCScoreAugmenter
+eu.essi_lab.access.augmenter.DataCacheAugmenter
+eu.essi_lab.access.augmenter.DataCacheAugmenterOnlyNew
+eu.essi_lab.access.augmenter.EmodPaceAugmenter
+eu.essi_lab.access.augmenter.ICHANGEStationAugmenter

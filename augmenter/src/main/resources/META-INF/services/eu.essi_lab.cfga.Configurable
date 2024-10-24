@@ -7,3 +7,4 @@ eu.essi_lab.augmenter.metadata.MetadataAugmenter
 eu.essi_lab.augmenter.WFSAugmenter
 eu.essi_lab.augmenter.OrganizationAugmenter
 eu.essi_lab.augmenter.CountryAugmenter
+eu.essi_lab.augmenter.HISCentralVariableAugmenter

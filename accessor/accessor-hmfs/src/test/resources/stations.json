@@ -1,0 +1,62 @@
+[
+    {
+        "id": 1005704398,
+        "nombre": null,
+        "id_externo": "1005704398",
+        "geom": {
+            "type": "Point",
+            "coordinates": [
+                -58.5911004093614,
+                -27.2741854977372
+            ]
+        },
+        "tabla": "hmfs",
+        "provincia": null,
+        "pais": null,
+        "rio": null,
+        "has_obs": null,
+        "tipo": null,
+        "automatica": null,
+        "habilitar": null,
+        "propietario": null,
+        "abreviatura": null,
+        "localidad": null,
+        "real": null,
+        "nivel_alerta": null,
+        "nivel_evacuacion": null,
+        "nivel_aguas_bajas": null,
+        "altitud": null,
+        "public": true,
+        "cero_ign": null
+    },
+    {
+        "id": 1005704399,
+        "nombre": null,
+        "id_externo": "1005704399",
+        "geom": {
+            "type": "Point",
+            "coordinates": [
+                -58.6256630703294,
+                -27.189495185536
+            ]
+        },
+        "tabla": "hmfs",
+        "provincia": null,
+        "pais": null,
+        "rio": null,
+        "has_obs": null,
+        "tipo": null,
+        "automatica": null,
+        "habilitar": null,
+        "propietario": null,
+        "abreviatura": null,
+        "localidad": null,
+        "real": null,
+        "nivel_alerta": null,
+        "nivel_evacuacion": null,
+        "nivel_aguas_bajas": null,
+        "altitud": null,
+        "public": true,
+        "cero_ign": null
+    }
+]

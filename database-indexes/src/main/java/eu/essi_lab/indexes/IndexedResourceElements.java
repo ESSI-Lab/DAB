@@ -4,7 +4,7 @@ package eu.essi_lab.indexes;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -99,6 +99,10 @@ public final class IndexedResourceElements extends IndexedElementsGroup {
      * See {@link ResourcePropertyHandler#setIsDeleted(boolean)}
      */
     public static final IndexedResourceProperty IS_DELETED = new IndexedResourceProperty(ResourceProperty.IS_DELETED);
+    /**
+     * See {@link ResourcePropertyHandler#setIsValidated(boolean)}
+     */
+    public static final IndexedResourceProperty IS_VALIDATED = new IndexedResourceProperty(ResourceProperty.IS_VALIDATED);
 
     /**
      * See {@link ResourcePropertyHandler#setIsGDC(boolean)}
@@ -177,11 +181,21 @@ public final class IndexedResourceElements extends IndexedElementsGroup {
      * Set by the AccessAugmenter
      */
     public static final IndexedResourceProperty IS_GRID = new IndexedResourceProperty(ResourceProperty.IS_GRID);
+        
+    /**
+     * Set by the AccessAugmenter
+     */
+    public static final IndexedResourceProperty IS_VECTOR = new IndexedResourceProperty(ResourceProperty.IS_VECTOR);
 
     /**
      * Set by the AccessAugmenter
      */
     public static final IndexedResourceProperty IS_TIMESERIES = new IndexedResourceProperty(ResourceProperty.IS_TIMESERIES);
+
+    /**
+     * Set once using a tool
+     */
+    public static final IndexedResourceProperty IS_EIFFEL_RECORD = new IndexedResourceProperty(ResourceProperty.IS_EIFFEL_RECORD);
 
     private static List<IndexedResourceProperty> getIndexes() {
 

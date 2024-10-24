@@ -4,7 +4,7 @@ package eu.essi_lab.api.database.marklogic;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -34,8 +34,8 @@ import org.w3c.dom.Node;
 
 import com.marklogic.xcc.exceptions.RequestException;
 
+import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.DatabaseWriter;
-import eu.essi_lab.api.database.internal.Folder;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.XMLNodeReader;
 import eu.essi_lab.messages.bond.View;
@@ -68,15 +68,13 @@ public class MarkLogicWriter extends MarkLogicReader implements DatabaseWriter {
 
 	try {
 
-	    Folder folder = getUsersFolder();
+	    DatabaseFolder folder = getUsersFolder();
 
 	    Document document = user.asDocument(true);
 
-	    String identifier = user.encodeIdentifier() ? user.getEncodedIdentifier() : user.getIdentifier();
+	    folder.store(user.getUri(), document);
 
-	    folder.store(identifier, document);
-
-	    folder.replace(identifier, document);
+	    folder.replace(user.getUri(), document);
 
 	} catch (Exception e) {
 
@@ -94,13 +92,37 @@ public class MarkLogicWriter extends MarkLogicReader implements DatabaseWriter {
     }
 
     @Override
+    public void removeUser(String userIdentifier) throws GSException {
+
+	try {
+
+	    DatabaseFolder folder = getUsersFolder();
+
+	    folder.remove(GSUser.toURI(userIdentifier));
+
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error("Unable to remove user {}", userIdentifier, e);
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    MARK_LOGIC_RESOURCE_REMOVAL_ERROR, //
+		    e);
+	}
+
+    }
+
+    @Override
     public void store(View view) throws GSException {
 
 	try {
 
 	    String id = view.getId();
 
-	    Folder folder = getViewFolder();
+	    DatabaseFolder folder = getViewFolder();
 
 	    ViewFactory factory = new ViewFactory();
 
@@ -143,7 +165,7 @@ public class MarkLogicWriter extends MarkLogicReader implements DatabaseWriter {
 
 	    SourceStorageWorker worker = markLogicDB.getWorker(source.getUniqueIdentifier());
 
-	    Folder folder = findWritingFolder(worker);
+	    DatabaseFolder folder = findWritingFolder(worker);
 
 	    Document asDocument = resource.asDocument(true);
 
@@ -252,7 +274,7 @@ public class MarkLogicWriter extends MarkLogicReader implements DatabaseWriter {
 
 	    String key = resource.getPrivateId();
 
-	    Folder folder = findWritingFolder(worker);
+	    DatabaseFolder folder = findWritingFolder(worker);
 
 	    folder.replace(key, asDocument);
 
@@ -349,7 +371,7 @@ public class MarkLogicWriter extends MarkLogicReader implements DatabaseWriter {
 
 	try {
 
-	    Folder folder = getViewFolder();
+	    DatabaseFolder folder = getViewFolder();
 
 	    folder.remove(id);
 
@@ -371,9 +393,10 @@ public class MarkLogicWriter extends MarkLogicReader implements DatabaseWriter {
     /**
      * 
      */
-    protected Folder getProtectedFolder(String dirURI) throws RequestException {
+    @Override
+    protected DatabaseFolder getProtectedFolder(String dirURI) throws RequestException {
 	MarkLogicDatabase markLogicDB = getDatabase();
-	Folder ret = markLogicDB.getFolder(dirURI);
+	DatabaseFolder ret = markLogicDB.getFolder(dirURI);
 	if (ret == null) {
 	    markLogicDB.addFolder(dirURI);
 	    ret = markLogicDB.getFolder(dirURI);
@@ -406,9 +429,9 @@ public class MarkLogicWriter extends MarkLogicReader implements DatabaseWriter {
      * @throws GSException
      * @throws RequestException
      */
-    private Folder findWritingFolder(SourceStorageWorker worker) throws GSException, RequestException {
+    public DatabaseFolder findWritingFolder(SourceStorageWorker worker) throws GSException, RequestException {
 
-	Folder folder = worker.getWritingFolder(Optional.empty());
+	DatabaseFolder folder = worker.getWritingFolder(Optional.empty());
 
 	if (folder == null) {
 
@@ -446,11 +469,4 @@ public class MarkLogicWriter extends MarkLogicReader implements DatabaseWriter {
 
 	return folder;
     }
-
-    @Override
-    public Optional<GSUser> getUser(String email) throws GSException {
-	// TODO Auto-generated method stub
-	return null;
-    }
-
 }

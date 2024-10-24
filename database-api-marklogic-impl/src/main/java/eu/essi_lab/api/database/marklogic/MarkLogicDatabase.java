@@ -4,7 +4,7 @@ package eu.essi_lab.api.database.marklogic;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -49,8 +49,7 @@ import com.marklogic.xcc.types.XdmItem;
 import com.marklogic.xcc.types.XdmNode;
 
 import eu.essi_lab.api.database.Database;
-import eu.essi_lab.api.database.DatabaseProvider;
-import eu.essi_lab.api.database.internal.Folder;
+import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.marklogic.search.DistinctQueryHandler;
 import eu.essi_lab.api.database.marklogic.search.MarkLogicDiscoveryBondHandler;
 import eu.essi_lab.api.database.marklogic.search.MarkLogicSelectorBuilder;
@@ -59,7 +58,6 @@ import eu.essi_lab.api.database.marklogic.stats.StatisticsQueryManager;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.lib.xml.XMLFactories;
@@ -71,7 +69,7 @@ import eu.essi_lab.messages.stats.StatisticsMessage;
 import eu.essi_lab.messages.stats.StatisticsResponse;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
 import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.ResourceProperty;
@@ -80,20 +78,22 @@ import eu.essi_lab.wrapper.marklogic.MarkLogicWrapper;
 /**
  * @author Fabrizio
  */
-public class MarkLogicDatabase implements DatabaseProvider, Database<DatabaseSetting> {
+public class MarkLogicDatabase implements Database {
 
     /**
      * Query trace disabled because not strictly necessary and it makes logs unreadable
      */
     public static final boolean QUERY_TRACE = false;
 
-    public static final String USERS_PROTECTED_FOLDER = "users";
     public static final Boolean SKIP_REGISTERED_QUERIES_MANAGER = true;
     protected static final String SEMANTIC_FOLDER = "semantic";
+
     //
     // ---
     //
-    protected static final String VIEWS_PROTECTED_FOLDER = "views";
+
+    private static final String RUNTIME_INFO_PROTECTED_FOLDER = "runtime-info";
+    private static final String GS_MODULES_PROTECTED_FOLDER = "gs-modules";
     //
     // ---
     //
@@ -106,8 +106,8 @@ public class MarkLogicDatabase implements DatabaseProvider, Database<DatabaseSet
     // ---
     //
     private MarkLogicWrapper wrapper;
-    private String suiteId;
-    private StorageUri dbUri;
+    private String dbIdentifier;
+    private StorageInfo dbInfo;
     private boolean initialized;
     private HashMap<String, SourceStorageWorker> workersMap;
     private RegisteredQueriesManager regQueriesManager;
@@ -134,10 +134,9 @@ public class MarkLogicDatabase implements DatabaseProvider, Database<DatabaseSet
     private static final String MARKLOGIC_DB_COMPUTATION_ENDED = "Marklogic Computation ENDED";
     private static final String WRAPPER_SUBMIT_STARTED = "Marklogic Wrapper Submit STARTED";
     private static final String WRAPPER_SUBMIT_ENDED = "Marklogic Wrapper Submit ENDED";
-    private static final String RUNTIME_INFO_PROTECTED_FOLDER = "runtime-info";
-    private static final String GS_MODULES_PROTECTED_FOLDER = "gs-modules";
 
-    private static final String FUNCTIONS_MODULE_PATH = "functions-module.xqy";
+    private static final String FUNCTIONS_MODULE_NAME = "functions-module.xqy";
+    private static final String FUNCTIONS_MODULE_PATH = "/gs-modules/functions-module.xqy";
 
     //
     // This variable enables the HTTP load balancer on the XCC protocol
@@ -156,20 +155,16 @@ public class MarkLogicDatabase implements DatabaseProvider, Database<DatabaseSet
     }
 
     @Override
-    public String initialize(StorageUri storageUri, String suiteIdentifier) throws GSException {
-
-	if (suiteIdentifier == null) {
-	    suiteIdentifier = UUID.randomUUID().toString();
-	} else {
-	    suiteId = suiteIdentifier;
-	}
+    public void initialize(StorageInfo storageUri) throws GSException {
 
 	if (!initialized) {
+
+	    dbIdentifier = storageUri.getIdentifier() == null ? UUID.randomUUID().toString() : storageUri.getIdentifier();
 
 	    GSLoggerFactory.getLogger(this.getClass()).info("MarkLogic DB initialization STARTED");
 
 	    GSLoggerFactory.getLogger(this.getClass()).info("MarkLogic DB wrapper initialization STARTED");
-	    initializeWrapper(storageUri, suiteIdentifier);
+	    initializeWrapper(storageUri);
 	    //
 	    // now the wrapper, required by the manager, is initialized and the manager can be created
 	    //
@@ -185,31 +180,47 @@ public class MarkLogicDatabase implements DatabaseProvider, Database<DatabaseSet
 		GSLoggerFactory.getLogger(this.getClass()).warn("MarkLogic DB index manager initialization DISABLED");
 	    }
 
-	    GSLoggerFactory.getLogger(this.getClass()).info("MarkLogic DB folders initialization STARTED");
-	    initializeFolders();
-	    GSLoggerFactory.getLogger(this.getClass()).info("MarkLogic DB folders initialization ENDED");
+	    GSLoggerFactory.getLogger(this.getClass()).info("MarkLogic DB storage folders initialization STARTED");
+	    initializeStorageWorkers();
+	    GSLoggerFactory.getLogger(this.getClass()).info("MarkLogic DB storage folders initialization ENDED");
 
 	    GSLoggerFactory.getLogger(this.getClass()).info("MarkLogic DB module initialization STARTED");
-	    initializeModule();
+
+	    try {
+		if (!exists_(FUNCTIONS_MODULE_PATH)) {
+
+		    initializeModule();
+
+		} else {
+
+		    GSLoggerFactory.getLogger(this.getClass()).info("MarkLogic DB module already exists");
+		}
+	    } catch (RequestException e) {
+
+		GSLoggerFactory.getLogger(getClass()).error(e);
+		GSLoggerFactory.getLogger(this.getClass())
+			.error("Error occurred during module existance check, an attempt to store it will be done");
+
+		initializeModule();
+	    }
+
 	    GSLoggerFactory.getLogger(this.getClass()).info("MarkLogic DB module initialization ENDED");
 
 	    if (!SKIP_REGISTERED_QUERIES_MANAGER) {
 		GSLoggerFactory.getLogger(this.getClass()).info("MarkLogic DB registered queries doc initialization STARTED");
-		regQueriesManager.init(storageUri.getStorageName());
+		regQueriesManager.init(storageUri.getName());
 		GSLoggerFactory.getLogger(this.getClass()).info("MarkLogic DB registered queries doc initialization ENDED");
 	    }
 
 	    GSLoggerFactory.getLogger(this.getClass()).info("MarkLogic DB initialization ENDED");
 	}
-
-	return suiteId;
     }
 
     @Override
     public void configure(DatabaseSetting setting) {
 
 	try {
-	    initialize(setting.asStorageUri(), setting.asStorageUri().getConfigFolder());
+	    initialize(setting.asStorageUri());
 
 	} catch (GSException e) {
 
@@ -223,7 +234,7 @@ public class MarkLogicDatabase implements DatabaseProvider, Database<DatabaseSet
     @Override
     public DatabaseSetting getSetting() {
 
-	return new DatabaseSetting(dbUri);
+	return new DatabaseSetting(dbInfo);
     }
 
     @Override
@@ -234,20 +245,24 @@ public class MarkLogicDatabase implements DatabaseProvider, Database<DatabaseSet
     }
 
     @Override
-    public Database<DatabaseSetting> getDatabase() {
+    public boolean supports(StorageInfo dbUri) {
 
-	if (initialized) {
-	    return this;
+	if (isSupported(dbUri)) {
+
+	    this.dbInfo = dbUri;
+	    return true;
 	}
 
-	return null;
+	return false;
     }
 
-    @Override
-    public boolean supports(StorageUri dbUri) {
+    /**
+     * @param dbUri
+     * @return
+     */
+    public static boolean isSupported(StorageInfo dbUri) {
 
 	if (dbUri != null && dbUri.getUri() != null && dbUri.getUri().startsWith("xdbc")) {
-	    this.dbUri = dbUri;
 	    return true;
 	}
 
@@ -255,12 +270,21 @@ public class MarkLogicDatabase implements DatabaseProvider, Database<DatabaseSet
     }
 
     @Override
-    public StorageUri getStorageUri() {
+    public StorageInfo getStorageInfo() {
 
-	return dbUri;
+	return dbInfo;
     }
 
-    private void initializeWrapper(StorageUri storageUri, String suiteIdentifier) throws GSException {
+    /**
+     * @return
+     */
+
+    public String getIdentifier() {
+
+	return dbIdentifier;
+    }
+
+    private void initializeWrapper(StorageInfo dbInfo) throws GSException {
 
 	// ------------------------------------------
 	//
@@ -268,14 +292,14 @@ public class MarkLogicDatabase implements DatabaseProvider, Database<DatabaseSet
 	//
 	try {
 
-	    String uri = storageUri.getUri();
-	    String dataBaseName = storageUri.getStorageName();
-	    String user = storageUri.getUser();
-	    String password = storageUri.getPassword();
+	    String uri = dbInfo.getUri();
+	    String dataBaseName = dbInfo.getName();
+	    String user = dbInfo.getUser();
+	    String password = dbInfo.getPassword();
 
 	    wrapper = new MarkLogicWrapper(uri, user, password, dataBaseName);
 
-	    this.dbUri = storageUri;
+	    this.dbInfo = dbInfo;
 	    this.initialized = true;
 
 	} catch (URISyntaxException e) {
@@ -325,12 +349,12 @@ public class MarkLogicDatabase implements DatabaseProvider, Database<DatabaseSet
 
     }
 
-    private void initializeFolders() throws GSException {
+    private void initializeStorageWorkers() throws GSException {
 	try {
 
-	    Folder[] folders = getFolders();
+	    DatabaseFolder[] folders = getFolders();
 	    for (int i = 0; i < folders.length; i++) {
-		String sourceId = SourceStorageWorker.retrieveSourceName(suiteId, folders[i].getCompleteName());
+		String sourceId = SourceStorageWorker.retrieveSourceName(dbIdentifier, folders[i].getCompleteName());
 
 		if (sourceId != null) {
 
@@ -361,9 +385,9 @@ public class MarkLogicDatabase implements DatabaseProvider, Database<DatabaseSet
 
 	try {
 
-	    InputStream stream = getClass().getClassLoader().getResourceAsStream(FUNCTIONS_MODULE_PATH);
-	    String xQuery = IOStreamUtils.asUTF8String(stream);
-	    execXQuery(xQuery);
+	    InputStream stream = getClass().getClassLoader().getResourceAsStream(FUNCTIONS_MODULE_NAME);
+
+	    getWrapper().storeBinary(FUNCTIONS_MODULE_PATH, stream);
 
 	} catch (Exception e) {
 
@@ -748,22 +772,13 @@ public class MarkLogicDatabase implements DatabaseProvider, Database<DatabaseSet
 	return wrapper.getContentSource();
     }
 
-    /**
-     * @return
-     */
-
-    public String getSuiteIdentifier() {
-
-	return suiteId;
-    }
-
     // -----------------------------------------------------
     //
     // Folders section
     //
     //
 
-    public Folder getFolder(String folderName) throws RequestException {
+    public DatabaseFolder getFolder(String folderName) throws RequestException {
 
 	checkName(folderName);
 	folderName = normalizeName(folderName);
@@ -775,7 +790,7 @@ public class MarkLogicDatabase implements DatabaseProvider, Database<DatabaseSet
 	return null;
     }
 
-    public Optional<Folder> getFolder(String folderName, boolean createIfNotExist) throws RequestException {
+    public Optional<DatabaseFolder> getFolder(String folderName, boolean createIfNotExist) throws RequestException {
 
 	checkName(folderName);
 	String normalizefolderName = normalizeName(folderName);
@@ -822,21 +837,43 @@ public class MarkLogicDatabase implements DatabaseProvider, Database<DatabaseSet
 	return exists_(folderName);
     }
 
+    /**
+     * @param folderName
+     * @return
+     * @throws RequestException
+     */
     public boolean removeFolder(String folderName) throws RequestException {
 
+	String simpleName = folderName;
+
 	if (!existsFolder(folderName)) {
+
+	    GSLoggerFactory.getLogger(getClass()).debug("Folder {} do not exists, unable to remove");
+
 	    return false;
 	}
+
+	GSLoggerFactory.getLogger(getClass()).debug("Removing folder {} STARTED", simpleName);
 
 	checkName(folderName);
 	folderName = normalizeName(folderName);
 
+	try {
+	    getFolder(simpleName).clear();
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	}
+
 	ResultSequence ret = execXQuery("xdmp:directory-delete('" + folderName + "');");
 	ret.close();
+
+	GSLoggerFactory.getLogger(getClass()).debug("Removing folder {} ENDED", simpleName);
+
 	return true;
     }
 
-    public Folder[] getFolders() throws RequestException {
+    public DatabaseFolder[] getFolders() throws RequestException {
 
 	ResultSequence ret = execXQuery(" for $x in xdmp:directory-properties('/','1')[not(normalize-space())] return base-uri($x)");
 
@@ -847,7 +884,7 @@ public class MarkLogicDatabase implements DatabaseProvider, Database<DatabaseSet
 	for (int i = 0; i < results.length; i++) {
 
 	    String name = results[i];
-	    if (name.startsWith("/" + getSuiteIdentifier()) || getSuiteIdentifier().equals("ROOT")) {
+	    if (name.startsWith("/" + getIdentifier()) || getIdentifier().equals("ROOT")) {
 		out.add(createFolder(results[i]));
 	    }
 	}
@@ -855,12 +892,12 @@ public class MarkLogicDatabase implements DatabaseProvider, Database<DatabaseSet
 	return out.toArray(new MarkLogicFolder[] {});
     }
 
-    public Folder[] getDataFolders() throws RequestException {
+    public DatabaseFolder[] getDataFolders() throws RequestException {
 
-	Folder[] folders = getFolders();
-	ArrayList<Folder> out = new ArrayList<>();
+	DatabaseFolder[] folders = getFolders();
+	ArrayList<DatabaseFolder> out = new ArrayList<>();
 	for (int i = 0; i < folders.length; i++) {
-	    Folder folder = folders[i];
+	    DatabaseFolder folder = folders[i];
 	    String uri = folder.getURI();
 	    if (!uri.endsWith(SourceStorageWorker.META_PREFIX + "/")) {
 		out.add(folder);
@@ -869,12 +906,12 @@ public class MarkLogicDatabase implements DatabaseProvider, Database<DatabaseSet
 	return out.toArray(new MarkLogicFolder[] {});
     }
 
-    public Folder[] getMetaFolders() throws RequestException {
+    public DatabaseFolder[] getMetaFolders() throws RequestException {
 
-	Folder[] folders = getFolders();
-	ArrayList<Folder> out = new ArrayList<>();
+	DatabaseFolder[] folders = getFolders();
+	ArrayList<DatabaseFolder> out = new ArrayList<>();
 	for (int i = 0; i < folders.length; i++) {
-	    Folder folder = folders[i];
+	    DatabaseFolder folder = folders[i];
 	    String uri = folder.getURI();
 	    if (uri.endsWith(SourceStorageWorker.META_PREFIX + "/")) {
 		out.add(folder);
@@ -883,12 +920,12 @@ public class MarkLogicDatabase implements DatabaseProvider, Database<DatabaseSet
 	return out.toArray(new MarkLogicFolder[] {});
     }
 
-    public Folder[] getProtectedFolders() throws RequestException {
+    public DatabaseFolder[] getProtectedFolders() throws RequestException {
 
-	Folder[] folders = getFolders();
-	ArrayList<Folder> out = new ArrayList<>();
+	DatabaseFolder[] folders = getFolders();
+	ArrayList<DatabaseFolder> out = new ArrayList<>();
 	for (int i = 0; i < folders.length; i++) {
-	    Folder folder = folders[i];
+	    DatabaseFolder folder = folders[i];
 	    String uri = folder.getURI();
 	    if (getProtectedFoldersNames().stream().anyMatch(n -> uri.startsWith("/" + n))) {
 		out.add(folder);
@@ -902,8 +939,9 @@ public class MarkLogicDatabase implements DatabaseProvider, Database<DatabaseSet
 	return Arrays.asList(//
 		GS_MODULES_PROTECTED_FOLDER, //
 		RUNTIME_INFO_PROTECTED_FOLDER, //
-		USERS_PROTECTED_FOLDER, //
-		VIEWS_PROTECTED_FOLDER, //
+		USERS_FOLDER, //
+		VIEWS_FOLDER, //
+		AUGMENTERS_FOLDER, //
 		RegisteredQueriesManager.REGISTERED_QUERIES_PROTECTED_FOLDER);
     }
 
@@ -921,8 +959,8 @@ public class MarkLogicDatabase implements DatabaseProvider, Database<DatabaseSet
      */
     public void removeAllFolders() throws Exception {
 
-	Folder[] folders = getFolders();
-	for (Folder folder : folders) {
+	DatabaseFolder[] folders = getFolders();
+	for (DatabaseFolder folder : folders) {
 
 	    folder.clear();
 
@@ -938,8 +976,8 @@ public class MarkLogicDatabase implements DatabaseProvider, Database<DatabaseSet
      */
     public void removeFolders() throws Exception {
 
-	Folder[] folders = getFolders();
-	for (Folder folder : folders) {
+	DatabaseFolder[] folders = getFolders();
+	for (DatabaseFolder folder : folders) {
 
 	    boolean noneMatch = getProtectedFoldersNames().//
 		    stream().//
@@ -1039,7 +1077,7 @@ public class MarkLogicDatabase implements DatabaseProvider, Database<DatabaseSet
 
 	String out = "xquery version \"1.0-ml\";\n";
 	out += "import module namespace gs=\"http://flora.eu/gi-suite/1.0/dataModel/schema\" at \"/" + GS_MODULES_PROTECTED_FOLDER + "/"
-		+ FUNCTIONS_MODULE_PATH + "\";\n";
+		+ FUNCTIONS_MODULE_NAME + "\";\n";
 	// out += "declare namespace " + NameSpace.GI_SUITE_DATA_MODEL.getPrefix() + " = \"" +
 	// NameSpace.GI_SUITE_DATA_MODEL.getURI()
 	// + "\";\n";
@@ -1050,9 +1088,9 @@ public class MarkLogicDatabase implements DatabaseProvider, Database<DatabaseSet
 	return out;
     }
 
-    private boolean exists_(String folder_name) throws RequestException {
+    private boolean exists_(String resourceName) throws RequestException {
 
-	ResultSequence result = execXQuery("exists(xdmp:document-properties('" + folder_name + "'));");
+	ResultSequence result = execXQuery("exists(xdmp:document-properties('" + resourceName + "'));");
 	boolean ret = result.asString().toLowerCase().contains("true");
 	result.close();
 	return ret;
@@ -1060,8 +1098,8 @@ public class MarkLogicDatabase implements DatabaseProvider, Database<DatabaseSet
 
     String normalizeName(String name) {
 
-	if (!getSuiteIdentifier().equals("ROOT") && !name.contains(getSuiteIdentifier())) {
-	    return "/" + getSuiteIdentifier() + "_" + name + "/";
+	if (!getIdentifier().equals("ROOT") && !name.contains(getIdentifier())) {
+	    return "/" + getIdentifier() + "_" + name + "/";
 	}
 
 	return "/" + name + "/";

@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.rsm.access;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,6 +23,7 @@ package eu.essi_lab.pdk.rsm.access;
 
 import java.util.List;
 import java.util.ServiceLoader;
+import java.util.concurrent.TimeUnit;
 
 import eu.essi_lab.lib.utils.ExpiringCache;
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -34,7 +35,7 @@ import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
@@ -46,12 +47,12 @@ public class AccessQueryUtils {
 
     static {
 	resultCache = new ExpiringCache<>();
-	resultCache.setDuration(60000);
-	resultCache.setMaxSize(100);
+	resultCache.setDuration(TimeUnit.MINUTES.toMillis(30));
+	resultCache.setMaxSize(50);
     }
 
     public static ResultSet<GSResource> findResource(String requestId, List<GSSource> sources,
-	    String onlineIdentifier, StorageUri databaseURI) throws GSException {
+	    String onlineIdentifier, StorageInfo databaseURI) throws GSException {
 
 	if (requestId != null) {
 	    synchronized (resultCache) {

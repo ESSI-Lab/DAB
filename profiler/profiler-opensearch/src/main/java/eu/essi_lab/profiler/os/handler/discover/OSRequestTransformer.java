@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.os.handler.discover;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,6 +23,7 @@ package eu.essi_lab.profiler.os.handler.discover;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -36,11 +37,15 @@ import org.slf4j.Logger;
 import com.google.common.collect.Lists;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.lib.net.utils.whos.HISCentralOntology;
+import eu.essi_lab.lib.net.utils.whos.HydroOntology;
+import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
 import eu.essi_lab.lib.odip.rosetta.RosettaStone;
 import eu.essi_lab.lib.odip.rosetta.RosettaStoneConnector;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.messages.DiscoveryMessage;
+import eu.essi_lab.messages.DiscoveryMessage.EiffelAPIDiscoveryOption;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.ResourceSelector;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
@@ -51,15 +56,18 @@ import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
+import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.web.KeyValueParser;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.Queryable;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.ResultsPriority;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.RankingStrategy;
 import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import eu.essi_lab.pdk.wrt.WebRequestParameter;
@@ -67,6 +75,9 @@ import eu.essi_lab.profiler.os.OSParameter;
 import eu.essi_lab.profiler.os.OSParameters;
 import eu.essi_lab.profiler.os.OSProfiler;
 import eu.essi_lab.profiler.os.OSRequestParser;
+import eu.essi_lab.profiler.os.handler.discover.covering.CoveringModeDiscoveryHandler;
+import eu.essi_lab.profiler.os.handler.discover.covering.CoveringModeOptionsReader;
+import eu.essi_lab.profiler.os.handler.discover.eiffel.EiffelDiscoveryHelper;
 import eu.essi_lab.profiler.os.handler.srvinfo.OSGetSourcesFilter;
 
 /**
@@ -81,14 +92,6 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
     private static final String OS_PARAM_PARSING_ERROR = "OS_PARAM_PARSING_ERROR";
     private Logger logger = GSLoggerFactory.getLogger(OSRequestTransformer.class);
 
-    // ---------------------------
-    //
-    // Use of this cached values is to improve discovery response time
-    // when the requested view is geoss. we assume that in prod. env. such
-    // variables will never change
-    //
-    private static StorageUri storageUri;
-    private static StorageUri userJobStorageUri;
     //
     //
     // ---------------------------
@@ -100,112 +103,59 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
     }
 
     @Override
-    public DiscoveryMessage transform(WebRequest request) throws GSException {
+    protected DiscoveryMessage refineMessage(DiscoveryMessage message) throws GSException {
+
+	message = super.refineMessage(message);
+
+	StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
 
 	//
-	// -----------------------------------------------------------------------------------
+	// covering mode: overrides the satellites sources results priority,
+	// set the covering mode view and adjusts the ranking to give a weight only to bbox
 	//
+	if (CoveringModeOptionsReader.isCoveringModeEnabled()) {
 
-	DiscoveryMessage message = createMessage();
+	    message.setResultsPriority(ResultsPriority.DATASET);
 
-	message.setRequestId(request.getRequestId());
+	    setView(CoveringModeDiscoveryHandler.COVERING_MODE_VIEW_ID, databaseURI, message);
 
-	message.setRequestTimeout(10);
+	    RankingStrategy strategy = new RankingStrategy();
+	    strategy.setAbstractWeight("0");
+	    strategy.setAccessQualityWeight("0");
+	    strategy.setAnyTextWeight("0");
+	    strategy.setEssentialVariablesWeight("0");
+	    strategy.setIsGDCWeight("0");
+	    strategy.setMetadataQualityWeight("0");
+	    strategy.setSubjectWeight("0");
+	    strategy.setTitleWeight("0");
+	    strategy.setBoundingBoxWeight("100");
 
-	message.setWebRequest(request);
-
-	message.setPage(getPage(request));
-
-	message.setCurrentUser(request.getCurrentUser());
-
-	Optional<String> viewId = request.extractViewId();
-
-	//
-	// user job storage URI
-	//
-	if (viewId.orElse("").equals("geoss")) {
-
-	    if (Objects.isNull(userJobStorageUri)) {
-
-		userJobStorageUri = ConfigurationWrapper.getDownloadSetting().getStorageUri();
-	    }
-
-	    message.setUserJobStorageURI(userJobStorageUri);
-
-	} else {
-
-	    message.setUserJobStorageURI(ConfigurationWrapper.getDownloadSetting().getStorageUri());
-	}
-
-	//
-	// DB URI
-	//
-	StorageUri uri = null;
-
-	if (viewId.orElse("").equals("geoss")) {
-
-	    if (Objects.isNull(storageUri)) {
-
-		storageUri = ConfigurationWrapper.getDatabaseURI();
-	    }
-
-	    uri = storageUri;
-
-	} else {
-
-	    uri = ConfigurationWrapper.getDatabaseURI();
-	}
-
-	if (Objects.isNull(uri)) {
-
-	    GSException exception = GSException.createException(getClass(), //
-		    "Data Base storage URI not found", //
-		    null, //
-		    ErrorInfo.ERRORTYPE_INTERNAL, //
-		    ErrorInfo.SEVERITY_WARNING, //
-		    DB_STORAGE_URI_NOT_FOUND);
-
-	    message.getException().getErrorInfoList().add(exception.getErrorInfoList().get(0));
-
-	    GSLoggerFactory.getLogger(this.getClass()).warn("Data Base storage URI not found");
-	}
-
-	message.setDataBaseURI(uri);
-
-	//
-	// shared repo info
-	//
-	if (viewId.orElse("").equals("geoss")) {
-
-	} else {
-
-	}
-
-	message = refineMessage(message);
-
-	//
-	// set the view from the path if present
-	//
-	if (viewId.isPresent()) {
-
-	    setView(viewId.get(), uri, message);
+	    message.setRankingStrategy(strategy);
 	}
 
 	//
 	// -----------------------------------------------------------------------------------
 	//
 
-	if (request.getFormData().isPresent()) {
+	if (message.getWebRequest().getFormData().isPresent()) {
 
-	    KeyValueParser keyValueParser = new KeyValueParser(request.getFormData().get());
-	    OSRequestParser parser = new OSRequestParser(keyValueParser);
+	    //
+	    // Get Sources query
+	    //
 
-	    if (OSGetSourcesFilter.isGetSourcesQuery(request)) {
+	    if (OSGetSourcesFilter.isGetSourcesQuery(message.getWebRequest())) {
 
 		message.setRequestTimeout(30);
 		message.setDistinctValuesElement(ResourceProperty.SOURCE_ID);
 		message.setOutputSources(true);
 	    }
+
+	    //
+	    //
+	    //
+
+	    KeyValueParser keyValueParser = new KeyValueParser(message.getWebRequest().getFormData().get());
+	    OSRequestParser parser = new OSRequestParser(keyValueParser);
 
 	    OSParameter evtOrder = WebRequestParameter.findParameter(OSParameters.EVENT_ORDER.getName(), OSParameters.class);
 	    String evtOrderValue = parser.parse(evtOrder);
@@ -218,105 +168,21 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	    OSParameter viewIdParam = WebRequestParameter.findParameter(OSParameters.VIEW_ID.getName(), OSParameters.class);
 
 	    //
-	    // set the view from the param if present
+	    // Set the view from the param if present
 	    //
+
 	    String viewIdValue = parser.parse(viewIdParam);
 
 	    if (viewIdValue != null && !viewIdValue.equals("")) {
 
-		setView(viewIdValue, uri, message);
+		setView(viewIdValue, databaseURI, message);
 	    }
 
 	    //
-	    // term frequency
+	    // Term frequency
 	    //
-	    String termFrequency = parser.parse(OSParameters.TERM_FREQUENCY);
 
-	    List<String> values = Arrays.asList(termFrequency.split(","));
-
-	    ArrayList<Queryable> list = Lists.newArrayList();
-
-	    for (String v : values) {
-
-		switch (v) {
-		case "instrumentDesc":
-		    list.add(MetadataElement.INSTRUMENT_DESCRIPTION);
-		    break;
-		case "instrumentTitle":
-		    list.add(MetadataElement.INSTRUMENT_TITLE);
-		    break;
-		case "platformDesc":
-		    list.add(MetadataElement.PLATFORM_DESCRIPTION);
-		    break;
-		case "platformTitle":
-		    list.add(MetadataElement.PLATFORM_TITLE);
-		    break;
-		case "orgName":
-		    list.add(MetadataElement.ORGANISATION_NAME);
-		    break;
-		case "origOrgDesc":
-		    list.add(MetadataElement.ORIGINATOR_ORGANISATION_DESCRIPTION);
-		case "themeCategory":
-		    list.add(MetadataElement.THEME_CATEGORY);
-		    break;
-		case "attributeTitle":
-		    list.add(MetadataElement.ATTRIBUTE_TITLE);
-		    break;
-		case "instrumentId":
-		    list.add(MetadataElement.INSTRUMENT_IDENTIFIER);
-		    break;
-		case "platformId":
-		    list.add(MetadataElement.PLATFORM_IDENTIFIER);
-		    break;
-		case "origOrgId":
-		    list.add(MetadataElement.ORIGINATOR_ORGANISATION_IDENTIFIER);
-		    break;
-		case "attributeId":
-		    list.add(MetadataElement.ATTRIBUTE_IDENTIFIER);
-		    break;
-		case "keyword":
-		    list.add(MetadataElement.KEYWORD);
-		    break;
-		case "format":
-		    list.add(MetadataElement.DISTRIBUTION_FORMAT);
-		    break;
-		case "protocol":
-		    list.add(MetadataElement.ONLINE_PROTOCOL);
-		    break;
-		case "providerID":
-		    list.add(ResourceProperty.SOURCE_ID);
-		    break;
-		case "organisationName":
-		    list.add(MetadataElement.ORGANISATION_NAME);
-		    break;
-		case "prodType":
-		    list.add(MetadataElement.PRODUCT_TYPE);
-		    break;
-		case "sensorOpMode":
-		    list.add(MetadataElement.SENSOR_OP_MODE);
-		    break;
-		case "sensorSwath":
-		    list.add(MetadataElement.SENSOR_SWATH);
-		    break;
-		case "sarPolCh":
-		    list.add(MetadataElement.SAR_POL_CH);
-		    break;
-		case "sscScore":
-		    list.add(ResourceProperty.SSC_SCORE);
-		    break;
-		case "s3InstrumentIdx":
-		    list.add(MetadataElement.S3_INSTRUMENT_IDX);
-		    break;
-		case "s3ProductLevel":
-		    list.add(MetadataElement.S3_PRODUCT_LEVEL);
-		    break;
-		case "s3Timeliness":
-		    list.add(MetadataElement.S3_TIMELINESS);
-		    break;
-		}
-	    }
-
-	    message.setTermFrequencyTargets(list);
+	    handleTermFrequncy(parser, message);
 	}
 
 	return message;
@@ -411,6 +277,28 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 		}
 	    }
 
+	    String eiffelDiscoveryOption = parser.parse(OSParameters.EIFFEL_DISCOVERY);
+
+	    if (eiffelDiscoveryOption != null && !eiffelDiscoveryOption.equals("")) {
+
+		boolean supported = eiffelDiscoveryOption.equals(//
+
+			DiscoveryMessage.EiffelAPIDiscoveryOption.FILTER_AND_SORT.name())
+			|| eiffelDiscoveryOption.equals(//
+				DiscoveryMessage.EiffelAPIDiscoveryOption.SORT_AND_FILTER.name());
+
+		if (!supported) {
+
+		    GSLoggerFactory.getLogger(getClass())
+			    .error("Validation failed, unsupported eiffel API discoery option: " + eiffelDiscoveryOption);
+
+		    message.setResult(ValidationResult.VALIDATION_FAILED);
+		    message.setError("Validation failed, unsupported eiffel API discoery option: " + eiffelDiscoveryOption);
+
+		    return message;
+		}
+	    }
+
 	    // String parsedParents = parser.parse(OSParameters.PARENTS);
 	    //
 	    // if (parsedParents != null && !parsedParents.isEmpty() && parsedParents.split(",").length > 1) {
@@ -456,10 +344,22 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	// creates the bond list
 	ArrayList<Bond> bondList = new ArrayList<>();
 
-	// creates the search terms bond
-	Bond searchTermsBond = createSearchTermsBond(parser);
-	if (searchTermsBond != null) {
-	    bondList.add(searchTermsBond);
+	//
+	// search terms are NOT included in case of Eiffel SORT_AND_FILTER
+	//
+	Optional<EiffelAPIDiscoveryOption> eiffelOption = EiffelDiscoveryHelper.readEiffelOption(request);
+
+	if (!eiffelOption.isPresent() || eiffelOption.get() == EiffelAPIDiscoveryOption.FILTER_AND_SORT) {
+
+	    //
+	    // creates the search terms bond
+	    //
+	    Bond searchTermsBond = createSearchTermsBond(request, parser, eiffelOption.isPresent());
+
+	    if (searchTermsBond != null) {
+
+		bondList.add(searchTermsBond);
+	    }
 	}
 
 	String rosetta = parser.parse(OSParameters.ROSETTA);
@@ -610,6 +510,102 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	return new Page(startIndex, count);
     }
 
+    /**
+     * @param parser
+     * @param message
+     */
+    private void handleTermFrequncy(OSRequestParser parser, DiscoveryMessage message) {
+
+	String termFrequency = parser.parse(OSParameters.TERM_FREQUENCY);
+
+	List<String> values = Arrays.asList(termFrequency.split(","));
+
+	ArrayList<Queryable> list = Lists.newArrayList();
+
+	for (String v : values) {
+
+	    switch (v) {
+	    case "instrumentDesc":
+		list.add(MetadataElement.INSTRUMENT_DESCRIPTION);
+		break;
+	    case "instrumentTitle":
+		list.add(MetadataElement.INSTRUMENT_TITLE);
+		break;
+	    case "platformDesc":
+		list.add(MetadataElement.PLATFORM_DESCRIPTION);
+		break;
+	    case "platformTitle":
+		list.add(MetadataElement.PLATFORM_TITLE);
+		break;
+	    case "orgName":
+		list.add(MetadataElement.ORGANISATION_NAME);
+		break;
+	    case "origOrgDesc":
+		list.add(MetadataElement.ORIGINATOR_ORGANISATION_DESCRIPTION);
+	    case "themeCategory":
+		list.add(MetadataElement.THEME_CATEGORY);
+		break;
+	    case "attributeTitle":
+		list.add(MetadataElement.ATTRIBUTE_TITLE);
+		break;
+	    case "instrumentId":
+		list.add(MetadataElement.INSTRUMENT_IDENTIFIER);
+		break;
+	    case "platformId":
+		list.add(MetadataElement.PLATFORM_IDENTIFIER);
+		break;
+	    case "origOrgId":
+		list.add(MetadataElement.ORIGINATOR_ORGANISATION_IDENTIFIER);
+		break;
+	    case "attributeId":
+		list.add(MetadataElement.ATTRIBUTE_IDENTIFIER);
+		break;
+	    case "keyword":
+		list.add(MetadataElement.KEYWORD);
+		break;
+	    case "format":
+		list.add(MetadataElement.DISTRIBUTION_FORMAT);
+		break;
+	    case "protocol":
+		list.add(MetadataElement.ONLINE_PROTOCOL);
+		break;
+	    case "providerID":
+		list.add(ResourceProperty.SOURCE_ID);
+		break;
+	    case "organisationName":
+		list.add(MetadataElement.ORGANISATION_NAME);
+		break;
+	    case "prodType":
+		list.add(MetadataElement.PRODUCT_TYPE);
+		break;
+	    case "sensorOpMode":
+		list.add(MetadataElement.SENSOR_OP_MODE);
+		break;
+	    case "sensorSwath":
+		list.add(MetadataElement.SENSOR_SWATH);
+		break;
+	    case "sarPolCh":
+		list.add(MetadataElement.SAR_POL_CH);
+		break;
+	    case "sscScore":
+		list.add(ResourceProperty.SSC_SCORE);
+		break;
+	    case "s3InstrumentIdx":
+		list.add(MetadataElement.S3_INSTRUMENT_IDX);
+		break;
+	    case "s3ProductLevel":
+		list.add(MetadataElement.S3_PRODUCT_LEVEL);
+		break;
+	    case "s3Timeliness":
+		list.add(MetadataElement.S3_TIMELINESS);
+		break;
+	    }
+	}
+
+	message.setTermFrequencyTargets(list);
+
+    }
+
     private static String createOrSearch(Set<String> terms) {
 	if (terms == null || terms.isEmpty()) {
 	    return null;
@@ -702,12 +698,72 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
      * </table>
      * </body>
      * </html>
+     * 
+     * @param request
+     * @param eiffelOption
      */
-    private Bond createSearchTermsBond(OSRequestParser parser) {
+    private Bond createSearchTermsBond(WebRequest request, OSRequestParser parser, boolean eiffelOption) {
 
 	String searchTerms = parser.parse(WebRequestParameter.findParameter(OSParameters.SEARCH_TERMS.getName(), OSParameters.class));
 	String searchFields = parser.parse(WebRequestParameter.findParameter(OSParameters.SEARCH_FIELDS.getName(), OSParameters.class));
-	if (searchFields == null) {
+
+	///////////////////////////////////////////////
+	// workaround for HIS-Central to be removed once the ontology functionality
+	// is implemented in the query initializer and in the GI-portal
+	///////////////////////////////////////////////
+	Optional<String> optionalView = request.extractViewId();
+	if (optionalView.isPresent() && optionalView.get().equals("his-central") && Objects.nonNull(searchTerms)
+		&& !searchTerms.isEmpty()) {
+
+	    List<Bond> innerBonds = new ArrayList<>();
+	    innerBonds.add(BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, searchTerms));
+
+	    HydroOntology ho = new HISCentralOntology();
+	    List<SKOSConcept> concepts = ho.findConcepts(searchTerms, true, false);
+	    HashSet<String> uris = new HashSet<String>();
+	    for (SKOSConcept concept : concepts) {
+		uris.add(concept.getURI());
+	    }
+	    if (concepts.isEmpty()) {
+		uris.add("notfounddd");
+	    }
+	    for (String uri : uris) {
+		SimpleValueBond b = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.OBSERVED_PROPERTY_URI, uri);
+		innerBonds.add(b);
+	    }
+
+	    switch (innerBonds.size()) {
+	    case 0:
+		return null;
+	    case 1:
+		return innerBonds.get(0);
+	    default:
+		return BondFactory.createOrBond(innerBonds);
+	    }
+
+	}
+
+	///////////////////////////////////////////////
+
+	Optional<Integer> filterAndSortSplitTreshold = EiffelDiscoveryHelper.getFilterAndSortSplitTreshold();
+
+	if (eiffelOption && searchTerms != null && filterAndSortSplitTreshold.isPresent()) {
+
+	    searchFields = "title,keyword,description";
+
+	    String[] split = searchTerms.split(" ");
+	    boolean notOr = searchTerms.split(" OR ").length == 1;
+	    boolean notAnd = searchTerms.split(" AND ").length == 1;
+
+	    if (split.length >= filterAndSortSplitTreshold.get() && //
+		    notOr && //
+		    notAnd) {
+
+		searchTerms = searchTerms.replaceAll(" ", " OR ");
+	    }
+
+	} else if (searchFields == null) {
+
 	    searchFields = "title,keyword";
 	}
 

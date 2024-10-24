@@ -4,7 +4,7 @@ package eu.essi_lab.model.resource;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -63,6 +63,11 @@ public enum ResourceProperty implements Queryable {
      * 
      */
     IS_DELETED("isDeleted", ContentType.BOOLEAN),
+    
+    /**
+     * 
+     */
+    IS_VALIDATED("isValidated", ContentType.BOOLEAN),
 
     /**
      * 
@@ -163,17 +168,31 @@ public enum ResourceProperty implements Queryable {
      * IS TIMESERIES
      */
     IS_TIMESERIES("isTimeseries", ContentType.BOOLEAN),
+    
+    /**
+     * IS GRID
+     */
+    IS_VECTOR("isVector", ContentType.BOOLEAN),
+
+    /**
+     * IS TRAJECTORY
+     */
+    IS_TRAJECTORY("isTrajectory", ContentType.BOOLEAN),
+
+    /**
+     * IS EIFFEL RECORD
+     */
+    IS_EIFFEL_RECORD("eiffelRecord", ContentType.BOOLEAN),
 
     /**
      * EXECUTION TEST
      */
     EXECUTION_TIME("testExecutionTime", ContentType.LONG),
-    
+
     /**
      * HAS_LOWEST_RANKING
      */
     HAS_LOWEST_RANKING("hasLowestRanging", ContentType.BOOLEAN);
-
 
     /**
      * 

@@ -1,0 +1,5 @@
+eu.essi_lab.accessor.sensorthings._1_1.mapper.HydroServer2Mapper
+eu.essi_lab.accessor.sensorthings._1_1.mapper.STA4HydrometryMapper
+eu.essi_lab.accessor.sensorthings._1_1.mapper.CITIOBSMapper
+eu.essi_lab.accessor.sensorthings._1_1.mapper.FraunhoferAirQualityMapper
+eu.essi_lab.accessor.sensorthings._1_1.mapper.BRGM_WQMapper

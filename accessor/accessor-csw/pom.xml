@@ -12,7 +12,11 @@
   
   	<dependencies>
 
-
+		<dependency>
+			<groupId>eu.essi_lab</groupId>
+			<artifactId>accessor-thredds</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
 
 	</dependencies>
 

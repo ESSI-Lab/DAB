@@ -1,0 +1,20 @@
+<doc>
+	<aaa>
+		<a>a</a>		
+	</aaa>
+	<bbb>
+		<a>ba</a>
+		<c>
+			<a>bca</a>
+			<d>
+				<a>bcda</a>
+			</d>
+		</c>
+		
+ 		<b1>b1</b1>
+		<b2>b2</b2>
+		<b3>b3</b3>
+	</bbb>
+	<c>C</c>
+	<d></d>
+</doc>

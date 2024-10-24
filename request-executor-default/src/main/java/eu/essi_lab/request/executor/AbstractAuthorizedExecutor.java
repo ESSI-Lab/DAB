@@ -7,7 +7,7 @@ package eu.essi_lab.request.executor;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,7 +24,6 @@ package eu.essi_lab.request.executor;
  * #L%
  */
 
-import eu.essi_lab.authorization.DefaultPdpEngineBuilder;
 import eu.essi_lab.authorization.xacml.XACMLAuthorizer;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.RequestMessage;
@@ -47,13 +46,11 @@ public abstract class AbstractAuthorizedExecutor {
 	    RequestMessage message, //
 	    String errorId) throws GSException {
 
-	XACMLAuthorizer authorizer = new XACMLAuthorizer();
 	boolean authorized = true;
 
-	DefaultPdpEngineBuilder engineBuilder = new DefaultPdpEngineBuilder();
-
 	try {
-	    authorizer.setPdpEngine(engineBuilder.build());
+
+	    XACMLAuthorizer authorizer = new XACMLAuthorizer();
 
 	    authorized = authorizer.isAuthorized(message);
 

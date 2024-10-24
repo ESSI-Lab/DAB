@@ -1,0 +1,471 @@
+{
+	"help": "http://drdsi.jrc.ec.europa.eu/api/3/action/help_show?name=package_show",
+	"success": true,
+	"result": {
+		"license_title": "My License Title",
+		"maintainer": "My Maintainer",
+		"relationships_as_object": [
+			{
+				"comment": "My Comment",
+				"type": "My Type",
+				"__extras": {
+					"object_package_id": "My Id",
+					"subject_package_id": "My Subject Package Id"
+				}
+			}
+		],
+		"private": false,
+		"maintainer_email": "mymaintainer@email.com",
+		"num_tags": 17,
+		"id": "0092a24f-9fec-4f7a-958d-0a4472f8767b",
+		"revision_timestamp": "9999-12-09T19:09:34.754708",
+		"metadata_created": "2014-12-09T19:09:34.754708",
+		"metadata_modified": "2014-12-09T19:09:34.833675",
+		"author": "My Author",
+		"author_email": "myauthor@email.com",
+		"state": "active",
+		"version": "My Version",
+		"creator_user_id": "f9d4e78a-acce-4bc7-9af1-eb39f385f4a2",
+		"type": "dataset",
+		"resources": [
+			{
+				"cache_last_updated": "My Cache Last Updated",
+				"package_id": "0092a24f-9fec-4f7a-958d-0a4472f8767b",
+				"webstore_last_updated": null,
+				"id": "f14dc685-6bbc-4617-b714-efb9a9b22075",
+				"size": "999.0",
+				"state": "active",
+				"resource_locator_function": "My Resource Locator Function",
+				"hash": "My Hash",
+				"description": "My Description",
+				"format": "My Format",
+				"mimetype_inner": "My Mime Type Inner",
+				"type": "My Type",
+				"url_type": "My Url Type",
+				"resource_locator_protocol": "My Resource Locator Protocol",
+				"resource_group_id": "My Resource Group Id",
+				"mimetype": "My Mime Type",
+				"cache_url": "My Cache URL",
+				"name": "INSPIRE prohlížecí služba pro téma Územní správní jednotky (AU)",
+				"created": "2014-12-09T20:09:34.954251",
+				"url": "http://services.cuzk.cz/wms/inspire-au-wms.asp?request=GetCapabilities",
+				"webstore_url": null,
+				"last_modified": "My Last Modified",
+				"position": 0,
+				"revision_id": "60e7de2c-c250-4d2c-81f3-f44a194824f2",
+				"revision_timestamp": "My Revision Timestamp",
+				"resource_type": "My Resource Type"
+			},
+			{
+				"cache_last_updated": null,
+				"package_id": "0092a24f-9fec-4f7a-958d-0a4472f8767b",
+				"webstore_last_updated": null,
+				"id": "eb6c8e98-e70c-4783-b6b0-13a9de5c14f2",
+				"size": null,
+				"state": "active",
+				"resource_locator_function": "",
+				"hash": "",
+				"description": "",
+				"format": "",
+				"mimetype_inner": null,
+				"url_type": null,
+				"resource_locator_protocol": "",
+				"mimetype": null,
+				"cache_url": null,
+				"name": "INSPIRE prohlížecí služba pro téma Územní správní jednotky (AU)",
+				"created": "2014-12-09T20:09:34.954280",
+				"url": "http://services.cuzk.cz/wms/inspire-au-wms.asp?",
+				"webstore_url": null,
+				"last_modified": null,
+				"position": 1,
+				"revision_id": "60e7de2c-c250-4d2c-81f3-f44a194824f2",
+				"resource_type": null
+			},
+			{
+				"cache_last_updated": null,
+				"package_id": "0092a24f-9fec-4f7a-958d-0a4472f8767b",
+				"webstore_last_updated": null,
+				"id": "9257db7e-216a-476e-8413-20e6c9351f81",
+				"size": null,
+				"state": "active",
+				"resource_locator_function": "",
+				"hash": "",
+				"description": "",
+				"format": "",
+				"mimetype_inner": null,
+				"url_type": null,
+				"resource_locator_protocol": "",
+				"mimetype": null,
+				"cache_url": null,
+				"name": "INSPIRE prohlížecí služba pro téma Územní správní jednotky (AU)",
+				"created": "2014-12-09T20:09:34.954293",
+				"url": "http://geoportal.cuzk.cz",
+				"webstore_url": null,
+				"last_modified": null,
+				"position": 2,
+				"revision_id": "60e7de2c-c250-4d2c-81f3-f44a194824f2",
+				"resource_type": null
+			},
+			{
+				"cache_last_updated": null,
+				"package_id": "0092a24f-9fec-4f7a-958d-0a4472f8767b",
+				"webstore_last_updated": null,
+				"id": "6fa41acb-5bb2-4319-bbce-f88ebf83baef",
+				"size": null,
+				"state": "active",
+				"resource_locator_function": "",
+				"hash": "",
+				"description": "",
+				"format": "",
+				"mimetype_inner": null,
+				"url_type": null,
+				"resource_locator_protocol": "",
+				"mimetype": null,
+				"cache_url": null,
+				"name": "INSPIRE prohlížecí služba pro téma Územní správní jednotky (AU)",
+				"created": "2014-12-09T20:09:34.954304",
+				"url": "http://services.cuzk.cz/wms/inspire-au-wms.asp",
+				"webstore_url": null,
+				"last_modified": null,
+				"position": 3,
+				"revision_id": "60e7de2c-c250-4d2c-81f3-f44a194824f2",
+				"resource_type": null
+			},
+			{
+				"cache_last_updated": null,
+				"package_id": "0092a24f-9fec-4f7a-958d-0a4472f8767b",
+				"webstore_last_updated": null,
+				"id": "35e78769-37a3-4e5f-8cf7-1c888a215ba6",
+				"size": null,
+				"state": "active",
+				"resource_locator_function": "",
+				"hash": "",
+				"description": "",
+				"format": "",
+				"mimetype_inner": null,
+				"url_type": null,
+				"resource_locator_protocol": "",
+				"mimetype": null,
+				"cache_url": null,
+				"name": "INSPIRE prohlížecí služba pro téma Územní správní jednotky (AU)",
+				"created": "2014-12-09T20:09:34.954316",
+				"url": "http://services.cuzk.cz/wms/inspire-au-wms.asp?",
+				"webstore_url": null,
+				"last_modified": null,
+				"position": 4,
+				"revision_id": "60e7de2c-c250-4d2c-81f3-f44a194824f2",
+				"resource_type": null
+			},
+			{
+				"cache_last_updated": null,
+				"package_id": "0092a24f-9fec-4f7a-958d-0a4472f8767b",
+				"webstore_last_updated": null,
+				"id": "a882a1b7-b1e5-42cb-8842-1f54da1350ba",
+				"size": null,
+				"state": "active",
+				"resource_locator_function": "",
+				"hash": "",
+				"description": "",
+				"format": "",
+				"mimetype_inner": null,
+				"url_type": null,
+				"resource_locator_protocol": "",
+				"mimetype": null,
+				"cache_url": null,
+				"name": "INSPIRE prohlížecí služba pro téma Územní správní jednotky (AU)",
+				"created": "2014-12-09T20:09:34.954327",
+				"url": "http://services.cuzk.cz/wms/inspire-au-wms.asp?",
+				"webstore_url": null,
+				"last_modified": null,
+				"position": 5,
+				"revision_id": "60e7de2c-c250-4d2c-81f3-f44a194824f2",
+				"resource_type": null
+			},
+			{
+				"cache_last_updated": null,
+				"package_id": "0092a24f-9fec-4f7a-958d-0a4472f8767b",
+				"webstore_last_updated": null,
+				"id": "f2cbee34-36b1-431d-9a45-6f5d37a3e9e5",
+				"size": null,
+				"state": "active",
+				"resource_locator_function": "",
+				"hash": "",
+				"description": "",
+				"format": "",
+				"mimetype_inner": null,
+				"url_type": null,
+				"resource_locator_protocol": "",
+				"mimetype": null,
+				"cache_url": null,
+				"name": "INSPIRE prohlížecí služba pro téma Územní správní jednotky (AU)",
+				"created": "2014-12-09T20:09:34.954338",
+				"url": "http://services.cuzk.cz/wms/inspire-au-wms.asp?",
+				"webstore_url": null,
+				"last_modified": null,
+				"position": 6,
+				"revision_id": "60e7de2c-c250-4d2c-81f3-f44a194824f2",
+				"resource_type": null
+			}
+		],
+		"num_resources": 7,
+		"tags": [
+			{
+				"vocabulary_id": "My Vocabulary Id",
+				"state": "active",
+				"display_name": "Informační systém územní identifikace (ISÚI)",
+				"id": "bd2069f3-536e-4858-93af-7487a80ab90b",
+				"name": "Informační systém územní identifikace (ISÚI)",
+				"revision_timestamp": "My Revision Timestamp"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "Registr územní identifikace, adres a nemovitostí (",
+				"id": "26ee543c-f71d-49ad-a733-95adf7c0b110",
+				"name": "Registr územní identifikace, adres a nemovitostí ("
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "Správní jednotky",
+				"id": "077955ae-6eb7-4005-b2d0-3be1cf104d5c",
+				"name": "Správní jednotky"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "administrativní hranice",
+				"id": "09d69785-0883-471f-9d04-4580bf6b16f7",
+				"name": "administrativní hranice"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "geografická informace, geoinformace, geoprostorová",
+				"id": "b143c811-91c6-40b4-a863-fb4809de1156",
+				"name": "geografická informace, geoinformace, geoprostorová"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "infoMapAccessService",
+				"id": "3ffaf6ed-7d11-449e-a9e8-a53c2395d745",
+				"name": "infoMapAccessService"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "obec",
+				"id": "43db0215-a4da-405a-8c15-af98e4cade29",
+				"name": "obec"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "okres",
+				"id": "799319b3-694e-406f-8459-1d614647bd01",
+				"name": "okres"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "prohlížecí služba",
+				"id": "2df934ad-bf0e-4baa-8f8f-b21bca42d4bc",
+				"name": "prohlížecí služba"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "rastrová mapa",
+				"id": "c0259ed6-49b5-456f-9baa-975141efcba1",
+				"name": "rastrová mapa"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "region NUTS",
+				"id": "c35d0e1c-848f-44a0-8687-5159010d0f56",
+				"name": "region NUTS"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "stát",
+				"id": "9e37dbec-3538-437c-9523-fc8ef800a3e3",
+				"name": "stát"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "vyšší územní samosprávný celek (VÚSC)",
+				"id": "81a7dad9-eb62-4130-8066-cbf2f56fa91c",
+				"name": "vyšší územní samosprávný celek (VÚSC)"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "webová mapová služba (WMS)",
+				"id": "f0d2e3f6-53ad-499c-93a4-199688eff881",
+				"name": "webová mapová služba (WMS)"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "zeměpisné jméno",
+				"id": "4a141c9d-c973-45cd-aee6-331b7b9899f7",
+				"name": "zeměpisné jméno"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "územní jednotka",
+				"id": "05617ce9-f1f2-4c73-98d7-a75ff75c55fc",
+				"name": "územní jednotka"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "územní správní jednotka",
+				"id": "f79f9375-df02-45cb-91ab-896c5a2ca11b",
+				"name": "územní správní jednotka"
+			}
+		],
+		"groups": [],
+		"license": null,
+		"license_id": "My License Id",
+		"relationships_as_subject": [
+			{
+				"comment": "My Comment",
+				"type": "My Type",
+				"__extras": {
+					"object_package_id": "My Object Package Id",
+					"subject_package_id": "My Id"
+				}
+			}
+		],
+		"organization": {
+			"description": "",
+			"title": "INSPIRE CZECH REPUBLIC",
+			"created": "2014-06-17T16:10:46.298074",
+			"approval_status": "approved",
+			"is_organization": true,
+			"state": "active",
+			"image_url": "20140617-141046.224325czinspire.png",
+			"revision_id": "42f74d88-d8ac-4a89-ba81-9e703dd5b53a",
+			"type": "organization",
+			"id": "6c6edf27-15c1-4465-b275-9734268a7679",
+			"name": "inspire-czeck-republic"
+		},
+		"name": "inspire-prohlieci-sluba-pro-tema-uzemni-spravni-jednotky-au",
+		"isopen": false,
+		"url": "http://myurl",
+		"notes": "Prohlížecí služba WMS pro téma Územní správní jendotky (AU) je veřejná prohlížecí služba pro poskytování dat harmonizovaných dle INSPIRE tématu Územní správní jednotky (AU). Služba je dostupná na celém území České Republiky. Služba splňuje technické pokyny pro INSPIRE prohlížeci služby ve verzi 3.11 a zároveň standardy OGC WMS 1.1.1 a 1.3.0.",
+		"theme-primary": "My Primary Theme",
+		"unpublished": "My Unpublished",
+		"owner_org": "6c6edf27-15c1-4465-b275-9734268a7679",
+		"extras": [
+			{
+				"key": "access_constraints",
+				"value": "[\"Op\\u011btovn\\u00e9mu vyu\\u017eit\\u00ed dat zp\\u0159\\u00edstupn\\u011bn\\u00fdch slu\\u017ebou pro obchodn\\u00ed \\u00fa\\u010dely je zamezeno za\\u010dlen\\u011bn\\u00edm ochrann\\u00fdch znak\\u016f (copyright \\u010c\\u00daZK).\"]"
+			},
+			{
+				"key": "bbox-east-long",
+				"value": "18.85"
+			},
+			{
+				"key": "bbox-north-lat",
+				"value": "51.05"
+			},
+			{
+				"key": "bbox-south-lat",
+				"value": "48.58"
+			},
+			{
+				"key": "bbox-west-long",
+				"value": "12.09"
+			},
+			{
+				"key": "bbox_extended",
+				"value": "12.09 48.58 18.85 51.05 "
+			},
+			{
+				"key": "contact-email",
+				"value": "cuzk.helpdesk@cuzk.cz"
+			},
+			{
+				"key": "coupled-resource",
+				"value": "[{\"href\": [\"http://geoportal.cuzk.cz/getHTML.aspx?mode=Metadata&fnc=getRecord&identifierid=CZ-CUZK-AU#\"], \"uuid\": [\"\"], \"title\": [\"Metadata s\\u00e9rie datov\\u00fdch sad INSPIRE - Adresy (AD)\"]}]"
+			},
+			{
+				"key": "dataset-reference-date",
+				"value": "[{\"type\": \"revision\", \"value\": \"2013-09-29\"}, {\"type\": \"creation\", \"value\": \"2013-09-29\"}, {\"type\": \"publication\", \"value\": \"9999-09-09\"}]"
+			},
+			{
+				"key": "frequency-of-update",
+				"value": "My Frequency"
+			},
+			{
+				"key": "guid",
+				"value": "/INSPIRE-16542303-763e-11e4-8b38-52540004b857_20141208-214650/services/1/PullResults/461-480/services/2_ID_CZ-CUZK-WMS-AU"
+			},
+			{
+				"key": "harvest_timestamp",
+				"value": "2014-12-09T20:09:34.714316"
+			},
+			{
+				"key": "licence",
+				"value": "[\"V\\u00fddejn\\u00ed jednotka nen\\u00ed stanovena\"]"
+			},
+			{
+				"key": "metadata-date",
+				"value": "2014-12-07"
+			},
+			{
+				"key": "metadata-language",
+				"value": "cze"
+			},
+			{
+				"key": "progress",
+				"value": "My Progress"
+			},
+			{
+				"key": "resource-type",
+				"value": "service"
+			},
+			{
+				"key": "responsible-party",
+				"value": "[{\"name\": \"\\u010cesk\\u00fd \\u00fa\\u0159ad zem\\u011bm\\u011b\\u0159ick\\u00fd a katastr\\u00e1ln\\u00ed\", \"roles\": [\"custodian\"]}]"
+			},
+			{
+				"key": "spatial",
+				"value": "{\"type\": \"Polygon\", \"coordinates\": [[[12.09, 48.58], [18.85, 48.58], [18.85, 51.05], [12.09, 51.05], [12.09, 48.58]]]}"
+			},
+			{
+				"key": "spatial-data-service-type",
+				"value": "view"
+			},
+			{
+				"key": "spatial-reference-system",
+				"value": "My Reference System"
+			},
+			{
+				"key": "spatial_harvester",
+				"value": "true"
+			},
+			{
+				"key": "harvest_object_id",
+				"value": "71cd789c-047f-4005-bcfe-205f2509d266"
+			},
+			{
+				"key": "harvest_source_id",
+				"value": "d19ded78-b6f9-4b95-ab3a-1ca54b69e7ab"
+			},
+			{
+				"key": "harvest_source_title",
+				"value": "INSPIRE Czeck Republic"
+			}
+		],
+		"title": "INSPIRE prohlížecí služba pro téma Územní správní jednotky (AU)",
+		"revision_id": "60e7de2c-c250-4d2c-81f3-f44a194824f2"
+	}
+}

@@ -1,0 +1,287 @@
+[
+	{
+		"p": {
+			"type": "uri",
+			"value": "http://eu.essi_lab.core/2018/06/d2k#isChildOf"
+		},
+		"pontologyDescription": {
+			"xml:lang": "en",
+			"type": "literal",
+			"value": "The core ontology of ESSI Lab Knowledge Base"
+		},
+		"ontologyName": {
+			"datatype": "http://www.w3.org/2001/XMLSchema#string",
+			"type": "literal",
+			"value": "Sustainable Development - Knowledge Platform"
+		},
+		"plabel": {
+			"xml:lang": "en",
+			"type": "literal",
+			"value": "is child of"
+		},
+		"label": {
+			"datatype": "http://www.w3.org/2001/XMLSchema#string",
+			"type": "literal",
+			"value": "Target 1.1"
+		},
+		"abstract": {
+			"datatype": "http://www.w3.org/2001/XMLSchema#string",
+			"type": "literal",
+			"value": "Target 1.1 Description"
+		},
+		"type": {
+			"type": "uri",
+			"value": "http://eu.essi_lab.core/2018/06/d2k#Policy_Goal"
+		},
+		"ontologyDescription": {
+			"datatype": "http://www.w3.org/2001/XMLSchema#string",
+			"type": "literal",
+			"value": "Sustainable Development - Knowledge Platform Description"
+		},
+		"ontology": {
+			"type": "uri",
+			"value": "http://eu.floraresearch.essi.core/test/unontology"
+		},
+		"pontology": {
+			"type": "uri",
+			"value": "http://eu.essi_lab.core/2018/06/d2k"
+		},
+		"object": {
+			"type": "uri",
+			"value": "http://eu.floraresearch.essi.core/test/target1"
+		},
+		"pontologyName": {
+			"xml:lang": "en",
+			"type": "literal",
+			"value": "ESSI Lab Data to Knowledge Ontology"
+		}
+	},
+	{
+		"p": {
+			"type": "uri",
+			"value": "http://eu.essi_lab.core/2018/06/d2k#isChildOf"
+		},
+		"pontologyDescription": {
+			"xml:lang": "en",
+			"type": "literal",
+			"value": "The core ontology of ESSI Lab Knowledge Base"
+		},
+		"ontologyName": {
+			"datatype": "http://www.w3.org/2001/XMLSchema#string",
+			"type": "literal",
+			"value": "Sustainable Development - Knowledge Platform"
+		},
+		"plabel": {
+			"xml:lang": "en",
+			"type": "literal",
+			"value": "is child of"
+		},
+		"label": {
+			"xml:lang": "it",
+			"type": "literal",
+			"value": "Target 1.2"
+		},
+		"abstract": {
+			"datatype": "http://www.w3.org/2001/XMLSchema#string",
+			"type": "literal",
+			"value": "Target 1.2 Description"
+		},
+		"type": {
+			"type": "uri",
+			"value": "http://eu.essi_lab.core/2018/06/d2k#Policy_Goal"
+		},
+		"ontologyDescription": {
+			"datatype": "http://www.w3.org/2001/XMLSchema#string",
+			"type": "literal",
+			"value": "Sustainable Development - Knowledge Platform Description"
+		},
+		"ontology": {
+			"type": "uri",
+			"value": "http://eu.floraresearch.essi.core/test/unontology"
+		},
+		"pontology": {
+			"type": "uri",
+			"value": "http://eu.essi_lab.core/2018/06/d2k"
+		},
+		"object": {
+			"type": "uri",
+			"value": "http://eu.floraresearch.essi.core/test/target2"
+		},
+		"pontologyName": {
+			"xml:lang": "en",
+			"type": "literal",
+			"value": "ESSI Lab Data to Knowledge Ontology"
+		}
+	},
+	{
+		"p": {
+			"type": "uri",
+			"value": "http://eu.essi_lab.core/2018/06/d2k#isChildOf"
+		},
+		"pontologyDescription": {
+			"xml:lang": "en",
+			"type": "literal",
+			"value": "The core ontology of ESSI Lab Knowledge Base"
+		},
+		"ontologyName": {
+			"datatype": "http://www.w3.org/2001/XMLSchema#string",
+			"type": "literal",
+			"value": "Sustainable Development - Knowledge Platform"
+		},
+		"plabel": {
+			"xml:lang": "en",
+			"type": "literal",
+			"value": "is child of"
+		},
+		"label": {
+			"xml:lang": "it",
+			"type": "literal",
+			"value": "Target 1.2"
+		},
+		"abstract": {
+			"xml:lang": "it",
+			"type": "literal",
+			"value": "Target 1.2 Description"
+		},
+		"type": {
+			"type": "uri",
+			"value": "http://eu.essi_lab.core/2018/06/d2k#Policy_Goal"
+		},
+		"ontologyDescription": {
+			"datatype": "http://www.w3.org/2001/XMLSchema#string",
+			"type": "literal",
+			"value": "Sustainable Development - Knowledge Platform Description"
+		},
+		"ontology": {
+			"type": "uri",
+			"value": "http://eu.floraresearch.essi.core/test/unontology"
+		},
+		"pontology": {
+			"type": "uri",
+			"value": "http://eu.essi_lab.core/2018/06/d2k"
+		},
+		"object": {
+			"type": "uri",
+			"value": "http://eu.floraresearch.essi.core/test/target2"
+		},
+		"pontologyName": {
+			"xml:lang": "en",
+			"type": "literal",
+			"value": "ESSI Lab Data to Knowledge Ontology"
+		}
+	},
+	{
+		"p": {
+			"type": "uri",
+			"value": "http://eu.essi_lab.core/2018/06/d2k#isChildOf"
+		},
+		"pontologyDescription": {
+			"xml:lang": "en",
+			"type": "literal",
+			"value": "The core ontology of ESSI Lab Knowledge Base"
+		},
+		"ontologyName": {
+			"datatype": "http://www.w3.org/2001/XMLSchema#string",
+			"type": "literal",
+			"value": "Sustainable Development - Knowledge Platform"
+		},
+		"plabel": {
+			"xml:lang": "en",
+			"type": "literal",
+			"value": "is child of"
+		},
+		"label": {
+			"datatype": "http://www.w3.org/2001/XMLSchema#string",
+			"type": "literal",
+			"value": "Target 1.2"
+		},
+		"abstract": {
+			"datatype": "http://www.w3.org/2001/XMLSchema#string",
+			"type": "literal",
+			"value": "Target 1.2 Description"
+		},
+		"type": {
+			"type": "uri",
+			"value": "http://eu.essi_lab.core/2018/06/d2k#Policy_Goal"
+		},
+		"ontologyDescription": {
+			"datatype": "http://www.w3.org/2001/XMLSchema#string",
+			"type": "literal",
+			"value": "Sustainable Development - Knowledge Platform Description"
+		},
+		"ontology": {
+			"type": "uri",
+			"value": "http://eu.floraresearch.essi.core/test/unontology"
+		},
+		"pontology": {
+			"type": "uri",
+			"value": "http://eu.essi_lab.core/2018/06/d2k"
+		},
+		"object": {
+			"type": "uri",
+			"value": "http://eu.floraresearch.essi.core/test/target2"
+		},
+		"pontologyName": {
+			"xml:lang": "en",
+			"type": "literal",
+			"value": "ESSI Lab Data to Knowledge Ontology"
+		}
+	},
+	{
+		"p": {
+			"type": "uri",
+			"value": "http://eu.essi_lab.core/2018/06/d2k#isChildOf"
+		},
+		"pontologyDescription": {
+			"xml:lang": "en",
+			"type": "literal",
+			"value": "The core ontology of ESSI Lab Knowledge Base"
+		},
+		"ontologyName": {
+			"datatype": "http://www.w3.org/2001/XMLSchema#string",
+			"type": "literal",
+			"value": "Sustainable Development - Knowledge Platform"
+		},
+		"plabel": {
+			"xml:lang": "en",
+			"type": "literal",
+			"value": "is child of"
+		},
+		"label": {
+			"datatype": "http://www.w3.org/2001/XMLSchema#string",
+			"type": "literal",
+			"value": "Target 1.2"
+		},
+		"abstract": {
+			"xml:lang": "it",
+			"type": "literal",
+			"value": "Target 1.2 Description"
+		},
+		"type": {
+			"type": "uri",
+			"value": "http://eu.essi_lab.core/2018/06/d2k#Policy_Goal"
+		},
+		"ontologyDescription": {
+			"datatype": "http://www.w3.org/2001/XMLSchema#string",
+			"type": "literal",
+			"value": "Sustainable Development - Knowledge Platform Description"
+		},
+		"ontology": {
+			"type": "uri",
+			"value": "http://eu.floraresearch.essi.core/test/unontology"
+		},
+		"pontology": {
+			"type": "uri",
+			"value": "http://eu.essi_lab.core/2018/06/d2k"
+		},
+		"object": {
+			"type": "uri",
+			"value": "http://eu.floraresearch.essi.core/test/target2"
+		},
+		"pontologyName": {
+			"xml:lang": "en",
+			"type": "literal",
+			"value": "ESSI Lab Data to Knowledge Ontology"
+		}
+	} 
+]

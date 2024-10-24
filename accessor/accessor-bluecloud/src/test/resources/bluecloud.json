@@ -1,0 +1,39 @@
+{
+    "Identifier": "006196A3D05799453983F10DCAA367939D75C7FD",
+    "Last_Update": "2023-07-02T20:23:58",
+    "Source": "EuroArgo - Argo",
+    "Title": "8673 - 2902296 - Argo INDIA",
+    "Abstract": "8673 - 2902296 - Argo INDIA",
+    "Organisations": [
+        "INCOIS"
+    ],
+    "Keywords": [
+        "41",
+        "WRC",
+        "ARGO"
+    ],
+    "Parameters": [
+        "SUBSURFACE PRESSURE",
+        "BACKSCATTER",
+        "SUBSURFACE SALINITY",
+        "OXYGEN",
+        "SUBSURFACE TEMPERATURE",
+        "CHLOROPHYLL"
+    ],
+    "Instruments": [
+        "SBE41CP",
+        "DRUCK",
+        "AANDERAA_OPTODE_4330",
+        "ECO_FLBB"
+    ],
+    "Platforms": [
+        "8673"
+    ],
+    "Bounding_Box_WestLongitude": 57.293079,
+    "Bounding_Box_NorthLatitude": -49.266708,
+    "Bounding_Box_EastLongitude": 78.508904,
+    "Bounding_Box_SouthLatitude": -55.411179,
+    "Temporal_Extent_Begin": "2020-02-29T10:57:55",
+    "Temporal_Extent_End": "2023-06-19T10:27:32",
+    "OnlineResourceUrl": "https:\/\/data.blue-cloud.org\/search-details?step=~012006196A3D05799453983F10DCAA367939D75C7FD"
+}

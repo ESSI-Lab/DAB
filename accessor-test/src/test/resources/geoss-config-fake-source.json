@@ -1,0 +1,143 @@
+	"SOURCE_ID:RND_1": {
+	"configurableComponentConcrete": "eu.essi_lab.gssrv.starter.BrokeredSourceConfigurable",
+	"key": "SOURCE_ID:RND_1",
+	"label": "Brokered GSSource Configuration",
+	"supportedOptions": {
+		"GS_SOURCE_OPTION_KEY": {
+			"concrete": "eu.essi_lab.model.configuration.option.GSConfOptionSource",
+			"key": "GS_SOURCE_OPTION_KEY",
+			"mandatory": false,
+			"value": {
+				"valueConcrete": "eu.essi_lab.model.Source",
+				"label": "SOURCE_LABEL",
+				"endpoint": "SOURCE_ENDPOINT",
+				"uniqueIdentifier": "SOURCE_ID"
+			},
+			"type": "eu.essi_lab.model.Source"
+		},
+		"GS_BROKERING_STRATEGY_OPTION_KEY": {
+			"concrete": "eu.essi_lab.model.configuration.option.GSConfOptionBrokeringStrategy",
+			"key": "GS_BROKERING_STRATEGY_OPTION_KEY",
+			"mandatory": true,
+			"value": {
+				"valueConcrete": "eu.essi_lab.model.BrokeringStrategy",
+				"value": "HARVESTED"
+			},
+			"allowedValues": [
+				{
+					"value": "HARVESTED"
+				}
+			],
+			"label": "Brokering Strategy",
+			"type": "eu.essi_lab.model.BrokeringStrategy",
+			"supported": [
+				{
+					"value": "HARVESTED"
+				}
+			]
+		}
+	},
+	"configurableComponents": {
+		"brokered:harvested": {
+			"configurableComponentConcrete": "eu.essi_lab.harvester.Harvester",
+			"key": "brokered:harvested",
+			"label": "Harvester",
+			"supportedOptions": {
+				"RECOVER_TAGS_KEY": {
+					"concrete": "eu.essi_lab.model.configuration.option.GSConfOptionBoolean",
+					"key": "RECOVER_TAGS_KEY",
+					"mandatory": false,
+					"value": true,
+					"allowedValues": [
+						true,
+						false
+					],
+					"label": "Recover resource tags",
+					"type": "java.lang.Boolean"
+				},
+				"MARK_DELETED_RECORDS_KEY": {
+					"concrete": "eu.essi_lab.model.configuration.option.GSConfOptionBoolean",
+					"key": "MARK_DELETED_RECORDS_KEY",
+					"mandatory": false,
+					"value": false,
+					"allowedValues": [
+						true,
+						false
+					],
+					"label": "Mark deleted records",
+					"type": "java.lang.Boolean"
+				},
+				"TEST_ISO_COMPLIANCE_KEY": {
+					"concrete": "eu.essi_lab.model.configuration.option.GSConfOptionBoolean",
+					"key": "TEST_ISO_COMPLIANCE_KEY",
+					"mandatory": false,
+					"value": false,
+					"allowedValues": [
+						true,
+						false
+					],
+					"label": "Test ISO compliance",
+					"type": "java.lang.Boolean"
+				}
+			},
+			"configurableComponents": {
+				"HARVESTER_ACCESSOR_KEY": {
+					"configurableComponentConcrete": "eu.essi_lab.adk.harvest.HarvestedAccessor",
+					"key": "HARVESTER_ACCESSOR_KEY",
+					"instantiableType": {
+						"instanceTypeConcrete": "eu.essi_lab.configuration.GSSourceAccessor",
+						"uniqueIdentifier": "SOURCE_ID",
+						"endpoint": "SOURCE_ENDPOINT",
+						"label": "SOURCE_LABEL",
+						"componentId": "HARVESTER_ACCESSOR_KEY",
+						"brokeringStrategy": {
+							"value": "HARVESTED"
+						}
+					},
+					"supportedOptions": {
+						"GS_CONNECTOR_OPTION_KEY": {
+							"concrete": "eu.essi_lab.model.configuration.option.GSConfOptionSubcomponent",
+							"key": "GS_CONNECTOR_OPTION_KEY",
+							"mandatory": true,
+							"value": {
+								"valueConcrete": "eu.essi_lab.model.configuration.Subcomponent",
+								"label": null,
+								"value": "eu.essi_lab.accessor.csw.CSWConnector"
+							},
+							"allowedValues": [
+								{
+									"label": "CSW Connector",
+									"value": "eu.essi_lab.accessor.csw.CSWConnector"
+								},
+								{
+									"label": "CSW Connector",
+									"value": "eu.essi_lab.accessor.cwic.CWICCSWConnector"
+								}
+							],
+							"label": "Select Connector",
+							"type": "eu.essi_lab.model.configuration.Subcomponent"
+						}
+					},
+					"configurableComponents": {
+						"RND_2": {
+							"configurableComponentConcrete": "eu.essi_lab.accessor.csw.CSWConnector",
+							"key": "RND_2",
+							"label": "CSW Connector",
+							"sourceURL": "SOURCE_ENDPOINT",
+							"supportedOptions": {
+								"CSW_CONNECTOR_PAGESIZE_OPTION_KEY": {
+									"concrete": "eu.essi_lab.model.configuration.option.GSConfOptionInteger",
+									"key": "CSW_CONNECTOR_PAGESIZE_OPTION_KEY",
+									"mandatory": false,
+									"value": 100,
+									"type": "java.lang.Integer"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+	

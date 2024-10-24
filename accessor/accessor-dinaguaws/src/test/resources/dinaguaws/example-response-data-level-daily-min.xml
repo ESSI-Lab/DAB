@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:getDiariosEstacionResponse xmlns:ns="http://services.com" xmlns:ax21="http://entity.com/xsd">
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-20 00:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Mínimo</ax21:tipo_de_calculo>
+            <ax21:valor>0.35</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:HorarioWS">
+            <ax21:estacion>1400</ax21:estacion>
+            <ax21:fecha>2022-05-21 00:00:00</ax21:fecha>
+            <ax21:indiceCalidad>Dato aceptado</ax21:indiceCalidad>
+            <ax21:indiceRevision>Datos brutos</ax21:indiceRevision>
+            <ax21:tipo_de_calculo>Mínimo</ax21:tipo_de_calculo>
+            <ax21:valor>0.35</ax21:valor>
+            <ax21:variable>Nivel</ax21:variable>
+         </ns:return>
+      </ns:getDiariosEstacionResponse>
+   </soapenv:Body>
+</soapenv:Envelope>

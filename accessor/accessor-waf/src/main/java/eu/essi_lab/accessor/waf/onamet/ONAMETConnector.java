@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.waf.onamet;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -44,8 +44,8 @@ import org.apache.commons.io.FileUtils;
 import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
 import eu.essi_lab.lib.net.dirlisting.WAFClient;
 import eu.essi_lab.lib.net.dirlisting.WAF_URL;
-import eu.essi_lab.lib.net.s3.S3TransferManager;
-import eu.essi_lab.lib.net.utils.Downloader;
+import eu.essi_lab.lib.net.downloader.Downloader;
+import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.utils.TarExtractor;
@@ -666,7 +666,7 @@ public class ONAMETConnector extends HarvestedQueryConnector<ONAMETConnectorSett
 
 		Downloader downloader = new Downloader();
 
-		Optional<InputStream> stream = downloader.downloadStream(fileUrl.toExternalForm());
+		Optional<InputStream> stream = downloader.downloadOptionalStream(fileUrl.toExternalForm());
 
 		GSLoggerFactory.getLogger(getClass()).debug("Downloading stream of nc file {} ENDED", fileUrl.toString());
 
@@ -731,7 +731,7 @@ public class ONAMETConnector extends HarvestedQueryConnector<ONAMETConnectorSett
 
 	Downloader downloader = new Downloader();
 
-	Optional<InputStream> stream = downloader.downloadStream(targGzURL.get().toExternalForm());
+	Optional<InputStream> stream = downloader.downloadOptionalStream(targGzURL.get().toExternalForm());
 
 	GSLoggerFactory.getLogger(getClass()).debug("Downloading of tar.gz at {} ENDED", targGzURL.get().toExternalForm());
 
@@ -847,9 +847,9 @@ public class ONAMETConnector extends HarvestedQueryConnector<ONAMETConnectorSett
      */
     private void uploadToS3(File file, ONAMETConnectorSetting setting) {
 
-	S3TransferManager manager = new S3TransferManager();
+	S3TransferWrapper manager = new S3TransferWrapper();
 	manager.setAccessKey(setting.getS3AccessKey().get());
-	manager.setSecreteKey(setting.getS3SecretKey().get());
+	manager.setSecretKey(setting.getS3SecretKey().get());
 
 	manager.uploadFile(file.getAbsolutePath(), setting.getS3BucketName().get());
     }

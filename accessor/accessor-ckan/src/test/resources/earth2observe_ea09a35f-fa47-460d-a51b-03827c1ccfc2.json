@@ -1,0 +1,332 @@
+{
+    "help": "https://wci.earth2observe.eu/data/api/3/action/help_show?name=package_show",
+    "success": true,
+    "result": {
+        "license_title": "Creative Commons Attribution Share-Alike",
+        "maintainer": "Ben Calton",
+        "relationships_as_object": [],
+        "private": false,
+        "maintainer_email": "bac@pml.ac.uk",
+        "num_tags": 26,
+        "id": "ea09a35f-fa47-460d-a51b-03827c1ccfc2",
+        "metadata_created": "2015-09-07T10:03:15.631102",
+        "metadata_modified": "2015-11-05T14:58:58.152979",
+        "author": "Alberto Martinez de La Torre",
+        "author_email": "albmar@ceh.ac.uk",
+        "state": "active",
+        "version": null,
+        "creator_user_id": "4fac4151-73c8-48d0-9919-a0797ad847b2",
+        "type": "dataset",
+        "resources": [
+            {
+                "mimetype": null,
+                "cache_url": null,
+                "hash": "",
+                "description": "",
+                "name": "WCS Endpoint",
+                "format": "WCS",
+                "url": "https://wci.earth2observe.eu/thredds/wcs/ceh/wrr1-daily-agg.nc?service=WCS&version=1.0.0&request=GetCapabilities",
+                "cache_last_updated": null,
+                "package_id": "ea09a35f-fa47-460d-a51b-03827c1ccfc2",
+                "created": "2015-09-07T11:03:16.667636",
+                "state": "active",
+                "mimetype_inner": null,
+                "webstore_last_updated": null,
+                "last_modified": null,
+                "position": 0,
+                "revision_id": "7809fcb1-451b-4ed1-b506-8f904dc9c7ff",
+                "webstore_url": null,
+                "url_type": null,
+                "id": "a6a738f3-080b-4260-bfbd-542ef668ecd1",
+                "resource_type": null,
+                "size": null
+            },
+            {
+                "mimetype": null,
+                "cache_url": null,
+                "hash": "",
+                "description": "",
+                "name": "WMS Endpoint",
+                "format": "WMS",
+                "url": "https://wci.earth2observe.eu/thredds/wms/ceh/wrr1-daily-agg.nc?service=WMS&version=1.3.0&request=GetCapabilities",
+                "cache_last_updated": null,
+                "package_id": "ea09a35f-fa47-460d-a51b-03827c1ccfc2",
+                "created": "2015-09-07T11:03:18.594741",
+                "state": "active",
+                "mimetype_inner": null,
+                "webstore_last_updated": null,
+                "last_modified": null,
+                "position": 1,
+                "revision_id": "cd630a84-4f08-4f55-a6b2-775ee1840c46",
+                "webstore_url": null,
+                "url_type": null,
+                "id": "9db80193-e310-4962-8111-4c2389781df9",
+                "resource_type": null,
+                "size": null
+            },
+            {
+                "mimetype": null,
+                "cache_url": null,
+                "hash": "",
+                "description": "",
+                "name": "OPENDAP Endpoint",
+                "format": "OPENDAP",
+                "url": "https://wci.earth2observe.eu/thredds/dodsC/ceh/wrr1-daily-agg.nc.html",
+                "cache_last_updated": null,
+                "package_id": "ea09a35f-fa47-460d-a51b-03827c1ccfc2",
+                "created": "2015-09-07T11:03:19.361149",
+                "state": "active",
+                "mimetype_inner": null,
+                "webstore_last_updated": null,
+                "last_modified": null,
+                "position": 2,
+                "revision_id": "7ef7d369-0468-476f-ad74-dba77e537a1a",
+                "webstore_url": null,
+                "url_type": null,
+                "id": "5ffa5ba5-02c4-4217-8641-04cb4c7749e8",
+                "resource_type": null,
+                "size": null
+            },
+            {
+                "mimetype": null,
+                "cache_url": null,
+                "hash": "",
+                "description": "",
+                "name": "Portal View",
+                "format": "Portal",
+                "url": "https://wci.earth2observe.eu/portal/?wms_url=https://wci.earth2observe.eu/thredds/wms/jrc/wrr1-daily-agg.nc?",
+                "cache_last_updated": null,
+                "package_id": "ea09a35f-fa47-460d-a51b-03827c1ccfc2",
+                "created": "2015-11-05T14:58:58.363383",
+                "state": "active",
+                "mimetype_inner": null,
+                "webstore_last_updated": null,
+                "last_modified": null,
+                "position": 3,
+                "revision_id": "ffa85220-8631-4857-b88f-3fa114012530",
+                "webstore_url": null,
+                "url_type": null,
+                "id": "88143409-c0b3-4c05-8d51-7711931863e0",
+                "resource_type": null,
+                "size": null
+            }
+        ],
+        "num_resources": 4,
+        "tags": [
+            {
+                "vocabulary_id": null,
+                "state": "active",
+                "display_name": "Average Surface Temperature",
+                "id": "758cba0f-60bc-42db-be32-67af0b7dc150",
+                "name": "Average Surface Temperature"
+            },
+            {
+                "vocabulary_id": null,
+                "state": "active",
+                "display_name": "Daily",
+                "id": "5439c338-24a6-4f0c-bfd8-f3bf41c4222c",
+                "name": "Daily"
+            },
+            {
+                "vocabulary_id": null,
+                "state": "active",
+                "display_name": "Interception Evaproation",
+                "id": "afa1be0b-0ef1-4f93-99e3-b8429e24c4dc",
+                "name": "Interception Evaproation"
+            },
+            {
+                "vocabulary_id": null,
+                "state": "active",
+                "display_name": "JULES",
+                "id": "cfb1f71e-6c63-4e46-af08-1857119de1a1",
+                "name": "JULES"
+            },
+            {
+                "vocabulary_id": null,
+                "state": "active",
+                "display_name": "Latent Heat Flux",
+                "id": "9d4674d1-f14a-4e0b-9672-1899f494e883",
+                "name": "Latent Heat Flux"
+            },
+            {
+                "vocabulary_id": null,
+                "state": "active",
+                "display_name": "Leaf Area Index",
+                "id": "daa416ff-55fb-41dd-be74-40d1af171382",
+                "name": "Leaf Area Index"
+            },
+            {
+                "vocabulary_id": null,
+                "state": "active",
+                "display_name": "Net Longwave Radiation",
+                "id": "4c1d95e4-c9b5-4cbf-b6f1-264776036f5c",
+                "name": "Net Longwave Radiation"
+            },
+            {
+                "vocabulary_id": null,
+                "state": "active",
+                "display_name": "Net Shortwave Radiation",
+                "id": "4edb6c31-a076-424a-9ae1-fbcdf75bfac9",
+                "name": "Net Shortwave Radiation"
+            },
+            {
+                "vocabulary_id": null,
+                "state": "active",
+                "display_name": "Rainfall",
+                "id": "f505fa49-e58d-47c2-bb96-27c33a077fde",
+                "name": "Rainfall"
+            },
+            {
+                "vocabulary_id": null,
+                "state": "active",
+                "display_name": "Root Zone Moisture",
+                "id": "9e90f864-8f82-4a4d-a5c6-639c51ea1528",
+                "name": "Root Zone Moisture"
+            },
+            {
+                "vocabulary_id": null,
+                "state": "active",
+                "display_name": "SWE Intercepted by the Vegetation",
+                "id": "dbc7cb74-597e-4fae-bc8f-1941ea95fbf5",
+                "name": "SWE Intercepted by the Vegetation"
+            },
+            {
+                "vocabulary_id": null,
+                "state": "active",
+                "display_name": "Sensible Heat Flux",
+                "id": "12145b17-c8ff-45b8-8e1c-24c3e4c7da67",
+                "name": "Sensible Heat Flux"
+            },
+            {
+                "vocabulary_id": null,
+                "state": "active",
+                "display_name": "Snow Covered Fraction",
+                "id": "c4dad342-a656-4520-9d69-314ac38d9c4a",
+                "name": "Snow Covered Fraction"
+            },
+            {
+                "vocabulary_id": null,
+                "state": "active",
+                "display_name": "Snow Depth",
+                "id": "c7a5031f-6006-4dbb-9b42-afc2c5a83834",
+                "name": "Snow Depth"
+            },
+            {
+                "vocabulary_id": null,
+                "state": "active",
+                "display_name": "Snow Melt",
+                "id": "a6b4d935-ef54-4ddc-8d5c-783da8879a6d",
+                "name": "Snow Melt"
+            },
+            {
+                "vocabulary_id": null,
+                "state": "active",
+                "display_name": "Snow Water Equivalent",
+                "id": "a0a8a7a7-2a26-47da-8457-3357ef2f1865",
+                "name": "Snow Water Equivalent"
+            },
+            {
+                "vocabulary_id": null,
+                "state": "active",
+                "display_name": "Soil Surface Moisture",
+                "id": "89f7c8f0-bc4f-4d91-874f-1cb9474e62d2",
+                "name": "Soil Surface Moisture"
+            },
+            {
+                "vocabulary_id": null,
+                "state": "active",
+                "display_name": "Subsurface Runoff",
+                "id": "00a4deea-d5b8-4f1e-8f84-ede908f65e1a",
+                "name": "Subsurface Runoff"
+            },
+            {
+                "vocabulary_id": null,
+                "state": "active",
+                "display_name": "Surface Albedo",
+                "id": "fb3315f9-a42b-4c1e-aaba-c8bfaec0390c",
+                "name": "Surface Albedo"
+            },
+            {
+                "vocabulary_id": null,
+                "state": "active",
+                "display_name": "Surface Runoff",
+                "id": "c2675560-28c1-4d18-9a4b-ebb9d7fc2670",
+                "name": "Surface Runoff"
+            },
+            {
+                "vocabulary_id": null,
+                "state": "active",
+                "display_name": "Total Canopy Water Storage",
+                "id": "06d12260-7f9d-41bb-9549-6c606895a62f",
+                "name": "Total Canopy Water Storage"
+            },
+            {
+                "vocabulary_id": null,
+                "state": "active",
+                "display_name": "Total Evapotranspiration",
+                "id": "835251f5-09d0-4df1-a8a3-29a345f7baae",
+                "name": "Total Evapotranspiration"
+            },
+            {
+                "vocabulary_id": null,
+                "state": "active",
+                "display_name": "Total Precipitation",
+                "id": "dbade1d4-467d-4d09-94a8-4e7227fcd417",
+                "name": "Total Precipitation"
+            },
+            {
+                "vocabulary_id": null,
+                "state": "active",
+                "display_name": "Total Runoff",
+                "id": "3411194a-ba02-437c-b21c-d9d82c46d4dd",
+                "name": "Total Runoff"
+            },
+            {
+                "vocabulary_id": null,
+                "state": "active",
+                "display_name": "Total Soil Moisture",
+                "id": "af061bca-f4e1-4d4c-bc11-7a0f4cc0143c",
+                "name": "Total Soil Moisture"
+            },
+            {
+                "vocabulary_id": null,
+                "state": "active",
+                "display_name": "wrr1",
+                "id": "c1b03867-1551-470a-87ff-6c0791dfec82",
+                "name": "wrr1"
+            }
+        ],
+        "groups": [{
+            "display_name": "eartH2Observe",
+            "description": "EartH2Observe \u201cGlobal Earth Observation for Integrated Water Resource Assessment\u201d is a collaborative project funded under the DG Research FP7 programme. The project begun in January 2014 and will run for 4 years, until the end of 2017. The overall objective is to contribute to the assessment of global water resources through the use of new Earth Observation datasets and techniques. For this purpose, the project will integrate available earth observations, in-situ datasets and models, to construct a consistent global water resources reanalysis dataset of sufficient length (at least 30 years). The resulting datasets will be made available through an open Water Cycle Integrator data portal: the European contribution to the GEOSS/WCI approach. The datasets will be downscaled for application in case-studies at regional and local levels, and optimized based on identified European and local needs supporting water management and decision making.",
+            "image_display_url": "https://rsg.pml.ac.uk/ckan/uploads/group/earth2observe.png",
+            "title": "eartH2Observe",
+            "id": "032afa76-19d9-4ad7-9310-9c10503f3fa6",
+            "name": "earth2observe"
+        }],
+        "license_id": "cc-by-sa",
+        "relationships_as_subject": [],
+        "organization": {
+            "description": "The Centre for Ecology & Hydrology (CEH) is a world-class research organisation focusing on land and freshwater ecosystems and their interaction with the atmosphere.\n\nFor more information, visit [http://www.ceh.ac.uk](http://www.ceh.ac.uk)",
+            "created": "2015-09-07T10:59:07.725374",
+            "title": "CEH",
+            "name": "ceh",
+            "is_organization": true,
+            "state": "active",
+            "image_url": "ceh.png",
+            "revision_id": "f31c740b-196b-4543-9f0b-cc887b634861",
+            "type": "organization",
+            "id": "fc992646-7e75-45eb-a92b-5d491e94abb9",
+            "approval_status": "approved"
+        },
+        "name": "ceh-wrr1-daily-agg",
+        "isopen": true,
+        "url": null,
+        "notes": "Daily Water Resource Re-analysis data produced by CEH as part of the eartH2Observe project.",
+        "owner_org": "fc992646-7e75-45eb-a92b-5d491e94abb9",
+        "extras": [],
+        "license_url": "http://www.opendefinition.org/licenses/cc-by-sa",
+        "title": "CEH Water Resource Re-analysis v1 - daily (aggregated)",
+        "revision_id": "b7b3da43-7e4b-4aca-b947-6729bb6f61ae"
+    }
+}

@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.wfs;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,7 +31,7 @@ import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.pdk.handler.WebRequestHandler;
@@ -77,8 +77,8 @@ public abstract class WFSQueryHandler implements WebRequestHandler, WebRequestVa
 	return null;
     }
 
-    public StorageUri getStorageURI(DiscoveryMessage message) throws GSException {
-	StorageUri storageUri = ConfigurationWrapper.getDatabaseURI();
+    public StorageInfo getStorageURI(DiscoveryMessage message) throws GSException {
+	StorageInfo storageUri = ConfigurationWrapper.getDatabaseURI();
 	if (storageUri != null) {
 
 	    message.setDataBaseURI(storageUri);

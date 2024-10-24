@@ -1,0 +1,4 @@
+eu.essi_lab.accessor.bndmet.BNDMETAccessor
+eu.essi_lab.accessor.apitempo.APITempoAccessor
+eu.essi_lab.bufr.BUFRAccessor
+eu.essi_lab.accessor.inmet.INMETAccessor

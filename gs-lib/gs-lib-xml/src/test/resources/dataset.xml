@@ -1,0 +1,23 @@
+<gs:Dataset gs:resourceType="dataset" xmlns:gs="http://flora.eu/gi-suite/1.0/dataModel/schema" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><gs:harmonizedMetadata/><gs:originalMetadata/><gs:indexesMetadata><gs:sourceId>uk-nrfa</gs:sourceId><gs:Country>United Kingdom of Great Britain and Northern Ireland</gs:Country><gs:platformTitle>Irvine at Shewalton</gs:platformTitle><gs:uniquePlatformId>00097A849F94A7508A2E0598FC1F93FF2A9A604F</gs:uniquePlatformId><gs:bbox>
+    <gs:sw>55.59709 -4.62779</gs:sw>
+    <gs:se>55.59709 -4.62779</gs:se>
+    <gs:nw>55.59709 -4.62779</gs:nw>
+    <gs:ne>55.59709 -4.62779</gs:ne>
+    <gs:isCrossed>false</gs:isCrossed>
+    <gs:area>0</gs:area>
+    <gs:center>55.59709 -4.62779</gs:center>
+    <gs:disjValues>
+        <gs:disjSouth>55.59709</gs:disjSouth>
+        <gs:disjWest>-4.62779</gs:disjWest>
+        <gs:disjNorth>55.59709</gs:disjNorth>
+        <gs:disjEast>-4.62779</gs:disjEast>
+    </gs:disjValues>
+    <gs:cardinalValues>
+        <gs:values>
+            <gs:south>55.59709</gs:south>
+            <gs:west>-4.62779</gs:west>
+            <gs:east>-4.62779</gs:east>
+            <gs:north>55.59709</gs:north>
+        </gs:values>
+    </gs:cardinalValues>
+</gs:bbox></gs:indexesMetadata></gs:Dataset>

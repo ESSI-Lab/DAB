@@ -1,0 +1,18 @@
+{
+    "help": "http://drdsi.jrc.ec.europa.eu/api/3/action/help_show?name=package_list",
+    "success": true,
+    "result": [
+        "__",
+        "06-08-2015-administrative-units",
+        "__1",
+        "__10",
+        "10-daily-water-bodies-over-africa-1km-continents",
+        "10-daily-water-bodies-over-africa-1km-tiles",
+        "10m-wind-direction-daily-gridded-dataset-croatia",
+        "10m-wind-direction-daily-gridded-dataset-czech-republic",
+        "10m-wind-direction-daily-gridded-dataset-hungary",
+        "10m-wind-direction-daily-gridded-dataset-poland",
+        "10m-wind-direction-daily-gridded-dataset-romania",
+        "10m-wind-direction-daily-gridded-dataset-serbia"
+    ]
+}

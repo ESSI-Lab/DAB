@@ -4,3 +4,5 @@ eu.essi_lab.validator.netcdf.NetCDFGridValidator
 eu.essi_lab.validator.netcdf.classic.NetCDF3TimeSeriesValidator
 eu.essi_lab.validator.netcdf.NetCDF4TimeSeriesValidator
 eu.essi_lab.validator.netcdf.NetCDFTimeSeriesValidator
+eu.essi_lab.validator.netcdf.NetCDF4TrajectoryValidator
+eu.essi_lab.validator.netcdf.NetCDFTrajectoryValidator

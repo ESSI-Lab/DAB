@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wcs:CoverageDescription xmlns:wcs="http://www.opengis.net/wcs"
+   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ogc="http://www.opengis.net/ogc"
+   xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:gml="http://www.opengis.net/gml"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.opengis.net/wcs http://sedac.ciesin.columbia.edu:80/geoserver/schemas/wcs/1.0.0/describeCoverage.xsd"
+   version="1.0.0">
+   <wcs:CoverageOffering>
+      <wcs:metadataLink metadataType="FGDC" xlink:type="simple"
+         xlink:href="http://sedac.ciesin.columbia.edu/data/set/wildareas-v3-1993-human-footprint/metadata"/>
+      <wcs:description>Generated from GeoTIFF</wcs:description>
+      <wcs:name>wildareas-v3:wildareas-v3-1993-human-footprint</wcs:name>
+      <wcs:label>1993 Human Footprint</wcs:label>
+      <wcs:lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+         <gml:pos>-179.999999909593 -55.791667932392016</gml:pos>
+         <gml:pos>179.99661110853617 83.66621130702998</gml:pos>
+      </wcs:lonLatEnvelope>
+      <wcs:keywords>
+         <wcs:keyword>conservation</wcs:keyword>
+         <wcs:keyword>wildareas-v3-1993-human-footprint</wcs:keyword>
+      </wcs:keywords>
+      <wcs:domainSet>
+         <wcs:spatialDomain>
+            <gml:Envelope srsName="EPSG:4326">
+               <gml:pos>-179.999999909593 -55.791667932392016</gml:pos>
+               <gml:pos>179.99661110853617 83.66621130702998</gml:pos>
+            </gml:Envelope>
+            <gml:RectifiedGrid dimension="2" srsName="EPSG:4326">
+               <gml:limits>
+                  <gml:GridEnvelope>
+                     <gml:low>0 0</gml:low>
+                     <gml:high>36389 14096</gml:high>
+                  </gml:GridEnvelope>
+               </gml:limits>
+               <gml:axisName>x</gml:axisName>
+               <gml:axisName>y</gml:axisName>
+               <gml:origin>
+                  <gml:pos>-179.99505354230777 83.66126493974477</gml:pos>
+               </gml:origin>
+               <gml:offsetVector>0.009892734570434986 0.0</gml:offsetVector>
+               <gml:offsetVector>0.0 -0.009892734570434986</gml:offsetVector>
+            </gml:RectifiedGrid>
+         </wcs:spatialDomain>
+      </wcs:domainSet>
+      <wcs:rangeSet>
+         <wcs:RangeSet>
+            <wcs:name>wildareas-v3-1993-human-footprint</wcs:name>
+            <wcs:label>1993 Human Footprint</wcs:label>
+            <wcs:axisDescription>
+               <wcs:AxisDescription>
+                  <wcs:name>Band</wcs:name>
+                  <wcs:label>Band</wcs:label>
+                  <wcs:values>
+                     <wcs:singleValue>1</wcs:singleValue>
+                  </wcs:values>
+               </wcs:AxisDescription>
+            </wcs:axisDescription>
+         </wcs:RangeSet>
+      </wcs:rangeSet>
+      <wcs:supportedCRSs/>
+      <wcs:supportedFormats nativeFormat="GeoTIFF">
+         <wcs:formats>GeoTIFF</wcs:formats>
+         <wcs:formats>GIF</wcs:formats>
+         <wcs:formats>JPEG</wcs:formats>
+         <wcs:formats>PNG</wcs:formats>
+         <wcs:formats>TIFF</wcs:formats>
+      </wcs:supportedFormats>
+      <wcs:supportedInterpolations default="nearest neighbor">
+         <wcs:interpolationMethod>nearest neighbor</wcs:interpolationMethod>
+         <wcs:interpolationMethod>bilinear</wcs:interpolationMethod>
+         <wcs:interpolationMethod>bicubic</wcs:interpolationMethod>
+      </wcs:supportedInterpolations>
+   </wcs:CoverageOffering>
+</wcs:CoverageDescription>

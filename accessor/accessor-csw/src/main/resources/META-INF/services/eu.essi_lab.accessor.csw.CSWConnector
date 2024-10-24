@@ -19,4 +19,7 @@ eu.essi_lab.accessor.csw.CSWCMEMSConnector
 eu.essi_lab.accessor.csw.CSWUNESCO_IHPConnector
 eu.essi_lab.accessor.csw.CSWC3SConnector
 eu.essi_lab.accessor.csw.CSWBLUECLOUDConnector
+eu.essi_lab.accessor.csw.CSWTHREDDSConnector
 eu.essi_lab.accessor.csw.CSWDIONEConnector
+eu.essi_lab.accessor.csw.CSWEMODNETConnector
+eu.essi_lab.accessor.csw.CSWAGAMEConnector

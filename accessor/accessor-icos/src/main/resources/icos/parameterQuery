@@ -1,0 +1,2 @@
+prefix skos: <http://www.w3.org/2004/02/skos/core#>
+select ?obj where{<${PARAMETER_URI}> skos:exactMatch ?obj}

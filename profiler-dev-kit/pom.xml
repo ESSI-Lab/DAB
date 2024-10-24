@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -13,6 +12,11 @@
 	<artifactId>profiler-dev-kit</artifactId>
 
 	<dependencies>
+
+		<dependency>
+		    <groupId>redis.clients</groupId>
+		    <artifactId>jedis</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>org.json</groupId>
@@ -36,8 +40,8 @@
 			<artifactId>configuration-api</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-    
-    	<dependency>
+
+		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>configuration-api-gs</artifactId>
 			<version>${project.parent.version}</version>
@@ -59,33 +63,26 @@
 		<dependency>
 			<groupId>eu.essi_lab</groupId>
 			<artifactId>runtime-info-provider</artifactId>
-			<version>${project.version}</version>
+			<version>${project.parent.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>eu.essi_lab</groupId>
 			<artifactId>gs-driver-elasticsearch</artifactId>
-			<version>${project.version}</version>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>gs-lib-eiffel-api</artifactId>
+			<version>${project.parent.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>eu.essi_lab</groupId>
 			<artifactId>views</artifactId>
-			<version>${project.version}</version>
-
-			<exclusions>
-				<exclusion>
-					<groupId>${project.parent.groupId}</groupId>
-					<artifactId>database-api</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>${project.parent.groupId}</groupId>
-					<artifactId>database-api-marklogic-impl</artifactId>
-				</exclusion>
-			</exclusions>
-
+			<version>${project.parent.version}</version>
 		</dependency>
-
 
 	</dependencies>
 

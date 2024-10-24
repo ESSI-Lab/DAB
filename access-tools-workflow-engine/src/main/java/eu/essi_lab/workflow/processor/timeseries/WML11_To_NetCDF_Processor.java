@@ -4,7 +4,7 @@ package eu.essi_lab.workflow.processor.timeseries;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -408,12 +408,14 @@ public class WML11_To_NetCDF_Processor extends DataProcessor {
 		GeoLocation geoLocation1 = siteInfo.getGeoLocation();
 		if (geoLocation1 != null) {
 		    GeogLocationType geoLocation = geoLocation1.getGeogLocation();
-		    if (geoLocation instanceof LatLonPointType) {
-			LatLonPointType point = (LatLonPointType) geoLocation;
-			station.setLatitude(point.getLatitude()); // 3) lat-lon
-			station.setLongitude(point.getLongitude());
-		    } else {
-			throw new RuntimeException("Found unexpected geometry");
+		    if (geoLocation != null) {
+			if (geoLocation instanceof LatLonPointType) {
+			    LatLonPointType point = (LatLonPointType) geoLocation;
+			    station.setLatitude(point.getLatitude()); // 3) lat-lon
+			    station.setLongitude(point.getLongitude());
+			} else {
+			    throw new RuntimeException("Found unexpected geometry");
+			}
 		    }
 		}
 		station.setAltitude(siteInfo.getElevationM()); // 4) elevation
@@ -480,12 +482,12 @@ public class WML11_To_NetCDF_Processor extends DataProcessor {
     }
 
     private GSException getGSException(String message) {
-	
+
 	return GSException.createException(//
-		getClass(),//
-		message,//
-		ErrorInfo.ERRORTYPE_INTERNAL,//
-		ErrorInfo.SEVERITY_ERROR,//
+		getClass(), //
+		message, //
+		ErrorInfo.ERRORTYPE_INTERNAL, //
+		ErrorInfo.SEVERITY_ERROR, //
 		WML_11_TO_NETCDF_ERROR);
 
     }

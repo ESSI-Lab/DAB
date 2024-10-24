@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<timeSeriesResponse xmlns="http://www.cuahsi.org/waterML/1.1/"
+                    xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <queryInfo>
+      <creationTime>2019-09-06T09:51:05+00:00</creationTime>
+      <criteria MethodCalled="GetValues">
+         <parameter name="site" value="hsl-emr:ALBARETOAGRO"/>
+         <parameter name="variable" value="hsl-emr:Precipitation"/>
+         <parameter name="startDate" value="2016-01-01T09:00:00"/>
+         <parameter name="endDate" value="2016-01-01T09:00:00"/>
+      </criteria>
+   </queryInfo>
+   <timeSeries>
+      <sourceInfo xsi:type="SiteInfoType">
+         <siteName>ALBARETOAGRO</siteName>
+         <siteCode network="hsl-emr" siteID="2">ALBARETOAGRO</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>44.58726</latitude>
+               <longitude>10.95149</longitude>
+            </geogLocation>
+         </geoLocation>
+      </sourceInfo>
+      <variable>
+         <variableCode default="true" variableID="2" vocabulary="hsl-emr">Precipitation</variableCode>
+         <variableName>Precipitation</variableName>
+         <valueType>Field Observation</valueType>
+         <dataType>Cumulative</dataType>
+         <generalCategory>Hydrology</generalCategory>
+         <sampleMedium>Precipitation</sampleMedium>
+         <unit>
+            <unitName>millimeter</unitName>
+            <unitType>Length</unitType>
+            <unitAbbreviation>mm</unitAbbreviation>
+            <unitCode>54</unitCode>
+         </unit>
+         <noDataValue>-9999</noDataValue>
+         <timeScale isRegular="false">
+            <unit>
+               <unitName>day</unitName>
+               <unitType>Time</unitType>
+               <unitAbbreviation>d</unitAbbreviation>
+               <unitCode>104</unitCode>
+            </unit>
+            <timeSupport>1</timeSupport>
+         </timeScale>
+         <speciation>Not Applicable</speciation>
+      </variable>
+      <values>
+         <value censorCode="nc"
+                dateTime="2016-01-01 09:00:00"
+                dateTimeUTC="2016-01-01 08:00:00"
+                methodCode="0"
+                qualityControlLevelCode="-9999"
+                sourceCode="1"
+                timeOffset="1">-9999</value>
+         <qualityControlLevel qualityControlLevelID="-9999">
+            <qualityControlLevelCode>-9999</qualityControlLevelCode>
+            <definition>Unknown</definition>
+            <explanation>The quality control level is unknown</explanation>
+         </qualityControlLevel>
+         <qualityControlLevel qualityControlLevelID="1">
+            <qualityControlLevelCode>1</qualityControlLevelCode>
+            <definition>Quality controlled data</definition>
+            <explanation>Quality controlled data that have passed quality assurance procedures such as routine estimation of timing and sensor calibration or visual inspection and removal of obvious errors. An example is USGS published streamflow records following parsing through USGS quality control procedures.</explanation>
+         </qualityControlLevel>
+         <method methodID="0">
+            <methodCode>0</methodCode>
+            <methodDescription>No method specified</methodDescription>
+            <methodLink/>
+         </method>
+         <source sourceID="1">
+            <sourceCode>1</sourceCode>
+            <organization>ARPA-EMR</organization>
+            <sourceDescription>ARPA-EMR</sourceDescription>
+            <contactInformation>
+               <contactName>Tonelli</contactName>
+               <typeOfContact>main</typeOfContact>
+               <email>ftonelli@arpa.emr.it</email>
+               <phone>333</phone>
+               <address xsi:type="xsd:string">ARPA-EMR, Parma, Italia, 333</address>
+            </contactInformation>
+            <sourceLink/>
+            <citation>Mah</citation>
+         </source>
+         <censorCode>
+            <censorCode>nc</censorCode>
+            <censorCodeDescription>not censored</censorCodeDescription>
+         </censorCode>
+      </values>
+   </timeSeries>
+</timeSeriesResponse>

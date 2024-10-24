@@ -4,7 +4,7 @@ package eu.essi_lab.augmenter.worker;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -73,7 +73,7 @@ public class AugmentationReportsHandler {
 	message += "Name: " + setting.getAugmentationJobName() + "\n";
 	message += "Max records: " + setting.getMaxRecords() + "\n";
 	message += "Less recent ordering ordering set: " + setting.isLessRecentOrderingSet() + "\n";
-	message += "Time back: " + setting.getTimeBack() + "\n";
+	message += "Time back: " + setting.getMaxAge() + "\n";
 	message += "\nSelected sources: \n";
 
 	for (GSSource source : setting.getSelectedSources()) {

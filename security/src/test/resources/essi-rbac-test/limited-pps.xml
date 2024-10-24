@@ -1,0 +1,75 @@
+<PolicySet
+	xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 https://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd"
+	PolicySetId="PPS:limited:role" Version="1.0"
+	PolicyCombiningAlgId="urn:oasis:names:tc:xacml:3.0:policy-combining-algorithm:permit-overrides">
+
+	<Target />
+
+	<Policy PolicyId="Permissions:specifically:for:the:limited:role"
+
+		Version="1.0"
+		RuleCombiningAlgId="urn:oasis:names:tc:xacml:3.0:rule-combining-algorithm:permit-overrides">
+
+		<Target />
+
+		<!-- 		
+			Discovery is limited to a specific set of sources
+		-->
+
+		<Rule RuleId="Permission:to:discover" Effect="Permit">
+
+			<Target>
+
+				<AnyOf>
+					<AllOf>
+						<Match
+							MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+
+							<AttributeValue
+								DataType="http://www.w3.org/2001/XMLSchema#string">discover</AttributeValue>
+
+							<AttributeDesignator 
+								MustBePresent="true"
+								Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action"
+								AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+								DataType="http://www.w3.org/2001/XMLSchema#string" />
+
+						</Match>
+					</AllOf>
+				</AnyOf>
+
+			</Target>
+
+			<Condition>
+
+				<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of-all">
+
+					<Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal" />
+				
+					<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+
+						<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">source1</AttributeValue>
+						<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">source2</AttributeValue>
+						<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">source3</AttributeValue>
+					
+					</Apply>
+
+					<AttributeDesignator 
+								MustBePresent="true"
+								Issuer="source"
+								AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id"
+								Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+								DataType="http://www.w3.org/2001/XMLSchema#string" />
+
+				</Apply>
+
+					
+			</Condition>
+			
+		</Rule>
+
+	</Policy>
+
+</PolicySet>

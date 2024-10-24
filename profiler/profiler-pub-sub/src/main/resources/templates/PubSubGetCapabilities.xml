@@ -36,7 +36,7 @@
         <ows:ProviderName>ESSI Lab</ows:ProviderName>
         <ows:ProviderSite xlink:href="http://essi-lab.eu"/>
         <ows:ServiceContact>
-            <ows:IndividualName>The DAB team</ows:IndividualName>
+            <ows:IndividualName>The GI-project team</ows:IndividualName>
             <ows:PositionName>provider</ows:PositionName>
             <ows:ContactInfo>
                 <ows:Address>

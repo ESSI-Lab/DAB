@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.waf.onamet;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import eu.essi_lab.augmenter.ResourceAugmenter;
-import eu.essi_lab.lib.net.s3.S3TransferManager;
+import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
@@ -130,9 +130,9 @@ public class ONAMETAugmenter extends ResourceAugmenter<ONAMETAugmenterSetting> {
 		    GSLoggerFactory.getLogger(getClass()).debug("Deleting nc file {} from S3 bucket {} STARTED", ncFile.getName(),
 			    s3BucketName.get());
 
-		    S3TransferManager manager = new S3TransferManager();
+		    S3TransferWrapper manager = new S3TransferWrapper();
 		    manager.setAccessKey(getSetting().getS3AccessKey().get());
-		    manager.setSecreteKey(getSetting().getS3SecretKey().get());
+		    manager.setSecretKey(getSetting().getS3SecretKey().get());
 
 		    manager.deleteObject(s3BucketName.get(), ncFile.getName());
 

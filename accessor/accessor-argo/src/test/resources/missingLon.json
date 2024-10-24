@@ -1,0 +1,557 @@
+{
+"wmo": "1900936",
+"serialInst": "2645",
+"serialIMEI": null,
+"platform": {
+"code": "1900936",
+"name": "APEX Profiling Float",
+"description": "Argo UK",
+"comment": null,
+"activity": null,
+"type": "APEX"
+},
+"sensors": [
+{
+"dimLevel": 1,
+"id": "CTD_PRES",
+"maker": "DRUCK",
+"model": "DRUCK_2900PSIA",
+"serial": "2952897",
+"units": "dbar",
+"accuracy": 2.4,
+"resolution": 0.1
+},
+{
+"dimLevel": 2,
+"id": "CTD_TEMP",
+"maker": "SBE",
+"model": "SBE41",
+"serial": "2671",
+"units": "Celsius_degree",
+"accuracy": 0.002,
+"resolution": 0.001
+},
+{
+"dimLevel": 3,
+"id": "CTD_CNDC",
+"maker": "SBE",
+"model": "SBE41",
+"serial": "2671",
+"units": "psu",
+"accuracy": 0.005,
+"resolution": 0.001
+}
+],
+"parameters": [
+{
+"dimLevel": 1,
+"id": "CTD_PRES",
+"units": "decibar",
+"accuracy": "2.4",
+"resolution": "0.1"
+},
+{
+"dimLevel": 2,
+"id": "CTD_TEMP",
+"units": "degree_Celsius",
+"accuracy": "0.002",
+"resolution": "0.001"
+},
+{
+"dimLevel": 3,
+"id": "CTD_PSAL",
+"units": "psu",
+"accuracy": "0.005",
+"resolution": "0.001"
+}
+],
+"transmissionSystem": "ARGOS",
+"alertStatus": 0,
+"battery": {
+"level": null,
+"status": "ok",
+"sourceParameter": null
+},
+"maker": "WRC",
+"model": "APEX-SBE",
+"firmwareVersion": "110604",
+"prVersion": null,
+"projectName": "Argo UK",
+"lastFlagSuperHydraulicAlert": "-",
+"configDataList": [
+{
+"argoCode": "CONFIG_AscentTime_hours",
+"value": 9
+},
+{
+"argoCode": "CONFIG_DownTime_hours",
+"value": 227
+},
+{
+"argoCode": "CONFIG_OkVacuum_COUNT",
+"value": 115
+},
+{
+"argoCode": "CONFIG_ParkAndProfileCycleCounter_COUNT",
+"value": 1
+},
+{
+"argoCode": "CONFIG_ParkPressure_dbar",
+"value": 1000
+},
+{
+"argoCode": "CONFIG_PistonFullExtension_COUNT",
+"value": 248
+},
+{
+"argoCode": "CONFIG_PistonPark_COUNT",
+"value": 85
+},
+{
+"argoCode": "CONFIG_PistonPositionBallast_COUNT",
+"value": 100
+},
+{
+"argoCode": "CONFIG_PistonPositionPressureActivation_COUNT",
+"value": 100
+},
+{
+"argoCode": "CONFIG_PistonProfile_COUNT",
+"value": 25
+},
+{
+"argoCode": "CONFIG_PressureBladderTarget_dbar",
+"value": 149
+},
+{
+"argoCode": "CONFIG_ProfilePressure_dbar",
+"value": 2000
+},
+{
+"argoCode": "CONFIG_SlowAscentPistonAdjustment_COUNT",
+"value": 12
+},
+{
+"argoCode": "CONFIG_TimeStartFirstDescentToStartFirstAscent_hours",
+"value": 227
+},
+{
+"argoCode": "CONFIG_TransmissionRepetitionPeriod_seconds",
+"value": 44
+},
+{
+"argoCode": "CONFIG_UpTime_hours",
+"value": 13
+}
+],
+"alertErrorFlags": [],
+"alertWarningFlags": [],
+"alertInfoFlags": [],
+"institution": {
+"code": null,
+"name": null
+},
+"dataCenter": {
+"code": "BO",
+"name": "BODC"
+},
+"owner": "UK Met Office",
+"projects": [
+"Argo UK"
+],
+"networks": [
+"CORE"
+],
+"variables": [
+"SUBSURFACE PRESSURE",
+"SUBSURFACE SALINITY",
+"SUBSURFACE TEMPERATURE"
+],
+"ptt": "63361",
+"deployment": {
+"launchDate": "2006-09-12T09:55:00.000+00:00",
+"year": null,
+"platform": "SA AGULHAS",
+"cruiseName": null,
+"profilerExperimentId": "Argo UK",
+"principalInvestigatorName": "Jon Turton",
+"lat": -34.99,
+"lon": 0,
+"qc": 1
+},
+"lastCycleBasicInfo": {
+"numCycle": 0,
+"lat": null,
+"lon": null,
+"positionQc": null,
+"date": null,
+"dateQc": null,
+"pMax": null,
+"grounded": false,
+"nLevelMax": null,
+"surfaceDate": null,
+"bottomMeasure": {
+"platformCode": null,
+"cycleNumber": null,
+"direction": null,
+"time": null,
+"timeQc": null,
+"latitude": null,
+"longitude": null,
+"positionQc": null,
+"pres": null,
+"presQc": null,
+"temp": null,
+"tempQc": null,
+"psal": null,
+"psalQc": null
+},
+"surfaceMeasure": {
+"platformCode": null,
+"cycleNumber": null,
+"direction": null,
+"time": null,
+"timeQc": null,
+"latitude": null,
+"longitude": null,
+"positionQc": null,
+"pres": null,
+"presQc": null,
+"temp": null,
+"tempQc": null,
+"psal": null,
+"psalQc": null
+}
+},
+"cycles": [],
+"cycleIds": [],
+"locations": [],
+"calibrations": [
+{
+"dimLevel": 1,
+"parameter": "PRES",
+"equation": "n/a",
+"coeff": "n/a",
+"comment": "n/a"
+},
+{
+"dimLevel": 2,
+"parameter": "TEMP",
+"equation": "n/a",
+"coeff": "n/a",
+"comment": "n/a"
+},
+{
+"dimLevel": 3,
+"parameter": "PSAL",
+"equation": "n/a",
+"coeff": "n/a",
+"comment": "n/a"
+}
+],
+"configurations": {
+"techs": [
+{
+"id": 8,
+"code": "PR_LAUNCH_DATETIME",
+"description": "Profiler LAUNCH DATETIME",
+"value": "12/09/2006 09:55:00"
+},
+{
+"id": 9,
+"code": "PR_LAUNCH_LATITUDE",
+"description": "Profiler LAUNCH LATITUDE",
+"value": "-34.99"
+},
+{
+"id": 10,
+"code": "PR_LAUNCH_LONGITUDE",
+"description": "Profiler LAUNCH LONGITUDE",
+"value": "0"
+},
+{
+"id": 13,
+"code": "PR_PROBE_CODE",
+"description": "Profiler PROBE CODE",
+"value": "846"
+},
+{
+"id": 15,
+"code": "PR_EXPERIMENT_ID",
+"description": "Profiler EXPERIMENT ID",
+"value": "Argo UK"
+},
+{
+"id": 19,
+"code": "PF_ACTIVITY_FLAG",
+"description": "Platform activity flag",
+"value": "I"
+},
+{
+"id": 376,
+"code": "DATA_CENTRE",
+"description": "Data centre in charge of platform data processing",
+"value": "BO"
+},
+{
+"id": 377,
+"code": "POSITIONING_SYSTEM",
+"description": "Positioning system",
+"value": "ARGOS"
+},
+{
+"id": 384,
+"code": "PTT",
+"description": "Transmission identifier (ARGOS, ORBCOMM, etc.)",
+"value": "63361"
+},
+{
+"id": 385,
+"code": "TRANS_SYSTEM",
+"description": "The telecommunications system used",
+"value": "ARGOS"
+},
+{
+"id": 386,
+"code": "TRANS_SYSTEM_ID",
+"description": "The program identifier used by the transmission system",
+"value": "02274"
+},
+{
+"id": 387,
+"code": "TRANS_FREQUENCY",
+"description": "The frequency of transmission from the float",
+"value": "n/a"
+},
+{
+"id": 388,
+"code": "TRANS_REPETITION",
+"description": "The repetition rate of transmission from the float",
+"value": "44"
+},
+{
+"id": 390,
+"code": "PLATFORM_MODEL",
+"description": "Model of the float",
+"value": "APEX-SBE"
+},
+{
+"id": 391,
+"code": "PLATFORM_MAKER",
+"description": "The name of the manufacturer",
+"value": "WRC"
+},
+{
+"id": 392,
+"code": "INST_REFERENCE",
+"description": "Instrument type",
+"value": "2645"
+},
+{
+"id": 393,
+"code": "DIRECTION",
+"description": "Direction of the profiles",
+"value": "A"
+},
+{
+"id": 394,
+"code": "PI_NAME",
+"description": "Name of the principal investigator",
+"value": "Jon Turton"
+},
+{
+"id": 395,
+"code": "ANOMALY",
+"description": "Describe any anomalies or problems the float may have had.",
+"value": "n/a"
+},
+{
+"id": 396,
+"code": "LAUNCH_QC",
+"description": "Quality on launch date, time and location",
+"value": "1"
+},
+{
+"id": 397,
+"code": "START_DATE",
+"description": "Date (UTC) of the first descent of the float.",
+"value": "12/09/2006 15:32:26"
+},
+{
+"id": 398,
+"code": "START_DATE_QC",
+"description": "Quality on start date",
+"value": "1"
+},
+{
+"id": 399,
+"code": "DEPLOY_PLATFORM",
+"description": "Identifier of the deployment platform",
+"value": "SA AGULHAS"
+},
+{
+"id": 401,
+"code": "DEPLOY_AVAILABLE_PROFILE_ID",
+"description": "Identifier of stations used to verify the first profile",
+"value": "n/a"
+},
+{
+"id": 419,
+"code": "REPETITION_RATE",
+"description": "The number of times this cycle repeats",
+"value": "1"
+},
+{
+"id": 438,
+"code": "PROJECT_NAME",
+"description": "Name of the project",
+"value": "Argo UK"
+},
+{
+"id": 441,
+"code": "LOADING_ID",
+"description": "The related loading id",
+"value": "60218154"
+},
+{
+"id": 482,
+"code": "METADATA_DATE_UPDATE",
+"description": "Date of last update of the metadata of the platform",
+"value": "16/04/2021 06:13:31"
+},
+{
+"id": 570,
+"code": "NETWORK_NAME",
+"description": "Name of the network related to the platform",
+"value": "GROUP"
+},
+{
+"id": 961,
+"code": "FIRMWARE_VERSION",
+"description": "Firmware version",
+"value": "110604"
+},
+{
+"id": 1244,
+"code": "MANUAL_VERSION",
+"description": "The manual version for the float",
+"value": "n/a"
+},
+{
+"id": 1245,
+"code": "FLOAT_SERIAL_NO",
+"description": "The serial number of the float",
+"value": "2645"
+},
+{
+"id": 1246,
+"code": "STANDARD_FORMAT_ID",
+"description": "A standard format number to describe the data format for each float",
+"value": "001018"
+},
+{
+"id": 1247,
+"code": "DAC_FORMAT_ID",
+"description": "The format number used by the DAC to describe the data format type for each float",
+"value": "A31AA"
+},
+{
+"id": 1248,
+"code": "BATTERY_TYPE",
+"description": "The type of battery packs in the float",
+"value": "Alkaline"
+},
+{
+"id": 1249,
+"code": "BATTERY_PACKS",
+"description": "The configuration of battery packs in the float",
+"value": "Alk D cell"
+},
+{
+"id": 1250,
+"code": "CONTROLLER_BOARD_TYPE_PRIMARY",
+"description": "The type of controller board",
+"value": "APF8C"
+},
+{
+"id": 1251,
+"code": "CONTROLLER_BOARD_TYPE_SECONDARY",
+"description": "The secondary type of controller board",
+"value": "n/a"
+},
+{
+"id": 1252,
+"code": "CONTROLLER_BOARD_SERIAL_NO_PRIMA",
+"description": "The serial number of the primary controller board",
+"value": "n/a"
+},
+{
+"id": 1253,
+"code": "CONTROLLER_BOARD_SERIAL_NO_SECON",
+"description": "The serial number of the secondary controller board",
+"value": "n/a"
+},
+{
+"id": 1254,
+"code": "SPECIAL_FEATURES",
+"description": "Extra features of the float (algorithms, compressee etc.)",
+"value": "n/a"
+},
+{
+"id": 1257,
+"code": "FLOAT_OWNER",
+"description": "The float owner",
+"value": "UK Met Office"
+},
+{
+"id": 1258,
+"code": "OPERATING_INSTITUTION",
+"description": "The operating institution of the float",
+"value": "UK Met Office"
+},
+{
+"id": 1259,
+"code": "CUSTOMISATION",
+"description": "Float customisation, i.e. (institution and modifications)",
+"value": "n/a"
+},
+{
+"id": 2081,
+"code": "PLATFORM_FAMILY",
+"description": "Category of instrument",
+"value": "FLOAT"
+},
+{
+"id": 2209,
+"code": "PLATFORM_TYPE",
+"description": "Platform type",
+"value": "APEX"
+},
+{
+"id": 2462,
+"code": "TECHNICAL_DATE_UPDATE",
+"description": "Date of last update of the tech data of the platform",
+"value": "16/04/2021 06:34:32"
+}
+],
+"phases": [
+{
+"dimLevel": 1,
+"cycleTime": 240,
+"downTime": null,
+"upTime": null,
+"parkPres": 1000,
+"deepestPresAsc": 2000
+}
+],
+"cycles": {},
+"missionCycles": {}
+},
+"countryCode": "74",
+"statusCode": "I",
+"greyListParameters": [],
+"lastCycle": null,
+"earliestCycle": null,
+"latestCycle": null,
+"firstCycle": null
+}

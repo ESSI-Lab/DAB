@@ -7,7 +7,7 @@ package eu.essi_lab.api.database.marklogic.stats;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,7 +35,7 @@ import org.json.JSONObject;
 import com.marklogic.xcc.exceptions.RequestException;
 
 import eu.essi_lab.api.database.marklogic.MarkLogicDatabase;
-import eu.essi_lab.api.database.marklogic.MarkLogicModuleManager;
+import eu.essi_lab.api.database.marklogic.MarkLogicModuleQueryBuilder;
 import eu.essi_lab.api.database.marklogic.XQueryBuilder;
 import eu.essi_lab.api.database.marklogic.search.MarkLogicDiscoveryBondHandler;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
@@ -237,14 +237,14 @@ public class StatisticsQueryManager {
 	if (bboxUnionComputationSet) {
 
 	    builder.appendCarriageReturn();
-	    builder.append(MarkLogicModuleManager.getInstance().getBboxUnionQuery(groupByTarget, forInVariable, groupByPeriod, false));
+	    builder.append(MarkLogicModuleQueryBuilder.getInstance().getBboxUnionQuery(groupByTarget, forInVariable, groupByPeriod, false));
 	    builder.appendComma();
 	}
 
 	if (queryBboxUnionComputationSet) {
 
 	    builder.appendCarriageReturn();
-	    builder.append(MarkLogicModuleManager.getInstance().getBboxUnionQuery(groupByTarget, forInVariable, groupByPeriod, true));
+	    builder.append(MarkLogicModuleQueryBuilder.getInstance().getBboxUnionQuery(groupByTarget, forInVariable, groupByPeriod, true));
 	    builder.appendComma();
 	}
 
@@ -252,7 +252,7 @@ public class StatisticsQueryManager {
 
 	    builder.appendCarriageReturn();
 	    builder.append(
-		    MarkLogicModuleManager.getInstance().getTemporalExtentUnionQuery(groupByTarget, forInVariable, groupByPeriod, false));
+		    MarkLogicModuleQueryBuilder.getInstance().getTemporalExtentUnionQuery(groupByTarget, forInVariable, groupByPeriod, false));
 	    builder.appendComma();
 	}
 
@@ -260,7 +260,7 @@ public class StatisticsQueryManager {
 
 	    builder.appendCarriageReturn();
 	    builder.append(
-		    MarkLogicModuleManager.getInstance().getTemporalExtentUnionQuery(groupByTarget, forInVariable, groupByPeriod, true));
+		    MarkLogicModuleQueryBuilder.getInstance().getTemporalExtentUnionQuery(groupByTarget, forInVariable, groupByPeriod, true));
 	    builder.appendComma();
 	}
 
@@ -271,7 +271,7 @@ public class StatisticsQueryManager {
 	    for (Queryable queryable : list) {
 
 		builder.appendCarriageReturn();
-		builder.append(MarkLogicModuleManager.getInstance().getCountDistinctQuery(//
+		builder.append(MarkLogicModuleQueryBuilder.getInstance().getCountDistinctQuery(//
 			queryable.getName(), //
 			groupByTarget, //
 			forInVariable, //
@@ -307,7 +307,7 @@ public class StatisticsQueryManager {
 		    bboxesBuilder.append(")");
 
 		    builder.appendCarriageReturn();
-		    builder.append(MarkLogicModuleManager.getInstance().getGeoSpatialFrequencyFunctionQuery(//
+		    builder.append(MarkLogicModuleQueryBuilder.getInstance().getGeoSpatialFrequencyFunctionQuery(//
 			    queryable.getName(), //
 			    bboxesBuilder.build(),
 			    maxFrequencyItems.orElse(10), //
@@ -321,7 +321,7 @@ public class StatisticsQueryManager {
 
 		    builder.appendCarriageReturn();
 
-		    builder.append(MarkLogicModuleManager.getInstance().getFrequencyFunctionQuery(//
+		    builder.append(MarkLogicModuleQueryBuilder.getInstance().getFrequencyFunctionQuery(//
 			    queryable.getName(), //
 			    maxFrequencyItems.orElse(10), //
 			    groupByTarget, //
@@ -370,7 +370,7 @@ public class StatisticsQueryManager {
 
 		builder.appendCarriageReturn();
 
-		builder.append(MarkLogicModuleManager.getInstance().getStatisticsFunctionQuery(//
+		builder.append(MarkLogicModuleQueryBuilder.getInstance().getStatisticsFunctionQuery(//
 			function.name(), //
 			queryable.getName(), //
 			groupByTarget, //

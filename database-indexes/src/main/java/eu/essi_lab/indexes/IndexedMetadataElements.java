@@ -4,7 +4,7 @@ package eu.essi_lab.indexes;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -48,6 +48,7 @@ import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
+import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.index.IndexedElement;
 import eu.essi_lab.model.index.IndexedElementInfo;
@@ -57,6 +58,8 @@ import eu.essi_lab.model.resource.ExtensionHandler;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.SatelliteScene;
+import eu.essi_lab.model.resource.worldcereal.WorldCerealItem;
+import eu.essi_lab.model.resource.worldcereal.WorldCerealMap;
 import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
 
 /**
@@ -587,23 +590,39 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	}
     };
 
+    public static final IndexedMetadataElement KEYWORD_URI_BLUE_CLOUD = new IndexedMetadataElement(MetadataElement.KEYWORD_URI_BLUE_CLOUD) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    addKeywordsURI(resource, null, new String[] { "platform", "platform_class", "parameter", "instrument", "cruise", "project" });
+
+	}
+    };
+
+    public static final IndexedMetadataElement KEYWORD_BLUE_CLOUD = new IndexedMetadataElement(MetadataElement.KEYWORD_BLUE_CLOUD) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    addKeywords(resource, null, new String[] { "platform", "platform_class", "parameter", "instrument", "cruise", "project" });
+
+	}
+    };
+
     public static final IndexedMetadataElement KEYWORD = new IndexedMetadataElement(MetadataElement.KEYWORD) {
 	@Override
 	public void defineValues(GSResource resource) {
 
-	    Iterator<DataIdentification> identifications = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
-		    .getDataIdentifications();
+	    addKeywords(resource, null);
 
-	    while (identifications.hasNext()) {
-		DataIdentification dataId = identifications.next();
-		Iterator<String> keywordsValues = dataId.getKeywordsValues();
-		while (keywordsValues.hasNext()) {
-		    String kwd = keywordsValues.next();
-		    if (checkStringValue(kwd)) {
-			getValues().add(kwd);
-		    }
-		}
-	    }
+	}
+    };
+
+    public static final IndexedMetadataElement KEYWORD_URI = new IndexedMetadataElement(MetadataElement.KEYWORD_URI) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    addKeywordsURI(resource, null);
+
 	}
     };
 
@@ -651,6 +670,49 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	}
     };
 
+    public static final IndexedMetadataElement ORGANISATION_ROLE = new IndexedMetadataElement(MetadataElement.ORGANISATION_ROLE) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    List<ResponsibleParty> parties = new ArrayList<ResponsibleParty>();
+
+	    parties.addAll(resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getPointOfContactParty());
+
+	    parties.addAll(resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getCitedParty());
+	    for (ResponsibleParty party : parties) {
+		if (party != null) {
+		    String role = party.getRoleCode();
+		    if (checkStringValue(role)) {
+			getValues().add(role);
+		    }
+		}
+	    }
+
+	}
+    };
+
+    public static final IndexedMetadataElement ORGANISATION_URI = new IndexedMetadataElement(MetadataElement.ORGANISATION_URI) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    List<ResponsibleParty> parties = new ArrayList<ResponsibleParty>();
+
+	    parties.addAll(resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getPointOfContactParty());
+
+	    parties.addAll(resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getCitedParty());
+
+	    for (ResponsibleParty party : parties) {
+		if (party != null) {
+		    String orgURI = party.getOrganisationURI();
+		    if (checkStringValue(orgURI)) {
+			getValues().add(orgURI);
+		    }
+		}
+	    }
+
+	}
+    };
+
     public static final IndexedMetadataElement ORIGINATOR_ORGANISATION_IDENTIFIER = new IndexedMetadataElement(
 	    MetadataElement.ORIGINATOR_ORGANISATION_IDENTIFIER) {
 	@Override
@@ -693,14 +755,13 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 	}
     };
-    public static final IndexedMetadataElement TEAM_CATEGORY = new IndexedMetadataElement(
-	    MetadataElement.THEME_CATEGORY) {
+    public static final IndexedMetadataElement TEAM_CATEGORY = new IndexedMetadataElement(MetadataElement.THEME_CATEGORY) {
 	@Override
 	public void defineValues(GSResource resource) {
 
 	    ExtensionHandler handler = resource.getExtensionHandler();
-	     Optional<String> themeCategoryOpt = handler.getThemeCategory();
-	    if(themeCategoryOpt.isPresent()) {
+	    Optional<String> themeCategoryOpt = handler.getThemeCategory();
+	    if (themeCategoryOpt.isPresent()) {
 		if (checkStringValue(themeCategoryOpt.get())) {
 		    getValues().add(themeCategoryOpt.get());
 		}
@@ -857,6 +918,46 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	}
     };
 
+    public static final IndexedMetadataElement INSTRUMENT_URI = new IndexedMetadataElement(MetadataElement.INSTRUMENT_URI) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    addKeywordsURI(resource, "instrument");
+	}
+    };
+
+    public static final IndexedMetadataElement CRUISE_NAME = new IndexedMetadataElement(MetadataElement.CRUISE_NAME) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    addKeywords(resource, "cruise");
+	}
+    };
+
+    public static final IndexedMetadataElement CRUISE_URI = new IndexedMetadataElement(MetadataElement.CRUISE_URI) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    addKeywordsURI(resource, "cruise");
+	}
+    };
+
+    public static final IndexedMetadataElement PROJECT_NAME = new IndexedMetadataElement(MetadataElement.PROJECT_NAME) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    addKeywords(resource, "project");
+	}
+    };
+
+    public static final IndexedMetadataElement PROJECT_URI = new IndexedMetadataElement(MetadataElement.PROJECT_URI) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    addKeywordsURI(resource, "project");
+	}
+    };
+
     public static final IndexedMetadataElement PLATFORM_IDENTIFIER = new IndexedMetadataElement(MetadataElement.PLATFORM_IDENTIFIER) {
 	@Override
 	public void defineValues(GSResource resource) {
@@ -872,7 +973,15 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    }
 	}
     };
+    public static final IndexedMetadataElement PLATFORM_URI = new IndexedMetadataElement(MetadataElement.PLATFORM_URI) {
+	@Override
+	public void defineValues(GSResource resource) {
 
+	    addKeywordsURI(resource, "platform");
+	    addKeywordsURI(resource, "platform_class");
+
+	}
+    };
     public static final IndexedMetadataElement PLATFORM_TITLE = new IndexedMetadataElement(MetadataElement.PLATFORM_TITLE) {
 	@Override
 	public void defineValues(GSResource resource) {
@@ -914,28 +1023,32 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	@Override
 	public void defineValues(GSResource resource) {
 
-	    Optional<Long> optional = resource.getExtensionHandler().getDataSize();
-	    if (optional.isPresent()) {
+	    try {
+		Optional<Long> optional = resource.getExtensionHandler().getDataSize();
+		if (optional.isPresent()) {
 
-		Long value = optional.get();
-		if (value != null) {
-		    getValues().add("" + value);
-		}
-	    } else {
-		GridSpatialRepresentation spatialRepresentation = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
-			.getGridSpatialRepresentation();
-		if (spatialRepresentation != null) {
-		    Iterator<Dimension> iterator = spatialRepresentation.getAxisDimensions();
-		    Long dataSize = 1l;
-		    while (iterator.hasNext()) {
-			Dimension dimension = (Dimension) iterator.next();
-			BigInteger size = dimension.getDimensionSize();
-			if (size != null) {
-			    dataSize = dataSize * size.longValue();
-			}
+		    Long value = optional.get();
+		    if (value != null) {
+			getValues().add("" + value);
 		    }
-		    getValues().add("" + dataSize);
+		} else {
+		    GridSpatialRepresentation spatialRepresentation = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
+			    .getGridSpatialRepresentation();
+		    if (spatialRepresentation != null) {
+			Iterator<Dimension> iterator = spatialRepresentation.getAxisDimensions();
+			Long dataSize = 1l;
+			while (iterator.hasNext()) {
+			    Dimension dimension = (Dimension) iterator.next();
+			    BigInteger size = dimension.getDimensionSize();
+			    if (size != null) {
+				dataSize = dataSize * size.longValue();
+			    }
+			}
+			getValues().add("" + dataSize);
+		    }
 		}
+	    } catch (Exception ex) {
+		GSLoggerFactory.getLogger(getClass()).error(ex);
 	    }
 	}
     };
@@ -988,12 +1101,97 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	}
     };
 
+    public static final IndexedMetadataElement OBSERVED_PROPERTY_URI = new IndexedMetadataElement(MetadataElement.OBSERVED_PROPERTY_URI) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    Optional<String> optional = resource.getExtensionHandler().getObservedPropertyURI();
+
+	    if (optional.isPresent()) {
+
+		String value = optional.get();
+		if (checkStringValue(value)) {
+		    getValues().add(value);
+		}
+	    }
+
+	}
+    };
+
+    public static final IndexedMetadataElement TIME_AGGREGATION_DURATION_8601 = new IndexedMetadataElement(
+	    MetadataElement.TIME_AGGREGATION_DURATION_8601) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    Optional<String> value = resource.getExtensionHandler().getTimeAggregationDuration8601();
+	    if (value.isPresent()) {
+		String duration = value.get();
+		if (duration != null) {
+		    if (checkStringValue(duration.toString())) {
+			getValues().add(duration.toString());
+		    }
+		}
+	    }
+
+	}
+    };
+
+    public static final IndexedMetadataElement TIME_RESOLUTION_DURATION_8601 = new IndexedMetadataElement(
+	    MetadataElement.TIME_RESOLUTION_DURATION_8601) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    Optional<String> value = resource.getExtensionHandler().getTimeResolutionDuration8601();
+	    if (value.isPresent()) {
+		String resolution = value.get();
+		if (resolution != null) {
+		    if (checkStringValue(resolution.toString())) {
+			getValues().add(resolution.toString());
+		    }
+		}
+	    }
+
+	}
+    };
+
     public static final IndexedMetadataElement UNIQUE_ATTRIBUTE_IDENTIFIER = new IndexedMetadataElement(
 	    MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER) {
 	@Override
 	public void defineValues(GSResource resource) {
 
 	    Optional<String> optional = resource.getExtensionHandler().getUniqueAttributeIdentifier();
+	    if (optional.isPresent()) {
+
+		String value = optional.get();
+		if (checkStringValue(value)) {
+		    getValues().add(value);
+		}
+	    }
+	}
+    };
+
+    public static final IndexedMetadataElement WIS_TOPIC_HIERARCHY = new IndexedMetadataElement(MetadataElement.WIS_TOPIC_HIERARCHY) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    Optional<String> optional = resource.getExtensionHandler().getWISTopicHierarchy();
+
+	    if (optional.isPresent()) {
+
+		String value = optional.get();
+		if (checkStringValue(value)) {
+		    getValues().add(value);
+		}
+	    }
+	}
+    };
+
+    public static final IndexedMetadataElement TIME_INTERPOLATION = new IndexedMetadataElement(MetadataElement.TIME_INTERPOLATION) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    Optional<String> optional = resource.getExtensionHandler().getTimeInterpolationString();
+
 	    if (optional.isPresent()) {
 
 		String value = optional.get();
@@ -1152,10 +1350,10 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	public void defineValues(GSResource resource) {
 
 	    Iterator<DataIdentification> di = resource.//
-	    getHarmonizedMetadata().//
-	    getCoreMetadata().//
-	    getMIMetadata().//
-	    getDataIdentifications();
+		    getHarmonizedMetadata().//
+		    getCoreMetadata().//
+		    getMIMetadata().//
+		    getDataIdentifications();
 
 	    while (di.hasNext()) {
 		DataIdentification next = di.next();
@@ -1341,7 +1539,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    defineBNHSProperty(BNHSProperty.COUNTRY, resource);
 	}
     };
-    
+
     public static final IndexedMetadataElement COUNTRY_ISO3 = new IndexedMetadataElement(MetadataElement.COUNTRY_ISO3) {
 	@Override
 	public void defineValues(GSResource resource) {
@@ -1436,6 +1634,16 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
     public static final IndexedMetadataElement ALTITUDE = new IndexedMetadataElement(MetadataElement.ALTITUDE) {
 	@Override
 	public void defineValues(GSResource resource) {
+	    MIMetadata miMetadata = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata();
+	    VerticalExtent vertical = miMetadata.getDataIdentification().getVerticalExtent();
+	    if (vertical != null) {
+		Double minimum = vertical.getMinimumValue();
+		Double maximum = vertical.getMaximumValue();
+		double tolerance = 1e-10; // Define your tolerance level here
+		if (maximum != null && minimum != null && Math.abs(maximum - minimum) < tolerance) {
+		    getValues().add(minimum.toString());
+		}
+	    }
 	    defineBNHSProperty(BNHSProperty.DATUM_ALTITUDE, resource);
 	}
     };
@@ -1722,6 +1930,160 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	@Override
 	public void defineValues(GSResource resource) {
 
+	}
+    };
+
+    public static final IndexedMetadataElement CROP_TYPES = new IndexedMetadataElement(MetadataElement.CROP_TYPES) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    Optional<WorldCerealMap> optional = resource.getExtensionHandler().getWorldCereal();
+	    if (optional.isPresent()) {
+
+		WorldCerealMap map = optional.get();
+
+		List<WorldCerealItem> cropTypes = map.getCropTypes();
+		if (cropTypes != null) {
+
+		    for (WorldCerealItem worldCerealItem : cropTypes) {
+
+			if (checkStringValue(worldCerealItem.getCode())) {
+			    getValues().add(worldCerealItem.getCode());
+			}
+		    }
+		}
+	    }
+	}
+    };
+    
+    public static final IndexedMetadataElement QUANTITY_TYPES = new IndexedMetadataElement(MetadataElement.QUANTITY_TYPES) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    Optional<WorldCerealMap> optional = resource.getExtensionHandler().getWorldCereal();
+	    if (optional.isPresent()) {
+
+		WorldCerealMap map = optional.get();
+
+		List<WorldCerealItem> quantityTypes = map.getQuantityTypes();
+		if (quantityTypes != null) {
+
+		    for (WorldCerealItem worldCerealItem : quantityTypes) {
+
+			if (checkStringValue(worldCerealItem.getCode())) {
+			    getValues().add(worldCerealItem.getCode());
+			}
+		    }
+		}
+	    }
+	}
+    };
+
+    public static final IndexedMetadataElement LAND_COVER_TYPES = new IndexedMetadataElement(MetadataElement.LAND_COVER_TYPES) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    Optional<WorldCerealMap> optional = resource.getExtensionHandler().getWorldCereal();
+	    if (optional.isPresent()) {
+
+		WorldCerealMap map = optional.get();
+
+		List<WorldCerealItem> lcTypes = map.getLandCoverTypes();
+
+		if (lcTypes != null) {
+
+		    for (WorldCerealItem worldCerealItem : lcTypes) {
+
+			if (checkStringValue(worldCerealItem.getCode())) {
+			    getValues().add(worldCerealItem.getCode());
+			}
+		    }
+		}
+	    }
+	}
+    };
+
+    public static final IndexedMetadataElement IRRIGATION_TYPES = new IndexedMetadataElement(MetadataElement.IRRIGATION_TYPES) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    Optional<WorldCerealMap> optional = resource.getExtensionHandler().getWorldCereal();
+	    if (optional.isPresent()) {
+
+		WorldCerealMap map = optional.get();
+
+		List<WorldCerealItem> irrTypes = map.getIrrigationTypes();
+
+		if (irrTypes != null) {
+
+		    for (WorldCerealItem worldCerealItem : irrTypes) {
+
+			if (checkStringValue(worldCerealItem.getCode())) {
+			    getValues().add(worldCerealItem.getCode());
+			}
+		    }
+		}
+	    }
+	}
+    };
+
+    public static final IndexedElement CROP_CONFIDENCE = new IndexedMetadataElement(MetadataElement.CONFIDENCE_CROP_TYPE) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    Optional<WorldCerealMap> optional = resource.getExtensionHandler().getWorldCereal();
+	    if (optional.isPresent()) {
+
+		WorldCerealMap map = optional.get();
+		Double cropConfidence = map.getCropTypeConfidence();
+		if (cropConfidence != null) {
+		    getValues().add(cropConfidence.toString());
+		}
+	    }
+
+	}
+    };
+
+    public static final IndexedElement LAND_COVER_CONFIDENCE = new IndexedMetadataElement(MetadataElement.CONFIDENCE_LC_TYPE) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    Optional<WorldCerealMap> optional = resource.getExtensionHandler().getWorldCereal();
+	    if (optional.isPresent()) {
+
+		WorldCerealMap map = optional.get();
+		Double lcConfidence = map.getLcTypeConfidence();
+		if (lcConfidence != null) {
+		    getValues().add(lcConfidence.toString());
+		}
+	    }
+
+	}
+    };
+
+    public static final IndexedElement IRRIGATION_CONFIDENCE = new IndexedMetadataElement(MetadataElement.CONFIDENCE_IRR_TYPE) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    Optional<WorldCerealMap> optional = resource.getExtensionHandler().getWorldCereal();
+	    if (optional.isPresent()) {
+
+		WorldCerealMap map = optional.get();
+		Double irrConfidence = map.getIrrigationTypeConfidence();
+		if (irrConfidence != null) {
+		    getValues().add(irrConfidence.toString());
+		}
+	    }
+
+	}
+    };
+
+    public static final IndexedMetadataElement IN_SITU = new IndexedMetadataElement(MetadataElement.IN_SITU) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    boolean found = resource.getExtensionHandler().isInSitu();
+	    getValues().add(String.valueOf(found));
 	}
     };
 

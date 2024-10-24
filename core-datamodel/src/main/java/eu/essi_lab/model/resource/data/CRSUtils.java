@@ -4,7 +4,7 @@ package eu.essi_lab.model.resource.data;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,11 +24,11 @@ package eu.essi_lab.model.resource.data;
 import java.util.AbstractMap.SimpleEntry;
 
 import org.geotools.geometry.jts.JTS;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
 
 public class CRSUtils {
     public static SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> translateBBOX(
@@ -71,5 +71,12 @@ public class CRSUtils {
 
 	return new SimpleEntry<Double, Double>(dest.x, dest.y);
 
+    }
+    
+    public static void main(String[] args) throws Exception {
+	SimpleEntry<Double, Double> result = CRSUtils.translatePoint(new SimpleEntry<Double, Double>(15092.814748879056,-7546.407374442555), CRS.EPSG_3857(), CRS.EPSG_4326());
+	System.out.println("LAT: "+result.getKey());
+	System.out.println("LON: "+result.getValue());
+	
     }
 }

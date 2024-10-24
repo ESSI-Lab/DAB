@@ -4,7 +4,7 @@ package eu.essi_lab.request.executor.access;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,18 +24,19 @@ package eu.essi_lab.request.executor.access;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.net.http.HttpHeaders;
+import java.net.http.HttpResponse;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.Header;
 import org.slf4j.Logger;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.DownloadSetting;
-import eu.essi_lab.lib.net.utils.Downloader;
+import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.request.executor.utils.MimeTypeConstants;
 import eu.essi_lab.shared.resultstorage.ResultStorage;
 import eu.essi_lab.shared.resultstorage.ResultStorageFactory;
@@ -52,25 +53,27 @@ public class DirectDownloader {
 
     public String download() {
 	Downloader d = new Downloader();
-	Optional<SimpleEntry<Header[], InputStream>> ret = d.downloadHeadersAndBody(linkage);
+	 Optional<HttpResponse<InputStream>> ret = d.downloadOptionalResponse(linkage);
 
 	InputStream stream;
 
 	String extension = null;
 
 	if (ret.isPresent()) {
-	    SimpleEntry<Header[], InputStream> headersAndBody = ret.get();
-	    stream = headersAndBody.getValue();
-	    Header[] header = headersAndBody.getKey();
+	    HttpResponse<InputStream> response = ret.get();
+	    stream = response.body();
+	    HttpHeaders headers = response.headers();
 	    String ct = null;
-	    for (Header h : header) {
-		if (h.getName().contains("Content-Type")) {
-		    ct = h.getValue();
-		    break;
-		}
 
+	    Optional<String> cType = headers.firstValue("Content-Type");
+	    if (cType.isEmpty()) {
+		cType = headers.firstValue("content-type");
 	    }
-	    if (ct != null) {
+
+	    if (cType.isPresent()) {
+
+		ct = cType.get();
+
 		String ext = MimeTypeConstants.getTypeExtension(ct);
 
 		if (ext != null) {
@@ -78,7 +81,6 @@ public class DirectDownloader {
 		} else {
 		    extension = guessExtension();
 		}
-
 	    } else {
 		extension = guessExtension();
 	    }
@@ -98,7 +100,7 @@ public class DirectDownloader {
 	    DownloadSetting downloadSetting = ConfigurationWrapper.getDownloadSetting();
 
 	    ResultStorage storage = null;
-	    StorageUri resultStorageURI = downloadSetting.getStorageUri();
+	    StorageInfo resultStorageURI = downloadSetting.getStorageUri();
 
 	    switch (downloadSetting.getDownloadStorage()) {
 
@@ -132,7 +134,7 @@ public class DirectDownloader {
 	    return get;
 
 	} catch (Exception e) {
-	 
+
 	    String msg = "Failed trying to store direct downloaded file.";
 
 	    GSLoggerFactory.getLogger(getClass()).info(msg);
@@ -152,9 +154,4 @@ public class DirectDownloader {
 	}
 	return extension;
     }
-
-    public static void main(String[] args) {
-
-    }
-
 }

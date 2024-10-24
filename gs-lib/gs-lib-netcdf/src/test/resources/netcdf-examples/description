@@ -1,0 +1,7 @@
+The following example NetCDF types used in tests are described in the following NetCDF CF conventions 1.7 
+exampleh2.nc -> Example H2 orthogonal multidimensional time series
+exampleh3.nc -> Example H3 incomplete multidimensional time series
+exampleh4.nc -> Example H4 single time series
+exampleh5.nc -> Example H5 single time series with time varying deviations
+exampleh6.nc -> Example H6 contiguous ragged array time series
+exampleh7.nc -> Example H7 indexed ragged array time series

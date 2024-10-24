@@ -1,0 +1,4 @@
+eu.essi_lab.accessor.gbif.distributed.GBIFMixedDistributedAccessor
+eu.essi_lab.accessor.gbif.distributed.GBIFDistributedConnector
+eu.essi_lab.accessor.gbif.harvested.GBIFMixedHarvestedAccessor
+eu.essi_lab.accessor.gbif.harvested.GBIFHarvestedConnector

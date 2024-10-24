@@ -1,0 +1,70 @@
+{
+    "interpolation-type": "Average",
+    "dataset-info": {
+        "nPoints": 364,
+        "nPhotos": 0,
+        "offsetTZ": "+0100",
+        "_id": "6559ea4361f90a4a912bf111",
+        "T0": {
+            "maxVal": 18.2,
+            "minVal": 15.3,
+            "avgVal": 16.4
+        },
+        "H": {
+            "maxVal": 79,
+            "minVal": 66,
+            "avgVal": 70
+        },
+        "a": {
+            "maxVal": 182,
+            "minVal": 33,
+            "avgVal": 86
+        },
+        "P": {
+            "maxVal": 1016,
+            "minVal": 998,
+            "avgVal": 1010
+        },
+        "td": {
+            "maxVal": 13.2,
+            "minVal": 9.9,
+            "avgVal": 11
+        },
+        "HDX": {
+            "maxVal": 20.6,
+            "minVal": 16.6,
+            "avgVal": 18.2
+        },
+        "i": {
+            "maxVal": -5,
+            "minVal": -0.6,
+            "avgVal": 1.8
+        },
+        "L": {
+            "maxVal": 2.2,
+            "minVal": 0.1,
+            "avgVal": 1
+        },
+        "bt": {},
+        "CO2": {},
+        "m1": {},
+        "m2": {},
+        "m4": {},
+        "m10": {},
+        "n0": {},
+        "n1": {},
+        "n2": {},
+        "n4": {},
+        "n10": {},
+        "tps": {},
+        "EAQ": {},
+        "FAQ": {},
+        "O3": {},
+        "from": "Genova",
+        "startTime": "2023-11-19T10:58:08.000Z",
+        "by": "genova_living_lab_1",
+        "to": "Manesseno",
+        "endTime": "2023-11-19T11:22:36.000Z"
+    },
+    "var-name": "Air Temperature"
+}

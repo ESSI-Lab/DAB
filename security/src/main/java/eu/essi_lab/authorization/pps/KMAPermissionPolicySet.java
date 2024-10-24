@@ -7,7 +7,7 @@ package eu.essi_lab.authorization.pps;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,12 +27,15 @@ package eu.essi_lab.authorization.pps;
 import java.util.Arrays;
 import java.util.List;
 
-import org.ow2.authzforce.core.pdp.impl.combining.StandardCombiningAlgorithm;
-
-import eu.essi_lab.messages.web.WebRequest;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.ApplyType;
-
 /**
+ * KMA users are allowed ONLY to discover if and only if:<br><br>
+ *  
+ * 1) the view identifier is "KMA"<br>
+ *  
+ * 2) the discovery path is "csw" or "kmaoaipmh"<br>
+ *  
+ * 3) the IP is supported (redundant check)<br>
+ * 
  * @author Fabrizio
  */
 public class KMAPermissionPolicySet extends AbstractPermissionPolicySet {
@@ -40,7 +43,7 @@ public class KMAPermissionPolicySet extends AbstractPermissionPolicySet {
     /**
      * 
      */
-    private static final List<String> ALLOWED_IP_LIST = Arrays.asList(//
+    public static final List<String> ALLOWED_IP_LIST = Arrays.asList(//
 	    "203.247.93.102", //
 	    "203.247.93.103", //
 	    "203.247.93.114", //
@@ -50,42 +53,29 @@ public class KMAPermissionPolicySet extends AbstractPermissionPolicySet {
 	    "210.107.255.22", //
 	    "210.107.255.108", //
 	    "203.239.43.21", //
-	    "218.154.54.13",//
+	    "218.154.54.13", //
 	    "203.247.93.106");//
 
     public KMAPermissionPolicySet() {
 
-	super("kma", StandardCombiningAlgorithm.XACML_3_0_RULE_COMBINING_PERMIT_OVERRIDES.getId());
+	super("kma");
     }
 
-    @Override
+    @Override//	    setAndCondition(ruleId, //
+//    createDiscoveryPathApply(), //
+//    XACML_JAXBUtils.createNotApply(createViewCreatorApply("trigger")));
     protected void editPPSPolicy() {
 
-	{
-	    String discoveryRuleId = "clientRule";
+	String ruleId = "kmaoaipmh:discovery:rule";
 
-	    //
-	    // discovery rule
-	    //
-	    setDiscoveryAction(discoveryRuleId);
+	setDiscoveryAction(ruleId);
 
-	    ApplyType allowedClientId = createAllowedClientIdentifiersApply(WebRequest.ESSI_LAB_CLIENT_IDENTIFIER);
+	setAndCondition(//
+		ruleId, //
 
-	    setAndCondition(discoveryRuleId, allowedClientId);
-	}
-	{
-	    String discoveryRuleId = "ipAndPathRule";
-
-	    //
-	    // discovery rule
-	    //
-	    setDiscoveryAction(discoveryRuleId);
-
-	    ApplyType pathApply = createPathApply("csw", "kmaoaipmh");
-	    ApplyType ipApply = createAllowedIPApply(ALLOWED_IP_LIST.toArray(new String[] {}));
-
-	    setAndCondition(discoveryRuleId, pathApply, ipApply);
-	}
-
+		createPathApply("csw", "kmaoaipmh"), //
+		createViewIdentifiersApply("KMA"), //
+		createAllowedIPApply(ALLOWED_IP_LIST.toArray(new String[] {}))// redundant check
+	);
     }
 }

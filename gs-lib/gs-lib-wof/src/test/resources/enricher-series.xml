@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<series xmlns="http://www.cuahsi.org/waterML/1.1/"
+        xmlns:wtr="http://www.cuahsi.org/waterML/"
+        xmlns:gml="http://www.opengis.net/gml"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <variable>
+      <variableCode default="true" variableID="3" vocabulary="LBR">USU3</variableCode>
+      <variableName>Battery voltage</variableName>
+      <valueType>Field Observation</valueType>
+      <dataType>Minimum</dataType>
+      <generalCategory>Instrumentation</generalCategory>
+      <sampleMedium>Not Relevant</sampleMedium>
+      <unit>
+         <unitName>volts</unitName>
+         <unitType>Potential Difference</unitType>
+         <unitAbbreviation>V</unitAbbreviation>
+         <unitCode>168</unitCode>
+      </unit>
+      <noDataValue>-9999</noDataValue>
+      <timeScale isRegular="true">
+         <unit>
+            <unitName>minute</unitName>
+            <unitType>Time</unitType>
+            <unitAbbreviation>min</unitAbbreviation>
+            <unitCode>102</unitCode>
+         </unit>
+         <timeSupport>30</timeSupport>
+      </timeScale>
+      <speciation>Not Applicable</speciation>
+   </variable>
+   <valueCount>186664</valueCount>
+   <variableTimeInterval xsi:type="TimeIntervalType">
+      <beginDateTime>2005-08-04T11:30:00</beginDateTime>
+      <endDateTime>2016-08-02T12:30:00</endDateTime>
+      <beginDateTimeUTC>2005-08-04T18:30:00</beginDateTimeUTC>
+      <endDateTimeUTC>2016-08-02T19:30:00</endDateTimeUTC>
+   </variableTimeInterval>
+   <method methodID="4">
+      <methodDescription>Battery voltage measured by Campbell Scientific CR206 datalogger.</methodDescription>
+   </method>
+   <source sourceID="1">
+      <organization>Utah State University Utah Water Research Laboratory</organization>
+      <sourceDescription>Continuous water quality monitoring by Utah State University as part of the USDA CEAP Grant</sourceDescription>
+      <citation>Continuous water quality monitoring by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+   </source>
+   <qualityControlLevel qualityControlLevelID="0">
+      <qualityControlLevelCode>0</qualityControlLevelCode>
+      <definition>Raw data</definition>
+   </qualityControlLevel>
+</series>

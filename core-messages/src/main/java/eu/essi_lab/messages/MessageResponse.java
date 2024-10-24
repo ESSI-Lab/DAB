@@ -4,7 +4,7 @@ package eu.essi_lab.messages;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,10 +22,13 @@ package eu.essi_lab.messages;
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import eu.essi_lab.messages.count.AbstractCountResponse;
+import eu.essi_lab.model.RuntimeInfoElement;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.rip.RuntimeInfoProvider;
 
@@ -35,15 +38,11 @@ import eu.essi_lab.rip.RuntimeInfoProvider;
  * @author Fabrizio
  */
 public abstract class MessageResponse<T, C extends AbstractCountResponse> implements RuntimeInfoProvider {
-
-    @Override
-    public String getBaseType() {
-	return "message-response";
-    }
-    
+   
     private List<T> results;
     private C countResponse;
     private GSException exception;
+    private String profilerName;
 
     /**
      * 
@@ -65,12 +64,32 @@ public abstract class MessageResponse<T, C extends AbstractCountResponse> implem
     }
 
     /**
-     * This default implementation returns an empty map
+     * This default implementation returns a map with common info
      */
     @Override
     public HashMap<String, List<String>> provideInfo() {
 
-	return new HashMap<>();
+	HashMap<String, List<String>> map = new HashMap<>();
+
+	getProfilerName().ifPresent(name -> map.put(RuntimeInfoElement.PROFILER_NAME.getName(), Arrays.asList(name)));
+
+	return map;
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getProfilerName() {
+
+	return Optional.ofNullable(profilerName);
+    }
+
+    /**
+     * @param name
+     */
+    public void setProfilerName(String name) {
+
+	this.profilerName = name;
     }
 
     /**

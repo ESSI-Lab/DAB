@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenLayers WMS Layer Toggle</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v10.2.1/ol.css" type="text/css">
+    <style>
+        .map {
+            height: 500px;
+            width: 100%;
+        }
+        #layerList {
+            margin-top: 10px;
+        }
+        #layerList li {
+            cursor: pointer;
+            list-style: none;
+            padding: 5px;
+            background-color: #f3f3f3;
+            margin-bottom: 5px;
+            border: 1px solid #ddd;
+        }
+        #layerList li:hover {
+            background-color: #e3e3e3;
+        }
+    </style>
+</head>
+<body>
+    <h2>OpenLayers WMS Example</h2>
+    <div id="map" class="map"></div>
+    <ul id="layerList"></ul>
+
+    <script src="https://cdn.jsdelivr.net/npm/ol@v10.2.1/dist/ol.js"></script>
+    <script type="text/javascript">
+        const wmsUrl = 'http://localhost:9090/gs-service/services/essi/view/test/wms'; // Example WMS URL
+
+        // Fetch the GetCapabilities from the WMS server
+        fetch(`${wmsUrl}?service=WMS&version=1.1.1&request=GetCapabilities`)
+            .then(response => response.text())
+            .then(xml => {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xml, 'application/xml');
+                
+                // Retrieve layers and their titles from the XML
+                const layers = xmlDoc.getElementsByTagName('Layer');
+                const layerList = document.getElementById('layerList');
+                let olLayers = {};
+
+                for (let i = 0; i < layers.length; i++) {
+                    const layer = layers[i];
+                    const layerName = layer.getElementsByTagName('Name')[0].textContent;
+                    const layerTitle = layer.getElementsByTagName('Title')[0] ? layer.getElementsByTagName('Title')[0].textContent : layerName;
+                    
+                    if (layerName) {
+                        // Create the WMS layer
+                        const wmsLayer = new ol.layer.Image({
+                            source: new ol.source.ImageWMS({
+                                url: wmsUrl,
+                                params: {'LAYERS': layerName},
+                                ratio: 1,
+                                serverType: 'geoserver',
+                            }),
+                            visible: false // Initially hidden
+                        });
+
+                        // Add the WMS layer to the map
+                        map.addLayer(wmsLayer);
+                        olLayers[layerName] = wmsLayer;
+
+                        // Create a list item for the layer using the Title
+                        const listItem = document.createElement('li');
+                        listItem.innerText = layerTitle; // Display the Title instead of Name
+                        layerList.appendChild(listItem);
+
+                        // Toggle layer visibility on click
+                        listItem.addEventListener('click', () => {
+                            const isVisible = wmsLayer.getVisible();
+                            wmsLayer.setVisible(!isVisible);
+                            listItem.style.backgroundColor = !isVisible ? '#d3ffd3' : '#f3f3f3';
+                        });
+                    }
+                }
+            })
+            .catch(error => console.error('Error fetching WMS GetCapabilities:', error));
+
+        // Create the OpenLayers map
+        const map = new ol.Map({
+            target: 'map',
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                })
+            ],
+            view: new ol.View({
+                center: ol.proj.fromLonLat([-100, 40]), // Centered on USA
+                zoom: 4
+            })
+        });
+    </script>
+</body>
+</html>

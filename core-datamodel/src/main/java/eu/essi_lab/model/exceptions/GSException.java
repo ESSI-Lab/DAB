@@ -4,7 +4,7 @@ package eu.essi_lab.model.exceptions;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -312,11 +312,16 @@ public class GSException extends Exception {
      */
     public void log() {
 
+	if (getErrorInfoList().isEmpty()) {
+	    // it should not happen
+	    return;
+	}
+
 	ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
 	this.printStackTrace(new PrintStream(stream));
 
-	GSLoggerFactory.getLogger(getClass()).error(stream.toString(Charsets.UTF_8));
+	GSLoggerFactory.getLogger(getErrorInfoList().get(0).getCaller()).error(stream.toString(Charsets.UTF_8), this);
     }
 
     /**

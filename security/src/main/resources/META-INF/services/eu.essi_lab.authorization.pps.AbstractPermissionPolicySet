@@ -3,8 +3,15 @@ eu.essi_lab.authorization.pps.GWPPermissionPolicySet
 eu.essi_lab.authorization.pps.AdminPermissionPolicySet
 eu.essi_lab.authorization.pps.AnonymousPermissionPolicySet
 eu.essi_lab.authorization.pps.WHOSPermissionPolicySet
+eu.essi_lab.authorization.pps.BlueCloudTermsPermissionPolicySet
 eu.essi_lab.authorization.pps.CSW_RIPermissionPolicySet
 eu.essi_lab.authorization.pps.SeadatanetPermissionPolicySet
 eu.essi_lab.authorization.pps.EIFFELPermissionPolicySet
 eu.essi_lab.authorization.pps.LODGEOSSPermissionPolicySet
 eu.essi_lab.authorization.pps.SSCPermissionPolicySet
+eu.essi_lab.authorization.pps.HISCentralPermissionPolicySet
+eu.essi_lab.authorization.pps.IChangePermissionPolicySet
+eu.essi_lab.authorization.pps.GEOSSReadPermissionPolicySet
+eu.essi_lab.authorization.pps.GEOSSPrivateWritePermissionPolicySet
+eu.essi_lab.authorization.pps.GEOSSWritePermissionPolicySet
+eu.essi_lab.authorization.pps.TRIGGERPermissionPolicySet

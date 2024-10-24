@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.os;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,17 +21,19 @@ package eu.essi_lab.profiler.os;
  * #L%
  */
 
+import java.util.Optional;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.slf4j.Logger;
 
 import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.NameSpace;
+import eu.essi_lab.messages.DiscoveryMessage.EiffelAPIDiscoveryOption;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.ErrorInfo;
@@ -59,9 +61,18 @@ import eu.essi_lab.pdk.validation.WebRequestValidator;
 import eu.essi_lab.profiler.os.handler.discover.OSDiscoveryRequestFilter;
 import eu.essi_lab.profiler.os.handler.discover.OSRequestTransformer;
 import eu.essi_lab.profiler.os.handler.discover.OS_XML_ResultSetFormatter;
+import eu.essi_lab.profiler.os.handler.discover.covering.CoveringModeDiscoveryHandler;
+import eu.essi_lab.profiler.os.handler.discover.covering.CoveringModeOptionsReader;
+import eu.essi_lab.profiler.os.handler.discover.eiffel.EiffelAtomMapper;
+import eu.essi_lab.profiler.os.handler.discover.eiffel.EiffelDiscoveryHandler;
+import eu.essi_lab.profiler.os.handler.discover.eiffel.EiffelDiscoveryHelper;
+import eu.essi_lab.profiler.os.handler.discover.eiffel.EiffelJsonMapper;
+import eu.essi_lab.profiler.os.handler.discover.eiffel.EiffelRequestTransformer;
+import eu.essi_lab.profiler.os.handler.srvinfo.NominatimQueryHandler;
 import eu.essi_lab.profiler.os.handler.srvinfo.OSDescriptionDocumentHandler;
 import eu.essi_lab.profiler.os.handler.srvinfo.OSGetSourcesFilter;
 import eu.essi_lab.profiler.os.handler.srvinfo.OSGetSourcesHandler;
+import eu.essi_lab.profiler.os.handler.srvinfo.WMSLayersHandler;
 
 /**
  * @author Fabrizio
@@ -79,9 +90,8 @@ public class OSProfiler extends Profiler {
     public static final ProfilerSetting OPENSEARCH_SERVICE_INFO = new ProfilerSetting();
 
     private static final String INVALID_OS_REQUEST = "INVALID_OS_REQUEST";
-    private DiscoveryHandler<String> discoveryHandler;
 
-    private Logger logger = GSLoggerFactory.getLogger(getClass());
+    private DiscoveryHandler<String> discoveryHandler;
 
     static {
 	OPENSEARCH_SERVICE_INFO.setServiceName("OpenSearch Service");
@@ -92,18 +102,38 @@ public class OSProfiler extends Profiler {
 
     public OSProfiler() {
 
-	discoveryHandler = new DiscoveryHandler<>();
-	discoveryHandler.setRequestTransformer(new OSRequestTransformer());
     }
 
     @Override
     public HandlerSelector getSelector(WebRequest request) {
 
 	HandlerSelector selector = new HandlerSelector();
-	
+
+	Optional<EiffelAPIDiscoveryOption> eiffelOption = EiffelDiscoveryHelper.readEiffelOption(request);
+
+	boolean coveringModeEnabled = CoveringModeOptionsReader.isCoveringModeEnabled();
+
 	//
 	// Discovery
 	//
+
+	if (eiffelOption.isPresent()) {
+
+	    GSLoggerFactory.getLogger(getClass()).debug("Detected Eiffel API discovery option: {}", eiffelOption.get());
+
+	    discoveryHandler = new EiffelDiscoveryHandler();
+	    discoveryHandler.setRequestTransformer(new EiffelRequestTransformer());
+
+	} else if (coveringModeEnabled) {
+
+	    discoveryHandler = new CoveringModeDiscoveryHandler();
+	    discoveryHandler.setRequestTransformer(new OSRequestTransformer());
+
+	} else {
+
+	    discoveryHandler = new DiscoveryHandler<>();
+	    discoveryHandler.setRequestTransformer(new OSRequestTransformer());
+	}
 
 	selector.register(//
 		new OSDiscoveryRequestFilter(), //
@@ -128,6 +158,22 @@ public class OSProfiler extends Profiler {
 	selector.register(//
 		new GETRequestFilter("opensearch/description"), //
 		new OSDescriptionDocumentHandler());
+
+	//
+	// Nominatim
+	//
+
+	selector.register(//
+		new GETRequestFilter("opensearch/nominatim"), //
+		new NominatimQueryHandler());
+
+	//
+	// WMS Layers handler
+	//
+
+	selector.register(//
+		new GETRequestFilter("opensearch/wmslayershandler"), //
+		new WMSLayersHandler());
 
 	return selector;
     }
@@ -176,35 +222,39 @@ public class OSProfiler extends Profiler {
 
 	String version = parser.parse(OSParameters.OUTPUT_VERSION);
 
+	Optional<EiffelAPIDiscoveryOption> eiffelOption = EiffelDiscoveryHelper.readEiffelOption(request);
+
+	DiscoveryResultSetMapper<String> mapper = null;
+	DiscoveryResultSetFormatter<String> formatter = null;
+
+	GSLoggerFactory.getLogger(getClass()).debug("Selecting mapper, encoding and formatter for {}", outputFormat);
+
 	switch (outputFormat) {
 	case MediaType.APPLICATION_JSON:
 
-	    logger.debug("Selecting mapper, encoding and formatter in APPLICATION_JSON");
+	    if (!eiffelOption.isPresent()) {
 
-	    DiscoveryResultSetMapper<String> mapper = DiscoveryResultSetMapperFactory.loadMappers(//
-		    new ESSILabProvider(), //
-		    JS_API_ResultSetMapper.JS_API_MAPPING_SCHEMA, String.class).get(0); //
+		mapper = DiscoveryResultSetMapperFactory.loadMappers(//
+			new ESSILabProvider(), //
+			JS_API_ResultSetMapper.JS_API_MAPPING_SCHEMA, String.class).get(0); //
+	    } else {
+
+		mapper = new EiffelJsonMapper();
+	    }
 
 	    FormattingEncoding encoding = version.equals("1.0") ? JS_API_ResultSetFormatter_1_0.JS_API_FORMATTING_ENCODING
 		    : JS_API_ResultSetFormatter_2_0.JS_API_FORMATTING_ENCODING;
 
-	    DiscoveryResultSetFormatter<String> formatter = DiscoveryResultSetFormatterFactory.loadFormatters(//
+	    formatter = DiscoveryResultSetFormatterFactory.loadFormatters(//
 		    new ESSILabProvider(), //
 		    encoding, //
 		    String.class).get(0);
 
-	    discoveryHandler.setMessageResponseMapper(mapper);
-	    discoveryHandler.setMessageResponseFormatter(formatter);
-
-	    logger.debug("Selected mapper: {}", mapper.getClass().getName());
-	    logger.debug("Selected encoding: {}", encoding.getClass().getName());
-	    logger.debug("Selected formatter: {}", formatter.getClass().getName());
+	    GSLoggerFactory.getLogger(getClass()).debug("Selected encoding version: {}", version);
 
 	    break;
 
 	case NameSpace.GS_DATA_MODEL_XML_MEDIA_TYPE:
-
-	    logger.debug("Selecting mapper and formatter in GS_DATA_MODEL_XML_MEDIA_TYPE");
 
 	    mapper = DiscoveryResultSetMapperFactory.loadMappers(//
 		    new ESSILabProvider(), //
@@ -216,24 +266,30 @@ public class OSProfiler extends Profiler {
 		    OS_XML_ResultSetFormatter.OS_XML_FORMATTING_ENCODING, //
 		    String.class).get(0);
 
-	    discoveryHandler.setMessageResponseMapper(mapper);
-	    discoveryHandler.setMessageResponseFormatter(formatter);
-
-	    logger.debug("Selected mapper: {}", mapper.getClass().getName());
-
-	    logger.debug("Selected formatter: {}", formatter.getClass().getName());
 	    break;
 
 	case MediaType.APPLICATION_ATOM_XML:
 	default:
 
-	    logger.debug("Selecting mapper and formatter in APPLICATION_ATOM_XML");
+	    if (!eiffelOption.isPresent()) {
 
-	    discoveryHandler.setMessageResponseMapper(new AtomGPResultSetMapper());
-	    discoveryHandler.setMessageResponseFormatter(new AtomGPResultSetFormatter());
+		mapper = new AtomGPResultSetMapper();
+
+	    } else {
+
+		mapper = new EiffelAtomMapper();
+	    }
+
+	    formatter = new AtomGPResultSetFormatter();
 
 	    break;
 	}
+
+	discoveryHandler.setMessageResponseMapper(mapper);
+	discoveryHandler.setMessageResponseFormatter(formatter);
+
+	GSLoggerFactory.getLogger(getClass()).debug("Selected mapper: {}", mapper.getClass().getName());
+	GSLoggerFactory.getLogger(getClass()).debug("Selected formatter: {}", formatter.getClass().getName());
     }
 
     /**
@@ -339,4 +395,9 @@ public class OSProfiler extends Profiler {
 
 	return OPENSEARCH_SERVICE_INFO;
     }
+
+    public static void main(String[] args) throws Exception {
+
+    }
+
 }

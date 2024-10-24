@@ -1,0 +1,119 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>eu.essi_lab</groupId>
+		<artifactId>DAB</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>configuration-api-test</artifactId>
+	<name>ESSI-Lab Configuration API test framework</name>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>gs-service</artifactId>
+			<version>${project.parent.version}</version>
+			<classifier>classes</classifier>
+		</dependency>
+
+	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>continuous-integration</id>
+			<build>
+				<finalName>gi-cat-latest-build</finalName>
+			</build>
+		</profile>
+		<profile>
+			<id>internaltest</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<configuration>
+							<systemPropertyVariables>
+								<mysql.port>${mysql.port}</mysql.port>
+							</systemPropertyVariables>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>io.fabric8</groupId>
+						<artifactId>docker-maven-plugin</artifactId>
+
+						<configuration>
+							<images>
+								<image>
+									<alias>gi-mysql</alias>
+									<name>${mySQLDocker.registry}</name>
+									<run>
+										<ports>
+											<port>mysql.port:3306</port>
+										</ports>
+										<wait>
+											<time>${fabric8-no-ping-timeout}</time>
+											<!-- http>
+												<url>http://${docker.host.address}:${mysql.port}</url>
+												<method>GET</method>
+												<status>200</status>
+											</http-->
+
+										</wait>
+										<env>
+											<MYSQL_ROOT_PASSWORD>pdw</MYSQL_ROOT_PASSWORD>
+										</env>
+									</run>
+								</image>
+								
+
+							</images>
+
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>externaltest</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<configuration>
+							<systemPropertyVariables>
+								<mysql.port>${mysql.port}</mysql.port>
+							</systemPropertyVariables>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>io.fabric8</groupId>
+						<artifactId>docker-maven-plugin</artifactId>
+
+						<configuration>
+							<images>
+
+							
+
+							</images>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+
+</project>

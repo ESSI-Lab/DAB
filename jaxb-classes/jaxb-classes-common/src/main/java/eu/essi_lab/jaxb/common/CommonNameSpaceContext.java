@@ -4,7 +4,7 @@ package eu.essi_lab.jaxb.common;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,10 +29,9 @@ import java.util.stream.Collectors;
 
 import javax.xml.namespace.NamespaceContext;
 
+import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
-
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
 import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
@@ -41,6 +40,8 @@ import eu.essi_lab.lib.xml.XMLDocumentReader;
  * @author Fabrizio
  */
 public class CommonNameSpaceContext extends NamespacePrefixMapper implements NamespaceContext {
+
+    protected HashMap<String, String> map;
 
     public static final String XACML_3_0 = "urn:oasis:names:tc:xacml:3.0:core:schema:wd-17";
     public static final String CSW_NS_URI = "http://www.opengis.net/cat/csw/2.0.2";
@@ -58,9 +59,13 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
     public static final String APISO_NS_URI = "http://www.opengis.net/cat/csw/apiso/1.0";
     public static final String SDN_NS_URI = "http://www.seadatanet.org";
     public static final String BLUECLOUD_NS_URI = "http://essi-lab.eu/BLUECLOUD";
+    public static final String BLUECLOUD_API = "http://essi-lab.eu/BlueCloudAPI";
     public static final String ARGO_NS_URI = "http://essi-lab.eu/ARGO";
     public static final String WEKEO_NS_URI = "http://essi-lab.eu/WEKEO";
     public static final String EUROBIS_NS_URI = "http://essi-lab.eu/EurOBIS";
+    public static final String EUROBIS_LD_NS_URI = "http://essi-lab.eu/EurOBIS-LD";
+    public static final String EMODNET_PHYSICS_NS_URI = "http://essi-lab.eu/EMODNETPhysics";
+    public static final String NIWA_NS_URI = "http://essi-lab.eu/NIWA";
     public static final String ICOS_NS_URI = "http://essi-lab.eu/ICOS";
     public static final String MCP_1_NS_URI = "http://bluenet3.antcrc.utas.edu.au/mcp";
     public static final String MCP_2_NS_URI = "http://schemas.aodn.org.au/mcp-2.0";
@@ -86,6 +91,7 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
     public static final String OWS_1_1_NS_URI = "http://www.opengis.net/ows/1.1";
     public static final String OAI_NS_URI = "http://www.openarchives.org/OAI/2.0/";
     public static final String OAI_DC_NS_URI = "http://www.openarchives.org/OAI/2.0/oai_dc/";
+    public static final String OAI_DATACITE_NS_URI = "https://schema.datacite.org/meta/kernel-4.3/metadata.xsd";
     public static final String PUB_SUB_NS_URI = "http://www.opengis.net/pubsub/1.0";
     public static final String MULTI = "http://essi-lab.eu/multi";
     public static final String OS_1_1_NS_URI = "http://a9.com/-/spec/opensearch/1.1/";
@@ -94,7 +100,10 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
     public static final String ENVIRONMENT_CANADA_URI = "http://essi-lab.eu/ENVIRONMENT_CANADA";
     public static final String THUNDER_URI = "http://essi-lab.eu/THUNDER";
     public static final String ECV_INVENTORY = "http://essi-lab.eu/ECV_INVENTORY";
-    public static final String ESSI_SOS_URI = "http://essi-lab.eu/sos";
+
+    public static final String SOS_2_0 = "http://www.opengis.net/spec/SOS/2.0/";
+    public static final String SOS_1_0_0 = "http://www.opengis.net/spec/SOS/1.0.0/";
+
     public static final String ANA_URI = "http://essi-lab.eu/ANA";
     public static final String ANA_SAR_URI = "http://essi-lab.eu/ANA-SAR";
     public static final String CEHQ_URI = "https://www.cehq.gouv.qc.ca/hydrometrie";
@@ -110,22 +119,61 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
     public static final String NVE_URI = "https://hydapi.nve.no/api/v1";
     public static final String DMH_URI = "https://meteorologia.gov.py";
 
+    public static final String SMHI_URI = "https://opendata-download-hydroobs.smhi.se/api/version/1.0";
     public static final String IMO_URI = "http://customer.vedur.is";
     public static final String RIHMI_URI = "http://ws.meteo.ru";
+    public static final String HIS_CENTRAL_SHAPEFILE = "http://shapefile.his-central.it";
     public static final String RIHMI_HISTORICAL_URI = "http://ws.meteo.ru/hydro/rest/GetHydroAveMonDischargesRF/xml/";
     public static final String BNHS_URI = "http://wmo.int/bnhs";
     public static final String RASAQM_URI = "http://www.feerc.ru/geoss/rasaqm";
 
-    protected HashMap<String, String> map;
     private static final String GEORSS = "http://www.georss.org/georss";
     public static final String DINAGUA_URI = "https://www.ambiente.gub.uy/axis2/services/Dinaguaws";
     public static final String WOD = "https://data.nodc.noaa.gov/woa/WOD";
     public static final String THREDDS_NS_URI = "http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0";
     public static final String INVENIO_NS_URI = "http://essi-lab.eu/invenio";
 
+    public static final String HISCENTRAL_BASILICATA_NS_URI = "http://essi-lab.eu/his-central/basilicata";
+    public static final String HISCENTRAL_SARDEGNA_NS_URI = "http://essi-lab.eu/his-central/sardegna";
     public static final String HISCENTRAL_TOSCANA_NS_URI = "http://essi-lab.eu/his-central/toscana";
+    public static final String HISCENTRAL_UMBRIA_NS_URI = "http://essi-lab.eu/his-central/umbria";
+
+    public static final String HISCENTRAL_EMILIA_NS_URI = "http://essi-lab.eu/his-central/emilia";
+
     public static final String HISCENTRAL_MARCHE_NS_URI = "http://essi-lab.eu/his-central/marche";
     public static final String HISCENTRAL_FRIULI_NS_URI = "http://essi-lab.eu/his-central/friuli";
+    public static final String HISCENTRAL_VENETO_NS_URI = "http://essi-lab.eu/his-central/veneto";
+    public static final String HISCENTRAL_LAZIO_NS_URI = "http://essi-lab.eu/his-central/lazio";
+    public static final String HISCENTRAL_VALDAOSTA_NS_URI = "http://essi-lab.eu/his-central/valdaosta";
+    public static final String HISCENTRAL_PIEMONTE_NS_URI = "http://essi-lab.eu/his-central/piemonte";
+    public static final String HISCENTRAL_LIGURIA_NS_URI = "http://essi-lab.eu/his-central/liguria";
+    public static final String HISCENTRAL_BOLZANO_NS_URI = "http://essi-lab.eu/his-central/bolzano";
+    public static final String HISCENTRAL_PUGLIA_NS_URI = "http://essi-lab.eu/his-central/puglia";
+    public static final String WMS_1_3_0_QWeMS_NS_URI = "urn:ogc:serviceType:WebMapService:QWeMS:1.3.0";
+    public static final String POLYTOPE = "http://essi-lab.eu/Polytope";
+    public static final String POLYTOPE_METEOTRACKER = "http://essi-lab.eu/Polytope/Meteotracker";
+    public static final String POLYTOPE_IONBEAM = "http://essi-lab.eu/Polytope/IonBeam";
+
+    public static final String DWS_URI = "urn:essi:serviceType:DWS";
+
+    public static final String AUTOMATIC_SYSTEM_PARAGUAY_URI = "https://automaticas.meteorologia.gov.py";
+    public static final String SIGEDAC_PARAGUAY_URI = "https://sigedac.meteorologia.gov.py";
+    public static final String SIGEDAC_RIVER_URI = "https://sigedac.river.meteorologia.gov.py";
+
+    public static final String DIF_URI = "http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/dif.xsd";
+
+    public static final String METEOTRACKER = "https://app.meteotracker.com";
+
+    public static final String TRIGGER = "https://trigger-io.difa.unibo.it";
+    
+    public static final String SMARTCITIZENKIT = "https://api.smartcitizen.me";
+    
+    public static final String ACRONET = "https://webdrops.cimafoundation.org/";
+    public static final String GEOMOUNTAIN = "http://essi-lab.eu/geomountain";
+    
+    public static final String EEA_NS_URI = "http://essi-lab.eu/eea";
+    
+    public static final String AGAME_NS_URI = "http://essi-lab.eu/agame";
 
     public CommonNameSpaceContext() {
 
@@ -176,8 +224,35 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
 	map.put("catalog", THREDDS_NS_URI);
 	map.put("invenio", INVENIO_NS_URI);
 	map.put("hiscentraltoscana", HISCENTRAL_TOSCANA_NS_URI);
+	map.put("hiscentralumbria", HISCENTRAL_UMBRIA_NS_URI);
+	map.put("hiscentralemilia", HISCENTRAL_EMILIA_NS_URI);
 	map.put("hiscentralmarche", HISCENTRAL_MARCHE_NS_URI);
 	map.put("hiscentralfriuli", HISCENTRAL_FRIULI_NS_URI);
+	map.put("hiscentralveneto", HISCENTRAL_VENETO_NS_URI);
+	map.put("hiscentrallazio", HISCENTRAL_LAZIO_NS_URI);
+	map.put("hiscentralvaldaosta", HISCENTRAL_VALDAOSTA_NS_URI);
+	map.put("hiscentralpiemonte", HISCENTRAL_PIEMONTE_NS_URI);
+	map.put("hiscentralliguria", HISCENTRAL_LIGURIA_NS_URI);
+	map.put("hiscentralbolzano", HISCENTRAL_BOLZANO_NS_URI);
+	map.put("hiscentralsardegna", HISCENTRAL_SARDEGNA_NS_URI);
+	map.put("hiscentralbasilicata", HISCENTRAL_BASILICATA_NS_URI);
+	map.put("hiscentralpuglia", HISCENTRAL_PUGLIA_NS_URI);
+
+	map.put("polytopemeteotracker", POLYTOPE_METEOTRACKER);
+	map.put("bluecloudapi", BLUECLOUD_API);
+	map.put("dwsuri", DWS_URI);
+	map.put("asparaguayuri", AUTOMATIC_SYSTEM_PARAGUAY_URI);
+	map.put("sigedacparaguayuri", SIGEDAC_PARAGUAY_URI);
+	map.put("sigedacriveruri", SIGEDAC_RIVER_URI);
+	map.put("dif", DIF_URI);
+	map.put("meteotracker", METEOTRACKER);
+	map.put("trigger", TRIGGER);
+	map.put("smartcitizenkit", SMARTCITIZENKIT);
+	map.put("acronet", ACRONET);
+	map.put("geomountain", GEOMOUNTAIN);
+	map.put("eea", EEA_NS_URI);
+	map.put("agame", AGAME_NS_URI);
+
     }
 
     /**

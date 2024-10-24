@@ -1,0 +1,2267 @@
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.w3.org/2005/Atom http://essi-lab.eu/schemas/geo-rss/atom_1.0_specification.xsd http://www.georss.org/georss http://essi-lab.eu/schemas/geo-rss/geo_rss_1.1_specification.xsd http://www.opengis.net/gml http://schemas.opengis.net/gml/3.1.1/base/gml.xsd">
+    <title>Search results</title>
+    <id>bb2b4b70-12ac-4d30-865f-c58c96a71f63</id>
+    <link
+        href="https://gs-service-production.geodab.eu/gs-service/services/essi/view/geoss/opensearch/query?searchFields=title,keywords,abstract&amp;r=emi2dk3jfvb&amp;si=1&amp;ct=30&amp;tf=keyword,format,protocol,providerID,organisationName,sscScore&amp;rel=OVERLAPS&amp;viewid=atlantic&amp;st=iAtlantic&amp;sources=seanoeId"
+        rel="search" title="Content Search" type="application/atom+xml"/>
+    <totalResults xmlns="http://a9.com/-/spec/opensearch/1.1/">23</totalResults>
+    <startIndex xmlns="http://a9.com/-/spec/opensearch/1.1/">1</startIndex>
+    <itemsPerPage xmlns="http://a9.com/-/spec/opensearch/1.1/">30</itemsPerPage>
+    <entry xmlns="http://www.w3.org/2005/Atom">
+        <title>Autonomous temperature probes data from the EMSO-Azores observatory,
+            2022-2023</title>
+        <id>d8b88e70-3a93-4937-85fd-040718ca3ae6</id>
+        <sourceId>seanoeId</sourceId>
+        <sourceTitle>SEA scieNtific Open data Edition (SEANOE)</sourceTitle>
+        <summary>This dataset contains temperature data acquired between june 2022 and july 2023
+            with an array of 33 autonomous temperature probes installed in smoker orifices, cracks
+            or patches of diffuse hydrothermal venting. We used 7 types of probes (HTW, HTWN, HTNKE,
+            LTNKE, LTW, LTI and LTGrad). Probes locations, acquisition parameters and clock drift
+            values (UTC-timeprobe) are listed in the metadata file. Temperature data are provided
+            for each deployed instrument as one or two text files, uncorrected for clock
+            drift.</summary>
+        <box xmlns="http://www.georss.org/georss">37.28825 -32.28217 37.29211 -32.26407</box>
+        <category label="Dataset" term="hlevel"/>
+        <category label="Mid-Atlantic Ridge" term="keywords"/>
+        <category label="EMSO-Azores" term="keywords"/>
+        <category label="Hydrothermal Vents" term="keywords"/>
+        <category label="Lucky Strike" term="keywords"/>
+        <category label="Eiffel Tower" term="keywords"/>
+        <category label="Capelinhos" term="keywords"/>
+        <category label="Cypres" term="keywords"/>
+        <category label="Montsegur" term="keywords"/>
+        <category label="Sintra" term="keywords"/>
+        <category label="South Crystal" term="keywords"/>
+        <category label="White Castle" term="keywords"/>
+        <category label="WHOI" term="keywords"/>
+        <category label="NKE" term="keywords"/>
+        <category label="iButton" term="keywords"/>
+        <category label="LTGrad" term="keywords"/>
+        <category label="LTI" term="keywords"/>
+        <category label="Temperature" term="keywords"/>
+        <category label="Time-series" term="keywords"/>
+        <category label="MoMAR" term="keywords"/>
+        <category label="MoMARSAT2022" term="keywords"/>
+        <category label="iAtlantic" term="keywords"/>
+        <contributor>
+            <orgName>CNRS, IPGP, France</orgName>
+            <indName>Cannat, Mathilde</indName>
+            <role>originator</role>
+        </contributor>
+        <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+        <gmd:distributionInfo xmlns:gmd="http://www.isotc211.org/2005/gmd"
+            xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+            xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/"
+            xmlns:gco="http://www.isotc211.org/2005/gco"
+            xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml"
+            xmlns:ns4="http://quakeml.org/xmlns/bed/1.2" xmlns:ogc="http://www.opengis.net/ogc"
+            xmlns:ows="http://www.opengis.net/ows" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0"
+            xmlns:xlink="http://www.w3.org/1999/xlink">
+            <gmd:MD_Distribution xmlns:dcterms="http://purl.org/dc/terms/"
+                xmlns:gml32="http://www.opengis.net/gml/3.2"
+                xmlns:gmx="http://www.isotc211.org/2005/gmx"
+                xmlns:gts="http://www.isotc211.org/2005/gts"
+                xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+                xmlns:ows11="http://www.opengis.net/ows/1.1"
+                xmlns:pubSub="http://www.opengis.net/pubsub/1.0"
+                xmlns:srv="http://www.isotc211.org/2005/srv"
+                xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+                <gmd:transferOptions>
+                    <gmd:MD_DigitalTransferOptions>
+                        <gmd:onLine>
+                            <gmd:CI_OnlineResource>
+                                <gmd:linkage>
+                                    <gmd:URL>https://doi.org/10.17882/96616</gmd:URL>
+                                </gmd:linkage>
+                                <gmd:function>
+                                    <gmd:CI_OnLineFunctionCode
+                                        codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode"
+                                        codeListValue="information" codeSpace="ISOTC211/19115"
+                                        >information</gmd:CI_OnLineFunctionCode>
+                                </gmd:function>
+                            </gmd:CI_OnlineResource>
+                        </gmd:onLine>
+                    </gmd:MD_DigitalTransferOptions>
+                </gmd:transferOptions>
+            </gmd:MD_Distribution>
+        </gmd:distributionInfo>
+    </entry>
+    <entry xmlns="http://www.w3.org/2005/Atom">
+        <title>ADCP data collected during the iMAR 2021/Eurofleets+ research cruise in Mid Atlantic
+            Ridge (Azores EEZ)</title>
+        <id>6483e695-06ee-4799-aae4-a5317b857960</id>
+        <sourceId>seanoeId</sourceId>
+        <sourceTitle>SEA scieNtific Open data Edition (SEANOE)</sourceTitle>
+        <summary>This dataset was produced during the iMAR cruise “The Integrated assessment of the
+            distribution of Vulnerable Marine Ecosystem along the Mid-Atlantic Ridge (MAR) in the
+            Azores region”, that took place aboard the Research Vessel Pelagia of the Royal
+            Netherlands Institute for Sea Research between May 19th and June 2nd 2021. The iMAR
+            cruise aimed to evaluate the role of the MAR in shaping latitudinal and trans-Atlantic
+            patterns in deep-sea biogeography, connectivity and assemblages of deep-sea megafauna.
+            This expedition was funded by the SEA OCEANS program of Eurofleets+ and the H2020
+            European project iAtlantic, and was led by the University of the Azores (Portugal) in
+            collaboration with the Hydrographic Institute and University of Porto (Portugal), the
+            University of Aarhus (Denmark), the National Oceanography Center (United Kingdom),
+            GEOMAR (Germany), the University Museum of Bergen (Norway), the PP Shirshov Institute of
+            Oceanology (Russia), and the University of Vale do Itajaí (Brazil). ADCP data was
+            collected at 34 stations during the iMAR cruise, mainly in the North portion of the MAR
+            in the EEZ around the Azores (Table 1). This dataset contain the “.ENR” and another 9
+            file types with the same name structure but different extensions (.ENS; .ENX; .TXT;
+            .LTA; .N1R; .N2R; .NMS; .STA; .VMO). VmDas Quick Start Guide: “.ENR” raw ADCP data file;
+            “.ENS” ADCP data after having been screened for RSSI and correlation by VmDas; “.ENX”
+            ADCP single-ping data (plus NAV) after having been bin-mapped, transformed to Earth
+            coordinates, and screened for error velocity, vertical velocity, and false targets.
+            “.LTA” ADCP (plus NAV) data that has been averaged using the long time period; “.N1R”
+            and “.N2R” Raw NMEA data files; includes ADCP time stamps; “.N1R” extension is used for
+            single-port NMEA data collection, or for GPS position data (Nav) in dual-port collection
+            mode. The “.N2R” extension is used for Roll/Pitch/Heading (RPH) data collection when
+            using two serial ports for NMEA data collection. “.NMS” Binary format NAV data file
+            after having been screened and pre-averaged. “.STA” ADCP (plus NAV) data that has been
+            averaged using the short time period; “.VMO” the option settings used for collecting the
+            data (text file). </summary>
+        <box xmlns="http://www.georss.org/georss">38.236108 -30.935026 42.484475 -28.559438</box>
+        <category label="Dataset" term="hlevel"/>
+        <category label="Mid-Atlantic Ridge" term="keywords"/>
+        <category label="Azores" term="keywords"/>
+        <category label="Deep-sea" term="keywords"/>
+        <category label="iMAR 2021" term="keywords"/>
+        <category label="Eurofleets" term="keywords"/>
+        <category label="ADCP" term="keywords"/>
+        <category label="Acoustic" term="keywords"/>
+        <category label="EurofleetsPlus" term="keywords"/>
+        <category label="iAtlantic" term="keywords"/>
+        <contributor>
+            <orgName>Aarhus University, Department of Ecoscience - Applied Marine Ecology and
+                Modelling, Denmark</orgName>
+            <indName>Mohn, Christian</indName>
+            <role>originator</role>
+        </contributor>
+        <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+        <gmd:distributionInfo xmlns:gmd="http://www.isotc211.org/2005/gmd"
+            xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+            xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/"
+            xmlns:gco="http://www.isotc211.org/2005/gco"
+            xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml"
+            xmlns:ns4="http://quakeml.org/xmlns/bed/1.2" xmlns:ogc="http://www.opengis.net/ogc"
+            xmlns:ows="http://www.opengis.net/ows" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0"
+            xmlns:xlink="http://www.w3.org/1999/xlink">
+            <gmd:MD_Distribution xmlns:dcterms="http://purl.org/dc/terms/"
+                xmlns:gml32="http://www.opengis.net/gml/3.2"
+                xmlns:gmx="http://www.isotc211.org/2005/gmx"
+                xmlns:gts="http://www.isotc211.org/2005/gts"
+                xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+                xmlns:ows11="http://www.opengis.net/ows/1.1"
+                xmlns:pubSub="http://www.opengis.net/pubsub/1.0"
+                xmlns:srv="http://www.isotc211.org/2005/srv"
+                xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+                <gmd:transferOptions>
+                    <gmd:MD_DigitalTransferOptions>
+                        <gmd:onLine>
+                            <gmd:CI_OnlineResource>
+                                <gmd:linkage>
+                                    <gmd:URL>https://doi.org/10.17882/86019</gmd:URL>
+                                </gmd:linkage>
+                                <gmd:function>
+                                    <gmd:CI_OnLineFunctionCode
+                                        codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode"
+                                        codeListValue="information" codeSpace="ISOTC211/19115"
+                                        >information</gmd:CI_OnLineFunctionCode>
+                                </gmd:function>
+                            </gmd:CI_OnlineResource>
+                        </gmd:onLine>
+                    </gmd:MD_DigitalTransferOptions>
+                </gmd:transferOptions>
+            </gmd:MD_Distribution>
+        </gmd:distributionInfo>
+    </entry>
+    <entry xmlns="http://www.w3.org/2005/Atom">
+        <title>List of deep-sea benthic video stations collected during the iMAR 2021/Eurofleets+
+            research cruise in Mid Atlantic Ridge (Azores EEZ)</title>
+        <id>974d3fbf-eaab-413a-aa10-0f83f9b74d9f</id>
+        <sourceId>seanoeId</sourceId>
+        <sourceTitle>SEA scieNtific Open data Edition (SEANOE)</sourceTitle>
+        <summary>This dataset was collected during the iMAR cruise “The Integrated assessment of the
+            distribution of Vulnerable Marine Ecosystem along the Mid-Atlantic Ridge (MAR) in the
+            Azores region”, that took place aboard the Research Vessel Pelagia of the Royal
+            Netherlands Institute for Sea Research (NIOZ) between May 19th and June 2nd 2021. The
+            iMAR cruise aimed to evaluate the role of the MAR in shaping latitudinal and
+            trans-Atlantic patterns in deep-sea biogeography, connectivity and assemblages of
+            deep-sea megafauna. This expedition was funded by the SEA OCEANS program of Eurofleets+
+            and the H2020 European project iAtlantic, and was led by the University of the Azores
+            (Portugal) in collaboration with the Hydrographic Institute and University of Porto
+            (Portugal), the University of Aarhus (Denmark), the National Oceanography Center (United
+            Kingdom), GEOMAR (Germany), the University Museum of Bergen (Norway), the PP Shirshov
+            Institute of Oceanology (Russia), and the University of Vale do Itajaí (Brazil). The
+            deep-sea benthic communities were mapped using the NIOZ towed camera system. The Hopper
+            system generated a series of high-definition video transects in each area explored,
+            starting from the deepest point (set at 1,200 m approx.) and moving upwards towards the
+            seamount or ridge summit (700 m to 300 m depth). During the iMAR cruise, 22 stations for
+            Hopper video transects were performed (Table 1), mainly in the North portion of the MAR
+            inside the Exclusive Economic Zone around the Azores, which produced approximately 54
+            hours of bottom time, along 48 km of seafloor. </summary>
+        <box xmlns="http://www.georss.org/georss">38.236108 -30.935026 42.484475 -28.559438</box>
+        <category label="Dataset" term="hlevel"/>
+        <category label="Mid-Atlantic Ridge" term="keywords"/>
+        <category label="Azores" term="keywords"/>
+        <category label="Deep-sea" term="keywords"/>
+        <category label="iMAR 2021" term="keywords"/>
+        <category label="Eurofleets" term="keywords"/>
+        <category label="Stations" term="keywords"/>
+        <category label="Video" term="keywords"/>
+        <category label="Hopper" term="keywords"/>
+        <category label="EurofleetsPlus" term="keywords"/>
+        <category label="iAtlantic" term="keywords"/>
+        <contributor>
+            <orgName>Universidade dos Açores, Okeanos, Portugal</orgName>
+            <indName>Dominguez-Carrió, Carlos</indName>
+            <role>originator</role>
+        </contributor>
+        <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+        <gmd:distributionInfo xmlns:gmd="http://www.isotc211.org/2005/gmd"
+            xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+            xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/"
+            xmlns:gco="http://www.isotc211.org/2005/gco"
+            xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml"
+            xmlns:ns4="http://quakeml.org/xmlns/bed/1.2" xmlns:ogc="http://www.opengis.net/ogc"
+            xmlns:ows="http://www.opengis.net/ows" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0"
+            xmlns:xlink="http://www.w3.org/1999/xlink">
+            <gmd:MD_Distribution xmlns:dcterms="http://purl.org/dc/terms/"
+                xmlns:gml32="http://www.opengis.net/gml/3.2"
+                xmlns:gmx="http://www.isotc211.org/2005/gmx"
+                xmlns:gts="http://www.isotc211.org/2005/gts"
+                xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+                xmlns:ows11="http://www.opengis.net/ows/1.1"
+                xmlns:pubSub="http://www.opengis.net/pubsub/1.0"
+                xmlns:srv="http://www.isotc211.org/2005/srv"
+                xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+                <gmd:transferOptions>
+                    <gmd:MD_DigitalTransferOptions>
+                        <gmd:onLine>
+                            <gmd:CI_OnlineResource>
+                                <gmd:linkage>
+                                    <gmd:URL>https://doi.org/10.17882/86110</gmd:URL>
+                                </gmd:linkage>
+                                <gmd:function>
+                                    <gmd:CI_OnLineFunctionCode
+                                        codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode"
+                                        codeListValue="information" codeSpace="ISOTC211/19115"
+                                        >information</gmd:CI_OnLineFunctionCode>
+                                </gmd:function>
+                            </gmd:CI_OnlineResource>
+                        </gmd:onLine>
+                    </gmd:MD_DigitalTransferOptions>
+                </gmd:transferOptions>
+            </gmd:MD_Distribution>
+        </gmd:distributionInfo>
+    </entry>
+    <entry xmlns="http://www.w3.org/2005/Atom">
+        <title>List of stations with data collected during the iMAR 2021/Eurofleets+ research cruise
+            in Mid Atlantic Ridge (Azores EEZ)</title>
+        <id>d24a00d5-d16b-4e3a-ab62-60365c627001</id>
+        <sourceId>seanoeId</sourceId>
+        <sourceTitle>SEA scieNtific Open data Edition (SEANOE)</sourceTitle>
+        <summary>This dataset contain the metadata for all stations conducted during the iMAR cruise
+            “The Integrated assessment of the distribution of Vulnerable Marine Ecosystem along the
+            Mid-Atlantic Ridge (MAR) in the Azores region”, that took place aboard the Research
+            Vessel Pelagia of the Royal Netherlands Institute for Sea Research between May 19th and
+            June 2nd 2021. This expedition was funded by the SEA OCEANS program of Eurofleets+ and
+            the H2020 European project iAtlantic, and was led by the University of the Azores
+            (Portugal) in collaboration with the Hydrographic Institute and University of Porto
+            (Portugal), the University of Aarhus (Denmark), the National Oceanography Center (United
+            Kingdom), GEOMAR (Germany), the University Museum of Bergen (Norway), the PP Shirshov
+            Institute of Oceanology (Russia), and the University of Vale do Itajaí (Brazil).
+            Statistics: Cruise duration was 17 days, 2,500 km of transits, 6 areas visited, 5,500
+            km2 of mapped seabed (mainly in the North portion of the MAR in the EEZ around the
+            Azores), 19 dives with the NIOZ video system that resulted in 54 hours of deep-sea
+            images over 48 km of the seabed, 13 stations for the analysis of water mass properties
+            and to collect sediments, which resulted in 380 samples for environmental DNA, 280
+            samples for nutrient analyses, 27 sediment samples for geological analyses, 24 for
+            microplastic analyses, 10 samples for bacteriological, and 10 samples meiofauna
+            analyses.</summary>
+        <box xmlns="http://www.georss.org/georss">38.236108 -30.935026 42.484475 -28.559438</box>
+        <category label="Dataset" term="hlevel"/>
+        <category label="Mid-Atlantic Ridge" term="keywords"/>
+        <category label="Azores" term="keywords"/>
+        <category label="Deep-sea" term="keywords"/>
+        <category label="iMAR 2021" term="keywords"/>
+        <category label="Eurofleets" term="keywords"/>
+        <category label="Stations" term="keywords"/>
+        <category label="EurofleetsPlus" term="keywords"/>
+        <category label="iAtlantic" term="keywords"/>
+        <contributor>
+            <orgName>Universidade dos Açores, Okeanos, Portugal</orgName>
+            <indName>Morato, Telmo</indName>
+            <role>originator</role>
+        </contributor>
+        <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+        <gmd:distributionInfo xmlns:gmd="http://www.isotc211.org/2005/gmd"
+            xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+            xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/"
+            xmlns:gco="http://www.isotc211.org/2005/gco"
+            xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml"
+            xmlns:ns4="http://quakeml.org/xmlns/bed/1.2" xmlns:ogc="http://www.opengis.net/ogc"
+            xmlns:ows="http://www.opengis.net/ows" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0"
+            xmlns:xlink="http://www.w3.org/1999/xlink">
+            <gmd:MD_Distribution xmlns:dcterms="http://purl.org/dc/terms/"
+                xmlns:gml32="http://www.opengis.net/gml/3.2"
+                xmlns:gmx="http://www.isotc211.org/2005/gmx"
+                xmlns:gts="http://www.isotc211.org/2005/gts"
+                xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+                xmlns:ows11="http://www.opengis.net/ows/1.1"
+                xmlns:pubSub="http://www.opengis.net/pubsub/1.0"
+                xmlns:srv="http://www.isotc211.org/2005/srv"
+                xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+                <gmd:transferOptions>
+                    <gmd:MD_DigitalTransferOptions>
+                        <gmd:onLine>
+                            <gmd:CI_OnlineResource>
+                                <gmd:linkage>
+                                    <gmd:URL>https://doi.org/10.17882/86103</gmd:URL>
+                                </gmd:linkage>
+                                <gmd:function>
+                                    <gmd:CI_OnLineFunctionCode
+                                        codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode"
+                                        codeListValue="information" codeSpace="ISOTC211/19115"
+                                        >information</gmd:CI_OnLineFunctionCode>
+                                </gmd:function>
+                            </gmd:CI_OnlineResource>
+                        </gmd:onLine>
+                    </gmd:MD_DigitalTransferOptions>
+                </gmd:transferOptions>
+            </gmd:MD_Distribution>
+        </gmd:distributionInfo>
+    </entry>
+    <entry xmlns="http://www.w3.org/2005/Atom">
+        <title>SVP data collected during the iMAR 2021/Eurofleets+ research cruise in Mid Atlantic
+            Ridge (Azores EEZ)</title>
+        <id>e84ff3c2-5e00-4d9a-9889-cb619b6f071a</id>
+        <sourceId>seanoeId</sourceId>
+        <sourceTitle>SEA scieNtific Open data Edition (SEANOE)</sourceTitle>
+        <summary>This dataset was produced during the iMAR cruise “The Integrated assessment of the
+            distribution of Vulnerable Marine Ecosystem along the Mid-Atlantic Ridge (MAR) in the
+            Azores region”, that took place aboard the Research Vessel Pelagia of the Royal
+            Netherlands Institute for Sea Research between May 19th and June 2nd 2021. The iMAR
+            cruise aimed to evaluate the role of the MAR in shaping latitudinal and trans-Atlantic
+            patterns in deep-sea biogeography, connectivity and assemblages of deep-sea megafauna.
+            This expedition was funded by the SEA OCEANS program of Eurofleets+ and the H2020
+            European project iAtlantic, and was led by the University of the Azores (Portugal) in
+            collaboration with the Hydrographic Institute and University of Porto (Portugal), the
+            University of Aarhus (Denmark), the National Oceanography Center (United Kingdom),
+            GEOMAR (Germany), the University Museum of Bergen (Norway), the PP Shirshov Institute of
+            Oceanology (Russia), and the University of Vale do Itajaí (Brazil). Vertical CTD Seabird
+            SBE 32 /Rosette profiles were conducted at 19 stations to generate Sound Velocity
+            Profiles (Table 1), mainly in the North portion of the MAR in the Exclusive Economic
+            Zone around the Azores. The “.cnv” files contain the sound velocity data binned to 1 m
+            depth intervals using the “bin average”.</summary>
+        <box xmlns="http://www.georss.org/georss">38.236108 -30.935026 42.484475 -28.559438</box>
+        <category label="Dataset" term="hlevel"/>
+        <category label="Mid-Atlantic Ridge" term="keywords"/>
+        <category label="Azores" term="keywords"/>
+        <category label="Deep-sea" term="keywords"/>
+        <category label="iMAR 2021" term="keywords"/>
+        <category label="Eurofleets" term="keywords"/>
+        <category label="SVP" term="keywords"/>
+        <category label="EurofleetsPlus" term="keywords"/>
+        <category label="iAtlantic" term="keywords"/>
+        <contributor>
+            <orgName>National Oceanography Center, United Kingdom</orgName>
+            <indName>Evans, Susan</indName>
+            <role>originator</role>
+        </contributor>
+        <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+        <gmd:distributionInfo xmlns:gmd="http://www.isotc211.org/2005/gmd"
+            xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+            xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/"
+            xmlns:gco="http://www.isotc211.org/2005/gco"
+            xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml"
+            xmlns:ns4="http://quakeml.org/xmlns/bed/1.2" xmlns:ogc="http://www.opengis.net/ogc"
+            xmlns:ows="http://www.opengis.net/ows" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0"
+            xmlns:xlink="http://www.w3.org/1999/xlink">
+            <gmd:MD_Distribution xmlns:dcterms="http://purl.org/dc/terms/"
+                xmlns:gml32="http://www.opengis.net/gml/3.2"
+                xmlns:gmx="http://www.isotc211.org/2005/gmx"
+                xmlns:gts="http://www.isotc211.org/2005/gts"
+                xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+                xmlns:ows11="http://www.opengis.net/ows/1.1"
+                xmlns:pubSub="http://www.opengis.net/pubsub/1.0"
+                xmlns:srv="http://www.isotc211.org/2005/srv"
+                xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+                <gmd:transferOptions>
+                    <gmd:MD_DigitalTransferOptions>
+                        <gmd:onLine>
+                            <gmd:CI_OnlineResource>
+                                <gmd:linkage>
+                                    <gmd:URL>https://doi.org/10.17882/86107</gmd:URL>
+                                </gmd:linkage>
+                                <gmd:function>
+                                    <gmd:CI_OnLineFunctionCode
+                                        codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode"
+                                        codeListValue="information" codeSpace="ISOTC211/19115"
+                                        >information</gmd:CI_OnLineFunctionCode>
+                                </gmd:function>
+                            </gmd:CI_OnlineResource>
+                        </gmd:onLine>
+                    </gmd:MD_DigitalTransferOptions>
+                </gmd:transferOptions>
+            </gmd:MD_Distribution>
+        </gmd:distributionInfo>
+    </entry>
+    <entry xmlns="http://www.w3.org/2005/Atom">
+        <title>CTD data collected during the iMAR 2021/Eurofleets+ research cruise in Mid Atlantic
+            Ridge (Azores EEZ)</title>
+        <id>23c7f795-7522-468d-9152-5b2a958d0355</id>
+        <sourceId>seanoeId</sourceId>
+        <sourceTitle>SEA scieNtific Open data Edition (SEANOE)</sourceTitle>
+        <summary>This dataset was produced during the iMAR cruise “The Integrated assessment of the
+            distribution of Vulnerable Marine Ecosystem along the Mid-Atlantic Ridge (MAR) in the
+            Azores region”, that took place aboard the Research Vessel Pelagia of the Royal
+            Netherlands Institute for Sea Research between May 18th and June 2nd 2021. The iMAR
+            cruise aimed to evaluate the role of the MAR in shaping latitudinal and trans-Atlantic
+            patterns in deep-sea biogeography, connectivity and assemblages of deep-sea megafauna.
+            This expedition was funded by the SEA OCEANS program of Eurofleets+ and the H2020
+            European project iAtlantic, and was led by the University of the Azores (Portugal) in
+            collaboration with the Hydrographic Institute and University of Porto (Portugal), the
+            University of Aarhus (Denmark), the National Oceanography Center (United Kingdom),
+            GEOMAR (Germany), the University Museum of Bergen (Norway), the PP Shirshov Institute of
+            Oceanology (Russia), and the University of Vale do Itajaí (Brazil). Vertical CTD/Rosette
+            profiles were conducted with the CTD Seabird SBE 32 at 19 stations to measure physical
+            and chemical seawater properties that characterize the dominant water masses described
+            for the North MAR region of the Azores (Table 1). The “.CNV” files of fully processed
+            data contain data of twenty-two parameters interpolated at 1-meter bins, (Table 2),
+            mainly in the North portion of the MAR in the Exclusive Economic Zone around the
+            Azores.</summary>
+        <box xmlns="http://www.georss.org/georss">38.236108 -30.935026 42.484475 -28.559438</box>
+        <category label="Dataset" term="hlevel"/>
+        <category label="Mid-Atlantic Ridge" term="keywords"/>
+        <category label="Azores" term="keywords"/>
+        <category label="Deep-sea" term="keywords"/>
+        <category label="iMAR 2021" term="keywords"/>
+        <category label="Eurofleets" term="keywords"/>
+        <category label="CTD" term="keywords"/>
+        <category label="EurofleetsPlus" term="keywords"/>
+        <category label="iAtlantic" term="keywords"/>
+        <contributor>
+            <orgName>National Oceanography Center, United Kingdom</orgName>
+            <indName>Evans, Susan</indName>
+            <role>originator</role>
+        </contributor>
+        <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+        <gmd:distributionInfo xmlns:gmd="http://www.isotc211.org/2005/gmd"
+            xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+            xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/"
+            xmlns:gco="http://www.isotc211.org/2005/gco"
+            xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml"
+            xmlns:ns4="http://quakeml.org/xmlns/bed/1.2" xmlns:ogc="http://www.opengis.net/ogc"
+            xmlns:ows="http://www.opengis.net/ows" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0"
+            xmlns:xlink="http://www.w3.org/1999/xlink">
+            <gmd:MD_Distribution xmlns:dcterms="http://purl.org/dc/terms/"
+                xmlns:gml32="http://www.opengis.net/gml/3.2"
+                xmlns:gmx="http://www.isotc211.org/2005/gmx"
+                xmlns:gts="http://www.isotc211.org/2005/gts"
+                xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+                xmlns:ows11="http://www.opengis.net/ows/1.1"
+                xmlns:pubSub="http://www.opengis.net/pubsub/1.0"
+                xmlns:srv="http://www.isotc211.org/2005/srv"
+                xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+                <gmd:transferOptions>
+                    <gmd:MD_DigitalTransferOptions>
+                        <gmd:onLine>
+                            <gmd:CI_OnlineResource>
+                                <gmd:linkage>
+                                    <gmd:URL>https://doi.org/10.17882/86106</gmd:URL>
+                                </gmd:linkage>
+                                <gmd:function>
+                                    <gmd:CI_OnLineFunctionCode
+                                        codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode"
+                                        codeListValue="information" codeSpace="ISOTC211/19115"
+                                        >information</gmd:CI_OnLineFunctionCode>
+                                </gmd:function>
+                            </gmd:CI_OnlineResource>
+                        </gmd:onLine>
+                    </gmd:MD_DigitalTransferOptions>
+                </gmd:transferOptions>
+            </gmd:MD_Distribution>
+        </gmd:distributionInfo>
+    </entry>
+    <entry xmlns="http://www.w3.org/2005/Atom">
+        <title>Multibeam Raw Data collected during the iMAR 2021/Eurofleets+ research cruise in Mid
+            Atlantic Ridge (Azores EEZ)</title>
+        <id>c93ed395-2e23-4c2c-9c29-08c6b9badbbb</id>
+        <sourceId>seanoeId</sourceId>
+        <sourceTitle>SEA scieNtific Open data Edition (SEANOE)</sourceTitle>
+        <summary>The iMAR cruise “The Integrated assessment of the distribution of Vulnerable Marine
+            Ecosystem along the Mid-Atlantic Ridge (MAR) in the Azores region” took place aboard the
+            Research Vessel Pelagia of the Royal Netherlands Institute for Sea Research (NIOZ)
+            between May 19th and June 2nd 2021. This expedition was funded by the SEA OCEANS program
+            of Eurofleets+ and the H2020 European project iAtlantic, and was led by the University
+            of the Azores (Portugal) in collaboration with the Hydrographic Institute and University
+            of Porto (Portugal), the University of Aarhus (Denmark), the National Oceanography
+            Center (United Kingdom), GEOMAR (Germany), the University Museum of Bergen (Norway), the
+            PP Shirshov Institute of Oceanology (Russia), and the University of Vale do Itajaí
+            (Brazil). During the iMAR cruise we performed 28 stations for multibeam surveys, summing
+            171:30 hours of surveys, 5,500 km2 of mapped seabed (mainly in the North portion of the
+            MAR in the Exclusive Economic Zone around the Azores), in 8 main areas and during many
+            of the 2,500 km of transits All multibeam data processing was treated by Leonor Neves de
+            Sousa (Instituto Hidrográfico) with the software “CARIS HIPS &amp; SIPS”.These are the
+            .all files of multibeam row data about 28 stations, between 18 May and 2 June, with
+            information about seamounts, ridges and depressions of the Mid-Atlantic Ridge in the
+            Azores.</summary>
+        <box xmlns="http://www.georss.org/georss">38.236108 -30.935026 42.484475 -28.559438</box>
+        <category label="Dataset" term="hlevel"/>
+        <category label="Mid-Atlantic Ridge" term="keywords"/>
+        <category label="Azores" term="keywords"/>
+        <category label="Deep-sea" term="keywords"/>
+        <category label="iMAR 2021" term="keywords"/>
+        <category label="Raw Data" term="keywords"/>
+        <category label="Bathymetry" term="keywords"/>
+        <category label="Raw Data" term="keywords"/>
+        <category label="Multibeam" term="keywords"/>
+        <category label="EurofleetsPlus" term="keywords"/>
+        <category label="iAtlantic" term="keywords"/>
+        <contributor>
+            <orgName>Instituto Hidrográfico, Portugal</orgName>
+            <indName>Neves De Sousa, Laura</indName>
+            <role>originator</role>
+        </contributor>
+        <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+        <gmd:distributionInfo xmlns:gmd="http://www.isotc211.org/2005/gmd"
+            xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+            xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/"
+            xmlns:gco="http://www.isotc211.org/2005/gco"
+            xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml"
+            xmlns:ns4="http://quakeml.org/xmlns/bed/1.2" xmlns:ogc="http://www.opengis.net/ogc"
+            xmlns:ows="http://www.opengis.net/ows" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0"
+            xmlns:xlink="http://www.w3.org/1999/xlink">
+            <gmd:MD_Distribution xmlns:dcterms="http://purl.org/dc/terms/"
+                xmlns:gml32="http://www.opengis.net/gml/3.2"
+                xmlns:gmx="http://www.isotc211.org/2005/gmx"
+                xmlns:gts="http://www.isotc211.org/2005/gts"
+                xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+                xmlns:ows11="http://www.opengis.net/ows/1.1"
+                xmlns:pubSub="http://www.opengis.net/pubsub/1.0"
+                xmlns:srv="http://www.isotc211.org/2005/srv"
+                xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+                <gmd:transferOptions>
+                    <gmd:MD_DigitalTransferOptions>
+                        <gmd:onLine>
+                            <gmd:CI_OnlineResource>
+                                <gmd:linkage>
+                                    <gmd:URL>https://doi.org/10.17882/85926</gmd:URL>
+                                </gmd:linkage>
+                                <gmd:function>
+                                    <gmd:CI_OnLineFunctionCode
+                                        codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode"
+                                        codeListValue="information" codeSpace="ISOTC211/19115"
+                                        >information</gmd:CI_OnLineFunctionCode>
+                                </gmd:function>
+                            </gmd:CI_OnlineResource>
+                        </gmd:onLine>
+                    </gmd:MD_DigitalTransferOptions>
+                </gmd:transferOptions>
+            </gmd:MD_Distribution>
+        </gmd:distributionInfo>
+    </entry>
+    <entry xmlns="http://www.w3.org/2005/Atom">
+        <title>Nutrient data collected during the iMAR 2021/Eurofleets+ research cruise in Mid
+            Atlantic Ridge (Azores EEZ)</title>
+        <id>3c2c0551-13a0-4f9a-9801-4c9fa41c0672</id>
+        <sourceId>seanoeId</sourceId>
+        <sourceTitle>SEA scieNtific Open data Edition (SEANOE)</sourceTitle>
+        <summary>This dataset was produced during the iMAR cruise “The Integrated assessment of the
+            distribution of Vulnerable Marine Ecosystem along the Mid-Atlantic Ridge (MAR) in the
+            Azores region”, that took place aboard the Research Vessel Pelagia of the Royal
+            Netherlands Institute for Sea Research between May 18th and June 2nd 2021. The iMAR
+            cruise aimed to evaluate the role of the MAR in shaping latitudinal and trans-Atlantic
+            patterns in deep-sea biogeography, connectivity and assemblages of deep-sea megafauna.
+            This expedition was funded by the SEA OCEANS program of Eurofleets+ and the H2020
+            European project iAtlantic, and was led by the University of the Azores (Portugal) in
+            collaboration with the Hydrographic Institute and University of Porto (Portugal), the
+            University of Aarhus (Denmark), the National Oceanography Center (United Kingdom),
+            GEOMAR (Germany), the University Museum of Bergen (Norway), the PP Shirshov Institute of
+            Oceanology (Russia), and the University of Vale do Itajaí (Brazil). Nutrient analysis
+            was performed according to Grasshoff et al, adopted for a 5 channel continues flow
+            analyzer (Skalar San Plus, Skalar Analytical B. V., Breda, The Netherlands). Nitrite and
+            nitrate+nitrite was measured using an ammonia buffer and
+            sulfanilamide/alpha-Naphthylethylene diamine dihydrochloride colour reagent in
+            phosphoric acid, with reduction of nitrate to nitrite by cadmium column of at least 80%
+            measured reduction capacity (90-100% achieved), followed by quantification with
+            spectrophotometric determination of the nitrite-azo dye at 540 nm. Nitrate was
+            determined as the difference between nitrate+nitrite and nitrite measurements. Ammonia
+            was measured using a citrate/tartrate buffer and phenol color reagent, catalyzed by
+            hypochlorite and nitroprusside , followed by quantification with spectrophotometric
+            determination of the phenol-ammonia complex at 630 nm. Phosphate samples reacted with
+            antimo nytartrate and ammonium molybdate solution in sulfuric acidified solution, the
+            resulting complex wasreduced by ascorbic acid to a deep blue dye, followed by
+            quantification with spectrophotometric determination of the reduced
+            antimony-phospho-molybdate complex at 880 nm. Silicate samples was acidified with
+            sulfuric acid and reacted with ammonium molybdate solution, reduced by ascorbic acid to
+            a blue dye with oxalic acid to remove phosphate interference , followed by
+            quantification with spectrophotometric determination of the reduced molybdo-silicate
+            complex at 810 nm. Methods used are accredited with expected detection limit of 0,04 µM
+            for nitrite, 0,1 µM for nitrate, 0,3 µM for ammonia, 0,06 µM for Phosphate and 0,2 µM
+            for silicate, with expected RSD between 4 and 7%for the individual nutrients. Certified
+            reference materials (VKI type QC RW1 for ammonia, phosphate and nitrate) and internal
+            reference materials for Nitrite and silicate was spiked at two levels to natural low
+            nutrient seawater sample for quality assurance, recovering 91-109% of the spike for
+            nitrite, nitrate, phosphate and silicate at with RSD% of 1 to 5%, and recovery of 84-91%
+            for ammonia, with RSDs up to 15%. No corrections was performed on data the recoveries.
+            Except for ammonia, all results was within the acceptance limits for accredited
+            analysis. Analysis was performed over two runs, one with triplicates and then a fourth
+            spare sample was included to investigate the ammonia instability, but it could not be
+            determined if this was due to storage/transport or instrument The “.CSV” files of fully
+            processed data contain data collected mainly in the North portion of the MAR in the
+            Exclusive Economic Zone around the Azores.</summary>
+        <box xmlns="http://www.georss.org/georss">38.236108 -30.935026 42.484475 -28.559438</box>
+        <category label="Dataset" term="hlevel"/>
+        <category label="Mid-Atlantic Ridge" term="keywords"/>
+        <category label="Azores" term="keywords"/>
+        <category label="Deep-sea" term="keywords"/>
+        <category label="iMAR 2021" term="keywords"/>
+        <category label="Eurofleets" term="keywords"/>
+        <category label="Nutrients" term="keywords"/>
+        <category label="Raw Data" term="keywords"/>
+        <category label="EurofleetsPlus" term="keywords"/>
+        <category label="iAtlantic" term="keywords"/>
+        <contributor>
+            <orgName>Aarhus University, Department of Ecoscience - Applied Marine Ecology and
+                Modelling, Denmark</orgName>
+            <indName>Mohn, Christian</indName>
+            <role>originator</role>
+        </contributor>
+        <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+        <gmd:distributionInfo xmlns:gmd="http://www.isotc211.org/2005/gmd"
+            xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+            xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/"
+            xmlns:gco="http://www.isotc211.org/2005/gco"
+            xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml"
+            xmlns:ns4="http://quakeml.org/xmlns/bed/1.2" xmlns:ogc="http://www.opengis.net/ogc"
+            xmlns:ows="http://www.opengis.net/ows" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0"
+            xmlns:xlink="http://www.w3.org/1999/xlink">
+            <gmd:MD_Distribution xmlns:dcterms="http://purl.org/dc/terms/"
+                xmlns:gml32="http://www.opengis.net/gml/3.2"
+                xmlns:gmx="http://www.isotc211.org/2005/gmx"
+                xmlns:gts="http://www.isotc211.org/2005/gts"
+                xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+                xmlns:ows11="http://www.opengis.net/ows/1.1"
+                xmlns:pubSub="http://www.opengis.net/pubsub/1.0"
+                xmlns:srv="http://www.isotc211.org/2005/srv"
+                xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+                <gmd:transferOptions>
+                    <gmd:MD_DigitalTransferOptions>
+                        <gmd:onLine>
+                            <gmd:CI_OnlineResource>
+                                <gmd:linkage>
+                                    <gmd:URL>https://doi.org/10.17882/86115</gmd:URL>
+                                </gmd:linkage>
+                                <gmd:function>
+                                    <gmd:CI_OnLineFunctionCode
+                                        codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode"
+                                        codeListValue="information" codeSpace="ISOTC211/19115"
+                                        >information</gmd:CI_OnLineFunctionCode>
+                                </gmd:function>
+                            </gmd:CI_OnlineResource>
+                        </gmd:onLine>
+                    </gmd:MD_DigitalTransferOptions>
+                </gmd:transferOptions>
+            </gmd:MD_Distribution>
+        </gmd:distributionInfo>
+    </entry>
+    <entry xmlns="http://www.w3.org/2005/Atom">
+        <title>Compilation of image annotations and environmental data of 7 years of monitoring of
+            hydrothermal assemblages using the TEMPO ecological module (EMSO-Azores
+            observatory)</title>
+        <id>328329ac-3f48-4b72-b5cf-cfb5190d9531</id>
+        <sourceId>seanoeId</sourceId>
+        <sourceTitle>SEA scieNtific Open data Edition (SEANOE)</sourceTitle>
+        <summary>The dataset contains annotations made on screenshots of video sequences collected
+            by the TEMPO ecological module from 2012 to 2019 at a frequency from infra-daily to 10
+            days (base of the Eiffel Tower hydrothermal edifice, Lucky Strike, Mid-Atlantic Ridge,
+            depth of 1695m). A long-term monitoring of the vent fauna dynamics was achieved with the
+            files provided in this DOI that includes: - Annotations of the substratum and of the
+            vent fauna (Bathymodiolus azoricus vent mussel) and microbial mats with polygons; -
+            Annotations of the crab Segonzacia mesatlantica within images; - Count of unidentified
+            zoanthids (manual and automatic; codes are provided). Long-term monitoring of the vent
+            habitat dynamics was made with the following environmental measurements also provided in
+            the DOI: - Yearly measurements made with the CHEMINI and temperatures probes of the
+            underwater vehicle since MoMARSAT2014 - Positions and temperatures measured by iButton®
+            probe in the TEMPO images - Linear regression-based modeling of the vent fluid dilution
+            gradient in order to interpolate the iButton® temperatures over the full set of images
+            The dataset is accompanied with rasters allowing spatio-temporal continuity of the data
+            by masking the portions of the images that do not overlap throughout the image time
+            series. The dataset is also accompanied with a read me to describe the structure of each
+            data.</summary>
+        <box xmlns="http://www.georss.org/georss">37.17 -32.16 37.17 -32.16</box>
+        <category label="Dataset" term="hlevel"/>
+        <category label="Mid-Atlantic Ridge" term="keywords"/>
+        <category label="EMSO-Azores" term="keywords"/>
+        <category label="Hydrothermal vent" term="keywords"/>
+        <category label="Lucky Strike" term="keywords"/>
+        <category label="Underwater imagery" term="keywords"/>
+        <category label="TEMPO" term="keywords"/>
+        <category label="Time series" term="keywords"/>
+        <category label="MoMARSAT" term="keywords"/>
+        <category label="Bathymodiolus azoricus" term="keywords"/>
+        <category label="Eiffel Tower" term="keywords"/>
+        <category label="Microbial mats" term="keywords"/>
+        <category label="Segonzacia mesatlantica" term="keywords"/>
+        <category label="Multidisciplinary" term="keywords"/>
+        <category label="Deep-sea observatory" term="keywords"/>
+        <category label="High-resolution monitoring" term="keywords"/>
+        <category label="Long-term monitoring" term="keywords"/>
+        <category label="Vent dynamics" term="keywords"/>
+        <category label="EMSO" term="keywords"/>
+        <category label="iAtlantic" term="keywords"/>
+        <contributor>
+            <orgName>Univ Brest, CNRS, Ifremer, UMR6197 BEEP, F-29280 Plouzané, France</orgName>
+            <indName>Van Audenhaege, Loic</indName>
+            <role>originator</role>
+        </contributor>
+        <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+        <gmd:distributionInfo xmlns:gmd="http://www.isotc211.org/2005/gmd"
+            xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+            xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/"
+            xmlns:gco="http://www.isotc211.org/2005/gco"
+            xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml"
+            xmlns:ns4="http://quakeml.org/xmlns/bed/1.2" xmlns:ogc="http://www.opengis.net/ogc"
+            xmlns:ows="http://www.opengis.net/ows" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0"
+            xmlns:xlink="http://www.w3.org/1999/xlink">
+            <gmd:MD_Distribution xmlns:dcterms="http://purl.org/dc/terms/"
+                xmlns:gml32="http://www.opengis.net/gml/3.2"
+                xmlns:gmx="http://www.isotc211.org/2005/gmx"
+                xmlns:gts="http://www.isotc211.org/2005/gts"
+                xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+                xmlns:ows11="http://www.opengis.net/ows/1.1"
+                xmlns:pubSub="http://www.opengis.net/pubsub/1.0"
+                xmlns:srv="http://www.isotc211.org/2005/srv"
+                xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+                <gmd:transferOptions>
+                    <gmd:MD_DigitalTransferOptions>
+                        <gmd:onLine>
+                            <gmd:CI_OnlineResource>
+                                <gmd:linkage>
+                                    <gmd:URL>https://doi.org/10.17882/84672</gmd:URL>
+                                </gmd:linkage>
+                                <gmd:function>
+                                    <gmd:CI_OnLineFunctionCode
+                                        codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode"
+                                        codeListValue="information" codeSpace="ISOTC211/19115"
+                                        >information</gmd:CI_OnLineFunctionCode>
+                                </gmd:function>
+                            </gmd:CI_OnlineResource>
+                        </gmd:onLine>
+                    </gmd:MD_DigitalTransferOptions>
+                </gmd:transferOptions>
+            </gmd:MD_Distribution>
+        </gmd:distributionInfo>
+    </entry>
+    <entry xmlns="http://www.w3.org/2005/Atom">
+        <title>Vent assemblage and substratum of the Eiffel Tower hydrothermal edifice from 1994 to
+            2008</title>
+        <id>879e5aa7-d0d6-4735-9aae-6345dcd7f0af</id>
+        <sourceId>seanoeId</sourceId>
+        <sourceTitle>SEA scieNtific Open data Edition (SEANOE)</sourceTitle>
+        <summary>The Eiffel Tower hydrothermal edifice is a large structure of ~450 m2 located 1700
+            m deep at the Lucky Strike hydrothermal vent field. Since its discovery in 1992, the
+            edifice has been repeatedly visited at pluriannuel time scales. Photomosaics of
+            different sides of the edifice were assembled based on videosequences acquired from 1994
+            to 2008. Surface of substrata and vent megafaunal assemblages were delimited and their
+            total cover were extracted to investigate their dynamics over time.</summary>
+        <box xmlns="http://www.georss.org/georss">37.17 -32.16 37.17 -32.16</box>
+        <category label="Dataset" term="hlevel"/>
+        <category label="Vent ecology" term="keywords"/>
+        <category label="Temporal monitoring" term="keywords"/>
+        <category label="Hydrothermal edifice" term="keywords"/>
+        <category label="Photomosaics" term="keywords"/>
+        <category label="Chemosynthetic ecosystem" term="keywords"/>
+        <category label="Deep sea" term="keywords"/>
+        <category label="Underwater imagery" term="keywords"/>
+        <category label="iAtlantic" term="keywords"/>
+        <contributor>
+            <orgName>Institute of Marine Sciences—Okeanos, University of the Azores, Horta,
+                Portugal</orgName>
+            <indName>Cuvelier, Daphné</indName>
+            <role>originator</role>
+        </contributor>
+        <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+        <gmd:distributionInfo xmlns:gmd="http://www.isotc211.org/2005/gmd"
+            xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+            xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/"
+            xmlns:gco="http://www.isotc211.org/2005/gco"
+            xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml"
+            xmlns:ns4="http://quakeml.org/xmlns/bed/1.2" xmlns:ogc="http://www.opengis.net/ogc"
+            xmlns:ows="http://www.opengis.net/ows" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0"
+            xmlns:xlink="http://www.w3.org/1999/xlink">
+            <gmd:MD_Distribution xmlns:dcterms="http://purl.org/dc/terms/"
+                xmlns:gml32="http://www.opengis.net/gml/3.2"
+                xmlns:gmx="http://www.isotc211.org/2005/gmx"
+                xmlns:gts="http://www.isotc211.org/2005/gts"
+                xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+                xmlns:ows11="http://www.opengis.net/ows/1.1"
+                xmlns:pubSub="http://www.opengis.net/pubsub/1.0"
+                xmlns:srv="http://www.isotc211.org/2005/srv"
+                xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+                <gmd:transferOptions>
+                    <gmd:MD_DigitalTransferOptions>
+                        <gmd:onLine>
+                            <gmd:CI_OnlineResource>
+                                <gmd:linkage>
+                                    <gmd:URL>https://doi.org/10.17882/95808</gmd:URL>
+                                </gmd:linkage>
+                                <gmd:function>
+                                    <gmd:CI_OnLineFunctionCode
+                                        codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode"
+                                        codeListValue="information" codeSpace="ISOTC211/19115"
+                                        >information</gmd:CI_OnLineFunctionCode>
+                                </gmd:function>
+                            </gmd:CI_OnlineResource>
+                        </gmd:onLine>
+                    </gmd:MD_DigitalTransferOptions>
+                </gmd:transferOptions>
+            </gmd:MD_Distribution>
+        </gmd:distributionInfo>
+    </entry>
+    <entry xmlns="http://www.w3.org/2005/Atom">
+        <title>Geochemistry of hydrothermal fluids at the Lucky Strike Hydrothermal Field data from
+            the EMSO-Azores observatory, 2023</title>
+        <id>f207f08c-a328-4a7d-8b0c-fc6df87610d1</id>
+        <sourceId>seanoeId</sourceId>
+        <sourceTitle>SEA scieNtific Open data Edition (SEANOE)</sourceTitle>
+        <summary>High temperature hydrothermal fluids are collected during the MOMARSAT 2023 cruise
+            by gas-tight fluid sampler manipulated and triggered by the hydraulic arm of the
+            submarine vehicle (ROV Victor). Several hydrothermal vents are sampled, namely : Aisics,
+            Eiffel tower, Montsegur, Montserrat, Isabel, Sintra, Y3, White Castle, Cypress, South
+            Crystal, Capelinhos. Several chemical analyses are performed aboard the research vessel:
+            such as salinity and d20/20 by refractometer, Conductivity, salinity and total dissolved
+            solid (TDS) by electrode (standard solution at 1413 µS/cm), pH and Eh by electrode (pH
+            standard 4.01 and 7; Eh standard solution at -220mV), iron concentration by photometer
+            (up to 5 ppm), H2S and total S concentrations measured by electrode (AquaMS,
+            amperometric method) at measured pH value. Regional Node: EMSO-Azores Vent field : Lucky
+            Strike Latitude : 37º17’N Longitude : 32º16’W 1600 – 1750 m depth</summary>
+        <box xmlns="http://www.georss.org/georss">37.283333 -32.266667 37.283333 -32.266667</box>
+        <category label="Dataset" term="hlevel"/>
+        <category label="Mid-Atlantic Ridge" term="keywords"/>
+        <category label="EMSO-Açores" term="keywords"/>
+        <category label="hydrothermal fluids" term="keywords"/>
+        <category label="Lucky Strike" term="keywords"/>
+        <category label="geochemistry" term="keywords"/>
+        <category label="MOMARSAT 2023" term="keywords"/>
+        <category label="iAtlantic" term="keywords"/>
+        <contributor>
+            <orgName>CNRS, GET, UMR5563, France</orgName>
+            <indName>Chavagnac, Valérie</indName>
+            <role>originator</role>
+        </contributor>
+        <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+        <gmd:distributionInfo xmlns:gmd="http://www.isotc211.org/2005/gmd"
+            xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+            xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/"
+            xmlns:gco="http://www.isotc211.org/2005/gco"
+            xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml"
+            xmlns:ns4="http://quakeml.org/xmlns/bed/1.2" xmlns:ogc="http://www.opengis.net/ogc"
+            xmlns:ows="http://www.opengis.net/ows" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0"
+            xmlns:xlink="http://www.w3.org/1999/xlink">
+            <gmd:MD_Distribution xmlns:dcterms="http://purl.org/dc/terms/"
+                xmlns:gml32="http://www.opengis.net/gml/3.2"
+                xmlns:gmx="http://www.isotc211.org/2005/gmx"
+                xmlns:gts="http://www.isotc211.org/2005/gts"
+                xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+                xmlns:ows11="http://www.opengis.net/ows/1.1"
+                xmlns:pubSub="http://www.opengis.net/pubsub/1.0"
+                xmlns:srv="http://www.isotc211.org/2005/srv"
+                xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+                <gmd:transferOptions>
+                    <gmd:MD_DigitalTransferOptions>
+                        <gmd:onLine>
+                            <gmd:CI_OnlineResource>
+                                <gmd:linkage>
+                                    <gmd:URL>https://doi.org/10.17882/96322</gmd:URL>
+                                </gmd:linkage>
+                                <gmd:function>
+                                    <gmd:CI_OnLineFunctionCode
+                                        codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode"
+                                        codeListValue="information" codeSpace="ISOTC211/19115"
+                                        >information</gmd:CI_OnLineFunctionCode>
+                                </gmd:function>
+                            </gmd:CI_OnlineResource>
+                        </gmd:onLine>
+                    </gmd:MD_DigitalTransferOptions>
+                </gmd:transferOptions>
+            </gmd:MD_Distribution>
+        </gmd:distributionInfo>
+    </entry>
+    <entry xmlns="http://www.w3.org/2005/Atom">
+        <title>Geochemistry of hydrothermal fluids at the Lucky Strike Hydrothermal Field data from
+            the EMSO-Azores observatory, 2022</title>
+        <id>258443fa-47da-4ab9-a3f1-dbd8672ff209</id>
+        <sourceId>seanoeId</sourceId>
+        <sourceTitle>SEA scieNtific Open data Edition (SEANOE)</sourceTitle>
+        <summary>High temperature hydrothermal fluids are collected during the MOMARSAT 2022 cruise
+            by gas-tight fluid sampler manipulated and triggered by the hydraulic arm of the
+            submarine vehicle (HOV Nautile). Several hydrothermal vents are sampled, namely :
+            Aisics, Montsegur, Montserrat, Isabel, Sintra, Y3, White Castle, Crystal, South Crystal,
+            Capelinhos. Several chemical analyses are performed aboard the research vessel: such as
+            salinity and d20/20 by refractometer, Conductivity, salinity and total dissolved solid
+            (TDS) by electrode (standard solution at 1413 µS/cm), pH and Eh by electrode (pH
+            standard 4.01 and 7; Eh standard solution at -220mV), iron concentration by photometer
+            (up to 5 ppm), H2S and total S concentrations measured by electrode (AquaMS,
+            amperometric method) at measured pH value… Regional Node: EMSO-Azores Vent field : Lucky
+            Strike Latitude : 37º17’N Longitude : 32º16’W 1600 – 1750 m depth</summary>
+        <box xmlns="http://www.georss.org/georss">37.283333 -32.266667 37.283333 -32.266667</box>
+        <category label="Dataset" term="hlevel"/>
+        <category label="Mid-Atlantic Ridge" term="keywords"/>
+        <category label="EMSO-Açores" term="keywords"/>
+        <category label="hydrothermal fluids" term="keywords"/>
+        <category label="Lucky Strike" term="keywords"/>
+        <category label="geochemistry" term="keywords"/>
+        <category label="MOMARSAT 2022 cruise" term="keywords"/>
+        <category label="iAtlantic" term="keywords"/>
+        <contributor>
+            <orgName>CNRS, GET, UMR5563, France</orgName>
+            <indName>Chavagnac, Valérie</indName>
+            <role>originator</role>
+        </contributor>
+        <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+        <gmd:distributionInfo xmlns:gmd="http://www.isotc211.org/2005/gmd"
+            xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+            xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/"
+            xmlns:gco="http://www.isotc211.org/2005/gco"
+            xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml"
+            xmlns:ns4="http://quakeml.org/xmlns/bed/1.2" xmlns:ogc="http://www.opengis.net/ogc"
+            xmlns:ows="http://www.opengis.net/ows" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0"
+            xmlns:xlink="http://www.w3.org/1999/xlink">
+            <gmd:MD_Distribution xmlns:dcterms="http://purl.org/dc/terms/"
+                xmlns:gml32="http://www.opengis.net/gml/3.2"
+                xmlns:gmx="http://www.isotc211.org/2005/gmx"
+                xmlns:gts="http://www.isotc211.org/2005/gts"
+                xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+                xmlns:ows11="http://www.opengis.net/ows/1.1"
+                xmlns:pubSub="http://www.opengis.net/pubsub/1.0"
+                xmlns:srv="http://www.isotc211.org/2005/srv"
+                xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+                <gmd:transferOptions>
+                    <gmd:MD_DigitalTransferOptions>
+                        <gmd:onLine>
+                            <gmd:CI_OnlineResource>
+                                <gmd:linkage>
+                                    <gmd:URL>https://doi.org/10.17882/93162</gmd:URL>
+                                </gmd:linkage>
+                                <gmd:function>
+                                    <gmd:CI_OnLineFunctionCode
+                                        codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode"
+                                        codeListValue="information" codeSpace="ISOTC211/19115"
+                                        >information</gmd:CI_OnLineFunctionCode>
+                                </gmd:function>
+                            </gmd:CI_OnlineResource>
+                        </gmd:onLine>
+                    </gmd:MD_DigitalTransferOptions>
+                </gmd:transferOptions>
+            </gmd:MD_Distribution>
+        </gmd:distributionInfo>
+    </entry>
+    <entry xmlns="http://www.w3.org/2005/Atom">
+        <title>Benthic assemblage and habitat dynamics monitored with photogrammetry reconstructions
+            of the Eiffel Tower hydrothermal edifice (2015, 2018 and 2020)</title>
+        <id>3765b9d5-8c25-4742-9cc6-0519065ccbf0</id>
+        <sourceId>seanoeId</sourceId>
+        <sourceTitle>SEA scieNtific Open data Edition (SEANOE)</sourceTitle>
+        <summary>The Eiffel Tower hydrothermal edifice is a large structure of ~450 m2 located at a
+            depth of 1700 m in the South-East of the Lucky Strike hydrothermal vent field. Since the
+            deployment of the EMSO-Azores observatory in 2010, the edifice has been repeatedly
+            surveyed with the remotely operated vehicle Victor6000 for inter-annual monitoring.
+            Video transects were collected with a forward-looking camera in 2015, 2018 and 2020.
+            Video sequences were used to build 3D models of the edifice using structure-from-motion
+            techniques. Surface of substrata, vent megafaunal assemblages, microbial mat and the
+            position of hydrothermal vent outflows and topographic changes were digitised over the
+            3D models for each side of the edifice. These variables were used to investigate scales
+            of ecological dynamics over space and time. Hereby, we provide the dataset as well as a
+            method to extract and visualise data in open-source software (R).</summary>
+        <box xmlns="http://www.georss.org/georss">37.17 -32.16 37.17 -32.16</box>
+        <category label="Dataset" term="hlevel"/>
+        <category label="Vent ecology" term="keywords"/>
+        <category label="Temporal monitoring" term="keywords"/>
+        <category label="Hydrothermal edifice" term="keywords"/>
+        <category label="Underwater imagery" term="keywords"/>
+        <category label="Photogrammetry" term="keywords"/>
+        <category label="Structure-from-motion" term="keywords"/>
+        <category label="Chemosynthetic ecosystem" term="keywords"/>
+        <category label="Deep sea" term="keywords"/>
+        <category label="Fine scales" term="keywords"/>
+        <category label="High resolution" term="keywords"/>
+        <category label="EMSO" term="keywords"/>
+        <category label="iAtlantic" term="keywords"/>
+        <contributor>
+            <orgName>Univ Brest, CNRS, Ifremer, UMR6197 BEEP, F-29280 Plouzané, France</orgName>
+            <indName>Van Audenhaege, Loic</indName>
+            <role>originator</role>
+        </contributor>
+        <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+        <gmd:distributionInfo xmlns:gmd="http://www.isotc211.org/2005/gmd"
+            xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+            xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/"
+            xmlns:gco="http://www.isotc211.org/2005/gco"
+            xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml"
+            xmlns:ns4="http://quakeml.org/xmlns/bed/1.2" xmlns:ogc="http://www.opengis.net/ogc"
+            xmlns:ows="http://www.opengis.net/ows" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0"
+            xmlns:xlink="http://www.w3.org/1999/xlink">
+            <gmd:MD_Distribution xmlns:dcterms="http://purl.org/dc/terms/"
+                xmlns:gml32="http://www.opengis.net/gml/3.2"
+                xmlns:gmx="http://www.isotc211.org/2005/gmx"
+                xmlns:gts="http://www.isotc211.org/2005/gts"
+                xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+                xmlns:ows11="http://www.opengis.net/ows/1.1"
+                xmlns:pubSub="http://www.opengis.net/pubsub/1.0"
+                xmlns:srv="http://www.isotc211.org/2005/srv"
+                xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+                <gmd:transferOptions>
+                    <gmd:MD_DigitalTransferOptions>
+                        <gmd:onLine>
+                            <gmd:CI_OnlineResource>
+                                <gmd:linkage>
+                                    <gmd:URL>https://doi.org/10.17882/96475</gmd:URL>
+                                </gmd:linkage>
+                                <gmd:function>
+                                    <gmd:CI_OnLineFunctionCode
+                                        codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode"
+                                        codeListValue="information" codeSpace="ISOTC211/19115"
+                                        >information</gmd:CI_OnLineFunctionCode>
+                                </gmd:function>
+                            </gmd:CI_OnlineResource>
+                        </gmd:onLine>
+                    </gmd:MD_DigitalTransferOptions>
+                </gmd:transferOptions>
+            </gmd:MD_Distribution>
+        </gmd:distributionInfo>
+    </entry>
+    <entry xmlns="http://www.w3.org/2005/Atom">
+        <title>CTD and LADCP data from the MomarSat 2022 cruise</title>
+        <id>90032ce9-2cda-4bff-8600-d78aa9ed3cb2</id>
+        <sourceId>seanoeId</sourceId>
+        <sourceTitle>SEA scieNtific Open data Edition (SEANOE)</sourceTitle>
+        <summary>Conductivity-Temperature-Depth (CTD) data and
+            Lowered-Acoustic-Doppler-Current-Profiler (LADCP) data from the 22 casts of the MomarSat
+            2022 Cruise. The CTD data from a Seabird SBE 25 were processed with Seasave V 7.26.7.121
+            software. Note that the conductivity/salinity data were NOT calibrated with bottles.
+            Only basic CTD processing was done. The LADCP horizontal currents were measured with a
+            combination of two 300 kHz RDI ADCPs, one uplooker and one downlooker. LADCP data were
+            processed with the LDEO v. IX.12 software with a 10-m vertical resolution.</summary>
+        <box xmlns="http://www.georss.org/georss">36.445026 -33.826744 38.123203 -30.81649</box>
+        <category label="Dataset" term="hlevel"/>
+        <category label="CTD" term="keywords"/>
+        <category label="temperature" term="keywords"/>
+        <category label="conductivity" term="keywords"/>
+        <category label="salinity" term="keywords"/>
+        <category label="pressure" term="keywords"/>
+        <category label="Mid-Atlantic Ridge" term="keywords"/>
+        <category label="hydrography" term="keywords"/>
+        <category label="ADCP" term="keywords"/>
+        <category label="LADCP" term="keywords"/>
+        <category label="current" term="keywords"/>
+        <category label="iAtlantic" term="keywords"/>
+        <contributor>
+            <orgName>Univ Brest, CNRS, Ifremer, IRD, Laboratoire d'Océanographie Physique et
+                Spatiale (LOPS), IUEM, F29280, Plouzané, France</orgName>
+            <indName>Ferron, Bruno</indName>
+            <role>originator</role>
+        </contributor>
+        <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+        <gmd:distributionInfo xmlns:gmd="http://www.isotc211.org/2005/gmd"
+            xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+            xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/"
+            xmlns:gco="http://www.isotc211.org/2005/gco"
+            xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml"
+            xmlns:ns4="http://quakeml.org/xmlns/bed/1.2" xmlns:ogc="http://www.opengis.net/ogc"
+            xmlns:ows="http://www.opengis.net/ows" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0"
+            xmlns:xlink="http://www.w3.org/1999/xlink">
+            <gmd:MD_Distribution xmlns:dcterms="http://purl.org/dc/terms/"
+                xmlns:gml32="http://www.opengis.net/gml/3.2"
+                xmlns:gmx="http://www.isotc211.org/2005/gmx"
+                xmlns:gts="http://www.isotc211.org/2005/gts"
+                xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+                xmlns:ows11="http://www.opengis.net/ows/1.1"
+                xmlns:pubSub="http://www.opengis.net/pubsub/1.0"
+                xmlns:srv="http://www.isotc211.org/2005/srv"
+                xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+                <gmd:transferOptions>
+                    <gmd:MD_DigitalTransferOptions>
+                        <gmd:onLine>
+                            <gmd:CI_OnlineResource>
+                                <gmd:linkage>
+                                    <gmd:URL>https://doi.org/10.17882/94681</gmd:URL>
+                                </gmd:linkage>
+                                <gmd:function>
+                                    <gmd:CI_OnLineFunctionCode
+                                        codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode"
+                                        codeListValue="information" codeSpace="ISOTC211/19115"
+                                        >information</gmd:CI_OnLineFunctionCode>
+                                </gmd:function>
+                            </gmd:CI_OnlineResource>
+                        </gmd:onLine>
+                    </gmd:MD_DigitalTransferOptions>
+                </gmd:transferOptions>
+            </gmd:MD_Distribution>
+        </gmd:distributionInfo>
+    </entry>
+    <entry xmlns="http://www.w3.org/2005/Atom">
+        <title>Eiffel Tower hydrothermal edifice of 2020 (Lucky Strike hydrothermal vent field, Mid
+            Atlantic Ridge): 3D scene and imagery</title>
+        <id>7ca438df-a709-4470-b069-8def70291017</id>
+        <sourceId>seanoeId</sourceId>
+        <sourceTitle>SEA scieNtific Open data Edition (SEANOE)</sourceTitle>
+        <summary>The Eiffel Tower active hydrothermal chimney is a major edifice investigated in
+            deep-sea vent ecology at the Lucky Strike hydrothermal field (~ -1700 m), along the
+            northern Mid-Atlantic Ridge (37.3°N, 32.3°W). This edifice, raising ~20 m over the
+            surrounding seafloor, is associated with black smoker fluids flowing at &gt;300°C as
+            well as diffusion areas colonized by large Bathymodiolus azoricus mussel assemblages and
+            microbial mats. This vent edifice was surveyed with vertical overlapping transects by
+            ROV Victor6000 using an HD camera during the MoMARSAT2020 cruise. This dataset is part
+            of a larger temporal series performed with other 3D reconstructions at the Eiffel Tower
+            hydrothermal edifice that was used to investigate temporal dynamics of the edifice
+            topography and the vent assemblages (Van Audenhaege et al. in prep.; see section
+            &quot;Note&quot;).</summary>
+        <box xmlns="http://www.georss.org/georss">37.288865 -32.275637 37.288865 -32.275637</box>
+        <category label="Dataset" term="hlevel"/>
+        <category label="Photogrammetry" term="keywords"/>
+        <category label="Hydrothermal edifice" term="keywords"/>
+        <category label="Vent ecology" term="keywords"/>
+        <category label="Underwater vehicle" term="keywords"/>
+        <category label="Computer vision" term="keywords"/>
+        <category label="Temporal series" term="keywords"/>
+        <category label="Vent field" term="keywords"/>
+        <category label="3D reconstructions" term="keywords"/>
+        <category label="Communty dynamics" term="keywords"/>
+        <category label="Seafloor mapping" term="keywords"/>
+        <category label="Sulfide mound" term="keywords"/>
+        <category label="Photomosaics" term="keywords"/>
+        <category label="EMSO" term="keywords"/>
+        <category label="iAtlantic" term="keywords"/>
+        <contributor>
+            <orgName>Univ Brest, CNRS, Ifremer, UMR6197 BEEP, F-29280 Plouzané, France</orgName>
+            <indName>Van Audenhaege, Loic</indName>
+            <role>originator</role>
+        </contributor>
+        <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+        <gmd:distributionInfo xmlns:gmd="http://www.isotc211.org/2005/gmd"
+            xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+            xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/"
+            xmlns:gco="http://www.isotc211.org/2005/gco"
+            xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml"
+            xmlns:ns4="http://quakeml.org/xmlns/bed/1.2" xmlns:ogc="http://www.opengis.net/ogc"
+            xmlns:ows="http://www.opengis.net/ows" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0"
+            xmlns:xlink="http://www.w3.org/1999/xlink">
+            <gmd:MD_Distribution xmlns:dcterms="http://purl.org/dc/terms/"
+                xmlns:gml32="http://www.opengis.net/gml/3.2"
+                xmlns:gmx="http://www.isotc211.org/2005/gmx"
+                xmlns:gts="http://www.isotc211.org/2005/gts"
+                xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+                xmlns:ows11="http://www.opengis.net/ows/1.1"
+                xmlns:pubSub="http://www.opengis.net/pubsub/1.0"
+                xmlns:srv="http://www.isotc211.org/2005/srv"
+                xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+                <gmd:transferOptions>
+                    <gmd:MD_DigitalTransferOptions>
+                        <gmd:onLine>
+                            <gmd:CI_OnlineResource>
+                                <gmd:linkage>
+                                    <gmd:URL>https://doi.org/10.17882/92219</gmd:URL>
+                                </gmd:linkage>
+                                <gmd:function>
+                                    <gmd:CI_OnLineFunctionCode
+                                        codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode"
+                                        codeListValue="information" codeSpace="ISOTC211/19115"
+                                        >information</gmd:CI_OnLineFunctionCode>
+                                </gmd:function>
+                            </gmd:CI_OnlineResource>
+                        </gmd:onLine>
+                    </gmd:MD_DigitalTransferOptions>
+                </gmd:transferOptions>
+            </gmd:MD_Distribution>
+        </gmd:distributionInfo>
+    </entry>
+    <entry xmlns="http://www.w3.org/2005/Atom">
+        <title>SMOOVE, video data from EMSO-Azores observatory, 2020-2021</title>
+        <id>731fd5ef-e016-4d25-b0f4-2cf3d2e7fa48</id>
+        <sourceId>seanoeId</sourceId>
+        <sourceTitle>SEA scieNtific Open data Edition (SEANOE)</sourceTitle>
+        <summary>This dataset contains video data and snapshots acquired with the camera SMOOVE
+            installed on the TEMPO ecological module, deployed on the EMSO-Azores observatory from
+            September 2020 to January 2021. Data consist in : - 98 daily snasphots (Size of
+            snapshots: 480 x 360 pixels). - 98 8-minute zoomed-in (daily) and zoomed-out (every 10
+            days) video sequences (Size of video sequences: 1920 x 1080 pixels). The module is
+            connected to the SEAMON East environmental monitoring node and films a mussel bed
+            located at the base of the active Tour Eiffel edifice at 1695 m depth. Position : lat
+            37° 17.334' N long 32° 16.534' W</summary>
+        <box xmlns="http://www.georss.org/georss">37.2888 -32.27982 37.30134 -32.275618</box>
+        <category label="Dataset" term="hlevel"/>
+        <category label="Mid-Atlantic Ridge" term="keywords"/>
+        <category label="EMSO-Azores" term="keywords"/>
+        <category label="Hydrothermal Vents" term="keywords"/>
+        <category label="Lucky Strike" term="keywords"/>
+        <category label="Marine imagery" term="keywords"/>
+        <category label="TEMPO observatory module" term="keywords"/>
+        <category label="Time-series" term="keywords"/>
+        <category label="MoMAR" term="keywords"/>
+        <category label="MoMARSAT2020-2021" term="keywords"/>
+        <category label="Bathymodiolus azoricus faunal assemblage" term="keywords"/>
+        <category label="Tour Eiffel" term="keywords"/>
+        <category label="FIXO3" term="keywords"/>
+        <category label="iAtlantic" term="keywords"/>
+        <contributor>
+            <orgName>Ifremer, REM, France</orgName>
+            <indName>Sarrazin, Jozee</indName>
+            <role>originator</role>
+        </contributor>
+        <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+        <gmd:distributionInfo xmlns:gmd="http://www.isotc211.org/2005/gmd"
+            xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+            xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/"
+            xmlns:gco="http://www.isotc211.org/2005/gco"
+            xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml"
+            xmlns:ns4="http://quakeml.org/xmlns/bed/1.2" xmlns:ogc="http://www.opengis.net/ogc"
+            xmlns:ows="http://www.opengis.net/ows" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0"
+            xmlns:xlink="http://www.w3.org/1999/xlink">
+            <gmd:MD_Distribution xmlns:dcterms="http://purl.org/dc/terms/"
+                xmlns:gml32="http://www.opengis.net/gml/3.2"
+                xmlns:gmx="http://www.isotc211.org/2005/gmx"
+                xmlns:gts="http://www.isotc211.org/2005/gts"
+                xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+                xmlns:ows11="http://www.opengis.net/ows/1.1"
+                xmlns:pubSub="http://www.opengis.net/pubsub/1.0"
+                xmlns:srv="http://www.isotc211.org/2005/srv"
+                xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+                <gmd:transferOptions>
+                    <gmd:MD_DigitalTransferOptions>
+                        <gmd:onLine>
+                            <gmd:CI_OnlineResource>
+                                <gmd:linkage>
+                                    <gmd:URL>https://doi.org/10.17882/83948</gmd:URL>
+                                </gmd:linkage>
+                                <gmd:function>
+                                    <gmd:CI_OnLineFunctionCode
+                                        codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode"
+                                        codeListValue="information" codeSpace="ISOTC211/19115"
+                                        >information</gmd:CI_OnLineFunctionCode>
+                                </gmd:function>
+                            </gmd:CI_OnlineResource>
+                        </gmd:onLine>
+                    </gmd:MD_DigitalTransferOptions>
+                </gmd:transferOptions>
+            </gmd:MD_Distribution>
+        </gmd:distributionInfo>
+    </entry>
+    <entry xmlns="http://www.w3.org/2005/Atom">
+        <title>CTD and ADCP hydrothermal plume data from the MomarSat 2023 cruise</title>
+        <id>2e5c48c0-b15e-446f-88d6-31909c61ca52</id>
+        <sourceId>seanoeId</sourceId>
+        <sourceTitle>SEA scieNtific Open data Edition (SEANOE)</sourceTitle>
+        <summary>This dataset contains measurement profiles for 3D velocity, temperature, pressure,
+            and salinity collected above the Tour Eiffel sulfide structure at the Lucky Strike
+            hydrothermal site, as well as in areas distant from the vents field. The data was
+            acquired with an ultra-short baseline (USBL) acoustic positioning system, an Acoustic
+            Doppler Current Profiler (ADCP Aquadopp V2.00.02), and a Conductivity-Temperature-Depth
+            (CTD Sea-Bird SBE 19plus) sonde. An overview of the experimental setup is provided. The
+            CTD instrument was calibrated in October 2021, and the calibration coefficients can be
+            found in a .xmlcon file. The primary objective of this experiment was to measure the
+            characteristics of the hydrothermal plume during the MomarSat 2023 Cruise. Acquisitions
+            were conducted intermittently over a span of 4 days, with a maximum vertical resolution
+            of O(10 m). The data is available in .cnv and .csv file formats, for compatibility with
+            the pandas library in Python. USBL data was filtered to retain only the temporal
+            positions (degrees and decimal minutes format). Basic post-processing of CTD data was
+            performed using Seasave V 7.23.1. Data acquisition was conducted in successive vertical
+            steps to align with the ADCP acquisition frequency, and ADCP data was filtered to keep
+            only the fixed positions.</summary>
+        <box xmlns="http://www.georss.org/georss">37.17 -32.16 37.17 -32.16</box>
+        <category label="Dataset" term="hlevel"/>
+        <category label="CTD" term="keywords"/>
+        <category label="temperature" term="keywords"/>
+        <category label="conductivity" term="keywords"/>
+        <category label="salinity" term="keywords"/>
+        <category label="pressure" term="keywords"/>
+        <category label="Mid-Atlantic Ridge" term="keywords"/>
+        <category label="ADCP" term="keywords"/>
+        <category label="current" term="keywords"/>
+        <category label="velocity" term="keywords"/>
+        <category label="Lucky Strike" term="keywords"/>
+        <category label="Tour Eiffel" term="keywords"/>
+        <category label="plume" term="keywords"/>
+        <category label="hydrothermal" term="keywords"/>
+        <category label="iAtlantic" term="keywords"/>
+        <contributor>
+            <orgName>Univ Brest, CNRS, Ifremer, IRD, Laboratoire d'Océanographie Physique et
+                Spatiale (LOPS), Plouzané, France</orgName>
+            <indName>Lemaréchal, Cyprien</indName>
+            <role>originator</role>
+        </contributor>
+        <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+        <gmd:distributionInfo xmlns:gmd="http://www.isotc211.org/2005/gmd"
+            xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+            xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/"
+            xmlns:gco="http://www.isotc211.org/2005/gco"
+            xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml"
+            xmlns:ns4="http://quakeml.org/xmlns/bed/1.2" xmlns:ogc="http://www.opengis.net/ogc"
+            xmlns:ows="http://www.opengis.net/ows" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0"
+            xmlns:xlink="http://www.w3.org/1999/xlink">
+            <gmd:MD_Distribution xmlns:dcterms="http://purl.org/dc/terms/"
+                xmlns:gml32="http://www.opengis.net/gml/3.2"
+                xmlns:gmx="http://www.isotc211.org/2005/gmx"
+                xmlns:gts="http://www.isotc211.org/2005/gts"
+                xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+                xmlns:ows11="http://www.opengis.net/ows/1.1"
+                xmlns:pubSub="http://www.opengis.net/pubsub/1.0"
+                xmlns:srv="http://www.isotc211.org/2005/srv"
+                xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+                <gmd:transferOptions>
+                    <gmd:MD_DigitalTransferOptions>
+                        <gmd:onLine>
+                            <gmd:CI_OnlineResource>
+                                <gmd:linkage>
+                                    <gmd:URL>https://doi.org/10.17882/96981</gmd:URL>
+                                </gmd:linkage>
+                                <gmd:function>
+                                    <gmd:CI_OnLineFunctionCode
+                                        codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode"
+                                        codeListValue="information" codeSpace="ISOTC211/19115"
+                                        >information</gmd:CI_OnLineFunctionCode>
+                                </gmd:function>
+                            </gmd:CI_OnlineResource>
+                        </gmd:onLine>
+                    </gmd:MD_DigitalTransferOptions>
+                </gmd:transferOptions>
+            </gmd:MD_Distribution>
+        </gmd:distributionInfo>
+    </entry>
+    <entry xmlns="http://www.w3.org/2005/Atom">
+        <title>Feature-matching based overlay of 7 years of high-resolution imagery collected by the
+            TEMPO ecological module (EMSO-Azores observatory)</title>
+        <id>1bf105ab-4909-4c20-9ba8-d788bf90394e</id>
+        <sourceId>seanoeId</sourceId>
+        <sourceTitle>SEA scieNtific Open data Edition (SEANOE)</sourceTitle>
+        <summary>The dataset contains raw screenshots retrieved from video sequences collected by
+            the TEMPO ecological module from 2012 to 2019 at a frequency from infra-daily to 10 days
+            (base of the Eiffel Tower hydrothermal edifice, Lucky Strike, Mid-Atlantic Ridge, depth
+            of 1695m). These screenshots were all transformed in a continuous spatio-temporal image
+            reference system. This homography transformation was calculated by a combination of
+            feature-matching algorithm and manual annotation of keypoints. All homography
+            transformation matrices and images transformed are included. The dataset is accompanied
+            with a read me to describe the structure of each data. Please contact Loïc Van
+            Audennhaege for further information on the workflow.</summary>
+        <box xmlns="http://www.georss.org/georss">37.17 -32.16 37.17 -32.16</box>
+        <category label="Dataset" term="hlevel"/>
+        <category label="Mid-Atlantic Ridge" term="keywords"/>
+        <category label="Lucky Strike" term="keywords"/>
+        <category label="Eiffel Tower" term="keywords"/>
+        <category label="TEMPO" term="keywords"/>
+        <category label="Spatio-temporal continuity" term="keywords"/>
+        <category label="Homography" term="keywords"/>
+        <category label="Feature matching" term="keywords"/>
+        <category label="Time series" term="keywords"/>
+        <category label="Underwater imagery" term="keywords"/>
+        <category label="Deep-sea observatory" term="keywords"/>
+        <category label="High-resolution monitoring" term="keywords"/>
+        <category label="Long-term monitoring" term="keywords"/>
+        <category label="EMSO" term="keywords"/>
+        <category label="iAtlantic" term="keywords"/>
+        <contributor>
+            <orgName>Univ Brest, CNRS, Ifremer, UMR6197 BEEP, F-29280 Plouzané, France</orgName>
+            <indName>Van Audenhaege, Loic</indName>
+            <role>originator</role>
+        </contributor>
+        <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+        <gmd:distributionInfo xmlns:gmd="http://www.isotc211.org/2005/gmd"
+            xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+            xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/"
+            xmlns:gco="http://www.isotc211.org/2005/gco"
+            xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml"
+            xmlns:ns4="http://quakeml.org/xmlns/bed/1.2" xmlns:ogc="http://www.opengis.net/ogc"
+            xmlns:ows="http://www.opengis.net/ows" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0"
+            xmlns:xlink="http://www.w3.org/1999/xlink">
+            <gmd:MD_Distribution xmlns:dcterms="http://purl.org/dc/terms/"
+                xmlns:gml32="http://www.opengis.net/gml/3.2"
+                xmlns:gmx="http://www.isotc211.org/2005/gmx"
+                xmlns:gts="http://www.isotc211.org/2005/gts"
+                xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+                xmlns:ows11="http://www.opengis.net/ows/1.1"
+                xmlns:pubSub="http://www.opengis.net/pubsub/1.0"
+                xmlns:srv="http://www.isotc211.org/2005/srv"
+                xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+                <gmd:transferOptions>
+                    <gmd:MD_DigitalTransferOptions>
+                        <gmd:onLine>
+                            <gmd:CI_OnlineResource>
+                                <gmd:linkage>
+                                    <gmd:URL>https://doi.org/10.17882/87389</gmd:URL>
+                                </gmd:linkage>
+                                <gmd:function>
+                                    <gmd:CI_OnLineFunctionCode
+                                        codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode"
+                                        codeListValue="information" codeSpace="ISOTC211/19115"
+                                        >information</gmd:CI_OnLineFunctionCode>
+                                </gmd:function>
+                            </gmd:CI_OnlineResource>
+                        </gmd:onLine>
+                    </gmd:MD_DigitalTransferOptions>
+                </gmd:transferOptions>
+            </gmd:MD_Distribution>
+        </gmd:distributionInfo>
+    </entry>
+    <entry xmlns="http://www.w3.org/2005/Atom">
+        <title>Geochemistry of hydrothermal fluids at the Lucky Strike Hydrothermal Field data from
+            the EMSO-Azores observatory, 2021</title>
+        <id>1da0f4a3-a32e-47f1-ab14-9750ea1983ed</id>
+        <sourceId>seanoeId</sourceId>
+        <sourceTitle>SEA scieNtific Open data Edition (SEANOE)</sourceTitle>
+        <summary>High temperature hydrothermal fluids are collected collected during the MOMARSAT
+            2021 cruise by gas-tight fluid sampler manipulated and triggered by the hydraulic arm of
+            the submarine vehicle (HOV Nautile). Several hydrothermal vents are sampled, namely :
+            Aisics, Montsegur, Montserrat, Isabel, Sintra, Y3, White Castle, Crystal, South Crystal,
+            Capelinhos. Several chemical analyses are performed aboard the research vessel: such as
+            salinity and d20/20 by refractometer, Conductivity, salinity and total dissolved solid
+            (TDS) by electrode (standard solution at 1413 µS/cm), pH and Eh by electrode (pH
+            standard 4.01 and 7; Eh standard solution at -220mV), iron concentration by photometer
+            (up to 5 ppm), H2S and total S concentrations measured by electrode (AquaMS,
+            amperometric method) at measured pH value… Regional Node: EMSO-Azores Vent field : Lucky
+            Strike Latitude : 37º17’N Longitude : 32º16’W 1600 – 1750 m depth</summary>
+        <box xmlns="http://www.georss.org/georss">37.283333 -32.266667 37.283333 -32.266667</box>
+        <category label="Dataset" term="hlevel"/>
+        <category label="Mid-Atlantic Ridge" term="keywords"/>
+        <category label="EMSO-Açores" term="keywords"/>
+        <category label="hydrothermal fluids" term="keywords"/>
+        <category label="Lucky Strike" term="keywords"/>
+        <category label="geochemistry" term="keywords"/>
+        <category label="MOMARSAT 2021 cruise" term="keywords"/>
+        <category label="iAtlantic" term="keywords"/>
+        <contributor>
+            <orgName>CNRS, GET, UMR5563, France</orgName>
+            <indName>Chavagnac, Valérie</indName>
+            <role>originator</role>
+        </contributor>
+        <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+        <gmd:distributionInfo xmlns:gmd="http://www.isotc211.org/2005/gmd"
+            xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+            xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/"
+            xmlns:gco="http://www.isotc211.org/2005/gco"
+            xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml"
+            xmlns:ns4="http://quakeml.org/xmlns/bed/1.2" xmlns:ogc="http://www.opengis.net/ogc"
+            xmlns:ows="http://www.opengis.net/ows" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0"
+            xmlns:xlink="http://www.w3.org/1999/xlink">
+            <gmd:MD_Distribution xmlns:dcterms="http://purl.org/dc/terms/"
+                xmlns:gml32="http://www.opengis.net/gml/3.2"
+                xmlns:gmx="http://www.isotc211.org/2005/gmx"
+                xmlns:gts="http://www.isotc211.org/2005/gts"
+                xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+                xmlns:ows11="http://www.opengis.net/ows/1.1"
+                xmlns:pubSub="http://www.opengis.net/pubsub/1.0"
+                xmlns:srv="http://www.isotc211.org/2005/srv"
+                xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+                <gmd:transferOptions>
+                    <gmd:MD_DigitalTransferOptions>
+                        <gmd:onLine>
+                            <gmd:CI_OnlineResource>
+                                <gmd:linkage>
+                                    <gmd:URL>https://doi.org/10.17882/93190</gmd:URL>
+                                </gmd:linkage>
+                                <gmd:function>
+                                    <gmd:CI_OnLineFunctionCode
+                                        codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode"
+                                        codeListValue="information" codeSpace="ISOTC211/19115"
+                                        >information</gmd:CI_OnLineFunctionCode>
+                                </gmd:function>
+                            </gmd:CI_OnlineResource>
+                        </gmd:onLine>
+                    </gmd:MD_DigitalTransferOptions>
+                </gmd:transferOptions>
+            </gmd:MD_Distribution>
+        </gmd:distributionInfo>
+    </entry>
+    <entry xmlns="http://www.w3.org/2005/Atom">
+        <title>Geochemistry of hydrothermal fluids at the Lucky Strike Hydrothermal Field data from
+            the EMSO-Azores observatory, 2019</title>
+        <id>52dff514-c0d6-4511-9df6-57fb38993774</id>
+        <sourceId>seanoeId</sourceId>
+        <sourceTitle>SEA scieNtific Open data Edition (SEANOE)</sourceTitle>
+        <summary>High temperature hydrothermal fluids are collected during the MOMARSAT 2019 cruise
+            by gas-tight fluid sampler manipulated and triggered by the hydraulic arm of the
+            submarine vehicle (HOV Nautile). Several hydrothermal vents are sampled, namely :
+            Aisics, Montsegur, Montserrat, Isabel, Sintra, Y3, White Castle, Crystal, Capelinhos,
+            Cimendeff, Tour Eiffel. Several chemical analyses are performed aboard the research
+            vessel: such as salinity and d20/20 by refractometer, Conductivity, salinity and total
+            dissolved solid (TDS) by electrode (standard solution at 1413 µS/cm), pH and Eh by
+            electrode (pH standard 4.01 and 7; Eh standard solution at -220mV), iron concentration
+            by photometer (up to 5 ppm), H2S and total S concentrations measured by electrode
+            (AquaMS, amperometric method) at measured pH value. Regional Node: EMSO-Azores Vent
+            field : Lucky Strike Latitude : 37º17’N Longitude : 32º16’W 1600 – 1750 m
+            depth</summary>
+        <box xmlns="http://www.georss.org/georss">37.283333 -32.266667 37.283333 -32.266667</box>
+        <category label="Dataset" term="hlevel"/>
+        <category label="Mid-Atlantic Ridge" term="keywords"/>
+        <category label="EMSO-Açores" term="keywords"/>
+        <category label="hydrothermal fluids" term="keywords"/>
+        <category label="Lucky Strike" term="keywords"/>
+        <category label="geochemistry" term="keywords"/>
+        <category label="MOMARSAT 2019" term="keywords"/>
+        <category label="iAtlantic" term="keywords"/>
+        <contributor>
+            <orgName>CNRS, GET, UMR5563, France</orgName>
+            <indName>Chavagnac, Valérie</indName>
+            <role>originator</role>
+        </contributor>
+        <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+        <gmd:distributionInfo xmlns:gmd="http://www.isotc211.org/2005/gmd"
+            xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+            xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/"
+            xmlns:gco="http://www.isotc211.org/2005/gco"
+            xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml"
+            xmlns:ns4="http://quakeml.org/xmlns/bed/1.2" xmlns:ogc="http://www.opengis.net/ogc"
+            xmlns:ows="http://www.opengis.net/ows" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0"
+            xmlns:xlink="http://www.w3.org/1999/xlink">
+            <gmd:MD_Distribution xmlns:dcterms="http://purl.org/dc/terms/"
+                xmlns:gml32="http://www.opengis.net/gml/3.2"
+                xmlns:gmx="http://www.isotc211.org/2005/gmx"
+                xmlns:gts="http://www.isotc211.org/2005/gts"
+                xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+                xmlns:ows11="http://www.opengis.net/ows/1.1"
+                xmlns:pubSub="http://www.opengis.net/pubsub/1.0"
+                xmlns:srv="http://www.isotc211.org/2005/srv"
+                xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+                <gmd:transferOptions>
+                    <gmd:MD_DigitalTransferOptions>
+                        <gmd:onLine>
+                            <gmd:CI_OnlineResource>
+                                <gmd:linkage>
+                                    <gmd:URL>https://doi.org/10.17882/93192</gmd:URL>
+                                </gmd:linkage>
+                                <gmd:function>
+                                    <gmd:CI_OnLineFunctionCode
+                                        codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode"
+                                        codeListValue="information" codeSpace="ISOTC211/19115"
+                                        >information</gmd:CI_OnLineFunctionCode>
+                                </gmd:function>
+                            </gmd:CI_OnlineResource>
+                        </gmd:onLine>
+                    </gmd:MD_DigitalTransferOptions>
+                </gmd:transferOptions>
+            </gmd:MD_Distribution>
+        </gmd:distributionInfo>
+    </entry>
+    <entry xmlns="http://www.w3.org/2005/Atom">
+        <title>Seabed images and substrata of the southern Lucky Strike hydrothermal vent
+            field</title>
+        <id>bc5388a5-4d52-4a2e-9058-72c3ab37a4af</id>
+        <sourceId>seanoeId</sourceId>
+        <sourceTitle>SEA scieNtific Open data Edition (SEANOE)</sourceTitle>
+        <summary>Located on the Mid-Atlantic Ridge, Lucky Strike is a large basalt hosted
+            hydrothermal vent field ranging from a depth of 1500 to 2000 m. Starting from 2010, the
+            deployment of a deep-sea observatory aimed to investigating hydrothermal processes in
+            that vent field. The yearly cruises MoMARSAT to maintain the observatory allowed to
+            gather additional datasets. This particular one comprises four sets of non-overlapping
+            images that were retrieved by a downward-looking camera (OTUS) mounted on the remotely
+            operated vehicle Victor6000. The latter was flown at constant altitude (~ 4 m) and speed
+            (~ 0.2 m/s) over parallel transects planned in four sites (Eiffel Tower, Montsegur,
+            Sapins, White Castle) and around different active vent edifices in order to acquire
+            seabed images for investigation of spatial patterns of the geology and of the biology.
+            The seabed characteristics observable in images was categorised by labeling manually in
+            Biigle (for Eiffel Tower, Montsegur and White Castle) or automatically (for Sapins with
+            a deep-learning model trained and validated on the other sites). Categories considered
+            for substratum classification were the shell/white fragment cover (0-10%; 10-50%;
+            50-100% of surface covered), the lithology (basalt; slab; sulphurs; volcanoclastic
+            sediment) and the geomorphology (brecciated; fractured; marbled; sedimented; presence of
+            scree rubbles). Annotations and .jpg images were georeferenced as .gpkg shapefiles and
+            .geotiff images respectively.</summary>
+        <box xmlns="http://www.georss.org/georss">37.17 -32.16 37.17 -32.16</box>
+        <category label="Dataset" term="hlevel"/>
+        <category label="Deep-sea imagery" term="keywords"/>
+        <category label="Remotely Operated Vehicle" term="keywords"/>
+        <category label="Victor6000" term="keywords"/>
+        <category label="Seabed" term="keywords"/>
+        <category label="Substratum" term="keywords"/>
+        <category label="Lithology" term="keywords"/>
+        <category label="Geomorphology" term="keywords"/>
+        <category label="Spatial patterns" term="keywords"/>
+        <category label="EMSO" term="keywords"/>
+        <category label="iAtlantic" term="keywords"/>
+        <contributor>
+            <orgName>Univ Brest, CNRS, Ifremer, UMR6197 BEEP, F-29280 Plouzané, France</orgName>
+            <indName>Ramière, Annah</indName>
+            <role>originator</role>
+        </contributor>
+        <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+        <gmd:distributionInfo xmlns:gmd="http://www.isotc211.org/2005/gmd"
+            xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+            xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/"
+            xmlns:gco="http://www.isotc211.org/2005/gco"
+            xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml"
+            xmlns:ns4="http://quakeml.org/xmlns/bed/1.2" xmlns:ogc="http://www.opengis.net/ogc"
+            xmlns:ows="http://www.opengis.net/ows" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0"
+            xmlns:xlink="http://www.w3.org/1999/xlink">
+            <gmd:MD_Distribution xmlns:dcterms="http://purl.org/dc/terms/"
+                xmlns:gml32="http://www.opengis.net/gml/3.2"
+                xmlns:gmx="http://www.isotc211.org/2005/gmx"
+                xmlns:gts="http://www.isotc211.org/2005/gts"
+                xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+                xmlns:ows11="http://www.opengis.net/ows/1.1"
+                xmlns:pubSub="http://www.opengis.net/pubsub/1.0"
+                xmlns:srv="http://www.isotc211.org/2005/srv"
+                xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+                <gmd:transferOptions>
+                    <gmd:MD_DigitalTransferOptions>
+                        <gmd:onLine>
+                            <gmd:CI_OnlineResource>
+                                <gmd:linkage>
+                                    <gmd:URL>https://doi.org/10.17882/95015</gmd:URL>
+                                </gmd:linkage>
+                                <gmd:function>
+                                    <gmd:CI_OnLineFunctionCode
+                                        codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode"
+                                        codeListValue="information" codeSpace="ISOTC211/19115"
+                                        >information</gmd:CI_OnLineFunctionCode>
+                                </gmd:function>
+                            </gmd:CI_OnlineResource>
+                        </gmd:onLine>
+                    </gmd:MD_DigitalTransferOptions>
+                </gmd:transferOptions>
+            </gmd:MD_Distribution>
+        </gmd:distributionInfo>
+    </entry>
+    <entry xmlns="http://www.w3.org/2005/Atom">
+        <title>Eiffel Tower: A Deep-Sea Underwater Dataset for Long-Term Visual Localization</title>
+        <id>8d4c3766-296a-4803-877c-532f2c15c153</id>
+        <sourceId>seanoeId</sourceId>
+        <sourceTitle>SEA scieNtific Open data Edition (SEANOE)</sourceTitle>
+        <summary>Visual localization plays an important role in positioning and navigation of
+            robotics systems within previously visited environments. When visits occur over long
+            periods of time, changes in the environment related to seasons or day/night cycles
+            present a major challenge. Under water the sources of variability are due to other
+            factors such as water conditions or growth of marine organisms. Yet it remains a major
+            obstacle and a much less studied one partly due to the lack of data. This paper presents
+            a new deep-sea dataset to benchmark underwater long-term visual localization. The
+            dataset is composed of images from four visits to the same hydrothermal vent edifice
+            over the course of five years. Camera poses and a common geometry of the scene were
+            estimated using navigation data and Structure-from-Motion. This serves as a reference
+            when evaluating visual localization techniques.</summary>
+        <box xmlns="http://www.georss.org/georss">37.17 -32.16 37.17 -32.16</box>
+        <category label="Dataset" term="hlevel"/>
+        <category label="Eiffel Tower" term="keywords"/>
+        <category label="underwater dataset" term="keywords"/>
+        <category label="visual localization" term="keywords"/>
+        <category label="deep sea" term="keywords"/>
+        <category label="iAtlantic" term="keywords"/>
+        <contributor>
+            <orgName>Ifremer, Zone Portuaire de Brégaillon, La Seyne-sur-Mer, France</orgName>
+            <indName>Boittiaux, Clementin</indName>
+            <role>originator</role>
+        </contributor>
+        <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+        <gmd:distributionInfo xmlns:gmd="http://www.isotc211.org/2005/gmd"
+            xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+            xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/"
+            xmlns:gco="http://www.isotc211.org/2005/gco"
+            xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml"
+            xmlns:ns4="http://quakeml.org/xmlns/bed/1.2" xmlns:ogc="http://www.opengis.net/ogc"
+            xmlns:ows="http://www.opengis.net/ows" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0"
+            xmlns:xlink="http://www.w3.org/1999/xlink">
+            <gmd:MD_Distribution xmlns:dcterms="http://purl.org/dc/terms/"
+                xmlns:gml32="http://www.opengis.net/gml/3.2"
+                xmlns:gmx="http://www.isotc211.org/2005/gmx"
+                xmlns:gts="http://www.isotc211.org/2005/gts"
+                xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+                xmlns:ows11="http://www.opengis.net/ows/1.1"
+                xmlns:pubSub="http://www.opengis.net/pubsub/1.0"
+                xmlns:srv="http://www.isotc211.org/2005/srv"
+                xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+                <gmd:transferOptions>
+                    <gmd:MD_DigitalTransferOptions>
+                        <gmd:onLine>
+                            <gmd:CI_OnlineResource>
+                                <gmd:linkage>
+                                    <gmd:URL>https://doi.org/10.17882/92226</gmd:URL>
+                                </gmd:linkage>
+                                <gmd:function>
+                                    <gmd:CI_OnLineFunctionCode
+                                        codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode"
+                                        codeListValue="information" codeSpace="ISOTC211/19115"
+                                        >information</gmd:CI_OnLineFunctionCode>
+                                </gmd:function>
+                            </gmd:CI_OnlineResource>
+                        </gmd:onLine>
+                    </gmd:MD_DigitalTransferOptions>
+                </gmd:transferOptions>
+            </gmd:MD_Distribution>
+        </gmd:distributionInfo>
+    </entry>
+    <entry xmlns="http://www.w3.org/2005/Atom">
+        <title>Microsatellites and mitochondrial dataset for the vesicomyid bivalve Christineconcha
+            regab</title>
+        <id>905a9003-f6f1-4820-a9b5-650a11356e07</id>
+        <sourceId>seanoeId</sourceId>
+        <sourceTitle>SEA scieNtific Open data Edition (SEANOE)</sourceTitle>
+        <summary>Distribution of five mitochondrial haplotypes among 176 individuals , and
+            multilocus genotypes at the eight microsatellite loci analysed for a total of 177
+            individuals, obtained for the vesicomyid bivalve Christineconcha regab from
+            chemiosynthetic sites of the West African Equatorial margin.</summary>
+        <category label="Dataset" term="hlevel"/>
+        <category label="Deep sea" term="keywords"/>
+        <category label="connectivity" term="keywords"/>
+        <category label="genetic diversity" term="keywords"/>
+        <category label="Atlantic" term="keywords"/>
+        <category label="vesicomyid bivalves" term="keywords"/>
+        <category label="microsatellites" term="keywords"/>
+        <category label="COI" term="keywords"/>
+        <category label="Christineconcha regab" term="keywords"/>
+        <category label="HERMIONE" term="keywords"/>
+        <category label="iAtlantic" term="keywords"/>
+        <contributor>
+            <orgName>MARBEC, Université Montpellier, Ifremer, IRD, CNRS, 34200 Sète,
+                France</orgName>
+            <indName>Hassan, Mohamad</indName>
+            <role>originator</role>
+        </contributor>
+        <harvested xmlns="http://flora.eu/gi-suite/1.0/dataModel/schema">true</harvested>
+        <gmd:distributionInfo xmlns:gmd="http://www.isotc211.org/2005/gmd"
+            xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+            xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/"
+            xmlns:gco="http://www.isotc211.org/2005/gco"
+            xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml"
+            xmlns:ns4="http://quakeml.org/xmlns/bed/1.2" xmlns:ogc="http://www.opengis.net/ogc"
+            xmlns:ows="http://www.opengis.net/ows" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0"
+            xmlns:xlink="http://www.w3.org/1999/xlink">
+            <gmd:MD_Distribution xmlns:dcterms="http://purl.org/dc/terms/"
+                xmlns:gml32="http://www.opengis.net/gml/3.2"
+                xmlns:gmx="http://www.isotc211.org/2005/gmx"
+                xmlns:gts="http://www.isotc211.org/2005/gts"
+                xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+                xmlns:ows11="http://www.opengis.net/ows/1.1"
+                xmlns:pubSub="http://www.opengis.net/pubsub/1.0"
+                xmlns:srv="http://www.isotc211.org/2005/srv"
+                xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd">
+                <gmd:transferOptions>
+                    <gmd:MD_DigitalTransferOptions>
+                        <gmd:onLine>
+                            <gmd:CI_OnlineResource>
+                                <gmd:linkage>
+                                    <gmd:URL>https://doi.org/10.17882/94263</gmd:URL>
+                                </gmd:linkage>
+                                <gmd:function>
+                                    <gmd:CI_OnLineFunctionCode
+                                        codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode"
+                                        codeListValue="information" codeSpace="ISOTC211/19115"
+                                        >information</gmd:CI_OnLineFunctionCode>
+                                </gmd:function>
+                            </gmd:CI_OnlineResource>
+                        </gmd:onLine>
+                    </gmd:MD_DigitalTransferOptions>
+                </gmd:transferOptions>
+            </gmd:MD_Distribution>
+        </gmd:distributionInfo>
+    </entry>
+    <dm:termFrequency xmlns:dm="http://floraresearch.eu/sdi/services/7.0/dataModel/schema">
+        <dm:source>
+            <dm:item>
+                <dm:sourceId>seanoeId</dm:sourceId>
+                <dm:term>SEA scieNtific Open data Edition (SEANOE)</dm:term>
+                <dm:term>SEA scieNtific Open data Edition (SEANOE)</dm:term>
+                <dm:decodedTerm>SEA scieNtific Open data Edition (SEANOE)</dm:decodedTerm>
+                <dm:freq>23</dm:freq>
+            </dm:item>
+        </dm:source>
+        <dm:keyword>
+            <dm:item>
+                <dm:term>iAtlantic</dm:term>
+                <dm:decodedTerm>iAtlantic</dm:decodedTerm>
+                <dm:freq>23</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Mid-Atlantic+Ridge</dm:term>
+                <dm:decodedTerm>Mid-Atlantic Ridge</dm:decodedTerm>
+                <dm:freq>17</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Lucky+Strike</dm:term>
+                <dm:decodedTerm>Lucky Strike</dm:decodedTerm>
+                <dm:freq>9</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Azores</dm:term>
+                <dm:decodedTerm>Azores</dm:decodedTerm>
+                <dm:freq>7</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Deep-sea</dm:term>
+                <dm:decodedTerm>Deep-sea</dm:decodedTerm>
+                <dm:freq>7</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>EurofleetsPlus</dm:term>
+                <dm:decodedTerm>EurofleetsPlus</dm:decodedTerm>
+                <dm:freq>7</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>iMAR+2021</dm:term>
+                <dm:decodedTerm>iMAR 2021</dm:decodedTerm>
+                <dm:freq>7</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Eurofleets</dm:term>
+                <dm:decodedTerm>Eurofleets</dm:decodedTerm>
+                <dm:freq>6</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>EMSO</dm:term>
+                <dm:decodedTerm>EMSO</dm:decodedTerm>
+                <dm:freq>5</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Eiffel+Tower</dm:term>
+                <dm:decodedTerm>Eiffel Tower</dm:decodedTerm>
+                <dm:freq>4</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>EMSO-A%c3%a7ores</dm:term>
+                <dm:decodedTerm>EMSO-Açores</dm:decodedTerm>
+                <dm:freq>4</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>geochemistry</dm:term>
+                <dm:decodedTerm>geochemistry</dm:decodedTerm>
+                <dm:freq>4</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>hydrothermal+fluids</dm:term>
+                <dm:decodedTerm>hydrothermal fluids</dm:decodedTerm>
+                <dm:freq>4</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Underwater+imagery</dm:term>
+                <dm:decodedTerm>Underwater imagery</dm:decodedTerm>
+                <dm:freq>4</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>ADCP</dm:term>
+                <dm:decodedTerm>ADCP</dm:decodedTerm>
+                <dm:freq>3</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>CTD</dm:term>
+                <dm:decodedTerm>CTD</dm:decodedTerm>
+                <dm:freq>3</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Deep+sea</dm:term>
+                <dm:decodedTerm>Deep sea</dm:decodedTerm>
+                <dm:freq>3</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>EMSO-Azores</dm:term>
+                <dm:decodedTerm>EMSO-Azores</dm:decodedTerm>
+                <dm:freq>3</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Hydrothermal+edifice</dm:term>
+                <dm:decodedTerm>Hydrothermal edifice</dm:decodedTerm>
+                <dm:freq>3</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Vent+ecology</dm:term>
+                <dm:decodedTerm>Vent ecology</dm:decodedTerm>
+                <dm:freq>3</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Chemosynthetic+ecosystem</dm:term>
+                <dm:decodedTerm>Chemosynthetic ecosystem</dm:decodedTerm>
+                <dm:freq>2</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>conductivity</dm:term>
+                <dm:decodedTerm>conductivity</dm:decodedTerm>
+                <dm:freq>2</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>current</dm:term>
+                <dm:decodedTerm>current</dm:decodedTerm>
+                <dm:freq>2</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Deep-sea+observatory</dm:term>
+                <dm:decodedTerm>Deep-sea observatory</dm:decodedTerm>
+                <dm:freq>2</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>High-resolution+monitoring</dm:term>
+                <dm:decodedTerm>High-resolution monitoring</dm:decodedTerm>
+                <dm:freq>2</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Hydrothermal+Vents</dm:term>
+                <dm:decodedTerm>Hydrothermal Vents</dm:decodedTerm>
+                <dm:freq>2</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Long-term+monitoring</dm:term>
+                <dm:decodedTerm>Long-term monitoring</dm:decodedTerm>
+                <dm:freq>2</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>MoMAR</dm:term>
+                <dm:decodedTerm>MoMAR</dm:decodedTerm>
+                <dm:freq>2</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Photogrammetry</dm:term>
+                <dm:decodedTerm>Photogrammetry</dm:decodedTerm>
+                <dm:freq>2</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Photomosaics</dm:term>
+                <dm:decodedTerm>Photomosaics</dm:decodedTerm>
+                <dm:freq>2</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>pressure</dm:term>
+                <dm:decodedTerm>pressure</dm:decodedTerm>
+                <dm:freq>2</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Raw+Data</dm:term>
+                <dm:decodedTerm>Raw Data</dm:decodedTerm>
+                <dm:freq>2</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>salinity</dm:term>
+                <dm:decodedTerm>salinity</dm:decodedTerm>
+                <dm:freq>2</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Stations</dm:term>
+                <dm:decodedTerm>Stations</dm:decodedTerm>
+                <dm:freq>2</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>temperature</dm:term>
+                <dm:decodedTerm>temperature</dm:decodedTerm>
+                <dm:freq>2</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>TEMPO</dm:term>
+                <dm:decodedTerm>TEMPO</dm:decodedTerm>
+                <dm:freq>2</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Temporal+monitoring</dm:term>
+                <dm:decodedTerm>Temporal monitoring</dm:decodedTerm>
+                <dm:freq>2</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Time+series</dm:term>
+                <dm:decodedTerm>Time series</dm:decodedTerm>
+                <dm:freq>2</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Time-series</dm:term>
+                <dm:decodedTerm>Time-series</dm:decodedTerm>
+                <dm:freq>2</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Tour+Eiffel</dm:term>
+                <dm:decodedTerm>Tour Eiffel</dm:decodedTerm>
+                <dm:freq>2</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>3D+reconstructions</dm:term>
+                <dm:decodedTerm>3D reconstructions</dm:decodedTerm>
+                <dm:freq>1</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Acoustic</dm:term>
+                <dm:decodedTerm>Acoustic</dm:decodedTerm>
+                <dm:freq>1</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Atlantic</dm:term>
+                <dm:decodedTerm>Atlantic</dm:decodedTerm>
+                <dm:freq>1</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Bathymetry</dm:term>
+                <dm:decodedTerm>Bathymetry</dm:decodedTerm>
+                <dm:freq>1</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Bathymodiolus+azoricus</dm:term>
+                <dm:decodedTerm>Bathymodiolus azoricus</dm:decodedTerm>
+                <dm:freq>1</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Bathymodiolus+azoricus+faunal+assemblage</dm:term>
+                <dm:decodedTerm>Bathymodiolus azoricus faunal assemblage</dm:decodedTerm>
+                <dm:freq>1</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Capelinhos</dm:term>
+                <dm:decodedTerm>Capelinhos</dm:decodedTerm>
+                <dm:freq>1</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Christineconcha+regab</dm:term>
+                <dm:decodedTerm>Christineconcha regab</dm:decodedTerm>
+                <dm:freq>1</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>COI</dm:term>
+                <dm:decodedTerm>COI</dm:decodedTerm>
+                <dm:freq>1</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Communty+dynamics</dm:term>
+                <dm:decodedTerm>Communty dynamics</dm:decodedTerm>
+                <dm:freq>1</dm:freq>
+            </dm:item>
+        </dm:keyword>
+        <dm:format/>
+        <dm:protocol/>
+        <dm:instrumentTitle/>
+        <dm:platformTitle/>
+        <dm:origOrgDesc/>
+        <dm:attributeTitle/>
+        <dm:organisationName>
+            <dm:item>
+                <dm:term>SEANOE</dm:term>
+                <dm:decodedTerm>SEANOE</dm:decodedTerm>
+                <dm:freq>23</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Instituto+Hidrogr%c3%a1fico,+Portugal</dm:term>
+                <dm:decodedTerm>Instituto Hidrográfico, Portugal</dm:decodedTerm>
+                <dm:freq>7</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>National+Oceanography+Center,+United+Kingdom</dm:term>
+                <dm:decodedTerm>National Oceanography Center, United Kingdom</dm:decodedTerm>
+                <dm:freq>7</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Universidade+dos+A%c3%a7ores,+Okeanos,+Portugal</dm:term>
+                <dm:decodedTerm>Universidade dos Açores, Okeanos, Portugal</dm:decodedTerm>
+                <dm:freq>7</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Univ+Brest,+CNRS,+Ifremer,+UMR6197+BEEP,+F-29280+Plouzan%c3%a9,+France</dm:term>
+                <dm:decodedTerm>Univ Brest, CNRS, Ifremer, UMR6197 BEEP, F-29280 Plouzané,
+                    France</dm:decodedTerm>
+                <dm:freq>6</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Aarhus+University,+Department+of+Ecoscience+-+Applied+Marine+Ecology+and+Modelling,+Denmark</dm:term>
+                <dm:decodedTerm>Aarhus University, Department of Ecoscience - Applied Marine Ecology
+                    and Modelling, Denmark</dm:decodedTerm>
+                <dm:freq>4</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>CNRS,+GET,+UMR5563,+France</dm:term>
+                <dm:decodedTerm>CNRS, GET, UMR5563, France</dm:decodedTerm>
+                <dm:freq>4</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>CNRS,+IPGP,+France</dm:term>
+                <dm:decodedTerm>CNRS, IPGP, France</dm:decodedTerm>
+                <dm:freq>2</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Animal+Production+Department,+Faculty+of+Agriculture,+Tishreen+University,+Syria</dm:term>
+                <dm:decodedTerm>Animal Production Department, Faculty of Agriculture, Tishreen
+                    University, Syria</dm:decodedTerm>
+                <dm:freq>1</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>DECOD+(Ecosystem+Dynamics+and+Sustainability),+IFREMER,+INRAE,+Institut+Agro,+Nantes,+France</dm:term>
+                <dm:decodedTerm>DECOD (Ecosystem Dynamics and Sustainability), IFREMER, INRAE,
+                    Institut Agro, Nantes, France</dm:decodedTerm>
+                <dm:freq>1</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>IFREMER+Institut+Carnot+EDROME,+France</dm:term>
+                <dm:decodedTerm>IFREMER Institut Carnot EDROME, France</dm:decodedTerm>
+                <dm:freq>1</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Ifremer,+Centre+de+Bretagne,+REM/EEP,+Laboratoire+Environnement+Profond,+29280+Plouzan%c3%a9,+France</dm:term>
+                <dm:decodedTerm>Ifremer, Centre de Bretagne, REM/EEP, Laboratoire Environnement
+                    Profond, 29280 Plouzané, France</dm:decodedTerm>
+                <dm:freq>1</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Ifremer,+Centre+de+M%c3%a9diterran%c3%a9e,+83500,+La+Seyne+sur+Mer,+France</dm:term>
+                <dm:decodedTerm>Ifremer, Centre de Méditerranée, 83500, La Seyne sur Mer,
+                    France</dm:decodedTerm>
+                <dm:freq>1</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Ifremer,+Ctr+M%c3%a9diterran%c3%a9e,+Unit%c3%a9+Syst%c3%a8mes+Marins,+83500,+La+Seyne+sur+Mer,+France</dm:term>
+                <dm:decodedTerm>Ifremer, Ctr Méditerranée, Unité Systèmes Marins, 83500, La Seyne
+                    sur Mer, France</dm:decodedTerm>
+                <dm:freq>1</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Ifremer,+ODE-LOPS,+Plouzan%c3%a9,+France</dm:term>
+                <dm:decodedTerm>Ifremer, ODE-LOPS, Plouzané, France</dm:decodedTerm>
+                <dm:freq>1</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Ifremer,+REM,+France</dm:term>
+                <dm:decodedTerm>Ifremer, REM, France</dm:decodedTerm>
+                <dm:freq>1</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Ifremer,+REM/RDT/LDCM,+F-29280+Plouzan%c3%a9,+France</dm:term>
+                <dm:decodedTerm>Ifremer, REM/RDT/LDCM, F-29280 Plouzané, France</dm:decodedTerm>
+                <dm:freq>1</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Ifremer,+REM/RDT/SIIM,+F-29280+Plouzan%c3%a9,+France</dm:term>
+                <dm:decodedTerm>Ifremer, REM/RDT/SIIM, F-29280 Plouzané, France</dm:decodedTerm>
+                <dm:freq>1</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Ifremer,+Zone+Portuaire+de+Br%c3%a9gaillon,+La+Seyne-sur-Mer,+France</dm:term>
+                <dm:decodedTerm>Ifremer, Zone Portuaire de Brégaillon, La Seyne-sur-Mer,
+                    France</dm:decodedTerm>
+                <dm:freq>1</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Institut+Carnot+IFREMER+EDROME,+Centre+de+Bretagne,+REM/EEP,+Laboratoire+Environnement+Profond,+BP70,+F-29280+Plouzan%c3%a9,+France</dm:term>
+                <dm:decodedTerm>Institut Carnot IFREMER EDROME, Centre de Bretagne, REM/EEP,
+                    Laboratoire Environnement Profond, BP70, F-29280 Plouzané,
+                    France</dm:decodedTerm>
+                <dm:freq>1</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Institute+of+Marine+Sciences%e2%80%94Okeanos,+University+of+the+Azores,+Horta,+Portugal</dm:term>
+                <dm:decodedTerm>Institute of Marine Sciences—Okeanos, University of the Azores,
+                    Horta, Portugal</dm:decodedTerm>
+                <dm:freq>1</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>MARBEC,+Universit%c3%a9+Montpellier,+Ifremer,+IRD,+CNRS,+34200+S%c3%a8te,+France</dm:term>
+                <dm:decodedTerm>MARBEC, Université Montpellier, Ifremer, IRD, CNRS, 34200 Sète,
+                    France</dm:decodedTerm>
+                <dm:freq>1</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Univ+Brest,+CNRS,+Ifremer,+IRD,+Laboratoire+d'Oc%c3%a9anographie+Physique+et+Spatiale+(LOPS),+IUEM,+F29280,+Plouzan%c3%a9,+France</dm:term>
+                <dm:decodedTerm>Univ Brest, CNRS, Ifremer, IRD, Laboratoire d'Océanographie Physique
+                    et Spatiale (LOPS), IUEM, F29280, Plouzané, France</dm:decodedTerm>
+                <dm:freq>1</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Univ+Brest,+CNRS,+Ifremer,+IRD,+Laboratoire+d'Oc%c3%a9anographie+Physique+et+Spatiale+(LOPS),+Plouzan%c3%a9,+France</dm:term>
+                <dm:decodedTerm>Univ Brest, CNRS, Ifremer, IRD, Laboratoire d'Océanographie Physique
+                    et Spatiale (LOPS), Plouzané, France</dm:decodedTerm>
+                <dm:freq>1</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Univ+Brest,+CNRS,+Ifremer,+UMR6197+BEEP+Plouzan%c3%a9,+France</dm:term>
+                <dm:decodedTerm>Univ Brest, CNRS, Ifremer, UMR6197 BEEP Plouzané,
+                    France</dm:decodedTerm>
+                <dm:freq>1</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Universit%c3%a9+de+Toulon,+Aix+Marseille+Univ,+CNRS,+LIS,+Toulon,+France</dm:term>
+                <dm:decodedTerm>Université de Toulon, Aix Marseille Univ, CNRS, LIS, Toulon,
+                    France</dm:decodedTerm>
+                <dm:freq>1</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Universit%c3%a9+de+Toulon,+COSMER,+Toulon,+France</dm:term>
+                <dm:decodedTerm>Université de Toulon, COSMER, Toulon, France</dm:decodedTerm>
+                <dm:freq>1</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Universit%c3%a9+Paris+Cit%c3%a9,+Institut+de+physique+du+globe+de+Paris,+CNRS,+F-75005,+Paris,+France</dm:term>
+                <dm:decodedTerm>Université Paris Cité, Institut de physique du globe de Paris, CNRS,
+                    F-75005, Paris, France</dm:decodedTerm>
+                <dm:freq>1</dm:freq>
+            </dm:item>
+            <dm:item>
+                <dm:term>Universit%c3%a9+Paris+Cit%c3%a9,+UMR+7154,+CNRS+et+Institut+de+Physique+du+Globe+de+Paris,+France</dm:term>
+                <dm:decodedTerm>Université Paris Cité, UMR 7154, CNRS et Institut de Physique du
+                    Globe de Paris, France</dm:decodedTerm>
+                <dm:freq>1</dm:freq>
+            </dm:item>
+        </dm:organisationName>
+        <dm:prodType/>
+        <dm:sensorOpMode/>
+        <dm:sensorSwath/>
+        <dm:sarPolCh/>
+        <dm:s3InstrumentIdx/>
+        <dm:s3ProductLevel/>
+        <dm:s3Timeliness/>
+        <dm:sscScore/>
+    </dm:termFrequency>
+</feed>

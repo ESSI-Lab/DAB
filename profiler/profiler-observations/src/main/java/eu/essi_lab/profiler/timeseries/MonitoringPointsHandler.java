@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.timeseries;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -45,19 +45,25 @@ public class MonitoringPointsHandler extends TimeseriesHandler {
 	return new MonitoringPointsTransformer();
     }
 
+    protected void addIdentifier(OutputStreamWriter writer) throws IOException {
+	
+    }
+    
+    protected String getSetName() {
+	return "results";
+    }
+    
     public void writeFeature(OutputStreamWriter writer, JSONObject feature) throws IOException {
 
-	JSONObject properties = feature.getJSONObject("properties");
+//	JSONObject properties = feature.getJSONObject("properties");
 
-	JSONObject monitoringPoint = properties.getJSONObject("timeseries").getJSONObject("featureOfInterest");
-
-	monitoringPoint.remove("relatedParties");
+	JSONObject monitoringPoint = feature.getJSONObject("featureOfInterest");
+	monitoringPoint.remove("type");
 	
-	properties.put("monitoring-point", monitoringPoint);
+	JSONObject shape = monitoringPoint.getJSONObject("shape");
+	monitoringPoint.put("shape", shape);
 
-	properties.remove("timeseries");
-
-	writer.write(feature.toString());
+	writer.write(monitoringPoint.toString());
 
 	writer.flush();
 

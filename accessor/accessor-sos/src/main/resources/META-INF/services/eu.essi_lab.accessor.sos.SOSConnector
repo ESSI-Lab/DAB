@@ -1,0 +1,4 @@
+eu.essi_lab.accessor.sos.SOSConnector
+eu.essi_lab.accessor.sos.tahmo.SOSTAHMOConnector
+eu.essi_lab.accessor.sos.grow.SOSGROWConnector
+eu.essi_lab.accessor.sos._1_0_0.SOSConnector

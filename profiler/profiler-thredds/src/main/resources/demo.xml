@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<catalog xmlns="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ncml="http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2" name="root-catalog" version="1.0.1">
+    <service name="VirtualServices" base="" serviceType="Compound">
+        <service name="HTTPServer" base="thredds/fileServer" serviceType="HTTPServer"/>
+        <service name="wmsServer" base="thredds/wms" serviceType="WMS"/>
+        <service name="ncdods" base="thredds/dodsC" serviceType="OPENDAP"/>
+    </service>
+    <dataset name="Brokered datasets from view: WMS test">
+        <metadata inherited="true">
+            <serviceName>VirtualServices</serviceName>
+        </metadata>
+        <dataset name="snow water equivalent, December (1987-2002)" harvest="true" ID="701266e1-dc6b-41a7-9f6e-ea904494de49" urlPath="701266e1-dc6b-41a7-9f6e-ea904494de49">
+            <documentation type="summary">Armstrong, R.L., M.J. Brodzik, K. Knowles, and M. Savoie. 2005. Global monthly EASE-Grid snow water equivalent climatology. Boulder, CO, USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0271.html. 30 August 2006. Background: Global, monthly snow water equivalent (SWE) climatologies are generated from passive microwave brightness temperature data derived from Nimbus-7 Scanning Multichannel Microwave Radiometer (SMMR) and Defense Meteorological Satellite Program (DMSP) -F8, -F11 and -F13 Special Sensor Microwave/Imager (SSM/I) radiances and gridded to the Northern and Southern 25 km Equal-Area Scalable Earth Grids (EASE-Grids). NOTE: WCS requests include Antarctica (despite the layer name) while WMS requests do not.</documentation>
+            <metadata inherited="true">
+                <creator>
+                    <name/>
+                </creator>
+                <geospatialCoverage>
+                    <northsouth>
+                        <start>-90.0</start>
+                        <size>177.839987219029</size>
+                        <units>degrees_north</units>
+                    </northsouth>
+                    <eastwest>
+                        <start>-178.854237161825</start>
+                        <size>358.85423716182504</size>
+                        <units>degrees_east</units>
+                    </eastwest>
+                </geospatialCoverage>
+            </metadata>
+        </dataset>
+        <dataset name="snow water equivalent, February (1988-2003)" harvest="true" ID="a2958a99-d7da-4c3c-a621-115662753c96" urlPath="a2958a99-d7da-4c3c-a621-115662753c96">
+            <documentation type="summary">Armstrong, R.L., M.J. Brodzik, K. Knowles, and M. Savoie. 2005. Global monthly EASE-Grid snow water equivalent climatology. Boulder, CO, USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0271.html. 30 August 2006. Background: Global, monthly snow water equivalent (SWE) climatologies are generated from passive microwave brightness temperature data derived from Nimbus-7 Scanning Multichannel Microwave Radiometer (SMMR) and Defense Meteorological Satellite Program (DMSP) -F8, -F11 and -F13 Special Sensor Microwave/Imager (SSM/I) radiances and gridded to the Northern and Southern 25 km Equal-Area Scalable Earth Grids (EASE-Grids). NOTE: WCS requests include Antarctica (despite the layer name) while WMS requests do not.</documentation>
+            <metadata inherited="true">
+                <creator>
+                    <name/>
+                </creator>
+                <geospatialCoverage>
+                    <northsouth>
+                        <start>-90.0</start>
+                        <size>177.839987219029</size>
+                        <units>degrees_north</units>
+                    </northsouth>
+                    <eastwest>
+                        <start>-178.854237161825</start>
+                        <size>358.85423716182504</size>
+                        <units>degrees_east</units>
+                    </eastwest>
+                </geospatialCoverage>
+            </metadata>
+        </dataset>
+    </dataset>
+</catalog>

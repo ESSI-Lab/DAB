@@ -4,7 +4,7 @@ package eu.essi_lab.access.augmenter;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -207,11 +207,13 @@ public class AccessAugmenter extends ResourceAugmenter<AugmenterSetting> {
 	    case TIME_SERIES:
 		level = DataComplianceLevel.TIME_SERIES_BASIC_DATA_COMPLIANCE;
 		break;
-	    case GML_FEATURE:
+	    case TRAJECTORY:
+		level = DataComplianceLevel.TRAJECTORY_BASIC_DATA_COMPLIANCE;
+		break;	    
+	    case VECTOR:
 	    case POINT:
 	    case PROFILE:
 	    case TIME_SERIES_PROFILE:
-	    case TRAJECTORY:
 	    case TRAJECTORY_PROFILE:
 	    default:
 		GSLoggerFactory.getLogger(getClass()).error("Unexpected data type: " + dataType + " Skipping descriptor.");
@@ -332,7 +334,7 @@ public class AccessAugmenter extends ResourceAugmenter<AugmenterSetting> {
 	    case TIME_SERIES:
 		resource.getPropertyHandler().setIsTimeseries(true);
 		break;
-	    case GML_FEATURE:
+	    case VECTOR:
 		break;
 	    case POINT:
 		break;
@@ -341,6 +343,7 @@ public class AccessAugmenter extends ResourceAugmenter<AugmenterSetting> {
 	    case TIME_SERIES_PROFILE:
 		break;
 	    case TRAJECTORY:
+		resource.getPropertyHandler().setIsTrajectory(true);
 		break;
 	    case TRAJECTORY_PROFILE:
 		break;

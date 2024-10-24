@@ -4,7 +4,7 @@ package eu.essi_lab.api.database.marklogic;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,14 +31,21 @@ import org.w3c.dom.Node;
 import com.marklogic.xcc.ResultSequence;
 import com.marklogic.xcc.exceptions.RequestException;
 
-import eu.essi_lab.api.database.internal.Folder;
+import eu.essi_lab.api.database.DatabaseFolder;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.lib.xml.XMLNodeReader;
 import eu.essi_lab.wrapper.marklogic.MarkLogicWrapper;
 
 /**
  * @author Fabrizio
  */
-public class MarkLogicFolder implements Folder {
+public class MarkLogicFolder implements DatabaseFolder {
+
+    /**
+     * 
+     */
+    private static final int CLEARING_STEP = 10000;
 
     protected String uri;
     protected MarkLogicDatabase mlDataBase;
@@ -73,7 +80,7 @@ public class MarkLogicFolder implements Folder {
     public String getSimpleName() {
 
 	String simpleName = getCompleteName();
-	simpleName = simpleName.replace(mlDataBase.getSuiteIdentifier() + "_", "");
+	simpleName = simpleName.replace(mlDataBase.getIdentifier() + "_", "");
 	simpleName = simpleName.replace(SourceStorageWorker.META_PREFIX, "");
 	simpleName = simpleName.replace(SourceStorageWorker.DATA_1_PREFIX, "");
 	simpleName = simpleName.replace(SourceStorageWorker.DATA_2_PREFIX, "");
@@ -197,17 +204,32 @@ public class MarkLogicFolder implements Folder {
     @Override
     public void clear() throws RequestException {
 
-	int step = 100;
-	while (size() > 0) {
+	GSLoggerFactory.getLogger(getClass()).debug("Clearing folder STARTED");
 
-	    int size = size();
-	    if (size < step) {
-		step = size;
-	    }
+	int step = CLEARING_STEP;
+	int size = size();
+	int counter = 0;
 
-	    String xQuery = "for $i in cts:uris(\"" + uri + "\",'document')[1 to " + step + "] return xdmp:document-delete( $i )";
+	GSLoggerFactory.getLogger(getClass()).debug("Folder size: {}", StringUtils.format(size));
+
+	while (counter < size) {
+
+	    String xQuery = "for $i in cts:uris(\"" + uri + "\",'document', cts:directory-query('"+uri+"', 'infinity'))[1 to " + step + "] return xdmp:document-delete( $i )";
 	    mlDataBase.execXQuery(xQuery);
+
+	    counter += CLEARING_STEP;
+
+	    if (counter < size) {
+
+		double percentage = (((double) counter) / size) * 100;
+
+		String status = "[" + StringUtils.format(counter) + "/" + StringUtils.format(size) + "] - " + StringUtils.format(percentage) + " %";
+
+		GSLoggerFactory.getLogger(getClass()).debug("Status: {}", status);
+	    }
 	}
+
+	GSLoggerFactory.getLogger(getClass()).debug("Clearing folder ENDED");
     }
 
     private String createResourceUri(String uri, String key) {

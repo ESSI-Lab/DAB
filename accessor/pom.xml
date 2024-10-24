@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -12,39 +12,101 @@
 	<name>ESSI-Lab Accessors</name>
 	<description>ESSI-Lab Accessor</description>
 	<packaging>pom</packaging>
-
-
-	<properties>
-		<jsoup.version>1.7.3</jsoup.version>
-	</properties>
-
-	<modules>		
-    	<module>accessor-csw</module>
-    	<module>accessor-fdsn</module>
-    	<module>accessor-local-fs</module>
-    	<module>accessor-oai-pmh</module>
-    	<module>accessor-waf</module>
-    	<module>accessor-wcs</module>
-    	<module>accessor-wfs</module>
-    	<module>accessor-wms</module>
-    	<module>accessor-wof</module>
+	
+	<modules>
+		<module>accessor-bnhs</module>
+		<module>accessor-cdi</module>
+		<module>accessor-cehq</module>
+		<module>accessor-emodnet-physics</module>
+		<module>accessor-eurobis</module>
+		<module>accessor-mcp</module>
+		<module>accessor-odip</module>
+		<module>accessor-nodc</module>
+		<module>accessor-ckan</module>
+		<module>accessor-fdsn</module>
+		<module>accessor-oai-pmh</module>
+		<module>accessor-local-fs</module>
+		<module>accessor-csw</module>
+		<module>accessor-cmr</module>
+		<module>accessor-hmfs</module>
+		<module>accessor-inumet</module>
+		<module>accessor-iris-station</module>
+		<module>accessor-waf</module>
+		<module>accessor-health-sites</module>
+		<module>accessor-oam</module>
+		<module>accessor-mch</module>
+		<module>accessor-hydroshare</module>
+		<module>accessor-obis</module>
+		<module>accessor-socat</module>
+		<module>accessor-south-africa</module>		
+		<module>accessor-egaskro</module>
+		<module>accessor-digital-globe</module>
+		<module>accessor-nasa-gsfc</module>
+		<module>accessor-landsat8</module>
+		<module>accessor-nrfa</module>
+		<module>accessor-wcs</module>
+		<module>accessor-wfs</module>
+		<module>accessor-wms</module>
+		<module>accessor-wof</module>
+		<module>accessor-arcgis-online</module>
+		<module>accessor-rasaqm</module>
+		<module>accessor-rihmi-wdc-hydro</module>
+		<module>accessor-s3-shapefile</module>
+		<module>accessor-sentinel</module>
+		<module>accessor-satellite-common</module>
+		<module>accessor-smhi</module>
+		<module>accessor-gbif</module>
+		<module>accessor-fedeo</module>
+		<module>accessor-usgs-waterservices</module>
+		<module>accessor-odata-hidrology</module>
+		<module>accessor-canada-msc</module>
+		<module>accessor-inmet</module>
+		<module>accessor-sava-his</module>
+		<module>accessor-sos</module>
+		<module>accessor-uk-nrfa</module>
+		<module>accessor-dinaguaws</module>
+		<module>accessor-ana</module>
+		<module>accessor-inpe</module>
+		<module>accessor-china-geoss</module>
+		<module>accessor-imo-hydro</module>
+	    <module>accessor-hydro-nve</module>
+	    <module>accessor-hydro-paraguay</module>
+    	<module>accessor-thunder</module>
+    	<module>accessor-wod</module>
+    	<module>accessor-thredds</module>
+    	<module>accessor-aviso</module>
+    	<module>accessor-ecv-inventory</module>
+    	<module>accessor-elixir-ena</module>
+    	<module>accessor-nextgeoss</module>
+    	<module>accessor-argo</module>
+    	<module>accessor-wekeo</module>
+    	<module>accessor-icos</module>
+    	<module>accessor-prisma</module>
+    	<module>accessor-invenio</module>
+    	<module>accessor-his-central</module>
+    	<module>accessor-saeon</module>
+    	<module>accessor-stac</module>
+    	<module>accessor-nmdis-erddap</module>
+    	<module>accessor-wis</module>
+    	<module>accessor-niwa</module>
+		<module>accessor-polytope</module>
+		<module>accessor-bluecloud</module>
+		<module>accessor-whos-paraguay</module>
+		<module>accessor-sensor-things</module>
+		<module>accessor-meteotracker</module>
+		<module>accessor-kisters</module>
+		<module>accessor-worldcereal</module>
+		<module>accessor-seanoe</module>
+		<module>accessor-eiffel-s3</module>
+		<module>accessor-copernicus-dataspace</module>
+		<module>accessor-trigger</module>
+		<module>accessor-smartcitizenkit</module>
+		<module>accessor-acronet</module>
+		<module>accessor-geo-mountain</module>
+		<module>accessor-agrostac</module>
 	</modules>
-
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<!-- jsoup HTML parser library @ http://jsoup.org/ -->
-				<groupId>org.jsoup</groupId>
-				<artifactId>jsoup</artifactId>
-				<version>${jsoup.version}</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-	<dependencies>
-		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-		</dependency>
+		
+	<dependencies>		
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>core-datamodel</artifactId>

@@ -12,7 +12,7 @@ package eu.essi_lab.thredds._1_0_6;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,6 +31,7 @@ package eu.essi_lab.thredds._1_0_6;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -38,6 +39,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlType;
+
 import eu.essi_lab.ncml._2_2.Netcdf;
 
 
@@ -99,8 +101,8 @@ public class FeatureCollection
      * <p>
      * You are getting this "catch-all" property because of the following reason: 
      * The field name "Netcdf" is used by two different parts of a schema. See: 
-     * line 326 of file:/home/boldrini/git/DAB/jaxb-classes/jaxb-classes-thredds/src/main/resources/schemas/InvCatalog.1.0.6.xsd
-     * line 107 of file:/home/boldrini/git/DAB/jaxb-classes/jaxb-classes-thredds/src/main/resources/schemas/InvCatalog.1.0.6.xsd
+     * line 326 of file:/home/boldrini/git/GI-project/jaxb-classes/jaxb-classes-thredds/src/main/resources/schemas/InvCatalog.1.0.6.xsd
+     * line 107 of file:/home/boldrini/git/GI-project/jaxb-classes/jaxb-classes-thredds/src/main/resources/schemas/InvCatalog.1.0.6.xsd
      * <p>
      * To get rid of this property, apply a property customization to one 
      * of both of the following declarations to change their names: 

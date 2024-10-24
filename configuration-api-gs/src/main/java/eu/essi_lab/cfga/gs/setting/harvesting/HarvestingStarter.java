@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gs.setting.harvesting;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,7 +28,6 @@ import com.vaadin.flow.component.grid.contextmenu.GridContextMenu.GridContextMen
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.TaskStarter;
-import eu.essi_lab.cfga.setting.SettingUtils;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting;
 
 /**
@@ -40,14 +39,14 @@ public class HarvestingStarter extends TaskStarter {
     /**
      * 
      */
-    private String sourceIdentifier;
+    private String settingId;
 
     @Override
     public void onClick(GridContextMenuItemClickEvent<HashMap<String, String>> event) {
 
 	Optional<HashMap<String, String>> item = event.getItem();
 
-	sourceIdentifier = item.get().get("Id");
+	settingId = item.get().get("Setting id");
 
 	super.onClick(event);
     }
@@ -64,15 +63,11 @@ public class HarvestingStarter extends TaskStarter {
     @Override
     protected SchedulerWorkerSetting getSetting() {
 
-	HarvestingSetting setting = SettingUtils.downCast(
-		ConfigurationWrapper.getHarvestingSettings().//
-			stream().//
-			filter(s -> s.getSelectedAccessorSetting().getGSSourceSetting().getSourceIdentifier().equals(sourceIdentifier)).//
-			findFirst().//
-			get().//
-			clone(), //
-
-		HarvestingSettingLoader.load().getClass());
+	HarvestingSetting setting = ConfigurationWrapper.getHarvestingSettings().//
+		stream().//
+		filter(s -> s.getIdentifier().equals(settingId)).//
+		findFirst().//
+		get();
 
 	return setting;
     }

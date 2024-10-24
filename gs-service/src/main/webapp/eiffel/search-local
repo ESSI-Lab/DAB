@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html>
+     
+    <head>
+    	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+        <title>Search portal</title>
+        <link rel="shortcut icon" type="image/png" href="https://api.geodab.eu/docs/assets/favicon.png">
+        
+        <link rel="stylesheet" type="text/css" href="./css/fonts-min.css" />
+        <link rel="stylesheet" type="text/css" href="./css/treeview.css" />
+                
+		<!-- jquery ui css -->
+        <link rel="stylesheet" type="text/css" href="https://api.geodab.eu/download/giapi/jquery/jquery-ui-1.11.14.min.css" />
+        
+        <!-- font-awesome css -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+         
+        <!-- required jtable css -->
+        <link rel="stylesheet" type="text/css" href="https://api.geodab.eu/download/giapi/jtable/highlight.css"/>
+        <link rel="stylesheet" type="text/css" href="https://api.geodab.eu/download/giapi/jtable/jtable_jqueryui.css"/>
+
+<!-- API minified js -->
+<script type="text/javascript" src="https://api.geodab.eu/download/giapi/lib/min/giapi.min.js"></script>
+<!-- API css -->
+<link rel="stylesheet" type="text/css" href="https://api.geodab.eu/docs/assets/css/giapi.css" />
+<!-- Portal css -->
+<link rel="stylesheet" type="text/css" href="https://api.geodab.eu/docs/assets/css/portal.css" />
+
+
+
+<!-- map js -->
+<script type="text/javascript" src="https://maps.google.com/maps/api/js?key=AIzaSyCOpS1j05N30cVg1omnkasEONNFgd7PoJ0"></script>
+<script type="text/javascript" src="https://api.geodab.eu/download/giapi/jquery/gmaps.js"></script>
+
+<!-- Openlayers 3 API CSS -->
+<!-- Comment this becasue not found link rel="stylesheet" type="text/css" href="http://openlayers.org/en/v3.15.1/css/ol.css" /-->
+<!-- Openlayers 3 Layer Switcher CSS -->
+<link rel="stylesheet" type="text/css" href="./css/ol3-layerswitcher.css" />
+
+                                   
+<!-- jtable option --> 
+<script type="text/javascript">
+    $.extend(true, $.hik.jtable.prototype.options, {
+        jqueryuiTheme: true
+    });
+    var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = window.location.search.substring(1),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+        }
+    }
+};
+</script>
+
+		<style>
+		
+			#controlToggle.toggle-button{
+				width: 28px !important;
+ 			    height: 28px !important;			    
+				margin-left: -30px;
+	    		left: -205px;
+ 			    margin-top: 57px !important;
+			    border-radius: 3px;
+			    padding: 0px !important;
+			    background: gray url(http://api.geodab.eu/docs/assets/img/bbox-selection.png) 0px 0px no-repeat !important;	
+ 			}			
+			#controlToggle.toggle-button-on{
+				background: white url(http://api.geodab.eu/docs/assets/img/bbox-selection.png) 0px 0px no-repeat !important;	
+			}		 
+			#controlToggleIcon{
+				display: none;
+			}		
+			.layers-control-table-div {
+			    opacity: 1 !important;
+			    margin-left: -198px !important;
+			}
+		
+			/* -------------------------------- */
+			/* header                           */
+			/*                                  */
+			#headerDiv{
+			    border: 1px solid #c0c0c0;
+ 			    background: #c0c0c0;
+			    margin-bottom: 0px;
+ 			}
+			#logoDiv{
+		    	vertical-align: top;
+		    	display: inline-block;
+			}
+			#what-div{
+				display: inline-block;
+				vertical-align: top;
+			}
+			#from-div{
+				display: inline-block;
+				margin-left: -10px;
+				vertical-align: top;			
+			}
+			#to-div{
+				display: inline-block;
+				margin-left: -10px;
+				vertical-align: top;
+			}			
+			#adv-search-button{	
+				display: inline-block;
+				vertical-align: top;
+  			}
+			#search-button{
+				display: inline-block;
+		    	vertical-align: top;
+ 			}
+			
+			/* -------------------------------- */
+			/* tabs                             */
+			/*                                  */
+			#tabs-ul{
+				 
+			}
+		    #tabs-div{
+		    	position: absolute; 
+				z-index: 99;
+			    border: none;
+			    background: transparent;
+ 		    }
+		    .tabs-element{			 
+ 			}
+ 			.ui-widget-header[role="tablist"] {
+			    border: 1px solid #999999;
+			    background: #999999;
+			}
+		    
+		    /* -------------------------------- */
+			/* results tab                      */
+			/*                                  */
+			#results-tab{
+			}	
+		    li[aria-controls="results-tab"]{
+
+		    }
+		    .resultset-layout-ul{			
+			}
+		    .series-browser-widget-table {
+		    	position: absolute;
+			    border: 1px solid #c0c0c0;
+			    background: rgb(221, 221, 221);		
+			}
+			#paginator-widget{
+				z-index: 100;
+				position: absolute; 
+ 				text-align: center;
+				display:inline-block;
+				background: #c0c0c0;
+			}
+			.paginator-widget-results-label {
+			    font-size: 1.0em;
+			}
+			.paginator-widget-button {
+			    padding: 3px;
+			    border-radius: 0px;
+			    height: 20px;
+			    font-size: 1.4em;			   
+			}
+			.paginator-widget-button-first {
+			   	padding-left: 8px;
+  			    padding-right: 8px;	   
+			}
+			.paginator-widget-button-last {
+			   	padding-left: 8px;
+  			    padding-right: 8px;	   
+			}
+			.paginator-widget-button-prev{
+				padding-right: 7px;
+			}
+			.paginator-widget-button-next{
+				padding-left: 7px;
+			}
+			.resultset-layout-table-div{
+ 				padding-right:0px!important;
+			}
+									
+			/* -------------------------------- */
+			/* sources tab                      */
+			/*                                  */
+			#sources-tab{
+				overflow: auto;
+				box-shadow: none;
+				background: rgb(221, 221, 221);
+			}			
+			.sources-widget{
+				box-shadow: none;
+				background: transparent;			 
+			}			
+			
+			/* -------------------------------- */
+			/* filters tab                      */
+			/*                                  */
+			#filters-tab{
+			    overflow-y: auto;
+			}
+						
+			/* -------------------------------- */
+			/* browse  tab                      */
+			/*                                  */
+			#browse-tab{
+		    	overflow-y: auto;
+ 				background: rgb(221, 221, 221);
+				font-size: 11px;
+			}
+			#browse-tree-div{
+				max-height: 455px;
+				overflow: auto;
+			}
+			
+			/* -------------------------------- */
+			/* map                              */
+			/*                                  */
+			.map-widget-div {
+			    background:transparent;
+			    padding: 0px; 
+			    border-radius: 0px; 
+			}						
+			
+		 
+			/* -------------------------------- */
+			/* constraints widget               */
+			/*                                  */
+		    .cnst-widget-where-input-control-div.resultset-layout{
+		    	display:none;
+  		    }
+		    .cnst-widget-where-input-control-button{
+		    	display:none;
+		    }
+
+		    /* -------------------------------- */
+			/* ui nodes                         */
+			/*    								*/
+			.no-overview-div {
+			    background: #ddd;
+			}
+			.common-ui-node-report-div {
+    			background: #ECEFF1;
+			}
+			.common-ui-node-report-div:hover {
+			    box-shadow: none;
+			    background: white;
+			}
+			.common-ui-node-report-div-hover {
+			    box-shadow: none;
+			    background: #ECEFF1!important
+			}		 
+			.common-ui-node-button-div .toggle-button{
+				font-size: 12px;
+			    padding: 2px;
+			}
+			.common-ui-node-button-div .font-awesome-button{
+				font-size: 12px;
+			    padding: 3px;
+			}
+			.common-ui-node-browse-collection-icon {
+ 			    margin-left: -21px;
+ 			    font-size: 1.3em;		 
+			}
+			.common-ui-node-browse-collection-button {
+			    width: 25px;
+			    height: 25px;		    
+			}
+			.common-ui-node-collection-check {			   
+			    font-size: 0.7em;			  
+			}			 
+			.common-ui-node-report-content-table-right{
+				font-size: 11px;
+			}
+			.common-ui-node-report-content-table-left{
+				font-size: 11px;
+			}
+			.common-ui-node-report-content-table-left-td{
+				font-size: 11px;
+			}
+			.common-ui-node-report-content-table-right-td {
+				font-size: 11px;
+			}
+			.common-ui-node-report-title {
+		        font-size: 11px;
+ 		    }
+		    .common-ui-node-report-desc {
+		    	font-size: 11px!important
+		    }		  
+		    .common-ui-node-time-label{
+		    	font-size: 11px;
+		    }
+		    .gbif-ui-node-occ-button-div div[class*='button']{
+		    	padding-left: 3px!important;
+	    		padding-top: 3px!important;
+				padding-bottom: 3px!important;
+		    	padding-right: 10px!important;
+		    }
+		    .gbif-ui-node-occ-button-div label{
+		    	font-size: 11px;
+		    }			   		    
+		    .gbif-ui-node-filters-button-div label{
+		    	font-size: 11px;
+		    }
+		    .gbif-ui-node-filters-button-div div[class*='button']{
+		    	padding: 4px!important;
+		        padding-right: 8px!important;	
+		    }
+		    .gbif-ui-node-filters-button-div div[class*='toggle-button'] i{
+		    	font-size:  17px;
+		    }
+		    .gbif-ui-node-filters-button-div div[class*='toggle-button']{
+		    	width:170px!important
+			}		    
+		    .gbif-ui-node-occurrence-count-div {
+ 		        padding: 4px;
+ 		    }
+		    .report-desc{
+		    	font-size: 12px;
+		    }
+		    .gbif-ui-node-occurrence-count-div {
+		        width: 200px;
+ 		        font-size: 12px;
+		    }
+			.classification-table{
+				font-size: 11px;
+			}
+			
+		    /* -------------------------------- */
+			/* jquery ui                        */
+			/*                                  */
+			#ui-datepicker-div{
+				z-index: 99!important
+			}
+			.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {
+				font-size: 95%;
+			}
+			    	   
+		</style>
+
+    	
+        <script>
+	        GIAPI.logger.enabled = true;
+	         	
+	    	GIAPI.ui.mapTypeId = google.maps.MapTypeId.HYBRID;	        	
+	        GIAPI.search = {};
+	        	        			 
+			GIAPI.search.dab = GIAPI.DAB('http://localhost:9090/gs-service', 'eiffel_aug_2022', 'services/essi','csw');
+				        	                	                
+	        jQuery(function() {
+	        
+	        var seadatanetLogos = '<a style="display:inline-block" target=_blank href="https://www.seadatanet.org/"><img style="width: 56px;" src="http://api.geodab.eu/docs/assets/img/sdn_logo.png"></img></a><a style="display:inline-block" target=_blank href="http://www.iia.cnr.it/"><img style="vertical-align: super" src="http://api.geodab.eu/docs/assets/img/iia.png"></img></a><a style="display:inline-block" targ et=_blank href="http://www.uos-firenze.iia.cnr.it/"><img style="vertical-align: super" src="http://api.geodab.eu/docs/assets/img/essilab.png"></img></a>';
+	        var standardLogos = '<a style="display:inline-block" target=_blank href="http://api.geodab.eu/"><img style="margin-top:-3px;" src="http://api.geodab.eu/docs/assets/img/api-logo-small-2.png"></img></a><a style="display:inline-block" target=_blank href="http://www.eurogeoss.eu/"><img src="http://api.geodab.eu/docs/assets/img/eurogeoss-small.png"></img></a><a style="display:inline-block" target=_blank href="http://www.iia.cnr.it/"><img style="vertical-align: super" src="http://api.geodab.eu/docs/assets/img/iia.png"></img></a><a style="display:inline-block" targ et=_blank href="http://www.uos-firenze.iia.cnr.it/"><img style="vertical-align: super" src="http://api.geodab.eu/docs/assets/img/essilab.png"></img></a>';
+	        	if (typeof view !== 'undefined') {
+	        		if (view == 'seadatanet'){
+	        			jQuery('#logoDiv').html(seadatanetLogos);
+	        		}else{
+	        			jQuery('#logoDiv').html(standardLogos);
+	        		}
+	        	}else{
+	        			jQuery('#logoDiv').html(standardLogos);	  
+	        	}
+	        	
+	        	// init the tabs	        	
+            	jQuery('#tabs-div').tabs({
+	          		  activate: function( event, ui ) {   
+	          			  
+	          			 // hides/shows the paginator widget
+	          			  if(ui.newPanel.selector === '#results-tab'){
+	          				  jQuery('#paginator-widget').css('display','block');
+	          			  }else{
+	          				  jQuery('#paginator-widget').css('display','none');
+	          			  }
+	          			  
+	          			  // refreshes the filters accordion 
+	          			  if(ui.newPanel.selector === '#filters-tab'){
+	           				  jQuery('#filters-tab').accordion('refresh');
+	           			  }  
+	          		  }
+      		    });
+            	
+	        	//------------------------------------------------------------------
+	        	// header settings
+	        	//
+            	jQuery('#headerDiv').css('padding','10px');
+            	jQuery('#headerDiv').css('padding-top','5px');
+            	jQuery('#headerDiv').css('height','30px');
+
+				var css = 'top: 50px!important;';
+            	css += 'left:660px!important;';
+             	GIAPI.UI_Utils.appendStyle('.cnst-widget-what-opt-dialog {'+css+'}');
+            	
+            	//------------------------------------------------------------------
+	        	// logo div settings
+	        	//
+            	jQuery('#logoDiv').css('margin-top','-2px');
+            	jQuery('#logoDiv').css('margin-left','50px');
+          
+            	var baseWidth = 600;
+            	
+            	//------------------------------------------------------------------
+	        	// search button
+	        	//
+            	jQuery('#search-button').css('margin-left','-3px');
+            	jQuery('#search-button').css('margin-top','5px');
+            	
+            	//------------------------------------------------------------------
+	        	// adv search button
+	        	//
+            	jQuery('#adv-search-button').css('margin-top','6px');
+             	
+            	//------------------------------------------------------------------
+	        	// tabs
+	        	//
+            	jQuery('#tabs-ul').css('width',(baseWidth + 22)+'px');
+            	jQuery('#tabs-ul').css('height','40px');
+            	jQuery('#tabs-ul').css('margin-left','3px');
+
+            	jQuery('#tabs-div').css('top','60px');
+            	jQuery('#tabs-div').css('left','15px');
+            	jQuery('#tabs-div').css('padding','0px');
+            	
+            	//------------------------------------------------------------------
+	        	// results tab
+	        	//
+            	jQuery('#results-tab').css('width',(baseWidth + 31)+'px');
+            	jQuery('#results-tab').css('margin-top','52px');
+            	
+            	jQuery('li[aria-controls="results-tab"').css('margin-left','190px');
+
+            	var css = 'width: '+(baseWidth + 22)+'px';
+             	GIAPI.UI_Utils.appendStyle('.resultset-layout-ul {'+css+'}');
+
+                jQuery('#paginator-widget').css('width',(baseWidth + 30)+'px');
+            	jQuery('#paginator-widget').css('height','55px');
+            	jQuery('#paginator-widget').css('top','108px');
+            	jQuery('#paginator-widget').css('left','18px');
+            	
+            	css = 'width: 290px;';
+            	css += 'margin-left:640px;';
+            	css += 'margin-top:-99px;';           	
+             	GIAPI.UI_Utils.appendStyle('.series-browser-widget-table {'+css+'}');
+
+            	//------------------------------------------------------------------
+            	// sources tab
+            	//
+            	jQuery('#sources-tab').css('width',(baseWidth + 27)+'px');
+            	jQuery('#sources-tab').css('margin-top','3px');
+            	jQuery('#sources-tab').css('margin-left','2px');
+          
+            	jQuery('.sources-widget').css('padding-right','10px');
+            	jQuery('.sources-widget').css('padding-left','10px');
+            	jQuery('.sources-widget').css('padding-top','0px');
+          
+            	//------------------------------------------------------------------
+            	// filters tab     
+            	//
+            	jQuery('#filters-tab').css('width',(baseWidth + 29)+'px');
+            	jQuery('#filters-tab').css('height','100%');
+            	jQuery('#filters-tab').css('margin-top','3px');
+
+            	//------------------------------------------------------------------
+            	// browse tab     
+            	//
+            	jQuery('#browse-tab').css('width',(baseWidth + 23)+'px');
+            	jQuery('#browse-tab').css('margin-left','3px');
+            	jQuery('#browse-tab').css('margin-top','3px');
+            	jQuery('#browse-tab').css('padding-left','5px');
+            	jQuery('#browse-tab').css('padding-top','5px');
+
+            	//------------------------------------------------------------------
+            	// nodes
+            	//
+            	var css = 'width: '+(baseWidth )+'px';
+             	GIAPI.UI_Utils.appendStyle('.classification-table {'+css+'}');
+            	
+            	//------------------------------------
+                // ResultsMapWidget
+                //
+            	GIAPI.search.resultsMapWidget = GIAPI.ResultsMapWidget('resMapWidget', 10, -50, {
+            		
+	            	'width': '100%',
+	            	'height': jQuery(window).height()-70,
+	            	'markerTitle': function(node){
+	        			
+	        			return node.report().title;
+	        		},
+	        		
+ 	        		'showSelectionControl': true,
+
+	//                	'onMarkerClick': function(node) {
+	//             		},
+	        		
+	        		'dabNode':  GIAPI.search.dab,
+	        		
+	        		'onMarkerMouseOver': function(node) {
+	        			
+	        			window.open('#section-div-'+node.uiId, '_self');   
+	        			jQuery('#section-'+node.uiId+' div').first().addClass('common-ui-node-report-div-hover');
+	        		},
+	        		
+	        		'onMarkerMouseOut': function(node) {
+	        			
+	        			jQuery('#section-'+node.uiId+' div').first().removeClass('common-ui-node-report-div-hover');
+	        		},
+	        		
+	        		'mapTypeControlOptions': {
+        	            style : google.maps.MapTypeControlStyle.HORIZONTAL_BAR,	        	     
+        	            position : google.maps.ControlPosition.TOP_RIGHT
+	        		 },
+ 	            	'zoom': 2,
+	        		'addLayers': false,
+	        		
+	        		'showLayersControl':true,
+	        		'layersControlWidth': 180,
+	        		'layersControlHeight': 200,
+	        		'layersControlOpacity': 0.9,
+	            });  
+            	
+            	// when the map is ready positions the control and hides it
+            	GIAPI.search.resultsMapWidget.map.map.addListener('tilesloaded', function() {
+            		
+                    jQuery('.cnst-widget-where-input-control-div.resultset-layout').css('display','block');
+                    jQuery('.cnst-widget-where-input-control-div.resultset-layout').css('position','relative');
+                    jQuery('.cnst-widget-where-input-control-div.resultset-layout').css('float','right');
+                    jQuery('.cnst-widget-where-input-control-div.resultset-layout').css('margin-top','98px');
+                    jQuery('.cnst-widget-where-input-control-div.resultset-layout').css('margin-right','9px');                                         	 
+    		    });
+            	
+            	// toggle button for the map input control
+            	var toggleButton = GIAPI.ToggleButton({
+      	    		'id': 'controlToggle',
+      	    		'width': 24,
+      	    		'duration':1,
+          			'targetSelector':'.cnst-widget-where-input-control',
+          			'attr': [{ name: 'title', value: 'Area selectionl' }],
+        			'offLabel':'',
+        			'onLabel':''
+          	    });
+            	
+            	jQuery(document).on('click','#controlToggle',function(){           		
+            		if(toggleButton.state() === 'on'){
+            			jQuery('#controlToggle').css('background','white');
+            		}else{
+            			jQuery('#controlToggle').css('background','gray');
+            		}
+            	});
+            	
+          	    toggleButton.css('div','height','22px');
+          	    toggleButton.css('div','background','gray');
+          	    toggleButton.css('div','color','black');         	    
+          	    toggleButton.css('div','border-radius','3px');
+          	   
+          	    toggleButton.css('icon','font-size','1.7em');
+          	    toggleButton.css('icon','margin-left','3px');
+
+      	    	toggleButton.css('div','top','0px');
+      	    	toggleButton.css('div','right','9px');
+          	    toggleButton.css('div','margin-top','118px');
+          	    toggleButton.css('div','margin-left','-440px');
+          	    toggleButton.css('div','position','relative');
+          	    toggleButton.css('div','float','right');
+          	    toggleButton.css('div','z-index','99');
+
+          	    toggleButton.stateIcon('on','fa-globe');
+          	    toggleButton.stateIcon('off','fa-globe');
+          	              	            	                  	
+            	jQuery('#controlToggleButtonDiv').append(toggleButton.div());   
+            	             	            	           	
+            	//------------------------------------
+                // search button
+                //
+	      	 	var searchButton  = GIAPI.FontAwesomeButton({
+      			    'width': baseWidth + 20,
+      			    'label':'SEARCH',
+      		        'icon':'fa-search',
+      		        'handler': function(){
+      		            if(GIAPI.search.sourcesWidget.sourcesCount() === 0){
+      		            	
+      		            	GIAPI.UI_Utils.dialog('open', {
+      		            		title : 'No sources selected',
+      		            		message : 'Please select at least one data source before starting the search'
+      		            	});
+      		            	
+                        }else{
+                            GIAPI.search.discover();  
+                        }      		        	
+      		        }
+      	        });
+      	 	
+      	 	    searchButton.css('div','padding','6.5px');     
+      	 	    searchButton.css('div','text-align','center');         
+      	 	    searchButton.css('label','font-size','1.2em');      
+      	 	  
+      	 	    jQuery('#search-button').append(searchButton.div());
+
+            	
+      	 	    //------------------------------------
+                // ConstraintsWidget
+                //
+                GIAPI.search.constWidget = GIAPI.ConstraintsWidget(GIAPI.search.dab, {
+            		'keyDownAction': (function(){ GIAPI.search.discover();}),
+            		'fieldsWidth': 205             	
+                });
+                
+                GIAPI.search.constWidget.whatConstraint('add',{
+                	 showOptDialog: false , 
+                	 showResultSetExtensionOpt: true, 
+                	 optDialogPosition : 'bottom',
+                	 showHelpIcon: false,
+                	 resizable:true
+                });               
+                GIAPI.search.constWidget.append('what-div');
+                jQuery('#'+GIAPI.search.constWidget.getId('what')).css('padding','6px');
+                               
+                GIAPI.search.constWidget.whenConstraint('add','from',{showHelpIcon: false});
+                GIAPI.search.constWidget.append('from-div');
+                
+                jQuery('#'+GIAPI.search.constWidget.getId('from')).css('padding','6px');
+                jQuery('#'+GIAPI.search.constWidget.getId('from')).css('width','80px');
+                jQuery('#'+GIAPI.search.constWidget.getId('from')).parent('div').parent('td').css('width','80px');
+ 
+                GIAPI.search.constWidget.whenConstraint('add','to',{showHelpIcon: false});
+                GIAPI.search.constWidget.append('to-div');
+                
+                jQuery('#'+GIAPI.search.constWidget.getId('to')).css('padding','6px');
+                jQuery('#'+GIAPI.search.constWidget.getId('to')).css('width','80px');
+                jQuery('#'+GIAPI.search.constWidget.getId('to')).parent('div').parent('td').css('width','80px');
+                
+                GIAPI.search.constWidget.append('constraints-div');
+                            
+                // advanced constraints                   
+                var advConstDiv = '<div id="advConstDiv">';
+                   
+                advConstDiv += '<br><input checked type="radio" id="classic" name="fav_language" value="">';
+             	advConstDiv += '<label for="classic">Classic search</label><br>';
+              	
+             	advConstDiv += '<input type="radio" id="sort_and_filter" name="fav_language" value="eiffelDiscovery=SORT_AND_FILTER">';
+               	advConstDiv += '<label for="sort_and_filter">Cognitive search (sort and filter)</label><br>';
+               
+               	advConstDiv += '<input type="radio" id="filter_and_sort" name="fav_language" value="eiffelDiscovery=FILTER_AND_SORT">';
+              	advConstDiv += '<label for="filter_and_sort">Cognitive sort (filter and sort)</label>';
+	                                    
+                advConstDiv += '</div>';
+                
+           	    var pos = GIAPI.position('bottom');
+	       
+	            jQuery("#advConstDialog").append(advConstDiv);      
+	          
+	            jQuery('#advConstDialog').dialog({
+	        	   autoOpen: false,
+	               dialogClass : 'no-titlebar',
+	               height : 110,
+ 	               width : 260,
+	               modal : false,
+	               position : {
+	                   of : '#adv-search-button',
+	                   my : pos.my,
+	                   at : pos.at,
+	                   collision : 'none'
+	               }
+	            });
+
+	            jQuery('#advConstDialog').css('background', 'rgb(221, 221, 221)');
+	            jQuery('[aria-describedby="advConstDialog"]').css('background', 'none');
+	            jQuery('[aria-describedby="advConstDialog"]').css('border', 'none');
+	           	       	 	  	 			           
+      	        // advanced constraints button    	    
+      	        var advConstButton  = GIAPI.FontAwesomeButton({
+    			    'width': 250,
+    			    'label':'Advanced',
+    		        'icon':' fa-bars',
+    		        'handler': function(){
+    		            
+    		        	if(jQuery("#advConstDialog").dialog("isOpen")){
+        		        	jQuery("#advConstDialog").dialog("close");
+    		        	}else{
+        		        	jQuery("#advConstDialog").dialog("open");
+    		        	}
+    		        }
+    	        });
+      	        
+      	        advConstButton .css('div','background','rgb(221, 221, 221)');     
+      	        advConstButton .css('div','color','black');     
+
+      	        jQuery('#adv-search-button').append( advConstButton.div());
+            	
+      	        //------------------------------------
+                // PaginatorWidget
+                //
+                GIAPI.search.paginatorWidget = GIAPI.PaginatorWidget('paginator-widget', 
+                		
+                		GIAPI.search.onDiscoverResponse,
+                		{'onPagination': function(action){
+
+                	        GIAPI.UI_Utils.discoverDialog('open');
+                  		},
+                  		'border': 'none'
+                	}
+                );
+                
+                //------------------------------------
+                // SourcesWidget
+                //
+                GIAPI.search.sourcesWidget = GIAPI.SourcesWidget('sources-tab', GIAPI.search.dab,{
+                 	'width':'none',    
+                 	'height':'none',
+                 	'viewId': 'eiffel_aug_2022',
+                	'include': function(source){                		
+                		// includes only harvested sources to speedup the initialization
+                		return source.contentType () === 'harvested';
+                 	},
+                	
+                	'onSourcesReady':  function(sources){                        
+                    	// starts the init discover
+                        GIAPI.search.discover();  
+                	}
+                });
+                GIAPI.UI_Utils.appendStyle('#sources-tab{ max-height: '+(jQuery(window).height()-150)+ 'px}');
+               
+                //------------------------------------
+                // TermFrequencyWidget
+                //
+                GIAPI.search.tfWidget = GIAPI.TermFrequencyWidget('filters-tab',
+            		(function(){GIAPI.UI_Utils.discoverDialog('open')}), null,
+            		{
+            			'itemLabelFontSize': '80%',
+                    	'divCSS': 'max-height:550px; overflow:auto',
+                    	'accordionMode': true
+                    }
+                );
+                
+                jQuery('#filters-tab').css('height',jQuery(window).height()-150);
+                
+                //-------------------------------
+                // GINodeTree
+                //
+                var lastClickedLabel;
+                GIAPI.search.tfWidget.nodeTree = GIAPI.GINodeTree(GIAPI.search.dab,'browse-tree-div',{
+                	
+//                	expandRoot: true,
+                	onCreateNode: function(labelId, label, giNode, parentTreeNode, expandNext, isRoot){
+                		
+                		    if(giNode){
+                 		            		           		 
+		                		jQuery(document).on('click','#'+labelId, function(){	 
+		                				                
+		                			jQuery('#'+lastClickedLabel).css('text-decoration','none');
+		                			jQuery('#'+labelId).css('text-decoration','underline');
+		                			
+		                			lastClickedLabel = labelId; 
+		                			
+		                			var id = 'browse-info-div';
+		                			jQuery('#'+id).remove();
+		                					
+		                			if(giNode.report().service && giNode.report().service.source){
+		                				
+		       	                        var css = 'padding-bottom: 5px;';
+	 		                			css += 'margin-top: 5px;';
+			                			
+			                			var div = '<div id="browse-info-div" style="'+css+'"></div>'
+			                			jQuery('#browse-tab').append(div);	        	                       
+	                					
+	        	                        var sourceInfo = GIAPI.Source_UINode(giNode,id);	     
+	        	                        sourceInfo.updateMap();	    	        	                        
+	    
+	        	                  	    jQuery('#'+id+' > table').css('width','100%');
+	        	                  	    jQuery('#'+id+' > table').css('margin-left','0px');
+	        	                  	    jQuery('#'+id+' > table').css('margin-top','0px');
+	
+	                 				}else{	 
+	                					
+	                					var css = 'border: 1px solid #9E9E9E;';
+ 			                			css += 'margin-bottom: 3px;';
+			                			css += 'margin-top: 5px;';
+			                		    css += 'height:100%;';
+			                			
+			                			var div = '<div id="browse-info-div" style="'+css+'"></div>'
+			                			jQuery('#browse-tab').append(div);	        	                       
+	      	                					                			
+			                			var Common_UINode_No_Aside = function(options) {
+			            	             	
+			            	            	var uiNode = GIAPI.Common_UINode(options);	
+			            	            	
+			            	            	options.asideDom = function(node,options,asideId){                	
+			            	            	};
+			            	            	
+			            	            	options.onAsideReady = function(aside,node){               	
+			            	            	};
+			            	
+			            	            	return uiNode;
+			            	            };
+			            	            
+			                			var node = Common_UINode_No_Aside({
+			                				noTitle: true,
+			                				mapWidget: GIAPI.search.resultsMapWidget
+			                			});
+			                			node.render(giNode,0,0,0,id);		  
+		                			}
+		                			
+		                			return false;                			
+		                		});
+	                		}
+	                		
+	                		return label;
+            		}              	 
+                });
+                GIAPI.UI_Utils.appendStyle('#browse-info-div div[class=common-ui-node-report-div]{ padding-bottom: 5px}');
+                GIAPI.UI_Utils.appendStyle('#browse-tab{ max-height: '+(jQuery(window).height()-150)+ 'px}');
+
+              
+                //------------------------------------
+                // ResultSetLayout
+                //
+                var Common_UINode_No_Aside = function(options) {
+	             	
+	            	var uiNode = GIAPI.Common_UINode(options);	
+	            	
+	            	options.asideDom = function(node,options,asideId){                	
+	            	};
+	            	
+	            	options.onAsideReady = function(aside,node){               	
+	            	};
+	
+	            	return uiNode;
+	            };
+	            
+	            var IrisEvent_UINode_No_Aside = function(options) {
+	             	
+	            	var uiNode = GIAPI.IrisEvent_UINode(options);	
+	            	
+	            	options.asideDom = function(node,options,asideId){                	
+	            	};
+	            	
+	            	options.onAsideReady = function(aside,node){               	
+	            	};
+	
+	            	return uiNode;
+	            };
+	            
+                // creates the layout
+	            GIAPI.search.resultSetLayout = GIAPI.ResultSetLayout('results-tab',{
+	            	                	
+	            	// registers the ui nodes
+                	'uiNodes' : [Common_UINode_No_Aside, IrisEvent_UINode_No_Aside, GIAPI.GBIF_UINode],
+                	
+                	// set the widgets to update
+                	'mapWidget' : GIAPI.search.resultsMapWidget,
+                	'pagWidget' : GIAPI.search.paginatorWidget,
+                    'tfWidget' : GIAPI.search.tfWidget,
+                    
+                    // set the onUpdateReady function with the implementation
+                	// provided by GBIF_UINode
+                	'onUpdateReady': function(renderedNodes){ 
+                		GIAPI.GBIF_UINode.onUpdateReady(GIAPI.search.dab, renderedNodes)
+                	},
+	            	
+                    // enables the collection browsing ------------------
+                	'browseCollection': true,
+                	'onDiscoverResponse': GIAPI.search.onDiscoverResponse,
+                 	// ---------------------------------------------------
+	                                	                   	                	
+	            	'dabNode': GIAPI.search.dab,     
+	               	//'height': jQuery(window).height()-100,
+	            	'maxHeight': jQuery(window).height()-210,
+	            });
+	            
+	            //------------------------------------
+                // Starts discover
+                //
+//	            GIAPI.search.discover();  
+	       });
+	        
+	       GIAPI.search.discover = function(init) {
+            	
+                var constraints = GIAPI.search.constWidget.constraints();                
+                constraints.where  = GIAPI.search.resultsMapWidget.where();
+ 
+                var sortAndFilter = jQuery('#sort_and_filter').is(":checked");
+                var filterAndSort = jQuery('#filter_and_sort').is(":checked");
+                
+                if(sortAndFilter){
+                	               
+	                constraints.kvp = [
+	                	{'key':'eiffelDiscovery','value':'SORT_AND_FILTER'}
+	                ];
+	                
+                }else if(filterAndSort){
+                	
+                	constraints.kvp = [
+	                	{'key':'eiffelDiscovery','value':'FILTER_AND_SORT'}
+	                ];
+                }
+
+                var options =  GIAPI.search.constWidget.options();
+                options.spatialRelation = GIAPI.search.resultsMapWidget.spatialRelation();
+                options.searchFields = 'title,description,keywords';
+                
+                // set the termFrequency option
+                options.termFrequency = 'source,keyword,format,protocol';
+                                                              
+                try {                	               	
+                	GIAPI.search.dab.discover( GIAPI.search.onDiscoverResponse, constraints, options);               	
+                	GIAPI.UI_Utils.discoverDialog('open');
+                
+                } catch(err) {
+                	GIAPI.UI_Utils.dialog('open',{title:'Error',message:err});
+                }
+            };
+                                  	               
+            GIAPI.search.onDiscoverResponse = function(response) {     
+            	           	            	                  
+        	    if(response.error){
+                   
+          		    GIAPI.UI_Utils.discoverDialog('close');           
+          		    GIAPI.UI_Utils.dialog('open',{title:'Error',message:response.error});        		 
+                    return;
+                }
+        	    
+        	    var resultSet = response[0];
+        	    
+             	// updates the result set layout
+        	    GIAPI.search.resultSetLayout.update(response);
+        	    
+           	    if(resultSet.extension){
+        	    	jQuery('.resultset-layout-table-div').css('max-height',jQuery(window).height()-280+'px');
+        	    }else{
+        	    	jQuery('.resultset-layout-table-div').css('max-height',jQuery(window).height()-210+'px');
+        	    }
+        	            	 	           	        	           	       	    
+        	    if(!response[0].termFrequency){
+        	    	jQuery('#filters-tab').empty();             	    	
+        	    }
+        	           	     
+                if (GIAPI.UI_Utils.discoverDialog('isOpen')) {            
+                    GIAPI.UI_Utils.discoverDialog('close');
+                }
+            };
+           </script>
+    </head>
+    
+    <body>
+    	
+        <div id="controlToggleButtonDiv"></div> 
+        
+        <div id="headerDiv">
+    		<div id="search-button"></div>
+        	<div id="what-div"></div>
+        	<div id="from-div"></div>
+        	<div id="to-div"></div>
+        	<div id="adv-search-button"></div>
+        	
+        	<div id="logoDiv" >
+	        	      	
+	       </div>
+          	
+	   </div>
+       	    
+       <div id="resMapWidget"></div>
+       
+       <div id="paginator-widget"></div>       
+       
+	   <div id="tabs-div">
+	   
+            <ul id="tabs-ul">
+                <li><a style="margin-left: -60px;" href="#results-tab">RESULTS</a></li>
+                <li><a href="#filters-tab">FILTERS</a></li>
+                <li><a href="#sources-tab">SOURCES</a></li>
+                <li><a href="#browse-tab">BROWSING</a></li>
+            </ul>
+            						               
+            <div class="tabs-element" id="results-tab">                 
+            </div>
+            
+            <div class="tabs-element" id="filters-tab">	                    
+            </div>
+               
+            <div class="tabs-element" id="sources-tab">
+            </div>
+                          	                               
+            <div class="tabs-element" id="browse-tab">
+            	<div id="browse-tree-div"></div>
+            	<div id="browse-info-div"></div>
+            </div>
+            
+	   </div>  	
+        
+       <div id="advConstDialog"></div>
+     
+    </body>
+    
+</html>

@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gs;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,15 +22,21 @@ package eu.essi_lab.cfga.gs;
  */
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.quartz.JobExecutionContext;
+
 import eu.essi_lab.cfga.Configuration;
+import eu.essi_lab.cfga.ConfigurationChangeListener;
 import eu.essi_lab.cfga.ConfigurationUtils;
 import eu.essi_lab.cfga.gs.DefaultConfiguration.MainSettingsIdentifier;
 import eu.essi_lab.cfga.gs.setting.CredentialsSetting;
 import eu.essi_lab.cfga.gs.setting.DownloadSetting;
+import eu.essi_lab.cfga.gs.setting.DownloadSetting.DownloadStorage;
 import eu.essi_lab.cfga.gs.setting.GDCSourcesSetting;
 import eu.essi_lab.cfga.gs.setting.GSSourceSetting;
 import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
@@ -41,13 +47,22 @@ import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
 import eu.essi_lab.cfga.gs.setting.augmenter.worker.AugmenterWorkerSetting;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.cfga.gs.setting.database.SourceStorageSetting;
+import eu.essi_lab.cfga.gs.setting.dc_connector.DataCacheConnectorSetting;
 import eu.essi_lab.cfga.gs.setting.distribution.DistributionSetting;
 import eu.essi_lab.cfga.gs.setting.driver.SharedCacheDriverSetting;
 import eu.essi_lab.cfga.gs.setting.driver.SharedPersistentDriverSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSettingLoader;
 import eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting;
+import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting;
 import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
+import eu.essi_lab.cfga.scheduler.SchedulerUtils;
+import eu.essi_lab.cfga.setting.SettingUtils;
+import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting;
+import eu.essi_lab.configuration.ExecutionMode;
+import eu.essi_lab.lib.net.s3.S3TransferWrapper;
+import eu.essi_lab.lib.utils.Chronometer;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
@@ -55,7 +70,7 @@ import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.BrokeringStrategy;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.ResourceProperty;
 
@@ -63,6 +78,16 @@ import eu.essi_lab.model.resource.ResourceProperty;
  * @author Fabrizio
  */
 public class ConfigurationWrapper {
+
+    /**
+     * Reload every 5 minutes
+     */
+    public static final int CONFIG_RELOAD_TIME = 5;
+
+    /**
+     * 
+     */
+    public static final TimeUnit CONFIG_RELOAD_TIME_UNIT = TimeUnit.MINUTES;
 
     /**
      * 
@@ -78,6 +103,28 @@ public class ConfigurationWrapper {
     public static void setConfiguration(Configuration config) {
 
 	configuration = config;
+	configuration.addChangeEventListener(new ConfigurationChangeListener() {
+
+	    @Override
+	    public void configurationChanged(ConfigurationChangeEvent event) {
+		int eventType = event.getEventType();
+		switch (eventType) {
+		case ConfigurationChangeEvent.SETTING_PUT:
+		case ConfigurationChangeEvent.SETTING_REMOVED:
+		case ConfigurationChangeEvent.SETTING_REPLACED:
+		case ConfigurationChangeEvent.CONFIGURATION_CLEARED:
+		case ConfigurationChangeEvent.CONFIGURATION_AUTO_RELOADED:
+		case ConfigurationChangeEvent.CONFIGURATION_FLUSHED:
+		    allSourcesCache = getSources(null, false);
+		    break;
+		default:
+		    break;
+		}
+	    }
+
+	});
+
+	allSourcesCache = getSources(null, false);
     }
 
     /**
@@ -91,7 +138,7 @@ public class ConfigurationWrapper {
     /**
      * @return
      */
-    public static StorageUri getDatabaseURI() {
+    public static StorageInfo getDatabaseURI() {
 
 	return getDatabaseSetting().asStorageUri();
     }
@@ -114,6 +161,30 @@ public class ConfigurationWrapper {
      */
     public static SourcePrioritySetting getSourcePrioritySetting() {
 
+	return getSourcePrioritySetting(configuration);
+    }
+
+    /**
+     * @return
+     */
+    public static SourceStorageSetting getSourceStorageSettings() {
+
+	return getSourceStorageSettings(configuration);
+    }
+
+    /**
+     * @return
+     */
+    public static GDCSourcesSetting getGDCSourceSetting() {
+
+	return getGDCSourceSetting(configuration);
+    }
+
+    /**
+     * @return
+     */
+    public static SourcePrioritySetting getSourcePrioritySetting(Configuration configuration) {
+
 	return configuration.get(//
 		MainSettingsIdentifier.SOURCE_PRIORITY_SETTINGS.getLabel(), //
 		SourcePrioritySetting.class //
@@ -125,7 +196,18 @@ public class ConfigurationWrapper {
     /**
      * @return
      */
-    public static GDCSourcesSetting getGDCSourceSetting() {
+    public static SourceStorageSetting getSourceStorageSettings(Configuration configuration) {
+
+	return configuration.get(//
+		MainSettingsIdentifier.SOURCE_STORAGE_SETTINGS.getLabel(), //
+		SourceStorageSetting.class //
+	).get();
+    }
+
+    /**
+     * @return
+     */
+    public static GDCSourcesSetting getGDCSourceSetting(Configuration configuration) {
 
 	return configuration.get(//
 		MainSettingsIdentifier.GDC_SOURCES_SETTINGS.getLabel(), //
@@ -186,11 +268,9 @@ public class ConfigurationWrapper {
      */
     public static List<AugmenterWorkerSetting> getAugmenterWorkerSettings() {
 
-	return configuration
-		.list(//
-			AugmenterWorkerSetting.class, //
-			false)
-		.//
+	return configuration.list(//
+		AugmenterWorkerSetting.class, //
+		false).//
 		stream().//
 		collect(Collectors.toList());
     }
@@ -200,11 +280,9 @@ public class ConfigurationWrapper {
      */
     public static List<CustomTaskSetting> getCustomTaskSettings() {
 
-	return configuration
-		.list(//
-			CustomTaskSetting.class, //
-			false)
-		.//
+	return configuration.list(//
+		CustomTaskSetting.class, //
+		false).//
 		stream().//
 		collect(Collectors.toList());
     }
@@ -366,6 +444,8 @@ public class ConfigurationWrapper {
 	return collect;
     }
 
+    private static List<GSSource> allSourcesCache = null;
+
     /**
      * Retrieves all the {@link GSSource}s defined by the current configuration: brokered, harvested, mixed
      *
@@ -373,8 +453,8 @@ public class ConfigurationWrapper {
      * @throws GSException
      */
     public static List<GSSource> getAllSources() {
+	return allSourcesCache;
 
-	return getSources(null, false);
     }
 
     /**
@@ -480,16 +560,16 @@ public class ConfigurationWrapper {
 
 	    if (s.getObject().getString("settingClass").equals(GSSourceSetting.class.getName()) && //
 
-	    (strategy == null && !harvestedAndMixed ||
+		    (strategy == null && !harvestedAndMixed ||
 
-		    strategy == null && harvestedAndMixed
-			    && (s.getObject().getString("brokeringStrategy").equals(BrokeringStrategy.HARVESTED.getLabel())
-				    || s.getObject().getString("brokeringStrategy").equals(BrokeringStrategy.MIXED.getLabel()))
-		    ||
+			    strategy == null && harvestedAndMixed
+				    && (s.getObject().getString("brokeringStrategy").equals(BrokeringStrategy.HARVESTED.getLabel())
+					    || s.getObject().getString("brokeringStrategy").equals(BrokeringStrategy.MIXED.getLabel()))
+			    ||
 
-		    strategy != null && s.getObject().getString("brokeringStrategy").equals(strategy.getLabel())
+			    strategy != null && s.getObject().getString("brokeringStrategy").equals(strategy.getLabel())
 
-	    ) //
+		    ) //
 
 	    ) {
 
@@ -527,17 +607,6 @@ public class ConfigurationWrapper {
 	return configuration.get(//
 		MainSettingsIdentifier.SYSTEM_SETTINGS.getLabel(), //
 		SystemSetting.class //
-	).get();
-    }
-
-    /**
-     * @return
-     */
-    public static SourceStorageSetting getSourceStorageSettings() {
-
-	return configuration.get(//
-		MainSettingsIdentifier.SOURCE_STORAGE_SETTINGS.getLabel(), //
-		SourceStorageSetting.class //
 	).get();
     }
 
@@ -587,4 +656,174 @@ public class ConfigurationWrapper {
 
 	return setting;
     }
+
+    // ----
+    //
+    // Rate limiter
+    //
+    // ----
+
+    public static RateLimiterSetting getRateLimiterSettingSettings() {
+
+	RateLimiterSetting setting = configuration.get(//
+		MainSettingsIdentifier.RATE_LIMITER_SETTINGS.getLabel(), //
+		RateLimiterSetting.class).get();
+
+	return setting;
+    }
+
+    /**
+     * @return
+     */
+    public static DataCacheConnectorSetting getDataCacheConnectorSetting() {
+
+	DataCacheConnectorSetting setting = configuration.get(//
+		MainSettingsIdentifier.DATA_CACHE_CONNECTOR_SETTINGS.getLabel(), //
+		DataCacheConnectorSetting.class, //
+		false).get();
+
+	return setting;
+    }
+
+    /**
+     * 
+     */
+    private static HashMap<String, Chronometer> isJobCanceledMap = new HashMap<>();
+
+    /**
+     * This method returns <code>true</code> in the following cases:
+     * <ol>
+     * <li>the scheduling of the given worker setting is disabled</li>
+     * <li>the given worker setting is not found in the configuration</li>
+     * </ol>
+     * The second case can return a false positive, since the given worker setting can result missing even if is
+     * present
+     * in the
+     * configuration. This can happen in a production environment if the given worker setting has been put in the
+     * configuration less then
+     * {@value #CONFIG_RELOAD_TIME} minutes from the method call and the task which calls this method is not in synch
+     * with the
+     * configuration.<br>
+     * For example. An harvested accessor is added to the configuration and the scheduling is immediately started. The
+     * task which runs the harvester, will
+     * update its own copy of the configuration in 2 minutes so in its own copy <i>the new setting is missing</i>.
+     * Thus, calling this method would return <code>true</code> since the task is not in synch with the DB
+     * configuration.<br>
+     * To avoid this, when this method is called from a production task for a given worker setting,
+     * we ensure that at least {@value #CONFIG_RELOAD_TIME} minutes are passed from the first call of this method
+     * for that worker setting. If
+     * {@value #CONFIG_RELOAD_TIME} minutes are not passed, the method returns <code>false</code> because we
+     * cannot be sure that the setting is
+     * actually not present in the configuration
+     * 
+     * @param context
+     * @return
+     */
+    public synchronized static boolean isJobCanceled(JobExecutionContext context) {
+
+	SchedulerWorkerSetting setting = SchedulerUtils.getSetting(context);
+
+	//
+	//
+	//
+
+	List<SchedulerWorkerSetting> workerSettingList = getAugmenterWorkerSettings().//
+		stream().//
+		map(s -> (SchedulerWorkerSetting) SettingUtils.downCast(s, s.getSettingClass())).//
+		collect(Collectors.toList());
+
+	workerSettingList.addAll(getHarvestingSettings().//
+		stream().//
+		map(s -> (SchedulerWorkerSetting) SettingUtils.downCast(s, s.getSettingClass())).//
+		collect(Collectors.toList()));
+
+	workerSettingList.addAll(getCustomTaskSettings().//
+		stream().//
+		map(s -> (SchedulerWorkerSetting) SettingUtils.downCast(s, s.getSettingClass())).//
+		collect(Collectors.toList()));
+
+	if (workerSettingList.//
+		stream().//
+		filter(s -> s.getIdentifier().equals(//
+			setting.getIdentifier()) && //
+			!s.getScheduling().isRunOnceSet() && // this is to exclude the worker with disabled scheduler
+							     // that are manually started with the "Start harvesting"
+							     // context menu button
+			!s.getScheduling().isEnabled())
+		.//
+		findFirst().//
+		isPresent()) {
+
+	    GSLoggerFactory.getLogger(ConfigurationWrapper.class).info("Scheduling of worker '" + setting.getWorkerName() + "' disabled");
+
+	    return true;
+	}
+
+	//
+	//
+	//
+
+	List<String> idList = workerSettingList.//
+		stream().//
+		map(s -> s.getIdentifier()).//
+		collect(Collectors.toList());
+
+	boolean settingMissing = !idList.contains(setting.getIdentifier());
+
+	if (settingMissing) {
+
+	    //
+	    // time check!
+	    //
+	    if (ExecutionMode.get() != ExecutionMode.MIXED && ExecutionMode.get() != ExecutionMode.LOCAL_PRODUCTION) {
+
+		Chronometer chronometer = isJobCanceledMap.get(setting.getIdentifier());
+
+		if (chronometer == null) {
+
+		    chronometer = new Chronometer();
+		    chronometer.start();
+
+		    isJobCanceledMap.put(setting.getIdentifier(), chronometer);
+
+		    return false;
+		}
+
+		long elapsedTimeMillis = chronometer.getElapsedTimeMillis();
+		long reloadTime = CONFIG_RELOAD_TIME_UNIT.toMillis(CONFIG_RELOAD_TIME * 2);
+
+		if (elapsedTimeMillis < reloadTime) {
+
+		    return false;
+		}
+	    }
+
+	    GSLoggerFactory.getLogger(ConfigurationWrapper.class).info("Setting of worker '" + setting.getWorkerName() + "' removed");
+
+	    return true;
+	}
+
+	return false;
+    }
+
+    /**
+     * @return
+     */
+    public static Optional<S3TransferWrapper> getS3TransferManager() {
+
+	if (getDownloadSetting().getDownloadStorage() == DownloadStorage.LOCAL_DOWNLOAD_STORAGE) {
+
+	    return Optional.empty();
+	}
+
+	String accessKey = getDownloadSetting().getS3StorageSetting().getAccessKey().get();
+	String secretKey = getDownloadSetting().getS3StorageSetting().getSecretKey().get();
+
+	S3TransferWrapper manager = new S3TransferWrapper();
+	manager.setAccessKey(accessKey);
+	manager.setSecretKey(secretKey);
+
+	return Optional.of(manager);
+    }
+
 }

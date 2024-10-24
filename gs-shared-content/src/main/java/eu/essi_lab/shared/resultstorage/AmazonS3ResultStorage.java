@@ -4,7 +4,7 @@ package eu.essi_lab.shared.resultstorage;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,9 +23,9 @@ package eu.essi_lab.shared.resultstorage;
 
 import java.io.File;
 
-import eu.essi_lab.lib.net.s3.S3TransferManager;
+import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 
 /**
  * @author Fabrizio
@@ -35,27 +35,27 @@ public class AmazonS3ResultStorage extends ResultStorage {
     /**
      * @param resultStorageURI
      */
-    public AmazonS3ResultStorage(StorageUri storageURI) {
+    public AmazonS3ResultStorage(StorageInfo storageURI) {
 
 	super(storageURI);
     }
 
     public void store(String objectName, File file) throws Exception {
 
-	S3TransferManager manager = new S3TransferManager();
+	S3TransferWrapper manager = new S3TransferWrapper();
 	manager.setAccessKey(getResultStorageURI().getUser());
-	manager.setSecreteKey(getResultStorageURI().getPassword());
+	manager.setSecretKey(getResultStorageURI().getPassword());
 	
 	manager.setACLPublicRead(true);
 
-	GSLoggerFactory.getLogger(getClass()).debug("Uploading file {} to bucket {} STARTED", file, getResultStorageURI().getStorageName());
+	GSLoggerFactory.getLogger(getClass()).debug("Uploading file {} to bucket {} STARTED", file, getResultStorageURI().getName());
 
 	manager.uploadFile(//
 		file.getAbsolutePath(), //
-		getResultStorageURI().getStorageName(), //
+		getResultStorageURI().getName(), //
 		objectName);
 
-	GSLoggerFactory.getLogger(getClass()).debug("Uploading file {} to bucket {} ENDED", file, getResultStorageURI().getStorageName());
+	GSLoggerFactory.getLogger(getClass()).debug("Uploading file {} to bucket {} ENDED", file, getResultStorageURI().getName());
 
 	// AWSCredentialsProvider credentialsProvider = new AWSStaticCredentialsProvider(
 	// new BasicAWSCredentials(getResultStorageURI().getUser(), getResultStorageURI().getPassword()));
@@ -69,6 +69,6 @@ public class AmazonS3ResultStorage extends ResultStorage {
     @Override
     public String getStorageLocation(String objectName) {
 
-	return getResultStorageURI().getUri() + getResultStorageURI().getStorageName() + "/" + objectName;
+	return getResultStorageURI().getUri() + getResultStorageURI().getName() + "/" + objectName;
     }
 }

@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof.discovery.series;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -95,7 +95,7 @@ public class GetSeriesCatalogForBoxResultSetMapper extends DiscoveryResultSetMap
 
 	    String servCode = ""; // LittleBearRiver
 	    try {
-		servCode = metadata.getMIPlatform().getMDIdentifierCode().split(":")[0];
+		servCode = "DAB";
 	    } catch (Exception e) {
 	    }
 	    String servURL = ""; // http://data.iutahepscor.org/littlebearriverwof/cuahsi_1_1.asmx

@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.csw;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,21 +25,21 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.InputStreamEntity;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.net.utils.Downloader;
-import eu.essi_lab.lib.net.utils.HttpRequestExecutor;
+import eu.essi_lab.lib.net.downloader.Downloader;
+import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
+import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodWithBody;
 import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
@@ -206,7 +206,7 @@ public class CSWC3SConnector extends CSWConnector {
 	Optional<InputStream> optional = Optional.empty();
 
 	try {
-	    optional = pReq.downloadStream(quickLook);
+	    optional = pReq.downloadOptionalStream(quickLook);
 
 	} catch (IllegalArgumentException ex) {
 
@@ -239,16 +239,17 @@ public class CSWC3SConnector extends CSWConnector {
 		GSLoggerFactory.getLogger(getClass()).trace("Thumbnail uploading STARTED");
 		GSLoggerFactory.getLogger(getClass()).trace("Current upload url: {}", putRequ);
 
-		HttpPut putRequest = new HttpPut();
-		putRequest.setURI(new URI(putRequ));
-		putRequest.setEntity(new InputStreamEntity(cis.clone()));
+		// HttpPut putRequest = new HttpPut();
+		// putRequest.setURI(new URI(putRequ));
+		// putRequest.setEntity(new InputStreamEntity(cis.clone()));
 
-		HttpRequestExecutor executor = new HttpRequestExecutor();
-		executor.setTimeout(0);
+		Downloader executor = new Downloader();
+ 
+		HttpRequest putRequest = HttpRequestUtils.build(MethodWithBody.PUT, putRequ, cis.clone());
 
-		HttpResponse response = executor.execute(putRequest);
+		HttpResponse<InputStream> response = executor.downloadResponse(putRequest);
 
-		int statusCode = response.getStatusLine().getStatusCode();
+		int statusCode = response.statusCode();
 		if (statusCode == 200) {
 
 		    GSLoggerFactory.getLogger(getClass()).trace("Thumbnail uploading ENDED. Thumbnail correctly set");
@@ -257,7 +258,7 @@ public class CSWC3SConnector extends CSWConnector {
 
 		} else {
 
-		    GSLoggerFactory.getLogger(getClass()).error("Unable to upload thumbnail : " + response.getStatusLine());
+		    GSLoggerFactory.getLogger(getClass()).error("Unable to upload thumbnail : " + response.statusCode());
 		}
 	    } else {
 

@@ -4,7 +4,7 @@ package eu.essi_lab.harvester.component;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,6 +21,7 @@ package eu.essi_lab.harvester.component;
  * #L%
  */
 
+import eu.essi_lab.harvester.HarvestingComponentException;
 import eu.essi_lab.harvester.HarvestingComponent;
 import eu.essi_lab.identifierdecorator.ConflictingResourceException;
 import eu.essi_lab.identifierdecorator.DuplicatedResourceException;
@@ -44,7 +45,7 @@ public class IdentifierDecoratorComponent extends HarvestingComponent {
     }
 
     @Override
-    public void apply(GSResource resource) throws HarvesterComponentException, DuplicatedResourceException, ConflictingResourceException {
+    public void apply(GSResource resource) throws HarvestingComponentException, DuplicatedResourceException, ConflictingResourceException {
 
 	try {
 
@@ -58,7 +59,7 @@ public class IdentifierDecoratorComponent extends HarvestingComponent {
 
 	} catch (GSException e) {
 
-	    throw new HarvesterComponentException(e);
+	    throw new HarvestingComponentException(e);
 	}
     }
 }

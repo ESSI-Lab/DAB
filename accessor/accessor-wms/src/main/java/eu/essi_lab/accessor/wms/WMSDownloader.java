@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wms;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Optional;
 
 import eu.essi_lab.access.DataDownloader;
-import eu.essi_lab.lib.net.utils.Downloader;
+import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
@@ -225,7 +225,7 @@ public abstract class WMSDownloader extends DataDownloader {
 	try {
 	    URL url = getImageURL(descriptor);
 	    Downloader downloader = new Downloader();
-	    Optional<InputStream> ret = downloader.downloadStream(url.toString());
+	    Optional<InputStream> ret = downloader.downloadOptionalStream(url.toString());
 	    if (ret.isPresent()) {
 
 		return IOStreamUtils.tempFilefromStream(ret.get(), "wms-downloader", ".png");

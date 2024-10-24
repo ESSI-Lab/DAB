@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    version="1.0.1">
+    <service base="" name="both" serviceType="Compound">
+        <service base="/thredds/dodsC/" name="odap" serviceType="OPENDAP"/>
+        <service base="/thredds/fileServer/" name="http" serviceType="File Download"/>
+        <service base="/thredds/wcs/" name="wcs" serviceType="WCS"/>
+        <service base="/thredds/wms/" name="wms" serviceType="WMS"/>
+        <service base="/thredds/ncss/grid/" name="ncss" serviceType="NetcdfSubset"/>
+    </service>
+    <dataset ID="waves" harvest="true" name="Waves">
+        <metadata inherited="true">
+            <serviceName>both</serviceName>
+            <dataType>GRID</dataType>
+            <dataFormat>netCDF</dataFormat>
+            <documentation xlink:href="http://www.webservice-energy.org/resources-list/iremare"
+                xlink:title="Description of available information"/>
+            <documentation type="summary">Maps of wave parameters relevant for marine energy applications from the shore to 50 km offshore, western coast of France. If the map title mentions a specific season ( Spring (March to May), Summer (June to August), Fall (September to November) or Winter (December to January) ) then the data are season-averaged. Otherwise, the averaging has been performed over the 19 years of the time series.</documentation>
+            <documentation type="history">All the information comes from the processing of Homere database (Boudière et al. 2013) delivered by Ifremer (Institut Français de Recherche pour l'Exploitation de la Mer/French Research Institute for Exploitation of the Sea). Homere is a 19-year (1994-2012) sea-state hindcast (Boudière et al. 2013) with hourly outputs and spatial resolution ranging from 9 km offshore to about 200 m near the coast and shallow areas. This database was identified by Dubranna et al. 2015 as the most appropriate for the production of MRE resource information along the western coast of France at relevant time and spatial scales. The information produced during IREMARE project covers the western coast of France (Atlantic, English Channel and North Sea) and can be used for national down to local scale studies.</documentation>
+            <documentation type="references">Boudiere Edwige, Maisondieu Christophe, Ardhuin Fabrice, Accensi Mickael, Pineau-Guillou Lucia, Lepesqueur Jeremy (2013). A suitable metocean hindcast database for the design of Marine energy converters. International Journal of Marine Energy, 3-4, e40-e52. Dubranna Jean, Ranchin Thierry, Ménard Lionel, Gschwind Benoît (2015). Production and dissemination of marine renewable energy resource information. Proceedings of 11th European Wave and Tidal Energy Conference, 6-11th September 2015, Nantes, France.</documentation>
+            <documentation type="rights">This information was generated in the frame of the IREMARE national research project (ADEME 1505C0027). The data are provided free of charge, without warranty of any kind. When used, this information should be cited as : “The IREMARE project was funded by the Agence de l’environnement et de la maîtrise de l’énergie (ADEME 1505C0027) and coordinated by MINES ParisTech/ARMINES. The output is publicly available at (tds.webservice-energy.org/thredds/)”.</documentation>
+            <contributor role="Principal Investigator">Dr. Jean Dubranna</contributor>
+            <contributor role="Principal Investigator">Prof. Thierry Ranchin</contributor>
+            <contributor role="Data Manager">Lionel Menard</contributor>
+            <creator>
+                <name>Prof. Thierry Ranchin</name>
+                <contact email="thierry.ranchin@mines-paristech.fr"
+                    url="http://www.mines-paristech.fr/Services/Annuaire/thierry-ranchin"/>
+            </creator>
+            <creator>
+                <name>Lionel Ménard</name>
+                <contact email="lionel.menard@mines-paristech.fr"
+                    url="http://www.mines-paristech.fr/Services/Annuaire/lionel-menard"/>
+            </creator>
+            <keyword vocabulary="DIF">Energy</keyword>
+            <keyword vocabulary="DIF">Renewable energy</keyword>
+            <keyword vocabulary="DIF">Marine energy</keyword>
+            <keyword vocabulary="DIF">Wave</keyword>
+            <keyword vocabulary="DIF">Electricity</keyword>
+            <keyword vocabulary="DIF">Wave climate</keyword>
+            <keyword vocabulary="DIF">Sea state</keyword>
+            <keyword vocabulary="DIF">IREMARE</keyword>
+            <keyword vocabulary="DIF">Thredds</keyword>
+            <keyword vocabulary="DIF">TDS</keyword>
+            <keyword vocabulary="DIF">NetCDF</keyword>
+            <project>Informations sur la Ressource pour les Energies Marines REnouvelables (IREMARE), funded by ADEME (Agence de l'Environnement et de la Maitrise de l'Energie/Agency for the Environment and Energy Control, French Public Institution), convention n° 1505C0027.</project>
+            <property name="Institution" value="MINES ParisTech/ARMINES"/>
+            <publisher>
+                <name vocabulary="DIF">MINES ParisTech / ARMINES  
+                    Center  Observation, Impacts, Energy (O.I.E.)</name>
+                <contact email="lionel.menard@mines-paristech.fr"
+                    url="http://www.webservice-energy.org"/>
+            </publisher>
+            <geospatialCoverage zpositive="down">
+                <northsouth>
+                    <start>43.3</start>
+                    <size>8.3</size>
+                    <resolution>0.002</resolution>
+                    <units>degrees_north</units>
+                </northsouth>
+                <eastwest>
+                    <start>-6.3</start>
+                    <size>9.3</size>
+                    <resolution>0.002</resolution>
+                    <units>degrees_east</units>
+                </eastwest>
+                <updown>
+                    <start>0.0</start>
+                    <size>0.0</size>
+                    <units>m</units>
+                </updown>
+                <name vocabulary="N/A">N/A</name>
+            </geospatialCoverage>
+            <timeCoverage>
+                <start>1994-01-01T00:00:00Z</start>
+                <end>2012-12-31T23:00:00Z</end>
+                <resolution>1 hour</resolution>
+            </timeCoverage>
+        </metadata>
+        <dataset ID="waves/wave_t0m1_maps.nc"
+            name="wave_t0m1_maps.nc"
+            urlPath="waves/wave_t0m1_maps.nc">
+            <dataSize units="Mbytes">48.73</dataSize>
+            <date type="modified">2021-03-22T20:13:13Z</date>
+        </dataset>
+    </dataset>
+</catalog>

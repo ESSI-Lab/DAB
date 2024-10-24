@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof.discovery.sites;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,9 +23,8 @@ package eu.essi_lab.accessor.wof.discovery.sites;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
 import java.util.List;
-import java.util.ServiceLoader;
+import java.util.Optional;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -43,11 +42,11 @@ import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
+import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
-import eu.essi_lab.request.executor.IDiscoveryStringExecutor;
 
 public class GetSitesObjectHandler extends StreamingRequestHandler {
 
@@ -76,9 +75,6 @@ public class GetSitesObjectHandler extends StreamingRequestHandler {
 	    public void write(OutputStream output) throws IOException, WebApplicationException {
 
 		try {
-
-		    ServiceLoader<IDiscoveryStringExecutor> loader = ServiceLoader.load(IDiscoveryStringExecutor.class);
-		    IDiscoveryStringExecutor executor = loader.iterator().next();
 
 		    GetSitesObjectFastTransformer transformer = new GetSitesObjectFastTransformer();
 		    DiscoveryMessage discoveryMessage = transformer.transform(webRequest);
@@ -118,14 +114,33 @@ public class GetSitesObjectHandler extends StreamingRequestHandler {
 		    writer.writeEndElement();
 		    writer.writeEndElement();
 
-		    Page page = discoveryMessage.getPage();
-		    page.setSize(1000);
-		    int pageSize = page.getSize();
-		    ResultSet<String> resultSet = null;
+		    Page userPage = discoveryMessage.getPage();
+		    int userStart = userPage.getStart();
+		    int userSize = userPage.getSize();
+
+		    int maxPageSize = 1000;
+		    Page tmpPage = new Page(userStart, Math.min(userSize, maxPageSize));
+		    discoveryMessage.setPage(tmpPage);
+		    int totalExpected = 0;
+		    int currentSize = 0;
+		    int totalSize = 0;
+		    
+		    Optional<Bond> optUserBond = discoveryMessage.getUserBond();
+		    Bond userBond = null;
+		    
+		    if(optUserBond.isPresent()){
+			
+			userBond = optUserBond.get();
+		    }
+		    
 		    do {
 
 			try {
-			    resultSet = executor.retrieveStrings(discoveryMessage);
+			    
+			    discoveryMessage.setUserBond(userBond);
+			    
+			    ResultSet<String> resultSet = exec(discoveryMessage);
+
 			    List<String> results = resultSet.getResultsList();
 
 			    for (String result : results) {
@@ -191,13 +206,19 @@ public class GetSitesObjectHandler extends StreamingRequestHandler {
 				}
 
 			    }
+			    tmpPage.setStart(tmpPage.getStart() + maxPageSize);
+			    totalExpected = resultSet.getCountResponse().getCount();
+			    currentSize = results.size();
+			    totalSize += currentSize;
+			    tmpPage.setSize(Math.min(maxPageSize, userSize - totalSize));
+
 			} catch (Exception e) {
 			    e.printStackTrace();
 			}
-			page.setStart(page.getStart() + pageSize);
 
-		    } while (resultSet.getResultsList().size() < resultSet.getCountResponse().getCount()
-			    && !resultSet.getResultsList().isEmpty());
+			// tmpPage.setSize(defaultPageSize)
+
+		    } while (totalSize < userSize && currentSize != 0);
 
 		    writer.writeEndDocument();
 		    writer.flush();

@@ -7,7 +7,7 @@ package eu.essi_lab.cfga.scheduler.impl;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,11 +24,13 @@ package eu.essi_lab.cfga.scheduler.impl;
  * #L%
  */
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.sql.Blob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -42,6 +44,9 @@ import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.cfga.scheduler.SchedulerUtils;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting;
+import eu.essi_lab.lib.utils.ClonableInputStream;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.IOStreamUtils;
 
 /**
  * @author Fabrizio
@@ -81,10 +86,33 @@ public class PersistentJobStoreScheduler extends AbstractScheduler {
 	this.manager.setPwd(setting.getSQLDatabasePassword());
     }
 
+    /**
+     * @return
+     * @throws Throwable
+     */
+    public synchronized List<SimpleEntry<String, String>> checkJobData() throws Throwable {
+
+	String sql1 = "select JOB_NAME, JOB_DATA from GS_QRTZ_TRIGGERS";
+	String sql2 = "select JOB_NAME, JOB_DATA from GS_QRTZ_JOB_DETAILS";
+
+	ResultSet rs1 = manager.execQuery(sql1);
+	ResultSet rs2 = manager.execQuery(sql2);
+
+	List<SimpleEntry<String, String>> report = new ArrayList<>();
+
+	checkJobData(rs1, report, "GS_QRTZ_TRIGGERS");
+	checkJobData(rs2, report, "GS_QRTZ_JOB_DETAILS");
+
+	manager.close(rs1);
+	manager.close(rs2);
+
+	return report;
+    }
+
     @Override
     public synchronized List<SchedulerWorkerSetting> listScheduledSettings() throws Exception {
 
-	String sql = "select JOB_DATA, NEXT_FIRE_TIME from GS_QRTZ_TRIGGERS";
+	String sql = "select JOB_DATA, NEXT_FIRE_TIME, TRIGGER_NAME from GS_QRTZ_TRIGGERS";
 
 	ResultSet rs = manager.execQuery(sql);
 
@@ -92,19 +120,29 @@ public class PersistentJobStoreScheduler extends AbstractScheduler {
 
 	while (rs.next()) {
 
-	    SchedulerWorkerSetting setting = createSetting(rs);
+	    try {
 
-	    long nextFire = rs.getLong("NEXT_FIRE_TIME");
+		String triggerName = rs.getString("TRIGGER_NAME");
 
-	    if (nextFire != 0) {
+		long nextFire = rs.getLong("NEXT_FIRE_TIME");
 
-		setting.setNextFireTime(new Date(nextFire));
+		SchedulerWorkerSetting setting = createSetting(rs, triggerName);
+
+		if (nextFire != 0) {
+
+		    setting.setNextFireTime(new Date(nextFire));
+		}
+
+		out.add(setting);
+
+	    } catch (Exception ex) {
+
+		GSLoggerFactory.getLogger(getClass()).error("Error ocurred during list scheduled settings: {}", ex.getMessage());
+		GSLoggerFactory.getLogger(getClass()).error(ex);
 	    }
-
-	    out.add(setting);
 	}
 
-	rs.close();
+	manager.close(rs);
 
 	return out;
     }
@@ -131,17 +169,25 @@ public class PersistentJobStoreScheduler extends AbstractScheduler {
 
 	    while (jobDataRs.next()) {
 
-		SchedulerWorkerSetting setting = createSetting(jobDataRs);
+		try {
 
-		setting.setFiredTime(new Date(firedTime));
+		    SchedulerWorkerSetting setting = createSetting(jobDataRs, triggerName);
 
-		out.add(setting);
+		    setting.setFiredTime(new Date(firedTime));
+
+		    out.add(setting);
+
+		} catch (Exception ex) {
+
+		    GSLoggerFactory.getLogger(getClass()).error("Error ocurred during list executing settings: {}", ex.getMessage());
+		    GSLoggerFactory.getLogger(getClass()).error(ex);
+		}
 	    }
 
 	    jobDataRs.close();
 	}
 
-	rs.close();
+	manager.close(rs);
 
 	return out;
     }
@@ -170,24 +216,76 @@ public class PersistentJobStoreScheduler extends AbstractScheduler {
 	    }
 	}
 
+	manager.close(rs);
+
 	return list;
     }
 
     /**
+     * @param rs
+     * @param report
+     * @param table
+     * @throws SQLException
+     * @throws IOException
+     * @throws Throwable
+     */
+    private void checkJobData(ResultSet rs, List<SimpleEntry<String, String>> report, String table)
+	    throws SQLException, IOException, Throwable {
+
+	while (rs.next()) {
+
+	    Blob blob = rs.getBlob("JOB_DATA");
+	    String jobName = rs.getString("JOB_NAME");
+
+	    try {
+
+		InputStream binaryStream = blob.getBinaryStream();
+
+		ObjectInputStream in = new ObjectInputStream(binaryStream);
+
+		JobDataMap map = (JobDataMap) in.readObject();
+
+		new SchedulerWorkerSetting(map.getString("setting"));
+
+	    } catch (Throwable t) {
+
+		GSLoggerFactory.getLogger(getClass()).error(t);
+
+		report.add(new SimpleEntry<>(jobName, table));
+	    }
+	}
+    }
+
+    /**
      * @param resultSet
+     * @param triggerName
      * @return
      * @throws Exception
      */
-    private SchedulerWorkerSetting createSetting(ResultSet resultSet) throws Exception {
+    private SchedulerWorkerSetting createSetting(ResultSet resultSet, String triggerName) throws Exception {
 
 	Blob blob = resultSet.getBlob("JOB_DATA");
 
-	InputStream binaryStream = blob.getBinaryStream();
-	ObjectInputStream in = new ObjectInputStream(binaryStream);
+	ClonableInputStream clonableInputStream = new ClonableInputStream(blob.getBinaryStream());
 
-	JobDataMap map = (JobDataMap) in.readObject();
+	try {
 
-	return new SchedulerWorkerSetting(map.getString("setting"));
+	    ObjectInputStream in = new ObjectInputStream(clonableInputStream.clone());
+
+	    JobDataMap map = (JobDataMap) in.readObject();
+
+	    return new SchedulerWorkerSetting(map.getString("setting"));
+
+	} catch (Throwable t) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(t);
+
+	    GSLoggerFactory.getLogger(getClass()).error("Trigger name with error: {}", triggerName);
+
+	    GSLoggerFactory.getLogger(getClass()).error("Blob with error: {}", IOStreamUtils.asUTF8String(clonableInputStream.clone()));
+
+	    throw t;
+	}
     }
 
     /**

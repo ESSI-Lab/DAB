@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,8 +22,8 @@ package eu.essi_lab.accessor.wof;
  */
 
 import java.io.IOException;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -131,23 +131,17 @@ public class CUAHSIHISServerConnector<C extends FirstSiteConnectorSetting> exten
 	 * SERIES_NUMBER = the progressive number of the series as it appears on the site info response document
 	 */
 
-	TimeSeries timeSeries = null;
-
 	String nextId = null;
 
 	Integer siteNumber;
-	Integer seriesNumber;
 
 	String siteName = "";
 	String seriesName = "";
 
 	if (id == null) {
 	    siteNumber = 0;
-	    seriesNumber = 0;
 	} else {
-	    SimpleEntry<Integer, Integer> decodedResumptionToken = decodeResumptionToken(id);
-	    siteNumber = decodedResumptionToken.getKey();
-	    seriesNumber = decodedResumptionToken.getValue();
+	    siteNumber = decodeResumptionToken(id);
 	}
 
 	// we select the site
@@ -162,14 +156,9 @@ public class CUAHSIHISServerConnector<C extends FirstSiteConnectorSetting> exten
 		    this.cachedSiteInfo = siteInfoIterator.next();
 		    this.cachedSiteNumber++;
 		} else {
-		    ErrorInfo info = new ErrorInfo();
-		    info.setErrorDescription(getUnableToResumeError(id));
-		    info.setCaller(this.getClass());
-		    info.setErrorId(CUAHSI_HIS_SERVER_CONNECTOR_ERROR);
-		    info.setErrorType(ErrorInfo.ERRORTYPE_CLIENT);
-		    info.setSeverity(ErrorInfo.SEVERITY_ERROR);
-
-		    throw GSException.createException(info);
+		    ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<>();
+		    ret.setResumptionToken(null);
+		    return ret;
 		}
 	    }
 	}
@@ -193,9 +182,8 @@ public class CUAHSIHISServerConnector<C extends FirstSiteConnectorSetting> exten
 		// where the site envirodiy:160065_Limno_Crossroads is available, while envirodiy:MM_001 gives error
 		ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<>();
 		// in this case we skip to next site
-		seriesNumber = 0;
 		siteNumber++;
-		nextId = siteNumber + ":" + seriesNumber;
+		nextId = "" + siteNumber;
 		if (!siteInfoIterator.hasNext()) {
 		    // but if the last site is fully visited no next records are available
 		    nextId = null;
@@ -213,10 +201,9 @@ public class CUAHSIHISServerConnector<C extends FirstSiteConnectorSetting> exten
 	}
 	siteName = siteInfo.getSiteName();
 	List<TimeSeries> seriesCatalog = siteInfo.getSeries();
-	if (seriesNumber == 0 && seriesCatalog.isEmpty()) {
-	    seriesNumber = 0;
+	if (seriesCatalog.isEmpty()) {
 	    siteNumber++;
-	    nextId = siteNumber + ":" + seriesNumber;
+	    nextId = siteNumber + ":";
 	    if (!siteInfoIterator.hasNext()) {
 		// but if the last site is fully visited no next records are available
 		nextId = null;
@@ -225,117 +212,55 @@ public class CUAHSIHISServerConnector<C extends FirstSiteConnectorSetting> exten
 	    ret.setResumptionToken(nextId);
 	    return ret;
 	}
-	if (seriesNumber < seriesCatalog.size()) {
-	    // we select the time series
-	    timeSeries = seriesCatalog.get(seriesNumber);
 
-	    seriesName = timeSeries.getVariableName();
-	    // also the time series is enriched at maximum level (included contact information such as email address)
-	    if (ENRICH_TIME_SERIES) {
-		String variableCode = timeSeries.getVariableCode();
-		String methodId = timeSeries.getMethodId();
-		String qualityControlLevelCode = timeSeries.getQualityControlLevelCode();
-		String sourceId = timeSeries.getSourceId();
-		try {
-		    timeSeries = client.getAugmentedTimeSeries(siteInfo, variableCode, methodId, qualityControlLevelCode, sourceId);
-		} catch (GSException e) {
-		    // in case an exception occurred, no metadata is returned for this series
-		    GSLoggerFactory.getLogger(this.getClass()).error("Remote server error augmenting time series. ");
-		    GSLoggerFactory.getLogger(this.getClass()).error("URL: {}", getSourceURL());
-		    GSLoggerFactory.getLogger(this.getClass()).error("Site: {}", siteInfo);
-		    GSLoggerFactory.getLogger(this.getClass()).error("Variable: {}", variableCode);
-		}
-	    }
-
-	    // the next (not duplicated) time series from current site is selected as next
-
-	    boolean duplicated = false;
-	    do {
-		seriesNumber++;
-
-		if (seriesNumber < seriesCatalog.size()) {
-
-		    TimeSeries nextSeries = seriesCatalog.get(seriesNumber);
-		    String nextSeriesVariableCode = nextSeries.getVariableCode();
-		    duplicated = false;
-		    for (int i = 0; i < seriesNumber; i++) {
-			String visitedVariableCode = seriesCatalog.get(i).getVariableCode();
-			// this is the case of a time series with duplicated variable code
-			if (nextSeriesVariableCode.equals(visitedVariableCode)) {
-			    duplicated = true;
-			    GSLoggerFactory.getLogger(this.getClass()).warn("Found duplicated variable code, skipping: {}",
-				    visitedVariableCode);
-			    break;
-			}
-		    }
-		}
-
-	    } while (duplicated && seriesNumber < seriesCatalog.size());
-
-	    nextId = siteNumber + ":" + seriesNumber;
-	    if (seriesNumber >= seriesCatalog.size()) {
-		// if we are at the last time series of the site then
-		// the next time series is the first series from the next site
-		seriesNumber = 0;
-		siteNumber++;
-		nextId = siteNumber + ":" + seriesNumber;
-		if (!siteInfoIterator.hasNext()) {
-		    // but if the last site is fully visited no next records are available
-		    nextId = null;
-		}
-	    }
-	    if (isFirstSiteOnly() && siteNumber > 0) {
-		nextId = null;
-	    }
-
-	} else {
-	    ErrorInfo info = new ErrorInfo();
-	    info.setErrorDescription(getUnableToResumeError(id));
-	    info.setCaller(this.getClass());
-	    info.setErrorId(CUAHSI_HIS_SERVER_CONNECTOR_ERROR);
-	    info.setErrorType(ErrorInfo.ERRORTYPE_CLIENT);
-	    info.setSeverity(ErrorInfo.SEVERITY_ERROR);
-
-	    throw GSException.createException(info);
-	}
+	siteNumber++;
+	nextId = "" + siteNumber;
 
 	ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<OriginalMetadata>();
-	OriginalMetadata metadataRecord = new OriginalMetadata();
-	metadataRecord.setSchemeURI(listMetadataFormats().get(0));
-	try {
 
-	    SitesResponseDocument emptySRD = getEmptyResponseDocument(richerSiteInfoDocument);
-
-	    emptySRD.getSites().get(0).addSeries(timeSeries);
-
-	    String metadata = emptySRD.getReader().asString();
-	    metadataRecord.setMetadata(metadata);
-	    ret.addRecord(metadataRecord);
-	    recordsReturned++;
-
-	    if (!getSetting().isMaxRecordsUnlimited()) {
-
-		Optional<Integer> mr = getSetting().getMaxRecords();
-
-		if (mr.isPresent() && recordsReturned >= mr.get()) {
-
-		    GSLoggerFactory.getLogger(this.getClass()).info("Reached max records of {}", mr.get());
-
-		    ret.setResumptionToken(null);
-
-		    return ret;
-
+	// we select the time series
+	HashSet<String>variableCodes = new HashSet<String>();
+	for (TimeSeries timeSeries : seriesCatalog) {
+	    try {
+		SitesResponseDocument emptySRD = getEmptyResponseDocument(richerSiteInfoDocument);
+		String code = timeSeries.getVariableCode();
+		if (variableCodes.contains(code)) {
+		    GSLoggerFactory.getLogger(getClass()).error("Duplicate variable code: "+code);
+		    continue;
+		}else {
+		    variableCodes.add(code);
 		}
-	    }
-	} catch (Exception e) {
-	    ErrorInfo info = new ErrorInfo();
-	    info.setErrorDescription("Error marshalling metadata for site: " + siteName + " variable name: " + seriesName);
-	    info.setCaller(this.getClass());
-	    info.setErrorId(CUAHSI_HIS_SERVER_CONNECTOR_ERROR);
-	    info.setErrorType(ErrorInfo.ERRORTYPE_CLIENT);
-	    info.setSeverity(ErrorInfo.SEVERITY_ERROR);
+		emptySRD.getSites().get(0).addSeries(timeSeries);
 
-	    throw GSException.createException(info);
+		String metadata = emptySRD.getReader().asString();
+		OriginalMetadata metadataRecord = new OriginalMetadata();
+		metadataRecord.setSchemeURI(listMetadataFormats().get(0));
+		metadataRecord.setMetadata(metadata);
+		ret.addRecord(metadataRecord);
+		recordsReturned++;
+
+		if (!getSetting().isMaxRecordsUnlimited()) {
+
+		    Optional<Integer> mr = getSetting().getMaxRecords();
+
+		    if (mr.isPresent() && recordsReturned >= mr.get()) {
+
+			GSLoggerFactory.getLogger(this.getClass()).info("Reached max records of {}", mr.get());
+
+			ret.setResumptionToken(null);
+
+			return ret;
+
+		    }
+		}
+		seriesName = timeSeries.getVariableName();
+	    } catch (Exception e) {
+		GSLoggerFactory.getLogger(getClass()).error(e);
+	    }
+
+	}
+	if (isFirstSiteOnly() && siteNumber > 0) {
+	    nextId = null;
 	}
 	ret.setResumptionToken(nextId);
 	return ret;
@@ -360,18 +285,11 @@ public class CUAHSIHISServerConnector<C extends FirstSiteConnectorSetting> exten
 	return ret;
     }
 
-    protected SimpleEntry<Integer, Integer> decodeResumptionToken(String id) throws GSException {
-	if (!id.contains(":")) {
-	    ErrorInfo info = new ErrorInfo();
-	    info.setErrorDescription(getUnableToResumeError(id));
-	    throw GSException.createException(info);
-	}
-	String[] split = id.split(":");
+    protected Integer decodeResumptionToken(String id) throws GSException {
 	try {
-	    Integer sites = Integer.parseInt(split[0]);
-	    Integer series = Integer.parseInt(split[1]);
+	    Integer site = Integer.parseInt(id);
 
-	    if (sites < 0 || series < 0) {
+	    if (site < 0) {
 		ErrorInfo info = new ErrorInfo();
 		info.setErrorDescription(getUnableToResumeError(id));
 		info.setCaller(this.getClass());
@@ -382,8 +300,7 @@ public class CUAHSIHISServerConnector<C extends FirstSiteConnectorSetting> exten
 		throw GSException.createException(info);
 	    }
 
-	    SimpleEntry<Integer, Integer> ret = new SimpleEntry<Integer, Integer>(sites, series);
-	    return ret;
+	    return site;
 	} catch (NumberFormatException e) {
 
 	    throw GSException.createException(//

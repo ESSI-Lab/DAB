@@ -7,7 +7,7 @@ package eu.essi_lab.authorization.pps;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,85 +24,40 @@ package eu.essi_lab.authorization.pps;
  * #L%
  */
 
-import eu.essi_lab.authorization.xacml.XACML_JAXBUtils;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.ApplyType;
-
 /**
+ * Users having the "seadatanet" role, are allowed to discovery if and only if:<br>
+ * <br>
+ * 1) the view creator is "seadatanet"<br>
+ *
+ * 2) the discovery path is supported<br>
+ * <br>
+ * Users having this policy role, are allowed to access if and only if:<br>
+ * <br>
+ * 1) the view creator is "seadatanet"<br>
+ * 
+ * 2) the access path is is supported<br>
+ * <br>
+ * Users having this policy role are also allowed to perform other actions if and only if:<br>
+ * <br>
+ * 1) the view creator is "seadatanet"<br>
+ *
+ * 2) the discovery path is supported OR the access path is is supported<br>
+ * 
  * @author Fabrizio
  */
-public class SeadatanetPermissionPolicySet extends AbstractPermissionPolicySet {
+public class SeadatanetPermissionPolicySet extends CreatorPermissionPolicySet {
 
     /**
      * 
      */
-    private static final String SEADATANET_VIEW_CREATOR = "seadatanet";
-
     public SeadatanetPermissionPolicySet() {
 
 	super("seadatanet");
     }
 
     @Override
-    protected void editPPSPolicy() {
+    protected String getCreator() {
 
-	//
-	// discovery rule for the non Seadatanet creator
-	//
-	{
-	    String ruleId = "Permission:to:discover:not:seadatanet:creator";
-
-	    setDiscoveryAction(ruleId);
-
-	    setOffsetLimit(ruleId, DEFAULT_OFFSET_LIMIT);
-	    
-	    setMaxRecordsLimit(ruleId, DEFAULT_MAX_RECORDS_LIMIT);
-
-	    ApplyType notWhosCreatorApply = XACML_JAXBUtils.createNotApply(createViewCreatorApply(SEADATANET_VIEW_CREATOR));
-
-	    setAndCondition(ruleId, createDiscoveryPathApply(), notWhosCreatorApply);
-	}
-
-	//
-	// discovery rule for the Seadatanet creator
-	//
-	{
-	    String ruleId = "Permission:to:discover:seadatanet:creator";
-
-	    setDiscoveryAction(ruleId);
-	    
-	    setMaxRecordsLimit(ruleId, 500);
-
-	    setAndCondition(ruleId, createDiscoveryPathApply(), createViewCreatorApply(SEADATANET_VIEW_CREATOR));
-	}
-
-	//
-	// access rule for the non Seadatanet creator
-	//
-	{
-	    String ruleId = "Permission:to:access:not:seadatanet:creator";
-
-	    setAccessAction(ruleId);
-
-	    setOffsetLimit(ruleId, DEFAULT_OFFSET_LIMIT);
-	    
-	    setMaxRecordsLimit(ruleId, DEFAULT_MAX_RECORDS_LIMIT);
-
-	    ApplyType notWhosCreatorApply = XACML_JAXBUtils.createNotApply(createViewCreatorApply(SEADATANET_VIEW_CREATOR));
-
-	    setAndCondition(ruleId, createAccessPathApply(), notWhosCreatorApply);
-	}
-
-	//
-	// access rule for the Seadatanet creator
-	//
-	{
-	    String ruleId = "Permission:to:access:seadatanet:creator";
-
-	    setAccessAction(ruleId);
-	    
-	    setMaxRecordsLimit(ruleId, 500);
-
-	    setAndCondition(ruleId, createAccessPathApply(), createViewCreatorApply(SEADATANET_VIEW_CREATOR));
-	}
+	return "seadatanet";
     }
 }

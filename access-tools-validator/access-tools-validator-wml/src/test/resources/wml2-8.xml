@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<wml2:Collection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:wml2="http://www.opengis.net/waterml/2.0" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:om="http://www.opengis.net/om/2.0" xmlns:sam="http://www.opengis.net/sampling/2.0" xmlns:swe="http://www.opengis.net/swe/2.0" xmlns:samspa="http://www.opengis.net/samplingSpatial/2.0" gml:id="COL.1">
+    <gml:description>Time series for parameter: Streamflow, ft&amp;#179;/s</gml:description>
+    <gml:boundedBy  xsi:nil="true"/>
+    <wml2:metadata>
+        <wml2:DocumentMetadata gml:id="DMD.1">
+            <wml2:generationDate>2019-04-17T08:59:57.815Z</wml2:generationDate>
+            <wml2:generationSystem>GI-suite</wml2:generationSystem>
+        </wml2:DocumentMetadata>
+    </wml2:metadata>
+    <wml2:observationMember>
+        <om:OM_Observation gml:id="OBS.1">
+            <gml:boundedBy  xsi:nil="true"/>
+            <om:phenomenonTime>
+                <gml:TimePeriod gml:id="TP.1">
+                    <gml:beginPosition>1978-08-30T05:00:00Z</gml:beginPosition>
+                    <gml:endPosition>1978-09-29T05:00:00Z</gml:endPosition>
+                </gml:TimePeriod>
+            </om:phenomenonTime>
+            <om:resultTime>
+                <gml:TimeInstant gml:id="TI.1">
+                    <gml:timePosition>1978-09-29T05:00:00Z</gml:timePosition>
+                </gml:TimeInstant>
+            </om:resultTime>
+            <om:procedure>
+                <wml2:ObservationProcess gml:id="PROC.1">
+                    <gml:boundedBy  xsi:nil="true"/>
+                    <wml2:processType xlink:href="Derived Value" xlink:title="Derived Value"/>
+                </wml2:ObservationProcess>
+            </om:procedure>
+            <om:observedProperty xlink:href="streamflow,_ft&amp;#179;s" xlink:title="Streamflow, ft&amp;#179;/s"/>
+            <om:featureOfInterest>
+                <wml2:MonitoringPoint gml:id="STA.1">
+                    <gml:identifier codeSpace="">Tacony Creek near Jenkintown, PA</gml:identifier>
+                    <gml:boundedBy  xsi:nil="true"/>
+                    <sam:sampledFeature xlink:href="Tacony Creek near Jenkintown, PA" xlink:title="Tacony Creek near Jenkintown, PA"/>
+                    <samspa:shape>
+                        <gml:Point gml:id="LOC.1">
+                            <gml:pos srsName="EPSG:4326">40.08566628 -75.13517478</gml:pos>
+                        </gml:Point>
+                    </samspa:shape>
+                </wml2:MonitoringPoint>
+            </om:featureOfInterest>
+            <om:result>
+                <wml2:MeasurementTimeseries>
+                    <gml:boundedBy xsi:nil="true"/>
+                    <wml2:defaultPointMetadata>
+                        <wml2:DefaultTVPMeasurementMetadata>
+                            <wml2:uom code="ft3/s"/>
+                        </wml2:DefaultTVPMeasurementMetadata>
+                    </wml2:defaultPointMetadata>
+                    <wml2:point>
+                        <wml2:MeasurementTVP>
+                            <wml2:time>1978-08-30T05:00:00Z</wml2:time>
+                            <wml2:value>4.4</wml2:value>
+                        </wml2:MeasurementTVP>
+                    </wml2:point>                    
+                    <wml2:point>
+                        <wml2:MeasurementTVP>
+                            <wml2:time>1978-09-01T05:00:00Z</wml2:time>
+                            <wml2:value>8.4</wml2:value>
+                        </wml2:MeasurementTVP>
+                    </wml2:point>
+                    <wml2:point>
+                        <wml2:MeasurementTVP>
+                            <wml2:time>1978-09-02T05:00:00Z</wml2:time>
+                            <wml2:value>4.6</wml2:value>
+                        </wml2:MeasurementTVP>
+                    </wml2:point>
+                    <wml2:point>
+                        <wml2:MeasurementTVP>
+                            <wml2:time>1978-09-03T05:00:00Z</wml2:time>
+                            <wml2:value>4.3</wml2:value>
+                        </wml2:MeasurementTVP>
+                    </wml2:point>
+                    <wml2:point>
+                        <wml2:MeasurementTVP>
+                            <wml2:time>1978-09-04T05:00:00Z</wml2:time>
+                            <wml2:value>4.3</wml2:value>
+                        </wml2:MeasurementTVP>
+                    </wml2:point>
+                    <wml2:point>
+                        <wml2:MeasurementTVP>
+                            <wml2:time>1978-09-05T05:00:00Z</wml2:time>
+                            <wml2:value>4.3</wml2:value>
+                        </wml2:MeasurementTVP>
+                    </wml2:point>
+                    <wml2:point>
+                        <wml2:MeasurementTVP>
+                            <wml2:time>1978-09-06T05:00:00Z</wml2:time>
+                            <wml2:value>4.3</wml2:value>
+                        </wml2:MeasurementTVP>
+                    </wml2:point>
+                    <wml2:point>
+                        <wml2:MeasurementTVP>
+                            <wml2:time>1978-09-07T05:00:00Z</wml2:time>
+                            <wml2:value>4.0</wml2:value>
+                        </wml2:MeasurementTVP>
+                    </wml2:point>
+                    <wml2:point>
+                        <wml2:MeasurementTVP>
+                            <wml2:time>1978-09-08T05:00:00Z</wml2:time>
+                            <wml2:value>4.4</wml2:value>
+                        </wml2:MeasurementTVP>
+                    </wml2:point>
+                    <wml2:point>
+                        <wml2:MeasurementTVP>
+                            <wml2:time>1978-09-09T05:00:00Z</wml2:time>
+                            <wml2:value>4.5</wml2:value>
+                        </wml2:MeasurementTVP>
+                    </wml2:point>
+                    <wml2:point>
+                        <wml2:MeasurementTVP>
+                            <wml2:time>1978-09-10T05:00:00Z</wml2:time>
+                            <wml2:value>3.9</wml2:value>
+                        </wml2:MeasurementTVP>
+                    </wml2:point>
+                    <wml2:point>
+                        <wml2:MeasurementTVP>
+                            <wml2:time>1978-09-11T05:00:00Z</wml2:time>
+                            <wml2:value>4.0</wml2:value>
+                        </wml2:MeasurementTVP>
+                    </wml2:point>
+                    <wml2:point>
+                        <wml2:MeasurementTVP>
+                            <wml2:time>1978-09-12T05:00:00Z</wml2:time>
+                            <wml2:value>30.0</wml2:value>
+                        </wml2:MeasurementTVP>
+                    </wml2:point>
+                    <wml2:point>
+                        <wml2:MeasurementTVP>
+                            <wml2:time>1978-09-13T05:00:00Z</wml2:time>
+                            <wml2:value>6.3</wml2:value>
+                        </wml2:MeasurementTVP>
+                    </wml2:point>
+                    <wml2:point>
+                        <wml2:MeasurementTVP>
+                            <wml2:time>1978-09-14T05:00:00Z</wml2:time>
+                            <wml2:value>3.8</wml2:value>
+                        </wml2:MeasurementTVP>
+                    </wml2:point>
+                    <wml2:point>
+                        <wml2:MeasurementTVP>
+                            <wml2:time>1978-09-15T05:00:00Z</wml2:time>
+                            <wml2:value>5.7</wml2:value>
+                        </wml2:MeasurementTVP>
+                    </wml2:point>
+                    <wml2:point>
+                        <wml2:MeasurementTVP>
+                            <wml2:time>1978-09-16T05:00:00Z</wml2:time>
+                            <wml2:value>3.7</wml2:value>
+                        </wml2:MeasurementTVP>
+                    </wml2:point>
+                    <wml2:point>
+                        <wml2:MeasurementTVP>
+                            <wml2:time>1978-09-17T05:00:00Z</wml2:time>
+                            <wml2:value>3.5</wml2:value>
+                        </wml2:MeasurementTVP>
+                    </wml2:point>
+                    <wml2:point>
+                        <wml2:MeasurementTVP>
+                            <wml2:time>1978-09-18T05:00:00Z</wml2:time>
+                            <wml2:value>4.5</wml2:value>
+                        </wml2:MeasurementTVP>
+                    </wml2:point>
+                    <wml2:point>
+                        <wml2:MeasurementTVP>
+                            <wml2:time>1978-09-19T05:00:00Z</wml2:time>
+                            <wml2:value>5.6</wml2:value>
+                        </wml2:MeasurementTVP>
+                    </wml2:point>
+                    <wml2:point>
+                        <wml2:MeasurementTVP>
+                            <wml2:time>1978-09-20T05:00:00Z</wml2:time>
+                            <wml2:value>3.5</wml2:value>
+                        </wml2:MeasurementTVP>
+                    </wml2:point>
+                    <wml2:point>
+                        <wml2:MeasurementTVP>
+                            <wml2:time>1978-09-21T05:00:00Z</wml2:time>
+                            <wml2:value>3.5</wml2:value>
+                        </wml2:MeasurementTVP>
+                    </wml2:point>
+                    <wml2:point>
+                        <wml2:MeasurementTVP>
+                            <wml2:time>1978-09-22T05:00:00Z</wml2:time>
+                            <wml2:value>4.4</wml2:value>
+                        </wml2:MeasurementTVP>
+                    </wml2:point>
+                    <wml2:point>
+                        <wml2:MeasurementTVP>
+                            <wml2:time>1978-09-23T05:00:00Z</wml2:time>
+                            <wml2:value>3.8</wml2:value>
+                        </wml2:MeasurementTVP>
+                    </wml2:point>
+                    <wml2:point>
+                        <wml2:MeasurementTVP>
+                            <wml2:time>1978-09-24T05:00:00Z</wml2:time>
+                            <wml2:value>3.3</wml2:value>
+                        </wml2:MeasurementTVP>
+                    </wml2:point>
+                    <wml2:point>
+                        <wml2:MeasurementTVP>
+                            <wml2:time>1978-09-25T05:00:00Z</wml2:time>
+                            <wml2:value>3.4</wml2:value>
+                        </wml2:MeasurementTVP>
+                    </wml2:point>
+                    <wml2:point>
+                        <wml2:MeasurementTVP>
+                            <wml2:time>1978-09-26T05:00:00Z</wml2:time>
+                            <wml2:value>3.2</wml2:value>
+                        </wml2:MeasurementTVP>
+                    </wml2:point>
+                    <wml2:point>
+                        <wml2:MeasurementTVP>
+                            <wml2:time>1978-09-27T05:00:00Z</wml2:time>
+                            <wml2:value>3.2</wml2:value>
+                        </wml2:MeasurementTVP>
+                    </wml2:point>
+                    <wml2:point>
+                        <wml2:MeasurementTVP>
+                            <wml2:time>1978-09-28T05:00:00Z</wml2:time>
+                            <wml2:value>3.1</wml2:value>
+                        </wml2:MeasurementTVP>
+                    </wml2:point>
+                    <wml2:point>
+                        <wml2:MeasurementTVP>
+                            <wml2:time>1978-09-29T05:00:00Z</wml2:time>
+                            <wml2:value>3.3</wml2:value>
+                        </wml2:MeasurementTVP>
+                    </wml2:point>
+                </wml2:MeasurementTimeseries>
+            </om:result>
+        </om:OM_Observation>
+    </wml2:observationMember>
+</wml2:Collection>

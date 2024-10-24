@@ -4,7 +4,7 @@ package eu.essi_lab.messages;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -40,7 +40,6 @@ import eu.essi_lab.messages.DataDescriptorRuntimeInfo.TargetProvider;
 import eu.essi_lab.messages.count.CountSet;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.RuntimeInfoElement;
-import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.data.DataDescriptor;
@@ -72,14 +71,14 @@ public class ResultSet<T> extends MessageResponse<T, CountSet> {
     }
 
     public ResultSet(List<T> results) {
-	setException(GSException.createException(new ErrorInfo()));
+	setException(GSException.createException());
 	setResultsList(results);
     }
 
     @Override
     public HashMap<String, List<String>> provideInfo() {
 
-	HashMap<String, List<String>> map = new HashMap<>();
+	HashMap<String, List<String>> map = super.provideInfo();
 
 	map.put(//
 		RuntimeInfoElement.RESULT_SET_TIME_STAMP.getName(), //

@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.wrt;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,6 +29,7 @@ import eu.essi_lab.messages.AccessMessage;
 import eu.essi_lab.messages.RequestMessage;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.GSSource;
+import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.model.resource.data.DataFormat;
@@ -46,6 +47,11 @@ import eu.essi_lab.request.executor.IAccessExecutor;
 public abstract class AccessRequestTransformer extends WebRequestTransformer<AccessMessage> {
 
     /**
+     * 
+     */
+    private static final String ACCESS_REQUEST_TRANSFORMER_NULL_ONLINE_ID = "ACCESS_REQUEST_TRANSFORMER_NULL_ONLINE_ID";
+
+    /**
      * Refines the <code>message</code> by setting the {@link DataDescriptor} the online identifier and the
      * {@link GSSource}s
      * 
@@ -58,6 +64,17 @@ public abstract class AccessRequestTransformer extends WebRequestTransformer<Acc
     public AccessMessage refineMessage(AccessMessage message) throws GSException {
 
 	String onlineId = getOnlineId(message.getWebRequest());
+
+	if (onlineId == null) {
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    "Null online id from: " + message.getWebRequest().getUriInfo().getRequestUri(), //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    ACCESS_REQUEST_TRANSFORMER_NULL_ONLINE_ID);
+	}
+
 	message.setOnlineId(onlineId);
 
 	Optional<DataDescriptor> descriptor = getTargetDescriptor(message.getWebRequest());
@@ -109,7 +126,7 @@ public abstract class AccessRequestTransformer extends WebRequestTransformer<Acc
      * <code>request</code> parameters.<br>
      * 
      * @implNote
-     *           An empty optional means that no transformation is required, so the data will be downloaded and returned
+     * 	  An empty optional means that no transformation is required, so the data will be downloaded and returned
      *           as it is.<br>
      *           Otherwise, the returned {@link DataDescriptor} should has only the properties that require a
      *           transformation. The missing properties are added by the {@link IAccessExecutor} implementation using

@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gs.setting;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,7 +29,7 @@ import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 
 /**
  * @author Fabrizio
@@ -40,11 +40,6 @@ public class S3StorageSetting extends Setting implements EditableSetting {
     private static String STORAGE_USER_OPTION_KEY = "s3StorageUser";
     private static String STORAGE_PWD_OPTION_KEY = "s3StoragePassword";
     private static String BUCKET_NAME_OPTION_KEY = "s3BucketName";
-    
-    public static void main(String[] args) {
-	
-	System.out.println(new S3StorageSetting());
-    }
 
     /**
      * 
@@ -57,9 +52,7 @@ public class S3StorageSetting extends Setting implements EditableSetting {
 
 	Option<String> endpointOption = StringOptionBuilder.get().//
 		withLabel("S3 endpoint").//
-		withDescription(
-			"Overrides the default endpoint to send requests to the specified AWS region")
-		.//
+		withDescription("Overrides the default endpoint to send requests to the specified AWS region").//
 		withKey(STORAGE_URI_OPTION_KEY).//
 		required().//
 		withValue("https://s3.amazonaws.com/").//
@@ -111,7 +104,7 @@ public class S3StorageSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * @return 
+     * @return
      */
     public Optional<String> getEndpoint() {
 
@@ -127,7 +120,7 @@ public class S3StorageSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * @return 
+     * @return
      */
     public Optional<String> getAccessKey() {
 
@@ -177,10 +170,10 @@ public class S3StorageSetting extends Setting implements EditableSetting {
     /**
      * @param storageUri
      */
-    public void setStorageUri(StorageUri uri) {
+    public void setStorageUri(StorageInfo uri) {
 
 	setEndpoint(uri.getUri());
-	setBucketName(uri.getStorageName());
+	setBucketName(uri.getName());
 	setSecretKey(uri.getPassword());
 	setAccessKey(uri.getUser());
     }
@@ -188,15 +181,14 @@ public class S3StorageSetting extends Setting implements EditableSetting {
     /***
      * @return
      */
-    public Optional<StorageUri> asStorageUri() {
+    public Optional<StorageInfo> asStorageUri() {
 
-	if (getEndpoint().isPresent() && getBucketName().isPresent() && getAccessKey().isPresent()
-		&& getSecretKey().isPresent()) {
+	if (getEndpoint().isPresent() && getBucketName().isPresent() && getAccessKey().isPresent() && getSecretKey().isPresent()) {
 
-	    StorageUri storageUri = new StorageUri();
+	    StorageInfo storageUri = new StorageInfo();
 
 	    storageUri.setUri(getEndpoint().get());
-	    storageUri.setStorageName(getBucketName().get());
+	    storageUri.setName(getBucketName().get());
 	    storageUri.setUser(getAccessKey().get());
 	    storageUri.setPassword(getSecretKey().get());
 

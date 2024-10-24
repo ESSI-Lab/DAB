@@ -1,0 +1,175 @@
+{
+	"help": "http://datasets.wri.org/api/3/action/help_show?name=package_search",
+	"success": true,
+	"result": {
+		"license_title": "Creative Commons Attribution - Share-Alike (CC-BY-SA)",
+		"maintainer": "Lukas Brunner",
+		"spatial_name": "",
+		"issued": "2018-02-21T10:02:49.181266",
+		"use_limitation": "for_research_only",
+		"private": false,
+		"maintainer_email": "lukas.brunner@env.ethz.ch",
+		"num_tags": 3,
+		"specifics": [
+		],
+		"frequency": "DAILY",
+		"modified": "2018-02-21T10:23:31.897121",
+		"contact_points": "[{\"role\": \"subset creator\", \"email\": \"chris.schubert@ccca.ac.at\", \"name\": \"Chris Schubert\"}]",
+		"isopen": true,
+		"id": "052d16a1-4970-4f88-be4f-867a181a600f",
+		"metadata_created": "2018-08-21T10:56:45.826964",
+		"citation_info": "Brunner et al. ",
+		"temporal_end": "2016-08-17T12:00:00",
+		"dimensions": [
+			{
+				"description": "Latitude",
+				"start": "-87.5",
+				"shape": "71",
+				"increment": "2.5",
+				"units": "degrees_north",
+				"name": "Latitude"
+			},
+			{
+				"description": "Longitude",
+				"start": "-180.0",
+				"shape": "144",
+				"increment": "2.5",
+				"units": "degrees_east",
+				"name": "Longitude"
+			},
+			{
+				"description": "Pressure",
+				"start": "6161.5795955",
+				"shape": "1",
+				"increment": "discrete values",
+				"units": "Pa",
+				"name": "Pressure"
+			},
+			{
+				"description": "Time",
+				"start": "0.0",
+				"shape": "3653",
+				"increment": "1.0",
+				"units": "days since 2006-09-01 12:00:00",
+				"name": "Time"
+			}
+		],
+		"metadata_modified": "2018-08-21T10:56:48.460335",
+		"author": "Lukas Brunner",
+		"author_email": "lukas.brunner@uni-graz.at",
+		"controlled_tags": "[{\"taxonomy_term\":\"temperature\",\"uri\":\"http://www.eionet.europa.eu/gemet/concept/8366\",\"taxonomy\":\"GEMET\",\"taxonomy_date\":\"2017-01-09\"},{\"taxonomy_term\":\"climatology\",\"uri\":\"http://www.eionet.europa.eu/gemet/concept/1479\",\"taxonomy\":\"GEMET\",\"taxonomy_date\":\"2017-01-09\"},{\"taxonomy_term\":\"observation satellite\",\"uri\":\"http://www.eionet.europa.eu/gemet/concept/11706\",\"taxonomy\":\"GEMET\",\"taxonomy_date\":\"2017-01-09\"}]",
+		"specification": "",
+		"provenance": "",
+		"equiv_scale": "",
+		"relations": [
+			{
+				"relation": "is_part_of",
+				"id": "fb4d2118-ba17-41c7-a164-dfa524b627b0"
+			}
+		],
+		"state": "active",
+		"version": null,
+		"spatial": "{\"type\": \"MultiPolygon\", \"coordinates\": [[[[8.4375, 23.564], [10.5469, 23.564], [10.5469, 60.0648], [8.4375, 60.0648], [8.4375, 23.564]]]]}",
+		"creator_user_id": "4b957eb9-cd7f-4b47-a1b8-63b8919cffd8",
+		"conformance": "",
+		"variables": [
+			{
+				"units": "K",
+				"shape": [
+					"Time",
+					"Pressure",
+					"Latitude",
+					"Longitude"
+				],
+				"description": "Temperature",
+				"standard_name": "air_temperature",
+				"name": "Temperature"
+			}
+		],
+		"resources": [
+			{
+				"format_version": "4",
+				"cache_last_updated": null,
+				"anonymous_download": "False",
+				"package_id": "052d16a1-4970-4f88-be4f-867a181a600f",
+				"webstore_last_updated": null,
+				"datastore_active": false,
+				"id": "55237a9e-2cd8-4e2c-b824-d53c8b5c9c12",
+				"size": "325018",
+				"state": "active",
+				"hash": "401c11ade3016c9f22b657720805a5c8",
+				"description": "",
+				"format": "NetCDF",
+				"mimetype_inner": null,
+				"url_type": null,
+				"mimetype": null,
+				"cache_url": null,
+				"name": "subset_NetCDF",
+				"created": "2018-08-21T10:56:46.663354",
+				"url": "https://data.ccca.ac.at/subset/55237a9e-2cd8-4e2c-b824-d53c8b5c9c12/download",
+				"uri": "https://hdl.handle.net/20.500.11756/bf8e14bc",
+				"webstore_url": null,
+				"last_modified": null,
+				"position": 0,
+				"revision_id": "d8ca13b4-2872-4219-b892-79a4bbbe5c16",
+				"resource_type": null
+			}
+		],
+		"num_resources": 1,
+		"author_department": "Wegener Center for Climate and Global Change",
+		"resource_status": "",
+		"groups": [
+		],
+		"license_id": "cc-by-sa",
+		"temporal_start": "2012-08-16T12:00:00",
+		"tags": [
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "climatology",
+				"id": "a67ae886-7ab2-432f-80d6-834681cb74e6",
+				"name": "climatology"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "observation satellite",
+				"id": "aa7f2d12-2e7b-4526-b7d3-8363c23235cc",
+				"name": "observation satellite"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "temperature",
+				"id": "cf3e02d6-7b87-4741-9a10-e4a8d5c20996",
+				"name": "temperature"
+			}
+		],
+		"scale_dist": "",
+		"organization": {
+			"description": "Data Centre at Climate Change Centre Austria",
+			"created": "2016-05-02T14:33:12.223678",
+			"title": "CCCA Data Centre",
+			"name": "ccca",
+			"is_organization": true,
+			"state": "active",
+			"image_url": "2016-05-02-123312.203281logoccca.png",
+			"revision_id": "30714a51-6701-456d-b267-6bed7ae8d910",
+			"type": "organization",
+			"id": "e1ef4b31-f546-43e8-9cf2-a89ecc5e4ff5",
+			"approval_status": "approved"
+		},
+		"name": "ro-temp-v01",
+		"language": "eng",
+		"created": "2018-08-21T10:56:45.783815",
+		"url": null,
+		"type": "dataset",
+		"notes": "Radio occultation observations gridded to daily 2.5\u00b0x2.5\u00b0 fields by a Gaussian weighted average\r\nover \u00b12 days and 15\u00b0x5\u00b0 longitude-latitude, based on radio occultation profile data version OPSv5.6.2.\r\nA detailed description of this data is given in Brunner and Steiner (2017): https://doi.org/10.5194/amt-10-4727-2017",
+		"owner_org": "e1ef4b31-f546-43e8-9cf2-a89ecc5e4ff5",
+		"uri": "https://hdl.handle.net/20.500.11756/75f2ffe8",
+		"license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+		"title": "RO_Temp",
+		"revision_id": "625342c1-f853-4e32-bb85-d8b6a7995612",
+		"maintainer_department": "Wegener Center for Climate and Global Change"
+	}
+}

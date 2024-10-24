@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.setting;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,6 +21,7 @@ package eu.essi_lab.cfga.setting;
  * #L%
  */
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -34,6 +35,31 @@ import eu.essi_lab.lib.utils.StreamUtils;
  * @author Fabrizio
  */
 public abstract class ConfigurationObject {
+
+    /**
+     * 
+     */
+    public static Property<Boolean> ENABLED = Property.of("Enabled", "enabled", true, Optional.of(true)); //
+    /**
+     * 
+     */
+    public static Property<Boolean> CAN_BE_DISABLED = Property.of("CanBeDisabled", "canBeDisabled", true, Optional.of(true));//
+    /**
+     * 
+     */
+    public static Property<Boolean> VISIBLE = Property.of("Visible", "visible", true, Optional.of(true)); //
+    /**
+     * 
+     */
+    public static Property<Boolean> EDITABLE = Property.of("Editable", "editable", true, Optional.of(true)); //
+    /**
+     * 
+     */
+    public static Property<String> DESCRIPTION = Property.of("Description", "description", false, Optional.empty());
+    /**
+     * 
+     */
+    public static Property<String> OBJECT_TYPE = Property.of("ObjectType", "type", true, Optional.empty());
 
     private JSONObject object;
 
@@ -69,13 +95,13 @@ public abstract class ConfigurationObject {
      * @param enabled
      */
     public final void setEnabled(boolean enabled) {
-	
-	if(!canBeDisabled() && !enabled){
+
+	if (!canBeDisabled() && !enabled) {
 	    return;
 	}
-	
+
 	setProperty("enabled", enabled, true);
-	
+
 	if (!enabled) {
 	    propagateEnabled(enabled);
 	}
@@ -95,7 +121,7 @@ public abstract class ConfigurationObject {
      * @param canBeDisabled
      */
     public void setCanBeDisabled(boolean canBeDisabled) {
-	
+
 	setProperty("canBeDisabled", canBeDisabled, true);
     }
 
@@ -103,7 +129,7 @@ public abstract class ConfigurationObject {
      * @return
      */
     public boolean canBeDisabled() {
-	
+
 	return isPropertySet("canBeDisabled", true);
     }
 
@@ -125,13 +151,13 @@ public abstract class ConfigurationObject {
      * @return
      */
     public final boolean isVisible() {
-	
+
 	return isPropertySet("visible", true);
     }
 
     /**
      * Default: true
-     * The behavior is different according to the object type:<br>
+     * The behaviour is different according to the object type:<br>
      * <ul>
      * <li>{@link Setting}: shows or hide the edit button</li>
      * <li>{@link Option}: renders the option field editable or readonly</li>
@@ -140,13 +166,13 @@ public abstract class ConfigurationObject {
      * @return
      */
     public boolean isEditable() {
-	
+
 	return isPropertySet("editable", true);
     }
 
     /**
      * Default: true
-     * The behavior is different according to the object type:<br>
+     * The behaviour is different according to the object type:<br>
      * <ul>
      * <li>{@link Setting}: shows or hide the edit button</li>
      * <li>{@link Option}: renders the option field editable or readonly</li>
@@ -155,7 +181,7 @@ public abstract class ConfigurationObject {
      * @param editable
      */
     public void setEditable(boolean editable) {
-	
+
 	setProperty("editable", editable, true);
     }
 
@@ -173,6 +199,17 @@ public abstract class ConfigurationObject {
     public void setDescription(String description) {
 
 	getObject().put("description", description);
+    }
+
+    /**
+    * 
+    */
+    public void clearDescription() {
+
+	if (getObject().has("description")) {
+
+	    getObject().remove("description");
+	}
     }
 
     /**
@@ -207,6 +244,34 @@ public abstract class ConfigurationObject {
     public String getObjectType() {
 
 	return getObject().getString("type");
+    }
+
+    /**
+     * @return
+     */
+    public Optional<Property<?>> getProperty(String name) {
+
+	return getProperties().//
+		stream().//
+		filter(p -> p.getName().equals(name)).//
+		findFirst();
+    }
+
+    /**
+     * @return
+     */
+    public List<Property<?>> getProperties() {
+
+	ArrayList<Property<?>> properties = new ArrayList<Property<?>>();
+
+	properties.add(ENABLED);
+	properties.add(CAN_BE_DISABLED);
+	properties.add(VISIBLE);
+	properties.add(EDITABLE);
+	properties.add(DESCRIPTION);
+	properties.add(OBJECT_TYPE);
+
+	return properties;
     }
 
     /**

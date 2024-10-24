@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.conf;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -34,7 +34,7 @@ import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.validation.ValidationContext;
 import eu.essi_lab.cfga.setting.validation.ValidationResponse;
 import eu.essi_lab.cfga.setting.validation.ValidationResponse.ValidationResult;
-import eu.essi_lab.gssrv.starter.GISuiteStarter;
+import eu.essi_lab.gssrv.starter.GIPStarter;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
@@ -93,7 +93,7 @@ class AdminConfigurationDialog extends SettingEditDialog {
 
 	    try {
 
-		GISuiteStarter.configuration.flush();
+		GIPStarter.configuration.flush();
 
 		LoginDialog dialog = new LoginDialog(requestURL);
 

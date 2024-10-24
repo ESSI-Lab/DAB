@@ -1,0 +1,24 @@
+{
+    "dataset-info": {
+        "altitude": -1,
+        "tipo": "PREC",
+        "latitudine": 45.01567605,
+        "nome_stazione": "Adria - Bellombra",
+        "codice_stazione": 115,
+        "codseq": 300000313,
+        "point": "{\"type\": \"Point\", \"coordinates\": [12.0076803, 45.01567605]}",
+        "longitudine": 12.0076803
+    },
+    "sensor-info": {
+        "dataora": "2022-01-01T00:00:00",
+        "tipo": "PREC",
+        "valore":"{\"MINIMO\":77.57,\"MEDIO\":78.51,\"MASSIMO\":78.86}",
+        "unitnm": "mm",
+        "nome_stazione": "Adria - Bellombra",
+        "nome_sensore": "Precipitazione",
+        "codice_stazione": 115
+    },
+    "value" : "MASSIMO",
+    "startDate" : 2010,
+    "endDate" : 2022
+}

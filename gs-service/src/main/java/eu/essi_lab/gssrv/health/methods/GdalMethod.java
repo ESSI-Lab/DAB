@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.health.methods;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -20,8 +20,6 @@ package eu.essi_lab.gssrv.health.methods;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-
-import java.io.IOException;
 
 import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.gssrv.health.GSPingMethod;
@@ -54,13 +52,14 @@ public class GdalMethod implements GSPingMethod {
     public Boolean applicableTo(ExecutionMode mode) {
 
 	switch (mode) {
-	case CONFIGURATION:
-	case LOCAL_PRODUCTION:
+	case CONFIGURATION:	
 	    return false;
+	case LOCAL_PRODUCTION:
 	case BATCH:
 	case MIXED:
 	case FRONTEND:
 	case ACCESS:
+	case INTENSIVE:
 	default:
 	    return true;
 	}
@@ -68,10 +67,9 @@ public class GdalMethod implements GSPingMethod {
 
     /**
      * @param args
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws Exception 
      */
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws Exception {
 
 	String command = "gdalwarp --version";
 	Runtime rt = Runtime.getRuntime();
@@ -82,5 +80,7 @@ public class GdalMethod implements GSPingMethod {
 	if (exitVal == 0) {
 	    System.out.println("OK");
 	}
+	GdalMethod gm = new GdalMethod();
+	gm.ping();
     }
 }

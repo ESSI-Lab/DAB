@@ -11,7 +11,7 @@ you must copy the sh in the same destination folder). The Dockerfile is a modifi
 
 https://github.com/docker-library/mysql/blob/6b1dc54320b03b83a89068f49cc796fea0ff6bb4/5.7/Dockerfile
 
-Baasically, I removed the VOLUME declaration for /var/lib/mysql so that its content copuld be committed to an image (for persisting the mysql configuraiton).
+Baasically, I removed the VOLUME declaration for /var/lib/mysql so that its content could be committed to an image (for persisting the mysql configuration).
 I also had to insert the chmod command at line 69.
 
 

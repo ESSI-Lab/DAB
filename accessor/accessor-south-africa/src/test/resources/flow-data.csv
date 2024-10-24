@@ -1,0 +1,15 @@
+Data are continuously updated and reviewed.
+The format of this file is as follows:
+POS.  1-8   = Date of daily flow  CCYYMMDD
+POS. 10-18  = Daily avg flow rate in cubic metres/sec 99999.999
+POS. 20-24  = Quality code
+
+A2H002
+Variable 100.00 Surface Water Level
+
+DATE     D AVG F/R  QUAL
+19040801             255
+19040802     0.513     5
+19040803     0.513     5
+19040804     0.513     5
+ZZZZZZZZZZZZ

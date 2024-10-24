@@ -7,7 +7,7 @@ package eu.essi_lab.api.database.marklogic.search;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -33,6 +33,7 @@ import eu.essi_lab.indexes.marklogic.MarkLogicIndexTypes;
 import eu.essi_lab.indexes.marklogic.MarkLogicScalarType;
 import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.lib.xml.QualifiedName;
+import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
 import eu.essi_lab.messages.bond.QueryableBond;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.RuntimeInfoElementBond;
@@ -225,6 +226,12 @@ public interface MarkLogicSearchBuilder {
     public String buildCTSLogicQuery(CTSLogicOperator operator, String... operands);
 
     /**
+     * @param operator
+     * @return
+     */
+    public String getCTSLogicQueryName(LogicalOperator operator);
+
+    /**
      * @return
      */
     public RankingStrategy getRankingStrategy();
@@ -237,7 +244,7 @@ public interface MarkLogicSearchBuilder {
     /**
      * Returns the target of the cts:search which includes 'doc()' followed by all the available types of GSResources
      */
-    public static String getCTSSearchTarget() {
+    public default String getCTSSearchTarget() {
 
 	return Arrays.asList(ResourceType.values()).//
 		stream().map(r -> "gs:" + r.getType()).//

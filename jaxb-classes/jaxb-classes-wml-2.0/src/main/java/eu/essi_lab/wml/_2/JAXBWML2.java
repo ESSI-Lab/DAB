@@ -4,7 +4,7 @@ package eu.essi_lab.wml._2;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -38,12 +38,13 @@ import eu.essi_lab.jaxb.wml._2_0.CollectionType;
 import eu.essi_lab.jaxb.wml._2_0.MeasurementTimeseriesType;
 import eu.essi_lab.jaxb.wml._2_0.ObjectFactory;
 import eu.essi_lab.jaxb.wml._2_0.om__2.OMObservationType;
+import eu.essi_lab.lib.xml.NameSpace;
 
 public class JAXBWML2 {
 
     public Marshaller getMarshaller() throws JAXBException {
 	    Marshaller marshaller = context.createMarshaller();
-	    marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new JAXBWML2PrefixMapper());
+	    marshaller.setProperty(NameSpace.NAMESPACE_PREFIX_MAPPER_IMPL, new JAXBWML2PrefixMapper());
 	    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 	    return marshaller;
     }

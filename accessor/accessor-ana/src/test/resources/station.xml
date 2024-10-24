@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Table xmlns:msdata="urn:schemas-microsoft-com:xml-msdata"
+xmlns:diffgr="urn:schemas-microsoft-com:xml-diffgram-v1"
+diffgr:id="Table139"
+msdata:rowOrder="138">
+<NomeEstacao>TAMISHIYACU</NomeEstacao>
+<CodEstacao>10075000</CodEstacao>
+<Bacia>1</Bacia>
+<SubBacia>10</SubBacia>
+<Operadora>00906 - SENAMHI-PERU - SENAMHI-PERU</Operadora>
+<Responsavel>00906 - SENAMHI-PERU - SENAMHI-PERU</Responsavel>
+<Municipio-UF>PERU-PU</Municipio-UF>
+<Latitude>-4.00360</Latitude>
+<Longitude>-73.16110</Longitude>
+<Altitude>105.00</Altitude>
+<CodRio>10001000</CodRio>
+<NomeRio>RIO SOLIMÕES/AMAZONAS</NomeRio>
+<Origem>RHN</Origem>
+<StatusEstacao>Ativo</StatusEstacao>
+</Table>

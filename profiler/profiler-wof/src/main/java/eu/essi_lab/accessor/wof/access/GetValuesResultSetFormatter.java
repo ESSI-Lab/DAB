@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof.access;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,6 +23,7 @@ package eu.essi_lab.accessor.wof.access;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
@@ -69,7 +70,15 @@ public class GetValuesResultSetFormatter extends AccessResultSetFormatter<DataOb
 	Response.status(Status.OK);
 	File file = dataObject.getFile();
 	ResponseBuilder builder = Response.status(Status.OK);
-
+//	File tmp = new File("/home/boldrini/test/wof.xml");
+//	File file = new File("/home/boldrini/test/dest.xml");
+//	try {
+//	    IOUtils.copy(new FileInputStream(tmp), new FileOutputStream(file));
+//	} catch (IOException e1) {
+//	    // TODO Auto-generated catch block
+//	    e1.printStackTrace();
+//	}
+	
 	StreamingOutput stream = new StreamingOutput() {
 	    @Override
 	    public void write(OutputStream out) throws IOException, WebApplicationException {

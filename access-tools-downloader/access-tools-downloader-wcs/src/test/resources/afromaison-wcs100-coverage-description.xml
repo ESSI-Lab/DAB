@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wcs:CoverageDescription xmlns:wcs="http://www.opengis.net/wcs"
+                         xmlns:gml="http://www.opengis.net/gml"
+                         xmlns:ogc="http://www.opengis.net/ogc"
+                         xmlns:ows="http://www.opengis.net/ows/1.1"
+                         xmlns:xlink="http://www.w3.org/1999/xlink"
+                         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                         version="1.0.0"
+                         xsi:schemaLocation="http://www.opengis.net/wcs http://afromaison.grid.unep.ch:8080/geoserver/schemas/wcs/1.0.0/describeCoverage.xsd">
+   <wcs:CoverageOffering>
+      <wcs:metadataLink metadataType="other">http://afromaison.grid.unep.ch:8080/geonetwork?uuid=ce78048d-088a-4433-a9ef-8794c64604cc</wcs:metadataLink>
+      <wcs:description>Generated from GeoTIFF</wcs:description>
+      <wcs:name>ethiopia:ETH_Aster</wcs:name>
+      <wcs:label>ETH_Aster</wcs:label>
+      <wcs:lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+         <gml:pos>37.447 11.6</gml:pos>
+         <gml:pos>38.049 12.127</gml:pos>
+      </wcs:lonLatEnvelope>
+      <wcs:keywords>
+         <wcs:keyword>WCS</wcs:keyword>
+         <wcs:keyword>GeoTIFF</wcs:keyword>
+         <wcs:keyword>ETH_Aster</wcs:keyword>
+      </wcs:keywords>
+      <wcs:domainSet>
+         <wcs:spatialDomain>
+            <gml:Envelope srsName="EPSG:4326">
+               <gml:pos>37.441 11.556</gml:pos>
+               <gml:pos>38.055 12.171</gml:pos>
+            </gml:Envelope>
+            <gml:RectifiedGrid dimension="2">
+               <gml:limits>
+                  <gml:GridEnvelope>
+                     <gml:low>0 0</gml:low>
+                     <gml:high>2165 1896</gml:high>
+                  </gml:GridEnvelope>
+               </gml:limits>
+               <gml:axisName>x</gml:axisName>
+               <gml:axisName>y</gml:axisName>
+               <gml:origin>
+                  <gml:pos>37.44750000000012 12.12638888888902</gml:pos>
+               </gml:origin>
+               <gml:offsetVector>2.777777777777777E-4 0.0</gml:offsetVector>
+               <gml:offsetVector>0.0 -2.7777777777777767E-4</gml:offsetVector>
+            </gml:RectifiedGrid>
+         </wcs:spatialDomain>
+      </wcs:domainSet>
+      <wcs:rangeSet>
+         <wcs:RangeSet>
+            <wcs:name>ETH_Aster</wcs:name>
+            <wcs:label>ETH_Aster</wcs:label>
+            <wcs:axisDescription>
+               <wcs:AxisDescription>
+                  <wcs:name>Band</wcs:name>
+                  <wcs:label>Band</wcs:label>
+                  <wcs:values>
+                     <wcs:singleValue>1</wcs:singleValue>
+                  </wcs:values>
+               </wcs:AxisDescription>
+            </wcs:axisDescription>
+         </wcs:RangeSet>
+      </wcs:rangeSet>
+      <wcs:supportedCRSs>
+         <wcs:requestResponseCRSs>EPSG:4326</wcs:requestResponseCRSs>
+      </wcs:supportedCRSs>
+      <wcs:supportedFormats nativeFormat="GeoTIFF">
+         <wcs:formats>GeoTIFF</wcs:formats>
+         <wcs:formats>GIF</wcs:formats>
+         <wcs:formats>JPEG</wcs:formats>
+         <wcs:formats>PNG</wcs:formats>
+         <wcs:formats>TIFF</wcs:formats>
+      </wcs:supportedFormats>
+      <wcs:supportedInterpolations>
+         <wcs:interpolationMethod>bilinear</wcs:interpolationMethod>
+         <wcs:interpolationMethod>bicubic</wcs:interpolationMethod>
+      </wcs:supportedInterpolations>
+   </wcs:CoverageOffering>
+</wcs:CoverageDescription>

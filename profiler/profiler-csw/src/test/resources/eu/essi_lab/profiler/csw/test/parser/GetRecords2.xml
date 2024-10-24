@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<csw:GetRecords xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+	xmlns:ogc="http://www.opengis.net/ogc" xmlns:gmd="http://www.isotc211.org/2005/gmd"
+	xmlns:apiso="http://www.opengis.net/cat/csw/apiso/1.0" xmlns:ows="http://www.opengis.net/ows"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="CSW" version="2.0.2"
+	resultType="results" outputFormat="application/xml"
+	xsi:schemaLocation="http://www.opengis.net/gml http://schemas.opengis.net/gml/3.2.1/gml.xsd 
+    http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-discovery.xsd"
+	outputSchema="http://www.opengis.net/cat/csw/2.0.2" startPosition="1" maxRecords="15">
+	<csw:Query typeNames="csw:Record">
+		<csw:ElementSetName typeNames="csw:Record">full</csw:ElementSetName>
+		<csw:Constraint version="1.1.0">
+			<ogc:Filter>
+				<ogc:And>
+
+					<ogc:PropertyIsLike wildCard="*" matchCase="true" escapeChar="#" singleChar=".">
+						<ogc:PropertyName>dc:title</ogc:PropertyName>
+						<ogc:Literal>A</ogc:Literal>
+					</ogc:PropertyIsLike>
+
+					<ogc:PropertyIsNotEqualTo>
+						<ogc:PropertyName>dc:title</ogc:PropertyName>
+						<ogc:Literal>B</ogc:Literal>
+					</ogc:PropertyIsNotEqualTo>
+
+					<ogc:Not>
+						<ogc:PropertyIsEqualTo>
+							<ogc:PropertyName>dc:title</ogc:PropertyName>
+							<ogc:Literal>C</ogc:Literal>
+						</ogc:PropertyIsEqualTo>
+					</ogc:Not>
+
+					<ogc:Not>
+						<ogc:PropertyIsNotEqualTo>
+							<ogc:PropertyName>dc:title</ogc:PropertyName>
+							<ogc:Literal>D</ogc:Literal>
+						</ogc:PropertyIsNotEqualTo>
+					</ogc:Not>
+
+					<ogc:PropertyIsGreaterThan>
+						<ogc:PropertyName>dc:title</ogc:PropertyName>
+						<ogc:Literal>E</ogc:Literal>
+					</ogc:PropertyIsGreaterThan>
+
+					<ogc:PropertyIsGreaterThanOrEqualTo>
+						<ogc:PropertyName>dc:title</ogc:PropertyName>
+						<ogc:Literal>F</ogc:Literal>
+					</ogc:PropertyIsGreaterThanOrEqualTo>
+					
+					<ogc:PropertyIsLessThan>						
+						<ogc:PropertyName>dc:title</ogc:PropertyName>
+						<ogc:Literal>G</ogc:Literal>
+					</ogc:PropertyIsLessThan>
+					
+					<ogc:PropertyIsLessThanOrEqualTo>						
+						<ogc:PropertyName>dc:title</ogc:PropertyName>
+						<ogc:Literal>H</ogc:Literal>
+					</ogc:PropertyIsLessThanOrEqualTo>
+					
+					<ogc:PropertyIsNull>
+						<ogc:PropertyName>dc:title</ogc:PropertyName>
+					</ogc:PropertyIsNull>
+					
+					<ogc:Contains>
+						<ogc:PropertyName>ows:BoundingBox</ogc:PropertyName>
+						<gml:Envelope>
+							<gml:lowerCorner>14.05 46.46</gml:lowerCorner>
+							<gml:upperCorner>17.24 48.42</gml:upperCorner>
+						</gml:Envelope>
+					</ogc:Contains>
+					
+					<ogc:Intersects>
+						<ogc:PropertyName>ows:BoundingBox</ogc:PropertyName>
+						<gml:Envelope>
+							<gml:lowerCorner>14.05 46.46</gml:lowerCorner>
+							<gml:upperCorner>17.24 48.42</gml:upperCorner>
+						</gml:Envelope>
+					</ogc:Intersects>
+					
+					<ogc:BBOX>
+						<ogc:PropertyName>ows:BoundingBox</ogc:PropertyName>                       
+						<gml:Envelope>
+							<gml:lowerCorner>14.05 46.46</gml:lowerCorner>
+							<gml:upperCorner>17.24 48.42</gml:upperCorner>
+						</gml:Envelope>
+					</ogc:BBOX>
+					
+					<ogc:Disjoint>
+						<ogc:PropertyName>ows:BoundingBox</ogc:PropertyName>
+						<gml:Envelope>
+							<gml:lowerCorner>14.05 46.46</gml:lowerCorner>
+							<gml:upperCorner>17.24 48.42</gml:upperCorner>
+						</gml:Envelope>
+					</ogc:Disjoint>
+								
+				</ogc:And>
+			</ogc:Filter>
+		</csw:Constraint>
+	</csw:Query>
+</csw:GetRecords>

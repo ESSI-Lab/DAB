@@ -7,7 +7,7 @@ package eu.essi_lab.authorization.pps;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,7 +24,7 @@ package eu.essi_lab.authorization.pps;
  * #L%
  */
 
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.ApplyType;
+import eu.essi_lab.authorization.rps.CSW_RIRolePolicySet;
 
 /**
  * @author Fabrizio
@@ -32,26 +32,33 @@ import oasis.names.tc.xacml._3_0.core.schema.wd_17.ApplyType;
 public class CSW_RIPermissionPolicySet extends AbstractPermissionPolicySet {
 
     /**
+     * 
+     */
+    public static final String SUPPORTED_PATH = "csw";
+
+    /**
+     * 
+     */
+    public static final String SUPPORTED_VIEW_ID = "cite-csw-ri";
+
+    /**
      * @param role
      */
     public CSW_RIPermissionPolicySet() {
 
-	super("cswri");
+	super(CSW_RIRolePolicySet.ROLE);
     }
 
     @Override
     protected void editPPSPolicy() {
 
-	String discoveryRuleId = createRandomId();
+	String discoveryRuleId = "cswri:discovery:rule";
 
-	//
-	// discovery rule
-	//
 	setDiscoveryAction(discoveryRuleId);
 
-	ApplyType pathApply = createPathApply("csw");
-	ApplyType viewIdApply = createViewIdentifiersApply("cite-csw-ri");
-
-	setAndCondition(discoveryRuleId, pathApply, viewIdApply);
+	setAndCondition(//
+		discoveryRuleId, //
+		createPathApply(SUPPORTED_PATH), //
+		createViewIdentifiersApply(SUPPORTED_VIEW_ID));
     }
 }

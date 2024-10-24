@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.csw.handler.discover;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,6 +21,8 @@ package eu.essi_lab.profiler.csw.handler.discover;
  * #L%
  */
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,6 +35,7 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.xml.sax.SAXParseException;
 
+import eu.essi_lab.jaxb.common.CommonContext;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.jaxb.common.schemas.BooleanValidationHandler;
 import eu.essi_lab.jaxb.common.schemas.CommonSchemas;
@@ -44,6 +47,7 @@ import eu.essi_lab.jaxb.csw._2_0_2.ExceptionCode;
 import eu.essi_lab.jaxb.csw._2_0_2.GetRecords;
 import eu.essi_lab.jaxb.csw._2_0_2.QueryType;
 import eu.essi_lab.lib.utils.ClonableInputStream;
+import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
@@ -54,8 +58,9 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.pdk.validation.WebRequestValidator;
 import eu.essi_lab.profiler.csw.CSWGetRecordsParser;
 import eu.essi_lab.profiler.csw.CSWProfiler;
-import eu.essi_lab.profiler.csw.CSWRequestMethodConverter;
-import eu.essi_lab.profiler.csw.CSWRequestMethodConverter.CSWRequest;
+import eu.essi_lab.profiler.csw.CSWRequestConverter;
+import eu.essi_lab.profiler.csw.CSWRequestConverter.CSWRequest;
+import eu.essi_lab.profiler.csw.CSWRequestUtils;
 import eu.essi_lab.profiler.csw.handler.srvinfo.CSWDescribeRecordHandler;
 import eu.essi_lab.profiler.csw.handler.srvinfo.CSWGetCapabilitiesHandler;
 import eu.essi_lab.profiler.csw.profile.CSWProfile;
@@ -75,7 +80,24 @@ public class CSWRequestValidator implements WebRequestValidator {
 
 	if (request.isGetRequest()) {
 
-	    return doGetRequestValidation(request, request.getQueryString());
+	    if (CSWRequestUtils.isGetRecordsFromGET(request)) {
+
+		try {
+
+		    CSWRequestConverter converter = new CSWRequestConverter();
+		    GetRecords getRecords = converter.convert(request);
+
+		    ByteArrayInputStream stream = CommonContext.asInputStream(getRecords, false);
+
+		    return doPostRequestValidation(request, new ClonableInputStream(stream));
+
+		} catch (Exception ex) {
+
+		    throw GSException.createException(getClass(), CSW_POST_REQUEST_VALIDATION_ERROR, ex);
+		}
+	    }
+
+	    return doGetRequestValidation(request, request.getURLDecodedQueryString());
 	}
 
 	return doPostRequestValidation(request, request.getBodyStream());
@@ -379,19 +401,33 @@ public class CSWRequestValidator implements WebRequestValidator {
 
 	    String queryPart = null;
 
-	    CSWRequestMethodConverter converter = new CSWRequestMethodConverter();
+	    CSWRequestConverter converter = new CSWRequestConverter();
 
 	    if (isGetCapabilitiesPOSTRequest(reader)) {
+
 		queryPart = converter.convert(CSWRequest.GET_CAPABILITIES, stream);
+
 	    } else if (isDescribeRecordPOSTRequest(reader)) {
+
 		queryPart = converter.convert(CSWRequest.DESCRIBE_RECORD, stream);
+
 	    } else if (isGetRecordByIdPOSTRequest(reader)) {
+
 		queryPart = converter.convert(CSWRequest.GET_RECORD_BY_ID, stream);
+
+	    } else if (CSWRequestUtils.isGetRecordsFromGET(request)) {
+
+		GetRecords getRecords = converter.convert(request);
+
+		return doGetRecordsValidation(getRecords);
+
 	    } else if (isGetRecordsPOSTRequest(reader)) {
-		return doGetRecordsValidation(request, stream);
+
+		return doGetRecordsValidation(stream);
 	    }
 
 	    if (queryPart != null) {
+
 		return doGetRequestValidation(request, queryPart);
 	    }
 
@@ -418,7 +454,26 @@ public class CSWRequestValidator implements WebRequestValidator {
 	return message;
     }
 
-    private ValidationMessage doGetRecordsValidation(WebRequest webRequest, ClonableInputStream stream) {
+    /**
+     * @param getRecords
+     * @return
+     * @throws JAXBException
+     * @throws IOException
+     */
+    private ValidationMessage doGetRecordsValidation(GetRecords getRecords) throws JAXBException, IOException {
+
+	ByteArrayInputStream inputStream = CommonContext.asInputStream(getRecords, false);
+
+	ClonableInputStream clonableInputStream = new ClonableInputStream(inputStream);
+
+	return doGetRecordsValidation(clonableInputStream);
+    }
+
+    /**
+     * @param stream
+     * @return
+     */
+    private ValidationMessage doGetRecordsValidation(ClonableInputStream stream) {
 
 	ValidationMessage message = new ValidationMessage();
 	message.setResult(ValidationResult.VALIDATION_SUCCESSFUL);

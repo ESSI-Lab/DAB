@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gui.components.option;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,11 +24,10 @@ package eu.essi_lab.cfga.gui.components.option;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.vaadin.gatanaso.MultiselectComboBox;
-
 import com.vaadin.flow.component.HasValue.ValueChangeEvent;
 import com.vaadin.flow.component.HasValue.ValueChangeListener;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 import eu.essi_lab.cfga.Configuration;
@@ -136,7 +135,7 @@ public class OptionSettingComponent extends VerticalLayout {
 
 	case MULTI:
 
-	    MultiselectComboBox<String> select = new MultiselectComboBox<>();
+	    MultiSelectComboBox<String> select = new MultiSelectComboBox<>();
 
 	    select.setWidthFull();
 	    select.getStyle().set("margin-bottom", "10px");

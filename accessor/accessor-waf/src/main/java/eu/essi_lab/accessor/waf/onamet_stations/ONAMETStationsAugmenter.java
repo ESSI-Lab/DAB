@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.waf.onamet_stations;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -39,9 +39,9 @@ import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
 import eu.essi_lab.lib.net.dirlisting.WAFClient;
 import eu.essi_lab.lib.net.dirlisting.WAF_URL;
+import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.protocols.NetProtocols;
-import eu.essi_lab.lib.net.s3.S3TransferManager;
-import eu.essi_lab.lib.net.utils.Downloader;
+import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
@@ -213,7 +213,7 @@ public class ONAMETStationsAugmenter extends ResourceAugmenter<ONAMETStationsAug
 	    if (csvFileContent == null) {
 
 		Downloader downloader = new Downloader();
-		Optional<String> csvFile = downloader.downloadString(url.toString());
+		Optional<String> csvFile = downloader.downloadOptionalString(url.toString());
 
 		csvFileContent = csvFile.get();
 
@@ -406,9 +406,9 @@ public class ONAMETStationsAugmenter extends ResourceAugmenter<ONAMETStationsAug
 	GSLoggerFactory.getLogger(getClass()).debug("Uploading nc file {} to the S3 bucket {} STARTED", file,
 		setting.getS3BucketName().get());
 
-	S3TransferManager manager = new S3TransferManager();
+	S3TransferWrapper manager = new S3TransferWrapper();
 	manager.setAccessKey(setting.getS3AccessKey().get());
-	manager.setSecreteKey(setting.getS3SecretKey().get());
+	manager.setSecretKey(setting.getS3SecretKey().get());
 	
 	manager.setACLPublicRead(true);
 

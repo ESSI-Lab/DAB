@@ -4,7 +4,7 @@ package eu.essi_lab.model.resource.data;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -402,6 +402,7 @@ public class CRS implements Serializable {
 		}
 	    }
 	    int dimensions = asCRS.getDimension();
+	    javax.measure.Unit<?> unit;
 	    switch (dimensions) {
 	    case 0:
 		break;
@@ -411,7 +412,7 @@ public class CRS implements Serializable {
 	    case 1:
 		CoordinateSystemAxis axis1 = asCRS.getAxis(0);
 		this.firstAxisName = axis1.getName().getCode();
-		javax.measure.unit.Unit<?> unit = axis1.getUnit();
+		unit = axis1.getUnit();
 		this.uom = Unit.fromIdentifier(unit.toString());
 	    default:
 		break;

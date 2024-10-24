@@ -4,7 +4,7 @@ package eu.essi_lab.lib.xml;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -158,6 +158,10 @@ public class XMLNodeWriter {
 
     }
 
+    public void addAttributes(String xPath, String... nameValuePairs) throws XPathExpressionException {
+	addAttributes(null, xPath, nameValuePairs);
+    }
+
     /**
      * Adds the attributes specified by the given name value pairs to the nodes resulting from the supplied
      * <code>xPath</code>
@@ -166,8 +170,8 @@ public class XMLNodeWriter {
      * @param nameValuePairs
      * @throws XPathExpressionException
      */
-    public void addAttributes(String xPath, String... nameValuePairs) throws XPathExpressionException {
-	List<Node> list = this.xmlNodeReader.evaluateOriginalNodesList(xPath);
+    public void addAttributes(Node target, String xPath, String... nameValuePairs) throws XPathExpressionException {
+	List<Node> list = this.xmlNodeReader.evaluateOriginalNodesList(target, xPath);
 	for (Node node : list) {
 	    if (node instanceof Element) {
 		Element element = (Element) node;
@@ -178,6 +182,10 @@ public class XMLNodeWriter {
 	}
     }
 
+    public void addAttributesNS(String xPath, String... namespaceURINameValueTriples) throws XPathExpressionException {
+	addAttributesNS(null, xPath, namespaceURINameValueTriples);
+    }
+
     /**
      * Adds the attributes specified by the attribute namespace plus qualified name plus value triples to the nodes
      * resulting from the supplied <code>xPath</code>
@@ -186,7 +194,7 @@ public class XMLNodeWriter {
      * @param namespaceURINameValueTriples the namespaceURI + qualified name + value triples
      * @throws XPathExpressionException
      */
-    public void addAttributesNS(String xPath, String... namespaceURINameValueTriples) throws XPathExpressionException {
+    public void addAttributesNS(Node target, String xPath, String... namespaceURINameValueTriples) throws XPathExpressionException {
 	List<Node> list = this.xmlNodeReader.evaluateOriginalNodesList(xPath);
 	for (Node node : list) {
 	    if (node instanceof Element) {

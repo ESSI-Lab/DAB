@@ -7,7 +7,7 @@ package eu.essi_lab.authorization.xacml;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -50,6 +50,7 @@ import org.ow2.authzforce.core.pdp.api.value.StringValue;
 import org.ow2.authzforce.xacml.identifiers.XacmlAttributeId;
 
 import eu.essi_lab.authorization.PolicySetWrapper.Issuer;
+import eu.essi_lab.messages.bond.View.ViewVisibility;
 import oasis.names.tc.xacml._3_0.core.schema.wd_17.DecisionType;
 
 /**
@@ -160,7 +161,7 @@ public class PdpEngineWrapper {
 
 	requestBuilder.putNamedAttributeIfAbsent(resourceIdAttributeId, resourceIdAttributeValues);
     }
-    
+
     /**
      * @param maxRecords
      */
@@ -185,7 +186,7 @@ public class PdpEngineWrapper {
 
 	setAccessSubject(Issuer.PATH.getId(), path);
     }
-    
+
     /**
      * @param ip
      */
@@ -198,7 +199,7 @@ public class PdpEngineWrapper {
      * @param ipList
      */
     public void setIPs(String... ipList) {
-	
+
 	AttributeFqn subjectIdAttributeId = AttributeFqns.newInstance(//
 		XACML_1_0_ACCESS_SUBJECT.value(), //
 		Optional.of(Issuer.ALLOWED_IP.getId()), //
@@ -208,14 +209,14 @@ public class PdpEngineWrapper {
 		stream().//
 		map(StringValue::new).//
 		collect(Collectors.toList());
-	
+
 	AttributeBag<StringValue> ipAttributeValues = Bags.newAttributeBag(//
 		StandardDatatypes.STRING, //
 		collect);
 
 	requestBuilder.putNamedAttributeIfAbsent(subjectIdAttributeId, ipAttributeValues);
-	
-//	setAccessSubject(Issuer.ALLOWED_IP.getId(), ip);
+
+	// setAccessSubject(Issuer.ALLOWED_IP.getId(), ip);
     }
 
     /**
@@ -227,13 +228,29 @@ public class PdpEngineWrapper {
     }
 
     /**
+     * @param viewVisibility
+     */
+    public void setViewVisibility(ViewVisibility viewVisibility) {
+
+	setAccessSubject(Issuer.VIEW_VISIBILITY.getId(), viewVisibility.name());
+    }
+
+    /**
+     * @param viewOwner
+     */
+    public void setViewOwner(String viewOwner) {
+
+	setAccessSubject(Issuer.VIEW_OWNER.getId(), viewOwner);
+    }
+
+    /**
      * @param viewCreator
      */
     public void setViewCreator(String viewCreator) {
 
 	setAccessSubject(Issuer.VIEW_CREATOR.getId(), viewCreator);
     }
-    
+
     /**
      * @param origin
      */
@@ -285,11 +302,11 @@ public class PdpEngineWrapper {
     public DecisionType evaluate() {
 
 	DecisionRequest request = requestBuilder.build(false);
-	
-//	System.out.println("---------------------------------------\n");
-//	System.out.println(request);
-//	System.out.println("---------------------------------------\n");
-	
+
+	// System.out.println("---------------------------------------\n");
+	// System.out.println(request);
+	// System.out.println("---------------------------------------\n");
+
 	DecisionResult result = pdp.evaluate(request);
 
 	return result.getDecision();

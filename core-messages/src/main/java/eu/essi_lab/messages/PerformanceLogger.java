@@ -4,7 +4,7 @@ package eu.essi_lab.messages;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -41,18 +41,18 @@ public class PerformanceLogger {
 
     public enum PerformancePhase {
 
-	MESSAGE_AUTHORIZATION,//
-	RESULT_SET_FORMATTING,//
-	RESULT_SET_MAPPING,//
-	RESULT_SET_RETRIEVING,//
-	REQUEST_HANDLING,//
-	BOND_NORMALIZATION,//
-	MARKLOGIC_QUERY_EXECUTION,//
-	MARKLOGIC_QUERY_GENERATION,//
-	MARKLOGIC_NODES_CREATION,//
-	MARKLOGIC_NODES_TO_GS_RESOURCE_MAPPING,//
-	MARKLOGIC_COUNTQUERY_GENERATION,//
-	MARKLOGIC_COUNTQUERY_EXECUTION,//
+	MESSAGE_AUTHORIZATION, //
+	RESULT_SET_FORMATTING, //
+	RESULT_SET_MAPPING, //
+	RESULT_SET_RETRIEVING, //
+	REQUEST_HANDLING, //
+	BOND_NORMALIZATION, //
+	MARKLOGIC_QUERY_EXECUTION, //
+	MARKLOGIC_QUERY_GENERATION, //
+	MARKLOGIC_NODES_CREATION, //
+	MARKLOGIC_NODES_TO_GS_RESOURCE_MAPPING, //
+	MARKLOGIC_COUNTQUERY_GENERATION, //
+	MARKLOGIC_COUNTQUERY_EXECUTION, //
 	ITERATED_WORKFLOW
 
     }
@@ -70,15 +70,20 @@ public class PerformanceLogger {
     }
 
     public void logPerformance(Logger logger) {
-	Double elapsedTime = chronometer.getElapsedTimeMillis()/1000.0;
+	Double elapsedTime = chronometer.getElapsedTimeMillis() / 1000.0;
 
 	String queryString = "N/A";
 
-	if (qs.isPresent())
+	if (qs.isPresent()) {
 	    queryString = qs.get();
+	}
+
+	if (queryString.length() > 100) {
+
+	    queryString = queryString.substring(0, 100) + "...";
+	}
 
 	logger.info("Performance [{}] [{}] [{}] [{}] [{}]", phase, elapsedTime, "secs", rid, queryString);
-
     }
 
     public static void main(String[] args) {

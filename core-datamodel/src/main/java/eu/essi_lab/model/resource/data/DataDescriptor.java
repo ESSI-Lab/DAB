@@ -4,7 +4,7 @@ package eu.essi_lab.model.resource.data;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -178,7 +178,7 @@ public class DataDescriptor implements Serializable {
 		Number upper = spatialDimension.getContinueDimension().getUpper();
 		Long size = spatialDimension.getContinueDimension().getSize();
 
-		if (size.equals(targetSize)) {
+		if (size!=null && size.equals(targetSize)) {
 
 		    if (targetLower == null) {
 			targetSpatialDimension.getContinueDimension().setLower(lower);
@@ -326,6 +326,29 @@ public class DataDescriptor implements Serializable {
 
 	setSpatialDimensions(spatialDimensions);
     }
+    
+    public void setEPSG3857SpatialDimensions(Double minx, Double miny, Double maxx, Double maxy) {
+
+ 	List<DataDimension> spatialDimensions = new ArrayList<>();
+
+ 	ContinueDimension dim1 = new ContinueDimension(X_DIMENSION_NAME);
+ 	dim1.setType(DimensionType.ROW);
+ 	dim1.setLower(minx);
+ 	dim1.setUpper(maxx);
+ 	dim1.setUom(Unit.METRE);
+
+ 	spatialDimensions.add(dim1);
+
+ 	ContinueDimension dim2 = new ContinueDimension(Y_DIMENSION_NAME);
+ 	dim2.setType(DimensionType.COLUMN);
+ 	dim2.setLower(miny);
+ 	dim2.setUpper(maxy);
+ 	dim2.setUom(Unit.METRE);
+
+ 	spatialDimensions.add(dim2);
+
+ 	setSpatialDimensions(spatialDimensions);
+     }
 
     /**
      * Sets the temporal dimension

@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.scheduler.impl;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,6 +31,7 @@ import org.joda.time.DateTimeZone;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerListener;
@@ -78,6 +79,18 @@ public abstract class AbstractScheduler implements eu.essi_lab.cfga.scheduler.Sc
 	if (!scheduler.isStarted() && !scheduler.isShutdown()) {
 
 	    scheduler.start();
+	}
+    }
+
+    /**
+     * @throws SchedulerException
+     */
+    @Override
+    public synchronized void startDelayed(int minutes) throws SchedulerException {
+
+	if (!scheduler.isStarted() && !scheduler.isShutdown()) {
+
+	    scheduler.startDelayed((int) TimeUnit.MINUTES.toSeconds(minutes));
 	}
     }
 
@@ -135,6 +148,22 @@ public abstract class AbstractScheduler implements eu.essi_lab.cfga.scheduler.Sc
 	if (!isScheduled) {
 
 	    GSLoggerFactory.getLogger(getClass()).info("Worker not scheduled (scheduling was disabled), adding new job");
+
+	    JobKey key = jobDetail.getKey();
+
+	    boolean exists = scheduler.checkExists(key);
+
+	    if (exists) {
+
+		GSLoggerFactory.getLogger(getClass()).info("Deleting existing job before adding a new one");
+
+		boolean deleted = scheduler.deleteJob(key);
+
+		if (!deleted) {
+
+		    GSLoggerFactory.getLogger(getClass()).warn("Unable to deleted existing job: {}", key.getName());
+		}
+	    }
 
 	    schedule(setting);
 	    return;
@@ -405,15 +434,6 @@ public abstract class AbstractScheduler implements eu.essi_lab.cfga.scheduler.Sc
 		findFirst();
     }
 
-    public static void main(String[] args) throws Exception {
-
-	// ?useSSL=false
-
-	String url = "jdbc:mysql://hydrodb-cluster.cluster-cuj9mnzczk9c.us-east-1.rds.amazonaws.com:3306?useSSL=false";
-
-	DriverManager.getConnection(url, "essihydro", "ciardi25");
-    }
-
     /**
      * @param scheduling
      */
@@ -422,8 +442,10 @@ public abstract class AbstractScheduler implements eu.essi_lab.cfga.scheduler.Sc
 	GSLoggerFactory.getLogger(getClass()).info("With repeat count {}", scheduling.getRepeatCount().map(r -> r.toString()).orElse("-"));
 	GSLoggerFactory.getLogger(getClass()).info("With repeat interval {}", scheduling.getRepeatInterval());
 	GSLoggerFactory.getLogger(getClass()).info("With repeat interval time unit {}", scheduling.getRepeatIntervalUnit());
-	GSLoggerFactory.getLogger(getClass()).info("With start time {}", scheduling.getStartTime().map(t -> t.toString()+" "+dateTimeZone).orElse("-"));
-	GSLoggerFactory.getLogger(getClass()).info("With end time {}", scheduling.getEndTime().map(t -> t.toString()+" "+dateTimeZone).orElse("-"));
+	GSLoggerFactory.getLogger(getClass()).info("With start time {}",
+		scheduling.getStartTime().map(t -> t.toString() + " " + dateTimeZone).orElse("-"));
+	GSLoggerFactory.getLogger(getClass()).info("With end time {}",
+		scheduling.getEndTime().map(t -> t.toString() + " " + dateTimeZone).orElse("-"));
     }
 
     /**

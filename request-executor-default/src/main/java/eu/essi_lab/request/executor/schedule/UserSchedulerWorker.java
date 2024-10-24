@@ -4,7 +4,7 @@ package eu.essi_lab.request.executor.schedule;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,6 +24,7 @@ package eu.essi_lab.request.executor.schedule;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Date;
+import java.util.Optional;
 
 import javax.ws.rs.core.Response;
 
@@ -36,7 +37,7 @@ import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.cfga.scheduler.SchedulerWorker;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.RequestMessage;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.pdk.handler.ProfilerHandler;
@@ -110,6 +111,8 @@ public class UserSchedulerWorker extends SchedulerWorker<UserScheduledSetting> {
     @Override
     public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
 
+	DownloadReportsHandler.sendBulkDownloadEmail("STARTED", getSetting(), Optional.empty());
+
 	String handlerClass = getSetting().getHandler();
 	String mapperClass = getSetting().getMapper();
 	String formatterClass = getSetting().getFormatter();
@@ -169,7 +172,7 @@ public class UserSchedulerWorker extends SchedulerWorker<UserScheduledSetting> {
 		    GSLoggerFactory.getLogger(this.getClass()).info("Uploading file to {} STARTED", downloadStorage.getLabel());
 
 		    ResultStorage storage = null;
-		    StorageUri resultStorageURI = message.getUserJobStorageURI();
+		    StorageInfo resultStorageURI = message.getUserJobStorageURI();
 
 		    switch (downloadStorage) {
 
@@ -212,6 +215,12 @@ public class UserSchedulerWorker extends SchedulerWorker<UserScheduledSetting> {
 		    // Updates the status
 		    //
 		    status.setDataUri(get);
+
+		    //
+		    //
+		    //
+
+		    DownloadReportsHandler.sendBulkDownloadEmail("ENDED", getSetting(), Optional.of(get));
 
 		} catch (Exception e) {
 
@@ -291,7 +300,7 @@ public class UserSchedulerWorker extends SchedulerWorker<UserScheduledSetting> {
 	    throw createException(EXCEPTION_MISSING_MESSAGE, "Missing message from job data map");
 	}
 
-	StorageUri resultStorageURI = message.getUserJobStorageURI();
+	StorageInfo resultStorageURI = message.getUserJobStorageURI();
 	if (resultStorageURI == null) {
 	    throw createException(EXCEPTION_MISSING_RESULT_STORAGE_URI_COMPLEX, "Missing result storage URI complex object from message");
 	}
@@ -300,7 +309,7 @@ public class UserSchedulerWorker extends SchedulerWorker<UserScheduledSetting> {
 	    throw createException(EXCEPTION_MISSING_RESULT_STORAGE_URI, "Missing result storage URI from message");
 	}
 
-	if (resultStorageURI.getStorageName() == null || resultStorageURI.getStorageName().length() == 0) {
+	if (resultStorageURI.getName() == null || resultStorageURI.getName().length() == 0) {
 	    throw createException(EXCEPTION_MISSING_RESULT_STORAGE_URI_STORAGE_NAME,
 		    "Missing result storage URI storage name from message");
 	}

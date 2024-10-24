@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wms._1_3_0;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -48,8 +48,9 @@ import eu.essi_lab.jaxb.wms._1_3_0.Keyword;
 import eu.essi_lab.jaxb.wms._1_3_0.KeywordList;
 import eu.essi_lab.jaxb.wms._1_3_0.Layer;
 import eu.essi_lab.jaxb.wms._1_3_0.WMSCapabilities;
+import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.protocols.NetProtocols;
-import eu.essi_lab.lib.net.utils.Downloader;
+import eu.essi_lab.lib.net.utils.HttpConnectionUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.GSSource;
@@ -81,7 +82,6 @@ public class WMS_1_3_0ResourceMapper extends OriginalIdentifierMapper {
     public WMS_1_3_0ResourceMapper() {
     }
 
-    
     protected Downloader downloader = new Downloader();
 
     public void setDownloader(Downloader downloader) {
@@ -92,7 +92,6 @@ public class WMS_1_3_0ResourceMapper extends OriginalIdentifierMapper {
 	this.wmsDownloader = wmsDownloader;
     }
 
-    
     protected WMS_1_3_0Downloader wmsDownloader = new WMS_1_3_0Downloader();
 
     @Override
@@ -392,8 +391,8 @@ public class WMS_1_3_0ResourceMapper extends OriginalIdentifierMapper {
 		useSourceEndpoint = true;
 	    }
 
-	    if (!useSourceEndpoint && downloader != null) {
-		Optional<Integer> integer = downloader.getResponseCode(mapURL);
+	    if (!useSourceEndpoint) {
+		Optional<Integer> integer = HttpConnectionUtils.getOptionalResponseCode(mapURL);
 		if (integer.isPresent()) {
 		    String status = "" + integer;
 		    // in case of client error, such as 404 not found
@@ -422,6 +421,7 @@ public class WMS_1_3_0ResourceMapper extends OriginalIdentifierMapper {
 	    online.setProtocol(NetProtocols.WMS_1_3_0.getCommonURN());
 	    online.setLinkage(mapURL);
 	    online.setName(wmsLayer.getName());
+	    online.setDescription(wmsLayer.getTitle());
 	    online.setFunctionCode("download");
 	    online.setIdentifier(uuid);
 

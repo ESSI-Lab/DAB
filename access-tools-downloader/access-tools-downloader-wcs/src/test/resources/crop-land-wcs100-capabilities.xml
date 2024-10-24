@@ -1,0 +1,232 @@
+<?xml version='1.0' encoding="ISO-8859-1" standalone="no" ?>
+<WCS_Capabilities
+   version="1.0.0" 
+   updateSequence="0" 
+   xmlns="http://www.opengis.net/wcs" 
+   xmlns:xlink="http://www.w3.org/1999/xlink" 
+   xmlns:gml="http://www.opengis.net/gml" 
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.opengis.net/wcs http://schemas.opengis.net/wcs/1.0.0/wcsCapabilities.xsd">
+<Service>
+  <metadataLink metadataType="TC211" xlink:type="simple" xlink:href="http://www.nass.usda.gov/research/Cropland/metadata/meta.htm"/>  <description>Cropland Data Layer WCS Service</description>
+  <name>MapServer WCS</name>
+  <label>CropScape WCS Server</label>
+  <keywords>
+    <keyword>WCS</keyword>
+    <keyword> CropScape</keyword>
+    <keyword> Cropland Data Layer</keyword>
+  </keywords>
+<responsibleParty>
+    <individualName>Dr. Weiguo Han</individualName>
+    <organisationName>Center for Spatial Information Sceince and Systems</organisationName>
+    <positionName>Research Assistant Professor</positionName>
+  <contactInfo>
+    <phone>
+    <voice>703-993-6111</voice>
+    </phone>
+    <address>
+    <deliveryPoint>4400 University Drive, MS 6E1</deliveryPoint>
+    <city>Fairfax</city>
+    <administrativeArea>VA</administrativeArea>
+    <postalCode>22030</postalCode>
+    <country>USA</country>
+    <electronicMailAddress>whan@gmu.edu</electronicMailAddress>
+    </address>
+    <onlineResource xlink:type="simple" xlink:href="http://gis.csiss.gmu.edu/cgi-bin/cdl_services?"/>
+  </contactInfo>
+</responsibleParty>
+  <fees>none</fees>
+  <accessConstraints>
+    none
+  </accessConstraints>
+</Service>
+<Capability>
+  <Request>
+    <GetCapabilities>
+      <DCPType>
+        <HTTP>
+          <Get><OnlineResource xlink:type="simple" xlink:href="http://gis.csiss.gmu.edu/cgi-bin/cdl_services?" /></Get>
+        </HTTP>
+      </DCPType>
+      <DCPType>
+        <HTTP>
+          <Post><OnlineResource xlink:type="simple" xlink:href="http://gis.csiss.gmu.edu/cgi-bin/cdl_services?" /></Post>
+        </HTTP>
+      </DCPType>
+    </GetCapabilities>
+    <DescribeCoverage>
+      <DCPType>
+        <HTTP>
+          <Get><OnlineResource xlink:type="simple" xlink:href="http://gis.csiss.gmu.edu/cgi-bin/cdl_services?" /></Get>
+        </HTTP>
+      </DCPType>
+      <DCPType>
+        <HTTP>
+          <Post><OnlineResource xlink:type="simple" xlink:href="http://gis.csiss.gmu.edu/cgi-bin/cdl_services?" /></Post>
+        </HTTP>
+      </DCPType>
+    </DescribeCoverage>
+    <GetCoverage>
+      <DCPType>
+        <HTTP>
+          <Get><OnlineResource xlink:type="simple" xlink:href="http://gis.csiss.gmu.edu/cgi-bin/cdl_services?" /></Get>
+        </HTTP>
+      </DCPType>
+      <DCPType>
+        <HTTP>
+          <Post><OnlineResource xlink:type="simple" xlink:href="http://gis.csiss.gmu.edu/cgi-bin/cdl_services?" /></Post>
+        </HTTP>
+      </DCPType>
+    </GetCoverage>
+  </Request>
+  <Exception>
+    <Format>application/vnd.ogc.se_xml</Format>
+  </Exception>
+</Capability>
+<ContentMetadata>
+  <CoverageOfferingBrief>
+  <name>cdl_2009</name>
+  <label>the 2009 Cropland Data Layer</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-127.886599740259 22.9401450824376</gml:pos>
+      <gml:pos>-65.3455155736575 51.6050202016246</gml:pos>
+    </lonLatEnvelope>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <name>cdl_2014</name>
+  <label>the 2014 Cropland Data Layer</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-127.88721217969 22.9402704032552</gml:pos>
+      <gml:pos>-65.3455070126293 51.6051215683218</gml:pos>
+    </lonLatEnvelope>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <name>cdl_2013</name>
+  <label>the 2013 Cropland Data Layer</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-127.88721217969 22.9402704032552</gml:pos>
+      <gml:pos>-65.3455070126293 51.6051215683218</gml:pos>
+    </lonLatEnvelope>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <name>cdl_2012</name>
+  <label>the 2012 Cropland Data Layer</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-127.88721217969 22.9402704032552</gml:pos>
+      <gml:pos>-65.3455070126293 51.6051215683218</gml:pos>
+    </lonLatEnvelope>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <name>cdl_2011</name>
+  <label>the 2011 Cropland Data Layer</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-127.88721217969 22.9402704032552</gml:pos>
+      <gml:pos>-65.3455070126293 51.6051215683218</gml:pos>
+    </lonLatEnvelope>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <name>cdl_2010</name>
+  <label>the 2010 Cropland Data Layer</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-127.88721217969 22.9402704032552</gml:pos>
+      <gml:pos>-65.3455070126293 51.6051215683218</gml:pos>
+    </lonLatEnvelope>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <name>cdl_2008</name>
+  <label>the 2008 Cropland Data Layer</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-127.886599740259 22.9401450824376</gml:pos>
+      <gml:pos>-65.3455155736575 51.6050202016246</gml:pos>
+    </lonLatEnvelope>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <name>cdl_2007</name>
+  <label>the 2007 Cropland Data Layer</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-127.886599740259 26.4534667089505</gml:pos>
+      <gml:pos>-78.0337302974642 51.6048579215701</gml:pos>
+    </lonLatEnvelope>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <name>cdl_2006</name>
+  <label>the 2006 Cropland Data Layer</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-125.127113818695 26.9206826192966</gml:pos>
+      <gml:pos>-78.0337302974642 51.6049428455397</gml:pos>
+    </lonLatEnvelope>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <name>cdl_2005</name>
+  <label>the 2005 Cropland Data Layer</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-119.260492756672 27.7015031627212</gml:pos>
+      <gml:pos>-82.7805223555804 50.5682727904385</gml:pos>
+    </lonLatEnvelope>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <name>cdl_2004</name>
+  <label>the 2004 Cropland Data Layer</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-105.064706240309 24.3319681696842</gml:pos>
+      <gml:pos>-74.6823342644829 49.2298670967555</gml:pos>
+    </lonLatEnvelope>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <name>cdl_2003</name>
+  <label>the 2003 Cropland Data Layer</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-105.064706240309 29.9128968022315</gml:pos>
+      <gml:pos>-83.0529521951643 49.2299347501539</gml:pos>
+    </lonLatEnvelope>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <name>cdl_2002</name>
+  <label>the 2002 Cropland Data Layer</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-105.064706240309 28.3381118653676</gml:pos>
+      <gml:pos>-69.1322196324271 49.2299124863356</gml:pos>
+    </lonLatEnvelope>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <name>cdl_2001</name>
+  <label>the 2001 Cropland Data Layer</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-105.064706240309 29.9128968022315</gml:pos>
+      <gml:pos>-83.0529521951643 49.2299347501539</gml:pos>
+    </lonLatEnvelope>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <name>cdl_2000</name>
+  <label>the 2000 Cropland Data Layer</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-104.429250406229 29.9128968022315</gml:pos>
+      <gml:pos>-83.0529521951643 49.2299169643739</gml:pos>
+    </lonLatEnvelope>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <name>cdl_1999</name>
+  <label>the 1999 Cropland Data Layer</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-104.429250406229 30.1047964708739</gml:pos>
+      <gml:pos>-86.1289560191042 49.2299364770907</gml:pos>
+    </lonLatEnvelope>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <name>cdl_1998</name>
+  <label>the 1998 Cropland Data Layer</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-104.429250406229 45.6990882325956</gml:pos>
+      <gml:pos>-96.5530647927168 49.2287387423382</gml:pos>
+    </lonLatEnvelope>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <name>cdl_1997</name>
+  <label>the 1997 Cropland Data Layer</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-104.429250406229 45.6990882325956</gml:pos>
+      <gml:pos>-96.5530647927168 49.2287387423382</gml:pos>
+    </lonLatEnvelope>
+  </CoverageOfferingBrief>
+</ContentMetadata>
+</WCS_Capabilities>

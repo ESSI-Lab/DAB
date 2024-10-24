@@ -1,0 +1,686 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<gs:Dataset xmlns:gs="http://flora.eu/gi-suite/1.0/dataModel/schema"
+    xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gmd="http://www.isotc211.org/2005/gmd"
+    xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:gml="http://www.opengis.net/gml"
+    xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:gmi="http://www.isotc211.org/2005/gmi"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <gs:source gs:uniqueIdentifier="lbr" gs:strategy="HARVESTED">
+        <gs:endpoint>http://icewater.usu.edu/littlebearriverwof/cuahsi_1_1.asmx?WSDL</gs:endpoint>
+        <gs:label>Little Bear River</gs:label>
+    </gs:source>
+    <gs:harmonizedMetadata>
+        <gs:coreMetadata>
+            <gs:isoMetadata>
+                <gmi:MI_Metadata>
+                    <gmd:fileIdentifier>
+                        <gco:CharacterString>platform;LBR:USU-LBR-Mendon;parameter;LBR:USU3</gco:CharacterString>
+                    </gmd:fileIdentifier>
+                    <gmd:language>
+                        <gco:CharacterString>English</gco:CharacterString>
+                    </gmd:language>
+                    <gmd:characterSet>
+                        <gmd:MD_CharacterSetCode
+                            codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CharacterSetCode"
+                            codeListValue="utf8" codeSpace="ISOTC211/19115"
+                            >utf8</gmd:MD_CharacterSetCode>
+                    </gmd:characterSet>
+                    <gmd:hierarchyLevel>
+                        <gmd:MD_ScopeCode
+                            codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_ScopeCode"
+                            codeListValue="dataset" codeSpace="ISOTC211/19115"
+                            >dataset</gmd:MD_ScopeCode>
+                    </gmd:hierarchyLevel>
+                    <gmd:spatialRepresentationInfo>
+                        <gmd:AbstractMD_SpatialRepresentation
+                            xsi:type="gmd:MD_GridSpatialRepresentation_Type">
+                            <gmd:numberOfDimensions>
+                                <gco:Integer>1</gco:Integer>
+                            </gmd:numberOfDimensions>
+                            <gmd:axisDimensionProperties>
+                                <gmd:MD_Dimension>
+                                    <gmd:dimensionName>
+                                        <gmd:MD_DimensionNameTypeCode
+                                            codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_DimensionNameTypeCode"
+                                            codeListValue="time" codeSpace="ISOTC211/19115"
+                                            >time</gmd:MD_DimensionNameTypeCode>
+                                    </gmd:dimensionName>
+                                    <gmd:dimensionSize>
+                                        <gco:Integer>186664</gco:Integer>
+                                    </gmd:dimensionSize>
+                                    <gmd:resolution>
+                                        <gco:Measure uom="minute">30.0</gco:Measure>
+                                    </gmd:resolution>
+                                </gmd:MD_Dimension>
+                            </gmd:axisDimensionProperties>
+                            <gmd:cellGeometry>
+                                <gmd:MD_CellGeometryCode
+                                    codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CellGeometryCode"
+                                    codeListValue="point" codeSpace="ISOTC211/19115"
+                                    >point</gmd:MD_CellGeometryCode>
+                            </gmd:cellGeometry>
+                        </gmd:AbstractMD_SpatialRepresentation>
+                    </gmd:spatialRepresentationInfo>
+                    <gmd:referenceSystemInfo>
+                        <gmd:MD_ReferenceSystem>
+                            <gmd:referenceSystemIdentifier>
+                                <gmd:RS_Identifier>
+                                    <gmd:code>
+                                        <gco:CharacterString>4269</gco:CharacterString>
+                                    </gmd:code>
+                                    <gmd:codeSpace>
+                                        <gco:CharacterString>EPSG</gco:CharacterString>
+                                    </gmd:codeSpace>
+                                </gmd:RS_Identifier>
+                            </gmd:referenceSystemIdentifier>
+                        </gmd:MD_ReferenceSystem>
+                    </gmd:referenceSystemInfo>
+                    <gmd:referenceSystemInfo>
+                        <gmd:MD_ReferenceSystem>
+                            <gmd:referenceSystemIdentifier>
+                                <gmd:RS_Identifier>
+                                    <gmd:code>
+                                        <gco:CharacterString>NAD83 / UTM zone
+                                            12N</gco:CharacterString>
+                                    </gmd:code>
+                                </gmd:RS_Identifier>
+                            </gmd:referenceSystemIdentifier>
+                        </gmd:MD_ReferenceSystem>
+                    </gmd:referenceSystemInfo>
+                    <gmd:identificationInfo>
+                        <gmd:MD_DataIdentification>
+                            <gmd:citation>
+                                <gmd:CI_Citation>
+                                    <gmd:title>
+                                        <gco:CharacterString>Little Bear River at Mendon Road near
+                                            Mendon, Utah - Battery voltage -
+                                            Minimum</gco:CharacterString>
+                                    </gmd:title>
+                                    <gmd:alternateTitle>
+                                        <gco:CharacterString>Little Bear River Conservation Effects
+                                            Assessment Project Water Quality
+                                            Data</gco:CharacterString>
+                                    </gmd:alternateTitle>
+                                    <gmd:identifier>
+                                        <gmd:MD_Identifier>
+                                            <gmd:code>
+                                                <gco:CharacterString>LBR:USU3</gco:CharacterString>
+                                            </gmd:code>
+                                        </gmd:MD_Identifier>
+                                    </gmd:identifier>
+                                </gmd:CI_Citation>
+                            </gmd:citation>
+                            <gmd:abstract>
+                                <gco:CharacterString>Under funding from the United States Department
+                                    of Agricultures Conservations Effects Assessment program, USU is
+                                    conducting continuous water quality monitoring of the Little
+                                    Bear River to demonstrate and compare the use of alternative
+                                    monitoring approaches in estimating pollutant concentrations and
+                                    loads.</gco:CharacterString>
+                            </gmd:abstract>
+                            <gmd:pointOfContact>
+                                <gmd:CI_ResponsibleParty>
+                                    <gmd:individualName>
+                                        <gco:CharacterString>Jeff Horsburgh</gco:CharacterString>
+                                    </gmd:individualName>
+                                    <gmd:organisationName>
+                                        <gco:CharacterString>Utah State University Utah Water
+                                            Research Laboratory</gco:CharacterString>
+                                    </gmd:organisationName>
+                                    <gmd:positionName>
+                                        <gco:CharacterString>main</gco:CharacterString>
+                                    </gmd:positionName>
+                                    <gmd:contactInfo>
+                                        <gmd:CI_Contact>
+                                            <gmd:phone>
+                                                <gmd:CI_Telephone>
+                                                  <gmd:voice>
+                                                  <gco:CharacterString>1-435-797-2946</gco:CharacterString>
+                                                  </gmd:voice>
+                                                </gmd:CI_Telephone>
+                                            </gmd:phone>
+                                            <gmd:address>
+                                                <gmd:CI_Address>
+                                                  <gmd:deliveryPoint>
+                                                  <gco:CharacterString>8200 Old Main Hill ,Logan, UT
+                                                  84322-8200</gco:CharacterString>
+                                                  </gmd:deliveryPoint>
+                                                  <gmd:electronicMailAddress>
+                                                  <gco:CharacterString>jeff.horsburgh@usu.edu</gco:CharacterString>
+                                                  </gmd:electronicMailAddress>
+                                                </gmd:CI_Address>
+                                            </gmd:address>
+                                            <gmd:onlineResource>
+                                                <gmd:CI_OnlineResource>
+                                                  <gmd:linkage>
+                                                  <gmd:URL>http://littlebearriver.usu.edu</gmd:URL>
+                                                  </gmd:linkage>
+                                                </gmd:CI_OnlineResource>
+                                            </gmd:onlineResource>
+                                        </gmd:CI_Contact>
+                                    </gmd:contactInfo>
+                                    <gmd:role>
+                                        <gmd:CI_RoleCode
+                                            codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_RoleCode"
+                                            codeListValue="custodian" codeSpace="ISOTC211/19115"
+                                            >custodian</gmd:CI_RoleCode>
+                                    </gmd:role>
+                                </gmd:CI_ResponsibleParty>
+                            </gmd:pointOfContact>
+                            <gmd:descriptiveKeywords>
+                                <gmd:MD_Keywords>
+                                    <gmd:keyword>
+                                        <gco:CharacterString>Stream</gco:CharacterString>
+                                    </gmd:keyword>
+                                </gmd:MD_Keywords>
+                            </gmd:descriptiveKeywords>
+                            <gmd:descriptiveKeywords>
+                                <gmd:MD_Keywords>
+                                    <gmd:keyword>
+                                        <gco:CharacterString>Cache</gco:CharacterString>
+                                    </gmd:keyword>
+                                    <gmd:type>
+                                        <gmd:MD_KeywordTypeCode
+                                            codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_KeywordTypeCode"
+                                            codeListValue="place" codeSpace="ISOTC211/19115"
+                                            >place</gmd:MD_KeywordTypeCode>
+                                    </gmd:type>
+                                </gmd:MD_Keywords>
+                            </gmd:descriptiveKeywords>
+                            <gmd:descriptiveKeywords>
+                                <gmd:MD_Keywords>
+                                    <gmd:keyword>
+                                        <gco:CharacterString>Utah</gco:CharacterString>
+                                    </gmd:keyword>
+                                    <gmd:type>
+                                        <gmd:MD_KeywordTypeCode
+                                            codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_KeywordTypeCode"
+                                            codeListValue="place" codeSpace="ISOTC211/19115"
+                                            >place</gmd:MD_KeywordTypeCode>
+                                    </gmd:type>
+                                </gmd:MD_Keywords>
+                            </gmd:descriptiveKeywords>
+                            <gmd:descriptiveKeywords>
+                                <gmd:MD_Keywords>
+                                    <gmd:keyword>
+                                        <gco:CharacterString>Instrumentation</gco:CharacterString>
+                                    </gmd:keyword>
+                                    <gmd:type>
+                                        <gmd:MD_KeywordTypeCode
+                                            codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_KeywordTypeCode"
+                                            codeListValue="discipline" codeSpace="ISOTC211/19115"
+                                            >discipline</gmd:MD_KeywordTypeCode>
+                                    </gmd:type>
+                                </gmd:MD_Keywords>
+                            </gmd:descriptiveKeywords>
+                            <gmd:descriptiveKeywords>
+                                <gmd:MD_Keywords>
+                                    <gmd:keyword>
+                                        <gco:CharacterString>Not Relevant</gco:CharacterString>
+                                    </gmd:keyword>
+                                    <gmd:type>
+                                        <gmd:MD_KeywordTypeCode
+                                            codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_KeywordTypeCode"
+                                            codeListValue="stratum" codeSpace="ISOTC211/19115"
+                                            >stratum</gmd:MD_KeywordTypeCode>
+                                    </gmd:type>
+                                </gmd:MD_Keywords>
+                            </gmd:descriptiveKeywords>
+                            <gmd:descriptiveKeywords>
+                                <gmd:MD_Keywords>
+                                    <gmd:keyword>
+                                        <gco:CharacterString>volts</gco:CharacterString>
+                                    </gmd:keyword>
+                                </gmd:MD_Keywords>
+                            </gmd:descriptiveKeywords>
+                            <gmd:descriptiveKeywords>
+                                <gmd:MD_Keywords>
+                                    <gmd:keyword>
+                                        <gco:CharacterString>Potential
+                                            Difference</gco:CharacterString>
+                                    </gmd:keyword>
+                                </gmd:MD_Keywords>
+                            </gmd:descriptiveKeywords>
+                            <gmd:descriptiveKeywords>
+                                <gmd:MD_Keywords>
+                                    <gmd:keyword>
+                                        <gco:CharacterString>Raw data</gco:CharacterString>
+                                    </gmd:keyword>
+                                    <gmd:thesaurusName>
+                                        <gmd:CI_Citation>
+                                            <gmd:title>
+                                                <gco:CharacterString>CUAHSI Quality Control Levels
+                                                  CV</gco:CharacterString>
+                                            </gmd:title>
+                                        </gmd:CI_Citation>
+                                    </gmd:thesaurusName>
+                                </gmd:MD_Keywords>
+                            </gmd:descriptiveKeywords>
+                            <gmd:descriptiveKeywords>
+                                <gmd:MD_Keywords>
+                                    <gmd:keyword>
+                                        <gco:CharacterString>Field Observation</gco:CharacterString>
+                                    </gmd:keyword>
+                                    <gmd:thesaurusName>
+                                        <gmd:CI_Citation>
+                                            <gmd:title>
+                                                <gco:CharacterString>CUAHSI Value Type
+                                                  CV</gco:CharacterString>
+                                            </gmd:title>
+                                        </gmd:CI_Citation>
+                                    </gmd:thesaurusName>
+                                </gmd:MD_Keywords>
+                            </gmd:descriptiveKeywords>
+                            <gmd:descriptiveKeywords>
+                                <gmd:MD_Keywords>
+                                    <gmd:keyword>
+                                        <gco:CharacterString>Minimum</gco:CharacterString>
+                                    </gmd:keyword>
+                                    <gmd:thesaurusName>
+                                        <gmd:CI_Citation>
+                                            <gmd:title>
+                                                <gco:CharacterString>CUAHSI Data Type
+                                                  CV</gco:CharacterString>
+                                            </gmd:title>
+                                        </gmd:CI_Citation>
+                                    </gmd:thesaurusName>
+                                </gmd:MD_Keywords>
+                            </gmd:descriptiveKeywords>
+                            <gmd:spatialResolution>
+                                <gmd:MD_Resolution>
+                                    <gmd:distance>
+                                        <gco:Distance uom="m">10.0</gco:Distance>
+                                    </gmd:distance>
+                                </gmd:MD_Resolution>
+                            </gmd:spatialResolution>
+                            <gmd:topicCategory>
+                                <gmd:MD_TopicCategoryCode>inlandWaters</gmd:MD_TopicCategoryCode>
+                            </gmd:topicCategory>
+                            <gmd:extent>
+                                <gmd:EX_Extent>
+                                    <gmd:description>
+                                        <gco:CharacterString>Cache ; Utah</gco:CharacterString>
+                                    </gmd:description>
+                                    <gmd:geographicElement>
+                                        <gmd:EX_GeographicBoundingBox>
+                                            <gmd:westBoundLongitude>
+                                                <gco:Decimal>-111.946402</gco:Decimal>
+                                            </gmd:westBoundLongitude>
+                                            <gmd:eastBoundLongitude>
+                                                <gco:Decimal>-111.946402</gco:Decimal>
+                                            </gmd:eastBoundLongitude>
+                                            <gmd:southBoundLatitude>
+                                                <gco:Decimal>41.718473</gco:Decimal>
+                                            </gmd:southBoundLatitude>
+                                            <gmd:northBoundLatitude>
+                                                <gco:Decimal>41.718473</gco:Decimal>
+                                            </gmd:northBoundLatitude>
+                                        </gmd:EX_GeographicBoundingBox>
+                                    </gmd:geographicElement>
+                                </gmd:EX_Extent>
+                            </gmd:extent>
+                            <gmd:extent>
+                                <gmd:EX_Extent>
+                                    <gmd:verticalElement>
+                                        <gmd:EX_VerticalExtent>
+                                            <gmd:minimumValue>
+                                                <gco:Real>1345.0</gco:Real>
+                                            </gmd:minimumValue>
+                                            <gmd:maximumValue>
+                                                <gco:Real>1345.0</gco:Real>
+                                            </gmd:maximumValue>
+                                            <gmd:verticalCRS>
+                                                <gml:VerticalCRS gml:id="NGVD29"/>
+                                            </gmd:verticalCRS>
+                                        </gmd:EX_VerticalExtent>
+                                    </gmd:verticalElement>
+                                </gmd:EX_Extent>
+                            </gmd:extent>
+                            <gmd:extent>
+                                <gmd:EX_Extent>
+                                    <gmd:temporalElement>
+                                        <gmd:EX_TemporalExtent>
+                                            <gmd:extent>
+                                                <gml:TimePeriod>
+                                                  <gml:beginPosition>2005-08-04T18:30:00Z</gml:beginPosition>
+                                                  <gml:endPosition>2016-08-02T19:30:00Z</gml:endPosition>
+                                                </gml:TimePeriod>
+                                            </gmd:extent>
+                                        </gmd:EX_TemporalExtent>
+                                    </gmd:temporalElement>
+                                </gmd:EX_Extent>
+                            </gmd:extent>
+                        </gmd:MD_DataIdentification>
+                    </gmd:identificationInfo>
+                    <gmd:contentInfo>
+                        <gmd:MD_CoverageDescription>
+                            <gmd:attributeDescription>
+                                <gco:RecordType xlink:href="Battery voltage">Battery voltage Data
+                                    type: Minimum Value type: Field Observation Units: volts Units
+                                    type: Potential Difference Unit abbreviation: V No data value:
+                                    -9999 Speciation: Not Applicable</gco:RecordType>
+                            </gmd:attributeDescription>
+                            <gmd:contentType>
+                                <gmd:MD_CoverageContentTypeCode
+                                    codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode"
+                                    codeListValue="physicalMeasurement" codeSpace="ISOTC211/19115"
+                                    >physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+                            </gmd:contentType>
+                        </gmd:MD_CoverageDescription>
+                    </gmd:contentInfo>
+                    <gmd:distributionInfo>
+                        <gmd:MD_Distribution>
+                            <gmd:distributionFormat>
+                                <gmd:MD_Format>
+                                    <gmd:name>
+                                        <gco:CharacterString>WaterML 1.1</gco:CharacterString>
+                                    </gmd:name>
+                                </gmd:MD_Format>
+                            </gmd:distributionFormat>
+                            <gmd:transferOptions>
+                                <gmd:MD_DigitalTransferOptions>
+                                    <gmd:onLine>
+                                        <gmd:CI_OnlineResource
+                                            id="59b10db1-cb21-4f9b-980c-e3003da43e3c">
+                                            <gmd:linkage>
+                                                <gmd:URL>http://icewater.usu.edu/littlebearriverwof/cuahsi_1_1.asmx?WSDL</gmd:URL>
+                                            </gmd:linkage>
+                                            <gmd:protocol>
+                                                <gco:CharacterString>urn:ogc:serviceType:WaterOneFlow:1.1:HTTP</gco:CharacterString>
+                                            </gmd:protocol>
+                                            <gmd:name>
+                                                <gco:CharacterString>platform;LBR:USU-LBR-Mendon;parameter;LBR:USU3</gco:CharacterString>
+                                            </gmd:name>
+                                            <gmd:function>
+                                                <gmd:CI_OnLineFunctionCode
+                                                  codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode"
+                                                  codeListValue="download"
+                                                  codeSpace="ISOTC211/19115"
+                                                  >download</gmd:CI_OnLineFunctionCode>
+                                            </gmd:function>
+                                        </gmd:CI_OnlineResource>
+                                    </gmd:onLine>
+                                </gmd:MD_DigitalTransferOptions>
+                            </gmd:transferOptions>
+                        </gmd:MD_Distribution>
+                    </gmd:distributionInfo>
+                    <gmd:dataQualityInfo>
+                        <gmd:DQ_DataQuality>
+                            <gmd:lineage>
+                                <gmd:LI_Lineage>
+                                    <gmd:statement>
+                                        <gco:CharacterString>Battery voltage measured by Campbell
+                                            Scientific CR206 datalogger.</gco:CharacterString>
+                                    </gmd:statement>
+                                </gmd:LI_Lineage>
+                            </gmd:lineage>
+                        </gmd:DQ_DataQuality>
+                    </gmd:dataQualityInfo>
+                    <gmi:acquisitionInformation>
+                        <gmi:MI_AcquisitionInformation>
+                            <gmi:platform>
+                                <gmi:MI_Platform>
+                                    <gmi:citation>
+                                        <gmd:CI_Citation>
+                                            <gmd:title>
+                                                <gco:CharacterString>Little Bear River at Mendon
+                                                  Road near Mendon, Utah</gco:CharacterString>
+                                            </gmd:title>
+                                        </gmd:CI_Citation>
+                                    </gmi:citation>
+                                    <gmi:identifier>
+                                        <gmd:MD_Identifier>
+                                            <gmd:code>
+                                                <gco:CharacterString>LBR:USU-LBR-Mendon</gco:CharacterString>
+                                            </gmd:code>
+                                        </gmd:MD_Identifier>
+                                    </gmi:identifier>
+                                    <gmi:description>
+                                        <gco:CharacterString>Little Bear River at Mendon Road near
+                                            Mendon, Utah ; Stream ; Located below county road bridge
+                                            at Mendon Road crossing</gco:CharacterString>
+                                    </gmi:description>
+                                </gmi:MI_Platform>
+                            </gmi:platform>
+                        </gmi:MI_AcquisitionInformation>
+                    </gmi:acquisitionInformation>
+                </gmi:MI_Metadata>
+            </gs:isoMetadata>
+        </gs:coreMetadata>
+        <gs:augmentedMetadata/>
+        <gs:extendedMetadata>
+            <gs:extension>
+                <gs:accessReports>
+                    <gs:report>
+                        <gs:onlineId>59b10db1-cb21-4f9b-980c-e3003da43e3c</gs:onlineId>
+                        <gs:timeStamp>2018-04-05T10:10:48Z</gs:timeStamp>
+                        <gs:targetComplianceLevel>TS-B</gs:targetComplianceLevel>
+                        <gs:targetTest>EXECUTION</gs:targetTest>
+                        <gs:lastSucceededTest>EXECUTION</gs:lastSucceededTest>
+                        <gs:previewDescriptor>
+                            <gs:dataType>TIME_SERIES</gs:dataType>
+                            <gs:dataFormat>WATERML_1_1</gs:dataFormat>
+                            <gs:CRS>EPSG:4326</gs:CRS>
+                            <gs:continueSpatialDimensions>
+                                <gs:continueDimension>
+                                    <gs:name>Latitude</gs:name>
+                                    <gs:type>column</gs:type>
+                                    <gs:lower xsi:type="xs:double">41.718473</gs:lower>
+                                    <gs:upper xsi:type="xs:double">41.718473</gs:upper>
+                                    <gs:uom>degree</gs:uom>
+                                </gs:continueDimension>
+                                <gs:continueDimension>
+                                    <gs:name>Longitude</gs:name>
+                                    <gs:type>row</gs:type>
+                                    <gs:lower xsi:type="xs:double">-111.946402</gs:lower>
+                                    <gs:upper xsi:type="xs:double">-111.946402</gs:upper>
+                                    <gs:uom>degree</gs:uom>
+                                </gs:continueDimension>
+                            </gs:continueSpatialDimensions>
+                            <gs:continueTemporalDimension>
+                                <gs:name>time</gs:name>
+                                <gs:type>time</gs:type>
+                                <gs:lower xsi:type="xs:long">1123180200000</gs:lower>
+                                <gs:upper xsi:type="xs:long">1123216200000</gs:upper>
+                                <gs:uom>millisecond</gs:uom>
+                                <gs:datum>1970-01-01T00:00:00Z</gs:datum>
+                                <gs:resolution xsi:type="xs:long">1800000</gs:resolution>
+                            </gs:continueTemporalDimension>
+                            <gs:continueOtherDimensions>
+                                <gs:continueDimension>
+                                    <gs:name>vertical</gs:name>
+                                    <gs:type>vertical</gs:type>
+                                    <gs:lower xsi:type="xs:double">1345.0</gs:lower>
+                                    <gs:upper xsi:type="xs:double">1345.0</gs:upper>
+                                    <gs:uom>metre</gs:uom>
+                                    <gs:datum>NGVD29</gs:datum>
+                                </gs:continueDimension>
+                            </gs:continueOtherDimensions>
+                        </gs:previewDescriptor>
+                        <gs:fullDescriptor>
+                            <gs:dataType>TIME_SERIES</gs:dataType>
+                            <gs:dataFormat>WATERML_1_1</gs:dataFormat>
+                            <gs:CRS>EPSG:4326</gs:CRS>
+                            <gs:continueSpatialDimensions>
+                                <gs:continueDimension>
+                                    <gs:name>Latitude</gs:name>
+                                    <gs:type>column</gs:type>
+                                    <gs:lower xsi:type="xs:double">41.718473</gs:lower>
+                                    <gs:upper xsi:type="xs:double">41.718473</gs:upper>
+                                    <gs:uom>degree</gs:uom>
+                                </gs:continueDimension>
+                                <gs:continueDimension>
+                                    <gs:name>Longitude</gs:name>
+                                    <gs:type>row</gs:type>
+                                    <gs:lower xsi:type="xs:double">-111.946402</gs:lower>
+                                    <gs:upper xsi:type="xs:double">-111.946402</gs:upper>
+                                    <gs:uom>degree</gs:uom>
+                                </gs:continueDimension>
+                            </gs:continueSpatialDimensions>
+                            <gs:continueTemporalDimension>
+                                <gs:name>time</gs:name>
+                                <gs:type>time</gs:type>
+                                <gs:lower xsi:type="xs:long">1123180200000</gs:lower>
+                                <gs:upper xsi:type="xs:long">1123216200000</gs:upper>
+                                <gs:uom>millisecond</gs:uom>
+                                <gs:datum>1970-01-01T00:00:00Z</gs:datum>
+                                <gs:resolution xsi:type="xs:long">1800000</gs:resolution>
+                            </gs:continueTemporalDimension>
+                            <gs:continueOtherDimensions>
+                                <gs:continueDimension>
+                                    <gs:name>vertical</gs:name>
+                                    <gs:type>vertical</gs:type>
+                                    <gs:lower xsi:type="xs:double">1345.0</gs:lower>
+                                    <gs:upper xsi:type="xs:double">1345.0</gs:upper>
+                                    <gs:uom>metre</gs:uom>
+                                    <gs:datum>NGVD29</gs:datum>
+                                </gs:continueDimension>
+                            </gs:continueOtherDimensions>
+                        </gs:fullDescriptor>
+                        <gs:basicTest>
+                            <gs:workflowsCount>1</gs:workflowsCount>
+                            <gs:workflowsLength>2</gs:workflowsLength>
+                        </gs:basicTest>
+                        <gs:downloadTest>
+                            <gs:downloadable>true</gs:downloadable>
+                            <gs:downloadTimeLong>3702</gs:downloadTimeLong>
+                            <gs:downloadTime>00:03.702</gs:downloadTime>
+                        </gs:downloadTest>
+                        <gs:validationTest>
+                            <gs:validationResult>VALIDATION_SUCCESSFUL</gs:validationResult>
+                        </gs:validationTest>
+                        <gs:executionTest>
+                            <gs:executionResult>VALIDATION_SUCCESSFUL</gs:executionResult>
+                            <gs:executionTimeLong>683</gs:executionTimeLong>
+                            <gs:executionTime>00:00.683</gs:executionTime>
+                        </gs:executionTest>
+                    </gs:report>
+                </gs:accessReports>
+            </gs:extension>
+        </gs:extendedMetadata>
+    </gs:harmonizedMetadata>
+    <gs:originalMetadata>
+        <gs:schemeURI>http://www.cuahsi.org/waterML/1.1/</gs:schemeURI>
+        <gs:metadata><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<timeSeries xmlns="http://www.cuahsi.org/waterML/1.1/"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+         <sourceInfo xsi:type="SiteInfoType">
+            <siteName>Little Bear River at Mendon Road near Mendon, Utah</siteName>
+            <siteCode network="LBR" siteID="1">USU-LBR-Mendon</siteCode>
+            <geoLocation>
+               <geogLocation srs="EPSG:4269" xsi:type="LatLonPointType">
+                  <latitude>41.718473</latitude>
+                  <longitude>-111.946402</longitude>
+               </geogLocation>
+               <localSiteXY projectionInformation="NAD83 / UTM zone 12N">
+                  <X>421276.323</X>
+                  <Y>4618952.04</Y>
+               </localSiteXY>
+            </geoLocation>
+            <elevation_m>1345</elevation_m>
+            <verticalDatum>NGVD29</verticalDatum>
+            <siteProperty name="County">Cache</siteProperty>
+            <siteProperty name="State">Utah</siteProperty>
+            <siteProperty name="Site Comments">Located below county road bridge at Mendon Road crossing</siteProperty>
+            <siteProperty name="PosAccuracy_m">10</siteProperty>
+            <siteProperty name="Site Type">Stream</siteProperty>
+         </sourceInfo>
+         <variable>
+            <variableCode default="true" variableID="3" vocabulary="LBR">USU3</variableCode>
+            <variableName>Battery voltage</variableName>
+            <valueType>Field Observation</valueType>
+            <dataType>Minimum</dataType>
+            <generalCategory>Instrumentation</generalCategory>
+            <sampleMedium>Not Relevant</sampleMedium>
+            <unit>
+               <unitName>volts</unitName>
+               <unitType>Potential Difference</unitType>
+               <unitAbbreviation>V</unitAbbreviation>
+               <unitCode>168</unitCode>
+            </unit>
+            <noDataValue>-9999</noDataValue>
+            <timeScale isRegular="true">
+               <unit>
+                  <unitName>minute</unitName>
+                  <unitType>Time</unitType>
+                  <unitAbbreviation>min</unitAbbreviation>
+                  <unitCode>102</unitCode>
+               </unit>
+               <timeSupport>30</timeSupport>
+            </timeScale>
+            <speciation>Not Applicable</speciation>
+         </variable>
+         <values>
+            <value censorCode="nc"
+             dateTime="2005-08-04T11:30:00"
+             dateTimeUTC="2005-08-04T18:30:00"
+             methodCode="4"
+             qualityControlLevelCode="0"
+             sourceCode="1"
+             timeOffset="-07:00">13.24467</value>
+            <qualityControlLevel qualityControlLevelID="0">
+               <qualityControlLevelCode>0</qualityControlLevelCode>
+               <definition>Raw data</definition>
+               <explanation>Raw and unprocessed data and data products that have not undergone quality control.  Depending on the variable, data type, and data transmission system, raw data may be available within seconds or minutes after the measurements have been made. Examples include real time precipitation, streamflow and water quality measurements.</explanation>
+            </qualityControlLevel>
+            <method methodID="4">
+               <methodCode>4</methodCode>
+               <methodDescription>Battery voltage measured by Campbell Scientific CR206 datalogger.</methodDescription>
+               <methodLink>http://www.campbellsci.com</methodLink>
+            </method>
+            <source sourceID="1">
+               <sourceCode>1</sourceCode>
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Continuous water quality monitoring by Utah State University as part of the USDA CEAP Grant</sourceDescription>
+               <metadata>
+                  <topicCategory>inlandWaters</topicCategory>
+                  <title>Little Bear River Conservation Effects Assessment Project Water Quality Data</title>
+                  <abstract>Under funding from the United States Department of Agricultures Conservations Effects Assessment program, USU is conducting continuous water quality monitoring of the Little Bear River to demonstrate and compare the use of alternative monitoring approaches in estimating pollutant concentrations and loads.</abstract>
+                  <profileVersion>Unknown</profileVersion>
+               </metadata>
+               <contactInformation>
+                  <contactName>Jeff Horsburgh</contactName>
+                  <typeOfContact>main</typeOfContact>
+                  <email>jeff.horsburgh@usu.edu</email>
+                  <phone>1-435-797-2946</phone>
+                  <address xsi:type="xsd:string">8200 Old Main Hill
+,Logan, UT 84322-8200</address>
+               </contactInformation>
+               <sourceLink>http://littlebearriver.usu.edu</sourceLink>
+               <citation>Continuous water quality monitoring by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <censorCode>
+               <censorCode>nc</censorCode>
+               <censorCodeDescription>not censored</censorCodeDescription>
+            </censorCode>
+         </values>
+      <valueCount>186664</valueCount>
+   <variableTimeInterval>
+      <beginDateTime>2005-08-04T11:30:00</beginDateTime>
+      <endDateTime>2016-08-02T12:30:00</endDateTime>
+      <beginDateTimeUTC>2005-08-04T18:30:00</beginDateTimeUTC>
+      <endDateTimeUTC>2016-08-02T19:30:00</endDateTimeUTC>
+   </variableTimeInterval>
+</timeSeries>]]></gs:metadata>
+    </gs:originalMetadata>
+    <gs:indexesMetadata>
+          <gs:resourceType>Dataset</gs:resourceType>        
+          <gs:resourceTimeStamp>2018-01-01T00:00:00Z</gs:resourceTimeStamp>
+          <gs:onlineId>59b10db1-cb21-4f9b-980c-e3003da43e3c</gs:onlineId>
+          <gs:sourceId>lbr</gs:sourceId>
+          <gs:originalId>platform;LBR:USU-LBR-Mendon;parameter;LBR:USU3</gs:originalId>
+          <gs:privateId>f91662aa-ee53-4700-a061-be7cd97b1257</gs:privateId>
+          <gs:testTimeStamp>2018-04-05T10:10:48Z</gs:testTimeStamp>
+          <gs:succeededTest>EXECUTION</gs:succeededTest>
+          <gs:isTransformable>true</gs:isTransformable>
+          <gs:isDownloadable>true</gs:isDownloadable>
+          <gs:isExecutable>true</gs:isExecutable>
+          <gs:testDownloadTime>3702</gs:testDownloadTime>
+          <gs:testExecutionTime>683</gs:testExecutionTime>
+          <gs:complianceLevel>TS-B</gs:complianceLevel>
+          <gs:accessQuality>10</gs:accessQuality>        
+    </gs:indexesMetadata>
+</gs:Dataset>

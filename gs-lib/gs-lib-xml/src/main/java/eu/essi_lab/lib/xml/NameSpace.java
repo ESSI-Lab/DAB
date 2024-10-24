@@ -4,7 +4,7 @@ package eu.essi_lab.lib.xml;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,6 +30,11 @@ public enum NameSpace {
      * The GI-suite name space
      */
     GI_SUITE_DATA_MODEL(NameSpace.GS_DATA_MODEL_SCHEMA_URI, NameSpace.GI_SUITE_DATA_MODEL_SCHEMA_PREFIX);
+  
+    /**
+     * 
+     */
+    public static final String NAMESPACE_PREFIX_MAPPER_IMPL = "com.sun.xml.bind.namespacePrefixMapper";
 
     /**
      * The GI-suite Data model schema version

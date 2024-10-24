@@ -1,0 +1,693 @@
+#
+# National Water Information System
+# 2018/03/05
+#
+#
+# Date Retrieved: USGS Water Data for the Nation Help System
+#
+agency_cd	party_nm
+5s	64s
+AK001	Alaska Department of Transportation and Public Facilities
+AK002	Alaska Department of Environmental Conservation
+AK004	Alaska Department of Natural Resources (DNR)
+AK008	Alaska Department of Fish and Game
+AK010	Alaska DNR, Division of Land and Water Management
+AK011	Alaska DNR, Division of Geological and Geophysical Surveys
+AL001	Alabama Geological Survey
+AL002	Alabama Water Improvement Commission
+AL003	Auburn University Water Resources Research Institute, AL
+AL006	Alabama State Highway Department
+AL012	Alabama Office of Water Resources
+AR001	Arkansas Dept of Health, Bureau of Environmental Engineering
+AR004	Arkansas Geological Survey
+AR008	Arkansas Natural Resources Commission
+AR019	International Paper-Pine Bluff, AR
+AR025	Union County Conservation District, AR
+ASCE	American Society of Civil Engineers
+AWRA	American Water Resources Association
+AYRES	Ayres Associates
+AZ001	University of Arizona, Water Resources Research Center
+AZ002	Roosevelt Irrigation District, AZ
+AZ003	Arizona Game and Fish Department
+AZ004	Maricopa County Municipal Water Conservation District #1, AZ
+AZ005	Gila Water Commissioner, AZ
+AZ006	Salt River Valley Water Users Association, AZ
+AZ007	Arizona Department of Health
+AZ008	Central Arizona Project
+AZ009	Arizona Department of Environmental Quality
+AZ010	Arizona Corporation Commission
+AZ011	Salt River Project, AZ
+AZ013	City of Tucson Water and Sewer Department, AZ
+AZ014	Arizona Department of Water Resources
+AZ015	Motorola Aerial Remote Sensing, Inc., AZ
+AZ017	Arizona Department of Transportation
+AZ021	Arizona State University
+AZ044	US Water Conservation Laboratory, AZ
+AZ047	Southwest Rangeland Watershed, AZ
+AZ052	Arizona State Land Department
+AZ056	Maricopa County Flood Control District, AZ
+AZ063	Northern Arizona University
+AZ070	Pima County Flood Control District, AZ
+AZ080	University of Arizona
+AZ100	Arizona Geological Survey
+AZ112	Colorado River Indian Tribes, AZ
+AZ115	Havasupai Tribe, AZ
+AZ116	City of Flagstaff, AZ
+AZ117	City of Williams, AZ
+AZ118	Valle Water Users Association, AZ
+AZ119	Tusayan Water Users Association, AZ
+AZ120	Yuma County Water Users Association, AZ
+AZ121	Fort Mojave Indian Tribes, AZ
+AZ122	Phelps Dodge, AZ
+AZ123	Freeport-McMoRan Inc., AZ
+AZ124	US Indian Health Service, AZ
+AZ125	Arizona Testing Laboratories
+AZ126	Mohave Valley Irrigation and Drainage District, AZ
+CA001	California Department of Water Resources
+CA002	San-Lo Aerial Surveys Inc, CA
+CA005	Los Angeles County Flood Control District, CA
+CA006	Alameda County Water District, CA
+CA008	Whitewater Mutual Water Company, CA
+CA009	California State Water Resources Control Board
+CA011	Phelan Pinyon Hills Community Services District, CA
+CA015	Coachella Valley County Water District, CA
+CA016	Ventura County Flood Control District, CA
+CA020	Turlock Irrigation District, CA
+CA025	East Bay Municipal Utility District, CA
+CA026	Modesto Irrigation District, CA
+CA036	Buena Vista Water Storage District, CA
+CA039	Monterey County Flood Control & Water Conservation District, CA
+CA040	San Luis Obispo Cnty Flood Control & Water Conservation Dist, CA
+CA042	Santa Barbara County Flood Control & Water Conservation Dist, CA
+CA043	Metropolitan Water District of Southern California
+CA045	North Marin County Water District, CA
+CA047	Alameda County Flood Control & Water Conservation District, CA
+CA048	Santa Clara Valley Water District, CA
+CA049	Tule Irrigation District, CA
+CA051	Los Angeles City Department of Water and Power, CA
+CA052	Desert Water Agency, CA
+CA057	Riverside County Flood Control & Water Conservation District, CA
+CA065	Pacific Gas and Electric Company, CA
+CA066	Southern California Edison Company, CA
+CA087	Napa County Flood Control & Water Conservation District, CA
+CA088	San Diego County Health Department, CA
+CA092	San Luis Obispo County Health Agency, CA
+CA093	Monterey County Health Department, CA
+CA098	Humboldt-Del Norte County Public Health Department, CA
+CA105	University of California, Berkeley-Lawrence Livermore Lab
+CA111	California Department of Health
+CA114	Central Coast Region, CA Regional Water Quality Control Board
+CA116	Central Valley Region, CA Regional Water Quality Control Board
+CA154	Wheeler Ridge-Maricopa Water Storage District, CA
+CA155	North Kern Water Storage District, CA
+CA160	Fresno County Department of Health, CA
+CA161	Fresno City Department of Public Works, CA
+CA163	San Joaquin County Department of Public Works, CA
+CA166	Kern County Water Agency, CA
+CA174	Foster Farms (Delhi), CA
+CA175	Stanislaus County Department of Environmental Resources, CA
+CA176	Pacific Fibreboard, CA
+CA177	Selma-Kingsburg-Fowler Sanitation District, CA
+CA178	F.M.C. Corporation, CA
+CA179	Arvin-Edison Water Storage District, CA
+CA186	Soquel Creek County Water District, CA
+CA188	Sacramento Municipal Utility District, CA
+CA208	City of San Diego Water Utilities Department, CA
+CA217	Santa Margarita Water District, CA
+CA220	Yucaipa Valley County Water District, CA
+CA226	San Francisco Water District, CA
+CA235	California-American Water Company, CA
+CA239	San Lorenzo Valley County Water District, CA
+CA241	California Water Service Company
+CA244	Coastside County Water Department, CA
+CA251	City of Dos Palos, CA
+CA335	Sonoma County Water Agency, CA
+CA338	Envirosphere Company, CA
+CA351	Benchmark Photography, CA
+CA381	Mojave Water Agency, CA
+CA397	Santa Maria Valley Water Conservation District, CA
+CA400	Sacramento Suburban Water District, Sacramento, CA
+CA551	City of Santa Barbara, CA
+CA552	City of Lompoc, CA
+CA553	Water Replenishment District of Southern California
+CA555	San Gorgonio Pass Water Agency, CA
+CA557	Los Angeles County Sanitation Districts, CA
+CA558	Palo Verde Irrigation District, CA
+CA563	Riverside County Waste Management Department, CA
+CA564	Victor Valley Water District, Victorville, CA
+CA565	Hesperia Water District, CA
+CA566	Southern California Water, San Bernardino
+CA567	Twentynine Palms Water District, CA
+CA568	Bighorn-Desert View Water Agency, Yucca Valley, CA
+CA569	High Desert Water District, Yucca Valley, CA
+CA570	Sheep Creek Water Company, Phelan, CA
+CA571	City of Adelanto, CA
+CA572	Apple Valley Ranchos Water District, Apple Valley, CA
+CA573	Joshua Basin Water District, Joshua Tree, CA
+CA574	Imperial Irrigation District, CA
+CA576	Borrego Water District, Borrego Springs, CA
+CA578	San Luis and Delta-Mendota Water Authority, Byron, CA
+CA579	Western Heights Water Company, Yucaipa, CA
+CA582	Luhdorff and Scalmanini Consulting Engineers, CA
+CAX01	Inland Waters Directorate, Water Resources Bureau, Canada
+CAX11	Environment Canada, Inland Waters Directorate
+CHMH	CH2M/Hill
+CO001	Denver Water Department, CO
+CO002	Colorado Division of Water Resources, Office of State Engineer
+CO003	City of Colorado Springs Water Division, CO
+CO004	Boulder City-County Health Department, CO
+CO005	Pueblo Board of Water Works, CO
+CO006	Colorado Department of Natural Resources
+CO008	Metropolitan Denver Sewage Disposal District #1, CO
+CO012	Pikes Peak Area Council of Governments, CO
+CO020	Colorado Department of Highways
+CO025	Rio Grande Water Conservancy District, CO
+CO026	Cherokee Water District, CO
+CO034	Colorado Geological Survey
+CO040	EPA Region 8, CO
+CO046	Colorado State University
+CO052	Arkansas River Compact Administration, CO
+CO054	City of Aurora, CO
+CO153	Upper Clear Creek Advisory Group, CO
+CT005	University of Connecticut
+DC001	District of Columbia Department of Environmental Services
+DE001	Delaware Geological Survey
+DE002	Delaware Department of Natural Resources & Environmental Control
+DE005	Delaware Department of Transportation
+DMI	Dames & Moore, Inc
+EERCI	Energy Environmental Resource Consultants, Inc
+FL001	Bureau of Geology, Florida Department of Natural Resources
+FL002	Florida Department of Transportation
+FL005	South Florida Water Management District
+FL007	Southwest Florida Water Management District
+FL016	Dade County, FL
+FL022	Lee County, FL
+FL030	Volusia County, FL
+FL039	City of Jacksonville Water Conservation, FL
+FL043	City of Pensacola, FL
+FL051	Florida Department of Environmental Regulation
+FL069	Sarasota County Public Works, FL
+FL083	Northwest Florida Water Management District
+FL084	Suwannee River Water Management District, FL
+FL085	St. Johns River Water Management District, FL
+FL117	Univ of Miami-Rosenstiel School of Marine & Atmospheric Sci., FL
+FL121	University of Miami, FL
+FL124	Auburn University, FL
+FL125	Florida Department of Health & Rehabilitative Services
+FL128	University of Florida
+FL129	Florida Keys Aqueduct Authority
+FL130	Florida Geological Survey
+FL220	Tampa Bay Water, FL
+FL221	Alachua County Department of Environmental Protection, FL
+FL222	Pinellas County, FL
+GA009	Environmental Protection Div, Georgia Dept of Natural Resources
+GA025	City of Brunswick, GA
+GA027	Albany Water, Gas, and Light Commission, GA
+GQ012	Guam Environmental Protection Agency
+HI001	Honolulu Board of Water Supply, HI
+HI003	County of Maui Department of Water Supply, HI
+HI007	HI Dept of Land & Natural Resources, Div of Water & Land Dev
+HI021	HI Dept of Land & Natural Resources, Div of Aquatic Resources
+HI022	Norman Saito Engineering Consultant Inc, HI
+HI023	Wailuku Sugar Company, HI
+HI024	Pioneer Mill Company, HI
+HI025	HI Dept of Land & Natural Resources, Comm on Water Resource Mgt
+HI026	Hawaiian Commercial & Sugar Company, HI
+HI027	Department of Water Supply, County of Maui, HI
+HI028	Hawaii State Department of Health
+IA001	State Hygienic Laboratory, University of Iowa
+IA004	Fond du Lac Band of Lake Superior Chippewa, MN
+IA004	Iowa State University, Ames, IA
+IA005	Department of Civil Engineering, University of Iowa
+IA018	Iowa Geological Survey, Iowa City
+IA021	Iowa Department of Water, Air, and Waste Management
+ID001	Idaho Department of Water Resources
+ID002	Idaho Fish and Game Department
+ID003	Water Resources Research Institute, University of Idaho
+ID004	Idaho Department of Health and Welfare
+ID011	Idaho Bureau of Mines and Geology
+IL001	Illinois Department of Public Health
+IL002	Metropolitan Water Reclamation District of Greater Chicago, IL
+IL003	Illinois State Water Survey
+IL004	Illinois Department of Transportation
+IL006	State of Illinois Environmental Protection Agency
+IL010	Illinois Natural History Survey
+IL019	Illinois Department of Agriculture
+IL028	Illinois State Geological Survey
+IL032	Illinois Water Resources Division
+IL038	Northern Illinois University
+IL040	EPA Region 5, IL
+IL044	Southern Illinois University at Carbondale
+IL045	University of Illinois
+IL048	US Forest Service, Midewin National Tallgrass Prairie, IL
+IL049	McHenry County, Illinois Water Resources Department
+IL050	AECOM, Inc, IL
+IN002	Indiana Department of Natural Resources
+IN014	Indiana University-Northwest Lab for Environmental Research
+IN015	Indiana Geological Survey
+IN018	Conservation Tillage Information Center, IN
+IN021	Ball State University, IN
+IN032	Indiana Department of Transportation
+IN033	IN Dept Env Mngmt, Drinking Water Bureau, Groundwater Section
+IN038	Indiana Univ-School of Public and Environmental Affairs (SPEA)
+IN039	LaPorte County Health Department, IN
+IN040	ATC Associates Inc, IN
+IN041	Peerless-Midwest Inc, IN
+IN042	USX Corporation, IN
+KS001	Kansas Department of Health and Environment
+KS003	Division of Water Resources, Kansas State Board of Agriculture
+KS009	Kansas Water Office
+KS014	Kansas Geological Survey
+KS015	City of Wichita, KS
+KS016	Western Kansas Groundwater Management District No. 1
+KS017	Equus Beds Groundwater Management District No. 2, KS
+KS018	Southwest Kansas Groundwater Management District No. 3
+KS019	Northwest Kansas Groundwater Management District No. 4
+KS020	Big Bend Groundwater Management District No. 5, KS
+KY001	KY Department for Natural Resources & Environmental Protection
+KY002	Kentucky Geological Survey, University of Kentucky
+KY003	Div of Sanitation Engineering, Kentucky Dept of Human Resources
+KY004	Louisville Water Company, KY
+LA002	Louisiana State Department of Health and Hospitals
+LA014	Louisiana Department of Transportation & Development
+LA015	Parish of East Baton Rouge-Engineering Division, LA
+LA017	Louisiana Coastal Commission
+LA018	Louisiana Department of Natural Resources
+LASD	NAWQA National VOC Quality Assurance Studies
+LASD	Laboratory and Analytical Services Division
+LOX01	Imperial College of Science and Technology, London
+MA003	Massachusetts Division of Water Pollution Control
+MA007	Barnstable County Department of Health and Environment, MA
+MA031	Cape Cod Commission, MA
+MA032	Martha's Vineyard Commission, MA
+MA033	Nantucket Land Council, MA
+MA034	University of Massachusetts Department of Geosciences
+MA035	Massachusetts Department of Environmental Protection
+MA036	Massachusetts DCR, Division of Water Supply Protection
+MA037	Massachusetts DCR, Office of Water Resources
+MD004	Montgomery County Department of Environmental Protection, MD
+MD006	Maryland Geological Survey
+MD007	Maryland Department of the Environment (MDE)
+MD008	Baltimore County Office of Planning and Zoning, MD
+MD030	Maryland University-Center for Environmental & Estuarine Studies
+MD032	Maryland Department of Health and Mental Hygiene
+MD058	Maryland Department of the Environment, Water Use Conveyance
+ME001	Maine Department of Environmental Protection
+ME002	Maine Geological Survey
+ME005	Maine Department of Inland Fisheries and Wildlife
+ME008	Maine Department of Transportation
+MI001	Michigan Department of Natural Resources
+MI002	Michigan State University
+MI011	Michigan Department of State Highways and Transportation
+MI015	Stereo Foto, Inc, MI
+MI021	Michigan Geological Survey
+MI032	Tri-County Regional Planning Commission, MI
+MI041	Clinton River Watershed Council, MI
+MI045	Huron River Watershed Council, MI
+MI056	Huron County Health Department, MI
+MI057	Monroe County Health Department, MI
+MI061	Huron Conservation District, MI
+MI066	City of Portage, MI
+MI086	Kalamazoo County, MI
+MI087	Department of Environmental Quality (MDEQ), MI
+MN003	Minnesota Department of Natural Resources
+MN005	Ramsey County Environmental Service, MN
+MN012	Minnesota Pollution Control Agency
+MN019	Minnesota Health Department
+MN021	Metropolitan Council of the Twin Cities Area, MN
+MN022	Minnesota Department of Natural Resources Division of Waters
+MN028	Minnesota Soil and Water Conservation Board
+MN039	Lower Sioux Indian Community, MN
+MN039	Bemidji State University, MN
+MN040	Minnesota Geological Survey
+MN045	Upper Sioux Community, MN
+MN045	Fond du Lac Band of Lake Superior Chippewa, MN
+MN046	Lower Sioux Indian Community, MN
+MN046	Lower Sioux Indian Community, MN
+MN047	Oklahoma Department of Environmental Quality
+MN047	Upper Sioux Community, MN
+MN048	Dakota County Environmental Management, MN
+MN049	Rochester Public Utility (RPU), MN
+MN050	Prairie Island Indian Community, MN
+MO001	Missouri Department of Health
+MO005	Missouri Div. of Geology & Land Survey, Dept-Natural Resources
+MO011	Burns and McDonnell, MO
+MO017	EPA Region 7, MO
+MO021	Missouri Public Drinking Water Program
+MS003	Pearl River Valley Water Supply District, MS
+MS007	MS Dept. of Environmental Quality, Office of Pollution Control
+MS008	Mississippi Bureau of Land and Water Resources
+MS018	Yazoo Mississippi Delta Joint Water Management District, MS
+MT001	Montana Department of Fish, Wildlife & Parks
+MT002	Fort Peck Tribes, MT
+MT003	Montana Department of Health and Environmental Sciences
+MT004	Montana Department of Natural Resources and Conservation
+MT005	Montana Bureau of Mines and Geology
+MT006	Northern Cheyenne Tribe, MT
+MT007	Montana Department of Transportation
+MT013	Land Management Bureau Montana District
+MT014	Montana Natural Resources & Conservation Department
+NASA	National Aeronautics and Space Administration
+NC001	Bald Head Island Conservancy and Smith Island Land Trust, NC
+NC004	NC Department of Natural Resources and Community Development
+NC016	North Carolina Water Resources Research Institute
+NC018	North Carolina State University
+NC027	North Carolina Department of Natural Resources
+NC028	Elizabeth City State University, NC
+NC030	City of Jacksonville, NC
+NC031	USMC Camp Lejeune, NC
+NC032	Onslow Water and Sewer Authority, NC
+NC033	NC Department of Environmental Quality
+NC035	Wake County Environmental Services, NC
+NC036	Town of Pollocksville, NC
+NC037	North Carolina Department of Public Safety
+ND001	North Dakota Game and Fish Department
+ND002	North Dakota State Department of Health
+ND003	Minot City Water Treatment Plant, ND
+ND004	City of Bismarck Water Department, ND
+ND005	City of Dickinson Water Treatment Plant, ND
+ND007	North Dakota Geological Survey
+ND009	North Dakota State Water Commission
+ND010	Water Resources Research Institute-North Dakota State University
+ND012	Energy Department Grand Forks Energy Technology Center, ND
+NE001	Nebraska Game and Parks Commission
+NE004	Soil and Water Testing Lab, University of Nebraska
+NE006	Nebraska Natural Resources Commission
+NE008	University of Nebraska, Conservation and Survey Division
+NE009	Nebraska Department of Roads
+NE010	Nebraska Department of Water Resources
+NE013	Nebraska Conservation and Survey Division
+NE021	Central Platte Natural Resources District, NE
+NE022	Lower Republican Natural Resources District, NE
+NE023	Twin Platte Natural Resources District, NE
+NE024	Upper Loup Natural Resources District, NE
+NE025	Little Blue Natural Resources District, NE
+NE031	Upper Big Blue Natural Resources District, NE
+NE032	Lower Big Blue Natural Resources District, NE
+NE033	Lower Platte North Natural Resources District, NE
+NE034	Lower Platte South Natural Resources District, NE
+NE035	Papio-Missouri River Natural Resources District, NE
+NE036	Tri-Basin Natural Resources District, NE
+NE037	Nemaha Natural Resources District, NE
+NE038	North Platte Natural Resources District, NE
+NE039	South Platte Natural Resources District, NE
+NE040	Upper Niobrara-White Natural Resources District, NE
+NE041	Middle Niobrara Natural Resources District, NE
+NE042	Lower Niobrara Natural Resources District, NE
+NE043	Upper Republican Natural Resources District, NE
+NE044	Middle Republican Natural Resources District, NE
+NE045	Lewis and Clark Natural Resources District, NE
+NE046	Lower Loup Natural Resources District, NE
+NE047	Upper Elkhorn Natural Resources District, NE
+NE048	Lower Elkhorn Natural Resources District, NE
+NE049	Nebraska Public Power District
+NE050	Central Nebraska Public Power and Irrigation District
+NH001	Water Resources Research Center, University of New Hampshire
+NH002	New Hampshire Water Supply and Pollution Control Commission
+NH021	New Hampshire Department of Environmental Services
+NIH	National Intstitutes of Health
+NJ001	Passaic Valley Water Commission, NJ
+NJ002	Division of Water Resources, NJ Dept of Environmental Protection
+NM001	New Mexico State Engineers Office
+NM002	New Mexico Health and Environment Department
+NM003	New Mexico Institute of Mining and Technology
+NM005	Los Alamos Scientific Laboratory, NM
+NM010	New Mexico Interstate Stream Commission
+NM011	New Mexico Legislative Council Service
+NM016	Environmental Improvement Division, NM
+NM019	Elephant Butte Irrigation District, NM
+NM022	Pecos Valley Artesian Conservation District, NM
+NM030	Natural Resource Conservation System, NM
+NM031	City of Rio Rancho Department of Public Works, NM
+NM032	Sandia National Lab, NM
+NM033	Kirkland Air Force Base, NM
+NM034	City of Las Cruces, NM
+NM036	Bernalillo County Public Works-Natural Resource Services, NM
+NRCS	Natural Resources Conservation Service
+NV001	Nevada Division of Environmental Protection
+NV002	Walker River Irrigation District, NV
+NV003	Div-Water Resources, Nevada Dept-Conservation&Natural Resources
+NV004	Roundhill General Improvement District, NV
+NV008	Nevada State Highway Department
+NV012	Nevada Consumer Health Protection Service
+NV013	Desert Research Institute, University of Nevada
+NV017	Las Vegas Valley Water District, NV
+NV018	Sierra Pacific Power Company, NV
+NV024	Bechtel, NV
+NV026	Carson City Department of Public Works, NV
+NV035	Energy Department Nevada Operations Office
+NV038	Nevada Water Resources Division
+NV042	Fenix & Scisson, NV
+NV045	Churchill County, NV
+NV052	Pershing County Water Conservation District, NV
+NV053	Harry Reid Center (HRC) for Environmental Studies, UNLV, NV
+NV065	International Technology (IT) Corporation, NV
+NV066	Lawrence Livermore National Laboratory (LLNL), NV
+NV067	Los Alamos National Laboratory (LANL), NV
+NV069	Nye Nclr Wst Repos Prj Off/Erly Wrning Drl Prgm (NWRPO/EWDP), NV
+NV071	Reynolds Electrical and Engineering Company (REECO), NV
+NV072	Shaw E&I, NV
+NV073	Southern Nevada Water Authority (SNWA)
+NV074	Stoller-Navarro, NV
+NV079	Clark County, NV
+NV081	Hawthorne Utilities-Water, Sewer, and Disposal, NV
+NV082	Washoe County Department of Water Resources, NV
+NV083	White Pine County Water Advisory Committee, NV
+NV084	McGill-Ruth Consolidated Sewer & Water District, NV
+NV085	Bald Mountain Mine - Placer Dome America, NV
+NV086	Quadra Mining Ltd. - Robinson Operation, NV
+NV087	Barrick Gold Corporation, NV
+NV088	Eureka County, NV
+NV089	Lander County, NV
+NV090	Nye County, NV
+NV091	US Ecology Nevada, Inc., NV
+NV092	Holmes & Narver, Inc., NV
+NV093	National Security Technologies LLC (NSTEC), NV
+NV094	Raytheon Services Nevada
+NV095	Second Nature Inc., NV
+NV096	Lyon County, NV
+NV097	Bently Agrowdynamics, NV
+NV098	Navarro Nevada Environmental Services, LLC, NV
+NV099	Central Nevada Regional Water Authority (CNRWA)
+NV100	Mahannah and Associates, LLC, NV
+NV101	Beatty Water & Sanitation District, NV
+NV102	Truckee Meadows Water Authority (TMWA), NV
+NV103	Navarro-Intera, LLC, NV
+NV104	Navarro, NV
+NY001	New York State Department of Environmental Conservation
+NY002	Division-Sanitation & Water Sup, Nassau County Public Supply, NY
+NY011	Rennselaer Polytechnic Institute, NY
+NY022	New York State Department of Health
+NY043	New York Geological Survey
+OH002	Miami Conservancy District, OH
+OH004	Ohio Environmental Protection Agency
+OH013	Heidelberg College, OH
+OH015	Ohio Department of Natural Resources
+OH044	Columbus Department of Public Service, OH
+OH060	Ohio State University, Department of Agricultural Engineering
+OK001	Oklahoma State Department of Health
+OK002	Oklahoma Water Resources Board
+OK003	Central Arizona Project
+OK003	Oklahoma Department of Environmental Quality
+OK005	Oklahoma State University, Department of Geology
+OK011	Oklahoma Geological Survey
+OK022	City of Ada, OK
+OMORA	Omora Foundation of Tierra Del Fuego, Chile
+OR001	Department of Forest Engineering, Oregon State University
+OR002	Johnson Creek Watershed Council
+OR003	Douglas County Water Resources Survey, OR
+OR004	Oregon Water Resources Department
+OR005	WEST Consultants, Inc.
+OR006	Portland General Electric Company, OR
+OR028	City of Medford Engineering Department, OR
+OR044	EPA Oregon Operations Office
+OR046	Oregon Geology and Mineral Industries Department
+OR049	Oregon Water Resources Research Institute
+OR058	City of Portland, OR
+OR059	Douglas County, OR
+OR064	Confederated Tribes of the Umatilla Indian Reservation, OR
+PA001	Pennsylvania Department of Environmental Protection
+PA002	Montgomery County, PA
+PA028	Pennsylvania Topographic and Geologic Survey Bureau
+PA034	Pennsylvania Geological Survey
+PA039	Susquenhanna River Basin Commission, PA
+PA060	Adams County Conservation District, PA
+PA061	Pike County Conservation District, PA
+QUOX0	1McGill University-Subarctic Research Station, Quebec
+RI002	Rhode Island Department of Environmental Management
+RI007	Rhode Island Water Resources Board
+RI013	Rhode Island Department of Health
+RQ001	Puerto Rico Department of Health, PRDOH
+RQ002	Puerto Rico Aqueduct and Sewer Authority, PRASA
+RQ008	Puerto Rico Department of Natural Resources
+RQ020	Puerto Rico Emergency Management Agency
+RQ021	Servicio Nacional De Estudios Territoriales (SNET), ES
+RQ022	Ins. Nacional Sismologia Vulcanologia Meteorologia Hidrologia,GT
+RQ023	Ministere De L'Agriculture Des Ressources Naturell (MARNDR), HA
+RQ024	Empresa Nacional De Energia Electrica (ENEE), HO
+RQ025	Secretaria De Recursos Naturales Y Ambientales (SERNA), HO
+RQ026	Comision De Control De Inundaciones Del Valle De Sula, PR
+RQ027	Instituto Nicaraguense De Estudios Territoriales (INETER), NU
+RQ028	St Lucia Ministry of Agriculture & Forestry Botanical Garden
+RQ029	St Vicent Ministry of Agriculture & Forestry Botanical Garden
+RQ030	Dominica Ministry of Agriculture & Forestry Botanical Garden
+SC001	Agricultural Engineering Department, Clemson University, SC
+SC004	South Carolina Department of Health and Environmental Control
+SC008	South Carolina Water Resources Commission
+SC009	Kershaw County Tax Assessor, SC
+SD001	Water Resource Research Institute, South Dakota State University
+SD002	East Dakota Conservancy Sub-District, SD
+SD003	South Dakota Geological Survey
+SD005	South Dakota Department of Water and Natural Resources
+SD008	South Dakota Department of Environmental Protection
+SD009	South Dakota School of Mines and Technology
+SD010	Soil Testing Lab, South Dakota State University
+SD011	South Dakota State Chemist, University of South Dakota
+SD012	Station Biochemistry, South Dakota State University
+SD019	South Dakota State University-SD Agricultural Experiment Station
+SHELL	Shell Oil Company
+TEEI	Ten Ech Environmental Engineers, Inc
+TN011	Oak Ridge National Laboratory, TN
+TN017	Tennessee Department of Environment and Conservation
+TX001	Texas Water Development Board
+TX003	Texas Natural Resources Conservation Commission
+TX006	Texas Department of Health
+TX009	Railroad Commission of Texas
+TX011	Texas Parks and Wildlife Department
+TX038	San Antonio Water System, TX
+TX057	Houston-Galveston Area Council, TX
+TX071	Lower Colorado River Authority, TX
+TX073	North Central Texas Municipal Water Authority
+TX077	San Antonio River Authority, TX
+TX078	San Jacinto River Authority, TX
+TX087	Bistone Municipal Water Supply District, TX
+TX101	Edwards Aquifer Conservation District, TX
+TX120	Edwards Underground Water District, TX
+TX123	Texarkana Water Utilities, TX
+TX144	Bexar-Medina-Atascosa Water Control and Irr District No 1, TX
+USA	U.S. Army
+USAF	U.S. Air Force
+USAHS	U.S. Army Health Services Command
+USAID	U.S. Agency for International Development
+USAPA	Alaska Power Administration
+USARS	U.S. Agricultural Research Service
+USBIA	U.S. Bureau of Indian Affairs
+USBLM	U.S. Bureau of Land Management
+USBM	U.S. Bureau of Mines
+USBPA	Bonneville Power Administration
+USBR	U.S. Bureau of Reclamation
+USCE	U.S. Army Corps of Engineers
+USCEQ	Council on Environmental Quality
+USDA	U.S. Department of Agriculture
+USDOC	U.S. Department of Commerce
+USDOE	U.S. Department of Energy
+USDOT	U.S. Department of Transportation
+USEPA	U.S. Environmental Protection Agency
+USESS	National Environmental Satellite Service
+USFEC	Federal Energy Regulatory Commission
+USFEM	Federal Emergency Management Agency
+USFHA	Federal Highway Administration
+USFS	U.S. Forest Service
+USFWS	U.S. Fish and Wildlife Service
+USGS	U.S. Geological Survey
+USHEW	U.S. Department of Health, Education and Welfare
+USHHS	U.S. Department of Health and Human Services
+USIBW	International Boundary and Water Commission
+USMC	U.S. Marine Corps
+USN	U.S. Navy Department
+USNFE	U.S. Naval Facilities Engineering Command
+USNOA	National Oceanic and Atmospheric Administration
+USNOS	National Ocean Service
+USNPS	National Park Service
+USNWS	National Weather Service
+USPCC	Panama Canal Commission
+USSCS	U.S. Soil Conservation Service
+USSEA	U.S. Society for Education Through Art
+USSWP	Southwestern Power Administration
+USTVA	Tennessee Valley Authority
+USWRC	Water Resources Council
+UT001	Utah Department of Health
+UT002	Metropolitan Water District of Salt Lake and Sandy, UT
+UT003	Utah Department of Natural Resources, Div. of Wildlife Resources
+UT004	Jordan Valley Water Conservancy District, UT
+UT006	Ogden Bay Waterfowl Management Area, UT
+UT008	Utah Geological and Mineralogical Survey
+UT010	Weber Distribution System, UT
+UT013	Utah Department of Natural Resources, Division of Water Rights
+UT029	Utah Department of Natural Resources, Division Water Resources
+VA001	Virginia State Water Control Board
+VA007	Virginia Department of Highways and Transportation
+VA016	Bureau of Water Supply Engineering, VA
+VA019	Virginia Health Department
+VA038	City of Roanoke, VA
+VA086	Frederick County Sanitation Authority, VA
+VA087	Virginia Department of Environmental Quality
+VOCNS	NAWQA National VOC Quality Assurance Studies
+VOCNS	NAWQA National VOC Quality Assurance Studies
+VT001	State of Vermont, Agency oF Environmental Conservation
+VT002	Vermont Department of Health
+VT004	Vermont Department of Water Resources
+VT012	Vermont Agency of Natural Resources
+WA001	Washington Department of Ecology
+WA002	Public Utility District No 1, Skagit County, WA
+WA003	Washington Department of Health
+WA003	Washington Department of Health
+WA004	Fisheries Research Institute, University of Washington
+WA005	Environmental Engineering, Washington State University
+WA013	Washington Water Power Company
+WA022	Geohydrology Section, Washington State University
+WA034	Washington State University, Department of Civil Engineering
+WA050	Spokane County Engineers Office, WA
+WA051	Walla Walla County Engineer, WA
+WA052	Columbia River Gorge Commission, WA
+WA053	City of Snohomish Director of Public Works, WA
+WA054	City of Walla Walla, Engineering Division, WA
+WA055	East Columbia Basin Irrigation District, WA
+WA056	Energy Department Richland Operations Office, WA
+WA057	EPA Region 10, WA
+WA058	Forest Service Washington
+WA059	National Park Service Pacific Northwest Region, WA
+WA060	Pacific Northwest River Basins Commission, WA
+WA061	Washington Code Reviser Office
+WA062	Western Snow Conference, WA
+WA063	R. W. Beck and Associates, WA
+WA064	Libby Photographers, WA
+WA080	Washington State Univ-State of Washington Water Resources Center
+WA097	Yakima Tribal Council, WA
+WA127	Washington State Department of Social and Health Services
+WA169	City of Bainbridge Island, WA
+WA170	Northwest Indian Fisheries Commission (NWIFC), WA
+WA171	Spokane Community College, WA
+WA172	Confederated Tribes of the Colville Reservation, WA
+WI001	Wisconsin Department of Natural Resources
+WI002	Waukesha Water Utility, WI
+WI003	Portage County Planning and Zoning, WI
+WI004	East Central Wisconsin Regional Planning Commission
+WI005	Wisconsin State Laboratory of Hygiene
+WI006	Wisconsin Public Service Commission
+WI007	University of Wisconsin - Madison
+WI008	Southeastern Wisconsin Regional Planning Commission
+WI009	Wisconsin Geological and Natural History Survey
+WI010	Dane County Regional Planning Commission, WI
+WI011	Bay-Lake Regional Planning Commission, WI
+WI013	Wisconsin Department of Administration
+WI014	Wisconsin Department of Transportation
+WI028	Wisconsin Department of Agriculture, Trade & Consumer Protection
+WI029	Wisconsin Department of Health
+WI030	Northwest Wisconsin Regional Planning Commission
+WI034	University of Wisconsin - Stevens Point
+WI039	Soei Sigurd Olson Environmental Institute(Northland College), WI
+WI040	Grant County Land Conservation Department, WI
+WI041	Green Lake Highway Department, WI
+WI042	Markesan Water Utility, WI
+WI043	Pepin County Land Conservation Department, WI
+WI044	Waupaca County Highway Department, WI
+WI045	Wausau Water Utility, WI
+WV001	Division of Water Resources, West Virginia Dept of Nat Resources
+WV002	Sanitary Engineering Division-West Virginia Department of Health
+WY003	Wyoming State Engineer's Office
+WY004	Wyoming Water Development Commission
+WY006	Wyoming Department of Environmental Quality
+WY014	Wyoming Department of Agriculture
+WY015	City of Cheyenne Board of Public Utilities, WY
+WY016	Teton Conservation District, WY

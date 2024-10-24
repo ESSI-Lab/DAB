@@ -1,0 +1,1926 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitesResponse xmlns="http://www.cuahsi.org/waterML/1.1/"
+               xmlns:gml="http://www.opengis.net/gml"
+               xmlns:wtr="http://www.cuahsi.org/waterML/"
+               xmlns:xlink="http://www.w3.org/1999/xlink"
+               xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <queryInfo>
+      <creationTime>2018-01-10T07:59:55.1952838-07:00</creationTime>
+      <criteria MethodCalled="GetSiteInfo">
+         <parameter name="site" value="LBR:USU-LBR-Mendon"/>
+      </criteria>
+   </queryInfo>
+   <site>
+      <siteInfo>
+         <siteName>Little Bear River at Mendon Road near Mendon, Utah</siteName>
+         <siteCode network="LBR" siteID="1">USU-LBR-Mendon</siteCode>
+         <geoLocation>
+            <geogLocation srs="EPSG:4269" xsi:type="LatLonPointType">
+               <latitude>41.718473</latitude>
+               <longitude>-111.946402</longitude>
+            </geogLocation>
+            <localSiteXY projectionInformation="NAD83 / UTM zone 12N">
+               <X>421276.323</X>
+               <Y>4618952.04</Y>
+            </localSiteXY>
+         </geoLocation>
+         <elevation_m>1345</elevation_m>
+         <verticalDatum>NGVD29</verticalDatum>
+         <siteProperty name="County">Cache</siteProperty>
+         <siteProperty name="State">Utah</siteProperty>
+         <siteProperty name="Site Comments">Located below county road bridge at Mendon Road crossing</siteProperty>
+         <siteProperty name="PosAccuracy_m">10</siteProperty>
+         <siteProperty name="Site Type">Stream</siteProperty>
+      </siteInfo>
+      <seriesCatalog menuGroupName="Local OD GetValues"
+                     serviceWsdl="http://www7.ncdc.noaa.gov/CUAHSIServices/CUAHSIServices">
+         <series>
+            <variable>
+               <variableCode default="true" variableID="3" vocabulary="LBR">USU3</variableCode>
+               <variableName>Battery voltage</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Minimum</dataType>
+               <generalCategory>Instrumentation</generalCategory>
+               <sampleMedium>Not Relevant</sampleMedium>
+               <unit>
+                  <unitName>volts</unitName>
+                  <unitType>Potential Difference</unitType>
+                  <unitAbbreviation>V</unitAbbreviation>
+                  <unitCode>168</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale isRegular="true">
+                  <unit>
+                     <unitName>minute</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>min</unitAbbreviation>
+                     <unitCode>102</unitCode>
+                  </unit>
+                  <timeSupport>30</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>186664</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2005-08-04T11:30:00</beginDateTime>
+               <endDateTime>2016-08-02T12:30:00</endDateTime>
+               <beginDateTimeUTC>2005-08-04T18:30:00</beginDateTimeUTC>
+               <endDateTimeUTC>2016-08-02T19:30:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="4">
+               <methodDescription>Battery voltage measured by Campbell Scientific CR206 datalogger.</methodDescription>
+            </method>
+            <source sourceID="1">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Continuous water quality monitoring by Utah State University as part of the USDA CEAP Grant</sourceDescription>
+               <citation>Continuous water quality monitoring by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="0">
+               <qualityControlLevelCode>0</qualityControlLevelCode>
+               <definition>Raw data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="4" vocabulary="LBR">USU4</variableCode>
+               <variableName>Turbidity</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Average</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>nephelometric turbidity units</unitName>
+                  <unitType>Turbidity</unitType>
+                  <unitAbbreviation>NTU</unitAbbreviation>
+                  <unitCode>221</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale isRegular="true">
+                  <unit>
+                     <unitName>second</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>s</unitAbbreviation>
+                     <unitCode>100</unitCode>
+                  </unit>
+                  <timeSupport>5</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>185565</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2005-08-04T11:30:00</beginDateTime>
+               <endDateTime>2016-08-02T12:30:00</endDateTime>
+               <beginDateTimeUTC>2005-08-04T18:30:00</beginDateTimeUTC>
+               <endDateTimeUTC>2016-08-02T19:30:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="2">
+               <methodDescription>Turbidity measured using a Forest Technology Systems DTS-12  turbidity sensor.</methodDescription>
+            </method>
+            <source sourceID="1">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Continuous water quality monitoring by Utah State University as part of the USDA CEAP Grant</sourceDescription>
+               <citation>Continuous water quality monitoring by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="0">
+               <qualityControlLevelCode>0</qualityControlLevelCode>
+               <definition>Raw data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="5" vocabulary="LBR">USU5</variableCode>
+               <variableName>Turbidity</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Variance</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>nephelometric turbidity units</unitName>
+                  <unitType>Turbidity</unitType>
+                  <unitAbbreviation>NTU</unitAbbreviation>
+                  <unitCode>221</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale isRegular="true">
+                  <unit>
+                     <unitName>second</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>s</unitAbbreviation>
+                     <unitCode>100</unitCode>
+                  </unit>
+                  <timeSupport>5</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>185565</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2005-08-04T11:30:00</beginDateTime>
+               <endDateTime>2016-08-02T12:30:00</endDateTime>
+               <beginDateTimeUTC>2005-08-04T18:30:00</beginDateTimeUTC>
+               <endDateTimeUTC>2016-08-02T19:30:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="2">
+               <methodDescription>Turbidity measured using a Forest Technology Systems DTS-12  turbidity sensor.</methodDescription>
+            </method>
+            <source sourceID="1">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Continuous water quality monitoring by Utah State University as part of the USDA CEAP Grant</sourceDescription>
+               <citation>Continuous water quality monitoring by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="0">
+               <qualityControlLevelCode>0</qualityControlLevelCode>
+               <definition>Raw data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="6" vocabulary="LBR">USU6</variableCode>
+               <variableName>Turbidity</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Median</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>nephelometric turbidity units</unitName>
+                  <unitType>Turbidity</unitType>
+                  <unitAbbreviation>NTU</unitAbbreviation>
+                  <unitCode>221</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale isRegular="true">
+                  <unit>
+                     <unitName>second</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>s</unitAbbreviation>
+                     <unitCode>100</unitCode>
+                  </unit>
+                  <timeSupport>5</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>114369</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2005-08-04T11:30:00</beginDateTime>
+               <endDateTime>2012-05-31T23:30:00</endDateTime>
+               <beginDateTimeUTC>2005-08-04T18:30:00</beginDateTimeUTC>
+               <endDateTimeUTC>2012-06-01T06:30:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="28">
+               <methodDescription>Quality Control Level 1 Data Series created from raw QC Level 0 data using ODM Tools.</methodDescription>
+            </method>
+            <source sourceID="1">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Continuous water quality monitoring by Utah State University as part of the USDA CEAP Grant</sourceDescription>
+               <citation>Continuous water quality monitoring by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="6" vocabulary="LBR">USU6</variableCode>
+               <variableName>Turbidity</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Median</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>nephelometric turbidity units</unitName>
+                  <unitType>Turbidity</unitType>
+                  <unitAbbreviation>NTU</unitAbbreviation>
+                  <unitCode>221</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale isRegular="true">
+                  <unit>
+                     <unitName>second</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>s</unitAbbreviation>
+                     <unitCode>100</unitCode>
+                  </unit>
+                  <timeSupport>5</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>185565</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2005-08-04T11:30:00</beginDateTime>
+               <endDateTime>2016-08-02T12:30:00</endDateTime>
+               <beginDateTimeUTC>2005-08-04T18:30:00</beginDateTimeUTC>
+               <endDateTimeUTC>2016-08-02T19:30:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="2">
+               <methodDescription>Turbidity measured using a Forest Technology Systems DTS-12  turbidity sensor.</methodDescription>
+            </method>
+            <source sourceID="1">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Continuous water quality monitoring by Utah State University as part of the USDA CEAP Grant</sourceDescription>
+               <citation>Continuous water quality monitoring by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="0">
+               <qualityControlLevelCode>0</qualityControlLevelCode>
+               <definition>Raw data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="7" vocabulary="LBR">USU7</variableCode>
+               <variableName>Turbidity</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Best Easy Systematic Estimator</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>nephelometric turbidity units</unitName>
+                  <unitType>Turbidity</unitType>
+                  <unitAbbreviation>NTU</unitAbbreviation>
+                  <unitCode>221</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale isRegular="true">
+                  <unit>
+                     <unitName>second</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>s</unitAbbreviation>
+                     <unitCode>100</unitCode>
+                  </unit>
+                  <timeSupport>5</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>185565</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2005-08-04T11:30:00</beginDateTime>
+               <endDateTime>2016-08-02T12:30:00</endDateTime>
+               <beginDateTimeUTC>2005-08-04T18:30:00</beginDateTimeUTC>
+               <endDateTimeUTC>2016-08-02T19:30:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="2">
+               <methodDescription>Turbidity measured using a Forest Technology Systems DTS-12  turbidity sensor.</methodDescription>
+            </method>
+            <source sourceID="1">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Continuous water quality monitoring by Utah State University as part of the USDA CEAP Grant</sourceDescription>
+               <citation>Continuous water quality monitoring by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="0">
+               <qualityControlLevelCode>0</qualityControlLevelCode>
+               <definition>Raw data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="8" vocabulary="LBR">USU8</variableCode>
+               <variableName>Turbidity</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Minimum</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>nephelometric turbidity units</unitName>
+                  <unitType>Turbidity</unitType>
+                  <unitAbbreviation>NTU</unitAbbreviation>
+                  <unitCode>221</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale isRegular="true">
+                  <unit>
+                     <unitName>second</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>s</unitAbbreviation>
+                     <unitCode>100</unitCode>
+                  </unit>
+                  <timeSupport>5</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>185565</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2005-08-04T11:30:00</beginDateTime>
+               <endDateTime>2016-08-02T12:30:00</endDateTime>
+               <beginDateTimeUTC>2005-08-04T18:30:00</beginDateTimeUTC>
+               <endDateTimeUTC>2016-08-02T19:30:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="2">
+               <methodDescription>Turbidity measured using a Forest Technology Systems DTS-12  turbidity sensor.</methodDescription>
+            </method>
+            <source sourceID="1">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Continuous water quality monitoring by Utah State University as part of the USDA CEAP Grant</sourceDescription>
+               <citation>Continuous water quality monitoring by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="0">
+               <qualityControlLevelCode>0</qualityControlLevelCode>
+               <definition>Raw data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="9" vocabulary="LBR">USU9</variableCode>
+               <variableName>Turbidity</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Maximum</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>nephelometric turbidity units</unitName>
+                  <unitType>Turbidity</unitType>
+                  <unitAbbreviation>NTU</unitAbbreviation>
+                  <unitCode>221</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale isRegular="true">
+                  <unit>
+                     <unitName>second</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>s</unitAbbreviation>
+                     <unitCode>100</unitCode>
+                  </unit>
+                  <timeSupport>5</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>185565</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2005-08-04T11:30:00</beginDateTime>
+               <endDateTime>2016-08-02T12:30:00</endDateTime>
+               <beginDateTimeUTC>2005-08-04T18:30:00</beginDateTimeUTC>
+               <endDateTimeUTC>2016-08-02T19:30:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="2">
+               <methodDescription>Turbidity measured using a Forest Technology Systems DTS-12  turbidity sensor.</methodDescription>
+            </method>
+            <source sourceID="1">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Continuous water quality monitoring by Utah State University as part of the USDA CEAP Grant</sourceDescription>
+               <citation>Continuous water quality monitoring by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="0">
+               <qualityControlLevelCode>0</qualityControlLevelCode>
+               <definition>Raw data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="10" vocabulary="LBR">USU10</variableCode>
+               <variableName>Temperature</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Continuous</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>degree celsius</unitName>
+                  <unitType>Temperature</unitType>
+                  <unitAbbreviation>degC</unitAbbreviation>
+                  <unitCode>96</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale isRegular="true">
+                  <unit>
+                     <unitName>second</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>s</unitAbbreviation>
+                     <unitCode>100</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>185563</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2005-08-04T11:30:00</beginDateTime>
+               <endDateTime>2016-08-02T12:30:00</endDateTime>
+               <beginDateTimeUTC>2005-08-04T18:30:00</beginDateTimeUTC>
+               <endDateTimeUTC>2016-08-02T19:30:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="1">
+               <methodDescription>Water temperature measured using a Forest Technology Systems DTS-12 turbidity sensor.</methodDescription>
+            </method>
+            <source sourceID="1">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Continuous water quality monitoring by Utah State University as part of the USDA CEAP Grant</sourceDescription>
+               <citation>Continuous water quality monitoring by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="0">
+               <qualityControlLevelCode>0</qualityControlLevelCode>
+               <definition>Raw data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="11" vocabulary="LBR">USU11</variableCode>
+               <variableName>Gage height</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Minimum</dataType>
+               <generalCategory>Hydrology</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>international foot</unitName>
+                  <unitType>Length</unitType>
+                  <unitAbbreviation>ft</unitAbbreviation>
+                  <unitCode>48</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale isRegular="true">
+                  <unit>
+                     <unitName>minute</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>min</unitAbbreviation>
+                     <unitCode>102</unitCode>
+                  </unit>
+                  <timeSupport>30</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>35526</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2005-08-04T11:30:00</beginDateTime>
+               <endDateTime>2007-08-16T13:30:00</endDateTime>
+               <beginDateTimeUTC>2005-08-04T18:30:00</beginDateTimeUTC>
+               <endDateTimeUTC>2007-08-16T20:30:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="3">
+               <methodDescription>Water level measured using a ACData Solutions, Inc. SPXD-600 SDI-12 Pressure Transducer</methodDescription>
+            </method>
+            <source sourceID="1">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Continuous water quality monitoring by Utah State University as part of the USDA CEAP Grant</sourceDescription>
+               <citation>Continuous water quality monitoring by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="0">
+               <qualityControlLevelCode>0</qualityControlLevelCode>
+               <definition>Raw data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="12" vocabulary="LBR">USU12</variableCode>
+               <variableName>Gage height</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Maximum</dataType>
+               <generalCategory>Hydrology</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>international foot</unitName>
+                  <unitType>Length</unitType>
+                  <unitAbbreviation>ft</unitAbbreviation>
+                  <unitCode>48</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale isRegular="true">
+                  <unit>
+                     <unitName>minute</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>min</unitAbbreviation>
+                     <unitCode>102</unitCode>
+                  </unit>
+                  <timeSupport>30</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>35526</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2005-08-04T11:30:00</beginDateTime>
+               <endDateTime>2007-08-16T13:30:00</endDateTime>
+               <beginDateTimeUTC>2005-08-04T18:30:00</beginDateTimeUTC>
+               <endDateTimeUTC>2007-08-16T20:30:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="3">
+               <methodDescription>Water level measured using a ACData Solutions, Inc. SPXD-600 SDI-12 Pressure Transducer</methodDescription>
+            </method>
+            <source sourceID="1">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Continuous water quality monitoring by Utah State University as part of the USDA CEAP Grant</sourceDescription>
+               <citation>Continuous water quality monitoring by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="0">
+               <qualityControlLevelCode>0</qualityControlLevelCode>
+               <definition>Raw data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="13" vocabulary="LBR">USU13</variableCode>
+               <variableName>Gage height</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Average</dataType>
+               <generalCategory>Hydrology</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>international foot</unitName>
+                  <unitType>Length</unitType>
+                  <unitAbbreviation>ft</unitAbbreviation>
+                  <unitCode>48</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale isRegular="true">
+                  <unit>
+                     <unitName>minute</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>min</unitAbbreviation>
+                     <unitCode>102</unitCode>
+                  </unit>
+                  <timeSupport>30</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>82070</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2011-10-11T15:30:00</beginDateTime>
+               <endDateTime>2016-08-02T12:30:00</endDateTime>
+               <beginDateTimeUTC>2011-10-11T22:30:00</beginDateTimeUTC>
+               <endDateTimeUTC>2016-08-02T19:30:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="34">
+               <methodDescription>Water level measured using a Campbell Scientific CS450 Pressure Transducer.</methodDescription>
+            </method>
+            <source sourceID="1">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Continuous water quality monitoring by Utah State University as part of the USDA CEAP Grant</sourceDescription>
+               <citation>Continuous water quality monitoring by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="0">
+               <qualityControlLevelCode>0</qualityControlLevelCode>
+               <definition>Raw data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="13" vocabulary="LBR">USU13</variableCode>
+               <variableName>Gage height</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Average</dataType>
+               <generalCategory>Hydrology</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>international foot</unitName>
+                  <unitType>Length</unitType>
+                  <unitAbbreviation>ft</unitAbbreviation>
+                  <unitCode>48</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale isRegular="true">
+                  <unit>
+                     <unitName>minute</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>min</unitAbbreviation>
+                     <unitCode>102</unitCode>
+                  </unit>
+                  <timeSupport>30</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>114533</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2005-08-04T11:30:00</beginDateTime>
+               <endDateTime>2012-05-22T11:00:00</endDateTime>
+               <beginDateTimeUTC>2005-08-04T18:30:00</beginDateTimeUTC>
+               <endDateTimeUTC>2012-05-22T18:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="28">
+               <methodDescription>Quality Control Level 1 Data Series created from raw QC Level 0 data using ODM Tools.</methodDescription>
+            </method>
+            <source sourceID="1">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Continuous water quality monitoring by Utah State University as part of the USDA CEAP Grant</sourceDescription>
+               <citation>Continuous water quality monitoring by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="13" vocabulary="LBR">USU13</variableCode>
+               <variableName>Gage height</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Average</dataType>
+               <generalCategory>Hydrology</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>international foot</unitName>
+                  <unitType>Length</unitType>
+                  <unitAbbreviation>ft</unitAbbreviation>
+                  <unitCode>48</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale isRegular="true">
+                  <unit>
+                     <unitName>minute</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>min</unitAbbreviation>
+                     <unitCode>102</unitCode>
+                  </unit>
+                  <timeSupport>30</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>104594</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2005-08-04T11:30:00</beginDateTime>
+               <endDateTime>2011-09-25T12:30:00</endDateTime>
+               <beginDateTimeUTC>2005-08-04T18:30:00</beginDateTimeUTC>
+               <endDateTimeUTC>2011-09-25T19:30:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="3">
+               <methodDescription>Water level measured using a ACData Solutions, Inc. SPXD-600 SDI-12 Pressure Transducer</methodDescription>
+            </method>
+            <source sourceID="1">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Continuous water quality monitoring by Utah State University as part of the USDA CEAP Grant</sourceDescription>
+               <citation>Continuous water quality monitoring by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="0">
+               <qualityControlLevelCode>0</qualityControlLevelCode>
+               <definition>Raw data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="32" vocabulary="LBR">USU32</variableCode>
+               <variableName>Oxygen, dissolved</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Average</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>milligrams per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mg/L</unitAbbreviation>
+                  <unitCode>199</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale isRegular="true">
+                  <unit>
+                     <unitName>minute</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>min</unitAbbreviation>
+                     <unitCode>102</unitCode>
+                  </unit>
+                  <timeSupport>30</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>23500</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2007-08-16T16:30:00</beginDateTime>
+               <endDateTime>2009-01-16T12:30:00</endDateTime>
+               <beginDateTimeUTC>2007-08-16T23:30:00</beginDateTimeUTC>
+               <endDateTimeUTC>2009-01-16T19:30:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="28">
+               <methodDescription>Quality Control Level 1 Data Series created from raw QC Level 0 data using ODM Tools.</methodDescription>
+            </method>
+            <source sourceID="1">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Continuous water quality monitoring by Utah State University as part of the USDA CEAP Grant</sourceDescription>
+               <citation>Continuous water quality monitoring by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="32" vocabulary="LBR">USU32</variableCode>
+               <variableName>Oxygen, dissolved</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Average</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>milligrams per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mg/L</unitAbbreviation>
+                  <unitCode>199</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale isRegular="true">
+                  <unit>
+                     <unitName>minute</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>min</unitAbbreviation>
+                     <unitCode>102</unitCode>
+                  </unit>
+                  <timeSupport>30</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>151138</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2007-08-16T16:30:00</beginDateTime>
+               <endDateTime>2016-08-02T12:30:00</endDateTime>
+               <beginDateTimeUTC>2007-08-16T23:30:00</beginDateTimeUTC>
+               <endDateTimeUTC>2016-08-02T19:30:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="19">
+               <methodDescription>Dissolved oxygen measured using a Hydrolab MS5 Water Quality Multiprobe.</methodDescription>
+            </method>
+            <source sourceID="1">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Continuous water quality monitoring by Utah State University as part of the USDA CEAP Grant</sourceDescription>
+               <citation>Continuous water quality monitoring by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="0">
+               <qualityControlLevelCode>0</qualityControlLevelCode>
+               <definition>Raw data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="33" vocabulary="LBR">USU33</variableCode>
+               <variableName>Oxygen, dissolved percent of saturation</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Average</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>percent</unitName>
+                  <unitType>Dimensionless</unitType>
+                  <unitAbbreviation>%</unitAbbreviation>
+                  <unitCode>1</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale isRegular="true">
+                  <unit>
+                     <unitName>minute</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>min</unitAbbreviation>
+                     <unitCode>102</unitCode>
+                  </unit>
+                  <timeSupport>30</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>151138</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2007-08-16T16:30:00</beginDateTime>
+               <endDateTime>2016-08-02T12:30:00</endDateTime>
+               <beginDateTimeUTC>2007-08-16T23:30:00</beginDateTimeUTC>
+               <endDateTimeUTC>2016-08-02T19:30:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="19">
+               <methodDescription>Dissolved oxygen measured using a Hydrolab MS5 Water Quality Multiprobe.</methodDescription>
+            </method>
+            <source sourceID="1">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Continuous water quality monitoring by Utah State University as part of the USDA CEAP Grant</sourceDescription>
+               <citation>Continuous water quality monitoring by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="0">
+               <qualityControlLevelCode>0</qualityControlLevelCode>
+               <definition>Raw data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="34" vocabulary="LBR">USU34</variableCode>
+               <variableName>Specific conductance</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Average</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>microsiemens per centimeter</unitName>
+                  <unitType>Electrical Conductivity</unitType>
+                  <unitAbbreviation>uS/cm</unitAbbreviation>
+                  <unitCode>192</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale isRegular="true">
+                  <unit>
+                     <unitName>minute</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>min</unitAbbreviation>
+                     <unitCode>102</unitCode>
+                  </unit>
+                  <timeSupport>30</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>151138</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2007-08-16T16:30:00</beginDateTime>
+               <endDateTime>2016-08-02T12:30:00</endDateTime>
+               <beginDateTimeUTC>2007-08-16T23:30:00</beginDateTimeUTC>
+               <endDateTimeUTC>2016-08-02T19:30:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="20">
+               <methodDescription>Specific conductance measured using a Hydrolab MS5 Water Quality Multiprobe.</methodDescription>
+            </method>
+            <source sourceID="1">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Continuous water quality monitoring by Utah State University as part of the USDA CEAP Grant</sourceDescription>
+               <citation>Continuous water quality monitoring by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="0">
+               <qualityControlLevelCode>0</qualityControlLevelCode>
+               <definition>Raw data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="34" vocabulary="LBR">USU34</variableCode>
+               <variableName>Specific conductance</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Average</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>microsiemens per centimeter</unitName>
+                  <unitType>Electrical Conductivity</unitType>
+                  <unitAbbreviation>uS/cm</unitAbbreviation>
+                  <unitCode>192</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale isRegular="true">
+                  <unit>
+                     <unitName>minute</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>min</unitAbbreviation>
+                     <unitCode>102</unitCode>
+                  </unit>
+                  <timeSupport>30</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>24206</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2007-08-16T16:30:00</beginDateTime>
+               <endDateTime>2009-01-16T12:30:00</endDateTime>
+               <beginDateTimeUTC>2007-08-16T23:30:00</beginDateTimeUTC>
+               <endDateTimeUTC>2009-01-16T19:30:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="28">
+               <methodDescription>Quality Control Level 1 Data Series created from raw QC Level 0 data using ODM Tools.</methodDescription>
+            </method>
+            <source sourceID="1">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Continuous water quality monitoring by Utah State University as part of the USDA CEAP Grant</sourceDescription>
+               <citation>Continuous water quality monitoring by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="35" vocabulary="LBR">USU35</variableCode>
+               <variableName>pH</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Average</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>dimensionless</unitName>
+                  <unitType>Dimensionless</unitType>
+                  <unitAbbreviation>-</unitAbbreviation>
+                  <unitCode>137</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale isRegular="true">
+                  <unit>
+                     <unitName>minute</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>min</unitAbbreviation>
+                     <unitCode>102</unitCode>
+                  </unit>
+                  <timeSupport>30</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>23479</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2007-08-16T16:30:00</beginDateTime>
+               <endDateTime>2009-01-16T12:30:00</endDateTime>
+               <beginDateTimeUTC>2007-08-16T23:30:00</beginDateTimeUTC>
+               <endDateTimeUTC>2009-01-16T19:30:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="28">
+               <methodDescription>Quality Control Level 1 Data Series created from raw QC Level 0 data using ODM Tools.</methodDescription>
+            </method>
+            <source sourceID="1">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Continuous water quality monitoring by Utah State University as part of the USDA CEAP Grant</sourceDescription>
+               <citation>Continuous water quality monitoring by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="35" vocabulary="LBR">USU35</variableCode>
+               <variableName>pH</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Average</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>dimensionless</unitName>
+                  <unitType>Dimensionless</unitType>
+                  <unitAbbreviation>-</unitAbbreviation>
+                  <unitCode>137</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale isRegular="true">
+                  <unit>
+                     <unitName>minute</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>min</unitAbbreviation>
+                     <unitCode>102</unitCode>
+                  </unit>
+                  <timeSupport>30</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>151138</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2007-08-16T16:30:00</beginDateTime>
+               <endDateTime>2016-08-02T12:30:00</endDateTime>
+               <beginDateTimeUTC>2007-08-16T23:30:00</beginDateTimeUTC>
+               <endDateTimeUTC>2016-08-02T19:30:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="21">
+               <methodDescription>pH measured using a Hydrolab MS5 Water Quality Multiprobe.</methodDescription>
+            </method>
+            <source sourceID="1">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Continuous water quality monitoring by Utah State University as part of the USDA CEAP Grant</sourceDescription>
+               <citation>Continuous water quality monitoring by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="0">
+               <qualityControlLevelCode>0</qualityControlLevelCode>
+               <definition>Raw data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="36" vocabulary="LBR">USU36</variableCode>
+               <variableName>Temperature</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Average</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>degree celsius</unitName>
+                  <unitType>Temperature</unitType>
+                  <unitAbbreviation>degC</unitAbbreviation>
+                  <unitCode>96</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale isRegular="true">
+                  <unit>
+                     <unitName>minute</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>min</unitAbbreviation>
+                     <unitCode>102</unitCode>
+                  </unit>
+                  <timeSupport>30</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>24206</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2007-08-16T16:30:00</beginDateTime>
+               <endDateTime>2009-01-16T12:30:00</endDateTime>
+               <beginDateTimeUTC>2007-08-16T23:30:00</beginDateTimeUTC>
+               <endDateTimeUTC>2009-01-16T19:30:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="28">
+               <methodDescription>Quality Control Level 1 Data Series created from raw QC Level 0 data using ODM Tools.</methodDescription>
+            </method>
+            <source sourceID="1">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Continuous water quality monitoring by Utah State University as part of the USDA CEAP Grant</sourceDescription>
+               <citation>Continuous water quality monitoring by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="36" vocabulary="LBR">USU36</variableCode>
+               <variableName>Temperature</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Average</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>degree celsius</unitName>
+                  <unitType>Temperature</unitType>
+                  <unitAbbreviation>degC</unitAbbreviation>
+                  <unitCode>96</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale isRegular="true">
+                  <unit>
+                     <unitName>minute</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>min</unitAbbreviation>
+                     <unitCode>102</unitCode>
+                  </unit>
+                  <timeSupport>30</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>80732</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2011-11-08T15:00:00</beginDateTime>
+               <endDateTime>2016-08-02T12:30:00</endDateTime>
+               <beginDateTimeUTC>2011-11-08T22:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2016-08-02T19:30:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="33">
+               <methodDescription>Water temperature measured using a Campbell Scientific CS450 pressure transducer.</methodDescription>
+            </method>
+            <source sourceID="1">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Continuous water quality monitoring by Utah State University as part of the USDA CEAP Grant</sourceDescription>
+               <citation>Continuous water quality monitoring by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="0">
+               <qualityControlLevelCode>0</qualityControlLevelCode>
+               <definition>Raw data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="36" vocabulary="LBR">USU36</variableCode>
+               <variableName>Temperature</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Average</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>degree celsius</unitName>
+                  <unitType>Temperature</unitType>
+                  <unitAbbreviation>degC</unitAbbreviation>
+                  <unitCode>96</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale isRegular="true">
+                  <unit>
+                     <unitName>minute</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>min</unitAbbreviation>
+                     <unitCode>102</unitCode>
+                  </unit>
+                  <timeSupport>30</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>151138</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2007-08-16T16:30:00</beginDateTime>
+               <endDateTime>2016-08-02T12:30:00</endDateTime>
+               <beginDateTimeUTC>2007-08-16T23:30:00</beginDateTimeUTC>
+               <endDateTimeUTC>2016-08-02T19:30:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="18">
+               <methodDescription>Water temperature measured using a Hydrolab MS5 Water Quality Multiprobe.</methodDescription>
+            </method>
+            <source sourceID="1">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Continuous water quality monitoring by Utah State University as part of the USDA CEAP Grant</sourceDescription>
+               <citation>Continuous water quality monitoring by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="0">
+               <qualityControlLevelCode>0</qualityControlLevelCode>
+               <definition>Raw data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="37" vocabulary="LBR">USU37</variableCode>
+               <variableName>Turbidity</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Average</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>nephelometric turbidity units</unitName>
+                  <unitType>Turbidity</unitType>
+                  <unitAbbreviation>NTU</unitAbbreviation>
+                  <unitCode>221</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale isRegular="true">
+                  <unit>
+                     <unitName>minute</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>min</unitAbbreviation>
+                     <unitCode>102</unitCode>
+                  </unit>
+                  <timeSupport>30</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>24206</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2007-08-16T16:30:00</beginDateTime>
+               <endDateTime>2009-01-16T12:30:00</endDateTime>
+               <beginDateTimeUTC>2007-08-16T23:30:00</beginDateTimeUTC>
+               <endDateTimeUTC>2009-01-16T19:30:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="23">
+               <methodDescription>Turbidity measured using a Hydroloab MS5 Water Quality Multiprobe.</methodDescription>
+            </method>
+            <source sourceID="1">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Continuous water quality monitoring by Utah State University as part of the USDA CEAP Grant</sourceDescription>
+               <citation>Continuous water quality monitoring by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="0">
+               <qualityControlLevelCode>0</qualityControlLevelCode>
+               <definition>Raw data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="39" vocabulary="LBR">USU39</variableCode>
+               <variableName>Phosphorus, total</variableName>
+               <valueType>Sample</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>milligrams per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mg/L</unitAbbreviation>
+                  <unitCode>199</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>second</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>s</unitAbbreviation>
+                     <unitCode>100</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>P</speciation>
+            </variable>
+            <valueCount>141</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2005-04-27T20:00:00</beginDateTime>
+               <endDateTime>2007-06-07T14:20:00</endDateTime>
+               <beginDateTimeUTC>2005-04-28T03:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2007-06-07T21:20:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="25">
+               <methodDescription>Water chemistry grab sample collected by technicians in the field.</methodDescription>
+            </method>
+            <source sourceID="4">
+               <organization>Utah State University Department of Watershed Sciences</organization>
+               <sourceDescription>Water chemistry monitoring data collected by Utah State Univeristy as part of the USDA CEAP Grant.</sourceDescription>
+               <citation>Water chemistry monitoring data collected by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="39" vocabulary="LBR">USU39</variableCode>
+               <variableName>Phosphorus, total</variableName>
+               <valueType>Sample</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>milligrams per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mg/L</unitAbbreviation>
+                  <unitCode>199</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>second</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>s</unitAbbreviation>
+                     <unitCode>100</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>P</speciation>
+            </variable>
+            <valueCount>91</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2007-10-04T12:00:00</beginDateTime>
+               <endDateTime>2009-12-10T14:00:00</endDateTime>
+               <beginDateTimeUTC>2007-10-04T19:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2009-12-10T21:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="25">
+               <methodDescription>Water chemistry grab sample collected by technicians in the field.</methodDescription>
+            </method>
+            <source sourceID="3">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Water chemistry monitoring data collected by Utah State University as part of a National Science Foundation funded test bed project.</sourceDescription>
+               <citation>Water chemistry monitoring data collected by Jeff Horsburgh, David Stevens, David Tarboton, Nancy Mesner, Amber Spackman, and Sandra Gurrero at Utah State University as part of a National Science Foundation funded WATERS Network Test Bed project.</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="40" vocabulary="LBR">USU40</variableCode>
+               <variableName>Phosphorus, total dissolved</variableName>
+               <valueType>Sample</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>milligrams per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mg/L</unitAbbreviation>
+                  <unitCode>199</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>second</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>s</unitAbbreviation>
+                     <unitCode>100</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>P</speciation>
+            </variable>
+            <valueCount>88</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2007-10-04T12:00:00</beginDateTime>
+               <endDateTime>2009-12-10T14:00:00</endDateTime>
+               <beginDateTimeUTC>2007-10-04T19:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2009-12-10T21:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="25">
+               <methodDescription>Water chemistry grab sample collected by technicians in the field.</methodDescription>
+            </method>
+            <source sourceID="3">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Water chemistry monitoring data collected by Utah State University as part of a National Science Foundation funded test bed project.</sourceDescription>
+               <citation>Water chemistry monitoring data collected by Jeff Horsburgh, David Stevens, David Tarboton, Nancy Mesner, Amber Spackman, and Sandra Gurrero at Utah State University as part of a National Science Foundation funded WATERS Network Test Bed project.</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="40" vocabulary="LBR">USU40</variableCode>
+               <variableName>Phosphorus, total dissolved</variableName>
+               <valueType>Sample</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>milligrams per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mg/L</unitAbbreviation>
+                  <unitCode>199</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>second</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>s</unitAbbreviation>
+                     <unitCode>100</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>P</speciation>
+            </variable>
+            <valueCount>146</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2005-10-27T21:30:00</beginDateTime>
+               <endDateTime>2007-06-07T14:20:00</endDateTime>
+               <beginDateTimeUTC>2005-10-28T04:30:00</beginDateTimeUTC>
+               <endDateTimeUTC>2007-06-07T21:20:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="25">
+               <methodDescription>Water chemistry grab sample collected by technicians in the field.</methodDescription>
+            </method>
+            <source sourceID="4">
+               <organization>Utah State University Department of Watershed Sciences</organization>
+               <sourceDescription>Water chemistry monitoring data collected by Utah State Univeristy as part of the USDA CEAP Grant.</sourceDescription>
+               <citation>Water chemistry monitoring data collected by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="41" vocabulary="LBR">USU41</variableCode>
+               <variableName>Solids, total Suspended</variableName>
+               <valueType>Sample</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>milligrams per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mg/L</unitAbbreviation>
+                  <unitCode>199</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>second</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>s</unitAbbreviation>
+                     <unitCode>100</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>92</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2007-10-04T12:00:00</beginDateTime>
+               <endDateTime>2009-12-10T14:00:00</endDateTime>
+               <beginDateTimeUTC>2007-10-04T19:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2009-12-10T21:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="25">
+               <methodDescription>Water chemistry grab sample collected by technicians in the field.</methodDescription>
+            </method>
+            <source sourceID="3">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Water chemistry monitoring data collected by Utah State University as part of a National Science Foundation funded test bed project.</sourceDescription>
+               <citation>Water chemistry monitoring data collected by Jeff Horsburgh, David Stevens, David Tarboton, Nancy Mesner, Amber Spackman, and Sandra Gurrero at Utah State University as part of a National Science Foundation funded WATERS Network Test Bed project.</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="41" vocabulary="LBR">USU41</variableCode>
+               <variableName>Solids, total Suspended</variableName>
+               <valueType>Sample</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>milligrams per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mg/L</unitAbbreviation>
+                  <unitCode>199</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>second</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>s</unitAbbreviation>
+                     <unitCode>100</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>15</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2012-01-06T12:00:00</beginDateTime>
+               <endDateTime>2012-05-10T12:30:00</endDateTime>
+               <beginDateTimeUTC>2012-01-06T19:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2012-05-10T19:30:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="25">
+               <methodDescription>Water chemistry grab sample collected by technicians in the field.</methodDescription>
+            </method>
+            <source sourceID="7">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Water quality grab samples collected in the Little Bear River</sourceDescription>
+               <citation>Water quality grab samples collected by Brant Whiting at Utah State University as part of a Utah Water Research Laboratory funded project examining sediment concentrations and fluxes in the Little Bear River, Utah, USA.</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="41" vocabulary="LBR">USU41</variableCode>
+               <variableName>Solids, total Suspended</variableName>
+               <valueType>Sample</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>milligrams per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mg/L</unitAbbreviation>
+                  <unitCode>199</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>second</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>s</unitAbbreviation>
+                     <unitCode>100</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>146</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2005-04-27T20:00:00</beginDateTime>
+               <endDateTime>2007-06-07T14:20:00</endDateTime>
+               <beginDateTimeUTC>2005-04-28T03:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2007-06-07T21:20:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="25">
+               <methodDescription>Water chemistry grab sample collected by technicians in the field.</methodDescription>
+            </method>
+            <source sourceID="4">
+               <organization>Utah State University Department of Watershed Sciences</organization>
+               <sourceDescription>Water chemistry monitoring data collected by Utah State Univeristy as part of the USDA CEAP Grant.</sourceDescription>
+               <citation>Water chemistry monitoring data collected by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="44" vocabulary="LBR">USU44</variableCode>
+               <variableName>Discharge</variableName>
+               <valueType>Derived Value</valueType>
+               <dataType>Average</dataType>
+               <generalCategory>Hydrology</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>cubic feet per second</unitName>
+                  <unitType>Flow</unitType>
+                  <unitAbbreviation>cfs</unitAbbreviation>
+                  <unitCode>35</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale isRegular="true">
+                  <unit>
+                     <unitName>minute</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>min</unitAbbreviation>
+                     <unitCode>102</unitCode>
+                  </unit>
+                  <timeSupport>30</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>114364</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2005-08-04T11:30:00</beginDateTime>
+               <endDateTime>2012-05-22T11:00:00</endDateTime>
+               <beginDateTimeUTC>2005-08-04T18:30:00</beginDateTimeUTC>
+               <endDateTimeUTC>2012-05-22T18:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="29">
+               <methodDescription>Discharge derived from water level measurements using a site specific stage-discharge relationship.</methodDescription>
+            </method>
+            <source sourceID="1">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Continuous water quality monitoring by Utah State University as part of the USDA CEAP Grant</sourceDescription>
+               <citation>Continuous water quality monitoring by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="2">
+               <qualityControlLevelCode>2</qualityControlLevelCode>
+               <definition>Derived products</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="47" vocabulary="LBR">USU47</variableCode>
+               <variableName>Solids, total suspended</variableName>
+               <valueType>Model Simulation Result</valueType>
+               <dataType>Median</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>milligrams per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mg/L</unitAbbreviation>
+                  <unitCode>199</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale isRegular="true">
+                  <unit>
+                     <unitName>second</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>s</unitAbbreviation>
+                     <unitCode>100</unitCode>
+                  </unit>
+                  <timeSupport>5</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>50022</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2005-08-04T11:30:00</beginDateTime>
+               <endDateTime>2008-06-19T08:00:00</endDateTime>
+               <beginDateTimeUTC>2005-08-04T18:30:00</beginDateTimeUTC>
+               <endDateTimeUTC>2008-06-19T15:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="31">
+               <methodDescription>Synthetic time series generated from continuous turbidity observations using surrogate relationships.</methodDescription>
+            </method>
+            <source sourceID="6">
+               <organization> Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Continuous time series concentration estimates generated by the Little Bear River test bed project for the purpose of high frequency water quality constituent load estimates.</sourceDescription>
+               <citation>Continuous time series concentration estimates generated by the Little Bear River test bed project for the purpose of high frequency water quality constituent load estimates.</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="2">
+               <qualityControlLevelCode>2</qualityControlLevelCode>
+               <definition>Derived products</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="48" vocabulary="LBR">USU48</variableCode>
+               <variableName>Phosphorus, total</variableName>
+               <valueType>Model Simulation Result</valueType>
+               <dataType>Median</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>milligrams per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mg/L</unitAbbreviation>
+                  <unitCode>199</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale isRegular="true">
+                  <unit>
+                     <unitName>second</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>s</unitAbbreviation>
+                     <unitCode>100</unitCode>
+                  </unit>
+                  <timeSupport>5</timeSupport>
+               </timeScale>
+               <speciation>P</speciation>
+            </variable>
+            <valueCount>50022</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2005-08-04T11:30:00</beginDateTime>
+               <endDateTime>2008-06-19T08:00:00</endDateTime>
+               <beginDateTimeUTC>2005-08-04T18:30:00</beginDateTimeUTC>
+               <endDateTimeUTC>2008-06-19T15:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="31">
+               <methodDescription>Synthetic time series generated from continuous turbidity observations using surrogate relationships.</methodDescription>
+            </method>
+            <source sourceID="6">
+               <organization> Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Continuous time series concentration estimates generated by the Little Bear River test bed project for the purpose of high frequency water quality constituent load estimates.</sourceDescription>
+               <citation>Continuous time series concentration estimates generated by the Little Bear River test bed project for the purpose of high frequency water quality constituent load estimates.</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="2">
+               <qualityControlLevelCode>2</qualityControlLevelCode>
+               <definition>Derived products</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="63" vocabulary="LBR">USU63</variableCode>
+               <variableName>Alkalinity, carbonate plus bicarbonate</variableName>
+               <valueType>Sample</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>milligrams per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mg/L</unitAbbreviation>
+                  <unitCode>199</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>second</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>s</unitAbbreviation>
+                     <unitCode>100</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>CaCO3</speciation>
+            </variable>
+            <valueCount>41</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2008-08-21T14:00:00</beginDateTime>
+               <endDateTime>2009-12-10T14:00:00</endDateTime>
+               <beginDateTimeUTC>2008-08-21T21:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2009-12-10T21:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="25">
+               <methodDescription>Water chemistry grab sample collected by technicians in the field.</methodDescription>
+            </method>
+            <source sourceID="3">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Water chemistry monitoring data collected by Utah State University as part of a National Science Foundation funded test bed project.</sourceDescription>
+               <citation>Water chemistry monitoring data collected by Jeff Horsburgh, David Stevens, David Tarboton, Nancy Mesner, Amber Spackman, and Sandra Gurrero at Utah State University as part of a National Science Foundation funded WATERS Network Test Bed project.</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="64" vocabulary="LBR">USU64</variableCode>
+               <variableName>Nitrogen, total dissolved</variableName>
+               <valueType>Sample</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>milligrams per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mg/L</unitAbbreviation>
+                  <unitCode>199</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>second</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>s</unitAbbreviation>
+                     <unitCode>100</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>N</speciation>
+            </variable>
+            <valueCount>14</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2008-02-12T15:15:00</beginDateTime>
+               <endDateTime>2009-06-25T12:00:00</endDateTime>
+               <beginDateTimeUTC>2008-02-12T22:15:00</beginDateTimeUTC>
+               <endDateTimeUTC>2009-06-25T19:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="25">
+               <methodDescription>Water chemistry grab sample collected by technicians in the field.</methodDescription>
+            </method>
+            <source sourceID="3">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Water chemistry monitoring data collected by Utah State University as part of a National Science Foundation funded test bed project.</sourceDescription>
+               <citation>Water chemistry monitoring data collected by Jeff Horsburgh, David Stevens, David Tarboton, Nancy Mesner, Amber Spackman, and Sandra Gurrero at Utah State University as part of a National Science Foundation funded WATERS Network Test Bed project.</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="65" vocabulary="LBR">USU65</variableCode>
+               <variableName>Nitrogen, total</variableName>
+               <valueType>Sample</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>milligrams per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mg/L</unitAbbreviation>
+                  <unitCode>199</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>second</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>s</unitAbbreviation>
+                     <unitCode>100</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>N</speciation>
+            </variable>
+            <valueCount>17</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2008-02-12T15:15:00</beginDateTime>
+               <endDateTime>2009-06-25T12:00:00</endDateTime>
+               <beginDateTimeUTC>2008-02-12T22:15:00</beginDateTimeUTC>
+               <endDateTimeUTC>2009-06-25T19:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="25">
+               <methodDescription>Water chemistry grab sample collected by technicians in the field.</methodDescription>
+            </method>
+            <source sourceID="3">
+               <organization>Utah State University Utah Water Research Laboratory</organization>
+               <sourceDescription>Water chemistry monitoring data collected by Utah State University as part of a National Science Foundation funded test bed project.</sourceDescription>
+               <citation>Water chemistry monitoring data collected by Jeff Horsburgh, David Stevens, David Tarboton, Nancy Mesner, Amber Spackman, and Sandra Gurrero at Utah State University as part of a National Science Foundation funded WATERS Network Test Bed project.</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="39" vocabulary="LBR">USU39</variableCode>
+               <variableName>Phosphorus, total</variableName>
+               <valueType>Sample</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>milligrams per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mg/L</unitAbbreviation>
+                  <unitCode>199</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>second</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>s</unitAbbreviation>
+                     <unitCode>100</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>P</speciation>
+            </variable>
+            <valueCount>141</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2005-04-27T20:00:00</beginDateTime>
+               <endDateTime>2007-06-07T14:20:00</endDateTime>
+               <beginDateTimeUTC>2005-04-28T03:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2007-06-07T21:20:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="25">
+               <methodDescription>Water chemistry grab sample collected by technicians in the field.</methodDescription>
+            </method>
+            <source sourceID="4">
+               <organization>Utah State University Department of Watershed Sciences</organization>
+               <sourceDescription>Water chemistry monitoring data collected by Utah State Univeristy as part of the USDA CEAP Grant.</sourceDescription>
+               <citation>Water chemistry monitoring data collected by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="40" vocabulary="LBR">USU40</variableCode>
+               <variableName>Phosphorus, total dissolved</variableName>
+               <valueType>Sample</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>milligrams per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mg/L</unitAbbreviation>
+                  <unitCode>199</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>second</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>s</unitAbbreviation>
+                     <unitCode>100</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>P</speciation>
+            </variable>
+            <valueCount>146</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2005-10-27T21:30:00</beginDateTime>
+               <endDateTime>2007-06-07T14:20:00</endDateTime>
+               <beginDateTimeUTC>2005-10-28T04:30:00</beginDateTimeUTC>
+               <endDateTimeUTC>2007-06-07T21:20:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="25">
+               <methodDescription>Water chemistry grab sample collected by technicians in the field.</methodDescription>
+            </method>
+            <source sourceID="4">
+               <organization>Utah State University Department of Watershed Sciences</organization>
+               <sourceDescription>Water chemistry monitoring data collected by Utah State Univeristy as part of the USDA CEAP Grant.</sourceDescription>
+               <citation>Water chemistry monitoring data collected by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="41" vocabulary="LBR">USU41</variableCode>
+               <variableName>Solids, total Suspended</variableName>
+               <valueType>Sample</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Water Quality</generalCategory>
+               <sampleMedium>Surface Water</sampleMedium>
+               <unit>
+                  <unitName>milligrams per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mg/L</unitAbbreviation>
+                  <unitCode>199</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>second</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>s</unitAbbreviation>
+                     <unitCode>100</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>146</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2005-04-27T20:00:00</beginDateTime>
+               <endDateTime>2007-06-07T14:20:00</endDateTime>
+               <beginDateTimeUTC>2005-04-28T03:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2007-06-07T21:20:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="25">
+               <methodDescription>Water chemistry grab sample collected by technicians in the field.</methodDescription>
+            </method>
+            <source sourceID="4">
+               <organization>Utah State University Department of Watershed Sciences</organization>
+               <sourceDescription>Water chemistry monitoring data collected by Utah State Univeristy as part of the USDA CEAP Grant.</sourceDescription>
+               <citation>Water chemistry monitoring data collected by Jeff Horsburgh, David Stevens, Nancy Mesner and others from Utah State University as part of the USDA Conservation Effects Assessment Grant</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+      </seriesCatalog>
+   </site>
+</sitesResponse>

@@ -1,0 +1,536 @@
+{
+  "accessUrl": "https://data.icos-cp.eu/objects/n94jijAEWH95fMNn8Mwd4I0M",
+  "coverageGeo": {
+    "geometry": {
+      "coordinates": [2.993217, 51.57989],
+      "type": "Point"
+    },
+    "properties": {
+      "label": "1199"
+    },
+    "type": "Feature"
+  },
+  "doi": "10.18160/TPH2-QBBE",
+  "fileName": "119920180214.csv",
+  "hash": "n94jijAEWH95fMNn8Mwd4I0MNmnWH0nZwblGu6EbHls",
+  "latestVersion": "https://meta.icos-cp.eu/objects/n94jijAEWH95fMNn8Mwd4I0M",
+  "parentCollections": [{
+    "comments": [],
+    "label": "ICOS Ocean Level 2 Data Release May-Dec 2021 (2021-1)",
+    "uri": "https://meta.icos-cp.eu/collections/TqzkW2nUzbufj_6pnJzzq7o5"
+  }],
+  "pid": "11676/n94jijAEWH95fMNn8Mwd4I0M",
+  "references": {
+    "authors": [{
+      "email": "thanos.gkritzalis@vliz.be",
+      "firstName": "Thanos",
+      "lastName": "Gkritzalis",
+      "orcid": "0000-0002-7897-4230",
+      "self": {
+        "comments": [],
+        "uri": "http://meta.icos-cp.eu/resources/people/Thanos_Gkritzalis"
+      }
+    }, {
+      "email": "hannelore.theetaert@vliz.be",
+      "firstName": "Hannelore",
+      "lastName": "Theetaert",
+      "orcid": "0000-0003-2307-884X",
+      "self": {
+        "comments": [],
+        "uri": "http://meta.icos-cp.eu/resources/people/Hannelore_Theetaert"
+      }
+    }, {
+      "email": "andre.cattrijsse@vliz.be",
+      "firstName": "Andre",
+      "lastName": "Cattrijsse",
+      "orcid": "0000-0003-0772-3087",
+      "self": {
+        "comments": [],
+        "uri": "http://meta.icos-cp.eu/resources/people/Andre_Cattrijsse"
+      }
+    }],
+    "citationBibTex": "@misc{https://doi.org/10.18160/tph2-qbbe,\n  doi = {10.18160/TPH2-QBBE},\n  url = {https://meta.icos-cp.eu/objects/n94jijAEWH95fMNn8Mwd4I0M},\n  author = {Gkritzalis, Thanos and Theetaert, Hannelore and Cattrijsse, Andre},\n  title = {ICOS OTC FOS Release from BE-FOS-Thornton Buoy 2018-02-14–2020-07-10},\n  publisher = {ICOS Ocean Thematic Centre},\n  year = {2021}\n}",
+    "citationRis": "TY  - DATA\r\nT1  - ICOS OTC FOS Release from BE-FOS-Thornton Buoy 2018-02-14–2020-07-10\r\nAU  - Gkritzalis, Thanos\r\nAU  - Theetaert, Hannelore\r\nAU  - Cattrijsse, Andre\r\nDO  - 10.18160/TPH2-QBBE\r\nUR  - https://meta.icos-cp.eu/objects/n94jijAEWH95fMNn8Mwd4I0M\r\nPY  - 2021\r\nPB  - ICOS Ocean Thematic Centre\r\nER  -",
+    "citationString": "Gkritzalis, T., Theetaert, H., Cattrijsse, A., 2021. ICOS OTC FOS Release from BE-FOS-Thornton Buoy 2018-02-14–2020-07-10. https://doi.org/10.18160/TPH2-QBBE",
+    "doi": {
+      "contributors": [{
+        "affiliation": [{
+          "name": "Geophysical Institute, University of Bergen"
+        }],
+        "contributorType": "DataManager",
+        "name": "Bjerknes Climate Data Centre",
+        "nameIdentifiers": [],
+        "nameType": "Organizational"
+      }],
+      "creators": [{
+        "affiliation": [{
+          "name": "Vlaams Instituut voor de Zee (Flanders Marine Institute), VLIZ"
+        }],
+        "familyName": "Gkritzalis",
+        "givenName": "Thanos",
+        "nameIdentifiers": [{
+          "nameIdentifier": "https://orcid.org/0000-0002-7897-4230",
+          "nameIdentifierScheme": "ORCID",
+          "schemeUri": "http://orcid.org/"
+        }],
+        "nameType": "Personal"
+      }, {
+        "affiliation": [{
+          "name": "Vlaams Instituut voor de Zee (Flanders Marine Institute), VLIZ"
+        }],
+        "familyName": "Theetaert",
+        "givenName": "Hannelore",
+        "nameIdentifiers": [{
+          "nameIdentifier": "https://orcid.org/0000-0003-2307-884X",
+          "nameIdentifierScheme": "ORCID",
+          "schemeUri": "http://orcid.org/"
+        }],
+        "nameType": "Personal"
+      }, {
+        "affiliation": [{
+          "name": "Vlaams Instituut voor de Zee (Flanders Marine Institute), VLIZ"
+        }],
+        "familyName": "Cattrijsse",
+        "givenName": "Andre",
+        "nameIdentifiers": [{
+          "nameIdentifier": "https://orcid.org/0000-0003-0772-3087",
+          "nameIdentifierScheme": "ORCID",
+          "schemeUri": "http://orcid.org/"
+        }],
+        "nameType": "Personal"
+      }],
+      "dates": [{
+        "date": "2021",
+        "dateType": "Issued"
+      }],
+      "descriptions": [],
+      "doi": "10.18160/TPH2-QBBE",
+      "formats": [],
+      "fundingReferences": [],
+      "geoLocations": [],
+      "publicationYear": 2021,
+      "publisher": "ICOS Ocean Thematic Centre",
+      "rightsList": [],
+      "state": "findable",
+      "subjects": [],
+      "titles": [{
+        "lang": "en-uk",
+        "title": "ICOS OTC FOS Release from BE-FOS-Thornton Buoy 2018-02-14–2020-07-10"
+      }],
+      "types": {
+        "resourceType": "L2",
+        "resourceTypeGeneral": "Dataset"
+      },
+      "url": "https://meta.icos-cp.eu/objects/n94jijAEWH95fMNn8Mwd4I0M"
+    },
+    "licence": {
+      "baseLicence": "https://creativecommons.org/licenses/by/4.0",
+      "name": "ICOS CCBY4 Data Licence",
+      "url": "http://meta.icos-cp.eu/ontologies/cpmeta/icosLicence",
+      "webpage": "https://data.icos-cp.eu/licence"
+    },
+    "temporalCoverageDisplay": "2018-02-14–2020-07-10",
+    "title": "ICOS OTC FOS Release, BE-FOS-Thornton Buoy, 2018-02-14–2020-07-10"
+  },
+  "size": 1042099,
+  "specificInfo": {
+    "acquisition": {
+      "instrument": {
+        "comments": [],
+        "label": "Thornton Buoy Pro-OCEANUS CO2-Pro",
+        "uri": "http://meta.icos-cp.eu/resources/instruments/OTC_Thornton_Pro-OCEANUS"
+      },
+      "interval": {
+        "start": "2018-02-14T16:20:00Z",
+        "stop": "2020-07-10T20:00:31Z"
+      },
+      "station": {
+        "countryCode": "BE",
+        "id": "1199",
+        "location": {
+          "label": "1199",
+          "lat": 51.57989,
+          "lon": 2.993217
+        },
+        "org": {
+          "name": "BE-FOS-Thornton Buoy",
+          "self": {
+            "comments": ["Moored surface buoy that serves both ERICs ICOS and LifeWatch. The buoy is equipped with sensors for pCO2, dissolved oxygen, temperature, salinity, fluorescence (chl-a), turbidity, passive acoustic receiver. Sensors are deployed approx 1m below sea surface. Station is visited on a monthly basis in order to collect samples for validation/calibration of sensors and maintain/replace equipment. Station has a secure and stable communication with VLIZ servers for NRT data transmission and overall interactive communication with in situ equipment "],
+            "label": "1199",
+            "uri": "http://meta.icos-cp.eu/resources/stations/OS_1199"
+          }
+        },
+        "pictures": [],
+        "responsibleOrganization": {
+          "name": "Vlaams Instituut voor de Zee (Flanders Marine Institute), VLIZ",
+          "self": {
+            "comments": [],
+            "uri": "http://meta.icos-cp.eu/resources/organizations/vliz"
+          }
+        },
+        "specificInfo": {
+          "_type": "otc",
+          "discontinued": false,
+          "documentation": [],
+          "labelingDate": "2018-11-30",
+          "stationClass": "1",
+          "theme": {
+            "icon": "https://static.icos-cp.eu/images/themes/oce.svg",
+            "markerIcon": "https://static.icos-cp.eu/share/stations/icons/os.png",
+            "self": {
+              "comments": [],
+              "label": "Ocean data",
+              "uri": "http://meta.icos-cp.eu/resources/themes/ocean"
+            }
+          }
+        }
+      }
+    },
+    "columns": [{
+      "label": "TIMESTAMP",
+      "model": {
+        "comments": [],
+        "label": "TIMESTAMP (ISO)",
+        "uri": "http://meta.icos-cp.eu/resources/cpmeta/timeStampColumn"
+      },
+      "valueFormat": "http://meta.icos-cp.eu/ontologies/cpmeta/iso8601dateTime",
+      "valueType": {
+        "self": {
+          "comments": [],
+          "label": "time instant, UTC",
+          "uri": "http://meta.icos-cp.eu/resources/cpmeta/timeStamp"
+        }
+      }
+    }, {
+      "label": "Temp [degC]",
+      "model": {
+        "comments": [],
+        "label": "Temp [degC]",
+        "uri": "http://meta.icos-cp.eu/resources/cpmeta/waterTempDegCelciusColumn"
+      },
+      "valueFormat": "http://meta.icos-cp.eu/ontologies/cpmeta/float32",
+      "valueType": {
+        "quantityKind": {
+          "comments": ["physical temperature"],
+          "label": "temperature",
+          "uri": "http://meta.icos-cp.eu/resources/cpmeta/temperature"
+        },
+        "self": {
+          "comments": [],
+          "label": "water temperature",
+          "uri": "http://meta.icos-cp.eu/resources/cpmeta/waterTempCelcius"
+        },
+        "unit": "°C"
+      }
+    }, {
+      "label": "Temp [degC] QC Flag",
+      "model": {
+        "comments": [],
+        "label": "Temp [degC] QC Flag",
+        "uri": "http://meta.icos-cp.eu/resources/cpmeta/waterTempDegCelciusQCflag"
+      },
+      "valueFormat": "http://meta.icos-cp.eu/ontologies/cpmeta/bmpChar",
+      "valueType": {
+        "self": {
+          "comments": ["small positive integer number"],
+          "label": "quality flag (int)",
+          "uri": "http://meta.icos-cp.eu/resources/cpmeta/integerQualityFlag"
+        }
+      }
+    }, {
+      "label": "P_sal [psu]",
+      "model": {
+        "comments": [],
+        "label": "P_sal [psu]",
+        "uri": "http://meta.icos-cp.eu/resources/cpmeta/practSalinityColumn"
+      },
+      "valueFormat": "http://meta.icos-cp.eu/ontologies/cpmeta/float32",
+      "valueType": {
+        "quantityKind": {
+          "comments": ["Magnitude of a part of a whole. Can be measured in percent, or be a number between 0 and maximum (inclusive)."],
+          "label": "portion",
+          "uri": "http://meta.icos-cp.eu/resources/cpmeta/portion"
+        },
+        "self": {
+          "comments": ["practical salinity of the water body"],
+          "label": "practical salinity",
+          "uri": "http://meta.icos-cp.eu/resources/cpmeta/salinity"
+        },
+        "unit": "psu"
+      }
+    }, {
+      "label": "P_sal [psu] QC Flag",
+      "model": {
+        "comments": [],
+        "label": "P_sal [psu] QC Flag",
+        "uri": "http://meta.icos-cp.eu/resources/cpmeta/practSalinityQCflag"
+      },
+      "valueFormat": "http://meta.icos-cp.eu/ontologies/cpmeta/bmpChar",
+      "valueType": {
+        "self": {
+          "comments": ["small positive integer number"],
+          "label": "quality flag (int)",
+          "uri": "http://meta.icos-cp.eu/resources/cpmeta/integerQualityFlag"
+        }
+      }
+    }, {
+      "label": "pCO2 [uatm]",
+      "model": {
+        "comments": [],
+        "label": "pCO2 [uatm]",
+        "uri": "http://meta.icos-cp.eu/resources/cpmeta/pCO2_sst_uatm"
+      },
+      "valueFormat": "http://meta.icos-cp.eu/ontologies/cpmeta/float32",
+      "valueType": {
+        "quantityKind": {
+          "comments": ["mechanical pressure, e.g. atmospheric or gas pressure"],
+          "label": "pressure",
+          "uri": "http://meta.icos-cp.eu/resources/cpmeta/pressure"
+        },
+        "self": {
+          "comments": ["CO2 partial pressure in water body at sea surface temperature"],
+          "label": "CO2 partial pressure (water), SST",
+          "uri": "http://meta.icos-cp.eu/resources/cpmeta/co2PartPressWaterSST"
+        },
+        "unit": "µatm"
+      }
+    }, {
+      "label": "pCO2 [uatm] QC Flag",
+      "model": {
+        "comments": [],
+        "label": "pCO2 [uatm] QC Flag",
+        "uri": "http://meta.icos-cp.eu/resources/cpmeta/pCO2_sst_uatmQCflag"
+      },
+      "valueFormat": "http://meta.icos-cp.eu/ontologies/cpmeta/bmpChar",
+      "valueType": {
+        "self": {
+          "comments": ["small positive integer number"],
+          "label": "quality flag (int)",
+          "uri": "http://meta.icos-cp.eu/resources/cpmeta/integerQualityFlag"
+        }
+      }
+    }, {
+      "label": "fCO2 [uatm]",
+      "model": {
+        "comments": [],
+        "label": "fCO2 [uatm]",
+        "uri": "http://meta.icos-cp.eu/resources/cpmeta/otc_fCO2_column"
+      },
+      "valueFormat": "http://meta.icos-cp.eu/ontologies/cpmeta/float32",
+      "valueType": {
+        "quantityKind": {
+          "comments": ["mechanical pressure, e.g. atmospheric or gas pressure"],
+          "label": "pressure",
+          "uri": "http://meta.icos-cp.eu/resources/cpmeta/pressure"
+        },
+        "self": {
+          "comments": ["Fugacity of carbon dioxide (water) at sea surface temperature (wet air)"],
+          "label": "CO2 fugacity (water), SST",
+          "uri": "http://meta.icos-cp.eu/resources/cpmeta/co2FugacityWater"
+        },
+        "unit": "µatm"
+      }
+    }, {
+      "label": "fCO2 [uatm] QC Flag",
+      "model": {
+        "comments": [],
+        "label": "fCO2 [uatm] QC Flag",
+        "uri": "http://meta.icos-cp.eu/resources/cpmeta/otc_fCO2_columnQCflag"
+      },
+      "valueFormat": "http://meta.icos-cp.eu/ontologies/cpmeta/bmpChar",
+      "valueType": {
+        "self": {
+          "comments": ["small positive integer number"],
+          "label": "quality flag (int)",
+          "uri": "http://meta.icos-cp.eu/resources/cpmeta/integerQualityFlag"
+        }
+      }
+    }],
+    "nRows": 10639,
+    "productionInfo": {
+      "contributors": [{
+        "email": "thanos.gkritzalis@vliz.be",
+        "firstName": "Thanos",
+        "lastName": "Gkritzalis",
+        "orcid": "0000-0002-7897-4230",
+        "self": {
+          "comments": [],
+          "uri": "http://meta.icos-cp.eu/resources/people/Thanos_Gkritzalis"
+        }
+      }],
+      "creator": {
+        "name": "Ocean Thematic Centre",
+        "self": {
+          "comments": [],
+          "label": "ICOS OTC",
+          "uri": "http://meta.icos-cp.eu/resources/organizations/OTC"
+        }
+      },
+      "dateTime": "2021-01-21T14:42:00Z",
+      "host": {
+        "name": "Vlaams Instituut voor de Zee (Flanders Marine Institute), VLIZ",
+        "self": {
+          "comments": [],
+          "uri": "http://meta.icos-cp.eu/resources/organizations/vliz"
+        }
+      },
+      "sources": [{
+        "hash": "xEqHdlPT1At-d9QgUg11Qll2c_Epky3jXyLzSo80BK0",
+        "name": "Thornton_Buoy_Wifi_CR6Series_Seabird.dat",
+        "res": "https://meta.icos-cp.eu/objects/xEqHdlPT1At-d9QgUg11Qll2"
+      }, {
+        "hash": "FBrZ6Do5mmTcm5oQepe0x_FJXFEYXKNL4VD7ntOmvBE",
+        "name": "Thornton_Buoy_Wifi_CR6Series_PCO2_Water.dat",
+        "res": "https://meta.icos-cp.eu/objects/FBrZ6Do5mmTcm5oQepe0x_FJ"
+      }, {
+        "hash": "4C6y-m4922IoUGVoTRcfkFTfzZJAN6LWU2EoPD0Fsa0",
+        "name": "Thornton_Buoy_Wifi_CR6Series_PCO2_Air.dat",
+        "res": "https://meta.icos-cp.eu/objects/4C6y-m4922IoUGVoTRcfkFTf"
+      }, {
+        "hash": "OxCs38c0W3B6r4bm9m6VFC6kD-qOfDZhyQOhF9jadrY",
+        "name": "Thornton_Buoy_Wifi_CR6Series_obsData.dat",
+        "res": "https://meta.icos-cp.eu/objects/OxCs38c0W3B6r4bm9m6VFC6k"
+      }, {
+        "hash": "Jv-yrPwX40YvI--0RC0wj4ktzVTWeqCNO2GJozaOjEo",
+        "name": "Thornton_Buoy_Wifi_CR6Series_MetData.dat",
+        "res": "https://meta.icos-cp.eu/objects/Jv-yrPwX40YvI--0RC0wj4kt"
+      }, {
+        "hash": "-nhgwoMRn40Nubx4B0S22ys5xk60TofQC4TJDwipkVw",
+        "name": "Thornton_Buoy_Wifi_CR6Series_Lisst.dat",
+        "res": "https://meta.icos-cp.eu/objects/-nhgwoMRn40Nubx4B0S22ys5"
+      }, {
+        "hash": "Qod5Ei0gHfqlE8HLVJIUqEmEKfTpMU3HcRyKRECKlBQ",
+        "name": "Thornton_Buoy_Wifi_CR6Series_gsmInfo.dat",
+        "res": "https://meta.icos-cp.eu/objects/Qod5Ei0gHfqlE8HLVJIUqEmE"
+      }, {
+        "hash": "AiizhYihRegGM639l3Me49_usveiZlLvH4cypVzPNdM",
+        "name": "Thornton_Buoy_Wifi_CR6Series_GPSData.dat",
+        "res": "https://meta.icos-cp.eu/objects/AiizhYihRegGM639l3Me49_u"
+      }, {
+        "hash": "3NCl9-EdoLDbBT4HXdn9WRs2Os2PBZV7xM8RasGidqM",
+        "name": "Thornton_Buoy_Wifi_CR6Series_CYCLOPS_Data.dat",
+        "res": "https://meta.icos-cp.eu/objects/3NCl9-EdoLDbBT4HXdn9WRs2"
+      }, {
+        "hash": "B7HEgfh2OmTeR3P7xk_8a8s4Z7shisNVVaOeZrwbi9w",
+        "name": "Thornton_Buoy_Wifi_CR6Series_Seabird.dat",
+        "res": "https://meta.icos-cp.eu/objects/B7HEgfh2OmTeR3P7xk_8a8s4"
+      }, {
+        "hash": "3E6dG8-wenkNCJUg8KjlcCY5jCzhHQYPY-N4-XPisF4",
+        "name": "Thornton_Buoy_Wifi_CR6Series_PCO2_Water.dat",
+        "res": "https://meta.icos-cp.eu/objects/3E6dG8-wenkNCJUg8KjlcCY5"
+      }, {
+        "hash": "yohnJj58m2tGzJQHYqoBZufLOvnzh-wcDuefypaFmT0",
+        "name": "Thornton_Buoy_Wifi_CR6Series_PCO2_Cal.dat",
+        "res": "https://meta.icos-cp.eu/objects/yohnJj58m2tGzJQHYqoBZufL"
+      }, {
+        "hash": "AvVp56bLHtPp0bV81jyYGaxcyX8bQGj3aXGJ0uFyc9s",
+        "name": "Thornton_Buoy_Wifi_CR6Series_PCO2_Air.dat",
+        "res": "https://meta.icos-cp.eu/objects/AvVp56bLHtPp0bV81jyYGaxc"
+      }, {
+        "hash": "PEpVWrzW0-mM-jEM5q8oXaVMAXmmKDy4VT7beuOzCLE",
+        "name": "Thornton_Buoy_Wifi_CR6Series_MetData.dat",
+        "res": "https://meta.icos-cp.eu/objects/PEpVWrzW0-mM-jEM5q8oXaVM"
+      }, {
+        "hash": "WKaH4ifXdKdeHSATd1ju6LSL1BkI9TzSMT6-uiwr1jU",
+        "name": "Thornton_Buoy_Wifi_CR6Series_GPSData.dat",
+        "res": "https://meta.icos-cp.eu/objects/WKaH4ifXdKdeHSATd1ju6LSL"
+      }, {
+        "hash": "uBggz8Lm-jkx72HwmMFvDTkjZA7UcdwJvQiWkGQVFiQ",
+        "name": "Thornton-Buoy-Terminal-SBE37.txt",
+        "res": "https://meta.icos-cp.eu/objects/uBggz8Lm-jkx72HwmMFvDTkj"
+      }, {
+        "hash": "HAPkBhcGEwc-_BsHXZ5nLyX9Wti5LXUrNR4rtl4Lhw8",
+        "name": "Thornton_Buoy_Wifi-CR1000_Seaguard.dat",
+        "res": "https://meta.icos-cp.eu/objects/HAPkBhcGEwc-_BsHXZ5nLyX9"
+      }, {
+        "hash": "V4-ClTt4g8yvhbw6-l1oyEysucs1eFlojt5Xc3NbAM8",
+        "name": "Thornton_Buoy_Wifi-CR1000_pH_1.txt",
+        "res": "https://meta.icos-cp.eu/objects/V4-ClTt4g8yvhbw6-l1oyEys"
+      }, {
+        "hash": "6dNCozrhb-ujBBDpq0Ovyq4Bmm7TeqIo-gZtUOaEkgI",
+        "name": "Thornton_Buoy_Wifi-CR1000_pH.dat",
+        "res": "https://meta.icos-cp.eu/objects/6dNCozrhb-ujBBDpq0Ovyq4B"
+      }, {
+        "hash": "Z7YW93O05yWi3HbYyY2h0t-HHhqM6VrgtsQvw7PMWnY",
+        "name": "Thornton_Buoy_Wifi-CR1000_PCO2_W.dat",
+        "res": "https://meta.icos-cp.eu/objects/Z7YW93O05yWi3HbYyY2h0t-H"
+      }, {
+        "hash": "dC_C6F79LX7wWb_YWa5-3S6AUZ298ens7h8HVBQDpXQ",
+        "name": "Thornton_Buoy_Wifi-CR1000_PCO2_A.dat",
+        "res": "https://meta.icos-cp.eu/objects/dC_C6F79LX7wWb_YWa5-3S6A"
+      }, {
+        "hash": "u4TdAQ-KDK_8Ai2b1ETBew3EALNAS2wBvVV85WbCya0",
+        "name": "Thornton_Buoy_Wifi-CR1000_OBS.dat",
+        "res": "https://meta.icos-cp.eu/objects/u4TdAQ-KDK_8Ai2b1ETBew3E"
+      }, {
+        "hash": "dIRv_JbNTrrqrKm5O8nwA6j3vW8zogVgY4oCDv-iLgk",
+        "name": "Thornton_Buoy_Wifi-CR1000_LISST.dat",
+        "res": "https://meta.icos-cp.eu/objects/dIRv_JbNTrrqrKm5O8nwA6j3"
+      }, {
+        "hash": "5c4rIooTvkvqvithpiX9NhMOhrMjlPshnUrJV2FrSMM",
+        "name": "Thornton_Buoy_Wifi-CR1000_Buoy.dat",
+        "res": "https://meta.icos-cp.eu/objects/5c4rIooTvkvqvithpiX9NhMO"
+      }, {
+        "hash": "xPJAEOErT39kQp2cf7sf8BScwmQX0zRlW1gXmGhIrXw",
+        "name": "Thornton_Buoy_GSM-CR1000_SBEuCAT.dat",
+        "res": "https://meta.icos-cp.eu/objects/xPJAEOErT39kQp2cf7sf8BSc"
+      }]
+    }
+  },
+  "specification": {
+    "dataLevel": 2,
+    "datasetSpec": {
+      "self": {
+        "comments": [],
+        "label": "OTC FOS dataset",
+        "uri": "http://meta.icos-cp.eu/resources/cpmeta/otcFosDataset"
+      }
+    },
+    "documentation": [],
+    "encoding": {
+      "comments": [],
+      "label": "plain file",
+      "uri": "http://meta.icos-cp.eu/ontologies/cpmeta/plainFileEncoding"
+    },
+    "format": {
+      "comments": ["Single-line comment, first column is UTC ISO-8601 timestamp, NaN for missing values, comma-separated."],
+      "label": "ICOS OTC time series",
+      "uri": "http://meta.icos-cp.eu/ontologies/cpmeta/asciiOtcProductCsv"
+    },
+    "project": {
+      "keywords": ["ICOS"],
+      "self": {
+        "comments": ["Official ICOS data"],
+        "label": "ICOS",
+        "uri": "http://meta.icos-cp.eu/resources/projects/icos"
+      }
+    },
+    "self": {
+      "comments": [],
+      "label": "ICOS OTC FOS Release",
+      "uri": "http://meta.icos-cp.eu/resources/cpmeta/icosOtcFosL2Product"
+    },
+    "specificDatasetType": "StationTimeSeries",
+    "theme": {
+      "icon": "https://static.icos-cp.eu/images/themes/oce.svg",
+      "markerIcon": "https://static.icos-cp.eu/share/stations/icons/os.png",
+      "self": {
+        "comments": [],
+        "label": "Ocean data",
+        "uri": "http://meta.icos-cp.eu/resources/themes/ocean"
+      }
+    }
+  },
+  "submission": {
+    "start": "2021-01-21T14:52:41.608Z",
+    "stop": "2021-01-21T14:52:43.064Z",
+    "submitter": {
+      "name": "Ocean Thematic Centre",
+      "self": {
+        "comments": [],
+        "label": "ICOS OTC",
+        "uri": "http://meta.icos-cp.eu/resources/organizations/OTC"
+      }
+    }
+  }
+}

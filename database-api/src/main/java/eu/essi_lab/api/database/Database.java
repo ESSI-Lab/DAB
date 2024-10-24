@@ -4,7 +4,7 @@ package eu.essi_lab.api.database;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,24 +23,13 @@ package eu.essi_lab.api.database;
 
 import eu.essi_lab.cfga.Configurable;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
+import eu.essi_lab.model.StorageInfo;
+import eu.essi_lab.model.exceptions.GSException;
 
 /**
- * Marker interface for Database instances. A Database instance must be able to establish a single connection with a
- * Database
- * and to interact using different sessions<br>
- * <br>
- * <b>Implementation notes</b><br>
- * <br>
- * Implementation should publish a complete mid-level/low-level API to read and write
- * the underlying system. This low-level API is published by {@link DatabaseConsumer} instances through
- * high-level interfaces
- * 
- * @see DatabaseConsumer
- * @see DatabaseReader
- * @see DatabaseWriter
  * @author Fabrizio
  */
-public interface Database<T extends DatabaseSetting> extends Configurable<T> {
+public interface Database extends DatabaseCompliant, Configurable<DatabaseSetting> {
 
     /**
      * @author Fabrizio
@@ -73,4 +62,46 @@ public interface Database<T extends DatabaseSetting> extends Configurable<T> {
 	    return getName();
 	}
     }
+
+    /**
+     * 
+     */
+    public static final String USERS_FOLDER = "users";
+    /**
+     * 
+     */
+    public static final String VIEWS_FOLDER = "views";
+    /*
+     * 
+     */
+    public static final String AUGMENTERS_FOLDER = "augmenters";
+
+    /**
+     * Initializes a data base instance with the given <code>storageInfo</code>
+     *
+     * @param storageInfo
+     * @throws GSException if the initialization fails
+     */
+    public void initialize(StorageInfo storageInfo) throws GSException;
+
+    /**
+     * Return the checked {@link StorageInfo}
+     * 
+     * @return
+     */
+    public StorageInfo getStorageInfo();
+
+    /**
+     * A possible implementation can execute some code which release some resources.<br>
+     * After this method calling, the {@link Database} provided by this provider is no longer usable
+     * 
+     * @throws GSException
+     */
+    public void release() throws GSException;
+
+    /**
+     * @return
+     */
+    public String getIdentifier();
+
 }

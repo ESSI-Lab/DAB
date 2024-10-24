@@ -1,0 +1,14 @@
+eu.essi_lab.accessor.hiscentral.toscana.HISCentralToscanaMapper
+eu.essi_lab.accessor.hiscentral.marche.HISCentralMarcheMapper
+eu.essi_lab.accessor.hiscentral.friuli.HISCentralFriuliMapper
+eu.essi_lab.accessor.hiscentral.veneto.HISCentralVenetoMapper
+eu.essi_lab.accessor.hiscentral.lazio.HISCentralLazioMapper
+eu.essi_lab.accessor.hiscentral.valdaosta.HISCentralValdaostaMapper
+eu.essi_lab.accessor.hiscentral.piemonte.HISCentralPiemonteMapper
+eu.essi_lab.accessor.hiscentral.liguria.HISCentralLiguriaMapper
+eu.essi_lab.accessor.hiscentral.bolzano.HISCentralBolzanoMapper
+eu.essi_lab.accessor.hiscentral.emilia.HISCentralEmiliaMapper
+eu.essi_lab.accessor.hiscentral.sardegna.HISCentralSardegnaMapper
+eu.essi_lab.accessor.hiscentral.basilicata.HISCentralBasilicataMapper
+eu.essi_lab.accessor.hiscentral.umbria.HISCentralUmbriaMapper
+eu.essi_lab.accessor.hiscentral.puglia.HISCentralPugliaMapper

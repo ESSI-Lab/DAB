@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gui.components;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -466,8 +466,10 @@ public class SettingComponentFactory {
      * @return
      */
     public static Label createSettingNameLabel(Setting setting, Setting parent) {
+	
+	String name = parent != null ? "[ "+setting.getName()+" ]" : setting.getName();
 
-	Label label = ComponentFactory.createLabel(setting.getName());
+	Label label = ComponentFactory.createLabel(name);
 	label.getStyle().set("font-weight", "bold");
 	label.getStyle().set("margin-top", "10px");
 
@@ -479,6 +481,8 @@ public class SettingComponentFactory {
 	}
 
 	if (parent == null) {
+	    
+	    label.getStyle().set("font-size", "15px");
 	    label.getStyle().set("background-color", "#3c8df5");
 	    label.getStyle().set("padding", "5px");
 	    label.getStyle().set("padding-bottom", "3px");
@@ -486,6 +490,12 @@ public class SettingComponentFactory {
 	    label.getStyle().set("border-radius", "5px");
 	    label.getStyle().set("color", "white");
 	    label.getStyle().set("opacity", "0.9");
+	
+	}else {
+	    
+	  
+	    label.getStyle().set("padding-bottom", "5px");
+
 	}
 
 	return label;

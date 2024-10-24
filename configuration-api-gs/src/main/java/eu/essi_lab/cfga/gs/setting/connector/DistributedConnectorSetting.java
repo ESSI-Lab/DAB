@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gs.setting.connector;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,12 +23,13 @@ package eu.essi_lab.cfga.gs.setting.connector;
 
 import org.json.JSONObject;
 
+import eu.essi_lab.cfga.setting.KeyValueOptionDecorator;
 import eu.essi_lab.model.BrokeringStrategy;
 
 /**
  * @author Fabrizio
  */
-public abstract class DistributedConnectorSetting extends ConnectorSetting {
+public abstract class DistributedConnectorSetting extends ConnectorSetting implements KeyValueOptionDecorator{
 
     /**
      * 
@@ -36,6 +37,8 @@ public abstract class DistributedConnectorSetting extends ConnectorSetting {
     public DistributedConnectorSetting() {
 
 	setName(initSettingName());
+	
+	addKeyValueOption();
 
 	setConfigurableType(initConnectorType());
     }

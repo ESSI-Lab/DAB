@@ -1,0 +1,152 @@
+{
+  "access": {
+    "embargo": {
+      "active": false,
+      "reason": null
+    },
+    "files": "public",
+    "record": "public",
+    "status": "open"
+  },
+  "created": "2021-08-21T00:07:12.404217+00:00",
+  "files": {
+    "enabled": true,
+    "order": []
+  },
+  "id": "7fm1q-5xq17",
+  "is_published": true,
+  "links": {
+    "access_links": "https://35.166.90.189:443/api/records/7fm1q-5xq17/access/links",
+    "draft": "https://35.166.90.189:443/api/records/7fm1q-5xq17/draft",
+    "files": "https://35.166.90.189:443/api/records/7fm1q-5xq17/files",
+    "latest": "https://35.166.90.189:443/api/records/7fm1q-5xq17/versions/latest",
+    "latest_html": "https://35.166.90.189:443/records/7fm1q-5xq17/latest",
+    "reserve_doi": "https://35.166.90.189:443/api/records/7fm1q-5xq17/draft/pids/doi",
+    "self": "https://35.166.90.189:443/api/records/7fm1q-5xq17",
+    "self_doi": "https://35.166.90.189:443/doi/10.5072%2F7fm1q-5xq17",
+    "self_html": "https://35.166.90.189:443/records/7fm1q-5xq17",
+    "versions": "https://35.166.90.189:443/api/records/7fm1q-5xq17/versions"
+  },
+  "metadata": {
+    "creators": [
+      {
+        "affiliations": [
+          {
+            "name": "CNR-Institute of Atmospheric Pollution Research"
+          }
+        ],
+        "person_or_org": {
+          "family_name": "Pirrone",
+          "given_name": "Nicola",
+          "identifiers": [
+            {
+              "identifier": "0000-0003-3484-8037",
+              "scheme": "orcid"
+            }
+          ],
+          "name": "Pirrone, Nicola",
+          "type": "personal"
+        }
+      },
+      {
+        "affiliations": [
+          {
+            "name": "CNR-Institute of Atmospheric Pollution Research"
+          }
+        ],
+        "person_or_org": {
+          "family_name": "Cinnirella",
+          "given_name": "Sergio",
+          "identifiers": [
+            {
+              "identifier": "0000-0003-3251-5298",
+              "scheme": "orcid"
+            }
+          ],
+          "name": "Cinnirella, Sergio",
+          "type": "personal"
+        }
+      },
+      {
+        "affiliations": [
+          {
+            "name": "CNR-Institute of Atmospheric Pollution Research"
+          }
+        ],
+        "person_or_org": {
+          "family_name": "Hedgecock",
+          "given_name": "Ian M.",
+          "identifiers": [
+            {
+              "identifier": "0000-0002-3743-1870",
+              "scheme": "orcid"
+            }
+          ],
+          "name": "Hedgecock, Ian M.",
+          "type": "personal"
+        }
+      }
+    ],
+    "description": "<p>Presentation at the Sixteenth Plenary Session \u2013 GEO-XVI Canberra, Australia 6-7 November 2019:</p><p>http://www.gos4m.org/communication/</p>",
+    "publication_date": "2019-11-06",
+    "publisher": "GOS4M Knowledge Hub",
+    "related_identifiers": [
+      {
+        "identifier": "10.5072/39538-d8f93",
+        "relation_type": {
+          "id": "ispartof",
+          "title": {
+            "en": "Is part of"
+          }
+        },
+        "resource_type": {
+          "id": "knowledge",
+          "title": {
+            "en": "Knowledge Package"
+          }
+        },
+        "scheme": "doi"
+      }
+    ],
+    "resource_type": {
+      "id": "video",
+      "title": {
+        "en": "Video/Audio"
+      }
+    },
+    "subjects": [
+      {
+        "subject": "GOS4M"
+      },
+      {
+        "subject": "Mercury Monitoring"
+      },
+      {
+        "subject": "Minamata Convention on Mercury"
+      },
+      {
+        "subject": "Deposition Scenarios"
+      },
+      {
+        "subject": "Chemical-Transport Model"
+      }
+    ],
+    "title": "Presentation of GOS4M Knowledge Hub"
+  },
+  "parent": {
+    "id": "nma3r-y9r40"
+  },
+  "pids": {
+    "doi": {
+      "client": "datacite",
+      "identifier": "10.5072/7fm1q-5xq17",
+      "provider": "datacite"
+    }
+  },
+  "revision_id": 3,
+  "updated": "2021-08-21T00:07:12.510432+00:00",
+  "versions": {
+    "index": 1,
+    "is_latest": true
+  }
+}

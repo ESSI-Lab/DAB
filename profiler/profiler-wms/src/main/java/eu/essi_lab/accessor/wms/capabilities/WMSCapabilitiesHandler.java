@@ -7,7 +7,7 @@ package eu.essi_lab.accessor.wms.capabilities;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -40,6 +40,7 @@ import eu.essi_lab.access.compliance.DataComplianceReport;
 import eu.essi_lab.access.compliance.wrapper.ReportsMetadataHandler;
 import eu.essi_lab.accessor.wms.WMSProfiler;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.jaxb.wms._1_3_0.Capability;
 import eu.essi_lab.jaxb.wms._1_3_0.ContactAddress;
 import eu.essi_lab.jaxb.wms._1_3_0.ContactInformation;
@@ -73,7 +74,6 @@ import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.data.CRS;
-import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.model.resource.data.DataFormat;
 import eu.essi_lab.pdk.handler.DefaultRequestHandler;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
@@ -117,12 +117,28 @@ public class WMSCapabilitiesHandler extends DefaultRequestHandler {
 	    ResourcePropertyBond downBond = BondFactory.createIsDownloadableBond(true);
 	    operands.add(downBond);
 
-	    // we are interested only on TIME SERIES datasets
+	    // we are interested only on GRIDDED datasets
 	    ResourcePropertyBond gridBond = BondFactory.createIsGridBond(true);
 	    operands.add(gridBond);
 
 	    LogicalBond andBond = BondFactory.createAndBond(operands);
+	    
+	    Set<Bond> operands2 = new HashSet<>();
 
+	    // we are interested only on downloadable datasets
+	    operands2.add(accessBond);
+
+	    // we are interested only on downloadable datasets
+	    operands2.add(downBond);
+
+	    // we are interested only on GRIDDED datasets
+	    ResourcePropertyBond vectorBond = BondFactory.createIsVectorBond(true);
+	    operands2.add(vectorBond);
+
+	    LogicalBond andBond2 = BondFactory.createAndBond(operands2);
+
+	    LogicalBond finalBond = BondFactory.createOrBond(andBond,andBond2);
+	    
 	    //
 	    // creates the message
 	    //
@@ -133,7 +149,7 @@ public class WMSCapabilitiesHandler extends DefaultRequestHandler {
 	    // set the required properties
 	    discoveryMessage.setSources(allSources);
 	    discoveryMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
-	    
+
 	    discoveryMessage.setWebRequest(webRequest);
 
 	    ResourceSelector selector = new ResourceSelector();
@@ -152,7 +168,7 @@ public class WMSCapabilitiesHandler extends DefaultRequestHandler {
 	    }
 
 	    // set the user bond
-	    discoveryMessage.setUserBond(andBond);
+	    discoveryMessage.setUserBond(finalBond);
 
 	    // pagination works with grouped results. in this case there is one result item for each source.
 	    // in order to be sure to get all the items in the same statistics response,
@@ -255,18 +271,26 @@ public class WMSCapabilitiesHandler extends DefaultRequestHandler {
 		    layer.setTitle(resource.getHarmonizedMetadata().getCoreMetadata().getTitle());
 		    layer.setAbstract(resource.getHarmonizedMetadata().getCoreMetadata().getAbstract());
 		    DataComplianceReport report = reports.get(0);
-		    DataDescriptor descriptor = report.getFullDataDescriptor();
-		    // CRS crs = descriptor.getCRS();
-		    // if (crs != null) {
-
-		    // }
 		    String onlineId = report.getOnlineId();
 		    layer.setName(onlineId);
+
+		    GeographicBoundingBox boundingBox = resource.getHarmonizedMetadata().getCoreMetadata().getBoundingBox();
+
 		    EXGeographicBoundingBox bbox = new EXGeographicBoundingBox();
-		    bbox.setNorthBoundLatitude(90);
-		    bbox.setSouthBoundLatitude(-90);
-		    bbox.setWestBoundLongitude(-180);
-		    bbox.setEastBoundLongitude(180);
+
+		    if (boundingBox != null) {
+
+			bbox.setNorthBoundLatitude(boundingBox.getNorth());
+			bbox.setSouthBoundLatitude(boundingBox.getSouth());
+			bbox.setWestBoundLongitude(boundingBox.getWest());
+			bbox.setEastBoundLongitude(boundingBox.getEast());
+		    } else {
+			bbox.setNorthBoundLatitude(90);
+			bbox.setSouthBoundLatitude(-90);
+			bbox.setWestBoundLongitude(-180);
+			bbox.setEastBoundLongitude(180);
+		    }
+		    
 		    layer.setEXGeographicBoundingBox(bbox);
 		    rootLayer.getLayers().add(layer);
 		}
@@ -281,7 +305,7 @@ public class WMSCapabilitiesHandler extends DefaultRequestHandler {
 
 	} catch (Exception e) {
 	    e.printStackTrace();
-		
+
 	    throw GSException.createException(//
 		    getClass(), //
 		    ErrorInfo.ERRORTYPE_INTERNAL, //

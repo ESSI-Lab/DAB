@@ -4,7 +4,7 @@ package eu.essi_lab.netcdf.timeseries;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -32,6 +32,7 @@ import ucar.nc2.Dimension;
 import ucar.nc2.Variable;
 import ucar.nc2.constants.AxisType;
 import ucar.nc2.dataset.CoordinateAxis;
+import ucar.nc2.dataset.CoordinateAxis1DTime;
 import ucar.nc2.dataset.NetcdfDataset;
 
 public class NetCDFUtils {
@@ -58,6 +59,56 @@ public class NetCDFUtils {
 	} else {
 	    return null;
 	}
+    }
+
+    public static Double readMinimumResolutionInMilliseconds(CoordinateAxis1DTime timeAxis) throws Exception {
+	Array array = timeAxis.read();
+	IndexIterator index = array.getIndexIterator();
+	Double tmp = null;
+	Double res = null;
+	Double min = null;
+	Double max = null;
+	while (index.hasNext()) {
+	    double d = index.getDoubleNext();
+	    if (min == null || d < min) {
+		min = d;
+	    }
+	    if (max == null || d > max) {
+		max = d;
+	    }
+	    if (tmp == null) {
+		tmp = d;
+	    } else {
+		double res2 = Math.abs(d - tmp);
+		tmp = d;
+		if (res == null || res2 < res) {
+		    res = res2;
+		}
+	    }
+	}
+	long milliSeconds = timeAxis.getCalendarDateRange().getDurationInSecs() * 1000;
+	double allPeriod = max - min;
+	double ms = res * (milliSeconds / allPeriod);
+	return ms;
+    }
+
+    public static Double readMinimumResolution(Array array) {
+	IndexIterator index = array.getIndexIterator();
+	Double tmp = null;
+	Double res = null;
+	while (index.hasNext()) {
+	    double d = index.getDoubleNext();
+	    if (tmp == null) {
+		tmp = d;
+	    } else {
+		double res2 = Math.abs(d - tmp);
+		tmp = d;
+		if (res == null || res2 < res) {
+		    res = res2;
+		}
+	    }
+	}
+	return res;
     }
 
     public static Double readResolution(Array array) {
@@ -165,4 +216,5 @@ public class NetCDFUtils {
 	}
 	return ret;
     }
+
 }

@@ -1,0 +1,587 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns:os="http://a9.com/-/spec/opensearch/1.1/" xmlns:georss="http://www.georss.org/georss" xmlns="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/terms/" xmlns:echo="https://cmr.earthdata.nasa.gov/search/site/docs/search/api.html#atom" xmlns:esipdiscovery="http://commons.esipfed.org/ns/discovery/1.2/" xmlns:gml="http://www.opengis.net/gml" xmlns:time="http://a9.com/-/opensearch/extensions/time/1.0/" xmlns:eo="http://a9.com/-/opensearch/extensions/eo/1.0/" esipdiscovery:version="1.2">
+  <updated>2020-10-09T09:51:26.486Z</updated>
+  <id>https://cmr.earthdata.nasa.gov/opensearch/collections.atom</id>
+  <author>
+    <name>CMR</name>
+    <email>echodev@echo.nasa.gov</email>
+  </author>
+  <title type="text">ECHO dataset metadata</title>
+  <subtitle type="text">Search parameters: None</subtitle>
+  <link href="https://cmr.earthdata.nasa.gov/opensearch/granules/descriptor_document.xml" hreflang="en-US" type="application/opensearchdescription+xml" rel="search"/>
+  <link href="http://cmr.earthdata.nasa.gov/opensearch/collections.atom?isCwic=true&amp;httpAccept=application/atom%2Bxml&amp;recordSchema=iso19139&amp;" hreflang="en-US" type="application/atom+xml" rel="self"/>
+  <link href="http://cmr.earthdata.nasa.gov/opensearch/collections.atom?isCwic=true&amp;httpAccept=application/atom%2Bxml&amp;recordSchema=iso19139&amp;cursor=321" hreflang="en-US" type="application/atom+xml" rel="last"/>
+  <link href="http://cmr.earthdata.nasa.gov/opensearch/collections.atom?isCwic=true&amp;httpAccept=application/atom%2Bxml&amp;recordSchema=iso19139&amp;cursor=2" hreflang="en-US" type="application/atom+xml" rel="next"/>
+  <link href="http://cmr.earthdata.nasa.gov/opensearch/collections.atom?isCwic=true&amp;httpAccept=application/atom%2Bxml&amp;recordSchema=iso19139&amp;cursor=1" hreflang="en-US" type="application/atom+xml" rel="first"/>
+  <link href="https://wiki.earthdata.nasa.gov/display/echo/Open+Search+API+release+information" hreflang="en-US" type="text/html" rel="describedBy" title="Release Notes"/>
+  <os:Query xmlns:geo="http://a9.com/-/opensearch/extensions/geo/1.0/" role="request"/>
+  <os:totalResults>3203</os:totalResults>
+  <os:itemsPerPage>10</os:itemsPerPage>
+  <os:startIndex>1</os:startIndex>
+  <entry>
+    <id>https://cmr.earthdata.nasa.gov/opensearch/collections.atom?uid=C179003030-ORNL_DAAC</id>
+    <author>
+      <name>CMR</name>
+      <email>echodev@echo.nasa.gov</email>
+    </author>
+    <title type="text">15 Minute Stream Flow Data: USGS (FIFE)</title>
+    <summary type="text">USGS 15 minute stream flow data for Kings Creek on the Konza Prairie</summary>
+    <updated>2019-04-15T16:59:45.000Z</updated>
+    <link rel="enclosure" hreflang="en-US" href="https://daac.ornl.gov/daacdata/fife/"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/FIFE/guides/15_min_strm_flow.html" type="text/html"/>
+    <link rel="via" hreflang="en-US" href="https://doi.org/10.3334/ORNLDAAC/1"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/fife/document/hydrolgy/15_min_strm_flow.pdf" type="application/pdf"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/fife/document/hydrolgy/strm_15m.doc"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/fife/data/hydrolgy/strm_15m/strm_15m.tdf"/>
+    <link rel="icon" hreflang="en-US" href="https://daac.ornl.gov/graphics/browse/project/square/fife_logo_square.png" type="image/png"/>
+    <link href="https://cmr.earthdata.nasa.gov/opensearch/granules/descriptor_document.xml?collectionConceptId=C179003030-ORNL_DAAC&amp;clientId=" hreflang="en-US" type="application/opensearchdescription+xml" rel="search" title="CWIC Granule Open Search Descriptor Document"/>
+    <link href="https://cmr.earthdata.nasa.gov/search/concepts/C179003030-ORNL_DAAC.xml" hreflang="en-US" type="application/xml" rel="via" title="Product metadata"/>
+    <dc:identifier>C179003030-ORNL_DAAC</dc:identifier>
+    <dc:date>1984-12-25T00:00:00.000Z/1988-03-04T23:59:59.000Z</dc:date>
+    <echo:datasetId>15 Minute Stream Flow Data: USGS (FIFE)</echo:datasetId>
+    <echo:shortName>FIFE_STRM_15M_1</echo:shortName>
+    <echo:versionId>1</echo:versionId>
+    <echo:dataCenter>ORNL_DAAC</echo:dataCenter>
+    <echo:archiveCenter>ORNL_DAAC</echo:archiveCenter>
+    <echo:organization>ORNL_DAAC</echo:organization>
+    <echo:processingLevelId>3</echo:processingLevelId>
+    <echo:coordinateSystem>CARTESIAN</echo:coordinateSystem>
+    <echo:orbitParameters/>
+    <georss:point>39.1 -96.6</georss:point>
+    <echo:hasVariables>true</echo:hasVariables>
+    <echo:hasFormats>false</echo:hasFormats>
+    <echo:hasTransforms>true</echo:hasTransforms>
+    <echo:hasSpatialSubsetting>true</echo:hasSpatialSubsetting>
+    <echo:hasTemporalSubsetting>false</echo:hasTemporalSubsetting>
+    <echo:tag>
+      <echo:tagKey>org.geoss.geoss_data-core</echo:tagKey>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>org.ceos.wgiss.cwic.granules.provider</echo:tagKey>
+      <echo:data>"NASA"</echo:data>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>org.ceos.wgiss.cwic.granules.native_id</echo:tagKey>
+      <echo:data>"15 Minute Stream Flow Data: USGS (FIFE)"</echo:data>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>org.ceos.wgiss.cwic.granules.prod</echo:tagKey>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>gov.nasa.eosdis</echo:tagKey>
+    </echo:tag>
+    <echo:is_geoss>true</echo:is_geoss>
+    <echo:is_eosdis>true</echo:is_eosdis>
+  </entry>
+  <entry>
+    <id>https://cmr.earthdata.nasa.gov/opensearch/collections.atom?uid=C179002914-ORNL_DAAC</id>
+    <author>
+      <name>CMR</name>
+      <email>echodev@echo.nasa.gov</email>
+    </author>
+    <title type="text">30 Minute Rainfall Data (FIFE)</title>
+    <summary type="text">30 minute rainfall data for the Konza Prairie</summary>
+    <updated>2019-04-15T16:59:46.000Z</updated>
+    <link rel="enclosure" hreflang="en-US" href="https://daac.ornl.gov/daacdata/fife/"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/FIFE/guides/30_Min_Rain_Data.html" type="text/html"/>
+    <link rel="via" hreflang="en-US" href="https://doi.org/10.3334/ORNLDAAC/2"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/fife/document/sur_met/30_Min_Rain_Data.pdf" type="application/pdf"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/fife/document/sur_met/rain_30m.doc"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/fife/data/sur_met/rain_30m/rain_30m.tdf"/>
+    <link rel="icon" hreflang="en-US" href="https://daac.ornl.gov/graphics/browse/project/square/fife_logo_square.png" type="image/png"/>
+    <link href="https://cmr.earthdata.nasa.gov/opensearch/granules/descriptor_document.xml?collectionConceptId=C179002914-ORNL_DAAC&amp;clientId=" hreflang="en-US" type="application/opensearchdescription+xml" rel="search" title="CWIC Granule Open Search Descriptor Document"/>
+    <link href="https://cmr.earthdata.nasa.gov/search/concepts/C179002914-ORNL_DAAC.xml" hreflang="en-US" type="application/xml" rel="via" title="Product metadata"/>
+    <dc:identifier>C179002914-ORNL_DAAC</dc:identifier>
+    <dc:date>1987-05-29T00:00:00.000Z/1987-10-26T23:59:59.000Z</dc:date>
+    <echo:datasetId>30 Minute Rainfall Data (FIFE)</echo:datasetId>
+    <echo:shortName>FIFE_RAIN_30M_2</echo:shortName>
+    <echo:versionId>1</echo:versionId>
+    <echo:dataCenter>ORNL_DAAC</echo:dataCenter>
+    <echo:archiveCenter>ORNL_DAAC</echo:archiveCenter>
+    <echo:organization>ORNL_DAAC</echo:organization>
+    <echo:processingLevelId>3</echo:processingLevelId>
+    <echo:coordinateSystem>CARTESIAN</echo:coordinateSystem>
+    <echo:orbitParameters/>
+    <georss:box>39.08 -96.6 39.11 -96.55</georss:box>
+    <echo:hasVariables>true</echo:hasVariables>
+    <echo:hasFormats>false</echo:hasFormats>
+    <echo:hasTransforms>true</echo:hasTransforms>
+    <echo:hasSpatialSubsetting>true</echo:hasSpatialSubsetting>
+    <echo:hasTemporalSubsetting>false</echo:hasTemporalSubsetting>
+    <echo:tag>
+      <echo:tagKey>org.geoss.geoss_data-core</echo:tagKey>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>org.ceos.wgiss.cwic.granules.provider</echo:tagKey>
+      <echo:data>"NASA"</echo:data>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>org.ceos.wgiss.cwic.granules.native_id</echo:tagKey>
+      <echo:data>"30 Minute Rainfall Data (FIFE)"</echo:data>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>org.ceos.wgiss.cwic.granules.prod</echo:tagKey>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>gov.nasa.eosdis</echo:tagKey>
+    </echo:tag>
+    <echo:is_geoss>true</echo:is_geoss>
+    <echo:is_eosdis>true</echo:is_eosdis>
+  </entry>
+  <entry>
+    <id>https://cmr.earthdata.nasa.gov/opensearch/collections.atom?uid=C1000000000-ORNL_DAAC</id>
+    <author>
+      <name>CMR</name>
+      <email>echodev@echo.nasa.gov</email>
+    </author>
+    <title type="text">A Compilation of Global Soil Microbial Biomass Carbon, Nitrogen, and Phosphorus Data</title>
+    <summary type="text">This data set provides the concentrations of soil microbial biomass carbon (C), nitrogen (N) and phosphorus (P), soil organic carbon, total nitrogen, and total phosphorus at biome and global scales. The data were compiled from a comprehensive survey of publications from the late 1970s to 2012 and include 3,422 data points from 315 papers. These data are from soil samples collected primarily at 0-15 cm depth with some from 0-30 cm. In addition, data were compiled for soil microbial biomass concentrations from soil profile samples to depths of 100 cm. Sampling site latitude and longitude were available for the majority of the samples that enabled assembling additional soil properties, site characteristics, vegetation distributions, biomes, and long-term climate data from several global sources of soil, land-cover, and climate data. These site attributes are included with the microbial biomass data. This data set contains two *.csv files of the soil microbial biomass C, N, P data. The first provides all compiled results emphasizing the full spatial extent of the data, while the second is a subset that provides only data from a series of profile samples emphasizing the vertical distribution of microbial biomass concentrations.There is a companion file, also in .csv format, of the references for the surveyed publications. A reference_number relates the data to the respective publication.The concentrations of soil microbial biomass, in combination with other soil databases, were used to estimate the global storage of soil microbial biomass C and N in 0-30 cm and 0-100 cm soil profiles. These storage estimates were combined with a spatial map of 12 major biomes (boreal forest, temperate coniferous forest, temperate broadleaf forest, tropical and subtropical forests, mixed forest, grassland, shrub, tundra, desert, natural wetland, cropland, and pasture) at 0.05-degree by 0.5-degree spatial resolution. The biome map and six estimates of C and N storage and C:N ration in soil microbial biomass are provided in a single netCDF format file. </summary>
+    <updated>2019-04-15T18:53:46.000Z</updated>
+    <link rel="enclosure" hreflang="en-US" href="https://daac.ornl.gov/daacdata/global_soil/Global_Microbial_Biomass_C_N_P//"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/SOILS/guides/Global_Microbial_Biomass_C_N_P.html" type="text/html"/>
+    <link rel="via" hreflang="en-US" href="https://doi.org/10.3334/ORNLDAAC/1264"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/global_soil/Global_Microbial_Biomass_C_N_P//comp/Global_Microbial_Biomass_C_N_P.pdf" type="application/pdf"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/global_soil/Global_Microbial_Biomass_C_N_P//comp/Soil_Microbial_Biomass_C_N_P_references.csv"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/global_soil/Global_Microbial_Biomass_C_N_P//comp/XuXF2013_GEB.pdf" type="application/pdf"/>
+    <link rel="icon" hreflang="en-US" href="https://daac.ornl.gov/SOILS/guides/fig_1_global_biomass.png" type="image/png"/>
+    <link href="https://cmr.earthdata.nasa.gov/opensearch/granules/descriptor_document.xml?collectionConceptId=C1000000000-ORNL_DAAC&amp;clientId=" hreflang="en-US" type="application/opensearchdescription+xml" rel="search" title="CWIC Granule Open Search Descriptor Document"/>
+    <link href="https://cmr.earthdata.nasa.gov/search/concepts/C1000000000-ORNL_DAAC.xml" hreflang="en-US" type="application/xml" rel="via" title="Product metadata"/>
+    <dc:identifier>C1000000000-ORNL_DAAC</dc:identifier>
+    <dc:date>1977-11-16T00:00:00.000Z/2012-06-01T23:59:59.000Z</dc:date>
+    <echo:datasetId>A Compilation of Global Soil Microbial Biomass Carbon, Nitrogen, and Phosphorus Data</echo:datasetId>
+    <echo:shortName>GLOBAL_MICROBIAL_BIOMASS_C_N_P_1264</echo:shortName>
+    <echo:versionId>1</echo:versionId>
+    <echo:dataCenter>ORNL_DAAC</echo:dataCenter>
+    <echo:archiveCenter>ORNL_DAAC</echo:archiveCenter>
+    <echo:organization>ORNL_DAAC</echo:organization>
+    <echo:processingLevelId>3</echo:processingLevelId>
+    <echo:coordinateSystem>CARTESIAN</echo:coordinateSystem>
+    <echo:orbitParameters/>
+    <georss:box>-90 -180 79 177.9</georss:box>
+    <echo:hasVariables>true</echo:hasVariables>
+    <echo:hasFormats>false</echo:hasFormats>
+    <echo:hasTransforms>true</echo:hasTransforms>
+    <echo:hasSpatialSubsetting>true</echo:hasSpatialSubsetting>
+    <echo:hasTemporalSubsetting>false</echo:hasTemporalSubsetting>
+    <echo:tag>
+      <echo:tagKey>org.geoss.geoss_data-core</echo:tagKey>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>org.ceos.wgiss.cwic.granules.provider</echo:tagKey>
+      <echo:data>"NASA"</echo:data>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>org.ceos.wgiss.cwic.granules.native_id</echo:tagKey>
+      <echo:data>"A Compilation of Global Soil Microbial Biomass Carbon, Nitrogen, and Phosphorus Data"</echo:data>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>org.ceos.wgiss.cwic.granules.prod</echo:tagKey>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>gov.nasa.eosdis</echo:tagKey>
+    </echo:tag>
+    <echo:is_geoss>true</echo:is_geoss>
+    <echo:is_eosdis>true</echo:is_eosdis>
+  </entry>
+  <entry>
+    <id>https://cmr.earthdata.nasa.gov/opensearch/collections.atom?uid=C179126725-ORNL_DAAC</id>
+    <author>
+      <name>CMR</name>
+      <email>echodev@echo.nasa.gov</email>
+    </author>
+    <title type="text">A Global Data Set of Leaf Photosynthetic Rates, Leaf N and P, and Specific Leaf Area</title>
+    <summary type="text">This global data set of photosynthetic rates and leaf nutrient traits was compiled from a comprehensive literature review. It includes estimates of Vcmax (maximum rate of carboxylation), Jmax (maximum rate of electron transport), leaf nitrogen content (N), leaf phosphorus content (P), and specific leaf area (SLA) data from both experimental and ambient field conditions, for a total of 325 species and treatment combinations. Both the original published Vcmax and Jmax values as well as estimates at standard temperature are reported. The maximum rate of carboxylation (Vcmax) and the maximum rate of electron transport (Jmax) are primary determinants of photosynthetic rates in plants, and modeled carbon fluxes are highly sensitive to these parameters. Previous studies have shown that Vcmax and Jmax correlate with leaf nitrogen across species and regions, and locally across species with leaf phosphorus and specific leaf area, yet no universal relationship suitable for global-scale models is currently available. These data are suitable for exploring the general relationships of Vcmax and Jmax with each other and with leaf N, P and SLA. This data set contains one *.csv file.</summary>
+    <updated>2019-04-15T18:43:50.000Z</updated>
+    <link rel="enclosure" hreflang="en-US" href="https://daac.ornl.gov/daacdata/global_vegetation/Leaf_Photosynthesis_Traits//"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/VEGETATION/guides/Leaf_Photosynthesis_Traits.html" type="text/html"/>
+    <link rel="via" hreflang="en-US" href="https://doi.org/10.3334/ORNLDAAC/1224"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/global_vegetation/Leaf_Photosynthesis_Traits//comp/Leaf_Photosynthesis_Traits.pdf" type="application/pdf"/>
+    <link rel="icon" hreflang="en-US" href="https://daac.ornl.gov/VEGETATION/guides/Walker_figure1.png" type="image/png"/>
+    <link href="https://cmr.earthdata.nasa.gov/opensearch/granules/descriptor_document.xml?collectionConceptId=C179126725-ORNL_DAAC&amp;clientId=" hreflang="en-US" type="application/opensearchdescription+xml" rel="search" title="CWIC Granule Open Search Descriptor Document"/>
+    <link href="https://cmr.earthdata.nasa.gov/search/concepts/C179126725-ORNL_DAAC.xml" hreflang="en-US" type="application/xml" rel="via" title="Product metadata"/>
+    <dc:identifier>C179126725-ORNL_DAAC</dc:identifier>
+    <dc:date>1993-01-01T00:00:00.000Z/2010-12-31T23:59:59.000Z</dc:date>
+    <echo:datasetId>A Global Data Set of Leaf Photosynthetic Rates, Leaf N and P, and Specific Leaf Area</echo:datasetId>
+    <echo:shortName>LEAF_PHOTOSYNTHESIS_TRAITS_1224</echo:shortName>
+    <echo:versionId>1</echo:versionId>
+    <echo:dataCenter>ORNL_DAAC</echo:dataCenter>
+    <echo:archiveCenter>ORNL_DAAC</echo:archiveCenter>
+    <echo:organization>ORNL_DAAC</echo:organization>
+    <echo:processingLevelId>3</echo:processingLevelId>
+    <echo:coordinateSystem>CARTESIAN</echo:coordinateSystem>
+    <echo:orbitParameters/>
+    <georss:box>-43.2 -122.4 58.42 176.13</georss:box>
+    <echo:hasVariables>true</echo:hasVariables>
+    <echo:hasFormats>false</echo:hasFormats>
+    <echo:hasTransforms>true</echo:hasTransforms>
+    <echo:hasSpatialSubsetting>true</echo:hasSpatialSubsetting>
+    <echo:hasTemporalSubsetting>false</echo:hasTemporalSubsetting>
+    <echo:tag>
+      <echo:tagKey>org.geoss.geoss_data-core</echo:tagKey>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>org.ceos.wgiss.cwic.granules.provider</echo:tagKey>
+      <echo:data>"NASA"</echo:data>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>org.ceos.wgiss.cwic.granules.native_id</echo:tagKey>
+      <echo:data>"A Global Data Set of Leaf Photosynthetic Rates, Leaf N and P, and Specific Leaf Area"</echo:data>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>org.ceos.wgiss.cwic.granules.prod</echo:tagKey>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>gov.nasa.eosdis</echo:tagKey>
+    </echo:tag>
+    <echo:is_geoss>true</echo:is_geoss>
+    <echo:is_eosdis>true</echo:is_eosdis>
+  </entry>
+  <entry>
+    <id>https://cmr.earthdata.nasa.gov/opensearch/collections.atom?uid=C179003380-ORNL_DAAC</id>
+    <author>
+      <name>CMR</name>
+      <email>echodev@echo.nasa.gov</email>
+    </author>
+    <title type="text">A Global Database of Carbon and Nutrient Concentrations of Green and Senesced Leaves</title>
+    <summary type="text">This data set provides carbon (C), nitrogen (N), phosphorus (P), potassium (K), calcium (Ca), and magnesium (Mg) concentrations in green and senesced leaves. Vegetation characteristics reported include species growth habit, leaf area, mass, and mass loss with senescence. The data were compiled from 86 selected studies in 31 countries, and resulted in approximately 1,000 data points for both green and senesced leaves from woody and non-woody vegetation as described in Vergutz et al (2012). The studies were conducted from 1970-2009. There are two comma-delimited data files with this data set.</summary>
+    <updated>2019-04-15T18:43:47.000Z</updated>
+    <link rel="enclosure" hreflang="en-US" href="https://daac.ornl.gov/daacdata/global_vegetation/Leaf_Carbon_Nutrients//"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/VEGETATION/guides/Leaf_carbon_nutrients.html" type="text/html"/>
+    <link rel="via" hreflang="en-US" href="https://doi.org/10.3334/ORNLDAAC/1106"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/global_vegetation/Leaf_Carbon_Nutrients/comp/Leaf_carbon_nutrients.pdf" type="application/pdf"/>
+    <link rel="icon" hreflang="en-US" href="https://daac.ornl.gov/VEGETATION/guides/Leaf_Carbon_Nutrients_Figure1_rev2.png" type="image/png"/>
+    <link href="https://cmr.earthdata.nasa.gov/opensearch/granules/descriptor_document.xml?collectionConceptId=C179003380-ORNL_DAAC&amp;clientId=" hreflang="en-US" type="application/opensearchdescription+xml" rel="search" title="CWIC Granule Open Search Descriptor Document"/>
+    <link href="https://cmr.earthdata.nasa.gov/search/concepts/C179003380-ORNL_DAAC.xml" hreflang="en-US" type="application/xml" rel="via" title="Product metadata"/>
+    <dc:identifier>C179003380-ORNL_DAAC</dc:identifier>
+    <dc:date>1970-01-01T00:00:00.000Z/2009-12-31T23:59:59.000Z</dc:date>
+    <echo:datasetId>A Global Database of Carbon and Nutrient Concentrations of Green and Senesced Leaves</echo:datasetId>
+    <echo:shortName>LEAF_CARBON_NUTRIENTS_1106</echo:shortName>
+    <echo:versionId>1</echo:versionId>
+    <echo:dataCenter>ORNL_DAAC</echo:dataCenter>
+    <echo:archiveCenter>ORNL_DAAC</echo:archiveCenter>
+    <echo:organization>ORNL_DAAC</echo:organization>
+    <echo:processingLevelId>3</echo:processingLevelId>
+    <echo:coordinateSystem>CARTESIAN</echo:coordinateSystem>
+    <echo:orbitParameters/>
+    <georss:box>-50 -159.7 68.5 176.9</georss:box>
+    <echo:hasVariables>true</echo:hasVariables>
+    <echo:hasFormats>false</echo:hasFormats>
+    <echo:hasTransforms>true</echo:hasTransforms>
+    <echo:hasSpatialSubsetting>true</echo:hasSpatialSubsetting>
+    <echo:hasTemporalSubsetting>false</echo:hasTemporalSubsetting>
+    <echo:tag>
+      <echo:tagKey>org.geoss.geoss_data-core</echo:tagKey>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>org.ceos.wgiss.cwic.granules.provider</echo:tagKey>
+      <echo:data>"NASA"</echo:data>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>org.ceos.wgiss.cwic.granules.native_id</echo:tagKey>
+      <echo:data>"A Global Database of Carbon and Nutrient Concentrations of Green and Senesced Leaves"</echo:data>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>org.ceos.wgiss.cwic.granules.prod</echo:tagKey>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>gov.nasa.eosdis</echo:tagKey>
+    </echo:tag>
+    <echo:is_geoss>true</echo:is_geoss>
+    <echo:is_eosdis>true</echo:is_eosdis>
+  </entry>
+  <entry>
+    <id>https://cmr.earthdata.nasa.gov/opensearch/collections.atom?uid=C179130805-ORNL_DAAC</id>
+    <author>
+      <name>CMR</name>
+      <email>echodev@echo.nasa.gov</email>
+    </author>
+    <title type="text">A Global Database of Field-observed Leaf Area Index in Woody Plant Species, 1932-2011</title>
+    <summary type="text">This data set provides global leaf area index (LAI) values for woody species. The data are a compilation of field-observed data from 1,216 locations obtained from 554 literature sources published between 1932 and 2011. Only site-specific maximum LAI values were included from the sources; values affected by significant artificial treatments (e.g. continuous fertilization and/or irrigation) and LAI values that were low due to drought or disturbance (e.g. intensive thinning, wildfire, or disease), or because vegetation was immature or old/declining, were excluded (Lio et al., 2014). To maximize the generic applicability of the data, original LAI values from source literature and values standardized using the definition of half of total surface area (HSA) are included. Supporting information, such as geographical coordinates of plot, altitude, stand age, name of dominant species, plant functional types, and climate data are also provided in the data file. There is one data file in comma-separated (.csv) format with this data set and one companion file which provides the data sources.</summary>
+    <updated>2019-04-15T18:43:51.000Z</updated>
+    <link rel="enclosure" hreflang="en-US" href="https://daac.ornl.gov/daacdata/global_vegetation/LAI_Woody_Plants//"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/VEGETATION/guides/LAI_Woody_Plants.html" type="text/html"/>
+    <link rel="via" hreflang="en-US" href="https://doi.org/10.3334/ORNLDAAC/1231"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/global_vegetation/LAI_Woody_Plants//comp/LAI_Database_Reference_List.pdf" type="application/pdf"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/global_vegetation/LAI_Woody_Plants//comp/LAI_Woody_Plants.pdf" type="application/pdf"/>
+    <link rel="icon" hreflang="en-US" href="https://daac.ornl.gov/VEGETATION/guides/global_LAI.png" type="image/png"/>
+    <link href="https://cmr.earthdata.nasa.gov/opensearch/granules/descriptor_document.xml?collectionConceptId=C179130805-ORNL_DAAC&amp;clientId=" hreflang="en-US" type="application/opensearchdescription+xml" rel="search" title="CWIC Granule Open Search Descriptor Document"/>
+    <link href="https://cmr.earthdata.nasa.gov/search/concepts/C179130805-ORNL_DAAC.xml" hreflang="en-US" type="application/xml" rel="via" title="Product metadata"/>
+    <dc:identifier>C179130805-ORNL_DAAC</dc:identifier>
+    <dc:date>1932-01-01T00:00:00.000Z/2011-12-31T23:59:59.000Z</dc:date>
+    <echo:datasetId>A Global Database of Field-observed Leaf Area Index in Woody Plant Species, 1932-2011</echo:datasetId>
+    <echo:shortName>LAI_WOODY_PLANTS_1231</echo:shortName>
+    <echo:versionId>1</echo:versionId>
+    <echo:dataCenter>ORNL_DAAC</echo:dataCenter>
+    <echo:archiveCenter>ORNL_DAAC</echo:archiveCenter>
+    <echo:organization>ORNL_DAAC</echo:organization>
+    <echo:processingLevelId>3</echo:processingLevelId>
+    <echo:coordinateSystem>CARTESIAN</echo:coordinateSystem>
+    <echo:orbitParameters/>
+    <georss:box>-54.2 -164.78 78.42 175.62</georss:box>
+    <echo:hasVariables>true</echo:hasVariables>
+    <echo:hasFormats>false</echo:hasFormats>
+    <echo:hasTransforms>true</echo:hasTransforms>
+    <echo:hasSpatialSubsetting>true</echo:hasSpatialSubsetting>
+    <echo:hasTemporalSubsetting>false</echo:hasTemporalSubsetting>
+    <echo:tag>
+      <echo:tagKey>org.geoss.geoss_data-core</echo:tagKey>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>org.ceos.wgiss.cwic.granules.provider</echo:tagKey>
+      <echo:data>"NASA"</echo:data>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>org.ceos.wgiss.cwic.granules.native_id</echo:tagKey>
+      <echo:data>"A Global Database of Field-observed Leaf Area Index in Woody Plant Species, 1932-2011"</echo:data>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>org.ceos.wgiss.cwic.granules.prod</echo:tagKey>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>gov.nasa.eosdis</echo:tagKey>
+    </echo:tag>
+    <echo:is_geoss>true</echo:is_geoss>
+    <echo:is_eosdis>true</echo:is_eosdis>
+  </entry>
+  <entry>
+    <id>https://cmr.earthdata.nasa.gov/opensearch/collections.atom?uid=C179003657-ORNL_DAAC</id>
+    <author>
+      <name>CMR</name>
+      <email>echodev@echo.nasa.gov</email>
+    </author>
+    <title type="text">A Global Database of Gas Fluxes from Soils after Rewetting or Thawing, Version 1.0</title>
+    <summary type="text">This database contains information compiled from published studies on gas flux from soil following rewetting or thawing. The resulting database includes 222 field and laboratory observations focused on rewetting of dry soils, and 116 field laboratory observations focused on thawing of frozen soils studies conducted from 1956 to 2010. Fluxes of carbon dioxide, methane, nitrous oxide, nitrogen oxide, and ammonia (CO2, CH4, N2O, NO and NH3) were compiled from the literature and the flux rates were normalized for ease of comparison. Field observations of gas flux following rewetting of dry soils include events caused by natural rainfall, simulated rainfall in natural ecosystems, and irrigation in agricultural lands. Similarly, thawing of frozen soils include field observations of natural thawing, simulated freezing-thawing events (i.e., thawing of simulated frozen soil by snow removal), and thawing of seasonal ice in temperate and high latitude regions (Kim et al., 2012). Reported parameters include experiment type, location, site type, vegetation, climate, soil properties, rainfall, soil moisture, soil gas flux after wetting and thawing, peak soil gas flux properties, and the corresponding study references. There is one comma-delimited data file. </summary>
+    <updated>2019-04-15T17:52:33.000Z</updated>
+    <link rel="enclosure" hreflang="en-US" href="https://daac.ornl.gov/daacdata/global_soil/Global_RTSG_Flux/"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/SOILS/guides/global_rtsg_flux_v1.html" type="text/html"/>
+    <link rel="via" hreflang="en-US" href="https://doi.org/10.3334/ORNLDAAC/1078"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/global_soil/Global_RTSG_Flux/comp/global_rtsg_flux_v1.pdf" type="application/pdf"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/global_soil/Global_RTSG_Flux/comp/unit_conversion_table_v1.csv"/>
+    <link rel="icon" hreflang="en-US" href="https://daac.ornl.gov/SOILS/guides/global_rtsg_flux_v1_figure1.jpg" type="image/jpeg"/>
+    <link href="https://cmr.earthdata.nasa.gov/opensearch/granules/descriptor_document.xml?collectionConceptId=C179003657-ORNL_DAAC&amp;clientId=" hreflang="en-US" type="application/opensearchdescription+xml" rel="search" title="CWIC Granule Open Search Descriptor Document"/>
+    <link href="https://cmr.earthdata.nasa.gov/search/concepts/C179003657-ORNL_DAAC.xml" hreflang="en-US" type="application/xml" rel="via" title="Product metadata"/>
+    <dc:identifier>C179003657-ORNL_DAAC</dc:identifier>
+    <dc:date>1956-01-01T00:00:00.000Z/2009-12-31T23:59:59.000Z</dc:date>
+    <echo:datasetId>A Global Database of Gas Fluxes from Soils after Rewetting or Thawing, Version 1.0</echo:datasetId>
+    <echo:shortName>GLOBAL_RTSG_FLUX_V1_1078</echo:shortName>
+    <echo:versionId>1</echo:versionId>
+    <echo:dataCenter>ORNL_DAAC</echo:dataCenter>
+    <echo:archiveCenter>ORNL_DAAC</echo:archiveCenter>
+    <echo:organization>ORNL_DAAC</echo:organization>
+    <echo:processingLevelId>3</echo:processingLevelId>
+    <echo:coordinateSystem>CARTESIAN</echo:coordinateSystem>
+    <echo:orbitParameters/>
+    <georss:box>-36.45 -149.63 74.5 160.52</georss:box>
+    <echo:hasVariables>true</echo:hasVariables>
+    <echo:hasFormats>false</echo:hasFormats>
+    <echo:hasTransforms>true</echo:hasTransforms>
+    <echo:hasSpatialSubsetting>true</echo:hasSpatialSubsetting>
+    <echo:hasTemporalSubsetting>false</echo:hasTemporalSubsetting>
+    <echo:tag>
+      <echo:tagKey>org.geoss.geoss_data-core</echo:tagKey>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>org.ceos.wgiss.cwic.granules.provider</echo:tagKey>
+      <echo:data>"NASA"</echo:data>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>org.ceos.wgiss.cwic.granules.native_id</echo:tagKey>
+      <echo:data>"A Global Database of Gas Fluxes from Soils after Rewetting or Thawing, Version 1.0"</echo:data>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>org.ceos.wgiss.cwic.granules.prod</echo:tagKey>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>gov.nasa.eosdis</echo:tagKey>
+    </echo:tag>
+    <echo:is_geoss>true</echo:is_geoss>
+    <echo:is_eosdis>true</echo:is_eosdis>
+  </entry>
+  <entry>
+    <id>https://cmr.earthdata.nasa.gov/opensearch/collections.atom?uid=C1227811476-ORNL_DAAC</id>
+    <author>
+      <name>CMR</name>
+      <email>echodev@echo.nasa.gov</email>
+    </author>
+    <title type="text">A Global Database of Litterfall Mass and Litter Pool Carbon and Nutrients</title>
+    <summary type="text">Measurement data of aboveground litterfall and littermass and litter carbon, nitrogen, and nutrient concentrations were extracted from 685 original literature sources and compiled into a comprehensive database to support the analysis of global patterns of carbon and nutrients in litterfall and litter pools. Data are included from sources dating from 1827 to 1997. The reported data include the literature reference, general site information (description, latitude, longitude, and elevation), site climate data (mean annual temperature and precipitation), site vegetation characteristics (management, stand age, ecosystem and vegetation-type codes), annual quantities of litterfall (by class, kg m-2 yr-1), litter pool mass (by class and litter layer, kg m-2), and concentrations of nitrogen (N), phosphorus (P), and base cations for the litterfall (g m-2 yr-1) and litter pool components (g m-2).  The investigators intent was to compile a comprehensive data set of individual direct field measurements as reported by researchers. While the primary emphasis was on acquiring C data, measurements of N, P, and base cations were also obtained, although the database is sparse for elements other than C and N. Each of the 1,497 records in the database represents a measurement site. Replicate measurements were averaged according to conventions described in Section 5 and recorded for each site in the database. The sites were at 575 different locations. </summary>
+    <updated>2019-04-15T18:43:52.000Z</updated>
+    <link rel="enclosure" hreflang="en-US" href="https://daac.ornl.gov/daacdata/global_vegetation/Global_Litter_Carbon_Nutrients//"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/VEGETATION/guides/Global_Litter_Carbon_Nutrients.html" type="text/html"/>
+    <link rel="via" hreflang="en-US" href="https://doi.org/10.3334/ORNLDAAC/1244"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/global_vegetation/Global_Litter_Carbon_Nutrients//comp/Global_Litter_Carbon_Nutrients.pdf" type="application/pdf"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/global_vegetation/Global_Litter_Carbon_Nutrients//comp/Litterfall_code_companion.pdf" type="application/pdf"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/global_vegetation/Global_Litter_Carbon_Nutrients//comp/Litterfall_source_bibliography.pdf" type="application/pdf"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/global_vegetation/Global_Litter_Carbon_Nutrients//comp/Litterfall_source_bibliography.txt"/>
+    <link rel="icon" hreflang="en-US" href="https://daac.ornl.gov/VEGETATION/guides/Post_LitterfallPlots.png" type="image/png"/>
+    <link href="https://cmr.earthdata.nasa.gov/opensearch/granules/descriptor_document.xml?collectionConceptId=C1227811476-ORNL_DAAC&amp;clientId=" hreflang="en-US" type="application/opensearchdescription+xml" rel="search" title="CWIC Granule Open Search Descriptor Document"/>
+    <link href="https://cmr.earthdata.nasa.gov/search/concepts/C1227811476-ORNL_DAAC.xml" hreflang="en-US" type="application/xml" rel="via" title="Product metadata"/>
+    <dc:identifier>C1227811476-ORNL_DAAC</dc:identifier>
+    <dc:date>1827-01-01T00:00:00.000Z/1997-12-31T23:59:59.000Z</dc:date>
+    <echo:datasetId>A Global Database of Litterfall Mass and Litter Pool Carbon and Nutrients</echo:datasetId>
+    <echo:shortName>GLOBAL_LITTER_CARBON_NUTRIENTS_1244</echo:shortName>
+    <echo:versionId>1</echo:versionId>
+    <echo:dataCenter>ORNL_DAAC</echo:dataCenter>
+    <echo:archiveCenter>ORNL_DAAC</echo:archiveCenter>
+    <echo:organization>ORNL_DAAC</echo:organization>
+    <echo:processingLevelId>3</echo:processingLevelId>
+    <echo:coordinateSystem>CARTESIAN</echo:coordinateSystem>
+    <echo:orbitParameters/>
+    <georss:box>-54.5 -156.7 72.5 176.2</georss:box>
+    <echo:hasVariables>true</echo:hasVariables>
+    <echo:hasFormats>false</echo:hasFormats>
+    <echo:hasTransforms>true</echo:hasTransforms>
+    <echo:hasSpatialSubsetting>true</echo:hasSpatialSubsetting>
+    <echo:hasTemporalSubsetting>false</echo:hasTemporalSubsetting>
+    <echo:tag>
+      <echo:tagKey>org.geoss.geoss_data-core</echo:tagKey>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>org.ceos.wgiss.cwic.granules.provider</echo:tagKey>
+      <echo:data>"NASA"</echo:data>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>org.ceos.wgiss.cwic.granules.native_id</echo:tagKey>
+      <echo:data>"A Global Database of Litterfall Mass and Litter Pool Carbon and Nutrients"</echo:data>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>org.ceos.wgiss.cwic.granules.prod</echo:tagKey>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>gov.nasa.eosdis</echo:tagKey>
+    </echo:tag>
+    <echo:is_geoss>true</echo:is_geoss>
+    <echo:is_eosdis>true</echo:is_eosdis>
+  </entry>
+  <entry>
+    <id>https://cmr.earthdata.nasa.gov/opensearch/collections.atom?uid=C179130785-ORNL_DAAC</id>
+    <author>
+      <name>CMR</name>
+      <email>echodev@echo.nasa.gov</email>
+    </author>
+    <title type="text">A Global Database of Soil Phosphorus Compiled from Studies Using Hedley Fractionation</title>
+    <summary type="text">This data set provides concentrations of soil phosphorus (P) compiled from the peer-reviewed literature that cited the Hedley fractionation method (Hedley and Stewart, 1982). This database contains estimates of different forms of naturally occurring soil phosphorus, including labile inorganic P, organic P, occluded P, secondary mineral P, apatite P, and total P, based on the analyses of the various Hedley soil fractions.The recent literature survey (Yang and Post, 2011) was restricted to studies of natural, unfertilized, and uncultivated soils since 1995. Ninety measurements of soil P fractions were identified. These were added to the 88 values from soils in natural ecosystems that Cross and Schlesinger (1995) had compiled. Cross and Schlesinger provided a comprehensive survey on Hedley P data prior to 1995. Measurement data are provided for studies published from 1985 through 2010. In addition to the Hedley P fraction measurement data Yang and Post (2011) also compiled information on soil order, soil pH, organic carbon and nitrogen content, as well as the geographic location (longitude and latitude) of the measurement sites. </summary>
+    <updated>2019-04-15T17:52:35.000Z</updated>
+    <link rel="enclosure" hreflang="en-US" href="https://daac.ornl.gov/daacdata/global_soil/Global_Phosphorus_Hedley_Fract//"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/SOILS/guides/Global_Phosphorus_Hedley_Fract.html" type="text/html"/>
+    <link rel="via" hreflang="en-US" href="https://doi.org/10.3334/ORNLDAAC/1230"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/global_soil/Global_Phosphorus_Hedley_Fract//comp/Global_Phosphorus_Hedley_Fract.pdf" type="application/pdf"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/global_soil/Global_Phosphorus_Hedley_Fract//comp/References_HedleyPdatabase.pdf" type="application/pdf"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/global_soil/Global_Phosphorus_Hedley_Fract//comp/Yang_and_Post_2011_bg-8-2907-2011.pdf" type="application/pdf"/>
+    <link rel="icon" hreflang="en-US" href="https://daac.ornl.gov/SOILS/guides/Hedley_P_figure1.png" type="image/png"/>
+    <link href="https://cmr.earthdata.nasa.gov/opensearch/granules/descriptor_document.xml?collectionConceptId=C179130785-ORNL_DAAC&amp;clientId=" hreflang="en-US" type="application/opensearchdescription+xml" rel="search" title="CWIC Granule Open Search Descriptor Document"/>
+    <link href="https://cmr.earthdata.nasa.gov/search/concepts/C179130785-ORNL_DAAC.xml" hreflang="en-US" type="application/xml" rel="via" title="Product metadata"/>
+    <dc:identifier>C179130785-ORNL_DAAC</dc:identifier>
+    <dc:date>1985-01-01T00:00:00.000Z/2010-12-31T23:59:59.000Z</dc:date>
+    <echo:datasetId>A Global Database of Soil Phosphorus Compiled from Studies Using Hedley Fractionation</echo:datasetId>
+    <echo:shortName>GLOBAL_PHOSPHORUS_HEDLEY_FRACT_1230</echo:shortName>
+    <echo:versionId>1</echo:versionId>
+    <echo:dataCenter>ORNL_DAAC</echo:dataCenter>
+    <echo:archiveCenter>ORNL_DAAC</echo:archiveCenter>
+    <echo:organization>ORNL_DAAC</echo:organization>
+    <echo:processingLevelId>3</echo:processingLevelId>
+    <echo:coordinateSystem>CARTESIAN</echo:coordinateSystem>
+    <echo:orbitParameters/>
+    <georss:box>-42.5 -117.86 63.23 117.6</georss:box>
+    <echo:hasVariables>true</echo:hasVariables>
+    <echo:hasFormats>false</echo:hasFormats>
+    <echo:hasTransforms>true</echo:hasTransforms>
+    <echo:hasSpatialSubsetting>true</echo:hasSpatialSubsetting>
+    <echo:hasTemporalSubsetting>false</echo:hasTemporalSubsetting>
+    <echo:tag>
+      <echo:tagKey>org.geoss.geoss_data-core</echo:tagKey>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>org.ceos.wgiss.cwic.granules.provider</echo:tagKey>
+      <echo:data>"NASA"</echo:data>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>org.ceos.wgiss.cwic.granules.native_id</echo:tagKey>
+      <echo:data>"A Global Database of Soil Phosphorus Compiled from Studies Using Hedley Fractionation"</echo:data>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>org.ceos.wgiss.cwic.granules.prod</echo:tagKey>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>gov.nasa.eosdis</echo:tagKey>
+    </echo:tag>
+    <echo:is_geoss>true</echo:is_geoss>
+    <echo:is_eosdis>true</echo:is_eosdis>
+  </entry>
+  <entry>
+    <id>https://cmr.earthdata.nasa.gov/opensearch/collections.atom?uid=C1248454748-ORNL_DAAC</id>
+    <author>
+      <name>CMR</name>
+      <email>echodev@echo.nasa.gov</email>
+    </author>
+    <title type="text">ABoVE: Burn Severity, Fire Progression, Landcover and Field Data, NWT, Canada, 2014</title>
+    <summary type="text">This data set provides peatland landcover classification maps, fire progression maps, and vegetation community biophysical data collected from areas that were burned by wildfire in 2014 in the Northwest Territories, Canada. The peatland maps include peatland type (bog, fen, marsh, swamp) and level of biomass (open, forested). The fire progression maps enabled an assessment of wildfire progression rates at a daily time scale. Field data, collected in 2015, include an estimate of burn severity, woody seedling/sprouting data, soil moisture, and tree diameter and height of burned sites and similar vegetation characterization at landcover validation sites.</summary>
+    <updated>2019-04-15T18:54:21.000Z</updated>
+    <link rel="enclosure" hreflang="en-US" href="https://daac.ornl.gov/daacdata/above/Wildfires_2014_NWT_Canada/"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/ABOVE/guides/Wildfires_2014_NWT_Canada.html" type="text/html"/>
+    <link rel="via" hreflang="en-US" href="https://doi.org/10.3334/ORNLDAAC/1307"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/above/Wildfires_2014_NWT_Canada/comp/2014_NWT_fireprogression.kmz"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/above/Wildfires_2014_NWT_Canada/comp/july_1326.kmz"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/above/Wildfires_2014_NWT_Canada/comp/july_1326_field_of_view.zip"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/above/Wildfires_2014_NWT_Canada/comp/july_1326_photos.zip"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/above/Wildfires_2014_NWT_Canada/comp/july_1326_photo_locations.zip"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/above/Wildfires_2014_NWT_Canada/comp/july_eastern.kmz"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/above/Wildfires_2014_NWT_Canada/comp/july_eastern_field_of_view.zip"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/above/Wildfires_2014_NWT_Canada/comp/july_eastern_photos.zip"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/above/Wildfires_2014_NWT_Canada/comp/july_eastern_photo_locations.zip"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/above/Wildfires_2014_NWT_Canada/comp/june_1326.kmz"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/above/Wildfires_2014_NWT_Canada/comp/june_1326_field_of_view.zip"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/above/Wildfires_2014_NWT_Canada/comp/june_1326_photos.zip"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/above/Wildfires_2014_NWT_Canada/comp/june_1326_photo_locations.zip"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/above/Wildfires_2014_NWT_Canada/comp/june_1327.kmz"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/above/Wildfires_2014_NWT_Canada/comp/june_1327_field_of_view.zip"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/above/Wildfires_2014_NWT_Canada/comp/june_1327_photos.zip"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/above/Wildfires_2014_NWT_Canada/comp/june_1327_photo_locations.zip"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/above/Wildfires_2014_NWT_Canada/comp/june_eastern.kmz"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/above/Wildfires_2014_NWT_Canada/comp/june_eastern_field_of_view.zip"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/above/Wildfires_2014_NWT_Canada/comp/june_eastern_photos.zip"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/above/Wildfires_2014_NWT_Canada/comp/june_eastern_photo_locations.zip"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/above/Wildfires_2014_NWT_Canada/comp/NWT_CANADA_Wildfires_2014_generaltable.csv"/>
+    <link rel="describedBy" hreflang="en-US" href="https://daac.ornl.gov/daacdata/above/Wildfires_2014_NWT_Canada/comp/Wildfires_2014_NWT_Canada.pdf" type="application/pdf"/>
+    <link rel="icon" hreflang="en-US" href="https://daac.ornl.gov/graphics/browse/sdat-tds/1307_1_fit.png" type="image/png"/>
+    <link rel="via" type="application/gml+xml" hreflang="en-US" href="https://webmap.ornl.gov/wcsdown/dataset.jsp?ds_id=1307"/>
+    <link href="https://cmr.earthdata.nasa.gov/opensearch/granules/descriptor_document.xml?collectionConceptId=C1248454748-ORNL_DAAC&amp;clientId=" hreflang="en-US" type="application/opensearchdescription+xml" rel="search" title="CWIC Granule Open Search Descriptor Document"/>
+    <link href="https://cmr.earthdata.nasa.gov/search/concepts/C1248454748-ORNL_DAAC.xml" hreflang="en-US" type="application/xml" rel="via" title="Product metadata"/>
+    <dc:identifier>C1248454748-ORNL_DAAC</dc:identifier>
+    <dc:date>1997-07-07T00:00:00.000Z/2015-07-15T23:59:59.000Z</dc:date>
+    <echo:datasetId>ABoVE: Burn Severity, Fire Progression, Landcover and Field Data, NWT, Canada, 2014</echo:datasetId>
+    <echo:shortName>Wildfires_2014_NWT_Canada_1307</echo:shortName>
+    <echo:versionId>1</echo:versionId>
+    <echo:dataCenter>ORNL_DAAC</echo:dataCenter>
+    <echo:archiveCenter>ORNL_DAAC</echo:archiveCenter>
+    <echo:organization>ORNL_DAAC</echo:organization>
+    <echo:processingLevelId>3</echo:processingLevelId>
+    <echo:coordinateSystem>CARTESIAN</echo:coordinateSystem>
+    <echo:orbitParameters/>
+    <georss:box>60.33 -121.6 64.25 -110.68</georss:box>
+    <echo:hasVariables>true</echo:hasVariables>
+    <echo:hasFormats>false</echo:hasFormats>
+    <echo:hasTransforms>true</echo:hasTransforms>
+    <echo:hasSpatialSubsetting>true</echo:hasSpatialSubsetting>
+    <echo:hasTemporalSubsetting>false</echo:hasTemporalSubsetting>
+    <echo:tag>
+      <echo:tagKey>org.geoss.geoss_data-core</echo:tagKey>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>org.ceos.wgiss.cwic.granules.provider</echo:tagKey>
+      <echo:data>"NASA"</echo:data>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>org.ceos.wgiss.cwic.granules.native_id</echo:tagKey>
+      <echo:data>"ABoVE: Burn Severity, Fire Progression, Landcover and Field Data, NWT, Canada, 2014"</echo:data>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>org.ceos.wgiss.cwic.granules.prod</echo:tagKey>
+    </echo:tag>
+    <echo:tag>
+      <echo:tagKey>gov.nasa.eosdis</echo:tagKey>
+    </echo:tag>
+    <echo:is_geoss>true</echo:is_geoss>
+    <echo:is_eosdis>true</echo:is_eosdis>
+  </entry>
+</feed>

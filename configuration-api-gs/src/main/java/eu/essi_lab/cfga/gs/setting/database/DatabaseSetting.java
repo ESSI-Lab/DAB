@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gs.setting.database;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,12 +26,13 @@ import java.util.Optional;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.EditableSetting;
+import eu.essi_lab.cfga.gs.setting.TabIndex;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 
 /**
  * @author Fabrizio
@@ -49,6 +50,7 @@ public final class DatabaseSetting extends Setting implements EditableSetting {
     protected static final String DATABASE_URI_OPTION_KEY = "dbUri";
     protected static final String DATABASE_USER_OPTION_KEY = "dbUser";
     protected static final String DATABASE_PWD_OPTION_KEY = "dbPassword";
+    protected static final String DATABASE_TYPE_OPTION_KEY = "dbType";
     protected static final String CONFIG_FOLDER_OPTION_KEY = "configFolder";
 
     private static final String DATABASE_SETTING_ID = "databaseConfiguration";
@@ -59,7 +61,7 @@ public final class DatabaseSetting extends Setting implements EditableSetting {
 	setCanBeDisabled(false);
 	setName("Database settings");
 	setDescription("Main database settings");
-	
+
 	setCanBeCleaned(false);
 
 	//
@@ -113,7 +115,7 @@ public final class DatabaseSetting extends Setting implements EditableSetting {
 	    dbSettings.setEditable(false);
 
 	    Option<String> uriOption = new Option<>(String.class);
-	    uriOption.setLabel("Database Uri");
+	    uriOption.setLabel("Database URI");
 	    uriOption.setKey(DATABASE_URI_OPTION_KEY);
 	    uriOption.setRequired(true);
 	    uriOption.setCanBeDisabled(false);
@@ -121,7 +123,7 @@ public final class DatabaseSetting extends Setting implements EditableSetting {
 	    dbSettings.addOption(uriOption);
 
 	    Option<String> userOption = new Option<>(String.class);
-	    userOption.setLabel("Database User");
+	    userOption.setLabel("Database user");
 	    userOption.setKey(DATABASE_USER_OPTION_KEY);
 	    userOption.setRequired(true);
 	    userOption.setCanBeDisabled(false);
@@ -129,7 +131,7 @@ public final class DatabaseSetting extends Setting implements EditableSetting {
 	    dbSettings.addOption(userOption);
 
 	    Option<String> pwdOption = new Option<>(String.class);
-	    pwdOption.setLabel("Database Password");
+	    pwdOption.setLabel("Database password");
 	    pwdOption.setKey(DATABASE_PWD_OPTION_KEY);
 	    pwdOption.setRequired(true);
 	    pwdOption.setCanBeDisabled(false);
@@ -152,6 +154,14 @@ public final class DatabaseSetting extends Setting implements EditableSetting {
 
 	    dbSettings.addOption(dbNameOption);
 
+	    Option<String> typeOption = new Option<>(String.class);
+	    typeOption.setLabel("Database type");
+	    typeOption.setKey(DATABASE_TYPE_OPTION_KEY);
+	    typeOption.setRequired(false);
+	    typeOption.setCanBeDisabled(false);
+
+	    dbSettings.addOption(typeOption);
+
 	    addSetting(dbSettings);
 	}
 
@@ -166,8 +176,6 @@ public final class DatabaseSetting extends Setting implements EditableSetting {
      */
     public static class DatabaseComponentInfo extends ComponentInfo {
 
-	public static int tabIndex = 3;
-
 	/**
 	 * 
 	 */
@@ -176,7 +184,7 @@ public final class DatabaseSetting extends Setting implements EditableSetting {
 	    setComponentName(DatabaseSetting.class.getName());
 
 	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(tabIndex).//
+		    withIndex(TabIndex.DATABASE_SETTING.getIndex()).//
 		    withShowDirective("Database").//
 		    build();
 
@@ -196,7 +204,7 @@ public final class DatabaseSetting extends Setting implements EditableSetting {
     /**
      * @param uri
      */
-    public DatabaseSetting(StorageUri uri) {
+    public DatabaseSetting(StorageInfo uri) {
 
 	this();
 
@@ -354,6 +362,32 @@ public final class DatabaseSetting extends Setting implements EditableSetting {
     }
 
     /**
+     * @param password
+     */
+    public void setDatabaseType(String password) {
+
+	if (isVolatile()) {
+
+	    throw new UnsupportedOperationException("Attempting to edit a volatile database setting");
+	}
+
+	getDbSetting().getOption(DATABASE_TYPE_OPTION_KEY, String.class).get().setValue(password);
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getDatabaseType() {
+
+	if (isVolatile()) {
+
+	    return Optional.empty();
+	}
+
+	return Optional.ofNullable(getDbSetting().getOption(DATABASE_TYPE_OPTION_KEY, String.class).get().getValue());
+    }
+
+    /**
      * @param folder
      */
     public void setConfigurationFolder(String folder) {
@@ -382,17 +416,17 @@ public final class DatabaseSetting extends Setting implements EditableSetting {
     /**
      * @param storageUri
      */
-    public void setStorageUri(StorageUri uri) {
+    public void setStorageUri(StorageInfo uri) {
 
 	if (uri != null) {
 
-	    setDatabaseName(uri.getStorageName());
+	    setDatabaseName(uri.getName());
 	    setDatabaseUri(uri.getUri());
 
 	    if (!isVolatile()) {
 
-		if (uri.getConfigFolder() != null) {
-		    setConfigurationFolder(uri.getConfigFolder());
+		if (uri.getIdentifier() != null) {
+		    setConfigurationFolder(uri.getIdentifier());
 		}
 
 		if (uri.getPassword() != null) {
@@ -402,6 +436,10 @@ public final class DatabaseSetting extends Setting implements EditableSetting {
 		if (uri.getUser() != null) {
 		    setDatabaseUser(uri.getUser());
 		}
+
+		if (uri.getType().isPresent()) {
+		    setDatabaseType(uri.getType().get());
+		}
 	    }
 	}
     }
@@ -409,18 +447,19 @@ public final class DatabaseSetting extends Setting implements EditableSetting {
     /***
      * @return
      */
-    public StorageUri asStorageUri() {
+    public StorageInfo asStorageUri() {
 
-	StorageUri storageUri = new StorageUri();
+	StorageInfo storageUri = new StorageInfo();
 
-	storageUri.setStorageName(getDatabaseName());
+	storageUri.setName(getDatabaseName());
 	storageUri.setUri(getDatabaseUri());
 
 	if (!isVolatile()) {
 
-	    storageUri.setConfigFolder(getConfigurationFolder());
+	    storageUri.setIdentifier(getConfigurationFolder());
 	    storageUri.setUser(getDatabaseUser());
 	    storageUri.setPassword(getDatabasePassword());
+	    storageUri.setType(getDatabaseType().orElse(null));
 	}
 
 	return storageUri;

@@ -1,0 +1,5 @@
+<t:test xmlns:t="http://essi-lab.eu/test">
+	<t:a>A</t:a>
+	<t:b t:att="pippo">B</t:b>
+	<t:c>C</t:c>
+</t:test>

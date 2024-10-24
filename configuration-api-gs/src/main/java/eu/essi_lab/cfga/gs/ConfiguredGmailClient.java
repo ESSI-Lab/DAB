@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gs;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -36,6 +36,7 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
  */
 public class ConfiguredGmailClient {
 
+    public static final String MAIL_ALARM = "[ALARM]";
     public static final String MAIL_REPORT_SUBJECT = "[GS-REPORT]";
     public static final String MAIL_REPORT_STATISTICS = "[STATISTICS]";
     public static final String MAIL_ERROR_SUBJECT = "[ERROR]";
@@ -90,7 +91,7 @@ public class ConfiguredGmailClient {
 
 	    return true;
 
-	} catch (MessagingException e) {
+	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(ConfiguredGmailClient.class).error(e.getMessage(), e);
 	}

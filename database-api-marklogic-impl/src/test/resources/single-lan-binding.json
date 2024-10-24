@@ -1,0 +1,11 @@
+{  
+   "ontology":{  
+      "type":"uri",
+      "value":"http://eu.floraresearch.essi.core/test/unontology"
+   },
+   "label":{  
+      "type":"literal",
+      "value":"Target 1.2",
+      "xml:lang":"de"
+   }
+}

@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.conf.task;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,22 +21,21 @@ package eu.essi_lab.gssrv.conf.task;
  * #L%
  */
 
-import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import javax.xml.xpath.XPathExpressionException;
 
 import org.quartz.JobExecutionContext;
 
-import com.marklogic.xcc.ResultSequence;
-
 import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.factory.DatabaseConsumerFactory;
-import eu.essi_lab.api.database.marklogic.MarkLogicDatabase;
+import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
-import eu.essi_lab.lib.xml.XMLDocumentReader;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
+import eu.essi_lab.model.auth.GSUser;
 
 /**
  * @author Fabrizio
@@ -52,57 +51,59 @@ public class UsersViewerTask extends AbstractCustomTask {
     @Override
     public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
 
-	StorageUri databaseURI = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
 
-	DatabaseReader dbReader = DatabaseConsumerFactory.createDataBaseReader(databaseURI);
-	MarkLogicDatabase dataBase = ((MarkLogicDatabase) dbReader.getDatabase());
+	DatabaseReader dbReader = DatabaseProviderFactory.getDatabaseReader(databaseURI);
 
-	String query = getCountQuery();
+	List<GSUser> users = dbReader.getUsers();
 
-	Integer usersCount = Integer.valueOf(dataBase.execXQuery(query).asString());
+	Integer usersCount = users.size();
 
-	log(status, "- Number of users: " + usersCount + "\n");
+	log(status, "---\n");
+	log(status, "[Number of users]: " + usersCount + "\n");
+	log(status, "---\n\n");
 
 	if (usersCount == 0) {
 
 	    return;
 	}
 
-	query = getQuery();
+	HashMap<String, List<String>> map = new HashMap<>();
 
-	ResultSequence resultSequence = dataBase.execXQuery(query);
+	for (GSUser user : users) {
 
-	while (resultSequence.hasNext()) {
+	    StringBuilder builder = new StringBuilder();
 
-	    InputStream stream = resultSequence.next().asInputStream();
-	    XMLDocumentReader reader = new XMLDocumentReader(stream);
+	    builder.append("- URI: " + user.getUri() + "\n");
+	    builder.append("- Role: " + user.getRole() + "\n");
+	    builder.append("- Identifier: " + user.getIdentifier() + "\n");
+	    builder.append("- Identifier type: " + user.getUserIdentifierType().map(t -> t.toString()).orElse("missing") + "\n");
+	    builder.append("- Enabled: " + user.isEnabled() + "\n");
+	    builder.append("- First name: " + readProperty(user, "firstName") + "\n");
+	    builder.append("- Last name: " + readProperty(user, "lastName") + "\n");
+	    builder.append("- Email: " + readProperty(user, "email") + "\n");
+	    builder.append("- Country: " + readProperty(user, "country") + "\n");
+	    builder.append("- Institution type: " + readProperty(user, "institutionType") + "\n");
+	    builder.append("- Registration date: " + readProperty(user, "registrationDate") + "\n");
 
-	    String id = reader.evaluateTextContent("//*:identifier/text()").get(0);
+	    List<String> list = map.get(user.getRole());
 
-	    String enabled = "true";
+	    if (list == null) {
 
-	    if (reader.evaluateBoolean("exists(//*:enabled)")) {
-
-		enabled = reader.evaluateTextContent("//*:enabled/text()").get(0);
+		list = new ArrayList<String>();
+		map.put(user.getRole(), list);
 	    }
 
-	    String role = new String(reader.evaluateTextContent("//*:role/text()").get(0).getBytes(Charset.forName("UTF-8")));
-	    String firstName = new String(readProperty(reader, "firstName").getBytes(Charset.forName("UTF-8")));
-	    String lastName = new String(readProperty(reader, "firstName").getBytes(Charset.forName("UTF-8")));
-	    String email = new String(readProperty(reader, "email").getBytes(Charset.forName("UTF-8")));
-	    String country = new String(readProperty(reader, "country").getBytes(Charset.forName("UTF-8")));
-	    String institutionType = new String(readProperty(reader, "institutionType").getBytes(Charset.forName("UTF-8")));
-	    String registrationDate = new String(readProperty(reader, "registrationDate").getBytes(Charset.forName("UTF-8")));
+	    list.add(builder.toString());
+	}
 
-	    log(status, "- Identifier: " + id);
-	    log(status, "- Enabled: " + enabled);
-	    log(status, "- Role: " + role);
-	    log(status, "- First name: " + firstName);
-	    log(status, "- Last name: " + lastName);
-	    log(status, "- Email: " + email);
-	    log(status, "- Country: " + country);
-	    log(status, "- Institution type: " + institutionType);
-	    log(status, "- Registration date: " + registrationDate + "\n");
+	String[] keys = map.keySet().toArray(new String[] {});
+
+	for (int i = 0; i < keys.length; i++) {
+
+	    log(status, "[ROLE] : " + keys[i] + "\n");
+
+	    map.get(keys[i]).forEach(user -> log(status, user));
 	}
     }
 
@@ -118,38 +119,14 @@ public class UsersViewerTask extends AbstractCustomTask {
      * @return
      * @throws XPathExpressionException
      */
-    private static String readProperty(XMLDocumentReader reader, String property) throws XPathExpressionException {
+    private static String readProperty(GSUser user, String property) throws XPathExpressionException {
 
-	String value = "missing";
-
-	if (reader.evaluateBoolean("exists(//*:property[name='" + property + "'])")) {
-
-	    value = reader.evaluateTextContent("//*:property[name='" + property + "']/*:value/text()").get(0);
-	}
-
-	return value;
-    }
-
-    /**
-     * @return
-     */
-    private static String getQuery() {
-
-	String query = "xquery version \"1.0-ml\";\n";
-	query += "declare namespace html = \"http://www.w3.org/1999/xhtml\";\n";
-	query += "import module namespace gs=\"http://flora.eu/gi-suite/1.0/dataModel/schema\" at \"/gs-modules/functions-module.xqy\";\n";
-
-	query += "cts:search(doc(),cts:directory-query(\"/preprodenvconf_users/\", \"infinity\"),\n";
-	query += "(\"unfiltered\",\"score-simple\"),0)\n";
-
-	return query;
-    }
-
-    /**
-     * @return
-     */
-    private static String getCountQuery() {
-
-	return getQuery().replace("cts:search", "xdmp:estimate(cts:search").replace(",0)", ",0))");
+	return user.//
+		getProperties().//
+		stream().//
+		filter(p -> p.getName().equals(property)).//
+		map(p -> p.getValue().toString()).//
+		findFirst().//
+		orElse("missing");
     }
 }

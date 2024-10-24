@@ -1,0 +1,1230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitesResponse xmlns="http://www.cuahsi.org/waterML/1.1/"
+                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                    xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://www.cuahsi.org/waterML/1.1/ ../../../src/main/resources/schemas/cuahsiTimeSeries_v1_1.xsd">               
+   <queryInfo>
+      <creationTime>2018-01-10T14:29:02.0157841+00:00</creationTime>
+      <criteria MethodCalled="GetSiteInfo">
+         <parameter name="site" value="GlobalRiversObservatory:AncientF"/>
+      </criteria>
+   </queryInfo>
+   <site>
+      <siteInfo>
+         <siteName>Ancient_Forest</siteName>
+         <siteCode network="GlobalRiversObservatory" siteID="1">AncientF</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>53.762455</latitude>
+               <longitude>-121.223328</longitude>
+            </geogLocation>
+            <localSiteXY projectionInformation="WGS84">
+               <X>53.762455</X>
+               <Y>-121.223328</Y>
+            </localSiteXY>
+         </geoLocation>
+         <siteProperty name="State">BC</siteProperty>
+      </siteInfo>
+      <seriesCatalog menuGroupName="Global Rivers Observatory"
+                     serviceWsdl="http://hydroportal.cuahsi.org/GlobalRiversObservatory/webapp/cuahsi_1_1.asmx?WSDL">
+         <series>
+            <variable>
+               <variableCode default="true" variableID="14" vocabulary="GlobalRiversObservatory">nh4</variableCode>
+               <variableName>Nitrogen, NH4</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Unknown</generalCategory>
+               <sampleMedium>Surface water</sampleMedium>
+               <unit>
+                  <unitName>micromoles per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>umol/L</unitAbbreviation>
+                  <unitCode>303</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>hour</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>hr</unitAbbreviation>
+                     <unitCode>103</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>NH4</speciation>
+            </variable>
+            <valueCount>1</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2011-06-02T00:00:00</beginDateTime>
+               <endDateTime>2011-06-02T00:00:00</endDateTime>
+               <beginDateTimeUTC>2011-06-02T00:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2011-06-02T00:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="0">
+               <methodDescription>No method specified</methodDescription>
+            </method>
+            <source sourceID="3">
+               <organization>Woods Hole Oceanographic Institute</organization>
+               <sourceDescription>Unknown</sourceDescription>
+               <citation>Unknown</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="15" vocabulary="GlobalRiversObservatory">sio2</variableCode>
+               <variableName>Silica</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Unknown</generalCategory>
+               <sampleMedium>Surface water</sampleMedium>
+               <unit>
+                  <unitName>micromoles per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>umol/L</unitAbbreviation>
+                  <unitCode>303</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>hour</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>hr</unitAbbreviation>
+                     <unitCode>103</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>SiO2</speciation>
+            </variable>
+            <valueCount>1</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2011-06-02T00:00:00</beginDateTime>
+               <endDateTime>2011-06-02T00:00:00</endDateTime>
+               <beginDateTimeUTC>2011-06-02T00:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2011-06-02T00:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="0">
+               <methodDescription>No method specified</methodDescription>
+            </method>
+            <source sourceID="3">
+               <organization>Woods Hole Oceanographic Institute</organization>
+               <sourceDescription>Unknown</sourceDescription>
+               <citation>Unknown</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="16" vocabulary="GlobalRiversObservatory">po4</variableCode>
+               <variableName>Phosphorus, phosphate (PO4)</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Unknown</generalCategory>
+               <sampleMedium>Surface water</sampleMedium>
+               <unit>
+                  <unitName>micromoles per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>umol/L</unitAbbreviation>
+                  <unitCode>303</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>hour</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>hr</unitAbbreviation>
+                     <unitCode>103</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>PO4</speciation>
+            </variable>
+            <valueCount>1</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2011-06-02T00:00:00</beginDateTime>
+               <endDateTime>2011-06-02T00:00:00</endDateTime>
+               <beginDateTimeUTC>2011-06-02T00:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2011-06-02T00:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="0">
+               <methodDescription>No method specified</methodDescription>
+            </method>
+            <source sourceID="3">
+               <organization>Woods Hole Oceanographic Institute</organization>
+               <sourceDescription>Unknown</sourceDescription>
+               <citation>Unknown</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="18" vocabulary="GlobalRiversObservatory">no3no2</variableCode>
+               <variableName>Nitrogen, dissolved nitrite (NO2) + nitrate (NO3)</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Unknown</generalCategory>
+               <sampleMedium>Surface water</sampleMedium>
+               <unit>
+                  <unitName>micromoles per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>umol/L</unitAbbreviation>
+                  <unitCode>303</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>hour</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>hr</unitAbbreviation>
+                     <unitCode>103</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>1</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2011-06-02T00:00:00</beginDateTime>
+               <endDateTime>2011-06-02T00:00:00</endDateTime>
+               <beginDateTimeUTC>2011-06-02T00:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2011-06-02T00:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="0">
+               <methodDescription>No method specified</methodDescription>
+            </method>
+            <source sourceID="3">
+               <organization>Woods Hole Oceanographic Institute</organization>
+               <sourceDescription>Unknown</sourceDescription>
+               <citation>Unknown</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="20" vocabulary="GlobalRiversObservatory">d18OH2O</variableCode>
+               <variableName>delta-18O of H2O</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Unknown</generalCategory>
+               <sampleMedium>Surface water</sampleMedium>
+               <unit>
+                  <unitName>per mille</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>‰</unitAbbreviation>
+                  <unitCode>210</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>hour</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>hr</unitAbbreviation>
+                     <unitCode>103</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>1</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2011-06-02T00:00:00</beginDateTime>
+               <endDateTime>2011-06-02T00:00:00</endDateTime>
+               <beginDateTimeUTC>2011-06-02T00:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2011-06-02T00:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="0">
+               <methodDescription>No method specified</methodDescription>
+            </method>
+            <source sourceID="5">
+               <organization>ETH</organization>
+               <sourceDescription>Unknown</sourceDescription>
+               <citation>Unknown</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="21" vocabulary="GlobalRiversObservatory">dDH2O</variableCode>
+               <variableName>delta-D of H2O</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Unknown</generalCategory>
+               <sampleMedium>Surface water</sampleMedium>
+               <unit>
+                  <unitName>per mille</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>‰</unitAbbreviation>
+                  <unitCode>210</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>hour</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>hr</unitAbbreviation>
+                     <unitCode>103</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>1</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2011-06-02T00:00:00</beginDateTime>
+               <endDateTime>2011-06-02T00:00:00</endDateTime>
+               <beginDateTimeUTC>2011-06-02T00:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2011-06-02T00:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="0">
+               <methodDescription>No method specified</methodDescription>
+            </method>
+            <source sourceID="5">
+               <organization>ETH</organization>
+               <sourceDescription>Unknown</sourceDescription>
+               <citation>Unknown</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="37" vocabulary="GlobalRiversObservatory">F</variableCode>
+               <variableName>Fluorine</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Unknown</generalCategory>
+               <sampleMedium>Surface water</sampleMedium>
+               <unit>
+                  <unitName>micromoles per kilogram</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>umol/kg</unitAbbreviation>
+                  <unitCode>383</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>hour</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>hr</unitAbbreviation>
+                     <unitCode>103</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>F</speciation>
+            </variable>
+            <valueCount>1</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2011-06-02T00:00:00</beginDateTime>
+               <endDateTime>2011-06-02T00:00:00</endDateTime>
+               <beginDateTimeUTC>2011-06-02T00:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2011-06-02T00:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="0">
+               <methodDescription>No method specified</methodDescription>
+            </method>
+            <source sourceID="3">
+               <organization>Woods Hole Oceanographic Institute</organization>
+               <sourceDescription>Unknown</sourceDescription>
+               <citation>Unknown</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="38" vocabulary="GlobalRiversObservatory">Cl</variableCode>
+               <variableName>Chlorine</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Unknown</generalCategory>
+               <sampleMedium>Surface water</sampleMedium>
+               <unit>
+                  <unitName>micromoles per kilogram</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>umol/kg</unitAbbreviation>
+                  <unitCode>383</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>hour</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>hr</unitAbbreviation>
+                     <unitCode>103</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>Cl</speciation>
+            </variable>
+            <valueCount>1</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2011-06-02T00:00:00</beginDateTime>
+               <endDateTime>2011-06-02T00:00:00</endDateTime>
+               <beginDateTimeUTC>2011-06-02T00:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2011-06-02T00:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="0">
+               <methodDescription>No method specified</methodDescription>
+            </method>
+            <source sourceID="3">
+               <organization>Woods Hole Oceanographic Institute</organization>
+               <sourceDescription>Unknown</sourceDescription>
+               <citation>Unknown</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="39" vocabulary="GlobalRiversObservatory">SO4</variableCode>
+               <variableName>Sulfate, total</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Unknown</generalCategory>
+               <sampleMedium>Surface water</sampleMedium>
+               <unit>
+                  <unitName>micromoles per kilogram</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>umol/kg</unitAbbreviation>
+                  <unitCode>383</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>hour</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>hr</unitAbbreviation>
+                     <unitCode>103</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>SO4</speciation>
+            </variable>
+            <valueCount>1</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2011-06-02T00:00:00</beginDateTime>
+               <endDateTime>2011-06-02T00:00:00</endDateTime>
+               <beginDateTimeUTC>2011-06-02T00:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2011-06-02T00:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="0">
+               <methodDescription>No method specified</methodDescription>
+            </method>
+            <source sourceID="3">
+               <organization>Woods Hole Oceanographic Institute</organization>
+               <sourceDescription>Unknown</sourceDescription>
+               <citation>Unknown</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="40" vocabulary="GlobalRiversObservatory">Br</variableCode>
+               <variableName>Bromine</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Unknown</generalCategory>
+               <sampleMedium>Surface water</sampleMedium>
+               <unit>
+                  <unitName>micromoles per kilogram</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>umol/kg</unitAbbreviation>
+                  <unitCode>383</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>hour</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>hr</unitAbbreviation>
+                     <unitCode>103</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>Br</speciation>
+            </variable>
+            <valueCount>1</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2011-06-02T00:00:00</beginDateTime>
+               <endDateTime>2011-06-02T00:00:00</endDateTime>
+               <beginDateTimeUTC>2011-06-02T00:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2011-06-02T00:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="0">
+               <methodDescription>No method specified</methodDescription>
+            </method>
+            <source sourceID="3">
+               <organization>Woods Hole Oceanographic Institute</organization>
+               <sourceDescription>Unknown</sourceDescription>
+               <citation>Unknown</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="41" vocabulary="GlobalRiversObservatory">As</variableCode>
+               <variableName>Arsenic, total</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Unknown</generalCategory>
+               <sampleMedium>Surface water</sampleMedium>
+               <unit>
+                  <unitName>milligrams per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mg/L</unitAbbreviation>
+                  <unitCode>199</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>hour</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>hr</unitAbbreviation>
+                     <unitCode>103</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>As</speciation>
+            </variable>
+            <valueCount>1</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2011-06-02T00:00:00</beginDateTime>
+               <endDateTime>2011-06-02T00:00:00</endDateTime>
+               <beginDateTimeUTC>2011-06-02T00:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2011-06-02T00:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="0">
+               <methodDescription>No method specified</methodDescription>
+            </method>
+            <source sourceID="9">
+               <organization>BPE</organization>
+               <sourceDescription>Unknown</sourceDescription>
+               <citation>Unknown</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="42" vocabulary="GlobalRiversObservatory">Sr</variableCode>
+               <variableName>Strontium, total</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Unknown</generalCategory>
+               <sampleMedium>Surface water</sampleMedium>
+               <unit>
+                  <unitName>milligrams per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mg/L</unitAbbreviation>
+                  <unitCode>199</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>hour</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>hr</unitAbbreviation>
+                     <unitCode>103</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>Sr</speciation>
+            </variable>
+            <valueCount>1</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2011-06-02T00:00:00</beginDateTime>
+               <endDateTime>2011-06-02T00:00:00</endDateTime>
+               <beginDateTimeUTC>2011-06-02T00:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2011-06-02T00:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="0">
+               <methodDescription>No method specified</methodDescription>
+            </method>
+            <source sourceID="9">
+               <organization>BPE</organization>
+               <sourceDescription>Unknown</sourceDescription>
+               <citation>Unknown</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="43" vocabulary="GlobalRiversObservatory">Mo</variableCode>
+               <variableName>Molybdenum, total</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Unknown</generalCategory>
+               <sampleMedium>Surface water</sampleMedium>
+               <unit>
+                  <unitName>milligrams per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mg/L</unitAbbreviation>
+                  <unitCode>199</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>hour</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>hr</unitAbbreviation>
+                     <unitCode>103</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>Mo</speciation>
+            </variable>
+            <valueCount>1</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2011-06-02T00:00:00</beginDateTime>
+               <endDateTime>2011-06-02T00:00:00</endDateTime>
+               <beginDateTimeUTC>2011-06-02T00:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2011-06-02T00:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="0">
+               <methodDescription>No method specified</methodDescription>
+            </method>
+            <source sourceID="9">
+               <organization>BPE</organization>
+               <sourceDescription>Unknown</sourceDescription>
+               <citation>Unknown</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="44" vocabulary="GlobalRiversObservatory">Sb</variableCode>
+               <variableName>Antimony, total</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Unknown</generalCategory>
+               <sampleMedium>Surface water</sampleMedium>
+               <unit>
+                  <unitName>milligrams per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mg/L</unitAbbreviation>
+                  <unitCode>199</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>hour</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>hr</unitAbbreviation>
+                     <unitCode>103</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>Sb</speciation>
+            </variable>
+            <valueCount>1</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2011-06-02T00:00:00</beginDateTime>
+               <endDateTime>2011-06-02T00:00:00</endDateTime>
+               <beginDateTimeUTC>2011-06-02T00:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2011-06-02T00:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="0">
+               <methodDescription>No method specified</methodDescription>
+            </method>
+            <source sourceID="9">
+               <organization>BPE</organization>
+               <sourceDescription>Unknown</sourceDescription>
+               <citation>Unknown</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="45" vocabulary="GlobalRiversObservatory">Ba</variableCode>
+               <variableName>Barium, total</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Unknown</generalCategory>
+               <sampleMedium>Surface water</sampleMedium>
+               <unit>
+                  <unitName>milligrams per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mg/L</unitAbbreviation>
+                  <unitCode>199</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>hour</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>hr</unitAbbreviation>
+                     <unitCode>103</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>Ba</speciation>
+            </variable>
+            <valueCount>1</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2011-06-02T00:00:00</beginDateTime>
+               <endDateTime>2011-06-02T00:00:00</endDateTime>
+               <beginDateTimeUTC>2011-06-02T00:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2011-06-02T00:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="0">
+               <methodDescription>No method specified</methodDescription>
+            </method>
+            <source sourceID="9">
+               <organization>BPE</organization>
+               <sourceDescription>Unknown</sourceDescription>
+               <citation>Unknown</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="46" vocabulary="GlobalRiversObservatory">U</variableCode>
+               <variableName>Uranium</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Unknown</generalCategory>
+               <sampleMedium>Surface water</sampleMedium>
+               <unit>
+                  <unitName>milligrams per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mg/L</unitAbbreviation>
+                  <unitCode>199</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>hour</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>hr</unitAbbreviation>
+                     <unitCode>103</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>U</speciation>
+            </variable>
+            <valueCount>1</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2011-06-02T00:00:00</beginDateTime>
+               <endDateTime>2011-06-02T00:00:00</endDateTime>
+               <beginDateTimeUTC>2011-06-02T00:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2011-06-02T00:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="0">
+               <methodDescription>No method specified</methodDescription>
+            </method>
+            <source sourceID="9">
+               <organization>BPE</organization>
+               <sourceDescription>Unknown</sourceDescription>
+               <citation>Unknown</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="47" vocabulary="GlobalRiversObservatory">Ca</variableCode>
+               <variableName>Calcium, total</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Unknown</generalCategory>
+               <sampleMedium>Surface water</sampleMedium>
+               <unit>
+                  <unitName>milligrams per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mg/L</unitAbbreviation>
+                  <unitCode>199</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>hour</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>hr</unitAbbreviation>
+                     <unitCode>103</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>Ca</speciation>
+            </variable>
+            <valueCount>1</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2011-06-02T00:00:00</beginDateTime>
+               <endDateTime>2011-06-02T00:00:00</endDateTime>
+               <beginDateTimeUTC>2011-06-02T00:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2011-06-02T00:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="0">
+               <methodDescription>No method specified</methodDescription>
+            </method>
+            <source sourceID="9">
+               <organization>BPE</organization>
+               <sourceDescription>Unknown</sourceDescription>
+               <citation>Unknown</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="48" vocabulary="GlobalRiversObservatory">Mn</variableCode>
+               <variableName>Manganese, total</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Unknown</generalCategory>
+               <sampleMedium>Surface water</sampleMedium>
+               <unit>
+                  <unitName>milligrams per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mg/L</unitAbbreviation>
+                  <unitCode>199</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>hour</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>hr</unitAbbreviation>
+                     <unitCode>103</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>Mn</speciation>
+            </variable>
+            <valueCount>1</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2011-06-02T00:00:00</beginDateTime>
+               <endDateTime>2011-06-02T00:00:00</endDateTime>
+               <beginDateTimeUTC>2011-06-02T00:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2011-06-02T00:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="0">
+               <methodDescription>No method specified</methodDescription>
+            </method>
+            <source sourceID="9">
+               <organization>BPE</organization>
+               <sourceDescription>Unknown</sourceDescription>
+               <citation>Unknown</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="49" vocabulary="GlobalRiversObservatory">Fe</variableCode>
+               <variableName>Iron, total</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Unknown</generalCategory>
+               <sampleMedium>Surface water</sampleMedium>
+               <unit>
+                  <unitName>milligrams per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mg/L</unitAbbreviation>
+                  <unitCode>199</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>hour</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>hr</unitAbbreviation>
+                     <unitCode>103</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>Fe</speciation>
+            </variable>
+            <valueCount>1</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2011-06-02T00:00:00</beginDateTime>
+               <endDateTime>2011-06-02T00:00:00</endDateTime>
+               <beginDateTimeUTC>2011-06-02T00:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2011-06-02T00:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="0">
+               <methodDescription>No method specified</methodDescription>
+            </method>
+            <source sourceID="9">
+               <organization>BPE</organization>
+               <sourceDescription>Unknown</sourceDescription>
+               <citation>Unknown</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="50" vocabulary="GlobalRiversObservatory">Co</variableCode>
+               <variableName>Cobalt, total</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Unknown</generalCategory>
+               <sampleMedium>Surface water</sampleMedium>
+               <unit>
+                  <unitName>milligrams per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mg/L</unitAbbreviation>
+                  <unitCode>199</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>hour</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>hr</unitAbbreviation>
+                     <unitCode>103</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>Co</speciation>
+            </variable>
+            <valueCount>1</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2011-06-02T00:00:00</beginDateTime>
+               <endDateTime>2011-06-02T00:00:00</endDateTime>
+               <beginDateTimeUTC>2011-06-02T00:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2011-06-02T00:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="0">
+               <methodDescription>No method specified</methodDescription>
+            </method>
+            <source sourceID="9">
+               <organization>BPE</organization>
+               <sourceDescription>Unknown</sourceDescription>
+               <citation>Unknown</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="51" vocabulary="GlobalRiversObservatory">Ni</variableCode>
+               <variableName>Nickel, total</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Unknown</generalCategory>
+               <sampleMedium>Surface water</sampleMedium>
+               <unit>
+                  <unitName>milligrams per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mg/L</unitAbbreviation>
+                  <unitCode>199</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>hour</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>hr</unitAbbreviation>
+                     <unitCode>103</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>Ni</speciation>
+            </variable>
+            <valueCount>1</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2011-06-02T00:00:00</beginDateTime>
+               <endDateTime>2011-06-02T00:00:00</endDateTime>
+               <beginDateTimeUTC>2011-06-02T00:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2011-06-02T00:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="0">
+               <methodDescription>No method specified</methodDescription>
+            </method>
+            <source sourceID="9">
+               <organization>BPE</organization>
+               <sourceDescription>Unknown</sourceDescription>
+               <citation>Unknown</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="52" vocabulary="GlobalRiversObservatory">Na</variableCode>
+               <variableName>Sodium, total</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Unknown</generalCategory>
+               <sampleMedium>Surface water</sampleMedium>
+               <unit>
+                  <unitName>milligrams per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mg/L</unitAbbreviation>
+                  <unitCode>199</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>hour</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>hr</unitAbbreviation>
+                     <unitCode>103</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>Na</speciation>
+            </variable>
+            <valueCount>1</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2011-06-02T00:00:00</beginDateTime>
+               <endDateTime>2011-06-02T00:00:00</endDateTime>
+               <beginDateTimeUTC>2011-06-02T00:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2011-06-02T00:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="0">
+               <methodDescription>No method specified</methodDescription>
+            </method>
+            <source sourceID="9">
+               <organization>BPE</organization>
+               <sourceDescription>Unknown</sourceDescription>
+               <citation>Unknown</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="53" vocabulary="GlobalRiversObservatory">Mg</variableCode>
+               <variableName>Magnesium, total</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Unknown</generalCategory>
+               <sampleMedium>Surface water</sampleMedium>
+               <unit>
+                  <unitName>milligrams per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mg/L</unitAbbreviation>
+                  <unitCode>199</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>hour</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>hr</unitAbbreviation>
+                     <unitCode>103</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>Mg</speciation>
+            </variable>
+            <valueCount>1</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2011-06-02T00:00:00</beginDateTime>
+               <endDateTime>2011-06-02T00:00:00</endDateTime>
+               <beginDateTimeUTC>2011-06-02T00:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2011-06-02T00:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="0">
+               <methodDescription>No method specified</methodDescription>
+            </method>
+            <source sourceID="9">
+               <organization>BPE</organization>
+               <sourceDescription>Unknown</sourceDescription>
+               <citation>Unknown</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="54" vocabulary="GlobalRiversObservatory">K</variableCode>
+               <variableName>Potassium, total</variableName>
+               <valueType>Field Observation</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Unknown</generalCategory>
+               <sampleMedium>Surface water</sampleMedium>
+               <unit>
+                  <unitName>milligrams per liter</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mg/L</unitAbbreviation>
+                  <unitCode>199</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>hour</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>hr</unitAbbreviation>
+                     <unitCode>103</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>K</speciation>
+            </variable>
+            <valueCount>1</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2011-06-02T00:00:00</beginDateTime>
+               <endDateTime>2011-06-02T00:00:00</endDateTime>
+               <beginDateTimeUTC>2011-06-02T00:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2011-06-02T00:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="0">
+               <methodDescription>No method specified</methodDescription>
+            </method>
+            <source sourceID="9">
+               <organization>BPE</organization>
+               <sourceDescription>Unknown</sourceDescription>
+               <citation>Unknown</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="57" vocabulary="GlobalRiversObservatory">NaCat</variableCode>
+               <variableName>Sodium, fraction of cations</variableName>
+               <valueType>Derived Value</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Unknown</generalCategory>
+               <sampleMedium>Surface water</sampleMedium>
+               <unit>
+                  <unitName>mole per mole</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mol/mol</unitAbbreviation>
+                  <unitCode>385</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>hour</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>hr</unitAbbreviation>
+                     <unitCode>103</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>1</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2011-06-02T00:00:00</beginDateTime>
+               <endDateTime>2011-06-02T00:00:00</endDateTime>
+               <beginDateTimeUTC>2011-06-02T00:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2011-06-02T00:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="0">
+               <methodDescription>No method specified</methodDescription>
+            </method>
+            <source sourceID="9">
+               <organization>BPE</organization>
+               <sourceDescription>Unknown</sourceDescription>
+               <citation>Unknown</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+         <series>
+            <variable>
+               <variableCode default="true" variableID="61" vocabulary="GlobalRiversObservatory">Sriso</variableCode>
+               <variableName>Strontium, stable isotope ratio</variableName>
+               <valueType>Derived Value</valueType>
+               <dataType>Sporadic</dataType>
+               <generalCategory>Unknown</generalCategory>
+               <sampleMedium>Surface water</sampleMedium>
+               <unit>
+                  <unitName>mole per mole</unitName>
+                  <unitType>Concentration</unitType>
+                  <unitAbbreviation>mol/mol</unitAbbreviation>
+                  <unitCode>385</unitCode>
+               </unit>
+               <noDataValue>-9999</noDataValue>
+               <timeScale>
+                  <unit>
+                     <unitName>hour</unitName>
+                     <unitType>Time</unitType>
+                     <unitAbbreviation>hr</unitAbbreviation>
+                     <unitCode>103</unitCode>
+                  </unit>
+                  <timeSupport>0</timeSupport>
+               </timeScale>
+               <speciation>Not Applicable</speciation>
+            </variable>
+            <valueCount>1</valueCount>
+            <variableTimeInterval xsi:type="TimeIntervalType">
+               <beginDateTime>2011-06-02T00:00:00</beginDateTime>
+               <endDateTime>2011-06-02T00:00:00</endDateTime>
+               <beginDateTimeUTC>2011-06-02T00:00:00</beginDateTimeUTC>
+               <endDateTimeUTC>2011-06-02T00:00:00</endDateTimeUTC>
+            </variableTimeInterval>
+            <method methodID="0">
+               <methodDescription>No method specified</methodDescription>
+            </method>
+            <source sourceID="3">
+               <organization>Woods Hole Oceanographic Institute</organization>
+               <sourceDescription>Unknown</sourceDescription>
+               <citation>Unknown</citation>
+            </source>
+            <qualityControlLevel qualityControlLevelID="1">
+               <qualityControlLevelCode>1</qualityControlLevelCode>
+               <definition>Quality controlled data</definition>
+            </qualityControlLevel>
+         </series>
+      </seriesCatalog>
+   </site>
+</sitesResponse>
+

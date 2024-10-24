@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.oaipmh;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -78,7 +78,13 @@ public class OAIPMHConnectorSetting extends HarvestedConnectorSetting {
 	protected List<String> loadValues(Optional<String> input) throws Exception {
 
 	    String endpoint = input.get();
-	    endpoint = endpoint.endsWith("?") ? endpoint : endpoint + "?";
+	    if(endpoint.contains("sios.csw.met.no")) {
+		endpoint = endpoint.endsWith("mode=oaipmh&") ? endpoint : endpoint + "&";
+	    } else if(endpoint.contains("www.vliz.be/projects/mission-atlantic")) {
+		endpoint = endpoint.endsWith("module=dataset&") ? endpoint : endpoint + "&";
+	    } else {
+		endpoint = endpoint.endsWith("?") ? endpoint : endpoint + "?";
+	    }
 	    List<String> sets = OAIPMHConnector.getSets(endpoint);
 	    return sets;
 	}
@@ -105,7 +111,13 @@ public class OAIPMHConnectorSetting extends HarvestedConnectorSetting {
 	protected List<String> loadValues(Optional<String> input) throws Exception {
 
 	    String endpoint = input.get();
-	    endpoint = endpoint.endsWith("?") ? endpoint : endpoint + "?";
+	    if(endpoint.contains("sios.csw.met.no")) {
+		endpoint = endpoint.endsWith("mode=oaipmh&") ? endpoint : endpoint + "&";
+	    } else if(endpoint.contains("www.vliz.be/projects/mission-atlantic")) {
+		endpoint = endpoint.endsWith("module=dataset&") ? endpoint : endpoint + "&";
+	    } else {
+		endpoint = endpoint.endsWith("?") ? endpoint : endpoint + "?";
+	    }
 	    List<String> metadataFormats = OAIPMHConnector.listMetadataFormats(endpoint);
 	    return metadataFormats;
 	}

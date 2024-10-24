@@ -4,7 +4,7 @@ package eu.essi_lab.model.ontology.d2k;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -86,9 +86,9 @@ public class D2KGSOntologyLoader {
 
 	} catch (IOException e) {
 
-	    GSLoggerFactory.getLogger(D2KGSOntologyLoader.class).error("IO Exception parsing stream", e);
+	    GSLoggerFactory.getLogger(D2KGSOntologyLoader.class).error(e);
 
-	    throw GSException.createException(J2RDFSerializer.class, "Can't parse ontology input stream", null,
+	    throw GSException.createException(J2RDFSerializer.class, e.getMessage(), null,
 		    ErrorInfo.ERRORTYPE_INTERNAL, ErrorInfo.SEVERITY_FATAL, ONTOLOGY_PARSE_ERROR, e);
 
 	}

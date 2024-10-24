@@ -4,7 +4,7 @@ package eu.essi_lab.messages.web;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,6 +27,7 @@ import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import eu.essi_lab.lib.utils.StringUtils;
@@ -125,6 +126,17 @@ public class KeyValueParser {
     }
 
     /**
+     * @param key
+     * @param ignoreCase
+     * @param defaultValue
+     * @return
+     */
+    public Optional<String> getOptionalValue(String key, boolean ignoreCase, String defaultValue) {
+
+	return Optional.ofNullable(getValue(key, ignoreCase, defaultValue));
+    }
+
+    /**
      * Return the value of the given <code>key</code>, <code>null</code> if <code>key</code> does not exist,
      * {@link #UNDEFINED} if the key exists but its value is the empty string (e.g.: 'key=')
      * 
@@ -148,6 +160,16 @@ public class KeyValueParser {
     }
 
     /**
+     * @param key
+     * @param ignoreCase
+     * @return
+     */
+    public Optional<String> getOptionalValue(String key, boolean ignoreCase) {
+
+	return Optional.ofNullable(getValue(key, ignoreCase));
+    }
+
+    /**
      * Return the value of the given <code>key</code> (case sensitive), <code>null</code> if <code>key</code> does not
      * exist, {@link #UNDEFINED} if the key exists but its value is the empty string (e.g.: 'key=')
      * 
@@ -157,6 +179,15 @@ public class KeyValueParser {
     public String getValue(String key) {
 
 	return getValue(key, false);
+    }
+
+    /**
+     * @param key
+     * @return
+     */
+    public Optional<String> getOptionalValue(String key) {
+
+	return Optional.ofNullable(getValue(key));
     }
 
     /**
@@ -178,14 +209,36 @@ public class KeyValueParser {
     }
 
     /**
-     * Like {@link #getValue(String)} but UTF-8 decoded
+     * @param key
+     * @param defaultValue
+     * @return
+     */
+    public Optional<String> getOptionalValue(String key, String defaultValue) {
+
+	return Optional.ofNullable(getValue(key, defaultValue));
+    }
+
+    /**
+     * Like {@link #getValue(String)} but UTF-8 decoded and with exact case match
      * 
      * @param key
      * @return
      */
     public String getDecodedValue(String key) {
 
-	String value = getValue(key, false);
+	return getDecodedValue(key, false);
+    }
+    
+    /**
+     * Like {@link #getValue(String)} but UTF-8 decoded
+     * 
+     * @param key
+     * @param ignoreCase
+     * @return
+     */
+    public String getDecodedValue(String key, boolean ignoreCase) {
+
+	String value = getValue(key, ignoreCase);
 	if (value == null) {
 	    return null;
 	}

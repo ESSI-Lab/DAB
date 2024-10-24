@@ -4,7 +4,7 @@ package eu.essi_lab.iso.datamodel.classes;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -68,7 +68,6 @@ import net.opengis.iso19139.gmd.v_20060504.MDMetadataType;
 import net.opengis.iso19139.gmd.v_20060504.MDReferenceSystemPropertyType;
 import net.opengis.iso19139.gmd.v_20060504.MDScopeCodePropertyType;
 import net.opengis.iso19139.gmd.v_20060504.MDSpatialRepresentationPropertyType;
-import net.opengis.iso19139.srv.v_20060504.SVServiceIdentificationPropertyType;
 import net.opengis.iso19139.srv.v_20060504.SVServiceIdentificationType;
 
 /**
@@ -311,8 +310,10 @@ public class MDMetadata extends ISOMetadata<MDMetadataType> {
      */
     @XmlTransient
     public String getLanguage() {
-	try {
 	    Object value = ISOMetadata.getStringFromCharacterString(getElementType().getLanguage());
+	    if (value==null) {
+		return null;
+	    }
 	    if (value instanceof CodeListValueType) {
 		CodeListValueType clvt = (CodeListValueType) value;
 		return clvt.getValue();
@@ -320,10 +321,6 @@ public class MDMetadata extends ISOMetadata<MDMetadataType> {
 		return value.toString();
 	    }
 
-	} catch (NullPointerException ex) {
-	}
-
-	return null;
     }
 
     /**
@@ -408,12 +405,10 @@ public class MDMetadata extends ISOMetadata<MDMetadataType> {
      */
     @XmlTransient
     public String getDateStamp() {
-	try {
-	    return getElementType().getDateStamp().getDate();
-	} catch (NullPointerException ex) {
+	if (getElementType().getDateStamp()==null) {
+	    return null;
 	}
-
-	return null;
+	return getElementType().getDateStamp().getDate();
     }
 
     /**
@@ -421,14 +416,10 @@ public class MDMetadata extends ISOMetadata<MDMetadataType> {
      * @return
      */
     public XMLGregorianCalendar getDateTimeStamp() {
-
-	try {
-	    return getElementType().getDateStamp().getDateTime();
-
-	} catch (NullPointerException ex) {
+	if (getElementType().getDateStamp()==null) {
+	    return null;
 	}
-
-	return null;
+	return getElementType().getDateStamp().getDateTime();
     }
 
     /**

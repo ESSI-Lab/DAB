@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -15,24 +14,21 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-impl</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-core</artifactId>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>gs-lib-xml</artifactId>
+			<version>${project.parent.version}</version>
 		</dependency>
 	</dependencies>
 
-	<build>
+	<!--<build>
 		<plugins>
 			<plugin>
-				<groupId>org.jvnet.jaxb2.maven2</groupId>
+				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>maven-jaxb2-plugin</artifactId>
 				<executions>
 					<execution>
 						<id>some-id</id>
-						<!-- Comment the following line to generate/update the classes! -->
+						 Comment the following line to generate/update the classes! 
 						<phase>none</phase>
 						<goals>
 							<goal>generate</goal>
@@ -48,10 +44,12 @@
 					<episodeFile>src/main/resources/META-INF/sun-jaxb.episode</episodeFile>
 					<schemaIncludes>
 						<value>schemas/capabilities_1_3_0.xsd</value>
+						<value>schemas/exceptions_1_3_0.xsd</value>
 					</schemaIncludes>
 				</configuration>
 			</plugin>
 
 		</plugins>
 	</build>
+	-->
 </project>

@@ -4,7 +4,7 @@ package eu.essi_lab.shared.driver.es.stats;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -50,85 +50,87 @@ import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.util.EntityUtils;
-import org.elasticsearch.action.DocWriteResponse;
-import org.elasticsearch.action.TaskOperationFailure;
-import org.elasticsearch.action.admin.cluster.node.tasks.list.ListTasksRequest;
-import org.elasticsearch.action.admin.cluster.node.tasks.list.ListTasksResponse;
-import org.elasticsearch.action.admin.cluster.repositories.get.GetRepositoriesRequest;
-import org.elasticsearch.action.admin.cluster.repositories.get.GetRepositoriesResponse;
-import org.elasticsearch.action.admin.cluster.repositories.put.PutRepositoryRequest;
-import org.elasticsearch.action.admin.cluster.snapshots.get.GetSnapshotsRequest;
-import org.elasticsearch.action.admin.cluster.snapshots.get.GetSnapshotsResponse;
-import org.elasticsearch.action.admin.cluster.snapshots.restore.RestoreSnapshotRequest;
-import org.elasticsearch.action.admin.cluster.snapshots.status.SnapshotIndexShardStatus;
-import org.elasticsearch.action.admin.cluster.snapshots.status.SnapshotIndexStatus;
-import org.elasticsearch.action.admin.cluster.snapshots.status.SnapshotStatus;
-import org.elasticsearch.action.admin.cluster.snapshots.status.SnapshotsStatusRequest;
-import org.elasticsearch.action.admin.cluster.snapshots.status.SnapshotsStatusResponse;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.bulk.BulkItemResponse;
-import org.elasticsearch.action.bulk.BulkItemResponse.Failure;
-import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.get.GetRequest;
-import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchScrollRequest;
-import org.elasticsearch.action.update.UpdateRequest;
-import org.elasticsearch.action.update.UpdateResponse;
-import org.elasticsearch.client.Request;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.Response;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestClientBuilder;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.client.core.CountRequest;
-import org.elasticsearch.client.core.CountResponse;
-import org.elasticsearch.client.indices.CloseIndexRequest;
-import org.elasticsearch.client.indices.CloseIndexResponse;
-import org.elasticsearch.client.indices.CreateIndexRequest;
-import org.elasticsearch.client.tasks.CancelTasksRequest;
-import org.elasticsearch.cluster.metadata.RepositoryMetadata;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.geometry.Geometry;
-import org.elasticsearch.geometry.Rectangle;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.RangeQueryBuilder;
-import org.elasticsearch.index.reindex.BulkByScrollResponse;
-import org.elasticsearch.index.reindex.DeleteByQueryRequest;
-import org.elasticsearch.index.reindex.ScrollableHitSource;
-import org.elasticsearch.index.reindex.UpdateByQueryRequest;
-import org.elasticsearch.rest.RestStatus;
-import org.elasticsearch.script.Script;
-import org.elasticsearch.script.ScriptType;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.aggregations.Aggregation;
-import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.Aggregations;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
-import org.elasticsearch.search.aggregations.bucket.histogram.ParsedDateHistogram;
-import org.elasticsearch.search.aggregations.bucket.terms.ParsedStringTerms;
-import org.elasticsearch.search.aggregations.bucket.terms.Terms.Bucket;
-import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.snapshots.SnapshotId;
-import org.elasticsearch.snapshots.SnapshotInfo;
-import org.elasticsearch.snapshots.SnapshotShardFailure;
-import org.elasticsearch.snapshots.SnapshotState;
-import org.elasticsearch.tasks.TaskInfo;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.opensearch.action.DocWriteResponse;
+import org.opensearch.action.TaskOperationFailure;
+import org.opensearch.action.admin.cluster.node.tasks.list.ListTasksRequest;
+import org.opensearch.action.admin.cluster.node.tasks.list.ListTasksResponse;
+import org.opensearch.action.admin.cluster.repositories.get.GetRepositoriesRequest;
+import org.opensearch.action.admin.cluster.repositories.get.GetRepositoriesResponse;
+import org.opensearch.action.admin.cluster.repositories.put.PutRepositoryRequest;
+import org.opensearch.action.admin.cluster.snapshots.get.GetSnapshotsRequest;
+import org.opensearch.action.admin.cluster.snapshots.get.GetSnapshotsResponse;
+import org.opensearch.action.admin.cluster.snapshots.restore.RestoreSnapshotRequest;
+import org.opensearch.action.admin.cluster.snapshots.status.SnapshotIndexShardStage;
+import org.opensearch.action.admin.cluster.snapshots.status.SnapshotIndexShardStatus;
+import org.opensearch.action.admin.cluster.snapshots.status.SnapshotIndexStatus;
+import org.opensearch.action.admin.cluster.snapshots.status.SnapshotStatus;
+import org.opensearch.action.admin.cluster.snapshots.status.SnapshotsStatusRequest;
+import org.opensearch.action.admin.cluster.snapshots.status.SnapshotsStatusResponse;
+import org.opensearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.opensearch.action.bulk.BulkItemResponse;
+import org.opensearch.action.bulk.BulkItemResponse.Failure;
+import org.opensearch.action.bulk.BulkRequest;
+import org.opensearch.action.bulk.BulkResponse;
+import org.opensearch.action.get.GetRequest;
+import org.opensearch.action.get.GetResponse;
+import org.opensearch.action.index.IndexRequest;
+import org.opensearch.action.search.SearchRequest;
+import org.opensearch.action.search.SearchResponse;
+import org.opensearch.action.search.SearchScrollRequest;
+import org.opensearch.action.update.UpdateRequest;
+import org.opensearch.action.update.UpdateResponse;
+import org.opensearch.client.Request;
+import org.opensearch.client.RequestOptions;
+import org.opensearch.client.Response;
+import org.opensearch.client.RestClient;
+import org.opensearch.client.RestClientBuilder;
+import org.opensearch.client.RestHighLevelClient;
+import org.opensearch.client.core.CountRequest;
+import org.opensearch.client.core.CountResponse;
+import org.opensearch.client.indices.CloseIndexRequest;
+import org.opensearch.client.indices.CloseIndexResponse;
+import org.opensearch.client.indices.CreateIndexRequest;
+import org.opensearch.client.tasks.CancelTasksRequest;
+import org.opensearch.cluster.metadata.RepositoryMetadata;
+import org.opensearch.common.settings.Settings;
+import org.opensearch.common.unit.TimeValue;
+import org.opensearch.common.xcontent.XContentType;
+import org.opensearch.geometry.Geometry;
+import org.opensearch.geometry.Rectangle;
+import org.opensearch.index.query.BoolQueryBuilder;
+import org.opensearch.index.query.QueryBuilder;
+import org.opensearch.index.query.QueryBuilders;
+import org.opensearch.index.query.RangeQueryBuilder;
+import org.opensearch.index.reindex.BulkByScrollResponse;
+import org.opensearch.index.reindex.DeleteByQueryRequest;
+import org.opensearch.index.reindex.ScrollableHitSource;
+import org.opensearch.index.reindex.UpdateByQueryRequest;
+import org.opensearch.rest.RestStatus;
+import org.opensearch.script.Script;
+import org.opensearch.script.ScriptType;
+import org.opensearch.search.SearchHit;
+import org.opensearch.search.SearchHits;
+import org.opensearch.search.aggregations.Aggregation;
+import org.opensearch.search.aggregations.AggregationBuilders;
+import org.opensearch.search.aggregations.Aggregations;
+import org.opensearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
+import org.opensearch.search.aggregations.bucket.histogram.DateHistogramInterval;
+import org.opensearch.search.aggregations.bucket.histogram.ParsedDateHistogram;
+import org.opensearch.search.aggregations.bucket.terms.ParsedStringTerms;
+import org.opensearch.search.aggregations.bucket.terms.Terms.Bucket;
+import org.opensearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
+import org.opensearch.search.builder.SearchSourceBuilder;
+import org.opensearch.snapshots.SnapshotId;
+import org.opensearch.snapshots.SnapshotInfo;
+import org.opensearch.snapshots.SnapshotShardFailure;
+import org.opensearch.snapshots.SnapshotState;
+import org.opensearch.tasks.TaskInfo;
 
 import com.amazonaws.auth.AWS4Signer;
 import com.amazonaws.auth.AWSCredentials;
@@ -241,9 +243,16 @@ public class ElasticsearchClient {
 			    .setHttpClientConfigCallback(new RestClientBuilder.HttpClientConfigCallback() {
 				@Override
 				public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {
-				    return httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+
+				    return httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider).//
+				    setSSLHostnameVerifier(new NoopHostnameVerifier());
 				}
 			    });
+
+		    if (url.getPath() != null) {
+
+			builder.setPathPrefix(url.getPath());
+		    }
 
 		    client = new RestHighLevelClient(builder);
 		    clients.put(key, client);
@@ -465,8 +474,8 @@ public class ElasticsearchClient {
 		frequencyResult.setValue(frequencyValue);
 	    } else if (aggregationResult instanceof ParsedDateHistogram) {
 		ParsedDateHistogram pdh = (ParsedDateHistogram) aggregationResult;
-		List<? extends org.elasticsearch.search.aggregations.bucket.histogram.Histogram.Bucket> buckets = pdh.getBuckets();
-		for (org.elasticsearch.search.aggregations.bucket.histogram.Histogram.Bucket bucket : buckets) {
+		List<? extends org.opensearch.search.aggregations.bucket.histogram.Histogram.Bucket> buckets = pdh.getBuckets();
+		for (org.opensearch.search.aggregations.bucket.histogram.Histogram.Bucket bucket : buckets) {
 		    ResponseItem responseItem = new ResponseItem();
 		    ret.getItems().add(responseItem);
 		    itemsCount++;
@@ -620,7 +629,7 @@ public class ElasticsearchClient {
     }
 
     public boolean checkIndexExistence(String index) throws IOException {
-	org.elasticsearch.client.indices.GetIndexRequest request = new org.elasticsearch.client.indices.GetIndexRequest(index);
+	org.opensearch.client.indices.GetIndexRequest request = new org.opensearch.client.indices.GetIndexRequest(index);
 	RequestOptions options = RequestOptions.DEFAULT;
 	return client.indices().exists(request, options);
     }
@@ -664,7 +673,7 @@ public class ElasticsearchClient {
 	    } catch (IOException e) {
 		unexpectedError = e;
 		GSLoggerFactory.getLogger(getClass()).error("Elasticsearch unexpected errors (sleep a bit before retry): {} try: {}",
-			e.getMessage(), maxTry);
+			e.getMessage(), maxTry, e);
 		try {
 		    Thread.sleep(120000);
 		} catch (InterruptedException e1) {
@@ -673,7 +682,8 @@ public class ElasticsearchClient {
 	    }
 	}
 	if (indexResponse == null) {
-	    GSLoggerFactory.getLogger(getClass()).error("Elasticsearch unexpected error: {}", unexpectedError.getMessage());
+	    GSLoggerFactory.getLogger(getClass()).error("Elasticsearch unexpected error: {}", unexpectedError.getMessage(),
+		    unexpectedError);
 	    failureMessage = unexpectedError.getMessage() + "\n\n";
 	    for (String item : items.values()) {
 		failureMessage += item + "\n\n";
@@ -867,8 +877,8 @@ public class ElasticsearchClient {
     }
 
     public void cancelTask(String taskId) {
-	CancelTasksRequest byTaskIdRequest = new org.elasticsearch.client.tasks.CancelTasksRequest.Builder()
-		.withTaskId(new org.elasticsearch.client.tasks.TaskId(taskId)).withWaitForCompletion(true).build();
+	CancelTasksRequest byTaskIdRequest = new org.opensearch.client.tasks.CancelTasksRequest.Builder()
+		.withTaskId(new org.opensearch.client.tasks.TaskId(taskId)).withWaitForCompletion(true).build();
 
 	try {
 	    client.tasks().cancel(byTaskIdRequest, RequestOptions.DEFAULT);
@@ -931,7 +941,7 @@ public class ElasticsearchClient {
 	int i = 0;
 	for (RepositoryMetadata repo : repos) {
 	    if (i++ == 0) {
-		// continue;
+		continue;
 	    }
 	    System.out.println("Repository name: " + repo.name());
 	    Settings settings = repo.settings();
@@ -989,7 +999,12 @@ public class ElasticsearchClient {
 		    SnapshotIndexShardStatus shardStatus = shardEntry.getValue();
 		    size += shardStatus.getStats().getTotalSize();
 		    count += shardStatus.getStats().getTotalFileCount();
+		    SnapshotIndexShardStage stage = shardStatus.getStage();
+		    if (!stage.equals(SnapshotIndexShardStage.DONE)) {
+			System.err.println("WARNING: " + stage);
+		    }
 		}
+
 		System.out.println("Snapshot " + id + " " + value.getIndex() + " size: " + size + " count: " + count);
 	    }
 	    System.out.println();
@@ -1053,11 +1068,11 @@ public class ElasticsearchClient {
 	return count(builder);
     }
 
-    public void countQueriesMatchingSource(String sourceId) throws Exception {
+    public void countQueriesMatchingSource(String... sourceId) throws Exception {
 	BoolQueryBuilder builder = getGEOSSQuery(false);
 	builder.must(QueryBuilders.rangeQuery(RuntimeInfoElement.CHRONOMETER_TIME_STAMP.getName()).from("2021-01-01T00:00:00.000Z")
-		.to("2022-06-01T00:00:00.000Z"));
-	builder.must(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.RESULT_SET_DISCOVERY_SOURCE_ID.getName(), sourceId));
+		.to("2022-10-01T00:00:00.000Z"));
+	builder.must(QueryBuilders.termsQuery(RuntimeInfoElement.RESULT_SET_DISCOVERY_SOURCE_ID.getName() + ".keyword", sourceId));
 
 	long count = count(builder);
 	System.out.println("Queries: " + count);
@@ -1071,10 +1086,11 @@ public class ElasticsearchClient {
 
 	if (!includeHarvest) {
 
-	    // builder.must(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_ABSOLUTE_PATH.getName(),
-	    // "http://gs-service-production.geodab.eu/gs-service/services/essi/view/geoss/opensearch/query"));
+	    builder.must(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_ABSOLUTE_PATH.getName(),
+		    "http://gs-service-production.geodab.eu/gs-service/services/essi/view/geoss/opensearch/query"));
 
-	    builder.must(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REQUEST_PATH.getName(), "opensearch"));
+	    // builder.must(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REQUEST_PATH.getName(),
+	    // "opensearch"));
 	    builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.PROFILER_NAME.getName(), "OAIPMHProfiler"));
 	    builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REQUEST_PATH.getName(), "oaipmh"));
 	    // kma
@@ -1084,23 +1100,39 @@ public class ElasticsearchClient {
 	}
 
 	// fastweb (probably roberto in many cases)
-	
-	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.47.230.149")); // for sure roberto
-//	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.34.139.128"));
-//	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.47.40.34"));
-//	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.44.184.46"));
-//	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.47.40.197"));
-//	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.34.132.8"));
-//	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.47.41.189"));
-//	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.47.44.64"));
-//	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.44.184.109"));
-//	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.47.40.213"));
-//	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.47.40.37"));
-//	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.47.41.5"));
-//	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.47.42.189"));
-//	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.47.43.17"));
-//	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.47.43.213"));
-	
+
+	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "93.47.230.149")); // for
+																    // sure
+																    // roberto
+	// builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(),
+	// "93.34.139.128"));
+	// builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(),
+	// "93.47.40.34"));
+	// builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(),
+	// "93.44.184.46"));
+	// builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(),
+	// "93.47.40.197"));
+	// builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(),
+	// "93.34.132.8"));
+	// builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(),
+	// "93.47.41.189"));
+	// builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(),
+	// "93.47.44.64"));
+	// builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(),
+	// "93.44.184.109"));
+	// builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(),
+	// "93.47.40.213"));
+	// builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(),
+	// "93.47.40.37"));
+	// builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(),
+	// "93.47.41.5"));
+	// builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(),
+	// "93.47.42.189"));
+	// builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(),
+	// "93.47.43.17"));
+	// builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(),
+	// "93.47.43.213"));
+
 	// jrc 2017 report
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REMOTE_ADDRESS.getName(), "139.191.247.2"));
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REMOTE_ADDRESS.getName(), "139.191.247.1"));
@@ -1122,7 +1154,7 @@ public class ElasticsearchClient {
 
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REQUEST_PATH.getName(), "gwps"));
 
-	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.DISCOVERY_MESSAGE_GS_USER_EMAIL.getName(), "seadatanet"));
+	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.USER_ROLE.getName(), "seadatanet"));
 
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.PROFILER_NAME.getName(), "HISCentralProfiler"));
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.PROFILER_NAME.getName(), "THREDDSProfiler"));
@@ -1155,7 +1187,7 @@ public class ElasticsearchClient {
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.VIEW_ID.getName(), "whos-plata"));
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.VIEW_ID.getName(), "preprod"));
 
-	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.DISCOVERY_MESSAGE_GS_USER_EMAIL.getName(), "whos"));
+	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.USER_ROLE.getName(), "whos"));
 
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REQUEST_PATH.getName(), "sos-tahmo-proxy"));
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_REQUEST_PATH.getName(), "gwis"));
@@ -1184,7 +1216,7 @@ public class ElasticsearchClient {
 	builder.mustNot(QueryBuilders.queryStringQuery("localhost").defaultField(RuntimeInfoElement.WEB_REQUEST_QUERY_STRING.getName()));
 
 	//
-	// CNR	
+	// CNR
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "149.139.19.4"));
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "149.139.19.2"));
 	builder.mustNot(QueryBuilders.matchPhraseQuery(RuntimeInfoElement.WEB_REQUEST_X_FORWARDER_FOR.getName(), "149.139.19.84"));
@@ -1287,7 +1319,7 @@ public class ElasticsearchClient {
 	CountRequest countRequest = new CountRequest(indices);
 	if (builder != null) {
 	    countRequest.query(builder);
-	    GSLoggerFactory.getLogger(getClass()).info(builder.toString());
+	    // GSLoggerFactory.getLogger(getClass()).info(builder.toString());
 	}
 	RequestOptions options = RequestOptions.DEFAULT;
 	CountResponse count = client.count(countRequest, options);

@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.wfs.feature.emodpace;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -38,14 +38,21 @@ public abstract class ThematicDataset extends FeatureType {
 
     @Override
     public QName getQName() {
-	return new QName("http://essi-lab.eu", getTheme() + "-dataset", "essi");
+	return new QName("http://essi-lab.eu", normalize(getTheme()), "essi");
+    }
+
+    private String normalize(String name) {
+	if (name.contains(" ")) {
+	    return name.replace(" ", "-");
+	}
+	return name;
     }
 
     protected abstract String getTheme();
 
     @Override
     public String getTitle() {
-	return getTheme() + " datasets";
+	return getTheme() ;
     }
 
     @Override
@@ -73,7 +80,7 @@ public abstract class ThematicDataset extends FeatureType {
     public DiscoveryRequestTransformer getRequestTransformer() {
 	return new ThematicDatasetRequestTransformer(this);
     }
-    
+
     @Override
     protected FeatureAttribute[] getAttributes() {
 	return new FeatureAttribute[] { //
@@ -82,8 +89,8 @@ public abstract class ThematicDataset extends FeatureType {
 		new FeatureAttribute("theme", "string"), //
 		new FeatureAttribute("organization", "string"), //
 		new FeatureAttribute("platform", "string"), //
-		new FeatureAttribute("parameter", "string"), //				
-		new FeatureAttribute("downloadURL", "string"), //
+		new FeatureAttribute("parameter", "string"), //
+		new FeatureAttribute("downloadURL", "string"), new FeatureAttribute("metadataURL", "string")//
 	};
     }
 

@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<script class="include" type="text/javascript"
+	src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script class="include" type="text/javascript"
+	src="lib/jquery.jqplot.js"></script>
+<script class="include" language="javascript" type="text/javascript"
+	src="lib/jqplot.dateAxisRenderer.js"></script>
+<script type="text/javascript" src="lib/jqplot.canvasTextRenderer.js"></script>
+<script type="text/javascript"
+	src="lib/jqplot.canvasAxisTickRenderer.js"></script>
+<script type="text/javascript" src="lib/jqplot.categoryAxisRenderer.js"></script>
+<script type="text/javascript" src="lib/jqplot.barRenderer.js"></script>
+<script type="text/javascript" src="lib/jqplot.highlighter.js"></script>
+<script type="text/javascript" src="lib/jqplot.cursor.js"></script>
+<link rel="stylesheet" type="text/css" href="lib/jquery.jqplot.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>I-CHANGE project</title>
+<script type="application/javascript"
+	src="https://unpkg.com/leaflet@1.9.1/dist/leaflet-src.js"></script>
+
+<link rel="stylesheet"
+	href="https://unpkg.com/leaflet@1.9.1/dist/leaflet.css">
+</head>
+<body>
+
+	<div id="overlay">
+		<h1>I-CHANGE test portal</h1>
+		<!--  div id="legend"-->
+
+
+
+	</div>
+	<div id="map"></div>
+	<script>
+    
+    function getParameterByName(name, url = window.location.href) {
+	    name = name.replace(/[\[\]]/g, '\\$&');
+	    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+	        results = regex.exec(url);
+	    if (!results) return null;
+	    if (!results[2]) return '';
+	    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+	}
+    
+        let map, geoJson;
+
+
+        window.addEventListener('load', function(){
+            map = new L.Map('map', {
+                renderer: L.canvas(),
+                center: new L.LatLng(44, 8),
+                zoom: 5,
+                maxZoom: 18,
+                zoomControl: false
+            });
+
+            L.control.zoom({
+                position: 'topright'
+            }).addTo(map);
+
+            let geofabrik = new L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+              });
+            
+            map.addLayer(geofabrik);
+
+            var view = getParameterByName('view');
+            var token = getParameterByName('token');
+
+            var featuresUrl = "../services/essi/token/i-change-23495798340278/view/i-change/om-api/features?offset=1&limit=100";
+            $.getJSON(featuresUrl, function(data) {
+            	
+            	for(var i = 0; i < data.results.length; i += 1){
+            			var result = data.results[i];
+            			var geometry = result.geometry;
+            			var type = geometry.type;
+            			var coordinates = geometry.coordinates;
+            			switch(type){
+            			case "Point":
+            				var lon = coordinates[0];
+                			var lat = coordinates[1];
+                			var point = new L.LatLng(lat,lon);
+                			var marker = new L.marker([lat,lon], {
+                				type: "Point",
+                				id: result.id,
+            				    color: 'red',
+            				    weight: 3,
+            				    opacity: 1,
+            				    smoothFactor: 1
+            				});
+                			marker.on('click', function(e) {
+                		               var latlng= e.latlng;
+                		               var lat = latlng.lat;
+                		               var lon = latlng.lng;
+                		               var id = this.options.id;
+                		               var type = this.options.type;
+                		               observation(id,type,latlng);
+                		            });
+            				marker.addTo(map);
+            				break;
+            			case "MultiPoint":
+            				
+            				
+            				var pointList = [];
+            				for(var j = 0; j < coordinates.length; j += 1){
+                    			var coordinate = coordinates[j];
+                    			var lon = coordinate[0];
+                    			var lat = coordinate[1];
+                    			var point = new L.LatLng(lat,lon);
+                    			pointList.push(point);
+            				}
+            				
+            				var color;
+            				var r = Math.floor(Math.random() * 255);
+            				var g = Math.floor(Math.random() * 255);
+            				var b = Math.floor(Math.random() * 255);
+            				color= "rgb("+r+" ,"+g+","+ b+")"; 
+
+            				var firstpolyline = new L.Polyline(pointList, {
+            					type: "MultiPoint",
+                				id: result.id,
+            				    color: color,
+            				    weight: 5,
+            				    opacity: 1,
+            				    smoothFactor: 1
+            				});
+            				firstpolyline.on('click', function(e) {
+         		               var latlng= e.latlng;
+         		               var lat = latlng.lat;
+         		               var lon = latlng.lng;
+         		               var id = this.options.id;
+         		               var type = this.options.type;
+         		               observation(id,type,latlng);
+         		            });
+            				firstpolyline.addTo(map);
+            				break;
+            				default:
+            					
+            					break;
+            			}
+            	} 
+            		
+
+            });
+
+        
+
+
+        });
+        
+    
+            function httpGet(theUrl)
+            {
+              var xmlHttp = null;
+
+              xmlHttp = new XMLHttpRequest();
+              xmlHttp.open( "GET", theUrl, false );
+              xmlHttp.send( null );
+              return xmlHttp.responseText;
+            }
+      
+
+            function plot(title, featureId, observationId,uom,lat,lng){
+            	var content= "<html><p>"+title+"</p><div id=\"chart"+observationId+"\" style=\"height:300px; width:500px;\"></div></div>";
+            	//if(title.indexOf("temperature") != -1){
+            	//	content+= "<p>ERA5 reference data</p>";
+            	//	content+= "<div id=\"chartERA5\" style=\"height:300px; width:500px;\"></div>";
+            	//}
+            	content+="</html>";
+            	var latlng = L.latLng(lat, lng);
+
+            	 L.popup({ maxWidth: 800})
+		            .setLatLng(latlng)
+		            .setContent(content)
+		            .openOn(map);
+            	 
+            	 	var chartId = "chart"+observationId;
+            	 	
+            	 	
+            	 	
+            	 	
+            	 	
+		        	  	var dataUrl = "../services/essi/token/i-change-23495798340278/view/i-change/om-api/observations?feature="+featureId+"&observationIdentifier="+observationId+"&includeData=true";
+		        	  	var beginTime = null;
+		        	  	var endTime = null;
+		        	  	var month = null;
+		        	  	var year = null;
+		        	  	$.getJSON(dataUrl, function(dd) {
+		        	  		var points = dd.member[0].result.points;
+		        	  		var values = [];
+		        	  		if(points.length > 0){
+		        	  		for(var i = points.length-20; i < points.length; i += 1){
+		            			var point = points[i];
+		            			var x = point.time.instant;
+		            			if (beginTime==null){
+		            				beginTime = x;
+		            			}
+		            			endTime = x;
+		            			var date = new Date(x); 
+		            			month = date.getMonth();
+		            			year = date.getYear();
+		            			var milliseconds = date.getTime(); 
+		            			var y = point.value;
+		            			values.push([milliseconds,y]);
+		        	  		}
+		        	  		var f = [];
+		        	  		f.push(values);
+		        	  		$.jqplot (chartId, f, {
+		        	  		    title:title+" ("+uom+")",
+		        	  		    axes:{
+		        	  		        xaxis:{
+		        	  		            renderer:$.jqplot.DateAxisRenderer,
+        	  		                    tickOptions:{formatString:'%Y-%m-%#d %H:%M:%S'
+        	  		          }}},
+		        	  		  axesDefaults: {
+		        	  	        tickRenderer: $.jqplot.CanvasAxisTickRenderer ,
+		        	  	        tickOptions: {
+		        	  	          fontFamily: 'Georgia',
+		        	  	          fontSize: '10pt',
+		        	  	          angle: -30
+		        	  	        }
+		        	  	    },
+		        	  	    highlighter: {
+		        	  	      show: true
+		        	  	    },
+		        	  	    cursor: {
+		        	  	      show: true,
+		        	  	      tooltipLocation:'sw'
+		        	  	    },
+		        	  		    series:[{lineWidth:4, markerOptions:{style:'square'}}]
+		        	  		  });
+		        	  		}else{
+		        	  			var data = [[null]];
+		        	  			$('#'+chartId).text("No data available");
+	            	  			//$.jqplot (chartId, data,{});	
+		        	  		}
+		        	  		
+/* 		        	  		if(title.indexOf("temperature") != -1){
+		                	var featureUrl = "../services/essi/token/i-change-23495798340278/view/i-change/om-api/features?south="+lat+"&north="+lat+"&east="+lng+"&west="+lng+"&provider=ichangeERA5";
+		            	  	$.getJSON(featureUrl, function(data) {
+		            	  		var eraId;
+		            	  		if(data.results){
+		            	  		for(var i = 0; i < data.results.length; i += 1){
+		                			var result = data.results[i];
+		                			var geometry = result.geometry;
+		                			var type = geometry.type;
+		                			var coordinates = geometry.coordinates;
+		                			if (type==="Polygon"){
+		                				eraId = result.id;
+		                			}
+		            	  		}
+		            	  		}
+		            	  		var dataUrl = "../services/essi/token/i-change-23495798340278/view/i-change/om-api/observations?south="+lat+"&north="+lat+"&east="+lng+"&west="+lng+"&observationIdentifier="+eraId+"&includeData=true";
+		            	  		
+			            	  	$.getJSON(dataUrl, function(datadata) {
+			            	  		if(datadata.member){
+			            	  		var points = datadata.member[0].result.points;
+			            	  		var values = [];
+			            	  		for(var i = 0; i < points.length; i += 1){
+			                			var point = points[i];
+			                			var time = point.time.instant;
+			                			var date = new Date(time); // some mock date
+			                			var eraMonth = date.getMonth();
+			                			var eraYear = date.getYear();
+			                			var day = date.getDate();
+			                			if (month===eraMonth && day===1){
+					            			var milliseconds = date.getTime(); 
+				                			var value = point.value;
+				                			values.push([milliseconds,value]);
+			                			}
+			            	  		}
+				        	  		var f = [];
+				        	  		f.push(values);
+				        	  		
+				        	  		
+				        	  		
+				        	  		$.jqplot ('chartERA5', f, {
+				        	  		    title:title+" ("+uom+")",
+				        	  		    axes:{
+				        	  		        xaxis:{
+				        	  		            renderer:$.jqplot.DateAxisRenderer,
+		        	  		                    tickOptions:{formatString:'%Y-%m-%#d %H:%M:%S'
+		        	  		          }}},
+				        	  		  axesDefaults: {
+				        	  	        tickRenderer: $.jqplot.CanvasAxisTickRenderer ,
+				        	  	        tickOptions: {
+				        	  	          fontFamily: 'Georgia',
+				        	  	          fontSize: '10pt',
+				        	  	          angle: -30
+				        	  	        }
+				        	  	    },
+				        	  	    highlighter: {
+				        	  	      show: true
+				        	  	    },
+				        	  	    cursor: {
+				        	  	      show: true,
+				        	  	      tooltipLocation:'sw'
+				        	  	    },
+				        	  		    series:[{lineWidth:4, markerOptions:{style:'square'}}]
+				        	  		  });
+
+			            	  		} else {
+			            	  			var data = [[null]];
+			            	  			$.jqplot ('chartERA5', data,{});
+			            	  		}
+			            	  	});
+			            	  	
+			        	        
+
+		            	  	});
+		        	  		} */
+		            	  	
+		        	  	});
+            	
+            }
+            
+
+        	function observation(id, type,latlng){
+        		 var observationsUrl = "../services/essi/token/i-change-23495798340278/view/i-change/om-api/observations?feature="+id;
+	               var content = "<html><b>Observed properties at location:</b>";
+	               $.getJSON(observationsUrl, function(data) {
+		               var titles = [];
+		               var begins = [];
+		               var ends = [];
+		               var uoms = [];
+		               var ids = [];
+	            	   for(var i = 0; i < data.member.length; i += 1){
+	            			var result = data.member[i];
+	            			var parameterTitle = result.observedProperty.title;
+	            			var uom = result.result.defaultPointMetadata.uom;
+	            			uoms.push(uom);
+	            			begins.push(result.phenomenonTime.begin);
+	            			ends.push(result.phenomenonTime.end);
+	            			var observationId = result.id;
+	            			titles.push(parameterTitle);
+	            			ids.push(observationId);
+	            	   }
+		               for(var i = 0; i < titles.length; i += 1){
+	            			var title = titles[i];
+	            			var observationId = ids[i];
+	            			var uom = uoms[i];
+	            			content+= "<div><p>"+title+"</p>";	            			
+	            			content+= "<p>Start time: "+begins[i]+"</p>";
+	            			content+= "<p>End time: "+ends[i]+"</p>";
+	            			var lat = latlng.lat;
+     		               var lng = latlng.lng;
+	            			content+= "<button onclick=\"plot('"+title+"','"+id+"','"+observationId+"','"+uom+"',"+lat+","+lng+")\">Graph latest available data</button></div>";
+	            			
+	            			
+ 		               }
+		               
+		               
+		          
+           			
+ 		               content+="</html>";
+ 		               
+     		            L.popup({ maxWidth: 800})
+     		            .setLatLng(latlng)
+     		            .setContent(content)
+     		            .openOn(map);
+     		           
+     		      
+     		            
+     		    
+	               });
+        	}
+           
+
+    </script>
+	<style>
+.leaflet-container.crosshair-cursor-enabled {
+	cursor: crosshair;
+}
+
+#overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 2;
+	padding: 0.25rem;
+}
+
+#legend {
+	background-color: white;
+	border-radius: 0.5rem;
+	max-width: 40000px;
+	display: inline-block;
+	padding: 0.25rem;
+}
+
+#legend img {
+	max-height: 10em;
+	margin: 0.1rem;
+	vertical-align: middle;
+}
+
+#map {
+	height: 100vh;
+	width: 100vw;
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 1;
+}
+
+.leaflet-popup-content {
+	max-height: 50vh !important;
+	overflow: auto;
+}
+</style>
+</body>
+</html>

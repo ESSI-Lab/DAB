@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.setting;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,6 +21,7 @@ package eu.essi_lab.cfga.setting;
  * #L%
  */
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -38,6 +39,37 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
  * @author Fabrizio
  */
 public abstract class AbstractSetting extends ConfigurationObject {
+
+    /**
+     * 
+     */
+    public static Property<Boolean> COMPACT_MODE = Property.of("CompactMode", "compactMode", true, Optional.of(true)); //
+    /**
+     * 
+     */
+    public static Property<Boolean> FOLDED_MODE = Property.of("FoldedMode", "foldedMode", true, Optional.of(false));//
+    /**
+     * 
+     */
+    public static Property<Boolean> CAN_BE_REMOVED = Property.of("CanBeRemoved", "canBeRemoved", true, Optional.of(false)); //
+    /**
+     * 
+     */
+    public static Property<Boolean> CAN_BE_CLEANED = Property.of("CanBeCleaned", "canBeCleaned", true, Optional.of(true)); //
+    /**
+     * 
+     */
+    public static Property<Boolean> SHOW_HEADER = Property.of("ShowHeader", "showHeader", true, Optional.of(true));
+
+    /**
+     * 
+     */
+    public static Property<? extends ObjectExtension> EXTENSION = Property.of("Extension", "extensionClass", false, Optional.empty());
+
+    /**
+     * 
+     */
+    public static Property<? extends Validator> VALIDATOR = Property.of("Validator", "validatorClass", false, Optional.empty());
 
     public AbstractSetting() {
     }
@@ -116,6 +148,18 @@ public abstract class AbstractSetting extends ConfigurationObject {
 		sorted(Option::sort).//
 
 		collect(Collectors.toList());
+    }
+
+    /**
+     * @param key
+     * @return
+     */
+    public Optional<Option<?>> getOption(String key) {
+
+	return getOptions().//
+		stream().//
+		filter(o -> o.getKey().equals(key)).//
+		findFirst();
     }
 
     /**
@@ -248,7 +292,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
 
 	    if (extension.isAssignableFrom(clazz)) {
 
-		return Optional.of((T) Class.forName(getObject().getString("extensionClass")).newInstance());
+		return Optional.of((T) Class.forName(getObject().getString("extensionClass")).getDeclaredConstructor().newInstance());
 	    }
 
 	} catch (Exception e) {
@@ -302,7 +346,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
 
 	    if (getObject().has("validatorClass")) {
 
-		return Optional.of((T) Class.forName(getObject().getString("validatorClass")).newInstance());
+		return Optional.of((T) Class.forName(getObject().getString("validatorClass")).getDeclaredConstructor().newInstance());
 	    }
 
 	} catch (Exception e) {
@@ -327,12 +371,12 @@ public abstract class AbstractSetting extends ConfigurationObject {
 
 	if (getObject().has("validatorClass")) {
 
-	    String afterCleanFunctionClass = getObject().getString("validatorClass");
+	    String validatorClass = getObject().getString("validatorClass");
 
 	    try {
 
 		@SuppressWarnings("unchecked")
-		Class<? extends Validator> clazz = (Class<? extends Validator>) Class.forName(afterCleanFunctionClass);
+		Class<? extends Validator> clazz = (Class<? extends Validator>) Class.forName(validatorClass);
 
 		return Optional.of(clazz);
 
@@ -343,6 +387,26 @@ public abstract class AbstractSetting extends ConfigurationObject {
 	}
 
 	return Optional.empty();
+    }
+
+    /**
+     * @return
+     */
+    public List<Property<?>> getProperties() {
+
+	List<Property<?>> properties = super.getProperties();
+
+	properties.addAll(//
+		Arrays.asList(//
+			COMPACT_MODE, //
+			FOLDED_MODE, //
+			CAN_BE_REMOVED, //
+			CAN_BE_CLEANED, //
+			SHOW_HEADER, //
+			EXTENSION, //
+			VALIDATOR));
+
+	return properties;
     }
 
     /**

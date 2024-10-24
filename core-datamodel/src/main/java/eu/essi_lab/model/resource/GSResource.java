@@ -4,7 +4,7 @@ package eu.essi_lab.model.resource;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
@@ -50,8 +49,6 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.w3c.dom.Node;
 
 import com.google.common.collect.Lists;
-import com.sun.xml.bind.marshaller.CharacterEscapeHandler;
-import com.sun.xml.bind.marshaller.NioEscapeHandler;
 
 import eu.essi_lab.iso.datamodel.DOMSerializer;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
@@ -380,23 +377,23 @@ public abstract class GSResource extends DOMSerializer {
     @Override
     protected Marshaller createMarshaller() throws JAXBException {
 
-//	NioEscapeHandler nioEscapeHandler = new NioEscapeHandler("UTF-8");
+	// NioEscapeHandler nioEscapeHandler = new NioEscapeHandler("UTF-8");
 	Marshaller marshaller = context.createMarshaller();
 	marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-	marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new CommonNameSpaceContext());
+	marshaller.setProperty(NameSpace.NAMESPACE_PREFIX_MAPPER_IMPL, new CommonNameSpaceContext());
 
-//	marshaller.setProperty(CharacterEscapeHandler.class.getName(), new CharacterEscapeHandler() {
-//	    @Override
-//	    public void escape(char[] ac, int i, int j, boolean flag, Writer writer) throws IOException {
-//
-//		String value = new String(ac);
-//		if (value.contains("CDATA")) {
-//		    writer.write(ac, i, j);
-//		} else {
-//		    nioEscapeHandler.escape(ac, i, j, flag, writer);
-//		}
-//	    }
-//	});
+	// marshaller.setProperty(CharacterEscapeHandler.class.getName(), new CharacterEscapeHandler() {
+	// @Override
+	// public void escape(char[] ac, int i, int j, boolean flag, Writer writer) throws IOException {
+	//
+	// String value = new String(ac);
+	// if (value.contains("CDATA")) {
+	// writer.write(ac, i, j);
+	// } else {
+	// nioEscapeHandler.escape(ac, i, j, flag, writer);
+	// }
+	// }
+	// });
 	return marshaller;
     }
 

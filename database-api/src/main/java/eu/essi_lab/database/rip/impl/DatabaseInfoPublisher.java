@@ -7,7 +7,7 @@ package eu.essi_lab.database.rip.impl;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -34,15 +34,14 @@ import java.util.concurrent.ThreadFactory;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import eu.essi_lab.api.database.DatabaseWriter;
-import eu.essi_lab.api.database.factory.DatabaseConsumerFactory;
+import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.servlet.RequestManager;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
-import eu.essi_lab.model.RuntimeInfoElement;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.rip.RuntimeInfoProvider;
 import eu.essi_lab.rip.RuntimeInfoPublisher;
@@ -76,12 +75,12 @@ public class DatabaseInfoPublisher extends RuntimeInfoPublisher {
      * @param context
      * @throws GSException
      */
-    public DatabaseInfoPublisher(StorageUri uri, String runtimeId, String context) throws GSException {
+    public DatabaseInfoPublisher(StorageInfo uri, String runtimeId, String context) throws GSException {
 
 	super(runtimeId, context);
 
 	if (enabled && writer == null) {
-	    writer = DatabaseConsumerFactory.createDataBaseWriter(uri);
+	    writer = DatabaseProviderFactory.getDatabaseWriter(uri);
 	}
     }
 
@@ -105,7 +104,7 @@ public class DatabaseInfoPublisher extends RuntimeInfoPublisher {
 	    @Override
 	    public void run() {
 
-		RequestManager.getInstance().addThreadName(DatabaseInfoPublisher.this.getRuntimeId());
+		RequestManager.getInstance().updateThreadName(getClass(), DatabaseInfoPublisher.this.getRuntimeId());
 
 		try {
 
@@ -115,9 +114,7 @@ public class DatabaseInfoPublisher extends RuntimeInfoPublisher {
 
 		    if (!map.isEmpty()) {
 
-			content.append(createTextNode(RuntimeInfoElement.RUNTIME_ID.getName(), getRuntimeId()));
 			content.append("\n");
-			content.append(createTextNode(RuntimeInfoElement.RUNTIME_CONTEXT.getName(), getContext()));
 			content.append("\n");
 
 			map.forEach((key, list) -> {

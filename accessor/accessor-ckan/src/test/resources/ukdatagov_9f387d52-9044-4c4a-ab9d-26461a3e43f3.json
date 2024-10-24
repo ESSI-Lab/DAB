@@ -1,0 +1,377 @@
+{
+    "help": "http://data.gov.uk/api/3/action/help_show?name=package_show",
+    "success": true,
+    "result": {
+        "license_title": "UK Open Government Licence (OGL)",
+        "maintainer": null,
+        "temporal_coverage-from": "[\"1957-01-19T00:00:00.000Z\"]",
+        "relationships_as_object": [],
+        "private": false,
+        "maintainer_email": null,
+        "num_tags": 0,
+        "id": "9f387d52-9044-4c4a-ab9d-26461a3e43f3",
+        "metadata_created": "2016-06-22T09:03:24.175018",
+        "metadata_modified": "2017-10-17T10:40:40.934350",
+        "author": null,
+        "author_email": null,
+        "state": "active",
+        "version": null,
+        "archiver": {
+            "status": "Archived successfully",
+            "is_broken": false,
+            "reason": "",
+            "status_id": 0
+        },
+        "temporal_coverage-to": "[\"1957-12-15T00:00:00.000Z\"]",
+        "license_id": "uk-ogl",
+        "type": "dataset",
+        "resources": [
+            {
+                "hash": "",
+                "description": "order",
+                "created": "2016-06-22T10:03:24.206069",
+                "url": "http://data.cefas.co.uk/#/View/11100/",
+                "format": "",
+                "qa": {
+                    "updated": "2018-07-07T03:14:46.275998",
+                    "openness_score": 0,
+                    "archival_timestamp": "2018-07-06T22:17:46.234882",
+                    "format": "HTML",
+                    "created": "2016-06-22T15:21:35.359557",
+                    "resource_timestamp": null,
+                    "openness_score_reason": "Content of file appeared to be format \"HTML\" which receives openness score: 0."
+                },
+                "tracking_summary": {
+                    "total": 0,
+                    "recent": 0
+                },
+                "resource_locator_function": "order",
+                "archiver": {
+                    "is_broken_printable": "Downloaded OK",
+                    "updated": "2018-07-06T22:17:46.234882",
+                    "cache_filepath": "/media/hulk/ckan_resource_cache/a6/a692dd84-be96-4a43-9a16-dd7efd2fb645/resource",
+                    "last_success": "2018-07-06T22:17:46.234882",
+                    "size": "16410",
+                    "is_broken": false,
+                    "failure_count": 0,
+                    "etag": "\"223b1fb09513d41:0\"",
+                    "status": "Archived successfully",
+                    "url_redirected_to": null,
+                    "hash": "a255c5a3834d482f488036206e9722878c97baa5",
+                    "status_id": 0,
+                    "reason": "",
+                    "last_modified": "Wed, 04 Jul 2018 12:51:12 GMT",
+                    "resource_timestamp": "2016-06-22T09:03:24.175018",
+                    "mimetype": "text/html",
+                    "cache_url": "http://data.gov.uk/data/resource_cache/a6/a692dd84-be96-4a43-9a16-dd7efd2fb645/resource",
+                    "created": "2016-06-22T12:49:31.343892",
+                    "first_failure": null
+                },
+                "resource_locator_protocol": "",
+                "position": 0,
+                "revision_id": "35c36f27-0edb-41e3-8968-f89ae8ede4f1",
+                "id": "a692dd84-be96-4a43-9a16-dd7efd2fb645",
+                "name": ""
+            }
+        ],
+        "num_resources": 1,
+        "contact-email": "data.manager@cefas.co.uk",
+        "tags": [],
+        "tracking_summary": {
+            "total": 0,
+            "recent": 0
+        },
+        "groups": [],
+        "creator_user_id": "431b5956-7b87-41ba-8fc5-a4a8b681b797",
+        "relationships_as_subject": [],
+        "revision_timestamp": "2016-06-22T09:03:24.175018",
+        "organization": {
+            "description": "Cefas - the Centre for Environment, Fisheries and Aquaculture Science - makes an important contribution to securing healthy and sustainable marine and freshwater environments so that current and future generations can prosper.\r\n",
+            "created": "2012-06-27T14:50:51.521004",
+            "title": "Centre for Environment, Fisheries & Aquaculture Science",
+            "name": "centre-for-environment-fisheries-aquaculture-science",
+            "revision_timestamp": "2013-10-16T08:45:15.226155",
+            "is_organization": true,
+            "state": "active",
+            "image_url": "",
+            "revision_id": "d7f44ef2-32ba-4651-a4c7-c01524fd86a7",
+            "type": "organization",
+            "id": "2f1c6ccb-3f21-40c0-8b26-41566c53eb2f",
+            "approval_status": "pending"
+        },
+        "name": "1957-1957-centre-for-environment-fisheries-aquaculture-science-cefas-survey-eholt-06-1957-part-",
+        "isopen": true,
+        "url": null,
+        "notes": "This survey was undertaken by Cefas as part of the Historic Arctic Survey \nSeries;\n\n*Gadus morhua* (Atlantic Cod) stocks in the Barents Sea are currently at \nlevels not seen since the 1950s. Causes for the population increase last \ncentury, and understanding of whether such large numbers will be maintained in \nthe future, are unclear. To explore this, we digitised and interrogated \nhistorical cod catch and diet datasets from the Barents Sea. Data includes \ntemporal and spatial information, cod catch data and length distributions, and \nhydrographic data.\n\nSurvey took place between 19/01/1957 and 15/12/1957 on Ernest Holt\n\nEquipment used during this survey :\n\n\n-   Otter Trawl 78ft Granton with shrimp netting cover\n\nSurvey operations were undertaken on 10 stations\n\n19 different species were caught on this survey",
+        "owner_org": "2f1c6ccb-3f21-40c0-8b26-41566c53eb2f",
+        "qa": {
+            "openness_score_reason": "Content of file appeared to be format \"HTML\" which receives openness score: 0.",
+            "updated": "2018-07-07T03:14:46.275998",
+            "openness_score": 0
+        },
+        "theme-secondary": [
+            "Mapping"
+        ],
+        "extras": [
+            {
+                "package_id": "9f387d52-9044-4c4a-ab9d-26461a3e43f3",
+                "value": "True",
+                "revision_timestamp": "2016-06-22T09:03:24.175018",
+                "state": "active",
+                "key": "UKLP",
+                "revision_id": "35c36f27-0edb-41e3-8968-f89ae8ede4f1",
+                "id": "c789ffcb-733a-48ac-9b56-58c1d3f63231"
+            },
+            {
+                "package_id": "9f387d52-9044-4c4a-ab9d-26461a3e43f3",
+                "value": "[\"Public data (Crown Copyright) - Open Government Licence Terms and Conditions apply\"]",
+                "revision_timestamp": "2016-06-22T09:03:24.175018",
+                "state": "active",
+                "key": "access_constraints",
+                "revision_id": "35c36f27-0edb-41e3-8968-f89ae8ede4f1",
+                "id": "0bb19087-aab1-4ae5-99e7-b63c8c840b06"
+            },
+            {
+                "package_id": "9f387d52-9044-4c4a-ab9d-26461a3e43f3",
+                "value": "55",
+                "revision_timestamp": "2016-06-22T09:03:24.175018",
+                "state": "active",
+                "key": "bbox-east-long",
+                "revision_id": "35c36f27-0edb-41e3-8968-f89ae8ede4f1",
+                "id": "0739d68d-fcce-4730-8115-83bbc40d12d7"
+            },
+            {
+                "package_id": "9f387d52-9044-4c4a-ab9d-26461a3e43f3",
+                "value": "80",
+                "revision_timestamp": "2016-06-22T09:03:24.175018",
+                "state": "active",
+                "key": "bbox-north-lat",
+                "revision_id": "35c36f27-0edb-41e3-8968-f89ae8ede4f1",
+                "id": "39e66596-50c9-4131-a8d6-18b6b33aba09"
+            },
+            {
+                "package_id": "9f387d52-9044-4c4a-ab9d-26461a3e43f3",
+                "value": "65",
+                "revision_timestamp": "2016-06-22T09:03:24.175018",
+                "state": "active",
+                "key": "bbox-south-lat",
+                "revision_id": "35c36f27-0edb-41e3-8968-f89ae8ede4f1",
+                "id": "957598bb-e20b-427c-a65b-53f084498355"
+            },
+            {
+                "package_id": "9f387d52-9044-4c4a-ab9d-26461a3e43f3",
+                "value": "5",
+                "revision_timestamp": "2016-06-22T09:03:24.175018",
+                "state": "active",
+                "key": "bbox-west-long",
+                "revision_id": "35c36f27-0edb-41e3-8968-f89ae8ede4f1",
+                "id": "5c19383f-2306-4dab-94ff-f5d182847d06"
+            },
+            {
+                "package_id": "9f387d52-9044-4c4a-ab9d-26461a3e43f3",
+                "value": "data.manager@cefas.co.uk",
+                "revision_timestamp": "2016-06-22T09:03:24.175018",
+                "state": "active",
+                "key": "contact-email",
+                "revision_id": "35c36f27-0edb-41e3-8968-f89ae8ede4f1",
+                "id": "f2255408-d70f-4132-a8c7-ba26cd27cc88"
+            },
+            {
+                "package_id": "9f387d52-9044-4c4a-ab9d-26461a3e43f3",
+                "value": "[]",
+                "revision_timestamp": "2016-06-22T09:03:24.175018",
+                "state": "active",
+                "key": "coupled-resource",
+                "revision_id": "35c36f27-0edb-41e3-8968-f89ae8ede4f1",
+                "id": "e367913f-107b-4bab-b3d3-839daf9581b6"
+            },
+            {
+                "package_id": "9f387d52-9044-4c4a-ab9d-26461a3e43f3",
+                "value": "[{\"type\": \"publication\", \"value\": \"2016-07-14\"}]",
+                "revision_timestamp": "2016-07-25T14:54:21.531466",
+                "state": "active",
+                "key": "dataset-reference-date",
+                "revision_id": "b605856a-831c-4ccf-91d3-10f3cb77a235",
+                "id": "8d63fbcf-3b87-49e3-9cfa-82e84d85e0d6"
+            },
+            {
+                "package_id": "9f387d52-9044-4c4a-ab9d-26461a3e43f3",
+                "value": "NOP",
+                "revision_timestamp": "2016-06-22T09:03:24.175018",
+                "state": "active",
+                "key": "frequency-of-update",
+                "revision_id": "35c36f27-0edb-41e3-8968-f89ae8ede4f1",
+                "id": "35ddc8ae-658b-4437-b924-fd731bc96c19"
+            },
+            {
+                "package_id": "9f387d52-9044-4c4a-ab9d-26461a3e43f3",
+                "value": "CEFASa3c801bd-4e98-4bd6-be7a-00c8a3c27a7f",
+                "revision_timestamp": "2016-06-22T09:03:24.175018",
+                "state": "active",
+                "key": "guid",
+                "revision_id": "35c36f27-0edb-41e3-8968-f89ae8ede4f1",
+                "id": "c3ee2054-91e4-433c-9f8c-a53e209e93d8"
+            },
+            {
+                "package_id": "9f387d52-9044-4c4a-ab9d-26461a3e43f3",
+                "value": "946b9f75-a357-4846-a846-10f8e7b14661",
+                "revision_timestamp": "2017-10-17T10:40:40.933388",
+                "state": "active",
+                "key": "harvest_object_id",
+                "revision_id": "118884fe-6b2e-425a-bb10-c36a16a8aebd",
+                "id": "a4a1a28b-18f6-4d91-b566-12045f0cccfa"
+            },
+            {
+                "package_id": "9f387d52-9044-4c4a-ab9d-26461a3e43f3",
+                "value": "https://cefasapp.cefas.co.uk/api/WAF/data.gov.uk/11100.xml",
+                "revision_timestamp": "2016-06-22T09:03:24.175018",
+                "state": "active",
+                "key": "harvest_source_reference",
+                "revision_id": "35c36f27-0edb-41e3-8968-f89ae8ede4f1",
+                "id": "3d82ceba-f114-40b0-ac2e-700efa1a39ba"
+            },
+            {
+                "package_id": "9f387d52-9044-4c4a-ab9d-26461a3e43f3",
+                "value": "harvest",
+                "revision_timestamp": "2016-06-22T09:03:24.175018",
+                "state": "active",
+                "key": "import_source",
+                "revision_id": "35c36f27-0edb-41e3-8968-f89ae8ede4f1",
+                "id": "b7e019af-cd50-491f-8419-38a4eee7a10e"
+            },
+            {
+                "package_id": "9f387d52-9044-4c4a-ab9d-26461a3e43f3",
+                "value": "2016-07-14",
+                "revision_timestamp": "2016-07-25T14:54:21.531466",
+                "state": "active",
+                "key": "metadata-date",
+                "revision_id": "b605856a-831c-4ccf-91d3-10f3cb77a235",
+                "id": "a6e58972-cb9a-48fc-b360-ea472ffbbcfe"
+            },
+            {
+                "package_id": "9f387d52-9044-4c4a-ab9d-26461a3e43f3",
+                "value": "eng",
+                "revision_timestamp": "2016-06-22T09:03:24.175018",
+                "state": "active",
+                "key": "metadata-language",
+                "revision_id": "35c36f27-0edb-41e3-8968-f89ae8ede4f1",
+                "id": "16e4f517-e712-4ce2-a3ec-a3300fbdbdf7"
+            },
+            {
+                "package_id": "9f387d52-9044-4c4a-ab9d-26461a3e43f3",
+                "value": "",
+                "revision_timestamp": "2016-06-22T09:03:24.175018",
+                "state": "active",
+                "key": "provider",
+                "revision_id": "35c36f27-0edb-41e3-8968-f89ae8ede4f1",
+                "id": "cb8ebc81-921b-49e7-8092-beae0269754a"
+            },
+            {
+                "package_id": "9f387d52-9044-4c4a-ab9d-26461a3e43f3",
+                "value": "series",
+                "revision_timestamp": "2016-06-22T09:03:24.175018",
+                "state": "active",
+                "key": "resource-type",
+                "revision_id": "35c36f27-0edb-41e3-8968-f89ae8ede4f1",
+                "id": "1c203fe6-7ea0-48d2-b0dc-8604ceed92fa"
+            },
+            {
+                "package_id": "9f387d52-9044-4c4a-ab9d-26461a3e43f3",
+                "value": "Centre for Environment, Fisheries & Aquaculture Science (originator, custodian)",
+                "revision_timestamp": "2016-06-22T09:03:24.175018",
+                "state": "active",
+                "key": "responsible-party",
+                "revision_id": "35c36f27-0edb-41e3-8968-f89ae8ede4f1",
+                "id": "cc5a2ed2-303f-41ef-a84c-c5befff8f4f4"
+            },
+            {
+                "package_id": "9f387d52-9044-4c4a-ab9d-26461a3e43f3",
+                "value": "{\"type\":\"Polygon\",\"coordinates\":[[[55, 65],[55, 80], [5, 80], [5, 65], [55, 65]]]}",
+                "revision_timestamp": "2016-06-22T09:03:24.175018",
+                "state": "active",
+                "key": "spatial",
+                "revision_id": "35c36f27-0edb-41e3-8968-f89ae8ede4f1",
+                "id": "7739609f-bc3a-4aa4-994c-4a77bd69afb5"
+            },
+            {
+                "package_id": "9f387d52-9044-4c4a-ab9d-26461a3e43f3",
+                "value": "",
+                "revision_timestamp": "2016-06-22T09:03:24.175018",
+                "state": "active",
+                "key": "spatial-data-service-type",
+                "revision_id": "35c36f27-0edb-41e3-8968-f89ae8ede4f1",
+                "id": "c0db45eb-827e-4cc5-b626-fe681bd4af78"
+            },
+            {
+                "package_id": "9f387d52-9044-4c4a-ab9d-26461a3e43f3",
+                "value": "",
+                "revision_timestamp": "2016-06-22T09:03:24.175018",
+                "state": "active",
+                "key": "spatial-reference-system",
+                "revision_id": "35c36f27-0edb-41e3-8968-f89ae8ede4f1",
+                "id": "ce38d455-adcb-411b-be6e-01c344905103"
+            },
+            {
+                "package_id": "9f387d52-9044-4c4a-ab9d-26461a3e43f3",
+                "value": "[\"1957-01-19T00:00:00.000Z\"]",
+                "revision_timestamp": "2016-06-22T09:03:24.175018",
+                "state": "active",
+                "key": "temporal_coverage-from",
+                "revision_id": "35c36f27-0edb-41e3-8968-f89ae8ede4f1",
+                "id": "142151ab-76dd-433d-aec9-2d9d14231f23"
+            },
+            {
+                "package_id": "9f387d52-9044-4c4a-ab9d-26461a3e43f3",
+                "value": "[\"1957-12-15T00:00:00.000Z\"]",
+                "revision_timestamp": "2016-06-22T09:03:24.175018",
+                "state": "active",
+                "key": "temporal_coverage-to",
+                "revision_id": "35c36f27-0edb-41e3-8968-f89ae8ede4f1",
+                "id": "7e6be31c-a44f-4b7a-b1ac-313fb4793e2b"
+            },
+            {
+                "package_id": "9f387d52-9044-4c4a-ab9d-26461a3e43f3",
+                "value": "Environment",
+                "revision_timestamp": "2016-06-22T09:03:24.175018",
+                "state": "active",
+                "key": "theme-primary",
+                "revision_id": "35c36f27-0edb-41e3-8968-f89ae8ede4f1",
+                "id": "d6d698aa-feb2-4177-824b-7cfda2f07f78"
+            },
+            {
+                "package_id": "9f387d52-9044-4c4a-ab9d-26461a3e43f3",
+                "value": "[\"Mapping\"]",
+                "revision_timestamp": "2016-06-22T09:03:24.175018",
+                "state": "active",
+                "key": "theme-secondary",
+                "revision_id": "35c36f27-0edb-41e3-8968-f89ae8ede4f1",
+                "id": "5bdb99a2-c878-4d76-b919-f87999f031f1"
+            }
+        ],
+        "license_url": "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+        "individual_resources": [
+            {
+                "hash": "",
+                "description": "order",
+                "created": "2016-06-22T10:03:24.206069",
+                "url": "http://data.cefas.co.uk/#/View/11100/",
+                "format": "",
+                "qa": "{'updated': '2018-07-07T03:14:46.275998', 'openness_score': 0, 'archival_timestamp': '2018-07-06T22:17:46.234882', 'format': u'HTML', 'created': '2016-06-22T15:21:35.359557', 'resource_timestamp': None, 'openness_score_reason': u'Content of file appeared to be format \"HTML\" which receives openness score: 0.'}",
+                "tracking_summary": {
+                    "total": 0,
+                    "recent": 0
+                },
+                "resource_locator_function": "order",
+                "archiver": "{'is_broken_printable': 'Downloaded OK', 'updated': '2018-07-06T22:17:46.234882', 'cache_filepath': u'/media/hulk/ckan_resource_cache/a6/a692dd84-be96-4a43-9a16-dd7efd2fb645/resource', 'last_success': '2018-07-06T22:17:46.234882', 'size': u'16410', 'is_broken': False, 'failure_count': 0, 'etag': u'\"223b1fb09513d41:0\"', 'status': 'Archived successfully', 'url_redirected_to': None, 'hash': u'a255c5a3834d482f488036206e9722878c97baa5', 'status_id': 0, 'reason': u'', 'last_modified': u'Wed, 04 Jul 2018 12:51:12 GMT', 'resource_timestamp': '2016-06-22T09:03:24.175018', 'mimetype': u'text/html', 'cache_url': u'http://data.gov.uk/data/resource_cache/a6/a692dd84-be96-4a43-9a16-dd7efd2fb645/resource', 'created': '2016-06-22T12:49:31.343892', 'first_failure': None}",
+                "resource_locator_protocol": "",
+                "position": 0,
+                "revision_id": "35c36f27-0edb-41e3-8968-f89ae8ede4f1",
+                "id": "a692dd84-be96-4a43-9a16-dd7efd2fb645",
+                "name": ""
+            }
+        ],
+        "title": "1957 - 1957 Centre for Environment, Fisheries & Aquaculture Science (Cefas) Survey : EHOLT/06/1957 (part of Historic Arctic Survey Series)",
+        "revision_id": "35c36f27-0edb-41e3-8968-f89ae8ede4f1",
+        "theme-primary": "Environment"
+    }
+}

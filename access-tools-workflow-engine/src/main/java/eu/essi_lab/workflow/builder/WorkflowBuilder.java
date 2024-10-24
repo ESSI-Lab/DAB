@@ -4,7 +4,7 @@ package eu.essi_lab.workflow.builder;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,8 +24,8 @@ package eu.essi_lab.workflow.builder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -34,10 +34,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.resource.data.CRS;
 import eu.essi_lab.model.resource.data.DataDescriptor;
-import eu.essi_lab.model.resource.data.DataFormat;
-import eu.essi_lab.model.resource.data.DataType;
 import eu.essi_lab.workflow.processor.DescriptorUtils;
 import eu.essi_lab.workflow.processor.IdentityProcessor;
 import eu.essi_lab.workflow.processor.ProcessorCapabilities;
@@ -71,14 +68,16 @@ public class WorkflowBuilder {
 	WorkflowBuilder builder = new WorkflowBuilder();
 
 	ServiceLoader<WorkblockBuilder> loader = ServiceLoader.load(WorkblockBuilder.class);
-	loader.forEach(b -> {
+	Iterator<WorkblockBuilder> iterator = loader.iterator();
+	while (iterator.hasNext()) {
+	    WorkblockBuilder b = iterator.next();
 	    try {
 		builder.add(b);
 	    } catch (Exception e) {
 
 		GSLoggerFactory.getLogger(WorkblockBuilder.class).error(e.getMessage(), e);
 	    }
-	});
+	}
 
 	return builder;
     }
@@ -583,8 +582,8 @@ public class WorkflowBuilder {
 		if (!b.isDeadEnd()) {
 		    //
 		    // the queue can already contains the block, but
-		    // now the level is incremented so it must replaced with 
-		    // 
+		    // now the level is incremented so it must replaced with
+		    //
 		    queue.remove(b);
 		    queue.add(b);
 		}
@@ -740,17 +739,17 @@ public class WorkflowBuilder {
 		count();
 
 	if (deepLogsEnabled) {
-	    
+
 	    List<Workblock> list = blockList.stream().//
-		peek(v -> {
-		    if (deepLogsEnabled) {
+		    peek(v -> {
+			if (deepLogsEnabled) {
 
-			GSLoggerFactory.getLogger(getClass()).info("Current : " + v.getOutput());
-		    }
+			    GSLoggerFactory.getLogger(getClass()).info("Current : " + v.getOutput());
+			}
 
-		}).filter(v -> terminal.accept(v.getOutput())).//
+		    }).filter(v -> terminal.accept(v.getOutput())).//
 
-		collect(Collectors.toList());
+		    collect(Collectors.toList());
 
 	    GSLoggerFactory.getLogger(getClass()).info("Found {} terminals", count);
 	}

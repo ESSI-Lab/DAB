@@ -4,7 +4,7 @@ package eu.essi_lab.harvester;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,6 @@ package eu.essi_lab.harvester;
 
 import eu.essi_lab.adk.harvest.IHarvestedAccessor;
 import eu.essi_lab.api.database.SourceStorage;
-import eu.essi_lab.harvester.component.HarvesterComponentException;
 import eu.essi_lab.identifierdecorator.ConflictingResourceException;
 import eu.essi_lab.identifierdecorator.DuplicatedResourceException;
 import eu.essi_lab.messages.HarvestingProperties;
@@ -162,10 +161,10 @@ public abstract class HarvestingComponent {
 
     /**
      * @param resource
-     * @throws HarvesterComponentException
+     * @throws HarvestingComponentException
      * @throws DuplicatedResourceException
      * @throws ConflictingResourceException
      */
     public abstract void apply(GSResource resource)
-	    throws HarvesterComponentException, DuplicatedResourceException, ConflictingResourceException;
+	    throws HarvestingComponentException, DuplicatedResourceException, ConflictingResourceException;
 }

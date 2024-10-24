@@ -1,0 +1,8 @@
+<NotAValidExceptionReport xmlns="http://www.opengis.net/ows" version="1.2.0">
+    <Exception exceptionCode="VersionNegotiationFailed" locator="acceptVersions">
+        <ExceptionText> Version negotiation failed: locator=acceptVersions </ExceptionText>
+        <ExceptionText>
+            None of the supplied parameter values are supported.
+        </ExceptionText>
+    </Exception>
+</NotAValidExceptionReport>

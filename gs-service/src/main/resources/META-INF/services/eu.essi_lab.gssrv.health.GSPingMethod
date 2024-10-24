@@ -4,3 +4,4 @@ eu.essi_lab.gssrv.health.methods.DiscoveryMethod
 eu.essi_lab.gssrv.health.methods.ProfilerMethod
 eu.essi_lab.gssrv.health.methods.XMLDocumentReaderMethod
 eu.essi_lab.gssrv.health.methods.DistributorMethod
+eu.essi_lab.gssrv.health.methods.DelayedSchedulerStartErrorMethod

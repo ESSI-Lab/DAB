@@ -4,7 +4,7 @@ package eu.essi_lab.iso.datamodel;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -47,7 +47,7 @@ public abstract class DOMSerializer {
     public void toStream(OutputStream out, boolean omitXMLdeclaration) throws JAXBException {
 
 	Marshaller marshaller = createMarshaller();
-	marshaller.setProperty("com.sun.xml.bind.xmlDeclaration", !omitXMLdeclaration);
+	marshaller.setProperty(Marshaller.JAXB_FRAGMENT, omitXMLdeclaration);
 	marshaller.marshal(getElement(), out);
     }
 
@@ -59,7 +59,7 @@ public abstract class DOMSerializer {
     public String asString(boolean omitXMLdeclaration) throws JAXBException, UnsupportedEncodingException {
 
 	Marshaller marshaller = createMarshaller();
-	marshaller.setProperty("com.sun.xml.bind.xmlDeclaration", !omitXMLdeclaration);
+	marshaller.setProperty(Marshaller.JAXB_FRAGMENT, omitXMLdeclaration);
 
 	ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 	marshaller.marshal(getElement(), outputStream);

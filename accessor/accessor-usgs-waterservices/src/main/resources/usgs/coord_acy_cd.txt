@@ -1,0 +1,22 @@
+#
+# National Water Information System
+# 2018/03/05
+#
+#
+# Date Retrieved: USGS Water Data for the Nation Help System
+#
+gw_ref_cd	gw_ref_ds
+1s	58s
+H	Accurate to + or - .01 sec (Differentially-Corrected GPS).
+1	Accurate to + or - .1  sec (Differentially-Corrected GPS).
+5	Accurate to + or - .5  sec (PLGR/PPS GPS).
+M	Accurate to + or - 1   min.
+S	Accurate to + or - 1   sec.
+T	Accurate to + or - 10  sec.
+R	Accurate to + or - 3   sec (SPS GPS).
+F	Accurate to + or - 5   sec.
+B	Level 1 survey-grade GPS
+C	Level 2 survey-grade GPS
+D	Level 3 survey-grade GPS
+E	Level 4 survey-grade GPS
+U	Unknown or unspecified.

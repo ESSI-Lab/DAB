@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gui.components.option.listener;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,13 +25,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.vaadin.gatanaso.MultiselectComboBox;
-
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.HasValue.ValueChangeEvent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
@@ -54,7 +53,7 @@ public class OptionValuesLoaderListener implements ButtonChangeListener {
 
     private Option<?> option;
     private Select<String> singleSelect;
-    private MultiselectComboBox<String> multiSelect;
+    private MultiSelectComboBox<String> multiSelect;
     private UI ui;
 
     /**
@@ -73,7 +72,7 @@ public class OptionValuesLoaderListener implements ButtonChangeListener {
      * @param option
      * @param multiSelect
      */
-    public OptionValuesLoaderListener(Option<?> option, MultiselectComboBox<String> multiSelect) {
+    public OptionValuesLoaderListener(Option<?> option, MultiSelectComboBox<String> multiSelect) {
 	this.option = option;
 	this.multiSelect = multiSelect;
 	this.multiSelect.setReadOnly(true);
@@ -209,7 +208,7 @@ public class OptionValuesLoaderListener implements ButtonChangeListener {
 	    setModal(false);
 	    setWidth(600, Unit.PIXELS);
 	    setTitle("Input required");
-	    
+
 	    addToCloseAll();
 
 	    VerticalLayout layout = ComponentFactory.createNoSpacingNoMarginVerticalLayout();

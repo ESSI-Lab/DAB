@@ -4,7 +4,7 @@ package eu.essi_lab.lib.geo;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,6 +22,7 @@ package eu.essi_lab.lib.geo;
  */
 
 import java.util.AbstractMap.SimpleEntry;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class BBOXUtils {
 	for (SimpleEntry<Double, Double> latLong : latLongs) {
 	    Double lat = latLong.getKey();
 	    Double lon = latLong.getValue();
-	    if(lat == null && lon == null) {
+	    if (lat == null && lon == null) {
 		continue;
 	    }
 	    if (south == null || lat < south) {
@@ -87,7 +88,69 @@ public class BBOXUtils {
 	SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> ret = new SimpleEntry<>(lowerCorner, upperCorner);
 	return ret;
     }
-    
+
+    public static SimpleEntry<SimpleEntry<BigDecimal, BigDecimal>, SimpleEntry<BigDecimal, BigDecimal>> getBigDecimalBBOX(
+	    List<SimpleEntry<BigDecimal, BigDecimal>> latLongs) {
+	BigDecimal south = null;
+	BigDecimal north = null;
+	BigDecimal minWest = null;
+	BigDecimal maxWest = null;
+	BigDecimal minEast = null;
+	BigDecimal maxEast = null;
+	for (SimpleEntry<BigDecimal, BigDecimal> latLong : latLongs) {
+	    BigDecimal lat = latLong.getKey();
+	    BigDecimal lon = latLong.getValue();
+	    if (lat == null && lon == null) {
+		continue;
+	    }
+	    if (south == null || lat.compareTo(south) == -1) {
+		south = lat;
+	    }
+	    if (north == null || lat.compareTo(north) == 1) {
+		north = lat;
+	    }
+	    if (lon.compareTo(BigDecimal.ZERO) == -1) {
+		if (minWest == null || lon.compareTo(minWest) == -1) {
+		    minWest = lon;
+		}
+		if (maxWest == null || lon.compareTo(maxWest) == 1) {
+		    maxWest = lon;
+		}
+	    } else {
+		if (minEast == null || lon.compareTo(minEast) == -1) {
+		    minEast = lon;
+		}
+		if (maxEast == null || lon.compareTo(maxEast) == 1) {
+		    maxEast = lon;
+		}
+	    }
+	}
+	BigDecimal west = null;
+	BigDecimal east = null;
+	if (minWest == null) {
+	    west = minEast;
+	    east = maxEast;
+	} else if (minEast == null) {
+	    west = minWest;
+	    east = maxWest;
+	} else {
+	    BigDecimal normalBboxSize = maxEast.subtract(minWest);
+	    BigDecimal crossBboxSize = (maxWest.subtract(minEast)).add(new BigDecimal("360"));
+	    if (normalBboxSize.compareTo(crossBboxSize) == -1) {
+		west = minWest;
+		east = maxEast;
+	    } else {
+		west = minEast;
+		east = maxWest;
+	    }
+	}
+	SimpleEntry<BigDecimal, BigDecimal> lowerCorner = new SimpleEntry<>(south, west);
+	SimpleEntry<BigDecimal, BigDecimal> upperCorner = new SimpleEntry<>(north, east);
+	SimpleEntry<SimpleEntry<BigDecimal, BigDecimal>, SimpleEntry<BigDecimal, BigDecimal>> ret = new SimpleEntry<>(lowerCorner,
+		upperCorner);
+	return ret;
+    }
+
     public static String toBBOX(String polygon, boolean firstIsLat) {
 
 	polygon = polygon.replace("MULTIPOLYGON", "").//
@@ -105,9 +168,8 @@ public class BBOXUtils {
 	Double[] lats = new Double[coords.length / 2];
 	Double[] lons = new Double[coords.length / 2];
 
-	List<SimpleEntry<Double, Double>> latLongs = new ArrayList<>();	
-	
-	
+	List<SimpleEntry<Double, Double>> latLongs = new ArrayList<>();
+
 	for (int i = 0; i < coords.length; i++) {
 
 	    if (i % 2 == 0) {
@@ -126,9 +188,9 @@ public class BBOXUtils {
 		}
 	    }
 	}
-	
-	for(int j = 0; j < lats.length; j++) {
-	    SimpleEntry<Double, Double> latLonMin = new SimpleEntry<>(lats[j],lons[j]);
+
+	for (int j = 0; j < lats.length; j++) {
+	    SimpleEntry<Double, Double> latLonMin = new SimpleEntry<>(lats[j], lons[j]);
 	    latLongs.add(latLonMin);
 	}
 
@@ -137,7 +199,6 @@ public class BBOXUtils {
 	Double maxLat = null;
 	Double maxLon = null;
 
-	
 	SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> bbox = getBBOX(latLongs);
 	SimpleEntry<Double, Double> lowerCorner = bbox.getKey();
 	SimpleEntry<Double, Double> upperCorner = bbox.getValue();
@@ -145,28 +206,26 @@ public class BBOXUtils {
 	minLon = lowerCorner.getValue();
 	maxLat = upperCorner.getKey();
 	maxLon = upperCorner.getValue();
-	
-	
+
 	return minLat + " " + minLon + " " + maxLat + " " + maxLon;
 
-//	for (int i = 1; i < lats.length; i++) {
-//
-//	    if (lats[i] < minLat) {
-//		minLat = lats[i];
-//	    }
-//	    if (lats[i] > maxLat) {
-//		maxLat = lats[i];
-//	    }
-//
-//	    if (lons[i] < minLon) {
-//		minLon = lons[i];
-//	    }
-//	    if (lons[i] > maxLon) {
-//		maxLon = lons[i];
-//	    }
-//	}
+	// for (int i = 1; i < lats.length; i++) {
+	//
+	// if (lats[i] < minLat) {
+	// minLat = lats[i];
+	// }
+	// if (lats[i] > maxLat) {
+	// maxLat = lats[i];
+	// }
+	//
+	// if (lons[i] < minLon) {
+	// minLon = lons[i];
+	// }
+	// if (lons[i] > maxLon) {
+	// maxLon = lons[i];
+	// }
+	// }
 
-	
     }
 
 }

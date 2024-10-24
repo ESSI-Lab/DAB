@@ -4,7 +4,7 @@ package eu.essi_lab.api.database.factory;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,103 +22,274 @@ package eu.essi_lab.api.database.factory;
  */
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.ServiceLoader;
 
 import eu.essi_lab.api.database.Database;
-import eu.essi_lab.api.database.DatabaseConsumer;
-import eu.essi_lab.api.database.DatabaseProvider;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.api.database.DatabaseExecutor;
+import eu.essi_lab.api.database.DatabaseFinder;
+import eu.essi_lab.api.database.DatabaseReader;
+import eu.essi_lab.api.database.DatabaseSemanticsExecutor;
+import eu.essi_lab.api.database.DatabaseWriter;
+import eu.essi_lab.api.database.SourceStorage;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 
 /**
- * This factory is the entry point of the "DataBase Manager" API<br>
- * <br>
- * <b>Usage notes</b><br>
- * <br>
- * Clients should create a suitable {@link DatabaseProvider} for a given {@link StorageUri} and initialize it with the
- * {@link DatabaseProvider#initialize(StorageUri, String)}
- * method. If the initialization is successful, the provided {@link Database} instance is shared between all the
- * suitable {@link DatabaseConsumer}s
- *
  * @author Fabrizio
  */
 public class DatabaseProviderFactory {
 
-    /**
-     * 
-     */
-    static final Object PROVIDER_LOCK = new Object();
-
-    private static final String NULL_DB_URI_ERR_ID = "NULL_DB_URI_ERR_ID";
-
-    private static final String DB_PROVIDER_FACTORY_PROVIDER_NOT_FOUND_EXCEPTION = "DB_PROVIDER_FACTORY_PROVIDER_NOT_FOUND_EXCEPTION";
-
-    private static Map<StorageUri, DatabaseProvider> providersMap = new HashMap<>();
+    private static final HashMap<StorageInfo, DatabaseWriter> WRITERS_MAP = new HashMap<>();
+    private static final HashMap<StorageInfo, DatabaseReader> READERS_MAP = new HashMap<>();
+    private static final HashMap<StorageInfo, DatabaseFinder> FINDERS_MAP = new HashMap<>();
+    private static final HashMap<StorageInfo, DatabaseExecutor> EXECUTORS_MAP = new HashMap<>();
+    private static final HashMap<StorageInfo, DatabaseSemanticsExecutor> SEMANTICS_MAP = new HashMap<>();
 
     private DatabaseProviderFactory() {
     }
-
-    public static void clearProviders() {
-	providersMap.clear();
-    }
-
+    
     /**
-     * Loads the available {@link DatabaseProvider}s using the {@link ServiceLoader} API and
+     * Loads the available {@link DatabaseFinder}s using the {@link ServiceLoader} API and
      * selects the one suitable for the given <code>dbUri</code>
      *
      * @param dbUri
-     * @return the suitable {@link DatabaseProvider} or <code>null</code> if none is found
+     * @return the suitable {@link DatabaseFinder} or <code>null</code> if none is found
      * @throws GSException if dbUri is <code>null</code> or dbUri.getUri is <code>null</code>
      */
-    public static DatabaseProvider create(StorageUri dbUri) throws GSException {
+    public static DatabaseFinder getDatabaseFinder(StorageInfo dbUri) throws GSException {
 
-	synchronized (PROVIDER_LOCK) {
+	synchronized (DatabaseFactory.PROVIDER_LOCK) {
 
-	    if (dbUri == null || dbUri.getUri() == null) {
+	    DatabaseFinder mapped = FINDERS_MAP.get(dbUri);
+	    if (mapped != null) {
 
-		throw GSException.createException(//
-			DatabaseProviderFactory.class, //
-			"Missing provider uri", //
-			null, //
-			null, //
-			ErrorInfo.ERRORTYPE_CLIENT, //
-			ErrorInfo.SEVERITY_ERROR, //
-			NULL_DB_URI_ERR_ID, //
-			null);
+		return mapped;
 	    }
 
-	    if (providersMap.containsKey(dbUri)) {
+	    Database database = DatabaseFactory.create(dbUri);
 
-		return providersMap.get(dbUri);
+	    for (DatabaseFinder finder : ServiceLoader.load(DatabaseFinder.class)) {
 
-	    } else {
+		if (finder.supports(dbUri)) {
 
-		GSLoggerFactory.getLogger(DatabaseProviderFactory.class).trace("Initializing new provider with URI [" + dbUri + "]");
-	    }
+		    finder.setDatabase(database);
 
-	    ServiceLoader<DatabaseProvider> inits = ServiceLoader.load(DatabaseProvider.class);
+		    FINDERS_MAP.put(dbUri, finder);
 
-	    for (DatabaseProvider init : inits) {
-		if (init.supports(dbUri)) {
-
-		    providersMap.put(dbUri, init);
-
-		    GSLoggerFactory.getLogger(DatabaseProviderFactory.class).trace("Providers map keys: [" + providersMap.keySet() + "]");
-
-		    return init;
+		    return finder;
 		}
 	    }
-
-	    throw GSException.createException(DatabaseConsumerFactory.class, //
-		    "Suitable provider not found", //
-		    null, //
-		    ErrorInfo.ERRORTYPE_INTERNAL, //
-		    ErrorInfo.SEVERITY_FATAL, //
-		    DB_PROVIDER_FACTORY_PROVIDER_NOT_FOUND_EXCEPTION);
-
 	}
+
+	throw GSException.createException(DatabaseProviderFactory.class, //
+		"Suitable provider not found: " + dbUri, //
+		null, //
+		ErrorInfo.ERRORTYPE_INTERNAL, //
+		ErrorInfo.SEVERITY_FATAL, //
+		"DatabaseFinderCreationError");
+
+    }
+
+    /**
+     * Loads the available {@link DatabaseReader}s using the {@link ServiceLoader} API and
+     * selects the one suitable for the given <code>dbUri</code>
+     *
+     * @param dbUri
+     * @return the suitable {@link DatabaseReader} or <code>null</code> if none is found
+     * @throws GSException if dbUri is <code>null</code> or dbUri.getUri is <code>null</code>
+     */
+    public static DatabaseReader getDatabaseReader(StorageInfo dbUri) throws GSException {
+
+	synchronized (DatabaseFactory.PROVIDER_LOCK) {
+
+	    DatabaseReader mapped = READERS_MAP.get(dbUri);
+	    if (mapped != null) {
+
+		return mapped;
+	    }
+
+	    Database database = DatabaseFactory.create(dbUri);
+
+	    for (DatabaseReader reader : ServiceLoader.load(DatabaseReader.class)) {
+
+		if (reader.supports(dbUri)) {
+
+		    reader.setDatabase(database);
+
+		    READERS_MAP.put(dbUri, reader);
+
+		    return reader;
+		}
+	    }
+	}
+
+	throw GSException.createException(DatabaseProviderFactory.class, //
+		"Suitable provider not found: " + dbUri, //
+		null, //
+		ErrorInfo.ERRORTYPE_INTERNAL, //
+		ErrorInfo.SEVERITY_FATAL, //
+		"DatabaseReaderCreationError");
+
+    }
+
+    /**
+     * Loads the available {@link DatabaseWriter}s using the {@link ServiceLoader} API and
+     * selects the one suitable for the given <code>dbUri</code>
+     *
+     * @param dbUri
+     * @return the suitable {@link DatabaseWriter} or <code>null</code> if none is found
+     * @throws GSException if dbUri is <code>null</code> or dbUri.getUri is <code>null</code>
+     */
+    public static DatabaseWriter getDatabaseWriter(StorageInfo dbUri) throws GSException {
+
+	synchronized (DatabaseFactory.PROVIDER_LOCK) {
+
+	    DatabaseWriter mapped = WRITERS_MAP.get(dbUri);
+	    if (mapped != null) {
+
+		return mapped;
+	    }
+
+	    Database database = DatabaseFactory.create(dbUri);
+
+	    for (DatabaseWriter writer : ServiceLoader.load(DatabaseWriter.class)) {
+
+		if (writer.supports(dbUri)) {
+
+		    writer.setDatabase(database);
+
+		    WRITERS_MAP.put(dbUri, writer);
+
+		    return writer;
+		}
+	    }
+	}
+
+	throw GSException.createException(DatabaseProviderFactory.class, //
+		"Suitable provider not found: " + dbUri, //
+		null, //
+		ErrorInfo.ERRORTYPE_INTERNAL, //
+		ErrorInfo.SEVERITY_FATAL, //
+		"DatabaseWriterCreationError");
+
+    }
+
+    /**
+     * Loads the available {@link DatabaseExecutor}s using the {@link ServiceLoader} API and
+     * selects the one suitable for the given <code>dbUri</code>
+     *
+     * @param dbUri
+     * @return the suitable {@link DatabaseWriter} or <code>null</code> if none is found
+     * @throws GSException if dbUri is <code>null</code> or dbUri.getUri is <code>null</code>
+     */
+    public static DatabaseExecutor getDatabaseExecutor(StorageInfo dbUri) throws GSException {
+
+	synchronized (DatabaseFactory.PROVIDER_LOCK) {
+
+	    DatabaseExecutor mapped = EXECUTORS_MAP.get(dbUri);
+	    if (mapped != null) {
+
+		return mapped;
+	    }
+
+	    Database database = DatabaseFactory.create(dbUri);
+
+	    for (DatabaseExecutor executor : ServiceLoader.load(DatabaseExecutor.class)) {
+
+		if (executor.supports(dbUri)) {
+
+		    executor.setDatabase(database);
+
+		    EXECUTORS_MAP.put(dbUri, executor);
+
+		    return executor;
+		}
+	    }
+	}
+
+	throw GSException.createException(DatabaseProviderFactory.class, //
+		"Suitable provider not found: " + dbUri, //
+		null, //
+		ErrorInfo.ERRORTYPE_INTERNAL, //
+		ErrorInfo.SEVERITY_FATAL, //
+		"DatabaseExecutorCreationError");
+
+    }
+
+    /**
+     * Loads the available {@link DatabaseExecutor}s using the {@link ServiceLoader} API and
+     * selects the one suitable for the given <code>dbUri</code>
+     *
+     * @param dbUri
+     * @return the suitable {@link DatabaseWriter} or <code>null</code> if none is found
+     * @throws GSException if dbUri is <code>null</code> or dbUri.getUri is <code>null</code>
+     */
+    public static DatabaseSemanticsExecutor getDatabaseSemanticsExecutor(StorageInfo dbUri) throws GSException {
+
+	synchronized (DatabaseFactory.PROVIDER_LOCK) {
+
+	    DatabaseSemanticsExecutor mapped = SEMANTICS_MAP.get(dbUri);
+	    if (mapped != null) {
+
+		return mapped;
+	    }
+
+	    Database database = DatabaseFactory.create(dbUri);
+
+	    for (DatabaseSemanticsExecutor executor : ServiceLoader.load(DatabaseSemanticsExecutor.class)) {
+
+		if (executor.supports(dbUri)) {
+
+		    executor.setDatabase(database);
+
+		    SEMANTICS_MAP.put(dbUri, executor);
+
+		    return executor;
+		}
+	    }
+	}
+
+	throw GSException.createException(DatabaseProviderFactory.class, //
+		"Suitable provider not found: " + dbUri, //
+		null, //
+		ErrorInfo.ERRORTYPE_INTERNAL, //
+		ErrorInfo.SEVERITY_FATAL, //
+		"DatabaseSemanticsExecutorCreationError");
+
+    }
+
+    /**
+     * Loads the available {@link SourceStorage}s using the {@link ServiceLoader} API and
+     * selects the one suitable for the given <code>dbUri</code>
+     *
+     * @param dbUri
+     * @return the suitable {@link SourceStorage} or <code>null</code> if none is found
+     * @throws GSException if dbUri is <code>null</code> or dbUri.getUri is <code>null</code>
+     */
+    public static SourceStorage getSourceStorage(StorageInfo dbUri) throws GSException {
+
+	synchronized (DatabaseFactory.PROVIDER_LOCK) {
+
+	    Database database = DatabaseFactory.create(dbUri);
+
+	    for (SourceStorage storage : ServiceLoader.load(SourceStorage.class)) {
+
+		if (storage.supports(dbUri)) {
+
+		    storage.setDatabase(database);
+
+		    return storage;
+		}
+	    }
+	}
+
+	throw GSException.createException(DatabaseProviderFactory.class, //
+		"Suitable provider not found: " + dbUri, //
+		null, //
+		ErrorInfo.ERRORTYPE_INTERNAL, //
+		ErrorInfo.SEVERITY_FATAL, //
+		"SourceStorageCreationError");
+
     }
 }

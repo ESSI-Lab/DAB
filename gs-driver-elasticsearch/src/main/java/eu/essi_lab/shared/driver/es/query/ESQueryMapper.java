@@ -4,7 +4,7 @@ package eu.essi_lab.shared.driver.es.query;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -111,7 +111,7 @@ public class ESQueryMapper {
 	idsList.forEach(id -> {
 	    JSONObject doc = new JSONObject();
 	    
-	    doc.put("_type", "_doc");
+//	    doc.put("_type", "_doc"); // commented, as newer versions of elasticsearch change the type to  json_typeestype
 	    doc.put("_id", id);
 	    
 	    json.getJSONArray("docs").put(doc);

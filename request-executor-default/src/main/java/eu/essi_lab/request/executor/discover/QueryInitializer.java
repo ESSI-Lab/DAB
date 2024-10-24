@@ -4,7 +4,7 @@ package eu.essi_lab.request.executor.discover;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -33,7 +33,7 @@ import org.logicng.formulas.Formula;
 
 import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.DatabaseWriter;
-import eu.essi_lab.api.database.factory.DatabaseConsumerFactory;
+import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.authorization.converter.IRequestAuthorizationConverter;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -49,7 +49,7 @@ import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.bond.parser.NotBondParser;
 import eu.essi_lab.messages.bond.parser.SourceBondHandler;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.ResourceProperty;
@@ -691,9 +691,9 @@ public class QueryInitializer implements IQueryInitializer {
 	return bond;
     }
 
-    protected IViewManager createViewManager(StorageUri databaseURI) throws GSException {
-	DatabaseReader reader = DatabaseConsumerFactory.createDataBaseReader(databaseURI);
-	DatabaseWriter writer = DatabaseConsumerFactory.createDataBaseWriter(databaseURI);
+    protected IViewManager createViewManager(StorageInfo databaseURI) throws GSException {
+	DatabaseReader reader = DatabaseProviderFactory.getDatabaseReader(databaseURI);
+	DatabaseWriter writer = DatabaseProviderFactory.getDatabaseWriter(databaseURI);
 	DefaultViewManager ret = new DefaultViewManager();
 	ret.setDatabaseReader(reader);
 	ret.setDatabaseWriter(writer);

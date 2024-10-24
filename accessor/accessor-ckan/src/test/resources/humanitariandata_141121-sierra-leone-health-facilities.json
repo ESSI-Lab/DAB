@@ -1,0 +1,164 @@
+{
+	"help": "http://data.humdata.org/api/3/action/help_show?name=package_show",
+	"success": true,
+	"result": {
+		"data_update_frequency": "-1",
+		"license_title": "cc-by-igo",
+		"maintainer": "c6ed1bad-d9ef-46ff-b865-f38217cd08df",
+		"relationships_as_object": [
+		],
+		"private": false,
+		"dataset_date": "11/21/2014",
+		"num_tags": 8,
+		"solr_additions": "{\"countries\": [\"Sierra Leone\"]}",
+		"id": "7453fb80-752b-4078-a892-d936f9846dab",
+		"metadata_created": "2014-11-01T18:54:09.629068",
+		"indicator": "0",
+		"caveats": "Might contain errors or mis-spelled location names",
+		"metadata_modified": "2015-11-24T23:38:35.839451",
+		"author": "Per",
+		"author_email": "per@standbytaskforce.com",
+		"subnational": "1",
+		"state": "active",
+		"license_other": "",
+		"methodology": "Other",
+		"version": null,
+		"is_requestdata_type": false,
+		"license_id": "cc-by-igo",
+		"num_of_showcases": 0,
+		"type": "dataset",
+		"resources": [
+			{
+				"resource_uploader": "per_sbtf",
+				"cache_last_updated": null,
+				"package_id": "7453fb80-752b-4078-a892-d936f9846dab",
+				"datastore_active": false,
+				"id": "f78dc606-04e2-4fb6-a7eb-9eb995c33f76",
+				"size": 295210,
+				"revision_last_updated": "2015-11-24T23:38:35.838140",
+				"state": "active",
+				"mimetype": null,
+				"hash": "",
+				"description": "The list comes from a variety of MOH sources in the field and not from the MOH at national level \r\nThe list shared refers only to \u201cnormal\u201d (non-Ebola) health facilities and should not be confused with Ebola treatment Centres even if some of the names might be similar or the same.\r\nThe 2014 update info refers only to the pre-Ebola outbreak.  \r\nThe data is not Oct 2014 status, but from earlier this year.",
+				"format": "XLSX",
+				"hdx_rel_url": "/dataset/7453fb80-752b-4078-a892-d936f9846dab/resource/f78dc606-04e2-4fb6-a7eb-9eb995c33f76/download/1501-sierra-leone-health-centers.xlsx",
+				"tracking_summary": {
+					"total": 179,
+					"recent": 87
+				},
+				"last_modified": null,
+				"url_type": "upload",
+				"perma_link": "http://data.hdx.rwlabs.org/dataset/141121-sierra-leone-health-facilities/resource_download/f78dc606-04e2-4fb6-a7eb-9eb995c33f76",
+				"cache_url": null,
+				"name": "1501 Sierra Leone Health Centers.xlsx",
+				"created": "2014-11-01T18:55:18.096365",
+				"url": "http://data.humdata.org/dataset/7453fb80-752b-4078-a892-d936f9846dab/resource/f78dc606-04e2-4fb6-a7eb-9eb995c33f76/download/1501-sierra-leone-health-centers.xlsx",
+				"mimetype_inner": null,
+				"position": 0,
+				"revision_id": "be8f619c-08c3-49a5-a017-0136c5eb368a",
+				"resource_type": "file.upload"
+			}
+		],
+		"dataset_preview": "first_resource",
+		"num_resources": 1,
+		"dataset_source": "MOHSW, District level, Sierra Leone",
+		"tags": [
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "coordinates",
+				"id": "c9054e52-d215-49e4-a3d2-19ab899d274b",
+				"name": "coordinates"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "ebola",
+				"id": "f14144a1-71c1-405c-ad3a-fdc836776630",
+				"name": "ebola"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "geodata",
+				"id": "29e4170e-6340-4949-b2ae-3c42062d012e",
+				"name": "geodata"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "health",
+				"id": "cfc3fb43-78a5-45e0-8bac-fbb81d00d211",
+				"name": "health"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "health facilities",
+				"id": "877373dc-559a-4f4a-a434-27e3f77b48e7",
+				"name": "health facilities"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "pcode",
+				"id": "32d49cc7-af42-41a6-ae43-50a62e14af82",
+				"name": "pcode"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "sbtf",
+				"id": "159f30d8-51b3-472e-9311-c2549fdab11a",
+				"name": "sbtf"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "sierra leone",
+				"id": "fbb98387-c36c-4182-aec6-7778d9d44023",
+				"name": "sierra leone"
+			}
+		],
+		"revision_id": "d5e6bcd7-4d19-449c-bf47-7a10404d8adc",
+		"groups": [
+			{
+				"display_name": "Sierra Leone",
+				"description": "",
+				"image_display_url": "",
+				"title": "Sierra Leone",
+				"id": "sle",
+				"name": "sle"
+			}
+		],
+		"creator_user_id": "8c9d2f68-7ad2-426a-9357-ac1a82dbf82e",
+		"has_quickcharts": false,
+		"has_geodata": false,
+		"methodology_other": "<p>Compilation of several lists of HF in SL<br />  </p>",
+		"relationships_as_subject": [
+		],
+		"total_res_downloads": 1110,
+		"organization": {
+			"description": "The mission of the Standby Task Force, is to provide volunteer online digital responses to humanitarian crises, local emergencies, and issues of local or global concern",
+			"created": "2014-09-13T15:58:26.591459",
+			"title": "Standby Task Force",
+			"name": "standby-task-force",
+			"is_organization": true,
+			"state": "active",
+			"image_url": "",
+			"revision_id": "0ae09e9f-9aa9-4bdb-8514-8a4dddae87ee",
+			"type": "organization",
+			"id": "25af272f-c07c-4bca-8472-7405f84f6713",
+			"approval_status": "approved"
+		},
+		"name": "141121-sierra-leone-health-facilities",
+		"isopen": false,
+		"url": null,
+		"notes": "Updated January 2015 with some cleaning of dataset. Health Facilities, with OCHA P-codes for level 1 and 2, Chiefdoms names, category of HF. The 2014 update info refers only to the pre-Ebola outbreak status. Please reflect this in the table to avoid misrepresentation as it is not actual (Oct 2014) status but from early in the year.",
+		"owner_org": "25af272f-c07c-4bca-8472-7405f84f6713",
+		"has_showcases": false,
+		"pageviews_last_14_days": 2,
+		"title": "Sierra Leone update 1501 Health Facilities Nov 2014",
+		"package_creator": "per_sbtf"
+	}
+}

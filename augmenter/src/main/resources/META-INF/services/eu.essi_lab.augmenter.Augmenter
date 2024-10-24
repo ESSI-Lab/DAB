@@ -1,4 +1,5 @@
 eu.essi_lab.augmenter.WHOSVariableAugmenter
+eu.essi_lab.augmenter.HISCentralVariableAugmenter
 eu.essi_lab.augmenter.WHOSRiverVariableAugmenter
 eu.essi_lab.augmenter.WHOSUnitsAugmenter
 eu.essi_lab.augmenter.RandomSSCScoreAugmenter

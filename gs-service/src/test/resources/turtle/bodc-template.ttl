@@ -1,0 +1,141 @@
+@prefix ex: <http://https://fairease.eu/dataset/> .
+@prefix dap: <http://example.org/dap-example/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sosa: <http://www.w3.org/ns/sosa/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcat: <https://www.w3.org/ns/dcat#> .
+@prefix dct: <http://purl.org/dc/terms/>.
+@prefix geosparql: <http://www.opengis.net/ont/geosparql#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix dqv: <http://www.w3.org/ns/dqv#> .
+@prefix adms: <http://www.w3.org/ns/adms#> .
+@prefix sdo: <https://schema.org/> .
+@prefix iop: <https://w3id.org/iadopt/ont/>.
+@prefix skos: <http://www.w3.org/2004/02/skos/core#>.
+
+<http://vocab.nerc.ac.uk/collection/P01/current/TEMPP681/> a skos:Concept, sosa:ObservedProperty, iop:Variable;
+skos:prefLabel "Temperature (IPTS-68) of the water body" .
+
+#Or do the iadopt decomposition here
+# iop:hasObjectOfInterest	<http://vocab.nerc.ac.uk/collection/S21/current/S21S027> ;
+# iop:hasProperty	<http://vocab.nerc.ac.uk/collection/S06/current/S0600160/> .
+
+
+ <http://vocab.nerc.ac.uk/collection/L27/current/ARGO_QC/> a skos:Concept;
+skos:prefLabel "ARGO quality flags".
+
+<https://edmo.seadatanet.org/report/43> a prov:Organization ;
+rdfs:label "BODC".
+
+
+ <https://edmo.seadatanet.org/report/4614> a prov:Organization ;
+rdfs:label "Argo".
+
+
+
+ <http://vocab.nerc.ac.uk/collection/P22/current/28/> a skos:Concept;
+ skos:prefLabel "Oceanographic geographical features" .
+
+  #The main catalogue
+  ex:FAIREASECatalog a dcat:Catalog ;
+  dct:title "FAIREASECatalog Catalog"@en ;
+  rdfs:label "FAIREASECatalog Catalog"@en ;
+  foaf:homepage <http://example.org/catalog> ;
+  dct:publisher  <https://edmo.seadatanet.org/report/43> ;
+  dct:language <http://id.loc.gov/vocabulary/iso639-1/en>  ;
+  #Contains other catalogues
+  dcat:catalog ex:SDNCatalog, ex:CopernicusCatalog .
+
+#Describe each Catalogue with as much detail as FAIRE-EASE has and list their datasets. here I only include one dataset for SDN ex:MyDataset
+
+  ex:SDNCatalog a dcat:Catalog ;
+  rdfs:label "SeaDataNet Catalogue";
+  dcat:dataset ex:MyDataset.
+ 
+  ex:CopernicusCatalog a dcat:Catalog ;
+  rdfs:label "Copernicus Catalogue".
+  
+
+#Describing the main dataset
+ex:MyDataset a dcat:Dataset, sdo:Dataset;
+dct:title "PROVOR-V JUMBO Profiling Float - 2903783 - Argo LOV";
+dct:description "SeaDataNet is the Pan-European infrastructure for marine and ocean data management and delivery services. ";
+dct:identifier <https://cdi.seadatanet.org/report/681> ;
+adms:identifier [
+rdf:type adms:Identifier;
+rdf:parseType "Resource";
+skos:notation "10.1000/182" ;
+adms:schemaAgency <https://registry.identifiers.org/registry/doi> ;
+];
+dcat:theme <http://vocab.nerc.ac.uk/collection/P22/current/28/> ;
+
+dct:issued "2008-12-04";
+dcat:distribution ex:MyDataset-001-csv ;
+dqv:hasQualityMeasurement ex:measurement1;
+dct:publisher  <https://edmo.seadatanet.org/report/4614>;
+dct:creator  <https://edmo.seadatanet.org/report/43> ;
+
+#Temporal Info
+dct:temporal [
+      a dct:PeriodOfTime ;    
+      dcat:startDate "1967-01-10"^^xsd:date ;    
+      dcat:endDate   "2021-04-09"^^xsd:date ;  
+    ]
+;
+
+#Spatial Info
+    dct:spatial [
+    a dct:Location ;
+    dcat:bbox """POLYGON((
+      3.053 47.975 , 7.24  47.975 ,
+      7.24  53.504 , 3.053 53.504 ,
+      3.053 47.975
+    ))"""^^geosparql:wktLiteral ;
+  ] ;
+
+sdo:variableMeasured [
+    
+      rdf:type sdo:PropertyValue;
+      sdo:name "Temperature (IPTS-68) of the water body";
+      sdo:alternateName "WC_temp68";
+      sdo:propertyID <http://vocab.nerc.ac.uk/collection/P01/current/TEMPP681> ;
+    ] ;
+
+  prov:wasGeneratedBy dap:Activity1 .
+  dap:Activity1 a prov:Activity;
+  prov:used <http://vocab.nerc.ac.uk/collection/L05/current/134/> .
+    
+<http://vocab.nerc.ac.uk/collection/L05/current/134/>  a sosa:Sensor, prov:Entity, skos:Concept;
+skos:prefLabel "water temperature sensor";
+sosa:observes <http://vocab.nerc.ac.uk/collection/P01/current/TEMPP681/> ;
+sosa:isHostedBy <http://vocab.nerc.ac.uk/collection/B76/current/B7600031/> .
+
+<http://vocab.nerc.ac.uk/collection/B76/current/B7600031/> a sosa:Platform;
+sosa:hosts <http://vocab.nerc.ac.uk/collection/L05/current/134/> .
+
+
+
+##Distribution
+ex:MyDataset-001-csv   a dcat:Distribution ;
+  dcat:downloadURL <http://dcat.example.org/files/001.csv> ;
+  dct:title "CSV distribution of imaginary dataset 001"@en ;
+  dct:title "distribuciÃ³n en CSV del conjunto de datos imaginario 001"@es ;
+  dcat:mediaType <http://www.iana.org/assignments/media-types/text/csv> ;
+  dcat:accessService ex:subset-service-001 ;
+  dcat:byteSize "5120"^^xsd:nonNegativeInteger .
+
+#The quality info here
+ex:measurement1 a dqv:QualityMeasurement ;
+dqv:isMeasurementOf  <http://vocab.nerc.ac.uk/collection/L27/current/ARGO_QC/> ;
+dqv:value "good"^^xsd:boolean .
+
+#A service
+ex:subset-service-001
+  rdf:type dcat:DataService ;
+  dct:conformsTo <http://dcat.example.org/apidef/table/v2.2> ;
+  dct:type <https://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType/invoke> ;
+  dcat:endpointDescription <http://dcat.example.org/api/table-005/capability> ;
+  dcat:endpointURL <http://dcat.example.org/api/table-001> ;
+  dcat:servesDataset ex:MyDataset .

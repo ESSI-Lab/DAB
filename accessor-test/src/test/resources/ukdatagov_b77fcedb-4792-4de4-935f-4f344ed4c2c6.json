@@ -1,0 +1,339 @@
+{
+    "help": "http://data.gov.uk/api/3/action/help_show?name=package_show",
+    "success": true,
+    "result": {
+        "license_title": "UK Open Government Licence (OGL)",
+        "maintainer": null,
+        "relationships_as_object": [],
+        "private": false,
+        "maintainer_email": null,
+        "num_tags": 6,
+        "id": "b77fcedb-4792-4de4-935f-4f344ed4c2c6",
+        "metadata_created": "2017-07-06T12:00:24.135232",
+        "metadata_modified": "2018-11-15T23:54:49.107461",
+        "author": null,
+        "author_email": null,
+        "state": "active",
+        "version": null,
+        "archiver": {
+            "status": "Archived successfully",
+            "is_broken": false,
+            "reason": "",
+            "status_id": 0
+        },
+        "license_id": "uk-ogl",
+        "type": "dataset",
+        "resources": [
+            {
+                "hash": "",
+                "description": "",
+                "created": "2017-07-06T13:00:24.322397",
+                "url": "https://files.datapress.com/london/dataset/general-election-results-2017/2017-06-29T11:17:24.85/2017 General Election Results.xls",
+                "format": "XLS",
+                "qa": {
+                    "updated": "2018-11-12T18:09:38.568077",
+                    "openness_score": 2,
+                    "archival_timestamp": "2017-07-06T13:00:31.051484",
+                    "format": "XLS",
+                    "created": "2017-07-06T13:01:00.390830",
+                    "resource_timestamp": null,
+                    "openness_score_reason": "Content of file appeared to be format \"XLS\" which receives openness score: 2."
+                },
+                "tracking_summary": {
+                    "total": 0,
+                    "recent": 0
+                },
+                "archiver": {
+                    "is_broken_printable": "Downloaded OK",
+                    "updated": "2017-07-06T13:00:31.051484",
+                    "cache_filepath": "/media/hulk/ckan_resource_cache/dd/ddbeec53-59f1-4b3b-b8eb-06768e4abba4/2017 General Election Results.xls",
+                    "last_success": "2017-07-06T13:00:31.051484",
+                    "size": "2939392",
+                    "is_broken": false,
+                    "failure_count": 0,
+                    "etag": "\"770487a2bb66562be76b7b3f4c9f7f88\"",
+                    "status": "Archived successfully",
+                    "url_redirected_to": "https://files.datapress.com/london/dataset/general-election-results-2017/2017-06-29T11:17:24.85/2017%20General%20Election%20Results.xls",
+                    "hash": "b04b798d4d0db83dd30356cef0f0408ba305850e",
+                    "status_id": 0,
+                    "reason": "",
+                    "last_modified": "Thu, 29 Jun 2017 11:17:27 GMT",
+                    "resource_timestamp": "2017-07-06T12:00:24.135232",
+                    "mimetype": "application/vnd.ms-excel",
+                    "cache_url": "http://data.gov.uk/data/resource_cache/dd/ddbeec53-59f1-4b3b-b8eb-06768e4abba4/2017 General Election Results.xls",
+                    "created": "2017-07-06T13:00:31.060088",
+                    "first_failure": null
+                },
+                "position": 0,
+                "revision_id": "e52afa06-5f20-4c85-8883-a60d7edf0b94",
+                "id": "ddbeec53-59f1-4b3b-b8eb-06768e4abba4",
+                "name": "2017 General Election Results.xls"
+            },
+            {
+                "hash": "",
+                "description": "",
+                "created": "2018-11-12T16:58:16.461015",
+                "url": "https://data.london.gov.uk/dataset/general-election-results-2017",
+                "format": "HTML",
+                "qa": {
+                    "updated": "2018-11-12T18:09:38.579417",
+                    "openness_score": 0,
+                    "archival_timestamp": "2018-11-12T17:20:34.141418",
+                    "format": "HTML",
+                    "created": "2018-11-12T18:09:38.583315",
+                    "resource_timestamp": null,
+                    "openness_score_reason": "Content of file appeared to be format \"HTML\" which receives openness score: 0."
+                },
+                "tracking_summary": {
+                    "total": 0,
+                    "recent": 0
+                },
+                "archiver": {
+                    "is_broken_printable": "Downloaded OK",
+                    "updated": "2018-11-12T17:20:34.141418",
+                    "cache_filepath": "/media/hulk/ckan_resource_cache/6c/6c5ccf58-ffef-48ad-b1ad-471690d1564f/general-election-results-2017",
+                    "last_success": "2018-11-12T17:20:34.141418",
+                    "size": "97856",
+                    "is_broken": false,
+                    "failure_count": 0,
+                    "etag": null,
+                    "status": "Archived successfully",
+                    "url_redirected_to": null,
+                    "hash": "79a690b0ad77140f3ba5c8a3a244e929aebb9115",
+                    "status_id": 0,
+                    "reason": "",
+                    "last_modified": null,
+                    "resource_timestamp": "2018-11-12T16:58:16.407047",
+                    "mimetype": "text/html",
+                    "cache_url": "http://data.gov.uk/data/resource_cache/6c/6c5ccf58-ffef-48ad-b1ad-471690d1564f/general-election-results-2017",
+                    "created": "2018-11-12T17:20:34.148708",
+                    "first_failure": null
+                },
+                "position": 1,
+                "revision_id": "63d5122d-0cdc-4606-943a-74a89765877b",
+                "id": "6c5ccf58-ffef-48ad-b1ad-471690d1564f",
+                "resource_type": "documentation",
+                "name": "Landing page"
+            }
+        ],
+        "num_resources": 2,
+        "tags": [
+            {
+                "vocabulary_id": null,
+                "display_name": "candidate",
+                "name": "candidate",
+                "revision_timestamp": "2017-07-06T12:00:24.135232",
+                "state": "active",
+                "id": "be474a44-e1a0-47ad-9890-eed52a15244d"
+            },
+            {
+                "vocabulary_id": null,
+                "display_name": "constituency",
+                "name": "constituency",
+                "revision_timestamp": "2017-07-06T12:00:24.135232",
+                "state": "active",
+                "id": "cb31dc93-1f87-4657-adbc-b4e1a4f8e355"
+            },
+            {
+                "vocabulary_id": null,
+                "display_name": "parliament",
+                "name": "parliament",
+                "revision_timestamp": "2017-07-06T12:00:24.135232",
+                "state": "active",
+                "id": "e267413e-e1a2-464f-ad5c-837e16327c08"
+            },
+            {
+                "vocabulary_id": null,
+                "display_name": "party",
+                "name": "party",
+                "revision_timestamp": "2017-07-06T12:00:24.135232",
+                "state": "active",
+                "id": "cb3347bd-2803-47e9-add2-61bfa1ee3326"
+            },
+            {
+                "vocabulary_id": null,
+                "display_name": "poll",
+                "name": "poll",
+                "revision_timestamp": "2017-07-06T12:00:24.135232",
+                "state": "active",
+                "id": "2e48f7e0-083f-4aca-b975-9d9ade126415"
+            },
+            {
+                "vocabulary_id": null,
+                "display_name": "voting",
+                "name": "voting",
+                "revision_timestamp": "2017-07-06T12:00:24.135232",
+                "state": "active",
+                "id": "90a794b0-e9e5-4075-83ce-5d1c21407767"
+            }
+        ],
+        "tracking_summary": {
+            "total": 0,
+            "recent": 0
+        },
+        "groups": [],
+        "creator_user_id": "431b5956-7b87-41ba-8fc5-a4a8b681b797",
+        "additional_resources": [
+            {
+                "hash": "",
+                "description": "",
+                "created": "2018-11-12T16:58:16.461015",
+                "url": "https://data.london.gov.uk/dataset/general-election-results-2017",
+                "format": "HTML",
+                "qa": "{'updated': '2018-11-12T18:09:38.579417', 'openness_score': 0, 'archival_timestamp': '2018-11-12T17:20:34.141418', 'format': u'HTML', 'created': '2018-11-12T18:09:38.583315', 'resource_timestamp': None, 'openness_score_reason': u'Content of file appeared to be format \"HTML\" which receives openness score: 0.'}",
+                "tracking_summary": {
+                    "total": 0,
+                    "recent": 0
+                },
+                "archiver": "{'is_broken_printable': 'Downloaded OK', 'updated': '2018-11-12T17:20:34.141418', 'cache_filepath': u'/media/hulk/ckan_resource_cache/6c/6c5ccf58-ffef-48ad-b1ad-471690d1564f/general-election-results-2017', 'last_success': '2018-11-12T17:20:34.141418', 'size': u'97856', 'is_broken': False, 'failure_count': 0, 'etag': None, 'status': 'Archived successfully', 'url_redirected_to': None, 'hash': u'79a690b0ad77140f3ba5c8a3a244e929aebb9115', 'status_id': 0, 'reason': u'', 'last_modified': None, 'resource_timestamp': '2018-11-12T16:58:16.407047', 'mimetype': u'text/html', 'cache_url': u'http://data.gov.uk/data/resource_cache/6c/6c5ccf58-ffef-48ad-b1ad-471690d1564f/general-election-results-2017', 'created': '2018-11-12T17:20:34.148708', 'first_failure': None}",
+                "position": 1,
+                "revision_id": "63d5122d-0cdc-4606-943a-74a89765877b",
+                "id": "6c5ccf58-ffef-48ad-b1ad-471690d1564f",
+                "resource_type": "documentation",
+                "name": "Landing page"
+            }
+        ],
+        "relationships_as_subject": [],
+        "revision_timestamp": "2018-11-12T16:58:16.407047",
+        "organization": {
+            "description": "",
+            "created": "2012-06-27T14:49:02.054509",
+            "title": "Greater London Authority",
+            "name": "greater-london-authority",
+            "revision_timestamp": "2018-02-13T12:16:21.796728",
+            "is_organization": true,
+            "state": "active",
+            "image_url": "",
+            "revision_id": "c63ccb27-7c70-4e38-a7ef-a12034201b9f",
+            "type": "organization",
+            "id": "4fc67187-8f81-4eaa-8820-b18d0cbf1ff6",
+            "approval_status": "pending"
+        },
+        "name": "general-election-results-2017",
+        "isopen": true,
+        "url": "https://data.london.gov.uk/dataset/general-election-results-2017",
+        "notes": "The results for every constituency in the United Kingdom, including Greater London's 73 seats are available to download as an Excel file. The data is also presented as a series of interactive maps below.\n\n[Read the blog](/apps_and_analysis/the-2017-general-election-the-numbers-behind-the-result/) which analyses some of the results.\n\nMore data will be made available once the [Electoral Commission](https://www.electoralcommission.org.uk/our-work/our-research/electoral-data) publish their full results.\n\n<a href='#'><img alt='General Election Results ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Ge&#47;GeneralElections2017&#47;GeneralElectionResults&#47;1_rss.png' style='border: none' /></a>\n\n// <!\\[CDATA\\[ var divElement = document.getElementById('viz1498734193408'); var vizElement = divElement.getElementsByTagName('object')\\[0\\]; vizElement.style.width='754px';vizElement.style.height='1119px'; var scriptElement = document.createElement('script'); scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js'; vizElement.parentNode.insertBefore(scriptElement, vizElement); // \\]\\]>",
+        "owner_org": "4fc67187-8f81-4eaa-8820-b18d0cbf1ff6",
+        "qa": {
+            "openness_score_reason": "Content of file appeared to be format \"XLS\" which receives openness score: 2.",
+            "updated": "2018-11-12T18:09:38.579417",
+            "openness_score": 2
+        },
+        "theme-secondary": [],
+        "extras": [
+            {
+                "package_id": "b77fcedb-4792-4de4-935f-4f344ed4c2c6",
+                "value": "2017-06-29T10:59:40",
+                "revision_timestamp": "2017-07-06T12:00:24.135232",
+                "state": "active",
+                "key": "data_issued",
+                "revision_id": "e52afa06-5f20-4c85-8883-a60d7edf0b94",
+                "id": "0607a55e-5ee8-4b55-8897-1d4f5b4415ea"
+            },
+            {
+                "package_id": "b77fcedb-4792-4de4-935f-4f344ed4c2c6",
+                "value": "2017-06-29T12:57:02",
+                "revision_timestamp": "2017-07-06T12:00:24.135232",
+                "state": "active",
+                "key": "data_modified",
+                "revision_id": "e52afa06-5f20-4c85-8883-a60d7edf0b94",
+                "id": "a5d4178c-6428-437c-a99a-94a8b33b2b46"
+            },
+            {
+                "package_id": "b77fcedb-4792-4de4-935f-4f344ed4c2c6",
+                "value": "Greater London Authority (GLA)",
+                "revision_timestamp": "2017-07-06T12:00:24.135232",
+                "state": "active",
+                "key": "dcat_publisher_name",
+                "revision_id": "e52afa06-5f20-4c85-8883-a60d7edf0b94",
+                "id": "d3c02a50-90b4-447a-9137-3b2a448b4213"
+            },
+            {
+                "package_id": "b77fcedb-4792-4de4-935f-4f344ed4c2c6",
+                "value": "01a398f4-0459-4e6e-beb9-41c4822e3aa3",
+                "revision_timestamp": "2017-07-06T12:00:24.135232",
+                "state": "active",
+                "key": "guid",
+                "revision_id": "e52afa06-5f20-4c85-8883-a60d7edf0b94",
+                "id": "39a1d70f-8560-462a-a055-aef6b4cb2d7b"
+            },
+            {
+                "package_id": "b77fcedb-4792-4de4-935f-4f344ed4c2c6",
+                "value": "94d950f0-9374-4628-8281-56c50e058b44",
+                "revision_timestamp": "2018-11-15T23:54:49.106599",
+                "state": "active",
+                "key": "harvest_object_id",
+                "revision_id": "8c1d5c52-3696-413c-b632-e5341635d7c6",
+                "id": "59d17a2f-08cc-46f1-8aa5-fde0f810f9c6"
+            },
+            {
+                "package_id": "b77fcedb-4792-4de4-935f-4f344ed4c2c6",
+                "value": "harvest",
+                "revision_timestamp": "2017-07-06T12:00:24.135232",
+                "state": "active",
+                "key": "import_source",
+                "revision_id": "e52afa06-5f20-4c85-8883-a60d7edf0b94",
+                "id": "755459eb-c55e-4dd2-af86-f80df920bbbc"
+            },
+            {
+                "package_id": "b77fcedb-4792-4de4-935f-4f344ed4c2c6",
+                "value": "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+                "revision_timestamp": "2017-07-06T12:00:24.135232",
+                "state": "active",
+                "key": "license_url",
+                "revision_id": "e52afa06-5f20-4c85-8883-a60d7edf0b94",
+                "id": "bb6599f4-64dc-41b5-a7c2-6b4ccdc27240"
+            },
+            {
+                "package_id": "b77fcedb-4792-4de4-935f-4f344ed4c2c6",
+                "value": "[{\"harvest_source_url\": \"https://data.london.gov.uk/data.json?slug=gla\", \"harvest_source_type\": \"data_json\", \"harvested_metadata_modified\": null, \"harvest_source_title\": \"London Datastore - GLA\", \"activity_occurred\": \"2018-11-15T23:54:49.056782\", \"activity\": \"harvest\", \"harvested_guid\": \"01a398f4-0459-4e6e-beb9-41c4822e3aa3\"}]",
+                "revision_timestamp": "2018-11-15T23:54:49.106599",
+                "state": "active",
+                "key": "metadata_provenance",
+                "revision_id": "8c1d5c52-3696-413c-b632-e5341635d7c6",
+                "id": "0fec0662-3929-4145-9393-988faf15bbb7"
+            },
+            {
+                "package_id": "b77fcedb-4792-4de4-935f-4f344ed4c2c6",
+                "value": "Government",
+                "revision_timestamp": "2017-07-06T12:00:24.135232",
+                "state": "active",
+                "key": "theme-primary",
+                "revision_id": "e52afa06-5f20-4c85-8883-a60d7edf0b94",
+                "id": "3490bedf-8c83-43e3-8d05-86bb44920fe8"
+            },
+            {
+                "package_id": "b77fcedb-4792-4de4-935f-4f344ed4c2c6",
+                "value": "[]",
+                "revision_timestamp": "2018-11-12T16:58:16.407047",
+                "state": "active",
+                "key": "theme-secondary",
+                "revision_id": "63d5122d-0cdc-4606-943a-74a89765877b",
+                "id": "befee97a-b3c2-4783-b65e-f9bad763a1dd"
+            }
+        ],
+        "license_url": "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+        "individual_resources": [
+            {
+                "hash": "",
+                "description": "",
+                "created": "2017-07-06T13:00:24.322397",
+                "url": "https://files.datapress.com/london/dataset/general-election-results-2017/2017-06-29T11:17:24.85/2017 General Election Results.xls",
+                "format": "XLS",
+                "qa": "{'updated': '2018-11-12T18:09:38.568077', 'openness_score': 2, 'archival_timestamp': '2017-07-06T13:00:31.051484', 'format': u'XLS', 'created': '2017-07-06T13:01:00.390830', 'resource_timestamp': None, 'openness_score_reason': u'Content of file appeared to be format \"XLS\" which receives openness score: 2.'}",
+                "tracking_summary": {
+                    "total": 0,
+                    "recent": 0
+                },
+                "archiver": "{'is_broken_printable': 'Downloaded OK', 'updated': '2017-07-06T13:00:31.051484', 'cache_filepath': u'/media/hulk/ckan_resource_cache/dd/ddbeec53-59f1-4b3b-b8eb-06768e4abba4/2017 General Election Results.xls', 'last_success': '2017-07-06T13:00:31.051484', 'size': u'2939392', 'is_broken': False, 'failure_count': 0, 'etag': u'\"770487a2bb66562be76b7b3f4c9f7f88\"', 'status': 'Archived successfully', 'url_redirected_to': u'https://files.datapress.com/london/dataset/general-election-results-2017/2017-06-29T11:17:24.85/2017%20General%20Election%20Results.xls', 'hash': u'b04b798d4d0db83dd30356cef0f0408ba305850e', 'status_id': 0, 'reason': u'', 'last_modified': u'Thu, 29 Jun 2017 11:17:27 GMT', 'resource_timestamp': '2017-07-06T12:00:24.135232', 'mimetype': u'application/vnd.ms-excel', 'cache_url': u'http://data.gov.uk/data/resource_cache/dd/ddbeec53-59f1-4b3b-b8eb-06768e4abba4/2017 General Election Results.xls', 'created': '2017-07-06T13:00:31.060088', 'first_failure': None}",
+                "position": 0,
+                "revision_id": "e52afa06-5f20-4c85-8883-a60d7edf0b94",
+                "id": "ddbeec53-59f1-4b3b-b8eb-06768e4abba4",
+                "name": "2017 General Election Results.xls"
+            }
+        ],
+        "title": "General Election Results 2017",
+        "revision_id": "63d5122d-0cdc-4606-943a-74a89765877b",
+        "theme-primary": "Government"
+    }
+}

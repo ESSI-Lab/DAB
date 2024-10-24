@@ -1,0 +1,31 @@
+<PolicySet xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 https://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd"
+   PolicySetId="RPS:default:role"
+   Version="1.0"
+   PolicyCombiningAlgId="urn:oasis:names:tc:xacml:3.0:policy-combining-algorithm:permit-overrides">
+
+  <Target>
+
+    <AnyOf>
+      <AllOf>
+        <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:anyURI-equal">
+
+          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#anyURI">roles;default</AttributeValue>
+          <AttributeDesignator
+
+            MustBePresent="false"
+            Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+            AttributeId="urn:oasis:names:tc:xacml:2.0:subject:role"
+            DataType="http://www.w3.org/2001/XMLSchema#anyURI"/>
+
+        </Match>
+      </AllOf>
+    </AnyOf>
+  </Target>
+  
+  <!-- Use permissions associated with the default role -->
+  <PolicySetIdReference>PPS:default:role</PolicySetIdReference>
+
+</PolicySet>

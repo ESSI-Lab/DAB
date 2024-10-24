@@ -1,0 +1,123 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<gmd:MD_Metadata xmlns:gmi="http://www.isotc211.org/2005/gmi"
+	xmlns:ns4="http://quakeml.org/xmlns/bed/1.2" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0"
+	xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gco="http://www.isotc211.org/2005/gco"
+	xmlns:dm="http://floraresearch.eu/sdi/services/7.0/dataModel/schema"
+	xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/4.0"
+	xmlns:rim="urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0" xmlns:gmx="http://www.opengis.net/gmx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gml="http://www.opengis.net/gml"
+	xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/iso/19139/20060504/gmd/gmd.xsd">
+	<gmd:fileIdentifier>
+		<gco:CharacterString>nasagsfcozone_prefix_mins</gco:CharacterString>
+	</gmd:fileIdentifier>
+	<gmd:language>
+		<gco:CharacterString>en</gco:CharacterString>
+	</gmd:language>
+	<gmd:characterSet>
+		<gmd:MD_CharacterSetCode
+			codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode"
+			codeListValue="MD_CharacterSetCode_utf8" codeSpace="ISOTC211/19115">MD_CharacterSetCode_utf8</gmd:MD_CharacterSetCode>
+	</gmd:characterSet>
+	<gmd:parentIdentifier />
+	<gmd:hierarchyLevel>
+		<gmd:MD_ScopeCode codeList="" codeListValue="dataset" />
+	</gmd:hierarchyLevel>
+	<gmd:contact>
+		<gmd:CI_ResponsibleParty xmlns:fn="http://www.w3.org/2005/xpath-functions">
+			<gmd:organisationName xmlns:fn="http://www.w3.org/2005/02/xpath-functions">
+				<gco:CharacterString>National Aeronautics and Space Administration - Goddard Space Flight Center</gco:CharacterString>
+			</gmd:organisationName>
+			<gmd:role xmlns:fn="http://www.w3.org/2005/02/xpath-functions">
+				<gmd:CI_RoleCode
+					codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode"
+					codeListValue="author" />
+			</gmd:role>
+		</gmd:CI_ResponsibleParty>
+	</gmd:contact>
+	<gmd:dateStamp>
+		<gco:Date>2015-10-30</gco:Date>
+	</gmd:dateStamp>
+	<gmd:identificationInfo>
+		<gmd:MD_DataIdentification
+			xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://essi-lab.eu/schemas/mirrors/schemas.opengis.net/csw/2.0.2/profiles/apiso/1.0.0/apiso.xsd">
+
+			<gmd:citation>
+				<gmd:CI_Citation>
+					<gmd:title>
+						<gco:CharacterString>Ozone Minimum - Ozone Hole Watch</gco:CharacterString>
+					</gmd:title>
+					<gmd:date />
+				</gmd:CI_Citation>
+			</gmd:citation>
+			<gmd:abstract>
+				<gco:CharacterString>The minimum ozone is found from total ozone satellite measurements south of 40th degree. No interpolation of missing values is performed. This means that the actual minimum value on a day may be estimated too high, especially in the polar night region.</gco:CharacterString>
+			</gmd:abstract>
+			<gmd:descriptiveKeywords>
+				<gmd:MD_Keywords>
+					<gmd:keyword>
+						<gco:CharacterString>Ozone</gco:CharacterString>
+					</gmd:keyword>
+				</gmd:MD_Keywords>
+			</gmd:descriptiveKeywords>
+			<gmd:spatialRepresentationType>
+				<gmd:MD_SpatialRepresentationTypeCode
+					codeList="" codeListValue="GRID" />
+			</gmd:spatialRepresentationType>
+			<gmd:language />
+			<gmd:extent>
+				<gmd:EX_Extent>
+					<gmd:geographicElement>
+						<gmd:EX_GeographicBoundingBox>
+							<gmd:westBoundLongitude>
+								<gco:Decimal>-180.0</gco:Decimal>
+							</gmd:westBoundLongitude>
+							<gmd:eastBoundLongitude>
+								<gco:Decimal>180.0</gco:Decimal>
+							</gmd:eastBoundLongitude>
+							<gmd:southBoundLatitude>
+								<gco:Decimal>-90.0</gco:Decimal>
+							</gmd:southBoundLatitude>
+							<gmd:northBoundLatitude>
+								<gco:Decimal>-40.0</gco:Decimal>
+							</gmd:northBoundLatitude>
+						</gmd:EX_GeographicBoundingBox>
+					</gmd:geographicElement>
+					<gmd:temporalElement>
+						<gmd:EX_TemporalExtent>
+							<gmd:extent>
+								<gml:TimePeriod gml:id="x32f2e80f-ce34-4f47-9603-91d8c3f112fe1">
+									<gml:beginPosition>1979-01-01T00:00:00Z</gml:beginPosition>
+									<gml:endPosition indeterminatePosition="now"></gml:endPosition>
+								</gml:TimePeriod>
+							</gmd:extent>
+						</gmd:EX_TemporalExtent>
+					</gmd:temporalElement>
+				</gmd:EX_Extent>
+			</gmd:extent>
+		</gmd:MD_DataIdentification>
+	</gmd:identificationInfo>
+    <gmd:distributionInfo>
+        <gmd:MD_Distribution>
+            <gmd:transferOptions>
+                <gmd:MD_DigitalTransferOptions>
+                    <gmd:onLine>
+                        <gmd:CI_OnlineResource>
+                            <gmd:linkage>
+                                <gmd:URL>http://ozonewatch.gsfc.nasa.gov/meteorology</gmd:URL>
+                            </gmd:linkage>
+                            <gmd:protocol>
+                                <gco:CharacterString>urn:nasa:gsfc:ozone</gco:CharacterString>
+                            </gmd:protocol>
+                            <gmd:name>
+                                <gco:CharacterString>nasagsfcozone_prefix_mins</gco:CharacterString>
+                            </gmd:name>                          
+                            <gmd:function>
+                                <gmd:CI_OnLineFunctionCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode" codeListValue="download" codeSpace="">download</gmd:CI_OnLineFunctionCode>
+                            </gmd:function>
+                        </gmd:CI_OnlineResource>
+                    </gmd:onLine>                 
+                </gmd:MD_DigitalTransferOptions>
+            </gmd:transferOptions>
+        </gmd:MD_Distribution>
+    </gmd:distributionInfo>
+</gmd:MD_Metadata>

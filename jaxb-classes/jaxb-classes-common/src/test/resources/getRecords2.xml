@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<csw:GetRecords xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:dcterms="http://purl.org/dc/terms/" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd"
+    xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml" xmlns:gmx="http://www.isotc211.org/2005/gmx" 
+    xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:oai="http://www.openarchives.org/OAI/2.0/" xmlns:ogc="http://www.opengis.net/ogc"
+    xmlns:ows="http://www.opengis.net/ows" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:xlink="http://www.w3.org/1999/xlink" 
+    outputFormat="application/xml" service="CSW" version="2.0.2">
+    <csw:Query typeNames="gmd:MD_Metadata">
+        <csw:ElementName>dc:identifier</csw:ElementName>
+        <csw:Constraint version="1.1.0">
+        	<ogc:And>
+	            <ogc:Filter>
+	                <ogc:BBOX>
+	                    <ogc:PropertyName>ows:BoundingBox</ogc:PropertyName>
+	                    <gml:Envelope>
+	                        <gml:lowerCorner>14.05 46.46</gml:lowerCorner>
+	                        <gml:upperCorner>17.24 48.42</gml:upperCorner>
+	                    </gml:Envelope>
+	                </ogc:BBOX>
+	            </ogc:Filter>
+            </ogc:And>
+        </csw:Constraint>
+    </csw:Query>
+</csw:GetRecords>

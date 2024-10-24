@@ -4,7 +4,7 @@ package eu.essi_lab.iso.datamodel.classes;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -33,6 +33,7 @@ import com.google.common.collect.Lists;
 
 import eu.essi_lab.iso.datamodel.ISOMetadata;
 import eu.essi_lab.jaxb.common.ObjectFactories;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;
 import net.opengis.iso19139.gco.v_20060504.CodeListValueType;
 import net.opengis.iso19139.gco.v_20060504.DatePropertyType;
@@ -216,6 +217,9 @@ public class Identification extends ISOMetadata<AbstractMDIdentificationType> {
     }
 
     public void addKeyword(String keyword) {
+
+	GSLoggerFactory.getLogger(getClass()).warn("Deprecated.. use addKeywords or reimplement, as this method may cause problems");
+	// as it can add keyword to group of keywords from different thesaurii
 
 	List<MDKeywordsPropertyType> descriptiveKeywords = type.getDescriptiveKeywords();
 	MDKeywordsPropertyType mdKeywordsPropertyType = null;

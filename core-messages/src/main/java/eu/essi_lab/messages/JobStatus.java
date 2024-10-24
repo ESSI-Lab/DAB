@@ -4,7 +4,7 @@ package eu.essi_lab.messages;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,6 +22,7 @@ package eu.essi_lab.messages;
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -52,7 +53,18 @@ public abstract class JobStatus {
 	/**
 	 * 
 	 */
+	RESCHEDULED("Rescheduled"),
+
+	/**
+	 * 
+	 */
 	COMPLETED("Completed"),
+
+	/**
+	 * 
+	 */
+	CANCELED("Canceled"),
+
 	/**
 	 * 
 	 */
@@ -124,30 +136,6 @@ public abstract class JobStatus {
     /**
      * @return
      */
-    public List<String> getInfoMessages() {
-
-	return getMessages(MessageType.INFO);
-    }
-
-    /**
-     * @return
-     */
-    public List<String> getErrorMessages() {
-
-	return getMessages(MessageType.ERROR);
-    }
-
-    /**
-     * @return
-     */
-    public List<String> getWarningMessages() {
-
-	return getMessages(MessageType.WARN);
-    }
-
-    /**
-     * @return
-     */
     public List<String> getMessagesList() {
 
 	return getMessagesList(true);
@@ -156,22 +144,55 @@ public abstract class JobStatus {
     /**
      * @return
      */
-    @SuppressWarnings("unchecked")
+    public List<String> getInfoMessages() {
+
+	return getMessagesList(false, MessageType.INFO);
+    }
+
+    /**
+     * @return
+     */
+    public List<String> getErrorMessages() {
+
+	return getMessagesList(false, MessageType.ERROR);
+    }
+
+    /**
+     * @return
+     */
+    public List<String> getWarningMessages() {
+
+	return getMessagesList(false, MessageType.WARN);
+    }
+
+    /**
+     * @return
+     */
     public List<String> getMessagesList(boolean insertMessageType) {
+
+	return getMessagesList(insertMessageType, null);
+    }
+
+    /**
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    private List<String> getMessagesList(boolean insertMessageType, MessageType targetType) {
 
 	List<MessageType> types = new ArrayList<>();
 
-	boolean hasInfo = getObject().has(MessageType.INFO.getType());
+	boolean hasInfo = getObject().has(MessageType.INFO.getType()) && (targetType == null || targetType == MessageType.INFO);
+
 	if (hasInfo) {
 	    types.add(MessageType.INFO);
 	}
 
-	boolean hasWarn = getObject().has(MessageType.WARN.getType());
+	boolean hasWarn = getObject().has(MessageType.WARN.getType()) && (targetType == null || targetType == MessageType.WARN);
 	if (hasWarn) {
 	    types.add(MessageType.WARN);
 	}
 
-	boolean hasError = getObject().has(MessageType.ERROR.getType());
+	boolean hasError = getObject().has(MessageType.ERROR.getType()) && (targetType == null || targetType == MessageType.ERROR);
 	if (hasError) {
 	    types.add(MessageType.ERROR);
 	}
@@ -185,41 +206,26 @@ public abstract class JobStatus {
 	    messages.addAll(jsonArray.//
 		    toList().//
 		    stream().//
+
 		    map(o -> {
 			JSONObject object = new JSONObject((HashMap<String, String>) o);
 
 			switch (type.getType()) {
 			case "errorMessages":
 
-			    if (insertMessageType) {
-				object.put("message", "- Error: " + object.getString("message"));
-			    } else {
-				object.put("message", object.getString("message"));
+			    getMessages(object, "- Error: ", insertMessageType);
 
-			    }
 			    break;
 
 			case "warnMessages":
 
-			    if (insertMessageType) {
-
-				object.put("message", "- Warning: " + object.getString("message"));
-
-			    } else {
-				object.put("message", object.getString("message"));
-			    }
+			    getMessages(object, "- Warning: ", insertMessageType);
 
 			    break;
+
 			case "infoMessages":
 
-			    if (insertMessageType) {
-
-				object.put("message", "- Info: " + object.getString("message"));
-
-			    } else {
-				object.put("message", object.getString("message"));
-
-			    }
+			    getMessages(object, "- Info: ", insertMessageType);
 
 			    break;
 			}
@@ -229,10 +235,60 @@ public abstract class JobStatus {
 		    collect(Collectors.toList()));
 	}
 
-	return messages.stream(). //
+	return messages.//
+		stream(). //
+
 		sorted((o1, o2) -> o1.getString("timeStamp").compareTo(o2.getString("timeStamp"))).//
-		map(o -> o.getString("message")).//
+
+		flatMap(o -> {
+
+		    return o.keySet().stream().//
+
+		    filter(k -> !k.equals("timeStamp")).//
+		    sorted((k1, k2) -> {
+
+			int v1 = Integer.valueOf(k1.equals("message") ? "1" : k1.replace("message ", ""));
+			int v2 = Integer.valueOf(k2.equals("message") ? "1" : k2.replace("message ", ""));
+
+			return Integer.compare(v1, v2);
+		    }).//
+
+		    map(k -> o.get(k).toString());
+		}).//
+
 		collect(Collectors.toList());
+    }
+
+    /**
+     * 
+     */
+    public void clearMessages() {
+
+	Arrays.asList(MessageType.values()).forEach(m -> {
+
+	    if (getObject().has(m.getType())) {
+
+		getObject().remove(m.getType());
+	    }
+	});
+    }
+
+    /**
+     * @param object
+     * @param msgType
+     * @param insertMessageType
+     */
+    private void getMessages(JSONObject object, String msgType, boolean insertMessageType) {
+
+	object.keySet().forEach(k -> {
+	    if (insertMessageType) {
+
+		object.put(k, msgType + object.get(k).toString());
+
+	    } else {
+		object.put(k, object.get(k).toString());
+	    }
+	});
     }
 
     /**
@@ -340,32 +396,6 @@ public abstract class JobStatus {
     }
 
     /**
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    private List<String> getMessages(MessageType msgType) {
-
-	String key = msgType.getType();
-
-	boolean has = getObject().has(key);
-	if (has) {
-
-	    JSONArray jsonArray = getObject().getJSONArray(key);
-
-	    return jsonArray.//
-		    toList().//
-		    stream().//
-		    map(o -> new JSONObject((HashMap<String, String>) o)).//
-		    sorted((o1, o2) -> o1.getString("timeStamp").compareTo(o2.getString("timeStamp"))).//
-		    map(o -> o.getString("message")).//
-		    collect(Collectors.toList());
-
-	}
-
-	return new ArrayList<>();
-    }
-
-    /**
      * @param message
      */
     private void addMessage(String message, MessageType msgType) {
@@ -374,12 +404,27 @@ public abstract class JobStatus {
 	    GSLoggerFactory.getLogger(getClass()).warn("Missing message");
 	    return;
 	}
+	
+	// to avoid SQL error in MySQLConnectionManager.execUpdate
+	// java.sql.SQLSyntaxErrorException: You have an error in your SQL syntax; 
+	// check the manual that corresponds to your MySQL server version for the right syntax to use near '['
+	message = message.replace("'", "");
+	
+	// " are not allowed in JSON
+	message = message.replace("\"", "");
 
 	String key = msgType.getType();
 
+	String timeStamp = ISO8601DateTimeUtils.getISO8601DateTime();
+
 	JSONObject objectMessage = new JSONObject();
-	objectMessage.put("timeStamp", ISO8601DateTimeUtils.getISO8601DateTime());
-	objectMessage.put("message", message);
+
+	objectMessage.put("timeStamp", timeStamp);
+	objectMessage.put("message 1", message);
+
+	//
+	//
+	//
 
 	JSONArray messages = new JSONArray();
 
@@ -388,12 +433,26 @@ public abstract class JobStatus {
 
 	    getObject().put(key, messages);
 
+	    messages.put(objectMessage);
+
 	} else {
 
 	    messages = getObject().getJSONArray(key);
-	}
 
-	messages.put(objectMessage);
+	    for (Object object : messages) {
+
+		JSONObject objMsg = (JSONObject) object;
+		String msgTimeStamp = objMsg.getString("timeStamp");
+
+		if (msgTimeStamp.equals(timeStamp)) {
+
+		    objMsg.put("message " + String.valueOf(objMsg.keySet().size()), message);
+		    return;
+		}
+	    }
+
+	    messages.put(objectMessage);
+	}
     }
 
     /**

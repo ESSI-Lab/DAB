@@ -1,0 +1,788 @@
+@prefix bibo: <http://purl.org/ontology/bibo/#> .
+@prefix cld: <http://purl.org/cld/terms/> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix dcmitype: <http://purl.org/dc/dcmitype/#> .
+@prefix dbo: <http://dbpedia.org/ontology/#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix freq: <http://purl.org/cld/freq/> .
+@prefix locn: <http://www.w3.org/ns/locn#> .
+@prefix org: <http://www.w3.org/ns/org#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <https://schema.org/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix time: <http://www.w3.org/2006/time#> .
+@prefix unit: <http://qudt.org/vocab/unit/#> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix mi: <http://www.marineinfo.org/ns/ontology#> .
+@prefix mibc: <http://marineinfo.org/ns/library/bibcodes#> .
+@prefix mibt: <http://marineinfo.org/ns/library/bibtypes#> . 
+@prefix mir: <http://marineinfo.org/ns/person/roles#> .
+@prefix miprog: <http://marineinfo.org/ns/progress#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ssn: <http://www.w3.org/ns/ssn/> . 
+@prefix sosa: <http://www.w3.org/ns/sosa/> . 
+@prefix geosparql: <http://www.opengis.net/ont/geosparql#> .
+
+@base <https://marineinfo.org/id/dataset/466> .
+
+
+<>
+     a dcat:Dataset, schema:Dataset ;
+    dct:title 'Ecological hyperbenthic data of the Scheldt estuary: historical data (1988-2001)'@en ;
+
+
+
+    dct:abstract 'Data on the ecology of the hyperbenthos community of the Scheldt estuary were derived from research projects on this matter (1988-2001).'@en ;
+    dct:abstract """Data aangaande de ecologie van de hyperbenthosgemeenschap van het Schelde-estuarium werden afgeleid uit onderzoekspojecten over deze materie (1988-2001)."""@nl ;
+
+
+    schema:version '1.0'^^xsd:string ;
+    dct:created '2004-09-16'^^xsd:date ;
+    dct:modified '2021-10-12'^^xsd:date ;
+
+    dct:license <https://spdx.org/licenses/CC-BY-4.0.html> ;
+
+    dc:bibliographicCitation 'Beyst, B.; Fockedey, N.; Hostens, K.; Mees, J.; Marine Biology Research Group - Ugent: Belgium; (2004): Ecological hyperbenthic data of the Scheldt estuary: historical data (1988-2001). Marine Data Archive.'^^xsd:string ;
+
+    rdfs:comment '''1) The sampled Caridea, Anomura, Brachyura were all stages in the development prior to becoming an adult (the adult species of these taxa are not caught with the hyperbenthic sledge and do not belong to the hyperbenthos). The fish species that were sampled were demersal fishes or early development stages (this fraction of demersal fishes is not sampled efficiently with the hyperbenthic sledge). Other taxa were caught as well but not efficiently or weren't considered as belonging to the hyperbenthos (e.g. Polychaeta).
+<p>
+2). This dataset is a collection of historical data that were collected through different research projects. Therefore not all stations (all located in the Westerschelde) were sampled at the same time. This is represented by combining the parameter "Hyperbenthos sampling" to the different dates and the different locations.'''^^xsd:string ;
+
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1988-12-8'^^xsd:date ;
+        dcat:endDate '1988-12-8'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1990-4-20'^^xsd:date ;
+        dcat:endDate '1990-4-20'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1990-5-4'^^xsd:date ;
+        dcat:endDate '1990-5-4'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1990-5-21'^^xsd:date ;
+        dcat:endDate '1990-5-21'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1990-6-20'^^xsd:date ;
+        dcat:endDate '1990-6-20'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1990-7-26'^^xsd:date ;
+        dcat:endDate '1990-7-26'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1990-8-23'^^xsd:date ;
+        dcat:endDate '1990-8-23'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1990-8-7'^^xsd:date ;
+        dcat:endDate '1990-8-7'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1990-9-26'^^xsd:date ;
+        dcat:endDate '1990-9-26'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1990-10-24'^^xsd:date ;
+        dcat:endDate '1990-10-24'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1990-11-27'^^xsd:date ;
+        dcat:endDate '1990-11-27'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1990-12-12'^^xsd:date ;
+        dcat:endDate '1990-12-12'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1990-12-11'^^xsd:date ;
+        dcat:endDate '1990-12-11'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1991-1-8'^^xsd:date ;
+        dcat:endDate '1991-1-8'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1991-1-21'^^xsd:date ;
+        dcat:endDate '1991-1-21'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1991-2-22'^^xsd:date ;
+        dcat:endDate '1991-2-22'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1991-2-5'^^xsd:date ;
+        dcat:endDate '1991-2-5'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1991-3-5'^^xsd:date ;
+        dcat:endDate '1991-3-5'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1991-3-18'^^xsd:date ;
+        dcat:endDate '1991-3-18'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1991-4-24'^^xsd:date ;
+        dcat:endDate '1991-4-24'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1991-4-12'^^xsd:date ;
+        dcat:endDate '1991-4-12'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1991-5-8'^^xsd:date ;
+        dcat:endDate '1991-5-8'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1991-6-26'^^xsd:date ;
+        dcat:endDate '1991-6-26'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1991-6-11'^^xsd:date ;
+        dcat:endDate '1991-6-11'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1991-7-24'^^xsd:date ;
+        dcat:endDate '1991-7-24'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1991-7-9'^^xsd:date ;
+        dcat:endDate '1991-7-9'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1991-8-20'^^xsd:date ;
+        dcat:endDate '1991-8-20'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1991-8-12'^^xsd:date ;
+        dcat:endDate '1991-8-12'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1991-9-18'^^xsd:date ;
+        dcat:endDate '1991-9-19'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1991-10-7'^^xsd:date ;
+        dcat:endDate '1991-10-7'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1991-10-17'^^xsd:date ;
+        dcat:endDate '1991-10-17'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1991-11-18'^^xsd:date ;
+        dcat:endDate '1991-11-18'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1991-11-5'^^xsd:date ;
+        dcat:endDate '1990-11-5'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1991-12-3'^^xsd:date ;
+        dcat:endDate '1991-12-3'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1991-12-16'^^xsd:date ;
+        dcat:endDate '1991-12-16'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1993-5-6'^^xsd:date ;
+        dcat:endDate '1993-5-6'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1994-4-25'^^xsd:date ;
+        dcat:endDate '1994-4-26'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1999-9-1'^^xsd:date ;
+        dcat:endDate '1999-9-2'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '1999-11-25'^^xsd:date ;
+        dcat:endDate '1999-11-26'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '2000-2-16'^^xsd:date ;
+        dcat:endDate '2000-2-17'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+dct:temporal [
+        a dct:PeriodOfTime ;
+        dcat:startDate '2000-5-17'^^xsd:date ;
+        dcat:endDate '2000-5-18'^^xsd:date ;
+
+        mi:progress 'Completed'^^xsd:string ;    ] ;
+
+    dct:spatial [
+        a dct:Location ;         dct:isPartOf <http://www.marineregions.org/mrgid/4800> ; 
+    ];
+    dct:spatial [
+        a dct:Location ;         dct:isPartOf <http://www.marineregions.org/mrgid/14660> ; 
+    ];
+    dct:spatial [
+        a dct:Location ;         dct:isPartOf <http://www.marineregions.org/mrgid/4811> ; 
+    ];
+    dct:spatial [
+        a dct:Location ;         dct:isPartOf <http://www.marineregions.org/mrgid/9106> ; 
+    ];
+    dct:spatial [
+        a dct:Location ;         dct:isPartOf <http://www.marineregions.org/mrgid/4757> ; 
+    ];
+    dct:spatial [
+        a dct:Location ; 
+    ];
+    dct:spatial [
+        a dct:Location ;         dct:isPartOf <http://www.marineregions.org/mrgid/4795> ; 
+    ];
+    dct:spatial [
+        a dct:Location ;         dct:isPartOf <http://www.marineregions.org/mrgid/4810> ; 
+    ];
+    dct:spatial [
+        a dct:Location ;         dct:isPartOf <http://www.marineregions.org/mrgid/4784> ; 
+    ];
+    dct:spatial [
+        a dct:Location ;         dct:isPartOf <http://www.marineregions.org/mrgid/4794> ; 
+    ];
+    dct:spatial [
+        a dct:Location ;         dct:isPartOf <http://www.marineregions.org/mrgid/4759> ; 
+    ];
+    dct:spatial [
+        a dct:Location ;         dct:isPartOf <http://www.marineregions.org/mrgid/4789> ; 
+    ];
+    dct:spatial [
+        a dct:Location ;         dct:isPartOf <http://www.marineregions.org/mrgid/4761> ; 
+    ];
+    dct:spatial [
+        a dct:Location ;         dct:isPartOf <http://www.marineregions.org/mrgid/4803> ; 
+    ];
+    dct:spatial [
+        a dct:Location ;         dct:isPartOf <http://www.marineregions.org/mrgid/9105> ; 
+    ];
+    dct:spatial [
+        a dct:Location ;         dct:isPartOf <http://www.marineregions.org/mrgid/4790> ; 
+    ];
+    dct:spatial [
+        a dct:Location ;         dct:isPartOf <http://www.marineregions.org/mrgid/4812> ; 
+    ];
+    dct:spatial [
+        a dct:Location ;         dct:isPartOf <http://www.marineregions.org/mrgid/2546> ; 
+    ];
+    dct:spatial [
+        a dct:Location ;         dct:isPartOf <http://www.marineregions.org/mrgid/2585> ; 
+    ];
+    dct:spatial [
+        a dct:Location ;         dct:isPartOf <http://www.marineregions.org/mrgid/19358> ; 
+    ];
+    dct:spatial [
+        a dct:Location ;         dct:isPartOf <http://www.marineregions.org/mrgid/9108> ; 
+    ];
+    dct:spatial [
+        a dct:Location ;         dct:isPartOf <http://www.marineregions.org/mrgid/19360> ; 
+    ];
+    dct:spatial [
+        a dct:Location ;         dct:isPartOf <http://www.marineregions.org/mrgid/31339> ; 
+    ];
+    dct:spatial [
+        a dct:Location ;         dcat:bbox """POLYGON((
+            -1.0177229642868 45.046360015869 , 7.2652821540833 45.046360015869 ,
+            7.2652821540833 53.423240661621 , -1.0177229642868 53.423240661621 ,
+            -1.0177229642868 45.046360015869
+        ))"""^^geosparql:wktLiteral; 
+    ];
+
+    dct:isPartOf </id/collection/619> ;
+    dct:isPartOf </id/collection/131> ;
+    dct:isPartOf </id/collection/552> ;
+    dct:isPartOf </id/collection/38> ;
+    dct:isPartOf </id/collection/27> ;
+
+    schema:keywords 'Benthic boundary layer'^^xsd:string ;
+    schema:keywords 'Biological data'^^xsd:string ;
+    schema:keywords 'Ecology'^^xsd:string ;
+    schema:keywords 'Estuaries'^^xsd:string ;
+    schema:keywords 'Hyperbenthos'^^xsd:string ;
+    schema:keywords 'Salinity gradients'^^xsd:string ;
+
+    dcat:theme 'Biology'^^xsd:string ;
+    dcat:theme 'Biology > Ecology - biodiversity'^^xsd:string ;
+    dcat:theme 'Biology > Invertebrates'^^xsd:string ;
+
+    schema:keywords [
+        a schema:DefinedTerm ; 
+        schema:inDefinedTermSet [
+            schema:name "Taxonomic terms"^^xsd:string ; 
+        ] ;        schema:name 'Amphipoda'^^xsd:string ;        schema:identifier <https://www.marinespecies.org/aphia.php?p=taxdetails&id=1135> ;    ];
+    schema:keywords [
+        a schema:DefinedTerm ; 
+        schema:inDefinedTermSet [
+            schema:name "Taxonomic terms"^^xsd:string ; 
+        ] ;        schema:name 'Anomura'^^xsd:string ;        schema:identifier <https://www.marinespecies.org/aphia.php?p=taxdetails&id=106671> ;    ];
+    schema:keywords [
+        a schema:DefinedTerm ; 
+        schema:inDefinedTermSet [
+            schema:name "Taxonomic terms"^^xsd:string ; 
+        ] ;        schema:name 'Brachyura'^^xsd:string ;        schema:identifier <https://www.marinespecies.org/aphia.php?p=taxdetails&id=106673> ;    ];
+    schema:keywords [
+        a schema:DefinedTerm ; 
+        schema:inDefinedTermSet [
+            schema:name "Taxonomic terms"^^xsd:string ; 
+        ] ;        schema:name 'Caridea'^^xsd:string ;        schema:identifier <https://www.marinespecies.org/aphia.php?p=taxdetails&id=106674> ;    ];
+    schema:keywords [
+        a schema:DefinedTerm ; 
+        schema:inDefinedTermSet [
+            schema:name "Taxonomic terms"^^xsd:string ; 
+        ] ;        schema:name 'Copepoda'^^xsd:string ;        schema:identifier <https://www.marinespecies.org/aphia.php?p=taxdetails&id=1080> ;    ];
+    schema:keywords [
+        a schema:DefinedTerm ; 
+        schema:inDefinedTermSet [
+            schema:name "Taxonomic terms"^^xsd:string ; 
+        ] ;        schema:name 'Cumacea'^^xsd:string ;        schema:identifier <https://www.marinespecies.org/aphia.php?p=taxdetails&id=1137> ;    ];
+    schema:keywords [
+        a schema:DefinedTerm ; 
+        schema:inDefinedTermSet [
+            schema:name "Taxonomic terms"^^xsd:string ; 
+        ] ;        schema:name 'Euphausiacea'^^xsd:string ;        schema:identifier <https://www.marinespecies.org/aphia.php?p=taxdetails&id=1128> ;    ];
+    schema:keywords [
+        a schema:DefinedTerm ; 
+        schema:inDefinedTermSet [
+            schema:name "Taxonomic terms"^^xsd:string ; 
+        ] ;        schema:name 'Isopoda'^^xsd:string ;        schema:identifier <https://www.marinespecies.org/aphia.php?p=taxdetails&id=1131> ;    ];
+    schema:keywords [
+        a schema:DefinedTerm ; 
+        schema:inDefinedTermSet [
+            schema:name "Taxonomic terms"^^xsd:string ; 
+        ] ;        schema:name 'Mysidacea'^^xsd:string ;        schema:identifier <https://www.marinespecies.org/aphia.php?p=taxdetails&id=149668> ;    ];
+    schema:keywords [
+        a schema:DefinedTerm ; 
+        schema:inDefinedTermSet [
+            schema:name "Taxonomic terms"^^xsd:string ; 
+        ] ;        schema:name 'Pisces'^^xsd:string ;        schema:identifier <https://www.marinespecies.org/aphia.php?p=taxdetails&id=11676> ;    ];
+    schema:keywords [
+        a schema:DefinedTerm ; 
+        schema:inDefinedTermSet [
+            schema:name "Taxonomic terms"^^xsd:string ; 
+        ] ;        schema:name 'Pycnogonida'^^xsd:string ;        schema:identifier <https://www.marinespecies.org/aphia.php?p=taxdetails&id=1302> ;    ];
+
+    schema:variableMeasured    [
+            a schema:PropertyValue ;            schema:name 'Hyperbenthic species'^^xsd:string ;        ] ;    schema:variableMeasured    [
+            a schema:PropertyValue ;            schema:name 'Hyperbenthos biomass'^^xsd:string ;        ] ;    schema:variableMeasured    [
+            a schema:PropertyValue ;            schema:name 'Hyperbenthos density'^^xsd:string ;        ] ;    schema:variableMeasured    [
+            a schema:PropertyValue ;            schema:name 'Hyperbenthos sampling'^^xsd:string ;        ] ;    schema:variableMeasured    [
+            a schema:PropertyValue ;            schema:name 'Mysidacea brood size'^^xsd:string ;        ] ;    schema:variableMeasured    [
+            a schema:PropertyValue ;            schema:name 'Mysidacea length'^^xsd:string ;        ] ;    schema:variableMeasured    [
+            a schema:PropertyValue ;            schema:name 'Mysidacea sexing'^^xsd:string ;        ] ;    schema:variableMeasured    [
+            a schema:PropertyValue ;            schema:name 'Physicochemical environmental variables'^^xsd:string ;        ] ;    schema:variableMeasured    [
+            a schema:PropertyValue ;            schema:name 'Physicochemical environmental variables'^^xsd:string ;        ] ;    schema:variableMeasured    [
+            a schema:PropertyValue ;            schema:name 'Physicochemical environmental variables'^^xsd:string ;        ] ;    schema:variableMeasured    [
+            a schema:PropertyValue ;            schema:name 'Size of hyperbenthos'^^xsd:string ;        ] ;    schema:variableMeasured    [
+            a schema:PropertyValue ;            schema:name 'Stage hyperbenthic species'^^xsd:string ;        ] ;    prov:wasGeneratedBy [
+        a prov:Activity, sosa:Observation ; 
+        
+        sosa:observedProperty [
+            a sosa:ObservableProperty ;            dct:title 'Hyperbenthic species'^^xsd:string ;        ] ; 
+
+        sosa:hasFeatureOfInterest            ""^^xsd:string ;    ] ;    prov:wasGeneratedBy [
+        a prov:Activity, sosa:Observation ; 
+        
+        sosa:observedProperty [
+            a sosa:ObservableProperty ;            dct:title 'Hyperbenthos biomass'^^xsd:string ;        ] ; 
+
+        sosa:hasFeatureOfInterest            ""^^xsd:string ;    ] ;    prov:wasGeneratedBy [
+        a prov:Activity, sosa:Observation ; 
+        
+        sosa:observedProperty [
+            a sosa:ObservableProperty ;            dct:title 'Hyperbenthos density'^^xsd:string ;        ] ; 
+
+        sosa:hasFeatureOfInterest            ""^^xsd:string ;    ] ;    prov:wasGeneratedBy [
+        a prov:Activity, sosa:Observation ; 
+        
+        sosa:observedProperty [
+            a sosa:ObservableProperty ;            dct:title 'Hyperbenthos sampling'^^xsd:string ;        ] ; 
+
+        sosa:hasFeatureOfInterest            ""^^xsd:string ;    ] ;    prov:wasGeneratedBy [
+        a prov:Activity, sosa:Observation ; 
+        
+        sosa:observedProperty [
+            a sosa:ObservableProperty ;            dct:title 'Mysidacea brood size'^^xsd:string ;        ] ; 
+
+        sosa:hasFeatureOfInterest            ""^^xsd:string ;    ] ;    prov:wasGeneratedBy [
+        a prov:Activity, sosa:Observation ; 
+        
+        sosa:observedProperty [
+            a sosa:ObservableProperty ;            dct:title 'Mysidacea length'^^xsd:string ;        ] ; 
+
+        sosa:hasFeatureOfInterest            ""^^xsd:string ;    ] ;    prov:wasGeneratedBy [
+        a prov:Activity, sosa:Observation ; 
+        
+        sosa:observedProperty [
+            a sosa:ObservableProperty ;            dct:title 'Mysidacea sexing'^^xsd:string ;        ] ; 
+
+        sosa:hasFeatureOfInterest            ""^^xsd:string ;    ] ;    prov:wasGeneratedBy [
+        a prov:Activity, sosa:Observation ; 
+        
+        sosa:observedProperty [
+            a sosa:ObservableProperty ;            dct:title 'Physicochemical environmental variables'^^xsd:string ;        ] ; 
+
+        sosa:hasFeatureOfInterest            ""^^xsd:string ;    ] ;    prov:wasGeneratedBy [
+        a prov:Activity, sosa:Observation ; 
+        
+        sosa:observedProperty [
+            a sosa:ObservableProperty ;            dct:title 'Physicochemical environmental variables'^^xsd:string ;        ] ; 
+
+        sosa:hasFeatureOfInterest            ""^^xsd:string ;    ] ;    prov:wasGeneratedBy [
+        a prov:Activity, sosa:Observation ; 
+        
+        sosa:observedProperty [
+            a sosa:ObservableProperty ;            dct:title 'Physicochemical environmental variables'^^xsd:string ;        ] ; 
+
+        sosa:hasFeatureOfInterest            ""^^xsd:string ;    ] ;    prov:wasGeneratedBy [
+        a prov:Activity, sosa:Observation ; 
+        
+        sosa:observedProperty [
+            a sosa:ObservableProperty ;            dct:title 'Size of hyperbenthos'^^xsd:string ;        ] ; 
+
+        sosa:hasFeatureOfInterest            ""^^xsd:string ;    ] ;    prov:wasGeneratedBy [
+        a prov:Activity, sosa:Observation ; 
+        
+        sosa:observedProperty [
+            a sosa:ObservableProperty ;            dct:title 'Stage hyperbenthic species'^^xsd:string ;        ] ; 
+
+        sosa:hasFeatureOfInterest            ""^^xsd:string ;    ] ;
+    
+    dcat:distribution [
+        a dcat:Distribution ; 
+        dcat:accessURL <https://www.emodnet-biology.eu/portal/index.php?dasid=466> ;
+        dct:type 'Online dataset'^^xsd:string ;
+    ] ;
+    dcat:distribution [
+        a dcat:Distribution ; 
+        dcat:accessURL <https://www.eurobis.org/toolbox/en/download/occurrence/dataset/466> ;
+        dct:type 'Online dataset'^^xsd:string ;
+    ] ;
+    dcat:distribution [
+        a dcat:Distribution ; 
+        dcat:accessURL <mda.vliz.be/mda/directlink.php?fid=VLIZ_00000105_1386082289> ;
+        dct:type 'Archived file'^^xsd:string ;
+    ] ;
+    dcat:distribution [
+        a dcat:Distribution ; 
+        dcat:accessURL <mda.vliz.be/mda/directlink.php?fid=VLIZ_00000321_1359103915> ;
+        dct:type 'Archived file'^^xsd:string ;
+    ] ;
+    dcat:distribution [
+        a dcat:Distribution ; 
+        dcat:accessURL <mda.vliz.be/mda/directlink.php?fid=VLIZ_00000321_1359103926> ;
+        dct:type 'Archived file'^^xsd:string ;
+    ] ;
+    dcat:distribution [
+        a dcat:Distribution ; 
+        dcat:accessURL <mda.vliz.be/mda/directlink.php?fid=VLIZ_00000321_1359104157> ;
+        dct:type 'Archived file'^^xsd:string ;
+    ] ;
+    dcat:distribution [
+        a dcat:Distribution ; 
+        dcat:accessURL <mda.vliz.be/mda/directlink.php?fid=VLIZ_00000321_1359104165> ;
+        dct:type 'Archived file'^^xsd:string ;
+    ] ;
+    dcat:distribution [
+        a dcat:Distribution ; 
+        dcat:accessURL <mda.vliz.be/mda/directlink.php?fid=VLIZ_00000321_1359104544> ;
+        dct:type 'Archived file'^^xsd:string ;
+    ] ;
+    dcat:distribution [
+        a dcat:Distribution ; 
+        dcat:accessURL <mda.vliz.be/mda/directlink.php?fid=VLIZ_00000321_1359104790> ;
+        dct:type 'Archived file'^^xsd:string ;
+    ] ;
+    dcat:distribution [
+        a dcat:Distribution ; 
+        dcat:accessURL <mda.vliz.be/mda/directlink.php?fid=VLIZ_00000321_1359110313> ;
+        dct:type 'Archived file'^^xsd:string ;
+    ] ;
+    dcat:distribution [
+        a dcat:Distribution ; 
+        dcat:accessURL <mda.vliz.be/mda/directlink.php?fid=VLIZ_00000321_1359110392> ;
+        dct:type 'Archived file'^^xsd:string ;
+    ] ;
+    dcat:distribution [
+        a dcat:Distribution ; 
+        dcat:accessURL <mda.vliz.be/mda/directlink.php?fid=VLIZ_00000321_1359110433> ;
+        dct:type 'Archived file'^^xsd:string ;
+    ] ;
+    dcat:distribution [
+        a dcat:Distribution ; 
+        dcat:accessURL <mda.vliz.be/mda/directlink.php?fid=VLIZ_00000321_1359112457> ;
+        dct:type 'Archived file'^^xsd:string ;
+    ] ;
+    dcat:distribution [
+        a dcat:Distribution ; 
+        dcat:accessURL <mda.vliz.be/mda/directlink.php?fid=VLIZ_00000321_1359112464> ;
+        dct:type 'Archived file'^^xsd:string ;
+    ] ;
+    dcat:distribution [
+        a dcat:Distribution ; 
+        dcat:accessURL <mda.vliz.be/mda/directlink.php?fid=VLIZ_00000321_1359112474> ;
+        dct:type 'Archived file'^^xsd:string ;
+    ] ;
+    dcat:distribution [
+        a dcat:Distribution ; 
+        dcat:accessURL <mda.vliz.be/mda/directlink.php?fid=VLIZ_00000321_1359112564> ;
+        dct:type 'Archived file'^^xsd:string ;
+    ] ;
+    dcat:distribution [
+        a dcat:Distribution ; 
+        dcat:accessURL <mda.vliz.be/mda/directlink.php?fid=VLIZ_00000321_1369644501> ;
+        dct:type 'Archived file'^^xsd:string ;
+    ] ;
+    dcat:distribution [
+        a dcat:Distribution ; 
+        dcat:accessURL <https://obis.org/dataset/7176d725-4046-4faa-8647-94ecf4dd8304> ;
+        dct:type 'Online dataset'^^xsd:string ;
+    ] ;
+    dcat:distribution [
+        a dcat:Distribution ; 
+        dcat:accessURL <www.vliz.be/vmdcdata/imers/?results&Das[]=466> ;
+        dct:type 'Online dataset'^^xsd:string ;
+    ] ;
+
+
+    dct:contributor </id/person/315> ;
+    dct:contributor </id/institute/13> ;
+    dct:contributor </id/person/218> ;
+    dct:contributor </id/institute/13> ;
+    dct:contributor </id/person/315> ;
+    dct:contributor </id/institute/13> ;
+    dct:contributor </id/person/48> ;
+    dct:contributor </id/institute/13> ;
+    dct:contributor </id/person/226> ;
+    dct:contributor </id/institute/13> ;
+    dcat:contactPoint </id/person/315> ;
+    dcat:contactPoint </id/institute/13> ;
+    dct:creator </id/person/218> ;
+    dct:creator </id/institute/13> ;
+    dct:creator </id/person/315> ;
+    dct:creator </id/institute/13> ;
+    dct:creator </id/person/226> ;
+    dct:creator </id/institute/13> ;
+    dct:creator </id/person/48> ;
+    dct:creator </id/institute/13> ;
+    dct:creator </id/institute/13> ;
+
+    dct:relation [
+        a dcat:Relationship ; 
+        dct:identifier </id/publication/10787> ;
+        dct:type 'Used in this dataset'^^xsd:string ;
+    ] ;
+    dct:relation [
+        a dcat:Relationship ; 
+        dct:identifier </id/publication/3979> ;
+        dct:type 'Used in this dataset'^^xsd:string ;
+    ] ;
+    dct:relation [
+        a dcat:Relationship ; 
+        dct:identifier </id/publication/12578> ;
+        dct:type 'Used in this dataset'^^xsd:string ;
+    ] ;
+    dct:relation [
+        a dcat:Relationship ; 
+        dct:identifier </id/publication/7470> ;
+        dct:type 'Used in this dataset'^^xsd:string ;
+    ] ;
+    dct:relation [
+        a dcat:Relationship ; 
+        dct:identifier </id/publication/100652> ;
+        dct:type 'Used in this dataset'^^xsd:string ;
+    ] ;
+    dct:relation [
+        a dcat:Relationship ; 
+        dct:identifier </id/publication/5966> ;
+        dct:type 'Used in this dataset'^^xsd:string ;
+    ] ;
+    dct:relation [
+        a dcat:Relationship ; 
+        dct:identifier </id/publication/20276> ;
+        dct:type 'Used in this dataset'^^xsd:string ;
+    ] ;
+    dct:relation [
+        a dcat:Relationship ; 
+        dct:identifier </id/publication/2671> ;
+        dct:type 'Used in this dataset'^^xsd:string ;
+    ] ;
+    dct:relation [
+        a dcat:Relationship ; 
+        dct:identifier </id/publication/2723> ;
+        dct:type 'Used in this dataset'^^xsd:string ;
+    ] ;
+    dct:relation [
+        a dcat:Relationship ; 
+        dct:identifier </id/publication/14835> ;
+        dct:type 'Used in this dataset'^^xsd:string ;
+    ] ;
+    dct:relation [
+        a dcat:Relationship ; 
+        dct:identifier </id/publication/12911> ;
+        dct:type 'Used in this dataset'^^xsd:string ;
+    ] ;
+    dct:relation [
+        a dcat:Relationship ; 
+        dct:identifier </id/publication/5821> ;
+        dct:type 'Used in this dataset'^^xsd:string ;
+    ] ;
+    dct:relation [
+        a dcat:Relationship ; 
+        dct:identifier </id/publication/12884> ;
+        dct:type 'Used in this dataset'^^xsd:string ;
+    ] ;
+    dct:relation [
+        a dcat:Relationship ; 
+        dct:identifier </id/publication/2741> ;
+        dct:type 'Used in this dataset'^^xsd:string ;
+    ] ;
+    dct:relation [
+        a dcat:Relationship ; 
+        dct:identifier </id/publication/12943> ;
+        dct:type 'Used in this dataset'^^xsd:string ;
+    ] ;
+    dct:relation [
+        a dcat:Relationship ; 
+        dct:identifier </id/publication/12924> ;
+        dct:type 'Used in this dataset'^^xsd:string ;
+    ] ;
+    dct:relation [
+        a dcat:Relationship ; 
+        dct:identifier </id/publication/12873> ;
+        dct:type 'Used in this dataset'^^xsd:string ;
+    ] ;
+
+    prov:wasGeneratedBy </id/project/564> ;
+    prov:wasGeneratedBy </id/project/983> ;
+    prov:wasGeneratedBy </id/project/1492> ;
+
+    dct:isPartOf <464> ;
+
+    dct:hasPart <4602> ;
+
+    mi:partiallyIncludedIn <46> ;
+
+    dct:relation <910> ;
+    mi:partiallyIncludedIn <754> ;
+
+.
+
+    </id/collection/619>
+    dct:type dcmitype:Collection ;
+    dct:title 'available through EurOBIS'^^xsd:string ;
+    dct:identifier '619'^^xsd:string ;
+    .
+    </id/collection/131>
+    dct:type dcmitype:Collection ;
+    dct:title 'Belgian marine datasets'^^xsd:string ;
+    dct:identifier '131'^^xsd:string ;
+    .
+    </id/collection/552>
+    dct:type dcmitype:Collection ;
+    dct:title 'EMODNET'^^xsd:string ;
+    dct:identifier '552'^^xsd:string ;
+    .
+    </id/collection/38>
+    dct:type dcmitype:Collection ;
+    dct:title 'Marine Biodiversity and Ecosystem Functioning'^^xsd:string ;
+    dct:identifier '38'^^xsd:string ;
+    .
+    </id/collection/27>
+    dct:type dcmitype:Collection ;
+    dct:title 'ScheldeMonitor'^^xsd:string ;
+    dct:identifier '27'^^xsd:string ;
+    .
+
+
+    <1510>
+    dcat:record <466> .
+    <1428>
+    dcat:record <466> .

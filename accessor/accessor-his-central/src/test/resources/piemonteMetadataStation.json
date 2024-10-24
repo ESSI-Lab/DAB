@@ -1,0 +1,27 @@
+{
+    "dataset-info": {
+      "url": "https://utility.arpa.piemonte.it/meteoidro/stazione_nivologica/PIE-001019-900-1987-09-26/",
+      "codice_istat_comune": "001019",
+      "progr_punto_com": 900,
+      "codice_stazione": "004 ",
+      "denominazione": "RIFUGIO GASTALDI",
+      "indirizzo_localita": "RIFUGIO GASTALDI",
+      "nazione": "ITALIA",
+      "longitudine_e_wgs84_d": 7.14333,
+      "latitudine_n_wgs84_d": 45.29806,
+      "quota_stazione": 2659,
+      "note": "null ",
+      "tipo_staz": "NPRTV",
+      "settore_alpino": "Alpi Graie di confine",
+      "campo_neve": "N",
+      "anno_automatica": null,
+      "anno_manuale": null,
+      "data_inizio": "1987-09-26",
+      "data_fine": null,
+      "sigla_prov": "TO",
+      "comune": "Balme",
+      "fk_id_punto_misura_nivo": "https://utility.arpa.piemonte.it/meteoidro/punti_misura_nivo/PIE-001019-900/"
+    },
+    "var-name": "HS",
+    "var-type":  "fk_id_punto_misura_nivo"
+}

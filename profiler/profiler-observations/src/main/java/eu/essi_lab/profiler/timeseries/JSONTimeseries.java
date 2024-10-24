@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.timeseries;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -34,17 +34,19 @@ import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 public class JSONTimeseries {
 
     JSONObject timeseries = new JSONObject();
-    // JSONObject metadata = new JSONObject();
+    JSONObject metadata = new JSONObject();
     JSONObject defaultPointMetadata = new JSONObject();
     JSONArray points = new JSONArray();
+    JSONArray parameters = new JSONArray();
 
     public JSONTimeseries() {
-	timeseries.put("type", "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_DiscreteTimeSeriesObservation");
+	timeseries.put("type", "TimeSeriesObservation");
 	JSONObject result = new JSONObject();
-	// result.put("metadata", metadata);
+	result.put("metadata", metadata);
 	result.put("defaultPointMetadata", defaultPointMetadata);
 	result.put("points", points);
 	timeseries.put("result", result);
+	timeseries.put("parameter", parameters);
     }
 
     // OBSERVATION
@@ -64,6 +66,13 @@ public class JSONTimeseries {
 	observedProperty.put("href", href);
 	observedProperty.put("title", title);
 	timeseries.put("observedProperty", observedProperty);
+    }
+
+    public String getId() {
+	if (timeseries.has("id")) {
+	    return timeseries.getString("id");
+	}
+	return null;
     }
 
     public String getObservedPropertyTitle() {
@@ -94,7 +103,7 @@ public class JSONTimeseries {
 
 	timeseries.put("featureOfInterest", platform.getJSONObject());
     }
-    
+
     public JSONMonitoringPoint getFeatureOfInterest() {
 	if (timeseries.has("featureOfInterest")) {
 	    JSONObject foi = timeseries.getJSONObject("featureOfInterest");
@@ -109,6 +118,10 @@ public class JSONTimeseries {
     }
 
     // METADATA
+
+    public void setIntendedObservationSpacing(Duration period) {
+	metadata.put("intendedObservationSpacing", period.toString());
+    }
 
     // DEFAULT POINT METADATA
     public void setInterpolationType(String href, String title) {
@@ -146,6 +159,14 @@ public class JSONTimeseries {
     // UTILS
     public JSONObject getJSONObject() {
 	return timeseries;
+    }
+
+    public void addParameter(String name, String value) {
+	JSONObject parameter = new JSONObject();
+	parameter.put("name", name);
+	parameter.put("value", value);
+	parameters.put(parameter);
+
     }
 
 }

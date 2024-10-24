@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gs.setting.database;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,6 +22,8 @@ package eu.essi_lab.cfga.gs.setting.database;
  */
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.json.JSONObject;
@@ -29,6 +31,7 @@ import org.json.JSONObject;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
+import eu.essi_lab.cfga.gs.setting.TabIndex;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
@@ -190,8 +193,6 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
      */
     public static class SourceStorageSettingComponentInfo extends ComponentInfo {
 
-	public static int tabIndex = 10;
-
 	/**
 	 * 
 	 */
@@ -200,7 +201,7 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
 	    setComponentName(SystemSetting.class.getName());
 
 	    TabInfo tabInfo = TabInfoBuilder.get().//
-		    withIndex(tabIndex).//
+		    withIndex(TabIndex.SOURCE_STORAGE_SETTING.getIndex()).//
 		    withShowDirective("Source storage").//
 		    build();
 
@@ -241,6 +242,14 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
     }
 
     /**
+     * @param sourceIdentifiers
+     */
+    public void removeMarkDeleted(String... sourceIdentifiers) {
+
+	removeIdentifier(MARK_DELETED_RECORDS_KEY, sourceIdentifiers);
+    }
+
+    /**
      * @return
      */
     public Boolean isISOComplianceTestSet(String sourceIdentifier) {
@@ -254,6 +263,14 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
     public void setTestISOCompliance(String... sourceIdentifiers) {
 
 	addIdentifier(TEST_ISO_COMPLIANCE_KEY, sourceIdentifiers);
+    }
+
+    /**
+     * @param sourceIdentifiers
+     */
+    public void removeTestISOCompliance(String... sourceIdentifiers) {
+
+	removeIdentifier(TEST_ISO_COMPLIANCE_KEY, sourceIdentifiers);
     }
 
     /**
@@ -273,12 +290,28 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
     }
 
     /**
+     * @param sourceIdentifiers
+     */
+    public void removeRecoverResourceTags(String... sourceIdentifiers) {
+
+	removeIdentifier(RECOVER_TAGS_KEY, sourceIdentifiers);
+    }
+
+    /**
      * @return
      */
     public Boolean isSmartStorageDisabledSet(String sourceIdentifier) {
 
 	return test(SMART_STORAGE_KEY, sourceIdentifier);
 
+    }
+
+    /**
+     * @param sourceIdentifiers
+     */
+    public void removeSmartStorageDisabledSet(String... sourceIdentifiers) {
+
+	removeIdentifier(SMART_STORAGE_KEY, sourceIdentifiers);
     }
 
     /**
@@ -300,6 +333,31 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
 	option.setEnabled(true);
 
 	option.setValue(option.getOptionalValue().orElse("") + Arrays.asList(sourceIdentifiers).stream().collect(Collectors.joining("\n")));
+    }
+
+    /**
+     * @param optionKey
+     * @param sourceIdentifiers
+     */
+    private void removeIdentifier(String optionKey, String... sourceIdentifiers) {
+
+	Option<String> option = getOption(optionKey, String.class).get();
+
+	option.setEnabled(true);
+
+	Optional<String> optionalValue = option.getOptionalValue();
+
+	List<String> targetList = Arrays.asList(sourceIdentifiers);
+
+	if (optionalValue.isPresent()) {
+
+	    String newValue = Arrays.asList(optionalValue.get().split("\n")).//
+		    stream().//
+		    filter(id -> !targetList.contains(id)).//
+		    collect(Collectors.joining("\n"));
+
+	    option.setValue(newValue);
+	}
     }
 
     /**

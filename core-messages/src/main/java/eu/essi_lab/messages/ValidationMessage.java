@@ -4,7 +4,7 @@ package eu.essi_lab.messages;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,9 +25,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import com.amazonaws.handlers.AbstractRequestHandler;
 
+import eu.essi_lab.configuration.ExecutionMode;
+import eu.essi_lab.lib.utils.GSLoggerFactory.GSLogger;
+import eu.essi_lab.lib.utils.HostNamePropertyUtils;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.GSProperty;
 import eu.essi_lab.model.RuntimeInfoElement;
@@ -66,11 +70,19 @@ public class ValidationMessage extends GSMessage implements RuntimeInfoProvider 
 
     private static final String VALIDATION_EXCEPTIONS = "VALIDATION_EXCEPTIONS";
     private static final String VALIDATION_RESULT = "VALIDATION_RESULT_NAME";
+    private String responseEncoding;
 
     @Override
     public HashMap<String, List<String>> provideInfo() {
 
 	HashMap<String, List<String>> map = new HashMap<>();
+
+	map.put(RuntimeInfoElement.PROVIDER_NAME.getName(), Arrays.asList(getName()));
+	map.put(RuntimeInfoElement.HOST_NAME.getName(), Arrays.asList(HostNamePropertyUtils.getHostNameProperty()));
+	map.put(RuntimeInfoElement.EXECUTION_MODE.getName(), Arrays.asList(ExecutionMode.get().name()));
+	map.put(RuntimeInfoElement.FREE_MEMORY.getName(), Arrays.asList(String.valueOf(GSLogger.getFreeMemory())));
+	map.put(RuntimeInfoElement.TOTAL_MEMORY.getName(), Arrays.asList(String.valueOf(GSLogger.getTotalMemory())));
+	map.put(RuntimeInfoElement.USED_MEMORY.getName(), Arrays.asList(String.valueOf(GSLogger.getUsedMemory())));
 
 	map.put(RuntimeInfoElement.VALIDATION_MESSAGE_RESULT.getName(), Arrays.asList(getResult().name()));
 
@@ -83,18 +95,41 @@ public class ValidationMessage extends GSMessage implements RuntimeInfoProvider 
 	return map;
     }
 
+    /**
+     * @param encoding
+     */
+    public void setResponseEncoding(String responseEncoding) {
+
+	this.responseEncoding = responseEncoding;
+    }
+
+    /**
+     * @return the responseEncoding
+     */
+    public Optional<String> getResponseEncoding() {
+
+	return Optional.ofNullable(responseEncoding);
+    }
+
+    /**
+     * @param result
+     */
     public void setResult(ValidationResult result) {
 
 	getPayload().add(new GSProperty<ValidationResult>(VALIDATION_RESULT, result));
     }
 
+    /**
+     * @return
+     */
     public ValidationResult getResult() {
 
 	return getPayload().get(VALIDATION_RESULT, ValidationResult.class);
     }
 
-    //
-
+    /**
+     * @param exception
+     */
     public void addException(ValidationException exception) {
 	getExceptions().add(exception);
     }
@@ -109,8 +144,11 @@ public class ValidationMessage extends GSMessage implements RuntimeInfoProvider 
 	return exceptions;
     }
 
-    // convenience methods to use in case of a single exception
-
+    /**
+     * Convenience methods to use in case of a single exception
+     * 
+     * @param error
+     */
     public void setError(String error) {
 	List<ValidationException> exceptions = getExceptions();
 	ValidationException exception;
@@ -123,6 +161,9 @@ public class ValidationMessage extends GSMessage implements RuntimeInfoProvider 
 	exception.setMessage(error);
     }
 
+    /**
+     * @return
+     */
     public String getError() {
 	List<ValidationException> exceptions = getExceptions();
 	if (exceptions.isEmpty()) {
@@ -132,6 +173,9 @@ public class ValidationMessage extends GSMessage implements RuntimeInfoProvider 
 	}
     }
 
+    /**
+     * @param info
+     */
     public void setLocator(String info) {
 	List<ValidationException> exceptions = getExceptions();
 	ValidationException exception;
@@ -144,6 +188,9 @@ public class ValidationMessage extends GSMessage implements RuntimeInfoProvider 
 	exception.setLocator(info);
     }
 
+    /**
+     * @return
+     */
     public String getLocator() {
 	List<ValidationException> exceptions = getExceptions();
 	if (exceptions.isEmpty()) {
@@ -153,6 +200,9 @@ public class ValidationMessage extends GSMessage implements RuntimeInfoProvider 
 	}
     }
 
+    /**
+     * @param error
+     */
     public void setErrorCode(String error) {
 	List<ValidationException> exceptions = getExceptions();
 	ValidationException exception;
@@ -165,6 +215,9 @@ public class ValidationMessage extends GSMessage implements RuntimeInfoProvider 
 	exception.setCode(error);
     }
 
+    /**
+     * @return
+     */
     public String getErrorCode() {
 	List<ValidationException> exceptions = getExceptions();
 	if (exceptions.isEmpty()) {
@@ -189,11 +242,5 @@ public class ValidationMessage extends GSMessage implements RuntimeInfoProvider 
     public String getName() {
 
 	return getClass().getSimpleName();
-    }
-
-    @Override
-    public String getBaseType() {
-
-	return "validation-message";
     }
 }

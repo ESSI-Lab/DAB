@@ -7,7 +7,7 @@
 	<ShortName>SHORT_NAME</ShortName>
 	<LongName>LONG_NAME</LongName>
 	<Description>DESCRIPTION</Description>
-	<Contact>fabrizio.papeschi@cnr.it</Contact>
+	<Contact>test@my-org.com</Contact>
 	<Image height="16" width="16" type="image/x-icon">http://essi-lab.eu/projects/gi-cat-favicon/favicon.ico
 	</Image>
 	
@@ -68,8 +68,7 @@
 	<Query role="example" geo:box="-20,-10,10,20" geo:relation="disjoint" />
 	<Query role="example" time:start="1990-01-01T00:00:00" time:end="2010-01-01T23:39:59" />
 
-	<Developer>fabrizio.papeschi@cnr.it</Developer>
-	<Developer>enrico.boldrini@cnr.it</Developer>
+	<Developer>test@my-org.com</Developer>
 	<SyndicationRight>open</SyndicationRight>
 	<AdultContent>false</AdultContent>
 	<Language>en-us</Language>

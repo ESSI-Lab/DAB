@@ -1,0 +1,119 @@
+{
+	"help": "http://datasets.wri.org/api/3/action/help_show?name=package_search",
+	"success": true,
+	"result": {
+		"cautions": "",
+		"license_title": "Creative Commons Attribution",
+		"maintainer": null,
+		"wri_main_contact_email": "aaron.kressig@wri.org",
+		"wri_update_frequency": "Every 4-6 months",
+		"relationships_as_object": [
+		],
+		"citation": "Global Energy Observatory, Google, KTH Royal Institute of Technology in Stockholm, Enipedia, World Resources Institute. 2018. Global Power Plant Database. Published on Resource Watch and Google Earth Engine; http://resourcewatch.org/  https://earthengine.google.com/ ",
+		"private": false,
+		"maintainer_email": null,
+		"num_tags": 4,
+		"wri_temporal_coverage": "2010-2018",
+		"wri_featured_dataset": "true",
+		"id": "540dcf46-f287-47ac-985d-269b04bea4c6",
+		"metadata_created": "2018-04-06T17:15:10.691960",
+		"wri_topics": "[u'Climate', u'Energy']",
+		"metadata_modified": "2018-08-02T19:13:30.350791",
+		"author": null,
+		"author_email": null,
+		"wri_main_contact": "Aaron Kressig",
+		"state": "active",
+		"version": null,
+		"license_id": "Creative Commons Attribution",
+		"dataset_last_updated": "2018-06-11 00:00:00",
+		"type": "dataset",
+		"resources": [
+			{
+				"mimetype": null,
+				"cache_url": null,
+				"hash": "",
+				"description": "Version 1.1.0 (June 2018)",
+				"name": "Global Power Plant Database",
+				"format": "CSV",
+				"url": "http://datasets.wri.org/dataset/540dcf46-f287-47ac-985d-269b04bea4c6/resource/27c271ef-63c3-49c5-a06a-f21bb7b96371/download/globalpowerplantdatabasev110.zip",
+				"cache_last_updated": null,
+				"package_id": "540dcf46-f287-47ac-985d-269b04bea4c6",
+				"created": "2018-06-11T04:20:56.868782",
+				"state": "active",
+				"mimetype_inner": null,
+				"webstore_last_updated": null,
+				"last_modified": "2018-06-11T04:29:56.580104",
+				"position": 0,
+				"revision_id": "2b707ed7-66c4-4323-bd55-19ff2733910e",
+				"webstore_url": null,
+				"url_type": "upload",
+				"id": "27c271ef-63c3-49c5-a06a-f21bb7b96371",
+				"resource_type": null,
+				"size": null
+			}
+		],
+		"wri_geography": "Global",
+		"num_resources": 1,
+		"tags": [
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "Climate",
+				"id": "3c26a4a3-98fc-49d5-b1fd-8a564fb94105",
+				"name": "Climate"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "Energy",
+				"id": "73c2446f-bff9-4d4b-89fd-97baa64b0084",
+				"name": "Energy"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "Power Plants",
+				"id": "ad2c7188-43da-4161-a55b-e3ca377ef797",
+				"name": "Power Plants"
+			},
+			{
+				"vocabulary_id": null,
+				"state": "active",
+				"display_name": "Power Sector",
+				"id": "b8fe8836-dc31-4939-93d8-7c65371966c2",
+				"name": "Power Sector"
+			}
+		],
+		"wri_projects": "Climate Data and Tools",
+		"groups": [
+		],
+		"creator_user_id": "d97080b2-6499-423c-baf7-8d76f51fa120",
+		"wri_spatial_resolution": "",
+		"relationships_as_subject": [
+		],
+		"organization": {
+			"description": "",
+			"created": "2016-02-11T19:55:06.595480",
+			"title": "World Resources Institute",
+			"name": "world-resources-institute",
+			"is_organization": true,
+			"state": "active",
+			"image_url": "",
+			"revision_id": "86b74132-398b-4385-a55c-db3c2a74cf3c",
+			"type": "organization",
+			"id": "29f3bc52-9695-40b9-9bde-de284f899759",
+			"approval_status": "approved"
+		},
+		"name": "globalpowerplantdatabase",
+		"isopen": false,
+		"url": null,
+		"notes": "The Global Power Plant Database is a comprehensive, open source database of power plants around the world. It centralizes power plant data to make it easier to navigate, compare and draw insights for one\u2019s own analysis. Each power plant is geolocated and entries contain information on plant capacity, generation, ownership, and fuel type. As of June 2018, the database includes around 28,500 power plants from 164 countries. It will be continuously updated as data becomes available. The most recent release of the Global Power Plant Database 1.1 includes the addition of two countries (China and Fiji), over 3,000 power plants, and nearly 1300 gigawatts of power capacity. We highly recommend using  version 1.1, available online as of June 2018.\r\n\r\n\r\nThe methodology for the dataset creation is given in the World Resources Institute publication [\"A Global Database of Power Plants\"](http://www.wri.org/publication/global-power-plant-database)\r\n\r\n\r\n\r\nThe [database can be visualized on Resource Watch](http://goo.gl/XMyMLt) together with hundreds of other datasets.\r\n\r\nThe database is available for immediate download and use through the [WRI Open Data Portal](http://datasets.wri.org/dataset/globalpowerplantdatabase).\r\n\r\nAssociated code for the creation of the dataset can be found on [GitHub](https://github.com/wri/global-power-plant-database). The bleeding-edge version of the database (which may contain substantial differences from the release you are viewing) is available on GitHub as well.\r\n\r\nTo be informed of important database releases in the future, please [sign up for our newsletter](https://goo.gl/ivTvkd).\r\n",
+		"owner_org": "29f3bc52-9695-40b9-9bde-de284f899759",
+		"summary": "A comprehensive, global, open source database of power plants",
+		"license_id_other": "",
+		"is_opendata": "",
+		"title": "Global Power Plant Database",
+		"revision_id": "11dbc5ee-4723-4d27-9f86-fef7aa086ea1",
+		"wri_spatial_extent": ""
+	}
+}

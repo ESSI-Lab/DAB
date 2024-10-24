@@ -4,9 +4,9 @@
     xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
     xsi:schemaLocation="http://java.sun.com/xml/ns/jaxb http://java.sun.com/xml/ns/jaxb/bindingschema_2_0.xsd"
     version="2.0">
-    <jxb:bindings schemaLocation="schemas/wmdr.1.0.rc.6.xsd" node="/xs:schema">
+    <jxb:bindings schemaLocation="schemas/wmdr.1.0.rc.9.xsd" node="/xs:schema">
         <jxb:schemaBindings>
-            <jxb:package name="eu.floraresearch.wigos._1_0.main"/>
+            <jxb:package name="eu.essi_lab.wigos._1_0.main"/>
         </jxb:schemaBindings>
         <jxb:bindings node="//xs:element[@name='description'][../../../../@name='AbstractEnvironmentalMonitoringFacilityType']">
             <jxb:property name="FacilityDescription"/>
@@ -14,22 +14,22 @@
     </jxb:bindings>
         <jxb:bindings schemaLocation="schemas/metce/1.0/metce.xsd" node="/xs:schema">
         <jxb:schemaBindings>
-            <jxb:package name="eu.floraresearch.wigos._1_0.metce"/>
+            <jxb:package name="eu.essi_lab.wigos._1_0.metce"/>
         </jxb:schemaBindings>
     </jxb:bindings>
     <jxb:bindings schemaLocation="schemas/sampling/2.0/samplingFeature.xsd" node="/xs:schema">
         <jxb:schemaBindings>
-            <jxb:package name="eu.floraresearch.wigos._1_0.sampling"/>
+            <jxb:package name="eu.essi_lab.wigos._1_0.sampling"/>
         </jxb:schemaBindings>
     </jxb:bindings>
     <jxb:bindings schemaLocation="schemas/gml/3.3/extdEncRule.xsd" node="/xs:schema">
         <jxb:schemaBindings>
-            <jxb:package name="eu.floraresearch.wigos._1_0.gmlexr"/>
+            <jxb:package name="eu.essi_lab.wigos._1_0.gmlexr"/>
         </jxb:schemaBindings>
     </jxb:bindings>
     <jxb:bindings schemaLocation="schemas/iso/19139/20070417/gmd/gmd.xsd" node="/xs:schema">
         <jxb:schemaBindings>
-            <jxb:package name="eu.floraresearch.wigos._1_0.gmd"/>
+            <jxb:package name="eu.essi_lab.wigos._1_0.gmd"/>
         </jxb:schemaBindings>
     </jxb:bindings>
     <jxb:bindings schemaLocation="schemas/gml/3.2.1/geometryPrimitives.xsd">
@@ -39,7 +39,7 @@
     </jxb:bindings>
     <jxb:bindings schemaLocation="http://www.w3.org/1999/xlink.xsd">
     <jxb:schemaBindings>
-            <jxb:package name="eu.floraresearch.wigos._1_0.xlink"/>
+            <jxb:package name="eu.essi_lab.wigos._1_0.xlink"/>
         </jxb:schemaBindings>
 		<jxb:bindings node="//xs:element[@ref='xlink:title'][../../@name='locatorModel']">
             <jxb:property name="LocatorModelTitle"/>
@@ -50,37 +50,37 @@
     </jxb:bindings>
     <jxb:bindings schemaLocation="schemas/opm/1.0/opm.xsd" node="/xs:schema">
         <jxb:schemaBindings>
-            <jxb:package name="eu.floraresearch.wigos._1_0.opm"/>
+            <jxb:package name="eu.essi_lab.wigos._1_0.opm"/>
         </jxb:schemaBindings>
     </jxb:bindings>
         <jxb:bindings schemaLocation="schemas/om/2.0/observation.xsd" node="/xs:schema">
         <jxb:schemaBindings>
-            <jxb:package name="eu.floraresearch.wigos._1_0.om"/>
+            <jxb:package name="eu.essi_lab.wigos._1_0.om"/>
         </jxb:schemaBindings>
     </jxb:bindings>
             <jxb:bindings schemaLocation="schemas/samplingSpatial/2.0/spatialSamplingFeature.xsd" node="/xs:schema">
         <jxb:schemaBindings>
-            <jxb:package name="eu.floraresearch.wigos._1_0.ssf"/>
+            <jxb:package name="eu.essi_lab.wigos._1_0.ssf"/>
         </jxb:schemaBindings>
     </jxb:bindings>
                 <jxb:bindings schemaLocation="schemas/iso/19139/20070417/gco/gco.xsd" node="/xs:schema">
         <jxb:schemaBindings>
-            <jxb:package name="eu.floraresearch.wigos._1_0.gco"/>
+            <jxb:package name="eu.essi_lab.wigos._1_0.gco"/>
         </jxb:schemaBindings>
     </jxb:bindings>
                  <jxb:bindings schemaLocation="schemas/iso/19139/20070417/gsr/gsr.xsd" node="/xs:schema">
         <jxb:schemaBindings>
-            <jxb:package name="eu.floraresearch.wigos._1_0.gsr"/>
+            <jxb:package name="eu.essi_lab.wigos._1_0.gsr"/>
         </jxb:schemaBindings>
     </jxb:bindings>
                      <jxb:bindings schemaLocation="schemas/iso/19139/20070417/gss/gss.xsd" node="/xs:schema">
         <jxb:schemaBindings>
-            <jxb:package name="eu.floraresearch.wigos._1_0.gss"/>
+            <jxb:package name="eu.essi_lab.wigos._1_0.gss"/>
         </jxb:schemaBindings>
     </jxb:bindings>
                      <jxb:bindings schemaLocation="schemas/iso/19139/20070417/gts/gts.xsd" node="/xs:schema">
         <jxb:schemaBindings>
-            <jxb:package name="eu.floraresearch.wigos._1_0.gts"/>
+            <jxb:package name="eu.essi_lab.wigos._1_0.gts"/>
         </jxb:schemaBindings>
     </jxb:bindings>
     
@@ -92,7 +92,7 @@
     <!-- GML -->
     <jxb:bindings schemaLocation="schemas/gml/3.2.1/gml.xsd" node="/xs:schema">
         <jxb:schemaBindings>
-            <jxb:package name="eu.floraresearch.wigos._1_0.gml._3_2_1"/>
+            <jxb:package name="eu.essi_lab.wigos._1_0.gml._3_2_1"/>
         </jxb:schemaBindings>
     </jxb:bindings>
     <!--jxb:bindings schemaLocation="schemas/gml/3.2.1/gmlBase.xsd">

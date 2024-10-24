@@ -1,0 +1,193 @@
+number,title,type,total_amount
+1,Arctic Data archive System,MIXED,200
+2,Australia Ocean Data Network,MIXED,1567
+3,AtlantOS,MIXED,7316
+4,CAFF/ABDS,OTHER,240
+5,Sustainable Caucasus,OTHER,97
+6,Climate Change Centre Austria (CCCA),OTHER,2409
+7,CCI Open Data Portal,SATELLITE,167
+8,China GEOSS,SATELLITE,2475490
+9,Satellite Altimetry Data (AVISO),SATELLITE,492
+10,Copernicus Atmosphere Monitoring Service (CAMS),MIXED,263
+11,Cyprus Geoportal,OTHER,94
+12,Danube Open Data Portal,OTHER,10210
+13,Digital Globe,SATELLITE,1931
+14,German Aerospace Center,SATELLITE,216
+15,EartH2Observe,OTHER,517
+16,ECOPOTENTIAL Catalogue,OTHER,3177
+17,ECOPotential VLab,OTHER,6
+18,ECOWAS Centre for Renewable Energy and Energy Efficiency,OTHER,94
+19,Environmental Data Portal (EnviDat),OTHER,298
+20,EOMORES,MIXED,1
+21,EURAC Research,MIXED,71713
+22,EURAC SOS,OTHER,27
+23,Eurogeoss Data,OTHER,8
+24,Food and Agriculture Organization (FAO),MIXED,7119
+25,Finnish Open Data,OTHER,1248
+26,UNOSAT,SATELLITE,250
+27,CONUS (WMS),OTHER,2
+28,WMS (at http://gis.csiss.gmu.edu/cgi-bin/mapserv?MAP=/media/gisiv01/Public/Share/Images/WMS/NDVI_2012_065_9827.map&),OTHER,2
+29,Polar Data Catalogue,MIXED,2939
+30,GMU LAITS Web Coverage Server (WCS),OTHER,1
+31,Environmental data on the Mediterranean and Black Sea regions,OTHER,1300
+32,Atmospheric Infrared Sounder (AIRS) NASA WMS,SATELLITE,89
+33,UNEP Environmental Data Explorer (WMS),OTHER,434
+34,VegScape - Vegetation Condition Explorer ( USDA) - 2011,SATELLITE,365
+35,The Geological Survey of Norway,OTHER,9
+36,USA Historical NDVI Layers - 2011,SATELLITE,366
+37,SEDAC CIESIN (WCS),MIXED,236
+38,SWISS Federal Spatial Data Infrastructure,MIXED,1164
+39,Atlas of the Cryosphere: Northern Hemisphere (WCS),MIXED,42
+40,EnviroGrids - Swatinputs (WFS),MIXED,18
+41,ISPRA Italian Environment Protection and Technical Services Agency - Data,OTHER,14252
+42,Ozone Monitoring Instrument - NASA,SATELLITE,10
+43,Environment Canada (WFS),OTHER,14
+44,Soil Moisture and Ocean Salinity (SMOS) Mission - ESA,SATELLITE,550
+45,drought WCS Server (WCS),OTHER,1
+47,GEO SUR,MIXED,17804
+49,Afromaison - UNEP GRID WMS,OTHER,88
+50,MINUSTAH Data - Haiti,OTHER,27
+51,VegScape - Vegetation Condition Explorer ( USDA) - 2012,SATELLITE,360
+52,ISRIC - World Soil Information (WDC-Soils),OTHER,184
+53,EnviroGrids - Scenarios (WCS),MIXED,35
+54,drought WCS Server (WCS at http://gis.csiss.gmu.edu/cgi-bin/mapserv?MAP=/media/gisiv01/mapfiles/drought/16days/2012/drought.2012.065.map&),OTHER,1
+55,CropScape WCS Server (WCS),OTHER,18
+56,VegScape - Vegetation Condition Explorer ( USDA) - 2009,SATELLITE,365
+57,CONUS (WMS at http://gis.csiss.gmu.edu/cgi-bin/mapserv?MAP=/media/gisiv01/mapfiles/drought/16days/2012/drought.2012.065.map&),OTHER,2
+58,Afromaison - UNEP GRID WFS,OTHER,45
+59,Atlas of the Cryosphere: Southern Hemisphere (WMS),MIXED,195
+60,Oak Ridge National Laboratory Distributed Active Archive Center (ORNL DAAC -WCS),MIXED,17528
+61,PREVIEW Global Risk Data Platform - UNEP (WMS),MIXED,106
+62,EnviroGrids - Swatinputs (WCS),MIXED,7
+63,NASA Earth Observations (NEO) WMS (WMS),SATELLITE,178
+64,Tropical Rainfall Measuring Mission (TRMM) Data from NASA,SATELLITE,1
+65,Esri GEOSS Portal,MIXED,27238
+66,UNEP Environmental Data Explorer (WCS),MIXED,2322
+67,Geoscience Data - Northern America,OTHER,10759
+68,EnviroGrids (WMS),MIXED,24
+69,EnviroGrids - Swatinputs (WMS),MIXED,26
+70,Envirogrids metadata catalogue,MIXED,34
+71,Antarctic Cryosphere Access Portal (WCS),MIXED???????,28
+72,SEDAC CIESIN (WMS),MIXED,479
+73,Ricerca Scientifica in Alta Quota -ev k2 cnr,OTHER,61
+74,PREVIEW Global Risk Data Platform - UNEP (WFS),MIXED,42
+75,NCA map solution for speed regulation - Norway,OTHER,35
+76,SatCat - Cataluna,SATELLITE,28
+77,PREVIEW Global Risk Data Platform - UNEP (WCS),MIXED,27
+79,Afromaison - UNEP GRID WCS,OTHER,41
+80,EnviroGrids (WCS),MIXED,9
+81,Alabama geologic map data (USGS),OTHER,13
+82,USA Historical NDVI Layers - 2012,SATELLITE,360
+83,IMERG Precipitation Accumulations (WMS),SATELLITE,10
+84,Great Lakes Metadata Catalog,OTHER,860
+85,OSM Haiti,OTHER,1
+86,Atlas of the Cryosphere: Northern Hemisphere (WMS),MIXED,98
+87,Polar Data / Canada,MIXED,2457
+88,PEGELONLINE,OTHER,7
+89,EvK2 CNR,OTHER,62
+90,SEDAC CIESIN (WFS),MIXED,111
+91,Cropland Data Layer,OTHER,19
+92,Atlas Climatico Digital de la Peninsula Iberica (WMS),OTHER,30
+93,Oak Ridge National Laboratory Distributed Active Archive Center (ORNL DAAC -WMS),MIXED,43316
+94,Atmospheric Infrared Sounder Near-Real Time Data (NASA),SATELLITE,52
+95,Afromaison - UNEP GRID - CSW,OTHER??????,531
+96,United States Geoscience Information Network Metadata Catalog,MIXED??????,48770
+97,Haiti Data store,OTHER,29
+98,EnviroGrids - Scenarios (WFS),MIXED,22
+99,Transboundary Waters Assessment Programme (TWAP),OTHER,317
+100,Atlas of the Cryosphere: Southern Hemisphere (WFS),MIXED,25
+101,EnviroGrids (WFS),MIXED,14
+102,Antarctic Cryosphere Access Portal (WMS),MIXED???????,349
+103,UNEP Environmental Data Explorer (WFS),MIXED???????,70
+104,Atlas of the Cryosphere: Northern Hemisphere (WFS),MIXED,19
+105,VegScape - Vegetation Condition Explorer ( USDA) - 2010,SATELLITE,365
+106,USA Historical NDVI Layers - 2009,SATELLITE,366
+107,Atlas of the Cryosphere: Southern Hemisphere (WCS),MIXED,29
+108,Arctic Research Mapping Application (WMS),OTHER,1
+109,Antarctic Cryosphere Access Portal (WFS),MIXED???????,90
+110,USA Historical NDVI Layers - 2010,SATELLITE,366
+111,geonetwork GRID,MIXED???????,114
+112,Mapserver WMS - kart.kystverket.no,OTHER,35
+113,VITO /Copernicus Global Land Services,SATELLITE,52
+114,Earth observation capacity building catalog,MIXED?????,1007
+115,Global Precipitation Measurement Missions (IMERG NASA),SATELLITE,5
+116,Open Topography,SATELLITE,200
+117,Environment Canada (WMS),OTHER,18
+118,The Land Resource Information Systems Portal - New Zeland,OTHER,237
+119,Alabama geologic map data,OTHER,8
+120,EnviroGrids - Scenarios (WMS),MIXED,58
+121,VCI WCS Server (WCS),MIXED?????,1
+122,MARIS WMS Server - Eyeonwater (WMS),OTHER,8
+123,EnerGEO Geoportal (Geoportal Server 1.2.2) - OGC CSW 2.0.2 ISO API including INSPIRE Network Service Capabilities,MIXED,46
+124,Geoscience Australia,OTHER?????,26615
+125,Geodatenkatalog-DE,MIXED,141551
+126,DEIMS-DIP,OTHER,3069
+127,Global Facility for Disaster Reduction and Recovery (GFDRR),OTHER????,523
+128,GROW Observatory,OTHER,33300
+129,World Bank Development Data Hub (WB-DDH),OTHER,3025
+130,Healthsites,OTHER,231800
+131,HydroShare,OTHER,4517
+132,ICIMOD Regional Database System,SATELLITE,26634
+133,Chile GEO Portal,OTHER?????,11654
+134,Sierra Nevada Global Change Observatory (iEcolab),OTHER,277
+135,IGN GeoPortal,MIXED?????,68
+136,National Institute for Space Research - Brazil (INPE),SATELLITE,289211
+137,Indian Space Research Organisation - ISRO Bhuvan Portal,SATELLITE,278
+138,JAMSTEC,SATELLITE,71
+139,Joint Research Centre Data Catalog,MIXED?????,2678
+140,USGS Landsat 8,SATELLITE,2349348
+141,Copernicus Marine Environment Monitoring Service (CMEMS),MIXED,161
+142,MESA-IGAD Geoportal,OTHER,457
+143,Moldova Geo Portal,OTHER,71
+144,NASA Goddard Space Flight Center (GSFC) Ozone Watch,SATELLITE,6
+145,Trans-African Hydro-Meteorological Observatory (TAHMO),OTHER,7656
+146,Eumetsat Product Navigator,SATELLITE,2940
+147,Ocean Biogeographic Information System,OTHER,57397660
+148,The Humanitarian Data Exchange,OTHER,27851
+149,One Geology,OTHER,824
+150,OpenAerialMap,MIXED?????,10951
+151,Regional Center for Mapping of Resources for Development (RCMRD) GEO PORTAL,MIXED?????,469
+152,Research Data Archive (RDA),MIXED?????,692
+153,Sentinel,SATELLITE,17951643
+154,Swedish Open Data (SMHI),OTHER,163
+155,Thunder FTP Database,OTHER,26024
+156,UK Data.Gov,MIXED?????,21094
+157,UNESCO-IHP Water Information Network System (WINS),MIXED,220
+158,UNESCO IIWQ World Water Quality Portal,MIXED,113
+159,United Nations Office for Outer Space Affairs (UNOOSA) / UN-SPIDER,MIXED,213
+160,United Nations Sustainable Development Goals (UN-SDG),OTHER,152341
+161,US NODC Collections,MIXED,45210
+162,Global River Discharge Datasets (GRDC/GEOWOW),OTHER,18924
+163,NOAA UNIFIED Access Framework Catalog,OTHER?????,14785
+164,US Data Gov,MIXED?????,247302
+165,EGASKRO,OTHER,661
+166,PANGAEA,MIXED?????,395233
+167,Webservice Energy Catalog,MIXED?????,1700
+168,European Environment Agency SDI Catalog,MIXED?????,462
+169,WIS GISC DWD,MIXED?????,1840949
+170,Hydrologic Information System (CUAHSI-HIS),OTHER,2971492
+171,Marine Ecosystem dynamics and Indicators for North Africa (MEDINA),OTHER,158
+172,South African Environmental Observation Network (SAEON),OTHER,14825
+173,Data Integration and Analysis System (DIAS) - Japan,MIXED,282
+174,Federated EO Gateway (FedEO) - CEOS,SATELLITE,82355410
+175,New Zealand Monitoring Network,MIXED,32
+176,IRIS Seismo Archive by Stations,OTHER,637388
+177,IspRA Italian Environment Protection and Technical Services Agency - Monitoring Network,OTHER,9887
+178,World Water Project - Brighman Young University,OTHER,23
+179,Red Vial (Road Network) Chile,OTHER,16
+180,CEOS International Directory Network (IDN),MIXED,6000
+181,New Zealand National Institute for Water and Atmospheric Research (NIWA),MIXED?????,97
+182,CEOS WGISS Integrated Catalog (CWIC),MIXED,280000000
+183,Russian Automated System for Air Quality monitoring Portal,OTHER,151
+184,New Zealand government geodata catalog,MIXED?????,10283
+185,SeaDataNet,OTHER,1300000
+186,Global Mercury Observing system (GMOS) Database,OTHER,816
+187,Water Switch-On,OTHER,815
+188,Smart Toolbox for Engaging Citizens into a People-Centric Observation Web (WFS),MIXED,35
+189,Smart Toolbox for Engaging Citizens into a People-Centric Observation Web (WMS),MIXED,97
+190,WorldPop,MIXED,121
+191,World Resources Institute (WRI),MIXED,125
+192,Copernicus Climate Change Service (C3S),MIXED,98
+192,ArcGIS Online ESRI,SATELLITE,928944
+193,GBIF (Free and Open Access to Biodiversity Data),OTHER,714017532
+194,USGS Earthquake Events,OTHER,2676919

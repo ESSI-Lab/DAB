@@ -1,2 +1,4 @@
 eu.essi_lab.accessor.oaipmh.OAIPMHAccessor
 eu.essi_lab.accessor.oaipmh.OAIPMHConnector
+eu.essi_lab.accessor.oaipmh.whole.WholeOAIPMHAccessor
+eu.essi_lab.accessor.oaipmh.whole.WholeOAIPMHConnector

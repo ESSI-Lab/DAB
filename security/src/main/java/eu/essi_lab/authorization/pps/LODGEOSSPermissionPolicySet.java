@@ -7,7 +7,7 @@ package eu.essi_lab.authorization.pps;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,18 +24,28 @@ package eu.essi_lab.authorization.pps;
  * #L%
  */
 
-import eu.essi_lab.authorization.xacml.XACML_JAXBUtils;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.ApplyType;
-
 /**
+ * Users having the "lod-geoss" role, are allowed to discovery if and only if:<br>
+ * <br>
+ * 1) the view creator is "lod-geoss"<br>
+ *
+ * 2) the discovery path is supported<br>
+ * <br>
+ * Users having this policy role, are allowed to access if and only if:<br>
+ * <br>
+ * 1) the view creator is "lod-geoss"<br>
+ * 
+ * 2) the access path is is supported<br>
+ * <br>
+ * Users having this policy role are also allowed to perform other actions if and only if:<br>
+ * <br>
+ * 1) the view creator is "lod-geoss"<br>
+ *
+ * 2) the discovery path is supported OR the access path is is supported<br>
+ * 
  * @author Fabrizio
  */
-public class LODGEOSSPermissionPolicySet extends AbstractPermissionPolicySet {
-
-    /**
-     * 
-     */
-    private static final String LOD_GEOSS_VIEW_CREATOR = "lod-geoss";
+public class LODGEOSSPermissionPolicySet extends CreatorPermissionPolicySet {
 
     public LODGEOSSPermissionPolicySet() {
 
@@ -43,67 +53,8 @@ public class LODGEOSSPermissionPolicySet extends AbstractPermissionPolicySet {
     }
 
     @Override
-    protected void editPPSPolicy() {
+    protected String getCreator() {
 
-	//
-	// discovery rule for the non LOD-GEOSS creator
-	//
-	{
-	    String ruleId = "Permission:to:discover:not:lod-geoss:creator";
-
-	    setDiscoveryAction(ruleId);
-
-	    setOffsetLimit(ruleId, DEFAULT_OFFSET_LIMIT);
-	    
-	    setMaxRecordsLimit(ruleId, DEFAULT_MAX_RECORDS_LIMIT);
-
-	    ApplyType notLodGEOSSCreatorApply = XACML_JAXBUtils.createNotApply(createViewCreatorApply(LOD_GEOSS_VIEW_CREATOR));
-
-	    setAndCondition(ruleId, createDiscoveryPathApply(), notLodGEOSSCreatorApply);
-	}
-
-	//
-	// discovery rule for the LOD-GEOSS creator
-	//
-	{
-	    String ruleId = "Permission:to:discover:lod-geoss:creator";
-
-	    setDiscoveryAction(ruleId);
-	    
-	    setMaxRecordsLimit(ruleId, DEFAULT_MAX_RECORDS_LIMIT);
-
-	    setAndCondition(ruleId, createDiscoveryPathApply(), createViewCreatorApply(LOD_GEOSS_VIEW_CREATOR));
-	}
-
-	//
-	// access rule for the non LOD-GEOSS creator
-	//
-	{
-	    String ruleId = "Permission:to:access:not:lod-geoss:creator";
-
-	    setAccessAction(ruleId);
-
-	    setOffsetLimit(ruleId, DEFAULT_OFFSET_LIMIT);
-	    
-	    setMaxRecordsLimit(ruleId, DEFAULT_MAX_RECORDS_LIMIT);
-
-	    ApplyType notLodGEOSSCreatorApply = XACML_JAXBUtils.createNotApply(createViewCreatorApply(LOD_GEOSS_VIEW_CREATOR));
-
-	    setAndCondition(ruleId, createAccessPathApply(), notLodGEOSSCreatorApply);
-	}
-
-	//
-	// access rule for the LOD-GEOSS creator
-	//
-	{
-	    String ruleId = "Permission:to:access:lod-geoss:creator";
-
-	    setAccessAction(ruleId);
-	    
-	    setMaxRecordsLimit(ruleId, DEFAULT_MAX_RECORDS_LIMIT);
-
-	    setAndCondition(ruleId, createAccessPathApply(), createViewCreatorApply(LOD_GEOSS_VIEW_CREATOR));
-	}
+	return "lod-geoss";
     }
-
 }

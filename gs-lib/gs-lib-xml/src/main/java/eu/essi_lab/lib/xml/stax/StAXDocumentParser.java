@@ -4,7 +4,7 @@ package eu.essi_lab.lib.xml.stax;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,6 +21,7 @@ package eu.essi_lab.lib.xml.stax;
  * #L%
  */
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -43,11 +44,14 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Characters;
 import javax.xml.stream.events.EndElement;
+import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.IOUtils;
+
+import com.google.common.xml.XmlEscapers;
 
 import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -82,6 +86,8 @@ public class StAXDocumentParser {
 
     private ClonableInputStream stream;
 
+    private boolean addNewLine;
+
     /**
      * @param document
      * @throws XMLStreamException
@@ -105,6 +111,19 @@ public class StAXDocumentParser {
 	parentsMap = new HashMap<>();
 	targetsList = new ArrayList<>();
 	conditionsList = new ArrayList<>();
+    }
+
+    /**
+     * The elements returned from the <code>find</code> methods are not formatted. If set to <code>true</code>,
+     * adds the new line character on the closing tags of the elements found with the
+     * <code>find</code> methods thus allowing further parsing by reading them line by line (for example by means
+     * of the {@link BufferedReader#lines()} method).<br>
+     * 
+     * @param addNewLine
+     */
+    public void addNewLineOnCloseTags(boolean addNewLine) {
+
+	this.addNewLine = addNewLine;
     }
 
     /**
@@ -187,19 +206,20 @@ public class StAXDocumentParser {
 
     /**
      * Defines one or more XML element as <i>parsing targets</i> according to the given <code>condition</code> and
-     * performs <code>action</code> on the current {@link XMLEvent} stack. The {@link XMLEvent} at the top of the stack
+     * performs <code>action</code> on the current {@link XMLEvent} stack.<br>
+     * The {@link XMLEvent} at the top of the stack
      * is the last parsed {@link XMLEvent} while the first is the 'start document' event<br>
      * E.g::<br>
      * <br>
      * Defines as <i>parsing targets</i> all the XML elements having non empty text content, and prints the text
-     * content<br>
+     * content:<br>
      * <br>
      * <code>parser.add( <br>
     	stack -> stack.peek().isCharacters() && !stack.peek().asCharacters().getData().trim().isEmpty(),  <br>
     	stack -> System.out.println("[" + stack.peek().asCharacters().getData().trim() + "]"));</code><br>
      * <br>
      * Defines as <i>parsing targets</i> all the XML elements having at least one attribute, and prints the first
-     * attribute<br>
+     * attribute:<br>
      * <br>
      * <code>parser.add( <br>
     	stack -> stack.peek().isStartElement() && stack.peek().asStartElement().getAttributes().hasNext(), <br>
@@ -262,10 +282,10 @@ public class StAXDocumentParser {
 		    List<Attribute> attributes = getAttributes(stack.peek());
 
 		    Attribute attribute = attributes.//
-		    stream().//
-		    filter(a -> a.getName().getLocalPart().equals(attributeName)).//
-		    findFirst().//
-		    get();
+			    stream().//
+			    filter(a -> a.getName().getLocalPart().equals(attributeName)).//
+			    findFirst().//
+			    get();
 
 		    action.accept(attribute.getValue());
 		});
@@ -299,6 +319,8 @@ public class StAXDocumentParser {
 
 	boolean found = false;
 
+	boolean root = true;
+
 	while (reader.hasNext()) {
 
 	    XMLEvent event = reader.nextEvent();
@@ -308,6 +330,22 @@ public class StAXDocumentParser {
 		eventsStack.push(event);
 
 		StartElement startElement = event.asStartElement();
+
+		if (root) {
+
+		    Iterator<Namespace> attributes = startElement.getNamespaces();
+
+		    while (attributes.hasNext()) {
+
+			Namespace ns = attributes.next();
+
+			QName qName = new QName(ns.getValue(), "*", ns.getPrefix());
+
+			namespaces.add(qName);
+		    }
+
+		    root = false;
+		}
 
 		if ((!found && test(condition, eventsStack)) || found) {
 
@@ -481,20 +519,23 @@ public class StAXDocumentParser {
 		//
 		// parents check
 		//
-		if (qnamesStackToList.size() >= 2) {
+		if (!parentsMap.isEmpty()) {
 
-		    for (List<QName> names : parentsMap.keySet()) {
+		    if (qnamesStackToList.size() >= 2) {
 
-			QName parent = names.get(0);
-			QName target = names.get(1);
+			for (List<QName> names : parentsMap.keySet()) {
 
-			boolean parentMatch = compare(parent, qnamesStackToList.get(qnamesStackToList.size() - 2));
-			boolean targetMatch = compare(target, qnamesStackToList.get(qnamesStackToList.size() - 1));
+			    QName parent = names.get(0);
+			    QName target = names.get(1);
 
-			if (parentMatch && targetMatch) {
+			    boolean parentMatch = compare(parent, qnamesStackToList.get(qnamesStackToList.size() - 2));
+			    boolean targetMatch = compare(target, qnamesStackToList.get(qnamesStackToList.size() - 1));
 
-			    Consumer<String> consumer = parentsMap.get(names);
-			    consumer.accept(value);
+			    if (parentMatch && targetMatch) {
+
+				Consumer<String> consumer = parentsMap.get(names);
+				consumer.accept(value);
+			    }
 			}
 		    }
 		}
@@ -502,12 +543,14 @@ public class StAXDocumentParser {
 		//
 		// paths check
 		//
-		for (List<QName> path : pathsMap.keySet()) {
+		if (!pathsMap.isEmpty()) {
+		    for (List<QName> path : pathsMap.keySet()) {
 
-		    if (compare(path, qnamesStackToList)) {
+			if (compare(path, qnamesStackToList)) {
 
-			Consumer<String> consumer = pathsMap.get(path);
-			consumer.accept(value);
+			    Consumer<String> consumer = pathsMap.get(path);
+			    consumer.accept(value);
+			}
 		    }
 		}
 
@@ -526,17 +569,19 @@ public class StAXDocumentParser {
 	    //
 	    // conditions
 	    //
-	    if (!eventsStack.isEmpty() && !evaluatedStacks.contains(eventsStack.toString())) {
+	    if (!conditionsList.isEmpty()) {
+		if (!eventsStack.isEmpty() && !evaluatedStacks.contains(eventsStack.toString())) {
 
-		evaluatedStacks.add(eventsStack.toString());
+		    evaluatedStacks.add(eventsStack.toString());
 
-		for (HashMap<Predicate<Stack<XMLEvent>>, Consumer<Stack<XMLEvent>>> map : conditionsList) {
+		    for (HashMap<Predicate<Stack<XMLEvent>>, Consumer<Stack<XMLEvent>>> map : conditionsList) {
 
-		    Predicate<Stack<XMLEvent>> condition = map.keySet().iterator().next();
+			Predicate<Stack<XMLEvent>> condition = map.keySet().iterator().next();
 
-		    if (condition.test(eventsStack)) {
+			if (condition.test(eventsStack)) {
 
-			map.get(condition).accept(eventsStack);
+			    map.get(condition).accept(eventsStack);
+			}
 		    }
 		}
 	    }
@@ -625,7 +670,6 @@ public class StAXDocumentParser {
      * @param stack
      * @return
      */
-    @SuppressWarnings("unchecked")
     private List<Attribute> getAttributes(XMLEvent event) {
 
 	Stream<?> stream = StreamUtils.iteratorToStream(event.asStartElement().getAttributes());
@@ -652,7 +696,7 @@ public class StAXDocumentParser {
 
 	builder.insert(index, qName.getPrefix());
 
-	builder.insert(index, " xmlns:");
+	builder.insert(index, qName.getPrefix().isBlank() ? " xmlns" : " xmlns:");
     }
 
     /**
@@ -711,10 +755,12 @@ public class StAXDocumentParser {
 	    addNameSpace(name, namespaces);
 	}
 
+	String escapedValue = XmlEscapers.xmlAttributeEscaper().escape(attr.getValue());
+
 	builder.append(attrName.getLocalPart());
 	builder.append("=");
 	builder.append("\"");
-	builder.append(attr.getValue());
+	builder.append(escapedValue);
 	builder.append("\"");
     }
 
@@ -737,6 +783,9 @@ public class StAXDocumentParser {
 	builder.append(name.getLocalPart());
 
 	builder.append(">");
+	if (addNewLine) {
+	    builder.append("\n");
+	}
     }
 
     /**
@@ -746,9 +795,27 @@ public class StAXDocumentParser {
     private void addNameSpace(QName name, List<QName> namespaces) {
 
 	QName qName = new QName(name.getNamespaceURI(), "*", name.getPrefix());
-	if (!namespaces.contains(qName)) {
+
+	boolean contains = namespaces.//
+		stream().//
+		filter(qn -> compareAsNameSpace(qn, qName)).//
+		findFirst().//
+		isPresent();
+
+	if (!contains) {
+
 	    namespaces.add(qName);
 	}
+    }
+
+    /**
+     * @param qName1
+     * @param qName2
+     * @return
+     */
+    private boolean compareAsNameSpace(QName qName1, QName qName2) {
+
+	return qName1.getNamespaceURI().equals(qName2.getNamespaceURI()) && qName1.getPrefix().equals(qName2.getPrefix());
     }
 
     /**

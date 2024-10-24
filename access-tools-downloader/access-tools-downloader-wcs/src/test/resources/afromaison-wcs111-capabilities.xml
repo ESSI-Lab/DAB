@@ -1,0 +1,706 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wcs:Capabilities version="1.1.1" xmlns:wcs="http://www.opengis.net/wcs/1.1.1"
+    xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ogc="http://www.opengis.net/ogc"
+    xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:gml="http://www.opengis.net/gml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://afromaison.grid.unep.ch:8080/geoserver/schemas/wcs/1.1.1/wcsGetCapabilities.xsd"
+    updateSequence="1352">
+    <ows:ServiceIdentification>
+        <ows:Title>Web Coverage Service</ows:Title>
+        <ows:Abstract>This server implements the WCS specification 1.0 and 1.1.1, it's reference
+            implementation of WCS 1.1.1. All layers published by this service are available on WMS
+            also. </ows:Abstract>
+        <ows:Keywords>
+            <ows:Keyword>WCS</ows:Keyword>
+            <ows:Keyword>WMS</ows:Keyword>
+            <ows:Keyword>GEOSERVER</ows:Keyword>
+        </ows:Keywords>
+        <ows:ServiceType>WCS</ows:ServiceType>
+        <ows:ServiceTypeVersion>1.1.0</ows:ServiceTypeVersion>
+        <ows:ServiceTypeVersion>1.1.1</ows:ServiceTypeVersion>
+        <ows:Fees>NONE</ows:Fees>
+        <ows:AccessConstraints>NONE</ows:AccessConstraints>
+    </ows:ServiceIdentification>
+    <ows:ServiceProvider>
+        <ows:ProviderName>OpenGeo</ows:ProviderName>
+        <ows:ProviderSite xlink:href="http://opengeo.org"/>
+        <ows:ServiceContact>
+            <ows:IndividualName>OpenGeo</ows:IndividualName>
+            <ows:PositionName>Outreach</ows:PositionName>
+            <ows:ContactInfo>
+                <ows:Phone/>
+                <ows:Address>
+                    <ows:City>New York</ows:City>
+                    <ows:Country>USA</ows:Country>
+                    <ows:ElectronicMailAddress>inquiry@opengeo.org</ows:ElectronicMailAddress>
+                </ows:Address>
+                <ows:OnlineResource xlink:href="http://opengeo.org"/>
+            </ows:ContactInfo>
+        </ows:ServiceContact>
+    </ows:ServiceProvider>
+    <ows:OperationsMetadata>
+        <ows:Operation name="GetCapabilities">
+            <ows:DCP>
+                <ows:HTTP>
+                    <ows:Get xlink:href="http://afromaison.grid.unep.ch:8080/geoserver/wcs?"/>
+                </ows:HTTP>
+            </ows:DCP>
+            <ows:DCP>
+                <ows:HTTP>
+                    <ows:Post xlink:href="http://afromaison.grid.unep.ch:8080/geoserver/wcs?"/>
+                </ows:HTTP>
+            </ows:DCP>
+        </ows:Operation>
+        <ows:Operation name="DescribeCoverage">
+            <ows:DCP>
+                <ows:HTTP>
+                    <ows:Get xlink:href="http://afromaison.grid.unep.ch:8080/geoserver/wcs?"/>
+                </ows:HTTP>
+            </ows:DCP>
+            <ows:DCP>
+                <ows:HTTP>
+                    <ows:Post xlink:href="http://afromaison.grid.unep.ch:8080/geoserver/wcs?"/>
+                </ows:HTTP>
+            </ows:DCP>
+        </ows:Operation>
+        <ows:Operation name="GetCoverage">
+            <ows:DCP>
+                <ows:HTTP>
+                    <ows:Get xlink:href="http://afromaison.grid.unep.ch:8080/geoserver/wcs?"/>
+                </ows:HTTP>
+            </ows:DCP>
+            <ows:DCP>
+                <ows:HTTP>
+                    <ows:Post xlink:href="http://afromaison.grid.unep.ch:8080/geoserver/wcs?"/>
+                </ows:HTTP>
+            </ows:DCP>
+            <ows:Parameter name="store">
+                <ows:AllowedValues>
+                    <ows:Value>True</ows:Value>
+                    <ows:Value>False</ows:Value>
+                </ows:AllowedValues>
+            </ows:Parameter>
+        </ows:Operation>
+        <ows:Constraint name="PostEncoding">
+            <ows:AllowedValues>
+                <ows:Value>XML</ows:Value>
+            </ows:AllowedValues>
+        </ows:Constraint>
+    </ows:OperationsMetadata>
+    <wcs:Contents>
+        <wcs:CoverageSummary>
+            <ows:Title>ETH_Aster</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>ETH_Aster</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>37.447 11.6</ows:LowerCorner>
+                <ows:UpperCorner>38.049 12.127</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>ETH_Aster</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>ETH_CRU_pre_1980_01</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>ETH_CRU_pre_1980_01</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>37.0 11.5</ows:LowerCorner>
+                <ows:UpperCorner>38.5 12.5</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>ETH_CRU_pre_1980_01</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>ETH_CRU_tmp_1980_01</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>ETH_CRU_tmp_1980_01</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>37.0 11.5</ows:LowerCorner>
+                <ows:UpperCorner>38.5 12.5</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>ETH_CRU_tmp_1980_01</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>ETH_GlobCover2005-2006</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>ETH_GlobCover2005-2006</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>37.446 11.599</ows:LowerCorner>
+                <ows:UpperCorner>38.051 12.129</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>ETH_GlobCover2005-2006</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>ETH_GlobCover2009</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>ETH_GlobCover2009</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>37.446 11.599</ows:LowerCorner>
+                <ows:UpperCorner>38.051 12.129</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>ETH_GlobCover2009</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>ETH_afripop_bb</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>ETH_afripop_bb</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>37.447 11.599</ows:LowerCorner>
+                <ows:UpperCorner>38.049 12.127</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>ETH_afripop_bb</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>ETH_etopo1</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>ETH_etopo1</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>37.442 11.592</ows:LowerCorner>
+                <ows:UpperCorner>38.058 12.142</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>ETH_etopo1</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>ETH_srtm</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>ETH_srtm</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>37.442 11.592</ows:LowerCorner>
+                <ows:UpperCorner>38.05 12.133</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>ETH_srtm</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>MLI_CRU_precipitations_1980_01</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>MLI_CRU_pre_1980_01</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>-6.0 13.5</ows:LowerCorner>
+                <ows:UpperCorner>-3.0 16.0</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>MLI_CRU_pre_1980_01</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>MLI_CRU_temperature_1980_01</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>MLI_CRU_tmp_1980_01</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>-6.0 13.5</ows:LowerCorner>
+                <ows:UpperCorner>-3.0 16.0</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>MLI_CRU_tmp_1980_01</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>MLI_DEM_Aster</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>MLI_Aster</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>-5.761 13.625</ows:LowerCorner>
+                <ows:UpperCorner>-3.499 15.732</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>MLI_Aster</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>MLI_DEM_SRTM</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>MLI_srtm</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>-5.767 13.625</ows:LowerCorner>
+                <ows:UpperCorner>-3.492 15.733</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>MLI_srtm</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>MLI_DEM_etopo1</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>MLI_etopo1</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>-5.775 13.625</ows:LowerCorner>
+                <ows:UpperCorner>-3.492 15.742</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>MLI_etopo1</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>MLI_land_cover_glc2000</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>glc2000_niger1</ows:Keyword>
+            </ows:Keywords>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>-11.582 4.171</ows:LowerCorner>
+                <ows:UpperCorner>15.302 24.081</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>glc2000_niger1</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>MLI_landcover_GlobCover2005-2006</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>MLI_GlobCover2005-2006</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>-5.762 13.624</ows:LowerCorner>
+                <ows:UpperCorner>-3.499 15.735</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>MLI_GlobCover2005-2006</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>MLI_landcover_GlobCover2009</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>MLI_GlobCover2009</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>-5.762 13.624</ows:LowerCorner>
+                <ows:UpperCorner>-3.499 15.735</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>MLI_GlobCover2009</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>MLI_population_afripop</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>MLI_afripop_bb</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>-5.762 13.625</ows:LowerCorner>
+                <ows:UpperCorner>-3.498 15.732</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>MLI_afripop_bb</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>TUN_Aster</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>TUN_Aster</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>10.013 33.201</ows:LowerCorner>
+                <ows:UpperCorner>10.561 33.695</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>TUN_Aster</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>TUN_CRU_pre_1980_01</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>TUN_CRU_pre_1980_01</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>10.0 33.0</ows:LowerCorner>
+                <ows:UpperCorner>11.0 34.0</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>TUN_CRU_pre_1980_01</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>TUN_CRU_tmp_1980_01</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>TUN_CRU_tmp_1980_01</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>10.0 33.0</ows:LowerCorner>
+                <ows:UpperCorner>11.0 34.0</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>TUN_CRU_tmp_1980_01</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>TUN_GlobCover2005-2006</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>TUN_GlobCover2005-2006</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>10.013 33.199</ows:LowerCorner>
+                <ows:UpperCorner>10.563 33.696</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>TUN_GlobCover2005-2006</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>TUN_GlobCover2009</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>TUN_GlobCover2009</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>10.012 33.199</ows:LowerCorner>
+                <ows:UpperCorner>10.562 33.696</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>TUN_GlobCover2009</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>TUN_afripop_bb</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>TUN_afripop_bb</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>10.013 33.201</ows:LowerCorner>
+                <ows:UpperCorner>10.561 33.695</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>TUN_afripop_bb</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>TUN_etopo1</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>TUN_etopo1</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>10.008 33.192</ows:LowerCorner>
+                <ows:UpperCorner>10.575 33.708</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>TUN_etopo1</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>TUN_srtm</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>TUN_srtm</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>10.008 33.2</ows:LowerCorner>
+                <ows:UpperCorner>10.567 33.7</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>TUN_srtm</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>UGA_Aster</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>UGA_Aster</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>29.735 -0.515</ows:LowerCorner>
+                <ows:UpperCorner>31.097 0.799</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>UGA_Aster</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>UGA_CRU_pre_1980_01</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>UGA_CRU_pre_1980_01</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>29.5 -1.0</ows:LowerCorner>
+                <ows:UpperCorner>31.5 1.0</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>UGA_CRU_pre_1980_01</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>UGA_CRU_tmp_1980_01</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>UGA_CRU_tmp_1980_01</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>29.5 -1.0</ows:LowerCorner>
+                <ows:UpperCorner>31.5 1.0</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>UGA_CRU_tmp_1980_01</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>UGA_GlobCover2005-2006</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>UGA_GlobCover2005-2006</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>29.735 -0.515</ows:LowerCorner>
+                <ows:UpperCorner>31.099 0.801</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>UGA_GlobCover2005-2006</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>UGA_GlobCover2009</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>UGA_GlobCover2009</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>29.735 -0.515</ows:LowerCorner>
+                <ows:UpperCorner>31.099 0.801</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>UGA_GlobCover2009</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>UGA_afripop_bb</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>UGA_afripop_bb</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>29.735 -0.516</ows:LowerCorner>
+                <ows:UpperCorner>31.098 0.799</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>UGA_afripop_bb</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>UGA_etopo1</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>UGA_etopo1</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>29.725 -0.525</ows:LowerCorner>
+                <ows:UpperCorner>31.108 0.808</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>UGA_etopo1</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>UGA_srtm</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>UGA_srtm</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>29.733 -0.517</ows:LowerCorner>
+                <ows:UpperCorner>31.1 0.8</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>UGA_srtm</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>ZAF_Aster</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>ZAF_Aster</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>28.608 -29.581</ows:LowerCorner>
+                <ows:UpperCorner>30.614 -27.765</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>ZAF_Aster</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>ZAF_CRU_pre_1980_01</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>ZAF_CRU_pre_1980_01</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>28.5 -30.0</ows:LowerCorner>
+                <ows:UpperCorner>31.0 -27.5</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>ZAF_CRU_pre_1980_01</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>ZAF_CRU_tmp_1980_01</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>ZAF_CRU_tmp_1980_01</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>28.5 -30.0</ows:LowerCorner>
+                <ows:UpperCorner>31.0 -27.5</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>ZAF_CRU_tmp_1980_01</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>ZAF_GlobCover2005-2006</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>ZAF_GlobCover2005-2006</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>28.607 -29.582</ows:LowerCorner>
+                <ows:UpperCorner>30.615 -27.763</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>ZAF_GlobCover2005-2006</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>ZAF_GlobCover2009</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>ZAF_GlobCover2009</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>28.607 -29.582</ows:LowerCorner>
+                <ows:UpperCorner>30.615 -27.763</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>ZAF_GlobCover2009</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>ZAF_afripop_bb</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>ZAF_afripop_bb</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>28.608 -29.581</ows:LowerCorner>
+                <ows:UpperCorner>30.615 -27.765</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>ZAF_afripop_bb</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>ZAF_etopo1</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>ZAF_etopo1</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>28.592 -29.592</ows:LowerCorner>
+                <ows:UpperCorner>30.625 -27.758</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>ZAF_etopo1</wcs:Identifier>
+        </wcs:CoverageSummary>
+        <wcs:CoverageSummary>
+            <ows:Title>ZAF_srtm</ows:Title>
+            <ows:Abstract>Generated from GeoTIFF</ows:Abstract>
+            <ows:Keywords>
+                <ows:Keyword>WCS</ows:Keyword>
+                <ows:Keyword>GeoTIFF</ows:Keyword>
+                <ows:Keyword>ZAF_srtm</ows:Keyword>
+            </ows:Keywords>
+            <ows:Metadata xlink:type="simple"/>
+            <ows:WGS84BoundingBox>
+                <ows:LowerCorner>28.6 -29.583</ows:LowerCorner>
+                <ows:UpperCorner>30.617 -27.758</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+            <wcs:Identifier>ZAF_srtm</wcs:Identifier>
+        </wcs:CoverageSummary>
+    </wcs:Contents>
+</wcs:Capabilities>

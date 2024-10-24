@@ -1,0 +1,642 @@
+<MD_Metadata xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gmd="http://www.isotc211.org/2005/gmd"
+    xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gml="http://www.opengis.net/gml"
+    xmlns="http://www.isotc211.org/2005/gmd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/iso/19139/20060504/gmd/gmd.xsd"
+    id="de.pangaea.dataset66871">
+    <fileIdentifier>
+        <gco:CharacterString>de.pangaea.dataset66871</gco:CharacterString>
+    </fileIdentifier>
+    <contact>
+        <CI_ResponsibleParty>
+            <organisationName>
+                <gco:CharacterString>PANGAEA</gco:CharacterString>
+            </organisationName>
+            <contactInfo>
+                <CI_Contact>
+                    <address>
+                        <CI_Address>
+                            <electronicMailAddress>
+                                <gco:CharacterString>info@pangaea.de</gco:CharacterString>
+                            </electronicMailAddress>
+                        </CI_Address>
+                    </address>
+                    <onlineResource>
+                        <CI_OnlineResource>
+                            <linkage>
+                                <URL>https://www.pangaea.de/</URL>
+                            </linkage>
+                            <function>
+                                <CI_OnLineFunctionCode
+                                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode"
+                                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode_information"
+                                    >information</CI_OnLineFunctionCode>
+                            </function>
+                        </CI_OnlineResource>
+                    </onlineResource>
+                </CI_Contact>
+            </contactInfo>
+            <role>
+                <CI_RoleCode
+                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode"
+                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode_pointOfContact"
+                    >pointOfContact</CI_RoleCode>
+            </role>
+        </CI_ResponsibleParty>
+    </contact>
+    <dateStamp>
+        <gco:DateTime>2019-12-20T02:42:10Z</gco:DateTime>
+    </dateStamp>
+    <dataSetURI>
+        <gco:CharacterString>https://doi.pangaea.de/10.1594/PANGAEA.66871</gco:CharacterString>
+    </dataSetURI>
+    <identificationInfo>
+        <MD_DataIdentification>
+            <citation>
+                <CI_Citation>
+                    <title>
+                        <gco:CharacterString>Geochemistry and age models of sediments from the Celtic margin</gco:CharacterString>
+                    </title>
+                    <date>
+                        <CI_Date>
+                            <date>
+                                <gco:DateTime>2002-04-06T10:12:25</gco:DateTime>
+                            </date>
+                            <dateType>
+                                <CI_DateTypeCode
+                                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode"
+                                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode_publication"
+                                    >publication</CI_DateTypeCode>
+                            </dateType>
+                        </CI_Date>
+                    </date>
+                    <identifier>
+                        <MD_Identifier>
+                            <code>
+                                <gco:CharacterString>https://doi.org/10.1594/PANGAEA.66871</gco:CharacterString>
+                            </code>
+                        </MD_Identifier>
+                    </identifier>
+                    <citedResponsibleParty>
+                        <CI_ResponsibleParty id="dataset.author10707">
+                            
+                             <individualName>
+                                <gco:CharacterString>Auffret, Gérard A</gco:CharacterString>
+                            </individualName>
+                        
+                            <organisationName>
+                                <gco:CharacterString>Auffret, Gérard A</gco:CharacterString>
+                            </organisationName>
+                                                    
+                            <role>
+                                <CI_RoleCode
+                                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode"
+                                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode_author"
+                                    >author</CI_RoleCode>
+                            </role>
+                            
+                        </CI_ResponsibleParty>
+                    </citedResponsibleParty>
+                    
+                    
+                    <citedResponsibleParty>
+                        <CI_ResponsibleParty id="dataset.author26372">
+                            <individualName>
+                                <gco:CharacterString>Zaragosi, Sebastien</gco:CharacterString>
+                            </individualName>
+                            <role>
+                                <CI_RoleCode
+                                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode"
+                                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode_author"
+                                    >author</CI_RoleCode>
+                            </role>
+                        </CI_ResponsibleParty>
+                    </citedResponsibleParty>
+                    <citedResponsibleParty>
+                        <CI_ResponsibleParty id="dataset.author21809">
+                            <individualName>
+                                <gco:CharacterString>Dennielou, Bernard</gco:CharacterString>
+                            </individualName>
+                            <contactInfo>
+                                <CI_Contact>
+                                    <address>
+                                        <CI_Address>
+                                            <electronicMailAddress>
+                                                <gco:CharacterString>Bernard.Dennielou@ifremer.fr</gco:CharacterString>
+                                            </electronicMailAddress>
+                                        </CI_Address>
+                                    </address>
+                                    <onlineResource>
+                                        <CI_OnlineResource>
+                                            <linkage>
+                                                <URL>https://orcid.org/0000-0002-9528-2746</URL>
+                                            </linkage>
+                                            <function>
+                                                <CI_OnLineFunctionCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode_information"
+                                                  >information</CI_OnLineFunctionCode>
+                                            </function>
+                                        </CI_OnlineResource>
+                                    </onlineResource>
+                                </CI_Contact>
+                            </contactInfo>
+                            <role>
+                                <CI_RoleCode
+                                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode"
+                                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode_author"
+                                    >author</CI_RoleCode>
+                            </role>
+                        </CI_ResponsibleParty>
+                    </citedResponsibleParty>
+                    <citedResponsibleParty>
+                        <CI_ResponsibleParty id="dataset.author734">
+                            <individualName>
+                                <gco:CharacterString>Cortijo, Elsa</gco:CharacterString>
+                            </individualName>
+                            <contactInfo>
+                                <CI_Contact>
+                                    <address>
+                                        <CI_Address>
+                                            <electronicMailAddress>
+                                                <gco:CharacterString>cortijo@lsce.cnrs-gif.fr</gco:CharacterString>
+                                            </electronicMailAddress>
+                                        </CI_Address>
+                                    </address>
+                                </CI_Contact>
+                            </contactInfo>
+                            <role>
+                                <CI_RoleCode
+                                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode"
+                                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode_author"
+                                    >author</CI_RoleCode>
+                            </role>
+                        </CI_ResponsibleParty>
+                    </citedResponsibleParty>
+                    <citedResponsibleParty>
+                        <CI_ResponsibleParty id="dataset.author20088">
+                            <individualName>
+                                <gco:CharacterString>Van Rooij, David</gco:CharacterString>
+                            </individualName>
+                            <contactInfo>
+                                <CI_Contact>
+                                    <address>
+                                        <CI_Address>
+                                            <electronicMailAddress>
+                                                <gco:CharacterString>david.vanrooij@rug.ac.be</gco:CharacterString>
+                                            </electronicMailAddress>
+                                        </CI_Address>
+                                    </address>
+                                    <onlineResource>
+                                        <CI_OnlineResource>
+                                            <linkage>
+                                                <URL>https://orcid.org/0000-0003-3633-3344</URL>
+                                            </linkage>
+                                            <function>
+                                                <CI_OnLineFunctionCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode_information"
+                                                  >information</CI_OnLineFunctionCode>
+                                            </function>
+                                        </CI_OnlineResource>
+                                    </onlineResource>
+                                </CI_Contact>
+                            </contactInfo>
+                            <role>
+                                <CI_RoleCode
+                                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode"
+                                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode_author"
+                                    >author</CI_RoleCode>
+                            </role>
+                        </CI_ResponsibleParty>
+                    </citedResponsibleParty>
+                    <citedResponsibleParty>
+                        <CI_ResponsibleParty id="dataset.author867">
+                            <individualName>
+                                <gco:CharacterString>Grousset, Francis E</gco:CharacterString>
+                            </individualName>
+                            <contactInfo>
+                                <CI_Contact>
+                                    <address>
+                                        <CI_Address>
+                                            <electronicMailAddress>
+                                                <gco:CharacterString>f.grousset@epoc.u-bordeaux1.fr</gco:CharacterString>
+                                            </electronicMailAddress>
+                                        </CI_Address>
+                                    </address>
+                                </CI_Contact>
+                            </contactInfo>
+                            <role>
+                                <CI_RoleCode
+                                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode"
+                                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode_author"
+                                    >author</CI_RoleCode>
+                            </role>
+                        </CI_ResponsibleParty>
+                    </citedResponsibleParty>
+                    <citedResponsibleParty>
+                        <CI_ResponsibleParty id="dataset.author21739">
+                            <individualName>
+                                <gco:CharacterString>Pujol, Claude</gco:CharacterString>
+                            </individualName>
+                            <contactInfo>
+                                <CI_Contact>
+                                    <address>
+                                        <CI_Address>
+                                            <electronicMailAddress>
+                                                <gco:CharacterString>pujol@geocean.u-bordeaux.fr</gco:CharacterString>
+                                            </electronicMailAddress>
+                                        </CI_Address>
+                                    </address>
+                                </CI_Contact>
+                            </contactInfo>
+                            <role>
+                                <CI_RoleCode
+                                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode"
+                                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode_author"
+                                    >author</CI_RoleCode>
+                            </role>
+                        </CI_ResponsibleParty>
+                    </citedResponsibleParty>
+                    <citedResponsibleParty>
+                        <CI_ResponsibleParty id="dataset.author21824">
+                            <individualName>
+                                <gco:CharacterString>Eynaud, Frédérique</gco:CharacterString>
+                            </individualName>
+                            <contactInfo>
+                                <CI_Contact>
+                                    <address>
+                                        <CI_Address>
+                                            <electronicMailAddress>
+                                                <gco:CharacterString>f.eynaud@epoc.u-bordeaux1.fr</gco:CharacterString>
+                                            </electronicMailAddress>
+                                        </CI_Address>
+                                    </address>
+                                    <onlineResource>
+                                        <CI_OnlineResource>
+                                            <linkage>
+                                                <URL>https://orcid.org/0000-0003-1283-7425</URL>
+                                            </linkage>
+                                            <function>
+                                                <CI_OnLineFunctionCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode_information"
+                                                  >information</CI_OnLineFunctionCode>
+                                            </function>
+                                        </CI_OnlineResource>
+                                    </onlineResource>
+                                </CI_Contact>
+                            </contactInfo>
+                            <role>
+                                <CI_RoleCode
+                                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode"
+                                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode_author"
+                                    >author</CI_RoleCode>
+                            </role>
+                        </CI_ResponsibleParty>
+                    </citedResponsibleParty>
+                    <citedResponsibleParty>
+                        <CI_ResponsibleParty id="dataset.author23602">
+                            <individualName>
+                                <gco:CharacterString>Siegert, Martin J</gco:CharacterString>
+                            </individualName>
+                            <contactInfo>
+                                <CI_Contact>
+                                    <onlineResource>
+                                        <CI_OnlineResource>
+                                            <linkage>
+                                                <URL>https://orcid.org/0000-0002-0090-4806</URL>
+                                            </linkage>
+                                            <function>
+                                                <CI_OnLineFunctionCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode_information"
+                                                  >information</CI_OnLineFunctionCode>
+                                            </function>
+                                        </CI_OnlineResource>
+                                    </onlineResource>
+                                </CI_Contact>
+                            </contactInfo>
+                            <role>
+                                <CI_RoleCode
+                                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode"
+                                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode_author"
+                                    >author</CI_RoleCode>
+                            </role>
+                        </CI_ResponsibleParty>
+                    </citedResponsibleParty>
+                    <citedResponsibleParty>
+                        <CI_ResponsibleParty>
+                            <organisationName>
+                                <gco:CharacterString>PANGAEA</gco:CharacterString>
+                            </organisationName>
+                            <contactInfo>
+                                <CI_Contact>
+                                    <address>
+                                        <CI_Address>
+                                            <electronicMailAddress>
+                                                <gco:CharacterString>info@pangaea.de</gco:CharacterString>
+                                            </electronicMailAddress>
+                                        </CI_Address>
+                                    </address>
+                                    <onlineResource>
+                                        <CI_OnlineResource>
+                                            <linkage>
+                                                <URL>https://www.pangaea.de/</URL>
+                                            </linkage>
+                                            <function>
+                                                <CI_OnLineFunctionCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode_information"
+                                                  >information</CI_OnLineFunctionCode>
+                                            </function>
+                                        </CI_OnlineResource>
+                                    </onlineResource>
+                                </CI_Contact>
+                            </contactInfo>
+                            <role>
+                                <CI_RoleCode
+                                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode"
+                                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode_publisher"
+                                    >publisher</CI_RoleCode>
+                            </role>
+                        </CI_ResponsibleParty>
+                    </citedResponsibleParty>
+                    <presentationForm>
+                        <CI_PresentationFormCode
+                            codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_PresentationFormCode"
+                            codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_PresentationFormCode_tableDigital"
+                            >tableDigital</CI_PresentationFormCode>
+                    </presentationForm>
+                    <otherCitationDetails>
+                        <gco:CharacterString>Supplement to: Auffret, Gérard A; Zaragosi, Sebastien;
+                            Dennielou, Bernard; Cortijo, Elsa; Van Rooij, David; Grousset, Francis
+                            E; Pujol, Claude; Eynaud, Frédérique; Siegert, Martin J (2002):
+                            Terrigenous fluxes at the Celtic Margin during the last glacial cycle.
+                            Marine Geology, 188(1-2), 79-108,
+                            https://doi.org/10.1016/S0025-3227(02)00276-1</gco:CharacterString>
+                    </otherCitationDetails>
+                </CI_Citation>
+            </citation>
+            <abstract>
+                <gco:CharacterString>The sedimentary sections of three cores from the Celtic margin
+                    provide high-resolution records of the terrigenous fluxes during the last
+                    glacial cycle. A total of 21 14C AMS dates allow us to define age models with a
+                    resolution better than 100 yr during critical periods such as Heinrich events 1
+                    and 2. Maximum sedimentary fluxes occurred at the Meriadzek Terrace site during
+                    the Last Glacial Maximum (LGM). Detailed X-ray imagery of core MD95-2002 from
+                    the Meriadzek Terrace shows no sedimentary structures suggestive of either
+                    deposition from high-density turbidity currents or significant erosion. Two
+                    paroxysmal terrigenous flux episodes have been identified. The first occurred
+                    after the deposition of Heinrich event 2 Canadian ice-rafted debris (IRD) and
+                    includes IRD from European sources. We suggest that the second represents an
+                    episode of deposition from turbid plumes, which precedes IRD deposition
+                    associated with Heinrich event 1. At the end of marine isotopic stage 2 (MIS 2)
+                    and the beginning of MIS 1 the highest fluxes are recorded on the Whittard Ridge
+                    where they correspond to deposition from turbidity current overflows. Canadian
+                    icebergs have rafted debris at the Celtic margin during Heinrich events 1, 2, 4
+                    and 5. The high-resolution records of Heinrich events 1 and 2 show that in both
+                    cases the arrival of the Canadian icebergs was preceded by a European ice
+                    rafting precursor event, which took place about 1–1.5 kyr before. Two rafting
+                    episodes of European IRD also occurred immediately after Heinrich event 2 and
+                    just before Heinrich event 1. The terrigenous fluxes recorded in core MD95-2002
+                    during the LGM are the highest reported at hemipelagic sites from the
+                    northwestern European margin. The magnitude of the Canadian IRD fluxes at
+                    Meriadzek Terrace is similar to those from oceanic sites.</gco:CharacterString>
+            </abstract>
+            <status>
+                <MD_ProgressCode
+                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ProgressCode"
+                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ProgressCode_completed"
+                    >completed</MD_ProgressCode>
+            </status>
+            <descriptiveKeywords>
+                <MD_Keywords>
+                    <keyword>
+                        <gco:CharacterString>IMAGES</gco:CharacterString>
+                    </keyword>
+                    <keyword>
+                        <gco:CharacterString>International Marine Global Change
+                            Study</gco:CharacterString>
+                    </keyword>
+                    <type>
+                        <MD_KeywordTypeCode
+                            codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode"
+                            codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode_theme"
+                            >theme</MD_KeywordTypeCode>
+                    </type>
+                    <thesaurusName>
+                        <CI_Citation>
+                            <title>
+                                <gco:CharacterString>PANGAEA Project List</gco:CharacterString>
+                            </title>
+                            <date>
+                                <CI_Date>
+                                    <date>
+                                        <gco:Date>1995-01-01</gco:Date>
+                                    </date>
+                                    <dateType>
+                                        <CI_DateTypeCode
+                                            codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode"
+                                            codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode_creation"
+                                            >creation</CI_DateTypeCode>
+                                    </dateType>
+                                </CI_Date>
+                            </date>
+                            <citedResponsibleParty>
+                                <CI_ResponsibleParty>
+                                    <organisationName>
+                                        <gco:CharacterString>PANGAEA</gco:CharacterString>
+                                    </organisationName>
+                                    <contactInfo>
+                                        <CI_Contact>
+                                            <address>
+                                                <CI_Address>
+                                                  <electronicMailAddress>
+                                                  <gco:CharacterString>info@pangaea.de</gco:CharacterString>
+                                                  </electronicMailAddress>
+                                                </CI_Address>
+                                            </address>
+                                            <onlineResource>
+                                                <CI_OnlineResource>
+                                                  <linkage>
+                                                  <URL>https://www.pangaea.de/</URL>
+                                                  </linkage>
+                                                  <function>
+                                                  <CI_OnLineFunctionCode
+                                                  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode"
+                                                  codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode_information"
+                                                  >information</CI_OnLineFunctionCode>
+                                                  </function>
+                                                </CI_OnlineResource>
+                                            </onlineResource>
+                                        </CI_Contact>
+                                    </contactInfo>
+                                    <role>
+                                        <CI_RoleCode
+                                            codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode"
+                                            codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode_pointOfContact"
+                                            >pointOfContact</CI_RoleCode>
+                                    </role>
+                                </CI_ResponsibleParty>
+                            </citedResponsibleParty>
+                        </CI_Citation>
+                    </thesaurusName>
+                </MD_Keywords>
+            </descriptiveKeywords>
+            <resourceConstraints>
+                <MD_LegalConstraints>
+                    <accessConstraints>
+                        <MD_RestrictionCode
+                            codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode"
+                            codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode_copyright"
+                            >copyright</MD_RestrictionCode>
+                    </accessConstraints>
+                    <useConstraints>
+                        <MD_RestrictionCode
+                            codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode"
+                            codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode_copyright"
+                            >copyright</MD_RestrictionCode>
+                    </useConstraints>
+                    <otherConstraints>
+                        <gco:CharacterString>CC-BY-3.0: Creative Commons Attribution 3.0
+                            Unported</gco:CharacterString>
+                    </otherConstraints>
+                </MD_LegalConstraints>
+            </resourceConstraints>
+            <spatialRepresentationType>
+                <MD_SpatialRepresentationTypeCode
+                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_SpatialRepresentationTypeCode"
+                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_SpatialRepresentationTypeCode_textTable"
+                    >textTable</MD_SpatialRepresentationTypeCode>
+            </spatialRepresentationType>
+            <language>
+                <LanguageCode
+                    codeList="http://www.isotc211.org/2005/resources/Codelist/ML_gmxCodelists.xml#LanguageCode"
+                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/ML_gmxCodelists.xml#LanguageCode_eng"
+                    >eng</LanguageCode>
+            </language>
+            <topicCategory>
+                <MD_TopicCategoryCode>geoscientificInformation</MD_TopicCategoryCode>
+            </topicCategory>
+            <extent>
+                <EX_Extent>
+                    <geographicElement>
+                        <EX_GeographicBoundingBox>
+                            <gmd:westBoundLongitude>
+                                <gco:Decimal>-12.595500000000015</gco:Decimal>
+                            </gmd:westBoundLongitude>
+                            <gmd:eastBoundLongitude>
+                                <gco:Decimal>-8.533833333333348</gco:Decimal>
+                            </gmd:eastBoundLongitude>
+                            <gmd:southBoundLatitude>
+                                <gco:Decimal>46.9105</gco:Decimal>
+                            </gmd:southBoundLatitude>
+                            <gmd:northBoundLatitude>
+                                <gco:Decimal>49.1715</gco:Decimal>
+                            </gmd:northBoundLatitude>
+                        </EX_GeographicBoundingBox>
+                    </geographicElement>
+                    <temporalElement>
+                        <EX_TemporalExtent>
+                            <extent>
+                                <gml:TimePeriod gml:id="timePeriod">
+                                    <gml:beginPosition>1995-05-30T00:00:00</gml:beginPosition>
+                                    <gml:endPosition>1995-05-30T00:00:00</gml:endPosition>
+                                </gml:TimePeriod>
+                            </extent>
+                        </EX_TemporalExtent>
+                    </temporalElement>
+                </EX_Extent>
+            </extent>
+        </MD_DataIdentification>
+    </identificationInfo>
+    <distributionInfo>
+        <MD_Distribution>
+            <distributionFormat>
+                <MD_Format>
+                    <name>
+                        <gco:CharacterString>application/zip</gco:CharacterString>
+                    </name>
+                    <version>
+                        <gco:CharacterString>unknown</gco:CharacterString>
+                    </version>
+                </MD_Format>
+            </distributionFormat>
+            <transferOptions>
+                <MD_DigitalTransferOptions>
+                    <onLine>
+                        <CI_OnlineResource>
+                            <linkage>
+                                <URL>https://doi.pangaea.de/10.1594/PANGAEA.66871?format=zip</URL>
+                            </linkage>
+                            <function>
+                                <CI_OnLineFunctionCode
+                                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode"
+                                    codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode_download"
+                                    >download</CI_OnLineFunctionCode>
+                            </function>
+                        </CI_OnlineResource>
+                    </onLine>
+                </MD_DigitalTransferOptions>
+            </transferOptions>
+        </MD_Distribution>
+    </distributionInfo>
+    <dataQualityInfo>
+        <DQ_DataQuality>
+            <scope>
+                <DQ_Scope>
+                    <level>
+                        <MD_ScopeCode
+                            codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ScopeCode"
+                            codeListValue="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ScopeCode_dataset"
+                            >dataset</MD_ScopeCode>
+                    </level>
+                </DQ_Scope>
+            </scope>
+            <lineage>
+                <LI_Lineage>
+                    <statement>
+                        <gco:CharacterString>The data set was checked for completeness, correctness,
+                            and consistency of metainformation. Validity of used methods was checked
+                            and - if applicable - precision and range of data.</gco:CharacterString>
+                    </statement>
+                    <processStep>
+                        <LI_ProcessStep id="event2627397">
+                            <description>
+                                <gco:CharacterString>EVENT LABEL: * LATITUDE: 49.171500 * LONGITUDE:
+                                    -12.595500 * ELEVATION: -1190.0 m * Recovery: 7 m * LOCATION:
+                                    Celtic Shelf * DEVICE: Piston corer</gco:CharacterString>
+                            </description>
+                        </LI_ProcessStep>
+                    </processStep>
+                    <processStep>
+                        <LI_ProcessStep id="event45175">
+                            <description>
+                                <gco:CharacterString>EVENT LABEL: (MD952002) * LATITUDE: 47.452000 *
+                                    LONGITUDE: -8.533833 * DATE/TIME: 1995-05-30T00:00:00 *
+                                    ELEVATION: -2174.0 m * Recovery: 30 m * LOCATION: Meriadzec *
+                                    CAMPAIGN: MD101 * BASIS: Marion Dufresne * DEVICE: Calypso
+                                    Corer</gco:CharacterString>
+                            </description>
+                            <rationale>
+                                <gco:CharacterString>XX Sections, OK</gco:CharacterString>
+                            </rationale>
+                            <dateTime>
+                                <gco:DateTime>1995-05-30T00:00:00</gco:DateTime>
+                            </dateTime>
+                        </LI_ProcessStep>
+                    </processStep>
+                    <processStep>
+                        <LI_ProcessStep id="event2627398">
+                            <description>
+                                <gco:CharacterString>EVENT LABEL: * LATITUDE: 46.910500 * LONGITUDE:
+                                    -10.060000 * ELEVATION: -4540.0 m * Recovery: 5 m * LOCATION:
+                                    Celtic Shelf * DEVICE: Piston corer</gco:CharacterString>
+                            </description>
+                        </LI_ProcessStep>
+                    </processStep>
+                </LI_Lineage>
+            </lineage>
+        </DQ_DataQuality>
+    </dataQualityInfo>
+</MD_Metadata>

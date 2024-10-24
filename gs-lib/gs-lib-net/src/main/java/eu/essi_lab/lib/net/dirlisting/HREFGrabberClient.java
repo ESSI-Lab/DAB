@@ -7,7 +7,7 @@ package eu.essi_lab.lib.net.dirlisting;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 
-import eu.essi_lab.lib.net.utils.Downloader;
+import eu.essi_lab.lib.net.downloader.Downloader;
 
 /**
  * @author Fabrizio
@@ -119,7 +119,7 @@ public class HREFGrabberClient {
 	Downloader downloader = new Downloader();
 	ArrayList<String> list = Lists.newArrayList();
 
-	String html_ = this.html != null ? this.html : downloader.downloadString(url.toExternalForm()).orElse(null);
+	String html_ = this.html != null ? this.html : downloader.downloadOptionalString(url.toExternalForm()).orElse(null);
 	if (html_ == null) {
 	    return list;
 	}

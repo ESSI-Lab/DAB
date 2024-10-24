@@ -4,7 +4,7 @@ package eu.essi_lab.thredds._1_0_6.factory;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,7 +21,6 @@ package eu.essi_lab.thredds._1_0_6.factory;
  * #L%
  */
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.io.Reader;
@@ -34,10 +33,10 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.ValidationEventHandler;
-import javax.xml.transform.Result;
 
 import org.w3c.dom.Node;
 
+import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.thredds._1_0_6.ObjectFactory;
 
 public class JAXBTHREDDS {
@@ -91,7 +90,7 @@ public class JAXBTHREDDS {
 
     public Marshaller getMarshaller() throws JAXBException {
 	Marshaller marshaller = context.createMarshaller();
-	marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new JAXBTHREDDSPrefixMapper());
+	marshaller.setProperty(NameSpace.NAMESPACE_PREFIX_MAPPER_IMPL, new JAXBTHREDDSPrefixMapper());
 	marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 	return marshaller;
     }

@@ -1,0 +1,456 @@
+{
+    "extent": {
+        "ymin": "46.861075",
+        "xmin": "-163.6773733",
+        "ymax": "78.93443",
+        "xmax": "161.1667",
+        "spatialReference": {"wkid": 4326}
+    },
+    "types": [],
+    "capabilities": "Query",
+    "maxScale": 0,
+    "templates": [],
+    "globalIdField": "",
+    "description": "Stations from the current DAB view, with attributes for WHOS-Arctic",
+    "type": "Feature Layer",
+    "currentVersion": 10.05,
+    "typeIdField": "",
+    "relationships": [],
+    "objectIdField": "hycosid",
+    "htmlPopupType": "esriServerHTMLPopupTypeAsHTMLText",
+    "name": "Stations (WHOS-Arctic)",
+    "displayField": "hycosid",
+    "drawingInfo": {
+        "renderer": {
+            "type": "uniqueValue",
+            "field1": "status",
+            "defaultSymbol": {
+                "outline": {
+                    "color": [
+                        0,
+                        0,
+                        0,
+                        255
+                    ],
+                    "width": 1
+                },
+                "color": [
+                    255,
+                    0,
+                    0,
+                    255
+                ],
+                "size": 4,
+                "yoffset": 0,
+                "xoffset": 0,
+                "angle": 0,
+                "style": "esriSMSCircle",
+                "type": "esriSMS"
+            },
+            "defaultLabel": "<all other values>",
+            "uniqueValueInfos": [
+                {
+                    "symbol": {
+                "outline": {
+                    "color": [
+                        0,
+                        0,
+                        0,
+                        255
+                    ],
+                    "width": 1
+                },
+                "color": [
+                    0,
+                    255,
+                    0,
+                    255
+                ],
+                "size": 4,
+                "yoffset": 0,
+                "xoffset": 0,
+                "angle": 0,
+                "style": "esriSMSCircle",
+                "type": "esriSMS"
+            },
+                    "value": "A",
+                    "label": "Time series data available",
+                    "description": ""
+                },
+                {
+                    "symbol": {
+                "outline": {
+                    "color": [
+                        0,
+                        0,
+                        0,
+                        255
+                    ],
+                    "width": 1
+                },
+                "color": [
+                    0,
+                    0,
+                    255,
+                    255
+                ],
+                "size": 4,
+                "yoffset": 0,
+                "xoffset": 0,
+                "angle": 0,
+                "style": "esriSMSCircle",
+                "type": "esriSMS"
+            },
+                    "value": "N",
+                    "label": "Time series data not available",
+                    "description": ""
+                }
+            ]
+        },
+        "transparency": 0,
+        "labelingInfo": null
+    },
+    "id": "1",
+    "copyrightText": "",
+    "minScale": 0,
+    "hasAttachments": false,
+    "fields": [
+        {
+            "editable": false,
+            "name": "whosPage",
+            "alias": "WHOS page",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "hycosid",
+            "alias": "HYCOSID",
+            "type": "esriFieldTypeOID"
+        },
+        {
+            "editable": false,
+            "name": "station_id",
+            "alias": "StationID",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "country",
+            "alias": "Country",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "institute",
+            "alias": "Institute",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "station_name",
+            "alias": "StationName",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "river",
+            "alias": "River",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "lake_station",
+            "alias": "Lake Station",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "grdc_id",
+            "alias": "GRDC ID",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "grdc_ardb",
+            "alias": "GRDC ARDB",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "wmo_region",
+            "alias": "WMO Region",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "latitude",
+            "alias": "Latitude",
+            "type": "esriFieldTypeDouble"
+        },
+        {
+            "editable": false,
+            "name": "longitude",
+            "alias": "Longitude",
+            "type": "esriFieldTypeDouble"
+        },
+        {
+            "editable": false,
+            "name": "latitude_of_discharge",
+            "alias": "Latitude of discharge",
+            "type": "esriFieldTypeDouble"
+        },
+        {
+            "editable": false,
+            "name": "longitude_of_discharge",
+            "alias": "Longitude of discharge",
+            "type": "esriFieldTypeDouble"
+        },
+        {
+            "editable": false,
+            "name": "status",
+            "alias": "Status",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "drainage_area",
+            "alias": "Drainage Area",
+            "type": "esriFieldTypeDouble"
+        },
+        {
+            "editable": false,
+            "name": "effective_drainage_area",
+            "alias": "Effective Drainage Area",
+            "type": "esriFieldTypeDouble"
+        },
+        {
+            "editable": false,
+            "name": "drainage_shapefile",
+            "alias": "Drainage Shapefile",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "datum_name",
+            "alias": "Datum Name",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "datum_altitude",
+            "alias": "Datum Altitude",
+            "type": "esriFieldTypeDouble"
+        },
+        {
+            "editable": false,
+            "name": "flow_to_ocean",
+            "alias": "Flow to Ocean",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "downstream_hycos_station",
+            "alias": "Downstream HYCOS station",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "regulation",
+            "alias": "Regulation",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "regulation_start_date",
+            "alias": "Regulation Start Date",
+            "type": "esriFieldTypeDate"
+        },
+        {
+            "editable": false,
+            "name": "regulation_end_date",
+            "alias": "Regulation End Date",
+            "type": "esriFieldTypeDate"
+        },
+        {
+            "editable": false,
+            "name": "land_use_change",
+            "alias": "Land Use Change",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "surface_cover",
+            "alias": "Surface Cover",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "data_quality_ice",
+            "alias": "Data_quality_ice",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "data_quality_open",
+            "alias": "Data_quality_open",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "discharge_availability",
+            "alias": "Discharge Availability",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "water_level_availability",
+            "alias": "Water Level Availability",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "water_temperature_availability",
+            "alias": "Water Temperature Availability",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "ice_on_off_availability",
+            "alias": "Ice On / Off Dates Availability",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "ice_thickness_availability",
+            "alias": "Ice Thickness Availability",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "snow_depth_availability",
+            "alias": "Snow Depth Availability",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "measurement_method_discharge",
+            "alias": "Measurement Method - Discharge",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "measurement_method_water_temperature",
+            "alias": "Measurement Method - Water Temperature (computed vs. observed)",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "measurement_method_ice_on_off",
+            "alias": "Measurement Method - Ice On / Off Dates",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "equipment",
+            "alias": "Equipment",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "station_notes",
+            "alias": "Station Notes (INTERNAL USE ONLY from here on)",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "start_year",
+            "alias": "StartYear",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "end_year",
+            "alias": "EndYear",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "n_years",
+            "alias": "NYears",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "real_time",
+            "alias": "RealTime",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "water_temperature_start_date",
+            "alias": "Water Temp start date",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "water_temperature_end_date",
+            "alias": "Water Temp end date",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "sampling_interval",
+            "alias": "Sampling interval (temporal frequency)",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "script_link_for_archived_data",
+            "alias": "Script-link for Archived data",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "notes_for_archived_data",
+            "alias": "Notes for archived data",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "script_link_for_real_time_data",
+            "alias": "Script-link for Real-time data",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "notes_for_real_time_data",
+            "alias": "Notes for real-time data",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "script_link_for_water_temperature_data",
+            "alias": "Script-link for Water Temp data",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "notes_water_temperature",
+            "alias": "Notes for water temp data",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "notes_ice_on_off",
+            "alias": "Notes for ice on/off dates and thickness",
+            "type": "esriFieldTypeString"
+        },
+        {
+            "editable": false,
+            "name": "notes_snow_depth",
+            "alias": "Notes for snow depth",
+            "type": "esriFieldTypeString"
+        }
+    ],
+    "geometryType": "esriGeometryPoint"
+}

@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.checker;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,190 +22,87 @@ package eu.essi_lab.cfga.checker;
  */
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
-import java.util.ServiceLoader;
-import java.util.Set;
-import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.ConfigurationUtils;
-import eu.essi_lab.cfga.EditableSetting;
-import eu.essi_lab.cfga.option.ValuesLoader;
-import eu.essi_lab.cfga.setting.AfterCleanFunction;
-import eu.essi_lab.cfga.setting.ObjectExtension;
-import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.cfga.setting.validation.Validator;
-import eu.essi_lab.lib.utils.StreamUtils;
+import eu.essi_lab.cfga.checker.CheckResponse.CheckResult;
 
 /**
  * @author Fabrizio
  */
-public class ConfigurationChecker implements Consumer<Setting> {
+public class ConfigurationChecker {
 
     /**
      * 
      */
-    private Set<String> errorsSet;
+    private List<CheckResponse> responseList;
+
+    /**
+     * 
+     */
+    private List<CheckMethod> methodsList;
 
     /**
      * 
      */
     public ConfigurationChecker() {
 
-	errorsSet = new HashSet<>();
+	responseList = new ArrayList<CheckResponse>();
+	methodsList = new ArrayList<CheckMethod>();
     }
 
     /**
+     * @param method
+     */
+    public void addCheckMethod(CheckMethod method) {
+
+	methodsList.add(method);
+    }
+
+    /**
+     * Executes the {@link CheckMethod}s in the order of insertion and collects the {@link CheckResponse}s
+     * 
+     * @see #addCheckMethod(CheckMethod)
      * @param configuration
      * @return
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public List<String> check(Configuration configuration) {
+    public List<CheckResponse> check(Configuration configuration) {
 
-	checkClasses(configuration);
+	for (CheckMethod method : methodsList) {
 
-	editableSettingCheck(configuration);
+	    CheckResponse error = method.check(configuration);
+	    responseList.add(error);
+	}
 
-	editableSettingCheck();
-
-	return new ArrayList(errorsSet);
-    }
-
-    /**
-     * @param configuration
-     */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public List<String> checkClasses(Configuration configuration) {
-
-	ConfigurationUtils.deepPerform(configuration, this);
-
-	return new ArrayList(errorsSet);
-    }
-
-    /**
-     * @return
-     */
-    public List<String> editableSettingCheck() {
-
-	ServiceLoader<EditableSetting> loader = ServiceLoader.load(EditableSetting.class);
-	StreamUtils.iteratorToStream(loader.iterator()).forEach(setting -> {
-
-	    boolean test = EditableSetting.test((Setting) setting);
-
-	    if (!test) {
-
-		errorsSet.add("Editable setting check failed: " + ((Setting) setting).getName());
-	    }
-	});
-
-	return Arrays.asList(errorsSet.toArray(new String[] {}));
+	return new ArrayList(responseList);
     }
 
     /**
      * @param configuration
      * @return
      */
-    public List<String> editableSettingCheck(Configuration configuration) {
+    public CheckResult getCheckResult(Configuration configuration) {
 
-	List<Setting> matches = new ArrayList<>();
-
-	ConfigurationUtils.deepFind(configuration, s -> {
-
-	    try {
-		return EditableSetting.class.isAssignableFrom(s.getSettingClass());
-	   
-	    } catch (Throwable t) {
-		
-		errorsSet.add("Editable setting check failed: " + ((Setting) s).getName());
-	    }
-	    
-	    return false;
-
-	}, matches);
-
-	matches.forEach(setting -> {
-
-	    boolean test = EditableSetting.test((Setting) setting);
-
-	    if (!test) {
-
-		errorsSet.add("Editable setting check failed: " + ((Setting) setting).getName());
-	    }
-	});
-
-	return Arrays.asList(errorsSet.toArray(new String[] {}));
+	return check(configuration).//
+		stream().//
+		filter(r -> r.getCheckResult() == CheckResult.CHECK_FAILED).//
+		map(r -> r.getCheckResult()).//
+		findFirst().//
+		orElse(CheckResult.CHECK_SUCCESSFUL);
     }
 
-    @Override
-    public void accept(Setting setting) {
+    /**
+     * @param responseList
+     * @return
+     */
+    public static List<String> getErrors(List<CheckResponse> responseList) {
 
-	try {
-
-	    //
-	    // 1) Setting class
-	    //
-	    setting.getSettingClass();
-
-	} catch (Throwable ex) {
-
-	    errorsSet.add("Setting class not found: " + setting.getObject().getString("settingClass"));
-	}
-
-	//
-	// 2) Setting extension class
-	//
-	Optional<Class<? extends ObjectExtension>> optionalExtensionClass = setting.getOptionalExtensionClass();
-
-	if (!optionalExtensionClass.isPresent() && setting.getObject().has("extensionClass")) {
-
-	    errorsSet.add("Setting ObjectExtension class not found: " + setting.getObject().getString("extensionClass"));
-	}
-
-	//
-	// 3) Setting after clean function
-	//
-	Optional<Class<? extends AfterCleanFunction>> optionalAfterCleanFunctionClass = setting.getOptionalAfterCleanFunctionClass();
-
-	if (!optionalAfterCleanFunctionClass.isPresent() && setting.getObject().has("afterCleanFunction")) {
-
-	    errorsSet.add("Setting AfterCleanFunction class not found: " + setting.getObject().getString("afterCleanFunction"));
-	}
-
-	//
-	// 4) Setting validator class
-	//
-	Optional<Class<? extends Validator>> optionalValidatorClass = setting.getOptionalValidatorClass();
-
-	if (!optionalValidatorClass.isPresent() && setting.getObject().has("validatorClass")) {
-
-	    errorsSet.add("Setting Validator class not found: " + setting.getObject().getString("validatorClass"));
-	}
-
-	setting.getOptions().forEach(option -> {
-
-	    //
-	    // 5) Option value class
-	    //
-	    Class<?> valueClass = option.getValueClass();
-
-	    if (valueClass == null) {
-
-		errorsSet.add("Option value class not found: " + option.getObject().getString("valueClass"));
-	    }
-
-	    //
-	    // 6) Option values loader
-	    //
-	    @SuppressWarnings("rawtypes")
-	    Optional<Class<? extends ValuesLoader>> optionalLoaderClass = option.getOptionalLoaderClass();
-
-	    if (!optionalLoaderClass.isPresent() && option.getObject().has("valuesLoaderClass")) {
-
-		errorsSet.add("Option ValuesLoader class not found: " + option.getObject().getString("valuesLoaderClass"));
-	    }
-	});
+	return responseList.//
+		stream().//
+		flatMap(r -> r.getMessages().stream()).//
+		collect(Collectors.toList());
     }
+
 }

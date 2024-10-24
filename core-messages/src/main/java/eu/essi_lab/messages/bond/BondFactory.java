@@ -4,7 +4,7 @@ package eu.essi_lab.messages.bond;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -237,6 +237,28 @@ public class BondFactory {
     public static ResourcePropertyBond createMissingResourcePropertyBond(ResourceProperty property) throws IllegalArgumentException {
 
 	return new ResourcePropertyBond(BondOperator.NULL, property);
+    }
+
+    /**
+     * Creates a {@link SimpleValueBond} using {@link BondOperator#NOT_NULL} as operator
+     * 
+     * @param element
+     * @return
+     */
+    public static SimpleValueBond createExistsSimpleValueBond(MetadataElement element) {
+
+	return new SimpleValueBond(BondOperator.NOT_NULL, element, null);
+    }
+
+    /**
+     * Creates a {@link ResourcePropertyBond} using {@link BondOperator#NOT_NULL} as operator.
+     * 
+     * @param property
+     * @return
+     */
+    public static ResourcePropertyBond createExistsResourcePropertyBond(ResourceProperty property) throws IllegalArgumentException {
+
+	return new ResourcePropertyBond(BondOperator.NOT_NULL, property);
     }
 
     /**
@@ -868,6 +890,20 @@ public class BondFactory {
     }
 
     /**
+     * @param validated
+     * @return
+     */
+    public static ResourcePropertyBond createIsValidatedBond(boolean validated) {
+
+	if (!validated) {
+
+	    return createMissingResourcePropertyBond(ResourceProperty.IS_VALIDATED);
+	}
+
+	return new ResourcePropertyBond(BondOperator.EQUAL, ResourceProperty.IS_VALIDATED, "true");
+    }
+
+    /**
      * @param downloadable
      * @return
      */
@@ -877,12 +913,21 @@ public class BondFactory {
     }
 
     /**
-     * @param isTimeSeriesBond
+     * @param isTimeSeries
      * @return
      */
-    public static ResourcePropertyBond createIsTimeSeriesBond(boolean isTimeSeriesBond) {
+    public static ResourcePropertyBond createIsTimeSeriesBond(boolean isTimeSeries) {
 
-	return new ResourcePropertyBond(BondOperator.EQUAL, ResourceProperty.IS_TIMESERIES, String.valueOf(isTimeSeriesBond));
+	return new ResourcePropertyBond(BondOperator.EQUAL, ResourceProperty.IS_TIMESERIES, String.valueOf(isTimeSeries));
+    }
+
+    /**
+     * @param isEiffelRecord
+     * @return
+     */
+    public static ResourcePropertyBond createIsEiffelRecordBond(boolean isEiffelRecord) {
+
+	return new ResourcePropertyBond(BondOperator.EQUAL, ResourceProperty.IS_EIFFEL_RECORD, String.valueOf(isEiffelRecord));
     }
 
     /**
@@ -892,6 +937,15 @@ public class BondFactory {
     public static ResourcePropertyBond createIsGridBond(boolean isGridBond) {
 
 	return new ResourcePropertyBond(BondOperator.EQUAL, ResourceProperty.IS_GRID, String.valueOf(isGridBond));
+    }
+    
+    /**
+     * @param isVectorBond
+     * @return
+     */
+    public static ResourcePropertyBond createIsVectorBond(boolean isVectorBond) {
+
+	return new ResourcePropertyBond(BondOperator.EQUAL, ResourceProperty.IS_VECTOR, String.valueOf(isVectorBond));
     }
 
     /**

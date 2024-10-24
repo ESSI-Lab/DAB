@@ -1,0 +1,63 @@
+<PolicySet
+	xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 https://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd"
+	PolicySetId="PPS:admin:role" 
+	Version="1.0"
+	PolicyCombiningAlgId="urn:oasis:names:tc:xacml:3.0:policy-combining-algorithm:permit-overrides">
+
+	<Target />
+
+	<Policy PolicyId="Permissions:specifically:for:the:admin:role"
+
+		Version="1.0" 
+		RuleCombiningAlgId="urn:oasis:names:tc:xacml:3.0:rule-combining-algorithm:permit-overrides">
+
+		<Target />
+
+		<Rule RuleId="Permission:to:discover" Effect="Permit">
+
+			<Target>			
+				<AnyOf>
+					<AllOf>
+						<Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+							<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">discover</AttributeValue>
+							<AttributeDesignator 
+								MustBePresent="true"
+								Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action" 
+								AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+								DataType="http://www.w3.org/2001/XMLSchema#string" />
+
+						</Match>
+					</AllOf>
+				</AnyOf>
+			</Target>
+		</Rule>
+		
+		<Rule RuleId="Permission:to:access" Effect="Permit">
+
+			<Target>
+			 
+				<AnyOf>
+					<AllOf>
+						<Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+							<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">access</AttributeValue>
+							<AttributeDesignator 
+								MustBePresent="true"
+								Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action" 
+								AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+								DataType="http://www.w3.org/2001/XMLSchema#string" />
+
+						</Match>
+					</AllOf>
+				</AnyOf>
+			</Target>
+		</Rule>
+				
+	</Policy>
+
+	<!-- Include permissions associated with kma role
+	<PolicySetIdReference>PPS:kma:role</PolicySetIdReference>
+	-->
+
+</PolicySet>

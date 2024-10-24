@@ -1,0 +1,8 @@
+{
+	"currentVersion": 11,
+	"fullVersion": "11.0.0",
+	"owningSystemUrl" : "https://whos.geodab.eu/", 
+	"authInfo": {
+		"isTokenBasedSecurity": false
+	}
+}

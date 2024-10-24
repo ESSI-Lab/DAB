@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.csw._2_0_2.org.purl.dc.terms;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -40,7 +40,7 @@ import eu.essi_lab.jaxb.csw._2_0_2.org.purl.dc.elements._1.SimpleLiteral;
 /**
  * This object contains factory methods for each 
  * Java content interface and Java element interface 
- * generated in the eu.floraresearch.ogc.csw._2_0_2.org.purl.dc.terms package. 
+ * generated in the eu.essi_lab.ogc.csw._2_0_2.org.purl.dc.terms package. 
  * <p>An ObjectFactory allows you to programatically 
  * construct new instances of the Java representation 
  * for XML content. The Java representation of XML 
@@ -92,7 +92,7 @@ public class ObjectFactory {
     private final static QName _Valid_QNAME = new QName("http://purl.org/dc/terms/", "valid");
 
     /**
-     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: eu.floraresearch.ogc.csw._2_0_2.org.purl.dc.terms
+     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: eu.essi_lab.ogc.csw._2_0_2.org.purl.dc.terms
      * 
      */
     public ObjectFactory() {

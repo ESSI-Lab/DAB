@@ -5,7 +5,7 @@
  * will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
  * PARTICULAR PURPOSE. See the GNU General Public License for more details. You should have received a copy of the GNU
  * General Public License along with SDI HydroServer Accessor. If not, see <http://www.gnu.org/licenses/>. Copyright (C)
- * 2009-2011 Flora research <info@floraresearch.eu>
+ * 2009-2011 ESSI-Lab <info@essi-lab.eu>
  */
 
 package eu.essi_lab.accessor.wof.client;
@@ -14,7 +14,7 @@ package eu.essi_lab.accessor.wof.client;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,6 +35,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import javax.xml.xpath.XPathExpressionException;
 
@@ -42,6 +43,7 @@ import org.w3c.dom.Node;
 
 import eu.essi_lab.accessor.wof.client.datamodel.GetServicesInBoxRequest;
 import eu.essi_lab.accessor.wof.client.datamodel.ServiceInfo;
+import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.lib.xml.XMLNodeReader;
 import eu.essi_lab.model.exceptions.GSException;
@@ -165,40 +167,22 @@ public class CUAHSIHISCentralClient {
     public List<ServiceInfo> getServicesInBox(String minx, String miny, String maxx, String maxy) throws GSException {
 	List<ServiceInfo> ret = new ArrayList<ServiceInfo>();
 
-	SOAPExecutorDOM executor = new SOAPExecutorDOM(endpoint);
-
-	executor.setSOAPAction(WOFSOAPAction.HIS_CENTRAL_GET_SERVICES_IN_BOX.getAction());
-
-	GetServicesInBoxRequest getServicesInBoxRequest = new GetServicesInBoxRequest();
-
-	getServicesInBoxRequest.setXmax(maxx);
-	getServicesInBoxRequest.setYmax(maxy);
-	getServicesInBoxRequest.setXmin(minx);
-	getServicesInBoxRequest.setYmin(miny);
-
-	InputStream input = null;
-	try {
-	    input = getServicesInBoxRequest.getReader().asStream();
-	} catch (Exception e) {
-	    e.printStackTrace();
+	Downloader downloader = new Downloader();
+	String request = endpoint;
+	if (!request.endsWith("/")) {
+	    request += "/";
 	}
-
-	executor.setBody(input);
-
-	executor.setResultPath("//*:GetServicesInBoxResult[1]");
-
-	XMLDocumentReader documentReader = executor.execute();
-
-	Node[] result = null;
+	request += "GetServicesInBox2?xmin=" + minx + "&ymin=" + miny + "&xmax=" + maxx + "&ymax=" + maxy;
 	try {
+	    String response = downloader.downloadOptionalString(request).get();
+	    XMLDocumentReader documentReader = new XMLDocumentReader(response);
+	    Node[] result = null;
 	    result = documentReader.evaluateNodes("//*[local-name(.)='ServiceInfo']");
 	    for (Node node : result) {
 		XMLNodeReader reader = new XMLNodeReader(node);
 		ret.add(new ServiceInfo(reader));
-
 	    }
-	} catch (XPathExpressionException e) {
-	    // this should never happen
+	} catch (Exception e) {
 	    e.printStackTrace();
 	}
 

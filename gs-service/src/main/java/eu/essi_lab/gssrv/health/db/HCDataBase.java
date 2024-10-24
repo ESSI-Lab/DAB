@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.health.db;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,26 +22,56 @@ package eu.essi_lab.gssrv.health.db;
  */
 
 import eu.essi_lab.api.database.Database;
-import eu.essi_lab.cfga.setting.Setting;
+import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
+import eu.essi_lab.model.StorageInfo;
+import eu.essi_lab.model.exceptions.GSException;
 
 /**
  * @author Fabrizio
  */
-@SuppressWarnings("rawtypes")
 public class HCDataBase implements Database {
 
     @Override
-    public void configure(Setting setting) {
+    public void configure(DatabaseSetting setting) {
+
     }
 
     @Override
-    public Setting getSetting() {
+    public DatabaseSetting getSetting() {
 
 	return null;
     }
 
     @Override
     public String getType() {
+
+	return null;
+    }
+
+    @Override
+    public void initialize(StorageInfo dbInfo) throws GSException {
+
+    }
+
+    @Override
+    public StorageInfo getStorageInfo() {
+
+	return null;
+    }
+
+    @Override
+    public boolean supports(StorageInfo dbUri) {
+
+	return dbUri instanceof HCStorageInfo;
+    }
+
+    @Override
+    public void release() throws GSException {
+
+    }
+
+    @Override
+    public String getIdentifier() {
 
 	return null;
     }

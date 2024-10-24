@@ -4,7 +4,7 @@ package eu.essi_lab.model.index;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -52,7 +52,7 @@ public class IndexedResourceProperty extends IndexedElement {
      * <code>value</code>
      * 
      * @param property
-     * @param value a non <code>null</code> string, emtpy string is admitted
+     * @param value a non <code>null</code> string, empty string is admitted
      */
     public IndexedResourceProperty(ResourceProperty property, String value) {
 	super(property.getName(), value);

@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.csw;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,6 +21,8 @@ package eu.essi_lab.profiler.csw;
  * #L%
  */
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -29,6 +31,7 @@ import eu.essi_lab.jaxb.common.CommonContext;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.jaxb.csw._2_0_2.GetRecords;
 import eu.essi_lab.jaxb.csw._2_0_2.ResultType;
+import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.ErrorInfo;
@@ -43,20 +46,33 @@ public class CSWRequestFilter extends GETRequestFilter {
     private static final String CSW_REQUEST_FILTER_ERROR = "CSW_REQUEST_FILTER_ERROR";
     private List<ResultType> types;
 
+    /**
+     * 
+     */
     public CSWRequestFilter() {
 	types = new ArrayList<>();
     }
 
+    /**
+     * @param type
+     */
     public CSWRequestFilter(ResultType type) {
 	types = new ArrayList<>();
 	types.add(type);
     }
 
+    /**
+     * @param queryString
+     * @param strategy
+     */
     public CSWRequestFilter(String queryString, InspectionStrategy strategy) {
 	super(queryString, strategy);
 	types = new ArrayList<>();
     }
 
+    /**
+     * @param type
+     */
     public void addResultTypeCondition(ResultType type) {
 
 	types.add(type);
@@ -66,10 +82,44 @@ public class CSWRequestFilter extends GETRequestFilter {
     public boolean accept(WebRequest request) throws GSException {
 
 	if (request.isGetRequest()) {
-	    return super.accept(request);
+
+	    if (CSWRequestUtils.isGetRecordsFromGET(request)) {
+
+		CSWRequestConverter converter = new CSWRequestConverter();
+
+		try {
+		    GetRecords getRecords = converter.convert(request);
+
+		    if (types != null && !types.isEmpty()) {
+
+			ResultType resultType = getRecords.getResultType();
+			return types.contains(resultType);
+		    }
+
+		} catch (Exception e) {
+
+		    throw GSException.createException(//
+			    getClass(), //
+			    e.getMessage(), //
+			    e.getMessage(), //
+			    ErrorInfo.ERRORTYPE_INTERNAL, //
+			    ErrorInfo.SEVERITY_ERROR, //
+			    CSW_REQUEST_FILTER_ERROR, e);
+
+		}
+
+	    } else if (request.isGetRequest()) {
+
+		return super.accept(request);
+	    }
 	}
 
 	try {
+
+	    if (CSWRequestUtils.isGetRecordByIdFromPOST(request)) {
+
+		return true;
+	    }
 
 	    XMLDocumentReader reader = new XMLDocumentReader(request.getBodyStream().clone());
 	    reader.setNamespaceContext(new CommonNameSpaceContext());
@@ -82,12 +132,12 @@ public class CSWRequestFilter extends GETRequestFilter {
 		ResultType resultType = getRecords.getResultType();
 		return types.contains(resultType);
 	    }
-	    
+
 	    Set<String> keySet = queryConditions.keySet();
-	    if(keySet.isEmpty()){
+	    if (keySet.isEmpty()) {
 		return false;
 	    }
-	    
+
 	    String operationName = keySet.toArray()[0].toString();
 	    return reader.evaluateBoolean("exists(//csw:" + operationName + ")");
 
@@ -102,5 +152,15 @@ public class CSWRequestFilter extends GETRequestFilter {
 		    CSW_REQUEST_FILTER_ERROR, e);
 
 	}
+    }
+
+    /**
+     * @param request
+     * @return
+     */
+    @Override
+    protected String getQueryString(WebRequest request) throws GSException {
+
+	return request.getURLDecodedQueryString();
     }
 }

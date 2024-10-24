@@ -1,0 +1,17 @@
+<html>
+<head></head>
+<body>
+<script type="text/javascript">
+
+var str = "https://gs-service-production.geodab.eu/gs-service/services/essi/token/i-change-23495798340278/view/i-change/om-api/observations?format=json&feature=20F8BA12BCAA2FC2D9186D3F7192CF765F6923C4";
+
+fetch(str, {
+	   headers: {
+	      'Accept': 'application/json'
+	   }
+	})
+	   .then(response => response.text())
+	   .then(text => console.log(text))
+</script>
+</body>
+</html>

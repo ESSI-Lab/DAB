@@ -1,0 +1,211 @@
+@prefix ex: <http://https://fairease.eu/dataset/> .
+@prefix dap: <http://example.org/dap-example/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sosa: <http://www.w3.org/ns/sosa/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcat: <https://www.w3.org/ns/dcat#> .
+@prefix dct: <http://purl.org/dc/terms/>.
+@prefix geosparql: <http://www.opengis.net/ont/geosparql#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix dqv: <http://www.w3.org/ns/dqv#> .
+@prefix adms: <http://www.w3.org/ns/adms#> .
+@prefix sdo: <https://schema.org/> .
+@prefix iop: <https://w3id.org/iadopt/ont/>.
+@prefix skos: <http://www.w3.org/2004/02/skos/core#>.
+<http://vocab.nerc.ac.uk/collection/P02/current/ALKY/> a skos:Concept, sosa:ObservedProperty, iop:Variable;
+skos:prefLabel "Alkalinity, acidity and pH of the water column" .
+<http://vocab.nerc.ac.uk/collection/P02/current/CPWC/> a skos:Concept, sosa:ObservedProperty, iop:Variable;
+skos:prefLabel "Chlorophyll pigment concentrations in water bodies" .
+<http://vocab.nerc.ac.uk/collection/P02/current/PSAL/> a skos:Concept, sosa:ObservedProperty, iop:Variable;
+skos:prefLabel "Salinity of the water column" .
+<http://vocab.nerc.ac.uk/collection/P02/current/TEMP/> a skos:Concept, sosa:ObservedProperty, iop:Variable;
+skos:prefLabel "Temperature of the water column" .
+<http://vocab.nerc.ac.uk/collection/P02/current/NTRA/> a skos:Concept, sosa:ObservedProperty, iop:Variable;
+skos:prefLabel "Nitrate concentration parameters in the water column" .
+<http://vocab.nerc.ac.uk/collection/P02/current/NTRI/> a skos:Concept, sosa:ObservedProperty, iop:Variable;
+skos:prefLabel "Nitrite concentration parameters in the water column" .
+<http://vocab.nerc.ac.uk/collection/P02/current/PHOS/> a skos:Concept, sosa:ObservedProperty, iop:Variable;
+skos:prefLabel "Phosphate concentration parameters in the water column" .
+<http://vocab.nerc.ac.uk/collection/P02/current/TDPX/> a skos:Concept, sosa:ObservedProperty, iop:Variable;
+skos:prefLabel "Dissolved total or organic phosphorus concentration in the water column" .
+<http://vocab.nerc.ac.uk/collection/P02/current/AMON/> a skos:Concept, sosa:ObservedProperty, iop:Variable;
+skos:prefLabel "Ammonium and ammonia concentration parameters in water bodies" .
+<http://vocab.nerc.ac.uk/collection/P02/current/SLCA/> a skos:Concept, sosa:ObservedProperty, iop:Variable;
+skos:prefLabel "Silicate concentration parameters in the water column" .
+<http://vocab.nerc.ac.uk/collection/P02/current/TDNT/> a skos:Concept, sosa:ObservedProperty, iop:Variable;
+skos:prefLabel "Dissolved total and organic nitrogen concentrations in the water column" .
+<http://vocab.nerc.ac.uk/collection/P02/current/DOXY/> a skos:Concept, sosa:ObservedProperty, iop:Variable;
+skos:prefLabel "Dissolved oxygen parameters in the water column" .
+<http://vocab.nerc.ac.uk/collection/P02/current/SECC/> a skos:Concept, sosa:ObservedProperty, iop:Variable;
+skos:prefLabel "Secchi disk depth" .
+<http://vocab.nerc.ac.uk/collection/P02/current/NTOT/> a skos:Concept, sosa:ObservedProperty, iop:Variable;
+skos:prefLabel "Particulate total and organic nitrogen concentrations in the water column" .
+<http://vocab.nerc.ac.uk/collection/P02/current/MTWD/> a skos:Concept, sosa:ObservedProperty, iop:Variable;
+skos:prefLabel "Dissolved metal concentrations in the water column" .
+<http://vocab.nerc.ac.uk/collection/P02/current/PPWC/> a skos:Concept, sosa:ObservedProperty, iop:Variable;
+skos:prefLabel "Concentration of polychlorobiphenyls (PCBs) in the water column" .
+<http://vocab.nerc.ac.uk/collection/P02/current/PEWB/> a skos:Concept, sosa:ObservedProperty, iop:Variable;
+skos:prefLabel "Pesticide concentrations in water bodies" .
+<http://vocab.nerc.ac.uk/collection/P02/current/WCOC/> a skos:Concept, sosa:ObservedProperty, iop:Variable;
+skos:prefLabel "Concentration of other organic contaminants in the water column" .
+<https://edmo.seadatanet.org/report/96> a prov:Organization ;
+rdfs:label "German Oceanographic Datacentre".
+<https://edmo.seadatanet.org/report/2537> a prov:Organization ;
+rdfs:label "State Office for Agriculture, Environment and Rural Areas of Schleswig Holstein ".
+<https://edmo.seadatanet.org/report/1181> a prov:Organization ;
+rdfs:label "State Agency for Nature and Environment of Schleswig Holstein ".
+<https://edmo.seadatanet.org/report/2537> a prov:Organization ;
+rdfs:label "State Office for Agriculture, Environment and Rural Areas of Schleswig Holstein ".
+<https://edmo.seadatanet.org/report/96> a prov:Organization ;
+rdfs:label "German Oceanographic Datacentre".
+ex:Catalog-seadatanet-open a dcat:Catalog ;
+rdfs:label "SeaDataNet - Open datasets";
+dcat:dataset ex:Dataset-sdn-open:urn:SDN:CDI:LOCAL:96-2537-96-ds01-4.
+ex:Dataset-sdn-open:urn:SDN:CDI:LOCAL:96-2537-96-ds01-4 a dcat:Dataset, sdo:Dataset;
+dct:title "SeaDataNet - Biological oceanography from German Oceanographic Datacentre (PointOfContact; Data Distributor), State Office for Agriculture, Environment and Rural Areas of Schleswig Holstein  (Data Custodian), point observations";
+dct:description "SeaDataNet is the Pan-European infrastructure for marine and ocean data management and delivery services. It is supported by the EU under its Research Infrastructures programme. It  connects 40 National Oceanographic Data Centres (NODC's) and 50 other data centres from 35 countries, bordering the European seas and Atlantic Ocean. The centres are mostly part of major marine management and research organisations that are acquiring and managing a large collection of marine and ocean data from various disciplines. This includes major international organisations, ICES and IOC-IODE. The overall objective is provide overview and access to marine and oceanographic data and data-products from government and research institutes in Europe. SeaDataNet contributes to the implementation of the EU INSPIRE and Marine Strategy Framework Directives. It also plays a key role in the development and operation of the EU EMODNet initiative. The SeaDataNet infrastructure is fully operational and INSPIRE compliant. It includes a versatile SeaDataNet portal (https://www.seadatanet.org) that provides users with a range of metadata, data and data product access services as well as standards, tools and guides for good marine data management. The Common Data Index (CDI) data discovery and access service provides harmonised access to the large volumes of datasets that are managed by the connected data centres. The CDI service contains already references and gives access to more than 1,5 milllion marine and oceanographic datasets as managed by 90 data centres. These numbers are increasing regularly because of further data population and more connected data centres as part of SeaDataNet II, EMODnet and other EU projects. For inclusion in the SeaDataNet INSPIRE compliant CSW service, the CDI records (at granule level) have been aggregated into CDI collections by a combination of Discipline, Data Centre, and geometric type. Each CSW XML record therefore represents a large collection of individual metadata records and associated datasets. By following the specified URL to the SeaDataNet portal users can evaluate these metadata in detail and request access by downloading of interesting datasets via the shopping cart transaction system that is integrated in the SeaDataNet portal.";
+dct:identifier "urn:SDN:CDI:LOCAL:96-2537-96-ds01-4" ;
+dcat:distribution ex:Dataset-sdn-open:urn:SDN:CDI:LOCAL:96-2537-96-ds01-4-0 ;
+dcat:distribution ex:Dataset-sdn-open:urn:SDN:CDI:LOCAL:96-2537-96-ds01-4-1 ;
+prov:wasGeneratedBy dap:Activitysdn-open:urn:SDN:CDI:LOCAL:96-2537-96-ds01-4-0;
+prov:wasGeneratedBy dap:Activitysdn-open:urn:SDN:CDI:LOCAL:96-2537-96-ds01-4-1;
+prov:wasGeneratedBy dap:Activitysdn-open:urn:SDN:CDI:LOCAL:96-2537-96-ds01-4-2;
+sdo:variableMeasured [
+rdf:type sdo:PropertyValue;
+sdo:name "Alkalinity, acidity and pH of the water column";
+sdo:propertyID <http://vocab.nerc.ac.uk/collection/P02/current/ALKY/> ;
+] ;
+sdo:variableMeasured [
+rdf:type sdo:PropertyValue;
+sdo:name "Chlorophyll pigment concentrations in water bodies";
+sdo:propertyID <http://vocab.nerc.ac.uk/collection/P02/current/CPWC/> ;
+] ;
+sdo:variableMeasured [
+rdf:type sdo:PropertyValue;
+sdo:name "Salinity of the water column";
+sdo:propertyID <http://vocab.nerc.ac.uk/collection/P02/current/PSAL/> ;
+] ;
+sdo:variableMeasured [
+rdf:type sdo:PropertyValue;
+sdo:name "Temperature of the water column";
+sdo:propertyID <http://vocab.nerc.ac.uk/collection/P02/current/TEMP/> ;
+] ;
+sdo:variableMeasured [
+rdf:type sdo:PropertyValue;
+sdo:name "Nitrate concentration parameters in the water column";
+sdo:propertyID <http://vocab.nerc.ac.uk/collection/P02/current/NTRA/> ;
+] ;
+sdo:variableMeasured [
+rdf:type sdo:PropertyValue;
+sdo:name "Nitrite concentration parameters in the water column";
+sdo:propertyID <http://vocab.nerc.ac.uk/collection/P02/current/NTRI/> ;
+] ;
+sdo:variableMeasured [
+rdf:type sdo:PropertyValue;
+sdo:name "Phosphate concentration parameters in the water column";
+sdo:propertyID <http://vocab.nerc.ac.uk/collection/P02/current/PHOS/> ;
+] ;
+sdo:variableMeasured [
+rdf:type sdo:PropertyValue;
+sdo:name "Dissolved total or organic phosphorus concentration in the water column";
+sdo:propertyID <http://vocab.nerc.ac.uk/collection/P02/current/TDPX/> ;
+] ;
+sdo:variableMeasured [
+rdf:type sdo:PropertyValue;
+sdo:name "Ammonium and ammonia concentration parameters in water bodies";
+sdo:propertyID <http://vocab.nerc.ac.uk/collection/P02/current/AMON/> ;
+] ;
+sdo:variableMeasured [
+rdf:type sdo:PropertyValue;
+sdo:name "Silicate concentration parameters in the water column";
+sdo:propertyID <http://vocab.nerc.ac.uk/collection/P02/current/SLCA/> ;
+] ;
+sdo:variableMeasured [
+rdf:type sdo:PropertyValue;
+sdo:name "Dissolved total and organic nitrogen concentrations in the water column";
+sdo:propertyID <http://vocab.nerc.ac.uk/collection/P02/current/TDNT/> ;
+] ;
+sdo:variableMeasured [
+rdf:type sdo:PropertyValue;
+sdo:name "Dissolved oxygen parameters in the water column";
+sdo:propertyID <http://vocab.nerc.ac.uk/collection/P02/current/DOXY/> ;
+] ;
+sdo:variableMeasured [
+rdf:type sdo:PropertyValue;
+sdo:name "Secchi disk depth";
+sdo:propertyID <http://vocab.nerc.ac.uk/collection/P02/current/SECC/> ;
+] ;
+sdo:variableMeasured [
+rdf:type sdo:PropertyValue;
+sdo:name "Particulate total and organic nitrogen concentrations in the water column";
+sdo:propertyID <http://vocab.nerc.ac.uk/collection/P02/current/NTOT/> ;
+] ;
+sdo:variableMeasured [
+rdf:type sdo:PropertyValue;
+sdo:name "Dissolved metal concentrations in the water column";
+sdo:propertyID <http://vocab.nerc.ac.uk/collection/P02/current/MTWD/> ;
+] ;
+sdo:variableMeasured [
+rdf:type sdo:PropertyValue;
+sdo:name "Concentration of polychlorobiphenyls (PCBs) in the water column";
+sdo:propertyID <http://vocab.nerc.ac.uk/collection/P02/current/PPWC/> ;
+] ;
+sdo:variableMeasured [
+rdf:type sdo:PropertyValue;
+sdo:name "Pesticide concentrations in water bodies";
+sdo:propertyID <http://vocab.nerc.ac.uk/collection/P02/current/PEWB/> ;
+] ;
+sdo:variableMeasured [
+rdf:type sdo:PropertyValue;
+sdo:name "Concentration of other organic contaminants in the water column";
+sdo:propertyID <http://vocab.nerc.ac.uk/collection/P02/current/WCOC/> ;
+] ;
+dct:creator  <https://edmo.seadatanet.org/report/2537>;
+dct:creator  <https://edmo.seadatanet.org/report/1181>;
+dct:publisher  <https://edmo.seadatanet.org/report/96>;
+dcat:theme "Oceanographic geographical features" ;
+dct:issued "2024-03-06";
+dct:temporal [
+a dct:PeriodOfTime ;
+dcat:startDate "2009-01-13"^^xsd:dateTime;
+dcat:endDate   "2011-12-12"^^xsd:dateTime;
+];
+dct:spatial [
+a dct:Location ;
+dcat:bbox """POLYGON((
+8.1169996262 55.0850028992, 11.5500001907 55.0850028992, 11.5500001907 53.8950004578, 8.1169996262 53.8950004578, 11.5500001907 55.0850028992))"""^^geosparql:wktLiteral ;
+] .
+dap:Activitysdn-open:urn:SDN:CDI:LOCAL:96-2537-96-ds01-4-0 a prov:Activity;
+prov:used <http://vocab.nerc.ac.uk/collection/L05/current/30/> .
+<http://vocab.nerc.ac.uk/collection/L05/current/30/>  a sosa:Sensor, prov:Entity, skos:Concept;
+skos:prefLabel "discrete water samplers".
+dap:Activitysdn-open:urn:SDN:CDI:LOCAL:96-2537-96-ds01-4-1 a prov:Activity;
+prov:used <http://vocab.nerc.ac.uk/collection/L05/current/124/> .
+<http://vocab.nerc.ac.uk/collection/L05/current/124/>  a sosa:Sensor, prov:Entity, skos:Concept;
+skos:prefLabel "transmissometers".
+dap:Activitysdn-open:urn:SDN:CDI:LOCAL:96-2537-96-ds01-4-2 a prov:Activity;
+prov:used <http://vocab.nerc.ac.uk/collection/L05/current/130/> .
+<http://vocab.nerc.ac.uk/collection/L05/current/130/>  a sosa:Sensor, prov:Entity, skos:Concept;
+skos:prefLabel "CTD".
+<http://vocab.nerc.ac.uk/collection/L06/current/0/> a sosa:Platform.
+ex:Dataset-sdn-open:urn:SDN:CDI:LOCAL:96-2537-96-ds01-4-0 a dcat:Distribution ;
+dcat:accessURL <https://cdi.seadatanet.org/search?step=00896~0372537~04896~0114~020ds01~0610> ;
+dcat:accessService ex:subset-service-1575433984.
+ex:subset-service-1575433984
+rdf:type dcat:DataService ;
+dct:type <https://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType/invoke> ;
+dcat:endpointDescription "Seadatanet CDI v5 portal website" ;
+dcat:endpointURL <https://cdi.seadatanet.org/search?step=00896~0372537~04896~0114~020ds01~0610> ;
+dcat:servesDataset ex:Dataset-sdn-open:urn:SDN:CDI:LOCAL:96-2537-96-ds01-4 .
+ex:Dataset-sdn-open:urn:SDN:CDI:LOCAL:96-2537-96-ds01-4-1 a dcat:Distribution ;
+dcat:accessURL <https://geo-service.maris.nl/seadatanet/wms> ;
+dcat:accessService ex:subset-service--588745607.
+ex:subset-service--588745607
+rdf:type dcat:DataService ;
+dct:conformsTo "urn:ogc:serviceType:WebMapService:1.1.1:HTTP" ;
+dct:type <https://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType/invoke> ;
+dcat:endpointDescription "WMS example url" ;
+dcat:endpointURL <https://geo-service.maris.nl/seadatanet/wms> ;
+dcat:servesDataset ex:Dataset-sdn-open:urn:SDN:CDI:LOCAL:96-2537-96-ds01-4 .

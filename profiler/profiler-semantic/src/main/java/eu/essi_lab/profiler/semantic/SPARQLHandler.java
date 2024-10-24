@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.semantic;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,6 @@ package eu.essi_lab.profiler.semantic;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -33,11 +32,12 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.client.methods.HttpGet;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import eu.essi_lab.lib.net.utils.HttpRequestExecutor;
+import eu.essi_lab.lib.net.downloader.Downloader;
+import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
+import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodNoBody;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.web.WebRequest;
@@ -101,12 +101,10 @@ public class SPARQLHandler implements WebRequestHandler, WebRequestValidator {
 
 	System.out.println("Sending to url: " + url);
 
-	HttpGet get = new HttpGet(url);
-
-	HttpRequestExecutor hre = new HttpRequestExecutor();
+	Downloader hre = new Downloader();
 
 	try {
-	    InputStream stream = hre.execute(get).getEntity().getContent();
+	    InputStream stream = hre.downloadResponse(HttpRequestUtils.build(MethodNoBody.GET, url)).body();
 
 	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -142,12 +140,13 @@ public class SPARQLHandler implements WebRequestHandler, WebRequestValidator {
 
 	System.out.println("Sending to url: " + url);
 
-	HttpGet get = new HttpGet(url);
-
-	HttpRequestExecutor hre = new HttpRequestExecutor();
+	Downloader hre = new Downloader();
 
 	try {
-	    InputStream stream = hre.execute(get, System.getProperty("dbUser"), System.getProperty("dbPassword")).getEntity().getContent();
+	    InputStream stream = hre.downloadResponse(//
+		    HttpRequestUtils.build(MethodNoBody.GET, url), //
+		    System.getProperty("dbUser"), System.getProperty("dbPassword")).//
+		    body();
 
 	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -158,7 +157,7 @@ public class SPARQLHandler implements WebRequestHandler, WebRequestValidator {
 	    String ret = callback + "(" + new String(baos.toByteArray()) + ")";
 
 	    return Response.status(Status.OK).type(MediaType.APPLICATION_JSON).entity(new ByteArrayInputStream(ret.getBytes())).build();
-	} catch (UnsupportedOperationException | IOException e) {
+	} catch (Exception e) {
 	    e.printStackTrace();
 	    return Response.status(Status.INTERNAL_SERVER_ERROR).type(MediaType.TEXT_PLAIN)
 		    .entity(new ByteArrayInputStream(e.getMessage().getBytes())).build();

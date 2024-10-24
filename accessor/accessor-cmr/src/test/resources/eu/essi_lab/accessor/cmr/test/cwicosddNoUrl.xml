@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns:os="http://a9.com/-/spec/opensearch/1.1/" xmlns:georss="http://www.georss.org/georss" xmlns="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/terms/" xmlns:echo="http://www.echo.nasa.gov/esip" xmlns:esipdiscovery="http://commons.esipfed.org/ns/discovery/1.2/" xmlns:gml="http://www.opengis.net/gml" xmlns:time="http://a9.com/-/opensearch/extensions/time/1.0/" xmlns:eo="http://a9.com/-/opensearch/extensions/eo/1.0/" esipdiscovery:version="1.2">
+    <updated>2018-05-22T14:59:08.778Z</updated>
+    <id>https://cmr.earthdata.nasa.gov/opensearch/collections.atom</id>
+    <author>
+        <name>CMR</name>
+        <email>echodev@echo.nasa.gov</email>
+    </author>
+    <title type="text">ECHO dataset metadata</title>
+    <subtitle type="text">Search parameters: uid =&gt; C1214587974-SCIOPS</subtitle>
+    <link href="https://cmr.earthdata.nasa.gov/opensearch/granules/descriptor_document.xml" hreflang="en-US" type="application/opensearchdescription+xml" rel="search"/>
+    <link href="http://cmr.earthdata.nasa.gov/opensearch/collections.atom?uid=C1214587974-SCIOPS&amp;" hreflang="en-US" type="application/atom+xml" rel="self"/>
+    <link href="http://cmr.earthdata.nasa.gov/opensearch/collections.atom?uid=C1214587974-SCIOPS&amp;cursor=1" hreflang="en-US" type="application/atom+xml" rel="last"/>
+    <link href="http://cmr.earthdata.nasa.gov/opensearch/collections.atom?uid=C1214587974-SCIOPS&amp;cursor=1" hreflang="en-US" type="application/atom+xml" rel="first"/>
+    <link href="https://wiki.earthdata.nasa.gov/display/echo/Open+Search+API+release+information" hreflang="en-US" type="text/html" rel="describedBy" title="Release Notes"/>
+    <os:Query xmlns:geo="http://a9.com/-/opensearch/extensions/geo/1.0/" role="request" geo:uid="C1214587974-SCIOPS"/>
+    <os:totalResults>1</os:totalResults>
+    <os:itemsPerPage>10</os:itemsPerPage>
+    <os:startIndex>1</os:startIndex>
+    <entry>
+        <id>https://cmr.earthdata.nasa.gov/opensearch/collections.atom?uid=C1214587974-SCIOPS</id>
+        <author>
+            <name>CMR</name>
+            <email>echodev@echo.nasa.gov</email>
+        </author>
+        <title type="text">(U-Th)/He ages from the Kukri Hills of southern Victoria Land</title>
+        <summary type="text">The data set consists of (U-Th)/He ages collected from three vertical profiles
+            from the the Kukri Hills (north side of the Ferrar Glacier) of Southern
+            Victoria Land.  The data set provides information on the cooling history and
+            hence the denduation history of the Transantarctic Mountains in this area.
+            Analyses were all carried out at the (U-Th)/He lab of Ken Farley at the
+            Californai Institute of Technology.</summary>
+        <updated/>
+        <link rel="describedBy" hreflang="en-US" href="http://su-thermochronology.syr.edu/"/>
+        <link href="http://gcmd.nasa.gov/getdif.htm?KUKRI_He" hreflang="en-US" type="text/html" rel="enclosure" title="KUKRI_He"/>
+        <link href="https://cmr.earthdata.nasa.gov/search/concepts/C1214587974-SCIOPS.xml" hreflang="en-US" type="application/xml" rel="via" title="Product metadata"/>
+        <dc:identifier>C1214587974-SCIOPS</dc:identifier>
+        <dc:date>1970-01-01T00:00:00.000Z/</dc:date>
+        <echo:datasetId>(U-Th)/He ages from the Kukri Hills of southern Victoria Land</echo:datasetId>
+        <echo:shortName>KUKRI_He</echo:shortName>
+        <echo:versionId>Not provided</echo:versionId>
+        <echo:dataCenter>SCIOPS</echo:dataCenter>
+        <echo:archiveCenter>SYRACUSE/ES/TGIGRG</echo:archiveCenter>
+        <echo:organization>SYRACUSE/ES/TGIGRG</echo:organization>
+        <echo:coordinateSystem>CARTESIAN</echo:coordinateSystem>
+        <echo:orbitParameters/>
+        <georss:box>-77.7 162.7 -77.7 162.7</georss:box>
+        <echo:hasVariables>false</echo:hasVariables>
+        <echo:hasFormats>false</echo:hasFormats>
+        <echo:hasTransforms>false</echo:hasTransforms>
+        <echo:hasSpatialSubsetting>false</echo:hasSpatialSubsetting>
+    </entry>
+</feed>

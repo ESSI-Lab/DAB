@@ -1,0 +1,30 @@
+{
+    "abstract": "All Sentinel-3 Non Time Critical (NTC) products are available at pick-up point in less than 30 days. The products  contain the typical altimetry measurements, like the altimeter range, the sea surface height, the wind speed, significant wave height and all required geophysical corrections and related flags. Also the sea Ice freeboard measurement is included. The measurements in the standard data file provide the measurements in low (1 Hz = approx.  7km) and high resolution (20 Hz = approx. 300 m), in LRM mode or in SAR mode, for both C-band and Ku band. The SAR mode is the default mode. The reduced measurement data file contains 1 Hz measurements only. The enhanced measurement data file contains also the waveforms and associated parameters and the pseudo LRM measurements when in SAR mode. Sentinel-3 is part of a series of Sentinel satellites, under the umbrella of the EU Copernicus programme.",
+    "contact": {
+        "contactEmail": "ops@eumetsat.int",
+        "contactIndividualName": "ops@eumetsat.int",
+        "contactOrganizationName": "ops@eumetsat.int",
+        "contactPhone": "+49(0)6151-807 3660/3770",
+        "contactUrl": "http://www.eumetsat.int"
+    },
+    "created": "2015-08-13T00:00:00Z",
+    "datasetId": "EO:EUM:DAT:SENTINEL-3:SR_2_WAT___",
+    "details": {
+        "instrumentId": "SRAL",
+        "instrumentName": "SRAL",
+        "instrumentType": "Altimetric",
+        "orbitType": "LEO",
+        "platformDescription": null,
+        "platformId": "Sentinel-3"
+    },
+    "extent": {
+        "bbox": "POLYGON((-180.0 90.0, 180.0 90.0, 180.0 -90.0, -180.0 -90.0, -180.0 90.0))",
+        "endDate": "unknown",
+        "geoDescription": "Global",
+        "startDate": "2017-01-19"
+    },
+    "parameters": "Level 2 Data, Ocean, Sea Surface Height",
+    "previewImage": "https://wekeo-broker.apps.mercator.dpi.wekeo.eu/previews/EO_EUM_DAT_SENTINEL-3_SR_2_WAT___.png",
+    "status": "Development",
+    "title": "SRAL Altimetry Global - Sentinel-3"
+}

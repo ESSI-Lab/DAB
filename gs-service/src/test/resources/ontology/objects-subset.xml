@@ -1,0 +1,97 @@
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:dct="http://purl.org/dc/terms/" xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:d2k="http://eu.essi_lab.core/2018/06/d2k#">
+
+
+	<rdf:Description rdf:about="http://eu.floraresearch.essi.core/test/target1">
+		<rdf:type rdf:resource="http://eu.essi_lab.core/2018/06/d2k#Policy_Goal" />
+		<rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Target 1.1</rdfs:label>
+		<skos:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Target 1.1 Description</skos:definition>
+		<d2k:isChildOf rdf:resource="http://eu.floraresearch.essi.core/test/goal1"></d2k:isChildOf>
+		<rdfs:isDefinedBy rdf:resource="http://eu.floraresearch.essi.core/test/unontology" />
+	</rdf:Description>
+
+	<rdf:Description rdf:about="http://eu.floraresearch.essi.core/test/target2">
+		<rdf:type rdf:resource="http://eu.essi_lab.core/2018/06/d2k#Policy_Goal" />
+		 
+		<rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Target 1.2</rdfs:label>
+		<rdfs:label xml:lang="en">Target 1.2</rdfs:label>
+		<rdfs:label xml:lang="fr">Target 1.2</rdfs:label>
+		<rdfs:label xml:lang="it">Target 1.2</rdfs:label>
+ 		<rdfs:label xml:lang="de">Target 1.2</rdfs:label>
+
+		<skos:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Target 1.2 Description</skos:definition>
+		<d2k:isChildOf rdf:resource="http://eu.floraresearch.essi.core/test/goal1"></d2k:isChildOf>
+		<rdfs:isDefinedBy rdf:resource="http://eu.floraresearch.essi.core/test/unontology" />
+	</rdf:Description>
+
+	<rdf:Description rdf:about="http://eu.floraresearch.essi.core/test/indicator111">
+		<rdf:type rdf:resource="http://eu.essi_lab.core/2018/06/d2k#Indicator" />
+		<rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Indicator 1.1.1</rdfs:label>
+		<skos:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Indicator 1.1.1 Description</skos:definition>
+		<d2k:addresses rdf:resource="http://eu.floraresearch.essi.core/test/target1"></d2k:addresses>
+		<rdfs:isDefinedBy rdf:resource="http://eu.floraresearch.essi.core/test/unontology" />
+	</rdf:Description>
+
+	<rdf:Description rdf:about="http://eu.floraresearch.essi.core/test/indicator121">
+		<rdf:type rdf:resource="http://eu.essi_lab.core/2018/06/d2k#Indicator" />
+		
+		
+		<rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Indicator 1.2.1</rdfs:label>
+		<rdfs:label xml:lang="fr">Indicator 1.2.1</rdfs:label>
+		
+		<skos:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Indicator 1.2.1 Description</skos:definition>
+		
+		<!-- remove this comment to add abstract as multi-language element like label		
+			<skos:definition xml:lang="fr">Indicator 1.2.1 Description</skos:definition>
+ 		-->		
+		
+		<d2k:addresses rdf:resource="http://eu.floraresearch.essi.core/test/target2"></d2k:addresses>
+		<rdfs:isDefinedBy rdf:resource="http://eu.floraresearch.essi.core/test/unontology" />
+	</rdf:Description>
+	
+	 
+
+	<rdf:Description rdf:about="http://eu.floraresearch.essi.core/test/indicator122">
+		<rdf:type rdf:resource="http://eu.essi_lab.core/2018/06/d2k#Indicator" />
+			
+		<rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Indicator 1.2.2</rdfs:label>
+	 	<rdfs:label xml:lang="en">Indicator 1.2.2</rdfs:label>
+		<rdfs:label xml:lang="fr">Indicator 1.2.2</rdfs:label> 
+		<rdfs:label xml:lang="es">Indicator 1.2.2</rdfs:label>
+
+		<skos:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Indicator 1.2.2 Description</skos:definition>
+		<d2k:addresses rdf:resource="http://eu.floraresearch.essi.core/test/target2"></d2k:addresses>
+		<rdfs:isDefinedBy rdf:resource="http://eu.floraresearch.essi.core/test/unontology" />
+	</rdf:Description>
+
+
+	<rdf:Description
+		rdf:about="http://eu.floraresearch.essi.core/test/modeltoindicator122">
+		<rdf:type
+			rdf:resource="http://eu.essi_lab.core/2018/06/d2k#Knowledge_Business_Process" />
+		<rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Model to Indicator 1.2.2</rdfs:label>
+		<skos:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Model for Generating Indicator 1.2.2 Description</skos:definition>
+		<d2k:generates_output
+			rdf:resource="http://eu.floraresearch.essi.core/test/indicator122"></d2k:generates_output>
+		<rdfs:isDefinedBy rdf:resource="http://eu.floraresearch.essi.core/test/unontology" />
+	</rdf:Description>
+
+
+
+	<rdf:Description
+		rdf:about="http://eu.floraresearch.essi.core/test/modeltoindicatorMultiple">
+		<rdf:type
+			rdf:resource="http://eu.essi_lab.core/2018/06/d2k#Knowledge_Business_Process" />
+		<rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Model to Indicator Multiple</rdfs:label>
+		<skos:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Model for Generating Multiple Indicators Description</skos:definition>
+		<d2k:generates_output
+			rdf:resource="http://eu.floraresearch.essi.core/test/indicator111"></d2k:generates_output>
+		<d2k:generates_output
+			rdf:resource="http://eu.floraresearch.essi.core/test/indicator121"></d2k:generates_output>
+		<rdfs:isDefinedBy rdf:resource="http://eu.floraresearch.essi.core/test/unontology" />
+	</rdf:Description>
+
+
+</rdf:RDF>

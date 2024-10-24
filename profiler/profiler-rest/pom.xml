@@ -14,6 +14,11 @@
 	<dependencies>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>access-tools-test</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>access-tools</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
@@ -21,12 +26,7 @@
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>access-tools-validator-netcdf</artifactId>
 			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>database-api-marklogic-impl</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
+		</dependency>		
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>gs-lib-wof</artifactId>
@@ -45,6 +45,10 @@
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>access-tools-downloader-wcs</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency><dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>access-tools-downloader-usgs</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 	 
@@ -72,30 +76,6 @@
 						<groupId>io.fabric8</groupId>
 						<artifactId>docker-maven-plugin</artifactId>
 
-						<configuration>
-							<images>
-
-								<image>
-									<alias>gi-marklogic</alias>
-									<name>${marklogic.registry}</name>
-									<run>
-										<ports>
-											<port>gi-marklogic.rest-port:8000</port>
-											<port>gi-marklogic.xdbc-port:8006</port>
-											<port>healthcheck.port:7997</port>
-										</ports>
-										<wait>
-											<http>
-												<!--suppress MavenModelInspection -->
-												<url>http://${docker.host.address}:${healthcheck.port}</url>
-											</http>
-											<time>${fabric8-timeout}</time>
-										</wait>
-									</run>
-								</image>
-
-							</images>
-						</configuration>
 					</plugin>
 				</plugins>
 			</build>
@@ -111,35 +91,7 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-failsafe-plugin</artifactId>
 					</plugin>
-					<plugin>
-						<groupId>io.fabric8</groupId>
-						<artifactId>docker-maven-plugin</artifactId>
-
-						<configuration>
-							<images>
-
-								<image>
-									<alias>gi-marklogic</alias>
-									<name>${marklogic.registry}</name>
-									<run>
-										<ports>
-											<port>gi-marklogic.rest-port:8000</port>
-											<port>gi-marklogic.xdbc-port:8006</port>
-											<port>healthcheck.port:7997</port>
-										</ports>
-										<wait>
-											<http>
-												<!--suppress MavenModelInspection -->
-												<url>http://${docker.host.address}:${healthcheck.port}</url>
-											</http>
-											<time>${fabric8-timeout}</time>
-										</wait>
-									</run>
-								</image>
-
-							</images>
-						</configuration>
-					</plugin>
+					
 				</plugins>
 			</build>
 		</profile>

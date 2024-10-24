@@ -1,0 +1,530 @@
+<DataSet xmlns="http://MRCS/">
+    <xs:schema xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="SubBacia">
+        <xs:element name="SubBacia" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+            <xs:complexType>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element name="Table">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="codBacia" type="xs:int" minOccurs="0"/>
+                                <xs:element name="nmBacia" type="xs:string" minOccurs="0"/>
+                                <xs:element name="codSubBacia" type="xs:int" minOccurs="0"/>
+                                <xs:element name="nmSubBacia" type="xs:string" minOccurs="0"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:choice>
+            </xs:complexType>
+        </xs:element>
+    </xs:schema>
+    <diffgr:diffgram xmlns:msdata="urn:schemas-microsoft-com:xml-msdata"
+        xmlns:diffgr="urn:schemas-microsoft-com:xml-diffgram-v1">
+        <SubBacia xmlns="">
+            <Table diffgr:id="Table1" msdata:rowOrder="0">
+                <codBacia>1</codBacia>
+                <nmBacia>RIO AMAZONAS</nmBacia>
+                <codSubBacia>10</codSubBacia>
+                <nmSubBacia>RIO SOLIMÕES, JAVARI,ITACUAI</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table2" msdata:rowOrder="1">
+                <codBacia>1</codBacia>
+                <nmBacia>RIO AMAZONAS</nmBacia>
+                <codSubBacia>11</codSubBacia>
+                <nmSubBacia>RIO SOLIMÕES,IÇÁ,JANDIATUBA,..</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table3" msdata:rowOrder="2">
+                <codBacia>1</codBacia>
+                <nmBacia>RIO AMAZONAS</nmBacia>
+                <codSubBacia>12</codSubBacia>
+                <nmSubBacia>RIO SOLIMÕES,JURUÁ,JAPURÁ,....</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table4" msdata:rowOrder="3">
+                <codBacia>1</codBacia>
+                <nmBacia>RIO AMAZONAS</nmBacia>
+                <codSubBacia>13</codSubBacia>
+                <nmSubBacia>RIO SOLIMÕES,PURUS,COARI,..</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table5" msdata:rowOrder="4">
+                <codBacia>1</codBacia>
+                <nmBacia>RIO AMAZONAS</nmBacia>
+                <codSubBacia>14</codSubBacia>
+                <nmSubBacia>RIO SOLIMÕES,NEGRO,BRANCO,....</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table6" msdata:rowOrder="5">
+                <codBacia>1</codBacia>
+                <nmBacia>RIO AMAZONAS</nmBacia>
+                <codSubBacia>15</codSubBacia>
+                <nmSubBacia>RIO AMAZONAS,MADEIRA,GUAPORÉ,...</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table7" msdata:rowOrder="6">
+                <codBacia>1</codBacia>
+                <nmBacia>RIO AMAZONAS</nmBacia>
+                <codSubBacia>16</codSubBacia>
+                <nmSubBacia>RIO AMAZONAS,TROMBETAS,OUTROS</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table8" msdata:rowOrder="7">
+                <codBacia>1</codBacia>
+                <nmBacia>RIO AMAZONAS</nmBacia>
+                <codSubBacia>17</codSubBacia>
+                <nmSubBacia>RIO AMAZONAS,TAPAJÓS,JURUENA..</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table9" msdata:rowOrder="8">
+                <codBacia>1</codBacia>
+                <nmBacia>RIO AMAZONAS</nmBacia>
+                <codSubBacia>18</codSubBacia>
+                <nmSubBacia>RIO AMAZONAS,,XINGÚ,IRIRI,PARU</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table10" msdata:rowOrder="9">
+                <codBacia>1</codBacia>
+                <nmBacia>RIO AMAZONAS</nmBacia>
+                <codSubBacia>19</codSubBacia>
+                <nmSubBacia>RIO AMAZONAS,JARI,PARÁ,OUTROS</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table11" msdata:rowOrder="10">
+                <codBacia>2</codBacia>
+                <nmBacia>RIO TOCANTINS</nmBacia>
+                <codSubBacia>20</codSubBacia>
+                <nmSubBacia>RIO TOCANTINS,MARANHÃO,PALMAS..</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table12" msdata:rowOrder="11">
+                <codBacia>2</codBacia>
+                <nmBacia>RIO TOCANTINS</nmBacia>
+                <codSubBacia>21</codSubBacia>
+                <nmSubBacia>RIO TOCANTINS,PARANÃ,PALMA....</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table13" msdata:rowOrder="12">
+                <codBacia>2</codBacia>
+                <nmBacia>RIO TOCANTINS</nmBacia>
+                <codSubBacia>22</codSubBacia>
+                <nmSubBacia>RIO TOCANTINS,MANUEL ALVES,SONO...</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table14" msdata:rowOrder="13">
+                <codBacia>2</codBacia>
+                <nmBacia>RIO TOCANTINS</nmBacia>
+                <codSubBacia>23</codSubBacia>
+                <nmSubBacia>RIO TOCANTINS,MANUEL ALVES GRANDE</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table15" msdata:rowOrder="14">
+                <codBacia>2</codBacia>
+                <nmBacia>RIO TOCANTINS</nmBacia>
+                <codSubBacia>24</codSubBacia>
+                <nmSubBacia>RIO ARAGUAIA,CAIAPÓ,CLARO.....</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table16" msdata:rowOrder="15">
+                <codBacia>2</codBacia>
+                <nmBacia>RIO TOCANTINS</nmBacia>
+                <codSubBacia>25</codSubBacia>
+                <nmSubBacia>RIO ARAGUAIA,CRIXÁS-AÇU,PEIXE</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table17" msdata:rowOrder="16">
+                <codBacia>2</codBacia>
+                <nmBacia>RIO TOCANTINS</nmBacia>
+                <codSubBacia>26</codSubBacia>
+                <nmSubBacia>RIO ARAGUAIA,MORTES,JAVAÉS....</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table18" msdata:rowOrder="17">
+                <codBacia>2</codBacia>
+                <nmBacia>RIO TOCANTINS</nmBacia>
+                <codSubBacia>27</codSubBacia>
+                <nmSubBacia>RIO ARAGUAIA,COCO,PAU DARCO..</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table19" msdata:rowOrder="18">
+                <codBacia>2</codBacia>
+                <nmBacia>RIO TOCANTINS</nmBacia>
+                <codSubBacia>28</codSubBacia>
+                <nmSubBacia>RIO ARAGUAIA,MURICIZAL,LONTRA</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table20" msdata:rowOrder="19">
+                <codBacia>2</codBacia>
+                <nmBacia>RIO TOCANTINS</nmBacia>
+                <codSubBacia>29</codSubBacia>
+                <nmSubBacia>RIO TOCANTINS,ITACAIÚNAS,.....</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table21" msdata:rowOrder="20">
+                <codBacia>3</codBacia>
+                <nmBacia>ATLÂNTICO,TRECHO NORTE/NORDESTE</nmBacia>
+                <codSubBacia>30</codSubBacia>
+                <nmSubBacia>RIOS OIAPOQUE,ARAGUARI E .....</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table22" msdata:rowOrder="21">
+                <codBacia>3</codBacia>
+                <nmBacia>ATLÂNTICO,TRECHO NORTE/NORDESTE</nmBacia>
+                <codSubBacia>31</codSubBacia>
+                <nmSubBacia>RIOS MERUU,ACARÁ,GUAMÁ, OUTROS</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table23" msdata:rowOrder="22">
+                <codBacia>3</codBacia>
+                <nmBacia>ATLÂNTICO,TRECHO NORTE/NORDESTE</nmBacia>
+                <codSubBacia>32</codSubBacia>
+                <nmSubBacia>RIOS GURUPI,TURIAÇU E OUTROS</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table24" msdata:rowOrder="23">
+                <codBacia>3</codBacia>
+                <nmBacia>ATLÂNTICO,TRECHO NORTE/NORDESTE</nmBacia>
+                <codSubBacia>33</codSubBacia>
+                <nmSubBacia>RIOS MEARIM,ITAPECURU E OUTROS</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table25" msdata:rowOrder="24">
+                <codBacia>3</codBacia>
+                <nmBacia>ATLÂNTICO,TRECHO NORTE/NORDESTE</nmBacia>
+                <codSubBacia>34</codSubBacia>
+                <nmSubBacia>RIO PARNAÍBA</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table26" msdata:rowOrder="25">
+                <codBacia>3</codBacia>
+                <nmBacia>ATLÂNTICO,TRECHO NORTE/NORDESTE</nmBacia>
+                <codSubBacia>35</codSubBacia>
+                <nmSubBacia>RIOS ACARAÚ,PIRANGI E OUTROS</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table27" msdata:rowOrder="26">
+                <codBacia>3</codBacia>
+                <nmBacia>ATLÂNTICO,TRECHO NORTE/NORDESTE</nmBacia>
+                <codSubBacia>36</codSubBacia>
+                <nmSubBacia>RIO JAGUARIBE</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table28" msdata:rowOrder="27">
+                <codBacia>3</codBacia>
+                <nmBacia>ATLÂNTICO,TRECHO NORTE/NORDESTE</nmBacia>
+                <codSubBacia>37</codSubBacia>
+                <nmSubBacia>RIOS APODI,PIRANHAS E OUTROS</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table29" msdata:rowOrder="28">
+                <codBacia>3</codBacia>
+                <nmBacia>ATLÂNTICO,TRECHO NORTE/NORDESTE</nmBacia>
+                <codSubBacia>38</codSubBacia>
+                <nmSubBacia>RIOS PARAÍBA,POTENJI E OUTROS</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table30" msdata:rowOrder="29">
+                <codBacia>3</codBacia>
+                <nmBacia>ATLÂNTICO,TRECHO NORTE/NORDESTE</nmBacia>
+                <codSubBacia>39</codSubBacia>
+                <nmSubBacia>RIOS CAPIBARIBE,MUNDAÚ E .....</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table31" msdata:rowOrder="30">
+                <codBacia>4</codBacia>
+                <nmBacia>RIO SÃO FRANCISCO</nmBacia>
+                <codSubBacia>40</codSubBacia>
+                <nmSubBacia>RIOS SÃO FRANCISCO,PARAOPEBA E</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table32" msdata:rowOrder="31">
+                <codBacia>4</codBacia>
+                <nmBacia>RIO SÃO FRANCISCO</nmBacia>
+                <codSubBacia>41</codSubBacia>
+                <nmSubBacia>RIOS SÃO FRANCISCO,DAS VELHAS</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table33" msdata:rowOrder="32">
+                <codBacia>4</codBacia>
+                <nmBacia>RIO SÃO FRANCISCO</nmBacia>
+                <codSubBacia>42</codSubBacia>
+                <nmSubBacia>RIOS SÃO FRANCISCO,PARACATU E</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table34" msdata:rowOrder="33">
+                <codBacia>4</codBacia>
+                <nmBacia>RIO SÃO FRANCISCO</nmBacia>
+                <codSubBacia>43</codSubBacia>
+                <nmSubBacia>RIOS SÃO FRANCISCO,URUCUIA E .</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table35" msdata:rowOrder="34">
+                <codBacia>4</codBacia>
+                <nmBacia>RIO SÃO FRANCISCO</nmBacia>
+                <codSubBacia>44</codSubBacia>
+                <nmSubBacia>RIOS SÃO FRANCISCO,VERDE GRANDE</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table36" msdata:rowOrder="35">
+                <codBacia>4</codBacia>
+                <nmBacia>RIO SÃO FRANCISCO</nmBacia>
+                <codSubBacia>45</codSubBacia>
+                <nmSubBacia>RIOS SÃO FRANCISCO,CARINHANHA</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table37" msdata:rowOrder="36">
+                <codBacia>4</codBacia>
+                <nmBacia>RIO SÃO FRANCISCO</nmBacia>
+                <codSubBacia>46</codSubBacia>
+                <nmSubBacia>RIOS SÃO FRANCISCO,GRANDE E ..</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table38" msdata:rowOrder="37">
+                <codBacia>4</codBacia>
+                <nmBacia>RIO SÃO FRANCISCO</nmBacia>
+                <codSubBacia>47</codSubBacia>
+                <nmSubBacia>RIOS SÃO FRANCISCO,JACARÉ E ..</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table39" msdata:rowOrder="38">
+                <codBacia>4</codBacia>
+                <nmBacia>RIO SÃO FRANCISCO</nmBacia>
+                <codSubBacia>48</codSubBacia>
+                <nmSubBacia>RIOS SÃO FRANCISCO,PAJEÚ E ...</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table40" msdata:rowOrder="39">
+                <codBacia>4</codBacia>
+                <nmBacia>RIO SÃO FRANCISCO</nmBacia>
+                <codSubBacia>49</codSubBacia>
+                <nmSubBacia>RIOS SÃO FRANCISCO,MOXOTÓ E ..</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table41" msdata:rowOrder="40">
+                <codBacia>5</codBacia>
+                <nmBacia>ATLÂNTICO,TRECHO LESTE</nmBacia>
+                <codSubBacia>50</codSubBacia>
+                <nmSubBacia>RIOS VAZA BARRIS,ITAPICURU E .</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table42" msdata:rowOrder="41">
+                <codBacia>5</codBacia>
+                <nmBacia>ATLÂNTICO,TRECHO LESTE</nmBacia>
+                <codSubBacia>51</codSubBacia>
+                <nmSubBacia>RIOS PARAGUAÇÚ,JEQUIRICÁ E ...</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table43" msdata:rowOrder="42">
+                <codBacia>5</codBacia>
+                <nmBacia>ATLÂNTICO,TRECHO LESTE</nmBacia>
+                <codSubBacia>52</codSubBacia>
+                <nmSubBacia>RIO DE CONTAS</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table44" msdata:rowOrder="43">
+                <codBacia>5</codBacia>
+                <nmBacia>ATLÂNTICO,TRECHO LESTE</nmBacia>
+                <codSubBacia>53</codSubBacia>
+                <nmSubBacia>RIOS PARDO,CACHOEIRA E OUTROS</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table45" msdata:rowOrder="44">
+                <codBacia>5</codBacia>
+                <nmBacia>ATLÂNTICO,TRECHO LESTE</nmBacia>
+                <codSubBacia>54</codSubBacia>
+                <nmSubBacia>RIO JEQUITINHONHA</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table46" msdata:rowOrder="45">
+                <codBacia>5</codBacia>
+                <nmBacia>ATLÂNTICO,TRECHO LESTE</nmBacia>
+                <codSubBacia>55</codSubBacia>
+                <nmSubBacia>RIOS MUCURI,SÃO MATEUS E ....</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table47" msdata:rowOrder="46">
+                <codBacia>5</codBacia>
+                <nmBacia>ATLÂNTICO,TRECHO LESTE</nmBacia>
+                <codSubBacia>56</codSubBacia>
+                <nmSubBacia>RIO DOCE</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table48" msdata:rowOrder="47">
+                <codBacia>5</codBacia>
+                <nmBacia>ATLÂNTICO,TRECHO LESTE</nmBacia>
+                <codSubBacia>57</codSubBacia>
+                <nmSubBacia>RIOS ITAPEMIRIM,ITABAPOANA E .</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table49" msdata:rowOrder="48">
+                <codBacia>5</codBacia>
+                <nmBacia>ATLÂNTICO,TRECHO LESTE</nmBacia>
+                <codSubBacia>58</codSubBacia>
+                <nmSubBacia>RIO PARAÍBA DO SUL</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table50" msdata:rowOrder="49">
+                <codBacia>5</codBacia>
+                <nmBacia>ATLÂNTICO,TRECHO LESTE</nmBacia>
+                <codSubBacia>59</codSubBacia>
+                <nmSubBacia>RIOS MACAÉ,SÃO JOÃO E OUTROS</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table51" msdata:rowOrder="50">
+                <codBacia>6</codBacia>
+                <nmBacia>RIO PARANÁ</nmBacia>
+                <codSubBacia>60</codSubBacia>
+                <nmSubBacia>RIO PARANAÍBA</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table52" msdata:rowOrder="51">
+                <codBacia>6</codBacia>
+                <nmBacia>RIO PARANÁ</nmBacia>
+                <codSubBacia>61</codSubBacia>
+                <nmSubBacia>RIO GRANDE</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table53" msdata:rowOrder="52">
+                <codBacia>6</codBacia>
+                <nmBacia>RIO PARANÁ</nmBacia>
+                <codSubBacia>62</codSubBacia>
+                <nmSubBacia>RIOS PARANÁ,TIETÊ E OUTROS</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table54" msdata:rowOrder="53">
+                <codBacia>6</codBacia>
+                <nmBacia>RIO PARANÁ</nmBacia>
+                <codSubBacia>63</codSubBacia>
+                <nmSubBacia>RIOS PARANÁ,PARDO E OUTROS</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table55" msdata:rowOrder="54">
+                <codBacia>6</codBacia>
+                <nmBacia>RIO PARANÁ</nmBacia>
+                <codSubBacia>64</codSubBacia>
+                <nmSubBacia>RIOS PARANÁ,PARANAPANEMA E ...</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table56" msdata:rowOrder="55">
+                <codBacia>6</codBacia>
+                <nmBacia>RIO PARANÁ</nmBacia>
+                <codSubBacia>65</codSubBacia>
+                <nmSubBacia>RIOS PARANÁ,IGUAÇU E OUTROS</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table57" msdata:rowOrder="56">
+                <codBacia>6</codBacia>
+                <nmBacia>RIO PARANÁ</nmBacia>
+                <codSubBacia>66</codSubBacia>
+                <nmSubBacia>RIOS PARAGUAI,SÃO LOURENÇO E .</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table58" msdata:rowOrder="57">
+                <codBacia>6</codBacia>
+                <nmBacia>RIO PARANÁ</nmBacia>
+                <codSubBacia>67</codSubBacia>
+                <nmSubBacia>RIOS PARAGUAI,APA E OUTROS</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table59" msdata:rowOrder="58">
+                <codBacia>6</codBacia>
+                <nmBacia>RIO PARANÁ</nmBacia>
+                <codSubBacia>68</codSubBacia>
+                <nmSubBacia>RIOS PARANÁ,CORRIENTES E .....</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table60" msdata:rowOrder="59">
+                <codBacia>6</codBacia>
+                <nmBacia>RIO PARANÁ</nmBacia>
+                <codSubBacia>69</codSubBacia>
+                <nmSubBacia>RIOS PARANÁ,TERCERO E OUTROS</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table61" msdata:rowOrder="60">
+                <codBacia>7</codBacia>
+                <nmBacia>RIO URUGUAI</nmBacia>
+                <codSubBacia>70</codSubBacia>
+                <nmSubBacia>RIO PELOTAS</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table62" msdata:rowOrder="61">
+                <codBacia>7</codBacia>
+                <nmBacia>RIO URUGUAI</nmBacia>
+                <codSubBacia>71</codSubBacia>
+                <nmSubBacia>RIO CANOAS</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table63" msdata:rowOrder="62">
+                <codBacia>7</codBacia>
+                <nmBacia>RIO URUGUAI</nmBacia>
+                <codSubBacia>72</codSubBacia>
+                <nmSubBacia>RIOS URUGUAI,DO PEIXE E OUTROS</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table64" msdata:rowOrder="63">
+                <codBacia>7</codBacia>
+                <nmBacia>RIO URUGUAI</nmBacia>
+                <codSubBacia>73</codSubBacia>
+                <nmSubBacia>RIOS URUGUAI,CHAPECÓ E OUTROS</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table65" msdata:rowOrder="64">
+                <codBacia>7</codBacia>
+                <nmBacia>RIO URUGUAI</nmBacia>
+                <codSubBacia>74</codSubBacia>
+                <nmSubBacia>RIOS URUGUAI,DA VÁRZEA E ....</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table66" msdata:rowOrder="65">
+                <codBacia>7</codBacia>
+                <nmBacia>RIO URUGUAI</nmBacia>
+                <codSubBacia>75</codSubBacia>
+                <nmSubBacia>RIOS URUGUAI,IJUÍ E OUTROS</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table67" msdata:rowOrder="66">
+                <codBacia>7</codBacia>
+                <nmBacia>RIO URUGUAI</nmBacia>
+                <codSubBacia>76</codSubBacia>
+                <nmSubBacia>RIOS URUGUAI,IBICUÍ E OUTROS</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table68" msdata:rowOrder="67">
+                <codBacia>7</codBacia>
+                <nmBacia>RIO URUGUAI</nmBacia>
+                <codSubBacia>77</codSubBacia>
+                <nmSubBacia>RIOS URUGUAI,QUARAÍ E OUTROS</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table69" msdata:rowOrder="68">
+                <codBacia>7</codBacia>
+                <nmBacia>RIO URUGUAI</nmBacia>
+                <codSubBacia>78</codSubBacia>
+                <nmSubBacia>RIOS URUGUAI E OUTROS</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table70" msdata:rowOrder="69">
+                <codBacia>7</codBacia>
+                <nmBacia>RIO URUGUAI</nmBacia>
+                <codSubBacia>79</codSubBacia>
+                <nmSubBacia>RIO URUGUAI, NEGRO E OUTROS</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table71" msdata:rowOrder="70">
+                <codBacia>8</codBacia>
+                <nmBacia>ATLÂNTICO, TRECHO SUDESTE</nmBacia>
+                <codSubBacia>80</codSubBacia>
+                <nmSubBacia>RIOS ITAPANHAÚ,ITANHAÉM E ....</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table72" msdata:rowOrder="71">
+                <codBacia>8</codBacia>
+                <nmBacia>ATLÂNTICO, TRECHO SUDESTE</nmBacia>
+                <codSubBacia>81</codSubBacia>
+                <nmSubBacia>RIO RIBEIRA DO IGUAPE</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table73" msdata:rowOrder="72">
+                <codBacia>8</codBacia>
+                <nmBacia>ATLÂNTICO, TRECHO SUDESTE</nmBacia>
+                <codSubBacia>82</codSubBacia>
+                <nmSubBacia>RIOS NHUNDIAQUARA,ITAPOCU E ..</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table74" msdata:rowOrder="73">
+                <codBacia>8</codBacia>
+                <nmBacia>ATLÂNTICO, TRECHO SUDESTE</nmBacia>
+                <codSubBacia>83</codSubBacia>
+                <nmSubBacia>RIO ITAJAÍ-AÇU</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table75" msdata:rowOrder="74">
+                <codBacia>8</codBacia>
+                <nmBacia>ATLÂNTICO, TRECHO SUDESTE</nmBacia>
+                <codSubBacia>84</codSubBacia>
+                <nmSubBacia>RIOS TUBARÃO,ARARANGUÁ E .....</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table76" msdata:rowOrder="75">
+                <codBacia>8</codBacia>
+                <nmBacia>ATLÂNTICO, TRECHO SUDESTE</nmBacia>
+                <codSubBacia>85</codSubBacia>
+                <nmSubBacia>RIO JACUÍ</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table77" msdata:rowOrder="76">
+                <codBacia>8</codBacia>
+                <nmBacia>ATLÂNTICO, TRECHO SUDESTE</nmBacia>
+                <codSubBacia>86</codSubBacia>
+                <nmSubBacia>RIO TAQUARI</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table78" msdata:rowOrder="77">
+                <codBacia>8</codBacia>
+                <nmBacia>ATLÂNTICO, TRECHO SUDESTE</nmBacia>
+                <codSubBacia>87</codSubBacia>
+                <nmSubBacia>LAGOA DOS PATOS</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table79" msdata:rowOrder="78">
+                <codBacia>8</codBacia>
+                <nmBacia>ATLÂNTICO, TRECHO SUDESTE</nmBacia>
+                <codSubBacia>88</codSubBacia>
+                <nmSubBacia>LAGOA MIRIM</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table80" msdata:rowOrder="79">
+                <codBacia>8</codBacia>
+                <nmBacia>ATLÂNTICO, TRECHO SUDESTE</nmBacia>
+                <codSubBacia>89</codSubBacia>
+                <nmSubBacia>LAGUNA MERIN</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table81" msdata:rowOrder="80">
+                <codBacia>9</codBacia>
+                <nmBacia>OUTRAS</nmBacia>
+                <codSubBacia>90</codSubBacia>
+                <nmSubBacia>OUTROS RIOS</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table82" msdata:rowOrder="81">
+                <codBacia>9</codBacia>
+                <nmBacia>OUTRAS</nmBacia>
+                <codSubBacia>92</codSubBacia>
+                <nmSubBacia>LA PLATA</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table83" msdata:rowOrder="82">
+                <codBacia>9</codBacia>
+                <nmBacia>OUTRAS</nmBacia>
+                <codSubBacia>93</codSubBacia>
+                <nmSubBacia>OCEANO ATLANTICO</nmSubBacia>
+            </Table>
+            <Table diffgr:id="Table84" msdata:rowOrder="83">
+                <codBacia>9</codBacia>
+                <nmBacia>OUTRAS</nmBacia>
+                <codSubBacia>96</codSubBacia>
+                <nmSubBacia>SANTA LUCIA</nmSubBacia>
+            </Table>
+        </SubBacia>
+    </diffgr:diffgram>
+</DataSet>

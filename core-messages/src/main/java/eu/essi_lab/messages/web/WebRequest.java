@@ -4,7 +4,7 @@ package eu.essi_lab.messages.web;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -42,6 +42,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.StringTokenizer;
 import java.util.UUID;
 
 import javax.servlet.AsyncContext;
@@ -88,11 +89,6 @@ import eu.essi_lab.rip.RuntimeInfoProvider;
  */
 public class WebRequest implements RuntimeInfoProvider, Serializable {
 
-    @Override
-    public String getBaseType() {
-	return "web-request";
-    }
-
     /**
      * 
      */
@@ -122,6 +118,10 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
     /**
      * 
      */
+    public static final String VIEWS_PATH = "views";
+    /**
+     * 
+     */
     public static final String HTTP_SERVLET_REQUEST_USER_ATTRIBUTE = "user";
     /**
      * 
@@ -133,7 +133,12 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
      * 
      */
     public static final String X_FORWARDED_FOR_HEADER = "x-forwarded-for";
-   
+
+    /**
+     * 
+     */
+    public static final String HTTP_SERVLET_REQUEST_ID_PROPERTY = "webRequestId";
+
     /**
      * 
      */
@@ -152,10 +157,45 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 
     private String profilerPath;
     private String requestContext;
+    private String profilerName;
 
+    /**
+     * 
+     */
     public WebRequest() {
+
+	this(UUID.randomUUID().toString());
+    }
+
+    /**
+     * @param id
+     */
+    public WebRequest(String id) {
+
 	setServicesPath(SERVICES_PATH);
-	setRequestId(UUID.randomUUID().toString());
+	setRequestId(id);
+    }
+
+    /**
+     * @param servletRequest
+     * @param readStream
+     * @throws IOException
+     */
+    public WebRequest(HttpServletRequest servletRequest, boolean readStream) throws IOException {
+
+	this(servletRequest, readStream, UUID.randomUUID().toString());
+    }
+
+    /**
+     * @param servletRequest
+     * @param readStream
+     * @throws IOException
+     */
+    public WebRequest(HttpServletRequest servletRequest, boolean readStream, String id) throws IOException {
+
+	setServicesPath(SERVICES_PATH);
+	setRequestId(id);
+	setServletRequest(servletRequest, readStream);
     }
 
     @Override
@@ -163,11 +203,41 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 
 	HashMap<String, List<String>> out = new HashMap<>();
 
+	if (getProfilerName() != null) {
+
+	    out.put(RuntimeInfoElement.PROFILER_NAME.getName(), Arrays.asList(getProfilerName()));
+	}
+
 	out.put(RuntimeInfoElement.WEB_REQUEST_TIME_STAMP.getName(), //
 		Arrays.asList(ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds()));
 
 	out.put(RuntimeInfoElement.WEB_REQUEST_TIME_STAMP_MILLIS.getName(), //
 		Arrays.asList(String.valueOf(System.currentTimeMillis())));
+
+	GSUser user = getCurrentUser();
+	if (user != null) {
+
+	    String authProvider = user.getAuthProvider();
+	    String identifier = user.getIdentifier();
+	    String role = user.getRole();
+	    String uri = user.getUri();
+
+	    if (authProvider != null) {
+		out.put(RuntimeInfoElement.USER_AUTH_PROVIDER.getName(), Arrays.asList(authProvider));
+	    }
+
+	    if (identifier != null) {
+		out.put(RuntimeInfoElement.USER_IDENTIFIER.getName(), Arrays.asList(identifier));
+	    }
+
+	    if (role != null) {
+		out.put(RuntimeInfoElement.USER_ROLE.getName(), Arrays.asList(role));
+	    }
+
+	    if (uri != null) {
+		out.put(RuntimeInfoElement.USER_URI.getName(), Arrays.asList(uri));
+	    }
+	}
 
 	Optional<String> viewId = this.extractViewId();
 	viewId.ifPresent(id -> out.put(RuntimeInfoElement.WEB_REQUEST_VIEW_ID.getName(), Arrays.asList(id)));
@@ -467,6 +537,22 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
     }
 
     /**
+     * @param name
+     */
+    public void setProfilerName(String name) {
+
+	this.profilerName = name;
+    }
+
+    /**
+     * @return
+     */
+    public String getProfilerName() {
+
+	return profilerName;
+    }
+
+    /**
      * @return
      */
     public Optional<String> readRemoteHostHeader() {
@@ -551,52 +637,8 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 		Objects.nonNull(refererValue) ? refererValue : //
 			remoteHost.orElse(getRequestId());
 
-	GSLoggerFactory.getLogger(WebRequest.class).trace("Request context: " + context);
-
 	return context;
     }
-
-    // /**
-    // * @param message
-    // * @return
-    // */
-    // public static String getContext(WebRequest request) {
-    //
-    // if (request == null) {
-    // //
-    // // in some tests can happen
-    // //
-    // return UUID.randomUUID().toString();
-    // }
-    //
-    // Optional<String> origin = request.readOriginHeader();
-    // Optional<String> referer = request.readRefererHeader();
-    // String refererValue = null;
-    // if(referer.isPresent()) {
-    //
-    // refererValue = referer.get();
-    // try {
-    // URL url = new URL(refererValue);
-    // String protocol = url.getProtocol();
-    // String host = url.getHost();
-    // // this way it looks just like the origin
-    // refererValue = protocol+"://"+host;
-    //
-    // } catch (MalformedURLException e) {
-    // GSLoggerFactory.getLogger(WebRequest.class).error(e.getMessage());
-    // }
-    // }
-    //
-    // Optional<String> remoteHost = request.readRemoteHostHeader();
-    //
-    // String context = origin.isPresent() ? origin.get() : //
-    // Objects.nonNull(refererValue) ? refererValue : //
-    // remoteHost.orElse(request.getRequestId());
-    //
-    // GSLoggerFactory.getLogger(WebRequest.class).trace("Request context: " + context);
-    //
-    // return context;
-    // }
 
     /**
      * @return
@@ -663,14 +705,14 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 
     /**
      * @param servletRequest
-     * @param setStream
+     * @param readStream
      * @throws IOException
      */
-    public void setServletRequest(HttpServletRequest servletRequest, boolean setStream) throws IOException {
+    public void setServletRequest(HttpServletRequest servletRequest, boolean readStream) throws IOException {
 
 	this.servletRequest = servletRequest;
 
-	if (setStream) {
+	if (readStream) {
 	    InputStream inputStream = servletRequest.getInputStream();
 	    if (inputStream != null) {
 		cloneStream = new ClonableInputStream(inputStream);
@@ -771,6 +813,14 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
     }
 
     /**
+     * @return
+     */
+    public String getURLDecodedQueryString() {
+
+	return StringUtils.URLDecodeUTF8(getQueryString());
+    }
+
+    /**
      * This method retrieves the form data (if available) provided as body in the
      * "application/x-www-form-urlencoded" encoding, or as query
      * string in the request URL after the path. In the latter case, this method is equivalent to
@@ -842,9 +892,21 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 	if (getUriInfo() != null) {
 	    requestPath = getUriInfo().getPath();
 	} else {
-	    String profilerPath = getServletRequest().getServletPath().replace(servicesPath, "");
-	    requestPath = profilerPath + getServletRequest().getPathInfo();
+
+	    HttpServletRequest servletRequest = getServletRequest();
+	    if (servletRequest != null) {
+
+		String servletPath = servletRequest.getServletPath();
+		if (servletPath != null) {
+
+		    String profilerPath = servletPath.replace(servicesPath, "");
+		    String pathInfo = servletRequest.getPathInfo();
+
+		    requestPath = profilerPath + (pathInfo != null ? pathInfo : "");
+		}
+	    }
 	}
+
 	return requestPath;
     }
 
@@ -881,14 +943,39 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 	return context;
     }
 
+    public Optional<String> extractQueryParameter(String key) {
+
+	String queryString = getQueryString();
+
+	if (queryString != null && queryString.contains(key + "=")) {
+
+	    String split = queryString.split(key + "=")[1];
+
+	    if (split.contains("&")) {
+
+		return Optional.of(split.split("&")[0]);
+	    }
+
+	    return Optional.of(queryString.split(key + "=")[1]);
+	}
+	return Optional.empty();
+    }
+
     /**
      * The more common way to express the token in GS-service is to put it in the first part of the path preceded by
      * "token" key in the
-     * form /token/{tokenId}/service This method extracts token id from the request path.
+     * form /token/{tokenId}/service This method extracts token id from the request path.<br>
+     * The other way is in the query string as value of the "token" key
      *
      * @return the tokenId or null if not found
      */
     public Optional<String> extractTokenId() {
+
+	Optional<String> optionalToken = extractQueryParameter("token");
+
+	if (optionalToken.isPresent()) {
+	    return optionalToken;
+	}
 
 	String requestPath = getRequestPath();
 	if (requestPath == null) {
@@ -897,12 +984,11 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 
 	String[] split = requestPath.split("/");
 
-	if (split.length >= 2) {
-	    for (int i = 0; i < split.length; i++) {
-		if (split[i].equals(TOKEN_PATH)) {
-		    return Optional.of(split[i + 1]);
-		}
-	    }
+	int index = Arrays.asList(split).indexOf("token") + 1;
+
+	if (index > 0 && index < split.length) {
+
+	    return Optional.of(split[index]);
 	}
 
 	return Optional.empty();
@@ -912,25 +998,61 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
      * The more common way to express the viewId in GS-service is to put it in the first part of the path (or after the
      * token path parameter) preceded by
      * "view" key in the
-     * form /view/{viewId}/service This method extracts view id from the request path.
+     * form /view/{viewId}/service This method extracts view id from the request path.<br>
+     * The other way is in the query string as value of the "token" key
      *
      * @return the viewId or null if not found
      */
     public Optional<String> extractViewId() {
 
 	String requestPath = getRequestPath();
-	if (requestPath == null) {
-	    return Optional.empty();
-	}
 
-	String[] split = requestPath.split("/");
+	try {
 
-	if (split.length >= 2) {
-	    for (int i = 0; i < split.length; i++) {
-		if (split[i].equals(VIEW_PATH)) {
-		    return Optional.of(split[i + 1]);
+	    if (requestPath != null) {
+
+		String[] split = requestPath.split("/");
+
+		if (split.length >= 2) {
+
+		    for (int i = 0; i < split.length; i++) {
+
+			//
+			// the path "view" is included so the view id is in the next path segment
+			//
+
+			if (split[i].equals(VIEW_PATH)) {
+
+			    return Optional.of(split[i + 1]);
+			}
+
+			//
+			// the path "views" is included and it is not the last, so the last is the view id
+			//
+			if (split[i].equals(VIEWS_PATH) && split.length == i + 2) {
+
+			    return Optional.of(split[i + 1]);
+			}
+		    }
 		}
 	    }
+
+	    //
+	    // we try in the query string
+	    //
+	    Optional<String> optionalView = extractQueryParameter("view");
+
+	    if (optionalView.isPresent()) {
+
+		return optionalView;
+	    }
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(//
+		    "Error occurred '{}' trying to extract view id from request path: {}", //
+		    ex.getMessage(), //
+		    requestPath);
 	}
 
 	return Optional.empty();
@@ -951,6 +1073,11 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 	return isMethod("get");
     }
 
+    public boolean isOptionsRequest() {
+
+	return isMethod("options");
+    }
+
     public boolean isDeleteRequest() {
 
 	return isMethod("delete");
@@ -959,6 +1086,11 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
     public boolean isPostRequest() {
 
 	return isMethod("post");
+    }
+
+    public boolean isPutRequest() {
+
+	return isMethod("put");
     }
 
     /**
@@ -976,6 +1108,142 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 
 	this.requestId = id;
     }
+
+    public String getRemoteAddress() {
+	// in case proxys are used by the client
+	// or GI-suite is deployed behind a load balancer
+	List<String> forwarded = readXForwardedForHeaders();
+	if (!forwarded.isEmpty()) {
+	    // the first is always the original client ip, followed by the proxy / load balancer ips
+	    return forwarded.get(0);
+	}
+	// otherwise return the direct ip address
+	return getServletRequest().getRemoteAddr();
+    }
+
+    /**
+     * Creates a "mocked" GET request with the given <code>requestUrl</code>.<br>
+     * <i>This method should be used for test purpose</i>
+     *
+     * @param requestUrl
+     * @return
+     */
+    public static WebRequest createGET(String requestUrl) {
+
+	return create(requestUrl, null, null, "GET");
+    }
+
+    /**
+     * Creates a "mocked" GET request with the given <code>requestUrl</code> and <code>remoteAddress</code>.<br>
+     * <i>This method should be used for test purpose</i>
+     *
+     * @param requestUrl
+     * @return
+     */
+    public static WebRequest createGET(String requestUrl, String remoteAddress) {
+
+	return create(requestUrl, remoteAddress, null, "GET");
+    }
+
+    /**
+     * Creates a "mocked" GET request with the given <code>requestUrl</code> and <code>remoteAddress</code>.<br>
+     * <i>This method should be used for test purpose</i>
+     *
+     * @param requestUrl
+     * @return
+     */
+    public static WebRequest createGET(String requestUrl, HashMap<String, String> headers) {
+
+	return create(requestUrl, null, headers, "GET");
+    }
+
+    /**
+     * Creates a "mocked" GET request with the given <code>requestUrl</code> and <code>remoteAddress</code>.<br>
+     * <i>This method should be used for test purpose</i>
+     *
+     * @param requestUrl
+     * @return
+     */
+    public static WebRequest createGET(String requestUrl, String remoteAddress, HashMap<String, String> headers) {
+
+	return create(requestUrl, remoteAddress, headers, "GET");
+    }
+
+    /**
+     * Creates a "mocked" DELETE request with the given <code>requestUrl</code>.<br>
+     * <i>This method should be used for test purpose</i>
+     *
+     * @param requestUrl
+     * @return
+     */
+    public static WebRequest createDELETE(String requestUrl) {
+
+	return create(requestUrl, null, null, "DELETE");
+    }
+
+    /**
+     * Creates a "mocked" DELETE request with the given <code>requestUrl</code> and <code>remoteAddress</code>.<br>
+     * <i>This method should be used for test purpose</i>
+     *
+     * @param requestUrl
+     * @return
+     */
+    public static WebRequest createDELETE(String requestUrl, String remoteAddress) {
+
+	return create(requestUrl, remoteAddress, null, "DELETE");
+    }
+
+    /**
+     * Creates a "mocked" DELETE request with the given <code>requestUrl</code> and <code>remoteAddress</code>.<br>
+     * <i>This method should be used for test purpose</i>
+     *
+     * @param requestUrl
+     * @return
+     */
+    public static WebRequest createDELETE(String requestUrl, HashMap<String, String> headers) {
+
+	return create(requestUrl, null, headers, "DELETE");
+    }
+
+    /**
+     * Creates a "mocked" DELETE request with the given <code>requestUrl</code> and <code>remoteAddress</code>.<br>
+     * <i>This method should be used for test purpose</i>
+     *
+     * @param requestUrl
+     * @return
+     */
+    public static WebRequest createDELETE(String requestUrl, String remoteAddress, HashMap<String, String> headers) {
+
+	return create(requestUrl, remoteAddress, headers, "DELETE");
+    }
+
+    /**
+     * Creates a "mocked" POST request with the given <code>body</code>.<br>
+     * <i>This method should be used for test purpose</i>
+     *
+     * @param body
+     * @param requestUrl
+     * @return
+     */
+    public static WebRequest createPOST(String requestUrl, InputStream body) {
+
+	return createWithBoby(requestUrl, body, "POST");
+    }
+
+    /**
+     * Creates a "mocked" PUT request with the given <code>body</code>.<br>
+     * <i>This method should be used for test purpose</i>
+     *
+     * @param body
+     * @param requestUrl
+     * @return
+     */
+    public static WebRequest createPUT(String requestUrl, InputStream body) {
+
+	return createWithBoby(requestUrl, body, "PUT");
+    }
+
+    private static HashMap<String, Object> attributes;
 
     /**
      * @param method
@@ -1001,37 +1269,90 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
     }
 
     /**
-     * Creates a "mocked" GET request with the given <code>requestUrl</code> and <code>remoteAddress</code>.<br>
-     * <i>This method should be used for test purpose</i>
-     *
      * @param requestUrl
+     * @param body
      * @return
      */
-    public static WebRequest create(String requestUrl, String remoteAddress) {
+    private static WebRequest createWithBoby(String requestUrl, InputStream body, String method) {
 
-	return create(requestUrl, remoteAddress, null);
+	return new WebRequest() {
+
+	    private static final long serialVersionUID = 1244759601771325810L;
+	    private ClonableInputStream is;
+
+	    @Override
+	    public ClonableInputStream getBodyStream() {
+
+		if (is == null) {
+		    try {
+			is = new ClonableInputStream(body);
+		    } catch (IOException e) {
+
+			GSLoggerFactory.getLogger(getClass()).error("Error cloning body {}", e);
+		    }
+		}
+
+		return is;
+	    }
+
+	    @Override
+	    public HttpServletRequest getServletRequest() {
+
+		String query = null;
+		try {
+		    URL url = new URL(requestUrl);
+		    query = url.getQuery();
+		} catch (MalformedURLException e) {
+		    GSLoggerFactory.getLogger(getClass()).error("Bad URI {}", requestUrl, e);
+		}
+
+		InputStream clone = getBodyStream().clone();
+
+		return createServletRequest(requestUrl, query, method, clone, "");
+	    }
+
+	    @Override
+	    public String getQueryString() {
+
+		String query = null;
+		try {
+		    URL url = new URL(requestUrl);
+		    query = url.getQuery();
+		} catch (MalformedURLException e) {
+		    GSLoggerFactory.getLogger(getClass()).error("Malformed URI {}", requestUrl, e);
+		}
+
+		return query;
+	    }
+
+	    @Override
+	    public UriInfo getUriInfo() {
+
+		return createUriInfo(requestUrl, getServicesPath());
+	    }
+
+	    @Override
+	    public boolean isGetRequest() {
+
+		return false;
+	    }
+
+	    @Override
+	    public boolean isPostRequest() {
+
+		return true;
+	    }
+	};
     }
 
     /**
-     * Creates a "mocked" GET request with the given <code>requestUrl</code> and <code>remoteAddress</code>.<br>
-     * <i>This method should be used for test purpose</i>
-     *
      * @param requestUrl
+     * @param remoteAddress
+     * @param headers
+     * @param method
      * @return
      */
-    public static WebRequest create(String requestUrl, HashMap<String, String> headers) {
-
-	return create(requestUrl, null, headers);
-    }
-
-    /**
-     * Creates a "mocked" GET request with the given <code>requestUrl</code> and <code>remoteAddress</code>.<br>
-     * <i>This method should be used for test purpose</i>
-     *
-     * @param requestUrl
-     * @return
-     */
-    public static WebRequest create(String requestUrl, String remoteAddress, HashMap<String, String> headers) {
+    private static WebRequest create(String requestUrl, String remoteAddress, HashMap<String, String> headers, String method) {
 
 	return new WebRequest() {
 
@@ -1048,7 +1369,7 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 		    GSLoggerFactory.getLogger(getClass()).error("Can't create URL {}", requestUrl, e);
 		}
 
-		HttpServletRequest request = createServletRequest(requestUrl, query, "get", null, remoteAddress);
+		HttpServletRequest request = createServletRequest(requestUrl, query, method, null, remoteAddress);
 
 		if (headers != null) {
 
@@ -1088,7 +1409,7 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 	    @Override
 	    public boolean isGetRequest() {
 
-		return true;
+		return method.toUpperCase().equals("GET");
 	    }
 
 	    @Override
@@ -1096,99 +1417,12 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 
 		return false;
 	    }
-	};
-    }
 
-    /**
-     * Creates a "mocked" POST request with the given <code>body</code>.<br>
-     * <i>This method should be used for test purpose</i>
-     *
-     * @param body
-     * @param requestUrl
-     * @return
-     */
-    public static WebRequest create(String requestUrl, InputStream body) {
+	    public boolean isDeleteRequest() {
 
-	return new WebRequest() {
-
-	    private static final long serialVersionUID = 1244759601771325810L;
-	    private ClonableInputStream is;
-
-	    @Override
-	    public ClonableInputStream getBodyStream() {
-
-		if (is == null) {
-		    try {
-			is = new ClonableInputStream(body);
-		    } catch (IOException e) {
-
-			GSLoggerFactory.getLogger(getClass()).error("Error cloning body {}", e);
-		    }
-		}
-
-		return is;
-	    }
-
-	    @Override
-	    public HttpServletRequest getServletRequest() {
-
-		String query = null;
-		try {
-		    URL url = new URL(requestUrl);
-		    query = url.getQuery();
-		} catch (MalformedURLException e) {
-		    GSLoggerFactory.getLogger(getClass()).error("Bad URI {}", requestUrl, e);
-		}
-
-		InputStream clone = getBodyStream().clone();
-
-		return createServletRequest(requestUrl, query, "post", clone, "");
-	    }
-
-	    @Override
-	    public String getQueryString() {
-
-		String query = null;
-		try {
-		    URL url = new URL(requestUrl);
-		    query = url.getQuery();
-		} catch (MalformedURLException e) {
-		    GSLoggerFactory.getLogger(getClass()).error("Malformed URI {}", requestUrl, e);
-		}
-
-		return query;
-	    }
-
-	    @Override
-	    public UriInfo getUriInfo() {
-
-		return createUriInfo(requestUrl, getServicesPath());
-	    }
-
-	    @Override
-	    public boolean isGetRequest() {
-
-		return false;
-	    }
-
-	    @Override
-	    public boolean isPostRequest() {
-
-		return true;
+		return method.toUpperCase().equals("DELETE");
 	    }
 	};
-    }
-
-    /**
-     * Creates a "mocked" GET request with the given <code>requestUrl</code>.<br>
-     * <i>This method should be used for test purpose</i>
-     *
-     * @param requestUrl
-     * @return
-     */
-    public static WebRequest create(String requestUrl) {
-
-	return create(requestUrl, "");
     }
 
     private static HttpServletRequest createServletRequest(//
@@ -1220,8 +1454,12 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 
 	    @Override
 	    public void setAttribute(String name, Object o) {
-		// TODO Auto-generated method stub
 
+		if (attributes == null) {
+		    attributes = new HashMap<>();
+		}
+
+		attributes.put(name, o);
 	    }
 
 	    @Override
@@ -1436,8 +1674,12 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 
 	    @Override
 	    public Object getAttribute(String name) {
-		// TODO Auto-generated method stub
-		return null;
+
+		if (attributes == null) {
+		    return null;
+		}
+
+		return attributes.get(name);
 	    }
 
 	    @Override
@@ -1527,7 +1769,21 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 	    @Override
 	    public StringBuffer getRequestURL() {
 
-		return new StringBuffer(requestURL);
+		String out = requestURL;
+
+		try {
+		    URL url = new URL(requestURL);
+		    String query = url.getQuery();
+
+		    if (query != null) {
+
+			out = requestURL.replace("?" + query, "");
+		    }
+		} catch (MalformedURLException e) {
+		    e.printStackTrace();
+		}
+
+		return new StringBuffer(out);
 	    }
 
 	    @Override
@@ -1784,18 +2040,6 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 	    }
 	};
 
-    }
-
-    public String getRemoteAddress() {
-	// in case proxys are used by the client
-	// or GI-suite is deployed behind a load balancer
-	List<String> forwarded = readXForwardedForHeaders();
-	if (!forwarded.isEmpty()) {
-	    // the first is always the original client ip, followed by the proxy / load balancer ips
-	    return forwarded.get(0);
-	}
-	// otherwise return the direct ip address
-	return getServletRequest().getRemoteAddr();
     }
 
 }

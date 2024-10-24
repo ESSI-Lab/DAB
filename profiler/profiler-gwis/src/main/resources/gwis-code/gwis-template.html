@@ -12,7 +12,7 @@ https://txpub.usgs.gov/DSS/GWIS/
     <!-- html head -->
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-        <title>GWIS JSAPI Sample</title>
+        <title>Recent data plot</title>
         
         <!-- GWIS requires jQuery -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
@@ -26,17 +26,16 @@ https://txpub.usgs.gov/DSS/GWIS/
     <body style="background:#eee; font-family:arial;">
         
         <!-- title -->
-        <h1>Sample GWIS JS API: Basic Usage</h1>
+        <h1>Recent data plot</h1>
         
-        <p>This graph shows the last 7 days of data (if available).</p>
-        <p>Please refer to <a href="https://txpub.usgs.gov/dss/gwis/0.0/doc/#overview">USGS GWIS JS API homepage</a> for advanced use.
+        <p>The graph shows ${Y_LABEL} observations from the last 7 days (if available) acquired at station ${PLATFORM_NAME_1}.</p>        
         
         <div id="plot1" style="width:95%; height:500px;"></div>
         <script>
             GWIS.plot({
-            	title:'${TITLE}',
+            	title:'${TITLE} at ${PLATFORM_NAME_2}',
             	xlabel:'${X_LABEL}',
-            	ylabel:'${Y_LABEL}',
+            	ylabel:'${Y_LABEL} (${Y_UNITS})',
             	start_dt: '${BEGIN_TIME}',            	
             	end_dt: '${END_TIME}',
                 div_id : "plot1",
@@ -45,7 +44,7 @@ https://txpub.usgs.gov/DSS/GWIS/
         </script>
         
 
-        
+        <p>The plot is powered by the USGS GWIS JS API, please refer to <a href="https://txpub.usgs.gov/dss/gwis/0.0/doc/#overview">USGS GWIS JS API documentation</a> for customizing this page.
     </body>
 </html>
 <!-- end GWIS JSAPI sample -->

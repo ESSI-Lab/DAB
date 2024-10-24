@@ -1,0 +1,31 @@
+{
+  "google": {
+    "client-id": "40510214544-pdbd3nmmd8bc33khbrs47u2iumcvlq20.apps.googleusercontent.com",
+    "client-secret": "tF26ArLiz4oIGm96PKrwfqSR",
+    "redirect-uri": "http://localhost:9090/gs-service/services/user/callback/google",
+    "login-url": "https://accounts.google.com/o/oauth2/v2/auth?client_id=%s&redirect_uri=%s&response_type=code&scope=openid%20profile%20email",
+    "token-url": "https://www.googleapis.com/oauth2/v4/token?client_id=%s&client_secret=%s&redirect_uri=%s&code=%s&grant_type=authorization_code",
+    "userinfo-url": "https://www.googleapis.com/plus/v1/people/me/openIdConnect"
+  },
+  "twitter": {
+    "client-id": "C6eoTj5ALFTMWEA3DwzYSzeRU",
+    "client-secret": "CyPbrUCvjbQ43FYo9cILj9LM7u9koyF4exZN0icA0TOjVIwtkp",
+    "redirect-uri": "http://localhost:9090/gs-service/services/user/callback/twitter",
+    "userinfo-url": "",
+    "access-token": "",
+    "request-token-url": "https://api.twitter.com/oauth/request_token",
+    "login-url": "https://api.twitter.com/oauth/authenticate?oauth_token=%s",
+    "token-url": "https://api.twitter.com/oauth/access_token",
+    "userinfo-url": "https://api.twitter.com/1.1/account/verify_credentials.json",
+    "authenticate-url": "",
+    "credentials-json-url": ""
+  },
+  "facebook": {
+    "client-id": "134121287286229",
+    "client-secret": "7223cb24077478030102378b47471e49",
+    "redirect-uri": "http://localhost:9090/gs-service/services/user/callback/facebook",
+    "login-url": "https://www.facebook.com/v2.11/dialog/oauth?client_id=%s&redirect_uri=%s&scope=email",
+    "token-url": "https://graph.facebook.com/v2.11/oauth/access_token?client_id=%s&redirect_uri=%s&client_secret=%s&code=%s",
+    "userinfo-url": "https://graph.facebook.com/v2.11/me?access_token=%s&fields=name,email"
+  }
+}

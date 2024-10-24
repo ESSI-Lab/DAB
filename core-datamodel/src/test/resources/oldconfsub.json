@@ -1,0 +1,25 @@
+{
+  "key": "00b7623a-0693-44fc-a14b-3760442049c3",
+  "timeStamp": 0,
+  "supportedOptions": {},
+  "configurableComponents": {
+    "comp1": {
+      "configurableComponentConcrete": "eu.essi_lab.configuration.test.UpdatedConfigurableSubcomponentOpt",
+      "key": "0479f251-05c8-4590-b008-dce0e59dc68f",
+      "supportedOptions": {
+        "op1": {
+          "concrete": "eu.essi_lab.model.configuration.option.GSConfOptionSubcomponent",
+          "key": "op1",
+          "mandatory": false,
+          "allowedValues": [
+            {
+              "label": "l1",
+              "value": "v1"
+            }
+          ],
+          "type": "eu.essi_lab.model.configuration.Subcomponent"
+        }
+      }
+    }
+  }
+}

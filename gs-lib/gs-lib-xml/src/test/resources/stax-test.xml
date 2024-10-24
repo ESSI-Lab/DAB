@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitesResponse xmlns="http://www.cuahsi.org/waterML/1.1/"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <queryInfo>
+      <creationTime>2018-01-10T13:10:20+00:00</creationTime>
+      <criteria MethodCalled="GetSites">
+         <parameter name="site" value="ALL SITES"/>
+      </criteria>
+   </queryInfo>
+   <site>
+      <siteInfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+         <siteName>Aktubinsk</siteName>
+         <siteCode network="hsl-kaza" siteID="1">130</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>50.28</latitude>
+               <longitude>57.15</longitude>
+            </geogLocation>
+         </geoLocation>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Akutkul</siteName>
+         <siteCode network="hsl-kaza" siteID="2">132</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>49.91</latitude>
+               <longitude>64.2</longitude>
+            </geogLocation>
+         </geoLocation>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Arys</siteName>
+         <siteCode network="hsl-kaza" siteID="3">134</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>42.41</latitude>
+               <longitude>68.76</longitude>
+            </geogLocation>
+         </geoLocation>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Sergiopolskoye</siteName>
+         <siteCode network="hsl-kaza" siteID="4">137</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>50.06</latitude>
+               <longitude>73.35</longitude>
+            </geogLocation>
+         </geoLocation>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Ush-Tobe</siteName>
+         <siteCode network="hsl-kaza" siteID="6">141</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>45.26</latitude>
+               <longitude>77.85</longitude>
+            </geogLocation>
+         </geoLocation>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Ulba-Perevalochnaya</siteName>
+         <siteCode network="hsl-kaza" siteID="7">148</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>50.12</latitude>
+               <longitude>83.02</longitude>
+            </geogLocation>
+         </geoLocation>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>SHARDARA</siteName>
+         <siteCode network="hsl-kaza" siteID="8">16031</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>41.26667</latitude>
+               <longitude>67.95</longitude>
+            </geogLocation>
+         </geoLocation>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>KOKTOBE</siteName>
+         <siteCode network="hsl-kaza" siteID="9">16035</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>43.21667</latitude>
+               <longitude>67.78333</longitude>
+            </geogLocation>
+         </geoLocation>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>KOKBULAK</siteName>
+         <siteCode network="hsl-kaza" siteID="10">16497</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>40.98333</latitude>
+               <longitude>68.65</longitude>
+            </geogLocation>
+         </geoLocation>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>TASBUGET</siteName>
+         <siteCode network="hsl-kaza" siteID="11">16659</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>44.76667</latitude>
+               <longitude>65.51667</longitude>
+            </geogLocation>
+         </geoLocation>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>KARATEREN</siteName>
+         <siteCode network="hsl-kaza" siteID="12">16676</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>46.01667</latitude>
+               <longitude>61.05</longitude>
+            </geogLocation>
+         </geoLocation>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Kushum</siteName>
+         <siteCode network="hsl-kaza" siteID="13">826</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>50.85</latitude>
+               <longitude>51.28</longitude>
+            </geogLocation>
+         </geoLocation>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Tyumen-Aryk</siteName>
+         <siteCode network="hsl-kaza" siteID="14">832</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>44.05</latitude>
+               <longitude>67.05</longitude>
+            </geogLocation>
+         </geoLocation>
+      </siteInfo>
+   </site>
+   <site>
+      <siteInfo>
+         <siteName>Petropavlovsk</siteName>
+         <siteCode network="hsl-kaza" siteID="15">833</siteCode>
+         <geoLocation>
+            <geogLocation xsi:type="LatLonPointType">
+               <latitude>54.97</latitude>
+               <longitude>69.12</longitude>
+            </geogLocation>
+         </geoLocation>
+      </siteInfo>
+   </site>
+</sitesResponse>
+

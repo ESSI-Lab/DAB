@@ -4,7 +4,7 @@ package eu.essi_lab.messages;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -33,7 +33,7 @@ import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.GSProperty;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.RuntimeInfoElement;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.rip.RuntimeInfoProvider;
@@ -79,15 +79,23 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
     private static final String OUTPUT_SOURCES = "outputSources";
     private static final String REQUEST_TIMEOUT = "requestTimeout";
     private static final String ITERATED_WORKFLOW = "ITERATED_WORKFLOW";
+    private static final String PROFILER_NAME = "profilerName";
 
     private String requestId;
 
+    /**
+     * This default implementation returns a map with common info
+     */
     @Override
     public HashMap<String, List<String>> provideInfo() {
-	HashMap<String, List<String>> ret = new HashMap<>();
-	ret.put(RuntimeInfoElement.MESSAGE_TYPE.getName(), Arrays.asList(getClass().getSimpleName()));
 
-	return ret;
+	HashMap<String, List<String>> map = new HashMap<>();
+
+	map.put(RuntimeInfoElement.MESSAGE_TYPE.getName(), Arrays.asList(getClass().getSimpleName()));
+
+	getProfilerName().ifPresent(name -> map.put(RuntimeInfoElement.PROFILER_NAME.getName(), Arrays.asList(name)));
+	
+	return map;
     }
 
     /**
@@ -100,6 +108,32 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
 	setOutputSources(false);
 
 	requestId = UUID.randomUUID().toString();
+    }
+
+    /**
+     * @param webRequest
+     */
+    public static RequestMessage create() {
+
+	RequestMessage message = new RequestMessage() {
+
+	    /**
+	     * 
+	     */
+	    private static final long serialVersionUID = 1L;
+
+	    @Override
+	    public String getName() {
+		return null;
+	    }
+
+	    @Override
+	    public String getBaseType() {
+		return null;
+	    }
+	};
+
+	return message;
     }
 
     /**
@@ -144,14 +178,14 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
 	getHeader().add(new GSProperty<Integer>(REQUEST_TIMEOUT, timeout));
     }
 
-    public StorageUri getUserJobStorageURI() {
+    public StorageInfo getUserJobStorageURI() {
 
-	return getHeader().get(USER_JOB_STORAGE_URI, StorageUri.class);
+	return getHeader().get(USER_JOB_STORAGE_URI, StorageInfo.class);
     }
 
-    public void setUserJobStorageURI(StorageUri url) {
+    public void setUserJobStorageURI(StorageInfo url) {
 
-	getHeader().add(new GSProperty<StorageUri>(USER_JOB_STORAGE_URI, url));
+	getHeader().add(new GSProperty<StorageInfo>(USER_JOB_STORAGE_URI, url));
     }
 
     public String getUserJobResultId() {
@@ -164,14 +198,14 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
 	getHeader().add(new GSProperty<String>(USER_JOB_RESULT_ID, id));
     }
 
-    public StorageUri getDataBaseURI() {
+    public StorageInfo getDataBaseURI() {
 
-	return getHeader().get(DATABASE_URL, StorageUri.class);
+	return getHeader().get(DATABASE_URL, StorageInfo.class);
     }
 
-    public void setDataBaseURI(StorageUri url) {
+    public void setDataBaseURI(StorageInfo url) {
 
-	getHeader().add(new GSProperty<StorageUri>(DATABASE_URL, url));
+	getHeader().add(new GSProperty<StorageInfo>(DATABASE_URL, url));
     }
 
     public WebRequest getWebRequest() {
@@ -213,6 +247,22 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
 	if (value != null) {
 	    getHeader().add(property);
 	}
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getProfilerName() {
+
+	return Optional.ofNullable(getHeader().get(PROFILER_NAME, String.class));
+    }
+
+    /**
+     * @param name
+     */
+    public void setProfilerName(String name) {
+
+	getHeader().add(new GSProperty<String>(PROFILER_NAME, name));
     }
 
     public Optional<GSUser> getCurrentUser() {
@@ -313,10 +363,12 @@ public abstract class RequestMessage extends GSMessage implements RuntimeInfoPro
     }
 
     public void setRequestAbsolutePath(String requestAbsolutePath) {
+
 	getHeader().add(new GSProperty<String>(REQUEST_ABSOLUTE_PATH, requestAbsolutePath));
     }
 
     public String getRequestAbsolutePath() {
+
 	return getHeader().get(REQUEST_ABSOLUTE_PATH, String.class);
     }
 

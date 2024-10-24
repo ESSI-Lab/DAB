@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<timeSeriesResponse xmlns="http://www.cuahsi.org/waterML/1.1/"
+                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                    xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://www.cuahsi.org/waterML/1.1/ ../../../src/main/resources/cuahsiTimeSeries_v1_1_modified.xsd">
+      <queryInfo>
+         <creationTime>2018-01-11T06:32:53.6327221-07:00</creationTime>
+         <criteria MethodCalled="GetValues">
+            <parameter name="site" value="LBR:USU-LBR-Mendon"/>
+            <parameter name="variable" value="LBR:USU3"/>
+            <parameter name="startDate" value="2005-08-04T11:30:00"/>
+            <parameter name="endDate" value="2005-08-05T11:30:00"/>
+         </criteria>
+      </queryInfo>
+      <timeSeries>
+         <sourceInfo xsi:type="SiteInfoType">
+            <siteName>Little Bear River at Mendon Road near Mendon, Utah</siteName>
+            <siteCode network="LBR" siteID="1">USU-LBR-Mendon</siteCode>
+            <geoLocation>
+               <geogLocation srs="EPSG:4269" xsi:type="LatLonPointType">
+                  <latitude>41.718473</latitude>
+                  <longitude>-111.946402</longitude>
+               </geogLocation>
+               <localSiteXY projectionInformation="NAD83 / UTM zone 12N">
+                  <X>421276.323</X>
+                  <Y>4618952.04</Y>
+               </localSiteXY>
+            </geoLocation>
+            <elevation_m>1345</elevation_m>
+            <verticalDatum>NGVD29</verticalDatum>
+            <siteProperty name="County">Cache</siteProperty>
+            <siteProperty name="State">Utah</siteProperty>
+            <siteProperty name="Site Comments">Located below county road bridge at Mendon Road crossing</siteProperty>
+            <siteProperty name="PosAccuracy_m">10</siteProperty>
+            <siteProperty name="Site Type">Stream</siteProperty>
+         </sourceInfo>
+         <variable>
+            <variableCode default="true" variableID="3" vocabulary="LBR">USU3</variableCode>
+            <variableName>Battery voltage</variableName>
+            <valueType>Field Observation</valueType>
+            <dataType>Minimum</dataType>
+            <generalCategory>Instrumentation</generalCategory>
+            <sampleMedium>Not Relevant</sampleMedium>
+            <unit>
+               <unitName>volts</unitName>
+               <unitType>Potential Difference</unitType>
+               <unitAbbreviation>V</unitAbbreviation>
+               <unitCode>168</unitCode>
+            </unit>
+            <noDataValue>-9999</noDataValue>
+            <timeScale isRegular="true">
+               <unit>
+                  <unitName>minute</unitName>
+                  <unitType>Time</unitType>
+                  <unitAbbreviation>min</unitAbbreviation>
+                  <unitCode>102</unitCode>
+               </unit>
+               <timeSupport>30</timeSupport>
+            </timeScale>
+            <speciation>Not Applicable</speciation>
+         </variable>
+         <values></values>
+      </timeSeries>
+   </timeSeriesResponse>

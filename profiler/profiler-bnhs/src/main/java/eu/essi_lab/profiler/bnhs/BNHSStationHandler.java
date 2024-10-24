@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.bnhs;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -45,16 +45,17 @@ import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
 import eu.essi_lab.lib.net.utils.whos.HydroOntology;
 import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
+import eu.essi_lab.lib.net.utils.whos.WHOSOntology;
 import eu.essi_lab.lib.net.utils.whos.WMOOntology;
 import eu.essi_lab.lib.net.utils.whos.WMOUnit;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
+import eu.essi_lab.messages.RequestMessage.IterationMode;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.ValidationMessage;
-import eu.essi_lab.messages.RequestMessage.IterationMode;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
@@ -64,7 +65,7 @@ import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.BNHSProperty;
 import eu.essi_lab.model.resource.BNHSPropertyReader;
@@ -160,7 +161,7 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 
 	    LogicalBond bond = BondFactory.createAndBond(operands);
 
-	    StorageUri storageUri = ConfigurationWrapper.getDatabaseURI();
+	    StorageInfo storageUri = ConfigurationWrapper.getDatabaseURI();
 
 	    Optional<View> optionalView = WebRequestTransformer.findView(storageUri, "whos-arctic");
 
@@ -201,15 +202,15 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 		} catch (Exception e) {
 		}
 		// if attribute URI is present, is preferred, to have an harmonized set of attributes
-		Optional<String> optionalAttributeURI = resource.getExtensionHandler().getAttributeURI();
+		Optional<String> optionalAttributeURI = resource.getExtensionHandler().getObservedPropertyURI();
 		if (optionalAttributeURI.isPresent()) {
 		    String uri = optionalAttributeURI.get();
 		    if (uri != null) {
-			HydroOntology ontology = new HydroOntology();
+			HydroOntology ontology = new WHOSOntology();
 			SKOSConcept concept = ontology.getConcept(uri);
 			if (concept != null) {
 			    attributeLabel = concept.getPreferredLabel().getKey();
-			    List<String> closeMatches = concept.getCloseMatches();
+			    HashSet<String> closeMatches = concept.getCloseMatches();
 			    if (closeMatches != null && !closeMatches.isEmpty()) {
 				try {
 				    WMOOntology wmoOntology = new WMOOntology();

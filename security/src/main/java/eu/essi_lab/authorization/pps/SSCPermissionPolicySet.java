@@ -7,7 +7,7 @@ package eu.essi_lab.authorization.pps;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,13 +27,11 @@ package eu.essi_lab.authorization.pps;
 import java.util.Arrays;
 import java.util.List;
 
-import org.ow2.authzforce.core.pdp.impl.combining.StandardCombiningAlgorithm;
-
-import eu.essi_lab.messages.web.WebRequest;
 import oasis.names.tc.xacml._3_0.core.schema.wd_17.ApplyType;
 
 /**
- * This policy allows in particular the Service Status Checker requests coming from 194.67.141.5 to execute "Describe sensor" requests on the "sos" path, since the {@link DescribeSensorTransformer} 
+ * This policy allows the Service Status Checker requests coming from 194.67.141.5 to execute "Describe
+ * sensor" requests on the "sos" path, since the {@link DescribeSensorTransformer}
  * set the page size to 10000 at the moment, and an anonymous user would be excluded
  * 
  * @author Fabrizio
@@ -43,56 +41,39 @@ public class SSCPermissionPolicySet extends AbstractPermissionPolicySet {
     /**
      * 
      */
-    private static final List<String> ALLOWED_IP_LIST = Arrays.asList(//
-	    "194.67.141.5",//
+    public static final List<String> ALLOWED_IP_LIST = Arrays.asList(//
+	    "194.67.141.5", //
 	    "152.61.128.50");//
 
     public SSCPermissionPolicySet() {
 
-	super("ssc", StandardCombiningAlgorithm.XACML_3_0_RULE_COMBINING_PERMIT_OVERRIDES.getId());
+	super("ssc");
     }
 
     @Override
     protected void editPPSPolicy() {
 
-	{
-	    String discoveryRuleId = "Permission:to:discover:essilab:client";
+	ApplyType pathApply = createPathApply("sos", "wcs", "wms");
+	ApplyType ipApply = createAllowedIPApply(ALLOWED_IP_LIST.toArray(new String[] {}));
 
-	    setDiscoveryAction(discoveryRuleId);
+	//
+	// discovery
+	//
 
-	    ApplyType allowedClientId = createAllowedClientIdentifiersApply(WebRequest.ESSI_LAB_CLIENT_IDENTIFIER);
+	String discoveryRuleId = "permission:to:discover:ssc:client";
 
-	    setAndCondition(discoveryRuleId, allowedClientId);
-	}
-	{
-	    String discoveryRuleId = "Permission:to:discover:ssc:client";
+	setDiscoveryAction(discoveryRuleId);
 
-	    setDiscoveryAction(discoveryRuleId);
+	setAndCondition(discoveryRuleId, pathApply, ipApply);
 
-	    ApplyType pathApply = createPathApply("sos", "wcs");
-	    ApplyType ipApply = createAllowedIPApply(ALLOWED_IP_LIST.toArray(new String[] {}));
+	//
+	// access
+	//
 
-	    setAndCondition(discoveryRuleId, pathApply, ipApply);
-	}
+	String accessRuleId = "permission:to:access:ssc:client";
 
-	{
-	    String accessRuleId = "Permission:to:access:essilab:client";
+	setAccessAction(accessRuleId);
 
-	    setAccessAction(accessRuleId);
-
-	    ApplyType allowedClientId = createAllowedClientIdentifiersApply(WebRequest.ESSI_LAB_CLIENT_IDENTIFIER);
-
-	    setAndCondition(accessRuleId, allowedClientId);
-	}
-	{
-	    String accessRuleId = "Permission:to:access:ssc:client";
-
-	    setAccessAction(accessRuleId);
-
-	    ApplyType pathApply = createPathApply("sos", "wcs");
-	    ApplyType ipApply = createAllowedIPApply(ALLOWED_IP_LIST.toArray(new String[] {}));
-
-	    setAndCondition(accessRuleId, pathApply, ipApply);
-	}
+	setAndCondition(accessRuleId, pathApply, ipApply);
     }
 }

@@ -4,7 +4,7 @@ package eu.essi_lab.lib.utils;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,19 +21,19 @@ package eu.essi_lab.lib.utils;
  * #L%
  */
 
-import java.io.PrintStream;
+import java.util.Optional;
+import java.util.concurrent.Executors;
 
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
-
-import com.google.common.base.Charsets;
 
 /**
  * @author Fabrizio
  */
 public class GSLoggerFactory {
+
+    private static ErrorLogListener listener;
 
     static {
 	HostNamePropertyUtils.setHostNameProperty();
@@ -42,15 +42,29 @@ public class GSLoggerFactory {
     /**
      * @author Fabrizio
      */
+    public interface ErrorLogListener {
+
+	/**
+	 * @param msg
+	 * @param throwable
+	 */
+	public void errorOccurred(Class<?> clazz, String msg, Optional<Throwable> throwable) throws Exception;
+    }
+
+    /**
+     * @author Fabrizio
+     */
     public static class GSLogger implements Logger {
 
 	private Logger logger;
+	private Class<?> clazz;
 
 	/**
 	 * @param clazz
 	 */
 	public GSLogger(Class<?> clazz) {
 
+	    this.clazz = clazz;
 	    logger = LoggerFactory.getLogger(clazz);
 	}
 
@@ -339,6 +353,20 @@ public class GSLoggerFactory {
 	@Override
 	public void error(String msg, Throwable t) {
 
+	    if (listener != null) {
+
+		Executors.newCachedThreadPool().submit(() -> {
+		    try {
+
+			listener.errorOccurred(clazz, msg, Optional.of(t));
+		    } catch (Exception e) {
+
+			e.printStackTrace();
+			logger.error(e.getMessage(), e);
+		    }
+		});
+	    }
+
 	    logger.error(msg, t);
 	}
 
@@ -346,6 +374,20 @@ public class GSLoggerFactory {
 	 * @param t
 	 */
 	public void error(Throwable t) {
+
+	    if (listener != null) {
+
+		Executors.newCachedThreadPool().submit(() -> {
+		    try {
+
+			listener.errorOccurred(clazz, t.getMessage(), Optional.of(t));
+		    } catch (Exception e) {
+
+			e.printStackTrace();
+			logger.error(e.getMessage(), e);
+		    }
+		});
+	    }
 
 	    logger.error(t.getMessage(), t);
 	}
@@ -364,6 +406,20 @@ public class GSLoggerFactory {
 
 	@Override
 	public void error(String msg) {
+
+	    if (listener != null) {
+
+		Executors.newCachedThreadPool().submit(() -> {
+		    try {
+
+			listener.errorOccurred(clazz, msg, Optional.empty());
+		    } catch (Exception e) {
+
+			e.printStackTrace();
+			logger.error(e.getMessage(), e);
+		    }
+		});
+	    }
 
 	    logger.error(msg);
 	}
@@ -431,17 +487,33 @@ public class GSLoggerFactory {
 	/**
 	 * 
 	 */
-	public void traceFreeMemory(String message) {
+	public void traceMemoryUsage(String message) {
 
-	    logger.trace(message + "[" + Runtime.getRuntime().freeMemory() / 1000000 + "] MB");
+	    logger.trace(message + "[" + getTotalMemory() + "/" + getFreeMemory() + "/" + getUsedMemory() + "] MB (T/F/U)");
 	}
 
 	/**
 	 * 
 	 */
-	public void traceFreeMemory() {
+	public static int getFreeMemory() {
 
-	    traceFreeMemory("FHSM: ");
+	    return (int) (Runtime.getRuntime().freeMemory() / 1000000);
+	}
+
+	/**
+	 * 
+	 */
+	public static int getUsedMemory() {
+
+	    return getTotalMemory() - getFreeMemory();
+	}
+
+	/**
+	 * 
+	 */
+	public static int getTotalMemory() {
+
+	    return (int) (Runtime.getRuntime().totalMemory() / 1000000);
 	}
     }
 
@@ -452,5 +524,15 @@ public class GSLoggerFactory {
     public static GSLogger getLogger(Class<?> clazz) {
 
 	return new GSLogger(clazz);
+    }
+
+    /**
+     * @param clazz
+     * @param listener
+     * @return
+     */
+    public static void setErrorLogListener(ErrorLogListener listener) {
+
+	GSLoggerFactory.listener = listener;
     }
 }

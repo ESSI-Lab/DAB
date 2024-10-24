@@ -7,7 +7,7 @@ package eu.essi_lab.lib.utils;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -62,7 +62,6 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.geometry.BoundingBox;
 
-import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * @author Fabrizio
@@ -143,7 +142,7 @@ public class ShapeReader {
      * @throws IOException
      * @throws Throwable
      */
-    public Envelope getBBox(String typeName) throws IOException {
+    public BoundingBox getBBox(String typeName) throws IOException {
 
 	return getBBox(dataStore.getFeatureSource(typeName).getFeatures());
     }
@@ -213,17 +212,12 @@ public class ShapeReader {
 	return getTimeExtent(dataStore.getFeatureSource(typeName).getFeatures(), timePropertyName);
     }
 
-    private com.vividsolutions.jts.geom.Envelope initJTSEnv(BoundingBox sourceGeometry) {
 
-	return new com.vividsolutions.jts.geom.Envelope(sourceGeometry.getMinX(), sourceGeometry.getMaxX(), sourceGeometry.getMinY(),
-		sourceGeometry.getMaxY());
 
-    }
-
-    private Envelope getBBox(FeatureCollection<?, ?> collection) {
+    private BoundingBox getBBox(FeatureCollection<?, ?> collection) {
 
 	FeatureIterator<?> iterator = collection.features();
-	Envelope envelope = null;
+	BoundingBox envelope = null;
 
 	try {
 
@@ -233,13 +227,13 @@ public class ShapeReader {
 		BoundingBox sourceGeometry = feature.getDefaultGeometryProperty().getBounds();
 
 		if (envelope == null) {
-
-		    envelope = initJTSEnv(sourceGeometry);
+		    
+		    envelope = sourceGeometry;
 
 		} else {
 
-		    Envelope geenvelope = initJTSEnv(sourceGeometry);
-		    envelope.expandToInclude(geenvelope);
+		    envelope.include(sourceGeometry);
+
 		}
 	    }
 	} finally {

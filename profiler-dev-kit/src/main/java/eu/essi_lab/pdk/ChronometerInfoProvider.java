@@ -7,7 +7,7 @@ package eu.essi_lab.pdk;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -41,7 +41,8 @@ public class ChronometerInfoProvider extends Chronometer implements RuntimeInfoP
 
     @Override
     public String getBaseType() {
-	return "chronometer";
+
+	return "Chronometer";
     }
 
     private long elapsedTimeMillis;
@@ -72,7 +73,11 @@ public class ChronometerInfoProvider extends Chronometer implements RuntimeInfoP
 
 	map.put(//
 		RuntimeInfoElement.CHRONOMETER_ELAPSED_TIME_MILLIS.getName(), //
-		Arrays.asList(String.valueOf(elapsedTimeMillis)));
+		Arrays.asList(String.valueOf(elapsedTimeMillis == 0 ? getElapsedTimeMillis() : elapsedTimeMillis)));
+
+	map.put(//
+		RuntimeInfoElement.CHRONOMETER_FORMATTED_ELAPSED_TIME.getName(), //
+		Arrays.asList(formatElapsedTime(elapsedTimeMillis)));
 
 	return map;
     }

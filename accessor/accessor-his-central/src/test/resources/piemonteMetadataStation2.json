@@ -1,0 +1,85 @@
+{
+    "var-type": "fk_id_punto_misura_meteo",
+    "dataset-info": {
+        "latitudine_n_wgs84_d": 45.0796,
+        "indirizzo_localita": "CORSO MARCHE 41",
+        "note": null,
+        "codice_istat_comune": "001272",
+        "longitudine_e_wgs84_d": 7.61073,
+        "codice_stazione": "S4294 ",
+        "data_inizio": "2005-06-01",
+        "url": "https://utility.arpa.piemonte.it/meteoidro/stazione_meteorologica/PIE-001272-908-2005-05-31/?format=json",
+        "quota_stazione": 320,
+        "comune": "TORINO",
+        "sensori_meteo": [
+            {
+                "quota_da_pc": null,
+                "note": "Anemometro installato su tetto palazzina Alenia                                                                                                                                                                                                                ",
+                "fk_id_stazione_meteorologica": "https://utility.arpa.piemonte.it/meteoidro/stazione_meteorologica/PIE-001272-908-2005-05-31/?format=json",
+                "id_parametro": "VELS",
+                "altezza_supporto": 36,
+                "data_inizio": "2005-06-01",
+                "url": "https://utility.arpa.piemonte.it/meteoidro/sensore_meteo/PIE-001272-908-VELS-2005-05-31/?format=json",
+                "data_fine": null
+            },
+            {
+                "quota_da_pc": null,
+                "note": "Anemometro installato su tetto palazzina Alenia                                                                                                                                                                                                                ",
+                "fk_id_stazione_meteorologica": "https://utility.arpa.piemonte.it/meteoidro/stazione_meteorologica/PIE-001272-908-2005-05-31/?format=json",
+                "id_parametro": "VELV",
+                "altezza_supporto": 36,
+                "data_inizio": "2005-06-01",
+                "url": "https://utility.arpa.piemonte.it/meteoidro/sensore_meteo/PIE-001272-908-VELV-2005-05-31/?format=json",
+                "data_fine": null
+            },
+            {
+                "quota_da_pc": null,
+                "note": null,
+                "fk_id_stazione_meteorologica": "https://utility.arpa.piemonte.it/meteoidro/stazione_meteorologica/PIE-001272-908-2005-05-31/?format=json",
+                "id_parametro": "DIRV",
+                "altezza_supporto": 36,
+                "data_inizio": "2005-06-01",
+                "url": "https://utility.arpa.piemonte.it/meteoidro/sensore_meteo/PIE-001272-908-DIRV-2005-05-31/?format=json",
+                "data_fine": null
+            },
+            {
+                "quota_da_pc": null,
+                "note": null,
+                "fk_id_stazione_meteorologica": "https://utility.arpa.piemonte.it/meteoidro/stazione_meteorologica/PIE-001272-908-2005-05-31/?format=json",
+                "id_parametro": "IGRO",
+                "altezza_supporto": null,
+                "data_inizio": "2005-06-01",
+                "url": "https://utility.arpa.piemonte.it/meteoidro/sensore_meteo/PIE-001272-908-IGRO-2005-05-31/?format=json",
+                "data_fine": null
+            },
+            {
+                "quota_da_pc": null,
+                "note": null,
+                "fk_id_stazione_meteorologica": "https://utility.arpa.piemonte.it/meteoidro/stazione_meteorologica/PIE-001272-908-2005-05-31/?format=json",
+                "id_parametro": "RADD",
+                "altezza_supporto": null,
+                "data_inizio": "2005-06-01",
+                "url": "https://utility.arpa.piemonte.it/meteoidro/sensore_meteo/PIE-001272-908-RADD-2005-05-31/?format=json",
+                "data_fine": null
+            },
+            {
+                "quota_da_pc": null,
+                "note": null,
+                "fk_id_stazione_meteorologica": "https://utility.arpa.piemonte.it/meteoidro/stazione_meteorologica/PIE-001272-908-2005-05-31/?format=json",
+                "id_parametro": "TERMA",
+                "altezza_supporto": null,
+                "data_inizio": "2005-06-01",
+                "url": "https://utility.arpa.piemonte.it/meteoidro/sensore_meteo/PIE-001272-908-TERMA-2005-05-31/?format=json",
+                "data_fine": null
+            }
+        ],
+        "tipo_staz": "HRTV         ",
+        "nazione": "ITALIA",
+        "esposizione": "NNW",
+        "denominazione": "TORINO ALENIA                                                                   ",
+        "sigla_prov": "TO",
+        "fk_id_punto_misura_meteo": "https://utility.arpa.piemonte.it/meteoidro/punti_misura_meteo/PIE-001272-908/?format=json",
+        "data_fine": null
+    },
+    "var-name": "RADD"
+}

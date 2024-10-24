@@ -1,0 +1,670 @@
+{
+    "help": "http://data.gov.uk/api/3/action/help_show?name=package_show",
+    "success": true,
+    "result": {
+        "license_title": "",
+        "maintainer": null,
+        "temporal_coverage-from": "[]",
+        "relationships_as_object": [],
+        "private": false,
+        "maintainer_email": null,
+        "num_tags": 27,
+        "id": "de6c5f3f-d9e6-4321-a317-780289f4fb9f",
+        "metadata_created": "2012-02-23T15:59:22.727558",
+        "metadata_modified": "2016-02-10T17:08:13.554320",
+        "author": null,
+        "author_email": null,
+        "state": "active",
+        "version": null,
+        "archiver": {
+            "status": "Download error",
+            "is_broken": true,
+            "reason": "Connection error: ('Connection aborted.', gaierror(-2, 'Name or service not known'))",
+            "status_id": 12
+        },
+        "temporal_coverage-to": "[]",
+        "license_id": "",
+        "type": "dataset",
+        "resources": [
+            {
+                "hash": "",
+                "description": "Resource locator",
+                "created": "2014-02-18T16:33:15.289446",
+                "url": "https://www.spatialni.gov.uk/wss/service/AFBI_Environmentally_Sensitive_Areas_NI-WMS-INC-LIC/WSS?request=GetCapabilities&service=WMS&version=1.3.0",
+                "format": "",
+                "qa": {
+                    "updated": "2017-01-15T01:40:33.182089",
+                    "openness_score": 0,
+                    "archival_timestamp": "2017-01-13T23:29:08.822304",
+                    "format": null,
+                    "created": "2014-05-09T22:17:44.661633",
+                    "resource_timestamp": "2014-02-18T16:33:15.096477",
+                    "openness_score_reason": "File could not be downloaded. Reason: Download error. Error details: Server content contained an API error message: <?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<ServiceExceptionReport version=\"1.1.0\">\n<ServiceException code=\"InvalidFormat\">\n<![CDATA[Invalid SERVICE parameter <WMS>.]]></ServiceException>\n</ServiceExceptionReport>\n. Attempted on 13/01/2017. Tried 148 times since 18/02/2014. This URL has not worked in the history of this tool."
+                },
+                "tracking_summary": {
+                    "total": 0,
+                    "recent": 0
+                },
+                "resource_locator_function": "",
+                "archiver": {
+                    "is_broken_printable": "Broken",
+                    "updated": "2018-08-25T00:08:13.220376",
+                    "cache_filepath": null,
+                    "last_success": null,
+                    "size": "0",
+                    "is_broken": true,
+                    "failure_count": 232,
+                    "etag": null,
+                    "status": "Download error",
+                    "url_redirected_to": null,
+                    "hash": "",
+                    "status_id": 12,
+                    "reason": "Server content contained an API error message: <?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<ServiceExceptionReport version=\"1.1.0\">\n<ServiceException code=\"InvalidFormat\">\n<![CDATA[Invalid SERVICE parameter <WMS>.]]></ServiceException>\n</ServiceExceptionReport>\n",
+                    "last_modified": null,
+                    "resource_timestamp": "2016-02-10T17:08:13.553189",
+                    "mimetype": null,
+                    "cache_url": null,
+                    "created": "2014-02-18T16:34:02.181692",
+                    "first_failure": "2014-02-18T16:34:02.181692"
+                },
+                "resource_locator_protocol": "",
+                "position": 0,
+                "revision_id": "d1f6fd5a-b9bc-4062-a396-7ae314da6c1e",
+                "id": "5d56bc4d-e4e9-40e2-9d90-84c95ecafee0",
+                "resource_type": "file",
+                "name": ""
+            },
+            {
+                "description": "Resource locator",
+                "created": "2014-02-18T16:33:15.289465",
+                "url": "http://www.gistrategyni.gov.uk/index/spatialni/download_services.htm",
+                "format": "HTML",
+                "qa": {
+                    "updated": "2017-01-15T01:40:33.290620",
+                    "openness_score": 0,
+                    "archival_timestamp": "2017-01-13T23:29:09.137359",
+                    "format": "HTML",
+                    "created": "2014-05-09T22:17:46.476106",
+                    "resource_timestamp": "2014-05-09T21:17:46.031062",
+                    "openness_score_reason": "Content of file appeared to be format \"HTML\" which receives openness score: 0."
+                },
+                "tracking_summary": {
+                    "total": 0,
+                    "recent": 0
+                },
+                "resource_locator_function": "",
+                "archiver": {
+                    "is_broken_printable": "Broken",
+                    "updated": "2018-08-25T00:08:13.306639",
+                    "cache_filepath": "/media/hulk/ckan_resource_cache/ad/ad3340e7-b3f3-4fe6-be12-73cbef1482e3/download_services.htm",
+                    "last_success": "2017-01-13T23:29:09.137359",
+                    "size": "22444",
+                    "is_broken": true,
+                    "failure_count": 84,
+                    "etag": null,
+                    "status": "Download error",
+                    "url_redirected_to": null,
+                    "hash": "137619ffe21ff4e63fe36b6f7d817554c92cce05",
+                    "status_id": 12,
+                    "reason": "Connection error: ('Connection aborted.', gaierror(-2, 'Name or service not known'))",
+                    "last_modified": null,
+                    "resource_timestamp": "2016-02-10T17:08:13.553189",
+                    "mimetype": "text/html",
+                    "cache_url": "http://data.gov.uk/data/resource_cache/ad/ad3340e7-b3f3-4fe6-be12-73cbef1482e3/download_services.htm",
+                    "created": "2014-02-18T16:34:02.668309",
+                    "first_failure": "2017-01-20T23:27:29.093148"
+                },
+                "resource_locator_protocol": "",
+                "position": 1,
+                "revision_id": "d1f6fd5a-b9bc-4062-a396-7ae314da6c1e",
+                "id": "ad3340e7-b3f3-4fe6-be12-73cbef1482e3",
+                "resource_type": "file",
+                "name": ""
+            }
+        ],
+        "num_resources": 2,
+        "contact-email": "Info@AFBINI.GOV.UK",
+        "tags": [
+            {
+                "vocabulary_id": null,
+                "display_name": "AFBI",
+                "name": "AFBI",
+                "revision_timestamp": "2012-02-23T15:59:22.727558",
+                "state": "active",
+                "id": "10cb10e8-d6b7-403b-999e-5ace90ecbb6f"
+            },
+            {
+                "vocabulary_id": null,
+                "display_name": "Agri Food and Biosciences Institute",
+                "name": "Agri Food and Biosciences Institute",
+                "revision_timestamp": "2014-02-18T16:33:15.096477",
+                "state": "active",
+                "id": "86b4e303-9b42-46b2-b49f-10a6d4d23059"
+            },
+            {
+                "vocabulary_id": null,
+                "display_name": "Agriculture",
+                "name": "Agriculture",
+                "revision_timestamp": "2014-02-18T16:33:15.096477",
+                "state": "active",
+                "id": "a0940c99-ad96-4e14-8c84-bd3051cd443a"
+            },
+            {
+                "vocabulary_id": null,
+                "display_name": "Bio-geographical Region",
+                "name": "Bio-geographical Region",
+                "revision_timestamp": "2014-02-18T16:33:15.096477",
+                "state": "active",
+                "id": "3821e6ea-8559-4f84-821a-317dce0657df"
+            },
+            {
+                "vocabulary_id": null,
+                "display_name": "Biotopes",
+                "name": "Biotopes",
+                "revision_timestamp": "2014-02-18T16:33:15.096477",
+                "state": "active",
+                "id": "d05258f1-fb6d-41a0-b372-319db126c6b0"
+            },
+            {
+                "vocabulary_id": null,
+                "display_name": "Causeway Glens",
+                "name": "Causeway Glens",
+                "revision_timestamp": "2014-02-18T16:33:15.096477",
+                "state": "active",
+                "id": "f2515585-e6e2-41b7-b768-67c58b4b6b93"
+            },
+            {
+                "vocabulary_id": null,
+                "display_name": "Conservation",
+                "name": "Conservation",
+                "revision_timestamp": "2014-02-18T16:33:15.096477",
+                "state": "active",
+                "id": "f43da32b-cbbc-46fc-bfe2-3cd5540af4f4"
+            },
+            {
+                "vocabulary_id": null,
+                "display_name": "Environment",
+                "name": "Environment",
+                "revision_timestamp": "2013-03-04T14:50:39.222238",
+                "state": "active",
+                "id": "f5624e90-3567-4554-a582-cf5eeca87dab"
+            },
+            {
+                "vocabulary_id": null,
+                "display_name": "Environmental",
+                "name": "Environmental",
+                "revision_timestamp": "2014-02-18T16:33:15.096477",
+                "state": "active",
+                "id": "22c98fe2-6851-4600-af74-1a03ff874574"
+            },
+            {
+                "vocabulary_id": null,
+                "display_name": "Fermanagh",
+                "name": "Fermanagh",
+                "revision_timestamp": "2014-02-18T16:33:15.096477",
+                "state": "active",
+                "id": "ca198519-7f50-4296-bbdf-fbb7b7f37b01"
+            },
+            {
+                "vocabulary_id": null,
+                "display_name": "Habitats",
+                "name": "Habitats",
+                "revision_timestamp": "2014-02-18T16:33:15.096477",
+                "state": "active",
+                "id": "9dce53d5-6ad2-4d4e-8c22-d822bf871f5b"
+            },
+            {
+                "vocabulary_id": null,
+                "display_name": "INSPIRE",
+                "name": "INSPIRE",
+                "revision_timestamp": "2012-02-23T15:59:22.727558",
+                "state": "active",
+                "id": "03dd6e33-5bfa-43cc-b7fc-f1c338128556"
+            },
+            {
+                "vocabulary_id": null,
+                "display_name": "Metadata",
+                "name": "Metadata",
+                "revision_timestamp": "2014-02-18T16:33:15.096477",
+                "state": "active",
+                "id": "756333c7-5b2f-4be4-ae6f-7b84e213a31e"
+            },
+            {
+                "vocabulary_id": null,
+                "display_name": "Mournes",
+                "name": "Mournes",
+                "revision_timestamp": "2014-02-18T16:33:15.096477",
+                "state": "active",
+                "id": "feb5a401-a7a1-49b0-b2e2-efa4dcbd5e80"
+            },
+            {
+                "vocabulary_id": null,
+                "display_name": "NI",
+                "name": "NI",
+                "revision_timestamp": "2013-03-04T14:50:39.222238",
+                "state": "active",
+                "id": "977308e7-3070-4e10-9e14-a84ce4642864"
+            },
+            {
+                "vocabulary_id": null,
+                "display_name": "Northern Ireland",
+                "name": "Northern Ireland",
+                "revision_timestamp": "2013-03-04T14:50:39.222238",
+                "state": "active",
+                "id": "9b88c0e6-2c10-49e0-ba2e-78afdffa3318"
+            },
+            {
+                "vocabulary_id": null,
+                "display_name": "Protected Area",
+                "name": "Protected Area",
+                "revision_timestamp": "2014-02-18T16:33:15.096477",
+                "state": "active",
+                "id": "2a40732a-e39c-49b8-bed5-daeba7e5c4f5"
+            },
+            {
+                "vocabulary_id": null,
+                "display_name": "Protected Sites",
+                "name": "Protected Sites",
+                "revision_timestamp": "2014-02-18T16:33:15.096477",
+                "state": "active",
+                "id": "be6b6130-8d75-4ea3-aff9-39699a860480"
+            },
+            {
+                "vocabulary_id": null,
+                "display_name": "Rathlin Island",
+                "name": "Rathlin Island",
+                "revision_timestamp": "2014-02-18T16:33:15.096477",
+                "state": "active",
+                "id": "57946a56-26a0-44b3-95fd-f3c5fe7ffd85"
+            },
+            {
+                "vocabulary_id": null,
+                "display_name": "Sensitive",
+                "name": "Sensitive",
+                "revision_timestamp": "2012-02-23T15:59:22.727558",
+                "state": "active",
+                "id": "b95d7089-4ee1-4098-97b5-d72fba18d21f"
+            },
+            {
+                "vocabulary_id": null,
+                "display_name": "Slieve Gullion",
+                "name": "Slieve Gullion",
+                "revision_timestamp": "2014-02-18T16:33:15.096477",
+                "state": "active",
+                "id": "e0d1e05c-83c0-4490-a71b-f08c1883f6a1"
+            },
+            {
+                "vocabulary_id": null,
+                "display_name": "Sperrins",
+                "name": "Sperrins",
+                "revision_timestamp": "2014-02-18T16:33:15.096477",
+                "state": "active",
+                "id": "072fb482-264f-4f21-8e01-c9c99d9aacaf"
+            },
+            {
+                "vocabulary_id": null,
+                "display_name": "agricultural land",
+                "name": "agricultural land",
+                "revision_timestamp": "2013-03-04T14:50:39.222238",
+                "state": "active",
+                "id": "8efc66ab-77ef-4fd0-9aea-c7e0254e08b4"
+            },
+            {
+                "vocabulary_id": null,
+                "display_name": "infoMapAccessService",
+                "name": "infoMapAccessService",
+                "revision_timestamp": "2012-02-23T15:59:22.727558",
+                "state": "active",
+                "id": "4a3e839c-1221-4e50-8025-f4954965e370"
+            },
+            {
+                "vocabulary_id": null,
+                "display_name": "protected site",
+                "name": "protected site",
+                "revision_timestamp": "2013-03-04T14:50:39.222238",
+                "state": "active",
+                "id": "c218e5b6-035e-4b7e-8d5e-37e3a74fc64f"
+            },
+            {
+                "vocabulary_id": null,
+                "display_name": "rural habitat",
+                "name": "rural habitat",
+                "revision_timestamp": "2013-03-04T14:50:39.222238",
+                "state": "active",
+                "id": "1e402187-d9d3-4496-a94b-78591839887c"
+            },
+            {
+                "vocabulary_id": null,
+                "display_name": "sensitive environment",
+                "name": "sensitive environment",
+                "revision_timestamp": "2013-03-04T14:50:39.222238",
+                "state": "active",
+                "id": "fae70c68-7417-40f0-9642-f356673405d8"
+            }
+        ],
+        "tracking_summary": {
+            "total": 0,
+            "recent": 0
+        },
+        "groups": [],
+        "creator_user_id": "60e687bf-a6d8-43e2-a50e-efab84b27952",
+        "relationships_as_subject": [],
+        "revision_timestamp": "2016-02-10T17:08:13.553189",
+        "organization": {
+            "description": "",
+            "created": "2012-06-27T14:55:27.012776",
+            "title": "Northern Ireland Spatial Data Infrastructure",
+            "name": "northern-ireland-spatial-data-infrastructure",
+            "revision_timestamp": "2012-06-27T13:48:36.948477",
+            "is_organization": true,
+            "state": "active",
+            "image_url": "",
+            "revision_id": "a1f4375a-4afe-4dad-88cd-03f2bd6adaaf",
+            "type": "organization",
+            "id": "cd937140-1310-4e2a-b211-5de8bebd910d",
+            "approval_status": "approved"
+        },
+        "name": "afbi-environmentally-sensitive-areas-ni-inspire-view-service",
+        "isopen": false,
+        "url": null,
+        "notes": "This vector dataset depicts the Environmentally Sensitive Area boundary lines, digitized from 1:50,000 paper maps in 1990.  \n\nUsers outside of the Spatial NI Portal please use Resource Locator 2.",
+        "owner_org": "cd937140-1310-4e2a-b211-5de8bebd910d",
+        "qa": {
+            "openness_score_reason": "File could not be downloaded. Reason: Download error. Error details: Server content contained an API error message: <?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<ServiceExceptionReport version=\"1.1.0\">\n<ServiceException code=\"InvalidFormat\">\n<![CDATA[Invalid SERVICE parameter <WMS>.]]></ServiceException>\n</ServiceExceptionReport>\n. Attempted on 13/01/2017. Tried 148 times since 18/02/2014. This URL has not worked in the history of this tool.",
+            "updated": "2017-01-15T01:40:33.290620",
+            "openness_score": 0
+        },
+        "theme-secondary": [
+            "Mapping"
+        ],
+        "extras": [
+            {
+                "package_id": "de6c5f3f-d9e6-4321-a317-780289f4fb9f",
+                "value": "True",
+                "revision_timestamp": "2012-02-23T15:59:22.727558",
+                "state": "active",
+                "key": "UKLP",
+                "revision_id": "47cc1f8e-fedd-44e5-861b-937db9ad2ff1",
+                "id": "e5796c11-484e-4eb3-9423-15c8fd6f055d"
+            },
+            {
+                "package_id": "de6c5f3f-d9e6-4321-a317-780289f4fb9f",
+                "value": "[\"(e) intellectual property rights;\"]",
+                "revision_timestamp": "2013-03-04T14:50:39.222238",
+                "state": "active",
+                "key": "access_constraints",
+                "revision_id": "b21b9f11-6020-4ce5-9b67-c84a05180893",
+                "id": "009c039b-eaa9-4a3c-8f83-60102283f49a"
+            },
+            {
+                "package_id": "de6c5f3f-d9e6-4321-a317-780289f4fb9f",
+                "value": "-5.40566902640608",
+                "revision_timestamp": "2013-03-04T14:50:39.222238",
+                "state": "active",
+                "key": "bbox-east-long",
+                "revision_id": "b21b9f11-6020-4ce5-9b67-c84a05180893",
+                "id": "8857e66b-ecc0-4266-a963-556a561faebb"
+            },
+            {
+                "package_id": "de6c5f3f-d9e6-4321-a317-780289f4fb9f",
+                "value": "55.3184340550243",
+                "revision_timestamp": "2013-03-04T14:50:39.222238",
+                "state": "active",
+                "key": "bbox-north-lat",
+                "revision_id": "b21b9f11-6020-4ce5-9b67-c84a05180893",
+                "id": "1ff3928e-676a-4a10-a329-aa78ffec9d97"
+            },
+            {
+                "package_id": "de6c5f3f-d9e6-4321-a317-780289f4fb9f",
+                "value": "54.0295252443606",
+                "revision_timestamp": "2012-02-23T15:59:22.727558",
+                "state": "active",
+                "key": "bbox-south-lat",
+                "revision_id": "47cc1f8e-fedd-44e5-861b-937db9ad2ff1",
+                "id": "2d0ce091-dd12-482b-8c19-b037dc9e3ec8"
+            },
+            {
+                "package_id": "de6c5f3f-d9e6-4321-a317-780289f4fb9f",
+                "value": "-8.17548890898914",
+                "revision_timestamp": "2012-02-23T15:59:22.727558",
+                "state": "active",
+                "key": "bbox-west-long",
+                "revision_id": "47cc1f8e-fedd-44e5-861b-937db9ad2ff1",
+                "id": "92040f18-2d9f-4ce8-a77c-6de147e65f18"
+            },
+            {
+                "package_id": "de6c5f3f-d9e6-4321-a317-780289f4fb9f",
+                "value": "Info@AFBINI.GOV.UK",
+                "revision_timestamp": "2012-02-23T15:59:22.727558",
+                "state": "active",
+                "key": "contact-email",
+                "revision_id": "47cc1f8e-fedd-44e5-861b-937db9ad2ff1",
+                "id": "21a7e211-2bd3-4670-b4db-a52ceee9c868"
+            },
+            {
+                "package_id": "de6c5f3f-d9e6-4321-a317-780289f4fb9f",
+                "value": "[{\"href\": [\"https://www.spatialni.gov.uk/wss/service/AFBI_Environmentally_Sensitive_Areas_NI-WMS-INC-LIC/WSS?request=GetCapabilities&service=WMS&version=1.3.0\"], \"uuid\": [], \"title\": []}]",
+                "revision_timestamp": "2013-12-03T15:24:08.161492",
+                "state": "active",
+                "key": "coupled-resource",
+                "revision_id": "8619684b-d55d-4885-85ec-4d24c871d813",
+                "id": "c2141ce7-694d-4bb0-865c-a15b034670d3"
+            },
+            {
+                "package_id": "de6c5f3f-d9e6-4321-a317-780289f4fb9f",
+                "value": "[{\"type\": \"revision\", \"value\": \"2012-02-02\"}]",
+                "revision_timestamp": "2013-03-04T14:50:39.222238",
+                "state": "active",
+                "key": "dataset-reference-date",
+                "revision_id": "b21b9f11-6020-4ce5-9b67-c84a05180893",
+                "id": "23fa19f1-fe57-46e6-a2bf-555af3a7dbcd"
+            },
+            {
+                "package_id": "de6c5f3f-d9e6-4321-a317-780289f4fb9f",
+                "value": "",
+                "revision_timestamp": "2012-02-23T15:59:22.727558",
+                "state": "active",
+                "key": "frequency-of-update",
+                "revision_id": "47cc1f8e-fedd-44e5-861b-937db9ad2ff1",
+                "id": "4268d867-0f2b-44d0-9bbd-f4724d2ae4b2"
+            },
+            {
+                "package_id": "de6c5f3f-d9e6-4321-a317-780289f4fb9f",
+                "value": "1fe676a9-0e70-433c-855c-fafa279b3e10",
+                "revision_timestamp": "2012-02-23T15:59:22.727558",
+                "state": "active",
+                "key": "guid",
+                "revision_id": "47cc1f8e-fedd-44e5-861b-937db9ad2ff1",
+                "id": "333e7570-ff72-4f7e-b611-dbfb7dd078e0"
+            },
+            {
+                "package_id": "de6c5f3f-d9e6-4321-a317-780289f4fb9f",
+                "value": "088a7747-60da-46d5-8b16-fb98f8e0b1b9",
+                "revision_timestamp": "2014-02-18T16:33:15.096477",
+                "state": "active",
+                "key": "harvest_object_id",
+                "revision_id": "03e334b9-1771-4890-8934-153c6d314754",
+                "id": "93c32153-01a6-438c-bc36-d135a8833e3b"
+            },
+            {
+                "package_id": "de6c5f3f-d9e6-4321-a317-780289f4fb9f",
+                "value": "1fe676a9-0e70-433c-855c-fafa279b3e10",
+                "revision_timestamp": "2013-02-26T16:56:04.898516",
+                "state": "active",
+                "key": "harvest_source_reference",
+                "revision_id": "3a8403b1-10eb-4767-815d-a596dbb573a3",
+                "id": "fd760a52-e191-4ecf-8166-981b701cad3e"
+            },
+            {
+                "package_id": "de6c5f3f-d9e6-4321-a317-780289f4fb9f",
+                "value": "2014-02-18T16:33:15.096477",
+                "revision_timestamp": "2014-04-12T01:46:16.343676",
+                "state": "active",
+                "key": "last_major_modification",
+                "revision_id": "28f8ba4c-8f57-469f-b746-e6488d6953ee",
+                "id": "09a14b72-193c-4595-a04f-7043e4c75bc4"
+            },
+            {
+                "package_id": "de6c5f3f-d9e6-4321-a317-780289f4fb9f",
+                "value": "Non commercial Inspire License",
+                "revision_timestamp": "2016-02-10T17:08:13.553189",
+                "state": "active",
+                "key": "licence",
+                "revision_id": "d1f6fd5a-b9bc-4062-a396-7ae314da6c1e",
+                "id": "6384cbd3-65ec-45bc-a109-8724473282ee"
+            },
+            {
+                "package_id": "de6c5f3f-d9e6-4321-a317-780289f4fb9f",
+                "value": "2014-02-18",
+                "revision_timestamp": "2014-02-18T16:33:15.096477",
+                "state": "active",
+                "key": "metadata-date",
+                "revision_id": "03e334b9-1771-4890-8934-153c6d314754",
+                "id": "7ad78928-9872-44e3-aad0-af166e530607"
+            },
+            {
+                "package_id": "de6c5f3f-d9e6-4321-a317-780289f4fb9f",
+                "value": "eng",
+                "revision_timestamp": "2012-02-23T15:59:22.727558",
+                "state": "active",
+                "key": "metadata-language",
+                "revision_id": "47cc1f8e-fedd-44e5-861b-937db9ad2ff1",
+                "id": "32b40a9a-a09b-428b-acad-2593a261e98a"
+            },
+            {
+                "package_id": "de6c5f3f-d9e6-4321-a317-780289f4fb9f",
+                "value": "Agri-Food and Biosciences Institute (AFBI)",
+                "revision_timestamp": "2013-03-04T14:50:39.222238",
+                "state": "active",
+                "key": "provider",
+                "revision_id": "b21b9f11-6020-4ce5-9b67-c84a05180893",
+                "id": "487c8f6b-aa81-43f2-9f7e-2489ffcb1a46"
+            },
+            {
+                "package_id": "de6c5f3f-d9e6-4321-a317-780289f4fb9f",
+                "value": "service",
+                "revision_timestamp": "2012-02-23T15:59:22.727558",
+                "state": "active",
+                "key": "resource-type",
+                "revision_id": "47cc1f8e-fedd-44e5-861b-937db9ad2ff1",
+                "id": "951013fe-c0e5-4d92-80fe-af8fcac0fb70"
+            },
+            {
+                "package_id": "de6c5f3f-d9e6-4321-a317-780289f4fb9f",
+                "value": "Agri-Food and Biosciences Institute (AFBI) (owner)",
+                "revision_timestamp": "2013-03-04T14:50:39.222238",
+                "state": "active",
+                "key": "responsible-party",
+                "revision_id": "b21b9f11-6020-4ce5-9b67-c84a05180893",
+                "id": "cb6694be-2291-48d5-a797-cbfc58d17970"
+            },
+            {
+                "package_id": "de6c5f3f-d9e6-4321-a317-780289f4fb9f",
+                "value": "{\"type\":\"Polygon\",\"coordinates\":[[[-5.40566902640608, 54.0295252443606],[-5.40566902640608, 55.3184340550243], [-8.17548890898914, 55.3184340550243], [-8.17548890898914, 54.0295252443606], [-5.40566902640608, 54.0295252443606]]]}",
+                "revision_timestamp": "2013-03-04T14:50:39.222238",
+                "state": "active",
+                "key": "spatial",
+                "revision_id": "b21b9f11-6020-4ce5-9b67-c84a05180893",
+                "id": "efe44228-6343-4218-95b5-7f8837e90b88"
+            },
+            {
+                "package_id": "de6c5f3f-d9e6-4321-a317-780289f4fb9f",
+                "value": "view",
+                "revision_timestamp": "2012-02-23T15:59:22.727558",
+                "state": "active",
+                "key": "spatial-data-service-type",
+                "revision_id": "47cc1f8e-fedd-44e5-861b-937db9ad2ff1",
+                "id": "0ac12a85-0991-4dcf-9ea4-9bb236f0e7ec"
+            },
+            {
+                "package_id": "de6c5f3f-d9e6-4321-a317-780289f4fb9f",
+                "value": "4258",
+                "revision_timestamp": "2013-12-03T15:24:08.161492",
+                "state": "active",
+                "key": "spatial-reference-system",
+                "revision_id": "8619684b-d55d-4885-85ec-4d24c871d813",
+                "id": "42a75f6b-bb63-45e5-b5a1-2931879d2af9"
+            },
+            {
+                "package_id": "de6c5f3f-d9e6-4321-a317-780289f4fb9f",
+                "value": "[]",
+                "revision_timestamp": "2012-02-23T15:59:22.727558",
+                "state": "active",
+                "key": "temporal_coverage-from",
+                "revision_id": "47cc1f8e-fedd-44e5-861b-937db9ad2ff1",
+                "id": "a853293f-b7a7-4a7f-a4ed-3746c5557054"
+            },
+            {
+                "package_id": "de6c5f3f-d9e6-4321-a317-780289f4fb9f",
+                "value": "[]",
+                "revision_timestamp": "2012-02-23T15:59:22.727558",
+                "state": "active",
+                "key": "temporal_coverage-to",
+                "revision_id": "47cc1f8e-fedd-44e5-861b-937db9ad2ff1",
+                "id": "f88c2066-266e-46f5-8906-5dbb516c5fbf"
+            },
+            {
+                "package_id": "de6c5f3f-d9e6-4321-a317-780289f4fb9f",
+                "value": "Environment",
+                "revision_timestamp": "2013-12-19T10:28:47.285969",
+                "state": "active",
+                "key": "theme-primary",
+                "revision_id": "c8b2b89f-d728-4113-92d9-5b49affbe2fa",
+                "id": "60fc67e3-3a25-49f9-b417-c18391b02853"
+            },
+            {
+                "package_id": "de6c5f3f-d9e6-4321-a317-780289f4fb9f",
+                "value": "[\"Mapping\"]",
+                "revision_timestamp": "2015-01-06T10:13:55.019177",
+                "state": "active",
+                "key": "theme-secondary",
+                "revision_id": "a5807517-bf55-4dd9-92ce-59d29608d1d2",
+                "id": "971478d9-9629-47e1-9f46-05766a35471e"
+            }
+        ],
+        "individual_resources": [
+            {
+                "hash": "",
+                "description": "Resource locator",
+                "created": "2014-02-18T16:33:15.289446",
+                "url": "https://www.spatialni.gov.uk/wss/service/AFBI_Environmentally_Sensitive_Areas_NI-WMS-INC-LIC/WSS?request=GetCapabilities&service=WMS&version=1.3.0",
+                "format": "",
+                "qa": "{'updated': '2017-01-15T01:40:33.182089', 'openness_score': 0, 'archival_timestamp': '2017-01-13T23:29:08.822304', 'format': None, 'created': '2014-05-09T22:17:44.661633', 'resource_timestamp': '2014-02-18T16:33:15.096477', 'openness_score_reason': u'File could not be downloaded. Reason: Download error. Error details: Server content contained an API error message: <?xml version=\"1.0\" encoding=\"UTF-8\"?>\\n<ServiceExceptionReport version=\"1.1.0\">\\n<ServiceException code=\"InvalidFormat\">\\n<![CDATA[Invalid SERVICE parameter <WMS>.]]></ServiceException>\\n</ServiceExceptionReport>\\n. Attempted on 13/01/2017. Tried 148 times since 18/02/2014. This URL has not worked in the history of this tool.'}",
+                "tracking_summary": {
+                    "total": 0,
+                    "recent": 0
+                },
+                "resource_locator_function": "",
+                "archiver": "{'is_broken_printable': 'Broken', 'updated': '2017-01-13T23:29:08.822304', 'cache_filepath': None, 'last_success': None, 'size': u'0', 'is_broken': True, 'failure_count': 148, 'etag': None, 'status': 'Download error', 'url_redirected_to': None, 'hash': u'', 'status_id': 12, 'reason': u'Server content contained an API error message: <?xml version=\"1.0\" encoding=\"UTF-8\"?>\\n<ServiceExceptionReport version=\"1.1.0\">\\n<ServiceException code=\"InvalidFormat\">\\n<![CDATA[Invalid SERVICE parameter <WMS>.]]></ServiceException>\\n</ServiceExceptionReport>\\n', 'last_modified': None, 'resource_timestamp': '2016-02-10T17:08:13.553189', 'mimetype': None, 'cache_url': None, 'created': '2014-02-18T16:34:02.181692', 'first_failure': '2014-02-18T16:34:02.181692'}",
+                "resource_locator_protocol": "",
+                "position": 0,
+                "revision_id": "d1f6fd5a-b9bc-4062-a396-7ae314da6c1e",
+                "id": "5d56bc4d-e4e9-40e2-9d90-84c95ecafee0",
+                "resource_type": "file",
+                "name": ""
+            },
+            {
+                "description": "Resource locator",
+                "created": "2014-02-18T16:33:15.289465",
+                "url": "http://www.gistrategyni.gov.uk/index/spatialni/download_services.htm",
+                "format": "HTML",
+                "qa": "{'updated': '2017-01-15T01:40:33.290620', 'openness_score': 0, 'archival_timestamp': '2017-01-13T23:29:09.137359', 'format': u'HTML', 'created': '2014-05-09T22:17:46.476106', 'resource_timestamp': '2014-05-09T21:17:46.031062', 'openness_score_reason': u'Content of file appeared to be format \"HTML\" which receives openness score: 0.'}",
+                "tracking_summary": {
+                    "total": 0,
+                    "recent": 0
+                },
+                "resource_locator_function": "",
+                "archiver": "{'is_broken_printable': 'Downloaded OK', 'updated': '2017-01-13T23:29:09.137359', 'cache_filepath': u'/media/hulk/ckan_resource_cache/ad/ad3340e7-b3f3-4fe6-be12-73cbef1482e3/download_services.htm', 'last_success': '2017-01-13T23:29:09.137359', 'size': u'22444', 'is_broken': False, 'failure_count': 0, 'etag': None, 'status': 'Archived successfully', 'url_redirected_to': u'https://www.finance-ni.gov.uk/land-property-services-lps', 'hash': u'137619ffe21ff4e63fe36b6f7d817554c92cce05', 'status_id': 0, 'reason': u'', 'last_modified': None, 'resource_timestamp': '2016-02-10T17:08:13.553189', 'mimetype': u'text/html', 'cache_url': u'http://data.gov.uk/data/resource_cache/ad/ad3340e7-b3f3-4fe6-be12-73cbef1482e3/download_services.htm', 'created': '2014-02-18T16:34:02.668309', 'first_failure': None}",
+                "resource_locator_protocol": "",
+                "position": 1,
+                "revision_id": "d1f6fd5a-b9bc-4062-a396-7ae314da6c1e",
+                "id": "ad3340e7-b3f3-4fe6-be12-73cbef1482e3",
+                "resource_type": "file",
+                "name": ""
+            }
+        ],
+        "title": "AFBI - Environmentally Sensitive Areas NI (INSPIRE View Service)",
+        "revision_id": "d1f6fd5a-b9bc-4062-a396-7ae314da6c1e",
+        "theme-primary": "Environment"
+    }
+}

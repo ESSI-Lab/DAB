@@ -1,0 +1,142 @@
+<Collection>
+            <ShortName>ND01_LAND_COVER_MAPS_1259</ShortName>
+            <VersionId>1</VersionId>
+            <InsertTime>2014-11-25T00:00:00Z</InsertTime>
+            <LastUpdate>2019-04-15T18:53:41Z</LastUpdate>
+            <LongName>LBA-ECO ND-01 Land Cover Classification, Rondonia, Brazil: 1975-2000</LongName>
+            <DataSetId>LBA-ECO ND-01 Land Cover Classification, Rondonia, Brazil: 1975-2000</DataSetId>
+            <Description>This data set provides a time series of land cover classifications for Ariquemes, Ji-Parana, and Luiza, research sites in Rondonia, Brazil. The land cover classifications are derived from the Landsat Multispectral Scanner (MSS), Thematic Mapper (TM), and Enhanced Thematic Mapper Plus (ETM+) sensors.  The time period ranges from June 1975 through June 2000, but all areas do not have images for all the years. The images were classified into the following categories: 1. Primary upland forest, representing the dominant natural vegetation in the area; 2. Pasture and green pasture; 3. Second growth, dominated by small trees and shrubs with low species diversity and biomass relative to primary forest; 4. Soil/urban; 5. Rock/savanna; 6. Water;  and 7. Cloud and smoke obscured. In addition, areas covered by rock and savanna were mapped and all areas outside of the overlap zone between all dates within a scene, and scene edges, were masked.There are 75 GeoTIFF files (.tif) with this data set which includes: classified images (*ful.tif) and a corresponding image mask (*ful_mask .tif) for each date (with the exception of 1978 and 1996 images for Ji-Parana, for which there are only ful_mask.tif files), and three mask files for rock, savannah, and scene edges, for each area. By area, there are 31 images for Ariquemes, 23 images for Ji-Parana, and 21 images for Luiza. </Description>
+            <DOI>
+                <DOI>10.3334/ORNLDAAC/1259</DOI>
+                <Authority>https://doi.org</Authority>
+            </DOI>
+            <Orderable>false</Orderable>
+            <Visible>true</Visible>
+            <RevisionDate>2014-11-25T00:00:00Z</RevisionDate>
+            <ProcessingLevelId>3</ProcessingLevelId>
+            <ProcessingLevelDescription>Variables mapped on uniform space-time grid scales with completeness and consistency</ProcessingLevelDescription>
+            <ArchiveCenter>ORNL_DAAC</ArchiveCenter>
+            <CitationForExternalPublication>Roberts, D.A., I. Numata, K.W. Holmes, G.T. Batista, T. Krug, A.L. Monteiro, B. Powell, and O.A. Chadwick. 2014. LBA-ECO ND-01 Land Cover Classification, Rondonia, Brazil: 1975-2000. ORNL DAAC, Oak Ridge, Tennessee, USA. http://dx.doi.org/10.3334/ORNLDAAC/1259</CitationForExternalPublication>
+            <CollectionState>COMPLETE</CollectionState>
+            <MaintenanceAndUpdateFrequency>As needed</MaintenanceAndUpdateFrequency>
+            <Price>0</Price>
+            <Temporal>
+                <RangeDateTime>
+                    <BeginningDateTime>1975-06-19T00:00:00Z</BeginningDateTime>
+                    <EndingDateTime>2000-06-28T23:59:59Z</EndingDateTime>
+                </RangeDateTime>
+            </Temporal>
+            <Contacts>
+                <Contact>
+                    <Role>ARCHIVER</Role>
+                    <OrganizationName>ORNL_DAAC</OrganizationName>
+                    <OrganizationAddresses>
+                        <Address>
+                            <StreetAddress>ORNL DAAC User Services Office, P.O. Box 2008, MS 6407, Oak Ridge National Laboratory</StreetAddress>
+                            <City>Oak Ridge</City>
+                            <StateProvince>Tennessee</StateProvince>
+                            <PostalCode>37831-6407</PostalCode>
+                            <Country>USA</Country>
+                        </Address>
+                    </OrganizationAddresses>
+                    <OrganizationPhones>
+                        <Phone>
+                            <Number>(865) 241-3952</Number>
+                            <Type>Direct Line</Type>
+                        </Phone>
+                    </OrganizationPhones>
+                    <OrganizationEmails>
+                        <Email>uso@daac.ornl.gov</Email>
+                    </OrganizationEmails>
+                </Contact>
+            </Contacts>
+            <ScienceKeywords>
+                <ScienceKeyword>
+                    <CategoryKeyword>EARTH SCIENCE</CategoryKeyword>
+                    <TopicKeyword>LAND SURFACE</TopicKeyword>
+                    <TermKeyword>LAND USE/LAND COVER</TermKeyword>
+                </ScienceKeyword>
+                <ScienceKeyword>
+                    <CategoryKeyword>EARTH SCIENCE</CategoryKeyword>
+                    <TopicKeyword>SPECTRAL/ENGINEERING</TopicKeyword>
+                    <TermKeyword>INFRARED WAVELENGTHS</TermKeyword>
+                    <VariableLevel1Keyword>
+                        <Value>INFRARED IMAGERY</Value>
+                    </VariableLevel1Keyword>
+                </ScienceKeyword>
+            </ScienceKeywords>
+            <Platforms>
+                <Platform>
+                    <ShortName>LANDSAT-2</ShortName>
+                    <LongName> </LongName>
+                    <Type>Earth Observation Satellites</Type>
+                    <Instruments>
+                        <Instrument>
+                            <ShortName>MSS</ShortName>
+                            <LongName>Multispectral Scanner</LongName>
+                        </Instrument>
+                    </Instruments>
+                </Platform>
+                <Platform>
+                    <ShortName>LANDSAT-5</ShortName>
+                    <LongName> </LongName>
+                    <Type>Earth Observation Satellites</Type>
+                    <Instruments>
+                        <Instrument>
+                            <ShortName>TM</ShortName>
+                            <LongName>Thematic Mapper</LongName>
+                        </Instrument>
+                    </Instruments>
+                </Platform>
+            </Platforms>
+            <Campaigns>
+                <Campaign>
+                    <ShortName>LBA-ECO</ShortName>
+                    <LongName>Large Scale Biosphere-Atmosphere Experiment - Ecology</LongName>
+                </Campaign>
+            </Campaigns>
+            <OnlineAccessURLs>
+                <OnlineAccessURL>
+                    <URL>https://daac.ornl.gov/daacdata/lba/nutrient_dynamics/ND01_Land_Cover_Maps//</URL>
+                    <URLDescription>This link allows direct data access via Earthdata login</URLDescription>
+                </OnlineAccessURL>
+            </OnlineAccessURLs>
+            <OnlineResources>
+                <OnlineResource>
+                    <URL>https://daac.ornl.gov/LBA/guides/ND01_Land_Cover_Maps.html</URL>
+                    <Description>ORNL DAAC Data Set Documentation</Description>
+                    <Type>USER'S GUIDE</Type>
+                </OnlineResource>
+                <OnlineResource>
+                    <URL>https://doi.org/10.3334/ORNLDAAC/1259</URL>
+                    <Description>Data set Landing Page DOI URL</Description>
+                    <Type>DATA SET LANDING PAGE</Type>
+                </OnlineResource>
+                <OnlineResource>
+                    <URL>https://daac.ornl.gov/daacdata/lba/nutrient_dynamics/ND01_Land_Cover_Maps//comp/ND01_Land_Cover_Maps.pdf</URL>
+                    <Description>Data Set Documentation</Description>
+                    <Type>GENERAL DOCUMENTATION</Type>
+                </OnlineResource>
+                <OnlineResource>
+                    <URL>https://daac.ornl.gov/graphics/browse/project/square/lba_logo_square.png</URL>
+                    <Description>Browse Image</Description>
+                    <Type>GET RELATED VISUALIZATION</Type>
+                    <MimeType>image/png</MimeType>
+                </OnlineResource>
+            </OnlineResources>
+            <Spatial>
+                <SpatialCoverageType>HORIZONTAL</SpatialCoverageType>
+                <HorizontalSpatialDomain>
+                    <Geometry>
+                        <CoordinateSystem>CARTESIAN</CoordinateSystem>
+                        <BoundingRectangle>
+                            <WestBoundingCoordinate>-64.64</WestBoundingCoordinate>
+                            <NorthBoundingCoordinate>-9.18</NorthBoundingCoordinate>
+                            <EastBoundingCoordinate>-61.18</EastBoundingCoordinate>
+                            <SouthBoundingCoordinate>-12.43</SouthBoundingCoordinate>
+                        </BoundingRectangle>
+                    </Geometry>
+                </HorizontalSpatialDomain>
+                <GranuleSpatialRepresentation>CARTESIAN</GranuleSpatialRepresentation>
+            </Spatial>
+        </Collection>

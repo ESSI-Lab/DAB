@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.timeseries;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -44,11 +44,15 @@ public class TimeseriesRequest {
 
     public enum APIParameters {
 	FORMAT("format"), //
-	INCLUDE_VALUES("includeValues","includeData"),
-	BEGIN_DATE("beginDate", "startDate", "beginTime", "startTime", "begin", "beginPosition"), //
+	USE_CACHE("useCache"), //
+	INCLUDE_VALUES("includeValues", "includeData"), BEGIN_DATE("beginDate", "startDate", "beginTime", "startTime", "begin",
+		"beginPosition"), //
 	END_DATE("endDate", "endTime", "end", "endPosition"), //
-	PLATFORM_CODE("sampledFeature", "monitoringPoint", "monitoringPointIdentifier","platform", "platformCode", "site", "location", "siteCode"), //
+	PLATFORM_CODE("sampledFeature", "monitoringPoint", "monitoringPointIdentifier", "platform", "platformCode", "site", "location",
+		"siteCode"), //
+	OBSERVED_PROPERTY("observedProperty"), //
 	VARIABLE("observedProperty", "variable", "varCode", "variableCode"), //
+	TIMESERIES("timeseriesIdentifier", "timeseriesId", "timeseries"), //
 	OUTPUT_PROPERTIES("outputProperties"), //
 	COUNTRY("country"), //
 	PROVIDER("provider"), //
@@ -161,6 +165,9 @@ public class TimeseriesRequest {
 	    } else {
 		n = 90.;
 	    }
+
+	    if (west == null && north == null && south == null && east == null)
+		return Optional.empty();
 
 	    SpatialExtent extent = new SpatialExtent(s, w, n, e);
 

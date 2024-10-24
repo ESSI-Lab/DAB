@@ -7,7 +7,7 @@ package eu.essi_lab.authorization.pps;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,10 +25,23 @@ package eu.essi_lab.authorization.pps;
  */
 
 import eu.essi_lab.authorization.BasicRole;
+import eu.essi_lab.authorization.xacml.XACML_JAXBUtils;
 import eu.essi_lab.messages.web.WebRequest;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.ApplyType;
 
 /**
+ * Anonymous users are allowed to discovery and access (no other actions are allowed),
+ * if and only if:<br>
+ * <br>
+ * 1) offset is <= 200<br>
+ * 2) max records <= 50<br>
+ * 3) the discovery path is supported (for discovery queries)<br>
+ * 5) the access path is supported (for access queries)<br>
+ * <br>
+ * OR<br>
+ * <br>
+ * 1) the client identifier {@link WebRequest#ESSI_LAB_CLIENT_IDENTIFIER} is provided, in this case also other actions
+ * are allowed
+ * 
  * @author Fabrizio
  */
 public class AnonymousPermissionPolicySet extends AbstractPermissionPolicySet {
@@ -45,46 +58,74 @@ public class AnonymousPermissionPolicySet extends AbstractPermissionPolicySet {
 	// discovery rule
 	//
 	{
-	    String ruleId = createRandomId();
+	    String ruleId = "anonymous:discovery:rule";
 
 	    setDiscoveryAction(ruleId);
 
 	    setOffsetLimit(ruleId, DEFAULT_OFFSET_LIMIT);
-	    
+
 	    setMaxRecordsLimit(ruleId, DEFAULT_MAX_RECORDS_LIMIT);
 
-	    setAndCondition(ruleId, createDiscoveryPathApply());
+	    setAndCondition(ruleId, //
+		    createDiscoveryPathApply(), //
+		    XACML_JAXBUtils.createNotApply(createViewCreatorApply("i-change"))
+
+	    );
 	}
 
 	//
 	// access rule
 	//
 	{
-	    String ruleId = createRandomId();
+	    String ruleId = "anonymous:access:rule";
 
 	    setAccessAction(ruleId);
 
 	    setOffsetLimit(ruleId, DEFAULT_OFFSET_LIMIT);
-	    
+
 	    setMaxRecordsLimit(ruleId, DEFAULT_MAX_RECORDS_LIMIT);
 
-	    setAndCondition(ruleId, createAccessPathApply());
+	    setAndCondition(//
+		    ruleId, //
+		    createAccessPathApply(), //
+		    XACML_JAXBUtils.createNotApply(createViewCreatorApply("i-change"))
+
+	    );
+
+
 	}
-	
+
 	//
-	// ESSILab Client Identifier rule
+	// ESSI-Lab client discovery rule
 	//
 	{
-	    String discoveryRuleId = "clientRule";
+	    String ruleId = "anonymous:discovery:essi:client:rule";
 
-	    //
-	    // discovery rule
-	    //
-	    setDiscoveryAction(discoveryRuleId);
+	    setDiscoveryAction(ruleId);
 
-	    ApplyType allowedClientId = createAllowedClientIdentifiersApply(WebRequest.ESSI_LAB_CLIENT_IDENTIFIER);
+	    setAndCondition(ruleId, createAllowedClientIdentifiersApply(WebRequest.ESSI_LAB_CLIENT_IDENTIFIER));
+	}
 
-	    setAndCondition(discoveryRuleId, allowedClientId);
+	//
+	// ESSI-Lab client access rule
+	//
+	{
+	    String ruleId = "anonymous:access:essi:client:rule";
+
+	    setAccessAction(ruleId);
+
+	    setAndCondition(ruleId, createAllowedClientIdentifiersApply(WebRequest.ESSI_LAB_CLIENT_IDENTIFIER));
+	}
+
+	//
+	// ESSI-Lab client other rule
+	//
+	{
+	    String ruleId = "anonymous:other:action:essi:client:rule";
+
+	    setOtherAction(ruleId);
+
+	    setAndCondition(ruleId, createAllowedClientIdentifiersApply(WebRequest.ESSI_LAB_CLIENT_IDENTIFIER));
 	}
     }
 }

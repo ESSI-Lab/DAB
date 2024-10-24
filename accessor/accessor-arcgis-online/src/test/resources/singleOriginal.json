@@ -1,0 +1,65 @@
+{
+  "id": "6bddc1f4c3644d758581cf4cf7b2fded",
+  "owner": "Ferrar@FracTracker.org",
+  "created": 1390867457000,
+  "modified": 1390889521000,
+  "guid": null,
+  "name": "Federal CAA Ozone Standard Compliance",
+  "title": "Federal Clean Air Act Ozone Attainment California",
+  "type": "Feature Service",
+  "typeKeywords": [
+    "ArcGIS Server",
+    "Data",
+    "Feature Access",
+    "Feature Service",
+    "Service",
+    "Hosted Service"
+  ],
+  "description": "According to the 2008 amendment to the US E.P.A. Clean Air Act, areas (county parcels) with 8 hour average ozone concentrations greater than 0.075ppm (150 ug/m^3) more than one day a year.  Ozone is included in the Clean Air Act (42 U.S.C. 7401 et seq.) under the National Ambient Air Quality Standards (NAAQS) that apply for outdoor air for the entirety of the United States.  Research has shown oil and gas development utilizing hydraulic fracturing can contribute to elevated concentrations of ambient ozone ((Utah Department of Environmental Quality, 2013; Olaguer, E. P. &quot;The Potential near-Source Ozone Impacts of Upstream Oil and Gas Industry Emissions.&quot; Journal of the Air &amp; Waste Management Association 62, no. 8 (2012): 966-77))",
+  "tags": [
+    "air",
+    "quality",
+    "ozone",
+    "attainment",
+    "CAA",
+    "EPA",
+    "ambient",
+    "concentration"
+  ],
+  "snippet": "The layer presents the current ambient ozone federal attainment status of air basins in California. Data from 2011",
+  "thumbnail": "thumbnail/thumbnail.png",
+  "documentation": null,
+  "extent": [
+    [
+      -124.50605939842023,
+      32.4235175955401
+    ],
+    [
+      -113.49863787908843,
+      42.06893788884729
+    ]
+  ],
+  "categories": [],
+  "spatialReference": "GCS_NAD_1983_2011",
+  "accessInformation": "http://www.arb.ca.gov/ei/gislib/gislib.htm",
+  "licenseInfo": "Please cite responsibly",
+  "culture": "en-us",
+  "properties": null,
+  "url": "http://services.arcgis.com/jDGuO8tYggdCCnUJ/arcgis/rest/services/Federal CAA Ozone Standard Compliance/FeatureServer",
+  "proxyFilter": null,
+  "access": "public",
+  "size": -1,
+  "appCategories": [],
+  "industries": [],
+  "languages": [],
+  "largeThumbnail": null,
+  "banner": null,
+  "screenshots": [],
+  "listed": false,
+  "numComments": 0,
+  "numRatings": 0,
+  "avgRating": 0,
+  "numViews": 5392,
+  "scoreCompleteness": 100,
+  "groupDesignations": null
+}

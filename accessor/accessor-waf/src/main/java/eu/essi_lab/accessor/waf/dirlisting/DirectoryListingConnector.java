@@ -7,7 +7,7 @@ package eu.essi_lab.accessor.waf.dirlisting;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -33,7 +33,7 @@ import java.util.Optional;
 import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
 import eu.essi_lab.lib.net.dirlisting.WAFClient;
 import eu.essi_lab.lib.net.dirlisting.WAF_URL;
-import eu.essi_lab.lib.net.utils.Downloader;
+import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IterationLogger;
 import eu.essi_lab.lib.xml.NameSpace;
@@ -137,15 +137,15 @@ public class DirectoryListingConnector extends HarvestedQueryConnector<Directory
 	    original.setSchemeURI(getSetting().getSelectedSchema());
 
 	    Downloader downloader = new Downloader();
-	    String metadata = downloader.downloadString(url.toExternalForm()).orElse(null);
+	    String metadata = downloader.downloadOptionalString(url.toExternalForm()).orElse(null);
 	    original.setMetadata(metadata);
 
 	    response.addRecord(original);
-	    logger.iterationDone();
+	    logger.iterationEnded();
 	}
 
 	if (response.getResumptionToken() == null) {
-	    logger.iterationDone();
+	    logger.iterationEnded();
 	}
 
 	GSLoggerFactory.getLogger(getClass()).debug("Downloading files [{}-{}/{}] ENDED", start, end, allFiles.size());

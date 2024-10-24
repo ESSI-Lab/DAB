@@ -1,0 +1,60 @@
+{
+    "currentVersion": 11,
+    "serviceDescription": "This service is powered by the Discovery and Access Broker (DAB). Contacts: http://essi-lab.eu",
+    "hasVersionedData": false,
+    "supportsDisconnectedEditing": false,
+    "hasStaticData": true,
+    "hasSharedDomains": false,
+    "maxRecordCount": 1000,
+    "supportedQueryFormats": "JSON",
+    "supportsVCSProjection": false,
+    "supportedExportFormats": "csv,shapefile,sqlite,geoPackage,filegdb,featureCollection,geojson,excel",
+    "capabilities": "Query",
+    "description": "",
+    "copyrightText": "",
+    "spatialReference": {
+        "wkid": 102100,
+        "latestWkid": 3857
+    },
+    "allowGeometryUpdates": true,
+    "units": "esriMeters",
+    "supportsAppend": true,
+    "supportsSharedDomains": true,
+    "supportsWebHooks": true,
+    "supportsTemporalLayers": true,
+    "layerOverridesEnabled": true,
+    "syncEnabled": false,
+    "supportsApplyEditsWithGlobalIds": false,
+    "supportsReturnDeleteResults": true,
+    "supportsLayerOverrides": true,
+    "supportsTilesAndBasicQueriesMode": true,
+    "supportsQueryContingentValues": true,
+    "supportedContingentValuesFormats": "JSON",
+    "supportsContingentValuesJson": 2,
+    "advancedEditingCapabilities": {
+        "supportsSplit": false,
+        "supportsReturnServiceEditsInSourceSR": false,
+        "supportsAsyncApplyEdits": true,
+        "supportsReturnEditResults": true,
+        "supportsApplyEditsbyUploadID": true,
+        "supportedApplyEditsUploadIDFormats": "JSON"
+    },
+    "editorTrackingInfo": {
+        "enableEditorTracking": false,
+        "enableOwnershipAccessControl": false,
+        "allowOthersToQuery": true,
+        "allowOthersToUpdate": true,
+        "allowOthersToDelete": false,
+        "allowAnonymousToQuery": true,
+        "allowAnonymousToUpdate": true,
+        "allowAnonymousToDelete": true
+    },
+    "xssPreventionInfo": {
+        "xssPreventionEnabled": false,
+        "xssPreventionRule": "InputOnly",
+        "xssInputRule": "rejectInvalid"
+    },
+    "layers": [		
+    ],
+    "tables": []
+}

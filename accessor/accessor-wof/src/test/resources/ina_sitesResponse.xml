@@ -1,0 +1,79 @@
+<sitesResponse xmlns="http://www.cuahsi.org/waterML/1.1/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<site>
+		<siteInfo oid="2">
+			<siteName>Rosario del Tala</siteName>
+			<siteCode defaultId="true" siteID="2" network="alturas_bdhi"
+				agencyCode="5" agencyName="Red Hidrológica Nacional - SSRH">2</siteCode>
+			<timeZoneInfo siteUsesDaylightSavingsTime="false">
+				<defaultTimeZone>-03</defaultTimeZone>
+			</timeZoneInfo>
+			<geoLocation>
+				<geogLocation xsi:type="LatLonPointType"
+					srs="EPSG:4326">
+					<latitude>-32.2918333333333</latitude>
+					<longitude>-59.0568055555556</longitude>
+				</geogLocation>
+				<localSiteXY projectionInformation="EPSG:4326">
+					<X>-59.0568055555556</X>
+					<Y>-32.2918333333333</Y>
+				</localSiteXY>
+			</geoLocation>
+			<elevation_m />
+			<verticalDatum>WGS84</verticalDatum>
+			<siteProperty title="Country">ARGENTINA</siteProperty>
+			<siteProperty title="State">ENTRERIOS</siteProperty>
+			<siteProperty title="Site Comments" />
+		</siteInfo>
+		<seriesCatalog>
+			<series seriesID="3215">
+				<dataType>Sporadic</dataType>
+				<variable>
+					<variableCode default="true" variableID="29"
+						vocabulary="INA">29</variableCode>
+					<variableName>Discharge</variableName>
+					<variableDescription>Aforos:Caudal</variableDescription>
+					<valueType>Field Observation</valueType>
+					<unit unitID="36">
+						<unitName>metros cúbicos por segundo</unitName>
+						<unitAbreviation>m^3/s</unitAbreviation>
+						<unitCode>36</unitCode>
+						<unitType>Flow</unitType>
+					</unit>
+					<dataType>Sporadic</dataType>
+					<generalCategory>Hydrology</generalCategory>
+					<timeScale isRegular="false">
+						<unit unitID="352">
+							<unitName>ISO DateTime</unitName>
+							<unitAbreviation>ISO DateTime</unitAbreviation>
+							<unitCode>352</unitCode>
+						</unit>
+						<timeSupport>0</timeSupport>
+						<timeSpacing>0</timeSpacing>
+					</timeScale>
+					<noDataValue>-9999</noDataValue>
+					<sampleMedium>Surface Water</sampleMedium>
+				</variable>
+				<valueCount>229</valueCount>
+				<variableTimeInterval>
+					<beginDateTime>1988-11-23T10:00:00</beginDateTime>
+					<endDateTime>2016-07-13T12:00:00</endDateTime>
+					<beginDateTimeUTC>1988-11-23T13:00:00</beginDateTimeUTC>
+					<endDateTimeUTC>2016-07-13T15:00:00</endDateTimeUTC>
+				</variableTimeInterval>
+				<method methodID="1">
+					<methodCode>medicion</methodCode>
+					<methodDescription>medición directa</methodDescription>
+				</method>
+				<source sourceID="5">
+					<sourceCode>alturas_bdhi</sourceCode>
+					<organization />
+					<sourceDescription>Red Hidrológica Nacional - SSRH
+					</sourceDescription>
+					<sourceLink>http://www.hidraulica.gob.ar/gualeguay_nivhidr.php
+					</sourceLink>
+				</source>
+			</series>
+		</seriesCatalog>
+	</site>
+</sitesResponse>

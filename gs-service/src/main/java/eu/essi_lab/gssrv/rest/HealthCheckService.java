@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.rest;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,10 +21,11 @@ package eu.essi_lab.gssrv.rest;
  * #L%
  */
 
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 
 import javax.jws.WebService;
 import javax.servlet.http.HttpServletRequest;
@@ -34,86 +35,127 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.ws.WebServiceContext;
 
+import eu.essi_lab.gssrv.health.AvailableDiskSpaceChecker;
 import eu.essi_lab.gssrv.health.HealthCheck;
+import eu.essi_lab.lib.utils.Chronometer.TimeFormat;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.RuntimeInfoElement;
+import eu.essi_lab.pdk.ChronometerInfoProvider;
+import eu.essi_lab.rip.RuntimeInfoProvider;
+import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
 
 /**
- * @author ilsanto
+ * @author Fabrizio
  */
 @WebService
 @Path("/")
-public class HealthCheckService {
-
-    /**
-     * 
-     */
-    private static Boolean lastResponse;
-    private static HealthCheck lastChecker;
-
-    private static final Timer RESPONSE_TIMER = new Timer();
-    static {
-
-	RESPONSE_TIMER.scheduleAtFixedRate(new TimerTask() {
-
-	    @Override
-	    public void run() {
-
-		synchronized (RESPONSE_TIMER) {
-
-		    lastResponse = null;
-		}
-	    }
-	}, //
-		TimeUnit.MINUTES.toMillis(2), //
-		TimeUnit.MINUTES.toMillis(2));
-
-    }
+public class HealthCheckService implements RuntimeInfoProvider {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/check")
     public Response health(@Context HttpServletRequest hsr, @Context UriInfo uriInfo, @Context WebServiceContext wscontext) {
 
-	synchronized (RESPONSE_TIMER) {
+	WebRequest webRequest = new WebRequest();
 
-	    if (lastResponse == null) {
+	webRequest.setUriInfo(uriInfo);
 
-		String id = UUID.randomUUID().toString();
+	try {
+	    webRequest.setServletRequest(hsr);
 
-//		GSLoggerFactory.getLogger(getClass()).info("[HEALTH_CHECK] {} STARTED", id);
+	} catch (IOException ex) {
 
-		lastChecker = new HealthCheck();
+	    GSLoggerFactory.getLogger(getClass()).error(ex);
+	}
 
-		lastResponse = lastChecker.isHealthy();
+	Optional<ElasticsearchInfoPublisher> publisher = ElasticsearchInfoPublisher.create(webRequest);
 
-		if(!lastResponse){
-		    
-		    GSLoggerFactory.getLogger(getClass()).info("[HEALTH_CHECK] {} FAILED", id);
-		}
-		
-//		GSLoggerFactory.getLogger(getClass()).info("[HEALTH_CHECK] {} ENDED: {}", id, lastResponse);
+	ChronometerInfoProvider chronometer = new ChronometerInfoProvider(TimeFormat.MIN_SEC_MLS);
+	chronometer.start();
+
+	HealthCheck healthCheck = new HealthCheck();
+
+	boolean healthy = new HealthCheck().isHealthy();
+
+	//
+	// This class is dedicated to check if the temporary directory has at least 1GB of available disk space.
+	// If it's not the case, an alarm mail is sent
+	//
+	AvailableDiskSpaceChecker.check();
+
+	Status status = responseStatus(healthy);
+	Response response = Response.//
+		status(status).//
+		type(MediaType.APPLICATION_JSON_TYPE).//
+		entity(healthCheck.toJson(healthy, false)).build();
+
+	String elapsedTime = chronometer.formatElapsedTime();
+	GSLoggerFactory.getLogger(getClass()).trace("HealthCheck elapsed time: {}", elapsedTime);
+
+	if (publisher.isPresent()) {
+
+	    try {
+
+		publisher.get().publish(webRequest);
+		publisher.get().publish(chronometer);
+		publisher.get().publish(new RuntimeInfoProvider() {
+
+		    @Override
+		    public HashMap<String, List<String>> provideInfo() {
+			HashMap<String, List<String>> ret = new HashMap<String, List<String>>();
+			ret.put(RuntimeInfoElement.RESPONSE_STATUS.getName(), Arrays.asList("" + status.getStatusCode()));
+			return ret;
+		    }
+
+		    @Override
+		    public String getName() {
+			return getBaseType();
+		    }
+		});
+		publisher.get().write();
+
+	    } catch (Exception ex) {
+
+		GSLoggerFactory.getLogger(getClass()).error(ex);
 	    }
 	}
 
-	return Response.//
-		status(responseStatus(lastResponse)).//
-		type(MediaType.APPLICATION_JSON_TYPE).//
-		entity(lastChecker.toJson(lastResponse, false)).build();
+	return response;
     }
 
-    HealthCheck newChecker() {
-	return new HealthCheck();
-    }
-
-    Response.Status responseStatus(boolean healthy) {
+    /**
+     * @param healthy
+     * @return
+     */
+    private Response.Status responseStatus(boolean healthy) {
 
 	if (healthy) {
 	    return Response.Status.OK;
 	}
 
 	return Response.Status.INTERNAL_SERVER_ERROR;
+    }
+
+    @Override
+    public HashMap<String, List<String>> provideInfo() {
+
+	return new HashMap<>();
+    }
+
+    @Override
+    public String getName() {
+
+	return getClass().getSimpleName();
+    }
+
+    @Override
+    public String getBaseType() {
+
+	return "HealthCheck";
     }
 }

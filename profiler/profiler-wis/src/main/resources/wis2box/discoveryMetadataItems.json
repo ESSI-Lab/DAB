@@ -1,0 +1,276 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "id": "observations",
+            "conformsTo": ["http://www.opengis.net/spec/ogcapi-records-1/1.0/req/record-core"],
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            90.0
+                        ],
+                        [
+                            180.0,
+                            90.0
+                        ],
+                        [
+                            180.0,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "identifier": "observations",
+                "title": "Observations from WHOS",
+                "description": "Observations from WHOS",
+                "themes": [
+                    {
+                        "concepts": [
+                            "WHOS",
+                            "observations"
+                        ]
+                    }
+                ],
+                "providers": [
+                    {
+                        "name": "WMO",
+                        "individual": "Firstname Lastname",
+                        "positionName": "Position Name",
+                        "contactInfo": {
+                            "phone": {"office": "NA"},
+                            "email": {"office": "NA"},
+                            "address": {
+                                "office": {
+                                    "deliveryPoint": "NA",
+                                    "city": "NA",
+                                    "administrativeArea": "NA",
+                                    "postalCode": "NA",
+                                    "country": "NA"
+                                },
+                                "onlineResource": {"href": "http://contact.url"}
+                            },
+                            "hoursOfService": "0700h - 1500h UTC",
+                            "contactInstructions": "email",
+                            "url": {
+                                "rel": "canonical",
+                                "type": "text/html",
+                                "href": "http://contact.url"
+                            }
+                        },
+                        "roles": [
+                            {"name": "pointOfContact"}
+                        ]
+                    },
+                    {
+                        "name": "WMO",
+                        "individual": "Firstname Lastname",
+                        "positionName": "Position Name",
+                        "contactInfo": {
+                            "phone": {"office": "NA"},
+                            "email": {"office": "NA"},
+                            "address": {
+                                "office": {
+                                    "deliveryPoint": "NA",
+                                    "city": "NA",
+                                    "administrativeArea": "NA",
+                                    "postalCode": "NA",
+                                    "country": "NA"
+                                },
+                                "onlineResource": {"href": "http://contact.url"}
+                            },
+                            "hoursOfService": "0700h - 1500h UTC",
+                            "contactInstructions": "email",
+                            "url": {
+                                "rel": "canonical",
+                                "type": "text/html",
+                                "href": "http://contact.url"
+                            }
+                        },
+                        "roles": [
+                            {"name": "distributor"}
+                        ]
+                    }
+                ],
+                "language": "en",
+                "type": "dataset",
+                "created": "2021-11-29",
+                "recordUpdated": "2021-11-29",
+                "rights": "WMO Unified Policy for the International Exchange of Earth System Data",
+                "_metadata-anytext": "Observations",
+                "id": "observations"
+            },
+            "links": [
+                {
+                    "rel": "collection",
+                    "href": "${BASE_ENDPOINT}/collections/observations",
+                    "type": "OAFeat",
+                    "title": "Observations"
+                }
+            ],
+            "time": {
+                "interval": [
+                    "2021-11-29",
+                    null
+                ],
+                "resolution": "P1H"
+            }
+        },
+        {
+            "id": "observations",
+            "conformsTo": ["http://www.opengis.net/spec/ogcapi-records-1/1.0/req/record-core"],
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -180.0,
+                            0.0
+                        ],
+                        [
+                            -180.0,
+                            90.0
+                        ],
+                        [
+                            0.0,
+                            90.0
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            -180.0,
+                            0.0
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "identifier": "observations",
+                "title": "Observations from WHOS",
+                "description": "Observations from WHOS",
+                "themes": [
+                    {
+                        "concepts": [
+                            "WHOS",
+                            "observations"
+                        ]
+                    }
+                ],
+                "providers": [
+                    {
+                        "name": "WMO",
+                        "individual": "Firstname Lastname",
+                        "positionName": "Position Name",
+                        "contactInfo": {
+                            "phone": {"office": "NA"},
+                            "email": {"office": "NA"},
+                            "address": {
+                                "office": {
+                                    "deliveryPoint": "NA",
+                                    "city": "NA",
+                                    "administrativeArea": "NA",
+                                    "postalCode": "NA",
+                                    "country": "NA"
+                                },
+                                "onlineResource": {"href": "http://contact.url"}
+                            },
+                            "hoursOfService": "0700h - 1500h UTC",
+                            "contactInstructions": "email",
+                            "url": {
+                                "rel": "canonical",
+                                "type": "text/html",
+                                "href": "http://contact.url"
+                            }
+                        },
+                        "roles": [
+                            {"name": "pointOfContact"}
+                        ]
+                    },
+                    {
+                        "name": "WMO",
+                        "individual": "Firstname Lastname",
+                        "positionName": "Position Name",
+                        "contactInfo": {
+                            "phone": {"office": "NA"},
+                            "email": {"office": "NA"},
+                            "address": {
+                                "office": {
+                                    "deliveryPoint": "NA",
+                                    "city": "NA",
+                                    "administrativeArea": "NA",
+                                    "postalCode": "NA",
+                                    "country": "NA"
+                                },
+                                "onlineResource": {"href": "http://contact.url"}
+                            },
+                            "hoursOfService": "0700h - 1500h UTC",
+                            "contactInstructions": "email",
+                            "url": {
+                                "rel": "canonical",
+                                "type": "text/html",
+                                "href": "http://contact.url"
+                            }
+                        },
+                        "roles": [
+                            {"name": "distributor"}
+                        ]
+                    }
+                ],
+                "language": "en",
+                "type": "dataset",
+                "created": "2021-11-29",
+                "recordUpdated": "2021-11-29",
+                "rights": "WMO Unified Policy for the International Exchange of Earth System Data",
+                "_metadata-anytext": "Observations",
+                "id": "observations"
+            },
+            "links": [
+                {
+                    "rel": "collection",
+                    "href": "${BASE_ENDPOINT}/collections/observations",
+                    "type": "OAFeat",
+                    "title": "Observations"
+                }
+            ],
+            "time": {
+                "interval": [
+                    "2021-11-29",
+                    null
+                ],
+                "resolution": "P1H"
+            }
+        }
+    ],
+    "numberMatched": 2,
+    "numberReturned": 2,
+    "links": [
+        {
+            "type": "application/geo+json",
+            "rel": "self",
+            "title": "This document as GeoJSON",
+            "href": "${BASE_ENDPOINT}/collections/discovery-metadata/items?f=json"
+        },
+        {
+            "type": "application/json",
+            "title": "Discovery metadata",
+            "rel": "collection",
+            "href": "${BASE_ENDPOINT}/collections/discovery-metadata/items"
+        }
+    ],
+    "timeStamp": "2022-11-30T14:01:16.137370Z"
+}

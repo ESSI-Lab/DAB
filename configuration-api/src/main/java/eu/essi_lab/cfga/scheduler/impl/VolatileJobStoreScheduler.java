@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.scheduler.impl;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,6 +24,7 @@ package eu.essi_lab.cfga.scheduler.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.quartz.JobDataMap;
@@ -64,7 +65,7 @@ public class VolatileJobStoreScheduler extends AbstractScheduler {
     public VolatileJobStoreScheduler(Scheduler quartzScheduler) {
 
 	super(quartzScheduler);
-	
+
 	jobStatusList = new ArrayList<>();
     }
 
@@ -133,10 +134,13 @@ public class VolatileJobStoreScheduler extends AbstractScheduler {
     @Override
     public void setJobStatus(SchedulerJobStatus status) {
 
-	if(jobStatusList.contains(status)){
-	    jobStatusList.remove(status);
+	Optional<SchedulerJobStatus> oldStatus = jobStatusList.stream().filter(s -> s.getJobIdentifier().equals(status.getJobIdentifier()))
+		.findFirst();
+
+	if (oldStatus.isPresent()) {
+	    jobStatusList.remove(oldStatus.get());
 	}
-	
+
 	jobStatusList.add(status);
     }
 

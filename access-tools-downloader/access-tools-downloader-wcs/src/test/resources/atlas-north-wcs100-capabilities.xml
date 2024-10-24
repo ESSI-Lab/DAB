@@ -1,0 +1,865 @@
+<?xml version='1.0' encoding="ISO-8859-1" standalone="no" ?>
+<WCS_Capabilities
+   version="1.0.0" 
+   updateSequence="0" 
+   xmlns="http://www.opengis.net/wcs" 
+   xmlns:xlink="http://www.w3.org/1999/xlink" 
+   xmlns:gml="http://www.opengis.net/gml" 
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.opengis.net/wcs http://schemas.opengis.net/wcs/1.0.0/wcsCapabilities.xsd">
+<Service>
+  <description>The National Snow and Ice Data Center (NSIDC) Atlas of the Cryosphere is a map server that provides data and information pertinent to the frozen regions of Earth, including monthly climatologies of sea ice extent and concentration, snow cover extent, and snow water equivalent, in addition to glacier outlines, permafrost extent and classification, ice sheet elevation and accumulation, and more. In order to support polar projections, the Atlas is divided into two separate map servers: one for the Northern Hemisphere and one for the Southern Hemisphere. In addition to providing map images and source data through Open Geospatial Consortium, Inc. (OGC) protocols (WMS, WFS, and WCS), a dynamic web interface for exploring these data is also available at http://nsidc.org/data/atlas. If you have questions, comments or suggestions, please contact NSIDC User Services at +1.303.492.6199 or nsidc@nsidc.org. The development of this map server application was supported by NASA&#39;s Earth Observing System (EOS) Program under contract NAS5-03099 and was developed using MapServer, an Open Source development environment for building spatially-enabled internet applications. To cite the Atlas of the Cryosphere: Maurer, J. 2007. Atlas of the Cryosphere. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/atlas/.</description>
+  <name>MapServer WCS</name>
+  <label>Atlas of the Cryosphere: Northern Hemisphere</label>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Ice Extent</keyword>
+    <keyword>Ice Sheets</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Oceans</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Sea Ice</keyword>
+    <keyword>Sea Ice Concentration</keyword>
+    <keyword>Snow/Ice</keyword>
+    <keyword>Snow Cover</keyword>
+    <keyword>Snow Melt</keyword>
+    <keyword>Snow Water Equivalent</keyword>
+  </keywords>
+<responsibleParty>
+    <individualName>NSIDC User Services</individualName>
+    <organisationName>National Snow and Ice Data Center</organisationName>
+    <positionName>User Services</positionName>
+  <contactInfo>
+    <phone>
+    <voice>+1 303.492.6199</voice>
+    <facsimile>+1 303.492.2468</facsimile>
+    </phone>
+    <address>
+    <deliveryPoint>CIRES, 449 UCB, University of Colorado</deliveryPoint>
+    <city>Boulder</city>
+    <administrativeArea>CO</administrativeArea>
+    <postalCode>80309-0449</postalCode>
+    <country>USA</country>
+    <electronicMailAddress>nsidc@nsidc.org</electronicMailAddress>
+    </address>
+    <onlineResource xlink:type="simple" xlink:href="http://nsidc.org"/>
+  </contactInfo>
+</responsibleParty>
+  <fees>none</fees>
+  <accessConstraints>
+    none
+  </accessConstraints>
+</Service>
+<Capability>
+  <Request>
+    <GetCapabilities>
+      <DCPType>
+        <HTTP>
+          <Get><OnlineResource xlink:type="simple" xlink:href="http://nsidc.org/cgi-bin/atlas_north?" /></Get>
+        </HTTP>
+      </DCPType>
+      <DCPType>
+        <HTTP>
+          <Post><OnlineResource xlink:type="simple" xlink:href="http://nsidc.org/cgi-bin/atlas_north?" /></Post>
+        </HTTP>
+      </DCPType>
+    </GetCapabilities>
+    <DescribeCoverage>
+      <DCPType>
+        <HTTP>
+          <Get><OnlineResource xlink:type="simple" xlink:href="http://nsidc.org/cgi-bin/atlas_north?" /></Get>
+        </HTTP>
+      </DCPType>
+      <DCPType>
+        <HTTP>
+          <Post><OnlineResource xlink:type="simple" xlink:href="http://nsidc.org/cgi-bin/atlas_north?" /></Post>
+        </HTTP>
+      </DCPType>
+    </DescribeCoverage>
+    <GetCoverage>
+      <DCPType>
+        <HTTP>
+          <Get><OnlineResource xlink:type="simple" xlink:href="http://nsidc.org/cgi-bin/atlas_north?" /></Get>
+        </HTTP>
+      </DCPType>
+      <DCPType>
+        <HTTP>
+          <Post><OnlineResource xlink:type="simple" xlink:href="http://nsidc.org/cgi-bin/atlas_north?" /></Post>
+        </HTTP>
+      </DCPType>
+    </GetCoverage>
+  </Request>
+  <Exception>
+    <Format>application/vnd.ogc.se_xml</Format>
+  </Exception>
+</Capability>
+<ContentMetadata>
+  <CoverageOfferingBrief>
+  <description>Stroeve, J. and W. Meier. 1999, updated 2008. Sea Ice Trends and Climatologies from SMMR and SSM/I. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/smmr_ssmi_ancillary/monthly_means.html. Accessed 27 June 2008. Compiled from: Cavalieri, D., C. Parkinson, P. Gloersen, and H. J. Zwally. 1996. Sea ice concentrations from Nimbus-7 SMMR and DMSP SSM/I passive microwave data. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0051.html. Background: Monthly climatologies of sea ice concentration represent mean ice concentration percentages for each month over the entire time period 1979-2007, which is generated from passive microwave brightness temperature data derived from Nimbus-7 Scanning Multichannel Microwave Radiometer (SMMR) and Defense Meteorological Satellite Program (DMSP) -F8, -F11 and -F13 Special Sensor Microwave/Imager (SSM/I) radiances at a grid cell size of 25 x 25 km using the NASA Team algorithm developed by the Oceans and Ice Branch, Laboratory for Hydrospheric Processes at NASA Goddard Space Flight Center (GSFC). A threshold of 15 percent concentration has been applied to the monthly climatologies.</description>
+  <name>sea_ice_concentration_01</name>
+  <label>sea ice concentration, January (1979-2007)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.999998745864 34.9037152643753</gml:pos>
+      <gml:pos>178.959571606408 53.7717181062498</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Arctic Ocean</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Oceans</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Sea Ice</keyword>
+    <keyword>Sea Ice Concentration</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Stroeve, J. and W. Meier. 1999, updated 2008. Sea Ice Trends and Climatologies from SMMR and SSM/I. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/smmr_ssmi_ancillary/monthly_means.html. Accessed 27 June 2008. Compiled from: Cavalieri, D., C. Parkinson, P. Gloersen, and H. J. Zwally. 1996. Sea ice concentrations from Nimbus-7 SMMR and DMSP SSM/I passive microwave data. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0051.html. Background: Monthly climatologies of sea ice concentration represent mean ice concentration percentages for each month over the entire time period 1979-2007, which is generated from passive microwave brightness temperature data derived from Nimbus-7 Scanning Multichannel Microwave Radiometer (SMMR) and Defense Meteorological Satellite Program (DMSP) -F8, -F11 and -F13 Special Sensor Microwave/Imager (SSM/I) radiances at a grid cell size of 25 x 25 km using the NASA Team algorithm developed by the Oceans and Ice Branch, Laboratory for Hydrospheric Processes at NASA Goddard Space Flight Center (GSFC). A threshold of 15 percent concentration has been applied to the monthly climatologies.</description>
+  <name>sea_ice_concentration_02</name>
+  <label>sea ice concentration, February (1979-2007)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.999998745864 34.9037152643753</gml:pos>
+      <gml:pos>178.959571606408 53.7717181062498</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Arctic Ocean</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Oceans</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Sea Ice</keyword>
+    <keyword>Sea Ice Concentration</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Stroeve, J. and W. Meier. 1999, updated 2008. Sea Ice Trends and Climatologies from SMMR and SSM/I. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/smmr_ssmi_ancillary/monthly_means.html. Accessed 27 June 2008. Compiled from: Cavalieri, D., C. Parkinson, P. Gloersen, and H. J. Zwally. 1996. Sea ice concentrations from Nimbus-7 SMMR and DMSP SSM/I passive microwave data. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0051.html. Background: Monthly climatologies of sea ice concentration represent mean ice concentration percentages for each month over the entire time period 1979-2007, which is generated from passive microwave brightness temperature data derived from Nimbus-7 Scanning Multichannel Microwave Radiometer (SMMR) and Defense Meteorological Satellite Program (DMSP) -F8, -F11 and -F13 Special Sensor Microwave/Imager (SSM/I) radiances at a grid cell size of 25 x 25 km using the NASA Team algorithm developed by the Oceans and Ice Branch, Laboratory for Hydrospheric Processes at NASA Goddard Space Flight Center (GSFC). A threshold of 15 percent concentration has been applied to the monthly climatologies.</description>
+  <name>sea_ice_concentration_03</name>
+  <label>sea ice concentration, March (1979-2007)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.999998745864 34.9037152643753</gml:pos>
+      <gml:pos>178.959571606408 53.7717181062498</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Arctic Ocean</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Oceans</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Sea Ice</keyword>
+    <keyword>Sea Ice Concentration</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Stroeve, J. and W. Meier. 1999, updated 2008. Sea Ice Trends and Climatologies from SMMR and SSM/I. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/smmr_ssmi_ancillary/monthly_means.html. Accessed 27 June 2008. Compiled from: Cavalieri, D., C. Parkinson, P. Gloersen, and H. J. Zwally. 1996. Sea ice concentrations from Nimbus-7 SMMR and DMSP SSM/I passive microwave data. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0051.html. Background: Monthly climatologies of sea ice concentration represent mean ice concentration percentages for each month over the entire time period 1979-2007, which is generated from passive microwave brightness temperature data derived from Nimbus-7 Scanning Multichannel Microwave Radiometer (SMMR) and Defense Meteorological Satellite Program (DMSP) -F8, -F11 and -F13 Special Sensor Microwave/Imager (SSM/I) radiances at a grid cell size of 25 x 25 km using the NASA Team algorithm developed by the Oceans and Ice Branch, Laboratory for Hydrospheric Processes at NASA Goddard Space Flight Center (GSFC). A threshold of 15 percent concentration has been applied to the monthly climatologies.</description>
+  <name>sea_ice_concentration_04</name>
+  <label>sea ice concentration, April (1979-2007)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.999998745864 34.9037152643753</gml:pos>
+      <gml:pos>178.959571606408 53.7717181062498</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Arctic Ocean</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Oceans</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Sea Ice</keyword>
+    <keyword>Sea Ice Concentration</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Stroeve, J. and W. Meier. 1999, updated 2008. Sea Ice Trends and Climatologies from SMMR and SSM/I. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/smmr_ssmi_ancillary/monthly_means.html. Accessed 27 June 2008. Compiled from: Cavalieri, D., C. Parkinson, P. Gloersen, and H. J. Zwally. 1996. Sea ice concentrations from Nimbus-7 SMMR and DMSP SSM/I passive microwave data. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0051.html. Background: Monthly climatologies of sea ice concentration represent mean ice concentration percentages for each month over the entire time period 1979-2007, which is generated from passive microwave brightness temperature data derived from Nimbus-7 Scanning Multichannel Microwave Radiometer (SMMR) and Defense Meteorological Satellite Program (DMSP) -F8, -F11 and -F13 Special Sensor Microwave/Imager (SSM/I) radiances at a grid cell size of 25 x 25 km using the NASA Team algorithm developed by the Oceans and Ice Branch, Laboratory for Hydrospheric Processes at NASA Goddard Space Flight Center (GSFC). A threshold of 15 percent concentration has been applied to the monthly climatologies.</description>
+  <name>sea_ice_concentration_05</name>
+  <label>sea ice concentration, May (1979-2007)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.999998745864 34.9037152643753</gml:pos>
+      <gml:pos>178.959571606408 53.7717181062498</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Arctic Ocean</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Oceans</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Sea Ice</keyword>
+    <keyword>Sea Ice Concentration</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Stroeve, J. and W. Meier. 1999, updated 2008. Sea Ice Trends and Climatologies from SMMR and SSM/I. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/smmr_ssmi_ancillary/monthly_means.html. Accessed 27 June 2008. Compiled from: Cavalieri, D., C. Parkinson, P. Gloersen, and H. J. Zwally. 1996. Sea ice concentrations from Nimbus-7 SMMR and DMSP SSM/I passive microwave data. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0051.html. Background: Monthly climatologies of sea ice concentration represent mean ice concentration percentages for each month over the entire time period 1979-2007, which is generated from passive microwave brightness temperature data derived from Nimbus-7 Scanning Multichannel Microwave Radiometer (SMMR) and Defense Meteorological Satellite Program (DMSP) -F8, -F11 and -F13 Special Sensor Microwave/Imager (SSM/I) radiances at a grid cell size of 25 x 25 km using the NASA Team algorithm developed by the Oceans and Ice Branch, Laboratory for Hydrospheric Processes at NASA Goddard Space Flight Center (GSFC). A threshold of 15 percent concentration has been applied to the monthly climatologies.</description>
+  <name>sea_ice_concentration_06</name>
+  <label>sea ice concentration, June (1979-2007)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.999998745864 34.9037152643753</gml:pos>
+      <gml:pos>178.959571606408 53.7717181062498</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Arctic Ocean</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Oceans</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Sea Ice</keyword>
+    <keyword>Sea Ice Concentration</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Stroeve, J. and W. Meier. 1999, updated 2008. Sea Ice Trends and Climatologies from SMMR and SSM/I. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/smmr_ssmi_ancillary/monthly_means.html. Accessed 27 June 2008. Compiled from: Cavalieri, D., C. Parkinson, P. Gloersen, and H. J. Zwally. 1996. Sea ice concentrations from Nimbus-7 SMMR and DMSP SSM/I passive microwave data. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0051.html. Background: Monthly climatologies of sea ice concentration represent mean ice concentration percentages for each month over the entire time period 1979-2007, which is generated from passive microwave brightness temperature data derived from Nimbus-7 Scanning Multichannel Microwave Radiometer (SMMR) and Defense Meteorological Satellite Program (DMSP) -F8, -F11 and -F13 Special Sensor Microwave/Imager (SSM/I) radiances at a grid cell size of 25 x 25 km using the NASA Team algorithm developed by the Oceans and Ice Branch, Laboratory for Hydrospheric Processes at NASA Goddard Space Flight Center (GSFC). A threshold of 15 percent concentration has been applied to the monthly climatologies.</description>
+  <name>sea_ice_concentration_07</name>
+  <label>sea ice concentration, July (1979-2007)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.999998745864 34.9037152643753</gml:pos>
+      <gml:pos>178.959571606408 53.7717181062498</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Arctic Ocean</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Oceans</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Sea Ice</keyword>
+    <keyword>Sea Ice Concentration</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Stroeve, J. and W. Meier. 1999, updated 2008. Sea Ice Trends and Climatologies from SMMR and SSM/I. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/smmr_ssmi_ancillary/monthly_means.html. Accessed 27 June 2008. Compiled from: Cavalieri, D., C. Parkinson, P. Gloersen, and H. J. Zwally. 1996. Sea ice concentrations from Nimbus-7 SMMR and DMSP SSM/I passive microwave data. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0051.html. Background: Monthly climatologies of sea ice concentration represent mean ice concentration percentages for each month over the entire time period 1979-2007, which is generated from passive microwave brightness temperature data derived from Nimbus-7 Scanning Multichannel Microwave Radiometer (SMMR) and Defense Meteorological Satellite Program (DMSP) -F8, -F11 and -F13 Special Sensor Microwave/Imager (SSM/I) radiances at a grid cell size of 25 x 25 km using the NASA Team algorithm developed by the Oceans and Ice Branch, Laboratory for Hydrospheric Processes at NASA Goddard Space Flight Center (GSFC). A threshold of 15 percent concentration has been applied to the monthly climatologies.</description>
+  <name>sea_ice_concentration_08</name>
+  <label>sea ice concentration, August (1979-2007)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.999998745864 34.9037152643753</gml:pos>
+      <gml:pos>178.959571606408 53.7717181062498</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Arctic Ocean</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Oceans</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Sea Ice</keyword>
+    <keyword>Sea Ice Concentration</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Stroeve, J. and W. Meier. 1999, updated 2008. Sea Ice Trends and Climatologies from SMMR and SSM/I. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/smmr_ssmi_ancillary/monthly_means.html. Accessed 27 June 2008. Compiled from: Cavalieri, D., C. Parkinson, P. Gloersen, and H. J. Zwally. 1996. Sea ice concentrations from Nimbus-7 SMMR and DMSP SSM/I passive microwave data. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0051.html. Background: Monthly climatologies of sea ice concentration represent mean ice concentration percentages for each month over the entire time period 1979-2007, which is generated from passive microwave brightness temperature data derived from Nimbus-7 Scanning Multichannel Microwave Radiometer (SMMR) and Defense Meteorological Satellite Program (DMSP) -F8, -F11 and -F13 Special Sensor Microwave/Imager (SSM/I) radiances at a grid cell size of 25 x 25 km using the NASA Team algorithm developed by the Oceans and Ice Branch, Laboratory for Hydrospheric Processes at NASA Goddard Space Flight Center (GSFC). A threshold of 15 percent concentration has been applied to the monthly climatologies.</description>
+  <name>sea_ice_concentration_09</name>
+  <label>sea ice concentration, September (1979-2007)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.999998745864 34.9037152643753</gml:pos>
+      <gml:pos>178.959571606408 53.7717181062498</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Arctic Ocean</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Oceans</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Sea Ice</keyword>
+    <keyword>Sea Ice Concentration</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Stroeve, J. and W. Meier. 1999, updated 2008. Sea Ice Trends and Climatologies from SMMR and SSM/I. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/smmr_ssmi_ancillary/monthly_means.html. Accessed 27 June 2008. Compiled from: Cavalieri, D., C. Parkinson, P. Gloersen, and H. J. Zwally. 1996. Sea ice concentrations from Nimbus-7 SMMR and DMSP SSM/I passive microwave data. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0051.html. Background: Monthly climatologies of sea ice concentration represent mean ice concentration percentages for each month over the entire time period 1979-2007, which is generated from passive microwave brightness temperature data derived from Nimbus-7 Scanning Multichannel Microwave Radiometer (SMMR) and Defense Meteorological Satellite Program (DMSP) -F8, -F11 and -F13 Special Sensor Microwave/Imager (SSM/I) radiances at a grid cell size of 25 x 25 km using the NASA Team algorithm developed by the Oceans and Ice Branch, Laboratory for Hydrospheric Processes at NASA Goddard Space Flight Center (GSFC). A threshold of 15 percent concentration has been applied to the monthly climatologies.</description>
+  <name>sea_ice_concentration_10</name>
+  <label>sea ice concentration, October (1979-2007)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.999998745864 34.9037152643753</gml:pos>
+      <gml:pos>178.959571606408 53.7717181062498</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Arctic Ocean</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Oceans</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Sea Ice</keyword>
+    <keyword>Sea Ice Concentration</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Stroeve, J. and W. Meier. 1999, updated 2008. Sea Ice Trends and Climatologies from SMMR and SSM/I. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/smmr_ssmi_ancillary/monthly_means.html. Accessed 27 June 2008. Compiled from: Cavalieri, D., C. Parkinson, P. Gloersen, and H. J. Zwally. 1996. Sea ice concentrations from Nimbus-7 SMMR and DMSP SSM/I passive microwave data. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0051.html. Background: Monthly climatologies of sea ice concentration represent mean ice concentration percentages for each month over the entire time period 1979-2007, which is generated from passive microwave brightness temperature data derived from Nimbus-7 Scanning Multichannel Microwave Radiometer (SMMR) and Defense Meteorological Satellite Program (DMSP) -F8, -F11 and -F13 Special Sensor Microwave/Imager (SSM/I) radiances at a grid cell size of 25 x 25 km using the NASA Team algorithm developed by the Oceans and Ice Branch, Laboratory for Hydrospheric Processes at NASA Goddard Space Flight Center (GSFC). A threshold of 15 percent concentration has been applied to the monthly climatologies.</description>
+  <name>sea_ice_concentration_11</name>
+  <label>sea ice concentration, November (1979-2007)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.999998745864 34.9037152643753</gml:pos>
+      <gml:pos>178.959571606408 53.7717181062498</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Arctic Ocean</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Oceans</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Sea Ice</keyword>
+    <keyword>Sea Ice Concentration</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Stroeve, J. and W. Meier. 1999, updated 2008. Sea Ice Trends and Climatologies from SMMR and SSM/I. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/smmr_ssmi_ancillary/monthly_means.html. Accessed 27 June 2008. Compiled from: Cavalieri, D., C. Parkinson, P. Gloersen, and H. J. Zwally. 1996. Sea ice concentrations from Nimbus-7 SMMR and DMSP SSM/I passive microwave data. Boulder, Colorado USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0051.html. Background: Monthly climatologies of sea ice concentration represent mean ice concentration percentages for each month over the entire time period 1979-2007, which is generated from passive microwave brightness temperature data derived from Nimbus-7 Scanning Multichannel Microwave Radiometer (SMMR) and Defense Meteorological Satellite Program (DMSP) -F8, -F11 and -F13 Special Sensor Microwave/Imager (SSM/I) radiances at a grid cell size of 25 x 25 km using the NASA Team algorithm developed by the Oceans and Ice Branch, Laboratory for Hydrospheric Processes at NASA Goddard Space Flight Center (GSFC). A threshold of 15 percent concentration has been applied to the monthly climatologies.</description>
+  <name>sea_ice_concentration_12</name>
+  <label>sea ice concentration, December (1979-2007)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.999998745864 34.9037152643753</gml:pos>
+      <gml:pos>178.959571606408 53.7717181062498</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Arctic Ocean</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Oceans</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Sea Ice</keyword>
+    <keyword>Sea Ice Concentration</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Liston, G.E., and M. Sturm. 1998. Global seasonal snow classification system. Boulder, CO, USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/arcss045.html. 31 August 2006. Background: Based on the physical properties of the snow (depth, density, thermal conductivity, number of layers, degree of wetting, etc.), the world&#39;s seasonal snow covers are divided into six classes, plus classes for water and ice fields. Each class is defined by its physical properties, then empirically related to climate using three variables (precipitation, wind, and air temperature). A vegetation proxy was used for wind data: tall vegetation equals low wind, short vegetation equals high wind.</description>
+  <name>seasonal_snow_classification</name>
+  <label>seasonal snow classification</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.855268310333 -89.3181405304869</gml:pos>
+      <gml:pos>178.996024534873 89.5930272089838</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Snow Cover</keyword>
+    <keyword>Snow Classification</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Armstrong, R. L., and M. J. Brodzik. 2005. Northern Hemisphere EASE-Grid weekly snow cover and sea ice extent version 3. Boulder, CO, USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0046.html. 02 August 2006. Background: Snow cover extent is based on the digital NOAA-NESDIS Weekly Northern Hemisphere Snow Charts, revised by D. Robinson (Rutgers University) (http://climate.rutgers.edu/snowcover/) and regridded to the EASE-Grid. The original NOAA-NESDIS weekly snow charts are derived from the manual interpretation of AVHRR, GOES, and other visible-band satellite data.</description>
+  <name>snow_extent_01</name>
+  <label>snow extent, January (1967-2005)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.855268310333 -89.3181405304869</gml:pos>
+      <gml:pos>178.996024534873 89.5930272089838</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Snow Cover</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Armstrong, R. L., and M. J. Brodzik. 2005. Northern Hemisphere EASE-Grid weekly snow cover and sea ice extent version 3. Boulder, CO, USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0046.html. 02 August 2006. Background: Snow cover extent is based on the digital NOAA-NESDIS Weekly Northern Hemisphere Snow Charts, revised by D. Robinson (Rutgers University) (http://climate.rutgers.edu/snowcover/) and regridded to the EASE-Grid. The original NOAA-NESDIS weekly snow charts are derived from the manual interpretation of AVHRR, GOES, and other visible-band satellite data.</description>
+  <name>snow_extent_02</name>
+  <label>snow extent, February (1967-2005)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.855268310333 -89.3181405304869</gml:pos>
+      <gml:pos>178.996024534873 89.5930272089838</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Snow Cover</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Armstrong, R. L., and M. J. Brodzik. 2005. Northern Hemisphere EASE-Grid weekly snow cover and sea ice extent version 3. Boulder, CO, USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0046.html. 02 August 2006. Background: Snow cover extent is based on the digital NOAA-NESDIS Weekly Northern Hemisphere Snow Charts, revised by D. Robinson (Rutgers University) (http://climate.rutgers.edu/snowcover/) and regridded to the EASE-Grid. The original NOAA-NESDIS weekly snow charts are derived from the manual interpretation of AVHRR, GOES, and other visible-band satellite data.</description>
+  <name>snow_extent_03</name>
+  <label>snow extent, March (1967-2005)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.855268310333 -89.3181405304869</gml:pos>
+      <gml:pos>178.996024534873 89.5930272089838</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Snow Cover</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Armstrong, R. L., and M. J. Brodzik. 2005. Northern Hemisphere EASE-Grid weekly snow cover and sea ice extent version 3. Boulder, CO, USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0046.html. 02 August 2006. Background: Snow cover extent is based on the digital NOAA-NESDIS Weekly Northern Hemisphere Snow Charts, revised by D. Robinson (Rutgers University) (http://climate.rutgers.edu/snowcover/) and regridded to the EASE-Grid. The original NOAA-NESDIS weekly snow charts are derived from the manual interpretation of AVHRR, GOES, and other visible-band satellite data.</description>
+  <name>snow_extent_04</name>
+  <label>snow extent, April (1967-2005)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.855268310333 -89.3181405304869</gml:pos>
+      <gml:pos>178.996024534873 89.5930272089838</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Snow Cover</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Armstrong, R. L., and M. J. Brodzik. 2005. Northern Hemisphere EASE-Grid weekly snow cover and sea ice extent version 3. Boulder, CO, USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0046.html. 02 August 2006. Background: Snow cover extent is based on the digital NOAA-NESDIS Weekly Northern Hemisphere Snow Charts, revised by D. Robinson (Rutgers University) (http://climate.rutgers.edu/snowcover/) and regridded to the EASE-Grid. The original NOAA-NESDIS weekly snow charts are derived from the manual interpretation of AVHRR, GOES, and other visible-band satellite data.</description>
+  <name>snow_extent_05</name>
+  <label>snow extent, May (1967-2005)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.855268310333 -89.3181405304869</gml:pos>
+      <gml:pos>178.996024534873 89.5930272089838</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Snow Cover</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Armstrong, R. L., and M. J. Brodzik. 2005. Northern Hemisphere EASE-Grid weekly snow cover and sea ice extent version 3. Boulder, CO, USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0046.html. 02 August 2006. Background: Snow cover extent is based on the digital NOAA-NESDIS Weekly Northern Hemisphere Snow Charts, revised by D. Robinson (Rutgers University) (http://climate.rutgers.edu/snowcover/) and regridded to the EASE-Grid. The original NOAA-NESDIS weekly snow charts are derived from the manual interpretation of AVHRR, GOES, and other visible-band satellite data.</description>
+  <name>snow_extent_06</name>
+  <label>snow extent, June (1967-2004)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.855268310333 -89.3181405304869</gml:pos>
+      <gml:pos>178.996024534873 89.5930272089838</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Snow Cover</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Armstrong, R. L., and M. J. Brodzik. 2005. Northern Hemisphere EASE-Grid weekly snow cover and sea ice extent version 3. Boulder, CO, USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0046.html. 02 August 2006. Background: Snow cover extent is based on the digital NOAA-NESDIS Weekly Northern Hemisphere Snow Charts, revised by D. Robinson (Rutgers University) (http://climate.rutgers.edu/snowcover/) and regridded to the EASE-Grid. The original NOAA-NESDIS weekly snow charts are derived from the manual interpretation of AVHRR, GOES, and other visible-band satellite data.</description>
+  <name>snow_extent_07</name>
+  <label>snow extent, July (1967-2004)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.855268310333 -89.3181405304869</gml:pos>
+      <gml:pos>178.996024534873 89.5930272089838</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Snow Cover</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Armstrong, R. L., and M. J. Brodzik. 2005. Northern Hemisphere EASE-Grid weekly snow cover and sea ice extent version 3. Boulder, CO, USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0046.html. 02 August 2006. Background: Snow cover extent is based on the digital NOAA-NESDIS Weekly Northern Hemisphere Snow Charts, revised by D. Robinson (Rutgers University) (http://climate.rutgers.edu/snowcover/) and regridded to the EASE-Grid. The original NOAA-NESDIS weekly snow charts are derived from the manual interpretation of AVHRR, GOES, and other visible-band satellite data.</description>
+  <name>snow_extent_08</name>
+  <label>snow extent, August (1967-2004)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.855268310333 -89.3181405304869</gml:pos>
+      <gml:pos>178.996024534873 89.5930272089838</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Snow Cover</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Armstrong, R. L., and M. J. Brodzik. 2005. Northern Hemisphere EASE-Grid weekly snow cover and sea ice extent version 3. Boulder, CO, USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0046.html. 02 August 2006. Background: Snow cover extent is based on the digital NOAA-NESDIS Weekly Northern Hemisphere Snow Charts, revised by D. Robinson (Rutgers University) (http://climate.rutgers.edu/snowcover/) and regridded to the EASE-Grid. The original NOAA-NESDIS weekly snow charts are derived from the manual interpretation of AVHRR, GOES, and other visible-band satellite data.</description>
+  <name>snow_extent_09</name>
+  <label>snow extent, September (1967-2004)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.855268310333 -89.3181405304869</gml:pos>
+      <gml:pos>178.996024534873 89.5930272089838</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Snow Cover</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Armstrong, R. L., and M. J. Brodzik. 2005. Northern Hemisphere EASE-Grid weekly snow cover and sea ice extent version 3. Boulder, CO, USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0046.html. 02 August 2006. Background: Snow cover extent is based on the digital NOAA-NESDIS Weekly Northern Hemisphere Snow Charts, revised by D. Robinson (Rutgers University) (http://climate.rutgers.edu/snowcover/) and regridded to the EASE-Grid. The original NOAA-NESDIS weekly snow charts are derived from the manual interpretation of AVHRR, GOES, and other visible-band satellite data.</description>
+  <name>snow_extent_10</name>
+  <label>snow extent, October (1967-2004)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.855268310333 -89.3181405304869</gml:pos>
+      <gml:pos>178.996024534873 89.5930272089838</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Snow Cover</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Armstrong, R. L., and M. J. Brodzik. 2005. Northern Hemisphere EASE-Grid weekly snow cover and sea ice extent version 3. Boulder, CO, USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0046.html. 02 August 2006. Background: Snow cover extent is based on the digital NOAA-NESDIS Weekly Northern Hemisphere Snow Charts, revised by D. Robinson (Rutgers University) (http://climate.rutgers.edu/snowcover/) and regridded to the EASE-Grid. The original NOAA-NESDIS weekly snow charts are derived from the manual interpretation of AVHRR, GOES, and other visible-band satellite data.</description>
+  <name>snow_extent_11</name>
+  <label>snow extent, November (1966-2004)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.855268310333 -89.3181405304869</gml:pos>
+      <gml:pos>178.996024534873 89.5930272089838</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Snow Cover</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Armstrong, R. L., and M. J. Brodzik. 2005. Northern Hemisphere EASE-Grid weekly snow cover and sea ice extent version 3. Boulder, CO, USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0046.html. 02 August 2006. Background: Snow cover extent is based on the digital NOAA-NESDIS Weekly Northern Hemisphere Snow Charts, revised by D. Robinson (Rutgers University) (http://climate.rutgers.edu/snowcover/) and regridded to the EASE-Grid. The original NOAA-NESDIS weekly snow charts are derived from the manual interpretation of AVHRR, GOES, and other visible-band satellite data.</description>
+  <name>snow_extent_12</name>
+  <label>snow extent, December (1966-2004)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.855268310333 -89.3181405304869</gml:pos>
+      <gml:pos>178.996024534873 89.5930272089838</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Snow Cover</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Armstrong, R.L., M.J. Brodzik, K. Knowles, and M. Savoie. 2005. Global monthly EASE-Grid snow water equivalent climatology. Boulder, CO, USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0271.html. 30 August 2006. Background: Global, monthly snow water equivalent (SWE) climatologies are generated from passive microwave brightness temperature data derived from Nimbus-7 Scanning Multichannel Microwave Radiometer (SMMR) and Defense Meteorological Satellite Program (DMSP) -F8, -F11 and -F13 Special Sensor Microwave/Imager (SSM/I) radiances and gridded to the Northern and Southern 25 km Equal-Area Scalable Earth Grids (EASE-Grids).</description>
+  <name>snow_water_equivalent_01</name>
+  <label>snow water equivalent, January (1988-2003)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.855268310333 -89.3181405304869</gml:pos>
+      <gml:pos>178.996024534873 89.5930272089838</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Snow Cover</keyword>
+    <keyword>Snow Water Equivalent</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Armstrong, R.L., M.J. Brodzik, K. Knowles, and M. Savoie. 2005. Global monthly EASE-Grid snow water equivalent climatology. Boulder, CO, USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0271.html. 30 August 2006. Background: Global, monthly snow water equivalent (SWE) climatologies are generated from passive microwave brightness temperature data derived from Nimbus-7 Scanning Multichannel Microwave Radiometer (SMMR) and Defense Meteorological Satellite Program (DMSP) -F8, -F11 and -F13 Special Sensor Microwave/Imager (SSM/I) radiances and gridded to the Northern and Southern 25 km Equal-Area Scalable Earth Grids (EASE-Grids).</description>
+  <name>snow_water_equivalent_02</name>
+  <label>snow water equivalent, February (1988-2003)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.855268310333 -89.3181405304869</gml:pos>
+      <gml:pos>178.996024534873 89.5930272089838</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Snow Cover</keyword>
+    <keyword>Snow Water Equivalent</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Armstrong, R.L., M.J. Brodzik, K. Knowles, and M. Savoie. 2005. Global monthly EASE-Grid snow water equivalent climatology. Boulder, CO, USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0271.html. 30 August 2006. Background: Global, monthly snow water equivalent (SWE) climatologies are generated from passive microwave brightness temperature data derived from Nimbus-7 Scanning Multichannel Microwave Radiometer (SMMR) and Defense Meteorological Satellite Program (DMSP) -F8, -F11 and -F13 Special Sensor Microwave/Imager (SSM/I) radiances and gridded to the Northern and Southern 25 km Equal-Area Scalable Earth Grids (EASE-Grids).</description>
+  <name>snow_water_equivalent_03</name>
+  <label>snow water equivalent, March (1988-2003)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.855268310333 -89.3181405304869</gml:pos>
+      <gml:pos>178.996024534873 89.5930272089838</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Snow Cover</keyword>
+    <keyword>Snow Water Equivalent</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Armstrong, R.L., M.J. Brodzik, K. Knowles, and M. Savoie. 2005. Global monthly EASE-Grid snow water equivalent climatology. Boulder, CO, USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0271.html. 30 August 2006. Background: Global, monthly snow water equivalent (SWE) climatologies are generated from passive microwave brightness temperature data derived from Nimbus-7 Scanning Multichannel Microwave Radiometer (SMMR) and Defense Meteorological Satellite Program (DMSP) -F8, -F11 and -F13 Special Sensor Microwave/Imager (SSM/I) radiances and gridded to the Northern and Southern 25 km Equal-Area Scalable Earth Grids (EASE-Grids).</description>
+  <name>snow_water_equivalent_04</name>
+  <label>snow water equivalent, April (1988-2003)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.855268310333 -89.3181405304869</gml:pos>
+      <gml:pos>178.996024534873 89.5930272089838</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Snow Cover</keyword>
+    <keyword>Snow Water Equivalent</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Armstrong, R.L., M.J. Brodzik, K. Knowles, and M. Savoie. 2005. Global monthly EASE-Grid snow water equivalent climatology. Boulder, CO, USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0271.html. 30 August 2006. Background: Global, monthly snow water equivalent (SWE) climatologies are generated from passive microwave brightness temperature data derived from Nimbus-7 Scanning Multichannel Microwave Radiometer (SMMR) and Defense Meteorological Satellite Program (DMSP) -F8, -F11 and -F13 Special Sensor Microwave/Imager (SSM/I) radiances and gridded to the Northern and Southern 25 km Equal-Area Scalable Earth Grids (EASE-Grids).</description>
+  <name>snow_water_equivalent_05</name>
+  <label>snow water equivalent, May (1988-2003)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.855268310333 -89.3181405304869</gml:pos>
+      <gml:pos>178.996024534873 89.5930272089838</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Snow Cover</keyword>
+    <keyword>Snow Water Equivalent</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Armstrong, R.L., M.J. Brodzik, K. Knowles, and M. Savoie. 2005. Global monthly EASE-Grid snow water equivalent climatology. Boulder, CO, USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0271.html. 30 August 2006. Background: Global, monthly snow water equivalent (SWE) climatologies are generated from passive microwave brightness temperature data derived from Nimbus-7 Scanning Multichannel Microwave Radiometer (SMMR) and Defense Meteorological Satellite Program (DMSP) -F8, -F11 and -F13 Special Sensor Microwave/Imager (SSM/I) radiances and gridded to the Northern and Southern 25 km Equal-Area Scalable Earth Grids (EASE-Grids).</description>
+  <name>snow_water_equivalent_06</name>
+  <label>snow water equivalent, June (1988-2003)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.855268310333 -89.3181405304869</gml:pos>
+      <gml:pos>178.996024534873 89.5930272089838</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Snow Cover</keyword>
+    <keyword>Snow Water Equivalent</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Armstrong, R.L., M.J. Brodzik, K. Knowles, and M. Savoie. 2005. Global monthly EASE-Grid snow water equivalent climatology. Boulder, CO, USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0271.html. 30 August 2006. Background: Global, monthly snow water equivalent (SWE) climatologies are generated from passive microwave brightness temperature data derived from Nimbus-7 Scanning Multichannel Microwave Radiometer (SMMR) and Defense Meteorological Satellite Program (DMSP) -F8, -F11 and -F13 Special Sensor Microwave/Imager (SSM/I) radiances and gridded to the Northern and Southern 25 km Equal-Area Scalable Earth Grids (EASE-Grids).</description>
+  <name>snow_water_equivalent_07</name>
+  <label>snow water equivalent, July (1988-2002)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.855268310333 -89.3181405304869</gml:pos>
+      <gml:pos>178.996024534873 89.5930272089838</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Snow Cover</keyword>
+    <keyword>Snow Water Equivalent</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Armstrong, R.L., M.J. Brodzik, K. Knowles, and M. Savoie. 2005. Global monthly EASE-Grid snow water equivalent climatology. Boulder, CO, USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0271.html. 30 August 2006. Background: Global, monthly snow water equivalent (SWE) climatologies are generated from passive microwave brightness temperature data derived from Nimbus-7 Scanning Multichannel Microwave Radiometer (SMMR) and Defense Meteorological Satellite Program (DMSP) -F8, -F11 and -F13 Special Sensor Microwave/Imager (SSM/I) radiances and gridded to the Northern and Southern 25 km Equal-Area Scalable Earth Grids (EASE-Grids).</description>
+  <name>snow_water_equivalent_08</name>
+  <label>snow water equivalent, August (1987-2002)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.855268310333 -89.3181405304869</gml:pos>
+      <gml:pos>178.996024534873 89.5930272089838</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Snow Cover</keyword>
+    <keyword>Snow Water Equivalent</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Armstrong, R.L., M.J. Brodzik, K. Knowles, and M. Savoie. 2005. Global monthly EASE-Grid snow water equivalent climatology. Boulder, CO, USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0271.html. 30 August 2006. Background: Global, monthly snow water equivalent (SWE) climatologies are generated from passive microwave brightness temperature data derived from Nimbus-7 Scanning Multichannel Microwave Radiometer (SMMR) and Defense Meteorological Satellite Program (DMSP) -F8, -F11 and -F13 Special Sensor Microwave/Imager (SSM/I) radiances and gridded to the Northern and Southern 25 km Equal-Area Scalable Earth Grids (EASE-Grids).</description>
+  <name>snow_water_equivalent_09</name>
+  <label>snow water equivalent, September (1987-2002)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.855268310333 -89.3181405304869</gml:pos>
+      <gml:pos>178.996024534873 89.5930272089838</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Snow Cover</keyword>
+    <keyword>Snow Water Equivalent</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Armstrong, R.L., M.J. Brodzik, K. Knowles, and M. Savoie. 2005. Global monthly EASE-Grid snow water equivalent climatology. Boulder, CO, USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0271.html. 30 August 2006. Background: Global, monthly snow water equivalent (SWE) climatologies are generated from passive microwave brightness temperature data derived from Nimbus-7 Scanning Multichannel Microwave Radiometer (SMMR) and Defense Meteorological Satellite Program (DMSP) -F8, -F11 and -F13 Special Sensor Microwave/Imager (SSM/I) radiances and gridded to the Northern and Southern 25 km Equal-Area Scalable Earth Grids (EASE-Grids).</description>
+  <name>snow_water_equivalent_10</name>
+  <label>snow water equivalent, October (1987-2002)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.855268310333 -89.3181405304869</gml:pos>
+      <gml:pos>178.996024534873 89.5930272089838</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Snow Cover</keyword>
+    <keyword>Snow Water Equivalent</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Armstrong, R.L., M.J. Brodzik, K. Knowles, and M. Savoie. 2005. Global monthly EASE-Grid snow water equivalent climatology. Boulder, CO, USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0271.html. 30 August 2006. Background: Global, monthly snow water equivalent (SWE) climatologies are generated from passive microwave brightness temperature data derived from Nimbus-7 Scanning Multichannel Microwave Radiometer (SMMR) and Defense Meteorological Satellite Program (DMSP) -F8, -F11 and -F13 Special Sensor Microwave/Imager (SSM/I) radiances and gridded to the Northern and Southern 25 km Equal-Area Scalable Earth Grids (EASE-Grids).</description>
+  <name>snow_water_equivalent_11</name>
+  <label>snow water equivalent, November (1987-2002)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.855268310333 -89.3181405304869</gml:pos>
+      <gml:pos>178.996024534873 89.5930272089838</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Snow Cover</keyword>
+    <keyword>Snow Water Equivalent</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Armstrong, R.L., M.J. Brodzik, K. Knowles, and M. Savoie. 2005. Global monthly EASE-Grid snow water equivalent climatology. Boulder, CO, USA: National Snow and Ice Data Center. Digital media. Available at http://nsidc.org/data/nsidc-0271.html. 30 August 2006. Background: Global, monthly snow water equivalent (SWE) climatologies are generated from passive microwave brightness temperature data derived from Nimbus-7 Scanning Multichannel Microwave Radiometer (SMMR) and Defense Meteorological Satellite Program (DMSP) -F8, -F11 and -F13 Special Sensor Microwave/Imager (SSM/I) radiances and gridded to the Northern and Southern 25 km Equal-Area Scalable Earth Grids (EASE-Grids).</description>
+  <name>snow_water_equivalent_12</name>
+  <label>snow water equivalent, December (1987-2002)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.855268310333 -89.3181405304869</gml:pos>
+      <gml:pos>178.996024534873 89.5930272089838</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Arctic</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Northern Hemisphere</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Snow Cover</keyword>
+    <keyword>Snow Water Equivalent</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Abdalati, W. 2007. Greenland ice sheet melt characteristics derived from passive microwave data. Boulder, Colorado USA: National Snow and Ice Data Center. Digital Media. Available at http://nsidc.org/data/nsidc-0218.html. 17 July 2007. Background: The ice sheet melt extent is a daily (or every-other-day, prior to August, 1987) estimate of the spatial extent of wet snow on the Greenland ice sheet derived from passive microwave satellite brightness temperature characteristics using the cross-polarized gradient ratio of Abdalati and Steffen (J. Climate, 1997). It is physically based on the changes in microwave emission characteristics observable in data from the Scanning Multi-channel Microwave Radiometer (SMMR) and the Special Sensor Microwave Imager (SSM/I). It is not a direct measure of the snow wetness, but rather is a binary indicator of the state of melt of each SMMR and SSM/I pixel on the ice sheet for each day of observation. It is, however a useful proxy for the amount of ablation that occurs on the Greenland ice sheet.</description>
+  <name>greenland_surface_melt</name>
+  <label>Greenland surface melt (1979-2004)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.724371524912 65.0917471938267</gml:pos>
+      <gml:pos>179.267576918496 82.2840082267087</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Greenland</keyword>
+    <keyword>Ice Sheets</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Snow Melt</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Bales, R.C., J.R. McConnell, E. Mosley-Thompson, and G. Lamorey. 2001. Accumulation map for the Greenland Ice Sheet: 1971-1990. Geophysical Research Letters. 28(15): 2967-2970. doi:10.1029/2000GL012052. Available at http://zero.eng.ucmerced.edu/rcbales/PARCA/. 24 October 2006. Background: An updated accumulation map for the Greenland Ice Sheet for the period 1971-1990, based on kriging of accurate in situ point estimates developed during the past decade at over 40 points (shallow ice cores) plus over 200 historical points (from snow pits, probes, shallow cores, and coastal precipitation data), shows an average water accumulation of 300 mm snow water equivalent (SWE) per year. Average uncertainty (standard deviation) in estimates of point accumulation for the interior part of the ice sheet, where the kriging drift surface is well constrained, is approximately 70 mm SWE per year, or 24% of mean accumulation. Because there are multiple cores in most regions, the regional uncertainty in accumulation should be considerably lower than the 70 mm SWE per year average uncertainty at a point. There are still many areas on the ice sheet, including northwest and southern Greenland, where annual accumulation remains poorly constrained.</description>
+  <name>greenland_accumulation</name>
+  <label>Greenland snow accumulation (1971-1990)</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.836596092188 65.1664483438673</gml:pos>
+      <gml:pos>179.269613064936 82.4667598139105</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Greenland</keyword>
+    <keyword>Ice Sheets</keyword>
+    <keyword>Polar</keyword>
+    <keyword>Snow Accumulation</keyword>
+    <keyword>Snow Water Equivalent</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Bamber, J.L., R.L. Layberry, S.P. Gogenini. 2001. A new ice thickness and bed data set for the Greenland ice sheet 1: Measurement, data reduction, and errors. Journal of Geophysical Research. 106(D24): 33773-33780. Data provided by the National Snow and Ice Data Center DAAC, University of Colorado, Boulder, CO, USA. Available at http://nsidc.org/data/nsidc-0092.html. 25 October 2006. Bamber, J.L., R.L. Layberry, S.P. Gogenini. 2001. A new ice thickness and bed data set for the Greenland ice sheet 2: Relationship between dynamics and basal topography. Journal of Geophysical Research. 106(D24): 33781-33788. Data provided by the National Snow and Ice Data Center DAAC, University of Colorado, Boulder, CO, USA. Available at http://nsidc.org/data/nsidc-0092.html. 25 October 2006. Background: Digital Elevation Model (DEM) data are a combination of European Remote-Sensing (ERS-1) and Geosat satellite radar altimetry data, Airborne Topographic Mapper (ATM) data, and photogrammetric digital height data. Ice thickness data are based on approximately 700,000 data points collected in the 1990s from a University of Kansas airborne ice penetrating radar (IPR). Nearly 30,000 data points were collected in the 1970s from a Technical University of Denmark (TUD) airborne echo sounder. Bamber subtracted the ice thickness grid from the DEM to produce a grid of bedrock elevation values.</description>
+  <name>greenland_bedrock_elevation</name>
+  <label>Greenland bedrock elevation</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.12303011456 63.0415709487752</gml:pos>
+      <gml:pos>179.982766500967 82.4151433839318</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Bedrock Elevation</keyword>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Greenland</keyword>
+    <keyword>Ice Sheets</keyword>
+    <keyword>Ice Sheet Elevation</keyword>
+    <keyword>Polar</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Bamber, J.L., R.L. Layberry, S.P. Gogenini. 2001. A new ice thickness and bed data set for the Greenland ice sheet 1: Measurement, data reduction, and errors. Journal of Geophysical Research. 106(D24): 33773-33780. Data provided by the National Snow and Ice Data Center DAAC, University of Colorado, Boulder, CO, USA. Available at http://nsidc.org/data/nsidc-0092.html. 25 October 2006. Bamber, J.L., R.L. Layberry, S.P. Gogenini. 2001. A new ice thickness and bed data set for the Greenland ice sheet 2: Relationship between dynamics and basal topography. Journal of Geophysical Research. 106(D24): 33781-33788. Data provided by the National Snow and Ice Data Center DAAC, University of Colorado, Boulder, CO, USA. Available at http://nsidc.org/data/nsidc-0092.html. 25 October 2006. Background: Ice thickness data are based on approximately 700,000 data points collected in the 1990s from a University of Kansas airborne ice penetrating radar (IPR). Nearly 30,000 data points were collected in the 1970s from a Technical University of Denmark (TUD) airborne echo sounder.</description>
+  <name>greenland_ice_thickness</name>
+  <label>Greenland ice sheet thickness</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.12303011456 63.0415709487752</gml:pos>
+      <gml:pos>179.982766500967 82.4151433839318</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Greenland</keyword>
+    <keyword>Ice Sheets</keyword>
+    <keyword>Ice Sheet Thickness</keyword>
+    <keyword>Polar</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+  <CoverageOfferingBrief>
+  <description>Bamber, J.L., R.L. Layberry, S.P. Gogenini. 2001. A new ice thickness and bed data set for the Greenland ice sheet 1: Measurement, data reduction, and errors. Journal of Geophysical Research. 106(D24): 33773-33780. Data provided by the National Snow and Ice Data Center DAAC, University of Colorado, Boulder, CO, USA. Available at http://nsidc.org/data/nsidc-0092.html. 25 October 2006. Bamber, J.L., R.L. Layberry, S.P. Gogenini. 2001. A new ice thickness and bed data set for the Greenland ice sheet 2: Relationship between dynamics and basal topography. Journal of Geophysical Research. 106(D24): 33781-33788. Data provided by the National Snow and Ice Data Center DAAC, University of Colorado, Boulder, CO, USA. Available at http://nsidc.org/data/nsidc-0092.html. 25 October 2006. Background: Digital Elevation Model (DEM) data are a combination of European Remote-Sensing (ERS-1) and Geosat satellite radar altimetry data, Airborne Topographic Mapper (ATM) data, and photogrammetric digital height data.</description>
+  <name>greenland_elevation</name>
+  <label>Greenland surface elevation</label>
+    <lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+      <gml:pos>-179.12303011456 63.0415709487752</gml:pos>
+      <gml:pos>179.982766500967 82.4151433839318</gml:pos>
+    </lonLatEnvelope>
+  <keywords>
+    <keyword>Cryosphere</keyword>
+    <keyword>Earth Science</keyword>
+    <keyword>Greenland</keyword>
+    <keyword>Ice Sheets</keyword>
+    <keyword>Ice Sheet Elevation</keyword>
+    <keyword>Polar</keyword>
+  </keywords>
+  </CoverageOfferingBrief>
+</ContentMetadata>
+</WCS_Capabilities>

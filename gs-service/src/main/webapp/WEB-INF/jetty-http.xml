@@ -3,6 +3,7 @@
 <!-- by adding a HTTP connector. -->
 <!-- This configuration must be used in conjunction with jetty.xml -->
 <!-- ============================================================= -->
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_0.dtd">
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
 	<!-- =========================================================== -->
 	<!-- Add a HTTP Connector. -->

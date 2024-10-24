@@ -4,7 +4,7 @@ package eu.essi_lab.access.wml;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,14 +21,19 @@ package eu.essi_lab.access.wml;
  * #L%
  */
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
+import javax.xml.datatype.Duration;
+
 import org.cuahsi.waterml._1.ContactInformationType;
 import org.cuahsi.waterml._1.LatLonPointType;
+import org.cuahsi.waterml._1.ObjectFactory;
 import org.cuahsi.waterml._1.SiteInfoType;
 import org.cuahsi.waterml._1.SiteInfoType.GeoLocation;
 import org.cuahsi.waterml._1.SiteInfoType.SiteCode;
@@ -39,6 +44,7 @@ import org.cuahsi.waterml._1.TsValuesSingleVariableType;
 import org.cuahsi.waterml._1.UnitsType;
 import org.cuahsi.waterml._1.ValueSingleVariable;
 import org.cuahsi.waterml._1.VariableInfoType;
+import org.cuahsi.waterml._1.VariableInfoType.TimeScale;
 import org.cuahsi.waterml._1.VariableInfoType.VariableCode;
 import org.cuahsi.waterml._1.essi.JAXBWML;
 import org.cuahsi.waterml._1.essi.JAXBWML.WML_SiteProperty;
@@ -50,8 +56,11 @@ import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.lib.net.utils.whos.HydroOntology;
 import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
+import eu.essi_lab.lib.net.utils.whos.WHOSOntology;
 import eu.essi_lab.lib.net.utils.whos.WMOOntology;
 import eu.essi_lab.lib.net.utils.whos.WMOUnit;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.resource.BNHSProperty;
 import eu.essi_lab.model.resource.BNHSPropertyReader;
 import eu.essi_lab.model.resource.Country;
@@ -80,15 +89,18 @@ public abstract class WMLDataDownloader extends DataDownloader {
 	} catch (Exception e) {
 	}
 	// if attribute URI is present, is preferred, to have an harmonized set of attributes
-	Optional<String> optionalAttributeURI = resource.getExtensionHandler().getAttributeURI();
+	Optional<String> optionalAttributeURI = resource.getExtensionHandler().getObservedPropertyURI();
 	if (optionalAttributeURI.isPresent()) {
 	    String uri = optionalAttributeURI.get();
 	    if (uri != null) {
-		HydroOntology ontology = new HydroOntology();
+
+		JAXBWML.getInstance().addVariableURI(variableInfo, uri);
+
+		HydroOntology ontology = new WHOSOntology();
 		SKOSConcept concept = ontology.getConcept(uri);
 		if (concept != null) {
 		    variableName = concept.getPreferredLabel().getKey();
-		    List<String> closeMatches = concept.getCloseMatches();
+		    HashSet<String> closeMatches = concept.getCloseMatches();
 		    if (closeMatches != null && !closeMatches.isEmpty()) {
 			try {
 			    WMOOntology wmoOntology = new WMOOntology();
@@ -176,10 +188,67 @@ public abstract class WMLDataDownloader extends DataDownloader {
 
 	variableInfo.getVariableCode().add(variableCode);
 
+	VariableCode variableCode2 = new VariableCode();
+	variableCode2.setVocabulary("WHOS");
+	variableCode2.setValue(resource.getExtensionHandler().getUniqueAttributeIdentifier().get());
+	variableInfo.getVariableCode().add(variableCode2);
+
 	try {
 	    Double noDataValue = Double.parseDouble(extensions.getAttributeMissingValue().get());
 	    variableInfo.setNoDataValue(noDataValue);
 	} catch (Exception e) {
+	}
+
+	Optional<String> aggregationPeriod = resource.getExtensionHandler().getTimeAggregationDuration8601();
+	Optional<String> resolutionPeriod = resource.getExtensionHandler().getTimeResolutionDuration8601();
+
+	TimeScale timeScale = new TimeScale();
+	org.cuahsi.waterml._1.ObjectFactory factory = new ObjectFactory();
+	variableInfo.setTimeScale(factory.createVariableInfoTypeTimeScale(timeScale));
+	UnitsType timeUnit = new UnitsType();
+	timeUnit.setUnitType("Time");
+	timeScale.setUnit(timeUnit);
+	if (aggregationPeriod.isPresent() || resolutionPeriod.isPresent()) {
+
+	    String aggregationTimeUnits = null;
+	    String resolutionTimeUnits = null;
+	    if (aggregationPeriod.isPresent()) {
+		try {
+		    Duration duration = ISO8601DateTimeUtils.getDuration(aggregationPeriod.get());
+		    SimpleEntry<BigDecimal, String> unitsValue = ISO8601DateTimeUtils.getUnitsValueFromDuration(duration);
+		    aggregationTimeUnits = unitsValue.getValue();
+		    timeScale.setTimeSupport(unitsValue.getKey().floatValue());
+		} catch (Exception e) {
+		    GSLoggerFactory.getLogger(getClass()).error(e);
+		}
+	    }
+	    if (resolutionPeriod.isPresent()) {
+		try {
+		    Duration duration = ISO8601DateTimeUtils.getDuration(resolutionPeriod.get());
+		    SimpleEntry<BigDecimal, String> unitsValue = ISO8601DateTimeUtils.getUnitsValueFromDuration(duration);
+		    resolutionTimeUnits = unitsValue.getValue();
+		    timeScale.setTimeSpacing(unitsValue.getKey().floatValue());
+		} catch (Exception e) {
+		    GSLoggerFactory.getLogger(getClass()).error(e);
+		}
+	    }
+	    if (aggregationTimeUnits != null && resolutionTimeUnits != null && !aggregationTimeUnits.equals(resolutionTimeUnits)) {
+		GSLoggerFactory.getLogger(getClass()).error("Different time units in WOF profiler!");
+	    }
+
+	    String timeUnits = aggregationTimeUnits;
+	    if (timeUnits == null) {
+		timeUnits = resolutionTimeUnits;
+	    }
+
+	    if (timeUnits != null) {
+		timeUnit.setUnitName(timeUnits);
+	    }
+	    String timeUnitsAbbreviation = ISO8601DateTimeUtils.getTimeUnitsAbbreviation(timeUnits);
+	    if (timeUnitsAbbreviation != null) {
+		timeUnit.setUnitAbbreviation(timeUnitsAbbreviation);
+	    }
+
 	}
 
 	TsValuesSingleVariableType value = new TsValuesSingleVariableType();
@@ -240,6 +309,11 @@ public abstract class WMLDataDownloader extends DataDownloader {
 	return ret;
     }
 
+    private void getTimeValueFromDuration(Duration duration) {
+	// TODO Auto-generated method stub
+
+    }
+
     public static void augmentValueInfo(TsValuesSingleVariableType value, GSResource resource) {
 	ResponsibleParty poc = null;
 	try {
@@ -256,6 +330,8 @@ public abstract class WMLDataDownloader extends DataDownloader {
 
 	if (poc != null) {
 	    SourceType source = new SourceType();
+	    source.setSourceID(1);
+
 	    ContactInformationType contactInfo = new ContactInformationType();
 	    try {
 		source.setOrganization(poc.getOrganisationName());
@@ -271,9 +347,13 @@ public abstract class WMLDataDownloader extends DataDownloader {
 			    String phone = (String) itPhone.next();
 			    contactInfo.getPhone().add(phone);
 			}
-			String a = address.getDeliveryPoint() + " " + address.getCity() + " " + address.getPostalCode() + " "
-				+ address.getCountry();
-			contactInfo.getAddress().add(a);
+
+			String deliveryPoint = Optional.ofNullable(address.getDeliveryPoint()).map(v -> v + " ").orElse("");
+			String city = Optional.ofNullable(address.getCity()).map(v -> v + " ").orElse("");
+			String postalCode = Optional.ofNullable(address.getPostalCode()).map(v -> v + " ").orElse("");
+			String country = Optional.ofNullable(address.getCountry()).map(v -> v + " ").orElse("");
+
+			contactInfo.getAddress().add(deliveryPoint + city + postalCode + country);
 
 		    }
 		    Online co = c.getOnline();
@@ -281,8 +361,8 @@ public abstract class WMLDataDownloader extends DataDownloader {
 			source.getSourceLink().add(co.getLinkage());
 		    }
 		}
-		source.setSourceID(1);
 	    } catch (Exception e) {
+		e.printStackTrace();
 	    }
 	    if (contactInfo.getContactName() == null) {
 		contactInfo.setContactName("");

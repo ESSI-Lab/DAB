@@ -1,11 +1,15 @@
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 
-SELECT DISTINCT (${CONCEPT_URI} as ?concept) ?prefLabel ?altLabel
+SELECT DISTINCT ?concept ?prefLabel ?altLabel ?close
 WHERE 
 {
-  ${CONCEPT_URI} rdf:type skos:Concept.
-  ${CONCEPT_URI} skos:prefLabel ?prefLabel .  
-   OPTIONAL { ${CONCEPT_URI} skos:altLabel ?altLabel } 
+  BIND(${CONCEPT_URI} AS ?concept1)
+  
+  ?concept skos:closeMatch* ?concept1.
+  OPTIONAL {?concept skos:closeMatch* ?close}.
+  ?concept skos:prefLabel ?prefLabel. 
+  OPTIONAL { ?concept skos:altLabel ?altLabel } 
+ 
 }
+LIMIT 1000

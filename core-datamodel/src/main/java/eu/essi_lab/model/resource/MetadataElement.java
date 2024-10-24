@@ -4,7 +4,7 @@ package eu.essi_lab.model.resource;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -62,7 +62,10 @@ public enum MetadataElement implements Queryable {
     /**
      * //gmd:keyword/gco:CharacterString
      */
+    KEYWORD_BLUE_CLOUD(MetadataElement.KEYWORD_BLUE_CLOUD_EL_NAME),
+    KEYWORD_URI_BLUE_CLOUD(MetadataElement.KEYWORD_URI_BLUE_CLOUD_EL_NAME),
     KEYWORD(MetadataElement.KEYWORD_EL_NAME),
+    KEYWORD_URI(MetadataElement.KEYWORD_URI_EL_NAME),
 
     /**
      * //gmd:topicCategory/gmd:MD_TopicCategoryCode"
@@ -70,132 +73,153 @@ public enum MetadataElement implements Queryable {
     TOPIC_CATEGORY("topicCategory"),
 
     /**
-     * NEW
+     *
      */
     HIERARCHY_LEVEL_CODE_LIST_VALUE("hLevelCodeValue"),
 
     /**
-     * NEW
+     * 
      */
     INSTRUMENT_IDENTIFIER(MetadataElement.INSTRUMENT_IDENTIFIER_EL_NAME),
 
     /**
-     * NEW
+     * 
      */
     UNIQUE_INSTRUMENT_IDENTIFIER(MetadataElement.UNIQUE_INSTRUMENT_IDENTIFIER_EL_NAME, false, true, ContentType.TEXTUAL, true),
 
     /**
-     * NEW
+     * 
      */
     INSTRUMENT_DESCRIPTION("instrumentDesc"),
 
     /**
-     * NEW
+     * 
      */
     INSTRUMENT_TITLE("instrumentTitle"),
+    INSTRUMENT_URI("instrumentURI"),
 
+    CRUISE_NAME(MetadataElement.CRUISE_NAME_EL_NAME),
+    
+    CRUISE_URI(MetadataElement.CRUISE_URI_EL_NAME),
+    
+    PROJECT_NAME(MetadataElement.PROJECT_NAME_EL_NAME),
+    
+    PROJECT_URI(MetadataElement.PROJECT_URI_EL_NAME),
+    
     /**
-     * NEW
+     * 
      */
     PLATFORM_IDENTIFIER(MetadataElement.PLATFORM_IDENTIFIER_EL_NAME),
 
     /**
-     * NEW
+     * 
      */
     PLATFORM_TITLE(MetadataElement.PLATFORM_TITLE_EL_NAME),
+    
+    PLATFORM_URI(MetadataElement.PLATFORM_URI_EL_NAME),    
 
     /**
-     * NEW
+     * 
      */
     UNIQUE_PLATFORM_IDENTIFIER(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER_EL_NAME, false, true, ContentType.TEXTUAL, true),
 
     /**
-     * NEW
+     * 
      */
     TIME_INTERPOLATION(MetadataElement.TIME_INTERPOLATION_EL_NAME, false, true, ContentType.TEXTUAL, true),
 
     /**
-     * NEW
+     * 
      */
     TIME_SUPPORT(MetadataElement.TIME_SUPPORT_EL_NAME, false, true, ContentType.TEXTUAL, true),
 
     /**
-     * NEW
+     * 
      */
     TIME_RESOLUTION(MetadataElement.TIME_RESOLUTION_EL_NAME, false, true, ContentType.TEXTUAL, true),
 
+    TIME_RESOLUTION_DURATION_8601(MetadataElement.TIME_RESOLUTION_DURATION_8601_EL_NAME, false, true, ContentType.TEXTUAL, true),
+    
+    TIME_AGGREGATION_DURATION_8601(MetadataElement.TIME_AGGREGATION_DURATION_8601_EL_NAME, false, true, ContentType.TEXTUAL, true),
+    
+    WIS_TOPIC_HIERARCHY(MetadataElement.WIS_TOPIC_HIERARCHY_EL_NAME, false, true, ContentType.TEXTUAL, true),
     /**
-     * NEW
+     * 
      */
     TIME_UNITS(MetadataElement.TIME_UNITS_EL_NAME, false, true, ContentType.TEXTUAL, true),
 
     /**
-     * NEW
+     * 
      */
     TIME_UNITS_ABBREVIATION(MetadataElement.TIME_UNITS_ABBREVIATION_EL_NAME, false, true, ContentType.TEXTUAL, true),
 
     /**
-     * NEW
+     * 
      */
     DATA_SIZE(MetadataElement.DATA_SIZE_EL_NAME, false, true, ContentType.LONG, true),
 
     /**
-     * NEW
+     * 
      */
     PLATFORM_DESCRIPTION("platformDesc"),
 
     /**
-     * NEW
+     * 
      */
     ATTRIBUTE_IDENTIFIER(MetadataElement.ATTRIBUTE_IDENTIFIER_EL_NAME),
 
     /**
-     * NEW
+     * 
      */
-    ATTRIBUTE_TITLE("attributeTitle"),
+    ATTRIBUTE_TITLE(MetadataElement.ATTRIBUTE_TITLE_EL_NAME),
 
     /**
-     * NEW
+     * 
      */
     ATTRIBUTE_UNITS(MetadataElement.ATTRIBUTE_UNITS_EL_NAME),
 
     /**
-     * NEW
+     * 
      */
     ATTRIBUTE_UNITS_ABBREVIATION(MetadataElement.ATTRIBUTE_UNITS_ABBREVIATION_EL_NAME, false, true, ContentType.TEXTUAL, true),
 
     /**
-     * NEW
+     * 
      */
     ATTRIBUTE_MISSING_VALUE(MetadataElement.ATTRIBUTE_MISSING_VALUE_EL_NAME, false, true, ContentType.TEXTUAL, true),
 
     /**
-     * NEW
+     * 
      */
     UNIQUE_ATTRIBUTE_IDENTIFIER(MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER_EL_NAME, false, true, ContentType.TEXTUAL, true),
-
+    
     /**
      * NEW
      */
-    ATTRIBUTE_DESCRIPTION("attributeDesc"),
+    OBSERVED_PROPERTY_URI(MetadataElement.OBSERVED_PROPERTY_URI_EL_NAME, false, true, ContentType.TEXTUAL, true),  
+    
+    /**
+     * 
+     */
+    ATTRIBUTE_DESCRIPTION(MetadataElement.ATTRIBUTE_DESCRIPTION_EL_NAME),
 
     /**
-     * NEW
+     * 
      */
     COVERAGE_CONTENT_TYPE_CODE("coverageContentTypeCode"),
 
     /**
-     * NEW
+     * 
      */
     COUPLING_TYPE("couplingType"),
 
     /**
-     * NEW
+     * 
      */
     DISTANCE_UOM("distanceUOM"),
 
     /**
-     * NEW
+     * 
      */
     REVISION_DATE("revisionDate"),
 
@@ -313,6 +337,8 @@ public enum MetadataElement implements Queryable {
      *
      */
     ORGANISATION_NAME(MetadataElement.ORGANISATION_NAME_EL_NAME),
+    ORGANISATION_ROLE(MetadataElement.ORGANISATION_ROLE_EL_NAME),
+    ORGANISATION_URI(MetadataElement.ORGANISATION_URI_EL_NAME),
     /**
      *
      */
@@ -469,6 +495,25 @@ public enum MetadataElement implements Queryable {
      * Extended
      */
     THEME_CATEGORY("themeCategory", false, true, ContentType.TEXTUAL, true),
+    
+    // ----------------------------------------------------------
+    //
+    // IN SITU
+    //    
+    IN_SITU("inSitu", ContentType.BOOLEAN),       
+    
+    // ----------------------------------------------------------
+    //
+    // WORLDCEREAL SPECIFIC QUERYABLES
+    //    
+    CROP_TYPES(MetadataElement.CROP_TYPES_EL_NAME, false, true, ContentType.TEXTUAL, true),
+    QUANTITY_TYPES(MetadataElement.QUANTITY_TYPES_EL_NAME, false, true, ContentType.TEXTUAL, true),
+    LAND_COVER_TYPES(MetadataElement.LAND_COVER_TYPES_EL_NAME, false, true, ContentType.TEXTUAL, true),
+    IRRIGATION_TYPES(MetadataElement.IRRIGATION_TYPES_EL_NAME, false, true, ContentType.TEXTUAL, true),
+    CONFIDENCE_CROP_TYPE("cropConfidence", ContentType.DOUBLE),
+    CONFIDENCE_IRR_TYPE("irrigationConfidence", ContentType.DOUBLE),
+    CONFIDENCE_LC_TYPE("landCoverConfidence", ContentType.DOUBLE),
+    
 
     // ----------------------------------------------------------
     //
@@ -529,8 +574,13 @@ public enum MetadataElement implements Queryable {
     MEASUREMENT_METHOD_DISCHARGE(MetadataElement.MEASUREMENT_METHOD_DISCHARGE_EL_NAME), //
     MEASUREMENT_METHOD_WATER_TEMPERATURE(MetadataElement.MEASUREMENT_METHOD_WATER_TEMPERATURE_EL_NAME), //
     MEASUREMENT_METHOD_ICE_ON_OFF(MetadataElement.MEASUREMENT_METHOD_ICE_ON_OFF_EL_NAME);
+    
 
+
+    public static final String KEYWORD_BLUE_CLOUD_EL_NAME = "keywordBlueCloud";
+    public static final String KEYWORD_URI_BLUE_CLOUD_EL_NAME = "keywordURIBlueCloud";
     public static final String KEYWORD_EL_NAME = "keyword";
+    public static final String KEYWORD_URI_EL_NAME = "keywordURI";
     public static final String DISTRIBUTION_FORMAT_EL_NAME = "format";
     public static final String ONLINE_PROTOCOL_EL_NAME = "protocol";
     public static final String INSTRUMENT_IDENTIFIER_EL_NAME = "instrumentId";
@@ -538,10 +588,22 @@ public enum MetadataElement implements Queryable {
 
     public static final String PLATFORM_IDENTIFIER_EL_NAME = "platformId";
     public static final String PLATFORM_TITLE_EL_NAME = "platformTitle";
+    public static final String PLATFORM_URI_EL_NAME = "platformURI";
+
+    public static final String CRUISE_NAME_EL_NAME = "cruiseName";
+    public static final String CRUISE_URI_EL_NAME = "cruiseURI";
+    
+    public static final String PROJECT_NAME_EL_NAME = "projectName";
+    public static final String PROJECT_URI_EL_NAME = "projectURI";
 
     public static final String DATA_SIZE_EL_NAME = "dataSize";
 
-    public static final String TIME_INTERPOLATION_EL_NAME = "timeInterpolation"; // from enum InterpolationType
+    public static final String TIME_INTERPOLATION_EL_NAME = "time_Interpolation"; // from enum InterpolationType
+    
+    public static final String TIME_AGGREGATION_DURATION_8601_EL_NAME = "timeAggregationDuration8601";
+    public static final String WIS_TOPIC_HIERARCHY_EL_NAME = "wisTopicHierarchy";
+    public static final String TIME_RESOLUTION_DURATION_8601_EL_NAME = "timeResolutionDuration8601";
+    
     public static final String TIME_RESOLUTION_EL_NAME = "timeResolution"; // the optional regular distance from a
 									   // sample to the next one in the time series
     public static final String TIME_SUPPORT_EL_NAME = "timeSupport"; // the time over which the interpolation is
@@ -564,8 +626,8 @@ public enum MetadataElement implements Queryable {
 
     public static final String ATTRIBUTE_IDENTIFIER_EL_NAME = "attributeId";
     public static final String ATTRIBUTE_TITLE_EL_NAME = "attributeTitle";
-    public static final String ATTRIBUTE_URI_EL_NAME = "attributeURI"; // can be
-								       // http://codes.wmo.int/common/unit/m3_s-1, etc.
+    public static final String ATTRIBUTE_DESCRIPTION_EL_NAME = "attributeDesc";    
+    public static final String OBSERVED_PROPERTY_URI_EL_NAME = "observedPropertyURI"; 
     public static final String ATTRIBUTE_UNITS_EL_NAME = "attributeUnits"; // can be meters, etc.
     public static final String ATTRIBUTE_UNITS_URI_EL_NAME = "attributeUnitsURI"; // can be
 										  // http://codes.wmo.int/common/unit/m3_s-1,
@@ -574,6 +636,14 @@ public enum MetadataElement implements Queryable {
     public static final String ATTRIBUTE_MISSING_VALUE_EL_NAME = "attributeMissingValue"; // can be -9999
 
     public static final String ORGANISATION_NAME_EL_NAME = "organisationName";
+    public static final String ORGANISATION_URI_EL_NAME = "organisationURI";
+    public static final String ORGANISATION_ROLE_EL_NAME = "organisationRole";
+    
+    public static final String CROP_TYPES_EL_NAME = "cropTypes";
+    public static final String QUANTITY_TYPES_EL_NAME = "quantityTypes";
+    public static final String IRRIGATION_TYPES_EL_NAME = "irrigationTypes";
+    public static final String LAND_COVER_TYPES_EL_NAME = "landCoverTypes";
+    
     public static final String PRODUCT_TYPE_EL_NAME = "prodType";
     public static final String SENSOR_OP_MODE_EL_NAME = "sensorOpMode";
     public static final String SENSOR_SWATH_EL_NAME = "sensorSwath";

@@ -14,14 +14,6 @@
 	<description>ESSI-Lab Data Access Tools Validator</description>
 	<packaging>pom</packaging>
 
-
-	<dependencies>
-		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-		</dependency>
-	</dependencies>
-
 	<modules>
 		<module>access-tools-validator-common</module>
 		<module>access-tools-validator-geotiff</module>

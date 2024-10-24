@@ -1,0 +1,35 @@
+{
+  "key": "47e86cea-5623-47ef-ab03-5defb4b39c61",
+  "timeStamp": 0,
+  "supportedOptions": {},
+  "configurableComponents": {
+    "comp1": {
+      "configurableComponentConcrete": "eu.essi_lab.configuration.test.UpdatedConfigurableComposed",
+      "key": "c392ad01-8b84-4d13-bf3a-a6bfe22e4adc",
+      "supportedOptions": {},
+      "configurableComponents": {
+        "mysub1": {
+          "configurableComponentConcrete": "eu.essi_lab.configuration.test.UpdatedConfigurable",
+          "key": "b9184eaa-5769-41b0-b27f-17393fac6a40",
+          "supportedOptions": {
+            "op2": {
+              "concrete": "eu.essi_lab.model.configuration.option.GSConfOptionString",
+              "key": "op2",
+              "mandatory": false,
+              "allowedValues": [],
+              "type": "java.lang.String"
+            },
+            "op1": {
+              "concrete": "eu.essi_lab.model.configuration.option.GSConfOptionString",
+              "key": "op1",
+              "mandatory": false,
+              "value": "val1",
+              "allowedValues": [],
+              "type": "java.lang.String"
+            }
+          }
+        }
+      }
+    }
+  }
+}

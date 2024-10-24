@@ -1,0 +1,93 @@
+{
+    "currentVersion": 11,
+    "serviceItemId": "6cbefc99425644dba1242abafbf8fc33",
+    "serviceDescription": "",
+    "hasVersionedData": false,
+    "supportsDisconnectedEditing": false,
+    "hasStaticData": true,
+    "hasSharedDomains": false,
+    "maxRecordCount": 1000,
+    "supportedQueryFormats": "JSON",
+    "supportsVCSProjection": false,
+    "supportedExportFormats": "csv,shapefile,sqlite,geoPackage,filegdb,featureCollection,geojson,excel",
+    "capabilities": "Query",
+    "description": "",
+    "copyrightText": "",
+    "spatialReference": {
+        "wkid": 102100,
+        "latestWkid": 3857
+    },
+    "initialExtent": {
+        "xmin": -900560.899609901,
+        "ymin": 6303636.4812084306,
+        "xmax": 195130.7474099235,
+        "ymax": 8488536.2040848285,
+        "spatialReference": {
+            "wkid": 102100,
+            "latestWkid": 3857
+        }
+    },
+    "fullExtent": {
+        "xmin": -900560.899609901,
+        "ymin": 6303636.4812084306,
+        "xmax": 195130.7474099235,
+        "ymax": 8488536.2040848285,
+        "spatialReference": {
+            "wkid": 102100,
+            "latestWkid": 3857
+        }
+    },
+    "allowGeometryUpdates": true,
+    "units": "esriMeters",
+    "supportsAppend": true,
+    "supportsSharedDomains": true,
+    "supportsWebHooks": true,
+    "supportsTemporalLayers": true,
+    "layerOverridesEnabled": true,
+    "size": 10207232,
+    "syncEnabled": false,
+    "supportsApplyEditsWithGlobalIds": false,
+    "supportsReturnDeleteResults": true,
+    "supportsLayerOverrides": true,
+    "supportsTilesAndBasicQueriesMode": true,
+    "supportsQueryContingentValues": true,
+    "supportedContingentValuesFormats": "JSON, PBF",
+    "supportsContingentValuesJson": 2,
+    "advancedEditingCapabilities": {
+        "supportsSplit": false,
+        "supportsReturnServiceEditsInSourceSR": false,
+        "supportsAsyncApplyEdits": true,
+        "supportsReturnEditResults": true,
+        "supportsApplyEditsbyUploadID": true,
+        "supportedApplyEditsUploadIDFormats": "JSON"
+    },
+    "editorTrackingInfo": {
+        "enableEditorTracking": false,
+        "enableOwnershipAccessControl": false,
+        "allowOthersToQuery": true,
+        "allowOthersToUpdate": true,
+        "allowOthersToDelete": false,
+        "allowAnonymousToQuery": true,
+        "allowAnonymousToUpdate": true,
+        "allowAnonymousToDelete": true
+    },
+    "xssPreventionInfo": {
+        "xssPreventionEnabled": true,
+        "xssPreventionRule": "InputOnly",
+        "xssInputRule": "rejectInvalid"
+    },
+    "layers": [
+        {
+            "id": 0,
+            "name": "Geolytix Retail Points 2022 Q4",
+            "parentLayerId": -1,
+            "defaultVisibility": true,
+            "subLayerIds": null,
+            "minScale": 36978596,
+            "maxScale": 0,
+            "type": "Feature Layer",
+            "geometryType": "esriGeometryPoint"
+        }
+    ],
+    "tables": []
+}

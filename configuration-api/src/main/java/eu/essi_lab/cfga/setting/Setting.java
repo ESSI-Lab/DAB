@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.setting;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,6 +21,7 @@ package eu.essi_lab.cfga.setting;
  * #L%
  */
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
@@ -34,6 +35,7 @@ import org.json.JSONObject;
 
 import eu.essi_lab.cfga.Configurable;
 import eu.essi_lab.cfga.Selectable;
+import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.setting.scheduling.Scheduling;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.LabeledEnum;
@@ -43,6 +45,43 @@ import eu.essi_lab.lib.utils.StreamUtils;
  * @author Fabrizio
  */
 public class Setting extends AbstractSetting implements Selectable<Setting> {
+
+    /**
+     * 
+     */
+    public static Property<String> IDENTIFIER = Property.of("Identifier", "settingId", true, Optional.empty()); //
+
+    /**
+     * 
+     */
+    public static Property<String> NAME = Property.of("Name", "settingName", true, Optional.empty());//
+
+    /**
+     * 
+     */
+    public static Property<SelectionMode> SELECTION_MODE = Property.of("SelectionMode", "selectionMode", true,
+	    Optional.of(SelectionMode.UNSET));//
+
+    /**
+     * 
+     */
+    public static Property<AfterCleanFunction> AFTER_CLEAN_FUNCTION = Property.of("AfterCleanFunction", "afterCleanFunction", false,
+	    Optional.empty());//
+
+    /**
+     * 
+     */
+    public static Property<Boolean> SELECTED = Property.of("Selected", "selected", true, Optional.of(false)); //
+
+    /**
+     * 
+     */
+    public static Property<String> CONFIGURABLE_TYPE = Property.of("ConfigurableType", "configurableType", false, Optional.empty());//
+
+    /**
+     * 
+     */
+    public static Property<Class<? extends Setting>> SETTING_CLASS = Property.of("SettingClass", "settingClass", true, Optional.empty());//
 
     /**
      * 
@@ -163,7 +202,7 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
 
 		Class<?> clazz = Class.forName(getObject().getString("afterCleanFunction"));
 
-		return Optional.of((T) clazz.newInstance());
+		return Optional.of((T) clazz.getDeclaredConstructor().newInstance());
 
 	    } catch (Exception e) {
 		GSLoggerFactory.getLogger(getClass()).warn(e.getMessage(), e);
@@ -215,6 +254,8 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
     }
 
     /**
+     * Default: false
+     * 
      * @return
      */
     public boolean isSelected() {
@@ -405,7 +446,7 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
 
 	//
 	// this setting can be a Setting subclass instance and
-	// since the Configurable interface is parameterized,
+	// since the Configurable interface is parameterised,
 	// the Configurable.configure method must take as argument
 	// an instance of the correct generic type
 	//
@@ -470,6 +511,174 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
 	}
     }
 
+    /**
+     * Verifies if this setting is similar to <code>other</code>.<br>
+     * Two settings are similar if:
+     * <ol>
+     * <li>they have the same {@link #getSettingClass()}</li>
+     * <li>the related {@link #getObject()}s have exactly the same keys, except the keys included in
+     * <code>exclusions</code> and for each key, they must have the same type of value (e.g: Integer, Double, String,
+     * JSONObject, ...) )</li>
+     * <li>all the options of this setting are similar to the options of <code>other</code> setting, according to the
+     * {@link Option#similar(Option)} method</li>
+     * <li>the above statements are recursively valid for the sub-settings of this and <code>other</code> setting</li>
+     * </ol>
+     * 
+     * @param other
+     * @param exclusions the {@link #getObject()} keys to exclude from the check.<br>
+     *        The following properties cannot be excluded, and if the related identifiers are provided, they are
+     *        ignored:
+     *        <ul>
+     *        <li>{@link #IDENTIFIER}</li>
+     *        <li>{@link Setting#SETTING_CLASS}</li>
+     *        <li>{@link Setting#OBJECT_TYPE}</li>
+     *        </ul>
+     * @return
+     */
+    public boolean similar(Setting other, List<String> exclusions) {
+
+	// they must have the same setting class
+	if (!this.getSettingClass().equals(other.getSettingClass())) {
+
+	    return false;
+	}
+
+	List<String> thisKeys = keys().//
+		stream().//
+		// excludes the keys which are identifiers of settings and options
+		// they are check later, and excludes the selection key
+		filter(k -> getSetting(k).isEmpty() && getOption(k).isEmpty()).//
+		// excludes the exclusions keys
+		filter(k -> !exclusions.contains(k)).//
+		sorted().//
+		collect(Collectors.toList());
+
+	List<String> otherKeys = other.keys().//
+		stream().//
+		// excludes the keys which are identifiers of settings and options
+		// they are check later, and excludes the selection key
+		filter(k -> other.getSetting(k).isEmpty() && other.getOption(k).isEmpty()).//
+		// excludes the exclusions properties
+		filter(k -> !exclusions.contains(k)).//
+		sorted().//
+		collect(Collectors.toList());
+
+	// they must have the same keys
+	if (thisKeys.equals(otherKeys)) {
+
+	    // each key value class must be exactly the same
+	    for (String key : thisKeys) {
+
+		Class<?> thisValueClass = this.getObject().get(key).getClass();
+		Class<?> otherValueClass = other.getObject().get(key).getClass();
+
+		if (!thisValueClass.equals(otherValueClass)) {
+
+		    return false;
+		}
+	    }
+
+	    List<String> thisOptionsKeys = this.getOptions().//
+		    stream().//
+		    map(o -> o.getKey()).//
+		    sorted().//
+		    collect(Collectors.toList());
+
+	    List<String> otherOptionsKeys = other.getOptions().//
+		    stream().//
+		    map(o -> o.getKey()).//
+		    sorted().//
+		    collect(Collectors.toList());
+
+	    // they must have the same options keys
+	    if (thisOptionsKeys.equals(otherOptionsKeys)) {
+
+		// all the options must be similar
+		for (String key : thisOptionsKeys) {
+
+		    if (!this.getOption(key).get().similar(other.getOption(key).get())) {
+
+			return false;
+		    }
+		}
+	    } else {
+		return false;
+	    }
+	} else {
+	    return false;
+	}
+
+	List<String> thisSettingsKeys = getSettings().//
+		stream().//
+		map(s -> s.getIdentifier()).//
+		sorted().//
+		collect(Collectors.toList());
+
+	List<String> otherSettingsKeys = other.getSettings().//
+		stream().//
+		map(s -> s.getIdentifier()).//
+		sorted().//
+		collect(Collectors.toList());
+
+	// they must have the same settings keys
+	if (thisSettingsKeys.equals(otherSettingsKeys)) {
+
+	    // recursive call
+	    for (String settingKey : thisSettingsKeys) {
+
+		if (!this.getSetting(settingKey).get().similar(other.getSetting(settingKey).get(), exclusions)) {
+
+		    return false;
+		}
+	    }
+	} else {
+	    return false;
+	}
+
+	return true;
+    }
+
+    /**
+     * Verifies if this setting is similar to <code>other</code>.<br>
+     * Two settings are similar if:
+     * <ol>
+     * <li>they have the same {@link #getSettingClass()}</li>
+     * <li>the related {@link #getObject()}s have exactly the same keys</li>
+     * <li>all the options of this setting are similar to the options of <code>other</code> setting, according to the
+     * {@link Option#similar(Option)} method</li>
+     * <li>the above statements are recursively valid for the sub-settings of this and <code>other</code> setting</li>
+     * </ol>
+     * 
+     * @param setting
+     * @return
+     */
+    public boolean similar(Setting other) {
+
+	return similar(other, Arrays.asList());
+    }
+
+    /**
+     * 
+     */
+    public final List<Property<?>> getProperties() {
+
+	List<Property<?>> properties = super.getProperties();
+
+	properties.addAll(//
+
+		Arrays.asList(//
+			IDENTIFIER, //
+			NAME, //
+			SELECTION_MODE, //
+			AFTER_CLEAN_FUNCTION, //
+			SELECTED, //
+			CONFIGURABLE_TYPE, //
+			SETTING_CLASS//
+		));
+
+	return properties;
+    }
+
     @Override
     protected void propagateEnabled(boolean value) {
 
@@ -482,12 +691,12 @@ public class Setting extends AbstractSetting implements Selectable<Setting> {
      */
     private void propagateEnabled(Setting setting, boolean value) {
 
-	if(!setting.canBeDisabled() && !value){
+	if (!setting.canBeDisabled() && !value) {
 	    return;
 	}
-	
+
 	setting.getObject().put("enabled", value);
-	
+
 	setting.getOptions().forEach(o -> {
 
 	    if (!o.canBeDisabled() && !value) {

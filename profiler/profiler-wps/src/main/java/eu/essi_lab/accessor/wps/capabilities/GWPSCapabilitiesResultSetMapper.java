@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wps.capabilities;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,10 +29,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.geotools.geometry.jts.JTS;
+import org.locationtech.jts.geom.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 import eu.essi_lab.access.compliance.DataComplianceLevel;
 import eu.essi_lab.access.compliance.DataComplianceReport;

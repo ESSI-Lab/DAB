@@ -4,7 +4,7 @@ package eu.essi_lab.messages;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,14 +21,13 @@ package eu.essi_lab.messages;
  * #L%
  */
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Optional;
 import java.util.Properties;
-import java.util.Set;
 
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.lib.utils.PropertiesUtils;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.resource.ResourceProperty;
 
@@ -39,12 +38,24 @@ import eu.essi_lab.model.resource.ResourceProperty;
  */
 public class HarvestingProperties extends Properties {
 
-    private static final long serialVersionUID = 1L;
+    /**
+    * 
+    */
+    private static final long serialVersionUID = 8995192992040560943L;
     private static final String RESOURCES_COUNT_KEY = "resourcesCount";
     private static final String HARVESTING_COUNT_KEY = "harvestingCount";
     private static final String END_TIME_STAMP_KEY = "endTimeStamp";
     private static final String START_TIME_STAMP_KEY = "startTimeStamp";
     private static final String RECOVERY_RESUMPTION_TOKEN_KEY = "recoveryResumptionToken";
+    private static final String COMPLETED_KEY = "completed";
+
+    /**
+     * 
+     */
+    public HarvestingProperties() {
+
+	setHarvestingCount(0);
+    }
 
     /**
      * @return
@@ -61,16 +72,7 @@ public class HarvestingProperties extends Properties {
      */
     public static HarvestingProperties fromStream(InputStream stream) throws IOException {
 
-	Properties properties = new Properties();
-	properties.load(stream);
-
-	Set<String> keys = properties.stringPropertyNames();
-	HarvestingProperties harvestingProperties = new HarvestingProperties();
-	for (String key : keys) {
-	    harvestingProperties.setProperty(key, properties.getProperty(key));
-	}
-
-	return harvestingProperties;
+	return PropertiesUtils.fromStream(stream, HarvestingProperties.class);
     }
 
     /**
@@ -79,10 +81,7 @@ public class HarvestingProperties extends Properties {
      */
     public InputStream asStream() throws IOException {
 
-	ByteArrayOutputStream out = new ByteArrayOutputStream();
-	store(out, "");
-
-	return new ByteArrayInputStream(out.toByteArray());
+	return PropertiesUtils.asStream(this);
     }
 
     /**
@@ -115,16 +114,21 @@ public class HarvestingProperties extends Properties {
     }
 
     /**
+     *  
+     */
+    public void incrementHarvestingCount() {
+
+	int count = getHarvestingCount();
+
+	setProperty(HARVESTING_COUNT_KEY, String.valueOf(count + 1));
+    }
+
+    /**
      * Get how many times the related {@link GSSource} has been harvested
      */
     public int getHarvestingCount() {
 
-	String property = getProperty(HARVESTING_COUNT_KEY);
-	if (property == null) {
-	    return -1;
-	}
-
-	return Integer.valueOf(property);
+	return Integer.valueOf(getProperty(HARVESTING_COUNT_KEY));
     }
 
     /**
@@ -193,4 +197,35 @@ public class HarvestingProperties extends Properties {
 
 	return getProperty(ResourceProperty.RECOVERY_REMOVAL_TOKEN.getName());
     }
+
+    /**
+     * @param completed
+     */
+    public void setCompleted(boolean completed) {
+
+	setProperty(COMPLETED_KEY, String.valueOf(completed));
+    }
+
+    /**
+     * @param isRecovering
+     * @return
+     */
+    public boolean isResumed(boolean isRecovering) {
+
+	return !isCompleted().orElse(true) && !isRecovering;
+    }
+
+    /**
+     * @return
+     */
+    public Optional<Boolean> isCompleted() {
+
+	String property = getProperty(COMPLETED_KEY);
+	if (property == null) {
+	    return Optional.empty();
+	}
+
+	return Optional.of(Boolean.valueOf(property));
+    }
+
 }

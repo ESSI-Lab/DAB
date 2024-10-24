@@ -4,7 +4,7 @@ package eu.essi_lab.iso.datamodel.classes;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -83,7 +83,8 @@ public class Address extends ISOMetadata<CIAddressType> {
      */
 
     public String getDeliveryPoint() {
-	if (type.isSetDeliveryPoint() && !type.getDeliveryPoint().isEmpty() && type.getDeliveryPoint().get(0).isSetCharacterString()) {
+	if (type.isSetDeliveryPoint() && type.getDeliveryPoint() != null && !type.getDeliveryPoint().isEmpty()
+		&& type.getDeliveryPoint().get(0) != null && type.getDeliveryPoint().get(0).isSetCharacterString()) {
 	    return getStringFromCharacterString(type.getDeliveryPoint().get(0));
 	}
 	return null;

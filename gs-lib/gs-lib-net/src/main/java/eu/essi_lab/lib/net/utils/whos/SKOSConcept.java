@@ -4,7 +4,7 @@ package eu.essi_lab.lib.net.utils.whos;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,15 +22,15 @@ package eu.essi_lab.lib.net.utils.whos;
  */
 
 import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+
 
 public class SKOSConcept {
 
     private SimpleEntry<String, String> preferredLabel;
     private SimpleEntry<String, String> definition;
-    private List<SimpleEntry<String, String>> alternateLabels = new ArrayList<>();
-    private List<String> closeMatches = new ArrayList<>();
+    private HashSet<SimpleEntry<String, String>> alternateLabels = new java.util.HashSet();
+    private HashSet<String> closeMatches = new HashSet<>();
 
     private String uri;
 
@@ -54,19 +54,19 @@ public class SKOSConcept {
 	this.preferredLabel = preferredLabel;
     }
 
-    public List<SimpleEntry<String, String>> getAlternateLabels() {
+    public HashSet<SimpleEntry<String, String>> getAlternateLabels() {
 	return alternateLabels;
     }
 
-    public void setAlternateLabels(List<SimpleEntry<String, String>> alternateLabels) {
+    public void setAlternateLabels(HashSet<SimpleEntry<String, String>> alternateLabels) {
 	this.alternateLabels = alternateLabels;
     }
 
-    public List<String> getCloseMatches() {
+    public HashSet<String> getCloseMatches() {
 	return closeMatches;
     }
 
-    public void setCloseMatches(List<String> closeMatches) {
+    public void setCloseMatches(HashSet<String> closeMatches) {
 	this.closeMatches = closeMatches;
     }
 

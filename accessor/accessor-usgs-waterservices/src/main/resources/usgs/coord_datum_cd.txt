@@ -1,0 +1,21 @@
+#
+# National Water Information System
+# 2018/03/05
+#
+#
+# Date Retrieved: USGS Water Data for the Nation Help System
+#
+gw_ref_cd	gw_ref_ds
+10s	48s
+NAD27	North American Datum of 1927
+NAD83	North American Datum of 1983
+OLDAK	Old Alaska (Mainland) and Aleutian Island Datum
+OLDAK	Old Alaska (Mainland) and Aleutian Islands Datum
+OLDGUAM	Old Guam Datum
+OLDHI	Old Hawaiian Datum
+OLDPR	Old Puerto Rico and Virgin Island Datum
+OLDPR	Old Puerto Rico and Virgin Islands Datum
+OLDSAMOA	Old American Samoa Datum
+PUERTORICO	Puerto Rico & Virgin Islands
+WGS72	World Datum 1972
+WGS84	World Datum 1984

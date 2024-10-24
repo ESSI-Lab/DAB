@@ -1,0 +1,47 @@
+<PolicySet
+	xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 https://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd"
+
+	PolicySetId="policySet3" 
+	Version="1.0"
+	PolicyCombiningAlgId="urn:oasis:names:tc:xacml:3.0:policy-combining-algorithm:deny-overrides">
+
+	<Target></Target>
+
+	<Policy 
+		PolicyId="testPolicy3" 
+		Version="1.0"
+		RuleCombiningAlgId="urn:oasis:names:tc:xacml:3.0:rule-combining-algorithm:deny-overrides">
+
+		<Target />
+		<Rule 
+			RuleId="testRule3"
+			Effect="Permit">
+			
+			<Target>
+
+				<AnyOf>
+					<AllOf>
+						<Match
+							MatchId="urn:oasis:names:tc:xacml:1.0:function:integer-greater-than-or-equal">
+
+							<AttributeValue
+								DataType="http://www.w3.org/2001/XMLSchema#integer">35</AttributeValue>
+
+							<AttributeDesignator 
+							    Issuer="test3"
+								MustBePresent="false"
+								Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+								AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id"
+								DataType="http://www.w3.org/2001/XMLSchema#integer" />
+
+						</Match>
+					</AllOf>
+				</AnyOf>
+			</Target>
+		</Rule>
+	</Policy>
+
+</PolicySet>
+

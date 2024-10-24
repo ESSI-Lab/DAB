@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns:os="http://a9.com/-/spec/opensearch/1.1/" xmlns:georss="http://www.georss.org/georss" xmlns="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/terms/" xmlns:echo="http://www.echo.nasa.gov/esip" xmlns:esipdiscovery="http://commons.esipfed.org/ns/discovery/1.2/" xmlns:gml="http://www.opengis.net/gml" xmlns:time="http://a9.com/-/opensearch/extensions/time/1.0/" xmlns:eo="http://a9.com/-/opensearch/extensions/eo/1.0/" esipdiscovery:version="1.2">
+    <updated>2018-05-22T14:58:52.543Z</updated>
+    <id>https://cmr.earthdata.nasa.gov/opensearch/collections.atom</id>
+    <author>
+        <name>CMR</name>
+        <email>echodev@echo.nasa.gov</email>
+    </author>
+    <title type="text">ECHO dataset metadata</title>
+    <subtitle type="text">Search parameters: uid =&gt; C1481-GHRC</subtitle>
+    <link href="https://cmr.earthdata.nasa.gov/opensearch/granules/descriptor_document.xml" hreflang="en-US" type="application/opensearchdescription+xml" rel="search"/>
+    <link href="http://cmr.earthdata.nasa.gov/opensearch/collections.atom?uid=C1481-GHRC&amp;" hreflang="en-US" type="application/atom+xml" rel="self"/>
+    <link href="http://cmr.earthdata.nasa.gov/opensearch/collections.atom?uid=C1481-GHRC&amp;cursor=1" hreflang="en-US" type="application/atom+xml" rel="last"/>
+    <link href="http://cmr.earthdata.nasa.gov/opensearch/collections.atom?uid=C1481-GHRC&amp;cursor=1" hreflang="en-US" type="application/atom+xml" rel="first"/>
+    <link href="https://wiki.earthdata.nasa.gov/display/echo/Open+Search+API+release+information" hreflang="en-US" type="text/html" rel="describedBy" title="Release Notes"/>
+    <os:Query xmlns:geo="http://a9.com/-/opensearch/extensions/geo/1.0/" role="request" geo:uid="C1481-GHRC"/>
+    <os:totalResults>1</os:totalResults>
+    <os:itemsPerPage>10</os:itemsPerPage>
+    <os:startIndex>1</os:startIndex>
+    <entry>
+        <id>https://cmr.earthdata.nasa.gov/opensearch/collections.atom?uid=C1481-GHRC</id>
+        <author>
+            <name>CMR</name>
+            <email>echodev@echo.nasa.gov</email>
+        </author>
+        <title type="text">CAMEX-4 MIPS 915 MHZ DOPPLER WIND PROFILER V1</title>
+        <summary type="text">The CAMEX-4 MIPS 915 MHZ Doppler Wind Profiler dataset was collected by the University of Alabama in Huntsville (UAH) Mobile Integrated Profiling System (MIPS), which is a mobile atmospheric profiling system. It includes a 915 MHz Doppler profiler, lidar ceilometer, 12 channel microwave profiling radiometer, Doppler Sodar, Radio Acoustic Sounding System (RASS), Field Mills, and surface observing station. This dataset contains 15 minute averaged 3-D wind profiles. Additionally, radial velocity and backscatter intensity data are contained in the dataset.</summary>
+        <updated>2017-10-02T12:06:19.000Z</updated>
+        <link rel="enclosure" hreflang="en-US" href="https://ghrc.nsstc.nasa.gov/pub/fieldCampaigns/camex4/MIPS_Wind_Profiler/data/"/>
+        <link rel="icon" hreflang="en-US" href="https://ghrc.nsstc.nasa.gov/pub/fieldCampaigns/camex4/MIPS_Wind_Profiler/browse/915_01217_snrs.jpg" type="image/jpeg"/>
+        <link rel="icon" hreflang="en-US" href="https://ghrc.nsstc.nasa.gov/pub/fieldCampaigns/camex4/MIPS_Wind_Profiler/browse/915_01217_snrs.jpg" type="image/jpeg"/>
+        <link rel="icon" hreflang="en-US" href="https://ghrc.nsstc.nasa.gov/pub/fieldCampaigns/camex4/MIPS_Wind_Profiler/browse/915_01217_vels.jpg" type="image/jpeg"/>
+        <link rel="icon" hreflang="en-US" href="https://ghrc.nsstc.nasa.gov/pub/fieldCampaigns/camex4/MIPS_Wind_Profiler/browse/915_01217_wnds.jpg" type="image/jpeg"/>
+        <link rel="describedBy" hreflang="en-US" href="https://ghrc.nsstc.nasa.gov/pub/fieldCampaigns/camex4/MIPS_Wind_Profiler/browse/"/>
+        <link rel="describedBy" hreflang="en-US" href="http://ghrc.nsstc.nasa.gov/uso/ds_docs/camex4/c4gmipwp/c4gmipwp_dataset.html" type="text/html"/>
+        <link rel="describedBy" hreflang="en-US" href="https://ghrc.nsstc.nasa.gov/pub/doc/camex4/c4gmipwp/UAHCAMEX.DOC"/>
+        <link rel="describedBy" hreflang="en-US" href="https://ghrc.nsstc.nasa.gov/pub/doc/camex4/c4gmipwp/mips.pdf" type="application/pdf"/>
+        <link rel="describedBy" hreflang="en-US" href="https://ghrc.nsstc.nasa.gov/pub/doc/camex4/c4gmipwp/Profiler_software.pdf" type="application/pdf"/>
+        <link rel="via" hreflang="en-US" href="http://dx.doi.org/10.5067/CAMEX-4/PROFILER/DATA201"/>
+        <link rel="via" hreflang="en-US" href="https://ghrc.nsstc.nasa.gov/home/field-campaigns/camex4"/>
+        <link rel="describedBy" hreflang="en-US" href="https://ghrc.nsstc.nasa.gov/home/about-ghrc/citing-ghrc-daac-data"/>
+        <link href="http://cwic.wgiss.ceos.org/opensearch/datasets/C1481-GHRC/osdd.xml?clientId=" hreflang="en-US" type="application/opensearchdescription+xml" rel="search" title="CWIC Granule Open Search Descriptor Document"/>
+        <link href="https://cmr.earthdata.nasa.gov/search/concepts/C1481-GHRC.xml" hreflang="en-US" type="application/xml" rel="via" title="Product metadata"/>
+        <dc:identifier>C1481-GHRC</dc:identifier>
+        <dc:date>2001-08-01T00:00:00.000Z/2001-09-14T23:59:00.000Z</dc:date>
+        <echo:datasetId>CAMEX-4 MIPS 915 MHZ DOPPLER WIND PROFILER V1</echo:datasetId>
+        <echo:shortName>c4gmipwp</echo:shortName>
+        <echo:versionId>1</echo:versionId>
+        <echo:dataCenter>GHRC</echo:dataCenter>
+        <echo:archiveCenter>NASA/MSFC/GHRC</echo:archiveCenter>
+        <echo:organization>NASA/MSFC/GHRC</echo:organization>
+        <echo:organization>Global Hydrology Resource Center, Marshall Space Flight Center, NASA</echo:organization>
+        <echo:processingLevelId>2</echo:processingLevelId>
+        <echo:coordinateSystem>CARTESIAN</echo:coordinateSystem>
+        <echo:orbitParameters/>
+        <georss:box>24.6 -81.7 24.8 -81.5</georss:box>
+        <echo:hasVariables>false</echo:hasVariables>
+        <echo:hasFormats>false</echo:hasFormats>
+        <echo:hasTransforms>false</echo:hasTransforms>
+        <echo:hasSpatialSubsetting>false</echo:hasSpatialSubsetting>
+        <echo:tag>
+            <echo:tagKey>org.ceos.wgiss.cwic.granules.prod</echo:tagKey>
+        </echo:tag>
+        <echo:tag>
+            <echo:tagKey>org.ceos.wgiss.cwic.granules.provider</echo:tagKey>
+            <echo:data>"NASA"</echo:data>
+        </echo:tag>
+        <echo:tag>
+            <echo:tagKey>org.ceos.wgiss.cwic.granules.native_id</echo:tagKey>
+            <echo:data>"CAMEX-4 MIPS 915 MHZ DOPPLER WIND PROFILER V1"</echo:data>
+        </echo:tag>
+        <echo:tag>
+            <echo:tagKey>org.geoss.geoss_data-core</echo:tagKey>
+        </echo:tag>
+        <echo:tag>
+            <echo:tagKey>gov.nasa.eosdis</echo:tagKey>
+        </echo:tag>
+        <echo:is_geoss>true</echo:is_geoss>
+        <echo:is_eosdis>true</echo:is_eosdis>
+    </entry>
+</feed>

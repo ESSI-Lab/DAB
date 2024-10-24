@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.health.methods;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,7 +30,7 @@ import java.util.UUID;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.gssrv.health.GSPingMethod;
-import eu.essi_lab.gssrv.health.db.HCDBStorageURI;
+import eu.essi_lab.gssrv.health.db.HCStorageInfo;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.ResultSet;
@@ -71,6 +71,7 @@ public class DiscoveryMethod implements GSPingMethod {
 	case MIXED:
 	case FRONTEND:
 	case ACCESS:
+	case INTENSIVE:
 	default:
 	    return true;
 	}
@@ -123,7 +124,7 @@ public class DiscoveryMethod implements GSPingMethod {
 
 	message.setPage(page);
 
-	message.setDataBaseURI(new HCDBStorageURI());
+	message.setDataBaseURI(new HCStorageInfo());
 
 	return message;
     }

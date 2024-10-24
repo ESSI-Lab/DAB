@@ -1,0 +1,616 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gs:Dataset xmlns:gco="http://www.isotc211.org/2005/gco"
+	xmlns:gmd="http://www.isotc211.org/2005/gmd"
+	xmlns:gmi="http://www.isotc211.org/2005/gmi"
+	xmlns:gml="http://www.opengis.net/gml"
+	xmlns:gmx="http://www.isotc211.org/2005/gmx"
+	xmlns:gs="http://flora.eu/gi-suite/1.0/dataModel/schema"
+	xmlns:gts="http://www.isotc211.org/2005/gts"
+	xmlns:srv="http://www.isotc211.org/2005/srv"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<gs:source gs:orderingDirection="ASCENDING"
+		gs:resultsPriority="UNSET" gs:strategy="HARVESTED"
+		gs:uniqueIdentifier="brazil-inmet">
+		<gs:endpoint>https://apitempo.inmet.gov.br/BNDMET/</gs:endpoint>
+		<gs:label>National Metereology Institute of Brazil</gs:label>
+	</gs:source>
+	<gs:harmonizedMetadata>
+		<gs:coreMetadata>
+			<gs:isoMetadata>
+				<gmi:MI_Metadata>
+					<gmd:fileIdentifier>
+						<gco:CharacterString>6d6b470d-3d01-4f58-a5c0-b27c1bbbe0ef
+						</gco:CharacterString>
+					</gmd:fileIdentifier>
+					<gmd:language>
+						<gco:CharacterString>Portuguese</gco:CharacterString>
+					</gmd:language>
+					<gmd:characterSet>
+						<gmd:MD_CharacterSetCode
+							codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CharacterSetCode"
+							codeListValue="utf8" codeSpace="ISOTC211/19115">utf8</gmd:MD_CharacterSetCode>
+					</gmd:characterSet>
+					<gmd:hierarchyLevel>
+						<gmd:MD_ScopeCode
+							codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_ScopeCode"
+							codeListValue="dataset" codeSpace="ISOTC211/19115">dataset</gmd:MD_ScopeCode>
+					</gmd:hierarchyLevel>
+					<gmd:spatialRepresentationInfo>
+						<gmd:AbstractMD_SpatialRepresentation
+							xsi:type="gmd:MD_GridSpatialRepresentation_Type">
+							<gmd:numberOfDimensions>
+								<gco:Integer>1</gco:Integer>
+							</gmd:numberOfDimensions>
+							<gmd:axisDimensionProperties>
+								<gmd:MD_Dimension>
+									<gmd:dimensionName>
+										<gmd:MD_DimensionNameTypeCode
+											codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_DimensionNameTypeCode"
+											codeListValue="time" codeSpace="ISOTC211/19115">time
+										</gmd:MD_DimensionNameTypeCode>
+									</gmd:dimensionName>
+								</gmd:MD_Dimension>
+							</gmd:axisDimensionProperties>
+							<gmd:cellGeometry>
+								<gmd:MD_CellGeometryCode
+									codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CellGeometryCode"
+									codeListValue="point" codeSpace="ISOTC211/19115">point</gmd:MD_CellGeometryCode>
+							</gmd:cellGeometry>
+						</gmd:AbstractMD_SpatialRepresentation>
+					</gmd:spatialRepresentationInfo>
+					<gmd:referenceSystemInfo>
+						<gmd:MD_ReferenceSystem>
+							<gmd:referenceSystemIdentifier>
+								<gmd:RS_Identifier>
+									<gmd:code>
+										<gco:CharacterString>4326</gco:CharacterString>
+									</gmd:code>
+									<gmd:codeSpace>
+										<gco:CharacterString>EPSG</gco:CharacterString>
+									</gmd:codeSpace>
+								</gmd:RS_Identifier>
+							</gmd:referenceSystemIdentifier>
+						</gmd:MD_ReferenceSystem>
+					</gmd:referenceSystemInfo>
+					<gmd:identificationInfo>
+						<gmd:MD_DataIdentification>
+							<gmd:citation>
+								<gmd:CI_Citation>
+									<gmd:title>
+										<gco:CharacterString>ALFREDO CHAVES - PRESSAO ATMOSFERICA,
+											MEDIA MENSAL (AUT)
+										</gco:CharacterString>
+									</gmd:title>
+									<gmd:alternateTitle>
+										<gco:CharacterString>PRESSAO ATMOSFERICA, MEDIA MENSAL (AUT)
+											Dado Calculado (Media Mensal)
+										</gco:CharacterString>
+									</gmd:alternateTitle>
+									<gmd:identifier>
+										<gmd:MD_Identifier>
+											<gmd:code>
+												<gco:CharacterString>parameter;I219;platform;A615
+												</gco:CharacterString>
+											</gmd:code>
+										</gmd:MD_Identifier>
+									</gmd:identifier>
+								</gmd:CI_Citation>
+							</gmd:citation>
+							<gmd:abstract>
+								<gco:CharacterString>Acquisition made at station: ALFREDO CHAVES
+									Measurement: PRESSAO ATMOSFERICA, MEDIA MENSAL (AUT)
+									Measurement type: Dado Calculado (Media Mensal)
+								</gco:CharacterString>
+							</gmd:abstract>
+							<gmd:pointOfContact>
+								<gmd:CI_ResponsibleParty>
+									<gmd:organisationName>
+										<gco:CharacterString>INMET</gco:CharacterString>
+									</gmd:organisationName>
+									<gmd:contactInfo>
+										<gmd:CI_Contact>
+											<gmd:phone>
+												<gmd:CI_Telephone>
+													<gmd:voice>
+														<gco:CharacterString>+(61) 2102-4602</gco:CharacterString>
+													</gmd:voice>
+												</gmd:CI_Telephone>
+											</gmd:phone>
+											<gmd:address>
+												<gmd:CI_Address>
+													<gmd:deliveryPoint>
+														<gco:CharacterString>INMET - Instituto Nacional de
+															Meteorologia | Eixo Monumental Sul Via S1 - Sudoeste
+														</gco:CharacterString>
+													</gmd:deliveryPoint>
+													<gmd:city>
+														<gco:CharacterString>Brasília</gco:CharacterString>
+													</gmd:city>
+													<gmd:administrativeArea>
+														<gco:CharacterString>DF</gco:CharacterString>
+													</gmd:administrativeArea>
+													<gmd:postalCode>
+														<gco:CharacterString>70680-900</gco:CharacterString>
+													</gmd:postalCode>
+													<gmd:country>
+														<gco:CharacterString>Brazil</gco:CharacterString>
+													</gmd:country>
+													<gmd:electronicMailAddress>
+														<gco:CharacterString>diretor.inmet@inmet.gov.br
+														</gco:CharacterString>
+													</gmd:electronicMailAddress>
+												</gmd:CI_Address>
+											</gmd:address>
+											<gmd:onlineResource>
+												<gmd:CI_OnlineResource>
+													<gmd:linkage>
+														<gmd:URL>http://www.inmet.gov.br/</gmd:URL>
+													</gmd:linkage>
+												</gmd:CI_OnlineResource>
+											</gmd:onlineResource>
+										</gmd:CI_Contact>
+									</gmd:contactInfo>
+									<gmd:role>
+										<gmd:CI_RoleCode
+											codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_RoleCode"
+											codeListValue="publisher" codeSpace="ISOTC211/19115">publisher
+										</gmd:CI_RoleCode>
+									</gmd:role>
+								</gmd:CI_ResponsibleParty>
+							</gmd:pointOfContact>
+							<gmd:descriptiveKeywords>
+								<gmd:MD_Keywords>
+									<gmd:keyword>
+										<gco:CharacterString>Automatica</gco:CharacterString>
+									</gmd:keyword>
+									<gmd:keyword>
+										<gco:CharacterString>Operante</gco:CharacterString>
+									</gmd:keyword>
+								</gmd:MD_Keywords>
+							</gmd:descriptiveKeywords>
+							<gmd:descriptiveKeywords>
+								<gmd:MD_Keywords>
+									<gmd:keyword>
+										<gco:CharacterString> 06</gco:CharacterString>
+									</gmd:keyword>
+									<gmd:type>
+										<gmd:MD_KeywordTypeCode
+											codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_KeywordTypeCode"
+											codeListValue="place" codeSpace="ISOTC211/19115">place
+										</gmd:MD_KeywordTypeCode>
+									</gmd:type>
+								</gmd:MD_Keywords>
+							</gmd:descriptiveKeywords>
+							<gmd:descriptiveKeywords>
+								<gmd:MD_Keywords>
+									<gmd:keyword>
+										<gco:CharacterString>ES</gco:CharacterString>
+									</gmd:keyword>
+									<gmd:type>
+										<gmd:MD_KeywordTypeCode
+											codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_KeywordTypeCode"
+											codeListValue="place" codeSpace="ISOTC211/19115">place
+										</gmd:MD_KeywordTypeCode>
+									</gmd:type>
+								</gmd:MD_Keywords>
+							</gmd:descriptiveKeywords>
+							<gmd:descriptiveKeywords>
+								<gmd:MD_Keywords>
+									<gmd:keyword>
+										<gco:CharacterString>mB</gco:CharacterString>
+									</gmd:keyword>
+								</gmd:MD_Keywords>
+							</gmd:descriptiveKeywords>
+							<gmd:descriptiveKeywords>
+								<gmd:MD_Keywords>
+									<gmd:keyword>
+										<gco:CharacterString>mB</gco:CharacterString>
+									</gmd:keyword>
+								</gmd:MD_Keywords>
+							</gmd:descriptiveKeywords>
+
+							<gmd:topicCategory>
+								<gmd:MD_TopicCategoryCode>inlandWaters</gmd:MD_TopicCategoryCode>
+							</gmd:topicCategory>
+							
+							<gmd:extent>
+								<gmd:EX_Extent>
+									<gmd:description>
+										<gco:CharacterString />
+									</gmd:description>
+									<gmd:geographicElement>
+										<gmd:EX_GeographicBoundingBox>
+											<gmd:westBoundLongitude>
+												<gco:Decimal>-40.741818</gco:Decimal>
+											</gmd:westBoundLongitude>
+											<gmd:eastBoundLongitude>
+												<gco:Decimal>-40.741818</gco:Decimal>
+											</gmd:eastBoundLongitude>
+											<gmd:southBoundLatitude>
+												<gco:Decimal>-20.636526</gco:Decimal>
+											</gmd:southBoundLatitude>
+											<gmd:northBoundLatitude>
+												<gco:Decimal>-20.636526</gco:Decimal>
+											</gmd:northBoundLatitude>
+										</gmd:EX_GeographicBoundingBox>
+									</gmd:geographicElement>
+								</gmd:EX_Extent>
+							</gmd:extent>
+							<gmd:extent>
+								<gmd:EX_Extent>
+									<gmd:verticalElement>
+										<gmd:EX_VerticalExtent>
+											<gmd:minimumValue>
+												<gco:Real>14.19</gco:Real>
+											</gmd:minimumValue>
+											<gmd:maximumValue>
+												<gco:Real>14.19</gco:Real>
+											</gmd:maximumValue>
+											<gmd:verticalCRS>
+												<gml:VerticalCRS />
+											</gmd:verticalCRS>
+										</gmd:EX_VerticalExtent>
+									</gmd:verticalElement>
+								</gmd:EX_Extent>
+							</gmd:extent>
+							<gmd:extent>
+								<gmd:EX_Extent>
+									<gmd:temporalElement>
+										<gmd:EX_TemporalExtent>
+											<gmd:extent>
+												<gml:TimePeriod>
+													<gml:beginPosition>2006-11-03T00:00:00Z</gml:beginPosition>
+													<gml:endPosition
+														indeterminatePosition="now" />
+												</gml:TimePeriod>
+											</gmd:extent>
+										</gmd:EX_TemporalExtent>
+									</gmd:temporalElement>
+								</gmd:EX_Extent>
+							</gmd:extent>
+						</gmd:MD_DataIdentification>
+					</gmd:identificationInfo>
+					<gmd:contentInfo>
+						<gmd:MD_CoverageDescription>
+							<gmd:attributeDescription>
+								<gco:RecordType
+									xlink:href="https://portal.inmet.gov.br/manual/manual-bndmet:I219"
+									xlink:title="PRESSAO ATMOSFERICA, MEDIA MENSAL (AUT)">PRESSAO ATMOSFERICA, MEDIA MENSAL (AUT)
+								</gco:RecordType>
+							</gmd:attributeDescription>
+							<gmd:contentType>
+								<gmd:MD_CoverageContentTypeCode
+									codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode"
+									codeListValue="physicalMeasurement" codeSpace="ISOTC211/19115">physicalMeasurement
+								</gmd:MD_CoverageContentTypeCode>
+							</gmd:contentType>
+						</gmd:MD_CoverageDescription>
+					</gmd:contentInfo>
+					<gmd:distributionInfo>
+						<gmd:MD_Distribution>
+							<gmd:distributionFormat>
+								<gmd:MD_Format>
+									<gmd:name>
+										<gco:CharacterString>JSON</gco:CharacterString>
+									</gmd:name>
+								</gmd:MD_Format>
+							</gmd:distributionFormat>
+							<gmd:transferOptions>
+								<gmd:MD_DigitalTransferOptions>
+									<gmd:onLine>
+										<gmd:CI_OnlineResource
+											id="urn:uuid:c32d5478-f08f-4631-bf7f-108e47a7731c">
+											<gmd:linkage>
+												<gmd:URL>https://apitempo.inmet.gov.br/BNDMET/</gmd:URL>
+											</gmd:linkage>
+											<gmd:protocol>
+												<gco:CharacterString>urn:br:gov:inmet:api:bndmet
+												</gco:CharacterString>
+											</gmd:protocol>
+											<gmd:name>
+												<gco:CharacterString>parameter;I219;platform;A615
+												</gco:CharacterString>
+											</gmd:name>
+											<gmd:function>
+												<gmd:CI_OnLineFunctionCode
+													codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_OnLineFunctionCode"
+													codeListValue="download" codeSpace="ISOTC211/19115">download
+												</gmd:CI_OnLineFunctionCode>
+											</gmd:function>
+										</gmd:CI_OnlineResource>
+									</gmd:onLine>
+								</gmd:MD_DigitalTransferOptions>
+							</gmd:transferOptions>
+						</gmd:MD_Distribution>
+					</gmd:distributionInfo>
+					<gmd:dataQualityInfo>
+						<gmd:DQ_DataQuality>
+							<gmd:lineage>
+								<gmd:LI_Lineage>
+									<gmd:statement>
+										<gco:CharacterString>Dado Calculado (Media Mensal)
+										</gco:CharacterString>
+									</gmd:statement>
+								</gmd:LI_Lineage>
+							</gmd:lineage>
+						</gmd:DQ_DataQuality>
+					</gmd:dataQualityInfo>
+					<gmi:acquisitionInformation>
+						<gmi:MI_AcquisitionInformation>
+							<gmi:platform>
+								<gmi:MI_Platform>
+									<gmi:citation>
+										<gmd:CI_Citation>
+											<gmd:title>
+												<gco:CharacterString>ALFREDO CHAVES</gco:CharacterString>
+											</gmd:title>
+										</gmd:CI_Citation>
+									</gmi:citation>
+									<gmi:identifier>
+										<gmd:MD_Identifier>
+											<gmd:code>
+												<gco:CharacterString>urn:wmo:wigos:0-76-0-3200300000000135
+												</gco:CharacterString>
+											</gmd:code>
+										</gmd:MD_Identifier>
+									</gmi:identifier>
+									<gmi:description>
+										<gco:CharacterString>ALFREDO CHAVES ; Automatica ; Operante
+										</gco:CharacterString>
+									</gmi:description>
+								</gmi:MI_Platform>
+							</gmi:platform>
+						</gmi:MI_AcquisitionInformation>
+					</gmi:acquisitionInformation>
+				</gmi:MI_Metadata>
+			</gs:isoMetadata>
+		</gs:coreMetadata>
+		<gs:augmentedMetadata />
+		<gs:extendedMetadata>
+			<gs:extension>
+				<gs:timeInterpolation>AVERAGE</gs:timeInterpolation>
+				<gs:timeUnits>month</gs:timeUnits>
+				<gs:timeUnitsAbbreviation>month</gs:timeUnitsAbbreviation>
+				<gs:timeSupport>1</gs:timeSupport>
+				<gs:attributeUnits>mB</gs:attributeUnits>
+				<gs:attributeUnitsAbbreviation>mB</gs:attributeUnitsAbbreviation>
+				<gs:uniquePlatformId>8E9E39790D47DE57F13E785B8A3A439BB6B25621
+				</gs:uniquePlatformId>
+				<gs:uniqueAttributeId>CDE0D1888442CC690D7F739F543724A2F23A94B1
+				</gs:uniqueAttributeId>
+				<gs:accessReports>
+					<gs:report>
+						<gs:onlineId>urn:uuid:c32d5478-f08f-4631-bf7f-108e47a7731c</gs:onlineId>
+						<gs:timeStamp>2020-05-07T16:36:02Z</gs:timeStamp>
+						<gs:targetComplianceLevel>TS-B</gs:targetComplianceLevel>
+						<gs:targetTest>EXECUTION</gs:targetTest>
+						<gs:lastSucceededTest>EXECUTION</gs:lastSucceededTest>
+						<gs:previewDescriptor>
+							<gs:dataType>TIME_SERIES</gs:dataType>
+							<gs:dataFormat>WATERML_1_1</gs:dataFormat>
+							<gs:CRS>EPSG:4326</gs:CRS>
+							<gs:continueSpatialDimensions>
+								<gs:continueDimension>
+									<gs:name>Latitude</gs:name>
+									<gs:type>column</gs:type>
+									<gs:lower>-20.636526</gs:lower>
+									<gs:upper>-20.636526</gs:upper>
+									<gs:uom>degree</gs:uom>
+									<gs:size>1</gs:size>
+								</gs:continueDimension>
+								<gs:continueDimension>
+									<gs:name>Longitude</gs:name>
+									<gs:type>row</gs:type>
+									<gs:lower>-40.741818</gs:lower>
+									<gs:upper>-40.741818</gs:upper>
+									<gs:uom>degree</gs:uom>
+									<gs:size>1</gs:size>
+								</gs:continueDimension>
+							</gs:continueSpatialDimensions>
+							<gs:continueTemporalDimension>
+								<gs:name>time</gs:name>
+								<gs:type>time</gs:type>
+								<gs:lower>1162512000000</gs:lower>
+								<gs:upper>1223420194659</gs:upper>
+								<gs:uom>millisecond</gs:uom>
+								<gs:datum>1970-01-01T00:00:00Z</gs:datum>
+								<gs:resolution>2678400000</gs:resolution>
+							</gs:continueTemporalDimension>
+							<gs:continueOtherDimensions>
+								<gs:continueDimension>
+									<gs:type>vertical</gs:type>
+									<gs:lower>14.19</gs:lower>
+									<gs:upper>14.19</gs:upper>
+									<gs:uom>metre</gs:uom>
+									<gs:size>1</gs:size>
+								</gs:continueDimension>
+							</gs:continueOtherDimensions>
+						</gs:previewDescriptor>
+						<gs:fullDescriptor>
+							<gs:dataType>TIME_SERIES</gs:dataType>
+							<gs:dataFormat>WATERML_1_1</gs:dataFormat>
+							<gs:CRS>EPSG:4326</gs:CRS>
+							<gs:continueSpatialDimensions>
+								<gs:continueDimension>
+									<gs:name>Latitude</gs:name>
+									<gs:type>column</gs:type>
+									<gs:lower>-20.636526</gs:lower>
+									<gs:upper>-20.636526</gs:upper>
+									<gs:uom>degree</gs:uom>
+									<gs:size>1</gs:size>
+								</gs:continueDimension>
+								<gs:continueDimension>
+									<gs:name>Longitude</gs:name>
+									<gs:type>row</gs:type>
+									<gs:lower>-40.741818</gs:lower>
+									<gs:upper>-40.741818</gs:upper>
+									<gs:uom>degree</gs:uom>
+									<gs:size>1</gs:size>
+								</gs:continueDimension>
+							</gs:continueSpatialDimensions>
+							<gs:continueTemporalDimension>
+								<gs:name>time</gs:name>
+								<gs:type>time</gs:type>
+								<gs:lower>1162512000000</gs:lower>
+								<gs:upper>1588869362614</gs:upper>
+								<gs:uom>millisecond</gs:uom>
+								<gs:datum>1970-01-01T00:00:00Z</gs:datum>
+								<gs:resolution>2678400000</gs:resolution>
+							</gs:continueTemporalDimension>
+							<gs:continueOtherDimensions>
+								<gs:continueDimension>
+									<gs:type>vertical</gs:type>
+									<gs:lower>14.19</gs:lower>
+									<gs:upper>14.19</gs:upper>
+									<gs:uom>metre</gs:uom>
+								</gs:continueDimension>
+							</gs:continueOtherDimensions>
+						</gs:fullDescriptor>
+						<gs:basicTest>
+							<gs:workflowsCount>2</gs:workflowsCount>
+							<gs:workflowsLength>2</gs:workflowsLength>
+						</gs:basicTest>
+						<gs:downloadTest>
+							<gs:downloadable>true</gs:downloadable>
+							<gs:downloadTimeLong>1034</gs:downloadTimeLong>
+							<gs:downloadTime>00:01.034</gs:downloadTime>
+						</gs:downloadTest>
+						<gs:validationTest>
+							<gs:validationResult>VALIDATION_SUCCESSFUL</gs:validationResult>
+						</gs:validationTest>
+						<gs:executionTest>
+							<gs:executionResult>VALIDATION_SUCCESSFUL</gs:executionResult>
+							<gs:executionTimeLong>9</gs:executionTimeLong>
+							<gs:executionTime>00:00.009</gs:executionTime>
+						</gs:executionTest>
+					</gs:report>
+				</gs:accessReports>
+			</gs:extension>
+		</gs:extendedMetadata>
+	</gs:harmonizedMetadata>
+	<gs:originalMetadata>
+		<gs:schemeURI>https://portal.inmet.gov.br/manual/manual-bndmet
+		</gs:schemeURI>
+		<gs:metadata>{&amp;quot;CD_OSCAR&amp;quot;:&amp;quot;0-2000-0-86829&amp;quot;,&amp;quot;DC_NOME&amp;quot;:&amp;quot;ALFREDO
+			CHAVES&amp;quot;,&amp;quot;FL_CAPITAL&amp;quot;:&amp;quot;N&amp;quot;,&amp;quot;DT_FIM_OPERACAO&amp;quot;:null,&amp;quot;CD_SITUACAO&amp;quot;:&amp;quot;Operante&amp;quot;,&amp;quot;TP_ESTACAO&amp;quot;:&amp;quot;Automatica&amp;quot;,&amp;quot;VL_LATITUDE&amp;quot;:&amp;quot;-20.636526&amp;quot;,&amp;quot;CD_WSI&amp;quot;:&amp;quot;0-76-0-3200300000000135&amp;quot;,&amp;quot;CD_DISTRITO&amp;quot;:&amp;quot;
+			06&amp;quot;,&amp;quot;VL_ALTITUDE&amp;quot;:&amp;quot;14.19&amp;quot;,&amp;quot;SG_ESTADO&amp;quot;:&amp;quot;ES&amp;quot;,&amp;quot;SG_ENTIDADE&amp;quot;:&amp;quot;INMET&amp;quot;,&amp;quot;CD_ESTACAO&amp;quot;:&amp;quot;A615&amp;quot;,&amp;quot;VL_LONGITUDE&amp;quot;:&amp;quot;-40.741818&amp;quot;,&amp;quot;DT_INICIO_OPERACAO&amp;quot;:&amp;quot;2006-11-02T21:00:00.000-03:00&amp;quot;,&amp;quot;parameters&amp;quot;:[{&amp;quot;CODIGO&amp;quot;:&amp;quot;I219&amp;quot;,&amp;quot;TIPO_GERACAO&amp;quot;:&amp;quot;Dado
+			Calculado (Media
+			Mensal)&amp;quot;,&amp;quot;DESCRICAO&amp;quot;:&amp;quot;PRESSAO
+			ATMOSFERICA, MEDIA MENSAL
+			(AUT)&amp;quot;,&amp;quot;PERIODICIDADE&amp;quot;:&amp;quot;Mensal&amp;quot;,&amp;quot;UNIDADE&amp;quot;:&amp;quot;mB&amp;quot;,&amp;quot;CLASSE&amp;quot;:&amp;quot;Pressão
+			Atmosférica&amp;quot;}]}</gs:metadata>
+	</gs:originalMetadata>
+	<gs:indexesMetadata>
+		<gs:resourceType>Dataset</gs:resourceType>
+		<gs:sourceId>brazil-inmet</gs:sourceId>
+		<gs:originalId xsi:nil="true" />
+		<gs:recoveryRemovalToken>9cd488aa-f2f2-4a27-bf89-d035dcc075b9
+		</gs:recoveryRemovalToken>
+		<gs:privateId>6d6b470d-3d01-4f58-a5c0-b27c1bbbe0ef</gs:privateId>
+		<gs:testTimeStamp>2020-05-07T16:36:02Z</gs:testTimeStamp>
+		<gs:succeededTest>EXECUTION</gs:succeededTest>
+		<gs:isTransformable>true</gs:isTransformable>
+		<gs:isDownloadable>true</gs:isDownloadable>
+		<gs:isExecutable>true</gs:isExecutable>
+		<gs:testDownloadTime>1034</gs:testDownloadTime>
+		<gs:testExecutionTime>9</gs:testExecutionTime>
+		<gs:complianceLevel>TS-B</gs:complianceLevel>
+		<gs:isTimeseries>true</gs:isTimeseries>
+		<gs:accessQuality>10</gs:accessQuality>
+		<gs:sscScore>100</gs:sscScore>
+		<gs:resourceTimeStamp>2020-05-07T16:36:03.692Z</gs:resourceTimeStamp>
+		<gs:metadataQuality>4</gs:metadataQuality>
+		<gs:abstract>Acquisition made at station: ALFREDO CHAVES Measurement:
+			PRESSAO ATMOSFERICA, MEDIA MENSAL (AUT) Measurement type: Dado
+			Calculado (Media Mensal)
+		</gs:abstract>
+		<gs:alternateTitle>PRESSAO ATMOSFERICA, MEDIA MENSAL (AUT) Dado
+			Calculado (Media Mensal)
+		</gs:alternateTitle>
+		<gs:anyText>6d6b470d-3d01-4f58-a5c0-b27c1bbbe0ef Portuguese utf8
+			dataset 1 time point 4326 EPSG ALFREDO CHAVES - PRESSAO ATMOSFERICA,
+			MEDIA MENSAL (AUT) PRESSAO ATMOSFERICA, MEDIA MENSAL (AUT) Dado
+			Calculado (Media Mensal) parameter;I219;platform;A615 Acquisition
+			made at station: ALFREDO CHAVES Measurement: PRESSAO ATMOSFERICA,
+			MEDIA MENSAL (AUT) Measurement type: Dado Calculado (Media Mensal)
+			INMET +(61) 2102-4602 INMET - Instituto Nacional de Meteorologia |
+			Eixo Monumental Sul Via S1 - Sudoeste Brasília DF 70680-900 Brazil
+			diretor.inmet@inmet.gov.br http://www.inmet.gov.br/ publisher
+			Automatica Operante 06 place ES place mB mB inlandWaters -40.741818
+			-40.741818 -20.636526 -20.636526 14.19 14.19 2006-11-03T00:00:00Z
+			PRESSAO ATMOSFERICA, MEDIA MENSAL (AUT) physicalMeasurement JSON
+			https://apitempo.inmet.gov.br/BNDMET/ urn:br:gov:inmet:api:bndmet
+			parameter;I219;platform;A615 download Dado Calculado (Media Mensal)
+			ALFREDO CHAVES urn:wmo:wigos:0-76-0-3200300000000135 ALFREDO CHAVES ;
+			Automatica ; Operante
+		</gs:anyText>
+		<gs:attributeDesc>PRESSAO ATMOSFERICA, MEDIA MENSAL (AUT)
+		</gs:attributeDesc>
+		<gs:attributeId>https://portal.inmet.gov.br/manual/manual-bndmet:I219
+		</gs:attributeId>
+		<gs:attributeTitle>PRESSAO ATMOSFERICA, MEDIA MENSAL (AUT)
+		</gs:attributeTitle>
+		<gs:crsAuthority>EPSG</gs:crsAuthority>
+		<gs:crsId>4326</gs:crsId>
+		<gs:dataSize>1</gs:dataSize>
+		<gs:fileId>6d6b470d-3d01-4f58-a5c0-b27c1bbbe0ef</gs:fileId>
+		<gs:format>JSON</gs:format>
+		<gs:hLevelCodeValue>dataset</gs:hLevelCodeValue>
+		<gs:hasAccessLegalConst>false</gs:hasAccessLegalConst>
+		<gs:hasOtherLegalConst>false</gs:hasOtherLegalConst>
+		<gs:hasSecurityConst>false</gs:hasSecurityConst>
+		<gs:hasUseLegalConst>false</gs:hasUseLegalConst>
+		<gs:keyword>Automatica</gs:keyword>
+		<gs:keyword>Operante</gs:keyword>
+		<gs:keyword> 06</gs:keyword>
+		<gs:keyword>ES</gs:keyword>
+		<gs:keyword>mB</gs:keyword>
+		<gs:keyword>mB</gs:keyword>
+		<gs:language>Portuguese</gs:language>
+		<gs:onlineId>urn:uuid:c32d5478-f08f-4631-bf7f-108e47a7731c
+		</gs:onlineId>
+		<gs:onlineLinkage>https://apitempo.inmet.gov.br/BNDMET/
+		</gs:onlineLinkage>
+		<gs:organisationName>INMET</gs:organisationName>
+		<gs:platformDesc>ALFREDO CHAVES ; Automatica ; Operante
+		</gs:platformDesc>
+		<gs:platformId>urn:wmo:wigos:0-76-0-3200300000000135</gs:platformId>
+		<gs:platformTitle>ALFREDO CHAVES</gs:platformTitle>
+		<gs:protocol>urn:br:gov:inmet:api:bndmet</gs:protocol>
+		<gs:resourceId>parameter;I219;platform;A615</gs:resourceId>
+		<gs:title>ALFREDO CHAVES - PRESSAO ATMOSFERICA, MEDIA MENSAL (AUT)
+		</gs:title>
+		<gs:tmpExtentBegin>2006-11-03T00:00:00Z</gs:tmpExtentBegin>
+		<gs:tmpExtentEnd_Now />
+		<gs:topicCategory>inlandWaters</gs:topicCategory>
+		<gs:uniqueAttributeId>CDE0D1888442CC690D7F739F543724A2F23A94B1
+		</gs:uniqueAttributeId>
+		<gs:uniquePlatformId>8E9E39790D47DE57F13E785B8A3A439BB6B25621
+		</gs:uniquePlatformId>
+		<gs:bbox>
+			<gs:sw>-20.636526 -40.741818</gs:sw>
+			<gs:se>-20.636526 -40.741818</gs:se>
+			<gs:nw>-20.636526 -40.741818</gs:nw>
+			<gs:ne>-20.636526 -40.741818</gs:ne>
+			<gs:isCrossed>false</gs:isCrossed>
+			<gs:area>0</gs:area>
+			<gs:center>-20.636526 -40.741818</gs:center>
+			<gs:disjValues>
+				<gs:disjSouth>-20.636526</gs:disjSouth>
+				<gs:disjWest>-40.741818</gs:disjWest>
+				<gs:disjNorth>-20.636526</gs:disjNorth>
+				<gs:disjEast>-40.741818</gs:disjEast>
+			</gs:disjValues>
+			<gs:cardinalValues>
+				<gs:values>
+					<gs:south>-20.636526</gs:south>
+					<gs:west>-40.741818</gs:west>
+					<gs:east>-40.741818</gs:east>
+					<gs:north>-20.636526</gs:north>
+				</gs:values>
+			</gs:cardinalValues>
+		</gs:bbox>
+	</gs:indexesMetadata>
+</gs:Dataset>

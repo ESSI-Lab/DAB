@@ -4,7 +4,7 @@ package eu.essi_lab.indexes;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -67,8 +67,7 @@ public class IndexedElementsWriter {
 	} catch (Exception e) {
 	    // this try catch is needed because in case of an error the harvesting procedure can continue, instead of
 	    // being stopped
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(IndexedElementsWriter.class).error("This shouldn't happen, please check and fix");
+	    GSLoggerFactory.getLogger(IndexedElementsWriter.class).error(e);
 	}
 
 	// all default indexed elements
@@ -130,8 +129,7 @@ public class IndexedElementsWriter {
 		    } catch (Exception e) {
 			// this try catch is needed because in case of an error the harvesting procedure can continue,
 			// instead of being stopped
-			e.printStackTrace();
-			GSLoggerFactory.getLogger(IndexedElementsWriter.class).error("This shouldn't happen, please check and fix");
+			GSLoggerFactory.getLogger(IndexedElementsWriter.class).error(e);
 		    }
 		});
 

@@ -4,7 +4,7 @@ package eu.essi_lab.access.compliance;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -157,6 +157,26 @@ public enum DataComplianceLevel {
      */
     TIME_SERIES_BASIC_DATA_COMPLIANCE(ProcessorCapabilities.create(//
 	    CapabilityElement.anyFromDataType(DataType.TIME_SERIES), //
+	    CapabilityElement.anyFromCRS(CRS.EPSG_4326()), //
+	    CapabilityElement.anyFromDataFormat(DataFormat.NETCDF()), //
+	    new SubsettingCapability(//
+		    new BooleanCapabilityElement(PresenceType.ANY), //
+		    new BooleanCapabilityElement(true), //
+		    new BooleanCapabilityElement(PresenceType.ANY)), //
+
+	    ResamplingCapability.ANY_RESAMPLING()), "TS-B"),
+    
+    /**
+     * Data compliance level properties and operations:
+     * <ul>
+     * <li>CRS: EPSG:4326</li>
+     * <li>Format: NetCDF 3</li>
+     * <li>Subsetting: temporal required. Spatial and other not strictly required</li>
+     * <li>Resampling: not strictly required</li>
+     * </ul>
+     */
+    TRAJECTORY_BASIC_DATA_COMPLIANCE(ProcessorCapabilities.create(//
+	    CapabilityElement.anyFromDataType(DataType.TRAJECTORY), //
 	    CapabilityElement.anyFromCRS(CRS.EPSG_4326()), //
 	    CapabilityElement.anyFromDataFormat(DataFormat.NETCDF()), //
 	    new SubsettingCapability(//

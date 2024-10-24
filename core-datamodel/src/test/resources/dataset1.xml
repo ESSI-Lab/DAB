@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<gs:Dataset xmlns:gs="http://flora.eu/gi-suite/1.0/dataModel/schema"
+	xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd"
+	xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gmx="http://www.isotc211.org/2005/gmx"
+	xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:gml="http://www.opengis.net/gml"
+	xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:gmi="http://www.isotc211.org/2005/gmi">
+
+	<gs:source gs:uniqueIdentifier="SOURCE_UNIQUE_ID" gs:strategy="HARVESTED">
+		<gs:endpoint>http://endpoint</gs:endpoint>
+		<gs:connectorType>SOURCE_TYPE</gs:connectorType>
+		<gs:version>SOURCE_VERSION</gs:version>
+		<gs:label>SOURCE_LABEL&lt;&gt;!%&amp;()=?^£</gs:label>
+	</gs:source>
+
+	<gs:harmonizedMetadata>
+		<gs:coreMetadata>
+			<gs:isoMetadata>
+				<gmi:MI_Metadata>
+					<gmd:fileIdentifier>
+						<gco:CharacterString>PUBLIC_ID</gco:CharacterString>
+					</gmd:fileIdentifier>
+					<gmd:parentIdentifier>
+						<gco:CharacterString>PARENT_ID</gco:CharacterString>
+					</gmd:parentIdentifier>
+					<gmd:hierarchyLevelName>
+						<gco:CharacterString>dataset</gco:CharacterString>
+					</gmd:hierarchyLevelName>
+					<gmd:identificationInfo>
+						<gmd:MD_DataIdentification>
+							<gmd:citation>
+								<gmd:CI_Citation>
+									<gmd:title>
+										<gco:CharacterString>New title</gco:CharacterString>
+									</gmd:title>
+								</gmd:CI_Citation>
+							</gmd:citation>
+							<gmd:abstract>
+								<gco:CharacterString>New abstract</gco:CharacterString>
+							</gmd:abstract>
+						</gmd:MD_DataIdentification>
+					</gmd:identificationInfo>
+					<gmd:distributionInfo>
+						<gmd:MD_Distribution>
+							<gmd:transferOptions>
+								<gmd:MD_DigitalTransferOptions>
+									<gmd:onLine>
+										<gmd:CI_OnlineResource>
+											<gmd:linkage>
+												<gmd:URL>http://endpoint</gmd:URL>
+											</gmd:linkage>
+											<gmd:description>
+												<gco:CharacterString>DESCRIPTION</gco:CharacterString>
+											</gmd:description>
+										</gmd:CI_OnlineResource>
+									</gmd:onLine>
+								</gmd:MD_DigitalTransferOptions>
+							</gmd:transferOptions>
+						</gmd:MD_Distribution>
+					</gmd:distributionInfo>
+					<gmi:acquisitionInformation>
+						<gmi:MI_AcquisitionInformation>
+							<gmi:platform>
+								<gmi:MI_Platform>
+									<gmi:description>
+										<gco:CharacterString>desc</gco:CharacterString>
+									</gmi:description>
+								</gmi:MI_Platform>
+							</gmi:platform>
+						</gmi:MI_AcquisitionInformation>
+					</gmi:acquisitionInformation>
+				</gmi:MI_Metadata>
+			</gs:isoMetadata>
+		</gs:coreMetadata>
+		<gs:augmentedMetadata>
+			<gs:element gs:update="2017-03-28T14:12:06Z">
+				<gs:name>title</gs:name>
+				<gs:oldValue>TITLE</gs:oldValue>
+				<gs:newValue>New title</gs:newValue>
+			</gs:element>
+			<gs:element gs:update="2017-03-28T14:12:06Z">
+				<gs:name>fileId</gs:name>
+				<gs:oldValue>FILE_ID</gs:oldValue>
+				<gs:newValue>New identifier</gs:newValue>
+			</gs:element>
+			<gs:element gs:update="2017-03-28T14:12:06Z">
+				<gs:name>abstract</gs:name>
+				<gs:newValue>New abstract</gs:newValue>
+			</gs:element>
+		</gs:augmentedMetadata>
+		<gs:extendedMetadata>
+			<gs:extension>
+				<gs:title>title</gs:title>
+				<gmd:element>
+					<gmi:innerElement>innerElementText</gmi:innerElement>
+				</gmd:element>
+			</gs:extension>
+		</gs:extendedMetadata>
+	</gs:harmonizedMetadata>
+
+	<gs:originalMetadata>
+		<gs:schemeURI>http://scheme-uri</gs:schemeURI>
+
+		<gs:metadata><![CDATA[<original><id>FILE_ID</id><title>TITLE</title><url>http://endpoint</url><parent>PARENT_ID</parent></original>]]></gs:metadata>
+	</gs:originalMetadata>
+
+
+	<gs:indexesMetadata>
+		<gs:resourceType>Dataset</gs:resourceType>      
+		<gs:originalId>ORIGINAL_ID</gs:originalId>
+		<gs:privateId>PRIVATE_ID</gs:privateId>
+		<gs:abstract>ABSTRACT</gs:abstract>
+		<gs:abstract>ABSTRACT2</gs:abstract>
+		<gs:title>TITLE</gs:title>
+		<gs:bbox>
+			<gs:sw>sw</gs:sw>
+			<gs:se>se</gs:se>
+			<gs:nw>nw</gs:nw>
+			<gs:ne>ne</gs:ne>
+			<gs:area>area</gs:area>
+			<gs:center>center</gs:center>
+			<gs:cardinalValues/>
+		</gs:bbox>
+
+	</gs:indexesMetadata>
+
+
+</gs:Dataset>

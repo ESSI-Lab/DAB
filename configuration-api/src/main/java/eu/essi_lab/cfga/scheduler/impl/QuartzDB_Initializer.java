@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.scheduler.impl;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,6 +35,7 @@ import org.apache.ibatis.jdbc.ScriptRunner;
 
 import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting.JobStoreType;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
  * @author Fabrizio
@@ -131,17 +132,17 @@ public class QuartzDB_Initializer {
      * @throws SQLException
      */
     private Connection createConnection(boolean withDBName) throws SQLException {
-    
-        String uri = MySQLConnectionManager.createConnectionURL(//
-        	setting.getSQLDatabaseUri(), //
-        	withDBName ? setting.getSQLDatabaseName() : null);
-    
-        Connection conn = DriverManager.getConnection(//
-        	uri, //
-        	setting.getSQLDatabaseUser(), //
-        	setting.getSQLDatabasePassword());//
-    
-        return conn;
+
+	String uri = MySQLConnectionManager.createConnectionURL(//
+		setting.getSQLDatabaseUri(), //
+		withDBName ? setting.getSQLDatabaseName() : null);
+
+	Connection conn = DriverManager.getConnection(//
+		uri, //
+		setting.getSQLDatabaseUser(), //
+		setting.getSQLDatabasePassword());//
+
+	return conn;
     }
 
     /**
@@ -202,5 +203,60 @@ public class QuartzDB_Initializer {
 	statement.close();
 
 	return resultSet.next();
+    }
+
+    /**
+     * @param args
+     */
+    public static void main(String[] args) {
+
+	SchedulerSetting setting = createSetting("quartzJobStore", "localhost", "root", "password", 3306);
+
+	QuartzDB_Initializer initializer = new QuartzDB_Initializer(setting);
+
+	try {
+
+	    boolean dbExists = initializer.dbExists();
+
+	    if (!dbExists) {
+
+		GSLoggerFactory.getLogger(QuartzDB_Initializer.class).info("DB creation STARTED");
+
+		initializer.createDb();
+
+		GSLoggerFactory.getLogger(QuartzDB_Initializer.class).info("DB creation ENDED");
+	    }
+
+	    GSLoggerFactory.getLogger(QuartzDB_Initializer.class).info("Tables initialization STARTED");
+
+	    initializer.initializeTables(true);
+
+	    GSLoggerFactory.getLogger(QuartzDB_Initializer.class).info("Tables initialization ENDED");
+
+	} catch (SQLException e) {
+
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(QuartzDB_Initializer.class).error(e.getMessage(), e);
+	}
+    }
+
+    /**
+     * @return
+     */
+    private static SchedulerSetting createSetting(String dbName, String host, String user, String pwd, int port) {
+
+	SchedulerSetting setting = new SchedulerSetting();
+
+	setting.setJobStoreType(JobStoreType.PERSISTENT);
+	setting.setUserDateTimeZone("UTC");
+
+	setting.setSQLDatabaseName(dbName);
+	setting.setSQLDatabaseUri("jdbc:mysql://" + host + ":" + port);
+	setting.setSQLDatabaseUser(user);
+	setting.setSQLDatabasePassword(pwd);
+
+	setting.debugSQLSettings();
+
+	return setting;
     }
 }

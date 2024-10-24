@@ -1,0 +1,176 @@
+<oai:record xmlns:oai="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+    <oai:header>
+        <oai:identifier>no.met.adc:57a2ac75-aa24-59c3-9af5-836d3f05ccb7</oai:identifier>
+        <oai:datestamp>2022-09-30T13:23:00Z</oai:datestamp>
+        <oai:setSpec/>
+    </oai:header>
+    <oai:metadata>
+        <dif:DIF xmlns:dif="http://gcmd.gsfc.nasa.gov/Aboutus/xml/dif/">
+            <dif:Entry_ID>no.met.adc:57a2ac75-aa24-59c3-9af5-836d3f05ccb7</dif:Entry_ID>
+            <dif:Entry_Title>Kongsvegen AWS sw250 aggregated</dif:Entry_Title>
+            <dif:Data_Set_Citation>
+                <dif:Dataset_Creator>Simon Filhol, Pierre Marie Lefeuvre, Jean-Charles
+                    Gallet</dif:Dataset_Creator>
+                <dif:Dataset_Title>Wireless Sensor Network for meteorological observations on
+                    Kongsvegen glacier</dif:Dataset_Title>
+                <dif:Dataset_Series_Name/>
+                <dif:Dataset_Release_Date>2022-09-30</dif:Dataset_Release_Date>
+                <dif:Dataset_Release_Place/>
+                <dif:Dataset_Publisher>Norwegian Meteorological Institute</dif:Dataset_Publisher>
+                <dif:Version/>
+                <dif:Other_Citation_Details/>
+                <dif:Dataset_DOI>https://doi.org/10.21343/1r1z-ae07</dif:Dataset_DOI>
+                <dif:Online_Resource/>
+            </dif:Data_Set_Citation>
+            <dif:Personnel>
+                <dif:Role>Investigator</dif:Role>
+                <dif:Last_Name>Simon Filhol</dif:Last_Name>
+                <dif:Email>simon.filhol@geo.uio.no</dif:Email>
+            </dif:Personnel>
+            <dif:Personnel>
+                <dif:Role>Investigator</dif:Role>
+                <dif:Last_Name>Pierre Marie Lefeuvre</dif:Last_Name>
+                <dif:Email>pierre.lefeuvre@npolar.no</dif:Email>
+            </dif:Personnel>
+            <dif:Personnel>
+                <dif:Role>Investigator</dif:Role>
+                <dif:Last_Name>Jean-Charles Gallet</dif:Last_Name>
+                <dif:Email>jean.charles.gallet@npolar.no</dif:Email>
+            </dif:Personnel>
+            <dif:Parameters>
+                <dif:Category>EARTH SCIENCE</dif:Category>
+                <dif:Topic>CRYOSPHERE</dif:Topic>
+                <dif:Term>GLACIERS/ICE SHEETS</dif:Term>
+                <dif:Variable_Level_1>GLACIERS</dif:Variable_Level_1>
+                <dif:Variable_Level_2/>
+            </dif:Parameters>
+            <dif:Parameters>
+                <dif:Category>EARTH SCIENCE</dif:Category>
+                <dif:Topic>CRYOSPHERE</dif:Topic>
+                <dif:Term>SNOW/ICE</dif:Term>
+                <dif:Variable_Level_1/>
+                <dif:Variable_Level_2/>
+            </dif:Parameters>
+            <dif:Parameters>
+                <dif:Category>EARTH SCIENCE</dif:Category>
+                <dif:Topic>CRYOSPHERE</dif:Topic>
+                <dif:Term>SNOW/ICE</dif:Term>
+                <dif:Variable_Level_1>SNOW ENERGY BALANCE</dif:Variable_Level_1>
+                <dif:Variable_Level_2/>
+            </dif:Parameters>
+            <dif:Parameters>
+                <dif:Category>EARTH SCIENCE</dif:Category>
+                <dif:Topic>CRYOSPHERE</dif:Topic>
+                <dif:Term>SNOW/ICE</dif:Term>
+                <dif:Variable_Level_1>SNOW DEPTH</dif:Variable_Level_1>
+                <dif:Variable_Level_2/>
+            </dif:Parameters>
+            <dif:Keyword>wind_from_direction</dif:Keyword>
+            <dif:Keyword>surface_snow_thickness</dif:Keyword>
+            <dif:Keyword>relative_humidity</dif:Keyword>
+            <dif:Keyword>air_temperature</dif:Keyword>
+            <dif:Keyword>surface_temperature</dif:Keyword>
+            <dif:Keyword>wind_speed</dif:Keyword>
+            <dif:Keyword>Time series analysis</dif:Keyword>
+            <dif:Temporal_Coverage>
+                <dif:Start_Date>2021-05-05T10:16:43Z</dif:Start_Date>
+                <dif:Stop_Date>2021-08-12T05:16:43Z</dif:Stop_Date>
+            </dif:Temporal_Coverage>
+            <dif:Spatial_Coverage>
+                <dif:Southernmost_Latitude>78.8187</dif:Southernmost_Latitude>
+                <dif:Northernmost_Latitude>78.8187</dif:Northernmost_Latitude>
+                <dif:Westernmost_Longitude>12.6506</dif:Westernmost_Longitude>
+                <dif:Easternmost_Longitude>12.6506</dif:Easternmost_Longitude>
+            </dif:Spatial_Coverage>
+            <dif:Location>
+                <dif:Location_Category>GEOGRAPHIC REGION</dif:Location_Category>
+                <dif:Location_Type>ARCTIC</dif:Location_Type>
+                <dif:Location_Subregion1/>
+                <dif:Location_Subregion2/>
+                <dif:Location_Subregion3/>
+                <dif:Detailed_Location/>
+            </dif:Location>
+            <dif:Project>
+                <dif:Short_Name>Hive WSN</dif:Short_Name>
+                <dif:Long_Name>Hive Wireless Sensor Network</dif:Long_Name>
+            </dif:Project>
+            <dif:Project>
+                <dif:Short_Name>SIOS InfraNOR</dif:Short_Name>
+                <dif:Long_Name>SIOS Svalbard Integrated Arctic Earth Observing
+                    System</dif:Long_Name>
+            </dif:Project>
+            <dif:Use_Constraints>CC-BY-NC-4.0</dif:Use_Constraints>
+            <dif:Originating_Center>University of Oslo</dif:Originating_Center>
+            <dif:Data_Center>
+                <dif:Data_Center_Name>
+                    <dif:Short_Name>NO/MET/ADC</dif:Short_Name>
+                    <dif:Long_Name>Norwegian Meteorological Institute / Arctic Data
+                        Centre</dif:Long_Name>
+                </dif:Data_Center_Name>
+                <dif:Data_Center_URL>https://adc.met.no/</dif:Data_Center_URL>
+                <dif:Personnel>
+                    <dif:Role>Data center contact</dif:Role>
+                    <dif:Last_Name>ADC support</dif:Last_Name>
+                    <dif:Phone/>
+                    <dif:Fax/>
+                    <dif:Contact_Address>
+                        <dif:Address/>
+                        <dif:City/>
+                        <dif:Province_or_State/>
+                        <dif:Postal_Code/>
+                        <dif:Country/>
+                    </dif:Contact_Address>
+                </dif:Personnel>
+            </dif:Data_Center>
+            <dif:Summary>
+                <dif:Abstract>The Hive Wireless sensor network project designed and assembled
+                    automatic weather stations that are currently installed at Kongsvegen glacier in
+                    Svalbard and records near surface meteorological variables: air temperature,
+                    relative humidity, air pressure, snow height, wind, surface skin temperature...
+                    The HiveWSN kit consists of: 1) a brain box containing the power system, the
+                    microcontroller, the communication system and the connectivity to the sensors,
+                    2) A set of sensors either commercially available or custom built at the
+                    Department of Geosciences at UiO as part of the UiO Hive project. The kit is
+                    autonomous and packaged as a beam that can be installed on simple mast.
+                    Currently, there are two versions of the WSN system: v1 from 2019, and v2 from
+                    2021. Both are based on the board Wasmpote v15 which handle power,
+                    communication, and data brokerage. The firmware running all instances has been
+                    written as part of the project UiO Hive, and include a set of tools described on
+                    the HiveWSN project website:
+                    https://www.mn.uio.no/geo/english/research/projects/hive. Important note: the
+                    height of the sensor to the snow/ice surface is not corrected for variations in
+                    surface deposition or melt over time. The sensor box is fixed to a stake drilled
+                    into the snow/ice.</dif:Abstract>
+                <dif:Purpose/>
+            </dif:Summary>
+            <dif:Related_URL>
+                <dif:URL_Content_Type>
+                    <dif:Type>VIEW DATASET LANDING PAGE</dif:Type>
+                </dif:URL_Content_Type>
+                <dif:URL>https://thredds.met.no/thredds/catalog/arcticdata/infranor/UiO-Kongsvegen-AWS/catalog.html?dataset=arcticdata/infranor/UiO-Kongsvegen-AWS/UiO-Kongsvegen-AWS-sw250-agg.ncml</dif:URL>
+                <dif:Description>Dataset landing page</dif:Description>
+            </dif:Related_URL>
+            <dif:Related_URL>
+                <dif:URL_Content_Type>
+                    <dif:Type>VIEW RELATED INFORMATION</dif:Type>
+                    <dif:Subtype>GENERAL DOCUMENTATION</dif:Subtype>
+                </dif:URL_Content_Type>
+                <dif:URL>https://hive-wireless-sensor-network.readthedocs.io/en/latest/source/hardware.html</dif:URL>
+                <dif:Description>Documentation of the Hive Wireless Sensor Network (Hive WSN)
+                    system</dif:Description>
+            </dif:Related_URL>
+            <dif:Related_URL>
+                <dif:URL_Content_Type>
+                    <dif:Type>GET DATA</dif:Type>
+                    <dif:Subtype>OPENDAP DATA (DODS)</dif:Subtype>
+                </dif:URL_Content_Type>
+                <dif:URL>https://thredds.met.no/thredds/dodsC/arcticdata/infranor/UiO-Kongsvegen-AWS/UiO-Kongsvegen-AWS-sw250-agg.ncml</dif:URL>
+                <dif:Description>OPeNDAP access to dataset</dif:Description>
+            </dif:Related_URL>
+            <dif:Metadata_Name>CEOS IDN DIF</dif:Metadata_Name>
+            <dif:Metadata_Version>9.8.4</dif:Metadata_Version>
+            <dif:DIF_Creation_Date>2022-09-30T13:23:00Z</dif:DIF_Creation_Date>
+            <dif:Last_DIF_Revision_Date>2022-09-30T13:23:00Z</dif:Last_DIF_Revision_Date>
+        </dif:DIF>
+    </oai:metadata>
+</oai:record>

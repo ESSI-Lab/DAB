@@ -4,7 +4,7 @@ package eu.essi_lab.configuration;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,39 +24,134 @@ package eu.essi_lab.configuration;
 import java.util.Arrays;
 import java.util.Optional;
 
+import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.LabeledEnum;
+
 /**
- * @author ilsanto
+ * @author Fabrizio
  */
-public enum ExecutionMode {
+public enum ExecutionMode implements LabeledEnum {
 
     /**
      * This mode disables execution of batch jobs and enables execution of incoming requests
      */
-    FRONTEND,
+    FRONTEND("Frontend"),
 
     /**
-     * This mode disables execution of incoming requests and enables execution of batch jobs in general (harvestings,
-     * bulk download requests)
+     * This mode disables execution of incoming requests and enables execution of batch jobs of type harvesting
      */
-    BATCH,
+    BATCH("Batch"),
 
     /**
-     * This mode disables execution of incoming requests and enables execution of single download jobs
+     * This mode disables execution of incoming requests and enables execution of batch jobs of type bulk download and
+     * type single download jobs
      */
-    ACCESS,
+    BULK("Bulk"),
+
+    /**
+     * This mode disables execution of incoming requests and enables execution of batch augmentation jobs
+     */
+    AUGMENTER("Augmenter"),
+    /**
+     * This mode disables execution of incoming requests, used for synch access cluster
+     */
+    ACCESS("Access"),
+
+    /**
+     * Reserved for very intensive requests usage
+     */
+    INTENSIVE("Intensive"),
     /**
      * 
      */
-    CONFIGURATION,
+    CONFIGURATION("Configuration"),
     /**
      * 
      */
-    LOCAL_PRODUCTION, 
+    LOCAL_PRODUCTION("Local Production"),
 
     /**
      * (default) This mode enables execution of batch jobs AND of incoming requests
      */
-    MIXED;
+    MIXED("Mixed");
+
+    /**
+     * 
+     */
+    public static final String GIPROJECT_EXECUTION_MODE_KEY = "EU_FLORA_ESSI_GI_PROJECT_EXECUTION";
+    
+    public static final String SKIP_AUTHORIZATION_KEY = "DAB_SKIP_AUTHORIZATION";
+
+    /**
+     * 
+     */
+    private String name;
+
+    /**
+     * @param name
+     */
+    private ExecutionMode(String name) {
+
+	this.name = name;
+    }
+
+    @Override
+    public String toString() {
+
+	return getLabel();
+    }
+
+    @Override
+    public String getLabel() {
+
+	return name;
+    }
+
+    /**
+     * @return
+     */
+    public static String readEnv() {
+
+	String execMode = System.getenv(GIPROJECT_EXECUTION_MODE_KEY);
+
+	if (execMode == null) {
+
+	    execMode = System.getProperty(GIPROJECT_EXECUTION_MODE_KEY);
+	}
+
+	return execMode;
+    }
+
+    /**
+     * @return
+     */
+    public static boolean skipAuthorization() {
+
+	String skipAuthorization = String.valueOf(false);
+
+	String skipAutProperty = System.getProperty(SKIP_AUTHORIZATION_KEY);
+	String skipAuthEnv = System.getenv(SKIP_AUTHORIZATION_KEY);
+	if (skipAutProperty != null) {
+		GSLoggerFactory.getLogger(ExecutionMode.class).info("authprop");
+	    skipAuthorization = skipAutProperty;
+
+	} else if (skipAuthEnv != null) {
+		GSLoggerFactory.getLogger(ExecutionMode.class).info("authenv");
+	    skipAuthorization = skipAuthEnv;
+	}
+
+	return Boolean.valueOf(skipAuthorization);
+    }
+
+    /**
+     * @return
+     */
+    public static ExecutionMode get() {
+
+	Optional<ExecutionMode> execmode = ExecutionMode.decode(readEnv());
+
+	return execmode.orElse(ExecutionMode.MIXED);
+    }
 
     /**
      * @param value
@@ -66,7 +161,8 @@ public enum ExecutionMode {
 
 	return Arrays.asList(values()).//
 		stream().//
-		filter(e -> e.toString().equalsIgnoreCase(value)).//
+		filter(e -> e.name().equalsIgnoreCase(value)).//
 		findFirst();
     }
+
 }

@@ -4,7 +4,7 @@ package eu.essi_lab.lib.xml;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,8 +29,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -140,10 +138,9 @@ public class XMLDocumentReader extends XMLNodeReader {
 			    GSLoggerFactory.getLogger(getClass()).info("LOCK_LONG_WAIT EXTREME in lock {}: {} seconds", uuid, (i * 10));
 			    executorService.shutdown();
 			    try {
-				File dump = File.createTempFile(getClass().getSimpleName(), ".dump.xml");
-				Files.copy(file.toPath(), dump.toPath(), StandardCopyOption.REPLACE_EXISTING);
-				GSLoggerFactory.getLogger(getClass()).info("Dumped XML file in lock {} at: {}", uuid,
-					dump.toPath().toString());
+
+				GSLoggerFactory.getLogger(getClass()).warn("File {} opening too long", file.getAbsolutePath());
+				
 			    } catch (Exception e) {
 				e.printStackTrace();
 				GSLoggerFactory.getLogger(getClass()).info("Error during dump in lock {} at: {}", uuid, e.getMessage());
@@ -193,16 +190,19 @@ public class XMLDocumentReader extends XMLNodeReader {
 	if (stream == null) {
 	    throw new IllegalArgumentException("XMLDocument: the stream containing the content to be parsed is null");
 	}
-	// GSLoggerFactory.getLogger(getClass()).trace("Creating tmp file");
-	File tmp = File.createTempFile(getClass().getSimpleName(), ".xml");
-	tmp.deleteOnExit();
-	FileOutputStream fos = new FileOutputStream(tmp);
-	IOUtils.copy(stream, fos);
-	stream.close();
-	init(tmp);
-	// GSLoggerFactory.getLogger(getClass()).trace("Deleting tmp file");
-	tmp.delete();
 
+	File tmp = File.createTempFile(getClass().getSimpleName(), ".xml");
+	
+	FileOutputStream fos = new FileOutputStream(tmp);
+	
+	IOUtils.copy(stream, fos);
+	
+	init(tmp);
+
+	stream.close();
+	fos.close();
+
+	tmp.delete();
     }
 
     /**

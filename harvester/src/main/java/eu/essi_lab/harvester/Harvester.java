@@ -4,7 +4,7 @@ package eu.essi_lab.harvester;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,15 +25,20 @@ import java.util.Iterator;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.quartz.JobExecutionContext;
+
 import eu.essi_lab.adk.harvest.IHarvestedAccessor;
 import eu.essi_lab.api.database.SourceStorage;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.task.CustomTask;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
-import eu.essi_lab.harvester.component.HarvesterComponentException;
+import eu.essi_lab.harvester.worker.HarvesterWorker.RecoveringContext;
 import eu.essi_lab.identifierdecorator.ConflictingResourceException;
 import eu.essi_lab.identifierdecorator.DuplicatedResourceException;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.HarvestingProperties;
+import eu.essi_lab.messages.JobStatus.JobPhase;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
 import eu.essi_lab.model.GSSource;
@@ -50,12 +55,15 @@ public class Harvester {
     private HarvesterPlan harvesterPlan;
     private SourceStorage sourceStorage;
     private HarvestingReportsHandler reportsHandler;
+    private CustomTask customTask;
     @SuppressWarnings("rawtypes")
     private IHarvestedAccessor harvesterAccessor;
+
     /**
      * 
      */
     private static final String UNEXPECTED_NO_LIST_RECORDS_ERROR_RESPONSE_ERROR = "UNEXPECTED_NO_LIST_RECORDS_ERROR_RESPONSE_ERROR";
+    private static final String HARVESTER_CUSTOM_TASK_ERROR = "HARVESTER_CUSTOM_TASK_ERROR";
 
     /**
      * 
@@ -71,40 +79,101 @@ public class Harvester {
      */
     public void harvest(Boolean isRecovering) throws GSException {
 
-	harvest(isRecovering, null);
+	harvest(RecoveringContext.create(isRecovering), null);
     }
 
     /**
-     * @param isRecovering
+     * @param context
      * @param status
      * @throws GSException
      */
-    public void harvest(Boolean isRecovering, SchedulerJobStatus status) throws GSException {
+    public void harvest(JobExecutionContext context, SchedulerJobStatus status) throws GSException {
 
 	GSException exception = null;
 
+	HarvestingProperties properties = getSourceStorage().retrieveHarvestingProperties(getAccessor().getSource());
+
+	//
+	// incremental harvesting
+	//
+
 	boolean isIncremental = isIncrementalHarvestingSupported();
 	HarvestingStrategy strategy = computeHarvestingStrategy(isIncremental);
+
+	//
+	// resumed harvesting
+	//
+
+	boolean resumed = properties.isResumed(context.isRecovering()) && getAccessor().supportsResumedHarvesting();
+	if (resumed) {
+	    GSLoggerFactory.getLogger(this.getClass()).debug("Resumed harvesting enabled");
+	}
+
+	//
+	// recovery
+	//
+
+	boolean recovery = context.isRecovering() && getAccessor().supportsRecovery();
+
+	// always reset the completed state
+	properties.setCompleted(false);
+
+	//
+	// sends the harvesting started email
+	//
+
+	GSLoggerFactory.getLogger(this.getClass()).info("Harvest of source {} [{}] STARTED with recovery flag {} / resumed flag {}",
+
+		getAccessor().getSource().getLabel(), //
+		getAccessor().getSource().getUniqueIdentifier(), //
+		recovery, //
+		resumed);
 
 	reportsHandler = new HarvestingReportsHandler(getAccessor().getSource(), getSourceStorage());
 
 	reportsHandler.sendHarvestingEmail(//
 		true, //
 		getAccessor().getSource(), //
-		isRecovering, //
+		recovery, //
+		resumed, //
 		null, //
-		getSourceStorage().retrieveHarvestingProperties(getAccessor().getSource()));
+		properties);
+
+	//
+	// starts the harvesting procedure
+	//
 
 	try {
 
-	    getSourceStorage().harvestingStarted(getAccessor().getSource(), strategy, isRecovering, Optional.ofNullable(status));
+	    getSourceStorage().harvestingStarted(//
+		    getAccessor().getSource(), //
+		    strategy, //
+		    recovery, //
+		    resumed, //
+		    Optional.ofNullable(status));
 
-	    GSLoggerFactory.getLogger(this.getClass()).info("Harvest of source {} [{}] STARTED with recovery flag {}",
-		    getAccessor().getSource().getLabel(), getAccessor().getSource().getUniqueIdentifier(), isRecovering);
+	} catch (GSException ex) {
 
-	    ListRecordsRequest request = new ListRecordsRequest(status);
+	    GSLoggerFactory.getLogger(this.getClass()).//
+		    error("Fatal error occurred: the harvesting START procedure is failed: " + ex.getMessage(), ex);
 
-	    HarvestingProperties properties = getSourceStorage().retrieveHarvestingProperties(getAccessor().getSource());
+	    reportsHandler.gatherGSException(ex);
+
+	    reportsHandler.sendErrorAndWarnMessageEmail();
+
+	    throw ex;
+	}
+
+	//
+	// executes the harvesting procedure
+	//
+
+	ListRecordsRequest request = new ListRecordsRequest(status);
+
+	boolean harvestingInterrupted = false;
+
+	try {
+
 	    request.setHarvestingProperties(properties);
 
 	    if (isIncremental) {
@@ -122,48 +191,93 @@ public class Harvester {
 		GSLoggerFactory.getLogger(this.getClass()).debug("Incremental harvesting not enabled");
 	    }
 
-	    request.setRecovering(isRecovering);
+	    // set the request flags
+	    request.setRecovered(recovery);
+	    request.setResumed(resumed);
 
-	    doHarvest(request, isRecovering, isIncremental, properties);
+	    doHarvest(request, context, recovery, resumed, isIncremental, properties, status);
 
 	} catch (GSException ex) {
 
+	    harvestingInterrupted = true;
+
 	    exception = ex;
-	    reportsHandler.gatherGSException(exception);
+	    reportsHandler.gatherGSException(ex);
 	}
+
+	//
+	// finalizes the harvesting procedure
+	//
 
 	try {
 
-	    getSourceStorage().harvestingEnded(getAccessor().getSource(), strategy, Optional.ofNullable(status));
+	    // the harvesting procedure is completed only when the procedure ends without errors
+	    if (!harvestingInterrupted) {
+
+		properties.setCompleted(true);
+	    }
+
+	    getSourceStorage().harvestingEnded(//
+		    getAccessor().getSource(), //
+		    Optional.of(properties), //
+		    strategy, //
+		    Optional.ofNullable(status), //
+		    Optional.of(request));
+
+	    // handles custom task only if the end procedure is successful
+	    handleCustomTask(context, status);
 
 	} catch (GSException ex) {
 
-	    GSLoggerFactory.getLogger(this.getClass()).error("Error occurred: the harvesting end procedure is failed");
-	    exception = ex;
+	    GSLoggerFactory.getLogger(this.getClass()).//
+		    error("Fatal error occurred: the harvesting END procedure is failed: " + ex.getMessage(), ex);
+
+	    if (exception != null) {
+
+		exception.getErrorInfoList().addAll(ex.getErrorInfoList());
+
+	    } else {
+
+		exception = ex;
+	    }
+
 	    reportsHandler.gatherGSException(exception);
 	}
 
-	GSLoggerFactory.getLogger(this.getClass()).info("Harvest of source {} [{}] ENDED", getAccessor().getSource().getLabel(),
+	//
+	//
+	//
+
+	GSLoggerFactory.getLogger(this.getClass()).info("Harvest of source {} [{}] ENDED", //
+		getAccessor().getSource().getLabel(), //
 		getAccessor().getSource().getUniqueIdentifier());
 
 	reportsHandler.sendHarvestingEmail(//
 		false, //
 		getAccessor().getSource(), //
-		isRecovering, //
+		recovery, //
+		resumed, //
 		getSourceStorage().getStorageReport(getAccessor().getSource()), //
-		getSourceStorage().retrieveHarvestingProperties(getAccessor().getSource()));
+		properties);
 
 	reportsHandler.sendErrorAndWarnMessageEmail();
 
+	//
+	//
+	//
+
 	if (exception != null) {
-
-	    if (exception instanceof GSException) {
-
-		((GSException) exception).log();
-	    }
 
 	    throw exception;
 	}
+    }
+
+    /**
+     * @param customTask
+     */
+    public void setCustomTask(CustomTask customTask) {
+
+	this.customTask = customTask;
     }
 
     /**
@@ -220,41 +334,77 @@ public class Harvester {
     }
 
     /**
-     * @param recordRequest
-     * @param isRecovering
+     * @param context
+     * @param status
+     */
+    private void handleCustomTask(JobExecutionContext context, SchedulerJobStatus status) {
+
+	if (customTask != null) {
+
+	    try {
+
+		GSLoggerFactory.getLogger(getClass()).info("Execution of custom task {} STARTED", customTask.getName());
+
+		customTask.doJob(context, status);
+
+		GSLoggerFactory.getLogger(getClass()).info("Execution of custom task {} ENDED", customTask.getName());
+
+	    } catch (Exception e) {
+
+		GSLoggerFactory.getLogger(getClass()).error(e);
+
+		reportsHandler.gatherGSException(GSException.createException(getClass(), HARVESTER_CUSTOM_TASK_ERROR, e));
+	    }
+	}
+    }
+
+    /**
+     * @param request
+     * @param context
      * @param isIncremental
+     * @param resumed
      * @param properties
+     * @param status
      * @throws GSException
      */
     @SuppressWarnings("unchecked")
     private void doHarvest(//
-	    ListRecordsRequest recordRequest, //
-	    Boolean isRecovering, //
+	    ListRecordsRequest request, //
+	    JobExecutionContext context, //
+	    boolean recovery, //
+	    boolean resumed, //
 	    boolean isIncremental, //
-	    HarvestingProperties properties) throws GSException {
+	    HarvestingProperties properties, //
+	    SchedulerJobStatus status) throws GSException {
 
 	String resumptionToken = null;
 
-	if (recordRequest.getRecovering()) {
+	if (request.isRecovered() || resumed) {
+
 	    resumptionToken = findRecoveryToken();
 
-	    GSLoggerFactory.getLogger(getClass()).trace("Harvesting plan application STARTED (recovery) - resumption token: {}",
+	    String info = request.isRecovered() ? "recovery" : "resume";
+
+	    GSLoggerFactory.getLogger(getClass()).trace("Harvesting plan application STARTED (" + info + ") - resumption token: {}",
 		    resumptionToken);
+
 	} else {
 
-	    GSLoggerFactory.getLogger(getClass()).trace("Harvesting plan application STARTED (not recovery)");
+	    GSLoggerFactory.getLogger(getClass()).trace("Harvesting plan application STARTED (not recovery nor resume)");
 	}
 
-	recordRequest.setFirst(true);
+	//
+	//
+	//
 
 	do {
 
-	    recordRequest.setResumptionToken(resumptionToken);
+	    request.setResumptionToken(resumptionToken);
 
 	    //
-	    // updates the recovery RESUMPTION token before the plan application
+	    // updates the recovery/resuming RESUMPTION token before the plan application
 	    //
-	    updateToken(resumptionToken, false);
+	    updateToken(properties, resumptionToken, false);
 
 	    //
 	    // updates the recovery REMOVAL token before the plan application.
@@ -262,13 +412,13 @@ public class Harvester {
 	    //
 	    String recoveryRemovalToken = UUID.randomUUID().toString();
 
-	    updateToken(UUID.randomUUID().toString(), true);
+	    updateToken(properties, UUID.randomUUID().toString(), true);
 
 	    ListRecordsResponse<GSResource> response;
 
 	    try {
 
-		response = getAccessor().listRecords(recordRequest);
+		response = getAccessor().listRecords(request);
 
 	    } catch (Throwable t) {
 
@@ -286,10 +436,10 @@ public class Harvester {
 			UNEXPECTED_NO_LIST_RECORDS_ERROR_RESPONSE_ERROR);
 	    }
 
-	    applyHarvestPlan(//
+	    applyHarvestingPlan(//
 		    response.getRecords(), //
-		    recordRequest.isFirstHarvesting(), //
-		    isRecovering, //
+		    request.isFirstHarvesting(), //
+		    recovery, //
 		    isIncremental, //
 		    resumptionToken, //
 		    recoveryRemovalToken, //
@@ -298,10 +448,20 @@ public class Harvester {
 	    // now get the response token
 	    resumptionToken = response.getResumptionToken();
 
-	    recordRequest.setRecovering(false);
-	    recordRequest.setFirst(false);
+	    // set the request flags
+	    request.setRecovered(false);
+	    request.setFirst(false);
 
 	    GSLoggerFactory.getLogger(getClass()).trace("Harvesting plan application ENDED");
+
+	    if (!RecoveringContext.isRecoveringContext(context) && ConfigurationWrapper.isJobCanceled(context)) {
+
+		GSLoggerFactory.getLogger(getClass()).trace("Harvesting canceled");
+
+		status.setPhase(JobPhase.CANCELED);
+
+		break;
+	    }
 
 	} while (resumptionToken != null);
 
@@ -316,7 +476,7 @@ public class Harvester {
      * @param recoveryRemovalToken
      * @param harvestingProperties
      */
-    private void applyHarvestPlan(//
+    private void applyHarvestingPlan(//
 	    Iterator<GSResource> records, //
 	    boolean firstHarvesting, //
 	    boolean isRecovering, //
@@ -329,8 +489,6 @@ public class Harvester {
 
 	    GSResource resource = records.next();
 
-	    // GSLoggerFactory.getLogger(getClass()).trace("Plan application on resource {} STARTED", resource);
-
 	    //
 	    // set the removal token used for the recovery. in case of recovery, resources
 	    // having this token (which corresponds to the token written in the properties file)
@@ -342,9 +500,7 @@ public class Harvester {
 
 	    plan.setResumptionToken(resumptionToken);
 	    plan.setHarvestingProperties(harvestingProperties);
-	    plan.setIsRecovering(isRecovering);
 	    plan.setIsFirstHarvesting(firstHarvesting);
-	    plan.setIsIncrementalHarvesting(isIncremental);
 
 	    try {
 
@@ -358,12 +514,10 @@ public class Harvester {
 
 		reportsHandler.gatherDuplicatedResourceException(rex);
 
-	    } catch (HarvesterComponentException hce) {
+	    } catch (HarvestingComponentException hce) {
 
 		reportsHandler.gatherHarvesterComponentException(hce);
 	    }
-
-	    // GSLoggerFactory.getLogger(getClass()).trace("Plan application on resource {} ENDED", resource);
 	}
     }
 
@@ -385,46 +539,40 @@ public class Harvester {
     }
 
     /**
+     * @param properties
      * @param token
      * @param removal
      * @throws GSException
      */
-    private void updateToken(String token, boolean removal) throws GSException {
+    private void updateToken(HarvestingProperties properties, String token, boolean removal) throws GSException {
 
 	if (token == null) {
 
 	    return;
 	}
 
-	if (!removal) {
-
-	    GSLoggerFactory.getLogger(getClass()).trace("Updating recovery resumption token STARTED");
-
-	} else {
-
-	    GSLoggerFactory.getLogger(getClass()).trace("Updating recovery removal token STARTED");
-	}
-
-	GSLoggerFactory.getLogger(getClass()).trace("Token {} ", token);
-
-	GSSource source = getAccessor().getSource();
-
-	HarvestingProperties properties = getSourceStorage().retrieveHarvestingProperties(source);
+	GSLoggerFactory.getLogger(getClass()).trace("Token: {} ", token);
 
 	if (!removal) {
+
+	    GSLoggerFactory.getLogger(getClass()).trace("Updating recovery/resuming resumption token STARTED");
 
 	    properties.setRecoveryResumptionToken(token);
 
 	} else {
 
+	    GSLoggerFactory.getLogger(getClass()).trace("Updating recovery removal token STARTED");
+
 	    properties.setRecoveryRemovalToken(token);
 	}
+
+	GSSource source = getAccessor().getSource();
 
 	getSourceStorage().storeHarvestingProperties(source, properties);
 
 	if (!removal) {
 
-	    GSLoggerFactory.getLogger(getClass()).trace("Updating recovery resumption token ENDED");
+	    GSLoggerFactory.getLogger(getClass()).trace("Updating recovery/resuming resumption token ENDED");
 
 	} else {
 

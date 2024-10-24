@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.rest;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -20,6 +20,8 @@ package eu.essi_lab.profiler.rest;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
+
+import java.util.Optional;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -42,6 +44,7 @@ import eu.essi_lab.pdk.handler.DiscoveryHandler;
 import eu.essi_lab.pdk.handler.SemanticHandler;
 import eu.essi_lab.pdk.handler.selector.GETRequestFilter;
 import eu.essi_lab.pdk.handler.selector.HandlerSelector;
+import eu.essi_lab.pdk.handler.selector.OPTIONSRequestFilter;
 import eu.essi_lab.pdk.handler.selector.POSTRequestFilter;
 import eu.essi_lab.pdk.rsf.AccessResultSetFormatterAttachment;
 import eu.essi_lab.pdk.rsf.DiscoveryResultSetFormatterFactory;
@@ -60,6 +63,8 @@ import eu.essi_lab.profiler.rest.handler.info.MessageFormat;
 import eu.essi_lab.profiler.rest.handler.info.RestParameter;
 import eu.essi_lab.profiler.rest.handler.info.ServiceInfoHandler;
 import eu.essi_lab.profiler.rest.handler.info.SourcesInfoHandler;
+import eu.essi_lab.profiler.rest.handler.token.MirrorSiteTokenGeneratorHandler;
+import eu.essi_lab.profiler.rest.handler.token.TokenGeneratorHandler;
 
 /**
  * @author Fabrizio
@@ -151,19 +156,19 @@ public class RestProfiler extends Profiler {
 	selector.register(//
 		new GETRequestFilter("rest/discovery/info"), //
 		new DiscoveryInfoHandler());
-			
+
 	selector.register(//
 		new GETRequestFilter("rest/sources/info"), //
 		new SourcesInfoHandler());
-	
+
 	selector.register(//
 		new GETRequestFilter("rest/access/info"), //
 		new AccessInfoHandler());
-	
+
 	selector.register(//
 		new GETRequestFilter("rest/service/info"), //
 		new ServiceInfoHandler());
-	
+
 	// -------------------------
 	//
 	// Statistics
@@ -171,20 +176,38 @@ public class RestProfiler extends Profiler {
 	selector.register(//
 		new GETRequestFilter("rest/stats"), //
 		new FullStatisticsHandler());
-	
+
 	selector.register(//
 		new GETRequestFilter("rest/stats/gp"), //
 		new GWPStatisticsHandler());
-	
+
 	selector.register(//
 		new GETRequestFilter("rest/stats/gp/discovery"), //
 		new GWPStatisticsHandler());
-	
+
 	selector.register(//
 		new GETRequestFilter("rest/stats/gp/access"), //
 		new GWPStatisticsHandler());
+
+	// --------------------------
+	//
+	// User creation with token
+	//
+
+	selector.register(//
+		new GETRequestFilter("rest/newtoken"), //
+		new TokenGeneratorHandler());
+
+	selector.register(//
+		new GETRequestFilter("rest/gpwtoken"), //
+		new MirrorSiteTokenGeneratorHandler());
 	
+	selector.register(//
+		new OPTIONSRequestFilter("rest/gpwtoken"), //
+		new MirrorSiteTokenGeneratorHandler());
+
 	return selector;
+
     }
 
     @Override
@@ -253,16 +276,25 @@ public class RestProfiler extends Profiler {
 	KeyValueParser parser = new KeyValueParser(queryString);
 	String reqEncoding = parser.getValue("requestEncoding");
 
+	Optional<String> responseEncoding = message.getResponseEncoding();
+
 	String error = null;
-	if (!parser.isValid(reqEncoding) || //
-		queryString.contains("xml")) {
+
+	if ((!parser.isValid(reqEncoding) && !responseEncoding.isPresent()) || //
+		(parser.isValid(reqEncoding) && queryString.contains("xml")) || (responseEncoding.isPresent() && responseEncoding.get().equals(MediaType.APPLICATION_XML))) {
 
 	    error = createXMLError(Status.BAD_REQUEST, message);
 
 	    builder.entity(error);
 	    builder.type(MediaType.APPLICATION_XML_TYPE);
-	} else {
-	    // JSON
+
+	} else if ((parser.isValid(reqEncoding) && queryString.contains("json"))
+		|| (responseEncoding.isPresent() && responseEncoding.get().equals(MediaType.APPLICATION_JSON))) {
+
+	    error = createJSONError(Status.BAD_REQUEST, message);
+
+	    builder.entity(error);
+	    builder.type(MediaType.APPLICATION_JSON);
 	}
 
 	return builder.build();
@@ -274,6 +306,11 @@ public class RestProfiler extends Profiler {
 	return createUncaughtError(request, Status.BAD_REQUEST, "Unknonwn request");
     }
 
+    /**
+     * @param status
+     * @param message
+     * @return
+     */
     private String createXMLError(Status status, ValidationMessage message) {
 
 	String error = "<gs:error xmlns:gs=\"http://flora.eu/gi-suite/1.0/dataModel/schema\">";
@@ -283,6 +320,22 @@ public class RestProfiler extends Profiler {
 	error += "</gs:error>";
 
 	return error;
+    }
+
+    /**
+     * @param status
+     * @param message
+     * @return
+     */
+    private String createJSONError(Status status, ValidationMessage message) {
+
+	JSONObject object = new JSONObject();
+
+	object.put("status", status);
+	object.put("message", message.getError());
+	object.put("locator", message.getLocator());
+
+	return object.toString(3);
     }
 
     private String createXMLError(Status status, String message) {

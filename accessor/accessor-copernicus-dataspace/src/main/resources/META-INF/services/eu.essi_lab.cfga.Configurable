@@ -1,0 +1,4 @@
+eu.essi_lab.accessor.copernicus.dataspace.harvested.CopernicusDataspaceConnector
+eu.essi_lab.accessor.copernicus.dataspace.harvested.CopernicusDataspaceAccessor
+eu.essi_lab.accessor.copernicus.dataspace.distributed.CopernicusDataspaceGranulesAccessor
+eu.essi_lab.accessor.copernicus.dataspace.distributed.CopernicusDataspaceGranulesConnector

@@ -4,7 +4,7 @@ package eu.essi_lab.api.database.marklogic;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -669,7 +669,7 @@ public class MarkLogicIndexesManager {
 	String query = "import module namespace admin = \"http://marklogic.com/xdmp/admin\" at \"/MarkLogic/admin.xqy\";";
 	query += "let $config := admin:get-configuration()";
 	query += " return ";//
-	query += " admin:database-get-word-query-included-elements($config, xdmp:database(\"" + markLogicDB.getStorageUri().getStorageName()
+	query += " admin:database-get-word-query-included-elements($config, xdmp:database(\"" + markLogicDB.getStorageInfo().getName()
 		+ "\"))";
 
 	return query;
@@ -680,7 +680,7 @@ public class MarkLogicIndexesManager {
 	String query = "import module namespace admin = \"http://marklogic.com/xdmp/admin\" at \"/MarkLogic/admin.xqy\";";
 	query += "let $config := admin:get-configuration()";
 	query += " return ";//
-	query += " admin:database-get-word-query-excluded-elements($config, xdmp:database(\"" + markLogicDB.getStorageUri().getStorageName()
+	query += " admin:database-get-word-query-excluded-elements($config, xdmp:database(\"" + markLogicDB.getStorageInfo().getName()
 		+ "\"))";
 
 	return query;
@@ -689,7 +689,7 @@ public class MarkLogicIndexesManager {
     private String getAddWordQueryIncludedElementsQuery(String elementName) {
 
 	String query = "let $config := admin:get-configuration()\n";
-	query += "	  let $dbid := xdmp:database(\"" + markLogicDB.getStorageUri().getStorageName() + "\")\n";
+	query += "	  let $dbid := xdmp:database(\"" + markLogicDB.getStorageInfo().getName() + "\")\n";
 	query += " let $wqspec :=   admin:database-included-element(\"" + NameSpace.GI_SUITE_DATA_MODEL.getURI() + "\",";
 	query += " \"" + elementName + "\", 1.0,\"\",\"\",\"\") \n";
 	query += "return \n";
@@ -701,7 +701,7 @@ public class MarkLogicIndexesManager {
     private String getDeleteWordQueryIncludedElementsQuery(String elementName, String nsURI) {
 
 	String query = "let $config := admin:get-configuration()\n";
-	query += "	  let $dbid := xdmp:database(\"" + markLogicDB.getStorageUri().getStorageName() + "\")\n";
+	query += "	  let $dbid := xdmp:database(\"" + markLogicDB.getStorageInfo().getName() + "\")\n";
 	query += " let $wqspec :=   admin:database-included-element(\"" + nsURI + "\",";
 	query += " \"" + elementName + "\", 1.0,\"\",\"\",\"\") \n";
 	query += "return \n";
@@ -713,7 +713,7 @@ public class MarkLogicIndexesManager {
     private String getDeleteWordQueryExcludedElementsQuery(String elementName, String nsURI) {
 
 	String query = "let $config := admin:get-configuration()\n";
-	query += "	  let $dbid := xdmp:database(\"" + markLogicDB.getStorageUri().getStorageName() + "\")\n";
+	query += "	  let $dbid := xdmp:database(\"" + markLogicDB.getStorageInfo().getName() + "\")\n";
 	query += " let $wqspec :=   admin:database-included-element(\"" + nsURI + "\",";
 	query += " \"" + elementName + "\", 1.0,\"\",\"\",\"\") \n";
 	query += "return \n";
@@ -733,7 +733,7 @@ public class MarkLogicIndexesManager {
 	String query = "import module namespace admin = \"http://marklogic.com/xdmp/admin\" at \"/MarkLogic/admin.xqy\";";
 	query += "let $config := admin:get-configuration()";
 	query += " return ";//
-	query += " admin:database-get-range-element-indexes($config, xdmp:database(\"" + markLogicDB.getStorageUri().getStorageName()
+	query += " admin:database-get-range-element-indexes($config, xdmp:database(\"" + markLogicDB.getStorageInfo().getName()
 		+ "\"))";
 
 	return query;
@@ -742,7 +742,7 @@ public class MarkLogicIndexesManager {
     private String getRemoveRangeElementeIndexQuery(String elName, String nsUri, String scalarType) {
 
 	String query = "let $config := admin:get-configuration()\n";
-	query += " let $dbid := xdmp:database(\"" + markLogicDB.getStorageUri().getStorageName() + "\")\n";
+	query += " let $dbid := xdmp:database(\"" + markLogicDB.getStorageInfo().getName() + "\")\n";
 	query += " let $rangespec := admin:database-range-element-index( \"" + scalarType + "\", " + "\"" + nsUri + "\",";
 	query += " \"" + elName + "\", \"http://marklogic.com/collation/\"";
 	query += " , fn:false() )\n";
@@ -755,7 +755,7 @@ public class MarkLogicIndexesManager {
     private String getAddRangeElementIndexQuery(String elName, String scalarType) {
 
 	String query = "let $config := admin:get-configuration()\n";
-	query += " let $dbid := xdmp:database(\"" + markLogicDB.getStorageUri().getStorageName() + "\")\n";
+	query += " let $dbid := xdmp:database(\"" + markLogicDB.getStorageInfo().getName() + "\")\n";
 	query += " let $rangespec := admin:database-range-element-index( \"" + scalarType + "\", " + "\""
 		+ NameSpace.GI_SUITE_DATA_MODEL.getURI() + "\",";
 	query += " \"" + elName + "\", \"http://marklogic.com/collation/\"";
@@ -771,7 +771,7 @@ public class MarkLogicIndexesManager {
 	String query = "import module namespace admin = \"http://marklogic.com/xdmp/admin\" at \"/MarkLogic/admin.xqy\";";
 	query += "let $config := admin:get-configuration()\n";
 	query += " return \n";//
-	query += "admin:database-get-geospatial-element-indexes($config, xdmp:database(\"" + markLogicDB.getStorageUri().getStorageName()
+	query += "admin:database-get-geospatial-element-indexes($config, xdmp:database(\"" + markLogicDB.getStorageInfo().getName()
 		+ "\"))";
 
 	return query;
@@ -783,7 +783,7 @@ public class MarkLogicIndexesManager {
 	query += " let $geospec := admin:database-geospatial-element-index(\"" + nsUri + "\",\"" + localName + "\", \"" + crs
 		+ "\", fn:false() ) \n";
 	query += " return \n";//
-	query += "admin:database-delete-geospatial-element-index($config, xdmp:database(\"" + markLogicDB.getStorageUri().getStorageName()
+	query += "admin:database-delete-geospatial-element-index($config, xdmp:database(\"" + markLogicDB.getStorageInfo().getName()
 		+ "\"),  $geospec )";
 
 	return query;
@@ -795,7 +795,7 @@ public class MarkLogicIndexesManager {
 	query += " let $geospec := admin:database-geospatial-element-index(\"" + NameSpace.GI_SUITE_DATA_MODEL.getURI() + "\",\""
 		+ localName + "\", \"wgs84\", fn:false() ) \n";
 	query += " return \n";//
-	query += "admin:database-add-geospatial-element-index($config, xdmp:database(\"" + markLogicDB.getStorageUri().getStorageName()
+	query += "admin:database-add-geospatial-element-index($config, xdmp:database(\"" + markLogicDB.getStorageInfo().getName()
 		+ "\"),  $geospec )";
 
 	return query;
@@ -811,7 +811,7 @@ public class MarkLogicIndexesManager {
 
 	String value = auto ? "automatic" : "none";
 
-	String query = " admin:database-set-index-detection($config, " + "xdmp:database(\"" + markLogicDB.getStorageUri().getStorageName()
+	String query = " admin:database-set-index-detection($config, " + "xdmp:database(\"" + markLogicDB.getStorageInfo().getName()
 		+ "\"), " + "\"" + value + "\")";
 
 	return query;
@@ -819,7 +819,7 @@ public class MarkLogicIndexesManager {
 
     private String getEnableTripleIndexQuery() {
 
-	return " admin:database-set-triple-index($config, " + "xdmp:database(\"" + markLogicDB.getStorageUri().getStorageName()
+	return " admin:database-set-triple-index($config, " + "xdmp:database(\"" + markLogicDB.getStorageInfo().getName()
 		+ "\"), fn:true() ) ";
     }
 
@@ -827,7 +827,7 @@ public class MarkLogicIndexesManager {
 
 	String value = enabled ? "fn:true()" : "fn:false()";
 
-	String query = " admin:database-set-reindexer-enable($config, " + "xdmp:database(\"" + markLogicDB.getStorageUri().getStorageName()
+	String query = " admin:database-set-reindexer-enable($config, " + "xdmp:database(\"" + markLogicDB.getStorageInfo().getName()
 		+ "\"), " + "" + value + ")";
 
 	return query;
@@ -836,7 +836,7 @@ public class MarkLogicIndexesManager {
     private String getSetReindexerThrottleQuery(int value) {
 
 	String query = " admin:database-set-reindexer-throttle($config, " + "xdmp:database(\""
-		+ markLogicDB.getStorageUri().getStorageName() + "\"), " + "" + value + ")";
+		+ markLogicDB.getStorageInfo().getName() + "\"), " + "" + value + ")";
 
 	return query;
     }

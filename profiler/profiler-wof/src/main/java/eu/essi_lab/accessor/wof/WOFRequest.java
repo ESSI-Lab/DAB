@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -32,7 +32,6 @@ import java.util.Set;
 import org.w3c.dom.Node;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
@@ -42,7 +41,6 @@ import eu.essi_lab.messages.bond.SpatialBond;
 import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
 
 /**
@@ -279,10 +277,30 @@ public abstract class WOFRequest {
 
     public Optional<SimpleValueBond> getKeywordBond() {
 	try {
-	    String conceptString = getParameterValue(Parameter.CONCEPT_KEYWORD);
+	    String conceptString = getParameterValue(Parameter.CONCEPT_KEYWORD).toLowerCase();
 	    if (conceptString.length() > 0 && !conceptString.equalsIgnoreCase("all")) {
-		SimpleValueBond ret = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.ATTRIBUTE_IDENTIFIER,
-			conceptString);//
+		
+		SimpleValueBond ret = null;
+		switch (conceptString) {
+		case "discharge, stream":
+		    ret = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.ATTRIBUTE_TITLE,
+				"Vazao");//   
+		    break;
+		case "precipitation":
+		    ret = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.ATTRIBUTE_TITLE,
+				"Chuva");//
+		    break;
+		case "level, stream":
+		    ret = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.ATTRIBUTE_TITLE,
+				"Nivel");//
+		    break;
+		default:
+		    break;
+		}
+		
+		if (ret==null) {
+		    return Optional.empty();
+		}
 		return Optional.of(ret);
 	    }
 	} catch (Exception e) {

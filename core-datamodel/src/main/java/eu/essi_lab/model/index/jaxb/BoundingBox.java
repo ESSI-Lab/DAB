@@ -4,7 +4,7 @@ package eu.essi_lab.model.index.jaxb;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -40,6 +40,7 @@ import eu.essi_lab.iso.datamodel.DOMSerializer;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.lib.xml.QualifiedName;
+import eu.essi_lab.model.Queryable;
 
 /**
  * @author Fabrizio
@@ -62,7 +63,6 @@ public class BoundingBox extends DOMSerializer {
 	return new BoundingBox().fromStream(stream);
     }
 
-  
     public static final String AREA_ELEMENT_NAME = "area";
     public static final String IS_CROSSED_ELEMENT_NAME = "isCrossed";
     public static final String SOUTH_ELEMENT_NAME = "south";
@@ -77,13 +77,46 @@ public class BoundingBox extends DOMSerializer {
     public static final String DISJ_NORTH_ELEMENT_NAME = "disjNorth";
     public static final String DISJ_WEST_ELEMENT_NAME = "disjWest";
     public static final String DISJ_EAST_ELEMENT_NAME = "disjEast";
-    
+
     public static final QualifiedName AREA_QUALIFIED_NAME = new QualifiedName(NameSpace.GI_SUITE_DATA_MODEL.getURI(), AREA_ELEMENT_NAME,
 	    NameSpace.GI_SUITE_DATA_MODEL.getPrefix());
 
-    public static final QualifiedName IS_CROSSED_QUALIFIED_NAME = new QualifiedName(NameSpace.GI_SUITE_DATA_MODEL.getURI(), IS_CROSSED_ELEMENT_NAME,
-	    NameSpace.GI_SUITE_DATA_MODEL.getPrefix());
+    public static final QualifiedName IS_CROSSED_QUALIFIED_NAME = new QualifiedName(NameSpace.GI_SUITE_DATA_MODEL.getURI(),
+	    IS_CROSSED_ELEMENT_NAME, NameSpace.GI_SUITE_DATA_MODEL.getPrefix());
 
+    /**
+     * 
+     */
+    public static final Queryable AREA_QUERYABLE = new Queryable() {
+
+	@Override
+	public void setEnabled(boolean enabled) {
+	}
+
+	@Override
+	public boolean isVolatile() {
+
+	    return false;
+	}
+
+	@Override
+	public boolean isEnabled() {
+
+	    return false;
+	}
+
+	@Override
+	public String getName() {
+
+	    return AREA_QUALIFIED_NAME.getLocalPart();
+	}
+
+	@Override
+	public ContentType getContentType() {
+
+	    return ContentType.DOUBLE;
+	}
+    };
 
     @XmlElement(namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     private String sw;
@@ -217,7 +250,7 @@ public class BoundingBox extends DOMSerializer {
 
 	Marshaller marshaller = context.createMarshaller();
 	marshaller.setProperty("jaxb.formatted.output", true);
-	marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new CommonNameSpaceContext());
+	marshaller.setProperty(NameSpace.NAMESPACE_PREFIX_MAPPER_IMPL, new CommonNameSpaceContext());
 	return marshaller;
     }
 

@@ -4,7 +4,7 @@ package eu.essi_lab.pdk.wrt;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -43,6 +43,7 @@ import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.RuntimeInfoElementBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.SpatialBond;
+import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.bond.ViewBond;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondHandler;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
@@ -50,7 +51,6 @@ import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.OrderingDirection;
 import eu.essi_lab.model.Queryable;
-import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.Pluggable;
 import eu.essi_lab.model.resource.GSResource;
@@ -141,7 +141,20 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
 	    message.setOrderingDirection(orderingDirection.get());
 	}
 
-	List<GSSource> sources = getSources(message.getUserBond().orElse(null));
+	Optional<View> optionalView = message.getView();
+	Bond finalBond = message.getUserBond().orElse(null);
+	if (optionalView.isPresent()) {
+	    Optional<View> view = WebRequestTransformer.findView(message.getDataBaseURI(), optionalView.get().getId());
+	    if (view.isPresent()) {
+		if (finalBond == null) {
+		    finalBond = view.get().getBond();
+		} else {
+		    finalBond = BondFactory.createAndBond(finalBond, view.get().getBond());
+		}
+	    }
+	}
+
+	List<GSSource> sources = getSources(finalBond);
 	message.setSources(sources);
 
 	ResourceSelector selector = getSelector(message.getWebRequest());
@@ -213,9 +226,9 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
     protected List<GSSource> getSources(Bond bond) throws GSException {
 
 	logger.trace("Getting sources STARTED");
-	
+
 	List<GSSource> allSources = ConfigurationWrapper.getAllSources();
-	
+
 	DiscoveryBondParser bondParser = new DiscoveryBondParser(bond);
 	final List<GSSource> sources = new ArrayList<>();
 	final List<GSException> excList = new ArrayList<>();
@@ -236,20 +249,21 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
 			return;
 		    }
 
-		    Optional<GSSource> source = allSources.stream().filter(s -> s.getUniqueIdentifier().equals(value)).findFirst();;
+		    Optional<GSSource> source = allSources.stream().filter(s -> s.getUniqueIdentifier().equals(value)).findFirst();
+		    ;
 
 		    if (source.isPresent()) {
 			sources.add(source.get());
 		    } else {
-			// the request validation MUST check the sources ids,
-			// this exception should NEVER be thrown
-			GSException exception = GSException.createException(//
-				getClass(), //
-				"Unidentified source: " + value, null, //
-				ErrorInfo.ERRORTYPE_CLIENT, //
-				ErrorInfo.SEVERITY_ERROR, //
-				UNIDENTIFIED_SOURCE_ERROR);//
-			excList.add(exception);
+			// // the request validation MUST check the sources ids,
+			// // this exception should NEVER be thrown
+			// GSException exception = GSException.createException(//
+			// getClass(), //
+			// "Unidentified source: " + value, null, //
+			// ErrorInfo.ERRORTYPE_CLIENT, //
+			// ErrorInfo.SEVERITY_ERROR, //
+			// UNIDENTIFIED_SOURCE_ERROR);//
+			// excList.add(exception);
 		    }
 		}
 	    }
@@ -319,7 +333,8 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
 	    Iterator<GSSource> iterator = sources.iterator();
 	    while (iterator.hasNext()) {
 		GSSource source = iterator.next();
-		if (source.getUniqueIdentifier().equals(excludedSource)) {
+		String id = source.getUniqueIdentifier();
+		if (id == null || id.equals(excludedSource)) {
 		    iterator.remove();
 		}
 	    }

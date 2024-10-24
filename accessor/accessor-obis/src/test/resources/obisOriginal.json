@@ -1,0 +1,73 @@
+{
+	"id": "9f1eb607-5c81-4bd3-a869-09a190c5aee3",
+	"url": "http://ipt.iobis.org/afrobis/resource?r=mcm_linefish",
+	"archive": "http://ipt.iobis.org/afrobis/archive.do?r=mcm_linefish",
+	"published": "2018-11-13T15:01:20.000Z",
+	"updated": "2019-06-18T11:09:03.630Z",
+	"title": "Marine and Coastal Management - Linefish Dataset (AfrOBIS)",
+	"citation": "Marine and Coastal Management - Linefish Dataset",
+	"abstract": "Marine and Coastal Management (MCM)'s linefish dataset is collected around the South African Coast, and currently contains 2759599 records of 63 families.",
+	"intellectualrights": "This work is licensed under a Creative Commons Attribution (CC-BY) 4.0 License",
+	"feed": {
+		"id": "052e40a0-84f9-4623-bccf-59ba8aa05a57",
+		"url": "http://ipt.iobis.org/afrobis/rss.do"
+	},
+	"institutes": null,
+	"contacts": [
+		{
+			"role": null,
+			"type": "associatedParty",
+			"givenname": null,
+			"surname": null,
+			"organization": null,
+			"position": null,
+			"email": null,
+			"url": null,
+			"organization_oceanexpert_id": null,
+			"type_display": "Associated Party"
+		},
+		{
+			"role": null,
+			"type": "contact",
+			"givenname": "Chris",
+			"surname": "Wilke",
+			"organization": "Marine and Coastal Management; Department of Environmental Affairs and Tourism",
+			"position": null,
+			"email": "cwilke@deat.gov.za",
+			"url": null,
+			"organization_oceanexpert_id": null,
+			"type_display": "Contact"
+		},
+		{
+			"role": null,
+			"type": "metadataProvider",
+			"givenname": "Ursula",
+			"surname": "von St Ange",
+			"organization": "CSIR / SADCO / AfrOBIS",
+			"position": "Data Manager",
+			"email": "uvstange@csir.co.za",
+			"url": null,
+			"organization_oceanexpert_id": null,
+			"type_display": "Metadata Provider"
+		},
+		{
+			"role": null,
+			"type": "creator",
+			"givenname": null,
+			"surname": null,
+			"organization": "Marine and Coastal Management Department of Environmental Affairs and Tourism",
+			"position": null,
+			"email": null,
+			"url": null,
+			"organization_oceanexpert_id": null,
+			"type_display": "Creator"
+		}
+	],
+	"nodes": [
+		{
+			"id": "14fc439c-707d-41d6-a3d4-b9d2696205fe",
+			"name": "AfrOBIS"
+		}
+	],
+	"records": 2744112
+}

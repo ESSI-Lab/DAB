@@ -1,0 +1,100 @@
+{
+  "version": "0.1.0",
+  "id": "station-info",
+  "title": "Station Information",
+  "description": "Returns the station feature collection with counted observations by station",
+  "keywords": [],
+  "links": [
+    {
+      "type": "application/json",
+      "rel": "self",
+      "href": "${BASE_ENDPOINT}/processes/station-info?f=json",
+      "title": "Process description as JSON",
+      "hreflang": "en-US"
+    },
+    {
+      "type": "application/json",
+      "rel": "http://www.opengis.net/def/rel/ogc/1.0/job-list",
+      "href": "${BASE_ENDPOINT}/jobs?f=json",
+      "title": "jobs for this process as JSON",
+      "hreflang": "en-US"
+    },
+    {
+      "type": "application/json",
+      "rel": "http://www.opengis.net/def/rel/ogc/1.0/execute",
+      "href": "${BASE_ENDPOINT}/processes/station-info/execution?f=json",
+      "title": "Execution for this process as JSON",
+      "hreflang": "en-US"
+    }
+  ],
+  "inputs": {
+    "collection": {
+      "title": "Collection identifier",
+      "description": "Collection identifier",
+      "keywords": [
+        "collection",
+        "topic",
+        "dataset"
+      ],
+      "schema": {
+        "type": "string",
+        "default": null
+      },
+      "minOccurs": 1,
+      "maxOccurs": 1,
+      "metadata": null
+    },
+    "wigos_station_identifier": {
+      "title": "WIGOS Station Identifier",
+      "schema": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "string"
+        }
+      },
+      "minOccurs": 0,
+      "maxOccurs": 1,
+      "metadata": null
+    },
+    "days": {
+      "title": "Days",
+      "schema": {
+        "type": "number",
+        "default": 1
+      },
+      "minOccurs": 0,
+      "maxOccurs": 1
+    },
+    "years": {
+      "title": "Years",
+      "schema": {
+        "type": "number",
+        "default": 0
+      },
+      "minOccurs": 0,
+      "maxOccurs": 1
+    }
+  },
+  "outputs": {
+    "path": {
+      "title": "FeatureCollection",
+      "description": "A GeoJSON FeatureCollection of the stations with their status",
+      "schema": {
+        "type": "object",
+        "contentMediaType": "application/json"
+      }
+    }
+  },
+  "example": {
+    "inputs": {
+      "collection": "whos-plata"
+    }
+  },
+  "jobControlOptions": [
+    "sync-execute"
+  ],
+  "outputTransmission": [
+    "value"
+  ]
+}

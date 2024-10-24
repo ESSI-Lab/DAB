@@ -4,7 +4,7 @@ package eu.essi_lab.request.executor.discover.submitter;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -90,7 +90,7 @@ public class DistributedQueryExecutor implements IDistributedQueryExecutor {
     @Override
     public SimpleEntry<String, DiscoveryCountResponse> count(ReducedDiscoveryMessage message) throws GSException {
 
-	RequestManager.getInstance().addThreadName(message.getRequestId());
+	RequestManager.getInstance().updateThreadName(getClass(), message.getRequestId());
 
 	Bond reducedBond = message.getReducedBond();
 
@@ -154,10 +154,10 @@ public class DistributedQueryExecutor implements IDistributedQueryExecutor {
     @Override
     public ResultSet<GSResource> retrieve(ReducedDiscoveryMessage message, Page page) throws GSException {
 
-	RequestManager.getInstance().addThreadName(message.getRequestId());
+	RequestManager.getInstance().updateThreadName(getClass(), message.getRequestId());
 
 	if (getIdentifierDecorator() == null) {
-	    
+
 	    throw GSException.createException(//
 		    getClass(), //
 		    "Identifier decorator not set in Distributed Query executor", //

@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.sos._2_0.swes_2;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -36,6 +36,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+
 import eu.essi_lab.jaxb.sos._2_0.gml._3_2_1.AbstractTimeGeometricPrimitiveType;
 import eu.essi_lab.jaxb.sos._2_0.gml._3_2_1.TimeInstantType;
 import eu.essi_lab.jaxb.sos._2_0.gml._3_2_1.TimePeriodType;

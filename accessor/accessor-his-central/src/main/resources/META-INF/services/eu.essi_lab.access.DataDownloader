@@ -1,0 +1,14 @@
+eu.essi_lab.downloader.hiscentral.HISCentralBolzanoDownloader
+eu.essi_lab.downloader.hiscentral.HISCentralEmiliaDownloader
+eu.essi_lab.downloader.hiscentral.HISCentralFriuliDownloader
+eu.essi_lab.downloader.hiscentral.HISCentralLazioDownloader
+eu.essi_lab.downloader.hiscentral.HISCentralLiguriaDownloader
+eu.essi_lab.downloader.hiscentral.HISCentralLombardiaDownloader
+eu.essi_lab.downloader.hiscentral.HISCentralMarcheDownloader
+eu.essi_lab.downloader.hiscentral.HISCentralPiemonteDownloader
+eu.essi_lab.downloader.hiscentral.HISCentralToscanaDownloader
+eu.essi_lab.downloader.hiscentral.HISCentralValdaostaDownloader
+eu.essi_lab.downloader.hiscentral.HISCentralVenetoDownloader
+eu.essi_lab.downloader.hiscentral.HISCentralSardegnaDownloader
+eu.essi_lab.downloader.hiscentral.HISCentralBasilicataDownloader
+eu.essi_lab.downloader.hiscentral.HISCentralUmbriaDownloader

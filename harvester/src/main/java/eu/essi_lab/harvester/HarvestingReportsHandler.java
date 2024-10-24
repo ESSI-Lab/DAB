@@ -7,7 +7,7 @@ package eu.essi_lab.harvester;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -33,10 +33,10 @@ import java.util.stream.Collectors;
 
 import eu.essi_lab.api.database.SourceStorage;
 import eu.essi_lab.cfga.gs.ConfiguredGmailClient;
-import eu.essi_lab.harvester.component.HarvesterComponentException;
 import eu.essi_lab.identifierdecorator.ConflictingResourceException;
 import eu.essi_lab.identifierdecorator.DuplicatedResourceException;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.HostNamePropertyUtils;
 import eu.essi_lab.messages.HarvestingProperties;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.ErrorInfo;
@@ -80,22 +80,32 @@ public class HarvestingReportsHandler {
 	    errorsReport = sourceStorage.retrieveErrorsReport(gsSource);
 	    warnReport = sourceStorage.retrieveWarnReport(gsSource);
 
+	    StringBuilder builder = new StringBuilder();
+
+	    builder.append("Problems occurred during harvesting of source: " + gsSource.getLabel());
+	    builder.append("\n");
+	    builder.append("Source endpoint: " + gsSource.getEndpoint());
+	    builder.append("\n");
+	    builder.append("Source id: " + gsSource.getUniqueIdentifier());
+	    builder.append("\n\n");
+
 	    if (!errorsReport.isEmpty()) {
 
-		String message = errorsReport.stream().collect(Collectors.joining("\n"));
+		builder.append(errorsReport.stream().collect(Collectors.joining("\n")));
+
 		String subject = ConfiguredGmailClient.MAIL_REPORT_SUBJECT + ConfiguredGmailClient.MAIL_HARVESTING_SUBJECT
 			+ ConfiguredGmailClient.MAIL_ERROR_SUBJECT;
 
-		ConfiguredGmailClient.sendEmail(subject, message);
+		ConfiguredGmailClient.sendEmail(subject, builder.toString());
 	    }
 
 	    if (!warnReport.isEmpty()) {
 
-		String message = warnReport.stream().collect(Collectors.joining("\n"));
+		builder.append(warnReport.stream().collect(Collectors.joining("\n")));
 		String subject = ConfiguredGmailClient.MAIL_REPORT_SUBJECT + ConfiguredGmailClient.MAIL_HARVESTING_SUBJECT
 			+ ConfiguredGmailClient.MAIL_WARNING_SUBJECT;
 
-		ConfiguredGmailClient.sendEmail(subject, message);
+		ConfiguredGmailClient.sendEmail(subject, builder.toString());
 	    }
 
 	} catch (GSException e) {
@@ -108,6 +118,7 @@ public class HarvestingReportsHandler {
      * @param start
      * @param source
      * @param isRecovering
+     * @param resumed
      * @param harvestingProperties
      * @throws GSException
      */
@@ -115,6 +126,7 @@ public class HarvestingReportsHandler {
 	    boolean start, //
 	    GSSource source, //
 	    Boolean isRecovering, //
+	    boolean resumed, //
 	    List<String> report, //
 	    HarvestingProperties harvestingProperties) {
 
@@ -130,6 +142,8 @@ public class HarvestingReportsHandler {
 	message += "Endpoint: " + source.getEndpoint() + "\n";
 	message += "Id: " + source.getUniqueIdentifier() + "\n";
 	message += "Recovering: " + isRecovering + "\n";
+	message += "Resumed: " + resumed + "\n";
+	message += "Host: " + HostNamePropertyUtils.getHostNameProperty() + "\n";
 
 	if (Objects.nonNull(harvestingProperties)) {
 
@@ -199,7 +213,7 @@ public class HarvestingReportsHandler {
     /**
      * @param hce
      */
-    void gatherHarvesterComponentException(HarvesterComponentException hce) {
+    void gatherHarvesterComponentException(HarvestingComponentException hce) {
 
 	if (!enabled) {
 

@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:getEstacionesResponse xmlns:ns="http://services.com" xmlns:ax21="http://entity.com/xsd">
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:EstacionWS">
+            <ax21:apodo>1.0</ax21:apodo>
+            <ax21:area_cuenca>70990.0</ax21:area_cuenca>
+            <ax21:coordenada_x>265724.92</ax21:coordenada_x>
+            <ax21:coordenada_y>6303338.95</ax21:coordenada_y>
+            <ax21:cuenca_nivel_5>58910</ax21:cuenca_nivel_5>
+            <ax21:curso_observado>RÍO NEGRO entre Ao. DE LAS MAULAS y Río Uruguay</ax21:curso_observado>
+            <ax21:id>10</ax21:id>
+            <ax21:id_departamento>5</ax21:id_departamento>
+            <ax21:latitud>-33.390480420851674</ax21:latitud>
+            <ax21:longitud>-58.3178917319674</ax21:longitud>
+            <ax21:nombre>Villa Soriano</ax21:nombre>
+            <ax21:nombre_curso_observado>Río Negro</ax21:nombre_curso_observado>
+            <ax21:observaciones/>
+            <ax21:regimen>2</ax21:regimen>
+            <ax21:ultima_fecha>2015-10-31 17:00:00</ax21:ultima_fecha>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:EstacionWS">
+            <ax21:apodo>2.0</ax21:apodo>
+            <ax21:area_cuenca>70164.0</ax21:area_cuenca>
+            <ax21:coordenada_x>291433.46</ax21:coordenada_x>
+            <ax21:coordenada_y>6319970.25</ax21:coordenada_y>
+            <ax21:cuenca_nivel_5>58830</ax21:cuenca_nivel_5>
+            <ax21:curso_observado>RÍO NEGRO entre Ao. BEQUELÓ y Ao. De Las Maulas</ax21:curso_observado>
+            <ax21:id>20</ax21:id>
+            <ax21:id_departamento>5</ax21:id_departamento>
+            <ax21:latitud>-33.24592</ax21:latitud>
+            <ax21:longitud>-58.03851</ax21:longitud>
+            <ax21:nombre>Mercedes (Puerto)</ax21:nombre>
+            <ax21:nombre_curso_observado>Río Negro</ax21:nombre_curso_observado>
+            <ax21:observaciones/>
+            <ax21:regimen>1</ax21:regimen>
+            <ax21:ultima_fecha>2022-04-20 10:00:00</ax21:ultima_fecha>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:EstacionWS">
+            <ax21:apodo>2.1</ax21:apodo>
+            <ax21:area_cuenca>70161.0</ax21:area_cuenca>
+            <ax21:coordenada_x>292694.81</ax21:coordenada_x>
+            <ax21:coordenada_y>6320392.0</ax21:coordenada_y>
+            <ax21:cuenca_nivel_5>58830</ax21:cuenca_nivel_5>
+            <ax21:curso_observado>RÍO NEGRO entre Ao. BEQUELÓ y Ao. De Las Maulas</ax21:curso_observado>
+            <ax21:id>21</ax21:id>
+            <ax21:id_departamento>5</ax21:id_departamento>
+            <ax21:latitud>-33.24250543646006</ax21:latitud>
+            <ax21:longitud>-58.02449810390211</ax21:longitud>
+            <ax21:nombre>Mercedes - Prefectura</ax21:nombre>
+            <ax21:nombre_curso_observado>Río Negro</ax21:nombre_curso_observado>
+            <ax21:observaciones xsi:nil="true"/>
+            <ax21:regimen>1</ax21:regimen>
+            <ax21:ultima_fecha xsi:nil="true"/>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:EstacionWS">
+            <ax21:apodo>2.2</ax21:apodo>
+            <ax21:area_cuenca>70139.0</ax21:area_cuenca>
+            <ax21:coordenada_x>293304.02</ax21:coordenada_x>
+            <ax21:coordenada_y>6320335.37</ax21:coordenada_y>
+            <ax21:cuenca_nivel_5>58830</ax21:cuenca_nivel_5>
+            <ax21:curso_observado>RÍO NEGRO entre Ao. BEQUELÓ y Ao. De Las Maulas</ax21:curso_observado>
+            <ax21:id>22</ax21:id>
+            <ax21:id_departamento>5</ax21:id_departamento>
+            <ax21:latitud>-33.24313235651487</ax21:latitud>
+            <ax21:longitud>-58.01797911325645</ax21:longitud>
+            <ax21:nombre>Mercedes (Puente R.2)</ax21:nombre>
+            <ax21:nombre_curso_observado>Río Negro</ax21:nombre_curso_observado>
+            <ax21:observaciones>Control de mareógrafo (a partir de 8/9/99 OTT Orphimedes 146437)</ax21:observaciones>
+            <ax21:regimen>1</ax21:regimen>
+            <ax21:ultima_fecha xsi:nil="true"/>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:EstacionWS">
+            <ax21:apodo>3.0</ax21:apodo>
+            <ax21:area_cuenca>62395.0</ax21:area_cuenca>
+            <ax21:coordenada_x>345745.54</ax21:coordenada_x>
+            <ax21:coordenada_y>6342049.66</ax21:coordenada_y>
+            <ax21:cuenca_nivel_5>58000</ax21:cuenca_nivel_5>
+            <ax21:curso_observado>RÍO NEGRO entre Rincón De Palmar y Ao. Grande Del Norte</ax21:curso_observado>
+            <ax21:id>30</ax21:id>
+            <ax21:id_departamento>5</ax21:id_departamento>
+            <ax21:latitud>-33.05619</ax21:latitud>
+            <ax21:longitud>-57.4519</ax21:longitud>
+            <ax21:nombre>Paso Palmar</ax21:nombre>
+            <ax21:nombre_curso_observado>Río Negro</ax21:nombre_curso_observado>
+            <ax21:observaciones>Ubicación exacta desconocida</ax21:observaciones>
+            <ax21:regimen>1</ax21:regimen>
+            <ax21:ultima_fecha>1973-08-11 00:00:00</ax21:ultima_fecha>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:EstacionWS">
+            <ax21:apodo>4.0</ax21:apodo>
+            <ax21:area_cuenca>44144.0</ax21:area_cuenca>
+            <ax21:coordenada_x>392620.26</ax21:coordenada_x>
+            <ax21:coordenada_y>6354989.93</ax21:coordenada_y>
+            <ax21:cuenca_nivel_5>55810</ax21:cuenca_nivel_5>
+            <ax21:curso_observado>RÍO NEGRO entre Ao. MOLLES DE QUINTEROS y Ao. Ramírez Grande</ax21:curso_observado>
+            <ax21:id>40</ax21:id>
+            <ax21:id_departamento>9</ax21:id_departamento>
+            <ax21:latitud>-32.94517</ax21:latitud>
+            <ax21:longitud>-56.94862</ax21:longitud>
+            <ax21:nombre>Paso Porrúa</ax21:nombre>
+            <ax21:nombre_curso_observado>Río Negro</ax21:nombre_curso_observado>
+            <ax21:observaciones>Otra referencia da el cero a 28.70 Wharton</ax21:observaciones>
+            <ax21:regimen>1</ax21:regimen>
+            <ax21:ultima_fecha>1952-10-02 00:00:00</ax21:ultima_fecha>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:EstacionWS">
+            <ax21:apodo>5.0</ax21:apodo>
+            <ax21:area_cuenca>40123.0</ax21:area_cuenca>
+            <ax21:coordenada_x>433374.11</ax21:coordenada_x>
+            <ax21:coordenada_y>6369184.04</ax21:coordenada_y>
+            <ax21:cuenca_nivel_5>55135</ax21:cuenca_nivel_5>
+            <ax21:curso_observado>RÍO NEGRO entre Ao. MINAS DE CALLORDA y Ao. De Los Molles</ax21:curso_observado>
+            <ax21:id>50</ax21:id>
+            <ax21:id_departamento>10</ax21:id_departamento>
+            <ax21:latitud>-32.82043862823731</ax21:latitud>
+            <ax21:longitud>-56.51182902572215</ax21:longitud>
+            <ax21:nombre>Paso de los Toros</ax21:nombre>
+            <ax21:nombre_curso_observado>Río Negro</ax21:nombre_curso_observado>
+            <ax21:observaciones xsi:nil="true"/>
+            <ax21:regimen>1</ax21:regimen>
+            <ax21:ultima_fecha>1953-09-17 12:00:00</ax21:ultima_fecha>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:EstacionWS">
+            <ax21:apodo>5.1</ax21:apodo>
+            <ax21:area_cuenca>40123.0</ax21:area_cuenca>
+            <ax21:coordenada_x>433436.32</ax21:coordenada_x>
+            <ax21:coordenada_y>6369188.32</ax21:coordenada_y>
+            <ax21:cuenca_nivel_5>55135</ax21:cuenca_nivel_5>
+            <ax21:curso_observado>RÍO NEGRO entre Ao. MINAS DE CALLORDA y Ao. De Los Molles</ax21:curso_observado>
+            <ax21:id>51</ax21:id>
+            <ax21:id_departamento>10</ax21:id_departamento>
+            <ax21:latitud>-32.8204</ax21:latitud>
+            <ax21:longitud>-56.51116</ax21:longitud>
+            <ax21:nombre>Paso de los Toros</ax21:nombre>
+            <ax21:nombre_curso_observado>Río Negro</ax21:nombre_curso_observado>
+            <ax21:observaciones/>
+            <ax21:regimen>1</ax21:regimen>
+            <ax21:ultima_fecha>2022-06-30 18:00:00</ax21:ultima_fecha>
+         </ns:return>
+         <ns:return xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="ax21:EstacionWS">
+            <ax21:apodo>6.0</ax21:apodo>
+            <ax21:area_cuenca>34872.0</ax21:area_cuenca>
+            <ax21:coordenada_x>497316.00825</ax21:coordenada_x>
+            <ax21:coordenada_y>6391628.92813</ax21:coordenada_y>
+            <ax21:cuenca_nivel_5>54430</ax21:cuenca_nivel_5>
+            <ax21:curso_observado>RÍO NEGRO entre Ao. DE LAS CAÑAS y Ao. Chileno Grande</ax21:curso_observado>
+            <ax21:id>60</ax21:id>
+            <ax21:id_departamento>10</ax21:id_departamento>
+            <ax21:latitud>-32.62007</ax21:latitud>
+            <ax21:longitud>-55.82894</ax21:longitud>
+            <ax21:nombre>San Gregorio de Polanco</ax21:nombre>
+            <ax21:nombre_curso_observado>Río Negro</ax21:nombre_curso_observado>
+            <ax21:observaciones>Desde el cierre del embalse en Rincón del Bonete se desdobló esta estación en 6.0 y 6.1&#xD;
+</ax21:observaciones>
+            <ax21:regimen>1</ax21:regimen>
+            <ax21:ultima_fecha>1946-08-31 07:00:00</ax21:ultima_fecha>
+         </ns:return>
+</ns:getEstacionesResponse>
+</soapenv:Body>
+</soapenv:Envelope>

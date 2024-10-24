@@ -25,6 +25,12 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 		
+		<dependency>
+			<groupId>eu.essi_lab</groupId>
+			<artifactId>augmenter</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		
 	</dependencies>
 
 </project>

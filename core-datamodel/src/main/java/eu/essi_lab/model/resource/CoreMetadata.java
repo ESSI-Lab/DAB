@@ -4,7 +4,7 @@ package eu.essi_lab.model.resource;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,6 +23,7 @@ package eu.essi_lab.model.resource;
 
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.util.Iterator;
 
 import javax.xml.bind.JAXBException;
@@ -163,7 +164,19 @@ public class CoreMetadata {
 	return isoMetadata.getDistribution().getFormat();
     }
 
+    /**
+     * use big decimals method
+     * @param north
+     * @param west
+     * @param south
+     * @param east
+     */
+    @Deprecated 
     public void addBoundingBox(double north, double west, double south, double east) {
+	addBoundingBox(new BigDecimal(north), new BigDecimal(west), new BigDecimal(south), new BigDecimal(east));
+    }
+    
+    public void addBoundingBox(BigDecimal north, BigDecimal west, BigDecimal south, BigDecimal east) {
 
 	getDataIdentification().addGeographicBoundingBox(north, west, south, east);
     }

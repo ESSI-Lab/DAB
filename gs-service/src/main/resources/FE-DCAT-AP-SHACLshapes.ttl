@@ -1,0 +1,292 @@
+
+@prefix ex: <https://fairease.eu/dataset/> .
+@prefix dap: <http://example.org/dap-example/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sosa: <http://www.w3.org/ns/sosa/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcat: <https://www.w3.org/ns/dcat#> .
+@prefix dct: <http://purl.org/dc/terms/>.
+@prefix geosparql: <http://www.opengis.net/ont/geosparql#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix dqv: <http://www.w3.org/ns/dqv#> .
+@prefix adms: <http://www.w3.org/ns/adms#> .
+@prefix sdo: <https://schema.org/> .
+@prefix iop: <https://w3id.org/iadopt/ont/>.
+@prefix skos: <http://www.w3.org/2004/02/skos/core#>.
+@prefix sh: <http://www.w3.org/ns/shacl#>.
+
+ex:CatalogShape
+    a sh:NodeShape ;
+    sh:nodeKind sh:IRI ;
+
+    sh:targetClass dcat:Catalog ;
+    sh:property [
+        sh:path dct:title ;
+        sh:datatype xsd:string ;
+    ] , [
+        sh:path rdfs:label ;
+        sh:minCount 1 ;                # appears as mandatory property from dataset.ttl example, but is it?
+        sh:datatype xsd:string ;
+    ] , [
+        sh:path foaf:homepage ;
+        sh:datatype xsd:anyURI ;
+    ] , [
+        sh:path dct:language ;
+        sh:datatype xsd:anyURI ;
+    ] , [
+        sh:path dcat:catalog ;
+        sh:node ex:CatalogShape ;
+    ] , [
+        sh:path dct:publisher ;
+        sh:minCount 1 ;                 # mandatory property?
+        sh:maxCount 1 ;                 # can there be more than one publisher? ~ similar questions / need for check with other cardinality statements
+        sh:node ex:OrganizationShape ;
+    ] , [
+        sh:path dcat:dataset ;
+        sh:node ex:DatasetShape ;
+    ] ; 
+.
+
+ex:DatasetShape 
+    a sh:NodeShape ;
+    sh:nodeKind sh:IRI ;
+    sh:targetClass dcat:Dataset , sdo:Dataset ;
+
+    sh:property [
+        sh:path dct:identifier ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:anyURI ;
+    ] , [
+        sh:path dct:issued ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:date ;
+    ] , [
+        sh:path dct:title ;
+        sh:datatype xsd:string ;
+    ] , [
+        sh:path dct:description ;
+        sh:datatype xsd:string ;
+    ] , [
+        sh:path dct:creator ;
+        sh:maxCount 1 ;
+        sh:node ex:OrganizationShape ;
+    ] , [
+        sh:path dct:publisher ;
+        sh:maxCount 1 ;
+        sh:node ex:OrganizationShape ;
+    ] , [
+        sh:path prov:wasGeneratedBy ;
+        sh:node ex:ActivityShape ;
+    ] , [
+        sh:path dcat:theme ;
+        sh:node ex:ConceptShape ;
+    ] , [
+        sh:path dqv:hasQualityMeasurement ;
+        sh:node ex:QualityMeasurementShape ;
+    ] , [
+        sh:path sdo:variableMeasured ;
+        sh:node ex:MeasuredVariableShape ;
+    ] , [
+        sh:path dct:spatial ;
+        sh:node ex:SpatialCoverageShape ;
+    ] , [
+        sh:path dct:temporal ;
+        sh:node ex:TemporalCoverageShape ;
+    ] , [
+        sh:path adms:identifier ;
+        sh:node ex:IdentifierShape ;
+    ] , [
+        sh:path dcat:distribution ;
+        sh:node ex:DistributionShape ;
+    ] ;
+.
+
+ex:DistributionShape
+    a sh:NodeShape ;
+    sh:nodeKind sh:IRI ;
+    sh:targetClass dcat:Distribution ;
+    sh:property [
+        sh:path dcat:downloadURL ;
+        sh:datatype xsd:anyURI ;
+    ] , [
+        sh:path dct:title ;
+        sh:datatype xsd:string ;
+    ] , [
+        sh:path dcat:mediaType ;
+        sh:datatype xsd:anyURI ;
+    ] , [
+        sh:path dcat:byteSize ;
+        sh:datatype xsd:nonNegativeInteger ;
+    ] , [
+        sh:path dcat:accessService ;
+        sh:node ex:DataserviceShape ;
+    ] ;
+.
+
+ex:DataserviceShape
+    a sh:NodeShape ;
+    sh:nodeKind sh:IRI ;
+    sh:targetClass dcat:DataService ;
+    sh:property [
+        sh:path dct:type ;
+        sh:datatype xsd:anyURI ;
+    ] , [
+        sh:path dcat:endpointURL ;
+        sh:datatype xsd:anyURI ;
+    ] , [
+        sh:path dcat:endpointDescription ;
+        sh:datatype xsd:anyURI ;
+    ] , [
+        sh:path dct:conformsTo ;
+        sh:datatype xsd:anyURI ;
+    ] , [
+        sh:path dcat:servesDataset ;
+        sh:node ex:DatasetShape ;
+    ] ;
+.
+
+ex:IdentifierShape
+    a sh:NodeShape ; 
+    sh:nodeKind sh:BlankNode ; 
+    sh:targetClass adms:Identifier ;
+    sh:property [
+        sh:path skos:notation ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+    ] , [
+        sh:path adms:schemaAgency ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:anyURI ;
+    ] , [
+        sh:path rdf:parseType ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+    ] ;
+.
+
+ex:TemporalCoverageShape 
+    a sh:NodeShape ; 
+    sh:nodeKind sh:BlankNode ; 
+    sh:targetClass dct:PeriodOfTime ;
+    sh:property [
+        sh:path dcat:startDate ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:date ;
+    ] , [
+        sh:path dcat:endDate ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:date ;
+    ] ; 
+.
+
+ex:SpatialCoverageShape
+    a sh:NodeShape ; 
+    sh:nodeKind sh:BlankNode ;
+    sh:targetClass dct:Location ;
+    sh:property [
+        sh:path dcat:bbox ;
+        sh:maxCount 1 ;
+        sh:datatype geosparql:wktLiteral ;
+    ] ;
+.
+
+
+ex:MeasuredVariableShape
+    a sh:NodeShape ; 
+    sh:nodeKind sh:BlankNode ;
+    sh:targetClass sdo:PropertyValue ;
+    sh:property [
+        sh:path sdo:name ;
+        sh:datatype xsd:string ;
+    ] , [
+        sh:path sdo:alternateName ;
+        sh:datatype xsd:string ;
+    ] , [
+        sh:path sdo:propertyID ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:anyURI ;
+    ]
+.
+
+ex:OrganizationShape
+    a sh:NodeShape ; 
+    sh:nodeKind sh:IRI ;
+    sh:targetClass prov:Organization ;
+    sh:property [
+        sh:path rdfs:label ;
+        sh:datatype xsd:string ;
+    ] ;
+.
+
+ex:QualityMeasurementShape
+    a sh:NodeShape ; 
+    sh:nodeKind sh:IRI ;
+    sh:targetClass dqv:QualityMeasurement ;
+    sh:property [
+        sh:path dqv:isMeasurementOf ;
+        sh:maxCount 1 ; 
+        sh:node ex:ConceptShape ;
+    ] , [
+        sh:path dqv:value ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+    ] ;
+.
+
+ex:ConceptShape
+    a sh:NodeShape ; 
+    sh:nodeKind sh:IRI ;
+    sh:targetClass skos:Concept ;
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:datatype xsd:string ;
+    ] ;
+.
+
+ex:ActivityShape
+    a sh:NodeShape ; 
+    sh:nodeKind sh:IRI ;
+    sh:targetClass prov:Activity ;
+    sh:property [
+        sh:path prov:used ;
+        sh:node ex:SensorShape ;
+    ] ;
+. 
+
+ex:SensorShape
+    a sh:NodeShape ; 
+    sh:nodeKind sh:IRI ;
+    sh:targetClass skos:Concept, prov:Entity, sosa:Sensor ;
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:datatype xsd:string ;
+    ] , [
+        sh:path sosa:isHostedBy ;
+        sh:node ex:PlatformShape ;
+    ] , [
+        sh:path sosa:observes ;
+        sh:node ex:ObservationShape ;
+    ] ;
+.
+
+ex:PlatformShape
+    a sh:NodeShape ; 
+    sh:nodeKind sh:IRI ;
+    sh:targetClass sosa:Platform ;
+    sh:property [
+        sh:path sosa:hosts ;
+        sh:node ex:SensorShape ;
+    ]
+.
+
+ex:ObservationShape
+    a sh:NodeShape ; 
+    sh:nodeKind sh:IRI ;
+    sh:targetClass skos:Concept, sosa:ObservedProperty, iop:Variable ;
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:datatype xsd:string ;
+    ] ;
+.

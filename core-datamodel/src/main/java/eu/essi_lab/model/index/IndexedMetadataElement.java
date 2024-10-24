@@ -4,7 +4,7 @@ package eu.essi_lab.model.index;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,8 +21,14 @@ package eu.essi_lab.model.index;
  * #L%
  */
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 
+import javax.xml.bind.JAXBElement;
+
+import eu.essi_lab.iso.datamodel.classes.DataIdentification;
+import eu.essi_lab.iso.datamodel.classes.Keywords;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.index.jaxb.BoundingBox;
 import eu.essi_lab.model.resource.BNHSProperty;
@@ -30,6 +36,9 @@ import eu.essi_lab.model.resource.BNHSPropertyReader;
 import eu.essi_lab.model.resource.CoreMetadata;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
+import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;
+import net.opengis.iso19139.gco.v_20060504.CodeListValueType;
+import net.opengis.iso19139.gmx.v_20060504.AnchorType;
 
 /**
  * An {@link IndexedElement} whose {@link #getValues()} are defined by the {@link #defineValues(GSResource)}
@@ -79,6 +88,116 @@ public abstract class IndexedMetadataElement extends IndexedElement {
     public IndexedMetadataElement(MetadataElement element) {
 	super(element.getName());
 	this.element = element;
+    }
+
+    public void addKeywords(GSResource resource, String type) {
+	addKeywords(resource, type, new String[] {});
+    }
+
+    public void addKeywords(GSResource resource, String typeToInclude, String... typesToExclude) {
+	Iterator<DataIdentification> identifications = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
+		.getDataIdentifications();
+	while (identifications.hasNext()) {
+	    DataIdentification dataId = identifications.next();
+	    Iterator<Keywords> keywords = dataId.getKeywords();
+	    k: while (keywords.hasNext()) {
+		Keywords keyword = (Keywords) keywords.next();
+		String t = keyword.getTypeCode();
+		if (typeToInclude != null) {
+		    if (t == null || !t.equals(typeToInclude)) {
+			continue;
+		    }
+		}
+		if (typesToExclude.length > 0) {
+		    for (String typeToExclude : typesToExclude) {
+			if (typeToExclude == null) {
+			    if (t == null) {
+				continue k;
+			    }
+			} else {
+			    if (t != null && t.equals(typeToExclude)) {
+				continue k;
+			    }
+			}
+		    }
+		}
+		List<CharacterStringPropertyType> ks = keyword.getElementType().getKeyword();
+		for (CharacterStringPropertyType k : ks) {
+		    if (k == null || k.getCharacterString() == null || k.getCharacterString().getValue() == null) {
+			continue;
+		    }
+		    Object obj = k.getCharacterString().getValue();
+		    if (obj instanceof AnchorType) {
+			AnchorType anchor = (AnchorType) obj;
+			String title = anchor.getValue();
+			if (checkStringValue(title)) {
+			    getValues().add(title);
+			}
+		    } else if (obj instanceof CodeListValueType) {
+			CodeListValueType cvt = (CodeListValueType) ks;
+			String title = cvt.getCodeListValue();
+			if (checkStringValue(title)) {
+			    getValues().add(title);
+			}
+		    } else if (obj instanceof String) {
+			String title = (String) obj;
+			if (checkStringValue(title)) {
+			    getValues().add(title);
+			}
+		    }
+		}
+	    }
+	}
+    }
+
+    public void addKeywordsURI(GSResource resource, String type) {
+	addKeywordsURI(resource, type, new String[] {});
+    }
+
+    public void addKeywordsURI(GSResource resource, String typeToInclude, String... typesToExclude) {
+	Iterator<DataIdentification> identifications = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
+		.getDataIdentifications();
+	while (identifications.hasNext()) {
+	    DataIdentification dataId = identifications.next();
+	    Iterator<Keywords> keywords = dataId.getKeywords();
+	    k: while (keywords.hasNext()) {
+		Keywords keyword = (Keywords) keywords.next();
+		String t = keyword.getTypeCode();
+		if (typeToInclude != null) {
+		    if (t == null || !t.equals(typeToInclude)) {
+			continue;
+		    }
+		}
+		if (typesToExclude.length > 0) {
+		    for (String typeToExclude : typesToExclude) {
+			if (typeToExclude == null) {
+			    if (t == null) {
+				continue k;
+			    }
+			} else {
+			    if (t != null && t.equals(typeToExclude)) {
+
+				continue k;
+			    }
+			}
+		    }
+		}
+		List<CharacterStringPropertyType> ks = keyword.getElementType().getKeyword();
+		for (CharacterStringPropertyType k : ks) {
+		    if (k == null || k.getCharacterString() == null || k.getCharacterString().getValue() == null) {
+			continue;
+		    }
+		    Object obj = k.getCharacterString().getValue();
+		    if (obj instanceof AnchorType) {
+			AnchorType anchor = (AnchorType) obj;
+			String href = anchor.getHref();
+			if (checkStringValue(href)) {
+			    getValues().add(href);
+			}
+		    }
+		}
+	    }
+	}
     }
 
     /**
@@ -136,15 +255,15 @@ public abstract class IndexedMetadataElement extends IndexedElement {
      *           {@link MetadataElement#IDENTIFIER}
      * 
      *           <pre>
-     * <code>@Override
-     * public void defineValues(GSResource resource){
-     * 
-     * 	// get the value of the identifier 
-     * 	String identifier = resource.getHarmonizedMetadata().getCoreMetadata().getIdentifier();
-     * 
-     * 	getValues().add(identifier);
-     * }
-     * </pre></code>
+     *  <code>@Override
+     *  public void defineValues(GSResource resource){
+             * 
+             * 	// get the value of the identifier 
+             * 	String identifier = resource.getHarmonizedMetadata().getCoreMetadata().getIdentifier();
+             * 
+             * 	getValues().add(identifier);
+             * }
+             * </pre></code>
      * @param resource the {@link GSResource} to be written
      */
     public abstract void defineValues(GSResource resource);

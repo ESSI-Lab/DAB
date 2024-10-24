@@ -7,7 +7,7 @@ package eu.essi_lab.api.database.vol;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,12 +31,11 @@ import java.util.List;
 import org.w3c.dom.Document;
 
 import eu.essi_lab.api.database.Database;
-import eu.essi_lab.api.database.DatabaseProvider;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.messages.HarvestingProperties;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
@@ -44,10 +43,10 @@ import eu.essi_lab.model.resource.GSResource;
 /**
  * @author Fabrizio
  */
-public class VolatileDatabase implements DatabaseProvider, Database<DatabaseSetting> {
+public class VolatileDatabase implements Database {
 
-    private StorageUri dbUri;
-    private String suiteIdentifier;
+    private StorageInfo dbInfo;
+    private String dbIdentifier;
     private DatabaseSetting setting;
     private List<GSResource> resourcesList;
     private List<GSUser> usersList;
@@ -146,24 +145,18 @@ public class VolatileDatabase implements DatabaseProvider, Database<DatabaseSett
     }
 
     @Override
-    public boolean supports(StorageUri dbUri) {
+    public boolean supports(StorageInfo dbInfo) {
 
-	this.dbUri = dbUri;
-	this.suiteIdentifier = dbUri.getConfigFolder();
+	this.dbInfo = dbInfo;
+	this.dbIdentifier = dbInfo.getIdentifier();
 
-	return dbUri.getStorageName().equals(DatabaseSetting.VOLATILE_DB_STORAGE_NAME);
+	return dbInfo.getName().equals(DatabaseSetting.VOLATILE_DB_STORAGE_NAME);
     }
 
     @Override
-    public StorageUri getStorageUri() {
+    public StorageInfo getStorageInfo() {
 
-	return this.dbUri;
-    }
-
-    @Override
-    public Database<DatabaseSetting> getDatabase() {
-
-	return this;
+	return this.dbInfo;
     }
 
     @Override
@@ -185,16 +178,14 @@ public class VolatileDatabase implements DatabaseProvider, Database<DatabaseSett
     }
 
     @Override
-    public String initialize(StorageUri dbUri, String suiteIdentifier) throws GSException {
+    public void initialize(StorageInfo dbUri) throws GSException {
 
 	if (!initialized) {
 
-	    this.dbUri = dbUri;
-	    this.suiteIdentifier = suiteIdentifier;
+	    this.dbInfo = dbUri;
+	    this.dbIdentifier = dbUri.getIdentifier();
 	    this.initialized = true;
 	}
-
-	return suiteIdentifier;
     }
 
     @Override
@@ -218,9 +209,8 @@ public class VolatileDatabase implements DatabaseProvider, Database<DatabaseSett
     /**
      * @return
      */
-    public String getSuiteIdentifier() {
+    public String getIdentifier() {
 
-	return suiteIdentifier;
+	return dbIdentifier;
     }
-
 }

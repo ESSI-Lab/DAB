@@ -7,7 +7,7 @@ package eu.essi_lab.authorization;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -43,6 +43,17 @@ public enum BasicRole {
      * 
      */
     ANONYMOUS("anonymous");
+    
+    /**
+     * 
+     */
+    public static final String ANONYMOUS_ROLE_VALUE = "anonymous";
+    
+    /**
+     * 
+     */
+    public static final String ADMIN_ROLE_VALUE = "admin";
+
 
     private String role;
 
@@ -67,6 +78,10 @@ public enum BasicRole {
      */
     public static GSUser createAnonymousUser() {
 
-	return new GSUser("anonymous", BasicRole.ANONYMOUS.getRole());
+	GSUser user = new GSUser();
+	user.setIdentifier(BasicRole.ANONYMOUS.getRole());
+	user.setRole(BasicRole.ANONYMOUS.getRole());
+
+	return user;
     }
 }

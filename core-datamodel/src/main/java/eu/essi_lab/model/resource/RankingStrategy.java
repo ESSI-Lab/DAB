@@ -4,7 +4,7 @@ package eu.essi_lab.model.resource;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -179,7 +179,7 @@ public class RankingStrategy implements Serializable {
 	this.anyTextWeight = weight;
     }
 
-    public void setIsGDWeightC(String weight) {
+    public void setIsGDCWeight(String weight) {
 
 	this.isGDCWeight = weight;
     }
@@ -197,6 +197,23 @@ public class RankingStrategy implements Serializable {
     public void setAccessQualityWeight(String weight) {
 
 	this.aqWeight = weight;
+    }
+
+    /**
+     * 
+     */
+    public void setZeroWeightAndScore() {
+    
+        setAbstractWeight("0");
+        setAccessQualityWeight("0");
+        setAnyTextWeight("0");
+        setBoundingBoxWeight("0");
+        setEssentialVariablesWeight("0");
+        setIsGDCWeight("0");
+        setMetadataQualityWeight("0");
+        setSubjectWeight("0");
+        setTitleWeight("0");
+        setScoreMethod("score-zero");
     }
 
     /**

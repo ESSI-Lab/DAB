@@ -4,7 +4,7 @@ package eu.essi_lab.model.resource;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -114,7 +114,7 @@ public class ResourcePropertyHandler {
      * Set the quality of the metadata using an instance of {@link MetadataQualifier}
      */
     public void setMetadataQuality() {
-	
+
 	if (hasLowestRanking()) {
 
 	    return;
@@ -247,6 +247,30 @@ public class ResourcePropertyHandler {
     public boolean isDeleted() {
 
 	return Boolean.valueOf(resource.getPropertyValue(ResourceProperty.IS_DELETED).orElse("false"));
+    }
+
+    /**
+     * Set the {@link ResourceProperty#IS_VALIDATED} property. If set is <code>true</code> an indexed
+     * element <isValidated>true</isValidated> is added, otherwise the element (if already exists) is removed
+     * (instead of adding an element <isValidated>false</isValidated>) since the latter case is the default one
+     * 
+     * @param set
+     */
+    public void setIsValidated(boolean set) {
+
+	if (!set) {
+	    resource.getIndexesMetadata().remove(ResourceProperty.IS_VALIDATED.getName());
+	} else {
+	    resource.setProperty(ResourceProperty.IS_VALIDATED, String.valueOf(set));
+	}
+    }
+
+    /**
+     * Get the {@link ResourceProperty#IS_VALIDATED} property
+     */
+    public boolean isValidated() {
+
+	return Boolean.valueOf(resource.getPropertyValue(ResourceProperty.IS_VALIDATED).orElse("false"));
     }
 
     /**
@@ -479,7 +503,7 @@ public class ResourcePropertyHandler {
 
 	resource.setProperty(ResourceProperty.IS_GRID, String.valueOf(set));
     }
-    
+
     /**
      * Get the {@link ResourceProperty#IS_GRID} property
      */
@@ -497,13 +521,57 @@ public class ResourcePropertyHandler {
 
 	resource.setProperty(ResourceProperty.IS_TIMESERIES, String.valueOf(set));
     }
-    
+
     /**
      * Get the {@link ResourceProperty#IS_TIMESERIES} property
      */
     public boolean isTimeSeries() {
 
 	return Boolean.valueOf(resource.getPropertyValue(ResourceProperty.IS_TIMESERIES).orElse("false"));
+    }
+    
+    /**
+     * Set the {@link ResourceProperty#IS_VECTOR} property
+     * 
+     * @param set
+     */
+    public void setIsVector(boolean set) {
+
+	resource.setProperty(ResourceProperty.IS_VECTOR, String.valueOf(set));
+    }
+
+    /**
+     * Get the {@link ResourceProperty#IS_VECTOR} property
+     */
+    public boolean isVector() {
+
+	return Boolean.valueOf(resource.getPropertyValue(ResourceProperty.IS_VECTOR).orElse("false"));
+    }
+
+    /**
+     * Get the {@link ResourceProperty#IS_EIFFEL_RECORD} property
+     */
+    public boolean isEiffelRecord() {
+
+	return Boolean.valueOf(resource.getPropertyValue(ResourceProperty.IS_EIFFEL_RECORD).orElse("false"));
+    }
+
+    /**
+     * Set the {@link ResourceProperty#IS_TRAJECTORY} property
+     * 
+     * @param set
+     */
+    public void setIsTrajectory(boolean set) {
+
+	resource.setProperty(ResourceProperty.IS_TRAJECTORY, String.valueOf(set));
+    }
+
+    /**
+     * Get the {@link ResourceProperty#IS_TRAJECTORY} property
+     */
+    public boolean isTrajectory() {
+
+	return Boolean.valueOf(resource.getPropertyValue(ResourceProperty.IS_TRAJECTORY).orElse("false"));
     }
 
     /**

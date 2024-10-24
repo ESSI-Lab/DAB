@@ -1,0 +1,117 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<gmi:MI_Metadata xmlns:gmi="http://www.isotc211.org/2005/gmi"
+    xmlns:ns4="http://quakeml.org/xmlns/bed/1.2" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0"
+    xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gco="http://www.isotc211.org/2005/gco"
+    xmlns:dm="http://floraresearch.eu/sdi/services/7.0/dataModel/schema"
+    xmlns:srv="http://www.isotc211.org/2005/srv"
+    xmlns:gvq="http://www.geoviqua.org/QualityInformationModel/4.0"
+    xmlns:rim="urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0" xmlns:gmx="http://www.opengis.net/gmx"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gml="http://www.opengis.net/gml"
+    xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://schemas.opengis.net/iso/19139/20060504/gmd/gmd.xsd">
+    <gmd:fileIdentifier>
+        <gco:CharacterString>inpe</gco:CharacterString>
+    </gmd:fileIdentifier>
+    <gmd:language>
+        <gco:CharacterString>en</gco:CharacterString>
+    </gmd:language>
+    <gmd:characterSet>
+        <gmd:MD_CharacterSetCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode" codeListValue="MD_CharacterSetCode_utf8" codeSpace="ISOTC211/19115">MD_CharacterSetCode_utf8</gmd:MD_CharacterSetCode>
+    </gmd:characterSet>
+    <gmd:parentIdentifier/>
+    <gmd:hierarchyLevel>
+        <gmd:MD_ScopeCode codeList="" codeListValue="series"/>
+    </gmd:hierarchyLevel>
+    <gmd:contact/>
+    <gmd:dateStamp/>
+    <gmd:identificationInfo/>
+    <gmd:identificationInfo>
+        <gmd:MD_DataIdentification
+            xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://essi-lab.eu/schemas/mirrors/schemas.opengis.net/csw/2.0.2/profiles/apiso/1.0.0/apiso.xsd">
+
+            <gmd:citation>
+                <gmd:CI_Citation>
+                    <gmd:title>
+                        <gco:CharacterString>National Institute for Space Research - Brazil (INPE)</gco:CharacterString>
+                    </gmd:title>
+                    <gmd:date/>
+                </gmd:CI_Citation>
+            </gmd:citation>
+            <gmd:abstract>
+            		<gco:CharacterString>Neste Banco de Dados, você encontrará, presentemente, imagens dos satélites AQUA, TERRA, S-NPP, UK-DMC-2 ,LANDSAT-1, LANDSAT-2, LANDSAT-3, LANDSAT-5, LANDSAT-7, LANDSAT-8 , CBERS-2 , CBERS-2B, CBERS-4 (Satélite Sino-Brasileiro de Recursos Terrestres), RESOURCESAT-1, RESOURCESAT-2.
+Cada satélite tem seu periodo de atividade.
+As imagens destes satélites são inteiramente gratuitas (não tarifadas). O meio de envio padrão das imagens (gratuitas) é por transferência de arquivos (FTP) via Internet.
+Informo que no catálogo oferecemos as imagens ortorretificadas GLS-LANDSAT, para serem usada de base para georeferenciamento.
+O INPE espera que você faça o melhor proveito possível dos produtos aqui oferecidos.
+Solicitamos a gentileza de nos enviar, na medida do possivel, os resultados de seus trabalhos com as imagens CBERS, bem como seus comentários e sugestões, subsidiando assim, a continuidade de nosso empenho com vistas a uma permanente melhoria do sistema</gco:CharacterString>
+            </gmd:abstract>
+            <gmd:descriptiveKeywords>
+                <gmd:MD_Keywords>
+                    <gmd:keyword>INPE</gmd:keyword>
+                </gmd:MD_Keywords>
+            </gmd:descriptiveKeywords>          
+            <gmd:descriptiveKeywords>
+                <gmd:MD_Keywords>
+                    <gmd:keyword>Satellite</gmd:keyword>
+                </gmd:MD_Keywords>
+            </gmd:descriptiveKeywords>
+            <gmd:pointOfContact>
+                    <gmd:CI_ResponsibleParty>
+                        <gmd:organisationName>
+                            <gco:CharacterString>INPE</gco:CharacterString>
+                        </gmd:organisationName>
+                        <gmd:role>
+                            <gmd:CI_RoleCode
+                                codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode"
+                                codeListValue="originator">originator</gmd:CI_RoleCode>
+                        </gmd:role>
+                    </gmd:CI_ResponsibleParty>
+                </gmd:pointOfContact>
+                <gmd:graphicOverview>
+                    <gmd:MD_BrowseGraphic>
+                        <gmd:fileName>
+                            <gco:CharacterString>https://iconape.com/wp-content/files/zo/195270/png/INPE-logo.png</gco:CharacterString>
+                        </gmd:fileName>
+                        <gmd:fileDescription>
+                            <gco:CharacterString></gco:CharacterString>
+                        </gmd:fileDescription>
+                        <gmd:fileType> </gmd:fileType>
+                    </gmd:MD_BrowseGraphic>
+                </gmd:graphicOverview>
+            <gmd:spatialRepresentationType>
+                <gmd:MD_SpatialRepresentationTypeCode codeList="" codeListValue="GRID"/>
+            </gmd:spatialRepresentationType>
+            <gmd:language/>
+            <gmd:extent>
+                <gmd:EX_Extent>
+                    <gmd:geographicElement>
+                        <gmd:EX_GeographicBoundingBox>
+                            <gmd:westBoundLongitude>
+                                <gco:Decimal>-180.0</gco:Decimal>
+                            </gmd:westBoundLongitude>
+                            <gmd:eastBoundLongitude>
+                                <gco:Decimal>180.0</gco:Decimal>
+                            </gmd:eastBoundLongitude>
+                            <gmd:southBoundLatitude>
+                                <gco:Decimal>-90.0</gco:Decimal>
+                            </gmd:southBoundLatitude>
+                            <gmd:northBoundLatitude>
+                                <gco:Decimal>90.0</gco:Decimal>
+                            </gmd:northBoundLatitude>
+                        </gmd:EX_GeographicBoundingBox>
+                    </gmd:geographicElement>
+                    <gmd:temporalElement>
+                        <gmd:EX_TemporalExtent>
+                            <gmd:extent>
+                                <gml:TimePeriod gml:id="x32f2e80f-ce31-4f47-9603-91d8c3f112fe">
+                                    <gml:beginPosition>1972-07-23T00:00:00Z</gml:beginPosition>
+                                    <gml:endPosition indeterminatePosition="now"></gml:endPosition>
+                                </gml:TimePeriod>
+                            </gmd:extent>
+                        </gmd:EX_TemporalExtent>
+                    </gmd:temporalElement>
+                </gmd:EX_Extent>
+            </gmd:extent>
+        </gmd:MD_DataIdentification>
+    </gmd:identificationInfo>
+
+</gmi:MI_Metadata>

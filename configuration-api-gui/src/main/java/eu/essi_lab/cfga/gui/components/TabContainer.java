@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gui.components;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -89,6 +89,8 @@ public class TabContainer extends VerticalLayout {
 		headerLayout.add(reloadButton);
 	    }
 	}
+	
+	removeAllButHeader();
 
 	List<Setting> settings = view.retrieveTabSettings(tabInfo);
 
@@ -101,11 +103,11 @@ public class TabContainer extends VerticalLayout {
 	    add(gridComponent.createColumnsHider());
 
 	    add(gridComponent);
-	    
+
 	    expand(gridComponent);
 
 	} else {
-
+	   
 	    settings.stream().//
 
 		    map(set -> SettingComponentFactory.createSettingComponent(configuration, set.getIdentifier(), readOnly, this)).//
@@ -130,6 +132,14 @@ public class TabContainer extends VerticalLayout {
     public boolean isRendered() {
 
 	return rendered;
+    }
+
+    /**
+     * @param rendered
+     */
+    public void setRendered(boolean rendered) {
+	
+	this.rendered = rendered;
     }
 
     /**

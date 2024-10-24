@@ -1,2 +1,3 @@
 eu.essi_lab.accessor.oaipmh.OAIPMHResourceMapper
-
+eu.essi_lab.accessor.oaipmh.DataCiteResourceMapper
+eu.essi_lab.accessor.oaipmh.DIFMapper

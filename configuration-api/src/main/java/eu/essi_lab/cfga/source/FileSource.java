@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.source;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,11 +31,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.FilenameUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.github.jsonldjava.shaded.com.google.common.io.Files;
 import com.google.common.base.Charsets;
 
 import eu.essi_lab.cfga.Configuration;
@@ -43,6 +44,7 @@ import eu.essi_lab.cfga.ConfigurationSource;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 
 /**
  * @author Fabrizio
@@ -82,7 +84,7 @@ public class FileSource implements ConfigurationSource {
 
 	this.source = source;
 
-	GSLoggerFactory.getLogger(getClass()).info(source.getAbsolutePath());
+	GSLoggerFactory.getLogger(getClass()).info("Source path: {}", source.getAbsolutePath());
     }
 
     /**
@@ -91,6 +93,14 @@ public class FileSource implements ConfigurationSource {
     public FileSource(URI uri) {
 
 	this(new File(uri));
+    }
+
+    /**
+     * @return
+     */
+    public File getSource() {
+
+	return source;
     }
 
     /**
@@ -320,5 +330,32 @@ public class FileSource implements ConfigurationSource {
 
 	File parent = source.getParentFile();
 	return new File(parent.getAbsolutePath() + File.separator + "lock." + owner);
+    }
+
+    @Override
+    public FileSource backup() throws IOException {
+
+	String extension = FilenameUtils.getExtension(source.getName());
+
+	String name = FilenameUtils.removeExtension(source.getName());
+
+	String date = ISO8601DateTimeUtils.getISO8601DateTime().//
+		replace("-", "_").//
+		replace(":", "_").//
+		replace(".", "");
+
+	String backupName = name + "_" + date + "." + extension + ".backup";
+
+	File backupFile = new File(source.getParentFile().getAbsolutePath() + File.separator + backupName);
+
+	Files.copy(source, backupFile);
+
+	return new FileSource(backupFile);
+    }
+
+    @Override
+    public String getLocation() {
+
+	return source.getAbsolutePath();
     }
 }

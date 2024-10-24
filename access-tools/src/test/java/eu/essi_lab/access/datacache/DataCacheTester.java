@@ -1,0 +1,37 @@
+package eu.essi_lab.access.datacache;
+
+import java.net.URL;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.Date;
+
+import eu.essi_lab.access.datacache.DataCacheConnectorFactory.DataConnectorType;
+import eu.essi_lab.access.datacache.opensearch.OpenSearchConnector;
+
+public class DataCacheTester {
+
+    public static void main(String[] args) throws Exception {
+	DataCacheConnector connector;
+
+	String dbname = "datacache1";
+	String sourceId = "uruguay-dinagua";
+
+	// connector= DataCacheConnectorFactory.newDataCacheConnector(DataConnectorType.OPEN_SEARCH_DOCKERHUB_1_3,
+	// new URL("http://localhost:9200"), "admin", "admin", dbname);
+	connector = DataCacheConnectorFactory.newDataCacheConnector(DataConnectorType.OPEN_SEARCH_AWS_1_3,
+		new URL(System.getProperty("dataCacheHost")), System.getProperty("dataCacheUser"), System.getProperty("dataCachePassword"),
+		dbname);
+
+	connector.configure(OpenSearchConnector.FLUSH_INTERVAL_MS, "1000");
+	connector.configure(OpenSearchConnector.MAX_BULK_SIZE, "1000");
+	connector.configure(OpenSearchConnector.CACHED_DAYS, "0");
+
+	SimpleEntry<String, Date> ner = connector.getNextExpectedRecord(sourceId);
+	
+	System.out.println(ner.getKey());
+	System.out.println(ner.getValue());
+	
+	Thread.sleep(2000);
+	connector.close();
+    }
+
+}

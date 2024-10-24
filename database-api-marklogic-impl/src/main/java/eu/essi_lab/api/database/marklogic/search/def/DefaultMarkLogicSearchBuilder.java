@@ -4,7 +4,7 @@ package eu.essi_lab.api.database.marklogic.search.def;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,7 +21,6 @@ package eu.essi_lab.api.database.marklogic.search.def;
  * #L%
  */
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,6 +28,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.xml.datatype.DatatypeFactory;
@@ -44,7 +45,6 @@ import com.marklogic.xcc.ResultSequence;
 import com.marklogic.xcc.exceptions.RequestException;
 
 import eu.essi_lab.api.database.marklogic.MarkLogicDatabase;
-import eu.essi_lab.api.database.marklogic.SourceStorageWorker;
 import eu.essi_lab.api.database.marklogic.search.MarkLogicSearchBuilder;
 import eu.essi_lab.api.database.marklogic.search.MarkLogicSpatialQueryBuilder;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
@@ -59,6 +59,7 @@ import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.lib.xml.QualifiedName;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.bond.BondOperator;
+import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
 import eu.essi_lab.messages.bond.QueryableBond;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.RuntimeInfoElementBond;
@@ -95,8 +96,12 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
     private boolean registerQuery;
     private Optional<OrderingDirection> orderingDirection;
     private Optional<Queryable> orderingProperty;
+    private boolean unfilteredQuery;
 
     private static final String UTF8_ENCODING = "UTF-8";
+    private static final String ENABLE_FILTERED_TRAILING_WILDCARDS_QUERIES = "enableFilteredTrailingWildcardQueries";
+
+    private static final List<IndexedMetadataElement> INDEXED_ELEMENTS = IndexedMetadataElements.getIndexes();
 
     /**
      * @param message
@@ -112,7 +117,7 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 	this.spatialBuilder = createSpatialQueryBuilder(this);
 	this.tfTargets = message.getTermFrequencyTargets();
 	this.registerQuery = message.isQueryRegistrationEnabled();
-
+	this.unfilteredQuery = true;
 	this.orderingDirection = message.getOrderingDirection();
 	this.orderingProperty = message.getOrderingProperty();
     }
@@ -185,9 +190,7 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
      */
     public String buildQuery(SimpleValueBond bond) {
 
-	List<IndexedMetadataElement> indexes = IndexedMetadataElements.getIndexes();
-
-	return buildQuery(bond, indexes);
+	return buildQuery(bond, INDEXED_ELEMENTS);
     }
 
     @Override
@@ -200,9 +203,9 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 	BondOperator operator = bond.getOperator();
 	QualifiedName name = new QualifiedName(NameSpace.GI_SUITE_DATA_MODEL, property.getName());
 
-	if (operator == BondOperator.NULL) {
+	if (operator == BondOperator.NULL || operator == BondOperator.NOT_NULL) {
 
-	    return createNullQuery(name, property);
+	    return createExistsOrNotExistsQuery(operator, name, property);
 	}
 
 	switch (property.getContentType()) {
@@ -251,9 +254,9 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 	BondOperator operator = bond.getOperator();
 	QualifiedName name = new QualifiedName(NameSpace.GI_SUITE_DATA_MODEL, property.getName());
 
-	if (operator == BondOperator.NULL) {
+	if (operator == BondOperator.NULL || operator == BondOperator.NOT_NULL) {
 
-	    return createNullQuery(name, property);
+	    return createExistsOrNotExistsQuery(operator, name, property);
 	}
 
 	switch (property) {
@@ -300,11 +303,14 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 	case PRIVATE_ID:
 	case IS_ISO_COMPLIANT:
 	case IS_DELETED:
+	case IS_VALIDATED:
 	case OAI_PMH_HEADER_ID:
 	case COMPLIANCE_LEVEL:
 	case IS_DOWNLOADABLE:
 	case IS_TIMESERIES:
+	case IS_EIFFEL_RECORD:
 	case IS_GRID:
+	case IS_VECTOR:
 	case IS_EXECUTABLE:
 	case IS_TRANSFORMABLE:
 	case SUCCEEDED_TEST:
@@ -357,23 +363,76 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 		+ value + "" + s + w + ")";
     }
 
-    public String buildCTSLogicQuery(CTSLogicOperator operator, String... operands) {
-	String op = null;
+    /**
+     * @param operator
+     * @param ordered
+     * @param operands
+     * @return
+     */
+    public String buildCTSLogicQuery(CTSLogicOperator operator, boolean ordered, String... operands) {
+
+	String ord = ordered ? ",'ordered'" : "";
+
+	String query = "\ncts:" + (operator == CTSLogicOperator.OR ? "or" : "and") + "-query((\n";
+	query += buildCTSLogicQueryOperands(operands);
+
+	return query + ")" + ord + ")";
+    }
+
+    /**
+     * @param operator
+     * @return
+     */
+    @Override
+    public String getCTSLogicQueryName(LogicalOperator operator) {
+
 	switch (operator) {
-	case OR:
-	    op = "or";
-	    break;
 	case AND:
-	    op = "and";
+	    return "cts:and-query";
+	case OR:
+	    return "cts:or-query";
+	case NOT:
+	default:
+	    return "cts:not-query";
 	}
-	String query = "\ncts:" + op + "-query((\n";
+    }
+
+    /**
+     * @param operands
+     * @return
+     */
+    protected String buildCTSLogicQueryOperands(String... operands) {
+
+	String out = "";
 	for (int i = 0; i < operands.length; i++) {
-	    query += operands[i];
+	    out += operands[i];
 	    if (i < operands.length - 1) {
-		query += ",\n";
+		out += ",\n";
 	    }
 	}
-	return query + "))";
+	return out;
+    }
+
+    /**
+     * 
+     */
+    @Override
+    public String buildCTSLogicQuery(CTSLogicOperator operator, String... operands) {
+
+	return buildCTSLogicQuery(operator, false, operands);
+    }
+
+    /**
+     * @param operator
+     * @param ordered
+     * @param operands
+     * @return
+     */
+    public String buildCTSLogicQuery(CTSLogicOperator operator, boolean ordered, List<String> operands) {
+
+	String[] array = operands.toArray(new String[] {});
+
+	return buildCTSLogicQuery(operator, ordered, array);
     }
 
     /**
@@ -412,44 +471,26 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
      */
     protected String buildSourceIdQuery(QualifiedName name, String value, Queryable property) {
 
-	String sourceIdQuery = buildCTSElementRangeQuery(//
-		name, //
-		BondOperator.EQUAL.asMathOperator(), //
-		value, //
-		ranking.computePropertyWeight(property), //
-		true);
+	//
+	// this is the current strategy, according to the module
+	//
+
+	String query = "cts:directory-query(concat('/" + markLogicDB.getIdentifier() + "_" + value.trim() + "',";
+	query += "cts:element-values(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema',concat('" + value.trim()
+		+ "','_dataFolder'))),";
+	query += "'/') ,'infinity')";
 
 	//
-	// the time stamp check can be disabled with the DiscoveryMessage
+	// these fallback queries are required in a very particular cases, that is during the legacy ISO compliance test
+	// which is performed before the harvesting finalization when the source data folder is not yet available
 	//
-	if (!dataFolderCheckEnabled) {
 
-	    return sourceIdQuery;
-	}
+	String fallbackQuery1 = "cts:directory-query(concat('/" + markLogicDB.getIdentifier() + "_" + value.trim()
+		+ "','-data-1/'),'infinity')";
+	String fallbackQuery2 = "cts:directory-query(concat('/" + markLogicDB.getIdentifier() + "_" + value.trim()
+		+ "','-data-2/'),'infinity')";
 
-	// ------------------------------------------------------------------------------------------------
-	// this additional constraint forces the retrieval of resources harvested before the
-	// source end harvesting time stamp.
-	// this avoids, in case the target source is harvested right now, to retrieve also
-	// the new resources while the harvesting is still in progress
-	// ------------------------------------------------------------------------------------------------
-
-	QualifiedName resTimeStampName = new QualifiedName(NameSpace.GI_SUITE_DATA_MODEL, //
-		ResourceProperty.RESOURCE_TIME_STAMP.getName());//
-
-	String resTimeStampQuery = buildCTSElementRangeQuery(//
-		resTimeStampName, //
-		BondOperator.LESS.asMathOperator(), //
-
-		buildCTSElementValues(//
-			new QualifiedName(//
-				NameSpace.GI_SUITE_DATA_MODEL, //
-				SourceStorageWorker.createDataFolderIndexName(value)),
-			"'()'", ""), //
-
-		false);//
-
-	return buildCTSLogicQuery(CTSLogicOperator.AND, sourceIdQuery, resTimeStampQuery);
+	return buildCTSLogicQuery(CTSLogicOperator.OR, query, fallbackQuery1, fallbackQuery2);
     }
 
     /**
@@ -481,6 +522,56 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 	QualifiedName sns = new QualifiedName(NameSpace.GI_SUITE_DATA_MODEL, element.getName());
 
 	return buildCTSElementRangeQuery(sns, operator.asMathOperator(), value, true);
+    }
+
+    /**
+     * @return
+     */
+    public String buildLastSixWeeksTemporalQuery() {
+
+	String now = ISO8601DateTimeUtils.getISO8601DateTime();
+	String lastWeek = ISO8601DateTimeUtils.getISO8601DateTime(new Date(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(7)));
+	String last2Weeks = ISO8601DateTimeUtils.getISO8601DateTime(new Date(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(14)));
+	String last3Weeks = ISO8601DateTimeUtils.getISO8601DateTime(new Date(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(21)));
+	String last4Weeks = ISO8601DateTimeUtils.getISO8601DateTime(new Date(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(28)));
+	String last5Weeks = ISO8601DateTimeUtils.getISO8601DateTime(new Date(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(35)));
+	String last6Weeks = ISO8601DateTimeUtils.getISO8601DateTime(new Date(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(42)));
+
+	String query = buildCTSLogicQuery(CTSLogicOperator.OR,
+
+		buildCTSElementRangeQuery(IndexedMetadataElements.TEMP_EXTENT_BEGIN.asQualifiedName(), "<", last6Weeks, 0, true),
+
+		buildCTSLogicQuery(CTSLogicOperator.AND,
+
+			buildCTSElementRangeQuery(IndexedMetadataElements.TEMP_EXTENT_BEGIN.asQualifiedName(), ">=", last6Weeks, 14, true),
+			buildCTSElementRangeQuery(IndexedMetadataElements.TEMP_EXTENT_BEGIN.asQualifiedName(), "<", last6Weeks, 14, true)),
+
+		buildCTSLogicQuery(CTSLogicOperator.AND,
+
+			buildCTSElementRangeQuery(IndexedMetadataElements.TEMP_EXTENT_BEGIN.asQualifiedName(), ">=", last5Weeks, 24, true),
+			buildCTSElementRangeQuery(IndexedMetadataElements.TEMP_EXTENT_BEGIN.asQualifiedName(), "<", last5Weeks, 24, true)),
+
+		buildCTSLogicQuery(CTSLogicOperator.AND,
+
+			buildCTSElementRangeQuery(IndexedMetadataElements.TEMP_EXTENT_BEGIN.asQualifiedName(), ">=", last4Weeks, 34, true),
+			buildCTSElementRangeQuery(IndexedMetadataElements.TEMP_EXTENT_BEGIN.asQualifiedName(), "<", last4Weeks, 34, true)),
+
+		buildCTSLogicQuery(CTSLogicOperator.AND,
+
+			buildCTSElementRangeQuery(IndexedMetadataElements.TEMP_EXTENT_BEGIN.asQualifiedName(), ">=", last3Weeks, 44, true),
+			buildCTSElementRangeQuery(IndexedMetadataElements.TEMP_EXTENT_BEGIN.asQualifiedName(), "<", last2Weeks, 44, true)),
+
+		buildCTSLogicQuery(CTSLogicOperator.AND,
+			buildCTSElementRangeQuery(IndexedMetadataElements.TEMP_EXTENT_BEGIN.asQualifiedName(), ">=", last2Weeks, 54, true),
+			buildCTSElementRangeQuery(IndexedMetadataElements.TEMP_EXTENT_BEGIN.asQualifiedName(), "<", lastWeek, 54, true)),
+
+		buildCTSLogicQuery(CTSLogicOperator.AND,
+			buildCTSElementRangeQuery(IndexedMetadataElements.TEMP_EXTENT_BEGIN.asQualifiedName(), ">=", lastWeek, 64, true),
+			buildCTSElementRangeQuery(IndexedMetadataElements.TEMP_EXTENT_BEGIN.asQualifiedName(), "<=", now, 64, true)),
+
+		buildCTSElementRangeQuery(IndexedElements.TEMP_EXTENT_BEGIN_NOW.asQualifiedName(), "=", "", 64, true));
+
+	return query;
     }
 
     /**
@@ -520,50 +611,51 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 
     private String buildQuery(QueryableBond<?> bond, List<IndexedMetadataElement> indexes) {
 
-	for (IndexedMetadataElement index : indexes) {
+	IndexedMetadataElement index = indexes.//
+		stream().//
+		filter(i -> i.getElementName().equals(bond.getProperty().getName())).//
+		findFirst().//
+		get();
 
-	    if (bond.getProperty().getName().equals(index.getElementName())) {
+	Queryable property = bond.getProperty();
+	BondOperator filterOp = bond.getOperator();
 
-		Queryable property = bond.getProperty();
-		BondOperator filterOp = bond.getOperator();
+	Object objValue = bond.getPropertyValue();
+	String value = objValue != null ? cleanValue(objValue.toString()) : null;
 
-		Object objValue = bond.getPropertyValue();
-		String value = objValue != null ? cleanValue(objValue.toString()) : null;
+	QueryableStrategy strategy = QueryableStrategy.DEFAULT_STRATEGY;
 
-		QueryableStrategy strategy = QueryableStrategy.DEFAULT_STRATEGY;
+	QueryableStrategy runTimestrategy = QueryableStrategy.getStrategy(index);
 
-		QueryableStrategy runTimestrategy = QueryableStrategy.getStrategy(index);
+	if (runTimestrategy != null) {
+	    strategy = runTimestrategy;
+	}
 
-		if (runTimestrategy != null)
-		    strategy = runTimestrategy;
+	switch (strategy) {
+	case DEFAULT_STRATEGY:
 
-		switch (strategy) {
-		case DEFAULT_STRATEGY:
+	    return execDefaultStrategy(property, filterOp, value);
 
-		    return execDefaultStrategy(property, filterOp, value);
+	case NUMERICAL_STRATEGY:
 
-		case NUMERICAL_STRATEGY:
+	    return execNumericalStrategy(property, filterOp, value);
 
-		    return execNumericalStrategy(property, filterOp, value);
+	case TEMP_EXTENT_STRATEGY:
 
-		case TEMP_EXTENT_STRATEGY:
+	    return execTempExtentStrategy(property, filterOp, value);
 
-		    return execTempExtentStrategy(property, filterOp, value);
+	case ANY_TEXT_STRATEGY:
 
-		case ANY_TEXT_STRATEGY:
+	    return execAnyTextStrategy(value);
 
-		    return execAnyTextStrategy(value);
+	case SUBJECT_STRATEGY:
 
-		case SUBJECT_STRATEGY:
+	    return execSubjectStrategy(value, bond.getOperator());
+	case BOUNDING_BOX_NULL_STRATEGY:
 
-		    return execSubjectStrategy(value, bond.getOperator());
-		case BOUNDING_BOX_NULL_STRATEGY:
-
-		    return execBoundingBoxNullStrategy();
-		default:
-		    break;
-		}
-	    }
+	    return execBoundingBoxNullStrategy();
+	default:
+	    break;
 	}
 
 	// return buildCTSLogicQuery(CTSLogicOperator.AND, "");// an always true query
@@ -579,8 +671,9 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 	switch (operator) {
 
 	case NULL:
+	case NOT_NULL:
 
-	    return createNullQuery(qName, element);
+	    return createExistsOrNotExistsQuery(operator, qName, element);
 
 	case NOT_EQUAL:
 	case EQUAL:
@@ -593,14 +686,28 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 
 	case LIKE:
 
+	    Optional<Properties> keyValueOption = ConfigurationWrapper.getSystemSettings().getKeyValueOptions();
+	    if (keyValueOption.isPresent()) {
+
+		Properties properties = keyValueOption.get();
+		Boolean enabled = Boolean.valueOf(properties.getOrDefault(ENABLE_FILTERED_TRAILING_WILDCARDS_QUERIES, "false").toString());
+
+		if (enabled && (value.startsWith("*") || value.endsWith("*"))) {
+
+		    unfilteredQuery = false;
+
+		    return buildCTSElementWordQuery(qName, value, ranking.computePropertyWeight(element));
+		}
+	    }
+
 	    //
-	    // Non filtered queries with * wildcard, can result in one ore more false positive.
+	    // unfiltered queries with * wildcard, can result in one ore more false positive.
 	    // E.g:: for the CSW compliance test there are 2 records with format "application/pdf" and
 	    // "application/xhtml+xml"
 	    // and in a test the request is: "records having format 'application/*xml'".
 	    // Using a single word query 'application/*xml' would result in both records, since the 'xml' word after the
 	    // * is not
-	    // considered in a non filtered query (it would be filtered in the last phase of a filtered query).
+	    // considered in a non unfiltered query (it would be unfiltered in the last phase of a unfiltered query).
 	    // In order to avoid this issue, the query is mapped in n word queries inside an AND logic op., where each
 	    // word query
 	    // has as target the result of the original value split by '*'.
@@ -611,11 +718,13 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 	    // do not contains 'xml')
 	    //
 
-	    List<String> operands = Arrays.asList(value.split("\\*")).stream().//
+	    List<String> operands = Arrays.asList(value.split("\\*")).//
+		    stream().//
+		    filter(v -> !v.isEmpty()).//
 		    map(v -> buildCTSElementWordQuery(qName, v, ranking.computePropertyWeight(element))).//
 		    collect(Collectors.toList());
 
-	    return buildCTSLogicQuery(CTSLogicOperator.AND, operands);
+	    return buildCTSLogicQuery(CTSLogicOperator.AND, true, operands);
 
 	// this is not correct. the min function is not constrained to the current bonds, so the returned
 	// value is the min or max value of all the db elements, not of the db elements which satisfy the
@@ -628,6 +737,22 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 	}
 
 	return null;
+    }
+
+    /**
+     * @return
+     */
+    private String getCountFunction() {
+
+	return unfilteredQuery ? "xdmp:estimate" : "xdmp:estimate";
+    }
+
+    /**
+     * @return
+     */
+    private String getSearchFilter() {
+
+	return unfilteredQuery ? "unfiltered" : "filtered";
     }
 
     private String execBoundingBoxNullStrategy() {
@@ -654,9 +779,22 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 	return buildCTSElementRangeQuery(qName, "=", "", ranking.computePropertyWeight(element), true);
     }
 
-    private String createNullQuery(QualifiedName qName, Queryable element) {
+    /**
+     * @param operator
+     * @param qName
+     * @param element
+     * @return
+     */
+    private String createExistsOrNotExistsQuery(BondOperator operator, QualifiedName qName, Queryable element) {
 
-	return buildCTSNotQuery(buildCTSElementRangeQuery(qName, "!=", "", ranking.computePropertyWeight(element), true));
+	String existsQuery = buildCTSElementRangeQuery(qName, "!=", "", ranking.computePropertyWeight(element), true);
+
+	if (operator == BondOperator.NULL) {
+
+	    return buildCTSNotQuery(existsQuery);
+	}
+
+	return existsQuery;
     }
 
     @SuppressWarnings("incomplete-switch")
@@ -670,6 +808,7 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 	 * to support this operator, each element must have a correspondent NULL element in the IndexedElements group
 	 */
 	case NULL:
+	case NOT_NULL:
 
 	    throw new IllegalArgumentException("NULL operator on double and integer elements not yet supported");
 
@@ -840,26 +979,26 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 	    ctsIndexOrder = ", " + createCTSIndexOrderOption(property, direction);
 	}
 
-	String search = "cts:search(" + MarkLogicSearchBuilder.getCTSSearchTarget() + //
+	String search = "cts:search(" + getCTSSearchTarget() + //
 		"," + query + //
-		",(\"unfiltered\",\"" + ranking.getScoreMethod() + "\"" + ctsIndexOrder + "),"//
+		",(\"" + getSearchFilter() + "\",\"" + ranking.getScoreMethod() + "\"" + ctsIndexOrder + "),"//
 		+ RankingStrategy.QUALITY_WEIGHT + ")";
 
 	if (estimate) {
 
-	    search = "cts:search(" + MarkLogicSearchBuilder.getCTSSearchTarget() + //
+	    search = "cts:search(" + getCTSSearchTarget() + //
 		    ",$query" + //
-		    ",(\"unfiltered\",\"" + ranking.getScoreMethod() + "\"),"//
+		    ",(\"" + getSearchFilter() + "\",\"" + ranking.getScoreMethod() + "\"),"//
 		    + RankingStrategy.QUALITY_WEIGHT + ")";
 
 	    if (registerQuery) {
 
 		String s = "let $registeredQuery := cts:register( \n";
 		s += query + ") \n";
-		s += "let $query as cts:query := cts:registered-query($registeredQuery,'unfiltered')";
+		s += "let $query as cts:query := cts:registered-query($registeredQuery,'" + getSearchFilter() + "')";
 		s += "return \n";
 		s += "<gs:out>{<gs:estimate>{\n\n";
-		s += "xdmp:estimate(" + search + ")\n\n";
+		s += getCountFunction() + "(" + search + ")\n\n";
 		s += "}</gs:estimate>}\n\n";
 		s += "{<gs:termFrequency xmlns:gs=\"http://flora.eu/gi-suite/1.0/dataModel/schema\">\n\n";
 		for (Queryable term : tfTargets) {
@@ -880,12 +1019,12 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 
 		if (Objects.isNull(tfTargets) || tfTargets.isEmpty()) {
 
-		    s += " xdmp:estimate(" + search + ")\n\n";
+		    s += " " + getCountFunction() + "(" + search + ")\n\n";
 
 		} else {
 
 		    s += "<gs:out>{<gs:estimate>{\n\n";
-		    s += "xdmp:estimate(" + search + ")\n\n";
+		    s += getCountFunction() + "(" + search + ")\n\n";
 		    s += "}</gs:estimate>}\n\n";
 		    s += "{<gs:termFrequency xmlns:gs=\"http://flora.eu/gi-suite/1.0/dataModel/schema\">\n\n";
 		    for (Queryable term : tfTargets) {
@@ -984,7 +1123,13 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 		buildCTSElementRangeQuery(element.asQualifiedName(), "=", "10", ranking.computeRangeWeight(element, 10), false));
     }
 
-    private String buildCTSElementWordQuery(QualifiedName el, String val, Integer weight) {
+    /**
+     * @param el
+     * @param val
+     * @param weight
+     * @return
+     */
+    protected String buildCTSElementWordQuery(QualifiedName el, String val, Integer weight) {
 
 	String w = weight == null ? "" : ",(\"case-insensitive\")," + weight + "";
 
@@ -1020,13 +1165,13 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 	return "(), (\"fragment-frequency\",\"frequency-order\",\"descending\",\"limit=" + max + "\",\"eager\"), $query";
     }
 
-    private String buildCTSNotQuery(String query) {
+    protected String buildCTSNotQuery(String query) {
 
 	return "cts:not-query(" + query + ")";
     }
 
     // @formatter:off
-    private String buildTermFrequencyQuery(Queryable target, int max) {
+    protected String buildTermFrequencyQuery(Queryable target, int max) {
 
 	QualifiedName ns = new QualifiedName(NameSpace.GI_SUITE_DATA_MODEL, target.getName());
 
@@ -1087,8 +1232,8 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 	    value = URLDecoder.decode(value, UTF8_ENCODING);
 	    value = URLDecoder.decode(value, UTF8_ENCODING);
 	    value = URLDecoder.decode(value, UTF8_ENCODING);
-	} catch (UnsupportedEncodingException e) {
-	    GSLoggerFactory.getLogger(getClass()).warn("Bad encoding {}", value, e);
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).warn("Unable to decode value [{}]: {}", value, e.getMessage());
 	}
 	return value;
     }
@@ -1101,14 +1246,6 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 
 	if (value == null) {
 	    return value;
-	}
-
-	if (value.startsWith("*")) {
-	    value = value.substring(1, value.length());
-	}
-
-	if (value.endsWith("*")) {
-	    value = value.substring(0, value.length() - 1);
 	}
 
 	// escapes the single quote (if present) since it's used in the cts:element-word-query
@@ -1125,7 +1262,7 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 	} catch (RequestException e) {
 
 	    // here a warning log should be enough
-	    GSLoggerFactory.getLogger(getClass()).warn("Can't compute mon or max", e);
+	    GSLoggerFactory.getLogger(getClass()).warn("Can't compute min or max", e);
 
 	}
 
@@ -1148,12 +1285,14 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 	    query = buildCTSElementRangeQuery(sourceIdName, BondOperator.EQUAL.asMathOperator(), sourceIdentifer, true);
 	}
 
+	String importNS = "import module namespace gs=\"http://flora.eu/gi-suite/1.0/dataModel/schema\" at \"/gs-modules/functions-module.xqy\"; \n";
+
 	String ref = createElementReference(name);
 	if (operatorType == BondOperator.MIN) {
-	    return "cts:min(" + ref + ",()," + query + ")";
+	    return importNS + "cts:min(" + ref + ",()," + query + ")";
 
 	}
-	return "cts:max(" + ref + ",()," + query + ")";
+	return importNS + "cts:max(" + ref + ",()," + query + ")";
     }
 
     private String createElementReference(QualifiedName name) {
@@ -1166,7 +1305,11 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 	return "cts:element-reference(" + MarkLogicSearchBuilder.createFNQName(name) + ")";
     }
 
-    private String createSSCScoreTermFrequencyQuery(String values) {
+    /**
+     * @param values
+     * @return
+     */
+    protected String createSSCScoreTermFrequencyQuery(String values) {
 
 	values = values.replace("\"limit=" + maxFrequencyMapItems + "\"", "()");
 

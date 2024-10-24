@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -98,7 +98,22 @@ public class CUAHSIHISCentralConnector extends HarvestedQueryConnector<CUAHSIHIS
 	}
 
 	if (services == null) {
-	    services = client.getServicesInBox("-180", "-90", "180", "90");
+	    services = new ArrayList<ServiceInfo>();
+	    List<ServiceInfo> tmp = client.getServicesInBox("-180", "-90", "180", "90");
+	    for (ServiceInfo info : tmp) {
+		if (//	
+			//
+			info.getServiceURL().contains("www4.des.state.nh.us/WaterOneFlow/cuahsi_1_1.asmx")// 403 forbidden
+//			info.getServiceURL().contains("hydro1.gesdisc.eosdis.nasa.gov/daac-bin/his/1.0/NLDAS_FORA_002.cgi")||//
+//			info.getServiceURL().contains("hydro1.gesdisc.eosdis.nasa.gov/daac-bin/his/1.0/NLDAS_NOAH_002")||//
+//			info.getServiceURL().contains("hydroportal.cuahsi.org/nwisgw/cuahsi_1_1.asmx") // usgs ground water
+			
+			//
+			) {
+		    continue;
+		}
+		services.add(info);
+	    }
 	}
 
 	String id = listRecords.getResumptionToken();
@@ -239,6 +254,8 @@ public class CUAHSIHISCentralConnector extends HarvestedQueryConnector<CUAHSIHIS
 
 	}
 
+	GSLoggerFactory.getLogger(this.getClass()).info("HIS Server position: {}", nextId);
+	
 	ret.setResumptionToken(nextId);
 	return ret;
 

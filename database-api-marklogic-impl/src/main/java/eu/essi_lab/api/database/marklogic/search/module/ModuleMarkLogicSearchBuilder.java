@@ -7,7 +7,7 @@ package eu.essi_lab.api.database.marklogic.search.module;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -24,18 +24,26 @@ package eu.essi_lab.api.database.marklogic.search.module;
  * #L%
  */
 
+import java.util.Optional;
+import java.util.Properties;
+
 import eu.essi_lab.api.database.marklogic.MarkLogicDatabase;
-import eu.essi_lab.api.database.marklogic.MarkLogicModuleManager;
+import eu.essi_lab.api.database.marklogic.MarkLogicModuleQueryBuilder;
 import eu.essi_lab.api.database.marklogic.search.MarkLogicSearchBuilder;
 import eu.essi_lab.api.database.marklogic.search.MarkLogicSpatialQueryBuilder;
 import eu.essi_lab.api.database.marklogic.search.def.DefaultMarkLogicSearchBuilder;
+import eu.essi_lab.api.database.marklogic.search.def.DefaultMarkLogicSpatialQueryBuilder;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.indexes.IndexedElements;
 import eu.essi_lab.lib.xml.QualifiedName;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.bond.BondOperator;
+import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
 import eu.essi_lab.model.Queryable;
+import eu.essi_lab.model.Queryable.ContentType;
 import eu.essi_lab.model.index.IndexedElement;
 import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.ResourceProperty;
 
 /**
  * @author Fabrizio
@@ -50,31 +58,69 @@ public class ModuleMarkLogicSearchBuilder extends DefaultMarkLogicSearchBuilder 
 
 	super(message, markLogicDB);
     }
+    
+    @Override
+    protected String buildTermFrequencyQuery(Queryable target, int max) {
 
-    protected String buildTempExtentQuery(Queryable element, BondOperator operator, String value) {
+	if (target.getName().equals(ResourceProperty.SSC_SCORE_EL_NAME) || target.getContentType() != ContentType.TEXTUAL) {
 
-	return MarkLogicModuleManager.getInstance().getTempExtentQuery(element, operator, value);
+	    return super.buildTermFrequencyQuery(target, max);
+	}
+	
+	return MarkLogicModuleQueryBuilder.getInstance().getTermFrequencyQuery(target.getName(), max);
     }
 
+    @Override
+    protected String buildTempExtentQuery(Queryable element, BondOperator operator, String value) {
+
+	return MarkLogicModuleQueryBuilder.getInstance().getTempExtentQuery(element, operator, value);
+    }
+
+    @Override
     protected String buildTempExtentNowQuery(Queryable element) {
 
 	QualifiedName now = element == MetadataElement.TEMP_EXTENT_BEGIN ? //
 		IndexedElements.TEMP_EXTENT_BEGIN_NOW.asQualifiedName() : //
 		IndexedElements.TEMP_EXTENT_END_NOW.asQualifiedName();
 
-	return MarkLogicModuleManager.getInstance().getTempExtentNowQuery(now.getLocalPart());
+	return MarkLogicModuleQueryBuilder.getInstance().getTempExtentNowQuery(now.getLocalPart());
     }
 
+    @Override
     public MarkLogicSpatialQueryBuilder createSpatialQueryBuilder(MarkLogicSearchBuilder builder) {
+
+	if (isCoveringModeEnabled()) {
+
+	    return new DefaultMarkLogicSpatialQueryBuilder(this);
+	}
 
 	return new ModuleMarkLogicSpatialQueryBuilder(this);
     }
 
-    protected String buildDelectedExcludedQuery() {
+    /**
+     * @return
+     */
+    private boolean isCoveringModeEnabled() {
 
-	return MarkLogicModuleManager.getInstance().getDeletedExcludedQuery();
+	Optional<Properties> keyValueOption = ConfigurationWrapper.getSystemSettings().getKeyValueOptions();
+	if (keyValueOption.isPresent()) {
+
+	    Properties properties = keyValueOption.get();
+	    String option = properties.getProperty("coveringMode");
+
+	    return option != null && option.equals("enabled");
+	}
+
+	return false;
     }
 
+    @Override
+    protected String buildDelectedExcludedQuery() {
+
+	return MarkLogicModuleQueryBuilder.getInstance().getDeletedExcludedQuery();
+    }
+
+    @Override
     protected String buildWeightQuery(IndexedElement element) {
 
 	int w0 = ranking.computeRangeWeight(element, 1);
@@ -88,12 +134,19 @@ public class ModuleMarkLogicSearchBuilder extends DefaultMarkLogicSearchBuilder 
 	int w8 = ranking.computeRangeWeight(element, 9);
 	int w9 = ranking.computeRangeWeight(element, 10);
 
-	return MarkLogicModuleManager.getInstance().getWeightQuery(element.getElementName(), w0, w1, w2, w3, w4, w5, w6, w7, w8, w9);
+	return MarkLogicModuleQueryBuilder.getInstance().getWeightQuery(element.getElementName(), w0, w1, w2, w3, w4, w5, w6, w7, w8, w9);
     }
 
+    @Override
     protected String buildGDCWeightQuery() {
 
-	return MarkLogicModuleManager.getInstance().getGDCWeightQuery();
+	return MarkLogicModuleQueryBuilder.getInstance().getGDCWeightQuery();
+    }
+
+    @Override
+    public String buildCTSElementRangeQuery(QualifiedName el, String operator, String value, double weight, boolean quoteValue) {
+
+	return MarkLogicModuleQueryBuilder.getInstance().getElementRangeQuery(el, operator, value, weight, quoteValue);
     }
 
     /**
@@ -103,6 +156,7 @@ public class ModuleMarkLogicSearchBuilder extends DefaultMarkLogicSearchBuilder 
      * @param bond
      * @return
      */
+    @Override
     protected String buildSourceIdQuery(QualifiedName name, String value, Queryable property) {
 
 	if (!dataFolderCheckEnabled) {
@@ -110,6 +164,51 @@ public class ModuleMarkLogicSearchBuilder extends DefaultMarkLogicSearchBuilder 
 	    return super.buildSourceIdQuery(name, value, property);
 	}
 
-	return MarkLogicModuleManager.getInstance().getSourceIdQuery(value, markLogicDB.getSuiteIdentifier());
+	return MarkLogicModuleQueryBuilder.getInstance().getSourceIdQuery(value, markLogicDB.getIdentifier());
+    }
+
+    /**
+     * @param operator
+     * @param ordered
+     * @param operands
+     * @return
+     */
+    @Override
+    public String buildCTSLogicQuery(CTSLogicOperator operator, boolean ordered, String... operands) {
+
+	if (ordered) {
+
+	    return super.buildCTSLogicQuery(operator, ordered, operands);
+	}
+
+	return MarkLogicModuleQueryBuilder.getInstance().getLogicQuery(operator, buildCTSLogicQueryOperands(operands));
+    }
+
+    /**
+     * @param el
+     * @param val
+     * @param weight
+     * @return
+     */
+    @Override
+    protected String buildCTSElementWordQuery(QualifiedName el, String val, Integer weight) {
+
+	return MarkLogicModuleQueryBuilder.getInstance().getWordQuery(el.getLocalPart(), val, weight);
+    }
+
+    /**
+     * @param operator
+     * @return
+     */
+    @Override
+    public String getCTSLogicQueryName(LogicalOperator operator) {
+
+	return MarkLogicModuleQueryBuilder.getInstance().getLogicQueryName(operator);
+    }
+
+    @Override
+    protected String buildCTSNotQuery(String query) {
+
+	return MarkLogicModuleQueryBuilder.getInstance().getNotQuery(query);
     }
 }

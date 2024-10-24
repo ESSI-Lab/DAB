@@ -4,7 +4,7 @@ package eu.essi_lab.messages.bond;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -39,11 +39,47 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlRootElement
 public class View implements Serializable {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -4652948734431078022L;
+
+    /**
+     * @author Fabrizio
+     */
+    public enum ViewVisibility {
+
+	/**
+	 * 
+	 */
+	PUBLIC,
+	/**
+	 * 
+	 */
+	PRIVATE;
+
+	/**
+	 * @param visibility
+	 * @return
+	 */
+	public static ViewVisibility fromName(String visibility) {
+
+	    if (visibility.equals(PUBLIC.name())) {
+
+		return PUBLIC;
+	    }
+
+	    return PRIVATE;
+	}
+    }
+
     private String creator;
     private String id;
     private String label;
     private Date creationTime = new Date();
     private Date expirationTime;
+    private String visibility;
+    private String owner;
 
     @XmlElements({ @XmlElement(name = "viewBond", type = ViewBond.class), //
 	    @XmlElement(name = "resourcePropertyBond", type = ResourcePropertyBond.class), //
@@ -57,6 +93,7 @@ public class View implements Serializable {
      * 	
      */
     public View() {
+	setVisibility(ViewVisibility.PRIVATE);
     }
 
     /**
@@ -64,6 +101,7 @@ public class View implements Serializable {
      */
     public View(String identifier) {
 	setId(identifier);
+	setVisibility(ViewVisibility.PRIVATE);
     }
 
     /**
@@ -71,7 +109,7 @@ public class View implements Serializable {
      * @param creator
      */
     public View(String identifier, String creator) {
-	setId(identifier);
+	this(identifier);
 	setCreator(creator);
     }
 
@@ -115,6 +153,26 @@ public class View implements Serializable {
 	this.label = label;
     }
 
+    public String getOwner() {
+
+	return owner;
+    }
+
+    public void setOwner(String owner) {
+
+	this.owner = owner;
+    }
+
+    public ViewVisibility getVisibility() {
+
+	return ViewVisibility.fromName(this.visibility);
+    }
+
+    public void setVisibility(ViewVisibility viewVisibility) {
+
+	this.visibility = viewVisibility.name();
+    }
+
     @XmlTransient
     public Bond getBond() {
 	return bond;
@@ -136,4 +194,9 @@ public class View implements Serializable {
 	return super.equals(obj);
     }
 
+    @Override
+    public String toString() {
+
+	return id + "_" + label;
+    }
 }

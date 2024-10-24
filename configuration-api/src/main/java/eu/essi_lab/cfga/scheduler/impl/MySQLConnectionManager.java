@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.scheduler.impl;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,6 +28,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Enumeration;
+import java.util.HashMap;
 
 import com.mysql.cj.jdbc.exceptions.CommunicationsException;
 
@@ -50,6 +51,8 @@ public class MySQLConnectionManager {
     private boolean autoReconnect;
     private String dbUri;
 
+    private HashMap<ResultSet, Statement> rsSetToStmntMap;
+
     /**
      * 
      */
@@ -57,36 +60,8 @@ public class MySQLConnectionManager {
 
 	setUseSSl(false);
 	setAutoReconnect(false);
-    }
 
-    /**
-     * @param dbUri must starts with 'jdbc:mysql://' and can ends with or without '/'
-     * @param useSSl
-     * @param dbName
-     * @param autoReconnect
-     * @see #MAX_OTHER_WAIT_TIMEOUT
-     * @see #MAX_WINDOWS_WAIT_TIMEOUT
-     * @return
-     */
-    public static String createConnectionURL(String dbUri, String dbName, boolean useSSl, boolean autoReconnect) {
-
-	String url = null;
-
-	if (dbName != null) {
-
-	    if (!dbUri.endsWith("/")) {
-
-		dbName = "/" + dbName;
-	    }
-
-	    url = dbUri + dbName + "?useSSL=" + useSSl;
-
-	} else {
-
-	    url = dbUri + "?useSSL=" + useSSl;
-	}
-
-	return url;
+	rsSetToStmntMap = new HashMap<>();
     }
 
     /**
@@ -100,61 +75,6 @@ public class MySQLConnectionManager {
     }
 
     /**
-     * @param dbUri
-     * @param dbName
-     * @return
-     */
-    public static String createConnectionURL(String dbUri) {
-
-	return createConnectionURL(dbUri, null, false, false);
-    }
-
-    /**
-     * @param connectionURL
-     * @param user
-     * @param pwd
-     * @return
-     * @throws SQLException
-     */
-    public static Connection connect(String connectionURL, String user, String pwd) throws SQLException {
-
-	Enumeration<Driver> drivers = DriverManager.getDrivers();
-	GSLoggerFactory.getLogger(MySQLConnectionManager.class).debug("Available SQL drivers:");
-	while (drivers.hasMoreElements()) {
-	    GSLoggerFactory.getLogger(MySQLConnectionManager.class).debug(drivers.nextElement().getClass().getName());
-	}
-
-	return DriverManager.getConnection(connectionURL, user, pwd);
-    }
-
-    /**
-     * @return
-     */
-    public Connection getConnection() {
-	try {
-	    if (connection == null) {
-
-		connection = createConnection();
-
-	    } else {
-
-		if (connection.isClosed()) {
-
-		    GSLoggerFactory.getLogger(getClass()).debug("Connection closed, new connection REQUIRED");
-
-		    connection = createConnection();
-		}
-	    }
-	} catch (SQLException e) {
-
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
-	}
-
-	return connection;
-    }
-
-    /**
      * @param query
      * @return
      * @throws SQLException
@@ -164,12 +84,13 @@ public class MySQLConnectionManager {
 	GSLoggerFactory.getLogger(getClass()).debug("Query execution STARTED");
 
 	ResultSet resultSet = null;
+	Statement statement = null;
 
 	try {
 
-	    Statement stmt = getConnection().createStatement();
+	    statement = getConnection().createStatement();
 
-	    resultSet = stmt.executeQuery(query);
+	    resultSet = statement.executeQuery(query);
 
 	} catch (CommunicationsException comEx) {
 
@@ -190,14 +111,16 @@ public class MySQLConnectionManager {
 	    GSLoggerFactory.getLogger(getClass()).warn("Creating new connection and try again");
 
 	    connection = createConnection();
-	    Statement stmt = connection.createStatement();
+	    statement = connection.createStatement();
 
-	    resultSet = stmt.executeQuery(query);
+	    resultSet = statement.executeQuery(query);
 
 	} catch (SQLException sqlEx) {
 
 	    throw sqlEx;
 	}
+
+	rsSetToStmntMap.put(resultSet, statement);
 
 	GSLoggerFactory.getLogger(getClass()).debug("Query execution ENDED");
 
@@ -209,15 +132,21 @@ public class MySQLConnectionManager {
      * @return
      * @throws SQLException
      */
+    @SuppressWarnings("resource")
     public void execUpdate(String query) throws SQLException {
 
-	GSLoggerFactory.getLogger(getClass()).debug("Query execution STARTED");
+	GSLoggerFactory.getLogger(getClass()).debug("Update execution STARTED");
+
+	Statement statement = null;
 
 	try {
 
-	    Statement stmt = getConnection().createStatement();
+	    statement = getConnection().createStatement();
 
-	    stmt.executeUpdate(query);
+	    // disabling escape processing should avoid the issue "SQLException: Not a valid escape sequence: {'"
+	    statement.setEscapeProcessing(false);
+
+	    statement.executeUpdate(query);
 
 	} catch (CommunicationsException comEx) {
 
@@ -238,16 +167,48 @@ public class MySQLConnectionManager {
 	    GSLoggerFactory.getLogger(getClass()).warn("Creating new connection and try again");
 
 	    connection = createConnection();
-	    Statement stmt = connection.createStatement();
+	    statement = connection.createStatement();
 
-	    stmt.executeUpdate(query);
+	    // disabling escape processing should avoid the issue "SQLException: Not a valid escape sequence: {'"
+	    statement.setEscapeProcessing(false);
+
+	    statement.executeUpdate(query);
 
 	} catch (SQLException sqlEx) {
 
 	    throw sqlEx;
+
+	} finally {
+
+	    if (statement != null) {
+		statement.close();
+	    }
 	}
 
-	GSLoggerFactory.getLogger(getClass()).debug("Query execution ENDED");
+	GSLoggerFactory.getLogger(getClass()).debug("Update execution ENDED");
+    }
+
+    /**
+     * @param resultSet
+     */
+    public void close(ResultSet resultSet) {
+
+	Statement statement = rsSetToStmntMap.get(resultSet);
+	if (statement != null) {
+
+	    try {
+		resultSet.close();
+		statement.close();
+
+	    } catch (SQLException e) {
+
+		GSLoggerFactory.getLogger(getClass()).error(e);
+
+	    } finally {
+
+		rsSetToStmntMap.remove(resultSet);
+	    }
+	}
     }
 
     /**
@@ -346,6 +307,89 @@ public class MySQLConnectionManager {
     public void setDbUri(String dbUri) {
 
 	this.dbUri = dbUri;
+    }
+
+    /**
+     * @return
+     */
+    private Connection getConnection() {
+	try {
+	    if (connection == null) {
+
+		connection = createConnection();
+
+		GSLoggerFactory.getLogger(getClass()).debug("Created new connection");
+
+	    } else {
+
+		if (connection.isClosed()) {
+
+		    GSLoggerFactory.getLogger(getClass()).debug("Connection closed, new connection REQUIRED");
+
+		    connection = createConnection();
+		} else {
+
+		    GSLoggerFactory.getLogger(getClass()).debug("Reusing existing connection");
+		}
+	    }
+
+	} catch (
+
+	SQLException e) {
+
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
+	}
+
+	return connection;
+    }
+
+    /**
+     * @param connectionURL
+     * @param user
+     * @param pwd
+     * @return
+     * @throws SQLException
+     */
+    private static Connection connect(String connectionURL, String user, String pwd) throws SQLException {
+
+	Enumeration<Driver> drivers = DriverManager.getDrivers();
+	GSLoggerFactory.getLogger(MySQLConnectionManager.class).debug("Available SQL drivers:");
+	while (drivers.hasMoreElements()) {
+	    GSLoggerFactory.getLogger(MySQLConnectionManager.class).debug(drivers.nextElement().getClass().getName());
+	}
+
+	return DriverManager.getConnection(connectionURL, user, pwd);
+    }
+
+    /**
+     * @param dbUri must starts with 'jdbc:mysql://' and can ends with or without '/'
+     * @param useSSl
+     * @param dbName
+     * @param autoReconnect
+     * @see #MAX_OTHER_WAIT_TIMEOUT
+     * @see #MAX_WINDOWS_WAIT_TIMEOUT
+     * @return
+     */
+    private static String createConnectionURL(String dbUri, String dbName, boolean useSSl, boolean autoReconnect) {
+
+	String url = null;
+
+	if (dbName != null) {
+
+	    if (!dbUri.endsWith("/")) {
+
+		dbName = "/" + dbName;
+	    }
+
+	    url = dbUri + dbName + "?useSSL=" + useSSl;
+
+	} else {
+
+	    url = dbUri + "?useSSL=" + useSSl;
+	}
+
+	return url;
     }
 
     /**

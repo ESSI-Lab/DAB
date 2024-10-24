@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gui.components;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,14 +25,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import org.vaadin.gatanaso.MultiselectComboBox;
-
 import com.vaadin.componentfactory.ToggleButton;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.details.DetailsVariant;
@@ -254,7 +253,7 @@ public class OptionComponentFactory {
     private static Component createOptionWithLoaderLayout(//
 	    Option<?> option, //
 	    Select<String> singleSelect, //
-	    MultiselectComboBox<String> multiSelect, //
+	    MultiSelectComboBox<String> multiSelect, //
 	    boolean forceReadonly) {
 
 	HorizontalLayout layout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout();
@@ -299,7 +298,7 @@ public class OptionComponentFactory {
      */
     public static Component createOptionMultiSelectionComponent(Option<?> option, boolean forceReadOnly) {
 
-	MultiselectComboBox<String> select = new MultiselectComboBox<String>();
+	MultiSelectComboBox<String> select = new MultiSelectComboBox<String>();
 	if (!option.getValueClass().equals(Integer.class) && !option.getValueClass().equals(Double.class)) {
 	    select.setWidthFull();
 	} else {

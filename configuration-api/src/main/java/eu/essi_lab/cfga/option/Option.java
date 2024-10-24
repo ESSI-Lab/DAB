@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.option;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -233,6 +233,22 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
 	getObject().put("inputPattern", pattern.getClass().getName() + "_" + pattern.getName());
     }
 
+    public static void main(String[] args) {
+
+	String s = "eu.essi_lab.cfga.gs.GSSourcePattern_gsSourceId";
+
+	int lastUs = s.lastIndexOf("_");
+
+	String className = s.substring(0, lastUs);
+
+	System.out.println(className);
+
+	String patternName = s.substring(lastUs + 1, s.length());
+
+	System.out.println(patternName);
+
+    }
+
     /**
      * @return
      */
@@ -240,15 +256,19 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
 
 	if (getObject().has("inputPattern")) {
 
-	    String string = getObject().getString("inputPattern");
+	    String inputPattern = getObject().getString("inputPattern");
+
+	    int lastUs = inputPattern.lastIndexOf("_");
+
+	    String className = inputPattern.substring(0, lastUs);
+	    String patternName = inputPattern.substring(lastUs + 1, inputPattern.length());
 
 	    try {
 		@SuppressWarnings("unchecked")
-		Class<? extends InputPattern> clazz = (Class<? extends InputPattern>) Class.forName(string.split("_")[0]);
-		String name = string.split("_")[1];
+		Class<? extends InputPattern> clazz = (Class<? extends InputPattern>) Class.forName(className);
 
 		Method method = clazz.getMethod("fromName", String.class);
-		InputPattern out = (InputPattern) method.invoke(null, name);
+		InputPattern out = (InputPattern) method.invoke(null, patternName);
 
 		return Optional.of(out);
 
@@ -347,8 +367,7 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
 
     /**
      * Default: false
-     * 
-     * If enabled, the option values is shown in a text area. In read-only mode, each new line character 
+     * If enabled, the option values is shown in a text area. In read-only mode, each new line character
      * corresponds to a text area row.<br>
      * This property is valid only for string content
      * 
@@ -706,7 +725,7 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
 	    if (getObject().has("optionMapperClass")) {
 
 		return (Optional<OptionValueMapper<T>>) Optional
-			.of((T) Class.forName(getObject().getString("optionMapperClass")).newInstance());
+			.of((T) Class.forName(getObject().getString("optionMapperClass")).getDeclaredConstructor().newInstance());
 	    }
 	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).warn(e.getMessage(), e);
@@ -733,7 +752,8 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
 
 	    if (getObject().has("valuesLoaderClass")) {
 
-		return (Optional<ValuesLoader<T>>) Optional.of((T) Class.forName(getObject().getString("valuesLoaderClass")).newInstance());
+		return (Optional<ValuesLoader<T>>) Optional
+			.of((T) Class.forName(getObject().getString("valuesLoaderClass")).getDeclaredConstructor().newInstance());
 	    }
 	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
@@ -776,6 +796,18 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
     }
 
     /**
+     * Verifies if this option is similar to <code>other</code>.<br>
+     * Two options are similar if they have the same {@link #getValueClass()}
+     * 
+     * @param other
+     * @return
+     */
+    public boolean similar(Option<?> other) {
+
+	return this.getValueClass().equals(other.getValueClass());
+    }
+
+    /**
      * @param opt1
      * @param opt2
      * @return
@@ -795,9 +827,9 @@ public class Option<T> extends ConfigurationObject implements Selectable<T> {
     private T create(Class<?> valueClass) {
 
 	try {
-	    return (T) valueClass.newInstance();
-	} catch (InstantiationException | IllegalAccessException e) {
-	    e.printStackTrace();
+	    return (T) valueClass.getDeclaredConstructor().newInstance();
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
 	return null;
     }

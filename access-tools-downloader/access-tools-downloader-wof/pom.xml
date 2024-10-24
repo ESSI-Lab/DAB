@@ -13,11 +13,7 @@
 	<packaging>jar</packaging>
 
 
-	<dependencies>
-		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-		</dependency>
+	<dependencies>		
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>access-tools</artifactId>

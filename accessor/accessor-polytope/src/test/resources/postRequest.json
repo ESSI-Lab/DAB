@@ -1,0 +1,16 @@
+{
+    "verb": "retrieve",
+    "request": {
+       "database" : "fdbdev",
+		"class": "rd",
+		"type": "oai",
+		"stream": "lwda",
+		"expver": "xxxx",
+		"obsgroup": "CONV",
+		"reportype": "16001",
+		"obstype": "15",
+		"date": "20150602/to/20150902",
+		"time": "0/to/23/by/1",
+		"domain": "off"
+    }
+}

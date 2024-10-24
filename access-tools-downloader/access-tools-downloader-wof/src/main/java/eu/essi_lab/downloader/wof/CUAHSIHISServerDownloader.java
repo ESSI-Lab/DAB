@@ -4,7 +4,7 @@ package eu.essi_lab.downloader.wof;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,6 +22,7 @@ package eu.essi_lab.downloader.wof;
  */
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -35,7 +36,7 @@ import eu.essi_lab.accessor.wof.client.datamodel.TimeSeries;
 import eu.essi_lab.accessor.wof.client.datamodel.TimeSeriesResponseDocument;
 import eu.essi_lab.accessor.wof.utils.WOFIdentifierMangler;
 import eu.essi_lab.lib.net.protocols.NetProtocols;
-import eu.essi_lab.lib.net.utils.Downloader;
+import eu.essi_lab.lib.net.utils.HttpConnectionUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.model.exceptions.ErrorInfo;
@@ -60,8 +61,14 @@ public class CUAHSIHISServerDownloader extends DataDownloader {
 
     @Override
     public boolean canConnect() {
-	Downloader d = new Downloader();
-	return d.checkConnectivity(online.getLinkage());
+
+	try {
+	    return HttpConnectionUtils.checkConnectivity(online.getLinkage());
+	} catch (URISyntaxException e) {
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	}
+
+	return false;
     }
 
     @Override
@@ -139,13 +146,13 @@ public class CUAHSIHISServerDownloader extends DataDownloader {
 		descriptor.getSecondSpatialDimension().getContinueDimension().setUpperTolerance(0.01);
 
 		TimeSeries timeSeries = mySite.getSeries(variableCode, method, quality, source);
-		
-		if(timeSeries == null){
-		    
+
+		if (timeSeries == null) {
+
 		    GSLoggerFactory.getLogger(getClass()).warn("No time series found");
 		    return ret;
 		}
-		
+
 		Date begin = timeSeries.getBeginTimePositionDate();
 		Date end = timeSeries.getEndTimePositionDate();
 

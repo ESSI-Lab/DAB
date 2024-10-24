@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<savaHIS>
+   <wml2:observationMember xmlns:wml2="http://www.opengis.net/waterml/2.0">
+      <om:OM_Observation xmlns:om="http://www.opengis.net/om/2.0"
+                         xmlns:gml="http://www.opengis.net/gml/3.2"
+                         gml:id="Ig.OM_Obs.hydro.1.S.SedMonthlyMax">
+         <om:phenomenonTime>
+            <gml:TimePeriod gml:id="Ig.ObsTime.1.S.SedMonthlyMax">
+               <gml:beginPosition>2003-12-31T23:01:00Z</gml:beginPosition>
+               <gml:endPosition>2006-12-31T23:01:00Z</gml:endPosition>
+            </gml:TimePeriod>
+         </om:phenomenonTime>
+         <om:resultTime>
+            <gml:TimeInstant gml:id="Ig.resTime.1.S.SedMonthlyMax">
+               <gml:timePosition>2019-05-07 13:01:00+01</gml:timePosition>
+            </gml:TimeInstant>
+         </om:resultTime>
+         <om:observedProperty MonitoringPoint="SI3420" ObservedProperty="SedMonthlyMax"/>
+         <om:featureOfInterest>
+            <wml2:MonitoringPoint gml:id="Ig.MP.hydro.SI3420">
+               <gml:description>Sava at Radovljica I</gml:description>
+               <gml:name>Radovljica I</gml:name>
+               <sa:sampledFeature xmlns:sa="http://www.opengis.net/sampling/2.0"
+                                  xmlns:xlink="http://www.w3.org/1999/xlink"
+                                  xlink:title="Radovljica I"/>
+               <sams:shape xmlns:sams="http://www.opengis.net/samplingSpatial/2.0">
+                  <gml:Point gml:id="Ig.P.hydro.SI3420">
+                     <gml:pos srsName="urn:ogc:def:crs:EPSG:4326">14.16535983 46.33993600</gml:pos>
+                  </gml:Point>
+               </sams:shape>
+            </wml2:MonitoringPoint>
+         </om:featureOfInterest>
+         <om:result>
+            <wml2:MeasurementTimeseries gml:id="Ig.Ts.hydro.1.S.SedMonthlyMax">
+               <wml2:defaultPointMetadata>
+                  <wml2:DefaultTVPMeasurementMetadata>
+                     <wml2:uom xmlns:xlink="http://www.w3.org/1999/xlink" xlink:title="kg/s"/>
+                  </wml2:DefaultTVPMeasurementMetadata>
+               </wml2:defaultPointMetadata>
+            </wml2:MeasurementTimeseries>
+         </om:result>
+      </om:OM_Observation>
+   </wml2:observationMember>
+   <gml:featureMember xmlns:gml="http://www.opengis.net/gml">
+      <savagis:monitoring_point_h xmlns:savagis="http://savagis" gml:id="monitoring_point_h.1">
+         <gml:name>Radovljica I</gml:name>
+         <gml:boundedBy>
+            <gml:Envelope srsDimension="2" srsName="urn:x-ogc:def:crs:EPSG:4326">
+               <gml:lowerCorner>46.33993600000008 14.165359829000124</gml:lowerCorner>
+               <gml:upperCorner>46.33993600000008 14.165359829000124</gml:upperCorner>
+            </gml:Envelope>
+         </gml:boundedBy>
+         <savagis:objectid>1</savagis:objectid>
+         <savagis:shape>
+            <gml:Point srsDimension="2" srsName="urn:x-ogc:def:crs:EPSG:4326">
+               <gml:pos>46.33993600000008 14.165359829000124</gml:pos>
+            </gml:Point>
+         </savagis:shape>
+         <savagis:server_id>SI_3420</savagis:server_id>
+         <savagis:x>14.16535983</savagis:x>
+         <savagis:y>46.33993600</savagis:y>
+         <savagis:z>408.08600000</savagis:z>
+         <savagis:monitoring_type>004</savagis:monitoring_type>
+         <savagis:real_time_data>true</savagis:real_time_data>
+         <savagis:h_max_date>2012-11-04T23:00:00Z</savagis:h_max_date>
+         <savagis:h_max_value>343.0</savagis:h_max_value>
+         <savagis:classification>2</savagis:classification>
+         <savagis:mswgst_code>3420</savagis:mswgst_code>
+         <savagis:european_wgst_code>SI3420</savagis:european_wgst_code>
+         <savagis:bank>2</savagis:bank>
+         <savagis:river_kilometer>900.9</savagis:river_kilometer>
+         <savagis:catchment_area>907.97</savagis:catchment_area>
+         <savagis:gauge_zero>408.086</savagis:gauge_zero>
+         <savagis:start_time>1895-12-31T23:00:00Z</savagis:start_time>
+         <savagis:timestep>Hourly</savagis:timestep>
+         <savagis:authority>ARSO Ljubljana</savagis:authority>
+         <savagis:station_number>10</savagis:station_number>
+         <savagis:river>34</savagis:river>
+         <savagis:country>3</savagis:country>
+         <savagis:id>1</savagis:id>
+         <savagis:river_basin>69</savagis:river_basin>
+         <savagis:ins_when>2016-03-25T10:54:04.819Z</savagis:ins_when>
+         <savagis:ins_by>Mirza Sarač</savagis:ins_by>
+         <savagis:waterlevel>86.0</savagis:waterlevel>
+         <savagis:flow>57.9</savagis:flow>
+         <savagis:temperature>8.5</savagis:temperature>
+         <savagis:flood_protection>0</savagis:flood_protection>
+         <savagis:result_time_position>2019-05-07T12:00:00Z</savagis:result_time_position>
+         <savagis:waterlevel_time>2019-05-07T12:00:00Z</savagis:waterlevel_time>
+         <savagis:flow_time>2019-05-07T12:00:00Z</savagis:flow_time>
+         <savagis:temperature_time>2019-05-07T12:00:00Z</savagis:temperature_time>
+      </savagis:monitoring_point_h>
+   </gml:featureMember>
+</savaHIS>

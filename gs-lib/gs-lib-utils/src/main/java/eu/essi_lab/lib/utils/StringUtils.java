@@ -7,7 +7,7 @@ package eu.essi_lab.lib.utils;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,7 +30,12 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.Normalizer;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.codec.binary.Hex;
 
@@ -43,6 +48,32 @@ public class StringUtils {
      * 
      */
     public static final String SHA1_IDENTIFIER = "SHA-1";
+
+    /**
+     * 
+     */
+    public static String format(int value) {
+
+	return format(Double.valueOf(value));
+    }
+
+    /**
+     * 
+     */
+    public static String format(double value) {
+
+	DecimalFormat decimalFormat = new DecimalFormat();
+	decimalFormat.setGroupingSize(3);
+	decimalFormat.setGroupingUsed(true);
+	decimalFormat.setMaximumFractionDigits(3);
+
+	DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+	symbols.setGroupingSeparator('.');
+	symbols.setDecimalSeparator(',');
+	decimalFormat.setDecimalFormatSymbols(symbols);
+
+	return decimalFormat.format(value);
+    }
 
     /**
      * @param value
@@ -72,6 +103,14 @@ public class StringUtils {
 	} catch (UnsupportedEncodingException e) {
 	}
 	return null;// no way
+    }
+
+    public static String normalize(String input) {
+	return input == null ? null : Normalizer.normalize(input, Normalizer.Form.NFKD);
+    }
+
+    public static String removeAccents(String input) {
+	return normalize(input).replaceAll("\\p{M}", "");
     }
 
     /**
@@ -151,9 +190,9 @@ public class StringUtils {
 
 	return !isNull(string);
     }
-
+    
     /**
-     * Returns true if the string is null or {@link String#isEmpty()} returns true
+     * Returns true if the string is <code>null</code> or {@link String#isEmpty()} returns true
      * 
      * @param string
      * @return
@@ -175,6 +214,17 @@ public class StringUtils {
     }
 
     /**
+     * Avoid the use of the '!' operator to negate the {@link String#isBlank()} method
+     * 
+     * @param string
+     * @return
+     */
+    public static boolean isNotBlank(String string) {
+
+	return !string.isBlank();
+    }
+
+    /**
      * Both methods {@link #isNotEmpty(String)} and {@link #isNotNull(String)} are applied
      * 
      * @param string
@@ -182,10 +232,48 @@ public class StringUtils {
      */
     public static boolean isNotEmptyAndNotNull(String string) {
 
-	return isNotEmpty(string) && isNotNull(string);
+	return isNotNull(string) && isNotEmpty(string);
     }
 
     /**
+     * Both methods {@link #isNotBlank(String)} and {@link #isNotNull(String)} are applied
+     * 
+     * @param string
+     * @return
+     */
+    public static boolean isNotBlankAndNotNull(String string) {
+
+	return isNotNull(string) && isNotBlank(string);
+    }
+
+    /**
+     * Returns <code>true</code> if the given <code>string</code> {@link #isNotNull(String)},
+     * {@link #isNotEmpty(String)} and {@link #isNotBlank(String)}
+     * 
+     * @param string
+     * @return
+     */
+    public static boolean isReadable(String string) {
+
+	return isNotNull(string) && isNotEmpty(string) && isNotBlank(string);
+    }
+
+    /**
+     * @param string
+     * @return
+     */
+    public static boolean hasOnlyLettersNumbersAndUnderscores(String string) {
+
+	Pattern pattern = Pattern.compile("^[a-zA-Z0-9_]*$");
+
+	Matcher matcher = pattern.matcher(string);
+	return matcher.find();
+    }
+
+    /**
+     * Regular expression:<br>
+     * ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
+     * 
      * @param value
      * @return
      */

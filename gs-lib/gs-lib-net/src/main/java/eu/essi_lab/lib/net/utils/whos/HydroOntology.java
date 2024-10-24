@@ -4,7 +4,7 @@ package eu.essi_lab.lib.net.utils.whos;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,9 +35,18 @@ import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import eu.essi_lab.lib.net.utils.Downloader;
+import eu.essi_lab.lib.net.downloader.Downloader;
+import eu.essi_lab.lib.utils.ExpiringCache;
 
-public class HydroOntology {
+public abstract class HydroOntology {
+
+    private String sparqlEndpoint = null;
+    private String scheme = null;
+
+    protected HydroOntology(String baseEndpoint) {
+	this.sparqlEndpoint = baseEndpoint + "/sparql?";
+	this.scheme = baseEndpoint + "/concept/scheme";
+    }
 
     /**
      * Given a variable name, find correspondent concepts in the ontology
@@ -46,13 +55,68 @@ public class HydroOntology {
      * @return
      */
     public List<SKOSConcept> findConcepts(String variableName) {
+	return findConcepts(variableName, false, true);
+    }
 
-	try {
+    /**
+     * Given a variable name, find correspondent concepts in the ontology optionally including children and equivalent
+     * concepts
+     * 
+     * @param searchTerm can be a variable name in any language or a concept URI
+     * @return
+     */
+    public List<SKOSConcept> findConcepts(String searchTerm, boolean includeChildrenAndEquivalents, boolean inScheme) {
 
-	    InputStream queryStream = HydroOntology.class.getClassLoader()
-		    .getResourceAsStream("whos/hydro-ontology-find-all-concepts.sparql");
-	    String query = IOUtils.toString(queryStream, StandardCharsets.UTF_8);
-	    query = query.replace("${SEARCH_TERM}", variableName);
+	try
+
+	{
+	    String children = null;
+
+	    if (includeChildrenAndEquivalents) {
+		children = "?father skos:narrower* ?concept1.\n"//
+			+ "  ?concept1 skos:closeMatch* ?concept.\n";
+	    } else {
+		children = "?father skos:closeMatch* ?concept.\n";
+	    }
+
+	    String query = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#>\n" //
+		    + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" //
+		    + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"//
+		    + "SELECT DISTINCT ?concept ?prefLabel ?altLabel\n" //
+		    + "WHERE \n"//
+		    + "{\n";
+
+	    if (searchTerm.startsWith("http")) {
+
+		query += "BIND(<${SEARCH_TERM}> AS ?father)\n" //
+			+ children //
+			+ "${IN_SCHEME}\n" //
+			+ "OPTIONAL{?concept skos:prefLabel ?prefLabel}\n" //
+			+ "OPTIONAL{?concept skos:altLabel ?altLabel} ";
+
+	    } else {
+		query += "?father rdf:type skos:Concept.\n" //
+			+ "?father (skos:prefLabel|skos:altLabel) ?match.\n" //
+			+ children //
+			+ "${IN_SCHEME}\n" //
+			+ "OPTIONAL{?concept skos:prefLabel ?prefLabel}\n" //
+			+ "OPTIONAL{?concept skos:altLabel ?altLabel }\n" //
+			+ "FILTER(regex(?match,\"^${SEARCH_TERM}$\",\"i\"))\n";
+	    }
+
+	    query += "}";
+
+	    String is = "";
+	    if (inScheme) {
+		is = //
+		     // "BIND(<" + scheme + "> AS ?s).\n" + //
+		     // "?concept skos:inScheme ?s.\n";
+			"?concept skos:inScheme <" + scheme + ">.\n";
+	    }
+	    query = query.replace("${IN_SCHEME}", is);
+	    // regex special characters escaping
+	    searchTerm = searchTerm.replace("(", "\\\\(").replace(")", "\\\\)");
+	    query = query.replace("${SEARCH_TERM}", searchTerm);
 	    return conceptQuery(query);
 	} catch (Exception e) {
 	    e.printStackTrace();
@@ -92,15 +156,25 @@ public class HydroOntology {
 	return null;
     }
 
+    private static ExpiringCache<ArrayList<SKOSConcept>> cache = new ExpiringCache<>();
+
+    static {
+	cache.setDuration(1200000);
+    }
+
     private List<SKOSConcept> conceptQuery(String query) throws Exception {
-	
-	Downloader d = new Downloader();
-	d.setTimeout((int) TimeUnit.SECONDS.toMillis(20));
-
-	String url = "http://hydro.geodab.eu/hydro-ontology/sparql?output=json&format=application/json&query=";
 	query = URLEncoder.encode(query, "UTF-8");
+	WMOOntology wmoOntology = new WMOOntology();
+	ArrayList<SKOSConcept> ret = cache.get(query);
+	if (ret != null) {
+	    return ret;
+	}
+	Downloader d = new Downloader();
+	d.setConnectionTimeout(TimeUnit.SECONDS, 20);
 
-	InputStream stream = d.downloadStream(url + query).get();
+	String url = sparqlEndpoint + "output=json&format=application/json&query=";
+
+	InputStream stream = d.downloadOptionalStream(url + query).get();
 
 	ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	IOUtils.copy(stream, baos);
@@ -117,20 +191,29 @@ public class HydroOntology {
 	    JSONObject conceptObject = binding.getJSONObject("concept");
 	    String uri = conceptObject.getString("value");
 
+	    if (uri.contains("http://server/unset-base")) {
+		continue;
+	    }
 	    SKOSConcept concept = map.get(uri);
 	    if (concept == null) {
-		concept = new SKOSConcept(uri);
+		if (uri.contains("codes.wmo.int/wmdr")) {
+		    concept = wmoOntology.getVariable(uri);
+		} else {
+		    concept = new SKOSConcept(uri);
+		}
 		map.put(uri, concept);
 	    }
 
-	    JSONObject prefLabelObject = binding.getJSONObject("prefLabel");
-	    String prefLabelValue = prefLabelObject.getString("value");
-	    String language = null;
-	    if (prefLabelObject.has("xml:lang")) {
-		language = prefLabelObject.getString("xml:lang");
+	    if (binding.has("prefLabel")) {
+		JSONObject prefLabelObject = binding.getJSONObject("prefLabel");
+		String prefLabelValue = prefLabelObject.getString("value");
+		String language = null;
+		if (prefLabelObject.has("xml:lang")) {
+		    language = prefLabelObject.getString("xml:lang");
+		}
+		SimpleEntry<String, String> preferredLabel = new SimpleEntry<>(prefLabelValue, language);
+		concept.setPreferredLabel(preferredLabel);
 	    }
-	    SimpleEntry<String, String> preferredLabel = new SimpleEntry<>(prefLabelValue, language);
-	    concept.setPreferredLabel(preferredLabel);
 
 	    if (binding.has("altLabel")) {
 		JSONObject altLabelObject = binding.getJSONObject("altLabel");
@@ -141,10 +224,20 @@ public class HydroOntology {
 		}
 		SimpleEntry<String, String> altLabel = new SimpleEntry<>(altLabelValue, altLanguage);
 		concept.getAlternateLabels().add(altLabel);
+	    }
+
+	    if (binding.has("close")) {
+		JSONObject closeObject = binding.getJSONObject("close");
+		String closeValue = closeObject.getString("value");
+		if (!closeValue.equals(uri)) {
+		    concept.getCloseMatches().add(closeValue);
+		}
 
 	    }
 	}
-	return new ArrayList<SKOSConcept>(map.values());
+	ret = new ArrayList<SKOSConcept>(map.values());
+	cache.put(query, ret);
+	return ret;
     }
 
 }

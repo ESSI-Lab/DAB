@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.rest;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,9 @@ import javax.jws.WebService;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
@@ -78,10 +80,22 @@ public class ESSIProfilerService extends AbstractProfilerService {
     public Response postRequest(@Context HttpServletRequest hsr, @Context UriInfo uriInfo, @PathParam("path") String path) {
 	return serve(new ESSIProfilerFilter(path), hsr, uriInfo);
     }
+    
+    @PUT
+    @Path("{path:.*}")
+    public Response putRequest(@Context HttpServletRequest hsr, @Context UriInfo uriInfo, @PathParam("path") String path) {
+	return serve(new ESSIProfilerFilter(path), hsr, uriInfo);
+    }
 
     @DELETE
     @Path("{path:.*}")
     public Response deleteRequest(@Context HttpServletRequest hsr, @Context UriInfo uriInfo, @PathParam("path") String path) {
+	return serve(new ESSIProfilerFilter(path), hsr, uriInfo);
+    }
+    
+    @OPTIONS
+    @Path("{path:.*}")
+    public Response optionsRequest(@Context HttpServletRequest hsr, @Context UriInfo uriInfo, @PathParam("path") String path) {
 	return serve(new ESSIProfilerFilter(path), hsr, uriInfo);
     }
 
@@ -101,10 +115,24 @@ public class ESSIProfilerService extends AbstractProfilerService {
 	    @PathParam("path") String path) {
 	return serve(new ESSIProfilerFilter(path), hsr, uriInfo);
     }
+    
+    @PUT
+    @Path("view/{viewId:[^/]+}/{path:.*}")
+    public Response putRequestWithView(@Context HttpServletRequest hsr, @Context UriInfo uriInfo, @PathParam("viewId") String viewId,
+	    @PathParam("path") String path) {
+	return serve(new ESSIProfilerFilter(path), hsr, uriInfo);
+    }
 
     @DELETE
     @Path("view/{viewId:[^/]+}/{path:.*}")
     public Response deleteRequestWithView(@Context HttpServletRequest hsr, @Context UriInfo uriInfo, @PathParam("viewId") String viewId,
+	    @PathParam("path") String path) {
+	return serve(new ESSIProfilerFilter(path), hsr, uriInfo);
+    }
+    
+    @OPTIONS
+    @Path("view/{viewId:[^/]+}/{path:.*}")
+    public Response optionsRequestWithView(@Context HttpServletRequest hsr, @Context UriInfo uriInfo, @PathParam("viewId") String viewId,
 	    @PathParam("path") String path) {
 	return serve(new ESSIProfilerFilter(path), hsr, uriInfo);
     }
@@ -125,10 +153,24 @@ public class ESSIProfilerService extends AbstractProfilerService {
 	    @PathParam("tokenId") String tokenId, @PathParam("viewId") String viewId, @PathParam("path") String path) {
 	return serve(new ESSIProfilerFilter(path), hsr, uriInfo);
     }
+    
+    @PUT
+    @Path("token/{tokenId:[^/]+}/view/{viewId:[^/]+}/{path:.*}")
+    public Response putRequestWithTokenAndView(@Context HttpServletRequest hsr, @Context UriInfo uriInfo,
+	    @PathParam("tokenId") String tokenId, @PathParam("viewId") String viewId, @PathParam("path") String path) {
+	return serve(new ESSIProfilerFilter(path), hsr, uriInfo);
+    }
 
     @DELETE
     @Path("token/{tokenId:[^/]+}/view/{viewId:[^/]+}/{path:.*}")
     public Response deleteRequestWithTokenAndView(@Context HttpServletRequest hsr, @Context UriInfo uriInfo,
+	    @PathParam("tokenId") String tokenId, @PathParam("viewId") String viewId, @PathParam("path") String path) {
+	return serve(new ESSIProfilerFilter(path), hsr, uriInfo);
+    }
+    
+    @OPTIONS
+    @Path("token/{tokenId:[^/]+}/view/{viewId:[^/]+}/{path:.*}")
+    public Response optionsRequestWithTokenAndView(@Context HttpServletRequest hsr, @Context UriInfo uriInfo,
 	    @PathParam("tokenId") String tokenId, @PathParam("viewId") String viewId, @PathParam("path") String path) {
 	return serve(new ESSIProfilerFilter(path), hsr, uriInfo);
     }
@@ -147,10 +189,23 @@ public class ESSIProfilerService extends AbstractProfilerService {
     public Response semanticPostRequest(@Context HttpServletRequest hsr, @Context UriInfo uriInfo, @PathParam("path") String path) {
 	return serve(new ESSIProfilerFilter(path), hsr, uriInfo);
     }
+    
+    @PUT
+    @Path("semantic/{path:.*}")
+    public Response semanticPutRequest(@Context HttpServletRequest hsr, @Context UriInfo uriInfo, @PathParam("path") String path) {
+	return serve(new ESSIProfilerFilter(path), hsr, uriInfo);
+    }
 
     @DELETE
     @Path("semantic/{path:.*}")
     public Response semanticDeleteRequest(@Context HttpServletRequest hsr, @Context UriInfo uriInfo, @PathParam("path") String path) {
+
+	return serve(new ESSIProfilerFilter(path), hsr, uriInfo);
+    }
+    
+    @OPTIONS
+    @Path("semantic/{path:.*}")
+    public Response semanticOptionsRequest(@Context HttpServletRequest hsr, @Context UriInfo uriInfo, @PathParam("path") String path) {
 
 	return serve(new ESSIProfilerFilter(path), hsr, uriInfo);
     }
@@ -171,6 +226,13 @@ public class ESSIProfilerService extends AbstractProfilerService {
 	    @PathParam("viewId") String viewId, @PathParam("path") String path) {
 	return serve(new ESSIProfilerFilter(path), hsr, uriInfo);
     }
+    
+    @PUT
+    @Path("semantic/view/{viewId:[^/]+}/{path:.*}")
+    public Response semanticPutRequestWithView(@Context HttpServletRequest hsr, @Context UriInfo uriInfo,
+	    @PathParam("viewId") String viewId, @PathParam("path") String path) {
+	return serve(new ESSIProfilerFilter(path), hsr, uriInfo);
+    }
 
     @DELETE
     @Path("semantic/view/{viewId:[^/]+}/{path:.*}")
@@ -178,4 +240,47 @@ public class ESSIProfilerService extends AbstractProfilerService {
 	    @PathParam("viewId") String viewId, @PathParam("path") String path) {
 	return serve(new ESSIProfilerFilter(path), hsr, uriInfo);
     }
+    
+    @OPTIONS
+    @Path("semantic/view/{viewId:[^/]+}/{path:.*}")
+    public Response semanticOptionsRequestWithView(@Context HttpServletRequest hsr, @Context UriInfo uriInfo,
+	    @PathParam("viewId") String viewId, @PathParam("path") String path) {
+	return serve(new ESSIProfilerFilter(path), hsr, uriInfo);
+    }
+    
+    @GET
+    @Path("semantic/token/{tokenId:[^/]+}/view/{viewId:[^/]+}/{path:.*}")
+    public Response getRequestWithSemanticTokenAndView(@Context HttpServletRequest hsr, @Context UriInfo uriInfo,
+	    @PathParam("tokenId") String tokenId, @PathParam("viewId") String viewId, @PathParam("path") String path) {
+	return serve(new ESSIProfilerFilter(path), hsr, uriInfo);
+    }
+
+    @POST
+    @Path("semantic/token/{tokenId:[^/]+}/view/{viewId:[^/]+}/{path:.*}")
+    public Response postRequestWithSemanticTokenAndView(@Context HttpServletRequest hsr, @Context UriInfo uriInfo,
+	    @PathParam("tokenId") String tokenId, @PathParam("viewId") String viewId, @PathParam("path") String path) {
+	return serve(new ESSIProfilerFilter(path), hsr, uriInfo);
+    }
+    
+    @PUT
+    @Path("semantic/token/{tokenId:[^/]+}/view/{viewId:[^/]+}/{path:.*}")
+    public Response putRequestWithSemanticTokenAndView(@Context HttpServletRequest hsr, @Context UriInfo uriInfo,
+	    @PathParam("tokenId") String tokenId, @PathParam("viewId") String viewId, @PathParam("path") String path) {
+	return serve(new ESSIProfilerFilter(path), hsr, uriInfo);
+    }
+
+    @DELETE
+    @Path("semantic/token/{tokenId:[^/]+}/view/{viewId:[^/]+}/{path:.*}")
+    public Response deleteRequestWithSemanticTokenAndView(@Context HttpServletRequest hsr, @Context UriInfo uriInfo,
+	    @PathParam("tokenId") String tokenId, @PathParam("viewId") String viewId, @PathParam("path") String path) {
+	return serve(new ESSIProfilerFilter(path), hsr, uriInfo);
+    }
+    
+    @OPTIONS
+    @Path("semantic/token/{tokenId:[^/]+}/view/{viewId:[^/]+}/{path:.*}")
+    public Response optionsRequestWithSemanticTokenAndView(@Context HttpServletRequest hsr, @Context UriInfo uriInfo,
+	    @PathParam("tokenId") String tokenId, @PathParam("viewId") String viewId, @PathParam("path") String path) {
+	return serve(new ESSIProfilerFilter(path), hsr, uriInfo);
+    }
+
 }

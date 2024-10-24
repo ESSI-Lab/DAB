@@ -1,0 +1,101 @@
+<PolicySet xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 xacml-core-v3-schema-wd-17.xsd"
+  PolicySetId="PPS:employee:role"
+  Version="1.0"
+  PolicyCombiningAlgId="urn:oasis:names:tc:xacml:3.0:policy-combining-algorithm:permit-overrides">
+
+  <Target/>
+
+  <!-- Permissions specifically for the employee role -->
+  <Policy PolicyId="Permissions:specifically:for:the:employee:role"
+
+    Version="1.0"
+    RuleCombiningAlgId="urn:oasis:names:tc:xacml:3.0:rule-combining-algorithm:permit-overrides">
+
+    <Target/>
+
+    <!-- Permission to create a purchase order -->
+    <Rule RuleId="Permission:to:create:a:purchase:order" Effect="Permit">
+
+      <Target>
+        <AnyOf>
+         
+          <AllOf>
+            <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+
+              <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">purchase order</AttributeValue>
+
+              <AttributeDesignator
+                MustBePresent="false"
+                Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id"
+                DataType="http://www.w3.org/2001/XMLSchema#string"/>
+
+            </Match>
+          </AllOf>
+        </AnyOf>
+
+        <AnyOf>
+          <AllOf>
+            <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+
+              <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">create</AttributeValue>
+
+              <AttributeDesignator
+                MustBePresent="false"
+                Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action"
+                AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+                DataType="http://www.w3.org/2001/XMLSchema#string"/>
+
+            </Match>
+          </AllOf>
+        </AnyOf>
+        
+        
+        
+      </Target>
+    </Rule>
+    
+    <Rule RuleId="Permission:to:read:a:purchase:order" Effect="Permit">
+
+      <Target>
+        <AnyOf>
+         
+          <AllOf>
+            <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+
+              <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">purchase order</AttributeValue>
+
+              <AttributeDesignator
+                MustBePresent="false"
+                Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id"
+                DataType="http://www.w3.org/2001/XMLSchema#string"/>
+
+            </Match>
+          </AllOf>
+        </AnyOf>
+
+        <AnyOf>
+          <AllOf>
+            <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+
+              <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">read</AttributeValue>
+
+              <AttributeDesignator
+                MustBePresent="false"
+                Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action"
+                AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+                DataType="http://www.w3.org/2001/XMLSchema#string"/>
+
+            </Match>
+          </AllOf>
+        </AnyOf>
+               
+      </Target>
+    </Rule>
+    
+  </Policy>
+
+</PolicySet>

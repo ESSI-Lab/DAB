@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.wml._2_0;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,12 +31,14 @@ package eu.essi_lab.jaxb.wml._2_0;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlType;
+
 import eu.essi_lab.jaxb.wml._2_0.gml._3_2_1.ReferenceType;
 import eu.essi_lab.jaxb.wml._2_0.gml._3_2_1.VerticalDatumPropertyType;
 import eu.essi_lab.jaxb.wml._2_0.iso2005.gmd.CIResponsiblePartyPropertyType;
@@ -91,7 +93,7 @@ public class MonitoringPointType
      * <p>
      * You are getting this "catch-all" property because of the following reason: 
      * The field name "DescriptionReference" is used by two different parts of a schema. See: 
-     * line 51 of file:/home/boldrini/git/DAB/jaxb-classes/jaxb-classes-wml-2.0/src/main/resources/schemas/monitoringPoint.xsd
+     * line 51 of file:/home/boldrini/git/GI-project/jaxb-classes/jaxb-classes-wml-2.0/src/main/resources/schemas/monitoringPoint.xsd
      * line 41 of http://schemas.opengis.net/gml/3.2.1/gmlBase.xsd
      * <p>
      * To get rid of this property, apply a property customization to one 

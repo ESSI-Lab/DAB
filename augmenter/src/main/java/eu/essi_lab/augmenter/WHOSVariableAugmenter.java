@@ -4,7 +4,7 @@ package eu.essi_lab.augmenter;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -28,6 +28,7 @@ import eu.essi_lab.cfga.gs.setting.augmenter.AugmenterSetting;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
 import eu.essi_lab.lib.net.utils.whos.HydroOntology;
 import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
+import eu.essi_lab.lib.net.utils.whos.WHOSOntology;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.ExtensionHandler;
@@ -59,7 +60,7 @@ public class WHOSVariableAugmenter extends ResourceAugmenter<AugmenterSetting> {
 	GSLoggerFactory.getLogger(getClass()).info("WHOS Variable augmentation of current resource STARTED");
 
 	ExtensionHandler extensionHandler = resource.getExtensionHandler();
-	Optional<String> uri = extensionHandler.getAttributeURI();
+	Optional<String> uri = extensionHandler.getObservedPropertyURI();
 	if (uri.isPresent()) {
 	    GSLoggerFactory.getLogger(getClass()).info("Variable URI already present in original metadata");
 	    return Optional.of(resource);
@@ -90,7 +91,7 @@ public class WHOSVariableAugmenter extends ResourceAugmenter<AugmenterSetting> {
 
 	    } else {
 		SKOSConcept concept = concepts.get(0);
-		extensionHandler.setAttributeURI(concept.getURI());
+		extensionHandler.setObservedPropertyURI(concept.getURI());
 		GSLoggerFactory.getLogger(getClass()).info("WHOS variable augmenter success");
 	    }
 
@@ -106,7 +107,7 @@ public class WHOSVariableAugmenter extends ResourceAugmenter<AugmenterSetting> {
     }
 
     public List<SKOSConcept> getConcepts(String variable) {
-	HydroOntology ontology = new HydroOntology();
+	HydroOntology ontology = new WHOSOntology();
 	List<SKOSConcept> ret = ontology.findConcepts(variable);
 	if (ret.isEmpty()) {
 	    // these translations should be added to the ontology in the future

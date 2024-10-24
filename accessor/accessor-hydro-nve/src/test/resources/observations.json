@@ -1,0 +1,2501 @@
+{
+  "currentLink": "https://hydapi.nve.no/api/v1/Observations?StationId=1.10.0&Parameter=1000&ResolutionTime=1440&ReferenceTime=1851-11-15T19%3A00%2F1853-01-01T19%3A00",
+  "apiVersion": "1.0",
+  "license": "https://data.norge.no/nlod/en",
+  "createdAt": "2019-11-19T13:20:54.6355923Z",
+  "queryTime": "00:00:00.1735616",
+  "itemCount": 1,
+  "data": [
+    {
+      "stationId": "1.10.0",
+      "stationName": "Skotberg bru",
+      "parameter": 1000,
+      "parameterName": "Vannstand",
+      "parameterNameEng": "Stage",
+      "serieVersionNo": 0,
+      "method": "Mean",
+      "unit": "m",
+      "observationCount": 413,
+      "observations": [
+        {
+          "time": "1851-11-16T11:00:00Z",
+          "value": 2.07,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-11-17T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-11-18T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-11-19T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-11-20T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-11-21T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-11-22T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-11-23T11:00:00Z",
+          "value": 2.35,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-11-24T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-11-25T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-11-26T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-11-27T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-11-28T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-11-29T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-11-30T11:00:00Z",
+          "value": 2.63,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-12-01T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-12-02T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-12-03T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-12-04T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-12-05T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-12-06T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-12-07T11:00:00Z",
+          "value": 2.66,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-12-08T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-12-09T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-12-10T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-12-11T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-12-12T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-12-13T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-12-14T11:00:00Z",
+          "value": 2.5,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-12-15T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-12-16T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-12-17T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-12-18T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-12-19T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-12-20T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-12-21T11:00:00Z",
+          "value": 2.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-12-22T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-12-23T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-12-24T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-12-25T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-12-26T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-12-27T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-12-28T11:00:00Z",
+          "value": 2.82,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-12-29T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-12-30T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1851-12-31T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-01-01T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-01-02T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-01-03T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-01-04T11:00:00Z",
+          "value": 2.91,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-01-05T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-01-06T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-01-07T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-01-08T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-01-09T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-01-10T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-01-11T11:00:00Z",
+          "value": 2.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-01-12T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-01-13T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-01-14T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-01-15T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-01-16T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-01-17T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-01-18T11:00:00Z",
+          "value": 2.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-01-19T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-01-20T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-01-21T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-01-22T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-01-23T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-01-24T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-01-25T11:00:00Z",
+          "value": 2.79,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-01-26T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-01-27T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-01-28T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-01-29T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-01-30T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-01-31T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-02-01T11:00:00Z",
+          "value": 2.72,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-02-02T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-02-03T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-02-04T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-02-05T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-02-06T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-02-07T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-02-08T11:00:00Z",
+          "value": 2.72,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-02-09T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-02-10T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-02-11T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-02-12T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-02-13T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-02-14T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-02-15T11:00:00Z",
+          "value": 2.82,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-02-16T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-02-17T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-02-18T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-02-19T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-02-20T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-02-21T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-02-22T11:00:00Z",
+          "value": 2.85,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-02-23T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-02-24T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-02-25T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-02-26T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-02-27T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-02-28T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-02-29T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-03-01T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-03-02T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-03-03T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-03-04T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-03-05T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-03-06T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-03-07T11:00:00Z",
+          "value": 3.07,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-03-08T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-03-09T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-03-10T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-03-11T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-03-12T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-03-13T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-03-14T11:00:00Z",
+          "value": 3.07,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-03-15T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-03-16T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-03-17T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-03-18T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-03-19T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-03-20T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-03-21T11:00:00Z",
+          "value": 3.04,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-03-22T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-03-23T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-03-24T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-03-25T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-03-26T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-03-27T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-03-28T11:00:00Z",
+          "value": 2.98,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-03-29T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-03-30T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-03-31T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-04-01T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-04-02T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-04-03T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-04-04T11:00:00Z",
+          "value": 3.04,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-04-05T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-04-06T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-04-07T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-04-08T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-04-09T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-04-10T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-04-11T11:00:00Z",
+          "value": 2.98,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-04-12T11:00:00Z",
+          "value": 2.94,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-04-13T11:00:00Z",
+          "value": 2.91,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-04-14T11:00:00Z",
+          "value": 2.88,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-04-15T11:00:00Z",
+          "value": 2.85,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-04-16T11:00:00Z",
+          "value": 2.82,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-04-17T11:00:00Z",
+          "value": 2.79,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-04-18T11:00:00Z",
+          "value": 2.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-04-19T11:00:00Z",
+          "value": 2.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-04-20T11:00:00Z",
+          "value": 2.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-04-21T11:00:00Z",
+          "value": 2.72,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-04-22T11:00:00Z",
+          "value": 2.69,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-04-23T11:00:00Z",
+          "value": 2.69,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-04-24T11:00:00Z",
+          "value": 2.69,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-04-25T11:00:00Z",
+          "value": 2.66,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-04-26T11:00:00Z",
+          "value": 2.63,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-04-27T11:00:00Z",
+          "value": 2.63,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-04-28T11:00:00Z",
+          "value": 2.63,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-04-29T11:00:00Z",
+          "value": 2.6,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-04-30T11:00:00Z",
+          "value": 2.57,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-05-01T11:00:00Z",
+          "value": 2.54,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-05-02T11:00:00Z",
+          "value": 2.54,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-05-03T11:00:00Z",
+          "value": 2.5,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-05-04T11:00:00Z",
+          "value": 2.5,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-05-05T11:00:00Z",
+          "value": 2.5,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-05-06T11:00:00Z",
+          "value": 2.5,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-05-07T11:00:00Z",
+          "value": 2.5,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-05-08T11:00:00Z",
+          "value": 2.5,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-05-09T11:00:00Z",
+          "value": 2.5,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-05-10T11:00:00Z",
+          "value": 2.5,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-05-11T11:00:00Z",
+          "value": 2.5,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-05-12T11:00:00Z",
+          "value": 2.25,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-05-13T11:00:00Z",
+          "value": 2.25,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-05-14T11:00:00Z",
+          "value": 2.29,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-05-15T11:00:00Z",
+          "value": 2.29,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-05-16T11:00:00Z",
+          "value": 2.32,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-05-17T11:00:00Z",
+          "value": 2.19,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-05-18T11:00:00Z",
+          "value": 2.19,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-05-19T11:00:00Z",
+          "value": 2.19,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-05-20T11:00:00Z",
+          "value": 2.19,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-05-21T11:00:00Z",
+          "value": 2.19,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-05-22T11:00:00Z",
+          "value": 2.19,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-05-23T11:00:00Z",
+          "value": 2.19,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-05-24T11:00:00Z",
+          "value": 2.22,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-05-25T11:00:00Z",
+          "value": 2.25,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-05-26T11:00:00Z",
+          "value": 2.25,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-05-27T11:00:00Z",
+          "value": 2.29,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-05-28T11:00:00Z",
+          "value": 2.32,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-05-29T11:00:00Z",
+          "value": 2.32,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-05-30T11:00:00Z",
+          "value": 2.35,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-05-31T11:00:00Z",
+          "value": 2.38,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-06-01T11:00:00Z",
+          "value": 2.41,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-06-02T11:00:00Z",
+          "value": 2.41,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-06-03T11:00:00Z",
+          "value": 2.44,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-06-04T11:00:00Z",
+          "value": 2.47,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-06-05T11:00:00Z",
+          "value": 2.47,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-06-06T11:00:00Z",
+          "value": 2.54,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-06-07T11:00:00Z",
+          "value": 2.57,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-06-08T11:00:00Z",
+          "value": 2.57,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-06-09T11:00:00Z",
+          "value": 2.6,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-06-10T11:00:00Z",
+          "value": 2.63,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-06-11T11:00:00Z",
+          "value": 2.63,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-06-12T11:00:00Z",
+          "value": 2.66,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-06-13T11:00:00Z",
+          "value": 2.72,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-06-14T11:00:00Z",
+          "value": 2.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-06-15T11:00:00Z",
+          "value": 2.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-06-16T11:00:00Z",
+          "value": 2.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-06-17T11:00:00Z",
+          "value": 2.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-06-18T11:00:00Z",
+          "value": 2.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-06-19T11:00:00Z",
+          "value": 2.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-06-20T11:00:00Z",
+          "value": 2.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-06-21T11:00:00Z",
+          "value": 2.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-06-22T11:00:00Z",
+          "value": 2.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-06-23T11:00:00Z",
+          "value": 2.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-06-24T11:00:00Z",
+          "value": 2.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-06-25T11:00:00Z",
+          "value": 2.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-06-26T11:00:00Z",
+          "value": 2.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-06-27T11:00:00Z",
+          "value": 2.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-06-28T11:00:00Z",
+          "value": 2.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-06-29T11:00:00Z",
+          "value": 2.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-06-30T11:00:00Z",
+          "value": 2.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-07-01T11:00:00Z",
+          "value": 2.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-07-02T11:00:00Z",
+          "value": 2.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-07-03T11:00:00Z",
+          "value": 2.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-07-04T11:00:00Z",
+          "value": 2.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-07-05T11:00:00Z",
+          "value": 2.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-07-06T11:00:00Z",
+          "value": 2.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-07-07T11:00:00Z",
+          "value": 2.82,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-07-08T11:00:00Z",
+          "value": 2.85,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-07-09T11:00:00Z",
+          "value": 2.88,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-07-10T11:00:00Z",
+          "value": 2.91,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-07-11T11:00:00Z",
+          "value": 2.94,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-07-12T11:00:00Z",
+          "value": 2.98,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-07-13T11:00:00Z",
+          "value": 3.01,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-07-14T11:00:00Z",
+          "value": 3.04,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-07-15T11:00:00Z",
+          "value": 3.07,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-07-16T11:00:00Z",
+          "value": 3.1,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-07-17T11:00:00Z",
+          "value": 3.13,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-07-18T11:00:00Z",
+          "value": 3.13,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-07-19T11:00:00Z",
+          "value": 3.16,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-07-20T11:00:00Z",
+          "value": 3.2,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-07-21T11:00:00Z",
+          "value": 3.23,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-07-22T11:00:00Z",
+          "value": 3.26,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-07-23T11:00:00Z",
+          "value": 3.29,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-07-24T11:00:00Z",
+          "value": 3.32,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-07-25T11:00:00Z",
+          "value": 3.35,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-07-26T11:00:00Z",
+          "value": 3.38,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-07-27T11:00:00Z",
+          "value": 3.41,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-07-28T11:00:00Z",
+          "value": 3.41,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-07-29T11:00:00Z",
+          "value": 3.41,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-07-30T11:00:00Z",
+          "value": 3.41,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-07-31T11:00:00Z",
+          "value": 3.41,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-08-01T11:00:00Z",
+          "value": 3.41,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-08-02T11:00:00Z",
+          "value": 3.41,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-08-03T11:00:00Z",
+          "value": 3.41,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-08-04T11:00:00Z",
+          "value": 3.41,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-08-05T11:00:00Z",
+          "value": 3.41,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-08-06T11:00:00Z",
+          "value": 3.41,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-08-07T11:00:00Z",
+          "value": 3.51,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-08-08T11:00:00Z",
+          "value": 3.51,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-08-09T11:00:00Z",
+          "value": 3.51,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-08-10T11:00:00Z",
+          "value": 3.51,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-08-11T11:00:00Z",
+          "value": 3.51,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-08-12T11:00:00Z",
+          "value": 3.51,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-08-13T11:00:00Z",
+          "value": 3.45,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-08-14T11:00:00Z",
+          "value": 3.45,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-08-15T11:00:00Z",
+          "value": 3.41,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-08-16T11:00:00Z",
+          "value": 3.41,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-08-17T11:00:00Z",
+          "value": 3.45,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-08-18T11:00:00Z",
+          "value": 3.48,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-08-19T11:00:00Z",
+          "value": 3.51,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-08-20T11:00:00Z",
+          "value": 3.51,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-08-21T11:00:00Z",
+          "value": 3.54,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-08-22T11:00:00Z",
+          "value": 3.57,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-08-23T11:00:00Z",
+          "value": 3.6,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-08-24T11:00:00Z",
+          "value": 3.63,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-08-25T11:00:00Z",
+          "value": 3.67,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-08-26T11:00:00Z",
+          "value": 3.67,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-08-27T11:00:00Z",
+          "value": 3.67,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-08-28T11:00:00Z",
+          "value": 3.73,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-08-29T11:00:00Z",
+          "value": 3.73,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-08-30T11:00:00Z",
+          "value": 3.7,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-08-31T11:00:00Z",
+          "value": 3.67,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-09-01T11:00:00Z",
+          "value": 3.67,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-09-02T11:00:00Z",
+          "value": 3.7,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-09-03T11:00:00Z",
+          "value": 3.7,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-09-04T11:00:00Z",
+          "value": 3.7,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-09-05T11:00:00Z",
+          "value": 3.7,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-09-06T11:00:00Z",
+          "value": 3.73,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-09-07T11:00:00Z",
+          "value": 3.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-09-08T11:00:00Z",
+          "value": 3.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-09-09T11:00:00Z",
+          "value": 3.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-09-10T11:00:00Z",
+          "value": 3.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-09-11T11:00:00Z",
+          "value": 3.79,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-09-12T11:00:00Z",
+          "value": 3.82,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-09-13T11:00:00Z",
+          "value": 3.82,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-09-14T11:00:00Z",
+          "value": 3.82,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-09-15T11:00:00Z",
+          "value": 3.82,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-09-16T11:00:00Z",
+          "value": 3.82,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-09-17T11:00:00Z",
+          "value": 3.82,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-09-18T11:00:00Z",
+          "value": 3.82,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-09-19T11:00:00Z",
+          "value": 3.82,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-09-20T11:00:00Z",
+          "value": 3.82,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-09-21T11:00:00Z",
+          "value": 3.82,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-09-22T11:00:00Z",
+          "value": 3.82,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-09-23T11:00:00Z",
+          "value": 3.82,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-09-24T11:00:00Z",
+          "value": 3.82,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-09-25T11:00:00Z",
+          "value": 3.82,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-09-26T11:00:00Z",
+          "value": 3.82,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-09-27T11:00:00Z",
+          "value": 3.79,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-09-28T11:00:00Z",
+          "value": 3.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-09-29T11:00:00Z",
+          "value": 3.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-09-30T11:00:00Z",
+          "value": 3.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-10-01T11:00:00Z",
+          "value": 3.73,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-10-02T11:00:00Z",
+          "value": 3.7,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-10-03T11:00:00Z",
+          "value": 3.67,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-10-04T11:00:00Z",
+          "value": 3.6,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-10-05T11:00:00Z",
+          "value": 3.57,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-10-06T11:00:00Z",
+          "value": 3.54,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-10-07T11:00:00Z",
+          "value": 3.51,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-10-08T11:00:00Z",
+          "value": 3.51,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-10-09T11:00:00Z",
+          "value": 3.51,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-10-10T11:00:00Z",
+          "value": 3.51,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-10-11T11:00:00Z",
+          "value": 3.48,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-10-12T11:00:00Z",
+          "value": 3.45,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-10-13T11:00:00Z",
+          "value": 3.45,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-10-14T11:00:00Z",
+          "value": 3.45,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-10-15T11:00:00Z",
+          "value": 3.41,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-10-16T11:00:00Z",
+          "value": 3.41,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-10-17T11:00:00Z",
+          "value": 3.38,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-10-18T11:00:00Z",
+          "value": 3.38,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-10-19T11:00:00Z",
+          "value": 3.38,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-10-20T11:00:00Z",
+          "value": 3.38,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-10-21T11:00:00Z",
+          "value": 3.45,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-10-22T11:00:00Z",
+          "value": 3.48,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-10-23T11:00:00Z",
+          "value": 3.51,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-10-24T11:00:00Z",
+          "value": 3.51,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-10-25T11:00:00Z",
+          "value": 3.45,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-10-26T11:00:00Z",
+          "value": 3.45,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-10-27T11:00:00Z",
+          "value": 3.41,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-10-28T11:00:00Z",
+          "value": 3.41,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-10-29T11:00:00Z",
+          "value": 3.41,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-10-30T11:00:00Z",
+          "value": 3.45,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-10-31T11:00:00Z",
+          "value": 3.48,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-11-01T11:00:00Z",
+          "value": 3.48,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-11-02T11:00:00Z",
+          "value": 3.38,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-11-03T11:00:00Z",
+          "value": 3.32,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-11-04T11:00:00Z",
+          "value": 3.26,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-11-05T11:00:00Z",
+          "value": 3.13,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-11-06T11:00:00Z",
+          "value": 3.13,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-11-07T11:00:00Z",
+          "value": 3.13,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-11-08T11:00:00Z",
+          "value": 2.98,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-11-09T11:00:00Z",
+          "value": 2.5,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-11-10T11:00:00Z",
+          "value": 2.5,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-11-11T11:00:00Z",
+          "value": 2.54,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-11-12T11:00:00Z",
+          "value": 2.57,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-11-13T11:00:00Z",
+          "value": 2.6,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-11-14T11:00:00Z",
+          "value": 2.66,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-11-15T11:00:00Z",
+          "value": 2.69,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-11-16T11:00:00Z",
+          "value": 2.69,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-11-17T11:00:00Z",
+          "value": 2.69,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-11-18T11:00:00Z",
+          "value": 2.69,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-11-19T11:00:00Z",
+          "value": 2.69,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-11-20T11:00:00Z",
+          "value": 2.66,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-11-21T11:00:00Z",
+          "value": 2.63,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-11-22T11:00:00Z",
+          "value": 2.6,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-11-23T11:00:00Z",
+          "value": 2.57,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-11-24T11:00:00Z",
+          "value": 2.57,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-11-25T11:00:00Z",
+          "value": 2.6,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-11-26T11:00:00Z",
+          "value": 2.6,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-11-27T11:00:00Z",
+          "value": 2.6,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-11-28T11:00:00Z",
+          "value": 2.63,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-11-29T11:00:00Z",
+          "value": 2.66,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-11-30T11:00:00Z",
+          "value": 2.69,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-12-01T11:00:00Z",
+          "value": 2.76,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-12-02T11:00:00Z",
+          "value": 2.29,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-12-03T11:00:00Z",
+          "value": 2.25,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-12-04T11:00:00Z",
+          "value": 2.22,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-12-05T11:00:00Z",
+          "value": 2.19,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-12-06T11:00:00Z",
+          "value": 2.22,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-12-07T11:00:00Z",
+          "value": 2.25,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-12-08T11:00:00Z",
+          "value": 2.25,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-12-09T11:00:00Z",
+          "value": 2.25,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-12-10T11:00:00Z",
+          "value": 2.25,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-12-11T11:00:00Z",
+          "value": 2.25,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-12-12T11:00:00Z",
+          "value": 2.13,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-12-13T11:00:00Z",
+          "value": 1.97,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-12-14T11:00:00Z",
+          "value": 1.88,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-12-15T11:00:00Z",
+          "value": 1.72,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-12-16T11:00:00Z",
+          "value": 1.47,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-12-17T11:00:00Z",
+          "value": 1.22,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-12-18T11:00:00Z",
+          "value": 1.06,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-12-19T11:00:00Z",
+          "value": 0.94,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-12-20T11:00:00Z",
+          "value": 0.84,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-12-21T11:00:00Z",
+          "value": 0.78,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-12-22T11:00:00Z",
+          "value": 0.62,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-12-23T11:00:00Z",
+          "value": 0.62,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-12-24T11:00:00Z",
+          "value": 0.9,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-12-25T11:00:00Z",
+          "value": 0.9,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-12-26T11:00:00Z",
+          "value": 0.72,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-12-27T11:00:00Z",
+          "value": 0.81,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-12-28T11:00:00Z",
+          "value": 0.87,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-12-29T11:00:00Z",
+          "value": 0.9,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-12-30T11:00:00Z",
+          "value": 1.03,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1852-12-31T11:00:00Z",
+          "value": 1.03,
+          "correction": 0,
+          "quality": 3
+        },
+        {
+          "time": "1853-01-01T11:00:00Z",
+          "value": null,
+          "correction": 0,
+          "quality": 3
+        }
+      ]
+    }
+  ]
+}

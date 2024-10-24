@@ -4,7 +4,7 @@ package eu.essi_lab.shared.driver.es.connector;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -44,7 +44,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.shared.SharedContent.SharedContentType;
@@ -57,7 +57,7 @@ public class ESConnector implements IESConnector {
 
     private Logger logger = GSLoggerFactory.getLogger(ESConnector.class);
 
-    private StorageUri esStaorageUri;
+    private StorageInfo esStaorageUri;
     private static final String GS_SERVICE_INIT_INDEX = "gsserviceinitialized";
 
     private static final String INITIALIZE_JSON = "{\"initialized\":\"true\"}";
@@ -72,16 +72,16 @@ public class ESConnector implements IESConnector {
     /**
      * 
      */
-    public StorageUri getEsStorageUri() {
+    public StorageInfo getEsStorageUri() {
 	return esStaorageUri;
     }
 
     /**
      * 
      */
-    public void setEsStorageUri(StorageUri uri) {
+    public void setEsStorageUri(StorageInfo uri) {
 
-	this.esStaorageUri = new StorageUri();
+	this.esStaorageUri = new StorageInfo();
 
 	String url = uri.getUri();
 
@@ -92,8 +92,8 @@ public class ESConnector implements IESConnector {
 
 	this.esStaorageUri.setUser(uri.getUser());
 	this.esStaorageUri.setPassword(uri.getPassword());
-	this.esStaorageUri.setStorageName(uri.getStorageName());
-	this.esStaorageUri.setConfigFolder(uri.getConfigFolder());
+	this.esStaorageUri.setName(uri.getName());
+	this.esStaorageUri.setIdentifier(uri.getIdentifier());
 
     }
 
@@ -393,7 +393,7 @@ public class ESConnector implements IESConnector {
 	return type.name().toLowerCase() + INDEX_TYPE_SUFFIX;
     }
 
-    private String getIndex(StorageUri storageUri) {
-	return storageUri.getStorageName().toLowerCase();
+    private String getIndex(StorageInfo storageUri) {
+	return storageUri.getName().toLowerCase();
     }
 }

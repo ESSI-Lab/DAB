@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<dinaguaMetadata>
+    <stationId>my-id</stationId>
+    <fromDate>2020-03-09T14:55:55.008+01:00</fromDate>
+    <latitude>34.0</latitude>
+    <longitude>111.0</longitude>
+</dinaguaMetadata>

@@ -12,7 +12,7 @@ package eu.essi_lab.jaxb.sos._2_0.iso2005.gco;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,11 +31,13 @@ package eu.essi_lab.jaxb.sos._2_0.iso2005.gco;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+
 import eu.essi_lab.jaxb.sos._2_0.iso2005.gmd.LocalisedCharacterStringPropertyType;
 import eu.essi_lab.jaxb.sos._2_0.xlink.ActuateType;
 import eu.essi_lab.jaxb.sos._2_0.xlink.ShowType;

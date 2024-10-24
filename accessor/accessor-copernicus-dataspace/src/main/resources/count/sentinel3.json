@@ -1,0 +1,49 @@
+{
+    "type": "FeatureCollection",
+    "properties": {
+        "id": "cc18827f-eb5f-5cec-b23b-28afb47c073f",
+        "totalResults": 5779751,
+        "exactCount": 1,
+        "startIndex": 1,
+        "itemsPerPage": 1,
+        "query": {
+            "originalFilters": {
+                "startDate": "2023-01-01",
+                "collection": "SENTINEL-3"
+            },
+            "appliedFilters": {
+                "startDate": "2023-01-01",
+                "collection": "SENTINEL-3"
+            },
+            "processingTime": 35.030853678
+        },
+        "links": [
+            {
+                "rel": "self",
+                "type": "application/json",
+                "title": "self",
+                "href": "https://catalogue.dataspace.copernicus.eu/resto/api/collections/Sentinel3/search.json?maxRecords=1&exactCount=true&sortParam=startDate&sortOrder=descending&startDate=2023-01-01"
+            },
+            {
+                "rel": "search",
+                "type": "application/opensearchdescription+xml",
+                "title": "OpenSearch Description Document",
+                "href": "https://catalogue.dataspace.copernicus.eu/resto/api/collections/Sentinel3/describe.xml"
+            },
+            {
+                "rel": "next",
+                "type": "application/json",
+                "title": "next",
+                "href": "https://catalogue.dataspace.copernicus.eu/resto/api/collections/Sentinel3/search.json?maxRecords=1&exactCount=true&sortParam=startDate&sortOrder=descending&startDate=2023-01-01&page=2"
+            },
+            {
+                "rel": "last",
+                "type": "application/json",
+                "title": "last",
+                "href": "https://catalogue.dataspace.copernicus.eu/resto/api/collections/Sentinel3/search.json?maxRecords=1&exactCount=true&sortParam=startDate&sortOrder=descending&startDate=2023-01-01&page=5779751"
+            }
+        ]
+    },
+    "features": [
+    ]
+}

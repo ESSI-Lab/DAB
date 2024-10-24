@@ -28,7 +28,26 @@
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>jaxb-classes-common</artifactId>
 			<version>${project.parent.version}</version>
-		</dependency>	
+		</dependency>
+				
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>jaxb-classes-19139_2_v1_0</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		
+		 <dependency>
+			<groupId>org.jvnet.ogc</groupId>
+			<artifactId>iso19139-v_20060504</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jvnet.ogc</groupId>
+			<artifactId>gml-v_3_2_0</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jvnet.ogc</groupId>
+			<artifactId>wfs-v_1_1_0</artifactId>
+		</dependency>		
 
 	</dependencies>
 

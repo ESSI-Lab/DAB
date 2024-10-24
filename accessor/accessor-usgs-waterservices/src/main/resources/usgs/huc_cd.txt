@@ -1,0 +1,2992 @@
+#
+# National Water Information System
+# 2018/03/05
+#
+#
+# Date Retrieved: USGS Water Data for the Nation Help System
+#
+huc_cd	huc_class_cd	huc_nm
+8s	15s	51s
+01	Region	New England Region
+0101	Subregion	St. John
+010100	Accounting Unit	St. John
+01010001	Cataloging Unit	Upper St. John
+01010002	Cataloging Unit	Allagash
+01010003	Cataloging Unit	Fish
+01010004	Cataloging Unit	Aroostook
+01010005	Cataloging Unit	Meduxnekeag
+0102	Subregion	Penobscot
+010200	Accounting Unit	Penobscot
+01020001	Cataloging Unit	West Branch Penobscot
+01020002	Cataloging Unit	East Branch Penobscot
+01020003	Cataloging Unit	Mattawamkeag
+01020004	Cataloging Unit	Piscataquis
+01020005	Cataloging Unit	Lower Penobscot
+0103	Subregion	Kennebec
+010300	Accounting Unit	Kennebec
+01030001	Cataloging Unit	Upper Kennebec
+01030002	Cataloging Unit	Dead
+01030003	Cataloging Unit	Lower Kennebec
+0104	Subregion	Androscoggin
+010400	Accounting Unit	Androscoggin
+01040001	Cataloging Unit	Upper Androscoggin
+01040002	Cataloging Unit	Lower Androscoggin
+0105	Subregion	Maine Coastal
+010500	Accounting Unit	Maine Coastal
+01050001	Cataloging Unit	St. Croix
+01050002	Cataloging Unit	Maine Coastal
+01050003	Cataloging Unit	St. George-Sheepscot
+01050004	Cataloging Unit	Passamaquoddy Bay-Bay of Fundy
+0106	Subregion	Saco
+010600	Accounting Unit	Saco
+01060001	Cataloging Unit	Presumpscot
+01060002	Cataloging Unit	Saco
+01060003	Cataloging Unit	Piscataqua-Salmon Falls
+0107	Subregion	Merrimack
+010700	Accounting Unit	Merrimack
+01070001	Cataloging Unit	Pemigewasset
+01070002	Cataloging Unit	Merrimack
+01070002	Cataloging Unit	Winnipesaukee River
+01070003	Cataloging Unit	Contoocook
+01070004	Cataloging Unit	Nashua
+01070005	Cataloging Unit	Concord
+01070006	Cataloging Unit	Merrimack River
+0108	Subregion	Connecticut
+010801	Accounting Unit	Upper Connecticut
+01080101	Cataloging Unit	Upper Connecticut
+01080102	Cataloging Unit	Passumpsic
+01080103	Cataloging Unit	Waits
+01080104	Cataloging Unit	Upper Connecticut-Mascoma
+01080105	Cataloging Unit	White
+01080106	Cataloging Unit	Black-Ottauquechee
+01080107	Cataloging Unit	West
+010802	Accounting Unit	Lower Connecticut
+01080201	Cataloging Unit	Middle Connecticut
+01080202	Cataloging Unit	Miller
+01080203	Cataloging Unit	Deerfield
+01080204	Cataloging Unit	Chicopee
+01080205	Cataloging Unit	Lower Connecticut
+01080206	Cataloging Unit	Westfield
+01080207	Cataloging Unit	Farmington
+0109	Subregion	Massachusetts-Rhode Island Coastal
+010900	Accounting Unit	Massachusetts-Rhode Island Coastal
+01090001	Cataloging Unit	Charles
+01090002	Cataloging Unit	Cape Cod
+01090003	Cataloging Unit	Blackstone
+01090004	Cataloging Unit	Narragansett
+01090005	Cataloging Unit	Pawcatuck-Wood
+0110	Subregion	Connecticut Coastal
+011000	Accounting Unit	Connecticut Coastal
+01100001	Cataloging Unit	Quinebaug
+01100002	Cataloging Unit	Shetucket
+01100003	Cataloging Unit	Thames
+01100004	Cataloging Unit	Quinnipiac
+01100005	Cataloging Unit	Housatonic
+01100006	Cataloging Unit	Saugatuck
+01100007	Cataloging Unit	Long Island Sound
+0111	Subregion	St. Francois
+011100	Accounting Unit	St. Francois
+01110000	Cataloging Unit	St. Francois
+02	Region	Mid Atlantic Region
+0201	Subregion	Richelieu
+020100	Accounting Unit	Richelieu
+02010001	Cataloging Unit	Lake George
+02010002	Cataloging Unit	Otter
+02010003	Cataloging Unit	Winooski
+02010004	Cataloging Unit	Ausable
+02010005	Cataloging Unit	Lamoille
+02010006	Cataloging Unit	Great Chazy-Saranac
+02010007	Cataloging Unit	Missisquoi
+0202	Subregion	Upper Hudson
+020200	Accounting Unit	Upper Hudson
+02020001	Cataloging Unit	Upper Hudson
+02020002	Cataloging Unit	Sacandaga
+02020003	Cataloging Unit	Hudson-Hoosic
+02020004	Cataloging Unit	Mohawk
+02020005	Cataloging Unit	Schoharie
+02020006	Cataloging Unit	Middle Hudson
+02020007	Cataloging Unit	Rondout
+02020008	Cataloging Unit	Hudson-Wappinger
+0203	Subregion	Lower Hudson-Long Island
+020301	Accounting Unit	Lower Hudson
+02030101	Cataloging Unit	Lower Hudson
+02030102	Cataloging Unit	Bronx
+02030103	Cataloging Unit	Hackensack-Passaic
+02030104	Cataloging Unit	Sandy Hook-Staten Island
+02030105	Cataloging Unit	Raritan
+020302	Accounting Unit	Long Island
+02030201	Cataloging Unit	Northern Long Island
+02030202	Cataloging Unit	Southern Long Island
+02030203	Cataloging Unit	Long Island Sound
+0204	Subregion	Delaware-Mid Atlantic Coastal
+020401	Accounting Unit	Upper Delaware
+02040101	Cataloging Unit	Upper Delaware
+02040102	Cataloging Unit	East Branch Delaware
+02040103	Cataloging Unit	Lackawaxen
+02040104	Cataloging Unit	Middle Delaware-Mongaup-Brodhead
+02040105	Cataloging Unit	Middle Delaware-Musconetcong
+02040106	Cataloging Unit	Lehigh
+020402	Accounting Unit	Lower Delaware
+02040201	Cataloging Unit	Crosswicks-Neshaminy
+02040202	Cataloging Unit	Lower Delaware
+02040203	Cataloging Unit	Schuylkill
+02040204	Cataloging Unit	Delaware Bay
+02040205	Cataloging Unit	Brandywine-Christina
+02040206	Cataloging Unit	Cohansey-Maurice
+02040207	Cataloging Unit	Broadkill-Smyrna
+020403	Accounting Unit	Mid Atlantic Coastal
+02040301	Cataloging Unit	Mullica-Toms
+02040302	Cataloging Unit	Great Egg Harbor
+02040303	Cataloging Unit	Chincoteague
+02040304	Cataloging Unit	Eastern Lower Delmarva
+0205	Subregion	Susquehanna
+020501	Accounting Unit	Upper Susquehanna
+02050101	Cataloging Unit	Upper Susquehanna
+02050102	Cataloging Unit	Chenango
+02050103	Cataloging Unit	Owego-Wappasening
+02050104	Cataloging Unit	Tioga
+02050105	Cataloging Unit	Chemung
+02050106	Cataloging Unit	Upper Susquehanna-Tunkhannock
+02050107	Cataloging Unit	Upper Susquehanna-Lackawanna
+020502	Accounting Unit	West Branch Susquehanna
+02050201	Cataloging Unit	Upper West Branch Susquehanna
+02050202	Cataloging Unit	Sinnemahoning
+02050203	Cataloging Unit	Middle West Branch Susquehanna
+02050204	Cataloging Unit	Bald Eagle
+02050205	Cataloging Unit	Pine
+02050206	Cataloging Unit	Lower West Branch Susquehanna
+020503	Accounting Unit	Lower Susquehanna
+02050301	Cataloging Unit	Lower Susquehanna-Penns
+02050302	Cataloging Unit	Upper Juniata
+02050303	Cataloging Unit	Raystown
+02050304	Cataloging Unit	Lower Juniata
+02050305	Cataloging Unit	Lower Susquehanna-Swatara
+02050306	Cataloging Unit	Lower Susquehanna
+0206	Subregion	Upper Chesapeake
+020600	Accounting Unit	Upper Chesapeake
+02060001	Cataloging Unit	Upper Chesapeake Bay
+02060002	Cataloging Unit	Chester-Sassafras
+02060003	Cataloging Unit	Gunpowder-Patapsco
+02060004	Cataloging Unit	Severn
+02060005	Cataloging Unit	Choptank
+02060006	Cataloging Unit	Patuxent
+02060007	Cataloging Unit	Blackwater-Wicomico
+02060008	Cataloging Unit	Nanticoke
+02060009	Cataloging Unit	Pocomoke
+02060010	Cataloging Unit	Chincoteague
+0207	Subregion	Potomac
+020700	Accounting Unit	Potomac
+02070001	Cataloging Unit	South Branch Potomac
+02070002	Cataloging Unit	North Branch Potomac
+02070003	Cataloging Unit	Cacapon-Town
+02070004	Cataloging Unit	Conococheague-Opequon
+02070005	Cataloging Unit	South Fork Shenandoah
+02070006	Cataloging Unit	North Fork Shenandoah
+02070007	Cataloging Unit	Shenandoah
+02070008	Cataloging Unit	Middle Potomac-Catoctin
+02070009	Cataloging Unit	Monocacy
+02070010	Cataloging Unit	Middle Potomac-Anacostia-Occoquan
+02070011	Cataloging Unit	Lower Potomac
+0208	Subregion	Lower Chesapeake
+020801	Accounting Unit	Lower Chesapeake
+02080101	Cataloging Unit	Lower Chesapeake Bay
+02080102	Cataloging Unit	Great Wicomico-Piankatank
+02080103	Cataloging Unit	Rapidan-Upper Rappahannock
+02080104	Cataloging Unit	Lower Rappahannock
+02080105	Cataloging Unit	Mattaponi
+02080106	Cataloging Unit	Pamunkey
+02080107	Cataloging Unit	York
+02080108	Cataloging Unit	Lynnhaven-Poquoson
+02080109	Cataloging Unit	Nanticoke
+02080109	Cataloging Unit	Western Lower Delmarva
+02080110	Cataloging Unit	Tangier
+02080111	Cataloging Unit	Pokomoke-Western Lower Delmarva
+020802	Accounting Unit	James
+02080201	Cataloging Unit	Upper James
+02080202	Cataloging Unit	Maury
+02080203	Cataloging Unit	Middle James-Buffalo
+02080204	Cataloging Unit	Rivanna
+02080205	Cataloging Unit	Middle James-Willis
+02080206	Cataloging Unit	Lower James
+02080207	Cataloging Unit	Appomattox
+02080208	Cataloging Unit	Hampton Roads
+03	Region	South Atlantic-Gulf Region
+0301	Subregion	Chowan-Roanoke
+030101	Accounting Unit	Roanoke
+03010101	Cataloging Unit	Upper Roanoke
+03010102	Cataloging Unit	Middle Roanoke
+03010103	Cataloging Unit	Upper Dan
+03010104	Cataloging Unit	Lower Dan
+03010105	Cataloging Unit	Banister
+03010106	Cataloging Unit	Roanoke Rapids
+03010107	Cataloging Unit	Lower Roanoke
+030102	Accounting Unit	Albemarle-Chowan
+03010201	Cataloging Unit	Nottoway
+03010202	Cataloging Unit	Blackwater
+03010203	Cataloging Unit	Chowan
+03010204	Cataloging Unit	Meherrin
+03010205	Cataloging Unit	Albemarle
+0302	Subregion	Neuse-Pamlico
+030201	Accounting Unit	Pamlico
+03020101	Cataloging Unit	Upper Tar
+03020102	Cataloging Unit	Fishing
+03020103	Cataloging Unit	Lower Tar
+03020104	Cataloging Unit	Pamlico
+03020105	Cataloging Unit	Pamlico Sound
+03020106	Cataloging Unit	Bogue-Core Sounds
+030202	Accounting Unit	Neuse
+03020201	Cataloging Unit	Upper Neuse
+03020202	Cataloging Unit	Middle Neuse
+03020203	Cataloging Unit	Contentnea
+03020204	Cataloging Unit	Lower Neuse
+030203	Accounting Unit	Onslow Bay
+03020301	Cataloging Unit	White Oak River
+03020302	Cataloging Unit	New River
+0303	Subregion	Cape Fear
+030300	Accounting Unit	Cape Fear
+03030001	Cataloging Unit	New
+03030002	Cataloging Unit	Haw
+03030003	Cataloging Unit	Deep
+03030004	Cataloging Unit	Upper Cape Fear
+03030005	Cataloging Unit	Lower Cape Fear
+03030006	Cataloging Unit	Black
+03030007	Cataloging Unit	Northeast Cape Fear
+0304	Subregion	Pee Dee
+030401	Accounting Unit	Upper Pee Dee
+03040101	Cataloging Unit	Upper Yadkin
+03040102	Cataloging Unit	South Yadkin
+03040103	Cataloging Unit	Lower Yadkin
+03040104	Cataloging Unit	Upper Pee Dee
+03040105	Cataloging Unit	Rocky
+030402	Accounting Unit	Lower Pee Dee
+03040201	Cataloging Unit	Lower Pee Dee
+03040202	Cataloging Unit	Lynches
+03040203	Cataloging Unit	Lumber
+03040204	Cataloging Unit	Little Pee Dee
+03040205	Cataloging Unit	Black
+03040206	Cataloging Unit	Waccamaw
+03040207	Cataloging Unit	Carolina Coastal-Sampit
+03040208	Cataloging Unit	Coastal Carolina
+0305	Subregion	Edisto-Santee
+030501	Accounting Unit	Santee
+03050101	Cataloging Unit	Upper Catawba
+03050102	Cataloging Unit	South Fork Catawba
+03050103	Cataloging Unit	Lower Catawba
+03050104	Cataloging Unit	Wateree
+03050105	Cataloging Unit	Upper Broad
+03050106	Cataloging Unit	Lower Broad
+03050107	Cataloging Unit	Tyger
+03050108	Cataloging Unit	Enoree
+03050109	Cataloging Unit	Saluda
+03050110	Cataloging Unit	Congaree
+03050111	Cataloging Unit	Lake Marion
+03050112	Cataloging Unit	Santee
+030502	Accounting Unit	Edisto-South Carolina Coastal
+03050201	Cataloging Unit	Cooper
+03050202	Cataloging Unit	South Carolina Coastal
+03050203	Cataloging Unit	North Fork Edisto
+03050204	Cataloging Unit	South Fork Edisto
+03050205	Cataloging Unit	Four Hole Swamp
+03050206	Cataloging Unit	Edisto River
+03050207	Cataloging Unit	Salkehatchie
+03050208	Cataloging Unit	Broad-St. Helena
+03050209	Cataloging Unit	Bulls Bay
+03050210	Cataloging Unit	St. Helena Island
+0306	Subregion	Ogeechee-Savannah
+030601	Accounting Unit	Savannah
+03060101	Cataloging Unit	Seneca
+03060102	Cataloging Unit	Tugaloo
+03060103	Cataloging Unit	Upper Savannah
+03060104	Cataloging Unit	Broad
+03060105	Cataloging Unit	Little
+03060105	Cataloging Unit	Upper French Broad
+03060106	Cataloging Unit	Middle Savannah
+03060107	Cataloging Unit	Stevens
+03060108	Cataloging Unit	Brier
+03060109	Cataloging Unit	Lower Savannah
+03060110	Cataloging Unit	Calibogue Sound-Wright River
+030602	Accounting Unit	Ogeechee
+03060201	Cataloging Unit	Upper Ogeechee
+03060202	Cataloging Unit	Lower Ogeechee
+03060203	Cataloging Unit	Canoochee
+03060204	Cataloging Unit	Ogeechee Coastal
+0307	Subregion	Altamaha-St. Marys
+030701	Accounting Unit	Altamaha
+03070101	Cataloging Unit	Upper Oconee
+03070102	Cataloging Unit	Lower Oconee
+03070103	Cataloging Unit	Upper Ocmulgee
+03070104	Cataloging Unit	Lower Ocmulgee
+03070105	Cataloging Unit	Little Ocmulgee
+03070106	Cataloging Unit	Altamaha
+03070107	Cataloging Unit	Ohoopee
+030702	Accounting Unit	St. Marys-Satilla
+03070201	Cataloging Unit	Satilla
+03070202	Cataloging Unit	Little Satilla
+03070203	Cataloging Unit	Cumberland-St. Simons
+03070204	Cataloging Unit	St. Marys
+03070205	Cataloging Unit	Nassau
+0308	Subregion	St. Johns
+030801	Accounting Unit	St. Johns
+03080101	Cataloging Unit	Upper St. Johns
+03080102	Cataloging Unit	Oklawaha
+03080103	Cataloging Unit	Lower St. Johns
+030802	Accounting Unit	East Florida Coastal
+03080201	Cataloging Unit	Daytona-St. Augustine
+03080202	Cataloging Unit	Cape Canaveral
+03080203	Cataloging Unit	Vero Beach
+0309	Subregion	Southern Florida
+030901	Accounting Unit	Kissimmee
+03090101	Cataloging Unit	Kissimmee
+03090102	Cataloging Unit	Northern Okeechobee Inflow
+03090103	Cataloging Unit	Western Okeechobee Inflow
+030902	Accounting Unit	Southern Florida
+03090201	Cataloging Unit	Lake Okeechobee
+03090202	Cataloging Unit	Everglades
+03090203	Cataloging Unit	Florida Bay-Florida Keys
+03090204	Cataloging Unit	Big Cypress Swamp
+03090205	Cataloging Unit	Caloosahatchee
+03090206	Cataloging Unit	Florida Southeast Coast
+0310	Subregion	Peace-Tampa Bay
+031001	Accounting Unit	Peace
+03100101	Cataloging Unit	Peace
+03100102	Cataloging Unit	Myakka
+03100103	Cataloging Unit	Charlotte Harbor
+031002	Accounting Unit	Tampa Bay
+03100201	Cataloging Unit	Sarasota Bay
+03100202	Cataloging Unit	Manatee
+03100203	Cataloging Unit	Little Manatee
+03100204	Cataloging Unit	Alafia
+03100205	Cataloging Unit	Hillsborough
+03100206	Cataloging Unit	Tampa Bay
+03100207	Cataloging Unit	Crystal-Pithlachascotee
+03100208	Cataloging Unit	Withlacoochee
+0311	Subregion	Suwannee
+031101	Accounting Unit	Aucilla-Waccasassa
+03110101	Cataloging Unit	Waccasassa
+03110102	Cataloging Unit	Econfina-Steinhatchee
+03110103	Cataloging Unit	Aucilla
+031102	Accounting Unit	Suwannee
+03110201	Cataloging Unit	Upper Suwannee
+03110202	Cataloging Unit	Alapaha
+03110203	Cataloging Unit	Withlacoochee
+03110204	Cataloging Unit	Little
+03110205	Cataloging Unit	Lower Suwannee
+03110206	Cataloging Unit	Santa Fe
+0312	Subregion	Ochlockonee
+031200	Accounting Unit	Ochlockonee
+03120001	Cataloging Unit	Apalachee Bay-St. Marks
+03120002	Cataloging Unit	Upper Ochlockonee
+03120003	Cataloging Unit	Lower Ochlockonee
+0313	Subregion	Apalachicola
+031300	Accounting Unit	Apalachicola
+03130001	Cataloging Unit	Upper Chattahoochee
+03130002	Cataloging Unit	Middle Chattahoochee-Lake Harding
+03130003	Cataloging Unit	Middle Chattahoochee-Walter F
+03130004	Cataloging Unit	Lower Chattahoochee
+03130005	Cataloging Unit	Upper Flint
+03130006	Cataloging Unit	Middle Flint
+03130007	Cataloging Unit	Kinchafoonee-Muckalee
+03130008	Cataloging Unit	Lower Flint
+03130009	Cataloging Unit	Ichawaynochaway
+03130010	Cataloging Unit	Spring
+03130011	Cataloging Unit	Apalachicola
+03130012	Cataloging Unit	Chipola
+03130013	Cataloging Unit	New
+03130014	Cataloging Unit	Apalachicola Bay
+0314	Subregion	Choctawhatchee-Escambia
+031401	Accounting Unit	Florida Panhandle Coastal
+03140101	Cataloging Unit	St. Andrew-St. Joseph Bays
+03140102	Cataloging Unit	Choctawhatchee Bay
+03140103	Cataloging Unit	Yellow
+03140104	Cataloging Unit	Blackwater
+03140105	Cataloging Unit	Pensacola Bay
+03140106	Cataloging Unit	Perdido
+03140107	Cataloging Unit	Perdido Bay
+031402	Accounting Unit	Choctawhatchee
+03140201	Cataloging Unit	Upper Choctawhatchee
+03140202	Cataloging Unit	Pea
+03140203	Cataloging Unit	Lower Choctawhatchee
+031403	Accounting Unit	Escambia
+03140301	Cataloging Unit	Upper Conecuh
+03140302	Cataloging Unit	Patsaliga
+03140303	Cataloging Unit	Sepulga
+03140304	Cataloging Unit	Lower Conecuh
+03140305	Cataloging Unit	Escambia
+0315	Subregion	Alabama
+031501	Accounting Unit	Coosa-Tallapoosa
+03150101	Cataloging Unit	Conasauga
+03150102	Cataloging Unit	Coosawattee
+03150103	Cataloging Unit	Oostanaula
+03150104	Cataloging Unit	Etowah
+03150105	Cataloging Unit	Upper Coosa
+03150106	Cataloging Unit	Middle Coosa
+03150107	Cataloging Unit	Lower Coosa
+03150108	Cataloging Unit	Upper Tallapoosa
+03150109	Cataloging Unit	Middle Tallapoosa
+03150110	Cataloging Unit	Lower Tallapoosa
+031502	Accounting Unit	Alabama
+03150201	Cataloging Unit	Upper Alabama
+03150202	Cataloging Unit	Cahaba
+03150203	Cataloging Unit	Middle Alabama
+03150204	Cataloging Unit	Lower Alabama
+0316	Subregion	Mobile-Tombigbee
+031601	Accounting Unit	Black Warrior-Tombigbee
+03160101	Cataloging Unit	Upper Tombigbee
+03160102	Cataloging Unit	Town
+03160103	Cataloging Unit	Buttahatchee
+03160104	Cataloging Unit	Tibbee
+03160105	Cataloging Unit	Luxapallila
+03160106	Cataloging Unit	Middle Tombigbee-Lubbub
+03160107	Cataloging Unit	Sipsey
+03160108	Cataloging Unit	Noxubee
+03160109	Cataloging Unit	Mulberry
+03160110	Cataloging Unit	Sipsey Fork
+03160111	Cataloging Unit	Locust
+03160112	Cataloging Unit	Upper Black Warrior
+03160113	Cataloging Unit	Lower Black Warrior
+031602	Accounting Unit	Mobile Bay-Tombigbee
+03160201	Cataloging Unit	Middle Tombigbee-Chickasaw
+03160202	Cataloging Unit	Sucarnoochee
+03160203	Cataloging Unit	Lower Tombigbee
+03160204	Cataloging Unit	Mobile-Tensaw
+03160205	Cataloging Unit	Mobile Bay
+0317	Subregion	Pascagoula
+031700	Accounting Unit	Pascagoula
+03170001	Cataloging Unit	Chunky-Okatibbee
+03170002	Cataloging Unit	Upper Chickasawhay
+03170003	Cataloging Unit	Lower Chickasawhay
+03170004	Cataloging Unit	Upper Leaf
+03170005	Cataloging Unit	Lower Leaf
+03170006	Cataloging Unit	Pascagoula
+03170007	Cataloging Unit	Black
+03170008	Cataloging Unit	Escatawpa
+03170009	Cataloging Unit	Mississippi Coastal
+0318	Subregion	Pearl
+031800	Accounting Unit	Pearl
+03180001	Cataloging Unit	Upper Pearl
+03180002	Cataloging Unit	Middle Pearl-Strong
+03180003	Cataloging Unit	Middle Pearl-Silver
+03180004	Cataloging Unit	Lower Pearl
+03180005	Cataloging Unit	Bogue Chitto
+04	Region	Great Lakes Region
+0401	Subregion	Western Lake Superior
+040101	Accounting Unit	Northwestern Lake Superior
+04010101	Cataloging Unit	Baptism-Brule
+04010102	Cataloging Unit	Beaver-Lester
+040102	Accounting Unit	St. Louis
+04010201	Cataloging Unit	St. Louis
+04010202	Cataloging Unit	Cloquet
+040103	Accounting Unit	Southwestern Lake Superior
+04010301	Cataloging Unit	Beartrap-Nemadji
+04010302	Cataloging Unit	Bad-Montreal
+0402	Subregion	Southern Lake Superior-Lake Superior
+040201	Accounting Unit	Southcentral Lake Superior
+04020101	Cataloging Unit	Black-Presque Isle
+04020102	Cataloging Unit	Ontonagon
+04020103	Cataloging Unit	Keweenaw Peninsula
+04020104	Cataloging Unit	Sturgeon
+04020105	Cataloging Unit	Dead-Kelsey
+040202	Accounting Unit	Southeastern Lake Superior
+04020201	Cataloging Unit	Betsy-Chocolay
+04020202	Cataloging Unit	Tahquamenon
+04020203	Cataloging Unit	Waiska
+040203	Accounting Unit	Lake Superior
+04020300	Cataloging Unit	Lake Superior
+0403	Subregion	Northwestern Lake Michigan
+040301	Accounting Unit	Northwestern Lake Michigan
+04030101	Cataloging Unit	Manitowoc-Sheboygan
+04030102	Cataloging Unit	Door-Kewaunee
+04030103	Cataloging Unit	Duck-Pensaukee
+04030104	Cataloging Unit	Oconto
+04030105	Cataloging Unit	Peshtigo
+04030106	Cataloging Unit	Brule
+04030107	Cataloging Unit	Michigamme
+04030108	Cataloging Unit	Menominee
+04030109	Cataloging Unit	Cedar-Ford
+04030110	Cataloging Unit	Escanaba
+04030111	Cataloging Unit	Tacoosh-Whitefish
+04030112	Cataloging Unit	Fishdam-Sturgeon
+040302	Accounting Unit	Fox
+04030201	Cataloging Unit	Upper Fox
+04030202	Cataloging Unit	Wolf
+04030203	Cataloging Unit	Lake Winnebago
+04030204	Cataloging Unit	Lower Fox
+0404	Subregion	Southwestern Lake Michigan
+040400	Accounting Unit	Southwestern Lake Michigan
+04040001	Cataloging Unit	Little Calumet-Galien
+04040002	Cataloging Unit	Pike-Root
+04040003	Cataloging Unit	Milwaukee
+0405	Subregion	Southeastern Lake Michigan
+040500	Accounting Unit	Southeastern Lake Michigan
+04050001	Cataloging Unit	St. Joseph
+04050002	Cataloging Unit	Black-Macatawa
+04050003	Cataloging Unit	Kalamazoo
+04050004	Cataloging Unit	Upper Grand
+04050005	Cataloging Unit	Maple
+04050006	Cataloging Unit	Lower Grand
+04050007	Cataloging Unit	Thornapple
+0406	Subregion	Northeastern Lake Michigan-Lake Michigan
+040601	Accounting Unit	Northeastern Lake Michigan
+04060101	Cataloging Unit	Pere Marquette-White
+04060102	Cataloging Unit	Muskegon
+04060103	Cataloging Unit	Manistee
+04060104	Cataloging Unit	Betsie-Platte
+04060105	Cataloging Unit	Boardman-Charlevoix
+04060106	Cataloging Unit	Manistique
+04060107	Cataloging Unit	Brevoort-Millecoquins
+040602	Accounting Unit	Lake Michigan
+04060200	Cataloging Unit	Lake Michigan
+0407	Subregion	Northwestern Lake Huron
+040700	Accounting Unit	Northwestern Lake Huron
+04070001	Cataloging Unit	St. Marys
+04070002	Cataloging Unit	Carp-Pine
+04070003	Cataloging Unit	Lone Lake-Ocqueoc
+04070004	Cataloging Unit	Cheboygan
+04070005	Cataloging Unit	Black
+04070006	Cataloging Unit	Thunder Bay
+04070007	Cataloging Unit	Au Sable
+0408	Subregion	Southwestern Lake Huron-Lake Huron
+040801	Accounting Unit	Southwestern Lake Huron
+04080101	Cataloging Unit	Au Gres-Rifle
+04080102	Cataloging Unit	Kawkawlin-Pine
+04080103	Cataloging Unit	Pigeon-Wiscoggin
+04080104	Cataloging Unit	Birch-Willow
+040802	Accounting Unit	Saginaw
+04080201	Cataloging Unit	Tittabawassee
+04080202	Cataloging Unit	Pine
+04080203	Cataloging Unit	Shiawassee
+04080204	Cataloging Unit	Flint
+04080205	Cataloging Unit	Cass
+04080206	Cataloging Unit	Saginaw
+040803	Accounting Unit	Lake Huron
+04080300	Cataloging Unit	Lake Huron
+0409	Subregion	St. Clair-Detroit
+040900	Accounting Unit	St. Clair-Detroit
+04090001	Cataloging Unit	St. Clair
+04090002	Cataloging Unit	Lake St. Clair
+04090003	Cataloging Unit	Clinton
+04090004	Cataloging Unit	Detroit
+04090005	Cataloging Unit	Huron
+0410	Subregion	Western Lake Erie
+041000	Accounting Unit	Western Lake Erie
+04100001	Cataloging Unit	Ottawa-Stony
+04100002	Cataloging Unit	Raisin
+04100003	Cataloging Unit	St. Joseph
+04100004	Cataloging Unit	St. Marys
+04100005	Cataloging Unit	Upper Maumee
+04100006	Cataloging Unit	Tiffin
+04100007	Cataloging Unit	Auglaize
+04100008	Cataloging Unit	Blanchard
+04100009	Cataloging Unit	Lower Maumee
+04100010	Cataloging Unit	Cedar-Portage
+04100011	Cataloging Unit	Sandusky
+04100012	Cataloging Unit	Huron-Vermilion
+0411	Subregion	Southern Lake Erie
+041100	Accounting Unit	Southern Lake Erie
+04110001	Cataloging Unit	Black-Rocky
+04110002	Cataloging Unit	Cuyahoga
+04110003	Cataloging Unit	Ashtabula-Chagrin
+04110004	Cataloging Unit	Grand
+0412	Subregion	Eastern Lake Erie-Lake Erie
+041201	Accounting Unit	Eastern Lake Erie
+04120101	Cataloging Unit	Chautauqua-Conneaut
+04120102	Cataloging Unit	Cattaraugus
+04120103	Cataloging Unit	Buffalo-Eighteenmile
+04120104	Cataloging Unit	Niagara
+041202	Accounting Unit	Lake Erie
+04120200	Cataloging Unit	Lake Erie
+0413	Subregion	Southwestern Lake Ontario
+041300	Accounting Unit	Southwestern Lake Ontario
+04130001	Cataloging Unit	Oak Orchard-Twelvemile
+04130002	Cataloging Unit	Upper Genesee
+04130003	Cataloging Unit	Lower Genesee
+0414	Subregion	Southeastern Lake Ontario
+041401	Accounting Unit	Southeastern Lake Ontario
+04140101	Cataloging Unit	Irondequoit-Ninemile
+04140102	Cataloging Unit	Salmon-Sandy
+041402	Accounting Unit	Oswego
+04140201	Cataloging Unit	Seneca
+04140202	Cataloging Unit	Oneida
+04140203	Cataloging Unit	Oswego
+0415	Subregion	Northeastern Lake Ontario-Lake Ontario-St. Lawrence
+041501	Accounting Unit	Northeastern Lake Ontario
+04150101	Cataloging Unit	Black
+04150102	Cataloging Unit	Chaumont-Perch
+041502	Accounting Unit	Lake Ontario
+04150200	Cataloging Unit	Lake Ontario
+041503	Accounting Unit	St. Lawrence
+04150301	Cataloging Unit	Upper St. Lawrence
+04150302	Cataloging Unit	Oswegatchie
+04150303	Cataloging Unit	Indian
+04150304	Cataloging Unit	Grass
+04150305	Cataloging Unit	Raquette
+04150306	Cataloging Unit	St. Regis
+04150307	Cataloging Unit	Salmon
+04150308	Cataloging Unit	Chateaugay-English
+041504	Accounting Unit	Lake Champlain-Richelieu River
+04150401	Cataloging Unit	Mettawee River
+04150402	Cataloging Unit	Otter Creek
+04150403	Cataloging Unit	Winooski River
+04150404	Cataloging Unit	Ausable River
+04150405	Cataloging Unit	Lamoille River
+04150406	Cataloging Unit	Saranac River
+04150407	Cataloging Unit	Missiquoi River
+04150408	Cataloging Unit	Lake Champlain
+04150409	Cataloging Unit	Richelieu River
+041505	Accounting Unit	St. Francois River
+04150500	Cataloging Unit	St. Francois River
+05	Region	Ohio Region
+0501	Subregion	Allegheny
+050100	Accounting Unit	Allegheny
+05010001	Cataloging Unit	Upper Allegheny
+05010002	Cataloging Unit	Conewango
+05010003	Cataloging Unit	Middle Allegheny-Tionesta
+05010004	Cataloging Unit	French
+05010005	Cataloging Unit	Clarion
+05010006	Cataloging Unit	Middle Allegheny-Redbank
+05010007	Cataloging Unit	Conemaugh
+05010008	Cataloging Unit	Kiskiminetas
+05010009	Cataloging Unit	Lower Allegheny
+0502	Subregion	Monongahela
+050200	Accounting Unit	Monongahela
+05020001	Cataloging Unit	Tygart Valley
+05020002	Cataloging Unit	West Fork
+05020003	Cataloging Unit	Upper Monongahela
+05020004	Cataloging Unit	Cheat
+05020005	Cataloging Unit	Lower Monongahela
+05020006	Cataloging Unit	Youghiogheny
+0503	Subregion	Upper Ohio
+050301	Accounting Unit	Upper Ohio-Beaver
+05030101	Cataloging Unit	Upper Ohio
+05030102	Cataloging Unit	Shenango
+05030103	Cataloging Unit	Mahoning
+05030104	Cataloging Unit	Beaver
+05030105	Cataloging Unit	Connoquenessing
+05030106	Cataloging Unit	Upper Ohio-Wheeling
+050302	Accounting Unit	Upper Ohio-Little Kanawha
+05030201	Cataloging Unit	Little Muskingum-Middle Island
+05030202	Cataloging Unit	Upper Ohio-Shade
+05030203	Cataloging Unit	Little Kanawha
+05030204	Cataloging Unit	Hocking
+0504	Subregion	Muskingum
+050400	Accounting Unit	Muskingum
+05040001	Cataloging Unit	Tuscarawas
+05040002	Cataloging Unit	Mohican
+05040003	Cataloging Unit	Walhonding
+05040004	Cataloging Unit	Muskingum
+05040005	Cataloging Unit	Wills
+05040006	Cataloging Unit	Licking
+0505	Subregion	Kanawha
+050500	Accounting Unit	Kanawha
+05050001	Cataloging Unit	Upper New
+05050002	Cataloging Unit	Middle New
+05050003	Cataloging Unit	Greenbrier
+05050004	Cataloging Unit	Lower New
+05050005	Cataloging Unit	Gauley
+05050006	Cataloging Unit	Upper Kanawha
+05050007	Cataloging Unit	Elk
+05050008	Cataloging Unit	Lower Kanawha
+05050009	Cataloging Unit	Coal
+0506	Subregion	Scioto
+050600	Accounting Unit	Scioto
+05060001	Cataloging Unit	Upper Scioto
+05060002	Cataloging Unit	Lower Scioto
+05060003	Cataloging Unit	Paint
+0507	Subregion	Big Sandy-Guyandotte
+050701	Accounting Unit	Guyandotte
+05070101	Cataloging Unit	Upper Guyandotte
+05070102	Cataloging Unit	Lower Guyandotte
+050702	Accounting Unit	Big Sandy
+05070201	Cataloging Unit	Tug
+05070202	Cataloging Unit	Upper Levisa
+05070203	Cataloging Unit	Lower Levisa
+05070204	Cataloging Unit	Big Sandy
+0508	Subregion	Great Miami
+050800	Accounting Unit	Great Miami
+05080001	Cataloging Unit	Upper Great Miami, Indiana, Ohio
+05080002	Cataloging Unit	Lower Great Miami, Indiana, Ohio
+05080003	Cataloging Unit	Whitewater
+0509	Subregion	Middle Ohio
+050901	Accounting Unit	Middle Ohio-Raccoon
+05090101	Cataloging Unit	Raccoon-Symmes
+05090102	Cataloging Unit	Twelvepole
+05090103	Cataloging Unit	Little Scioto-Tygarts
+05090104	Cataloging Unit	Little Sandy
+050902	Accounting Unit	Middle Ohio-Little Miami
+05090201	Cataloging Unit	Ohio Brush-Whiteoak
+05090202	Cataloging Unit	Little Miami
+05090203	Cataloging Unit	Middle Ohio-Laughery
+0510	Subregion	Kentucky-Licking
+051001	Accounting Unit	Licking
+05100101	Cataloging Unit	Licking
+05100102	Cataloging Unit	South Fork Licking
+051002	Accounting Unit	Kentucky
+05100201	Cataloging Unit	North Fork Kentucky
+05100202	Cataloging Unit	Middle Fork Kentucky
+05100203	Cataloging Unit	South Fork Kentucky
+05100204	Cataloging Unit	Upper Kentucky
+05100205	Cataloging Unit	Lower Kentucky
+0511	Subregion	Green
+051100	Accounting Unit	Green
+05110001	Cataloging Unit	Upper Green
+05110002	Cataloging Unit	Barren
+05110003	Cataloging Unit	Middle Green
+05110004	Cataloging Unit	Rough
+05110005	Cataloging Unit	Lower Green
+05110006	Cataloging Unit	Pond
+0512	Subregion	Wabash
+051201	Accounting Unit	Wabash
+05120101	Cataloging Unit	Upper Wabash
+05120102	Cataloging Unit	Salamonie
+05120103	Cataloging Unit	Mississinewa
+05120104	Cataloging Unit	Eel
+05120105	Cataloging Unit	Middle Wabash-Deer
+05120106	Cataloging Unit	Tippecanoe
+05120107	Cataloging Unit	Wildcat
+05120108	Cataloging Unit	Middle Wabash-Little Vermilion
+05120109	Cataloging Unit	Vermilion
+05120110	Cataloging Unit	Sugar
+05120111	Cataloging Unit	Middle Wabash-Busseron
+05120112	Cataloging Unit	Embarras
+05120113	Cataloging Unit	Lower Wabash
+05120114	Cataloging Unit	Little Wabash
+05120115	Cataloging Unit	Skillet
+051202	Accounting Unit	Patoka-White
+05120201	Cataloging Unit	Upper White
+05120202	Cataloging Unit	Lower White
+05120203	Cataloging Unit	Eel
+05120204	Cataloging Unit	Driftwood
+05120205	Cataloging Unit	Flatrock-Haw
+05120206	Cataloging Unit	Upper East Fork White
+05120207	Cataloging Unit	Muscatatuck
+05120208	Cataloging Unit	Lower East Fork White
+05120209	Cataloging Unit	Patoka
+0513	Subregion	Cumberland
+051301	Accounting Unit	Upper Cumberland
+05130101	Cataloging Unit	Upper Cumberland
+05130102	Cataloging Unit	Rockcastle
+05130103	Cataloging Unit	Upper Cumberland-Lake Cumberland
+05130104	Cataloging Unit	South Fork Cumberland
+05130105	Cataloging Unit	Obey
+05130106	Cataloging Unit	Upper Cumberland-Cordell Hull Reservoir
+05130107	Cataloging Unit	Collins
+05130108	Cataloging Unit	Caney
+051302	Accounting Unit	Lower Cumberland
+05130201	Cataloging Unit	Lower Cumberland-Old Hickory Lake
+05130202	Cataloging Unit	Lower Cumberland-Sycamore
+05130203	Cataloging Unit	Stones
+05130204	Cataloging Unit	Harpeth
+05130205	Cataloging Unit	Lower Cumberland
+05130206	Cataloging Unit	Red
+0514	Subregion	Lower Ohio
+051401	Accounting Unit	Lower Ohio-Salt
+05140101	Cataloging Unit	Silver-Little Kentucky
+05140102	Cataloging Unit	Salt
+05140103	Cataloging Unit	Rolling Fork
+05140104	Cataloging Unit	Blue-Sinking
+051402	Accounting Unit	Lower Ohio
+05140201	Cataloging Unit	Lower Ohio-Little Pigeon
+05140202	Cataloging Unit	Highland-Pigeon
+05140203	Cataloging Unit	Lower Ohio-Bay
+05140204	Cataloging Unit	Saline
+05140205	Cataloging Unit	Tradewater
+05140206	Cataloging Unit	Lower Ohio
+06	Region	Tennessee Region
+0601	Subregion	Upper Tennessee
+060101	Accounting Unit	French Broad-Holston
+06010101	Cataloging Unit	North Fork Holston
+06010102	Cataloging Unit	South Fork Holston
+06010103	Cataloging Unit	Watauga, North Carolina, Tennessee
+06010104	Cataloging Unit	Holston
+06010105	Cataloging Unit	Upper French Broad
+06010106	Cataloging Unit	Pigeon
+06010107	Cataloging Unit	Lower French Broad
+06010108	Cataloging Unit	Nolichucky
+060102	Accounting Unit	Upper Tennessee
+06010201	Cataloging Unit	Watts Bar Lake
+06010202	Cataloging Unit	Upper Little Tennessee
+06010203	Cataloging Unit	Tuckasegee
+06010204	Cataloging Unit	Lower Little Tennessee
+06010205	Cataloging Unit	Upper Clinch, Tennessee, Virginia
+06010206	Cataloging Unit	Powell
+06010207	Cataloging Unit	Lower Clinch
+06010208	Cataloging Unit	Emory
+0602	Subregion	Middle Tennessee-Hiwassee
+060200	Accounting Unit	Middle Tennessee-Hiwassee
+06020001	Cataloging Unit	Middle Tennessee-Chickamauga
+06020002	Cataloging Unit	Hiwassee
+06020003	Cataloging Unit	Ocoee
+06020004	Cataloging Unit	Sequatchie
+0603	Subregion	Middle Tennessee-Elk
+060300	Accounting Unit	Middle Tennessee-Elk
+06030001	Cataloging Unit	Guntersville Lake
+06030002	Cataloging Unit	Wheeler Lake
+06030003	Cataloging Unit	Upper Elk
+06030004	Cataloging Unit	Lower Elk
+06030005	Cataloging Unit	Pickwick Lake
+06030006	Cataloging Unit	Bear
+0604	Subregion	Lower Tennessee
+060400	Accounting Unit	Lower Tennessee
+06040001	Cataloging Unit	Lower Tennessee-Beech
+06040002	Cataloging Unit	Upper Duck
+06040003	Cataloging Unit	Lower Duck
+06040004	Cataloging Unit	Buffalo
+06040005	Cataloging Unit	Kentucky Lake
+06040006	Cataloging Unit	Lower Tennessee
+07	Region	Upper Mississippi Region
+0701	Subregion	Mississippi Headwaters
+070101	Accounting Unit	Mississippi Headwaters
+07010101	Cataloging Unit	Mississippi Headwaters
+07010102	Cataloging Unit	Leech Lake
+07010103	Cataloging Unit	Prairie-Willow
+07010104	Cataloging Unit	Elk-Nokasippi
+07010105	Cataloging Unit	Pine
+07010106	Cataloging Unit	Crow Wing
+07010107	Cataloging Unit	Redeye
+07010108	Cataloging Unit	Long Prairie
+070102	Accounting Unit	Upper Mississippi-Crow-Rum
+07010201	Cataloging Unit	Platte-Spunk
+07010202	Cataloging Unit	Sauk
+07010203	Cataloging Unit	Clearwater-Elk
+07010204	Cataloging Unit	Crow
+07010205	Cataloging Unit	South Fork Crow
+07010206	Cataloging Unit	Twin Cities
+07010207	Cataloging Unit	Rum
+0702	Subregion	Minnesota
+070200	Accounting Unit	Minnesota
+07020001	Cataloging Unit	Upper Minnesota
+07020002	Cataloging Unit	Pomme De Terre
+07020003	Cataloging Unit	Lac Qui Parle
+07020004	Cataloging Unit	Hawk-Yellow Medicine
+07020005	Cataloging Unit	Chippewa
+07020006	Cataloging Unit	Redwood
+07020007	Cataloging Unit	Middle Minnesota
+07020008	Cataloging Unit	Cottonwood
+07020009	Cataloging Unit	Blue Earth
+07020010	Cataloging Unit	Watonwan
+07020011	Cataloging Unit	Le Sueur
+07020012	Cataloging Unit	Lower Minnesota
+0703	Subregion	St. Croix
+070300	Accounting Unit	St. Croix
+07030001	Cataloging Unit	Upper St. Croix
+07030002	Cataloging Unit	Namekagon
+07030003	Cataloging Unit	Kettle
+07030004	Cataloging Unit	Snake
+07030005	Cataloging Unit	Lower St. Croix
+0704	Subregion	Upper Mississippi-Black-Root
+070400	Accounting Unit	Upper Mississippi-Black-Root
+07040001	Cataloging Unit	Rush-Vermillion
+07040002	Cataloging Unit	Cannon
+07040003	Cataloging Unit	Buffalo-Whitewater
+07040004	Cataloging Unit	Zumbro
+07040005	Cataloging Unit	Trempealeau
+07040006	Cataloging Unit	La Crosse-Pine
+07040007	Cataloging Unit	Black
+07040008	Cataloging Unit	Root
+0705	Subregion	Chippewa
+070500	Accounting Unit	Chippewa
+07050001	Cataloging Unit	Upper Chippewa
+07050002	Cataloging Unit	Flambeau
+07050003	Cataloging Unit	South Fork Flambeau
+07050004	Cataloging Unit	Jump
+07050005	Cataloging Unit	Lower Chippewa
+07050006	Cataloging Unit	Eau Claire
+07050007	Cataloging Unit	Red Cedar
+0706	Subregion	Upper Mississippi-Maquoketa-Plum
+070600	Accounting Unit	Upper Mississippi-Maquoketa-Plum
+07060001	Cataloging Unit	Coon-Yellow
+07060002	Cataloging Unit	Upper Iowa
+07060003	Cataloging Unit	Grant-Little Maquoketa
+07060004	Cataloging Unit	Turkey
+07060005	Cataloging Unit	Apple-Plum
+07060006	Cataloging Unit	Maquoketa
+0707	Subregion	Wisconsin
+070700	Accounting Unit	Wisconsin
+07070001	Cataloging Unit	Upper Wisconsin
+07070002	Cataloging Unit	Lake Dubay
+07070003	Cataloging Unit	Castle Rock
+07070004	Cataloging Unit	Baraboo
+07070005	Cataloging Unit	Lower Wisconsin
+07070006	Cataloging Unit	Kickapoo
+0708	Subregion	Upper Mississippi-Iowa-Skunk-Wapsipinicon
+070801	Accounting Unit	Upper Mississippi-Skunk-Wapsipinicon
+07080101	Cataloging Unit	Copperas-Duck
+07080102	Cataloging Unit	Upper Wapsipinicon
+07080103	Cataloging Unit	Lower Wapsipinicon
+07080104	Cataloging Unit	Flint-Henderson
+07080105	Cataloging Unit	South Skunk
+07080106	Cataloging Unit	North Skunk
+07080107	Cataloging Unit	Skunk
+070802	Accounting Unit	Iowa
+07080201	Cataloging Unit	Upper Cedar
+07080202	Cataloging Unit	Shell Rock
+07080203	Cataloging Unit	Winnebago
+07080204	Cataloging Unit	West Fork Cedar
+07080205	Cataloging Unit	Middle Cedar
+07080206	Cataloging Unit	Lower Cedar
+07080207	Cataloging Unit	Upper Iowa
+07080208	Cataloging Unit	Middle Iowa
+07080209	Cataloging Unit	Lower Iowa
+0709	Subregion	Rock
+070900	Accounting Unit	Rock
+07090001	Cataloging Unit	Upper Rock
+07090002	Cataloging Unit	Middle Rock
+07090003	Cataloging Unit	Pecatonica
+07090004	Cataloging Unit	Sugar
+07090005	Cataloging Unit	Lower Rock
+07090006	Cataloging Unit	Kishwaukee
+07090007	Cataloging Unit	Green
+0710	Subregion	Des Moines
+071000	Accounting Unit	Des Moines
+07100001	Cataloging Unit	Des Moines Headwaters
+07100002	Cataloging Unit	Upper Des Moines
+07100003	Cataloging Unit	East Fork Des Moines
+07100004	Cataloging Unit	Middle Des Moines
+07100005	Cataloging Unit	Boone
+07100006	Cataloging Unit	North Raccoon
+07100007	Cataloging Unit	South Raccoon
+07100008	Cataloging Unit	Lake Red Rock
+07100009	Cataloging Unit	Lower Des Moines
+0711	Subregion	Upper Mississippi-Salt
+071100	Accounting Unit	Upper Mississippi-Salt
+07110001	Cataloging Unit	Bear-Wyaconda
+07110002	Cataloging Unit	North Fabius
+07110003	Cataloging Unit	South Fabius
+07110004	Cataloging Unit	The Sny
+07110005	Cataloging Unit	North Fork Salt
+07110006	Cataloging Unit	South Fork Salt
+07110007	Cataloging Unit	Salt
+07110008	Cataloging Unit	Cuivre
+07110009	Cataloging Unit	Peruque-Piasa
+0712	Subregion	Upper Illinois
+0712	Subregion	UpperIllinois
+071200	Accounting Unit	Upper Illinois
+07120001	Cataloging Unit	Kankakee
+07120002	Cataloging Unit	Iroquois
+07120003	Cataloging Unit	Chicago
+07120004	Cataloging Unit	Des Plaines
+07120005	Cataloging Unit	Upper Illinois
+07120006	Cataloging Unit	Upper Fox
+07120007	Cataloging Unit	Lower Fox
+0713	Subregion	Lower Illinois
+071300	Accounting Unit	Lower Illinois
+07130001	Cataloging Unit	Lower Illinois-Senachwine Lake
+07130002	Cataloging Unit	Vermilion
+07130003	Cataloging Unit	Lower Illinois-Lake Chautauqua
+07130004	Cataloging Unit	Mackinaw
+07130005	Cataloging Unit	Spoon
+07130006	Cataloging Unit	Upper Sangamon
+07130007	Cataloging Unit	South Fork Sangamon
+07130008	Cataloging Unit	Lower Sangamon
+07130009	Cataloging Unit	Salt
+07130010	Cataloging Unit	La Moine
+07130011	Cataloging Unit	Lower Illinois
+07130012	Cataloging Unit	Macoupin
+0714	Subregion	Upper Mississippi-Kaskaskia-Meramec
+071401	Accounting Unit	Upper Mississippi-Meramec
+07140101	Cataloging Unit	Cahokia-Joachim
+07140102	Cataloging Unit	Meramec
+07140103	Cataloging Unit	Bourbeuse
+07140104	Cataloging Unit	Big
+07140105	Cataloging Unit	Upper Mississippi-Cape Girardeau
+07140106	Cataloging Unit	Big Muddy
+07140107	Cataloging Unit	Whitewater
+07140108	Cataloging Unit	Cache
+071402	Accounting Unit	Kaskaskia
+07140201	Cataloging Unit	Upper Kaskaskia
+07140202	Cataloging Unit	Middle Kaskaskia
+07140203	Cataloging Unit	Shoal
+07140204	Cataloging Unit	Lower Kaskaskia
+08	Region	Lower Mississippi Region
+0801	Subregion	Lower Mississippi-Hatchie
+080101	Accounting Unit	Lower Mississippi-Memphis
+08010100	Cataloging Unit	Lower Mississippi-Memphis
+080102	Accounting Unit	Hatchie-Obion
+08010201	Cataloging Unit	Bayou De Chien-Mayfield
+08010202	Cataloging Unit	Obion
+08010203	Cataloging Unit	South Fork Obion
+08010204	Cataloging Unit	North Fork Forked Deer
+08010205	Cataloging Unit	South Fork Forked Deer
+08010206	Cataloging Unit	Forked Deer
+08010207	Cataloging Unit	Upper Hatchie
+08010208	Cataloging Unit	Lower Hatchie
+08010209	Cataloging Unit	Loosahatchie
+08010210	Cataloging Unit	Wolf
+08010211	Cataloging Unit	Horn Lake-Nonconnah
+0802	Subregion	Lower Mississippi-St. Francis
+080201	Accounting Unit	Lower Mississippi
+080201	Accounting Unit	Lower Mississippi-Helena
+08020100	Cataloging Unit	Lower Mississippi-Helena
+080202	Accounting Unit	St. Francis
+08020201	Cataloging Unit	New Madrid-St. Johns
+08020202	Cataloging Unit	Upper St. Francis
+08020203	Cataloging Unit	Lower St. Francis
+08020204	Cataloging Unit	Little River Ditches
+08020205	Cataloging Unit	L'Anguille
+080203	Accounting Unit	Lower White
+08020301	Cataloging Unit	Lower White-Bayou Des Arc
+08020302	Cataloging Unit	Cache
+08020303	Cataloging Unit	Lower White
+08020304	Cataloging Unit	Big
+080204	Accounting Unit	Lower Arkansas
+08020401	Cataloging Unit	Lower Arkansas
+08020402	Cataloging Unit	Bayou Meto
+0803	Subregion	Lower Mississippi-Yazoo
+080301	Accounting Unit	Lower Mississippi-Greenville
+08030100	Cataloging Unit	Lower Mississippi-Greenville
+080302	Accounting Unit	Yazoo
+08030201	Cataloging Unit	Little Tallahatchie
+08030202	Cataloging Unit	Tallahatchie
+08030203	Cataloging Unit	Yocona
+08030204	Cataloging Unit	Coldwater
+08030205	Cataloging Unit	Yalobusha
+08030206	Cataloging Unit	Upper Yazoo
+08030207	Cataloging Unit	Big Sunflower
+08030208	Cataloging Unit	Lower Yazoo
+08030209	Cataloging Unit	Deer-Steele
+0804	Subregion	Lower Red-Ouachita
+080401	Accounting Unit	Upper Ouachita
+08040101	Cataloging Unit	Ouachita Headwaters
+08040102	Cataloging Unit	Upper Ouachita
+08040103	Cataloging Unit	Little Missouri
+080402	Accounting Unit	Lower Ouachita
+08040201	Cataloging Unit	Lower Ouachita-Smackover
+08040202	Cataloging Unit	Lower Ouachita-Bayou De Loutre
+08040203	Cataloging Unit	Upper Saline
+08040204	Cataloging Unit	Lower Saline
+08040205	Cataloging Unit	Bayou Bartholomew
+08040206	Cataloging Unit	Bayou D'Arbonne
+08040207	Cataloging Unit	Lower Ouachita
+080403	Accounting Unit	Lower Red
+08040301	Cataloging Unit	Lower Red
+08040302	Cataloging Unit	Castor
+08040303	Cataloging Unit	Dugdemona
+08040304	Cataloging Unit	Little
+08040305	Cataloging Unit	Black
+08040306	Cataloging Unit	Bayou Cocodrie
+0805	Subregion	Boeuf-Tensas
+080500	Accounting Unit	Boeuf-Tensas
+08050001	Cataloging Unit	Boeuf
+08050002	Cataloging Unit	Bayou Macon
+08050003	Cataloging Unit	Tensas
+0806	Subregion	Lower Mississippi-Big Black
+080601	Accounting Unit	Lower Mississippi-Natchez
+08060100	Cataloging Unit	Lower Mississippi-Natchez
+080602	Accounting Unit	Big Black-Homochitto
+08060201	Cataloging Unit	Upper Big Black
+08060202	Cataloging Unit	Lower Big Black
+08060203	Cataloging Unit	Bayou Pierre
+08060204	Cataloging Unit	Coles Creek
+08060205	Cataloging Unit	Homochitto
+08060206	Cataloging Unit	Buffalo
+0807	Subregion	Lower Mississippi-Lake Maurepas
+080701	Accounting Unit	Lower Mississippi-Baton Rouge
+08070100	Cataloging Unit	Lower Mississippi-Baton Rouge
+080702	Accounting Unit	Lake Maurepas
+08070201	Cataloging Unit	Bayou Sara-Thompson
+08070202	Cataloging Unit	Amite
+08070203	Cataloging Unit	Tickfaw
+08070204	Cataloging Unit	Lake Maurepas
+08070205	Cataloging Unit	Tangipahoa
+080703	Accounting Unit	Lower Grand
+08070300	Cataloging Unit	Lower Grand
+0808	Subregion	Louisiana Coastal
+080801	Accounting Unit	Atchafalaya-Vermilion
+08080101	Cataloging Unit	Atchafalaya
+08080102	Cataloging Unit	Bayou Teche
+08080103	Cataloging Unit	Vermilion
+080802	Accounting Unit	Calcasieu-Mermentau
+08080201	Cataloging Unit	Mermentau Headwaters
+08080202	Cataloging Unit	Mermentau
+08080203	Cataloging Unit	Upper Calcasieu
+08080204	Cataloging Unit	Whisky Chitto
+08080205	Cataloging Unit	West Fork Calcasieu
+08080206	Cataloging Unit	Lower Calcasieu
+0809	Subregion	Lower Mississippi
+080901	Accounting Unit	Lower Mississippi-New Orleans
+08090100	Cataloging Unit	Lower Mississippi-New Orleans
+080902	Accounting Unit	Lake Pontchartrain
+08090201	Cataloging Unit	Liberty Bayou-Tchefuncta
+08090202	Cataloging Unit	Lake Pontchartrain
+08090203	Cataloging Unit	Eastern Louisiana Coastal
+080903	Accounting Unit	Central Louisiana Coastal
+08090301	Cataloging Unit	East Central Louisiana Coastal
+08090302	Cataloging Unit	West Central Louisiana Coastal
+09	Region	Souris-Red-Rainy Region
+0901	Subregion	Souris
+090100	Accounting Unit	Souris
+09010001	Cataloging Unit	Upper Souris
+09010002	Cataloging Unit	Des Lacs
+09010003	Cataloging Unit	Lower Souris
+09010004	Cataloging Unit	Willow
+09010005	Cataloging Unit	Deep
+09010006	Cataloging Unit	Long Creek
+09010007	Cataloging Unit	Headwaters Souris River
+09010008	Cataloging Unit	Moose Mountain Creek-Souris River
+0902	Subregion	Red
+090201	Accounting Unit	Upper Red
+09020101	Cataloging Unit	Bois De Sioux
+09020102	Cataloging Unit	Mustinka
+09020103	Cataloging Unit	Otter Tail
+09020104	Cataloging Unit	Upper Red
+09020105	Cataloging Unit	Western Wild Rice
+09020106	Cataloging Unit	Buffalo
+09020107	Cataloging Unit	Elm-Marsh
+09020108	Cataloging Unit	Eastern Wild Rice
+09020109	Cataloging Unit	Goose
+090202	Accounting Unit	Devils Lake-Sheyenne
+09020201	Cataloging Unit	Devils Lake
+09020202	Cataloging Unit	Upper Sheyenne
+09020203	Cataloging Unit	Middle Sheyenne
+09020204	Cataloging Unit	Lower Sheyenne
+09020205	Cataloging Unit	Maple
+090203	Accounting Unit	Lower Red
+09020301	Cataloging Unit	Sandhill-Wilson
+09020302	Cataloging Unit	Red Lakes
+09020303	Cataloging Unit	Red Lake
+09020304	Cataloging Unit	Thief
+09020305	Cataloging Unit	Clearwater
+09020306	Cataloging Unit	Grand Marais-Red
+09020307	Cataloging Unit	Turtle
+09020308	Cataloging Unit	Forest
+09020309	Cataloging Unit	Snake
+09020310	Cataloging Unit	Park
+09020311	Cataloging Unit	Middle Red
+09020312	Cataloging Unit	Two Rivers
+09020313	Cataloging Unit	Pembina
+09020314	Cataloging Unit	Roseau
+09020315	Cataloging Unit	Upper Pembina River
+09020316	Cataloging Unit	Lower Pembina River
+0903	Subregion	Rainy
+090300	Accounting Unit	Rainy
+09030001	Cataloging Unit	Rainy Headwaters
+09030002	Cataloging Unit	Vermilion
+09030003	Cataloging Unit	Rainy Lake
+09030004	Cataloging Unit	Upper Rainy
+09030005	Cataloging Unit	Little Fork
+09030006	Cataloging Unit	Big Fork
+09030007	Cataloging Unit	Rapid
+09030008	Cataloging Unit	Lower Rainy
+09030009	Cataloging Unit	Lake of the Woods
+0904	Subregion	Saskatchewan River
+090400	Accounting Unit	Upper South Saskatchewan River
+09040001	Cataloging Unit	St. Marys
+09040002	Cataloging Unit	Belly
+10	Region	Missouri Region
+1001	Subregion	The Saskatchewan River Basin
+100100	Accounting Unit	Saskatchewan
+10010001	Cataloging Unit	Belly
+10010002	Cataloging Unit	St. Mary
+1002	Subregion	Missouri Headwaters
+100200	Accounting Unit	Missouri Headwaters
+10020001	Cataloging Unit	Red Rock
+10020002	Cataloging Unit	Beaverhead
+10020003	Cataloging Unit	Ruby
+10020004	Cataloging Unit	Big Hole
+10020005	Cataloging Unit	Jefferson
+10020006	Cataloging Unit	Boulder
+10020007	Cataloging Unit	Madison
+10020008	Cataloging Unit	Gallatin
+1003	Subregion	Missouri-Marias
+100301	Accounting Unit	Upper Missouri
+10030101	Cataloging Unit	Upper Missouri
+10030102	Cataloging Unit	Upper Missouri-Dearborn
+10030103	Cataloging Unit	Smith
+10030104	Cataloging Unit	Sun
+10030105	Cataloging Unit	Belt
+100302	Accounting Unit	Marias
+10030201	Cataloging Unit	Two Medicine
+10030202	Cataloging Unit	Cut Bank
+10030203	Cataloging Unit	Marias
+10030204	Cataloging Unit	Willow
+10030205	Cataloging Unit	Teton
+1004	Subregion	Missouri-Musselshell
+100401	Accounting Unit	Fort Peck Lake
+10040101	Cataloging Unit	Bullwhacker-Dog
+10040102	Cataloging Unit	Arrow
+10040103	Cataloging Unit	Judith
+10040104	Cataloging Unit	Fort Peck Reservoir
+10040105	Cataloging Unit	Big Dry
+10040106	Cataloging Unit	Little Dry
+100402	Accounting Unit	Musselshell
+10040201	Cataloging Unit	Upper Musselshell
+10040202	Cataloging Unit	Middle Musselshell
+10040203	Cataloging Unit	Flatwillow
+10040204	Cataloging Unit	Box Elder
+10040205	Cataloging Unit	Lower Musselshell
+1005	Subregion	Milk
+100500	Accounting Unit	Milk
+10050001	Cataloging Unit	Milk Headwaters
+10050002	Cataloging Unit	Upper Milk
+10050003	Cataloging Unit	Wild Horse Lake
+10050004	Cataloging Unit	Middle Milk
+10050005	Cataloging Unit	Big Sandy
+10050006	Cataloging Unit	Sage
+10050007	Cataloging Unit	Lodge
+10050008	Cataloging Unit	Battle
+10050009	Cataloging Unit	Peoples
+10050010	Cataloging Unit	Cottonwood
+10050011	Cataloging Unit	Whitewater
+10050012	Cataloging Unit	Lower Milk
+10050013	Cataloging Unit	Frenchman
+10050014	Cataloging Unit	Beaver
+10050015	Cataloging Unit	Rock
+10050016	Cataloging Unit	Porcupine
+1006	Subregion	Missouri-Poplar
+100600	Accounting Unit	Missouri-Poplar
+10060001	Cataloging Unit	Prarie Elk-Wolf
+10060002	Cataloging Unit	Redwater
+10060003	Cataloging Unit	Poplar
+10060004	Cataloging Unit	West Fork Poplar
+10060005	Cataloging Unit	Charlie-Little Muddy
+10060006	Cataloging Unit	Big Muddy
+10060007	Cataloging Unit	Brush Lake Closed Basin
+1007	Subregion	Upper Yellowstone
+100700	Accounting Unit	Upper Yellowstone
+10070001	Cataloging Unit	Yellowstone Headwaters
+10070002	Cataloging Unit	Upper Yellowstone
+10070003	Cataloging Unit	Shields
+10070004	Cataloging Unit	Upper Yellowstone-Lake Basin
+10070005	Cataloging Unit	Stillwater
+10070006	Cataloging Unit	Clarks Fork Yellowstone
+10070007	Cataloging Unit	Upper Yellowstone-Pompeys Pillar
+10070008	Cataloging Unit	Pryor
+1008	Subregion	Big Horn
+100800	Accounting Unit	Big Horn
+10080001	Cataloging Unit	Upper Wind
+10080002	Cataloging Unit	Little Wind
+10080003	Cataloging Unit	Popo Agie
+10080004	Cataloging Unit	Muskrat
+10080005	Cataloging Unit	Lower Wind
+10080006	Cataloging Unit	Badwater
+10080007	Cataloging Unit	Upper Bighorn
+10080008	Cataloging Unit	Nowood
+10080009	Cataloging Unit	Greybull
+10080010	Cataloging Unit	Big Horn Lake
+10080011	Cataloging Unit	Dry
+10080012	Cataloging Unit	North Fork Shoshone
+10080013	Cataloging Unit	South Fork Shoshone
+10080014	Cataloging Unit	Shoshone
+10080015	Cataloging Unit	Lower Bighorn
+10080016	Cataloging Unit	Little Bighorn
+1009	Subregion	Powder-Tongue
+100901	Accounting Unit	Tongue
+10090101	Cataloging Unit	Upper Tongue
+10090102	Cataloging Unit	Lower Tongue
+100902	Accounting Unit	Powder
+10090201	Cataloging Unit	Middle Fork Powder
+10090202	Cataloging Unit	Upper Powder
+10090203	Cataloging Unit	South Fork Powder
+10090204	Cataloging Unit	Salt
+10090205	Cataloging Unit	Crazy Woman
+10090206	Cataloging Unit	Clear
+10090207	Cataloging Unit	Middle Powder
+10090208	Cataloging Unit	Little Powder
+10090209	Cataloging Unit	Lower Powder
+10090210	Cataloging Unit	Mizpah
+1010	Subregion	Lower Yellowstone
+101000	Accounting Unit	Lower Yellowstone
+10100001	Cataloging Unit	Lower Yellowstone-Sunday
+10100002	Cataloging Unit	Big Porcupine
+10100003	Cataloging Unit	Rosebud
+10100004	Cataloging Unit	Lower Yellowstone
+10100005	Cataloging Unit	O'Fallon
+1011	Subregion	Missouri-Little Missouri
+101101	Accounting Unit	Lake Sakakawea
+10110101	Cataloging Unit	Lake Sakakawea
+10110102	Cataloging Unit	Little Muddy
+101102	Accounting Unit	Little Missouri
+10110201	Cataloging Unit	Upper Little Missouri
+10110202	Cataloging Unit	Boxelder
+10110203	Cataloging Unit	Middle Little Missouri
+10110204	Cataloging Unit	Beaver
+10110205	Cataloging Unit	Lower Little Missouri
+1012	Subregion	Cheyenne
+101201	Accounting Unit	Cheyenne
+10120101	Cataloging Unit	Antelope
+10120102	Cataloging Unit	Dry Fork Cheyenne
+10120103	Cataloging Unit	Upper Cheyenne
+10120104	Cataloging Unit	Lance
+10120105	Cataloging Unit	Lightning
+10120106	Cataloging Unit	Angostura Reservoir
+10120107	Cataloging Unit	Beaver
+10120108	Cataloging Unit	Hat
+10120109	Cataloging Unit	Middle Cheyenne-Spring
+10120110	Cataloging Unit	Rapid
+10120111	Cataloging Unit	Middle Cheyenne-Elk
+10120112	Cataloging Unit	Lower Cheyenne
+10120113	Cataloging Unit	Cherry
+101202	Accounting Unit	Belle Fourche
+10120201	Cataloging Unit	Upper Belle Fourche
+10120202	Cataloging Unit	Lower Belle Fourche
+10120203	Cataloging Unit	Redwater
+1013	Subregion	Missouri-Oahe
+101301	Accounting Unit	Lake Oahe
+10130101	Cataloging Unit	Painted Woods-Square Butte
+10130102	Cataloging Unit	Upper Lake Oahe
+10130103	Cataloging Unit	Apple
+10130104	Cataloging Unit	Beaver
+10130105	Cataloging Unit	Lower Lake Oahe
+10130106	Cataloging Unit	West Missouri Coteau
+101302	Accounting Unit	Cannonball-Heart-Knife
+10130201	Cataloging Unit	Knife
+10130202	Cataloging Unit	Upper Heart
+10130203	Cataloging Unit	Lower Heart
+10130204	Cataloging Unit	Upper Cannonball
+10130205	Cataloging Unit	Cedar
+10130206	Cataloging Unit	Lower Cannonball
+101303	Accounting Unit	Grand-Moreau
+10130301	Cataloging Unit	North Fork Grand
+10130302	Cataloging Unit	South Fork Grand
+10130303	Cataloging Unit	Grand
+10130304	Cataloging Unit	South Fork Moreau
+10130305	Cataloging Unit	Upper Moreau
+10130306	Cataloging Unit	Lower Moreau
+1014	Subregion	Missouri-White
+101401	Accounting Unit	Fort Randall Reservoir
+10140101	Cataloging Unit	Fort Randall Reservoir
+10140102	Cataloging Unit	Bad
+10140103	Cataloging Unit	Medicine Knoll
+10140104	Cataloging Unit	Medicine
+10140105	Cataloging Unit	Crow
+101402	Accounting Unit	White
+10140201	Cataloging Unit	Upper White
+10140202	Cataloging Unit	Middle White
+10140203	Cataloging Unit	Little White
+10140204	Cataloging Unit	Lower White
+1015	Subregion	Niobrara
+101500	Accounting Unit	Niobrara
+10150001	Cataloging Unit	Ponca
+10150002	Cataloging Unit	Niobrara Headwaters
+10150003	Cataloging Unit	Upper Niobrara
+10150004	Cataloging Unit	Middle Niobrara
+10150005	Cataloging Unit	Snake
+10150006	Cataloging Unit	Keya Paha
+10150007	Cataloging Unit	Lower Niobrara
+1016	Subregion	James
+101600	Accounting Unit	James
+10160001	Cataloging Unit	James Headwaters
+10160002	Cataloging Unit	Pipestem
+10160003	Cataloging Unit	Upper James
+10160004	Cataloging Unit	Elm
+10160005	Cataloging Unit	Mud
+10160006	Cataloging Unit	Middle James
+10160007	Cataloging Unit	North Fork Snake
+10160008	Cataloging Unit	Snake
+10160009	Cataloging Unit	Turtle
+10160010	Cataloging Unit	North Big Sioux Coteau
+10160011	Cataloging Unit	Lower James
+1017	Subregion	Missouri-Big Sioux
+101701	Accounting Unit	Lewis and Clark Lake
+10170101	Cataloging Unit	Lewis and Clark Lake
+10170102	Cataloging Unit	Vermillion
+10170103	Cataloging Unit	Lake Thompson
+101702	Accounting Unit	Big Sioux
+10170201	Cataloging Unit	Upper Big Sioux
+10170202	Cataloging Unit	Middle Big Sioux
+10170203	Cataloging Unit	Lower Big Sioux
+10170204	Cataloging Unit	Rock
+1018	Subregion	North Platte
+101800	Accounting Unit	North Platte
+10180001	Cataloging Unit	North Platte Headwaters
+10180002	Cataloging Unit	Upper North Platte
+10180003	Cataloging Unit	Pathfinder-Seminoe Reservoirs
+10180004	Cataloging Unit	Medicine Bow
+10180005	Cataloging Unit	Little Medicine Bow
+10180006	Cataloging Unit	Sweetwater
+10180007	Cataloging Unit	Middle North Platte-Casper
+10180008	Cataloging Unit	Glendo Reservoir
+10180009	Cataloging Unit	Middle North Platte-Scotts Bluff
+10180010	Cataloging Unit	Upper Laramie
+10180011	Cataloging Unit	Lower Laramie
+10180012	Cataloging Unit	Horse
+10180013	Cataloging Unit	Pumpkin
+10180014	Cataloging Unit	Lower North Platte
+1019	Subregion	South Platte
+101900	Accounting Unit	South Platte
+10190001	Cataloging Unit	South Platte Headwaters
+10190002	Cataloging Unit	Upper South Platte
+10190003	Cataloging Unit	Middle South Platte-Cherry Creek
+10190004	Cataloging Unit	Clear
+10190005	Cataloging Unit	St. Vrain
+10190006	Cataloging Unit	Big Thompson
+10190007	Cataloging Unit	Cache La Poudre
+10190008	Cataloging Unit	Lone Tree-Owl
+10190009	Cataloging Unit	Crow
+10190010	Cataloging Unit	Kiowa
+10190011	Cataloging Unit	Bijou
+10190012	Cataloging Unit	Middle South Platte-Sterling
+10190013	Cataloging Unit	Beaver
+10190014	Cataloging Unit	Pawnee
+10190015	Cataloging Unit	Upper Lodgepole
+10190016	Cataloging Unit	Lower Lodgepole
+10190017	Cataloging Unit	Sidney Draw
+10190018	Cataloging Unit	Lower South Platte
+1020	Subregion	Platte
+102001	Accounting Unit	Middle Platte
+10200101	Cataloging Unit	Middle Platte-Buffalo
+10200102	Cataloging Unit	Wood
+10200103	Cataloging Unit	Middle Platte-Prairie
+102002	Accounting Unit	Lower Platte
+10200201	Cataloging Unit	Lower Platte-Shell
+10200202	Cataloging Unit	Lower Platte
+10200203	Cataloging Unit	Salt
+1021	Subregion	Loup
+102100	Accounting Unit	Loup
+10210001	Cataloging Unit	Upper Middle Loup
+10210002	Cataloging Unit	Dismal
+10210003	Cataloging Unit	Lower Middle Loup
+10210004	Cataloging Unit	South Loup
+10210005	Cataloging Unit	Mud
+10210006	Cataloging Unit	Upper North Loup
+10210007	Cataloging Unit	Lower North Loup
+10210008	Cataloging Unit	Calamus
+10210009	Cataloging Unit	Loup
+10210010	Cataloging Unit	Cedar
+1022	Subregion	Elkhorn
+102200	Accounting Unit	Elkhorn
+10220001	Cataloging Unit	Upper Elkhorn
+10220002	Cataloging Unit	North Fork Elkhorn
+10220003	Cataloging Unit	Lower Elkhorn
+10220004	Cataloging Unit	Logan
+1023	Subregion	Missouri-Little Sioux
+102300	Accounting Unit	Missouri-Little Sioux
+10230001	Cataloging Unit	Blackbird-Soldier
+10230002	Cataloging Unit	Floyd
+10230003	Cataloging Unit	Little Sioux
+10230004	Cataloging Unit	Monona-Harrison Ditch
+10230005	Cataloging Unit	Maple
+10230006	Cataloging Unit	Big Papillion-Mosquito
+10230007	Cataloging Unit	Boyer
+1024	Subregion	Missouri-Nishnabotna
+102400	Accounting Unit	Missouri-Nishnabotna
+10240001	Cataloging Unit	Keg-Weeping Water
+10240002	Cataloging Unit	West Nishnabotna
+10240003	Cataloging Unit	East Nishnabotna
+10240004	Cataloging Unit	Nishnabotna
+10240005	Cataloging Unit	Tarkio-Wolf
+10240006	Cataloging Unit	Little Nemaha
+10240007	Cataloging Unit	South Fork Big Nemaha
+10240008	Cataloging Unit	Big Nemaha
+10240009	Cataloging Unit	West Nodaway
+10240010	Cataloging Unit	Nodaway
+10240011	Cataloging Unit	Independence-Sugar
+10240012	Cataloging Unit	Platte
+10240013	Cataloging Unit	One Hundred and Two
+1025	Subregion	Republican
+102500	Accounting Unit	Republican
+10250001	Cataloging Unit	Arikaree
+10250002	Cataloging Unit	North Fork Republican
+10250003	Cataloging Unit	South Fork Republican
+10250004	Cataloging Unit	Upper Republican
+10250005	Cataloging Unit	Frenchman
+10250006	Cataloging Unit	Stinking Water
+10250007	Cataloging Unit	Red Willow
+10250008	Cataloging Unit	Medicine
+10250009	Cataloging Unit	Harlan County Reservoir
+10250010	Cataloging Unit	Upper Sappa
+10250011	Cataloging Unit	Lower Sappa
+10250012	Cataloging Unit	South Fork Beaver
+10250013	Cataloging Unit	Little Beaver
+10250014	Cataloging Unit	Beaver
+10250015	Cataloging Unit	Prairie Dog
+10250016	Cataloging Unit	Middle Republican
+10250017	Cataloging Unit	Lower Republican
+1026	Subregion	Smoky Hill
+102600	Accounting Unit	Smoky Hill
+10260001	Cataloging Unit	Smoky Hill Headwaters
+10260002	Cataloging Unit	North Fork Smoky Hill
+10260003	Cataloging Unit	Upper Smoky Hill
+10260004	Cataloging Unit	Ladder
+10260005	Cataloging Unit	Hackberry
+10260006	Cataloging Unit	Middle Smoky Hill
+10260007	Cataloging Unit	Big
+10260008	Cataloging Unit	Lower Smoky Hill
+10260009	Cataloging Unit	Upper Saline
+10260010	Cataloging Unit	Lower Saline
+10260011	Cataloging Unit	Upper North Fork Solomon
+10260012	Cataloging Unit	Lower North Fork Solomon
+10260013	Cataloging Unit	Upper South Fork Solomon
+10260014	Cataloging Unit	Lower South Fork Solomon
+10260015	Cataloging Unit	Solomon
+1027	Subregion	Kansas
+102701	Accounting Unit	Kansas
+10270101	Cataloging Unit	Upper Kansas
+10270102	Cataloging Unit	Middle Kansas
+10270103	Cataloging Unit	Delaware
+10270104	Cataloging Unit	Lower Kansas, Kansas
+102702	Accounting Unit	Big Blue
+10270201	Cataloging Unit	Upper Big Blue
+10270202	Cataloging Unit	Middle Big Blue
+10270203	Cataloging Unit	West Fork Big Blue
+10270204	Cataloging Unit	Turkey
+10270205	Cataloging Unit	Lower Big Blue
+10270206	Cataloging Unit	Upper Little Blue
+10270207	Cataloging Unit	Lower Little Blue
+1028	Subregion	Chariton-Grand
+102801	Accounting Unit	Grand
+10280101	Cataloging Unit	Upper Grand
+10280102	Cataloging Unit	Thompson
+10280103	Cataloging Unit	Lower Grand
+102802	Accounting Unit	Chariton
+10280201	Cataloging Unit	Upper Chariton
+10280202	Cataloging Unit	Lower Chariton
+10280203	Cataloging Unit	Little Chariton
+1029	Subregion	Gasconade-Osage
+102901	Accounting Unit	Osage
+10290101	Cataloging Unit	Upper Marais Des Cygnes
+10290102	Cataloging Unit	Lower Marais Des Cygnes
+10290103	Cataloging Unit	Little Osage
+10290104	Cataloging Unit	Marmaton
+10290105	Cataloging Unit	Harry S. Truman Reservoir
+10290106	Cataloging Unit	Sac
+10290107	Cataloging Unit	Pomme De Terre
+10290108	Cataloging Unit	South Grand
+10290109	Cataloging Unit	Lake Of The Ozarks
+10290110	Cataloging Unit	Niangua
+10290111	Cataloging Unit	Lower Osage
+102902	Accounting Unit	Gasconade
+10290201	Cataloging Unit	Upper Gasconade
+10290202	Cataloging Unit	Big Piney
+10290203	Cataloging Unit	Lower Gasconade
+1030	Subregion	Lower Missouri
+103001	Accounting Unit	Lower Missouri-Blackwater
+10300101	Cataloging Unit	Lower Missouri-Crooked
+10300102	Cataloging Unit	Lower Missouri-Moreau
+10300103	Cataloging Unit	Lamine
+10300104	Cataloging Unit	Blackwater
+103002	Accounting Unit	Lower Missouri
+10300200	Cataloging Unit	Lower Missouri
+11	Region	Arkansas-White-Red Region
+1101	Subregion	Upper White
+110100	Accounting Unit	Upper White
+11010001	Cataloging Unit	Beaver Reservoir
+11010002	Cataloging Unit	James
+11010003	Cataloging Unit	Bull Shoals Lake
+11010004	Cataloging Unit	Middle White
+11010005	Cataloging Unit	Buffalo
+11010006	Cataloging Unit	North Fork White
+11010007	Cataloging Unit	Upper Black
+11010008	Cataloging Unit	Current
+11010009	Cataloging Unit	Lower Black
+11010010	Cataloging Unit	Spring
+11010011	Cataloging Unit	Eleven Point
+11010012	Cataloging Unit	Strawberry
+11010013	Cataloging Unit	Upper White-Village
+11010014	Cataloging Unit	Little Red
+1102	Subregion	Upper Arkansas
+110200	Accounting Unit	Upper Arkansas
+11020001	Cataloging Unit	Arkansas Headwaters
+11020002	Cataloging Unit	Upper Arkansas
+11020003	Cataloging Unit	Fountain
+11020004	Cataloging Unit	Chico
+11020005	Cataloging Unit	Upper Arkansas-Lake Meredith
+11020006	Cataloging Unit	Huerfano
+11020007	Cataloging Unit	Apishapa
+11020008	Cataloging Unit	Horse
+11020009	Cataloging Unit	Upper Arkansas-John Martin Reservoir
+11020010	Cataloging Unit	Purgatoire
+11020011	Cataloging Unit	Big Sandy
+11020012	Cataloging Unit	Rush
+11020013	Cataloging Unit	Two Butte
+1103	Subregion	Middle Arkansas
+110300	Accounting Unit	Middle Arkansas
+11030001	Cataloging Unit	Middle Arkansas-Lake Mckinney
+11030002	Cataloging Unit	Whitewoman
+11030003	Cataloging Unit	Arkansas-Dodge City
+11030004	Cataloging Unit	Coon-Pickerel
+11030005	Cataloging Unit	Pawnee
+11030006	Cataloging Unit	Buckner
+11030007	Cataloging Unit	Upper Walnut Creek
+11030008	Cataloging Unit	Lower Walnut Creek
+11030009	Cataloging Unit	Rattlesnake
+11030010	Cataloging Unit	Gar-Peace
+11030011	Cataloging Unit	Cow
+11030012	Cataloging Unit	Little Arkansas
+11030013	Cataloging Unit	Middle Arkansas-Slate
+11030014	Cataloging Unit	North Fork Ninnescah
+11030015	Cataloging Unit	South Fork Ninnescah
+11030016	Cataloging Unit	Ninnescah
+11030017	Cataloging Unit	Upper Walnut River
+11030018	Cataloging Unit	Lower Walnut River
+1104	Subregion	Upper Cimarron
+110400	Accounting Unit	Upper Cimarron
+11040001	Cataloging Unit	Cimarron Headwaters
+11040002	Cataloging Unit	Upper Cimarron
+11040003	Cataloging Unit	North Fork Cimarron
+11040004	Cataloging Unit	Sand Arroyo
+11040005	Cataloging Unit	Bear
+11040006	Cataloging Unit	Upper Cimarron-Liberal
+11040007	Cataloging Unit	Crooked
+11040008	Cataloging Unit	Upper Cimarron-Bluff
+1105	Subregion	Lower Cimarron
+110500	Accounting Unit	Lower Cimarron
+11050001	Cataloging Unit	Lower Cimarron-Eagle Chief
+11050002	Cataloging Unit	Lower Cimarron-Skeleton
+11050003	Cataloging Unit	Lower Cimarron
+1106	Subregion	Arkansas-Keystone
+110600	Accounting Unit	Arkansas-Keystone
+11060001	Cataloging Unit	Kaw Lake
+11060002	Cataloging Unit	Upper Salt Fork Arkansas
+11060003	Cataloging Unit	Medicine Lodge
+11060004	Cataloging Unit	Lower Salt Fork Arkansas
+11060005	Cataloging Unit	Chikaskia
+11060006	Cataloging Unit	Black Bear-Red Rock
+1107	Subregion	Neosho-Verdigris
+110701	Accounting Unit	Verdigris
+11070101	Cataloging Unit	Upper Verdigris
+11070102	Cataloging Unit	Fall
+11070103	Cataloging Unit	Middle Verdigris
+11070104	Cataloging Unit	Elk
+11070105	Cataloging Unit	Lower Verdigris
+11070106	Cataloging Unit	Caney
+11070107	Cataloging Unit	Bird
+110702	Accounting Unit	Neosho
+11070201	Cataloging Unit	Neosho Headwaters
+11070202	Cataloging Unit	Upper Cottonwood
+11070203	Cataloging Unit	Lower Cottonwood
+11070204	Cataloging Unit	Upper Neosho
+11070205	Cataloging Unit	Middle Neosho
+11070206	Cataloging Unit	Lake O' The Cherokees
+11070207	Cataloging Unit	Spring
+11070208	Cataloging Unit	Elk
+11070209	Cataloging Unit	Lower Neosho
+1108	Subregion	Upper Canadian
+110800	Accounting Unit	Upper Canadian
+11080001	Cataloging Unit	Canadian Headwaters
+11080002	Cataloging Unit	Cimarron
+11080003	Cataloging Unit	Upper Canadian
+11080004	Cataloging Unit	Mora
+11080005	Cataloging Unit	Conchas
+11080006	Cataloging Unit	Upper Canadian-Ute Reservoir
+11080007	Cataloging Unit	Ute
+11080008	Cataloging Unit	Revuelto
+1109	Subregion	Lower Canadian
+110901	Accounting Unit	Middle Canadian
+11090101	Cataloging Unit	Middle Canadian-Trujillo
+11090102	Cataloging Unit	Punta De Agua
+11090103	Cataloging Unit	Rita Blanca
+11090104	Cataloging Unit	Carrizo
+11090105	Cataloging Unit	Lake Meredith
+11090106	Cataloging Unit	Middle Canadian-Spring
+110902	Accounting Unit	Lower Canadian
+11090201	Cataloging Unit	Lower Canadian-Deer
+11090202	Cataloging Unit	Lower Canadian-Walnut
+11090203	Cataloging Unit	Little
+11090204	Cataloging Unit	Lower Canadian
+1110	Subregion	North Canadian
+111001	Accounting Unit	Upper Beaver
+11100101	Cataloging Unit	Upper Beaver
+11100102	Cataloging Unit	Middle Beaver
+11100103	Cataloging Unit	Coldwater
+11100104	Cataloging Unit	Palo Duro
+111002	Accounting Unit	Lower Beaver
+11100201	Cataloging Unit	Lower Beaver
+11100202	Cataloging Unit	Upper Wolf
+11100203	Cataloging Unit	Lower Wolf
+111003	Accounting Unit	Lower North Canadian
+11100301	Cataloging Unit	Middle North Canadian
+11100302	Cataloging Unit	Lower North Canadian
+11100303	Cataloging Unit	Deep Fork
+1111	Subregion	Lower Arkansas
+111101	Accounting Unit	Robert S. Kerr Reservoir
+11110101	Cataloging Unit	Polecat-Snake
+11110102	Cataloging Unit	Dirty-Greenleaf
+11110103	Cataloging Unit	Illinois
+11110104	Cataloging Unit	Robert S. Kerr Reservoir
+11110105	Cataloging Unit	Poteau
+111102	Accounting Unit	Lower Arkansas-Fourche La Fave
+11110201	Cataloging Unit	Frog-Mulberry
+11110202	Cataloging Unit	Dardanelle Reservoir
+11110203	Cataloging Unit	Lake Conway-Point Remove
+11110204	Cataloging Unit	Petit Jean
+11110205	Cataloging Unit	Cadron
+11110206	Cataloging Unit	Fourche La Fave
+11110207	Cataloging Unit	Lower Arkansas-Maumelle
+1112	Subregion	Red Headwaters
+111201	Accounting Unit	Prairie Dog Town Fork Red
+11120101	Cataloging Unit	Tierra Blanca
+11120102	Cataloging Unit	Palo Duro
+11120103	Cataloging Unit	Upper Prairie Dog Town Fork Red
+11120104	Cataloging Unit	Tule
+11120105	Cataloging Unit	Lower Prairie Dog Town Fork Red
+111202	Accounting Unit	Salt Fork Red
+11120201	Cataloging Unit	Upper Salt Fork Red
+11120202	Cataloging Unit	Lower Salt Fork Red
+111203	Accounting Unit	North Fork Red
+11120301	Cataloging Unit	Upper North Fork Red
+11120302	Cataloging Unit	Middle North Fork Red
+11120303	Cataloging Unit	Lower North Fork Red
+11120304	Cataloging Unit	Elm Fork Red
+1113	Subregion	Red-Washita
+111301	Accounting Unit	Red-Pease
+11130101	Cataloging Unit	Groesbeck-Sandy
+11130102	Cataloging Unit	Blue-China
+11130103	Cataloging Unit	North Pease
+11130104	Cataloging Unit	Middle Pease
+11130105	Cataloging Unit	Pease
+111302	Accounting Unit	Red-Lake Texoma
+11130201	Cataloging Unit	Farmers-Mud
+11130202	Cataloging Unit	Cache
+11130203	Cataloging Unit	West Cache
+11130204	Cataloging Unit	North Wichita
+11130205	Cataloging Unit	South Wichita
+11130206	Cataloging Unit	Wichita
+11130207	Cataloging Unit	Southern Beaver
+11130208	Cataloging Unit	Northern Beaver
+11130209	Cataloging Unit	Little Wichita
+11130210	Cataloging Unit	Lake Texoma
+111303	Accounting Unit	Washita
+11130301	Cataloging Unit	Washita Headwaters
+11130302	Cataloging Unit	Upper Washita
+11130303	Cataloging Unit	Middle Washita
+11130304	Cataloging Unit	Lower Washita
+1114	Subregion	Red-Sulphur
+111401	Accounting Unit	Red-Little
+11140101	Cataloging Unit	Bois D'Arc-Island
+11140102	Cataloging Unit	Blue
+11140103	Cataloging Unit	Muddy Boggy
+11140104	Cataloging Unit	Clear Boggy
+11140105	Cataloging Unit	Kiamichi
+11140106	Cataloging Unit	Pecan-Waterhole
+11140107	Cataloging Unit	Upper Little
+11140108	Cataloging Unit	Mountain Fork
+11140109	Cataloging Unit	Lower Little Arkansas, Oklahoma
+111402	Accounting Unit	Red-Saline
+11140201	Cataloging Unit	Mckinney-Posten Bayous
+11140202	Cataloging Unit	Middle Red-Coushatta
+11140203	Cataloging Unit	Loggy Bayou
+11140204	Cataloging Unit	Red Chute
+11140205	Cataloging Unit	Bodcau Bayou
+11140206	Cataloging Unit	Bayou Pierre
+11140207	Cataloging Unit	Lower Red-Lake Iatt
+11140208	Cataloging Unit	Saline Bayou
+11140209	Cataloging Unit	Black Lake Bayou
+111403	Accounting Unit	Big Cypress-Sulphur
+11140301	Cataloging Unit	Sulphur Headwaters
+11140302	Cataloging Unit	Lower Sulphur
+11140303	Cataloging Unit	White Oak Bayou
+11140304	Cataloging Unit	Cross Bayou
+11140305	Cataloging Unit	Lake O'The Pines
+11140306	Cataloging Unit	Caddo Lake
+11140307	Cataloging Unit	Little Cypress
+12	Region	Texas-Gulf Region
+1201	Subregion	Sabine
+120100	Accounting Unit	Sabine
+12010001	Cataloging Unit	Upper Sabine
+12010002	Cataloging Unit	Middle Sabine
+12010003	Cataloging Unit	Lake Fork
+12010004	Cataloging Unit	Toledo Bend Reservoir
+12010005	Cataloging Unit	Lower Sabine
+1202	Subregion	Neches
+120200	Accounting Unit	Neches
+12020001	Cataloging Unit	Upper Neches
+12020002	Cataloging Unit	Middle Neches
+12020003	Cataloging Unit	Lower Neches
+12020004	Cataloging Unit	Upper Angelina
+12020005	Cataloging Unit	Lower Angelina
+12020006	Cataloging Unit	Village
+12020007	Cataloging Unit	Pine Island Bayou
+1203	Subregion	Trinity
+120301	Accounting Unit	Upper Trinity
+12030101	Cataloging Unit	Upper West Fork Trinity
+12030102	Cataloging Unit	Lower West Fork Trinity
+12030103	Cataloging Unit	Elm Fork Trinity
+12030104	Cataloging Unit	Denton
+12030105	Cataloging Unit	Upper Trinity
+12030106	Cataloging Unit	East Fork Trinity
+12030107	Cataloging Unit	Cedar
+12030108	Cataloging Unit	Richland
+12030109	Cataloging Unit	Chambers
+120302	Accounting Unit	Lower Trinity
+12030201	Cataloging Unit	Lower Trinity-Tehuacana
+12030202	Cataloging Unit	Lower Trinity-Kickapoo
+12030203	Cataloging Unit	Lower Trinity
+1204	Subregion	Galveston Bay-San Jacinto
+120401	Accounting Unit	San Jacinto
+12040101	Cataloging Unit	West Fork San Jacinto
+12040102	Cataloging Unit	Spring
+12040103	Cataloging Unit	East Fork San Jacinto
+12040104	Cataloging Unit	Buffalo-San Jacinto
+120402	Accounting Unit	Galveston Bay-Sabine Lake
+12040201	Cataloging Unit	Sabine Lake
+12040202	Cataloging Unit	East Galveston Bay
+12040203	Cataloging Unit	North Galveston Bay
+12040204	Cataloging Unit	West Galveston Bay
+12040205	Cataloging Unit	Austin-Oyster
+1205	Subregion	Brazos Headwaters
+120500	Accounting Unit	Brazos Headwaters
+12050001	Cataloging Unit	Yellow House Draw
+12050002	Cataloging Unit	Blackwater Draw
+12050003	Cataloging Unit	North Fork Double Mountain Fork Brazos
+12050004	Cataloging Unit	Double Mountain Fork Brazos
+12050005	Cataloging Unit	Running Water Draw
+12050006	Cataloging Unit	White
+12050007	Cataloging Unit	Salt Fork Brazos
+1206	Subregion	Middle Brazos
+120601	Accounting Unit	Middle Brazos-Clear Fork
+12060101	Cataloging Unit	Middle Brazos-Millers
+12060102	Cataloging Unit	Upper Clear Fork Brazos
+12060103	Cataloging Unit	Paint
+12060104	Cataloging Unit	Lower Clear Fork Brazos
+12060105	Cataloging Unit	Hubbard
+120602	Accounting Unit	Middle Brazos-Bosque
+12060201	Cataloging Unit	Middle Brazos-Palo Pinto
+12060202	Cataloging Unit	Middle Brazos-Lake Whitney
+12060203	Cataloging Unit	Bosque
+12060204	Cataloging Unit	North Bosque
+1207	Subregion	Lower Brazos
+120701	Accounting Unit	Lower Brazos
+12070101	Cataloging Unit	Lower Brazos-Little Brazos
+12070102	Cataloging Unit	Yegua
+12070103	Cataloging Unit	Navasota
+12070104	Cataloging Unit	Lower Brazos
+120702	Accounting Unit	Little
+12070201	Cataloging Unit	Leon
+12070202	Cataloging Unit	Cowhouse
+12070203	Cataloging Unit	Lampasas
+12070204	Cataloging Unit	Little
+12070205	Cataloging Unit	San Gabriel
+1208	Subregion	Upper Colorado
+1208	Subregion	UpperColorado
+120800	Accounting Unit	Upper Colorado
+12080001	Cataloging Unit	Lost Draw
+12080002	Cataloging Unit	Colorado Headwaters
+12080003	Cataloging Unit	Monument-Seminole Draws
+12080004	Cataloging Unit	Mustang Draw
+12080005	Cataloging Unit	Johnson Draw
+12080006	Cataloging Unit	Sulphur Springs Draw
+12080007	Cataloging Unit	Beals
+12080008	Cataloging Unit	Upper Colorado
+1209	Subregion	Lower Colorado-San Bernard Coastal
+120901	Accounting Unit	Middle Colorado-Concho
+12090101	Cataloging Unit	Middle Colorado-Elm
+12090102	Cataloging Unit	South Concho
+12090103	Cataloging Unit	Middle Concho
+12090104	Cataloging Unit	North Concho
+12090105	Cataloging Unit	Concho
+12090106	Cataloging Unit	Middle Colorado
+12090107	Cataloging Unit	Pecan Bayou
+12090108	Cataloging Unit	Jim Ned
+12090109	Cataloging Unit	San Saba
+12090110	Cataloging Unit	Brady
+120902	Accounting Unit	Middle Colorado-Llano
+12090201	Cataloging Unit	Buchanan-Lyndon B. Johnson Lakes
+12090202	Cataloging Unit	North Llano
+12090203	Cataloging Unit	South Llano
+12090204	Cataloging Unit	Llano
+12090205	Cataloging Unit	Austin-Travis Lakes
+12090206	Cataloging Unit	Pedernales
+120903	Accounting Unit	Lower Colorado
+12090301	Cataloging Unit	Lower Colorado-Cummins
+12090302	Cataloging Unit	Lower Colorado
+120904	Accounting Unit	San Bernard Coastal
+12090401	Cataloging Unit	San Bernard
+12090402	Cataloging Unit	East Matagorda Bay
+1210	Subregion	Central Texas Coastal
+121001	Accounting Unit	Lavaca
+12100101	Cataloging Unit	Lavaca
+12100102	Cataloging Unit	Navidad
+121002	Accounting Unit	Guadalupe
+12100201	Cataloging Unit	Upper Guadalupe
+12100202	Cataloging Unit	Middle Guadalupe
+12100203	Cataloging Unit	San Marcos
+12100204	Cataloging Unit	Lower Guadalupe
+121003	Accounting Unit	San Antonio
+12100301	Cataloging Unit	Upper San Antonio
+12100302	Cataloging Unit	Medina
+12100303	Cataloging Unit	Lower San Antonio
+12100304	Cataloging Unit	Cibolo
+121004	Accounting Unit	Central Texas Coastal
+12100401	Cataloging Unit	East Matagorda Bay
+12100402	Cataloging Unit	West Matagorda Bay
+12100403	Cataloging Unit	East San Antonio Bay
+12100404	Cataloging Unit	West San Antonio Bay
+12100405	Cataloging Unit	Aransas Bay
+12100406	Cataloging Unit	Mission
+12100407	Cataloging Unit	Aransas
+1211	Subregion	Nueces-Southwestern Texas Coastal
+121101	Accounting Unit	Nueces
+12110101	Cataloging Unit	Nueces Headwaters
+12110102	Cataloging Unit	West Nueces
+12110103	Cataloging Unit	Upper Nueces
+12110104	Cataloging Unit	Turkey
+12110105	Cataloging Unit	Middle Nueces
+12110106	Cataloging Unit	Upper Frio
+12110107	Cataloging Unit	Hondo
+12110108	Cataloging Unit	Lower Frio
+12110109	Cataloging Unit	San Miguel
+12110110	Cataloging Unit	Atascosa
+12110111	Cataloging Unit	Lower Nueces
+121102	Accounting Unit	Southwestern Texas Coastal
+12110201	Cataloging Unit	North Corpus Christi Bay
+12110202	Cataloging Unit	South Corpus Christi Bay
+12110203	Cataloging Unit	North Laguna Madre
+12110204	Cataloging Unit	San Fernando
+12110205	Cataloging Unit	Baffin Bay
+12110206	Cataloging Unit	Palo Blanco
+12110207	Cataloging Unit	Central Laguna Madre
+12110208	Cataloging Unit	South Laguna Madre
+13	Region	Rio Grande Region
+1301	Subregion	Rio Grande Headwaters
+130100	Accounting Unit	Rio Grande Headwaters
+13010001	Cataloging Unit	Rio Grande Headwaters
+13010002	Cataloging Unit	Alamosa-Trinchera
+13010003	Cataloging Unit	San Luis
+13010004	Cataloging Unit	Saguache
+13010005	Cataloging Unit	Conejos
+1302	Subregion	Rio Grande-Elephant Butte
+130201	Accounting Unit	Upper Rio Grande
+13020101	Cataloging Unit	Upper Rio Grande
+13020102	Cataloging Unit	Rio Chama
+130202	Accounting Unit	Rio Grande-Elephant Butte
+13020201	Cataloging Unit	Rio Grande-Santa Fe
+13020202	Cataloging Unit	Jemez
+13020203	Cataloging Unit	Rio Grande-Albuquerque
+13020204	Cataloging Unit	Rio Puerco
+13020205	Cataloging Unit	Arroyo Chico
+13020206	Cataloging Unit	North Plains
+13020207	Cataloging Unit	Rio San Jose
+13020208	Cataloging Unit	Plains of San Agustin
+13020209	Cataloging Unit	Rio Salado
+13020210	Cataloging Unit	Jornada Del Muerto
+13020211	Cataloging Unit	Elephant Butte Reservoir
+1303	Subregion	Rio Grande-Mimbres
+130301	Accounting Unit	Rio Grande-Caballo
+13030101	Cataloging Unit	Caballo
+13030102	Cataloging Unit	El Paso-Las Cruces
+13030103	Cataloging Unit	Jornada Draw
+130302	Accounting Unit	Mimbres
+13030201	Cataloging Unit	Playas Lake
+13030202	Cataloging Unit	Mimbres
+1304	Subregion	Rio Grande-Amistad
+130401	Accounting Unit	Rio Grande-Fort Quitman
+13040100	Cataloging Unit	Rio Grande-Fort Quitman
+130402	Accounting Unit	Rio Grande-Amistad
+13040201	Cataloging Unit	Cibolo-Red Light
+13040202	Cataloging Unit	Alamito
+13040203	Cataloging Unit	Black Hills-Fresno
+13040204	Cataloging Unit	Terlingua
+13040205	Cataloging Unit	Big Bend
+13040206	Cataloging Unit	Maravillas
+13040207	Cataloging Unit	Santiago Draw
+13040208	Cataloging Unit	Reagan-Sanderson
+13040209	Cataloging Unit	San Francisco
+13040210	Cataloging Unit	Lozier Canyon
+13040211	Cataloging Unit	Big Canyon
+13040212	Cataloging Unit	Amistad Reservoir
+130403	Accounting Unit	Devils
+13040301	Cataloging Unit	Upper Devils
+13040302	Cataloging Unit	Lower Devils
+13040303	Cataloging Unit	Dry Devils
+1305	Subregion	Rio Grande Closed Basins
+130500	Accounting Unit	Rio Grande Closed Basins
+13050001	Cataloging Unit	Western Estancia
+13050002	Cataloging Unit	Eastern Estancia
+13050003	Cataloging Unit	Tularosa Valley
+13050004	Cataloging Unit	Salt Basin
+1306	Subregion	Upper Pecos
+130600	Accounting Unit	Upper Pecos
+13060001	Cataloging Unit	Pecos Headwaters
+13060002	Cataloging Unit	Pintada Arroyo
+13060003	Cataloging Unit	Upper Pecos
+13060004	Cataloging Unit	Taiban
+13060005	Cataloging Unit	Arroyo Del Macho
+13060006	Cataloging Unit	Gallo Arroyo
+13060007	Cataloging Unit	Upper Pecos-Long Arroyo
+13060008	Cataloging Unit	Rio Hondo
+13060009	Cataloging Unit	Rio Felix
+13060010	Cataloging Unit	Rio Penasco
+13060011	Cataloging Unit	Upper Pecos-Black
+1307	Subregion	Lower Pecos
+130700	Accounting Unit	Lower Pecos
+13070001	Cataloging Unit	Lower Pecos-Red Bluff Reservoir
+13070002	Cataloging Unit	Delaware
+13070003	Cataloging Unit	Toyah
+13070004	Cataloging Unit	Salt Draw
+13070005	Cataloging Unit	Barrilla Draw
+13070006	Cataloging Unit	Coyanosa-Hackberry Draws
+13070007	Cataloging Unit	Landreth-Monument Draws
+13070008	Cataloging Unit	Pecos
+13070009	Cataloging Unit	Tunas
+13070010	Cataloging Unit	Independence
+13070011	Cataloging Unit	Howard Draw
+13070012	Cataloging Unit	Lower Pecos
+1308	Subregion	Rio Grande-Falcon
+130800	Accounting Unit	Rio Grande-Falcon
+13080001	Cataloging Unit	Elm-Sycamore
+13080002	Cataloging Unit	San Ambrosia-Santa Isabel
+13080003	Cataloging Unit	International Falcon Reservoir
+1309	Subregion	Lower Rio Grande
+130900	Accounting Unit	Lower Rio Grande
+13090001	Cataloging Unit	Los Olmos
+13090002	Cataloging Unit	Lower Rio Grande
+14	Region	Upper Colorado Region
+1401	Subregion	Colorado Headwaters
+140100	Accounting Unit	Colorado Headwaters
+14010001	Cataloging Unit	Colorado Headwaters
+14010002	Cataloging Unit	Blue
+14010003	Cataloging Unit	Eagle
+14010004	Cataloging Unit	Roaring Fork
+14010005	Cataloging Unit	Colorado Headwaters-Plateau
+14010006	Cataloging Unit	Parachute-Roan
+1402	Subregion	Gunnison
+140200	Accounting Unit	Gunnison
+14020001	Cataloging Unit	East-Taylor
+14020002	Cataloging Unit	Upper Gunnison
+14020003	Cataloging Unit	Tomichi
+14020004	Cataloging Unit	North Fork Gunnison
+14020005	Cataloging Unit	Lower Gunnison
+14020006	Cataloging Unit	Uncompahgre
+1403	Subregion	Upper Colorado-Dolores
+140300	Accounting Unit	Upper Colorado-Dolores
+14030001	Cataloging Unit	Westwater Canyon
+14030002	Cataloging Unit	Upper Dolores
+14030003	Cataloging Unit	San Miguel
+14030004	Cataloging Unit	Lower Dolores
+14030005	Cataloging Unit	Upper Colorado-Kane Springs
+1404	Subregion	Great Divide-Upper Green
+140401	Accounting Unit	Upper Green
+14040101	Cataloging Unit	Upper Green
+14040102	Cataloging Unit	New Fork
+14040103	Cataloging Unit	Upper Green-Slate
+14040104	Cataloging Unit	Big Sandy
+14040105	Cataloging Unit	Bitter
+14040106	Cataloging Unit	Upper Green-Flaming Gorge Reservoir
+14040107	Cataloging Unit	Blacks Fork
+14040108	Cataloging Unit	Muddy
+14040109	Cataloging Unit	Vermilion
+140402	Accounting Unit	Great Divide Closed Basin
+14040200	Cataloging Unit	Great Divide Closed Basin
+1405	Subregion	White-Yampa
+140500	Accounting Unit	White-Yampa
+14050001	Cataloging Unit	Upper Yampa
+14050002	Cataloging Unit	Lower Yampa
+14050003	Cataloging Unit	Little Snake
+14050004	Cataloging Unit	Muddy
+14050005	Cataloging Unit	Upper White
+14050006	Cataloging Unit	Piceance-Yellow
+14050007	Cataloging Unit	Lower White
+1406	Subregion	Lower Green
+140600	Accounting Unit	Lower Green
+14060001	Cataloging Unit	Lower Green-Diamond
+14060002	Cataloging Unit	Ashley-Brush
+14060003	Cataloging Unit	Duchesne
+14060004	Cataloging Unit	Strawberry
+14060005	Cataloging Unit	Lower Green-Desolation Canyon
+14060006	Cataloging Unit	Willow
+14060007	Cataloging Unit	Price
+14060008	Cataloging Unit	Lower Green
+14060009	Cataloging Unit	San Rafael
+1407	Subregion	Upper Colorado-Dirty Devil
+140700	Accounting Unit	Upper Colorado-Dirty Devil
+14070001	Cataloging Unit	Upper Lake Powell
+14070002	Cataloging Unit	Muddy
+14070003	Cataloging Unit	Fremont
+14070004	Cataloging Unit	Dirty Devil
+14070005	Cataloging Unit	Escalante
+14070006	Cataloging Unit	Lower Lake Powell
+14070007	Cataloging Unit	Paria
+1408	Subregion	San Juan
+140801	Accounting Unit	Upper San Juan
+14080101	Cataloging Unit	Upper San Juan
+14080102	Cataloging Unit	Piedra
+14080103	Cataloging Unit	Blanco Canyon
+14080104	Cataloging Unit	Animas
+14080105	Cataloging Unit	Middle San Juan
+14080106	Cataloging Unit	Chaco
+14080107	Cataloging Unit	Mancos
+140802	Accounting Unit	Lower San Juan
+14080201	Cataloging Unit	Lower San Juan-Four Corners
+14080202	Cataloging Unit	McElmo
+14080203	Cataloging Unit	Montezuma
+14080204	Cataloging Unit	Chinle
+14080205	Cataloging Unit	Lower San Juan
+15	Region	Lower Colorado Region
+1501	Subregion	Lower Colorado-Lake Mead
+150100	Accounting Unit	Lower Colorado-Lake Mead
+15010001	Cataloging Unit	Lower Colorado-Marble Canyon
+15010002	Cataloging Unit	Grand Canyon
+15010003	Cataloging Unit	Kanab
+15010004	Cataloging Unit	Havasu Canyon
+15010005	Cataloging Unit	Lake Mead
+15010006	Cataloging Unit	Grand Wash
+15010007	Cataloging Unit	Red Lake
+15010008	Cataloging Unit	Upper Virgin
+15010009	Cataloging Unit	Fort Pearce Wash
+15010010	Cataloging Unit	Lower Virgin
+15010011	Cataloging Unit	White
+15010012	Cataloging Unit	Muddy
+15010013	Cataloging Unit	Meadow Valley Wash
+15010014	Cataloging Unit	Detrital Wash
+15010015	Cataloging Unit	Las Vegas Wash
+1502	Subregion	Little Colorado
+150200	Accounting Unit	Little Colorado
+15020001	Cataloging Unit	Little Colorado Headwaters
+15020002	Cataloging Unit	Upper Little Colorado
+15020003	Cataloging Unit	Carrizo Wash
+15020004	Cataloging Unit	Zuni
+15020005	Cataloging Unit	Silver
+15020006	Cataloging Unit	Upper Puerco
+15020007	Cataloging Unit	Lower Puerco
+15020008	Cataloging Unit	Middle Little Colorado
+15020009	Cataloging Unit	Leroux Wash
+15020010	Cataloging Unit	Chevelon Canyon
+15020011	Cataloging Unit	Cottonwood Wash
+15020012	Cataloging Unit	Corn-Oraibi
+15020013	Cataloging Unit	Polacca Wash
+15020014	Cataloging Unit	Jadito Wash
+15020015	Cataloging Unit	Canyon Diablo
+15020016	Cataloging Unit	Lower Little Colorado
+15020017	Cataloging Unit	Dinnebito Wash
+15020018	Cataloging Unit	Moenkopi Wash
+1503	Subregion	Lower Colorado
+150301	Accounting Unit	Lower Colorado
+15030101	Cataloging Unit	Havasu-Mohave Lakes
+15030102	Cataloging Unit	Piute Wash
+15030103	Cataloging Unit	Sacramento Wash
+15030104	Cataloging Unit	Imperial Reservoir
+15030105	Cataloging Unit	Bouse Wash
+15030106	Cataloging Unit	Tyson Wash
+15030107	Cataloging Unit	Lower Colorado
+15030108	Cataloging Unit	Yuma Desert
+150302	Accounting Unit	Bill Williams
+15030201	Cataloging Unit	Big Sandy
+15030202	Cataloging Unit	Burro
+15030203	Cataloging Unit	Santa Maria
+15030204	Cataloging Unit	Bill Williams
+1504	Subregion	Upper Gila
+150400	Accounting Unit	Upper Gila
+15040001	Cataloging Unit	Upper Gila
+15040002	Cataloging Unit	Upper Gila-Mangas
+15040003	Cataloging Unit	Animas Valley
+15040004	Cataloging Unit	San Francisco
+15040005	Cataloging Unit	Upper Gila-San Carlos Reservoir
+15040006	Cataloging Unit	San Simon
+15040007	Cataloging Unit	San Carlos
+1505	Subregion	Middle Gila
+150501	Accounting Unit	Middle Gila
+15050100	Cataloging Unit	Middle Gila
+150502	Accounting Unit	San Pedro-Willcox
+15050201	Cataloging Unit	Willcox Playa
+15050202	Cataloging Unit	Upper San Pedro
+15050203	Cataloging Unit	Lower San Pedro
+150503	Accounting Unit	Santa Cruz
+15050301	Cataloging Unit	Upper Santa Cruz
+15050302	Cataloging Unit	Rillito
+15050303	Cataloging Unit	Lower Santa Cruz
+15050304	Cataloging Unit	Brawley Wash
+15050305	Cataloging Unit	Aguirre Valley
+15050306	Cataloging Unit	Santa Rosa Wash
+1506	Subregion	Salt
+150601	Accounting Unit	Salt
+15060101	Cataloging Unit	Black
+15060102	Cataloging Unit	White
+15060103	Cataloging Unit	Upper Salt
+15060104	Cataloging Unit	Carrizo
+15060105	Cataloging Unit	Tonto
+15060106	Cataloging Unit	Lower Salt
+150602	Accounting Unit	Verde
+15060201	Cataloging Unit	Big Chino-Williamson Valley
+15060202	Cataloging Unit	Upper Verde
+15060203	Cataloging Unit	Lower Verde
+1507	Subregion	Lower Gila
+150701	Accounting Unit	Lower Gila-Agua Fria
+15070101	Cataloging Unit	Lower Gila-Painted Rock Reservoir
+15070102	Cataloging Unit	Agua Fria
+15070103	Cataloging Unit	Hassayampa
+15070104	Cataloging Unit	Centennial Wash
+150702	Accounting Unit	Lower Gila
+15070201	Cataloging Unit	Lower Gila
+15070202	Cataloging Unit	Tenmile Wash
+15070203	Cataloging Unit	San Cristobal Wash
+1508	Subregion	Sonora
+150801	Accounting Unit	Rio Sonoyta
+15080101	Cataloging Unit	San Simon Wash
+15080102	Cataloging Unit	Rio Sonoyta
+15080103	Cataloging Unit	Tule Desert
+150802	Accounting Unit	Rio De La Concepcion
+15080200	Cataloging Unit	Rio De La Concepcion
+150803	Accounting Unit	Rio De Bavispe
+15080301	Cataloging Unit	Whitewater Draw
+15080302	Cataloging Unit	San Bernardino Valley
+15080303	Cataloging Unit	Cloverdale
+16	Region	Great Basin Region
+1601	Subregion	Bear
+160101	Accounting Unit	Upper Bear
+16010101	Cataloging Unit	Upper Bear
+16010102	Cataloging Unit	Central Bear
+160102	Accounting Unit	Lower Bear
+16010201	Cataloging Unit	Bear Lake
+16010202	Cataloging Unit	Middle Bear
+16010203	Cataloging Unit	Little Bear-Logan
+16010204	Cataloging Unit	Lower Bear-Malad
+1602	Subregion	Great Salt Lake
+160201	Accounting Unit	Weber
+16020101	Cataloging Unit	Upper Weber
+16020102	Cataloging Unit	Lower Weber
+160202	Accounting Unit	Jordan
+16020201	Cataloging Unit	Utah Lake
+16020202	Cataloging Unit	Spanish Fork
+16020203	Cataloging Unit	Provo
+16020204	Cataloging Unit	Jordan
+160203	Accounting Unit	Great Salt Lake
+16020301	Cataloging Unit	Hamlin-Snake Valleys
+16020302	Cataloging Unit	Pine Valley
+16020303	Cataloging Unit	Tule Valley
+16020304	Cataloging Unit	Rush-Tooele Valleys
+16020305	Cataloging Unit	Skull Valley
+16020306	Cataloging Unit	Southern Great Salt Lake Desert
+16020307	Cataloging Unit	Pilot-Thousand Springs, Nevada, Utah
+16020308	Cataloging Unit	Northern Great Salt Lake Desert
+16020309	Cataloging Unit	Curlew Valley
+16020310	Cataloging Unit	Great Salt Lake
+1603	Subregion	Escalante Desert-Sevier Lake
+160300	Accounting Unit	Escalante Desert-Sevier Lake
+16030001	Cataloging Unit	Upper Sevier
+16030002	Cataloging Unit	East Fork Sevier
+16030003	Cataloging Unit	Middle Sevier
+16030004	Cataloging Unit	San Pitch
+16030005	Cataloging Unit	Lower Sevier
+16030006	Cataloging Unit	Escalante Desert
+16030007	Cataloging Unit	Beaver Bottoms-Upper Beaver
+16030008	Cataloging Unit	Lower Beaver
+16030009	Cataloging Unit	Sevier Lake
+1604	Subregion	Black Rock Desert-Humboldt
+160401	Accounting Unit	Humboldt
+16040101	Cataloging Unit	Upper Humboldt
+16040102	Cataloging Unit	North Fork Humboldt
+16040103	Cataloging Unit	South Fork Humboldt
+16040104	Cataloging Unit	Pine
+16040105	Cataloging Unit	Middle Humboldt
+16040106	Cataloging Unit	Rock
+16040107	Cataloging Unit	Reese
+16040108	Cataloging Unit	Lower Humboldt
+16040109	Cataloging Unit	Little Humboldt
+160402	Accounting Unit	Black Rock Desert
+16040201	Cataloging Unit	Upper Quinn
+16040202	Cataloging Unit	Lower Quinn
+16040203	Cataloging Unit	Smoke Creek Desert
+16040204	Cataloging Unit	Massacre Lake
+16040205	Cataloging Unit	Thousand-Virgin
+1605	Subregion	Central Lahontan
+160501	Accounting Unit	Truckee
+16050101	Cataloging Unit	Lake Tahoe
+16050102	Cataloging Unit	Truckee
+16050103	Cataloging Unit	Pyramid-Winnemucca Lakes
+16050104	Cataloging Unit	Granite Springs Valley
+160502	Accounting Unit	Carson
+16050201	Cataloging Unit	Upper Carson
+16050202	Cataloging Unit	Middle Carson
+16050203	Cataloging Unit	Carson Desert
+160503	Accounting Unit	Walker
+16050301	Cataloging Unit	East Walker
+16050302	Cataloging Unit	West Walker
+16050303	Cataloging Unit	Walker
+16050304	Cataloging Unit	Walker Lake
+1606	Subregion	Central Nevada Desert Basins
+160600	Accounting Unit	Central Nevada Desert Basins
+16060001	Cataloging Unit	Dixie Valley
+16060002	Cataloging Unit	Gabbs Valley
+16060003	Cataloging Unit	Southern Big Smoky Valley
+16060004	Cataloging Unit	Northern Big Smoky Valley
+16060005	Cataloging Unit	Diamond-Monitor Valleys
+16060006	Cataloging Unit	Little Smoky-Newark Valleys
+16060007	Cataloging Unit	Long-Ruby Valleys
+16060008	Cataloging Unit	Spring-Steptoe Valleys
+16060009	Cataloging Unit	Dry Lake Valley
+16060010	Cataloging Unit	Fish Lake-Soda Spring Valleys
+16060011	Cataloging Unit	Ralston-Stone Cabin Valleys
+16060012	Cataloging Unit	Hot Creek-Railroad Valleys
+16060013	Cataloging Unit	Cactus-Sarcobatus Flats
+16060014	Cataloging Unit	Sand Spring-Tikaboo Valleys
+16060015	Cataloging Unit	Ivanpah-Pahrump Valleys
+17	Region	Pacific Northwest Region
+1701	Subregion	Kootenai-Pend Oreille-Spokane
+170101	Accounting Unit	Kootenai
+17010101	Cataloging Unit	Middle Kootenai
+17010102	Cataloging Unit	Fisher
+17010103	Cataloging Unit	Yaak
+17010104	Cataloging Unit	Lower Kootenai
+17010105	Cataloging Unit	Moyie
+17010106	Cataloging Unit	Elk
+170102	Accounting Unit	Pend Oreille
+17010201	Cataloging Unit	Upper Clark Fork
+17010202	Cataloging Unit	Flint-Rock
+17010203	Cataloging Unit	Blackfoot
+17010204	Cataloging Unit	Middle Clark Fork
+17010205	Cataloging Unit	Bitterroot
+17010206	Cataloging Unit	North Fork Flathead
+17010207	Cataloging Unit	Middle Fork Flathead
+17010208	Cataloging Unit	Flathead Lake
+17010209	Cataloging Unit	South Fork Flathead
+17010210	Cataloging Unit	Stillwater
+17010211	Cataloging Unit	Swan
+17010212	Cataloging Unit	Lower Flathead
+17010213	Cataloging Unit	Lower Clark Fork
+17010214	Cataloging Unit	Pend Oreille Lake
+17010215	Cataloging Unit	Priest
+17010216	Cataloging Unit	Pend Oreille
+170103	Accounting Unit	Spokane
+17010301	Cataloging Unit	Upper Coeur D'Alene
+17010302	Cataloging Unit	South Fork Coeur D'Alene
+17010303	Cataloging Unit	Coeur D'Alene Lake
+17010304	Cataloging Unit	St. Joe
+17010305	Cataloging Unit	Upper Spokane
+17010306	Cataloging Unit	Hangman
+17010307	Cataloging Unit	Lower Spokane
+17010308	Cataloging Unit	Little Spokane
+1702	Subregion	Upper Columbia
+170200	Accounting Unit	Upper Columbia
+17020001	Cataloging Unit	Franklin D. Roosevelt Lake
+17020002	Cataloging Unit	Kettle
+17020003	Cataloging Unit	Colville
+17020004	Cataloging Unit	Sanpoil
+17020005	Cataloging Unit	Chief Joseph
+17020006	Cataloging Unit	Okanogan
+17020007	Cataloging Unit	Similkameen
+17020008	Cataloging Unit	Methow
+17020009	Cataloging Unit	Lake Chelan
+17020010	Cataloging Unit	Upper Columbia-Entiat
+17020011	Cataloging Unit	Wenatchee
+17020012	Cataloging Unit	Moses Coulee
+17020013	Cataloging Unit	Upper Crab
+17020014	Cataloging Unit	Banks Lake
+17020015	Cataloging Unit	Lower Crab
+17020016	Cataloging Unit	Upper Columbia-Priest Rapids
+1703	Subregion	Yakima
+170300	Accounting Unit	Yakima
+17030001	Cataloging Unit	Upper Yakima
+17030002	Cataloging Unit	Naches
+17030003	Cataloging Unit	Lower Yakima
+1704	Subregion	Upper Snake
+170401	Accounting Unit	Snake Headwaters
+17040101	Cataloging Unit	Snake Headwaters
+17040102	Cataloging Unit	Gros Ventre
+17040103	Cataloging Unit	Grays-Hobock
+17040103	Cataloging Unit	Greys-Hoback
+17040104	Cataloging Unit	Palisades
+17040105	Cataloging Unit	Salt
+170402	Accounting Unit	Upper Snake
+17040201	Cataloging Unit	Idaho Falls
+17040202	Cataloging Unit	Upper Henrys
+17040203	Cataloging Unit	Lower Henrys
+17040204	Cataloging Unit	Teton
+17040205	Cataloging Unit	Willow
+17040206	Cataloging Unit	American Falls
+17040207	Cataloging Unit	Blackfoot
+17040208	Cataloging Unit	Portneuf
+17040209	Cataloging Unit	Lake Walcott
+17040210	Cataloging Unit	Raft
+17040211	Cataloging Unit	Goose
+17040212	Cataloging Unit	Upper Snake-Rock
+17040213	Cataloging Unit	Salmon Falls
+17040214	Cataloging Unit	Beaver-Camas
+17040215	Cataloging Unit	Medicine Lodge
+17040216	Cataloging Unit	Birch
+17040217	Cataloging Unit	Little Lost
+17040218	Cataloging Unit	Big Lost
+17040219	Cataloging Unit	Big Wood
+17040220	Cataloging Unit	Camas
+17040221	Cataloging Unit	Little Wood
+1705	Subregion	Middle Snake
+170501	Accounting Unit	Middle Snake-Boise
+17050101	Cataloging Unit	C. J. Strike Reservoir
+17050102	Cataloging Unit	Bruneau
+17050103	Cataloging Unit	Middle Snake-Succor
+17050104	Cataloging Unit	Upper Owyhee
+17050105	Cataloging Unit	South Fork Owyhee
+17050106	Cataloging Unit	East Little Owyhee
+17050107	Cataloging Unit	Middle Owyhee
+17050108	Cataloging Unit	Jordan
+17050109	Cataloging Unit	Crooked-Rattlesnake
+17050110	Cataloging Unit	Lower Owyhee
+17050111	Cataloging Unit	North and Middle Forks Boise
+17050112	Cataloging Unit	Boise-Mores
+17050113	Cataloging Unit	South Fork Boise
+17050114	Cataloging Unit	Lower Boise
+17050115	Cataloging Unit	Middle Snake-Payette
+17050116	Cataloging Unit	Upper Malheur
+17050117	Cataloging Unit	Lower Malheur
+17050118	Cataloging Unit	Bully
+17050119	Cataloging Unit	Willow
+17050120	Cataloging Unit	South Fork Payette
+17050121	Cataloging Unit	Middle Fork Payette
+17050122	Cataloging Unit	Payette
+17050123	Cataloging Unit	North Fork Payette
+17050124	Cataloging Unit	Weiser
+170502	Accounting Unit	Middle Snake-Powder
+17050201	Cataloging Unit	Brownlee Reservoir
+17050202	Cataloging Unit	Burnt
+17050203	Cataloging Unit	Powder
+1706	Subregion	Lower Snake
+170601	Accounting Unit	Lower Snake
+17060101	Cataloging Unit	Hells Canyon
+17060102	Cataloging Unit	Imnaha
+17060103	Cataloging Unit	Lower Snake-Asotin
+17060104	Cataloging Unit	Upper Grande Ronde
+17060105	Cataloging Unit	Wallowa
+17060106	Cataloging Unit	Lower Grande Ronde
+17060107	Cataloging Unit	Lower Snake-Tucannon
+17060108	Cataloging Unit	Palouse
+17060109	Cataloging Unit	Rock
+17060110	Cataloging Unit	Lower Snake
+170602	Accounting Unit	Salmon
+17060201	Cataloging Unit	Upper Salmon
+17060202	Cataloging Unit	Pahsimeroi
+17060203	Cataloging Unit	Middle Salmon-Panther
+17060204	Cataloging Unit	Lemhi
+17060205	Cataloging Unit	Upper Middle Fork Salmon
+17060206	Cataloging Unit	Lower Middle Fork Salmon
+17060207	Cataloging Unit	Middle Salmon-Chamberlain
+17060208	Cataloging Unit	South Fork Salmon
+17060209	Cataloging Unit	Lower Salmon
+17060210	Cataloging Unit	Little Salmon
+170603	Accounting Unit	Clearwater
+17060301	Cataloging Unit	Upper Selway
+17060302	Cataloging Unit	Lower Selway
+17060303	Cataloging Unit	Lochsa
+17060304	Cataloging Unit	Middle Fork Clearwater
+17060305	Cataloging Unit	South Fork Clearwater
+17060306	Cataloging Unit	Clearwater
+17060307	Cataloging Unit	Upper North Fork Clearwater
+17060308	Cataloging Unit	Lower North Fork Clearwater
+1707	Subregion	Middle Columbia
+170701	Accounting Unit	Middle Columbia
+17070101	Cataloging Unit	Middle Columbia-Lake Wallula
+17070102	Cataloging Unit	Walla Walla
+17070103	Cataloging Unit	Umatilla
+17070104	Cataloging Unit	Willow
+17070105	Cataloging Unit	Middle Columbia-Hood
+17070106	Cataloging Unit	Klickitat
+170702	Accounting Unit	John Day
+17070201	Cataloging Unit	Upper John Day
+17070202	Cataloging Unit	North Fork John Day
+17070203	Cataloging Unit	Middle Fork John Day
+17070204	Cataloging Unit	Lower John Day
+170703	Accounting Unit	Deschutes
+17070301	Cataloging Unit	Upper Deschutes
+17070302	Cataloging Unit	Little Deschutes
+17070303	Cataloging Unit	Beaver-South Fork
+17070304	Cataloging Unit	Upper Crooked
+17070305	Cataloging Unit	Lower Crooked
+17070306	Cataloging Unit	Lower Deschutes
+17070307	Cataloging Unit	Trout
+1708	Subregion	Lower Columbia
+170800	Accounting Unit	Lower Columbia
+17080001	Cataloging Unit	Lower Columbia-Sandy
+17080002	Cataloging Unit	Lewis
+17080003	Cataloging Unit	Lower Columbia-Clatskanie
+17080004	Cataloging Unit	Upper Cowlitz
+17080005	Cataloging Unit	Lower Cowlitz
+17080006	Cataloging Unit	Lower Columbia
+1709	Subregion	Willamette
+170900	Accounting Unit	Willamette
+17090001	Cataloging Unit	Middle Fork Willamette
+17090002	Cataloging Unit	Coast Fork Willamette
+17090003	Cataloging Unit	Upper Willamette
+17090004	Cataloging Unit	Mckenzie
+17090005	Cataloging Unit	North Santiam
+17090006	Cataloging Unit	South Santiam
+17090007	Cataloging Unit	Middle Willamette
+17090008	Cataloging Unit	Yamhill
+17090009	Cataloging Unit	Molalla-Pudding
+17090010	Cataloging Unit	Tualatin
+17090011	Cataloging Unit	Clackamas
+17090012	Cataloging Unit	Lower Willamette
+1710	Subregion	Oregon-Washington Coastal
+171001	Accounting Unit	Washington Coastal
+17100101	Cataloging Unit	Hoh-Quillayute
+17100102	Cataloging Unit	Queets-Quinault
+17100103	Cataloging Unit	Upper Chehalis
+17100104	Cataloging Unit	Lower Chehalis
+17100105	Cataloging Unit	Grays Harbor
+17100106	Cataloging Unit	Willapa Bay
+171002	Accounting Unit	Northern Oregon Coastal
+17100201	Cataloging Unit	Necanicum
+17100202	Cataloging Unit	Nehalem
+17100203	Cataloging Unit	Wilson-Trusk-Nestuccu
+17100204	Cataloging Unit	Siletz-Yaquina
+17100205	Cataloging Unit	Alsea
+17100206	Cataloging Unit	Siuslaw
+17100207	Cataloging Unit	Siltcoos
+171003	Accounting Unit	Southern Oregon Coastal
+17100301	Cataloging Unit	North Umpqua
+17100302	Cataloging Unit	South Umpqua
+17100303	Cataloging Unit	Umpqua
+17100304	Cataloging Unit	Coos
+17100305	Cataloging Unit	Coquille
+17100306	Cataloging Unit	Sixes
+17100307	Cataloging Unit	Upper Rogue
+17100308	Cataloging Unit	Middle Rogue
+17100309	Cataloging Unit	Applegate
+17100310	Cataloging Unit	Lower Rogue
+17100311	Cataloging Unit	Illinois
+17100312	Cataloging Unit	Chetco
+1711	Subregion	Puget Sound
+171100	Accounting Unit	Puget Sound
+17110001	Cataloging Unit	Fraser
+17110002	Cataloging Unit	Strait of Georgia
+17110003	Cataloging Unit	San Juan Islands
+17110004	Cataloging Unit	Nooksack
+17110005	Cataloging Unit	Upper Skagit
+17110006	Cataloging Unit	Sauk
+17110007	Cataloging Unit	Lower Skagit
+17110008	Cataloging Unit	Stillaguamish
+17110009	Cataloging Unit	Skykomish
+17110010	Cataloging Unit	Snoqualmie
+17110011	Cataloging Unit	Snohomish
+17110012	Cataloging Unit	Lake Washington
+17110013	Cataloging Unit	Duwamish
+17110014	Cataloging Unit	Puyallup
+17110015	Cataloging Unit	Nisqually
+17110016	Cataloging Unit	Deschutes
+17110017	Cataloging Unit	Skokomish
+17110018	Cataloging Unit	Hood Canal
+17110019	Cataloging Unit	Puget Sound
+17110020	Cataloging Unit	Dungeness-Elwha
+17110021	Cataloging Unit	Crescent-Hoko
+1712	Subregion	Oregon Closed Basins
+171200	Accounting Unit	Oregon Closed Basins
+17120001	Cataloging Unit	Harney-Malheur Lakes
+17120002	Cataloging Unit	Silvies
+17120003	Cataloging Unit	Donner und Blitzen
+17120004	Cataloging Unit	Silver
+17120005	Cataloging Unit	Summer Lake
+17120006	Cataloging Unit	Lake Abert
+17120007	Cataloging Unit	Warner Lakes
+17120008	Cataloging Unit	Guano
+17120009	Cataloging Unit	Alvord Lake
+18	Region	California Region
+1801	Subregion	Klamath-Northern California Coastal
+180101	Accounting Unit	Northern California Coastal
+18010101	Cataloging Unit	Smith
+18010102	Cataloging Unit	Mad-Redwood
+18010103	Cataloging Unit	Upper Eel
+18010104	Cataloging Unit	Middle Fork Eel
+18010105	Cataloging Unit	Lower Eel
+18010106	Cataloging Unit	South Fork Eel
+18010107	Cataloging Unit	Mattole
+18010108	Cataloging Unit	Big-Navarro-Garcia
+18010109	Cataloging Unit	Gualala-Salmon
+18010110	Cataloging Unit	Russian
+18010111	Cataloging Unit	Bodega Bay
+180102	Accounting Unit	Klamath
+18010201	Cataloging Unit	Williamson
+18010202	Cataloging Unit	Sprague
+18010203	Cataloging Unit	Upper Klamath Lake
+18010204	Cataloging Unit	Lost
+18010205	Cataloging Unit	Butte
+18010206	Cataloging Unit	Upper Klamath
+18010207	Cataloging Unit	Shasta
+18010208	Cataloging Unit	Scott
+18010209	Cataloging Unit	Lower Klamath
+18010210	Cataloging Unit	Salmon
+18010211	Cataloging Unit	Trinity
+18010212	Cataloging Unit	South Fork Trinity
+1802	Subregion	Sacramento
+180200	Accounting Unit	Upper Sacramento
+18020001	Cataloging Unit	Goose Lake
+18020002	Cataloging Unit	Upper Pit
+18020003	Cataloging Unit	Lower Pit
+18020004	Cataloging Unit	McCloud
+18020005	Cataloging Unit	Sacramento Headwaters
+180201	Accounting Unit	Lower Sacramento
+18020101	Cataloging Unit	Sacramento-Lower Cow-Lower Clear
+18020102	Cataloging Unit	Lower Cottonwood
+18020103	Cataloging Unit	Sacramento-Lower Thomes
+18020104	Cataloging Unit	Sacramento-Stone Corral
+18020105	Cataloging Unit	Lower Butte
+18020106	Cataloging Unit	Lower Feather
+18020107	Cataloging Unit	Lower Yuba
+18020108	Cataloging Unit	Lower Bear
+18020109	Cataloging Unit	Lower Sacramento
+18020110	Cataloging Unit	Lower Cache
+18020111	Cataloging Unit	Lower American
+18020112	Cataloging Unit	Sacramento-Upper Clear
+18020113	Cataloging Unit	Cottonwood Headwaters
+18020114	Cataloging Unit	Upper Elder-Upper Thomes
+18020115	Cataloging Unit	Upper Stony
+18020116	Cataloging Unit	Upper Cache
+18020117	Cataloging Unit	Upper Putah
+18020118	Cataloging Unit	Upper Cow-Battle
+18020119	Cataloging Unit	Mill-Big Chico
+18020120	Cataloging Unit	Upper Butte
+18020121	Cataloging Unit	North Fork Feather
+18020122	Cataloging Unit	East Branch North Fork Feather
+18020123	Cataloging Unit	Middle Fork Feather
+18020124	Cataloging Unit	Honcut Headwaters
+18020125	Cataloging Unit	Upper Yuba
+18020126	Cataloging Unit	Upper Bear
+18020127	Cataloging Unit	Upper Coon-Upper Auburn
+18020128	Cataloging Unit	North Fork American
+18020129	Cataloging Unit	South Fork American
+18020151	Cataloging Unit	Cow Creek
+18020152	Cataloging Unit	Cottonwood Creek
+18020153	Cataloging Unit	Battle Creek
+18020154	Cataloging Unit	Clear Creek-Sacramento River
+18020155	Cataloging Unit	Paynes Creek-Sacramento River
+18020156	Cataloging Unit	Thomes Creek-Sacramento River
+18020157	Cataloging Unit	Big Chico Creek-Sacramento River
+18020158	Cataloging Unit	Butte Creek
+18020159	Cataloging Unit	Honcut Headwaters-Lower Feather
+18020161	Cataloging Unit	Upper Coon-Upper Auburn
+18020162	Cataloging Unit	Upper Putah
+18020163	Cataloging Unit	Lower Sacramento
+1803	Subregion	Tulare-Buena Vista Lakes
+180300	Accounting Unit	Tulare-Buena Vista Lakes
+18030001	Cataloging Unit	Upper Kern
+18030002	Cataloging Unit	South Fork Kern
+18030003	Cataloging Unit	Middle Kern-Upper Tehachapi-Grapevine
+18030004	Cataloging Unit	Upper Poso
+18030005	Cataloging Unit	Upper Deer-Upper White
+18030006	Cataloging Unit	Upper Tule
+18030007	Cataloging Unit	Upper Kaweah
+18030008	Cataloging Unit	Mill
+18030009	Cataloging Unit	Upper Dry
+18030010	Cataloging Unit	Upper King
+18030011	Cataloging Unit	Upper Los Gatos-Avenal
+18030012	Cataloging Unit	Tulare Lake Bed
+1804	Subregion	San Joaquin
+180400	Accounting Unit	San Joaquin
+18040001	Cataloging Unit	Middle San Joaquin-Lower Chowchilla
+18040002	Cataloging Unit	Lower San Joaquin River
+18040003	Cataloging Unit	San Joaquin Delta
+18040004	Cataloging Unit	Lower Calaveras-Mormon Slough
+18040005	Cataloging Unit	Lower Cosumnes-Lower Mokelumne
+18040006	Cataloging Unit	Upper San Joaquin
+18040007	Cataloging Unit	Fresno River
+18040008	Cataloging Unit	Upper Merced
+18040009	Cataloging Unit	Upper Tuolumne
+18040010	Cataloging Unit	Upper Stanislaus
+18040011	Cataloging Unit	Upper Calaveras California
+18040012	Cataloging Unit	Upper Mokelumne
+18040013	Cataloging Unit	Upper Cosumnes
+18040014	Cataloging Unit	Panoche-San Luis Reservoir
+18040051	Cataloging Unit	Rock Creek-French Camp Slough
+1805	Subregion	San Francisco Bay
+180500	Accounting Unit	San Francisco Bay
+18050001	Cataloging Unit	Suisun Bay
+18050002	Cataloging Unit	San Pablo Bay
+18050003	Cataloging Unit	Coyote
+18050004	Cataloging Unit	San Francisco Bay
+18050005	Cataloging Unit	Tomales-Drake Bays
+18050006	Cataloging Unit	San Francisco Coastal South
+1806	Subregion	Central California Coastal
+180600	Accounting Unit	Central California Coastal
+18060001	Cataloging Unit	San Lorenzo-Soquel
+18060002	Cataloging Unit	Pajaro
+18060003	Cataloging Unit	Carrizo Plain
+18060004	Cataloging Unit	Estrella
+18060005	Cataloging Unit	Salinas
+18060006	Cataloging Unit	Central Coastal
+18060007	Cataloging Unit	Cuyama
+18060008	Cataloging Unit	Santa Maria
+18060009	Cataloging Unit	San Antonio
+18060010	Cataloging Unit	Santa Ynez
+18060011	Cataloging Unit	Alisal-Elkhorn Sloughs
+18060012	Cataloging Unit	Carmel
+18060013	Cataloging Unit	Santa Barbara Coastal
+18060014	Cataloging Unit	Santa Barbara Channel Islands
+18060015	Cataloging Unit	Monterey Bay
+1807	Subregion	Southern California Coastal
+180701	Accounting Unit	Ventura-San Gabriel Coastal
+18070101	Cataloging Unit	Ventura
+18070102	Cataloging Unit	Santa Clara
+18070103	Cataloging Unit	Calleguas
+18070104	Cataloging Unit	Santa Monica Bay
+18070105	Cataloging Unit	Los Angeles
+18070106	Cataloging Unit	San Gabriel
+18070107	Cataloging Unit	San Pedro Channel Islands
+180702	Accounting Unit	Santa Ana
+18070201	Cataloging Unit	Seal Beach
+18070202	Cataloging Unit	San Jacinto
+18070203	Cataloging Unit	Santa Ana
+18070204	Cataloging Unit	Newport Bay
+180703	Accounting Unit	Laguna-San Diego Coastal
+18070301	Cataloging Unit	Aliso-San Onofre
+18070302	Cataloging Unit	Santa Margarita
+18070303	Cataloging Unit	San Luis Rey-Escondido
+18070304	Cataloging Unit	San Diego
+18070305	Cataloging Unit	Cottonwood-Tijuana
+1808	Subregion	North Lahontan
+180800	Accounting Unit	North Lahontan
+18080001	Cataloging Unit	Surprise Valley
+18080002	Cataloging Unit	Madeline Plains
+18080003	Cataloging Unit	Honey-Eagle Lakes
+1809	Subregion	Northern Mojave-Mono Lake
+180901	Accounting Unit	Mono Lake-Owens Lakes
+180901	Accounting Unit	Mono-Owens Lakes
+18090101	Cataloging Unit	Mono Lake
+18090102	Cataloging Unit	Crowley Lake
+18090103	Cataloging Unit	Owens Lake
+180902	Accounting Unit	Northern Mojave
+18090201	Cataloging Unit	Eureka-Saline Valleys
+18090202	Cataloging Unit	Upper Amargosa
+18090203	Cataloging Unit	Death Valley-Lower Amargosa
+18090204	Cataloging Unit	Panamint Valley
+18090205	Cataloging Unit	Indian Wells-Searles Valleys
+18090206	Cataloging Unit	Antelope-Fremont Valleys
+18090207	Cataloging Unit	Coyote-Cuddeback Lakes
+18090208	Cataloging Unit	Mojave
+1810	Subregion	Southern Mojave-Salton Sea
+181001	Accounting Unit	Southern Mojave
+18100100	Cataloging Unit	Southern Mojave
+181002	Accounting Unit	Salton Sea
+18100200	Cataloging Unit	Salton Sea
+18100201	Cataloging Unit	Whitewater River
+18100202	Cataloging Unit	Carrizo Creek
+18100203	Cataloging Unit	San Felipe Creek
+18100204	Cataloging Unit	Salton Sea
+19	Region	Alaska Region
+1901	Subregion	Southeast Alaska
+190101	Accounting Unit	Southern Southeast Alaska
+19010101	Cataloging Unit	Southeast Mainland
+19010102	Cataloging Unit	Ketchikan
+19010103	Cataloging Unit	Prince of Wales
+19010104	Cataloging Unit	Bradfield Canal
+19010105	Cataloging Unit	Burroughs Bay
+19010106	Cataloging Unit	Headwaters Portland Canal
+19010107	Cataloging Unit	Outlet Portland Canal
+190102	Accounting Unit	Central Southeast Alaska
+19010201	Cataloging Unit	Mainland
+19010202	Cataloging Unit	Kuiu-Kupreanof-Mitkof-Etolin-Zarembo-Wrangell
+19010203	Cataloging Unit	Baranof-Chichagof Islands
+19010204	Cataloging Unit	Admiralty Island
+19010205	Cataloging Unit	Lower Iskut
+19010206	Cataloging Unit	Holkham Bay
+19010207	Cataloging Unit	Stikine River
+19010208	Cataloging Unit	Thomas Bay
+190103	Accounting Unit	Northern Southeast Alaska
+19010301	Cataloging Unit	Lynn Canal
+19010302	Cataloging Unit	Glacier Bay
+19010303	Cataloging Unit	Chilkat-Skagway Rivers
+19010304	Cataloging Unit	Taku River
+190104	Accounting Unit	Gulf of Alaska
+19010401	Cataloging Unit	Yakutat Bay
+19010402	Cataloging Unit	Bering Glacier
+19010403	Cataloging Unit	Tatshenshini River
+19010404	Cataloging Unit	Alsek River
+19010405	Cataloging Unit	Yakutat Bay-Gulf of Alaska
+19010406	Cataloging Unit	Palma Bay
+190105	Accounting Unit	Icy Strait-Chatham Strait
+19010500	Cataloging Unit	Icy Strait-Chatham Strait
+1902	Subregion	South Central Alaska
+190201	Accounting Unit	Copper River
+19020101	Cataloging Unit	Upper Copper River
+19020102	Cataloging Unit	Middle Copper River
+19020103	Cataloging Unit	Chitina River
+19020104	Cataloging Unit	Lower Copper River
+190202	Accounting Unit	Prince William Sound
+19020201	Cataloging Unit	Eastern Prince William Sound
+19020202	Cataloging Unit	Western Prince William Sound
+19020203	Cataloging Unit	Prince William Sound
+190203	Accounting Unit	Kenai Peninsula
+19020301	Cataloging Unit	Lower Kenai Peninsula
+19020302	Cataloging Unit	Upper Kenai Peninsula
+190204	Accounting Unit	Knik Arm
+19020401	Cataloging Unit	Anchorage
+19020402	Cataloging Unit	Matanuska
+190205	Accounting Unit	Susitna River
+19020501	Cataloging Unit	Upper Susitna River
+19020502	Cataloging Unit	Chulitna River
+19020503	Cataloging Unit	Talkeetna River
+19020504	Cataloging Unit	Yentna River
+19020505	Cataloging Unit	Lower Susitna River
+190206	Accounting Unit	Western Cook Inlet
+19020601	Cataloging Unit	Redoubt-Trading Bays
+19020602	Cataloging Unit	Tuxedni-Kamishak Bays
+190207	Accounting Unit	Kodiak-Shelikof
+19020701	Cataloging Unit	Kodiak-Afognak Islands
+19020702	Cataloging Unit	Shelikof Strait
+190208	Accounting Unit	Cook Inlet
+19020800	Cataloging Unit	Cook Inlet
+1903	Subregion	Southwest Alaska
+190301	Accounting Unit	Aleutian Islands
+19030101	Cataloging Unit	Cold Bay
+19030102	Cataloging Unit	Fox Islands
+19030103	Cataloging Unit	Western Aleutian Islands
+19030104	Cataloging Unit	Pribilof Islands
+190302	Accounting Unit	Kvichak-Port Heiden
+19030201	Cataloging Unit	Port Heiden
+19030202	Cataloging Unit	Ugashik Bay
+19030203	Cataloging Unit	Egegik Bay
+19030204	Cataloging Unit	Naknek
+19030205	Cataloging Unit	Lake Clark
+19030206	Cataloging Unit	Lake Iliamna
+190303	Accounting Unit	Nushagak River
+19030301	Cataloging Unit	Upper Nushagak River
+19030302	Cataloging Unit	Mulchatna River
+19030303	Cataloging Unit	Lower Nushagak River
+19030304	Cataloging Unit	Wood River
+19030305	Cataloging Unit	Togiak
+19030306	Cataloging Unit	Nushagak Bay
+190304	Accounting Unit	Upper Kuskokwim River
+19030401	Cataloging Unit	North Fork Kuskokwim River
+19030402	Cataloging Unit	Farewell Lake
+19030403	Cataloging Unit	Takotna River
+19030404	Cataloging Unit	Holitna River
+19030405	Cataloging Unit	Stony River
+19030406	Cataloging Unit	Middle Fork Kuskokwim River
+19030407	Cataloging Unit	South Fork Kuskokwim River
+190305	Accounting Unit	Lower Kuskokwim River
+19030501	Cataloging Unit	Aniak
+19030502	Cataloging Unit	Kuskokwim Delta
+19030503	Cataloging Unit	Nunivak-St. Matthew Islands
+1904	Subregion	Yukon Alaska
+190401	Accounting Unit	Canada
+19040101	Cataloging Unit	White River
+19040102	Cataloging Unit	Ladue River
+19040103	Cataloging Unit	Sixtymile River
+19040104	Cataloging Unit	Fortymile River
+190402	Accounting Unit	Porcupine River
+19040201	Cataloging Unit	Old Crow River
+19040202	Cataloging Unit	Coleen River
+19040203	Cataloging Unit	Sheenjek River
+19040204	Cataloging Unit	Black River
+19040205	Cataloging Unit	Porcupine Flats
+190403	Accounting Unit	Chandalar-Christian Rivers
+19040301	Cataloging Unit	Middle Fork-North Fork Chandalar Rivers
+19040302	Cataloging Unit	East Fork Chandalar River
+19040303	Cataloging Unit	Christian River
+19040304	Cataloging Unit	Lower Chandalar River
+190404	Accounting Unit	Upper Yukon River
+19040401	Cataloging Unit	Eagle to Circle
+19040402	Cataloging Unit	Birch-Beaver Creeks
+19040403	Cataloging Unit	Yukon Flats
+19040404	Cataloging Unit	Ramparts
+190405	Accounting Unit	Tanana River
+19040501	Cataloging Unit	Nebesna-Chisana Rivers
+19040502	Cataloging Unit	Tok
+19040503	Cataloging Unit	Healy Lake
+19040504	Cataloging Unit	Delta River
+19040505	Cataloging Unit	Salcha River
+19040506	Cataloging Unit	Chena River
+19040507	Cataloging Unit	Tanana Flats
+19040508	Cataloging Unit	Nenana River
+19040509	Cataloging Unit	Tolovana River
+19040510	Cataloging Unit	Kantishna River
+19040511	Cataloging Unit	Lower Tanana River
+190406	Accounting Unit	Koyukuk River
+19040601	Cataloging Unit	Upper Koyukuk River
+19040602	Cataloging Unit	South Fork Koyukuk River
+19040603	Cataloging Unit	Alatna River
+19040604	Cataloging Unit	Kanuti River
+19040605	Cataloging Unit	Allakaket
+19040606	Cataloging Unit	Huslia River
+19040607	Cataloging Unit	Dulbi River
+19040608	Cataloging Unit	Koyukuk Flats
+19040609	Cataloging Unit	Kateel River
+190407	Accounting Unit	Central Yukon
+19040701	Cataloging Unit	Tozitna River
+19040702	Cataloging Unit	Nowitna River
+19040703	Cataloging Unit	Melozitna River
+19040704	Cataloging Unit	Ramparts to Ruby
+19040705	Cataloging Unit	Galena
+190408	Accounting Unit	Lower Yukon
+19040801	Cataloging Unit	Anvik River
+19040802	Cataloging Unit	Upper Innoko River
+19040803	Cataloging Unit	Lower Innoko River
+19040804	Cataloging Unit	Anvik to Pilot Station
+19040805	Cataloging Unit	Yukon Delta
+1905	Subregion	Northwest Alaska
+190501	Accounting Unit	Norton Sound
+19050101	Cataloging Unit	St. Lawrence Island
+19050102	Cataloging Unit	Unalakleet
+19050103	Cataloging Unit	Norton Bay
+19050104	Cataloging Unit	Nome
+19050105	Cataloging Unit	Imuruk Basin
+190502	Accounting Unit	Northern Seward Peninsula
+19050201	Cataloging Unit	Shishmaref
+19050202	Cataloging Unit	Goodhope-Spafarief Bay
+19050203	Cataloging Unit	Buckland River
+190503	Accounting Unit	Kobuk-Selawik Rivers
+19050301	Cataloging Unit	Selawik Lake
+19050302	Cataloging Unit	Upper Kobuk River
+19050303	Cataloging Unit	Middle Kobuk River
+19050304	Cataloging Unit	Lower Kobuk River
+190504	Accounting Unit	Noatak River-Lisburne Peninsula
+19050401	Cataloging Unit	Upper Noatak River
+19050402	Cataloging Unit	Middle Noatak River
+19050403	Cataloging Unit	Lower Noatak River
+19050404	Cataloging Unit	Wulik-Kivalina Rivers
+19050405	Cataloging Unit	Lisburne Peninsula
+190505	Accounting Unit	Kotzebue Sound
+19050500	Cataloging Unit	Kotzebue Sound
+1906	Subregion	Arctic Alaska
+190601	Accounting Unit	Western Arctic
+19060101	Cataloging Unit	Kukpowruk River
+19060102	Cataloging Unit	Kokolik River
+19060103	Cataloging Unit	Utukok River
+190602	Accounting Unit	Barrow Alaska
+19060201	Cataloging Unit	Kuk River
+19060202	Cataloging Unit	Northwest Coast
+19060203	Cataloging Unit	Meade River
+19060204	Cataloging Unit	Ikpikpuk River
+19060205	Cataloging Unit	Harrison Bay
+19060206	Cataloging Unit	Admiralty Bay-Dease Inlet
+190603	Accounting Unit	Colville River
+19060301	Cataloging Unit	Upper Colville River
+19060302	Cataloging Unit	Killik River
+19060303	Cataloging Unit	Chandler-Anaktuvuk Rivers
+19060304	Cataloging Unit	Lower Colville River
+190604	Accounting Unit	Prudhoe Bay
+19060401	Cataloging Unit	Kuparuk River
+19060402	Cataloging Unit	Sagavanirktok River
+19060403	Cataloging Unit	Mikkelsen Bay
+190605	Accounting Unit	Eastern Arctic
+19060501	Cataloging Unit	Canning River
+19060502	Cataloging Unit	Camden Bay
+19060503	Cataloging Unit	Beaufort Lagoon
+1907	Subregion	Headwaters Yukon-Lake Laberge
+190701	Accounting Unit	Headwaters Yukon River
+19070101	Cataloging Unit	Atlin Lake
+19070102	Cataloging Unit	Bennett Lake
+19070103	Cataloging Unit	Tagish Lake
+19070104	Cataloging Unit	Takhini River
+20	Region	Hawaii Region
+2001	Subregion	Hawaii
+200100	Accounting Unit	Hawaii
+20010000	Cataloging Unit	Hawaii
+2002	Subregion	Maui
+200200	Accounting Unit	Maui
+20020000	Cataloging Unit	Maui
+2003	Subregion	Kahoolawe
+200300	Accounting Unit	Kahoolawe
+20030000	Cataloging Unit	Kahoolawe
+2004	Subregion	Lanai
+200400	Accounting Unit	Lanai
+20040000	Cataloging Unit	Lanai
+2005	Subregion	Molokai
+200500	Accounting Unit	Molokai
+20050000	Cataloging Unit	Molokai
+2006	Subregion	Oahu
+200600	Accounting Unit	Oahu
+20060000	Cataloging Unit	Oahu
+2007	Subregion	Kauai
+200700	Accounting Unit	Kauai
+20070000	Cataloging Unit	Kauai
+2008	Subregion	Niihau
+200800	Accounting Unit	Niihau
+20080000	Cataloging Unit	Niihau
+2009	Subregion	Northwestern Hawaiian Islands
+200900	Accounting Unit	Northwestern Hawaiian Islands
+20090000	Cataloging Unit	Northwestern Hawaiian Islands
+21	Region	Caribbean Region
+2101	Subregion	Puerto Rico
+210100	Accounting Unit	Puerto Rico
+21010001	Cataloging Unit	Interior Puerto Rico
+21010002	Cataloging Unit	Cibuco-Guajataca
+21010003	Cataloging Unit	Culebrinas-Guanajibo
+21010004	Cataloging Unit	Southern Puerto Rico
+21010005	Cataloging Unit	Eastern Puerto Rico
+21010006	Cataloging Unit	Puerto Rican Islands
+2102	Subregion	Virgin Islands
+210200	Accounting Unit	Virgin Islands
+21020001	Cataloging Unit	St. John-St. Thomas
+21020002	Cataloging Unit	St. Croix
+2103	Subregion	Caribbean Outlying Areas
+210300	Accounting Unit	Caribbean Outlying Areas
+21030001	Cataloging Unit	Canal Zone
+21030002	Cataloging Unit	Navassa
+21030003	Cataloging Unit	Roncador-Serrana

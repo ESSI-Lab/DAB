@@ -4,7 +4,7 @@ package eu.essi_lab.jaxb.common;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -37,14 +37,14 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
 import eu.essi_lab.jaxb.common.schemas.CommonSchemas;
 import eu.essi_lab.jaxb.oaipmh.OAIPMHtype;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.lib.xml.XMLFactories;
 
 /**
@@ -118,8 +118,8 @@ public class CommonContext {
      * A marhsaller created from the common context, with the following properties set:
      * <ul>
      * <li>Marshaller.JAXB_FORMATTED_OUTPUT -> true</li>
-     * <li>"com.sun.xml.bind.xmlDeclaration" -> <code>omitXMLdeclaration</code></li>
-     * <li>"com.sun.xml.bind.namespacePrefixMapper" -> <code>new CommonNameSpaceContext()</code></li>
+     * <li>Marshaller.JAXB_FRAGMENT -> <code>omitXMLdeclaration</code></li>
+     * <li>"org.glassfish.jaxb.runtime.marshaller.NamespacePrefixMapper" -> <code>new CommonNameSpaceContext()</code></li>
      * </ul>
      *
      * @param omitXMLdeclaration
@@ -135,8 +135,8 @@ public class CommonContext {
      * A marhsaller created from the common context, with the following properties set:
      * <ul>
      * <li>Marshaller.JAXB_FORMATTED_OUTPUT -> true</li>
-     * <li>"com.sun.xml.bind.xmlDeclaration" -> <code>omitXMLdeclaration</code></li>
-     * <li>"com.sun.xml.bind.namespacePrefixMapper" -> <code>new CommonNameSpaceContext()</code></li>
+     * <li>Marshaller.JAXB_FRAGMENT -> <code>omitXMLdeclaration</code></li>
+     * <li>"org.glassfish.jaxb.runtime.marshaller.NamespacePrefixMapper" -> <code>new CommonNameSpaceContext()</code></li>
      * <li>Marshaller.JAXB_SCHEMA_LOCATION -> schemaLocation</li>
      * </ul>
      *
@@ -149,8 +149,8 @@ public class CommonContext {
 
 	Marshaller marshaller = jaxbContext.createMarshaller();
 	marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-	marshaller.setProperty("com.sun.xml.bind.xmlDeclaration", !omitXMLdeclaration);
-	marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", prefixMapper);
+	marshaller.setProperty(Marshaller.JAXB_FRAGMENT, omitXMLdeclaration);
+	marshaller.setProperty(NameSpace.NAMESPACE_PREFIX_MAPPER_IMPL, prefixMapper);
 	if (schemaLocation != null) {
 	    marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, schemaLocation);
 	}
@@ -162,8 +162,8 @@ public class CommonContext {
      * A marhsaller created from the common context, with the following properties set:
      * <ul>
      * <li>Marshaller.JAXB_FORMATTED_OUTPUT -> true</li>
-     * <li>"com.sun.xml.bind.xmlDeclaration" -> <code>omitXMLdeclaration</code></li>
-     * <li>"com.sun.xml.bind.namespacePrefixMapper" -> <code>new CommonNameSpaceContext()</code></li>
+     * <li>Marshaller.JAXB_FRAGMENT -> <code>omitXMLdeclaration</code></li>
+     * <li>"org.glassfish.jaxb.runtime.marshaller.NamespacePrefixMapper" -> <code>new CommonNameSpaceContext()</code></li>
      * </ul>
      *
      * @param omitXMLdeclaration

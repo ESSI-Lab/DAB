@@ -1,0 +1,40 @@
+{
+    "stac_version": "1.0.0",
+    "id": "cci_landcover",
+    "title": "cci_landcover",
+    "type": "Collection",
+    "license": "CC-BY-4.0",
+    "description": "ESA Climate Change Initiative Land Cover",
+    "properties": {},
+    "providers": [],
+    "extent": {
+        "temporal": {
+            "interval": [
+                [
+                    "1992-01-01T00:00:00+00:00",
+                    "2019-01-01T00:00:00+00:00"
+                ]
+            ]
+        },
+        "spatial": {
+            "bbox": [
+                [
+                    -26.361106324453548,
+                    -54.346956922596235,
+                    64.50002257687831,
+                    38.350005621406694
+                ]
+            ]
+        }
+    },
+    "links": [
+        {
+            "rel": "items",
+            "href": "https://explorer.digitalearth.africa/stac/collections/cci_landcover/items"
+        },
+        {
+            "rel": "root",
+            "href": "https://explorer.digitalearth.africa/stac"
+        }
+    ]
+}

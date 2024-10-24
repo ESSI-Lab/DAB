@@ -4,7 +4,7 @@ package eu.essi_lab.model.resource;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,6 +30,8 @@ public enum InterpolationType {
     AVERAGE(null,"Average"), //
     MAX(null,"Maximum"), //
     MIN(null,"Minimum"),//
+    MAX_DAILY_AVERAGES(null,"Maximum of daily averages"), //
+    MIN_DAILY_AVERAGES(null,"Minimum of daily averages"),//
     TOTAL(null,"Total"), //
     AVERAGE_PREC("http://www.opengis.net/def/waterml/2.0/interpolationType/AveragePrec","Average in preceding interval"), //
     MAX_PREC("http://www.opengis.net/def/waterml/2.0/interpolationType/MaxPrec","Maximum in preceding interval"), //

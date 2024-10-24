@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.csw;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,24 +23,24 @@ package eu.essi_lab.accessor.csw;
 
 import java.io.ByteArrayInputStream;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.http.HttpRequest;
 import java.util.Optional;
 
 import javax.ws.rs.core.MediaType;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.http.HttpHeaders;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.entity.ByteArrayEntity;
 import org.slf4j.Logger;
 
 import eu.essi_lab.jaxb.common.CommonContext;
 import eu.essi_lab.jaxb.csw._2_0_2.AbstractQueryType;
 import eu.essi_lab.jaxb.csw._2_0_2.GetRecords;
 import eu.essi_lab.jaxb.csw._2_0_2.QueryType;
+import eu.essi_lab.lib.net.downloader.HttpHeaderUtils;
+import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
+import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodNoBody;
+import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodWithBody;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -51,18 +51,21 @@ import eu.essi_lab.model.exceptions.GSException;
 public class CSWHttpGetRecordsRequestCreator {
 
     private final String getRecordsURL;
-    private final Logger logger = GSLoggerFactory.getLogger(CSWHttpGetRecordsRequestCreator.class);
-    private final HttpRequestBase baseRequest;
+    private HttpRequest baseRequest;
     private static final String CSW_CONNECTOR_GET_RECORDS_CREATION_ERROR = "CSW_CONNECTOR_GET_RECORDS_CREATION_ERROR";
 
     public CSWHttpGetRecordsRequestCreator(CSWConnector.Binding binding, CSWConnector connector, GetRecords getRecords) throws GSException {
 	switch (binding) {
 	case GET:
 	    getRecordsURL = connector.getRecordsURLGET;
-	    baseRequest = createRequestGET(getRecords, connector);
+	    try {
+		baseRequest = createRequestGET(getRecords, connector);
+	    } catch (URISyntaxException e) {
+		GSLoggerFactory.getLogger(getClass()).error(e);
+	    }
 	    break;
 	case POST_SOAP:
-	    logger.warn("NOT IMPLEMENTED!");
+	    GSLoggerFactory.getLogger(CSWHttpGetRecordsRequestCreator.class).error("POST SOAP NOT IMPLEMENTED");
 	    getRecordsURL = null;
 	    baseRequest = null;
 	    break;
@@ -85,8 +88,8 @@ public class CSWHttpGetRecordsRequestCreator {
 	    if (value instanceof QueryType) {
 		QueryType queryType = (QueryType) value;
 
-		Optional.of(queryType.getElementSetName()).ifPresent(
-			esn -> Optional.of(esn.getValue()).ifPresent(v -> elementSetName[0] = v.value()));
+		Optional.of(queryType.getElementSetName())
+			.ifPresent(esn -> Optional.of(esn.getValue()).ifPresent(v -> elementSetName[0] = v.value()));
 
 	    }
 	});
@@ -105,8 +108,8 @@ public class CSWHttpGetRecordsRequestCreator {
 	    if (value instanceof QueryType) {
 		QueryType queryType = (QueryType) value;
 
-		queryType.getTypeNames().forEach(typeName -> sb.append(typeName.getPrefix()).append(":").append(typeName.getLocalPart())
-			.append(" "));
+		queryType.getTypeNames()
+			.forEach(typeName -> sb.append(typeName.getPrefix()).append(":").append(typeName.getLocalPart()).append(" "));
 
 	    }
 	});
@@ -115,7 +118,7 @@ public class CSWHttpGetRecordsRequestCreator {
 
     }
 
-    private HttpRequestBase createRequestGET(GetRecords getRecords, CSWConnector connector) {
+    private HttpRequest createRequestGET(GetRecords getRecords, CSWConnector connector) throws URISyntaxException {
 
 	String url = strip80Port(connector.normalizeURL(getRecordsURL));
 
@@ -123,17 +126,17 @@ public class CSWHttpGetRecordsRequestCreator {
 
 	String typeNames = findTyoeNames(getRecords);
 
-	url += "service=CSW&request=GetRecords&version=2.0.2&outputFormat=" + getRecords.getOutputFormat() + "&outputSchema=" + getRecords
-		.getOutputSchema() + "&ElementSetName=" + elementSetName + "&resultType=" + getRecords.getResultType().value()
+	url += "service=CSW&request=GetRecords&version=2.0.2&outputFormat=" + getRecords.getOutputFormat() + "&outputSchema="
+		+ getRecords.getOutputSchema() + "&ElementSetName=" + elementSetName + "&resultType=" + getRecords.getResultType().value()
 		+ "&typeNames=" + typeNames + connector.getConstraintLanguageParameter() + "&startPosition=" + getRecords.getStartPosition()
 		+ "&maxRecords=" + getRecords.getMaxRecords();
 
-	return new HttpGet(url);
-
+	return HttpRequestUtils.build(MethodNoBody.GET, url);
     }
 
     /**
-     * The default 80 port can safely be always stripped, as it can give problem in general with some services, such as the FAO service
+     * The default 80 port can safely be always stripped, as it can give problem in general with some services, such as
+     * the FAO service
      * (i.e. http://www.fao.org/geonetwork/srv/en/csw?)
      *
      * @param urlString
@@ -146,34 +149,25 @@ public class CSWHttpGetRecordsRequestCreator {
 		urlString = urlString.replace(":80", "");
 	    }
 	} catch (MalformedURLException e) {
-	    // this should never happen
-	    logger.warn("Unexpected malformed url exception with string {}", urlString, e);
+	    GSLoggerFactory.getLogger(CSWHttpGetRecordsRequestCreator.class).error(e.getMessage(), e);
 	}
 	return urlString;
 
     }
 
-    private HttpRequestBase createRequestPOST(GetRecords getRecords) throws GSException {
+    private HttpRequest createRequestPOST(GetRecords getRecords) throws GSException {
 
 	String url = strip80Port(getGetRecordsUrl());
-
-	HttpPost httpPost = new HttpPost(url);
 
 	ByteArrayInputStream stream = null;
 	try {
 	    stream = CommonContext.asInputStream(getRecords, false);
 
-	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-	    IOUtils.copy(stream, baos);
-
-	    ByteArrayEntity inputStreamEntity = new ByteArrayEntity(baos.toByteArray());
-
-	    httpPost.setEntity(inputStreamEntity);
-
-	    httpPost.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML);
-
-	    return httpPost;
+	    return HttpRequestUtils.build(//
+		    MethodWithBody.POST, //
+		    url, //
+		    stream, //
+		    HttpHeaderUtils.build(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML));
 
 	} catch (Exception e) {
 
@@ -188,7 +182,7 @@ public class CSWHttpGetRecordsRequestCreator {
 
     }
 
-    public HttpRequestBase getHttpRequest() {
+    public HttpRequest getHttpRequest() {
 	return baseRequest;
     }
 

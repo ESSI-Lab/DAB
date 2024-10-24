@@ -1,10 +1,13 @@
+/**
+ * 
+ */
 package eu.essi_lab.api.database;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,39 +24,19 @@ package eu.essi_lab.api.database;
  * #L%
  */
 
-import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
-import eu.essi_lab.model.StorageUri;
-import eu.essi_lab.model.exceptions.GSException;
-
 /**
- * A provider of initialized {@link Database} instances. If the initialization fails, no {@link Database} instance is
- * provided
- *
  * @author Fabrizio
- * @see DatabaseProviderFactory
- * @see Database
- * @see DatabaseConsumer
  */
-public interface DatabaseProvider extends DatabaseClient {
+public interface DatabaseProvider extends DatabaseCompliant {
 
     /**
-     * Initializes a data base instance with the given <code>dbUri</code> and and <code>suiteIdentifier</code>
-     *
-     * @param dbUri
-     * @param suiteIdentifier an available suite identifier, or <code>null</code> if not available
-     * @return the suite identifier of this data base instance. Corresponds to <code>suiteIdentifier</code> if not
-     *         <code>null</code>,
-     *         otherwise a new identifier must be returned
-     * @throws GSException if the initialization fails
+     * @param dataBase
      */
-    public String initialize(StorageUri dbUri, String suiteIdentifier) throws GSException;
+    public void setDatabase(Database dataBase);
 
     /**
-     * A possible implementation can execute some code which release some resources.<br>
-     * After this method calling, the {@link Database} provided by this provider is no longer usable
-     * 
-     * @throws GSException
+     * @return
      */
-    public void release() throws GSException;
+    public Database getDatabase();
 
 }

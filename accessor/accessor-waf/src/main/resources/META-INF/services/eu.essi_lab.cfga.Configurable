@@ -12,3 +12,7 @@ eu.essi_lab.accessor.waf.onamet.ONAMETAugmenter
 eu.essi_lab.accessor.waf.onamet_stations.ONAMETStationsAccessor
 eu.essi_lab.accessor.waf.onamet_stations.ONAMETStationsConnector
 eu.essi_lab.accessor.waf.onamet_stations.ONAMETStationsAugmenter
+eu.essi_lab.accessor.waf.netcdf.NetCDFAccessor
+eu.essi_lab.accessor.waf.netcdf.NetCDFConnector
+eu.essi_lab.accessor.waf.zenodo.ZenodoS3BucketAccessor
+eu.essi_lab.accessor.waf.zenodo.ZenodoS3BucketConnector

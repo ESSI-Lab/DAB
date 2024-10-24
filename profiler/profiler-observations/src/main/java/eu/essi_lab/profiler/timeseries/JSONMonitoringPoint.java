@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.timeseries;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,6 +21,10 @@ package eu.essi_lab.profiler.timeseries;
  * #L%
  */
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -36,27 +40,27 @@ public class JSONMonitoringPoint {
 
     public JSONMonitoringPoint() {
 	platform.put("type", "MonitoringPoint");
-	platform.put("parameters", parameters);
-	platform.put("relatedParties", relatedParties);
+	platform.put("parameter", parameters);
+	platform.put("relatedParty", relatedParties);
     }
 
     // OBSERVATION
 
-    public void setSampledFeature(String href, String title) {
+    public void setId(String href) {
 
-	JSONObject sampledFeature = new JSONObject();
-	sampledFeature.put("href", href);
-	sampledFeature.put("title", title);
-	platform.put("sampledFeature", sampledFeature);
+	platform.put("id", href);
+
+    }
+
+    public void setName(String name) {
+
+	platform.put("name", name);
 
     }
 
     public String getSampledFeatureTitle() {
-	if (platform.has("sampledFeature")) {
-	    JSONObject sf = platform.getJSONObject("sampledFeature");
-	    if (sf.has("title")) {
-		return sf.getString("title");
-	    }
+	if (platform.has("name")) {
+	    return platform.getString("name");
 	}
 	return null;
     }
@@ -112,6 +116,17 @@ public class JSONMonitoringPoint {
     // UTILS
     public JSONObject getJSONObject() {
 	return platform;
+    }
+
+    public void setLatLon(BigDecimal lat, BigDecimal lon) {
+	JSONObject shape = new JSONObject();
+	shape.put("type", "Point");
+	List<BigDecimal> coordinates = new ArrayList<>();
+	coordinates.add(lon);
+	coordinates.add(lat);
+	shape.put("coordinates", coordinates);
+	platform.put("shape", shape);
+
     }
 
 }

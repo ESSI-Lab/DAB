@@ -1,0 +1,15 @@
+eu.flora.essi.accessor.hiscentral.toscana.HISCentralToscanaConnector
+eu.flora.essi.accessor.hiscentral.marche.HISCentralMarcheConnector
+eu.flora.essi.accessor.hiscentral.friuli.HISCentralFriuliConnector
+eu.flora.essi.accessor.hiscentral.veneto.HISCentralVenetoConnector
+eu.flora.essi.accessor.hiscentral.lazio.HISCentralLazioConnector
+eu.flora.essi.accessor.hiscentral.valdaosta.HISCentralValdaostaConnector
+eu.flora.essi.accessor.hiscentral.piemonte.HISCentralPiemonteConnector
+eu.flora.essi.accessor.hiscentral.lombardia.HISCentralLombardiaConnector
+eu.flora.essi.accessor.hiscentral.liguria.HISCentralLiguriaConnector
+eu.flora.essi.accessor.hiscentral.bolzano.HISCentralBolzanoConnector
+eu.flora.essi.accessor.hiscentral.emilia.HISCentralEmiliaConnector
+eu.flora.essi.accessor.hiscentral.sardegna.HISCentralSardegnaConnector
+eu.flora.essi.accessor.hiscentral.basilicata.HISCentralBasilicataConnector
+eu.flora.essi.accessor.hiscentral.umbria.HISCentralUmbriaConnector
+eu.flora.essi.accessor.hiscentral.puglia.HISCentralPugliaConnector

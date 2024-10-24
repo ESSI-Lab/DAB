@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<title>WMO Hydrological Observing System (WHOS) User Registration</title>
+		<style>
+			form { 
+			  display: block;
+			  margin-top: 30px;
+			  margin-left: 12px;
+			}
+
+			#otherInstitutionDiv {
+ 				display: none;
+			}
+			label{
+				font-size: x-large;
+				font-weight: bold;
+			}
+			
+			label2{
+				font-size: x-large;
+
+			}
+			
+			
+			/** 
+			 *  Colors	 
+			 */
+			 
+			:root {
+			  --color1: #00529c;
+			  --color2: #00abd0; 
+			  --color3: lightgray;
+		  	  --color4: white;			 
+			}
+									
+		    body{
+		      font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+		    }
+		    
+		    /** 
+			 *  Put the loading GIF	 
+			 */
+			 
+		    .loading_div{
+				  position: fixed;
+				  top: 50%;
+				  left: 50%;
+				  transform: translate(-50%, -50%);
+		    	  content: url("../../../../bnhs/station/gwis-loading.gif");		    	
+		    }
+
+		 	/** 
+			 *  Header and logos	 
+			 */
+			 
+		 	.page_header{	
+				  padding: 10px;
+			      background-color: var(--color1);
+			      margin-left: 12px;
+		          margin-right: 12px;
+			      font-size: 30px;
+			      color: var(--color4);
+			}
+							
+   			.main_title{
+   			    margin-left: 50px;   			
+   				font-weight:bold;
+   			}
+   			
+   			.sub_title{
+   			    margin-left: 50px;
+   			    margin-top: 10px;  		
+   				font-size:80%;
+   			}
+   			  					
+			.page_info{
+				line-height: 1.6;
+			 	padding: 10px;
+				margin-left: 12px;
+		        margin-right: 12px;
+		        border: 1px solid var(--color3);
+		        color: var(--color1);
+			}
+			
+			.page_info_text{
+				margin-left: 50px;
+			}
+   			  			
+   			.wmo_logo{
+				float:right; 
+				margin-right: 50px;
+				display:inline-block; 
+				margin-top: -70px;
+				width: 190px;
+				content: url("../bnhs/station/WMO_logo_white_ENG.png");
+			}
+			
+			.wmo_logo_below{
+				float:right; 
+				margin-right: 40px;
+				display:inline-block; 
+				margin-top: 12px;
+				width: 200px;
+				content: url("../bnhs/station/wmo-bar2.PNG");
+			}
+								
+			#hidden-div{
+				visibility: hidden;
+			}
+		 	
+		 	#dialog-download{
+		 	
+		 	}
+		 	#format-fieldset{
+		 		border: none;
+		 	}
+		 	
+		 	.custom_button {
+			  background-color: #4CAF50; /* Green */
+			  border: none;
+			  color: white;
+			  padding: 15px 32px;
+			  text-align: center;
+			  text-decoration: none;
+			  display: inline-block;
+			  font-size: 16px;
+			}
+			
+			.registerbtn {
+			  background-color: #04AA6D;
+			  color: white;
+			  padding: 16px 20px;
+			  margin: 8px 0;
+			  border: none;
+			  cursor: pointer;
+			  width: 100%;
+			  opacity: 0.9;
+			  font-size: xx-large;
+			}
+			
+			input[type=submit] {
+			  font-size: x-large;
+			  width: 100%;
+			  background-color: #4CAF50;
+			  color: white;
+			  padding: 14px 20px;
+			  margin: 8px 0;
+			  border: none;
+			  border-radius: 4px;
+			  cursor: pointer;
+			}
+			
+			input[type=submit]:hover {
+			  background-color: #45a049;
+			}
+			
+			input[type=text], select {
+			  width: 40%;
+			  padding: 12px 20px;
+			  margin: 8px 0;
+			  display: inline-block;
+			  border: 1px solid #ccc;
+			  border-radius: 4px;
+			  box-sizing: border-box;
+			}
+			
+		</style>
+	</head>
+	<body>
+
+		<div class="page_header">
+		
+			<div class="main_title">WMO Hydrological Observing System (WHOS)</div>
+			<div class="sub_title">User Registration</div>
+						
+			<a target=_blank href="https://public.wmo.int/en"><div class="wmo_logo"></div></a>
+			<a target=_blank href="https://public.wmo.int/en"><div class="wmo_logo_below"></div></a>
+						 									
+ 		</div> 
+
+			<form action="registration-listener.jsp">
+			  
+				  <label for="fname">First name:</label><br/>
+				  <input type="text" id="fname" name="fname" value=""><br/><br/>
+				  
+				  <label for="lname">Last name:</label><br/>
+				  <input type="text" id="lname" name="lname" value=""><br/><br/>
+				    
+				  <label for="email">E-mail Address:</label><br/>
+				  <input type="text" id="email" name="email" value=""><br/><br/>
+				  
+				  <label for="country">Country of residence:</label><br/>
+				  <input type="text" id="country" name="country" value=""><br/><br/>
+				  
+				  <!-- label for="institution">Institution:</label><br/>
+				  <input type="text" id="institution" name="institution" value=""><br/><br/-->
+				  
+				  <label for="institutionType">Institution type:</label><br/>
+				  
+				  <input type="radio" id="nmhs" name="institutionType" value="nmhs">
+				  <label2 for="nmhs">National Meteorological and Hydrological Services (NMHSs)</label2><br/>
+				  
+				  <input type="radio" id="defense" name="institutionType" value="defense">
+				  <label2 for="defense">Civil Defense</label2><br/>
+				  
+				  <input type="radio" id="private" name="institutionType" value="private">
+				  <label2 for="private">Private sector</label2><br/>
+				  
+				  <input type="radio" id="academia" name="institutionType" value="academia">
+				  <label2 for="academia">Academia</label2><br/>
+				  
+				  <input type="radio" id="international" name="institutionType" value="international">
+				  <label2 for="international">International Organization </label2><br/>
+				  
+				  <input onclick="showOtherDiv()" type="radio" id="other" name="institutionType" value="other">
+				  <label2 for="other">Other</label2><br/><br/>
+				  
+				  <div id='otherInstitutionDiv'>
+					  <label for="otherInstitutionType">Other institution type (please specify):</label><br/>
+					  <input type="text" id="otherInstitutionType" name="otherInstitutionType" value=""><br/><br/>
+				  </div>
+				  
+				  <label for="position">Position/Duty (if applicable):</label><br/>
+				  <input type="text" id="position" name="position" value=""><br/><br/>
+				  
+				  <label></label>
+				  				  
+				  <div style="border: solid lightgray 1px; padding: 5px">
+				  
+				  	  <label for="humanTest">Please, select the <i>only correct response</i> in order to proceed with the registration:</label><br/>
+				  
+					  <input type="checkbox" id="human" name="humanTest" value="human">
+					  <label2 for="human">I am a human</label2><br/>
+					  
+					  <input type="checkbox" id="robot" name="humanTest" value="robot">
+					  <label2 for="robot">I am a robot</label2><br/>
+					  
+					  <input type="checkbox" id="notsure" name="humanTest" value="notsure">
+					  <label2 for="notsure">Not sure...</label2><br/>
+					  
+				  </div>
+				
+				<h2>WHOS data</h2> 
+				 			 
+				<p>All data on the WMO Hydrological Observing System (hereinafter: WHOS) is made available in accordance with WMO data policy, which supports broadening and enhancing, whenever possible, the <i>free and unrestricted</i><sup>1</sup> international exchange of meteorological, hydrological, climatological and related environmental data and products.</p> 
+				 
+				<p>Please note that WHOS does not store or archive any data. By leveraging the Discovery and Access Broker technology, WHOS harmonizes, makes interoperable and shares the data that are published by original data providers through their web services.</p> 
+				
+				<p>Please note that not all data available on WHOS have undergone quality control procedures. Please contact the original data provider in order to get detailed information regarding data quality aspects.</p>
+				
+				<p>By accessing WHOS data, the user accepts the Terms of Use specified below.</p> 
+				 
+				<h2>Terms of Use</h2> 
+				 
+				<p>The user accepts all risks which may occur by using the data available on WHOS and accepts to not use the data for commercial purposes without the prior consent of the original data provider, noting that specific conditions of uses and licenses might apply.</p> 
+				 
+				<p>The user may not copy content available on WHOS to create a database in electronic or any other format, or publicly use and distribute it to third persons without prior consent of the original data provider.</p> 
+				 
+				<p>The user will attribute the source of the data for scientific publications and for operational products and services.</p> 
+				 
+				<p>World Meteorological Organization (hereinafter: WMO) shall not be held liable for any direct or indirect, accidental, material or non-material damages, loses or costs incurred as a result of using data on WHOS. Data that can be searched, viewed or downloaded using WHOS may be updated or modified at any time and WMO shall accept no responsibility for any harm resulting from such changes.</p> 
+				 
+				<p>WMO reserves the right to change or amend the Terms of Use for using WHOS and shall not be responsible for any harm that may result from such changes.</p> 
+				 
+				<footer>
+					<p><sup>1</sup> <i>Free and unrestricted</i> means the data is provided on a non-discriminatory basis and without charge.</p>
+				</footer>
+				 				
+				<input class="registerbtn" type="submit" value="Accept and Register">
+			
+			</form>  
+			
+			<script>		
+				function showOtherDiv() {
+				  var x = document.getElementById("otherInstitutionDiv");
+				    x.style.display = "block";  
+				}
+			</script>
+
+	</body>
+	
+</html>

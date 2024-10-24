@@ -7,7 +7,7 @@ package eu.essi_lab.api.database.marklogic.search.module;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,7 +29,7 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.essi_lab.api.database.marklogic.MarkLogicModuleManager;
+import eu.essi_lab.api.database.marklogic.MarkLogicModuleQueryBuilder;
 import eu.essi_lab.api.database.marklogic.search.MarkLogicSearchBuilder;
 import eu.essi_lab.api.database.marklogic.search.def.DefaultMarkLogicSpatialQueryBuilder;
 import eu.essi_lab.indexes.SpatialIndexHelper;
@@ -63,7 +63,7 @@ public class ModuleMarkLogicSpatialQueryBuilder extends DefaultMarkLogicSpatialQ
 	case BBOX:
 	case INTERSECTS:
 
-	    return MarkLogicModuleManager.getInstance().getSpatialIntersectsQuery(south, west, north, east);
+	    return MarkLogicModuleQueryBuilder.getInstance().getSpatialIntersectsQuery(south, west, north, east);
 
 	case DISJOINT:
 
@@ -109,7 +109,7 @@ public class ModuleMarkLogicSpatialQueryBuilder extends DefaultMarkLogicSpatialQ
 	    ranges.add(new SimpleEntry<Double, Double>(percent(area, 90), ranking.computeBoundingBoxWeight(area, 100)));
 	    ranges.add(new SimpleEntry<Double, Double>(area, ranking.computeBoundingBoxWeight(area, 100)));
 
-	    return MarkLogicModuleManager.getInstance().getSpatialContainsQuery(south, west, north, east, ranges);
+	    return MarkLogicModuleQueryBuilder.getInstance().getSpatialContainsQuery(south, west, north, east, ranges);
 
 	default:
 	    throw new IllegalArgumentException("Unknown area operation: " + op);

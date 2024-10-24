@@ -4,7 +4,7 @@ package eu.essi_lab.api.database.vol;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,7 +30,7 @@ import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseWriter;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.messages.bond.View;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.ontology.GSKnowledgeResourceDescription;
@@ -42,28 +42,21 @@ import eu.essi_lab.model.resource.GSResource;
 public class VolatileDatabaseWriter implements DatabaseWriter {
 
     private VolatileDatabase database;
-    private StorageUri dbUri;
+    private StorageInfo dbUri;
 
-    @SuppressWarnings("rawtypes")
+    @Override
+    public boolean supports(StorageInfo dbUri) {
+
+	this.dbUri = dbUri;
+
+	return dbUri.getName() != null && //
+		dbUri.getName().equals(DatabaseSetting.VOLATILE_DB_STORAGE_NAME);
+    }
+
     @Override
     public void setDatabase(Database db) {
 
 	this.database = (VolatileDatabase) db;
-    }
-
-    @Override
-    public boolean supports(StorageUri dbUri) {
-
-	this.dbUri = dbUri;
-
-	return dbUri.getStorageName() != null && //
-		dbUri.getStorageName().equals(DatabaseSetting.VOLATILE_DB_STORAGE_NAME);
-    }
-
-    @Override
-    public StorageUri getStorageUri() {
-
-	return null;
     }
 
     @Override
@@ -76,6 +69,21 @@ public class VolatileDatabaseWriter implements DatabaseWriter {
     public void store(GSUser user) throws GSException {
 
 	getDatabase().getUsersList().add(user);
+    }
+
+    @Override
+    public void removeUser(String userId) {
+
+	synchronized (getDatabase().getUsersList()) {
+
+	    Iterator<GSUser> iterator = getDatabase().getUsersList().iterator();
+	    while (iterator.hasNext()) {
+		GSUser next = iterator.next();
+		if (next.getIdentifier().equals(userId)) {
+		    iterator.remove();
+		}
+	    }
+	}
     }
 
     @Override
@@ -173,5 +181,4 @@ public class VolatileDatabaseWriter implements DatabaseWriter {
     public void storeRDF(Node rdf) throws GSException {
 
     }
-
 }

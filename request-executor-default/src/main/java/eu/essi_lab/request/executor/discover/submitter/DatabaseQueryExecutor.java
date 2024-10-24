@@ -4,7 +4,7 @@ package eu.essi_lab.request.executor.discover.submitter;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,8 +27,8 @@ import java.util.List;
 
 import org.w3c.dom.Node;
 
-import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.factory.DatabaseConsumerFactory;
+import eu.essi_lab.api.database.DatabaseFinder;
+import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.lib.servlet.RequestManager;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -36,7 +36,7 @@ import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.count.DiscoveryCountResponse;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.StorageUri;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.request.executor.query.IDatabaseQueryExecutor;
@@ -59,15 +59,15 @@ public class DatabaseQueryExecutor implements IDatabaseQueryExecutor {
     @Override
     public SimpleEntry<String, DiscoveryCountResponse> count(DiscoveryMessage message) throws GSException {
 
-	RequestManager.getInstance().addThreadName(message.getRequestId());
-	
-	StorageUri uri = message.getDataBaseURI();
+	RequestManager.getInstance().updateThreadName(getClass(), message.getRequestId());
 
-	DatabaseReader reader = DatabaseConsumerFactory.createDataBaseReader(uri);
+	StorageInfo uri = message.getDataBaseURI();
+	
+	DatabaseFinder finder = DatabaseProviderFactory.getDatabaseFinder(uri);
 
 	GSLoggerFactory.getLogger(getClass()).info("Count STARTED");
 
-	DiscoveryCountResponse countResult = reader.count(message);
+	DiscoveryCountResponse countResult = finder.count(message);
 
 	GSLoggerFactory.getLogger(getClass()).info("Count ENDED");
 
@@ -78,58 +78,58 @@ public class DatabaseQueryExecutor implements IDatabaseQueryExecutor {
 
     @Override
     public ResultSet<GSResource> retrieve(DiscoveryMessage message, Page page) throws GSException {
-	
-	GSLoggerFactory.getLogger(getClass()).info("Retrieve STARTED");
-	
-	RequestManager.getInstance().addThreadName(message.getRequestId());
-	
-	StorageUri uri = message.getDataBaseURI();
 
-	DatabaseReader reader = DatabaseConsumerFactory.createDataBaseReader(uri);
+	GSLoggerFactory.getLogger(getClass()).info("Retrieve STARTED");
+
+	RequestManager.getInstance().updateThreadName(getClass(), message.getRequestId());
+
+	StorageInfo uri = message.getDataBaseURI();
+
+	DatabaseFinder finder = DatabaseProviderFactory.getDatabaseFinder(uri);
 
 	message.setPage(page);
-	
-	ResultSet<GSResource> resultSet = reader.discover(message);
+
+	ResultSet<GSResource> resultSet = finder.discover(message);
 
 	GSLoggerFactory.getLogger(getClass()).info("Retrieve ENDED");
 
 	return resultSet;
     }
-    
+
     @Override
     public ResultSet<Node> retrieveNodes(DiscoveryMessage message, Page page) throws GSException {
 
 	GSLoggerFactory.getLogger(getClass()).info("Retrieve STARTED");
-	
-	RequestManager.getInstance().addThreadName(message.getRequestId());
-	
-	StorageUri uri = message.getDataBaseURI();
 
-	DatabaseReader reader = DatabaseConsumerFactory.createDataBaseReader(uri);
+	RequestManager.getInstance().updateThreadName(getClass(), message.getRequestId());
+
+	StorageInfo uri = message.getDataBaseURI();
+
+	DatabaseFinder finder = DatabaseProviderFactory.getDatabaseFinder(uri);
 
 	message.setPage(page);
-	
-	ResultSet<Node> resultSet = reader.discoverNodes(message);
+
+	ResultSet<Node> resultSet = finder.discoverNodes(message);
 
 	GSLoggerFactory.getLogger(getClass()).info("Retrieve ENDED");
 
 	return resultSet;
     }
-    
+
     @Override
     public ResultSet<String> retrieveStrings(DiscoveryMessage message, Page page) throws GSException {
 
 	GSLoggerFactory.getLogger(getClass()).info("Retrieve STARTED");
-	
-	RequestManager.getInstance().addThreadName(message.getRequestId());
-	
-	StorageUri uri = message.getDataBaseURI();
 
-	DatabaseReader reader = DatabaseConsumerFactory.createDataBaseReader(uri);
+	RequestManager.getInstance().updateThreadName(getClass(), message.getRequestId());
+
+	StorageInfo uri = message.getDataBaseURI();
+
+	DatabaseFinder finder = DatabaseProviderFactory.getDatabaseFinder(uri);
 
 	message.setPage(page);
-	
-	ResultSet<String> resultSet = reader.discoverStrings(message);
+
+	ResultSet<String> resultSet = finder.discoverStrings(message);
 
 	GSLoggerFactory.getLogger(getClass()).info("Retrieve ENDED");
 

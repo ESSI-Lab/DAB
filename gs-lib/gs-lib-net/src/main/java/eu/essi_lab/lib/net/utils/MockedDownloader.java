@@ -4,7 +4,7 @@ package eu.essi_lab.lib.net.utils;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,6 +25,8 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
+
+import eu.essi_lab.lib.net.downloader.Downloader;
 
 /**
  * A mocked download, useful for tests, that downloads only what indicated in the constructor.
@@ -47,13 +49,13 @@ public class MockedDownloader extends Downloader {
     }
 
     @Override
-    public Optional<InputStream> downloadStream(String url) {
+    public Optional<InputStream> downloadOptionalStream(String url) {
 	String response = getResponse(url);
 	return Optional.of(new ByteArrayInputStream(response.getBytes(StandardCharsets.UTF_8)));
     }
 
     @Override
-    public Optional<String> downloadString(String url) {
+    public Optional<String> downloadOptionalString(String url) {
 	return Optional.ofNullable(getResponse(url));
     }
 

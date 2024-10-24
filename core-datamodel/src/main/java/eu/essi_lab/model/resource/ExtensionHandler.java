@@ -4,7 +4,7 @@ package eu.essi_lab.model.resource;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,17 +21,22 @@ package eu.essi_lab.model.resource;
  * #L%
  */
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.datatype.Duration;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.w3c.dom.Node;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.NameSpace;
+import eu.essi_lab.model.resource.worldcereal.WorldCerealItem;
+import eu.essi_lab.model.resource.worldcereal.WorldCerealMap;
 
 /**
  * Utility class to read/write extended metadata
@@ -45,9 +50,11 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     private static final String ORIGINATOR_ORGANISATION_IDENTIFIER = "OriginatorOrganisationIdentifier";
     private static final String ORIGINATOR_ORGANISATION_DESCRIPTION = "OriginatorOrganisationDescription";
     private static final String FEDEO_SECOND_LEVEL_TEMPLATE = "fedeoSecondLevel";
+    private static final String STAC_SECOND_LEVEL_TEMPLATE = "STACSecondLevel";
     private static final String NC_FILE_CORRUPTED = "ncFileCorrupted";
     private static final String AVAILABLE_GRANULES = "availableGranules";
     private static final String THEME_CATEGORY = "themeCategory";
+    private static final String IN_SITU = "inSitu";
 
     private ExtendedMetadata metadata;
 
@@ -128,6 +135,33 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     public void setFEDEOSecondLevelInfo(String info) {
 	try {
 	    this.metadata.add(FEDEO_SECOND_LEVEL_TEMPLATE, info);
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+    
+    /**
+     * @return
+     */
+    public Optional<String> getSTACSecondLevelInfo() {
+
+	try {
+	    return Optional.ofNullable(this.metadata.getTextContent(STAC_SECOND_LEVEL_TEMPLATE));
+	} catch (XPathExpressionException e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @param info
+     */
+    public void setSTACSecondLevelInfo(String info) {
+	try {
+	    this.metadata.add(STAC_SECOND_LEVEL_TEMPLATE, info);
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
@@ -382,7 +416,68 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 
 	return Optional.empty();
     }
+    
+    /**
+     * @param scene
+     */
+    public void setWorldCereal(WorldCerealMap map) {
 
+	try {
+	    this.metadata.remove("//*:worldCerealMap");
+	    this.metadata.add(map.asDocument(true).getDocumentElement());
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    /**
+     * @return
+     */
+    public Optional<WorldCerealMap> getWorldCereal() {
+
+	try {
+	    List<Node> list = this.metadata.get("//*:worldCerealMap");
+	    if (!list.isEmpty()) {
+
+		Node node = list.get(0);
+		return Optional.of(WorldCerealMap.create(node));
+	    }
+	} catch (XPathExpressionException | JAXBException e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return Optional.empty();
+    }
+    
+
+    /**
+     * @return
+     */
+    public Optional<String> getCropTypes() {
+	try {
+	    String str = this.metadata.getTextContent(MetadataElement.CROP_TYPES_EL_NAME);
+	    return Optional.ofNullable(str);
+	} catch (XPathExpressionException e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return Optional.empty();
+    }
+
+    public void setCropTypes(String cropTypes) {
+	try {
+	    this.metadata.add(MetadataElement.CROP_TYPES_EL_NAME, cropTypes);
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+    }
+    
+    
     /**
      * @return
      */
@@ -421,9 +516,19 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	    e.printStackTrace();
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
-
 	return Optional.empty();
     }
+    public Optional<String> getTimeInterpolationString() {
+	try {
+	    String str = this.metadata.getTextContent(MetadataElement.TIME_INTERPOLATION_EL_NAME);
+	    return Optional.ofNullable(str);
+	} catch (XPathExpressionException e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+	return Optional.empty();
+    }
+    
 
     public void setTimeInterpolation(InterpolationType interpolationType) {
 	if (interpolationType != null) {
@@ -519,6 +624,88 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	}
 
     }
+    
+    /**
+     * @return
+     */
+    public Optional<String> getTimeResolutionDuration8601() {
+	try {
+	    String str = this.metadata.getTextContent(MetadataElement.TIME_RESOLUTION_DURATION_8601_EL_NAME);
+	    Optional<String> ret = Optional.ofNullable(str);
+	    if (ret.isPresent()) {
+		return ret;
+	    }
+	    Optional<String> timeUnits = getTimeUnits();
+	    Optional<String> timeResolution = getTimeResolution();
+
+	    if (timeUnits.isPresent() && timeResolution.isPresent()) {
+		String units = timeUnits.get();
+		BigDecimal value = new BigDecimal(timeResolution.get());
+		Duration res = ISO8601DateTimeUtils.getDuration(value, units);
+		if (res != null) {
+		    return Optional.ofNullable(res.toString());
+		} else {
+		    GSLoggerFactory.getLogger(getClass()).error("Unknown time resolution: {} {}", value, units);
+		}
+	    }
+	} catch (XPathExpressionException e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return Optional.empty();
+    }
+
+    public void setTimeResolutionDuration8601(String resolution) {
+	try {
+	    this.metadata.add(MetadataElement.TIME_RESOLUTION_DURATION_8601_EL_NAME, resolution);
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+    }
+    
+    /**
+     * @return
+     */
+    public Optional<String> getTimeAggregationDuration8601() {
+	try {
+	    String str = this.metadata.getTextContent(MetadataElement.TIME_AGGREGATION_DURATION_8601_EL_NAME);
+	    Optional<String> ret = Optional.ofNullable(str);
+	    if (ret.isPresent()) {
+		return ret;
+	    }
+	    Optional<String> timeUnits = getTimeUnits();
+	    Optional<String> timeSupport = getTimeSupport();
+
+	    if (timeUnits.isPresent() && timeSupport.isPresent()) {
+		String units = timeUnits.get();
+		BigDecimal value = new BigDecimal(timeSupport.get());
+		Duration duration = ISO8601DateTimeUtils.getDuration(value, units);
+		if (duration != null) {
+		    return Optional.ofNullable(duration.toString());
+		} else {
+		    GSLoggerFactory.getLogger(getClass()).error("Unknown time aggregation: {} {}", value, units);
+		}
+	    }
+	} catch (XPathExpressionException e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return Optional.empty();
+    }
+
+    public void setTimeAggregationDuration8601(String timeAggregation) {
+	try {
+	    this.metadata.add(MetadataElement.TIME_AGGREGATION_DURATION_8601_EL_NAME, timeAggregation);
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+    }
 
     /**
      * @return
@@ -569,9 +756,9 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 
     }
 
-    public void setAttributeURI(String attributeUnitsURI) {
+    public void setObservedPropertyURI(String attributeUnitsURI) {
 	try {
-	    this.metadata.add(MetadataElement.ATTRIBUTE_URI_EL_NAME, attributeUnitsURI);
+	    this.metadata.add(MetadataElement.OBSERVED_PROPERTY_URI_EL_NAME, attributeUnitsURI);
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
@@ -582,9 +769,9 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     /**
      * @return
      */
-    public Optional<String> getAttributeURI() {
+    public Optional<String> getObservedPropertyURI() {
 	try {
-	    String str = this.metadata.getTextContent(MetadataElement.ATTRIBUTE_URI_EL_NAME);
+	    String str = this.metadata.getTextContent(MetadataElement.OBSERVED_PROPERTY_URI_EL_NAME);
 	    return Optional.ofNullable(str);
 	} catch (XPathExpressionException e) {
 	    e.printStackTrace();
@@ -592,6 +779,30 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	}
 	return Optional.empty();
     }
+    
+    public void setWISTopicHierarchy(String topic) {
+   	try {
+   	    this.metadata.add(MetadataElement.WIS_TOPIC_HIERARCHY_EL_NAME, topic);
+   	} catch (Exception e) {
+   	    e.printStackTrace();
+   	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+   	}
+
+       }
+
+       /**
+        * @return
+        */
+       public Optional<String> getWISTopicHierarchy() {
+   	try {
+   	    String str = this.metadata.getTextContent(MetadataElement.WIS_TOPIC_HIERARCHY_EL_NAME);
+   	    return Optional.ofNullable(str);
+   	} catch (XPathExpressionException e) {
+   	    e.printStackTrace();
+   	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+   	}
+   	return Optional.empty();
+       }
 
     /**
      * @return
@@ -836,7 +1047,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
      */
     public Optional<String> getThemeCategory() {
 	try {
-	    String str = this.metadata.getTextContent("TeamCategory");
+	    String str = this.metadata.getTextContent("themeCategory");
 	    return Optional.ofNullable(str);
 	} catch (XPathExpressionException e) {
 	    e.printStackTrace();
@@ -858,6 +1069,46 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
     }
+    
+    /**
+     * @param themeCategory
+     */
+    public void setIsInSitu() {
+	try {
+	    this.metadata.add(IN_SITU, "true");
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+	
+    }
+    
+    /**
+     * @return
+     */
+    public boolean isInSitu() {
+	try {
+
+	    String textContent = this.metadata.getTextContent(IN_SITU);
+
+	    if (textContent == null) {
+
+		return false;
+	    }
+
+	    return textContent.equals("true") ? true : false;
+
+	} catch (XPathExpressionException e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return false;
+    }
+    
+    
+    
+    
 
 
 }

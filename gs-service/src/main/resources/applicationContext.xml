@@ -8,7 +8,7 @@
     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
     http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
     http://cxf.apache.org/jaxrs    http://cxf.apache.org/schemas/jaxrs.xsd"
-	default-dependency-check="none" default-lazy-init="false">
+	default-lazy-init="false">
 
 	<!-- Load the needed resources that are present in the cxf* jars -->
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
@@ -38,6 +38,14 @@
 	<bean id="extProfiler" class="eu.essi_lab.gssrv.rest.EXTProfilerService" />
 	
 
+	<jaxrs:server id="supportService" address="/support">
+		<jaxrs:serviceBeans>
+			<ref bean="support" />
+		</jaxrs:serviceBeans>
+	</jaxrs:server>
+
+	<bean id="support" class="eu.essi_lab.gssrv.rest.SupportService" />
+	
 	<jaxrs:server id="essiUserServer" address="/user">
 		<jaxrs:serviceBeans>
 			<ref bean="essiUserService" />

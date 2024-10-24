@@ -7,7 +7,7 @@ package eu.essi_lab.messages.stats;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -36,11 +36,6 @@ import eu.essi_lab.model.Queryable;
  * @author Fabrizio
  */
 public class StatisticsMessage extends QueryInitializerMessage {
-
-    @Override
-    public String getBaseType() {
-	return "statistics-message";
-    }
 
     private static final String MIN = "MIN";
     private static final String MAX = "MAX";
@@ -124,17 +119,16 @@ public class StatisticsMessage extends QueryInitializerMessage {
 	}
 
 	/**
-	 * 
 	 * @param interval e.g. 2d for 2 days
 	 */
 	public void setInterval(String interval) {
 	    this.interval = interval;
-	    
+
 	}
-	
+
 	public String getInterval() {
 	    return interval;
-	    
+
 	}
     }
 

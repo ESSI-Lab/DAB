@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gui.dialog;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -133,6 +133,50 @@ public class NotificationDialog extends ConfirmationDialog {
      * @param title
      * @param text
      * @param width
+     * @param throwable
+     * @return
+     */
+    public static NotificationDialog getNotificationDialog(String title, String text, int width, Throwable throwable) {
+
+	return new NotificationDialog(title, text, width, throwable);
+    }
+
+    /**
+     * @param title
+     * @param text
+     * @param throwable
+     * @return
+     */
+    public static NotificationDialog getNotificationDialog(String title, String text, Throwable throwable) {
+
+	return new NotificationDialog(title, text, 500, throwable);
+    }
+
+    /**
+     * @param title
+     * @param text
+     * @return
+     */
+    public static NotificationDialog getNotificationDialog(String title, String text) {
+
+	return new NotificationDialog(title, text, 500);
+    }
+
+    /**
+     * @param title
+     * @param text
+     * @param width
+     * @return
+     */
+    public static NotificationDialog getNotificationDialog(String title, String text, int width) {
+
+	return new NotificationDialog(title, text, width);
+    }
+
+    /**
+     * @param title
+     * @param text
+     * @param width
      */
     private NotificationDialog(String title, String text, int width) {
 
@@ -147,9 +191,9 @@ public class NotificationDialog extends ConfirmationDialog {
     private NotificationDialog(String title, String text, int width, Throwable throwable) {
 
 	setTitle(title);
-	
-	if(text == null || text.trim().isEmpty()){
-	    
+
+	if (text == null || text.trim().isEmpty()) {
+
 	    text = "No message available";
 	}
 

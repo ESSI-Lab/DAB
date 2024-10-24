@@ -4,7 +4,7 @@ package eu.essi_lab.cfga.gui.components;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -30,6 +30,8 @@ import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.Tabs.SelectedChangeEvent;
 
+import eu.essi_lab.cfga.ConfigurationChangeListener;
+
 /**
  * In Vaadin tabs are just tabs, they have no control on the tab content.<br>
  * This component allows to
@@ -38,7 +40,7 @@ import com.vaadin.flow.component.tabs.Tabs.SelectedChangeEvent;
  * @author Fabrizio
  */
 @SuppressWarnings("serial")
-public class TabsWithContent extends Tabs implements ComponentEventListener<SelectedChangeEvent> {
+public class TabsWithContent extends Tabs implements ComponentEventListener<SelectedChangeEvent>, ConfigurationChangeListener {
 
     private Map<Tab, TabContainer> tabsToContent;
     private Div contentDiv;
@@ -69,6 +71,18 @@ public class TabsWithContent extends Tabs implements ComponentEventListener<Sele
 
 		container.render();
 	    }
+	}
+    }
+
+    @Override
+    public void configurationChanged(ConfigurationChangeEvent event) {
+	switch (event.getEventType()) {
+	case ConfigurationChangeEvent.CONFIGURATION_FLUSHED:
+	case ConfigurationChangeEvent.SETTING_PUT:
+	case ConfigurationChangeEvent.SETTING_REMOVED:
+	case ConfigurationChangeEvent.SETTING_REPLACED:
+
+	    tabsToContent.values().forEach(tabContent -> tabContent.setRendered(false));
 	}
     }
 

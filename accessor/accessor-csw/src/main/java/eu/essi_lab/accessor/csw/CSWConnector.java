@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.csw;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2022 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -31,6 +31,8 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,9 +47,6 @@ import javax.xml.bind.UnmarshalException;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpRequestBase;
 import org.w3c.dom.Node;
 
 import eu.essi_lab.accessor.csw.parser.CSWOperationParser;
@@ -56,6 +55,7 @@ import eu.essi_lab.jaxb.common.CommonContext;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.jaxb.common.ObjectFactories;
 import eu.essi_lab.jaxb.csw._2_0_2.AbstractRecordType;
+import eu.essi_lab.jaxb.csw._2_0_2.BriefRecordType;
 import eu.essi_lab.jaxb.csw._2_0_2.Capabilities;
 import eu.essi_lab.jaxb.csw._2_0_2.ElementSetName;
 import eu.essi_lab.jaxb.csw._2_0_2.ElementSetType;
@@ -65,10 +65,13 @@ import eu.essi_lab.jaxb.csw._2_0_2.QueryType;
 import eu.essi_lab.jaxb.csw._2_0_2.RecordType;
 import eu.essi_lab.jaxb.csw._2_0_2.ResultType;
 import eu.essi_lab.jaxb.csw._2_0_2.SearchResultsType;
+import eu.essi_lab.jaxb.csw._2_0_2.SummaryRecordType;
 import eu.essi_lab.jaxb.ows._1_0_0.ExceptionReport;
 import eu.essi_lab.jaxb.ows._1_0_0.Operation;
 import eu.essi_lab.jaxb.ows._1_0_0.OperationsMetadata;
-import eu.essi_lab.lib.net.utils.HttpRequestExecutor;
+import eu.essi_lab.lib.net.downloader.Downloader;
+import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
+import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodNoBody;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
@@ -107,9 +110,10 @@ public class CSWConnector extends WrappedConnector {
     private static final String GET_RECORDS_OPERATION_NAME = "GetRecords";
 
     private Capabilities capabilitiesDocument;
+    private ElementSetType elementeSetType;
     private static final String PREFERRED_VERSION = "2.0.2";
     private static final String ACCEPTED_VERSION = "2.0.2";
-    private static final String OUTPUT_FORMAT = "application/xml";
+    protected static final String OUTPUT_FORMAT = "application/xml";
     private static final String CONSTRAINT_LAGUAGEPARAMETER = "&CONSTRAINTLANGUAGE=CQL_TEXT";
 
     public enum Binding {
@@ -131,7 +135,12 @@ public class CSWConnector extends WrappedConnector {
 	//
 	// default page size 100
 	//
-	getSetting().selectPageSize(requestSizeDefault);
+	getSetting().setPageSize(requestSizeDefault);
+
+	//
+	// default element set type FULL
+	//
+	setElementeSetType(ElementSetType.FULL);
     }
 
     /**
@@ -139,7 +148,7 @@ public class CSWConnector extends WrappedConnector {
      */
     protected int getPageSizeOption() {
 
-	return getSetting().getSelectedPageSize();
+	return getSetting().getPageSize();
     }
 
     public Binding getGetRecordsBinding() {
@@ -159,18 +168,18 @@ public class CSWConnector extends WrappedConnector {
 	return new CSWHttpGetRecordsRequestCreator(getRecordsBinding, this, getRecords);
     }
 
-    SimpleEntry<Integer, File> doExecHttpRequest(HttpRequestBase baseRequest) throws GSException {
+    SimpleEntry<Integer, File> doExecHttpRequest(HttpRequest httpRequest) throws GSException {
 
 	Integer code = null;
 	try {
 
-	    HttpResponse httpResponse = new HttpRequestExecutor().execute(baseRequest);
+	    HttpResponse<InputStream> httpResponse = new Downloader().downloadResponse(httpRequest);
 
-	    code = httpResponse.getStatusLine().getStatusCode();
+	    code = httpResponse.statusCode();
 
 	    GSLoggerFactory.getLogger(CSWConnector.class).debug("Returnded http code {}", code);
 
-	    InputStream content = httpResponse.getEntity().getContent();
+	    InputStream content = httpResponse.body();
 
 	    File tmpFile = File.createTempFile("CSWConnector", ".xml");
 	    tmpFile.deleteOnExit();
@@ -184,22 +193,22 @@ public class CSWConnector extends WrappedConnector {
 
 	    return ret;
 
-	} catch (IOException e1) {
+	} catch (Exception e1) {
 
-	    GSLoggerFactory.getLogger(CSWConnector.class).error("Error executing Http request to {}", baseRequest.getURI().toString(), e1);
+	    GSLoggerFactory.getLogger(CSWConnector.class).error("Error executing Http request to {}", httpRequest, e1);
 
 	    throw GSException.createException( //
 		    getClass(), //
-		    "IOException connecting to " + baseRequest.getURI().toString() + " -- http code: " + code, //
+		    "IOException connecting to " + httpRequest.uri() + " -- http code: " + code, //
 		    null, //
 		    ErrorInfo.ERRORTYPE_SERVICE, //
 		    ErrorInfo.SEVERITY_ERROR, //
-		    CSW_EXCEPTIO_REPORT_ERROR,//
+		    CSW_EXCEPTIO_REPORT_ERROR, //
 		    e1);
 	}
     }
 
-    private int calculateStart(String token) {
+    protected int calculateStart(String token) {
 	// the first request start position is "1"
 	int startPosition = this.startIndex;
 	if (token != null) {
@@ -209,7 +218,7 @@ public class CSWConnector extends WrappedConnector {
 	return startPosition;
     }
 
-    private int getRecordsLimit() {
+    protected int getRecordsLimit() {
 	Optional<Integer> op = getSetting().getMaxRecords();
 
 	return op.isPresent() ? op.get() : -100;
@@ -251,24 +260,34 @@ public class CSWConnector extends WrappedConnector {
 
 	    String getRecordsURL = creator.getGetRecordsUrl();
 
-	    HttpRequestBase baseRequest = creator.getHttpRequest();
-
 	    GSLoggerFactory.getLogger(CSWConnector.class).debug("Executing GetRecords request ({}-{}) to URL: {}",
 		    getRecords.getStartPosition(), getRecords.getStartPosition().add(getRecords.getMaxRecords()).subtract(BigInteger.ONE),
 		    getRecordsURL);
 
-	    SimpleEntry<Integer, File> codeFile = doExecHttpRequest(baseRequest);
+	    HttpRequest httpRequest = creator.getHttpRequest();
+
+	    SimpleEntry<Integer, File> codeFile = doExecHttpRequest(httpRequest);
 
 	    code = codeFile.getKey();
 	    file = codeFile.getValue();
+
 	    if (code > 400) {
-		// try to request one record only, for some services such as NODC it will work
-		requestSize = requestSize / 2;
+
+		requestSize = retryGetRecordsWithSmallerPage() ? requestSize / 2 : requestSize;
+
 		if (requestSize == 0) {
 		    requestSize = 1;
 		}
-		GSLoggerFactory.getLogger(getClass()).info("Retrying CSW GetRecords with smaller size (" + requestSize + ")");
-		if (requestSize == 1) {
+
+		if (retryGetRecordsWithSmallerPage()) {
+		    GSLoggerFactory.getLogger(getClass()).info("Retrying CSW GetRecords with smaller size (" + requestSize + ")");
+
+		} else {
+
+		    GSLoggerFactory.getLogger(getClass()).info("Retrying CSW GetRecords");
+		}
+
+		if (requestSize == 1 || !retryGetRecordsWithSmallerPage()) {
 		    tries--;
 		    GSLoggerFactory.getLogger(getClass()).info("Retrying CSW GetRecords with minimal size. " + tries + " tries left.");
 		}
@@ -279,8 +298,26 @@ public class CSWConnector extends WrappedConnector {
 
 	SearchResultsType searchResults = toSearchResults(file);
 
-	if (file != null && file.exists())
+	//
+	//
+	//
+
+	int expectedRecordsCount = searchResults.getNumberOfRecordsMatched().intValue();
+
+	if (supportsExpectedRecordsCount()) {
+
+	    GSLoggerFactory.getLogger(getClass()).trace("Setting expected records count: {}", expectedRecordsCount);
+
+	    request.setExpectedRecords(expectedRecordsCount);
+	}
+
+	//
+	//
+	//
+
+	if (file != null && file.exists()) {
 	    file.delete();
+	}
 
 	GSLoggerFactory.getLogger(CSWConnector.class).debug("GetRecords response obtained (" + searchResults.getNumberOfRecordsReturned()
 		+ " returned / " + searchResults.getNumberOfRecordsMatched() + " matched)");
@@ -288,6 +325,8 @@ public class CSWConnector extends WrappedConnector {
 	ret = toOriginalMetadata(searchResults);
 
 	filterResults(ret);
+
+	fixOnlineResources(ret);
 
 	BigInteger nextRecordField = searchResults.getNextRecord();
 	Integer nextRecord;
@@ -306,8 +345,7 @@ public class CSWConnector extends WrappedConnector {
 	}
 	// additional check if all records have been returned
 	int currentPosition = startPosition + requestSize;
-	if (nextRecord > searchResults.getNumberOfRecordsMatched().intValue()
-		|| currentPosition > searchResults.getNumberOfRecordsMatched().intValue()) {
+	if (nextRecord > expectedRecordsCount || currentPosition > expectedRecordsCount) {
 	    // all records have been returned
 	    ret.setResumptionToken(null);
 	}
@@ -320,6 +358,14 @@ public class CSWConnector extends WrappedConnector {
 	}
 
 	return ret;
+    }
+
+    /**
+     * @return
+     */
+    protected boolean retryGetRecordsWithSmallerPage() {
+
+	return false;
     }
 
     /**
@@ -341,7 +387,68 @@ public class CSWConnector extends WrappedConnector {
 
     }
 
-    OriginalMetadata objectToOriginalMetadata(Object object) {
+    /**
+     * Sub connectors might implement this method to fix online resources external datasets (e.g. check WMS or WCS
+     * online resources )
+     * 
+     * @param ret
+     */
+    public void fixOnlineResources(ListRecordsResponse<OriginalMetadata> ret) {
+
+    }
+
+    //
+    //
+    //
+
+    ListRecordsResponse<OriginalMetadata> toOriginalMetadata(SearchResultsType searchResults) {
+
+	ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<>();
+
+	toOriginalMetadataFromAbstractRecords(ret, Optional.of(searchResults.getAbstractRecords()));
+
+	toOriginalMetadataFromAnies(ret, Optional.of(searchResults.getAnies()));
+
+	return ret;
+    }
+
+    /**
+     * @param ret
+     * @param optional
+     */
+    protected void toOriginalMetadataFromAnies(ListRecordsResponse<OriginalMetadata> ret, Optional<List<Object>> optional) {
+
+	optional.ifPresent(
+		anies -> anies.stream().map(object -> objectToOriginalMetadata(object)).filter(Objects::nonNull).forEach(ret::addRecord));
+
+    }
+
+    /**
+     * @param ret
+     * @param optional
+     */
+    protected void toOriginalMetadataFromAbstractRecords(ListRecordsResponse<OriginalMetadata> ret,
+	    Optional<List<JAXBElement<? extends AbstractRecordType>>> optional) {
+
+	optional.ifPresent(abstractRecords -> abstractRecords.stream().map(elem ->
+
+	{
+
+	    switch (getElementSetType()) {
+	    case BRIEF:
+		return recordToOriginalMetadata((BriefRecordType) elem.getValue());
+	    case FULL:
+		return recordToOriginalMetadata((RecordType) elem.getValue());
+	    default:
+		return recordToOriginalMetadata((SummaryRecordType) elem.getValue());
+
+	    }
+	}
+
+	).filter(Objects::nonNull).forEach(ret::addRecord));
+    }
+
+    protected OriginalMetadata objectToOriginalMetadata(Object object) {
 
 	Node node;
 	try {
@@ -365,14 +472,11 @@ public class CSWConnector extends WrappedConnector {
 
     }
 
-    void toOriginalMetadataFromAnies(ListRecordsResponse<OriginalMetadata> ret, Optional<List<Object>> optional) {
-
-	optional.ifPresent(
-		anies -> anies.stream().map(object -> objectToOriginalMetadata(object)).filter(Objects::nonNull).forEach(ret::addRecord));
-
-    }
-
-    OriginalMetadata recordToOriginalMetadata(RecordType record) {
+    /**
+     * @param record
+     * @return
+     */
+    protected OriginalMetadata recordToOriginalMetadata(AbstractRecordType record) {
 	try {
 
 	    Node node = CommonContext.asDocument(record, true);
@@ -387,26 +491,9 @@ public class CSWConnector extends WrappedConnector {
 	return null;
     }
 
-    void toOriginalMetadataFromAbstractRecords(ListRecordsResponse<OriginalMetadata> ret,
-	    Optional<List<JAXBElement<? extends AbstractRecordType>>> optional) {
-
-	optional.ifPresent(abstractRecords -> abstractRecords.stream().map(elem ->
-
-	recordToOriginalMetadata((RecordType) elem.getValue())
-
-	).filter(Objects::nonNull).forEach(ret::addRecord));
-    }
-
-    ListRecordsResponse<OriginalMetadata> toOriginalMetadata(SearchResultsType searchResults) {
-
-	ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<>();
-
-	toOriginalMetadataFromAbstractRecords(ret, Optional.of(searchResults.getAbstractRecords()));
-
-	toOriginalMetadataFromAnies(ret, Optional.of(searchResults.getAnies()));
-
-	return ret;
-    }
+    //
+    //
+    //
 
     SearchResultsType toSearchResults(File file) throws GSException {
 	Exception e1 = null;
@@ -516,6 +603,29 @@ public class CSWConnector extends WrappedConnector {
 	}
     }
 
+    /**
+     * @return
+     */
+    public ElementSetType getElementSetType() {
+
+	return elementeSetType;
+    }
+
+    /**
+     * @param elementeSetType
+     */
+    public void setElementeSetType(ElementSetType elementeSetType) {
+
+	this.elementeSetType = elementeSetType;
+    }
+
+    /**
+     * @param startPosition
+     * @param requestSize
+     * @param type
+     * @return
+     * @throws GSException
+     */
     protected GetRecords createGetRecords(Integer startPosition, Integer requestSize) throws GSException {
 
 	GetRecords getRecords = new GetRecords();
@@ -529,10 +639,9 @@ public class CSWConnector extends WrappedConnector {
 	getRecords.setOutputSchema(getRequestedMetadataSchema());
 
 	ElementSetName elementSetName = new ElementSetName();
-	elementSetName.setValue(ElementSetType.FULL);
+	elementSetName.setValue(getElementSetType());
 
-	QueryType queryType = new QueryType();
-	queryType.setElementSetName(elementSetName);
+	QueryType queryType = createQueryType(elementSetName);
 
 	JAXBElement<QueryType> query = ObjectFactories.CSW().createQuery(queryType);
 	getRecords.setAbstractQuery(query);
@@ -545,6 +654,17 @@ public class CSWConnector extends WrappedConnector {
 	getRecords.setStartPosition(new BigInteger("" + startPosition));
 
 	return getRecords;
+    }
+
+    /**
+     * @return
+     */
+    protected QueryType createQueryType(ElementSetName elementSetName) {
+
+	QueryType queryType = new QueryType();
+	queryType.setElementSetName(elementSetName);
+
+	return queryType;
     }
 
     protected String getConstraintLanguageParameter() {
@@ -659,7 +779,7 @@ public class CSWConnector extends WrappedConnector {
      * @return
      * @throws GSException
      */
-    String getSelectedSchema() throws GSException {
+    protected String getSelectedSchema() throws GSException {
 
 	if (selectedSchema != null) {
 	    return selectedSchema;
@@ -736,18 +856,16 @@ public class CSWConnector extends WrappedConnector {
 	return supportedOutputSchemas;
     }
 
-    InputStream doExecGetRequest(URI uri, boolean silent) throws IOException {
+    InputStream doExecGetRequest(URI uri, boolean silent) throws Exception {
 
-	HttpGet httpGet = new HttpGet(uri);
-
-	HttpResponse response = new HttpRequestExecutor().execute(httpGet);
+	HttpResponse<InputStream> response = new Downloader().downloadResponse(HttpRequestUtils.build(MethodNoBody.GET, uri.toString()));
 
 	if (!silent && GSLoggerFactory.getLogger(CSWConnector.class).isTraceEnabled()) {
 
-	    GSLoggerFactory.getLogger(CSWConnector.class).trace("Response code {}", response.getStatusLine().getStatusCode());
+	    GSLoggerFactory.getLogger(CSWConnector.class).trace("Response code {}", response.statusCode());
 	}
 
-	InputStream content = response.getEntity().getContent();
+	InputStream content = response.body();
 
 	if (!silent && GSLoggerFactory.getLogger(CSWConnector.class).isTraceEnabled()) {
 
@@ -757,7 +875,13 @@ public class CSWConnector extends WrappedConnector {
 	return content;
     }
 
-    Capabilities doUnmarshallCapabiliesStream(InputStream content, boolean silent) throws JAXBException {
+    /**
+     * @param content
+     * @param silent
+     * @return
+     * @throws JAXBException
+     */
+    protected Capabilities doUnmarshallCapabiliesStream(InputStream content, boolean silent) throws Exception {
 
 	if (!silent && GSLoggerFactory.getLogger(CSWConnector.class).isTraceEnabled())
 	    GSLoggerFactory.getLogger(CSWConnector.class).trace("Unmarshalling");
@@ -791,18 +915,15 @@ public class CSWConnector extends WrappedConnector {
 
 		return capabilitiesDocument;
 
-	    } catch (IOException | JAXBException e) {
+	    } catch (Exception e) {
 		if (!silent && GSLoggerFactory.getLogger(CSWConnector.class).isWarnEnabled())
 		    GSLoggerFactory.getLogger(CSWConnector.class).warn("Can't use {} to download capabilities document", uri, e);
 	    }
-
 	}
-
-	GSLoggerFactory.getLogger(CSWConnector.class).error("Unable to get Capabilities document");
 
 	throw GSException.createException( //
 		getClass(), //
-		"Unable to download Capabilities Document", //
+		"Unable to download Capabilities Document from: " + sourceURL, //
 		null, //
 		ErrorInfo.ERRORTYPE_SERVICE, //
 		ErrorInfo.SEVERITY_ERROR, //

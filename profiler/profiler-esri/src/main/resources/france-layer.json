@@ -1,0 +1,422 @@
+{
+    "currentVersion": 11,
+    "id": 0,
+    "name": "Geolytix Retail Points 2022 Q4",
+    "type": "Feature Layer",
+    "serviceItemId": "6cbefc99425644dba1242abafbf8fc33",
+    "cacheMaxAge": 30,
+    "displayField": "",
+    "description": "",
+    "copyrightText": "",
+    "defaultVisibility": true,
+    "editingInfo": {
+        "lastEditDate": 1673450210038,
+        "schemaLastEditDate": 1672917342329,
+        "dataLastEditDate": 1672917342329
+    },
+    "relationships": [],
+    "isDataVersioned": false,
+    "hasContingentValuesDefinition": false,
+    "supportsAppend": true,
+    "supportsCalculate": true,
+    "supportsASyncCalculate": true,
+    "supportsTruncate": true,
+    "supportsAttachmentsByUploadId": true,
+    "supportsAttachmentsResizing": true,
+    "supportsRollbackOnFailureParameter": true,
+    "supportsStatistics": true,
+    "supportsExceedsLimitStatistics": true,
+    "supportsAdvancedQueries": true,
+    "supportsValidateSql": true,
+    "supportsCoordinatesQuantization": true,
+    "supportsLayerOverrides": true,
+    "supportsTilesAndBasicQueriesMode": true,
+    "supportsFieldDescriptionProperty": true,
+    "supportsQuantizationEditMode": true,
+    "supportsApplyEditsWithGlobalIds": false,
+    "supportsReturningQueryGeometry": true,
+    "advancedQueryCapabilities": {
+        "supportsPagination": true,
+        "supportsQueryAttachmentsCountOnly": true,
+        "supportsPaginationOnAggregatedQueries": true,
+        "supportsQueryRelatedPagination": true,
+        "supportsQueryWithDistance": true,
+        "supportsReturningQueryExtent": true,
+        "supportsStatistics": true,
+        "supportsOrderBy": true,
+        "supportsDistinct": true,
+        "supportsQueryWithResultType": true,
+        "supportsSqlExpression": true,
+        "supportsAdvancedQueryRelated": true,
+        "supportsCountDistinct": true,
+        "supportsPercentileStatistics": true,
+        "supportsSpatialAggregationStatistics": true,
+        "supportedSpatialAggregationStatistics": [
+            "EnvelopeAggregate",
+            "CentroidAggregate",
+            "ConvexHullAggregate"
+        ],
+        "supportsLod": true,
+        "supportsQueryWithLodSR": false,
+        "supportedLodTypes": ["geohash"],
+        "supportsReturningGeometryCentroid": false,
+        "supportsQueryWithDatumTransformation": true,
+        "supportsHavingClause": true,
+        "supportsOutFieldSQLExpression": true,
+        "supportsMaxRecordCountFactor": true,
+        "supportsTopFeaturesQuery": true,
+        "supportsDisjointSpatialRel": true,
+        "supportsQueryWithCacheHint": true,
+        "supportedOperationsWithCacheHint": [
+            "query",
+            "queryTopFilter",
+            "queryAnalytics",
+            "queryAttachments",
+            "queryRelated"
+        ],
+        "supportsQueryAnalytic": true,
+        "supportsDefaultSR": true,
+        "supportsFullTextSearch": true
+    },
+    "advancedQueryAnalyticCapabilities": {
+        "supportsLinearRegression": true,
+        "supportsAsync": true,
+        "supportsPercentileAnalytic": true
+    },
+    "advancedEditingCapabilities": {
+        "supportedSqlFormatsInCalculate": ["standard"],
+        "supportsAsyncApplyEdits": true,
+        "supportsReturnEditResults": true,
+        "supportsApplyEditsbyUploadID": true,
+        "supportedApplyEditsUploadIDFormats": "JSON"
+    },
+    "infoInEstimates": [
+        "extent",
+        "count"
+    ],
+    "useStandardizedQueries": true,
+    "geometryType": "esriGeometryPoint",
+    "minScale": 36978596,
+    "maxScale": 0,
+    "extent": {
+        "xmin": -900560.899609901,
+        "ymin": 6303636.4812084306,
+        "xmax": 195130.7474099235,
+        "ymax": 8488536.2040848285,
+        "spatialReference": {
+            "wkid": 102100,
+            "latestWkid": 3857
+        }
+    },
+    "drawingInfo": {
+        "renderer": {
+            "type": "simple",
+            "symbol": {
+                "type": "esriPMS",
+                "url": "RedSphere.png",
+                "imageData": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAGXRFWHRTb2Z0d2FyZQBQYWludC5ORVQgdjMuNS4xTuc4+QAAB3VJREFUeF7tmPlTlEcexnve94U5mANQbgQSbgiHXHINlxpRIBpRI6wHorLERUmIisKCQWM8cqigESVQS1Kx1piNi4mW2YpbcZONrilE140RCTcy3DDAcL/zbJP8CYPDL+9Ufau7uqb7eZ7P+/a8PS8hwkcgIBAQCAgEBAICAYGAQEAgIBAQCAgEBAICAYGAQEAgIBAQCDx/AoowKXFMUhD3lQrioZaQRVRS+fxl51eBTZUTdZ41U1Rox13/0JF9csGJ05Qv4jSz/YPWohtvLmSKN5iTGGqTm1+rc6weICOBRbZs1UVnrv87T1PUeovxyNsUP9P6n5cpHtCxu24cbrmwKLdj+osWiqrVKhI0xzbmZ7m1SpJ+1pFpvE2DPvGTomOxAoNLLKGLscZYvB10cbYYjrJCb7A5mrxleOBqim+cWJRakZY0JfnD/LieI9V1MrKtwokbrAtU4Vm0A3TJnphJD4B+RxD0u0LA7w7FTE4oprOCMbklEGNrfdGf4IqnQTb4wc0MFTYibZqM7JgjO8ZdJkpMln/sKu16pHZGb7IfptIWg389DPp9kcChWODoMuDdBOhL1JgpisbUvghM7AqFbtNiaFP80RLnhbuBdqi0N+1dbUpWGde9gWpuhFi95yL7sS7BA93JAb+Fn8mh4QujgPeTgb9kAZf3Apd2A+fXQ38yHjOHozB1IAJjOSEY2RSIwVUv4dd4X9wJccGHNrJ7CYQ4GGjLeNNfM+dyvgpzQstKf3pbB2A6m97uBRE0/Ergcxr8hyqg7hrwn0vAtRIKIRX6Y2pMl0RhIj8co9nBGFrvh55l3ngU7YObng7IVnFvGS+BYUpmHziY/Ls2zgP9SX50by/G9N5w6I+ogYvpwK1SoOlHQNsGfWcd9Peqof88B/rTyzF9hAIopAByQzC0JQB9ST5oVnvhnt+LOGsprvUhxNIwa0aY7cGR6Cp7tr8+whkjawIxkRWC6YJI6N+lAKq3Qf/Tx+B77oGfaQc/8hB8w2Xwtw9Bf3kzZspXY/JIDEbfpAB2BKLvVV90Jvjgoac9vpRxE8kciTVCBMMkNirJ7k/tRHyjtxwjKV4Yp3t/6s+R4E+/DH3N6+BrS8E314Dvvg2+/Sb4hxfBf5sP/up2TF3ZhonK1zD6dhwGdwail26DzqgX8MRKiq9ZBpkSkmeYOyPM3m9Jjl+1Z9D8AgNtlAq6bZ70qsZi+q+bwV/7I/hbB8D/dAr8Axq89iz474p/G5++koHJy1sx/lkGdBc2YjA3HF0rHNHuboomuQj/5DgclIvOGCGCYRKFFuTMV7YUAD3VDQaLMfyqBcZORGPy01QKYSNm/rYV/Nd/Av9NHvgbueBrsjDzRQamKKDxT9Kgq1iLkbIUDOSHoiNcgnYHgnYZi+9ZExSbiSoMc2eE2flKcuJLa4KGRQz6/U0wlGaP0feiMH4uFpMXEjBVlYjp6lWY+SSZtim0kulYMiYuJEJXuhTDJ9UYPByOvoIwdCxfgE4bAo0Jh39xLAoVpMwIEQyTyFCQvGpLon9sJ0K3J4OBDDcMH1dj9FQsxkrjMPFRPCbOx2GyfLal9VEcxstioTulxjAFNfROJPqLl6Bnfyg6V7ugz5yBhuHwrZjBdiU5YJg7I8wOpifAKoVIW7uQ3rpOBH2b3ekVjYT2WCRG3o+mIGKgO0OrlIaebU/HYOQDNbQnojB4NJyGD0NPfjA0bwTRE6Q7hsUcWhkWN8yZqSQlWWGECAZLmJfJmbrvVSI8taK37xpbdB/wQW8xPee/8xIGjvlj8IQ/hk4G0JbWcX8MHPVDX4kveoq8ocn3xLM33NCZRcPHOGJYZIKfpQyq7JjHS6yJjcHujLHADgkpuC7h8F8zEVqXSNC2awE69lqhs8AamkO26HrbDt2H7dBVQov2NcW26CiwQtu+BWjdY4n2nZboTbfCmKcCnRyDO/YmyLPnDlHvjDH8G6zhS9/wlEnYR7X00fWrFYuWdVI0ZpuhcbcczW/R2qdAcz6t/bRov4mONeaaoYl+p22rHF0bVNAmKtBvweIXGxNcfFH8eNlC4m6wMWMusEnKpn5hyo48pj9gLe4SNG9QoGGLAk8z5XiaJUd99u8122/IpBA2K9BGg2vWWKAvRYVeLzEa7E1R422m2+MsSTem97nSYnfKyN6/mzATv7AUgqcMrUnmaFlLX3ysM0fj+t/b5lQLtK22QEfyAmiSLKFZpUJ7kBRPXKW4HqCYynWVHKSG2LkyZex1uO1mZM9lKem9Tx9jjY5iNEYo0bKMhn7ZAu0r6H5PpLXCAq0rKJClSjSGynE/QIkrQYqBPe6S2X+AJsY2Ped6iWZk6RlL0c2r5szofRsO9R5S1IfQLRCpQL1aifoYFerpsbkuTImaUJXuXIDiH6/Ys8vm3Mg8L2i20YqsO7fItKLcSXyn0kXccclVqv3MS6at9JU/Ox+ouns+SF6Z4cSupz7l8+z1ucs7LF1AQjOdxfGZzmx8Iu1TRcfnrioICAQEAgIBgYBAQCAgEBAICAQEAgIBgYBAQCAgEBAICAQEAv8H44b/6ZiGvGAAAAAASUVORK5CYII=",
+                "contentType": "image/png",
+                "width": 15,
+                "height": 15
+            }
+        }
+    },
+    "allowGeometryUpdates": true,
+    "hasAttachments": false,
+    "htmlPopupType": "esriServerHTMLPopupTypeNone",
+    "hasM": false,
+    "hasZ": false,
+    "objectIdField": "ObjectId",
+    "uniqueIdField": {
+        "name": "ObjectId",
+        "isSystemMaintained": true
+    },
+    "globalIdField": "",
+    "typeIdField": "",
+    "fields": [
+        {
+            "name": "id",
+            "type": "esriFieldTypeInteger",
+            "actualType": "int",
+            "alias": "id",
+            "sqlType": "sqlTypeInteger",
+            "nullable": true,
+            "editable": true,
+            "domain": null,
+            "defaultValue": null
+        },
+        {
+            "name": "retailer",
+            "type": "esriFieldTypeString",
+            "actualType": "nvarchar",
+            "alias": "retailer",
+            "sqlType": "sqlTypeNVarchar",
+            "length": 4000,
+            "nullable": true,
+            "editable": true,
+            "domain": null,
+            "defaultValue": null
+        },
+        {
+            "name": "fascia",
+            "type": "esriFieldTypeString",
+            "actualType": "nvarchar",
+            "alias": "fascia",
+            "sqlType": "sqlTypeNVarchar",
+            "length": 4000,
+            "nullable": true,
+            "editable": true,
+            "domain": null,
+            "defaultValue": null
+        },
+        {
+            "name": "store_name",
+            "type": "esriFieldTypeString",
+            "actualType": "nvarchar",
+            "alias": "store name",
+            "sqlType": "sqlTypeNVarchar",
+            "length": 4000,
+            "nullable": true,
+            "editable": true,
+            "domain": null,
+            "defaultValue": null
+        },
+        {
+            "name": "add_one",
+            "type": "esriFieldTypeString",
+            "actualType": "nvarchar",
+            "alias": "add one",
+            "sqlType": "sqlTypeNVarchar",
+            "length": 4000,
+            "nullable": true,
+            "editable": true,
+            "domain": null,
+            "defaultValue": null
+        },
+        {
+            "name": "add_two",
+            "type": "esriFieldTypeString",
+            "actualType": "nvarchar",
+            "alias": "add two",
+            "sqlType": "sqlTypeNVarchar",
+            "length": 4000,
+            "nullable": true,
+            "editable": true,
+            "domain": null,
+            "defaultValue": null
+        },
+        {
+            "name": "town",
+            "type": "esriFieldTypeString",
+            "actualType": "nvarchar",
+            "alias": "town",
+            "sqlType": "sqlTypeNVarchar",
+            "length": 4000,
+            "nullable": true,
+            "editable": true,
+            "domain": null,
+            "defaultValue": null
+        },
+        {
+            "name": "suburb",
+            "type": "esriFieldTypeString",
+            "actualType": "nvarchar",
+            "alias": "suburb",
+            "sqlType": "sqlTypeNVarchar",
+            "length": 4000,
+            "nullable": true,
+            "editable": true,
+            "domain": null,
+            "defaultValue": null
+        },
+        {
+            "name": "postcode",
+            "type": "esriFieldTypeString",
+            "actualType": "nvarchar",
+            "alias": "postcode",
+            "sqlType": "sqlTypeNVarchar",
+            "length": 4000,
+            "nullable": true,
+            "editable": true,
+            "domain": null,
+            "defaultValue": null
+        },
+        {
+            "name": "long_wgs",
+            "type": "esriFieldTypeDouble",
+            "actualType": "float",
+            "alias": "longitude wgs",
+            "sqlType": "sqlTypeFloat",
+            "nullable": true,
+            "editable": true,
+            "domain": null,
+            "defaultValue": null
+        },
+        {
+            "name": "lat_wgs",
+            "type": "esriFieldTypeDouble",
+            "actualType": "float",
+            "alias": "latitude wgs",
+            "sqlType": "sqlTypeFloat",
+            "nullable": true,
+            "editable": true,
+            "domain": null,
+            "defaultValue": null
+        },
+        {
+            "name": "bng_e",
+            "type": "esriFieldTypeDouble",
+            "actualType": "float",
+            "alias": "bng easting",
+            "sqlType": "sqlTypeFloat",
+            "nullable": true,
+            "editable": true,
+            "domain": null,
+            "defaultValue": null
+        },
+        {
+            "name": "bng_n",
+            "type": "esriFieldTypeDouble",
+            "actualType": "float",
+            "alias": "bng northing",
+            "sqlType": "sqlTypeFloat",
+            "nullable": true,
+            "editable": true,
+            "domain": null,
+            "defaultValue": null
+        },
+        {
+            "name": "pqi",
+            "type": "esriFieldTypeString",
+            "actualType": "nvarchar",
+            "alias": "postcode quality indicator",
+            "sqlType": "sqlTypeNVarchar",
+            "length": 4000,
+            "nullable": true,
+            "editable": true,
+            "domain": null,
+            "defaultValue": null
+        },
+        {
+            "name": "open_date",
+            "type": "esriFieldTypeString",
+            "actualType": "nvarchar",
+            "alias": "open date",
+            "sqlType": "sqlTypeNVarchar",
+            "length": 4000,
+            "nullable": true,
+            "editable": true,
+            "domain": null,
+            "defaultValue": null
+        },
+        {
+            "name": "size_band",
+            "type": "esriFieldTypeString",
+            "actualType": "nvarchar",
+            "alias": "size band",
+            "sqlType": "sqlTypeNVarchar",
+            "length": 4000,
+            "nullable": true,
+            "editable": true,
+            "domain": null,
+            "defaultValue": null
+        },
+        {
+            "name": "county",
+            "type": "esriFieldTypeString",
+            "actualType": "nvarchar",
+            "alias": "county",
+            "sqlType": "sqlTypeNVarchar",
+            "length": 4000,
+            "nullable": true,
+            "editable": true,
+            "domain": null,
+            "defaultValue": null
+        },
+        {
+            "name": "ObjectId",
+            "type": "esriFieldTypeOID",
+            "actualType": "int",
+            "alias": "ObjectId",
+            "sqlType": "sqlTypeInteger",
+            "nullable": false,
+            "editable": false,
+            "domain": null,
+            "defaultValue": null
+        }
+    ],
+    "indexes": [
+        {
+            "name": "PK__GEOLYTIX__9A619291BA12D3E5",
+            "fields": "ObjectId",
+            "isAscending": true,
+            "isUnique": true,
+            "description": "clustered, unique, primary key"
+        },
+        {
+            "name": "user_11320.GEOLYTIX_RETAILPOINTS_V26_202211_GEOLYTIX_RETAILPOINTS_V26_202211_Shape_sidx",
+            "fields": "Shape",
+            "isAscending": false,
+            "isUnique": false,
+            "description": "Shape Index"
+        }
+    ],
+    "dateFieldsTimeReference": {
+        "timeZone": "UTC",
+        "respectsDaylightSaving": false
+    },
+    "preferredTimeReference": null,
+    "types": [],
+    "templates": [
+        {
+            "name": "New Feature",
+            "description": "",
+            "drawingTool": "esriFeatureEditToolPoint",
+            "prototype": {
+                "attributes": {
+                    "id": null,
+                    "retailer": null,
+                    "fascia": null,
+                    "store_name": null,
+                    "add_one": null,
+                    "add_two": null,
+                    "town": null,
+                    "suburb": null,
+                    "postcode": null,
+                    "long_wgs": null,
+                    "lat_wgs": null,
+                    "bng_e": null,
+                    "bng_n": null,
+                    "pqi": null,
+                    "open_date": null,
+                    "size_band": null,
+                    "county": null
+                }
+            }
+        }
+    ],
+    "supportedQueryFormats": "JSON, geoJSON, PBF",
+    "supportedAppendFormats": "sqlite,geoPackage,shapefile,filegdb,featureCollection,geojson,csv,excel",
+    "supportedExportFormats": "csv,shapefile,sqlite,geoPackage,filegdb,featureCollection,geojson,excel",
+    "supportedSpatialRelationships": [
+        "esriSpatialRelIntersects",
+        "esriSpatialRelContains",
+        "esriSpatialRelCrosses",
+        "esriSpatialRelEnvelopeIntersects",
+        "esriSpatialRelIndexIntersects",
+        "esriSpatialRelOverlaps",
+        "esriSpatialRelTouches",
+        "esriSpatialRelWithin",
+        "esriSpatialRelDisjoint",
+        "esriSpatialRelRelation"
+    ],
+    "supportedContingentValuesFormats": "JSON, PBF",
+    "supportedSyncDataOptions": 4,
+    "hasStaticData": true,
+    "maxRecordCount": 1000,
+    "standardMaxRecordCount": 32000,
+    "standardMaxRecordCountNoGeometry": 32000,
+    "tileMaxRecordCount": 8000,
+    "maxRecordCountFactor": 1,
+    "capabilities": "Query"
+}
