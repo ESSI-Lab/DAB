@@ -6,7 +6,7 @@
 	<groupId>eu.essi_lab</groupId>
 	<artifactId>DAB</artifactId>
 	<version>1.0-SNAPSHOT</version>
-	<packaging>pom</packaging> 
+	<packaging>pom</packaging>
 
 	<name>ESSI-Lab DAB</name>
 	<description><![CDATA[The suite of ESSI-Lab DAB related software products.
@@ -1719,7 +1719,7 @@
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
-		</repository> 
+		</repository>
 
 
 
