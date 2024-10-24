@@ -1,0 +1,8 @@
+[part~="cell"] ::slotted(vaadin-grid-cell-content) {
+    padding: 3px;
+    cursor: pointer;
+}
+
+[part~="row"]:hover > [part~="body-cell"]{
+	background-color: #fffeca;
+}

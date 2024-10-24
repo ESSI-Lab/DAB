@@ -1,3 +1,0 @@
-[part~="cell"] ::slotted(vaadin-grid-cell-content) {
-    padding: 3px;
-}
