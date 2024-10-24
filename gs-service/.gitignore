@@ -40,3 +40,7 @@ org.eclipse.jdt.core.prefs
 /.pydevproject
 /testm2repo/
 /repository/
+/frontend/generated/*
+package.json
+vite.generated.ts
+/frontend/index.html
