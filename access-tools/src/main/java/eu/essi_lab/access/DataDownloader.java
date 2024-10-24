@@ -43,6 +43,7 @@ import eu.essi_lab.model.resource.data.dimension.FiniteDimension;
  * <li>provide available remote service data descriptors</li>
  * <li>perform data download of the selected one</li>
  * </ul>
+ *
  * 
  * @author boldrini
  */
