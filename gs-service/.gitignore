@@ -44,3 +44,7 @@ org.eclipse.jdt.core.prefs
 package.json
 vite.generated.ts
 /frontend/index.html
+/package-lock.json
+/webpack.generated.js
+
+/node_modules/
