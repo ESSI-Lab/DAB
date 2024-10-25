@@ -38,6 +38,7 @@ import eu.essi_lab.cfga.setting.ConfigurableSetting;
  */
 public class CredentialsSetting extends ConfigurableSetting implements EditableSetting {
 
+    private static final String HIS_CENTRAL_PUGLIA_TOKEN = "pugliaToken";
     private static final String HIS_CENTRAL_SARDEGNA_API_KEY = "sardegnaApiKey";
     private static final String HIS_CENTRAL_LOMBARDIA_KEYSTORE_PASSWORD = "lombardiaKeystorePassword";
     private static final String HIS_CENTRAL_LOMBARDIA_USERNAME = "lombardiaUser";
@@ -222,6 +223,18 @@ public class CredentialsSetting extends ConfigurableSetting implements EditableS
 		    get().//
 		    withKey(HIS_CENTRAL_SARDEGNA_API_KEY).//
 		    withLabel("The Api-key used by the Sardegna connector and downloader").//
+		    required().//
+		    cannotBeDisabled().//
+		    build();
+
+	    addOption(password);
+	}
+	
+	{
+	    Option<String> password = StringOptionBuilder.//
+		    get().//
+		    withKey(HIS_CENTRAL_PUGLIA_TOKEN).//
+		    withLabel("The token used by the HIS-Central Puglia connector and downloader").//
 		    required().//
 		    cannotBeDisabled().//
 		    build();
@@ -1192,6 +1205,22 @@ public class CredentialsSetting extends ConfigurableSetting implements EditableS
     public Optional<String> getSardegnaApiKey() {
 
 	return getOption(HIS_CENTRAL_SARDEGNA_API_KEY, String.class).get().getOptionalValue();
+    }
+    
+    /**
+     * @param password
+     */
+    public void setPugliaToken(String password) {
+
+	getOption(HIS_CENTRAL_PUGLIA_TOKEN, String.class).get().setValue(password);
+    }
+
+    /**
+     *
+     */
+    public Optional<String> getPugliaToken() {
+
+	return getOption(HIS_CENTRAL_PUGLIA_TOKEN, String.class).get().getOptionalValue();
     }
 
     /**
