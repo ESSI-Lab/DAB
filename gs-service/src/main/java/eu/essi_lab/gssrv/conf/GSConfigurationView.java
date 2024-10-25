@@ -84,7 +84,7 @@ import eu.essi_lab.model.exceptions.GSException;
 @CssImport(value = "./styles/vaadin-select-styles.css", themeFor = "vaadin-select")
 @CssImport(value = "./styles/vaadin-dialog-styles.css", themeFor = "vaadin-dialog-overlay")
 @CssImport(value = "./styles/vaadin-app-layout.css", themeFor = "vaadin-app-layout")
-@CssImport(value = "./styles/vaadin-grid-cell-content.css", themeFor = "vaadin-grid")
+@CssImport(value = "./styles/vaadin-grid.css", themeFor = "vaadin-grid")
 @CssImport(value = "./styles/vaadin-text-area-no-border.css", themeFor = "vaadin-text-area")
 
 @SuppressWarnings("serial")

@@ -5,4 +5,5 @@
 
 [part~="row"]:hover > [part~="body-cell"]{
 	background-color: #fffeca;
+	cursor: pointer;
 }
