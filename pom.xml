@@ -1662,21 +1662,6 @@
 	</modules>
 
 	<repositories>
-
-		<repository>
-			<id>hosted.repos</id>
-			<name>ESSI-Lab hosted repositories</name>
-			<url>https://essi-lab.eu/nexus/repository/hosted.repos/</url>
-			<releases>
-				<enabled>true</enabled>
-				<updatePolicy>never</updatePolicy>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-				<updatePolicy>never</updatePolicy>
-			</snapshots>
-		</repository>
-
 		<repository>
 			<id>central</id>
 			<name>Central Repository</name>
@@ -1686,8 +1671,7 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-
-
+		
 		<repository>
 			<id>MarkLogic-releases</id>
 			<name>MarkLogic Releases</name>
@@ -1730,7 +1714,7 @@
 		</repository>
 
 		<repository>
-			<id>osgeos-geotools</id>
+			<id>geotools</id>
 			<name>OS Geo Dev Tools</name>
 			<url>https://download.osgeo.org/webdav/geotools</url>
 			<releases>
@@ -1767,19 +1751,6 @@
 			<id>boundless</id>
 			<name>repo.boundlessgeo.com</name>
 			<url>https://repo.osgeo.org/</url>
-			<releases>
-				<updatePolicy>never</updatePolicy>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-
-
-		<repository>
-			<id>geotools</id>
-			<name>geotools</name>
-			<url>https://download.osgeo.org/webdav/geotools/</url>
 			<releases>
 				<updatePolicy>never</updatePolicy>
 			</releases>
