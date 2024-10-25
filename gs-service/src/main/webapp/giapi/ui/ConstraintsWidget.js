@@ -129,6 +129,86 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 	});
 	
 	/**
+	 * <pre><code>
+	 * constWidget.advancedConstraints(
+      		'advConstDiv',
+      		'adv-search-div',
+      		[
+      			constWidget.textConstraint('get','instrumentTitle'),
+      			constWidget.textConstraint('get','attributeTitle'),
+      			constWidget.textConstraint('get','platformTitle')     			
+      		]
+          );
+	 * </pre></code>
+	 * 
+	 * @param advConstDivId identifier of the <i>div</i> which contains the advanced <code>constraints</code>
+	 * @param targetId identifier of the element to append the advanced search button
+	 * @param constraints array of constraints
+	 * @param options
+
+	 */
+	widget.advancedSearch = function(advConstDivId, targetId, constraints, options) {
+		
+		if(!options){
+			options = {};
+		}
+		
+		if(!options.searchButtonBckColor){
+			
+			options.searchButtonBckColor = 'rgb(221, 221, 221)';
+		}
+		
+		if(!options.searchButtonLabelColor){
+					
+			options.searchButtonLabelColor = 'black';
+		}
+		
+		if(!options.advConstDivBckColor){
+							
+			options.advConstDivBckColor = 'lightgray';
+		}
+		
+			 
+		var advConstDiv = '<div id="' + advConstDivId + '">';
+		constraints.forEach((con) => advConstDiv += con);
+
+		// advanced constraints button    	    
+		var advConstButton = GIAPI.FontAwesomeButton({
+			'width': 250,
+			'label': 'Advanced',
+			'icon': ' fa-bars',
+			'handler': function() {
+
+				if (jQuery("#"+advConstDivId).css("display") === 'block') {
+
+					jQuery("#"+advConstDivId).css("display", "none");
+
+				} else {
+
+					jQuery("#"+advConstDivId).css("display", "block");
+				}
+			}
+		});
+		
+		advConstButton.css('div', 'background', options.searchButtonBckColor);
+		advConstButton.css('div', 'color', options.searchButtonLabelColor);
+		
+		// advanced search table
+		var advSearchTable = '<table>';
+		advSearchTable += '<tr><td>' + advConstButton.div() + '</td></tr>';
+		advSearchTable += '<tr><td>' + advConstDiv + '</td></tr>';
+		advSearchTable += '</table>';
+
+		jQuery("#"+targetId).append(advSearchTable);    
+		
+		jQuery("#"+advConstDivId).css("position", "relative");	
+		jQuery("#"+advConstDivId).css("display", "none");	
+		jQuery("#"+advConstDivId).css("background-color", options.advConstDivBckColor);	
+		jQuery("#"+advConstDivId).css("padding", "10px");	
+		jQuery("#"+advConstDivId).css("padding-right", "3px");	
+	};
+
+	/**
 	 * Adds or get the control for the <a href="../classes/DAB.html#what" class="crosslink"><code>what</code></a> constraint 
 	 * 
 	 * <img style="border: none;" src="../assets/img/search-terms.png" />
