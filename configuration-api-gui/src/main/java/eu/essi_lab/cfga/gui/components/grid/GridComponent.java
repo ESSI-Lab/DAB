@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.Unit;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
@@ -60,6 +61,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
     private HeaderRow filterRow;
     private GridFilter gridFilter;
     private ListDataProvider<HashMap<String, String>> dataProvider;
+    private Grid.Column<HashMap<String, String>> column;
 
     /**
      * @param gridInfo
@@ -150,11 +152,31 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 	dataProvider = (ListDataProvider) getDataProvider();
 
+	ColumnDescriptor.createPositionalDescriptor();
+
 	gridInfo.getColumnsDescriptors().forEach(descriptor -> {
 
-	    Grid.Column<HashMap<String, String>> column = addColumn(//
+	    if (descriptor.getColumnName().equals(ColumnDescriptor.CHECKBOX_COLUMN_NAME)) {
 
-		    new MapValueProvider(descriptor.getColumnName()));
+		column = addColumn( 
+		    
+		    new ComponentRenderer<>(
+			    item -> {
+	                            Checkbox checkbox = new Checkbox();
+	                                           
+	                            return checkbox;
+	                        }
+	                )
+		    
+		    
+		);
+
+	    } else {
+
+		column = addColumn(//
+
+			new MapValueProvider(descriptor.getColumnName()));
+	    }
 
 	    column.setResizable(true);
 
@@ -167,7 +189,8 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 	    descriptor.getComparator().ifPresent(comp -> column.setComparator(comp));
 
-	    if (descriptor.getColumnName().equals(ColumnDescriptor.POSITIONAL_COLUMN_NAME)) {
+	    if (descriptor.getColumnName().equals(ColumnDescriptor.POSITIONAL_COLUMN_NAME)
+		    || descriptor.getColumnName().equals(ColumnDescriptor.CHECKBOX_COLUMN_NAME)) {
 
 		column.setHeader("");
 
@@ -359,7 +382,8 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 		String columnName = desc.getColumnName();
 
-		if (columnName.equals(ColumnDescriptor.POSITIONAL_COLUMN_NAME)) {
+		if (columnName.equals(ColumnDescriptor.POSITIONAL_COLUMN_NAME)
+			|| columnName.equals(ColumnDescriptor.CHECKBOX_COLUMN_NAME)) {
 
 		    return;
 		}
@@ -403,6 +427,11 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	    if (column.equals(ColumnDescriptor.POSITIONAL_COLUMN_NAME)) {
 
 		return String.valueOf(GridComponent.this.getListDataView().getItems().collect(Collectors.toList()).indexOf(source) + 1);
+	    }
+
+	    if (column.equals(ColumnDescriptor.CHECKBOX_COLUMN_NAME)) {
+
+		return "";
 	    }
 
 	    return source.get(column);

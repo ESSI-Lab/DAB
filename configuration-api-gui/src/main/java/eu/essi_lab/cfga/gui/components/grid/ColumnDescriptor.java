@@ -43,7 +43,8 @@ public class ColumnDescriptor {
     private Comparator<HashMap<String, String>> comparator;
 
     static final String POSITIONAL_COLUMN_NAME = "#";
-    
+    static final String CHECKBOX_COLUMN_NAME = "-";
+
     /**
      * 
      */
@@ -55,7 +56,15 @@ public class ColumnDescriptor {
      */
     public static ColumnDescriptor createPositionalDescriptor() {
 
-	return create(POSITIONAL_COLUMN_NAME, 20, false, false, null); //
+	return create(POSITIONAL_COLUMN_NAME, 30, false, false, null); //
+    }
+    
+    /**
+     * @return
+     */
+    public static ColumnDescriptor createCheckBoxDescriptor() {
+
+	return create(CHECKBOX_COLUMN_NAME, 30, false, false, null); //
     }
 
     /**
