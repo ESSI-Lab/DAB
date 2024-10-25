@@ -199,25 +199,20 @@
 				vertical-align: top;
   			}
   			
-  			#advConstDiv{
-  			    display: none;
-  				position: relative;
-			  	z-index: 1;
-			    background-color: lightgray;
-			    padding: 10px;
-			    padding-right: 3px;		
+  			#advConstDiv{  			   
+			  	z-index: 1;	
   			}
   			
 			#search-button{
 				display: inline-block;
 		    	vertical-align: top;
  			}
+ 			
  			#hide-results-button{
 				display: inline-block;
 				margin-top: 7px;
  			}
- 			
-			
+ 						
 			/* -------------------------------- */
 			/* tabs                             */
 			/*                                  */
@@ -775,56 +770,23 @@
                 // advanced search div        
                 //
                     
-                // advanced constraints div    	    
-                var advConstDiv = '<div id="advConstDiv">';
-           
-         		advConstDiv += GIAPI.search.constWidget.textConstraint('get','instrumentTitle');
-         		advConstDiv += GIAPI.search.constWidget.textConstraint('get','attributeTitle');
-         		advConstDiv += GIAPI.search.constWidget.textConstraint('get','platformTitle');
-        		         		
-         	    advConstDiv += GIAPI.search.constWidget.hlConstraint ('get');
-
-                advConstDiv += GIAPI.search.constWidget.booleanConstraint('get','gdc');
-              
-                advConstDiv += GIAPI.search.constWidget.evtOrdConstraint('get');     
-               
-                advConstDiv += GIAPI.search.constWidget.textConstraint('get','magt', {
-               	'values': [{'label':'All magnitudes','value':''}, {'label':'ML'},{'label':'Mw'}],
-               	'readOnlyValues': true});	    
-               
-                advConstDiv += GIAPI.search.constWidget.numericConstraint('get','maxmag',{'minValue': 0, 'step': 0.1});                
-                advConstDiv +=  GIAPI.search.constWidget.numericConstraint('get','minmag',{'minValue': 0, 'step': 0.1});
-      
-                advConstDiv += '</div>';
-  
-      	        // advanced constraints button    	    
-      	        var advConstButton  = GIAPI.FontAwesomeButton({
-    			    'width': 250,
-    			    'label':'Advanced',
-    		        'icon':' fa-bars',
-    		        'handler': function(){
-    		            
-    		        	if(jQuery("#advConstDiv").css("display") === 'block'){
-        		        	
-    		        		jQuery("#advConstDiv").css("display", "none");
-    		        	
-    		        	}else{
-        		        	
-    		        		jQuery("#advConstDiv").css("display", "block");
-    		        	} 
-    		        }
-    	        });
-      	        
-      	        advConstButton.css('div','background','rgb(221, 221, 221)');     
-      	        advConstButton.css('div','color','black');     
-      	        
-      	        // advanced search table
-                var advSearchTable = '<table>';
-      	        advSearchTable += '<tr><td>' + advConstButton.div() + '</td></tr>';
-      	        advSearchTable += '<tr><td>' + advConstDiv + '</td></tr>';
-      	        advSearchTable += '</table>';
-      	        
-	            jQuery("#adv-search-div").append(advSearchTable);      
+                GIAPI.search.constWidget.advancedSearch(
+            		'advConstDiv',
+            		'adv-search-div',
+            		[
+            			GIAPI.search.constWidget.textConstraint('get','instrumentTitle'),
+            			GIAPI.search.constWidget.textConstraint('get','attributeTitle'),
+            			GIAPI.search.constWidget.textConstraint('get','platformTitle'),
+            			GIAPI.search.constWidget.hlConstraint ('get'),
+            			GIAPI.search.constWidget.booleanConstraint('get','gdc'),
+            			GIAPI.search.constWidget.evtOrdConstraint('get'),
+            			GIAPI.search.constWidget.textConstraint('get','magt', {
+                           	'values': [{'label':'All magnitudes','value':''}, {'label':'ML'},{'label':'Mw'}],
+                           	'readOnlyValues': true}),
+                        GIAPI.search.constWidget.numericConstraint('get','maxmag',{'minValue': 0, 'step': 0.1}),
+                        GIAPI.search.constWidget.numericConstraint('get','minmag',{'minValue': 0, 'step': 0.1})	
+            		]              
+                ); 
          	
       	        //------------------------------------
                 // PaginatorWidget

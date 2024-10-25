@@ -200,12 +200,7 @@
   			}
   			
   			#advConstDiv{
-  			    display: none;
-  				position: relative;
-			  	z-index: 1;
-			    background-color: lightgray;
-			    padding: 10px;
-			    padding-right: 3px;			    
+			  	z-index: 1;		    
   			}
   			
 			#search-button{
@@ -786,45 +781,16 @@
                 // advanced search div        
                 //
                     
-                // advanced constraints div    	    
-                var advConstDiv = '<div id="advConstDiv">';
-           
-         		advConstDiv += GIAPI.search.constWidget.textConstraint('get','instrumentTitle');
-         		advConstDiv += GIAPI.search.constWidget.textConstraint('get','attributeTitle');
-         		advConstDiv += GIAPI.search.constWidget.textConstraint('get','platformTitle');
-        		
-         		advConstDiv += GIAPI.search.constWidget.booleanConstraint('get','isValidated');
-
-                advConstDiv += '</div>';
-                           	       	 	  	 			           
-      	        // advanced constraints button    	    
-      	        var advConstButton  = GIAPI.FontAwesomeButton({
-    			    'width': 250,
-    			    'label':'Advanced',
-    		        'icon':' fa-bars',
-    		        'handler': function(){
-    		            
-						if(jQuery("#advConstDiv").css("display") === 'block'){
-        		        	
-    		        		jQuery("#advConstDiv").css("display", "none");
-    		        	
-    		        	}else{
-        		        	
-    		        		jQuery("#advConstDiv").css("display", "block");
-    		        	} 
-    		        }
-    	        });
-      	        
-      	        advConstButton .css('div','background','rgb(221, 221, 221)');     
-      	        advConstButton .css('div','color','black');     
-
-      	        // advanced search table
-                var advSearchTable = '<table>';
-      	        advSearchTable += '<tr><td>' + advConstButton.div() + '</td></tr>';
-      	        advSearchTable += '<tr><td>' + advConstDiv + '</td></tr>';
-      	        advSearchTable += '</table>';
-      	        
-	            jQuery("#adv-search-div").append(advSearchTable);   
+         	    GIAPI.search.constWidget.advancedSearch(
+               		'advConstDiv',
+               		'adv-search-div',
+               		[
+               			GIAPI.search.constWidget.textConstraint('get','instrumentTitle'),
+               			GIAPI.search.constWidget.textConstraint('get','attributeTitle'),
+               			GIAPI.search.constWidget.textConstraint('get','platformTitle'),
+               			GIAPI.search.constWidget.booleanConstraint('get','isValidated')
+               		]              
+                ); 
             	
       	        //------------------------------------
                 // PaginatorWidget
