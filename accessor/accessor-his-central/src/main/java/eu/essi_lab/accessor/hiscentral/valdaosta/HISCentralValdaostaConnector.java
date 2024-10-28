@@ -156,7 +156,7 @@ public class HISCentralValdaostaConnector extends HarvestedQueryConnector<HISCen
     }
 
     private JSONObject getInfo(String param) throws GSException {
-	// e.g. curl -H "Authorization: Bearer $JWT_TOKEN" https://cf-api.regione.vda.it/ws2/stations | jq
+	
 	String url = getSourceURL() + param;
 
 	GSLoggerFactory.getLogger(getClass()).info("Getting " + url);
@@ -208,7 +208,7 @@ public class HISCentralValdaostaConnector extends HarvestedQueryConnector<HISCen
     }
 
     private JSONObject getParameters(String id) throws GSException {
-	// e.g: curl -H "Authorization: Bearer $JWT_TOKEN" https://cf-api.regione.vda.it/ws2/stations/1000 | jq
+	
 
 	String url = getSourceURL() + STATIONS_URL + "/" + id;
 
@@ -261,25 +261,17 @@ public class HISCentralValdaostaConnector extends HarvestedQueryConnector<HISCen
     }
 
     private JSONObject getStationsList() throws GSException {
-	// e.g. curl -H "Authorization: Bearer $JWT_TOKEN" https://cf-api.regione.vda.it/ws2/stations | jq
+	
 	String url = getSourceURL() + STATIONS_URL;
 
 	GSLoggerFactory.getLogger(getClass()).info("Getting " + url);
 	
-//	HttpGet get = new HttpGet(url.trim());
-//	get.addHeader("Authorization", "Bearer " + BEARER_TOKEN);
-
 	int timeout = 120;
 	int responseTimeout = 200;
 	InputStream stream = null;
 	try {
 
-//	    RequestConfig config = RequestConfig.custom().setConnectTimeout(timeout * 1000)
-//		    .setConnectionRequestTimeout(responseTimeout * 1000).setSocketTimeout(timeout * 1000).build();
-//	    CloseableHttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
-//	    CloseableHttpResponse getStationResponse = client.execute(get);
-//	    stream = getStationResponse.getEntity().getContent();
-	    
+    
 	    Downloader downloader = new Downloader();
 	    downloader.setConnectionTimeout(TimeUnit.MILLISECONDS, timeout * 1000);
 	    downloader.setResponseTimeout(TimeUnit.MILLISECONDS, responseTimeout * 1000);
@@ -316,21 +308,11 @@ public class HISCentralValdaostaConnector extends HarvestedQueryConnector<HISCen
 
 	GSLoggerFactory.getLogger(HISCentralValdaostaConnector.class).info("Getting BEARER TOKEN from Valle d'Aosta CFVDA service");
 
-//	StringEntity input = null;
+
 	String token = null;
 
 	try {
-//	    HttpPost httpPost = new HttpPost(TOKEN_URL);
-//	    HttpClient httpClient = HttpClientBuilder.create().build();
-//
-//	    List<NameValuePair> params = new ArrayList<NameValuePair>(2);
-//	    params.add(new BasicNameValuePair("email", CLIENT_USER));
-//	    params.add(new BasicNameValuePair("password", CLIENT_SECRET));
-//
-//	    httpPost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-//
-//	    HttpResponse response = null;
-//	    	    	    
+   	    
 	    HashMap<String, String> params = new HashMap<String, String>();
 	    params.put("email", ConfigurationWrapper.getCredentialsSetting().getAostaClientId().orElse(null));
 	    params.put("password", ConfigurationWrapper.getCredentialsSetting().getAostaClientPassword().orElse(null));
@@ -344,7 +326,7 @@ public class HISCentralValdaostaConnector extends HarvestedQueryConnector<HISCen
 	    
 
  	    JSONObject result = new JSONObject(IOStreamUtils.asUTF8String(response.body()));
-	    // result = IOUtils.toString(response.getEntity().getContent(), "UTF-8");
+	    
 	    if (result != null) {
 		token = result.optString("token");
 		GSLoggerFactory.getLogger(HISCentralValdaostaConnector.class).info("BEARER TOKEN obtained: " + BEARER_TOKEN);
@@ -386,22 +368,7 @@ public class HISCentralValdaostaConnector extends HarvestedQueryConnector<HISCen
 
     public static void main(String[] args) throws Exception {
 
-//	HttpPost httpPost = new HttpPost(TOKEN_URL);
-//	HttpClient httpClient = HttpClientBuilder.create().build();
-//
-//	List<NameValuePair> params = new ArrayList<NameValuePair>(2);
-//
-//	params.add(new BasicNameValuePair("username", CLIENT_USER));
-//	params.add(new BasicNameValuePair("password", CLIENT_SECRET));
-
-	// params.add(new BasicNameValuePair("refresh_token",
-	// "CfDJ8M4beJMvqa9Hn7wcS6XbAQVPympbQWe1dsG-jsqRW3580XldR0A33uyASg97uYWr2xbhbhv4NMXyVHY_QFU4fAtfdnTMgtaY_Hp0mtk6verPtQ95OjpQ1H39qCFHUzSAvo2zqDQM7GBW5CCCqgducyF_gUOuass0Ea-LX-cbpLXI7zVDay2D8axM52tDrPSEpZqCnGD-gZ8H37V-tLmkbOyfsFr5upEEti5R3_MH8ZDegRN_navJYQCqYr-QH4Hpd8DqmaIFWjKIRqEBLPkl8sAOma4I9Q1NfgCXouV5C8M_mycXEz-CHfBnWJG2S_4JFSztBJfLUxtqeZufPebrW_pPNRnx9NwOL6U66A755oKSXL0k7ceWHN_2kfMMbwtfDb_QM8i9yBMIhXAfTUNdhabPZEm6nlTbJ9igMGI2B9gLDxtRyCjGwHwyGEvibOjKsTkJ-AvKmrVxMcih9TzxB590791XG5bJmf-1-Nniuo2PCuKksPpvO2xxUPlo-P72fwnrY4yDo9cHUqs_ajHnG50yb8RGnxIRZXUoCErc2Y8yPgy-vXJ2vF1TkUkWOmjmxr2bGUMezMeEzxnfSrN3HpDwmO2mR7dEO9KBk2uvO8_oLMVDrdObVx6a4MVZZm3wkNvRUoZD6XoU7hKE9Kb13BFUP7S5AmbnVHmcZwUmnocnyt39Ta8e_ln8x9oBRcvFt31uqmdFSgZ8rdmOt5nkatS5tMOSG-69z35cz2jRRpFUv77E9wHN8wHg4urmESjS03qFvUaZdd7Uu1VYqToUeeJ_I0biNlioQVVRbvPAvLsg_sGsS1EY3ByqpM94yrLw2o8JqYc9_SvFTX0wK5eOb_9uJQStlv7WPHFjHYb44FwKrr7kZ1B4D9hlEOYezakPOw"));
-
-//	httpPost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-//	System.out.println(params);
-
-//	HttpResponse response = httpClient.execute(httpPost);
-		
+	
 	HashMap<String, String> params = new HashMap<String, String>();
 	params.put("username", ConfigurationWrapper.getCredentialsSetting().getAostaClientId().orElse(null));
 	params.put("password", ConfigurationWrapper.getCredentialsSetting().getAostaClientPassword().orElse(null));

@@ -33,6 +33,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.downloader.HttpHeaderUtils;
@@ -103,6 +104,11 @@ public class HISCentralPugliaConnector extends HarvestedQueryConnector<HISCentra
 	    page = request.getResumptionToken();
 	}
 
+	if(BEARER_TOKEN == null) {
+	    BEARER_TOKEN = ConfigurationWrapper.getCredentialsSetting().getPugliaToken().orElse(null);
+	}
+	
+	
 	// add authorization token
 	String baseUrl = getSourceURL();
 
@@ -151,25 +157,16 @@ public class HISCentralPugliaConnector extends HarvestedQueryConnector<HISCentra
     }
 
     private JSONObject getInfo(String param) throws GSException {
-	// e.g. curl -H "Authorization: Bearer $JWT_TOKEN" https://cf-api.regione.vda.it/ws2/stations | jq
+	
 	String url = getSourceURL() + param;
 
 	GSLoggerFactory.getLogger(getClass()).info("Getting " + url);
 	
-//	HttpGet get = new HttpGet(url.trim());
-//	get.addHeader("Authorization", "Bearer " + BEARER_TOKEN);
-
 	int timeout = 120;
 	int responseTimeout = 200;
 	InputStream stream = null;
 	try {
 
-//	    RequestConfig config = RequestConfig.custom().setConnectTimeout(timeout * 1000)
-//		    .setConnectionRequestTimeout(responseTimeout * 1000).setSocketTimeout(timeout * 1000).build();
-//	    CloseableHttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
-//	    CloseableHttpResponse getStationResponse = client.execute(get);
-//	    stream = getStationResponse.getEntity().getContent();
-//	    	    
 	    Downloader downloader = new Downloader();
 	    downloader.setConnectionTimeout(TimeUnit.MILLISECONDS, timeout * 1000);
 	    downloader.setResponseTimeout(TimeUnit.MILLISECONDS, responseTimeout * 1000);
@@ -203,26 +200,17 @@ public class HISCentralPugliaConnector extends HarvestedQueryConnector<HISCentra
     }
 
     private JSONObject getParameters(String id) throws GSException {
-	// e.g: curl -H "Authorization: Bearer $JWT_TOKEN" https://cf-api.regione.vda.it/ws2/stations/1000 | jq
 
 	String url = getSourceURL() + STATIONS_URL + "/" + id;
 
 	GSLoggerFactory.getLogger(getClass()).info("Getting " + url);
 	
-//	HttpGet get = new HttpGet(url.trim());
-//	get.addHeader("Authorization", "Bearer " + BEARER_TOKEN);
 
 	int timeout = 120;
 	int responseTimeout = 200;
 	InputStream stream = null;
 	try {
 
-//	    RequestConfig config = RequestConfig.custom().setConnectTimeout(timeout * 1000)
-//		    .setConnectionRequestTimeout(responseTimeout * 1000).setSocketTimeout(timeout * 1000).build();
-//	    CloseableHttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
-//	    CloseableHttpResponse getStationResponse = client.execute(get);
-//	    stream = getStationResponse.getEntity().getContent();
-//	    	    
 	    Downloader downloader = new Downloader();
 	    downloader.setConnectionTimeout(TimeUnit.MILLISECONDS, timeout * 1000);
 	    downloader.setResponseTimeout(TimeUnit.MILLISECONDS, responseTimeout * 1000);
@@ -256,25 +244,17 @@ public class HISCentralPugliaConnector extends HarvestedQueryConnector<HISCentra
     }
 
     private JSONObject getStationsList() throws GSException {
-	// e.g. curl -H "Authorization: Bearer $JWT_TOKEN" https://cf-api.regione.vda.it/ws2/stations | jq
+
 	String url = getSourceURL() + STATIONS_URL;
 
 	GSLoggerFactory.getLogger(getClass()).info("Getting " + url);
 	
-//	HttpGet get = new HttpGet(url.trim());
-//	get.addHeader("Authorization", "Bearer " + BEARER_TOKEN);
 
 	int timeout = 120;
 	int responseTimeout = 200;
 	InputStream stream = null;
 	try {
-
-//	    RequestConfig config = RequestConfig.custom().setConnectTimeout(timeout * 1000)
-//		    .setConnectionRequestTimeout(responseTimeout * 1000).setSocketTimeout(timeout * 1000).build();
-//	    CloseableHttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
-//	    CloseableHttpResponse getStationResponse = client.execute(get);
-//	    stream = getStationResponse.getEntity().getContent();
-	    
+    
 	    Downloader downloader = new Downloader();
 	    downloader.setConnectionTimeout(TimeUnit.MILLISECONDS, timeout * 1000);
 	    downloader.setResponseTimeout(TimeUnit.MILLISECONDS, responseTimeout * 1000);
