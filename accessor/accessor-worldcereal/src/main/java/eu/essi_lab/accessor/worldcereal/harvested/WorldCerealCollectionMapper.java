@@ -42,6 +42,7 @@ import eu.essi_lab.iso.datamodel.ISOMetadata;
 import eu.essi_lab.iso.datamodel.classes.BrowseGraphic;
 import eu.essi_lab.iso.datamodel.classes.Contact;
 import eu.essi_lab.iso.datamodel.classes.DataQuality;
+import eu.essi_lab.iso.datamodel.classes.Keywords;
 import eu.essi_lab.iso.datamodel.classes.LegalConstraints;
 import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.iso.datamodel.classes.Online;
@@ -114,12 +115,11 @@ public class WorldCerealCollectionMapper extends FileIdentifierMapper {
     private static final String ADDITIONAL_DATA = "additionalData";
 
     private static final String BACKGROUND_INFO_URL = "https://ewoc-rdm-ui.iiasa.ac.at/details/WorldCereal_crop_legend_ui_v2_20240709.pdf";
-    
+
     private static final String IRRIGATION_INFO_URL = "https://ewoc-rdm-ui.iiasa.ac.at/details/WorldCereal_irrigation_legend_ui_v2_20240709.pdf";
     private static final String CONFIDENCE_SCORE_URL = "https://ewoc-rdm-ui.iiasa.ac.at/details/WorldCereal_ConfidenceScoreCalculations_v1_1.pdf";
     private static final String CALCULATION_DATE_URL = "https://ewoc-rdm-ui.iiasa.ac.at/details/WorldCereal_DerivingValidityTime_v1_1.pdf";
-    						 
-    						        
+
     private static final int THRESOLD = 10000;
 
     // private static final String LICENSE = "license";
@@ -141,9 +141,6 @@ public class WorldCerealCollectionMapper extends FileIdentifierMapper {
     public Downloader getDownloader() {
 	return downloader == null ? new Downloader() : downloader;
     }
-
-
-
 
     @Override
     public GSResource execMapping(OriginalMetadata originalMD, GSSource source) throws GSException {
@@ -436,7 +433,6 @@ public class WorldCerealCollectionMapper extends FileIdentifierMapper {
 	 * EWOC_CODES
 	 */
 
-
 	WorldCerealCache wcCache = WorldCerealCache.getInstance();
 	String queryables = "";
 	boolean cropQueryable = false;
@@ -568,6 +564,14 @@ public class WorldCerealCollectionMapper extends FileIdentifierMapper {
 	extHandler.setWorldCereal(worldCerealMap);
 
 	ret.getExtensionHandler().setIsInSitu();
+
+	
+	List<String> keywords = List.of("crop type", "land cover", "reference data","WorldCereal");
+	for (String s : keywords) {
+	    Keywords kwd = new Keywords();
+	    kwd.addKeyword(s);
+	    miMetadata.getDataIdentification().addKeywords(kwd);
+	}
 
 	// readString(json, COLLECTION_ID_KEY).ifPresent(id -> extHandler.setSTACSecondLevelInfo(id));
 
@@ -722,7 +726,7 @@ public class WorldCerealCollectionMapper extends FileIdentifierMapper {
 	information.setFunctionCode("information");
 	information.setDescription("WorldCereal Legend");
 	miMetadata.getDistribution().addDistributionOnline(information);
-	
+
 	Online irrigationInfoURL = new Online();
 	irrigationInfoURL.setLinkage(IRRIGATION_INFO_URL);
 	irrigationInfoURL.setProtocol(NetProtocols.HTTP.getCommonURN());
@@ -730,7 +734,6 @@ public class WorldCerealCollectionMapper extends FileIdentifierMapper {
 	irrigationInfoURL.setDescription("Irrigation Legend");
 	miMetadata.getDistribution().addDistributionOnline(irrigationInfoURL);
 
-	
 	Online confidenceScore = new Online();
 	confidenceScore.setLinkage(CONFIDENCE_SCORE_URL);
 	confidenceScore.setProtocol(NetProtocols.HTTP.getCommonURN());
@@ -745,14 +748,11 @@ public class WorldCerealCollectionMapper extends FileIdentifierMapper {
 	calculationDate.setDescription("Calculation of date");
 	miMetadata.getDistribution().addDistributionOnline(calculationDate);
 
-
 	// addDistribution(json, miMetadata);
 
 	// enrichMetadata(miMetadata);
 
 	return ret;
-
-
 
     }
 
