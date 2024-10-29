@@ -193,16 +193,12 @@ public class WorldCerealHandler extends DiscoveryHandler<String> {
 
 		metadataString = parentGSResource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().asString(true);
 
-		Integer code = null;
+		Integer code = null; 
 		
 		Page requestPage = reducedMessage.getPage();
 		
 		int requestSize = requestPage.getSize();
 		
-		if(requestSize < DEFAULT_MAX_SIZE) {
-		    DEFAULT_MAX_SIZE = requestSize;
-		}
-
 		Downloader downloader = new Downloader();
 		// downloader.setConnectionTimeout(TimeUnit.SECONDS, 5);
 		int start = 1;
@@ -230,9 +226,6 @@ public class WorldCerealHandler extends DiscoveryHandler<String> {
 			listObj.add(jsonResponse);
 			String fileName = collectionID + "_" + start;
 			start = start + DEFAULT_STEP_SIZE;
-			if(start > requestSize) {
-			    DEFAULT_STEP_SIZE = requestSize - start;
-			}
 			page = new Page(start, DEFAULT_STEP_SIZE);
 
 			int numberMatched = jsonResponse.optInt("NumberMatched");
@@ -350,7 +343,7 @@ public class WorldCerealHandler extends DiscoveryHandler<String> {
 
 	    // Return the ZIP file as a Response
 	    return Response.ok(byteArrayOutputStream.toByteArray(), "application/zip")
-		    .header("Content-Disposition", "attachment; filename=\"json_files.zip\"").build();
+		    .header("Content-Disposition", "attachment; filename=\""+ uniqueJSONName + ".zip\"").build();
 
 	    //
 	    // // Return the JSON file as a Response

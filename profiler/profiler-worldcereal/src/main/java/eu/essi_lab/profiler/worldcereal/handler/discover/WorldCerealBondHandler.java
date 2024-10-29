@@ -1,5 +1,6 @@
 package eu.essi_lab.profiler.worldcereal.handler.discover;
 
+import java.util.ArrayList;
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -21,6 +22,7 @@ package eu.essi_lab.profiler.worldcereal.handler.discover;
  * #L%
  */
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -85,7 +87,7 @@ public class WorldCerealBondHandler implements DiscoveryBondHandler {
     private String endConfidenceLc;
 //    private String startConfidenceIrr;
 //    private String endConfidenceIrr;
-    private Map<String, String> textSearches;
+    private Map<String, List<String>> textSearches;
     private boolean valid;
 
     private String datasetId;
@@ -160,13 +162,31 @@ public class WorldCerealBondHandler implements DiscoveryBondHandler {
 //	    }
 //	    break;
 	case CROP_TYPES:
-	    textSearches.put(CROP_TYPES, bond.getPropertyValue());
+	    String cropValue = bond.getPropertyValue();
+	    List<String> newCropList = new ArrayList<String>();
+	    if(textSearches.containsKey(CROP_TYPES)) {
+		newCropList = textSearches.get(CROP_TYPES);
+	    } 
+	    newCropList.add(cropValue);
+	    textSearches.put(CROP_TYPES, newCropList);
 	    break;
 	case LAND_COVER_TYPES:
-	    textSearches.put(LAND_COVER_TYPES, bond.getPropertyValue());
+	    String lcValue = bond.getPropertyValue();
+	    List<String> newLcList = new ArrayList<String>();
+	    if(textSearches.containsKey(LAND_COVER_TYPES)) {
+		newLcList = textSearches.get(LAND_COVER_TYPES);
+	    } 
+	    newLcList.add(lcValue);
+	    textSearches.put(LAND_COVER_TYPES, newLcList);
 	    break;
 	case IRRIGATION_TYPES:
-	    textSearches.put(IRRIGATION_TYPES, bond.getPropertyValue());
+	    String irrValue = bond.getPropertyValue();
+	    List<String> newIrrList = new ArrayList<String>();
+	    if(textSearches.containsKey(IRRIGATION_TYPES)) {
+		newIrrList = textSearches.get(IRRIGATION_TYPES);
+	    } 
+	    newIrrList.add(irrValue);
+	    textSearches.put(IRRIGATION_TYPES, newIrrList);
 	    break;
 	case TITLE:
 	case ABSTRACT:
@@ -262,8 +282,8 @@ public class WorldCerealBondHandler implements DiscoveryBondHandler {
 	    builder.append(ENDDATE_KEY).append(EQUAL).append(endDate).append(AND);
 	}
 
-	for (Map.Entry<String, String> entry : textSearches.entrySet()) {
-	    String[] splittedTerms = entry.getValue().split(",");
+	for (Map.Entry<String, List<String>> entry : textSearches.entrySet()) {
+	    List<String> splittedTerms = entry.getValue();
 
 	    if (entry.getKey().equals(CROP_TYPES) || entry.getKey().equals(LAND_COVER_TYPES)) {
 		// split
