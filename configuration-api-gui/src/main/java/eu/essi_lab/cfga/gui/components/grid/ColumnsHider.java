@@ -56,13 +56,8 @@ public class ColumnsHider extends Details {
 
 	    if (grid.getColumns().//
 		    stream().//
-		    filter(col -> {
-
-			String key = col.getKey();
-			String columnName = descriptor.getColumnName();
-
-			return col.getKey().equals(descriptor.getColumnName()) && col.isVisible();
-		    }).//
+		    filter(c -> !c.getKey().isEmpty()).//
+		    filter(c -> c.getKey().equals(descriptor.getColumnName()) && c.isVisible()).//
 		    findFirst().//
 		    isPresent()) {
 
