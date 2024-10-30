@@ -2,7 +2,7 @@
     "openapi": "3.0.1",
     "info": {
         "title": "DAB Observations & Measurements REST API",
-        "description": "The DAB O&M REST API eases the discovery and access of observation data. It has been designed to be compliant with OM-JSON OGC DP 15-100r1 and GeoJSON",
+        "description": "The DAB O&M REST API eases the discovery and access of observation data. It is designed to be compliant with OM-JSON OGC DP 15-100r1 and GeoJSON",
         "version": "1.0"
     },
     "servers": [
