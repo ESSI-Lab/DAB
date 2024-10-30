@@ -22,7 +22,6 @@ package eu.essi_lab.cfga.gui.components.grid;
  */
 
 import java.util.HashMap;
-import java.util.Optional;
 
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu.GridContextMenuItemClickEvent;
 
@@ -34,7 +33,7 @@ public interface ContextMenuItem {
     /**
      * @param event
      */
-    void onClick(GridContextMenuItemClickEvent<HashMap<String, String>> event, Optional<Boolean> selected);
+    void onClick(GridContextMenuItemClickEvent<HashMap<String, String>> event, HashMap<String, Boolean> selected);
 
     /**
      * @return
