@@ -48,7 +48,7 @@ import eu.essi_lab.messages.JobStatus.JobPhase;
 public class HarvestingStatsProviderMenuItem implements ContextMenuItem {
 
     @Override
-    public void onClick(GridContextMenuItemClickEvent<HashMap<String, String>> event) {
+    public void onClick(GridContextMenuItemClickEvent<HashMap<String, String>> event, Optional<Boolean> selected) {
 
 	ConfirmationDialog dialog = new ConfirmationDialog();
 	dialog.setTitle("Harvesting statistics");

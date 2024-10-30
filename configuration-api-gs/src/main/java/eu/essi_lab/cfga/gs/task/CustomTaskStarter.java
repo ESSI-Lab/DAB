@@ -46,13 +46,13 @@ public class CustomTaskStarter extends TaskStarter {
     private String settingId;
 
     @Override
-    public void onClick(GridContextMenuItemClickEvent<HashMap<String, String>> event) {
+    public void onClick(GridContextMenuItemClickEvent<HashMap<String, String>> event, Optional<Boolean> selected) {
 
 	Optional<HashMap<String, String>> item = event.getItem();
 
 	settingId = item.get().get("Id");
 
-	super.onClick(event);
+	super.onClick(event, selected);
     }
 
     @Override
