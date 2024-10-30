@@ -24,7 +24,9 @@ package eu.essi_lab.cfga.gui.components.grid;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.function.Consumer;
 
+import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.function.ValueProvider;
 
 import eu.essi_lab.cfga.setting.Setting;
@@ -41,9 +43,10 @@ public class ColumnDescriptor {
     private boolean visible;
     private ValueProvider<Setting, String> valueProvider;
     private Comparator<HashMap<String, String>> comparator;
+    private Renderer<HashMap<String, String>> renderer;
+    private boolean hasCheckBox;
 
     static final String POSITIONAL_COLUMN_NAME = "#";
-    static final String CHECKBOX_COLUMN_NAME = "-";
 
     /**
      * 
@@ -58,13 +61,32 @@ public class ColumnDescriptor {
 
 	return create(POSITIONAL_COLUMN_NAME, 30, false, false, null); //
     }
-    
+
     /**
      * @return
      */
-    public static ColumnDescriptor createCheckBoxDescriptor() {
+    public static ColumnDescriptor createCheckBoxDescriptor(String columnName) {
 
-	return create(CHECKBOX_COLUMN_NAME, 30, false, false, null); //
+	return createCheckBoxDescriptor(columnName, null);
+    }
+
+    /**
+     * @return
+     */
+    public static ColumnDescriptor createCheckBoxDescriptor(Consumer<HashMap<String, String>> consumer) {
+
+	return createCheckBoxDescriptor("", consumer);
+    }
+
+    /**
+     * @return
+     */
+    public static ColumnDescriptor createCheckBoxDescriptor(String columnName, Consumer<HashMap<String, String>> consumer) {
+
+	ColumnDescriptor descriptor = create(columnName, 45, false, false, null, null, new CheckBoxColumnRenderer(consumer)); //
+	descriptor.setHasCheckbox(true);
+
+	return descriptor;
     }
 
     /**
@@ -75,6 +97,20 @@ public class ColumnDescriptor {
     public static ColumnDescriptor create(String columnName, ValueProvider<Setting, String> valueProvider) {
 
 	return create(columnName, -1, false, false, true, valueProvider, null);
+    }
+
+    /**
+     * @param columnName
+     * @param valueProvider
+     * @param renderer
+     * @return
+     */
+    public static ColumnDescriptor create(//
+	    String columnName, //
+	    ValueProvider<Setting, String> valueProvider, //
+	    Renderer<HashMap<String, String>> renderer) {
+
+	return create(columnName, -1, false, false, true, valueProvider, null, renderer);
     }
 
     /**
@@ -93,13 +129,48 @@ public class ColumnDescriptor {
 
     /**
      * @param columnName
+     * @param valueProvider
+     * @param comparator
+     * @param renderer
+     * @return
+     */
+    public static ColumnDescriptor create(//
+	    String columnName, //
+	    ValueProvider<Setting, String> valueProvider, //
+	    Comparator<HashMap<String, String>> comparator, //
+	    Renderer<HashMap<String, String>> renderer) {
+
+	return create(columnName, -1, false, false, true, valueProvider, comparator, renderer);
+    }
+
+    /**
+     * @param columnName
      * @param sortable
      * @param valueProvider
      * @return
      */
-    public static ColumnDescriptor create(String columnName, boolean sortable, ValueProvider<Setting, String> valueProvider) {
+    public static ColumnDescriptor create(//
+	    String columnName, //
+	    boolean sortable, //
+	    ValueProvider<Setting, String> valueProvider) {
 
 	return create(columnName, -1, sortable, false, true, valueProvider, null);
+    }
+
+    /**
+     * @param columnName
+     * @param sortable
+     * @param valueProvider
+     * @param renderer
+     * @return
+     */
+    public static ColumnDescriptor create(//
+	    String columnName, //
+	    boolean sortable, //
+	    ValueProvider<Setting, String> valueProvider, //
+	    Renderer<HashMap<String, String>> renderer) {
+
+	return create(columnName, -1, sortable, false, true, valueProvider, null, renderer);
     }
 
     /**
@@ -121,6 +192,24 @@ public class ColumnDescriptor {
     /**
      * @param columnName
      * @param sortable
+     * @param valueProvider
+     * @param comparator
+     * @param renderer
+     * @return
+     */
+    public static ColumnDescriptor create(//
+	    String columnName, //
+	    boolean sortable, //
+	    ValueProvider<Setting, String> valueProvider, //
+	    Comparator<HashMap<String, String>> comparator, //
+	    Renderer<HashMap<String, String>> renderer) {
+
+	return create(columnName, -1, sortable, false, true, valueProvider, comparator, renderer);
+    }
+
+    /**
+     * @param columnName
+     * @param sortable
      * @param filtered
      * @param valueProvider
      * @return
@@ -132,6 +221,24 @@ public class ColumnDescriptor {
 	    ValueProvider<Setting, String> valueProvider) {
 
 	return create(columnName, -1, sortable, filtered, true, valueProvider, null);
+    }
+
+    /**
+     * @param columnName
+     * @param sortable
+     * @param filtered
+     * @param valueProvider
+     * @param renderer
+     * @return
+     */
+    public static ColumnDescriptor create(//
+	    String columnName, //
+	    boolean sortable, //
+	    boolean filtered, //
+	    ValueProvider<Setting, String> valueProvider, //
+	    Renderer<HashMap<String, String>> renderer) {
+
+	return create(columnName, -1, sortable, filtered, true, valueProvider, null, renderer);
     }
 
     /**
@@ -157,6 +264,26 @@ public class ColumnDescriptor {
      * @param sortable
      * @param filtered
      * @param valueProvider
+     * @param comparator
+     * @param renderer
+     * @return
+     */
+    public static ColumnDescriptor create(//
+	    String columnName, //
+	    boolean sortable, //
+	    boolean filtered, //
+	    ValueProvider<Setting, String> valueProvider, //
+	    Comparator<HashMap<String, String>> comparator, //
+	    Renderer<HashMap<String, String>> renderer) {
+
+	return create(columnName, -1, sortable, filtered, true, valueProvider, comparator, renderer);
+    }
+
+    /**
+     * @param columnName
+     * @param sortable
+     * @param filtered
+     * @param valueProvider
      * @return
      */
     public static ColumnDescriptor create(//
@@ -167,6 +294,26 @@ public class ColumnDescriptor {
 	    ValueProvider<Setting, String> valueProvider) {
 
 	return create(columnName, columnWidth, sortable, filtered, true, valueProvider, null);
+    }
+
+    /**
+     * @param columnName
+     * @param columnWidth
+     * @param sortable
+     * @param filtered
+     * @param valueProvider
+     * @param renderer
+     * @return
+     */
+    public static ColumnDescriptor create(//
+	    String columnName, //
+	    int columnWidth, //
+	    boolean sortable, //
+	    boolean filtered, //
+	    ValueProvider<Setting, String> valueProvider, //
+	    Renderer<HashMap<String, String>> renderer) {
+
+	return create(columnName, columnWidth, sortable, filtered, true, valueProvider, null, renderer);
     }
 
     /**
@@ -191,6 +338,28 @@ public class ColumnDescriptor {
 
     /**
      * @param columnName
+     * @param columnWidth
+     * @param sortable
+     * @param filtered
+     * @param valueProvider
+     * @param comparator
+     * @param renderer
+     * @return
+     */
+    public static ColumnDescriptor create(//
+	    String columnName, //
+	    int columnWidth, //
+	    boolean sortable, //
+	    boolean filtered, //
+	    ValueProvider<Setting, String> valueProvider, //
+	    Comparator<HashMap<String, String>> comparator, //
+	    Renderer<HashMap<String, String>> renderer) {
+
+	return create(columnName, columnWidth, sortable, filtered, true, valueProvider, comparator, renderer);
+    }
+
+    /**
+     * @param columnName
      * @param sortable
      * @param filtered
      * @param visible
@@ -209,6 +378,25 @@ public class ColumnDescriptor {
 
     /**
      * @param columnName
+     * @param sortable
+     * @param filtered
+     * @param visible
+     * @param valueProvider
+     * @return
+     */
+    public static ColumnDescriptor create(//
+	    String columnName, //
+	    boolean sortable, //
+	    boolean filtered, //
+	    boolean visible, //
+	    ValueProvider<Setting, String> valueProvider, //
+	    Renderer<HashMap<String, String>> renderer) {
+
+	return create(columnName, -1, sortable, filtered, visible, valueProvider, null, renderer);
+    }
+
+    /**
+     * @param columnName
      * @param columnWidth
      * @param sortable
      * @param filtered
@@ -222,7 +410,32 @@ public class ColumnDescriptor {
 	    boolean sortable, //
 	    boolean filtered, //
 	    boolean visible, //
-	    ValueProvider<Setting, String> valueProvider, Comparator<HashMap<String, String>> comparator) {
+	    ValueProvider<Setting, String> valueProvider, //
+	    Comparator<HashMap<String, String>> comparator) {
+
+	return create(columnName, columnWidth, sortable, filtered, visible, valueProvider, comparator, null);
+    }
+
+    /**
+     * @param columnName
+     * @param columnWidth
+     * @param sortable
+     * @param filtered
+     * @param visible
+     * @param valueProvider
+     * @param comparator
+     * @param renderer
+     * @return
+     */
+    public static ColumnDescriptor create(//
+	    String columnName, //
+	    int columnWidth, //
+	    boolean sortable, //
+	    boolean filtered, //
+	    boolean visible, //
+	    ValueProvider<Setting, String> valueProvider, //
+	    Comparator<HashMap<String, String>> comparator, //
+	    Renderer<HashMap<String, String>> renderer) {
 
 	ColumnDescriptor descriptor = new ColumnDescriptor();
 	descriptor.setColumnName(columnName);
@@ -232,6 +445,35 @@ public class ColumnDescriptor {
 	descriptor.setValueProvider(valueProvider);
 	descriptor.setColumnVisible(visible);
 	descriptor.setComparator(comparator);
+	descriptor.setRenderer(renderer);
+
+	return descriptor;
+    }
+
+    /**
+     * @param columnName
+     * @param columnWidth
+     * @param sortable
+     * @param filtered
+     * @param visible
+     * @param valueProvider
+     * @return
+     */
+    public static ColumnDescriptor create(//
+	    String columnName, //
+	    int columnWidth, //
+	    boolean sortable, //
+	    boolean filtered, //
+	    boolean visible, //
+	    Renderer<HashMap<String, String>> renderer) {
+
+	ColumnDescriptor descriptor = new ColumnDescriptor();
+	descriptor.setColumnName(columnName);
+	descriptor.setColumnWidth(columnWidth);
+	descriptor.setSortable(sortable);
+	descriptor.setFiltered(filtered);
+	descriptor.setColumnVisible(visible);
+	descriptor.setRenderer(renderer);
 
 	return descriptor;
     }
@@ -348,4 +590,35 @@ public class ColumnDescriptor {
 	this.comparator = comparator;
     }
 
+    /**
+     * @return
+     */
+    public Optional<Renderer<HashMap<String, String>>> getRenderer() {
+
+	return Optional.ofNullable(renderer);
+    }
+
+    /**
+     * @param renderer
+     */
+    public void setRenderer(Renderer<HashMap<String, String>> renderer) {
+
+	this.renderer = renderer;
+    }
+
+    /**
+     * @param hasCheckBox
+     */
+    void setHasCheckbox(boolean hasCheckBox) {
+
+	this.hasCheckBox = hasCheckBox;
+    }
+
+    /**
+     * @return
+     */
+    boolean hasCheckBox() {
+
+	return hasCheckBox;
+    }
 }
