@@ -10,3 +10,8 @@
   max-width: 250px;
 }
 
+input[type='checkbox'] { 
+
+	cursor: pointer;
+}
+
