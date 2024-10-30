@@ -142,7 +142,7 @@ public abstract class TaskStarter implements ContextMenuItem, ButtonChangeListen
     }
 
     @Override
-    public void onClick(GridContextMenuItemClickEvent<HashMap<String, String>> event, Optional<Boolean> selected) {
+    public void onClick(GridContextMenuItemClickEvent<HashMap<String, String>> event, HashMap<String, Boolean> selected) {
 
 	session = VaadinSession.getCurrent();
 

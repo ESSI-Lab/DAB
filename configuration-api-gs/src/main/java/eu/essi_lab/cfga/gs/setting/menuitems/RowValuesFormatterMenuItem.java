@@ -37,7 +37,7 @@ import eu.essi_lab.cfga.gui.dialog.ConfirmationDialog;
 public class RowValuesFormatterMenuItem implements ContextMenuItem {
 
     @Override
-    public void onClick(GridContextMenuItemClickEvent<HashMap<String, String>> event, Optional<Boolean> selected) {
+    public void onClick(GridContextMenuItemClickEvent<HashMap<String, String>> event, HashMap<String, Boolean> selected) {
 
 	Optional<HashMap<String, String>> item = event.getItem();
 

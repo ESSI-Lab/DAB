@@ -97,7 +97,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	//
 	//
 	//
-	
+
 	if (!gridInfo.getContextMenuItems().isEmpty()) {
 
 	    GridContextMenu<HashMap<String, String>> menu = addContextMenu();
@@ -112,12 +112,10 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 		    return;
 		}
 
-		Optional<Checkbox> check = CHECKS.//
-			stream().//
-			filter(c -> c.getId().get().equals(item.get().get("identifier"))).//
-			findFirst();
+		HashMap<String, Boolean> map = new HashMap<>();
+		CHECKS.forEach(check -> map.put(check.getId().get(), check.getValue()));
 
-		cmi.onClick(e, check.isPresent() ? Optional.of(check.get().getValue()) : Optional.empty());
+		cmi.onClick(e, map);
 	    }));
 	}
 

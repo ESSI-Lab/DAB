@@ -42,7 +42,7 @@ public class HarvestingStarter extends TaskStarter {
     private String settingId;
 
     @Override
-    public void onClick(GridContextMenuItemClickEvent<HashMap<String, String>> event, Optional<Boolean> selected) {
+    public void onClick(GridContextMenuItemClickEvent<HashMap<String, String>> event, HashMap<String, Boolean> selected) {
 
 	Optional<HashMap<String, String>> item = event.getItem();
 
