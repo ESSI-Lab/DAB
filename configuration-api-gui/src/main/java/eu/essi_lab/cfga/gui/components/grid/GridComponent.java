@@ -61,7 +61,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
     private HeaderRow filterRow;
     private GridFilter gridFilter;
     private ListDataProvider<HashMap<String, String>> dataProvider;
-    private Grid.Column<HashMap<String, String>> column;
+    static List<Checkbox> CHECKS;
 
     /**
      * @param gridInfo
@@ -80,6 +80,8 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	    boolean readOnly, //
 	    boolean refresh) {
 
+	CHECKS = new ArrayList<Checkbox>();
+
 	this.gridInfo = gridInfo;
 
 	//
@@ -95,11 +97,12 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	//
 	//
 	//
+	
 	if (!gridInfo.getContextMenuItems().isEmpty()) {
 
 	    GridContextMenu<HashMap<String, String>> menu = addContextMenu();
 
-	    gridInfo.getContextMenuItems().forEach(p -> menu.addItem(p.getItemText(), e -> {
+	    gridInfo.getContextMenuItems().forEach(cmi -> menu.addItem(cmi.getItemText(), e -> {
 
 		Optional<HashMap<String, String>> item = e.getItem();
 
@@ -109,7 +112,12 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 		    return;
 		}
 
-		p.onClick(e);
+		Optional<Checkbox> check = CHECKS.//
+			stream().//
+			filter(c -> c.getId().get().equals(item.get().get("identifier"))).//
+			findFirst();
+
+		cmi.onClick(e, check.isPresent() ? Optional.of(check.get().getValue()) : Optional.empty());
 	    }));
 	}
 
@@ -152,31 +160,22 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 	dataProvider = (ListDataProvider) getDataProvider();
 
-	ColumnDescriptor.createPositionalDescriptor();
-
 	gridInfo.getColumnsDescriptors().forEach(descriptor -> {
 
-	    if (descriptor.getColumnName().equals(ColumnDescriptor.CHECKBOX_COLUMN_NAME)) {
+	    Grid.Column<HashMap<String, String>> column = null;
 
-		column = addColumn( 
-		    
-		    new ComponentRenderer<>(
-			    item -> {
-	                            Checkbox checkbox = new Checkbox();
-	                                           
-	                            return checkbox;
-	                        }
-	                )
-		    
-		    
-		);
+	    if (descriptor.getRenderer().isPresent()) {
+
+		column = addColumn(descriptor.getRenderer().get());
 
 	    } else {
 
-		column = addColumn(//
+		column = addColumn(new MapValueProvider(descriptor.getColumnName()));
 
-			new MapValueProvider(descriptor.getColumnName()));
+		column.setEditorComponent(new TextArea());
 	    }
+
+	    column.setKey(descriptor.getColumnName());
 
 	    column.setResizable(true);
 
@@ -187,10 +186,12 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 	    column.setSortable(descriptor.isSortable());//
 
-	    descriptor.getComparator().ifPresent(comp -> column.setComparator(comp));
+	    if (descriptor.getComparator().isPresent()) {
 
-	    if (descriptor.getColumnName().equals(ColumnDescriptor.POSITIONAL_COLUMN_NAME)
-		    || descriptor.getColumnName().equals(ColumnDescriptor.CHECKBOX_COLUMN_NAME)) {
+		column.setComparator(descriptor.getComparator().get());
+	    }
+
+	    if (descriptor.getColumnName().equals(ColumnDescriptor.POSITIONAL_COLUMN_NAME)) {
 
 		column.setHeader("");
 
@@ -198,10 +199,6 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 		column.setHeader(descriptor.getColumnName());
 	    }
-
-	    column.setKey(descriptor.getColumnName());
-
-	    column.setEditorComponent(new TextArea());
 
 	    if (descriptor.getColumnWidth() > 0) {
 
@@ -212,7 +209,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 		column.setAutoWidth(true);
 	    }
 
-	    if (descriptor.isFiltered()) {
+	    if (descriptor.isFiltered() || descriptor.getRenderer().isPresent()) {
 
 		addFilter(descriptor, column);
 	    }
@@ -331,31 +328,43 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	//
 	//
 
-	TextField filterField = new TextField();
+	if (descriptor.hasCheckBox()) {
 
-	filterField.addValueChangeListener(event -> {
+	    Checkbox checkbox = new Checkbox();
 
-	    gridFilter.filter(descriptor.getColumnName(), event.getValue());
+	    filterRow.getCell(column).setComponent(checkbox);
 
-	    dataProvider.refreshAll();
-	});
+	    checkbox.addClickListener(event -> {
 
-	filterField.setValueChangeMode(ValueChangeMode.EAGER);
+		Boolean value = event.getSource().getValue();
 
-	filterRow.getCell(column).setComponent(filterField);
+		GridComponent.CHECKS.forEach(c -> c.setValue(value));
+	    });
 
-	filterField.setSizeFull();
-	filterField.setPlaceholder("Filter");
-	filterField.getElement().setAttribute("focus-target", "");
+	} else {
 
-	//
-	//
-	//
+	    TextField filterField = new TextField();
 
-	Optional<String> value = GridFilter.getValue(descriptor.getColumnName());
-	if (value.isPresent()) {
+	    filterField.addValueChangeListener(event -> {
 
-	    filterField.setValue(value.get());
+		gridFilter.filter(descriptor.getColumnName(), event.getValue());
+
+		dataProvider.refreshAll();
+	    });
+
+	    filterField.setValueChangeMode(ValueChangeMode.EAGER);
+
+	    filterRow.getCell(column).setComponent(filterField);
+
+	    filterField.setSizeFull();
+	    filterField.setPlaceholder("Filter");
+	    filterField.getElement().setAttribute("focus-target", "");
+
+	    Optional<String> value = GridFilter.getValue(descriptor.getColumnName());
+	    if (value.isPresent()) {
+
+		filterField.setValue(value.get());
+	    }
 	}
     }
 
@@ -382,17 +391,14 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 		String columnName = desc.getColumnName();
 
-		if (columnName.equals(ColumnDescriptor.POSITIONAL_COLUMN_NAME)
-			|| columnName.equals(ColumnDescriptor.CHECKBOX_COLUMN_NAME)) {
-
-		    return;
-		}
-
 		ValueProvider<Setting, String> valueProvider = desc.getValueProvider();
 
-		String value = valueProvider.apply(setting);
+		if (valueProvider != null) {
 
-		map.put(columnName, value);
+		    String value = valueProvider.apply(setting);
+
+		    map.put(columnName, value);
+		}
 	    });
 
 	    items.add(map);
@@ -426,12 +432,11 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 	    if (column.equals(ColumnDescriptor.POSITIONAL_COLUMN_NAME)) {
 
-		return String.valueOf(GridComponent.this.getListDataView().getItems().collect(Collectors.toList()).indexOf(source) + 1);
-	    }
-
-	    if (column.equals(ColumnDescriptor.CHECKBOX_COLUMN_NAME)) {
-
-		return "";
+		return String.valueOf(//
+			GridComponent.this.getListDataView().//
+				getItems().//
+				collect(Collectors.toList()).//
+				indexOf(source) + 1);
 	    }
 
 	    return source.get(column);
