@@ -201,7 +201,7 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 
 			    ColumnDescriptor.createPositionalDescriptor(), //
 
-			    ColumnDescriptor.createCheckBoxDescriptor(), //
+			    ColumnDescriptor.createCheckBoxDescriptor("Sel.", item -> System.out.println(item)), //
 
 			    ColumnDescriptor.create("Name", true, true, (s) -> s.getName()), //
 
