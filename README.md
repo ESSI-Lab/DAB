@@ -9,7 +9,7 @@
 
 <h3 align="center">Discovery and Access Broker (DAB) Community Edition (CE)</h3>
 
- <p align="center">
+ <p align="center"> 
     <br />
     <a href="#getting-started"><strong>Getting started»</strong></a>
     <br />
