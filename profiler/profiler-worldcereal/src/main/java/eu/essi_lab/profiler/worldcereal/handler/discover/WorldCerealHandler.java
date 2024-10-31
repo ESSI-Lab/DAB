@@ -68,6 +68,7 @@ import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.handler.DiscoveryHandler;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
 import eu.essi_lab.request.executor.discover.BondReducer;
@@ -78,10 +79,11 @@ public class WorldCerealHandler extends DiscoveryHandler<String> {
     private static final String WORLDCEREAL_GRANULES_NO_PARENT_ERR_ID = "WORLDCEREAL_GRANULES_NO_PARENT_ERR_ID";
     private static final String WORLDCEREAL_GET_ITEMS_ERROR = "WORLDCEREAL_GET_ITEMS_ERROR";
     public final static String WORLDCEREAL_BASE_URL = "https://ewoc-rdm-api.iiasa.ac.at/";
+    public final static String AGROSTAC_BASE_URL = "https://agrostac-test.containers.wur.nl/agrostac/";
+
     private int DEFAULT_MAX_SIZE = 10000;
 
     private int DEFAULT_STEP_SIZE = 1000;
-
 
     // by default it waits five second
     private int waitTime = 5000;
@@ -128,8 +130,19 @@ public class WorldCerealHandler extends DiscoveryHandler<String> {
 
 	BondReducer bondReducer = new BondReducer();
 	Bond normalizedBond = message.getNormalizedBond();
+//	String identifierSource = "worldcereal";
+//	if (normalizedBond.toString().contains("agrostac")) {
+//	    identifierSource = "agrostac";
+//	}
 
-	Bond reducedBond = bondReducer.getReducedBond(normalizedBond, "worldcereal");
+	Bond reducedBond = null;
+
+	try {
+	    reducedBond = bondReducer.getReducedBond(normalizedBond, "worldcereal");
+	} catch (Exception e) {
+	    // try agrostac
+	    reducedBond = bondReducer.getReducedBond(normalizedBond, "agrostac");
+	}
 
 	ReducedDiscoveryMessage reducedMessage = new ReducedDiscoveryMessage(message, reducedBond);
 
@@ -193,12 +206,12 @@ public class WorldCerealHandler extends DiscoveryHandler<String> {
 
 		metadataString = parentGSResource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().asString(true);
 
-		Integer code = null; 
-		
+		Integer code = null;
+
 		Page requestPage = reducedMessage.getPage();
-		
+
 		int requestSize = requestPage.getSize();
-		
+
 		Downloader downloader = new Downloader();
 		// downloader.setConnectionTimeout(TimeUnit.SECONDS, 5);
 		int start = 1;
@@ -207,9 +220,11 @@ public class WorldCerealHandler extends DiscoveryHandler<String> {
 		boolean isNotFinished = true;
 		int tries = 3;
 
+		String type = parentGSResource.getSource().getEndpoint();
+
 		while (((code == null || code > 400) || isNotFinished) && tries > 0) {
 
-		    String request = createRequest(reducedMessage, page, collectionID);
+		    String request = createRequest(reducedMessage, page, collectionID, type);
 
 		    GSLoggerFactory.getLogger(getClass()).debug("Searching for query '{}' STARTED", request);
 
@@ -343,7 +358,7 @@ public class WorldCerealHandler extends DiscoveryHandler<String> {
 
 	    // Return the ZIP file as a Response
 	    return Response.ok(byteArrayOutputStream.toByteArray(), "application/zip")
-		    .header("Content-Disposition", "attachment; filename=\""+ uniqueJSONName + ".zip\"").build();
+		    .header("Content-Disposition", "attachment; filename=\"" + uniqueJSONName + ".zip\"").build();
 
 	    //
 	    // // Return the JSON file as a Response
@@ -413,13 +428,18 @@ public class WorldCerealHandler extends DiscoveryHandler<String> {
 	return parentIdBondHandler.getParentValue();
     }
 
-    private String createRequest(ReducedDiscoveryMessage message, Page page, String datasetId) {
+    private String createRequest(ReducedDiscoveryMessage message, Page page, String datasetId, String type) {
 
 	WorldCerealBondHandler bondHandler = parse(message, page.getStart(), page.getSize());
+	StringBuilder builder;
+	if (type.contains(WORLDCEREAL_BASE_URL)) {
+	    builder = new StringBuilder(WORLDCEREAL_BASE_URL + "collections/" + datasetId + "/items?");
 
-	StringBuilder builder = new StringBuilder(WORLDCEREAL_BASE_URL + "collections/" + datasetId + "/items?");
-	builder.append(bondHandler.getQueryString());
-
+	} else {
+	    builder = new StringBuilder(AGROSTAC_BASE_URL + "cropdatabyarea/");
+	    // String queryS = bondHandler.getQueryString(type);
+	}
+	builder.append(bondHandler.getQueryString(type));
 	return builder.toString();
     }
 
