@@ -1,5 +1,7 @@
 package eu.essi_lab.accessor.elixena;
 
+import java.util.Arrays;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -24,10 +26,8 @@ package eu.essi_lab.accessor.elixena;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.gs.setting.connector.HarvestedConnectorSetting;
-import eu.essi_lab.cfga.option.BooleanChoice;
-import eu.essi_lab.cfga.option.BooleanChoiceOptionBuilder;
 import eu.essi_lab.cfga.option.Option;
-import eu.essi_lab.lib.utils.LabeledEnum;
+import eu.essi_lab.cfga.option.StringOptionBuilder;
 
 /**
  * @author Fabrizio
@@ -37,19 +37,32 @@ public class ElixirEnaConnectorSetting extends HarvestedConnectorSetting {
     /**
      * 
      */
-    private static final String ELIXIR_ENA_DEFAULT_STUDIES_OPTION_KEY = "elixirEnadefaultStudies";
+    public static final String ELIXIR_ENA_HARVESTING_TYPE_KEY = "elixirEnaHarvestingType";
+
+    public static final String DEFAULT_STUDIES = "DEFAULT";
+
+    public static final String LOW_CONFIDENCE = "LOW";
+
+    public static final String MEDIUM_CONFIDENCE = "MEDIUM";
+
+    public static final String MEDIUM_PLUS_HIGH_CONFIDENCE = "MEDIUM_PLUS_HIGH";
+
+    public static final String HIGH_CONFIDENCE = "HIGH";
+
+    public static String[] HARVESTING_TYPES = new String[] { DEFAULT_STUDIES, LOW_CONFIDENCE, MEDIUM_CONFIDENCE, MEDIUM_PLUS_HIGH_CONFIDENCE,
+	    HIGH_CONFIDENCE };
 
     /**
      * 
      */
     public ElixirEnaConnectorSetting() {
 
-	Option<BooleanChoice> option = BooleanChoiceOptionBuilder.get().//
-		withKey(ELIXIR_ENA_DEFAULT_STUDIES_OPTION_KEY).//
-		withLabel("Use default studies").//
+	Option<String> option = StringOptionBuilder.get(String.class).//
+		withKey(ELIXIR_ENA_HARVESTING_TYPE_KEY).//
+		withLabel("Harvesting type").//
 		withSingleSelection().//
-		withValues(LabeledEnum.values(BooleanChoice.class)).//
-		withSelectedValue(BooleanChoice.TRUE).//
+		withValues(Arrays.asList(HARVESTING_TYPES)).//
+		withSelectedValue(LOW_CONFIDENCE).//
 		cannotBeDisabled().//
 		build();
 
@@ -73,19 +86,11 @@ public class ElixirEnaConnectorSetting extends HarvestedConnectorSetting {
     }
 
     /**
-     * @param set
-     */
-    public void setUseDefaultStudies(boolean set) {
-
-	getOption(ELIXIR_ENA_DEFAULT_STUDIES_OPTION_KEY, BooleanChoice.class).get().select(v -> v == BooleanChoice.fromBoolean(set));
-    }
-
-    /**
      * @return
      */
-    public boolean isUseDefaultStudiesSet() {
+    public String getHarvestingType() {
 
-	return BooleanChoice.toBoolean(getOption(ELIXIR_ENA_DEFAULT_STUDIES_OPTION_KEY, BooleanChoice.class).get().getSelectedValue());
+	return getOption(ELIXIR_ENA_HARVESTING_TYPE_KEY, String.class).get().getSelectedValue();
     }
 
     @Override
