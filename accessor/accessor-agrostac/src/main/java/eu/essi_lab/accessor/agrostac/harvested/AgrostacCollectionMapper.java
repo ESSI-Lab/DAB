@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
+
 import javax.xml.bind.JAXBElement;
 
 import org.apache.commons.io.IOUtils;
@@ -130,10 +132,8 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 
     private static final String QUANTITY_CODE = "quantitycode";
     private static final String QUANTITY_DESCRIPTION = "quantitydescriptionuk";
-    
+
     private static final String CROPDATABYAREA_URL = "cropdatabyarea";
-    
-    
 
     //
     private static final String minLat = "min_latitudedd";
@@ -153,8 +153,6 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
     private static final String BACKGROUND_INFO_URL = "https://ewoc-rdm-ui.iiasa.ac.at/details/WorldCereal_crop_legend_ui_v2_20240709.pdf";
 
     private static final int THRESOLD = 10000;
-    
-    
 
     // private static final String LICENSE = "license";
     // private static final String ABSTRACT_KEY = "description";
@@ -175,48 +173,32 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
     public Downloader getDownloader() {
 	return downloader == null ? new Downloader() : downloader;
     }
-    
-    public enum CROP_CODES{
-	
-	SBN("soy_soybeans","1106000020"),
-	CBN("beans","1105010010"),
-	COT("cotton","1108000010"),
-	SUN("sunflower","1106000010"),
-	RYEW("winter_rye","1101030001"),
-	WHBW("winter_common_soft_wheat","1101010011"),
-	TRO("unspecified_wheat","1101010000"),
-	SGG("unspecified_sorghum","1101070030"),
-	PML("unspecified_millet","1101070010"),
-	RIC("rice","1101080000"),
-	GRS("grass_fodder_crops","1111000000"),
-	RAP("rapeseed_rape","1106000030"),
-	RAPW("winter_rapeseed_rape","1106000031"),
-	POT("potatoes","1107000010"),
-	FAB("beans","1105010010"),
-	RYE("unspecified_rye","1101030000"),
-	OAT("unspecified_oats","1101040000"),
-	LABL("beans","1105010010"),
-	MAZ("maize","1101060000"),
-	RAPI("brassicaceae_cruciferae","1103050000"),
-	BAR("unspecified_barley","1101020000"),
-	PEA("peas","1105010020"),
-	WHB("common_soft_wheat","1101010010"),
-	BBN("beans","1105010010"),
-	FBT("fodder_beet","1107000032"),
-	FLAX("flax","1108020010"),
-	BARW("winter_barley","1101020001"),
-	SBT("sugar_beet","1107000031"),
-	BARS("spring_barley","1101020002");	
-	
-	
-	
+
+    public enum CROP_CODES {
+
+	SBN("soy_soybeans", "1106000020"), CBN("beans", "1105010010"), COT("cotton", "1108000010"), SUN("sunflower", "1106000010"), RYEW(
+		"winter_rye", "1101030001"), WHBW("winter_common_soft_wheat", "1101010011"), TRO("unspecified_wheat", "1101010000"), SGG(
+			"unspecified_sorghum", "1101070030"), PML("unspecified_millet", "1101070010"), RIC("rice", "1101080000"), GRS(
+				"grass_fodder_crops", "1111000000"), RAP("rapeseed_rape", "1106000030"), RAPW("winter_rapeseed_rape",
+					"1106000031"), POT("potatoes", "1107000010"), FAB("beans", "1105010010"), RYE("unspecified_rye",
+						"1101030000"), OAT("unspecified_oats", "1101040000"), LABL("beans",
+							"1105010010"), MAZ("maize", "1101060000"), RAPI("brassicaceae_cruciferae",
+								"1103050000"), BAR("unspecified_barley", "1101020000"), PEA("peas",
+									"1105010020"), WHB("common_soft_wheat", "1101010010"), BBN("beans",
+										"1105010010"), FBT("fodder_beet", "1107000032"), FLAX(
+											"flax", "1108020010"), BARW("winter_barley",
+												"1101020001"), SBT("sugar_beet",
+													"1107000031"), BARS("spring_barley",
+														"1101020002");
+
 	private String name;
 	private String code;
+
 	CROP_CODES(String name, String code) {
 	    this.name = name;
 	    this.code = code;
 	}
-	
+
 	public String getName() {
 	    return name;
 	}
@@ -225,11 +207,9 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 	    return code;
 	}
 
-	
-	
 	public static CROP_CODES decode(String code) {
-	    for(CROP_CODES c: values()) {
-		if(code.equals(c.name())) {
+	    for (CROP_CODES c : values()) {
+		if (code.equals(c.name())) {
 		    return c;
 		}
 	    }
@@ -252,21 +232,25 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 
 	/**
 	 * DATASET METADATA
-        {
-            "wiki_url": "http://wiki.agrostac.geodesk.nl/index.php/DWD_PHENO",
-            "related_publication": "DWD Climate Data Center (CDC): Phenological observations of crops from sowing to harvest (annual reporters, historical), Version v006, 2019",
-            "organization_name": "Deutscher Wetterdienst (DWD), Germany",
-            "min_latitudedd": 47.5544,
-            "title": "Phenological observations of crops from sowing to harvest in Germany (location is 5 km radius with for each crop a representative field being monitored)",
-            "dataset_code": "DWD_PHENO",
-            "max_latitudedd": 54.9,
-            "source_url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/phenology/annual_reporters/crops/",
-            "organization_web_address": "https://www.dwd.de",
-            "license": "Creative Commons Attribution 4.0 International License;  CC BY (Attribution), see https://opendata.dwd.de/climate_environment/CDC/Terms_of_use.pdf",
-            "min_longitudedd": 6.0,
-            "max_longitudedd": 15.0333,
-            "datasetid": 25
-        }
+	 * {
+	 * "wiki_url": "http://wiki.agrostac.geodesk.nl/index.php/DWD_PHENO",
+	 * "related_publication": "DWD Climate Data Center (CDC): Phenological observations of crops from sowing to
+	 * harvest (annual reporters, historical), Version v006, 2019",
+	 * "organization_name": "Deutscher Wetterdienst (DWD), Germany",
+	 * "min_latitudedd": 47.5544,
+	 * "title": "Phenological observations of crops from sowing to harvest in Germany (location is 5 km radius with
+	 * for each crop a representative field being monitored)",
+	 * "dataset_code": "DWD_PHENO",
+	 * "max_latitudedd": 54.9,
+	 * "source_url":
+	 * "https://opendata.dwd.de/climate_environment/CDC/observations_germany/phenology/annual_reporters/crops/",
+	 * "organization_web_address": "https://www.dwd.de",
+	 * "license": "Creative Commons Attribution 4.0 International License; CC BY (Attribution), see
+	 * https://opendata.dwd.de/climate_environment/CDC/Terms_of_use.pdf",
+	 * "min_longitudedd": 6.0,
+	 * "max_longitudedd": 15.0333,
+	 * "datasetid": 25
+	 * }
 	 */
 
 	/**
@@ -400,7 +384,7 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 
 	Map<String, Map<String, String>> cropQuantityMap = new HashMap<String, Map<String, String>>();
 	Set<String> quantitySet = new HashSet<String>();
-	List<String> keywords = new ArrayList<String>();		
+	List<String> keywords = new ArrayList<String>();
 	for (int k = 0; k < overviewArray.length(); k++) {
 
 	    JSONObject overviewObj = overviewArray.optJSONObject(k);
@@ -412,9 +396,9 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 		keywords.add(cropName);
 		CROP_CODES cCode = CROP_CODES.decode(cropCode);
 		String newCropCode = null;
-		if(cCode != null) {
+		if (cCode != null) {
 		    cropName = cCode.getName();
-		    newCropCode = cCode.getCode();	
+		    newCropCode = cCode.getCode();
 		} else {
 		    logger.info("NULL!!");
 		}
@@ -422,7 +406,7 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 		quantityQueryable = true;
 		WorldCerealItem item = new WorldCerealItem();
 		item.setLabel(cropName);
-		if(newCropCode != null) {
+		if (newCropCode != null) {
 		    item.setCode(newCropCode);
 		}
 		cropList.add(item);
@@ -451,16 +435,15 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 		}
 	    }
 	}
-	
-	
-//	for (Map.Entry<String, Map<String,String>> entry : cropQuantityMap.entrySet()) {
-//	    String crop = entry.getKey();
-//	    Map<String, String> mapQ = entry.getValue();
-//	    for (Map.Entry<String, String> qEntry : mapQ.entrySet()) {
-//		String qCode = qEntry.getKey();
-//		getArea(endpoint, token, crop, qCode, datasetId);
-//	    }
-//	}
+
+	// for (Map.Entry<String, Map<String,String>> entry : cropQuantityMap.entrySet()) {
+	// String crop = entry.getKey();
+	// Map<String, String> mapQ = entry.getValue();
+	// for (Map.Entry<String, String> qEntry : mapQ.entrySet()) {
+	// String qCode = qEntry.getKey();
+	// getArea(endpoint, token, crop, qCode, datasetId);
+	// }
+	// }
 
 	// worldCerealMap.setIrrigationTypes(irrigationItems);
 	if (cropQueryable) {
@@ -509,11 +492,11 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 	    // kwd.addKeyword(String.valueOf(confidenceLcType));
 	    // miMetadata.getDataIdentification().addKeywords(kwd);
 	}
-	
-	for(String s: keywords) {
-	  Keywords kwd = new Keywords();
-	  kwd.addKeyword(s);
-	  miMetadata.getDataIdentification().addKeywords(kwd);
+
+	for (String s : keywords) {
+	    Keywords kwd = new Keywords();
+	    kwd.addKeyword(s);
+	    miMetadata.getDataIdentification().addKeywords(kwd);
 	}
 
 	extHandler.setWorldCereal(worldCerealMap);
@@ -543,6 +526,13 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 	if (optId.isPresent()) {
 	    uuid = optId.get();
 	    miMetadata.setFileIdentifier(uuid);
+	} else {
+	    Optional<String> datasetCodeOpt = readString(json, DATASET_CODE);
+	    if (datasetCodeOpt.isPresent()) {
+		String datasetCode = datasetCodeOpt.get();
+		uuid = UUID.nameUUIDFromBytes(datasetCode.getBytes()).toString();
+		miMetadata.setFileIdentifier(uuid);
+	    }
 	}
 	// readString(json, RESOURCE_ID_KEY).ifPresent(id -> miMetadata.setFileIdentifier(id));
 
@@ -575,7 +565,7 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 	    // metadata point of contact and mail
 	    ResponsibleParty metadataResponsibleParty = new ResponsibleParty();
 	    Contact metadatacontactInfo = new Contact();
-	    
+
 	    // Address metadataAddress = new Address();
 	    // metadataAddress.addElectronicMailAddress(nameContact);
 	    // metadatacontactInfo.setAddress(metadataAddress);
@@ -606,20 +596,20 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 	// readString(json, PROVIDERS).ifPresent(date ->
 	// miMetadata.getDataIdentification().setCitationPublicationDate(date));
 
-	//BBOX
+	// BBOX
 	Double minLatDouble = json.optDouble(minLat);
 	Double minLonDouble = json.optDouble(minLon);
 	Double maxLatDouble = json.optDouble(maxLat);
-	Double maxLonDouble =json.optDouble(maxLon);
-	
-	if(minLatDouble != null && !minLatDouble.isNaN() && minLonDouble != null && !minLonDouble.isNaN() && maxLatDouble != null && !maxLatDouble.isNaN() && maxLonDouble != null && !maxLonDouble.isNaN() ) {
+	Double maxLonDouble = json.optDouble(maxLon);
+
+	if (minLatDouble != null && !minLatDouble.isNaN() && minLonDouble != null && !minLonDouble.isNaN() && maxLatDouble != null
+		&& !maxLatDouble.isNaN() && maxLonDouble != null && !maxLonDouble.isNaN()) {
 	    BigDecimal north = BigDecimal.valueOf(maxLatDouble);
 	    BigDecimal west = BigDecimal.valueOf(minLonDouble);
 	    BigDecimal south = BigDecimal.valueOf(minLatDouble);
 	    BigDecimal east = BigDecimal.valueOf(maxLonDouble);
 	    miMetadata.getDataIdentification().addGeographicBoundingBox(north, west, south, east);
 	}
-	
 
 	// addContactInfo(miMetadata, json.optJSONArray(PROVIDERS));
 
@@ -715,14 +705,15 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 	}
 	return ret;
     }
-    
+
     private List<Double> getArea(String endpoint, String token, String cCode, String qCode, String datasetId) {
 	List<Double> ret = new ArrayList<Double>();
 	Double minWest = null;
 	Double maxWest = null;
 	Double minEast = null;
 	Double maxEast = null;
-	String request = endpoint + CROPDATABYAREA_URL + "/" + cCode + "?accesstoken=" + token + "cropquantity=" + qCode + "datasetid=" + datasetId;
+	String request = endpoint + CROPDATABYAREA_URL + "/" + cCode + "?accesstoken=" + token + "cropquantity=" + qCode + "datasetid="
+		+ datasetId;
 	Optional<String> resp = getDownloader().downloadOptionalString(request);
 	if (resp.isPresent()) {
 	    JSONObject cropQuantities = new JSONObject(resp.get());
@@ -731,13 +722,12 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 		JSONObject cqObj = arrayCQ.optJSONObject(k);
 		Double lat = cqObj.optDouble("lat");
 		Double lon = cqObj.optDouble("lon");
-		
+
 	    }
 
 	}
 	return ret;
     }
-
 
     private void addReportQuality(DataQuality dataQuality, String type, Double confidenceType) {
 
@@ -926,7 +916,5 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 
 	return minLat + " " + minLon + " " + maxLat + " " + maxLon;
     }
-
-
 
 }
