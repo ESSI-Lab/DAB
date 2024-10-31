@@ -3,6 +3,12 @@
  */
 package eu.essi_lab.accessor.elixena;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -26,8 +32,8 @@ package eu.essi_lab.accessor.elixena;
 
 import java.io.InputStream;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -80,11 +86,13 @@ public class ElixirENAConnector extends HarvestedQueryConnector<ElixirEnaConnect
     /**
      * 
      */
-    private static final String FIRST_STEP_QUERY_STRING = "query=study_accession%3D%22*%22%20AND%20(tag%3D%22env_tax%3Amarine%22%20OR%20tag%3D%22env_tax%3Abrackish%22)&fields=study_accession&format=tsv&result=read_study";
-
-    private static final String SECOND_STEP_QUERY_STRING = "query=(study_accession=%22STUDY_IDENTIFIER%22)&result=study&fields=breed,broker_name,center_name,cultivar,first_public,geo_accession,isolate,keywords,last_updated,parent_study_accession,scientific_name,secondary_study_accession,strain,study_accession,study_description,study_name,study_title,tax_id&limit=1&download=true&format=json";
-
-    private static final String THIRD_STEP_QUERY_STRING = "query=study_accession=%22STUDY_IDENTIFIER%22&result=read_run&fields=sequencing_method,collection_date,depth,description,elevation,environment_biome,environment_feature,environment_material,environmental_medium,environmental_sample,fastq_ftp,first_created,instrument_model,instrument_platform,investigation_type,last_updated,lat,library_name,location,lon,project_name,sampling_campaign,sampling_platform,scientific_name,sra_ftp,submitted_format,submitted_ftp&limit=LIMIT&download=true&format=json&offset=OFFSET";
+    public static final String FIRST_STEP_LOW_QUERY_STRING = "study_accession%3D%22*%22%20AND%20(tag%3D%22env_tax%3Amarine%22%20OR%20tag%3D%22env_tax%3Abrackish%22)";
+    public static final String FIRST_STEP_MEDIUM_QUERY_STRING = "study_accession%3D%22*%22%20AND%20(%20tag%3D%22env_tax%3Amarine%22%20AND%20tag!%3D%22env_tax%3Abrackish%22%20AND%20tag!%3D%22env_tax%3Afreshwater%22%20AND%20tag!%3D%22env_tax%3Aterrestrial%22%20AND%20tag!%3D%22env_geo%3Amarine%22%20AND%20tag!%3D%22env_geo%3Acoastal%22%20AND%20tag!%3D%22env_geo%3Afreshwater%22%20AND%20tag!%3D%22env_geo%3Aterrestrial%22%20)%20OR%20(%20tag%3D%22env_tax%3Amarine%22%20AND%20(%20tag%3D%22env_tax%3Abrackish%22%20OR%20tag%3D%22env_tax%3Afreshwater%22%20OR%20tag%3D%22env_tax%3Aterrestrial%22%20)%20AND%20tag%3D%22env_geo%3Amarine%22%20AND%20(%20tag%3D%22env_geo%3Acoastal%22%20OR%20tag%3D%22env_geo%3Afreshwater%22%20OR%20tag%3D%22env_geo%3Aterrestrial%22%20)%20)%20OR%20(%20tag%3D%22env_geo%3Amarine%22%20AND%20tag!%3D%22env_geo%3Acoastal%22%20AND%20tag!%3D%22env_geo%3Afreshwater%22%20AND%20tag!%3D%22env_geo%3Aterrestrial%22%20AND%20tag!%3D%22env_tax%3Amarine%22%20AND%20tag!%3D%22env_tax%3Abrackish%22%20AND%20tag!%3D%22env_tax%3Afreshwater%22%20AND%20tag!%3D%22env_tax%3Aterrestrial%22%20)";
+    public static final String FIRST_STEP_HIGH_QUERY_STRING = "study_accession%3D%22*%22%20AND%20(%20tag%3D%22env_tax%3Amarine%22%20AND%20tag%3D%22env_geo%3Amarine%22%20)%20AND%20(%20(%20tag!%3D%22env_tax%3Abrackish%22%20AND%20tag!%3D%22env_tax%3Afreshwater%22%20AND%20tag!%3D%22env_tax%3Aterrestrial%22%20)%20OR%20(%20tag!%3D%22env_geo%3Acoastal%22%20AND%20tag!%3D%22env_geo%3Afreshwater%22%20AND%20tag!%3D%22env_geo%3Aterrestrial%22%20)%20)";
+    public static final String FIRST_STEP_MEDIUM_HIGH_QUERY_STRING = "(" + FIRST_STEP_MEDIUM_QUERY_STRING + ")%20OR%20("
+	    + FIRST_STEP_HIGH_QUERY_STRING + ")";
+    public static final String SECOND_STEP_QUERY_STRING = "query=(study_accession=%22STUDY_IDENTIFIER%22)&result=study&fields=breed,broker_name,center_name,cultivar,first_public,geo_accession,isolate,keywords,last_updated,parent_study_accession,scientific_name,secondary_study_accession,strain,study_accession,study_description,study_name,study_title,tax_id&limit=1&download=true&format=json";
+    public static final String THIRD_STEP_QUERY_STRING = "query=study_accession=%22STUDY_IDENTIFIER%22&result=read_run&fields=sequencing_method,collection_date,depth,description,elevation,environment_biome,environment_feature,environment_material,environmental_medium,environmental_sample,fastq_ftp,first_created,instrument_model,instrument_platform,investigation_type,last_updated,lat,library_name,location,lon,project_name,sampling_campaign,sampling_platform,scientific_name,sra_ftp,submitted_format,submitted_ftp&limit=LIMIT&download=true&format=json&offset=OFFSET";
 
     /**
      * 
@@ -109,24 +117,16 @@ public class ElixirENAConnector extends HarvestedQueryConnector<ElixirEnaConnect
     /**
      * @return
      */
-    public boolean isUseDefaultStudiesSet() {
+    public String getHarvestingType() {
 
-	return getSetting().isUseDefaultStudiesSet();
-    }
-
-    /**
-     * @return
-     */
-    public void setDefaultStudiesOption(Boolean value) {
-
-	getSetting().setUseDefaultStudies(value);
+	return getSetting().getHarvestingType();
     }
 
     /**
      * @param query
      * @return
      */
-    private Optional<String> download(String query) {
+    private Optional<File> download(String query) {
 
 	Downloader downloader = new Downloader();
 	downloader.setConnectionTimeout(TimeUnit.MINUTES, 1);
@@ -139,17 +139,18 @@ public class ElixirENAConnector extends HarvestedQueryConnector<ElixirEnaConnect
 
 	    if (Objects.nonNull(inputStream)) {
 
-		String out = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+		File tmpFile = File.createTempFile("elixir-ena", ".txt");
+		tmpFile.deleteOnExit();
+		FileOutputStream fos = new FileOutputStream(tmpFile);
+		IOUtils.copy(inputStream, fos);
 		inputStream.close();
 
-		return Optional.of(out);
+		return Optional.of(tmpFile);
 
 	    } else {
 
-		//
-		// this "service" returns an empty response (no body) if the offset is too large
-		//
-		return Optional.of("[]");
+		GSLoggerFactory.getLogger(getClass()).error("null response");
+		return Optional.empty();
 	    }
 
 	} catch (Exception e) {
@@ -162,13 +163,20 @@ public class ElixirENAConnector extends HarvestedQueryConnector<ElixirEnaConnect
     @Override
     public ListRecordsResponse<OriginalMetadata> listRecords(ListRecordsRequest request) throws GSException {
 
-	Boolean defaultStudies = isUseDefaultStudiesSet();
+	String harvestingType = getHarvestingType();
 
-	if (defaultStudies) {
+	GSLoggerFactory.getLogger(getClass()).info("ELIXIR-ENA Harvesting type is {}", harvestingType);
 
-	    String[] superProjects = new String[] { "PRJEB402" // Tara Oceans Metagenome
-		    , "PRJEB5129" // Ocean Sampling Day
-		    , "PRJNA330770" // Malaspina
+	if (harvestingType == null) {
+	    harvestingType = ElixirEnaConnectorSetting.DEFAULT_STUDIES;
+	}
+
+	if (harvestingType.equals(ElixirEnaConnectorSetting.DEFAULT_STUDIES)) {
+
+	    String[] superProjects = new String[] { //
+		    "PRJEB402", // Tara Oceans Metagenome
+		    "PRJEB5129", // Ocean Sampling Day
+		    "PRJNA330770" // Malaspina
 	    };
 
 	    String base = getSourceURL().replace("portal/api/search", "browser/api/xml/").replace("?", "");
@@ -177,7 +185,7 @@ public class ElixirENAConnector extends HarvestedQueryConnector<ElixirEnaConnect
 
 	    for (String superProject : superProjects) {
 
-		Optional<String> d = download(base + superProject);
+		Optional<File> d = download(base + superProject);
 		if (d.isPresent()) {
 
 		    try {
@@ -193,6 +201,8 @@ public class ElixirENAConnector extends HarvestedQueryConnector<ElixirEnaConnect
 			}
 		    } catch (Exception e) {
 			e.printStackTrace();
+		    } finally {
+			d.get().delete();
 		    }
 
 		}
@@ -203,9 +213,25 @@ public class ElixirENAConnector extends HarvestedQueryConnector<ElixirEnaConnect
 	if (Objects.isNull(studyArray)) {
 
 	    studyArray = new LinkedHashSet<String>();
-	    String firstStepQuery = getSourceURL() + FIRST_STEP_QUERY_STRING;
+	    String firstStepQuery = getSourceURL() + "result=read_study&fields=study_accession&format=tsv&query=";
 
-	    Optional<String> download = download(firstStepQuery);
+	    switch (harvestingType) {
+	    case ElixirEnaConnectorSetting.LOW_CONFIDENCE:
+		firstStepQuery += FIRST_STEP_LOW_QUERY_STRING;
+		break;
+	    case ElixirEnaConnectorSetting.MEDIUM_CONFIDENCE:
+		firstStepQuery += FIRST_STEP_MEDIUM_QUERY_STRING;
+		break;
+	    case ElixirEnaConnectorSetting.MEDIUM_PLUS_HIGH_CONFIDENCE:
+		firstStepQuery += FIRST_STEP_MEDIUM_HIGH_QUERY_STRING;
+		break;
+	    default:
+	    case ElixirEnaConnectorSetting.HIGH_CONFIDENCE:
+		firstStepQuery += FIRST_STEP_HIGH_QUERY_STRING;
+		break;
+	    }
+
+	    Optional<File> download = download(firstStepQuery);
 
 	    if (!download.isPresent()) {
 
@@ -218,17 +244,20 @@ public class ElixirENAConnector extends HarvestedQueryConnector<ElixirEnaConnect
 			ELIXIR_ENA_UNABLE_TO_DOWNLOAD_STUDIES_ARRAY);
 	    }
 
-	    String[] split = (download(firstStepQuery).get().split("\n"));
-	    for (int i = 1; i < split.length; i++) {
-		String s = split[i];
-		if (s.contains("\t")) {
-		    s = s.split("\t")[0];
+	    File file = download.get();
+
+	    try (BufferedReader br = new BufferedReader(new FileReader(file.getAbsolutePath()))) {
+		String line;
+		while ((line = br.readLine()) != null) {
+		    String[] split = line.split("\t");
+		    studyArray.add(split[0]);
 		}
-		studyArray.add(s);
+	    } catch (IOException e) {
+		e.printStackTrace();
+	    } finally {
+		file.delete();
 	    }
 	}
-
-	// studyArray = studyArray.subList(0, 10);
 
 	String resumptionToken = request.getResumptionToken();
 	Integer i;
@@ -253,7 +282,7 @@ public class ElixirENAConnector extends HarvestedQueryConnector<ElixirEnaConnect
 
 	GSLoggerFactory.getLogger(getClass()).info("Study name [" + studyId + "]");
 
-	Optional<String> optResponse = download(secondStepQuery);
+	Optional<File> optResponse = download(secondStepQuery);
 
 	if (!optResponse.isPresent()) {
 
@@ -266,8 +295,14 @@ public class ElixirENAConnector extends HarvestedQueryConnector<ElixirEnaConnect
 		    ELIXIR_ENA_UNABLE_TO_DOWNLOAD_STUDY_RECORDS);
 	}
 
-	String response = optResponse.get();
-
+	String response = null;
+	try {
+	    response = Files.readString(optResponse.get().toPath());
+	} catch (IOException e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	}
+	optResponse.get().delete();
 	System.out.println(response);
 
 	JSONArray a = new JSONArray(response);
@@ -453,15 +488,15 @@ public class ElixirENAConnector extends HarvestedQueryConnector<ElixirEnaConnect
 		    // keywords
 		    //
 
-		    addIfPresent(getString(object, "environment_biome"), keywords);
-		    addIfPresent(getString(object, "environment_feature"), keywords);
-		    addIfPresent(getString(object, "environment_material "), keywords);
-		    addIfPresent(getString(object, "environmental_medium"), keywords);
-		    addIfPresent(getString(object, "environmental_sample"), keywords);
-		    addIfPresent(getString(object, "investigation_type"), keywords);
-		    addIfPresent(getString(object, "country"), keywords);
-		    addIfPresent(getString(object, "sample_alias"), keywords);
-		    addIfPresent(getString(object, "project_name"), projects);
+//		    addIfPresent(getString(object, "environment_biome"), keywords);
+//		    addIfPresent(getString(object, "environment_feature"), keywords);
+//		    addIfPresent(getString(object, "environment_material "), keywords);
+//		    addIfPresent(getString(object, "environmental_medium"), keywords);
+//		    addIfPresent(getString(object, "environmental_sample"), keywords);
+//		    addIfPresent(getString(object, "investigation_type"), keywords);
+//		    addIfPresent(getString(object, "country"), keywords);
+//		    addIfPresent(getString(object, "sample_alias"), keywords);
+//		    addIfPresent(getString(object, "project_name"), projects);
 
 		} catch (Exception ee) {
 		    ee.printStackTrace();
@@ -749,7 +784,7 @@ public class ElixirENAConnector extends HarvestedQueryConnector<ElixirEnaConnect
 	GSLoggerFactory.getLogger(getClass()).info("Study name [" + studyName + "]");
 	GSLoggerFactory.getLogger(getClass()).info("Study offset [" + offset + "]");
 
-	Optional<String> optResponse = download(secondStepQuery);
+	Optional<File> optResponse = download(secondStepQuery);
 
 	if (!optResponse.isPresent()) {
 
@@ -762,9 +797,18 @@ public class ElixirENAConnector extends HarvestedQueryConnector<ElixirEnaConnect
 		    ELIXIR_ENA_UNABLE_TO_DOWNLOAD_STUDY_RECORDS);
 	}
 
-	String response = optResponse.get();
+	File response = optResponse.get();
+	String str = null;
+	try {
+	    str = Files.readString(Paths.get(response.getAbsolutePath()));
+	} catch (IOException e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error("reading file");
+	} finally {
+	    response.delete();
+	}
 
-	JSONArray jsonArray = new JSONArray(response);
+	JSONArray jsonArray = new JSONArray(str);
 	return jsonArray;
     }
 

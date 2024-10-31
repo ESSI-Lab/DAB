@@ -305,15 +305,15 @@ The following papers provide a technical description of the DAB brokering framwe
 	
 Many data scientists, computer scientists, information and software engineers have contributed to the DAB design and development throughout an implementation effort of over ten years, spanning different maturity stages (from prototypical to operational)  and sub-components (e.g. GI-cat, GI-axe, GI-sem, GI-suite, ...).
 
-[DAB development team (contact us)](https://www.uos-firenze.essi-lab.eu/personnel):
+DAB development team, in alphabetic order [(contact us)](https://www.uos-firenze.essi-lab.eu/personnel):
 
-- Stefano Nativi (DAB father)
-- Paolo Mazzetti (responsible)
+- Lorenzo Bigagli (software design)
 - Enrico Boldrini (software design, developer, coordinator of DAB activities with WMO)
+- Paolo Mazzetti (responsible)
+- Stefano Nativi (DAB father)
+- Massimiliano Olivieri (sysadmin)
 - Fabrizio Papeschi (developer)
 - Roberto Roncella (developer)
-- Massimiliano Olivieri (developer)
-- Lorenzo Bigagli (software design)
 - Mattia Santoro (software design, developer, coordinator of DAB activities with GEO)
 	
 Experts who contributed with valuable inputs and feedbacks representing significant data provider and user communities (in alphabetic order):
