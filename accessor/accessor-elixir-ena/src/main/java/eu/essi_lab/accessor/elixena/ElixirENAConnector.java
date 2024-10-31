@@ -488,15 +488,15 @@ public class ElixirENAConnector extends HarvestedQueryConnector<ElixirEnaConnect
 		    // keywords
 		    //
 
-		    addIfPresent(getString(object, "environment_biome"), keywords);
-		    addIfPresent(getString(object, "environment_feature"), keywords);
-		    addIfPresent(getString(object, "environment_material "), keywords);
-		    addIfPresent(getString(object, "environmental_medium"), keywords);
-		    addIfPresent(getString(object, "environmental_sample"), keywords);
-		    addIfPresent(getString(object, "investigation_type"), keywords);
-		    addIfPresent(getString(object, "country"), keywords);
-		    addIfPresent(getString(object, "sample_alias"), keywords);
-		    addIfPresent(getString(object, "project_name"), projects);
+//		    addIfPresent(getString(object, "environment_biome"), keywords);
+//		    addIfPresent(getString(object, "environment_feature"), keywords);
+//		    addIfPresent(getString(object, "environment_material "), keywords);
+//		    addIfPresent(getString(object, "environmental_medium"), keywords);
+//		    addIfPresent(getString(object, "environmental_sample"), keywords);
+//		    addIfPresent(getString(object, "investigation_type"), keywords);
+//		    addIfPresent(getString(object, "country"), keywords);
+//		    addIfPresent(getString(object, "sample_alias"), keywords);
+//		    addIfPresent(getString(object, "project_name"), projects);
 
 		} catch (Exception ee) {
 		    ee.printStackTrace();
