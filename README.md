@@ -312,7 +312,7 @@ Many data scientists, computer scientists, information and software engineers ha
 - Enrico Boldrini (software design, developer, coordinator of DAB activities with WMO)
 - Fabrizio Papeschi (developer)
 - Roberto Roncella (developer)
-- Massimiliano Olivieri (developer)
+- Massimiliano Olivieri (sysadmin)
 - Lorenzo Bigagli (software design)
 - Mattia Santoro (software design, developer, coordinator of DAB activities with GEO)
 	
