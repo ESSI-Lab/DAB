@@ -20,15 +20,27 @@ public class ElixirEnaTest {
 
     @Test
     public void test() throws IOException {
-	System.out.println("Starting5");
+	System.out.println("Startingmod");
 	// DAB-LOW
-	String url = "https://www.ebi.ac.uk/ena/portal/api/search?result=read_study&fields=study_accession&format=tsv&query="+ElixirENAConnector.FIRST_STEP_LOW_QUERY_STRING;
+	String url = "https://www.ebi.ac.uk/ena/portal/api/search?result=read_study&fields=study_accession&format=tsv&query="
+		+ ElixirENAConnector.FIRST_STEP_LOW_QUERY_STRING;
+	test(url);
 	// HIGH
-	url = "https://www.ebi.ac.uk/ena/portal/api/search?result=read_study&fields=study_accession&format=tsv&query="+ElixirENAConnector.FIRST_STEP_HIGH_QUERY_STRING;
+	url = "https://www.ebi.ac.uk/ena/portal/api/search?result=read_study&fields=study_accession&format=tsv&query="
+		+ ElixirENAConnector.FIRST_STEP_HIGH_QUERY_STRING;
+	test(url);
 	// MEDIUM
-	url = "https://www.ebi.ac.uk/ena/portal/api/search?result=read_study&fields=study_accession&format=tsv&query="+ElixirENAConnector.FIRST_STEP_MEDIUM_QUERY_STRING;
+	url = "https://www.ebi.ac.uk/ena/portal/api/search?result=read_study&fields=study_accession&format=tsv&query="
+		+ ElixirENAConnector.FIRST_STEP_MEDIUM_QUERY_STRING;
+	test(url);
 	// COMBINED
-	url = "https://www.ebi.ac.uk/ena/portal/api/search?result=read_study&fields=study_accession&format=tsv&query=(%20tag%3D%22env_tax%3Amarine%22%20AND%20tag!%3D%22env_tax%3Abrackish%22%20AND%20tag!%3D%22env_tax%3Afreshwater%22%20AND%20tag!%3D%22env_tax%3Aterrestrial%22%20AND%20tag!%3D%22env_geo%3Amarine%22%20AND%20tag!%3D%22env_geo%3Acoastal%22%20AND%20tag!%3D%22env_geo%3Afreshwater%22%20AND%20tag!%3D%22env_geo%3Aterrestrial%22%20)%20OR%20(%20tag%3D%22env_tax%3Amarine%22%20AND%20(%20tag%3D%22env_tax%3Abrackish%22%20OR%20tag%3D%22env_tax%3Afreshwater%22%20OR%20tag%3D%22env_tax%3Aterrestrial%22%20)%20AND%20tag%3D%22env_geo%3Amarine%22%20AND%20(%20tag%3D%22env_geo%3Acoastal%22%20OR%20tag%3D%22env_geo%3Afreshwater%22%20OR%20tag%3D%22env_geo%3Aterrestrial%22%20)%20)%20OR%20(%20tag%3D%22env_geo%3Amarine%22%20AND%20tag!%3D%22env_geo%3Acoastal%22%20AND%20tag!%3D%22env_geo%3Afreshwater%22%20AND%20tag!%3D%22env_geo%3Aterrestrial%22%20AND%20tag!%3D%22env_tax%3Amarine%22%20AND%20tag!%3D%22env_tax%3Abrackish%22%20AND%20tag!%3D%22env_tax%3Afreshwater%22%20AND%20tag!%3D%22env_tax%3Aterrestrial%22%20)%20OR%20(%20tag%3D%22env_tax%3Amarine%22%20AND%20tag%3D%22env_geo%3Amarine%22%20)%20AND%20(%20(%20tag!%3D%22env_tax%3Abrackish%22%20AND%20tag!%3D%22env_tax%3Afreshwater%22%20AND%20tag!%3D%22env_tax%3Aterrestrial%22%20)%20OR%20(%20tag!%3D%22env_geo%3Acoastal%22%20AND%20tag!%3D%22env_geo%3Afreshwater%22%20AND%20tag!%3D%22env_geo%3Aterrestrial%22%20)%20)";
+	url = "https://www.ebi.ac.uk/ena/portal/api/search?result=read_study&fields=study_accession&format=tsv&query="
+		+ ElixirENAConnector.FIRST_STEP_MEDIUM_HIGH_QUERY_STRING;
+	test(url);
+
+    }
+
+    private void test(String url) throws IOException {
 	Downloader d = new Downloader();
 	Optional<InputStream> stream = d.downloadOptionalStream(url);
 	InputStream s = stream.get();
@@ -45,6 +57,7 @@ public class ElixirEnaTest {
 		String[] split = line.split("\t");
 		projects.add(split[0]);
 	    }
+	    System.out.println(url);	    
 	    System.out.println(projects.size());
 	    tmpFile.delete();
 	} catch (IOException e) {
