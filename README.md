@@ -310,11 +310,12 @@ Many data scientists, computer scientists, information and software engineers ha
 - Stefano Nativi (DAB father)
 - Paolo Mazzetti (responsible)
 - Enrico Boldrini (software design, developer, coordinator of DAB activities with WMO)
+- Mattia Santoro (software design, developer, coordinator of DAB activities with GEO)
 - Fabrizio Papeschi (developer)
 - Roberto Roncella (developer)
 - Massimiliano Olivieri (sysadmin)
 - Lorenzo Bigagli (software design)
-- Mattia Santoro (software design, developer, coordinator of DAB activities with GEO)
+
 	
 Experts who contributed with valuable inputs and feedbacks representing significant data provider and user communities (in alphabetic order):
 	
