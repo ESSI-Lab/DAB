@@ -122,14 +122,7 @@ public class WorldCerealCollectionMapper extends FileIdentifierMapper {
 
     private static final int THRESOLD = 10000;
 
-    // private static final String LICENSE = "license";
-    // private static final String ABSTRACT_KEY = "description";
-    //
-    // private static final String PROPERTIES = "properties";
-    // private static final String PROVIDERS = "providers";
-    // private static final String KEYWORDS = "keywords";
-    // private static final String SUMMARIES = "summaries";
-    // private static final String ASSETS = "assets";
+    private List<String> keywords = Arrays.asList("crop type", "land cover", "reference data","WorldCereal");
 
     private static final String CONTACT_ROLE = "role";
     private static final String CONTACT_NAME = "name";
@@ -566,7 +559,6 @@ public class WorldCerealCollectionMapper extends FileIdentifierMapper {
 	ret.getExtensionHandler().setIsInSitu();
 
 	
-	List<String> keywords = List.of("crop type", "land cover", "reference data","WorldCereal");
 	for (String s : keywords) {
 	    Keywords kwd = new Keywords();
 	    kwd.addKeyword(s);
