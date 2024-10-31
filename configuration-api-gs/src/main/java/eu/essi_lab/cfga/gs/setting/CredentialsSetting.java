@@ -39,6 +39,7 @@ import eu.essi_lab.cfga.setting.ConfigurableSetting;
 public class CredentialsSetting extends ConfigurableSetting implements EditableSetting {
 
     private static final String HIS_CENTRAL_PUGLIA_TOKEN = "pugliaToken";
+    private static final String AGROSTAC_TOKEN = "agrostacToken";
     private static final String HIS_CENTRAL_SARDEGNA_API_KEY = "sardegnaApiKey";
     private static final String HIS_CENTRAL_LOMBARDIA_KEYSTORE_PASSWORD = "lombardiaKeystorePassword";
     private static final String HIS_CENTRAL_LOMBARDIA_USERNAME = "lombardiaUser";
@@ -235,6 +236,22 @@ public class CredentialsSetting extends ConfigurableSetting implements EditableS
 		    get().//
 		    withKey(HIS_CENTRAL_PUGLIA_TOKEN).//
 		    withLabel("The token used by the HIS-Central Puglia connector and downloader").//
+		    required().//
+		    cannotBeDisabled().//
+		    build();
+
+	    addOption(password);
+	}
+	
+	//
+	// AGROSTAC
+	//
+	
+	{
+	    Option<String> password = StringOptionBuilder.//
+		    get().//
+		    withKey(AGROSTAC_TOKEN).//
+		    withLabel("The token used by the AGROSTAC connector and WorldCereal profiler").//
 		    required().//
 		    cannotBeDisabled().//
 		    build();
@@ -1221,6 +1238,23 @@ public class CredentialsSetting extends ConfigurableSetting implements EditableS
     public Optional<String> getPugliaToken() {
 
 	return getOption(HIS_CENTRAL_PUGLIA_TOKEN, String.class).get().getOptionalValue();
+    }
+    
+    
+    /**
+     * @param password
+     */
+    public void setAGROSTACToken(String password) {
+
+	getOption(AGROSTAC_TOKEN, String.class).get().setValue(password);
+    }
+
+    /**
+     *
+     */
+    public Optional<String> getAGROSTACToken() {
+
+	return getOption(AGROSTAC_TOKEN, String.class).get().getOptionalValue();
     }
 
     /**
