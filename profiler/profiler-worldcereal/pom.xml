@@ -23,6 +23,11 @@
 			<artifactId>profiler-opensearch</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>eu.essi_lab</groupId>
+			<artifactId>accessor-agrostac</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>		
 	</dependencies>
 
 </project>
