@@ -39,4 +39,12 @@ public interface ContextMenuItem {
      * @return
      */
     String getItemText();
+
+    /**
+     * @return
+     */
+    default boolean withSeparator() {
+
+	return false;
+    }
 }
