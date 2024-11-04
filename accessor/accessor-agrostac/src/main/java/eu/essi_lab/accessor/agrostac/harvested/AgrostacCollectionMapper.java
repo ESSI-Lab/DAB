@@ -215,6 +215,15 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 	    }
 	    return null;
 	}
+	
+	public static CROP_CODES fromCode(String code) {
+	    for (CROP_CODES c : values()) {
+		if (code.equals(c.getCode())) {
+		    return c;
+		}
+	    }
+	    return null;
+	}
 
     }
 
