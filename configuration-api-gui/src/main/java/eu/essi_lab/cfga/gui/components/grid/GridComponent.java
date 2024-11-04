@@ -31,10 +31,12 @@ import java.util.stream.Collectors;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.Unit;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu;
+import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.ListDataProvider;
@@ -44,6 +46,7 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.function.ValueProvider;
 
 import eu.essi_lab.cfga.Configuration;
+import eu.essi_lab.cfga.ConfigurationChangeListener.ConfigurationChangeEvent;
 import eu.essi_lab.cfga.gui.components.SettingComponentFactory;
 import eu.essi_lab.cfga.gui.components.TabContainer;
 import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
@@ -60,6 +63,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
     private HeaderRow filterRow;
     private GridFilter gridFilter;
     private ListDataProvider<HashMap<String, String>> dataProvider;
+    static List<Checkbox> CHECKS;
 
     /**
      * @param gridInfo
@@ -78,11 +82,30 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	    boolean readOnly, //
 	    boolean refresh) {
 
-	this.gridInfo = gridInfo;
+	CHECKS = new ArrayList<Checkbox>();
+
+	configuration.addChangeEventListener(event -> {
+
+	    // updates the checks list in case of settings removal
+	    if (event.getEventType() == ConfigurationChangeEvent.SETTING_REMOVED) {
+
+		String identifier = event.getSetting().get().getIdentifier();
+
+		Checkbox checkbox = CHECKS.//
+			stream().//
+			filter(c -> c.getId().get().equals(identifier)).//
+			findFirst().//
+			get();
+
+		CHECKS.remove(checkbox);
+	    }
+	});
 
 	//
 	//
 	//
+
+	this.gridInfo = gridInfo;
 
 	if (!refresh) {
 
@@ -93,22 +116,36 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	//
 	//
 	//
+
 	if (!gridInfo.getContextMenuItems().isEmpty()) {
 
 	    GridContextMenu<HashMap<String, String>> menu = addContextMenu();
 
-	    gridInfo.getContextMenuItems().forEach(p -> menu.addItem(p.getItemText(), e -> {
+	    gridInfo.getContextMenuItems().forEach(cmi -> {
 
-		Optional<HashMap<String, String>> item = e.getItem();
+		menu.addItem(cmi.getItemText(), e -> {
 
-		if (!item.isPresent() || item.get().isEmpty()) {
+		    Optional<HashMap<String, String>> item = e.getItem();
 
-		    NotificationDialog.getWarningDialog("No row selected").open();
-		    return;
+		    if (!item.isPresent() || item.get().isEmpty()) {
+
+			NotificationDialog.getWarningDialog("No row selected").open();
+			return;
+		    }
+
+		    HashMap<String, Boolean> map = new HashMap<>();
+		    CHECKS.forEach(check -> map.put(check.getId().get(), check.getValue()));
+
+		    cmi.onClick(e, map);
+		});
+
+		if (cmi.withSeparator()) {
+
+		    menu.addItem(new Hr());
 		}
+	    }
 
-		p.onClick(e);
-	    }));
+	    );
 	}
 
 	//
@@ -152,9 +189,20 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 	gridInfo.getColumnsDescriptors().forEach(descriptor -> {
 
-	    Grid.Column<HashMap<String, String>> column = addColumn(//
+	    Grid.Column<HashMap<String, String>> column = null;
 
-		    new MapValueProvider(descriptor.getColumnName()));
+	    if (descriptor.getRenderer().isPresent()) {
+
+		column = addColumn(descriptor.getRenderer().get());
+
+	    } else {
+
+		column = addColumn(new MapValueProvider(descriptor.getColumnName()));
+
+		column.setEditorComponent(new TextArea());
+	    }
+
+	    column.setKey(descriptor.getColumnName());
 
 	    column.setResizable(true);
 
@@ -165,7 +213,10 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 	    column.setSortable(descriptor.isSortable());//
 
-	    descriptor.getComparator().ifPresent(comp -> column.setComparator(comp));
+	    if (descriptor.getComparator().isPresent()) {
+
+		column.setComparator(descriptor.getComparator().get());
+	    }
 
 	    if (descriptor.getColumnName().equals(ColumnDescriptor.POSITIONAL_COLUMN_NAME)) {
 
@@ -176,10 +227,6 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 		column.setHeader(descriptor.getColumnName());
 	    }
 
-	    column.setKey(descriptor.getColumnName());
-
-	    column.setEditorComponent(new TextArea());
-
 	    if (descriptor.getColumnWidth() > 0) {
 
 		column.setWidth(descriptor.getColumnWidth() + "px");
@@ -189,7 +236,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 		column.setAutoWidth(true);
 	    }
 
-	    if (descriptor.isFiltered()) {
+	    if (descriptor.isFiltered() || descriptor.getRenderer().isPresent()) {
 
 		addFilter(descriptor, column);
 	    }
@@ -308,31 +355,43 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	//
 	//
 
-	TextField filterField = new TextField();
+	if (descriptor.hasCheckBox()) {
 
-	filterField.addValueChangeListener(event -> {
+	    Checkbox checkbox = new Checkbox();
 
-	    gridFilter.filter(descriptor.getColumnName(), event.getValue());
+	    filterRow.getCell(column).setComponent(checkbox);
 
-	    dataProvider.refreshAll();
-	});
+	    checkbox.addClickListener(event -> {
 
-	filterField.setValueChangeMode(ValueChangeMode.EAGER);
+		Boolean value = event.getSource().getValue();
 
-	filterRow.getCell(column).setComponent(filterField);
+		GridComponent.CHECKS.forEach(c -> c.setValue(value));
+	    });
 
-	filterField.setSizeFull();
-	filterField.setPlaceholder("Filter");
-	filterField.getElement().setAttribute("focus-target", "");
+	} else {
 
-	//
-	//
-	//
+	    TextField filterField = new TextField();
 
-	Optional<String> value = GridFilter.getValue(descriptor.getColumnName());
-	if (value.isPresent()) {
+	    filterField.addValueChangeListener(event -> {
 
-	    filterField.setValue(value.get());
+		gridFilter.filter(descriptor.getColumnName(), event.getValue());
+
+		dataProvider.refreshAll();
+	    });
+
+	    filterField.setValueChangeMode(ValueChangeMode.EAGER);
+
+	    filterRow.getCell(column).setComponent(filterField);
+
+	    filterField.setSizeFull();
+	    filterField.setPlaceholder("Filter");
+	    filterField.getElement().setAttribute("focus-target", "");
+
+	    Optional<String> value = GridFilter.getValue(descriptor.getColumnName());
+	    if (value.isPresent()) {
+
+		filterField.setValue(value.get());
+	    }
 	}
     }
 
@@ -359,16 +418,14 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 		String columnName = desc.getColumnName();
 
-		if (columnName.equals(ColumnDescriptor.POSITIONAL_COLUMN_NAME)) {
-
-		    return;
-		}
-
 		ValueProvider<Setting, String> valueProvider = desc.getValueProvider();
 
-		String value = valueProvider.apply(setting);
+		if (valueProvider != null) {
 
-		map.put(columnName, value);
+		    String value = valueProvider.apply(setting);
+
+		    map.put(columnName, value);
+		}
 	    });
 
 	    items.add(map);
@@ -402,7 +459,11 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 	    if (column.equals(ColumnDescriptor.POSITIONAL_COLUMN_NAME)) {
 
-		return String.valueOf(GridComponent.this.getListDataView().getItems().collect(Collectors.toList()).indexOf(source) + 1);
+		return String.valueOf(//
+			GridComponent.this.getListDataView().//
+				getItems().//
+				collect(Collectors.toList()).//
+				indexOf(source) + 1);
 	    }
 
 	    return source.get(column);

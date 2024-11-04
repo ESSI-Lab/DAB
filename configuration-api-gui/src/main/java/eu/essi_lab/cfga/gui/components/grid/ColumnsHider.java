@@ -55,10 +55,11 @@ public class ColumnsHider extends Details {
 	gridInfo.getColumnsDescriptors().forEach(descriptor -> {
 
 	    if (grid.getColumns().//
-	    stream().//
-	    filter(c -> c.getKey().equals(descriptor.getColumnName()) && c.isVisible()).//
-	    findFirst().//
-	    isPresent()) {
+		    stream().//
+		    filter(c -> !c.getKey().isEmpty()).//
+		    filter(c -> c.getKey().equals(descriptor.getColumnName()) && c.isVisible()).//
+		    findFirst().//
+		    isPresent()) {
 
 		Checkbox checkBox = new Checkbox(descriptor.getColumnName());
 		checkBox.getStyle().set("font-size", "12px");
@@ -71,16 +72,16 @@ public class ColumnsHider extends Details {
 		    public void handleEvent(ClickEvent<Checkbox> event) {
 
 			String label = event.getSource().getLabel();
-			
+
 			findColumn(grid, label).setVisible(event.getSource().getValue());
-		 
+
 			VALUES_MAP.put(label, event.getSource().getValue());
 		    }
 		});
 
 		Boolean value = VALUES_MAP.get(descriptor.getColumnName());
 		checkBox.setValue(value != null ? value : true);
-		
+
 		findColumn(grid, descriptor.getColumnName()).setVisible(checkBox.getValue());
 	    }
 	});
@@ -93,20 +94,19 @@ public class ColumnsHider extends Details {
     }
 
     /**
-     * 
      * @param grid
      * @param colName
      * @return
      */
-    private Column<HashMap<String, String>> findColumn(GridComponent grid, String colName){
-	
+    private Column<HashMap<String, String>> findColumn(GridComponent grid, String colName) {
+
 	return grid.getColumns().//
-	stream().//
-	filter(c -> c.getKey().equals(colName)).//
-	findFirst().//
-	get();
+		stream().//
+		filter(c -> c.getKey().equals(colName)).//
+		findFirst().//
+		get();
     }
-    
+
     /**
      * 
      */

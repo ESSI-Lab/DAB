@@ -38,7 +38,7 @@ import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.TabIndex;
 import eu.essi_lab.cfga.gs.setting.harvesting.SchedulerSupport;
-import eu.essi_lab.cfga.gs.setting.menuitems.RowValuesFormatterMenuItem;
+import eu.essi_lab.cfga.gs.setting.menuitems.SettingsInfoMenuItem;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.ContextMenuItem;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
@@ -267,7 +267,7 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 
 	    ArrayList<ContextMenuItem> list = new ArrayList<>();
 //	    list.add(new CustomTaskSettingEditorMenuItem());
-	    list.add(new RowValuesFormatterMenuItem());
+	    list.add(new SettingsInfoMenuItem());
 	    list.add(new CustomTaskStarter());
 
 	    return list;
