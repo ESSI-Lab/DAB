@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 
+import eu.essi_lab.accessor.agrostac.harvested.AgrostacCollectionMapper.CROP_CODES;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
@@ -263,11 +264,11 @@ public class WorldCerealBondHandler implements DiscoveryBondHandler {
 	count = c;
     }
 
-    public String getQueryString(String type) {
+    public String getQueryString(boolean isWorldCereal) {
 
 	StringBuilder builder = new StringBuilder();
 
-	if (type.contains(WorldCerealHandler.WORLDCEREAL_BASE_URL)) {
+	if (isWorldCereal) {
 	    // worldcereal use case
 	    if (start != null) {
 		builder.append(WORLDCEREAL_START_KEY).append(EQUAL).append(start).append(AND);
@@ -332,8 +333,13 @@ public class WorldCerealBondHandler implements DiscoveryBondHandler {
 	    // agrostac
 	    if (!textSearches.isEmpty()) {
 		List<String> res = textSearches.get(CROP_TYPES);
-		if (res != null && !res.isEmpty())
-		    builder.append(res.get(0)).append("?");
+		if (res != null && !res.isEmpty()) {
+		    CROP_CODES crop = CROP_CODES.fromCode(res.get(0));
+		    if(crop != null) {
+			builder.append(crop.name()).append("?");
+		    }
+		    
+		}
 	    }
 	    
 	    if(quantity != null) {
@@ -346,10 +352,7 @@ public class WorldCerealBondHandler implements DiscoveryBondHandler {
 		builder.append(AGROSTAC_MIN_LON).append(EQUAL).append(splittedBbox[0]).append(AND);
 		builder.append(AGROSTAC_MAX_LON).append(EQUAL).append(splittedBbox[2]).append(AND);
 		builder.append(AGROSTAC_MIN_LAT).append(EQUAL).append(splittedBbox[1]).append(AND);
-		builder.append(AGROSTAC_MAX_LAT).append(EQUAL).append(splittedBbox[4]).append(AND);
-		for (String box : splittedBbox) {
-		    builder.append(BBOX).append(EQUAL).append(box).append(AND);
-		}
+		builder.append(AGROSTAC_MAX_LAT).append(EQUAL).append(splittedBbox[3]).append(AND);
 	    }
 	    
 	    if (start != null) {
@@ -363,7 +366,7 @@ public class WorldCerealBondHandler implements DiscoveryBondHandler {
 		builder.append(AGROSTAC_COUNT_KEY).append(EQUAL).append(count).append(AND);
 	    }
 	    
-	    builder.append(AGROSTAC_ACCESS_TOKEN).append(EQUAL).append(ConfigurationWrapper.getCredentialsSetting().getAGROSTACToken());
+	    builder.append(AGROSTAC_ACCESS_TOKEN).append(EQUAL).append(ConfigurationWrapper.getCredentialsSetting().getAGROSTACToken().orElse(null));
 	    
 	}
 

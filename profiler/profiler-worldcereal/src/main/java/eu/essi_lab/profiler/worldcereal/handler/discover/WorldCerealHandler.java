@@ -136,12 +136,13 @@ public class WorldCerealHandler extends DiscoveryHandler<String> {
 //	}
 
 	Bond reducedBond = null;
-
+	boolean isWordCereal = true;
 	try {
 	    reducedBond = bondReducer.getReducedBond(normalizedBond, "worldcereal");
 	} catch (Exception e) {
 	    // try agrostac
 	    reducedBond = bondReducer.getReducedBond(normalizedBond, "agrostac");
+	    isWordCereal = false; 
 	}
 
 	ReducedDiscoveryMessage reducedMessage = new ReducedDiscoveryMessage(message, reducedBond);
@@ -220,11 +221,11 @@ public class WorldCerealHandler extends DiscoveryHandler<String> {
 		boolean isNotFinished = true;
 		int tries = 3;
 
-		String type = parentGSResource.getSource().getEndpoint();
+		//String type = parentGSResource.getSource().getEndpoint();
 
 		while (((code == null || code > 400) || isNotFinished) && tries > 0) {
 
-		    String request = createRequest(reducedMessage, page, collectionID, type);
+		    String request = createRequest(reducedMessage, page, collectionID, isWordCereal);
 
 		    GSLoggerFactory.getLogger(getClass()).debug("Searching for query '{}' STARTED", request);
 
@@ -428,18 +429,22 @@ public class WorldCerealHandler extends DiscoveryHandler<String> {
 	return parentIdBondHandler.getParentValue();
     }
 
-    private String createRequest(ReducedDiscoveryMessage message, Page page, String datasetId, String type) {
+    private String createRequest(ReducedDiscoveryMessage message, Page page, String datasetId, boolean isWorldCereal) {
 
 	WorldCerealBondHandler bondHandler = parse(message, page.getStart(), page.getSize());
 	StringBuilder builder;
-	if (type.contains(WORLDCEREAL_BASE_URL)) {
+	if (isWorldCereal) {
 	    builder = new StringBuilder(WORLDCEREAL_BASE_URL + "collections/" + datasetId + "/items?");
 
 	} else {
 	    builder = new StringBuilder(AGROSTAC_BASE_URL + "cropdatabyarea/");
 	    // String queryS = bondHandler.getQueryString(type);
 	}
-	builder.append(bondHandler.getQueryString(type));
+	builder.append(bondHandler.getQueryString(isWorldCereal));
+	if(!isWorldCereal) {
+	    builder.append("&datasetid=" + datasetId);    
+	}
+	
 	return builder.toString();
     }
 
