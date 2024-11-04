@@ -60,7 +60,15 @@ public class CheckBoxColumnRenderer extends ComponentRenderer<Checkbox, HashMap<
 	    consumer.accept(item);
 	});
 
-	GridComponent.CHECKS.add(checkbox);
+	Optional<Checkbox> checkFound = GridComponent.CHECKS.//
+	stream().//
+	filter(check -> check.getId().get().equals(item.get("identifier"))).//
+	findFirst();
+ 	
+	if(checkFound.isEmpty()) {
+	    
+	    GridComponent.CHECKS.add(checkbox);
+	}
 
 	return checkbox;
     }
