@@ -34,7 +34,7 @@ import eu.essi_lab.cfga.gui.dialog.ConfirmationDialog;
 /**
  * @author Fabrizio
  */
-public class RowValuesFormatterMenuItem implements ContextMenuItem {
+public class SettingsInfoMenuItem implements ContextMenuItem {
 
     @Override
     public void onClick(GridContextMenuItemClickEvent<HashMap<String, String>> event, HashMap<String, Boolean> selected) {
@@ -44,7 +44,7 @@ public class RowValuesFormatterMenuItem implements ContextMenuItem {
 	String values = formatRowValues(item);
 
 	ConfirmationDialog dialog = new ConfirmationDialog();
-	dialog.setTitle("Show info");
+	dialog.setTitle("Show setting info");
 	dialog.setHeight(500, Unit.PIXELS);
 	dialog.setWidth(600, Unit.PIXELS);
 	dialog.getConfirmButton().setVisible(false);
@@ -66,7 +66,7 @@ public class RowValuesFormatterMenuItem implements ContextMenuItem {
     @Override
     public String getItemText() {
 
-	return "Show info";
+	return "Show setting info";
     }
 
     /**
