@@ -132,13 +132,13 @@ public class WorldCerealHandler extends DiscoveryHandler<String> {
 	Bond normalizedBond = message.getNormalizedBond();
 
 	Bond reducedBond = null;
-	boolean isWordCereal = true;
+	boolean isWordCereal;
 	try {
 	    reducedBond = bondReducer.getReducedBond(normalizedBond, "worldcereal");
 	} catch (Exception e) {
 	    // try agrostac
 	    reducedBond = bondReducer.getReducedBond(normalizedBond, "agrostac");
-	    isWordCereal = false;
+	    //isWordCereal = false;
 	}
 
 	ReducedDiscoveryMessage reducedMessage = new ReducedDiscoveryMessage(message, reducedBond);
@@ -190,7 +190,11 @@ public class WorldCerealHandler extends DiscoveryHandler<String> {
 	    // found parent identifier
 	    GSResource parentGSResource = resultSet.getResultsList().get(0);
 	    String collectionID = "";
-
+	    if(parentGSResource.getSource().getEndpoint().contains(WORLDCEREAL_BASE_URL)) {
+		isWordCereal = true;
+	    } else {
+		isWordCereal = false;
+	    }
 	    Optional<String> optionalCollectionId = readCollectionIdFromParent(parentGSResource);
 	    if (optionalCollectionId.isPresent()) {
 		collectionID = optionalCollectionId.get();
