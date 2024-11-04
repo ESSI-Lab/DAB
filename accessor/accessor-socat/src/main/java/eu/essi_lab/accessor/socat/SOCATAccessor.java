@@ -38,7 +38,7 @@ public class SOCATAccessor extends HarvestedAccessor<SOCATConnector> {
      */
     protected String initSourceEndpoint() {
 
-	return "https://ferret.pmel.noaa.gov/socat/erddap/tabledap/socat_v2020_fulldata";
+	return "https://data.pmel.noaa.gov/socat/erddap/tabledap/socat_v2024_fulldata";
     }
 
     @Override

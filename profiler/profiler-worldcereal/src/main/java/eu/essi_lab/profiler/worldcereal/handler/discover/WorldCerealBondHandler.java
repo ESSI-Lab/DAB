@@ -27,6 +27,8 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 
+import eu.essi_lab.accessor.agrostac.harvested.AgrostacCollectionMapper.CROP_CODES;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.bond.Bond;
@@ -49,14 +51,23 @@ public class WorldCerealBondHandler implements DiscoveryBondHandler {
 
     private Logger logger = GSLoggerFactory.getLogger(WorldCerealBondHandler.class);
 
+    private static final String WORLDCEREAL_URL = "ewoc-rdm-api.iiasa.ac.at";
+
     private static final String COLLECTION_ID_KEY = "collections";
     private static final String EQUAL = "=";
-    private static final String START_KEY = "SkipCount";
-    private static final String COUNT_KEY = "MaxResultCount";
+    private static final String WORLDCEREAL_START_KEY = "SkipCount";
+    private static final String WORLDCEREAL_COUNT_KEY = "MaxResultCount";
+    private static final String AGROSTAC_START_KEY = "pagenumber";
+    private static final String AGROSTAC_COUNT_KEY = "pagesize";
     private static final String AND = "&";
     private static final String ENCODED_SPACE = "%20";
     private static final String COMMA = ",";
     private static final String BBOX = "Bbox";
+    private static final String AGROSTAC_MIN_LON = "minlondd";
+    private static final String AGROSTAC_MAX_LON = "maxlondd";
+    private static final String AGROSTAC_MIN_LAT = "minlatdd";
+    private static final String AGROSTAC_MAX_LAT = "maxlatdd";
+    private static final String AGROSTAC_ACCESS_TOKEN = "accesstoken";
     // private static final String END_POLYGON = "))";
     // private static final String GEOM_KEY = "geometry";
     private static final String DATETIME = "datetime";
@@ -65,6 +76,7 @@ public class WorldCerealBondHandler implements DiscoveryBondHandler {
     private static final String ENDDATE_KEY = "ValidityEndTime";
     private static final String EWOC_CODES = "EwocCodes";
     private static final String CROP_TYPES = "cropTypes";
+    private static final String QUANTITY_TYPES = "cropquantity";
     private static final String LAND_COVER_TYPES = "landCoverTypes";
     private static final String IRRIGATION_TYPES = "IrrigationTypes";
     private static final String INTERSECT = "intersect";
@@ -72,12 +84,12 @@ public class WorldCerealBondHandler implements DiscoveryBondHandler {
     private static final String START_CONFIDENCE_LC = "LandCoverConfidence.Start";
     private static final String END_CONFIDENCE_CROP = "CropTypeConfidence.End";
     private static final String END_CONFIDENCE_LC = "LandCoverConfidence.End";
-    //private static final String START_CONFIDENCE_IRR = "IrrigationConfidence.Start";
-    //private static final String END_CONFIDENCE_IRR = "IrrigationConfidence.End";
+    // private static final String START_CONFIDENCE_IRR = "IrrigationConfidence.Start";
+    // private static final String END_CONFIDENCE_IRR = "IrrigationConfidence.End";
 
     private Integer start;
     private Integer count;
-    
+
     private String polygon;
     private String startDate;
     private String endDate;
@@ -85,9 +97,10 @@ public class WorldCerealBondHandler implements DiscoveryBondHandler {
     private String endConfidenceCrop;
     private String startConfidenceLc;
     private String endConfidenceLc;
-//    private String startConfidenceIrr;
-//    private String endConfidenceIrr;
+    // private String startConfidenceIrr;
+    // private String endConfidenceIrr;
     private Map<String, List<String>> textSearches;
+    private String quantity;
     private boolean valid;
 
     private String datasetId;
@@ -99,7 +112,7 @@ public class WorldCerealBondHandler implements DiscoveryBondHandler {
     public void setOnlineId(String onlineId) {
 	this.datasetId = onlineId;
     }
-    
+
     /**
      * @param datasetId
      */
@@ -151,43 +164,48 @@ public class WorldCerealBondHandler implements DiscoveryBondHandler {
 		System.out.println("" + Double.valueOf(bond.getPropertyValue()).intValue());
 	    }
 	    break;
-//	case CONFIDENCE_IRR_TYPE:
-//	    BondOperator irrOp = bond.getOperator();
-//	    if (irrOp.equals(BondOperator.GREATER_OR_EQUAL)) {
-//		startConfidenceIrr = "" + Double.valueOf(bond.getPropertyValue()).intValue();
-//		System.out.println("" + Double.valueOf(bond.getPropertyValue()).intValue());
-//	    } else if (irrOp.equals(BondOperator.LESS_OR_EQUAL)) {
-//		endConfidenceIrr = "" + Double.valueOf(bond.getPropertyValue()).intValue();
-//		System.out.println("" + Double.valueOf(bond.getPropertyValue()).intValue());
-//	    }
-//	    break;
+	// case CONFIDENCE_IRR_TYPE:
+	// BondOperator irrOp = bond.getOperator();
+	// if (irrOp.equals(BondOperator.GREATER_OR_EQUAL)) {
+	// startConfidenceIrr = "" + Double.valueOf(bond.getPropertyValue()).intValue();
+	// System.out.println("" + Double.valueOf(bond.getPropertyValue()).intValue());
+	// } else if (irrOp.equals(BondOperator.LESS_OR_EQUAL)) {
+	// endConfidenceIrr = "" + Double.valueOf(bond.getPropertyValue()).intValue();
+	// System.out.println("" + Double.valueOf(bond.getPropertyValue()).intValue());
+	// }
+	// break;
 	case CROP_TYPES:
 	    String cropValue = bond.getPropertyValue();
 	    List<String> newCropList = new ArrayList<String>();
-	    if(textSearches.containsKey(CROP_TYPES)) {
+	    if (textSearches.containsKey(CROP_TYPES)) {
 		newCropList = textSearches.get(CROP_TYPES);
-	    } 
+	    }
 	    newCropList.add(cropValue);
 	    textSearches.put(CROP_TYPES, newCropList);
 	    break;
 	case LAND_COVER_TYPES:
 	    String lcValue = bond.getPropertyValue();
 	    List<String> newLcList = new ArrayList<String>();
-	    if(textSearches.containsKey(LAND_COVER_TYPES)) {
+	    if (textSearches.containsKey(LAND_COVER_TYPES)) {
 		newLcList = textSearches.get(LAND_COVER_TYPES);
-	    } 
+	    }
 	    newLcList.add(lcValue);
 	    textSearches.put(LAND_COVER_TYPES, newLcList);
 	    break;
 	case IRRIGATION_TYPES:
 	    String irrValue = bond.getPropertyValue();
 	    List<String> newIrrList = new ArrayList<String>();
-	    if(textSearches.containsKey(IRRIGATION_TYPES)) {
+	    if (textSearches.containsKey(IRRIGATION_TYPES)) {
 		newIrrList = textSearches.get(IRRIGATION_TYPES);
-	    } 
+	    }
 	    newIrrList.add(irrValue);
 	    textSearches.put(IRRIGATION_TYPES, newIrrList);
 	    break;
+
+	case QUANTITY_TYPES:
+	    quantity = bond.getPropertyValue();
+	    break;
+
 	case TITLE:
 	case ABSTRACT:
 	case KEYWORD:
@@ -246,77 +264,111 @@ public class WorldCerealBondHandler implements DiscoveryBondHandler {
 	count = c;
     }
 
-    public String getQueryString() {
+    public String getQueryString(boolean isWorldCereal) {
 
 	StringBuilder builder = new StringBuilder();
 
-	// if (!valid) {
-	//
-	// builder.append(EQUAL).append(INVALID_DATASET_ID);
-	// return builder.toString();
-	// }
-	//
-	// builder.append(SEPARATOR).append(datasetId).append(AND);
-
-	if (start != null) {
-	    builder.append(START_KEY).append(EQUAL).append(start).append(AND);
-	}
-
-	if (count != null) {
-	    builder.append(COUNT_KEY).append(EQUAL).append(count).append(AND);
-	}
-
-	if (polygon != null) {
-	    // TODO: bbox request are in this form: Bbox=minLon&Bbox=minLat&Bbox=maxLon&Bbox=maxLat
-	    String[] splittedBbox = polygon.split(COMMA);
-	    for (String box : splittedBbox) {
-		builder.append(BBOX).append(EQUAL).append(box).append(AND);
+	if (isWorldCereal) {
+	    // worldcereal use case
+	    if (start != null) {
+		builder.append(WORLDCEREAL_START_KEY).append(EQUAL).append(start).append(AND);
 	    }
-	}
 
-	if (startDate != null) {
-	    builder.append(STARTDATE_KEY).append(EQUAL).append(startDate).append(AND);
-	}
+	    if (count != null) {
+		builder.append(WORLDCEREAL_COUNT_KEY).append(EQUAL).append(count).append(AND);
+	    }
 
-	if (endDate != null) {
-	    builder.append(ENDDATE_KEY).append(EQUAL).append(endDate).append(AND);
-	}
-
-	for (Map.Entry<String, List<String>> entry : textSearches.entrySet()) {
-	    List<String> splittedTerms = entry.getValue();
-
-	    if (entry.getKey().equals(CROP_TYPES) || entry.getKey().equals(LAND_COVER_TYPES)) {
-		// split
-		for (String s : splittedTerms) {
-		    builder.append(EWOC_CODES).append(EQUAL).append(s).append(AND);
-		}
-	    } else if (entry.getKey().equals(IRRIGATION_TYPES)) {
-		// irrigationType
-		for (String s : splittedTerms) {
-		    builder.append(entry.getKey()).append(EQUAL).append(s).append(AND);
+	    if (polygon != null) {
+		// TODO: bbox request are in this form: Bbox=minLon&Bbox=minLat&Bbox=maxLon&Bbox=maxLat
+		String[] splittedBbox = polygon.split(COMMA);
+		for (String box : splittedBbox) {
+		    builder.append(BBOX).append(EQUAL).append(box).append(AND);
 		}
 	    }
-	}
 
-	if (startConfidenceCrop != null) {
-	    builder.append(START_CONFIDENCE_CROP).append(EQUAL).append(startConfidenceCrop).append(AND);
-	}
-	if (startConfidenceLc != null) {
-	    builder.append(START_CONFIDENCE_LC).append(EQUAL).append(startConfidenceLc).append(AND);
-	}
-//	if (startConfidenceIrr != null) {
-//	    builder.append(START_CONFIDENCE_IRR).append(EQUAL).append(startConfidenceIrr).append(AND);
-//	}
-//	if (endConfidenceIrr != null) {
-//	    builder.append(END_CONFIDENCE_IRR).append(EQUAL).append(endConfidenceIrr).append(AND);
-//	}
-	if (endConfidenceCrop != null) {
-	    builder.append(END_CONFIDENCE_CROP).append(EQUAL).append(endConfidenceCrop).append(AND);
-	}
-	if (endConfidenceLc != null) {
-	    builder.append(END_CONFIDENCE_LC).append(EQUAL).append(endConfidenceLc).append(AND);
-	}
+	    if (startDate != null) {
+		builder.append(STARTDATE_KEY).append(EQUAL).append(startDate).append(AND);
+	    }
 
+	    if (endDate != null) {
+		builder.append(ENDDATE_KEY).append(EQUAL).append(endDate).append(AND);
+	    }
+
+	    for (Map.Entry<String, List<String>> entry : textSearches.entrySet()) {
+		List<String> splittedTerms = entry.getValue();
+
+		if (entry.getKey().equals(CROP_TYPES) || entry.getKey().equals(LAND_COVER_TYPES)) {
+		    // split
+		    for (String s : splittedTerms) {
+			builder.append(EWOC_CODES).append(EQUAL).append(s).append(AND);
+		    }
+		} else if (entry.getKey().equals(IRRIGATION_TYPES)) {
+		    // irrigationType
+		    for (String s : splittedTerms) {
+			builder.append(entry.getKey()).append(EQUAL).append(s).append(AND);
+		    }
+		}
+	    }
+
+	    if (startConfidenceCrop != null) {
+		builder.append(START_CONFIDENCE_CROP).append(EQUAL).append(startConfidenceCrop).append(AND);
+	    }
+	    if (startConfidenceLc != null) {
+		builder.append(START_CONFIDENCE_LC).append(EQUAL).append(startConfidenceLc).append(AND);
+	    }
+	    // if (startConfidenceIrr != null) {
+	    // builder.append(START_CONFIDENCE_IRR).append(EQUAL).append(startConfidenceIrr).append(AND);
+	    // }
+	    // if (endConfidenceIrr != null) {
+	    // builder.append(END_CONFIDENCE_IRR).append(EQUAL).append(endConfidenceIrr).append(AND);
+	    // }
+	    if (endConfidenceCrop != null) {
+		builder.append(END_CONFIDENCE_CROP).append(EQUAL).append(endConfidenceCrop).append(AND);
+	    }
+	    if (endConfidenceLc != null) {
+		builder.append(END_CONFIDENCE_LC).append(EQUAL).append(endConfidenceLc).append(AND);
+	    }
+
+	} else {
+	    // agrostac
+	    if (!textSearches.isEmpty()) {
+		List<String> res = textSearches.get(CROP_TYPES);
+		if (res != null && !res.isEmpty()) {
+		    CROP_CODES crop = CROP_CODES.fromCode(res.get(0));
+		    if(crop != null) {
+			builder.append(crop.name()).append("?");
+		    }
+		    
+		}
+	    }
+	    
+	    if(quantity != null) {
+		builder.append(QUANTITY_TYPES).append(EQUAL).append(quantity).append(AND);
+	    }
+
+	    if (polygon != null) {
+		// TODO: bbox request are in this form: Bbox=minLon&Bbox=minLat&Bbox=maxLon&Bbox=maxLat
+		String[] splittedBbox = polygon.split(COMMA);
+		builder.append(AGROSTAC_MIN_LON).append(EQUAL).append(splittedBbox[0]).append(AND);
+		builder.append(AGROSTAC_MAX_LON).append(EQUAL).append(splittedBbox[2]).append(AND);
+		builder.append(AGROSTAC_MIN_LAT).append(EQUAL).append(splittedBbox[1]).append(AND);
+		builder.append(AGROSTAC_MAX_LAT).append(EQUAL).append(splittedBbox[3]).append(AND);
+	    }
+	    
+	    if (start != null) {
+		if(start == 0) {
+		    start++;
+		}
+		builder.append(AGROSTAC_START_KEY).append(EQUAL).append(start).append(AND);
+	    }
+
+	    if (count != null) {
+		builder.append(AGROSTAC_COUNT_KEY).append(EQUAL).append(count).append(AND);
+	    }
+	    
+	    builder.append(AGROSTAC_ACCESS_TOKEN).append(EQUAL).append(ConfigurationWrapper.getCredentialsSetting().getAGROSTACToken().orElse(null));
+	    
+	}
 
 	// if (startDate != null && endDate != null) {
 	// builder.append(DATETIME).append(EQUAL).append(startDate).append(TIME_SEPARATOR).append(endDate).append(AND);
