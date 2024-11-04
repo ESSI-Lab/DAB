@@ -130,10 +130,6 @@ public class WorldCerealHandler extends DiscoveryHandler<String> {
 
 	BondReducer bondReducer = new BondReducer();
 	Bond normalizedBond = message.getNormalizedBond();
-//	String identifierSource = "worldcereal";
-//	if (normalizedBond.toString().contains("agrostac")) {
-//	    identifierSource = "agrostac";
-//	}
 
 	Bond reducedBond = null;
 	boolean isWordCereal = true;
@@ -142,7 +138,7 @@ public class WorldCerealHandler extends DiscoveryHandler<String> {
 	} catch (Exception e) {
 	    // try agrostac
 	    reducedBond = bondReducer.getReducedBond(normalizedBond, "agrostac");
-	    isWordCereal = false; 
+	    isWordCereal = false;
 	}
 
 	ReducedDiscoveryMessage reducedMessage = new ReducedDiscoveryMessage(message, reducedBond);
@@ -199,6 +195,9 @@ public class WorldCerealHandler extends DiscoveryHandler<String> {
 	    if (optionalCollectionId.isPresent()) {
 		collectionID = optionalCollectionId.get();
 		uniqueJSONName = collectionID;
+		if (!isWordCereal) {
+		    uniqueJSONName = "Agrostac_dataset_id_" + collectionID;
+		}
 	    }
 
 	    GSLoggerFactory.getLogger(getClass()).trace("WorldCereal Parent Node id {}", collectionID);
@@ -221,7 +220,7 @@ public class WorldCerealHandler extends DiscoveryHandler<String> {
 		boolean isNotFinished = true;
 		int tries = 3;
 
-		//String type = parentGSResource.getSource().getEndpoint();
+		// String type = parentGSResource.getSource().getEndpoint();
 
 		while (((code == null || code > 400) || isNotFinished) && tries > 0) {
 
@@ -328,9 +327,6 @@ public class WorldCerealHandler extends DiscoveryHandler<String> {
 
 	    // Convert the JSONArray to a string
 	    String jsonString = jsonArray.toString(4);
-
-	    // Convert the JSON string to an InputStream
-	    // ByteArrayInputStream inputStream = new ByteArrayInputStream(jsonString.getBytes(StandardCharsets.UTF_8));
 
 	    map.put(uniqueJSONName + ".json", jsonString);
 	    map.put(uniqueJSONName + ".xml", metadataString);
@@ -441,10 +437,10 @@ public class WorldCerealHandler extends DiscoveryHandler<String> {
 	    // String queryS = bondHandler.getQueryString(type);
 	}
 	builder.append(bondHandler.getQueryString(isWorldCereal));
-	if(!isWorldCereal) {
-	    builder.append("&datasetid=" + datasetId);    
+	if (!isWorldCereal) {
+	    builder.append("&datasetid=" + datasetId);
 	}
-	
+
 	return builder.toString();
     }
 
