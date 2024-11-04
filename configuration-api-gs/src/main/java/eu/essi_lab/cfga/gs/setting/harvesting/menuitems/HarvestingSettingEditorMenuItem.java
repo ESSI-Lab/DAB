@@ -41,7 +41,7 @@ public class HarvestingSettingEditorMenuItem implements ContextMenuItem {
 
 	Optional<HashMap<String, String>> item = event.getItem();
 
-	String settingId = item.get().get("Setting id");
+	String settingId = item.get().get("identifier");
 
 	HarvestingSetting setting = ConfigurationWrapper.getHarvestingSettings().//
 		stream().//
@@ -55,6 +55,6 @@ public class HarvestingSettingEditorMenuItem implements ContextMenuItem {
     @Override
     public String getItemText() {
 
-	return "Edit";
+	return "Edit setting";
     }
 }
