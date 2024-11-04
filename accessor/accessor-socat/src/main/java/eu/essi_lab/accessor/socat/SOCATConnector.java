@@ -69,7 +69,7 @@ public class SOCATConnector extends HarvestedQueryConnector<SOCATConnectorSettin
 
     @Override
     public boolean supports(GSSource source) {
-	return source.getEndpoint().equals("https://data.pmel.noaa.gov/socat/erddap/tabledap/socat_v2023_fulldata");
+	return source.getEndpoint().equals("https://data.pmel.noaa.gov/socat/erddap/tabledap/socat_v2023_fulldata") || source.getEndpoint().equals("https://data.pmel.noaa.gov/socat/erddap/tabledap/socat_v2024_fulldata");
 	// old endpoint
 	//return source.getEndpoint().equals("https://ferret.pmel.noaa.gov/socat/erddap/tabledap/socat_v2020_fulldata");
     }
