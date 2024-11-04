@@ -36,6 +36,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu;
+import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.ListDataProvider;
@@ -45,6 +46,7 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.function.ValueProvider;
 
 import eu.essi_lab.cfga.Configuration;
+import eu.essi_lab.cfga.ConfigurationChangeListener.ConfigurationChangeEvent;
 import eu.essi_lab.cfga.gui.components.SettingComponentFactory;
 import eu.essi_lab.cfga.gui.components.TabContainer;
 import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
@@ -82,11 +84,28 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 	CHECKS = new ArrayList<Checkbox>();
 
-	this.gridInfo = gridInfo;
+	configuration.addChangeEventListener(event -> {
+
+	    // updates the checks list in case of settings removal
+	    if (event.getEventType() == ConfigurationChangeEvent.SETTING_REMOVED) {
+
+		String identifier = event.getSetting().get().getIdentifier();
+
+		Checkbox checkbox = CHECKS.//
+			stream().//
+			filter(c -> c.getId().get().equals(identifier)).//
+			findFirst().//
+			get();
+
+		CHECKS.remove(checkbox);
+	    }
+	});
 
 	//
 	//
 	//
+
+	this.gridInfo = gridInfo;
 
 	if (!refresh) {
 
@@ -102,21 +121,31 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 	    GridContextMenu<HashMap<String, String>> menu = addContextMenu();
 
-	    gridInfo.getContextMenuItems().forEach(cmi -> menu.addItem(cmi.getItemText(), e -> {
+	    gridInfo.getContextMenuItems().forEach(cmi -> {
 
-		Optional<HashMap<String, String>> item = e.getItem();
+		menu.addItem(cmi.getItemText(), e -> {
 
-		if (!item.isPresent() || item.get().isEmpty()) {
+		    Optional<HashMap<String, String>> item = e.getItem();
 
-		    NotificationDialog.getWarningDialog("No row selected").open();
-		    return;
+		    if (!item.isPresent() || item.get().isEmpty()) {
+
+			NotificationDialog.getWarningDialog("No row selected").open();
+			return;
+		    }
+
+		    HashMap<String, Boolean> map = new HashMap<>();
+		    CHECKS.forEach(check -> map.put(check.getId().get(), check.getValue()));
+
+		    cmi.onClick(e, map);
+		});
+
+		if (cmi.withSeparator()) {
+
+		    menu.addItem(new Hr());
 		}
+	    }
 
-		HashMap<String, Boolean> map = new HashMap<>();
-		CHECKS.forEach(check -> map.put(check.getId().get(), check.getValue()));
-
-		cmi.onClick(e, map);
-	    }));
+	    );
 	}
 
 	//
