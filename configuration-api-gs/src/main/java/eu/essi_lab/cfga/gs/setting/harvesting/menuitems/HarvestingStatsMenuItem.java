@@ -31,6 +31,7 @@ import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu.GridContextMenuItemClickEvent;
 import com.vaadin.flow.component.textfield.TextArea;
 
+import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.SchedulerSupport;
@@ -39,16 +40,20 @@ import eu.essi_lab.cfga.gui.dialog.ConfirmationDialog;
 import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
+import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.JobStatus.JobPhase;
 
 /**
  * @author Fabrizio
  */
-public class HarvestingStatsProviderMenuItem implements ContextMenuItem {
+public class HarvestingStatsMenuItem implements ContextMenuItem {
 
     @Override
-    public void onClick(GridContextMenuItemClickEvent<HashMap<String, String>> event, HashMap<String, Boolean> selected) {
+    public void onClick(GridContextMenuItemClickEvent<HashMap<String, String>> event, //
+	    Configuration configuration, //
+	    Setting setting, //
+	    HashMap<String, Boolean> selection) {
 
 	ConfirmationDialog dialog = new ConfirmationDialog();
 	dialog.setTitle("Harvesting statistics");

@@ -27,9 +27,12 @@ import java.util.Optional;
 
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu.GridContextMenuItemClickEvent;
 
+import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.TaskStarter;
 import eu.essi_lab.cfga.gs.setting.EmailSetting;
+import eu.essi_lab.cfga.setting.Setting;
+import eu.essi_lab.cfga.setting.SettingUtils;
 
 /**
  * @author Fabrizio
@@ -43,16 +46,17 @@ public class CustomTaskStarter extends TaskStarter {
     /**
      * 
      */
-    private String settingId;
+    private CustomTaskSetting customTaskSetting;
 
     @Override
-    public void onClick(GridContextMenuItemClickEvent<HashMap<String, String>> event, HashMap<String, Boolean> selected) {
+    public void onClick(GridContextMenuItemClickEvent<HashMap<String, String>> event, //
+	    Configuration configuration, //
+	    Setting setting, //
+	    HashMap<String, Boolean> selection) {
+	
+	customTaskSetting = SettingUtils.downCast(setting, CustomTaskSetting.class);
 
-	Optional<HashMap<String, String>> item = event.getItem();
-
-	settingId = item.get().get("Id");
-
-	super.onClick(event, selected);
+	super.onClick(event, configuration, setting, selection);
     }
 
     @Override
@@ -64,13 +68,7 @@ public class CustomTaskStarter extends TaskStarter {
     @Override
     protected CustomTaskSetting getSetting() {
 
-	CustomTaskSetting setting = ConfigurationWrapper.getCustomTaskSettings().//
-		stream().//
-		filter(s -> s.getIdentifier().equals(settingId)).//
-		findFirst().//
-		get();
-
-	return setting;
+	return customTaskSetting;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package eu.essi_lab.cfga.gs.setting.harvesting.menuitems;
+package eu.essi_lab.cfga.gui.components.grid.menuitem;
 
 /*-
  * #%L
@@ -22,34 +22,26 @@ package eu.essi_lab.cfga.gs.setting.harvesting.menuitems;
  */
 
 import java.util.HashMap;
-import java.util.Optional;
 
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu.GridContextMenuItemClickEvent;
 
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
+import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gui.components.grid.ContextMenuItem;
 import eu.essi_lab.cfga.gui.components.setting.edit_put.SettingEditDialog;
+import eu.essi_lab.cfga.setting.Setting;
 
 /**
  * @author Fabrizio
  */
-public class HarvestingSettingEditorMenuItem implements ContextMenuItem {
+public class SettingEditorMenuItem implements ContextMenuItem {
 
     @Override
-    public void onClick(GridContextMenuItemClickEvent<HashMap<String, String>> event, HashMap<String, Boolean> selected) {
+    public void onClick(GridContextMenuItemClickEvent<HashMap<String, String>> event, //
+	    Configuration configuration, //
+	    Setting setting, //
+	    HashMap<String, Boolean> selection) {
 
-	Optional<HashMap<String, String>> item = event.getItem();
-
-	String settingId = item.get().get("identifier");
-
-	HarvestingSetting setting = ConfigurationWrapper.getHarvestingSettings().//
-		stream().//
-		filter(s -> s.getIdentifier().equals(settingId)).//		
-		findFirst().//
-		get();
-
-	new SettingEditDialog(ConfigurationWrapper.getConfiguration().get(), setting).open();
+	new SettingEditDialog(configuration, setting).open();
     }
 
     @Override

@@ -29,9 +29,7 @@ import eu.essi_lab.cfga.ConfigurationSource;
 import eu.essi_lab.cfga.SelectionUtils;
 import eu.essi_lab.cfga.gs.DefaultConfiguration.MainSettingsIdentifier;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
-import eu.essi_lab.cfga.gs.setting.SystemSetting.SystemSettingComponentInfo;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
-import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting.DatabaseComponentInfo;
 import eu.essi_lab.cfga.source.FileSource;
 
 /**

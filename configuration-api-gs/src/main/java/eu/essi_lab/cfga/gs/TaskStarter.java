@@ -40,6 +40,7 @@ import com.vaadin.flow.component.grid.contextmenu.GridContextMenu.GridContextMen
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.server.VaadinSession;
 
+import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gui.components.grid.ContextMenuItem;
 import eu.essi_lab.cfga.gui.components.listener.ButtonChangeListener;
 import eu.essi_lab.cfga.gui.dialog.ConfirmationDialog;
@@ -49,6 +50,7 @@ import eu.essi_lab.cfga.scheduler.Scheduler.JobEvent;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.cfga.scheduler.SchedulerUtils;
+import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
@@ -142,7 +144,10 @@ public abstract class TaskStarter implements ContextMenuItem, ButtonChangeListen
     }
 
     @Override
-    public void onClick(GridContextMenuItemClickEvent<HashMap<String, String>> event, HashMap<String, Boolean> selected) {
+    public void onClick(GridContextMenuItemClickEvent<HashMap<String, String>> event, //
+	    Configuration configuration, //
+	    Setting setting, //
+	    HashMap<String, Boolean> selection) {
 
 	session = VaadinSession.getCurrent();
 

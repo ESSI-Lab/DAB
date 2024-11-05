@@ -36,13 +36,12 @@ import eu.essi_lab.cfga.gs.setting.BrokeringSetting;
 import eu.essi_lab.cfga.gs.setting.TabIndex;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
 import eu.essi_lab.cfga.gs.setting.augmenter.AugmenterSetting;
-import eu.essi_lab.cfga.gs.setting.harvesting.menuitems.HarvestingSettingEditorMenuItem;
-import eu.essi_lab.cfga.gs.setting.harvesting.menuitems.HarvestingStatsProviderMenuItem;
+import eu.essi_lab.cfga.gs.setting.harvesting.menuitems.HarvestingStatsMenuItem;
 import eu.essi_lab.cfga.gs.setting.menuitems.SettingsInfoMenuItem;
 import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.ContextMenuItem;
-import eu.essi_lab.cfga.gui.components.grid.SettingsRemoverMenuItem;
+import eu.essi_lab.cfga.gui.components.grid.menuitem.SettingEditorMenuItem;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
@@ -262,7 +261,7 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 
 	    ArrayList<ContextMenuItem> list = new ArrayList<>();
 
-	    list.add(new HarvestingSettingEditorMenuItem());
+	    list.add(new SettingEditorMenuItem());
 	    list.add(new SettingsInfoMenuItem());
 
 	    if (ExecutionMode.get() == ExecutionMode.MIXED || //
@@ -273,7 +272,7 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 
 //	    list.add(new SettingsRemoverMenuItem());
 
-	    list.add(new HarvestingStatsProviderMenuItem());
+	    list.add(new HarvestingStatsMenuItem());
 
 	    return list;
 	}
