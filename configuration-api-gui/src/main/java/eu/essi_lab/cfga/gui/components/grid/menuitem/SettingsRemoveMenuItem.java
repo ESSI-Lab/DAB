@@ -25,18 +25,25 @@ package eu.essi_lab.cfga.gui.components.grid.menuitem;
  */
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu.GridContextMenuItemClickEvent;
+import com.vaadin.flow.component.textfield.TextArea;
 
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gui.components.TabContainer;
 import eu.essi_lab.cfga.gui.components.grid.ContextMenuItem;
+import eu.essi_lab.cfga.gui.dialog.ConfirmationDialog;
 import eu.essi_lab.cfga.setting.Setting;
 
 /**
  * @author Fabrizio
  */
 public class SettingsRemoveMenuItem extends ContextMenuItem {
+
+    private List<String> ids;
 
     /**
      * 
@@ -62,13 +69,65 @@ public class SettingsRemoveMenuItem extends ContextMenuItem {
 	    Setting setting, //
 	    HashMap<String, Boolean> selection) {
 
-	System.out.println(selection);
-    }
+	String names = configuration.//
+		list().//
+		stream().//
+		filter(s -> selection.containsKey(s.getIdentifier()) && selection.get(s.getIdentifier())).//
+		map(s -> "- " + s.getName()).//
+		collect(Collectors.joining("\n"));
 
-    @Override
-    public boolean withTopDivider() {
+	ids = configuration.//
+		list().//
+		stream().//
+		filter(s -> selection.containsKey(s.getIdentifier()) && selection.get(s.getIdentifier())).//
+		map(s -> s.getIdentifier()).//
+		collect(Collectors.toList());
 
-	return true;
+	ConfirmationDialog dialog = new ConfirmationDialog();
+	dialog.setTitle("Remove selected settings");
+	dialog.setHeight(500, Unit.PIXELS);
+	dialog.setWidth(600, Unit.PIXELS);
+
+	TextArea textArea = new TextArea();
+
+	String text = "No setting selected";
+
+	if (names.isEmpty()) {
+	    dialog.getConfirmButton().setVisible(false);
+	    dialog.setCancelText("Close");
+
+	    dialog.setHeight(200, Unit.PIXELS);
+
+	    textArea.setHeight(70, Unit.PIXELS);
+
+	} else {
+
+	    text = "Are you sure you want to remove the following settings?\n\n";
+	    text += names;
+
+	    textArea.setHeight(375, Unit.PIXELS);
+	}
+
+	textArea.setValue(text);
+	textArea.setWidth(580, Unit.PIXELS);
+	textArea.getStyle().set("font-size", "14px");
+
+	textArea.setReadOnly(true);
+
+	dialog.setContent(textArea);
+	dialog.open();
+
+	//
+	//
+	//
+
+	dialog.setOnConfirmListener(e -> {
+
+	    ids.forEach(id -> {
+		configuration.remove(id);
+		tabContainer.removeSettingComponent(null, id);
+	    });
+	});
     }
 
     @Override

@@ -42,6 +42,7 @@ import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.ContextMenuItem;
 import eu.essi_lab.cfga.gui.components.grid.menuitem.SettingEditMenuItem;
+import eu.essi_lab.cfga.gui.components.grid.menuitem.SettingsRemoveMenuItem;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
@@ -202,7 +203,7 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 
 			    ColumnDescriptor.createPositionalDescriptor(), //
 
-			    // ColumnDescriptor.createCheckBoxDescriptor("Sel.", item -> System.out.println(item)), //
+			    ColumnDescriptor.createCheckBoxDescriptor("Sel."), //
 
 			    ColumnDescriptor.create("Name", true, true, (s) -> s.getName()), //
 
@@ -270,9 +271,9 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 		list.add(new HarvestingStarter());
 	    }
 
-	    // list.add(new SettingRemoverMenuItem());
+	    list.add(new SettingsRemoveMenuItem(true, false));
 
-	    list.add(new HarvestingStatsMenuItem(true, false));
+	    list.add(new HarvestingStatsMenuItem());
 
 	    return list;
 	}
