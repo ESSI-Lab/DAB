@@ -142,7 +142,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 			    findFirst().//
 			    get();
 
-		    cmi.onClick(event, configuration, setting, map);
+		    cmi.onClick(event, container, configuration, setting, map);
 		});
 
 		if (cmi.withSeparator()) {
