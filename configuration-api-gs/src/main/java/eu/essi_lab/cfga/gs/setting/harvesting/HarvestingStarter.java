@@ -45,6 +45,22 @@ public class HarvestingStarter extends TaskStarter {
      */
     private HarvestingSetting harvSetting;
 
+    /**
+     * 
+     */
+    public HarvestingStarter() {
+
+    }
+
+    /**
+     * @param withTopDivider
+     * @param withBottomDivider
+     */
+    public HarvestingStarter(boolean withTopDivider, boolean withBottomDivider) {
+
+	super(withTopDivider, withBottomDivider);
+    }
+
     @Override
     public void onClick(//
 	    GridContextMenuItemClickEvent<HashMap<String, String>> event, //

@@ -1,4 +1,4 @@
-package eu.essi_lab.cfga.gs.setting.menuitems;
+package eu.essi_lab.cfga.gs.setting.harvesting.menuitems;
 
 /*-
  * #%L
@@ -37,7 +37,23 @@ import eu.essi_lab.cfga.setting.Setting;
 /**
  * @author Fabrizio
  */
-public class SettingsInfoMenuItem implements ContextMenuItem {
+public class HarvestingInfoMenuItem extends ContextMenuItem {
+
+    /**
+     * 
+     */
+    public HarvestingInfoMenuItem() {
+
+    }
+
+    /**
+     * @param withTopDivider
+     * @param withBottomDivider
+     */
+    public HarvestingInfoMenuItem(boolean withTopDivider, boolean withBottomDivider) {
+
+	super(withTopDivider, withBottomDivider);
+    }
 
     @Override
     public void onClick(//
@@ -52,7 +68,7 @@ public class SettingsInfoMenuItem implements ContextMenuItem {
 	String values = formatRowValues(item);
 
 	ConfirmationDialog dialog = new ConfirmationDialog();
-	dialog.setTitle("Show setting info");
+	dialog.setTitle("Harvesting info");
 	dialog.setHeight(500, Unit.PIXELS);
 	dialog.setWidth(600, Unit.PIXELS);
 	dialog.getConfirmButton().setVisible(false);
@@ -73,7 +89,7 @@ public class SettingsInfoMenuItem implements ContextMenuItem {
     @Override
     public String getItemText() {
 
-	return "Show setting info";
+	return "Harvesting info";
     }
 
     /**

@@ -36,7 +36,23 @@ import eu.essi_lab.cfga.setting.Setting;
 /**
  * @author Fabrizio
  */
-public class SettingsRemoveMenuItem implements ContextMenuItem {
+public class SettingsRemoveMenuItem extends ContextMenuItem {
+
+    /**
+     * 
+     */
+    public SettingsRemoveMenuItem() {
+
+    }
+
+    /**
+     * @param withTopDivider
+     * @param withBottomDivider
+     */
+    public SettingsRemoveMenuItem(boolean withTopDivider, boolean withBottomDivider) {
+
+	super(withTopDivider, withBottomDivider);
+    }
 
     @Override
     public void onClick(//
@@ -50,7 +66,7 @@ public class SettingsRemoveMenuItem implements ContextMenuItem {
     }
 
     @Override
-    public boolean withSeparator() {
+    public boolean withTopDivider() {
 
 	return true;
     }

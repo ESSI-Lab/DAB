@@ -34,7 +34,23 @@ import eu.essi_lab.cfga.setting.Setting;
 /**
  * @author Fabrizio
  */
-public class SettingEditMenuItem implements ContextMenuItem {
+public class SettingEditMenuItem extends ContextMenuItem {
+
+    /**
+     * 
+     */
+    public SettingEditMenuItem() {
+
+    }
+
+    /**
+     * @param withTopDivider
+     * @param withBottomDivider
+     */
+    public SettingEditMenuItem(boolean withTopDivider, boolean withBottomDivider) {
+
+	super(withTopDivider, withBottomDivider);
+    }
 
     @Override
     public void onClick(//

@@ -123,6 +123,11 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 	    gridInfo.getContextMenuItems().forEach(cmi -> {
 
+		if (cmi.withTopDivider()) {
+
+		    menu.add(new Hr());
+		}
+
 		menu.addItem(cmi.getItemText(), event -> {
 
 		    Optional<HashMap<String, String>> item = event.getItem();
@@ -145,9 +150,9 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 		    cmi.onClick(event, container, configuration, setting, map);
 		});
 
-		if (cmi.withSeparator()) {
+		if (cmi.withBottomDivider()) {
 
-		    menu.addItem(new Hr());
+		    menu.add(new Hr());
 		}
 	    }
 

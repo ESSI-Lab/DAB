@@ -48,7 +48,23 @@ import eu.essi_lab.messages.JobStatus.JobPhase;
 /**
  * @author Fabrizio
  */
-public class HarvestingStatsMenuItem implements ContextMenuItem {
+public class HarvestingStatsMenuItem extends ContextMenuItem {
+
+    /**
+     * 
+     */
+    public HarvestingStatsMenuItem() {
+
+    }
+
+    /**
+     * @param withTopDivider
+     * @param withBottomDivider
+     */
+    public HarvestingStatsMenuItem(boolean withTopDivider, boolean withBottomDivider) {
+
+	super(withTopDivider, withBottomDivider);
+    }
 
     @Override
     public void onClick(//

@@ -49,6 +49,22 @@ public class CustomTaskStarter extends TaskStarter {
      */
     private CustomTaskSetting customTaskSetting;
 
+    /**
+     * 
+     */
+    public CustomTaskStarter() {
+
+    }
+
+    /**
+     * @param withTopDivider
+     * @param withBottomDivider
+     */
+    public CustomTaskStarter(boolean withTopDivider, boolean withBottomDivider) {
+
+	super(withTopDivider, withBottomDivider);
+    }
+
     @Override
     public void onClick(//
 	    GridContextMenuItemClickEvent<HashMap<String, String>> event, //

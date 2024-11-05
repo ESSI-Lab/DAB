@@ -32,13 +32,31 @@ import eu.essi_lab.cfga.setting.Setting;
 /**
  * @author Fabrizio
  */
-public interface ContextMenuItem {
+public abstract class ContextMenuItem {
+
+    private boolean withTopDivider;
+    private boolean withBottomDivider;
+
+    /**
+     * 
+     */
+    public ContextMenuItem() {
+    }
+
+    /**
+     * @param withTopDivider
+     */
+    public ContextMenuItem(boolean withTopDivider, boolean withBottomDivider) {
+
+	setTopDivider(withTopDivider);
+	setBottomDivider(withBottomDivider);
+    }
 
     /**
      * @param event
      */
-    void onClick(//
-	    GridContextMenuItemClickEvent<HashMap<String, String>> event,//
+    public abstract void onClick(//
+	    GridContextMenuItemClickEvent<HashMap<String, String>> event, //
 	    TabContainer tabContainer, //
 	    Configuration configuration, //
 	    Setting setting, //
@@ -47,13 +65,37 @@ public interface ContextMenuItem {
     /**
      * @return
      */
-    String getItemText();
+    public abstract String getItemText();
 
     /**
      * @return
      */
-    default boolean withSeparator() {
+    protected boolean withBottomDivider() {
 
-	return false;
+	return withBottomDivider;
+    }
+
+    /**
+     * @param withBottomDivider
+     */
+    protected void setBottomDivider(boolean withBottomDivider) {
+
+	this.withBottomDivider = withBottomDivider;
+    }
+
+    /**
+     * @param withTopDivider
+     */
+    protected void setTopDivider(boolean withTopDivider) {
+
+	this.withTopDivider = withTopDivider;
+    }
+
+    /**
+     * @return
+     */
+    public boolean withTopDivider() {
+
+	return withTopDivider;
     }
 }

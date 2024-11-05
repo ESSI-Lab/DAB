@@ -60,7 +60,7 @@ import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
  * @author Fabrizio
  */
 @SuppressWarnings("serial")
-public abstract class TaskStarter implements ContextMenuItem, ButtonChangeListener {
+public abstract class TaskStarter extends ContextMenuItem implements ButtonChangeListener {
 
     protected TextArea textArea;
     protected Checkbox forceVolatileScheduler;
@@ -71,6 +71,15 @@ public abstract class TaskStarter implements ContextMenuItem, ButtonChangeListen
      * 
      */
     public TaskStarter() {
+    }
+
+    /**
+     * @param withTopDivider
+     * @param withBottomDivider
+     */
+    public TaskStarter(boolean withTopDivider, boolean withBottomDivider) {
+
+	super(withTopDivider, withBottomDivider);
     }
 
     @Override
