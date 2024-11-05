@@ -123,9 +123,9 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 	    gridInfo.getContextMenuItems().forEach(cmi -> {
 
-		menu.addItem(cmi.getItemText(), e -> {
+		menu.addItem(cmi.getItemText(), event -> {
 
-		    Optional<HashMap<String, String>> item = e.getItem();
+		    Optional<HashMap<String, String>> item = event.getItem();
 
 		    if (!item.isPresent() || item.get().isEmpty()) {
 
@@ -136,7 +136,13 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 		    HashMap<String, Boolean> map = new HashMap<>();
 		    CHECKS.forEach(check -> map.put(check.getId().get(), check.getValue()));
 
-		    cmi.onClick(e, map);
+		    Setting setting = configuration.list().//
+			    stream().//
+			    filter(s -> s.getIdentifier().equals(item.get().get("identifier"))).//
+			    findFirst().//
+			    get();
+
+		    cmi.onClick(event, configuration, setting, map);
 		});
 
 		if (cmi.withSeparator()) {
