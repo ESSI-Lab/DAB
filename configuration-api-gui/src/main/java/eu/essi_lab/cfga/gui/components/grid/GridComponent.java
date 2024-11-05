@@ -307,8 +307,12 @@ public class GridComponent extends Grid<HashMap<String, String>> {
      */
     public void removeSettingComponent(SettingComponent component, String settingIdentifier) {
 
-	HashMap<String, String> items = dataProvider.getItems().stream().filter(map -> map.get("identifier").equals(settingIdentifier))
-		.findFirst().get();
+	HashMap<String, String> items = dataProvider.//
+		getItems().//
+		stream().//
+		filter(map -> map.get("identifier").equals(settingIdentifier)).//
+		findFirst().//
+		get();
 
 	this.dataProvider.getItems().remove(items);
 
