@@ -41,7 +41,7 @@ import eu.essi_lab.cfga.gs.setting.menuitems.SettingsInfoMenuItem;
 import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.ContextMenuItem;
-import eu.essi_lab.cfga.gui.components.grid.menuitem.SettingEditorMenuItem;
+import eu.essi_lab.cfga.gui.components.grid.menuitem.SettingEditMenuItem;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
@@ -261,7 +261,7 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 
 	    ArrayList<ContextMenuItem> list = new ArrayList<>();
 
-	    list.add(new SettingEditorMenuItem());
+	    list.add(new SettingEditMenuItem());
 	    list.add(new SettingsInfoMenuItem());
 
 	    if (ExecutionMode.get() == ExecutionMode.MIXED || //

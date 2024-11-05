@@ -29,6 +29,7 @@ import com.vaadin.flow.component.grid.contextmenu.GridContextMenu.GridContextMen
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.TaskStarter;
+import eu.essi_lab.cfga.gui.components.TabContainer;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.SettingUtils;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting;
@@ -45,14 +46,16 @@ public class HarvestingStarter extends TaskStarter {
     private HarvestingSetting harvSetting;
 
     @Override
-    public void onClick(GridContextMenuItemClickEvent<HashMap<String, String>> event, //
+    public void onClick(//
+	    GridContextMenuItemClickEvent<HashMap<String, String>> event, //
+	    TabContainer tabContainer, //
 	    Configuration configuration, //
 	    Setting setting, //
 	    HashMap<String, Boolean> selection) {
-	
+
 	harvSetting = SettingUtils.downCast(setting, HarvestingSettingLoader.load().getClass());
 
-	super.onClick(event, configuration, setting, selection);
+	super.onClick(event, tabContainer, configuration, setting, selection);
     }
 
     @Override

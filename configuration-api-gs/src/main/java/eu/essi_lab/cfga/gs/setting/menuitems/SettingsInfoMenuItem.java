@@ -29,6 +29,7 @@ import com.vaadin.flow.component.grid.contextmenu.GridContextMenu.GridContextMen
 import com.vaadin.flow.component.textfield.TextArea;
 
 import eu.essi_lab.cfga.Configuration;
+import eu.essi_lab.cfga.gui.components.TabContainer;
 import eu.essi_lab.cfga.gui.components.grid.ContextMenuItem;
 import eu.essi_lab.cfga.gui.dialog.ConfirmationDialog;
 import eu.essi_lab.cfga.setting.Setting;
@@ -39,7 +40,9 @@ import eu.essi_lab.cfga.setting.Setting;
 public class SettingsInfoMenuItem implements ContextMenuItem {
 
     @Override
-    public void onClick(GridContextMenuItemClickEvent<HashMap<String, String>> event, //
+    public void onClick(//
+	    GridContextMenuItemClickEvent<HashMap<String, String>> event, //
+	    TabContainer tabContainer, //
 	    Configuration configuration, //
 	    Setting setting, //
 	    HashMap<String, Boolean> selection) {

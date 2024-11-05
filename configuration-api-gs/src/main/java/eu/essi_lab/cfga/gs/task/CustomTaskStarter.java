@@ -31,6 +31,7 @@ import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.TaskStarter;
 import eu.essi_lab.cfga.gs.setting.EmailSetting;
+import eu.essi_lab.cfga.gui.components.TabContainer;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.SettingUtils;
 
@@ -49,14 +50,16 @@ public class CustomTaskStarter extends TaskStarter {
     private CustomTaskSetting customTaskSetting;
 
     @Override
-    public void onClick(GridContextMenuItemClickEvent<HashMap<String, String>> event, //
+    public void onClick(//
+	    GridContextMenuItemClickEvent<HashMap<String, String>> event, //
+	    TabContainer tabContainer, //
 	    Configuration configuration, //
 	    Setting setting, //
 	    HashMap<String, Boolean> selection) {
-	
+
 	customTaskSetting = SettingUtils.downCast(setting, CustomTaskSetting.class);
 
-	super.onClick(event, configuration, setting, selection);
+	super.onClick(event, tabContainer, configuration, setting, selection);
     }
 
     @Override

@@ -26,6 +26,7 @@ import java.util.HashMap;
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu.GridContextMenuItemClickEvent;
 
 import eu.essi_lab.cfga.Configuration;
+import eu.essi_lab.cfga.gui.components.TabContainer;
 import eu.essi_lab.cfga.gui.components.grid.ContextMenuItem;
 import eu.essi_lab.cfga.gui.components.setting.edit_put.SettingEditDialog;
 import eu.essi_lab.cfga.setting.Setting;
@@ -33,15 +34,17 @@ import eu.essi_lab.cfga.setting.Setting;
 /**
  * @author Fabrizio
  */
-public class SettingEditorMenuItem implements ContextMenuItem {
+public class SettingEditMenuItem implements ContextMenuItem {
 
     @Override
-    public void onClick(GridContextMenuItemClickEvent<HashMap<String, String>> event, //
+    public void onClick(//
+	    GridContextMenuItemClickEvent<HashMap<String, String>> event, //
+	    TabContainer tabContainer, //
 	    Configuration configuration, //
 	    Setting setting, //
 	    HashMap<String, Boolean> selection) {
 
-	new SettingEditDialog(configuration, setting).open();
+	new SettingEditDialog(configuration, setting, null, tabContainer).open();
     }
 
     @Override
