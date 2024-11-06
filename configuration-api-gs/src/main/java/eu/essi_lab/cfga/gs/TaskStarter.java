@@ -42,7 +42,7 @@ import com.vaadin.flow.server.VaadinSession;
 
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gui.components.TabContainer;
-import eu.essi_lab.cfga.gui.components.grid.ContextMenuItem;
+import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.components.listener.ButtonChangeListener;
 import eu.essi_lab.cfga.gui.dialog.ConfirmationDialog;
 import eu.essi_lab.cfga.gui.dialog.NotificationDialog;
@@ -60,7 +60,7 @@ import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
  * @author Fabrizio
  */
 @SuppressWarnings("serial")
-public abstract class TaskStarter extends ContextMenuItem implements ButtonChangeListener {
+public abstract class TaskStarter extends GridMenuItemHandler implements ButtonChangeListener {
 
     protected TextArea textArea;
     protected Checkbox forceVolatileScheduler;
@@ -158,7 +158,7 @@ public abstract class TaskStarter extends ContextMenuItem implements ButtonChang
 	    GridContextMenuItemClickEvent<HashMap<String, String>> event, //
 	    TabContainer tabContainer, //
 	    Configuration configuration, //
-	    Setting setting, //
+	    Optional<Setting> setting, //
 	    HashMap<String, Boolean> selection) {
 
 	session = VaadinSession.getCurrent();

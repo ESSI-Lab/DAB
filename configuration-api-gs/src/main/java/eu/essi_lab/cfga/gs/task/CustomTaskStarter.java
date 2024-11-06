@@ -70,10 +70,10 @@ public class CustomTaskStarter extends TaskStarter {
 	    GridContextMenuItemClickEvent<HashMap<String, String>> event, //
 	    TabContainer tabContainer, //
 	    Configuration configuration, //
-	    Setting setting, //
+	    Optional<Setting> setting, //
 	    HashMap<String, Boolean> selection) {
 
-	customTaskSetting = SettingUtils.downCast(setting, CustomTaskSetting.class);
+	customTaskSetting = SettingUtils.downCast(setting.get(), CustomTaskSetting.class);
 
 	super.onClick(event, tabContainer, configuration, setting, selection);
     }

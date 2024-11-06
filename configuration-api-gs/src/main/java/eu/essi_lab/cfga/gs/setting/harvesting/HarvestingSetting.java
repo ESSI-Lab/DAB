@@ -36,13 +36,13 @@ import eu.essi_lab.cfga.gs.setting.BrokeringSetting;
 import eu.essi_lab.cfga.gs.setting.TabIndex;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
 import eu.essi_lab.cfga.gs.setting.augmenter.AugmenterSetting;
-import eu.essi_lab.cfga.gs.setting.harvesting.menuitems.HarvestingInfoMenuItem;
-import eu.essi_lab.cfga.gs.setting.harvesting.menuitems.HarvestingStatsMenuItem;
+import eu.essi_lab.cfga.gs.setting.harvesting.menuitems.HarvestingInfoItemHandler;
+import eu.essi_lab.cfga.gs.setting.harvesting.menuitems.HarvestingStatsItemHandler;
 import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
-import eu.essi_lab.cfga.gui.components.grid.ContextMenuItem;
-import eu.essi_lab.cfga.gui.components.grid.menuitem.SettingEditMenuItem;
-import eu.essi_lab.cfga.gui.components.grid.menuitem.SettingsRemoveMenuItem;
+import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
+import eu.essi_lab.cfga.gui.components.grid.menuitem.SettingEditItemHandler;
+import eu.essi_lab.cfga.gui.components.grid.menuitem.SettingsRemoveItemHandler;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
@@ -258,12 +258,12 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 	/**
 	 * @return
 	 */
-	private List<ContextMenuItem> getItemsList() {
+	private List<GridMenuItemHandler> getItemsList() {
 
-	    ArrayList<ContextMenuItem> list = new ArrayList<>();
+	    ArrayList<GridMenuItemHandler> list = new ArrayList<>();
 
-	    list.add(new SettingEditMenuItem());
-	    list.add(new HarvestingInfoMenuItem());
+	    list.add(new SettingEditItemHandler());
+	    list.add(new HarvestingInfoItemHandler());
 
 	    if (ExecutionMode.get() == ExecutionMode.MIXED || //
 		    ExecutionMode.get() == ExecutionMode.LOCAL_PRODUCTION) {
@@ -271,9 +271,9 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 		list.add(new HarvestingStarter());
 	    }
 
-	    list.add(new SettingsRemoveMenuItem(true, false));
+	    list.add(new SettingsRemoveItemHandler(true, false));
 
-	    list.add(new HarvestingStatsMenuItem());
+	    list.add(new HarvestingStatsItemHandler(true, false));
 
 	    return list;
 	}

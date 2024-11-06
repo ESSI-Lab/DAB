@@ -22,24 +22,25 @@ package eu.essi_lab.cfga.gui.components.grid.menuitem;
  */
 
 import java.util.HashMap;
+import java.util.Optional;
 
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu.GridContextMenuItemClickEvent;
 
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gui.components.TabContainer;
-import eu.essi_lab.cfga.gui.components.grid.ContextMenuItem;
+import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.components.setting.edit_put.SettingEditDialog;
 import eu.essi_lab.cfga.setting.Setting;
 
 /**
  * @author Fabrizio
  */
-public class SettingEditMenuItem extends ContextMenuItem {
+public class SettingEditItemHandler extends GridMenuItemHandler {
 
     /**
      * 
      */
-    public SettingEditMenuItem() {
+    public SettingEditItemHandler() {
 
     }
 
@@ -47,7 +48,7 @@ public class SettingEditMenuItem extends ContextMenuItem {
      * @param withTopDivider
      * @param withBottomDivider
      */
-    public SettingEditMenuItem(boolean withTopDivider, boolean withBottomDivider) {
+    public SettingEditItemHandler(boolean withTopDivider, boolean withBottomDivider) {
 
 	super(withTopDivider, withBottomDivider);
     }
@@ -57,10 +58,10 @@ public class SettingEditMenuItem extends ContextMenuItem {
 	    GridContextMenuItemClickEvent<HashMap<String, String>> event, //
 	    TabContainer tabContainer, //
 	    Configuration configuration, //
-	    Setting setting, //
+	    Optional<Setting> setting, //
 	    HashMap<String, Boolean> selection) {
 
-	new SettingEditDialog(configuration, setting, null, tabContainer).open();
+	new SettingEditDialog(configuration, setting.get(), null, tabContainer).open();
     }
 
     @Override

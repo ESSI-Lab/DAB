@@ -38,9 +38,9 @@ import eu.essi_lab.cfga.EditableSetting;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.TabIndex;
 import eu.essi_lab.cfga.gs.setting.harvesting.SchedulerSupport;
-import eu.essi_lab.cfga.gs.setting.harvesting.menuitems.HarvestingInfoMenuItem;
+import eu.essi_lab.cfga.gs.setting.harvesting.menuitems.HarvestingInfoItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
-import eu.essi_lab.cfga.gui.components.grid.ContextMenuItem;
+import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
@@ -263,11 +263,11 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 	/**
 	 * @return
 	 */
-	private List<ContextMenuItem> getItemsList() {
+	private List<GridMenuItemHandler> getItemsList() {
 
-	    ArrayList<ContextMenuItem> list = new ArrayList<>();
+	    ArrayList<GridMenuItemHandler> list = new ArrayList<>();
 //	    list.add(new CustomTaskSettingEditorMenuItem());
-	    list.add(new HarvestingInfoMenuItem());
+	    list.add(new HarvestingInfoItemHandler());
 	    list.add(new CustomTaskStarter());
 
 	    return list;

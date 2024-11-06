@@ -36,6 +36,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu;
+import com.vaadin.flow.component.grid.contextmenu.GridMenuItem;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
@@ -50,7 +51,6 @@ import eu.essi_lab.cfga.ConfigurationChangeListener.ConfigurationChangeEvent;
 import eu.essi_lab.cfga.gui.components.SettingComponentFactory;
 import eu.essi_lab.cfga.gui.components.TabContainer;
 import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
-import eu.essi_lab.cfga.gui.dialog.NotificationDialog;
 import eu.essi_lab.cfga.setting.Setting;
 
 /**
@@ -114,49 +114,90 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	}
 
 	//
-	//
+	// handles the context menu items
 	//
 
-	if (!gridInfo.getContextMenuItems().isEmpty()) {
+	if (!gridInfo.getGridMenuItemHandlers().isEmpty()) {
 
 	    GridContextMenu<HashMap<String, String>> menu = addContextMenu();
 
-	    gridInfo.getContextMenuItems().forEach(cmi -> {
+	    //
+	    // a listener called when the grid context menu is opened. it enables/disables
+	    // the menu items according to the ContextMenuItem.isEnabled method
+	    //
+	    menu.addGridContextMenuOpenedListener(event -> {
 
-		if (cmi.withTopDivider()) {
+		GridContextMenu<HashMap<String, String>> source = event.getSource();
 
-		    menu.add(new Hr());
-		}
+		List<GridMenuItem<HashMap<String, String>>> menuItems = source.getItems();
 
-		menu.addItem(cmi.getItemText(), event -> {
+		Optional<HashMap<String, String>> eventItem = event.getItem();
 
-		    Optional<HashMap<String, String>> item = event.getItem();
+		HashMap<String, Boolean> map = createSelectionMap();
 
-		    if (!item.isPresent() || item.get().isEmpty()) {
+		Optional<Setting> setting = findEventSetting(configuration, eventItem);
 
-			NotificationDialog.getWarningDialog("No row selected").open();
-			return;
-		    }
+		for (GridMenuItem<HashMap<String, String>> menuItem : menuItems) {
 
-		    HashMap<String, Boolean> map = new HashMap<>();
-		    CHECKS.forEach(check -> map.put(check.getId().get(), check.getValue()));
+		    String menuItemId = menuItem.getId().get();
 
-		    Setting setting = configuration.list().//
+		    //
+		    // finds the menu item handler related to the current menu item
+		    // according to their identifier
+		    //
+		    GridMenuItemHandler gmih = gridInfo.//
+			    getGridMenuItemHandlers().//
 			    stream().//
-			    filter(s -> s.getIdentifier().equals(item.get().get("identifier"))).//
+			    filter(i -> i.getIdentifier().equals(menuItemId)).//
 			    findFirst().//
 			    get();
 
-		    cmi.onClick(event, container, configuration, setting, map);
-		});
+		    if (eventItem.isPresent()) {
 
-		if (cmi.withBottomDivider()) {
+			menuItem.setEnabled(gmih.isEnabled(eventItem.get(), container, configuration, setting.get(), map));
+
+		    } else {
+
+			// if no context is selected, only the non contextual items are enabled
+			menuItem.setEnabled(!gmih.isContextual());
+		    }
+		}
+	    });
+
+	    //
+	    // adds the menu item to the grid context menu
+	    //
+	    gridInfo.getGridMenuItemHandlers().forEach(gmih -> {
+
+		// adds an optional top divider
+		if (gmih.withTopDivider()) {
 
 		    menu.add(new Hr());
 		}
-	    }
 
-	    );
+		// adds the item and set its id according to the related handler
+		GridMenuItem<HashMap<String, String>> gridMenuItem = menu.addItem(gmih.getItemText(), event -> {
+
+		    Optional<HashMap<String, String>> eventItem = event.getItem();
+
+		    HashMap<String, Boolean> map = createSelectionMap();
+
+		    // the setting is not found in case of non contextual menu items
+		    // since they are enabled also if no context is selected
+		    Optional<Setting> setting = findEventSetting(configuration, eventItem);
+
+		    gmih.onClick(event, container, configuration, setting, map);
+		});
+
+		// set the identifier according to its handler
+		gridMenuItem.setId(gmih.getIdentifier());
+
+		// adds an optional bottom divider
+		if (gmih.withBottomDivider()) {
+
+		    menu.add(new Hr());
+		}
+	    });
 	}
 
 	//
@@ -317,6 +358,30 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	this.dataProvider.getItems().remove(items);
 
 	this.dataProvider.refreshAll();
+    }
+
+    /**
+     * @return
+     */
+    private HashMap<String, Boolean> createSelectionMap() {
+
+	HashMap<String, Boolean> map = new HashMap<>();
+	CHECKS.forEach(check -> map.put(check.getId().get(), check.getValue()));
+
+	return map;
+    }
+
+    /**
+     * @param configuration
+     * @param eventItem
+     * @return
+     */
+    private Optional<Setting> findEventSetting(Configuration configuration, Optional<HashMap<String, String>> eventItem) {
+
+	return configuration.list().//
+		stream().//
+		filter(s -> eventItem.isPresent() && s.getIdentifier().equals(eventItem.get().get("identifier"))).//
+		findFirst();
     }
 
     /**

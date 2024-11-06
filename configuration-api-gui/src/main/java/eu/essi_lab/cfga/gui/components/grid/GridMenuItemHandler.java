@@ -22,6 +22,8 @@ package eu.essi_lab.cfga.gui.components.grid;
  */
 
 import java.util.HashMap;
+import java.util.Optional;
+import java.util.UUID;
 
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu.GridContextMenuItemClickEvent;
 
@@ -32,21 +34,26 @@ import eu.essi_lab.cfga.setting.Setting;
 /**
  * @author Fabrizio
  */
-public abstract class ContextMenuItem {
+public abstract class GridMenuItemHandler {
 
     private boolean withTopDivider;
     private boolean withBottomDivider;
+    private String id;
 
     /**
      * 
      */
-    public ContextMenuItem() {
+    public GridMenuItemHandler() {
+
+	id = UUID.randomUUID().toString();
     }
 
     /**
      * @param withTopDivider
      */
-    public ContextMenuItem(boolean withTopDivider, boolean withBottomDivider) {
+    public GridMenuItemHandler(boolean withTopDivider, boolean withBottomDivider) {
+
+	this();
 
 	setTopDivider(withTopDivider);
 	setBottomDivider(withBottomDivider);
@@ -59,7 +66,7 @@ public abstract class ContextMenuItem {
 	    GridContextMenuItemClickEvent<HashMap<String, String>> event, //
 	    TabContainer tabContainer, //
 	    Configuration configuration, //
-	    Setting setting, //
+	    Optional<Setting> setting, //
 	    HashMap<String, Boolean> selected);
 
     /**
@@ -70,7 +77,28 @@ public abstract class ContextMenuItem {
     /**
      * @return
      */
-    protected boolean withBottomDivider() {
+    public boolean isEnabled(//
+	    HashMap<String, String> eventItem, //
+	    TabContainer tabContainer, //
+	    Configuration configuration, //
+	    Setting setting, //
+	    HashMap<String, Boolean> selection) {
+
+	return true;
+    }
+
+    /**
+     * @return
+     */
+    public boolean isContextual() {
+
+	return true;
+    }
+
+    /**
+     * @return
+     */
+    public boolean withBottomDivider() {
 
 	return withBottomDivider;
     }
@@ -78,7 +106,7 @@ public abstract class ContextMenuItem {
     /**
      * @param withBottomDivider
      */
-    protected void setBottomDivider(boolean withBottomDivider) {
+    public void setBottomDivider(boolean withBottomDivider) {
 
 	this.withBottomDivider = withBottomDivider;
     }
@@ -86,7 +114,7 @@ public abstract class ContextMenuItem {
     /**
      * @param withTopDivider
      */
-    protected void setTopDivider(boolean withTopDivider) {
+    public void setTopDivider(boolean withTopDivider) {
 
 	this.withTopDivider = withTopDivider;
     }
@@ -97,5 +125,13 @@ public abstract class ContextMenuItem {
     public boolean withTopDivider() {
 
 	return withTopDivider;
+    }
+
+    /**
+     * @return
+     */
+    final String getIdentifier() {
+
+	return id;
     }
 }

@@ -66,10 +66,10 @@ public class HarvestingStarter extends TaskStarter {
 	    GridContextMenuItemClickEvent<HashMap<String, String>> event, //
 	    TabContainer tabContainer, //
 	    Configuration configuration, //
-	    Setting setting, //
+	    Optional<Setting> setting, //
 	    HashMap<String, Boolean> selection) {
 
-	harvSetting = SettingUtils.downCast(setting, HarvestingSettingLoader.load().getClass());
+	harvSetting = SettingUtils.downCast(setting.get(), HarvestingSettingLoader.load().getClass());
 
 	super.onClick(event, tabContainer, configuration, setting, selection);
     }

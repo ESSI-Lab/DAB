@@ -26,6 +26,7 @@ package eu.essi_lab.cfga.gui.components.grid.menuitem;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.vaadin.flow.component.Unit;
@@ -34,21 +35,19 @@ import com.vaadin.flow.component.textfield.TextArea;
 
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gui.components.TabContainer;
-import eu.essi_lab.cfga.gui.components.grid.ContextMenuItem;
+import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.dialog.ConfirmationDialog;
 import eu.essi_lab.cfga.setting.Setting;
 
 /**
  * @author Fabrizio
  */
-public class SettingsRemoveMenuItem extends ContextMenuItem {
-
-    private List<String> ids;
+public class SettingsRemoveItemHandler extends GridMenuItemHandler {
 
     /**
      * 
      */
-    public SettingsRemoveMenuItem() {
+    public SettingsRemoveItemHandler() {
 
     }
 
@@ -56,7 +55,7 @@ public class SettingsRemoveMenuItem extends ContextMenuItem {
      * @param withTopDivider
      * @param withBottomDivider
      */
-    public SettingsRemoveMenuItem(boolean withTopDivider, boolean withBottomDivider) {
+    public SettingsRemoveItemHandler(boolean withTopDivider, boolean withBottomDivider) {
 
 	super(withTopDivider, withBottomDivider);
     }
@@ -66,7 +65,7 @@ public class SettingsRemoveMenuItem extends ContextMenuItem {
 	    GridContextMenuItemClickEvent<HashMap<String, String>> event, //
 	    TabContainer tabContainer, //
 	    Configuration configuration, //
-	    Setting setting, //
+	    Optional<Setting> setting, //
 	    HashMap<String, Boolean> selection) {
 
 	String names = configuration.//
@@ -76,42 +75,19 @@ public class SettingsRemoveMenuItem extends ContextMenuItem {
 		map(s -> "- " + s.getName()).//
 		collect(Collectors.joining("\n"));
 
-	ids = configuration.//
-		list().//
-		stream().//
-		filter(s -> selection.containsKey(s.getIdentifier()) && selection.get(s.getIdentifier())).//
-		map(s -> s.getIdentifier()).//
-		collect(Collectors.toList());
-
 	ConfirmationDialog dialog = new ConfirmationDialog();
 	dialog.setTitle("Remove selected settings");
 	dialog.setHeight(500, Unit.PIXELS);
 	dialog.setWidth(600, Unit.PIXELS);
 
+	String text = "Are you sure you want to remove the following settings?\n\n";
+	text += names;
+
 	TextArea textArea = new TextArea();
-
-	String text = "No setting selected";
-
-	if (names.isEmpty()) {
-	    dialog.getConfirmButton().setVisible(false);
-	    dialog.setCancelText("Close");
-
-	    dialog.setHeight(200, Unit.PIXELS);
-
-	    textArea.setHeight(70, Unit.PIXELS);
-
-	} else {
-
-	    text = "Are you sure you want to remove the following settings?\n\n";
-	    text += names;
-
-	    textArea.setHeight(375, Unit.PIXELS);
-	}
-
+	textArea.setHeight(375, Unit.PIXELS);
 	textArea.setValue(text);
 	textArea.setWidth(580, Unit.PIXELS);
 	textArea.getStyle().set("font-size", "14px");
-
 	textArea.setReadOnly(true);
 
 	dialog.setContent(textArea);
@@ -121,6 +97,13 @@ public class SettingsRemoveMenuItem extends ContextMenuItem {
 	//
 	//
 
+	List<String> ids = configuration.//
+		list().//
+		stream().//
+		filter(s -> selection.containsKey(s.getIdentifier()) && selection.get(s.getIdentifier())).//
+		map(s -> s.getIdentifier()).//
+		collect(Collectors.toList());
+
 	dialog.setOnConfirmListener(e -> {
 
 	    ids.forEach(id -> {
@@ -128,6 +111,17 @@ public class SettingsRemoveMenuItem extends ContextMenuItem {
 		tabContainer.removeSettingComponent(null, id);
 	    });
 	});
+    }
+
+    @Override
+    public boolean isEnabled(//
+	    HashMap<String, String> eventItem, //
+	    TabContainer tabContainer, //
+	    Configuration configuration, //
+	    Setting setting, //
+	    HashMap<String, Boolean> selection) {
+
+	return selection.values().stream().anyMatch(v -> v == true);
     }
 
     @Override

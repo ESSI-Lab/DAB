@@ -36,7 +36,7 @@ import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.SchedulerSupport;
 import eu.essi_lab.cfga.gui.components.TabContainer;
-import eu.essi_lab.cfga.gui.components.grid.ContextMenuItem;
+import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.dialog.ConfirmationDialog;
 import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
@@ -48,12 +48,12 @@ import eu.essi_lab.messages.JobStatus.JobPhase;
 /**
  * @author Fabrizio
  */
-public class HarvestingStatsMenuItem extends ContextMenuItem {
+public class HarvestingStatsItemHandler extends GridMenuItemHandler {
 
     /**
      * 
      */
-    public HarvestingStatsMenuItem() {
+    public HarvestingStatsItemHandler() {
 
     }
 
@@ -61,7 +61,7 @@ public class HarvestingStatsMenuItem extends ContextMenuItem {
      * @param withTopDivider
      * @param withBottomDivider
      */
-    public HarvestingStatsMenuItem(boolean withTopDivider, boolean withBottomDivider) {
+    public HarvestingStatsItemHandler(boolean withTopDivider, boolean withBottomDivider) {
 
 	super(withTopDivider, withBottomDivider);
     }
@@ -71,7 +71,7 @@ public class HarvestingStatsMenuItem extends ContextMenuItem {
 	    GridContextMenuItemClickEvent<HashMap<String, String>> event, //
 	    TabContainer tabContainer, //
 	    Configuration configuration, //
-	    Setting setting, //
+	    Optional<Setting> setting, //
 	    HashMap<String, Boolean> selection) {
 
 	ConfirmationDialog dialog = new ConfirmationDialog();
@@ -145,6 +145,14 @@ public class HarvestingStatsMenuItem extends ContextMenuItem {
 
 	textArea.setValue(builder.toString());
 	dialog.open();
+    }
+
+    /**
+     * @return
+     */
+    public boolean isContextual() {
+
+	return false;
     }
 
     /**

@@ -30,19 +30,19 @@ import com.vaadin.flow.component.textfield.TextArea;
 
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gui.components.TabContainer;
-import eu.essi_lab.cfga.gui.components.grid.ContextMenuItem;
+import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.dialog.ConfirmationDialog;
 import eu.essi_lab.cfga.setting.Setting;
 
 /**
  * @author Fabrizio
  */
-public class HarvestingInfoMenuItem extends ContextMenuItem {
+public class HarvestingInfoItemHandler extends GridMenuItemHandler {
 
     /**
      * 
      */
-    public HarvestingInfoMenuItem() {
+    public HarvestingInfoItemHandler() {
 
     }
 
@@ -50,7 +50,7 @@ public class HarvestingInfoMenuItem extends ContextMenuItem {
      * @param withTopDivider
      * @param withBottomDivider
      */
-    public HarvestingInfoMenuItem(boolean withTopDivider, boolean withBottomDivider) {
+    public HarvestingInfoItemHandler(boolean withTopDivider, boolean withBottomDivider) {
 
 	super(withTopDivider, withBottomDivider);
     }
@@ -60,7 +60,7 @@ public class HarvestingInfoMenuItem extends ContextMenuItem {
 	    GridContextMenuItemClickEvent<HashMap<String, String>> event, //
 	    TabContainer tabContainer, //
 	    Configuration configuration, //
-	    Setting setting, //
+	    Optional<Setting> setting, //
 	    HashMap<String, Boolean> selection) {
 
 	Optional<HashMap<String, String>> item = event.getItem();
@@ -84,6 +84,17 @@ public class HarvestingInfoMenuItem extends ContextMenuItem {
 
 	dialog.setContent(textArea);
 	dialog.open();
+    }
+
+    @Override
+    public boolean isEnabled(//
+	    HashMap<String, String> eventItem, //
+	    TabContainer tabContainer, //
+	    Configuration configuration, //
+	    Setting setting, //
+	    HashMap<String, Boolean> selection) {
+
+	return eventItem.get("Info") != null && !eventItem.get("Info").isEmpty();
     }
 
     @Override
