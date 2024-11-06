@@ -25,8 +25,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import javax.mail.MessagingException;
-
 import eu.essi_lab.cfga.gs.setting.EmailSetting;
 import eu.essi_lab.lib.net.smtp.GmailClient;
 import eu.essi_lab.lib.utils.GSLoggerFactory;

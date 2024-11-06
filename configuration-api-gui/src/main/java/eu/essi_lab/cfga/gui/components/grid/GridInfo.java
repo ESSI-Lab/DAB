@@ -38,7 +38,7 @@ public class GridInfo {
 
     private List<ColumnDescriptor> descriptors;
 
-    private List<ContextMenuItem> items;
+    private List<GridMenuItemHandler> handlers;
 
     /**
      * 
@@ -49,7 +49,7 @@ public class GridInfo {
 
 	descriptors = new ArrayList<>();
 
-	items = new ArrayList<>();
+	handlers = new ArrayList<>();
     }
 
     /**
@@ -69,19 +69,19 @@ public class GridInfo {
     }
 
     /**
-     * @param item
+     * @param handler
      */
-    public void addContextMenuItem(ContextMenuItem item) {
+    public void addGridMenuItemHandler(GridMenuItemHandler handler) {
 
-	items.add(item);
+	handlers.add(handler);
     }
 
     /**
-     * @return the formatter
+     * @return 
      */
-    public List<ContextMenuItem> getContextMenuItems() {
+    public List<GridMenuItemHandler> getGridMenuItemHandlers() {
 
-	return items;
+	return handlers;
     }
 
     /**

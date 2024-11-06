@@ -1,4 +1,4 @@
-package eu.essi_lab.cfga.gs.setting.menuitems;
+package eu.essi_lab.cfga.gs.setting.harvesting.menuitems;
 
 /*-
  * #%L
@@ -28,23 +28,47 @@ import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu.GridContextMenuItemClickEvent;
 import com.vaadin.flow.component.textfield.TextArea;
 
-import eu.essi_lab.cfga.gui.components.grid.ContextMenuItem;
+import eu.essi_lab.cfga.Configuration;
+import eu.essi_lab.cfga.gui.components.TabContainer;
+import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.dialog.ConfirmationDialog;
+import eu.essi_lab.cfga.setting.Setting;
 
 /**
  * @author Fabrizio
  */
-public class SettingsInfoMenuItem implements ContextMenuItem {
+public class HarvestingInfoItemHandler extends GridMenuItemHandler {
+
+    /**
+     * 
+     */
+    public HarvestingInfoItemHandler() {
+
+    }
+
+    /**
+     * @param withTopDivider
+     * @param withBottomDivider
+     */
+    public HarvestingInfoItemHandler(boolean withTopDivider, boolean withBottomDivider) {
+
+	super(withTopDivider, withBottomDivider);
+    }
 
     @Override
-    public void onClick(GridContextMenuItemClickEvent<HashMap<String, String>> event, HashMap<String, Boolean> selected) {
+    public void onClick(//
+	    GridContextMenuItemClickEvent<HashMap<String, String>> event, //
+	    TabContainer tabContainer, //
+	    Configuration configuration, //
+	    Optional<Setting> setting, //
+	    HashMap<String, Boolean> selection) {
 
 	Optional<HashMap<String, String>> item = event.getItem();
 
 	String values = formatRowValues(item);
 
 	ConfirmationDialog dialog = new ConfirmationDialog();
-	dialog.setTitle("Show setting info");
+	dialog.setTitle("Harvesting info");
 	dialog.setHeight(500, Unit.PIXELS);
 	dialog.setWidth(600, Unit.PIXELS);
 	dialog.getConfirmButton().setVisible(false);
@@ -60,13 +84,23 @@ public class SettingsInfoMenuItem implements ContextMenuItem {
 
 	dialog.setContent(textArea);
 	dialog.open();
+    }
 
+    @Override
+    public boolean isEnabled(//
+	    HashMap<String, String> eventItem, //
+	    TabContainer tabContainer, //
+	    Configuration configuration, //
+	    Setting setting, //
+	    HashMap<String, Boolean> selection) {
+
+	return eventItem.get("Info") != null && !eventItem.get("Info").isEmpty();
     }
 
     @Override
     public String getItemText() {
 
-	return "Show setting info";
+	return "Harvesting info";
     }
 
     /**

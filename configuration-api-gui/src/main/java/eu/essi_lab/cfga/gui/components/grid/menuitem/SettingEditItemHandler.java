@@ -1,4 +1,4 @@
-package eu.essi_lab.cfga.gs.setting.harvesting.menuitems;
+package eu.essi_lab.cfga.gui.components.grid.menuitem;
 
 /*-
  * #%L
@@ -26,30 +26,42 @@ import java.util.Optional;
 
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu.GridContextMenuItemClickEvent;
 
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
-import eu.essi_lab.cfga.gui.components.grid.ContextMenuItem;
+import eu.essi_lab.cfga.Configuration;
+import eu.essi_lab.cfga.gui.components.TabContainer;
+import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.components.setting.edit_put.SettingEditDialog;
+import eu.essi_lab.cfga.setting.Setting;
 
 /**
  * @author Fabrizio
  */
-public class HarvestingSettingEditorMenuItem implements ContextMenuItem {
+public class SettingEditItemHandler extends GridMenuItemHandler {
+
+    /**
+     * 
+     */
+    public SettingEditItemHandler() {
+
+    }
+
+    /**
+     * @param withTopDivider
+     * @param withBottomDivider
+     */
+    public SettingEditItemHandler(boolean withTopDivider, boolean withBottomDivider) {
+
+	super(withTopDivider, withBottomDivider);
+    }
 
     @Override
-    public void onClick(GridContextMenuItemClickEvent<HashMap<String, String>> event, HashMap<String, Boolean> selected) {
+    public void onClick(//
+	    GridContextMenuItemClickEvent<HashMap<String, String>> event, //
+	    TabContainer tabContainer, //
+	    Configuration configuration, //
+	    Optional<Setting> setting, //
+	    HashMap<String, Boolean> selection) {
 
-	Optional<HashMap<String, String>> item = event.getItem();
-
-	String settingId = item.get().get("identifier");
-
-	HarvestingSetting setting = ConfigurationWrapper.getHarvestingSettings().//
-		stream().//
-		filter(s -> s.getIdentifier().equals(settingId)).//		
-		findFirst().//
-		get();
-
-	new SettingEditDialog(ConfigurationWrapper.getConfiguration().get(), setting).open();
+	new SettingEditDialog(configuration, setting.get(), null, tabContainer).open();
     }
 
     @Override

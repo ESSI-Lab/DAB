@@ -42,9 +42,9 @@ import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.TabIndex;
 import eu.essi_lab.cfga.gs.setting.augmenter.AugmenterSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.SchedulerSupport;
-import eu.essi_lab.cfga.gs.setting.menuitems.SettingsInfoMenuItem;
+import eu.essi_lab.cfga.gs.setting.harvesting.menuitems.HarvestingInfoItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
-import eu.essi_lab.cfga.gui.components.grid.ContextMenuItem;
+import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
@@ -295,10 +295,10 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 	/**
 	 * @return
 	 */
-	private List<ContextMenuItem> getItemsList() {
+	private List<GridMenuItemHandler> getItemsList() {
 
-	    ArrayList<ContextMenuItem> list = new ArrayList<>();
-	    list.add(new SettingsInfoMenuItem());
+	    ArrayList<GridMenuItemHandler> list = new ArrayList<>();
+	    list.add(new HarvestingInfoItemHandler());
 
 	    return list;
 	}

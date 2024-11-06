@@ -26,8 +26,12 @@ import java.util.Optional;
 
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu.GridContextMenuItemClickEvent;
 
+import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.TaskStarter;
+import eu.essi_lab.cfga.gui.components.TabContainer;
+import eu.essi_lab.cfga.setting.Setting;
+import eu.essi_lab.cfga.setting.SettingUtils;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting;
 
 /**
@@ -39,16 +43,35 @@ public class HarvestingStarter extends TaskStarter {
     /**
      * 
      */
-    private String settingId;
+    private HarvestingSetting harvSetting;
+
+    /**
+     * 
+     */
+    public HarvestingStarter() {
+
+    }
+
+    /**
+     * @param withTopDivider
+     * @param withBottomDivider
+     */
+    public HarvestingStarter(boolean withTopDivider, boolean withBottomDivider) {
+
+	super(withTopDivider, withBottomDivider);
+    }
 
     @Override
-    public void onClick(GridContextMenuItemClickEvent<HashMap<String, String>> event, HashMap<String, Boolean> selected) {
+    public void onClick(//
+	    GridContextMenuItemClickEvent<HashMap<String, String>> event, //
+	    TabContainer tabContainer, //
+	    Configuration configuration, //
+	    Optional<Setting> setting, //
+	    HashMap<String, Boolean> selection) {
 
-	Optional<HashMap<String, String>> item = event.getItem();
+	harvSetting = SettingUtils.downCast(setting.get(), HarvestingSettingLoader.load().getClass());
 
-	settingId = item.get().get("Setting id");
-
-	super.onClick(event, selected);
+	super.onClick(event, tabContainer, configuration, setting, selection);
     }
 
     @Override
@@ -63,13 +86,7 @@ public class HarvestingStarter extends TaskStarter {
     @Override
     protected SchedulerWorkerSetting getSetting() {
 
-	HarvestingSetting setting = ConfigurationWrapper.getHarvestingSettings().//
-		stream().//
-		filter(s -> s.getIdentifier().equals(settingId)).//
-		findFirst().//
-		get();
-
-	return setting;
+	return harvSetting;
     }
 
     @Override

@@ -31,24 +31,48 @@ import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu.GridContextMenuItemClickEvent;
 import com.vaadin.flow.component.textfield.TextArea;
 
+import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.SchedulerSupport;
-import eu.essi_lab.cfga.gui.components.grid.ContextMenuItem;
+import eu.essi_lab.cfga.gui.components.TabContainer;
+import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.dialog.ConfirmationDialog;
 import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
+import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.JobStatus.JobPhase;
 
 /**
  * @author Fabrizio
  */
-public class HarvestingStatsProviderMenuItem implements ContextMenuItem {
+public class HarvestingStatsItemHandler extends GridMenuItemHandler {
+
+    /**
+     * 
+     */
+    public HarvestingStatsItemHandler() {
+
+    }
+
+    /**
+     * @param withTopDivider
+     * @param withBottomDivider
+     */
+    public HarvestingStatsItemHandler(boolean withTopDivider, boolean withBottomDivider) {
+
+	super(withTopDivider, withBottomDivider);
+    }
 
     @Override
-    public void onClick(GridContextMenuItemClickEvent<HashMap<String, String>> event, HashMap<String, Boolean> selected) {
+    public void onClick(//
+	    GridContextMenuItemClickEvent<HashMap<String, String>> event, //
+	    TabContainer tabContainer, //
+	    Configuration configuration, //
+	    Optional<Setting> setting, //
+	    HashMap<String, Boolean> selection) {
 
 	ConfirmationDialog dialog = new ConfirmationDialog();
 	dialog.setTitle("Harvesting statistics");
@@ -121,6 +145,14 @@ public class HarvestingStatsProviderMenuItem implements ContextMenuItem {
 
 	textArea.setValue(builder.toString());
 	dialog.open();
+    }
+
+    /**
+     * @return
+     */
+    public boolean isContextual() {
+
+	return false;
     }
 
     /**

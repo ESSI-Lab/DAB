@@ -21,7 +21,6 @@ package eu.essi_lab.cfga.gui.components.option;
  * #L%
  */
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 import com.vaadin.flow.component.textfield.TextArea;

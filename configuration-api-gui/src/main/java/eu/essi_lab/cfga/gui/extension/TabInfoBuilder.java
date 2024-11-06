@@ -26,7 +26,7 @@ import java.util.List;
 import com.vaadin.flow.data.provider.SortDirection;
 
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
-import eu.essi_lab.cfga.gui.components.grid.ContextMenuItem;
+import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.GridInfo;
 import eu.essi_lab.cfga.gui.extension.directive.AddDirective;
 import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
@@ -210,11 +210,11 @@ public class TabInfoBuilder {
      * @param items
      * @return
      */
-    public TabInfoBuilder withGridInfo(List<ColumnDescriptor> descriptors, List<ContextMenuItem> items) {
+    public TabInfoBuilder withGridInfo(List<ColumnDescriptor> descriptors, List<GridMenuItemHandler> items) {
 
 	GridInfo gridInfo = new GridInfo();
 	descriptors.forEach(d -> gridInfo.addColumnDescriptor(d));
-	items.forEach(i -> gridInfo.addContextMenuItem(i));
+	items.forEach(i -> gridInfo.addGridMenuItemHandler(i));
 
 	tabInfo.setGridInfo(gridInfo);
 
@@ -227,12 +227,12 @@ public class TabInfoBuilder {
      * @param items
      * @return
      */
-    public TabInfoBuilder withGridInfo(int pageSize, List<ColumnDescriptor> descriptors, List<ContextMenuItem> items) {
+    public TabInfoBuilder withGridInfo(int pageSize, List<ColumnDescriptor> descriptors, List<GridMenuItemHandler> items) {
 
 	GridInfo gridInfo = new GridInfo();
 	gridInfo.setPageSize(pageSize);
 	descriptors.forEach(d -> gridInfo.addColumnDescriptor(d));
-	items.forEach(i -> gridInfo.addContextMenuItem(i));
+	items.forEach(i -> gridInfo.addGridMenuItemHandler(i));
 
 	tabInfo.setGridInfo(gridInfo);
 

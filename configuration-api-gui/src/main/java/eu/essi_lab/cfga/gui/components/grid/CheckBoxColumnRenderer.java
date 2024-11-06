@@ -44,7 +44,14 @@ public class CheckBoxColumnRenderer extends ComponentRenderer<Checkbox, HashMap<
     private Checkbox checkbox;
 
     /**
-     * @param listener
+    * 
+    */
+    public CheckBoxColumnRenderer() {
+
+    }
+
+    /**
+     * @param consumer
      */
     public CheckBoxColumnRenderer(Consumer<HashMap<String, String>> consumer) {
 
@@ -55,18 +62,20 @@ public class CheckBoxColumnRenderer extends ComponentRenderer<Checkbox, HashMap<
 
 	checkbox = new Checkbox();
 	checkbox.setId(item.get("identifier"));
-	checkbox.addClickListener(event -> {
+	if (consumer != null) {
+	    checkbox.addClickListener(event -> {
 
-	    consumer.accept(item);
-	});
+		consumer.accept(item);
+	    });
+	}
 
 	Optional<Checkbox> checkFound = GridComponent.CHECKS.//
-	stream().//
-	filter(check -> check.getId().get().equals(item.get("identifier"))).//
-	findFirst();
- 	
-	if(checkFound.isEmpty()) {
-	    
+		stream().//
+		filter(check -> check.getId().get().equals(item.get("identifier"))).//
+		findFirst();
+
+	if (checkFound.isEmpty()) {
+
 	    GridComponent.CHECKS.add(checkbox);
 	}
 
