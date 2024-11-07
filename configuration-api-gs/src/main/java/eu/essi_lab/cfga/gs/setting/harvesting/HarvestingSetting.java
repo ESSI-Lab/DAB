@@ -271,9 +271,9 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 		list.add(new HarvestingStarter());
 	    }
 
-	    list.add(new SettingsRemoveItemHandler(true, false));
+	    list.add(new SettingsRemoveItemHandler(true, true));
 
-	    list.add(new HarvestingStatsItemHandler(true, false));
+	    list.add(new HarvestingStatsItemHandler());
 
 	    return list;
 	}

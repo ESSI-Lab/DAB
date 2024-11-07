@@ -48,6 +48,7 @@ import com.vaadin.flow.function.ValueProvider;
 
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.ConfigurationChangeListener.ConfigurationChangeEvent;
+import eu.essi_lab.cfga.gui.components.ComponentFactory;
 import eu.essi_lab.cfga.gui.components.SettingComponentFactory;
 import eu.essi_lab.cfga.gui.components.TabContainer;
 import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
@@ -172,7 +173,8 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 		// adds an optional top divider
 		if (gmih.withTopDivider()) {
 
-		    menu.add(new Hr());
+		    Hr hr = ComponentFactory.createHr();
+		    menu.add(hr);
 		}
 
 		// adds the item and set its id according to the related handler
@@ -195,7 +197,8 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 		// adds an optional bottom divider
 		if (gmih.withBottomDivider()) {
 
-		    menu.add(new Hr());
+		    Hr hr = ComponentFactory.createHr();
+		    menu.add(hr);
 		}
 	    });
 	}
