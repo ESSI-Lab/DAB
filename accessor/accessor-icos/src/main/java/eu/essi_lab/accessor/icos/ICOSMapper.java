@@ -126,7 +126,31 @@ public class ICOSMapper extends FileIdentifierMapper {
 		    String type = getString(geometryObj, "type");
 		    addCoordinates(longitudes, latitudes, elevations, coordArray, type);
 		} else {
-		    GSLoggerFactory.getLogger(getClass()).error("Missing BBOX for {}", identifier);
+		    JSONArray featuresArray = coverageGeoObject.optJSONArray("features");
+		    JSONArray tmp = new JSONArray();
+		    JSONArray tmpPolygon = new JSONArray();
+		    for(int k=0; k<featuresArray.length(); k++) {
+			JSONObject featureObj = featuresArray.getJSONObject(k);
+			geometryObj = featureObj.optJSONObject("geometry");
+			if (geometryObj != null) {
+			    JSONArray coordArray = geometryObj.optJSONArray("coordinates");
+			    String type = getString(geometryObj, "type");
+			    if (type != null && type.equals("Polygon")) {
+				tmpPolygon.put(coordArray);
+				break;
+			    } else if (type != null && type.equals("Point")) {
+				Object one = coordArray.get(0);
+				Object two = coordArray.get(0);
+				tmp.put(coordArray);
+			    }
+			    
+			}
+		    }
+		    if(tmpPolygon.isEmpty()) {
+			addCoordinates(longitudes, latitudes, elevations, tmp, "Multi-Point");
+		    }else {
+			addCoordinates(longitudes, latitudes, elevations, tmpPolygon.getJSONArray(0), "Polygon");
+		    }
 		}
 	    } catch (Exception e) {
 		e.printStackTrace();
@@ -558,6 +582,13 @@ public class ICOSMapper extends FileIdentifierMapper {
 	    tmp.put(array);
 	    array = tmp;
 	}
+	if (type != null && type.equals("Multi-Point")) {
+	    JSONArray tmp = new JSONArray();
+	    tmp.put(array);
+	    array = tmp;
+	    array = array.getJSONArray(0);
+	}
+	
 	for (int i = 0; i < array.length(); i++) {
 	    JSONArray coords = array.getJSONArray(i);
 	    longitudes.add(coords.getBigDecimal(0));
