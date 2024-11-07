@@ -30,6 +30,7 @@ import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.details.Details.OpenedChangeEvent;
 import com.vaadin.flow.component.details.DetailsVariant;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -53,7 +54,7 @@ public class ComponentFactory {
 
 	return layout;
     }
-    
+
     /**
      * @param id
      * @return
@@ -309,4 +310,25 @@ public class ComponentFactory {
 	return div;
     }
 
+    /**
+     * @param defaultColor
+     * @return
+     */
+    public static Hr createHr(boolean defaultColor) {
+
+	Hr hr = new Hr();
+	if (!defaultColor) {
+	    hr.getStyle().set("background", "lightgray");
+	}
+
+	return hr;
+    }
+
+    /**
+     * @return
+     */
+    public static Hr createHr() {
+
+	return createHr(false);
+    }
 }
