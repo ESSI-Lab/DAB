@@ -492,32 +492,32 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 	worldCerealMap.setCropTypes(cropList);
 	worldCerealMap.setQuantityTypes(quantityList);
 
-	if (confidenceCropType != null && !confidenceCropType.isNaN()) {
-	    worldCerealMap.setCropTypeConfidence(confidenceCropType);
-
-	    addReportQuality(dataQuality, "cropConfidence", confidenceCropType);
-	    // Keywords kwd = new Keywords();
-	    // kwd.setTypeCode("cropConfidence");
-	    // kwd.addKeyword(String.valueOf(confidenceCropType));
-	    // miMetadata.getDataIdentification().addKeywords(kwd);
-
-	}
-	if (confidenceIrrType != null && !confidenceIrrType.isNaN()) {
-	    worldCerealMap.setIrrigationTypeConfidence(confidenceIrrType);
-	    addReportQuality(dataQuality, "irrigationConfidence", confidenceIrrType);
-	    // Keywords kwd = new Keywords();
-	    // kwd.setTypeCode("irrigationConfidence");
-	    // kwd.addKeyword(String.valueOf(confidenceIrrType));
-	    // miMetadata.getDataIdentification().addKeywords(kwd);
-	}
-	if (confidenceLcType != null && !confidenceLcType.isNaN()) {
-	    worldCerealMap.setLcTypeConfidence(confidenceLcType);
-	    addReportQuality(dataQuality, "landCoverConfidence", confidenceLcType);
-	    // Keywords kwd = new Keywords();
-	    // kwd.setTypeCode("landCoverConfidence");
-	    // kwd.addKeyword(String.valueOf(confidenceLcType));
-	    // miMetadata.getDataIdentification().addKeywords(kwd);
-	}
+//	if (confidenceCropType != null && !confidenceCropType.isNaN()) {
+//	    worldCerealMap.setCropTypeConfidence(confidenceCropType);
+//
+//	    addReportQuality(dataQuality, "cropConfidence", confidenceCropType);
+//	    // Keywords kwd = new Keywords();
+//	    // kwd.setTypeCode("cropConfidence");
+//	    // kwd.addKeyword(String.valueOf(confidenceCropType));
+//	    // miMetadata.getDataIdentification().addKeywords(kwd);
+//
+//	}
+//	if (confidenceIrrType != null && !confidenceIrrType.isNaN()) {
+//	    worldCerealMap.setIrrigationTypeConfidence(confidenceIrrType);
+//	    addReportQuality(dataQuality, "irrigationConfidence", confidenceIrrType);
+//	    // Keywords kwd = new Keywords();
+//	    // kwd.setTypeCode("irrigationConfidence");
+//	    // kwd.addKeyword(String.valueOf(confidenceIrrType));
+//	    // miMetadata.getDataIdentification().addKeywords(kwd);
+//	}
+//	if (confidenceLcType != null && !confidenceLcType.isNaN()) {
+//	    worldCerealMap.setLcTypeConfidence(confidenceLcType);
+//	    addReportQuality(dataQuality, "landCoverConfidence", confidenceLcType);
+//	    // Keywords kwd = new Keywords();
+//	    // kwd.setTypeCode("landCoverConfidence");
+//	    // kwd.addKeyword(String.valueOf(confidenceLcType));
+//	    // miMetadata.getDataIdentification().addKeywords(kwd);
+//	}
 
 	for (String s : keywords) {
 	    Keywords kwd = new Keywords();
