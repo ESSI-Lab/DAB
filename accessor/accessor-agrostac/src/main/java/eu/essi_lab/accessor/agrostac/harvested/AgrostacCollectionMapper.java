@@ -556,7 +556,12 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 	    Optional<String> datasetCodeOpt = readString(json, DATASET_CODE);
 	    if (datasetCodeOpt.isPresent()) {
 		String datasetCode = datasetCodeOpt.get();
-		uuid = UUID.nameUUIDFromBytes(datasetCode.getBytes()).toString();
+		String t = miMetadata.getDataIdentification().getCitationTitle();
+		String toHash = datasetCode;
+		if(t!= null) {
+		    toHash += t;
+		}
+		uuid = UUID.nameUUIDFromBytes(toHash.getBytes()).toString();
 		miMetadata.setFileIdentifier(uuid);
 	    }
 	}
