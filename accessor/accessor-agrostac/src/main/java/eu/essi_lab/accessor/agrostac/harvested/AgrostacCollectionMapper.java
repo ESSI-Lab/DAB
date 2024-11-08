@@ -93,22 +93,6 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 
     private static final String RESOURCE_ID_KEY = "id";
 
-    private static final String FEATURE_COUNT = "featureCount";
-    private static final String TYPE = "type"; // polygon
-    private static final String ACCESS_TYPE = "accessType";
-
-    private static final String OBSERVATION_METHOD = "typeOfObservationMethod";
-    private static final String CONFIDENCE_LAND_COVER = "confidenceLandCover";
-    private static final String CONFIDENCE_CROP_TYPE = "confidenceCropType";
-    private static final String CONFIDENCE_IRRIGATION_TYPE = "confidenceIrrigationType";
-
-    private static final String LAND_COVERS = "landCovers";
-    private static final String CROP_TYPES = "cropTypes";
-    private static final String IRRIGATION_TYPES = "irrTypes";
-    private static final String EWOC_CODES = "ewocCodes";
-    private static final String EXTENT = "extent";
-    private static final String TEMPORAL = "temporal";
-    private static final String SPATIAL = "spatial";
 
     // DATASET INFO
     private static final String LICENSE = "license";
@@ -155,18 +139,6 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
     private static final String maxLat = "max_latitudedd";
     private static final String maxLon = "max_longitudedd";
 
-    private static final String BBOX = "bbox";
-    private static final String CRS = "crs";
-    private static final String LAST_MODIFICATION_TIME = "lastModificationTime";
-    private static final String LAST_MODIFIER_ID = "lastModifierId";
-    private static final String CREATION_TIME = "creationTime";
-    private static final String CREATOR_ID = "creatorId";
-
-    private static final String ADDITIONAL_DATA = "additionalData";
-
-    private static final String BACKGROUND_INFO_URL = "https://ewoc-rdm-ui.iiasa.ac.at/details/WorldCereal_crop_legend_ui_v2_20240709.pdf";
-
-    private static final int THRESOLD = 10000;
 
     // private static final String LICENSE = "license";
     // private static final String ABSTRACT_KEY = "description";
@@ -177,8 +149,6 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
     // private static final String SUMMARIES = "summaries";
     // private static final String ASSETS = "assets";
 
-    private static final String CONTACT_ROLE = "role";
-    private static final String CONTACT_NAME = "name";
 
     public static int COLLECTIONS_WITH_GRANULES_COUNT = 0;
 
@@ -365,7 +335,7 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 	miMetadata.setHierarchyLevelName("dataset");
 	miMetadata.addHierarchyLevelScopeCodeListValue("dataset");
 
-	List<JSONObject> collectionMetadataList = null;
+	
 
 	//
 	// data quality
@@ -398,26 +368,9 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 	    baseAccessURL = AgrostacConnector.BASE_URL + "collections/" + datasetId + "/items";
 	}
 
-	String name = null;
-	String value = null;
-	String providerCode = null;
-	String datasetDescription = null;
-	String providerURL = null;
-	String nameContact = null;
+
 	String nameDataset = null;
-	String doi = null;
-	String license = null;
-	String requiredCitation = null;
 	String licenseUrl = null;
-	String objective = null;
-	String infoDesign = null;
-	String datasetDescription2 = null;
-	String geoParquetUrl = null;
-	String geoParquetUrl2 = null;
-	String pdfUrl = null;
-	List<String> lcTypes = new ArrayList<String>();
-	List<String> cTypes = new ArrayList<String>();
-	List<String> irrTypes = new ArrayList<String>();
 
 	// if (json != null && !json.isEmpty()) {
 	// readString(json, TITLE);
@@ -436,8 +389,6 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 	String queryables = "";
 
 	boolean cropQueryable = false;
-	boolean landCoverQueryable = false;
-	boolean irrigationQueryable = false;
 	boolean quantityQueryable = false;
 	// JSONArray ewocCodes = json.optJSONArray(EWOC_CODES);
 	List<WorldCerealItem> cropList = new ArrayList<WorldCerealItem>();
