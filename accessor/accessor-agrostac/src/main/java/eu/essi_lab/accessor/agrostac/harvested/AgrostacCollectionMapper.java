@@ -122,6 +122,20 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
     private static final String ORG_ADDRESS = "organization_web_address";
     //
 
+    // QUANTITY_COUNT
+    private static final String CANOPY_HEIGHT_M_COUNT = "canopy_height_m_count"; // CANOPY_HEIGHT_M
+    private static final String LAIG_COUNT = "laig_count"; // LAIG
+    private static final String CROP_DEV_BBCH_COUNT = "crop_dev_bbch_count"; // CROP_DEV_BBCH
+    private static final String LAIT_COUNT = "lait_count"; // LAIT
+    private static final String CUL_NAME_COUNT = "cul_name_count"; // CUL_NAME
+    private static final String PLANT_DENSITY_CNT_M2_COUNT = "plant_density_cnt_m2_count"; // PLANT_DENSITY_CNT_M2
+    private static final String SO_DWT_KGHA_COUNT = "so_dwt_kgha_count"; // SO_DWT_KGHA
+    private static final String TOPS_DWT_KGHA_COUNT = "tops_dwt_kgha_count"; // TOPS_DWT_KGHA
+    private static final String SO_FWT_KGHA_COUNT = "so_fwt_kgha_count"; // SO_FWT_KGHA
+    private static final String TOPS_FWT_KGHA_COUNT = "tops_fwt_kgha_count"; // TOPS_FWT_KGHA
+    private static final String CUL_NOTES_COUNT = "cul_notes_count"; // CUL_NOTES
+    private static final String SO_MOISTURE_FWT_FR_COUNT = "so_moisture_fwt_fr_count"; // SO_MOISTURE_FWT_FR
+
     // OVERVIEW INFO
     private static final String CROPS = "Crops";
     private static final String CROP_CODE = "crop_code";
@@ -215,9 +229,54 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 	    }
 	    return null;
 	}
-	
+
 	public static CROP_CODES fromCode(String code) {
 	    for (CROP_CODES c : values()) {
+		if (code.equals(c.getCode())) {
+		    return c;
+		}
+	    }
+	    return null;
+	}
+
+    }
+
+    public enum QUANTITY_CODES {
+
+	CANOPY_HEIGHT_M("CANOPY_HEIGHT_M", CANOPY_HEIGHT_M_COUNT), LAIG("LAIG", LAIG_COUNT), CROP_DEV_BBCH("CROP_DEV_BBCH",
+		CROP_DEV_BBCH_COUNT), LAIT("LAIT", LAIT_COUNT), CUL_NAME("CUL_NAME", CUL_NAME_COUNT), PLANT_DENSITY_CNT_M2(
+			"PLANT_DENSITY_CNT_M2", PLANT_DENSITY_CNT_M2_COUNT), SO_DWT_KGHA("SO_DWT_KGHA", SO_DWT_KGHA_COUNT), TOPS_DWT_KGHA(
+				"TOPS_DWT_KGHA", TOPS_DWT_KGHA_COUNT), SO_FWT_KGHA("SO_FWT_KGHA", SO_FWT_KGHA_COUNT), TOPS_FWT_KGHA(
+					"TOPS_FWT_KGHA", TOPS_FWT_KGHA_COUNT), CUL_NOTES("CUL_NOTES", CUL_NOTES_COUNT), SO_MOISTURE_FWT_FR(
+						"SO_MOISTURE_FWT_FR", SO_MOISTURE_FWT_FR_COUNT), CROP_CODE("CROP_CODE", "CROP_CODE");
+
+	private String name;
+	private String code;
+
+	QUANTITY_CODES(String name, String code) {
+	    this.name = name;
+	    this.code = code;
+	}
+
+	public String getName() {
+	    return name;
+	}
+
+	public String getCode() {
+	    return code;
+	}
+
+	public static QUANTITY_CODES decode(String code) {
+	    for (QUANTITY_CODES c : values()) {
+		if (code.equals(c.name())) {
+		    return c;
+		}
+	    }
+	    return null;
+	}
+
+	public static QUANTITY_CODES fromCode(String code) {
+	    for (QUANTITY_CODES c : values()) {
 		if (code.equals(c.getCode())) {
 		    return c;
 		}
@@ -426,13 +485,20 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 		    for (Map.Entry<String, String> entry : quantityMap.entrySet()) {
 			String quantityCode = entry.getKey();
 			if (!quantitySet.contains(quantityCode)) {
-			    quantitySet.add(quantityCode);
-			    String quantityDescription = entry.getValue();
-			    keywords.add(quantityDescription);
-			    WorldCerealItem quantityItem = new WorldCerealItem();
-			    quantityItem.setLabel(quantityDescription);
-			    quantityItem.setCode(quantityCode);
-			    quantityList.add(quantityItem);
+			    // check if quantityCount > 0
+			    QUANTITY_CODES qCode = QUANTITY_CODES.decode(quantityCode);
+			    if (qCode != null && !qCode.equals(QUANTITY_CODES.CROP_CODE)) {
+				int countQCode = overviewObj.optInt(qCode.getCode());
+				if (countQCode > 0) {
+				    quantitySet.add(quantityCode);
+				    String quantityDescription = entry.getValue();
+				    keywords.add(quantityDescription);
+				    WorldCerealItem quantityItem = new WorldCerealItem();
+				    quantityItem.setLabel(quantityDescription);
+				    quantityItem.setCode(quantityCode);
+				    quantityList.add(quantityItem);
+				}
+			    }
 			} else {
 			    logger.info("QUANTITY ALREADY ADDED!!!");
 			}
@@ -633,7 +699,7 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 	    online.setLinkage(wikiUrl.get());
 	    online.setProtocol(NetProtocols.HTTP.getCommonURN());
 	    online.setFunctionCode("information");
-	    online.setDescription("WIKI URL");
+	    online.setDescription("Data curation URL");
 
 	    miMetadata.getDistribution().addDistributionOnline(online);
 	}
