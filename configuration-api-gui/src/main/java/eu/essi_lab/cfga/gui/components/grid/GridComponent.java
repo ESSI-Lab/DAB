@@ -27,11 +27,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.Unit;
-import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
@@ -47,7 +47,6 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.function.ValueProvider;
 
 import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.ConfigurationChangeListener.ConfigurationChangeEvent;
 import eu.essi_lab.cfga.gui.components.ComponentFactory;
 import eu.essi_lab.cfga.gui.components.SettingComponentFactory;
 import eu.essi_lab.cfga.gui.components.TabContainer;
@@ -64,7 +63,6 @@ public class GridComponent extends Grid<HashMap<String, String>> {
     private HeaderRow filterRow;
     private GridFilter gridFilter;
     private ListDataProvider<HashMap<String, String>> dataProvider;
-    static List<Checkbox> CHECKS;
 
     /**
      * @param gridInfo
@@ -82,25 +80,6 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	    TabContainer container, //
 	    boolean readOnly, //
 	    boolean refresh) {
-
-	CHECKS = new ArrayList<Checkbox>();
-
-	configuration.addChangeEventListener(event -> {
-
-	    // updates the checks list in case of settings removal
-	    if (event.getEventType() == ConfigurationChangeEvent.SETTING_REMOVED) {
-
-		String identifier = event.getSetting().get().getIdentifier();
-
-		Checkbox checkbox = CHECKS.//
-			stream().//
-			filter(c -> c.getId().get().equals(identifier)).//
-			findFirst().//
-			get();
-
-		CHECKS.remove(checkbox);
-	    }
-	});
 
 	//
 	//
@@ -229,7 +208,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	//
 	//
 
-	setSelectionMode(Grid.SelectionMode.NONE);
+	setSelectionMode(gridInfo.getSelectionMode());
 
 	//
 	// shows the setting component when the user clicks on a row
@@ -362,14 +341,52 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 	this.dataProvider.refreshAll();
     }
+    
+    /**
+     * 
+     * @param settingIdentifiers
+     */
+    public void removeSettingComponents(List<String> settingIdentifiers) {
+
+	HashMap<String, String> items = dataProvider.//
+		getItems().//
+		stream().//
+		filter(map -> settingIdentifiers.contains(map.get("identifier"))).//
+		findFirst().//
+		get();
+
+	this.dataProvider.getItems().remove(items);
+
+	this.dataProvider.refreshAll();
+    }
 
     /**
      * @return
      */
     private HashMap<String, Boolean> createSelectionMap() {
 
+	List<String> selIds = getSelectedItems().//
+		stream().//
+		map(item -> item.get("identifier")).//
+		collect(Collectors.toList());
+
+	Stream<HashMap<String, String>> items = getListDataView().getItems();
+
 	HashMap<String, Boolean> map = new HashMap<>();
-	CHECKS.forEach(check -> map.put(check.getId().get(), check.getValue()));
+
+	items.forEach(item -> {
+
+	    String identifier = item.get("identifier");
+
+	    if (selIds.contains(identifier)) {
+
+		map.put(identifier, true);
+
+	    } else {
+
+		map.put(identifier, false);
+	    }
+	});
 
 	return map;
     }
@@ -438,43 +455,27 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	//
 	//
 
-	if (descriptor.hasCheckBox()) {
+	TextField filterField = new TextField();
 
-	    Checkbox checkbox = new Checkbox();
+	filterField.addValueChangeListener(event -> {
 
-	    filterRow.getCell(column).setComponent(checkbox);
+	    gridFilter.filter(descriptor.getColumnName(), event.getValue());
 
-	    checkbox.addClickListener(event -> {
+	    dataProvider.refreshAll();
+	});
 
-		Boolean value = event.getSource().getValue();
+	filterField.setValueChangeMode(ValueChangeMode.EAGER);
 
-		GridComponent.CHECKS.forEach(c -> c.setValue(value));
-	    });
+	filterRow.getCell(column).setComponent(filterField);
 
-	} else {
+	filterField.setSizeFull();
+	filterField.setPlaceholder("Filter");
+	filterField.getElement().setAttribute("focus-target", "");
 
-	    TextField filterField = new TextField();
+	Optional<String> value = GridFilter.getValue(descriptor.getColumnName());
+	if (value.isPresent()) {
 
-	    filterField.addValueChangeListener(event -> {
-
-		gridFilter.filter(descriptor.getColumnName(), event.getValue());
-
-		dataProvider.refreshAll();
-	    });
-
-	    filterField.setValueChangeMode(ValueChangeMode.EAGER);
-
-	    filterRow.getCell(column).setComponent(filterField);
-
-	    filterField.setSizeFull();
-	    filterField.setPlaceholder("Filter");
-	    filterField.getElement().setAttribute("focus-target", "");
-
-	    Optional<String> value = GridFilter.getValue(descriptor.getColumnName());
-	    if (value.isPresent()) {
-
-		filterField.setValue(value.get());
-	    }
+	    filterField.setValue(value.get());
 	}
     }
 

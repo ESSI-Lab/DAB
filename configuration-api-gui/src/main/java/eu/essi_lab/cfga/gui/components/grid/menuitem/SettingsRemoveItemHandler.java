@@ -108,8 +108,9 @@ public class SettingsRemoveItemHandler extends GridMenuItemHandler {
 
 	    ids.forEach(id -> {
 		configuration.remove(id);
-		tabContainer.removeSettingComponent(null, id);
 	    });
+
+	    tabContainer.removeSettingComponents(ids);
 	});
     }
 

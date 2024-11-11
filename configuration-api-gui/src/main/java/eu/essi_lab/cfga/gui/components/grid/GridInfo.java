@@ -24,6 +24,9 @@ package eu.essi_lab.cfga.gui.components.grid;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.Grid.SelectionMode;
+
 /**
  * @author Fabrizio
  */
@@ -32,7 +35,7 @@ public class GridInfo {
     /**
      * 
      */
-    private static final int DEFAULT_PAGE_SIZE = 15;
+    public static final int DEFAULT_PAGE_SIZE = 15;
 
     private int pageSize;
 
@@ -40,16 +43,36 @@ public class GridInfo {
 
     private List<GridMenuItemHandler> handlers;
 
+    private Grid.SelectionMode selectionMode;
+
     /**
      * 
      */
     public GridInfo() {
 
 	setPageSize(DEFAULT_PAGE_SIZE);
+	
+	setSelectionMode(SelectionMode.NONE);
 
 	descriptors = new ArrayList<>();
 
 	handlers = new ArrayList<>();
+    }
+
+    /**
+     * @return
+     */
+    public Grid.SelectionMode getSelectionMode() {
+
+	return selectionMode;
+    }
+
+    /**
+     * @param selectionMode
+     */
+    public void setSelectionMode(Grid.SelectionMode selectionMode) {
+
+	this.selectionMode = selectionMode;
     }
 
     /**
@@ -77,7 +100,7 @@ public class GridInfo {
     }
 
     /**
-     * @return 
+     * @return
      */
     public List<GridMenuItemHandler> getGridMenuItemHandlers() {
 

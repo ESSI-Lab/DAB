@@ -203,8 +203,6 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 
 			    ColumnDescriptor.createPositionalDescriptor(), //
 
-//			    ColumnDescriptor.createCheckBoxDescriptor("Sel."), //
-
 			    ColumnDescriptor.create("Name", true, true, (s) -> s.getName()), //
 
 			    ColumnDescriptor.create("Type", 150, true, true, (s) -> getSelectedAccessorType(s)), //
@@ -246,7 +244,7 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 
 			    ColumnDescriptor.create("Info", true, true, false, (s) -> SchedulerSupport.getInstance().getAllMessages(s))//
 
-		    ), getItemsList()).//
+		    ), getItemsList(), com.vaadin.flow.component.grid.Grid.SelectionMode.MULTI).//
 
 		    reloadable(() -> SchedulerSupport.getInstance().update()).//
 

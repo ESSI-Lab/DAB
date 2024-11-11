@@ -32,6 +32,9 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 
 /**
+ * Not used
+ * 
+ * @deprecated
  * @author Fabrizio
  */
 public class CheckBoxColumnRenderer extends ComponentRenderer<Checkbox, HashMap<String, String>> {
@@ -62,21 +65,12 @@ public class CheckBoxColumnRenderer extends ComponentRenderer<Checkbox, HashMap<
 
 	checkbox = new Checkbox();
 	checkbox.setId(item.get("identifier"));
+
 	if (consumer != null) {
 	    checkbox.addClickListener(event -> {
 
 		consumer.accept(item);
 	    });
-	}
-
-	Optional<Checkbox> checkFound = GridComponent.CHECKS.//
-		stream().//
-		filter(check -> check.getId().get().equals(item.get("identifier"))).//
-		findFirst();
-
-	if (checkFound.isEmpty()) {
-
-	    GridComponent.CHECKS.add(checkbox);
 	}
 
 	return checkbox;

@@ -24,7 +24,6 @@ package eu.essi_lab.cfga.gui.components.grid;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.function.ValueProvider;
@@ -60,33 +59,6 @@ public class ColumnDescriptor {
     public static ColumnDescriptor createPositionalDescriptor() {
 
 	return create(POSITIONAL_COLUMN_NAME, 30, false, false, null); //
-    }
-
-    /**
-     * @return
-     */
-    public static ColumnDescriptor createCheckBoxDescriptor(String columnName) {
-
-	return createCheckBoxDescriptor(columnName, null);
-    }
-
-    /**
-     * @return
-     */
-    public static ColumnDescriptor createCheckBoxDescriptor(Consumer<HashMap<String, String>> consumer) {
-
-	return createCheckBoxDescriptor("", consumer);
-    }
-
-    /**
-     * @return
-     */
-    public static ColumnDescriptor createCheckBoxDescriptor(String columnName, Consumer<HashMap<String, String>> consumer) {
-
-	ColumnDescriptor descriptor = create(columnName, 45, false, false, null, null, new CheckBoxColumnRenderer(consumer)); //
-	descriptor.setHasCheckbox(true);
-
-	return descriptor;
     }
 
     /**

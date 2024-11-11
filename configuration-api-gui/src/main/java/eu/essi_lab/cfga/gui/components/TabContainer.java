@@ -89,7 +89,7 @@ public class TabContainer extends VerticalLayout {
 		headerLayout.add(reloadButton);
 	    }
 	}
-	
+
 	removeAllButHeader();
 
 	List<Setting> settings = view.retrieveTabSettings(tabInfo);
@@ -107,7 +107,7 @@ public class TabContainer extends VerticalLayout {
 	    expand(gridComponent);
 
 	} else {
-	   
+
 	    settings.stream().//
 
 		    map(set -> SettingComponentFactory.createSettingComponent(configuration, set.getIdentifier(), readOnly, this)).//
@@ -138,7 +138,7 @@ public class TabContainer extends VerticalLayout {
      * @param rendered
      */
     public void setRendered(boolean rendered) {
-	
+
 	this.rendered = rendered;
     }
 
@@ -245,6 +245,19 @@ public class TabContainer extends VerticalLayout {
 
 	    component.getStyle().set("display", "none");
 	    component = null;
+	}
+    }
+
+    /**
+     * Working only if a {@link #getGrid()} is present
+     * 
+     * @param settingIdentifiers
+     */
+    public void removeSettingComponents(List<String> settingIdentifiers) {
+
+	if (getGrid().isPresent()) {
+
+	    getGrid().get().removeSettingComponents(settingIdentifiers);
 	}
     }
 

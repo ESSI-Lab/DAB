@@ -1,5 +1,7 @@
 package eu.essi_lab.cfga.gui.extension;
 
+import java.util.ArrayList;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -23,6 +25,7 @@ package eu.essi_lab.cfga.gui.extension;
 
 import java.util.List;
 
+import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.data.provider.SortDirection;
 
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
@@ -177,16 +180,22 @@ public class TabInfoBuilder {
     }
 
     /**
+     * @param descriptors
      * @return
      */
     public TabInfoBuilder withGridInfo(List<ColumnDescriptor> descriptors) {
 
-	GridInfo gridInfo = new GridInfo();
-	descriptors.forEach(d -> gridInfo.addColumnDescriptor(d));
+	return withGridInfo(GridInfo.DEFAULT_PAGE_SIZE, descriptors, new ArrayList<>(), SelectionMode.NONE);
+    }
 
-	tabInfo.setGridInfo(gridInfo);
+    /**
+     * @param descriptors
+     * @param selectionMode
+     * @return
+     */
+    public TabInfoBuilder withGridInfo(List<ColumnDescriptor> descriptors, SelectionMode selectionMode) {
 
-	return this;
+	return withGridInfo(GridInfo.DEFAULT_PAGE_SIZE, descriptors, new ArrayList<>(), selectionMode);
     }
 
     /**
@@ -196,13 +205,18 @@ public class TabInfoBuilder {
      */
     public TabInfoBuilder withGridInfo(int pageSize, List<ColumnDescriptor> descriptors) {
 
-	GridInfo gridInfo = new GridInfo();
-	gridInfo.setPageSize(pageSize);
-	descriptors.forEach(d -> gridInfo.addColumnDescriptor(d));
+	return withGridInfo(pageSize, descriptors, new ArrayList<>(), SelectionMode.NONE);
+    }
 
-	tabInfo.setGridInfo(gridInfo);
+    /**
+     * @param pageSize
+     * @param descriptors
+     * @param selectionMode
+     * @return
+     */
+    public TabInfoBuilder withGridInfo(int pageSize, List<ColumnDescriptor> descriptors, SelectionMode selectionMode) {
 
-	return this;
+	return withGridInfo(pageSize, descriptors, new ArrayList<>(), selectionMode);
     }
 
     /**
@@ -212,13 +226,18 @@ public class TabInfoBuilder {
      */
     public TabInfoBuilder withGridInfo(List<ColumnDescriptor> descriptors, List<GridMenuItemHandler> items) {
 
-	GridInfo gridInfo = new GridInfo();
-	descriptors.forEach(d -> gridInfo.addColumnDescriptor(d));
-	items.forEach(i -> gridInfo.addGridMenuItemHandler(i));
+	return withGridInfo(GridInfo.DEFAULT_PAGE_SIZE, descriptors, items, SelectionMode.NONE);
+    }
 
-	tabInfo.setGridInfo(gridInfo);
+    /**
+     * @param descriptors
+     * @param items
+     * @param selectionMode
+     * @return
+     */
+    public TabInfoBuilder withGridInfo(List<ColumnDescriptor> descriptors, List<GridMenuItemHandler> items, SelectionMode selectionMode) {
 
-	return this;
+	return withGridInfo(GridInfo.DEFAULT_PAGE_SIZE, descriptors, items, selectionMode);
     }
 
     /**
@@ -229,8 +248,26 @@ public class TabInfoBuilder {
      */
     public TabInfoBuilder withGridInfo(int pageSize, List<ColumnDescriptor> descriptors, List<GridMenuItemHandler> items) {
 
+	return withGridInfo(pageSize, descriptors, items, SelectionMode.NONE);
+    }
+
+    /**
+     * @param pageSize
+     * @param descriptors
+     * @param items
+     * @param selectionMode
+     * @return
+     */
+    public TabInfoBuilder withGridInfo(//
+	    int pageSize, //
+	    List<ColumnDescriptor> descriptors, //
+	    List<GridMenuItemHandler> items, //
+	    SelectionMode selectionMode) {
+
 	GridInfo gridInfo = new GridInfo();
 	gridInfo.setPageSize(pageSize);
+	gridInfo.setSelectionMode(selectionMode);
+
 	descriptors.forEach(d -> gridInfo.addColumnDescriptor(d));
 	items.forEach(i -> gridInfo.addGridMenuItemHandler(i));
 
