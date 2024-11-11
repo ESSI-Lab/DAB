@@ -341,21 +341,22 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 	this.dataProvider.refreshAll();
     }
-    
+
     /**
-     * 
      * @param settingIdentifiers
      */
     public void removeSettingComponents(List<String> settingIdentifiers) {
 
-	HashMap<String, String> items = dataProvider.//
-		getItems().//
-		stream().//
-		filter(map -> settingIdentifiers.contains(map.get("identifier"))).//
-		findFirst().//
-		get();
+	List<HashMap<String, String>> list = settingIdentifiers.//
+		stream().map(id -> dataProvider.//
+			getItems().//
+			stream().//
+			filter(map -> map.get("identifier").equals(id)).//
+			findFirst().//
+			get())
+		.collect(Collectors.toList());
 
-	this.dataProvider.getItems().remove(items);
+	this.dataProvider.getItems().removeAll(list);
 
 	this.dataProvider.refreshAll();
     }
