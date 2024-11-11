@@ -605,21 +605,40 @@ public class Configuration {
     /**
      * Write method. If successfully invoked put the RW configuration in a {@link State#DIRTY} state.<br>
      * <br>
-     * In order to be removed, a {@link Setting} with the provided <code>settingId</code> must be already in
+     * In order to be removed, {@link Setting}s with the provided <code>settingIds</code> must be already in
      *
-     * @param settingId
+     * @param settingIds
+     * @param dispatchEvent
      */
-    private synchronized boolean remove(String settingId, boolean dispatchEvent) {
+    public synchronized boolean remove(List<String> settingIds) {
 
-	Optional<Setting> optional = get(settingId);
+	return remove(settingIds, true);
+    }
 
-	if (optional.isPresent()) {
+    /**
+     * Write method. If successfully invoked put the RW configuration in a {@link State#DIRTY} state.<br>
+     * <br>
+     * In order to be removed, {@link Setting}s with the provided <code>settingIds</code> must be already in
+     *
+     * @param settingIds
+     * @param dispatchEvent
+     */
+    public synchronized boolean remove(List<String> settingIds, boolean dispatchEvent) {
 
-	    this.list.remove(optional.get());
+	List<Setting> toRemove = settingIds.//
+		stream().//
+		map(id -> get(id)).//
+		filter(opt -> opt.isPresent()).//
+		map(opt -> opt.get()).//
+		collect(Collectors.toList());
+
+	if (!toRemove.isEmpty()) {
+
+	    this.list.removeAll(toRemove);
 	    this.dirty = true;
 
 	    if (dispatchEvent) {
-		dispatchEvent(optional.get(), ConfigurationChangeEvent.SETTING_REMOVED);
+		dispatchEvent(toRemove, ConfigurationChangeEvent.SETTING_REMOVED);
 	    }
 
 	    return true;
@@ -629,11 +648,39 @@ public class Configuration {
     }
 
     /**
+     * Write method. If successfully invoked put the RW configuration in a {@link State#DIRTY} state.<br>
+     * <br>
+     * In order to be removed, a {@link Setting} with the provided <code>settingId</code> must be already in
+     *
+     * @param settingId
+     */
+    public synchronized boolean remove(String settingId, boolean dispatchEvent) {
+
+	ArrayList<String> ids = new ArrayList<>();
+	ids.add(settingId);
+
+	return remove(ids, dispatchEvent);
+    }
+
+    /**
      * @param writable
      */
     void setWritable(boolean writable) {
 
 	this.writable = writable;
+    }
+
+    /**
+     * @param setting
+     * @param event
+     */
+    private void dispatchEvent(List<Setting> settings, int event) {
+
+	this.listenerList.forEach(l -> l.configurationChanged(//
+		new ConfigurationChangeEvent(//
+			this, //
+			settings, //
+			event)));
     }
 
     /**
@@ -654,7 +701,10 @@ public class Configuration {
      */
     private void dispatchEvent(int event) {
 
-	dispatchEvent(null, event);
+	this.listenerList.forEach(l -> l.configurationChanged(//
+		new ConfigurationChangeEvent(//
+			this, //
+			event)));
     }
 
 }
