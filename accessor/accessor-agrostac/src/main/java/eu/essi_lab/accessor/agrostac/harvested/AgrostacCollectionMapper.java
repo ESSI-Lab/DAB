@@ -101,6 +101,10 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
     private static final String COLLECTION_ID_KEY = "datasetid";
     private static final String ORG_NAME = "organization_name";
     private static final String TITLE = "title";
+    private static final String SUMMARY = "summary";
+    private static final String DATASET_ACCESS = "dataset_access";
+    private static final String START_DATE = "min_startdate";
+    private static final String END_DATE = "max_enddate";
     private static final String DATASET_CODE = "dataset_code";
     private static final String SOURCE_URL = "source_url";
     private static final String ORG_ADDRESS = "organization_web_address";
@@ -146,7 +150,7 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
     // private static final String PROPERTIES = "properties";
     // private static final String PROVIDERS = "providers";
     // private static final String KEYWORDS = "keywords";
-    // private static final String SUMMARIES = "summaries";
+   
     // private static final String ASSETS = "assets";
 
 
@@ -335,6 +339,12 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 	miMetadata.setHierarchyLevelName("dataset");
 	miMetadata.addHierarchyLevelScopeCodeListValue("dataset");
 
+	Optional<String> optDataAccess = readString(json, DATASET_ACCESS);
+	if(optDataAccess.isPresent()) {
+	    if(!optDataAccess.get().toLowerCase().equals("open"))
+		return null;
+	}
+	
 	
 
 	//
@@ -540,9 +550,9 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 	/**
 	 * ABSTRAKT
 	 */
-	if (nameDataset != null) {
-	    miMetadata.getDataIdentification().setAbstract(nameDataset);
-	}
+	
+	readString(json, SUMMARY).ifPresent(abstrakt -> miMetadata.getDataIdentification().setAbstract(abstrakt));
+
 
 	/**
 	 * ID
@@ -643,6 +653,22 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 	}
 
 	// addContactInfo(miMetadata, json.optJSONArray(PROVIDERS));
+	
+	/**
+	 * TEMPORAL EXTENT
+	 */
+	Optional<String> optStartDate = readString(json, START_DATE);
+	Optional<String> optEndDate = readString(json, END_DATE);
+	
+	if(optStartDate.isPresent() && optEndDate.isPresent()) {	
+	    
+	    TemporalExtent tempExtent = new TemporalExtent();
+	    tempExtent.setBeginPosition(optStartDate.get());
+	    tempExtent.setEndPosition(optEndDate.get());
+	    miMetadata.getDataIdentification().addTemporalExtent(tempExtent);	    	    
+	    
+	}
+	
 
 	/**
 	 * WIKI URL
