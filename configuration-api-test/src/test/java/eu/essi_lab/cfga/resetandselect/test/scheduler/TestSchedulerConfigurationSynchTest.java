@@ -24,19 +24,8 @@ import eu.essi_lab.cfga.source.FileSource;
 public class TestSchedulerConfigurationSynchTest {
 
     /**
-     * The tested configuration "synch-test-configuration-1.json" has an instance of {@link TestSetting1}
-     * with option 1, option 2 and option 3.<br>
-     * The selected values of {@link TestSetting1} options in the configurations are:
-     * <ul>
-     * <li>option 1 -> "No"</li>
-     * <li>option 2 -> "2"</li>
-     * <li>option 3 -> "C"</li>
-     * </ul>
-     * {@link TestSetting1}.java misses option 1, so the setting in the
-     * configuration is not valid according to the similarity test.<br>
-     * <br>
-     * In this test the configuration instance of {@link TestSetting1} is synchronized with {@link TestSetting1}.java,
-     * than it is replaced with the synch instance and the similarity test is redone with success.
+     * The tested configuration "synch-test-configuration-5.json" has an instance of {@link TestSchedulerSetting}
+     * without the test option.<br>
      * 
      * @throws Exception
      */
@@ -65,14 +54,15 @@ public class TestSchedulerConfigurationSynchTest {
 	Assert.assertEquals("TEST Scheduler", settings.get(0).getName());
 
 	//
-	// the serialized version has 1 option
+	// the serialized TestSchedulerSetting version has only 1 option (userDateTime) 
+	// while it should have 3 options
 	//
 
 	List<Option<?>> options = settings.get(0).getOptions();
 	Assert.assertEquals(1, options.size());
 
 	//
-	// synchronizes the configuration TestSetting1 instance with the current TestSetting1 setting class
+	// synchronizes the configuration TestSchedulerSetting instance with the current TestSchedulerSetting setting class
 	//
 
 	TestSchedulerSetting synchTestSetting = null;
@@ -87,11 +77,11 @@ public class TestSchedulerConfigurationSynchTest {
 	}
 
 	//
-	// the current version has 2 options
+	// the current version has 3 options
 	//
 
 	List<Option<?>> synchTestSettingOptions = synchTestSetting.getOptions();
-	Assert.assertEquals(2, synchTestSettingOptions.size());
+	Assert.assertEquals(3, synchTestSettingOptions.size());
 
 	//
 	// now replaces the invalid configuration setting with the synch one

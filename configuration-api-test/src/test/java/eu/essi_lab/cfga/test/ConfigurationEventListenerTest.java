@@ -30,15 +30,15 @@ public class ConfigurationEventListenerTest {
 
 		switch (event.getEventType()) {
 		case ConfigurationChangeEvent.SETTING_PUT:
-		    Assert.assertEquals("settingId", event.getSetting().get().getIdentifier());
+		    Assert.assertEquals("settingId", event.getSettings().get(0).getIdentifier());
 		    eventsCount++;
 		    break;
 		case ConfigurationChangeEvent.SETTING_REMOVED:
-		    Assert.assertEquals("settingId", event.getSetting().get().getIdentifier());
+		    Assert.assertEquals("settingId", event.getSettings().get(0).getIdentifier());
 		    eventsCount++;
 		    break;
 		case ConfigurationChangeEvent.SETTING_REPLACED:
-		    Assert.assertEquals("settingId", event.getSetting().get().getIdentifier());
+		    Assert.assertEquals("settingId", event.getSettings().get(0).getIdentifier());
 		    eventsCount++;
 		    break;
 		case ConfigurationChangeEvent.CONFIGURATION_CLEARED:
@@ -81,11 +81,11 @@ public class ConfigurationEventListenerTest {
 	//
 
 	configuration.flush();
-	
+
 	//
 	//
 	//
-	
+
 	Assert.assertEquals(5, eventsCount);
 
     }

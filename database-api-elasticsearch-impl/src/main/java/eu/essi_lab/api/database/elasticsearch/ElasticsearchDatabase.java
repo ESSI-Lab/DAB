@@ -48,7 +48,7 @@ public class ElasticsearchDatabase implements Database {
     @Override
     public String getType() {
 
-	return null;
+	return "";
     }
 
     @Override
