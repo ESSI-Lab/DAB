@@ -66,11 +66,24 @@ public class GWPPermissionPolicySet extends AbstractPermissionPolicySet {
 	    "https://geoss.uat.esaportal.eu", //
 	    "http://geoss.sit.esaportal.eu", //
 	    "http://geoss.devel.esaportal.eu", //
+	    
 	    "https://geoss.sit.esaportal.eu", //
 	    "https://geoss.devel.esaportal.eu",//
 	    "https://afrigeoss.eversis.com",//	    
 	    "https://gpp.devel.esaportal.eu",//
-	    "https://gpp.uat.esaportal.eu" 
+	    "https://gpp.uat.esaportal.eu",//
+	    	    
+            "http://gpp-data.devel.esaportal.eu",// 
+            "http://gpp-data.uat.esaportal.eu",// 
+            "http://gpp-data.sit.esaportal.eu",// 
+            "http://data.geoportal.org",// 
+            "http://data.geoportal.app",// 
+            
+            "https://gpp-data.devel.esaportal.eu",//  
+            "https://gpp-data.uat.esaportal.eu",//  
+            "https://gpp-data.sit.esaportal.eu",//  
+            "https://data.geoportal.org",//  
+            "https://data.geoportal.app" 
     };
 
     public GWPPermissionPolicySet() {
