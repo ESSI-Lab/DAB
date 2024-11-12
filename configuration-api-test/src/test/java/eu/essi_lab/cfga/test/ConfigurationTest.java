@@ -272,6 +272,49 @@ public class ConfigurationTest {
     }
 
     @Test
+    public void multiRemovalTest() {
+
+	Configuration configuration = new Configuration();
+
+	for (int i = 0; i < 5; i++) {
+
+	    Setting setting = new Setting();
+	    setting.setIdentifier("setting" + i);
+
+	    configuration.put(setting);
+	}
+
+	List<Setting> list = configuration.list();
+	Assert.assertEquals(5, list.size());
+
+	//
+	//
+	//
+
+	boolean removed = configuration.remove(Arrays.asList("settingX"));
+	Assert.assertFalse(removed);
+	Assert.assertEquals(5, list.size());
+
+	//
+	//
+	//
+
+	removed = configuration.remove(Arrays.asList("settingX", "setting0"));
+	Assert.assertTrue(removed);
+	list = configuration.list();
+	Assert.assertEquals(4, list.size());
+
+	//
+	//
+	//
+
+	removed = configuration.remove(Arrays.asList("setting1", "setting2", "setting3", "setting4"));
+	Assert.assertTrue(removed);
+	list = configuration.list();
+	Assert.assertEquals(0, list.size());
+    }
+
+    @Test
     public void dirtyFlagTest() throws Exception {
 
 	FileSource filesSource = new FileSource();

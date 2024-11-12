@@ -483,6 +483,66 @@ public class Configuration {
     }
 
     /**
+     * Write method. If successfully invoked put the RW configuration in a {@link State#DIRTY} state.<br>
+     * <br>
+     * In order to be removed, a {@link Setting} with the provided <code>settingId</code> must be already in
+     *
+     * @param settingId
+     * @param dispatchEvent
+     */
+    public synchronized boolean remove(String settingId, boolean dispatchEvent) {
+
+	ArrayList<String> ids = new ArrayList<>();
+	ids.add(settingId);
+
+	return remove(ids, dispatchEvent);
+    }
+
+    /**
+     * Write method. If successfully invoked put the RW configuration in a {@link State#DIRTY} state.<br>
+     * <br>
+     * In order to be removed, {@link Setting}s with the provided <code>settingIds</code> must be already in
+     *
+     * @param settingIds
+     */
+    public synchronized boolean remove(List<String> settingIds) {
+
+	return remove(settingIds, true);
+    }
+
+    /**
+     * Write method. If successfully invoked put the RW configuration in a {@link State#DIRTY} state.<br>
+     * <br>
+     * In order to be removed, {@link Setting}s with the provided <code>settingIds</code> must be already in
+     *
+     * @param settingIds
+     * @param dispatchEvent
+     */
+    public synchronized boolean remove(List<String> settingIds, boolean dispatchEvent) {
+
+	List<Setting> toRemove = settingIds.//
+		stream().//
+		map(id -> get(id)).//
+		filter(opt -> opt.isPresent()).//
+		map(opt -> opt.get()).//
+		collect(Collectors.toList());
+
+	if (!toRemove.isEmpty()) {
+
+	    this.list.removeAll(toRemove);
+	    this.dirty = true;
+
+	    if (dispatchEvent) {
+		dispatchEvent(toRemove, ConfigurationChangeEvent.SETTING_REMOVED);
+	    }
+
+	    return true;
+	}
+
+	return false;
+    }
+
+    /**
      * Write method. It put the RW configuration in a {@link State#DIRTY} state
      */
     public synchronized void clear() {
@@ -600,66 +660,6 @@ public class Configuration {
     public ConfigurationSource getSource() {
 
 	return source;
-    }
-
-    /**
-     * Write method. If successfully invoked put the RW configuration in a {@link State#DIRTY} state.<br>
-     * <br>
-     * In order to be removed, {@link Setting}s with the provided <code>settingIds</code> must be already in
-     *
-     * @param settingIds
-     * @param dispatchEvent
-     */
-    public synchronized boolean remove(List<String> settingIds) {
-
-	return remove(settingIds, true);
-    }
-
-    /**
-     * Write method. If successfully invoked put the RW configuration in a {@link State#DIRTY} state.<br>
-     * <br>
-     * In order to be removed, {@link Setting}s with the provided <code>settingIds</code> must be already in
-     *
-     * @param settingIds
-     * @param dispatchEvent
-     */
-    public synchronized boolean remove(List<String> settingIds, boolean dispatchEvent) {
-
-	List<Setting> toRemove = settingIds.//
-		stream().//
-		map(id -> get(id)).//
-		filter(opt -> opt.isPresent()).//
-		map(opt -> opt.get()).//
-		collect(Collectors.toList());
-
-	if (!toRemove.isEmpty()) {
-
-	    this.list.removeAll(toRemove);
-	    this.dirty = true;
-
-	    if (dispatchEvent) {
-		dispatchEvent(toRemove, ConfigurationChangeEvent.SETTING_REMOVED);
-	    }
-
-	    return true;
-	}
-
-	return false;
-    }
-
-    /**
-     * Write method. If successfully invoked put the RW configuration in a {@link State#DIRTY} state.<br>
-     * <br>
-     * In order to be removed, a {@link Setting} with the provided <code>settingId</code> must be already in
-     *
-     * @param settingId
-     */
-    public synchronized boolean remove(String settingId, boolean dispatchEvent) {
-
-	ArrayList<String> ids = new ArrayList<>();
-	ids.add(settingId);
-
-	return remove(ids, dispatchEvent);
     }
 
     /**

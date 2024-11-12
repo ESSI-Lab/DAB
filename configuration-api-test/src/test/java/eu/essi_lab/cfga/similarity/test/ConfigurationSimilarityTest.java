@@ -283,7 +283,7 @@ public class ConfigurationSimilarityTest {
     @Test
     public void inclusionTest6() {
 
-	CheckResponse response = inclusionTest(Setting.CONFIGURABLE_TYPE, 31);
+	CheckResponse response = inclusionTest(Setting.CONFIGURABLE_TYPE, 32);
 
 	//
 	// 30 ProfilerSetting

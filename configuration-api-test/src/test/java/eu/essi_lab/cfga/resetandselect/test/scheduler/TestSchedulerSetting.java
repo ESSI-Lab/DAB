@@ -32,16 +32,16 @@ public class TestSchedulerSetting extends SchedulerSetting {
 
 	setName("TEST Scheduler");
 
-	Option<Integer> slotsCount = IntegerOptionBuilder.get().//
-		withKey("slotsCount").//
-		withLabel("Number of slots for scheduler tasks").//
+	Option<Integer> testOption = IntegerOptionBuilder.get().//
+		withKey("testOption").//
+		withLabel("TEST OPTION").//
 		withSingleSelection().//
 		withValues(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)).//
 		withSelectedValue(2).//
 		cannotBeDisabled().//
 		build();
 
-	addOption(slotsCount);
+	addOption(testOption);
     }
 
     /**
