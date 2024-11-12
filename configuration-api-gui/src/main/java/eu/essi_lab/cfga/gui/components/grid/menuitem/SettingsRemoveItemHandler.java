@@ -106,9 +106,7 @@ public class SettingsRemoveItemHandler extends GridMenuItemHandler {
 
 	dialog.setOnConfirmListener(e -> {
 
-	    ids.forEach(id -> {
-		configuration.remove(id);
-	    });
+	    configuration.remove(ids);
 
 	    tabContainer.removeSettingComponents(ids);
 	});
