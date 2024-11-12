@@ -37,6 +37,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 import javax.ws.rs.WebApplicationException;
@@ -68,7 +71,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -112,6 +114,7 @@ public class Layer {
     }
 
     private boolean completed = false;
+    private Date lastHarvesting = null;
     private DefaultFeatureCollection collectionPoints;
     private DefaultFeatureCollection collectionLines;
 
@@ -356,6 +359,28 @@ public class Layer {
 
     }
 
+    static DataCacheConnector dataCacheConnector;
+    static {
+	dataCacheConnector = DataCacheConnectorFactory.getDataCacheConnector();
+	if (dataCacheConnector == null) {
+	    DataCacheConnectorSetting setting = ConfigurationWrapper.getDataCacheConnectorSetting();
+	    try {
+		dataCacheConnector = DataCacheConnectorFactory.newDataCacheConnector(setting);
+		String cachedDays = setting.getOptionValue(DataCacheConnector.CACHED_DAYS).get();
+		String flushInterval = setting.getOptionValue(DataCacheConnector.FLUSH_INTERVAL_MS).get();
+		String maxBulkSize = setting.getOptionValue(DataCacheConnector.MAX_BULK_SIZE).get();
+		dataCacheConnector.configure(DataCacheConnector.MAX_BULK_SIZE, maxBulkSize);
+		dataCacheConnector.configure(DataCacheConnector.FLUSH_INTERVAL_MS, flushInterval);
+		dataCacheConnector.configure(DataCacheConnector.CACHED_DAYS, cachedDays);
+		DataCacheConnectorFactory.setDataCacheConnector(dataCacheConnector);
+	    } catch (Exception e) {
+		e.printStackTrace();
+		GSLoggerFactory.getLogger(Layer.class).error(e);
+	    }
+
+	}
+    }
+
     public void prepare() {
 	GSLoggerFactory.getLogger(getClass()).info("Preparing cached layer {}", name);
 
@@ -367,18 +392,7 @@ public class Layer {
 	    public void run() {
 
 		try {
-		    DataCacheConnector dataCacheConnector = DataCacheConnectorFactory.getDataCacheConnector();
-		    if (dataCacheConnector == null) {
-			DataCacheConnectorSetting setting = ConfigurationWrapper.getDataCacheConnectorSetting();
-			dataCacheConnector = DataCacheConnectorFactory.newDataCacheConnector(setting);
-			String cachedDays = setting.getOptionValue(DataCacheConnector.CACHED_DAYS).get();
-			String flushInterval = setting.getOptionValue(DataCacheConnector.FLUSH_INTERVAL_MS).get();
-			String maxBulkSize = setting.getOptionValue(DataCacheConnector.MAX_BULK_SIZE).get();
-			dataCacheConnector.configure(DataCacheConnector.MAX_BULK_SIZE, maxBulkSize);
-			dataCacheConnector.configure(DataCacheConnector.FLUSH_INTERVAL_MS, flushInterval);
-			dataCacheConnector.configure(DataCacheConnector.CACHED_DAYS, cachedDays);
-			DataCacheConnectorFactory.setDataCacheConnector(dataCacheConnector);
-		    }
+
 		    String[] layerSplit = new String[] {};
 		    if (Layer.this.name.contains(",")) {
 			layerSplit = Layer.this.name.split(",");
@@ -430,9 +444,6 @@ public class Layer {
 					String shape = record.getShape();
 
 					if (shape != null && shape.toLowerCase().contains("linestring")) {
-					    // if (included)
-					    // continue rec;
-					    // included = true;
 
 					    shape = shape.substring(shape.indexOf("("));
 					    shape = shape.replace("(", "").replace(")", "").trim();
@@ -494,35 +505,29 @@ public class Layer {
 					typeBuilder.add(colorAttributeName, String.class);
 					typeBuilder.add(beginAttributeName, Date.class);
 					typeBuilder.add(endAttributeName, Date.class);
+					typeBuilder.add(harvestingAttributeName, Date.class);
 					typeBuilder.add(idAttributeName, String.class);
 					typeBuilder.add(nameAttributeName, String.class);
 					SimpleFeatureType featureType = typeBuilder.buildFeatureType();
 					String c = getColor(record.getMetadataIdentifier());
-					// featureType.getUserData().put(colorAttributeName, c);
-					// featureType.getUserData().put(beginAttributeName, record.getBegin());
-					// featureType.getUserData().put(endAttributeName, record.getEnd());
-					// featureType.getUserData().put(idAttributeName,
-					// record.getPlatformIdentifier());
-					// featureType.getUserData().put(nameAttributeName,n);
 					SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(featureType);
 					featureBuilder.add(geometry);
 					featureBuilder.add(c);
 					featureBuilder.add(record.getBegin());
 					featureBuilder.add(record.getEnd());
+					featureBuilder.add(record.getLastHarvesting());
 					featureBuilder.add(record.getPlatformIdentifier());
 					featureBuilder.add(n);
 					SimpleFeature feature = featureBuilder.buildFeature(null);
-					// feature.getUserData().put(colorAttributeName,
-					// getColor(record.getMetadataIdentifier()));
-					// feature.getUserData().put(beginAttributeName, record.getBegin());
-					// feature.getUserData().put(endAttributeName, record.getEnd());
-					// feature.getUserData().put(idAttributeName, record.getPlatformIdentifier());
-					// feature.getUserData().put(nameAttributeName,
-					// n);
 					if (geometry instanceof Point) {
 					    collectionPoints.add(feature);
 					} else {
 					    collectionLines.add(feature);
+					}
+
+					Date tmpHarvesting = record.getLastHarvesting();
+					if (lastHarvesting == null || lastHarvesting.before(tmpHarvesting)) {
+					    lastHarvesting = tmpHarvesting;
 					}
 
 				    }
@@ -566,7 +571,7 @@ public class Layer {
 			}
 		    };
 		    BBOX bbox = null;
-		    dataCacheConnector.getStationsWithProperties(listener, bbox, null, false, props);
+		    dataCacheConnector.getStationsWithProperties(listener, lastHarvesting, bbox, null, false, props);
 		    GSLoggerFactory.getLogger(getClass()).info("layer implementation completed");
 		    setCompleted();
 
@@ -575,7 +580,10 @@ public class Layer {
 		}
 	    }
 	};
-	t.start();
+
+	ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
+	scheduler.scheduleAtFixedRate(t, 0, 1, TimeUnit.MINUTES);
 
     }
 
@@ -613,6 +621,7 @@ public class Layer {
     public static String endAttributeName = "end";
     public static String idAttributeName = "id";
     public static String nameAttributeName = "name";
+    public static String harvestingAttributeName = "harvesting";
     private static final Color LINE_COLOUR = Color.GREEN;
     private static final Color FILL_COLOUR = Color.GREEN;
     private static final Color SELECTED_COLOUR = Color.YELLOW;
