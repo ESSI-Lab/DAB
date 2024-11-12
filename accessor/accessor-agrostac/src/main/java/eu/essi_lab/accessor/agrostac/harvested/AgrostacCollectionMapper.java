@@ -93,7 +93,6 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 
     private static final String RESOURCE_ID_KEY = "id";
 
-
     // DATASET INFO
     private static final String LICENSE = "license";
     private static final String WIKI_URL = "wiki_url";
@@ -143,16 +142,14 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
     private static final String maxLat = "max_latitudedd";
     private static final String maxLon = "max_longitudedd";
 
-
     // private static final String LICENSE = "license";
     // private static final String ABSTRACT_KEY = "description";
     //
     // private static final String PROPERTIES = "properties";
     // private static final String PROVIDERS = "providers";
     // private static final String KEYWORDS = "keywords";
-   
-    // private static final String ASSETS = "assets";
 
+    // private static final String ASSETS = "assets";
 
     public static int COLLECTIONS_WITH_GRANULES_COUNT = 0;
 
@@ -340,12 +337,10 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 	miMetadata.addHierarchyLevelScopeCodeListValue("dataset");
 
 	Optional<String> optDataAccess = readString(json, DATASET_ACCESS);
-	if(optDataAccess.isPresent()) {
-	    if(!optDataAccess.get().toLowerCase().equals("open"))
+	if (optDataAccess.isPresent()) {
+	    if (!optDataAccess.get().toLowerCase().equals("open"))
 		return null;
 	}
-	
-	
 
 	//
 	// data quality
@@ -377,7 +372,6 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 	    // collectionMetadataList = getMetadataCollection(collectionOpt.get());
 	    baseAccessURL = AgrostacConnector.BASE_URL + "collections/" + datasetId + "/items";
 	}
-
 
 	String nameDataset = null;
 	String licenseUrl = null;
@@ -428,46 +422,48 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 		if (cCode != null) {
 		    cropName = cCode.getName();
 		    newCropCode = cCode.getCode();
-		} else {
-		    logger.info("NULL!!");
-		}
-		cropQueryable = true;
-		quantityQueryable = true;
-		WorldCerealItem item = new WorldCerealItem();
-		item.setLabel(cropName);
-		if (newCropCode != null) {
-		    item.setCode(newCropCode);
-		}
-		cropList.add(item);
-		// calculate quantity for cropCode
-		Map<String, String> quantityMap = getQuantityForCrop(endpoint, token, cropCode);
-		if (!cropQuantityMap.containsKey(cropCode)) {
-		    cropQuantityMap.put(cropCode, quantityMap);
-		    for (Map.Entry<String, String> entry : quantityMap.entrySet()) {
-			String quantityCode = entry.getKey();
-			if (!quantitySet.contains(quantityCode)) {
-			    // check if quantityCount > 0
-			    QUANTITY_CODES qCode = QUANTITY_CODES.decode(quantityCode);
-			    if (qCode != null && !qCode.equals(QUANTITY_CODES.CROP_CODE)) {
-				int countQCode = overviewObj.optInt(qCode.getCode());
-				if (countQCode > 0) {
-				    quantitySet.add(quantityCode);
-				    String quantityDescription = entry.getValue();
-				    keywords.add(quantityDescription);
-				    WorldCerealItem quantityItem = new WorldCerealItem();
-				    quantityItem.setLabel(quantityDescription);
-				    quantityItem.setCode(quantityCode);
-				    quantityList.add(quantityItem);
+
+		    cropQueryable = true;
+		    quantityQueryable = true;
+		    WorldCerealItem item = new WorldCerealItem();
+		    item.setLabel(cropName);
+		    if (newCropCode != null) {
+			item.setCode(newCropCode);
+		    }
+		    cropList.add(item);
+		    // calculate quantity for cropCode
+		    Map<String, String> quantityMap = getQuantityForCrop(endpoint, token, cropCode);
+		    if (!cropQuantityMap.containsKey(cropCode)) {
+			cropQuantityMap.put(cropCode, quantityMap);
+			for (Map.Entry<String, String> entry : quantityMap.entrySet()) {
+			    String quantityCode = entry.getKey();
+			    if (!quantitySet.contains(quantityCode)) {
+				// check if quantityCount > 0
+				QUANTITY_CODES qCode = QUANTITY_CODES.decode(quantityCode);
+				if (qCode != null && !qCode.equals(QUANTITY_CODES.CROP_CODE)) {
+				    int countQCode = overviewObj.optInt(qCode.getCode());
+				    if (countQCode > 0) {
+					quantitySet.add(quantityCode);
+					String quantityDescription = entry.getValue();
+					keywords.add(quantityDescription);
+					WorldCerealItem quantityItem = new WorldCerealItem();
+					quantityItem.setLabel(quantityDescription);
+					quantityItem.setCode(quantityCode);
+					quantityList.add(quantityItem);
+				    }
 				}
+			    } else {
+				logger.info("QUANTITY ALREADY ADDED!!!");
 			    }
-			} else {
-			    logger.info("QUANTITY ALREADY ADDED!!!");
+
 			}
 
+		    } else {
+			logger.info("CROP ALREADY ADDED!!!");
 		    }
 
 		} else {
-		    logger.info("CROP ALREADY ADDED!!!");
+		    logger.info("NULL!!");
 		}
 	    }
 	}
@@ -502,32 +498,32 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 	worldCerealMap.setCropTypes(cropList);
 	worldCerealMap.setQuantityTypes(quantityList);
 
-//	if (confidenceCropType != null && !confidenceCropType.isNaN()) {
-//	    worldCerealMap.setCropTypeConfidence(confidenceCropType);
-//
-//	    addReportQuality(dataQuality, "cropConfidence", confidenceCropType);
-//	    // Keywords kwd = new Keywords();
-//	    // kwd.setTypeCode("cropConfidence");
-//	    // kwd.addKeyword(String.valueOf(confidenceCropType));
-//	    // miMetadata.getDataIdentification().addKeywords(kwd);
-//
-//	}
-//	if (confidenceIrrType != null && !confidenceIrrType.isNaN()) {
-//	    worldCerealMap.setIrrigationTypeConfidence(confidenceIrrType);
-//	    addReportQuality(dataQuality, "irrigationConfidence", confidenceIrrType);
-//	    // Keywords kwd = new Keywords();
-//	    // kwd.setTypeCode("irrigationConfidence");
-//	    // kwd.addKeyword(String.valueOf(confidenceIrrType));
-//	    // miMetadata.getDataIdentification().addKeywords(kwd);
-//	}
-//	if (confidenceLcType != null && !confidenceLcType.isNaN()) {
-//	    worldCerealMap.setLcTypeConfidence(confidenceLcType);
-//	    addReportQuality(dataQuality, "landCoverConfidence", confidenceLcType);
-//	    // Keywords kwd = new Keywords();
-//	    // kwd.setTypeCode("landCoverConfidence");
-//	    // kwd.addKeyword(String.valueOf(confidenceLcType));
-//	    // miMetadata.getDataIdentification().addKeywords(kwd);
-//	}
+	// if (confidenceCropType != null && !confidenceCropType.isNaN()) {
+	// worldCerealMap.setCropTypeConfidence(confidenceCropType);
+	//
+	// addReportQuality(dataQuality, "cropConfidence", confidenceCropType);
+	// // Keywords kwd = new Keywords();
+	// // kwd.setTypeCode("cropConfidence");
+	// // kwd.addKeyword(String.valueOf(confidenceCropType));
+	// // miMetadata.getDataIdentification().addKeywords(kwd);
+	//
+	// }
+	// if (confidenceIrrType != null && !confidenceIrrType.isNaN()) {
+	// worldCerealMap.setIrrigationTypeConfidence(confidenceIrrType);
+	// addReportQuality(dataQuality, "irrigationConfidence", confidenceIrrType);
+	// // Keywords kwd = new Keywords();
+	// // kwd.setTypeCode("irrigationConfidence");
+	// // kwd.addKeyword(String.valueOf(confidenceIrrType));
+	// // miMetadata.getDataIdentification().addKeywords(kwd);
+	// }
+	// if (confidenceLcType != null && !confidenceLcType.isNaN()) {
+	// worldCerealMap.setLcTypeConfidence(confidenceLcType);
+	// addReportQuality(dataQuality, "landCoverConfidence", confidenceLcType);
+	// // Keywords kwd = new Keywords();
+	// // kwd.setTypeCode("landCoverConfidence");
+	// // kwd.addKeyword(String.valueOf(confidenceLcType));
+	// // miMetadata.getDataIdentification().addKeywords(kwd);
+	// }
 
 	for (String s : keywords) {
 	    Keywords kwd = new Keywords();
@@ -550,9 +546,8 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 	/**
 	 * ABSTRAKT
 	 */
-	
-	readString(json, SUMMARY).ifPresent(abstrakt -> miMetadata.getDataIdentification().setAbstract(abstrakt));
 
+	readString(json, SUMMARY).ifPresent(abstrakt -> miMetadata.getDataIdentification().setAbstract(abstrakt));
 
 	/**
 	 * ID
@@ -568,7 +563,7 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 		String datasetCode = datasetCodeOpt.get();
 		String t = miMetadata.getDataIdentification().getCitationTitle();
 		String toHash = datasetCode;
-		if(t!= null) {
+		if (t != null) {
 		    toHash += t;
 		}
 		uuid = UUID.nameUUIDFromBytes(toHash.getBytes()).toString();
@@ -653,22 +648,21 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 	}
 
 	// addContactInfo(miMetadata, json.optJSONArray(PROVIDERS));
-	
+
 	/**
 	 * TEMPORAL EXTENT
 	 */
 	Optional<String> optStartDate = readString(json, START_DATE);
 	Optional<String> optEndDate = readString(json, END_DATE);
-	
-	if(optStartDate.isPresent() && optEndDate.isPresent()) {	
-	    
+
+	if (optStartDate.isPresent() && optEndDate.isPresent()) {
+
 	    TemporalExtent tempExtent = new TemporalExtent();
 	    tempExtent.setBeginPosition(optStartDate.get());
 	    tempExtent.setEndPosition(optEndDate.get());
-	    miMetadata.getDataIdentification().addTemporalExtent(tempExtent);	    	    
-	    
+	    miMetadata.getDataIdentification().addTemporalExtent(tempExtent);
+
 	}
-	
 
 	/**
 	 * WIKI URL
