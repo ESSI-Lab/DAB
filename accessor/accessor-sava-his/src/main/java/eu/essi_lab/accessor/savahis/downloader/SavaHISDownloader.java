@@ -83,8 +83,8 @@ public class SavaHISDownloader extends DataDownloader {
 
     @Override
     public boolean canDownload() {
-
-	return (online.getProtocol() != null && online.getProtocol().equals(NetProtocols.SAVAHIS.getCommonURN()));
+	return false;
+//	return (online.getProtocol() != null && online.getProtocol().equals(NetProtocols.SAVAHIS.getCommonURN()));
 
     }
 
