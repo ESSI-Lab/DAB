@@ -217,7 +217,7 @@ public abstract class DataCacheConnector {
      * @return
      * @throws Exception
      */
-    public abstract void getStationsWithProperties(ResponseListener<StationRecord> listener, BBOX bbox, Integer maxRecords,
+    public abstract void getStationsWithProperties(ResponseListener<StationRecord> listener,Date lastHarvesting, BBOX bbox, Integer maxRecords,
 	    boolean allProperties, SimpleEntry<String, String>... propertyValue) throws Exception;
 
     /**

@@ -320,7 +320,7 @@ public class OpenSearchConnector extends DataCacheConnector {
 		osType = "geo_shape";
 	    } else if (javaType.equals(BBOX3857.class)) {
 		osType = "geo_shape";
-	    }else if (javaType.equals(Polygon4326.class)) {
+	    } else if (javaType.equals(Polygon4326.class)) {
 		osType = "geo_shape";
 	    } else if (javaType.equals(Boolean.class)) {
 		osType = "boolean";
@@ -397,7 +397,7 @@ public class OpenSearchConnector extends DataCacheConnector {
 		    String wkt = value.toString();
 		    BBOX3857 bb = new BBOX3857(wkt);
 		    field.set(record, bb);
-		}else if (javaType.equals(Polygon4326.class)) {
+		} else if (javaType.equals(Polygon4326.class)) {
 		    String wkt = value.toString();
 		    Polygon4326 bb = new Polygon4326(wkt);
 		    field.set(record, bb);
@@ -456,7 +456,7 @@ public class OpenSearchConnector extends DataCacheConnector {
 	    } else if (javaType.equals(Polygon4326.class)) {
 		Polygon4326 polygon = (Polygon4326) value;
 		ret.put(javaName, polygon.getWkt());
-	    }else if (javaType.equals(BigDecimal.class)) {
+	    } else if (javaType.equals(BigDecimal.class)) {
 		BigDecimal decimal = (BigDecimal) value;
 		ret.put(javaName, decimal.toString());
 	    } else if (javaType.equals(Duration.class)) {
@@ -1092,7 +1092,7 @@ public class OpenSearchConnector extends DataCacheConnector {
 
 	SearchRequest searchRequest = new SearchRequest(DataCacheIndex.STATIONS.getIndex(databaseName));
 
-	SearchSourceBuilder sourceBuilder = getStationsQuery(bbox, allProperties, neededProperties, propertyValues);
+	SearchSourceBuilder sourceBuilder = getStationsQuery(null, bbox, allProperties, neededProperties, propertyValues);
 
 	if (offset != null) {
 	    sourceBuilder.from(offset);
@@ -1116,11 +1116,11 @@ public class OpenSearchConnector extends DataCacheConnector {
     }
 
     @Override
-    public void getStationsWithProperties(ResponseListener<StationRecord> listener, BBOX bbox, Integer maxRecords, boolean allProperties,
-	    SimpleEntry<String, String>... propertyValues) throws Exception {
+    public void getStationsWithProperties(ResponseListener<StationRecord> listener, Date lastHarvesting, BBOX bbox, Integer maxRecords,
+	    boolean allProperties, SimpleEntry<String, String>... propertyValues) throws Exception {
 	SearchRequest searchRequest = new SearchRequest(DataCacheIndex.STATIONS.getIndex(databaseName));
 
-	SearchSourceBuilder sourceBuilder = getStationsQuery(bbox, allProperties, propertyValues);
+	SearchSourceBuilder sourceBuilder = getStationsQuery(lastHarvesting, bbox, allProperties, propertyValues);
 
 	if (maxRecords != null) {
 	    sourceBuilder.size(maxRecords);
@@ -1162,11 +1162,12 @@ public class OpenSearchConnector extends DataCacheConnector {
 
     }
 
-    private SearchSourceBuilder getStationsQuery(BBOX bbox, boolean allProperties, SimpleEntry<String, String>... propertyValues) {
-	return getStationsQuery(bbox, allProperties, null, propertyValues);
+    private SearchSourceBuilder getStationsQuery(Date lastHarvesting, BBOX bbox, boolean allProperties,
+	    SimpleEntry<String, String>... propertyValues) {
+	return getStationsQuery(lastHarvesting, bbox, allProperties, null, propertyValues);
     }
 
-    private SearchSourceBuilder getStationsQuery(BBOX bbox, boolean allProperties, List<String> neededProperties,
+    private SearchSourceBuilder getStationsQuery(Date lastHarvesting, BBOX bbox, boolean allProperties, List<String> neededProperties,
 	    SimpleEntry<String, String>... propertyValues) {
 
 	BoolQueryBuilder query = QueryBuilders.boolQuery();
@@ -1178,6 +1179,10 @@ public class OpenSearchConnector extends DataCacheConnector {
 	    }
 	}
 	addBBOX(query, bbox);
+
+	if (lastHarvesting != null) {
+	    query.must(QueryBuilders.rangeQuery("lastHarvesting").gt(ISO8601DateTimeUtils.getISO8601DateTime(lastHarvesting)));
+	}
 
 	SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
 	if (!allProperties && propertyValues != null && propertyValues.length > 0) {
@@ -1312,7 +1317,7 @@ public class OpenSearchConnector extends DataCacheConnector {
 	// delete also the index
 	client.indices().delete(dir, RequestOptions.DEFAULT);
 	indexInitialization();
-	
+
     }
 
 }
