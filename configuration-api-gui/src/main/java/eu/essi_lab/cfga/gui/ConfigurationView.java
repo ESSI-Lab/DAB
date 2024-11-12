@@ -542,13 +542,13 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	switch (event.getEventType()) {
 	case ConfigurationChangeEvent.SETTING_PUT:
-	    onSettingPut(event.getSetting().get());
+	    onSettingPut(event.getSettings());
 	    break;
 	case ConfigurationChangeEvent.SETTING_REPLACED:
-	    onSettingReplaced(event.getSetting().get());
+	    onSettingReplaced(event.getSettings());
 	    break;
 	case ConfigurationChangeEvent.SETTING_REMOVED:
-	    onSettingRemoved(event.getSetting().get());
+	    onSettingRemoved(event.getSettings());
 	    break;
 	case ConfigurationChangeEvent.CONFIGURATION_CLEARED:
 	    onConfigurationCleared();
@@ -740,25 +740,28 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     /**
      * @param setting
      */
-    protected void onSettingPut(Setting setting) {
+    protected void onSettingPut(List<Setting> settings) {
 
-	GSLoggerFactory.getLogger(getClass()).debug("Setting {} put", setting.getName());
+	GSLoggerFactory.getLogger(getClass()).debug("Setting {} put",
+		settings.stream().map(s -> s.getName()).collect(Collectors.joining(",")));
     }
 
     /**
      * @param setting
      */
-    protected void onSettingReplaced(Setting setting) {
+    protected void onSettingReplaced(List<Setting> settings) {
 
-	GSLoggerFactory.getLogger(getClass()).debug("Setting {} replaced", setting.getName());
+	GSLoggerFactory.getLogger(getClass()).debug("Setting {} repalced",
+		settings.stream().map(s -> s.getName()).collect(Collectors.joining(",")));
     }
 
     /**
      * @param setting
      */
-    protected void onSettingRemoved(Setting setting) {
+    protected void onSettingRemoved(List<Setting> settings) {
 
-	GSLoggerFactory.getLogger(getClass()).debug("Setting {} removed", setting.getName());
+	GSLoggerFactory.getLogger(getClass()).debug("Setting {} removed",
+		settings.stream().map(s -> s.getName()).collect(Collectors.joining(",")));
     }
 
     /**

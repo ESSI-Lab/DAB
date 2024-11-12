@@ -483,6 +483,66 @@ public class Configuration {
     }
 
     /**
+     * Write method. If successfully invoked put the RW configuration in a {@link State#DIRTY} state.<br>
+     * <br>
+     * In order to be removed, a {@link Setting} with the provided <code>settingId</code> must be already in
+     *
+     * @param settingId
+     * @param dispatchEvent
+     */
+    public synchronized boolean remove(String settingId, boolean dispatchEvent) {
+
+	ArrayList<String> ids = new ArrayList<>();
+	ids.add(settingId);
+
+	return remove(ids, dispatchEvent);
+    }
+
+    /**
+     * Write method. If successfully invoked put the RW configuration in a {@link State#DIRTY} state.<br>
+     * <br>
+     * In order to be removed, {@link Setting}s with the provided <code>settingIds</code> must be already in
+     *
+     * @param settingIds
+     */
+    public synchronized boolean remove(List<String> settingIds) {
+
+	return remove(settingIds, true);
+    }
+
+    /**
+     * Write method. If successfully invoked put the RW configuration in a {@link State#DIRTY} state.<br>
+     * <br>
+     * In order to be removed, {@link Setting}s with the provided <code>settingIds</code> must be already in
+     *
+     * @param settingIds
+     * @param dispatchEvent
+     */
+    public synchronized boolean remove(List<String> settingIds, boolean dispatchEvent) {
+
+	List<Setting> toRemove = settingIds.//
+		stream().//
+		map(id -> get(id)).//
+		filter(opt -> opt.isPresent()).//
+		map(opt -> opt.get()).//
+		collect(Collectors.toList());
+
+	if (!toRemove.isEmpty()) {
+
+	    this.list.removeAll(toRemove);
+	    this.dirty = true;
+
+	    if (dispatchEvent) {
+		dispatchEvent(toRemove, ConfigurationChangeEvent.SETTING_REMOVED);
+	    }
+
+	    return true;
+	}
+
+	return false;
+    }
+
+    /**
      * Write method. It put the RW configuration in a {@link State#DIRTY} state
      */
     public synchronized void clear() {
@@ -603,37 +663,24 @@ public class Configuration {
     }
 
     /**
-     * Write method. If successfully invoked put the RW configuration in a {@link State#DIRTY} state.<br>
-     * <br>
-     * In order to be removed, a {@link Setting} with the provided <code>settingId</code> must be already in
-     *
-     * @param settingId
-     */
-    private synchronized boolean remove(String settingId, boolean dispatchEvent) {
-
-	Optional<Setting> optional = get(settingId);
-
-	if (optional.isPresent()) {
-
-	    this.list.remove(optional.get());
-	    this.dirty = true;
-
-	    if (dispatchEvent) {
-		dispatchEvent(optional.get(), ConfigurationChangeEvent.SETTING_REMOVED);
-	    }
-
-	    return true;
-	}
-
-	return false;
-    }
-
-    /**
      * @param writable
      */
     void setWritable(boolean writable) {
 
 	this.writable = writable;
+    }
+
+    /**
+     * @param setting
+     * @param event
+     */
+    private void dispatchEvent(List<Setting> settings, int event) {
+
+	this.listenerList.forEach(l -> l.configurationChanged(//
+		new ConfigurationChangeEvent(//
+			this, //
+			settings, //
+			event)));
     }
 
     /**
@@ -654,7 +701,10 @@ public class Configuration {
      */
     private void dispatchEvent(int event) {
 
-	dispatchEvent(null, event);
+	this.listenerList.forEach(l -> l.configurationChanged(//
+		new ConfigurationChangeEvent(//
+			this, //
+			event)));
     }
 
 }

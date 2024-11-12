@@ -299,11 +299,13 @@ public class GSConfigurationView extends ConfigurationView {
     }
 
     /**
-     * @param setting
+     * @param settings
      */
-    protected void onSettingPut(Setting setting) {
+    protected void onSettingPut(List<Setting> settings) {
 
-	super.onSettingPut(setting);
+	super.onSettingPut(settings);
+	
+	Setting setting = settings.get(0);
 
 	putSettingList.add(setting);
 
@@ -324,9 +326,11 @@ public class GSConfigurationView extends ConfigurationView {
     /**
      * @param setting
      */
-    protected void onSettingReplaced(Setting setting) {
+    protected void onSettingReplaced(List<Setting> settings) {
 
-	super.onSettingReplaced(setting);
+	super.onSettingReplaced(settings);
+	
+	Setting setting = settings.get(0);
 
 	editedSettingList.add(setting);
 
@@ -350,9 +354,11 @@ public class GSConfigurationView extends ConfigurationView {
     /**
      * @param setting
      */
-    protected void onSettingRemoved(Setting setting) {
+    protected void onSettingRemoved(List<Setting> settings) {
 
-	super.onSettingRemoved(setting);
+	super.onSettingRemoved(settings);
+	
+	Setting setting = settings.get(0);
 
 	removedSettingList.add(setting);
 
