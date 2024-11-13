@@ -65,7 +65,7 @@ public class SensorThingsClientExternalTestIT {
     @Test
     public void getServerInfoTest() throws GSException, IllegalArgumentException, IOException {
 
-	SensorThingsClient client = new SensorThingsClient(new URL("https://beta.hydroserver2.org/api/sensorthings/v1.1/"));
+	SensorThingsClient client = new SensorThingsClient(new URL("https://playground.hydroserver.org/api/sensorthings/v1.1/"));
 
 	FluentSensorThingsRequest request = FluentSensorThingsRequest.get(true);
 
@@ -105,7 +105,7 @@ public class SensorThingsClientExternalTestIT {
     @Test
     public void addressableEntityResponseTest_Things_Collections() throws IllegalArgumentException, GSException, IOException {
 
-	SensorThingsClient client = new SensorThingsClient(new URL("https://beta.hydroserver2.org/api/sensorthings/v1.1/"));
+	SensorThingsClient client = new SensorThingsClient(new URL("https://playground.hydroserver.org/api/sensorthings/v1.1/"));
 
 	FluentSensorThingsRequest request = FluentSensorThingsRequest.//
 		get(true).//
@@ -135,7 +135,7 @@ public class SensorThingsClientExternalTestIT {
 	Assert.assertEquals("4dbd8b69-be1c-4368-923a-eb72b657b9ad", identifier);
 
 	String selfLink = thing.getSelfLink().get();
-	Assert.assertEquals("https://beta.hydroserver2.org/api/sensorthings/v1.1/Things('4dbd8b69-be1c-4368-923a-eb72b657b9ad')", selfLink);
+	Assert.assertEquals("https://playground.hydroserver.org/api/sensorthings/v1.1/Things('4dbd8b69-be1c-4368-923a-eb72b657b9ad')", selfLink);
 
 	Optional<JSONObject> properties = thing.getProperties();
 	Assert.assertTrue(properties.isPresent());
@@ -192,7 +192,7 @@ public class SensorThingsClientExternalTestIT {
 	Assert.assertTrue(locProp.isPresent());
 
 	String locSelfLink = location.getSelfLink().get();
-	Assert.assertEquals("https://beta.hydroserver2.org/api/sensorthings/v1.1/Locations('dfbbf648-88e3-45fc-85e9-5204cfad4fcc')",
+	Assert.assertEquals("https://playground.hydroserver.org/api/sensorthings/v1.1/Locations('dfbbf648-88e3-45fc-85e9-5204cfad4fcc')",
 		locSelfLink);
 
     }
@@ -205,7 +205,7 @@ public class SensorThingsClientExternalTestIT {
     @Test
     public void addressableEntityResponseTest_Things_Single() throws IllegalArgumentException, GSException, IOException {
 
-	SensorThingsClient client = new SensorThingsClient(new URL("https://beta.hydroserver2.org/api/sensorthings/v1.1/"));
+	SensorThingsClient client = new SensorThingsClient(new URL("https://playground.hydroserver.org/api/sensorthings/v1.1/"));
 
 	FluentSensorThingsRequest request = FluentSensorThingsRequest.//
 		get(true).//
@@ -236,7 +236,7 @@ public class SensorThingsClientExternalTestIT {
 	Assert.assertEquals("0637f970-4b79-485a-98f1-de4573411cf0", identifier);
 
 	String selfLink = thing.getSelfLink().get();
-	Assert.assertEquals("https://beta.hydroserver2.org/api/sensorthings/v1.1/Things('0637f970-4b79-485a-98f1-de4573411cf0')", selfLink);
+	Assert.assertEquals("https://playground.hydroserver.org/api/sensorthings/v1.1/Things('0637f970-4b79-485a-98f1-de4573411cf0')", selfLink);
 
 	Optional<JSONObject> properties = thing.getProperties();
 	Assert.assertTrue(properties.isPresent());
@@ -267,7 +267,7 @@ public class SensorThingsClientExternalTestIT {
     @Test
     public void addressableEntityResponseTest_Datastreams_Collections() throws IllegalArgumentException, GSException, IOException {
 
-	SensorThingsClient client = new SensorThingsClient(new URL("https://beta.hydroserver2.org/api/sensorthings/v1.1/"));
+	SensorThingsClient client = new SensorThingsClient(new URL("https://playground.hydroserver.org/api/sensorthings/v1.1/"));
 
 	FluentSensorThingsRequest request = FluentSensorThingsRequest.//
 		get(true).//
@@ -297,7 +297,7 @@ public class SensorThingsClientExternalTestIT {
 	Assert.assertEquals("0203d754-a5e0-47de-9a3f-c182a1c92c9d", identifier);
 
 	String selfLink = stream.getSelfLink().get();
-	Assert.assertEquals("https://beta.hydroserver2.org/api/sensorthings/v1.1/Datastreams('0203d754-a5e0-47de-9a3f-c182a1c92c9d')",
+	Assert.assertEquals("https://playground.hydroserver.org/api/sensorthings/v1.1/Datastreams('0203d754-a5e0-47de-9a3f-c182a1c92c9d')",
 		selfLink);
 
 	Optional<JSONObject> properties = stream.getProperties();
@@ -348,7 +348,7 @@ public class SensorThingsClientExternalTestIT {
     @Test
     public void addressableEntityResponseTest_Observations_Collections() throws IllegalArgumentException, GSException, IOException {
 
-	SensorThingsClient client = new SensorThingsClient(new URL("https://beta.hydroserver2.org/api/sensorthings/v1.1/"));
+	SensorThingsClient client = new SensorThingsClient(new URL("https://playground.hydroserver.org/api/sensorthings/v1.1/"));
 
 	FluentSensorThingsRequest request = FluentSensorThingsRequest.//
 		get(true).//
@@ -362,7 +362,7 @@ public class SensorThingsClientExternalTestIT {
 	Assert.assertFalse(count.isPresent());
 
 	Optional<String> nextLink = addressableEntityResponse.getNextLink();
-	Assert.assertEquals(nextLink.get(), "https://beta.hydroserver2.org/api/sensorthings/v1.1/Observations?$skip=100&$top=100");
+	Assert.assertEquals(nextLink.get(), "https://playground.hydroserver.org/api/sensorthings/v1.1/Observations?$skip=100&$top=100");
 
 	List<Observation> entities = addressableEntityResponse.getEntities();
 
@@ -375,7 +375,7 @@ public class SensorThingsClientExternalTestIT {
 	Assert.assertFalse(observation.getDescription().isPresent());
 
 	String selfLink = observation.getSelfLink().get();
-	Assert.assertEquals("https://beta.hydroserver2.org/api/sensorthings/v1.1/Observations('79e33dbc-f659-4142-b60b-abac8b52175e')",
+	Assert.assertEquals("https://playground.hydroserver.org/api/sensorthings/v1.1/Observations('79e33dbc-f659-4142-b60b-abac8b52175e')",
 		selfLink);
 
 	Optional<JSONObject> properties = observation.getProperties();
