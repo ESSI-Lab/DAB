@@ -370,7 +370,7 @@ public class MeteoTrackerMapper extends OriginalIdentifierMapper {
 			// }
 
 			if (endDate != null && !endDate.isEmpty()) {
-			    skipData = true;
+			    skipData = false;
 			    extent.setEndPosition(endDate);
 
 			}
