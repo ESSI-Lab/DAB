@@ -39,6 +39,7 @@ import eu.essi_lab.iso.datamodel.classes.TemporalExtent.FrameValue;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.model.GSPropertyHandler;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.CoreMetadata;
@@ -77,7 +78,6 @@ public class RIHMIMapper extends OriginalIdentifierMapper {
 	return dataset;
     }
 
-    
     @Override
     public String getSupportedOriginalMetadataSchema() {
 	return CommonNameSpaceContext.RIHMI_URI;
@@ -212,14 +212,25 @@ public class RIHMIMapper extends OriginalIdentifierMapper {
 	Online onlineValues = new Online();
 
 	onlineValues.setName(id);
-	if (interpolation != null) {
-	    onlineValues.setProtocol(CommonNameSpaceContext.RIHMI_HISTORICAL_URI);
-	    onlineValues.setLinkage(RIHMIClient.historicalEndpoint + stationId);
-	} else {
-	    onlineValues.setProtocol(CommonNameSpaceContext.RIHMI_URI);
-	    onlineValues.setLinkage(endpoint);
-	}
 
+	GSPropertyHandler additionalInfo = originalMD.getAdditionalInfo();
+	if (additionalInfo != null) {
+	    Boolean isAral = originalMD.getAdditionalInfo().get("isAral", Boolean.class);
+	    //aral basin case
+	    if (isAral) {
+		String linkage = originalMD.getAdditionalInfo().get("downloadLink", String.class);
+
+	    } else {
+		//russian case
+		if (interpolation != null) {
+		    onlineValues.setProtocol(CommonNameSpaceContext.RIHMI_HISTORICAL_URI);
+		    onlineValues.setLinkage(RIHMIClient.historicalEndpoint + stationId);
+		} else {
+		    onlineValues.setProtocol(CommonNameSpaceContext.RIHMI_URI);
+		    onlineValues.setLinkage(endpoint);
+		}
+	    }
+	}
 	onlineValues.setFunctionCode("download");
 
 	coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(onlineValues);

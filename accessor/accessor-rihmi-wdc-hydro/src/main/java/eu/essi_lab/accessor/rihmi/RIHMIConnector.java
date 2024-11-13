@@ -41,6 +41,8 @@ import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
+import eu.essi_lab.model.GSProperty;
+import eu.essi_lab.model.GSPropertyHandler;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -52,6 +54,8 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
     public static final String TYPE = "RIHMIConnector";
     private static final String RIHMI_CONNECTOR_ERROR = "RIHMI_CONNECTOR_ERROR";
 
+    private static boolean isAral = false;
+
     @Override
     public boolean supports(GSSource source) {
 	String url = source.getEndpoint();
@@ -59,7 +63,6 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
     }
 
     private RIHMIClient client = null;
-
 
     @Override
     public ListRecordsResponse<OriginalMetadata> listTimeseries(String stationId) throws GSException {
@@ -71,9 +74,9 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
     @Override
     public ListRecordsResponse<OriginalMetadata> listRecords(ListRecordsRequest request) throws GSException {
 	List<String> stationIdentifiers;
-	
-	Boolean isAral = getSetting().isAral();
-	
+
+	isAral = getSetting().isAral();
+
 	try {
 	    stationIdentifiers = getStationIdentifiers(isAral);
 	} catch (Exception e) {
@@ -144,11 +147,20 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 		}
 
 		List<String> downloadUrls = new ArrayList<>();
-		// real time download url
-		downloadUrls.add(getRealtimeDownloadUrl(getSourceURL(), stationId));
-		// historical download url
-		downloadUrls.add(client.getHistoricalDownloadUrl(stationId));
 
+		if (isAral) {
+		    // discharges
+		    downloadUrls.add(getRealtimeDownloadUrl(client.getAralDischargeEndpoint(), stationId));
+		    // water level
+		    downloadUrls.add(getRealtimeDownloadUrl(client.getAralWaterLevelEndpoint(), stationId));
+
+		} else {
+		    // real time download url
+		    downloadUrls.add(getRealtimeDownloadUrl(getSourceURL(), stationId));
+		    // historical download url
+		    downloadUrls.add(client.getHistoricalDownloadUrl(stationId));
+		}
+		
 		for (String url : downloadUrls) {
 
 		    OriginalMetadata metadataRecord = new OriginalMetadata();
@@ -201,9 +213,14 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 
 		    rm.setLatitude(Double.parseDouble(split[0]));
 		    rm.setLongitude(Double.parseDouble(split[1]));
-
-		    rm.setParameterId("RIHMI:Discharge");
-		    rm.setParameterName("Discharge");
+		    
+		    if(url.contains(client.getAralWaterLevelEndpoint())) {
+			rm.setParameterId("RIHMI:WaterLevel");
+			rm.setParameterName("Water Level");
+		    } else {
+			rm.setParameterId("RIHMI:Discharge");
+			rm.setParameterName("Discharge");
+		    }
 		    rm.setStationId(stationId);
 		    String name = reader
 			    .evaluateString("//*:MonitoringPoint[1]/*:parameter[1]/*:NamedValue[1]/*:value[1]/*:CharacterString[1]");
@@ -241,6 +258,13 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 
 		    metadataRecord.setMetadata(str);
 
+		    GSPropertyHandler handler = GSPropertyHandler.of(new GSProperty<Boolean>("isAral", isAral));
+		    if (isAral) {
+			handler.add(//
+				new GSProperty<String>("downloadLink", url));
+		    }
+		    metadataRecord.setAdditionalInfo(handler);
+		    
 		    ret.addRecord(metadataRecord);
 
 		}
@@ -271,7 +295,11 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 	if (time.isEmpty()) {
 	    return null;
 	}
-	return time.replace(" ", "") + "Z";
+	if(time.endsWith("Z")) {
+	    return time.replace(" ", "");
+	}else {
+	    return time.replace(" ", "") + "Z";
+	}
     }
 
     public static String getRealtimeDownloadUrl(String url, String stationId) {

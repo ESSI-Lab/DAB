@@ -53,14 +53,22 @@ public class RIHMIClient {
     
     public static String aralStationListendpoint = "http://ws.meteo.ru/hydro/rest/GetWHOSHydroStationsAral/whos";
     
-    public static String aralDischargeEndpoint = "http://ws.meteo.ru/hydro/rest/GetHydroDischargesAral/xml";
+    public static String aralDischargeEndpoint = "http://ws.meteo.ru/hydro/rest/GetHydroDischargesAral/xml?";
     
-    public static String aralWaterLevelendpoint = "http://ws.meteo.ru/hydro/rest/GetHydroWaterLevelAral/xml";
+    public static String aralWaterLevelendpoint = "http://ws.meteo.ru/hydro/rest/GetHydroWaterLevelAral/xml?";
 
     public String getEndpoint() {
 	return realtimeEndpoint;
     }
 
+    public String getAralDischargeEndpoint() {
+	return aralDischargeEndpoint;
+    }
+    
+    public String getAralWaterLevelEndpoint() {
+	return aralWaterLevelendpoint;
+    }
+    
     public void setEndpoint(String endpoint) {
 	this.realtimeEndpoint = endpoint;
     }
