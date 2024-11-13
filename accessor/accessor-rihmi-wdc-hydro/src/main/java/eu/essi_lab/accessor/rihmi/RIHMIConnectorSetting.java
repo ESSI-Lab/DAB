@@ -1,5 +1,7 @@
 package eu.essi_lab.accessor.rihmi;
 
+import org.json.JSONObject;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -22,17 +24,81 @@ package eu.essi_lab.accessor.rihmi;
  */
 
 import eu.essi_lab.cfga.gs.setting.connector.HarvestedConnectorSetting;
+import eu.essi_lab.cfga.option.BooleanChoice;
+import eu.essi_lab.cfga.option.BooleanChoiceOptionBuilder;
+import eu.essi_lab.cfga.option.Option;
+import eu.essi_lab.lib.utils.LabeledEnum;
 
 /**
  * @author Fabrizio
  */
 public class RIHMIConnectorSetting extends HarvestedConnectorSetting {
 
+    private static final String ARAL_OPTION_KEY = "aral_option_key";
+
+    /**
+     * 
+     */
+    private static final int DEFAULT_PAGE_SIZE = 50;
+
+    
+    public RIHMIConnectorSetting() {
+	
+	setPageSize(DEFAULT_PAGE_SIZE);
+	
+	Option<BooleanChoice> option = BooleanChoiceOptionBuilder.get().//
+			withKey(ARAL_OPTION_KEY).//
+			withLabel("ARAL BASIN").//
+			withSingleSelection().//
+			withValues(LabeledEnum.values(BooleanChoice.class)).//
+			withSelectedValue(BooleanChoice.FALSE).//
+			cannotBeDisabled().//
+			build();
+
+		addOption(option);
+    }
+    
+    /**
+     * @param set
+     */
+    public void setIsAral(boolean set) {
+
+	getOption(ARAL_OPTION_KEY, BooleanChoice.class).get().select(v -> v == BooleanChoice.fromBoolean(set));
+    }
+
+    /**
+     * @return
+     */
+    public boolean isAral() {
+
+	return BooleanChoice.toBoolean(getOption(ARAL_OPTION_KEY, BooleanChoice.class).get().getSelectedValue());
+    }
+
+
+    /**
+     * @param object
+     */
+    public RIHMIConnectorSetting(JSONObject object) {
+
+	super(object);
+    }
+
+    /**
+     * @param object
+     */
+    public RIHMIConnectorSetting(String object) {
+
+	super(object);
+    }
+
+    
     @Override
-    protected String initConnectorType() {
+    protected String initConnectorType() {	
 
 	return RIHMIConnector.TYPE;
     }
+
+    
 
     @Override
     protected String initSettingName() {

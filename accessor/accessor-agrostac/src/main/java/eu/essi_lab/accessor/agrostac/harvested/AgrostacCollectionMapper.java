@@ -161,7 +161,7 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 
     public enum CROP_CODES {
 
-	SBN("soy_soybeans", "1106000020"), CBN("beans", "1105010010"), COT("cotton", "1108000010"), SUN("sunflower", "1106000010"), RYEW(
+	WHD("durum_hard_wheat","1101010020"),TRI("triticale","1101050000"),ONI("onions","1103110040"),SBN("soy_soybeans", "1106000020"), CBN("beans", "1105010010"), COT("cotton", "1108000010"), SUN("sunflower", "1106000010"), RYEW(
 		"winter_rye", "1101030001"), WHBW("winter_common_soft_wheat", "1101010011"), TRO("unspecified_wheat", "1101010000"), SGG(
 			"unspecified_sorghum", "1101070030"), PML("unspecified_millet", "1101070010"), RIC("rice", "1101080000"), GRS(
 				"grass_fodder_crops", "1111000000"), RAP("rapeseed_rape", "1106000030"), RAPW("winter_rapeseed_rape",
