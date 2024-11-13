@@ -50,6 +50,12 @@ public class RIHMIClient {
     public static String historicalEndpoint = "http://ws.meteo.ru/hydro/rest/GetHydroAveMonDischargesRF/xml/";
 
     public static String stationListendpoint = "http://ws.meteo.ru/hydro/rest/GetWHOSHydroStationsRF/whos";
+    
+    public static String aralStationListendpoint = "http://ws.meteo.ru/hydro/rest/GetWHOSHydroStationsAral/whos";
+    
+    public static String aralDischargeEndpoint = "http://ws.meteo.ru/hydro/rest/GetHydroDischargesAral/xml";
+    
+    public static String aralWaterLevelendpoint = "http://ws.meteo.ru/hydro/rest/GetHydroWaterLevelAral/xml";
 
     public String getEndpoint() {
 	return realtimeEndpoint;
@@ -96,8 +102,9 @@ public class RIHMIClient {
 
     }
 
-    public List<String> getStationIdentifiers() throws Exception {
-	InputStream stream = downloadStream(stationListendpoint);
+    public List<String> getStationIdentifiers(boolean isAral) throws Exception {
+	String identifierEndpoint = isAral ? aralStationListendpoint : stationListendpoint;
+	InputStream stream = downloadStream(identifierEndpoint);
 	XMLDocumentReader reader = new XMLDocumentReader(stream);
 	Node[] nodes = reader.evaluateNodes("//*:MonitoringPoint/*:identifier");
 	List<String> ret = new ArrayList<>();

@@ -50,7 +50,7 @@ public class RIHMIClientExternalTestIT {
     @Test
     public void testStationIdentifiers() throws Exception {
 	RIHMIClient client = new RIHMIClient();
-	List<String> ids = client.getStationIdentifiers();
+	List<String> ids = client.getStationIdentifiers(false);
 	System.out.println(ids.size() + " values retrieved");
 	assertTrue(ids.size() > 60);
     }
