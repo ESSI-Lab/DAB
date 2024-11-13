@@ -28,6 +28,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -186,10 +187,16 @@ public class MeteoTrackerMapper extends OriginalIdentifierMapper {
     protected String createOriginalIdentifier(GSResource resource) {
 
 	String metadata = resource.getOriginalMetadata().getMetadata();
-	JSONObject object = new JSONObject(metadata);
+	OriginalMetadata om = new OriginalMetadata();
+	om.setMetadata(metadata);
+	
+	JSONObject object = retrieveDatasetInfo(om);
+	String varName = retrieveVariableInfo(om);
 
 	if (object.has("_id")) {
-	    return object.getString("_id");
+	    String toHash = object.getString("_id") + "_" + varName;
+	    String uuid = UUID.nameUUIDFromBytes(toHash.getBytes()).toString();
+	    return uuid;
 	}
 
 	return null;
@@ -202,6 +209,11 @@ public class MeteoTrackerMapper extends OriginalIdentifierMapper {
 	dataset.setSource(source);
 
 	mapMetadata(originalMD, dataset);
+	
+	
+	if(!dataset.getPropertyHandler().isValidated()) {
+	    return null;
+	}
 
 	return dataset;
 
@@ -552,7 +564,9 @@ public class MeteoTrackerMapper extends OriginalIdentifierMapper {
 	    }
 	    
 	    if(skipData) {
-		dataset = null;
+		dataset.getPropertyHandler().setIsValidated(false);
+	    }else {
+		dataset.getPropertyHandler().setIsValidated(true);
 	    }
 
 	    // String metadata = originalMD.getMetadata();

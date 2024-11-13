@@ -32,10 +32,12 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.TimeZone;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
@@ -71,7 +73,6 @@ public class MeteoTrackerConnector extends HarvestedQueryConnector<MeteoTrackerC
      * 
      */
     public static final String TYPE = "MeteoTrackerConnector";
-
 
     /**
      *
@@ -211,8 +212,8 @@ public class MeteoTrackerConnector extends HarvestedQueryConnector<MeteoTrackerC
 	}
 
 	int pageSize = getSetting().getPageSize();
-//	if (pageSize == 0)
-//	    pageSize = 100;
+	// if (pageSize == 0)
+	// pageSize = 100;
 
 	Optional<Integer> mr = getSetting().getMaxRecords();
 	boolean maxNumberReached = false;
@@ -233,7 +234,14 @@ public class MeteoTrackerConnector extends HarvestedQueryConnector<MeteoTrackerC
 		if (timestamp != null) {
 		    @SuppressWarnings("deprecation")
 		    Date date = ISO8601DateTimeUtils.parseISO8601(timestamp);
-		    time = date.getTime();
+		    Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+		    calendar.setTime(date);
+		    calendar.set(Calendar.HOUR_OF_DAY, 0);
+		    calendar.set(Calendar.MINUTE, 0);
+		    calendar.set(Calendar.SECOND, 0);
+		    calendar.set(Calendar.MILLISECOND, 0);
+		    Date updatedDate = calendar.getTime();
+		    time = updatedDate.getTime();
 		    GSLoggerFactory.getLogger(getClass()).info("Incremental harvesting enabled starting from: " + timestamp);
 		}
 	    }
