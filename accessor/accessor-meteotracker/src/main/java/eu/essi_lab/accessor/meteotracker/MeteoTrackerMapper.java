@@ -211,6 +211,7 @@ public class MeteoTrackerMapper extends OriginalIdentifierMapper {
 
 	try {
 
+	    boolean skipData = true;
 	    dataset.getPropertyHandler().setIsTrajectory(true);
 
 	    String metadata = originalMD.getMetadata();
@@ -369,7 +370,7 @@ public class MeteoTrackerMapper extends OriginalIdentifierMapper {
 			// }
 
 			if (endDate != null && !endDate.isEmpty()) {
-
+			    skipData = true;
 			    extent.setEndPosition(endDate);
 
 			}
@@ -548,6 +549,10 @@ public class MeteoTrackerMapper extends OriginalIdentifierMapper {
 
 		    coreMetadata.getMIMetadata().getDistribution().getDistributionOnline().setIdentifier(resourceIdentifier);
 		}
+	    }
+	    
+	    if(skipData) {
+		dataset = null;
 	    }
 
 	    // String metadata = originalMD.getMetadata();
