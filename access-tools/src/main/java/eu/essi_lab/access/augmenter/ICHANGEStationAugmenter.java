@@ -182,6 +182,7 @@ public class ICHANGEStationAugmenter extends ResourceAugmenter<ICHANGEStationAug
 		}
 	    }
 
+	    record.setLastHarvesting(new Date());
 	    dataCacheConnector.writeStation(record);
 
 	    GSLoggerFactory.getLogger(getClass()).info("[STATION] Augmented {}", fileId);
