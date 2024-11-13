@@ -34,6 +34,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -116,6 +117,7 @@ public class Layer {
     private boolean completed = false;
     private Date lastHarvesting = null;
     private DefaultFeatureCollection collectionPoints;
+    private HashSet<String> featureIdentifiers;
     private DefaultFeatureCollection collectionLines;
 
     public boolean isCompleted() {
@@ -386,6 +388,7 @@ public class Layer {
 
 	this.collectionPoints = new DefaultFeatureCollection();
 	this.collectionLines = new DefaultFeatureCollection();
+	featureIdentifiers = new HashSet<>();
 
 	Thread t = new Thread() {
 	    @Override
@@ -519,15 +522,17 @@ public class Layer {
 					featureBuilder.add(record.getPlatformIdentifier());
 					featureBuilder.add(n);
 					SimpleFeature feature = featureBuilder.buildFeature(null);
-					if (geometry instanceof Point) {
-					    collectionPoints.add(feature);
-					} else {
-					    collectionLines.add(feature);
-					}
-
-					Date tmpHarvesting = record.getLastHarvesting();
-					if (lastHarvesting == null || lastHarvesting.before(tmpHarvesting)) {
-					    lastHarvesting = tmpHarvesting;
+					if (!featureIdentifiers.contains(record.getPlatformIdentifier())) {
+					    featureIdentifiers.add(record.getPlatformIdentifier());
+					    if (geometry instanceof Point) {
+						collectionPoints.add(feature);
+					    } else {
+						collectionLines.add(feature);
+					    }
+					    Date tmpHarvesting = record.getLastHarvesting();
+					    if (lastHarvesting == null || lastHarvesting.before(tmpHarvesting)) {
+						lastHarvesting = tmpHarvesting;
+					    }
 					}
 
 				    }
@@ -583,7 +588,7 @@ public class Layer {
 
 	ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-	scheduler.scheduleAtFixedRate(t, 0, 1, TimeUnit.MINUTES);
+	scheduler.scheduleAtFixedRate(t, 0, 5, TimeUnit.MINUTES);
 
     }
 
