@@ -71,8 +71,11 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
     @Override
     public ListRecordsResponse<OriginalMetadata> listRecords(ListRecordsRequest request) throws GSException {
 	List<String> stationIdentifiers;
+	
+	Boolean isAral = getSetting().isAral();
+	
 	try {
-	    stationIdentifiers = getStationIdentifiers();
+	    stationIdentifiers = getStationIdentifiers(isAral);
 	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(e);
@@ -111,7 +114,7 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 
     private static List<String> stationIdentifiers = null;
 
-    private List<String> getStationIdentifiers() throws Exception {
+    private List<String> getStationIdentifiers(boolean isAral) throws Exception {
 
 	if (client == null) {
 	    client = new RIHMIClient();
@@ -120,7 +123,7 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 	if (stationIdentifiers != null) {
 	    return stationIdentifiers;
 	}
-	stationIdentifiers = client.getStationIdentifiers();
+	stationIdentifiers = client.getStationIdentifiers(isAral);
 	return stationIdentifiers;
     }
 
