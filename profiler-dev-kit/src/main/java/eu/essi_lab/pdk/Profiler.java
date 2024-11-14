@@ -383,9 +383,13 @@ public abstract class Profiler implements Configurable<ProfilerSetting>, WebRequ
 			handler.getClass().getSimpleName());
 
 		onFilterAccept(request, handler);
-
+		
+		//
+		// request validation (optional) 
+		// 
+		
 		WebRequestValidator validator = null;
-		RequestType type = null;
+		RequestType requestType = null;
 
 		if (handler instanceof ProfilerHandler) {
 
@@ -395,46 +399,50 @@ public abstract class Profiler implements Configurable<ProfilerSetting>, WebRequ
 
 		    if (handler instanceof DiscoveryHandler<?>) {
 
-			type = RequestType.DISCOVERY;
+			requestType = RequestType.DISCOVERY;
 
 		    } else if (handler instanceof AccessHandler<?>) {
 
-			type = RequestType.ACCESS;
+			requestType = RequestType.ACCESS;
 
 		    } else if (handler instanceof SemanticHandler<?>) {
 
-			type = RequestType.SEMANTIC;
+			requestType = RequestType.SEMANTIC;
 		    }
 
 		} else if (handler instanceof WebRequestValidator) {
 
 		    validator = (WebRequestValidator) handler;
-		    type = RequestType.OTHER;
+		    requestType = RequestType.OTHER;
+		}
+
+		if (validator != null) {
+
+		    String validatorInfo = "[using validator: " + validator.getClass().getSimpleName() + "]";
+		    validationMessage = validator.validate(request);
+
+		    // get the validation result
+		    ValidationResult result = validationMessage.getResult();
+
+		    // in case of validation failed, throws a GSException with
+		    // the validation error message
+		    if (result == ValidationResult.VALIDATION_FAILED) {
+
+			GSLoggerFactory.getLogger(getClass()).warn("{} Validation FAILED {}", getRequestLogPrefix(request), validatorInfo);
+			return onValidationFailed(request, validationMessage);
+		    }
+
+		    GSLoggerFactory.getLogger(getClass()).info("{} Validation SUCCESSFUL {}", getRequestLogPrefix(request), validatorInfo);
+		    onRequestValidated(request, validator, requestType);
+
 		} else {
-		    throw GSException.createException(//
-			    getClass(), //
-			    "Can't find validator", //
-			    ErrorInfo.ERRORTYPE_INTERNAL, //
-			    ErrorInfo.SEVERITY_ERROR, //
-			    NO_VALIDATOR_FOUND);
+
+		    GSLoggerFactory.getLogger(getClass()).warn("No validator found");
 		}
-
-		String validatorInfo = "[using validator: " + validator.getClass().getSimpleName() + "]";
-		validationMessage = validator.validate(request);
-
-		// get the validation result
-		ValidationResult result = validationMessage.getResult();
-
-		// in case of validation failed, throws a GSException with
-		// the validation error message
-		if (result == ValidationResult.VALIDATION_FAILED) {
-
-		    GSLoggerFactory.getLogger(getClass()).warn("{} Validation FAILED {}", getRequestLogPrefix(request), validatorInfo);
-		    return onValidationFailed(request, validationMessage);
-		}
-
-		GSLoggerFactory.getLogger(getClass()).info("{} Validation SUCCESSFUL {}", getRequestLogPrefix(request), validatorInfo);
-		onRequestValidated(request, validator, type);
+		
+		//
+		// request handling
+		//
 
 		response = handler.handle(request);
 
@@ -447,7 +455,7 @@ public abstract class Profiler implements Configurable<ProfilerSetting>, WebRequ
 	    }
 
 	} catch (Throwable e) {
-	    
+
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
 
 	    throw e;
