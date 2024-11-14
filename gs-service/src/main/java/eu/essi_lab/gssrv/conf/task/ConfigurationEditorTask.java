@@ -74,7 +74,7 @@ public class ConfigurationEditorTask extends AbstractCustomTask {
 	// scheduling
 	//
 
-	Date startDate = new Date();
+	Date startDate = new Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(10));
 
 	Scheduling scheduling = harvestingSetting.getScheduling();
 	scheduling.setEnabled(true);
@@ -85,6 +85,14 @@ public class ConfigurationEditorTask extends AbstractCustomTask {
 	scheduling.setStartTime(startDate);
 
 	scheduler.schedule(harvestingSetting);
+
+	//
+	//
+	//
+
+	SelectionUtils.deepClean(harvestingSetting);
+
+	configuration.put(harvestingSetting);
 
 	//
 	//
@@ -152,12 +160,6 @@ public class ConfigurationEditorTask extends AbstractCustomTask {
 		wrapper.selectConnectorType(connectorType.get());
 	    }
 	}
-
-	//
-	//
-	//
-
-	SelectionUtils.deepClean(harvSetting);
 
 	//
 	//
