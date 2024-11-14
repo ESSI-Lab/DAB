@@ -39,6 +39,7 @@ import eu.essi_lab.lib.sensorthings._1_1.model.entities.Location;
 import eu.essi_lab.lib.sensorthings._1_1.model.entities.Sensor;
 import eu.essi_lab.lib.sensorthings._1_1.model.entities.Thing;
 import eu.essi_lab.model.resource.CoreMetadata;
+import eu.essi_lab.model.resource.Country;
 import eu.essi_lab.model.resource.ExtensionHandler;
 
 /**
@@ -168,7 +169,7 @@ public class FraunhoferAirQualityMapper extends SensorThingsMapper {
      * @return
      */
     @Override
-    protected void addPlatform(Thing thing, CoreMetadata coreMetadata, DataIdentification dataId, Keywords keywords) {
+    protected void addPlatform(Thing thing, CoreMetadata coreMetadata, DataIdentification dataId, Keywords keywords,ExtensionHandler handler) {
 
 	Location location = thing.getLocations().get(0);
 
@@ -197,10 +198,13 @@ public class FraunhoferAirQualityMapper extends SensorThingsMapper {
 	if (optLocationProp.isPresent()) {
 
 	    String countryCode = optLocationProp.get().optString("countryCode");
-
-	    platform.setDescription("Country: " + countryCode);
-
-	    addKeyword(keywords, countryCode);
+	    if (countryCode != null && !countryCode.isEmpty()) {
+		Country c = Country.decode(countryCode);
+		if (c!=null) {
+		    handler.setCountry(c.getShortName());
+		    handler.setCountryISO3(c.getISO3());
+		}		
+	    }
 	}
 
 	//
