@@ -107,8 +107,6 @@ public class ConfigurationEditorTask extends AbstractCustomTask {
 
 	scheduler.schedule(harvestingSetting);
 	
-	SelectionUtils.deepClean(harvestingSetting);
-
 	//
 	//
 	//
