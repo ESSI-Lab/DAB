@@ -57,6 +57,7 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.CoreMetadata;
+import eu.essi_lab.model.resource.Country;
 import eu.essi_lab.model.resource.ExtensionHandler;
 
 /**
@@ -106,7 +107,7 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 	    throw GSException.createException(getClass(), getDownloadStreamErrorMessage(), e);
 	}
     }
-    
+
     /**
      * @param thingId
      * @return
@@ -134,7 +135,6 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 	}
     }
 
-
     /**
      * @param stream
      * @param coreMetadata
@@ -147,14 +147,16 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 	// at the moment since title is equal to the id, we replace it with the description
 	// deprived of the text after the '-' symbol
 	//
-	if (streamDesc.isPresent()) {
 
+	Optional<String> streamId = stream.getIdentifier();
+	Optional<String> streamName = stream.getName();
+
+	if (streamId.isPresent() && streamName.isPresent() && streamDesc.isPresent() && streamDesc.get().contains("-")
+		&& streamId.get().equals(streamName.get())) {
 	    String title = streamDesc.get().substring(0, streamDesc.get().indexOf("-")).trim();
 	    coreMetadata.setTitle(title);
 
 	} else {
-
-	    Optional<String> streamName = stream.getName();
 	    coreMetadata.setTitle(streamName.isPresent() ? streamName.get() : stream.getIdentifier().get());
 	}
     }
@@ -309,18 +311,24 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 		String firstName = object.optString("firstName");
 		String lastName = object.optString("lastName");
 		String email = object.optString("email");
+		String organization = object.optString("organizationName");
 
-		if (!firstName.isEmpty() && !lastName.isEmpty() && !email.isEmpty()) {
+		if (!firstName.isEmpty() || !lastName.isEmpty() || !organization.isEmpty()) {
 
 		    ResponsibleParty responsibleParty = new ResponsibleParty();
-		    responsibleParty.setIndividualName(firstName.trim() + " " + lastName.trim());
+		    if (!firstName.isEmpty() && !lastName.isEmpty()) {
+			responsibleParty.setIndividualName(firstName.trim() + " " + lastName.trim());
+		    } else {
+			responsibleParty.setOrganisationName(organization.trim());
+		    }
 
-		    Contact con = new Contact();
-		    Address address = new Address();
-		    address.addElectronicMailAddress(email.trim());
-		    con.setAddress(address);
-
-		    responsibleParty.setContactInfo(con);
+		    if (!email.isEmpty()) {
+			Contact con = new Contact();
+			Address address = new Address();
+			address.addElectronicMailAddress(email.trim());
+			con.setAddress(address);
+			responsibleParty.setContactInfo(con);
+		    }
 
 		    dataId.addPointOfContact(responsibleParty);
 		}
@@ -428,11 +436,11 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 	    Object object = properties.get("timeAggregationIntervalUnitOfMeasurement");
 	    if (object instanceof JSONObject) {
 
-		JSONObject timeUnit = (JSONObject)object;
+		JSONObject timeUnit = (JSONObject) object;
 		aggrTimeUnitName = timeUnit.optString("name");
-	
+
 	    } else {
-		
+
 		aggrTimeUnitName = object.toString();
 	    }
 
@@ -500,7 +508,7 @@ public class HydroServer2Mapper extends SensorThingsMapper {
      * @return
      */
     @Override
-    protected void addPlatform(Thing thing, CoreMetadata coreMetadata, DataIdentification dataId, Keywords keywords) {
+    protected void addPlatform(Thing thing, CoreMetadata coreMetadata, DataIdentification dataId, Keywords keywords,ExtensionHandler handler) {
 
 	Location location = thing.getLocations().get(0);
 
@@ -535,6 +543,16 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 
 	    addKeyword(keywords, state);
 	    addKeyword(keywords, county);
+
+	    String countryCode = optLocationProp.get().optString("countryCode");
+	    if (countryCode != null && !countryCode.isEmpty()) {
+		Country c = Country.decode(countryCode);
+		if (c!=null) {
+		    handler.setCountry(c.getShortName());
+		    handler.setCountryISO3(c.getISO3());
+		}		
+	    }
+
 	}
 
 	//

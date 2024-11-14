@@ -112,7 +112,7 @@ public class ICHANGEStationAugmenter extends ResourceAugmenter<ICHANGEStationAug
 	    		if (optBegin.isPresent()&&optEnd.isPresent()) {
 	    			record.setBegin(optBegin.get());
 	    			record.setEnd(optEnd.get());
-	    		}
+	    		}	    		
 	    	}
 	    }
 	    
