@@ -23,6 +23,8 @@ package eu.essi_lab.gssrv.conf.task;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,6 +54,16 @@ public class CUAHSISourceFinder extends SourceFinder {
 	    GSLoggerFactory.getLogger(getClass()).error(e);
 	    tmp = new ArrayList<ServiceInfo>();
 	}
+	tmp.sort(new Comparator<ServiceInfo>() {
+	    @Override
+	    public int compare(ServiceInfo o1, ServiceInfo o2) {
+		String s1 = o1.getSiteCount();
+		String s2 = o2.getSiteCount();
+		Integer i1 = Integer.parseInt(s1);
+		Integer i2 = Integer.parseInt(s2);
+		return i1.compareTo(i2);
+	    }
+	});
 	for (ServiceInfo info : tmp) {
 	    if (//
 		//
