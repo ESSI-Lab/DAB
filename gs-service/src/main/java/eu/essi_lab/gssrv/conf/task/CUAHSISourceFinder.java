@@ -26,7 +26,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import eu.essi_lab.accessor.wof.client.CUAHSIHISCentralClient;
+import eu.essi_lab.accessor.wof.client.datamodel.ServiceInfo;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.model.exceptions.GSException;
 
 public class CUAHSISourceFinder extends SourceFinder {
 
@@ -37,22 +41,38 @@ public class CUAHSISourceFinder extends SourceFinder {
 		"EasyAccessAugmenter", //
 		"WHOSUnitsAugmenter", //
 		"WHOSVariableAugmenter");
-	HarvestingSetting harvestingSetting = createSetting(//
-		"CUAHSIHISServer", //
-		Optional.empty(), //
-		"wof1", //
-		"WOF test 1", //
-		"https://hydroportal.cuahsi.org/woftest/cuahsi_1_1.asmx", //
-		augmenterTypes);
-	ret.add(harvestingSetting);
-	HarvestingSetting harvestingSetting2 = createSetting(//
-		"CUAHSIHISServer", //
-		Optional.empty(), //
-		"wof2", //
-		"WOF test 2", //
-		"https://hydroportal.cuahsi.org/woftest/cuahsi_1_1.asmx", //
-		augmenterTypes);
-	ret.add(harvestingSetting2);
+
+	CUAHSIHISCentralClient client = new CUAHSIHISCentralClient(endpoint);
+
+	List<ServiceInfo> tmp;
+	try {
+	    tmp = client.getServicesInBox("-180", "-90", "180", "90");
+	} catch (GSException e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	    tmp = new ArrayList<ServiceInfo>();
+	}
+	for (ServiceInfo info : tmp) {
+	    if (//
+		//
+	    info.getServiceURL().contains("www4.des.state.nh.us/WaterOneFlow/cuahsi_1_1.asmx")// 403 forbidden
+	    // info.getServiceURL().contains("hydro1.gesdisc.eosdis.nasa.gov/daac-bin/his/1.0/NLDAS_FORA_002.cgi")||//
+	    // info.getServiceURL().contains("hydro1.gesdisc.eosdis.nasa.gov/daac-bin/his/1.0/NLDAS_NOAH_002")||//
+	    // info.getServiceURL().contains("hydroportal.cuahsi.org/nwisgw/cuahsi_1_1.asmx") // usgs ground water
+	    ) {
+		continue;
+	    }
+	    HarvestingSetting harvestingSetting = createSetting(//
+		    "CUAHSIHISServer", //
+		    Optional.empty(), //
+		    identifierPrefix + "-" + info.getServiceID().trim(), //
+		    "HIS-Central: " + info.getTitle().trim(), //
+		    info.getServiceURL(), //
+		    augmenterTypes);
+	    ret.add(harvestingSetting);
+
+	}
+
 	return ret;
     }
 

@@ -60,7 +60,7 @@ public class ServiceInfo  {
 
     public String getTitle() {
 	try {
-	    return reader.evaluateString("*:Title");
+	    return reader.evaluateString("*:Title").trim();
 	} catch (XPathExpressionException e) {
 
 	    logger.warn("Title not found", e);
@@ -182,7 +182,7 @@ public class ServiceInfo  {
 
     public String getServiceID() {
 	try {
-	    return reader.evaluateString("*:ServiceID");
+	    return reader.evaluateString("*:ServiceID").trim();
 	} catch (XPathExpressionException e) {
 
 	    logger.warn("Service ID not found", e);
