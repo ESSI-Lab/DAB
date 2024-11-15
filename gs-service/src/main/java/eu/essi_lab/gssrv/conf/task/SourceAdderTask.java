@@ -3,7 +3,6 @@
  */
 package eu.essi_lab.gssrv.conf.task;
 
-import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -36,7 +35,6 @@ import java.util.Optional;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
-import org.joda.time.DateTimeZone;
 import org.quartz.JobExecutionContext;
 
 import eu.essi_lab.cfga.Configuration;
@@ -52,12 +50,11 @@ import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.cfga.setting.scheduling.Scheduling;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 
 /**
  * @author Fabrizio
  */
-public class ConfigurationEditorTask extends AbstractCustomTask {
+public class SourceAdderTask extends AbstractCustomTask {
 
     public enum SourceType {
 	SIMPLE_CUAHSI_SOURCES, CUAHSI_HIS_CENTRAL
@@ -77,6 +74,7 @@ public class ConfigurationEditorTask extends AbstractCustomTask {
 	 * id
 	 * offset 1 (minutes to wait before starting the tasks)
 	 * offset 2 (minutes between the start of each task)
+	 * schedule (yes or no)
 	 * Example: (it will expand the his-central at the given endpoint, scheduling the related hydroserver sources at
 	 * interval of 2 minutes from each other. The sources id will have the gfhc prefix)
 	 * CUAHSI_HIS_CENTRAL
@@ -84,6 +82,7 @@ public class ConfigurationEditorTask extends AbstractCustomTask {
 	 * gfhc
 	 * 0
 	 * 2
+	 * yes
 	 */
 
 	String type = null;
@@ -91,13 +90,14 @@ public class ConfigurationEditorTask extends AbstractCustomTask {
 	String id = null;
 	Integer offset1 = null;
 	Integer offset2 = null;
+	String schedule = null;
 
 	if (taskOptions.isPresent()) {
 	    String options = taskOptions.get();
 	    if (options != null) {
 		if (options.contains("\n")) {
 		    String[] split = options.split("\n");
-		    if (split.length < 5) {
+		    if (split.length < 6) {
 			GSLoggerFactory.getLogger(getClass()).error("Missing options for this task");
 			return;
 		    }
@@ -106,10 +106,11 @@ public class ConfigurationEditorTask extends AbstractCustomTask {
 		    id = split[2].trim();
 		    offset1 = Integer.parseInt(split[3].trim());
 		    offset2 = Integer.parseInt(split[4].trim());
+		    schedule = split[5].trim();
 		}
 	    }
 	}
-	if (type == null || endpoint == null || id == null || offset1 == null || offset2 == null) {
+	if (type == null || endpoint == null || id == null || offset1 == null || offset2 == null || schedule == null) {
 	    GSLoggerFactory.getLogger(getClass()).error("Missing options for this task");
 	    return;
 	}
@@ -166,6 +167,12 @@ public class ConfigurationEditorTask extends AbstractCustomTask {
 	// scheduling
 	//
 
+	boolean bigSet = false;
+	if (sources.size() > 30) {
+	    // the first sources in a big set starts together
+	    bigSet = true;
+	}
+
 	for (int i = 0; i < sources.size(); i++) {
 
 	    HarvestingSetting source = sources.get(i);
@@ -179,23 +186,42 @@ public class ConfigurationEditorTask extends AbstractCustomTask {
 
 	    if (optional.isEmpty()) {
 
-		Scheduling scheduling = source.getScheduling();
-		scheduling.setEnabled(true);
-		scheduling.setRunIndefinitely();
-		scheduling.setRepeatInterval(1000, TimeUnit.DAYS);
-		
-		ZonedDateTime now = ZonedDateTime.now(); 
-		now = now.plusMinutes(i * offset2);
-		
-		ZonedDateTime tokyoTime = now.withZoneSameInstant(ZoneId.of(schedulerSetting.getUserDateTimeZone().getID())); // Format the date-time 
-		
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"); 
-		
-		String formattedDate = tokyoTime.format(formatter);		
+		if (schedule.equals("yes")) {
+		    Scheduling scheduling = source.getScheduling();
+		    scheduling.setEnabled(true);
+		    scheduling.setRunIndefinitely();
+		    scheduling.setRepeatInterval(1000, TimeUnit.DAYS);
 
-		scheduling.setStartTime(formattedDate);
+		    ZonedDateTime now = ZonedDateTime.now();
 
-		scheduler.schedule(source);
+		    // the start offset
+		    int offset = offset1;
+
+		    // the first n sources in a big set starts together (hack for CUAHSI HIS-CENTRAL)
+		    if (bigSet) {
+			int n = 60;
+			if (i < n) {
+			    // the first sources start together
+			} else {
+			    // then the other sources at regular intervals
+			    offset = offset + (i - n) * offset2;
+			}
+		    } else {
+			offset = offset + i * offset2;
+		    }
+		    now = now.plusMinutes(offset);
+
+		    ZonedDateTime tokyoTime = now.withZoneSameInstant(ZoneId.of(schedulerSetting.getUserDateTimeZone().getID())); // Format
+
+		    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+
+		    String formattedDate = tokyoTime.format(formatter);
+
+		    scheduling.setStartTime(formattedDate);
+
+		    scheduler.schedule(source);
+
+		}
 		SelectionUtils.deepClean(source);
 		configuration.put(source);
 		GSLoggerFactory.getLogger(getClass()).info("Added source: {}", source.getName());
@@ -212,21 +238,21 @@ public class ConfigurationEditorTask extends AbstractCustomTask {
     @Override
     public String getName() {
 
-	return "Configuration editor task";
+	return "Source adder task";
     }
 
     public static void main(String[] args) {
-	
+
 	Date startDate = new Date(System.currentTimeMillis() + 5 * TimeUnit.MINUTES.toMillis(2));
 
-//	String iso8601Date = ISO8601DateTimeUtils.getISO8601DateTime(startDate);
-	
+	// String iso8601Date = ISO8601DateTimeUtils.getISO8601DateTime(startDate);
+
 	Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Berlin"));
 	cal.setTime(startDate);
 
 	startDate = cal.getTime();
-	
+
 	System.out.println(startDate);
     }
-    
+
 }

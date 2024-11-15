@@ -15,4 +15,4 @@ eu.essi_lab.gssrv.conf.task.bluecloud.BlueCloudReportTask
 eu.essi_lab.gssrv.conf.task.CorruptedBlobTriggersCleanerTask
 eu.essi_lab.gssrv.conf.task.WISMetadataTask
 eu.essi_lab.gssrv.conf.task.turtle.TurtleTask
-eu.essi_lab.gssrv.conf.task.ConfigurationEditorTask
+eu.essi_lab.gssrv.conf.task.SourceAdderTask
