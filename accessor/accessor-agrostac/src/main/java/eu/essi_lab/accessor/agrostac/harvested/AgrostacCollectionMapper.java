@@ -416,7 +416,11 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 	    if (id.equals(datasetId)) {
 		String cropCode = overviewObj.optString(CROP_CODE);
 		String cropName = overviewObj.optString(CROP_NAME);
-		keywords.add(cropName);
+		String cropKey = agrostacCache.getCrop(cropCode);
+		if(cropKey != null && !cropKey.isEmpty()) {
+		    keywords.add(cropKey);    
+		}
+		
 		CROP_CODES cCode = CROP_CODES.decode(cropCode);
 		String newCropCode = null;
 		if (cCode != null) {
