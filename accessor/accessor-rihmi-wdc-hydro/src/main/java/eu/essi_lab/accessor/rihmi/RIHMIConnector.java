@@ -160,7 +160,7 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 		    // historical download url
 		    downloadUrls.add(client.getHistoricalDownloadUrl(stationId));
 		}
-		
+
 		for (String url : downloadUrls) {
 
 		    OriginalMetadata metadataRecord = new OriginalMetadata();
@@ -203,18 +203,31 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 		    }
 
 		    RIHMIMetadata rm = new RIHMIMetadata();
-
+		    if(from == null ||from.isEmpty()) {
+			 ret.setResumptionToken(null);
+			 return ret;
+		    }
 		    ISO8601DateTimeUtils.parseISO8601ToDate(from).ifPresent(d -> rm.setBegin(d));
 		    ISO8601DateTimeUtils.parseISO8601ToDate(to).ifPresent(d -> rm.setEnd(d));
 
 		    String pos = reader.evaluateString("//*:shape/*:Point/*:pos");
-		    pos = pos.replace(",", "");
-		    String[] split = pos.split(" ");
+		    String[] split = new String[2];
+		    if (isAral) {
+			String[] splittedPos = pos.split(", ");
+			if (splittedPos != null && splittedPos.length > 1) {
+			    split[0] = splittedPos[0].replace(",", ".");
+			    split[1] = splittedPos[1].replace(",", ".");
+			}
+		    } else {
+			pos = pos.replace(",", "");
+			split = pos.split(" ");
+		    }
 
-		    rm.setLatitude(Double.parseDouble(split[0]));
-		    rm.setLongitude(Double.parseDouble(split[1]));
-		    
-		    if(url.contains(client.getAralWaterLevelEndpoint())) {
+		    if (split.length > 1 && split[0] != null) {
+			rm.setLatitude(Double.parseDouble(split[0]));
+			rm.setLongitude(Double.parseDouble(split[1]));
+		    }
+		    if (url.contains(client.getAralWaterLevelEndpoint())) {
 			rm.setParameterId("RIHMI:WaterLevel");
 			rm.setParameterName("Water Level");
 		    } else {
@@ -264,7 +277,7 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 				new GSProperty<String>("downloadLink", url));
 		    }
 		    metadataRecord.setAdditionalInfo(handler);
-		    
+
 		    ret.addRecord(metadataRecord);
 
 		}
@@ -295,9 +308,9 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 	if (time.isEmpty()) {
 	    return null;
 	}
-	if(time.endsWith("Z")) {
+	if (time.endsWith("Z")) {
 	    return time.replace(" ", "");
-	}else {
+	} else {
 	    return time.replace(" ", "") + "Z";
 	}
     }

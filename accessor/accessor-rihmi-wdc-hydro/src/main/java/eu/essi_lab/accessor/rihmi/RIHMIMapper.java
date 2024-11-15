@@ -161,8 +161,9 @@ public class RIHMIMapper extends OriginalIdentifierMapper {
 	coreMetadata.getMIMetadata().getDataIdentification().addKeyword(stationName);
 
 	coreMetadata.getMIMetadata().addHierarchyLevelScopeCodeListValue("dataset");
-
+	if(lat != null && lon != null) {
 	coreMetadata.addBoundingBox(lat, lon, lat, lon);
+	}
 
 	ResponsibleParty creatorContact = new ResponsibleParty();
 
@@ -219,6 +220,8 @@ public class RIHMIMapper extends OriginalIdentifierMapper {
 	    //aral basin case
 	    if (isAral) {
 		String linkage = originalMD.getAdditionalInfo().get("downloadLink", String.class);
+		    onlineValues.setProtocol(CommonNameSpaceContext.ARAL_BASIN_URI);
+		    onlineValues.setLinkage(linkage);
 
 	    } else {
 		//russian case
