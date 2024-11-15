@@ -304,7 +304,7 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
      * @param dataId
      * @return
      */
-    protected abstract void addPlatform(Thing thing, CoreMetadata coreMetadata, DataIdentification dataId, Keywords keywords);
+    protected abstract void addPlatform(Thing thing, CoreMetadata coreMetadata, DataIdentification dataId, Keywords keywords,ExtensionHandler handler);
 
     /**
      * @param location
@@ -415,7 +415,7 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	// Platform, Vertical extent and keywords (from the expanded Thing)
 	//
 
-	addPlatform(thing, coreMetadata, dataId, keywords);
+	addPlatform(thing, coreMetadata, dataId, keywords,  dataset.getExtensionHandler());
 
 	//
 	// Responsible party
@@ -506,7 +506,7 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	// Platform, Vertical extent and keywords
 	//
 
-	addPlatform(thing, coreMetadata, dataId, keywords);
+	addPlatform(thing, coreMetadata, dataId, keywords, collection.getExtensionHandler());
 
 	//
 	// Responsible party

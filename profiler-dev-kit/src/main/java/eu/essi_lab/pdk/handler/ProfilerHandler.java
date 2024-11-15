@@ -155,7 +155,7 @@ public abstract class ProfilerHandler//
      *
      * @throws GSException if errors occurred during the workflow execution
      */
-
+    @Override
     public final Response handle(WebRequest request) throws GSException {
 
 	M message = handleWebRequest(request);
