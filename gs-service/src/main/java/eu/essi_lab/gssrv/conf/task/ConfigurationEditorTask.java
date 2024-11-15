@@ -3,30 +3,6 @@
  */
 package eu.essi_lab.gssrv.conf.task;
 
-import java.util.ArrayList;
-
-/*-
- * #%L
- * Discovery and Access Broker (DAB) Community Edition (CE)
- * %%
- * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
- * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * #L%
- */
-
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -34,16 +10,12 @@ import java.util.concurrent.TimeUnit;
 
 import org.quartz.JobExecutionContext;
 
-import eu.essi_lab.cdk.harvest.wrapper.ConnectorWrapperSetting;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.ConfigurationSource;
 import eu.essi_lab.cfga.SelectionUtils;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.SchedulerViewSetting;
-import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
-import eu.essi_lab.cfga.gs.setting.connector.HarvestedConnectorSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
-import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSettingLoader;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
 import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.scheduler.Scheduler;
@@ -58,7 +30,7 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 public class ConfigurationEditorTask extends AbstractCustomTask {
 
     public enum SourceType {
-	CUAHSI_HIS_CENTRAL
+	SIMPLE_CUAHSI_SOURCES, CUAHSI_HIS_CENTRAL
     }
 
     @Override
@@ -126,6 +98,9 @@ public class ConfigurationEditorTask extends AbstractCustomTask {
 	}
 	SourceFinder finder = null;
 	switch (sourceType) {
+	case SIMPLE_CUAHSI_SOURCES:
+	    finder = new SimpleCUAHSISourceFinder();
+	    break;
 	case CUAHSI_HIS_CENTRAL:
 	    finder = new CUAHSISourceFinder();
 	    break;
