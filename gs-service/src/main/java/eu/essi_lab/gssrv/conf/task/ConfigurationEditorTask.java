@@ -3,6 +3,12 @@
  */
 package eu.essi_lab.gssrv.conf.task;
 
+import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -27,8 +33,10 @@ package eu.essi_lab.gssrv.conf.task;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
+import org.joda.time.DateTimeZone;
 import org.quartz.JobExecutionContext;
 
 import eu.essi_lab.cfga.Configuration;
@@ -44,6 +52,7 @@ import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.cfga.setting.scheduling.Scheduling;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 
 /**
  * @author Fabrizio
@@ -158,17 +167,39 @@ public class ConfigurationEditorTask extends AbstractCustomTask {
 	//
 
 	for (int i = 0; i < sources.size(); i++) {
+
 	    HarvestingSetting source = sources.get(i);
-	    Scheduling scheduling = source.getScheduling();
-	    scheduling.setEnabled(true);
-	    scheduling.setRunIndefinitely();
-	    scheduling.setRepeatInterval(1000, TimeUnit.DAYS);
-	    Date startDate = new Date(System.currentTimeMillis() + i * TimeUnit.MINUTES.toMillis(offset2));
-	    scheduling.setStartTime(startDate);
-	    scheduler.schedule(source);
-	    SelectionUtils.deepClean(source);
-	    configuration.put(source);
-	    GSLoggerFactory.getLogger(getClass()).info("Added source: {}", source.getName());
+
+	    String sourceId = source.getSelectedAccessorSetting().getSource().getUniqueIdentifier();
+
+	    Optional<HarvestingSetting> optional = ConfigurationWrapper.//
+		    getHarvestingSettings().//
+		    stream().//
+		    filter(s -> s.getSelectedAccessorSetting().getSource().getUniqueIdentifier().equals(sourceId)).findFirst();
+
+	    if (optional.isEmpty()) {
+
+		Scheduling scheduling = source.getScheduling();
+		scheduling.setEnabled(true);
+		scheduling.setRunIndefinitely();
+		scheduling.setRepeatInterval(1000, TimeUnit.DAYS);
+		
+		ZonedDateTime now = ZonedDateTime.now(); 
+		now = now.plusMinutes(i * offset2);
+		
+		ZonedDateTime tokyoTime = now.withZoneSameInstant(ZoneId.of(schedulerSetting.getUserDateTimeZone().getID())); // Format the date-time 
+		
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"); 
+		
+		String formattedDate = tokyoTime.format(formatter);		
+
+		scheduling.setStartTime(formattedDate);
+
+		scheduler.schedule(source);
+		SelectionUtils.deepClean(source);
+		configuration.put(source);
+		GSLoggerFactory.getLogger(getClass()).info("Added source: {}", source.getName());
+	    }
 	}
 
 	//
@@ -184,4 +215,18 @@ public class ConfigurationEditorTask extends AbstractCustomTask {
 	return "Configuration editor task";
     }
 
+    public static void main(String[] args) {
+	
+	Date startDate = new Date(System.currentTimeMillis() + 5 * TimeUnit.MINUTES.toMillis(2));
+
+//	String iso8601Date = ISO8601DateTimeUtils.getISO8601DateTime(startDate);
+	
+	Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Berlin"));
+	cal.setTime(startDate);
+
+	startDate = cal.getTime();
+	
+	System.out.println(startDate);
+    }
+    
 }
