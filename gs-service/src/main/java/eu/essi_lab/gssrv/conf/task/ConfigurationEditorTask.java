@@ -3,6 +3,8 @@
  */
 package eu.essi_lab.gssrv.conf.task;
 
+import java.util.ArrayList;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -43,18 +45,96 @@ import eu.essi_lab.cfga.gs.setting.connector.HarvestedConnectorSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSettingLoader;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
+import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.cfga.setting.scheduling.Scheduling;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
  * @author Fabrizio
  */
 public class ConfigurationEditorTask extends AbstractCustomTask {
 
+    public enum SourceType {
+	CUAHSI_HIS_CENTRAL
+    }
+
     @Override
     public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
+
+	CustomTaskSetting taskSettings = retrieveSetting(context);
+
+	Optional<String> taskOptions = taskSettings.getTaskOptions();
+
+	/**
+	 * Three options are present:
+	 * type
+	 * endpoint
+	 * id
+	 * offset 1 (minutes to wait before starting the tasks)
+	 * offset 2 (minutes between the start of each task)
+	 * Example: (it will expand the his-central at the given endpoint, scheduling the related hydroserver sources at
+	 * interval of 2 minutes from each other. The sources id will have the gfhc prefix)
+	 * CUAHSI_HIS_CENTRAL
+	 * https://hiscentral.cuahsi.org/webservices/hiscentral.asmx
+	 * gfhc
+	 * 0
+	 * 2
+	 */
+
+	String type = null;
+	String endpoint = null;
+	String id = null;
+	Integer offset1 = null;
+	Integer offset2 = null;
+
+	if (taskOptions.isPresent()) {
+	    String options = taskOptions.get();
+	    if (options != null) {
+		if (options.contains("\n")) {
+		    String[] split = options.split("\n");
+		    if (split.length < 5) {
+			GSLoggerFactory.getLogger(getClass()).error("Missing options for this task");
+			return;
+		    }
+		    type = split[0].trim();
+		    endpoint = split[1].trim();
+		    id = split[2].trim();
+		    offset1 = Integer.parseInt(split[3].trim());
+		    offset2 = Integer.parseInt(split[4].trim());
+		}
+	    }
+	}
+	if (type == null || endpoint == null || id == null || offset1 == null || offset2 == null) {
+	    GSLoggerFactory.getLogger(getClass()).error("Missing options for this task");
+	    return;
+	}
+
+	SourceType sourceType = null;
+	String options = "";
+	for (SourceType t : SourceType.values()) {
+	    if (t.toString().equals(type)) {
+		sourceType = t;
+	    } else {
+		options += t.toString() + " ";
+	    }
+	}
+	if (sourceType == null) {
+	    GSLoggerFactory.getLogger(getClass()).error("Wrong source type for this task, possible options are: {}", options);
+	}
+	SourceFinder finder = null;
+	switch (sourceType) {
+	case CUAHSI_HIS_CENTRAL:
+	    finder = new CUAHSISourceFinder();
+	    break;
+	default:
+	    GSLoggerFactory.getLogger(getClass()).error("This should not happen");
+	    return;
+	}
+
+	List<HarvestingSetting> sources = finder.getSources(endpoint, id);
 
 	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
 
@@ -62,8 +142,8 @@ public class ConfigurationEditorTask extends AbstractCustomTask {
 	//
 	//
 
-	ConfigurationSource source = configuration.getSource();
-	source.backup();
+	ConfigurationSource configurationSource = configuration.getSource();
+	configurationSource.backup();
 
 	//
 	//
@@ -77,117 +157,29 @@ public class ConfigurationEditorTask extends AbstractCustomTask {
 	//
 	//
 
-	List<String> augmenterTypes = Arrays.asList(//
-		"EasyAccessAugmenter", //
-		"WHOSUnitsAugmenter", //
-		"WHOSVariableAugmenter", //
-		"WHOSRiverVariableAugmenter");
-
-	HarvestingSetting harvestingSetting = createSetting(//
-		"WCS", //
-		Optional.of("WCS Connector 1.1.1"), //
-		"source_id", //
-		"Source label", //
-		"http://", //
-		augmenterTypes);
-
 	//
 	// scheduling
 	//
 
-	Date startDate = new Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(10));
-
-	Scheduling scheduling = harvestingSetting.getScheduling();
-	scheduling.setEnabled(true);
-
-	scheduling.setRunIndefinitely();
-	scheduling.setRepeatInterval(1000, TimeUnit.DAYS);
-
-	scheduling.setStartTime(startDate);
-
-	scheduler.schedule(harvestingSetting);
-	
-	//
-	//
-	//
-
-	SelectionUtils.deepClean(harvestingSetting);
-
-	configuration.put(harvestingSetting);
-
-	//
-	//
-	//
-
-	configuration.flush();
-    }
-
-    /**
-     * @param startTime
-     * @param accessorType
-     * @param connectorType
-     * @param sourceId
-     * @param sourceLabel
-     * @param sourceEndpoint
-     * @param augmenterTypes
-     * @return
-     */
-    private HarvestingSetting createSetting(//
-	    String accessorType, //
-	    Optional<String> connectorType, //
-	    String sourceId, //
-	    String sourceLabel, //
-	    String sourceEndpoint, //
-	    List<String> augmenterTypes
-
-    ) {
-
-	HarvestingSetting harvSetting = HarvestingSettingLoader.load();
-
-	harvSetting.selectAccessorSetting(s -> s.getAccessorType().equals(accessorType));
-
-	harvSetting.setName(sourceLabel);
-
-	//
-	// source
-	//
-
-	AccessorSetting accessorSetting = harvSetting.getSelectedAccessorSetting();
-
-	accessorSetting.getGSSourceSetting().setSourceIdentifier(sourceId);
-	accessorSetting.getGSSourceSetting().setSourceLabel(sourceLabel);
-	accessorSetting.getGSSourceSetting().setSourceEndpoint(sourceEndpoint);
-
-	//
-	// augmenters
-	//
-
-	harvSetting.getAugmentersSetting().select(s -> //
-
-	augmenterTypes.contains(s.getConfigurableType()));
-
-	//
-	// optional wrapped connector
-	//
-
-	if (connectorType.isPresent()) {
-
-	    HarvestedConnectorSetting connectorSetting = accessorSetting.getHarvestedConnectorSetting();
-
-	    if (connectorSetting instanceof ConnectorWrapperSetting) {
-
-		@SuppressWarnings("rawtypes")
-		ConnectorWrapperSetting wrapper = (ConnectorWrapperSetting) connectorSetting;
-		wrapper.selectConnectorType(connectorType.get());
-	    }
+	for (int i = 0; i < sources.size(); i++) {
+	    HarvestingSetting source = sources.get(i);
+	    Scheduling scheduling = source.getScheduling();
+	    scheduling.setEnabled(true);
+	    scheduling.setRunIndefinitely();
+	    scheduling.setRepeatInterval(1000, TimeUnit.DAYS);
+	    Date startDate = new Date(System.currentTimeMillis() + i * TimeUnit.MINUTES.toMillis(offset2));
+	    scheduling.setStartTime(startDate);
+	    scheduler.schedule(source);
+	    SelectionUtils.deepClean(source);
+	    configuration.put(source);
+	    GSLoggerFactory.getLogger(getClass()).info("Added source: {}", source.getName());
 	}
 
 	//
 	//
 	//
 
-	return harvSetting;
-
+	configuration.flush();
     }
 
     @Override
