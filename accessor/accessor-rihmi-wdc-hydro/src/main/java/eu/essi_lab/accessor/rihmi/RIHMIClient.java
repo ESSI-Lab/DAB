@@ -109,6 +109,17 @@ public class RIHMIClient {
 	return downloadStream(url);
 
     }
+    
+    public InputStream getAralWaterML(String stationId, Date start, Date end, boolean isDischarge) throws IOException, InterruptedException, URISyntaxException {
+
+	String from = sdf.format(start);
+	String to = sdf.format(end);
+
+	String url = isDischarge ? aralDischargeEndpoint + "dateFrom=" + from + "&dateTo=" + to + "&index=" + stationId : aralWaterLevelendpoint + "dateFrom=" + from + "&dateTo=" + to + "&index=" + stationId;
+
+	return downloadStream(url);
+
+    }
 
     public List<String> getStationIdentifiers(boolean isAral) throws Exception {
 	String identifierEndpoint = isAral ? aralStationListendpoint : stationListendpoint;
