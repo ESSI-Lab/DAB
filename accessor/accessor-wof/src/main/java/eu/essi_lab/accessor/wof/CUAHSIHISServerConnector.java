@@ -125,11 +125,12 @@ public class CUAHSIHISServerConnector<C extends FirstSiteConnectorSetting> exten
 	String id = listRecords.getResumptionToken();
 	/*
 	 * The resumption token for HydroServerConnector is in the form:
-	 * SITE_NUMBER:SERIES_NUMBER
+	 * SITE_NUMBER
 	 * where:
 	 * SITE_NUMBER = the progressive number of the site as it appears on the sites response document
-	 * SERIES_NUMBER = the progressive number of the series as it appears on the site info response document
 	 */
+
+	GSLoggerFactory.getLogger(getClass()).info("Getting records, at site {}", id);
 
 	String nextId = null;
 
