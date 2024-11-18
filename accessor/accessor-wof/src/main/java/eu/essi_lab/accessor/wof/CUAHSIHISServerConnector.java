@@ -203,7 +203,7 @@ public class CUAHSIHISServerConnector<C extends FirstSiteConnectorSetting> exten
 	List<TimeSeries> seriesCatalog = siteInfo.getSeries();
 	if (seriesCatalog.isEmpty()) {
 	    siteNumber++;
-	    nextId = siteNumber + ":";
+	    nextId = "" + siteNumber;
 	    if (!siteInfoIterator.hasNext()) {
 		// but if the last site is fully visited no next records are available
 		nextId = null;
@@ -219,15 +219,15 @@ public class CUAHSIHISServerConnector<C extends FirstSiteConnectorSetting> exten
 	ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<OriginalMetadata>();
 
 	// we select the time series
-	HashSet<String>variableCodes = new HashSet<String>();
+	HashSet<String> variableCodes = new HashSet<String>();
 	for (TimeSeries timeSeries : seriesCatalog) {
 	    try {
 		SitesResponseDocument emptySRD = getEmptyResponseDocument(richerSiteInfoDocument);
 		String code = timeSeries.getVariableCode();
 		if (variableCodes.contains(code)) {
-		    GSLoggerFactory.getLogger(getClass()).error("Duplicate variable code: "+code);
+		    GSLoggerFactory.getLogger(getClass()).error("Duplicate variable code: " + code);
 		    continue;
-		}else {
+		} else {
 		    variableCodes.add(code);
 		}
 		emptySRD.getSites().get(0).addSeries(timeSeries);
