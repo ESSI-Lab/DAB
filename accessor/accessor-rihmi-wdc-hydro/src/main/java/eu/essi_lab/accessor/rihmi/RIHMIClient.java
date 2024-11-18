@@ -144,7 +144,7 @@ public class RIHMIClient {
 
     public HttpResponse<InputStream> getDownloadResponse(String url) throws IOException, InterruptedException, URISyntaxException {
 	url = getProxiedURL(url);
-
+	logger.info("Request url:" + url);
 	HttpResponse<InputStream> response = new Downloader().downloadResponse(HttpRequestUtils.build(MethodNoBody.GET, url));
 
 	int responseCode = response.statusCode();
