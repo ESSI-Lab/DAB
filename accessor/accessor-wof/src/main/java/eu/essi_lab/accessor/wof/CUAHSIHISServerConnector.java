@@ -125,11 +125,12 @@ public class CUAHSIHISServerConnector<C extends FirstSiteConnectorSetting> exten
 	String id = listRecords.getResumptionToken();
 	/*
 	 * The resumption token for HydroServerConnector is in the form:
-	 * SITE_NUMBER:SERIES_NUMBER
+	 * SITE_NUMBER
 	 * where:
 	 * SITE_NUMBER = the progressive number of the site as it appears on the sites response document
-	 * SERIES_NUMBER = the progressive number of the series as it appears on the site info response document
 	 */
+
+	GSLoggerFactory.getLogger(getClass()).info("Getting records, at site {}", id);
 
 	String nextId = null;
 
@@ -203,7 +204,7 @@ public class CUAHSIHISServerConnector<C extends FirstSiteConnectorSetting> exten
 	List<TimeSeries> seriesCatalog = siteInfo.getSeries();
 	if (seriesCatalog.isEmpty()) {
 	    siteNumber++;
-	    nextId = siteNumber + ":";
+	    nextId = "" + siteNumber;
 	    if (!siteInfoIterator.hasNext()) {
 		// but if the last site is fully visited no next records are available
 		nextId = null;
@@ -219,15 +220,15 @@ public class CUAHSIHISServerConnector<C extends FirstSiteConnectorSetting> exten
 	ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<OriginalMetadata>();
 
 	// we select the time series
-	HashSet<String>variableCodes = new HashSet<String>();
+	HashSet<String> variableCodes = new HashSet<String>();
 	for (TimeSeries timeSeries : seriesCatalog) {
 	    try {
 		SitesResponseDocument emptySRD = getEmptyResponseDocument(richerSiteInfoDocument);
 		String code = timeSeries.getVariableCode();
 		if (variableCodes.contains(code)) {
-		    GSLoggerFactory.getLogger(getClass()).error("Duplicate variable code: "+code);
+		    GSLoggerFactory.getLogger(getClass()).error("Duplicate variable code: " + code);
 		    continue;
-		}else {
+		} else {
 		    variableCodes.add(code);
 		}
 		emptySRD.getSites().get(0).addSeries(timeSeries);
