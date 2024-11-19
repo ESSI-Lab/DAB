@@ -104,6 +104,13 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
     private static final List<IndexedMetadataElement> INDEXED_ELEMENTS = IndexedMetadataElements.getIndexes();
 
     /**
+     * 
+     */
+    public DefaultMarkLogicSearchBuilder() {
+
+    }
+
+    /**
      * @param message
      * @param markLogicDB
      */
@@ -262,7 +269,7 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 	switch (property) {
 	case SOURCE_ID: {
 
-	    return buildSourceIdQuery(name, value, property);
+	    return buildSourceIdQuery(name, value, property, operator);
 	}
 
 	case RESOURCE_TIME_STAMP: {
@@ -282,10 +289,9 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 
 		if (Objects.nonNull(sourceIdentifier)) {
 
-		    String sourceIdQuery = buildSourceIdQuery(
-			    new QualifiedName(NameSpace.GI_SUITE_DATA_MODEL, //
+		    String sourceIdQuery = buildSourceIdQuery(new QualifiedName(NameSpace.GI_SUITE_DATA_MODEL, //
 
-				    ResourceProperty.SOURCE_ID.getName()), //
+			    ResourceProperty.SOURCE_ID.getName()), //
 
 			    sourceIdentifier, ResourceProperty.SOURCE_ID); //
 
@@ -470,6 +476,18 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
      * @return
      */
     protected String buildSourceIdQuery(QualifiedName name, String value, Queryable property) {
+
+	return buildSourceIdQuery(name, value, property, BondOperator.EQUAL);
+    }
+
+    /**
+     * @param name
+     * @param value
+     * @param property
+     * @param operator
+     * @return
+     */
+    protected String buildSourceIdQuery(QualifiedName name, String value, Queryable property, BondOperator operator) {
 
 	//
 	// this is the current strategy, according to the module
