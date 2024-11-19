@@ -1,0 +1,19 @@
+{
+	"canBeDisabled": false,
+	"extensionClass": "eu.essi_lab.cfga.resetandselect.test.TestSetting5$TestObjectExension",
+	"validatorClass": "eu.essi_lab.cfga.resetandselect.test.TestSetting5$TestValidator",
+	"visible": false,
+	"compactMode": false,
+	"editable": false,
+	"showHeader": false,
+	"settingClass": "eu.essi_lab.cfga.resetandselect.test.TestSetting5",
+	"description": "description",
+	"type": "setting",
+	"enabled": false,
+	"settingName": "Test setting 5",
+	"canBeCleaned": false,
+	"canBeRemoved": true,
+	"configurableType": "condigurableType",
+	"settingId": "identifier",
+	"foldedMode": true
+}
