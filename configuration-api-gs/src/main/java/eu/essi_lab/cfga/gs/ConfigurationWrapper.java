@@ -64,6 +64,7 @@ import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.Chronometer;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.bond.Bond;
+import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.View;
@@ -482,6 +483,7 @@ public class ConfigurationWrapper {
      * @param bond
      * @param out
      */
+    @SuppressWarnings("incomplete-switch")
     private static void findSourceIdentifiers(Bond bond, List<String> out) {
 
 	if (bond instanceof LogicalBond) {
@@ -497,7 +499,23 @@ public class ConfigurationWrapper {
 
 	    ResourcePropertyBond resBond = (ResourcePropertyBond) bond;
 	    if (resBond.getProperty() == ResourceProperty.SOURCE_ID) {
-		out.add(resBond.getPropertyValue());
+
+		BondOperator operator = resBond.getOperator();
+		switch (operator) {
+		case EQUAL:
+		    out.add(resBond.getPropertyValue());
+		    break;
+		case LIKE:
+
+		    List<String> ids = getHarvestedAndMixedSources().//
+			    stream().//
+			    filter(s -> s.getUniqueIdentifier().startsWith(resBond.getPropertyValue())).//
+			    map(s -> s.getUniqueIdentifier()).//
+			    collect(Collectors.toList());
+
+		    out.addAll(ids);
+		    break;
+		}
 	    }
 	}
     }

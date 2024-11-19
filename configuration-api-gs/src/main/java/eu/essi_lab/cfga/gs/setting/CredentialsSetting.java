@@ -230,7 +230,7 @@ public class CredentialsSetting extends ConfigurableSetting implements EditableS
 
 	    addOption(password);
 	}
-	
+
 	{
 	    Option<String> password = StringOptionBuilder.//
 		    get().//
@@ -242,11 +242,11 @@ public class CredentialsSetting extends ConfigurableSetting implements EditableS
 
 	    addOption(password);
 	}
-	
+
 	//
 	// AGROSTAC
 	//
-	
+
 	{
 	    Option<String> password = StringOptionBuilder.//
 		    get().//
@@ -397,6 +397,26 @@ public class CredentialsSetting extends ConfigurableSetting implements EditableS
 		    build();
 
 	    addOption(password);
+
+	    Option<String> id = StringOptionBuilder.//
+		    get().//
+		    withKey(ACRONET_CLIENT_ID).//
+		    withLabel("The client id used by Acronet connector").//
+		    required().//
+		    cannotBeDisabled().//
+		    build();
+
+	    addOption(id);
+
+	    Option<String> clientSecret = StringOptionBuilder.//
+		    get().//
+		    withKey(ACRONET_CLIENT_PASSWORD).//
+		    withLabel("The client secret used by Acronet connector").//
+		    required().//
+		    cannotBeDisabled().//
+		    build();
+
+	    addOption(clientSecret);
 
 	}
 
@@ -1223,7 +1243,7 @@ public class CredentialsSetting extends ConfigurableSetting implements EditableS
 
 	return getOption(HIS_CENTRAL_SARDEGNA_API_KEY, String.class).get().getOptionalValue();
     }
-    
+
     /**
      * @param password
      */
@@ -1239,8 +1259,7 @@ public class CredentialsSetting extends ConfigurableSetting implements EditableS
 
 	return getOption(HIS_CENTRAL_PUGLIA_TOKEN, String.class).get().getOptionalValue();
     }
-    
-    
+
     /**
      * @param password
      */

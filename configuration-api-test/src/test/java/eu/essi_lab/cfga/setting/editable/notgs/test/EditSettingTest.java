@@ -45,7 +45,7 @@ public class EditSettingTest {
      * @throws InterruptedException
      */
     @Test
-    public void EditableTestSettingTest() throws ClassNotFoundException, JSONException, InterruptedException {
+    public void editableTestSettingTest() throws ClassNotFoundException, JSONException, InterruptedException {
 
 	EditableTestSetting originalSetting = new EditableTestSetting();
 
@@ -75,7 +75,7 @@ public class EditSettingTest {
 
 	originalSetting.getSetting2().getOption("option2", String.class).get().select(v -> v.equals("c3"));
 
-	// simulation of user behavior. the option3 loader is called, the values are
+	// simulation of user behaviour. the option3 loader is called, the values are
 	// loaded and the user selects "option3value2"
 	ValuesLoader<String> loader = originalSetting.getSetting2().getOption("option3", String.class).get().getLoader().get();
 	loader.load((values, exception) -> {
