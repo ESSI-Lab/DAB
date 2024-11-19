@@ -574,7 +574,7 @@ public class GetWaterOneFlowServiceInfoHandler extends DefaultRequestHandler {
 
 	    return "<ServiceInfo>\n" + //
 		    "	<servURL>" + servURL + "</servURL>\n" + // http://icewater.usu.edu/littlebearriverwof/cuahsi_1_1.asmx?WSDL
-		    "	<Title>" + title + "</Title>\n" + // Little Bear River Experimental Watershed, Northern
+		    "	<Title>" + normalize(title) + "</Title>\n" + // Little Bear River Experimental Watershed, Northern
 							  // Utah,
 							  // USA\n" + //
 		    "	<ServiceDescriptionURL>" + serviceDescriptionURL + "</ServiceDescriptionURL>\n" + // http://hiscentral.cuahsi.org/pub_network.aspx?n=52\n
@@ -601,6 +601,10 @@ public class GetWaterOneFlowServiceInfoHandler extends DefaultRequestHandler {
 		    "	<maxy>" + maxy + "</maxy>\n" + // 41.71847
 		    "	<serviceStatus />\n" + //
 		    "</ServiceInfo>";
+	}
+
+	private String normalize(String str) {
+	    return str.replace("&", "&amp;");
 	}
     }
 
