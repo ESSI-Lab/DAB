@@ -214,9 +214,10 @@ public class RIHMIMapper extends OriginalIdentifierMapper {
 
 	onlineValues.setName(id);
 
+	 boolean isAral = false;
 	GSPropertyHandler additionalInfo = originalMD.getAdditionalInfo();
 	if (additionalInfo != null) {
-	    Boolean isAral = originalMD.getAdditionalInfo().get("isAral", Boolean.class);
+	    isAral = originalMD.getAdditionalInfo().get("isAral", Boolean.class);
 	    //aral basin case
 	    if (isAral) {
 		String linkage = originalMD.getAdditionalInfo().get("downloadLink", String.class);
@@ -256,7 +257,8 @@ public class RIHMIMapper extends OriginalIdentifierMapper {
 	dataset.getExtensionHandler().setAttributeUnits(units);
 	dataset.getExtensionHandler().setAttributeUnitsAbbreviation(units);
 
-	dataset.getExtensionHandler().setCountry(Country.RUSSIAN_FEDERATION.getShortName());
+	if(!isAral)
+	    dataset.getExtensionHandler().setCountry(Country.RUSSIAN_FEDERATION.getShortName());
 
 	// LegalConstraints lc = new LegalConstraints();
 	// lc.addOtherConstraints("Norwegian Licence for Open Government Data (NLOD)");

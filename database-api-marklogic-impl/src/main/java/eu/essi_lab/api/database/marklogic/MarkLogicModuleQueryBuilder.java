@@ -27,8 +27,11 @@ package eu.essi_lab.api.database.marklogic;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import eu.essi_lab.api.database.marklogic.search.MarkLogicSearchBuilder.CTSLogicOperator;
+import eu.essi_lab.api.database.marklogic.search.def.DefaultMarkLogicSearchBuilder;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.xml.QualifiedName;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
@@ -87,6 +90,23 @@ public class MarkLogicModuleQueryBuilder {
 	sourceId = sourceId.trim();
 
 	return "gs:siq('" + sourceId + "','" + suiteIdentifier + "')";
+    }
+
+    /**
+     * @param sourceId
+     * @param suiteIdentifier
+     * @return
+     */
+    public String getSourceIdLikeQuery(String sourceId, String suiteIdentifier) {
+
+	List<String> siqQueries = ConfigurationWrapper.//
+		getHarvestedAndMixedSources().//
+		stream().//
+		filter(s -> s.getUniqueIdentifier().startsWith(sourceId.trim())).//
+		map(s -> "gs:siq('" + s.getUniqueIdentifier() + "','" + suiteIdentifier + "')").//
+		collect(Collectors.toList());
+
+	return new DefaultMarkLogicSearchBuilder().buildCTSLogicQuery(CTSLogicOperator.OR, false, siqQueries);
     }
 
     /**

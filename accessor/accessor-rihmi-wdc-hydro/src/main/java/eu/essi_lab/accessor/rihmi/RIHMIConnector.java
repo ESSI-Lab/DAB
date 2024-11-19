@@ -149,10 +149,10 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 		List<String> downloadUrls = new ArrayList<>();
 
 		if (isAral) {
-		    // discharges
-		    downloadUrls.add(getRealtimeDownloadUrl(client.getAralDischargeEndpoint(), stationId));
 		    // water level
 		    downloadUrls.add(getRealtimeDownloadUrl(client.getAralWaterLevelEndpoint(), stationId));
+		    // discharges
+		    downloadUrls.add(getRealtimeDownloadUrl(client.getAralDischargeEndpoint(), stationId));
 
 		} else {
 		    // real time download url
@@ -161,8 +161,9 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 		    downloadUrls.add(client.getHistoricalDownloadUrl(stationId));
 		}
 
+		int count = 0;
 		for (String url : downloadUrls) {
-
+		    count++;
 		    OriginalMetadata metadataRecord = new OriginalMetadata();
 
 		    metadataRecord.setSchemeURI(CommonNameSpaceContext.RIHMI_URI);
@@ -203,9 +204,14 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 		    }
 
 		    RIHMIMetadata rm = new RIHMIMetadata();
-		    if(from == null ||from.isEmpty()) {
-			 ret.setResumptionToken(null);
-			 return ret;
+		    if (from == null || from.isEmpty()) {
+			if (count == 2) {
+			    ret.setResumptionToken(null);
+			    return ret;
+			} else {
+			    continue;
+			}
+
 		    }
 		    ISO8601DateTimeUtils.parseISO8601ToDate(from).ifPresent(d -> rm.setBegin(d));
 		    ISO8601DateTimeUtils.parseISO8601ToDate(to).ifPresent(d -> rm.setEnd(d));
