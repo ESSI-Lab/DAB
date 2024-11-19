@@ -532,7 +532,7 @@ public abstract class CUAHSIHISServerClient {
     }
 
     protected String getGetValuesResultXPath() {
-	return "//*:TimeSeriesResponse/*:timeSeriesResponse";
+	return "//*:timeSeriesResponse";
     }
 
     /*
