@@ -17,6 +17,7 @@
 	<modules>
 		<module>profiler-oaipmh</module>
 		<module>profiler-opensearch</module>
+		<module>profiler-openmetrics</module>
 		<module>profiler-esri</module>
 		<module>profiler-bnhs</module>
 		<module>profiler-csw</module>
