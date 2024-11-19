@@ -45,7 +45,6 @@ import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.RuntimeInfoElement;
-import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.Pluggable;
 import eu.essi_lab.model.resource.GSResource;
@@ -294,6 +293,7 @@ public abstract class Profiler implements Configurable<ProfilerSetting>, WebRequ
     /**
      * @param setting
      */
+    @Override
     public void configure(ProfilerSetting setting) {
 
 	this.setting = setting;
@@ -383,11 +383,11 @@ public abstract class Profiler implements Configurable<ProfilerSetting>, WebRequ
 			handler.getClass().getSimpleName());
 
 		onFilterAccept(request, handler);
-		
+
 		//
-		// request validation (optional) 
-		// 
-		
+		// request validation (optional)
+		//
+
 		WebRequestValidator validator = null;
 		RequestType requestType = null;
 
@@ -439,7 +439,7 @@ public abstract class Profiler implements Configurable<ProfilerSetting>, WebRequ
 
 		    GSLoggerFactory.getLogger(getClass()).warn("No validator found");
 		}
-		
+
 		//
 		// request handling
 		//
