@@ -37,11 +37,18 @@ import javax.ws.rs.core.StreamingOutput;
 
 import com.google.common.base.Charsets;
 
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
+import eu.essi_lab.profiler.semantic.SourceStatistics;
+import eu.essi_lab.profiler.semantic.Stats;
+import io.micrometer.core.instrument.Gauge;
 import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 
@@ -56,12 +63,59 @@ public class OpenMetricsHandler extends StreamingRequestHandler {
 
 	    @Override
 	    public void run() {
+		GSLoggerFactory.getLogger(getClass()).info("Updating metrics");
 		for (String view : interestingViews) {
-		    
+		    GSLoggerFactory.getLogger(getClass()).info("Updating metrics for view {}",view);
+		    SourceStatistics sourceStats = null;
+		    try {
+			sourceStats = new SourceStatistics(null, Optional.of(view), ResourceProperty.SOURCE_ID);
+		    } catch (Exception e1) {
+			e1.printStackTrace();
+		    }
+		    HashMap<String, Stats> overallStats = sourceStats.getStatistics();
+		    HashMap<String, Integer> resources = new HashMap<String, Integer>();
+		    synchronized (registries) {
+
+			PrometheusMeterRegistry registry = registries.get(view);
+			for (String source : overallStats.keySet()) {
+			    GSSource s = ConfigurationWrapper.getSource(source);
+			    Gauge.builder("source_info", () -> 1)//
+				    .description("Metadata about each source.")//
+				    .tags("source_id", source, "source_label", s.getLabel())//
+				    .register(registry);
+			    try {
+				Stats stats = overallStats.get(source);
+				resources.put(source, Integer.parseInt(stats.getTimeSeriesCount()));
+				io.micrometer.core.instrument.Gauge.builder("resources_total", resources, g -> g.get(source))//
+					.description("Total number of resources ")//
+					.tag("source", source).//
+					register(registry);
+				// String content = "<tr><td colspan='15'><br/>"//
+				// + "Data provider: <b>" + source + "</b><br/>"//
+				// + "#Platforms: " + stats.getSiteCount() + "<br/>"//
+				// + "#Variables:" + stats.getAttributeCount() + "<br/>"//
+				// + "#Timeseries:" + stats.getTimeSeriesCount() + "<br/>"//
+				// + "Begin:" + stats.getBegin() + "<br/>"//
+				// + "End:" + stats.getEnd() + "<br/>"//
+				// + "BBOX(w,s,e,n): " + stats.getWest() + "," + stats.getSouth() + "," +
+				// stats.getEast() +
+				// ","
+				// + stats.getNorth() + "<br/>" //
+				// + "Altitude:" + stats.getMinimumAltitude() + "/" + stats.getMaximumAltitude() +
+				// "<br/>"//
+				// + "</td></tr>" + "" //
+				// + "<tr>";
+			    } catch (Exception e) {
+				e.printStackTrace();
+				GSLoggerFactory.getLogger(getClass()).error(e);
+			    }
+
+			}
+		    }
 		}
 	    }
 	};
-	scheduler.scheduleAtFixedRate(task, 2, 2, TimeUnit.MINUTES);
+	scheduler.scheduleAtFixedRate(task, 0, 1, TimeUnit.MINUTES);
     }
 
     @Override

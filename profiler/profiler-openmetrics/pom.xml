@@ -14,8 +14,17 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-semantic</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-registry-prometheus</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-core</artifactId>
 		</dependency>
 	</dependencies>
 
