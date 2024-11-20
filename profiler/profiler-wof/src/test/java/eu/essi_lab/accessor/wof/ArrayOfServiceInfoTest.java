@@ -7,7 +7,7 @@ import java.io.InputStream;
 import org.apache.cxf.helpers.IOUtils;
 import org.junit.Test;
 
-import eu.essi_lab.accessor.wof.info.datamodel.ArrayOfServiceInfo;
+import eu.essi_lab.profiler.wof.info.datamodel.ArrayOfServiceInfo;
 
 public class ArrayOfServiceInfoTest {
     @Test

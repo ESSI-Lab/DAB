@@ -21,8 +21,6 @@ package eu.essi_lab.profiler.csw;
  * #L%
  */
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -31,7 +29,6 @@ import eu.essi_lab.jaxb.common.CommonContext;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.jaxb.csw._2_0_2.GetRecords;
 import eu.essi_lab.jaxb.csw._2_0_2.ResultType;
-import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.ErrorInfo;

@@ -58,7 +58,7 @@ public class ESSIProfilerService extends AbstractProfilerService {
 	}
 
 	@Override
-	public boolean accept(Profiler profiler) {
+	public boolean accept(Profiler<?> profiler) {
 
 	    String profilerPath = profiler.getSetting().getServicePath();
 

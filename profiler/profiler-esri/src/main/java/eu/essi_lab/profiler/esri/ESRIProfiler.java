@@ -28,7 +28,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.jaxb.csw._2_0_2.ExceptionCode;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.web.KeyValueParser;
@@ -49,21 +48,7 @@ import eu.essi_lab.profiler.esri.feature.query.FeatureQueryRequestFilter;
 /**
  * @author boldrini
  */
-public class ESRIProfiler extends Profiler {
-
-    /**
-     * The profiler type
-     */
-    private static final String ESRI_PROFILER_TYPE = "ESRI";
-
-    public static final ProfilerSetting ESRI_INFO = new ProfilerSetting();
-    static {
-	ESRI_INFO.setServiceName("ESRI");
-	ESRI_INFO.setServiceType(ESRI_PROFILER_TYPE);
-//	ESRI_INFO.setServicePath("ArcGISProxy");
-	ESRI_INFO.setServicePath("ArcGIS");
-	ESRI_INFO.setServiceVersion("0.0");
-    }
+public class ESRIProfiler extends Profiler<ESRIProfilerSetting> {
 
     protected static final List<String> SUPPORTED_VERSIONS = new ArrayList<>();
 
@@ -97,11 +82,11 @@ public class ESRIProfiler extends Profiler {
 	selector.register(new FeatureQueryCountRequestFilter(), new FeatureQueryCountHandler());
 
 	// FEATURE GET IDENTIFIERS
-//	selector.register(new FeatureQueryIdentifiersRequestFilter(), new FeatureQueryIdentifiersHandler());
+	// selector.register(new FeatureQueryIdentifiersRequestFilter(), new FeatureQueryIdentifiersHandler());
 
 	// MAP SERVER
 	// TODO
-	
+
 	// INFO
 	selector.register(new FeatureServerInfoRequestFilter(), new FeatureServerInfoHandler());
 
@@ -152,8 +137,8 @@ public class ESRIProfiler extends Profiler {
     }
 
     @Override
-    protected ProfilerSetting initSetting() {
+    protected ESRIProfilerSetting initSetting() {
 
-	return ESRI_INFO;
+	return new ESRIProfilerSetting();
     }
 }

@@ -35,7 +35,6 @@ import javax.xml.stream.XMLStreamException;
 
 import org.json.JSONObject;
 
-import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.net.utils.whos.HISCentralOntology;
 import eu.essi_lab.lib.net.utils.whos.HydroOntology;

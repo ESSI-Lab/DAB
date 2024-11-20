@@ -1,2 +1,2 @@
-eu.essi_lab.accessor.wof.HISCentralProfiler
-eu.essi_lab.accessor.wof.HydroServerProfiler
+eu.essi_lab.profiler.wof.HISCentralProfiler
+eu.essi_lab.profiler.wof.HydroServerProfiler

@@ -30,7 +30,6 @@ import javax.ws.rs.core.Response.Status;
 
 import org.json.JSONObject;
 
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.web.KeyValueParser;
 import eu.essi_lab.messages.web.WebRequest;
@@ -69,20 +68,11 @@ import eu.essi_lab.profiler.rest.handler.token.TokenGeneratorHandler;
 /**
  * @author Fabrizio
  */
-public class RestProfiler extends Profiler {
+public class RestProfiler extends Profiler<RestProfilerSetting> {
 
-    public static final String REST_PROFILER_TYPE = "Rest";
     public static final String REST_SEMANTIC_BROWSING_PATH = "rest/" + WebRequest.SEMANTIC_PATH + "/browsing/";
     public static final String REST_SEMANTIC_SEARCH_PATH = "rest/" + WebRequest.SEMANTIC_PATH + "/search/";
     private DiscoveryHandler<String> discoveryHandler;
-
-    public static final ProfilerSetting REST_SERVICE_INFO = new ProfilerSetting();
-    static {
-	REST_SERVICE_INFO.setServiceName("Rest");
-	REST_SERVICE_INFO.setServiceType(REST_PROFILER_TYPE);
-	REST_SERVICE_INFO.setServicePath("rest");
-	REST_SERVICE_INFO.setServiceVersion("1.0.0");
-    }
 
     @Override
     public HandlerSelector getSelector(WebRequest request) {
@@ -201,7 +191,7 @@ public class RestProfiler extends Profiler {
 	selector.register(//
 		new GETRequestFilter("rest/gpwtoken"), //
 		new MirrorSiteTokenGeneratorHandler());
-	
+
 	selector.register(//
 		new OPTIONSRequestFilter("rest/gpwtoken"), //
 		new MirrorSiteTokenGeneratorHandler());
@@ -281,7 +271,8 @@ public class RestProfiler extends Profiler {
 	String error = null;
 
 	if ((!parser.isValid(reqEncoding) && !responseEncoding.isPresent()) || //
-		(parser.isValid(reqEncoding) && queryString.contains("xml")) || (responseEncoding.isPresent() && responseEncoding.get().equals(MediaType.APPLICATION_XML))) {
+		(parser.isValid(reqEncoding) && queryString.contains("xml"))
+		|| (responseEncoding.isPresent() && responseEncoding.get().equals(MediaType.APPLICATION_XML))) {
 
 	    error = createXMLError(Status.BAD_REQUEST, message);
 
@@ -355,9 +346,9 @@ public class RestProfiler extends Profiler {
     }
 
     @Override
-    protected ProfilerSetting initSetting() {
+    protected RestProfilerSetting initSetting() {
 
-	return REST_SERVICE_INFO;
+	return new RestProfilerSetting();
     }
 
 }

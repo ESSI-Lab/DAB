@@ -37,5 +37,5 @@ public interface ProfilerFilter {
      * @param profiler
      * @return
      */
-    public boolean accept(Profiler profiler);
+    public boolean accept(Profiler<?> profiler);
 }

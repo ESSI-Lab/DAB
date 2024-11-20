@@ -59,20 +59,7 @@ import eu.essi_lab.profiler.wis.station.info.WISStationInfoHandler;
  * 
  * @author boldrini
  */
-public class WISProfiler extends Profiler {
-
-    /**
-     * The profiler type
-     */
-    private static final String WIS_PROFILER_TYPE = "WIS-EXTENT";
-
-    public static final ProfilerSetting WIS_SERVICE_INFO = new ProfilerSetting();
-    static {
-	WIS_SERVICE_INFO.setServiceName("WIS Extent Profiler");
-	WIS_SERVICE_INFO.setServiceType(WIS_PROFILER_TYPE);
-	WIS_SERVICE_INFO.setServicePath("oapi");
-	WIS_SERVICE_INFO.setServiceVersion("2.0");
-    }
+public class WISProfiler extends Profiler<WISProfilerSetting> {
 
     /**
      * 
@@ -166,8 +153,8 @@ public class WISProfiler extends Profiler {
     }
 
     @Override
-    protected ProfilerSetting initSetting() {
+    protected WISProfilerSetting initSetting() {
 
-	return WIS_SERVICE_INFO;
+	return new WISProfilerSetting();
     }
 }

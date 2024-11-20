@@ -50,6 +50,7 @@ import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.model.resource.data.DataFormat;
 import eu.essi_lab.pdk.wrt.AccessRequestTransformer;
 import eu.essi_lab.profiler.thredds.THREDDSProfiler;
+import eu.essi_lab.profiler.thredds.THREDDSProfilerSetting;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
 
 public class THREDDSHTTPTransformer extends AccessRequestTransformer {
@@ -77,7 +78,7 @@ public class THREDDSHTTPTransformer extends AccessRequestTransformer {
 	    DataDescriptor descriptor = getDefaultDescriptor(request.getRequestId(), id);
 
 	    if (descriptor != null) {
-		
+
 		descriptor.setDataFormat(DataFormat.NETCDF());
 
 		return Optional.of(descriptor);
@@ -105,7 +106,6 @@ public class THREDDSHTTPTransformer extends AccessRequestTransformer {
 
 	discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
 	discoveryMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
-	
 
 	SimpleValueBond bond = BondFactory.createSimpleValueBond(//
 		BondOperator.EQUAL, //
@@ -147,7 +147,7 @@ public class THREDDSHTTPTransformer extends AccessRequestTransformer {
 	try {
 
 	    String path = request.getRequestPath();
-	    path  = path.substring(path.lastIndexOf("/")+1);
+	    path = path.substring(path.lastIndexOf("/") + 1);
 	    path = path.replace("urn-uuid-", "urn:uuid:");
 	    return path;
 
@@ -163,7 +163,7 @@ public class THREDDSHTTPTransformer extends AccessRequestTransformer {
     @Override
     public String getProfilerType() {
 
-	return THREDDSProfiler.THREDDS_SERVICE_INFO.getServiceType();
+	return new THREDDSProfilerSetting().getServiceType();
     }
 
     @Override

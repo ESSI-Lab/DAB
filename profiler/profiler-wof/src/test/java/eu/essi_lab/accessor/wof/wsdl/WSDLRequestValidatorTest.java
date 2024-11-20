@@ -6,6 +6,7 @@ import org.mockito.Mockito;
 
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.profiler.wof.wsdl.WSDLRequestValidator;
 
 /**
  * @author boldrini
