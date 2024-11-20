@@ -23,7 +23,6 @@ package eu.essi_lab.gssrv.servlet;
 
 import java.io.IOException;
 import java.util.Optional;
-import java.util.ServiceLoader;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -36,11 +35,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
-import eu.essi_lab.lib.utils.StreamUtils;
-import eu.essi_lab.pdk.Profiler;
 
 /**
- * A filter which blocks the request and returns a 404 error code in case the request path owns to a disabled profiler
+ * A filter which blocks the request and returns a 404 error code in case the request path owns to a offline profiler
  *
  * @author Fabrizio
  */
@@ -54,13 +51,11 @@ public class ProfilerServiceFilter implements Filter {
 	HttpServletRequest httpRequest = (HttpServletRequest) request;
 	String pathInfo = httpRequest.getPathInfo(); // e.g: /essi/oaipmh
 
-	ServiceLoader<Profiler> profilers = ServiceLoader.load(Profiler.class);
+	boolean isProfilerPath = ConfigurationWrapper.getProfilerSettings().//
+		stream().//
+		anyMatch(s -> pathInfo.contains(s.getServicePath()));
 
-	boolean isProfilerPath = StreamUtils.iteratorToStream(profilers.iterator()).//
-		map(p -> p.getSetting()).//
-		anyMatch(i -> pathInfo != null && pathInfo.contains(i.getServicePath()));
-
-	if (isProfilerPath && isDisabled(pathInfo)) {
+	if (isProfilerPath && isOffline(pathInfo)) {
 
 	    HttpServletResponse httpResponse = (HttpServletResponse) response;
 	    httpResponse.setStatus(404);
@@ -73,22 +68,19 @@ public class ProfilerServiceFilter implements Filter {
     }
 
     /**
-     * Calls the configuration manager component in order to know if the given path owns to a disabled profiler
-     *
      * @param pathInfo
      * @return
      */
-    private boolean isDisabled(String pathInfo) {
+    private boolean isOffline(String pathInfo) {
 
 	Optional<ProfilerSetting> setting = ConfigurationWrapper.getProfilerSettings().//
 		stream().//
 		filter(c -> pathInfo.contains(c.getServicePath())).//
 		findFirst();
 
-	return (setting.isPresent() && !setting.get().isEnabled());
+	return (setting.isPresent() && !setting.get().isOnline());
     }
 
     public void destroy() {
-	// nothing to do here
     }
 }
