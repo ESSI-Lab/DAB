@@ -65,7 +65,7 @@ public class OpenMetricsHandler extends StreamingRequestHandler {
 	    public void run() {
 		GSLoggerFactory.getLogger(getClass()).info("Updating metrics");
 		for (String view : interestingViews) {
-		    GSLoggerFactory.getLogger(getClass()).info("Updating metrics for view {}",view);
+		    GSLoggerFactory.getLogger(getClass()).info("Updating metrics for view {}", view);
 		    SourceStatistics sourceStats = null;
 		    try {
 			sourceStats = new SourceStatistics(null, Optional.of(view), ResourceProperty.SOURCE_ID);
@@ -73,7 +73,9 @@ public class OpenMetricsHandler extends StreamingRequestHandler {
 			e1.printStackTrace();
 		    }
 		    HashMap<String, Stats> overallStats = sourceStats.getStatistics();
-		    HashMap<String, Integer> resources = new HashMap<String, Integer>();
+		    HashMap<String, Integer> datasets = new HashMap<String, Integer>();
+		    HashMap<String, Integer> platforms = new HashMap<String, Integer>();
+		    HashMap<String, Integer> variables = new HashMap<String, Integer>();
 		    synchronized (registries) {
 
 			PrometheusMeterRegistry registry = registries.get(view);
@@ -85,11 +87,24 @@ public class OpenMetricsHandler extends StreamingRequestHandler {
 				    .register(registry);
 			    try {
 				Stats stats = overallStats.get(source);
-				resources.put(source, Integer.parseInt(stats.getTimeSeriesCount()));
-				io.micrometer.core.instrument.Gauge.builder("resources_total", resources, g -> g.get(source))//
-					.description("Total number of resources ")//
+				datasets.put(source, Integer.parseInt(stats.getTimeSeriesCount()));
+				io.micrometer.core.instrument.Gauge.builder("timeseries_total", datasets, g -> g.get(source))//
+					.description("Total number of timeseries ")//
 					.tag("source", source).//
 					register(registry);
+
+				platforms.put(source, Integer.parseInt(stats.getSiteCount()));
+				io.micrometer.core.instrument.Gauge.builder("platforms_total", platforms, g -> g.get(source))//
+					.description("Total number of platforms ")//
+					.tag("source", source).//
+					register(registry);
+
+				variables.put(source, Integer.parseInt(stats.getAttributeCount()));
+				io.micrometer.core.instrument.Gauge.builder("variables_total", variables, g -> g.get(source))//
+					.description("Total number of variables ")//
+					.tag("source", source).//
+					register(registry);
+
 				// String content = "<tr><td colspan='15'><br/>"//
 				// + "Data provider: <b>" + source + "</b><br/>"//
 				// + "#Platforms: " + stats.getSiteCount() + "<br/>"//
