@@ -145,16 +145,13 @@ public class S3SourceExternalTestIT {
 	// uploads a default config
 	//
 
-	JSONArray array = new JSONArray();
-
 	DefaultConfiguration configuration = new DefaultConfiguration();
 
-	configuration.list().forEach(s -> array.put(new JSONObject(s.getObject().toString())));
-
-	S3Source.uploadConfig(array, manager, TEST_BUCKET_NAME, TEST_CONFIG_NAME);
+	S3Source.uploadConfig(configuration.toJSONArray(), manager, TEST_BUCKET_NAME, TEST_CONFIG_NAME);
 
 	//
-	// in the current uploaded config the first ordered setting is not editable
+	// in the default config the first ordered setting is a "ARPA HydroCSV" 
+	// a ProfilerSetting which is editable
 	//
 
 	Setting setting1 = configuration.//
@@ -165,16 +162,16 @@ public class S3SourceExternalTestIT {
 		get();
 
 	String setting1Name = setting1.getName();
-	
+
 	boolean editable1 = setting1.isEditable();
 
-	Assert.assertFalse(editable1);
+	Assert.assertTrue(editable1);
 
 	//
-	// replaces the setting which now can be edited
+	// replaces the setting which now cannot be edited
 	//
 
-	setting1.setEditable(true);
+	setting1.setEditable(false);
 
 	boolean replaced = configuration.replace(setting1);
 
@@ -187,7 +184,8 @@ public class S3SourceExternalTestIT {
 	source.flush(configuration.list());
 
 	//
-	// get the configuration and asserts that the is edited so it has been flushed
+	// get the configuration and asserts that the setting now is not
+	// editable, so it has been flushed
 	//
 
 	Setting setting2 = source.//
@@ -201,7 +199,7 @@ public class S3SourceExternalTestIT {
 
 	boolean editable2 = setting2.isEditable();
 
-	Assert.assertTrue(editable2);
+	Assert.assertFalse(editable2);
     }
 
     /**
