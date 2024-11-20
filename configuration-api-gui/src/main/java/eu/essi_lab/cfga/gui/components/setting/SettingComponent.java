@@ -743,6 +743,8 @@ public class SettingComponent extends Div {
 	    boolean checkUpdated = !isScheduling(setting) && updateCheckGroup(parent, setting, toggle, multiSelectionMode);
 
 	    if (!radioUpdated && !checkUpdated) {
+		
+		toggle.getStyle().set("margin-left", "5px");
 
 		headerLayout.add(toggle);
 	    }
