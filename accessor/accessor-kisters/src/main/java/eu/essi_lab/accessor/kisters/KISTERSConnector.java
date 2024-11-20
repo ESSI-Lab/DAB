@@ -84,11 +84,11 @@ public class KISTERSConnector extends HarvestedQueryConnector<KISTERSConnectorSe
 	    //
 	    // Stations
 	    //
-
+	    boolean onlySeries = true;
 	    boolean onlyOneStation = false;
 
 	    if (onlyOneStation) {
-		stationsList=stationsList.subList(0, 1);
+		stationsList = stationsList.subList(0, 1);
 	    }
 
 	    List<KISTERSEntity> finalStationsList = stationsList;
@@ -102,10 +102,11 @@ public class KISTERSConnector extends HarvestedQueryConnector<KISTERSConnectorSe
 		stationIdentifiers.add(stationId);
 
 		Optional<KISTERSEntity> childTimeSeries = timeSeriesList.//
-		stream().//
-		filter(ts -> ts.getObject().getString(KISTERSClient.STATION_ID)
-			.equals(station.getObject().getString(KISTERSClient.STATION_ID))).//
-		findFirst();
+			stream().//
+			filter(ts -> ts.getObject().getString(KISTERSClient.STATION_ID)
+				.equals(station.getObject().getString(KISTERSClient.STATION_ID)))
+			.//
+			findFirst();
 
 		if (childTimeSeries.isPresent()) {
 
@@ -115,8 +116,9 @@ public class KISTERSConnector extends HarvestedQueryConnector<KISTERSConnectorSe
 		OriginalMetadata originalMetadata = new OriginalMetadata();
 		originalMetadata.setMetadata(station.toString());
 		originalMetadata.setSchemeURI(KISTERSMapper.KISTERS_SCHEMA);
-
-		entityList.add(originalMetadata);
+		if (!onlySeries) {
+		    entityList.add(originalMetadata);
+		}
 	    });
 
 	    //
@@ -136,10 +138,11 @@ public class KISTERSConnector extends HarvestedQueryConnector<KISTERSConnectorSe
 		    timeSeries.setType(EntityType.TIME_SERIES);
 
 		    Optional<KISTERSEntity> parentStation = finalStationsList.//
-		    stream().//
-		    filter(s -> s.getObject().getString(KISTERSClient.STATION_ID).//
-		    equals(timeSeries.getObject().getString(KISTERSClient.STATION_ID))).//
-		    findFirst();
+			    stream().//
+			    filter(s -> s.getObject().getString(KISTERSClient.STATION_ID).//
+				    equals(timeSeries.getObject().getString(KISTERSClient.STATION_ID)))
+			    .//
+			    findFirst();
 
 		    if (parentStation.isPresent()) {
 
