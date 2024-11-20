@@ -63,7 +63,7 @@ public class KISTERSConnector extends HarvestedQueryConnector<KISTERSConnectorSe
 
 	    List<OriginalMetadata> entityList = new ArrayList<>();
 
-	    KISTERSClient kistersClient = new KISTERSClient();
+	    KISTERSClient kistersClient = new KISTERSClient(getSourceURL());
 
 	    GSLoggerFactory.getLogger(getClass()).debug("Retrieving stations STARTED");
 
