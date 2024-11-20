@@ -3,6 +3,8 @@
  */
 package eu.essi_lab.cfga.gs.setting;
 
+import java.util.Arrays;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -42,6 +44,7 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
     private static final String PATH_OPTION_KEY = "pathOption";
     private static final String TYPE_OPTION_KEY = "typeOption";
     private static final String VERSION_OPTION_KEY = "versionOption";
+    private static final String ONLINE_OPTION = "onlineOption";
 
     public ProfilerSetting() {
 
@@ -81,6 +84,22 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 	//
 	//
 
+	Option<String> onlineOption = StringOptionBuilder.get().//
+		withKey(ONLINE_OPTION).//
+		withLabel("Service state").//
+		withDescription("If the service is offline, requests forwarded on the service path return a 404 'Not Found' error code").//
+		withSingleSelection().//
+		withValues(Arrays.asList("Online", "Offline")).//
+		withSelectedValue("Online").//
+		cannotBeDisabled().//
+		build();
+
+	addOption(onlineOption);
+
+	//
+	//
+	//
+
 	addKeyValueOption();
 
 	//
@@ -98,7 +117,7 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 	 * 
 	 */
 	public ProfilerComponentInfo() {
-	    
+
 	    setComponentName(ProfilerSetting.class.getName());
 
 	    TabInfo tabInfo = TabInfoBuilder.get().//
@@ -108,6 +127,14 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 
 	    setTabInfo(tabInfo);
 	}
+    }
+
+    /**
+     * @return
+     */
+    public boolean isOnline() {
+
+	return getOption(ONLINE_OPTION, String.class).get().getSelectedValue().equals("Online");
     }
 
     /**
