@@ -587,7 +587,7 @@ public class GetWaterOneFlowServiceInfoHandler extends DefaultRequestHandler {
 		    "	<citation>" + citation + "</citation>\n" + // Horsburgh, J. S., D. K. Stevens, D. G.
 								   // Tarboton,
 								   // N. O. ..." + //
-		    "	<aabstract>" + aabstract + "</aabstract>\n" + // Utah State University is conducting
+		    "	<aabstract>" + normalize(aabstract) + "</aabstract>\n" + // Utah State University is conducting
 								      // continuous
 								      // monitoring...
 		    "	<valuecount>" + valueCount + "</valuecount>\n" + // 4546654
