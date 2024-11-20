@@ -259,7 +259,7 @@ public class ConfigurationWrapper {
      */
     public static List<ProfilerSetting> getProfilerSettings() {
 
-	List<ProfilerSetting> list = configuration.list(ProfilerSetting.class);
+	List<ProfilerSetting> list = configuration.list(ProfilerSetting.class, false);
 
 	return list;
     }
