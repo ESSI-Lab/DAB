@@ -34,6 +34,8 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.JSONObject;
 
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.lib.utils.Chronometer.TimeFormat;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.web.WebRequest;
@@ -68,12 +70,13 @@ public abstract class AbstractProfilerService {
      * @param uriInfo
      * @return
      */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     protected Response serve(ProfilerFilter strategy, HttpServletRequest httpServletRequest, UriInfo uriInfo) {
 
 	ChronometerInfoProvider chronometer = new ChronometerInfoProvider(TimeFormat.MIN_SEC_MLS);
 	chronometer.start();
 
-	Optional<Profiler> profiler = null;
+	Optional<Profiler> optProfiler = null;
 	Response response = null;
 
 	WebRequest webRequest = new WebRequest(Thread.currentThread().getName());
@@ -100,9 +103,9 @@ public abstract class AbstractProfilerService {
 	    PluginsLoader<Profiler> pluginsLoader = new PluginsLoader<>();
 	    List<Profiler> profilers = pluginsLoader.loadPlugins(Profiler.class);
 
-	    profiler = profilers.stream().filter(strategy::accept).findFirst();
+	    optProfiler = profilers.stream().filter(strategy::accept).findFirst();
 
-	    if (!profiler.isPresent()) {
+	    if (!optProfiler.isPresent()) {
 
 		ex = GSException.createException(//
 			getClass(), //
@@ -113,12 +116,31 @@ public abstract class AbstractProfilerService {
 			NO_PROFILER);
 	    } else {
 
-		webRequest.setProfilerName(profiler.get().getName());
-		webRequest.setProfilerPath(profiler.get().getSetting().getServicePath());
+		Profiler profiler = optProfiler.get();
+
+		webRequest.setProfilerName(profiler.getName());
+		webRequest.setProfilerPath(profiler.getSetting().getServicePath());
 
 		try {
 
-		    response = profiler.get().handle(webRequest);
+		    //
+		    // configures the profiler
+		    //
+
+		    ProfilerSetting profilerSetting = ConfigurationWrapper.//
+			    getProfilerSettings().//
+			    stream().//
+			    filter(ps -> ps.getServiceType().equals(profiler.getType())).//
+			    findFirst().//
+			    get();
+
+		    profiler.configure(profilerSetting);
+
+		    //
+		    // handles the request
+		    //
+
+		    response = profiler.handle(webRequest);
 
 		} catch (GSException gsEx) {
 
@@ -152,9 +174,10 @@ public abstract class AbstractProfilerService {
 		}
 	    });
 
-	    if (profiler.isPresent()) {
+	    if (optProfiler.isPresent()) {
 
-		response = profiler.get().createUncaughtError(webRequest, Status.INTERNAL_SERVER_ERROR, ExceptionUtils.getStackTrace(ex));
+		response = optProfiler.get().createUncaughtError(webRequest, Status.INTERNAL_SERVER_ERROR,
+			ExceptionUtils.getStackTrace(ex));
 
 	    } else {
 
