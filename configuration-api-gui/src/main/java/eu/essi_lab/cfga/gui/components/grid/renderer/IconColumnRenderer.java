@@ -25,7 +25,7 @@ package eu.essi_lab.cfga.gui.components.grid.renderer;
  */
 
 import java.util.HashMap;
-import java.util.function.Consumer;
+import java.util.Optional;
 
 import com.vaadin.flow.component.icon.Icon;
 
@@ -43,31 +43,28 @@ public abstract class IconColumnRenderer extends GridColumnRenderer<Icon> {
      * 
      */
     public IconColumnRenderer() {
-
-    }
-
-    /**
-     * @param consumer
-     */
-    public IconColumnRenderer(Consumer<HashMap<String, String>> consumer) {
-
-	super(consumer);
     }
 
     @Override
     public Icon createComponent(HashMap<String, String> item) {
 
-	component = createIcon(item);
+	Icon component = createIcon(item);
 	component.setId(item.get("identifier"));
 
-	if (consumer != null) {
-	    component.addClickListener(event -> {
-
-		consumer.accept(item);
-	    });
-	}
+	getToolTip(item).ifPresent(toolTip -> component.setTooltipText(toolTip));
 
 	return component;
+    }
+
+    /**
+     * @return
+     */
+    public static Icon getEmptyIcon() {
+
+	Icon icon = new Icon();
+	icon.setSize("0px");
+
+	return icon;
     }
 
     /**
@@ -76,4 +73,12 @@ public abstract class IconColumnRenderer extends GridColumnRenderer<Icon> {
      */
     protected abstract Icon createIcon(HashMap<String, String> item);
 
+    /**
+     * @param item
+     * @return
+     */
+    protected Optional<String> getToolTip(HashMap<String, String> item) {
+
+	return Optional.empty();
+    }
 }

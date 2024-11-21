@@ -41,6 +41,7 @@ public class CheckBoxColumnRenderer extends GridColumnRenderer<Checkbox> {
      * 
      */
     private static final long serialVersionUID = 233009253707393876L;
+    private Consumer<HashMap<String, String>> consumer;
 
     /**
     * 
@@ -54,13 +55,13 @@ public class CheckBoxColumnRenderer extends GridColumnRenderer<Checkbox> {
      */
     public CheckBoxColumnRenderer(Consumer<HashMap<String, String>> consumer) {
 
-	super(consumer);
+	this.consumer = consumer;
     }
 
     @Override
     public Checkbox createComponent(HashMap<String, String> item) {
 
-	component = new Checkbox();
+	Checkbox component = new Checkbox();
 	component.setId(item.get("identifier"));
 
 	if (consumer != null) {
