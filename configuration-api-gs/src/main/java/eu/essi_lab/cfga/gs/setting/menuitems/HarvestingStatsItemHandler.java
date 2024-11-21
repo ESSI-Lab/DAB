@@ -1,4 +1,4 @@
-package eu.essi_lab.cfga.gs.setting.harvesting.menuitems;
+package eu.essi_lab.cfga.gs.setting.menuitems;
 
 /*-
  * #%L
