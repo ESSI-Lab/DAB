@@ -92,7 +92,9 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
     public static final String AGROSTAC_SECOND_LEVEL_TEMPLATE = "agrostacSecondLevel";
 
     private static final String RESOURCE_ID_KEY = "id";
-
+    
+    private static final String BACKGROUND_INFO_URL = "https://agrostac.wenr.wur.nl/pdf/AGROSTAC-API-crop.pdf";
+    
     // DATASET INFO
     private static final String LICENSE = "license";
     private static final String WIKI_URL = "wiki_url";
@@ -738,6 +740,13 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 	// addDistribution(json, miMetadata);
 
 	// enrichMetadata(miMetadata);
+	Online information = new Online();
+	information.setLinkage(BACKGROUND_INFO_URL);
+	information.setProtocol(NetProtocols.HTTP.getCommonURN());
+	information.setFunctionCode("information");
+	information.setDescription("AGROSTAC API Services");
+	miMetadata.getDistribution().addDistributionOnline(information);
+	
 
 	return ret;
 
