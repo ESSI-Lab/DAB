@@ -25,7 +25,7 @@ public class CUAHSIHISServerConnectorExternalTestIT {
     public ExpectedException ee = ExpectedException.none();
     protected static final String ENDPOINT2 = "https://hisprod.rtnccad.epa.gov/prod/CUAHSI_1_1.asmx?WSDL";
     protected static final String ENDPOINT3 = "http://hydroportal.cuahsi.org/GlobalRiversObservatory/webapp/cuahsi_1_1.asmx?WSDL";
-    protected static final String ENDPOINT1 = "http://icewater.usu.edu/littlebearriverwof/cuahsi_1_1.asmx?WSDL";
+    protected static final String ENDPOINT1 = "https://hydroportal.cuahsi.org/littlebearriverwof/cuahsi_1_1.asmx?WSDL";    
     protected static final String ENDPOINT_1_0 = "http://icewater.boisestate.edu/srbdataservices/cuahsi_1_0.asmx?WSDL";
     protected static final String ENDPOINT_BIG_SERVICE = "http://hydroportal.cuahsi.org/nwisgw/cuahsi_1_1.asmx?WSDL";
     @SuppressWarnings("rawtypes")

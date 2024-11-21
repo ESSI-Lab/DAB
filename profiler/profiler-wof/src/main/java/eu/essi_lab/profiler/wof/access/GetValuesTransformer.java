@@ -309,7 +309,7 @@ public class GetValuesTransformer extends AccessRequestTransformer {
 		} else {
 		    descriptor.setDataFormat(DataFormat.WATERML_1_1());
 		}
-
+		descriptor.getSpatialDimensions().clear(); // no need of subsetting for time series
 		return Optional.of(descriptor);
 	    }
 

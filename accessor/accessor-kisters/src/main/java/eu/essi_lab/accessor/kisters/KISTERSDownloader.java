@@ -74,7 +74,7 @@ public class KISTERSDownloader extends WMLDataDownloader {
 
 	String name = online.getName();
 
-	KISTERSClient client = new KISTERSClient();
+	KISTERSClient client = new KISTERSClient(online.getLinkage());
 
 	KISTERSEntity entity = client.retrieveTimeSeries(name);
 
@@ -117,7 +117,7 @@ public class KISTERSDownloader extends WMLDataDownloader {
 	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
 
-	KISTERSClient client = new KISTERSClient();
+	KISTERSClient client = new KISTERSClient(online.getLinkage());
 	List<KISTERSEntity> values = client.retrieveTimeSeriesValues(name, begin, end);
 
 	TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
