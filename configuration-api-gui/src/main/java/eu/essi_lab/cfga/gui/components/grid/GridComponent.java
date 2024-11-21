@@ -264,10 +264,12 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	    if (descriptor.getColumnWidth() > 0) {
 
 		column.setWidth(descriptor.getColumnWidth() + "px");
+		column.setFlexGrow(0);
 
 	    } else {
 
-		column.setAutoWidth(true);
+//		column.setAutoWidth(true);
+		column.setFlexGrow(1);
 	    }
 
 	    if (descriptor.isFiltered() || descriptor.getRenderer().isPresent()) {
