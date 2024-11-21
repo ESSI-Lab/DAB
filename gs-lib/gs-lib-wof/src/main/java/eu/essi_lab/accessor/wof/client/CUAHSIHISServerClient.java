@@ -34,6 +34,9 @@ import java.util.Iterator;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
+import javax.xml.namespace.NamespaceContext;
+import javax.xml.xpath.XPathExpressionException;
+
 import org.slf4j.Logger;
 
 import eu.essi_lab.accessor.wof.client.datamodel.GetValuesRequest;
@@ -278,14 +281,14 @@ public abstract class CUAHSIHISServerClient {
      */
     public SitesResponseDocument getSiteInfo(String networkName, String siteCode) throws GSException {
 
-	String fullSiteCode = networkName+":"+siteCode;
+	String fullSiteCode = networkName + ":" + siteCode;
 	synchronized (siteInfoCache) {
 	    SitesResponseDocument ret = siteInfoCache.get(fullSiteCode);
-	    if (ret!=null) {
+	    if (ret != null) {
 		return ret;
 	    }
 	}
-	
+
 	SOAPExecutorDOM executor = new SOAPExecutorDOM(endpoint);
 
 	executor.setSOAPAction(getGetSiteInfoSOAPAction());
@@ -320,9 +323,9 @@ public abstract class CUAHSIHISServerClient {
 	return srd;
 
     }
-    
-    private static ExpiringCache<SitesResponseDocument>siteInfoCache;
-    static {	
+
+    private static ExpiringCache<SitesResponseDocument> siteInfoCache;
+    static {
 	siteInfoCache = new ExpiringCache<SitesResponseDocument>();
 	siteInfoCache.setMaxSize(50);
 	siteInfoCache.setDuration(TimeUnit.MINUTES.toMillis(5));
@@ -502,6 +505,20 @@ public abstract class CUAHSIHISServerClient {
 	executor.setResultPath(getGetValuesResultXPath());
 
 	XMLDocumentReader reader = executor.execute();
+	NamespaceContext nc = new CUAHSINamespaceContext();
+	reader.setNamespaceContext(nc);
+	XMLDocumentWriter writer = new XMLDocumentWriter(reader);
+
+	try {
+	    // Some HIS server (e.g.https://hydroportal.cuahsi.org/nwisuv/cuahsi_1_1.asmx?WSDL )
+	    // produces invalid wml, we try to fix it
+	    writer.rename("//wml:units", "wml:unit");
+	    writer.rename("//wml:unitsAbbreviation", "wml:unitAbbreviation");
+	    writer.remove("//wml:unitIDSpecified");
+	    writer.remove("//wml:oid");
+	} catch (XPathExpressionException e) {
+	    e.printStackTrace();
+	}
 
 	TimeSeriesResponseDocument ret = new TimeSeriesResponseDocument(reader.getDocument());
 
@@ -532,7 +549,7 @@ public abstract class CUAHSIHISServerClient {
     }
 
     protected String getGetValuesResultXPath() {
-	return "//*:TimeSeriesResponse/*:timeSeriesResponse";
+	return "//*:timeSeriesResponse";
     }
 
     /*

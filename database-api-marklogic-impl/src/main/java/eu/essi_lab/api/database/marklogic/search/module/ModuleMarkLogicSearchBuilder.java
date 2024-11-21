@@ -58,7 +58,7 @@ public class ModuleMarkLogicSearchBuilder extends DefaultMarkLogicSearchBuilder 
 
 	super(message, markLogicDB);
     }
-    
+
     @Override
     protected String buildTermFrequencyQuery(Queryable target, int max) {
 
@@ -66,7 +66,7 @@ public class ModuleMarkLogicSearchBuilder extends DefaultMarkLogicSearchBuilder 
 
 	    return super.buildTermFrequencyQuery(target, max);
 	}
-	
+
 	return MarkLogicModuleQueryBuilder.getInstance().getTermFrequencyQuery(target.getName(), max);
     }
 
@@ -159,12 +159,36 @@ public class ModuleMarkLogicSearchBuilder extends DefaultMarkLogicSearchBuilder 
     @Override
     protected String buildSourceIdQuery(QualifiedName name, String value, Queryable property) {
 
+	return buildSourceIdQuery(name, value, property, BondOperator.EQUAL);
+    }
+
+    /**
+     * @param name
+     * @param value
+     * @param property
+     * @param bond
+     * @return
+     */
+    @SuppressWarnings("incomplete-switch")
+    @Override
+    protected String buildSourceIdQuery(QualifiedName name, String value, Queryable property, BondOperator operator) {
+
 	if (!dataFolderCheckEnabled) {
 
-	    return super.buildSourceIdQuery(name, value, property);
+	    return super.buildSourceIdQuery(name, value, property, operator);
 	}
 
-	return MarkLogicModuleQueryBuilder.getInstance().getSourceIdQuery(value, markLogicDB.getIdentifier());
+	switch (operator) {
+	case EQUAL:
+
+	    return MarkLogicModuleQueryBuilder.getInstance().getSourceIdQuery(value, markLogicDB.getIdentifier());
+
+	case LIKE:
+
+	    return MarkLogicModuleQueryBuilder.getInstance().getSourceIdLikeQuery(value, markLogicDB.getIdentifier());
+	}
+
+	throw new IllegalArgumentException("Unsupported bond operator: " + operator);
     }
 
     /**

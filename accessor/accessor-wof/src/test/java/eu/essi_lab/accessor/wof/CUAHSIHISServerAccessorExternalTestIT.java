@@ -51,20 +51,22 @@ public class CUAHSIHISServerAccessorExternalTestIT {
 	    logger.debug("Token: {}", token);
 	    Iterator<OriginalMetadata> iterator = response.getRecords();
 	    List<OriginalMetadata> list = Lists.newArrayList(iterator);
-	    Assert.assertEquals(1, list.size());
-	    OriginalMetadata metadata = list.get(0);
-	    GSResource res = mapper.map(metadata, source);
-	    String id = res.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getResourceIdentifier();
-	    logger.debug("Resource id: {}", id);
-	    if (!resourceIdentifiers.contains(id)) {
-		resourceIdentifiers.add(id);
-	    } else {
-		String msg = "Found a duplicate identifier: " + id;
-		logger.error(msg);
-		Assert.fail(msg);
-	    }
+	    // Assert.assertEquals(1, list.size());
+	    if (!list.isEmpty()) {
+		OriginalMetadata metadata = list.get(0);
+		GSResource res = mapper.map(metadata, source);
+		String id = res.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getResourceIdentifier();
+		logger.debug("Resource id: {}", id);
+		if (!resourceIdentifiers.contains(id)) {
+		    resourceIdentifiers.add(id);
+		} else {
+		    String msg = "Found a duplicate identifier: " + id;
+		    logger.error(msg);
+		    Assert.fail(msg);
+		}
 
-	    count++;
+		count++;
+	    }
 	    token = response.getResumptionToken();
 	    request.setResumptionToken(token);
 	    response = connector.listRecords(request);

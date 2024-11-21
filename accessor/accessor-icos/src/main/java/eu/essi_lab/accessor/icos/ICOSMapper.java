@@ -129,7 +129,7 @@ public class ICOSMapper extends FileIdentifierMapper {
 		    JSONArray featuresArray = coverageGeoObject.optJSONArray("features");
 		    JSONArray tmp = new JSONArray();
 		    JSONArray tmpPolygon = new JSONArray();
-		    for(int k=0; k<featuresArray.length(); k++) {
+		    for (int k = 0; k < featuresArray.length(); k++) {
 			JSONObject featureObj = featuresArray.getJSONObject(k);
 			geometryObj = featureObj.optJSONObject("geometry");
 			if (geometryObj != null) {
@@ -143,12 +143,12 @@ public class ICOSMapper extends FileIdentifierMapper {
 				Object two = coordArray.get(0);
 				tmp.put(coordArray);
 			    }
-			    
+
 			}
 		    }
-		    if(tmpPolygon.isEmpty()) {
+		    if (tmpPolygon.isEmpty()) {
 			addCoordinates(longitudes, latitudes, elevations, tmp, "Multi-Point");
-		    }else {
+		    } else {
 			addCoordinates(longitudes, latitudes, elevations, tmpPolygon.getJSONArray(0), "Polygon");
 		    }
 		}
@@ -469,7 +469,7 @@ public class ICOSMapper extends FileIdentifierMapper {
 	    Keywords keyword = new Keywords();
 	    keyword.setTypeCode("instrument");
 	    if (uri != null) {
-		keyword.addKeyword(label,uri);
+		keyword.addKeyword(label, uri);
 	    } else {
 		keyword.addKeyword(label);
 	    }
@@ -561,13 +561,16 @@ public class ICOSMapper extends FileIdentifierMapper {
 	    }
 	}
 
-	if (isForGEOSS && accessUrl != null) {
-	    Online online = new Online();
-	    online.setLinkage(accessUrl);
-	    online.setProtocol(NetProtocols.HTTP.getCommonURN());
-	    online.setFunctionCode("download");
-	    online.setDescription("ICOS Portal Download Page");
-	    coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(online);
+	if (isForGEOSS) {
+	    dataset.getExtensionHandler().setIsInSitu();
+	    if (accessUrl != null) {
+		Online online = new Online();
+		online.setLinkage(accessUrl);
+		online.setProtocol(NetProtocols.HTTP.getCommonURN());
+		online.setFunctionCode("download");
+		online.setDescription("ICOS Portal Download Page");
+		coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(online);
+	    }
 	}
 
     }
@@ -588,7 +591,7 @@ public class ICOSMapper extends FileIdentifierMapper {
 	    array = tmp;
 	    array = array.getJSONArray(0);
 	}
-	
+
 	for (int i = 0; i < array.length(); i++) {
 	    JSONArray coords = array.getJSONArray(i);
 	    longitudes.add(coords.getBigDecimal(0));
