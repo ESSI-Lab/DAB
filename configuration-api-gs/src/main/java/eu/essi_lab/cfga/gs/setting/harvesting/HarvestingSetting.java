@@ -203,20 +203,20 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 
 			    ColumnDescriptor.createPositionalDescriptor(), //
 
-			    ColumnDescriptor.create("Name", true, true, (s) -> s.getName()), //
+			    ColumnDescriptor.create("Name", 400, true, true, (s) -> s.getName()), //
 
 			    ColumnDescriptor.create("Type", 150, true, true, (s) -> getSelectedAccessorType(s)), //
 
-			    ColumnDescriptor.create("Source id", 150, true, true, (s) -> getSourceId(s)), //
+			    ColumnDescriptor.create("Source id", 200, true, true, (s) -> getSourceId(s)), //
 
-			    ColumnDescriptor.create("Setting id", true, true, true, (s) -> s.getIdentifier()), //
+			    ColumnDescriptor.create("Setting id", 200, true, true, (s) -> s.getIdentifier()), //
 
 			    ColumnDescriptor.create("Comment", 150, true, true, (s) -> getComment(s)), //
 
-			    ColumnDescriptor.create("Repeat count", 50, true, true,
+			    ColumnDescriptor.create("Repeat count", 150, true, true,
 				    (s) -> SchedulerSupport.getInstance().getRepeatCount(s)), //
 
-			    ColumnDescriptor.create("Repeat interval", 50, true, true,
+			    ColumnDescriptor.create("Repeat interval", 150, true, true,
 				    (s) -> SchedulerSupport.getInstance().getRepeatInterval(s)), //
 
 			    ColumnDescriptor.create("Status", 100, true, true, (s) -> SchedulerSupport.getInstance().getJobPhase(s)), //
@@ -231,7 +231,7 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 			    ColumnDescriptor.create("Next fire time", 150, true, true,
 				    (s) -> SchedulerSupport.getInstance().getNextFireTime(s)), //
 
-			    ColumnDescriptor.create("Size", 70, true, true, (s) -> SchedulerSupport.getInstance().getSize(s),
+			    ColumnDescriptor.create("Size", true, true, (s) -> SchedulerSupport.getInstance().getSize(s),
 
 				    (o1, o2) -> {
 

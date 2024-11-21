@@ -161,7 +161,7 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 
 			    ColumnDescriptor.create("Type", 300, true, true, (s) -> getServiceType(s)), //
 
-			    ColumnDescriptor.create("Version", 150, true, true, (s) -> getServiceVersion(s)) //
+			    ColumnDescriptor.create("Version",  true, true, (s) -> getServiceVersion(s)) //
 
 		    ), getItemsList(), com.vaadin.flow.component.grid.Grid.SelectionMode.MULTI, false).//
 

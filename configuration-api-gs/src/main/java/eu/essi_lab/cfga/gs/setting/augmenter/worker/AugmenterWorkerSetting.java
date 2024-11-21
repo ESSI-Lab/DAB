@@ -265,9 +265,9 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 
 			    ColumnDescriptor.create("Name", true, true, (s) -> getName(s)), //
 
-			    ColumnDescriptor.create("Repeat count", 50, true, true, (s) -> SchedulerSupport.getInstance().getRepeatCount(s)), //
+			    ColumnDescriptor.create("Repeat count", 150, true, true, (s) -> SchedulerSupport.getInstance().getRepeatCount(s)), //
 
-			    ColumnDescriptor.create("Repeat interval", 50, true, true,
+			    ColumnDescriptor.create("Repeat interval", 150, true, true,
 				    (s) -> SchedulerSupport.getInstance().getRepeatInterval(s)), //
 
 			    ColumnDescriptor.create("Status", 100, true, true, (s) -> SchedulerSupport.getInstance().getJobPhase(s)), //
@@ -279,7 +279,7 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 			    ColumnDescriptor.create("El. time (HH:mm:ss)", 170, true, true,
 				    (s) -> SchedulerSupport.getInstance().getElapsedTime(s)), //
 
-			    ColumnDescriptor.create("Next fire time", 150, true, true,
+			    ColumnDescriptor.create("Next fire time", true, true,
 				    (s) -> SchedulerSupport.getInstance().getNextFireTime(s)), //
 
 			    ColumnDescriptor.create("Info", true, true, false, (s) -> SchedulerSupport.getInstance().getAllMessages(s))//
