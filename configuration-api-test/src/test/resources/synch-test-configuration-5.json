@@ -46,7 +46,7 @@
             "type": "option",
             "key": "pathOption"
         },
-        "onlineOption": {
+        "stateOption": {
             "canBeDisabled": false,
             "values": ["Online"],
             "description": "IIf the service is offline, requests forwarded on the service path return a 404 'Not Found' error code",
@@ -55,7 +55,7 @@
             "label": "Service state",
             "type": "option",
             "selectedIndexes": [0],
-            "key": "onlineOption"
+            "key": "stateOption"
         },
         "configurableType": "WIS-EXTENTProfiler",
         "settingId": "46a5223e-51fe-46d2-bba6-8335712d633d",
@@ -108,7 +108,7 @@
             "type": "option",
             "key": "pathOption"
         },
-        "onlineOption": {
+        "stateOption": {
             "canBeDisabled": false,
             "values": ["Online"],
             "description": "IIf the service is offline, requests forwarded on the service path return a 404 'Not Found' error code",
@@ -117,7 +117,7 @@
             "label": "Service state",
             "type": "option",
             "selectedIndexes": [0],
-            "key": "onlineOption"
+            "key": "stateOption"
         },
         "configurableType": "GWISProfiler",
         "settingId": "73eaae60-9db8-4f6a-b153-8b866ac25e6e",
@@ -170,7 +170,7 @@
             "type": "option",
             "key": "pathOption"
         },
-        "onlineOption": {
+        "stateOption": {
             "canBeDisabled": false,
             "values": ["Online"],
             "description": "IIf the service is offline, requests forwarded on the service path return a 404 'Not Found' error code",
@@ -179,7 +179,7 @@
             "label": "Service state",
             "type": "option",
             "selectedIndexes": [0],
-            "key": "onlineOption"
+            "key": "stateOption"
         },
         "configurableType": "TIMESERIESProfiler",
         "settingId": "3b1e33eb-9a24-4718-83d6-b113b58ce5f2",
@@ -232,7 +232,7 @@
             "type": "option",
             "key": "pathOption"
         },
-        "onlineOption": {
+        "stateOption": {
             "canBeDisabled": false,
             "values": ["Online"],
             "description": "IIf the service is offline, requests forwarded on the service path return a 404 'Not Found' error code",
@@ -241,7 +241,7 @@
             "label": "Service state",
             "type": "option",
             "selectedIndexes": [0],
-            "key": "onlineOption"
+            "key": "stateOption"
         },
         "configurableType": "OMProfiler",
         "settingId": "e44c5420-211e-4472-90c4-82c97cf31960",
@@ -294,7 +294,7 @@
             "type": "option",
             "key": "pathOption"
         },
-        "onlineOption": {
+        "stateOption": {
             "canBeDisabled": false,
             "values": ["Online"],
             "description": "IIf the service is offline, requests forwarded on the service path return a 404 'Not Found' error code",
@@ -303,7 +303,7 @@
             "label": "Service state",
             "type": "option",
             "selectedIndexes": [0],
-            "key": "onlineOption"
+            "key": "stateOption"
         },
         "configurableType": "TERMSProfiler",
         "settingId": "919d17e0-d8fc-43ec-8fb4-4646773d862f",
@@ -356,7 +356,7 @@
             "type": "option",
             "key": "pathOption"
         },
-        "onlineOption": {
+        "stateOption": {
             "canBeDisabled": false,
             "values": ["Online"],
             "description": "IIf the service is offline, requests forwarded on the service path return a 404 'Not Found' error code",
@@ -365,7 +365,7 @@
             "label": "Service state",
             "type": "option",
             "selectedIndexes": [0],
-            "key": "onlineOption"
+            "key": "stateOption"
         },
         "configurableType": "ESRIProfiler",
         "settingId": "1feed8ea-7ce0-4140-b40b-01cad675f047",
@@ -418,7 +418,7 @@
             "type": "option",
             "key": "pathOption"
         },
-        "onlineOption": {
+        "stateOption": {
             "canBeDisabled": false,
             "values": ["Online"],
             "description": "IIf the service is offline, requests forwarded on the service path return a 404 'Not Found' error code",
@@ -427,7 +427,7 @@
             "label": "Service state",
             "type": "option",
             "selectedIndexes": [0],
-            "key": "onlineOption"
+            "key": "stateOption"
         },
         "configurableType": "ESRIPROXYProfiler",
         "settingId": "d19d6850-4eeb-448a-8617-1e43d2fdd88e",
@@ -480,7 +480,7 @@
             "type": "option",
             "key": "pathOption"
         },
-        "onlineOption": {
+        "stateOption": {
             "canBeDisabled": false,
             "values": ["Online"],
             "description": "IIf the service is offline, requests forwarded on the service path return a 404 'Not Found' error code",
@@ -489,7 +489,7 @@
             "label": "Service state",
             "type": "option",
             "selectedIndexes": [0],
-            "key": "onlineOption"
+            "key": "stateOption"
         },
         "configurableType": "SEMANTICProfiler",
         "settingId": "d8dcca99-86f4-4ad3-863f-2f778f8366b4",
@@ -542,7 +542,7 @@
             "type": "option",
             "key": "pathOption"
         },
-        "onlineOption": {
+        "stateOption": {
             "canBeDisabled": false,
             "values": ["Online"],
             "description": "IIf the service is offline, requests forwarded on the service path return a 404 'Not Found' error code",
@@ -551,7 +551,7 @@
             "label": "Service state",
             "type": "option",
             "selectedIndexes": [0],
-            "key": "onlineOption"
+            "key": "stateOption"
         },
         "configurableType": "THREDDSProfiler",
         "settingId": "9ccca682-2a64-4c6c-8643-2b36b30a60d5",
@@ -604,7 +604,7 @@
             "type": "option",
             "key": "pathOption"
         },
-        "onlineOption": {
+        "stateOption": {
             "canBeDisabled": false,
             "values": ["Online"],
             "description": "IIf the service is offline, requests forwarded on the service path return a 404 'Not Found' error code",
@@ -613,7 +613,7 @@
             "label": "Service state",
             "type": "option",
             "selectedIndexes": [0],
-            "key": "onlineOption"
+            "key": "stateOption"
         },
         "configurableType": "BNHSProfiler",
         "settingId": "dfcbb613-cac7-46a8-99ba-d25ee7c333f0",
@@ -666,7 +666,7 @@
             "type": "option",
             "key": "pathOption"
         },
-        "onlineOption": {
+        "stateOption": {
             "canBeDisabled": false,
             "values": ["Online"],
             "description": "IIf the service is offline, requests forwarded on the service path return a 404 'Not Found' error code",
@@ -675,7 +675,7 @@
             "label": "Service state",
             "type": "option",
             "selectedIndexes": [0],
-            "key": "onlineOption"
+            "key": "stateOption"
         },
         "configurableType": "SOSProfiler",
         "settingId": "778c0dc0-1ee3-4bf2-88dc-9ccd6ff7f903",
@@ -728,7 +728,7 @@
             "type": "option",
             "key": "pathOption"
         },
-        "onlineOption": {
+        "stateOption": {
             "canBeDisabled": false,
             "values": ["Online"],
             "description": "IIf the service is offline, requests forwarded on the service path return a 404 'Not Found' error code",
@@ -737,7 +737,7 @@
             "label": "Service state",
             "type": "option",
             "selectedIndexes": [0],
-            "key": "onlineOption"
+            "key": "stateOption"
         },
         "configurableType": "SOS-TAHMO-PROXYProfiler",
         "settingId": "68c579fa-92bd-43d0-bcc1-4dec82379adc",
@@ -790,7 +790,7 @@
             "type": "option",
             "key": "pathOption"
         },
-        "onlineOption": {
+        "stateOption": {
             "canBeDisabled": false,
             "values": ["Online"],
             "description": "IIf the service is offline, requests forwarded on the service path return a 404 'Not Found' error code",
@@ -799,7 +799,7 @@
             "label": "Service state",
             "type": "option",
             "selectedIndexes": [0],
-            "key": "onlineOption"
+            "key": "stateOption"
         },
         "configurableType": "ARPA-HYDROCSVProfiler",
         "settingId": "041dcf10-8f54-4c13-9723-fab2a8be5b26",
@@ -852,7 +852,7 @@
             "type": "option",
             "key": "pathOption"
         },
-        "onlineOption": {
+        "stateOption": {
             "canBeDisabled": false,
             "values": ["Online"],
             "description": "IIf the service is offline, requests forwarded on the service path return a 404 'Not Found' error code",
@@ -861,7 +861,7 @@
             "label": "Service state",
             "type": "option",
             "selectedIndexes": [0],
-            "key": "onlineOption"
+            "key": "stateOption"
         },
         "configurableType": "ARPA-RESTProfiler",
         "settingId": "d562cb53-f40d-4ef4-b005-024037a7e70f",
@@ -914,7 +914,7 @@
             "type": "option",
             "key": "pathOption"
         },
-        "onlineOption": {
+        "stateOption": {
             "canBeDisabled": false,
             "values": ["Online"],
             "description": "IIf the service is offline, requests forwarded on the service path return a 404 'Not Found' error code",
@@ -923,7 +923,7 @@
             "label": "Service state",
             "type": "option",
             "selectedIndexes": [0],
-            "key": "onlineOption"
+            "key": "stateOption"
         },
         "configurableType": "OAI-PMHProfiler",
         "settingId": "d22c0ca4-fd8c-4d5c-9c6a-c0b407dd975a",
@@ -976,7 +976,7 @@
             "type": "option",
             "key": "pathOption"
         },
-        "onlineOption": {
+        "stateOption": {
             "canBeDisabled": false,
             "values": ["Online"],
             "description": "IIf the service is offline, requests forwarded on the service path return a 404 'Not Found' error code",
@@ -985,7 +985,7 @@
             "label": "Service state",
             "type": "option",
             "selectedIndexes": [0],
-            "key": "onlineOption"
+            "key": "stateOption"
         },
         "configurableType": "KMA-OAI-PMHProfiler",
         "settingId": "11c31066-a0f8-4910-b573-72756eec9481",
@@ -1038,7 +1038,7 @@
             "type": "option",
             "key": "pathOption"
         },
-        "onlineOption": {
+        "stateOption": {
             "canBeDisabled": false,
             "values": ["Online"],
             "description": "IIf the service is offline, requests forwarded on the service path return a 404 'Not Found' error code",
@@ -1047,7 +1047,7 @@
             "label": "Service state",
             "type": "option",
             "selectedIndexes": [0],
-            "key": "onlineOption"
+            "key": "stateOption"
         },
         "configurableType": "GWPSProfiler",
         "settingId": "2a5c04e2-668e-4694-bc0e-7d26e1741226",
@@ -1100,7 +1100,7 @@
             "type": "option",
             "key": "pathOption"
         },
-        "onlineOption": {
+        "stateOption": {
             "canBeDisabled": false,
             "values": ["Online"],
             "description": "IIf the service is offline, requests forwarded on the service path return a 404 'Not Found' error code",
@@ -1109,7 +1109,7 @@
             "label": "Service state",
             "type": "option",
             "selectedIndexes": [0],
-            "key": "onlineOption"
+            "key": "stateOption"
         },
         "configurableType": "WMSProfiler",
         "settingId": "7646b5f8-ce5d-426d-aea3-f2cca264bc6f",
@@ -1162,7 +1162,7 @@
             "type": "option",
             "key": "pathOption"
         },
-        "onlineOption": {
+        "stateOption": {
             "canBeDisabled": false,
             "values": ["Online"],
             "description": "IIf the service is offline, requests forwarded on the service path return a 404 'Not Found' error code",
@@ -1171,7 +1171,7 @@
             "label": "Service state",
             "type": "option",
             "selectedIndexes": [0],
-            "key": "onlineOption"
+            "key": "stateOption"
         },
         "configurableType": "WMS-EXTENTProfiler",
         "settingId": "086194b5-6dff-4732-b103-79fd2c156b13",
@@ -1224,7 +1224,7 @@
             "type": "option",
             "key": "pathOption"
         },
-        "onlineOption": {
+        "stateOption": {
             "canBeDisabled": false,
             "values": ["Online"],
             "description": "IIf the service is offline, requests forwarded on the service path return a 404 'Not Found' error code",
@@ -1233,7 +1233,7 @@
             "label": "Service state",
             "type": "option",
             "selectedIndexes": [0],
-            "key": "onlineOption"
+            "key": "stateOption"
         },
         "configurableType": "WFSProfiler",
         "settingId": "57997547-1145-46f8-a517-3a6d3e51ba64",
@@ -1286,7 +1286,7 @@
             "type": "option",
             "key": "pathOption"
         },
-        "onlineOption": {
+        "stateOption": {
             "canBeDisabled": false,
             "values": ["Online"],
             "description": "IIf the service is offline, requests forwarded on the service path return a 404 'Not Found' error code",
@@ -1295,7 +1295,7 @@
             "label": "Service state",
             "type": "option",
             "selectedIndexes": [0],
-            "key": "onlineOption"
+            "key": "stateOption"
         },
         "configurableType": "OpenSearchProfiler",
         "settingId": "c72fa519-396c-43ca-a4af-3ebef462b87f",
@@ -1348,7 +1348,7 @@
             "type": "option",
             "key": "pathOption"
         },
-        "onlineOption": {
+        "stateOption": {
             "canBeDisabled": false,
             "values": ["Online"],
             "description": "IIf the service is offline, requests forwarded on the service path return a 404 'Not Found' error code",
@@ -1357,7 +1357,7 @@
             "label": "Service state",
             "type": "option",
             "selectedIndexes": [0],
-            "key": "onlineOption"
+            "key": "stateOption"
         },
         "configurableType": "CSWProfiler",
         "settingId": "8d57ee89-c668-4b8c-a292-d93fd9f8c8e3",
@@ -1410,7 +1410,7 @@
             "type": "option",
             "key": "pathOption"
         },
-        "onlineOption": {
+        "stateOption": {
             "canBeDisabled": false,
             "values": ["Online"],
             "description": "IIf the service is offline, requests forwarded on the service path return a 404 'Not Found' error code",
@@ -1419,7 +1419,7 @@
             "label": "Service state",
             "type": "option",
             "selectedIndexes": [0],
-            "key": "onlineOption"
+            "key": "stateOption"
         },
         "configurableType": "CSWISOGEOProfiler",
         "settingId": "b3145e18-da1b-4c8c-8239-eeadf782a8fa",
@@ -1472,7 +1472,7 @@
             "type": "option",
             "key": "pathOption"
         },
-        "onlineOption": {
+        "stateOption": {
             "canBeDisabled": false,
             "values": ["Online"],
             "description": "IIf the service is offline, requests forwarded on the service path return a 404 'Not Found' error code",
@@ -1481,7 +1481,7 @@
             "label": "Service state",
             "type": "option",
             "selectedIndexes": [0],
-            "key": "onlineOption"
+            "key": "stateOption"
         },
         "configurableType": "PUB-SUBProfiler",
         "settingId": "1c2c1026-0c42-45e4-85a6-f0422126460c",
@@ -1534,7 +1534,7 @@
             "type": "option",
             "key": "pathOption"
         },
-        "onlineOption": {
+        "stateOption": {
             "canBeDisabled": false,
             "values": ["Online"],
             "description": "IIf the service is offline, requests forwarded on the service path return a 404 'Not Found' error code",
@@ -1543,7 +1543,7 @@
             "label": "Service state",
             "type": "option",
             "selectedIndexes": [0],
-            "key": "onlineOption"
+            "key": "stateOption"
         },
         "configurableType": "CSW-PUB-SUBProfiler",
         "settingId": "d01d59c2-0b15-4ff5-9ed6-9e2b61da4ceb",
@@ -1596,7 +1596,7 @@
             "type": "option",
             "key": "pathOption"
         },
-        "onlineOption": {
+        "stateOption": {
             "canBeDisabled": false,
             "values": ["Online"],
             "description": "IIf the service is offline, requests forwarded on the service path return a 404 'Not Found' error code",
@@ -1605,7 +1605,7 @@
             "label": "Service state",
             "type": "option",
             "selectedIndexes": [0],
-            "key": "onlineOption"
+            "key": "stateOption"
         },
         "configurableType": "HIS-CENTRALProfiler",
         "settingId": "2610c403-f0ac-4ed9-885d-5c45ab9fa236",
@@ -1658,7 +1658,7 @@
             "type": "option",
             "key": "pathOption"
         },
-        "onlineOption": {
+        "stateOption": {
             "canBeDisabled": false,
             "values": ["Online"],
             "description": "IIf the service is offline, requests forwarded on the service path return a 404 'Not Found' error code",
@@ -1667,7 +1667,7 @@
             "label": "Service state",
             "type": "option",
             "selectedIndexes": [0],
-            "key": "onlineOption"
+            "key": "stateOption"
         },
         "configurableType": "HYDRO-SERVERProfiler",
         "settingId": "9759f709-9afe-4073-bc40-27ec01e0c9eb",
@@ -1720,7 +1720,7 @@
             "type": "option",
             "key": "pathOption"
         },
-        "onlineOption": {
+        "stateOption": {
             "canBeDisabled": false,
             "values": ["Online"],
             "description": "IIf the service is offline, requests forwarded on the service path return a 404 'Not Found' error code",
@@ -1729,7 +1729,7 @@
             "label": "Service state",
             "type": "option",
             "selectedIndexes": [0],
-            "key": "onlineOption"
+            "key": "stateOption"
         },
         "configurableType": "RestProfiler",
         "settingId": "1ec21e99-8eae-4687-a749-a665a429ba27",
@@ -1782,7 +1782,7 @@
             "type": "option",
             "key": "pathOption"
         },
-        "onlineOption": {
+        "stateOption": {
             "canBeDisabled": false,
             "values": ["Online"],
             "description": "IIf the service is offline, requests forwarded on the service path return a 404 'Not Found' error code",
@@ -1791,7 +1791,7 @@
             "label": "Service state",
             "type": "option",
             "selectedIndexes": [0],
-            "key": "onlineOption"
+            "key": "stateOption"
         },
         "configurableType": "REST-VIEWSProfiler",
         "settingId": "1fdd92db-7591-470d-b871-4e14caa8a5ed",
@@ -1844,7 +1844,7 @@
             "type": "option",
             "key": "pathOption"
         },
-        "onlineOption": {
+        "stateOption": {
             "canBeDisabled": false,
             "values": ["Online"],
             "description": "IIf the service is offline, requests forwarded on the service path return a 404 'Not Found' error code",
@@ -1853,7 +1853,7 @@
             "label": "Service state",
             "type": "option",
             "selectedIndexes": [0],
-            "key": "onlineOption"
+            "key": "stateOption"
         },
         "configurableType": "ServiceStatusCheckerFeedProfiler",
         "settingId": "3b973baf-001b-4966-8435-c1f5969d1101",
@@ -1906,7 +1906,7 @@
             "type": "option",
             "key": "pathOption"
         },
-        "onlineOption": {
+        "stateOption": {
             "canBeDisabled": false,
             "values": ["Online"],
             "description": "IIf the service is offline, requests forwarded on the service path return a 404 'Not Found' error code",
@@ -1915,7 +1915,7 @@
             "label": "Service state",
             "type": "option",
             "selectedIndexes": [0],
-            "key": "onlineOption"
+            "key": "stateOption"
         },
         "configurableType": "WORLDCEREALProfiler",
         "settingId": "7d55a91f-f161-4332-b4b9-c13496602beb",
