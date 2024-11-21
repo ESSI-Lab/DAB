@@ -23,6 +23,7 @@ package eu.essi_lab.accessor.kisters;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -38,6 +39,7 @@ import eu.essi_lab.messages.listrecords.ListRecordsResponse;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.OriginalMetadata;
+import ucar.nc2.ft.point.remote.PointStreamProto.StationList;
 
 /**
  * @author Fabrizio
@@ -49,8 +51,10 @@ public class KISTERSConnector extends HarvestedQueryConnector<KISTERSConnectorSe
      */
     public static final String TYPE = "KISTERSConnector";
     private static final int DEFAULT_PARTITION_SIZE = 50;
-    private List<List<OriginalMetadata>> partitions;
+    // private List<List<OriginalMetadata>> partitions;
     private int recordsCount;
+    private HashMap<String, KISTERSEntity> stations = new HashMap<String, KISTERSEntity>();
+    private List<String> stationIdentifiers = new ArrayList<>();
 
     @Override
     public ListRecordsResponse<OriginalMetadata> listRecords(ListRecordsRequest request) throws GSException {
@@ -59,145 +63,125 @@ public class KISTERSConnector extends HarvestedQueryConnector<KISTERSConnectorSe
 
 	ListRecordsResponse<OriginalMetadata> response = new ListRecordsResponse<OriginalMetadata>();
 
-	if (partitions == null) {
+	KISTERSClient kistersClient = new KISTERSClient(getSourceURL());
+	//
+	// Stations
+	//
+	boolean onlySeries = true;
+	boolean onlyOneStation = false;
 
-	    List<OriginalMetadata> entityList = new ArrayList<>();
-
-	    KISTERSClient kistersClient = new KISTERSClient(getSourceURL());
+	if (stations == null) {
 
 	    GSLoggerFactory.getLogger(getClass()).debug("Retrieving stations STARTED");
 
 	    List<KISTERSEntity> stationsList = kistersClient.retrieveStations();
 
-	    GSLoggerFactory.getLogger(getClass()).debug("Retrievied {} stations", StringUtils.format(stationsList.size()));
-
-	    GSLoggerFactory.getLogger(getClass()).debug("Retrieving stations ENDED");
-
-	    GSLoggerFactory.getLogger(getClass()).debug("Retrieving timeSeries STARTED");
-
-	    List<KISTERSEntity> timeSeriesList = kistersClient.retrieveTimeSeries();
-
-	    GSLoggerFactory.getLogger(getClass()).debug("Retrievied {} timeSeries", StringUtils.format(timeSeriesList.size()));
-
-	    GSLoggerFactory.getLogger(getClass()).debug("Retrieving timeSeries ENDED");
-
-	    //
-	    // Stations
-	    //
-	    boolean onlySeries = true;
-	    boolean onlyOneStation = false;
-
 	    if (onlyOneStation) {
 		stationsList = stationsList.subList(0, 1);
 	    }
 
-	    List<KISTERSEntity> finalStationsList = stationsList;
-
-	    HashSet<String> stationIdentifiers = new HashSet<>();
-
-	    finalStationsList.forEach(station -> {
-
-		station.setType(EntityType.STATION);
-		String stationId = station.getObject().getString(KISTERSClient.STATION_ID);
+	    for (KISTERSEntity ke : stationsList) {
+		String stationId = ke.getObject().getString(KISTERSClient.STATION_ID);
 		stationIdentifiers.add(stationId);
+		stations.put(stationId, ke);
+	    }
 
-		Optional<KISTERSEntity> childTimeSeries = timeSeriesList.//
-			stream().//
-			filter(ts -> ts.getObject().getString(KISTERSClient.STATION_ID)
-				.equals(station.getObject().getString(KISTERSClient.STATION_ID)))
-			.//
-			findFirst();
+	    GSLoggerFactory.getLogger(getClass()).debug("Retrievied {} stations", StringUtils.format(stationsList.size()));
 
-		if (childTimeSeries.isPresent()) {
+	    GSLoggerFactory.getLogger(getClass()).debug("Retrieving stations ENDED");
 
-		    copy(childTimeSeries.get(), station);
-		}
-
-		OriginalMetadata originalMetadata = new OriginalMetadata();
-		originalMetadata.setMetadata(station.toString());
-		originalMetadata.setSchemeURI(KISTERSMapper.KISTERS_SCHEMA);
-		if (!onlySeries) {
-		    entityList.add(originalMetadata);
-		}
-	    });
-
-	    //
-	    // Time series
-	    //
-
-	    timeSeriesList.forEach(timeSeries -> {
-		String stationId = timeSeries.getObject().getString(KISTERSClient.STATION_ID);
-		if (!stationIdentifiers.contains(stationId)) {
-		    return;
-		}
-		String from = timeSeries.getObject().getString(KISTERSClient.TS_FROM);
-		String to = timeSeries.getObject().getString(KISTERSClient.TS_TO);
-
-		if (from != null && !from.isEmpty() && to != null && !to.isEmpty()) {
-
-		    timeSeries.setType(EntityType.TIME_SERIES);
-
-		    Optional<KISTERSEntity> parentStation = finalStationsList.//
-			    stream().//
-			    filter(s -> s.getObject().getString(KISTERSClient.STATION_ID).//
-				    equals(timeSeries.getObject().getString(KISTERSClient.STATION_ID)))
-			    .//
-			    findFirst();
-
-		    if (parentStation.isPresent()) {
-
-			copy(parentStation.get(), timeSeries);
-		    }
-
-		    OriginalMetadata originalMetadata = new OriginalMetadata();
-		    originalMetadata.setMetadata(timeSeries.toString());
-		    originalMetadata.setSchemeURI(KISTERSMapper.KISTERS_SCHEMA);
-
-		    entityList.add(originalMetadata);
-
-		} else {
-
-		    GSLoggerFactory.getLogger(getClass()).warn("Time series {} has incomplete temporal extent",
-			    timeSeries.getObject().getString(KISTERSClient.TS_ID));
-		}
-	    });
-
-	    GSLoggerFactory.getLogger(getClass()).debug("Total number of entities: {}",
-
-		    StringUtils.format(entityList.size()));
-
-	    partitions = Lists.partition(entityList, DEFAULT_PARTITION_SIZE);
-
-	    GSLoggerFactory.getLogger(getClass()).debug("List partition size: {}", partitions.size());
 	}
 
-	int partitionIndex = 0;
+	// finalStationsList.forEach(station -> {
+	//
+	// station.setType(EntityType.STATION);
+	// String stationId = station.getObject().getString(KISTERSClient.STATION_ID);
+	// stationIdentifiers.add(stationId);
+	//
+	// Optional<KISTERSEntity> childTimeSeries = timeSeriesList.//
+	// stream().//
+	// filter(ts -> ts.getObject().getString(KISTERSClient.STATION_ID)
+	// .equals(station.getObject().getString(KISTERSClient.STATION_ID)))
+	// .//
+	// findFirst();
+	//
+	// if (childTimeSeries.isPresent()) {
+	//
+	// copy(childTimeSeries.get(), station);
+	// }
+	//
+	// OriginalMetadata originalMetadata = new OriginalMetadata();
+	// originalMetadata.setMetadata(station.toString());
+	// originalMetadata.setSchemeURI(KISTERSMapper.KISTERS_SCHEMA);
+	// if (!onlySeries) {
+	// entityList.add(originalMetadata);
+	// }
+	// });
+
+	//
+	// Time series
+	//
+
+	int stationIndex = 0;
 	String resumptionToken = request.getResumptionToken();
 	if (resumptionToken != null) {
-	    partitionIndex = Integer.valueOf(resumptionToken);
+	    stationIndex = Integer.valueOf(resumptionToken);
 	}
 
-	GSLoggerFactory.getLogger(getClass()).debug("Current partition index: [{}/{}]", partitionIndex, partitions.size());
-	partitions.get(partitionIndex).forEach(o -> response.addRecord(o));
+	GSLoggerFactory.getLogger(getClass()).debug("Retrieving timeSeries STARTED");
+
+	String stationId = stationIdentifiers.get(stationIndex);
+	KISTERSEntity station = stations.get(stationId);
+	List<KISTERSEntity> timeSeriesList = kistersClient.retrieveTimeSeriesByStation(stationId);
+
+	GSLoggerFactory.getLogger(getClass()).debug("Retrievied {} timeSeries", StringUtils.format(timeSeriesList.size()));
+
+	GSLoggerFactory.getLogger(getClass()).debug("Retrieving timeSeries ENDED");
+
+	List<OriginalMetadata> originalMetadatas = new ArrayList<>();
+
+	timeSeriesList.forEach(timeSeries -> {
+
+	    String from = timeSeries.getObject().getString(KISTERSClient.TS_FROM);
+	    String to = timeSeries.getObject().getString(KISTERSClient.TS_TO);
+
+	    if (from != null && !from.isEmpty() && to != null && !to.isEmpty()) {
+
+		timeSeries.setType(EntityType.TIME_SERIES);
+
+		copy(station, timeSeries);
+
+		OriginalMetadata originalMetadata = new OriginalMetadata();
+		originalMetadata.setMetadata(timeSeries.toString());
+		originalMetadata.setSchemeURI(KISTERSMapper.KISTERS_SCHEMA);
+
+		originalMetadatas.add(originalMetadata);
+		response.addRecord(originalMetadata);
+	    } else {
+
+		GSLoggerFactory.getLogger(getClass()).warn("Time series {} has incomplete temporal extent",
+			timeSeries.getObject().getString(KISTERSClient.TS_ID));
+	    }
+	});
+
+	GSLoggerFactory.getLogger(getClass()).debug("Total number of metadatas: {}",
+
+		StringUtils.format(originalMetadatas.size()));
+
+	GSLoggerFactory.getLogger(getClass()).debug("List partition size: {}", originalMetadatas.size());
+
+	GSLoggerFactory.getLogger(getClass()).debug("Current station index: [{}/{}]", stationIndex, stations.size());
+
 	recordsCount += response.getRecordsAsList().size();
 
 	int maxRecords = getSetting().getMaxRecords().orElse(Integer.MAX_VALUE);
 
-	if (recordsCount >= maxRecords) {
+	stationIndex++;
 
-	    GSLoggerFactory.getLogger(getClass()).debug("Max records {} reached", maxRecords);
-
-	} else if (partitionIndex == partitions.size() - 1) {
-
-	    GSLoggerFactory.getLogger(getClass()).debug("Last partition processed");
-
+	if (stationIndex < stations.size()) {
+	    response.setResumptionToken(String.valueOf(++stationIndex));
 	} else {
-
-	    partitionIndex++;
-
-	    response.setResumptionToken(String.valueOf(partitionIndex));
-
-	    GSLoggerFactory.getLogger(getClass()).debug("Set resumption token to: {}", partitionIndex);
+	    response.setResumptionToken(null);
 	}
 
 	GSLoggerFactory.getLogger(getClass()).debug("List records ENDED");
