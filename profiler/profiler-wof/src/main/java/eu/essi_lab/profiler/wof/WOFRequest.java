@@ -279,28 +279,9 @@ public abstract class WOFRequest {
 	try {
 	    String conceptString = getParameterValue(Parameter.CONCEPT_KEYWORD).toLowerCase();
 	    if (conceptString.length() > 0 && !conceptString.equalsIgnoreCase("all")) {
-		
-		SimpleValueBond ret = null;
-		switch (conceptString) {
-		case "discharge, stream":
-		    ret = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.ATTRIBUTE_TITLE,
-				"Vazao");//   
-		    break;
-		case "precipitation":
-		    ret = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.ATTRIBUTE_TITLE,
-				"Chuva");//
-		    break;
-		case "level, stream":
-		    ret = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.ATTRIBUTE_TITLE,
-				"Nivel");//
-		    break;
-		default:
-		    break;
-		}
-		
-		if (ret==null) {
-		    return Optional.empty();
-		}
+
+		SimpleValueBond ret = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.ATTRIBUTE_TITLE, conceptString);//
+
 		return Optional.of(ret);
 	    }
 	} catch (Exception e) {
