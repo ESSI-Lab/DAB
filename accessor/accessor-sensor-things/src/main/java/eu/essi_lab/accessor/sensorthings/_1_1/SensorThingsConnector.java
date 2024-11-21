@@ -229,7 +229,7 @@ public class SensorThingsConnector extends HarvestedQueryConnector<SensorThingsC
 				totalMappingRecords++;
 
 			    } else {
-
+				addOriginalMetadata(stream, listRecordsResponse, schema, EntityRef.DATASTREAMS, thing);
 				discardedStreams++;
 			    }
 			} catch (Exception e) {
@@ -249,10 +249,12 @@ public class SensorThingsConnector extends HarvestedQueryConnector<SensorThingsC
 			addOriginalMetadata(thing, listRecordsResponse, schema, EntityRef.THINGS, null);
 			thingsCount++;
 			totalMappingRecords++;
+		    } else {
+			addOriginalMetadata(thing, listRecordsResponse, schema, EntityRef.THINGS, null);
 		    }
 
 		} else {
-
+		    addOriginalMetadata(thing, listRecordsResponse, schema, EntityRef.THINGS, null);
 		    discardedThings++;
 		}
 	    }
