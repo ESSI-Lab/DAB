@@ -3,7 +3,13 @@
  */
 package eu.essi_lab.cfga.gs.setting;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 
 /*-
  * #%L
@@ -28,9 +34,15 @@ import java.util.Arrays;
 
 import com.vaadin.flow.data.provider.SortDirection;
 
+import eu.essi_lab.cfga.gs.setting.menuitems.ProfilerStateOfflineItemHandler;
+import eu.essi_lab.cfga.gs.setting.menuitems.ProfilerStateOnlineItemHandler;
+import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
+import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
+import eu.essi_lab.cfga.gui.components.grid.renderer.IconColumnRenderer;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
+import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.KeyValueOptionDecorator;
@@ -44,7 +56,7 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
     private static final String PATH_OPTION_KEY = "pathOption";
     private static final String TYPE_OPTION_KEY = "typeOption";
     private static final String VERSION_OPTION_KEY = "versionOption";
-    private static final String ONLINE_OPTION = "onlineOption";
+    private static final String STATE_OPTION = "stateOption";
 
     public ProfilerSetting() {
 
@@ -85,7 +97,7 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 	//
 
 	Option<String> onlineOption = StringOptionBuilder.get().//
-		withKey(ONLINE_OPTION).//
+		withKey(STATE_OPTION).//
 		withLabel("Service state").//
 		withDescription("If the service is offline, requests forwarded on the service path return a 404 'Not Found' error code").//
 		withSingleSelection().//
@@ -123,10 +135,97 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 	    TabInfo tabInfo = TabInfoBuilder.get().//
 		    withIndex(TabIndex.PROFILER_SETTING.getIndex()).//
 		    withShowDirective("Profilers", SortDirection.ASCENDING).//
+		    withEditDirective("Edit profiler", ConfirmationPolicy.ON_WARNINGS).//
+
+		    withGridInfo(Arrays.asList(//
+
+			    ColumnDescriptor.createPositionalDescriptor(), //
+
+			    ColumnDescriptor.create("Name", true, true, (s) -> s.getName()), //
+
+			    ColumnDescriptor.create("State", 150, true, true, (s) -> getServiceState(s), new IconColumnRenderer() {
+
+				/**
+				 * 
+				 */
+				private static final long serialVersionUID = -5355241303442699327L;
+
+				@Override
+				protected Icon createIcon(HashMap<String, String> item) {
+
+				    return item.get("State").equals("Online") ? VaadinIcon.SIGNAL.create() : VaadinIcon.BAN.create();
+				}
+			    }), //
+
+			    ColumnDescriptor.create("Path", 200, true, true, (s) -> getServicePath(s)), //
+
+			    ColumnDescriptor.create("Type", 300, true, true, (s) -> getServiceType(s)), //
+
+			    ColumnDescriptor.create("Version", 150, true, true, (s) -> getServiceVersion(s)) //
+
+		    ), getItemsList(), com.vaadin.flow.component.grid.Grid.SelectionMode.MULTI, false).//
+
 		    build();
 
 	    setTabInfo(tabInfo);
 	}
+
+	/**
+	 * @param setting
+	 * @return
+	 */
+	private String getServiceState(Setting setting) {
+
+	    return setting.getOption(STATE_OPTION, String.class).get().getSelectedValue();
+	}
+
+	/**
+	 * @param setting
+	 * @return
+	 */
+	private String getServicePath(Setting setting) {
+
+	    return setting.getOption(PATH_OPTION_KEY, String.class).get().getValue();
+	}
+
+	/**
+	 * @param setting
+	 * @return
+	 */
+	private String getServiceType(Setting setting) {
+
+	    return setting.getOption(TYPE_OPTION_KEY, String.class).get().getValue();
+	}
+
+	/**
+	 * @param setting
+	 * @return
+	 */
+	private String getServiceVersion(Setting setting) {
+
+	    return setting.getOption(VERSION_OPTION_KEY, String.class).get().getValue();
+	}
+
+	/**
+	 * @return
+	 */
+	private List<GridMenuItemHandler> getItemsList() {
+
+	    ArrayList<GridMenuItemHandler> list = new ArrayList<>();
+
+	    list.add(new ProfilerStateOnlineItemHandler());
+	    list.add(new ProfilerStateOfflineItemHandler(true, false));
+
+	    return list;
+	}
+    }
+
+    /**
+     * @param online
+     */
+    public void setOnline(boolean online) {
+
+	getOption(STATE_OPTION, String.class).get().select(state -> online ? state.equals("Online") : state.equals("Offline"));
     }
 
     /**
@@ -134,7 +233,7 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
      */
     public boolean isOnline() {
 
-	return getOption(ONLINE_OPTION, String.class).get().getSelectedValue().equals("Online");
+	return getOption(STATE_OPTION, String.class).get().getSelectedValue().equals("Online");
     }
 
     /**
