@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.cfga.gui.components.grid;
+package eu.essi_lab.cfga.gui.components.grid.renderer;
 
 /*-
  * #%L
@@ -25,11 +25,9 @@ package eu.essi_lab.cfga.gui.components.grid;
  */
 
 import java.util.HashMap;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.data.renderer.ComponentRenderer;
 
 /**
  * Not used
@@ -37,14 +35,12 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
  * @deprecated
  * @author Fabrizio
  */
-public class CheckBoxColumnRenderer extends ComponentRenderer<Checkbox, HashMap<String, String>> {
+public class CheckBoxColumnRenderer extends GridColumnRenderer<Checkbox> {
 
     /**
      * 
      */
-    private static final long serialVersionUID = -6816629717419845396L;
-    private Consumer<HashMap<String, String>> consumer;
-    private Checkbox checkbox;
+    private static final long serialVersionUID = 233009253707393876L;
 
     /**
     * 
@@ -58,38 +54,22 @@ public class CheckBoxColumnRenderer extends ComponentRenderer<Checkbox, HashMap<
      */
     public CheckBoxColumnRenderer(Consumer<HashMap<String, String>> consumer) {
 
-	this.consumer = consumer;
+	super(consumer);
     }
 
+    @Override
     public Checkbox createComponent(HashMap<String, String> item) {
 
-	checkbox = new Checkbox();
-	checkbox.setId(item.get("identifier"));
+	component = new Checkbox();
+	component.setId(item.get("identifier"));
 
 	if (consumer != null) {
-	    checkbox.addClickListener(event -> {
+	    component.addClickListener(event -> {
 
 		consumer.accept(item);
 	    });
 	}
 
-	return checkbox;
+	return component;
     }
-
-    /**
-     * @return
-     */
-    public Checkbox getCheckbox() {
-
-	return checkbox;
-    }
-
-    /**
-     * @return
-     */
-    public Optional<Consumer<HashMap<String, String>>> getConsumer() {
-
-	return Optional.ofNullable(consumer);
-    }
-
 }
