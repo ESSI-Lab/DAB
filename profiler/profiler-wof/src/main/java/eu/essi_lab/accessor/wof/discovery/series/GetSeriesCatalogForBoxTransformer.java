@@ -38,6 +38,7 @@ import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
+import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.SpatialBond;
@@ -147,11 +148,17 @@ public class GetSeriesCatalogForBoxTransformer extends DiscoveryRequestTransform
 			viewCreator = view.get().getCreator();			
 		    }
 		}
-		List<SimpleValueBond> keywords = getKeywords(viewCreator, keywordBond.get());
-		for (SimpleValueBond keyword : keywords) {
-		    operands.add(keyword);
+		List<? extends Bond> keywords = getKeywords(viewCreator, keywordBond.get());
+		switch (keywords.size()) {
+		case 0:		    
+		    break;
+		case 1:
+		    operands.add(keywords.get(0));
+		default:
+		    LogicalBond orBond = BondFactory.createOrBond(keywords.toArray(new Bond[] {}));
+		    operands.add(orBond);
+		    break;
 		}
-
 	    }
 
 	    Optional<Bond> sourcesBond = request.getSourcesBond();
