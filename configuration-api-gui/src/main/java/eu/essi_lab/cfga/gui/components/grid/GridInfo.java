@@ -45,13 +45,15 @@ public class GridInfo {
 
     private Grid.SelectionMode selectionMode;
 
+    private boolean showColumnsHider;
+
     /**
      * 
      */
     public GridInfo() {
 
 	setPageSize(DEFAULT_PAGE_SIZE);
-	
+
 	setSelectionMode(SelectionMode.NONE);
 
 	descriptors = new ArrayList<>();
@@ -121,6 +123,22 @@ public class GridInfo {
     public void setPageSize(int pageSize) {
 
 	this.pageSize = pageSize;
+    }
+
+    /**
+     * @return
+     */
+    public boolean isShowColumnsHider() {
+
+	return showColumnsHider;
+    }
+
+    /**
+     * @param showColumnsHider
+     */
+    public void setShowColumnsHider(boolean showColumnsHider) {
+
+	this.showColumnsHider = showColumnsHider;
     }
 
 }

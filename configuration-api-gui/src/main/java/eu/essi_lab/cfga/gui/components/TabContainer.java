@@ -95,7 +95,7 @@ public class TabContainer extends VerticalLayout {
 	removeAllButHeader();
 
 	List<Setting> settings = view.retrieveTabSettings(tabInfo);
-	
+
 	DirectiveManager directiveManager = tabInfo.getDirectiveManager();
 
 	Optional<ShowDirective> showDirective = directiveManager.getDirective(ShowDirective.class);
@@ -121,7 +121,10 @@ public class TabContainer extends VerticalLayout {
 
 	    GridComponent gridComponent = new GridComponent(gridInfo.get(), settings, configuration, this, readOnly, refresh);
 
-	    add(gridComponent.createColumnsHider());
+	    if (tabInfo.getGridInfo().get().isShowColumnsHider()) {
+
+		add(gridComponent.createColumnsHider());
+	    }
 
 	    add(gridComponent);
 
