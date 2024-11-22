@@ -88,6 +88,21 @@ public class HydroOntologyExternalTestIT {
 		assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/78"));
 		assertTrue(uris.contains("http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/171"));
 	}
+	
+	@Test
+	public void testFindCloseConcepts2() {
+
+		List<SKOSConcept> concepts = ontology.findConcepts("portata", true, false);
+		System.out.println(concepts.size());
+
+		HashSet uris = new HashSet<>();
+		for (SKOSConcept concept : concepts) {
+			System.out.println(concept.getURI());
+			uris.add(concept.getURI());
+		}
+		assertTrue(uris.contains("http://hydro.geodab.eu/hydro-ontology/concept/78"));
+		assertTrue(uris.contains("http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/171"));
+	}
 
 	private void assertDischargeConcept(SKOSConcept concept) {
 		assertEquals(dischargeURI, concept.getURI());

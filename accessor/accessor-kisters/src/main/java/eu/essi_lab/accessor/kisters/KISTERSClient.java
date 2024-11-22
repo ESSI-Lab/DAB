@@ -63,7 +63,7 @@ public class KISTERSClient {
     public KISTERSClient(String endpoint) {
 	this.endpoint = endpoint;
     }
-    
+
     /**
      * @return
      */
@@ -113,8 +113,8 @@ public class KISTERSClient {
     @SuppressWarnings("unchecked")
     public List<KISTERSEntity> retrieveTimeSeriesValues(String timeSeriesId, String from, String to) {
 
-	String query = getEndpoint() + "service=kisters&type=queryServices&request=getTimeseriesValues&format=json&ts_id="
-		+ timeSeriesId + "&from=" + from + "&to=" + to;
+	String query = getEndpoint() + "service=kisters&type=queryServices&request=getTimeseriesValues&format=json&ts_id=" + timeSeriesId
+		+ "&from=" + from + "&to=" + to;
 
 	Downloader downloader = new Downloader();
 	String response = downloader.downloadOptionalString(query).get();
@@ -144,8 +144,8 @@ public class KISTERSClient {
 		stream().//
 		collect(Collectors.joining(","));
 
-	return retrieveEntities("service=kisters&type=queryServices&request=getStationList&format=json&returnfields="
-		+ returnfields + "&flatten=true");
+	return retrieveEntities(
+		"service=kisters&type=queryServices&request=getStationList&format=json&returnfields=" + returnfields + "&flatten=true");
     }
 
     /**
@@ -172,8 +172,20 @@ public class KISTERSClient {
 		collect(Collectors.joining(","));
 
 	return retrieveEntities(
-		"service=kisters&type=queryServices&request=getTimeseriesList&format=json&station_no=*&returnfields="
-			+ returnfields);
+		"service=kisters&type=queryServices&request=getTimeseriesList&format=json&station_no=*&returnfields=" + returnfields);
+    }
+
+    /**
+     * @return
+     */
+    public List<KISTERSEntity> retrieveTimeSeriesByStation(String stationNumber) {
+
+	String returnfields = getTimeSeriesFields().//
+		stream().//
+		collect(Collectors.joining(","));
+
+	return retrieveEntities("service=kisters&type=queryServices&request=getTimeseriesList&format=json&station_id=" + stationNumber
+		+ "&returnfields=" + returnfields);
     }
 
     /**
