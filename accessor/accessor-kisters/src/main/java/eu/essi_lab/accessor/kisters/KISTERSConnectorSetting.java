@@ -1,5 +1,7 @@
 package eu.essi_lab.accessor.kisters;
 
+import java.util.Arrays;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -24,16 +26,40 @@ package eu.essi_lab.accessor.kisters;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.gs.setting.connector.HarvestedConnectorSetting;
+import eu.essi_lab.cfga.option.BooleanChoice;
+import eu.essi_lab.cfga.option.BooleanChoiceOptionBuilder;
+import eu.essi_lab.cfga.option.Option;
+import eu.essi_lab.cfga.option.StringOptionBuilder;
+import eu.essi_lab.lib.utils.LabeledEnum;
 
 /**
  * @author Fabrizio
  */
 public class KISTERSConnectorSetting extends HarvestedConnectorSetting {
 
+    public final String KISTERS_SITE_NAME = "KISTERS_SITE_NAME";
+
     /**
      * 
      */
     public KISTERSConnectorSetting() {
+	Option<String> option = StringOptionBuilder.get().//
+		withKey(KISTERS_SITE_NAME).//
+		withLabel("Site name (empty for all sites)").//
+		withValue("").//
+		required().//
+		cannotBeDisabled().//
+		build();
+
+	addOption(option);
+    }
+
+    /**
+     * @return
+     */
+    public String getSiteName() {
+
+	return getOption(KISTERS_SITE_NAME, String.class).get().getValue();
     }
 
     /**
@@ -63,4 +89,5 @@ public class KISTERSConnectorSetting extends HarvestedConnectorSetting {
 
 	return "KISTERS Connector settings";
     }
+
 }
