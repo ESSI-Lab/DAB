@@ -559,6 +559,7 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
 		"bnhs", //
 		"thredds", //
 		"csw", //
+		"metrics", //
 		"cswisogeo", //
 		"oaipmh", //
 		"hiscentral.asmx", //
