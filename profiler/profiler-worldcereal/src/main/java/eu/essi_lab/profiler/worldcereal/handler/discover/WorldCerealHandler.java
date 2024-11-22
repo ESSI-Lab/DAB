@@ -26,6 +26,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -341,6 +343,12 @@ public class WorldCerealHandler extends DiscoveryHandler<String> {
 
 			map.put(uniqueJSONName + ".json", jsonString);
 			map.put(uniqueJSONName + ".xml", metadataString);
+
+			//TODO generate this file on-the-fly
+			String docFileName = "Codes_" + uniqueJSONName + ".pdf";
+			if (!isWordCereal) {
+				map.put(docFileName, "https://vlab-test-data.s3.us-east-1.amazonaws.com/AgrostacDoc.pdf");
+			}
 			// return a ZIP file
 			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
@@ -352,10 +360,23 @@ public class WorldCerealHandler extends DiscoveryHandler<String> {
 						ZipEntry zipEntry = new ZipEntry(name);
 						zipOutputStream.putNextEntry(zipEntry);
 
-						zipOutputStream.write(objString.getBytes());
+						if (name != docFileName) {
+							zipOutputStream.write(objString.getBytes());
+
+						} else {
+							InputStream pdfBody = new Downloader().downloadResponse(objString).body();
+							pdfBody.transferTo(zipOutputStream);
+
+						}
+
 						zipOutputStream.closeEntry();
+
 					} catch (IOException e) {
 						throw new RuntimeException("Error writing JSON to ZIP", e);
+					} catch (URISyntaxException e) {
+						throw new RuntimeException("Error writing PDF to ZIP", e);
+					} catch (InterruptedException e) {
+						throw new RuntimeException("Error writing PDF to ZIP", e);
 					}
 				});
 
