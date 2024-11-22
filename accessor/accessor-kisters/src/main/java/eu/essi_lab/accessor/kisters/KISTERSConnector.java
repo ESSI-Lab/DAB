@@ -70,25 +70,31 @@ public class KISTERSConnector extends HarvestedQueryConnector<KISTERSConnectorSe
 	boolean onlySeries = true;
 	boolean onlyOneStation = false;
 
-	if (stations == null) {
+	if (stations.isEmpty()) {
 
-	    GSLoggerFactory.getLogger(getClass()).debug("Retrieving stations STARTED");
+	    synchronized (stations) {
 
-	    List<KISTERSEntity> stationsList = kistersClient.retrieveStations();
+		if (stations.isEmpty()) {
+		    GSLoggerFactory.getLogger(getClass()).debug("Retrieving stations STARTED");
 
-	    if (onlyOneStation) {
-		stationsList = stationsList.subList(0, 1);
+		    List<KISTERSEntity> stationsList = kistersClient.retrieveStations();
+
+		    if (onlyOneStation) {
+			stationsList = stationsList.subList(0, 1);
+		    }
+
+		    for (KISTERSEntity ke : stationsList) {
+			String stationId = ke.getObject().getString(KISTERSClient.STATION_ID);
+			stationIdentifiers.add(stationId);
+			stations.put(stationId, ke);
+		    }
+
+		    GSLoggerFactory.getLogger(getClass()).debug("Retrievied {} stations", StringUtils.format(stationsList.size()));
+
+		    GSLoggerFactory.getLogger(getClass()).debug("Retrieving stations ENDED");
+		}
+
 	    }
-
-	    for (KISTERSEntity ke : stationsList) {
-		String stationId = ke.getObject().getString(KISTERSClient.STATION_ID);
-		stationIdentifiers.add(stationId);
-		stations.put(stationId, ke);
-	    }
-
-	    GSLoggerFactory.getLogger(getClass()).debug("Retrievied {} stations", StringUtils.format(stationsList.size()));
-
-	    GSLoggerFactory.getLogger(getClass()).debug("Retrieving stations ENDED");
 
 	}
 
@@ -175,8 +181,6 @@ public class KISTERSConnector extends HarvestedQueryConnector<KISTERSConnectorSe
 	recordsCount += response.getRecordsAsList().size();
 
 	int maxRecords = getSetting().getMaxRecords().orElse(Integer.MAX_VALUE);
-
-	stationIndex++;
 
 	if (stationIndex < stations.size()) {
 	    response.setResumptionToken(String.valueOf(++stationIndex));
