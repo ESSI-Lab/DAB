@@ -227,19 +227,24 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 		    withEditDirective("Edit task", ConfirmationPolicy.ON_WARNINGS).//
 
 		    withGridInfo(Arrays.asList(//
-			    
-			    ColumnDescriptor.create("Id", true, true, false, (s) -> s.getIdentifier()),//
+
+			    ColumnDescriptor.create("Id", true, true, false, (s) -> s.getIdentifier()), //
 
 			    ColumnDescriptor.create("Name", true, true, (s) -> getName(s)), //
 
 			    ColumnDescriptor.create("Description", true, true, (s) -> getDescription(s)), //
 
-			    ColumnDescriptor.create("Repeat count", 150, true, true, (s) -> SchedulerSupport.getInstance().getRepeatCount(s)), //
+			    ColumnDescriptor.create("Repeat count", 150, true, true,
+				    (s) -> SchedulerSupport.getInstance().getRepeatCount(s)), //
 
 			    ColumnDescriptor.create("Repeat interval", 150, true, true,
 				    (s) -> SchedulerSupport.getInstance().getRepeatInterval(s)), //
 
-			    ColumnDescriptor.create("Status", 100, true, true, (s) -> SchedulerSupport.getInstance().getJobPhase(s), new JobPhaseColumnRenderer()), //
+			    ColumnDescriptor.create("Status", 100, true, true, (s) -> SchedulerSupport.getInstance().getJobPhase(s), //
+
+				    (item1, item2) -> item1.get("Status").compareTo(item2.get("Status")), //
+
+				    new JobPhaseColumnRenderer()), //
 
 			    ColumnDescriptor.create("Fired time", 150, true, true, (s) -> SchedulerSupport.getInstance().getFiredTime(s)), //
 
@@ -248,8 +253,7 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 			    ColumnDescriptor.create("El. time (HH:mm:ss)", 170, true, true,
 				    (s) -> SchedulerSupport.getInstance().getElapsedTime(s)), //
 
-			    ColumnDescriptor.create("Next fire time", true, true,
-				    (s) -> SchedulerSupport.getInstance().getNextFireTime(s)), //
+			    ColumnDescriptor.create("Next fire time", true, true, (s) -> SchedulerSupport.getInstance().getNextFireTime(s)), //
 
 			    ColumnDescriptor.create("Info", true, true, false, (s) -> SchedulerSupport.getInstance().getAllMessages(s))//
 		    ), getItemsList()).//
@@ -267,7 +271,7 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 	private List<GridMenuItemHandler> getItemsList() {
 
 	    ArrayList<GridMenuItemHandler> list = new ArrayList<>();
-//	    list.add(new CustomTaskSettingEditorMenuItem());
+	    // list.add(new CustomTaskSettingEditorMenuItem());
 	    list.add(new HarvestingInfoItemHandler());
 	    list.add(new CustomTaskStarter());
 
@@ -401,12 +405,10 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 
 	if (optional.isPresent()) {
 
-	    return Arrays
-		    .asList(getOption(EMAIL_RECIPIENTS_OPTIONS_OPTION_KEY, String.class).//
-			    get().//
-			    getValue().//
-			    split(","))
-		    .//
+	    return Arrays.asList(getOption(EMAIL_RECIPIENTS_OPTIONS_OPTION_KEY, String.class).//
+		    get().//
+		    getValue().//
+		    split(",")).//
 		    stream().//
 		    map(v -> v.trim()).//
 		    collect(Collectors.toList());
@@ -493,9 +495,9 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 
 	super(object);
     }
-    
+
     public static void main(String[] args) {
-	
+
 	System.out.println(new CustomTaskSetting());
     }
 }

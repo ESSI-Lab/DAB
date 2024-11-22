@@ -144,34 +144,41 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 
 			    ColumnDescriptor.create("Name", true, true, (s) -> s.getName()), //
 
-			    ColumnDescriptor.create("State", 150, true, true, (s) -> getServiceState(s), new IconColumnRenderer() {
+			    ColumnDescriptor.create("State", 150, true, true, //
 
-				/**
-				 * 
-				 */
-				private static final long serialVersionUID = -5355241303442699327L;
+				    (s) -> getServiceState(s), //
 
-				@Override
-				protected Icon createIcon(HashMap<String, String> item) {
+				    (item1, item2) -> item1.get("State").compareTo(item2.get("State")), //
 
-				    return item.get("State").equals("Online") ? VaadinIcon.SIGNAL.create() : VaadinIcon.BAN.create();
-				}
+				    new IconColumnRenderer() {
 
-				@Override
-				protected Optional<String> getToolTip(HashMap<String, String> item) {
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = -5355241303442699327L;
 
-				    String status = item.get("State");
-				    switch (status) {
+					@Override
+					protected Icon createIcon(HashMap<String, String> item) {
 
-				    case "Online":
-				    case "Offline":
+					    return item.get("State").equals("Online") ? VaadinIcon.SIGNAL.create()
+						    : VaadinIcon.BAN.create();
+					}
 
-					return Optional.of(status);
-				    }
+					@Override
+					protected Optional<String> getToolTip(HashMap<String, String> item) {
 
-				    return Optional.empty();
-				}
-			    }), //
+					    String status = item.get("State");
+					    switch (status) {
+
+					    case "Online":
+					    case "Offline":
+
+						return Optional.of(status);
+					    }
+
+					    return Optional.empty();
+					}
+				    }), //
 
 			    ColumnDescriptor.create("Path", 200, true, true, (s) -> getServicePath(s)), //
 

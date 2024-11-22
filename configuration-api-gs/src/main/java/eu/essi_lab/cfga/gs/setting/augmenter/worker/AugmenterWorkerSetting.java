@@ -270,7 +270,10 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 			    ColumnDescriptor.create("Repeat interval", 150, true, true,
 				    (s) -> SchedulerSupport.getInstance().getRepeatInterval(s)), //
 
-			    ColumnDescriptor.create("Status", 100, true, true, (s) -> SchedulerSupport.getInstance().getJobPhase(s),
+			    ColumnDescriptor.create("Status", 100, true, true, (s) -> SchedulerSupport.getInstance().getJobPhase(s), //
+
+				    (item1, item2) -> item1.get("Status").compareTo(item2.get("Status")), //
+
 				    new JobPhaseColumnRenderer()), //
 
 			    ColumnDescriptor.create("Fired time", 150, true, true, (s) -> SchedulerSupport.getInstance().getFiredTime(s)), //
