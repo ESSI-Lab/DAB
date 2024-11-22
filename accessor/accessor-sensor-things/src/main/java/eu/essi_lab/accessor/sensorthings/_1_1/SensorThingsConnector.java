@@ -106,6 +106,8 @@ public class SensorThingsConnector extends HarvestedQueryConnector<SensorThingsC
 
 	String schema = getSetting().getProfileSchema();
 	GSLoggerFactory.getLogger(getClass()).debug("Selected mapping schema: {}", schema);
+	
+	Boolean discardStation = isDiscardStationsWithNoData();
 
 	//
 	//
@@ -229,7 +231,9 @@ public class SensorThingsConnector extends HarvestedQueryConnector<SensorThingsC
 				totalMappingRecords++;
 
 			    } else {
-				addOriginalMetadata(stream, listRecordsResponse, schema, EntityRef.DATASTREAMS, thing);
+				if(!discardStation) {
+				    addOriginalMetadata(stream, listRecordsResponse, schema, EntityRef.DATASTREAMS, thing);
+				}
 				discardedStreams++;
 			    }
 			} catch (Exception e) {
@@ -250,11 +254,15 @@ public class SensorThingsConnector extends HarvestedQueryConnector<SensorThingsC
 			thingsCount++;
 			totalMappingRecords++;
 		    } else {
-			addOriginalMetadata(thing, listRecordsResponse, schema, EntityRef.THINGS, null);
+			if(!discardStation) {
+			    addOriginalMetadata(thing, listRecordsResponse, schema, EntityRef.THINGS, null);
+			}
 		    }
 
 		} else {
-		    addOriginalMetadata(thing, listRecordsResponse, schema, EntityRef.THINGS, null);
+		    if(!discardStation) {
+			addOriginalMetadata(thing, listRecordsResponse, schema, EntityRef.THINGS, null);
+		    }
 		    discardedThings++;
 		}
 	    }
@@ -381,6 +389,9 @@ public class SensorThingsConnector extends HarvestedQueryConnector<SensorThingsC
 			    parentThing.getSelfLink().get(), //
 			    parentThing.getIdentifier().get()).toString(3))));
 	}
+	boolean discardStation = isDiscardStationsWithNoData();
+	handler.add(new GSProperty<Boolean>("discardStation", discardStation));
+
 
 	originalMetadata.setAdditionalInfo(handler);
 
@@ -417,6 +428,15 @@ public class SensorThingsConnector extends HarvestedQueryConnector<SensorThingsC
 
 	return new SensorThingsConnectorSetting();
     }
+    
+    /**
+     * @return
+     */
+
+    public boolean isDiscardStationsWithNoData() {
+	return getSetting().isDiscardStationsWithNoData();
+    }
+
 
     @Override
     public String getType() {
