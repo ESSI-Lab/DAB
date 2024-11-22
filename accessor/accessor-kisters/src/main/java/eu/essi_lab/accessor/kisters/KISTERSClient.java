@@ -147,6 +147,19 @@ public class KISTERSClient {
 	return retrieveEntities(
 		"service=kisters&type=queryServices&request=getStationList&format=json&returnfields=" + returnfields + "&flatten=true");
     }
+    
+    /**
+     * @return
+     */
+    public List<KISTERSEntity> retrieveStationsBySiteName(String name) {
+
+	String returnfields = getStationFields().//
+		stream().//
+		collect(Collectors.joining(","));
+
+	return retrieveEntities(
+		"service=kisters&type=queryServices&request=getStationList&site_name="+name+"&format=json&returnfields=" + returnfields + "&flatten=true");
+    }
 
     /**
      * @param timeSeriesId
