@@ -181,6 +181,7 @@ public class OpenMetricsHandler extends StreamingRequestHandler {
 		    ret = registry.scrape();
 		}
 		writer.write(ret);
+		writer.write("# EOF");
 		writer.flush();
 		writer.close();
 		output.close();
