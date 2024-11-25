@@ -194,7 +194,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 	// headerImage.setHeight("44px");
 
 	headerLabel = new Label();
-	headerLabel.getStyle().set("font-size", "35px");
+	headerLabel.getStyle().set("font-size", "28px");
 	headerLabel.setWidthFull();
 
 	UI.getCurrent().getPage().retrieveExtendedClientDetails(receiver -> {
@@ -659,6 +659,33 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
      * @param width
      * @param height
      */
+    public void setHeaderImageUrl(String source, int width, int height) {
+
+	headerImage.setSrc(source);
+
+	if (height > 0) {
+	    headerImage.setHeight(String.valueOf(height) + "px");
+	}
+
+	if (width > 0) {
+	    headerImage.setWidth(String.valueOf(width) + "px");
+	}
+    }
+
+    /**
+     * @param source
+     * @param height
+     */
+    public void setHeaderImageUrl(String source, int height) {
+
+	setHeaderImageUrl(source, -1, height);
+    }
+
+    /**
+     * @param source
+     * @param width
+     * @param height
+     */
     public void setHeaderImage(InputStream source, int width, int height) {
 
 	StreamResource resource = new StreamResource("icon", new InputStreamFactory() {
@@ -714,6 +741,22 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	headerLabel.setText(headerText);
 	headerLabel.getStyle().set("width", width + "px");
+    }
+
+    /**
+     * @return
+     */
+    public Image getHeaderImage() {
+
+	return headerImage;
+    }
+
+    /**
+     * @return the headerLabel
+     */
+    public Label getHeaderLabel() {
+
+	return headerLabel;
     }
 
     /**
