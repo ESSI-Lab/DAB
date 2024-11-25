@@ -1,0 +1,26 @@
+{
+	"unitOfMeasurement": {
+		"name": "unkonwn",
+		"symbol": "unkonwn",
+		"definition": "https://qudt.org/vocab/unit/#Unkown"
+	},
+	"@iot.selfLink": "http://example.org/v1.1/ObservedProperties(1)",
+	"observationType": "OM_Measurement",
+	"@iot.id": "#REPLACE_ID#",
+	"name": "Stage at DST_1 with processing level 0",
+	"description": "A datastream of Stage....",
+	"properties": {
+		"valueCount": 0,
+		"lastUpdated": "2024-10-22T17:43:34.519Z",
+		"aggregationStatistic": "Continuous",
+		"intendedTimeSpacingUnitOfMeasurement": "minutes",
+		"noDataValue": -9999,
+		"timeAggregationIntervalUnitOfMeasurement": "minutes",
+		"sampledMedium": "Unkown",
+		"resultType": "Time Series Coverage",
+		"timeAggregationInterval": 15,
+		"processingLevelCode": "0",
+		"status": "Ongoing",
+		"intendedTimeSpacing": 15
+	}
+}
