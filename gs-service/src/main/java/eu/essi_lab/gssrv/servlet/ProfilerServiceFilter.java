@@ -53,7 +53,7 @@ public class ProfilerServiceFilter implements Filter {
 
 	boolean isProfilerPath = ConfigurationWrapper.getProfilerSettings().//
 		stream().//
-		anyMatch(s -> pathInfo.contains(s.getServicePath()));
+		anyMatch(s -> pathInfo!= null && pathInfo.contains(s.getServicePath()));
 
 	if (isProfilerPath && isOffline(pathInfo)) {
 
