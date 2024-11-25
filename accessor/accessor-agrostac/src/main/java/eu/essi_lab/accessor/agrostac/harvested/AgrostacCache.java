@@ -69,8 +69,11 @@ public class AgrostacCache {
 
     private JSONObject getAgrostacOverview() {
 	JSONObject ret = null;
-	String overviewRequest = AgrostacConnector.BASE_URL + OVERVIEW + "?accesstoken=" + ACCESS_TOKEN;
-	ret = new JSONObject(downloader.downloadOptionalString(overviewRequest).get());
+	
+	String overviewRequest = AgrostacConnector.BASE_URL + OVERVIEW + "?accesstoken=" + ACCESS_TOKEN;	
+	String str = downloader.downloadOptionalString(overviewRequest).get();	
+	ret = new JSONObject(str.replaceAll(System.lineSeparator()," "));
+	
 	return ret;
     }
 
