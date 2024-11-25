@@ -104,10 +104,12 @@ public class GSConfigurationView extends ConfigurationView {
      */
     public GSConfigurationView() {
 
-	setHeaderText("DAB configuration GUI");
+	setHeaderText("Configuration GUI");
 
-	setHeaderImage(getClass().getClassLoader().getResourceAsStream("ESSI.png"), 44);
+	setHeaderImageUrl("https://raw.githubusercontent.com/ESSI-Lab/DAB/main/DAB.png", 44);
 
+	getHeaderImage().getStyle().set("margin-top", "15px");
+	
 	// removeDrawerToggle();
 
 	if (!tabAlreadyOpen) {
@@ -304,7 +306,7 @@ public class GSConfigurationView extends ConfigurationView {
     protected void onSettingPut(List<Setting> settings) {
 
 	super.onSettingPut(settings);
-	
+
 	Setting setting = settings.get(0);
 
 	putSettingList.add(setting);
@@ -329,7 +331,7 @@ public class GSConfigurationView extends ConfigurationView {
     protected void onSettingReplaced(List<Setting> settings) {
 
 	super.onSettingReplaced(settings);
-	
+
 	Setting setting = settings.get(0);
 
 	editedSettingList.add(setting);
@@ -357,7 +359,7 @@ public class GSConfigurationView extends ConfigurationView {
     protected void onSettingRemoved(List<Setting> settings) {
 
 	super.onSettingRemoved(settings);
-	
+
 	Setting setting = settings.get(0);
 
 	removedSettingList.add(setting);
