@@ -761,7 +761,7 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 	information.setLinkage(BACKGROUND_INFO_URL);
 	information.setProtocol(NetProtocols.HTTP.getCommonURN());
 	information.setFunctionCode("information");
-	information.setDescription("AGROSTAC API Services");
+	information.setDescription("AGROSTAC API description");
 	miMetadata.getDistribution().addDistributionOnline(information);
 
 	return ret;

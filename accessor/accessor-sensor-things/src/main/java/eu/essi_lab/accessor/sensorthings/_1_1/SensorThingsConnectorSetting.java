@@ -47,6 +47,11 @@ public class SensorThingsConnectorSetting extends HarvestedConnectorSetting {
      * 
      */
     private static final String MAPPING_PROFILE_OPTION_KEY = "mappingProfileOptionKey";
+    
+    /**
+     * 
+     */
+    private static final String DISCARDS_STATIONS_WITH_NO_DATA = "discardsStationsWithNoData";
 
     /**
      * 
@@ -74,6 +79,17 @@ public class SensorThingsConnectorSetting extends HarvestedConnectorSetting {
 		build();
 
 	addOption(mappingOption);
+	
+	Option<BooleanChoice> option = BooleanChoiceOptionBuilder.get().//
+		withKey(DISCARDS_STATIONS_WITH_NO_DATA).//
+		withLabel("Discards stations with no data").//
+		withSingleSelection().//
+		withValues(LabeledEnum.values(BooleanChoice.class)).//
+		withSelectedValue(BooleanChoice.TRUE).//
+		cannotBeDisabled().//
+		build();
+
+	addOption(option);
     }
 
     /**
@@ -119,6 +135,24 @@ public class SensorThingsConnectorSetting extends HarvestedConnectorSetting {
 
 	return BooleanChoice.toBoolean(getOption(QUOTE_IDS_OPTION_KEY, BooleanChoice.class).get().getSelectedValue());
     }
+    
+    
+    /**
+     * @param set
+     */
+    public void setDiscardsStationsWithNoData(boolean set) {
+
+	getOption(DISCARDS_STATIONS_WITH_NO_DATA, BooleanChoice.class).get().select(v -> v == BooleanChoice.fromBoolean(set));
+    }
+
+    /**
+     * @return
+     */
+    public boolean isDiscardStationsWithNoData() {
+
+	return BooleanChoice.toBoolean(getOption(DISCARDS_STATIONS_WITH_NO_DATA, BooleanChoice.class).get().getSelectedValue());
+    }
+
 
     /**
      * @return

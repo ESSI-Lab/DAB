@@ -50,9 +50,8 @@ public class KISTERSConnector extends HarvestedQueryConnector<KISTERSConnectorSe
      * 
      */
     public static final String TYPE = "KISTERSConnector";
-    private static final int DEFAULT_PARTITION_SIZE = 50;
     // private List<List<OriginalMetadata>> partitions;
-    private int recordsCount;
+    private int recordsCount = 0;
     private HashMap<String, KISTERSEntity> stations = new HashMap<String, KISTERSEntity>();
     private List<String> stationIdentifiers = new ArrayList<>();
 
@@ -77,7 +76,15 @@ public class KISTERSConnector extends HarvestedQueryConnector<KISTERSConnectorSe
 		if (stations.isEmpty()) {
 		    GSLoggerFactory.getLogger(getClass()).debug("Retrieving stations STARTED");
 
-		    List<KISTERSEntity> stationsList = kistersClient.retrieveStations();
+		    String siteName = getSetting().getSiteName();
+
+		    List<KISTERSEntity> stationsList = null;
+
+		    if (siteName == null || siteName.isEmpty()) {
+			stationsList = kistersClient.retrieveStations();
+		    } else {
+			stationsList = kistersClient.retrieveStationsBySiteName(siteName);
+		    }
 
 		    if (onlyOneStation) {
 			stationsList = stationsList.subList(0, 1);
@@ -182,7 +189,7 @@ public class KISTERSConnector extends HarvestedQueryConnector<KISTERSConnectorSe
 
 	int maxRecords = getSetting().getMaxRecords().orElse(Integer.MAX_VALUE);
 
-	if (stationIndex < stations.size()) {
+	if (stationIndex < stations.size() && recordsCount < maxRecords) {
 	    response.setResumptionToken(String.valueOf(++stationIndex));
 	} else {
 	    response.setResumptionToken(null);

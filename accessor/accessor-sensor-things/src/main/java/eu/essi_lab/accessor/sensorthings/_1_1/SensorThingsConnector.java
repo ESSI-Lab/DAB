@@ -1,5 +1,8 @@
 package eu.essi_lab.accessor.sensorthings._1_1;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -27,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 
 import eu.essi_lab.accessor.sensorthings._1_1.mapper.HydroServer2Mapper;
@@ -47,6 +51,7 @@ import eu.essi_lab.lib.sensorthings._1_1.model.entities.Entity;
 import eu.essi_lab.lib.sensorthings._1_1.model.entities.Observation;
 import eu.essi_lab.lib.sensorthings._1_1.model.entities.Thing;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
 import eu.essi_lab.messages.web.KeyValueParser;
@@ -106,6 +111,8 @@ public class SensorThingsConnector extends HarvestedQueryConnector<SensorThingsC
 
 	String schema = getSetting().getProfileSchema();
 	GSLoggerFactory.getLogger(getClass()).debug("Selected mapping schema: {}", schema);
+
+	Boolean discardStation = isDiscardStationsWithNoData();
 
 	//
 	//
@@ -229,7 +236,9 @@ public class SensorThingsConnector extends HarvestedQueryConnector<SensorThingsC
 				totalMappingRecords++;
 
 			    } else {
-				addOriginalMetadata(stream, listRecordsResponse, schema, EntityRef.DATASTREAMS, thing);
+				if (!discardStation) {
+				    addOriginalMetadata(stream, listRecordsResponse, schema, EntityRef.DATASTREAMS, thing);
+				}
 				discardedStreams++;
 			    }
 			} catch (Exception e) {
@@ -250,11 +259,23 @@ public class SensorThingsConnector extends HarvestedQueryConnector<SensorThingsC
 			thingsCount++;
 			totalMappingRecords++;
 		    } else {
-			addOriginalMetadata(thing, listRecordsResponse, schema, EntityRef.THINGS, null);
+			if (!discardStation) {
+			    addOriginalMetadata(thing, listRecordsResponse, schema, EntityRef.THINGS, null);
+			}
 		    }
 
 		} else {
-		    addOriginalMetadata(thing, listRecordsResponse, schema, EntityRef.THINGS, null);
+		    if (!discardStation) {
+			addOriginalMetadata(thing, listRecordsResponse, schema, EntityRef.THINGS, null);
+//			String optString = getFakeStream();
+//			Optional<String> optId = thing.getIdentifier();
+//			if (optId.isPresent()) {
+//			    optString = optString.replace("#REPLACE_ID#", optId.get());
+//			}
+//			JSONObject jsonEntity = new JSONObject(optString);
+//			Datastream newDS = new Datastream(jsonEntity);
+//			addOriginalMetadata(newDS, listRecordsResponse, schema, EntityRef.DATASTREAMS, thing);
+		    }
 		    discardedThings++;
 		}
 	    }
@@ -307,6 +328,11 @@ public class SensorThingsConnector extends HarvestedQueryConnector<SensorThingsC
 	}
 
 	return listRecordsResponse;
+    }
+
+    public static String getFakeStream() throws IOException {
+	InputStream in = SensorThingsConnector.class.getClassLoader().getResourceAsStream("dataStream/fakeDataStream.json");
+	return IOStreamUtils.asUTF8String(in);
     }
 
     /**
@@ -381,6 +407,8 @@ public class SensorThingsConnector extends HarvestedQueryConnector<SensorThingsC
 			    parentThing.getSelfLink().get(), //
 			    parentThing.getIdentifier().get()).toString(3))));
 	}
+	boolean discardStation = isDiscardStationsWithNoData();
+	handler.add(new GSProperty<Boolean>("discardStation", discardStation));
 
 	originalMetadata.setAdditionalInfo(handler);
 
@@ -416,6 +444,14 @@ public class SensorThingsConnector extends HarvestedQueryConnector<SensorThingsC
     protected SensorThingsConnectorSetting initSetting() {
 
 	return new SensorThingsConnectorSetting();
+    }
+
+    /**
+     * @return
+     */
+
+    public boolean isDiscardStationsWithNoData() {
+	return getSetting().isDiscardStationsWithNoData();
     }
 
     @Override
