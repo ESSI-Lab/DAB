@@ -448,11 +448,11 @@ public class WorldCerealBondHandler implements DiscoveryBondHandler {
 					if (start == 0) {
 						start++;
 					}
-					builder.append(AGROSTAC_START_KEY).append(EQUAL).append(start).append(AND);
+//					builder.append(AGROSTAC_START_KEY).append(EQUAL).append(start).append(AND);
 				}
 
 				if (count != null) {
-					builder.append(AGROSTAC_COUNT_KEY).append(EQUAL).append(count).append(AND);
+//					builder.append(AGROSTAC_COUNT_KEY).append(EQUAL).append(count).append(AND);
 				}
 
 				builder.append(AGROSTAC_ACCESS_TOKEN).append(EQUAL).append(
