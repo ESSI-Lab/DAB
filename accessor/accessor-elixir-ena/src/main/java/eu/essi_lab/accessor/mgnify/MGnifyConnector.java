@@ -110,7 +110,8 @@ public class MGnifyConnector extends HarvestedQueryConnector<MGnifyConnectorSett
 		} else {
 			Pages<Study> studyPages = null;
 			try {
-				studyPages = client.getPages(new StudyFactory(), null, "biome_name=root%3AEnvironmental%3AAquatic%3AMarine");
+				studyPages = client.getPages(new StudyFactory(), null,
+						"biome_name=root%3AEnvironmental%3AAquatic%3AMarine");
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
@@ -165,10 +166,12 @@ public class MGnifyConnector extends HarvestedQueryConnector<MGnifyConnectorSett
 								BigDecimal lat = sample.getLatitude();
 								BigDecimal lon = sample.getLongitude();
 
-								s = (s == null || lat.compareTo(s) < 0) ? lat : s;
-								n = (n == null || lat.compareTo(n) > 0) ? lat : n;
-								w = (w == null || lon.compareTo(w) < 0) ? lon : w;
-								e = (e == null || lon.compareTo(e) > 0) ? lon : e;
+								if (lat != null && lon != null) {
+									s = (s == null || lat.compareTo(s) < 0) ? lat : s;
+									n = (n == null || lat.compareTo(n) > 0) ? lat : n;
+									w = (w == null || lon.compareTo(w) < 0) ? lon : w;
+									e = (e == null || lon.compareTo(e) > 0) ? lon : e;
+								}
 
 								String dateString = sample.getCollectionDate();
 								if (dateString != null) {
@@ -267,9 +270,8 @@ public class MGnifyConnector extends HarvestedQueryConnector<MGnifyConnectorSett
 							coreMetadata.getMIMetadata().getDataIdentification().addKeywords(k);
 						}
 
-						if (s != null && w != null) {
-							coreMetadata.addBoundingBox(n.doubleValue(), w.doubleValue(), s.doubleValue(),
-									e.doubleValue());
+						if (s != null && w != null && e != null && n != null) {
+							coreMetadata.addBoundingBox(n, w, s, e);
 						}
 
 						keywords.add("ELIXIR-ENA");
