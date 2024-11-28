@@ -40,19 +40,16 @@ public class Analysis extends MGnifyObject {
 	return json.getString("id");
     }
 
-    public String getCompleteTime() {
-	if (attributes.isNull("complete-time")) {
-	    return null;
-	}
-	return attributes.getString("complete-time");
+    public String getCompleteTime() {	
+	return attributes.optString("complete-time");
     }
-    
+
     public String getInstrumentPlatform() {
-	return attributes.getString("instrument-platform");
+	return attributes.optString("instrument-platform");
     }
 
     public String getInstrumentModel() {
-	return attributes.getString("instrument-model");
+	return attributes.optString("instrument-model");
     }
 
     public String getTaxonomyLSULink() {
