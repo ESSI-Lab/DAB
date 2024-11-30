@@ -36,7 +36,7 @@ public class OpenMetricProfilerSetting extends ProfilerSetting{
      */
     public OpenMetricProfilerSetting() {
 	
-	setServiceName("OpenMetrics");
+	setServiceName("Open Metrics Service");
 	setServiceType("OPEN_METRICS");
 	setServicePath("metrics");
 	setServiceVersion("1.0");
