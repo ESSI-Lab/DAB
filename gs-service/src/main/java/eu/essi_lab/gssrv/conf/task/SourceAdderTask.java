@@ -79,7 +79,7 @@ public class SourceAdderTask extends AbstractCustomTask {
 	 * interval of 2 minutes from each other. The sources id will have the gfhc prefix)
 	 * CUAHSI_HIS_CENTRAL
 	 * https://hiscentral.cuahsi.org/webservices/hiscentral.asmx
-	 * gfhc
+	 * cuahsi-hc
 	 * 0
 	 * 2
 	 * yes
