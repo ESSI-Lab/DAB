@@ -35,6 +35,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 
 import com.vaadin.flow.data.provider.SortDirection;
 
+import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gs.setting.menuitems.ProfilerStateOfflineItemHandler;
 import eu.essi_lab.cfga.gs.setting.menuitems.ProfilerStateOnlineItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
@@ -49,6 +50,11 @@ import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.KeyValueOptionDecorator;
 import eu.essi_lab.cfga.setting.Setting;
+import eu.essi_lab.cfga.setting.SettingUtils;
+import eu.essi_lab.cfga.setting.validation.ValidationContext;
+import eu.essi_lab.cfga.setting.validation.ValidationResponse;
+import eu.essi_lab.cfga.setting.validation.ValidationResponse.ValidationResult;
+import eu.essi_lab.cfga.setting.validation.Validator;
 
 /**
  * @author Fabrizio
@@ -83,8 +89,8 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 	Option<String> pathOption = StringOptionBuilder.get().//
 		withKey(PATH_OPTION_KEY).//
 		withLabel("Path").//
-		withDescription("Service path can contains alphanumeric characters and underscores").//
-		withInputPattern(InputPattern.ALPHANUMERIC_AND_UNDERSCORE).//		
+		withDescription("Service path must be unique can contains alphanumeric characters and underscores").//
+		withInputPattern(InputPattern.ALPHANUMERIC_AND_UNDERSCORE).//
 		cannotBeDisabled().//
 		build();
 
@@ -125,6 +131,42 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 	// set the component extension
 	//
 	setExtension(new ProfilerComponentInfo());
+
+	//
+	// set the validator
+	//
+	setValidator(new ProfilerSettingValidator());
+    }
+
+    /**
+     * @author Fabrizio
+     */
+    public static class ProfilerSettingValidator implements Validator {
+
+	@Override
+	public ValidationResponse validate(Configuration configuration, Setting setting, ValidationContext context) {
+
+	    ProfilerSetting thisSetting = (ProfilerSetting) SettingUtils.downCast(setting, setting.getSettingClass());
+
+	    ValidationResponse validationResponse = new ValidationResponse();
+
+	    if (context.getContext().equals(ValidationContext.PUT)) {
+
+		String servicePath = thisSetting.getServicePath();
+
+		boolean exists = configuration.list(ProfilerSetting.class, false).//
+			stream().//
+			anyMatch(s -> s.getServicePath().equals(servicePath));
+
+		if (exists) {
+
+		    validationResponse.setResult(ValidationResult.VALIDATION_FAILED);
+		    validationResponse.getErrors().add("Another profiler with path '" + servicePath + "' already exists");
+		}
+	    }
+
+	    return validationResponse;
+	}
     }
 
     /**
