@@ -44,6 +44,7 @@ import eu.essi_lab.cfga.gui.extension.ComponentInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
 import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
+import eu.essi_lab.cfga.option.InputPattern;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.KeyValueOptionDecorator;
@@ -59,8 +60,12 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
     private static final String VERSION_OPTION_KEY = "versionOption";
     private static final String STATE_OPTION = "stateOption";
 
+    /**
+     * 
+     */
     public ProfilerSetting() {
 
+	setCanBeRemoved(true);
 	setEditable(true);
 	enableCompactMode(false);
 	enableFoldedMode(true);
@@ -78,7 +83,8 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 	Option<String> pathOption = StringOptionBuilder.get().//
 		withKey(PATH_OPTION_KEY).//
 		withLabel("Path").//
-		readOnly().//
+		withDescription("Service path can contains alphanumeric characters and underscores").//
+		withInputPattern(InputPattern.ALPHANUMERIC_AND_UNDERSCORE).//		
 		cannotBeDisabled().//
 		build();
 
@@ -135,9 +141,10 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 
 	    TabInfo tabInfo = TabInfoBuilder.get().//
 		    withIndex(TabIndex.PROFILER_SETTING.getIndex()).//
-		    withShowDirective("Profilers", SortDirection.ASCENDING).//
+		    withAddDirective("Add profiler", ProfilerSettingSelector.class). //
 		    withEditDirective("Edit profiler", ConfirmationPolicy.ON_WARNINGS).//
-
+		    withRemoveDirective("Remove profiler", false, ProfilerSetting.class).//
+		    withShowDirective("Profilers", SortDirection.ASCENDING).//
 		    withGridInfo(Arrays.asList(//
 
 			    ColumnDescriptor.createPositionalDescriptor(), //
