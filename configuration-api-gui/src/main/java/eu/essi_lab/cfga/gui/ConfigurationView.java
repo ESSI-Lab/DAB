@@ -933,8 +933,9 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 			orientation, //
 			tabName, //
 			addDirective, //
-			removeDirective, editDirective);
-
+			removeDirective,//
+			editDirective);
+			
 		container.getElement().getStyle().set("margin-left", "auto");
 		container.getElement().getStyle().set("margin-right", "auto");
 

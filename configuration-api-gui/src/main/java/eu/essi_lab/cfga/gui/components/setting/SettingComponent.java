@@ -685,7 +685,11 @@ public class SettingComponent extends Div {
      * @param headerLayout
      * @param multiSelectionMode
      */
-    private void handleRemoveButton(Setting parent, Setting setting, TabContainer tabContainer, HorizontalLayout headerLayout,
+    private void handleRemoveButton(//
+	    Setting parent,//
+	    Setting setting,//
+	    TabContainer tabContainer,//
+	    HorizontalLayout headerLayout,//
 	    SelectionMode multiSelectionMode) {
 
 	boolean canBeRemoved = setting.canBeRemoved();
