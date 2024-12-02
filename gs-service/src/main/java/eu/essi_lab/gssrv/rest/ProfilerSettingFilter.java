@@ -1,5 +1,7 @@
 package eu.essi_lab.gssrv.rest;
 
+import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -29,13 +31,14 @@ import eu.essi_lab.pdk.Profiler;
  * 
  * @author Fabrizio
  */
-public interface ProfilerFilter {
+public interface ProfilerSettingFilter {
 
     /**
-     * Tests whether or not the specified <code>profiler</code> is suitable for a given {@link WebRequest}
+     * Tests whether or not the specified <code>setting</code> refers
+     * to a {@link Profiler} that can handles a given {@link WebRequest}
      * 
-     * @param profiler
+     * @param setting
      * @return
      */
-    public boolean accept(Profiler<?> profiler);
+    public boolean accept(ProfilerSetting setting);
 }
