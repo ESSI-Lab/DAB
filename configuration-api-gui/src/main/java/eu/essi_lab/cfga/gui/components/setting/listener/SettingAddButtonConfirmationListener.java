@@ -26,13 +26,16 @@ import com.vaadin.flow.component.button.Button;
 
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.SelectionUtils;
+import eu.essi_lab.cfga.Selector;
 import eu.essi_lab.cfga.gui.components.SettingComponentFactory;
 import eu.essi_lab.cfga.gui.components.TabContainer;
 import eu.essi_lab.cfga.gui.components.listener.ButtonChangeListener;
 import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
 import eu.essi_lab.cfga.gui.components.setting.edit_put.SettingPutDialog;
+import eu.essi_lab.cfga.gui.dialog.ConfirmationDialog;
 import eu.essi_lab.cfga.gui.dialog.NotificationDialog;
 import eu.essi_lab.cfga.setting.Setting;
+import eu.essi_lab.cfga.setting.SettingUtils;
 
 /**
  * @author Fabrizio
@@ -70,6 +73,18 @@ public class SettingAddButtonConfirmationListener implements ButtonChangeListene
     @Override
     public void handleEvent(ClickEvent<Button> event) {
 
+	//
+	// in case of a selector, retrieves the selected setting
+	// 
+	if (Selector.class.isAssignableFrom(settingToAdd.getSettingClass())) {
+
+	    @SuppressWarnings("rawtypes")
+	    Selector selector = (Selector)settingToAdd;
+	    
+	    settingToAdd = (Setting) selector.getSelectedSettings().get(0);
+	}
+
+	//
 	// clean the setting
 	//
 	SelectionUtils.deepClean(settingToAdd);
@@ -104,8 +119,6 @@ public class SettingAddButtonConfirmationListener implements ButtonChangeListene
 		this.tabContainer);
 
 	tabContainer.addSettingComponent(addedSettingComponent);
-
-	// System.out.println(configuration);
 
 	dialog.close();
     }
