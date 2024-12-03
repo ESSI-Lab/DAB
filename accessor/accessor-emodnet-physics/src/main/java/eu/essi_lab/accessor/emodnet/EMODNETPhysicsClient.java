@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.AbstractMap.SimpleEntry;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
@@ -45,61 +46,79 @@ public class EMODNETPhysicsClient {
 	this.endpoint = endpoint;
     }
 
-    public List<String> getIdentifiers() throws Exception {
+    public SimpleEntry<List<String>, List<String>> getIdentifiers() throws Exception {
 	String url = endpoint.contains("emodnet-physics.eu")
 		? endpoint + "/tabledap/allDatasets.json?datasetID&institution=%22EMODnet%20Physics%22"
 		: endpoint + "/tabledap/allDatasets.json?datasetID";
 	JSONObject ret = retrieveJSONObject(url);
 	JSONArray rows = ret.getJSONObject("table").getJSONArray("rows");
-	List<String> list = new ArrayList<>();
+	SimpleEntry<List<String>, List<String>> list = new SimpleEntry<List<String>, List<String>>(new ArrayList<>(), new ArrayList<>());
 	for (int i = 0; i < rows.length(); i++) {
 	    String row = rows.getJSONArray(i).getString(0);
 	    if (row.equals("allDatasets")) {
 		continue;
 	    }
-	    list.add(row);
+	    list.getKey().add(row);
 	}
 	List<String> toRemove = new ArrayList<String>();
-	for (String id : list) {
+	for (String id : list.getKey()) {
 	    if (!id.endsWith("_METADATA")) {
 		String metadataId = id + "_METADATA";
-		if (list.contains(metadataId)) {
+		if (list.getKey().contains(metadataId)) {
 		    toRemove.add(metadataId);
 		}
 	    }
 	}
-	list.removeAll(toRemove);
+	list.getKey().removeAll(toRemove);
+	list.getValue().addAll(toRemove);
 	return list;
     }
 
     public JSONObject getMetadata(String id) throws Exception {
 	String url = endpoint + "/info/" + id + "/index.json";
 	JSONObject ret = retrieveJSONObject(url);
-	if (ret.toString().contains("data_owner_EDMO")) {
-	    JSONObject edmoCodes = retrieveJSONObject(endpoint + "/tabledap/" + id + ".json?data_owner_EDMO&distinct()");
+	addDistinctValuesFromVariable(ret, id, "metadata_countries");	
+	addDistinctValuesFromVariable(ret, id, "metadata_data_owners", "data_owner_EDMO", "data_owner_longname");
+	addDistinctValuesFromVariable(ret, id, "metadata_platforms", "PLATFORMCODE", "call_name");
+
+	ret.put("identifier", id);
+	return ret;
+    }
+
+    private void addDistinctValuesFromVariable(JSONObject ret, String id, String variableName) throws Exception {
+	if (ret.toString().contains("\"variable\", \"" + variableName + "\"")) {
+	    JSONObject edmoCodes = retrieveJSONObject(endpoint + "/tabledap/" + id + ".json?" + variableName + "&distinct()");
 	    if (edmoCodes != null) {
 		if (edmoCodes.has("table")) {
 		    JSONObject table = edmoCodes.getJSONObject("table");
 		    if (table.has("rows")) {
 			JSONArray codes = table.getJSONArray("rows");
-			ret.put("data_owner_EDMO", codes);
+			ret.put(variableName, codes);
 		    }
 		}
 	    }
 	}
-	// JSONObject platformTypes = retrieveJSONObject(endpoint + "/tabledap/" + id +
-	// ".json?data_owner_EDMO&distinct()");
-	// if (platformTypes != null) {
-	// if (platformTypes.has("table")) {
-	// JSONObject table = platformTypes.getJSONObject("table");
-	// if (table.has("rows")) {
-	// JSONArray codes = table.getJSONArray("rows");
-	// ret.put("data_owner_EDMO", codes);
-	// }
-	// }
-	// }
-	ret.put("identifier", id);
-	return ret;
+    }
+
+    private void addDistinctValuesFromVariable(JSONObject ret, String id, String attributeName, String variableName1, String variableName2)
+	    throws Exception {
+	String str = ret.toString();
+	str = str.replace(" ", "").replace("\n", "");
+	if (str.contains("\"variable\",\"" + variableName1 + "\"") && //
+		str.contains("\"variable\",\"" + variableName2 + "\"")) {
+	    JSONObject edmoCodes = retrieveJSONObject(
+		    endpoint + "/tabledap/" + id + ".json?" + variableName1 + "%2C" + variableName2 + "&distinct()");
+	    if (edmoCodes != null) {
+		if (edmoCodes.has("table")) {
+		    JSONObject table = edmoCodes.getJSONObject("table");
+		    if (table.has("rows")) {
+			JSONArray codes = table.getJSONArray("rows");
+			ret.put(attributeName, codes);
+		    }
+		}
+	    }
+	}
+
     }
 
     private JSONObject retrieveJSONObject(String url) throws Exception {
