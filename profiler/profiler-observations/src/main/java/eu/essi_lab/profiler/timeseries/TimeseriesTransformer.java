@@ -148,15 +148,17 @@ public class TimeseriesTransformer extends DiscoveryRequestTransformer {
 	if (variableCode != null) {
 	    operands.add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER, variableCode));
 	}
-	
+
 	String observedProperty = request.getParameterValue(APIParameters.OBSERVED_PROPERTY);
 	if (observedProperty != null) {
-	    SimpleValueBond b1 = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER, observedProperty);
-//	    SimpleValueBond b2 = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.ATTRIBUTE_URI, observedProperty);	    
-//	    operands.add(BondFactory.createOrBond(b1,b2));
+	    SimpleValueBond b1 = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER,
+		    observedProperty);
+	    // SimpleValueBond b2 = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.ATTRIBUTE_URI,
+	    // observedProperty);
+	    // operands.add(BondFactory.createOrBond(b1,b2));
 	    operands.add(b1);
 	}
-	
+
 	String timeseriesCode = request.getParameterValue(APIParameters.TIMESERIES);
 	if (timeseriesCode != null) {
 	    operands.add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.ONLINE_ID, timeseriesCode));
@@ -168,15 +170,15 @@ public class TimeseriesTransformer extends DiscoveryRequestTransformer {
 	}
 
 	String countryCode = request.getParameterValue(APIParameters.COUNTRY);
-	if (countryCode!= null) {
+	if (countryCode != null) {
 	    operands.add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.COUNTRY_ISO3, countryCode));
 	}
-	
+
 	String providerCode = request.getParameterValue(APIParameters.PROVIDER);
-	if (providerCode!= null) {
+	if (providerCode != null) {
 	    operands.add(BondFactory.createSourceIdentifierBond(providerCode));
 	}
-	
+
 	switch (operands.size()) {
 	case 0:
 	    return null;
@@ -231,7 +233,7 @@ public class TimeseriesTransformer extends DiscoveryRequestTransformer {
     @Override
     public String getProfilerType() {
 
-	return TimeseriesProfiler.TIMESERIES_INFO.getServiceType();
+	return new TimeseriesProfilerSetting().getServiceType();
     }
 
 }

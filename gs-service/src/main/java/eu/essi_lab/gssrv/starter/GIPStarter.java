@@ -34,8 +34,6 @@ import javax.xml.bind.JAXBException;
 
 import org.quartz.SchedulerException;
 
-import eu.essi_lab.accessor.wms.extent.WMSLayer;
-import eu.essi_lab.accessor.wms.extent.map.WMSGetMapHandler;
 import eu.essi_lab.augmenter.worker.AugmentationReportsHandler;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.ConfigurationSource;
@@ -74,6 +72,8 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.profiler.esri.feature.FeatureLayer1StationsArctic;
 import eu.essi_lab.profiler.esri.feature.query.CachedCollections;
+import eu.essi_lab.profiler.wms.extent.WMSLayer;
+import eu.essi_lab.profiler.wms.extent.map.WMSGetMapHandler;
 import eu.essi_lab.request.executor.schedule.DownloadReportsHandler;
 import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
 

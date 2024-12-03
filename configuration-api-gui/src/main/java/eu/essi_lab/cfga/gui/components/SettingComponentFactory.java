@@ -593,7 +593,9 @@ public class SettingComponentFactory {
      * @param settingComponent
      * @return
      */
-    public static Button createSettingRemoveButton(Configuration configuration, TabContainer tabContainer,
+    public static Button createSettingRemoveButton(//
+	    Configuration configuration,//
+	    TabContainer tabContainer,//
 	    SettingComponent settingComponent) {
 
 	ConfigurationViewButton button = new ConfigurationViewButton("Remove", VaadinIcon.MINUS_SQUARE_O.create());

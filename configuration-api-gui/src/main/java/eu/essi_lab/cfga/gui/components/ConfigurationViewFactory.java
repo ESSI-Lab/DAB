@@ -90,7 +90,8 @@ public class ConfigurationViewFactory {
 	    Orientation orientation, //
 	    String tabName, //
 	    Optional<AddDirective> addDirective,//
-	    Optional<RemoveDirective> removeDirective, Optional<EditDirective> editDirective) {
+	    Optional<RemoveDirective> removeDirective,//
+	    Optional<EditDirective> editDirective) {
 
 	TabContainer layout = null;
 

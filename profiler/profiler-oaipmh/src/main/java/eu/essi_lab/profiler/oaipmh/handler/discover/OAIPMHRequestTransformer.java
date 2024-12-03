@@ -29,7 +29,6 @@ import java.util.Optional;
 import java.util.Properties;
 
 import eu.essi_lab.api.database.DatabaseFinder;
-import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -60,6 +59,7 @@ import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import eu.essi_lab.profiler.oaipmh.OAIPMHProfiler;
+import eu.essi_lab.profiler.oaipmh.OAIPMHProfilerSetting;
 import eu.essi_lab.profiler.oaipmh.OAIPMHRequestReader;
 import eu.essi_lab.profiler.oaipmh.OAIPMHRequestValidator;
 import eu.essi_lab.profiler.oaipmh.OAIPMRequestFilter;
@@ -81,7 +81,7 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
 
     /**
      * @return
-     */   
+     */
     protected int getPageSize() {
 
 	Optional<Properties> properties = ConfigurationWrapper.getSystemSettings().getKeyValueOptions();
@@ -276,7 +276,7 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
 	StorageInfo uri = ConfigurationWrapper.getDatabaseURI();
 	GSLoggerFactory.getLogger(OAIPMHRequestTransformer.class).debug("Storage uri: {}", uri);
 
- 	DatabaseFinder finder = DatabaseProviderFactory.getDatabaseFinder(uri);
+	DatabaseFinder finder = DatabaseProviderFactory.getDatabaseFinder(uri);
 
 	try {
 
@@ -376,6 +376,6 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
     @Override
     public String getProfilerType() {
 
-	return OAIPMHProfiler.OAI_PMH_PROFILER_TYPE;
+	return new OAIPMHProfilerSetting().getServiceType();
     }
 }

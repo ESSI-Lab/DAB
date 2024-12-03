@@ -43,6 +43,7 @@ import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.pdk.validation.WebRequestValidator;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import eu.essi_lab.profiler.sos.SOSProfiler;
+import eu.essi_lab.profiler.sos.SOSProfilerSetting;
 import eu.essi_lab.profiler.sos.SOSUtils;
 import eu.essi_lab.profiler.sos.SOSRequest.Parameter;
 
@@ -164,7 +165,7 @@ public class GetFeatureOfInterestTransformer extends DiscoveryRequestTransformer
     @Override
     public String getProfilerType() {
 
-	return SOSProfiler.SOS_SERVICE_INFO.getServiceType();
+	return new SOSProfilerSetting().getServiceType();
     }
 
 }

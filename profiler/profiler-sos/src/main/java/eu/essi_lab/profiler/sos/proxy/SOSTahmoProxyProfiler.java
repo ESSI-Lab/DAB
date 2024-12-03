@@ -24,24 +24,14 @@ package eu.essi_lab.profiler.sos.proxy;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.pdk.handler.selector.HandlerSelector;
+import eu.essi_lab.profiler.sos.SOSProfiler;
 import eu.essi_lab.profiler.sos.observation.GetObservationRequestFilter;
 
-public class SOSTahmoProxyProfiler extends SOSProxyProfiler {
-
-    private static final String SOS_TAHMO_PROXY_PROFILER_TYPE = "SOS-TAHMO-PROXY";
-
-    public static final ProfilerSetting SOS_TAHMO_PROXY_SERVICE_INFO = new ProfilerSetting();
-    static {
-	SOS_TAHMO_PROXY_SERVICE_INFO.setServiceName("Sensor Observation Service TAHMO-PROXY");
-	SOS_TAHMO_PROXY_SERVICE_INFO.setServiceType(SOS_TAHMO_PROXY_PROFILER_TYPE);
-	SOS_TAHMO_PROXY_SERVICE_INFO.setServicePath("sos-tahmo-proxy");
-	SOS_TAHMO_PROXY_SERVICE_INFO.setServiceVersion("2.0");
-    }
+public class SOSTahmoProxyProfiler extends SOSProfiler<SOSTahmoProxyProfilerSetting> {
 
     public static final List<String> SUPPORTED_VERSIONS = new ArrayList<>();
 
@@ -72,8 +62,8 @@ public class SOSTahmoProxyProfiler extends SOSProxyProfiler {
     }
 
     @Override
-    protected ProfilerSetting initSetting() {
+    protected SOSTahmoProxyProfilerSetting initSetting() {
 
-	return SOS_TAHMO_PROXY_SERVICE_INFO;
+	return new SOSTahmoProxyProfilerSetting();
     }
 }

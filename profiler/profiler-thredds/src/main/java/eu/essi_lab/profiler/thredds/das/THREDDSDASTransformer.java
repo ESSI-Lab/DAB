@@ -50,7 +50,7 @@ import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.model.resource.data.DataFormat;
 import eu.essi_lab.model.resource.data.dimension.DataDimension;
 import eu.essi_lab.pdk.wrt.AccessRequestTransformer;
-import eu.essi_lab.profiler.thredds.THREDDSProfiler;
+import eu.essi_lab.profiler.thredds.THREDDSProfilerSetting;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
 
 public class THREDDSDASTransformer extends AccessRequestTransformer {
@@ -176,7 +176,7 @@ public class THREDDSDASTransformer extends AccessRequestTransformer {
     @Override
     public String getProfilerType() {
 
-	return THREDDSProfiler.THREDDS_SERVICE_INFO.getServiceType();
+	return new THREDDSProfilerSetting().getServiceType();
     }
 
     @Override

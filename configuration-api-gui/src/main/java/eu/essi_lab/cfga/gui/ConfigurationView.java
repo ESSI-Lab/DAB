@@ -906,18 +906,6 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 		if (showDirective.isPresent()) {
 
-		    showDirective.get().getSortDirection().ifPresent(d -> {
-
-			switch (d) {
-			case ASCENDING:
-			    settings.sort((s1, s2) -> s1.getName().compareTo(s2.getName()));
-			    break;
-			case DESCENDING:
-			    settings.sort((s1, s2) -> s2.getName().compareTo(s1.getName()));
-			    break;
-			}
-		    });
-
 		    tabName = showDirective.get().getName();
 		}
 
@@ -945,8 +933,9 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 			orientation, //
 			tabName, //
 			addDirective, //
-			removeDirective, editDirective);
-
+			removeDirective,//
+			editDirective);
+			
 		container.getElement().getStyle().set("margin-left", "auto");
 		container.getElement().getStyle().set("margin-right", "auto");
 

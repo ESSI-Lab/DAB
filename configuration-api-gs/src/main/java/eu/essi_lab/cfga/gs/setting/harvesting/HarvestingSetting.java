@@ -36,13 +36,14 @@ import eu.essi_lab.cfga.gs.setting.BrokeringSetting;
 import eu.essi_lab.cfga.gs.setting.TabIndex;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
 import eu.essi_lab.cfga.gs.setting.augmenter.AugmenterSetting;
-import eu.essi_lab.cfga.gs.setting.harvesting.menuitems.HarvestingInfoItemHandler;
-import eu.essi_lab.cfga.gs.setting.harvesting.menuitems.HarvestingStatsItemHandler;
+import eu.essi_lab.cfga.gs.setting.menuitems.HarvestingInfoItemHandler;
+import eu.essi_lab.cfga.gs.setting.menuitems.HarvestingStatsItemHandler;
 import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.menuitem.SettingEditItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.menuitem.SettingsRemoveItemHandler;
+import eu.essi_lab.cfga.gui.components.grid.renderer.JobPhaseColumnRenderer;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
@@ -203,23 +204,28 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 
 			    ColumnDescriptor.createPositionalDescriptor(), //
 
-			    ColumnDescriptor.create("Name", true, true, (s) -> s.getName()), //
+			    ColumnDescriptor.create("Name", 400, true, true, (s) -> s.getName()), //
 
 			    ColumnDescriptor.create("Type", 150, true, true, (s) -> getSelectedAccessorType(s)), //
 
-			    ColumnDescriptor.create("Source id", 150, true, true, (s) -> getSourceId(s)), //
+			    ColumnDescriptor.create("Source id", 200, true, true, (s) -> getSourceId(s)), //
 
-			    ColumnDescriptor.create("Setting id", true, true, true, (s) -> s.getIdentifier()), //
+			    ColumnDescriptor.create("Setting id", 200, true, true, (s) -> s.getIdentifier()), //
 
 			    ColumnDescriptor.create("Comment", 150, true, true, (s) -> getComment(s)), //
 
-			    ColumnDescriptor.create("Repeat count", 50, true, true,
+			    ColumnDescriptor.create("Repeat count", 150, true, true,
 				    (s) -> SchedulerSupport.getInstance().getRepeatCount(s)), //
 
-			    ColumnDescriptor.create("Repeat interval", 50, true, true,
+			    ColumnDescriptor.create("Repeat interval", 150, true, true,
 				    (s) -> SchedulerSupport.getInstance().getRepeatInterval(s)), //
 
-			    ColumnDescriptor.create("Status", 100, true, true, (s) -> SchedulerSupport.getInstance().getJobPhase(s)), //
+			    ColumnDescriptor.create("Status", 100, true, true, (s) -> SchedulerSupport.getInstance().getJobPhase(s),//
+				   
+				    (item1, item2) -> item1.get("Status").compareTo(item2.get("Status")), //
+
+				    new JobPhaseColumnRenderer()
+			    ), //
 
 			    ColumnDescriptor.create("Fired time", 150, true, true, (s) -> SchedulerSupport.getInstance().getFiredTime(s)), //
 
@@ -231,7 +237,7 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 			    ColumnDescriptor.create("Next fire time", 150, true, true,
 				    (s) -> SchedulerSupport.getInstance().getNextFireTime(s)), //
 
-			    ColumnDescriptor.create("Size", 70, true, true, (s) -> SchedulerSupport.getInstance().getSize(s),
+			    ColumnDescriptor.create("Size", true, true, (s) -> SchedulerSupport.getInstance().getSize(s),
 
 				    (o1, o2) -> {
 

@@ -47,7 +47,6 @@ import eu.essi_lab.jaxb.csw._2_0_2.ExceptionCode;
 import eu.essi_lab.jaxb.csw._2_0_2.GetRecords;
 import eu.essi_lab.jaxb.csw._2_0_2.QueryType;
 import eu.essi_lab.lib.utils.ClonableInputStream;
-import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;

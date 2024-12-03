@@ -25,7 +25,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
@@ -37,21 +36,9 @@ import eu.essi_lab.pdk.handler.selector.HandlerSelector;
 /**
  * @author boldrini
  */
-public class HydroCSVProfiler extends Profiler {
+public class HydroCSVProfiler extends Profiler<HydroCSVProfilerSetting> {
 
-    /**
-     * The ARPA HydroCSV profiler type
-     */
-    public static final String ARPA_HYDROCSV_PROFILER_TYPE = "ARPA-HYDROCSV";
-
-    public static final ProfilerSetting ARPA_HYDROCSV_SERVICE_INFO = new ProfilerSetting();
-    static {
-	ARPA_HYDROCSV_SERVICE_INFO.setServiceName("ARPA HydroCSV");
-	ARPA_HYDROCSV_SERVICE_INFO.setServiceType(ARPA_HYDROCSV_PROFILER_TYPE);
-	ARPA_HYDROCSV_SERVICE_INFO.setServicePath("hydrocsv");
-	ARPA_HYDROCSV_SERVICE_INFO.setServiceVersion("1.0.0");
-    }
-
+  
     public HydroCSVProfiler() {
     }
 
@@ -104,8 +91,8 @@ public class HydroCSVProfiler extends Profiler {
     }
 
     @Override
-    protected ProfilerSetting initSetting() {
+    protected HydroCSVProfilerSetting initSetting() {
 
-	return ARPA_HYDROCSV_SERVICE_INFO;
+	return new HydroCSVProfilerSetting();
     }
 }

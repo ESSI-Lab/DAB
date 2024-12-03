@@ -242,7 +242,7 @@ public class WISTransformer extends DiscoveryRequestTransformer {
     @Override
     public String getProfilerType() {
 
-	return WISProfiler.WIS_SERVICE_INFO.getServiceType();
+	return new WISProfilerSetting().getServiceType();
     }
 
 }

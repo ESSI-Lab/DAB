@@ -33,7 +33,6 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.jaxb.common.CommonContext;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.jaxb.csw._2_0_2.ElementSetName;
@@ -73,20 +72,7 @@ import eu.essi_lab.profiler.csw.profile.CSWProfile;
 /**
  * @author Fabrizio
  */
-public class CSWProfiler extends Profiler {
-
-    /**
-     * The CSW profiler type
-     */
-    protected static final String CSW_PROFILER_TYPE = "CSW";
-
-    public static final ProfilerSetting CSW_SERVICE_INFO = new ProfilerSetting();
-    static {
-	CSW_SERVICE_INFO.setServiceName("CSW");
-	CSW_SERVICE_INFO.setServiceType(CSW_PROFILER_TYPE);
-	CSW_SERVICE_INFO.setServicePath("csw");
-	CSW_SERVICE_INFO.setServiceVersion("2.0.2");
-    }
+public class CSWProfiler<CSWPS extends CSWProfilerSetting> extends Profiler<CSWProfilerSetting> {
 
     /**
      * 
@@ -343,9 +329,9 @@ public class CSWProfiler extends Profiler {
     }
 
     @Override
-    protected ProfilerSetting initSetting() {
+    protected CSWProfilerSetting initSetting() {
 
-	return CSW_SERVICE_INFO;
+	return new CSWProfilerSetting();
     }
 
     private DiscoveryResultSetMapper<Element> createDummyResultSetMapper() {

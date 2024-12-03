@@ -34,6 +34,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.pdk.Profiler;
@@ -45,18 +46,25 @@ import eu.essi_lab.pdk.Profiler;
  */
 public class EXTProfilerService extends AbstractProfilerService {
 
-    private class EXTProfilerFilter implements ProfilerFilter {
+    private class EXTProfilerFilter implements ProfilerSettingFilter {
 
 	public EXTProfilerFilter() {
 	}
 
 	@Override
-	public boolean accept(Profiler profiler) {
+	public boolean accept(ProfilerSetting setting) {
 
-	    Provider provider = profiler.getProvider();
-	    if (provider != null) {
-		String organization = provider.getOrganization();
-		return organization != null && !organization.equals(ESSILabProvider.ESSI_LAB_ORGANIZATION);
+	    @SuppressWarnings("rawtypes")
+	    Profiler profiler = (Profiler) setting.createConfigurableOrNull();
+
+	    if (profiler != null) {
+
+		Provider provider = profiler.getProvider();
+		
+		if (provider != null) {
+		    String organization = provider.getOrganization();
+		    return organization != null && !organization.equals(ESSILabProvider.ESSI_LAB_ORGANIZATION);
+		}
 	    }
 
 	    return false;

@@ -30,7 +30,6 @@ import javax.ws.rs.core.Response.Status;
 
 import org.json.JSONObject;
 
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.jaxb.csw._2_0_2.ExceptionCode;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.web.WebRequest;
@@ -44,20 +43,7 @@ import eu.essi_lab.pdk.handler.selector.HandlerSelector;
  * 
  * @author boldrini
  */
-public class OpenMetricsProfiler extends Profiler {
-
-    /**
-     * The profiler type
-     */
-    private static final String OPEN_METRICS_PROFILER_TYPE = "OPEN_METRICS";
-
-    public static final ProfilerSetting OPEN_METRICS_INFO = new ProfilerSetting();
-    static {
-	OPEN_METRICS_INFO.setServiceName("OpenMetrics");
-	OPEN_METRICS_INFO.setServiceType(OPEN_METRICS_PROFILER_TYPE);
-	OPEN_METRICS_INFO.setServicePath("metrics");
-	OPEN_METRICS_INFO.setServiceVersion("1.0");
-    }
+public class OpenMetricsProfiler extends Profiler<OpenMetricProfilerSetting> {
 
     protected static final List<String> SUPPORTED_VERSIONS = new ArrayList<>();
 
@@ -123,9 +109,8 @@ public class OpenMetricsProfiler extends Profiler {
     }
 
     @Override
-    protected ProfilerSetting initSetting() {
+    protected OpenMetricProfilerSetting initSetting() {
 
-	return OPEN_METRICS_INFO;
+	return new OpenMetricProfilerSetting();
     }
-
 }

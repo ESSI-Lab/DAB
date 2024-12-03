@@ -264,7 +264,7 @@ public class RestAccessRequestTransformer extends AccessRequestTransformer {
     @Override
     public String getProfilerType() {
 
-	return RestProfiler.REST_PROFILER_TYPE;
+	return new RestProfilerSetting().getServiceType();
     }
 
     @Override

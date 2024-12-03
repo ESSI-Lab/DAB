@@ -30,7 +30,6 @@ import javax.ws.rs.core.Response.Status;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.messages.DiscoveryMessage.EiffelAPIDiscoveryOption;
@@ -77,28 +76,11 @@ import eu.essi_lab.profiler.os.handler.srvinfo.WMSLayersHandler;
 /**
  * @author Fabrizio
  */
-public class OSProfiler extends Profiler {
-
-    /**
-     * The OpenSearch profiler type
-     */
-    public static final String OPEN_SEARCH_PROFILER_TYPE = "OpenSearch";
-
-    /**
-     * The OpenSearch service info
-     */
-    public static final ProfilerSetting OPENSEARCH_SERVICE_INFO = new ProfilerSetting();
+public class OSProfiler extends Profiler<OSProfilerSetting> {
 
     private static final String INVALID_OS_REQUEST = "INVALID_OS_REQUEST";
 
     private DiscoveryHandler<String> discoveryHandler;
-
-    static {
-	OPENSEARCH_SERVICE_INFO.setServiceName("OpenSearch Service");
-	OPENSEARCH_SERVICE_INFO.setServiceType(OPEN_SEARCH_PROFILER_TYPE);
-	OPENSEARCH_SERVICE_INFO.setServicePath("opensearch");
-	OPENSEARCH_SERVICE_INFO.setServiceVersion("1.0.0");
-    }
 
     public OSProfiler() {
 
@@ -391,13 +373,8 @@ public class OSProfiler extends Profiler {
     }
 
     @Override
-    protected ProfilerSetting initSetting() {
+    protected OSProfilerSetting initSetting() {
 
-	return OPENSEARCH_SERVICE_INFO;
+	return new OSProfilerSetting();
     }
-
-    public static void main(String[] args) throws Exception {
-
-    }
-
 }

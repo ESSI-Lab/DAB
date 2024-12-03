@@ -30,7 +30,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.xml.bind.Marshaller;
 
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.jaxb.common.CommonContext;
 import eu.essi_lab.jaxb.csw._2_0_2.ExceptionCode;
 import eu.essi_lab.jaxb.ows._1_0_0.ExceptionReport;
@@ -49,20 +48,7 @@ import eu.essi_lab.profiler.wfs.description.DescribeFeatureRequestFilter;
 import eu.essi_lab.profiler.wfs.feature.GetFeatureQueryHandler;
 import eu.essi_lab.profiler.wfs.feature.GetFeatureRequestFilter;
 
-public class WFSProfiler extends Profiler {
-
-    /**
-     * The profiler type
-     */
-    private static final String WFS_PROFILER_TYPE = "WFS";
-
-    public static final ProfilerSetting WFS_SERVICE_INFO = new ProfilerSetting();
-    static {
-	WFS_SERVICE_INFO.setServiceName("WFS Profiler");
-	WFS_SERVICE_INFO.setServiceType(WFS_PROFILER_TYPE);
-	WFS_SERVICE_INFO.setServicePath("wfs");
-	WFS_SERVICE_INFO.setServiceVersion("1.1.0");
-    }
+public class WFSProfiler extends Profiler<WFSProfilerSetting> {
 
     /**
      * 
@@ -173,8 +159,8 @@ public class WFSProfiler extends Profiler {
     }
 
     @Override
-    protected ProfilerSetting initSetting() {
+    protected WFSProfilerSetting initSetting() {
 
-	return WFS_SERVICE_INFO;
+	return new WFSProfilerSetting();
     }
 }

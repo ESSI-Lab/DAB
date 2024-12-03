@@ -60,7 +60,7 @@ import eu.essi_lab.model.index.jaxb.CardinalValues;
 import eu.essi_lab.pdk.handler.DefaultRequestHandler;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.profiler.wfs.JAXBWFS;
-import eu.essi_lab.profiler.wfs.WFSProfiler;
+import eu.essi_lab.profiler.wfs.WFSProfilerSetting;
 import eu.essi_lab.profiler.wfs.feature.FeatureType;
 import eu.essi_lab.request.executor.IStatisticsExecutor;
 import net.opengis.filter.v_1_1_0.ComparisonOperatorType;
@@ -229,7 +229,7 @@ public class WFSCapabilitiesHandler extends DefaultRequestHandler {
 	    String wfsURL = "";
 	    try {
 		UriInfo uri = webRequest.getUriInfo();
-		wfsURL = uri.getBaseUri().toString() + "/" + WFSProfiler.WFS_SERVICE_INFO.getServicePath();
+		wfsURL = uri.getBaseUri().toString() + "/" + new WFSProfilerSetting().getServicePath();
 	    } catch (Exception e) {
 	    }
 

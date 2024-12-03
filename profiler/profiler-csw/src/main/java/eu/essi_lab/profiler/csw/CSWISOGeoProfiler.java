@@ -24,26 +24,16 @@ package eu.essi_lab.profiler.csw;
  * #L%
  */
 
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
-
 /**
  * Designed for the GEOSS Web Portal
  * 
  * @author Fabrizio
  */
-public class CSWISOGeoProfiler extends CSWProfiler {
-
-    public static final ProfilerSetting CSW_ISO_GEO_SERVICE_INFO = new ProfilerSetting();
-    static {
-	CSW_ISO_GEO_SERVICE_INFO.setServiceName("CSW ISO-GEO");
-	CSW_ISO_GEO_SERVICE_INFO.setServiceType(CSW_PROFILER_TYPE);
-	CSW_ISO_GEO_SERVICE_INFO.setServicePath("cswisogeo");
-	CSW_ISO_GEO_SERVICE_INFO.setServiceVersion("2.0.2");
-    }
+public class CSWISOGeoProfiler extends CSWProfiler<CSWISOGeoProfilerSetting> {
 
     @Override
-    protected ProfilerSetting initSetting() {
+    protected CSWISOGeoProfilerSetting initSetting() {
 
-	return CSW_ISO_GEO_SERVICE_INFO;
+	return new CSWISOGeoProfilerSetting();
     }
 }

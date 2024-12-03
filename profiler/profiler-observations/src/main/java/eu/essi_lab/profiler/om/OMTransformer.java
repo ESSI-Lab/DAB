@@ -155,15 +155,17 @@ public class OMTransformer extends DiscoveryRequestTransformer {
 	if (variableCode != null) {
 	    operands.add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER, variableCode));
 	}
-	
+
 	String intendedObservationSpacing = request.getParameterValue(APIParameters.INTENDED_OBSERVATION_SPACING);
 	if (intendedObservationSpacing != null) {
-	    operands.add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.TIME_RESOLUTION_DURATION_8601, intendedObservationSpacing));
+	    operands.add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.TIME_RESOLUTION_DURATION_8601,
+		    intendedObservationSpacing));
 	}
-	
+
 	String aggregationPeriod = request.getParameterValue(APIParameters.AGGREGATION_PERIOD);
 	if (aggregationPeriod != null) {
-	    operands.add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.TIME_AGGREGATION_DURATION_8601, aggregationPeriod));
+	    operands.add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.TIME_AGGREGATION_DURATION_8601,
+		    aggregationPeriod));
 	}
 
 	String observedProperty = request.getParameterValue(APIParameters.OBSERVED_PROPERTY);
@@ -183,18 +185,19 @@ public class OMTransformer extends DiscoveryRequestTransformer {
 		}
 	    }
 	    if (ho == null) {
-		    SimpleValueBond b1 = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.ATTRIBUTE_TITLE, observedProperty);
-		    operands.add(b1);
+		SimpleValueBond b1 = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.ATTRIBUTE_TITLE,
+			observedProperty);
+		operands.add(b1);
 	    } else {
-		List<SKOSConcept> concepts = ho.findConcepts(observedProperty, true,false);
+		List<SKOSConcept> concepts = ho.findConcepts(observedProperty, true, false);
 		HashSet<String> uris = new HashSet<String>();
 		for (SKOSConcept concept : concepts) {
-		    uris.add(concept.getURI());		    
+		    uris.add(concept.getURI());
 		}
 		if (concepts.isEmpty()) {
 		    uris.add("notfounddd");
 		}
-		List<Bond>bonds = new ArrayList<>();
+		List<Bond> bonds = new ArrayList<>();
 		for (String uri : uris) {
 		    SimpleValueBond b = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.OBSERVED_PROPERTY_URI, uri);
 		    bonds.add(b);
@@ -206,10 +209,9 @@ public class OMTransformer extends DiscoveryRequestTransformer {
 		    operands.add(bonds.get(0));
 		    break;
 		default:
-		    operands.add(BondFactory.createOrBond(bonds));		
-		}			
+		    operands.add(BondFactory.createOrBond(bonds));
+		}
 	    }
-
 
 	}
 
@@ -217,7 +219,7 @@ public class OMTransformer extends DiscoveryRequestTransformer {
 	if (interpolation != null) {
 	    operands.add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.TIME_INTERPOLATION, interpolation));
 	}
-	
+
 	String timeseriesCode = request.getParameterValue(APIParameters.OBSERVATION);
 	if (timeseriesCode != null) {
 	    operands.add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.ONLINE_ID, timeseriesCode));
@@ -292,7 +294,7 @@ public class OMTransformer extends DiscoveryRequestTransformer {
     @Override
     public String getProfilerType() {
 
-	return OMProfiler.TIMESERIES_INFO.getServiceType();
+	return new OMProfilerSetting().getServiceType();
     }
 
 }

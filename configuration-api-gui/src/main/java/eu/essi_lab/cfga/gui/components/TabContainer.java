@@ -41,8 +41,10 @@ import eu.essi_lab.cfga.gui.components.grid.GridInfo;
 import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfo;
+import eu.essi_lab.cfga.gui.extension.directive.DirectiveManager;
 import eu.essi_lab.cfga.gui.extension.directive.EditDirective;
 import eu.essi_lab.cfga.gui.extension.directive.RemoveDirective;
+import eu.essi_lab.cfga.gui.extension.directive.ShowDirective;
 import eu.essi_lab.cfga.setting.Setting;
 
 /**
@@ -94,13 +96,35 @@ public class TabContainer extends VerticalLayout {
 
 	List<Setting> settings = view.retrieveTabSettings(tabInfo);
 
+	DirectiveManager directiveManager = tabInfo.getDirectiveManager();
+
+	Optional<ShowDirective> showDirective = directiveManager.getDirective(ShowDirective.class);
+
+	if (showDirective.isPresent()) {
+
+	    showDirective.get().getSortDirection().ifPresent(dir -> {
+
+		switch (dir) {
+		case ASCENDING:
+		    settings.sort((s1, s2) -> s1.getName().compareTo(s2.getName()));
+		    break;
+		case DESCENDING:
+		    settings.sort((s1, s2) -> s2.getName().compareTo(s1.getName()));
+		    break;
+		}
+	    });
+	}
+
 	if (tabInfo.getGridInfo().isPresent()) {
 
 	    Optional<GridInfo> gridInfo = tabInfo.getGridInfo();
 
 	    GridComponent gridComponent = new GridComponent(gridInfo.get(), settings, configuration, this, readOnly, refresh);
 
-	    add(gridComponent.createColumnsHider());
+	    if (tabInfo.getGridInfo().get().isShowColumnsHider()) {
+
+		add(gridComponent.createColumnsHider());
+	    }
 
 	    add(gridComponent);
 

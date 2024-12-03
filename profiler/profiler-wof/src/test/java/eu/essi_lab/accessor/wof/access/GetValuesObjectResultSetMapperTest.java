@@ -7,6 +7,7 @@ import static org.junit.Assert.assertNull;
 import org.junit.Test;
 
 import eu.essi_lab.lib.xml.XMLDocumentReader;
+import eu.essi_lab.profiler.wof.access.GetValuesObjectResultSetMapper;
 
 public class GetValuesObjectResultSetMapperTest {
 

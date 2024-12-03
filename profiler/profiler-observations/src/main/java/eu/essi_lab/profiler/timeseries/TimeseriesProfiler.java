@@ -30,7 +30,6 @@ import javax.ws.rs.core.Response.Status;
 
 import org.json.JSONObject;
 
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.jaxb.csw._2_0_2.ExceptionCode;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.web.WebRequest;
@@ -44,20 +43,7 @@ import eu.essi_lab.pdk.handler.selector.HandlerSelector;
  * 
  * @author boldrini
  */
-public class TimeseriesProfiler extends Profiler {
-
-    /**
-     * The profiler type
-     */
-    private static final String TIMESERIES_PROFILER_TYPE = "TIMESERIES";
-
-    public static final ProfilerSetting TIMESERIES_INFO = new ProfilerSetting();
-    static {
-	TIMESERIES_INFO.setServiceName("Timeseries API");
-	TIMESERIES_INFO.setServiceType(TIMESERIES_PROFILER_TYPE);
-	TIMESERIES_INFO.setServicePath("timeseries-api");
-	TIMESERIES_INFO.setServiceVersion("1.0");
-    }
+public class TimeseriesProfiler extends Profiler<TimeseriesProfilerSetting> {
 
     protected static final List<String> SUPPORTED_VERSIONS = new ArrayList<>();
 
@@ -74,28 +60,26 @@ public class TimeseriesProfiler extends Profiler {
 
 	HandlerSelector selector = new HandlerSelector();
 
-
 	////////////////////
 	// MONITORING POINTS
 	////////////////////
 	selector.register(new MonitoringPointsFilter(), new MonitoringPointsHandler());
-	
+
 	////////////////////
 	// TIMESERIES
 	////////////////////
 	selector.register(new TimeseriesFilter(), new TimeseriesHandler());
-	
+
 	////////////////////
 	// COUNTRIES
 	////////////////////
 	selector.register(new CountriesFilter(), new CountriesHandler());
-	
+
 	////////////////////
 	// PROVIDERS
 	////////////////////
 	selector.register(new ProvidersFilter(), new ProvidersHandler());
 
-	
 	return selector;
     }
 
@@ -106,7 +90,6 @@ public class TimeseriesProfiler extends Profiler {
 	vm.setErrorCode(ExceptionCode.NO_APPLICABLE_CODE.toString());
 	return onValidationFailed(null, vm);
     }
-
 
     @Override
     protected Response onValidationFailed(WebRequest request, ValidationMessage validationMessage) {
@@ -142,9 +125,9 @@ public class TimeseriesProfiler extends Profiler {
     }
 
     @Override
-    protected ProfilerSetting initSetting() {
+    protected TimeseriesProfilerSetting initSetting() {
 
-	return TIMESERIES_INFO;
+	return new TimeseriesProfilerSetting();
     }
 
 }
