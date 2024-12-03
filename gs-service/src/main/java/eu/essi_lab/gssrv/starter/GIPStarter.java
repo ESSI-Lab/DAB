@@ -125,7 +125,6 @@ public class GIPStarter {
      * @param confConnector
      * @throws GSException
      */
-    @SuppressWarnings("incomplete-switch")
     public void start() throws GSException {
 
 	GSLoggerFactory.getLogger(getClass()).info("Cluster: {}", getCluster());
@@ -141,27 +140,30 @@ public class GIPStarter {
 
 	initConfig();
 
-	CheckResponse similarityCheckResponse = checkConfig();
+	if (configCheckEnabled()) {
 
-	if (similarityCheckResponse.getCheckResult() == CheckResult.CHECK_FAILED) {
+	    CheckResponse similarityCheckResponse = checkConfig();
 
-	    switch (mode) {
-	    case CONFIGURATION:
-	    case LOCAL_PRODUCTION:
-	    case MIXED:
+	    if (similarityCheckResponse.getCheckResult() == CheckResult.CHECK_FAILED) {
 
-		ConfigurationUtils.fix(configuration, similarityCheckResponse);
-		break;
-	    default:
-		throw GSException.createException(//
-			ConfigurationUtils.class, //
-			"Configuration issues found, but this node is not empowered to fix the configuration, exit!", //
-			null, //
-			null, //
-			ErrorInfo.ERRORTYPE_INTERNAL, //
-			ErrorInfo.SEVERITY_FATAL, //
-			"NodeNotEmpoweredToFixConfiguarionError");
+		switch (mode) {
+		case CONFIGURATION:
+		case LOCAL_PRODUCTION:
+		case MIXED:
 
+		    ConfigurationUtils.fix(configuration, similarityCheckResponse);
+		    break;
+		default:
+		    throw GSException.createException(//
+			    ConfigurationUtils.class, //
+			    "Configuration issues found, but this node is not empowered to fix the configuration, exit!", //
+			    null, //
+			    null, //
+			    ErrorInfo.ERRORTYPE_INTERNAL, //
+			    ErrorInfo.SEVERITY_FATAL, //
+			    "NodeNotEmpoweredToFixConfiguarionError");
+
+		}
 	    }
 	}
 
@@ -191,6 +193,19 @@ public class GIPStarter {
 	}
 
 	initCaches();
+    }
+
+    /**
+     * @return
+     */
+    private static boolean configCheckEnabled() {
+
+	String check = System.getProperty("checkConfig");
+	if (check == null) {
+	    check = System.getenv("checkConfig");
+	}
+
+	return check != null ? Boolean.valueOf(check) : true;
     }
 
     /**
