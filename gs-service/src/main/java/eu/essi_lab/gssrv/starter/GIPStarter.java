@@ -59,6 +59,7 @@ import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting.JobStoreType;
 import eu.essi_lab.cfga.source.FileSource;
 import eu.essi_lab.cfga.source.MarkLogicSource;
+import eu.essi_lab.configuration.ClusterType;
 import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.gssrv.conf.task.ErrorLogsPublisherTask;
 import eu.essi_lab.gssrv.health.HealthCheck;
@@ -127,7 +128,7 @@ public class GIPStarter {
      */
     public void start() throws GSException {
 
-	GSLoggerFactory.getLogger(getClass()).info("Cluster: {}", getCluster());
+	GSLoggerFactory.getLogger(getClass()).info("Cluster: {}", ClusterType.get().getLabel());
 
 	//
 	// see GIP-235
@@ -206,18 +207,6 @@ public class GIPStarter {
 	}
 
 	return check != null ? Boolean.valueOf(check) : true;
-    }
-
-    /**
-     * @return
-     */
-    public static String getCluster() {
-
-	String cluster = System.getProperty("cluster");
-	if (cluster == null) {
-	    cluster = System.getenv("cluster");
-	}
-	return cluster != null ? cluster : "Local";
     }
 
     /**
