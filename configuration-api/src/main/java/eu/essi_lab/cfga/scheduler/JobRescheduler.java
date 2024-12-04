@@ -35,6 +35,7 @@ import org.quartz.TriggerBuilder;
 import eu.essi_lab.cfga.setting.SettingUtils;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting.SchedulingGroup;
+import eu.essi_lab.configuration.ClusterType;
 import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
@@ -51,34 +52,62 @@ public class JobRescheduler {
      * @param context
      * @return
      */
+    @SuppressWarnings("incomplete-switch")
     public boolean isRescheduled(SchedulerWorkerSetting setting, JobExecutionContext context) {
 
 	ExecutionMode executionMode = ExecutionMode.get();
+
+	ClusterType clusterType = ClusterType.get();
 
 	SchedulingGroup group = setting.getGroup();
 
 	switch (executionMode) {
 
 	//
-	// Batch nodes executes all these jobs
+	//
 	//
 	case BATCH:
 
-	    switch (group) {
-	    case HARVESTING:
-	    case BULK_DOWNLOAD:
-	    case DEFAULT:
+	    switch (clusterType) {
+	    case PRE_PRODUCTION:
 
-		logJobExecuting(setting, executionMode, group);
+		switch (group) {
+		case HARVESTING:
+		case AUGMENTING:
+		case ASYNCH_ACCESS:
+		case CUSTOM_TASK:
+		case DEFAULT:
 
-		return false;
+		    logJobExecuting(setting, executionMode, group);
 
-	    default:
+		    return false;
 
-		logJobRescheduled(setting, executionMode, group);
+		default:
 
-		rescheduleJob(setting, context);
-		return true;
+		    logJobRescheduled(setting, executionMode, group);
+
+		    rescheduleJob(setting, context);
+		    return true;
+		}
+
+	    case PRODUCTION:
+
+		switch (group) {
+		case HARVESTING:
+		case BULK_DOWNLOAD:
+		case DEFAULT:
+
+		    logJobExecuting(setting, executionMode, group);
+
+		    return false;
+
+		default:
+
+		    logJobRescheduled(setting, executionMode, group);
+
+		    rescheduleJob(setting, context);
+		    return true;
+		}
 	    }
 
 	    //
@@ -102,6 +131,9 @@ public class JobRescheduler {
 		return true;
 	    }
 
+	    //
+	    //
+	    //
 	case AUGMENTER:
 
 	    switch (group) {
