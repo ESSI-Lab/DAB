@@ -25,19 +25,16 @@ import java.util.HashMap;
 
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.details.Details;
-import com.vaadin.flow.component.details.DetailsVariant;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 
-import eu.essi_lab.cfga.gui.components.ComponentFactory;
 import eu.essi_lab.cfga.gui.components.listener.CheckBoxClickListener;
 
 /**
  * @author Fabrizio
  */
 @SuppressWarnings("serial")
-public class ColumnsHider extends Details {
+public class ColumnsHider extends HorizontalLayout {
 
     /**
      * 
@@ -50,7 +47,9 @@ public class ColumnsHider extends Details {
      */
     public ColumnsHider(GridComponent grid, GridInfo gridInfo) {
 
-	final HorizontalLayout layout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout();
+	setMargin(false);
+	setSpacing(false);
+	setHeight("30px");
 
 	gridInfo.getColumnsDescriptors().forEach(descriptor -> {
 
@@ -64,7 +63,7 @@ public class ColumnsHider extends Details {
 		Checkbox checkBox = new Checkbox(descriptor.getColumnName());
 		checkBox.getStyle().set("font-size", "12px");
 
-		layout.add(checkBox);
+		add(checkBox);
 
 		checkBox.addClickListener(new CheckBoxClickListener() {
 
@@ -85,12 +84,6 @@ public class ColumnsHider extends Details {
 		findColumn(grid, descriptor.getColumnName()).setVisible(checkBox.getValue());
 	    }
 	});
-
-	setSummaryText("Show/hide columns");
-	setContent(layout);
-
-	addThemeVariants(DetailsVariant.FILLED, DetailsVariant.SMALL);
-	setOpened(true);
     }
 
     /**
