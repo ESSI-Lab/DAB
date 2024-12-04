@@ -12,12 +12,12 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
  * @author Fabrizio
  */
 @SuppressWarnings("serial")
-public class LegendsViewer extends HorizontalLayout {
+public class LegendViewer extends HorizontalLayout {
 
     /**
      * 
      */
-    public LegendsViewer(GridComponent grid, List<Component> legends) {
+    public LegendViewer(GridComponent grid, List<Component> legends) {
 
 	setMargin(false);
 	setSpacing(false);

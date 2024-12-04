@@ -313,7 +313,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
      */
     public Component createLegendsViewer(List<Component> legends) {
 
-	return new LegendsViewer(this, legends);
+	return new LegendViewer(this, legends);
     }
 
     /**

@@ -33,10 +33,8 @@ import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.TabSheet;
 
 import eu.essi_lab.cfga.Configuration;
@@ -151,7 +149,7 @@ public class TabContainer extends VerticalLayout {
 
 	    if (!legends.isEmpty()) {
 
-		tabSheet.add("Legends", gridComponent.createLegendsViewer(legends));
+		tabSheet.add("Legend", gridComponent.createLegendsViewer(legends));
 	    }
 
 	    add(tabSheet);

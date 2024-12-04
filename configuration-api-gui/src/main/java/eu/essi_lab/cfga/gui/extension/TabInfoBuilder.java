@@ -29,8 +29,8 @@ import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.data.provider.SortDirection;
 
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
-import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.GridInfo;
+import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.extension.directive.AddDirective;
 import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
 import eu.essi_lab.cfga.gui.extension.directive.EditDirective;
@@ -355,7 +355,8 @@ public class TabInfoBuilder {
 	    int pageSize, //
 	    List<ColumnDescriptor> descriptors, //
 	    List<GridMenuItemHandler> items, //
-	    SelectionMode selectionMode, boolean showColumnsHider) {
+	    SelectionMode selectionMode,//
+	    boolean showColumnsHider) {
 
 	GridInfo gridInfo = new GridInfo();
 	gridInfo.setPageSize(pageSize);
