@@ -25,6 +25,7 @@ package eu.essi_lab.cfga.gui.components.grid.renderer;
  */
 
 import java.util.HashMap;
+import java.util.Optional;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
@@ -44,6 +45,14 @@ public abstract class GridColumnRenderer<C extends Component> extends ComponentR
     */
     public GridColumnRenderer() {
 
+    }
+
+    /**
+     * @return
+     */
+    public Optional<Component> getLegend() {
+
+	return Optional.empty();
     }
 
     @Override
