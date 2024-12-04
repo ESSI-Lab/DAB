@@ -25,9 +25,9 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Optional;
 
-import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.function.ValueProvider;
 
+import eu.essi_lab.cfga.gui.components.grid.renderer.GridColumnRenderer;
 import eu.essi_lab.cfga.setting.Setting;
 
 /**
@@ -42,7 +42,7 @@ public class ColumnDescriptor {
     private boolean visible;
     private ValueProvider<Setting, String> valueProvider;
     private Comparator<HashMap<String, String>> comparator;
-    private Renderer<HashMap<String, String>> renderer;
+    private GridColumnRenderer<?> renderer;
     private boolean hasCheckBox;
 
     static final String POSITIONAL_COLUMN_NAME = "#";
@@ -80,7 +80,7 @@ public class ColumnDescriptor {
     public static ColumnDescriptor create(//
 	    String columnName, //
 	    ValueProvider<Setting, String> valueProvider, //
-	    Renderer<HashMap<String, String>> renderer) {
+	    GridColumnRenderer<?> renderer) {
 
 	return create(columnName, -1, false, false, true, valueProvider, null, renderer);
     }
@@ -110,7 +110,7 @@ public class ColumnDescriptor {
 	    String columnName, //
 	    ValueProvider<Setting, String> valueProvider, //
 	    Comparator<HashMap<String, String>> comparator, //
-	    Renderer<HashMap<String, String>> renderer) {
+	    GridColumnRenderer<?> renderer) {
 
 	return create(columnName, -1, false, false, true, valueProvider, comparator, renderer);
     }
@@ -140,7 +140,7 @@ public class ColumnDescriptor {
 	    String columnName, //
 	    boolean sortable, //
 	    ValueProvider<Setting, String> valueProvider, //
-	    Renderer<HashMap<String, String>> renderer) {
+	    GridColumnRenderer<?> renderer) {
 
 	return create(columnName, -1, sortable, false, true, valueProvider, null, renderer);
     }
@@ -174,7 +174,7 @@ public class ColumnDescriptor {
 	    boolean sortable, //
 	    ValueProvider<Setting, String> valueProvider, //
 	    Comparator<HashMap<String, String>> comparator, //
-	    Renderer<HashMap<String, String>> renderer) {
+	    GridColumnRenderer<?> renderer) {
 
 	return create(columnName, -1, sortable, false, true, valueProvider, comparator, renderer);
     }
@@ -208,7 +208,7 @@ public class ColumnDescriptor {
 	    boolean sortable, //
 	    boolean filtered, //
 	    ValueProvider<Setting, String> valueProvider, //
-	    Renderer<HashMap<String, String>> renderer) {
+	    GridColumnRenderer<?> renderer) {
 
 	return create(columnName, -1, sortable, filtered, true, valueProvider, null, renderer);
     }
@@ -246,7 +246,7 @@ public class ColumnDescriptor {
 	    boolean filtered, //
 	    ValueProvider<Setting, String> valueProvider, //
 	    Comparator<HashMap<String, String>> comparator, //
-	    Renderer<HashMap<String, String>> renderer) {
+	    GridColumnRenderer<?> renderer) {
 
 	return create(columnName, -1, sortable, filtered, true, valueProvider, comparator, renderer);
     }
@@ -283,7 +283,7 @@ public class ColumnDescriptor {
 	    boolean sortable, //
 	    boolean filtered, //
 	    ValueProvider<Setting, String> valueProvider, //
-	    Renderer<HashMap<String, String>> renderer) {
+	    GridColumnRenderer<?> renderer) {
 
 	return create(columnName, columnWidth, sortable, filtered, true, valueProvider, null, renderer);
     }
@@ -325,7 +325,7 @@ public class ColumnDescriptor {
 	    boolean filtered, //
 	    ValueProvider<Setting, String> valueProvider, //
 	    Comparator<HashMap<String, String>> comparator, //
-	    Renderer<HashMap<String, String>> renderer) {
+	    GridColumnRenderer<?> renderer) {
 
 	return create(columnName, columnWidth, sortable, filtered, true, valueProvider, comparator, renderer);
     }
@@ -362,7 +362,7 @@ public class ColumnDescriptor {
 	    boolean filtered, //
 	    boolean visible, //
 	    ValueProvider<Setting, String> valueProvider, //
-	    Renderer<HashMap<String, String>> renderer) {
+	    GridColumnRenderer<?> renderer) {
 
 	return create(columnName, -1, sortable, filtered, visible, valueProvider, null, renderer);
     }
@@ -407,7 +407,7 @@ public class ColumnDescriptor {
 	    boolean visible, //
 	    ValueProvider<Setting, String> valueProvider, //
 	    Comparator<HashMap<String, String>> comparator, //
-	    Renderer<HashMap<String, String>> renderer) {
+	    GridColumnRenderer<?> renderer) {
 
 	ColumnDescriptor descriptor = new ColumnDescriptor();
 	descriptor.setColumnName(columnName);
@@ -437,7 +437,7 @@ public class ColumnDescriptor {
 	    boolean sortable, //
 	    boolean filtered, //
 	    boolean visible, //
-	    Renderer<HashMap<String, String>> renderer) {
+	    GridColumnRenderer<?> renderer) {
 
 	ColumnDescriptor descriptor = new ColumnDescriptor();
 	descriptor.setColumnName(columnName);
@@ -565,7 +565,7 @@ public class ColumnDescriptor {
     /**
      * @return
      */
-    public Optional<Renderer<HashMap<String, String>>> getRenderer() {
+    public Optional<GridColumnRenderer<?>> getRenderer() {
 
 	return Optional.ofNullable(renderer);
     }
@@ -573,7 +573,7 @@ public class ColumnDescriptor {
     /**
      * @param renderer
      */
-    public void setRenderer(Renderer<HashMap<String, String>> renderer) {
+    public void setRenderer(GridColumnRenderer<?> renderer) {
 
 	this.renderer = renderer;
     }
