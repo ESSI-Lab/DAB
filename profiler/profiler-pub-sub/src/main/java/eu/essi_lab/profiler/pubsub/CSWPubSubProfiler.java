@@ -28,7 +28,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.xml.bind.Marshaller;
 
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.jaxb.common.CommonContext;
 import eu.essi_lab.jaxb.csw._2_0_2.ExceptionCode;
 import eu.essi_lab.jaxb.ows._1_0_0.ExceptionReport;
@@ -54,17 +53,7 @@ import eu.essi_lab.profiler.pubsub.handler.csw.CSWUnsubscribeHandler;
  * 
  * @author Fabrizio
  */
-public class CSWPubSubProfiler extends Profiler {
-
-    static final String CSW_PUB_SUB_PROFILER_TYPE = "CSW-PUB-SUB";
-
-    public static final ProfilerSetting PUB_SUB_SERVICE_INFO = new ProfilerSetting();
-    static {
-	PUB_SUB_SERVICE_INFO.setServiceName("CSWPubSub");
-	PUB_SUB_SERVICE_INFO.setServiceType(CSW_PUB_SUB_PROFILER_TYPE);
-	PUB_SUB_SERVICE_INFO.setServicePath("cswpubsub");
-	PUB_SUB_SERVICE_INFO.setServiceVersion("1.0.0");
-    }
+public class CSWPubSubProfiler extends Profiler<CSWPubSubProfilerSetting> {
 
     @Override
     public HandlerSelector getSelector(WebRequest request) {
@@ -72,14 +61,14 @@ public class CSWPubSubProfiler extends Profiler {
 	HandlerSelector selector = new HandlerSelector();
 
 	// GET capabilities
-	selector.register(new GETRequestFilter(PUB_SUB_SERVICE_INFO.getServicePath()), new CSWPubSubGetCapabilitiesHandler());
+	selector.register(new GETRequestFilter(getSetting().getServicePath()), new CSWPubSubGetCapabilitiesHandler());
 
 	// GET subscription
 	// GET subscription/id
-	selector.register(new GETRequestFilter(PUB_SUB_SERVICE_INFO.getServicePath() + "/subscription"), new CSWSubscriptionsHandler());
-	selector.register(new GETRequestFilter(PUB_SUB_SERVICE_INFO.getServicePath() + "/subscription/*"), new CSWSubscriptionsHandler());
+	selector.register(new GETRequestFilter(getSetting().getServicePath() + "/subscription"), new CSWSubscriptionsHandler());
+	selector.register(new GETRequestFilter(getSetting().getServicePath() + "/subscription/*"), new CSWSubscriptionsHandler());
 	// DELETE subscription/id
-	selector.register(new DELETERequestFilter(PUB_SUB_SERVICE_INFO.getServicePath() + "/subscription/*"), new CSWUnsubscribeHandler());
+	selector.register(new DELETERequestFilter(getSetting().getServicePath() + "/subscription/*"), new CSWUnsubscribeHandler());
 	// POST
 	selector.register(new WebRequestFilter() {
 	    @Override
@@ -92,9 +81,9 @@ public class CSWPubSubProfiler extends Profiler {
     }
 
     @Override
-    protected ProfilerSetting initSetting() {
+    protected CSWPubSubProfilerSetting initSetting() {
 
-	return PUB_SUB_SERVICE_INFO;
+	return new CSWPubSubProfilerSetting();
     }
 
     @Override

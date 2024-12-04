@@ -69,7 +69,7 @@ public class RestDiscoveryRequestTransformer extends DiscoveryRequestTransformer
     @Override
     public String getProfilerType() {
 
-	return RestProfiler.REST_PROFILER_TYPE;
+	return new RestProfilerSetting().getServiceType();
     }
 
     @Override

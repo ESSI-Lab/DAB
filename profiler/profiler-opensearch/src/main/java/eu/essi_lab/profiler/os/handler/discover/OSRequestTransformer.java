@@ -73,7 +73,7 @@ import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import eu.essi_lab.pdk.wrt.WebRequestParameter;
 import eu.essi_lab.profiler.os.OSParameter;
 import eu.essi_lab.profiler.os.OSParameters;
-import eu.essi_lab.profiler.os.OSProfiler;
+import eu.essi_lab.profiler.os.OSProfilerSetting;
 import eu.essi_lab.profiler.os.OSRequestParser;
 import eu.essi_lab.profiler.os.handler.discover.covering.CoveringModeDiscoveryHandler;
 import eu.essi_lab.profiler.os.handler.discover.covering.CoveringModeOptionsReader;
@@ -465,7 +465,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
     @Override
     public String getProfilerType() {
 
-	return OSProfiler.OPEN_SEARCH_PROFILER_TYPE;
+	return OSProfilerSetting.OPEN_SEARCH_PROFILER_TYPE;
     }
 
     @Override

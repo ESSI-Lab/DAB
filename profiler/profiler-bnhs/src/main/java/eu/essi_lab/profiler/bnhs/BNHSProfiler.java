@@ -25,11 +25,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.slf4j.Logger;
-
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.jaxb.csw._2_0_2.ExceptionCode;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
@@ -43,24 +39,8 @@ import eu.essi_lab.pdk.handler.selector.HandlerSelector;
 /**
  * @author boldrini
  */
-public class BNHSProfiler extends Profiler {
+public class BNHSProfiler extends Profiler<BNHSProfilerSetting> {
 
-    public static final String BNHS_PROFILER_TYPE = "BNHS";
-
-    /**
-     * BNHS service info
-     */
-    public static final ProfilerSetting BNHS_SERVICE_INFO = new ProfilerSetting();
-
-    
-    private Logger logger = GSLoggerFactory.getLogger(getClass());
-
-    static {
-	BNHS_SERVICE_INFO.setServiceName("BNHS Service");
-	BNHS_SERVICE_INFO.setServiceType(BNHS_PROFILER_TYPE);
-	BNHS_SERVICE_INFO.setServicePath("bnhs");
-	BNHS_SERVICE_INFO.setServiceVersion("1.0.0");
-    }
 
     public BNHSProfiler() {
 
@@ -128,9 +108,9 @@ public class BNHSProfiler extends Profiler {
     }
 
     @Override
-    protected ProfilerSetting initSetting() {
+    protected BNHSProfilerSetting initSetting() {
 
-	return BNHS_SERVICE_INFO;
+	return new BNHSProfilerSetting();
     }
 
     @Override

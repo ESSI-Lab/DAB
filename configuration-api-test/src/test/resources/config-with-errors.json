@@ -1122,7 +1122,7 @@
                     },
                     "compactMode": false,
                     "editable": false,
-                    "settingClass": "eu.essi_lab.accessor.gbif.harvested.GBIFHarvestedConnectorSetting",
+                    "settingClass": "eu.essi_lab.profiler.gbif.harvested.GBIFHarvestedConnectorSetting",
                     "pageSize": {
                         "canBeDisabled": false,
                         "values": [50],
@@ -1250,7 +1250,7 @@
                     },
                     "compactMode": false,
                     "editable": false,
-                    "settingClass": "eu.essi_lab.accessor.gbif.distributed.GBIFDistributedConnectorSetting",
+                    "settingClass": "eu.essi_lab.profiler.gbif.distributed.GBIFDistributedConnectorSetting",
                     "type": "setting",
                     "configurableType": "GBIFDistributedConnector",
                     "settingId": "GBIFDistributedConnector",
@@ -1757,7 +1757,7 @@
                         "key": "cswConnectorType",
                         "required": true
                     },
-                    "settingClass": "eu.essi_lab.accessor.csw.CSWConnectorWrapperSetting",
+                    "settingClass": "eu.essi_lab.profiler.csw.CSWConnectorWrapperSetting",
                     "pageSize": {
                         "canBeDisabled": false,
                         "values": [50],
@@ -2001,7 +2001,7 @@
                         "key": "cswConnectorType",
                         "required": true
                     },
-                    "settingClass": "eu.essi_lab.accessor.csw.CSWConnectorWrapperSetting",
+                    "settingClass": "eu.essi_lab.profiler.csw.CSWConnectorWrapperSetting",
                     "pageSize": {
                         "canBeDisabled": false,
                         "values": [50],
@@ -2245,7 +2245,7 @@
                         "key": "cswConnectorType",
                         "required": true
                     },
-                    "settingClass": "eu.essi_lab.accessor.csw.CSWConnectorWrapperSetting",
+                    "settingClass": "eu.essi_lab.profiler.csw.CSWConnectorWrapperSetting",
                     "pageSize": {
                         "canBeDisabled": false,
                         "values": [50],
@@ -2807,7 +2807,7 @@
                     },
                     "compactMode": false,
                     "editable": false,
-                    "settingClass": "eu.essi_lab.accessor.wms.WMSConnectorWrapperSetting",
+                    "settingClass": "eu.essi_lab.profiler.wms.WMSConnectorWrapperSetting",
                     "pageSize": {
                         "canBeDisabled": false,
                         "values": [100],
@@ -3051,7 +3051,7 @@
                     },
                     "compactMode": false,
                     "editable": false,
-                    "settingClass": "eu.essi_lab.accessor.wms.WMSConnectorWrapperSetting",
+                    "settingClass": "eu.essi_lab.profiler.wms.WMSConnectorWrapperSetting",
                     "pageSize": {
                         "canBeDisabled": false,
                         "values": [100],
@@ -3295,7 +3295,7 @@
                     },
                     "compactMode": false,
                     "editable": false,
-                    "settingClass": "eu.essi_lab.accessor.wms.WMSConnectorWrapperSetting",
+                    "settingClass": "eu.essi_lab.profiler.wms.WMSConnectorWrapperSetting",
                     "pageSize": {
                         "canBeDisabled": false,
                         "values": [100],
@@ -3438,7 +3438,7 @@
                     },
                     "compactMode": false,
                     "editable": false,
-                    "settingClass": "eu.essi_lab.accessor.waf.ecovlab.ECOPotentialVlabConnectorSetting",
+                    "settingClass": "eu.essi_lab.profiler.waf.ecovlab.ECOPotentialVlabConnectorSetting",
                     "pageSize": {
                         "canBeDisabled": false,
                         "values": [100],
@@ -3778,7 +3778,7 @@
                     },
                     "compactMode": false,
                     "editable": false,
-                    "settingClass": "eu.essi_lab.accessor.wfs.WFSConnectorWrapperSetting",
+                    "settingClass": "eu.essi_lab.profiler.wfs.WFSConnectorWrapperSetting",
                     "pageSize": {
                         "canBeDisabled": false,
                         "values": [100],
@@ -3914,7 +3914,7 @@
                     },
                     "compactMode": false,
                     "editable": false,
-                    "settingClass": "eu.essi_lab.accessor.iris.station.IRISStationConnectorSetting",
+                    "settingClass": "eu.essi_lab.profiler.iris.station.IRISStationConnectorSetting",
                     "pageSize": {
                         "canBeDisabled": false,
                         "values": [100],
@@ -4145,7 +4145,7 @@
                     },
                     "compactMode": false,
                     "editable": false,
-                    "settingClass": "eu.essi_lab.accessor.egaskro.EGASKROConnectorSetting",
+                    "settingClass": "eu.essi_lab.profiler.egaskro.EGASKROConnectorSetting",
                     "pageSize": {
                         "canBeDisabled": false,
                         "values": [100],

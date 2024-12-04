@@ -25,7 +25,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
@@ -39,15 +38,7 @@ import eu.essi_lab.pdk.handler.selector.POSTRequestFilter;
 /**
  * @author boldrini
  */
-public class ARPARestProfiler extends Profiler {
-
-    public static final ProfilerSetting ARPA_REST_SERVICE_INFO = new ProfilerSetting();
-    static {
-	ARPA_REST_SERVICE_INFO.setServiceName("ARPA-REST");
-	ARPA_REST_SERVICE_INFO.setServiceType("ARPA-REST");
-	ARPA_REST_SERVICE_INFO.setServicePath("arpa-rest");
-	ARPA_REST_SERVICE_INFO.setServiceVersion("1.0.0");
-    }
+public class ARPARestProfiler extends Profiler<ARPARestProfilerSetting> {
 
     @Override
     public HandlerSelector getSelector(WebRequest request) {
@@ -115,8 +106,8 @@ public class ARPARestProfiler extends Profiler {
     }
 
     @Override
-    protected ProfilerSetting initSetting() {
+    protected ARPARestProfilerSetting initSetting() {
 
-	return ARPA_REST_SERVICE_INFO;
+	return new ARPARestProfilerSetting();
     }
 }

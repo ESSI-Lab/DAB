@@ -72,7 +72,7 @@ public class PubSubRequestTransformer extends DiscoveryRequestTransformer {
     @Override
     public String getProfilerType() {
 
-	return PubSubProfiler.PUB_SUB_PROFILER_TYPE;
+	return new PubSubProfilerSetting().getServiceType();
     }
 
     @Override
@@ -116,20 +116,18 @@ public class PubSubRequestTransformer extends DiscoveryRequestTransformer {
 
 	if (!ts.equals("")) {
 
-	    andBond.getOperands()
-		    .add(BondFactory.createSimpleValueBond(//
-			    BondOperator.GREATER_OR_EQUAL, //
-			    MetadataElement.TEMP_EXTENT_BEGIN, //
-			    ts));//
+	    andBond.getOperands().add(BondFactory.createSimpleValueBond(//
+		    BondOperator.GREATER_OR_EQUAL, //
+		    MetadataElement.TEMP_EXTENT_BEGIN, //
+		    ts));//
 	}
 
 	if (!te.equals("")) {
 
-	    andBond.getOperands()
-		    .add(BondFactory.createSimpleValueBond(//
-			    BondOperator.LESS_OR_EQUAL, //
-			    MetadataElement.TEMP_EXTENT_END, //
-			    te));//
+	    andBond.getOperands().add(BondFactory.createSimpleValueBond(//
+		    BondOperator.LESS_OR_EQUAL, //
+		    MetadataElement.TEMP_EXTENT_END, //
+		    te));//
 	}
 
 	if (!bbox.equals("")) {
@@ -150,20 +148,18 @@ public class PubSubRequestTransformer extends DiscoveryRequestTransformer {
 
 	if (!kwd.equals("")) {
 
-	    andBond.getOperands()
-		    .add(BondFactory.createSimpleValueBond(//
-			    BondOperator.EQUAL, //
-			    MetadataElement.KEYWORD, //
-			    kwd));//
+	    andBond.getOperands().add(BondFactory.createSimpleValueBond(//
+		    BondOperator.EQUAL, //
+		    MetadataElement.KEYWORD, //
+		    kwd));//
 	}
 
 	if (!parents.equals("")) {
 
-	    andBond.getOperands()
-		    .add(BondFactory.createSimpleValueBond(//
-			    BondOperator.EQUAL, //
-			    MetadataElement.PARENT_IDENTIFIER, //
-			    parents));//
+	    andBond.getOperands().add(BondFactory.createSimpleValueBond(//
+		    BondOperator.EQUAL, //
+		    MetadataElement.PARENT_IDENTIFIER, //
+		    parents));//
 	}
 
 	if (!sources.equals("")) {

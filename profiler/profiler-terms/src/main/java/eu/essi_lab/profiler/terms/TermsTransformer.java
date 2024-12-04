@@ -153,7 +153,7 @@ public class TermsTransformer extends DiscoveryRequestTransformer {
     @Override
     public String getProfilerType() {
 
-	return TermsProfiler.TERMS_INFO.getServiceType();
+	return new TermsProfilerSetting().getServiceType();
     }
 
 }

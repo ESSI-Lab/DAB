@@ -72,7 +72,10 @@ public class SettingPutDialog extends SettingPutOrEditDialog {
 
 	// SettingHelper.expand(settingToAdd);
 
-	Component settingToAddComponent = createSettingToAddOrEditComponent(configuration, this.settingToAdd, dialogHeight);
+	Component settingToAddComponent = createSettingToAddOrEditComponent(//
+		configuration,//
+		this.settingToAdd,//
+		dialogHeight);
 
 	setContent(settingToAddComponent);
     }

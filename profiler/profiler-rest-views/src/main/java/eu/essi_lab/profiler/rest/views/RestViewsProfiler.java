@@ -25,7 +25,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
@@ -40,15 +39,7 @@ import eu.essi_lab.pdk.handler.selector.PUTRequestFilter;
 /**
  * @author boldrini
  */
-public class RestViewsProfiler extends Profiler {
-
-    public static final ProfilerSetting REST_VIEWS_SERVICE_INFO = new ProfilerSetting();
-    static {
-	REST_VIEWS_SERVICE_INFO.setServiceName("REST-VIEWS");
-	REST_VIEWS_SERVICE_INFO.setServiceType("REST-VIEWS");
-	REST_VIEWS_SERVICE_INFO.setServicePath("rest-views");
-	REST_VIEWS_SERVICE_INFO.setServiceVersion("1.0.0");
-    }
+public class RestViewsProfiler extends Profiler<RestViewsProfilerSetting> {
 
     @Override
     public HandlerSelector getSelector(WebRequest request) {
@@ -125,8 +116,8 @@ public class RestViewsProfiler extends Profiler {
     }
 
     @Override
-    protected ProfilerSetting initSetting() {
+    protected RestViewsProfilerSetting initSetting() {
 
-	return REST_VIEWS_SERVICE_INFO;
+	return new RestViewsProfilerSetting();
     }
 }

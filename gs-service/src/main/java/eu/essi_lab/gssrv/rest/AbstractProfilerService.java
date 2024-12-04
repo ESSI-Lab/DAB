@@ -22,7 +22,6 @@ package eu.essi_lab.gssrv.rest;
  */
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,12 +33,14 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.JSONObject;
 
+import eu.essi_lab.cfga.Configurable;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.lib.utils.Chronometer.TimeFormat;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.pluggable.PluginsLoader;
 import eu.essi_lab.pdk.ChronometerInfoProvider;
 import eu.essi_lab.pdk.Profiler;
 import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
@@ -50,13 +51,9 @@ import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
  *
  * @author Fabrizio
  * @see Profiler
- * @see ProfilerFilter
+ * @see ProfilerSettingFilter
  */
 public abstract class AbstractProfilerService {
-
-    public static final String NO_PROFILER = "NO_PROFILER";
-    private static final String PROFILER_SERVE_ERROR = "PROFILER_SERVE_ERROR";
-    private static final String PROFILER_SERVICE_SERVLET_REQUEST_ERROR = "PROFILER_SERVICE_SERVLET_REQUEST_ERROR";
 
     /**
      * Creates a {@link WebRequest} from the given arguments, selects the suitable {@link Profiler} basing on
@@ -68,12 +65,13 @@ public abstract class AbstractProfilerService {
      * @param uriInfo
      * @return
      */
-    protected Response serve(ProfilerFilter strategy, HttpServletRequest httpServletRequest, UriInfo uriInfo) {
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    protected Response serve(ProfilerSettingFilter strategy, HttpServletRequest httpServletRequest, UriInfo uriInfo) {
 
 	ChronometerInfoProvider chronometer = new ChronometerInfoProvider(TimeFormat.MIN_SEC_MLS);
 	chronometer.start();
 
-	Optional<Profiler> profiler = null;
+	Optional<Profiler> optProfiler = Optional.empty();
 	Response response = null;
 
 	WebRequest webRequest = new WebRequest(Thread.currentThread().getName());
@@ -91,34 +89,67 @@ public abstract class AbstractProfilerService {
 		    getClass(), //
 		    ErrorInfo.ERRORTYPE_INTERNAL, //
 		    ErrorInfo.SEVERITY_ERROR, //
-		    PROFILER_SERVICE_SERVLET_REQUEST_ERROR, //
+		    "ServletRequestError", //
 		    thr);
 	}
 
 	if (ex == null) {
 
-	    PluginsLoader<Profiler> pluginsLoader = new PluginsLoader<>();
-	    List<Profiler> profilers = pluginsLoader.loadPlugins(Profiler.class);
+	    Optional<ProfilerSetting> profilerSetting = ConfigurationWrapper.//
+		    getProfilerSettings().//
+		    stream().//
+		    filter(strategy::accept).//
+		    findFirst();
 
-	    profiler = profilers.stream().filter(strategy::accept).findFirst();
+	    if (profilerSetting.isPresent()) {
 
-	    if (!profiler.isPresent()) {
+		try {
+		    
+		    optProfiler = Optional.of(profilerSetting.get().createConfigurable());
 
-		ex = GSException.createException(//
-			getClass(), //
-			"No profiler listening at this URL: " + uriInfo.getPath(), //
-			"No service listening at this URL: " + uriInfo.getPath(), //
-			ErrorInfo.ERRORTYPE_INTERNAL, //
-			ErrorInfo.SEVERITY_FATAL, //
-			NO_PROFILER);
+		} catch (Exception e) {
+
+		    ex = GSException.createException(//
+			    getClass(), //
+			    ErrorInfo.ERRORTYPE_INTERNAL, //
+			    ErrorInfo.SEVERITY_ERROR, //
+			    "ProfilerConfigurableCreationError", //
+			    e);
+		}
+	    }
+
+	    if (optProfiler.isEmpty()) {
+
+		if (ex == null) {
+
+		    ex = GSException.createException(//
+			    getClass(), //
+			    "No profiler listening at this URL: " + uriInfo.getPath(), //
+			    "No service listening at this URL: " + uriInfo.getPath(), //
+			    ErrorInfo.ERRORTYPE_INTERNAL, //
+			    ErrorInfo.SEVERITY_FATAL, //
+			    "NoProfilerListeningError");
+		}
 	    } else {
 
-		webRequest.setProfilerName(profiler.get().getName());
-		webRequest.setProfilerPath(profiler.get().getSetting().getServicePath());
+		Profiler profiler = optProfiler.get();
+
+		webRequest.setProfilerName(profiler.getName());
+		webRequest.setProfilerPath(profiler.getSetting().getServicePath());
 
 		try {
 
-		    response = profiler.get().handle(webRequest);
+		    //
+		    // configures the profiler
+		    //
+
+		    profiler.configure(profilerSetting.get());
+
+		    //
+		    // handles the request
+		    //
+
+		    response = profiler.handle(webRequest);
 
 		} catch (GSException gsEx) {
 
@@ -130,7 +161,7 @@ public abstract class AbstractProfilerService {
 			    getClass(), //
 			    ErrorInfo.ERRORTYPE_INTERNAL, //
 			    ErrorInfo.SEVERITY_ERROR, //
-			    PROFILER_SERVE_ERROR, //
+			    "ProfilerServeError", //
 			    thr);
 		}
 	    }
@@ -152,9 +183,10 @@ public abstract class AbstractProfilerService {
 		}
 	    });
 
-	    if (profiler.isPresent()) {
+	    if (optProfiler.isPresent()) {
 
-		response = profiler.get().createUncaughtError(webRequest, Status.INTERNAL_SERVER_ERROR, ExceptionUtils.getStackTrace(ex));
+		response = optProfiler.get().createUncaughtError(webRequest, Status.INTERNAL_SERVER_ERROR,
+			ExceptionUtils.getStackTrace(ex));
 
 	    } else {
 

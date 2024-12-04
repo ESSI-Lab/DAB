@@ -27,7 +27,6 @@ import javax.ws.rs.core.Response.Status;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.jaxb.common.CommonContext;
 import eu.essi_lab.jaxb.oaipmh.OAIPMHerrorType;
 import eu.essi_lab.jaxb.oaipmh.OAIPMHerrorcodeType;
@@ -51,21 +50,9 @@ import eu.essi_lab.profiler.oaipmh.handler.srvinfo.OAIPMHListSetsHandler;
 /**
  * @author Fabrizio
  */
-public class OAIPMHProfiler extends Profiler {
+public class OAIPMHProfiler<OAIPS extends OAIPMHProfilerSetting> extends Profiler<OAIPMHProfilerSetting> {
 
-    /**
-     * The OAI-PMH profiler type
-     */
-    public static final String OAI_PMH_PROFILER_TYPE = "OAI-PMH";
     public static final String SCHEMA_LOCATION = "http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd";
-
-    public static final ProfilerSetting OAIPMH_SERVICE_INFO = new ProfilerSetting();
-    static {
-	OAIPMH_SERVICE_INFO.setServiceName("OAI-PMH");
-	OAIPMH_SERVICE_INFO.setServiceType(OAI_PMH_PROFILER_TYPE);
-	OAIPMH_SERVICE_INFO.setServicePath("oaipmh");
-	OAIPMH_SERVICE_INFO.setServiceVersion("1.0.0");
-    }
 
     public OAIPMHProfiler() {
     }
@@ -187,8 +174,8 @@ public class OAIPMHProfiler extends Profiler {
     }
 
     @Override
-    protected ProfilerSetting initSetting() {
+    protected OAIPMHProfilerSetting initSetting() {
 
-	return OAIPMH_SERVICE_INFO;
+	return new OAIPMHProfilerSetting();
     }
 }

@@ -183,13 +183,16 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	}
 
 	//
+	// set the grid height according to the screen height and the presence 
+	// or not of the columns hider
 	//
-	//
+
+	int offset = gridInfo.isShowColumnsHider() ? 440 : 370;
 
 	UI.getCurrent().getPage().retrieveExtendedClientDetails(receiver -> {
 
 	    int screenHeight = receiver.getScreenHeight();
-	    setHeight(screenHeight - 420, Unit.PIXELS);
+	    setHeight(screenHeight - offset, Unit.PIXELS);
 	});
 
 	getStyle().set("font-size", "14px");
@@ -264,10 +267,12 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	    if (descriptor.getColumnWidth() > 0) {
 
 		column.setWidth(descriptor.getColumnWidth() + "px");
+		column.setFlexGrow(0);
 
 	    } else {
 
-		column.setAutoWidth(true);
+		// column.setAutoWidth(true);
+		column.setFlexGrow(1);
 	    }
 
 	    if (descriptor.isFiltered() || descriptor.getRenderer().isPresent()) {

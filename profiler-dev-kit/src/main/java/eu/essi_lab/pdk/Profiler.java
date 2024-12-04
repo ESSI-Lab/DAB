@@ -233,11 +233,9 @@ import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
  *
  * @author Fabrizio
  */
-public abstract class Profiler implements Configurable<ProfilerSetting>, WebRequestHandler, Pluggable, RuntimeInfoProvider {
+public abstract class Profiler<PS extends ProfilerSetting> implements Configurable<PS>, WebRequestHandler, Pluggable, RuntimeInfoProvider {
 
-    private static final String NO_VALIDATOR_FOUND = "NO_VALIDATOR_FOUND";
-
-    private ProfilerSetting setting;
+    private PS setting;
 
     //
     //
@@ -272,6 +270,7 @@ public abstract class Profiler implements Configurable<ProfilerSetting>, WebRequ
      * Creates a new instance of <code>Profiler</code>
      */
     public Profiler() {
+	
 	configure(initSetting());
     }
 
@@ -288,13 +287,13 @@ public abstract class Profiler implements Configurable<ProfilerSetting>, WebRequ
      *
      * @return a non <code>null</code> {@link ProfilerSetting}
      */
-    protected abstract ProfilerSetting initSetting();
+    protected abstract PS initSetting();
 
     /**
      * @param setting
      */
     @Override
-    public void configure(ProfilerSetting setting) {
+    public void configure(PS setting) {
 
 	this.setting = setting;
     }
@@ -302,7 +301,7 @@ public abstract class Profiler implements Configurable<ProfilerSetting>, WebRequ
     /**
      * @return
      */
-    public ProfilerSetting getSetting() {
+    public PS getSetting() {
 
 	return setting;
     }

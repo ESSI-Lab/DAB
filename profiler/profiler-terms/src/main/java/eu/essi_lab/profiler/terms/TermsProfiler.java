@@ -30,7 +30,6 @@ import javax.ws.rs.core.Response.Status;
 
 import org.json.JSONObject;
 
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.jaxb.csw._2_0_2.ExceptionCode;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.web.WebRequest;
@@ -44,20 +43,7 @@ import eu.essi_lab.pdk.handler.selector.HandlerSelector;
  * 
  * @author boldrini
  */
-public class TermsProfiler extends Profiler {
-
-    /**
-     * The profiler type
-     */
-    private static final String TERMS_PROFILER_TYPE = "TERMS";
-
-    public static final ProfilerSetting TERMS_INFO = new ProfilerSetting();
-    static {
-	TERMS_INFO.setServiceName("TERMS API");
-	TERMS_INFO.setServiceType(TERMS_PROFILER_TYPE);
-	TERMS_INFO.setServicePath("terms-api");
-	TERMS_INFO.setServiceVersion("1.0");
-    }
+public class TermsProfiler extends Profiler<TermsProfilerSetting> {
 
     protected static final List<String> SUPPORTED_VERSIONS = new ArrayList<>();
 
@@ -74,15 +60,11 @@ public class TermsProfiler extends Profiler {
 
 	HandlerSelector selector = new HandlerSelector();
 
-
 	////////////////////
 	// FEATURES
 	////////////////////
 	selector.register(new TermsFilter(), new TermsHandler());
-	
-	
 
-	
 	return selector;
     }
 
@@ -93,7 +75,6 @@ public class TermsProfiler extends Profiler {
 	vm.setErrorCode(ExceptionCode.NO_APPLICABLE_CODE.toString());
 	return onValidationFailed(null, vm);
     }
-
 
     @Override
     protected Response onValidationFailed(WebRequest request, ValidationMessage validationMessage) {
@@ -129,9 +110,9 @@ public class TermsProfiler extends Profiler {
     }
 
     @Override
-    protected ProfilerSetting initSetting() {
+    protected TermsProfilerSetting initSetting() {
 
-	return TERMS_INFO;
+	return new TermsProfilerSetting();
     }
 
 }

@@ -30,7 +30,6 @@ import javax.ws.rs.core.Response.Status;
 
 import org.json.JSONObject;
 
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.jaxb.csw._2_0_2.ExceptionCode;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.web.WebRequest;
@@ -48,22 +47,9 @@ import eu.essi_lab.profiler.worldcereal.handler.discover.WorldCerealHandler;
  * 
  * @author boldrini
  */
-public class WorldCerealProfiler extends Profiler {
+public class WorldCerealProfiler extends Profiler<WorldCerealProfilerSetting> {
 
-    /**
-     * The profiler type
-     */
-    private static final String WORLDCEREAL_PROFILER_TYPE = "WORLDCEREAL";
-
-    public static final ProfilerSetting WORLDCEREAL_INFO = new ProfilerSetting();
-    
     private DiscoveryHandler<String> discoveryHandler;
-    static {
-	WORLDCEREAL_INFO.setServiceName("WORLDCEREAL");
-	WORLDCEREAL_INFO.setServiceType(WORLDCEREAL_PROFILER_TYPE);
-	WORLDCEREAL_INFO.setServicePath("worldcereal");
-	WORLDCEREAL_INFO.setServiceVersion("1.0");
-    }
 
     protected static final List<String> SUPPORTED_VERSIONS = new ArrayList<>();
 
@@ -80,15 +66,12 @@ public class WorldCerealProfiler extends Profiler {
     public HandlerSelector getSelector(WebRequest request) {
 
 	HandlerSelector selector = new HandlerSelector();
-	
-	
+
 	discoveryHandler = new WorldCerealHandler();
 	discoveryHandler.setRequestTransformer(new OSRequestTransformer());
 
 	selector.register(new GETRequestFilter("worldcereal/query"), discoveryHandler);
-	
-	
-	
+
 	return selector;
     }
 
@@ -99,7 +82,6 @@ public class WorldCerealProfiler extends Profiler {
 	vm.setErrorCode(ExceptionCode.NO_APPLICABLE_CODE.toString());
 	return onValidationFailed(null, vm);
     }
-
 
     @Override
     protected Response onValidationFailed(WebRequest request, ValidationMessage validationMessage) {
@@ -135,9 +117,9 @@ public class WorldCerealProfiler extends Profiler {
     }
 
     @Override
-    protected ProfilerSetting initSetting() {
+    protected WorldCerealProfilerSetting initSetting() {
 
-	return WORLDCEREAL_INFO;
+	return new WorldCerealProfilerSetting();
     }
 
 }

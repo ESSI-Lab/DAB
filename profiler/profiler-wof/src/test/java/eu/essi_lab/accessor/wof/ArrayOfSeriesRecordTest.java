@@ -7,7 +7,7 @@ import java.io.InputStream;
 import org.apache.cxf.helpers.IOUtils;
 import org.junit.Test;
 
-import eu.essi_lab.accessor.wof.info.datamodel.ArrayOfSeriesRecord;
+import eu.essi_lab.profiler.wof.info.datamodel.ArrayOfSeriesRecord;
 
 public class ArrayOfSeriesRecordTest {
     @Test

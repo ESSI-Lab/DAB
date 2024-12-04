@@ -135,7 +135,7 @@ public class HydroCSVRequestTransformer extends DiscoveryRequestTransformer {
 
     @Override
     public String getProfilerType() {
-	return HydroCSVProfiler.ARPA_HYDROCSV_PROFILER_TYPE;
+	return HydroCSVProfilerSetting.ARPA_HYDROCSV_PROFILER_TYPE;
     }
 
     @Override

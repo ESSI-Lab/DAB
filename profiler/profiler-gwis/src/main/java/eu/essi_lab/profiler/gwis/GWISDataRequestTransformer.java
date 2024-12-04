@@ -134,7 +134,7 @@ public class GWISDataRequestTransformer extends AccessRequestTransformer {
 
 	discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
 	discoveryMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
-	
+
 	discoveryMessage.setResultsPriority(ResultsPriority.ALL);
 
 	SimpleValueBond bond1 = BondFactory.createSimpleValueBond(//
@@ -259,7 +259,7 @@ public class GWISDataRequestTransformer extends AccessRequestTransformer {
     @Override
     public String getProfilerType() {
 
-	return GWISProfiler.GWIS_INFO.getServiceType();
+	return new GWISProfilerSetting().getServiceType();
     }
 
     @Override

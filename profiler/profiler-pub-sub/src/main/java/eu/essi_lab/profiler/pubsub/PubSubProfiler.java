@@ -24,7 +24,6 @@ package eu.essi_lab.profiler.pubsub;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
@@ -39,33 +38,23 @@ import eu.essi_lab.profiler.pubsub.handler.UnsubscribeHandler;
 /**
  * @author Fabrizio
  */
-public class PubSubProfiler extends Profiler {
-
-    static final String PUB_SUB_PROFILER_TYPE = "PUB-SUB";
-
-    public static final ProfilerSetting PUB_SUB_SERVICE_INFO = new ProfilerSetting();
-    static {
-	PUB_SUB_SERVICE_INFO.setServiceName("PubSub");
-	PUB_SUB_SERVICE_INFO.setServiceType(PUB_SUB_PROFILER_TYPE);
-	PUB_SUB_SERVICE_INFO.setServicePath("pubsub");
-	PUB_SUB_SERVICE_INFO.setServiceVersion("1.0.0");
-    }
+public class PubSubProfiler extends Profiler<PubSubProfilerSetting> {
 
     @Override
     public HandlerSelector getSelector(WebRequest request) {
 
 	HandlerSelector selector = new HandlerSelector();
-	selector.register(new GETRequestFilter(PUB_SUB_SERVICE_INFO.getServicePath() + "/subscribe"), new SubscribeHandler());
-	selector.register(new GETRequestFilter(PUB_SUB_SERVICE_INFO.getServicePath() + "/unsubscribe"), new UnsubscribeHandler());
-	selector.register(new GETRequestFilter(PUB_SUB_SERVICE_INFO.getServicePath() + "/subscriptions"), new SubscriptionsHandler());
+	selector.register(new GETRequestFilter(getSetting().getServicePath() + "/subscribe"), new SubscribeHandler());
+	selector.register(new GETRequestFilter(getSetting().getServicePath() + "/unsubscribe"), new UnsubscribeHandler());
+	selector.register(new GETRequestFilter(getSetting().getServicePath() + "/subscriptions"), new SubscriptionsHandler());
 
 	return selector;
     }
 
     @Override
-    protected ProfilerSetting initSetting() {
+    protected PubSubProfilerSetting initSetting() {
 
-	return PUB_SUB_SERVICE_INFO;
+	return new PubSubProfilerSetting();
     }
 
     @Override

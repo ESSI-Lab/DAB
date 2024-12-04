@@ -46,7 +46,6 @@ import com.esri.arcgis.protobuf.FeatureCollection;
 import com.esri.arcgis.protobuf.FeatureCollection.FeatureCollectionPBuffer;
 import com.esri.arcgis.protobuf.FeatureCollection.FeatureCollectionPBuffer.Feature;
 import com.esri.arcgis.protobuf.FeatureCollection.FeatureCollectionPBuffer.FeatureResult;
-import com.esri.arcgis.protobuf.FeatureCollection.FeatureCollectionPBuffer.FieldType;
 import com.esri.arcgis.protobuf.FeatureCollection.FeatureCollectionPBuffer.FeatureResult.Builder;
 import com.esri.arcgis.protobuf.FeatureCollection.FeatureCollectionPBuffer.Geometry;
 import com.esri.arcgis.protobuf.FeatureCollection.FeatureCollectionPBuffer.QueryResult;
@@ -76,7 +75,6 @@ import eu.essi_lab.pdk.rsf.FormattingEncoding;
 import eu.essi_lab.profiler.esri.feature.ESRIFieldType;
 import eu.essi_lab.profiler.esri.feature.FeatureLayer;
 import eu.essi_lab.profiler.esri.feature.Field;
-import eu.essi_lab.profiler.esri.pbf.PBFEncoder;
 
 /**
  * @author boldrini

@@ -13,6 +13,7 @@ import org.mockito.Mockito;
 
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.profiler.wof.wsdl.HISCentralWSDLHandler;
 
 public class HISCentralWSDLHandlerTest {
     
