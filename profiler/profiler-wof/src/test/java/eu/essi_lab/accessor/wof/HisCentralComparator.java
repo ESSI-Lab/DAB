@@ -87,7 +87,7 @@ public class HisCentralComparator {
 			msg += "Different variables: " + variables2 + " instead of " + variables + "\n";
 		    }
 		    if (differentValues) {
-			// msg += "Different values: " + values2 + " instead of " + values + "\n";
+			 msg += "Different values: " + values2 + " instead of " + values + "\n";
 		    }
 		    msg += "\n";
 		    if (differentSites) {
