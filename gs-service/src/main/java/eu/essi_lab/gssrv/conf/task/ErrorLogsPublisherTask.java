@@ -45,6 +45,7 @@ import com.google.common.base.Charsets;
 
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
+import eu.essi_lab.configuration.ClusterType;
 import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.gssrv.starter.GIPStarter;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
@@ -111,7 +112,7 @@ public class ErrorLogsPublisherTask extends AbstractCustomTask implements ErrorL
 
 		    GSLoggerFactory.getLogger(getClass()).warn("Creating error log file: " + logFile.getAbsolutePath());
 
-		    newLog = "- Cluster: [" + GIPStarter.getCluster() + "]\n" + //
+		    newLog = "- Cluster: [" + ClusterType.get().getLabel() + "]\n" + //
 			    "- Execution mode: [" + ExecutionMode.get() + "]\n\n" + newLog;
 
 		    writeLogFile(manager, logFile, newLog);

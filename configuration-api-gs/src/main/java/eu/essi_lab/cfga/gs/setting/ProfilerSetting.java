@@ -5,12 +5,7 @@ package eu.essi_lab.cfga.gs.setting;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
-
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
 
 /*-
  * #%L
@@ -40,7 +35,6 @@ import eu.essi_lab.cfga.gs.setting.menuitems.ProfilerStateOfflineItemHandler;
 import eu.essi_lab.cfga.gs.setting.menuitems.ProfilerStateOnlineItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
-import eu.essi_lab.cfga.gui.components.grid.renderer.IconColumnRenderer;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
@@ -199,35 +193,7 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 
 				    (item1, item2) -> item1.get("State").compareTo(item2.get("State")), //
 
-				    new IconColumnRenderer() {
-
-					/**
-					 * 
-					 */
-					private static final long serialVersionUID = -5355241303442699327L;
-
-					@Override
-					protected Icon createIcon(HashMap<String, String> item) {
-
-					    return item.get("State").equals("Online") ? VaadinIcon.SIGNAL.create()
-						    : VaadinIcon.BAN.create();
-					}
-
-					@Override
-					protected Optional<String> getToolTip(HashMap<String, String> item) {
-
-					    String status = item.get("State");
-					    switch (status) {
-
-					    case "Online":
-					    case "Offline":
-
-						return Optional.of(status);
-					    }
-
-					    return Optional.empty();
-					}
-				    }), //
+				    new ProfilerStateColumnRenderer()), //
 
 			    ColumnDescriptor.create("Path", 200, true, true, (s) -> getServicePath(s)), //
 
@@ -235,7 +201,7 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 
 			    ColumnDescriptor.create("Version", true, true, (s) -> getServiceVersion(s)) //
 
-		    ), getItemsList(), com.vaadin.flow.component.grid.Grid.SelectionMode.MULTI, false).//
+		    ), getItemsList(), com.vaadin.flow.component.grid.Grid.SelectionMode.MULTI).//
 
 		    build();
 

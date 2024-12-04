@@ -1,5 +1,7 @@
 package eu.essi_lab.cfga.gui.components;
 
+import java.util.ArrayList;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -33,6 +35,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.tabs.TabSheet;
 
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gui.ConfigurationView;
@@ -61,6 +64,15 @@ public class TabContainer extends VerticalLayout {
     private Configuration configuration;
     private boolean rendered;
     private ConfigurationView view;
+    private List<Component> legends;
+
+    /**
+     *
+     */
+    public TabContainer() {
+
+	legends = new ArrayList<Component>();
+    }
 
     /**
      * 
@@ -80,9 +92,9 @@ public class TabContainer extends VerticalLayout {
 
 	boolean readOnly = componentInfo.isForceReadOnlySet();
 
-	if (tabInfo.isReloadable()) {
+	HorizontalLayout headerLayout = findHeader();
 
-	    HorizontalLayout headerLayout = findHeader();
+	if (tabInfo.isReloadable()) {
 
 	    if (addReloadButton(headerLayout)) {
 
@@ -119,12 +131,28 @@ public class TabContainer extends VerticalLayout {
 
 	    Optional<GridInfo> gridInfo = tabInfo.getGridInfo();
 
-	    GridComponent gridComponent = new GridComponent(gridInfo.get(), settings, configuration, this, readOnly, refresh);
+	    GridComponent gridComponent = new GridComponent(//
+		    gridInfo.get(), //
+		    settings, //
+		    configuration, //
+		    this, //
+		    readOnly, //
+		    refresh);
+
+	    TabSheet tabSheet = new TabSheet();
+	    tabSheet.getStyle().set("border-bottom", "1px solid #d3d3d39e");
 
 	    if (tabInfo.getGridInfo().get().isShowColumnsHider()) {
 
-		add(gridComponent.createColumnsHider());
+		tabSheet.add("Columns", gridComponent.createColumnsHider());
 	    }
+
+	    if (!legends.isEmpty()) {
+
+		tabSheet.add("Legend", gridComponent.createLegendsViewer(legends));
+	    }
+
+	    add(tabSheet);
 
 	    add(gridComponent);
 
@@ -192,6 +220,15 @@ public class TabContainer extends VerticalLayout {
 
 	    this.grid = (GridComponent) components[0];
 	}
+    }
+
+    /**
+     * @param legend
+     * @return
+     */
+    public void addLegend(Component legend) {
+
+	legends.add(legend);
     }
 
     /**

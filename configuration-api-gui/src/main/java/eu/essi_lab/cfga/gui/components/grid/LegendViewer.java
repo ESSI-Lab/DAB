@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.cfga.gui.components.grid.renderer;
+package eu.essi_lab.cfga.gui.components.grid;
 
 /*-
  * #%L
@@ -24,38 +24,26 @@ package eu.essi_lab.cfga.gui.components.grid.renderer;
  * #L%
  */
 
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.List;
 
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 
 /**
  * @author Fabrizio
  */
-public abstract class GridColumnRenderer<C extends Component> extends ComponentRenderer<C, HashMap<String, String>> {
+@SuppressWarnings("serial")
+public class LegendViewer extends HorizontalLayout {
 
     /**
      * 
      */
-    private static final long serialVersionUID = -6816629717419845396L;
+    public LegendViewer(GridComponent grid, List<Component> legends) {
 
-    /**
-    * 
-    */
-    public GridColumnRenderer() {
+	setMargin(false);
+	setSpacing(false);
+	setHeight("30px");
 
+	legends.forEach(leg -> add(leg));
     }
-
-    /**
-     * @return
-     */
-    public Optional<Component> getLegend() {
-
-	return Optional.empty();
-    }
-
-    @Override
-    public abstract C createComponent(HashMap<String, String> item);
-
 }

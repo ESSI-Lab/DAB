@@ -39,8 +39,8 @@ import com.indeed.status.core.CheckStatus;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.ConfiguredGmailClient;
+import eu.essi_lab.configuration.ClusterType;
 import eu.essi_lab.configuration.ExecutionMode;
-import eu.essi_lab.gssrv.starter.GIPStarter;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
@@ -159,7 +159,7 @@ public class HealthCheck {
 	jsonGenerator.flush();
 
 	JSONObject jsonReport = new JSONObject(jsonWriter.toString());
-	jsonReport.put("cluster", GIPStarter.getCluster());
+	jsonReport.put("cluster", ClusterType.get().getLabel());
 	jsonReport.put("executionMode", ExecutionMode.get());
 
 	return jsonReport.toString(3);

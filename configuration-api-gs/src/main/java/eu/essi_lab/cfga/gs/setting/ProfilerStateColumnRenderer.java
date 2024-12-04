@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.cfga.gui.components.grid.renderer;
+package eu.essi_lab.cfga.gs.setting;
 
 /*-
  * #%L
@@ -32,21 +32,13 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 
 import eu.essi_lab.cfga.gui.components.grid.LegendBuilder;
-import eu.essi_lab.messages.JobStatus.JobPhase;
+import eu.essi_lab.cfga.gui.components.grid.renderer.IconColumnRenderer;
 
 /**
  * @author Fabrizio
  */
-public class JobPhaseColumnRenderer extends IconColumnRenderer {
-
-    private static final long serialVersionUID = -5355241303442699327L;
-
-    /**
-     * 
-     */
-    public JobPhaseColumnRenderer() {
-
-    }
+@SuppressWarnings("serial")
+public class ProfilerStateColumnRenderer extends IconColumnRenderer {
 
     /**
      * @return
@@ -54,34 +46,30 @@ public class JobPhaseColumnRenderer extends IconColumnRenderer {
     public Optional<Component> getLegend() {
 
 	Component component = LegendBuilder.get().//
-		addLegendPart(JobPhase.RUNNING_LABEL, createIcon(JobPhase.RUNNING_LABEL), 3, 50, 5).//
-		addLegendPart(JobPhase.CANCELED_LABEL, createIcon(JobPhase.CANCELED_LABEL), 5, 50, -8).//
-		addLegendPart(JobPhase.COMPLETED_LABEL, createIcon(JobPhase.COMPLETED_LABEL), 10, 55, -5).//
-		addLegendPart(JobPhase.ERROR_LABEL, createIcon(JobPhase.ERROR_LABEL), -5, 30, 0).//
-		addLegendPart(JobPhase.RESCHEDULED_LABEL, createIcon(JobPhase.RESCHEDULED_LABEL), 10, 60, -5).//
-		build("Status");
+		addLegendPart("Online", createIcon("Online"), -1, 35, 0).//
+		addLegendPart("Offline", createIcon("Offline"), -1, 35, 0).//
+		build("State");
 
 	return Optional.of(component);
     }
 
+    /**
+     * 
+     */
     @Override
     protected Icon createIcon(HashMap<String, String> item) {
 
-	String status = item.get("Status");
-	return createIcon(status);
+	return createIcon(item.get("State"));
     }
 
     @Override
     protected Optional<String> getToolTip(HashMap<String, String> item) {
 
-	String status = item.get("Status");
+	String status = item.get("State");
 	switch (status) {
 
-	case JobPhase.RUNNING_LABEL:
-	case JobPhase.CANCELED_LABEL:
-	case JobPhase.COMPLETED_LABEL:
-	case JobPhase.ERROR_LABEL:
-	case JobPhase.RESCHEDULED_LABEL:
+	case "Online":
+	case "Offline":
 
 	    return Optional.of(status);
 	}
@@ -94,31 +82,7 @@ public class JobPhaseColumnRenderer extends IconColumnRenderer {
      * @return
      */
     private Icon createIcon(String status) {
-
-	switch (status) {
-
-	case JobPhase.RUNNING_LABEL:
-
-	    return VaadinIcon.PLAY_CIRCLE_O.create();
-
-	case JobPhase.CANCELED_LABEL:
-
-	    return VaadinIcon.CLOSE_CIRCLE_O.create();
-
-	case JobPhase.COMPLETED_LABEL:
-
-	    return VaadinIcon.CHECK_SQUARE_O.create();
-
-	case JobPhase.ERROR_LABEL:
-
-	    return VaadinIcon.WARNING.create();
-
-	case JobPhase.RESCHEDULED_LABEL:
-
-	    return VaadinIcon.ALARM.create();
-
-	default:
-	    return IconColumnRenderer.getEmptyIcon();
-	}
+    
+        return status.equals("Online") ? VaadinIcon.SIGNAL.create() : VaadinIcon.BAN.create();
     }
 }
