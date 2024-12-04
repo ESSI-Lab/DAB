@@ -44,6 +44,7 @@ import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.OriginalMetadata;
+import eu.essi_lab.model.resource.RankingStrategy;
 import eu.essi_lab.model.resource.SatelliteScene;
 import eu.essi_lab.ommdk.GMDResourceMapper;
 
@@ -173,13 +174,22 @@ public class CopernicusDataspaceConnector extends HarvestedQueryConnector<Copern
 	// other collections with lowest ranking
 	//
 	GSResource sentinel1Collection = mapCollection(s1Stream.clone(), sentinelSource, true, setIndexes);
-	sentinel1Collection.getPropertyHandler().setLowestRanking();
+//	sentinel1Collection.getPropertyHandler().setLowestRanking();
+	
+	sentinel1Collection.getPropertyHandler().setMetadataQuality(RankingStrategy.MAX_VARIABLE_VALUE);
+	sentinel1Collection.getPropertyHandler().setAccessQuality(RankingStrategy.MAX_VARIABLE_VALUE);
 
 	GSResource sentinel2Collection = mapCollection(s2Stream.clone(), sentinelSource, true, setIndexes);
-	sentinel2Collection.getPropertyHandler().setLowestRanking();
+//	sentinel2Collection.getPropertyHandler().setLowestRanking();
+	
+	sentinel2Collection.getPropertyHandler().setMetadataQuality(RankingStrategy.MAX_VARIABLE_VALUE);
+	sentinel2Collection.getPropertyHandler().setAccessQuality(RankingStrategy.MAX_VARIABLE_VALUE);
 
 	GSResource sentinel3Collection = mapCollection(s3Stream.clone(), sentinelSource, true, setIndexes);
-	sentinel3Collection.getPropertyHandler().setLowestRanking();
+//	sentinel3Collection.getPropertyHandler().setLowestRanking();
+	
+	sentinel3Collection.getPropertyHandler().setMetadataQuality(RankingStrategy.MAX_VARIABLE_VALUE);
+	sentinel3Collection.getPropertyHandler().setAccessQuality(RankingStrategy.MAX_VARIABLE_VALUE);
 
 	return Arrays.asList(//
 		//sentinelCollection, //
