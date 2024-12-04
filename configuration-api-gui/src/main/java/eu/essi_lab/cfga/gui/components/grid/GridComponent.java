@@ -50,6 +50,7 @@ import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gui.components.ComponentFactory;
 import eu.essi_lab.cfga.gui.components.SettingComponentFactory;
 import eu.essi_lab.cfga.gui.components.TabContainer;
+import eu.essi_lab.cfga.gui.components.grid.renderer.GridColumnRenderer;
 import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
 import eu.essi_lab.cfga.setting.Setting;
 
@@ -63,6 +64,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
     private HeaderRow filterRow;
     private GridFilter gridFilter;
     private ListDataProvider<HashMap<String, String>> dataProvider;
+    private boolean legendsHider;
 
     /**
      * @param gridInfo
@@ -183,17 +185,8 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	}
 
 	//
-	// set the grid height according to the screen height and the presence 
-	// or not of the columns hider
 	//
-
-	int offset = gridInfo.isShowColumnsHider() ? 440 : 370;
-
-	UI.getCurrent().getPage().retrieveExtendedClientDetails(receiver -> {
-
-	    int screenHeight = receiver.getScreenHeight();
-	    setHeight(screenHeight - offset, Unit.PIXELS);
-	});
+	//
 
 	getStyle().set("font-size", "14px");
 
@@ -230,7 +223,13 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 	    if (descriptor.getRenderer().isPresent()) {
 
-		column = addColumn(descriptor.getRenderer().get());
+		GridColumnRenderer<?> renderer = descriptor.getRenderer().get();
+
+		column = addColumn(renderer);
+
+		renderer.getLegend().ifPresent(leg -> container.addLegend(leg));
+
+		legendsHider = renderer.getLegend().isPresent();
 
 	    } else {
 
@@ -282,6 +281,19 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	});
 
 	//
+	// set the grid height according to the screen height and the presence
+	// or not of the columns selector and of the legends viewer
+	//
+
+	int offset = gridInfo.isShowColumnsHider() || legendsHider ? 450 : 370;
+
+	UI.getCurrent().getPage().retrieveExtendedClientDetails(receiver -> {
+
+	    int screenHeight = receiver.getScreenHeight();
+	    setHeight(screenHeight - offset, Unit.PIXELS);
+	});
+
+	//
 	//
 	//
 
@@ -294,6 +306,14 @@ public class GridComponent extends Grid<HashMap<String, String>> {
     public Component createColumnsHider() {
 
 	return new ColumnsHider(this, gridInfo);
+    }
+
+    /**
+     * @return
+     */
+    public Component createLegendsViewer(List<Component> legends) {
+
+	return new LegendsViewer(this, legends);
     }
 
     /**
