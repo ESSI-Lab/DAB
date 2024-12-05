@@ -69,17 +69,17 @@ public class HisCentralComparator {
 		    msg += "URL: " + servURL + "\n";
 		    if (differentSites) {
 
-//			CUAHSIHISServerClient1_1 client = new CUAHSIHISServerClient1_1(servURL);
-//			Iterator<SiteInfo> staxi = client.getSitesObjectStAX();
-//			long total = 0;
-//			while (staxi.hasNext()) {
-//			    staxi.next();
-//			    total++;
-//			}
-//			if (total != sites2) {
-//			    System.err.println("different sites for "+title+": actually they are " + total + ", however his-central says they are "
-//				    + sites + " and DAB " + sites2);
-//			}
+			CUAHSIHISServerClient1_1 client = new CUAHSIHISServerClient1_1(servURL);
+			Iterator<SiteInfo> staxi = client.getSitesObjectStAX();
+			long total = 0;
+			while (staxi.hasNext()) {
+			    staxi.next();
+			    total++;
+			}
+			if (total != sites2) {
+			    System.err.println("different sites for "+title+": actually they are " + total + ", however his-central says they are "
+				    + sites + " and DAB " + sites2);
+			}
 
 			msg += "Different sites: " + sites2 + " instead of " + sites + "\n";
 		    }

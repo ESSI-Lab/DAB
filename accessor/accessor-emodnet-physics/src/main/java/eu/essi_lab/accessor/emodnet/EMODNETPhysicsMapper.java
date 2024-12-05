@@ -583,7 +583,7 @@ public class EMODNETPhysicsMapper extends FileIdentifierMapper {
 			platformCitation.setTitle(platformName);
 			platform.setCitation(platformCitation);
 			coreMetadata.getMIMetadata().addMIPlatform(platform);
-			pk.addKeyword(platformName);
+			pk.addKeyword(platformName, platformCode);		    
 		}
 
 		coreMetadata.getMIMetadata().getDataIdentification().addKeywords(pk);
