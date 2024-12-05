@@ -285,7 +285,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	// or not of the columns selector and of the legends viewer
 	//
 
-	int offset = gridInfo.isShowColumnsHider() || legendsHider ? 450 : 370;
+	int offset = gridInfo.isShowColumnsHider() || legendsHider ? 430 : 370;
 
 	UI.getCurrent().getPage().retrieveExtendedClientDetails(receiver -> {
 

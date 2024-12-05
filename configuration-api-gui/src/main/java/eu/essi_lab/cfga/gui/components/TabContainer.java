@@ -32,6 +32,7 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -160,21 +161,46 @@ public class TabContainer extends VerticalLayout {
 
 	} else {
 
-	    settings.stream().//
+	    for (int i = 0; i < settings.size(); i++) {
 
-		    map(set -> SettingComponentFactory.createSettingComponent(configuration, set.getIdentifier(), readOnly, this)).//
+		Setting setting = settings.get(i);
 
-		    forEach(settingComponent -> {
+		SettingComponent component = SettingComponentFactory.createSettingComponent(configuration, setting.getIdentifier(),
+			readOnly, this);
 
-			if (settingComponent.getDetails().isPresent()) {
+		if (component.getDetails().isPresent()) {
 
-			    ((HasComponents) this).add(settingComponent.getDetails().get());
+		    Details details = component.getDetails().get();
 
-			} else {
+		    if (i == 0) {
 
-			    ((HasComponents) this).add(settingComponent);
-			}
-		    });
+			details.getStyle().set("margin-top", "15px");
+		    }
+
+		    ((HasComponents) this).add(details);
+
+		} else {
+
+		    ((HasComponents) this).add(component);
+		}
+	    }
+
+	    // settings.stream().//
+	    //
+	    // map(set -> SettingComponentFactory.createSettingComponent(configuration, set.getIdentifier(), readOnly,
+	    // this)).//
+	    //
+	    // forEach(settingComponent -> {
+	    //
+	    // if (settingComponent.getDetails().isPresent()) {
+	    //
+	    // ((HasComponents) this).add(settingComponent.getDetails().get());
+	    //
+	    // } else {
+	    //
+	    // ((HasComponents) this).add(settingComponent);
+	    // }
+	    // });
 	}
     }
 
