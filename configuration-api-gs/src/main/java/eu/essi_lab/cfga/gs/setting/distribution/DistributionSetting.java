@@ -55,10 +55,7 @@ public class DistributionSetting extends Setting implements BrokeringSetting {
     public DistributionSetting() {
 
 	setCanBeRemoved(true);
-	enableFoldedMode(true);
-
 	setCanBeDisabled(false);
-
 	setName("Distributed accessor settings");
 
 	setValidator(createValidator());
