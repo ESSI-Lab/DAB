@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Optional;
 
+import javax.xml.xpath.XPathExpressionException;
+
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -14,10 +16,16 @@ import eu.essi_lab.accessor.wof.client.CUAHSIHISServerClient1_1;
 import eu.essi_lab.accessor.wof.client.datamodel.SiteInfo;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
+import eu.essi_lab.model.exceptions.GSException;
 
 public class HisCentralComparator {
 
-    public static void main(String[] args) throws Exception, IOException {
+    public HisCentralComparator() {
+	// TODO Auto-generated constructor stub
+    }
+
+    public void compare() throws Exception {
+
 	Downloader d = new Downloader();
 	String url1 = "https://hiscentral.cuahsi.org/webservices/hiscentral.asmx/GetWaterOneFlowServiceInfo";
 	String url2 = "https://whos.geodab.eu/gs-service/services/essi/token/token/view/whos-cuahsi/hiscentral.asmx/GetWaterOneFlowServiceInfo";
@@ -69,25 +77,20 @@ public class HisCentralComparator {
 		    msg += "URL: " + servURL + "\n";
 		    if (differentSites) {
 
-			CUAHSIHISServerClient1_1 client = new CUAHSIHISServerClient1_1(servURL);
-			Iterator<SiteInfo> staxi = client.getSitesObjectStAX();
-			long total = 0;
-			while (staxi.hasNext()) {
-			    staxi.next();
-			    total++;
-			}
-			if (total != sites2) {
-			    System.err.println("different sites for "+title+": actually they are " + total + ", however his-central says they are "
-				    + sites + " and DAB " + sites2);
-			}
-
-			msg += "Different sites: " + sites2 + " instead of " + sites + "\n";
+			// long total = checkService(servURL);
+			// if (total != sites2) {
+			// System.err.println("different sites for "+title+": actually they are " + total + ", however
+			// his-central says they are "
+			// + sites + " and DAB " + sites2);
+			// }
+			//
+			 msg += "Different sites: " + sites2 + " instead of " + sites + "\n";
 		    }
 		    if (differentVariables) {
 			msg += "Different variables: " + variables2 + " instead of " + variables + "\n";
 		    }
 		    if (differentValues) {
-			 msg += "Different values: " + values2 + " instead of " + values + "\n";
+			msg += "Different values: " + values2 + " instead of " + values + "\n";
 		    }
 		    msg += "\n";
 		    if (differentSites) {
@@ -114,5 +117,24 @@ public class HisCentralComparator {
 	System.out.println("Services from #1 HIS-Central: " + services.length);
 	System.out.println("Services from #2 HIS-Central: " + services2.length);
 	System.out.println("Good services: " + good + "/" + (good + bad) + " (" + bad + " bad, " + notfound + " not found)");
+    }
+
+    public static void main(String[] args) throws Exception, IOException {
+	HisCentralComparator hcc = new HisCentralComparator();
+	hcc.compare();
+//	hcc.compare();
+//	long total = hcc.checkService("https://hydroportal.cuahsi.org/CDEC/cuahsi_1_1.asmx?WSDL");
+//	System.out.println(total + " sites");
+    }
+
+    private static long checkService(String servURL) throws GSException {
+	CUAHSIHISServerClient1_1 client = new CUAHSIHISServerClient1_1(servURL);
+	Iterator<SiteInfo> staxi = client.getSitesObjectStAX();
+	long total = 0;
+	while (staxi.hasNext()) {
+	    staxi.next();
+	    total++;
+	}
+	return total;
     }
 }
