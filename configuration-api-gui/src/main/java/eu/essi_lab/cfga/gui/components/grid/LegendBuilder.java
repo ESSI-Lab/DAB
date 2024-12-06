@@ -34,6 +34,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 import eu.essi_lab.cfga.gui.components.ComponentFactory;
+import eu.essi_lab.lib.utils.StringUtils;
 
 /**
  * @author Fabrizio
@@ -113,6 +114,9 @@ public class LegendBuilder {
     public Component build(String legendName) {
 
 	HorizontalLayout layout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout();
+
+	layout.setId("grid-component-legend-" + StringUtils.encodeUTF8(legendName));
+
 	layout.getStyle().set("padding-top", "3px");
 	layout.getStyle().set("padding-bottom", "3px");
 	layout.getStyle().set("padding-left", "3px");

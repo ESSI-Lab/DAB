@@ -64,7 +64,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
     private HeaderRow filterRow;
     private GridFilter gridFilter;
     private ListDataProvider<HashMap<String, String>> dataProvider;
-    private boolean legendsHider;
+    private boolean legendsViewer;
 
     /**
      * @param gridInfo
@@ -229,7 +229,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 		renderer.getLegend().ifPresent(leg -> container.addLegend(leg));
 
-		legendsHider = renderer.getLegend().isPresent();
+		legendsViewer = renderer.getLegend().isPresent();
 
 	    } else {
 
@@ -285,7 +285,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	// or not of the columns selector and of the legends viewer
 	//
 
-	int offset = gridInfo.isShowColumnsHider() || legendsHider ? 430 : 370;
+	int offset = gridInfo.isShowColumnsHider() || legendsViewer ? 430 : 370;
 
 	UI.getCurrent().getPage().retrieveExtendedClientDetails(receiver -> {
 
