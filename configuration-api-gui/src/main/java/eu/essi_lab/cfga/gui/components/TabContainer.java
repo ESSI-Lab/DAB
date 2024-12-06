@@ -254,7 +254,10 @@ public class TabContainer extends VerticalLayout {
      */
     public void addLegend(Component legend) {
 
-	legends.add(legend);
+	if (!legends.stream().map(lg -> lg.getId().get()).anyMatch(id -> id.equals(legend.getId().get())) ) {
+
+	    legends.add(legend);
+	}
     }
 
     /**
