@@ -52,6 +52,6 @@ public class ConfigurableLoader {
 
 	Iterator<Configurable> iterator = loader.iterator();
 
-	return StreamUtils.iteratorToStream(iterator);
+	return StreamUtils.iteratorToStream(iterator, true);
     }
 }

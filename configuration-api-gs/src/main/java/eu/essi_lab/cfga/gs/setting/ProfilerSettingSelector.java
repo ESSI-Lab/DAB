@@ -50,8 +50,7 @@ public class ProfilerSettingSelector<P extends ProfilerSetting> extends Selector
     protected List<P> initSettings() {
 
 	List<? extends Setting> collect = ConfigurableLoader.//
-		loadToList().//
-		stream().//
+		load().//
 		filter(c -> c.getSetting() != null).//
 		filter(c -> ProfilerSetting.class.isAssignableFrom(c.getSetting().getSettingClass())).//
 		map(c -> SettingUtils.create(c.getSetting().getSettingClass())).//
