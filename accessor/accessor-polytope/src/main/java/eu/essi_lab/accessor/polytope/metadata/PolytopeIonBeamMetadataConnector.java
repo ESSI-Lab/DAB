@@ -35,6 +35,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
+import com.google.common.collect.Lists;
+
 import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
@@ -81,7 +83,11 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 
     static final String STATIONS_URL = "stations";
 
-    static final String BASE_URL = "https://ionbeam-dev.ecmwf.int/api/v1/";
+    static final String MARS_REQUEST_URL = "list";
+
+    static final String BASE_URL = "http://ionbeam-ichange.ecmwf-ichange.f.ewcloud.host/api/v1/";
+    
+    static final String RETRIEVE_URL = "retrieve/";
 
     public static String BEARER_TOKEN;
 
@@ -103,7 +109,7 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 	ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<>();
 
 	// post requests with Polytope Rest API to get data
-	// e.g. endpoint: https://ionbeam-dev.ecmwf.int/api/v1/stations
+	// e.g. endpoint: http://ionbeam-ichange.ecmwf-ichange.f.ewcloud.host/api/v1/stations
 	// Authorization Bearer + psw
 	//
 
@@ -113,7 +119,7 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 	} else {
 	    BEARER_TOKEN = getBearerToken();
 	}
-	
+
 	int count = 0;
 
 	String token = listRecords.getResumptionToken();
@@ -132,7 +138,8 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 
 	try {
 
-	    JSONArray stationsArray = getStationsList();
+	    JSONArray stationsArray = getList(STATIONS_URL);
+	    JSONArray marsRequestArray = getList(MARS_REQUEST_URL);
 
 	    if (stationsArray != null) {
 
@@ -142,25 +149,13 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 
 		    JSONObject datasetMetadata = stationsArray.getJSONObject(i);
 		    String id = datasetMetadata.optString("external_id");
+
 		    if (id != null && !id.isEmpty()) {
-			JSONArray sensorsArray = datasetMetadata.optJSONArray("sensors");
 
-			if (sensorsArray != null) {
-			    JSONObject sensorObj = sensorsArray.optJSONObject(0);
-			    if (sensorObj != null) {
-				JSONArray propertiesArray = sensorObj.optJSONArray("properties");
-				if (propertiesArray != null) {
-				    for (int j = 0; j < propertiesArray.length(); j++) {
-					JSONObject sensorInfo = propertiesArray.getJSONObject(j);
-					String key = sensorInfo.optString("key");
-					PolytopeIonBeamMetadataVariable variable = PolytopeIonBeamMetadataVariable.decode(key);
-					if (variable != null)
-					    ret.addRecord(PolytopeIonBeamMetadataMapper.create(datasetMetadata, sensorInfo));
-				    }
-				}
-
-			    }
+			for (PolytopeIonBeamMetadataVariable var : PolytopeIonBeamMetadataVariable.values()) {
+			    ret.addRecord(PolytopeIonBeamMetadataMapper.create(datasetMetadata, var.getKey()));
 			}
+
 		    }
 
 		}
@@ -181,9 +176,9 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 
     }
 
-    private JSONArray getStationsList() throws Exception {
+    private JSONArray getList(String path) throws Exception {
 
-	String url = getSourceURL() + STATIONS_URL;
+	String url = getSourceURL() + path;
 	GSLoggerFactory.getLogger(getClass()).info("Getting " + url);
 
 	Downloader downloader = new Downloader();
@@ -206,6 +201,11 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 	}
 
 	return null;
+    }
+
+    public static List<JSONObject> getResultList(String url) throws Exception {
+	ArrayList<JSONObject> out = Lists.newArrayList();
+	return out;
     }
 
     public Downloader getDownloader() {
@@ -415,33 +415,9 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
     @Override
     public boolean supports(GSSource source) {
 
-	return source.getEndpoint().contains("polytope.ecmwf.int") || source.getEndpoint().contains("ionbeam-dev.ecmwf.int");
+	return source.getEndpoint().contains("polytope.ecmwf.int") || source.getEndpoint().contains("ionbeam-dev.ecmwf.int")
+		|| source.getEndpoint().contains("ionbeam-ichange");
 
-	// TODO: to be implemented
-	// String baseEndpoint = source.getEndpoint();
-	//
-	// if (!baseEndpoint.endsWith("/")) {
-	// baseEndpoint += "/";
-	// }
-	//
-	// String url = baseEndpoint + "collections";
-	//
-	// Map<String, String> headers = new HashMap<String, String>();
-	// headers.put("Authorization", "EmailKey " + getSetting().getPolytopeUsername() + ":" +
-	// getSetting().getPolytopePassword());
-	//
-	// Downloader d = getDownloader();
-	// d.setRequestHeaders(headers);
-	//
-	// try {
-	//
-	// return d.checkConnectivity(url);
-	//
-	// } catch (Exception e) {
-	// // any exception during download or during XML parsing
-	// logger.warn("Exception during connection to FTP remote service", e);
-	// }
-	// return false;
     }
 
     @Override

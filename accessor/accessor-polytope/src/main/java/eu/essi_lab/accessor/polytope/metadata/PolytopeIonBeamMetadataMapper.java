@@ -24,6 +24,7 @@ package eu.essi_lab.accessor.polytope.metadata;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -75,14 +76,14 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	// do nothing
     }
 
-    public static OriginalMetadata create(JSONObject datasetInfo, JSONObject sensorInfo) {
+    public static OriginalMetadata create(JSONObject datasetInfo, String varType) {
 	OriginalMetadata originalMetadata = new OriginalMetadata();
 
 	originalMetadata.setSchemeURI(CommonNameSpaceContext.POLYTOPE_IONBEAM);
 
 	JSONObject jsonObject = new JSONObject();
 	jsonObject.put("dataset-info", datasetInfo);
-	jsonObject.put("sensor-info", sensorInfo);
+	jsonObject.put("var-type", varType);
 
 	originalMetadata.setMetadata(jsonObject.toString(4));
 
@@ -100,12 +101,12 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
     }
 
     /**
-     * @param sensor metadata
+     * @param metadata
      * @return
      */
-    private JSONObject retrieveSensorInfo(OriginalMetadata metadata) {
+    private String retrieveVarInfo(OriginalMetadata metadata) {
 
-	return new JSONObject(metadata.getMetadata()).getJSONObject("sensor-info");
+	return new JSONObject(metadata.getMetadata()).optString("var-type");
     }
 
     public enum Resolution {
@@ -183,332 +184,346 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	// ]
 	// }
 
-	JSONObject datasetInfo = retrieveDatasetInfo(originalMD);
+	try {
+	    
+	    
+	    JSONObject datasetInfo = retrieveDatasetInfo(originalMD);
 
-	JSONObject sensorInfo = retrieveSensorInfo(originalMD);
+	    String varType = retrieveVarInfo(originalMD);
 
-	String stationName = datasetInfo.optString("stationName");
+	    String stationName = datasetInfo.optString("name");
+	    String stationId = datasetInfo.optString("external_id");
 
-	String stationId = datasetInfo.optString("external_id");
+	    JSONArray time_span = datasetInfo.optJSONArray("time_span");
+	    String startDate = time_span.getString(0);
+	    String endDate = time_span.getString(1);
+	    JSONArray authors = datasetInfo.optJSONArray("authors");
 
-	String startDate = datasetInfo.optString("start_time");
-	String endDate = datasetInfo.optString("stop_time");
+	    JSONObject marsRequest = datasetInfo.optJSONObject("mars_request");
+	    String marsRequestDate = marsRequest.optString("date");
+	    String marsRequestStream = marsRequest.optString("stream");
+	    String marsRequestExpver = marsRequest.optString("expver");
+	    String marsRequestClass = marsRequest.optString("class");
+	    String platformName = datasetInfo.optString("platform");
+	    
+	    
+	    String queryPath = "class=" + marsRequestClass + "&date=" + marsRequestDate + "&expver=" + marsRequestExpver + "&stream=" + marsRequestStream + "&platform="  +platformName + "&source_id=" + stationId;
+	   
 
-	JSONArray authors = datasetInfo.optJSONArray("authors");
+	    PolytopeIonBeamMetadataVariable variable = PolytopeIonBeamMetadataVariable.decode(varType);
 
-	String location_bbox = datasetInfo.optString("location_bbox");
-	String location_hull = datasetInfo.optString("location_hull");
-	String platformName = datasetInfo.optString("platform");
+	    
 
-	String key = sensorInfo.optString("key");
-	PolytopeIonBeamMetadataVariable variable = PolytopeIonBeamMetadataVariable.decode(key);
+	    Resolution resolution = Resolution.HOURLY;
 
-	Double pointLon = datasetInfo.optDouble("longitude");
-	Double pointLat = datasetInfo.optDouble("latitude");
-	Double altitude = datasetInfo.optDouble("altitude");
+	    // TEMPORAL EXTENT
+	    CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
+	    TemporalExtent extent = new TemporalExtent();
 
-	Resolution resolution = Resolution.HOURLY;
+	    if (startDate != null && !startDate.isEmpty()) {
 
-	// TEMPORAL EXTENT
-	CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
-	TemporalExtent extent = new TemporalExtent();
+		extent.setBeginPosition(startDate);
 
-	if (startDate != null && !startDate.isEmpty()) {
+		if (endDate != null && !endDate.isEmpty()) {
 
-	    extent.setBeginPosition(startDate);
+		    extent.setEndPosition(endDate);
+		}
 
-	    if (endDate != null && !endDate.isEmpty()) {
+		/**
+		 * CODE COMMENTED BELOW COULD BE USEFUL
+		 * // if (dateTime.isPresent()) {
+		 * // String beginTime = ISO8601DateTimeUtils.getISO8601DateTime(dateTime.get());
+		 * // extent.setPosition(beginTime, startIndeterminate, false, true);
+		 * // // Estimate of the data size
+		 * // // only an estimate seems to be possible, as this odata service doesn't seem to support the
+		 * /$count
+		 * // // operator
+		 * // double expectedValuesPerYears = 12.0; // 1 value every 5 minutes
+		 * // double expectedValuesPerDay = expectedValuesPerHours * 24.0;
+		 * // long expectedSize = TimeSeriesUtils.estimateSize(dateTime.get(), new Date(),
+		 * expectedValuesPerDay);
+		 * // GridSpatialRepresentation grid = new GridSpatialRepresentation();
+		 * // grid.setNumberOfDimensions(1);
+		 * // grid.setCellGeometryCode("point");
+		 * // Dimension time = new Dimension();
+		 * // time.setDimensionNameTypeCode("time");
+		 * // try {
+		 * // time.setDimensionSize(new BigInteger("" + expectedSize));
+		 * // ExtensionHandler extensionHandler = dataset.getExtensionHandler();
+		 * // extensionHandler.setDataSize(expectedSize);
+		 * // } catch (Exception e) {
+		 * // }
+		 * // grid.addAxisDimension(time);
+		 * // coreMetadata.getMIMetadata().addGridSpatialRepresentation(grid);
+		 * // }
+		 */
 
-		extent.setEndPosition(endDate);
+		coreMetadata.getMIMetadata().getDataIdentification().addTemporalExtent(extent);
 	    }
 
-	    /**
-	     * CODE COMMENTED BELOW COULD BE USEFUL
-	     * // if (dateTime.isPresent()) {
-	     * // String beginTime = ISO8601DateTimeUtils.getISO8601DateTime(dateTime.get());
-	     * // extent.setPosition(beginTime, startIndeterminate, false, true);
-	     * // // Estimate of the data size
-	     * // // only an estimate seems to be possible, as this odata service doesn't seem to support the
-	     * /$count
-	     * // // operator
-	     * // double expectedValuesPerYears = 12.0; // 1 value every 5 minutes
-	     * // double expectedValuesPerDay = expectedValuesPerHours * 24.0;
-	     * // long expectedSize = TimeSeriesUtils.estimateSize(dateTime.get(), new Date(),
-	     * expectedValuesPerDay);
-	     * // GridSpatialRepresentation grid = new GridSpatialRepresentation();
-	     * // grid.setNumberOfDimensions(1);
-	     * // grid.setCellGeometryCode("point");
-	     * // Dimension time = new Dimension();
-	     * // time.setDimensionNameTypeCode("time");
-	     * // try {
-	     * // time.setDimensionSize(new BigInteger("" + expectedSize));
-	     * // ExtensionHandler extensionHandler = dataset.getExtensionHandler();
-	     * // extensionHandler.setDataSize(expectedSize);
-	     * // } catch (Exception e) {
-	     * // }
-	     * // grid.addAxisDimension(time);
-	     * // coreMetadata.getMIMetadata().addGridSpatialRepresentation(grid);
-	     * // }
-	     */
+	    coreMetadata.setTitle("Acquisitions of " + variable.getLabel() + " through MeteoTracker mobile weather station: " + stationId);
+	    coreMetadata.setAbstract("This dataset contains " + variable.getLabel()
+		    + " timeseries from I-CHANGE Citizen Observatory, acquired by a specific observing mobile weather station (" + stationId
+		    + " ).");
 
-	    coreMetadata.getMIMetadata().getDataIdentification().addTemporalExtent(extent);
-	}
+	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword(POLYTOPE_IONBEAM);
 
-	coreMetadata.setTitle("Acquisitions of " + variable.getLabel() + " through MeteoTracker mobile weather station: " + stationId);
-	coreMetadata.setAbstract("This dataset contains " + variable.getLabel()
-		+ " timeseries from I-CHANGE Citizen Observatory, acquired by a specific observing mobile weather station (" + stationId
-		+ " ).");
+	    coreMetadata.getMIMetadata().getDataIdentification()
+		    .setCitationPublicationDate(ISO8601DateTimeUtils.getISO8601Date(new Date()));
 
-	coreMetadata.getMIMetadata().getDataIdentification().addKeyword(POLYTOPE_IONBEAM);
+	    // if (!station.getState().equals("")) {
+	    // coreMetadata.getMIMetadata().getDataIdentification().addKeyword("State: " + station.getState());
+	    // }
+	    // if (!station.getCountry().equals("")) {
+	    // coreMetadata.getMIMetadata().getDataIdentification().addKeyword("Country: " + station.getCountry());
+	    // }
+	    // if (!station.getIcao().equals("")) {
+	    // coreMetadata.getMIMetadata().getDataIdentification().addKeyword("ICAO: " + station.getIcao());
+	    // }
 
-	coreMetadata.getMIMetadata().getDataIdentification().setCitationPublicationDate(ISO8601DateTimeUtils.getISO8601Date(new Date()));
+	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword(variable.getLabel());
+	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword(variable.getKey());
+	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword(variable.toString().toLowerCase());
 
-	// if (!station.getState().equals("")) {
-	// coreMetadata.getMIMetadata().getDataIdentification().addKeyword("State: " + station.getState());
-	// }
-	// if (!station.getCountry().equals("")) {
-	// coreMetadata.getMIMetadata().getDataIdentification().addKeyword("Country: " + station.getCountry());
-	// }
-	// if (!station.getIcao().equals("")) {
-	// coreMetadata.getMIMetadata().getDataIdentification().addKeyword("ICAO: " + station.getIcao());
-	// }
+	    if (resolution.equals(Resolution.HOURLY))
+		coreMetadata.getMIMetadata().getDataIdentification().addKeyword("hourly");
 
-	coreMetadata.getMIMetadata().getDataIdentification().addKeyword(variable.getLabel());
-	coreMetadata.getMIMetadata().getDataIdentification().addKeyword(variable.getKey());
-	coreMetadata.getMIMetadata().getDataIdentification().addKeyword(variable.toString().toLowerCase());
+	    ExtensionHandler handler = dataset.getExtensionHandler();
+	    handler.setTimeUnits("h");
+	    handler.setTimeResolution("1");
+	    handler.setAttributeMissingValue("-9999");
+	    handler.setAttributeUnitsAbbreviation(variable.getUnit());
 
-	if (resolution.equals(Resolution.HOURLY))
-	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword("hourly");
+	    //
+	    // URL + variable
+	    //
+	    // String id = UUID.nameUUIDFromBytes((splittedStrings[0] + splittedStrings[11]).getBytes()).toString();
 
-	ExtensionHandler handler = dataset.getExtensionHandler();
-	handler.setTimeUnits("h");
-	handler.setTimeResolution("1");
-	handler.setAttributeMissingValue("-9999");
-	handler.setAttributeUnitsAbbreviation(variable.getUnit());
+	    coreMetadata.getMIMetadata().addHierarchyLevelScopeCodeListValue("dataset");
 
-	//
-	// URL + variable
-	//
-	// String id = UUID.nameUUIDFromBytes((splittedStrings[0] + splittedStrings[11]).getBytes()).toString();
+	    // bounding box (Multipoint)
+	    // "POLYGON ((8.6391694 44.386031, 8.6391037 44.3860898, 8.6390179 44.3863223, 8.6391489
+	    // 44.3864548, 8.6393916 44.3866083, 8.6636556 44.3988833, 8.6672147 44.4002499, 8.6676504 44.4003547,
+	    // 8.6690215
+	    // 44.4005383, 8.6708526 44.4007344, 8.6736574 44.4008072, 8.6742229 44.4007635, 8.6746885 44.4006371,
+	    // 8.6750503
+	    // 44.4005098, 8.675219 44.400353, 8.6750815 44.4002186, 8.6655395 44.3914033, 8.665203 44.3911424, 8.664728
+	    // 44.3910255, 8.6391694 44.386031))",
 
-	coreMetadata.getMIMetadata().addHierarchyLevelScopeCodeListValue("dataset");
-
-	// bounding box (Multipoint)
-	// "POLYGON ((8.6391694 44.386031, 8.6391037 44.3860898, 8.6390179 44.3863223, 8.6391489
-	// 44.3864548, 8.6393916 44.3866083, 8.6636556 44.3988833, 8.6672147 44.4002499, 8.6676504 44.4003547, 8.6690215
-	// 44.4005383, 8.6708526 44.4007344, 8.6736574 44.4008072, 8.6742229 44.4007635, 8.6746885 44.4006371, 8.6750503
-	// 44.4005098, 8.675219 44.400353, 8.6750815 44.4002186, 8.6655395 44.3914033, 8.665203 44.3911424, 8.664728
-	// 44.3910255, 8.6391694 44.386031))",
-
-	if (platformName.toLowerCase().contains("meteotracker")) {
-	    // meteotracker use-case
-	    dataset.getPropertyHandler().setIsTrajectory(true);
-	} else {
-	    dataset.getPropertyHandler().setIsTimeseries(true);
-	}
-
-	List<List<Double>> multiPoints = new ArrayList<List<Double>>();
-	Double minLon = null;
-	Double minLat = null;
-	Double maxLon = null;
-	Double maxLat = null;
-	Double minAlt = null;
-	Double maxAlt = null;
-	String[] coordinates;
-	location_hull = location_hull.replace("POLYGON ((", "");
-	location_hull = location_hull.replace("POINT ((", "");
-	location_hull = location_hull.replace("))", "");
-	coordinates = location_hull.split(", ");
-	for (int i = 0; i < coordinates.length; i++) {
-	    String[] splittedCoord = coordinates[i].split(" ");
-	    Double lonDouble = Double.valueOf(splittedCoord[0]);
-	    Double latDouble = Double.valueOf(splittedCoord[1]);
-	    Double altDouble = null;
-	    List<Double> lat_lon_alt = new ArrayList<>();
-	    lat_lon_alt.add(latDouble);
-	    lat_lon_alt.add(lonDouble);
-	    lat_lon_alt.add(altDouble);
-	    multiPoints.add(lat_lon_alt);
-
-	    if (minLat == null)
-		minLat = latDouble;
-	    if (minLon == null)
-		minLon = lonDouble;
-	    if (maxLat == null)
-		maxLat = latDouble;
-	    if (maxLon == null)
-		maxLon = lonDouble;
-	    if (minAlt == null)
-		minAlt = altDouble;
-	    if (maxAlt == null)
-		maxAlt = altDouble;
-
-	    if (minLat != null && minLat > latDouble) {
-		minLat = latDouble;
-	    }
-	    if (minLon != null && minLon > lonDouble) {
-		minLon = lonDouble;
-	    }
-	    if (maxLat != null && maxLat < latDouble) {
-		maxLat = latDouble;
-	    }
-	    if (maxLon != null && maxLon < lonDouble) {
-		maxLon = lonDouble;
-	    }
-	    if (minAlt != null && minAlt > altDouble) {
-		minAlt = altDouble;
-	    }
-	    if (maxAlt != null && maxAlt < altDouble) {
-		maxAlt = altDouble;
+	    if (platformName.toLowerCase().contains("meteotracker")) {
+		// meteotracker use-case
+		dataset.getPropertyHandler().setIsTrajectory(true);
+	    } else {
+		dataset.getPropertyHandler().setIsTimeseries(true);
 	    }
 
-	}
+	    
+	    
+	    List<JSONObject> jsonResponse = getSessionData(queryPath);
+	    
+	    List<List<Double>> multiPoints = new ArrayList<List<Double>>();
+	    Double minLon = null;
+	    Double minLat = null;
+	    Double maxLon = null;
+	    Double maxLat = null;
+	    Double minAlt = null;
+	    Double maxAlt = null;
+	    for (JSONObject obj : jsonResponse) {
 
-	// Double[] bbox = multipointToBbox(coordinates);
+		BigDecimal alt = obj.optBigDecimal("a", null);
+		JSONArray bboxArray = obj.optJSONArray("lo");
+		Double lonDouble = bboxArray.optDouble(0);
+		Double latDouble = bboxArray.optDouble(1);
+		// Double latDouble = Double.valueOf(lat);
+		// Double lonDouble = Double.valueOf(lon);
+		Double altDouble = alt.doubleValue();
 
-	// bounding box (Multipoint)
+		List<Double> lat_lon_alt = new ArrayList<>();
+		lat_lon_alt.add(latDouble);
+		lat_lon_alt.add(lonDouble);
+		lat_lon_alt.add(altDouble);
+		multiPoints.add(lat_lon_alt);
 
-	if (multiPoints != null && multiPoints.size() > 0) {
-	    BoundingPolygon myPolygon = new BoundingPolygon();
+		if (minLat == null)
+		    minLat = latDouble;
+		if (minLon == null)
+		    minLon = lonDouble;
+		if (maxLat == null)
+		    maxLat = latDouble;
+		if (maxLon == null)
+		    maxLon = lonDouble;
+		if (minAlt == null)
+		    minAlt = altDouble;
+		if (maxAlt == null)
+		    maxAlt = altDouble;
 
-	    myPolygon.setMultiPoints(multiPoints);
+		if (minLat != null && minLat > latDouble) {
+		    minLat = latDouble;
+		}
+		if (minLon != null && minLon > lonDouble) {
+		    minLon = lonDouble;
+		}
+		if (maxLat != null && maxLat < latDouble) {
+		    maxLat = latDouble;
+		}
+		if (maxLon != null && maxLon < lonDouble) {
+		    maxLon = lonDouble;
+		}
+		if (minAlt != null && minAlt > altDouble) {
+		    minAlt = altDouble;
+		}
+		if (maxAlt != null && maxAlt < altDouble) {
+		    maxAlt = altDouble;
+		}
 
-	    coreMetadata.getMIMetadata().getDataIdentification().addBoundingPolygon(myPolygon);
+	    }
 
-	}
-	// bounding box
-	if (minLon != null && minLat != null && maxLon != null && maxLat != null) {
 
-	    coreMetadata.addBoundingBox(maxLat, minLon, minLat, maxLon);
+	    // Double[] bbox = multipointToBbox(coordinates);
 
-	}
-	// elevation
+	    // bounding box (Multipoint)
 
-	if (minAlt != null && maxAlt != null) {
-	    VerticalExtent verticalExtent = new VerticalExtent();
-	    verticalExtent.setMinimumValue(minAlt);
-	    verticalExtent.setMaximumValue(maxAlt);
-	    coreMetadata.getMIMetadata().getDataIdentification().addVerticalExtent(verticalExtent);
-	}
+	    if (multiPoints != null && multiPoints.size() > 0) {
+		BoundingPolygon myPolygon = new BoundingPolygon();
 
-	// elevation
-	// String minElevation = station.getMinElevation();
-	// String maxElevation = station.getMaxElevation();
-	// if (minElevation != null && !minElevation.equals("") && maxElevation != null && !maxElevation.equals("")) {
-	// VerticalExtent verticalExtent = new VerticalExtent();
-	// if (isDouble(minElevation)) {
-	// verticalExtent.setMinimumValue(Double.parseDouble(minElevation));
-	// }
-	// if (isDouble(maxElevation)) {
-	// verticalExtent.setMaximumValue(Double.parseDouble(maxElevation));
-	// }
-	// coreMetadata.getMIMetadata().getDataIdentification().addVerticalExtent(verticalExtent);
-	// }
+		myPolygon.setMultiPoints(multiPoints);
 
-	// contact point
-	if (authors != null) {
-	    String owner = null;
-	    for (int k = 0; k < authors.length(); k++) {
-		JSONObject authorObj = authors.optJSONObject(k);
-		if (authorObj != null) {
-		    String authorName = authorObj.optString("name");
-		    if (!authorName.contains("meteotracker")) {
-			owner = authorName;
-			break;
+		coreMetadata.getMIMetadata().getDataIdentification().addBoundingPolygon(myPolygon);
+
+	    }
+	    // bounding box
+	    if (minLon != null && minLat != null && maxLon != null && maxLat != null) {
+
+		coreMetadata.addBoundingBox(maxLat, minLon, minLat, maxLon);
+
+	    }
+	    // elevation
+
+	    if (minAlt != null && maxAlt != null) {
+		VerticalExtent verticalExtent = new VerticalExtent();
+		verticalExtent.setMinimumValue(minAlt);
+		verticalExtent.setMaximumValue(maxAlt);
+		coreMetadata.getMIMetadata().getDataIdentification().addVerticalExtent(verticalExtent);
+	    }
+
+	    // elevation
+	    // String minElevation = station.getMinElevation();
+	    // String maxElevation = station.getMaxElevation();
+	    // if (minElevation != null && !minElevation.equals("") && maxElevation != null && !maxElevation.equals(""))
+	    // {
+	    // VerticalExtent verticalExtent = new VerticalExtent();
+	    // if (isDouble(minElevation)) {
+	    // verticalExtent.setMinimumValue(Double.parseDouble(minElevation));
+	    // }
+	    // if (isDouble(maxElevation)) {
+	    // verticalExtent.setMaximumValue(Double.parseDouble(maxElevation));
+	    // }
+	    // coreMetadata.getMIMetadata().getDataIdentification().addVerticalExtent(verticalExtent);
+	    // }
+
+	    // contact point
+	    if (authors != null) {
+		String owner = null;
+		for (int k = 0; k < authors.length(); k++) {
+		    JSONObject authorObj = authors.optJSONObject(k);
+		    if (authorObj != null) {
+			String authorName = authorObj.optString("name");
+			if (!authorName.contains("meteotracker")) {
+			    owner = authorName;
+			    break;
+			}
 		    }
 		}
+		if (owner != null) {
+		    ResponsibleParty creatorContact = new ResponsibleParty();
+		    creatorContact.setOrganisationName(owner);
+		    creatorContact.setRoleCode("originator");
+		    // creatorContact.setIndividualName("Anirban Guha");
+		    coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(creatorContact);
+		}
 	    }
-	    if (owner != null) {
-		ResponsibleParty creatorContact = new ResponsibleParty();
-		creatorContact.setOrganisationName(owner);
-		creatorContact.setRoleCode("originator");
-		// creatorContact.setIndividualName("Anirban Guha");
-		coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(creatorContact);
-	    }
-	}
 
-	// contact point
-	// ResponsibleParty creatorContact = new ResponsibleParty();
-	//
-	// creatorContact.setOrganisationName("Tripura University");
-	// creatorContact.setRoleCode("originator");
-	// creatorContact.setIndividualName("Anirban Guha");
-	//
-	// Contact contactcreatorContactInfo = new Contact();
-	// Address address = new Address();
-	// address.addElectronicMailAddress("anirbanguha@tripurauniv.in");
-	// contactcreatorContactInfo.setAddress(address);
-	// creatorContact.setContactInfo(contactcreatorContactInfo);
-	//
+	    // contact point
+	    // ResponsibleParty creatorContact = new ResponsibleParty();
+	    //
+	    // creatorContact.setOrganisationName("Tripura University");
+	    // creatorContact.setRoleCode("originator");
+	    // creatorContact.setIndividualName("Anirban Guha");
+	    //
+	    // Contact contactcreatorContactInfo = new Contact();
+	    // Address address = new Address();
+	    // address.addElectronicMailAddress("anirbanguha@tripurauniv.in");
+	    // contactcreatorContactInfo.setAddress(address);
+	    // creatorContact.setContactInfo(contactcreatorContactInfo);
+	    //
 
-	/**
-	 * MIPLATFORM
-	 **/
+	    /**
+	     * MIPLATFORM
+	     **/
 
-	MIPlatform platform = new MIPlatform();
+	    MIPlatform platform = new MIPlatform();
 
-	String platformIdentifier = "i-change-citizen-observatory-ionbeam:" + stationId;
+	    String platformIdentifier = "i-change-citizen-observatory-ionbeam:" + stationId;
 
-	platform.setMDIdentifierCode(platformIdentifier);
+	    platform.setMDIdentifierCode(platformIdentifier);
 
-	String siteDescription = stationId;
+	    String siteDescription = stationId;
 
-	platform.setDescription(siteDescription);
+	    platform.setDescription(siteDescription);
 
-	Citation platformCitation = new Citation();
-	platformCitation.setTitle(stationId);
-	platform.setCitation(platformCitation);
+	    Citation platformCitation = new Citation();
+	    platformCitation.setTitle(stationId);
+	    platform.setCitation(platformCitation);
 
-	coreMetadata.getMIMetadata().addMIPlatform(platform);
+	    coreMetadata.getMIMetadata().addMIPlatform(platform);
 
-	/**
-	 * COVERAGEDescription
-	 **/
+	    /**
+	     * COVERAGEDescription
+	     **/
 
-	CoverageDescription coverageDescription = new CoverageDescription();
-	String variableId = "IONBEAM:" + variable.name();
+	    CoverageDescription coverageDescription = new CoverageDescription();
+	    String variableId = "IONBEAM:" + variable.name();
 
-	coverageDescription.setAttributeIdentifier(variableId);
-	coverageDescription.setAttributeTitle(variable.getLabel());
+	    coverageDescription.setAttributeIdentifier(variableId);
+	    coverageDescription.setAttributeTitle(variable.getLabel());
 
-	String attributeDescription = variable.getLabel() + " Units: " + variable.getUnit();
+	    String attributeDescription = variable.getLabel() + " Units: " + variable.getUnit();
 
-	coverageDescription.setAttributeDescription(attributeDescription);
-	coreMetadata.getMIMetadata().addCoverageDescription(coverageDescription);
+	    coverageDescription.setAttributeDescription(attributeDescription);
+	    coreMetadata.getMIMetadata().addCoverageDescription(coverageDescription);
 
-	/**
-	 * ONLINE
-	 */
-	// https://i-change.s3.amazonaws.com/Ams01_TEMP.csv
-	// Online online = new Online();
-	// online.setProtocol(NetProtocols.HTTP.getCommonURN());
-	// String linkage = "https://i-change.s3.amazonaws.com/" + station.getName() + buildingURL;
-	// online.setLinkage(linkage);
-	// online.setName(variable + "@" + station.getName());
-	// online.setFunctionCode("download");
-	// online.setDescription(variable + " Station name: " + station.getName());
-	//
-	// coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(online);
+	    /**
+	     * ONLINE
+	     */
+	    // https://i-change.s3.amazonaws.com/Ams01_TEMP.csv
+	    // Online online = new Online();
+	    // online.setProtocol(NetProtocols.HTTP.getCommonURN());
+	    // String linkage = "https://i-change.s3.amazonaws.com/" + station.getName() + buildingURL;
+	    // online.setLinkage(linkage);
+	    // online.setName(variable + "@" + station.getName());
+	    // online.setFunctionCode("download");
+	    // online.setDescription(variable + " Station name: " + station.getName());
+	    //
+	    // coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(online);
 
-	String resourceIdentifier = generateCode(dataset, variable + ":" + stationId);
+	    String resourceIdentifier = generateCode(dataset, variable + ":" + stationId);
 
-	coreMetadata.getDataIdentification().setResourceIdentifier(resourceIdentifier);
+	    coreMetadata.getDataIdentification().setResourceIdentifier(resourceIdentifier);
 
-	// https://ionbeam-dev.ecmwf.int/api/v1/retrieve?project=public&platform=meteotracker&observation_variable=air_temperature_near_surface&
-	// datetime=2022-06-16T18%3A13%3A15%2B00%3A00&filter=select+%2A+from+result+where+source_id+%3D+%2762ab72c11d8e11061d32002a%27%3B&format=csv
+	    // https://ionbeam-dev.ecmwf.int/api/v1/retrieve?project=public&platform=meteotracker&observation_variable=air_temperature_near_surface&
+	    // datetime=2022-06-16T18%3A13%3A15%2B00%3A00&filter=select+%2A+from+result+where+source_id+%3D+%2762ab72c11d8e11061d32002a%27%3B&format=csv
 
-	/**
-	 * Linkage url to be parametized:
-	 * project={public, i-change}
-	 * platform = {meteotracker, acronet, smart}
-	 * observation_variable = platform.getKey()
-	 */
-	try {
+	    /**
+	     * Linkage url to be parametized:
+	     * project={public, i-change}
+	     * platform = {meteotracker, acronet, smart}
+	     * observation_variable = platform.getKey()
+	     */
 	    startDate = startDate.replace("Z", "+00:00");
 	    String linkage = PolytopeIonBeamMetadataConnector.BASE_URL
 		    + "retrieve?project=public&platform=meteotracker&observation_variable=" + variable.getKey() + "&datetime="
-		    + URLEncoder.encode(startDate, "UTF-8") + "&filter=select+*+from+result+where+source_id+%3D+%27"
-		    +  stationId + "%27%3B&format=json";// + station.getName() +
+		    + URLEncoder.encode(startDate, "UTF-8") + "&filter=select+*+from+result+where+source_id+%3D+%27" + stationId
+		    + "%27%3B&format=json";// + station.getName() +
 	    // buildingURL;
 
 	    Online o = new Online();
@@ -519,12 +534,23 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	    o.setProtocol(CommonNameSpaceContext.POLYTOPE_IONBEAM);
 	    o.setDescription(variable.getLabel() + " Station name: " + stationId);
 	    coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(o);
-	
+
+	    coreMetadata.getMIMetadata().getDistribution().getDistributionOnline().setIdentifier(resourceIdentifier);
+
 	} catch (Exception e) {
-	    // TODO: handle exception
+	   
+	    
 	}
 
-	coreMetadata.getMIMetadata().getDistribution().getDistributionOnline().setIdentifier(resourceIdentifier);
+    }
+
+    private List<JSONObject> getSessionData(String queryPath) throws Exception {
+	//e.g. http://ionbeam-ichange.ecmwf-ichange.f.ewcloud.host/api/v1/retrieve?class=rd&date=20241129&expver=xxxx&stream=lwda&platform=meteotracker&source_id=674954b21def300ee9705dcc
+	List<JSONObject> ret = new ArrayList<>();
+	String url = PolytopeIonBeamMetadataConnector.BASE_URL + PolytopeIonBeamMetadataConnector.RETRIEVE_URL + "?" + queryPath;
+	GSLoggerFactory.getLogger(getClass()).info("Getting " + url);
+	ret = PolytopeIonBeamMetadataConnector.getResultList(url);
+	return ret;
 
     }
 
