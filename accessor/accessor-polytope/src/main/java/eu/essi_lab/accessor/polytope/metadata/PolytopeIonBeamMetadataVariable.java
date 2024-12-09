@@ -36,6 +36,7 @@ public enum PolytopeIonBeamMetadataVariable {
     SOLAR_RADIATION_INDEX(25, "Solar Radiation Index", "solar_radiation_index", "units"), 
     PRESSURE(107, "Air Pressure", "air_pressure_near_surface", "Pa"), 
     DEW_POINT_TEMPERATURE(40, "Dew Point Temperature", "dew_point_temperature", "Kelvin"),
+    POTENTIAL_TEMPERATURE(3, "Potential Temperature", "potential_temperature", "Kelvin"),
     VERTICAL_TEMPERATURE_GRADIENT(100, "Vertical Temperature Gradient", "vertical_temperature_gradient", "°C/100m");
 
     private Integer id;
