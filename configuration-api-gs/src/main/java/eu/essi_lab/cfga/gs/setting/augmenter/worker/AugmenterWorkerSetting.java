@@ -257,7 +257,7 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 			    "Add augmentation job", //
 			    "eu.essi_lab.augmenter.worker.AugmenterWorkerSettingImpl")
 		    .//
-		    withRemoveDirective("Remove augmenter", false, "eu.essi_lab.harvester.worker.HarvestingSettingImpl").//
+		    withRemoveDirective("Remove augmenter", false, "eu.essi_lab.augmenter.worker.AugmenterWorkerSettingImpl").//
 		    withEditDirective("Edit augmenter", ConfirmationPolicy.ON_WARNINGS).//
 
 		    withGridInfo(Arrays.asList(//
