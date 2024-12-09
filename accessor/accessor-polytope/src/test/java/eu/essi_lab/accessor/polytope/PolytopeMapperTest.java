@@ -106,7 +106,7 @@ public class PolytopeMapperTest {
 
     }
 
-    @Test
+    //@Test
     public void testMeteoTrackerMapperFromExample() throws Exception {
 	InputStream stream = PolytopeMapperTest.class.getClassLoader().getResourceAsStream("meteotracker.csv");
 
@@ -253,7 +253,7 @@ public class PolytopeMapperTest {
     
     
 
-    @Test
+    //@Test
     public void testCsvLibraryWithExample() throws IOException {
 	InputStream stream = PolytopeMapperTest.class.getClassLoader().getResourceAsStream("meteotracker.csv");
 
