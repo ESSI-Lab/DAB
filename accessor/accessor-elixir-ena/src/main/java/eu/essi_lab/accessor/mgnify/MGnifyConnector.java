@@ -288,7 +288,9 @@ public class MGnifyConnector extends HarvestedQueryConnector<MGnifyConnectorSett
 			miMetadata.getDataIdentification().addKeywords(k);
 
 			DataIdentification dataIdentification = miMetadata.getDataIdentification();
-			addPointOfContact(dataIdentification, organization);
+			if (organization!=null) {
+				addPointOfContact(dataIdentification, organization);	
+			}			
 
 			dataIdentification.setCitationTitle(title);
 

@@ -60,7 +60,7 @@ public class Study extends MGnifyObject {
     }
 
     public String getCentreName() {
-	return attributes.getString("centre-name");
+	return attributes.optString("centre-name");
     }
     
     public String getLastUpdate() {
