@@ -8,6 +8,8 @@ eu.essi_lab.accessor.csw.CSWMCP1Connector
 eu.essi_lab.accessor.csw.CSWMCP2Connector
 eu.essi_lab.accessor.csw.CSWMultiConnector
 eu.essi_lab.accessor.csw.CSWNODCConnector
+eu.essi_lab.accessor.csw.CSWGetConnector
+eu.essi_lab.accessor.csw.CSWEasyConnector
 eu.essi_lab.accessor.csw.CSWSAEONConnector
 eu.essi_lab.accessor.csw.CSWSHMIConnector
 eu.essi_lab.accessor.csw.CSWTWAPConnector
