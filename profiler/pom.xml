@@ -37,6 +37,7 @@
 		<module>profiler-wis</module>
 		<module>profiler-wms</module>
 		<module>profiler-wms-extent</module>
+		<module>profiler-wms-cluster</module>
 		<module>profiler-thredds</module>
 		<module>profiler-gwis</module>
 		<module>profiler-ssc-feed</module>
