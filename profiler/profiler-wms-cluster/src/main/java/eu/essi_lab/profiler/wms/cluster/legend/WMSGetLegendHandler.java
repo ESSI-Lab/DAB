@@ -31,7 +31,9 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import javax.imageio.ImageIO;
 import javax.ws.rs.WebApplicationException;
@@ -44,10 +46,14 @@ import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.dc_connector.DataCacheConnectorSetting;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
+import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
+import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import eu.essi_lab.profiler.wms.cluster.WMSRequest.Parameter;
+import eu.essi_lab.profiler.wms.cluster.map.WMSGetMapHandler;
 
 /**
  * @author boldrini
@@ -92,23 +98,23 @@ public class WMSGetLegendHandler extends StreamingRequestHandler {
 	    @Override
 	    public void write(OutputStream output) throws IOException, WebApplicationException {
 
-		DataCacheConnector dataCacheConnector = null;
+//		DataCacheConnector dataCacheConnector = null;
 
 		try {
 
-		    dataCacheConnector = DataCacheConnectorFactory.getDataCacheConnector();
-
-		    if (dataCacheConnector == null) {
-			DataCacheConnectorSetting setting = ConfigurationWrapper.getDataCacheConnectorSetting();
-			dataCacheConnector = DataCacheConnectorFactory.newDataCacheConnector(setting);
-			String cachedDays = setting.getOptionValue(DataCacheConnector.CACHED_DAYS).get();
-			String flushInterval = setting.getOptionValue(DataCacheConnector.FLUSH_INTERVAL_MS).get();
-			String maxBulkSize = setting.getOptionValue(DataCacheConnector.MAX_BULK_SIZE).get();
-			dataCacheConnector.configure(DataCacheConnector.MAX_BULK_SIZE, maxBulkSize);
-			dataCacheConnector.configure(DataCacheConnector.FLUSH_INTERVAL_MS, flushInterval);
-			dataCacheConnector.configure(DataCacheConnector.CACHED_DAYS, cachedDays);
-			DataCacheConnectorFactory.setDataCacheConnector(dataCacheConnector);
-		    }
+//		    dataCacheConnector = DataCacheConnectorFactory.getDataCacheConnector();
+//
+//		    if (dataCacheConnector == null) {
+//			DataCacheConnectorSetting setting = ConfigurationWrapper.getDataCacheConnectorSetting();
+//			dataCacheConnector = DataCacheConnectorFactory.newDataCacheConnector(setting);
+//			String cachedDays = setting.getOptionValue(DataCacheConnector.CACHED_DAYS).get();
+//			String flushInterval = setting.getOptionValue(DataCacheConnector.FLUSH_INTERVAL_MS).get();
+//			String maxBulkSize = setting.getOptionValue(DataCacheConnector.MAX_BULK_SIZE).get();
+//			dataCacheConnector.configure(DataCacheConnector.MAX_BULK_SIZE, maxBulkSize);
+//			dataCacheConnector.configure(DataCacheConnector.FLUSH_INTERVAL_MS, flushInterval);
+//			dataCacheConnector.configure(DataCacheConnector.CACHED_DAYS, cachedDays);
+//			DataCacheConnectorFactory.setDataCacheConnector(dataCacheConnector);
+//		    }
 
 		    WMSLegendRequest map = new WMSLegendRequest(webRequest);
 
@@ -140,10 +146,26 @@ public class WMSGetLegendHandler extends StreamingRequestHandler {
 			format = "GIF";
 		    }
 
-		    String view = webRequest.extractViewId().get();
+		    String viewId = webRequest.extractViewId().get();
 
 		    List<InfoLegend> infos = new ArrayList<>();
 		   
+		    Optional<View> view = DiscoveryRequestTransformer.findView(ConfigurationWrapper.getDatabaseURI(), viewId);
+			
+		    List<GSSource> sources = ConfigurationWrapper.getViewSources(view.get());
+		    
+		    sources.sort(new Comparator<GSSource>() {
+
+				@Override
+				public int compare(GSSource o1, GSSource o2) {
+					return o1.getLabel().compareTo(o2.getLabel());
+				}
+			});
+		    
+		    for (GSSource source : sources) {
+				InfoLegend info = new InfoLegend(WMSGetMapHandler.getRandomColorFromSourceId(source.getUniqueIdentifier()), source.getLabel());
+				infos.add(info );
+			}
 
 		    if (widthString == null || widthString.isEmpty()) {
 			widthString = "" + (10 + 10 * 30);

@@ -33,5 +33,16 @@ public class CRSUtilsTest {
 	assertEquals(45.0, upper3.getKey(),0.00001);
 	assertEquals(45.0, upper3.getValue(),0.00001);
     }
+    
+    public static void main(String[] args) throws Exception {    	
+    	SimpleEntry<Double, Double> lower = new SimpleEntry<Double, Double>(-10018754.171394622,0.);//-10018754.171394622 0
+    	SimpleEntry<Double, Double> upper = new SimpleEntry<Double, Double>(0.,10018754.171394628);//0 10018754.171394628
+    	SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> result2 = new SimpleEntry<>(lower,upper);
+    	SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> result3 = CRSUtils.translateBBOX(result2, CRS.EPSG_3857(), CRS.EPSG_4326());
+    	SimpleEntry<Double, Double> lower3 = result3.getKey();	
+    	SimpleEntry<Double, Double> upper3 = result3.getValue();
+    	System.out.println(lower3);
+    	System.out.println(upper3);
+	}
 
 }
