@@ -27,10 +27,12 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 
 import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
@@ -63,19 +65,19 @@ public class HISCentralPugliaConnector extends HarvestedQueryConnector<HISCentra
      */
     public HISCentralPugliaConnector() {
 
+	originalMetadata = new JSONObject();
     }
 
     /**
      * 
      */
 
-    static final String STATIONS_URL = "https://cloud.arpa.puglia.it/Meteo/Stations";
-    
-    
-    static final String BASE_URL = "https://cloud.arpa.puglia.it/Meteo/";
+    static final String STATIONS_URL = "user-permissions";
+
+    static final String BASE_URL = "http://valida-dev.siapmicros.com:9000/api/";
 
     static final String ORGANIZATION_URL = "organization";
-    
+
     static final String PARAMETERS = "parameters";
     /**
      * 
@@ -88,80 +90,89 @@ public class HISCentralPugliaConnector extends HarvestedQueryConnector<HISCentra
      * 
      */
 
+    JSONObject originalMetadata;
+
     private int maxRecords;
 
+    private Logger logger = GSLoggerFactory.getLogger(this.getClass());
+
     public static String BEARER_TOKEN = null;
+
+    private int partialNumbers;
 
     @Override
     public ListRecordsResponse<OriginalMetadata> listRecords(ListRecordsRequest request) throws GSException {
 
 	ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<>();
 
-	String page = "1";
+	int page = 0;
 
 	if (request.getResumptionToken() != null) {
 
-	    page = request.getResumptionToken();
+	    page = Integer.valueOf(request.getResumptionToken());
 	}
 
-	if(BEARER_TOKEN == null) {
+	if (BEARER_TOKEN == null) {
 	    BEARER_TOKEN = ConfigurationWrapper.getCredentialsSetting().getPugliaToken().orElse(null);
 	}
-	
-	
-	// add authorization token
-	String baseUrl = getSourceURL();
 
-	JSONObject organizationInfo = getInfo(ORGANIZATION_URL);
-	JSONObject parameterInfo = getInfo(PARAMETERS);
-	JSONObject stations = getStationsList();
+	Optional<Integer> mr = getSetting().getMaxRecords();
+	boolean maxNumberReached = false;
+	if (!getSetting().isMaxRecordsUnlimited() && mr.isPresent() && page > mr.get() - 1) {
+	    // max record set
+	    maxNumberReached = true;
+	}
+	if (originalMetadata.isEmpty()) {
+	    originalMetadata = getMetadataList();
+	}
 
-	if (stations != null) {
-	    JSONArray stationsArray = stations.optJSONArray("stations");
+	JSONArray metadataArray = originalMetadata.optJSONArray("user_permissions");
 
-	    if (stationsArray != null) {
+	if (page < metadataArray.length() && !maxNumberReached) {
 
-		maxRecords = stationsArray.length();
-		getSetting().getMaxRecords().ifPresent(v -> maxRecords = v);
-		for (int i = 0; i < maxRecords; i++) {
-
-		    JSONObject datasetMetadata = stationsArray.getJSONObject(i);
-		    String id = datasetMetadata.optString("station-id");
-		    if (id != null && !id.isEmpty()) {
-			JSONObject parameterObject = getParameters(id);
-
-			if (parameterObject != null) {
-			    JSONObject stationObject = parameterObject.optJSONObject("station");
-			    if (stationObject != null) {
-				JSONArray parameterArray = stationObject.optJSONArray("parameters");
-				if (parameterArray != null) {
-				    for (int j = 0; j < parameterArray.length(); j++) {
-					JSONObject sensorInfo = parameterArray.getJSONObject(j);
-					ret.addRecord(HISCentralPugliaMapper.create(datasetMetadata, sensorInfo, organizationInfo, parameterInfo));
-				    }
-
-				}
-			    }
-			}
-
-		    }
+	    JSONObject datasetMetadata = metadataArray.getJSONObject(page);
+	    JSONArray stationsArray = datasetMetadata.optJSONArray("station");
+	    JSONArray aggregationArray = datasetMetadata.optJSONArray("aggregation");
+	    List<JSONObject> stationList = new ArrayList<JSONObject>();
+	    List<JSONObject> aggregationList = new ArrayList<JSONObject>();
+	    for (int j = 0; j < stationsArray.length(); j++) {
+		stationList.add(stationsArray.optJSONObject(j));
+	    }
+	    for (int k = 0; k < aggregationArray.length(); k++) {
+		aggregationList.add(stationsArray.optJSONObject(k));
+	    }
+	    datasetMetadata.remove("station");
+	    datasetMetadata.remove("aggregation");
+	    for (JSONObject stationInfo : stationList) {
+		for (JSONObject aggregationInfo : aggregationList) {
+		    ret.addRecord(HISCentralPugliaMapper.create(datasetMetadata, stationInfo, aggregationInfo));
+		    partialNumbers++;
 		}
 	    }
 
+	    ret.setResumptionToken(String.valueOf(page + 1));
+	    logger.debug("ADDED {} records for variable {}", partialNumbers, datasetMetadata.optString("description"));
+
 	} else {
-	    GSLoggerFactory.getLogger(getClass()).info("ERROR getting items.");
+	    ret.setResumptionToken(null);
+
+	    logger.debug("Added Collection records: {} . TOTAL STATION SIZE: {}", partialNumbers, metadataArray.length());
+	    partialNumbers = 0;
 	    BEARER_TOKEN = null;
+	    return ret;
 	}
 
 	return ret;
     }
 
+   
+
     private JSONObject getInfo(String param) throws GSException {
-	
+
 	String url = getSourceURL() + param;
 
 	GSLoggerFactory.getLogger(getClass()).info("Getting " + url);
-	
+
 	int timeout = 120;
 	int responseTimeout = 200;
 	InputStream stream = null;
@@ -170,13 +181,13 @@ public class HISCentralPugliaConnector extends HarvestedQueryConnector<HISCentra
 	    Downloader downloader = new Downloader();
 	    downloader.setConnectionTimeout(TimeUnit.MILLISECONDS, timeout * 1000);
 	    downloader.setResponseTimeout(TimeUnit.MILLISECONDS, responseTimeout * 1000);
-	    
+
 	    HttpResponse<InputStream> getStationResponse = downloader.downloadResponse(//
 		    url.trim(), //
 		    HttpHeaderUtils.build("Authorization", "Bearer " + BEARER_TOKEN));
 
 	    stream = getStationResponse.body();
-	    
+
 	    GSLoggerFactory.getLogger(getClass()).info("Got " + url);
 
 	    if (stream != null) {
@@ -204,7 +215,6 @@ public class HISCentralPugliaConnector extends HarvestedQueryConnector<HISCentra
 	String url = getSourceURL() + STATIONS_URL + "/" + id;
 
 	GSLoggerFactory.getLogger(getClass()).info("Getting " + url);
-	
 
 	int timeout = 120;
 	int responseTimeout = 200;
@@ -214,13 +224,13 @@ public class HISCentralPugliaConnector extends HarvestedQueryConnector<HISCentra
 	    Downloader downloader = new Downloader();
 	    downloader.setConnectionTimeout(TimeUnit.MILLISECONDS, timeout * 1000);
 	    downloader.setResponseTimeout(TimeUnit.MILLISECONDS, responseTimeout * 1000);
-	    
+
 	    HttpResponse<InputStream> getStationResponse = downloader.downloadResponse(//
 		    url.trim(), //
 		    HttpHeaderUtils.build("Authorization", "Bearer " + BEARER_TOKEN));
 
 	    stream = getStationResponse.body();
-	    	    
+
 	    GSLoggerFactory.getLogger(getClass()).info("Got " + url);
 
 	    if (stream != null) {
@@ -243,28 +253,27 @@ public class HISCentralPugliaConnector extends HarvestedQueryConnector<HISCentra
 	return null;
     }
 
-    private JSONObject getStationsList() throws GSException {
+    private JSONObject getMetadataList() throws GSException {
 
 	String url = getSourceURL() + STATIONS_URL;
 
 	GSLoggerFactory.getLogger(getClass()).info("Getting " + url);
-	
 
 	int timeout = 120;
 	int responseTimeout = 200;
 	InputStream stream = null;
 	try {
-    
+
 	    Downloader downloader = new Downloader();
 	    downloader.setConnectionTimeout(TimeUnit.MILLISECONDS, timeout * 1000);
 	    downloader.setResponseTimeout(TimeUnit.MILLISECONDS, responseTimeout * 1000);
-	    
+
 	    HttpResponse<InputStream> getStationResponse = downloader.downloadResponse(//
 		    url.trim(), //
 		    HttpHeaderUtils.build("Authorization", "Bearer " + BEARER_TOKEN));
 
 	    stream = getStationResponse.body();
-	        
+
 	    GSLoggerFactory.getLogger(getClass()).info("Got " + url);
 
 	    if (stream != null) {
@@ -286,8 +295,6 @@ public class HISCentralPugliaConnector extends HarvestedQueryConnector<HISCentra
 	}
 	return null;
     }
-
-
 
     @Override
     public List<String> listMetadataFormats() throws GSException {
@@ -305,7 +312,7 @@ public class HISCentralPugliaConnector extends HarvestedQueryConnector<HISCentra
     @Override
     public boolean supports(GSSource source) {
 	String endpoint = source.getEndpoint();
-	return endpoint.contains("arpa.puglia.it");
+	return endpoint.contains("valida-dev.siapmicros.com") || endpoint.contains("93.57.89.5");
     }
 
     @Override
@@ -325,10 +332,8 @@ public class HISCentralPugliaConnector extends HarvestedQueryConnector<HISCentra
 	return url;
 
     }
-    
-    
-    public static void main(String[] args) throws Exception {
 
+    public static void main(String[] args) throws Exception {
 
     }
 
