@@ -68,7 +68,7 @@ public class HISCentralPugliaMapper extends FileIdentifierMapper {
     public HISCentralPugliaMapper() {
 	// 2010-06-01T00:00:00
 	// 2023-01-16T09:30:00+01:00
-	this.iso8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+	this.iso8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 	iso8601Format.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 
@@ -81,7 +81,7 @@ public class HISCentralPugliaMapper extends FileIdentifierMapper {
      * @param sensorInfo
      * @return
      */
-    static OriginalMetadata create(JSONObject datasetInfo, JSONObject sensorInfo, JSONObject organizationInfo, JSONObject parameterInfo) {
+    static OriginalMetadata create(JSONObject datasetInfo, JSONObject stationInfo, JSONObject aggregationInfo) {
 
 	OriginalMetadata originalMetadata = new OriginalMetadata();
 
@@ -89,9 +89,8 @@ public class HISCentralPugliaMapper extends FileIdentifierMapper {
 
 	JSONObject jsonObject = new JSONObject();
 	jsonObject.put("dataset-info", datasetInfo);
-	jsonObject.put("sensor-info", sensorInfo);
-	jsonObject.put("organization-info", organizationInfo);
-	jsonObject.put("parameter-info", parameterInfo);
+	jsonObject.put("station-info", stationInfo);
+	jsonObject.put("aggregation-info", aggregationInfo);
 
 	originalMetadata.setMetadata(jsonObject.toString(4));
 
@@ -111,27 +110,18 @@ public class HISCentralPugliaMapper extends FileIdentifierMapper {
      * @param metadata
      * @return
      */
-    private JSONObject retrieveSensorInfo(OriginalMetadata metadata) {
+    private JSONObject retrieveStationInfo(OriginalMetadata metadata) {
 
-	return new JSONObject(metadata.getMetadata()).getJSONObject("sensor-info");
+	return new JSONObject(metadata.getMetadata()).getJSONObject("station-info");
     }
 
     /**
      * @param metadata
      * @return
      */
-    private JSONObject retrieveOrganizationInfo(OriginalMetadata metadata) {
+    private JSONObject retrieveAggregationInfo(OriginalMetadata metadata) {
 
-	return new JSONObject(metadata.getMetadata()).getJSONObject("organization-info");
-    }
-
-    /**
-     * @param metadata
-     * @return
-     */
-    private JSONObject retrieveParameterInfo(OriginalMetadata metadata) {
-
-	return new JSONObject(metadata.getMetadata()).getJSONObject("parameter-info");
+	return new JSONObject(metadata.getMetadata()).getJSONObject("aggregation-info");
     }
 
     @Override
@@ -149,16 +139,10 @@ public class HISCentralPugliaMapper extends FileIdentifierMapper {
 
 	JSONObject datasetInfo = retrieveDatasetInfo(originalMD);
 
-	JSONObject sensorInfo = retrieveSensorInfo(originalMD);
+	JSONObject stationInfo = retrieveStationInfo(originalMD);
 
-	JSONObject organizationInfo = retrieveOrganizationInfo(originalMD);
-
-	JSONObject parameterInfo = retrieveParameterInfo(originalMD);
-
-
-
-	String resourceTitle = datasetInfo.optString("station-name");
-	String resourceAbstract = datasetInfo.optString("abstract"); // always null
+	String resourceTitle = stationInfo.optString("station_name");
+	String resourceAbstract = datasetInfo.optString("description"); // always null
 
 	// locality repeat the name of station
 	String locality = datasetInfo.optString("site-information");
@@ -170,47 +154,34 @@ public class HISCentralPugliaMapper extends FileIdentifierMapper {
 	    }
 	    additionalInfo = additionalInfo.substring(0, additionalInfo.length() - 2);
 	}
-	String stationId = datasetInfo.optString("station-id");
-	String spatialExtent = datasetInfo.optString("spatial-extent");
+	String stationId = stationInfo.optString("id_stz");
 
+	// BBOX
+	// "altitude": 60,
+	// "long": "16.48389",
+	// "lat": "41.23361"
 	//
-	// spatailextent: seems to be lat, lon, alt
-	// e.g.45.6783,7.10742,1238
-	Double pointLon = null;
-	Double pointLat = null;
-	Double altitude = null;
-
-	String[] splittedSpatial = spatialExtent.split(",");
-	if (splittedSpatial.length > 0) {
-	    if (splittedSpatial.length > 2) {
-		pointLat = Double.parseDouble(splittedSpatial[0]);
-		pointLon = Double.parseDouble(splittedSpatial[1]);
-		altitude = Double.parseDouble(splittedSpatial[2]);
-	    } else {
-		pointLat = Double.parseDouble(splittedSpatial[0]);
-		pointLon = Double.parseDouble(splittedSpatial[1]);
-	    }
-	}
-	String region = datasetInfo.optString("territory-of-origin-of-data");
-
-	// topic category
-	String topicCataegory = datasetInfo.optString("topic-category");
+	Double pointLon = stationInfo.optDouble("long");
+	Double pointLat = stationInfo.optDouble("lat");
+	Double altitude = stationInfo.optDouble("altitude");
 
 	// temporal
-	String temporalExtentInterval = datasetInfo.optString("temporal-extent");
-
-	String[] splittedTime = temporalExtentInterval.split("\\/");
 	String tempExtenBegin = null;
 	String tempExtenEnd = null;
+	String temporalExtentInterval = datasetInfo.optString("date_range");
+	if (temporalExtentInterval != null) {
+	    temporalExtentInterval = temporalExtentInterval.replaceFirst(" ", "T").trim();
+	    String[] splittedTime = temporalExtentInterval.split("\\|");
 
-	if (splittedTime.length > 0) {
-	    if (splittedTime.length > 1) {
-		tempExtenBegin = splittedTime[0];
-		tempExtenEnd = splittedTime[1];
-	    } else {
-		tempExtenBegin = splittedTime[0];
+	    if (splittedTime.length > 0) {
+		if (splittedTime.length > 1) {
+		    tempExtenBegin = splittedTime[0].trim();
+		    tempExtenEnd = splittedTime[1].trim();
+		} else {
+		    tempExtenBegin = splittedTime[0].trim();
+		}
+
 	    }
-
 	}
 
 	String city = datasetInfo.optString("city");
@@ -222,49 +193,55 @@ public class HISCentralPugliaMapper extends FileIdentifierMapper {
 
 	//
 	// MEASURE INFO
+	// "measure": [
 	// {
-	// "observed-property": "Portata",
-	// "temporal-extent": "2023-03-02T14:14:29Z",
-	// "time-series-id": 672,
-	// "units-of-measure": "m³/sec"
+	// "id_measure": 21,
+	// "measure_name": "Livello",
+	// "measure_unit": "m"
+	// },
+	// {
+	// "id_measure": 1021,
+	// "measure_name": "Livello2",
+	// "measure_unit": null
 	// }
+	// ]
 
-	String timeSeriesId = sensorInfo.optString("time-series-id");
-	String measureName = sensorInfo.optString("observed-property");
+	JSONArray measureInfo = datasetInfo.optJSONArray("measure");
+	JSONObject measure = measureInfo.optJSONObject(0);
+	String measureId = measure.optString("id_measure");
+	String measureName = measure.optString("measure_name");
+	String measureUnits = measure.optString("measure_unit");
+
+	String timeSeriesId = stationInfo.optString("time-series-id");
+
 	// String tempExtenBegin = sensorInfo.optString("startDate");
 	// String tempExtenEnd = sensorInfo.optString("endDate");
 
-	String measureUnits = sensorInfo.optString("units-of-measure");
-
-
-
-	JSONObject organizationObject = organizationInfo.optJSONObject("organization");
+	// JSONObject organizationObject = organizationInfo.optJSONObject("organization");
 	String legalConstraint = null;
 	String creatorOrg = null;
 	String legalLimitations = null;
 	String pointOfContact = null;
-	if (organizationObject != null) {
-	    legalConstraint = organizationObject.optString("conditions-for-access-and-use");
-	    creatorOrg = organizationObject.optString("creator-organization");
-	    legalLimitations = organizationObject.optString("limitations-on-public-access");
-	    pointOfContact = organizationObject.optString("point-of-contact-organization");
-	}
+	// if (organizationObject != null) {
+	// legalConstraint = organizationObject.optString("conditions-for-access-and-use");
+	// creatorOrg = organizationObject.optString("creator-organization");
+	// legalLimitations = organizationObject.optString("limitations-on-public-access");
+	// pointOfContact = organizationObject.optString("point-of-contact-organization");
+	// }
 
-
-
-	JSONArray parametersArr = parameterInfo.optJSONArray("parameters");
-	String uriCode = null;
-	for (int i = 0; i < parametersArr.length(); i++) {
-	    JSONObject jsonParameter = parametersArr.getJSONObject(i);
-	    if (jsonParameter != null) {
-		String obsProp = jsonParameter.optString("observed-property");
-		if (obsProp.toLowerCase().equals(measureName.toLowerCase())) {
-		    uriCode = jsonParameter.optString("keywords");
-		    break;
-		}
-
-	    }
-	}
+	// JSONArray parametersArr = parameterInfo.optJSONArray("parameters");
+	// String uriCode = null;
+	// for (int i = 0; i < parametersArr.length(); i++) {
+	// JSONObject jsonParameter = parametersArr.getJSONObject(i);
+	// if (jsonParameter != null) {
+	// String obsProp = jsonParameter.optString("observed-property");
+	// if (obsProp.toLowerCase().equals(measureName.toLowerCase())) {
+	// uriCode = jsonParameter.optString("keywords");
+	// break;
+	// }
+	//
+	// }
+	// }
 
 	// String statisticalFunction = "";
 	// if (sensorInfo.getJSONObject("observedProperty").has("statisticalFunction")) {
@@ -327,11 +304,11 @@ public class HISCentralPugliaMapper extends FileIdentifierMapper {
 	//
 	// topic category
 	//
-	if (topicCataegory.toLowerCase().contains("meteo")) {
-	    MDTopicCategoryCodeType topic = MDTopicCategoryCodeType.CLIMATOLOGY_METEOROLOGY_ATMOSPHERE;
-	    coreMetadata.getMIMetadata().getDataIdentification().addTopicCategory(topic);
-
-	}
+	// if (topicCataegory.toLowerCase().contains("meteo")) {
+	// MDTopicCategoryCodeType topic = MDTopicCategoryCodeType.CLIMATOLOGY_METEOROLOGY_ATMOSPHERE;
+	// coreMetadata.getMIMetadata().getDataIdentification().addTopicCategory(topic);
+	//
+	// }
 
 	//
 	// legal constraints
@@ -420,9 +397,7 @@ public class HISCentralPugliaMapper extends FileIdentifierMapper {
 	//
 	// keywords
 	//
-	coreMetadata.getMIMetadata().getDataIdentification().addKeyword(region);
 	coreMetadata.getMIMetadata().getDataIdentification().addKeyword(measureName);
-	coreMetadata.getMIMetadata().getDataIdentification().addKeyword(topicCataegory);
 	// coreMetadata.getMIMetadata().getDataIdentification().addKeyword(measureDescription);
 
 	coreMetadata.getMIMetadata().getDataIdentification().addKeyword("PUGLIA");
@@ -439,7 +414,7 @@ public class HISCentralPugliaMapper extends FileIdentifierMapper {
 	referenceSystem.setCode("EPSG:4326");
 	referenceSystem.setCodeSpace("EPSG");
 	coreMetadata.getMIMetadata().addReferenceSystemInfo(referenceSystem);
-	
+
 	if (pointLat != null && pointLon != null) {
 	    coreMetadata.addBoundingBox(//
 		    pointLat, //
@@ -479,7 +454,7 @@ public class HISCentralPugliaMapper extends FileIdentifierMapper {
 	TemporalExtent temporalExtent = new TemporalExtent();
 	temporalExtent.setBeginPosition(beginPosition);
 	// end time to be reviewed
-	if (tempExtenEnd != null && tempExtenEnd.isEmpty()) {
+	if (tempExtenEnd == null || tempExtenEnd.isEmpty()) {
 	    temporalExtent.setIndeterminateEndPosition(TimeIndeterminateValueType.NOW);
 	} else {
 	    temporalExtent.setEndPosition(normalizeUTCPosition(tempExtenEnd));
@@ -540,13 +515,13 @@ public class HISCentralPugliaMapper extends FileIdentifierMapper {
 	    dataset.getExtensionHandler().setAttributeUnits(measureUnits);
 	}
 
-	if (uriCode != null && !uriCode.isEmpty()) {
-	    dataset.getExtensionHandler().setObservedPropertyURI(uriCode);
-	}
+	// if (uriCode != null && !uriCode.isEmpty()) {
+	// dataset.getExtensionHandler().setObservedPropertyURI(uriCode);
+	// }
 
 	// as no description is given this field is calculated
 	HISCentralUtils.addDefaultAttributeDescription(dataset, coverageDescription);
-	
+
 	coreMetadata.getMIMetadata().addCoverageDescription(coverageDescription);
 
 	coreMetadata.getDataIdentification().setResourceIdentifier(resourceIdentifier);
@@ -564,5 +539,13 @@ public class HISCentralPugliaMapper extends FileIdentifierMapper {
 	}
 
 	return timePosition;
+    }
+
+    public static void main(String[] args) {
+	String s = "2009-04-16 00:00:00 | ";
+	s = s.replaceFirst(" ", "T").trim();
+	String[] splittedTime = s.split("\\|");
+	System.out.println(s);
+
     }
 }
