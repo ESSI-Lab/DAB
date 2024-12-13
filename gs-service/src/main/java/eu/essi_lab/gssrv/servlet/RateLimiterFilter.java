@@ -156,6 +156,7 @@ public class RateLimiterFilter implements Filter {
 		requestPath.contains("request-monitor") || //
 		requestPath.endsWith("/wms") || //
 		requestPath.endsWith("/wms-extent") || //
+		requestPath.endsWith("/wms-cluster") || //
 		requestPath.contains("/FeatureServer/") || //
 		requestPath.contains("/worldcereal/") || //
 		setting.getComputationType() == ComputationType.DISABLED) {
