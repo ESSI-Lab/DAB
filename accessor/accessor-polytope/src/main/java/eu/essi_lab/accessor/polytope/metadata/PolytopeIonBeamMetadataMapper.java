@@ -196,6 +196,10 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	    
 	    String internalId = datasetInfo.optString("internal_id");
 
+	    JSONArray location = datasetInfo.optJSONArray("location");
+	    Double lat = location.getDouble(0);
+	    Double lon  = location.getDouble(1);
+	    
 	    JSONArray time_span = datasetInfo.optJSONArray("time_span");
 	    String startDate = time_span.getString(0);
 	    String endDate = time_span.getString(1);
@@ -209,13 +213,31 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	    String platformName = datasetInfo.optString("platform");
 	    
 	    
-	    String queryPath = "class=" + marsRequestClass + "&date=" + marsRequestDate + "&expver=" + marsRequestExpver + "&stream=" + marsRequestStream + "&platform="  +platformName + "&source_id=" + stationId;
+	    String queryPath = "class=" + marsRequestClass + "&date=" + marsRequestDate + "&expver=" + marsRequestExpver + "&stream=" + marsRequestStream + "&platform="  +platformName + "&internal_id=" + internalId;
 	   
-
-	    PolytopeIonBeamMetadataMeteoTrackerVariable variable = PolytopeIonBeamMetadataMeteoTrackerVariable.decode(varType);
-
 	    
-
+	   String variableLabel = null;
+	   String variableKey = null;
+	   String variableName = null;
+	   String variableUnits = null;
+	    if (platformName.toLowerCase().contains("meteotracker")) {
+		// meteotracker use-case
+		dataset.getPropertyHandler().setIsTrajectory(true);
+		PolytopeIonBeamMetadataMeteoTrackerVariable variable = PolytopeIonBeamMetadataMeteoTrackerVariable.decode(varType);
+		variableLabel = variable.getLabel();
+		variableKey = variable.getKey();
+		variableUnits = variable.getUnit();
+		variableName = variable.name();
+	    } else {
+		//acronet
+		dataset.getPropertyHandler().setIsTimeseries(true);
+		PolytopeIonBeamMetadataAcronetVariable variable = PolytopeIonBeamMetadataAcronetVariable.decode(varType);
+		variableLabel = variable.getLabel();
+		variableKey = variable.getKey();
+		variableUnits = variable.getUnit();
+		variableName = variable.name();
+	    }
+	    
 	    Resolution resolution = Resolution.HOURLY;
 
 	    // TEMPORAL EXTENT
@@ -263,8 +285,8 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 		coreMetadata.getMIMetadata().getDataIdentification().addTemporalExtent(extent);
 	    }
 
-	    coreMetadata.setTitle("Acquisitions of " + variable.getLabel() + " through MeteoTracker mobile weather station: " + stationId);
-	    coreMetadata.setAbstract("This dataset contains " + variable.getLabel()
+	    coreMetadata.setTitle("Acquisitions of " + variableLabel + " through MeteoTracker mobile weather station: " + stationId);
+	    coreMetadata.setAbstract("This dataset contains " + variableLabel
 		    + " timeseries from I-CHANGE Citizen Observatory, acquired by a specific observing mobile weather station (" + stationId
 		    + " ).");
 
@@ -283,9 +305,9 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	    // coreMetadata.getMIMetadata().getDataIdentification().addKeyword("ICAO: " + station.getIcao());
 	    // }
 
-	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword(variable.getLabel());
-	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword(variable.getKey());
-	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword(variable.toString().toLowerCase());
+	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword(variableLabel);
+	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword(variableKey);
+	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword(variableName);
 
 	    if (resolution.equals(Resolution.HOURLY))
 		coreMetadata.getMIMetadata().getDataIdentification().addKeyword("hourly");
@@ -294,7 +316,7 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	    handler.setTimeUnits("h");
 	    handler.setTimeResolution("1");
 	    handler.setAttributeMissingValue("-9999");
-	    handler.setAttributeUnitsAbbreviation(variable.getUnit());
+	    handler.setAttributeUnitsAbbreviation(variableUnits);
 
 	    //
 	    // URL + variable
@@ -312,12 +334,7 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	    // 44.4005098, 8.675219 44.400353, 8.6750815 44.4002186, 8.6655395 44.3914033, 8.665203 44.3911424, 8.664728
 	    // 44.3910255, 8.6391694 44.386031))",
 
-	    if (platformName.toLowerCase().contains("meteotracker")) {
-		// meteotracker use-case
-		dataset.getPropertyHandler().setIsTrajectory(true);
-	    } else {
-		dataset.getPropertyHandler().setIsTimeseries(true);
-	    }
+
 
 	    
 	    
@@ -400,7 +417,6 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 
 	    }
 	    // elevation
-
 	    if (minAlt != null && maxAlt != null) {
 		VerticalExtent verticalExtent = new VerticalExtent();
 		verticalExtent.setMinimumValue(minAlt);
@@ -484,12 +500,12 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	     **/
 
 	    CoverageDescription coverageDescription = new CoverageDescription();
-	    String variableId = "IONBEAM:" + variable.name();
+	    String variableId = "IONBEAM:" + variableName;
 
 	    coverageDescription.setAttributeIdentifier(variableId);
-	    coverageDescription.setAttributeTitle(variable.getLabel());
+	    coverageDescription.setAttributeTitle(variableLabel);
 
-	    String attributeDescription = variable.getLabel() + " Units: " + variable.getUnit();
+	    String attributeDescription = variableLabel + " Units: " + variableUnits;
 
 	    coverageDescription.setAttributeDescription(attributeDescription);
 	    coreMetadata.getMIMetadata().addCoverageDescription(coverageDescription);
@@ -508,7 +524,7 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	    //
 	    // coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(online);
 
-	    String resourceIdentifier = generateCode(dataset, variable + ":" + stationId);
+	    String resourceIdentifier = generateCode(dataset, variableKey + ":" + stationId);
 
 	    coreMetadata.getDataIdentification().setResourceIdentifier(resourceIdentifier);
 
@@ -523,7 +539,7 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	     */
 	    startDate = startDate.replace("Z", "+00:00");
 	    String linkage = PolytopeIonBeamMetadataConnector.BASE_URL
-		    + "retrieve?project=public&platform=meteotracker&observation_variable=" + variable.getKey() + "&datetime="
+		    + "retrieve?project=public&platform=meteotracker&observation_variable=" + variableKey + "&datetime="
 		    + URLEncoder.encode(startDate, "UTF-8") + "&filter=select+*+from+result+where+source_id+%3D+%27" + stationId
 		    + "%27%3B&format=json";// + station.getName() +
 	    // buildingURL;
@@ -531,10 +547,10 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	    Online o = new Online();
 	    o.setLinkage(linkage);
 	    o.setFunctionCode("download");
-	    o.setName(stationId + ":" + variable.getKey());
+	    o.setName(stationId + ":" + variableKey);
 	    o.setIdentifier(stationId + ":" + variableId);
 	    o.setProtocol(CommonNameSpaceContext.POLYTOPE_IONBEAM);
-	    o.setDescription(variable.getLabel() + " Station name: " + stationId);
+	    o.setDescription(variableLabel + " Station name: " + stationId);
 	    coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(o);
 
 	    coreMetadata.getMIMetadata().getDistribution().getDistributionOnline().setIdentifier(resourceIdentifier);
