@@ -114,7 +114,7 @@ public class WMSGetMapHandler extends StreamingRequestHandler {
 		return ret;
 	}
 
-	private String checkParameter(WMSMapRequest map, Parameter parameter) throws Exception {
+	public static String checkParameter(WMSMapRequest map, Parameter parameter) throws Exception {
 		String ret = map.getParameterValue(parameter);
 		if (ret == null) {
 			throw new Exception(parameter.getKeys()[0]);
@@ -279,7 +279,7 @@ public class WMSGetMapHandler extends StreamingRequestHandler {
 
 						CountSet count = executor.count(discoveryMessage);
 						int stationCount = count.getCount();
-
+						int transparency = 200;
 						if (stationCount > 0) {
 
 							List<StationRecord> stations = new ArrayList<>();
@@ -362,7 +362,7 @@ public class WMSGetMapHandler extends StreamingRequestHandler {
 
 								// Draw the white background rectangle
 								int padding = 1; // Padding around the text
-								ig2.setColor(new Color(255, 255, 255, 128));
+								ig2.setColor(new Color(255, 255, 255, transparency));
 								ig2.fillRect(centerLabelX - labelWidth / 2 - padding / 2,
 										centerLabelY - labelHeight / 2 - padding / 2, labelWidth + padding,
 										labelHeight - padding);
@@ -381,9 +381,9 @@ public class WMSGetMapHandler extends StreamingRequestHandler {
 								ig2.setStroke(new BasicStroke(1)); // Thin line for the border
 								ig2.drawOval(x, y, diameter, diameter);
 
-//			    ig2.setColor(Color.BLACK);
-//			    ig2.setStroke(new BasicStroke(1)); // Slightly thicker line for the border
-//			    ig2.drawRect(1, 1, width - 2, height - 2);
+			    ig2.setColor(new Color(0,0,0,40));
+			    ig2.setStroke(new BasicStroke(1)); // Slightly thicker line for the border
+			    ig2.drawRect(0, 0 , width - 2, height - 2);
 
 							} else {
 
@@ -443,11 +443,11 @@ public class WMSGetMapHandler extends StreamingRequestHandler {
 										color = getRandomColorFromSourceId(sourceId);
 									}
 									// point
-									Color ac = new Color(color.getRed(), color.getGreen(), color.getBlue(), 127);
+									Color ac = new Color(color.getRed(), color.getGreen(), color.getBlue(), transparency);
 									ig2.setColor(ac);
 									ig2.fillOval(pixMinX - r / 2, pixMinY - r / 2, r, r);
 									Color g = Color.black;
-									Color ag = new Color(g.getRed(), g.getGreen(), g.getBlue(), 127);
+									Color ag = new Color(g.getRed(), g.getGreen(), g.getBlue(), transparency);
 									ig2.setColor(ag);
 									ig2.drawOval(pixMinX - r / 2, pixMinY - r / 2, r, r);
 
@@ -503,10 +503,10 @@ public class WMSGetMapHandler extends StreamingRequestHandler {
 		int r = (hash & 0xFF0000) >> 16;
 		int g = (hash & 0x00FF00) >> 8;
 		int b = (hash & 0x0000FF);
-		return new Color(r, g, b, 120);
+		return new Color(r, g, b, 200);
 	}
 
-	private String decodeFormat(String format) {
+	public static String decodeFormat(String format) {
 		if (format == null || format.isEmpty()) {
 			format = "PNG";
 		}

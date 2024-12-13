@@ -48,7 +48,7 @@ import eu.essi_lab.profiler.wms.cluster.feature.info.WMSGetFeatureInfoHandler;
 import eu.essi_lab.profiler.wms.cluster.feature.info.WMSGetFeatureInfoRequestFilter;
 import eu.essi_lab.profiler.wms.cluster.legend.WMSGetLegendHandler;
 import eu.essi_lab.profiler.wms.cluster.legend.WMSLegendRequestFilter;
-import eu.essi_lab.profiler.wms.cluster.map.WMSGetMapHandler;
+import eu.essi_lab.profiler.wms.cluster.map.WMSGetMapHandler2;
 import eu.essi_lab.profiler.wms.cluster.map.WMSMapRequestFilter;
 
 /**
@@ -85,7 +85,7 @@ public class WMSProfiler extends Profiler<WMSClusterProfilerSetting> {
 	selector.register(new WMSCapabilitiesFilter(), capabilitiesHandler);
 
 	// Get Map
-	WMSGetMapHandler getMapHandler = new WMSGetMapHandler();
+	WMSGetMapHandler2 getMapHandler = new WMSGetMapHandler2();
 	selector.register(new WMSMapRequestFilter(), getMapHandler);
 
 	// Get Legend
