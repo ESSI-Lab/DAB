@@ -94,4 +94,10 @@ public class ElasticsearchExecutor implements DatabaseExecutor {
 	return null;
     }
 
+    @Override
+    public WMSClusterResponse execute(WMSClusterRequest request) throws GSException {
+
+	return null;
+    }
+
 }

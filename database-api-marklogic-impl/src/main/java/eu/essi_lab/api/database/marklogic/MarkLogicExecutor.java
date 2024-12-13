@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.json.JSONObject;
+import org.w3c.dom.Node;
 
 import com.marklogic.xcc.ResultSequence;
 import com.marklogic.xcc.exceptions.RequestException;
@@ -40,6 +41,10 @@ import eu.essi_lab.api.database.marklogic.executor.ExecutorUtils;
 import eu.essi_lab.api.database.marklogic.executor.eiffel.EiffelBondHandler;
 import eu.essi_lab.api.database.marklogic.executor.eiffel.EiffelSpatialExtentHandler;
 import eu.essi_lab.api.database.marklogic.search.MarkLogicDiscoveryBondHandler;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.IOStreamUtils;
+import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
@@ -50,6 +55,7 @@ import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
 import eu.essi_lab.messages.stats.StatisticsMessage;
 import eu.essi_lab.messages.stats.StatisticsResponse;
+import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.wrapper.marklogic.MarkLogicWrapper;
@@ -58,6 +64,80 @@ import eu.essi_lab.wrapper.marklogic.MarkLogicWrapper;
  * @author Fabrizio
  */
 public class MarkLogicExecutor extends MarkLogicReader implements DatabaseExecutor {
+
+    @Override
+    public WMSClusterResponse execute(WMSClusterRequest request) throws GSException {
+
+	try {
+	    String template = IOStreamUtils.asUTF8String(//
+		    getClass().getClassLoader().getResourceAsStream("wms-cluster-query-template.txt"));
+
+	    template = template.replace("MAX_RESULTS", String.valueOf(request.getMaxResults()));
+
+	    template = template.replace("SOUTH", String.valueOf(request.getExtent().getSouth()));
+	    template = template.replace("WEST", String.valueOf(request.getExtent().getWest()));
+	    template = template.replace("NORTH", String.valueOf(request.getExtent().getNorth()));
+	    template = template.replace("EAST", String.valueOf(request.getExtent().getEast()));
+
+	    String viewQuery = ConfigurationWrapper.getViewSources(request.getView()).//
+		    stream().//
+		    map(v -> "gs:siq('" + v.getUniqueIdentifier() + "','preprodenvconf')\n").//
+		    collect(Collectors.joining(",", "gs:orq((", "))"));
+
+	    template = template.replace("VIEW_QUERY", viewQuery);
+
+	    String responseString = getDatabase().getWrapper().submit(template).asString();
+
+	    WMSClusterResponse response = new WMSClusterResponse();
+
+	    if (!responseString.isEmpty()) {
+
+		XMLDocumentReader reader = new XMLDocumentReader(responseString);
+
+		boolean estimateResponse = reader.evaluateBoolean("exists(//*:estimate)");
+		boolean datasetsResponse = reader.evaluateBoolean("exists(//*:datasets)");
+
+		if (estimateResponse) {
+
+		    Integer stationsCount = Integer.valueOf(reader.evaluateTextContent("//*:estimate/*:stationsCount/text()").get(0));
+		    Integer totalCount = Integer.valueOf(reader.evaluateTextContent("//*:estimate/*:totalCount/text()").get(0));
+
+		    Node termFrequency = reader.evaluateNode("//*:termFrequency");
+
+		    TermFrequencyMap map = TermFrequencyMap.create(termFrequency);
+
+		    response.setTotalCount(totalCount);
+		    response.setStationsCount(stationsCount);
+
+		    response.setMap(map);
+
+		} else if (datasetsResponse) {
+
+		    List<String> list = new ArrayList<String>(Arrays.asList(responseString.split("<gs:Dataset")));
+		    list.remove(0); // removes <gs:datasets>
+
+		    List<String> datasets = list.stream().map(s -> {
+
+			String out = "<gs:Dataset " + s;
+			out = out.replace("</gs:datasets>", "");
+
+			return out;
+
+		    }).collect(Collectors.toList());
+
+		    response.setDatasets(datasets);
+		}
+	    }
+
+	    return response;
+
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+
+	    throw GSException.createException(getClass(), "MarkLogicExecutorWMSClusterError", e);
+	}
+    }
 
     @Override
     public StatisticsResponse compute(StatisticsMessage message) throws GSException {
@@ -77,7 +157,7 @@ public class MarkLogicExecutor extends MarkLogicReader implements DatabaseExecut
 	    throw e;
 	}
     }
-    
+
     /**
      * @param message
      * @param start
