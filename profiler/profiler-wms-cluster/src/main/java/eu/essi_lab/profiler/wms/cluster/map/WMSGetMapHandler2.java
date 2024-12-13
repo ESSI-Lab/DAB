@@ -284,9 +284,9 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 			    ig2.setStroke(new BasicStroke(1)); // Thin line for the border
 			    ig2.drawOval(x, y, diameter, diameter);
 
-			    // ig2.setColor(Color.BLACK);
-			    // ig2.setStroke(new BasicStroke(1)); // Slightly thicker line for the border
-			    // ig2.drawRect(1, 1, width - 2, height - 2)
+			    ig2.setColor(new Color(0,0,0,40));
+			    ig2.setStroke(new BasicStroke(1)); // Slightly thicker line for the border
+			    ig2.drawRect(0, 0 , width - 2, height - 2);
 
 			} else if (!response.getDatasets().isEmpty()) {
 
