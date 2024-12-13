@@ -21,7 +21,7 @@ package eu.essi_lab.accessor.polytope.metadata;
  * #L%
  */
 
-public enum PolytopeIonBeamMetadataVariable {
+public enum PolytopeIonBeamMetadataMeteoTrackerVariable {
 
     /**
      * The values of variables are taken from the following:
@@ -71,15 +71,15 @@ public enum PolytopeIonBeamMetadataVariable {
 	this.key = key;
     }
 
-    PolytopeIonBeamMetadataVariable(Integer id, String label, String key, String unit) {
+    PolytopeIonBeamMetadataMeteoTrackerVariable(Integer id, String label, String key, String unit) {
 	this.id = id;
 	this.label = label;
 	this.key = key;
 	this.unit = unit;
     }
 
-    public static PolytopeIonBeamMetadataVariable decode(String id) {
-	for (PolytopeIonBeamMetadataVariable var : values()) {
+    public static PolytopeIonBeamMetadataMeteoTrackerVariable decode(String id) {
+	for (PolytopeIonBeamMetadataMeteoTrackerVariable var : values()) {
 	    if (var.getKey().toString().equals(id)) {
 		return var;
 	    }

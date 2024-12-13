@@ -193,6 +193,8 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 
 	    String stationName = datasetInfo.optString("name");
 	    String stationId = datasetInfo.optString("external_id");
+	    
+	    String internalId = datasetInfo.optString("internal_id");
 
 	    JSONArray time_span = datasetInfo.optJSONArray("time_span");
 	    String startDate = time_span.getString(0);
@@ -210,7 +212,7 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	    String queryPath = "class=" + marsRequestClass + "&date=" + marsRequestDate + "&expver=" + marsRequestExpver + "&stream=" + marsRequestStream + "&platform="  +platformName + "&source_id=" + stationId;
 	   
 
-	    PolytopeIonBeamMetadataVariable variable = PolytopeIonBeamMetadataVariable.decode(varType);
+	    PolytopeIonBeamMetadataMeteoTrackerVariable variable = PolytopeIonBeamMetadataMeteoTrackerVariable.decode(varType);
 
 	    
 
@@ -606,9 +608,9 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	}
     }
 
-    protected Map<PolytopeIonBeamMetadataVariable, PolytopeIonBeamMetadataStation> getMapStations(String originalMetadata) {
+    protected Map<PolytopeIonBeamMetadataMeteoTrackerVariable, PolytopeIonBeamMetadataStation> getMapStations(String originalMetadata) {
 
-	Map<PolytopeIonBeamMetadataVariable, PolytopeIonBeamMetadataStation> mapStations = new HashMap<>();
+	Map<PolytopeIonBeamMetadataMeteoTrackerVariable, PolytopeIonBeamMetadataStation> mapStations = new HashMap<>();
 	try {
 	    // delimiter seems to be ; by default
 	    Reader in = new StringReader(originalMetadata);
@@ -636,9 +638,9 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	return mapStations;
     }
 
-    protected Map<PolytopeIonBeamMetadataVariable, PolytopeIonBeamMetadataStation> readCSV(Iterable<CSVRecord> records) {
+    protected Map<PolytopeIonBeamMetadataMeteoTrackerVariable, PolytopeIonBeamMetadataStation> readCSV(Iterable<CSVRecord> records) {
 
-	Map<PolytopeIonBeamMetadataVariable, PolytopeIonBeamMetadataStation> mapStations = new HashMap<>();
+	Map<PolytopeIonBeamMetadataMeteoTrackerVariable, PolytopeIonBeamMetadataStation> mapStations = new HashMap<>();
 
 	for (CSVRecord record : records) {
 
@@ -650,7 +652,7 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	    String dateTime = buildDate(date, time);
 	    String varName = record.get("varno@body");
 	    String alt = record.get("stalt@hdr");
-	    PolytopeIonBeamMetadataVariable pv = PolytopeIonBeamMetadataVariable.decode(varName);
+	    PolytopeIonBeamMetadataMeteoTrackerVariable pv = PolytopeIonBeamMetadataMeteoTrackerVariable.decode(varName);
 
 	    if (mapStations.isEmpty()) {
 		PolytopeIonBeamMetadataStation station = new PolytopeIonBeamMetadataStation();

@@ -86,7 +86,7 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
     static final String MARS_REQUEST_URL = "list";
 
     static final String BASE_URL = "http://ionbeam-ichange.ecmwf-ichange.f.ewcloud.host/api/v1/";
-    
+
     static final String RETRIEVE_URL = "retrieve/";
 
     public static String BEARER_TOKEN;
@@ -148,14 +148,36 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 		for (int i = 0; i < maxRecords; i++) {
 
 		    JSONObject datasetMetadata = stationsArray.getJSONObject(i);
-		    String id = datasetMetadata.optString("external_id");
+		    String id = datasetMetadata.optString("internal_id");
 
 		    if (id != null && !id.isEmpty()) {
 
-			for (PolytopeIonBeamMetadataVariable var : PolytopeIonBeamMetadataVariable.values()) {
-			    ret.addRecord(PolytopeIonBeamMetadataMapper.create(datasetMetadata, var.getKey()));
-			}
+			String platform = datasetMetadata.optString("platform");
 
+			if (platform != null) {
+			    
+			    JSONArray jsonArray = new JSONArray();
+			    for(int k=0; k < marsRequestArray.length(); k++) {
+				 JSONObject m = marsRequestArray.getJSONObject(k);
+				 String req = m.optString("url");
+				 if(req.contains(id)) {
+				     jsonArray.put(m);
+				 }
+			    }
+
+			    if (platform.toLowerCase().contains("acronet")) {
+				for (PolytopeIonBeamMetadataAcronetVariable var : PolytopeIonBeamMetadataAcronetVariable.values()) {
+				    ret.addRecord(PolytopeIonBeamMetadataMapper.create(datasetMetadata, var.getKey()));
+				}
+			    } else {
+
+				for (PolytopeIonBeamMetadataMeteoTrackerVariable var : PolytopeIonBeamMetadataMeteoTrackerVariable
+					.values()) {
+				    ret.addRecord(PolytopeIonBeamMetadataMapper.create(datasetMetadata, var.getKey()));
+				}
+			    }
+
+			}
 		    }
 
 		}
