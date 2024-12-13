@@ -114,7 +114,7 @@ public class WMSGetMapHandler extends StreamingRequestHandler {
 		return ret;
 	}
 
-	private String checkParameter(WMSMapRequest map, Parameter parameter) throws Exception {
+	public static String checkParameter(WMSMapRequest map, Parameter parameter) throws Exception {
 		String ret = map.getParameterValue(parameter);
 		if (ret == null) {
 			throw new Exception(parameter.getKeys()[0]);
@@ -506,7 +506,7 @@ public class WMSGetMapHandler extends StreamingRequestHandler {
 		return new Color(r, g, b, 200);
 	}
 
-	private String decodeFormat(String format) {
+	public static String decodeFormat(String format) {
 		if (format == null || format.isEmpty()) {
 			format = "PNG";
 		}
