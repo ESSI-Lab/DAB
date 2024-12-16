@@ -163,7 +163,10 @@
  * 
  * @param {String} [options.wmsEndpoint]
  * @param {String} [options.wmsVersion='1.3.0']
-
+ * 
+ * @param {Boolean} [options.clusterWMS=false]
+   @param {String} [options.clusterWMSToken]
+   @param {String} [options.clusterWMSView]
  *
  */
 
@@ -348,10 +351,31 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 	        _inputControl = GIAPI._whereInputControl(widget,options);
 	        _inputControl.updateWhereFields();
 	        
-	           // add the input control to the map
-	           _inputControl.add(widget.map);
+           // add the input control to the map
+           _inputControl.add(widget.map);
         }
-                       
+		
+		if(options.clusterWMS){
+		
+			var onlineArray = [];			 
+			var protocol = 'urn:ogc:serviceType:WebMapService:1.3.0:HTTP';		 
+			var url = 'http://localhost:9090/gs-service/services/essi/token/'+options.clusterWMSToken+'/view/'+options.clusterWMSView+'/wms-cluster'
+			var online = {
+				
+				'function':'download',
+				'name': options.clusterWMSLayerName,
+				'title': options.clusterWMSLayerTitle,
+				'protocol': protocol,
+				'url': url												
+			 };
+			 
+			 onlineArray.push(online);
+			 
+			 var mapLayers = GIAPI.LayersFactory.ol3_Layer(onlineArray, 'urn:ogc:serviceType:WebMapService:');
+			 					  			 
+			 ol3Map.addLayers(mapLayers);
+	 	}
+	                 
         break;
         
     case 'google':
