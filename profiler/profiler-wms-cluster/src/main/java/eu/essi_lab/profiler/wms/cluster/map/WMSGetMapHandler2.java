@@ -317,10 +317,14 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 																 // "gs:uniquePlatformId");
 				    String sourceId = res.getIndexesMetadata().read(ResourceProperty.SOURCE_ID).get();
 
-				    BigDecimal sb = new BigDecimal(Double.valueOf(res.getIndexesMetadata().readBoundingBox().get().getCardinalValues().get(0).getSouth()));
-				    BigDecimal nb =  new BigDecimal(Double.valueOf(res.getIndexesMetadata().readBoundingBox().get().getCardinalValues().get(0).getNorth()));
-				    BigDecimal wb = new BigDecimal(Double.valueOf(res.getIndexesMetadata().readBoundingBox().get().getCardinalValues().get(0).getWest()));
-				    BigDecimal eb = new BigDecimal(Double.valueOf(res.getIndexesMetadata().readBoundingBox().get().getCardinalValues().get(0).getEast()));
+				    BigDecimal sb = new BigDecimal(Double.valueOf(
+					    res.getIndexesMetadata().readBoundingBox().get().getCardinalValues().get(0).getSouth()));
+				    BigDecimal nb = new BigDecimal(Double.valueOf(
+					    res.getIndexesMetadata().readBoundingBox().get().getCardinalValues().get(0).getNorth()));
+				    BigDecimal wb = new BigDecimal(Double.valueOf(
+					    res.getIndexesMetadata().readBoundingBox().get().getCardinalValues().get(0).getWest()));
+				    BigDecimal eb = new BigDecimal(Double.valueOf(
+					    res.getIndexesMetadata().readBoundingBox().get().getCardinalValues().get(0).getEast()));
 				    station.setSourceIdentifier(sourceId);
 
 				    BBOX4326 b = new BBOX4326(sb, nb, wb, eb);
@@ -366,8 +370,9 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 				}
 			    }
 
-			    ImageIO.write(bi, format, output);
 			}
+			
+			ImageIO.write(bi, format, output);
 
 		    } catch (Exception e) {
 			e.printStackTrace();
