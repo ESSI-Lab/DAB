@@ -38,6 +38,7 @@ import java.math.BigDecimal;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -196,13 +197,43 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 
 			request.setMaxResults(max);
 			request.setView(view.get());
-			request.addExtent(extent);
+
+			int divisions = 2;
+
+			double totalWest = extent.getWest();
+			double totalSouth = extent.getSouth();
+			double totalEast = extent.getEast();
+			double totalNorth = extent.getNorth();
+
+			double totalLatitude = totalNorth - totalSouth;
+			double totalLongitude = totalEast - totalWest;
+
+			double tmpSouth = totalSouth;
+			double tmpWest = totalWest;
+			double tmpLatitude = totalLatitude / ((double) divisions);
+			double tmpLongitude = totalLongitude / ((double) divisions);
+			for (int i = 0; i < divisions; i++) {
+			    tmpSouth = totalSouth + i * tmpLatitude;
+			    for (int j = 0; j < divisions; j++) {
+				tmpWest = totalWest + j * tmpLongitude;
+				SpatialExtent tmp = new SpatialExtent(tmpSouth, tmpWest, tmpSouth + tmpLatitude, tmpWest + tmpLongitude);
+				request.addExtent(tmp);
+
+			    }
+			}
+
+			int subImageWidth = width / divisions;
+			int subImageHeight = height / divisions;
 
 			List<WMSClusterResponse> responseList = executor.execute(request);
 
 			for (WMSClusterResponse response : responseList) {
 
 			    if (response.getMap().isPresent()) {
+
+				Optional<SpatialExtent> optionalAvgBbox = response.getAvgBbox();
+
+				SpatialExtent bbox = response.getBbox();
 
 				TermFrequencyMap tfm = response.getMap().get();
 
@@ -229,7 +260,7 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 				    }
 				});
 				double startAngle = 0.0;
-				int diameter = Math.min(width, height) - 60; // Keep some padding
+				int diameter = Math.min(subImageWidth, subImageHeight) - 60; // Keep some padding
 				int od = diameter;
 				double pd = ((double) totalCount) / 1000;
 				diameter = (int) (diameter * pd);
@@ -240,8 +271,12 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 				    diameter = 10;
 				}
 
-				int x = (width - diameter) / 2;
-				int y = (height - diameter) / 2;
+				int subOffsetX = (int) (subImageWidth * (Math.round((bbox.getWest() - totalWest) / totalLongitude)));
+				int subOffsetY = (int) (subImageHeight * (Math.round((bbox.getSouth() - totalSouth) / totalLatitude)));
+
+				int x = subOffsetX + (subImageWidth - diameter) / 2;
+				int y = subOffsetY + (subImageHeight - diameter) / 2;
+
 				for (int i = 0; i < percentages.size(); i++) {
 				    double percentage = percentages.get(i).getValue();
 				    double arcAngle = 360 * (percentage / 100); // Convert percentage to degrees
@@ -292,6 +327,14 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 				ig2.setColor(new Color(0, 0, 0, 40));
 				ig2.setStroke(new BasicStroke(1)); // Slightly thicker line for the border
 				ig2.drawRect(0, 0, width - 2, height - 2);
+
+				if (optionalAvgBbox.isPresent()) {
+				    SpatialExtent avgBBox = optionalAvgBbox.get();
+				    int centroidX = subOffsetX + (int) (avgBBox.getWest() - bbox.getWest()) / subImageWidth;
+				    int centroidY = subOffsetY + (int) (avgBBox.getSouth() - bbox.getSouth()) / subImageHeight;
+				    ig2.setColor(Color.RED);
+				    ig2.drawOval(centroidX, centroidY, 3, 3);
+				}
 
 			    } else if (!response.getDatasets().isEmpty()) {
 
@@ -371,7 +414,7 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 			    }
 
 			}
-			
+
 			ImageIO.write(bi, format, output);
 
 		    } catch (Exception e) {

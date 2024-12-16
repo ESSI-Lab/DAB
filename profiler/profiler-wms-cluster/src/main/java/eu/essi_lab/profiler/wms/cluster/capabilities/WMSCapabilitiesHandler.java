@@ -237,10 +237,15 @@ public class WMSCapabilitiesHandler extends DefaultRequestHandler {
 
 	    EXGeographicBoundingBox bbox = new EXGeographicBoundingBox();
 	    
-	    bbox.setNorthBoundLatitude(47.793);
-	    bbox.setSouthBoundLatitude(35.984);
-	    bbox.setWestBoundLongitude(5.193);
-	    bbox.setEastBoundLongitude(20.251);
+	    double west = 5.193;
+	    double east = 20.251;
+	    double south = 35.984;
+	    double north = 47.793;
+	    
+	    bbox.setNorthBoundLatitude(north);
+	    bbox.setSouthBoundLatitude(south);
+	    bbox.setWestBoundLongitude(west);
+	    bbox.setEastBoundLongitude(east);
 
 	    Layer layer = new Layer();
 	    layer.setName(view);
@@ -251,10 +256,10 @@ public class WMSCapabilitiesHandler extends DefaultRequestHandler {
 	    BoundingBox wbbox4326 = new BoundingBox();
 	    wbbox4326.setCRS("CRS:84");
 	  
-	    wbbox4326.setMinx(5.193);
-	    wbbox4326.setMaxx(20.251);
-	    wbbox4326.setMiny(35.984);
-	    wbbox4326.setMaxy(47.793);
+	    wbbox4326.setMinx(west);
+	    wbbox4326.setMaxx(east);
+	    wbbox4326.setMiny(south);
+	    wbbox4326.setMaxy(north);
 	    
 	    layer.getBoundingBoxes().add(wbbox4326);
 	    

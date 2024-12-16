@@ -206,9 +206,9 @@ public interface DatabaseExecutor extends DatabaseProvider {
 	public void setBbox(String bbox) {
 
 	    double south = Double.valueOf(bbox.split(",")[0]);
-	    double west = Double.valueOf(bbox.split(",")[0]);
-	    double north = Double.valueOf(bbox.split(",")[0]);
-	    double east = Double.valueOf(bbox.split(",")[0]);
+	    double west = Double.valueOf(bbox.split(",")[1]);
+	    double north = Double.valueOf(bbox.split(",")[2]);
+	    double east = Double.valueOf(bbox.split(",")[3]);
 
 	    this.bbox = new SpatialExtent(south, west, north, east);
 	}

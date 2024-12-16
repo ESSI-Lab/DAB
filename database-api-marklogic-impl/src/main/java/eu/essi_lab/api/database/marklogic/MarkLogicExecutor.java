@@ -112,11 +112,11 @@ public class MarkLogicExecutor extends MarkLogicReader implements DatabaseExecut
 	    // estimate responses
 	    //
 
-	    List<Node> estimateNodes = Arrays.asList(reader.evaluateNodes("//*:response//*:estimate"));
+	    List<Node> estimateNodes = Arrays.asList(reader.evaluateNodes("//*:response/*:estimate"));
 
 	    for (Node estimateNode : estimateNodes) {
 
-		String bbox = reader.evaluateString(estimateNode, "//@*:bbox");
+		String bbox = reader.evaluateString(estimateNode, "@*:bbox");
 		response.setBbox(bbox);
 
 		Integer stationsCount = Integer.valueOf(reader.evaluateString(estimateNode, "//*:stationsCount/text()"));
@@ -134,10 +134,10 @@ public class MarkLogicExecutor extends MarkLogicReader implements DatabaseExecut
 
 		// average extent
 		Node avgBbox = reader.evaluateNode(estimateNode, "//*:avgBbox");
-		double south = Double.valueOf(reader.evaluateString(avgBbox, "//*:south/text()"));
-		double west = Double.valueOf(reader.evaluateString(avgBbox, "//*:west/text()"));
-		double north = Double.valueOf(reader.evaluateString(avgBbox, "//*:north/text()"));
-		double east = Double.valueOf(reader.evaluateString(avgBbox, "//*:east/text()"));
+		double south = Double.valueOf(reader.evaluateString(avgBbox, "*:south"));
+		double west = Double.valueOf(reader.evaluateString(avgBbox, "*:west"));
+		double north = Double.valueOf(reader.evaluateString(avgBbox, "*:north"));
+		double east = Double.valueOf(reader.evaluateString(avgBbox, "*:east"));
 
 		response.setAvgBbox(new SpatialExtent(south, west, north, east));
 
