@@ -142,10 +142,6 @@ public class MarkLogicExecutor extends MarkLogicReader implements DatabaseExecut
 		response.setAvgBbox(new SpatialExtent(south, west, north, east));
 
 		responseList.add(response);
-
-		System.out.println("- BBOX:" + response.getBbox());
-		System.out.println("- AVGB:" + response.getAvgBbox().get());
-		System.out.println("---------");
 	    }
 
 	    //
