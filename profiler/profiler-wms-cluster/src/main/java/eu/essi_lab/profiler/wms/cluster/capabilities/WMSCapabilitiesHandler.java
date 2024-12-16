@@ -236,10 +236,11 @@ public class WMSCapabilitiesHandler extends DefaultRequestHandler {
 	    rootLayer.getCRS().add("EPSG:3857");
 
 	    EXGeographicBoundingBox bbox = new EXGeographicBoundingBox();
-	    bbox.setNorthBoundLatitude(90);
-	    bbox.setSouthBoundLatitude(-90);
-	    bbox.setWestBoundLongitude(-180);
-	    bbox.setEastBoundLongitude(180);
+	    
+	    bbox.setNorthBoundLatitude(47.793);
+	    bbox.setSouthBoundLatitude(35.984);
+	    bbox.setWestBoundLongitude(5.193);
+	    bbox.setEastBoundLongitude(20.251);
 
 	    Layer layer = new Layer();
 	    layer.setName(view);
@@ -249,25 +250,34 @@ public class WMSCapabilitiesHandler extends DefaultRequestHandler {
 	    layer.setEXGeographicBoundingBox(bbox);
 	    BoundingBox wbbox4326 = new BoundingBox();
 	    wbbox4326.setCRS("CRS:84");
-	    wbbox4326.setMinx(-180);
-	    wbbox4326.setMaxx(180);
-	    wbbox4326.setMiny(-90);
-	    wbbox4326.setMaxy(90);
+	  
+	    wbbox4326.setMinx(5.193);
+	    wbbox4326.setMaxx(20.251);
+	    wbbox4326.setMiny(35.984);
+	    wbbox4326.setMaxy(47.793);
+	    
 	    layer.getBoundingBoxes().add(wbbox4326);
+	    
 	    BoundingBox wbbox3857 = new BoundingBox();
 	    wbbox3857.setCRS("EPSG:3857");
-	    SimpleEntry<Double, Double> lower = new SimpleEntry<>(-90., -180.);
-	    SimpleEntry<Double, Double> upper = new SimpleEntry<>(90., 180.);
+	    
+	    SimpleEntry<Double, Double> lower = new SimpleEntry<>(35.984, 5.193);
+	    SimpleEntry<Double, Double> upper = new SimpleEntry<>(20.251, 47.793);
 	    SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> sourceCorners = new SimpleEntry<>(lower, upper);
-	    SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> bbox3857 = CRSUtils.translateBBOX(sourceCorners,
+	    SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> bbox3857 = CRSUtils.translateBBOX(
+		    sourceCorners,
 		    CRS.EPSG_4326(), CRS.EPSG_3857());
+	 
 	    SimpleEntry<Double, Double> lower2 = bbox3857.getKey();
 	    SimpleEntry<Double, Double> upper2 = bbox3857.getValue();
+	   
 	    wbbox3857.setMinx(lower2.getKey());
 	    wbbox3857.setMaxx(upper2.getKey());
 	    wbbox3857.setMiny(lower2.getValue());
 	    wbbox3857.setMaxy(upper2.getValue());
+	    
 	    layer.getBoundingBoxes().add(wbbox3857);
+	    
 	    Style style = new Style();
 	    style.setName("default");
 	    style.setTitle("default");
