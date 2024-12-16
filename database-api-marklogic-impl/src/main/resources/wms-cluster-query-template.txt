@@ -3,150 +3,160 @@ import module namespace gs="http://flora.eu/gi-suite/1.0/dataModel/schema" at "/
 
 let $max := MAX_RESULTS
 
-let $south := SOUTH
-let $west := WEST
-let $north := NORTH
-let $east := EAST
+let $bboxes := BBOXES
 
-let $viewQuery := VIEW_QUERY
+let $splitBoxes := tokenize($bboxes, '§')
 
-let $bboxQuery := gs:spiq($south,$west,$north,$east)
-  
-let $query as cts:query := 
+return <gs:response>{
 
-    gs:andq((
-    gs:erq('isTimeseries','=','true',0.0), 
-    $bboxQuery, 
-    $viewQuery ))
+for $bbox in $splitBoxes
 
-(: ------ :)
-(: query 1:)
-(: ------ :)
+    let $south := xs:double(tokenize($bbox, ',')[1])
+    let $west := xs:double(tokenize($bbox, ',')[2])
+    let $north := xs:double(tokenize($bbox, ',')[3])
+    let $east := xs:double(tokenize($bbox, ',')[4])
 
-let $stationsCount := count(cts:element-values(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema','uniquePlatformId'), (), ('eager'), $query))
+    let $viewQuery := VIEW_QUERY
 
-return if ($stationsCount > 0) 
+    let $bboxQuery := gs:spiq($south,$west,$north,$east)
 
-  then (
+    let $query as cts:query := 
 
-    (: ------- :)
-    (: query 2 :)
-    (: ------- :)
+        gs:andq((
+        gs:erq('isTimeseries','=','true',0.0), 
+        $bboxQuery, 
+        $viewQuery ))
 
-    let $totalCount := xdmp:estimate(cts:search(doc()[gs:Dataset or gs:DatasetCollection], $query, ("unfiltered","score-simple"),0))
+    (: ------ :)
+    (: query 1:)
+    (: ------ :)
 
-    return if ($stationsCount > $max) then (
-         
-       (<gs:estimate>
-          {<gs:totalCount>{
+    let $stationsCount := count(cts:element-values(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema','uniquePlatformId'), (), ('eager'), $query))
 
-          $totalCount
+    return if ($stationsCount > 0) 
 
-          }</gs:totalCount>}
+      then (
 
-          {<gs:stationsCount>{
+        (: ------- :)
+        (: query 2 :)
+        (: ------- :)
 
-          $stationsCount
+        let $totalCount := xdmp:estimate(cts:search(doc()[gs:Dataset or gs:DatasetCollection], $query, ("unfiltered","score-simple"),0))
 
-          }</gs:stationsCount>}
-          
-          {<gs:termFrequency xmlns:gs="http://flora.eu/gi-suite/1.0/dataModel/schema">
+        return if ($stationsCount > $max) then (
 
-          {gs:tf('sourceId', $query,'50')}
+           (<gs:estimate gs:bbox='{$bbox}'>
+              {<gs:totalCount>{
 
-          </gs:termFrequency>}
-          </gs:estimate>
-      )
-                   
-    )  else (
+              $totalCount
 
-     <gs:datasets>{
- 
-            (: ------- :)
-            (: query 3 :)
-            (: ------- :)
-       
-            for $y in subsequence(cts:element-values(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema','uniquePlatformId'), (), ('eager'), $query),1, $stationsCount)
+              }</gs:totalCount>}
 
-                let $x := cts:search(doc()[gs:Dataset or gs:DatasetCollection or gs:Document or gs:Ontology or gs:Service or gs:Observation],
-                cts:and-query((
-                 $query,
-                cts:element-range-query(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema','uniquePlatformId'),'=',$y,('score-function=linear'),0.0)
-                )),('unfiltered','score-simple'),0)[1 to 1]
+              {<gs:stationsCount>{
 
-                let $name := fn:local-name($x/*[1])
+              $stationsCount
 
-                let $selectedIndexes := 'uniquePlatformId,bbox,sourceId'
+              }</gs:stationsCount>}
 
-                let $selectedExtendedElements := 'NONE'
+              {<gs:termFrequency xmlns:gs="http://flora.eu/gi-suite/1.0/dataModel/schema">
 
-                return element{ fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', concat('gs:',$name)) }{
+              {gs:tf('sourceId', $query,'50')}
 
-                  if ($name = 'Dataset') then 
-                    attribute{'gs:resourceType'}{'dataset'} else 
+              </gs:termFrequency>}
+              </gs:estimate>
+          )
 
-                  if ($name = 'DatasetCollection') then 
-                    attribute{'gs:resourceType'}{'datasetCollection'} else 
+        )  else (
 
-                    attribute{'gs:resourceType'}{'dataset'},
+         <gs:datasets gs:bbox='{$bbox}'>{
 
-                  attribute{'xmlns:gs'}{"http://flora.eu/gi-suite/1.0/dataModel/schema"},
-                  attribute{'xmlns:gco'}{"http://www.isotc211.org/2005/gco"},
-                  attribute{'xmlns:gmd'}{"http://www.isotc211.org/2005/gmd"},
-                  attribute{'xmlns:gmi'}{"http://www.isotc211.org/2005/gmi"},
-                  attribute{'xmlns:gml'}{"http://www.opengis.net/gml"},
-                  attribute{'xmlns:gmx'}{"http://www.isotc211.org/2005/gmx"},
-                  attribute{'xmlns:gts'}{"http://www.isotc211.org/2005/gts"},
-                  attribute{'xmlns:srv'}{"http://www.isotc211.org/2005/srv"},
-                  attribute{'xmlns:xlink'}{"http://www.w3.org/1999/xlink"},
-                  attribute{'xmlns:xs'}{"http://www.w3.org/2001/XMLSchema"},
-                  attribute{'xmlns:xsi'}{"http://www.w3.org/2001/XMLSchema-instance"},
+                (: ------- :)
+                (: query 3 :)
+                (: ------- :)
 
-                  element{ fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema','gs:harmonizedMetadata') }{
+                for $y in subsequence(cts:element-values(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema','uniquePlatformId'), (), ('eager'), $query),1, $stationsCount)
 
-                    if($selectedExtendedElements = 'NONE') then 
+                    let $x := cts:search(doc()[gs:Dataset or gs:DatasetCollection or gs:Document or gs:Ontology or gs:Service or gs:Observation],
+                    cts:and-query((
+                     $query,
+                    cts:element-range-query(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema','uniquePlatformId'),'=',$y,('score-function=linear'),0.0)
+                    )),('unfiltered','score-simple'),0)[1 to 1]
 
-                            '' else
+                    let $name := fn:local-name($x/*[1])
 
-                       element{fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', 'gs:extendedMetadata') }{
+                    let $selectedIndexes := 'uniquePlatformId,bbox,sourceId'
 
-                       if($selectedExtendedElements = 'ALL') then 
+                    let $selectedExtendedElements := 'NONE'
 
-                            $x//gs:extendedMetadata/* 
+                    return element{ fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', concat('gs:',$name)) }{
 
-                            else
+                      if ($name = 'Dataset') then 
+                        attribute{'gs:resourceType'}{'dataset'} else 
 
-                    element{fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', 'gs:extension') }{
-                          for $el in $x//gs:extendedMetadata/gs:extension/* where contains($selectedExtendedElements,local-name($el))
+                      if ($name = 'DatasetCollection') then 
+                        attribute{'gs:resourceType'}{'datasetCollection'} else 
 
-                            return $el
-                          }
+                        attribute{'gs:resourceType'}{'dataset'},
 
-                       }
-                  },
+                      attribute{'xmlns:gs'}{"http://flora.eu/gi-suite/1.0/dataModel/schema"},
+                      attribute{'xmlns:gco'}{"http://www.isotc211.org/2005/gco"},
+                      attribute{'xmlns:gmd'}{"http://www.isotc211.org/2005/gmd"},
+                      attribute{'xmlns:gmi'}{"http://www.isotc211.org/2005/gmi"},
+                      attribute{'xmlns:gml'}{"http://www.opengis.net/gml"},
+                      attribute{'xmlns:gmx'}{"http://www.isotc211.org/2005/gmx"},
+                      attribute{'xmlns:gts'}{"http://www.isotc211.org/2005/gts"},
+                      attribute{'xmlns:srv'}{"http://www.isotc211.org/2005/srv"},
+                      attribute{'xmlns:xlink'}{"http://www.w3.org/1999/xlink"},
+                      attribute{'xmlns:xs'}{"http://www.w3.org/2001/XMLSchema"},
+                      attribute{'xmlns:xsi'}{"http://www.w3.org/2001/XMLSchema-instance"},
 
-                  element{fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', 'gs:originalMetadata') }{        
-                  },
+                      element{ fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema','gs:harmonizedMetadata') }{
 
-                  element{fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', 'gs:indexesMetadata') }{  
+                        if($selectedExtendedElements = 'NONE') then 
 
-                       if($selectedIndexes = 'NONE') then 
+                                '' else
 
-                            '' else
+                           element{fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', 'gs:extendedMetadata') }{
 
-                       if($selectedIndexes = 'ALL') then 
+                           if($selectedExtendedElements = 'ALL') then 
 
-                            $x//gs:indexesMetadata/* else
+                                $x//gs:extendedMetadata/* 
 
-                       for $index in $x//gs:indexesMetadata/* where contains($selectedIndexes,local-name($index)) 
+                                else
 
-                       return $index
-                  }
-                }
-      
-          }</gs:datasets>
-         
-      )
-)
+                        element{fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', 'gs:extension') }{
+                              for $el in $x//gs:extendedMetadata/gs:extension/* where contains($selectedExtendedElements,local-name($el))
 
-else ()
+                                return $el
+                              }
+
+                           }
+                      },
+
+                      element{fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', 'gs:originalMetadata') }{        
+                      },
+
+                      element{fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', 'gs:indexesMetadata') }{  
+
+                           if($selectedIndexes = 'NONE') then 
+
+                                '' else
+
+                           if($selectedIndexes = 'ALL') then 
+
+                                $x//gs:indexesMetadata/* else
+
+                           for $index in $x//gs:indexesMetadata/* where contains($selectedIndexes,local-name($index)) 
+
+                           return $index
+                      }
+                    }
+
+              }</gs:datasets>
+
+          )
+    )
+
+    else ( <gs:empty gs:bbox='{$bbox}'></gs:empty>)
+
+}</gs:response>

@@ -29,8 +29,6 @@ import java.util.List;
 import org.json.JSONObject;
 
 import eu.essi_lab.api.database.DatabaseExecutor;
-import eu.essi_lab.api.database.DatabaseExecutor.WMSClusterRequest;
-import eu.essi_lab.api.database.DatabaseExecutor.WMSClusterResponse;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.stats.StatisticsMessage;
 import eu.essi_lab.messages.stats.StatisticsResponse;
@@ -77,7 +75,7 @@ public class VolatileDatabaseExecutor extends VolatileDatabaseReader implements 
     }
 
     @Override
-    public WMSClusterResponse execute(WMSClusterRequest request) throws GSException {
+    public List<WMSClusterResponse> execute(WMSClusterRequest request) throws GSException {
 
 	return null;
     }

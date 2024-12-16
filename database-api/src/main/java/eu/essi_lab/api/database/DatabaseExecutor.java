@@ -38,6 +38,7 @@ import eu.essi_lab.messages.stats.StatisticsMessage;
 import eu.essi_lab.messages.stats.StatisticsResponse;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.MetadataElement;
 
 /**
@@ -95,13 +96,22 @@ public interface DatabaseExecutor extends DatabaseProvider {
     public class WMSClusterRequest {
 
 	private int maxResults;
-	private SpatialExtent extent;
+	private List<SpatialExtent> extents;
 	private View view;
+
+	/**
+	 * 
+	 */
+	public WMSClusterRequest() {
+
+	    extents = new ArrayList<SpatialExtent>();
+	}
 
 	/**
 	 * @return
 	 */
 	public int getMaxResults() {
+
 	    return maxResults;
 	}
 
@@ -114,19 +124,19 @@ public interface DatabaseExecutor extends DatabaseProvider {
 	}
 
 	/**
-	 * @return the extent
+	 * @return
 	 */
-	public SpatialExtent getExtent() {
+	public List<SpatialExtent> getExtents() {
 
-	    return extent;
+	    return extents;
 	}
 
 	/**
 	 * @param extent
 	 */
-	public void setExtent(SpatialExtent extent) {
+	public void addExtent(SpatialExtent extent) {
 
-	    this.extent = extent;
+	    this.extents.add(extent);
 	}
 
 	/**
@@ -151,17 +161,39 @@ public interface DatabaseExecutor extends DatabaseProvider {
      */
     public class WMSClusterResponse {
 
-	private List<String> datasets;
+	private List<Dataset> datasets;
 	private TermFrequencyMap map;
 	private Integer stationsCount;
 	private Integer totalCount;
+	private SpatialExtent bbox;
 
 	/**
 	 * 
 	 */
 	public WMSClusterResponse() {
 
-	    datasets = new ArrayList<String>();
+	    datasets = new ArrayList<>();
+	}
+
+	/**
+	 * @return
+	 */
+	public SpatialExtent getBbox() {
+
+	    return bbox;
+	}
+
+	/**
+	 * @param bbox
+	 */
+	public void setBbox(String bbox) {
+
+	    double south = Double.valueOf(bbox.split(",")[0]);
+	    double west = Double.valueOf(bbox.split(",")[0]);
+	    double north = Double.valueOf(bbox.split(",")[0]);
+	    double east = Double.valueOf(bbox.split(",")[0]);
+
+	    this.bbox = new SpatialExtent(south, west, north, east);
 	}
 
 	/**
@@ -199,7 +231,7 @@ public interface DatabaseExecutor extends DatabaseProvider {
 	/**
 	 * @param datasets
 	 */
-	public void setDatasets(List<String> datasets) {
+	public void setDatasets(List<Dataset> datasets) {
 
 	    this.datasets = datasets;
 	}
@@ -223,7 +255,7 @@ public interface DatabaseExecutor extends DatabaseProvider {
 	/**
 	 * @return
 	 */
-	public List<String> getDatasets() {
+	public List<Dataset> getDatasets() {
 
 	    return datasets;
 	}
@@ -234,6 +266,6 @@ public interface DatabaseExecutor extends DatabaseProvider {
      * @return
      * @throws GSException
      */
-    public WMSClusterResponse execute(WMSClusterRequest request) throws GSException;
+    public List<WMSClusterResponse> execute(WMSClusterRequest request) throws GSException;
 
 }

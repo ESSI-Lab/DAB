@@ -62,6 +62,9 @@ import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap.TermFrequencyTarget;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.resource.Dataset;
+import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.model.resource.data.CRS;
 import eu.essi_lab.model.resource.data.CRSUtils;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
@@ -193,172 +196,178 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 
 			request.setMaxResults(max);
 			request.setView(view.get());
-			request.setExtent(extent);
+			request.addExtent(extent);
 
-			WMSClusterResponse response = executor.execute(request);
+			List<WMSClusterResponse> responseList = executor.execute(request);
 
-			if (response.getMap().isPresent()) {
+			for (WMSClusterResponse response : responseList) {
 
-			    TermFrequencyMap tfm = response.getMap().get();
+			    if (response.getMap().isPresent()) {
 
-			    int totalCount = response.getTotalCount().get();
-			    int stationsCount = response.getStationsCount().get();
+				TermFrequencyMap tfm = response.getMap().get();
 
-			    List<TermFrequencyItem> items = tfm.getItems(TermFrequencyTarget.SOURCE);
-			    List<SimpleEntry<String, Double>> percentages = new ArrayList<SimpleEntry<String, Double>>();
-			    int tmpTotal = 0;
-			    for (TermFrequencyItem item : items) {
-				double percentage = (((double) item.getFreq()) / totalCount) * 100.0;
-				tmpTotal += item.getFreq();
-				percentages.add(new SimpleEntry<String, Double>(item.getTerm(), percentage));
-			    }
-			    if (tmpTotal < totalCount) {
-				int rest = totalCount - tmpTotal;
-				double percentage = (((double) rest) / totalCount) * 100.0;
-				percentages.add(new SimpleEntry<String, Double>("rest", percentage));
-			    }
-			    percentages.sort(new Comparator<SimpleEntry<String, Double>>() {
-				@Override
-				public int compare(SimpleEntry<String, Double> o1, SimpleEntry<String, Double> o2) {
-				    return o1.getValue().compareTo(o2.getValue());
+				int totalCount = response.getTotalCount().get();
+				int stationsCount = response.getStationsCount().get();
+
+				List<TermFrequencyItem> items = tfm.getItems(TermFrequencyTarget.SOURCE);
+				List<SimpleEntry<String, Double>> percentages = new ArrayList<SimpleEntry<String, Double>>();
+				int tmpTotal = 0;
+				for (TermFrequencyItem item : items) {
+				    double percentage = (((double) item.getFreq()) / totalCount) * 100.0;
+				    tmpTotal += item.getFreq();
+				    percentages.add(new SimpleEntry<String, Double>(item.getTerm(), percentage));
 				}
-			    });
-			    double startAngle = 0.0;
-			    int diameter = Math.min(width, height) - 60; // Keep some padding
-			    int od = diameter;
-			    double pd = ((double) totalCount) / 1000;
-			    diameter = (int) (diameter * pd);
-			    if (diameter > od) {
-				diameter = od;
-			    }
-			    if (diameter < 10) {
-				diameter = 10;
-			    }
-
-			    int x = (width - diameter) / 2;
-			    int y = (height - diameter) / 2;
-			    for (int i = 0; i < percentages.size(); i++) {
-				double percentage = percentages.get(i).getValue();
-				double arcAngle = 360 * (percentage / 100); // Convert percentage to degrees
-				Color color = getRandomColorFromSourceId(percentages.get(i).getKey());
-
-				// Set slice color
-				ig2.setColor(color);
-
-				// Draw slice
-				ig2.fillArc(x, y, diameter, diameter, (int) Math.round(startAngle), (int) Math.round(arcAngle));
-
-				// Update start angle for the next slice
-				startAngle += arcAngle;
-			    }
-
-			    String centerLabel = "" + stationsCount;
-			    // Draw center label with white background
-			    ig2.setFont(new Font("SansSerif", Font.BOLD, 10));
-			    FontMetrics metrics = ig2.getFontMetrics();
-			    int labelWidth = metrics.stringWidth(centerLabel);
-			    int labelHeight = metrics.getHeight();
-
-			    int centerX = x + diameter / 2;
-			    int centerY = y + diameter / 2;
-
-			    int centerLabelX = x + diameter / 2 + 20;
-			    int centerLabelY = y + diameter / 2 + 20;
-
-			    // Draw the white background rectangle
-			    int padding = 1; // Padding around the text
-			    ig2.setColor(new Color(255, 255, 255, 128));
-			    ig2.fillRect(centerLabelX - labelWidth / 2 - padding / 2, centerLabelY - labelHeight / 2 - padding / 2,
-				    labelWidth + padding, labelHeight - padding);
-
-			    // Draw the black border around the white background
-			    ig2.setColor(Color.BLACK);
-			    ig2.drawRect(centerLabelX - labelWidth / 2 - padding / 2, centerLabelY - labelHeight / 2 - padding / 2,
-				    labelWidth + padding, labelHeight - padding);
-
-			    // Draw the label text
-			    ig2.setColor(Color.BLACK);
-			    ig2.drawString(centerLabel, centerLabelX - labelWidth / 2, centerLabelY + padding * 4);
-
-			    ig2.setColor(Color.BLACK);
-			    ig2.setStroke(new BasicStroke(1)); // Thin line for the border
-			    ig2.drawOval(x, y, diameter, diameter);
-
-			    ig2.setColor(new Color(0,0,0,40));
-			    ig2.setStroke(new BasicStroke(1)); // Slightly thicker line for the border
-			    ig2.drawRect(0, 0 , width - 2, height - 2);
-
-			} else if (!response.getDatasets().isEmpty()) {
-
-			    double be = extent.getEast();
-			    double bw = extent.getWest();
-			    double bn = extent.getNorth();
-			    double bs = extent.getSouth();
-			    double bx = be - bw;
-			    double by = bn - bs;
-			    extent.setEast(be - bx / 10.);
-			    extent.setWest(bw + bx / 10.);
-			    extent.setNorth(bn - by / 10.);
-			    extent.setSouth(bs + by / 10.);
-
-			    List<String> resultSet = response.getDatasets();
-			    List<StationRecord> stations = new ArrayList<>();
-
-			    for (String res : resultSet) {
-
-				StationRecord station = new StationRecord();
-				String id = extractValue(res, "gs:uniquePlatformId");
-				String sourceId = extractValue(res, "gs:sourceId");
-				BigDecimal sb = new BigDecimal(extractValue(res, "gs:south"));
-				BigDecimal nb = new BigDecimal(extractValue(res, "gs:north"));
-				BigDecimal wb = new BigDecimal(extractValue(res, "gs:west"));
-				BigDecimal eb = new BigDecimal(extractValue(res, "gs:east"));
-				station.setSourceIdentifier(sourceId);
-
-				BBOX4326 b = new BBOX4326(sb, nb, wb, eb);
-				station.setBbox4326(b);
-				stations.add(station);
-			    }
-
-			    // draws each station
-			    for (StationRecord station : stations) {
-
-				Double sminx = null;
-				Double sminy = null;
-				Double smaxx = null;
-				Double smaxy = null;
-				BBOX stationBbbox = station.getBbox4326();
-
-				sminx = stationBbbox.getMinx().doubleValue();
-				sminy = stationBbbox.getMiny().doubleValue();
-				smaxx = stationBbbox.getMaxx().doubleValue();
-				smaxy = stationBbbox.getMaxy().doubleValue();
-
-				int pixMinY = getYPixel(height, sminy, bminy, h);
-				int pixMinX = getXPixel(width, sminx, bminx, w);
-
-				ig2.setStroke(new BasicStroke(2));
-
-				// Color c = wl.getInfoLegend(layers, station).get(0).getColor();
-
-				Color color = Color.red;
-				String sourceId = station.getSourceIdentifier();
-				if (sourceId != null) {
-				    color = getRandomColorFromSourceId(sourceId);
+				if (tmpTotal < totalCount) {
+				    int rest = totalCount - tmpTotal;
+				    double percentage = (((double) rest) / totalCount) * 100.0;
+				    percentages.add(new SimpleEntry<String, Double>("rest", percentage));
 				}
-				// point
-				Color ac = new Color(color.getRed(), color.getGreen(), color.getBlue(), 127);
-				ig2.setColor(ac);
-				ig2.fillOval(pixMinX - r / 2, pixMinY - r / 2, r, r);
-				Color g = Color.black;
-				Color ag = new Color(g.getRed(), g.getGreen(), g.getBlue(), 127);
-				ig2.setColor(ag);
-				ig2.drawOval(pixMinX - r / 2, pixMinY - r / 2, r, r);
+				percentages.sort(new Comparator<SimpleEntry<String, Double>>() {
+				    @Override
+				    public int compare(SimpleEntry<String, Double> o1, SimpleEntry<String, Double> o2) {
+					return o1.getValue().compareTo(o2.getValue());
+				    }
+				});
+				double startAngle = 0.0;
+				int diameter = Math.min(width, height) - 60; // Keep some padding
+				int od = diameter;
+				double pd = ((double) totalCount) / 1000;
+				diameter = (int) (diameter * pd);
+				if (diameter > od) {
+				    diameter = od;
+				}
+				if (diameter < 10) {
+				    diameter = 10;
+				}
 
+				int x = (width - diameter) / 2;
+				int y = (height - diameter) / 2;
+				for (int i = 0; i < percentages.size(); i++) {
+				    double percentage = percentages.get(i).getValue();
+				    double arcAngle = 360 * (percentage / 100); // Convert percentage to degrees
+				    Color color = getRandomColorFromSourceId(percentages.get(i).getKey());
+
+				    // Set slice color
+				    ig2.setColor(color);
+
+				    // Draw slice
+				    ig2.fillArc(x, y, diameter, diameter, (int) Math.round(startAngle), (int) Math.round(arcAngle));
+
+				    // Update start angle for the next slice
+				    startAngle += arcAngle;
+				}
+
+				String centerLabel = "" + stationsCount;
+				// Draw center label with white background
+				ig2.setFont(new Font("SansSerif", Font.BOLD, 10));
+				FontMetrics metrics = ig2.getFontMetrics();
+				int labelWidth = metrics.stringWidth(centerLabel);
+				int labelHeight = metrics.getHeight();
+
+				int centerX = x + diameter / 2;
+				int centerY = y + diameter / 2;
+
+				int centerLabelX = x + diameter / 2 + 20;
+				int centerLabelY = y + diameter / 2 + 20;
+
+				// Draw the white background rectangle
+				int padding = 1; // Padding around the text
+				ig2.setColor(new Color(255, 255, 255, 128));
+				ig2.fillRect(centerLabelX - labelWidth / 2 - padding / 2, centerLabelY - labelHeight / 2 - padding / 2,
+					labelWidth + padding, labelHeight - padding);
+
+				// Draw the black border around the white background
+				ig2.setColor(Color.BLACK);
+				ig2.drawRect(centerLabelX - labelWidth / 2 - padding / 2, centerLabelY - labelHeight / 2 - padding / 2,
+					labelWidth + padding, labelHeight - padding);
+
+				// Draw the label text
+				ig2.setColor(Color.BLACK);
+				ig2.drawString(centerLabel, centerLabelX - labelWidth / 2, centerLabelY + padding * 4);
+
+				ig2.setColor(Color.BLACK);
+				ig2.setStroke(new BasicStroke(1)); // Thin line for the border
+				ig2.drawOval(x, y, diameter, diameter);
+
+				ig2.setColor(new Color(0, 0, 0, 40));
+				ig2.setStroke(new BasicStroke(1)); // Slightly thicker line for the border
+				ig2.drawRect(0, 0, width - 2, height - 2);
+
+			    } else if (!response.getDatasets().isEmpty()) {
+
+				double be = extent.getEast();
+				double bw = extent.getWest();
+				double bn = extent.getNorth();
+				double bs = extent.getSouth();
+				double bx = be - bw;
+				double by = bn - bs;
+				extent.setEast(be - bx / 10.);
+				extent.setWest(bw + bx / 10.);
+				extent.setNorth(bn - by / 10.);
+				extent.setSouth(bs + by / 10.);
+
+				List<Dataset> resultSet = response.getDatasets();
+				List<StationRecord> stations = new ArrayList<>();
+
+				for (Dataset res : resultSet) {
+
+				    StationRecord station = new StationRecord();
+
+				    String id = res.getIndexesMetadata().read(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER).get(0);// (res,
+																 // "gs:uniquePlatformId");
+				    String sourceId = res.getIndexesMetadata().read(ResourceProperty.SOURCE_ID).get();
+
+				    BigDecimal sb = new BigDecimal(Double.valueOf(res.getIndexesMetadata().readBoundingBox().get().getCardinalValues().get(0).getSouth()));
+				    BigDecimal nb =  new BigDecimal(Double.valueOf(res.getIndexesMetadata().readBoundingBox().get().getCardinalValues().get(0).getNorth()));
+				    BigDecimal wb = new BigDecimal(Double.valueOf(res.getIndexesMetadata().readBoundingBox().get().getCardinalValues().get(0).getWest()));
+				    BigDecimal eb = new BigDecimal(Double.valueOf(res.getIndexesMetadata().readBoundingBox().get().getCardinalValues().get(0).getEast()));
+				    station.setSourceIdentifier(sourceId);
+
+				    BBOX4326 b = new BBOX4326(sb, nb, wb, eb);
+				    station.setBbox4326(b);
+				    stations.add(station);
+				}
+
+				// draws each station
+				for (StationRecord station : stations) {
+
+				    Double sminx = null;
+				    Double sminy = null;
+				    Double smaxx = null;
+				    Double smaxy = null;
+				    BBOX stationBbbox = station.getBbox4326();
+
+				    sminx = stationBbbox.getMinx().doubleValue();
+				    sminy = stationBbbox.getMiny().doubleValue();
+				    smaxx = stationBbbox.getMaxx().doubleValue();
+				    smaxy = stationBbbox.getMaxy().doubleValue();
+
+				    int pixMinY = getYPixel(height, sminy, bminy, h);
+				    int pixMinX = getXPixel(width, sminx, bminx, w);
+
+				    ig2.setStroke(new BasicStroke(2));
+
+				    // Color c = wl.getInfoLegend(layers, station).get(0).getColor();
+
+				    Color color = Color.red;
+				    String sourceId = station.getSourceIdentifier();
+				    if (sourceId != null) {
+					color = getRandomColorFromSourceId(sourceId);
+				    }
+				    // point
+				    Color ac = new Color(color.getRed(), color.getGreen(), color.getBlue(), 127);
+				    ig2.setColor(ac);
+				    ig2.fillOval(pixMinX - r / 2, pixMinY - r / 2, r, r);
+				    Color g = Color.black;
+				    Color ag = new Color(g.getRed(), g.getGreen(), g.getBlue(), 127);
+				    ig2.setColor(ag);
+				    ig2.drawOval(pixMinX - r / 2, pixMinY - r / 2, r, r);
+
+				}
 			    }
+
+			    ImageIO.write(bi, format, output);
 			}
-
-			ImageIO.write(bi, format, output);
 
 		    } catch (Exception e) {
 			e.printStackTrace();

@@ -3,6 +3,8 @@
  */
 package eu.essi_lab.api.database.marklogic;
 
+import java.text.DecimalFormat;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -27,6 +29,7 @@ package eu.essi_lab.api.database.marklogic;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.json.JSONObject;
@@ -57,6 +60,7 @@ import eu.essi_lab.messages.stats.StatisticsMessage;
 import eu.essi_lab.messages.stats.StatisticsResponse;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.wrapper.marklogic.MarkLogicWrapper;
 
@@ -66,18 +70,30 @@ import eu.essi_lab.wrapper.marklogic.MarkLogicWrapper;
 public class MarkLogicExecutor extends MarkLogicReader implements DatabaseExecutor {
 
     @Override
-    public WMSClusterResponse execute(WMSClusterRequest request) throws GSException {
+    public List<WMSClusterResponse> execute(WMSClusterRequest request) throws GSException {
 
 	try {
+
+	    ArrayList<WMSClusterResponse> responseList = new ArrayList<WMSClusterResponse>();
+
+	    DecimalFormat format = new DecimalFormat();
+	    format.setMaximumFractionDigits(5);
+
 	    String template = IOStreamUtils.asUTF8String(//
 		    getClass().getClassLoader().getResourceAsStream("wms-cluster-query-template.txt"));
 
+	    List<SpatialExtent> extents = request.getExtents();
+
+	    String bboxes = extents.//
+		    stream().//
+		    map(e -> format.format(e.getSouth()) + "," + format.format(e.getWest()) + "," + format.format(e.getNorth()) + ","
+			    + format.format(e.getEast()))
+		    .//
+		    collect(Collectors.joining("§", "'", "'"));
+
 	    template = template.replace("MAX_RESULTS", String.valueOf(request.getMaxResults()));
 
-	    template = template.replace("SOUTH", String.valueOf(request.getExtent().getSouth()));
-	    template = template.replace("WEST", String.valueOf(request.getExtent().getWest()));
-	    template = template.replace("NORTH", String.valueOf(request.getExtent().getNorth()));
-	    template = template.replace("EAST", String.valueOf(request.getExtent().getEast()));
+	    template = template.replace("BBOXES", bboxes);
 
 	    String viewQuery = ConfigurationWrapper.getViewSources(request.getView()).//
 		    stream().//
@@ -90,46 +106,63 @@ public class MarkLogicExecutor extends MarkLogicReader implements DatabaseExecut
 
 	    WMSClusterResponse response = new WMSClusterResponse();
 
-	    if (!responseString.isEmpty()) {
+	    XMLDocumentReader reader = new XMLDocumentReader(responseString);
 
-		XMLDocumentReader reader = new XMLDocumentReader(responseString);
+	    //
+	    // estimate responses
+	    //
 
-		boolean estimateResponse = reader.evaluateBoolean("exists(//*:estimate)");
-		boolean datasetsResponse = reader.evaluateBoolean("exists(//*:datasets)");
+	    List<Node> estimateNodes = Arrays.asList(reader.evaluateNodes("//*:response//*:estimate"));
 
-		if (estimateResponse) {
+	    for (Node estimateNode : estimateNodes) {
 
-		    Integer stationsCount = Integer.valueOf(reader.evaluateTextContent("//*:estimate/*:stationsCount/text()").get(0));
-		    Integer totalCount = Integer.valueOf(reader.evaluateTextContent("//*:estimate/*:totalCount/text()").get(0));
+		String bbox = reader.evaluateString(estimateNode, "//@*:bbox");
+		response.setBbox(bbox);
 
-		    Node termFrequency = reader.evaluateNode("//*:termFrequency");
+		Integer stationsCount = Integer.valueOf(reader.evaluateString(estimateNode, "//*:stationsCount/text()"));
+		Integer totalCount = Integer.valueOf(reader.evaluateString(estimateNode, "//*:totalCount/text()"));
 
-		    TermFrequencyMap map = TermFrequencyMap.create(termFrequency);
+		Node termFrequency = reader.evaluateNode(estimateNode, "//*:termFrequency");
 
-		    response.setTotalCount(totalCount);
-		    response.setStationsCount(stationsCount);
+		TermFrequencyMap map = TermFrequencyMap.create(termFrequency);
 
-		    response.setMap(map);
+		response.setTotalCount(totalCount);
+		response.setStationsCount(stationsCount);
 
-		} else if (datasetsResponse) {
+		response.setMap(map);
 
-		    List<String> list = new ArrayList<String>(Arrays.asList(responseString.split("<gs:Dataset")));
-		    list.remove(0); // removes <gs:datasets>
-
-		    List<String> datasets = list.stream().map(s -> {
-
-			String out = "<gs:Dataset " + s;
-			out = out.replace("</gs:datasets>", "");
-
-			return out;
-
-		    }).collect(Collectors.toList());
-
-		    response.setDatasets(datasets);
-		}
+		responseList.add(response);
 	    }
 
-	    return response;
+	    //
+	    // datasets responses
+	    //
+
+	    List<Node> datasetsNodes = Arrays.asList(reader.evaluateNodes("//*:response//*:datasets"));
+
+	    for (Node datasetsNode : datasetsNodes) {
+
+		String bbox = reader.evaluateString(datasetsNode, "//@*:bbox");
+		response.setBbox(bbox);
+
+		List<Dataset> datasets = Arrays.asList(reader.evaluateNodes(datasetsNode, "//*:Dataset")).//
+			stream().map(n -> {
+			    try {
+				return (Dataset) Dataset.create(n);
+			    } catch (Exception ex) {
+				GSLoggerFactory.getLogger(getClass()).error(ex);
+			    }
+			    return null;
+			}).//
+			filter(Objects::nonNull).//
+			collect(Collectors.toList());
+
+		response.setDatasets(datasets);
+
+		responseList.add(response);
+	    }
+
+	    return responseList;
 
 	} catch (Exception e) {
 
