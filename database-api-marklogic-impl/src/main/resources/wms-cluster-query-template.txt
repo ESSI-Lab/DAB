@@ -57,6 +57,34 @@ for $bbox in $splitBoxes
               $stationsCount
 
               }</gs:stationsCount>}
+              
+              {<gs:avgBbox>{
+
+                 <gs:south>{
+                    cts:avg-aggregate(
+                         cts:element-reference(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', 'south')), (),
+                         $query)
+                 }</gs:south>
+               
+                 }<gs:west>{
+                    cts:avg-aggregate(
+                         cts:element-reference(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', 'west')), (),
+                         $query)
+                 }</gs:west>{
+                 
+                 }<gs:north>{
+                    cts:avg-aggregate(
+                         cts:element-reference(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', 'north')), (),
+                         $query)
+                 }</gs:north>{
+               
+                 }<gs:east>{
+                    cts:avg-aggregate(
+                         cts:element-reference(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema', 'east')), (),
+                         $query)
+                 }</gs:east>{
+                 
+              }</gs:avgBbox>}
 
               {<gs:termFrequency xmlns:gs="http://flora.eu/gi-suite/1.0/dataModel/schema">
 

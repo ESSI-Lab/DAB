@@ -166,6 +166,7 @@ public interface DatabaseExecutor extends DatabaseProvider {
 	private Integer stationsCount;
 	private Integer totalCount;
 	private SpatialExtent bbox;
+	private SpatialExtent avgBbox;
 
 	/**
 	 * 
@@ -173,6 +174,22 @@ public interface DatabaseExecutor extends DatabaseProvider {
 	public WMSClusterResponse() {
 
 	    datasets = new ArrayList<>();
+	}
+
+	/**
+	 * @return
+	 */
+	public Optional<SpatialExtent> getAvgBbox() {
+
+	    return Optional.ofNullable(avgBbox);
+	}
+
+	/**
+	 * @param avgBbox
+	 */
+	public void setAvgBbox(SpatialExtent avgBbox) {
+
+	    this.avgBbox = avgBbox;
 	}
 
 	/**
