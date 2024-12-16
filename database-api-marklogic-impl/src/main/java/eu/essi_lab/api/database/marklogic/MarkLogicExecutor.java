@@ -104,7 +104,7 @@ public class MarkLogicExecutor extends MarkLogicReader implements DatabaseExecut
 
 	    String responseString = getDatabase().getWrapper().submit(template).asString();
 
-	    WMSClusterResponse response = new WMSClusterResponse();
+	   
 
 	    XMLDocumentReader reader = new XMLDocumentReader(responseString);
 
@@ -115,7 +115,7 @@ public class MarkLogicExecutor extends MarkLogicReader implements DatabaseExecut
 	    List<Node> estimateNodes = Arrays.asList(reader.evaluateNodes("//*:response/*:estimate"));
 
 	    for (Node estimateNode : estimateNodes) {
-
+		WMSClusterResponse response = new WMSClusterResponse();
 		String bbox = reader.evaluateString(estimateNode, "@*:bbox");
 		response.setBbox(bbox);
 
@@ -151,6 +151,7 @@ public class MarkLogicExecutor extends MarkLogicReader implements DatabaseExecut
 	    List<Node> datasetsNodes = Arrays.asList(reader.evaluateNodes("//*:response//*:datasets"));
 
 	    for (Node datasetsNode : datasetsNodes) {
+		WMSClusterResponse response = new WMSClusterResponse();
 
 		String bbox = reader.evaluateString(datasetsNode, "//@*:bbox");
 		response.setBbox(bbox);
