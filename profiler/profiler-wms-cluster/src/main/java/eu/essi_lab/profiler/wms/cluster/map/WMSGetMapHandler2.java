@@ -467,45 +467,45 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 
 	LogicalBond andBond = BondFactory.createAndBond();
 
-	String what = parser.getValue("what");
+	Optional<String> what = parser.getOptionalValue("what");
 
-	if (!what.equals(KeyValueParser.UNDEFINED)) {
+	if (what.isPresent() && !what.get().equals(KeyValueParser.UNDEFINED)) {
 
 	    LogicalBond orBond = BondFactory.createOrBond();
 
 	    orBond.getOperands().add(BondFactory.createSimpleValueBond(//
 		    BondOperator.LIKE, //
 		    MetadataElement.TITLE, //
-		    what));
+		    what.get()));
 
 	    orBond.getOperands().add(BondFactory.createSimpleValueBond(//
 		    BondOperator.LIKE, //
 		    MetadataElement.KEYWORD, //
-		    what));
+		    what.get()));
 
 	    andBond.getOperands().add(orBond);
 	}
 
-	String from = parser.getValue("from");
+	Optional<String> from = parser.getOptionalValue("from");
 
-	if (!from.equals(KeyValueParser.UNDEFINED)) {
+	if (from.isPresent() && !from.get().equals(KeyValueParser.UNDEFINED)) {
 
 	    andBond.getOperands().add(BondFactory.createSimpleValueBond(//
 		    BondOperator.GREATER_OR_EQUAL, //
 		    MetadataElement.TEMP_EXTENT_BEGIN, //
-		    from));
+		    from.get()));
 
 	}
 
-	String to = parser.getValue("to");
+	Optional<String> to = parser.getOptionalValue("to");
 
-	if (!to.equals(KeyValueParser.UNDEFINED)) {
+	if (to.isPresent() && !to.get().equals(KeyValueParser.UNDEFINED)) {
 
 	    andBond.getOperands().add(//
 		    BondFactory.createSimpleValueBond(//
 			    BondOperator.LESS_OR_EQUAL, //
 			    MetadataElement.TEMP_EXTENT_BEGIN, //
-			    to));
+			    to.get()));
 
 	}
 
