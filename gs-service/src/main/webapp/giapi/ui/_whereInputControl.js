@@ -215,9 +215,7 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 						 		
 			jQuery( "#layerNameSearchInput" ).on( "keyup", function() {
 				
-				updateWmsLayersTable(jQuery( "#layerNameSearchInput" ).val());		
-			
-			    console.log(jQuery( "#layerNameSearchInput" ).val() );
+				updateWmsLayersTable(jQuery( "#layerNameSearchInput" ).val());					
 			});
 						
 			downloadWmsLayers();		
