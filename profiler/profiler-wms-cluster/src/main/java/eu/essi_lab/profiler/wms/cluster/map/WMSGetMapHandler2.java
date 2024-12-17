@@ -56,11 +56,15 @@ import eu.essi_lab.api.database.DatabaseExecutor.WMSClusterRequest;
 import eu.essi_lab.api.database.DatabaseExecutor.WMSClusterResponse;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.messages.bond.BondFactory;
+import eu.essi_lab.messages.bond.BondOperator;
+import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap.TermFrequencyTarget;
+import eu.essi_lab.messages.web.KeyValueParser;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.Dataset;
@@ -101,6 +105,8 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 
 	    Integer width = Integer.parseInt(widthString);
 	    Integer height = Integer.parseInt(heightString);
+
+	    LogicalBond constraints = getConstraints(webRequest);
 
 	    return new StreamingOutput() {
 
@@ -195,6 +201,7 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 
 			WMSClusterRequest request = new WMSClusterRequest();
 
+			request.setConstraints(constraints);
 			request.setMaxResults(max);
 			request.setView(view.get());
 
@@ -424,10 +431,6 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 
 		}
 
-		private String extractValue(String res, String key) {
-		    return res.substring(res.indexOf("<" + key + ">"), res.indexOf("</" + key + ">")).replace("<" + key + ">", "");
-		}
-
 		private int getXPixel(Integer imageWidthPixel, Double stationX, double imageMinX, double imageWidthY) {
 		    return (int) ((stationX - imageMinX) * imageWidthPixel / imageWidthY);
 		}
@@ -451,7 +454,46 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 
 	    };
 	}
+    }
 
+    /**
+     * @param webRequest
+     * @return
+     */
+    private LogicalBond getConstraints(WebRequest webRequest) {
+
+	String queryString = webRequest.getQueryString();
+	KeyValueParser parser = new KeyValueParser(queryString);
+
+	LogicalBond andBond = BondFactory.createAndBond();
+
+	String searchTerms = parser.getValue("what");
+
+	if (!searchTerms.equals(KeyValueParser.UNDEFINED)) {
+
+	    LogicalBond orBond = BondFactory.createOrBond();
+
+	    orBond.getOperands().add(BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, searchTerms));
+	    orBond.getOperands().add(BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, searchTerms));
+
+	    andBond.getOperands().add(orBond);
+	}
+
+	Optional<String> startTime = parser.getOptionalValue("startTime");
+
+	Optional<String> endTime = parser.getOptionalValue("endTime");
+
+	Optional<String> bbox = parser.getOptionalValue("bbox");
+
+	Optional<String> instrumentName = parser.getOptionalValue("instrumentName");
+
+	Optional<String> parameterName = parser.getOptionalValue("parameterName");
+
+	Optional<String> platformName = parser.getOptionalValue("platformName");
+
+	Optional<String> validRecords = parser.getOptionalValue("validRecords");
+
+	return andBond;
     }
 
 }
