@@ -32,6 +32,7 @@ import java.util.Optional;
 import org.json.JSONObject;
 
 import eu.essi_lab.messages.DiscoveryMessage;
+import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.stats.StatisticsMessage;
@@ -98,6 +99,7 @@ public interface DatabaseExecutor extends DatabaseProvider {
 	private int maxResults;
 	private List<SpatialExtent> extents;
 	private View view;
+	private LogicalBond constraints;
 
 	/**
 	 * 
@@ -154,6 +156,22 @@ public interface DatabaseExecutor extends DatabaseProvider {
 
 	    this.view = view;
 	}
+
+	/**
+	 * @param requestBond
+	 */
+	public void setConstraints(LogicalBond requestBond) {
+	    
+	    this.constraints = requestBond;
+	}
+
+	/**
+	 * @return  
+	 */
+	public LogicalBond getConstraints() {
+	    
+	    return constraints;
+	}	
     }
 
     /**
