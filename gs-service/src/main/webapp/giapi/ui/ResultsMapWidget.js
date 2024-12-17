@@ -167,7 +167,7 @@
  * @param {Boolean} [options.clusterWMS=false]
    @param {String} [options.clusterWMSToken]
    @param {String} [options.clusterWMSView]
- *
+ 
  */
 
 GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
@@ -378,7 +378,13 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 	
    		var onlineArray = [];			 
    		var protocol = 'urn:ogc:serviceType:WebMapService:1.3.0:HTTP';		 
-   		var url = 'http://localhost:9090/gs-service/services/essi/token/'+options.clusterWMSToken+'/view/'+options.clusterWMSView+'/wms-cluster?'+query;
+		
+		var endpoint = options.dabNode.endpoint();
+	    endpoint = endpoint.endsWith('/') ? endpoint : endpoint + '/';
+	         
+	    var servicePath = options.dabNode.servicePath();
+		
+		var url = endpoint + servicePath+'/token/'+options.clusterWMSToken+'/view/'+options.clusterWMSView+'/wms-cluster?'+query;
    		var online = {
    			
    			'function':'download',
@@ -393,12 +399,12 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
    		 return GIAPI.LayersFactory.ol3_Layer(onlineArray, 'urn:ogc:serviceType:WebMapService:');	
    	};
 	
-	if(options.clusterWMS){
+	/*if(options.clusterWMS){
 		
 		var layerArray = createWMSCLusterLayer(options);	 			 					  			 
 			
 		ol3Map.addLayers(layerArray);
- 	}
+ 	}*/
 	                 	
 	/**
 	 * 
@@ -604,15 +610,15 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 	      	   	
    	   switch(mapType){
        case 'ol':   	 
-    	 if(!ol3Map.selectionVisible()){
-       		 return null;
-       	 } 
-         break;
-       case 'google':  	 
-    	 if(!selection.getVisible()){
-    		 return null;
-    	 }
-    	 break;
+	    	 if(!ol3Map.selectionVisible()){
+	       		 return null;
+	       	 } 
+	         break;
+	      case 'google':  	 
+	    	 if(!selection.getVisible()){
+	    		 return null;
+	    	 }
+	    	 break;
        }
    	 
    	   return _inputControl.where(true);
