@@ -467,31 +467,99 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 
 	LogicalBond andBond = BondFactory.createAndBond();
 
-	String searchTerms = parser.getValue("what");
+	String what = parser.getValue("what");
 
-	if (!searchTerms.equals(KeyValueParser.UNDEFINED)) {
+	if (!what.equals(KeyValueParser.UNDEFINED)) {
 
 	    LogicalBond orBond = BondFactory.createOrBond();
 
-	    orBond.getOperands().add(BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, searchTerms));
-	    orBond.getOperands().add(BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, searchTerms));
+	    orBond.getOperands().add(BondFactory.createSimpleValueBond(//
+		    BondOperator.LIKE, //
+		    MetadataElement.TITLE, //
+		    what));
+
+	    orBond.getOperands().add(BondFactory.createSimpleValueBond(//
+		    BondOperator.LIKE, //
+		    MetadataElement.KEYWORD, //
+		    what));
 
 	    andBond.getOperands().add(orBond);
 	}
 
-	Optional<String> startTime = parser.getOptionalValue("startTime");
+	String from = parser.getValue("from");
 
-	Optional<String> endTime = parser.getOptionalValue("endTime");
+	if (!from.equals(KeyValueParser.UNDEFINED)) {
 
-	Optional<String> bbox = parser.getOptionalValue("bbox");
+	    andBond.getOperands().add(BondFactory.createSimpleValueBond(//
+		    BondOperator.GREATER_OR_EQUAL, //
+		    MetadataElement.TEMP_EXTENT_BEGIN, //
+		    from));
 
-	Optional<String> instrumentName = parser.getOptionalValue("instrumentName");
+	}
 
-	Optional<String> parameterName = parser.getOptionalValue("parameterName");
+	String to = parser.getValue("to");
 
-	Optional<String> platformName = parser.getOptionalValue("platformName");
+	if (!to.equals(KeyValueParser.UNDEFINED)) {
 
-	Optional<String> validRecords = parser.getOptionalValue("validRecords");
+	    andBond.getOperands().add(//
+		    BondFactory.createSimpleValueBond(//
+			    BondOperator.LESS_OR_EQUAL, //
+			    MetadataElement.TEMP_EXTENT_BEGIN, //
+			    to));
+
+	}
+
+	Optional<String> where = parser.getOptionalValue("where");
+
+	if (where.isPresent() && !where.get().equals(KeyValueParser.UNDEFINED)) {
+
+	    SpatialExtent extent = new SpatialExtent(//
+		    Double.valueOf(where.get().split(",")[0]), //
+		    Double.valueOf(where.get().split(",")[1]), //
+		    Double.valueOf(where.get().split(",")[2]), //
+		    Double.valueOf(where.get().split(",")[3]));//
+
+	    Optional<String> spatialOp = parser.getOptionalValue("spatialOp");
+
+	    andBond.getOperands().add(//
+		    BondFactory.createSpatialExtentBond(BondOperator.decode(spatialOp.get()), extent));
+	}
+
+	Optional<String> instrumentTitle = parser.getOptionalValue("instrumentTitle");
+	if (instrumentTitle.isPresent() && !instrumentTitle.get().equals(KeyValueParser.UNDEFINED)) {
+
+	    andBond.getOperands().add(BondFactory.createSimpleValueBond(//
+		    BondOperator.EQUAL, //
+		    MetadataElement.INSTRUMENT_TITLE, //
+		    instrumentTitle.get()));
+	}
+
+	Optional<String> attributeTitle = parser.getOptionalValue("attributeTitle");
+	if (attributeTitle.isPresent() && !attributeTitle.get().equals(KeyValueParser.UNDEFINED)) {
+
+	    andBond.getOperands().add(BondFactory.createSimpleValueBond(//
+		    BondOperator.EQUAL, //
+		    MetadataElement.ATTRIBUTE_TITLE, //
+		    attributeTitle.get()));
+	}
+
+	Optional<String> platformTitle = parser.getOptionalValue("platformTitle");
+	if (platformTitle.isPresent() && !platformTitle.get().equals(KeyValueParser.UNDEFINED)) {
+
+	    andBond.getOperands().add(BondFactory.createSimpleValueBond(//
+		    BondOperator.EQUAL, //
+		    MetadataElement.PLATFORM_TITLE, //
+		    platformTitle.get()));
+	}
+
+	Optional<String> isValidated = parser.getOptionalValue("isValidated");
+	if (isValidated.isPresent() && !isValidated.get().equals(KeyValueParser.UNDEFINED)) {
+
+	    andBond.getOperands().add(BondFactory.createResourcePropertyBond(//
+		    BondOperator.EQUAL, //
+		    ResourceProperty.IS_VALIDATED, //
+		    isValidated.get()));
+	}
 
 	return andBond;
     }
