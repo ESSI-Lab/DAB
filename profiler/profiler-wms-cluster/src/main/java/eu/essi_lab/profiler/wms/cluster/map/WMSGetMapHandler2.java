@@ -326,7 +326,7 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 
 				ig2.setColor(new Color(0, 0, 0, 40));
 				ig2.setStroke(new BasicStroke(1)); // Slightly thicker line for the border
-				ig2.drawRect(0, 0, width - 2, height - 2);
+				ig2.drawRect(subOffsetX, subOffsetY, subImageWidth - 2, subImageHeight - 2);
 
 				if (optionalAvgBbox.isPresent()) {
 				    SpatialExtent avgBBox = optionalAvgBbox.get();
