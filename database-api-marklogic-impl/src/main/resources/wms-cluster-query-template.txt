@@ -20,9 +20,12 @@ for $bbox in $splitBoxes
 
     let $bboxQuery := gs:spiq($south,$west,$north,$east)
 
+	let $paramsQuery := PARAMS_QUERY
+
     let $query as cts:query := 
 
         gs:andq((
+        $paramsQuery,
         gs:erq('isTimeseries','=','true',0.0), 
         $bboxQuery, 
         $viewQuery ))

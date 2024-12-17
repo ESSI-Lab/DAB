@@ -167,7 +167,7 @@
  * @param {Boolean} [options.clusterWMS=false]
    @param {String} [options.clusterWMSToken]
    @param {String} [options.clusterWMSView]
- *
+ 
  */
 
 GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
@@ -329,127 +329,94 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
     options.latitude = latitude;
     options.divId = divId;
     options.dialogMode = false;
-
-    switch(mapType){
-    case 'ol':
-    	           
-        // creates the ol3 map
-        ol3Map = GIAPI.OL3_Map(options);
- 
-        /**
-         * The <a target=_blank href="http://openlayers.org/en/v3.15.1/apidoc/">Openlayers 3 API</a> instance
-         *
-         * @property {<a target=_blank href="http://openlayers.org/en/v3.15.1/apidoc/">Openlayers 3 API</a>} olmap
-         */
-        widget.map = ol3Map.map();
+		   	      	           
+    // creates the ol3 map
+    ol3Map = GIAPI.OL3_Map(options);
+   
+    widget.map = ol3Map.map();
+    
+    options.widgetMap = widget.map;
+    options.ol3Map = ol3Map;
+    
+    if(options.showSelectionControl){        
+        // creates the input control
+        _inputControl = GIAPI._whereInputControl(widget,options);
+        _inputControl.updateWhereFields();
         
-   	    options.widgetMap = widget.map;
-        options.ol3Map = ol3Map;
-        
-        if(options.showSelectionControl){        
-	        // creates the input control
-	        _inputControl = GIAPI._whereInputControl(widget,options);
-	        _inputControl.updateWhereFields();
-	        
-           // add the input control to the map
-           _inputControl.add(widget.map);
-        }
-		
-		if(options.clusterWMS){
-		
-			var onlineArray = [];			 
-			var protocol = 'urn:ogc:serviceType:WebMapService:1.3.0:HTTP';		 
-			var url = 'http://localhost:9090/gs-service/services/essi/token/'+options.clusterWMSToken+'/view/'+options.clusterWMSView+'/wms-cluster'
-			var online = {
-				
-				'function':'download',
-				'name': options.clusterWMSLayerName,
-				'title': options.clusterWMSLayerTitle,
-				'protocol': protocol,
-				'url': url												
-			 };
-			 
-			 onlineArray.push(online);
-			 
-			 var mapLayers = GIAPI.LayersFactory.ol3_Layer(onlineArray, 'urn:ogc:serviceType:WebMapService:');
-			 					  			 
-			 ol3Map.addLayers(mapLayers);
-	 	}
-	                 
-        break;
-        
-    case 'google':
-        /**
-         * The <a target=_blank href="https://hpneo.github.io/gmaps/">gmaps.js</a> instance
-         *
-         * @property {<a target=_blank href="https://hpneo.github.io/gmaps/">gmaps.js</a>} gmap
-         */
-        widget.map = new GMaps({
-            div : '#' + divId,
-            lat : latitude,
-            lng : longitude,
-            minZoom: 2,
-
-            fullscreenControl : options.fullscreenControl,
-            fullscreenControlOptions : options.fullscreenControlOptions,
-
-            zoomControl : options.zoomControl,
-            zoomControlOptions : options.zoomControlOptions,
-
-            scrollwheel : options.scrollwheel,
-            panControl : options.panControl,
-            panControlOptions : options.panControlOptions,
-            streetViewControl : options.streetViewControl,
-            overviewMapControl : options.overviewMapControl,
-            mapTypeId : options.mapTypeId,
-            mapTypeControl : options.mapTypeControl,
-            mapTypeControlOptions : options.mapTypeControlOptions,
-
-            navigationControl : options.navigationControl,
-            //      navigationControlOptions: { style: google.maps.NavigationControlStyle.ZOOM_PAN },
-        });
-
-        widget.map.setZoom(options.zoom);
-        
-//        options.value = {'south': -30, 'west': -30, 'north': 30, 'east': 30 };
-          
-        selection = new google.maps.Rectangle({
-
-            strokeColor : '#0000FF',
-            strokeOpacity : 1,
-            strokeWeight : 3,
-            fillColor : '#0000FF',
-            fillOpacity : 0.3,
-
-            bounds : options.value,
-            editable : true,
-            draggable : true
-        });
-
-        selection.setMap(widget.map.map);
-        
-        selection.setVisible(options.showSelectionControl);
-        
-        options.controlPosition = google.maps.ControlPosition.LEFT_TOP;
-        
-        options.widgetMap = widget.map;
-        options.selection = selection;
-        
-        if(options.showSelectionControl){   
-        
-	        _inputControl = GIAPI._whereInputControl(widget,options);
-	        _inputControl.updateWhereFields();
-	        
-	        google.maps.event.addListener(selection, 'bounds_changed', function() {
-	        	
-	        	_inputControl.updateWhereFields();
-	        });        
-	        
-	           // add the input control to the map
-	           _inputControl.add(widget.map.map);
-        }
-        break;
+       // add the input control to the map
+       _inputControl.add(widget.map);
     }
+	
+	var createWMSCLusterLayer = function(options, constraints){
+			
+		if(!constraints){
+			constraints = {};
+		}
+		
+		var query = 'what=' + (constraints.what || '') + '&'; 		
+		
+		query += 'from=' + ((constraints.when && constraints.when.from) || '') + '&'; 
+		
+		query += 'to=' + ((constraints.when && constraints.when.to) || '') + '&';
+			
+		if(constraints.where){
+			
+			var where = constraints.where;
+			query += 'where=' + where.south + ',' + where.west + ',' + where.north + ',' + where.east + '&';
+			
+			var spatialOp = constraints.spatialOp;
+			query += 'spatialOp='+spatialOp + '&';
+		}
+				
+	 	if(constraints.kvp){
+			
+			constraints.kvp.forEach(function(item) {
+				
+				query += item.key + '=' + item.value + '&'				
+           });			
+		}
+	
+   		var onlineArray = [];			 
+   		var protocol = 'urn:ogc:serviceType:WebMapService:1.3.0:HTTP';		 
+		
+		var endpoint = options.dabNode.endpoint();
+	    endpoint = endpoint.endsWith('/') ? endpoint : endpoint + '/';
+	         
+	    var servicePath = options.dabNode.servicePath();
+		
+		var url = endpoint + servicePath+'/token/'+options.clusterWMSToken+'/view/'+options.clusterWMSView+'/wms-cluster?'+query;
+   		var online = {
+   			
+   			'function':'download',
+   			'name': options.clusterWMSLayerName,
+   			'title': options.clusterWMSLayerTitle,
+   			'protocol': protocol,
+   			'url': url												
+   		 };
+   		 
+   		 onlineArray.push(online);
+   		 
+   		 return GIAPI.LayersFactory.ol3_Layer(onlineArray, 'urn:ogc:serviceType:WebMapService:');	
+   	};
+	
+	/*if(options.clusterWMS){
+		
+		var layerArray = createWMSCLusterLayer(options);	 			 					  			 
+			
+		ol3Map.addLayers(layerArray);
+ 	}*/
+	                 	
+	/**
+	 * 
+	 */
+	widget.setWMSClusterParams = function(constraints){
+				
+		var layerArray = createWMSCLusterLayer(options, constraints);	 			 					  			 
+				
+		ol3Map.removeLayers(layerArray);
+	
+		ol3Map.addLayers(layerArray);
+	}
              
     /**
      * Updates the widget with the first <a href="../classes/Page.html" class="crosslink">page</a> of the current <a href="../classes/ResultSet.html" class="crosslink">result set</a>
@@ -643,15 +610,15 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 	      	   	
    	   switch(mapType){
        case 'ol':   	 
-    	 if(!ol3Map.selectionVisible()){
-       		 return null;
-       	 } 
-         break;
-       case 'google':  	 
-    	 if(!selection.getVisible()){
-    		 return null;
-    	 }
-    	 break;
+	    	 if(!ol3Map.selectionVisible()){
+	       		 return null;
+	       	 } 
+	         break;
+	      case 'google':  	 
+	    	 if(!selection.getVisible()){
+	    		 return null;
+	    	 }
+	    	 break;
        }
    	 
    	   return _inputControl.where(true);
@@ -807,7 +774,7 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 	   addLayers(layers);
    };
     
-   var addLayers = function(layers) {
+    var addLayers = function(layers) {
     	
     	 switch(mapType){
  	     case 'ol':
@@ -951,7 +918,7 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
     
     var showRectanglesControl = function() {
     	
-    	var checked = showRectangles ? ' checked':'';
+   	 	var checked = showRectangles ? ' checked':'';
         var content = '<tr>';
         content += '<td><input class="layers-control-check" type="checkbox" id="rectangles" '+checked+'/></td>';
         content += '<td>Results area</td>';
@@ -971,10 +938,10 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 
     var updateLayersTable = function() {
     	
-    	var normalizeLayerName = function(name){
-    		
-    		return name.replace(/:/g,'','_');
-    	};
+	    	var normalizeLayerName = function(name){
+	    		
+	    		return name.replace(/:/g,'','_');
+	    	};
 
         var layers = widget.map.map.overlayMapTypes;
         jQuery('#layers-table').html('');
