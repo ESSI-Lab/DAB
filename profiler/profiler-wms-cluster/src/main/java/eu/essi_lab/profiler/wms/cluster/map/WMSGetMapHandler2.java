@@ -443,17 +443,15 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 				// Draw the white background rectangle
 				int padding = 1; // Padding around the text
 				ig2.setColor(new Color(255, 255, 255, 128));
-				ig2.fillRect(centerLabelX - labelWidth / 2 - padding / 2, centerLabelY - labelHeight / 2 - padding / 2,
-					labelWidth + padding, labelHeight - padding);
+				ig2.fillRoundRect(centerLabelX - labelWidth / 2-padding, centerLabelY - labelHeight / 2, labelWidth+2*padding, labelHeight,5,5);
 
 				// Draw the black border around the white background
 				ig2.setColor(Color.BLACK);
-				ig2.drawRect(centerLabelX - labelWidth / 2 - padding / 2, centerLabelY - labelHeight / 2 - padding / 2,
-					labelWidth + padding, labelHeight - padding);
+				ig2.drawRoundRect(centerLabelX - labelWidth / 2-padding, centerLabelY - labelHeight / 2, labelWidth+2*padding, labelHeight,5,5);
 
 				// Draw the label text
 				ig2.setColor(Color.BLACK);
-				ig2.drawString(centerLabel, centerLabelX - labelWidth / 2, centerLabelY + padding * 4);
+				ig2.drawString(centerLabel, centerLabelX - labelWidth / 2, (int)( centerLabelY + labelHeight / 2.8));
 
 				ig2.setColor(Color.BLACK);
 				ig2.setStroke(new BasicStroke(1)); // Thin line for the border
@@ -592,8 +590,8 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 				    ig2.setColor(g);
 				    if (debug) {
 					if (offsetX != 0 || offsetY != 0) {
-					     ig2.drawLine(stationCenterX, stationCenterY, stationCenterX + offsetX,
-					     stationCenterY + offsetY);
+					    ig2.drawLine(stationCenterX, stationCenterY, stationCenterX + offsetX,
+						    stationCenterY + offsetY);
 					}
 				    }
 				    ig2.drawOval(stationMinX, stationMinY, stationDiameterInPixels, stationDiameterInPixels);

@@ -26,7 +26,9 @@ package eu.essi_lab.profiler.wms.cluster.legend;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -71,7 +73,6 @@ public class WMSGetLegendHandler extends StreamingRequestHandler {
 	    WMSLegendRequest map = new WMSLegendRequest(request);
 	    String layers = checkParameter(map, Parameter.LAYERS);
 
-
 	    ret.setResult(ValidationResult.VALIDATION_SUCCESSFUL);
 	} catch (Exception e) {
 	    ret.setError("Missing mandatory parameter: " + e.getMessage());
@@ -98,23 +99,23 @@ public class WMSGetLegendHandler extends StreamingRequestHandler {
 	    @Override
 	    public void write(OutputStream output) throws IOException, WebApplicationException {
 
-//		DataCacheConnector dataCacheConnector = null;
+		// DataCacheConnector dataCacheConnector = null;
 
 		try {
 
-//		    dataCacheConnector = DataCacheConnectorFactory.getDataCacheConnector();
-//
-//		    if (dataCacheConnector == null) {
-//			DataCacheConnectorSetting setting = ConfigurationWrapper.getDataCacheConnectorSetting();
-//			dataCacheConnector = DataCacheConnectorFactory.newDataCacheConnector(setting);
-//			String cachedDays = setting.getOptionValue(DataCacheConnector.CACHED_DAYS).get();
-//			String flushInterval = setting.getOptionValue(DataCacheConnector.FLUSH_INTERVAL_MS).get();
-//			String maxBulkSize = setting.getOptionValue(DataCacheConnector.MAX_BULK_SIZE).get();
-//			dataCacheConnector.configure(DataCacheConnector.MAX_BULK_SIZE, maxBulkSize);
-//			dataCacheConnector.configure(DataCacheConnector.FLUSH_INTERVAL_MS, flushInterval);
-//			dataCacheConnector.configure(DataCacheConnector.CACHED_DAYS, cachedDays);
-//			DataCacheConnectorFactory.setDataCacheConnector(dataCacheConnector);
-//		    }
+		    // dataCacheConnector = DataCacheConnectorFactory.getDataCacheConnector();
+		    //
+		    // if (dataCacheConnector == null) {
+		    // DataCacheConnectorSetting setting = ConfigurationWrapper.getDataCacheConnectorSetting();
+		    // dataCacheConnector = DataCacheConnectorFactory.newDataCacheConnector(setting);
+		    // String cachedDays = setting.getOptionValue(DataCacheConnector.CACHED_DAYS).get();
+		    // String flushInterval = setting.getOptionValue(DataCacheConnector.FLUSH_INTERVAL_MS).get();
+		    // String maxBulkSize = setting.getOptionValue(DataCacheConnector.MAX_BULK_SIZE).get();
+		    // dataCacheConnector.configure(DataCacheConnector.MAX_BULK_SIZE, maxBulkSize);
+		    // dataCacheConnector.configure(DataCacheConnector.FLUSH_INTERVAL_MS, flushInterval);
+		    // dataCacheConnector.configure(DataCacheConnector.CACHED_DAYS, cachedDays);
+		    // DataCacheConnectorFactory.setDataCacheConnector(dataCacheConnector);
+		    // }
 
 		    WMSLegendRequest map = new WMSLegendRequest(webRequest);
 
@@ -149,29 +150,40 @@ public class WMSGetLegendHandler extends StreamingRequestHandler {
 		    String viewId = webRequest.extractViewId().get();
 
 		    List<InfoLegend> infos = new ArrayList<>();
-		   
+
 		    Optional<View> view = DiscoveryRequestTransformer.findView(ConfigurationWrapper.getDatabaseURI(), viewId);
-			
+
 		    List<GSSource> sources = ConfigurationWrapper.getViewSources(view.get());
-		    
+
 		    sources.sort(new Comparator<GSSource>() {
 
-				@Override
-				public int compare(GSSource o1, GSSource o2) {
-					return o1.getLabel().compareTo(o2.getLabel());
-				}
-			});
-		    
-		    for (GSSource source : sources) {
-				InfoLegend info = new InfoLegend(WMSGetMapHandler.getRandomColorFromSourceId(source.getUniqueIdentifier()), source.getLabel());
-				infos.add(info );
+			@Override
+			public int compare(GSSource o1, GSSource o2) {
+			    return o1.getLabel().compareTo(o2.getLabel());
 			}
+		    });
+
+		    for (GSSource source : sources) {
+			InfoLegend info = new InfoLegend(WMSGetMapHandler.getRandomColorFromSourceId(source.getUniqueIdentifier()),
+				source.getLabel());
+			infos.add(info);
+		    }
+
+		    int fontSize = 20;
+		    int lineSize = 28;
 
 		    if (widthString == null || widthString.isEmpty()) {
-			widthString = "" + (10 + 10 * 30);
+			int maxLength = 0;
+			for (InfoLegend info : infos) {
+			    int size = info.getLabel().length();
+			    if (size > maxLength) {
+				maxLength = size;
+			    }
+			}
+			widthString = "" + (40 + (int) (maxLength * fontSize * 0.61));
 		    }
 		    if (heightString == null || heightString.isEmpty()) {
-			heightString = "" + (20 * infos.size());
+			heightString = "" + lineSize*infos.size();
 		    }
 
 		    Integer width = Integer.parseInt(widthString);
@@ -180,22 +192,23 @@ public class WMSGetLegendHandler extends StreamingRequestHandler {
 		    BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
 		    Graphics2D ig2 = bi.createGraphics();
-
+		    ig2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		    ig2.setStroke(new BasicStroke(2));
 
-		    int offset = 0;
+		    int offset = 5;
+		    ig2.setFont(new Font("SansSerif", Font.BOLD, fontSize));
 		    for (InfoLegend infoLegend : infos) {
 
 			// point
 			ig2.setColor(infoLegend.getColor());
-			int r = 8;
+			int r = 15;
 			int pixMinX = 10;
 			int pixMinY = 10;
 			ig2.fillOval(pixMinX - r / 2, offset + pixMinY - r / 2, r, r);
-			ig2.setColor(Color.gray);
+			ig2.setColor(Color.black);
 			ig2.drawOval(pixMinX - r / 2, offset + pixMinY - r / 2, r, r);
 			ig2.drawString(infoLegend.getLabel(), pixMinX + r + 5, offset + pixMinY + 5);
-			offset += 20;
+			offset += (fontSize*1.4 );
 
 		    }
 
