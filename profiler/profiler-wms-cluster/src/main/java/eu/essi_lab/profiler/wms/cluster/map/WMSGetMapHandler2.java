@@ -38,7 +38,6 @@ import java.math.BigDecimal;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -100,6 +99,7 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 	    String heightString = checkParameter(map, Parameter.HEIGHT);
 	    String format = decodeFormat(map.getParameterValue(Parameter.FORMAT));
 	    String time = map.getParameterValue(Parameter.TIME);
+	    boolean debug = false;
 	    // String transparent = map.getParameterValue(Parameter.TRANSPARENT);
 	    // String bgcolor = map.getParameterValue(Parameter.BGCOLOR);
 	    // String exceptions = map.getParameterValue(Parameter.EXCEPTIONS);
@@ -115,15 +115,23 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 		public void write(OutputStream output) throws IOException, WebApplicationException {
 
 		    String outputCRS = crs;
-		    int max = 10;
+
+		    int minimumClusterSize = 10; // minimum number of stations per cluster
+		    int maximumClusterSize = 1000; // minimum number of stations for the biggest pie
+
+		    int stationDiameterInPixels = 8;
+		    int minimumClusterDiameterInPixels = 10;
+		    int fontSizeInPixels = 10;
+		    double maxDiameterRatio = 0.4; // pie diameter with respect to sub image
+
+		    boolean eachPieinEachSubTile = false;
+
 		    try {
 
 			BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
 			Graphics2D ig2 = bi.createGraphics();
 			ig2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-			int r = 8;
 
 			// we calculate bbox in x-y coordinates (map coordinates) and lat lon
 			// coordinates (db coordinates)
@@ -132,17 +140,11 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 			// miny means the vertical coordinate
 			// in case of EPSG:4326 the first coordinate is the vertical, so they are inverted
 
-			boolean invertedCoordinates = false;
-
 			String[] split = bboxString.split(",");
 			BigDecimal minx = null;
 			BigDecimal miny = null;
 			BigDecimal maxx = null;
 			BigDecimal maxy = null;
-			BigDecimal west = null;
-			BigDecimal east = null;
-			BigDecimal south = null;
-			BigDecimal north = null;
 
 			if (version.equals("1.3.0") && outputCRS.equals("EPSG:4326")) {
 			    // northing, easting
@@ -162,7 +164,6 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 			switch (outputCRS) {
 			case "EPSG:4326":
 			case "CRS:84":
-			    invertedCoordinates = true;
 			    if (minx.doubleValue() < -180) {
 				minx = new BigDecimal("-180");
 			    }
@@ -181,11 +182,6 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 			    break;
 			}
 
-			south = miny;
-			west = minx;
-			north = maxy;
-			east = maxx;
-
 			if (outputCRS.contains("3857")) {
 			    SimpleEntry<Double, Double> lower = new SimpleEntry<>(minx.doubleValue(), miny.doubleValue());
 			    SimpleEntry<Double, Double> upper = new SimpleEntry<>(maxx.doubleValue(), maxy.doubleValue());
@@ -195,10 +191,6 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 				    .translateBBOX(bbox3857, CRS.EPSG_3857(), CRS.EPSG_4326());
 			    lower = bbox4326.getKey();
 			    upper = bbox4326.getValue();
-			    south = new BigDecimal(lower.getValue());
-			    west = new BigDecimal(lower.getKey());
-			    north = new BigDecimal(upper.getValue());
-			    east = new BigDecimal(upper.getKey());
 
 			}
 
@@ -208,7 +200,6 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 
 			double widthGeo = maxx.doubleValue() - minx.doubleValue();
 			double heightGeo = maxy.doubleValue() - miny.doubleValue();
-			double perc = 10.0;
 
 			double tol = 0.0000000001;
 
@@ -217,7 +208,7 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 			WMSClusterRequest request = new WMSClusterRequest();
 
 			request.setConstraints(constraints);
-			request.setMaxResults(max);
+			request.setMaxResults(minimumClusterSize);
 			request.setView(view.get());
 
 			int divisions = 3;
@@ -300,15 +291,20 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 				bboxMaxY = upper.getValue();
 			    }
 			    // the top left pixel of each sub plot
-			    int subOffsetX = getXPixel(width, bboxMinX, minx.doubleValue(), widthGeo);
-			    int subOffsetY = getYPixel(height, bboxMaxY, maxy.doubleValue(), heightGeo);
+			    int subMinX = getXPixel(width, bboxMinX, minx.doubleValue(), widthGeo);
+			    int subMinY = getYPixel(height, bboxMaxY, maxy.doubleValue(), heightGeo);
+			    // and the bottom right pixel of each sub plot
+			    int subMaxX = getXPixel(width, bboxMaxX, minx.doubleValue(), widthGeo);
+			    int subMaxY = getYPixel(height, bboxMinY, maxy.doubleValue(), heightGeo);
 
 			    // blue square per debug
-			    ig2.setColor(randomColor);
-			    ig2.setStroke(new BasicStroke(1)); // Slightly thicker line for the border
-			    ig2.drawRect(subOffsetX, subOffsetY, subImageWidth - 2, subImageHeight - 2);
-			    String debugString = bbboxIndex++ + ": " + bbox;
-			    ig2.drawString(debugString, subOffsetX, subOffsetY + 10);
+			    if (debug) {
+				ig2.setColor(randomColor);
+				ig2.setStroke(new BasicStroke(1)); // Slightly thicker line for the border
+				ig2.drawRect(subMinX, subMinY, subImageWidth - 2, subImageHeight - 2);
+				String debugString = bbboxIndex++ + ": " + bbox;
+				ig2.drawString(debugString, subMinX, subMinY + 10);
+			    }
 
 			    if (response.getMap().isPresent()) {
 
@@ -339,70 +335,18 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 				    }
 				});
 				double startAngle = 0.0;
-				int diameter = Math.min(subImageWidth, subImageHeight) - 60; // Keep some padding
-				int od = diameter;
-				double pd = ((double) totalCount) / 1000;
-				diameter = (int) (diameter * pd);
-				if (diameter > od) {
-				    diameter = od;
+				int maxDiameter = (int) (Math.min(subImageWidth, subImageHeight) * maxDiameterRatio);
+
+				int pieDiameter = (int) (maxDiameter * ((double) totalCount) / ((double) maximumClusterSize));
+				if (pieDiameter > maxDiameter) {
+				    pieDiameter = maxDiameter;
 				}
-				if (diameter < 10) {
-				    diameter = 10;
-				}
-
-				int x = subOffsetX + (subImageWidth - diameter) / 2;
-				int y = subOffsetY + (subImageHeight - diameter) / 2;
-
-				for (int i = 0; i < percentages.size(); i++) {
-				    double percentage = percentages.get(i).getValue();
-				    double arcAngle = 360 * (percentage / 100); // Convert percentage to degrees
-				    Color color = getRandomColorFromSourceId(percentages.get(i).getKey());
-
-				    // Set slice color
-				    ig2.setColor(color);
-
-				    // Draw slice
-				    ig2.fillArc(x, y, diameter, diameter, (int) Math.round(startAngle), (int) Math.round(arcAngle));
-
-				    // Update start angle for the next slice
-				    startAngle += arcAngle;
+				if (pieDiameter < minimumClusterDiameterInPixels) {
+				    pieDiameter = minimumClusterDiameterInPixels;
 				}
 
-				String centerLabel = "" + stationsCount;
-				// Draw center label with white background
-				ig2.setFont(new Font("SansSerif", Font.BOLD, 10));
-				FontMetrics metrics = ig2.getFontMetrics();
-				int labelWidth = metrics.stringWidth(centerLabel);
-				int labelHeight = metrics.getHeight();
-
-				int centerX = x + diameter / 2;
-				int centerY = y + diameter / 2;
-
-				int centerLabelX = x + diameter / 2 + 20;
-				int centerLabelY = y + diameter / 2 + 20;
-
-				// Draw the white background rectangle
-				int padding = 1; // Padding around the text
-				ig2.setColor(new Color(255, 255, 255, 128));
-				ig2.fillRect(centerLabelX - labelWidth / 2 - padding / 2, centerLabelY - labelHeight / 2 - padding / 2,
-					labelWidth + padding, labelHeight - padding);
-
-				// Draw the black border around the white background
-				ig2.setColor(Color.BLACK);
-				ig2.drawRect(centerLabelX - labelWidth / 2 - padding / 2, centerLabelY - labelHeight / 2 - padding / 2,
-					labelWidth + padding, labelHeight - padding);
-
-				// Draw the label text
-				ig2.setColor(Color.BLACK);
-				ig2.drawString(centerLabel, centerLabelX - labelWidth / 2, centerLabelY + padding * 4);
-
-				ig2.setColor(Color.BLACK);
-				ig2.setStroke(new BasicStroke(1)); // Thin line for the border
-				ig2.drawOval(x, y, diameter, diameter);
-
-				ig2.setColor(new Color(0, 0, 0, 40));
-				ig2.setStroke(new BasicStroke(1)); // Slightly thicker line for the border
-				ig2.drawRect(subOffsetX, subOffsetY, subImageWidth - 2, subImageHeight - 2);
+				int centroidX = subMinX + subImageWidth / 2;
+				int centroidY = subMinY + subImageHeight / 2;
 
 				if (optionalAvgBbox.isPresent()) {
 				    SpatialExtent avgBBox = optionalAvgBbox.get();
@@ -427,13 +371,99 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 					avgbboxMaxY = upper.getValue();
 				    }
 
-				    int centroidX = getXPixel(width, avgbboxMinX, minx.doubleValue(), widthGeo);
-				    int centroidY = getYPixel(height, avgbboxMinY, maxy.doubleValue(), heightGeo);
+				    centroidX = getXPixel(width, avgbboxMinX, minx.doubleValue(), widthGeo);
+				    centroidY = getYPixel(height, avgbboxMinY, maxy.doubleValue(), heightGeo);
 
-				    // int centroidX = subOffsetX + (int) (((avgBBox.getWest() - bbox.getWest()) /
-				    // tmpLongitude)*subImageWidth);
-				    // int centroidY = subOffsetY + (int) (((bbox.getNorth() - avgBBox.getNorth()) /
-				    // tmpLatitude)*subImageHeight);
+				}
+
+				int pieMinX = centroidX - pieDiameter / 2;
+				int pieMinY = centroidY - pieDiameter / 2;
+				int pieMaxX = centroidX + pieDiameter / 2;
+				int pieMaxY = centroidY + pieDiameter / 2;
+
+				String centerLabel = "" + stationsCount;
+				// Draw center label with white background
+				ig2.setFont(new Font("SansSerif", Font.BOLD, fontSizeInPixels));
+				FontMetrics metrics = ig2.getFontMetrics();
+				int labelWidth = metrics.stringWidth(centerLabel);
+				int labelHeight = metrics.getHeight();
+
+				int labelMaxY = pieMaxY + labelHeight / 2;
+
+				// in these cases the pie is moved, otherwise would partially render outside the tile
+				int offsetX = 0;
+				int offsetY = 0;
+				if (eachPieinEachSubTile) {
+				    if (pieMinX < subMinX) {
+					offsetX = subMinX - pieMinX;
+				    }
+				    if (pieMaxX > subMaxX) {
+					offsetX = subMaxX - pieMaxX;
+				    }
+				    if (pieMinY < subMinY) {
+					offsetY = subMinY - pieMinY;
+				    }
+				    if (labelMaxY > subMaxY) {
+					offsetY = subMaxY - pieMaxY;
+				    }
+
+				} else {
+				    if (pieMinX < 0) {
+					offsetX = -pieMinX;
+				    }
+				    if (pieMaxX > width) {
+					offsetX = width - pieMaxX;
+				    }
+				    if (pieMinY < 0) {
+					offsetY = -pieMinY;
+				    }
+				    if (labelMaxY > height) {
+					offsetY = height - labelMaxY;
+				    }
+				}
+
+				pieMinX += offsetX;
+				pieMaxX += offsetX;
+				pieMinY += offsetY;
+				pieMaxY += offsetY;
+
+				for (int i = 0; i < percentages.size(); i++) {
+				    double percentage = percentages.get(i).getValue();
+				    double arcAngle = 360 * (percentage / 100); // Convert percentage to degrees
+				    Color color = getRandomColorFromSourceId(percentages.get(i).getKey());
+				    ig2.setColor(color);
+				    ig2.fillArc(pieMinX, pieMinY, pieDiameter, pieDiameter, (int) Math.round(startAngle),
+					    (int) Math.round(arcAngle));
+				    startAngle += arcAngle;
+				}
+
+				int centerLabelX = pieMinX + pieDiameter / 2;
+				int centerLabelY = pieMaxY + labelHeight / 2 + 1;
+
+				// Draw the white background rectangle
+				int padding = 1; // Padding around the text
+				ig2.setColor(new Color(255, 255, 255, 128));
+				ig2.fillRoundRect(centerLabelX - labelWidth / 2-padding, centerLabelY - labelHeight / 2, labelWidth+2*padding, labelHeight,5,5);
+
+				// Draw the black border around the white background
+				ig2.setColor(Color.BLACK);
+				ig2.drawRoundRect(centerLabelX - labelWidth / 2-padding, centerLabelY - labelHeight / 2, labelWidth+2*padding, labelHeight,5,5);
+
+				// Draw the label text
+				ig2.setColor(Color.BLACK);
+				ig2.drawString(centerLabel, centerLabelX - labelWidth / 2, (int)( centerLabelY + labelHeight / 2.8));
+
+				ig2.setColor(Color.BLACK);
+				ig2.setStroke(new BasicStroke(1)); // Thin line for the border
+				ig2.drawOval(pieMinX, pieMinY, pieDiameter, pieDiameter);
+
+				// ig2.setColor(new Color(0, 0, 0, 40));
+				// ig2.setStroke(new BasicStroke(1)); // Slightly thicker line for the border
+				// ig2.drawRect(subOffsetX, subOffsetY, subImageWidth - 2, subImageHeight - 2);
+
+				// draws the centroid
+				if (debug) {
+				    ig2.setStroke(new BasicStroke(2));
 				    ig2.setColor(Color.RED);
 				    ig2.drawOval(centroidX, centroidY, 9, 9);
 				    ig2.setColor(Color.black);
@@ -442,6 +472,17 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 				    ig2.drawOval(centroidX, centroidY, 5, 5);
 				    ig2.setColor(Color.green);
 				    ig2.drawOval(centroidX, centroidY, 3, 3);
+				    ig2.setColor(Color.BLACK);
+				}
+				if (offsetX != 0 || offsetY != 0) {
+				    ig2.setStroke(new BasicStroke(2));
+				    ig2.setColor(Color.gray);
+				    ig2.drawLine(centroidX - stationDiameterInPixels, centroidY - stationDiameterInPixels,
+					    centroidX + stationDiameterInPixels, centroidY + stationDiameterInPixels);
+				    ig2.drawLine(centroidX - stationDiameterInPixels, centroidY + stationDiameterInPixels,
+					    centroidX + stationDiameterInPixels, centroidY - stationDiameterInPixels);
+				    ig2.setColor(Color.gray);
+				    ig2.drawLine(centroidX, centroidY, centroidX + offsetX, centroidY + offsetY);
 				}
 
 			    } else if (!response.getDatasets().isEmpty()) {
@@ -490,46 +531,70 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 
 				    BBOX stationBbbox = station.getBbox4326();
 
-				    Double sminx = stationBbbox.getMinx().doubleValue();
-				    Double sminy = stationBbbox.getMiny().doubleValue();
-				    Double smaxx = stationBbbox.getMaxx().doubleValue();
-				    Double smaxy = stationBbbox.getMaxy().doubleValue();
+				    Double stationX = stationBbbox.getMinx().doubleValue();
+				    Double stationY = stationBbbox.getMiny().doubleValue();
 
 				    if (outputCRS.contains("3857")) {
-					SimpleEntry<Double, Double> lower = new SimpleEntry<>(sminy, sminx);
-					SimpleEntry<Double, Double> upper = new SimpleEntry<>(smaxy, smaxx);
+					SimpleEntry<Double, Double> lower = new SimpleEntry<>(stationY, stationX);
+					SimpleEntry<Double, Double> upper = new SimpleEntry<>(stationY, stationX);
 					SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> bbox4326 = new SimpleEntry<>(
 						lower, upper);
 					SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> bbox3857 = CRSUtils
 						.translateBBOX(bbox4326, CRS.EPSG_4326(), CRS.EPSG_3857());
 					lower = bbox3857.getKey();
 					upper = bbox3857.getValue();
-					sminx = lower.getKey();
-					sminy = lower.getValue();
-					smaxx = upper.getKey();
-					smaxy = upper.getValue();
+					stationX = lower.getKey();
+					stationY = lower.getValue();
 				    }
 
-				    int pixMinY = getYPixel(height, sminy, maxy.doubleValue(), heightGeo);
-				    int pixMinX = getXPixel(width, sminx, minx.doubleValue(), widthGeo);
+				    int stationCenterY = getYPixel(height, stationY, maxy.doubleValue(), heightGeo);
+				    int stationCenterX = getXPixel(width, stationX, minx.doubleValue(), widthGeo);
 
 				    ig2.setStroke(new BasicStroke(2));
-
-				    // Color c = wl.getInfoLegend(layers, station).get(0).getColor();
 
 				    Color color = Color.red;
 				    String sourceId = station.getSourceIdentifier();
 				    if (sourceId != null) {
 					color = getRandomColorFromSourceId(sourceId);
 				    }
-				    // point
-				    Color ac = new Color(color.getRed(), color.getGreen(), color.getBlue(), 127);
+				    Color ac = new Color(color.getRed(), color.getGreen(), color.getBlue());
 				    ig2.setColor(ac);
-				    ig2.fillOval(pixMinX - r / 2, pixMinY - r / 2, r, r);
+				    int stationMinX = stationCenterX - (stationDiameterInPixels) / 2;
+				    int stationMinY = stationCenterY - (stationDiameterInPixels) / 2;
+				    int stationMaxX = stationCenterX + (stationDiameterInPixels) / 2;
+				    int stationMaxY = stationCenterY + (stationDiameterInPixels) / 2;
+				    int offsetX = 0;
+				    int offsetY = 0;
+				    if (stationMinX < 0) {
+					offsetX = -stationMinX + 1;
+				    }
+				    if (stationMaxX > width) {
+					offsetX = width - stationMaxX - 1;
+				    }
+				    if (stationMinY < 0) {
+					offsetY = -stationMinY + 1;
+				    }
+				    if (stationMaxY > height) {
+					offsetY = height - stationMaxY - 1;
+				    }
+				    stationMinX += offsetX;
+				    stationMaxX += offsetX;
+				    stationMinY += offsetY;
+				    stationMaxY += offsetY;
+
+				    ig2.fillOval(stationMinX, stationMinY, stationDiameterInPixels, stationDiameterInPixels);
 				    Color g = Color.black;
-				    Color ag = new Color(g.getRed(), g.getGreen(), g.getBlue(), 127);
-				    ig2.setColor(ag);
-				    ig2.drawOval(pixMinX - r / 2, pixMinY - r / 2, r, r);
+				    if (offsetX != 0 || offsetY != 0) {
+					g = Color.gray;
+				    }
+				    ig2.setColor(g);
+				    if (debug) {
+					if (offsetX != 0 || offsetY != 0) {
+					    ig2.drawLine(stationCenterX, stationCenterY, stationCenterX + offsetX,
+						    stationCenterY + offsetY);
+					}
+				    }
+				    ig2.drawOval(stationMinX, stationMinY, stationDiameterInPixels, stationDiameterInPixels);
 
 				}
 			    }

@@ -391,7 +391,50 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
    		 
    		 onlineArray.push(online);
    		 
-   		 return GIAPI.LayersFactory.ol3_Layer(onlineArray, 'urn:ogc:serviceType:WebMapService:');	
+   		 var array = GIAPI.LayersFactory.ol3_Layer(onlineArray, 'urn:ogc:serviceType:WebMapService:');	
+		 
+		 var layer = array[0];
+		 var source = layer.getSource();
+		 
+		 source.on('tileloadend', function (evt) {
+		 			 	
+		 	console.log(evt);
+			
+		 	//console.log(evt.coordinate);
+		 	
+		 	/*map.forEachLayerAtPixel(evt.pixel, function(layer){ 
+		 				
+		 			         console.log(layer);
+		 			    });*/
+		 	
+		 });
+		 
+		 layer.on('render', function (evt) {
+		 	 		 	 	
+	 	 	   var context = evt.vectorContext;			 
+
+	 		   var iconFeature = new ol.Feature({
+
+	 			       geometry: new ol.geom.Polygon([context.c]),
+	                   name : 'My Polygon'
+	 			});
+	 	          		                     
+	 			var iconStyle = new ol.style.Style({
+	 				
+	 				image : new ol.style.Icon(( {
+	 					  src: "https://api.geodab.eu/docs/assets/img/circle-yellow-marker.png",
+	 					  anchor : [0.5, 1]
+	 				  }))
+	 			});
+	 	          
+
+	 		 context.drawFeature(iconFeature, iconStyle);
+
+	 		 console.log(context);
+	 	 	
+	 	 });
+		 
+		 return array;
    	};
 	
 	/*if(options.clusterWMS){
@@ -404,7 +447,7 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 	/**
 	 * 
 	 */
-	widget.setWMSClusterParams = function(constraints){
+	widget.updateWMSClusterLayers = function(constraints){
 				
 		var layerArray = createWMSCLusterLayer(options, constraints);	 			 					  			 
 				

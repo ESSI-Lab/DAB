@@ -107,10 +107,9 @@
                var latlng= e.latlng;
                var lat = latlng.lat;
                var lon = latlng.lng;
-               
             L.popup({ maxWidth: 800})
             .setLatLng(latlng)
-            .setContent(httpGet("token/"+token+"/view/"+view+"/wms-cluster?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&TIME="+begin+"/"+end+"&BBOX="+(lon-0.1/zoom)+","+(lat-0.1/zoom)+","+(lon+0.1/zoom)+","+(lat+0.1/zoom)+"&CRS=CRS:84&WIDTH=3&HEIGHT=3&STYLES=&LAYERS="+view+"&I=2&J=2&FEATURE_COUNT=100"))
+            .setContent(httpGet("/gs-service/services/essi/token/"+token+"/view/"+view+"/wms-cluster?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&BBOX="+(lon-0.1/zoom)+","+(lat-0.1/zoom)+","+(lon+0.1/zoom)+","+(lat+0.1/zoom)+"&CRS=CRS:84&WIDTH=3&HEIGHT=3&STYLES=&LAYERS="+view+"&I=2&J=2&FEATURE_COUNT=100"))
             .openOn(map);
            
             });
