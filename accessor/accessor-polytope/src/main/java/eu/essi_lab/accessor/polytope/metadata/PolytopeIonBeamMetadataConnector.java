@@ -87,7 +87,7 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 
     static final String BASE_URL = "http://ionbeam-ichange.ecmwf-ichange.f.ewcloud.host/api/v1/";
 
-    static final String RETRIEVE_URL = "retrieve/";
+    static final String RETRIEVE_URL = "retrieve";
 
     public static String BEARER_TOKEN;
 
@@ -155,25 +155,25 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 			String platform = datasetMetadata.optString("platform");
 
 			if (platform != null) {
-			    
+
 			    JSONArray jsonArray = new JSONArray();
-			    for(int k=0; k < marsRequestArray.length(); k++) {
-				 JSONObject m = marsRequestArray.getJSONObject(k);
-				 String req = m.optString("url");
-				 if(req.contains(id)) {
-				     jsonArray.put(m);
-				 }
+			    for (int k = 0; k < marsRequestArray.length(); k++) {
+				JSONObject m = marsRequestArray.getJSONObject(k);
+				String req = m.optString("url");
+				if (req.contains(id)) {
+				    jsonArray.put(m);
+				}
 			    }
 
 			    if (platform.toLowerCase().contains("acronet")) {
 				for (PolytopeIonBeamMetadataAcronetVariable var : PolytopeIonBeamMetadataAcronetVariable.values()) {
-				    ret.addRecord(PolytopeIonBeamMetadataMapper.create(datasetMetadata, var.getKey()));
+				    ret.addRecord(PolytopeIonBeamMetadataMapper.create(datasetMetadata, jsonArray, var.getKey()));
 				}
 			    } else {
 
 				for (PolytopeIonBeamMetadataMeteoTrackerVariable var : PolytopeIonBeamMetadataMeteoTrackerVariable
 					.values()) {
-				    ret.addRecord(PolytopeIonBeamMetadataMapper.create(datasetMetadata, var.getKey()));
+				    ret.addRecord(PolytopeIonBeamMetadataMapper.create(datasetMetadata, jsonArray, var.getKey()));
 				}
 			    }
 
@@ -227,7 +227,41 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 
     public static List<JSONObject> getResultList(String url) throws Exception {
 	ArrayList<JSONObject> out = Lists.newArrayList();
-	return out;
+
+	GSLoggerFactory.getLogger(PolytopeIonBeamMetadataConnector.class).info("Getting " + url);
+
+	Downloader downloader = new Downloader();
+	downloader.setRetryPolicy(20, TimeUnit.SECONDS, 2);
+
+	if(BEARER_TOKEN == null) {
+	    BEARER_TOKEN = getBearerToken();
+	}
+	
+	HttpResponse<InputStream> stationResponse = downloader.downloadResponse(//
+		url.trim(), //
+		HttpHeaderUtils.build("Authorization", "Bearer " + BEARER_TOKEN));
+
+	InputStream stream = stationResponse.body();
+
+	GSLoggerFactory.getLogger(PolytopeIonBeamMetadataConnector.class).info("Got " + url);
+
+	if (stream != null) {
+	    ClonableInputStream cis = new ClonableInputStream(stream);
+	    GSLoggerFactory.getLogger(PolytopeIonBeamMetadataConnector.class)
+		    .info("Stream result " + IOStreamUtils.asUTF8String(cis.clone()));
+	    JSONArray arr = new JSONArray(IOStreamUtils.asUTF8String(cis.clone()));
+	    if (arr != null) {
+		for (int i = 0; i < arr.length(); i++) {
+		    out.add(arr.optJSONObject(i));
+		}
+	    }
+	    stream.close();
+	    return out;
+	}
+
+	return null;
+
+	
     }
 
     public Downloader getDownloader() {

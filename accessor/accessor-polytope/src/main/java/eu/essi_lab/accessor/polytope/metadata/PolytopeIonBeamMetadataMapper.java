@@ -45,6 +45,7 @@ import org.slf4j.Logger;
 import eu.essi_lab.iso.datamodel.classes.BoundingPolygon;
 import eu.essi_lab.iso.datamodel.classes.Citation;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
+import eu.essi_lab.iso.datamodel.classes.Keywords;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
 import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
@@ -76,13 +77,14 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	// do nothing
     }
 
-    public static OriginalMetadata create(JSONObject datasetInfo, String varType) {
+    public static OriginalMetadata create(JSONObject datasetInfo, JSONArray array, String varType) {
 	OriginalMetadata originalMetadata = new OriginalMetadata();
 
 	originalMetadata.setSchemeURI(CommonNameSpaceContext.POLYTOPE_IONBEAM);
 
 	JSONObject jsonObject = new JSONObject();
 	jsonObject.put("dataset-info", datasetInfo);
+	jsonObject.put("array-type", array);
 	jsonObject.put("var-type", varType);
 
 	originalMetadata.setMetadata(jsonObject.toString(4));
@@ -107,6 +109,16 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
     private String retrieveVarInfo(OriginalMetadata metadata) {
 
 	return new JSONObject(metadata.getMetadata()).optString("var-type");
+    }
+
+    /**
+     * @param array
+     * @return
+     */
+    private JSONArray retrieveArrayInfo(OriginalMetadata metadata) {
+
+	return new JSONObject(metadata.getMetadata()).optJSONArray("array-type");
+	// return new JSONArray(metadata.getMetadata()).getJSONArray(0);
     }
 
     public enum Resolution {
@@ -185,21 +197,22 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	// }
 
 	try {
-	    
-	    
+
 	    JSONObject datasetInfo = retrieveDatasetInfo(originalMD);
 
 	    String varType = retrieveVarInfo(originalMD);
 
+	    JSONArray array = retrieveArrayInfo(originalMD);
+
 	    String stationName = datasetInfo.optString("name");
 	    String stationId = datasetInfo.optString("external_id");
-	    
+
 	    String internalId = datasetInfo.optString("internal_id");
 
 	    JSONArray location = datasetInfo.optJSONArray("location");
 	    Double lat = location.getDouble(0);
-	    Double lon  = location.getDouble(1);
-	    
+	    Double lon = location.getDouble(1);
+
 	    JSONArray time_span = datasetInfo.optJSONArray("time_span");
 	    String startDate = time_span.getString(0);
 	    String endDate = time_span.getString(1);
@@ -212,15 +225,26 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	    String marsRequestClass = marsRequest.optString("class");
 	    String platformName = datasetInfo.optString("platform");
 	    
-	    
-	    String queryPath = "class=" + marsRequestClass + "&date=" + marsRequestDate + "&expver=" + marsRequestExpver + "&stream=" + marsRequestStream + "&platform="  +platformName + "&internal_id=" + internalId;
-	   
-	    
-	   String variableLabel = null;
-	   String variableKey = null;
-	   String variableName = null;
-	   String variableUnits = null;
-	    if (platformName.toLowerCase().contains("meteotracker")) {
+	    boolean isMeteoTracker = platformName.toLowerCase().contains("meteotracker") ? true : false;
+
+	    String queryPath = "?class=" + marsRequestClass + "&date=" + marsRequestDate + "&expver=" + marsRequestExpver + "&stream="
+		    + marsRequestStream + "&platform=" + platformName + "&internal_id=" + internalId;
+
+	    String variableLabel = null;
+	    String variableKey = null;
+	    String variableName = null;
+	    String variableUnits = null;
+	    String url = null;
+
+	    if (array != null) {
+		JSONObject arrayObj = array.getJSONObject(0);
+		url = arrayObj.optString("url");
+		if (url != null && !url.isEmpty()) {
+		    url = url.contains("retrieve?") ? url.split("retrieve")[1] : url;
+		}
+
+	    }
+	    if (isMeteoTracker) {
 		// meteotracker use-case
 		dataset.getPropertyHandler().setIsTrajectory(true);
 		PolytopeIonBeamMetadataMeteoTrackerVariable variable = PolytopeIonBeamMetadataMeteoTrackerVariable.decode(varType);
@@ -229,7 +253,7 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 		variableUnits = variable.getUnit();
 		variableName = variable.name();
 	    } else {
-		//acronet
+		// acronet
 		dataset.getPropertyHandler().setIsTimeseries(true);
 		PolytopeIonBeamMetadataAcronetVariable variable = PolytopeIonBeamMetadataAcronetVariable.decode(varType);
 		variableLabel = variable.getLabel();
@@ -237,7 +261,7 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 		variableUnits = variable.getUnit();
 		variableName = variable.name();
 	    }
-	    
+
 	    Resolution resolution = Resolution.HOURLY;
 
 	    // TEMPORAL EXTENT
@@ -308,6 +332,11 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword(variableLabel);
 	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword(variableKey);
 	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword(variableName);
+	    
+	    Keywords kwd = new Keywords();
+	    kwd.setTypeCode("platform");
+	    kwd.addKeyword(platformName);
+	    coreMetadata.getMIMetadata().getDataIdentification().addKeywords(kwd);
 
 	    if (resolution.equals(Resolution.HOURLY))
 		coreMetadata.getMIMetadata().getDataIdentification().addKeyword("hourly");
@@ -334,12 +363,12 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	    // 44.4005098, 8.675219 44.400353, 8.6750815 44.4002186, 8.6655395 44.3914033, 8.665203 44.3911424, 8.664728
 	    // 44.3910255, 8.6391694 44.386031))",
 
+	    List<JSONObject> jsonResponse = new ArrayList<JSONObject>();
 
+	    if (url != null && isMeteoTracker) {
+		jsonResponse = getSessionData(url);
+	    }
 
-	    
-	    
-	    List<JSONObject> jsonResponse = getSessionData(queryPath);
-	    
 	    List<List<Double>> multiPoints = new ArrayList<List<Double>>();
 	    Double minLon = null;
 	    Double minLat = null;
@@ -349,10 +378,9 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	    Double maxAlt = null;
 	    for (JSONObject obj : jsonResponse) {
 
-		BigDecimal alt = obj.optBigDecimal("a", null);
-		JSONArray bboxArray = obj.optJSONArray("lo");
-		Double lonDouble = bboxArray.optDouble(0);
-		Double latDouble = bboxArray.optDouble(1);
+		BigDecimal alt = obj.optBigDecimal("altitude", null);
+		Double lonDouble = obj.optDouble("lon");
+		Double latDouble = obj.optDouble("lat");
 		// Double latDouble = Double.valueOf(lat);
 		// Double lonDouble = Double.valueOf(lon);
 		Double altDouble = alt.doubleValue();
@@ -396,7 +424,6 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 		}
 
 	    }
-
 
 	    // Double[] bbox = multipointToBbox(coordinates);
 
@@ -537,12 +564,19 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	     * platform = {meteotracker, acronet, smart}
 	     * observation_variable = platform.getKey()
 	     */
-	    startDate = startDate.replace("Z", "+00:00");
-	    String linkage = PolytopeIonBeamMetadataConnector.BASE_URL
-		    + "retrieve?project=public&platform=meteotracker&observation_variable=" + variableKey + "&datetime="
-		    + URLEncoder.encode(startDate, "UTF-8") + "&filter=select+*+from+result+where+source_id+%3D+%27" + stationId
-		    + "%27%3B&format=json";// + station.getName() +
-	    // buildingURL;
+	    String linkage = null;
+	    if (url != null) {
+		linkage = PolytopeIonBeamMetadataConnector.BASE_URL + PolytopeIonBeamMetadataConnector.RETRIEVE_URL + url;
+	    } else {
+		linkage = PolytopeIonBeamMetadataConnector.BASE_URL + PolytopeIonBeamMetadataConnector.RETRIEVE_URL + queryPath;
+//		startDate = startDate.replace("Z", "+00:00");
+//		linkage = PolytopeIonBeamMetadataConnector.BASE_URL + "retrieve?project=public&platform=meteotracker&observation_variable="
+//			+ variableKey + "&datetime=" + URLEncoder.encode(startDate, "UTF-8")
+//			+ "&filter=select+*+from+result+where+source_id+%3D+%27" + stationId + "%27%3B&format=json";// +
+//														    // station.getName()
+//														    // +
+		// buildingURL;
+	    }
 
 	    Online o = new Online();
 	    o.setLinkage(linkage);
@@ -556,16 +590,16 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	    coreMetadata.getMIMetadata().getDistribution().getDistributionOnline().setIdentifier(resourceIdentifier);
 
 	} catch (Exception e) {
-	   
-	    
+
 	}
 
     }
 
     private List<JSONObject> getSessionData(String queryPath) throws Exception {
-	//e.g. http://ionbeam-ichange.ecmwf-ichange.f.ewcloud.host/api/v1/retrieve?class=rd&date=20241129&expver=xxxx&stream=lwda&platform=meteotracker&source_id=674954b21def300ee9705dcc
+	// e.g.
+	// http://ionbeam-ichange.ecmwf-ichange.f.ewcloud.host/api/v1/retrieve?class=rd&date=20241129&expver=xxxx&stream=lwda&platform=meteotracker&source_id=674954b21def300ee9705dcc
 	List<JSONObject> ret = new ArrayList<>();
-	String url = PolytopeIonBeamMetadataConnector.BASE_URL + PolytopeIonBeamMetadataConnector.RETRIEVE_URL + "?" + queryPath;
+	String url = PolytopeIonBeamMetadataConnector.BASE_URL + PolytopeIonBeamMetadataConnector.RETRIEVE_URL + queryPath;
 	GSLoggerFactory.getLogger(getClass()).info("Getting " + url);
 	ret = PolytopeIonBeamMetadataConnector.getResultList(url);
 	return ret;
@@ -848,6 +882,11 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
     }
 
     public static void main(String[] args) {
+
+	String t = "2024-12-12T23:06:20.011000Z";
+
+	Optional<Date> ddd = ISO8601DateTimeUtils.parseISO8601ToDate(t);
+
 	TemporalExtent extent = new TemporalExtent();
 	TimeIndeterminateValueType endTimeInderminate = TimeIndeterminateValueType.NOW;
 	extent.setIndeterminateEndPosition(endTimeInderminate);
