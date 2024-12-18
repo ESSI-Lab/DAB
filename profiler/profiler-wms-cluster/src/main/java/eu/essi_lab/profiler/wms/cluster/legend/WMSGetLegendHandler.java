@@ -195,7 +195,7 @@ public class WMSGetLegendHandler extends StreamingRequestHandler {
 		    ig2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		    ig2.setStroke(new BasicStroke(2));
 
-		    int offset = 5;
+		    int offset = 10;
 		    ig2.setFont(new Font("SansSerif", Font.BOLD, fontSize));
 		    for (InfoLegend infoLegend : infos) {
 
@@ -204,10 +204,10 @@ public class WMSGetLegendHandler extends StreamingRequestHandler {
 			int r = 15;
 			int pixMinX = 10;
 			int pixMinY = 10;
-			ig2.fillOval(pixMinX - r / 2, offset + pixMinY - r / 2, r, r);
+			ig2.fillOval(pixMinX - r / 2, offset + pixMinY - r , r, r);
 			ig2.setColor(Color.black);
-			ig2.drawOval(pixMinX - r / 2, offset + pixMinY - r / 2, r, r);
-			ig2.drawString(infoLegend.getLabel(), pixMinX + r + 5, offset + pixMinY + 5);
+			ig2.drawOval(pixMinX - r / 2, offset + pixMinY - r , r, r);
+			ig2.drawString(infoLegend.getLabel(), pixMinX + r + 5, offset + pixMinY );
 			offset += (fontSize*1.4 );
 
 		    }
