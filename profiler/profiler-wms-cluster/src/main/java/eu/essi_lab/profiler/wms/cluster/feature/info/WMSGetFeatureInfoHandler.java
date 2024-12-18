@@ -32,6 +32,8 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.ServiceLoader;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -41,13 +43,27 @@ import org.apache.commons.io.IOUtils;
 
 import eu.essi_lab.access.datacache.BBOX;
 import eu.essi_lab.access.datacache.StationRecord;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.messages.DiscoveryMessage;
+import eu.essi_lab.messages.Page;
+import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.ValidationMessage;
+import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
+import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
+import eu.essi_lab.messages.bond.BondFactory;
+import eu.essi_lab.messages.bond.BondOperator;
+import eu.essi_lab.messages.bond.SpatialExtent;
+import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
+import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.profiler.wms.cluster.WMSRequest.Parameter;
+import eu.essi_lab.request.executor.IDiscoveryExecutor;
+import eu.essi_lab.request.executor.IDiscoveryStringExecutor;
 
 /**
  * @author boldrini
@@ -110,7 +126,7 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 		    if (featureCountString != null && !featureCountString.isEmpty()) {
 			featureCount = Integer.parseInt(featureCountString);
 		    }
-
+int maxRecords = 10;
 		    String iParameter = request.getParameterValue(Parameter.I);
 		    String jParameter = request.getParameterValue(Parameter.J);
 		    Integer i = null;
@@ -186,9 +202,56 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 			    layerSplit = new String[] { layers };
 			}
 
-			WMSFeatureInfoGenerator generator = null;
+			WMSFeatureInfoGenerator generator = new StationFeatureInfoGenerator();
 
 			List<StationRecord> stations = new ArrayList<StationRecord>();
+			
+			DiscoveryMessage discoveryMessage = new DiscoveryMessage();
+			discoveryMessage.setDistinctValuesElement(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER);
+			discoveryMessage.setRequestId(getClass().getSimpleName() + "-" + (new Date().getTime()));
+			discoveryMessage.getResourceSelector().setIndexesPolicy(IndexesPolicy.NONE);
+			discoveryMessage.getResourceSelector().setSubset(ResourceSubset.NONE);
+			discoveryMessage.getResourceSelector().addIndex(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER);
+			discoveryMessage.getResourceSelector().addIndex(MetadataElement.PLATFORM_TITLE);
+			discoveryMessage.getResourceSelector().setIncludeOriginal(false);
+			discoveryMessage.setPage(new Page(1, maxRecords));
+			double south = fminy;
+			double north = fmaxy;
+			double west = fminx;
+			double east = fmaxx;
+			SpatialExtent extent = new SpatialExtent(south, west, north, east);
+			discoveryMessage.setUserBond(BondFactory.createSpatialExtentBond(BondOperator.INTERSECTS, extent ));
+
+			discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
+			discoveryMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+			String viewId = webRequest.extractViewId().get();
+			Optional<View> view = WebRequestTransformer.findView(ConfigurationWrapper.getDatabaseURI(), viewId);
+			WebRequestTransformer.setView(view.get().getId(), ConfigurationWrapper.getDatabaseURI(), discoveryMessage);
+
+			
+			Page userPage = discoveryMessage.getPage();
+			userPage.setStart(1);
+			userPage.setSize(maxRecords);
+			discoveryMessage.setPage(userPage);
+
+			ServiceLoader<IDiscoveryStringExecutor> loader = ServiceLoader.load(IDiscoveryStringExecutor.class);
+			IDiscoveryStringExecutor discoveryExecutor = loader.iterator().next();
+			
+			ResultSet<String> resultSet = discoveryExecutor.retrieveStrings(discoveryMessage);
+			List<String> results = resultSet.getResultsList();
+			for (String result : results) {
+			    String id = result.substring(result.indexOf("<gs:uniquePlatformId>"), result.indexOf("</gs:uniquePlatformId>"));
+			    id = id.replace("<gs:uniquePlatformId>", "");
+			    String platformTitle = result.substring(result.indexOf("<gs:platformTitle>"), result.indexOf("</gs:platformTitle>"));
+			    platformTitle = platformTitle.replace("<gs:platformTitle>", "");
+			    
+			    StationRecord station = new StationRecord();
+			    station.setPlatformIdentifier(id);
+			    station.setPlatformName(platformTitle);
+			    station.setDatasetName(platformTitle);
+			    stations.add(station );
+			}
+			
 			InputStream stream = generator.getInfoPage(stations, format, request);
 
 			IOUtils.copy(stream, output);

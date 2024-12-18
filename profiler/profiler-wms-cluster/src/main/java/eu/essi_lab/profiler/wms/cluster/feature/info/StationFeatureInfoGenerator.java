@@ -80,33 +80,30 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 		geo.put("id", station.getPlatformIdentifier());
 	    }
 	    JSONObject geometry = new JSONObject();
-	    
+
 	    BigDecimal w = station.getBbox4326().getWest();
 	    BigDecimal e = station.getBbox4326().getEast();
 	    BigDecimal s = station.getBbox4326().getSouth();
 	    BigDecimal n = station.getBbox4326().getNorth();
-	    
+
 	    double TOL = 0.00000001d;
 	    JSONArray coordinates = new JSONArray();
-	    if (n.doubleValue()-s.doubleValue()>TOL && e.doubleValue()-w.doubleValue()>TOL) {
-		geometry.put("type", "Polygon");
-		JSONArray exteriorRing = new JSONArray();
-		exteriorRing.put(getJSONArray(w.doubleValue(),s.doubleValue()));
-		exteriorRing.put(getJSONArray(w.doubleValue(),n.doubleValue()));
-		exteriorRing.put(getJSONArray(e.doubleValue(),n.doubleValue()));
-		exteriorRing.put(getJSONArray(e.doubleValue(),s.doubleValue()));
-		exteriorRing.put(getJSONArray(w.doubleValue(),s.doubleValue()));
-		coordinates.put(exteriorRing);
-	    }else {
-		geometry.put("type", "Point");
+	    if (w != null && s != null && e != null && n != null) {
+		if (n.doubleValue() - s.doubleValue() > TOL && e.doubleValue() - w.doubleValue() > TOL) {
+		    geometry.put("type", "Polygon");
+		    JSONArray exteriorRing = new JSONArray();
+		    exteriorRing.put(getJSONArray(w.doubleValue(), s.doubleValue()));
+		    exteriorRing.put(getJSONArray(w.doubleValue(), n.doubleValue()));
+		    exteriorRing.put(getJSONArray(e.doubleValue(), n.doubleValue()));
+		    exteriorRing.put(getJSONArray(e.doubleValue(), s.doubleValue()));
+		    exteriorRing.put(getJSONArray(w.doubleValue(), s.doubleValue()));
+		    coordinates.put(exteriorRing);
+		} else {
+		    geometry.put("type", "Point");
 		    coordinates.put(station.getBbox4326().getEast());
 		    coordinates.put(station.getBbox4326().getNorth());
+		}
 	    }
-	    
-	    
-	    
-	   
-
 	    geometry.put("coordinates", coordinates);
 	    geo.put("geometry", geometry);
 	    JSONObject properties = new JSONObject();
@@ -164,7 +161,7 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 	JSONArray ret = new JSONArray();
 	ret.put(lon);
 	ret.put(lat);
-	return ret ;
+	return ret;
     }
 
     private void addProperty(JSONObject obj, String key, String name, String value, int isTitle, int isLink) {
