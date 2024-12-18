@@ -476,12 +476,12 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 				}
 				if (offsetX != 0 || offsetY != 0) {
 				    ig2.setStroke(new BasicStroke(2));
-				    ig2.setColor(Color.black);
+				    ig2.setColor(Color.gray);
 				    ig2.drawLine(centroidX - stationDiameterInPixels, centroidY - stationDiameterInPixels,
 					    centroidX + stationDiameterInPixels, centroidY + stationDiameterInPixels);
 				    ig2.drawLine(centroidX - stationDiameterInPixels, centroidY + stationDiameterInPixels,
 					    centroidX + stationDiameterInPixels, centroidY - stationDiameterInPixels);
-				    ig2.setColor(Color.BLACK);
+				    ig2.setColor(Color.gray);
 				    ig2.drawLine(centroidX, centroidY, centroidX + offsetX, centroidY + offsetY);
 				}
 
