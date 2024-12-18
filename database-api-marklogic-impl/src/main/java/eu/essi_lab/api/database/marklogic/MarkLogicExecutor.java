@@ -119,11 +119,11 @@ public class MarkLogicExecutor extends MarkLogicReader implements DatabaseExecut
 		String bbox = reader.evaluateString(estimateNode, "@*:bbox");
 		response.setBbox(bbox);
 
-		Integer stationsCount = Integer.valueOf(reader.evaluateString(estimateNode, "//*:stationsCount/text()"));
-		Integer totalCount = Integer.valueOf(reader.evaluateString(estimateNode, "//*:totalCount/text()"));
+		Integer stationsCount = Integer.valueOf(reader.evaluateString(estimateNode, "*:stationsCount/text()"));
+		Integer totalCount = Integer.valueOf(reader.evaluateString(estimateNode, "*:totalCount/text()"));
 
 		// term frequency
-		Node termFrequency = reader.evaluateNode(estimateNode, "//*:termFrequency");
+		Node termFrequency = reader.evaluateNode(estimateNode, "*:termFrequency");
 
 		TermFrequencyMap map = TermFrequencyMap.create(termFrequency);
 
@@ -133,7 +133,7 @@ public class MarkLogicExecutor extends MarkLogicReader implements DatabaseExecut
 		response.setMap(map);
 
 		// average extent
-		Node avgBbox = reader.evaluateNode(estimateNode, "//*:avgBbox");
+		Node avgBbox = reader.evaluateNode(estimateNode, "*:avgBbox");
 		double south = Double.valueOf(reader.evaluateString(avgBbox, "*:south"));
 		double west = Double.valueOf(reader.evaluateString(avgBbox, "*:west"));
 		double north = Double.valueOf(reader.evaluateString(avgBbox, "*:north"));
@@ -148,15 +148,15 @@ public class MarkLogicExecutor extends MarkLogicReader implements DatabaseExecut
 	    // datasets responses
 	    //
 
-	    List<Node> datasetsNodes = Arrays.asList(reader.evaluateNodes("//*:response//*:datasets"));
+	    List<Node> datasetsNodes = Arrays.asList(reader.evaluateNodes("//*:response/*:datasets"));
 
 	    for (Node datasetsNode : datasetsNodes) {
 		WMSClusterResponse response = new WMSClusterResponse();
 
-		String bbox = reader.evaluateString(datasetsNode, "//@*:bbox");
+		String bbox = reader.evaluateString(datasetsNode, "@*:bbox");
 		response.setBbox(bbox);
 
-		List<Dataset> datasets = Arrays.asList(reader.evaluateNodes(datasetsNode, "//*:Dataset")).//
+		List<Dataset> datasets = Arrays.asList(reader.evaluateNodes(datasetsNode, "*:Dataset")).//
 			stream().map(n -> {
 			    try {
 				return (Dataset) Dataset.create(n);
