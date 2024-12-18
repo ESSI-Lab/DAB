@@ -74,7 +74,7 @@ public class HISCentralPugliaConnector extends HarvestedQueryConnector<HISCentra
 
     static final String STATIONS_URL = "user-permissions";
 
-    static final String BASE_URL = "http://valida-dev.siapmicros.com:9000/api/";
+    public static final String BASE_URL = "http://93.57.89.5:9000/api/";
 
     static final String ORGANIZATION_URL = "organization";
 
@@ -139,7 +139,7 @@ public class HISCentralPugliaConnector extends HarvestedQueryConnector<HISCentra
 		stationList.add(stationsArray.optJSONObject(j));
 	    }
 	    for (int k = 0; k < aggregationArray.length(); k++) {
-		aggregationList.add(stationsArray.optJSONObject(k));
+		aggregationList.add(aggregationArray.optJSONObject(k));
 	    }
 	    datasetMetadata.remove("station");
 	    datasetMetadata.remove("aggregation");

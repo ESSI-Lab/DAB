@@ -1,5 +1,7 @@
 package eu.essi_lab.accessor.hiscentral.puglia;
 
+import java.math.BigDecimal;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -140,6 +142,12 @@ public class HISCentralPugliaMapper extends FileIdentifierMapper {
 	JSONObject datasetInfo = retrieveDatasetInfo(originalMD);
 
 	JSONObject stationInfo = retrieveStationInfo(originalMD);
+	
+	JSONObject aggregationInfo = retrieveAggregationInfo(originalMD);
+	
+	String aggregationId = aggregationInfo.optString("id_aggregation");
+	String aggregationName =aggregationInfo.optString("name");
+	String aggregationType =aggregationInfo.optString("aggregration");
 
 	String resourceTitle = stationInfo.optString("station_name");
 	String resourceAbstract = datasetInfo.optString("description"); // always null
@@ -161,8 +169,8 @@ public class HISCentralPugliaMapper extends FileIdentifierMapper {
 	// "long": "16.48389",
 	// "lat": "41.23361"
 	//
-	Double pointLon = stationInfo.optDouble("long");
-	Double pointLat = stationInfo.optDouble("lat");
+	BigDecimal pointLon = stationInfo.optBigDecimal("longitude", null);
+	BigDecimal pointLat = stationInfo.optBigDecimal("latitude", null);
 	Double altitude = stationInfo.optDouble("altitude");
 
 	// temporal
@@ -290,14 +298,14 @@ public class HISCentralPugliaMapper extends FileIdentifierMapper {
 	coreMetadata.addDistributionFormat("WaterML 1.1");
 
 	coreMetadata.getMIMetadata().getDataIdentification()
-		.setCitationTitle(resourceTitle + " (" + additionalInfo + ")" + " - " + measureName);
-	coreMetadata.getMIMetadata().getDataIdentification().setAbstract(resourceTitle + " (" + additionalInfo + ")" + " - " + measureName);
+		.setCitationTitle(resourceTitle +  " - " + aggregationName);
+	coreMetadata.getMIMetadata().getDataIdentification().setAbstract(resourceTitle +  " - " + aggregationName);
 
 	//
 	// id
 	//
 
-	String resourceIdentifier = generateCode(dataset, stationId + "-" + measureName);
+	String resourceIdentifier = generateCode(dataset, stationId + "-" + aggregationName);
 
 	coreMetadata.getMIMetadata().setFileIdentifier(resourceIdentifier);
 
@@ -480,20 +488,16 @@ public class HISCentralPugliaMapper extends FileIdentifierMapper {
 	//
 	// distribution info, download
 	//
-
-	if (tempExtenBegin.contains("+")) {
-
-	    tempExtenBegin = tempExtenBegin.substring(0, tempExtenBegin.indexOf("+"));
-	}
+	
 	// data linkage (last 24 hours)
 	String linkage = HISCentralPugliaConnector.BASE_URL.endsWith("/")
-		? HISCentralPugliaConnector.BASE_URL + "data_time_series/" + timeSeriesId + "/24"
-		: HISCentralPugliaConnector.BASE_URL + "/data_time_series/" + timeSeriesId + "/24";
+		? HISCentralPugliaConnector.BASE_URL + "data/aggregation/" + aggregationId + "/station/" + stationId + "/measure/" + measureId
+		: HISCentralPugliaConnector.BASE_URL + "/data/aggregation/" + aggregationId + "/station/" + stationId + "/measure/" + measureId;
 
 	Online online = new Online();
 	online.setLinkage(linkage);
 	online.setFunctionCode("download");
-	online.setName(resourceTitle + "_" + timeSeriesId);
+	online.setName(stationId + "_" + measureId + "_" + aggregationId);
 	online.setIdentifier(resourceIdentifier);
 	online.setProtocol(CommonNameSpaceContext.HISCENTRAL_PUGLIA_NS_URI);
 
