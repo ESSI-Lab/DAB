@@ -449,9 +449,9 @@
 	                      	
 	        const view = 'his-central';
 	        
-            GIAPI.search.dab = GIAPI.DAB('http://localhost:9090/gs-service', view, 'services/essi','csw');
-			// GIAPI.search.dab = GIAPI.DAB('https://gs-service-preproduction.geodab.eu/gs-service', view, 'services/essi','csw');
-            // GIAPI.search.dab = GIAPI.DAB('./', view, 'services/essi','csw');
+            // GIAPI.search.dab = GIAPI.DAB('http://localhost:9090/gs-service', view, 'services/essi','csw');
+		    GIAPI.search.dab = GIAPI.DAB('https://gs-service-preproduction.geodab.eu/gs-service', view, 'services/essi','csw');
+            // GIAPI.search.dab = GIAPI.DAB('../', view, 'services/essi','csw');
             
 	        jQuery(function() {
 	        
@@ -588,15 +588,15 @@
 		//             		},
 		        		
 		        		'dabNode':  GIAPI.search.dab,
-		        			        		
+		        				        				        			        		
 	 	        		// 'wmsEndpoint' : 'http://localhost:9090/gs-service/services/essi/view/test/wms',
-	 	        		// 'wmsEndpoint' : 'https://geoportale.regione.lazio.it/geoserver/ows',
+	 	        		'wmsEndpoint' : 'https://geoportale.regione.lazio.it/geoserver/ows',
 	
-	  	        		/* 'clusterWMS': true,
+	  	        		'clusterWMS': true,
 	  	        		'clusterWMSToken': 'his_central-568a4888-d6bd-4be3-b7a6-d9887997bb0f',
 	  	        		'clusterWMSView': 'his-central',
 	  	        		'clusterWMSLayerName': 'his-central',
-	  	        		'clusterWMSLayerTitle': 'his-central', */
+	  	        		'clusterWMSLayerTitle': 'his-central',	  	        		
 	  	        			
 		        		'onMarkerMouseOver': function(node) {
 		        			
@@ -651,36 +651,6 @@
       	 	    jQuery('#search-button').append(searchButton.div());
       	 	    
       	 		//------------------------------------------------------------------
-             	// legend button
-             	//           	
-             	var legendButton = GIAPI.ButtonsFactory.onOffSwitchButton('Show legend', 'Hide legend', {
-                    'id' : 'legend-button',
-                    'checked': false,
-                    'size' : 'large',
-                    'offBckColor': 'white',
-                    'onBckColor': 'white',
-                    'offColor': 'black',
-                    'onColor': 'black',
-                    'switchColor': '#2c3e50',
-                    'switchBorderColor': '#2c3e50',
-                    'borderColor': 'rgba(44, 62, 80, 0.07)'
-                });
-             	
-             	jQuery('#legendButton').append(legendButton);
-             	
-	            	jQuery(document).on('click','#legend-button',function(){      
-	
-	            		if(jQuery('#legend-button').is(":checked")){	
-	            			 
-	            			jQuery('#legendImage').css('display','none');
-	            			
-	            		}else{
-	
-	            			jQuery('#legendImage').css('display','inline-block');
-					}
-	            	});       
-      	 	    
-      	 		//------------------------------------------------------------------
              	// hide results button
              	//           	
              	 var hideResultsButton = GIAPI.ButtonsFactory.onOffSwitchButton('Show results', 'Hide results', {
@@ -709,7 +679,7 @@
 	
 	            			jQuery('#paginator-widget').css('display','inline-block');
 	            			jQuery('#tabs-div').css('display','block');
-					}
+						}
 	            	});       
             	
       	 	    //------------------------------------
@@ -1001,14 +971,6 @@
        	    
        <div id="resMapWidget"></div>
        
-       <div id="legendDiv" style="background: white; position: absolute; margin-top: -822px; margin-left: 650px;">
-       
-           <div id='legendButton'></div>
-            
-       	   <img id='legendImage' src="http://localhost:9090/gs-service/services/essi/token/his_central-568a4888-d6bd-4be3-b7a6-d9887997bb0f/view/his-central/wms-cluster?&service=WMS&request=GetLegendGraphic&layers=his-central">       	
-       
-       </div>
-       
        <div id="paginator-widget"></div>       
        
 	   <div id="tabs-div">
@@ -1032,9 +994,6 @@
 	   </div>  	
         
        <div id="advConstDialog"></div>
-       
-      
-       
      
     </body>
     

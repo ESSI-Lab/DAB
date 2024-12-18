@@ -167,6 +167,9 @@
  * @param {Boolean} [options.clusterWMS=false]
    @param {String} [options.clusterWMSToken]
    @param {String} [options.clusterWMSView]
+   @param {String} [options.clusterWMSLayer]
+   @param {String} [options.clusterWMSLayerName]
+   @param {String} [options.clusterWMSLayerTitle]
  
  */
 
@@ -313,15 +316,7 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 	}
 
     var divId = GIAPI.random();
-    var div = '';
-    switch(mapType){
-    case 'ol':
-    	div = '<div style="width: ' + options.width + '; height: ' + options.height + 'px" class="map-widget-div"><div id="' + divId + '"  class="ol-fullscreen-map"></div></div>';	
-    	break;
-    case 'google':
-    	div = '<div style="width:' + options.width + '; " class="map-widget-div"><div id="' + divId + '" style="position: relative; width: ' + options.width + 'px; height: ' + options.height + 'px"></div></div>';    	
-    	break;
-    }
+    var div = '<div style="width: ' + options.width + '; height: ' + options.height + 'px" class="map-widget-div"><div id="' + divId + '"  class="ol-fullscreen-map"></div></div>';	
     
     jQuery('#' + id).append(div);
 
@@ -429,176 +424,52 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
         var paginator = resultSet.paginator;
         var page = paginator.page();
         arrayFeatures = new Object();
-        
-        switch(mapType){
-	    case 'ol':
-	    	
+                	
 	    	if (options.showNoResultsMsg && count === 0) {
-	             jQuery('#no-results-div').css('display', 'inline');
-	        }else{
-	             jQuery('#no-results-div').css('display', 'none');
-	        }
 	    
+		    jQuery('#no-results-div').css('display', 'inline');
+        
+		}else{
+         
+			jQuery('#no-results-div').css('display', 'none');
+        }
+    
 	    	options.page = page;
 	    	
 	    	// set the map markers
 	    	ol3Map.markers(options);
 	    	
-	     	// resets the page in order to make it reusable
+	    // resets the page in order to make it reusable
 	    	page.reset();
 
-			// set the bboxes
-	        ol3Map.bboxes(options);
+		// set the bboxes
+        ol3Map.bboxes(options);
 	    	
 	    	// resets the page in order to make it reusable
 	    	page.reset();
 	    	
-            while (page.hasNext()) {
+        while (page.hasNext()) {
 
-                var node = page.next();
-                var title = node.report().title;
+            var node = page.next();
+            var title = node.report().title;
 
-                // adds the layers
-                var layers = node.ol3WMS_Layer({
-                    // options : {
-                    // isBaseLayer : false,
-                    // rendererOptions : {
-                    // zIndexing : true
-                    // }
-                    //}
-                });
-                
-                if (layers.length > 0 && options.addLayers) {
-                    addLayers(layers);
-                }                
-            }
-
-            // resets the page in order to make it reusable
-            page.reset();
-           
-            break;
+            // adds the layers
+            var layers = node.ol3WMS_Layer({
+                // options : {
+                // isBaseLayer : false,
+                // rendererOptions : {
+                // zIndexing : true
+                // }
+                //}
+            });
             
-	    case 'google':
-	    	
-            //remove markers and rectangles
-            widget.map.removeMarkers();
-            
-            for(var i = 0; i < rectanglesArray.length;i++){
-            	rectanglesArray[i].setMap(null);
-            }
-            rectanglesArray = [];
-
-            var count = 0;
-
-            while (page.hasNext()) {
-
-                var node = page.next();
-                var title = node.report().title;
-
-                // adds the layers
-                
-     	    	widget.map.map.overlayMapTypes.clear();
-
-                updateLayersTable();
-                
-                var layers = node.googleImageMapType(widget.map.map);
-                if (layers.length > 0 && options.addLayers) {
-                    addLayers(layers);
-                }
-
-                // set the current marker on the map
-                if (node.report().where) {
-
-                    var where = node.report().where[0];
-
-                    var bounds = new google.maps.LatLngBounds(
-                    		new google.maps.LatLng(where.south, where.west), 
-                    		new google.maps.LatLng(where.north, where.east));
-
-                    var center = bounds.getCenter();
-
-                    var opt = {
-                        lat : center.lat(),
-                        lng : center.lng(),
-                        title : options.markerTitle(node),
-                        uiId: node.uiId
-                    };
-
-                    if (options.markerURL) {
-                        opt.icon = markerURL;
-
-                    } else {
-                    	opt.icon = GIAPI.UI_Utils.markerIcon(options.markerColor);
-                    }
-                    
-                    var clickable = false;
-                    if (options.onMarkerClick) {
-                    	clickable = true;
-                        opt.click = ((function(n) {
-                                return function() {
-                                    options.onMarkerClick(n);
-                                };
-
-                            })(node));
-                    } 
-                    
-                    if(options.onMarkerMouseOver){
-                    	clickable = true;
-                    	opt.mouseover = ((function(n) {
-                            return function() {
-                                options.onMarkerMouseOver(n);
-                            };
-
-                        })(node));
-                    }
-                    
-                    if(options.onMarkerMouseOut){
-                    	clickable = true;
-                    	opt.mouseout = ((function(n) {
-                            return function() {
-                                options.onMarkerMouseOut(n);
-                            };
-
-                        })(node));
-                    }
-                    
-                    opt.clickable = clickable;
-
-                    widget.map.addMarker(opt);
-                                      
-                    var rect = new google.maps.Rectangle({
-                        strokeColor : '#ffff00',
-                        strokeOpacity : 1,
-                        strokeWeight : 1,
-                        fillColor : '#ffff00',
-                        fillOpacity : 0.05,
-
-                        bounds : bounds,
-                        editable : false,
-                        draggable : false,
-                        clickable: false
-                    });
-
-                    rect.setMap(widget.map.map);                   
-                    rect.setVisible(showRectangles);
-                    
-                    rectanglesArray.push(rect);
-
-                    count++;
-                }
-            }
-
-            if (options.showNoResultsMsg && count === 0) {
-                jQuery('#no-results-div').css('display', 'inline');
-            } else {
-                jQuery('#no-results-div').css('display', 'none');
-            }
-
-            // resets the page in order to make it reusable
-            page.reset();
-            
-            break;
+            if (layers.length > 0 && options.addLayers) {
+                addLayers(layers);
+            }                
         }
+
+        // resets the page in order to make it reusable
+        page.reset();        
     };
     
    /**
@@ -651,15 +522,7 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
     widget.addLayersButton = function(node) {
 
         // adds the layers
-        var layers;
-        switch(mapType){
-	    case 'ol':
-	    	layers = node.ol3WMS_Layer({});
-	    	break;
-	    case 'google':
-	    	layers = node.googleImageMapType(widget.map.map);
-	    	break;
-        }
+        var layers = node.ol3WMS_Layer({});
 
         if (layers.length > 0) {
             
@@ -673,6 +536,7 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
    		        },
    				'attr':[{ name:'title',value:'Add layers'  }]	        
 	   	    });
+			
 	   	    button.css('div','padding','4px');
 	   	    button.css('div','background',' #2196f3');
 	   	    button.css('icon','font-size','12.5px');
@@ -694,61 +558,20 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
      */
     widget.markerIcon = function(node,options){
     	 
-    	 switch(mapType){
- 	     case 'ol':
-
-    		 ol3Map.markerIcon(node, options);    		 
-    		 break;
-    		 
- 	     case 'google':
-        	 var markers = widget.map.markers;    	
-        	 markers.forEach(function(mark,index){
-        		 if(mark.uiId === node. uiId){
-        			
-        			 mark.icon = options.color ? GIAPI.UI_Utils.markerIcon(options.color) : options.url;
-        			 
-        			 markers.splice(index, 1);
-        	    	 widget.map.addMarker(mark);
-        	    	 
-        	    	 return;
-        		 }
-        	 });    
-        	 
-        	 break;
-    	 }   	
-   };
+    	    ol3Map.markerIcon(node, options); 
+    };
    
    /**
     * Applies the given bounding box to the user selection
     */
    widget.select = function(where) {
    	
-	   	switch(mapType){
-	   	case 'ol':
-	   		
-		   		if(!where){
-		   			ol3Map.selectionVisible(false);  	
-		   		}else{
-		   			ol3Map.select(where);  	
-				}
-		   		
-		   		break;
-	   		
-	   	case 'google':
-	   		
-		   	   if (!where) {
-		            selection.setVisible(false);            	 
-	                return;
-	           }
-	         
-	           selection.setBounds(where);
-	           selection.setVisible(true);
-	           selection.setDraggable(false);
-	           selection.setEditable(false);
-	
-	           widget.map.fitBounds(where);
-	   	}
-	   	
+		if(!where){
+   			ol3Map.selectionVisible(false);  	
+   		}else{
+   			ol3Map.select(where);  	
+		}
+
 	   	if(options.showSelectionControl){
 	   		_inputControl.updateWhereFields();
 	   	}
@@ -776,29 +599,7 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
     
     var addLayers = function(layers) {
     	
-    	 switch(mapType){
- 	     case 'ol':
-          
-        	ol3Map.addLayers(layers);
-        	
-        	break;
-
- 	     case 'google':
- 	    	 
- 	    	widget.map.map.overlayMapTypes.clear();
-
-            layers.forEach(function(layer) {
-            	
-            	// all layers are hidden
-            	layer.setOpacity(0);
-
-            	widget.map.map.overlayMapTypes.push(layer);
-            });
-
-            updateLayersTable();
-            
-            break;
-        }
+    	 	ol3Map.addLayers(layers);
     };  
 
     var createNoResultsOverlay = function() {
@@ -809,96 +610,32 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
         jQuery(div).attr('class', 'results-map-widget-no-results-div');
         div.innerHTML = '<label style="font-weight: bold;font-style: italic">' + options.noResultsMsg + '</label>';
         
-        switch(mapType){
-        case 'ol':
-        	
-        	 var popup = new ol.Overlay({
-                 element : document.getElementById('no-results-div')
-             });
+		var popup = new ol.Overlay({
+             element : document.getElementById('no-results-div')
+         });
 
-             widget.map.addOverlay(popup);
-             
-             popup.setPosition([longitude, latitude]);
-             popup.setPositioning('top-right');
-        	
-        	 break;
-        case 'google':
-            
-        	 widget.map.map.controls[google.maps.ControlPosition.CENTER].push(div);
-
-        	 break;
-        }
+         widget.map.addOverlay(popup);
+         
+         popup.setPosition([longitude, latitude]);
+         popup.setPositioning('top-right');
     };
 
     var createLayersControl = function() {
-
-       switch(mapType){
-       case 'ol':
-    	   
-            var layerSwitcher = new ol.control.LayerSwitcher({
-                tipLabel : 'Legend' // Optional label for button
-            });
-            
-            widget.map.addControl(layerSwitcher);
-            
-            break;
-      
-       case 'google':
-
-            var controlDiv = document.createElement('div');
-            controlDiv.style.padding = '5px';
-
-            // control button
-            var controlButton = document.createElement('div');
-            var controlButtonId = 'control-button';
-            controlButton.id = controlButtonId;
-
-            jQuery(controlButton).addClass('layers-control-button');
-            jQuery(controlButton).attr('title', 'Layers control');
-            jQuery(controlButton).attr('pressed', false);
-
-            jQuery(controlDiv).append(controlButton);
-
-            // control table div (used to get the scrollbar)
-            var controlTableDiv = document.createElement('div');
-            jQuery(controlTableDiv).addClass('layers-control-table-div');
-
-            jQuery(controlDiv).append(controlTableDiv);
-
-            // control table
-            var controlTable = document.createElement('table');
-            jQuery(controlTable).addClass('layers-control-table');
-
-            var controlTableId = 'layers-table';
-            controlTable.id = controlTableId;
-
-            jQuery(controlTableDiv).append(controlTable);
-            jQuery(controlTableDiv).css('visibility', 'hidden');
-
-            jQuery(controlTable).append(userSelectionControl());
-            jQuery(controlTable).append(showRectanglesControl());
-
-            // put the control on the top-right position
-            widget.map.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(controlDiv);
-
-            // control button listener
-            jQuery(controlButton).click(function() {
-
-                if (jQuery(this).attr('pressed') === 'true') {
-                    jQuery(controlTableDiv).css('visibility', 'hidden');
-
-                    jQuery(controlButton).removeClass('layers-control-button-pressed');
-                    jQuery(controlButton).attr('pressed', false);
-                } else {
-                    jQuery(controlTableDiv).css('visibility', 'visible');
-
-                    jQuery(controlButton).addClass('layers-control-button-pressed');
-                    jQuery(controlButton).attr('pressed', true);
-                }
-            });
-            
-            break;
-        }
+			 
+	   var layerSwitcher = new ol.control.LayerSwitcher({
+		
+           tipLabel : 'Legend',
+		   clusterWMS: options.clusterWMS,
+		   clusterWMSToken:options.clusterWMS,
+		   clusterWMSView:options.clusterWMSView,
+		   clusterWMSLayer: options.clusterWMSLayer,
+		   clusterWMSLayerName: options.clusterWMSLayerName,
+		   clusterWMSLayerTitle: options.clusterWMSLayerTitle,
+		   dabEndpoint: options.dabNode.endpoint(),
+		   servicePath: options.dabNode.servicePath()		   
+       });
+	          
+       widget.map.addControl(layerSwitcher);
     };
 
     var userSelectionControl = function() {
@@ -990,11 +727,13 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
     };
 
     if (options.showLayersControl) {
+		
         createLayersControl();
     }
 
     if(options.showNoResultsMsg){
-    	createNoResultsOverlay();
+		
+    		createNoResultsOverlay();
     }
 
     return widget;

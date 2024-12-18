@@ -8,53 +8,67 @@
  */
 ol.control.LayerSwitcher = function(opt_options) {
 
-    var options = opt_options || {};
+    this.options = opt_options || {};
 
-    var tipLabel = options.tipLabel ?
-      options.tipLabel : 'Legend';
+    var tipLabel = this.options.tipLabel ?
+    this.options.tipLabel : 'Legend';
 
     this.mapListeners = [];
 
-    this.hiddenClassName = 'ol-unselectable ol-control layer-switcher';
-    if (ol.control.LayerSwitcher.isTouchDevice_()) {
+    this.hiddenClassName = 'ol-unselectable layer-switcher';
+   
+	if (ol.control.LayerSwitcher.isTouchDevice_()) {
         this.hiddenClassName += ' touch';
     }
+	
     this.shownClassName = this.hiddenClassName + ' shown';
 
     var element = document.createElement('div');
     element.className = this.hiddenClassName;
 
     var button = document.createElement('button');
-    button.setAttribute('title', tipLabel);
+    button.setAttribute('title', 'Show legend');
     element.appendChild(button);
 
     this.panel = document.createElement('div');
     this.panel.className = 'panel';
+	this.panel.id = 'layerSwitcherPanel';
     element.appendChild(this.panel);
     ol.control.LayerSwitcher.enableTouchScroll_(this.panel);
-
+	
     var this_ = this;
-
-    button.onmouseover = function(e) {
-        this_.showPanel();
-    };
 
     button.onclick = function(e) {
         e = e || window.event;
-        this_.showPanel();
+		
+		if(jQuery('#layerSwitcherPanel').css('display') === 'none'){
+			
+			button.setAttribute('title', 'Hide legend');
+			this_.showPanel();
+			
+		}else{
+			
+			button.setAttribute('title', 'Show legend');
+			this_.hidePanel();
+		}
+		       
         e.preventDefault();
     };
 
-    this_.panel.onmouseout = function(e) {
+	button.onmouseover = function(e) {
+	      // this_.showPanel();
+	};
+	  
+    button.onmouseout = function(e) {
         e = e || window.event;
         if (!this_.panel.contains(e.toElement || e.relatedTarget)) {
-            this_.hidePanel();
+            // this_.hidePanel();
         }
     };
 
     ol.control.Control.call(this, {
         element: element,
-        target: options.target
+        target: this.options.target
     });
 
 };
@@ -65,19 +79,26 @@ ol.inherits(ol.control.LayerSwitcher, ol.control.Control);
  * Show the layer panel.
  */
 ol.control.LayerSwitcher.prototype.showPanel = function() {
-    if (this.element.className != this.shownClassName) {
-        this.element.className = this.shownClassName;
+	
+	jQuery('#layerSwitcherPanel').css('display','block');	
+	this.renderPanel();
+	
+   /* if (this.panel.className != this.shownClassName) {
+        this.panel.className = this.shownClassName;
         this.renderPanel();
-    }
+    }*/
 };
 
 /**
  * Hide the layer panel.
  */
 ol.control.LayerSwitcher.prototype.hidePanel = function() {
-    if (this.element.className != this.hiddenClassName) {
-        this.element.className = this.hiddenClassName;
-    }
+	
+	jQuery('#layerSwitcherPanel').css('display','none');	
+		
+    /*if (this.panel.className != this.hiddenClassName) {
+        this.panel.className = this.hiddenClassName;
+    }*/
 };
 
 /**
@@ -94,7 +115,24 @@ ol.control.LayerSwitcher.prototype.renderPanel = function() {
     var ul = document.createElement('ul');
     this.panel.appendChild(ul);
     this.renderLayers_(this.getMap(), ul);
-
+	
+	if(this.options.clusterWMS){
+				
+		if(!this.legendImage){
+			
+			var endpoint = this.options.dabEndpoint;
+		    endpoint = endpoint.endsWith('/') ? endpoint : endpoint + '/';
+		         									
+			var url = endpoint + this.options.servicePath+'/token/'+this.options.clusterWMSToken+'/view/'+this.options.clusterWMSView+'/wms-cluster?service=WMS&request=GetLegendGraphic&layers='+this.options.clusterWMSLayerName;
+																		
+			this.legendImage = document.createElement('img');
+			this.legendImage.id = 'wmsClusterLegendImg';		
+			this.legendImage.src = url;
+		
+		} 
+		
+		this.panel.appendChild(this.legendImage);	
+   }
 };
 
 /**
