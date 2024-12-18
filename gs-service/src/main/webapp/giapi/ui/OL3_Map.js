@@ -158,6 +158,33 @@ GIAPI.OL3_Map = function(options){
              zoom : options.zoom
          })        
     });
+	
+	map.on('singleclick', function (evt) {
+		
+		
+		//console.log(evt);
+		//console.log(evt.coordinate);
+		
+		/*map.forEachLayerAtPixel(evt.pixel, function(layer){ 
+					
+				         console.log(layer);
+				    });*/
+		
+	});
+	
+	map.on("pointermove", function (evt) {
+		
+		/*var pixel = map.getEventPixel(evt.originalEvent);
+		var hit = map.hasFeatureAtPixel(pixel);
+		
+		this.getTargetElement().style.cursor = hit ? 'pointer' : '';
+		
+		map.forEachLayerAtPixel(evt.pixel, function(layer){ 
+			
+		         
+		});*/
+	    
+	});
         
     //
     // base maps group
@@ -328,7 +355,7 @@ GIAPI.OL3_Map = function(options){
      */
     obj.markerIcon = function(node, options){
     	
-    	 var features = markersVector.getFeatures();
+    	 	 var features = markersVector.getFeatures();
     	 
 		 features.forEach(function(feature,index){
             
@@ -342,18 +369,19 @@ GIAPI.OL3_Map = function(options){
 		            });
 		          
 		            var iconFeature = new ol.Feature({
-		                          geometry : feature.getGeometry(),
-		                          name : feature.getProperties().name
+                          geometry : feature.getGeometry(),
+                          name : feature.getProperties().name
 		            });
 
 		            flagSource.addFeature(iconFeature);
 		          
 		            feature.icon = options.url;                   
 		            var iconStyle = new ol.style.Style({
-		              image : new ol.style.Icon(( {
-		                          anchor : [0.5, 1],
-		                          src : feature.icon
-		                      }))
+						
+		              	image : new ol.style.Icon(( {
+	                          anchor : [0.5, 1],
+	                          src : feature.icon
+	                      }))
 		            });
 		          
 		            flagLayer = new ol.layer.Vector({
@@ -564,7 +592,7 @@ GIAPI.OL3_Map = function(options){
      */
     obj.map = function(){
     	
-    	return map;
+    	   return map;
     }; 
     
 	return obj;
