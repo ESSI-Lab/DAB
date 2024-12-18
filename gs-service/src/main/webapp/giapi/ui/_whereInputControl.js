@@ -215,9 +215,7 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 						 		
 			jQuery( "#layerNameSearchInput" ).on( "keyup", function() {
 				
-				updateWmsLayersTable(jQuery( "#layerNameSearchInput" ).val());		
-			
-			    console.log(jQuery( "#layerNameSearchInput" ).val() );
+				updateWmsLayersTable(jQuery( "#layerNameSearchInput" ).val());					
 			});
 						
 			downloadWmsLayers();		
@@ -445,17 +443,8 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 						 
 						 onlineArray.push(online);
 						 
-						 var mapLayers = null;
-						 
-					     switch(mapType){
-						    case 'ol':
-						    	mapLayers = GIAPI.LayersFactory.ol3_Layer(onlineArray, 'urn:ogc:serviceType:WebMapService:');
-						    	break;
-						    case 'google':
-						    	mapLayers =  GIAPI.LayersFactory.googleImageMapType(resultsMapWidget.map.map, onlineArray);
-						    	break;
-					        }
-						 
+						 var mapLayers = GIAPI.LayersFactory.ol3_Layer(onlineArray, 'urn:ogc:serviceType:WebMapService:');
+						 					  			 
 						 resultsMapWidget.addLayers(mapLayers);	
 						 
 						 //

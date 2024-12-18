@@ -377,9 +377,9 @@ GIAPI.OL3_Map = function(options){
      */
     obj.addLayers = function(layers){
     	
-    	layers.forEach(function(layer) {
-            
-    		/*var group = map.getLayerGroup().getLayers();
+	    	layers.forEach(function(layer) {
+	            
+    		   /*var group = map.getLayerGroup().getLayers();
             var isOverlay = false;
             
             group.forEach(function(l) {
@@ -399,6 +399,7 @@ GIAPI.OL3_Map = function(options){
             curLayers.forEach(function(curLayer) {
                 if (curLayer.get('name') === layer.get('name')) {
                     addLayer = false;
+				    return;
                 }
             });
 
@@ -406,7 +407,30 @@ GIAPI.OL3_Map = function(options){
                 overlayGroup.getLayers().push(layer);
             }
         });
-    	
+    };
+	
+	/**
+     * 
+     */
+	obj.removeLayers = function(layers){
+	    	
+	    	layers.forEach(function(layer) {
+	                          
+            var curLayers = overlayGroup.getLayers();
+			var index = -1;
+
+            curLayers.forEach(function(curLayer) {
+                if (curLayer.get('name') === layer.get('name')) {
+					index = curLayers.getArray().indexOf(curLayer);
+					return;
+                }
+            });
+		
+            if (index > -1) {
+				
+				overlayGroup.getLayers().removeAt(index);
+            }
+        });   	
     };
       
     /**

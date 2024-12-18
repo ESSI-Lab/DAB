@@ -152,4 +152,11 @@ public class MarkLogicDiscoveryBondHandler implements DiscoveryBondHandler {
 
     }
 
+    /**
+     * @return
+     */
+    public String getParsedQuery() {
+
+	return stringBuilder.toString();
+    }
 }

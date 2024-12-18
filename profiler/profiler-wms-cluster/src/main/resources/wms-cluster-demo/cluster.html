@@ -52,6 +52,7 @@
 
         window.addEventListener('load', function(){
             map = new L.Map('map', {
+//             	crs: L.CRS.EPSG4326,
                 renderer: L.canvas(),
                 center: new L.LatLng(20, 0),
                 zoom: 2,
@@ -63,10 +64,16 @@
                 position: 'topright'
             }).addTo(map);
 
-            let geofabrik = new L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
-              });
+//             let geofabrik = new L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+//                 maxZoom: 19,
+//                 attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+//               });
+
+        let geofabrik = new L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+            attribution: 'Map data: &copy; <a href="https://opentopomap.org">OpenTopoMap</a>',
+            continuousWorld: true,
+            noWrap: true
+        });
             
             map.addLayer(geofabrik);
 
@@ -76,7 +83,7 @@
             wms = L.tileLayer.wms("/gs-service/services/essi/token/"+token+"/view/"+view+"/wms-cluster?", {
                 layers: view,
                 format: 'image/png',
-                crs: L.CRS.CRS84,
+                crs: L.CRS.EPSG4326,
                 tileSize: 1024,
                 transparent: true
             }).addTo(map);
