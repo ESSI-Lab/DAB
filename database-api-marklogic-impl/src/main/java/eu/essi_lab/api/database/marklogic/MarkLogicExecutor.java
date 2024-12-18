@@ -3,6 +3,8 @@
  */
 package eu.essi_lab.api.database.marklogic;
 
+import java.text.DecimalFormat;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -27,6 +29,7 @@ package eu.essi_lab.api.database.marklogic;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.json.JSONObject;
@@ -57,6 +60,7 @@ import eu.essi_lab.messages.stats.StatisticsMessage;
 import eu.essi_lab.messages.stats.StatisticsResponse;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.wrapper.marklogic.MarkLogicWrapper;
 
@@ -66,18 +70,30 @@ import eu.essi_lab.wrapper.marklogic.MarkLogicWrapper;
 public class MarkLogicExecutor extends MarkLogicReader implements DatabaseExecutor {
 
     @Override
-    public WMSClusterResponse execute(WMSClusterRequest request) throws GSException {
+    public List<WMSClusterResponse> execute(WMSClusterRequest request) throws GSException {
 
 	try {
+
+	    ArrayList<WMSClusterResponse> responseList = new ArrayList<WMSClusterResponse>();
+
+	    DecimalFormat format = new DecimalFormat();
+	    format.setMaximumFractionDigits(5);
+
 	    String template = IOStreamUtils.asUTF8String(//
 		    getClass().getClassLoader().getResourceAsStream("wms-cluster-query-template.txt"));
 
+	    List<SpatialExtent> extents = request.getExtents();
+
+	    String bboxes = extents.//
+		    stream().//
+		    map(e -> format.format(e.getSouth()) + "," + format.format(e.getWest()) + "," + format.format(e.getNorth()) + ","
+			    + format.format(e.getEast()))
+		    .//
+		    collect(Collectors.joining("§", "'", "'"));
+
 	    template = template.replace("MAX_RESULTS", String.valueOf(request.getMaxResults()));
 
-	    template = template.replace("SOUTH", String.valueOf(request.getExtent().getSouth()));
-	    template = template.replace("WEST", String.valueOf(request.getExtent().getWest()));
-	    template = template.replace("NORTH", String.valueOf(request.getExtent().getNorth()));
-	    template = template.replace("EAST", String.valueOf(request.getExtent().getEast()));
+	    template = template.replace("BBOXES", bboxes);
 
 	    String viewQuery = ConfigurationWrapper.getViewSources(request.getView()).//
 		    stream().//
@@ -86,50 +102,89 @@ public class MarkLogicExecutor extends MarkLogicReader implements DatabaseExecut
 
 	    template = template.replace("VIEW_QUERY", viewQuery);
 
+	    LogicalBond constraints = request.getConstraints();
+	    DiscoveryMessage message = new DiscoveryMessage();
+	    message.setUserBond(constraints);
+	    MarkLogicDiscoveryBondHandler bondHandler = new MarkLogicDiscoveryBondHandler(message, null);
+	    DiscoveryBondParser bondParser = new DiscoveryBondParser(message.getUserBond().get());
+	    bondParser.parse(bondHandler);
+
+	    template = template.replace("PARAMS_QUERY", bondHandler.getParsedQuery());
+	    
+	    //
+	    //
+	    //
+
 	    String responseString = getDatabase().getWrapper().submit(template).asString();
 
-	    WMSClusterResponse response = new WMSClusterResponse();
+	    XMLDocumentReader reader = new XMLDocumentReader(responseString);
 
-	    if (!responseString.isEmpty()) {
+	    //
+	    // estimate responses
+	    //
 
-		XMLDocumentReader reader = new XMLDocumentReader(responseString);
+	    List<Node> estimateNodes = Arrays.asList(reader.evaluateNodes("//*:response/*:estimate"));
 
-		boolean estimateResponse = reader.evaluateBoolean("exists(//*:estimate)");
-		boolean datasetsResponse = reader.evaluateBoolean("exists(//*:datasets)");
+	    for (Node estimateNode : estimateNodes) {
+		WMSClusterResponse response = new WMSClusterResponse();
+		String bbox = reader.evaluateString(estimateNode, "@*:bbox");
+		response.setBbox(bbox);
 
-		if (estimateResponse) {
+		Integer stationsCount = Integer.valueOf(reader.evaluateString(estimateNode, "*:stationsCount/text()"));
+		Integer totalCount = Integer.valueOf(reader.evaluateString(estimateNode, "*:totalCount/text()"));
 
-		    Integer stationsCount = Integer.valueOf(reader.evaluateTextContent("//*:estimate/*:stationsCount/text()").get(0));
-		    Integer totalCount = Integer.valueOf(reader.evaluateTextContent("//*:estimate/*:totalCount/text()").get(0));
+		// term frequency
+		Node termFrequency = reader.evaluateNode(estimateNode, "*:termFrequency");
 
-		    Node termFrequency = reader.evaluateNode("//*:termFrequency");
+		TermFrequencyMap map = TermFrequencyMap.create(termFrequency);
 
-		    TermFrequencyMap map = TermFrequencyMap.create(termFrequency);
+		response.setTotalCount(totalCount);
+		response.setStationsCount(stationsCount);
 
-		    response.setTotalCount(totalCount);
-		    response.setStationsCount(stationsCount);
+		response.setMap(map);
 
-		    response.setMap(map);
+		// average extent
+		Node avgBbox = reader.evaluateNode(estimateNode, "*:avgBbox");
+		double south = Double.valueOf(reader.evaluateString(avgBbox, "*:south"));
+		double west = Double.valueOf(reader.evaluateString(avgBbox, "*:west"));
+		double north = Double.valueOf(reader.evaluateString(avgBbox, "*:north"));
+		double east = Double.valueOf(reader.evaluateString(avgBbox, "*:east"));
 
-		} else if (datasetsResponse) {
+		response.setAvgBbox(new SpatialExtent(south, west, north, east));
 
-		    List<String> list = new ArrayList<String>(Arrays.asList(responseString.split("<gs:Dataset")));
-		    list.remove(0); // removes <gs:datasets>
-
-		    List<String> datasets = list.stream().map(s -> {
-
-			String out = "<gs:Dataset " + s;
-			out = out.replace("</gs:datasets>", "");
-
-			return out;
-
-		    }).collect(Collectors.toList());
-
-		    response.setDatasets(datasets);
-		}
+		responseList.add(response);
 	    }
 
-	    return response;
+	    //
+	    // datasets responses
+	    //
+
+	    List<Node> datasetsNodes = Arrays.asList(reader.evaluateNodes("//*:response/*:datasets"));
+
+	    for (Node datasetsNode : datasetsNodes) {
+		WMSClusterResponse response = new WMSClusterResponse();
+
+		String bbox = reader.evaluateString(datasetsNode, "@*:bbox");
+		response.setBbox(bbox);
+
+		List<Dataset> datasets = Arrays.asList(reader.evaluateNodes(datasetsNode, "*:Dataset")).//
+			stream().map(n -> {
+			    try {
+				return (Dataset) Dataset.create(n);
+			    } catch (Exception ex) {
+				GSLoggerFactory.getLogger(getClass()).error(ex);
+			    }
+			    return null;
+			}).//
+			filter(Objects::nonNull).//
+			collect(Collectors.toList());
+
+		response.setDatasets(datasets);
+
+		responseList.add(response);
+	    }
+
+	    return responseList;
 
 	} catch (Exception e) {
 

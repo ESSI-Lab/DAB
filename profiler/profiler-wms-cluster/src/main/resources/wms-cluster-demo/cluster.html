@@ -52,6 +52,8 @@
 
         window.addEventListener('load', function(){
             map = new L.Map('map', {
+//              	crs: L.CRS.EPSG4326,
+             	crs: L.CRS.EPSG3857,
                 renderer: L.canvas(),
                 center: new L.LatLng(20, 0),
                 zoom: 2,
@@ -63,10 +65,26 @@
                 position: 'topright'
             }).addTo(map);
 
-            let geofabrik = new L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
-              });
+//             let geofabrik = new L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+//                 maxZoom: 19,
+//                 attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+//               });
+
+// maybe 4326
+//         let geofabrik = new L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+//             attribution: 'Map data: &copy; <a href="https://opentopomap.org">OpenTopoMap</a>',
+//             continuousWorld: true,
+//             noWrap: true
+//         });
+
+        let geofabrik = new L.tileLayer.wms("https://ows.terrestris.de/osm/service", {
+            layers: "OSM-WMS",       // The layer name from the WMS service
+            format: "image/png",     // Format of the returned tiles
+            transparent: true,       // Transparency support
+             srs: "EPSG:4326",         // Request tiles in EPSG:4326
+            attribution: "Map data © OpenStreetMap contributors | Service: terrestris.de"
+        });
+
             
             map.addLayer(geofabrik);
 
@@ -76,8 +94,8 @@
             wms = L.tileLayer.wms("/gs-service/services/essi/token/"+token+"/view/"+view+"/wms-cluster?", {
                 layers: view,
                 format: 'image/png',
-                crs: L.CRS.CRS84,
-                tileSize: 256,
+//                 crs: L.CRS.EPSG4326,
+                tileSize: 1024,
                 transparent: true
             }).addTo(map);
             

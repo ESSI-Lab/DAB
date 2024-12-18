@@ -111,86 +111,71 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
             });
         });
 
-        switch(mapType){
-   	 	case 'ol':
-
-            controlDiv.className = 'map-control-div ol-control';
-          
-			jQuery(controlDiv).css({
-               'margin-top' : '5px',
-               // 'margin-left' : '5px',
-                'background-color' : 'transparent'
-            });
-			
-            var mirrorDiv = document.createElement('div');
-			mirrorDiv.setAttribute("id","mapControlDiv");
-                              
-           if(options.mapTypeControlOptions && // 
-			  options.mapTypeControlOptions.position !== undefined && //
-			  options.mapTypeControlOptions.position === 'ol'){
-				
-                jQuery('#controlToggleButtonDiv').append(mirrorDiv);
-                jQuery(mirrorDiv).css({
-	                'right': 160,
-	                'top': 20,
-	                'margin-top': 440,
-	                //'margin-left': 440,
-	                'position':'relative',
-	                'float':'right',
-	                'z-index' : 100,
-            	});
-          
-            } else {
-				          
-	            jQuery('.ol-viewport').append(mirrorDiv);
-				
-				jQuery(mirrorDiv).append( '<label id="whereTableCaption" class="cnst-widget-where-input-table-ol-caption">Bounding box</label>');
-					           
-	            if(options.dialogMode){
-					
-	            	jQuery(mirrorDiv).position({
-						
-	                    of : '#'+options.dialogId,
-	                    my : 'left top',
-	                    at : 'left+12 top+55',
-	                    //collision : 'none'
-	                });
-					
-	             }else{
-	            	 
-	            	 //jQuery(mirrorDiv).position({
-	                 //    of : '.ol-viewport',
-	                 //    my : 'left top',
-	                 //    at : 'left+1065 top-50',
-	                 //   //collision : 'none'
-	                 // });
-	            }
-	                      
-	           // jQuery(mirrorDiv).css({       
-	           //     'z-index' : 1000,
-	           // });
-            }
+        controlDiv.className = 'map-control-div ol-control';
       
-            var myControl = new ol.control.Control({
-                element : controlDiv,
-                target : mirrorDiv
-            });
-
-            map.addControl(myControl);
-            break;
-
-   	 	case 'google':
-        	if(!options.controlPosition){
-        		options.controlPosition = google.maps.ControlPosition.TOP_LEFT;
-        	}
-            // put the control on the top-left position
-        	if(!map.controls[options.controlPosition]){      		
-        		map.controls[options.controlPosition] = [];
-        	}
-        	map.controls[options.controlPosition].push(controlDiv);
-        	break;
-        }
+		jQuery(controlDiv).css({
+           'margin-top' : '5px',
+           // 'margin-left' : '5px',
+            'background-color' : 'transparent'
+        });
 		
+        var mirrorDiv = document.createElement('div');
+		mirrorDiv.setAttribute("id","mapControlDiv");
+                          
+        if(options.mapTypeControlOptions && // 
+		
+		  options.mapTypeControlOptions.position !== undefined && //
+		  options.mapTypeControlOptions.position === 'ol'){
+			
+            jQuery('#controlToggleButtonDiv').append(mirrorDiv);
+            jQuery(mirrorDiv).css({
+                'right': 160,
+                'top': 20,
+                'margin-top': 440,
+                //'margin-left': 440,
+                'position':'relative',
+                'float':'right',
+                'z-index' : 100,
+        		});
+      
+        } else {
+			          
+            jQuery('.ol-viewport').append(mirrorDiv);
+			
+			jQuery(mirrorDiv).append( '<label id="whereTableCaption" class="cnst-widget-where-input-table-ol-caption">Bounding box</label>');
+				           
+            if(options.dialogMode){
+				
+            	jQuery(mirrorDiv).position({
+					
+                    of : '#'+options.dialogId,
+                    my : 'left top',
+                    at : 'left+12 top+55',
+                    //collision : 'none'
+                });
+				
+             }else{
+            	 
+            	 //jQuery(mirrorDiv).position({
+                 //    of : '.ol-viewport',
+                 //    my : 'left top',
+                 //    at : 'left+1065 top-50',
+                 //   //collision : 'none'
+                 // });
+            }
+                      
+           // jQuery(mirrorDiv).css({       
+           //     'z-index' : 1000,
+           // });
+        }
+  
+        var myControl = new ol.control.Control({
+            element : controlDiv,
+            target : mirrorDiv
+        });
+
+        map.addControl(myControl);
+                  		
 		if(options.wmsEndpoint){
 		
 			//
@@ -215,9 +200,7 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 						 		
 			jQuery( "#layerNameSearchInput" ).on( "keyup", function() {
 				
-				updateWmsLayersTable(jQuery( "#layerNameSearchInput" ).val());		
-			
-			    console.log(jQuery( "#layerNameSearchInput" ).val() );
+				updateWmsLayersTable(jQuery( "#layerNameSearchInput" ).val());					
 			});
 						
 			downloadWmsLayers();		
@@ -445,17 +428,8 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 						 
 						 onlineArray.push(online);
 						 
-						 var mapLayers = null;
-						 
-					     switch(mapType){
-						    case 'ol':
-						    	mapLayers = GIAPI.LayersFactory.ol3_Layer(onlineArray, 'urn:ogc:serviceType:WebMapService:');
-						    	break;
-						    case 'google':
-						    	mapLayers =  GIAPI.LayersFactory.googleImageMapType(resultsMapWidget.map.map, onlineArray);
-						    	break;
-					        }
-						 
+						 var mapLayers = GIAPI.LayersFactory.ol3_Layer(onlineArray, 'urn:ogc:serviceType:WebMapService:');
+						 					  			 
 						 resultsMapWidget.addLayers(mapLayers);	
 						 
 						 //

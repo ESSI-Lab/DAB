@@ -32,12 +32,14 @@ import java.util.Optional;
 import org.json.JSONObject;
 
 import eu.essi_lab.messages.DiscoveryMessage;
+import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.stats.StatisticsMessage;
 import eu.essi_lab.messages.stats.StatisticsResponse;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.MetadataElement;
 
 /**
@@ -95,13 +97,23 @@ public interface DatabaseExecutor extends DatabaseProvider {
     public class WMSClusterRequest {
 
 	private int maxResults;
-	private SpatialExtent extent;
+	private List<SpatialExtent> extents;
 	private View view;
+	private LogicalBond constraints;
+
+	/**
+	 * 
+	 */
+	public WMSClusterRequest() {
+
+	    extents = new ArrayList<SpatialExtent>();
+	}
 
 	/**
 	 * @return
 	 */
 	public int getMaxResults() {
+
 	    return maxResults;
 	}
 
@@ -114,19 +126,19 @@ public interface DatabaseExecutor extends DatabaseProvider {
 	}
 
 	/**
-	 * @return the extent
+	 * @return
 	 */
-	public SpatialExtent getExtent() {
+	public List<SpatialExtent> getExtents() {
 
-	    return extent;
+	    return extents;
 	}
 
 	/**
 	 * @param extent
 	 */
-	public void setExtent(SpatialExtent extent) {
+	public void addExtent(SpatialExtent extent) {
 
-	    this.extent = extent;
+	    this.extents.add(extent);
 	}
 
 	/**
@@ -144,6 +156,22 @@ public interface DatabaseExecutor extends DatabaseProvider {
 
 	    this.view = view;
 	}
+
+	/**
+	 * @param requestBond
+	 */
+	public void setConstraints(LogicalBond requestBond) {
+	    
+	    this.constraints = requestBond;
+	}
+
+	/**
+	 * @return  
+	 */
+	public LogicalBond getConstraints() {
+	    
+	    return constraints;
+	}	
     }
 
     /**
@@ -151,17 +179,56 @@ public interface DatabaseExecutor extends DatabaseProvider {
      */
     public class WMSClusterResponse {
 
-	private List<String> datasets;
+	private List<Dataset> datasets;
 	private TermFrequencyMap map;
 	private Integer stationsCount;
 	private Integer totalCount;
+	private SpatialExtent bbox;
+	private SpatialExtent avgBbox;
 
 	/**
 	 * 
 	 */
 	public WMSClusterResponse() {
 
-	    datasets = new ArrayList<String>();
+	    datasets = new ArrayList<>();
+	}
+
+	/**
+	 * @return
+	 */
+	public Optional<SpatialExtent> getAvgBbox() {
+
+	    return Optional.ofNullable(avgBbox);
+	}
+
+	/**
+	 * @param avgBbox
+	 */
+	public void setAvgBbox(SpatialExtent avgBbox) {
+
+	    this.avgBbox = avgBbox;
+	}
+
+	/**
+	 * @return
+	 */
+	public SpatialExtent getBbox() {
+
+	    return bbox;
+	}
+
+	/**
+	 * @param bbox
+	 */
+	public void setBbox(String bbox) {
+
+	    double south = Double.valueOf(bbox.split(",")[0]);
+	    double west = Double.valueOf(bbox.split(",")[1]);
+	    double north = Double.valueOf(bbox.split(",")[2]);
+	    double east = Double.valueOf(bbox.split(",")[3]);
+
+	    this.bbox = new SpatialExtent(south, west, north, east);
 	}
 
 	/**
@@ -199,7 +266,7 @@ public interface DatabaseExecutor extends DatabaseProvider {
 	/**
 	 * @param datasets
 	 */
-	public void setDatasets(List<String> datasets) {
+	public void setDatasets(List<Dataset> datasets) {
 
 	    this.datasets = datasets;
 	}
@@ -223,7 +290,7 @@ public interface DatabaseExecutor extends DatabaseProvider {
 	/**
 	 * @return
 	 */
-	public List<String> getDatasets() {
+	public List<Dataset> getDatasets() {
 
 	    return datasets;
 	}
@@ -234,6 +301,6 @@ public interface DatabaseExecutor extends DatabaseProvider {
      * @return
      * @throws GSException
      */
-    public WMSClusterResponse execute(WMSClusterRequest request) throws GSException;
+    public List<WMSClusterResponse> execute(WMSClusterRequest request) throws GSException;
 
 }

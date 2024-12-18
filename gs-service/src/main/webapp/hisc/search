@@ -450,8 +450,8 @@
 	        const view = 'his-central';
 	        
             // GIAPI.search.dab = GIAPI.DAB('http://localhost:9090/gs-service', view, 'services/essi','csw');
-		    GIAPI.search.dab = GIAPI.DAB('https://gs-service-preproduction.geodab.eu/gs-service', view, 'services/essi','csw');
-            // GIAPI.search.dab = GIAPI.DAB('../', view, 'services/essi','csw');
+			// GIAPI.search.dab = GIAPI.DAB('https://gs-service-preproduction.geodab.eu/gs-service', view, 'services/essi','csw');
+            GIAPI.search.dab = GIAPI.DAB('../', view, 'services/essi','csw');
             
 	        jQuery(function() {
 	        
