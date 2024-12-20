@@ -144,7 +144,6 @@ public class BNHSRequestTransformer extends DiscoveryRequestTransformer {
     @Override
     public String getProfilerType() {
 
-	return BNHSProfiler.BNHS_SERVICE_INFO.getServiceType();
+	return new BNHSProfilerSetting().getServiceType();
     }
-
 }

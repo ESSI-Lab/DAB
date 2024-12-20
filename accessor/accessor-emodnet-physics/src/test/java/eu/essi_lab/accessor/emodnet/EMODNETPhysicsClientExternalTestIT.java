@@ -1,5 +1,6 @@
 package eu.essi_lab.accessor.emodnet;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -20,7 +21,8 @@ public class EMODNETPhysicsClientExternalTestIT {
     public void test() throws Exception {
 	String endpoint = "https://data-erddap.emodnet-physics.eu/erddap";
 	EMODNETPhysicsClient client = new EMODNETPhysicsClient(endpoint);
-	List<String> identifiers = client.getIdentifiers();
+	SimpleEntry<List<String>, List<String>> fullIdentifiers = client.getIdentifiers();
+	List<String> identifiers = fullIdentifiers.getKey();
 	System.out.println(identifiers.size());
 	EMODNETPhysicsMapper mapper = new EMODNETPhysicsMapper();
 	// identifiers.clear();

@@ -8,8 +8,9 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 import org.junit.Test;
+
+import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
 import eu.essi_lab.jaxb.common.CommonContext;
 import eu.essi_lab.jaxb.common.schemas.CommonSchemas;

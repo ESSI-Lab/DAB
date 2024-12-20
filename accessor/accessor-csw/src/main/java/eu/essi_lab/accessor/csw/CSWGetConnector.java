@@ -26,8 +26,16 @@ package eu.essi_lab.accessor.csw;
  *
  * @author boldrini
  */
-public abstract class CSWGetConnector extends CSWConnector {
+public class CSWGetConnector extends CSWConnector {
 
+    public static final String TYPE = "CSW GET Connector";
+
+    @Override
+    public String getType() {
+
+	return TYPE;
+    }
+    
     public CSWGetConnector() {
 	setGetRecordsBinding(Binding.GET);
     }

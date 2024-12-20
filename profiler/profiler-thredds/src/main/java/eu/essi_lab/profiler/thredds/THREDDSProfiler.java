@@ -29,7 +29,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.xml.bind.JAXBElement;
 
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.jaxb.csw._2_0_2.ExceptionCode;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.web.WebRequest;
@@ -57,7 +56,8 @@ import eu.essi_lab.profiler.thredds.ncss.NCSSRequestFilter;
 import eu.essi_lab.profiler.thredds.ncss.NCSSTransformer;
 import eu.essi_lab.thredds._1_0_6.DatasetType;
 
-public class THREDDSProfiler extends Profiler {
+public class THREDDSProfiler extends Profiler<THREDDSProfilerSetting> {
+
     /*
      * TODO
      * thredds/dodsC/testAll/Level3_Composite_N0R_20201004_0005.grib2.dds
@@ -66,19 +66,6 @@ public class THREDDSProfiler extends Profiler {
      * /thredds/dodsC/testAll/Level3_Composite_N0R_20201004_0005.grib2.dods?LambertConformal_Projection,y,reftime,time
      * /thredds/dodsC/testAll/Level3_Composite_N0R_20201004_0005.grib2.dods?x
      */
-
-    /**
-     * The profiler type
-     */
-    private static final String THREDDS_PROFILER_TYPE = "THREDDS";
-
-    public static final ProfilerSetting THREDDS_SERVICE_INFO = new ProfilerSetting();
-    static {
-	THREDDS_SERVICE_INFO.setServiceName("THREDDS Profiler");
-	THREDDS_SERVICE_INFO.setServiceType(THREDDS_PROFILER_TYPE);
-	THREDDS_SERVICE_INFO.setServicePath("thredds");
-	THREDDS_SERVICE_INFO.setServiceVersion("1.0.6");
-    }
 
     /**
      * 
@@ -115,28 +102,28 @@ public class THREDDSProfiler extends Profiler {
 	ddsHandler.setMessageResponseMapper(new DefaultAccessResultSetMapper());
 	ddsHandler.setMessageResponseFormatter(new DDSAccessResultSetFormatterInline());
 	selector.register(new THREDDSDDSRequestFilter(), ddsHandler);
-	
+
 	// DAS
 	AccessHandler<DataObject> dasHandler = new AccessHandler<>();
 	dasHandler.setRequestTransformer(new THREDDSDASTransformer());
 	dasHandler.setMessageResponseMapper(new DefaultAccessResultSetMapper());
 	dasHandler.setMessageResponseFormatter(new AccessResultSetFormatterInline());
 	selector.register(new THREDDSDASRequestFilter(), dasHandler);
-	
+
 	// HTTP
 	AccessHandler<DataObject> httpHandler = new AccessHandler<>();
 	httpHandler.setRequestTransformer(new THREDDSHTTPTransformer());
 	httpHandler.setMessageResponseMapper(new DefaultAccessResultSetMapper());
 	httpHandler.setMessageResponseFormatter(new AccessResultSetFormatterInline());
 	selector.register(new THREDDSHTTPRequestFilter(), httpHandler);
-	
+
 	// NCSS
 	AccessHandler<DataObject> ncssHandler = new AccessHandler<>();
 	ncssHandler.setRequestTransformer(new NCSSTransformer());
 	ncssHandler.setMessageResponseMapper(new DefaultAccessResultSetMapper());
 	ncssHandler.setMessageResponseFormatter(new AccessResultSetFormatterInline());
 	selector.register(new NCSSRequestFilter(), ncssHandler);
-	
+
 	return selector;
     }
 
@@ -171,8 +158,8 @@ public class THREDDSProfiler extends Profiler {
     }
 
     @Override
-    protected ProfilerSetting initSetting() {
+    protected THREDDSProfilerSetting initSetting() {
 
-	return THREDDS_SERVICE_INFO;
+	return new THREDDSProfilerSetting();
     }
 }

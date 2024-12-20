@@ -29,8 +29,8 @@ import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.data.provider.SortDirection;
 
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
-import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.GridInfo;
+import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.extension.directive.AddDirective;
 import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
 import eu.essi_lab.cfga.gui.extension.directive.EditDirective;
@@ -181,11 +181,32 @@ public class TabInfoBuilder {
 
     /**
      * @param descriptors
+     * @param showColumnsHider
+     * @return
+     */
+    public TabInfoBuilder withGridInfo(List<ColumnDescriptor> descriptors, boolean showColumnsHider) {
+
+	return withGridInfo(GridInfo.DEFAULT_PAGE_SIZE, descriptors, new ArrayList<>(), SelectionMode.NONE, showColumnsHider);
+    }
+
+    /**
+     * @param descriptors
      * @return
      */
     public TabInfoBuilder withGridInfo(List<ColumnDescriptor> descriptors) {
 
-	return withGridInfo(GridInfo.DEFAULT_PAGE_SIZE, descriptors, new ArrayList<>(), SelectionMode.NONE);
+	return withGridInfo(GridInfo.DEFAULT_PAGE_SIZE, descriptors, new ArrayList<>(), SelectionMode.NONE, true);
+    }
+
+    /**
+     * @param descriptors
+     * @param selectionMode
+     * @param showColumnsHider
+     * @return
+     */
+    public TabInfoBuilder withGridInfo(List<ColumnDescriptor> descriptors, SelectionMode selectionMode, boolean showColumnsHider) {
+
+	return withGridInfo(GridInfo.DEFAULT_PAGE_SIZE, descriptors, new ArrayList<>(), selectionMode, showColumnsHider);
     }
 
     /**
@@ -195,7 +216,18 @@ public class TabInfoBuilder {
      */
     public TabInfoBuilder withGridInfo(List<ColumnDescriptor> descriptors, SelectionMode selectionMode) {
 
-	return withGridInfo(GridInfo.DEFAULT_PAGE_SIZE, descriptors, new ArrayList<>(), selectionMode);
+	return withGridInfo(GridInfo.DEFAULT_PAGE_SIZE, descriptors, new ArrayList<>(), selectionMode, true);
+    }
+
+    /**
+     * @param pageSize
+     * @param descriptors
+     * @param showColumnsHider
+     * @return
+     */
+    public TabInfoBuilder withGridInfo(int pageSize, List<ColumnDescriptor> descriptors, boolean showColumnsHider) {
+
+	return withGridInfo(pageSize, descriptors, new ArrayList<>(), SelectionMode.NONE, showColumnsHider);
     }
 
     /**
@@ -205,7 +237,20 @@ public class TabInfoBuilder {
      */
     public TabInfoBuilder withGridInfo(int pageSize, List<ColumnDescriptor> descriptors) {
 
-	return withGridInfo(pageSize, descriptors, new ArrayList<>(), SelectionMode.NONE);
+	return withGridInfo(pageSize, descriptors, new ArrayList<>(), SelectionMode.NONE, true);
+    }
+
+    /**
+     * @param pageSize
+     * @param descriptors
+     * @param selectionMode
+     * @param showColumnsHider
+     * @return
+     */
+    public TabInfoBuilder withGridInfo(int pageSize, List<ColumnDescriptor> descriptors, SelectionMode selectionMode,
+	    boolean showColumnsHider) {
+
+	return withGridInfo(pageSize, descriptors, new ArrayList<>(), selectionMode, showColumnsHider);
     }
 
     /**
@@ -216,7 +261,18 @@ public class TabInfoBuilder {
      */
     public TabInfoBuilder withGridInfo(int pageSize, List<ColumnDescriptor> descriptors, SelectionMode selectionMode) {
 
-	return withGridInfo(pageSize, descriptors, new ArrayList<>(), selectionMode);
+	return withGridInfo(pageSize, descriptors, new ArrayList<>(), selectionMode, true);
+    }
+
+    /**
+     * @param descriptors
+     * @param items
+     * @param showColumnsHider
+     * @return
+     */
+    public TabInfoBuilder withGridInfo(List<ColumnDescriptor> descriptors, List<GridMenuItemHandler> items, boolean showColumnsHider) {
+
+	return withGridInfo(GridInfo.DEFAULT_PAGE_SIZE, descriptors, items, SelectionMode.NONE, showColumnsHider);
     }
 
     /**
@@ -226,7 +282,7 @@ public class TabInfoBuilder {
      */
     public TabInfoBuilder withGridInfo(List<ColumnDescriptor> descriptors, List<GridMenuItemHandler> items) {
 
-	return withGridInfo(GridInfo.DEFAULT_PAGE_SIZE, descriptors, items, SelectionMode.NONE);
+	return withGridInfo(GridInfo.DEFAULT_PAGE_SIZE, descriptors, items, SelectionMode.NONE, true);
     }
 
     /**
@@ -235,9 +291,43 @@ public class TabInfoBuilder {
      * @param selectionMode
      * @return
      */
-    public TabInfoBuilder withGridInfo(List<ColumnDescriptor> descriptors, List<GridMenuItemHandler> items, SelectionMode selectionMode) {
+    public TabInfoBuilder withGridInfo(//
+	    List<ColumnDescriptor> descriptors, //
+	    List<GridMenuItemHandler> items, //
+	    SelectionMode selectionMode, //
+	    boolean showColumnsHider) {
 
-	return withGridInfo(GridInfo.DEFAULT_PAGE_SIZE, descriptors, items, selectionMode);
+	return withGridInfo(GridInfo.DEFAULT_PAGE_SIZE, descriptors, items, selectionMode, showColumnsHider);
+    }
+
+    /**
+     * @param descriptors
+     * @param items
+     * @param selectionMode
+     * @return
+     */
+    public TabInfoBuilder withGridInfo(//
+	    List<ColumnDescriptor> descriptors, //
+	    List<GridMenuItemHandler> items, //
+	    SelectionMode selectionMode) {
+
+	return withGridInfo(GridInfo.DEFAULT_PAGE_SIZE, descriptors, items, selectionMode, true);
+    }
+
+    /**
+     * @param pageSize
+     * @param descriptors
+     * @param items
+     * @param showColumnsHider
+     * @return
+     */
+    public TabInfoBuilder withGridInfo(//
+	    int pageSize, //
+	    List<ColumnDescriptor> descriptors, //
+	    List<GridMenuItemHandler> items, //
+	    boolean showColumnsHider) {
+
+	return withGridInfo(pageSize, descriptors, items, SelectionMode.NONE, showColumnsHider);
     }
 
     /**
@@ -246,9 +336,12 @@ public class TabInfoBuilder {
      * @param items
      * @return
      */
-    public TabInfoBuilder withGridInfo(int pageSize, List<ColumnDescriptor> descriptors, List<GridMenuItemHandler> items) {
+    public TabInfoBuilder withGridInfo(//
+	    int pageSize, //
+	    List<ColumnDescriptor> descriptors, //
+	    List<GridMenuItemHandler> items) {
 
-	return withGridInfo(pageSize, descriptors, items, SelectionMode.NONE);
+	return withGridInfo(pageSize, descriptors, items, SelectionMode.NONE, true);
     }
 
     /**
@@ -262,28 +355,16 @@ public class TabInfoBuilder {
 	    int pageSize, //
 	    List<ColumnDescriptor> descriptors, //
 	    List<GridMenuItemHandler> items, //
-	    SelectionMode selectionMode) {
+	    SelectionMode selectionMode,//
+	    boolean showColumnsHider) {
 
 	GridInfo gridInfo = new GridInfo();
 	gridInfo.setPageSize(pageSize);
 	gridInfo.setSelectionMode(selectionMode);
+	gridInfo.setShowColumnsHider(showColumnsHider);
 
 	descriptors.forEach(d -> gridInfo.addColumnDescriptor(d));
 	items.forEach(i -> gridInfo.addGridMenuItemHandler(i));
-
-	tabInfo.setGridInfo(gridInfo);
-
-	return this;
-    }
-
-    /**
-     * @param pageSize
-     * @return
-     */
-    public TabInfoBuilder withGridInfo(int pageSize) {
-
-	GridInfo gridInfo = new GridInfo();
-	gridInfo.setPageSize(pageSize);
 
 	tabInfo.setGridInfo(gridInfo);
 

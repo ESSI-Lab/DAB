@@ -283,26 +283,20 @@ public class ConfigurationSimilarityTest {
     @Test
     public void inclusionTest6() {
 
-	CheckResponse response = inclusionTest(Setting.CONFIGURABLE_TYPE, 32);
+	CheckResponse response = inclusionTest(Setting.CONFIGURABLE_TYPE, 1);
 
 	//
-	// 30 ProfilerSetting
 	// 1 SystemSetting
-
+	//
+	
 	List<Setting> settings = response.//
 		getSettings().//
 		stream().//
 		distinct().//
 		sorted((s1, s2) -> s1.getSettingClass().getSimpleName().compareTo(s2.getSettingClass().getSimpleName())).//
 		collect(Collectors.toList());
-
-	//
-	// - ProfilerSetting per default has no configurableType (no def.value), so the property is hidden
-	// - the ProfilerSetting in the configuration have the configurableType
-	// -> so they differ for configurableType property which is included in this test
-	//
-	Assert.assertEquals(ProfilerSetting.class, settings.get(0).getSettingClass());
-
+	
+	Assert.assertEquals(SystemSetting.class, settings.get(0).getSettingClass());
     }
 
     @Test

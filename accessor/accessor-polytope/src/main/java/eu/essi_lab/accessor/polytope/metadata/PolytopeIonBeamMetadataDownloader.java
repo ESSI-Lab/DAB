@@ -278,7 +278,7 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 	    String identifier = online.getName();
 	    String[] splittedId = identifier.split(":");
 	    String varId = (splittedId.length > 2) ? splittedId[splittedId.length - 1] : splittedId[1];
-	    PolytopeIonBeamMetadataVariable var = PolytopeIonBeamMetadataVariable.decode(varId);
+	    PolytopeIonBeamMetadataMeteoTrackerVariable var = PolytopeIonBeamMetadataMeteoTrackerVariable.decode(varId);
 	    String units = var.getUnit();
 	    List<JSONObject> ret = new ArrayList<>();
 	    File tempFile;

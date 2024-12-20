@@ -19,13 +19,14 @@ import eu.essi_lab.cfga.checker.ConfigEditableSettingMethod;
 import eu.essi_lab.cfga.checker.ConfigurationChecker;
 import eu.essi_lab.cfga.checker.ReferencedClassesMethod;
 import eu.essi_lab.cfga.checker.RegisteredEditableSettingMethod;
-import eu.essi_lab.cfga.gs.SimilarityCheckMethod;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.DefaultConfiguration;
+import eu.essi_lab.cfga.gs.SimilarityCheckMethod;
 import eu.essi_lab.cfga.gs.setting.CredentialsSetting;
 import eu.essi_lab.cfga.gs.setting.DownloadSetting;
 import eu.essi_lab.cfga.gs.setting.DownloadSetting.DownloadStorage;
 import eu.essi_lab.cfga.gs.setting.GDCSourcesSetting;
+import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.cfga.gs.setting.SchedulerViewSetting;
 import eu.essi_lab.cfga.gs.setting.SourcePrioritySetting;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
@@ -100,11 +101,18 @@ public class DefaultConfigurationTest {
 	// --- Profilers ---
 	//
 
+	@SuppressWarnings("rawtypes")
 	ServiceLoader<Profiler> profilers = ServiceLoader.load(Profiler.class);
 
 	Assert.assertEquals(//
 		StreamUtils.iteratorToStream(profilers.iterator()).count(), //
 		ConfigurationWrapper.getProfilerSettings().size());
+
+	// all profilers have its own type of setting
+	long count = StreamUtils.iteratorToStream(profilers.iterator())
+		.filter(p -> p.getSetting().getSettingClass().equals(ProfilerSetting.class)).count();
+
+	Assert.assertEquals(0, count);	
 
 	//
 	//

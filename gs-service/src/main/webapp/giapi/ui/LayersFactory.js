@@ -264,6 +264,7 @@ GIAPI.LayersFactory = new function() {
                             name: name,
                             title: title,
                             source: new ol.source.TileWMS({
+							   crossOrigin: 'anonymous',
                                 url: url,
                                 ratio: 1,
                                 params: getMapParams,
@@ -275,6 +276,7 @@ GIAPI.LayersFactory = new function() {
                             name: name,
                             title: title,
                             source: new ol.source.TileWMS({
+							    crossOrigin: 'anonymous',	
                                 url: url,
                                 ratio: 1,
                                 params: getMapParams

@@ -28,7 +28,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.jaxb.csw._2_0_2.ExceptionCode;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.web.KeyValueParser;
@@ -49,20 +48,7 @@ import eu.essi_lab.profiler.gwis.request.data.GWISDataRequestFilter;
 /**
  * @author boldrini
  */
-public class GWISProfiler extends Profiler {
-
-    /**
-     * The profiler type
-     */
-    private static final String GWIS_PROFILER_TYPE = "GWIS";
-
-    public static final ProfilerSetting GWIS_INFO = new ProfilerSetting();
-    static {
-	GWIS_INFO.setServiceName("GWIS");
-	GWIS_INFO.setServiceType(GWIS_PROFILER_TYPE);
-	GWIS_INFO.setServicePath("gwis");
-	GWIS_INFO.setServiceVersion("0.0");
-    }
+public class GWISProfiler extends Profiler<GWISProfilerSetting> {
 
     protected static final List<String> SUPPORTED_VERSIONS = new ArrayList<>();
 
@@ -81,7 +67,7 @@ public class GWISProfiler extends Profiler {
     public HandlerSelector getSelector(WebRequest request) {
 
 	HandlerSelector selector = new HandlerSelector();
-	
+
 	DiscoveryHandler<GSResource> handler = new DiscoveryHandler<>();
 	handler.setRequestTransformer(new GWISRequestTransformer());
 	handler.setMessageResponseMapper(new GWISResultSetMapper());
@@ -96,7 +82,7 @@ public class GWISProfiler extends Profiler {
 	handler3.setMessageResponseMapper(new DefaultAccessResultSetMapper());
 	handler3.setMessageResponseFormatter(new GWISDataResultSetFormatter());
 	selector.register(new GWISDataRequestFilter(), handler3);
-	
+
 	return selector;
     }
 
@@ -144,8 +130,8 @@ public class GWISProfiler extends Profiler {
     }
 
     @Override
-    protected ProfilerSetting initSetting() {
+    protected GWISProfilerSetting initSetting() {
 
-	return GWIS_INFO;
+	return new GWISProfilerSetting();
     }
 }

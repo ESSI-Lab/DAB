@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.profiler.wof.wsdl.WSDLRequestFilter;
 
 /**
  * @author boldrini

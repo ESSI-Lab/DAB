@@ -29,7 +29,7 @@ public enum TabIndex {
     /**
      * 
      */
-    PROFILER_SETTING(0),
+    PROFILER_SETTING(2),
     /**
      * 
      */
@@ -37,7 +37,7 @@ public enum TabIndex {
     /**
      * 
      */
-    HARVESTING_SETTING(2),
+    HARVESTING_SETTING(0),
     /**
      * 
      */

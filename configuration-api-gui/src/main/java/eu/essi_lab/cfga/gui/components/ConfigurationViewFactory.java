@@ -90,7 +90,8 @@ public class ConfigurationViewFactory {
 	    Orientation orientation, //
 	    String tabName, //
 	    Optional<AddDirective> addDirective,//
-	    Optional<RemoveDirective> removeDirective, Optional<EditDirective> editDirective) {
+	    Optional<RemoveDirective> removeDirective,//
+	    Optional<EditDirective> editDirective) {
 
 	TabContainer layout = null;
 
@@ -119,7 +120,7 @@ public class ConfigurationViewFactory {
 
 	    HorizontalLayout headerLayout = ComponentFactory
 		    .createNoSpacingNoMarginHorizontalLayout("tab-container-header-layout-for-" + tabName);
-	    headerLayout.setHeight("60px");
+	    headerLayout.setHeight("40px");
 	    headerLayout.setWidthFull();
 	    headerLayout.setAlignItems(Alignment.BASELINE);
 	    headerLayout.setId(TAB_HEADER_ID_PREFIX+"_"+tabName);

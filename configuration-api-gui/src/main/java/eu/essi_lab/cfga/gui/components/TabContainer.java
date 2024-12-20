@@ -1,5 +1,7 @@
 package eu.essi_lab.cfga.gui.components;
 
+import java.util.ArrayList;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -30,9 +32,11 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.tabs.TabSheet;
 
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gui.ConfigurationView;
@@ -41,8 +45,10 @@ import eu.essi_lab.cfga.gui.components.grid.GridInfo;
 import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfo;
+import eu.essi_lab.cfga.gui.extension.directive.DirectiveManager;
 import eu.essi_lab.cfga.gui.extension.directive.EditDirective;
 import eu.essi_lab.cfga.gui.extension.directive.RemoveDirective;
+import eu.essi_lab.cfga.gui.extension.directive.ShowDirective;
 import eu.essi_lab.cfga.setting.Setting;
 
 /**
@@ -59,6 +65,15 @@ public class TabContainer extends VerticalLayout {
     private Configuration configuration;
     private boolean rendered;
     private ConfigurationView view;
+    private List<Component> legends;
+
+    /**
+     *
+     */
+    public TabContainer() {
+
+	legends = new ArrayList<Component>();
+    }
 
     /**
      * 
@@ -78,9 +93,9 @@ public class TabContainer extends VerticalLayout {
 
 	boolean readOnly = componentInfo.isForceReadOnlySet();
 
-	if (tabInfo.isReloadable()) {
+	HorizontalLayout headerLayout = findHeader();
 
-	    HorizontalLayout headerLayout = findHeader();
+	if (tabInfo.isReloadable()) {
 
 	    if (addReloadButton(headerLayout)) {
 
@@ -94,13 +109,51 @@ public class TabContainer extends VerticalLayout {
 
 	List<Setting> settings = view.retrieveTabSettings(tabInfo);
 
+	DirectiveManager directiveManager = tabInfo.getDirectiveManager();
+
+	Optional<ShowDirective> showDirective = directiveManager.getDirective(ShowDirective.class);
+
+	if (showDirective.isPresent()) {
+
+	    showDirective.get().getSortDirection().ifPresent(dir -> {
+
+		switch (dir) {
+		case ASCENDING:
+		    settings.sort((s1, s2) -> s1.getName().compareTo(s2.getName()));
+		    break;
+		case DESCENDING:
+		    settings.sort((s1, s2) -> s2.getName().compareTo(s1.getName()));
+		    break;
+		}
+	    });
+	}
+
 	if (tabInfo.getGridInfo().isPresent()) {
 
 	    Optional<GridInfo> gridInfo = tabInfo.getGridInfo();
 
-	    GridComponent gridComponent = new GridComponent(gridInfo.get(), settings, configuration, this, readOnly, refresh);
+	    GridComponent gridComponent = new GridComponent(//
+		    gridInfo.get(), //
+		    settings, //
+		    configuration, //
+		    this, //
+		    readOnly, //
+		    refresh);
 
-	    add(gridComponent.createColumnsHider());
+	    TabSheet tabSheet = new TabSheet();
+	    tabSheet.getStyle().set("border-bottom", "1px solid #d3d3d39e");
+
+	    if (tabInfo.getGridInfo().get().isShowColumnsHider()) {
+
+		tabSheet.add("Columns", gridComponent.createColumnsHider());
+	    }
+
+	    if (!legends.isEmpty()) {
+
+		tabSheet.add("Legend", gridComponent.createLegendsViewer(legends));
+	    }
+
+	    add(tabSheet);
 
 	    add(gridComponent);
 
@@ -108,21 +161,46 @@ public class TabContainer extends VerticalLayout {
 
 	} else {
 
-	    settings.stream().//
+	    for (int i = 0; i < settings.size(); i++) {
 
-		    map(set -> SettingComponentFactory.createSettingComponent(configuration, set.getIdentifier(), readOnly, this)).//
+		Setting setting = settings.get(i);
 
-		    forEach(settingComponent -> {
+		SettingComponent component = SettingComponentFactory.createSettingComponent(configuration, setting.getIdentifier(),
+			readOnly, this);
 
-			if (settingComponent.getDetails().isPresent()) {
+		if (component.getDetails().isPresent()) {
 
-			    ((HasComponents) this).add(settingComponent.getDetails().get());
+		    Details details = component.getDetails().get();
 
-			} else {
+		    if (i == 0) {
 
-			    ((HasComponents) this).add(settingComponent);
-			}
-		    });
+			details.getStyle().set("margin-top", "15px");
+		    }
+
+		    ((HasComponents) this).add(details);
+
+		} else {
+
+		    ((HasComponents) this).add(component);
+		}
+	    }
+
+	    // settings.stream().//
+	    //
+	    // map(set -> SettingComponentFactory.createSettingComponent(configuration, set.getIdentifier(), readOnly,
+	    // this)).//
+	    //
+	    // forEach(settingComponent -> {
+	    //
+	    // if (settingComponent.getDetails().isPresent()) {
+	    //
+	    // ((HasComponents) this).add(settingComponent.getDetails().get());
+	    //
+	    // } else {
+	    //
+	    // ((HasComponents) this).add(settingComponent);
+	    // }
+	    // });
 	}
     }
 
@@ -167,6 +245,18 @@ public class TabContainer extends VerticalLayout {
 	if (components.length == 1 && components[0] instanceof GridComponent) {
 
 	    this.grid = (GridComponent) components[0];
+	}
+    }
+
+    /**
+     * @param legend
+     * @return
+     */
+    public void addLegend(Component legend) {
+
+	if (!legends.stream().map(lg -> lg.getId().get()).anyMatch(id -> id.equals(legend.getId().get())) ) {
+
+	    legends.add(legend);
 	}
     }
 

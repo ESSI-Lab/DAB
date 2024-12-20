@@ -267,6 +267,26 @@ public class ComponentFactory {
 
     /**
      * @param label
+     * @param widthFull
+     * @param fontSize
+     * @return
+     */
+    public static Label createLabel(String label, boolean widthFull, int fontSize) {
+
+	Label out = new Label(label);
+	if (widthFull) {
+	    out.setWidthFull();
+	}
+
+	if (fontSize > 0) {
+	    out.getStyle().set("font-size", "" + fontSize + "px");
+	}
+
+	return out;
+    }
+
+    /**
+     * @param label
      * @return
      */
     public static Label createLabel() {
@@ -290,14 +310,7 @@ public class ComponentFactory {
      */
     public static Label createLabel(String label, int sizePx) {
 
-	Label out = new Label(label);
-	out.setWidthFull();
-
-	if (sizePx > 0) {
-	    out.getStyle().set("font-size", "" + sizePx + "px");
-	}
-
-	return out;
+	return createLabel(label, true, sizePx);
     }
 
     /**

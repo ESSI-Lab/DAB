@@ -3,6 +3,8 @@
  */
 package eu.essi_lab.api.database;
 
+import java.util.ArrayList;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -25,13 +27,19 @@ package eu.essi_lab.api.database;
  */
 
 import java.util.List;
+import java.util.Optional;
 
 import org.json.JSONObject;
 
 import eu.essi_lab.messages.DiscoveryMessage;
+import eu.essi_lab.messages.bond.LogicalBond;
+import eu.essi_lab.messages.bond.SpatialExtent;
+import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.stats.StatisticsMessage;
 import eu.essi_lab.messages.stats.StatisticsResponse;
+import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.MetadataElement;
 
 /**
@@ -82,4 +90,217 @@ public interface DatabaseExecutor extends DatabaseProvider {
      * @throws GSException
      */
     public List<String> getIndexValues(DiscoveryMessage message, MetadataElement element, int start, int count) throws GSException;
+
+    /**
+     * @author Fabrizio
+     */
+    public class WMSClusterRequest {
+
+	private int maxResults;
+	private List<SpatialExtent> extents;
+	private View view;
+	private LogicalBond constraints;
+
+	/**
+	 * 
+	 */
+	public WMSClusterRequest() {
+
+	    extents = new ArrayList<SpatialExtent>();
+	}
+
+	/**
+	 * @return
+	 */
+	public int getMaxResults() {
+
+	    return maxResults;
+	}
+
+	/**
+	 * @param maxResults
+	 */
+	public void setMaxResults(int maxResults) {
+
+	    this.maxResults = maxResults;
+	}
+
+	/**
+	 * @return
+	 */
+	public List<SpatialExtent> getExtents() {
+
+	    return extents;
+	}
+
+	/**
+	 * @param extent
+	 */
+	public void addExtent(SpatialExtent extent) {
+
+	    this.extents.add(extent);
+	}
+
+	/**
+	 * @return
+	 */
+	public View getView() {
+
+	    return view;
+	}
+
+	/**
+	 * @param view
+	 */
+	public void setView(View view) {
+
+	    this.view = view;
+	}
+
+	/**
+	 * @param requestBond
+	 */
+	public void setConstraints(LogicalBond requestBond) {
+	    
+	    this.constraints = requestBond;
+	}
+
+	/**
+	 * @return  
+	 */
+	public LogicalBond getConstraints() {
+	    
+	    return constraints;
+	}	
+    }
+
+    /**
+     * @author Fabrizio
+     */
+    public class WMSClusterResponse {
+
+	private List<Dataset> datasets;
+	private TermFrequencyMap map;
+	private Integer stationsCount;
+	private Integer totalCount;
+	private SpatialExtent bbox;
+	private SpatialExtent avgBbox;
+
+	/**
+	 * 
+	 */
+	public WMSClusterResponse() {
+
+	    datasets = new ArrayList<>();
+	}
+
+	/**
+	 * @return
+	 */
+	public Optional<SpatialExtent> getAvgBbox() {
+
+	    return Optional.ofNullable(avgBbox);
+	}
+
+	/**
+	 * @param avgBbox
+	 */
+	public void setAvgBbox(SpatialExtent avgBbox) {
+
+	    this.avgBbox = avgBbox;
+	}
+
+	/**
+	 * @return
+	 */
+	public SpatialExtent getBbox() {
+
+	    return bbox;
+	}
+
+	/**
+	 * @param bbox
+	 */
+	public void setBbox(String bbox) {
+
+	    double south = Double.valueOf(bbox.split(",")[0]);
+	    double west = Double.valueOf(bbox.split(",")[1]);
+	    double north = Double.valueOf(bbox.split(",")[2]);
+	    double east = Double.valueOf(bbox.split(",")[3]);
+
+	    this.bbox = new SpatialExtent(south, west, north, east);
+	}
+
+	/**
+	 * @return
+	 */
+	public Optional<Integer> getStationsCount() {
+
+	    return Optional.ofNullable(stationsCount);
+	}
+
+	/**
+	 * @param stationsCount
+	 */
+	public void setStationsCount(int stationsCount) {
+
+	    this.stationsCount = stationsCount;
+	}
+
+	/**
+	 * @return the totalCount
+	 */
+	public Optional<Integer> getTotalCount() {
+
+	    return Optional.ofNullable(totalCount);
+	}
+
+	/**
+	 * @param totalCount
+	 */
+	public void setTotalCount(int totalCount) {
+
+	    this.totalCount = totalCount;
+	}
+
+	/**
+	 * @param datasets
+	 */
+	public void setDatasets(List<Dataset> datasets) {
+
+	    this.datasets = datasets;
+	}
+
+	/**
+	 * @param map
+	 */
+	public void setMap(TermFrequencyMap map) {
+
+	    this.map = map;
+	}
+
+	/**
+	 * @return
+	 */
+	public Optional<TermFrequencyMap> getMap() {
+
+	    return Optional.ofNullable(map);
+	}
+
+	/**
+	 * @return
+	 */
+	public List<Dataset> getDatasets() {
+
+	    return datasets;
+	}
+    }
+
+    /**
+     * @param request
+     * @return
+     * @throws GSException
+     */
+    public List<WMSClusterResponse> execute(WMSClusterRequest request) throws GSException;
+
 }

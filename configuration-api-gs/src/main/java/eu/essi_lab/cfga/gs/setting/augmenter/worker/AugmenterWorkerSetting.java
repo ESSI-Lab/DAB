@@ -42,9 +42,10 @@ import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.TabIndex;
 import eu.essi_lab.cfga.gs.setting.augmenter.AugmenterSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.SchedulerSupport;
-import eu.essi_lab.cfga.gs.setting.harvesting.menuitems.HarvestingInfoItemHandler;
+import eu.essi_lab.cfga.gs.setting.menuitems.HarvestingInfoItemHandler;
 import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
 import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
+import eu.essi_lab.cfga.gui.components.grid.renderer.JobPhaseColumnRenderer;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
@@ -180,9 +181,7 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 	Option<Integer> timeBackOption = IntegerOptionBuilder.get().//
 		required().//
 		withKey(TIME_BACK_OPTION_KEY).//
-		withLabel(
-			"Elaborates only records created since the given amount of minutes. 0 to elaborates all records")
-		.//
+		withLabel("Elaborates only records created since the given amount of minutes. 0 to elaborates all records").//
 		withValue(0).//
 		withMinValue(0).//
 		cannotBeDisabled().//
@@ -258,19 +257,24 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 			    "Add augmentation job", //
 			    "eu.essi_lab.augmenter.worker.AugmenterWorkerSettingImpl")
 		    .//
-		    withRemoveDirective("Remove augmenter", false, "eu.essi_lab.harvester.worker.HarvestingSettingImpl").//
+		    withRemoveDirective("Remove augmenter", false, "eu.essi_lab.augmenter.worker.AugmenterWorkerSettingImpl").//
 		    withEditDirective("Edit augmenter", ConfirmationPolicy.ON_WARNINGS).//
 
 		    withGridInfo(Arrays.asList(//
 
 			    ColumnDescriptor.create("Name", true, true, (s) -> getName(s)), //
 
-			    ColumnDescriptor.create("Repeat count", 50, true, true, (s) -> SchedulerSupport.getInstance().getRepeatCount(s)), //
+			    ColumnDescriptor.create("Repeat count", 150, true, true,
+				    (s) -> SchedulerSupport.getInstance().getRepeatCount(s)), //
 
-			    ColumnDescriptor.create("Repeat interval", 50, true, true,
+			    ColumnDescriptor.create("Repeat interval", 150, true, true,
 				    (s) -> SchedulerSupport.getInstance().getRepeatInterval(s)), //
 
-			    ColumnDescriptor.create("Status", 100, true, true, (s) -> SchedulerSupport.getInstance().getJobPhase(s)), //
+			    ColumnDescriptor.create("Status", 100, true, true, (s) -> SchedulerSupport.getInstance().getJobPhase(s), //
+
+				    (item1, item2) -> item1.get("Status").compareTo(item2.get("Status")), //
+
+				    new JobPhaseColumnRenderer()), //
 
 			    ColumnDescriptor.create("Fired time", 150, true, true, (s) -> SchedulerSupport.getInstance().getFiredTime(s)), //
 
@@ -279,8 +283,7 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 			    ColumnDescriptor.create("El. time (HH:mm:ss)", 170, true, true,
 				    (s) -> SchedulerSupport.getInstance().getElapsedTime(s)), //
 
-			    ColumnDescriptor.create("Next fire time", 150, true, true,
-				    (s) -> SchedulerSupport.getInstance().getNextFireTime(s)), //
+			    ColumnDescriptor.create("Next fire time", true, true, (s) -> SchedulerSupport.getInstance().getNextFireTime(s)), //
 
 			    ColumnDescriptor.create("Info", true, true, false, (s) -> SchedulerSupport.getInstance().getAllMessages(s))//
 		    ), getItemsList()).//

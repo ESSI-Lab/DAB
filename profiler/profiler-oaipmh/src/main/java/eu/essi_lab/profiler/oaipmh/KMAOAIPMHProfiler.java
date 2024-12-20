@@ -24,7 +24,6 @@ package eu.essi_lab.profiler.oaipmh;
  * #L%
  */
 
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.profiler.oaipmh.handler.discover.OAIPMHRequestTransformer;
 import eu.essi_lab.profiler.oaipmh.handler.discover.OAIPMHResultSetMapper;
 import eu.essi_lab.profiler.oaipmh.handler.kma.discover.KMAOAIPMHResultSetMapper;
@@ -35,20 +34,7 @@ import eu.essi_lab.profiler.oaipmh.handler.srvinfo.OAIPMHListSetsHandler;
 /**
  * @author Fabrizio
  */
-public class KMAOAIPMHProfiler extends OAIPMHProfiler {
-
-    /**
-     * The OAI-PMH profiler type
-     */
-    public static final String KMA_OAI_PMH_PROFILER_TYPE = "KMA-OAI-PMH";
-
-    public static final ProfilerSetting KMA_OAIPMH_SERVICE_INFO = new ProfilerSetting();
-    static {
-	KMA_OAIPMH_SERVICE_INFO.setServiceName("KMA-OAI-PMH");
-	KMA_OAIPMH_SERVICE_INFO.setServiceType(KMA_OAI_PMH_PROFILER_TYPE);
-	KMA_OAIPMH_SERVICE_INFO.setServicePath("kmaoaipmh");
-	KMA_OAIPMH_SERVICE_INFO.setServiceVersion("1.0.0");
-    }
+public class KMAOAIPMHProfiler extends OAIPMHProfiler<KMAOAIPMHProfilerSetting> {
 
     public KMAOAIPMHProfiler() {
     }
@@ -72,8 +58,8 @@ public class KMAOAIPMHProfiler extends OAIPMHProfiler {
     }
 
     @Override
-    protected ProfilerSetting initSetting() {
+    protected KMAOAIPMHProfilerSetting initSetting() {
 
-	return KMA_OAIPMH_SERVICE_INFO;
+	return new KMAOAIPMHProfilerSetting();
     }
 }

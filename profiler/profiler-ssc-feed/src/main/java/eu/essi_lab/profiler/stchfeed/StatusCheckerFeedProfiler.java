@@ -29,7 +29,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
@@ -41,18 +40,7 @@ import eu.essi_lab.pdk.handler.selector.HandlerSelector;
 /**
  * @author Fabrizio
  */
-public class StatusCheckerFeedProfiler extends Profiler {
-
-    public static final String SSC_FEED_PROFILER_TYPE = "ServiceStatusCheckerFeed";
-    public static final String SSC_FEED_PROFILER_PATH = "ssc";
-
-    public static final ProfilerSetting SSC_FEED_SERVICE_INFO = new ProfilerSetting();
-    static {
-	SSC_FEED_SERVICE_INFO.setServiceName("ServiceStatusCheckerFeed");
-	SSC_FEED_SERVICE_INFO.setServiceType(SSC_FEED_PROFILER_TYPE);
-	SSC_FEED_SERVICE_INFO.setServicePath(SSC_FEED_PROFILER_PATH);
-	SSC_FEED_SERVICE_INFO.setServiceVersion("1.0.0");
-    }
+public class StatusCheckerFeedProfiler extends Profiler<StatusCheckerFeedProfilerSetting> {
 
     @Override
     public HandlerSelector getSelector(WebRequest request) {
@@ -60,7 +48,7 @@ public class StatusCheckerFeedProfiler extends Profiler {
 	HandlerSelector selector = new HandlerSelector();
 
 	selector.register(//
-		new GETRequestFilter(SSC_FEED_PROFILER_PATH + "/feed"), //
+		new GETRequestFilter(new StatusCheckerFeedProfilerSetting().getServicePath() + "/feed"), //
 		new StatusCheckerFeedHandler());
 
 	return selector;
@@ -106,8 +94,8 @@ public class StatusCheckerFeedProfiler extends Profiler {
     }
 
     @Override
-    protected ProfilerSetting initSetting() {
+    protected StatusCheckerFeedProfilerSetting initSetting() {
 
-	return SSC_FEED_SERVICE_INFO;
+	return new StatusCheckerFeedProfilerSetting();
     }
 }

@@ -258,7 +258,7 @@ public class SiteInfo implements ISiteInfo {
 		constraints += "[*:method/@methodID='" + methodId + "']";
 	    }
 	    if (qualityControlLevelCode != null && !qualityControlLevelCode.isEmpty()) {
-		constraints += "[*:qualityControlLevel/*:qualityControlLevelCode='" + qualityControlLevelCode + "']";
+		constraints += "[*:qualityControlLevel/@qualityControlLevelID='" + qualityControlLevelCode + "']";
 	    }
 	    if (sourceId != null && !sourceId.isEmpty()) {
 		constraints += "[*:source/@sourceID='" + sourceId + "']";

@@ -28,7 +28,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.jaxb.csw._2_0_2.ExceptionCode;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.web.KeyValueParser;
@@ -41,20 +40,7 @@ import eu.essi_lab.pdk.handler.selector.HandlerSelector;
 /**
  * @author boldrini
  */
-public class SemanticProfiler extends Profiler {
-
-    /**
-     * The profiler type
-     */
-    private static final String SEMANTIC_PROFILER_TYPE = "SEMANTIC";
-
-    public static final ProfilerSetting SEMANTIC_INFO = new ProfilerSetting();
-    static {
-	SEMANTIC_INFO.setServiceName("SEMANTIC");
-	SEMANTIC_INFO.setServiceType(SEMANTIC_PROFILER_TYPE);
-	SEMANTIC_INFO.setServicePath("semantic");
-	SEMANTIC_INFO.setServiceVersion("0.0");
-    }
+public class SemanticProfiler extends Profiler<SemanticProfilerSetting> {
 
     protected static final List<String> SUPPORTED_VERSIONS = new ArrayList<>();
 
@@ -76,7 +62,7 @@ public class SemanticProfiler extends Profiler {
 
 	VariableTableHandler handler1 = new VariableTableHandler();
 	selector.register(new VariableTableRequestFilter(), handler1);
-	
+
 	SPARQLHandler handler2 = new SPARQLHandler();
 	selector.register(new SPARQLRequestFilter(), handler2);
 
@@ -127,8 +113,8 @@ public class SemanticProfiler extends Profiler {
     }
 
     @Override
-    protected ProfilerSetting initSetting() {
+    protected SemanticProfilerSetting initSetting() {
 
-	return SEMANTIC_INFO;
+	return new SemanticProfilerSetting();
     }
 }

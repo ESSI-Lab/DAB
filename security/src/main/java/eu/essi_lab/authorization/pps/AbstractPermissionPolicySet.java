@@ -559,6 +559,7 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
 		"bnhs", //
 		"thredds", //
 		"csw", //
+		"metrics", //
 		"cswisogeo", //
 		"oaipmh", //
 		"hiscentral.asmx", //
@@ -570,6 +571,7 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
 		"sos", //
 		"wfs", //
 		"wms-extent", //
+		"wms-cluster", //		
 		"oapi", //
 		"gwis", //
 		"ArcGIS", //
@@ -593,6 +595,7 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
 		"thredds", //
 		"wms", //
 		"wms-extent", //
+		"wms-cluster", //
 		"oapi", //
 		"wfs", //
 		"sos", //

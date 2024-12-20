@@ -51,6 +51,7 @@ import eu.essi_lab.model.resource.data.DataFormat;
 import eu.essi_lab.model.resource.data.dimension.DataDimension;
 import eu.essi_lab.pdk.wrt.AccessRequestTransformer;
 import eu.essi_lab.profiler.thredds.THREDDSProfiler;
+import eu.essi_lab.profiler.thredds.THREDDSProfilerSetting;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
 
 public class THREDDSDDSTransformer extends AccessRequestTransformer {
@@ -118,7 +119,6 @@ public class THREDDSDDSTransformer extends AccessRequestTransformer {
 
 	discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
 	discoveryMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
-	
 
 	SimpleValueBond bond = BondFactory.createSimpleValueBond(//
 		BondOperator.EQUAL, //
@@ -176,7 +176,7 @@ public class THREDDSDDSTransformer extends AccessRequestTransformer {
     @Override
     public String getProfilerType() {
 
-	return THREDDSProfiler.THREDDS_SERVICE_INFO.getServiceType();
+	return new THREDDSProfilerSetting().getServiceType();
     }
 
     @Override

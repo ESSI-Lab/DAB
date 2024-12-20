@@ -45,7 +45,6 @@ import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.RuntimeInfoElement;
-import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.Pluggable;
 import eu.essi_lab.model.resource.GSResource;
@@ -234,11 +233,9 @@ import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
  *
  * @author Fabrizio
  */
-public abstract class Profiler implements Configurable<ProfilerSetting>, WebRequestHandler, Pluggable, RuntimeInfoProvider {
+public abstract class Profiler<PS extends ProfilerSetting> implements Configurable<PS>, WebRequestHandler, Pluggable, RuntimeInfoProvider {
 
-    private static final String NO_VALIDATOR_FOUND = "NO_VALIDATOR_FOUND";
-
-    private ProfilerSetting setting;
+    private PS setting;
 
     //
     //
@@ -273,6 +270,7 @@ public abstract class Profiler implements Configurable<ProfilerSetting>, WebRequ
      * Creates a new instance of <code>Profiler</code>
      */
     public Profiler() {
+	
 	configure(initSetting());
     }
 
@@ -289,12 +287,13 @@ public abstract class Profiler implements Configurable<ProfilerSetting>, WebRequ
      *
      * @return a non <code>null</code> {@link ProfilerSetting}
      */
-    protected abstract ProfilerSetting initSetting();
+    protected abstract PS initSetting();
 
     /**
      * @param setting
      */
-    public void configure(ProfilerSetting setting) {
+    @Override
+    public void configure(PS setting) {
 
 	this.setting = setting;
     }
@@ -302,7 +301,7 @@ public abstract class Profiler implements Configurable<ProfilerSetting>, WebRequ
     /**
      * @return
      */
-    public ProfilerSetting getSetting() {
+    public PS getSetting() {
 
 	return setting;
     }
@@ -383,11 +382,11 @@ public abstract class Profiler implements Configurable<ProfilerSetting>, WebRequ
 			handler.getClass().getSimpleName());
 
 		onFilterAccept(request, handler);
-		
+
 		//
-		// request validation (optional) 
-		// 
-		
+		// request validation (optional)
+		//
+
 		WebRequestValidator validator = null;
 		RequestType requestType = null;
 
@@ -439,7 +438,7 @@ public abstract class Profiler implements Configurable<ProfilerSetting>, WebRequ
 
 		    GSLoggerFactory.getLogger(getClass()).warn("No validator found");
 		}
-		
+
 		//
 		// request handling
 		//

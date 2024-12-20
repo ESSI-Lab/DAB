@@ -28,66 +28,64 @@ import java.util.Set;
 
 public class ReportManager {
 
-    public ReportManager() {
+	public ReportManager() {
 
-    }
+	}
 
-    private HashMap<String, DocumentReport> metadatas = new HashMap<>();
+	private HashMap<String, DocumentReport> metadatas = new HashMap<>();
 
-    public HashMap<String, DocumentReport> getMetadatas() {
-        return metadatas;
-    }
+	public HashMap<String, DocumentReport> getMetadatas() {
+		return metadatas;
+	}
 
-    private HashMap<MetadataElement, ReportResult> reportResults = new HashMap<>();
+	private HashMap<MetadataElement, ReportResult> reportResults = new HashMap<>();
 
-    public HashMap<MetadataElement, ReportResult> getReportResults() {
-	return reportResults;
-    }
+	public HashMap<MetadataElement, ReportResult> getReportResults() {
+		return reportResults;
+	}
 
-    public void reset() {
-	metadatas = new HashMap<>();
-	reportResults = new HashMap<>();
-    }
+	public void reset() {
+		metadatas = new HashMap<>();
+		reportResults = new HashMap<>();
+	}
 
-    public void addDocumentReport(String id, DocumentReport metadata) {
-	metadatas.put(id, metadata);
-    }
+	public void addDocumentReport(String id, DocumentReport metadata) {
+		metadatas.put(id, metadata);
+	}
 
-    public void printStatistics() {
-	int total = metadatas.size();
-	System.out.println("Metadata documents: " + total);
-	Set<Entry<String, DocumentReport>> set = metadatas.entrySet();
-	reportResults = new HashMap<>();
-	for (Entry<String, DocumentReport> entry : set) {
-	    String id = entry.getKey();
-	    DocumentReport metadata = entry.getValue();
-	    HashMap<MetadataElement, List<String>> innerMap = metadata.getMap();
-	    Set<Entry<MetadataElement, List<String>>> innerEntries = innerMap.entrySet();
-	    for (Entry<MetadataElement, List<String>> innerEntry : innerEntries) {
+	public void printStatistics() {
+		int total = metadatas.size();
+		System.out.println("Metadata documents: " + total);
+		Set<Entry<String, DocumentReport>> set = metadatas.entrySet();
+		reportResults = new HashMap<>();
+		for (Entry<String, DocumentReport> entry : set) {
+			String id = entry.getKey();
+			DocumentReport metadata = entry.getValue();
+			HashMap<MetadataElement, List<String>> innerMap = metadata.getMap();
+			Set<Entry<MetadataElement, List<String>>> innerEntries = innerMap.entrySet();
+			for (Entry<MetadataElement, List<String>> innerEntry : innerEntries) {
 
-		MetadataElement element = innerEntry.getKey();
-		List<String> values = innerEntry.getValue();
-		if (values != null && !values.isEmpty()) {
-		    ReportResult reportResult = reportResults.get(element);
-		    if (reportResult == null) {
-			reportResult = new ReportResult();
-			reportResult.setTotal(total);
-		    }
-		    reportResults.put(element, reportResult);
-		    reportResult.addValue(values);
+				MetadataElement element = innerEntry.getKey();
+				List<String> values = innerEntry.getValue();
+				if (values != null && !values.isEmpty()) {
+					ReportResult reportResult = reportResults.get(element);
+					if (reportResult == null) {
+						reportResult = new ReportResult();
+						reportResult.setTotal(total);
+					}
+					reportResults.put(element, reportResult);
+					reportResult.addValue(values);
+				}
+			}
 		}
-	    }
+		for (Entry<MetadataElement, ReportResult> entry : reportResults.entrySet()) {
+			MetadataElement element = entry.getKey();
+			ReportResult reportResult = entry.getValue();
+			int count = reportResult.getCount();
+			int percent = (int) (((double) count / (double) total) * 100.0);
+			System.out.println(element + ": " + count + " (" + percent + "%)");
+		}
+
 	}
-	for (Entry<MetadataElement, ReportResult> entry : reportResults.entrySet()) {
-	    MetadataElement element = entry.getKey();
-	    ReportResult reportResult = entry.getValue();
-	    int count = reportResult.getCount();
-	    int percent = (int) (((double) count / (double) total) * 100.0);
-	    System.out.println(element + ": " + count + " (" + percent + "%)");
-	}
-
-    }
-
-
 
 }

@@ -70,6 +70,12 @@ public abstract class JobStatus {
 	 */
 	ERROR("Error");
 
+	public static final String RUNNING_LABEL = "Running";
+	public static final String RESCHEDULED_LABEL = "Rescheduled";
+	public static final String COMPLETED_LABEL = "Completed";
+	public static final String CANCELED_LABEL = "Canceled";
+	public static final String ERROR_LABEL = "Error";
+
 	private String label;
 
 	/**
@@ -244,16 +250,16 @@ public abstract class JobStatus {
 
 		    return o.keySet().stream().//
 
-		    filter(k -> !k.equals("timeStamp")).//
-		    sorted((k1, k2) -> {
+			    filter(k -> !k.equals("timeStamp")).//
+			    sorted((k1, k2) -> {
 
-			int v1 = Integer.valueOf(k1.equals("message") ? "1" : k1.replace("message ", ""));
-			int v2 = Integer.valueOf(k2.equals("message") ? "1" : k2.replace("message ", ""));
+				int v1 = Integer.valueOf(k1.equals("message") ? "1" : k1.replace("message ", ""));
+				int v2 = Integer.valueOf(k2.equals("message") ? "1" : k2.replace("message ", ""));
 
-			return Integer.compare(v1, v2);
-		    }).//
+				return Integer.compare(v1, v2);
+			    }).//
 
-		    map(k -> o.get(k).toString());
+			    map(k -> o.get(k).toString());
 		}).//
 
 		collect(Collectors.toList());
@@ -404,12 +410,12 @@ public abstract class JobStatus {
 	    GSLoggerFactory.getLogger(getClass()).warn("Missing message");
 	    return;
 	}
-	
+
 	// to avoid SQL error in MySQLConnectionManager.execUpdate
-	// java.sql.SQLSyntaxErrorException: You have an error in your SQL syntax; 
+	// java.sql.SQLSyntaxErrorException: You have an error in your SQL syntax;
 	// check the manual that corresponds to your MySQL server version for the right syntax to use near '['
 	message = message.replace("'", "");
-	
+
 	// " are not allowed in JSON
 	message = message.replace("\"", "");
 

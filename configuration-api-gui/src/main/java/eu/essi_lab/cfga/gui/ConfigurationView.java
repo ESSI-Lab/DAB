@@ -194,7 +194,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 	// headerImage.setHeight("44px");
 
 	headerLabel = new Label();
-	headerLabel.getStyle().set("font-size", "35px");
+	headerLabel.getStyle().set("font-size", "28px");
 	headerLabel.setWidthFull();
 
 	UI.getCurrent().getPage().retrieveExtendedClientDetails(receiver -> {
@@ -659,6 +659,33 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
      * @param width
      * @param height
      */
+    public void setHeaderImageUrl(String source, int width, int height) {
+
+	headerImage.setSrc(source);
+
+	if (height > 0) {
+	    headerImage.setHeight(String.valueOf(height) + "px");
+	}
+
+	if (width > 0) {
+	    headerImage.setWidth(String.valueOf(width) + "px");
+	}
+    }
+
+    /**
+     * @param source
+     * @param height
+     */
+    public void setHeaderImageUrl(String source, int height) {
+
+	setHeaderImageUrl(source, -1, height);
+    }
+
+    /**
+     * @param source
+     * @param width
+     * @param height
+     */
     public void setHeaderImage(InputStream source, int width, int height) {
 
 	StreamResource resource = new StreamResource("icon", new InputStreamFactory() {
@@ -714,6 +741,22 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	headerLabel.setText(headerText);
 	headerLabel.getStyle().set("width", width + "px");
+    }
+
+    /**
+     * @return
+     */
+    public Image getHeaderImage() {
+
+	return headerImage;
+    }
+
+    /**
+     * @return the headerLabel
+     */
+    public Label getHeaderLabel() {
+
+	return headerLabel;
     }
 
     /**
@@ -863,18 +906,6 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 		if (showDirective.isPresent()) {
 
-		    showDirective.get().getSortDirection().ifPresent(d -> {
-
-			switch (d) {
-			case ASCENDING:
-			    settings.sort((s1, s2) -> s1.getName().compareTo(s2.getName()));
-			    break;
-			case DESCENDING:
-			    settings.sort((s1, s2) -> s2.getName().compareTo(s1.getName()));
-			    break;
-			}
-		    });
-
 		    tabName = showDirective.get().getName();
 		}
 
@@ -902,8 +933,9 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 			orientation, //
 			tabName, //
 			addDirective, //
-			removeDirective, editDirective);
-
+			removeDirective,//
+			editDirective);
+			
 		container.getElement().getStyle().set("margin-left", "auto");
 		container.getElement().getStyle().set("margin-right", "auto");
 

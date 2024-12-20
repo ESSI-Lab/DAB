@@ -180,11 +180,10 @@
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 	
-	<!-- ================================== -->
-	<!--   ProfilerServiceFilter (disabled) -->
-	<!-- ================================== -->
-	
-	<!-- 
+	<!-- ======================== -->
+	<!--   ProfilerServiceFilter  -->
+	<!-- ======================== -->
+		
 	<filter>
 		<filter-name>ProfilerServiceFilter</filter-name>
 		<filter-class>eu.essi_lab.gssrv.servlet.ProfilerServiceFilter</filter-class>		
@@ -195,6 +194,5 @@
 		<filter-name>ProfilerServiceFilter</filter-name>
 		<url-pattern>*</url-pattern>
 	</filter-mapping>
-	-->
 	
 </web-app>

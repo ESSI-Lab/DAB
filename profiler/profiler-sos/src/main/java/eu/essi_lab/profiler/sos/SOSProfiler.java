@@ -28,7 +28,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.jaxb.csw._2_0_2.ExceptionCode;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.web.KeyValueParser;
@@ -64,20 +63,7 @@ import eu.essi_lab.profiler.sos.sensor.DescribeSensorTransformer;
  * 
  * @author boldrini
  */
-public class SOSProfiler extends Profiler {
-
-    /**
-     * The profiler type
-     */
-    private static final String SOS_PROFILER_TYPE = "SOS";
-
-    public static final ProfilerSetting SOS_SERVICE_INFO = new ProfilerSetting();
-    static {
-	SOS_SERVICE_INFO.setServiceName("Sensor Observation Service");
-	SOS_SERVICE_INFO.setServiceType(SOS_PROFILER_TYPE);
-	SOS_SERVICE_INFO.setServicePath("sos");
-	SOS_SERVICE_INFO.setServiceVersion("2.0");
-    }
+public class SOSProfiler<SOSPS extends SOSProfilerSetting> extends Profiler<SOSProfilerSetting> {
 
     public static final List<String> SUPPORTED_VERSIONS = new ArrayList<>();
 
@@ -103,8 +89,7 @@ public class SOSProfiler extends Profiler {
 	getFeatureOfInterestHandler.setRequestTransformer(new GetFeatureOfInterestTransformer());
 	getFeatureOfInterestHandler.setMessageResponseFormatter(new GetFeatureOfInterestFormatter());
 	selector.register(new GetFeatureOfInterestFilter(), getFeatureOfInterestHandler);
-	
-	
+
 	DiscoveryHandler<String> getDescribeSensorHandler = new DiscoveryHandler<>();
 	getDescribeSensorHandler.setMessageResponseMapper(new DescribeSensorMapper());
 	getDescribeSensorHandler.setRequestTransformer(new DescribeSensorTransformer());
@@ -178,9 +163,9 @@ public class SOSProfiler extends Profiler {
     }
 
     @Override
-    protected ProfilerSetting initSetting() {
+    protected SOSProfilerSetting initSetting() {
 
-	return SOS_SERVICE_INFO;
+	return new SOSProfilerSetting();
     }
 
 }

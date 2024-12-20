@@ -23,6 +23,7 @@ package eu.essi_lab.accessor.emodnet;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.AbstractMap.SimpleEntry;
 
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -74,21 +75,31 @@ public class EMODNETPhysicsConnector extends HarvestedQueryConnector<EMODNETPhys
 
 	ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<>();
 
-	List<String> identifiers;
+	SimpleEntry<List<String>, List<String>> datasetIdentifiers;
 	try {
-	    identifiers = client.getIdentifiers();
+	    datasetIdentifiers = client.getIdentifiers();
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    throw GSException.createException();
 	}
+	List<String> identifiers = datasetIdentifiers.getKey();
+	List<String> metadataIdentifiers = datasetIdentifiers.getValue();
+
 	for (String identifier : identifiers) {
-	    JSONObject metadata;
+	    JSONObject metadata = null;
+	    JSONObject additionalMetadata = null;
 	    try {
 		metadata = client.getMetadata(identifier);
+		String metadataIdentifier = identifier + "_METADATA";
+		if (metadataIdentifiers.contains(metadataIdentifier)) {
+		    additionalMetadata = client.getMetadata(metadataIdentifier);
+		    metadata.put("additionalMetadata", additionalMetadata);
+		}
 	    } catch (Exception e) {
 		e.printStackTrace();
 		throw GSException.createException();
 	    }
+
 	    OriginalMetadata metadataRecord = new OriginalMetadata();
 	    metadataRecord.setMetadata(metadata.toString());
 	    metadataRecord.setSchemeURI(CommonNameSpaceContext.EMODNET_PHYSICS_NS_URI);
@@ -96,14 +107,11 @@ public class EMODNETPhysicsConnector extends HarvestedQueryConnector<EMODNETPhys
 	    GSPropertyHandler handler = GSPropertyHandler.of(new GSProperty<Boolean>("isDownloadLink", isDownloadLink));
 	    if (isDownloadLink) {
 		String downloadLink = getSourceURL() + "/tabledap/" + identifier + ".nc";
-		handler.add(//
-			new GSProperty<String>("downloadLink", downloadLink));
+		handler.add(new GSProperty<String>("downloadLink", downloadLink));
 	    }
 	    metadataRecord.setAdditionalInfo(handler);
 	    ret.addRecord(metadataRecord);
-
 	}
-
 	return ret;
 
     }

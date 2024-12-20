@@ -22,6 +22,7 @@ package eu.essi_lab.accessor.wof;
  */
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -320,13 +321,13 @@ public class WML_1_1Mapper extends OriginalIdentifierMapper {
 	    // TODO: use libraries to convert between the two geographical crs
 	    // based on srs. For the moment, no conversion is made; the error
 	    // (only on latitudes) is usually however very low e.g. 48.7438798543649 instead of 48.7438798534299
-	    Double north = Double.parseDouble(siteInfo.getLatitude());
-	    Double east = Double.parseDouble(siteInfo.getLongitude());
-	    if (north > 90 || north < -90) {
+	    BigDecimal north = new BigDecimal(siteInfo.getLatitude());
+	    BigDecimal east = new BigDecimal(siteInfo.getLongitude());
+	    if (north.compareTo(new BigDecimal(90)) > 0 || north.compareTo(new BigDecimal(-90)) < 0) {
 		String warn = "Invalid latitude for station: " + platformIdentifier;
 		GSLoggerFactory.getLogger(getClass()).warn(warn);
 	    }
-	    if (east > 180 || east < -180) {
+	    if (east.compareTo(new BigDecimal(180)) > 0 || east.compareTo(new BigDecimal(-180)) < 0) {
 		String warn = "Invalid longitude for station: " + platformIdentifier;
 		GSLoggerFactory.getLogger(getClass()).warn(warn);
 	    }

@@ -31,11 +31,13 @@ import java.util.stream.Collectors;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import eu.essi_lab.accessor.sensorthings._1_1.SensorThingsConnector;
 import eu.essi_lab.accessor.sensorthings._1_1.SensorThingsMangler;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
 import eu.essi_lab.iso.datamodel.classes.DataIdentification;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.iso.datamodel.classes.Keywords;
+import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.lib.sensorthings._1_1.client.SensorThingsClient;
 import eu.essi_lab.lib.sensorthings._1_1.client.request.EntityRef;
 import eu.essi_lab.lib.sensorthings._1_1.client.request.FluentSensorThingsRequest;
@@ -82,10 +84,8 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
      */
     public static List<String> getNames() {
 
-	return StreamUtils
-		.iteratorToStream(//
-			ServiceLoader.load(IResourceMapper.class).iterator())
-		.//
+	return StreamUtils.iteratorToStream(//
+		ServiceLoader.load(IResourceMapper.class).iterator()).//
 		filter(m -> m instanceof SensorThingsMapper).//
 		map(m -> (SensorThingsMapper) m).//
 		map(m -> m.getProfileName()).//
@@ -97,10 +97,8 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
      */
     public static List<String> getSchemas() {
 
-	return StreamUtils
-		.iteratorToStream(//
-			ServiceLoader.load(IResourceMapper.class).iterator())
-		.//
+	return StreamUtils.iteratorToStream(//
+		ServiceLoader.load(IResourceMapper.class).iterator()).//
 		filter(m -> m instanceof SensorThingsMapper).//
 		map(m -> (SensorThingsMapper) m).//
 		map(m -> m.getSupportedOriginalMetadataSchema()).//
@@ -113,10 +111,8 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
      */
     public static String getSchema(String profileName) {
 
-	return StreamUtils
-		.iteratorToStream(//
-			ServiceLoader.load(IResourceMapper.class).iterator())
-		.//
+	return StreamUtils.iteratorToStream(//
+		ServiceLoader.load(IResourceMapper.class).iterator()).//
 		filter(m -> m instanceof SensorThingsMapper).//
 		map(m -> (SensorThingsMapper) m).//
 		filter(m -> m.getProfileName().equals(profileName)).//
@@ -204,6 +200,8 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 
 	EntityRef entitySet = originalMD.getAdditionalInfo().get("entitySet", EntityRef.class);
 
+	Boolean discardStations = originalMD.getAdditionalInfo().get("discardStation", Boolean.class);
+
 	GSResource resource = null;
 
 	if (entitySet == EntityRef.THINGS) {
@@ -213,7 +211,7 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	    resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().setHierarchyLevelName("series");
 	    resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().addHierarchyLevelScopeCodeListValue("series");
 
-	    mapCollection(entityId, (DatasetCollection) resource);
+	    mapCollection(entityId, (DatasetCollection) resource, discardStations);
 
 	} else {
 
@@ -225,7 +223,7 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	    String parentId = originalMD.getAdditionalInfo().get("parentId", String.class);
 	    resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().setParentIdentifier(parentId);
 
-	    mapDataset(entityId, (Dataset) resource);
+	    mapDataset(entityId, (Dataset) resource, discardStations);
 	}
 
 	return resource;
@@ -304,7 +302,8 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
      * @param dataId
      * @return
      */
-    protected abstract void addPlatform(Thing thing, CoreMetadata coreMetadata, DataIdentification dataId, Keywords keywords,ExtensionHandler handler);
+    protected abstract void addPlatform(Thing thing, CoreMetadata coreMetadata, DataIdentification dataId, Keywords keywords,
+	    ExtensionHandler handler);
 
     /**
      * @param location
@@ -370,9 +369,26 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
      * @param dataset
      * @throws GSException
      */
-    protected void mapDataset(String streamId, Dataset dataset) throws GSException {
+    protected void mapDataset(String streamId, Dataset dataset, Boolean discardStations) throws GSException {
 
 	Datastream stream = downloadStrem(streamId);
+//	if (discardStations) {
+//	    stream = downloadStrem(streamId);
+//	} else {
+//	    try {
+//		String optString = SensorThingsConnector.getFakeStream();
+//		if (optString != null) {
+//		    JSONObject jsonEntity = new JSONObject(optString);
+//		    stream = new Datastream(jsonEntity);
+//		}
+//	    } catch (Exception e) {
+//
+//		GSLoggerFactory.getLogger(getClass()).equals(e);
+//
+//		throw GSException.createException(getClass(), getDownloadStreamErrorMessage(), e);
+//	    }
+//
+//	}
 
 	CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
 	DataIdentification dataId = coreMetadata.getDataIdentification();
@@ -415,7 +431,7 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	// Platform, Vertical extent and keywords (from the expanded Thing)
 	//
 
-	addPlatform(thing, coreMetadata, dataId, keywords,  dataset.getExtensionHandler());
+	addPlatform(thing, coreMetadata, dataId, keywords, dataset.getExtensionHandler());
 
 	//
 	// Responsible party
@@ -449,7 +465,6 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	//
 	// Distribution info
 	//
-
 	addDistributionInfo(stream, coreMetadata, dataset.getSource().getEndpoint());
 
 	//
@@ -470,6 +485,18 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 
 	    // ObservedArea observedArea = optObservedArea.get();
 	}
+
+	if (!discardStations) {
+	    TemporalExtent temporalExtent = dataId.getTemporalExtent();
+	    if (temporalExtent != null) {
+		String start = temporalExtent.getBeginPosition();
+		if (start == null || start.isEmpty()) {
+		    dataId.addTemporalExtent("2024-01-01T00:00:00Z", "2024-11-21T00:00:00Z");
+		}
+	    } else {
+		dataId.addTemporalExtent("2024-01-01T00:00:00Z", "2024-11-21T00:00:00Z");
+	    }
+	}
     }
 
     /**
@@ -477,7 +504,7 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
      * @param collection
      * @throws GSException
      */
-    protected void mapCollection(String thingId, DatasetCollection collection) throws GSException {
+    protected void mapCollection(String thingId, DatasetCollection collection, Boolean discardStations) throws GSException {
 
 	Thing thing = downloadThing(thingId);
 
@@ -533,6 +560,18 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	List<Datastream> datastreams = thing.getDatastreams();
 
 	addTemporalExtent(datastreams, dataId);
+
+	if (!discardStations) {
+	    TemporalExtent temporalExtent = dataId.getTemporalExtent();
+	    if (temporalExtent != null) {
+		String start = temporalExtent.getBeginPosition();
+		if (start == null || start.isEmpty()) {
+		    dataId.addTemporalExtent("2024-01-01T00:00:00Z", "2024-11-21T00:00:00Z");
+		}
+	    } else {
+		dataId.addTemporalExtent("2024-01-01T00:00:00Z", "2024-11-21T00:00:00Z");
+	    }
+	}
     }
 
     /**
@@ -544,11 +583,10 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 
 	SensorThingsRequest sensorThingsRequest = createRequest().//
 		add(EntityRef.DATASTREAMS, streamId).//
-		with(SystemQueryOptions.get()
-			.expand(new ExpandOption(//
-				ExpandItem.get(EntityRef.THING, EntityRef.LOCATIONS), //
-				ExpandItem.get(EntityRef.SENSOR), //
-				ExpandItem.get(EntityRef.OBSERVED_PROPERTY))));
+		with(SystemQueryOptions.get().expand(new ExpandOption(//
+			ExpandItem.get(EntityRef.THING, EntityRef.LOCATIONS), //
+			ExpandItem.get(EntityRef.SENSOR), //
+			ExpandItem.get(EntityRef.OBSERVED_PROPERTY))));
 
 	Optional<AddressableEntityResult<Datastream>> entityResponse;
 
@@ -576,12 +614,11 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 
 	SensorThingsRequest sensorThingsRequest = createRequest().//
 		add(EntityRef.THINGS, thingId).//
-		with(SystemQueryOptions.get()
-			.expand(new ExpandOption(//
-				ExpandItem.get(EntityRef.LOCATIONS), //
-				ExpandItem.get(EntityRef.HISTORICAL_LOCATIONS), //
-				// only phenomenonTime is required
-				ExpandItem.get(EntityRef.DATASTREAMS, Operation.SELECT, "phenomenonTime"))));
+		with(SystemQueryOptions.get().expand(new ExpandOption(//
+			ExpandItem.get(EntityRef.LOCATIONS), //
+			ExpandItem.get(EntityRef.HISTORICAL_LOCATIONS), //
+			// only phenomenonTime is required
+			ExpandItem.get(EntityRef.DATASTREAMS, Operation.SELECT, "phenomenonTime"))));
 
 	Optional<AddressableEntityResult<Thing>> entityResponse;
 

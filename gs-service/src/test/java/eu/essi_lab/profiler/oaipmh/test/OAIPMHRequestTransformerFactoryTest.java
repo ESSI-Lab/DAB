@@ -8,19 +8,19 @@ import org.junit.Test;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformerFactory;
-import eu.essi_lab.profiler.oaipmh.OAIPMHProfiler;
- 
+import eu.essi_lab.profiler.oaipmh.OAIPMHProfilerSetting;
+
 public class OAIPMHRequestTransformerFactoryTest {
 
     @Test
-    public void test(){
-	
+    public void test() {
+
 	List<DiscoveryRequestTransformer> transformers = DiscoveryRequestTransformerFactory.loadTransformers(//
 		new ESSILabProvider(), //
-		OAIPMHProfiler.OAI_PMH_PROFILER_TYPE);//
+		new OAIPMHProfilerSetting().getServiceType());//
 	Assert.assertFalse(transformers.isEmpty());
-	
+
 	DiscoveryRequestTransformer webRequestTransformer = transformers.get(0);
-	Assert.assertEquals(webRequestTransformer.getProfilerType(), OAIPMHProfiler.OAI_PMH_PROFILER_TYPE);
+	Assert.assertEquals(webRequestTransformer.getProfilerType(), new OAIPMHProfilerSetting().getServiceType());
     }
 }

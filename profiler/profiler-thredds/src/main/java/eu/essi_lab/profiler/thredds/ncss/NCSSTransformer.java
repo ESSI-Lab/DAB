@@ -50,7 +50,7 @@ import eu.essi_lab.model.resource.data.CRS;
 import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.model.resource.data.DataFormat;
 import eu.essi_lab.pdk.wrt.AccessRequestTransformer;
-import eu.essi_lab.profiler.thredds.THREDDSProfiler;
+import eu.essi_lab.profiler.thredds.THREDDSProfilerSetting;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
 
 public class NCSSTransformer extends AccessRequestTransformer {
@@ -97,7 +97,7 @@ public class NCSSTransformer extends AccessRequestTransformer {
 
 		return Optional.of(descriptor);
 	    }
-	
+
 	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(getClass()).warn("Can't get target descriptor", e);
@@ -120,7 +120,6 @@ public class NCSSTransformer extends AccessRequestTransformer {
 
 	discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
 	discoveryMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
-	
 
 	SimpleValueBond bond = BondFactory.createSimpleValueBond(//
 		BondOperator.EQUAL, //
@@ -178,7 +177,7 @@ public class NCSSTransformer extends AccessRequestTransformer {
     @Override
     public String getProfilerType() {
 
-	return THREDDSProfiler.THREDDS_SERVICE_INFO.getServiceType();
+	return new THREDDSProfilerSetting().getServiceType();
     }
 
     @Override

@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import eu.essi_lab.accessor.wof.discovery.series.SeriesRecordCreator;
+import eu.essi_lab.profiler.wof.discovery.series.SeriesRecordCreator;
 
 public class SeriesRecordCreatorTest {
 

@@ -428,6 +428,11 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-openmetrics</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>profiler-gwis</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
@@ -494,6 +499,11 @@
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>profiler-wms-extent</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>profiler-wms-cluster</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
@@ -567,6 +577,12 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-egy-mwri</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>accessor-niwa</artifactId>

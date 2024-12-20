@@ -28,7 +28,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.jaxb.csw._2_0_2.ExceptionCode;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.web.KeyValueParser;
@@ -41,21 +40,7 @@ import eu.essi_lab.pdk.handler.selector.HandlerSelector;
 import eu.essi_lab.pdk.handler.selector.WebRequestFilter;
 import eu.essi_lab.profiler.esri.proxy.FeatureServerProxyHandler;
 
-public class ESRIProfilerProxy extends Profiler {
-
-    /**
-     * The profiler type
-     */
-    private static final String ESRI_PROFILER_TYPE = "ESRIPROXY";
-
-    public static final ProfilerSetting ESRI_INFO = new ProfilerSetting();
-    static {
-	ESRI_INFO.setServiceName("ESRIPROXY");
-	ESRI_INFO.setServiceType(ESRI_PROFILER_TYPE);
-	ESRI_INFO.setServicePath("ArcGISProxy");
-//	ESRI_INFO.setServicePath("ArcGIS");
-	ESRI_INFO.setServiceVersion("0.0");
-    }
+public class ESRIProfilerProxy extends Profiler<ESRIProfilerProxySetting> {
 
     protected static final List<String> SUPPORTED_VERSIONS = new ArrayList<>();
 
@@ -77,7 +62,7 @@ public class ESRIProfilerProxy extends Profiler {
 
 	// FEATURE SERVER
 	selector.register(new WebRequestFilter() {
-	    
+
 	    @Override
 	    public boolean accept(WebRequest request) throws GSException {
 		return true;
@@ -131,8 +116,8 @@ public class ESRIProfilerProxy extends Profiler {
     }
 
     @Override
-    protected ProfilerSetting initSetting() {
+    protected ESRIProfilerProxySetting initSetting() {
 
-	return ESRI_INFO;
+	return new ESRIProfilerProxySetting();
     }
 }

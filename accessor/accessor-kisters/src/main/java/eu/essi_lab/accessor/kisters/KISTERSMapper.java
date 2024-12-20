@@ -59,7 +59,6 @@ public class KISTERSMapper extends AbstractResourceMapper {
 
 	switch (entity.getType()) {
 	case STATION:
-
 	    resource = mapStation(entity, source);
 	    break;
 	case TIME_SERIES:

@@ -93,6 +93,12 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 
     private static final String RESOURCE_ID_KEY = "id";
 
+    private static final String BACKGROUND_INFO_URL = "https://agrostac.wenr.wur.nl/pdf/AGROSTAC-API-crop.pdf";
+
+    // private List<String> keywords = Arrays.asList("AGROSTAC");
+
+    private String AGROSTAC_KEYWORD = "AGROSTAC";
+
     // DATASET INFO
     private static final String LICENSE = "license";
     private static final String WIKI_URL = "wiki_url";
@@ -161,20 +167,28 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 
     public enum CROP_CODES {
 
-	BN("common_beans","1105010018"),WHD("durum_hard_wheat","1101010020"),TRI("triticale","1101050000"),ONI("onions","1103110040"),SBN("soy_soybeans", "1106000020"), CBN("beans", "1105010010"), COT("cotton", "1108000010"), SUN("sunflower", "1106000010"), RYEW(
-		"winter_rye", "1101030001"), WHBW("winter_common_soft_wheat", "1101010011"), TRO("unspecified_wheat", "1101010000"), SGG(
-			"unspecified_sorghum", "1101070030"), PML("unspecified_millet", "1101070010"), RIC("rice", "1101080000"), GRS(
-				"grass_fodder_crops", "1111000000"), RAP("rapeseed_rape", "1106000030"), RAPW("winter_rapeseed_rape",
-					"1106000031"), POT("potatoes", "1107000010"), FAB("beans", "1105010010"), RYE("unspecified_rye",
-						"1101030000"), OAT("unspecified_oats", "1101040000"), LABL("beans",
-							"1105010010"), MAZ("maize", "1101060000"), RAPI("brassicaceae_cruciferae",
-								"1103050000"), BAR("unspecified_barley", "1101020000"), PEA("peas",
-									"1105010020"), WHB("common_soft_wheat", "1101010010"), BBN("beans",
-										"1105010010"), FBT("fodder_beet", "1107000032"), FLAX(
-											"flax", "1108020010"), BARW("winter_barley",
-												"1101020001"), SBT("sugar_beet",
-													"1107000031"), BARS("spring_barley",
-														"1101020002");
+	BN("common_beans", "1105010018"), WHD("durum_hard_wheat", "1101010020"), TRI("triticale", "1101050000"), ONI("onions",
+		"1103110040"), SBN("soy_soybeans", "1106000020"), CBN("beans", "1105010010"), COT("cotton", "1108000010"), SUN("sunflower",
+			"1106000010"), RYEW("winter_rye", "1101030001"), WHBW("winter_common_soft_wheat", "1101010011"), TRO(
+				"unspecified_wheat",
+				"1101010000"), SGG("unspecified_sorghum", "1101070030"), PML("unspecified_millet", "1101070010"), RIC(
+					"rice",
+					"1101080000"), GRS("grass_fodder_crops", "1111000000"), RAP("rapeseed_rape", "1106000030"), RAPW(
+						"winter_rapeseed_rape",
+						"1106000031"), POT("potatoes", "1107000010"), FAB("beans", "1105010010"), RYE(
+							"unspecified_rye",
+							"1101030000"), OAT("unspecified_oats", "1101040000"), LABL("beans",
+								"1105010010"), MAZ("maize", "1101060000"), RAPI("brassicaceae_cruciferae",
+									"1103050000"), BAR("unspecified_barley", "1101020000"), PEA("peas",
+										"1105010020"), WHB("common_soft_wheat",
+											"1101010010"), BBN("beans", "1105010010"), FBT(
+												"fodder_beet", "1107000032"), FLAX("flax",
+													"1108020010"), BARW("winter_barley",
+														"1101020001"), SBT(
+															"sugar_beet",
+															"1107000031"), BARS(
+																"spring_barley",
+																"1101020002");
 
 	private String name;
 	private String code;
@@ -417,10 +431,10 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 		String cropCode = overviewObj.optString(CROP_CODE);
 		String cropName = overviewObj.optString(CROP_NAME);
 		String cropKey = agrostacCache.getCrop(cropCode);
-		if(cropKey != null && !cropKey.isEmpty()) {
-		    keywords.add(cropKey);    
+		if (cropKey != null && !cropKey.isEmpty()) {
+		    keywords.add(cropKey);
 		}
-		
+
 		CROP_CODES cCode = CROP_CODES.decode(cropCode);
 		String newCropCode = null;
 		if (cCode != null) {
@@ -534,6 +548,11 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 	    kwd.addKeyword(s);
 	    miMetadata.getDataIdentification().addKeywords(kwd);
 	}
+
+	// add static keyword AGROSTAC
+	Keywords agrKwd = new Keywords();
+	agrKwd.addKeyword(AGROSTAC_KEYWORD);
+	miMetadata.getDataIdentification().addKeywords(agrKwd);
 
 	extHandler.setWorldCereal(worldCerealMap);
 
@@ -738,6 +757,12 @@ public class AgrostacCollectionMapper extends FileIdentifierMapper {
 	// addDistribution(json, miMetadata);
 
 	// enrichMetadata(miMetadata);
+	Online information = new Online();
+	information.setLinkage(BACKGROUND_INFO_URL);
+	information.setProtocol(NetProtocols.HTTP.getCommonURN());
+	information.setFunctionCode("information");
+	information.setDescription("AGROSTAC API description");
+	miMetadata.getDistribution().addDistributionOnline(information);
 
 	return ret;
 

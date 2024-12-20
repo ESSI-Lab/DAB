@@ -126,13 +126,11 @@ public class SelectionUtils {
 	Setting resetSetting = targetSetting.clone();
 	resetSetting.reset();
 
-	resetSetting.setIdentifier(targetSetting.getIdentifier());
-
 	//
 	// Step 2:
 	//
 
-	applySettingAndOptionsState(targetSetting, resetSetting);
+	applySettingPropertiesAndOptionsState(targetSetting, resetSetting);
 
 	//
 	// Step 3: selected settings
@@ -168,17 +166,88 @@ public class SelectionUtils {
     }
 
     /**
-     * @param originalSetting
-     * @param outSetting
+     * {@link Setting} properties can be set outside the default constructor, that is after its initialization, so this
+     * method copies all the <code>targetSetting</code> properties to its <code>resetSetting</code>.
+     * 
+     * @param resetSetting
+     * @param targetSetting
      */
-    private static void applySettingAndOptionsState(Setting originalSetting, Setting outSetting) {
+    private static void applySettingProperties(Setting targetSetting, Setting resetSetting) {
 
-	boolean enabled = originalSetting.isEnabled();
-	outSetting.setEnabled(enabled);
+	//
+	// ConfigurationObject properties
+	//
 
-	originalSetting.getOptions().forEach(targetOption -> {
+	resetSetting.setEnabled(targetSetting.isEnabled());
 
-	    Optional<Option<?>> outOption = outSetting.//
+//	resetSetting.setCanBeDisabled(targetSetting.canBeDisabled());
+//
+//	resetSetting.setVisible(targetSetting.isVisible());
+//
+//	resetSetting.setEditable(targetSetting.isEditable());
+//
+//	targetSetting.getDescription().ifPresent(desc -> resetSetting.setDescription(desc));
+
+	//
+	// AbstractSetting properties
+	//
+
+//	resetSetting.enableCompactMode(targetSetting.isCompactModeEnabled());
+//
+//	resetSetting.enableFoldedMode(targetSetting.isFoldedModeEnabled());
+//
+//	resetSetting.setCanBeRemoved(targetSetting.canBeRemoved());
+//
+//	resetSetting.setCanBeCleaned(targetSetting.canBeCleaned());
+//
+//	resetSetting.setShowHeader(targetSetting.isShowHeaderSet());
+//
+//	targetSetting.getOptionalExtensionClass().ifPresent(clazz -> resetSetting.getObject().put("extensionClass", clazz.getName()));
+//
+//	targetSetting.getOptionalValidatorClass().ifPresent(clazz -> resetSetting.getObject().put("validatorClass", clazz.getName()));
+
+	//
+	// Setting properties
+	//
+
+	resetSetting.setIdentifier(targetSetting.getIdentifier());
+
+//	resetSetting.setName(targetSetting.getName());
+//
+//	targetSetting.getOptionalAfterCleanFunctionClass()
+//		.ifPresent(clazz -> resetSetting.getObject().put("afterCleanFunction", clazz.getName()));
+
+//	try {
+//	    resetSetting.setConfigurableType(targetSetting.getConfigurableType());
+//	} catch (RuntimeException ex) {
+//	}
+	
+	//
+	// this option becomes UNSET after a clean, so since target setting is clean and its original mode is SINGLE or
+	// MULTI, we would set to the reset setting a wrong value UNSET instead of SINGLE or MULTI.
+	//
+	// because of this, this options is ignored here and we consider only its value according
+	// to the target setting constructor
+	//
+	// resetSetting.setSelectionMode(targetSetting.getSelectionMode());
+	//
+
+    }
+
+    /**
+     * @param targetSetting
+     * @param resetSetting
+     */
+    private static void applySettingPropertiesAndOptionsState(Setting targetSetting, Setting resetSetting) {
+
+	// boolean enabled = targetSetting.isEnabled();
+	// resetSetting.setEnabled(enabled);
+
+	applySettingProperties(targetSetting, resetSetting);
+
+	targetSetting.getOptions().forEach(targetOption -> {
+
+	    Optional<Option<?>> outOption = resetSetting.//
 		    getOptions().//
 		    stream().//
 		    filter(opt -> opt.getKey().equals(targetOption.getKey())).//
@@ -194,14 +263,14 @@ public class SelectionUtils {
 	    }
 	});
 
-	originalSetting.getSettings().forEach(originalChild -> {
+	targetSetting.getSettings().forEach(originalChild -> {
 
 	    ArrayList<Setting> list = new ArrayList<Setting>();
-	    SettingUtils.deepFind(outSetting, set -> set.getIdentifier().equals(originalChild.getIdentifier()), list);
+	    SettingUtils.deepFind(resetSetting, set -> set.getIdentifier().equals(originalChild.getIdentifier()), list);
 
 	    if (!list.isEmpty()) {
 
-		applySettingAndOptionsState(originalChild, list.get(0));
+		applySettingPropertiesAndOptionsState(originalChild, list.get(0));
 	    }
 	});
     }

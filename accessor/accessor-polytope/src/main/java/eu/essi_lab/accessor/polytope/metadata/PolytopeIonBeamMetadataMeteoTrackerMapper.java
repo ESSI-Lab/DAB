@@ -105,17 +105,17 @@ public class PolytopeIonBeamMetadataMeteoTrackerMapper extends PolytopeIonBeamMe
 	dataset.getPropertyHandler().setIsTrajectory(true);
 
 	String originalMetadata = originalMD.getMetadata();
-	Map<PolytopeIonBeamMetadataVariable, PolytopeIonBeamMetadataStation> mapStations = getMapStations(originalMetadata);
+	Map<PolytopeIonBeamMetadataMeteoTrackerVariable, PolytopeIonBeamMetadataStation> mapStations = getMapStations(originalMetadata);
 
 	if (!mapStations.isEmpty()) {
 
-	    PolytopeIonBeamMetadataStation station = mapStations.get(PolytopeIonBeamMetadataVariable.TEMPERATURE);
-	    PolytopeIonBeamMetadataVariable variable = PolytopeIonBeamMetadataVariable.TEMPERATURE;
+	    PolytopeIonBeamMetadataStation station = mapStations.get(PolytopeIonBeamMetadataMeteoTrackerVariable.TEMPERATURE);
+	    PolytopeIonBeamMetadataMeteoTrackerVariable variable = PolytopeIonBeamMetadataMeteoTrackerVariable.TEMPERATURE;
 	    String abbreviation = "K";
 	    String buildingURL = "_TEMP.csv";
 	    if (station == null) {
-		station = mapStations.get(PolytopeIonBeamMetadataVariable.HUMIDITY);
-		variable = PolytopeIonBeamMetadataVariable.HUMIDITY;
+		station = mapStations.get(PolytopeIonBeamMetadataMeteoTrackerVariable.HUMIDITY);
+		variable = PolytopeIonBeamMetadataMeteoTrackerVariable.HUMIDITY;
 		buildingURL = "_HUM.csv";
 		abbreviation = "%";
 	    }
@@ -359,9 +359,9 @@ public class PolytopeIonBeamMetadataMeteoTrackerMapper extends PolytopeIonBeamMe
 
     }
 
-    protected Map<PolytopeIonBeamMetadataVariable, PolytopeIonBeamMetadataStation> readCSV(Iterable<CSVRecord> records) {
+    protected Map<PolytopeIonBeamMetadataMeteoTrackerVariable, PolytopeIonBeamMetadataStation> readCSV(Iterable<CSVRecord> records) {
 
-	Map<PolytopeIonBeamMetadataVariable, PolytopeIonBeamMetadataStation> mapStations = new HashMap<>();
+	Map<PolytopeIonBeamMetadataMeteoTrackerVariable, PolytopeIonBeamMetadataStation> mapStations = new HashMap<>();
 	Double minLon = null;
 	Double minLat = null;
 	Double maxLon = null;
@@ -389,7 +389,7 @@ public class PolytopeIonBeamMetadataMeteoTrackerMapper extends PolytopeIonBeamMe
 	    lat_lon_alt.add(lonDouble);
 	    lat_lon_alt.add(altDouble);
 	    multiPoints.add(lat_lon_alt);
-	    PolytopeIonBeamMetadataVariable pv = PolytopeIonBeamMetadataVariable.decode(varName);
+	    PolytopeIonBeamMetadataMeteoTrackerVariable pv = PolytopeIonBeamMetadataMeteoTrackerVariable.decode(varName);
 
 	    if (mapStations.isEmpty()) {
 		minLat = latDouble;

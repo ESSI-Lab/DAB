@@ -58,6 +58,11 @@ public class KISTERSClient {
     public static final String TS_FROM = "from";
     public static final String TS_TO = "to";
     public static final String GRDC_COUNTRY = "GRDCCOUNTRY";
+    private String endpoint;
+
+    public KISTERSClient(String endpoint) {
+	this.endpoint = endpoint;
+    }
 
     /**
      * @return
@@ -108,8 +113,8 @@ public class KISTERSClient {
     @SuppressWarnings("unchecked")
     public List<KISTERSEntity> retrieveTimeSeriesValues(String timeSeriesId, String from, String to) {
 
-	String query = getEndpoint() + "service=kisters&type=queryServices&request=getTimeseriesValues&datasource=1&format=json&ts_id="
-		+ timeSeriesId + "&from=" + from + "&to=" + to;
+	String query = getEndpoint() + "service=kisters&type=queryServices&request=getTimeseriesValues&format=json&ts_id=" + timeSeriesId
+		+ "&from=" + from + "&to=" + to;
 
 	Downloader downloader = new Downloader();
 	String response = downloader.downloadOptionalString(query).get();
@@ -139,8 +144,21 @@ public class KISTERSClient {
 		stream().//
 		collect(Collectors.joining(","));
 
-	return retrieveEntities("datasource=1&service=kisters&type=queryServices&request=getStationList&format=json&returnfields="
-		+ returnfields + "&flatten=true");
+	return retrieveEntities(
+		"service=kisters&type=queryServices&request=getStationList&format=json&returnfields=" + returnfields + "&flatten=true");
+    }
+    
+    /**
+     * @return
+     */
+    public List<KISTERSEntity> retrieveStationsBySiteName(String name) {
+
+	String returnfields = getStationFields().//
+		stream().//
+		collect(Collectors.joining(","));
+
+	return retrieveEntities(
+		"service=kisters&type=queryServices&request=getStationList&site_name="+name+"&format=json&returnfields=" + returnfields + "&flatten=true");
     }
 
     /**
@@ -153,7 +171,7 @@ public class KISTERSClient {
 		stream().//
 		collect(Collectors.joining(","));
 
-	return retrieveEntities("datasource=1&service=kisters&type=queryServices&request=getTimeseriesList&ts_id=" + timeSeriesId
+	return retrieveEntities("service=kisters&type=queryServices&request=getTimeseriesList&ts_id=" + timeSeriesId
 		+ "&format=json&station_no=*&returnfields=" + returnfields).get(0);
     }
 
@@ -167,8 +185,20 @@ public class KISTERSClient {
 		collect(Collectors.joining(","));
 
 	return retrieveEntities(
-		"datasource=1&service=kisters&type=queryServices&request=getTimeseriesList&format=json&station_no=*&returnfields="
-			+ returnfields);
+		"service=kisters&type=queryServices&request=getTimeseriesList&format=json&station_no=*&returnfields=" + returnfields);
+    }
+
+    /**
+     * @return
+     */
+    public List<KISTERSEntity> retrieveTimeSeriesByStation(String stationNumber) {
+
+	String returnfields = getTimeSeriesFields().//
+		stream().//
+		collect(Collectors.joining(","));
+
+	return retrieveEntities("service=kisters&type=queryServices&request=getTimeseriesList&format=json&station_id=" + stationNumber
+		+ "&returnfields=" + returnfields);
     }
 
     /**
@@ -200,6 +230,6 @@ public class KISTERSClient {
      */
     private String getEndpoint() {
 
-	return "https://portal.grdc.bafg.de/KiWIS/KiWIS?";
+	return endpoint;
     }
 }

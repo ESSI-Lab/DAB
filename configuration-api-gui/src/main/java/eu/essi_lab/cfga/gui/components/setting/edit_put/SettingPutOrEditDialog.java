@@ -28,6 +28,7 @@ import com.vaadin.flow.component.HasSize;
 import com.vaadin.flow.component.Unit;
 
 import eu.essi_lab.cfga.Configuration;
+import eu.essi_lab.cfga.Selector;
 import eu.essi_lab.cfga.gui.components.SettingComponentFactory;
 import eu.essi_lab.cfga.gui.components.TabContainer;
 import eu.essi_lab.cfga.gui.components.listener.ButtonChangeListener;
@@ -57,7 +58,7 @@ public abstract class SettingPutOrEditDialog extends ConfirmationDialog {
      * @param context
      */
     public SettingPutOrEditDialog(Configuration configuration, TabContainer tabContainer, ValidationContext context) {
-	
+
 	addToCloseAll();
 
 	this.configuration = configuration;
@@ -82,7 +83,22 @@ public abstract class SettingPutOrEditDialog extends ConfirmationDialog {
 	//
 	setOnConfirmListener(e -> {
 
-	    Optional<ValidationResponse> optional = getSetting().validate(configuration, context);
+	    Optional<ValidationResponse> optional = Optional.empty();
+
+	    //
+	    // in case of a selector, used the selected setting
+	    //
+	    if (Selector.class.isAssignableFrom(getSetting().getSettingClass())) {
+
+		@SuppressWarnings("rawtypes")
+		Selector selector = (Selector) getSetting();
+
+		optional = ((Setting) selector.getSelectedSettings().get(0)).validate(configuration, context);
+	   
+	    } else {
+
+		optional = getSetting().validate(configuration, context);
+	    }
 
 	    ValidationResponse validationResponse = null;
 

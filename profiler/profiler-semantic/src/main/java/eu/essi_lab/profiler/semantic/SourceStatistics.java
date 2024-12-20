@@ -21,7 +21,6 @@ package eu.essi_lab.profiler.semantic;
  * #L%
  */
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +34,7 @@ import eu.essi_lab.messages.stats.ResponseItem;
 import eu.essi_lab.messages.stats.StatisticsMessage;
 import eu.essi_lab.messages.stats.StatisticsResponse;
 import eu.essi_lab.model.GSSource;
+import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.index.jaxb.CardinalValues;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
@@ -48,7 +48,7 @@ public class SourceStatistics {
 	return statistics;
     }
 
-    public SourceStatistics(String source, Optional<String> viewId, MetadataElement groupBy) throws Exception {
+    public SourceStatistics(String source, Optional<String> viewId, Queryable groupBy) throws Exception {
 	StatisticsMessage statisticsMessage = new StatisticsMessage();
 	List<GSSource> allSources = ConfigurationWrapper.getAllSources();
 	// set the required properties
@@ -65,7 +65,9 @@ public class SourceStatistics {
 	}
 
 	// set the user bond
-	 statisticsMessage.setUserBond(BondFactory.createSourceIdentifierBond(source));
+	if (source != null) {
+	    statisticsMessage.setUserBond(BondFactory.createSourceIdentifierBond(source));
+	}
 
 	// groups by source id
 	if (groupBy != null) {
@@ -83,9 +85,8 @@ public class SourceStatistics {
 
 	// computes union of bboxes
 	statisticsMessage.computeBboxUnion();
-	statisticsMessage.computeMin(Arrays.asList(MetadataElement.TEMP_EXTENT_BEGIN,MetadataElement.ALTITUDE));
-	statisticsMessage.computeMax(Arrays.asList(MetadataElement.TEMP_EXTENT_END,MetadataElement.ALTITUDE));
-	
+	statisticsMessage.computeMin(Arrays.asList(MetadataElement.TEMP_EXTENT_BEGIN, MetadataElement.ALTITUDE));
+	statisticsMessage.computeMax(Arrays.asList(MetadataElement.TEMP_EXTENT_END, MetadataElement.ALTITUDE));
 
 	// computes count distinct of 2 queryables
 	statisticsMessage.countDistinct(//

@@ -26,9 +26,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.AbstractMap.SimpleEntry;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -163,6 +165,17 @@ public class EMODNETPhysicsMapper extends FileIdentifierMapper {
 
 		JSONObject json = new JSONObject(originalMetadata);
 
+		JSONArray countries = null;
+		JSONArray dataOwners = null;
+		JSONArray platforms = null;
+
+		if (json.has("additionalMetadata")) {
+			JSONObject additionalMetadata = json.getJSONObject("additionalMetadata");
+			countries = additionalMetadata.optJSONArray("metadata_countries");
+			dataOwners = additionalMetadata.optJSONArray("metadata_data_owners");
+			platforms = additionalMetadata.optJSONArray("metadata_platforms");
+		}
+
 		String linkage = null;
 		JSONArray rows = json.getJSONObject("table").getJSONArray("rows");
 		String title = null;
@@ -178,7 +191,7 @@ public class EMODNETPhysicsMapper extends FileIdentifierMapper {
 		String endPosition = null;
 		String project = null;
 		String lineage = null;
-		HashSet<String> platformNames = new HashSet<String>();
+//	HashSet<String> platformNames = new HashSet<String>();
 		String license = null;
 		String timeStamp = null;
 		List<String> keywords = new ArrayList<>();
@@ -205,10 +218,19 @@ public class EMODNETPhysicsMapper extends FileIdentifierMapper {
 		HashSet<Party> parties = new HashSet<>();
 
 		HashMap<String, HashMap<String, String>> attributesByVariable = new HashMap<String, HashMap<String, String>>();
-		List<String> tmpPlatformNames = new ArrayList<String>();
-		List<String> tmpPlatformCodes = new ArrayList<String>();
-		HashSet<Integer> edmosInteger = new HashSet<>();
 
+		List<SimpleEntry<String, String>> platformNameCode = new ArrayList<>();
+
+		if (platforms != null) {
+			for (int i = 0; i < platforms.length(); i++) {
+				String code = platforms.getJSONArray(i).optString(0);
+				String name = platforms.getJSONArray(i).optString(1);
+				platformNameCode.add(new SimpleEntry<String, String>(name, code));
+			}
+		}
+
+		List<String> tmpPNames = new ArrayList<>();
+		List<String> tmpPCodes = new ArrayList<>();
 		for (int i = 0; i < rows.length(); i++) {
 			JSONArray row = rows.getJSONArray(i);
 			String type = row.getString(0);
@@ -226,10 +248,10 @@ public class EMODNETPhysicsMapper extends FileIdentifierMapper {
 					title = value;
 					break;
 				case "platform_name":
-					addSeparatedValues(tmpPlatformNames, value);
+					addSeparatedValues(tmpPNames, value);
 					break;
 				case "platform_code":
-					addSeparatedValues(tmpPlatformCodes, value);
+					addSeparatedValues(tmpPCodes, value);
 					break;
 				case "license":
 					license = value;
@@ -336,36 +358,40 @@ public class EMODNETPhysicsMapper extends FileIdentifierMapper {
 			attributes.put(name, value);
 		}
 
-		if (json.has("data_owner_EDMO")) {
-			JSONArray edmos = json.getJSONArray("data_owner_EDMO");
-			for (int j = 0; j < edmos.length(); j++) {
-				JSONArray arr = edmos.getJSONArray(j);
-				if (!arr.isNull(0)) {
-					Integer edmo = arr.getInt(0);
-					edmosInteger.add(edmo);
-				}
+		if (tmpPCodes.size() == tmpPNames.size()) {
+			for (int i = 0; i < tmpPCodes.size(); i++) {
+				String code = tmpPCodes.get(i);
+				String name = tmpPNames.get(i);
+				platformNameCode.add(new SimpleEntry<String, String>(name, code));
 			}
-
+		}else {
+			for (int i = 0; i < tmpPNames.size(); i++) {
+				String name = tmpPNames.get(i);
+				platformNameCode.add(new SimpleEntry<String, String>(name, null));
+			}
 		}
 
-		for (Integer edmo : edmosInteger) {
-			if (edmo != null) {
-				EDMOClient client = new EDMOClient();
-				String label = client.getLabelFromCode("" + edmo);
+		if (dataOwners != null) {
+			for (int j = 0; j < dataOwners.length(); j++) {
+				JSONArray arr = dataOwners.getJSONArray(j);
+				String label = arr.optString(1);
+
+				Integer edmo = arr.optIntegerObject(0);
 				Party party = new Party();
+				if (edmo != null) {
+					EDMOClient client = new EDMOClient();
+					label = client.getLabelFromCode("" + edmo);
+					party.setUri(client.getURN("" + edmo));
+				}
 				party.setOrganization(true);
 				party.setName(label);
 				party.setRole("originator");
-				party.setUri(client.getURN("" + edmo));
 				parties.add(party);
+
 			}
+
 		}
 
-		if (!tmpPlatformNames.isEmpty()) {
-			platformNames.addAll(tmpPlatformNames);
-		} else {
-			platformNames.addAll(tmpPlatformCodes);
-		}
 
 		List<String> empty = new ArrayList<>();
 		List<Party> originatorParties = getParties(institutions, institutionURIs, empty, empty, empty, "originator");
@@ -424,6 +450,13 @@ public class EMODNETPhysicsMapper extends FileIdentifierMapper {
 		String identifier = json.getString("identifier");
 		coreMetadata.setIdentifier(identifier);
 		coreMetadata.getMIMetadata().setFileIdentifier(identifier);
+
+		if (countries != null) {
+			for (int i = 0; i < countries.length(); i++) {
+				String country = countries.getString(i);
+				dataset.getExtensionHandler().setCountry(country);
+			}
+		}
 
 		coreMetadata.getDataIdentification().setResourceIdentifier(dataIdentifier);
 
@@ -538,14 +571,21 @@ public class EMODNETPhysicsMapper extends FileIdentifierMapper {
 
 		Keywords pk = new Keywords();
 		pk.setTypeCode("platform");
-		for (String platformName : platformNames) {
+
+
+		for (int i = 0; i < platformNameCode.size(); i++) {
+			SimpleEntry<String, String> nameCode = platformNameCode.get(i);
+			String platformName = nameCode.getKey();
+			String platformCode = nameCode.getValue();
 			MIPlatform platform = new MIPlatform();
+			platform.setMDIdentifierCode(platformCode);
 			Citation platformCitation = new Citation();
 			platformCitation.setTitle(platformName);
 			platform.setCitation(platformCitation);
 			coreMetadata.getMIMetadata().addMIPlatform(platform);
-			pk.addKeyword(platformName);
+			pk.addKeyword(platformName, platformCode);		    
 		}
+
 		coreMetadata.getMIMetadata().getDataIdentification().addKeywords(pk);
 		// bbox
 

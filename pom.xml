@@ -6,7 +6,7 @@
 	<groupId>eu.essi_lab</groupId>
 	<artifactId>DAB</artifactId>
 	<version>1.0-SNAPSHOT</version>
-	<packaging>pom</packaging> 
+	<packaging>pom</packaging>
 
 	<name>ESSI-Lab DAB</name>
 	<description><![CDATA[The suite of ESSI-Lab DAB related software products.
@@ -17,7 +17,7 @@
     ]]>
     </description>
 
-	<url>http://www.essi-lab.eu/</url> 
+	<url>http://www.essi-lab.eu/</url>
 
 	<organization>
 		<name>Earth &amp; Space Science Informatics-Laboratory (ESSI-Lab)</name>
@@ -253,6 +253,17 @@
 
 	<dependencyManagement>
 		<dependencies>
+
+			<dependency>
+				<groupId>io.micrometer</groupId>
+				<artifactId>micrometer-registry-prometheus</artifactId>
+				<version>1.12.13</version> <!-- Check for the latest version -->
+			</dependency>
+			<dependency>
+				<groupId>io.micrometer</groupId>
+				<artifactId>micrometer-core</artifactId>
+				<version>1.12.13</version> <!-- Check for the latest version -->
+			</dependency>
 
 			<dependency>
 				<groupId>org.apache.logging.log4j</groupId>
@@ -944,13 +955,13 @@
 					<version>3.1.1</version>
 					<!-- <version>2.8</version> -->
 				</plugin>
-								<plugin>
+				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-eclipse-plugin</artifactId>
 					<version>2.10</version>
 					<!-- <version>2.9</version> -->
 				</plugin>
-								<plugin>
+				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-enforcer-plugin</artifactId>
 					<version>3.0.0-M2</version>
@@ -1671,7 +1682,7 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-		
+
 		<repository>
 			<id>MarkLogic-releases</id>
 			<name>MarkLogic Releases</name>

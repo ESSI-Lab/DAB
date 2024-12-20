@@ -73,4 +73,11 @@ public class VolatileDatabaseExecutor extends VolatileDatabaseReader implements 
 
 	return 0;
     }
+
+    @Override
+    public List<WMSClusterResponse> execute(WMSClusterRequest request) throws GSException {
+
+	return null;
+    }
+
 }

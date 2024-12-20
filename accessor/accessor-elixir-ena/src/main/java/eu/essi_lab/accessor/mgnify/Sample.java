@@ -40,11 +40,11 @@ public class Sample extends MGnifyObject {
     }
 
     public BigDecimal getLongitude() {
-	return attributes.getBigDecimal("longitude");
+	return attributes.optBigDecimal("longitude",null);
     }
 
     public BigDecimal getLatitude() {
-	return attributes.getBigDecimal("latitude");
+	return attributes.optBigDecimal("latitude",null);
     }
     
     public String getSampleName() {

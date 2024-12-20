@@ -58,10 +58,10 @@ import eu.essi_lab.model.resource.data.DataFormat;
 import eu.essi_lab.model.resource.data.dimension.ContinueDimension.LimitType;
 import eu.essi_lab.pdk.wrt.AccessRequestTransformer;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
-import eu.essi_lab.profiler.sos.SOSProfiler;
+import eu.essi_lab.profiler.sos.SOSProfilerSetting;
 import eu.essi_lab.profiler.sos.SOSRequest;
-import eu.essi_lab.profiler.sos.SOSUtils;
 import eu.essi_lab.profiler.sos.SOSRequest.Parameter;
+import eu.essi_lab.profiler.sos.SOSUtils;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
 
 public class GetObservationTransformer extends AccessRequestTransformer {
@@ -357,7 +357,7 @@ public class GetObservationTransformer extends AccessRequestTransformer {
     @Override
     public String getProfilerType() {
 
-	return SOSProfiler.SOS_SERVICE_INFO.getServiceType();
+	return new SOSProfilerSetting().getServiceType();
     }
 
     @Override

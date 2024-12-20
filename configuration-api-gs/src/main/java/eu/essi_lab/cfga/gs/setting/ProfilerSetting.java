@@ -3,6 +3,10 @@
  */
 package eu.essi_lab.cfga.gs.setting;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -26,166 +30,338 @@ package eu.essi_lab.cfga.gs.setting;
 
 import com.vaadin.flow.data.provider.SortDirection;
 
+import eu.essi_lab.cfga.Configuration;
+import eu.essi_lab.cfga.gs.setting.menuitems.ProfilerStateOfflineItemHandler;
+import eu.essi_lab.cfga.gs.setting.menuitems.ProfilerStateOnlineItemHandler;
+import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
+import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
 import eu.essi_lab.cfga.gui.extension.ComponentInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfo;
 import eu.essi_lab.cfga.gui.extension.TabInfoBuilder;
+import eu.essi_lab.cfga.gui.extension.directive.Directive.ConfirmationPolicy;
+import eu.essi_lab.cfga.option.InputPattern;
 import eu.essi_lab.cfga.option.Option;
+import eu.essi_lab.cfga.option.StringOptionBuilder;
+import eu.essi_lab.cfga.setting.KeyValueOptionDecorator;
 import eu.essi_lab.cfga.setting.Setting;
+import eu.essi_lab.cfga.setting.SettingUtils;
+import eu.essi_lab.cfga.setting.validation.ValidationContext;
+import eu.essi_lab.cfga.setting.validation.ValidationResponse;
+import eu.essi_lab.cfga.setting.validation.ValidationResponse.ValidationResult;
+import eu.essi_lab.cfga.setting.validation.Validator;
 
 /**
  * @author Fabrizio
  */
-public class ProfilerSetting extends Setting {
+public abstract class ProfilerSetting extends Setting implements KeyValueOptionDecorator {
 
-	private static final String PATH_OPTION_KEY = "pathOption";
-	private static final String TYPE_OPTION_KEY = "typeOption";
-	private static final String VERSION_OPTION_KEY = "versionOption";
+    private static final String PATH_OPTION_KEY = "pathOption";
+    private static final String TYPE_OPTION_KEY = "typeOption";
+    private static final String VERSION_OPTION_KEY = "versionOption";
+    private static final String STATE_OPTION = "stateOption";
 
-	public ProfilerSetting() {
+    /**
+     * 
+     */
+    public ProfilerSetting() {
 
-		setEditable(false);
-		enableCompactMode(false);
-		enableFoldedMode(true);
+	setCanBeRemoved(true);
+	setEditable(true);
+	enableCompactMode(false);
+	enableFoldedMode(true);
+	setCanBeDisabled(false);
 
-		Option<String> typeOption = new Option<String>(String.class);
-		typeOption.setKey(TYPE_OPTION_KEY);
-		typeOption.setLabel("Type");
-		typeOption.setEditable(false);
-		typeOption.setCanBeDisabled(false);
+	Option<String> typeOption = StringOptionBuilder.get().//
+		withKey(TYPE_OPTION_KEY).//
+		withLabel("Type").//
+		readOnly().//
+		cannotBeDisabled().//
+		build();
 
-		addOption(typeOption);
+	addOption(typeOption);
 
-		Option<String> pathOption = new Option<String>(String.class);
-		pathOption.setKey(PATH_OPTION_KEY);
-		pathOption.setLabel("Path");
-		pathOption.setEditable(false);
-		pathOption.setCanBeDisabled(false);
+	Option<String> pathOption = StringOptionBuilder.get().//
+		withKey(PATH_OPTION_KEY).//
+		withLabel("Path").//
+		withDescription("Service path must be unique can contains alphanumeric characters and underscores").//
+		withInputPattern(InputPattern.ALPHANUMERIC_AND_UNDERSCORE).//
+		cannotBeDisabled().//
+		build();
 
-		addOption(pathOption);
+	addOption(pathOption);
 
-		Option<String> versionOption = new Option<String>(String.class);
-		versionOption.setKey(VERSION_OPTION_KEY);
-		versionOption.setLabel("Version");
-		versionOption.setEditable(false);
-		versionOption.setCanBeDisabled(false);
+	Option<String> versionOption = StringOptionBuilder.get().//
+		withKey(VERSION_OPTION_KEY).//
+		withLabel("Version").//
+		readOnly().//
+		cannotBeDisabled().//
+		build();
 
-		addOption(versionOption);
+	addOption(versionOption);
 
-		//
-		// set the component extension
-		//
-		setExtension(new ProfilerComponentInfo());
-	}
+	//
+	//
+	//
 
-	/**
-	 * @author Fabrizio
-	 */
-	public static class ProfilerComponentInfo extends ComponentInfo {
+	Option<String> onlineOption = StringOptionBuilder.get().//
+		withKey(STATE_OPTION).//
+		withLabel("Service state").//
+		withDescription("If the service is offline, requests forwarded on the service path return a 404 'Not Found' error code").//
+		withSingleSelection().//
+		withValues(Arrays.asList("Online", "Offline")).//
+		withSelectedValue("Online").//
+		cannotBeDisabled().//
+		build();
 
-		/**
-		 * 
-		 */
-		public ProfilerComponentInfo() {
+	addOption(onlineOption);
 
-			setComponentName(ProfilerSetting.class.getName());
+	//
+	//
+	//
 
-			TabInfo tabInfo = TabInfoBuilder.get().//
-					withIndex(TabIndex.PROFILER_SETTING.getIndex()).//
-					withShowDirective("Profilers", SortDirection.ASCENDING).//
-					build();
+	addKeyValueOption();
 
-			setTabInfo(tabInfo);
+	//
+	// set the component extension
+	//
+	setExtension(new ProfilerComponentInfo());
+
+	//
+	// set the validator
+	//
+	setValidator(new ProfilerSettingValidator());
+    }
+
+    /**
+     * @author Fabrizio
+     */
+    public static class ProfilerSettingValidator implements Validator {
+
+	@Override
+	public ValidationResponse validate(Configuration configuration, Setting setting, ValidationContext context) {
+
+	    ProfilerSetting thisSetting = (ProfilerSetting) SettingUtils.downCast(setting, setting.getSettingClass());
+
+	    ValidationResponse validationResponse = new ValidationResponse();
+
+	    if (context.getContext().equals(ValidationContext.PUT)) {
+
+		String servicePath = thisSetting.getServicePath();
+
+		boolean exists = configuration.list(ProfilerSetting.class, false).//
+			stream().//
+			anyMatch(s -> s.getServicePath().equals(servicePath));
+
+		if (exists) {
+
+		    validationResponse.setResult(ValidationResult.VALIDATION_FAILED);
+		    validationResponse.getErrors().add("Another profiler with path '" + servicePath + "' already exists");
 		}
+	    }
+
+	    return validationResponse;
+	}
+    }
+
+    /**
+     * @author Fabrizio
+     */
+    public static class ProfilerComponentInfo extends ComponentInfo {
+
+	/**
+	 * 
+	 */
+	public ProfilerComponentInfo() {
+
+	    setComponentName(ProfilerSetting.class.getName());
+
+	    TabInfo tabInfo = TabInfoBuilder.get().//
+		    withIndex(TabIndex.PROFILER_SETTING.getIndex()).//
+		    withAddDirective("Add profiler", ProfilerSettingSelector.class). //
+		    withEditDirective("Edit profiler", ConfirmationPolicy.ON_WARNINGS).//
+		    withRemoveDirective("Remove profiler", false, ProfilerSetting.class).//
+		    withShowDirective("Profilers", SortDirection.ASCENDING).//
+		    withGridInfo(Arrays.asList(//
+
+			    ColumnDescriptor.createPositionalDescriptor(), //
+
+			    ColumnDescriptor.create("Name", true, true, (s) -> s.getName()), //
+
+			    ColumnDescriptor.create("State", 150, true, true, //
+
+				    (s) -> getServiceState(s), //
+
+				    (item1, item2) -> item1.get("State").compareTo(item2.get("State")), //
+
+				    new ProfilerStateColumnRenderer()), //
+
+			    ColumnDescriptor.create("Path", 200, true, true, (s) -> getServicePath(s)), //
+
+			    ColumnDescriptor.create("Type", 300, true, true, (s) -> getServiceType(s)), //
+
+			    ColumnDescriptor.create("Version", true, true, (s) -> getServiceVersion(s)) //
+
+		    ), getItemsList(), com.vaadin.flow.component.grid.Grid.SelectionMode.MULTI).//
+
+		    build();
+
+	    setTabInfo(tabInfo);
 	}
 
 	/**
-	 * Get the path where the "GI-suite service" is expected to receive the
-	 * {@link Profiler} requests from the suitable clients
-	 * 
-	 * @return a non <code>null</code> string which contains only alphabetic
-	 *         characters
+	 * @param setting
+	 * @return
 	 */
-	public String getServicePath() {
+	private String getServiceState(Setting setting) {
 
-		return getOption(PATH_OPTION_KEY, String.class).get().getValue();
+	    return setting.getOption(STATE_OPTION, String.class).get().getSelectedValue();
 	}
 
 	/**
-	 * Set the path where the "GI-suite service" is expected to receive the
-	 * {@link Profiler} requests from the suitable clients
-	 * 
-	 * @param path a non <code>null</code> string which contains only alphabetic
-	 *             characters
+	 * @param setting
+	 * @return
 	 */
-	public void setServicePath(String path) {
+	private String getServicePath(Setting setting) {
 
-		getOption(PATH_OPTION_KEY, String.class).get().setValue(path);
+	    return setting.getOption(PATH_OPTION_KEY, String.class).get().getValue();
 	}
 
 	/**
-	 * Returns the {@link Profiler} name
-	 * 
-	 * @return a non <code>null</code> string
+	 * @param setting
+	 * @return
 	 */
-	public String getServiceName() {
+	private String getServiceType(Setting setting) {
 
-		return getName();
+	    return setting.getOption(TYPE_OPTION_KEY, String.class).get().getValue();
 	}
 
 	/**
-	 * Set the {@link Profiler} name
-	 * 
-	 * @param name a non <code>null</code> string
+	 * @param setting
+	 * @return
 	 */
-	public void setServiceName(String name) {
+	private String getServiceVersion(Setting setting) {
 
-		setName(name);
+	    return setting.getOption(VERSION_OPTION_KEY, String.class).get().getValue();
 	}
 
 	/**
-	 * Returns the type of the {@link Profiler} service
-	 * 
-	 * @return a non <code>null</code> string
+	 * @return
 	 */
-	public String getServiceType() {
+	private List<GridMenuItemHandler> getItemsList() {
 
-		return getOption(TYPE_OPTION_KEY, String.class).get().getValue();
+	    ArrayList<GridMenuItemHandler> list = new ArrayList<>();
+
+	    list.add(new ProfilerStateOnlineItemHandler());
+	    list.add(new ProfilerStateOfflineItemHandler(true, false));
+
+	    return list;
 	}
+    }
 
-	/**
-	 * Set the type of the {@link Profiler} service (e.g: "OAI-PMH", "OpenSearch",
-	 * etc..) by adding the suffix "Profiler" to the type.<br>
-	 * This method also set the {@link #getConfigurableType()} with the same value
-	 * 
-	 * @param type
-	 */
-	public void setServiceType(String type) {
+    /**
+     * @param online
+     */
+    public void setOnline(boolean online) {
 
-		type = type + "Profiler";
+	getOption(STATE_OPTION, String.class).get().select(state -> online ? state.equals("Online") : state.equals("Offline"));
+    }
 
-		getOption(TYPE_OPTION_KEY, String.class).get().setValue(type);
-		setConfigurableType(type);
-	}
+    /**
+     * @return
+     */
+    public boolean isOnline() {
 
-	/**
-	 * Get the version of the {@link Profiler} service
-	 * 
-	 * @return a non <code>null</code> string
-	 */
-	public String getServiceVersion() {
+	return getOption(STATE_OPTION, String.class).get().getSelectedValue().equals("Online");
+    }
 
-		return getOption(VERSION_OPTION_KEY, String.class).get().getValue();
-	}
+    /**
+     * Get the path where the "GI-suite service" is expected to receive the
+     * {@link Profiler} requests from the suitable clients
+     * 
+     * @return a non <code>null</code> string which contains only alphabetic
+     *         characters
+     */
+    public String getServicePath() {
 
-	/**
-	 * Set the version of the {@link Profiler} service (e.g: "OAI-PMH",
-	 * "OpenSearch", etc..)
-	 * 
-	 * @param version a non <code>null</code> string
-	 */
-	public void setServiceVersion(String version) {
+	return getOption(PATH_OPTION_KEY, String.class).get().getValue();
+    }
 
-		getOption(VERSION_OPTION_KEY, String.class).get().setValue(version);
-	}
+    /**
+     * Set the path where the "GI-suite service" is expected to receive the
+     * {@link Profiler} requests from the suitable clients
+     * 
+     * @param path a non <code>null</code> string which contains only alphabetic
+     *        characters
+     */
+    public void setServicePath(String path) {
+
+	getOption(PATH_OPTION_KEY, String.class).get().setValue(path);
+    }
+
+    /**
+     * Returns the {@link Profiler} name
+     * 
+     * @return a non <code>null</code> string
+     */
+    public String getServiceName() {
+
+	return getName();
+    }
+
+    /**
+     * Set the {@link Profiler} name
+     * 
+     * @param name a non <code>null</code> string
+     */
+    public void setServiceName(String name) {
+
+	setName(name);
+    }
+
+    /**
+     * Returns the type of the {@link Profiler} service
+     * 
+     * @return a non <code>null</code> string
+     */
+    public String getServiceType() {
+
+	return getOption(TYPE_OPTION_KEY, String.class).get().getValue();
+    }
+
+    /**
+     * Set the type of the {@link Profiler} service (e.g: "OAI-PMH", "OpenSearch",
+     * etc..) by adding the suffix "Profiler" to the type.<br>
+     * This method also set the {@link #getConfigurableType()} with the same value
+     * 
+     * @param type
+     */
+    public void setServiceType(String type) {
+
+	type = type + "Profiler";
+
+	getOption(TYPE_OPTION_KEY, String.class).get().setValue(type);
+	setConfigurableType(type);
+    }
+
+    /**
+     * Get the version of the {@link Profiler} service
+     * 
+     * @return a non <code>null</code> string
+     */
+    public String getServiceVersion() {
+
+	return getOption(VERSION_OPTION_KEY, String.class).get().getValue();
+    }
+
+    /**
+     * Set the version of the {@link Profiler} service (e.g: "OAI-PMH",
+     * "OpenSearch", etc..)
+     * 
+     * @param version a non <code>null</code> string
+     */
+    public void setServiceVersion(String version) {
+
+	getOption(VERSION_OPTION_KEY, String.class).get().setValue(version);
+    }
 
 }

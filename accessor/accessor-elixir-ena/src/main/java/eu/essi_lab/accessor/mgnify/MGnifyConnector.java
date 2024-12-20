@@ -110,7 +110,7 @@ public class MGnifyConnector extends HarvestedQueryConnector<MGnifyConnectorSett
 	} else {
 	    Pages<Study> studyPages = null;
 	    try {
-		studyPages = client.getPages(new StudyFactory(), null,"biome_name=marine");
+		studyPages = client.getPages(new StudyFactory(), null, "biome_name=root%3AEnvironmental%3AAquatic%3AMarine");
 	    } catch (Exception e1) {
 		e1.printStackTrace();
 	    }
@@ -164,10 +164,12 @@ public class MGnifyConnector extends HarvestedQueryConnector<MGnifyConnectorSett
 				BigDecimal lat = sample.getLatitude();
 				BigDecimal lon = sample.getLongitude();
 
-				s = (s == null || lat.compareTo(s) < 0) ? lat : s;
-				n = (n == null || lat.compareTo(n) > 0) ? lat : n;
-				w = (w == null || lon.compareTo(w) < 0) ? lon : w;
-				e = (e == null || lon.compareTo(e) > 0) ? lon : e;
+				if (lat != null && lon != null) {
+				    s = (s == null || lat.compareTo(s) < 0) ? lat : s;
+				    n = (n == null || lat.compareTo(n) > 0) ? lat : n;
+				    w = (w == null || lon.compareTo(w) < 0) ? lon : w;
+				    e = (e == null || lon.compareTo(e) > 0) ? lon : e;
+				}
 
 				String dateString = sample.getCollectionDate();
 				if (dateString != null) {
@@ -205,9 +207,13 @@ public class MGnifyConnector extends HarvestedQueryConnector<MGnifyConnectorSett
 				    }
 				}
 				String instrumentPlatform = ana.getInstrumentPlatform();
-				platforms.add(instrumentPlatform);
+				if (instrumentPlatform != null) {
+				    platforms.add(instrumentPlatform);
+				}
 				String instrumentModel = ana.getInstrumentModel();
-				instruments.add(instrumentModel);
+				if (instrumentModel != null) {
+				    instruments.add(instrumentModel);
+				}
 				Pages<Download> downloadPages = client.getDownloads(ana.getDownloadsLink());
 				while (downloadPages != null) {
 				    List<Download> downloads = downloadPages.getObjects();
@@ -266,8 +272,8 @@ public class MGnifyConnector extends HarvestedQueryConnector<MGnifyConnectorSett
 			    coreMetadata.getMIMetadata().getDataIdentification().addKeywords(k);
 			}
 
-			if (s != null && w != null) {
-			    coreMetadata.addBoundingBox(n.doubleValue(), w.doubleValue(), s.doubleValue(), e.doubleValue());
+			if (s != null && w != null && e != null && n != null) {
+			    coreMetadata.addBoundingBox(n, w, s, e);
 			}
 
 			keywords.add("ELIXIR-ENA");
@@ -282,7 +288,9 @@ public class MGnifyConnector extends HarvestedQueryConnector<MGnifyConnectorSett
 			miMetadata.getDataIdentification().addKeywords(k);
 
 			DataIdentification dataIdentification = miMetadata.getDataIdentification();
-			addPointOfContact(dataIdentification, organization);
+			if (organization!=null) {
+				addPointOfContact(dataIdentification, organization);	
+			}			
 
 			dataIdentification.setCitationTitle(title);
 
@@ -331,7 +339,7 @@ public class MGnifyConnector extends HarvestedQueryConnector<MGnifyConnectorSett
 			// END STUDY
 
 		    } catch (Exception e) {
-			// TODO: handle exception
+			GSLoggerFactory.getLogger(getClass()).error("Error for MGNIFY study {}, {}", study.getId(), e.getMessage());
 			e.printStackTrace();
 		    }
 		    // return ret;

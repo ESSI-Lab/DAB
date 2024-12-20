@@ -25,7 +25,6 @@ import java.io.ByteArrayInputStream;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -38,7 +37,6 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.geotools.data.simple.SimpleFeatureCollection;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.locationtech.jts.geom.Point;
@@ -49,7 +47,6 @@ import com.esri.arcgis.protobuf.FeatureCollection;
 import com.esri.arcgis.protobuf.FeatureCollection.FeatureCollectionPBuffer;
 import com.esri.arcgis.protobuf.FeatureCollection.FeatureCollectionPBuffer.Feature;
 import com.esri.arcgis.protobuf.FeatureCollection.FeatureCollectionPBuffer.FeatureResult;
-import com.esri.arcgis.protobuf.FeatureCollection.FeatureCollectionPBuffer.FieldType;
 import com.esri.arcgis.protobuf.FeatureCollection.FeatureCollectionPBuffer.FeatureResult.Builder;
 import com.esri.arcgis.protobuf.FeatureCollection.FeatureCollectionPBuffer.Geometry;
 import com.esri.arcgis.protobuf.FeatureCollection.FeatureCollectionPBuffer.QueryResult;
@@ -70,8 +67,6 @@ import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
-import eu.essi_lab.model.resource.BNHSProperty;
-import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.data.CRS;
 import eu.essi_lab.model.resource.data.CRSUtils;
 import eu.essi_lab.pdk.rsf.DiscoveryResultSetFormatter;
@@ -79,7 +74,6 @@ import eu.essi_lab.pdk.rsf.FormattingEncoding;
 import eu.essi_lab.profiler.esri.feature.ESRIFieldType;
 import eu.essi_lab.profiler.esri.feature.FeatureLayer;
 import eu.essi_lab.profiler.esri.feature.Field;
-import eu.essi_lab.profiler.esri.pbf.PBFEncoder;
 
 /**
  * @author boldrini

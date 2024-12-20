@@ -10,7 +10,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<!-- GetCapabilities operation. See pag. 131 OGC 07-006r1 -->
 	<ows:ServiceIdentification>
-		<ows:Title>ESSI Lab GI-cat CSW 2.0.2 (ISO AP)</ows:Title>
+		<ows:Title>ESSI Lab DAB CSW 2.0.2 (ISO AP)</ows:Title>
 		<ows:Abstract>A catalogue service that conforms to the HTTP protocol binding of the OpenGIS
             Catalogue Service specification version 2.0.2. ISO application profile (see OGC 07-045
             document)</ows:Abstract>
@@ -34,7 +34,7 @@
 		<ows:ProviderName>ESSI Lab</ows:ProviderName>
 		<ows:ProviderSite xlink:href="http://essi-lab.eu" />
 		<ows:ServiceContact>
-			<ows:IndividualName>The GI-project team</ows:IndividualName>
+			<ows:IndividualName>ESSI-Lab team</ows:IndividualName>
 			<ows:PositionName>provider</ows:PositionName>
 			<ows:ContactInfo>
 				<ows:Address>

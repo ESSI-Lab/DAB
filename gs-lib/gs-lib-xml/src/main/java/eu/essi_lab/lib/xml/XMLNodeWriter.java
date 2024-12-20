@@ -123,6 +123,44 @@ public class XMLNodeWriter {
 	}
     }
 
+    /**
+     * Removes all the attributes matching the qualified name from the elements result of the xPath
+     * 
+     * @param xPath
+     * @param qualifiedName
+     * @return
+     * @throws XPathExpressionException
+     */
+    public boolean remove(String xPath, String localName) throws XPathExpressionException {
+
+	List<Node> list = this.xmlNodeReader.evaluateOriginalNodesList(xPath);
+	if (list.isEmpty()) {
+	    return false;
+	}
+	for (Node node : list) {
+	    if (node instanceof Element) {
+		Element element = (Element) node;
+		element.removeAttribute(localName);
+	    }
+	}
+	return true;
+    }
+    
+    public boolean remove(String xPath, String namespace, String localName) throws XPathExpressionException {
+
+	List<Node> list = this.xmlNodeReader.evaluateOriginalNodesList(xPath);
+	if (list.isEmpty()) {
+	    return false;
+	}
+	for (Node node : list) {
+	    if (node instanceof Element) {
+		Element element = (Element) node;
+		element.removeAttributeNS(namespace, localName);
+	    }
+	}
+	return true;
+    }
+
     private void rename(Node node, String qualifiedName) {
 	if (node instanceof Element) {
 	    Element element = (Element) node;
