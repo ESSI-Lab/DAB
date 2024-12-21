@@ -374,9 +374,7 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 	 * @param {Integer} [options.zoom=6]
 	 * @param {Number} [options.lat=0]
 	 * @param {Number} [options.lng=0]
-	 * 
-	 * @param {String} mapType
-	 * 
+	 * 	  
  	 * @return the control HTML markup if <code>op</code> is set to "get" or <code>null</code> otherwise
      * 
 	 * @method whereConstraint
@@ -417,10 +415,6 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 			whereOpt.widgetPosition = 'right';
 		}
 		
-		if(!whereOpt.mapType){
-			whereOpt.mapType = 'google';
-		}
-		
 		if(!whereOpt.zoom){
 			whereOpt.zoom = 2;
 		}	
@@ -445,31 +439,27 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 		if(whereOpt.streetViewControl === undefined){
 			whereOpt.streetViewControl = false;
 		}
+		
 		if(whereOpt.overviewMapControl === undefined){
 			whereOpt.overviewMapControl = true;
 		}
+		
 		if(whereOpt.mapTypeControl === undefined){
 			whereOpt.mapTypeControl = false;
 		}
-		if(!whereOpt.mapTypeControlOptions && whereOpt.mapType === 'google'){
-			whereOpt.mapTypeControlOptions = { style: google.maps.MapTypeControlStyle.DROPDOWN_MENU };
-		}
-	    if(!whereOpt.mapTypeId && whereOpt.mapType === 'google'){    	
-	    	whereOpt.mapTypeId = GIAPI.ui.mapTypeId || google.maps.MapTypeId.ROADMAP;
-	    }
+			
 		if(whereOpt.navigationControl === undefined){
 			whereOpt.navigationControl = false;
 		}
+		
 		if(whereOpt.fullscreenControl === undefined){
 			whereOpt.fullscreenControl = true;
-		}
-		if(!whereOpt.fullscreenControlOptions && whereOpt.mapType === 'google'){
-			whereOpt.fullscreenControlOptions = { position: google.maps.ControlPosition.RIGHT_BOTTOM };
 		}
 		
 		if(!whereOpt.value){
 			whereOpt.value = {'south':-30, 'west':-30, 'north':30, 'east':30};
 		}
+		
 		var value = whereOpt.applyValue ? whereOpt.value.south+','+whereOpt.value.west+','+whereOpt.value.north+','+whereOpt.value.east : '';
 		
 		if(whereOpt.applyValue){
@@ -1390,7 +1380,6 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 				
 				if(whereOpt.resultsMapWidget){
 					
-					var mapType = whereOpt.resultsMapWidget.mapType();
  					whereOpt.resultsMapWidget.select();    					 		
 				}
 			}
