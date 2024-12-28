@@ -17,8 +17,8 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 
 	var predefinedLayers = [];
 
-	if (options.ol3Map) {
-		options.ol3Map.inputControl(inControl);
+	if (options.olMap) {
+		options.olMap.inputControl(inControl);
 	}
 
 	/**
@@ -232,10 +232,10 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 	inControl.updateWhereFields = function() {
 
 		updateWhereFields(
-			options.ol3Map.where().west,
-			options.ol3Map.where().south,
-			options.ol3Map.where().east,
-			options.ol3Map.where().north
+			options.olMap.where().west,
+			options.olMap.where().south,
+			options.olMap.where().east,
+			options.olMap.where().north
 		);
 	};
 
@@ -296,12 +296,12 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 
 	var updateSelection = function() {
 
-		options.ol3Map.select(inControl.where());
+		options.olMap.select(inControl.where());
 	};
 
 	var fitMapToBounds = function() {
 
-		options.ol3Map.fitBounds(inControl.where());
+		options.olMap.fitBounds(inControl.where());
 	};
 
 	/**
@@ -710,7 +710,7 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 
 				'handler': function() {
 
-					options.ol3Map.selectionVisible(false);
+					options.olMap.selectionVisible(false);
 					jQuery('#' + southFieldId).val('');
 					jQuery('#' + westFieldId).val('');
 					jQuery('#' + northFieldId).val('');

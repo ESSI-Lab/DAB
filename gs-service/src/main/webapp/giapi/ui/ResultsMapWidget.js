@@ -173,7 +173,7 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 	var widget = {};
 	var selection;
 	var noResultsOverlay;
-	var ol3Map;
+	var olMap;
 	var showRectangles = true;
 	var rectanglesArray = [];
 	var _inputControl;
@@ -181,9 +181,6 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 	if (!options) {
 		options = {};
 	}
-
-
-
 
 	if (!options.width) {
 		options.width = '368px';
@@ -305,13 +302,13 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 	options.divId = divId;
 	options.dialogMode = false;
 
-	// creates the ol3 map
-	ol3Map = GIAPI.OL_Map(options);
+	// creates the ol map
+	olMap = GIAPI.OL_Map(options);
 
-	widget.map = ol3Map.map();
+	widget.map = olMap.map();
 
 	options.widgetMap = widget.map;
-	options.ol3Map = ol3Map;
+	options.olMap = olMap;
 
 	if (options.showSelectionControl) {
 		// creates the input control
@@ -371,15 +368,23 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 
 		onlineArray.push(online);
 
-		return GIAPI.LayersFactory.layers(onlineArray, 'urn:ogc:serviceType:WebMapService:');
+		var array = GIAPI.LayersFactory.layers(onlineArray, 'urn:ogc:serviceType:WebMapService:');
+		var wmsLayer = array[0];
+
+		widget.map.on('pointermove', function(evt) {
+
+			if (evt.dragging) {
+				return;
+			}
+			const data = wmsLayer.getData(evt.pixel);
+			const hit = data && data[3] > 0; // transparent pixels have zero for data[3]
+
+			widget.map.getTargetElement().style.cursor = hit ? 'pointer' : '';
+		});
+
+		return array;
 	};
 
-	/*if(options.clusterWMS){
-		
-		var layerArray = createWMSCLusterLayer(options);	 			 					  			 
-			
-		ol3Map.addLayers(layerArray);
-	  }*/
 
 	/**
 	 * 
@@ -388,9 +393,9 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 
 		var layerArray = createWMSCLusterLayer(options, constraints);
 
-		ol3Map.removeLayers(layerArray);
+		olMap.removeLayers(layerArray);
 
-		ol3Map.addLayers(layerArray);
+		olMap.addLayers(layerArray);
 	}
 
 	/**
@@ -417,13 +422,13 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 		options.page = page;
 
 		// set the map markers
-		ol3Map.markers(options);
+		olMap.markers(options);
 
 		// resets the page in order to make it reusable
 		page.reset();
 
 		// set the bboxes
-		ol3Map.bboxes(options);
+		olMap.bboxes(options);
 
 		// resets the page in order to make it reusable
 		page.reset();
@@ -459,7 +464,7 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 	 */
 	widget.where = function() {
 
-		if (!ol3Map.selectionVisible()) {
+		if (!olMap.selectionVisible()) {
 
 			return null;
 		}
@@ -530,7 +535,7 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 	 */
 	widget.markerIcon = function(node, options) {
 
-		ol3Map.markerIcon(node, options);
+		olMap.markerIcon(node, options);
 	};
 
 	/**
@@ -539,9 +544,9 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 	widget.select = function(where) {
 
 		if (!where) {
-			ol3Map.selectionVisible(false);
+			olMap.selectionVisible(false);
 		} else {
-			ol3Map.select(where);
+			olMap.select(where);
 		}
 
 		if (options.showSelectionControl) {
@@ -559,7 +564,7 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 
 	var addLayers = function(layers) {
 
-		ol3Map.addLayers(layers);
+		olMap.addLayers(layers);
 	};
 
 	var createNoResultsOverlay = function() {
@@ -583,9 +588,13 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 	var createLayersControl = function() {
 
 		var layerSwitcher = new ol.control.LayerSwitcher({
-
-			tipLabel: 'Legend',
-			clusterWMS: options.clusterWMS,
+			tipLabel: 'Show layers control', //
+			collapseTipLabel: 'Hide layers control',//
+			activationMode: 'click', //
+			startActive: true, //
+			groupSelectStyle: 'children', // Can be 'children' [default], 'group' or 'none',
+		   
+		    clusterWMS: options.clusterWMS,
 			clusterWMSToken: options.clusterWMS,
 			clusterWMSView: options.clusterWMSView,
 			clusterWMSLayer: options.clusterWMSLayer,

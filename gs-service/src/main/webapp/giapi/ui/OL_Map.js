@@ -121,15 +121,20 @@ GIAPI.OL_Map = function(options) {
 	//
 	//
 
-	var controls = [new ol.control.Attribution(), new ol.control.MousePosition({
-		//undefinedHTML : 'outside',
-		projection: 'EPSG:3857',
-		coordinateFormat: function(coordinate) {
-			return ol.coordinate.format(coordinate, '{x}, {y}', 3);
-		}
-	}), new ol.control.ScaleLine(), new ol.control.Zoom({ className: 'custom-zoom' }), new ol.control.Rotate({
-		autoHide: true
-	})];
+	var controls = [ //
+		new ol.control.Attribution(),//
+		new ol.control.MousePosition({//
+			//undefinedHTML : 'outside',
+			projection: 'EPSG:3857',
+			coordinateFormat: function(coordinate) {
+				return ol.coordinate.format(coordinate, '{x}, {y}', 3);
+			}
+		}),//
+		new ol.control.ScaleLine(),  //
+		// new ol.control.Zoom({ className: 'custom-zoom' }), //
+		new ol.control.Rotate({//
+			autoHide: true
+		})];
 
 	if (options.fullscreenControl) {
 		controls.push(new ol.control.FullScreen());
@@ -143,8 +148,9 @@ GIAPI.OL_Map = function(options) {
 
 		layers: [],
 
-		interactions: (options.scrollwheel) ? ol.interaction.defaults() : ol.interaction.defaults({
-			mouseWheelZoom: false
+		interactions: ol.interaction.defaults.defaults({
+
+			mouseWheelZoom: options.scrollwheel
 		}),
 
 		controls: controls,
