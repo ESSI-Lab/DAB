@@ -239,6 +239,7 @@
 					var url = endpoint + this.options.servicePath + '/token/' + this.options.clusterWMSToken + '/view/' + this.options.clusterWMSView + '/wms-cluster?service=WMS&request=GetLegendGraphic&layers=' + this.options.clusterWMSLayerName;
 
 					this.legendImage = document.createElement('img');
+					this.legendImage.style = 'margin-left: 13px; margin-right: 7px; margin-top: -15px;'
 					this.legendImage.id = 'wmsClusterLegendImg';
 					this.legendImage.src = url;
 
