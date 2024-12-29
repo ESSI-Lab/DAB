@@ -598,8 +598,10 @@
 	  	        		'clusterWMSToken': 'his_central-568a4888-d6bd-4be3-b7a6-d9887997bb0f',
 	  	        		'clusterWMSView': 'his-central',
 	  	        		'clusterWMSLayerName': 'his-central',
-	  	        		'clusterWMSLayerTitle': 'his-central',	  	        		
-	  	        			
+	  	        		'clusterWMSLayerTitle': 'his-central',
+	  	        		
+	  	        		'stationInfoId': 'stationInfo',	  	    
+	  	        		
 		        		'onMarkerMouseOver': function(node) {
 		        			
 		        			window.open('#section-div-'+node.uiId, '_self');   
@@ -842,44 +844,44 @@
                 //
                 var Common_UINode_No_Aside = function(options) {
 	             	
-	            	var uiNode = GIAPI.Common_UINode(options);	
-	            	
-	            	options.asideDom = function(node,options,asideId){                	
-	            	};
-	            	
-	            	options.onAsideReady = function(aside,node){               	
-	            	};
-	
-	            	return uiNode;
+		            	var uiNode = GIAPI.Common_UINode(options);	
+		            	
+		            	options.asideDom = function(node,options,asideId){                	
+		            	};
+		            	
+		            	options.onAsideReady = function(aside,node){               	
+		            	};
+		
+		            	return uiNode;
 	            };
 	                     
 	            
                 // creates the layout
 	            GIAPI.search.resultSetLayout = GIAPI.ResultSetLayout('results-tab',{
 	            	                	
-	            	// registers the ui nodes
-                	'uiNodes' : [Common_UINode_No_Aside],
-                	
-                	// set the widgets to update
-                	'mapWidget' : GIAPI.search.resultsMapWidget,
-                	'pagWidget' : GIAPI.search.paginatorWidget,
-                    'tfWidget' : GIAPI.search.tfWidget,
-                    
-                   	
-                	'browseCollection': false,
-                	'browseCollectionMapType': 'ol',
-                	'onDiscoverResponse': GIAPI.search.onDiscoverResponse,
-                 	// ---------------------------------------------------
-	                                	                   	                	
-	            	'dabNode': GIAPI.search.dab,     
-	               	//'height': jQuery(window).height()-100,
-	            	'maxHeight': jQuery(window).height()-210,
-	            });
-	            
-	            //------------------------------------
-                // Starts discover
-                //
-//	            GIAPI.search.discover();  
+		            	// registers the ui nodes
+	                	'uiNodes' : [Common_UINode_No_Aside],
+	                	
+	                	// set the widgets to update
+	                	'mapWidget' : GIAPI.search.resultsMapWidget,
+	                	'pagWidget' : GIAPI.search.paginatorWidget,
+	                    'tfWidget' : GIAPI.search.tfWidget,
+	                    
+	                   	
+	                	'browseCollection': false,
+	                	'browseCollectionMapType': 'ol',
+	                	'onDiscoverResponse': GIAPI.search.onDiscoverResponse,
+	                 	// ---------------------------------------------------
+		                                	                   	                	
+		            	'dabNode': GIAPI.search.dab,     
+		               	//'height': jQuery(window).height()-100,
+		            	'maxHeight': jQuery(window).height()-210,
+		            });
+		            
+		            //------------------------------------
+	                // Starts discover
+	                //
+	//	            GIAPI.search.discover();  
 	       });
 	        
 	       GIAPI.search.discover = function(init) {
@@ -953,26 +955,27 @@
         <div id="controlToggleButtonDiv"></div> 
         
         <div id="headerDiv">
-    		<div id="search-button"></div>
-    		
-    		<div id="hide-results-button"></div>    	
-    			
-        	<div id="what-div"></div>
-        	<div id="from-div"></div>
-        	<div id="to-div"></div>
-        	
-        	<div id="where-div"></div>
-        	      	
-        	<div id="adv-search-div"></div>
-         	
-        	<div id="logoDiv" >
+        
+	    		<div id="search-button"></div>
+	    		
+	    		<div id="hide-results-button"></div>    	
+	    			
+	        	<div id="what-div"></div>
+	        	<div id="from-div"></div>
+	        	<div id="to-div"></div>
+	        	
+	        	<div id="where-div"></div>
 	        	      	
-	       </div>
+	        	<div id="adv-search-div"></div>
+	         	
+	        	<div id="logoDiv"></div>
           	
 	   </div>
        	    
        <div id="resMapWidget"></div>
-       
+        
+       <div id="stationInfo" style="margin-top: -310px; position: relative; float: right; margin-right: 8px;"></div>
+        
        <div id="paginator-widget"></div>       
        
 	   <div id="tabs-div">
