@@ -371,6 +371,9 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 		var array = GIAPI.LayersFactory.layers(onlineArray, 'urn:ogc:serviceType:WebMapService:');
 		var wmsLayer = array[0];
 
+		//
+		// set the pointer cursor when over a tile
+		//
 		widget.map.on('pointermove', function(evt) {
 
 			if (evt.dragging) {
@@ -380,6 +383,30 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 			const hit = data && data[3] > 0; // transparent pixels have zero for data[3]
 
 			widget.map.getTargetElement().style.cursor = hit ? 'pointer' : '';
+		});
+
+		//
+		// updates the station info panel after a click
+		//
+		widget.map.on('singleclick', function(evt) {
+			
+			document.getElementById('stationInfo').innerHTML = '';
+		
+			const viewResolution = /** @type {number} */ (widget.map.getView().getResolution());
+			const url = wmsLayer.getSource().getFeatureInfoUrl(
+				evt.coordinate,
+				viewResolution,
+				'EPSG:3857',
+				{ 'INFO_FORMAT': 'text/html' },
+			);
+			
+			if (url) {
+				fetch(url)
+					.then((response) => response.text())
+					.then((html) => {
+						document.getElementById(options.stationInfoId).innerHTML = html;
+					});
+			}
 		});
 
 		return array;
@@ -593,8 +620,8 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 			activationMode: 'click', //
 			startActive: true, //
 			groupSelectStyle: 'children', // Can be 'children' [default], 'group' or 'none',
-		   
-		    clusterWMS: options.clusterWMS,
+
+			clusterWMS: options.clusterWMS,
 			clusterWMSToken: options.clusterWMS,
 			clusterWMSView: options.clusterWMSView,
 			clusterWMSLayer: options.clusterWMSLayer,
