@@ -164,34 +164,7 @@ GIAPI.OL_Map = function(options) {
 			zoom: options.zoom
 		})
 	});
-
-	map.on('singleclick', function(evt) {
-
-
-		//console.log(evt);
-		//console.log(evt.coordinate);
-
-		/*map.forEachLayerAtPixel(evt.pixel, function(layer){ 
-					
-						 console.log(layer);
-					});*/
-
-	});
-
-	map.on("pointermove", function(evt) {
-
-		/*var pixel = map.getEventPixel(evt.originalEvent);
-		var hit = map.hasFeatureAtPixel(pixel);
-		
-		this.getTargetElement().style.cursor = hit ? 'pointer' : '';
-		
-		map.forEachLayerAtPixel(evt.pixel, function(layer){ 
-			
-				 
-		});*/
-
-	});
-
+	
 	//
 	// base maps group
 	//
