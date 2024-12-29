@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.Set;
 
@@ -48,6 +49,7 @@ import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
 import eu.essi_lab.lib.net.utils.whos.WHOSOntology;
 import eu.essi_lab.lib.net.utils.whos.WMOOntology;
 import eu.essi_lab.lib.net.utils.whos.WMOUnit;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
@@ -88,9 +90,19 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
      * 
      */
     private static final int DEFAULT_PAGE_SIZE = 10;
+    private String viewId;
+
+    /**
+     * @param setting
+     */
+    public BNHSStationHandler(WebRequest request) {
+
+	viewId = BNHSProfiler.readViewId(request);
+    }
 
     @Override
     public Response handle(WebRequest webRequest) throws GSException {
+
 	ResponseBuilder builder = Response.status(Status.OK);
 
 	// station/C4EE9FB0F47E8B247EE17F597A2F1105A0006399
@@ -163,12 +175,11 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 
 	    StorageInfo storageUri = ConfigurationWrapper.getDatabaseURI();
 
-	    Optional<View> optionalView = WebRequestTransformer.findView(storageUri, "whos-arctic");
+	    Optional<View> optionalView = WebRequestTransformer.findView(storageUri, viewId);
 
 	    if (optionalView.isPresent()) {
 
-		discoveryMessage.setView(optionalView.get());
-
+		//discoveryMessage.setView(optionalView.get());
 	    }
 
 	    discoveryMessage.setPermittedBond(bond);
@@ -385,22 +396,36 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 
 	} else {
 
+	    //
 	    // main page
+	    //
 
-	    InputStream stream = BNHSStationHandler.class.getClassLoader().getResourceAsStream("bnhs/station.html");
+	    InputStream stream = null;
+
+	    switch (viewId) {
+	    case "whos-arctic":
+		stream = BNHSStationHandler.class.getClassLoader().getResourceAsStream("bnhs/station.html");
+		break;
+	    case "whos":
+		stream = BNHSStationHandler.class.getClassLoader().getResourceAsStream("bnhs-whos/station.html");
+		break;
+	    case "his-central":
+		stream = BNHSStationHandler.class.getClassLoader().getResourceAsStream("bnhs-his-central/station.html");
+		break;
+	    }
+
 	    String html = "";
 
 	    try {
 		html = IOUtils.toString(stream, StandardCharsets.UTF_8);
 		stream.close();
 	    } catch (Exception e) {
-		e.printStackTrace();
+		GSLoggerFactory.getLogger(getClass()).error(e);
 	    }
 
 	    builder = builder.entity(html).type(new MediaType("text", "html"));
 
 	    return builder.build();
-
 	}
     }
 
