@@ -270,7 +270,7 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 			    stations.add(station);
 			}
 
-			InputStream stream = generator.getInfoPage(stations, format, request);
+			InputStream stream = generator.getInfoPage(viewId, stations, format, request);
 
 			IOUtils.copy(stream, output);
 

@@ -36,7 +36,7 @@ import eu.essi_lab.profiler.wms.cluster.WMSRequest.Parameter;
 public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 
     @Override
-    public InputStream getInfoPage(List<StationRecord> stations, String contentType, WMSGetFeatureInfoRequest request) {
+    public InputStream getInfoPage(String viewId, List<StationRecord> stations, String contentType, WMSGetFeatureInfoRequest request) {
 
 	StringBuilder htmlBuilder = new StringBuilder();
 
@@ -117,14 +117,16 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 	    // HTML
 	    //
 
-	    htmlBuilder = append(htmlBuilder, station);
+	    htmlBuilder = append(htmlBuilder, station, viewId);
 	}
-
-	htmlBuilder = close(htmlBuilder);
 
 	if (stations.isEmpty()) {
 
 	    htmlBuilder = build(new StringBuilder(), true);
+
+	} else {
+
+	    htmlBuilder = close(htmlBuilder);
 	}
 
 	ByteArrayInputStream bis;
@@ -152,20 +154,27 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
      */
     private StringBuilder close(StringBuilder builder) {
 
-	builder.append("</table>\n" + "<br/>\n" + "\n" + "  </body>\n" + "</html>");
+	builder.append("</table></div>\n" + "<br/>\n" + "\n" + "  </body>\n" + "</html>");
 	return builder;
     }
 
     /**
+     * @param builder
      * @param station
+     * @param viewId
      * @return
      */
-    private StringBuilder append(StringBuilder builder, StationRecord station) {
+    private StringBuilder append(StringBuilder builder, StationRecord station, String viewId) {
 
-	builder.append("    <tr>\n");
-	builder.append("  <td>" + station.getDatasetName() + "</td>    \n");
-	builder.append("      <td><a href='" + station.getMetadataUrl() + "' target='_blank'>Station information</a></td>\n");
-	builder.append("  </tr>\n");
+	String url = "../services/view/" + viewId + "/bnhs/station/" + station.getPlatformIdentifier() + "/";
+
+	String image = "<a href='" + url
+		+ "' target='_blank'><img src='https://upload.wikimedia.org/wikipedia/commons/5/54/Information.png' alt='' style='width:18px;height:18px;'></a>";
+
+	builder.append("<tr>\n");
+	builder.append("  <td style='vertical-align: middle;'>" + station.getDatasetName() + "</td>    \n");
+	builder.append("  <td style='text-align: center;'>" + image + "</td>\n");
+	builder.append("</tr>\n");
 
 	return builder;
     }
@@ -216,11 +225,11 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 
 	if (!empty) {
 
-	    builder.append("<table class='featureInfo'>\n");
+	    builder.append("<div style='max-height: 400px; overflow-y: auto'><table class='featureInfo'>\n");
 
 	    builder.append("<tr>\n");
 	    builder.append(" <th >Station name</th>\n");
-	    builder.append(" <th >Station information</th>\n");
+	    builder.append(" <th >Station info</th>\n");
 	    builder.append(" </tr>\n");
 
 	} else {
