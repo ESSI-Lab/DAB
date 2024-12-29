@@ -37,22 +37,10 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 
     @Override
     public InputStream getInfoPage(List<StationRecord> stations, String contentType, WMSGetFeatureInfoRequest request) {
-	String html = "<html>\n" + "  <head>\n" + "    <title>DAB GetFeatureInfo output</title>\n" + "  </head>\n"
-		+ "  <style type=\"text/css\">\n" + "	table.featureInfo, table.featureInfo td, table.featureInfo th {\n"
-		+ "		border:1px solid #ddd;\n" + "		border-collapse:collapse;\n" + "		margin:0;\n"
-		+ "		padding:0;\n" + "		font-size: 90%;\n" + "		padding:.2em .1em;\n" + "	}\n"
-		+ "	table.featureInfo th {\n" + "	    padding:.2em .2em;\n" + "		font-weight:bold;\n"
-		+ "		background:#eee;\n" + "	}\n" + "	table.featureInfo td{\n" + "		background:#fff;\n" + "	}\n"
-		+ "	table.featureInfo tr.odd td{\n" + "		background:#eee;\n" + "	}\n"
-		+ "	table.featureInfo caption{\n" + "		text-align:left;\n" + "		font-size:100%;\n"
-		+ "		font-weight:bold;\n" + "		padding:.2em .2em;\n" + "	}\n" + "  </style>\n" + "  <body>\n"
-		+ "  \n" + "<table class=\"featureInfo\">\n" + "  <caption class=\"featureInfo\">selected station(s)</caption>\n"
-		+ "  <tr>\n" + //
 
-		"    <th >Station name</th>\n" + //
-		"    <th >Station information</th>\n" + //
-		"  </tr>\n" + //
-		"\n";
+	StringBuilder htmlBuilder = new StringBuilder();
+
+	htmlBuilder = build(htmlBuilder, false);
 
 	JSONArray json = new JSONArray();
 
@@ -63,17 +51,23 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 	geoJson.put("numberReturned", stations.size());
 	geoJson.put("timeStamp", ISO8601DateTimeUtils.getISO8601DateTime());
 	geoJson.put("crs", request.getParameterValue(Parameter.CRS));
+
 	JSONArray features = new JSONArray();
 	geoJson.put("features", features);
 
 	for (StationRecord station : stations) {
-	    // JSON
 
+	    //
+	    // JSON
+	    //
 	    JSONObject obj = new JSONObject();
 	    addProperty(obj, "name", "Name", station.getDatasetName(), 1, 0);
 	    addProperty(obj, "metadata", "Metadata URL", station.getMetadataUrl(), 0, 1);
 	    json.put(obj);
+
+	    //
 	    // GEO JSON
+	    //
 	    JSONObject geo = new JSONObject();
 	    geo.put("type", "Feature");
 	    if (station.getPlatformIdentifier() != null) {
@@ -104,8 +98,10 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 		    coordinates.put(station.getBbox4326().getNorth());
 		}
 	    }
+
 	    geometry.put("coordinates", coordinates);
 	    geo.put("geometry", geometry);
+
 	    JSONObject properties = new JSONObject();
 	    if (station.getDatasetName() != null) {
 		properties.put("name", station.getDatasetName());
@@ -116,26 +112,19 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 
 	    geo.put("properties", properties);
 	    features.put(geo);
+
+	    //
 	    // HTML
-	    html += "    <tr>\n" + "\n" + //
-		    "  <td>" + station.getDatasetName() + "</td>    \n" + //
-		    "      <td><a href='" + station.getMetadataUrl() + "' target='_blank'>Station information</a></td>\n" + //
-		    "  </tr>\n";//
+	    //
+
+	    htmlBuilder = append(htmlBuilder, station);
 	}
 
-	html += "</table>\n" + "<br/>\n" + "\n" + "  </body>\n" + "</html>";
+	htmlBuilder = close(htmlBuilder);
 
 	if (stations.isEmpty()) {
-	    html = "\n" + "<html>\n" + "  <head>\n" + "    <title>DAB GetFeatureInfo output</title>\n" + "  </head>\n"
-		    + "  <style type=\"text/css\">\n" + "	table.featureInfo, table.featureInfo td, table.featureInfo th {\n"
-		    + "		border:1px solid #ddd;\n" + "		border-collapse:collapse;\n" + "		margin:0;\n"
-		    + "		padding:0;\n" + "		font-size: 90%;\n" + "		padding:.2em .1em;\n" + "	}\n"
-		    + "	table.featureInfo th {\n" + "	    padding:.2em .2em;\n" + "		font-weight:bold;\n"
-		    + "		background:#eee;\n" + "	}\n" + "	table.featureInfo td{\n" + "		background:#fff;\n" + "	}\n"
-		    + "	table.featureInfo tr.odd td{\n" + "		background:#eee;\n" + "	}\n"
-		    + "	table.featureInfo caption{\n" + "		text-align:left;\n" + "		font-size:100%;\n"
-		    + "		font-weight:bold;\n" + "		padding:.2em .2em;\n" + "	}\n" + "  </style>\n" + "  <body>\n"
-		    + "  \n" + "  </body>\n" + "</html>";
+
+	    htmlBuilder = build(new StringBuilder(), true);
 	}
 
 	ByteArrayInputStream bis;
@@ -151,10 +140,95 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 	    break;
 	default:
 	case "text/html":
-	    bis = new ByteArrayInputStream(html.getBytes());
+	    bis = new ByteArrayInputStream(htmlBuilder.toString().getBytes());
 	}
 
 	return bis;
+    }
+
+    /**
+     * @param builder
+     * @return
+     */
+    private StringBuilder close(StringBuilder builder) {
+
+	builder.append("</table>\n" + "<br/>\n" + "\n" + "  </body>\n" + "</html>");
+	return builder;
+    }
+
+    /**
+     * @param station
+     * @return
+     */
+    private StringBuilder append(StringBuilder builder, StationRecord station) {
+
+	builder.append("    <tr>\n");
+	builder.append("  <td>" + station.getDatasetName() + "</td>    \n");
+	builder.append("      <td><a href='" + station.getMetadataUrl() + "' target='_blank'>Station information</a></td>\n");
+	builder.append("  </tr>\n");
+
+	return builder;
+    }
+
+    /**
+     * @param empty
+     * @return
+     */
+    private StringBuilder build(StringBuilder builder, boolean empty) {
+
+	builder.append("<html>\n");
+	builder.append("  <head>\n");
+	builder.append("    <title>DAB GetFeatureInfo output</title>\n");
+	builder.append("  </head>\n");
+
+	builder.append(" <style type='text/css'>\n");
+
+	builder.append("	table.featureInfo, table.featureInfo td, table.featureInfo th {\n");
+	builder.append("		border:1px solid black;\n");
+	builder.append("		border-collapse:collapse;\n");
+	builder.append("		margin:0;\n");
+	builder.append("		font-size: 100%;\n");
+	builder.append("		padding:.2em .5em;\n");
+	builder.append("	}\n");
+
+	builder.append("	table.featureInfo th {\n");
+	builder.append("	    	padding:.5em .5em;\n");
+	builder.append("		font-weight:bold;\n");
+	builder.append("		background:#eee;\n");
+	builder.append("	}\n");
+
+	builder.append("	table.featureInfo td{\n");
+	builder.append("		background:#fff;\n");
+	builder.append("	}\n");
+
+	builder.append("	table.featureInfo tr.odd td{\n");
+	builder.append("		background:#eee;\n");
+	builder.append("	}\n");
+
+	builder.append("	table.featureInfo caption{\n");
+	builder.append("		text-align:left;\n");
+	builder.append("		font-size:100%;\n");
+	builder.append("		font-weight:bold;\n");
+	builder.append("		padding:.2em .2em;\n");
+	builder.append("	}\n");
+	builder.append("  </style>\n");
+	builder.append("  <body>\n");
+
+	if (!empty) {
+
+	    builder.append("<table class='featureInfo'>\n");
+
+	    builder.append("<tr>\n");
+	    builder.append(" <th >Station name</th>\n");
+	    builder.append(" <th >Station information</th>\n");
+	    builder.append(" </tr>\n");
+
+	} else {
+
+	    builder.append("\n</body>\n </html>");
+	}
+
+	return builder;
     }
 
     private JSONArray getJSONArray(double lon, double lat) {
@@ -171,7 +245,5 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 	json.put("isTitle", isTitle);
 	json.put("isLink", isLink);
 	obj.put(key, json);
-
     }
-
 }
