@@ -169,11 +169,12 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 	String url = "../services/view/" + viewId + "/bnhs/station/" + station.getPlatformIdentifier() + "/";
 
 	String image = "<a href='" + url
-		+ "' target='_blank'><img src='https://upload.wikimedia.org/wikipedia/commons/5/54/Information.png' alt='' style='width:18px;height:18px;'></a>";
+		+ "' target='_blank'><i class=\"font-awesome-button-icon fa fa-info-circle\" style=\"color:blue; font-size:15px;\" aria-hidden=\"true\"></i></a>";
 
 	builder.append("<tr>\n");
 	builder.append("  <td style='vertical-align: middle;'>" + station.getDatasetName() + "</td>    \n");
 	builder.append("  <td style='text-align: center;'>" + image + "</td>\n");
+	builder.append("  <td style='text-align: center; cursor:pointer' id='addToSearch_"+station.getDatasetName()+"'><i class=\"font-awesome-button-icon fa fa-plus-circle\" style=\"color:darkred; font-size:15px;\" aria-hidden=\"true\"></i></td>\n");
 	builder.append("  <td style='border: 1px solid transparent; background: transparent;'></td>\n");
 
 	builder.append("</tr>\n");
@@ -232,6 +233,7 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 	    builder.append("<tr>\n");
 	    builder.append(" <th >Station name</th>\n");
 	    builder.append(" <th >Station info</th>\n");
+	    builder.append(" <th >Add to search</th>\n");
 	    builder.append(" <th title='Close' id='closePopup' style='background: white; cursor: pointer; background:'><i class=\"font-awesome-button-icon fa fa-times\" style=\"font-size:15px;\" aria-hidden=\"true\"></i></th>\n");
 	    builder.append(" </tr>\n");
 

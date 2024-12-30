@@ -602,6 +602,8 @@
 	  	        		
 	  	        		'stationInfoId': 'stationInfo',	  	    
 	  	        		
+	  	        		'stationNameAddId' : 'platformNameConstraint',
+	  	        		
 		        		'onMarkerMouseOver': function(node) {
 		        			
 		        			window.open('#section-div-'+node.uiId, '_self');   
@@ -785,7 +787,7 @@
                		[
                			GIAPI.search.constWidget.textConstraint('get','instrumentTitle'),
                			GIAPI.search.constWidget.textConstraint('get','attributeTitle'),
-               			GIAPI.search.constWidget.textConstraint('get','platformTitle'),
+               			GIAPI.search.constWidget.textConstraint('get','platformTitle', {id:'platformNameConstraint'}),
                			GIAPI.search.constWidget.booleanConstraint('get','isValidated')
                		]              
                 ); 

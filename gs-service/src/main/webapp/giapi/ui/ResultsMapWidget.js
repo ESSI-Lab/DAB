@@ -422,7 +422,16 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 						jQuery('#closePopup').on("click", function() {
 
 							overlay.setPosition(undefined);
-							return false;						
+							return false;
+						});
+
+						jQuery('[id^=addToSearch]').on("click", function() {
+
+							var name = this.id.substring(this.id.indexOf('_')+1, this.id.length);
+							
+							jQuery('#'+options.stationNameAddId).val(name);
+							
+							return false;
 						});
 					});
 			}
