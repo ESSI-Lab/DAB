@@ -386,12 +386,23 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 		});
 
 		//
+		// creates an overlay to anchor the popup to the map
+		//		 
+		const overlay = new ol.Overlay({
+			element: document.getElementById(options.stationInfoId)
+		});
+
+		widget.map.addOverlay(overlay);
+
+		//
 		// updates the station info panel after a click
 		//
 		widget.map.on('singleclick', function(evt) {
-			
+
 			document.getElementById('stationInfo').innerHTML = '';
-		
+
+			const coordinate = evt.coordinate;
+
 			const viewResolution = /** @type {number} */ (widget.map.getView().getResolution());
 			const url = wmsLayer.getSource().getFeatureInfoUrl(
 				evt.coordinate,
@@ -399,12 +410,20 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 				'EPSG:3857',
 				{ 'INFO_FORMAT': 'text/html' },
 			);
-			
+
 			if (url) {
 				fetch(url)
 					.then((response) => response.text())
 					.then((html) => {
+
 						document.getElementById(options.stationInfoId).innerHTML = html;
+						overlay.setPosition(coordinate);
+
+						jQuery('#closePopup').on("click", function() {
+
+							overlay.setPosition(undefined);
+							return false;						
+						});
 					});
 			}
 		});

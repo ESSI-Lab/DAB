@@ -174,6 +174,8 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 	builder.append("<tr>\n");
 	builder.append("  <td style='vertical-align: middle;'>" + station.getDatasetName() + "</td>    \n");
 	builder.append("  <td style='text-align: center;'>" + image + "</td>\n");
+	builder.append("  <td style='border: 1px solid transparent; background: transparent;'></td>\n");
+
 	builder.append("</tr>\n");
 
 	return builder;
@@ -230,6 +232,7 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 	    builder.append("<tr>\n");
 	    builder.append(" <th >Station name</th>\n");
 	    builder.append(" <th >Station info</th>\n");
+	    builder.append(" <th title='Close' id='closePopup' style='background: white; cursor: pointer; background:'><i class=\"font-awesome-button-icon fa fa-times\" style=\"font-size:15px;\" aria-hidden=\"true\"></i></th>\n");
 	    builder.append(" </tr>\n");
 
 	} else {

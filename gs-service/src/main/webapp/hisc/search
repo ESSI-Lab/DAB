@@ -974,7 +974,7 @@
        	    
        <div id="resMapWidget"></div>
        
-       <div id="stationInfo" style="margin-top: -310px; position: relative; float: right; margin-right: 8px;"></div>
+       <div id="stationInfo"></div>
            
        <div id="paginator-widget"></div>       
        
