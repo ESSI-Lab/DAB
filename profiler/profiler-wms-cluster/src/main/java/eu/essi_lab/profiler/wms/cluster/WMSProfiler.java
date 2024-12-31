@@ -89,7 +89,7 @@ public class WMSProfiler extends Profiler<WMSClusterProfilerSetting> {
 	selector.register(new WMSMapRequestFilter(), getMapHandler);
 
 	// Get Legend
-	WMSGetLegendHandler getLegendHandler = new WMSGetLegendHandler();
+	WMSGetLegendHandler getLegendHandler = new WMSGetLegendHandler(getSetting());
 	selector.register(new WMSLegendRequestFilter(), getLegendHandler);
 
 	// Get Feature Info

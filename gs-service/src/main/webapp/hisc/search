@@ -23,12 +23,14 @@
 		<script type="text/javascript" src="../giapi/yahoo/connection-min-2.9.0.js"></script>
 		<script type="text/javascript" src="../giapi/yahoo/tree-view-min-2.9.0.js"></script>
 		
- 		<script type="text/javascript" src="../giapi/ol/ol-3.15.1.js"></script>
-		<script type="text/javascript" src="../giapi/ol/ol3-layerswitcher.js"></script>
-		
-		<link rel="stylesheet" type="text/css" href="../giapi/ol/ol-3.15.1.css" />
-		<link rel="stylesheet" type="text/css" href="../giapi/ol/ol3-layerswitcher.css" />
-		
+		<!-- OpenLayers --> 		
+		<script src="https://cdn.jsdelivr.net/npm/ol@v10.3.1/dist/ol.js"></script>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v10.3.1/ol.css">				
+			
+		<!-- OpenLayerSwitcher --> 		
+		<link rel="stylesheet" type="text/css" href="../giapi/ol-layerswitcher/ol-layerswitcher.css" />
+ 	    <script type="text/javascript" src="../giapi/ol-layerswitcher/ol-layerswitcher.js"></script> 
+ 	  			
 		<script type="text/javascript" src="../giapi/core/GIAPI.js"></script>
 		<script type="text/javascript" src="../giapi/core/DAB.js"></script>
 		<script type="text/javascript" src="../giapi/core/DABSource.js"></script>
@@ -87,7 +89,7 @@
 		<script type="text/javascript" src="../giapi/ui/NodeMapWidget.js"></script>
 		<script type="text/javascript" src="../giapi/ui/ODIPSourcesWidget.js"></script>
 		<script type="text/javascript" src="../giapi/ui/ODIPWidget.js"></script>
-		<script type="text/javascript" src="../giapi/ui/OL3_Map.js"></script>
+		<script type="text/javascript" src="../giapi/ui/OL_Map.js"></script>
 		<script type="text/javascript" src="../giapi/ui/PageSizeWidget.js"></script>
 		<script type="text/javascript" src="../giapi/ui/PaginatorWidget.js"></script>
 		<script type="text/javascript" src="../giapi/ui/ResultSetLayout.js"></script>
@@ -597,7 +599,12 @@
 	  	        		'clusterWMSView': 'his-central',
 	  	        		'clusterWMSLayerName': 'his-central',
 	  	        		'clusterWMSLayerTitle': 'his-central',	  	        		
-	  	        			
+	  	        		
+	  	        		'stationInfoId': 'stationInfo',	  	    	  	        		
+	  	        		'stationNameAddId' : 'platformNameConstraint',
+	  	        		
+	  	        		'advancedConstraintDivId': 'advConstDiv',
+	  	        		
 		        		'onMarkerMouseOver': function(node) {
 		        			
 		        			window.open('#section-div-'+node.uiId, '_self');   
@@ -781,7 +788,8 @@
                		[
                			GIAPI.search.constWidget.textConstraint('get','instrumentTitle'),
                			GIAPI.search.constWidget.textConstraint('get','attributeTitle'),
-               			GIAPI.search.constWidget.textConstraint('get','platformTitle'),
+               			GIAPI.search.constWidget.textConstraint('get','platformTitle', 
+               					{id:'platformNameConstraint', helpIconImage: 'fa-wifi' }),
                			GIAPI.search.constWidget.booleanConstraint('get','isValidated')
                		]              
                 ); 
@@ -951,26 +959,27 @@
         <div id="controlToggleButtonDiv"></div> 
         
         <div id="headerDiv">
-    		<div id="search-button"></div>
-    		
-    		<div id="hide-results-button"></div>    	
-    			
-        	<div id="what-div"></div>
-        	<div id="from-div"></div>
-        	<div id="to-div"></div>
-        	
-        	<div id="where-div"></div>
-        	      	
-        	<div id="adv-search-div"></div>
-         	
-        	<div id="logoDiv" >
+        
+	    		<div id="search-button"></div>
+	    		
+	    		<div id="hide-results-button"></div>    	
+	    			
+	        	<div id="what-div"></div>
+	        	<div id="from-div"></div>
+	        	<div id="to-div"></div>
+	        	
+	        	<div id="where-div"></div>
 	        	      	
-	       </div>
+	        	<div id="adv-search-div"></div>
+	         	
+	        	<div id="logoDiv"></div>
           	
 	   </div>
        	    
        <div id="resMapWidget"></div>
        
+       <div id="stationInfo"></div>
+           
        <div id="paginator-widget"></div>       
        
 	   <div id="tabs-div">

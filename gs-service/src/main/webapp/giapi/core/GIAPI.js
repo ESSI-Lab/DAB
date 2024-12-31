@@ -43,19 +43,10 @@ var GIAPI = {
         arpa: 'http://arpa-er.geodab.eu/gi-cat-arpa/'
 
     },
-    
-    
+       
     ui: {
     	
-    	/** 
-    	 * Set the <a href="../classes/NodeMapWidget.html#mapType">mapType</a> option of the <a href="../classes/NodeMapWidget.html">widgets</a> 
-    	 * located in the <code>&lt;aside&gt;</code> element.<br>
-    	 * If set before the creation of a ResultsMapWidget, it is used as value for the mapType option 
-    	 * 
-    	 * @static
-    	 * @property {String} [GIAPI.ui.mapType='google']
-    	 */
-    	mapType: 'google'
+     
     },
     
     nameSpace: {

@@ -1,5 +1,8 @@
 package eu.essi_lab.profiler.bnhs;
 
+import java.util.Optional;
+import java.util.Properties;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -41,9 +44,17 @@ import eu.essi_lab.pdk.handler.selector.HandlerSelector;
  */
 public class BNHSProfiler extends Profiler<BNHSProfilerSetting> {
 
-
     public BNHSProfiler() {
 
+    }
+
+    /**
+     * @param setting
+     * @return
+     */
+    static String readViewId(WebRequest request) {
+	
+	return request.extractViewId().orElse("whos-arctic");	
     }
 
     @Override
@@ -54,8 +65,9 @@ public class BNHSProfiler extends Profiler<BNHSProfilerSetting> {
 	//
 	// the modified CSV list (adding the links to the DAB)
 	//
+
 	DiscoveryHandler<String> bnhsHandler = new DiscoveryHandler<>();
-	bnhsHandler.setRequestTransformer(new BNHSRequestTransformer());
+	bnhsHandler.setRequestTransformer(new BNHSRequestTransformer(request));
 	bnhsHandler.setMessageResponseMapper(new BNHSResultSetMapper());
 	bnhsHandler.setMessageResponseFormatter(new BNHSResultSetFormatter());
 	selector.register(//
@@ -65,7 +77,7 @@ public class BNHSProfiler extends Profiler<BNHSProfilerSetting> {
 	//
 	// the station page
 	//
-	WebRequestHandler stationHandler = new BNHSStationHandler();
+	WebRequestHandler stationHandler = new BNHSStationHandler(request);
 	selector.register(//
 		createFiter("bnhs/station/*"), //
 		stationHandler);
@@ -73,7 +85,7 @@ public class BNHSProfiler extends Profiler<BNHSProfilerSetting> {
 	//
 	// the station timeseries page
 	//
-	WebRequestHandler stationTimeSeriesHandler = new BNHSStationHandler();
+	WebRequestHandler stationTimeSeriesHandler = new BNHSStationHandler(request);
 	selector.register(//
 		createFiter("bnhs/station/*/timeseries"), //
 		stationTimeSeriesHandler);
@@ -81,7 +93,7 @@ public class BNHSProfiler extends Profiler<BNHSProfilerSetting> {
 	//
 	// base web page, with links (e.g. http://gs-service-production.geodab.eu/gs-service/services/bnhs)
 	//
-	WebRequestHandler infoHandler = new BNHSInfoHandler();
+	WebRequestHandler infoHandler = new BNHSInfoHandler(request);
 	selector.register(//
 		createFiter("bnhs"), //
 		infoHandler);

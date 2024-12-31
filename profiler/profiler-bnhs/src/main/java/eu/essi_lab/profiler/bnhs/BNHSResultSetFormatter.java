@@ -60,8 +60,6 @@ public class BNHSResultSetFormatter extends DiscoveryResultSetFormatter<String> 
 	BNHS_FORMATTING_ENCODING.setMediaType(new MediaType("text", "csv"));
     }
 
-    private static final String BNHS_FORMATTER_ERROR = "BNHS_FORMATTER_ERROR";
-
     @Override
     public Response format(DiscoveryMessage message, ResultSet<String> mappedResultSet) throws GSException {
 

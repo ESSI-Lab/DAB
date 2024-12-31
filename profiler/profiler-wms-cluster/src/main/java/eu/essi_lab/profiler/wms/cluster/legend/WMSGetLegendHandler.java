@@ -37,16 +37,15 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 
 import javax.imageio.ImageIO;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
 
-import eu.essi_lab.access.datacache.DataCacheConnector;
-import eu.essi_lab.access.datacache.DataCacheConnectorFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.dc_connector.DataCacheConnectorSetting;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.bond.View;
@@ -55,6 +54,7 @@ import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
+import eu.essi_lab.profiler.wms.cluster.WMSClusterProfilerSetting;
 import eu.essi_lab.profiler.wms.cluster.WMSRequest.Parameter;
 import eu.essi_lab.profiler.wms.cluster.map.WMSGetMapHandler;
 
@@ -63,7 +63,20 @@ import eu.essi_lab.profiler.wms.cluster.map.WMSGetMapHandler;
  */
 public class WMSGetLegendHandler extends StreamingRequestHandler {
 
-    private static final String WMS_GET_MAP_HANDLER_ERROR = "WMS_GET_MAP_HANDLER_ERROR";
+    private int fontSize;
+    private int lineSize;
+    private int fontStyle;
+
+    /**
+     * @param setting
+     */
+    public WMSGetLegendHandler(WMSClusterProfilerSetting setting) {
+
+	Properties properties = setting.getKeyValueOptions().orElse(new Properties());
+	fontSize = Integer.valueOf(properties.getOrDefault("legendFontSize", "13").toString());
+	lineSize = Integer.valueOf(properties.getOrDefault("legendLineSize", "20").toString());
+	fontStyle = properties.getOrDefault("legendFontStyle", "plain").toString().equals("plain") ? Font.PLAIN : Font.BOLD;
+    }
 
     @Override
     public ValidationMessage validate(WebRequest request) throws GSException {
@@ -147,9 +160,7 @@ public class WMSGetLegendHandler extends StreamingRequestHandler {
 		    if (format.toLowerCase().contains("gif")) {
 			format = "GIF";
 		    }
-		    
-		    int fontSize = 20;
-		    int lineSize = 28;
+
 		    int r = 15;
 		    int pixMinX = 10;
 		    int pixMinY = 10;
@@ -164,7 +175,7 @@ public class WMSGetLegendHandler extends StreamingRequestHandler {
 
 		    List<GSSource> sources = ConfigurationWrapper.getViewSources(view.get());
 
-		    Font font = new Font("SansSerif", Font.BOLD, fontSize);
+		    Font font = new Font("SansSerif", fontStyle, fontSize);
 		    BufferedImage testBI = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
 		    Graphics2D igTest = testBI.createGraphics();
 		    igTest.setFont(font);
@@ -200,7 +211,6 @@ public class WMSGetLegendHandler extends StreamingRequestHandler {
 			}
 		    }
 
-		    
 		    int initialGap = pixMinX + r + 5;
 
 		    if (!drawIcon) {
@@ -220,12 +230,12 @@ public class WMSGetLegendHandler extends StreamingRequestHandler {
 		    }
 
 		    Integer width = Integer.parseInt(widthString);
-		    Integer height = Integer.parseInt(heightString);
+		    Integer height = Integer.parseInt(heightString) - lineSize;
 
 		    BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		    Graphics2D ig2 = bi.createGraphics();
 		    ig2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		    ig2.setFont(new Font("SansSerif", Font.BOLD, fontSize));
+		    ig2.setFont(new Font("SansSerif", fontStyle, fontSize));
 
 		    ig2.setStroke(new BasicStroke(2));
 
@@ -243,17 +253,15 @@ public class WMSGetLegendHandler extends StreamingRequestHandler {
 			ig2.setColor(Color.black);
 			ig2.drawString(infoLegend.getLabel(), initialGap, offset + pixMinY);
 			offset += (fontSize * 1.4);
-
 		    }
 
 		    ImageIO.write(bi, format, output);
 
 		} catch (Exception e) {
-		    e.printStackTrace();
 
+		    GSLoggerFactory.getLogger(getClass()).error(e);
 		}
 	    }
-
 	};
     }
 

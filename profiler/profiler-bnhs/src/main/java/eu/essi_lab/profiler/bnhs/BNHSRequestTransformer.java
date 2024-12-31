@@ -23,6 +23,7 @@ package eu.essi_lab.profiler.bnhs;
 
 import java.util.HashSet;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
@@ -53,9 +54,20 @@ public class BNHSRequestTransformer extends DiscoveryRequestTransformer {
      * 
      */
     private static final int DEFAULT_PAGE_SIZE = 10;
+    private String viewId;
 
+    /**
+     * 
+     */
     public BNHSRequestTransformer() {
-	// empty constructor for service loader
+    }
+
+    /**
+     * @param setting
+     */
+    public BNHSRequestTransformer(WebRequest request) {
+
+	viewId = BNHSProfiler.readViewId(request);
     }
 
     @Override
@@ -63,7 +75,7 @@ public class BNHSRequestTransformer extends DiscoveryRequestTransformer {
 
 	DiscoveryMessage message = super.transform(request);
 
-	setView("whos-arctic", ConfigurationWrapper.getDatabaseURI(), message);
+	setView(viewId, ConfigurationWrapper.getDatabaseURI(), message);
 
 	message.setIteratedWorkflow(IterationMode.FULL_RESPONSE);
 
