@@ -603,6 +603,8 @@
 	  	        		'stationInfoId': 'stationInfo',	  	    	  	        		
 	  	        		'stationNameAddId' : 'platformNameConstraint',
 	  	        		
+	  	        		'advancedConstraintDivId': 'advConstDiv',
+	  	        		
 		        		'onMarkerMouseOver': function(node) {
 		        			
 		        			window.open('#section-div-'+node.uiId, '_self');   
@@ -786,10 +788,11 @@
                		[
                			GIAPI.search.constWidget.textConstraint('get','instrumentTitle'),
                			GIAPI.search.constWidget.textConstraint('get','attributeTitle'),
-               			GIAPI.search.constWidget.textConstraint('get','platformTitle', {id:'platformNameConstraint'}),
+               			GIAPI.search.constWidget.textConstraint('get','platformTitle', 
+               					{id:'platformNameConstraint', helpIconImage: 'fa-wifi' }),
                			GIAPI.search.constWidget.booleanConstraint('get','isValidated')
-               		]              
-                ); 
+               		]
+                );	          
             	
       	        //------------------------------------
                 // PaginatorWidget
