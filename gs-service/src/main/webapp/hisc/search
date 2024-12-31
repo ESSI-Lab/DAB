@@ -600,7 +600,8 @@
 	  	        		'clusterWMSLayerName': 'his-central',
 	  	        		'clusterWMSLayerTitle': 'his-central',	  	        		
 	  	        		
-	  	        		'stationInfoId': 'stationInfo',	  	    
+	  	        		'stationInfoId': 'stationInfo',		  	        		
+	  	        		'stationNameAddId' : 'platformNameConstraint',  	    
 	  	        			
 		        		'onMarkerMouseOver': function(node) {
 		        			
@@ -785,7 +786,7 @@
                		[
                			GIAPI.search.constWidget.textConstraint('get','instrumentTitle'),
                			GIAPI.search.constWidget.textConstraint('get','attributeTitle'),
-               			GIAPI.search.constWidget.textConstraint('get','platformTitle'),
+               			GIAPI.search.constWidget.textConstraint('get','platformTitle', {id:'platformNameConstraint'}),
                			GIAPI.search.constWidget.booleanConstraint('get','isValidated')
                		]              
                 ); 
