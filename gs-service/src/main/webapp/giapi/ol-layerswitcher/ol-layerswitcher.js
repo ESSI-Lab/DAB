@@ -87,6 +87,15 @@
 			this.reverse = options.reverse !== false;
 			this.options = options;
 			
+			LayerSwitcher.clusterWMS = this.options.clusterWMS;
+			LayerSwitcher.dabEndpoint = this.options.dabEndpoint;
+			LayerSwitcher.servicePath = this.options.servicePath;
+			LayerSwitcher.clusterWMSToken = this.options.clusterWMSToken;
+			LayerSwitcher.clusterWMSView = this.options.clusterWMSView;
+			LayerSwitcher.clusterWMSLayerName = this.options.clusterWMSLayerName;
+			LayerSwitcher.clusterWMSLayerTitle = this.options.clusterWMSLayerTitle;
+			
+			
 			this.mapListeners = [];
 			this.hiddenClassName = 'ol-unselectable ol-control layer-switcher';
 			if (LayerSwitcher.isTouchDevice_()) {
@@ -228,25 +237,6 @@
 				reverse: this.reverse
 			});
 			this.dispatchEvent('rendercomplete');
-
-			if (this.options.clusterWMS) {
-
-				if (!this.legendImage) {
-
-					var endpoint = this.options.dabEndpoint;
-					endpoint = endpoint.endsWith('/') ? endpoint : endpoint + '/';
-
-					var url = endpoint + this.options.servicePath + '/token/' + this.options.clusterWMSToken + '/view/' + this.options.clusterWMSView + '/wms-cluster?service=WMS&request=GetLegendGraphic&layers=' + this.options.clusterWMSLayerName;
-
-					this.legendImage = document.createElement('img');
-					this.legendImage.style = 'margin-left: 13px; margin-right: 7px; margin-top: -15px;'
-					this.legendImage.id = 'wmsClusterLegendImg';
-					this.legendImage.src = url;
-
-				}
-
-				this.panel.appendChild(this.legendImage);
-			}
 		}
 		/**
 		 * **_[static]_** - Re-draw the layer panel to represent the current state of the layers.
@@ -286,6 +276,28 @@
 			LayerSwitcher.renderLayers_(map, map, ul, options, function render(_changedLyr) {
 				LayerSwitcher.renderPanel(map, panel, options);
 			});
+
+			//
+			// appends the WMS cluster legend
+			//
+			if (LayerSwitcher.clusterWMS) {
+
+				if (!LayerSwitcher.legendImage) {
+
+					var endpoint = LayerSwitcher.dabEndpoint;
+					endpoint = endpoint.endsWith('/') ? endpoint : endpoint + '/';
+
+					var url = endpoint + LayerSwitcher.servicePath + '/token/' + LayerSwitcher.clusterWMSToken + '/view/' + LayerSwitcher.clusterWMSView + '/wms-cluster?service=WMS&request=GetLegendGraphic&layers=' + LayerSwitcher.clusterWMSLayerName;
+
+					LayerSwitcher.legendImage = document.createElement('img');
+					LayerSwitcher.legendImage.style = 'margin-left: 13px; margin-right: 7px; margin-top: -15px;'
+					LayerSwitcher.legendImage.id = 'wmsClusterLegendImg';
+					LayerSwitcher.legendImage.src = url;
+				}
+
+				panel.appendChild(LayerSwitcher.legendImage);
+			}
+
 			// Create the event.
 			const rendercomplete_event = new Event('rendercomplete');
 			// Dispatch the event.
