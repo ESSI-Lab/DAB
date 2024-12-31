@@ -394,6 +394,14 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 
 		widget.map.addOverlay(overlay);
 
+
+	    // [*2] open the advanced search panel after the inpute field value 
+		// has been set (see [*1])
+		jQuery('#' + options.stationNameAddId).on("change", function() {
+
+			jQuery("#" + options.advancedConstraintDivId).css("display", "block");
+		});
+
 		//
 		// updates the station info panel after a click
 		//
@@ -419,18 +427,26 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 						document.getElementById(options.stationInfoId).innerHTML = html;
 						overlay.setPosition(coordinate);
 
+						// closes the station info popup on a X click
 						jQuery('#closePopup').on("click", function() {
 
 							overlay.setPosition(undefined);
 							return false;
 						});
 
+						// adds the station name to the advanced station name field
+						// and opens the advanced constraints panel
 						jQuery('[id^=addToSearch]').on("click", function() {
 
-							var name = this.id.substring(this.id.indexOf('_')+1, this.id.length);
-							
-							jQuery('#'+options.stationNameAddId).val(name);
-							
+							var name = this.id.substring(this.id.indexOf('_') + 1, this.id.length);
+
+							// set the value of the input field
+							jQuery('#' + options.stationNameAddId).val(name);
+
+							// [*1] triggers the value changed event to open the 
+							// adv. constraints panel (see [*2])
+							jQuery('#' + options.stationNameAddId).trigger("change");
+
 							return false;
 						});
 					});
