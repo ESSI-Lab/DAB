@@ -168,7 +168,6 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 			options.advConstDivBckColor = 'lightgray';
 		}
 
-
 		var advConstDiv = '<div id="' + advConstDivId + '">';
 		constraints.forEach((con) => advConstDiv += con);
 
@@ -324,6 +323,7 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 			null,
 			whatOpt.readOnlyValues,
 			whatOpt.showHelpIcon,
+			options.helpIconImage,
 			whatOpt.value,
 			whatOpt.resizable);
 
@@ -496,6 +496,7 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 			null,
 			null,
 			options.showHelpIcon,
+			options.helpIconImage,
 			value);
 
 		switch (op) {
@@ -565,6 +566,7 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 			options.maxDate,
 			null,
 			options.showHelpIcon,
+			options.helpIconImage,
 			options.value);
 
 		switch (op) {
@@ -871,8 +873,8 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 				options.value = '';
 			}
 		}
-		
-		options.id = _getId(constraint, options.id);		
+
+		options.id = _getId(constraint, options.id);
 
 		var tr = createTextField(
 			options.id,
@@ -884,6 +886,7 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 			null,
 			options.readOnlyValues,
 			options.showHelpIcon,
+			options.helpIconImage,
 			options.value);
 
 		switch (op) {
@@ -983,6 +986,7 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 			null,
 			true,
 			options.showHelpIcon,
+			options.helpIconImage,
 			options.value);
 
 		switch (op) {
@@ -1047,6 +1051,7 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 			null,
 			true,
 			options.showHelpIcon,
+			options.helpIconImage,
 			options.value);
 
 		switch (op) {
@@ -1111,6 +1116,7 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 			null,
 			true,
 			options.showHelpIcon,
+			options.helpIconImage,
 			options.value);
 
 		switch (op) {
@@ -1334,7 +1340,19 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 			'</td></tr>';
 	};
 
-	var createTextField = function(id, label, help, values, time, minDate, maxDate, ro, helpIcon, initValue, whatResizable) {
+	var createTextField = function(
+		id,
+		label,
+		help,
+	    values,
+		time,
+		minDate,
+		maxDate,
+		ro,
+        showHelpIcon,
+		helpIconImage,
+		initValue,
+		whatResizable) {
 
 		var taxonFieldWidth = (id === _getId('what') && whatOpt && whatOpt.showTaxonDialog) ? 'width: ' + (initOptions.fieldsWidth - 28) + 'px;' : '';
 
@@ -1405,9 +1423,9 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 
 		var tr = '<tr>';
 		var _helpTd = '';
-		if (helpIcon && !(whatOpt && whatOpt.showTaxonDialog && id === _getId('what'))) {
+		if (showHelpIcon && !(whatOpt && whatOpt.showTaxonDialog && id === _getId('what'))) {
 			var helpId = GIAPI.random();
-			_helpTd = helpTd(label, help, helpId);
+			_helpTd = helpTd(label, help, helpId, helpIconImage);
 			var trId = GIAPI.random();
 			tr = '<tr id="' + trId + '">';
 			//			setRowListener(trId,helpId);
@@ -1926,26 +1944,35 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 		}
 	};
 
-	var helpTd = function(title, help, id) {
+	var helpTd = function(title, help, id, imageId_) {
 
 		var td = '';
 		if (help) {
+			
 			var imageId = 'fa-question-circle-o';
+			
 			if (title.toLowerCase().includes('instrument')) {
 				imageId = 'fa-thermometer-full';
 			}
+			
 			if (title.toLowerCase().includes('platform')) {
 				imageId = 'fa-ship';
 			}
+			
 			if (title.toLowerCase().includes('originator')) {
 				imageId = 'fa-users';
 			}
+			
 			if (title.toLowerCase().includes('attribute') || title.toLowerCase().includes('parameter')) {
 				imageId = 'fa-bar-chart';
 			}
+			
 			if (title.toLowerCase().includes('validated')) {
 				imageId = 'fa-check-square-o';
 			}
+			
+			imageId = imageId_ || imageId;
+			
 			td = '<td style="vertical-align: middle;height: ' + (fixedHeight + 1) + 'px;" id="' + id + '">' +
 				GIAPI.UI_Utils.helpImage(title, help, 'margin-left: -4px;', imageId, 'odip-help') +
 				'</td>';
