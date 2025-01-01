@@ -406,6 +406,13 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 		// updates the station info panel after a click
 		//
 		widget.map.on('singleclick', function(evt) {
+			
+			if(widget.map.getTargetElement().style.cursor !== 'pointer'){
+				
+				return false;
+			}
+
+			widget.map.getTargetElement().style.cursor = 'wait';
 
 			document.getElementById('stationInfo').innerHTML = '';
 
@@ -423,6 +430,8 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 				fetch(url)
 					.then((response) => response.text())
 					.then((html) => {
+
+						widget.map.getTargetElement().style.cursor = 'pointer';
 
 						document.getElementById(options.stationInfoId).innerHTML = html;
 						overlay.setPosition(coordinate);
