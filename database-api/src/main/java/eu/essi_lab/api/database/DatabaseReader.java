@@ -143,13 +143,4 @@ public interface DatabaseReader extends DatabaseProvider, UserBaseClient {
      * @see DatabaseWriter#store(GSResource)
      */
     public GSResource getResource(String originalIdentifier, GSSource source) throws GSException;
-
-    /**
-     * @param folderName
-     * @param createIfNotExist
-     * @return
-     * @throws GSException
-     */
-    public Optional<DatabaseFolder> getFolder(String folderName, boolean createIfNotExist) throws GSException;
-
 }

@@ -790,24 +790,32 @@ public class MarkLogicDatabase implements Database {
 	return null;
     }
 
-    public Optional<DatabaseFolder> getFolder(String folderName, boolean createIfNotExist) throws RequestException {
+    @Override
+    public Optional<DatabaseFolder> getFolder(String folderName, boolean createIfNotExist) throws GSException {
 
 	checkName(folderName);
 	String normalizefolderName = normalizeName(folderName);
 
-	if (exists_(normalizefolderName)) {
-	    return Optional.ofNullable(createFolder(normalizefolderName));
-	}
+	try {
 
-	if (!createIfNotExist)
-	    return Optional.empty();
+	    if (exists_(normalizefolderName)) {
+		return Optional.ofNullable(createFolder(normalizefolderName));
+	    }
 
-	boolean created = addFolder(folderName);
+	    if (!createIfNotExist) {
+		return Optional.empty();
+	    }
 
-	if (created) {
+	    boolean created = addFolder(folderName);
 
-	    return Optional.ofNullable(getFolder(folderName));
+	    if (created) {
 
+		return Optional.ofNullable(getFolder(folderName));
+	    }
+
+	} catch (RequestException ex) {
+
+	    throw GSException.createException(getClass(), "MARKLOGIC_GET_FOLDER_ERROR", ex);
 	}
 
 	return Optional.empty();

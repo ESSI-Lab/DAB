@@ -3,6 +3,8 @@
  */
 package eu.essi_lab.api.database.elasticsearch;
 
+import java.util.Optional;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -25,6 +27,7 @@ package eu.essi_lab.api.database.elasticsearch;
  */
 
 import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -37,6 +40,12 @@ public class ElasticsearchDatabase implements Database {
     @Override
     public void configure(DatabaseSetting setting) {
 
+    }
+
+    @Override
+    public Optional<DatabaseFolder> getFolder(String folderName, boolean createIfNotExist) throws GSException {
+
+	return Optional.empty();
     }
 
     @Override

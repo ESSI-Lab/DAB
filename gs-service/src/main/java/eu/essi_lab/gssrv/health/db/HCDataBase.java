@@ -1,5 +1,7 @@
 package eu.essi_lab.gssrv.health.db;
 
+import java.util.Optional;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -22,6 +24,7 @@ package eu.essi_lab.gssrv.health.db;
  */
 
 import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -51,6 +54,12 @@ public class HCDataBase implements Database {
     @Override
     public void initialize(StorageInfo dbInfo) throws GSException {
 
+    }
+
+    @Override
+    public Optional<DatabaseFolder> getFolder(String folderName, boolean createIfNotExist) throws GSException {
+
+	return Optional.empty();
     }
 
     @Override

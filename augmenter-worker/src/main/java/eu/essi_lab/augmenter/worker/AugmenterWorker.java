@@ -201,7 +201,7 @@ public class AugmenterWorker extends SchedulerWorker<AugmenterWorkerSetting> {
 
 	GSLoggerFactory.getLogger(getClass()).debug("Get properties file STARTED");
 
-	Optional<AugmenterProperties> optProperties = getProperties(getSetting(), reader);
+	Optional<AugmenterProperties> optProperties = getProperties(getSetting(), reader.getDatabase());
 
 	GSLoggerFactory.getLogger(getClass()).debug("Get properties file ENDED");
 
@@ -227,7 +227,7 @@ public class AugmenterWorker extends SchedulerWorker<AugmenterWorkerSetting> {
 
 	    GSLoggerFactory.getLogger(getClass()).debug("Properties file not found");
 
-	    properties = createProperties(getSetting(), reader);
+	    properties = createProperties(getSetting(), reader.getDatabase());
 	}
 
 	IterationLogger logger = new IterationLogger(this, iterationsCount, count, pageSize);
@@ -479,9 +479,9 @@ public class AugmenterWorker extends SchedulerWorker<AugmenterWorkerSetting> {
      * @return
      * @throws Exception
      */
-    private AugmenterProperties createProperties(AugmenterWorkerSetting setting, DatabaseReader reader) throws Exception {
+    private AugmenterProperties createProperties(AugmenterWorkerSetting setting, Database database) throws Exception {
 
-	DatabaseFolder folder = getPropertiesFolder(getSetting(), reader).get();
+	DatabaseFolder folder = getPropertiesFolder(getSetting(), database).get();
 
 	String fileName = setting.getIdentifier() + ".properties";
 	AugmenterProperties augmenterProperties = new AugmenterProperties();
@@ -496,9 +496,9 @@ public class AugmenterWorker extends SchedulerWorker<AugmenterWorkerSetting> {
      * @return
      * @throws GSException
      */
-    private Optional<AugmenterProperties> getProperties(AugmenterWorkerSetting setting, DatabaseReader reader) throws Exception {
+    private Optional<AugmenterProperties> getProperties(AugmenterWorkerSetting setting, Database database) throws Exception {
 
-	DatabaseFolder folder = getPropertiesFolder(getSetting(), reader).get();
+	DatabaseFolder folder = getPropertiesFolder(getSetting(), database).get();
 
 	Optional<String> fileName = Arrays.asList(folder.listKeys()).//
 		stream().//
@@ -525,9 +525,12 @@ public class AugmenterWorker extends SchedulerWorker<AugmenterWorkerSetting> {
      * @param dataBaseWriter
      * @throws Exception
      */
-    private void updateProperties(AugmenterProperties properties, AugmenterWorkerSetting setting, DatabaseReader reader) throws Exception {
+    private void updateProperties(//
+	    AugmenterProperties properties,//
+	    AugmenterWorkerSetting setting,//
+	    DatabaseReader reader) throws Exception {
 
-	DatabaseFolder folder = getPropertiesFolder(getSetting(), reader).get();
+	DatabaseFolder folder = getPropertiesFolder(getSetting(), reader.getDatabase()).get();
 
 	String fileName = setting.getIdentifier() + ".properties";
 
@@ -546,7 +549,7 @@ public class AugmenterWorker extends SchedulerWorker<AugmenterWorkerSetting> {
 
 	GSLoggerFactory.getLogger(getClass()).debug("Removing properties file STARTED");
 
-	DatabaseFolder folder = getPropertiesFolder(getSetting(), reader).get();
+	DatabaseFolder folder = getPropertiesFolder(getSetting(), reader.getDatabase()).get();
 
 	String fileName = setting.getIdentifier() + ".properties";
 
@@ -563,10 +566,10 @@ public class AugmenterWorker extends SchedulerWorker<AugmenterWorkerSetting> {
      * @return
      * @throws GSException
      */
-    private Optional<DatabaseFolder> getPropertiesFolder(AugmenterWorkerSetting setting, DatabaseReader reader) throws GSException {
+    private Optional<DatabaseFolder> getPropertiesFolder(AugmenterWorkerSetting setting, Database database) throws GSException {
 
 	String folderName = null;
-	StorageInfo storageInfo = reader.getDatabase().getStorageInfo();
+	StorageInfo storageInfo = database.getStorageInfo();
 
 	if (storageInfo == null) {
 	    // this is in case of VolatileDatabaseReader
@@ -577,7 +580,7 @@ public class AugmenterWorker extends SchedulerWorker<AugmenterWorkerSetting> {
 	    folderName = storageInfo.getIdentifier() + "_" + Database.AUGMENTERS_FOLDER;
 	}
 
-	return reader.getFolder(folderName, true);
+	return database.getFolder(folderName, true);
     }
 
     @Override

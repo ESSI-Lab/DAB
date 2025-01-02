@@ -412,26 +412,4 @@ public class VolatileDatabaseReader implements DatabaseReader {
 		orElse(null);
 
     }
-
-    @Override
-    public Optional<DatabaseFolder> getFolder(String folderName, boolean createIfNotExist) throws GSException {
-
-	Optional<VolatileFolder> opt = getDatabase().getFodersList().stream().filter(f -> f.getSimpleName().equals(folderName)).findFirst();
-
-	if (opt.isPresent()) {
-	    return Optional.of(opt.get());
-	}
-
-	if (createIfNotExist) {
-
-	    VolatileFolder folder = new VolatileFolder(folderName);
-
-	    getDatabase().getFodersList().add(folder);
-
-	    return Optional.of(folder);
-	}
-
-	return Optional.empty();
-    }
-
 }

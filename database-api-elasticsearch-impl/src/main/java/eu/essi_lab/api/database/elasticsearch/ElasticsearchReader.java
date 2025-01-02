@@ -107,10 +107,4 @@ public class ElasticsearchReader implements DatabaseReader {
 
 	return null;
     }
-
-    @Override
-    public Optional<DatabaseFolder> getFolder(String folderName, boolean createIfNotExist) throws GSException {
-
-	return Optional.empty();
-    }
 }

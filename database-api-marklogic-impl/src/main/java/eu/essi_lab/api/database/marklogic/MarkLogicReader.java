@@ -617,25 +617,7 @@ public class MarkLogicReader implements DatabaseReader {
 	}
     }
 
-    @Override
-    public Optional<DatabaseFolder> getFolder(String folderName, boolean createIfNotExist) throws GSException {
-
-	try {
-	    return getDatabase().getFolder(folderName, createIfNotExist);
-	} catch (RequestException e) {
-
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-
-	    throw GSException.createException(//
-		    getClass(), //
-		    e.getMessage(), //
-		    null, //
-		    ErrorInfo.ERRORTYPE_INTERNAL, //
-		    ErrorInfo.SEVERITY_ERROR, //
-		    "MARK_LOGIC_GET_FOLDER_ERROR", //
-		    e);
-	}
-    }
+    
 
     /**
      * @param viewId

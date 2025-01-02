@@ -27,10 +27,12 @@ package eu.essi_lab.api.database.vol;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import org.w3c.dom.Document;
 
 import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.messages.HarvestingProperties;
 import eu.essi_lab.messages.bond.View;
@@ -212,5 +214,26 @@ public class VolatileDatabase implements Database {
     public String getIdentifier() {
 
 	return dbIdentifier;
+    }
+
+    @Override
+    public Optional<DatabaseFolder> getFolder(String folderName, boolean createIfNotExist) throws GSException {
+
+	Optional<VolatileFolder> opt = getFodersList().stream().filter(f -> f.getSimpleName().equals(folderName)).findFirst();
+
+	if (opt.isPresent()) {
+	    return Optional.of(opt.get());
+	}
+
+	if (createIfNotExist) {
+
+	    VolatileFolder folder = new VolatileFolder(folderName);
+
+	    getFodersList().add(folder);
+
+	    return Optional.of(folder);
+	}
+
+	return Optional.empty();
     }
 }
