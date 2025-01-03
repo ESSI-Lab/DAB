@@ -43,7 +43,7 @@ public class SemanticExecutor implements ISemanticExecutor {
 
 	StorageInfo uri = message.getDataBaseURI();
 
-	DatabaseSemanticsExecutor executor = DatabaseProviderFactory.getDatabaseSemanticsExecutor(uri);
+	DatabaseSemanticsExecutor executor = DatabaseProviderFactory.getSemanticsExecutor(uri);
 
 	GSLoggerFactory.getLogger(getClass()).info("Count STARTED");
 
@@ -59,7 +59,7 @@ public class SemanticExecutor implements ISemanticExecutor {
 
 	StorageInfo uri = message.getDataBaseURI();
 
-	DatabaseSemanticsExecutor executor = DatabaseProviderFactory.getDatabaseSemanticsExecutor(uri);
+	DatabaseSemanticsExecutor executor = DatabaseProviderFactory.getSemanticsExecutor(uri);
 
 	GSLoggerFactory.getLogger(getClass()).info("Retrieve STARTED");
 

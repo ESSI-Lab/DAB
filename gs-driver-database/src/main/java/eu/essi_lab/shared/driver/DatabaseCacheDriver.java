@@ -263,7 +263,7 @@ public class DatabaseCacheDriver implements ISharedRepositoryDriver<SharedCacheD
 
 	StorageInfo uri = setting.getDatabaseCacheSetting().get().asStorageUri();
 
-	Database database = DatabaseFactory.create(uri);
+	Database database = DatabaseFactory.get(uri);
 
 	return database;
     }
@@ -272,7 +272,7 @@ public class DatabaseCacheDriver implements ISharedRepositoryDriver<SharedCacheD
 
 	StorageInfo uri = setting.getDatabaseCacheSetting().get().asStorageUri();
 
-	DatabaseExecutor executor = DatabaseProviderFactory.getDatabaseExecutor(uri);
+	DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(uri);
 
 	return executor;
     }

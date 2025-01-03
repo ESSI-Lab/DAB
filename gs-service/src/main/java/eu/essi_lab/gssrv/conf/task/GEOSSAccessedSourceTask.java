@@ -51,7 +51,7 @@ public class GEOSSAccessedSourceTask extends AbstractCustomTask {
 	//
 	//
 
-	DatabaseReader reader = DatabaseProviderFactory.getDatabaseReader(ConfigurationWrapper.getDatabaseURI());
+	DatabaseReader reader = DatabaseProviderFactory.getReader(ConfigurationWrapper.getDatabaseURI());
 
 	DefaultViewManager viewManager = new DefaultViewManager();
 	viewManager.setDatabaseReader(reader);

@@ -119,9 +119,9 @@ public class AugmenterWorker extends SchedulerWorker<AugmenterWorkerSetting> {
 
 	StorageInfo storageURI = ConfigurationWrapper.getDatabaseURI();
 
-	DatabaseReader reader = DatabaseProviderFactory.getDatabaseReader(storageURI);
-	DatabaseWriter writer = DatabaseProviderFactory.getDatabaseWriter(storageURI);
-	DatabaseFinder finder = DatabaseProviderFactory.getDatabaseFinder(storageURI);
+	DatabaseReader reader = DatabaseProviderFactory.getReader(storageURI);
+	DatabaseWriter writer = DatabaseProviderFactory.getWriter(storageURI);
+	DatabaseFinder finder = DatabaseProviderFactory.getFinder(storageURI);
 
 	DiscoveryMessage message = new DiscoveryMessage();
 

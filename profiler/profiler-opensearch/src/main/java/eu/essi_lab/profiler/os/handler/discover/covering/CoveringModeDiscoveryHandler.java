@@ -451,7 +451,7 @@ public class CoveringModeDiscoveryHandler extends DiscoveryHandler<String> {
 
 	    try {
 
-		DatabaseExecutor executor = DatabaseProviderFactory.getDatabaseExecutor(ConfigurationWrapper.getDatabaseURI());
+		DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(ConfigurationWrapper.getDatabaseURI());
 
 		JSONObject jsonObject = executor.executePartitionsQuery(message, temporalConstraintEnabled);
 

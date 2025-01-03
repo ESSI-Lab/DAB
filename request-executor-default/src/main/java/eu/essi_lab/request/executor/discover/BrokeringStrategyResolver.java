@@ -123,7 +123,7 @@ public class BrokeringStrategyResolver {
 	    discoveryMessage.setUserBond(bond);
 	    discoveryMessage.setNormalizedBond(bond);
 
-	    DatabaseFinder finder = DatabaseProviderFactory.getDatabaseFinder(message.getDataBaseURI());
+	    DatabaseFinder finder = DatabaseProviderFactory.getFinder(message.getDataBaseURI());
 
 	    DiscoveryCountResponse countResponse = finder.count(message);
 
@@ -186,7 +186,7 @@ public class BrokeringStrategyResolver {
 	    // discoveryMessage.getResourceSelector().setIndexesPolicy(IndexesPolicy.NONE);
 	    discoveryMessage.getResourceSelector().addIndex(ResourceProperty.ORIGINAL_ID);
 
-	    DatabaseFinder finder = DatabaseProviderFactory.getDatabaseFinder(message.getDataBaseURI());
+	    DatabaseFinder finder = DatabaseProviderFactory.getFinder(message.getDataBaseURI());
 
 	    ResultSet<GSResource> results = finder.discover(discoveryMessage);
 

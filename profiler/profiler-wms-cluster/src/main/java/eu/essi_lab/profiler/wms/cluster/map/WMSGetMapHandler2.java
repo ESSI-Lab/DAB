@@ -203,7 +203,7 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 
 			double tol = 0.0000000001;
 
-			DatabaseExecutor executor = DatabaseProviderFactory.getDatabaseExecutor(ConfigurationWrapper.getDatabaseURI());
+			DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(ConfigurationWrapper.getDatabaseURI());
 
 			WMSClusterRequest request = new WMSClusterRequest();
 

@@ -80,7 +80,7 @@ public class DatabaseInfoPublisher extends RuntimeInfoPublisher {
 	super(runtimeId, context);
 
 	if (enabled && writer == null) {
-	    writer = DatabaseProviderFactory.getDatabaseWriter(uri);
+	    writer = DatabaseProviderFactory.getWriter(uri);
 	}
     }
 

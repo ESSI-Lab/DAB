@@ -63,7 +63,7 @@ public class DatabaseQueryExecutor implements IDatabaseQueryExecutor {
 
 	StorageInfo uri = message.getDataBaseURI();
 	
-	DatabaseFinder finder = DatabaseProviderFactory.getDatabaseFinder(uri);
+	DatabaseFinder finder = DatabaseProviderFactory.getFinder(uri);
 
 	GSLoggerFactory.getLogger(getClass()).info("Count STARTED");
 
@@ -85,7 +85,7 @@ public class DatabaseQueryExecutor implements IDatabaseQueryExecutor {
 
 	StorageInfo uri = message.getDataBaseURI();
 
-	DatabaseFinder finder = DatabaseProviderFactory.getDatabaseFinder(uri);
+	DatabaseFinder finder = DatabaseProviderFactory.getFinder(uri);
 
 	message.setPage(page);
 
@@ -105,7 +105,7 @@ public class DatabaseQueryExecutor implements IDatabaseQueryExecutor {
 
 	StorageInfo uri = message.getDataBaseURI();
 
-	DatabaseFinder finder = DatabaseProviderFactory.getDatabaseFinder(uri);
+	DatabaseFinder finder = DatabaseProviderFactory.getFinder(uri);
 
 	message.setPage(page);
 
@@ -125,7 +125,7 @@ public class DatabaseQueryExecutor implements IDatabaseQueryExecutor {
 
 	StorageInfo uri = message.getDataBaseURI();
 
-	DatabaseFinder finder = DatabaseProviderFactory.getDatabaseFinder(uri);
+	DatabaseFinder finder = DatabaseProviderFactory.getFinder(uri);
 
 	message.setPage(page);
 

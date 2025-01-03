@@ -757,7 +757,7 @@ public class SourceStorageWorker {
 
 		debug("Records removal STARTED", status);
 
-		DatabaseWriter writer = DatabaseProviderFactory.getDatabaseWriter(database.getStorageInfo());
+		DatabaseWriter writer = DatabaseProviderFactory.getWriter(database.getStorageInfo());
 
 		writer.removeByRecoveryRemovalToken(recoveryRemovalToken, count);
 
@@ -1442,7 +1442,7 @@ public class SourceStorageWorker {
 
 	if (this.reader == null) {
 
-	    this.reader = DatabaseProviderFactory.getDatabaseReader(database.getStorageInfo());
+	    this.reader = DatabaseProviderFactory.getReader(database.getStorageInfo());
 	}
 
 	return reader;
@@ -1456,7 +1456,7 @@ public class SourceStorageWorker {
 
 	if (this.reader == null) {
 
-	    this.finder = DatabaseProviderFactory.getDatabaseFinder(database.getStorageInfo());
+	    this.finder = DatabaseProviderFactory.getFinder(database.getStorageInfo());
 	}
 
 	return finder;

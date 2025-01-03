@@ -32,7 +32,7 @@ public class VolatileDatabaseTest {
 	// ----------------------------
 	//
 	//
-	Database database = DatabaseFactory.create(TEST_DB_URI);
+	Database database = DatabaseFactory.get(TEST_DB_URI);
 
 	if (database == null) {
 
@@ -55,14 +55,14 @@ public class VolatileDatabaseTest {
 	// ----------------------------
 	//
 	//
-	database = DatabaseFactory.create(TEST_DB_URI);
+	database = DatabaseFactory.get(TEST_DB_URI);
 	try {
 	    database.initialize(TEST_DB_URI);
 	} catch (GSException e) {
 	    fail("Exception thrown");
 	}
 
-	database = DatabaseFactory.create(TEST_DB_URI);
+	database = DatabaseFactory.get(TEST_DB_URI);
 	try {
 	    database.initialize(TEST_DB_URI);
 	    VolatileDatabase db = (VolatileDatabase) database;
@@ -73,7 +73,7 @@ public class VolatileDatabaseTest {
 	    fail("Exception thrown");
 	}
 
-	database = DatabaseFactory.create(TEST_DB_URI);
+	database = DatabaseFactory.get(TEST_DB_URI);
 	TEST_DB_URI.setIdentifier("xxx");
 
 	// ------------------------------------------------

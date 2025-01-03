@@ -52,7 +52,7 @@ public class StatisticsExecutor implements IStatisticsExecutor {
 
 	StorageInfo uri = message.getDataBaseURI();
 
-	DatabaseExecutor executor = DatabaseProviderFactory.getDatabaseExecutor(uri);
+	DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(uri);
 
 	GSLoggerFactory.getLogger(getClass()).info("Computation STARTED");
 

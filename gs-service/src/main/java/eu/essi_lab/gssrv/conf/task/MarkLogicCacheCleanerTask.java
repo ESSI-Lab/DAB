@@ -58,7 +58,7 @@ public class MarkLogicCacheCleanerTask extends AbstractCustomTask {
 
 	StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
 
-	DatabaseReader dbReader = DatabaseProviderFactory.getDatabaseReader(databaseURI);
+	DatabaseReader dbReader = DatabaseProviderFactory.getReader(databaseURI);
 	MarkLogicWrapper wrapper = ((MarkLogicDatabase) dbReader.getDatabase()).getWrapper();
 
 	String cacheFolder = dbReader.getDatabase().getStorageInfo().getIdentifier() + "_" + CACHE_FOLDER_NAME;
