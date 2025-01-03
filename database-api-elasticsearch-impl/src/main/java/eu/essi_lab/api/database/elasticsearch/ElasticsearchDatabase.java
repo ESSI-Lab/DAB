@@ -3,6 +3,7 @@
  */
 package eu.essi_lab.api.database.elasticsearch;
 
+import java.util.List;
 import java.util.Optional;
 
 /*-
@@ -28,6 +29,7 @@ import java.util.Optional;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFolder;
+import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -85,6 +87,54 @@ public class ElasticsearchDatabase implements Database {
     @Override
     public String getIdentifier() {
 
+	return null;
+    }
+
+    @Override
+    public SourceStorageWorker getWorker(String sourceId) throws GSException {
+	// TODO Auto-generated method stub
+	return null;
+    }
+
+    @Override
+    public DatabaseFolder getFolder(String folderName) throws GSException {
+	// TODO Auto-generated method stub
+	return null;
+    }
+
+    @Override
+    public boolean existsFolder(String folderName) throws GSException {
+	// TODO Auto-generated method stub
+	return false;
+    }
+
+    @Override
+    public DatabaseFolder[] getFolders() throws GSException {
+	// TODO Auto-generated method stub
+	return null;
+    }
+
+    @Override
+    public boolean removeFolder(String folderName) throws GSException {
+	// TODO Auto-generated method stub
+	return false;
+    }
+
+    @Override
+    public boolean addFolder(String folderName) throws GSException {
+	// TODO Auto-generated method stub
+	return false;
+    }
+
+    @Override
+    public DatabaseFolder findWritingFolder(SourceStorageWorker worker) throws GSException {
+	// TODO Auto-generated method stub
+	return null;
+    }
+
+    @Override
+    public List<String> getOriginalIDs(String folderName, boolean excludeDeletedb) throws GSException {
+	// TODO Auto-generated method stub
 	return null;
     }
 

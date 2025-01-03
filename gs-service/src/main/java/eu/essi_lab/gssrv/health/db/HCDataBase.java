@@ -1,5 +1,6 @@
 package eu.essi_lab.gssrv.health.db;
 
+import java.util.List;
 import java.util.Optional;
 
 /*-
@@ -25,6 +26,7 @@ import java.util.Optional;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFolder;
+import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -81,6 +83,54 @@ public class HCDataBase implements Database {
 
     @Override
     public String getIdentifier() {
+
+	return null;
+    }
+
+    @Override
+    public SourceStorageWorker getWorker(String sourceId) throws GSException {
+
+	return null;
+    }
+
+    @Override
+    public DatabaseFolder getFolder(String folderName) throws GSException {
+
+	return null;
+    }
+
+    @Override
+    public boolean existsFolder(String folderName) throws GSException {
+
+	return false;
+    }
+
+    @Override
+    public DatabaseFolder[] getFolders() throws GSException {
+
+	return null;
+    }
+
+    @Override
+    public boolean removeFolder(String folderName) throws GSException {
+
+	return false;
+    }
+
+    @Override
+    public boolean addFolder(String folderName) throws GSException {
+
+	return false;
+    }
+
+    @Override
+    public DatabaseFolder findWritingFolder(SourceStorageWorker worker) throws GSException {
+
+	return null;
+    }
+
+    @Override
+    public List<String> getOriginalIDs(String folderName, boolean excludeDeletedb) throws GSException {
 
 	return null;
     }

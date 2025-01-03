@@ -181,4 +181,9 @@ public class VolatileDatabaseWriter implements DatabaseWriter {
     public void storeRDF(Node rdf) throws GSException {
 
     }
+
+    @Override
+    public void removeByRecoveryRemovalToken(String recoveryRemovalToken, int count) throws GSException {
+
+    }
 }

@@ -266,6 +266,7 @@ public class MarkLogicReader implements DatabaseReader {
      * @return
      * @throws GSException
      */
+    @Override
     public GSResource getResource(String originalIdentifier, GSSource source, boolean includeDeleted) throws GSException {
 
 	List<GSResource> resultsList = getResources(originalIdentifier, source, includeDeleted);
@@ -292,6 +293,7 @@ public class MarkLogicReader implements DatabaseReader {
      * and from the current
      * one
      */
+    @Override
     public List<GSResource> getResources(String originalIdentifier, GSSource source, boolean includeDeleted) throws GSException {
 
 	DiscoveryMessage message = new DiscoveryMessage();
@@ -617,8 +619,6 @@ public class MarkLogicReader implements DatabaseReader {
 	}
     }
 
-    
-
     /**
      * @param viewId
      * @return
@@ -709,17 +709,17 @@ public class MarkLogicReader implements DatabaseReader {
 
     }
 
-    protected DatabaseFolder getViewFolder() throws RequestException {
+    protected DatabaseFolder getViewFolder() throws GSException {
 
 	return getProtectedFolder(MarkLogicDatabase.VIEWS_FOLDER);
     }
 
-    protected DatabaseFolder getUsersFolder() throws RequestException {
+    protected DatabaseFolder getUsersFolder() throws GSException {
 
 	return getProtectedFolder(MarkLogicDatabase.USERS_FOLDER);
     }
 
-    protected DatabaseFolder getProtectedFolder(String dirURI) throws RequestException {
+    protected DatabaseFolder getProtectedFolder(String dirURI) throws GSException {
 
 	MarkLogicDatabase mldb = getDatabase();
 	return mldb.getFolder(dirURI);

@@ -107,4 +107,16 @@ public class ElasticsearchReader implements DatabaseReader {
 
 	return null;
     }
+
+    @Override
+    public List<GSResource> getResources(String originalIdentifier, GSSource source, boolean includeDeleted) throws GSException {
+	// TODO Auto-generated method stub
+	return null;
+    }
+
+    @Override
+    public GSResource getResource(String originalIdentifier, GSSource source, boolean includeDeleted) throws GSException {
+	// TODO Auto-generated method stub
+	return null;
+    }
 }

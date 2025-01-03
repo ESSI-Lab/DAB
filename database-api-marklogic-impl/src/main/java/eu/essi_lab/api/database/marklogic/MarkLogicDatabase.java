@@ -50,6 +50,7 @@ import com.marklogic.xcc.types.XdmNode;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFolder;
+import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.marklogic.search.DistinctQueryHandler;
 import eu.essi_lab.api.database.marklogic.search.MarkLogicDiscoveryBondHandler;
 import eu.essi_lab.api.database.marklogic.search.MarkLogicSelectorBuilder;
@@ -109,7 +110,7 @@ public class MarkLogicDatabase implements Database {
     private String dbIdentifier;
     private StorageInfo dbInfo;
     private boolean initialized;
-    private HashMap<String, SourceStorageWorker> workersMap;
+    private HashMap<String, MarkLogicSourceStorageWorker> workersMap;
     private RegisteredQueriesManager regQueriesManager;
     //
     // ---
@@ -358,7 +359,7 @@ public class MarkLogicDatabase implements Database {
 
 		if (sourceId != null) {
 
-		    SourceStorageWorker worker = new SourceStorageWorker(sourceId, this);
+		    MarkLogicSourceStorageWorker worker = new MarkLogicSourceStorageWorker(sourceId, this);
 		    workersMap.put(sourceId, worker);
 		}
 	    }
@@ -655,30 +656,6 @@ public class MarkLogicDatabase implements Database {
     }
 
     /**
-     * @param recoveryRemovalToken
-     * @param count
-     * @throws RequestException
-     */
-    public void removeResourcesByRemovalResumptionToken(String recoveryRemovalToken, int count) throws RequestException {
-
-	String xQuery = "xquery version \"1.0-ml\";\n"
-		+ "import module namespace gs=\"http://flora.eu/gi-suite/1.0/dataModel/schema\" at \"/gs-modules/functions-module.xqy\";\n"
-		+ xdmpQueryTrace() + ",\n" +
-
-		"for $x in subsequence(\n"
-		+ "cts:search(doc()[gs:Dataset or gs:DatasetCollection or gs:Document or gs:Ontology or gs:Service or gs:Observation],\n"
-		+ "cts:element-range-query(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema','recoveryRemovalToken'),'=','"
-		+ recoveryRemovalToken + "',(\"score-function=linear\"),0.0),\n" + "(\"unfiltered\",\"score-simple\"),0), 1, " + count
-		+ " )\n" +
-
-		"return xdmp:document-delete(fn:document-uri($x))\n" +
-
-		",xdmp:query-trace(false());";
-
-	execXQuery(xQuery);
-    }
-
-    /**
      * @param message
      * @param start
      * @param count
@@ -749,14 +726,15 @@ public class MarkLogicDatabase implements Database {
 
     /**
      * @return
+     * @throws GSException
      * @throws Exception
      */
+    @Override
+    public SourceStorageWorker getWorker(String sourceId) throws GSException {
 
-    public SourceStorageWorker getWorker(String sourceId) {
-
-	SourceStorageWorker worker = workersMap.get(sourceId);
+	MarkLogicSourceStorageWorker worker = workersMap.get(sourceId);
 	if (worker == null) {
-	    worker = new SourceStorageWorker(sourceId, this);
+	    worker = new MarkLogicSourceStorageWorker(sourceId, this);
 	    workersMap.put(sourceId, worker);
 	}
 
@@ -778,13 +756,21 @@ public class MarkLogicDatabase implements Database {
     //
     //
 
-    public DatabaseFolder getFolder(String folderName) throws RequestException {
+    @Override
+    public DatabaseFolder getFolder(String folderName) throws GSException {
 
 	checkName(folderName);
 	folderName = normalizeName(folderName);
 
-	if (exists_(folderName)) {
-	    return createFolder(folderName);
+	try {
+
+	    if (exists_(folderName)) {
+		return createFolder(folderName);
+	    }
+
+	} catch (RequestException ex) {
+
+	    throw GSException.createException(getClass(), "MARKLOGIC_GET_FOLDER_ERROR", ex);
 	}
 
 	return null;
@@ -821,28 +807,44 @@ public class MarkLogicDatabase implements Database {
 	return Optional.empty();
     }
 
-    public boolean addFolder(String folderName) throws RequestException {
+    @Override
+    public boolean addFolder(String folderName) throws GSException {
 
-	if (existsFolder(folderName)) {
-	    return false;
+	try {
+	    if (existsFolder(folderName)) {
+		return false;
+	    }
+
+	    checkName(folderName);
+	    folderName = normalizeName(folderName);
+
+	    String xquery = "xdmp:directory-create('" + folderName + "');";
+
+	    ResultSequence ret = execXQuery(xquery);
+	    ret.close();
+
+	} catch (RequestException ex) {
+
+	    throw GSException.createException(getClass(), "MARKLOGIC_ADD_FOLDER_ERROR", ex);
 	}
 
-	checkName(folderName);
-	folderName = normalizeName(folderName);
-
-	String xquery = "xdmp:directory-create('" + folderName + "');";
-
-	ResultSequence ret = execXQuery(xquery);
-	ret.close();
 	return true;
     }
 
-    public boolean existsFolder(String folderName) throws RequestException {
+    @Override
+    public boolean existsFolder(String folderName) throws GSException {
 
 	checkName(folderName);
 	folderName = normalizeName(folderName);
 
-	return exists_(folderName);
+	try {
+
+	    return exists_(folderName);
+
+	} catch (RequestException ex) {
+
+	    throw GSException.createException(getClass(), "MARKLOGIC_EXISTS_FOLDER_ERROR", ex);
+	}
     }
 
     /**
@@ -850,7 +852,8 @@ public class MarkLogicDatabase implements Database {
      * @return
      * @throws RequestException
      */
-    public boolean removeFolder(String folderName) throws RequestException {
+    @Override
+    public boolean removeFolder(String folderName) throws GSException {
 
 	String simpleName = folderName;
 
@@ -873,7 +876,15 @@ public class MarkLogicDatabase implements Database {
 	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
 
-	ResultSequence ret = execXQuery("xdmp:directory-delete('" + folderName + "');");
+	ResultSequence ret;
+	try {
+	    ret = execXQuery("xdmp:directory-delete('" + folderName + "');");
+
+	} catch (RequestException ex) {
+
+	    throw GSException.createException(getClass(), "MARKLOGIC_REMOVE_FOLDER_ERROR", ex);
+	}
+
 	ret.close();
 
 	GSLoggerFactory.getLogger(getClass()).debug("Removing folder {} ENDED", simpleName);
@@ -881,9 +892,16 @@ public class MarkLogicDatabase implements Database {
 	return true;
     }
 
-    public DatabaseFolder[] getFolders() throws RequestException {
+    @Override
+    public DatabaseFolder[] getFolders() throws GSException {
 
-	ResultSequence ret = execXQuery(" for $x in xdmp:directory-properties('/','1')[not(normalize-space())] return base-uri($x)");
+	ResultSequence ret = null;
+	try {
+	    ret = execXQuery(" for $x in xdmp:directory-properties('/','1')[not(normalize-space())] return base-uri($x)");
+	} catch (RequestException ex) {
+
+	    throw GSException.createException(getClass(), "MARKLOGIC_GET_FOLDERS_ERROR", ex);
+	}
 
 	String[] results = ret.asStrings();
 	ret.close();
@@ -900,7 +918,49 @@ public class MarkLogicDatabase implements Database {
 	return out.toArray(new MarkLogicFolder[] {});
     }
 
-    public DatabaseFolder[] getDataFolders() throws RequestException {
+    @Override
+    public DatabaseFolder findWritingFolder(SourceStorageWorker worker) throws GSException {
+
+	DatabaseFolder folder = worker.getWritingFolder(Optional.empty());
+
+	if (folder == null) {
+
+	    if (worker.existsData1Folder() && worker.existsData2Folder()) {
+
+		throw GSException.createException(//
+			getClass(), //
+			"Both data-1 and data-2 folders exist", //
+			null, //
+			ErrorInfo.ERRORTYPE_INTERNAL, //
+			ErrorInfo.SEVERITY_ERROR, //
+			"MarkLogicBothDataFoldersExistError" //
+		);
+	    }
+
+	    if (worker.existsData1Folder()) {
+
+		return worker.getData1Folder();
+	    }
+
+	    if (worker.existsData2Folder()) {
+
+		return worker.getData2Folder();
+	    }
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    "No data folder found", //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    "MarkLogicNODataFoldersExistError" //
+	    );
+	}
+
+	return folder;
+    }
+
+    public DatabaseFolder[] getDataFolders() throws GSException {
 
 	DatabaseFolder[] folders = getFolders();
 	ArrayList<DatabaseFolder> out = new ArrayList<>();
@@ -914,7 +974,7 @@ public class MarkLogicDatabase implements Database {
 	return out.toArray(new MarkLogicFolder[] {});
     }
 
-    public DatabaseFolder[] getMetaFolders() throws RequestException {
+    public DatabaseFolder[] getMetaFolders() throws GSException {
 
 	DatabaseFolder[] folders = getFolders();
 	ArrayList<DatabaseFolder> out = new ArrayList<>();
@@ -928,7 +988,7 @@ public class MarkLogicDatabase implements Database {
 	return out.toArray(new MarkLogicFolder[] {});
     }
 
-    public DatabaseFolder[] getProtectedFolders() throws RequestException {
+    public DatabaseFolder[] getProtectedFolders() throws GSException {
 
 	DatabaseFolder[] folders = getFolders();
 	ArrayList<DatabaseFolder> out = new ArrayList<>();
@@ -953,7 +1013,7 @@ public class MarkLogicDatabase implements Database {
 		RegisteredQueriesManager.REGISTERED_QUERIES_PROTECTED_FOLDER);
     }
 
-    public int getFoldersCount() throws RequestException {
+    public int getFoldersCount() throws GSException {
 
 	return getFolders().length;
     }
@@ -1028,7 +1088,8 @@ public class MarkLogicDatabase implements Database {
      * @return
      * @throws RequestException
      */
-    public List<String> getOriginalIDs(String folderName, boolean excludeDeleted) throws RequestException {
+    @Override
+    public List<String> getOriginalIDs(String folderName, boolean excludeDeleted) throws GSException {
 
 	String dirURI = normalizeName(folderName);
 
@@ -1044,7 +1105,16 @@ public class MarkLogicDatabase implements Database {
 	query += "cts:element-values(\n" + "fn:QName(\"" + NameSpace.GI_SUITE_DATA_MODEL.getURI() + "\",\""
 		+ ResourceProperty.ORIGINAL_ID.getName() + "\"),\n" + "(),(),\n" + constraint + ")";
 
-	ResultSequence rs = execXQuery(query);
+	ResultSequence rs = null;
+
+	try {
+	    rs = execXQuery(query);
+
+	} catch (RequestException ex) {
+
+	    throw GSException.createException(getClass(), "MARKLOGIC_GET_ORIGINAL_IDS_ERROR", ex);
+	}
+
 	ArrayList<String> out = new ArrayList<>();
 	out.addAll(Arrays.asList(rs.asStrings()));
 	return out;
@@ -1116,7 +1186,7 @@ public class MarkLogicDatabase implements Database {
     /**
      * @return
      */
-    private String xdmpQueryTrace() {
+    String xdmpQueryTrace() {
 
 	return QUERY_TRACE ? "xdmp:query-trace(true())" : "xdmp:query-trace(false())";
     }

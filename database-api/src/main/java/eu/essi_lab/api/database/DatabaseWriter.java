@@ -24,6 +24,8 @@ package eu.essi_lab.api.database;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import com.marklogic.xcc.exceptions.RequestException;
+
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.exceptions.GSException;
@@ -127,5 +129,12 @@ public interface DatabaseWriter extends DatabaseProvider {
      * @param rdf
      */
     void storeRDF(Node rdf) throws GSException;
+
+    /**
+     * @param recoveryRemovalToken
+     * @param count
+     * @throws RequestException
+     */
+    void removeByRecoveryRemovalToken(String recoveryRemovalToken, int count) throws GSException;
 
 }

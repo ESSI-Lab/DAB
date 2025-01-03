@@ -43,7 +43,6 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import eu.essi_lab.api.database.Database;
-import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.GetViewIdentifiersRequest;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
@@ -411,5 +410,17 @@ public class VolatileDatabaseReader implements DatabaseReader {
 		findFirst().//
 		orElse(null);
 
+    }
+
+    @Override
+    public List<GSResource> getResources(String originalIdentifier, GSSource source, boolean includeDeleted) throws GSException {
+	//
+	return null;
+    }
+
+    @Override
+    public GSResource getResource(String originalIdentifier, GSSource source, boolean includeDeleted) throws GSException {
+	//
+	return null;
     }
 }

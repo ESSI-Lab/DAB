@@ -1,6 +1,9 @@
 package eu.essi_lab.api.database;
 
+import java.util.List;
 import java.util.Optional;
+
+import com.marklogic.xcc.exceptions.RequestException;
 
 /*-
  * #%L
@@ -87,12 +90,69 @@ public interface Database extends DatabaseCompliant, Configurable<DatabaseSettin
     public void initialize(StorageInfo storageInfo) throws GSException;
 
     /**
+     * @param sourceId
+     * @return
+     * @throws GSException
+     */
+    public SourceStorageWorker getWorker(String sourceId) throws GSException;
+
+    /**
+     * @param folderName
+     * @return
+     */
+    public DatabaseFolder getFolder(String folderName) throws GSException;
+
+    /**
      * @param folderName
      * @param createIfNotExist
      * @return
      * @throws GSException
      */
     public Optional<DatabaseFolder> getFolder(String folderName, boolean createIfNotExist) throws GSException;
+
+    /**
+     * @param folderName
+     * @return
+     */
+    public boolean existsFolder(String folderName) throws GSException;
+
+    /**
+     * @return
+     */
+    public DatabaseFolder[] getFolders() throws GSException;
+
+    /**
+     * @param folderName
+     */
+    public boolean removeFolder(String folderName) throws GSException;
+
+    /**
+     * @param folderName
+     */
+    public boolean addFolder(String folderName) throws GSException;
+    
+    /**
+     * The folder tagged ad writing folder exists only during harvesting.
+     * in this case no harvesting is in progress, so we need to find the
+     * current data folder with max. 2 attempts
+     * If both folder exist or none, there is some kind of issue and an exception is thrown
+     * since the resource can not be stored/updated.
+     * See GIP-288
+     * 
+     * @param worker
+     * @return
+     * @throws GSException
+     * @throws RequestException
+     */
+    public DatabaseFolder findWritingFolder(SourceStorageWorker worker) throws GSException;
+
+
+    /**
+     * @param folderName
+     * @param excludeDeleted
+     * @return
+     */
+    public List<String> getOriginalIDs(String folderName, boolean excludeDeletedb) throws GSException;
 
     /**
      * Return the checked {@link StorageInfo}
@@ -113,5 +173,4 @@ public interface Database extends DatabaseCompliant, Configurable<DatabaseSettin
      * @return
      */
     public String getIdentifier();
-
 }

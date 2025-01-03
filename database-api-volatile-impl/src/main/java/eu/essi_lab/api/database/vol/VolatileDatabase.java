@@ -33,6 +33,7 @@ import org.w3c.dom.Document;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFolder;
+import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.messages.HarvestingProperties;
 import eu.essi_lab.messages.bond.View;
@@ -235,5 +236,53 @@ public class VolatileDatabase implements Database {
 	}
 
 	return Optional.empty();
+    }
+
+    @Override
+    public SourceStorageWorker getWorker(String sourceId) throws GSException {
+	//
+	return null;
+    }
+
+    @Override
+    public DatabaseFolder getFolder(String folderName) throws GSException {
+	//
+	return null;
+    }
+
+    @Override
+    public boolean existsFolder(String folderName) throws GSException {
+	//
+	return false;
+    }
+
+    @Override
+    public DatabaseFolder[] getFolders() throws GSException {
+	//
+	return null;
+    }
+
+    @Override
+    public boolean removeFolder(String folderName) throws GSException {
+	//
+	return false;
+    }
+
+    @Override
+    public boolean addFolder(String folderName) throws GSException {
+	//
+	return false;
+    }
+
+    @Override
+    public DatabaseFolder findWritingFolder(SourceStorageWorker worker) throws GSException {
+	//
+	return null;
+    }
+
+    @Override
+    public List<String> getOriginalIDs(String folderName, boolean excludeDeletedb) throws GSException {
+	//
+	return null;
     }
 }

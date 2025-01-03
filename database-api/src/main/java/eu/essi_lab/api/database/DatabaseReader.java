@@ -120,6 +120,25 @@ public interface DatabaseReader extends DatabaseProvider, UserBaseClient {
     public List<GSResource> getResources(IdentifierType identifierType, String identifier) throws GSException;
 
     /**
+     * 
+     * @param originalIdentifier
+     * @param source
+     * @param includeDeleted
+     * @return
+     * @throws GSException
+     */
+    public List<GSResource> getResources(String originalIdentifier, GSSource source, boolean includeDeleted) throws GSException;
+
+    /**
+     * @param originalIdentifier
+     * @param source
+     * @param includeDeleted
+     * @return
+     * @throws GSException
+     */
+    public GSResource getResource(String originalIdentifier, GSSource source, boolean includeDeleted) throws GSException;
+
+    /**
      * Verify if there is a resource that match the given
      * <code>originalIdentifier</code> and <code>source</code>.
      *
