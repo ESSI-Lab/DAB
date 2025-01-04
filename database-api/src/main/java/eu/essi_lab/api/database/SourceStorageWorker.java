@@ -195,13 +195,75 @@ public class SourceStorageWorker {
     }
 
     /**
+     * @param suiteId
+     * @param folderName
+     * @return
+     */
+    public static String retrieveSourceName(String suiteId, String folderName) {
+    
+        if (folderName.endsWith(SourceStorageWorker.META_PREFIX)) {
+    
+            folderName = folderName.replace(suiteId + "_", "");
+            folderName = folderName.replace(META_PREFIX, "");
+    
+            return folderName;
+        }
+    
+        return null;
+    }
+
+    /**
+     * @return
+     * @throws RequestException
+     */
+    public DatabaseFolder getData2Folder() throws GSException {
+    
+        return database.getFolder(sourceId + DATA_2_PREFIX);
+    }
+
+    /**
+     * @return
+     * @throws RequestException
+     */
+    public DatabaseFolder getData1Folder() throws GSException {
+    
+        return database.getFolder(sourceId + DATA_1_PREFIX);
+    }
+
+    /**
+     * @return
+     * @throws RequestException
+     */
+    public boolean existsData1Folder() throws GSException {
+    
+        return database.existsFolder(sourceId + DATA_1_PREFIX);
+    }
+
+    /**
+     * @return
+     * @throws RequestException
+     */
+    public boolean existsData2Folder() throws GSException {
+    
+        return database.existsFolder(sourceId + DATA_2_PREFIX);
+    }
+
+    /**
+     * @return
+     */
+    public List<String> getStorageReport() {
+    
+        return report;
+    }
+
+    /**
      * @param strategy
      * @param recovery
      * @param resumed
      * @param status
      * @throws Exception
      */
-    public void harvestingStarted(//
+    void harvestingStarted(//
 	    HarvestingStrategy strategy, //
 	    boolean recovery, //
 	    boolean resumed, //
@@ -437,7 +499,7 @@ public class SourceStorageWorker {
      * @param request
      * @throws Exception
      */
-    public void harvestingEnded(//
+    void harvestingEnded(//
 	    SourceStorage storage, //
 	    Optional<HarvestingProperties> properties, //
 	    HarvestingStrategy strategy, //
@@ -558,28 +620,10 @@ public class SourceStorageWorker {
     }
 
     /**
-     * @param suiteId
-     * @param folderName
-     * @return
-     */
-    public static String retrieveSourceName(String suiteId, String folderName) {
-
-	if (folderName.endsWith(SourceStorageWorker.META_PREFIX)) {
-
-	    folderName = folderName.replace(suiteId + "_", "");
-	    folderName = folderName.replace(META_PREFIX, "");
-
-	    return folderName;
-	}
-
-	return null;
-    }
-
-    /**
      * @param properties
      * @throws Exception
      */
-    public void storeHarvestingProperties(HarvestingProperties properties) throws Exception {
+    void storeHarvestingProperties(HarvestingProperties properties) throws Exception {
 
 	DatabaseFolder sourceFolder = getMetaFolder();
 
@@ -589,56 +633,12 @@ public class SourceStorageWorker {
     }
 
     /**
-     * @return
-     * @throws RequestException
-     */
-    public DatabaseFolder getData2Folder() throws GSException {
-
-	return database.getFolder(sourceId + DATA_2_PREFIX);
-    }
-
-    /**
-     * @return
-     * @throws RequestException
-     */
-    public DatabaseFolder getData1Folder() throws GSException {
-
-	return database.getFolder(sourceId + DATA_1_PREFIX);
-    }
-
-    /**
-     * @return
-     * @throws RequestException
-     */
-    public boolean existsData1Folder() throws GSException {
-
-	return database.existsFolder(sourceId + DATA_1_PREFIX);
-    }
-
-    /**
-     * @return
-     * @throws RequestException
-     */
-    public boolean existsData2Folder() throws GSException {
-
-	return database.existsFolder(sourceId + DATA_2_PREFIX);
-    }
-
-    /**
-     * @return
-     */
-    public List<String> getStorageReport() {
-
-	return report;
-    }
-
-    /**
      * @param report
      * @return
      * @throws Exception
      * @throws RequestException
      */
-    public void updateErrorsAndWarnHarvestingReport(String report, boolean error) throws RequestException, Exception {
+    void updateErrorsAndWarnHarvestingReport(String report, boolean error) throws RequestException, Exception {
 
 	// GSLoggerFactory.getLogger(getClass()).debug("Updating of " + (error ? "error" : "warn") + " harvesting report
 	// STARTED");
@@ -687,7 +687,7 @@ public class SourceStorageWorker {
      * @return
      * @throws Exception
      */
-    public List<String> retrieveErrorsReport() throws Exception {
+    List<String> retrieveErrorsReport() throws Exception {
 
 	if (getMetaFolder().exists(ERRORS_REPORT_FILE_NAME)) {
 
@@ -703,7 +703,7 @@ public class SourceStorageWorker {
      * @return
      * @throws Exception
      */
-    public List<String> retrieveWarnReport() throws Exception {
+    List<String> retrieveWarnReport() throws Exception {
 
 	if (getMetaFolder().exists(WARN_REPORT_FILE_NAME)) {
 
@@ -713,6 +713,26 @@ public class SourceStorageWorker {
 	}
 
 	return new ArrayList<String>();
+    }
+
+    /**
+     * @param indexName
+     * @param status
+     */
+    protected void checkDataFolderIndex(String indexName, Optional<SchedulerJobStatus> status) throws Exception {
+
+    }
+
+    /**
+     * @param message
+     * @param status
+     */
+    protected void debug(String message, Optional<SchedulerJobStatus> status) {
+
+	status.ifPresent(s -> s.addInfoMessage(message));
+
+	GSLoggerFactory.getLogger(getClass()).debug(message);
+	report.add(message);
     }
 
     /**
@@ -933,14 +953,6 @@ public class SourceStorageWorker {
     }
 
     /**
-     * @param indexName
-     * @param status
-     */
-    protected void checkDataFolderIndex(String indexName, Optional<SchedulerJobStatus> status) throws Exception {
-
-    }
-
-    /**
      * @param status
      * @throws Exception
      */
@@ -1045,18 +1057,6 @@ public class SourceStorageWorker {
 	properties.setEndHarvestingTimestamp();
 
 	storeHarvestingProperties(properties);
-    }
-
-    /**
-     * @param message
-     * @param status
-     */
-    protected void debug(String message, Optional<SchedulerJobStatus> status) {
-
-	status.ifPresent(s -> s.addInfoMessage(message));
-
-	GSLoggerFactory.getLogger(getClass()).debug(message);
-	report.add(message);
     }
 
     /**

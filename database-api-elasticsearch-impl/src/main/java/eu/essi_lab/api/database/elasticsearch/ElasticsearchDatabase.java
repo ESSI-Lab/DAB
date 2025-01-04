@@ -37,17 +37,17 @@ import eu.essi_lab.model.exceptions.GSException;
 /**
  * @author Fabrizio
  */
-public class ElasticsearchDatabase implements Database {
+public class ElasticsearchDatabase extends Database {
+
+    @Override
+    public boolean supports(StorageInfo dbUri) {
+
+	return false;
+    }
 
     @Override
     public void configure(DatabaseSetting setting) {
 
-    }
-
-    @Override
-    public Optional<DatabaseFolder> getFolder(String folderName, boolean createIfNotExist) throws GSException {
-
-	return Optional.empty();
     }
 
     @Override
@@ -59,24 +59,72 @@ public class ElasticsearchDatabase implements Database {
     @Override
     public String getType() {
 
-	return "";
+	return null;
     }
 
     @Override
-    public void initialize(StorageInfo dbUri) throws GSException {
+    public void initialize(StorageInfo storageInfo) throws GSException {
 
+    }
+
+    @Override
+    public SourceStorageWorker getWorker(String sourceId) throws GSException {
+
+	return null;
+    }
+
+    @Override
+    public DatabaseFolder getFolder(String folderName) throws GSException {
+
+	return null;
+    }
+
+    @Override
+    public Optional<DatabaseFolder> getFolder(String folderName, boolean createIfNotExist) throws GSException {
+
+	return Optional.empty();
+    }
+
+    @Override
+    public boolean existsFolder(String folderName) throws GSException {
+
+	return false;
+    }
+
+    @Override
+    public DatabaseFolder[] getFolders() throws GSException {
+
+	return null;
+    }
+
+    @Override
+    public boolean removeFolder(String folderName) throws GSException {
+
+	return false;
+    }
+
+    @Override
+    public boolean addFolder(String folderName) throws GSException {
+
+	return false;
+    }
+
+    @Override
+    public DatabaseFolder findWritingFolder(SourceStorageWorker worker) throws GSException {
+
+	return null;
+    }
+
+    @Override
+    public List<String> getOriginalIDs(String folderName, boolean excludDeleted) throws GSException {
+
+	return null;
     }
 
     @Override
     public StorageInfo getStorageInfo() {
 
 	return null;
-    }
-
-    @Override
-    public boolean supports(StorageInfo dbUri) {
-
-	return false;
     }
 
     @Override
@@ -87,54 +135,6 @@ public class ElasticsearchDatabase implements Database {
     @Override
     public String getIdentifier() {
 
-	return null;
-    }
-
-    @Override
-    public SourceStorageWorker getWorker(String sourceId) throws GSException {
-	// TODO Auto-generated method stub
-	return null;
-    }
-
-    @Override
-    public DatabaseFolder getFolder(String folderName) throws GSException {
-	// TODO Auto-generated method stub
-	return null;
-    }
-
-    @Override
-    public boolean existsFolder(String folderName) throws GSException {
-	// TODO Auto-generated method stub
-	return false;
-    }
-
-    @Override
-    public DatabaseFolder[] getFolders() throws GSException {
-	// TODO Auto-generated method stub
-	return null;
-    }
-
-    @Override
-    public boolean removeFolder(String folderName) throws GSException {
-	// TODO Auto-generated method stub
-	return false;
-    }
-
-    @Override
-    public boolean addFolder(String folderName) throws GSException {
-	// TODO Auto-generated method stub
-	return false;
-    }
-
-    @Override
-    public DatabaseFolder findWritingFolder(SourceStorageWorker worker) throws GSException {
-	// TODO Auto-generated method stub
-	return null;
-    }
-
-    @Override
-    public List<String> getOriginalIDs(String folderName, boolean excludeDeletedb) throws GSException {
-	// TODO Auto-generated method stub
 	return null;
     }
 

@@ -34,7 +34,13 @@ import eu.essi_lab.model.exceptions.GSException;
 /**
  * @author Fabrizio
  */
-public class HCDataBase implements Database {
+public class HCDataBase extends Database {
+
+    @Override
+    public boolean supports(StorageInfo dbUri) {
+
+	return false;
+    }
 
     @Override
     public void configure(DatabaseSetting setting) {
@@ -54,37 +60,8 @@ public class HCDataBase implements Database {
     }
 
     @Override
-    public void initialize(StorageInfo dbInfo) throws GSException {
+    public void initialize(StorageInfo storageInfo) throws GSException {
 
-    }
-
-    @Override
-    public Optional<DatabaseFolder> getFolder(String folderName, boolean createIfNotExist) throws GSException {
-
-	return Optional.empty();
-    }
-
-    @Override
-    public StorageInfo getStorageInfo() {
-
-	return null;
-    }
-
-    @Override
-    public boolean supports(StorageInfo dbUri) {
-
-	return dbUri instanceof HCStorageInfo;
-    }
-
-    @Override
-    public void release() throws GSException {
-
-    }
-
-    @Override
-    public String getIdentifier() {
-
-	return null;
     }
 
     @Override
@@ -97,6 +74,12 @@ public class HCDataBase implements Database {
     public DatabaseFolder getFolder(String folderName) throws GSException {
 
 	return null;
+    }
+
+    @Override
+    public Optional<DatabaseFolder> getFolder(String folderName, boolean createIfNotExist) throws GSException {
+
+	return Optional.empty();
     }
 
     @Override
@@ -130,7 +113,24 @@ public class HCDataBase implements Database {
     }
 
     @Override
-    public List<String> getOriginalIDs(String folderName, boolean excludeDeletedb) throws GSException {
+    public List<String> getOriginalIDs(String folderName, boolean excludDeleted) throws GSException {
+
+	return null;
+    }
+
+    @Override
+    public StorageInfo getStorageInfo() {
+
+	return null;
+    }
+
+    @Override
+    public void release() throws GSException {
+
+    }
+
+    @Override
+    public String getIdentifier() {
 
 	return null;
     }

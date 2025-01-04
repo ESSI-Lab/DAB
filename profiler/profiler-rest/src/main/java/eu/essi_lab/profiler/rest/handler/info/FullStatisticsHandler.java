@@ -98,7 +98,7 @@ public class FullStatisticsHandler extends DefaultRequestHandler {
 	StorageInfo uri = ConfigurationWrapper.getDatabaseURI();
 	GSLoggerFactory.getLogger(FullStatisticsHandler.class).debug("Storage uri: {}", uri);
 
-	DatabaseExecutor executor = DatabaseProviderFactory.getDatabaseExecutor(uri);
+	DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(uri);
 
 	StatisticsMessage message = createMessage(webRequest);
 

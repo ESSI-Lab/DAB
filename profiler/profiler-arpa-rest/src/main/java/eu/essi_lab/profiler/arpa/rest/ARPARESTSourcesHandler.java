@@ -79,7 +79,7 @@ public class ARPARESTSourcesHandler extends DefaultRequestHandler {
     public String getStringResponse(WebRequest webRequest) throws GSException {
 
 	StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
-	DatabaseReader reader = DatabaseProviderFactory.getDatabaseReader(databaseURI);
+	DatabaseReader reader = DatabaseProviderFactory.getReader(databaseURI);
 
 	JSONArray ret = new JSONArray();
 

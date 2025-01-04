@@ -34,7 +34,7 @@ import eu.essi_lab.model.exceptions.GSException;
 /**
  * @author Fabrizio
  */
-public interface Database extends DatabaseCompliant, Configurable<DatabaseSetting> {
+public abstract class Database implements DatabaseCompliant, Configurable<DatabaseSetting> {
 
     /**
      * @author Fabrizio
@@ -87,20 +87,20 @@ public interface Database extends DatabaseCompliant, Configurable<DatabaseSettin
      * @param storageInfo
      * @throws GSException if the initialization fails
      */
-    public void initialize(StorageInfo storageInfo) throws GSException;
+    public abstract void initialize(StorageInfo storageInfo) throws GSException;
 
     /**
      * @param sourceId
      * @return
      * @throws GSException
      */
-    public SourceStorageWorker getWorker(String sourceId) throws GSException;
+    public abstract SourceStorageWorker getWorker(String sourceId) throws GSException;
 
     /**
      * @param folderName
      * @return
      */
-    public DatabaseFolder getFolder(String folderName) throws GSException;
+    public abstract DatabaseFolder getFolder(String folderName) throws GSException;
 
     /**
      * @param folderName
@@ -108,29 +108,29 @@ public interface Database extends DatabaseCompliant, Configurable<DatabaseSettin
      * @return
      * @throws GSException
      */
-    public Optional<DatabaseFolder> getFolder(String folderName, boolean createIfNotExist) throws GSException;
+    public abstract Optional<DatabaseFolder> getFolder(String folderName, boolean createIfNotExist) throws GSException;
 
     /**
      * @param folderName
      * @return
      */
-    public boolean existsFolder(String folderName) throws GSException;
+    public abstract boolean existsFolder(String folderName) throws GSException;
 
     /**
      * @return
      */
-    public DatabaseFolder[] getFolders() throws GSException;
+    public abstract DatabaseFolder[] getFolders() throws GSException;
 
     /**
      * @param folderName
      */
-    public boolean removeFolder(String folderName) throws GSException;
+    public abstract boolean removeFolder(String folderName) throws GSException;
 
     /**
      * @param folderName
      */
-    public boolean addFolder(String folderName) throws GSException;
-    
+    public abstract boolean addFolder(String folderName) throws GSException;
+
     /**
      * The folder tagged ad writing folder exists only during harvesting.
      * in this case no harvesting is in progress, so we need to find the
@@ -144,22 +144,21 @@ public interface Database extends DatabaseCompliant, Configurable<DatabaseSettin
      * @throws GSException
      * @throws RequestException
      */
-    public DatabaseFolder findWritingFolder(SourceStorageWorker worker) throws GSException;
-
+    public abstract DatabaseFolder findWritingFolder(SourceStorageWorker worker) throws GSException;
 
     /**
      * @param folderName
-     * @param excludeDeleted
+     * @param excludDeleted
      * @return
      */
-    public List<String> getOriginalIDs(String folderName, boolean excludeDeletedb) throws GSException;
+    public abstract List<String> getOriginalIDs(String folderName, boolean excludDeleted) throws GSException;
 
     /**
      * Return the checked {@link StorageInfo}
      * 
      * @return
      */
-    public StorageInfo getStorageInfo();
+    public abstract StorageInfo getStorageInfo();
 
     /**
      * A possible implementation can execute some code which release some resources.<br>
@@ -167,10 +166,48 @@ public interface Database extends DatabaseCompliant, Configurable<DatabaseSettin
      * 
      * @throws GSException
      */
-    public void release() throws GSException;
+    public abstract void release() throws GSException;
 
     /**
      * @return
      */
-    public String getIdentifier();
+    public abstract String getIdentifier();
+
+    /**
+     * @return
+     * @throws GSException
+     */
+    public DatabaseFolder getViewFolder(boolean createIfNotExist) throws GSException {
+
+	return getProtectedFolder(VIEWS_FOLDER, createIfNotExist);
+    }
+
+    /**
+     * @return
+     * @throws GSException
+     */
+    public DatabaseFolder getUsersFolder() throws GSException {
+
+	return getProtectedFolder(USERS_FOLDER, true);
+    }
+
+    /**
+     * @return
+     * @throws GSException
+     */
+    public DatabaseFolder getAugmentersFolder() throws GSException {
+
+	return getProtectedFolder(AUGMENTERS_FOLDER, true);
+    }
+
+    /**
+     * @param dirURI
+     * @return
+     * @throws GSException
+     */
+    protected DatabaseFolder getProtectedFolder(String dirURI, boolean createIfNotExist) throws GSException {
+
+	return getFolder(dirURI, createIfNotExist).orElse(null);
+    }
+
 }

@@ -64,8 +64,8 @@ public class ViewWorker {
 	this.message = message;
 	this.request = message.getWebRequest();
 	this.databaseURI = ConfigurationWrapper.getDatabaseURI();
-	this.reader = DatabaseProviderFactory.getDatabaseReader(databaseURI);
-	this.writer = DatabaseProviderFactory.getDatabaseWriter(databaseURI);
+	this.reader = DatabaseProviderFactory.getReader(databaseURI);
+	this.writer = DatabaseProviderFactory.getWriter(databaseURI);
     }
 
     /**

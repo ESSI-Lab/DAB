@@ -61,7 +61,7 @@ public class RestViewsSourcesHandler extends DefaultRequestHandler {
     public String getStringResponse(WebRequest webRequest) throws GSException {
 
 	StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
-	DatabaseReader reader = DatabaseProviderFactory.getDatabaseReader(databaseURI);
+	DatabaseReader reader = DatabaseProviderFactory.getReader(databaseURI);
 
 	//
 	// users can see only sources which are set as source property bond in its

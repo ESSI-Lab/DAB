@@ -39,7 +39,7 @@ import eu.essi_lab.model.resource.GSResource;
 /**
  * @author Fabrizio
  */
-public class VolatileDatabaseWriter implements DatabaseWriter {
+public class VolatileDatabaseWriter extends DatabaseWriter {
 
     private VolatileDatabase database;
     private StorageInfo dbUri;

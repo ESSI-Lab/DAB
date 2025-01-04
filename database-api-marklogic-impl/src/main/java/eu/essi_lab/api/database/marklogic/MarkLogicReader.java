@@ -544,7 +544,7 @@ public class MarkLogicReader implements DatabaseReader {
 
 	    if (viewFolder == null) {
 
-		viewFolder = getViewFolder();
+		viewFolder = getDatabase().getViewFolder(false);
 
 		if (viewFolder == null) {
 
@@ -648,9 +648,10 @@ public class MarkLogicReader implements DatabaseReader {
 
 	try {
 
-	    DatabaseFolder folder = getViewFolder();
+	    DatabaseFolder folder = getDatabase().getViewFolder(false);
 
 	    if (folder == null) {
+
 		return new ArrayList<>();
 	    }
 
@@ -664,7 +665,7 @@ public class MarkLogicReader implements DatabaseReader {
 
 		    GSLoggerFactory.getLogger(getClass()).info("Get view folder STARTED");
 
-		    viewFolder = getViewFolder();
+		    viewFolder = getDatabase().getViewFolder(false);
 
 		    GSLoggerFactory.getLogger(getClass()).info("Get view folder ENDED");
 
@@ -707,22 +708,6 @@ public class MarkLogicReader implements DatabaseReader {
 		    e);
 	}
 
-    }
-
-    protected DatabaseFolder getViewFolder() throws GSException {
-
-	return getProtectedFolder(MarkLogicDatabase.VIEWS_FOLDER);
-    }
-
-    protected DatabaseFolder getUsersFolder() throws GSException {
-
-	return getProtectedFolder(MarkLogicDatabase.USERS_FOLDER);
-    }
-
-    protected DatabaseFolder getProtectedFolder(String dirURI) throws GSException {
-
-	MarkLogicDatabase mldb = getDatabase();
-	return mldb.getFolder(dirURI);
     }
 
     public static void main(String[] args) {

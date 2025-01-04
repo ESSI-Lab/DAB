@@ -46,7 +46,7 @@ import eu.essi_lab.model.resource.GSResource;
 /**
  * @author Fabrizio
  */
-public class VolatileDatabase implements Database {
+public class VolatileDatabase extends Database {
 
     private StorageInfo dbInfo;
     private String dbIdentifier;
@@ -281,7 +281,7 @@ public class VolatileDatabase implements Database {
     }
 
     @Override
-    public List<String> getOriginalIDs(String folderName, boolean excludeDeletedb) throws GSException {
+    public List<String> getOriginalIDs(String folderName, boolean excludDeleted) throws GSException {
 	//
 	return null;
     }

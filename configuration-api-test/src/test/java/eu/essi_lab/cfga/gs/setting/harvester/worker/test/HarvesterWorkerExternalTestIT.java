@@ -62,7 +62,7 @@ public class HarvesterWorkerExternalTestIT {
 
 	// clears the volatile db
 	StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
-	Database provider = DatabaseFactory.create(databaseURI);
+	Database provider = DatabaseFactory.get(databaseURI);
 	VolatileDatabase database = (VolatileDatabase) provider;
 	database.clear();
 
@@ -114,8 +114,8 @@ public class HarvesterWorkerExternalTestIT {
 	// Makes some test on the empty DB
 	//
 
-	DatabaseReader reader = DatabaseProviderFactory.getDatabaseReader(ConfigurationWrapper.getDatabaseURI());
-	DatabaseFinder finder = DatabaseProviderFactory.getDatabaseFinder(ConfigurationWrapper.getDatabaseURI());
+	DatabaseReader reader = DatabaseProviderFactory.getReader(ConfigurationWrapper.getDatabaseURI());
+	DatabaseFinder finder = DatabaseProviderFactory.getFinder(ConfigurationWrapper.getDatabaseURI());
 
 	DiscoveryCountResponse count = finder.count(new DiscoveryMessage());
 

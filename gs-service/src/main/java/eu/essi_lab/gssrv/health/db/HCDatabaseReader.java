@@ -49,7 +49,7 @@ import eu.essi_lab.model.resource.GSResource;
 /**
  * @author Fabrizio
  */
-public class HCDatabaseReader implements DatabaseReader, DatabaseFinder, Database {
+public class HCDatabaseReader extends Database implements DatabaseReader, DatabaseFinder {
 
     private static final String BAD_HEALTH_CHECK_MESSAGE = "BAD_HEALTH_CHECK_MESSAGE";
 
@@ -248,7 +248,7 @@ public class HCDatabaseReader implements DatabaseReader, DatabaseFinder, Databas
     }
 
     @Override
-    public List<String> getOriginalIDs(String folderName, boolean excludeDeletedb) throws GSException {
+    public List<String> getOriginalIDs(String folderName, boolean excludDeleted) throws GSException {
 
 	return null;
     }

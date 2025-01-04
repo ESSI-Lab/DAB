@@ -81,7 +81,7 @@ public class TokenGeneratorHandler extends DefaultRequestHandler {
 
 	GSUser user = new GSUser(token, UserIdentifierType.USER_TOKEN, role);
 
-	DatabaseWriter writer = DatabaseProviderFactory.getDatabaseWriter(ConfigurationWrapper.getDatabaseURI());
+	DatabaseWriter writer = DatabaseProviderFactory.getWriter(ConfigurationWrapper.getDatabaseURI());
 
 	writer.store(user);
 

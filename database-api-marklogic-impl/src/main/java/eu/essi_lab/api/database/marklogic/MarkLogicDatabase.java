@@ -79,7 +79,7 @@ import eu.essi_lab.wrapper.marklogic.MarkLogicWrapper;
 /**
  * @author Fabrizio
  */
-public class MarkLogicDatabase implements Database {
+public class MarkLogicDatabase extends Database {
 
     /**
      * Query trace disabled because not strictly necessary and it makes logs unreadable
@@ -1084,12 +1084,12 @@ public class MarkLogicDatabase implements Database {
 
     /**
      * @param folderName
-     * @param excludeDeleted
+     * @param excludDeleted
      * @return
      * @throws RequestException
      */
     @Override
-    public List<String> getOriginalIDs(String folderName, boolean excludeDeleted) throws GSException {
+    public List<String> getOriginalIDs(String folderName, boolean excludDeleted) throws GSException {
 
 	String dirURI = normalizeName(folderName);
 
@@ -1100,7 +1100,7 @@ public class MarkLogicDatabase implements Database {
 	String dirQuery = "cts:directory-query('" + dirURI + "','infinity')";
 	String noDelQuery = "cts:not-query(cts:element-range-query(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema','isDeleted'),'!=','',(\"score-function=linear\"),0.0))";
 	String andQuery = "cts:and-query((" + dirQuery + "," + noDelQuery + "))";
-	String constraint = excludeDeleted ? andQuery : dirQuery;
+	String constraint = excludDeleted ? andQuery : dirQuery;
 
 	query += "cts:element-values(\n" + "fn:QName(\"" + NameSpace.GI_SUITE_DATA_MODEL.getURI() + "\",\""
 		+ ResourceProperty.ORIGINAL_ID.getName() + "\"),\n" + "(),(),\n" + constraint + ")";
