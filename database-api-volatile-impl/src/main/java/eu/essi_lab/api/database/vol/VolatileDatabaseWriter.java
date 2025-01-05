@@ -183,7 +183,7 @@ public class VolatileDatabaseWriter extends DatabaseWriter {
     }
 
     @Override
-    public void removeByRecoveryRemovalToken(String recoveryRemovalToken, int count) throws GSException {
+    public void removeByRecoveryRemovalToken(String recoveryRemovalToken) throws GSException {
 
     }
 }

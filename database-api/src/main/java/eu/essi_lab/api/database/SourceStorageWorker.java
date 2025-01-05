@@ -779,7 +779,7 @@ public class SourceStorageWorker {
 
 		DatabaseWriter writer = DatabaseProviderFactory.getWriter(database.getStorageInfo());
 
-		writer.removeByRecoveryRemovalToken(recoveryRemovalToken, count);
+		writer.removeByRecoveryRemovalToken(recoveryRemovalToken);
 
 		debug("Records removal ENDED", status);
 	    }

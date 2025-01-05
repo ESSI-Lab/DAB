@@ -97,6 +97,13 @@ public abstract class DatabaseWriter implements DatabaseProvider {
     public abstract void remove(GSResource resource) throws GSException;
 
     /**
+     * @param recoveryRemovalToken
+     * @param count
+     * @throws RequestException
+     */
+    public abstract void removeByRecoveryRemovalToken(String recoveryRemovalToken) throws GSException;
+
+    /**
      * Updates the given resource in a single transaction (e.g. not using the two db operations "remove" + "store"
      * operation, but the single
      * db operation "replace")
@@ -292,13 +299,6 @@ public abstract class DatabaseWriter implements DatabaseProvider {
      * @param rdf
      */
     public abstract void storeRDF(Node rdf) throws GSException;
-
-    /**
-     * @param recoveryRemovalToken
-     * @param count
-     * @throws RequestException
-     */
-    public abstract void removeByRecoveryRemovalToken(String recoveryRemovalToken, int count) throws GSException;
 
     /**
      * Stores the supplied <code>object</code> in the common semantic folder. The object is serialized utilizing {@link
