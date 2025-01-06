@@ -49,6 +49,7 @@ import org.xml.sax.SAXException;
 import com.google.common.io.ByteStreams;
 import com.marklogic.xcc.exceptions.RequestException;
 
+import eu.essi_lab.api.database.Database.IdentifierType;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.iso.datamodel.classes.MIMetadata;
@@ -71,6 +72,7 @@ import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.AugmentedMetadataElement;
 import eu.essi_lab.model.resource.GSResource;
+import eu.essi_lab.model.resource.ResourceProperty;
 
 /**
  * @author Fabrizio
@@ -83,7 +85,6 @@ public class SourceStorageWorker {
     public static final String DATA_FOLDER_POSTFIX = "_dataFolder";
 
     private String sourceId;
-    protected Database database;
     private String startTimeStamp;
     private static final String WRITING_FOLDER = "writingFolder";
 
@@ -98,6 +99,7 @@ public class SourceStorageWorker {
      */
     private static final double DEFAULT_SMART_STORAGE_PERCENTAGE_TRESHOLD = 60;
 
+    private Database database;
     private DatabaseReader reader;
     private DatabaseFinder finder;
     private List<String> report;
@@ -200,16 +202,16 @@ public class SourceStorageWorker {
      * @return
      */
     public static String retrieveSourceName(String suiteId, String folderName) {
-    
-        if (folderName.endsWith(SourceStorageWorker.META_PREFIX)) {
-    
-            folderName = folderName.replace(suiteId + "_", "");
-            folderName = folderName.replace(META_PREFIX, "");
-    
-            return folderName;
-        }
-    
-        return null;
+
+	if (folderName.endsWith(SourceStorageWorker.META_PREFIX)) {
+
+	    folderName = folderName.replace(suiteId + "_", "");
+	    folderName = folderName.replace(META_PREFIX, "");
+
+	    return folderName;
+	}
+
+	return null;
     }
 
     /**
@@ -217,8 +219,8 @@ public class SourceStorageWorker {
      * @throws RequestException
      */
     public DatabaseFolder getData2Folder() throws GSException {
-    
-        return database.getFolder(sourceId + DATA_2_PREFIX);
+
+	return database.getFolder(sourceId + DATA_2_PREFIX);
     }
 
     /**
@@ -226,8 +228,8 @@ public class SourceStorageWorker {
      * @throws RequestException
      */
     public DatabaseFolder getData1Folder() throws GSException {
-    
-        return database.getFolder(sourceId + DATA_1_PREFIX);
+
+	return database.getFolder(sourceId + DATA_1_PREFIX);
     }
 
     /**
@@ -235,8 +237,8 @@ public class SourceStorageWorker {
      * @throws RequestException
      */
     public boolean existsData1Folder() throws GSException {
-    
-        return database.existsFolder(sourceId + DATA_1_PREFIX);
+
+	return database.existsFolder(sourceId + DATA_1_PREFIX);
     }
 
     /**
@@ -244,16 +246,16 @@ public class SourceStorageWorker {
      * @throws RequestException
      */
     public boolean existsData2Folder() throws GSException {
-    
-        return database.existsFolder(sourceId + DATA_2_PREFIX);
+
+	return database.existsFolder(sourceId + DATA_2_PREFIX);
     }
 
     /**
      * @return
      */
     public List<String> getStorageReport() {
-    
-        return report;
+
+	return report;
     }
 
     /**
@@ -779,7 +781,7 @@ public class SourceStorageWorker {
 
 		DatabaseWriter writer = DatabaseProviderFactory.getWriter(database.getStorageInfo());
 
-		writer.removeByRecoveryRemovalToken(recoveryRemovalToken);
+		writer.remove(ResourceProperty.RECOVERY_REMOVAL_TOKEN.getName(), recoveryRemovalToken);
 
 		debug("Records removal ENDED", status);
 	    }
@@ -1158,8 +1160,8 @@ public class SourceStorageWorker {
 	    }
 
 	    // 1) get the original ids of the old folder and the original ids from the new folder
-	    List<String> newIds = database.getOriginalIDs(newFolder.getCompleteName(), false);
-	    List<String> oldIds = database.getOriginalIDs(oldFolder.getCompleteName(), false);
+	    List<String> newIds = database.getIdentifiers(IdentifierType.ORIGINAL, newFolder.getCompleteName(), false);
+	    List<String> oldIds = database.getIdentifiers(IdentifierType.ORIGINAL, oldFolder.getCompleteName(), false);
 
 	    // 2) removes all the ids of the new folder from the ids of the old folder.
 	    // the remaining are the original ids of the removed resources (they are in the old folder
@@ -1198,7 +1200,7 @@ public class SourceStorageWorker {
 	DatabaseFolder newFolder = getWritingFolder(status);
 
 	// 1) get the original ids of the old folder and the original ids from the new folder
-	List<String> newIds = database.getOriginalIDs(newFolder.getCompleteName(), false);
+	List<String> newIds = database.getIdentifiers(IdentifierType.ORIGINAL, newFolder.getCompleteName(), false);
 
 	DatabaseFolder oldFolder = null;
 
@@ -1209,7 +1211,7 @@ public class SourceStorageWorker {
 	}
 
 	if (oldFolder != null) {
-	    List<String> oldIds = database.getOriginalIDs(oldFolder.getCompleteName(), false);
+	    List<String> oldIds = database.getIdentifiers(IdentifierType.ORIGINAL, oldFolder.getCompleteName(), false);
 
 	    // 2) removes all the old ids from the new folder ids
 	    // the remaining are the ids of the new resources
@@ -1275,8 +1277,8 @@ public class SourceStorageWorker {
 		oldFolder = getData1Folder();
 	    }
 
-	    List<String> newIds = database.getOriginalIDs(newFolder.getCompleteName(), false);
-	    List<String> oldIds = database.getOriginalIDs(oldFolder.getCompleteName(), false);
+	    List<String> newIds = database.getIdentifiers(IdentifierType.ORIGINAL, newFolder.getCompleteName(), false);
+	    List<String> oldIds = database.getIdentifiers(IdentifierType.ORIGINAL, oldFolder.getCompleteName(), false);
 
 	    @SuppressWarnings("unchecked")
 	    Collection<String> intersection = CollectionUtils.intersection(newIds, oldIds);
@@ -1460,5 +1462,14 @@ public class SourceStorageWorker {
 	}
 
 	return finder;
+    }
+
+    /**
+     * @return
+     * @throws GSException
+     */
+    protected Database getDatabase() {
+
+	return database;
     }
 }

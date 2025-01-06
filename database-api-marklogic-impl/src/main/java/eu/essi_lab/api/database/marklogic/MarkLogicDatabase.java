@@ -70,9 +70,11 @@ import eu.essi_lab.messages.stats.StatisticsMessage;
 import eu.essi_lab.messages.stats.StatisticsResponse;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
 import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.wrapper.marklogic.MarkLogicWrapper;
 
@@ -1089,7 +1091,7 @@ public class MarkLogicDatabase extends Database {
      * @throws RequestException
      */
     @Override
-    public List<String> getOriginalIDs(String folderName, boolean excludDeleted) throws GSException {
+    public List<String> getIdentifiers(IdentifierType type, String folderName, boolean excludDeleted) throws GSException {
 
 	String dirURI = normalizeName(folderName);
 
@@ -1102,8 +1104,24 @@ public class MarkLogicDatabase extends Database {
 	String andQuery = "cts:and-query((" + dirQuery + "," + noDelQuery + "))";
 	String constraint = excludDeleted ? andQuery : dirQuery;
 
-	query += "cts:element-values(\n" + "fn:QName(\"" + NameSpace.GI_SUITE_DATA_MODEL.getURI() + "\",\""
-		+ ResourceProperty.ORIGINAL_ID.getName() + "\"),\n" + "(),(),\n" + constraint + ")";
+	Queryable queryable = null;
+	switch (type) {
+	case OAI_HEADER:
+	    queryable = ResourceProperty.OAI_PMH_HEADER_ID;
+	    break;
+	case ORIGINAL:
+	    queryable = ResourceProperty.ORIGINAL_ID;
+	    break;
+	case PRIVATE:
+	    queryable = ResourceProperty.PRIVATE_ID;
+	    break;
+	case PUBLIC:
+	    queryable = MetadataElement.IDENTIFIER;
+	    break;
+	}
+
+	query += "cts:element-values(\n" + "fn:QName(\"" + NameSpace.GI_SUITE_DATA_MODEL.getURI() + "\",\"" + queryable.getName() + "\"),\n"
+		+ "(),(),\n" + constraint + ")";
 
 	ResultSequence rs = null;
 
@@ -1112,7 +1130,7 @@ public class MarkLogicDatabase extends Database {
 
 	} catch (RequestException ex) {
 
-	    throw GSException.createException(getClass(), "MARKLOGIC_GET_ORIGINAL_IDS_ERROR", ex);
+	    throw GSException.createException(getClass(), "MarkLogicGetIdentifiersError", ex);
 	}
 
 	ArrayList<String> out = new ArrayList<>();

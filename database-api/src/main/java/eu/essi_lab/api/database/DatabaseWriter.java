@@ -42,6 +42,7 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.ontology.GSKnowledgeResourceDescription;
 import eu.essi_lab.model.ontology.d2k.serialization.J2RDFSerializer;
 import eu.essi_lab.model.resource.GSResource;
+import eu.essi_lab.model.resource.stax.GIResourceParser;
 
 /**
  * @author Fabrizio
@@ -97,11 +98,13 @@ public abstract class DatabaseWriter implements DatabaseProvider {
     public abstract void remove(GSResource resource) throws GSException;
 
     /**
-     * @param recoveryRemovalToken
-     * @param count
-     * @throws RequestException
+     * Removes the {@link GSResource}s matching a <code>propertyName</code> with the given <code>propertyValue</code>
+     * 
+     * @param propertyName
+     * @param propertyValue
+     * @throws GSException
      */
-    public abstract void removeByRecoveryRemovalToken(String recoveryRemovalToken) throws GSException;
+    public abstract void remove(String propertyName, String propertyValue) throws GSException;
 
     /**
      * Updates the given resource in a single transaction (e.g. not using the two db operations "remove" + "store"

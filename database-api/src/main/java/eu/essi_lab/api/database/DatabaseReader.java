@@ -24,6 +24,7 @@ package eu.essi_lab.api.database;
 import java.util.List;
 import java.util.Optional;
 
+import eu.essi_lab.api.database.Database.IdentifierType;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.auth.GSUser;
@@ -36,29 +37,6 @@ import eu.essi_lab.model.resource.HarmonizedMetadata;
  * @author Fabrizio
  */
 public interface DatabaseReader extends DatabaseProvider, UserBaseClient {
-
-    /**
-     * @author Fabrizio
-     */
-    public enum IdentifierType {
-
-	/**
-	 * 
-	 */
-	PUBLIC,
-	/**
-	 * 
-	 */
-	PRIVATE,
-	/**
-	 * 
-	 */
-	ORIGINAL,
-	/**
-	 * 
-	 */
-	OAI_HEADER
-    }
 
     /**
      * Gets the {@link GSUser} with the provided identifier
@@ -120,7 +98,6 @@ public interface DatabaseReader extends DatabaseProvider, UserBaseClient {
     public List<GSResource> getResources(IdentifierType identifierType, String identifier) throws GSException;
 
     /**
-     * 
      * @param originalIdentifier
      * @param source
      * @param includeDeleted

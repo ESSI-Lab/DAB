@@ -43,6 +43,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.Database.IdentifierType;
 import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.GetViewIdentifiersRequest;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;

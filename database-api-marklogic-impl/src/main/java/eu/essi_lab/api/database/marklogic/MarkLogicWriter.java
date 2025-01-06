@@ -157,7 +157,7 @@ public class MarkLogicWriter extends DatabaseWriter {
      * @throws RequestException
      */
     @Override
-    public void removeByRecoveryRemovalToken(String recoveryRemovalToken) throws GSException {
+    public void remove(String propertyName, String propertyValue) throws GSException {
 
 	String xQuery = "xquery version \"1.0-ml\";\n"
 		+ "import module namespace gs=\"http://flora.eu/gi-suite/1.0/dataModel/schema\" at \"/gs-modules/functions-module.xqy\";\n"
@@ -165,8 +165,8 @@ public class MarkLogicWriter extends DatabaseWriter {
 
 		"for $x in \n"
 		+ "cts:search(doc()[gs:Dataset or gs:DatasetCollection or gs:Document or gs:Ontology or gs:Service or gs:Observation],\n"
-		+ "cts:element-range-query(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema','recoveryRemovalToken'),'=','"
-		+ recoveryRemovalToken + "',(\"score-function=linear\"),0.0),\n" + "(\"unfiltered\",\"score-simple\"),0)\n" +
+		+ "cts:element-range-query(fn:QName('http://flora.eu/gi-suite/1.0/dataModel/schema','" + propertyName + "'),'=','"
+		+ propertyValue + "',(\"score-function=linear\"),0.0),\n" + "(\"unfiltered\",\"score-simple\"),0)\n" +
 
 		"return xdmp:document-delete(fn:document-uri($x))\n" +
 

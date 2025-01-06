@@ -81,7 +81,7 @@ public class ElasticsearchWriter extends DatabaseWriter {
     }
 
     @Override
-    public void removeByRecoveryRemovalToken(String recoveryRemovalToken) throws GSException {
+    public void remove(String propertyName, String propertyValue) throws GSException {
 	// TODO Auto-generated method stub
 
     }

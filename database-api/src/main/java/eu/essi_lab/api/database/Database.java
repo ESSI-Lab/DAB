@@ -39,6 +39,29 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
     /**
      * @author Fabrizio
      */
+    public enum IdentifierType {
+
+	/**
+	 * 
+	 */
+	PUBLIC,
+	/**
+	 * 
+	 */
+	PRIVATE,
+	/**
+	 * 
+	 */
+	ORIGINAL,
+	/**
+	 * 
+	 */
+	OAI_HEADER
+    }
+
+    /**
+     * @author Fabrizio
+     */
     public enum DatabaseImpl {
 
 	/**
@@ -48,7 +71,7 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
 	/**
 	 * 
 	 */
-	EXIST_EMBEDDED("eXistEmbedded");
+	OPENSEARCH("OpenSearch");
 
 	private String name;
 
@@ -147,11 +170,13 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
     public abstract DatabaseFolder findWritingFolder(SourceStorageWorker worker) throws GSException;
 
     /**
+     * @param type
      * @param folderName
      * @param excludDeleted
      * @return
+     * @throws GSException
      */
-    public abstract List<String> getOriginalIDs(String folderName, boolean excludDeleted) throws GSException;
+    public abstract List<String> getIdentifiers(IdentifierType type, String folderName, boolean excludDeleted) throws GSException;
 
     /**
      * Return the checked {@link StorageInfo}

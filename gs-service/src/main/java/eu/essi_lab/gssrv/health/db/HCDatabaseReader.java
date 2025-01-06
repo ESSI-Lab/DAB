@@ -248,7 +248,7 @@ public class HCDatabaseReader extends Database implements DatabaseReader, Databa
     }
 
     @Override
-    public List<String> getOriginalIDs(String folderName, boolean excludDeleted) throws GSException {
+    public List<String> getIdentifiers(IdentifierType type, String folderName, boolean excludDeleted) throws GSException {
 
 	return null;
     }

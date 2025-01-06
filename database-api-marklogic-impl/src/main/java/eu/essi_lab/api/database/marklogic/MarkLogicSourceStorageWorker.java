@@ -55,7 +55,7 @@ public class MarkLogicSourceStorageWorker extends SourceStorageWorker {
     @Override
     protected void checkDataFolderIndex(String indexName, Optional<SchedulerJobStatus> status) throws Exception {
 
-	MarkLogicIndexesManager idxManager = new MarkLogicIndexesManager((MarkLogicDatabase) database, false);
+	MarkLogicIndexesManager idxManager = new MarkLogicIndexesManager((MarkLogicDatabase) getDatabase(), false);
 
 	if (!idxManager.rangeIndexExists(//
 		indexName, //

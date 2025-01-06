@@ -27,6 +27,7 @@ import java.util.Optional;
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.SourceStorageWorker;
+import eu.essi_lab.api.database.Database.IdentifierType;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -113,7 +114,7 @@ public class HCDataBase extends Database {
     }
 
     @Override
-    public List<String> getOriginalIDs(String folderName, boolean excludDeleted) throws GSException {
+    public List<String> getIdentifiers(IdentifierType type, String folderName, boolean excludDeleted) throws GSException {
 
 	return null;
     }

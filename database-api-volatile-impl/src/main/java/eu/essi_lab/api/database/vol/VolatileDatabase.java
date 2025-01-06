@@ -34,6 +34,7 @@ import org.w3c.dom.Document;
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.SourceStorageWorker;
+import eu.essi_lab.api.database.Database.IdentifierType;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.messages.HarvestingProperties;
 import eu.essi_lab.messages.bond.View;
@@ -281,7 +282,7 @@ public class VolatileDatabase extends Database {
     }
 
     @Override
-    public List<String> getOriginalIDs(String folderName, boolean excludDeleted) throws GSException {
+    public List<String> getIdentifiers(IdentifierType type, String folderName, boolean excludDeleted) throws GSException {
 	//
 	return null;
     }
