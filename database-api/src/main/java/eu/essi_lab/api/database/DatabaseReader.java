@@ -24,6 +24,7 @@ package eu.essi_lab.api.database;
 import java.util.List;
 import java.util.Optional;
 
+import eu.essi_lab.api.database.Database.IdentifierType;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.auth.GSUser;
@@ -36,29 +37,6 @@ import eu.essi_lab.model.resource.HarmonizedMetadata;
  * @author Fabrizio
  */
 public interface DatabaseReader extends DatabaseProvider, UserBaseClient {
-
-    /**
-     * @author Fabrizio
-     */
-    public enum IdentifierType {
-
-	/**
-	 * 
-	 */
-	PUBLIC,
-	/**
-	 * 
-	 */
-	PRIVATE,
-	/**
-	 * 
-	 */
-	ORIGINAL,
-	/**
-	 * 
-	 */
-	OAI_HEADER
-    }
 
     /**
      * Gets the {@link GSUser} with the provided identifier
@@ -120,6 +98,24 @@ public interface DatabaseReader extends DatabaseProvider, UserBaseClient {
     public List<GSResource> getResources(IdentifierType identifierType, String identifier) throws GSException;
 
     /**
+     * @param originalIdentifier
+     * @param source
+     * @param includeDeleted
+     * @return
+     * @throws GSException
+     */
+    public List<GSResource> getResources(String originalIdentifier, GSSource source, boolean includeDeleted) throws GSException;
+
+    /**
+     * @param originalIdentifier
+     * @param source
+     * @param includeDeleted
+     * @return
+     * @throws GSException
+     */
+    public GSResource getResource(String originalIdentifier, GSSource source, boolean includeDeleted) throws GSException;
+
+    /**
      * Verify if there is a resource that match the given
      * <code>originalIdentifier</code> and <code>source</code>.
      *
@@ -143,13 +139,4 @@ public interface DatabaseReader extends DatabaseProvider, UserBaseClient {
      * @see DatabaseWriter#store(GSResource)
      */
     public GSResource getResource(String originalIdentifier, GSSource source) throws GSException;
-
-    /**
-     * @param folderName
-     * @param createIfNotExist
-     * @return
-     * @throws GSException
-     */
-    public Optional<DatabaseFolder> getFolder(String folderName, boolean createIfNotExist) throws GSException;
-
 }

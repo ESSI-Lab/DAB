@@ -29,87 +29,60 @@ import org.w3c.dom.Node;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseWriter;
-import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.model.StorageInfo;
-import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.ontology.GSKnowledgeResourceDescription;
 import eu.essi_lab.model.resource.GSResource;
 
 /**
  * @author Fabrizio
  */
-public class ElasticsearchWriter implements DatabaseWriter {
-
-    @Override
-    public boolean supports(StorageInfo dbUri) {
-
-	return false;
-    }
+public class ElasticsearchWriter extends DatabaseWriter {
 
     @Override
     public void setDatabase(Database dataBase) {
+	// TODO Auto-generated method stub
 
     }
 
     @Override
     public Database getDatabase() {
-
+	// TODO Auto-generated method stub
 	return null;
     }
 
     @Override
-    public void store(GSUser user) throws GSException {
-
-    }
-
-    @Override
-    public void removeUser(String userId) throws GSException {
-
-    }
-
-    @Override
-    public void store(View view) throws GSException {
-
-    }
-
-    @Override
-    public void removeView(String viewId) throws GSException {
-
-    }
-
-    @Override
-    public void store(GSResource resource) throws GSException {
-
+    public boolean supports(StorageInfo dbUri) {
+	// TODO Auto-generated method stub
+	return false;
     }
 
     @Override
     public void remove(GSResource resource) throws GSException {
+	// TODO Auto-generated method stub
 
     }
 
     @Override
     public void store(String identifier, Document document) throws GSException {
+	// TODO Auto-generated method stub
 
     }
 
     @Override
     public void removeDocument(String identifier) throws GSException {
-
-    }
-
-    @Override
-    public void update(GSResource resource) throws GSException {
-
-    }
-
-    @Override
-    public void store(GSKnowledgeResourceDescription object) throws GSException {
+	// TODO Auto-generated method stub
 
     }
 
     @Override
     public void storeRDF(Node rdf) throws GSException {
+	// TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void remove(String propertyName, String propertyValue) throws GSException {
+	// TODO Auto-generated method stub
 
     }
 

@@ -534,7 +534,7 @@ public class RestViewsHandler extends DefaultRequestHandler {
      */
     private DatabaseReader getDatabaseReader() throws GSException {
 
-	return DatabaseProviderFactory.getDatabaseReader(ConfigurationWrapper.getDatabaseURI());
+	return DatabaseProviderFactory.getReader(ConfigurationWrapper.getDatabaseURI());
     }
 
     /**

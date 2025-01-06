@@ -36,13 +36,13 @@ public class ViewWorker {
     public static final String CREATOR = "whos";
 
     protected DatabaseWriter createWriter() throws GSException {
-	return DatabaseProviderFactory.getDatabaseWriter(databaseURI);
+	return DatabaseProviderFactory.getWriter(databaseURI);
     }
 
     public ViewWorker(WebRequest request) throws GSException {
 	this.request = request;
 	this.databaseURI = ConfigurationWrapper.getDatabaseURI();
-	this.reader = DatabaseProviderFactory.getDatabaseReader(databaseURI);
+	this.reader = DatabaseProviderFactory.getReader(databaseURI);
     }
 
     protected static String errorMessage(String msg) {

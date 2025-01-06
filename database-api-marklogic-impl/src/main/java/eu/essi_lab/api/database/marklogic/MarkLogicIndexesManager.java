@@ -37,6 +37,7 @@ import com.marklogic.xcc.ResultSequence;
 import com.marklogic.xcc.exceptions.RequestException;
 
 import eu.essi_lab.api.database.Database.DatabaseImpl;
+import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.indexes.CustomIndexedElements;
 import eu.essi_lab.indexes.IndexedElements;
 import eu.essi_lab.indexes.IndexedMetadataElements;

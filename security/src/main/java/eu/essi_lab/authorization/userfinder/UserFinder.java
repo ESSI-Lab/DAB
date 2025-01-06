@@ -146,8 +146,8 @@ public class UserFinder {
 
 	StorageInfo storageUri = ConfigurationWrapper.getDatabaseURI();
 
-	DatabaseReader reader = DatabaseProviderFactory.getDatabaseReader(storageUri);
-	DatabaseWriter writer = DatabaseProviderFactory.getDatabaseWriter(storageUri);
+	DatabaseReader reader = DatabaseProviderFactory.getReader(storageUri);
+	DatabaseWriter writer = DatabaseProviderFactory.getWriter(storageUri);
 
 	finder.setClient(reader);
 	finder.setDatabaseReader(reader);

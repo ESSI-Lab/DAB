@@ -293,7 +293,7 @@ public class EiffelDiscoveryHandler extends DiscoveryHandler<String> {
 
 	    GSLoggerFactory.getLogger(getClass()).info("Executing merged query for identifers STARTED");
 
-	    DatabaseExecutor executor = DatabaseProviderFactory.getDatabaseExecutor(ConfigurationWrapper.getDatabaseURI());
+	    DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(ConfigurationWrapper.getDatabaseURI());
 
 	    mergedRecordsIds = executor.getIndexValues(message, MetadataElement.IDENTIFIER, 0, EiffelAPI.DEFAULT_MAX_SORT_IDENTIFIERS);
 
@@ -752,7 +752,7 @@ public class EiffelDiscoveryHandler extends DiscoveryHandler<String> {
 
 	    GSLoggerFactory.getLogger(getClass()).info("[1/4] Retrieving user query records ids STARTED");
 
-	    DatabaseExecutor executor = DatabaseProviderFactory.getDatabaseExecutor(ConfigurationWrapper.getDatabaseURI());
+	    DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(ConfigurationWrapper.getDatabaseURI());
 
 	    recordsIds = executor.getIndexValues(message, MetadataElement.IDENTIFIER, 0, EiffelAPI.DEFAULT_MAX_SORT_IDENTIFIERS);
 

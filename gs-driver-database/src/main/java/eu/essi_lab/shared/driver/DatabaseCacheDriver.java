@@ -28,9 +28,11 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseExecutor;
-import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.DatabaseFolder;
+import eu.essi_lab.api.database.DatabaseReader;
+import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.setting.driver.SharedCacheDriverSetting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -103,9 +105,9 @@ public class DatabaseCacheDriver implements ISharedRepositoryDriver<SharedCacheD
 
 	try {
 
-	    DatabaseReader reader = getDatabaseReader();
+	    Database database = getDatabase();
 
-	    Optional<DatabaseFolder> optFolder = reader.getFolder(CACHE_FOLDER_NAME, true);
+	    Optional<DatabaseFolder> optFolder = database.getFolder(CACHE_FOLDER_NAME, true);
 
 	    if (optFolder.isPresent()) {
 
@@ -173,9 +175,9 @@ public class DatabaseCacheDriver implements ISharedRepositoryDriver<SharedCacheD
 
 	try {
 
-	    DatabaseReader reader = getDatabaseReader();
+	    Database database = getDatabase();
 
-	    Optional<DatabaseFolder> optFolder = reader.getFolder(CACHE_FOLDER_NAME, true);
+	    Optional<DatabaseFolder> optFolder = database.getFolder(CACHE_FOLDER_NAME, true);
 
 	    if (optFolder.isPresent()) {
 
@@ -257,20 +259,20 @@ public class DatabaseCacheDriver implements ISharedRepositoryDriver<SharedCacheD
 	return Optional.ofNullable(SharedContentSerializers.getSerializer(type));
     }
 
-    private DatabaseReader getDatabaseReader() throws GSException {
+    private Database getDatabase() throws GSException {
 
 	StorageInfo uri = setting.getDatabaseCacheSetting().get().asStorageUri();
 
-	DatabaseReader reader = DatabaseProviderFactory.getDatabaseReader(uri);
+	Database database = DatabaseFactory.get(uri);
 
-	return reader;
+	return database;
     }
 
     private DatabaseExecutor getDatabaseExecutor() throws GSException {
 
 	StorageInfo uri = setting.getDatabaseCacheSetting().get().asStorageUri();
 
-	DatabaseExecutor executor = DatabaseProviderFactory.getDatabaseExecutor(uri);
+	DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(uri);
 
 	return executor;
     }

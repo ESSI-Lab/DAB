@@ -26,8 +26,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+import eu.essi_lab.api.database.Database.IdentifierType;
 import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.DatabaseReader.IdentifierType;
 import eu.essi_lab.api.database.SourceStorage;
 import eu.essi_lab.cfga.gs.setting.SourcePrioritySetting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;

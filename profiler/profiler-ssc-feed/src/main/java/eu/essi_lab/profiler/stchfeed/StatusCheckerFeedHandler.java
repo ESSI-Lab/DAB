@@ -166,7 +166,7 @@ public class StatusCheckerFeedHandler extends DefaultRequestHandler {
 	Page page = new Page(1, 500);
 	message.setPage(page);
 
-	DatabaseExecutor executor = DatabaseProviderFactory.getDatabaseExecutor(uri);
+	DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(uri);
 
 	StatisticsResponse response = executor.compute(message);
 
@@ -251,7 +251,7 @@ public class StatusCheckerFeedHandler extends DefaultRequestHandler {
 
 	StorageInfo uri = ConfigurationWrapper.getDatabaseURI();
 
-	DatabaseFinder finder = DatabaseProviderFactory.getDatabaseFinder(uri);
+	DatabaseFinder finder = DatabaseProviderFactory.getFinder(uri);
 
 	ResultSet<GSResource> resultSet = finder.discover(message);
 

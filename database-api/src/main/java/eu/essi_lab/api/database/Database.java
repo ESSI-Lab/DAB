@@ -1,5 +1,10 @@
 package eu.essi_lab.api.database;
 
+import java.util.List;
+import java.util.Optional;
+
+import com.marklogic.xcc.exceptions.RequestException;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -29,7 +34,30 @@ import eu.essi_lab.model.exceptions.GSException;
 /**
  * @author Fabrizio
  */
-public interface Database extends DatabaseCompliant, Configurable<DatabaseSetting> {
+public abstract class Database implements DatabaseCompliant, Configurable<DatabaseSetting> {
+
+    /**
+     * @author Fabrizio
+     */
+    public enum IdentifierType {
+
+	/**
+	 * 
+	 */
+	PUBLIC,
+	/**
+	 * 
+	 */
+	PRIVATE,
+	/**
+	 * 
+	 */
+	ORIGINAL,
+	/**
+	 * 
+	 */
+	OAI_HEADER
+    }
 
     /**
      * @author Fabrizio
@@ -43,7 +71,7 @@ public interface Database extends DatabaseCompliant, Configurable<DatabaseSettin
 	/**
 	 * 
 	 */
-	EXIST_EMBEDDED("eXistEmbedded");
+	OPENSEARCH("OpenSearch");
 
 	private String name;
 
@@ -82,14 +110,80 @@ public interface Database extends DatabaseCompliant, Configurable<DatabaseSettin
      * @param storageInfo
      * @throws GSException if the initialization fails
      */
-    public void initialize(StorageInfo storageInfo) throws GSException;
+    public abstract void initialize(StorageInfo storageInfo) throws GSException;
+
+    /**
+     * @param sourceId
+     * @return
+     * @throws GSException
+     */
+    public abstract SourceStorageWorker getWorker(String sourceId) throws GSException;
+
+    /**
+     * @param folderName
+     * @return
+     */
+    public abstract DatabaseFolder getFolder(String folderName) throws GSException;
+
+    /**
+     * @param folderName
+     * @param createIfNotExist
+     * @return
+     * @throws GSException
+     */
+    public abstract Optional<DatabaseFolder> getFolder(String folderName, boolean createIfNotExist) throws GSException;
+
+    /**
+     * @param folderName
+     * @return
+     */
+    public abstract boolean existsFolder(String folderName) throws GSException;
+
+    /**
+     * @return
+     */
+    public abstract DatabaseFolder[] getFolders() throws GSException;
+
+    /**
+     * @param folderName
+     */
+    public abstract boolean removeFolder(String folderName) throws GSException;
+
+    /**
+     * @param folderName
+     */
+    public abstract boolean addFolder(String folderName) throws GSException;
+
+    /**
+     * The folder tagged ad writing folder exists only during harvesting.
+     * in this case no harvesting is in progress, so we need to find the
+     * current data folder with max. 2 attempts
+     * If both folder exist or none, there is some kind of issue and an exception is thrown
+     * since the resource can not be stored/updated.
+     * See GIP-288
+     * 
+     * @param worker
+     * @return
+     * @throws GSException
+     * @throws RequestException
+     */
+    public abstract DatabaseFolder findWritingFolder(SourceStorageWorker worker) throws GSException;
+
+    /**
+     * @param type
+     * @param folderName
+     * @param excludDeleted
+     * @return
+     * @throws GSException
+     */
+    public abstract List<String> getIdentifiers(IdentifierType type, String folderName, boolean excludDeleted) throws GSException;
 
     /**
      * Return the checked {@link StorageInfo}
      * 
      * @return
      */
-    public StorageInfo getStorageInfo();
+    public abstract StorageInfo getStorageInfo();
 
     /**
      * A possible implementation can execute some code which release some resources.<br>
@@ -97,11 +191,48 @@ public interface Database extends DatabaseCompliant, Configurable<DatabaseSettin
      * 
      * @throws GSException
      */
-    public void release() throws GSException;
+    public abstract void release() throws GSException;
 
     /**
      * @return
      */
-    public String getIdentifier();
+    public abstract String getIdentifier();
+
+    /**
+     * @return
+     * @throws GSException
+     */
+    public DatabaseFolder getViewFolder(boolean createIfNotExist) throws GSException {
+
+	return getProtectedFolder(VIEWS_FOLDER, createIfNotExist);
+    }
+
+    /**
+     * @return
+     * @throws GSException
+     */
+    public DatabaseFolder getUsersFolder() throws GSException {
+
+	return getProtectedFolder(USERS_FOLDER, true);
+    }
+
+    /**
+     * @return
+     * @throws GSException
+     */
+    public DatabaseFolder getAugmentersFolder() throws GSException {
+
+	return getProtectedFolder(AUGMENTERS_FOLDER, true);
+    }
+
+    /**
+     * @param dirURI
+     * @return
+     * @throws GSException
+     */
+    protected DatabaseFolder getProtectedFolder(String dirURI, boolean createIfNotExist) throws GSException {
+
+	return getFolder(dirURI, createIfNotExist).orElse(null);
+    }
 
 }

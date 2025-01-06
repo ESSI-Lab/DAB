@@ -25,13 +25,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import com.google.protobuf.DescriptorProtos.MethodOptions.IdempotencyLevel;
-
+import eu.essi_lab.api.database.Database.IdentifierType;
 import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.DatabaseReader.IdentifierType;
 import eu.essi_lab.api.database.DatabaseWriter;
-import eu.essi_lab.harvester.HarvestingComponentException;
 import eu.essi_lab.harvester.HarvestingComponent;
+import eu.essi_lab.harvester.HarvestingComponentException;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;

@@ -68,7 +68,7 @@ public class IndexesSizeViewerTask extends AbstractCustomTask {
 
 	StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
 
-	DatabaseReader dbReader = DatabaseProviderFactory.getDatabaseReader(databaseURI);
+	DatabaseReader dbReader = DatabaseProviderFactory.getReader(databaseURI);
 	MarkLogicDatabase dataBase = ((MarkLogicDatabase) dbReader.getDatabase());
 
 	List<IndexedElementInfo> supportedIndexes = IndexedMetadataElements.getIndexesInfo(DatabaseImpl.MARK_LOGIC);

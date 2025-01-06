@@ -11,8 +11,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import eu.essi_lab.api.database.Database.IdentifierType;
 import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.DatabaseReader.IdentifierType;
 import eu.essi_lab.messages.HarvestingProperties;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;

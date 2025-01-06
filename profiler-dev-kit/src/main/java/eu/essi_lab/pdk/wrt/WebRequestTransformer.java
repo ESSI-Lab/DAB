@@ -187,7 +187,7 @@ public abstract class WebRequestTransformer<M extends RequestMessage> implements
 
 	try {
 
-	    DatabaseReader reader = DatabaseProviderFactory.getDatabaseReader(databaseURI);
+	    DatabaseReader reader = DatabaseProviderFactory.getReader(databaseURI);
 
 	    DefaultViewManager manager = new DefaultViewManager();
 	    manager.setDatabaseReader(reader);

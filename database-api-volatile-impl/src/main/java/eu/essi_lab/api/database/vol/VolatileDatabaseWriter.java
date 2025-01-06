@@ -39,7 +39,7 @@ import eu.essi_lab.model.resource.GSResource;
 /**
  * @author Fabrizio
  */
-public class VolatileDatabaseWriter implements DatabaseWriter {
+public class VolatileDatabaseWriter extends DatabaseWriter {
 
     private VolatileDatabase database;
     private StorageInfo dbUri;
@@ -179,6 +179,11 @@ public class VolatileDatabaseWriter implements DatabaseWriter {
 
     @Override
     public void storeRDF(Node rdf) throws GSException {
+
+    }
+
+    @Override
+    public void remove(String propertyName, String propertyValue) throws GSException {
 
     }
 }

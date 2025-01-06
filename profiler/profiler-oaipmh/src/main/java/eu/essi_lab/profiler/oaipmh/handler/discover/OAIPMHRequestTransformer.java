@@ -276,7 +276,7 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
 	StorageInfo uri = ConfigurationWrapper.getDatabaseURI();
 	GSLoggerFactory.getLogger(OAIPMHRequestTransformer.class).debug("Storage uri: {}", uri);
 
-	DatabaseFinder finder = DatabaseProviderFactory.getDatabaseFinder(uri);
+	DatabaseFinder finder = DatabaseProviderFactory.getFinder(uri);
 
 	try {
 

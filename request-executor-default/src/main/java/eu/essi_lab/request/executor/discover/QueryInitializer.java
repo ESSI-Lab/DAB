@@ -692,8 +692,8 @@ public class QueryInitializer implements IQueryInitializer {
     }
 
     protected IViewManager createViewManager(StorageInfo databaseURI) throws GSException {
-	DatabaseReader reader = DatabaseProviderFactory.getDatabaseReader(databaseURI);
-	DatabaseWriter writer = DatabaseProviderFactory.getDatabaseWriter(databaseURI);
+	DatabaseReader reader = DatabaseProviderFactory.getReader(databaseURI);
+	DatabaseWriter writer = DatabaseProviderFactory.getWriter(databaseURI);
 	DefaultViewManager ret = new DefaultViewManager();
 	ret.setDatabaseReader(reader);
 	ret.setDatabaseWriter(writer);

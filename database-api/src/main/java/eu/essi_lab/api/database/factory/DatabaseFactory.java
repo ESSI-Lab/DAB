@@ -63,7 +63,7 @@ public class DatabaseFactory {
      * @return the suitable {@link Database} or <code>null</code> if none is found
      * @throws GSException if dbUri is <code>null</code> or dbUri.getUri is <code>null</code>
      */
-    public static Database create(StorageInfo dbUri) throws GSException {
+    public static Database get(StorageInfo dbUri) throws GSException {
 
 	if (dbUri == null || dbUri.getUri() == null) {
 

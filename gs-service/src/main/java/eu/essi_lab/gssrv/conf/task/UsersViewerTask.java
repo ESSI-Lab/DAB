@@ -53,7 +53,7 @@ public class UsersViewerTask extends AbstractCustomTask {
 
 	StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
 
-	DatabaseReader dbReader = DatabaseProviderFactory.getDatabaseReader(databaseURI);
+	DatabaseReader dbReader = DatabaseProviderFactory.getReader(databaseURI);
 
 	List<GSUser> users = dbReader.getUsers();
 

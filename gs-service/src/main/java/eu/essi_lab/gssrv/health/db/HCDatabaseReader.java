@@ -32,6 +32,7 @@ import eu.essi_lab.api.database.DatabaseFinder;
 import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.GetViewIdentifiersRequest;
+import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.ResultSet;
@@ -48,7 +49,7 @@ import eu.essi_lab.model.resource.GSResource;
 /**
  * @author Fabrizio
  */
-public class HCDatabaseReader implements DatabaseReader, DatabaseFinder, Database {
+public class HCDatabaseReader extends Database implements DatabaseReader, DatabaseFinder {
 
     private static final String BAD_HEALTH_CHECK_MESSAGE = "BAD_HEALTH_CHECK_MESSAGE";
 
@@ -200,6 +201,66 @@ public class HCDatabaseReader implements DatabaseReader, DatabaseFinder, Databas
 
     @Override
     public String getIdentifier() {
+
+	return null;
+    }
+
+    @Override
+    public SourceStorageWorker getWorker(String sourceId) throws GSException {
+
+	return null;
+    }
+
+    @Override
+    public DatabaseFolder getFolder(String folderName) throws GSException {
+
+	return null;
+    }
+
+    @Override
+    public boolean existsFolder(String folderName) throws GSException {
+
+	return false;
+    }
+
+    @Override
+    public DatabaseFolder[] getFolders() throws GSException {
+
+	return null;
+    }
+
+    @Override
+    public boolean removeFolder(String folderName) throws GSException {
+
+	return false;
+    }
+
+    @Override
+    public boolean addFolder(String folderName) throws GSException {
+
+	return false;
+    }
+
+    @Override
+    public DatabaseFolder findWritingFolder(SourceStorageWorker worker) throws GSException {
+
+	return null;
+    }
+
+    @Override
+    public List<String> getIdentifiers(IdentifierType type, String folderName, boolean excludDeleted) throws GSException {
+
+	return null;
+    }
+
+    @Override
+    public List<GSResource> getResources(String originalIdentifier, GSSource source, boolean includeDeleted) throws GSException {
+
+	return null;
+    }
+
+    @Override
+    public GSResource getResource(String originalIdentifier, GSSource source, boolean includeDeleted) throws GSException {
 
 	return null;
     }

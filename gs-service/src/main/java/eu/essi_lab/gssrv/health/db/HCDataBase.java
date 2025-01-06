@@ -1,5 +1,8 @@
 package eu.essi_lab.gssrv.health.db;
 
+import java.util.List;
+import java.util.Optional;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -22,6 +25,9 @@ package eu.essi_lab.gssrv.health.db;
  */
 
 import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.DatabaseFolder;
+import eu.essi_lab.api.database.SourceStorageWorker;
+import eu.essi_lab.api.database.Database.IdentifierType;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -29,7 +35,13 @@ import eu.essi_lab.model.exceptions.GSException;
 /**
  * @author Fabrizio
  */
-public class HCDataBase implements Database {
+public class HCDataBase extends Database {
+
+    @Override
+    public boolean supports(StorageInfo dbUri) {
+
+	return false;
+    }
 
     @Override
     public void configure(DatabaseSetting setting) {
@@ -49,20 +61,68 @@ public class HCDataBase implements Database {
     }
 
     @Override
-    public void initialize(StorageInfo dbInfo) throws GSException {
+    public void initialize(StorageInfo storageInfo) throws GSException {
 
+    }
+
+    @Override
+    public SourceStorageWorker getWorker(String sourceId) throws GSException {
+
+	return null;
+    }
+
+    @Override
+    public DatabaseFolder getFolder(String folderName) throws GSException {
+
+	return null;
+    }
+
+    @Override
+    public Optional<DatabaseFolder> getFolder(String folderName, boolean createIfNotExist) throws GSException {
+
+	return Optional.empty();
+    }
+
+    @Override
+    public boolean existsFolder(String folderName) throws GSException {
+
+	return false;
+    }
+
+    @Override
+    public DatabaseFolder[] getFolders() throws GSException {
+
+	return null;
+    }
+
+    @Override
+    public boolean removeFolder(String folderName) throws GSException {
+
+	return false;
+    }
+
+    @Override
+    public boolean addFolder(String folderName) throws GSException {
+
+	return false;
+    }
+
+    @Override
+    public DatabaseFolder findWritingFolder(SourceStorageWorker worker) throws GSException {
+
+	return null;
+    }
+
+    @Override
+    public List<String> getIdentifiers(IdentifierType type, String folderName, boolean excludDeleted) throws GSException {
+
+	return null;
     }
 
     @Override
     public StorageInfo getStorageInfo() {
 
 	return null;
-    }
-
-    @Override
-    public boolean supports(StorageInfo dbUri) {
-
-	return dbUri instanceof HCStorageInfo;
     }
 
     @Override

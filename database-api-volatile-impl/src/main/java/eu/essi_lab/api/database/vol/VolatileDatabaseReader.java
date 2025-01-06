@@ -43,7 +43,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import eu.essi_lab.api.database.Database;
-import eu.essi_lab.api.database.DatabaseFolder;
+import eu.essi_lab.api.database.Database.IdentifierType;
 import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.GetViewIdentifiersRequest;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
@@ -414,24 +414,14 @@ public class VolatileDatabaseReader implements DatabaseReader {
     }
 
     @Override
-    public Optional<DatabaseFolder> getFolder(String folderName, boolean createIfNotExist) throws GSException {
-
-	Optional<VolatileFolder> opt = getDatabase().getFodersList().stream().filter(f -> f.getSimpleName().equals(folderName)).findFirst();
-
-	if (opt.isPresent()) {
-	    return Optional.of(opt.get());
-	}
-
-	if (createIfNotExist) {
-
-	    VolatileFolder folder = new VolatileFolder(folderName);
-
-	    getDatabase().getFodersList().add(folder);
-
-	    return Optional.of(folder);
-	}
-
-	return Optional.empty();
+    public List<GSResource> getResources(String originalIdentifier, GSSource source, boolean includeDeleted) throws GSException {
+	//
+	return null;
     }
 
+    @Override
+    public GSResource getResource(String originalIdentifier, GSSource source, boolean includeDeleted) throws GSException {
+	//
+	return null;
+    }
 }

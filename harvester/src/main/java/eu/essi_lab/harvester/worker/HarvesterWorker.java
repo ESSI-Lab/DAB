@@ -235,8 +235,8 @@ public class HarvesterWorker extends SchedulerWorker<HarvestingSetting> {
 
 	GSLoggerFactory.getLogger(this.getClass()).debug("Configured Database URI: {}", databaseURI.getUri());
 
-	DatabaseReader dataBaseReader = DatabaseProviderFactory.getDatabaseReader(databaseURI);
-	DatabaseWriter dataBaseWriter = DatabaseProviderFactory.getDatabaseWriter(databaseURI);
+	DatabaseReader dataBaseReader = DatabaseProviderFactory.getReader(databaseURI);
+	DatabaseWriter dataBaseWriter = DatabaseProviderFactory.getWriter(databaseURI);
 	SourceStorage storage = DatabaseProviderFactory.getSourceStorage(databaseURI);
 
 	// ----------------------------------------------------

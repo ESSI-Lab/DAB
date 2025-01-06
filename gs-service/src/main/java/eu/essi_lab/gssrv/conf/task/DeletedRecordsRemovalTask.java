@@ -42,7 +42,7 @@ public class DeletedRecordsRemovalTask extends AbstractCustomTask {
 
 	StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
 
-	DatabaseExecutor executor = DatabaseProviderFactory.getDatabaseExecutor(databaseURI);
+	DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(databaseURI);
 
 	log(status, "Count deleted records STARTED");
 

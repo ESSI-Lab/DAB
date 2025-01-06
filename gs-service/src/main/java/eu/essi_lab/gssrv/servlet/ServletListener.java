@@ -95,7 +95,7 @@ public class ServletListener implements ServletContextListener {
 
 	    GSLoggerFactory.getLogger(getClass()).info("Releasing database resources");
 
-	    Database provider = DatabaseFactory.create(uri);
+	    Database provider = DatabaseFactory.get(uri);
 	    if (provider != null) {
 		provider.release();
 	    }
