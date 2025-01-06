@@ -4,7 +4,7 @@ package eu.essi_lab.api.database.marklogic;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -37,6 +37,7 @@ import com.marklogic.xcc.ResultSequence;
 import com.marklogic.xcc.exceptions.RequestException;
 
 import eu.essi_lab.api.database.Database.DatabaseImpl;
+import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.indexes.CustomIndexedElements;
 import eu.essi_lab.indexes.IndexedElements;
 import eu.essi_lab.indexes.IndexedMetadataElements;

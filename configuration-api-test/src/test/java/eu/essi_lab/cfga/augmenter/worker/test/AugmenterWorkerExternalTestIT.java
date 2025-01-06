@@ -92,7 +92,7 @@ public class AugmenterWorkerExternalTestIT {
 	}
 
 	StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
-	DatabaseFinder finder = DatabaseProviderFactory.getDatabaseFinder(databaseURI);
+	DatabaseFinder finder = DatabaseProviderFactory.getFinder(databaseURI);
 
 	DiscoveryMessage message = new DiscoveryMessage();
 
@@ -132,7 +132,7 @@ public class AugmenterWorkerExternalTestIT {
 
 	// clears the volatile db
 	StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
-	Database dataBase = DatabaseFactory.create(databaseURI);
+	Database dataBase = DatabaseFactory.get(databaseURI);
 	VolatileDatabase database = (VolatileDatabase) dataBase;
 	database.clear();
 

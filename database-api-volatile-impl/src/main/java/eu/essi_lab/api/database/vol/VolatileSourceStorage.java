@@ -4,7 +4,7 @@ package eu.essi_lab.api.database.vol;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,7 +29,6 @@ import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.SourceStorage;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
-import eu.essi_lab.cfga.gs.setting.database.SourceStorageSetting;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.HarvestingProperties;
@@ -42,10 +41,9 @@ import eu.essi_lab.model.exceptions.GSException;
 /**
  * @author Fabrizio
  */
-public class VolatileSourceStorage implements SourceStorage {
+public class VolatileSourceStorage extends SourceStorage {
 
     private VolatileDatabase database;
-    private SourceStorageSetting setting;
     private StorageInfo dbUri;
     private String startTimeStamp;
 
@@ -68,12 +66,6 @@ public class VolatileSourceStorage implements SourceStorage {
     public VolatileDatabase getDatabase() {
 
 	return (VolatileDatabase) this.database;
-    }
-
-    @Override
-    public void configure(SourceStorageSetting setting) {
-
-	this.setting = setting;
     }
 
     @Override
@@ -157,12 +149,6 @@ public class VolatileSourceStorage implements SourceStorage {
     public List<String> retrieveWarnReport(GSSource source) throws GSException {
 
 	return new ArrayList<String>();
-    }
-
-    @Override
-    public SourceStorageSetting getSetting() {
-
-	return this.setting;
     }
 
     @Override

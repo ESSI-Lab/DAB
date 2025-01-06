@@ -15,13 +15,13 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.Database.IdentifierType;
 import eu.essi_lab.api.database.DatabaseFinder;
 import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.DatabaseReader.IdentifierType;
 import eu.essi_lab.api.database.DatabaseWriter;
 import eu.essi_lab.api.database.SourceStorage;
-import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.api.database.factory.DatabaseFactory;
+import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.api.database.vol.VolatileDatabase;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.indexes.IndexedElementsWriter;
@@ -86,7 +86,7 @@ public class HarvestingAndDiscoveryTest {
 	source2.setUniqueIdentifier(SOURCE_2_ID);
 
 	try {
-	    provider = DatabaseFactory.create(TEST_DB_URI);
+	    provider = DatabaseFactory.get(TEST_DB_URI);
 	    provider.initialize(TEST_DB_URI);
 
 	} catch (GSException e) {
@@ -98,9 +98,9 @@ public class HarvestingAndDiscoveryTest {
 	//
 	// creates the consumers
 	//
-	writer = DatabaseProviderFactory.getDatabaseWriter(TEST_DB_URI);
-	reader = DatabaseProviderFactory.getDatabaseReader(TEST_DB_URI);
-	finder = DatabaseProviderFactory.getDatabaseFinder(TEST_DB_URI);
+	writer = DatabaseProviderFactory.getWriter(TEST_DB_URI);
+	reader = DatabaseProviderFactory.getReader(TEST_DB_URI);
+	finder = DatabaseProviderFactory.getFinder(TEST_DB_URI);
 	storage = DatabaseProviderFactory.getSourceStorage(TEST_DB_URI);
 
 	volatileDatabase = (VolatileDatabase) provider;

@@ -1,10 +1,10 @@
-package eu.essi_lab.api.database.marklogic;
+package eu.essi_lab.api.database;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -49,10 +49,9 @@ import org.xml.sax.SAXException;
 import com.google.common.io.ByteStreams;
 import com.marklogic.xcc.exceptions.RequestException;
 
-import eu.essi_lab.access.compliance.wrapper.ReportsMetadataHandler;
-import eu.essi_lab.api.database.DatabaseFolder;
+import eu.essi_lab.api.database.Database.IdentifierType;
+import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
-import eu.essi_lab.indexes.marklogic.MarkLogicScalarType;
 import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.jaxb.common.schemas.BooleanValidationHandler;
 import eu.essi_lab.jaxb.common.schemas.CommonSchemas;
@@ -72,9 +71,8 @@ import eu.essi_lab.model.HarvestingStrategy;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.AugmentedMetadataElement;
-import eu.essi_lab.model.resource.ExtensionHandler;
 import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.model.resource.PropertiesAdapter.AdaptPolicy;
+import eu.essi_lab.model.resource.ResourceProperty;
 
 /**
  * @author Fabrizio
@@ -87,7 +85,6 @@ public class SourceStorageWorker {
     public static final String DATA_FOLDER_POSTFIX = "_dataFolder";
 
     private String sourceId;
-    private MarkLogicDatabase markLogicDB;
     private String startTimeStamp;
     private static final String WRITING_FOLDER = "writingFolder";
 
@@ -102,20 +99,21 @@ public class SourceStorageWorker {
      */
     private static final double DEFAULT_SMART_STORAGE_PERCENTAGE_TRESHOLD = 60;
 
-    private MarkLogicReader reader;
+    private Database database;
+    private DatabaseReader reader;
+    private DatabaseFinder finder;
     private List<String> report;
 
     /**
      * @param sourceId
-     * @param db
+     * @param database
+     * @throws GSException
      * @throws Exception
      */
-    public SourceStorageWorker(String sourceId, MarkLogicDatabase db) {
+    public SourceStorageWorker(String sourceId, Database database) throws GSException {
 
 	this.sourceId = sourceId;
-	this.markLogicDB = db;
-	this.reader = new MarkLogicReader();
-	this.reader.setDatabase(db);
+	this.database = database;
     }
 
     /**
@@ -199,6 +197,68 @@ public class SourceStorageWorker {
     }
 
     /**
+     * @param suiteId
+     * @param folderName
+     * @return
+     */
+    public static String retrieveSourceName(String suiteId, String folderName) {
+
+	if (folderName.endsWith(SourceStorageWorker.META_PREFIX)) {
+
+	    folderName = folderName.replace(suiteId + "_", "");
+	    folderName = folderName.replace(META_PREFIX, "");
+
+	    return folderName;
+	}
+
+	return null;
+    }
+
+    /**
+     * @return
+     * @throws RequestException
+     */
+    public DatabaseFolder getData2Folder() throws GSException {
+
+	return database.getFolder(sourceId + DATA_2_PREFIX);
+    }
+
+    /**
+     * @return
+     * @throws RequestException
+     */
+    public DatabaseFolder getData1Folder() throws GSException {
+
+	return database.getFolder(sourceId + DATA_1_PREFIX);
+    }
+
+    /**
+     * @return
+     * @throws RequestException
+     */
+    public boolean existsData1Folder() throws GSException {
+
+	return database.existsFolder(sourceId + DATA_1_PREFIX);
+    }
+
+    /**
+     * @return
+     * @throws RequestException
+     */
+    public boolean existsData2Folder() throws GSException {
+
+	return database.existsFolder(sourceId + DATA_2_PREFIX);
+    }
+
+    /**
+     * @return
+     */
+    public List<String> getStorageReport() {
+
+	return report;
+    }
+
+    /**
      * @param strategy
      * @param recovery
      * @param resumed
@@ -231,7 +291,7 @@ public class SourceStorageWorker {
 	    //
 	    // first full harvesting
 	    //
-	    if (!markLogicDB.existsFolder(getMetaFolderName())) {
+	    if (!database.existsFolder(getMetaFolderName())) {
 
 		debug("First harvesting detected", status);
 
@@ -344,7 +404,7 @@ public class SourceStorageWorker {
 
 	    debug("Selecting writing folder for SELECTIVE harvest with recovery flag " + recovery + " / resumed flag " + resumed, status);
 
-	    if (!markLogicDB.existsFolder(getMetaFolderName())) {
+	    if (!database.existsFolder(getMetaFolderName())) {
 
 		debug("First harvesting detected", status);
 
@@ -442,7 +502,7 @@ public class SourceStorageWorker {
      * @throws Exception
      */
     void harvestingEnded(//
-	    MarkLogicSourceStorage storage, //
+	    SourceStorage storage, //
 	    Optional<HarvestingProperties> properties, //
 	    HarvestingStrategy strategy, //
 	    Optional<SchedulerJobStatus> status, //
@@ -562,24 +622,6 @@ public class SourceStorageWorker {
     }
 
     /**
-     * @param suiteId
-     * @param folderName
-     * @return
-     */
-    static String retrieveSourceName(String suiteId, String folderName) {
-
-	if (folderName.endsWith(SourceStorageWorker.META_PREFIX)) {
-
-	    folderName = folderName.replace(suiteId + "_", "");
-	    folderName = folderName.replace(META_PREFIX, "");
-
-	    return folderName;
-	}
-
-	return null;
-    }
-
-    /**
      * @param properties
      * @throws Exception
      */
@@ -590,50 +632,6 @@ public class SourceStorageWorker {
 	sourceFolder.remove(HarvestingProperties.getFileName());
 
 	sourceFolder.storeBinary(HarvestingProperties.getFileName(), properties.asStream());
-    }
-
-    /**
-     * @return
-     * @throws RequestException
-     */
-    DatabaseFolder getData2Folder() throws RequestException {
-
-	return markLogicDB.getFolder(sourceId + DATA_2_PREFIX);
-    }
-
-    /**
-     * @return
-     * @throws RequestException
-     */
-    DatabaseFolder getData1Folder() throws RequestException {
-
-	return markLogicDB.getFolder(sourceId + DATA_1_PREFIX);
-    }
-
-    /**
-     * @return
-     * @throws RequestException
-     */
-    boolean existsData1Folder() throws RequestException {
-
-	return markLogicDB.existsFolder(sourceId + DATA_1_PREFIX);
-    }
-
-    /**
-     * @return
-     * @throws RequestException
-     */
-    boolean existsData2Folder() throws RequestException {
-
-	return markLogicDB.existsFolder(sourceId + DATA_2_PREFIX);
-    }
-
-    /**
-     * @return
-     */
-    List<String> getStorageReport() {
-
-	return report;
     }
 
     /**
@@ -720,6 +718,26 @@ public class SourceStorageWorker {
     }
 
     /**
+     * @param indexName
+     * @param status
+     */
+    protected void checkDataFolderIndex(String indexName, Optional<SchedulerJobStatus> status) throws Exception {
+
+    }
+
+    /**
+     * @param message
+     * @param status
+     */
+    protected void debug(String message, Optional<SchedulerJobStatus> status) {
+
+	status.ifPresent(s -> s.addInfoMessage(message));
+
+	GSLoggerFactory.getLogger(getClass()).debug(message);
+	report.add(message);
+    }
+
+    /**
      * @param status
      * @throws Exception
      */
@@ -754,14 +772,16 @@ public class SourceStorageWorker {
 		throw new Exception("No recovery removal token found");
 	    }
 
-	    int count = reader.count(message).getCount();
+	    int count = getFinder().count(message).getCount();
 	    debug("Found " + count + " records to remove", status);
 
 	    if (count > 0) {
 
 		debug("Records removal STARTED", status);
 
-		markLogicDB.removeResourcesByRemovalResumptionToken(recoveryRemovalToken, count);
+		DatabaseWriter writer = DatabaseProviderFactory.getWriter(database.getStorageInfo());
+
+		writer.remove(ResourceProperty.RECOVERY_REMOVAL_TOKEN.getName(), recoveryRemovalToken);
 
 		debug("Records removal ENDED", status);
 	    }
@@ -940,8 +960,6 @@ public class SourceStorageWorker {
      */
     private void updateMetaFolder(Optional<SchedulerJobStatus> status) throws Exception {
 
-	MarkLogicIndexesManager idxManager = new MarkLogicIndexesManager(markLogicDB, false);
-
 	DatabaseFolder metaFolder = getMetaFolder();
 
 	String sourceId = metaFolder.getSimpleName().replace(META_PREFIX, "");
@@ -949,26 +967,16 @@ public class SourceStorageWorker {
 
 	debug("Handling data folder index file STARTED", status);
 
-	if (!idxManager.rangeIndexExists(//
-		indexName, //
-		MarkLogicScalarType.STRING)) {
+	checkDataFolderIndex(indexName, status);
 
-	    debug("Adding data folder range index STARTED", status);
-
-	    idxManager.addRangeIndex(indexName, //
-		    MarkLogicScalarType.STRING.getType());
-
-	    debug("Adding data folder range index ENDED", status);
-	}
-
-	debug("Suite  id [" + markLogicDB.getIdentifier() + "]", status);
+	debug("Suite  id [" + database.getIdentifier() + "]", status);
 	debug("Source id [" + sourceId + "]", status);
 
-	DatabaseFolder dataFolder = Arrays.asList(markLogicDB.getFolders()).//
+	DatabaseFolder dataFolder = Arrays.asList(database.getFolders()).//
 		stream().//
 
-		filter(f -> f.getCompleteName().equals(markLogicDB.getIdentifier() + "_" + sourceId + DATA_1_PREFIX) || //
-			f.getCompleteName().equals(markLogicDB.getIdentifier() + "_" + sourceId + DATA_2_PREFIX))
+		filter(f -> f.getCompleteName().equals(database.getIdentifier() + "_" + sourceId + DATA_1_PREFIX) || //
+			f.getCompleteName().equals(database.getIdentifier() + "_" + sourceId + DATA_2_PREFIX))
 		.
 
 		findFirst().//
@@ -1003,7 +1011,6 @@ public class SourceStorageWorker {
 	    debug("Storing index " + (stored ? "SUCCEEDED" : "FAILED"), status);
 
 	    debug("Storing index ENDED", status);
-
 	}
 
 	debug("Handling data folder index file ENDED", status);
@@ -1018,7 +1025,7 @@ public class SourceStorageWorker {
      */
     private void updateHarvestingProperties(//
 	    Optional<HarvestingProperties> optProperties, //
-	    MarkLogicDatabase markLogicDB, //
+	    Database markLogicDB, //
 	    DatabaseFolder writingFolder, //
 	    Optional<SchedulerJobStatus> status) throws Exception {
 
@@ -1052,18 +1059,6 @@ public class SourceStorageWorker {
 	properties.setEndHarvestingTimestamp();
 
 	storeHarvestingProperties(properties);
-    }
-
-    /**
-     * @param message
-     * @param status
-     */
-    private void debug(String message, Optional<SchedulerJobStatus> status) {
-
-	status.ifPresent(s -> s.addInfoMessage(message));
-
-	GSLoggerFactory.getLogger(getClass()).debug(message);
-	report.add(message);
     }
 
     /**
@@ -1165,8 +1160,8 @@ public class SourceStorageWorker {
 	    }
 
 	    // 1) get the original ids of the old folder and the original ids from the new folder
-	    List<String> newIds = markLogicDB.getOriginalIDs(newFolder.getCompleteName(), false);
-	    List<String> oldIds = markLogicDB.getOriginalIDs(oldFolder.getCompleteName(), false);
+	    List<String> newIds = database.getIdentifiers(IdentifierType.ORIGINAL, newFolder.getCompleteName(), false);
+	    List<String> oldIds = database.getIdentifiers(IdentifierType.ORIGINAL, oldFolder.getCompleteName(), false);
 
 	    // 2) removes all the ids of the new folder from the ids of the old folder.
 	    // the remaining are the original ids of the removed resources (they are in the old folder
@@ -1183,7 +1178,7 @@ public class SourceStorageWorker {
 
 	    for (String string : oldIds) {
 		// 3) get the resource with the removed original id from the old folder
-		GSResource resource = reader.getResource(string, gsSource, true);
+		GSResource resource = getReader().getResource(string, gsSource, true);
 		// 4) marks it as deleted (some resources can be already be tagged from previous harvesting)
 		if (!resource.getPropertyHandler().isDeleted()) {
 		    resource.getPropertyHandler().setIsDeleted(true);
@@ -1205,7 +1200,7 @@ public class SourceStorageWorker {
 	DatabaseFolder newFolder = getWritingFolder(status);
 
 	// 1) get the original ids of the old folder and the original ids from the new folder
-	List<String> newIds = markLogicDB.getOriginalIDs(newFolder.getCompleteName(), false);
+	List<String> newIds = database.getIdentifiers(IdentifierType.ORIGINAL, newFolder.getCompleteName(), false);
 
 	DatabaseFolder oldFolder = null;
 
@@ -1216,7 +1211,7 @@ public class SourceStorageWorker {
 	}
 
 	if (oldFolder != null) {
-	    List<String> oldIds = markLogicDB.getOriginalIDs(oldFolder.getCompleteName(), false);
+	    List<String> oldIds = database.getIdentifiers(IdentifierType.ORIGINAL, oldFolder.getCompleteName(), false);
 
 	    // 2) removes all the old ids from the new folder ids
 	    // the remaining are the ids of the new resources
@@ -1234,7 +1229,7 @@ public class SourceStorageWorker {
 	for (String originalId : newIds) {
 
 	    // 3) get the resource with the original id from the new folder
-	    GSResource resource = reader.getResource(originalId, gsSource, true);
+	    GSResource resource = getReader().getResource(originalId, gsSource, true);
 
 	    SchemaValidator sv = new SchemaValidator();
 
@@ -1282,8 +1277,8 @@ public class SourceStorageWorker {
 		oldFolder = getData1Folder();
 	    }
 
-	    List<String> newIds = markLogicDB.getOriginalIDs(newFolder.getCompleteName(), false);
-	    List<String> oldIds = markLogicDB.getOriginalIDs(oldFolder.getCompleteName(), false);
+	    List<String> newIds = database.getIdentifiers(IdentifierType.ORIGINAL, newFolder.getCompleteName(), false);
+	    List<String> oldIds = database.getIdentifiers(IdentifierType.ORIGINAL, oldFolder.getCompleteName(), false);
 
 	    @SuppressWarnings("unchecked")
 	    Collection<String> intersection = CollectionUtils.intersection(newIds, oldIds);
@@ -1301,7 +1296,7 @@ public class SourceStorageWorker {
 		for (String id : intersection) {
 
 		    // get the two resources with same original id (the old one and the new one)
-		    List<GSResource> resources = reader.getResources(id, gsSource, true);
+		    List<GSResource> resources = getReader().getResources(id, gsSource, true);
 
 		    debug("Found " + resources.size() + " resources with same identifier", resources.size(), status);
 
@@ -1363,42 +1358,42 @@ public class SourceStorageWorker {
      */
     private void recoverExtendedElements(GSResource oldResource, GSResource newResource) {
 
-	{
-	    ExtensionHandler oldHandler = oldResource.getExtensionHandler();
-	    ExtensionHandler newHandler = newResource.getExtensionHandler();
-
-	    // at the moment, the properties currently handled by the ExtendedMetadataHandler are set
-	    // at harvesting time by the mappers, so there is no need to adapt....
-	    // this is done just in case for some reason, the mappers fail to add the extensions
-	    oldHandler.adapt(newHandler, AdaptPolicy.ON_EMPTY);
-	}
-
-	{
-	    ReportsMetadataHandler oldHandler = new ReportsMetadataHandler(oldResource);
-	    ReportsMetadataHandler newHandler = new ReportsMetadataHandler(newResource);
-
-	    // the old reports are copied only if the new resource has no reports at all
-	    // (that is, the AccessAugmenter was disabled)
-	    // this way more recent properties are preserved
-	    oldHandler.adapt(newHandler, AdaptPolicy.ON_EMPTY);
-	}
+	// {
+	// ExtensionHandler oldHandler = oldResource.getExtensionHandler();
+	// ExtensionHandler newHandler = newResource.getExtensionHandler();
+	//
+	// // at the moment, the properties currently handled by the ExtendedMetadataHandler are set
+	// // at harvesting time by the mappers, so there is no need to adapt....
+	// // this is done just in case for some reason, the mappers fail to add the extensions
+	// oldHandler.adapt(newHandler, AdaptPolicy.ON_EMPTY);
+	// }
+	//
+	// {
+	// ReportsMetadataHandler oldHandler = new ReportsMetadataHandler(oldResource);
+	// ReportsMetadataHandler newHandler = new ReportsMetadataHandler(newResource);
+	//
+	// // the old reports are copied only if the new resource has no reports at all
+	// // (that is, the AccessAugmenter was disabled)
+	// // this way more recent properties are preserved
+	// oldHandler.adapt(newHandler, AdaptPolicy.ON_EMPTY);
+	// }
     }
 
     /**
      * @throws RequestException
      */
-    private void addMetaFolder() throws RequestException {
+    private void addMetaFolder() throws GSException {
 
-	markLogicDB.addFolder(sourceId + META_PREFIX);
+	database.addFolder(sourceId + META_PREFIX);
     }
 
     /**
      * @return
      * @throws RequestException
      */
-    private DatabaseFolder getMetaFolder() throws RequestException {
+    private DatabaseFolder getMetaFolder() throws GSException {
 
-	return markLogicDB.getFolder(sourceId + META_PREFIX);
+	return database.getFolder(sourceId + META_PREFIX);
     }
 
     /**
@@ -1412,32 +1407,69 @@ public class SourceStorageWorker {
     /**
      * @throws RequestException
      */
-    private void addData2Folder() throws RequestException {
+    private void addData2Folder() throws GSException {
 
-	markLogicDB.addFolder(sourceId + DATA_2_PREFIX);
+	database.addFolder(sourceId + DATA_2_PREFIX);
     }
 
     /**
      * @throws RequestException
      */
-    private void addData1Folder() throws RequestException {
+    private void addData1Folder() throws GSException {
 
-	markLogicDB.addFolder(sourceId + DATA_1_PREFIX);
+	database.addFolder(sourceId + DATA_1_PREFIX);
     }
 
     /**
      * @throws RequestException
      */
-    private void removeData1Folder() throws RequestException {
+    private void removeData1Folder() throws GSException {
 
-	markLogicDB.removeFolder(sourceId + DATA_1_PREFIX);
+	database.removeFolder(sourceId + DATA_1_PREFIX);
     }
 
     /**
      * @throws RequestException
      */
-    private void removeData2Folder() throws RequestException {
+    private void removeData2Folder() throws GSException {
 
-	markLogicDB.removeFolder(sourceId + DATA_2_PREFIX);
+	database.removeFolder(sourceId + DATA_2_PREFIX);
+    }
+
+    /**
+     * @return
+     * @throws GSException
+     */
+    private DatabaseReader getReader() throws GSException {
+
+	if (this.reader == null) {
+
+	    this.reader = DatabaseProviderFactory.getReader(database.getStorageInfo());
+	}
+
+	return reader;
+    }
+
+    /**
+     * @return
+     * @throws GSException
+     */
+    private DatabaseFinder getFinder() throws GSException {
+
+	if (this.reader == null) {
+
+	    this.finder = DatabaseProviderFactory.getFinder(database.getStorageInfo());
+	}
+
+	return finder;
+    }
+
+    /**
+     * @return
+     * @throws GSException
+     */
+    protected Database getDatabase() {
+
+	return database;
     }
 }

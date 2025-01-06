@@ -7,7 +7,7 @@ package eu.essi_lab.augmenter.worker;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -93,7 +93,7 @@ public class AugmenterWorkerSettingImpl extends AugmenterWorkerSetting {
 	@Override
 	protected List<String> loadValues(Optional<String> input) throws Exception {
 
-	    DatabaseReader reader = DatabaseProviderFactory.getDatabaseReader(ConfigurationWrapper.getDatabaseURI());
+	    DatabaseReader reader = DatabaseProviderFactory.getReader(ConfigurationWrapper.getDatabaseURI());
 
 	    return reader.getViewIdentifiers(GetViewIdentifiersRequest.create());
 	}

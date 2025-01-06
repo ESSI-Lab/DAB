@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.os.handler.discover.eiffel;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -293,7 +293,7 @@ public class EiffelDiscoveryHandler extends DiscoveryHandler<String> {
 
 	    GSLoggerFactory.getLogger(getClass()).info("Executing merged query for identifers STARTED");
 
-	    DatabaseExecutor executor = DatabaseProviderFactory.getDatabaseExecutor(ConfigurationWrapper.getDatabaseURI());
+	    DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(ConfigurationWrapper.getDatabaseURI());
 
 	    mergedRecordsIds = executor.getIndexValues(message, MetadataElement.IDENTIFIER, 0, EiffelAPI.DEFAULT_MAX_SORT_IDENTIFIERS);
 
@@ -752,7 +752,7 @@ public class EiffelDiscoveryHandler extends DiscoveryHandler<String> {
 
 	    GSLoggerFactory.getLogger(getClass()).info("[1/4] Retrieving user query records ids STARTED");
 
-	    DatabaseExecutor executor = DatabaseProviderFactory.getDatabaseExecutor(ConfigurationWrapper.getDatabaseURI());
+	    DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(ConfigurationWrapper.getDatabaseURI());
 
 	    recordsIds = executor.getIndexValues(message, MetadataElement.IDENTIFIER, 0, EiffelAPI.DEFAULT_MAX_SORT_IDENTIFIERS);
 

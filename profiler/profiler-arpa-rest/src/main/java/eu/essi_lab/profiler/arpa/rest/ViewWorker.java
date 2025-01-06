@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.arpa.rest;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -36,13 +36,13 @@ public class ViewWorker {
     public static final String CREATOR = "whos";
 
     protected DatabaseWriter createWriter() throws GSException {
-	return DatabaseProviderFactory.getDatabaseWriter(databaseURI);
+	return DatabaseProviderFactory.getWriter(databaseURI);
     }
 
     public ViewWorker(WebRequest request) throws GSException {
 	this.request = request;
 	this.databaseURI = ConfigurationWrapper.getDatabaseURI();
-	this.reader = DatabaseProviderFactory.getDatabaseReader(databaseURI);
+	this.reader = DatabaseProviderFactory.getReader(databaseURI);
     }
 
     protected static String errorMessage(String msg) {

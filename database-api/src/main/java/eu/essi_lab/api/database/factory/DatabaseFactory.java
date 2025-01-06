@@ -4,7 +4,7 @@ package eu.essi_lab.api.database.factory;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -63,7 +63,7 @@ public class DatabaseFactory {
      * @return the suitable {@link Database} or <code>null</code> if none is found
      * @throws GSException if dbUri is <code>null</code> or dbUri.getUri is <code>null</code>
      */
-    public static Database create(StorageInfo dbUri) throws GSException {
+    public static Database get(StorageInfo dbUri) throws GSException {
 
 	if (dbUri == null || dbUri.getUri() == null) {
 

@@ -7,7 +7,7 @@ package eu.essi_lab.request.executor.statistics;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -52,7 +52,7 @@ public class StatisticsExecutor implements IStatisticsExecutor {
 
 	StorageInfo uri = message.getDataBaseURI();
 
-	DatabaseExecutor executor = DatabaseProviderFactory.getDatabaseExecutor(uri);
+	DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(uri);
 
 	GSLoggerFactory.getLogger(getClass()).info("Computation STARTED");
 
