@@ -6,15 +6,16 @@ import org.junit.Test;
 
 import eu.essi_lab.gssrv.conf.task.turtle.TurtleMapper;
 import eu.essi_lab.model.resource.Dataset;
+import eu.essi_lab.model.resource.DatasetCollection;
 
 public class TurtleMapperTest {
 
     @Test
     public void fairEaseTest() throws Exception {
-	String filename = "dataset-sdn.xml";
+	String filename = "test-cmems.xml";
 	InputStream stream = TurtleMapperTest.class.getClassLoader().getResourceAsStream(filename);
 	TurtleMapper mapper = new TurtleMapper();
-	Dataset dataset = Dataset.create(stream);
+	DatasetCollection dataset = DatasetCollection.create(stream);
 	dataset.setOriginalMetadata(null);
 	String result = mapper.map(null, dataset);
 	System.out.println(result);

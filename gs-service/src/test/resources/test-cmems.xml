@@ -1,0 +1,2049 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gs:DatasetCollection xmlns:gs="http://flora.eu/gi-suite/1.0/dataModel/schema" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <gs:source gs:orderingDirection="ASCENDING" gs:resultsPriority="UNSET" gs:strategy="HARVESTED" gs:uniqueIdentifier="marineID">
+    <gs:endpoint>https://cmems-catalog-ro.cls.fr/geonetwork/srv/eng/csw-MYOCEAN-CORE-PRODUCTS?</gs:endpoint>
+    <gs:label>Copernicus Marine Environment Monitoring Service (CMEMS)</gs:label>
+  </gs:source>
+  <gs:harmonizedMetadata>
+    <gs:coreMetadata>
+      <gs:isoMetadata>
+	<gmi:MI_Metadata>
+	  <gmd:fileIdentifier>
+	    <gco:CharacterString>0a1cf029-1a8e-4ac0-9d96-95060065e3e8</gco:CharacterString>
+	  </gmd:fileIdentifier>
+	  <gmd:language>
+	    <gmd:LanguageCode codeList="http://www.loc.gov/standards/iso639-2/" codeListValue="eng"/>
+	  </gmd:language>
+	  <gmd:characterSet>
+	    <gmd:MD_CharacterSetCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_CharacterSetCode" codeListValue="utf8"/>
+	  </gmd:characterSet>
+	  <gmd:hierarchyLevel>
+	    <gmd:MD_ScopeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_ScopeCode" codeListValue="series"/>
+	  </gmd:hierarchyLevel>
+	  <gmd:hierarchyLevelName>
+	    <gco:CharacterString>Copernicus Marine Service product specification</gco:CharacterString>
+	  </gmd:hierarchyLevelName>
+	  <gmd:contact>
+	    <gmd:CI_ResponsibleParty>
+	      <gmd:organisationName>
+		<gco:CharacterString>CMEMS</gco:CharacterString>
+	      </gmd:organisationName>
+	      <gmd:contactInfo>
+		<gmd:CI_Contact>
+		  <gmd:address>
+		    <gmd:CI_Address>
+		      <gmd:electronicMailAddress>
+			<gco:CharacterString>servicedesk.cmems@mercator-ocean.eu</gco:CharacterString>
+		      </gmd:electronicMailAddress>
+		    </gmd:CI_Address>
+		  </gmd:address>
+		  <gmd:onlineResource>
+		    <gmd:CI_OnlineResource>
+		      <gmd:linkage>
+			<gmd:URL>http://marine.copernicus.eu/</gmd:URL>
+		      </gmd:linkage>
+		    </gmd:CI_OnlineResource>
+		  </gmd:onlineResource>
+		</gmd:CI_Contact>
+	      </gmd:contactInfo>
+	      <gmd:role>
+		<gmd:CI_RoleCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode" codeListValue="pointOfContact"/>
+	      </gmd:role>
+	    </gmd:CI_ResponsibleParty>
+	  </gmd:contact>
+	  <gmd:dateStamp>
+	    <gco:Date xsi:nil="true"/>
+	    <gco:DateTime>2024-03-25T11:15:24.252Z</gco:DateTime>
+	  </gmd:dateStamp>
+	  <gmd:metadataStandardName>
+	    <gco:CharacterString>ISO 19139, MyOcean profile</gco:CharacterString>
+	  </gmd:metadataStandardName>
+	  <gmd:metadataStandardVersion>
+	    <gco:CharacterString>0.2</gco:CharacterString>
+	  </gmd:metadataStandardVersion>
+	  <gmd:spatialRepresentationInfo>
+	    <gmd:MD_GridSpatialRepresentation>
+	      <gmd:numberOfDimensions>
+		<gco:Integer>2</gco:Integer>
+	      </gmd:numberOfDimensions>
+	      <gmd:axisDimensionProperties>
+		<gmd:MD_Dimension>
+		  <gmd:dimensionName>
+		    <gmd:MD_DimensionNameTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_DimensionNameTypeCode" codeListValue="row"/>
+		  </gmd:dimensionName>
+		  <gmd:resolution>
+		    <gco:Measure uom="degree">0.25</gco:Measure>
+		  </gmd:resolution>
+		</gmd:MD_Dimension>
+	      </gmd:axisDimensionProperties>
+	      <gmd:axisDimensionProperties>
+		<gmd:MD_Dimension>
+		  <gmd:dimensionName>
+		    <gmd:MD_DimensionNameTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_DimensionNameTypeCode" codeListValue="column"/>
+		  </gmd:dimensionName>
+		  <gmd:resolution>
+		    <gco:Measure uom="degree">0.25</gco:Measure>
+		  </gmd:resolution>
+		</gmd:MD_Dimension>
+	      </gmd:axisDimensionProperties>
+	      <gmd:cellGeometry>
+		<gmd:MD_CellGeometryCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_CellGeometryCode" codeListValue="area"/>
+	      </gmd:cellGeometry>
+	      <gmd:transformationParameterAvailability>
+		<gco:Boolean>false</gco:Boolean>
+	      </gmd:transformationParameterAvailability>
+	    </gmd:MD_GridSpatialRepresentation>
+	  </gmd:spatialRepresentationInfo>
+	  <gmd:referenceSystemInfo>
+	    <gmd:MD_ReferenceSystem>
+	      <gmd:referenceSystemIdentifier>
+		<gmd:RS_Identifier>
+		  <gmd:code>
+		    <gco:CharacterString>rectangular</gco:CharacterString>
+		  </gmd:code>
+		  <gmd:codeSpace>
+		    <gco:CharacterString>EPSG</gco:CharacterString>
+		  </gmd:codeSpace>
+		</gmd:RS_Identifier>
+	      </gmd:referenceSystemIdentifier>
+	    </gmd:MD_ReferenceSystem>
+	  </gmd:referenceSystemInfo>
+	  <gmd:identificationInfo>
+	    <gmd:MD_DataIdentification>
+	      <gmd:citation>
+		<gmd:CI_Citation>
+		  <gmd:title>
+		    <gco:CharacterString>GLOBAL OCEAN GRIDDED L4 SEA SURFACE HEIGHTS AND DERIVED VARIABLES REPROCESSED (COPERNICUS CLIMATE SERVICE)</gco:CharacterString>
+		  </gmd:title>
+		  <gmd:alternateTitle>
+		    <gco:CharacterString>SEALEVEL_GLO_PHY_CLIMATE_L4_MY_008_057</gco:CharacterString>
+		  </gmd:alternateTitle>
+		  <gmd:date>
+		    <gmd:CI_Date>
+		      <gmd:date>
+			<gco:Date>2012-08-26</gco:Date>
+		      </gmd:date>
+		      <gmd:dateType>
+			<gmd:CI_DateTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" codeListValue="creation"/>
+		      </gmd:dateType>
+		    </gmd:CI_Date>
+		  </gmd:date>
+		  <gmd:edition>
+		    <gco:CharacterString>2.1</gco:CharacterString>
+		  </gmd:edition>
+		  <gmd:editionDate>
+		    <gco:Date>2023-11-30</gco:Date>
+		  </gmd:editionDate>
+		  <gmd:identifier>
+		    <gmd:MD_Identifier>
+		      <gmd:code>
+			<gco:CharacterString>0a1cf029-1a8e-4ac0-9d96-95060065e3e8</gco:CharacterString>
+		      </gmd:code>
+		    </gmd:MD_Identifier>
+		  </gmd:identifier>
+		</gmd:CI_Citation>
+	      </gmd:citation>
+	      <gmd:abstract>
+		<gco:CharacterString>'''Short description:''' 
+
+DUACS delayed-time altimeter gridded maps of sea surface heights and derived variables over the global Ocean (https://cds.climate.copernicus.eu/cdsapp#!/dataset/satellite-sea-level-global?tab=overview). The processing focuses on the stability and homogeneity of the sea level record (based on a stable two-satellite constellation) and the product is dedicated to the monitoring of the sea level long-term evolution for climate applications and the analysis of Ocean/Climate indicators. These products are produced and distributed by the Copernicus Climate Change Service (C3S, https://climate.copernicus.eu/).
+
+'''DOI (product):'''
+https://doi.org/10.48670/moi-00145</gco:CharacterString>
+	      </gmd:abstract>
+	      <gmd:credit>
+		<gco:CharacterString>E.U. Copernicus Marine Service Information</gco:CharacterString>
+	      </gmd:credit>
+	      <gmd:pointOfContact>
+		<gmd:CI_ResponsibleParty>
+		  <gmd:individualName>
+		    <gco:CharacterString>M-Isabelle Pujol</gco:CharacterString>
+		  </gmd:individualName>
+		  <gmd:organisationName>
+		    <gco:CharacterString>SL-CLS-TOULOUSE-FR</gco:CharacterString>
+		  </gmd:organisationName>
+		  <gmd:contactInfo>
+		    <gmd:CI_Contact>
+		      <gmd:address>
+			<gmd:CI_Address>
+			  <gmd:electronicMailAddress>
+			    <gco:CharacterString>managementboard-sltac@cls.fr</gco:CharacterString>
+			  </gmd:electronicMailAddress>
+			</gmd:CI_Address>
+		      </gmd:address>
+		    </gmd:CI_Contact>
+		  </gmd:contactInfo>
+		  <gmd:role>
+		    <gmd:CI_RoleCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode" codeListValue="custodian"/>
+		  </gmd:role>
+		</gmd:CI_ResponsibleParty>
+	      </gmd:pointOfContact>
+	      <gmd:pointOfContact>
+		<gmd:CI_ResponsibleParty>
+		  <gmd:individualName>
+		    <gco:CharacterString>Françoise MERTZ</gco:CharacterString>
+		  </gmd:individualName>
+		  <gmd:organisationName>
+		    <gco:CharacterString>SL-CLS-TOULOUSE-FR</gco:CharacterString>
+		  </gmd:organisationName>
+		  <gmd:contactInfo>
+		    <gmd:CI_Contact>
+		      <gmd:address>
+			<gmd:CI_Address>
+			  <gmd:electronicMailAddress>
+			    <gco:CharacterString>servicemanager-sltac@cls.fr</gco:CharacterString>
+			  </gmd:electronicMailAddress>
+			</gmd:CI_Address>
+		      </gmd:address>
+		    </gmd:CI_Contact>
+		  </gmd:contactInfo>
+		  <gmd:role>
+		    <gmd:CI_RoleCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode" codeListValue="originator"/>
+		  </gmd:role>
+		</gmd:CI_ResponsibleParty>
+	      </gmd:pointOfContact>
+	      <gmd:pointOfContact>
+		<gmd:CI_ResponsibleParty>
+		  <gmd:individualName>
+		    <gco:CharacterString>servicedesk.cmems@cls.fr</gco:CharacterString>
+		  </gmd:individualName>
+		  <gmd:organisationName>
+		    <gco:CharacterString>SL-CLS-TOULOUSE-FR</gco:CharacterString>
+		  </gmd:organisationName>
+		  <gmd:contactInfo>
+		    <gmd:CI_Contact>
+		      <gmd:address>
+			<gmd:CI_Address>
+			  <gmd:electronicMailAddress>
+			    <gco:CharacterString>servicedesk.cmems@cls.fr</gco:CharacterString>
+			  </gmd:electronicMailAddress>
+			</gmd:CI_Address>
+		      </gmd:address>
+		    </gmd:CI_Contact>
+		  </gmd:contactInfo>
+		  <gmd:role>
+		    <gmd:CI_RoleCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode" codeListValue="pointOfContact"/>
+		  </gmd:role>
+		</gmd:CI_ResponsibleParty>
+	      </gmd:pointOfContact>
+	      <gmd:pointOfContact>
+		<gmd:CI_ResponsibleParty>
+		  <gmd:individualName>
+		    <gco:CharacterString>Guillaume Taburet</gco:CharacterString>
+		  </gmd:individualName>
+		  <gmd:organisationName>
+		    <gco:CharacterString>SL-CLS-TOULOUSE-FR</gco:CharacterString>
+		  </gmd:organisationName>
+		  <gmd:contactInfo>
+		    <gmd:CI_Contact>
+		      <gmd:address>
+			<gmd:CI_Address>
+			  <gmd:electronicMailAddress>
+			    <gco:CharacterString>exploitation-duacs@cls.fr</gco:CharacterString>
+			  </gmd:electronicMailAddress>
+			</gmd:CI_Address>
+		      </gmd:address>
+		    </gmd:CI_Contact>
+		  </gmd:contactInfo>
+		  <gmd:role>
+		    <gmd:CI_RoleCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode" codeListValue="resourceProvider"/>
+		  </gmd:role>
+		</gmd:CI_ResponsibleParty>
+	      </gmd:pointOfContact>
+	      <gmd:pointOfContact>
+		<gmd:CI_ResponsibleParty>
+		  <gmd:individualName>
+		    <gco:CharacterString>Françoise Mertz</gco:CharacterString>
+		  </gmd:individualName>
+		  <gmd:organisationName>
+		    <gco:CharacterString>SL-CLS-TOULOUSE-FR</gco:CharacterString>
+		  </gmd:organisationName>
+		  <gmd:contactInfo>
+		    <gmd:CI_Contact>
+		      <gmd:address>
+			<gmd:CI_Address>
+			  <gmd:electronicMailAddress>
+			    <gco:CharacterString>exploitation-duacs@cls.fr</gco:CharacterString>
+			  </gmd:electronicMailAddress>
+			</gmd:CI_Address>
+		      </gmd:address>
+		    </gmd:CI_Contact>
+		  </gmd:contactInfo>
+		  <gmd:role>
+		    <gmd:CI_RoleCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode" codeListValue="distributor"/>
+		  </gmd:role>
+		</gmd:CI_ResponsibleParty>
+	      </gmd:pointOfContact>
+	      <gmd:resourceMaintenance>
+		<gmd:MD_MaintenanceInformation>
+		  <gmd:maintenanceAndUpdateFrequency>
+		    <gmd:MD_MaintenanceFrequencyCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_MaintenanceFrequencyCode" codeListValue="irregular"/>
+		  </gmd:maintenanceAndUpdateFrequency>
+		  <gmd:updateScopeDescription>
+		    <gmd:MD_ScopeDescription>
+		      <gmd:other>
+			<gco:CharacterString>P0M0D0H/P0M0D0H</gco:CharacterString>
+		      </gmd:other>
+		    </gmd:MD_ScopeDescription>
+		  </gmd:updateScopeDescription>
+		  <gmd:maintenanceNote>
+		    <gco:CharacterString>N/A</gco:CharacterString>
+		  </gmd:maintenanceNote>
+		</gmd:MD_MaintenanceInformation>
+	      </gmd:resourceMaintenance>
+	      <gmd:resourceMaintenance>
+		<gmd:MD_MaintenanceInformation>
+		  <gmd:maintenanceAndUpdateFrequency>
+		    <gmd:MD_MaintenanceFrequencyCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_MaintenanceFrequencyCode" codeListValue="annually"/>
+		  </gmd:maintenanceAndUpdateFrequency>
+		</gmd:MD_MaintenanceInformation>
+	      </gmd:resourceMaintenance>
+	      <gmd:graphicOverview>
+		<gmd:MD_BrowseGraphic>
+		  <gmd:fileName>
+		    <gco:CharacterString>https://catalogue.marine.copernicus.eu/documents/IMG/SEALEVEL_GLO_PHY_CLIMATE_L4_MY_008_057.png</gco:CharacterString>
+		  </gmd:fileName>
+		</gmd:MD_BrowseGraphic>
+	      </gmd:graphicOverview>
+	      <gmd:descriptiveKeywords>
+		<gmd:MD_Keywords>
+		  <gmd:keyword>
+		    <gmx:Anchor xlink:href="http://inspire.ec.europa.eu/theme/of">Oceanographic geographical features</gmx:Anchor>
+		  </gmd:keyword>
+		  <gmd:type>
+		    <gmd:MD_KeywordTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="theme"/>
+		  </gmd:type>
+		  <gmd:thesaurusName>
+		    <gmd:CI_Citation>
+		      <gmd:title>
+			<gco:CharacterString>GEMET - INSPIRE themes, version 1.0</gco:CharacterString>
+		      </gmd:title>
+		      <gmd:date>
+			<gmd:CI_Date>
+			  <gmd:date>
+			    <gco:Date>2009-09-22</gco:Date>
+			  </gmd:date>
+			  <gmd:dateType>
+			    <gmd:CI_DateTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" codeListValue="creation"/>
+			  </gmd:dateType>
+			</gmd:CI_Date>
+		      </gmd:date>
+		    </gmd:CI_Citation>
+		  </gmd:thesaurusName>
+		</gmd:MD_Keywords>
+	      </gmd:descriptiveKeywords>
+	      <gmd:descriptiveKeywords>
+		<gmd:MD_Keywords>
+		  <gmd:keyword>
+		    <gmx:Anchor xlink:href="https://vocab.ifremer.fr/scheme/SXT/myocean.discipline/a9f2224a-0e1b-4815-9abc-7a7d6ba6fa76">satellite-observation</gmx:Anchor>
+		  </gmd:keyword>
+		  <gmd:type>
+		    <gmd:MD_KeywordTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="discipline"/>
+		  </gmd:type>
+		  <gmd:thesaurusName>
+		    <gmd:CI_Citation>
+		      <gmd:title>
+			<gmx:Anchor xlink:href="https://vocab.ifremer.fr/scheme/SXT/myocean.discipline">Discipline</gmx:Anchor>
+		      </gmd:title>
+		      <gmd:date>
+			<gmd:CI_Date>
+			  <gmd:date>
+			    <gco:Date>2023-03-16</gco:Date>
+			  </gmd:date>
+			  <gmd:dateType>
+			    <gmd:CI_DateTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" codeListValue="publication"/>
+			  </gmd:dateType>
+			</gmd:CI_Date>
+		      </gmd:date>
+		      <gmd:identifier>
+			<gmd:MD_Identifier>
+			  <gmd:code>
+			    <gmx:Anchor xlink:href="https://sextant.ifremer.fr/geonetwork/srv/api/registries/vocabularies/local.discipline.myocean.discipline">geonetwork.thesaurus.local.discipline.myocean.discipline</gmx:Anchor>
+			  </gmd:code>
+			</gmd:MD_Identifier>
+		      </gmd:identifier>
+		    </gmd:CI_Citation>
+		  </gmd:thesaurusName>
+		</gmd:MD_Keywords>
+	      </gmd:descriptiveKeywords>
+	      <gmd:descriptiveKeywords>
+		<gmd:MD_Keywords>
+		  <gmd:keyword>
+		    <gmx:Anchor xlink:href="http://vocab.nerc.ac.uk/collection/P07/current/CFV8NS5/">surface_geostrophic_northward_sea_water_velocity_assuming_sea_level_for_geoid</gmx:Anchor>
+		  </gmd:keyword>
+		  <gmd:keyword>
+		    <gmx:Anchor xlink:href="http://vocab.nerc.ac.uk/collection/P07/current/CFV8NS3/">surface_geostrophic_eastward_sea_water_velocity_assuming_sea_level_for_geoid</gmx:Anchor>
+		  </gmd:keyword>
+		  <gmd:keyword>
+		    <gmx:Anchor xlink:href="http://vocab.nerc.ac.uk/collection/P07/current/CFV8NS2/">surface_geostrophic_eastward_sea_water_velocity</gmx:Anchor>
+		  </gmd:keyword>
+		  <gmd:keyword>
+		    <gmx:Anchor xlink:href="http://vocab.nerc.ac.uk/collection/P07/current/CFV8NS4/">surface_geostrophic_northward_sea_water_velocity</gmx:Anchor>
+		  </gmd:keyword>
+		  <gmd:keyword>
+		    <gmx:Anchor xlink:href="http://vocab.nerc.ac.uk/collection/P07/current/CFSN0375/">sea_surface_height_above_sea_level</gmx:Anchor>
+		  </gmd:keyword>
+		  <gmd:keyword>
+		    <gmx:Anchor xlink:href="http://vocab.nerc.ac.uk/collection/P07/current/CFSN0374/">sea_surface_height_above_geoid</gmx:Anchor>
+		  </gmd:keyword>
+		  <gmd:type>
+		    <gmd:MD_KeywordTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="parameter"/>
+		  </gmd:type>
+		  <gmd:thesaurusName>
+		    <gmd:CI_Citation>
+		      <gmd:title>
+			<gmx:Anchor xlink:href="http://vocab.nerc.ac.uk/collection/P07/current/">Climate and Forecast Standard Names</gmx:Anchor>
+		      </gmd:title>
+		      <gmd:date>
+			<gmd:CI_Date>
+			  <gmd:date>
+			    <gco:Date>2017-04-04</gco:Date>
+			  </gmd:date>
+			  <gmd:dateType>
+			    <gmd:CI_DateTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" codeListValue="publication"/>
+			  </gmd:dateType>
+			</gmd:CI_Date>
+		      </gmd:date>
+		      <gmd:identifier>
+			<gmd:MD_Identifier>
+			  <gmd:code>
+			    <gmx:Anchor xlink:href="https://sextant.ifremer.fr/geonetwork/srv/api/registries/vocabularies/external.parameter.myocean.ocean-variables">geonetwork.thesaurus.external.parameter.myocean.ocean-variables</gmx:Anchor>
+			  </gmd:code>
+			</gmd:MD_Identifier>
+		      </gmd:identifier>
+		    </gmd:CI_Citation>
+		  </gmd:thesaurusName>
+		</gmd:MD_Keywords>
+	      </gmd:descriptiveKeywords>
+	      <gmd:descriptiveKeywords>
+		<gmd:MD_Keywords>
+		  <gmd:keyword>
+		    <gmx:Anchor xlink:href="https://vocab.ifremer.fr/scheme/SXT/myocean.temporal-scale/dc220820-f871-4383-b54e-e3a05e26ab7f">multi-year</gmx:Anchor>
+		  </gmd:keyword>
+		  <gmd:type>
+		    <gmd:MD_KeywordTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="temporal-scale"/>
+		  </gmd:type>
+		  <gmd:thesaurusName>
+		    <gmd:CI_Citation>
+		      <gmd:title>
+			<gmx:Anchor xlink:href="https://vocab.ifremer.fr/scheme/SXT/myocean.temporal-scale">Temporal scale</gmx:Anchor>
+		      </gmd:title>
+		      <gmd:date>
+			<gmd:CI_Date>
+			  <gmd:date>
+			    <gco:Date>2023-03-16</gco:Date>
+			  </gmd:date>
+			  <gmd:dateType>
+			    <gmd:CI_DateTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" codeListValue="publication"/>
+			  </gmd:dateType>
+			</gmd:CI_Date>
+		      </gmd:date>
+		      <gmd:identifier>
+			<gmd:MD_Identifier>
+			  <gmd:code>
+			    <gmx:Anchor xlink:href="https://sextant.ifremer.fr/geonetwork/srv/api/registries/vocabularies/local.temporal-scale.myocean.temporal-scale">geonetwork.thesaurus.local.temporal-scale.myocean.temporal-scale</gmx:Anchor>
+			  </gmd:code>
+			</gmd:MD_Identifier>
+		      </gmd:identifier>
+		    </gmd:CI_Citation>
+		  </gmd:thesaurusName>
+		</gmd:MD_Keywords>
+	      </gmd:descriptiveKeywords>
+	      <gmd:descriptiveKeywords>
+		<gmd:MD_Keywords>
+		  <gmd:keyword>
+		    <gmx:Anchor xlink:href="https://vocab.ifremer.fr/scheme/SXT/myocean.area-of-benefit/8c77fb97-7415-45d6-8cf2-a90686ef7032">weather-climate-and-seasonal-forecasting</gmx:Anchor>
+		  </gmd:keyword>
+		  <gmd:keyword>
+		    <gmx:Anchor xlink:href="https://vocab.ifremer.fr/scheme/SXT/myocean.area-of-benefit/361657b6-6b9e-40f5-b75f-0d50e6ccd2fe">marine-resources</gmx:Anchor>
+		  </gmd:keyword>
+		  <gmd:keyword>
+		    <gmx:Anchor xlink:href="https://vocab.ifremer.fr/scheme/SXT/myocean.area-of-benefit/440849d3-a62f-428e-b679-c815afd74084">coastal-marine-environment</gmx:Anchor>
+		  </gmd:keyword>
+		  <gmd:keyword>
+		    <gmx:Anchor xlink:href="https://vocab.ifremer.fr/scheme/SXT/myocean.area-of-benefit/2e1374cd-3cce-4955-abc7-aa448a4e8c53">marine-safety</gmx:Anchor>
+		  </gmd:keyword>
+		  <gmd:type>
+		    <gmd:MD_KeywordTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="area-of-benefit"/>
+		  </gmd:type>
+		  <gmd:thesaurusName>
+		    <gmd:CI_Citation>
+		      <gmd:title>
+			<gmx:Anchor xlink:href="https://vocab.ifremer.fr/scheme/SXT/myocean.area-of-benefit">Area of benefit</gmx:Anchor>
+		      </gmd:title>
+		      <gmd:date>
+			<gmd:CI_Date>
+			  <gmd:date>
+			    <gco:Date>2023-03-16</gco:Date>
+			  </gmd:date>
+			  <gmd:dateType>
+			    <gmd:CI_DateTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" codeListValue="publication"/>
+			  </gmd:dateType>
+			</gmd:CI_Date>
+		      </gmd:date>
+		      <gmd:identifier>
+			<gmd:MD_Identifier>
+			  <gmd:code>
+			    <gmx:Anchor xlink:href="https://sextant.ifremer.fr/geonetwork/srv/api/registries/vocabularies/local.area-of-benefit.myocean.area-of-benefit">geonetwork.thesaurus.local.area-of-benefit.myocean.area-of-benefit</gmx:Anchor>
+			  </gmd:code>
+			</gmd:MD_Identifier>
+		      </gmd:identifier>
+		    </gmd:CI_Citation>
+		  </gmd:thesaurusName>
+		</gmd:MD_Keywords>
+	      </gmd:descriptiveKeywords>
+	      <gmd:descriptiveKeywords>
+		<gmd:MD_Keywords>
+		  <gmd:keyword>
+		    <gmx:Anchor xlink:href="https://vocab.ifremer.fr/scheme/SXT/myocean.reference-geographical-area/e66ceb40-9449-44a9-8b3f-dc1cdc379506">arctic-ocean</gmx:Anchor>
+		  </gmd:keyword>
+		  <gmd:keyword>
+		    <gmx:Anchor xlink:href="https://vocab.ifremer.fr/scheme/SXT/myocean.reference-geographical-area/bf2c2f16-3f48-4104-89c1-7269317d03ce">north-west-shelf-seas</gmx:Anchor>
+		  </gmd:keyword>
+		  <gmd:keyword>
+		    <gmx:Anchor xlink:href="https://vocab.ifremer.fr/scheme/SXT/myocean.reference-geographical-area/af963abd-2ecb-459d-9622-db1f22999b27">iberian-biscay-irish-seas</gmx:Anchor>
+		  </gmd:keyword>
+		  <gmd:keyword>
+		    <gmx:Anchor xlink:href="https://vocab.ifremer.fr/scheme/SXT/myocean.reference-geographical-area/0ea3d280-b1f1-4d12-9037-6acb6104b4b3">global-ocean</gmx:Anchor>
+		  </gmd:keyword>
+		  <gmd:keyword>
+		    <gmx:Anchor xlink:href="https://vocab.ifremer.fr/scheme/SXT/myocean.reference-geographical-area/d9a03423-c641-4eaf-a184-4c1767033fa5">baltic-sea</gmx:Anchor>
+		  </gmd:keyword>
+		  <gmd:type>
+		    <gmd:MD_KeywordTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="reference-geographical-area"/>
+		  </gmd:type>
+		  <gmd:thesaurusName>
+		    <gmd:CI_Citation>
+		      <gmd:title>
+			<gmx:Anchor xlink:href="https://vocab.ifremer.fr/scheme/SXT/myocean.reference-geographical-area">Reference Geographical Areas</gmx:Anchor>
+		      </gmd:title>
+		      <gmd:date>
+			<gmd:CI_Date>
+			  <gmd:date>
+			    <gco:Date>2023-03-16</gco:Date>
+			  </gmd:date>
+			  <gmd:dateType>
+			    <gmd:CI_DateTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" codeListValue="publication"/>
+			  </gmd:dateType>
+			</gmd:CI_Date>
+		      </gmd:date>
+		      <gmd:identifier>
+			<gmd:MD_Identifier>
+			  <gmd:code>
+			    <gmx:Anchor xlink:href="https://sextant.ifremer.fr/geonetwork/srv/api/registries/vocabularies/local.reference-geographical-area.myocean.reference-geographical-area">geonetwork.thesaurus.local.reference-geographical-area.myocean.reference-geographical-area</gmx:Anchor>
+			  </gmd:code>
+			</gmd:MD_Identifier>
+		      </gmd:identifier>
+		    </gmd:CI_Citation>
+		  </gmd:thesaurusName>
+		</gmd:MD_Keywords>
+	      </gmd:descriptiveKeywords>
+	      <gmd:descriptiveKeywords>
+		<gmd:MD_Keywords>
+		  <gmd:keyword>
+		    <gmx:Anchor xlink:href="https://vocab.ifremer.fr/scheme/SXT/myocean.processing-level/78a4ba97-b2b9-4a16-8680-1eef0bdf8481">Level 4</gmx:Anchor>
+		  </gmd:keyword>
+		  <gmd:type>
+		    <gmd:MD_KeywordTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="processing-level"/>
+		  </gmd:type>
+		  <gmd:thesaurusName>
+		    <gmd:CI_Citation>
+		      <gmd:title>
+			<gmx:Anchor xlink:href="https://vocab.ifremer.fr/scheme/SXT/myocean.processing-level">Processing level</gmx:Anchor>
+		      </gmd:title>
+		      <gmd:date>
+			<gmd:CI_Date>
+			  <gmd:date>
+			    <gco:Date>2023-03-16</gco:Date>
+			  </gmd:date>
+			  <gmd:dateType>
+			    <gmd:CI_DateTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" codeListValue="publication"/>
+			  </gmd:dateType>
+			</gmd:CI_Date>
+		      </gmd:date>
+		      <gmd:identifier>
+			<gmd:MD_Identifier>
+			  <gmd:code>
+			    <gmx:Anchor xlink:href="https://sextant.ifremer.fr/geonetwork/srv/api/registries/vocabularies/local.processing-level.myocean.processing-level">geonetwork.thesaurus.local.processing-level.myocean.processing-level</gmx:Anchor>
+			  </gmd:code>
+			</gmd:MD_Identifier>
+		      </gmd:identifier>
+		    </gmd:CI_Citation>
+		  </gmd:thesaurusName>
+		</gmd:MD_Keywords>
+	      </gmd:descriptiveKeywords>
+	      <gmd:descriptiveKeywords>
+		<gmd:MD_Keywords>
+		  <gmd:keyword>
+		    <gmx:Anchor xlink:href="http://purl.org/myocean/ontology/vocabulary/model-assimilation#not-applicable">Not Applicable</gmx:Anchor>
+		  </gmd:keyword>
+		  <gmd:type>
+		    <gmd:MD_KeywordTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="theme"/>
+		  </gmd:type>
+		  <gmd:thesaurusName>
+		    <gmd:CI_Citation>
+		      <gmd:title>
+			<gmx:Anchor xlink:href="http://purl.org/myocean/ontology/vocabulary/model-assimilation#">Model assimilation</gmx:Anchor>
+		      </gmd:title>
+		      <gmd:date>
+			<gmd:CI_Date>
+			  <gmd:date>
+			    <gco:Date>2016-02-03</gco:Date>
+			  </gmd:date>
+			  <gmd:dateType>
+			    <gmd:CI_DateTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" codeListValue="publication"/>
+			  </gmd:dateType>
+			</gmd:CI_Date>
+		      </gmd:date>
+		      <gmd:identifier>
+			<gmd:MD_Identifier>
+			  <gmd:code>
+			    <gmx:Anchor xlink:href="https://sextant.ifremer.fr/geonetwork/srv/api/registries/vocabularies/external.theme.myocean.model-assimilation">geonetwork.thesaurus.external.theme.myocean.model-assimilation</gmx:Anchor>
+			  </gmd:code>
+			</gmd:MD_Identifier>
+		      </gmd:identifier>
+		    </gmd:CI_Citation>
+		  </gmd:thesaurusName>
+		</gmd:MD_Keywords>
+	      </gmd:descriptiveKeywords>
+	      <gmd:resourceConstraints>
+		<gmd:MD_LegalConstraints>
+		  <gmd:useLimitation>
+		    <gco:CharacterString>See Copernicus Marine Environment Monitoring Service Data commitments and licence at: http://marine.copernicus.eu/web/27-service-commitments-and-licence.php</gco:CharacterString>
+		  </gmd:useLimitation>
+		  <gmd:accessConstraints>
+		    <gmd:MD_RestrictionCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_RestrictionCode" codeListValue="otherRestrictions"/>
+		  </gmd:accessConstraints>
+		  <gmd:useConstraints>
+		    <gmd:MD_RestrictionCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_RestrictionCode" codeListValue="license"/>
+		  </gmd:useConstraints>
+		  <gmd:otherConstraints>
+		    <gco:CharacterString>No limitations on public access</gco:CharacterString>
+		  </gmd:otherConstraints>
+		</gmd:MD_LegalConstraints>
+	      </gmd:resourceConstraints>
+	      <gmd:aggregationInfo>
+		<gmd:MD_AggregateInformation>
+		  <gmd:aggregateDataSetIdentifier>
+		    <gmd:MD_Identifier>
+		      <gmd:code>
+			<gco:CharacterString>04ff75a4-b0f9-4b51-82d9-8ed5c9f7d809</gco:CharacterString>
+		      </gmd:code>
+		    </gmd:MD_Identifier>
+		  </gmd:aggregateDataSetIdentifier>
+		  <gmd:associationType>
+		    <gmd:DS_AssociationTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#DS_AssociationTypeCode" codeListValue="crossReference"/>
+		  </gmd:associationType>
+		  <gmd:initiativeType>
+		    <gmd:DS_InitiativeTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#DS_InitiativeTypeCode" codeListValue="document"/>
+		  </gmd:initiativeType>
+		</gmd:MD_AggregateInformation>
+	      </gmd:aggregationInfo>
+	      <gmd:aggregationInfo>
+		<gmd:MD_AggregateInformation>
+		  <gmd:aggregateDataSetIdentifier>
+		    <gmd:MD_Identifier>
+		      <gmd:code>
+			<gco:CharacterString>1cfa071a-8562-4d29-95a4-c1fab11d5f3c</gco:CharacterString>
+		      </gmd:code>
+		    </gmd:MD_Identifier>
+		  </gmd:aggregateDataSetIdentifier>
+		  <gmd:associationType>
+		    <gmd:DS_AssociationTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#DS_AssociationTypeCode" codeListValue="crossReference"/>
+		  </gmd:associationType>
+		  <gmd:initiativeType>
+		    <gmd:DS_InitiativeTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#DS_InitiativeTypeCode" codeListValue="document"/>
+		  </gmd:initiativeType>
+		</gmd:MD_AggregateInformation>
+	      </gmd:aggregationInfo>
+	      <gmd:aggregationInfo>
+		<gmd:MD_AggregateInformation>
+		  <gmd:aggregateDataSetIdentifier>
+		    <gmd:MD_Identifier>
+		      <gmd:code>
+			<gco:CharacterString>d611f7b0-4dbc-48e1-a838-c9a0a68b48d0</gco:CharacterString>
+		      </gmd:code>
+		    </gmd:MD_Identifier>
+		  </gmd:aggregateDataSetIdentifier>
+		  <gmd:associationType>
+		    <gmd:DS_AssociationTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#DS_AssociationTypeCode" codeListValue="crossReference"/>
+		  </gmd:associationType>
+		  <gmd:initiativeType>
+		    <gmd:DS_InitiativeTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#DS_InitiativeTypeCode" codeListValue="document"/>
+		  </gmd:initiativeType>
+		</gmd:MD_AggregateInformation>
+	      </gmd:aggregationInfo>
+	      <gmd:language>
+		<gco:CharacterString>eng</gco:CharacterString>
+	      </gmd:language>
+	      <gmd:topicCategory>
+		<gmd:MD_TopicCategoryCode>oceans</gmd:MD_TopicCategoryCode>
+	      </gmd:topicCategory>
+	      <gmd:extent>
+		<gmd:EX_Extent>
+		  <gmd:description>
+		    <gco:CharacterString>bounding box</gco:CharacterString>
+		  </gmd:description>
+		  <gmd:geographicElement>
+		    <gmd:EX_GeographicBoundingBox>
+		      <gmd:westBoundLongitude>
+			<gco:Decimal>-180.00</gco:Decimal>
+		      </gmd:westBoundLongitude>
+		      <gmd:eastBoundLongitude>
+			<gco:Decimal>180.00</gco:Decimal>
+		      </gmd:eastBoundLongitude>
+		      <gmd:southBoundLatitude>
+			<gco:Decimal>-90.00</gco:Decimal>
+		      </gmd:southBoundLatitude>
+		      <gmd:northBoundLatitude>
+			<gco:Decimal>90.00</gco:Decimal>
+		      </gmd:northBoundLatitude>
+		    </gmd:EX_GeographicBoundingBox>
+		  </gmd:geographicElement>
+		  <gmd:temporalElement>
+		    <gmd:EX_TemporalExtent>
+		      <gmd:extent>
+			<gml:TimePeriod gml:id="d1185275e861a1051934">
+			  <gml:description/>
+			  <gml:beginPosition>1993-01-01</gml:beginPosition>
+			  <gml:endPosition>2020-12-31</gml:endPosition>
+			</gml:TimePeriod>
+		      </gmd:extent>
+		    </gmd:EX_TemporalExtent>
+		  </gmd:temporalElement>
+		  <gmd:verticalElement>
+		    <gmd:EX_VerticalExtent>
+		      <gmd:minimumValue/>
+		      <gmd:maximumValue/>
+		      <gmd:verticalCRS uuidref="urn:ogc:def:crs:EPSG:5714"/>
+		    </gmd:EX_VerticalExtent>
+		  </gmd:verticalElement>
+		</gmd:EX_Extent>
+	      </gmd:extent>
+	      <gmd:supplementalInformation>
+		<gco:CharacterString>display priority: 10055</gco:CharacterString>
+	      </gmd:supplementalInformation>
+	    </gmd:MD_DataIdentification>
+	  </gmd:identificationInfo>
+	  <gmd:contentInfo>
+	    <gmd:MD_CoverageDescription>
+	      <gmd:attributeDescription>
+		<gco:RecordType>observation</gco:RecordType>
+	      </gmd:attributeDescription>
+	      <gmd:contentType>
+		<gmd:MD_CoverageContentTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_CoverageContentTypeCode" codeListValue="physicalMeasurement"/>
+	      </gmd:contentType>
+	      <gmd:dimension>
+		<gmd:MD_RangeDimension>
+		  <gmd:descriptor>
+		    <gco:CharacterString>temporal resolution: daily instantaneous</gco:CharacterString>
+		  </gmd:descriptor>
+		</gmd:MD_RangeDimension>
+	      </gmd:dimension>
+	      <gmd:dimension>
+		<gmd:MD_RangeDimension>
+		  <gmd:descriptor>
+		    <gco:CharacterString>vertical level number: 1</gco:CharacterString>
+		  </gmd:descriptor>
+		</gmd:MD_RangeDimension>
+	      </gmd:dimension>
+	    </gmd:MD_CoverageDescription>
+	  </gmd:contentInfo>
+	  <gmd:contentInfo>
+	    <gmd:MD_FeatureCatalogueDescription>
+	      <gmd:includedWithDataset>
+		<gco:Boolean>false</gco:Boolean>
+	      </gmd:includedWithDataset>
+	      <gmd:featureTypes>
+		<gco:LocalName codeSpace="http://purl.org/myocean/ontology/vocabulary/feature-type#Grid">Grid</gco:LocalName>
+	      </gmd:featureTypes>
+	      <gmd:featureCatalogueCitation/>
+	    </gmd:MD_FeatureCatalogueDescription>
+	  </gmd:contentInfo>
+	  <gmd:contentInfo>
+	    <gmd:MD_CoverageDescription>
+	      <gmd:attributeDescription>
+		<gco:RecordType xlink:href="http://vocab.nerc.ac.uk/collection/P07/current/CFV8NS5/" xlink:title="surface_geostrophic_northward_sea_water_velocity_assuming_sea_level_for_geoid">surface_geostrophic_northward_sea_water_velocity_assuming_sea_level_for_geoid</gco:RecordType>
+	      </gmd:attributeDescription>
+	      <gmd:contentType>
+		<gmd:MD_CoverageContentTypeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode" codeListValue="physicalMeasurement" codeSpace="ISOTC211/19115">physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+	      </gmd:contentType>
+	    </gmd:MD_CoverageDescription>
+	  </gmd:contentInfo>
+	  <gmd:contentInfo>
+	    <gmd:MD_CoverageDescription>
+	      <gmd:attributeDescription>
+		<gco:RecordType xlink:href="http://vocab.nerc.ac.uk/collection/P07/current/CFV8NS3/" xlink:title="surface_geostrophic_eastward_sea_water_velocity_assuming_sea_level_for_geoid">surface_geostrophic_eastward_sea_water_velocity_assuming_sea_level_for_geoid</gco:RecordType>
+	      </gmd:attributeDescription>
+	      <gmd:contentType>
+		<gmd:MD_CoverageContentTypeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode" codeListValue="physicalMeasurement" codeSpace="ISOTC211/19115">physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+	      </gmd:contentType>
+	    </gmd:MD_CoverageDescription>
+	  </gmd:contentInfo>
+	  <gmd:contentInfo>
+	    <gmd:MD_CoverageDescription>
+	      <gmd:attributeDescription>
+		<gco:RecordType xlink:href="http://vocab.nerc.ac.uk/collection/P07/current/CFV8NS2/" xlink:title="surface_geostrophic_eastward_sea_water_velocity">surface_geostrophic_eastward_sea_water_velocity</gco:RecordType>
+	      </gmd:attributeDescription>
+	      <gmd:contentType>
+		<gmd:MD_CoverageContentTypeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode" codeListValue="physicalMeasurement" codeSpace="ISOTC211/19115">physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+	      </gmd:contentType>
+	    </gmd:MD_CoverageDescription>
+	  </gmd:contentInfo>
+	  <gmd:contentInfo>
+	    <gmd:MD_CoverageDescription>
+	      <gmd:attributeDescription>
+		<gco:RecordType xlink:href="http://vocab.nerc.ac.uk/collection/P07/current/CFV8NS4/" xlink:title="surface_geostrophic_northward_sea_water_velocity">surface_geostrophic_northward_sea_water_velocity</gco:RecordType>
+	      </gmd:attributeDescription>
+	      <gmd:contentType>
+		<gmd:MD_CoverageContentTypeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode" codeListValue="physicalMeasurement" codeSpace="ISOTC211/19115">physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+	      </gmd:contentType>
+	    </gmd:MD_CoverageDescription>
+	  </gmd:contentInfo>
+	  <gmd:contentInfo>
+	    <gmd:MD_CoverageDescription>
+	      <gmd:attributeDescription>
+		<gco:RecordType xlink:href="http://vocab.nerc.ac.uk/collection/P07/current/CFSN0375/" xlink:title="sea_surface_height_above_sea_level">sea_surface_height_above_sea_level</gco:RecordType>
+	      </gmd:attributeDescription>
+	      <gmd:contentType>
+		<gmd:MD_CoverageContentTypeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode" codeListValue="physicalMeasurement" codeSpace="ISOTC211/19115">physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+	      </gmd:contentType>
+	    </gmd:MD_CoverageDescription>
+	  </gmd:contentInfo>
+	  <gmd:contentInfo>
+	    <gmd:MD_CoverageDescription>
+	      <gmd:attributeDescription>
+		<gco:RecordType xlink:href="http://vocab.nerc.ac.uk/collection/P07/current/CFSN0374/" xlink:title="sea_surface_height_above_geoid">sea_surface_height_above_geoid</gco:RecordType>
+	      </gmd:attributeDescription>
+	      <gmd:contentType>
+		<gmd:MD_CoverageContentTypeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode" codeListValue="physicalMeasurement" codeSpace="ISOTC211/19115">physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+	      </gmd:contentType>
+	    </gmd:MD_CoverageDescription>
+	  </gmd:contentInfo>
+	  <gmd:distributionInfo>
+	    <gmd:MD_Distribution>
+	      <gmd:distributionFormat>
+		<gmd:MD_Format>
+		  <gmd:name>
+		    <gco:CharacterString>NetCDF-4</gco:CharacterString>
+		  </gmd:name>
+		  <gmd:version gco:nilReason="unknown">
+		    <gco:CharacterString/>
+		  </gmd:version>
+		</gmd:MD_Format>
+	      </gmd:distributionFormat>
+	      <gmd:transferOptions>
+		<gmd:MD_DigitalTransferOptions>
+		  <gmd:onLine>
+		    <gmd:CI_OnlineResource>
+		      <gmd:linkage>
+			<gmd:URL>https://stac.marine.copernicus.eu/metadata/SEALEVEL_GLO_PHY_CLIMATE_L4_MY_008_057/c3s_obs-sl_glo_phy-ssh_my_twosat-l4-duacs-0.25deg_P1D_202112/dataset.stac.json</gmd:URL>
+		      </gmd:linkage>
+		      <gmd:protocol>
+			<gco:CharacterString>WWW:STAC</gco:CharacterString>
+		      </gmd:protocol>
+		      <gmd:name>
+			<gco:CharacterString>c3s_obs-sl_glo_phy-ssh_my_twosat-l4-duacs-0.25deg_P1D</gco:CharacterString>
+		      </gmd:name>
+		      <gmd:description>
+			<gco:CharacterString>For accessing native data and Analysis-ready Cloud-optimized data services, consult this STAC metadata endpoint</gco:CharacterString>
+		      </gmd:description>
+		    </gmd:CI_OnlineResource>
+		  </gmd:onLine>
+		  <gmd:onLine>
+		    <gmd:CI_OnlineResource>
+		      <gmd:linkage>
+			<gmd:URL>https://stac.marine.copernicus.eu/metadata/SEALEVEL_GLO_PHY_CLIMATE_L4_MY_008_057/c3s_obs-sl_glo_phy-ssh_myint_twosat-l4-duacs-0.25deg_P1D_202311/dataset.stac.json</gmd:URL>
+		      </gmd:linkage>
+		      <gmd:protocol>
+			<gco:CharacterString>WWW:STAC</gco:CharacterString>
+		      </gmd:protocol>
+		      <gmd:name>
+			<gco:CharacterString>c3s_obs-sl_glo_phy-ssh_myint_twosat-l4-duacs-0.25deg_P1D</gco:CharacterString>
+		      </gmd:name>
+		      <gmd:description>
+			<gco:CharacterString>For accessing native data and Analysis-ready Cloud-optimized data services, consult this STAC metadata endpoint</gco:CharacterString>
+		      </gmd:description>
+		    </gmd:CI_OnlineResource>
+		  </gmd:onLine>
+		  <gmd:onLine>
+		    <gmd:CI_OnlineResource>
+		      <gmd:linkage>
+			<gmd:URL>https://wmts.marine.copernicus.eu/teroWmts/SEALEVEL_GLO_PHY_CLIMATE_L4_MY_008_057/c3s_obs-sl_glo_phy-ssh_myint_twosat-l4-duacs-0.25deg_P1D_202311</gmd:URL>
+		      </gmd:linkage>
+		      <gmd:protocol>
+			<gco:CharacterString>OGC:WMTS</gco:CharacterString>
+		      </gmd:protocol>
+		      <gmd:name>
+			<gco:CharacterString>c3s_obs-sl_glo_phy-ssh_myint_twosat-l4-duacs-0.25deg_P1D</gco:CharacterString>
+		      </gmd:name>
+		    </gmd:CI_OnlineResource>
+		  </gmd:onLine>
+		</gmd:MD_DigitalTransferOptions>
+	      </gmd:transferOptions>
+	    </gmd:MD_Distribution>
+	  </gmd:distributionInfo>
+	  <gmd:dataQualityInfo>
+	    <gmd:DQ_DataQuality>
+	      <gmd:scope>
+		<gmd:DQ_Scope>
+		  <gmd:level>
+		    <gmd:MD_ScopeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_ScopeCode" codeListValue="series"/>
+		  </gmd:level>
+		</gmd:DQ_Scope>
+	      </gmd:scope>
+	      <gmd:report>
+		<gmd:DQ_DomainConsistency>
+		  <gmd:result>
+		    <gmd:DQ_ConformanceResult>
+		      <gmd:specification>
+			<gmd:CI_Citation>
+			  <gmd:title>
+			    <gco:CharacterString>COMMISSION REGULATION (EU) No 1089/2010 of 23 November 2010 implementing Directive 2007/2/EC of the European Parliament and of the Council as regards interoperability of spatial data sets and services</gco:CharacterString>
+			  </gmd:title>
+			  <gmd:date>
+			    <gmd:CI_Date>
+			      <gmd:date>
+				<gco:Date>2010-12-08</gco:Date>
+			      </gmd:date>
+			      <gmd:dateType>
+				<gmd:CI_DateTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" codeListValue="publication"/>
+			      </gmd:dateType>
+			    </gmd:CI_Date>
+			  </gmd:date>
+			</gmd:CI_Citation>
+		      </gmd:specification>
+		      <gmd:explanation>
+			<gco:CharacterString>See the referenced specification</gco:CharacterString>
+		      </gmd:explanation>
+		      <gmd:pass gco:nilReason="unknown"/>
+		    </gmd:DQ_ConformanceResult>
+		  </gmd:result>
+		</gmd:DQ_DomainConsistency>
+	      </gmd:report>
+	      <gmd:lineage>
+		<gmd:LI_Lineage>
+		  <gmd:statement>
+		    <gco:CharacterString>The myOcean products depends on other products for production or validation. The detailed list of dependencies is given in ISO19115's aggregationInfo (ISO19139 Xpath = "gmd:MD_Metadata/gmd:identificationInfo/gmd:aggregationInfo[./gmd:MD_AggregateInformation/gmd:initiativeType/gmd:DS_InitiativeTypeCode/@codeListValue='upstream-validation' or 'upstream-production']")</gco:CharacterString>
+		  </gmd:statement>
+		</gmd:LI_Lineage>
+	      </gmd:lineage>
+	    </gmd:DQ_DataQuality>
+	  </gmd:dataQualityInfo>
+	</gmi:MI_Metadata>
+      </gs:isoMetadata>
+    </gs:coreMetadata>
+    <gs:augmentedMetadata/>
+    <gs:extendedMetadata>
+      <gs:extension>
+	<gs:OriginatorOrganisationDescription>SL-CLS-TOULOUSE-FR</gs:OriginatorOrganisationDescription>
+      </gs:extension>
+    </gs:extendedMetadata>
+  </gs:harmonizedMetadata>
+  <gs:originalMetadata>
+    <gs:schemeURI>http://www.isotc211.org/2005/gmd</gs:schemeURI>
+    <gs:metadata>&lt;![CDATA[&amp;lt;gmd:MD_Metadata xmlns:csw=&amp;quot;http://www.opengis.net/cat/csw/2.0.2&amp;quot; xmlns:ogc=&amp;quot;http://www.opengis.net/ogc&amp;quot; xmlns:gml=&amp;quot;http://www.opengis.net/gml&amp;quot; xmlns:dc=&amp;quot;http://purl.org/dc/elements/1.1/&amp;quot; xmlns:dcterms=&amp;quot;http://purl.org/dc/terms/&amp;quot; xmlns:ows=&amp;quot;http://www.opengis.net/ows&amp;quot; xmlns:xlink=&amp;quot;http://www.w3.org/1999/xlink&amp;quot; xmlns:gmd=&amp;quot;http://www.isotc211.org/2005/gmd&amp;quot; xmlns:gco=&amp;quot;http://www.isotc211.org/2005/gco&amp;quot; xmlns:gmx=&amp;quot;http://www.isotc211.org/2005/gmx&amp;quot; xmlns:srv=&amp;quot;http://www.isotc211.org/2005/srv&amp;quot; xmlns:gmi=&amp;quot;http://www.isotc211.org/2005/gmi&amp;quot; xmlns:gts=&amp;quot;http://www.isotc211.org/2005/gts&amp;quot; xmlns:pubSub=&amp;quot;http://www.opengis.net/pubsub/1.0&amp;quot; xmlns:ows11=&amp;quot;http://www.opengis.net/ows/1.1&amp;quot; xmlns:gml32=&amp;quot;http://www.opengis.net/gml/3.2&amp;quot; xmlns:xacml=&amp;quot;urn:oasis:names:tc:xacml:3.0:core:schema:wd-17&amp;quot; xmlns:oai=&amp;quot;http://www.openarchives.org/OAI/2.0/&amp;quot; xmlns:xsi=&amp;quot;http://www.w3.org/2001/XMLSchema-instance&amp;quot; xmlns:xs=&amp;quot;http://www.w3.org/2001/XMLSchema&amp;quot; xsi:schemaLocation=&amp;quot;http://www.isotc211.org/2005/gmi http://www.isotc211.org/2005/gmi/gmi.xsd&amp;quot;&amp;gt;
+    &amp;lt;gmd:fileIdentifier&amp;gt;
+        &amp;lt;gco:CharacterString&amp;gt;0a1cf029-1a8e-4ac0-9d96-95060065e3e8&amp;lt;/gco:CharacterString&amp;gt;
+    &amp;lt;/gmd:fileIdentifier&amp;gt;
+    &amp;lt;gmd:language&amp;gt;
+        &amp;lt;gmd:LanguageCode codeList=&amp;quot;http://www.loc.gov/standards/iso639-2/&amp;quot; codeListValue=&amp;quot;eng&amp;quot;&amp;gt;&amp;lt;/gmd:LanguageCode&amp;gt;
+    &amp;lt;/gmd:language&amp;gt;
+    &amp;lt;gmd:characterSet&amp;gt;
+        &amp;lt;gmd:MD_CharacterSetCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_CharacterSetCode&amp;quot; codeListValue=&amp;quot;utf8&amp;quot;&amp;gt;&amp;lt;/gmd:MD_CharacterSetCode&amp;gt;
+    &amp;lt;/gmd:characterSet&amp;gt;
+    &amp;lt;gmd:hierarchyLevel&amp;gt;
+        &amp;lt;gmd:MD_ScopeCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_ScopeCode&amp;quot; codeListValue=&amp;quot;series&amp;quot;&amp;gt;&amp;lt;/gmd:MD_ScopeCode&amp;gt;
+    &amp;lt;/gmd:hierarchyLevel&amp;gt;
+    &amp;lt;gmd:hierarchyLevelName&amp;gt;
+        &amp;lt;gco:CharacterString&amp;gt;Copernicus Marine Service product specification&amp;lt;/gco:CharacterString&amp;gt;
+    &amp;lt;/gmd:hierarchyLevelName&amp;gt;
+    &amp;lt;gmd:contact&amp;gt;
+        &amp;lt;gmd:CI_ResponsibleParty&amp;gt;
+            &amp;lt;gmd:organisationName&amp;gt;
+                &amp;lt;gco:CharacterString&amp;gt;CMEMS&amp;lt;/gco:CharacterString&amp;gt;
+            &amp;lt;/gmd:organisationName&amp;gt;
+            &amp;lt;gmd:contactInfo&amp;gt;
+                &amp;lt;gmd:CI_Contact&amp;gt;
+                    &amp;lt;gmd:address&amp;gt;
+                        &amp;lt;gmd:CI_Address&amp;gt;
+                            &amp;lt;gmd:electronicMailAddress&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;servicedesk.cmems@mercator-ocean.eu&amp;lt;/gco:CharacterString&amp;gt;
+                            &amp;lt;/gmd:electronicMailAddress&amp;gt;
+                        &amp;lt;/gmd:CI_Address&amp;gt;
+                    &amp;lt;/gmd:address&amp;gt;
+                    &amp;lt;gmd:onlineResource&amp;gt;
+                        &amp;lt;gmd:CI_OnlineResource&amp;gt;
+                            &amp;lt;gmd:linkage&amp;gt;
+&amp;lt;gmd:URL&amp;gt;http://marine.copernicus.eu/&amp;lt;/gmd:URL&amp;gt;
+                            &amp;lt;/gmd:linkage&amp;gt;
+                        &amp;lt;/gmd:CI_OnlineResource&amp;gt;
+                    &amp;lt;/gmd:onlineResource&amp;gt;
+                &amp;lt;/gmd:CI_Contact&amp;gt;
+            &amp;lt;/gmd:contactInfo&amp;gt;
+            &amp;lt;gmd:role&amp;gt;
+                &amp;lt;gmd:CI_RoleCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode&amp;quot; codeListValue=&amp;quot;pointOfContact&amp;quot;&amp;gt;&amp;lt;/gmd:CI_RoleCode&amp;gt;
+            &amp;lt;/gmd:role&amp;gt;
+        &amp;lt;/gmd:CI_ResponsibleParty&amp;gt;
+    &amp;lt;/gmd:contact&amp;gt;
+    &amp;lt;gmd:dateStamp&amp;gt;
+        &amp;lt;gco:Date xsi:nil=&amp;quot;true&amp;quot;/&amp;gt;
+        &amp;lt;gco:DateTime&amp;gt;2024-03-25T11:15:24.252Z&amp;lt;/gco:DateTime&amp;gt;
+    &amp;lt;/gmd:dateStamp&amp;gt;
+    &amp;lt;gmd:metadataStandardName&amp;gt;
+        &amp;lt;gco:CharacterString&amp;gt;ISO 19139, MyOcean profile&amp;lt;/gco:CharacterString&amp;gt;
+    &amp;lt;/gmd:metadataStandardName&amp;gt;
+    &amp;lt;gmd:metadataStandardVersion&amp;gt;
+        &amp;lt;gco:CharacterString&amp;gt;0.2&amp;lt;/gco:CharacterString&amp;gt;
+    &amp;lt;/gmd:metadataStandardVersion&amp;gt;
+    &amp;lt;gmd:spatialRepresentationInfo&amp;gt;
+        &amp;lt;gmd:MD_GridSpatialRepresentation&amp;gt;
+            &amp;lt;gmd:numberOfDimensions&amp;gt;
+                &amp;lt;gco:Integer&amp;gt;2&amp;lt;/gco:Integer&amp;gt;
+            &amp;lt;/gmd:numberOfDimensions&amp;gt;
+            &amp;lt;gmd:axisDimensionProperties&amp;gt;
+                &amp;lt;gmd:MD_Dimension&amp;gt;
+                    &amp;lt;gmd:dimensionName&amp;gt;
+                        &amp;lt;gmd:MD_DimensionNameTypeCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_DimensionNameTypeCode&amp;quot; codeListValue=&amp;quot;row&amp;quot;&amp;gt;&amp;lt;/gmd:MD_DimensionNameTypeCode&amp;gt;
+                    &amp;lt;/gmd:dimensionName&amp;gt;
+                    &amp;lt;gmd:resolution&amp;gt;
+                        &amp;lt;gco:Measure uom=&amp;quot;degree&amp;quot;&amp;gt;0.25&amp;lt;/gco:Measure&amp;gt;
+                    &amp;lt;/gmd:resolution&amp;gt;
+                &amp;lt;/gmd:MD_Dimension&amp;gt;
+            &amp;lt;/gmd:axisDimensionProperties&amp;gt;
+            &amp;lt;gmd:axisDimensionProperties&amp;gt;
+                &amp;lt;gmd:MD_Dimension&amp;gt;
+                    &amp;lt;gmd:dimensionName&amp;gt;
+                        &amp;lt;gmd:MD_DimensionNameTypeCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_DimensionNameTypeCode&amp;quot; codeListValue=&amp;quot;column&amp;quot;&amp;gt;&amp;lt;/gmd:MD_DimensionNameTypeCode&amp;gt;
+                    &amp;lt;/gmd:dimensionName&amp;gt;
+                    &amp;lt;gmd:resolution&amp;gt;
+                        &amp;lt;gco:Measure uom=&amp;quot;degree&amp;quot;&amp;gt;0.25&amp;lt;/gco:Measure&amp;gt;
+                    &amp;lt;/gmd:resolution&amp;gt;
+                &amp;lt;/gmd:MD_Dimension&amp;gt;
+            &amp;lt;/gmd:axisDimensionProperties&amp;gt;
+            &amp;lt;gmd:cellGeometry&amp;gt;
+                &amp;lt;gmd:MD_CellGeometryCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_CellGeometryCode&amp;quot; codeListValue=&amp;quot;area&amp;quot;&amp;gt;&amp;lt;/gmd:MD_CellGeometryCode&amp;gt;
+            &amp;lt;/gmd:cellGeometry&amp;gt;
+            &amp;lt;gmd:transformationParameterAvailability&amp;gt;
+                &amp;lt;gco:Boolean&amp;gt;false&amp;lt;/gco:Boolean&amp;gt;
+            &amp;lt;/gmd:transformationParameterAvailability&amp;gt;
+        &amp;lt;/gmd:MD_GridSpatialRepresentation&amp;gt;
+    &amp;lt;/gmd:spatialRepresentationInfo&amp;gt;
+    &amp;lt;gmd:referenceSystemInfo&amp;gt;
+        &amp;lt;gmd:MD_ReferenceSystem&amp;gt;
+            &amp;lt;gmd:referenceSystemIdentifier&amp;gt;
+                &amp;lt;gmd:RS_Identifier&amp;gt;
+                    &amp;lt;gmd:code&amp;gt;
+                        &amp;lt;gco:CharacterString&amp;gt;rectangular&amp;lt;/gco:CharacterString&amp;gt;
+                    &amp;lt;/gmd:code&amp;gt;
+                    &amp;lt;gmd:codeSpace&amp;gt;
+                        &amp;lt;gco:CharacterString&amp;gt;EPSG&amp;lt;/gco:CharacterString&amp;gt;
+                    &amp;lt;/gmd:codeSpace&amp;gt;
+                &amp;lt;/gmd:RS_Identifier&amp;gt;
+            &amp;lt;/gmd:referenceSystemIdentifier&amp;gt;
+        &amp;lt;/gmd:MD_ReferenceSystem&amp;gt;
+    &amp;lt;/gmd:referenceSystemInfo&amp;gt;
+    &amp;lt;gmd:identificationInfo&amp;gt;
+        &amp;lt;gmd:MD_DataIdentification&amp;gt;
+            &amp;lt;gmd:citation&amp;gt;
+                &amp;lt;gmd:CI_Citation&amp;gt;
+                    &amp;lt;gmd:title&amp;gt;
+                        &amp;lt;gco:CharacterString&amp;gt;GLOBAL OCEAN GRIDDED L4 SEA SURFACE HEIGHTS AND DERIVED VARIABLES REPROCESSED (COPERNICUS CLIMATE SERVICE)&amp;lt;/gco:CharacterString&amp;gt;
+                    &amp;lt;/gmd:title&amp;gt;
+                    &amp;lt;gmd:alternateTitle&amp;gt;
+                        &amp;lt;gco:CharacterString&amp;gt;SEALEVEL_GLO_PHY_CLIMATE_L4_MY_008_057&amp;lt;/gco:CharacterString&amp;gt;
+                    &amp;lt;/gmd:alternateTitle&amp;gt;
+                    &amp;lt;gmd:date&amp;gt;
+                        &amp;lt;gmd:CI_Date&amp;gt;
+                            &amp;lt;gmd:date&amp;gt;
+&amp;lt;gco:Date&amp;gt;2012-08-26&amp;lt;/gco:Date&amp;gt;
+                            &amp;lt;/gmd:date&amp;gt;
+                            &amp;lt;gmd:dateType&amp;gt;
+&amp;lt;gmd:CI_DateTypeCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode&amp;quot; codeListValue=&amp;quot;creation&amp;quot;&amp;gt;&amp;lt;/gmd:CI_DateTypeCode&amp;gt;
+                            &amp;lt;/gmd:dateType&amp;gt;
+                        &amp;lt;/gmd:CI_Date&amp;gt;
+                    &amp;lt;/gmd:date&amp;gt;
+                    &amp;lt;gmd:edition&amp;gt;
+                        &amp;lt;gco:CharacterString&amp;gt;2.1&amp;lt;/gco:CharacterString&amp;gt;
+                    &amp;lt;/gmd:edition&amp;gt;
+                    &amp;lt;gmd:editionDate&amp;gt;
+                        &amp;lt;gco:Date&amp;gt;2023-11-30&amp;lt;/gco:Date&amp;gt;
+                    &amp;lt;/gmd:editionDate&amp;gt;
+                    &amp;lt;gmd:identifier&amp;gt;
+                        &amp;lt;gmd:MD_Identifier&amp;gt;
+                            &amp;lt;gmd:code&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;0a1cf029-1a8e-4ac0-9d96-95060065e3e8&amp;lt;/gco:CharacterString&amp;gt;
+                            &amp;lt;/gmd:code&amp;gt;
+                        &amp;lt;/gmd:MD_Identifier&amp;gt;
+                    &amp;lt;/gmd:identifier&amp;gt;
+                &amp;lt;/gmd:CI_Citation&amp;gt;
+            &amp;lt;/gmd:citation&amp;gt;
+            &amp;lt;gmd:abstract&amp;gt;
+                &amp;lt;gco:CharacterString&amp;gt;&amp;apos;&amp;apos;&amp;apos;Short description:&amp;apos;&amp;apos;&amp;apos; 
+
+DUACS delayed-time altimeter gridded maps of sea surface heights and derived variables over the global Ocean (https://cds.climate.copernicus.eu/cdsapp#!/dataset/satellite-sea-level-global?tab=overview). The processing focuses on the stability and homogeneity of the sea level record (based on a stable two-satellite constellation) and the product is dedicated to the monitoring of the sea level long-term evolution for climate applications and the analysis of Ocean/Climate indicators. These products are produced and distributed by the Copernicus Climate Change Service (C3S, https://climate.copernicus.eu/).
+
+&amp;apos;&amp;apos;&amp;apos;DOI (product):&amp;apos;&amp;apos;&amp;apos;
+https://doi.org/10.48670/moi-00145&amp;lt;/gco:CharacterString&amp;gt;
+            &amp;lt;/gmd:abstract&amp;gt;
+            &amp;lt;gmd:credit&amp;gt;
+                &amp;lt;gco:CharacterString&amp;gt;E.U. Copernicus Marine Service Information&amp;lt;/gco:CharacterString&amp;gt;
+            &amp;lt;/gmd:credit&amp;gt;
+            &amp;lt;gmd:pointOfContact&amp;gt;
+                &amp;lt;gmd:CI_ResponsibleParty&amp;gt;
+                    &amp;lt;gmd:individualName&amp;gt;
+                        &amp;lt;gco:CharacterString&amp;gt;M-Isabelle Pujol&amp;lt;/gco:CharacterString&amp;gt;
+                    &amp;lt;/gmd:individualName&amp;gt;
+                    &amp;lt;gmd:organisationName&amp;gt;
+                        &amp;lt;gco:CharacterString&amp;gt;SL-CLS-TOULOUSE-FR&amp;lt;/gco:CharacterString&amp;gt;
+                    &amp;lt;/gmd:organisationName&amp;gt;
+                    &amp;lt;gmd:contactInfo&amp;gt;
+                        &amp;lt;gmd:CI_Contact&amp;gt;
+                            &amp;lt;gmd:address&amp;gt;
+&amp;lt;gmd:CI_Address&amp;gt;
+    &amp;lt;gmd:electronicMailAddress&amp;gt;
+        &amp;lt;gco:CharacterString&amp;gt;managementboard-sltac@cls.fr&amp;lt;/gco:CharacterString&amp;gt;
+    &amp;lt;/gmd:electronicMailAddress&amp;gt;
+&amp;lt;/gmd:CI_Address&amp;gt;
+                            &amp;lt;/gmd:address&amp;gt;
+                        &amp;lt;/gmd:CI_Contact&amp;gt;
+                    &amp;lt;/gmd:contactInfo&amp;gt;
+                    &amp;lt;gmd:role&amp;gt;
+                        &amp;lt;gmd:CI_RoleCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode&amp;quot; codeListValue=&amp;quot;custodian&amp;quot;&amp;gt;&amp;lt;/gmd:CI_RoleCode&amp;gt;
+                    &amp;lt;/gmd:role&amp;gt;
+                &amp;lt;/gmd:CI_ResponsibleParty&amp;gt;
+            &amp;lt;/gmd:pointOfContact&amp;gt;
+            &amp;lt;gmd:pointOfContact&amp;gt;
+                &amp;lt;gmd:CI_ResponsibleParty&amp;gt;
+                    &amp;lt;gmd:individualName&amp;gt;
+                        &amp;lt;gco:CharacterString&amp;gt;Françoise MERTZ&amp;lt;/gco:CharacterString&amp;gt;
+                    &amp;lt;/gmd:individualName&amp;gt;
+                    &amp;lt;gmd:organisationName&amp;gt;
+                        &amp;lt;gco:CharacterString&amp;gt;SL-CLS-TOULOUSE-FR&amp;lt;/gco:CharacterString&amp;gt;
+                    &amp;lt;/gmd:organisationName&amp;gt;
+                    &amp;lt;gmd:contactInfo&amp;gt;
+                        &amp;lt;gmd:CI_Contact&amp;gt;
+                            &amp;lt;gmd:address&amp;gt;
+&amp;lt;gmd:CI_Address&amp;gt;
+    &amp;lt;gmd:electronicMailAddress&amp;gt;
+        &amp;lt;gco:CharacterString&amp;gt;servicemanager-sltac@cls.fr&amp;lt;/gco:CharacterString&amp;gt;
+    &amp;lt;/gmd:electronicMailAddress&amp;gt;
+&amp;lt;/gmd:CI_Address&amp;gt;
+                            &amp;lt;/gmd:address&amp;gt;
+                        &amp;lt;/gmd:CI_Contact&amp;gt;
+                    &amp;lt;/gmd:contactInfo&amp;gt;
+                    &amp;lt;gmd:role&amp;gt;
+                        &amp;lt;gmd:CI_RoleCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode&amp;quot; codeListValue=&amp;quot;originator&amp;quot;&amp;gt;&amp;lt;/gmd:CI_RoleCode&amp;gt;
+                    &amp;lt;/gmd:role&amp;gt;
+                &amp;lt;/gmd:CI_ResponsibleParty&amp;gt;
+            &amp;lt;/gmd:pointOfContact&amp;gt;
+            &amp;lt;gmd:pointOfContact&amp;gt;
+                &amp;lt;gmd:CI_ResponsibleParty&amp;gt;
+                    &amp;lt;gmd:individualName&amp;gt;
+                        &amp;lt;gco:CharacterString&amp;gt;servicedesk.cmems@cls.fr&amp;lt;/gco:CharacterString&amp;gt;
+                    &amp;lt;/gmd:individualName&amp;gt;
+                    &amp;lt;gmd:organisationName&amp;gt;
+                        &amp;lt;gco:CharacterString&amp;gt;SL-CLS-TOULOUSE-FR&amp;lt;/gco:CharacterString&amp;gt;
+                    &amp;lt;/gmd:organisationName&amp;gt;
+                    &amp;lt;gmd:contactInfo&amp;gt;
+                        &amp;lt;gmd:CI_Contact&amp;gt;
+                            &amp;lt;gmd:address&amp;gt;
+&amp;lt;gmd:CI_Address&amp;gt;
+    &amp;lt;gmd:electronicMailAddress&amp;gt;
+        &amp;lt;gco:CharacterString&amp;gt;servicedesk.cmems@cls.fr&amp;lt;/gco:CharacterString&amp;gt;
+    &amp;lt;/gmd:electronicMailAddress&amp;gt;
+&amp;lt;/gmd:CI_Address&amp;gt;
+                            &amp;lt;/gmd:address&amp;gt;
+                        &amp;lt;/gmd:CI_Contact&amp;gt;
+                    &amp;lt;/gmd:contactInfo&amp;gt;
+                    &amp;lt;gmd:role&amp;gt;
+                        &amp;lt;gmd:CI_RoleCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode&amp;quot; codeListValue=&amp;quot;pointOfContact&amp;quot;&amp;gt;&amp;lt;/gmd:CI_RoleCode&amp;gt;
+                    &amp;lt;/gmd:role&amp;gt;
+                &amp;lt;/gmd:CI_ResponsibleParty&amp;gt;
+            &amp;lt;/gmd:pointOfContact&amp;gt;
+            &amp;lt;gmd:pointOfContact&amp;gt;
+                &amp;lt;gmd:CI_ResponsibleParty&amp;gt;
+                    &amp;lt;gmd:individualName&amp;gt;
+                        &amp;lt;gco:CharacterString&amp;gt;Guillaume Taburet&amp;lt;/gco:CharacterString&amp;gt;
+                    &amp;lt;/gmd:individualName&amp;gt;
+                    &amp;lt;gmd:organisationName&amp;gt;
+                        &amp;lt;gco:CharacterString&amp;gt;SL-CLS-TOULOUSE-FR&amp;lt;/gco:CharacterString&amp;gt;
+                    &amp;lt;/gmd:organisationName&amp;gt;
+                    &amp;lt;gmd:contactInfo&amp;gt;
+                        &amp;lt;gmd:CI_Contact&amp;gt;
+                            &amp;lt;gmd:address&amp;gt;
+&amp;lt;gmd:CI_Address&amp;gt;
+    &amp;lt;gmd:electronicMailAddress&amp;gt;
+        &amp;lt;gco:CharacterString&amp;gt;exploitation-duacs@cls.fr&amp;lt;/gco:CharacterString&amp;gt;
+    &amp;lt;/gmd:electronicMailAddress&amp;gt;
+&amp;lt;/gmd:CI_Address&amp;gt;
+                            &amp;lt;/gmd:address&amp;gt;
+                        &amp;lt;/gmd:CI_Contact&amp;gt;
+                    &amp;lt;/gmd:contactInfo&amp;gt;
+                    &amp;lt;gmd:role&amp;gt;
+                        &amp;lt;gmd:CI_RoleCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode&amp;quot; codeListValue=&amp;quot;resourceProvider&amp;quot;&amp;gt;&amp;lt;/gmd:CI_RoleCode&amp;gt;
+                    &amp;lt;/gmd:role&amp;gt;
+                &amp;lt;/gmd:CI_ResponsibleParty&amp;gt;
+            &amp;lt;/gmd:pointOfContact&amp;gt;
+            &amp;lt;gmd:pointOfContact&amp;gt;
+                &amp;lt;gmd:CI_ResponsibleParty&amp;gt;
+                    &amp;lt;gmd:individualName&amp;gt;
+                        &amp;lt;gco:CharacterString&amp;gt;Françoise Mertz&amp;lt;/gco:CharacterString&amp;gt;
+                    &amp;lt;/gmd:individualName&amp;gt;
+                    &amp;lt;gmd:organisationName&amp;gt;
+                        &amp;lt;gco:CharacterString&amp;gt;SL-CLS-TOULOUSE-FR&amp;lt;/gco:CharacterString&amp;gt;
+                    &amp;lt;/gmd:organisationName&amp;gt;
+                    &amp;lt;gmd:contactInfo&amp;gt;
+                        &amp;lt;gmd:CI_Contact&amp;gt;
+                            &amp;lt;gmd:address&amp;gt;
+&amp;lt;gmd:CI_Address&amp;gt;
+    &amp;lt;gmd:electronicMailAddress&amp;gt;
+        &amp;lt;gco:CharacterString&amp;gt;exploitation-duacs@cls.fr&amp;lt;/gco:CharacterString&amp;gt;
+    &amp;lt;/gmd:electronicMailAddress&amp;gt;
+&amp;lt;/gmd:CI_Address&amp;gt;
+                            &amp;lt;/gmd:address&amp;gt;
+                        &amp;lt;/gmd:CI_Contact&amp;gt;
+                    &amp;lt;/gmd:contactInfo&amp;gt;
+                    &amp;lt;gmd:role&amp;gt;
+                        &amp;lt;gmd:CI_RoleCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode&amp;quot; codeListValue=&amp;quot;distributor&amp;quot;&amp;gt;&amp;lt;/gmd:CI_RoleCode&amp;gt;
+                    &amp;lt;/gmd:role&amp;gt;
+                &amp;lt;/gmd:CI_ResponsibleParty&amp;gt;
+            &amp;lt;/gmd:pointOfContact&amp;gt;
+            &amp;lt;gmd:resourceMaintenance&amp;gt;
+                &amp;lt;gmd:MD_MaintenanceInformation&amp;gt;
+                    &amp;lt;gmd:maintenanceAndUpdateFrequency&amp;gt;
+                        &amp;lt;gmd:MD_MaintenanceFrequencyCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_MaintenanceFrequencyCode&amp;quot; codeListValue=&amp;quot;irregular&amp;quot;&amp;gt;&amp;lt;/gmd:MD_MaintenanceFrequencyCode&amp;gt;
+                    &amp;lt;/gmd:maintenanceAndUpdateFrequency&amp;gt;
+                    &amp;lt;gmd:updateScopeDescription&amp;gt;
+                        &amp;lt;gmd:MD_ScopeDescription&amp;gt;
+                            &amp;lt;gmd:other&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;P0M0D0H/P0M0D0H&amp;lt;/gco:CharacterString&amp;gt;
+                            &amp;lt;/gmd:other&amp;gt;
+                        &amp;lt;/gmd:MD_ScopeDescription&amp;gt;
+                    &amp;lt;/gmd:updateScopeDescription&amp;gt;
+                    &amp;lt;gmd:maintenanceNote&amp;gt;
+                        &amp;lt;gco:CharacterString&amp;gt;N/A&amp;lt;/gco:CharacterString&amp;gt;
+                    &amp;lt;/gmd:maintenanceNote&amp;gt;
+                &amp;lt;/gmd:MD_MaintenanceInformation&amp;gt;
+            &amp;lt;/gmd:resourceMaintenance&amp;gt;
+            &amp;lt;gmd:resourceMaintenance&amp;gt;
+                &amp;lt;gmd:MD_MaintenanceInformation&amp;gt;
+                    &amp;lt;gmd:maintenanceAndUpdateFrequency&amp;gt;
+                        &amp;lt;gmd:MD_MaintenanceFrequencyCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_MaintenanceFrequencyCode&amp;quot; codeListValue=&amp;quot;annually&amp;quot;&amp;gt;&amp;lt;/gmd:MD_MaintenanceFrequencyCode&amp;gt;
+                    &amp;lt;/gmd:maintenanceAndUpdateFrequency&amp;gt;
+                &amp;lt;/gmd:MD_MaintenanceInformation&amp;gt;
+            &amp;lt;/gmd:resourceMaintenance&amp;gt;
+            &amp;lt;gmd:graphicOverview&amp;gt;
+                &amp;lt;gmd:MD_BrowseGraphic&amp;gt;
+                    &amp;lt;gmd:fileName&amp;gt;
+                        &amp;lt;gco:CharacterString&amp;gt;https://catalogue.marine.copernicus.eu/documents/IMG/SEALEVEL_GLO_PHY_CLIMATE_L4_MY_008_057.png&amp;lt;/gco:CharacterString&amp;gt;
+                    &amp;lt;/gmd:fileName&amp;gt;
+                &amp;lt;/gmd:MD_BrowseGraphic&amp;gt;
+            &amp;lt;/gmd:graphicOverview&amp;gt;
+            &amp;lt;gmd:descriptiveKeywords&amp;gt;
+                &amp;lt;gmd:MD_Keywords&amp;gt;
+                    &amp;lt;gmd:keyword&amp;gt;
+                        &amp;lt;gmx:Anchor xlink:href=&amp;quot;http://inspire.ec.europa.eu/theme/of&amp;quot;&amp;gt;Oceanographic geographical features&amp;lt;/gmx:Anchor&amp;gt;
+                    &amp;lt;/gmd:keyword&amp;gt;
+                    &amp;lt;gmd:type&amp;gt;
+                        &amp;lt;gmd:MD_KeywordTypeCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode&amp;quot; codeListValue=&amp;quot;theme&amp;quot;&amp;gt;&amp;lt;/gmd:MD_KeywordTypeCode&amp;gt;
+                    &amp;lt;/gmd:type&amp;gt;
+                    &amp;lt;gmd:thesaurusName&amp;gt;
+                        &amp;lt;gmd:CI_Citation&amp;gt;
+                            &amp;lt;gmd:title&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;GEMET - INSPIRE themes, version 1.0&amp;lt;/gco:CharacterString&amp;gt;
+                            &amp;lt;/gmd:title&amp;gt;
+                            &amp;lt;gmd:date&amp;gt;
+&amp;lt;gmd:CI_Date&amp;gt;
+    &amp;lt;gmd:date&amp;gt;
+        &amp;lt;gco:Date&amp;gt;2009-09-22&amp;lt;/gco:Date&amp;gt;
+    &amp;lt;/gmd:date&amp;gt;
+    &amp;lt;gmd:dateType&amp;gt;
+        &amp;lt;gmd:CI_DateTypeCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode&amp;quot; codeListValue=&amp;quot;creation&amp;quot;&amp;gt;&amp;lt;/gmd:CI_DateTypeCode&amp;gt;
+    &amp;lt;/gmd:dateType&amp;gt;
+&amp;lt;/gmd:CI_Date&amp;gt;
+                            &amp;lt;/gmd:date&amp;gt;
+                        &amp;lt;/gmd:CI_Citation&amp;gt;
+                    &amp;lt;/gmd:thesaurusName&amp;gt;
+                &amp;lt;/gmd:MD_Keywords&amp;gt;
+            &amp;lt;/gmd:descriptiveKeywords&amp;gt;
+            &amp;lt;gmd:descriptiveKeywords&amp;gt;
+                &amp;lt;gmd:MD_Keywords&amp;gt;
+                    &amp;lt;gmd:keyword&amp;gt;
+                        &amp;lt;gmx:Anchor xlink:href=&amp;quot;https://vocab.ifremer.fr/scheme/SXT/myocean.discipline/a9f2224a-0e1b-4815-9abc-7a7d6ba6fa76&amp;quot;&amp;gt;satellite-observation&amp;lt;/gmx:Anchor&amp;gt;
+                    &amp;lt;/gmd:keyword&amp;gt;
+                    &amp;lt;gmd:type&amp;gt;
+                        &amp;lt;gmd:MD_KeywordTypeCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode&amp;quot; codeListValue=&amp;quot;discipline&amp;quot;&amp;gt;&amp;lt;/gmd:MD_KeywordTypeCode&amp;gt;
+                    &amp;lt;/gmd:type&amp;gt;
+                    &amp;lt;gmd:thesaurusName&amp;gt;
+                        &amp;lt;gmd:CI_Citation&amp;gt;
+                            &amp;lt;gmd:title&amp;gt;
+&amp;lt;gmx:Anchor xlink:href=&amp;quot;https://vocab.ifremer.fr/scheme/SXT/myocean.discipline&amp;quot;&amp;gt;Discipline&amp;lt;/gmx:Anchor&amp;gt;
+                            &amp;lt;/gmd:title&amp;gt;
+                            &amp;lt;gmd:date&amp;gt;
+&amp;lt;gmd:CI_Date&amp;gt;
+    &amp;lt;gmd:date&amp;gt;
+        &amp;lt;gco:Date&amp;gt;2023-03-16&amp;lt;/gco:Date&amp;gt;
+    &amp;lt;/gmd:date&amp;gt;
+    &amp;lt;gmd:dateType&amp;gt;
+        &amp;lt;gmd:CI_DateTypeCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode&amp;quot; codeListValue=&amp;quot;publication&amp;quot;&amp;gt;&amp;lt;/gmd:CI_DateTypeCode&amp;gt;
+    &amp;lt;/gmd:dateType&amp;gt;
+&amp;lt;/gmd:CI_Date&amp;gt;
+                            &amp;lt;/gmd:date&amp;gt;
+                            &amp;lt;gmd:identifier&amp;gt;
+&amp;lt;gmd:MD_Identifier&amp;gt;
+    &amp;lt;gmd:code&amp;gt;
+        &amp;lt;gmx:Anchor xlink:href=&amp;quot;https://sextant.ifremer.fr/geonetwork/srv/api/registries/vocabularies/local.discipline.myocean.discipline&amp;quot;&amp;gt;geonetwork.thesaurus.local.discipline.myocean.discipline&amp;lt;/gmx:Anchor&amp;gt;
+    &amp;lt;/gmd:code&amp;gt;
+&amp;lt;/gmd:MD_Identifier&amp;gt;
+                            &amp;lt;/gmd:identifier&amp;gt;
+                        &amp;lt;/gmd:CI_Citation&amp;gt;
+                    &amp;lt;/gmd:thesaurusName&amp;gt;
+                &amp;lt;/gmd:MD_Keywords&amp;gt;
+            &amp;lt;/gmd:descriptiveKeywords&amp;gt;
+            &amp;lt;gmd:descriptiveKeywords&amp;gt;
+                &amp;lt;gmd:MD_Keywords&amp;gt;
+                    &amp;lt;gmd:keyword&amp;gt;
+                        &amp;lt;gmx:Anchor xlink:href=&amp;quot;http://vocab.nerc.ac.uk/collection/P07/current/CFV8NS5/&amp;quot;&amp;gt;surface_geostrophic_northward_sea_water_velocity_assuming_sea_level_for_geoid&amp;lt;/gmx:Anchor&amp;gt;
+                    &amp;lt;/gmd:keyword&amp;gt;
+                    &amp;lt;gmd:keyword&amp;gt;
+                        &amp;lt;gmx:Anchor xlink:href=&amp;quot;http://vocab.nerc.ac.uk/collection/P07/current/CFV8NS3/&amp;quot;&amp;gt;surface_geostrophic_eastward_sea_water_velocity_assuming_sea_level_for_geoid&amp;lt;/gmx:Anchor&amp;gt;
+                    &amp;lt;/gmd:keyword&amp;gt;
+                    &amp;lt;gmd:keyword&amp;gt;
+                        &amp;lt;gmx:Anchor xlink:href=&amp;quot;http://vocab.nerc.ac.uk/collection/P07/current/CFV8NS2/&amp;quot;&amp;gt;surface_geostrophic_eastward_sea_water_velocity&amp;lt;/gmx:Anchor&amp;gt;
+                    &amp;lt;/gmd:keyword&amp;gt;
+                    &amp;lt;gmd:keyword&amp;gt;
+                        &amp;lt;gmx:Anchor xlink:href=&amp;quot;http://vocab.nerc.ac.uk/collection/P07/current/CFV8NS4/&amp;quot;&amp;gt;surface_geostrophic_northward_sea_water_velocity&amp;lt;/gmx:Anchor&amp;gt;
+                    &amp;lt;/gmd:keyword&amp;gt;
+                    &amp;lt;gmd:keyword&amp;gt;
+                        &amp;lt;gmx:Anchor xlink:href=&amp;quot;http://vocab.nerc.ac.uk/collection/P07/current/CFSN0375/&amp;quot;&amp;gt;sea_surface_height_above_sea_level&amp;lt;/gmx:Anchor&amp;gt;
+                    &amp;lt;/gmd:keyword&amp;gt;
+                    &amp;lt;gmd:keyword&amp;gt;
+                        &amp;lt;gmx:Anchor xlink:href=&amp;quot;http://vocab.nerc.ac.uk/collection/P07/current/CFSN0374/&amp;quot;&amp;gt;sea_surface_height_above_geoid&amp;lt;/gmx:Anchor&amp;gt;
+                    &amp;lt;/gmd:keyword&amp;gt;
+                    &amp;lt;gmd:type&amp;gt;
+                        &amp;lt;gmd:MD_KeywordTypeCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode&amp;quot; codeListValue=&amp;quot;parameter&amp;quot;&amp;gt;&amp;lt;/gmd:MD_KeywordTypeCode&amp;gt;
+                    &amp;lt;/gmd:type&amp;gt;
+                    &amp;lt;gmd:thesaurusName&amp;gt;
+                        &amp;lt;gmd:CI_Citation&amp;gt;
+                            &amp;lt;gmd:title&amp;gt;
+&amp;lt;gmx:Anchor xlink:href=&amp;quot;http://vocab.nerc.ac.uk/collection/P07/current/&amp;quot;&amp;gt;Climate and Forecast Standard Names&amp;lt;/gmx:Anchor&amp;gt;
+                            &amp;lt;/gmd:title&amp;gt;
+                            &amp;lt;gmd:date&amp;gt;
+&amp;lt;gmd:CI_Date&amp;gt;
+    &amp;lt;gmd:date&amp;gt;
+        &amp;lt;gco:Date&amp;gt;2017-04-04&amp;lt;/gco:Date&amp;gt;
+    &amp;lt;/gmd:date&amp;gt;
+    &amp;lt;gmd:dateType&amp;gt;
+        &amp;lt;gmd:CI_DateTypeCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode&amp;quot; codeListValue=&amp;quot;publication&amp;quot;&amp;gt;&amp;lt;/gmd:CI_DateTypeCode&amp;gt;
+    &amp;lt;/gmd:dateType&amp;gt;
+&amp;lt;/gmd:CI_Date&amp;gt;
+                            &amp;lt;/gmd:date&amp;gt;
+                            &amp;lt;gmd:identifier&amp;gt;
+&amp;lt;gmd:MD_Identifier&amp;gt;
+    &amp;lt;gmd:code&amp;gt;
+        &amp;lt;gmx:Anchor xlink:href=&amp;quot;https://sextant.ifremer.fr/geonetwork/srv/api/registries/vocabularies/external.parameter.myocean.ocean-variables&amp;quot;&amp;gt;geonetwork.thesaurus.external.parameter.myocean.ocean-variables&amp;lt;/gmx:Anchor&amp;gt;
+    &amp;lt;/gmd:code&amp;gt;
+&amp;lt;/gmd:MD_Identifier&amp;gt;
+                            &amp;lt;/gmd:identifier&amp;gt;
+                        &amp;lt;/gmd:CI_Citation&amp;gt;
+                    &amp;lt;/gmd:thesaurusName&amp;gt;
+                &amp;lt;/gmd:MD_Keywords&amp;gt;
+            &amp;lt;/gmd:descriptiveKeywords&amp;gt;
+            &amp;lt;gmd:descriptiveKeywords&amp;gt;
+                &amp;lt;gmd:MD_Keywords&amp;gt;
+                    &amp;lt;gmd:keyword&amp;gt;
+                        &amp;lt;gmx:Anchor xlink:href=&amp;quot;https://vocab.ifremer.fr/scheme/SXT/myocean.temporal-scale/dc220820-f871-4383-b54e-e3a05e26ab7f&amp;quot;&amp;gt;multi-year&amp;lt;/gmx:Anchor&amp;gt;
+                    &amp;lt;/gmd:keyword&amp;gt;
+                    &amp;lt;gmd:type&amp;gt;
+                        &amp;lt;gmd:MD_KeywordTypeCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode&amp;quot; codeListValue=&amp;quot;temporal-scale&amp;quot;&amp;gt;&amp;lt;/gmd:MD_KeywordTypeCode&amp;gt;
+                    &amp;lt;/gmd:type&amp;gt;
+                    &amp;lt;gmd:thesaurusName&amp;gt;
+                        &amp;lt;gmd:CI_Citation&amp;gt;
+                            &amp;lt;gmd:title&amp;gt;
+&amp;lt;gmx:Anchor xlink:href=&amp;quot;https://vocab.ifremer.fr/scheme/SXT/myocean.temporal-scale&amp;quot;&amp;gt;Temporal scale&amp;lt;/gmx:Anchor&amp;gt;
+                            &amp;lt;/gmd:title&amp;gt;
+                            &amp;lt;gmd:date&amp;gt;
+&amp;lt;gmd:CI_Date&amp;gt;
+    &amp;lt;gmd:date&amp;gt;
+        &amp;lt;gco:Date&amp;gt;2023-03-16&amp;lt;/gco:Date&amp;gt;
+    &amp;lt;/gmd:date&amp;gt;
+    &amp;lt;gmd:dateType&amp;gt;
+        &amp;lt;gmd:CI_DateTypeCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode&amp;quot; codeListValue=&amp;quot;publication&amp;quot;&amp;gt;&amp;lt;/gmd:CI_DateTypeCode&amp;gt;
+    &amp;lt;/gmd:dateType&amp;gt;
+&amp;lt;/gmd:CI_Date&amp;gt;
+                            &amp;lt;/gmd:date&amp;gt;
+                            &amp;lt;gmd:identifier&amp;gt;
+&amp;lt;gmd:MD_Identifier&amp;gt;
+    &amp;lt;gmd:code&amp;gt;
+        &amp;lt;gmx:Anchor xlink:href=&amp;quot;https://sextant.ifremer.fr/geonetwork/srv/api/registries/vocabularies/local.temporal-scale.myocean.temporal-scale&amp;quot;&amp;gt;geonetwork.thesaurus.local.temporal-scale.myocean.temporal-scale&amp;lt;/gmx:Anchor&amp;gt;
+    &amp;lt;/gmd:code&amp;gt;
+&amp;lt;/gmd:MD_Identifier&amp;gt;
+                            &amp;lt;/gmd:identifier&amp;gt;
+                        &amp;lt;/gmd:CI_Citation&amp;gt;
+                    &amp;lt;/gmd:thesaurusName&amp;gt;
+                &amp;lt;/gmd:MD_Keywords&amp;gt;
+            &amp;lt;/gmd:descriptiveKeywords&amp;gt;
+            &amp;lt;gmd:descriptiveKeywords&amp;gt;
+                &amp;lt;gmd:MD_Keywords&amp;gt;
+                    &amp;lt;gmd:keyword&amp;gt;
+                        &amp;lt;gmx:Anchor xlink:href=&amp;quot;https://vocab.ifremer.fr/scheme/SXT/myocean.area-of-benefit/8c77fb97-7415-45d6-8cf2-a90686ef7032&amp;quot;&amp;gt;weather-climate-and-seasonal-forecasting&amp;lt;/gmx:Anchor&amp;gt;
+                    &amp;lt;/gmd:keyword&amp;gt;
+                    &amp;lt;gmd:keyword&amp;gt;
+                        &amp;lt;gmx:Anchor xlink:href=&amp;quot;https://vocab.ifremer.fr/scheme/SXT/myocean.area-of-benefit/361657b6-6b9e-40f5-b75f-0d50e6ccd2fe&amp;quot;&amp;gt;marine-resources&amp;lt;/gmx:Anchor&amp;gt;
+                    &amp;lt;/gmd:keyword&amp;gt;
+                    &amp;lt;gmd:keyword&amp;gt;
+                        &amp;lt;gmx:Anchor xlink:href=&amp;quot;https://vocab.ifremer.fr/scheme/SXT/myocean.area-of-benefit/440849d3-a62f-428e-b679-c815afd74084&amp;quot;&amp;gt;coastal-marine-environment&amp;lt;/gmx:Anchor&amp;gt;
+                    &amp;lt;/gmd:keyword&amp;gt;
+                    &amp;lt;gmd:keyword&amp;gt;
+                        &amp;lt;gmx:Anchor xlink:href=&amp;quot;https://vocab.ifremer.fr/scheme/SXT/myocean.area-of-benefit/2e1374cd-3cce-4955-abc7-aa448a4e8c53&amp;quot;&amp;gt;marine-safety&amp;lt;/gmx:Anchor&amp;gt;
+                    &amp;lt;/gmd:keyword&amp;gt;
+                    &amp;lt;gmd:type&amp;gt;
+                        &amp;lt;gmd:MD_KeywordTypeCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode&amp;quot; codeListValue=&amp;quot;area-of-benefit&amp;quot;&amp;gt;&amp;lt;/gmd:MD_KeywordTypeCode&amp;gt;
+                    &amp;lt;/gmd:type&amp;gt;
+                    &amp;lt;gmd:thesaurusName&amp;gt;
+                        &amp;lt;gmd:CI_Citation&amp;gt;
+                            &amp;lt;gmd:title&amp;gt;
+&amp;lt;gmx:Anchor xlink:href=&amp;quot;https://vocab.ifremer.fr/scheme/SXT/myocean.area-of-benefit&amp;quot;&amp;gt;Area of benefit&amp;lt;/gmx:Anchor&amp;gt;
+                            &amp;lt;/gmd:title&amp;gt;
+                            &amp;lt;gmd:date&amp;gt;
+&amp;lt;gmd:CI_Date&amp;gt;
+    &amp;lt;gmd:date&amp;gt;
+        &amp;lt;gco:Date&amp;gt;2023-03-16&amp;lt;/gco:Date&amp;gt;
+    &amp;lt;/gmd:date&amp;gt;
+    &amp;lt;gmd:dateType&amp;gt;
+        &amp;lt;gmd:CI_DateTypeCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode&amp;quot; codeListValue=&amp;quot;publication&amp;quot;&amp;gt;&amp;lt;/gmd:CI_DateTypeCode&amp;gt;
+    &amp;lt;/gmd:dateType&amp;gt;
+&amp;lt;/gmd:CI_Date&amp;gt;
+                            &amp;lt;/gmd:date&amp;gt;
+                            &amp;lt;gmd:identifier&amp;gt;
+&amp;lt;gmd:MD_Identifier&amp;gt;
+    &amp;lt;gmd:code&amp;gt;
+        &amp;lt;gmx:Anchor xlink:href=&amp;quot;https://sextant.ifremer.fr/geonetwork/srv/api/registries/vocabularies/local.area-of-benefit.myocean.area-of-benefit&amp;quot;&amp;gt;geonetwork.thesaurus.local.area-of-benefit.myocean.area-of-benefit&amp;lt;/gmx:Anchor&amp;gt;
+    &amp;lt;/gmd:code&amp;gt;
+&amp;lt;/gmd:MD_Identifier&amp;gt;
+                            &amp;lt;/gmd:identifier&amp;gt;
+                        &amp;lt;/gmd:CI_Citation&amp;gt;
+                    &amp;lt;/gmd:thesaurusName&amp;gt;
+                &amp;lt;/gmd:MD_Keywords&amp;gt;
+            &amp;lt;/gmd:descriptiveKeywords&amp;gt;
+            &amp;lt;gmd:descriptiveKeywords&amp;gt;
+                &amp;lt;gmd:MD_Keywords&amp;gt;
+                    &amp;lt;gmd:keyword&amp;gt;
+                        &amp;lt;gmx:Anchor xlink:href=&amp;quot;https://vocab.ifremer.fr/scheme/SXT/myocean.reference-geographical-area/e66ceb40-9449-44a9-8b3f-dc1cdc379506&amp;quot;&amp;gt;arctic-ocean&amp;lt;/gmx:Anchor&amp;gt;
+                    &amp;lt;/gmd:keyword&amp;gt;
+                    &amp;lt;gmd:keyword&amp;gt;
+                        &amp;lt;gmx:Anchor xlink:href=&amp;quot;https://vocab.ifremer.fr/scheme/SXT/myocean.reference-geographical-area/bf2c2f16-3f48-4104-89c1-7269317d03ce&amp;quot;&amp;gt;north-west-shelf-seas&amp;lt;/gmx:Anchor&amp;gt;
+                    &amp;lt;/gmd:keyword&amp;gt;
+                    &amp;lt;gmd:keyword&amp;gt;
+                        &amp;lt;gmx:Anchor xlink:href=&amp;quot;https://vocab.ifremer.fr/scheme/SXT/myocean.reference-geographical-area/af963abd-2ecb-459d-9622-db1f22999b27&amp;quot;&amp;gt;iberian-biscay-irish-seas&amp;lt;/gmx:Anchor&amp;gt;
+                    &amp;lt;/gmd:keyword&amp;gt;
+                    &amp;lt;gmd:keyword&amp;gt;
+                        &amp;lt;gmx:Anchor xlink:href=&amp;quot;https://vocab.ifremer.fr/scheme/SXT/myocean.reference-geographical-area/0ea3d280-b1f1-4d12-9037-6acb6104b4b3&amp;quot;&amp;gt;global-ocean&amp;lt;/gmx:Anchor&amp;gt;
+                    &amp;lt;/gmd:keyword&amp;gt;
+                    &amp;lt;gmd:keyword&amp;gt;
+                        &amp;lt;gmx:Anchor xlink:href=&amp;quot;https://vocab.ifremer.fr/scheme/SXT/myocean.reference-geographical-area/d9a03423-c641-4eaf-a184-4c1767033fa5&amp;quot;&amp;gt;baltic-sea&amp;lt;/gmx:Anchor&amp;gt;
+                    &amp;lt;/gmd:keyword&amp;gt;
+                    &amp;lt;gmd:type&amp;gt;
+                        &amp;lt;gmd:MD_KeywordTypeCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode&amp;quot; codeListValue=&amp;quot;reference-geographical-area&amp;quot;&amp;gt;&amp;lt;/gmd:MD_KeywordTypeCode&amp;gt;
+                    &amp;lt;/gmd:type&amp;gt;
+                    &amp;lt;gmd:thesaurusName&amp;gt;
+                        &amp;lt;gmd:CI_Citation&amp;gt;
+                            &amp;lt;gmd:title&amp;gt;
+&amp;lt;gmx:Anchor xlink:href=&amp;quot;https://vocab.ifremer.fr/scheme/SXT/myocean.reference-geographical-area&amp;quot;&amp;gt;Reference Geographical Areas&amp;lt;/gmx:Anchor&amp;gt;
+                            &amp;lt;/gmd:title&amp;gt;
+                            &amp;lt;gmd:date&amp;gt;
+&amp;lt;gmd:CI_Date&amp;gt;
+    &amp;lt;gmd:date&amp;gt;
+        &amp;lt;gco:Date&amp;gt;2023-03-16&amp;lt;/gco:Date&amp;gt;
+    &amp;lt;/gmd:date&amp;gt;
+    &amp;lt;gmd:dateType&amp;gt;
+        &amp;lt;gmd:CI_DateTypeCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode&amp;quot; codeListValue=&amp;quot;publication&amp;quot;&amp;gt;&amp;lt;/gmd:CI_DateTypeCode&amp;gt;
+    &amp;lt;/gmd:dateType&amp;gt;
+&amp;lt;/gmd:CI_Date&amp;gt;
+                            &amp;lt;/gmd:date&amp;gt;
+                            &amp;lt;gmd:identifier&amp;gt;
+&amp;lt;gmd:MD_Identifier&amp;gt;
+    &amp;lt;gmd:code&amp;gt;
+        &amp;lt;gmx:Anchor xlink:href=&amp;quot;https://sextant.ifremer.fr/geonetwork/srv/api/registries/vocabularies/local.reference-geographical-area.myocean.reference-geographical-area&amp;quot;&amp;gt;geonetwork.thesaurus.local.reference-geographical-area.myocean.reference-geographical-area&amp;lt;/gmx:Anchor&amp;gt;
+    &amp;lt;/gmd:code&amp;gt;
+&amp;lt;/gmd:MD_Identifier&amp;gt;
+                            &amp;lt;/gmd:identifier&amp;gt;
+                        &amp;lt;/gmd:CI_Citation&amp;gt;
+                    &amp;lt;/gmd:thesaurusName&amp;gt;
+                &amp;lt;/gmd:MD_Keywords&amp;gt;
+            &amp;lt;/gmd:descriptiveKeywords&amp;gt;
+            &amp;lt;gmd:descriptiveKeywords&amp;gt;
+                &amp;lt;gmd:MD_Keywords&amp;gt;
+                    &amp;lt;gmd:keyword&amp;gt;
+                        &amp;lt;gmx:Anchor xlink:href=&amp;quot;https://vocab.ifremer.fr/scheme/SXT/myocean.processing-level/78a4ba97-b2b9-4a16-8680-1eef0bdf8481&amp;quot;&amp;gt;Level 4&amp;lt;/gmx:Anchor&amp;gt;
+                    &amp;lt;/gmd:keyword&amp;gt;
+                    &amp;lt;gmd:type&amp;gt;
+                        &amp;lt;gmd:MD_KeywordTypeCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode&amp;quot; codeListValue=&amp;quot;processing-level&amp;quot;&amp;gt;&amp;lt;/gmd:MD_KeywordTypeCode&amp;gt;
+                    &amp;lt;/gmd:type&amp;gt;
+                    &amp;lt;gmd:thesaurusName&amp;gt;
+                        &amp;lt;gmd:CI_Citation&amp;gt;
+                            &amp;lt;gmd:title&amp;gt;
+&amp;lt;gmx:Anchor xlink:href=&amp;quot;https://vocab.ifremer.fr/scheme/SXT/myocean.processing-level&amp;quot;&amp;gt;Processing level&amp;lt;/gmx:Anchor&amp;gt;
+                            &amp;lt;/gmd:title&amp;gt;
+                            &amp;lt;gmd:date&amp;gt;
+&amp;lt;gmd:CI_Date&amp;gt;
+    &amp;lt;gmd:date&amp;gt;
+        &amp;lt;gco:Date&amp;gt;2023-03-16&amp;lt;/gco:Date&amp;gt;
+    &amp;lt;/gmd:date&amp;gt;
+    &amp;lt;gmd:dateType&amp;gt;
+        &amp;lt;gmd:CI_DateTypeCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode&amp;quot; codeListValue=&amp;quot;publication&amp;quot;&amp;gt;&amp;lt;/gmd:CI_DateTypeCode&amp;gt;
+    &amp;lt;/gmd:dateType&amp;gt;
+&amp;lt;/gmd:CI_Date&amp;gt;
+                            &amp;lt;/gmd:date&amp;gt;
+                            &amp;lt;gmd:identifier&amp;gt;
+&amp;lt;gmd:MD_Identifier&amp;gt;
+    &amp;lt;gmd:code&amp;gt;
+        &amp;lt;gmx:Anchor xlink:href=&amp;quot;https://sextant.ifremer.fr/geonetwork/srv/api/registries/vocabularies/local.processing-level.myocean.processing-level&amp;quot;&amp;gt;geonetwork.thesaurus.local.processing-level.myocean.processing-level&amp;lt;/gmx:Anchor&amp;gt;
+    &amp;lt;/gmd:code&amp;gt;
+&amp;lt;/gmd:MD_Identifier&amp;gt;
+                            &amp;lt;/gmd:identifier&amp;gt;
+                        &amp;lt;/gmd:CI_Citation&amp;gt;
+                    &amp;lt;/gmd:thesaurusName&amp;gt;
+                &amp;lt;/gmd:MD_Keywords&amp;gt;
+            &amp;lt;/gmd:descriptiveKeywords&amp;gt;
+            &amp;lt;gmd:descriptiveKeywords&amp;gt;
+                &amp;lt;gmd:MD_Keywords&amp;gt;
+                    &amp;lt;gmd:keyword&amp;gt;
+                        &amp;lt;gmx:Anchor xlink:href=&amp;quot;http://purl.org/myocean/ontology/vocabulary/model-assimilation#not-applicable&amp;quot;&amp;gt;Not Applicable&amp;lt;/gmx:Anchor&amp;gt;
+                    &amp;lt;/gmd:keyword&amp;gt;
+                    &amp;lt;gmd:type&amp;gt;
+                        &amp;lt;gmd:MD_KeywordTypeCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode&amp;quot; codeListValue=&amp;quot;theme&amp;quot;&amp;gt;&amp;lt;/gmd:MD_KeywordTypeCode&amp;gt;
+                    &amp;lt;/gmd:type&amp;gt;
+                    &amp;lt;gmd:thesaurusName&amp;gt;
+                        &amp;lt;gmd:CI_Citation&amp;gt;
+                            &amp;lt;gmd:title&amp;gt;
+&amp;lt;gmx:Anchor xlink:href=&amp;quot;http://purl.org/myocean/ontology/vocabulary/model-assimilation#&amp;quot;&amp;gt;Model assimilation&amp;lt;/gmx:Anchor&amp;gt;
+                            &amp;lt;/gmd:title&amp;gt;
+                            &amp;lt;gmd:date&amp;gt;
+&amp;lt;gmd:CI_Date&amp;gt;
+    &amp;lt;gmd:date&amp;gt;
+        &amp;lt;gco:Date&amp;gt;2016-02-03&amp;lt;/gco:Date&amp;gt;
+    &amp;lt;/gmd:date&amp;gt;
+    &amp;lt;gmd:dateType&amp;gt;
+        &amp;lt;gmd:CI_DateTypeCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode&amp;quot; codeListValue=&amp;quot;publication&amp;quot;&amp;gt;&amp;lt;/gmd:CI_DateTypeCode&amp;gt;
+    &amp;lt;/gmd:dateType&amp;gt;
+&amp;lt;/gmd:CI_Date&amp;gt;
+                            &amp;lt;/gmd:date&amp;gt;
+                            &amp;lt;gmd:identifier&amp;gt;
+&amp;lt;gmd:MD_Identifier&amp;gt;
+    &amp;lt;gmd:code&amp;gt;
+        &amp;lt;gmx:Anchor xlink:href=&amp;quot;https://sextant.ifremer.fr/geonetwork/srv/api/registries/vocabularies/external.theme.myocean.model-assimilation&amp;quot;&amp;gt;geonetwork.thesaurus.external.theme.myocean.model-assimilation&amp;lt;/gmx:Anchor&amp;gt;
+    &amp;lt;/gmd:code&amp;gt;
+&amp;lt;/gmd:MD_Identifier&amp;gt;
+                            &amp;lt;/gmd:identifier&amp;gt;
+                        &amp;lt;/gmd:CI_Citation&amp;gt;
+                    &amp;lt;/gmd:thesaurusName&amp;gt;
+                &amp;lt;/gmd:MD_Keywords&amp;gt;
+            &amp;lt;/gmd:descriptiveKeywords&amp;gt;
+            &amp;lt;gmd:resourceConstraints&amp;gt;
+                &amp;lt;gmd:MD_LegalConstraints&amp;gt;
+                    &amp;lt;gmd:useLimitation&amp;gt;
+                        &amp;lt;gco:CharacterString&amp;gt;See Copernicus Marine Environment Monitoring Service Data commitments and licence at: http://marine.copernicus.eu/web/27-service-commitments-and-licence.php&amp;lt;/gco:CharacterString&amp;gt;
+                    &amp;lt;/gmd:useLimitation&amp;gt;
+                    &amp;lt;gmd:accessConstraints&amp;gt;
+                        &amp;lt;gmd:MD_RestrictionCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_RestrictionCode&amp;quot; codeListValue=&amp;quot;otherRestrictions&amp;quot;&amp;gt;&amp;lt;/gmd:MD_RestrictionCode&amp;gt;
+                    &amp;lt;/gmd:accessConstraints&amp;gt;
+                    &amp;lt;gmd:useConstraints&amp;gt;
+                        &amp;lt;gmd:MD_RestrictionCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_RestrictionCode&amp;quot; codeListValue=&amp;quot;license&amp;quot;&amp;gt;&amp;lt;/gmd:MD_RestrictionCode&amp;gt;
+                    &amp;lt;/gmd:useConstraints&amp;gt;
+                    &amp;lt;gmd:otherConstraints&amp;gt;
+                        &amp;lt;gco:CharacterString&amp;gt;No limitations on public access&amp;lt;/gco:CharacterString&amp;gt;
+                    &amp;lt;/gmd:otherConstraints&amp;gt;
+                &amp;lt;/gmd:MD_LegalConstraints&amp;gt;
+            &amp;lt;/gmd:resourceConstraints&amp;gt;
+            &amp;lt;gmd:aggregationInfo&amp;gt;
+                &amp;lt;gmd:MD_AggregateInformation&amp;gt;
+                    &amp;lt;gmd:aggregateDataSetIdentifier&amp;gt;
+                        &amp;lt;gmd:MD_Identifier&amp;gt;
+                            &amp;lt;gmd:code&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;04ff75a4-b0f9-4b51-82d9-8ed5c9f7d809&amp;lt;/gco:CharacterString&amp;gt;
+                            &amp;lt;/gmd:code&amp;gt;
+                        &amp;lt;/gmd:MD_Identifier&amp;gt;
+                    &amp;lt;/gmd:aggregateDataSetIdentifier&amp;gt;
+                    &amp;lt;gmd:associationType&amp;gt;
+                        &amp;lt;gmd:DS_AssociationTypeCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#DS_AssociationTypeCode&amp;quot; codeListValue=&amp;quot;crossReference&amp;quot;&amp;gt;&amp;lt;/gmd:DS_AssociationTypeCode&amp;gt;
+                    &amp;lt;/gmd:associationType&amp;gt;
+                    &amp;lt;gmd:initiativeType&amp;gt;
+                        &amp;lt;gmd:DS_InitiativeTypeCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#DS_InitiativeTypeCode&amp;quot; codeListValue=&amp;quot;document&amp;quot;&amp;gt;&amp;lt;/gmd:DS_InitiativeTypeCode&amp;gt;
+                    &amp;lt;/gmd:initiativeType&amp;gt;
+                &amp;lt;/gmd:MD_AggregateInformation&amp;gt;
+            &amp;lt;/gmd:aggregationInfo&amp;gt;
+            &amp;lt;gmd:aggregationInfo&amp;gt;
+                &amp;lt;gmd:MD_AggregateInformation&amp;gt;
+                    &amp;lt;gmd:aggregateDataSetIdentifier&amp;gt;
+                        &amp;lt;gmd:MD_Identifier&amp;gt;
+                            &amp;lt;gmd:code&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;1cfa071a-8562-4d29-95a4-c1fab11d5f3c&amp;lt;/gco:CharacterString&amp;gt;
+                            &amp;lt;/gmd:code&amp;gt;
+                        &amp;lt;/gmd:MD_Identifier&amp;gt;
+                    &amp;lt;/gmd:aggregateDataSetIdentifier&amp;gt;
+                    &amp;lt;gmd:associationType&amp;gt;
+                        &amp;lt;gmd:DS_AssociationTypeCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#DS_AssociationTypeCode&amp;quot; codeListValue=&amp;quot;crossReference&amp;quot;&amp;gt;&amp;lt;/gmd:DS_AssociationTypeCode&amp;gt;
+                    &amp;lt;/gmd:associationType&amp;gt;
+                    &amp;lt;gmd:initiativeType&amp;gt;
+                        &amp;lt;gmd:DS_InitiativeTypeCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#DS_InitiativeTypeCode&amp;quot; codeListValue=&amp;quot;document&amp;quot;&amp;gt;&amp;lt;/gmd:DS_InitiativeTypeCode&amp;gt;
+                    &amp;lt;/gmd:initiativeType&amp;gt;
+                &amp;lt;/gmd:MD_AggregateInformation&amp;gt;
+            &amp;lt;/gmd:aggregationInfo&amp;gt;
+            &amp;lt;gmd:aggregationInfo&amp;gt;
+                &amp;lt;gmd:MD_AggregateInformation&amp;gt;
+                    &amp;lt;gmd:aggregateDataSetIdentifier&amp;gt;
+                        &amp;lt;gmd:MD_Identifier&amp;gt;
+                            &amp;lt;gmd:code&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;d611f7b0-4dbc-48e1-a838-c9a0a68b48d0&amp;lt;/gco:CharacterString&amp;gt;
+                            &amp;lt;/gmd:code&amp;gt;
+                        &amp;lt;/gmd:MD_Identifier&amp;gt;
+                    &amp;lt;/gmd:aggregateDataSetIdentifier&amp;gt;
+                    &amp;lt;gmd:associationType&amp;gt;
+                        &amp;lt;gmd:DS_AssociationTypeCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#DS_AssociationTypeCode&amp;quot; codeListValue=&amp;quot;crossReference&amp;quot;&amp;gt;&amp;lt;/gmd:DS_AssociationTypeCode&amp;gt;
+                    &amp;lt;/gmd:associationType&amp;gt;
+                    &amp;lt;gmd:initiativeType&amp;gt;
+                        &amp;lt;gmd:DS_InitiativeTypeCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#DS_InitiativeTypeCode&amp;quot; codeListValue=&amp;quot;document&amp;quot;&amp;gt;&amp;lt;/gmd:DS_InitiativeTypeCode&amp;gt;
+                    &amp;lt;/gmd:initiativeType&amp;gt;
+                &amp;lt;/gmd:MD_AggregateInformation&amp;gt;
+            &amp;lt;/gmd:aggregationInfo&amp;gt;
+            &amp;lt;gmd:language&amp;gt;
+                &amp;lt;gco:CharacterString&amp;gt;eng&amp;lt;/gco:CharacterString&amp;gt;
+            &amp;lt;/gmd:language&amp;gt;
+            &amp;lt;gmd:topicCategory&amp;gt;
+                &amp;lt;gmd:MD_TopicCategoryCode&amp;gt;oceans&amp;lt;/gmd:MD_TopicCategoryCode&amp;gt;
+            &amp;lt;/gmd:topicCategory&amp;gt;
+            &amp;lt;gmd:extent&amp;gt;
+                &amp;lt;gmd:EX_Extent&amp;gt;
+                    &amp;lt;gmd:description&amp;gt;
+                        &amp;lt;gco:CharacterString&amp;gt;bounding box&amp;lt;/gco:CharacterString&amp;gt;
+                    &amp;lt;/gmd:description&amp;gt;
+                    &amp;lt;gmd:geographicElement&amp;gt;
+                        &amp;lt;gmd:EX_GeographicBoundingBox&amp;gt;
+                            &amp;lt;gmd:westBoundLongitude&amp;gt;
+&amp;lt;gco:Decimal&amp;gt;-180.00&amp;lt;/gco:Decimal&amp;gt;
+                            &amp;lt;/gmd:westBoundLongitude&amp;gt;
+                            &amp;lt;gmd:eastBoundLongitude&amp;gt;
+&amp;lt;gco:Decimal&amp;gt;180.00&amp;lt;/gco:Decimal&amp;gt;
+                            &amp;lt;/gmd:eastBoundLongitude&amp;gt;
+                            &amp;lt;gmd:southBoundLatitude&amp;gt;
+&amp;lt;gco:Decimal&amp;gt;-90.00&amp;lt;/gco:Decimal&amp;gt;
+                            &amp;lt;/gmd:southBoundLatitude&amp;gt;
+                            &amp;lt;gmd:northBoundLatitude&amp;gt;
+&amp;lt;gco:Decimal&amp;gt;90.00&amp;lt;/gco:Decimal&amp;gt;
+                            &amp;lt;/gmd:northBoundLatitude&amp;gt;
+                        &amp;lt;/gmd:EX_GeographicBoundingBox&amp;gt;
+                    &amp;lt;/gmd:geographicElement&amp;gt;
+                    &amp;lt;gmd:temporalElement&amp;gt;
+                        &amp;lt;gmd:EX_TemporalExtent&amp;gt;
+                            &amp;lt;gmd:extent&amp;gt;
+&amp;lt;gml:TimePeriod gml:id=&amp;quot;d1185275e861a1051934&amp;quot;&amp;gt;
+    &amp;lt;gml:description&amp;gt;&amp;lt;/gml:description&amp;gt;
+    &amp;lt;gml:beginPosition&amp;gt;1993-01-01&amp;lt;/gml:beginPosition&amp;gt;
+    &amp;lt;gml:endPosition&amp;gt;2020-12-31&amp;lt;/gml:endPosition&amp;gt;
+&amp;lt;/gml:TimePeriod&amp;gt;
+                            &amp;lt;/gmd:extent&amp;gt;
+                        &amp;lt;/gmd:EX_TemporalExtent&amp;gt;
+                    &amp;lt;/gmd:temporalElement&amp;gt;
+                    &amp;lt;gmd:verticalElement&amp;gt;
+                        &amp;lt;gmd:EX_VerticalExtent&amp;gt;
+                            &amp;lt;gmd:minimumValue/&amp;gt;
+                            &amp;lt;gmd:maximumValue/&amp;gt;
+                            &amp;lt;gmd:verticalCRS uuidref=&amp;quot;urn:ogc:def:crs:EPSG:5714&amp;quot;/&amp;gt;
+                        &amp;lt;/gmd:EX_VerticalExtent&amp;gt;
+                    &amp;lt;/gmd:verticalElement&amp;gt;
+                &amp;lt;/gmd:EX_Extent&amp;gt;
+            &amp;lt;/gmd:extent&amp;gt;
+            &amp;lt;gmd:supplementalInformation&amp;gt;
+                &amp;lt;gco:CharacterString&amp;gt;display priority: 10055&amp;lt;/gco:CharacterString&amp;gt;
+            &amp;lt;/gmd:supplementalInformation&amp;gt;
+        &amp;lt;/gmd:MD_DataIdentification&amp;gt;
+    &amp;lt;/gmd:identificationInfo&amp;gt;
+    &amp;lt;gmd:contentInfo&amp;gt;
+        &amp;lt;gmd:MD_CoverageDescription&amp;gt;
+            &amp;lt;gmd:attributeDescription&amp;gt;
+                &amp;lt;gco:RecordType&amp;gt;observation&amp;lt;/gco:RecordType&amp;gt;
+            &amp;lt;/gmd:attributeDescription&amp;gt;
+            &amp;lt;gmd:contentType&amp;gt;
+                &amp;lt;gmd:MD_CoverageContentTypeCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_CoverageContentTypeCode&amp;quot; codeListValue=&amp;quot;physicalMeasurement&amp;quot;&amp;gt;&amp;lt;/gmd:MD_CoverageContentTypeCode&amp;gt;
+            &amp;lt;/gmd:contentType&amp;gt;
+            &amp;lt;gmd:dimension&amp;gt;
+                &amp;lt;gmd:MD_RangeDimension&amp;gt;
+                    &amp;lt;gmd:descriptor&amp;gt;
+                        &amp;lt;gco:CharacterString&amp;gt;temporal resolution: daily instantaneous&amp;lt;/gco:CharacterString&amp;gt;
+                    &amp;lt;/gmd:descriptor&amp;gt;
+                &amp;lt;/gmd:MD_RangeDimension&amp;gt;
+            &amp;lt;/gmd:dimension&amp;gt;
+            &amp;lt;gmd:dimension&amp;gt;
+                &amp;lt;gmd:MD_RangeDimension&amp;gt;
+                    &amp;lt;gmd:descriptor&amp;gt;
+                        &amp;lt;gco:CharacterString&amp;gt;vertical level number: 1&amp;lt;/gco:CharacterString&amp;gt;
+                    &amp;lt;/gmd:descriptor&amp;gt;
+                &amp;lt;/gmd:MD_RangeDimension&amp;gt;
+            &amp;lt;/gmd:dimension&amp;gt;
+        &amp;lt;/gmd:MD_CoverageDescription&amp;gt;
+    &amp;lt;/gmd:contentInfo&amp;gt;
+    &amp;lt;gmd:contentInfo&amp;gt;
+        &amp;lt;gmd:MD_FeatureCatalogueDescription&amp;gt;
+            &amp;lt;gmd:includedWithDataset&amp;gt;
+                &amp;lt;gco:Boolean&amp;gt;false&amp;lt;/gco:Boolean&amp;gt;
+            &amp;lt;/gmd:includedWithDataset&amp;gt;
+            &amp;lt;gmd:featureTypes&amp;gt;
+                &amp;lt;gco:LocalName codeSpace=&amp;quot;http://purl.org/myocean/ontology/vocabulary/feature-type#Grid&amp;quot;&amp;gt;Grid&amp;lt;/gco:LocalName&amp;gt;
+            &amp;lt;/gmd:featureTypes&amp;gt;
+            &amp;lt;gmd:featureCatalogueCitation/&amp;gt;
+        &amp;lt;/gmd:MD_FeatureCatalogueDescription&amp;gt;
+    &amp;lt;/gmd:contentInfo&amp;gt;
+    &amp;lt;gmd:contentInfo&amp;gt;
+        &amp;lt;gmd:MD_CoverageDescription&amp;gt;
+            &amp;lt;gmd:attributeDescription&amp;gt;
+                &amp;lt;gco:RecordType xlink:href=&amp;quot;http://vocab.nerc.ac.uk/collection/P07/current/CFV8NS5/&amp;quot; xlink:title=&amp;quot;surface_geostrophic_northward_sea_water_velocity_assuming_sea_level_for_geoid&amp;quot;&amp;gt;surface_geostrophic_northward_sea_water_velocity_assuming_sea_level_for_geoid&amp;lt;/gco:RecordType&amp;gt;
+            &amp;lt;/gmd:attributeDescription&amp;gt;
+            &amp;lt;gmd:contentType&amp;gt;
+                &amp;lt;gmd:MD_CoverageContentTypeCode codeList=&amp;quot;http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode&amp;quot; codeListValue=&amp;quot;physicalMeasurement&amp;quot; codeSpace=&amp;quot;ISOTC211/19115&amp;quot;&amp;gt;physicalMeasurement&amp;lt;/gmd:MD_CoverageContentTypeCode&amp;gt;
+            &amp;lt;/gmd:contentType&amp;gt;
+        &amp;lt;/gmd:MD_CoverageDescription&amp;gt;
+    &amp;lt;/gmd:contentInfo&amp;gt;
+    &amp;lt;gmd:contentInfo&amp;gt;
+        &amp;lt;gmd:MD_CoverageDescription&amp;gt;
+            &amp;lt;gmd:attributeDescription&amp;gt;
+                &amp;lt;gco:RecordType xlink:href=&amp;quot;http://vocab.nerc.ac.uk/collection/P07/current/CFV8NS3/&amp;quot; xlink:title=&amp;quot;surface_geostrophic_eastward_sea_water_velocity_assuming_sea_level_for_geoid&amp;quot;&amp;gt;surface_geostrophic_eastward_sea_water_velocity_assuming_sea_level_for_geoid&amp;lt;/gco:RecordType&amp;gt;
+            &amp;lt;/gmd:attributeDescription&amp;gt;
+            &amp;lt;gmd:contentType&amp;gt;
+                &amp;lt;gmd:MD_CoverageContentTypeCode codeList=&amp;quot;http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode&amp;quot; codeListValue=&amp;quot;physicalMeasurement&amp;quot; codeSpace=&amp;quot;ISOTC211/19115&amp;quot;&amp;gt;physicalMeasurement&amp;lt;/gmd:MD_CoverageContentTypeCode&amp;gt;
+            &amp;lt;/gmd:contentType&amp;gt;
+        &amp;lt;/gmd:MD_CoverageDescription&amp;gt;
+    &amp;lt;/gmd:contentInfo&amp;gt;
+    &amp;lt;gmd:contentInfo&amp;gt;
+        &amp;lt;gmd:MD_CoverageDescription&amp;gt;
+            &amp;lt;gmd:attributeDescription&amp;gt;
+                &amp;lt;gco:RecordType xlink:href=&amp;quot;http://vocab.nerc.ac.uk/collection/P07/current/CFV8NS2/&amp;quot; xlink:title=&amp;quot;surface_geostrophic_eastward_sea_water_velocity&amp;quot;&amp;gt;surface_geostrophic_eastward_sea_water_velocity&amp;lt;/gco:RecordType&amp;gt;
+            &amp;lt;/gmd:attributeDescription&amp;gt;
+            &amp;lt;gmd:contentType&amp;gt;
+                &amp;lt;gmd:MD_CoverageContentTypeCode codeList=&amp;quot;http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode&amp;quot; codeListValue=&amp;quot;physicalMeasurement&amp;quot; codeSpace=&amp;quot;ISOTC211/19115&amp;quot;&amp;gt;physicalMeasurement&amp;lt;/gmd:MD_CoverageContentTypeCode&amp;gt;
+            &amp;lt;/gmd:contentType&amp;gt;
+        &amp;lt;/gmd:MD_CoverageDescription&amp;gt;
+    &amp;lt;/gmd:contentInfo&amp;gt;
+    &amp;lt;gmd:contentInfo&amp;gt;
+        &amp;lt;gmd:MD_CoverageDescription&amp;gt;
+            &amp;lt;gmd:attributeDescription&amp;gt;
+                &amp;lt;gco:RecordType xlink:href=&amp;quot;http://vocab.nerc.ac.uk/collection/P07/current/CFV8NS4/&amp;quot; xlink:title=&amp;quot;surface_geostrophic_northward_sea_water_velocity&amp;quot;&amp;gt;surface_geostrophic_northward_sea_water_velocity&amp;lt;/gco:RecordType&amp;gt;
+            &amp;lt;/gmd:attributeDescription&amp;gt;
+            &amp;lt;gmd:contentType&amp;gt;
+                &amp;lt;gmd:MD_CoverageContentTypeCode codeList=&amp;quot;http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode&amp;quot; codeListValue=&amp;quot;physicalMeasurement&amp;quot; codeSpace=&amp;quot;ISOTC211/19115&amp;quot;&amp;gt;physicalMeasurement&amp;lt;/gmd:MD_CoverageContentTypeCode&amp;gt;
+            &amp;lt;/gmd:contentType&amp;gt;
+        &amp;lt;/gmd:MD_CoverageDescription&amp;gt;
+    &amp;lt;/gmd:contentInfo&amp;gt;
+    &amp;lt;gmd:contentInfo&amp;gt;
+        &amp;lt;gmd:MD_CoverageDescription&amp;gt;
+            &amp;lt;gmd:attributeDescription&amp;gt;
+                &amp;lt;gco:RecordType xlink:href=&amp;quot;http://vocab.nerc.ac.uk/collection/P07/current/CFSN0375/&amp;quot; xlink:title=&amp;quot;sea_surface_height_above_sea_level&amp;quot;&amp;gt;sea_surface_height_above_sea_level&amp;lt;/gco:RecordType&amp;gt;
+            &amp;lt;/gmd:attributeDescription&amp;gt;
+            &amp;lt;gmd:contentType&amp;gt;
+                &amp;lt;gmd:MD_CoverageContentTypeCode codeList=&amp;quot;http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode&amp;quot; codeListValue=&amp;quot;physicalMeasurement&amp;quot; codeSpace=&amp;quot;ISOTC211/19115&amp;quot;&amp;gt;physicalMeasurement&amp;lt;/gmd:MD_CoverageContentTypeCode&amp;gt;
+            &amp;lt;/gmd:contentType&amp;gt;
+        &amp;lt;/gmd:MD_CoverageDescription&amp;gt;
+    &amp;lt;/gmd:contentInfo&amp;gt;
+    &amp;lt;gmd:contentInfo&amp;gt;
+        &amp;lt;gmd:MD_CoverageDescription&amp;gt;
+            &amp;lt;gmd:attributeDescription&amp;gt;
+                &amp;lt;gco:RecordType xlink:href=&amp;quot;http://vocab.nerc.ac.uk/collection/P07/current/CFSN0374/&amp;quot; xlink:title=&amp;quot;sea_surface_height_above_geoid&amp;quot;&amp;gt;sea_surface_height_above_geoid&amp;lt;/gco:RecordType&amp;gt;
+            &amp;lt;/gmd:attributeDescription&amp;gt;
+            &amp;lt;gmd:contentType&amp;gt;
+                &amp;lt;gmd:MD_CoverageContentTypeCode codeList=&amp;quot;http://www.isotc211.org/2005/resources/codeList.xml#MD_CoverageContentTypeCode&amp;quot; codeListValue=&amp;quot;physicalMeasurement&amp;quot; codeSpace=&amp;quot;ISOTC211/19115&amp;quot;&amp;gt;physicalMeasurement&amp;lt;/gmd:MD_CoverageContentTypeCode&amp;gt;
+            &amp;lt;/gmd:contentType&amp;gt;
+        &amp;lt;/gmd:MD_CoverageDescription&amp;gt;
+    &amp;lt;/gmd:contentInfo&amp;gt;
+    &amp;lt;gmd:distributionInfo&amp;gt;
+        &amp;lt;gmd:MD_Distribution&amp;gt;
+            &amp;lt;gmd:distributionFormat&amp;gt;
+                &amp;lt;gmd:MD_Format&amp;gt;
+                    &amp;lt;gmd:name&amp;gt;
+                        &amp;lt;gco:CharacterString&amp;gt;NetCDF-4&amp;lt;/gco:CharacterString&amp;gt;
+                    &amp;lt;/gmd:name&amp;gt;
+                    &amp;lt;gmd:version gco:nilReason=&amp;quot;unknown&amp;quot;&amp;gt;
+                        &amp;lt;gco:CharacterString&amp;gt;&amp;lt;/gco:CharacterString&amp;gt;
+                    &amp;lt;/gmd:version&amp;gt;
+                &amp;lt;/gmd:MD_Format&amp;gt;
+            &amp;lt;/gmd:distributionFormat&amp;gt;
+            &amp;lt;gmd:transferOptions&amp;gt;
+                &amp;lt;gmd:MD_DigitalTransferOptions&amp;gt;
+                    &amp;lt;gmd:onLine&amp;gt;
+                        &amp;lt;gmd:CI_OnlineResource&amp;gt;
+                            &amp;lt;gmd:linkage&amp;gt;
+&amp;lt;gmd:URL&amp;gt;https://stac.marine.copernicus.eu/metadata/SEALEVEL_GLO_PHY_CLIMATE_L4_MY_008_057/c3s_obs-sl_glo_phy-ssh_my_twosat-l4-duacs-0.25deg_P1D_202112/dataset.stac.json&amp;lt;/gmd:URL&amp;gt;
+                            &amp;lt;/gmd:linkage&amp;gt;
+                            &amp;lt;gmd:protocol&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;WWW:STAC&amp;lt;/gco:CharacterString&amp;gt;
+                            &amp;lt;/gmd:protocol&amp;gt;
+                            &amp;lt;gmd:name&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;c3s_obs-sl_glo_phy-ssh_my_twosat-l4-duacs-0.25deg_P1D&amp;lt;/gco:CharacterString&amp;gt;
+                            &amp;lt;/gmd:name&amp;gt;
+                            &amp;lt;gmd:description&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;For accessing native data and Analysis-ready Cloud-optimized data services, consult this STAC metadata endpoint&amp;lt;/gco:CharacterString&amp;gt;
+                            &amp;lt;/gmd:description&amp;gt;
+                        &amp;lt;/gmd:CI_OnlineResource&amp;gt;
+                    &amp;lt;/gmd:onLine&amp;gt;
+                    &amp;lt;gmd:onLine&amp;gt;
+                        &amp;lt;gmd:CI_OnlineResource&amp;gt;
+                            &amp;lt;gmd:linkage&amp;gt;
+&amp;lt;gmd:URL&amp;gt;https://stac.marine.copernicus.eu/metadata/SEALEVEL_GLO_PHY_CLIMATE_L4_MY_008_057/c3s_obs-sl_glo_phy-ssh_myint_twosat-l4-duacs-0.25deg_P1D_202311/dataset.stac.json&amp;lt;/gmd:URL&amp;gt;
+                            &amp;lt;/gmd:linkage&amp;gt;
+                            &amp;lt;gmd:protocol&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;WWW:STAC&amp;lt;/gco:CharacterString&amp;gt;
+                            &amp;lt;/gmd:protocol&amp;gt;
+                            &amp;lt;gmd:name&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;c3s_obs-sl_glo_phy-ssh_myint_twosat-l4-duacs-0.25deg_P1D&amp;lt;/gco:CharacterString&amp;gt;
+                            &amp;lt;/gmd:name&amp;gt;
+                            &amp;lt;gmd:description&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;For accessing native data and Analysis-ready Cloud-optimized data services, consult this STAC metadata endpoint&amp;lt;/gco:CharacterString&amp;gt;
+                            &amp;lt;/gmd:description&amp;gt;
+                        &amp;lt;/gmd:CI_OnlineResource&amp;gt;
+                    &amp;lt;/gmd:onLine&amp;gt;
+                    &amp;lt;gmd:onLine&amp;gt;
+                        &amp;lt;gmd:CI_OnlineResource&amp;gt;
+                            &amp;lt;gmd:linkage&amp;gt;
+&amp;lt;gmd:URL&amp;gt;https://wmts.marine.copernicus.eu/teroWmts/SEALEVEL_GLO_PHY_CLIMATE_L4_MY_008_057/c3s_obs-sl_glo_phy-ssh_myint_twosat-l4-duacs-0.25deg_P1D_202311&amp;lt;/gmd:URL&amp;gt;
+                            &amp;lt;/gmd:linkage&amp;gt;
+                            &amp;lt;gmd:protocol&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;OGC:WMTS&amp;lt;/gco:CharacterString&amp;gt;
+                            &amp;lt;/gmd:protocol&amp;gt;
+                            &amp;lt;gmd:name&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;c3s_obs-sl_glo_phy-ssh_myint_twosat-l4-duacs-0.25deg_P1D&amp;lt;/gco:CharacterString&amp;gt;
+                            &amp;lt;/gmd:name&amp;gt;
+                        &amp;lt;/gmd:CI_OnlineResource&amp;gt;
+                    &amp;lt;/gmd:onLine&amp;gt;
+                &amp;lt;/gmd:MD_DigitalTransferOptions&amp;gt;
+            &amp;lt;/gmd:transferOptions&amp;gt;
+        &amp;lt;/gmd:MD_Distribution&amp;gt;
+    &amp;lt;/gmd:distributionInfo&amp;gt;
+    &amp;lt;gmd:dataQualityInfo&amp;gt;
+        &amp;lt;gmd:DQ_DataQuality&amp;gt;
+            &amp;lt;gmd:scope&amp;gt;
+                &amp;lt;gmd:DQ_Scope&amp;gt;
+                    &amp;lt;gmd:level&amp;gt;
+                        &amp;lt;gmd:MD_ScopeCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_ScopeCode&amp;quot; codeListValue=&amp;quot;series&amp;quot;&amp;gt;&amp;lt;/gmd:MD_ScopeCode&amp;gt;
+                    &amp;lt;/gmd:level&amp;gt;
+                &amp;lt;/gmd:DQ_Scope&amp;gt;
+            &amp;lt;/gmd:scope&amp;gt;
+            &amp;lt;gmd:report&amp;gt;
+                &amp;lt;gmd:DQ_DomainConsistency&amp;gt;
+                    &amp;lt;gmd:result&amp;gt;
+                        &amp;lt;gmd:DQ_ConformanceResult&amp;gt;
+                            &amp;lt;gmd:specification&amp;gt;
+&amp;lt;gmd:CI_Citation&amp;gt;
+    &amp;lt;gmd:title&amp;gt;
+        &amp;lt;gco:CharacterString&amp;gt;COMMISSION REGULATION (EU) No 1089/2010 of 23 November 2010 implementing Directive 2007/2/EC of the European Parliament and of the Council as regards interoperability of spatial data sets and services&amp;lt;/gco:CharacterString&amp;gt;
+    &amp;lt;/gmd:title&amp;gt;
+    &amp;lt;gmd:date&amp;gt;
+        &amp;lt;gmd:CI_Date&amp;gt;
+            &amp;lt;gmd:date&amp;gt;
+                &amp;lt;gco:Date&amp;gt;2010-12-08&amp;lt;/gco:Date&amp;gt;
+            &amp;lt;/gmd:date&amp;gt;
+            &amp;lt;gmd:dateType&amp;gt;
+                &amp;lt;gmd:CI_DateTypeCode codeList=&amp;quot;http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode&amp;quot; codeListValue=&amp;quot;publication&amp;quot;&amp;gt;&amp;lt;/gmd:CI_DateTypeCode&amp;gt;
+            &amp;lt;/gmd:dateType&amp;gt;
+        &amp;lt;/gmd:CI_Date&amp;gt;
+    &amp;lt;/gmd:date&amp;gt;
+&amp;lt;/gmd:CI_Citation&amp;gt;
+                            &amp;lt;/gmd:specification&amp;gt;
+                            &amp;lt;gmd:explanation&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;See the referenced specification&amp;lt;/gco:CharacterString&amp;gt;
+                            &amp;lt;/gmd:explanation&amp;gt;
+                            &amp;lt;gmd:pass gco:nilReason=&amp;quot;unknown&amp;quot;/&amp;gt;
+                        &amp;lt;/gmd:DQ_ConformanceResult&amp;gt;
+                    &amp;lt;/gmd:result&amp;gt;
+                &amp;lt;/gmd:DQ_DomainConsistency&amp;gt;
+            &amp;lt;/gmd:report&amp;gt;
+            &amp;lt;gmd:lineage&amp;gt;
+                &amp;lt;gmd:LI_Lineage&amp;gt;
+                    &amp;lt;gmd:statement&amp;gt;
+                        &amp;lt;gco:CharacterString&amp;gt;The myOcean products depends on other products for production or validation. The detailed list of dependencies is given in ISO19115&amp;apos;s aggregationInfo (ISO19139 Xpath = &amp;quot;gmd:MD_Metadata/gmd:identificationInfo/gmd:aggregationInfo[./gmd:MD_AggregateInformation/gmd:initiativeType/gmd:DS_InitiativeTypeCode/@codeListValue=&amp;apos;upstream-validation&amp;apos; or &amp;apos;upstream-production&amp;apos;]&amp;quot;)&amp;lt;/gco:CharacterString&amp;gt;
+                    &amp;lt;/gmd:statement&amp;gt;
+                &amp;lt;/gmd:LI_Lineage&amp;gt;
+            &amp;lt;/gmd:lineage&amp;gt;
+        &amp;lt;/gmd:DQ_DataQuality&amp;gt;
+    &amp;lt;/gmd:dataQualityInfo&amp;gt;
+&amp;lt;/gmd:MD_Metadata&amp;gt;]]&gt;</gs:metadata>
+  </gs:originalMetadata>
+  <gs:indexesMetadata>
+    <gs:resourceType>DatasetCollection</gs:resourceType>
+    <gs:sourceId>marineID</gs:sourceId>
+    <gs:originalId>0a1cf029-1a8e-4ac0-9d96-95060065e3e8</gs:originalId>
+    <gs:recoveryRemovalToken>22f1c8f6-21e6-4680-901e-a65fd19fb778</gs:recoveryRemovalToken>
+    <gs:privateId>0a1cf029-1a8e-4ac0-9d96-95060065e3e8</gs:privateId>
+    <gs:resourceTimeStamp>2024-12-18T10:25:18.677Z</gs:resourceTimeStamp>
+    <gs:metadataQuality>4</gs:metadataQuality>
+    <gs:abstract>'''Short description:''' 
+
+DUACS delayed-time altimeter gridded maps of sea surface heights and derived variables over the global Ocean (https://cds.climate.copernicus.eu/cdsapp#!/dataset/satellite-sea-level-global?tab=overview). The processing focuses on the stability and homogeneity of the sea level record (based on a stable two-satellite constellation) and the product is dedicated to the monitoring of the sea level long-term evolution for climate applications and the analysis of Ocean/Climate indicators. These products are produced and distributed by the Copernicus Climate Change Service (C3S, https://climate.copernicus.eu/).
+
+'''DOI (product):'''
+https://doi.org/10.48670/moi-00145</gs:abstract>
+    <gs:aggResId>04ff75a4-b0f9-4b51-82d9-8ed5c9f7d809</gs:aggResId>
+    <gs:aggResId>1cfa071a-8562-4d29-95a4-c1fab11d5f3c</gs:aggResId>
+    <gs:aggResId>d611f7b0-4dbc-48e1-a838-c9a0a68b48d0</gs:aggResId>
+    <gs:alternateTitle>SEALEVEL_GLO_PHY_CLIMATE_L4_MY_008_057</gs:alternateTitle>
+    <gs:anyText>0a1cf029-1a8e-4ac0-9d96-95060065e3e8 Copernicus Marine Service product specification CMEMS servicedesk.cmems@mercator-ocean.eu http://marine.copernicus.eu/ 2024-03-25T11:15:24.252Z ISO 19139, MyOcean profile 0.2 2 0.25 0.25 false rectangular EPSG GLOBAL OCEAN GRIDDED L4 SEA SURFACE HEIGHTS AND DERIVED VARIABLES REPROCESSED (COPERNICUS CLIMATE SERVICE) SEALEVEL_GLO_PHY_CLIMATE_L4_MY_008_057 2012-08-26 2.1 2023-11-30 0a1cf029-1a8e-4ac0-9d96-95060065e3e8 '''Short description:''' DUACS delayed-time altimeter gridded maps of sea surface heights and derived variables over the global Ocean (https://cds.climate.copernicus.eu/cdsapp#!/dataset/satellite-sea-level-global?tab=overview). The processing focuses on the stability and homogeneity of the sea level record (based on a stable two-satellite constellation) and the product is dedicated to the monitoring of the sea level long-term evolution for climate applications and the analysis of Ocean/Climate indicators. These products are produced and distributed by the Copernicus Climate Change Service (C3S, https://climate.copernicus.eu/). '''DOI (product):''' https://doi.org/10.48670/moi-00145 E.U. Copernicus Marine Service Information M-Isabelle Pujol SL-CLS-TOULOUSE-FR managementboard-sltac@cls.fr Françoise MERTZ SL-CLS-TOULOUSE-FR servicemanager-sltac@cls.fr servicedesk.cmems@cls.fr SL-CLS-TOULOUSE-FR servicedesk.cmems@cls.fr Guillaume Taburet SL-CLS-TOULOUSE-FR exploitation-duacs@cls.fr Françoise Mertz SL-CLS-TOULOUSE-FR exploitation-duacs@cls.fr P0M0D0H/P0M0D0H N/A https://catalogue.marine.copernicus.eu/documents/IMG/SEALEVEL_GLO_PHY_CLIMATE_L4_MY_008_057.png Oceanographic geographical features GEMET - INSPIRE themes, version 1.0 2009-09-22 satellite-observation Discipline 2023-03-16 geonetwork.thesaurus.local.discipline.myocean.discipline surface_geostrophic_northward_sea_water_velocity_assuming_sea_level_for_geoid surface_geostrophic_eastward_sea_water_velocity_assuming_sea_level_for_geoid surface_geostrophic_eastward_sea_water_velocity surface_geostrophic_northward_sea_water_velocity sea_surface_height_above_sea_level sea_surface_height_above_geoid Climate and Forecast Standard Names 2017-04-04 geonetwork.thesaurus.external.parameter.myocean.ocean-variables multi-year Temporal scale 2023-03-16 geonetwork.thesaurus.local.temporal-scale.myocean.temporal-scale weather-climate-and-seasonal-forecasting marine-resources coastal-marine-environment marine-safety Area of benefit 2023-03-16 geonetwork.thesaurus.local.area-of-benefit.myocean.area-of-benefit arctic-ocean north-west-shelf-seas iberian-biscay-irish-seas global-ocean baltic-sea Reference Geographical Areas 2023-03-16 geonetwork.thesaurus.local.reference-geographical-area.myocean.reference-geographical-area Level 4 Processing level 2023-03-16 geonetwork.thesaurus.local.processing-level.myocean.processing-level Not Applicable Model assimilation 2016-02-03 geonetwork.thesaurus.external.theme.myocean.model-assimilation See Copernicus Marine Environment Monitoring Service Data commitments and licence at: http://marine.copernicus.eu/web/27-service-commitments-and-licence.php No limitations on public access 04ff75a4-b0f9-4b51-82d9-8ed5c9f7d809 1cfa071a-8562-4d29-95a4-c1fab11d5f3c d611f7b0-4dbc-48e1-a838-c9a0a68b48d0 eng oceans bounding box -180.00 180.00 -90.00 90.00 1993-01-01 2020-12-31 display priority: 10055 observation temporal resolution: daily instantaneous vertical level number: 1 false Grid surface_geostrophic_northward_sea_water_velocity_assuming_sea_level_for_geoid physicalMeasurement surface_geostrophic_eastward_sea_water_velocity_assuming_sea_level_for_geoid physicalMeasurement surface_geostrophic_eastward_sea_water_velocity physicalMeasurement surface_geostrophic_northward_sea_water_velocity physicalMeasurement sea_surface_height_above_sea_level physicalMeasurement sea_surface_height_above_geoid physicalMeasurement NetCDF-4 https://stac.marine.copernicus.eu/metadata/SEALEVEL_GLO_PHY_CLIMATE_L4_MY_008_057/c3s_obs-sl_glo_phy-ssh_my_twosat-l4-duacs-0.25deg_P1D_202112/dataset.stac.json WWW:STAC c3s_obs-sl_glo_phy-ssh_my_twosat-l4-duacs-0.25deg_P1D For accessing native data and Analysis-ready Cloud-optimized data services, consult this STAC metadata endpoint https://stac.marine.copernicus.eu/metadata/SEALEVEL_GLO_PHY_CLIMATE_L4_MY_008_057/c3s_obs-sl_glo_phy-ssh_myint_twosat-l4-duacs-0.25deg_P1D_202311/dataset.stac.json WWW:STAC c3s_obs-sl_glo_phy-ssh_myint_twosat-l4-duacs-0.25deg_P1D For accessing native data and Analysis-ready Cloud-optimized data services, consult this STAC metadata endpoint https://wmts.marine.copernicus.eu/teroWmts/SEALEVEL_GLO_PHY_CLIMATE_L4_MY_008_057/c3s_obs-sl_glo_phy-ssh_myint_twosat-l4-duacs-0.25deg_P1D_202311 OGC:WMTS c3s_obs-sl_glo_phy-ssh_myint_twosat-l4-duacs-0.25deg_P1D COMMISSION REGULATION (EU) No 1089/2010 of 23 November 2010 implementing Directive 2007/2/EC of the European Parliament and of the Council as regards interoperability of spatial data sets and services 2010-12-08 See the referenced specification The myOcean products depends on other products for production or validation. The detailed list of dependencies is given in ISO19115's aggregationInfo (ISO19139 Xpath = "gmd:MD_Metadata/gmd:identificationInfo/gmd:aggregationInfo[./gmd:MD_AggregateInformation/gmd:initiativeType/gmd:DS_InitiativeTypeCode/@codeListValue='upstream-validation' or 'upstream-production']")</gs:anyText>
+    <gs:attributeDesc>observation</gs:attributeDesc>
+    <gs:attributeDesc>surface_geostrophic_northward_sea_water_velocity_assuming_sea_level_for_geoid</gs:attributeDesc>
+    <gs:attributeDesc>surface_geostrophic_eastward_sea_water_velocity_assuming_sea_level_for_geoid</gs:attributeDesc>
+    <gs:attributeDesc>surface_geostrophic_eastward_sea_water_velocity</gs:attributeDesc>
+    <gs:attributeDesc>surface_geostrophic_northward_sea_water_velocity</gs:attributeDesc>
+    <gs:attributeDesc>sea_surface_height_above_sea_level</gs:attributeDesc>
+    <gs:attributeDesc>sea_surface_height_above_geoid</gs:attributeDesc>
+    <gs:attributeId>http://vocab.nerc.ac.uk/collection/P07/current/CFV8NS5/</gs:attributeId>
+    <gs:attributeId>http://vocab.nerc.ac.uk/collection/P07/current/CFV8NS3/</gs:attributeId>
+    <gs:attributeId>http://vocab.nerc.ac.uk/collection/P07/current/CFV8NS2/</gs:attributeId>
+    <gs:attributeId>http://vocab.nerc.ac.uk/collection/P07/current/CFV8NS4/</gs:attributeId>
+    <gs:attributeId>http://vocab.nerc.ac.uk/collection/P07/current/CFSN0375/</gs:attributeId>
+    <gs:attributeId>http://vocab.nerc.ac.uk/collection/P07/current/CFSN0374/</gs:attributeId>
+    <gs:attributeTitle>surface_geostrophic_northward_sea_water_velocity_assuming_sea_level_for_geoid</gs:attributeTitle>
+    <gs:attributeTitle>surface_geostrophic_eastward_sea_water_velocity_assuming_sea_level_for_geoid</gs:attributeTitle>
+    <gs:attributeTitle>surface_geostrophic_eastward_sea_water_velocity</gs:attributeTitle>
+    <gs:attributeTitle>surface_geostrophic_northward_sea_water_velocity</gs:attributeTitle>
+    <gs:attributeTitle>sea_surface_height_above_sea_level</gs:attributeTitle>
+    <gs:attributeTitle>sea_surface_height_above_geoid</gs:attributeTitle>
+    <gs:creationDate>2012-08-26</gs:creationDate>
+    <gs:crsAuthority>EPSG</gs:crsAuthority>
+    <gs:crsId>rectangular</gs:crsId>
+    <gs:dataSize>1</gs:dataSize>
+    <gs:dateStamp>2024-03-25T11:15:24.252Z</gs:dateStamp>
+    <gs:fileId>0a1cf029-1a8e-4ac0-9d96-95060065e3e8</gs:fileId>
+    <gs:format>NetCDF-4</gs:format>
+    <gs:hLevelCodeValue>series</gs:hLevelCodeValue>
+    <gs:hasAccessLegalConst>true</gs:hasAccessLegalConst>
+    <gs:hasOtherLegalConst>true</gs:hasOtherLegalConst>
+    <gs:hasSecurityConst>false</gs:hasSecurityConst>
+    <gs:hasUseLegalConst>true</gs:hasUseLegalConst>
+    <gs:inSitu>false</gs:inSitu>
+    <gs:keyword>Oceanographic geographical features</gs:keyword>
+    <gs:keyword>satellite-observation</gs:keyword>
+    <gs:keyword>surface_geostrophic_northward_sea_water_velocity_assuming_sea_level_for_geoid</gs:keyword>
+    <gs:keyword>surface_geostrophic_eastward_sea_water_velocity_assuming_sea_level_for_geoid</gs:keyword>
+    <gs:keyword>surface_geostrophic_eastward_sea_water_velocity</gs:keyword>
+    <gs:keyword>surface_geostrophic_northward_sea_water_velocity</gs:keyword>
+    <gs:keyword>sea_surface_height_above_sea_level</gs:keyword>
+    <gs:keyword>sea_surface_height_above_geoid</gs:keyword>
+    <gs:keyword>multi-year</gs:keyword>
+    <gs:keyword>weather-climate-and-seasonal-forecasting</gs:keyword>
+    <gs:keyword>marine-resources</gs:keyword>
+    <gs:keyword>coastal-marine-environment</gs:keyword>
+    <gs:keyword>marine-safety</gs:keyword>
+    <gs:keyword>arctic-ocean</gs:keyword>
+    <gs:keyword>north-west-shelf-seas</gs:keyword>
+    <gs:keyword>iberian-biscay-irish-seas</gs:keyword>
+    <gs:keyword>global-ocean</gs:keyword>
+    <gs:keyword>baltic-sea</gs:keyword>
+    <gs:keyword>Level 4</gs:keyword>
+    <gs:keyword>Not Applicable</gs:keyword>
+    <gs:keywordBlueCloud>Oceanographic geographical features</gs:keywordBlueCloud>
+    <gs:keywordBlueCloud>satellite-observation</gs:keywordBlueCloud>
+    <gs:keywordBlueCloud>multi-year</gs:keywordBlueCloud>
+    <gs:keywordBlueCloud>weather-climate-and-seasonal-forecasting</gs:keywordBlueCloud>
+    <gs:keywordBlueCloud>marine-resources</gs:keywordBlueCloud>
+    <gs:keywordBlueCloud>coastal-marine-environment</gs:keywordBlueCloud>
+    <gs:keywordBlueCloud>marine-safety</gs:keywordBlueCloud>
+    <gs:keywordBlueCloud>arctic-ocean</gs:keywordBlueCloud>
+    <gs:keywordBlueCloud>north-west-shelf-seas</gs:keywordBlueCloud>
+    <gs:keywordBlueCloud>iberian-biscay-irish-seas</gs:keywordBlueCloud>
+    <gs:keywordBlueCloud>global-ocean</gs:keywordBlueCloud>
+    <gs:keywordBlueCloud>baltic-sea</gs:keywordBlueCloud>
+    <gs:keywordBlueCloud>Level 4</gs:keywordBlueCloud>
+    <gs:keywordBlueCloud>Not Applicable</gs:keywordBlueCloud>
+    <gs:keywordType>theme</gs:keywordType>
+    <gs:keywordType>discipline</gs:keywordType>
+    <gs:keywordType>parameter</gs:keywordType>
+    <gs:keywordType>temporal-scale</gs:keywordType>
+    <gs:keywordType>area-of-benefit</gs:keywordType>
+    <gs:keywordType>reference-geographical-area</gs:keywordType>
+    <gs:keywordType>processing-level</gs:keywordType>
+    <gs:keywordType>theme</gs:keywordType>
+    <gs:keywordURI>http://inspire.ec.europa.eu/theme/of</gs:keywordURI>
+    <gs:keywordURI>https://vocab.ifremer.fr/scheme/SXT/myocean.discipline/a9f2224a-0e1b-4815-9abc-7a7d6ba6fa76</gs:keywordURI>
+    <gs:keywordURI>http://vocab.nerc.ac.uk/collection/P07/current/CFV8NS5/</gs:keywordURI>
+    <gs:keywordURI>http://vocab.nerc.ac.uk/collection/P07/current/CFV8NS3/</gs:keywordURI>
+    <gs:keywordURI>http://vocab.nerc.ac.uk/collection/P07/current/CFV8NS2/</gs:keywordURI>
+    <gs:keywordURI>http://vocab.nerc.ac.uk/collection/P07/current/CFV8NS4/</gs:keywordURI>
+    <gs:keywordURI>http://vocab.nerc.ac.uk/collection/P07/current/CFSN0375/</gs:keywordURI>
+    <gs:keywordURI>http://vocab.nerc.ac.uk/collection/P07/current/CFSN0374/</gs:keywordURI>
+    <gs:keywordURI>https://vocab.ifremer.fr/scheme/SXT/myocean.temporal-scale/dc220820-f871-4383-b54e-e3a05e26ab7f</gs:keywordURI>
+    <gs:keywordURI>https://vocab.ifremer.fr/scheme/SXT/myocean.area-of-benefit/8c77fb97-7415-45d6-8cf2-a90686ef7032</gs:keywordURI>
+    <gs:keywordURI>https://vocab.ifremer.fr/scheme/SXT/myocean.area-of-benefit/361657b6-6b9e-40f5-b75f-0d50e6ccd2fe</gs:keywordURI>
+    <gs:keywordURI>https://vocab.ifremer.fr/scheme/SXT/myocean.area-of-benefit/440849d3-a62f-428e-b679-c815afd74084</gs:keywordURI>
+    <gs:keywordURI>https://vocab.ifremer.fr/scheme/SXT/myocean.area-of-benefit/2e1374cd-3cce-4955-abc7-aa448a4e8c53</gs:keywordURI>
+    <gs:keywordURI>https://vocab.ifremer.fr/scheme/SXT/myocean.reference-geographical-area/e66ceb40-9449-44a9-8b3f-dc1cdc379506</gs:keywordURI>
+    <gs:keywordURI>https://vocab.ifremer.fr/scheme/SXT/myocean.reference-geographical-area/bf2c2f16-3f48-4104-89c1-7269317d03ce</gs:keywordURI>
+    <gs:keywordURI>https://vocab.ifremer.fr/scheme/SXT/myocean.reference-geographical-area/af963abd-2ecb-459d-9622-db1f22999b27</gs:keywordURI>
+    <gs:keywordURI>https://vocab.ifremer.fr/scheme/SXT/myocean.reference-geographical-area/0ea3d280-b1f1-4d12-9037-6acb6104b4b3</gs:keywordURI>
+    <gs:keywordURI>https://vocab.ifremer.fr/scheme/SXT/myocean.reference-geographical-area/d9a03423-c641-4eaf-a184-4c1767033fa5</gs:keywordURI>
+    <gs:keywordURI>https://vocab.ifremer.fr/scheme/SXT/myocean.processing-level/78a4ba97-b2b9-4a16-8680-1eef0bdf8481</gs:keywordURI>
+    <gs:keywordURI>http://purl.org/myocean/ontology/vocabulary/model-assimilation#not-applicable</gs:keywordURI>
+    <gs:keywordURIBlueCloud>http://inspire.ec.europa.eu/theme/of</gs:keywordURIBlueCloud>
+    <gs:keywordURIBlueCloud>https://vocab.ifremer.fr/scheme/SXT/myocean.discipline/a9f2224a-0e1b-4815-9abc-7a7d6ba6fa76</gs:keywordURIBlueCloud>
+    <gs:keywordURIBlueCloud>https://vocab.ifremer.fr/scheme/SXT/myocean.temporal-scale/dc220820-f871-4383-b54e-e3a05e26ab7f</gs:keywordURIBlueCloud>
+    <gs:keywordURIBlueCloud>https://vocab.ifremer.fr/scheme/SXT/myocean.area-of-benefit/8c77fb97-7415-45d6-8cf2-a90686ef7032</gs:keywordURIBlueCloud>
+    <gs:keywordURIBlueCloud>https://vocab.ifremer.fr/scheme/SXT/myocean.area-of-benefit/361657b6-6b9e-40f5-b75f-0d50e6ccd2fe</gs:keywordURIBlueCloud>
+    <gs:keywordURIBlueCloud>https://vocab.ifremer.fr/scheme/SXT/myocean.area-of-benefit/440849d3-a62f-428e-b679-c815afd74084</gs:keywordURIBlueCloud>
+    <gs:keywordURIBlueCloud>https://vocab.ifremer.fr/scheme/SXT/myocean.area-of-benefit/2e1374cd-3cce-4955-abc7-aa448a4e8c53</gs:keywordURIBlueCloud>
+    <gs:keywordURIBlueCloud>https://vocab.ifremer.fr/scheme/SXT/myocean.reference-geographical-area/e66ceb40-9449-44a9-8b3f-dc1cdc379506</gs:keywordURIBlueCloud>
+    <gs:keywordURIBlueCloud>https://vocab.ifremer.fr/scheme/SXT/myocean.reference-geographical-area/bf2c2f16-3f48-4104-89c1-7269317d03ce</gs:keywordURIBlueCloud>
+    <gs:keywordURIBlueCloud>https://vocab.ifremer.fr/scheme/SXT/myocean.reference-geographical-area/af963abd-2ecb-459d-9622-db1f22999b27</gs:keywordURIBlueCloud>
+    <gs:keywordURIBlueCloud>https://vocab.ifremer.fr/scheme/SXT/myocean.reference-geographical-area/0ea3d280-b1f1-4d12-9037-6acb6104b4b3</gs:keywordURIBlueCloud>
+    <gs:keywordURIBlueCloud>https://vocab.ifremer.fr/scheme/SXT/myocean.reference-geographical-area/d9a03423-c641-4eaf-a184-4c1767033fa5</gs:keywordURIBlueCloud>
+    <gs:keywordURIBlueCloud>https://vocab.ifremer.fr/scheme/SXT/myocean.processing-level/78a4ba97-b2b9-4a16-8680-1eef0bdf8481</gs:keywordURIBlueCloud>
+    <gs:keywordURIBlueCloud>http://purl.org/myocean/ontology/vocabulary/model-assimilation#not-applicable</gs:keywordURIBlueCloud>
+    <gs:onlineLinkage>https://stac.marine.copernicus.eu/metadata/SEALEVEL_GLO_PHY_CLIMATE_L4_MY_008_057/c3s_obs-sl_glo_phy-ssh_my_twosat-l4-duacs-0.25deg_P1D_202112/dataset.stac.json</gs:onlineLinkage>
+    <gs:onlineLinkage>https://stac.marine.copernicus.eu/metadata/SEALEVEL_GLO_PHY_CLIMATE_L4_MY_008_057/c3s_obs-sl_glo_phy-ssh_myint_twosat-l4-duacs-0.25deg_P1D_202311/dataset.stac.json</gs:onlineLinkage>
+    <gs:onlineLinkage>https://wmts.marine.copernicus.eu/teroWmts/SEALEVEL_GLO_PHY_CLIMATE_L4_MY_008_057/c3s_obs-sl_glo_phy-ssh_myint_twosat-l4-duacs-0.25deg_P1D_202311</gs:onlineLinkage>
+    <gs:organisationName>SL-CLS-TOULOUSE-FR</gs:organisationName>
+    <gs:organisationName>SL-CLS-TOULOUSE-FR</gs:organisationName>
+    <gs:organisationName>SL-CLS-TOULOUSE-FR</gs:organisationName>
+    <gs:organisationName>SL-CLS-TOULOUSE-FR</gs:organisationName>
+    <gs:organisationName>SL-CLS-TOULOUSE-FR</gs:organisationName>
+    <gs:organisationRole>custodian</gs:organisationRole>
+    <gs:organisationRole>originator</gs:organisationRole>
+    <gs:organisationRole>pointOfContact</gs:organisationRole>
+    <gs:organisationRole>resourceProvider</gs:organisationRole>
+    <gs:organisationRole>distributor</gs:organisationRole>
+    <gs:organisationURI>SL-CLS-TOULOUSE-FR</gs:organisationURI>
+    <gs:organisationURI>SL-CLS-TOULOUSE-FR</gs:organisationURI>
+    <gs:organisationURI>SL-CLS-TOULOUSE-FR</gs:organisationURI>
+    <gs:organisationURI>SL-CLS-TOULOUSE-FR</gs:organisationURI>
+    <gs:organisationURI>SL-CLS-TOULOUSE-FR</gs:organisationURI>
+    <gs:origOrgDesc>SL-CLS-TOULOUSE-FR</gs:origOrgDesc>
+    <gs:protocol>WWW:STAC</gs:protocol>
+    <gs:protocol>WWW:STAC</gs:protocol>
+    <gs:protocol>OGC:WMTS</gs:protocol>
+    <gs:resLanguage>eng</gs:resLanguage>
+    <gs:resourceId>0a1cf029-1a8e-4ac0-9d96-95060065e3e8</gs:resourceId>
+    <gs:title>GLOBAL OCEAN GRIDDED L4 SEA SURFACE HEIGHTS AND DERIVED VARIABLES REPROCESSED (COPERNICUS CLIMATE SERVICE)</gs:title>
+    <gs:tmpExtentBegin>1993-01-01</gs:tmpExtentBegin>
+    <gs:tmpExtentEnd>2020-12-31</gs:tmpExtentEnd>
+    <gs:topicCategory>oceans</gs:topicCategory>
+    <gs:bbox>
+      <gs:sw>-90.0 -180.0</gs:sw>
+      <gs:se>-90.0 180.0</gs:se>
+      <gs:nw>90.0 -180.0</gs:nw>
+      <gs:ne>90.0 180.0</gs:ne>
+      <gs:isCrossed>false</gs:isCrossed>
+      <gs:area>64800</gs:area>
+      <gs:center>0.0 0.0</gs:center>
+      <gs:disjValues>
+	<gs:disjSouth>-90.0</gs:disjSouth>
+	<gs:disjWest>-180.0</gs:disjWest>
+	<gs:disjNorth>90.0</gs:disjNorth>
+	<gs:disjEast>180.0</gs:disjEast>
+      </gs:disjValues>
+      <gs:cardinalValues>
+	<gs:values>
+	  <gs:south>-90.0</gs:south>
+	  <gs:west>-180.0</gs:west>
+	  <gs:east>180.0</gs:east>
+	  <gs:north>90.0</gs:north>
+	</gs:values>
+      </gs:cardinalValues>
+    </gs:bbox>
+  </gs:indexesMetadata>
+</gs:DatasetCollection>
