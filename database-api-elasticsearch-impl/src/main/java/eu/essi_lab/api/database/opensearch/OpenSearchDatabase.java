@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.api.database.elasticsearch;
+package eu.essi_lab.api.database.opensearch;
 
 import java.util.List;
 import java.util.Optional;
@@ -38,7 +38,7 @@ import eu.essi_lab.model.exceptions.GSException;
 /**
  * @author Fabrizio
  */
-public class ElasticsearchDatabase extends Database {
+public class OpenSearchDatabase extends Database {
 
     @Override
     public boolean supports(StorageInfo dbUri) {

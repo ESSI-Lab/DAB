@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.api.database.elasticsearch;
+package eu.essi_lab.api.database.opensearch;
 
 /*-
  * #%L
@@ -24,21 +24,14 @@ package eu.essi_lab.api.database.elasticsearch;
  * #L%
  */
 
-import org.w3c.dom.Node;
-
 import eu.essi_lab.api.database.Database;
-import eu.essi_lab.api.database.DatabaseFinder;
-import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.ResultSet;
-import eu.essi_lab.messages.count.DiscoveryCountResponse;
+import eu.essi_lab.api.database.SourceStorage;
 import eu.essi_lab.model.StorageInfo;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.GSResource;
 
 /**
  * @author Fabrizio
  */
-public class ElasticsearchFinder implements DatabaseFinder {
+public class OpenSearchSourceStorage extends SourceStorage {
 
     @Override
     public void setDatabase(Database dataBase) {
@@ -58,25 +51,7 @@ public class ElasticsearchFinder implements DatabaseFinder {
     }
 
     @Override
-    public DiscoveryCountResponse count(DiscoveryMessage message) throws GSException {
-
-	return null;
-    }
-
-    @Override
-    public ResultSet<GSResource> discover(DiscoveryMessage message) throws GSException {
-
-	return null;
-    }
-
-    @Override
-    public ResultSet<Node> discoverNodes(DiscoveryMessage message) throws GSException {
-
-	return null;
-    }
-
-    @Override
-    public ResultSet<String> discoverStrings(DiscoveryMessage message) throws GSException {
+    public String getType() {
 
 	return null;
     }

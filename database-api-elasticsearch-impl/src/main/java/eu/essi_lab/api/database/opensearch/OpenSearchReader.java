@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.api.database.elasticsearch;
+package eu.essi_lab.api.database.opensearch;
 
 /*-
  * #%L
@@ -41,7 +41,7 @@ import eu.essi_lab.model.resource.GSResource;
 /**
  * @author Fabrizio
  */
-public class ElasticsearchReader implements DatabaseReader {
+public class OpenSearchReader implements DatabaseReader {
 
     @Override
     public boolean supports(StorageInfo dbUri) {

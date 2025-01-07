@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.api.database.elasticsearch;
+package eu.essi_lab.api.database.opensearch;
 
 /*-
  * #%L
@@ -24,23 +24,22 @@ package eu.essi_lab.api.database.elasticsearch;
  * #L%
  */
 
-import java.util.List;
-
-import org.json.JSONObject;
+import java.util.Optional;
 
 import eu.essi_lab.api.database.Database;
-import eu.essi_lab.api.database.DatabaseExecutor;
-import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.stats.StatisticsMessage;
-import eu.essi_lab.messages.stats.StatisticsResponse;
+import eu.essi_lab.api.database.DatabaseSemanticsExecutor;
+import eu.essi_lab.messages.count.SemanticCountResponse;
+import eu.essi_lab.messages.sem.SemanticMessage;
+import eu.essi_lab.messages.sem.SemanticResponse;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.ontology.GSKnowledgeResourceDescription;
+import eu.essi_lab.model.ontology.GSKnowledgeScheme;
 
 /**
  * @author Fabrizio
  */
-public class ElasticsearchExecutor implements DatabaseExecutor {
+public class OpenSearchSemanticsExecutor implements DatabaseSemanticsExecutor {
 
     @Override
     public boolean supports(StorageInfo dbUri) {
@@ -60,44 +59,21 @@ public class ElasticsearchExecutor implements DatabaseExecutor {
     }
 
     @Override
-    public void clearDeletedRecords() throws GSException {
-
-    }
-
-    @Override
-    public int countDeletedRecords() throws GSException {
-
-	return 0;
-    }
-
-    @Override
-    public StatisticsResponse compute(StatisticsMessage message) throws GSException {
+    public SemanticCountResponse count(SemanticMessage message) throws GSException {
 
 	return null;
     }
 
     @Override
-    public List<String> retrieveEiffelIds(DiscoveryMessage message, int start, int count) throws GSException {
+    public SemanticResponse<GSKnowledgeResourceDescription> execute(SemanticMessage message) throws GSException {
 
 	return null;
     }
 
     @Override
-    public JSONObject executePartitionsQuery(DiscoveryMessage message, boolean temporalConstraintEnabled) throws GSException {
+    public Optional<GSKnowledgeResourceDescription> getKnowlegdeResource(GSKnowledgeScheme scheme, String subjectId) throws GSException {
 
-	return null;
-    }
-
-    @Override
-    public List<String> getIndexValues(DiscoveryMessage message, MetadataElement element, int start, int count) throws GSException {
-
-	return null;
-    }
-
-    @Override
-    public List<WMSClusterResponse> execute(WMSClusterRequest request) throws GSException {
-
-	return null;
+	return Optional.empty();
     }
 
 }

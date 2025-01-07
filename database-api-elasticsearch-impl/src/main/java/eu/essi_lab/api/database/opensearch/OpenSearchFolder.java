@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.api.database.elasticsearch;
+package eu.essi_lab.api.database.opensearch;
 
 /*-
  * #%L
@@ -36,7 +36,7 @@ import eu.essi_lab.api.database.DatabaseFolder;
 /**
  * @author Fabrizio
  */
-public class ElasticsearchFolder implements DatabaseFolder {
+public class OpenSearchFolder implements DatabaseFolder {
 
     @Override
     public String getURI() {

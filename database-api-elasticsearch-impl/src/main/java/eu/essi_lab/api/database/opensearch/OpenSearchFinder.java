@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.api.database.elasticsearch;
+package eu.essi_lab.api.database.opensearch;
 
 /*-
  * #%L
@@ -24,28 +24,21 @@ package eu.essi_lab.api.database.elasticsearch;
  * #L%
  */
 
-import java.util.Optional;
+import org.w3c.dom.Node;
 
 import eu.essi_lab.api.database.Database;
-import eu.essi_lab.api.database.DatabaseSemanticsExecutor;
-import eu.essi_lab.messages.count.SemanticCountResponse;
-import eu.essi_lab.messages.sem.SemanticMessage;
-import eu.essi_lab.messages.sem.SemanticResponse;
+import eu.essi_lab.api.database.DatabaseFinder;
+import eu.essi_lab.messages.DiscoveryMessage;
+import eu.essi_lab.messages.ResultSet;
+import eu.essi_lab.messages.count.DiscoveryCountResponse;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.ontology.GSKnowledgeResourceDescription;
-import eu.essi_lab.model.ontology.GSKnowledgeScheme;
+import eu.essi_lab.model.resource.GSResource;
 
 /**
  * @author Fabrizio
  */
-public class ElasticsearchSemanticsExecutor implements DatabaseSemanticsExecutor {
-
-    @Override
-    public boolean supports(StorageInfo dbUri) {
-
-	return false;
-    }
+public class OpenSearchFinder implements DatabaseFinder {
 
     @Override
     public void setDatabase(Database dataBase) {
@@ -59,21 +52,32 @@ public class ElasticsearchSemanticsExecutor implements DatabaseSemanticsExecutor
     }
 
     @Override
-    public SemanticCountResponse count(SemanticMessage message) throws GSException {
+    public boolean supports(StorageInfo dbUri) {
+
+	return false;
+    }
+
+    @Override
+    public DiscoveryCountResponse count(DiscoveryMessage message) throws GSException {
 
 	return null;
     }
 
     @Override
-    public SemanticResponse<GSKnowledgeResourceDescription> execute(SemanticMessage message) throws GSException {
+    public ResultSet<GSResource> discover(DiscoveryMessage message) throws GSException {
 
 	return null;
     }
 
     @Override
-    public Optional<GSKnowledgeResourceDescription> getKnowlegdeResource(GSKnowledgeScheme scheme, String subjectId) throws GSException {
+    public ResultSet<Node> discoverNodes(DiscoveryMessage message) throws GSException {
 
-	return Optional.empty();
+	return null;
     }
 
+    @Override
+    public ResultSet<String> discoverStrings(DiscoveryMessage message) throws GSException {
+
+	return null;
+    }
 }

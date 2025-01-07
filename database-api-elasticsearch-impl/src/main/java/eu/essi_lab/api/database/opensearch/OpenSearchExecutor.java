@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.api.database.elasticsearch;
+package eu.essi_lab.api.database.opensearch;
 
 /*-
  * #%L
@@ -24,66 +24,80 @@ package eu.essi_lab.api.database.elasticsearch;
  * #L%
  */
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
+import java.util.List;
+
+import org.json.JSONObject;
 
 import eu.essi_lab.api.database.Database;
-import eu.essi_lab.api.database.DatabaseWriter;
+import eu.essi_lab.api.database.DatabaseExecutor;
+import eu.essi_lab.messages.DiscoveryMessage;
+import eu.essi_lab.messages.stats.StatisticsMessage;
+import eu.essi_lab.messages.stats.StatisticsResponse;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.GSResource;
+import eu.essi_lab.model.resource.MetadataElement;
 
 /**
  * @author Fabrizio
  */
-public class ElasticsearchWriter extends DatabaseWriter {
+public class OpenSearchExecutor implements DatabaseExecutor {
+
+    @Override
+    public boolean supports(StorageInfo dbUri) {
+
+	return false;
+    }
 
     @Override
     public void setDatabase(Database dataBase) {
-	// TODO Auto-generated method stub
 
     }
 
     @Override
     public Database getDatabase() {
-	// TODO Auto-generated method stub
+
 	return null;
     }
 
     @Override
-    public boolean supports(StorageInfo dbUri) {
-	// TODO Auto-generated method stub
-	return false;
-    }
-
-    @Override
-    public void remove(GSResource resource) throws GSException {
-	// TODO Auto-generated method stub
+    public void clearDeletedRecords() throws GSException {
 
     }
 
     @Override
-    public void store(String identifier, Document document) throws GSException {
-	// TODO Auto-generated method stub
+    public int countDeletedRecords() throws GSException {
 
+	return 0;
     }
 
     @Override
-    public void removeDocument(String identifier) throws GSException {
-	// TODO Auto-generated method stub
+    public StatisticsResponse compute(StatisticsMessage message) throws GSException {
 
+	return null;
     }
 
     @Override
-    public void storeRDF(Node rdf) throws GSException {
-	// TODO Auto-generated method stub
+    public List<String> retrieveEiffelIds(DiscoveryMessage message, int start, int count) throws GSException {
 
+	return null;
     }
 
     @Override
-    public void remove(String propertyName, String propertyValue) throws GSException {
-	// TODO Auto-generated method stub
+    public JSONObject executePartitionsQuery(DiscoveryMessage message, boolean temporalConstraintEnabled) throws GSException {
 
+	return null;
+    }
+
+    @Override
+    public List<String> getIndexValues(DiscoveryMessage message, MetadataElement element, int start, int count) throws GSException {
+
+	return null;
+    }
+
+    @Override
+    public List<WMSClusterResponse> execute(WMSClusterRequest request) throws GSException {
+
+	return null;
     }
 
 }
