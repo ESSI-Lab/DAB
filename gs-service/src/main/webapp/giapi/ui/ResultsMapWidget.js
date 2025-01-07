@@ -407,7 +407,7 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 		//
 		widget.map.on('singleclick', function(evt) {
 			
-			if(widget.map.getTargetElement().style.cursor !== 'pointer'){
+			if(widget.map.getTargetElement().style.cursor === ''){
 				
 				return false;
 			}
