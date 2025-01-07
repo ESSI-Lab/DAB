@@ -4,7 +4,7 @@ package eu.essi_lab.harvester.worker;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -235,8 +235,8 @@ public class HarvesterWorker extends SchedulerWorker<HarvestingSetting> {
 
 	GSLoggerFactory.getLogger(this.getClass()).debug("Configured Database URI: {}", databaseURI.getUri());
 
-	DatabaseReader dataBaseReader = DatabaseProviderFactory.getDatabaseReader(databaseURI);
-	DatabaseWriter dataBaseWriter = DatabaseProviderFactory.getDatabaseWriter(databaseURI);
+	DatabaseReader dataBaseReader = DatabaseProviderFactory.getReader(databaseURI);
+	DatabaseWriter dataBaseWriter = DatabaseProviderFactory.getWriter(databaseURI);
 	SourceStorage storage = DatabaseProviderFactory.getSourceStorage(databaseURI);
 
 	// ----------------------------------------------------

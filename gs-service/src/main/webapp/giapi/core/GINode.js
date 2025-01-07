@@ -1004,20 +1004,20 @@ GIAPI.GINode = function() {
                                         html: 'All maps © ' + '<a href="http://www.example.org/">ExampleMap</a>'
                                   }); 
      *
-     * var layers = giNode.ol3WMS_Layer(opt_options);
+     * var layers = giNode.olMWS_Layer(opt_options);
      * </code></pre>
      *
      * @param {Object} [opt_options] See Tile WMS options in the <a href="http://openlayers.org/en/v3.15.1/apidoc/ol.source.TileWMS.html" target="_blank">ol.source.TileWMS </a>
      * constructor
      *
-     * @method ol3WMS_Layer
+     * @method olMWS_Layer
      * @return {<a href="http://openlayers.org/en/v3.15.1/apidoc/ol.source.TileWMS.html" target="_blank">ol.source.TileWMS </a>[[]]} Array of
      * <a href="http://openlayers.org/en/v3.15.1/apidoc/ol.source.TileWMS.html" target="_blank">ol.source.TileWMS </a> possible empty if this
      * {{#crossLink "GINode"}}node{{/crossLink}} does not provide any
      */
-    giNode.ol3WMS_Layer = function(opt_options) {
+    giNode.olMWS_Layer = function(opt_options) {
         
-        return GIAPI.LayersFactory.ol3_Layer(report.online, 'urn:ogc:serviceType:WebMapService:', opt_options);
+        return GIAPI.LayersFactory.layers(report.online, 'urn:ogc:serviceType:WebMapService:', opt_options);
     };
     
     

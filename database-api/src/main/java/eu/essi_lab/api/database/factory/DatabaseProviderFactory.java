@@ -4,7 +4,7 @@ package eu.essi_lab.api.database.factory;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -57,7 +57,7 @@ public class DatabaseProviderFactory {
      * @return the suitable {@link DatabaseFinder} or <code>null</code> if none is found
      * @throws GSException if dbUri is <code>null</code> or dbUri.getUri is <code>null</code>
      */
-    public static DatabaseFinder getDatabaseFinder(StorageInfo dbUri) throws GSException {
+    public static DatabaseFinder getFinder(StorageInfo dbUri) throws GSException {
 
 	synchronized (DatabaseFactory.PROVIDER_LOCK) {
 
@@ -67,7 +67,7 @@ public class DatabaseProviderFactory {
 		return mapped;
 	    }
 
-	    Database database = DatabaseFactory.create(dbUri);
+	    Database database = DatabaseFactory.get(dbUri);
 
 	    for (DatabaseFinder finder : ServiceLoader.load(DatabaseFinder.class)) {
 
@@ -99,7 +99,7 @@ public class DatabaseProviderFactory {
      * @return the suitable {@link DatabaseReader} or <code>null</code> if none is found
      * @throws GSException if dbUri is <code>null</code> or dbUri.getUri is <code>null</code>
      */
-    public static DatabaseReader getDatabaseReader(StorageInfo dbUri) throws GSException {
+    public static DatabaseReader getReader(StorageInfo dbUri) throws GSException {
 
 	synchronized (DatabaseFactory.PROVIDER_LOCK) {
 
@@ -109,7 +109,7 @@ public class DatabaseProviderFactory {
 		return mapped;
 	    }
 
-	    Database database = DatabaseFactory.create(dbUri);
+	    Database database = DatabaseFactory.get(dbUri);
 
 	    for (DatabaseReader reader : ServiceLoader.load(DatabaseReader.class)) {
 
@@ -141,7 +141,7 @@ public class DatabaseProviderFactory {
      * @return the suitable {@link DatabaseWriter} or <code>null</code> if none is found
      * @throws GSException if dbUri is <code>null</code> or dbUri.getUri is <code>null</code>
      */
-    public static DatabaseWriter getDatabaseWriter(StorageInfo dbUri) throws GSException {
+    public static DatabaseWriter getWriter(StorageInfo dbUri) throws GSException {
 
 	synchronized (DatabaseFactory.PROVIDER_LOCK) {
 
@@ -151,7 +151,7 @@ public class DatabaseProviderFactory {
 		return mapped;
 	    }
 
-	    Database database = DatabaseFactory.create(dbUri);
+	    Database database = DatabaseFactory.get(dbUri);
 
 	    for (DatabaseWriter writer : ServiceLoader.load(DatabaseWriter.class)) {
 
@@ -183,7 +183,7 @@ public class DatabaseProviderFactory {
      * @return the suitable {@link DatabaseWriter} or <code>null</code> if none is found
      * @throws GSException if dbUri is <code>null</code> or dbUri.getUri is <code>null</code>
      */
-    public static DatabaseExecutor getDatabaseExecutor(StorageInfo dbUri) throws GSException {
+    public static DatabaseExecutor getExecutor(StorageInfo dbUri) throws GSException {
 
 	synchronized (DatabaseFactory.PROVIDER_LOCK) {
 
@@ -193,7 +193,7 @@ public class DatabaseProviderFactory {
 		return mapped;
 	    }
 
-	    Database database = DatabaseFactory.create(dbUri);
+	    Database database = DatabaseFactory.get(dbUri);
 
 	    for (DatabaseExecutor executor : ServiceLoader.load(DatabaseExecutor.class)) {
 
@@ -225,7 +225,7 @@ public class DatabaseProviderFactory {
      * @return the suitable {@link DatabaseWriter} or <code>null</code> if none is found
      * @throws GSException if dbUri is <code>null</code> or dbUri.getUri is <code>null</code>
      */
-    public static DatabaseSemanticsExecutor getDatabaseSemanticsExecutor(StorageInfo dbUri) throws GSException {
+    public static DatabaseSemanticsExecutor getSemanticsExecutor(StorageInfo dbUri) throws GSException {
 
 	synchronized (DatabaseFactory.PROVIDER_LOCK) {
 
@@ -235,7 +235,7 @@ public class DatabaseProviderFactory {
 		return mapped;
 	    }
 
-	    Database database = DatabaseFactory.create(dbUri);
+	    Database database = DatabaseFactory.get(dbUri);
 
 	    for (DatabaseSemanticsExecutor executor : ServiceLoader.load(DatabaseSemanticsExecutor.class)) {
 
@@ -271,7 +271,7 @@ public class DatabaseProviderFactory {
 
 	synchronized (DatabaseFactory.PROVIDER_LOCK) {
 
-	    Database database = DatabaseFactory.create(dbUri);
+	    Database database = DatabaseFactory.get(dbUri);
 
 	    for (SourceStorage storage : ServiceLoader.load(SourceStorage.class)) {
 

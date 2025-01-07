@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Portal Login</title>
+    <script src="keycloak.js"></script>
+    <script>
+        let keycloak = new Keycloak({
+            url: 'http://localhost:8080',
+            realm: 'his-central',
+            clientId: 'his-central-client'
+        });
+
+        // Initialize Keycloak
+        keycloak.init({ onLoad: 'login-required', checkLoginIframe: false })
+            .then(function (authenticated) {
+                if (authenticated) {
+                    console.log("User is authenticated");
+                    console.log("Access Token:", keycloak.token);
+                    document.getElementById("username").innerText = keycloak.tokenParsed.preferred_username;
+                } else {
+                    console.log("User is not authenticated");
+                }
+            })
+            .catch(function (error) {
+                console.error("Keycloak initialization failed", error);
+            });
+
+        function logout() {
+            keycloak.logout();
+        }
+    </script>
+</head>
+<body>
+    <h1>Welcome to the Geo Web Portal</h1>
+    <p>User: <span id="username">Loading...</span></p>
+    <button onclick="logout()">Logout</button>
+</body>
+</html>

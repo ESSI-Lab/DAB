@@ -4,7 +4,7 @@ package eu.essi_lab.request.executor.discover;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -692,8 +692,8 @@ public class QueryInitializer implements IQueryInitializer {
     }
 
     protected IViewManager createViewManager(StorageInfo databaseURI) throws GSException {
-	DatabaseReader reader = DatabaseProviderFactory.getDatabaseReader(databaseURI);
-	DatabaseWriter writer = DatabaseProviderFactory.getDatabaseWriter(databaseURI);
+	DatabaseReader reader = DatabaseProviderFactory.getReader(databaseURI);
+	DatabaseWriter writer = DatabaseProviderFactory.getWriter(databaseURI);
 	DefaultViewManager ret = new DefaultViewManager();
 	ret.setDatabaseReader(reader);
 	ret.setDatabaseWriter(writer);

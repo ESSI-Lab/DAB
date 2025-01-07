@@ -7,7 +7,7 @@ package eu.essi_lab.profiler.rest.handler.info;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -247,7 +247,7 @@ public class GWPStatisticsHandler extends DefaultRequestHandler {
 	    StorageInfo uri = ConfigurationWrapper.getDatabaseURI();
 	    GSLoggerFactory.getLogger(FullStatisticsHandler.class).debug("Storage uri: {}", uri);
 
-	    DatabaseExecutor executor = DatabaseProviderFactory.getDatabaseExecutor(uri);
+	    DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(uri);
 
 	    response = executor.compute(message);
 	}

@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.conf.task;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -58,7 +58,7 @@ public class MarkLogicCacheCleanerTask extends AbstractCustomTask {
 
 	StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
 
-	DatabaseReader dbReader = DatabaseProviderFactory.getDatabaseReader(databaseURI);
+	DatabaseReader dbReader = DatabaseProviderFactory.getReader(databaseURI);
 	MarkLogicWrapper wrapper = ((MarkLogicDatabase) dbReader.getDatabase()).getWrapper();
 
 	String cacheFolder = dbReader.getDatabase().getStorageInfo().getIdentifier() + "_" + CACHE_FOLDER_NAME;

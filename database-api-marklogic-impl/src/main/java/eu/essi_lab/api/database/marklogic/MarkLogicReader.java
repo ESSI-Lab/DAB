@@ -4,7 +4,7 @@ package eu.essi_lab.api.database.marklogic;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -42,6 +42,7 @@ import com.marklogic.xcc.ResultSequence;
 import com.marklogic.xcc.exceptions.RequestException;
 
 import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.Database.IdentifierType;
 import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.GetViewIdentifiersRequest;
@@ -266,6 +267,7 @@ public class MarkLogicReader implements DatabaseReader {
      * @return
      * @throws GSException
      */
+    @Override
     public GSResource getResource(String originalIdentifier, GSSource source, boolean includeDeleted) throws GSException {
 
 	List<GSResource> resultsList = getResources(originalIdentifier, source, includeDeleted);
@@ -292,6 +294,7 @@ public class MarkLogicReader implements DatabaseReader {
      * and from the current
      * one
      */
+    @Override
     public List<GSResource> getResources(String originalIdentifier, GSSource source, boolean includeDeleted) throws GSException {
 
 	DiscoveryMessage message = new DiscoveryMessage();
@@ -542,7 +545,7 @@ public class MarkLogicReader implements DatabaseReader {
 
 	    if (viewFolder == null) {
 
-		viewFolder = getViewFolder();
+		viewFolder = getDatabase().getViewFolder(false);
 
 		if (viewFolder == null) {
 
@@ -617,26 +620,6 @@ public class MarkLogicReader implements DatabaseReader {
 	}
     }
 
-    @Override
-    public Optional<DatabaseFolder> getFolder(String folderName, boolean createIfNotExist) throws GSException {
-
-	try {
-	    return getDatabase().getFolder(folderName, createIfNotExist);
-	} catch (RequestException e) {
-
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-
-	    throw GSException.createException(//
-		    getClass(), //
-		    e.getMessage(), //
-		    null, //
-		    ErrorInfo.ERRORTYPE_INTERNAL, //
-		    ErrorInfo.SEVERITY_ERROR, //
-		    "MARK_LOGIC_GET_FOLDER_ERROR", //
-		    e);
-	}
-    }
-
     /**
      * @param viewId
      * @return
@@ -666,9 +649,10 @@ public class MarkLogicReader implements DatabaseReader {
 
 	try {
 
-	    DatabaseFolder folder = getViewFolder();
+	    DatabaseFolder folder = getDatabase().getViewFolder(false);
 
 	    if (folder == null) {
+
 		return new ArrayList<>();
 	    }
 
@@ -682,7 +666,7 @@ public class MarkLogicReader implements DatabaseReader {
 
 		    GSLoggerFactory.getLogger(getClass()).info("Get view folder STARTED");
 
-		    viewFolder = getViewFolder();
+		    viewFolder = getDatabase().getViewFolder(false);
 
 		    GSLoggerFactory.getLogger(getClass()).info("Get view folder ENDED");
 
@@ -725,22 +709,6 @@ public class MarkLogicReader implements DatabaseReader {
 		    e);
 	}
 
-    }
-
-    protected DatabaseFolder getViewFolder() throws RequestException {
-
-	return getProtectedFolder(MarkLogicDatabase.VIEWS_FOLDER);
-    }
-
-    protected DatabaseFolder getUsersFolder() throws RequestException {
-
-	return getProtectedFolder(MarkLogicDatabase.USERS_FOLDER);
-    }
-
-    protected DatabaseFolder getProtectedFolder(String dirURI) throws RequestException {
-
-	MarkLogicDatabase mldb = getDatabase();
-	return mldb.getFolder(dirURI);
     }
 
     public static void main(String[] args) {

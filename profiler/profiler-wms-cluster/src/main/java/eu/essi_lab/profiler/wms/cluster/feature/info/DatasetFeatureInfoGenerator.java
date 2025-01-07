@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.wms.cluster.feature.info;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,7 +35,7 @@ import eu.essi_lab.profiler.wms.cluster.WMSRequest.Parameter;
 public class DatasetFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 
     @Override
-    public InputStream getInfoPage(List<StationRecord> stations, String contentType, WMSGetFeatureInfoRequest request) {
+    public InputStream getInfoPage(String viewId, List<StationRecord> stations, String contentType, WMSGetFeatureInfoRequest request) {
 	String html = "<html>\n" + "  <head>\n" + "    <title>DAB GetFeatureInfo output</title>\n" + "  </head>\n"
 		+ "  <style type=\"text/css\">\n" + "	table.featureInfo, table.featureInfo td, table.featureInfo th {\n"
 		+ "		border:1px solid #ddd;\n" + "		border-collapse:collapse;\n" + "		margin:0;\n"
@@ -56,7 +56,7 @@ public class DatasetFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 
 	JSONArray json = new JSONArray();
 	JSONObject geoJson = new JSONObject();
-	
+
 	geoJson.put("type", "FeatureCollection");
 	geoJson.put("totalFeatures", "unknown");
 	geoJson.put("numberReturned", stations.size());
@@ -73,7 +73,7 @@ public class DatasetFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 	    // GEO JSON
 	    JSONObject geo = new JSONObject();
 	    geo.put("type", "Feature");
-	    geo.put("id","" );
+	    geo.put("id", "");
 	    JSONObject geometry = new JSONObject();
 	    geometry.put("type", "Point");
 	    JSONArray coordinates = new JSONArray();

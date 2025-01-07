@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.wms.cluster;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -89,7 +89,7 @@ public class WMSProfiler extends Profiler<WMSClusterProfilerSetting> {
 	selector.register(new WMSMapRequestFilter(), getMapHandler);
 
 	// Get Legend
-	WMSGetLegendHandler getLegendHandler = new WMSGetLegendHandler();
+	WMSGetLegendHandler getLegendHandler = new WMSGetLegendHandler(getSetting());
 	selector.register(new WMSLegendRequestFilter(), getLegendHandler);
 
 	// Get Feature Info

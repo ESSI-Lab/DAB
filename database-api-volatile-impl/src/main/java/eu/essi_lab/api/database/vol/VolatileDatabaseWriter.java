@@ -4,7 +4,7 @@ package eu.essi_lab.api.database.vol;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -39,7 +39,7 @@ import eu.essi_lab.model.resource.GSResource;
 /**
  * @author Fabrizio
  */
-public class VolatileDatabaseWriter implements DatabaseWriter {
+public class VolatileDatabaseWriter extends DatabaseWriter {
 
     private VolatileDatabase database;
     private StorageInfo dbUri;
@@ -179,6 +179,11 @@ public class VolatileDatabaseWriter implements DatabaseWriter {
 
     @Override
     public void storeRDF(Node rdf) throws GSException {
+
+    }
+
+    @Override
+    public void remove(String propertyName, String propertyValue) throws GSException {
 
     }
 }

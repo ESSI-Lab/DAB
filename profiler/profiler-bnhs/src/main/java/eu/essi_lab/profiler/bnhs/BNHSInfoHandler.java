@@ -1,10 +1,13 @@
 package eu.essi_lab.profiler.bnhs;
 
+import java.util.Optional;
+import java.util.Properties;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,14 +38,54 @@ import eu.essi_lab.pdk.validation.WebRequestValidator;
 
 public class BNHSInfoHandler implements WebRequestHandler, WebRequestValidator {
 
+    private String viewId;
+
+    /**
+     * 
+     */
+    public BNHSInfoHandler() {
+    }
+
+    /**
+     * @param setting
+     */
+    public BNHSInfoHandler(WebRequest request) {
+
+	viewId = BNHSProfiler.readViewId(request);
+    }
+
     @Override
     public Response handle(WebRequest webRequest) throws GSException {
-	ResponseBuilder builder = Response.status(Status.OK);
 
-	String html = "<html><head><title>WHOS-broker: Arctic resources</title><body><h2>WHOS-broker Arctic page</h2><p>"
-		+ "<a href='https://hydrohub.wmo.int/en/projects/Arctic-HYCOS'>Arctic-HYCOS page</a><br/><br/>" //
-		+ "<a href='https://docs.google.com/spreadsheets/d/1ni9_BNcgoWD5HcU0sT_E20CwcOpOjsdek7_fQd4DWtI/edit?usp=sharing'>BNHS list - original Google Sheet</a> Click to open the station list as compiled by WMO experts<br/><br/>" //
-		+ "<a href='bnhs/csv'>BNHS list - Broker modified CSV table</a> Click to download the same list as before, but augmented with links to real time station data, provided by WHOS-broker</p></body></html>";
+	ResponseBuilder builder = Response.status(Status.OK);
+	String html = null;
+
+	switch (viewId) {
+
+	case "whos-arctic":
+
+	    html = "<html><head><title>WHOS-broker: Arctic resources</title><body><h2>WHOS-broker Arctic page</h2><p>"
+		    + "<a href='https://hydrohub.wmo.int/en/projects/Arctic-HYCOS'>Arctic-HYCOS page</a><br/><br/>" //
+		    + "<a href='https://docs.google.com/spreadsheets/d/1ni9_BNcgoWD5HcU0sT_E20CwcOpOjsdek7_fQd4DWtI/edit?usp=sharing'>BNHS list - original Google Sheet</a> Click to open the station list as compiled by WMO experts<br/><br/>" //
+		    + "<a href='bnhs/csv'>BNHS list - Broker modified CSV table</a> Click to download the same list as before, but augmented with links to real time station data, provided by WHOS-broker</p></body></html>";
+	    break;
+
+	case "whos":
+
+	    html = "<html><head><title>WHOS resources</title><body><h2>WHOS-broker page</h2><p>"
+		    + "<a href='https://hydrohub.wmo.int/en/projects/Arctic-HYCOS'>Arctic-HYCOS page</a><br/><br/>" //
+		    + "<a href='https://docs.google.com/spreadsheets/d/1ni9_BNcgoWD5HcU0sT_E20CwcOpOjsdek7_fQd4DWtI/edit?usp=sharing'>BNHS list - original Google Sheet</a> Click to open the station list as compiled by WMO experts<br/><br/>" //
+		    + "<a href='bnhs/csv'>BNHS list - Broker modified CSV table</a> Click to download the same list as before, but augmented with links to real time station data, provided by WHOS-broker</p></body></html>";
+	    break;
+
+	case "his-central":
+
+	    html = "<html><head><title>HIS-Central resources</title><body><h2>HIS-Central page</h2><p>"
+		    + "<a href='https://hydrohub.wmo.int/en/projects/Arctic-HYCOS'>Arctic-HYCOS page</a><br/><br/>" //
+		    + "<a href='https://docs.google.com/spreadsheets/d/1ni9_BNcgoWD5HcU0sT_E20CwcOpOjsdek7_fQd4DWtI/edit?usp=sharing'>BNHS list - original Google Sheet</a> Click to open the station list as compiled by WMO experts<br/><br/>" //
+		    + "<a href='bnhs/csv'>BNHS list - Broker modified CSV table</a> Click to download the same list as before, but augmented with links to real time station data, provided by WHOS-broker</p></body></html>";
+	    break;
+	}
 
 	builder = builder.entity(html).type(new MediaType("text", "html"));
 

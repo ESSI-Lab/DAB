@@ -7,7 +7,7 @@ package eu.essi_lab.profiler.stchfeed;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -166,7 +166,7 @@ public class StatusCheckerFeedHandler extends DefaultRequestHandler {
 	Page page = new Page(1, 500);
 	message.setPage(page);
 
-	DatabaseExecutor executor = DatabaseProviderFactory.getDatabaseExecutor(uri);
+	DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(uri);
 
 	StatisticsResponse response = executor.compute(message);
 
@@ -251,7 +251,7 @@ public class StatusCheckerFeedHandler extends DefaultRequestHandler {
 
 	StorageInfo uri = ConfigurationWrapper.getDatabaseURI();
 
-	DatabaseFinder finder = DatabaseProviderFactory.getDatabaseFinder(uri);
+	DatabaseFinder finder = DatabaseProviderFactory.getFinder(uri);
 
 	ResultSet<GSResource> resultSet = finder.discover(message);
 

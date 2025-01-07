@@ -4,7 +4,7 @@ package eu.essi_lab.profiler.bnhs;
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
  * %%
- * Copyright (C) 2021 - 2024 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -59,8 +59,6 @@ public class BNHSResultSetFormatter extends DiscoveryResultSetFormatter<String> 
 	BNHS_FORMATTING_ENCODING.setEncodingVersion(BNHS_ENCODING_VERSION);
 	BNHS_FORMATTING_ENCODING.setMediaType(new MediaType("text", "csv"));
     }
-
-    private static final String BNHS_FORMATTER_ERROR = "BNHS_FORMATTER_ERROR";
 
     @Override
     public Response format(DiscoveryMessage message, ResultSet<String> mappedResultSet) throws GSException {
