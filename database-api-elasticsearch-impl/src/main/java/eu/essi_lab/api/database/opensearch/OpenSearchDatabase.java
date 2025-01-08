@@ -5,13 +5,18 @@ package eu.essi_lab.api.database.opensearch;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.OpenSearchException;
-import org.opensearch.client.opensearch.core.InfoResponse;
+import org.opensearch.client.opensearch.indices.CreateIndexRequest;
+import org.opensearch.client.opensearch.indices.IndexSettings;
+import org.opensearch.client.opensearch.indices.PutIndicesSettingsRequest;
 import org.opensearch.client.transport.aws.AwsSdk2Transport;
 import org.opensearch.client.transport.aws.AwsSdk2TransportOptions;
+
+import com.amazonaws.auth.AWS4Signer;
 
 /*-
  * #%L
@@ -56,8 +61,7 @@ public class OpenSearchDatabase extends Database {
 	AwsCredentialsProvider credentialsProvider = DefaultCredentialsProvider.create();
 
 	AwsSdk2TransportOptions awsSdk2TransportOptions = AwsSdk2TransportOptions.builder().//
-		setCredentials(credentialsProvider).//
-		build();
+ 		build();
 
 	SdkHttpClient httpClient = ApacheHttpClient.builder().build();
 
@@ -70,8 +74,38 @@ public class OpenSearchDatabase extends Database {
 
 	OpenSearchClient client = new OpenSearchClient(awsSdk2Transport);
 
-	InfoResponse info = client.info();
-	System.out.println(info.version().distribution() + ": " + info.version().number());
+	// InfoResponse info = client.info();
+
+	//
+	// create the index
+	//
+	
+	String index = "test";
+	
+	CreateIndexRequest createIndexRequest = new CreateIndexRequest.Builder().index(index).build();
+
+	try {
+	    client.indices().create(createIndexRequest);
+
+	    // add settings to the index
+	    IndexSettings indexSettings = new IndexSettings.Builder().build();
+	    PutIndicesSettingsRequest putSettingsRequest = new PutIndicesSettingsRequest.Builder().index(index).settings(indexSettings)
+		    .build();
+	  
+	    client.indices().putSettings(putSettingsRequest);
+	    
+	    System.out.println(client.indices());
+
+	} catch (OpenSearchException ex) {
+	    final String errorType = Objects.requireNonNull(ex.response().error().type());
+	    if (!errorType.equals("resource_already_exists_exception")) {
+		throw ex;
+	    }
+	}
+
+	//
+	//
+	//
 
 	httpClient.close();
     }
