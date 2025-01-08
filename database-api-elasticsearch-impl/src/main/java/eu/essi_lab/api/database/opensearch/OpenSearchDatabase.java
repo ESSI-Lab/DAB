@@ -5,18 +5,16 @@ package eu.essi_lab.api.database.opensearch;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
+import org.apache.http.HttpHost;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.OpenSearchException;
-import org.opensearch.client.opensearch.indices.CreateIndexRequest;
-import org.opensearch.client.opensearch.indices.IndexSettings;
-import org.opensearch.client.opensearch.indices.PutIndicesSettingsRequest;
+import org.opensearch.client.opensearch.indices.ExistsRequest;
 import org.opensearch.client.transport.aws.AwsSdk2Transport;
 import org.opensearch.client.transport.aws.AwsSdk2TransportOptions;
-
-import com.amazonaws.auth.AWS4Signer;
+import org.opensearch.client.transport.endpoints.BooleanResponse;
 
 /*-
  * #%L
@@ -45,8 +43,6 @@ import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
-import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.http.SdkHttpClient;
 import software.amazon.awssdk.http.apache.ApacheHttpClient;
 import software.amazon.awssdk.regions.Region;
@@ -56,12 +52,17 @@ import software.amazon.awssdk.regions.Region;
  */
 public class OpenSearchDatabase extends Database {
 
+    private OpenSearchClient client;
+    private String identifier;
+    private DatabaseSetting setting;
+
     public static void main(String[] args) throws OpenSearchException, IOException {
 
-	AwsCredentialsProvider credentialsProvider = DefaultCredentialsProvider.create();
+	System.setProperty("aws.accessKeyId", "AKIAZZJV3K5RWVO7Z646");
+	System.setProperty("aws.secretAccessKey", "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");
 
 	AwsSdk2TransportOptions awsSdk2TransportOptions = AwsSdk2TransportOptions.builder().//
- 		build();
+		build();
 
 	SdkHttpClient httpClient = ApacheHttpClient.builder().build();
 
@@ -76,32 +77,36 @@ public class OpenSearchDatabase extends Database {
 
 	// InfoResponse info = client.info();
 
-	//
 	// create the index
+	ExistsRequest existsIndexRequest = new ExistsRequest.Builder().index("movies-index").build();
+
+	BooleanResponse exists = client.indices().exists(existsIndexRequest);
+
+	System.out.println(exists);
+
+	// String index = "movies";
 	//
-	
-	String index = "test";
-	
-	CreateIndexRequest createIndexRequest = new CreateIndexRequest.Builder().index(index).build();
-
-	try {
-	    client.indices().create(createIndexRequest);
-
-	    // add settings to the index
-	    IndexSettings indexSettings = new IndexSettings.Builder().build();
-	    PutIndicesSettingsRequest putSettingsRequest = new PutIndicesSettingsRequest.Builder().index(index).settings(indexSettings)
-		    .build();
-	  
-	    client.indices().putSettings(putSettingsRequest);
-	    
-	    System.out.println(client.indices());
-
-	} catch (OpenSearchException ex) {
-	    final String errorType = Objects.requireNonNull(ex.response().error().type());
-	    if (!errorType.equals("resource_already_exists_exception")) {
-		throw ex;
-	    }
-	}
+	// CreateIndexRequest createIndexRequest = new CreateIndexRequest.Builder().index(index).build();
+	//
+	// try {
+	// client.indices().create(createIndexRequest);
+	//
+	// // add settings to the index
+	// IndexSettings indexSettings = new IndexSettings.Builder().build();
+	// PutIndicesSettingsRequest putSettingsRequest = new
+	// PutIndicesSettingsRequest.Builder().index(index).settings(indexSettings)
+	// .build();
+	//
+	// client.indices().putSettings(putSettingsRequest);
+	//
+	// System.out.println(client.indices());
+	//
+	// } catch (OpenSearchException ex) {
+	// final String errorType = Objects.requireNonNull(ex.response().error().type());
+	// if (!errorType.equals("resource_already_exists_exception")) {
+	// throw ex;
+	// }
+	// }
 
 	//
 	//
@@ -111,30 +116,32 @@ public class OpenSearchDatabase extends Database {
     }
 
     @Override
-    public boolean supports(StorageInfo dbUri) {
-
-	return false;
-    }
-
-    @Override
-    public void configure(DatabaseSetting setting) {
-
-    }
-
-    @Override
-    public DatabaseSetting getSetting() {
-
-	return null;
-    }
-
-    @Override
-    public String getType() {
-
-	return null;
-    }
-
-    @Override
     public void initialize(StorageInfo storageInfo) throws GSException {
+
+	System.setProperty("aws.accessKeyId", storageInfo.getUser());
+	System.setProperty("aws.secretAccessKey", storageInfo.getPassword());
+
+	identifier = storageInfo.getIdentifier() == null ? UUID.randomUUID().toString() : storageInfo.getIdentifier();
+
+	AwsSdk2TransportOptions awsSdk2TransportOptions = AwsSdk2TransportOptions.builder().//
+		build();
+
+	SdkHttpClient httpClient = ApacheHttpClient.builder().build();
+	
+	String serviceName = storageInfo.getType().get().equals("OpenSearch") ? "es" : "aoss";
+
+	AwsSdk2Transport awsSdk2Transport = new AwsSdk2Transport(//
+		httpClient, //
+		HttpHost.create(storageInfo.getUri()).getHostName(), // "w6iz16h1nis29el1etjd.us-east-1.aoss.amazonaws.com"
+		serviceName, // Amazon OpenSearch Serverless
+		Region.US_EAST_1, // signing service region
+		awsSdk2TransportOptions);
+
+	client = new OpenSearchClient(awsSdk2Transport);
+
+	//
+	//
+	//
 
     }
 
@@ -206,7 +213,31 @@ public class OpenSearchDatabase extends Database {
     @Override
     public String getIdentifier() {
 
-	return null;
+	return identifier;
     }
 
+    @Override
+    public boolean supports(StorageInfo dbInfo) {
+
+	return dbInfo.getType().isPresent()
+		&& (dbInfo.getType().get().equals("OpenSearch") || dbInfo.getType().get().equals("OpenSearchServerless"));
+    }
+
+    @Override
+    public void configure(DatabaseSetting setting) {
+
+	this.setting = setting;
+    }
+
+    @Override
+    public DatabaseSetting getSetting() {
+
+	return this.setting;
+    }
+
+    @Override
+    public String getType() {
+
+	return "OpenSearch";
+    }
 }
