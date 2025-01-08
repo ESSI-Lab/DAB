@@ -1,1 +1,1 @@
-eu.essi_lab.api.database.elasticsearch.ElasticsearchSourceStorage
+eu.essi_lab.api.database.opensearch.OpenSearchSourceStorage

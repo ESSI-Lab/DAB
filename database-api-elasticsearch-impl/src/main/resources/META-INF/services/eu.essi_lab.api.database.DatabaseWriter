@@ -1,1 +1,1 @@
-eu.essi_lab.api.database.elasticsearch.ElasticsearchWriter
+eu.essi_lab.api.database.opensearch.OpenSearchWriter
