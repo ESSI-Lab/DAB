@@ -190,8 +190,8 @@ public class StorageInfo implements Serializable {
     public String toString() {
 
 	return "URI: " + this.uri + //
-		", folder: " + this.identifier + //
-		", storage: " + this.name + //
+		", identifier: " + this.identifier + //
+		", name: " + this.name + //
 		", user: " + this.user + //
 		", password: " + this.password + //
 		", type: " + this.type;
