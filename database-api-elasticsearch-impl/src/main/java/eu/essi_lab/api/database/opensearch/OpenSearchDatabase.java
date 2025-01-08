@@ -58,9 +58,6 @@ public class OpenSearchDatabase extends Database {
 
     public static void main(String[] args) throws OpenSearchException, IOException {
 
-	System.setProperty("aws.accessKeyId", "AKIAZZJV3K5RWVO7Z646");
-	System.setProperty("aws.secretAccessKey", "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");
-
 	AwsSdk2TransportOptions awsSdk2TransportOptions = AwsSdk2TransportOptions.builder().//
 		build();
 
@@ -127,14 +124,14 @@ public class OpenSearchDatabase extends Database {
 		build();
 
 	SdkHttpClient httpClient = ApacheHttpClient.builder().build();
-	
+
 	String serviceName = storageInfo.getType().get().equals("OpenSearch") ? "es" : "aoss";
 
 	AwsSdk2Transport awsSdk2Transport = new AwsSdk2Transport(//
 		httpClient, //
-		HttpHost.create(storageInfo.getUri()).getHostName(), // "w6iz16h1nis29el1etjd.us-east-1.aoss.amazonaws.com"
-		serviceName, // Amazon OpenSearch Serverless
-		Region.US_EAST_1, // signing service region
+		HttpHost.create(storageInfo.getUri()).getHostName(), //
+		serviceName, //
+		Region.US_EAST_1, //
 		awsSdk2TransportOptions);
 
 	client = new OpenSearchClient(awsSdk2Transport);
@@ -142,7 +139,27 @@ public class OpenSearchDatabase extends Database {
 	//
 	//
 	//
+	 
+	checkIndex("resources-index");
 
+	checkIndex("users-index");
+
+	checkIndex("views-index");
+	
+    }
+    
+    /**
+     * 
+     * @param indexName
+     * @return
+     * @throws IOException 
+     * @throws OpenSearchException 
+     */
+    private boolean checkIndex(String indexName) throws OpenSearchException, IOException {
+	
+	ExistsRequest existsIndexRequest = new ExistsRequest.Builder().index(indexName).build();
+
+	return client.indices().exists(existsIndexRequest).value();
     }
 
     @Override
