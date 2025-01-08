@@ -139,24 +139,29 @@ public class OpenSearchDatabase extends Database {
 	//
 	//
 	//
-	 
-	checkIndex("resources-index");
 
-	checkIndex("users-index");
+	try {
 
-	checkIndex("views-index");
-	
+	    checkIndex("resources-index");
+
+	    checkIndex("users-index");
+
+	    checkIndex("views-index");
+
+	} catch (Exception ex) {
+
+	    throw GSException.createException(getClass(), "OpenSearchDatabaseInitilizationError", ex);
+	}
     }
-    
+
     /**
-     * 
      * @param indexName
      * @return
-     * @throws IOException 
-     * @throws OpenSearchException 
+     * @throws IOException
+     * @throws OpenSearchException
      */
     private boolean checkIndex(String indexName) throws OpenSearchException, IOException {
-	
+
 	ExistsRequest existsIndexRequest = new ExistsRequest.Builder().index(indexName).build();
 
 	return client.indices().exists(existsIndexRequest).value();
