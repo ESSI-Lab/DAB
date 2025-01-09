@@ -39,8 +39,8 @@ public class HCDataBase extends Database {
 
     @Override
     public boolean supports(StorageInfo dbUri) {
-
-	return false;
+ 
+	return dbUri instanceof HCStorageInfo;
     }
 
     @Override

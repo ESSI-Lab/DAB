@@ -64,6 +64,8 @@ public class CSWEasyConnector extends CSWGetConnector {
 	    file.delete();
 
 	    String str = new String(bytes, StandardCharsets.UTF_8);
+	    str = str.replace("gco:nilReason=\"missing\"", "");
+	    str = str.replace("xsi:type=\"lan:", "xsi:type=\"gmd:");
 	    reader = new XMLDocumentReader(str);
 	    Map<String, String> map = new HashMap<>();
 	    map.put("xsi", "http://www.w3.org/2001/XMLSchema-instance");
