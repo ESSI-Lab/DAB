@@ -127,7 +127,8 @@ public class OpenSearchDatabase extends Database {
 	    USERS_INDEX, //
 	    VIEWS_INDEX, //
 	    AUGMENTER_PROPERTIES_INDEX, //
-	    MISC_INDEX//
+	    MISC_INDEX,//
+	    CONFIGURATION_INDEX
     );
 
     private SdkHttpClient httpClient;
