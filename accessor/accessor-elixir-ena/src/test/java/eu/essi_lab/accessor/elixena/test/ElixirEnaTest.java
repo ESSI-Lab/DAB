@@ -21,22 +21,25 @@ public class ElixirEnaTest {
     @Test
     public void test() throws IOException {
 	System.out.println("Startingmod");
-	// DAB-LOW
-	String url = "https://www.ebi.ac.uk/ena/portal/api/search?result=read_study&fields=study_accession&format=tsv&query="
-		+ ElixirENAConnector.FIRST_STEP_LOW_QUERY_STRING;
-	test(url);
-	// HIGH
-	url = "https://www.ebi.ac.uk/ena/portal/api/search?result=read_study&fields=study_accession&format=tsv&query="
-		+ ElixirENAConnector.FIRST_STEP_HIGH_QUERY_STRING;
-	test(url);
-	// MEDIUM
-	url = "https://www.ebi.ac.uk/ena/portal/api/search?result=read_study&fields=study_accession&format=tsv&query="
-		+ ElixirENAConnector.FIRST_STEP_MEDIUM_QUERY_STRING;
-	test(url);
 	// COMBINED
-	url = "https://www.ebi.ac.uk/ena/portal/api/search?result=read_study&fields=study_accession&format=tsv&query="
+	String url = "https://www.ebi.ac.uk/ena/portal/api/search?result=read_study&fields=study_accession&format=tsv&query="
 		+ ElixirENAConnector.FIRST_STEP_MEDIUM_HIGH_QUERY_STRING;
 	test(url);
+	// // DAB-LOW
+	// String url =
+	// "https://www.ebi.ac.uk/ena/portal/api/search?result=read_study&fields=study_accession&format=tsv&query="
+	// + ElixirENAConnector.FIRST_STEP_LOW_QUERY_STRING;
+	// test(url);
+	// // HIGH
+	// url =
+	// "https://www.ebi.ac.uk/ena/portal/api/search?result=read_study&fields=study_accession&format=tsv&query="
+	// + ElixirENAConnector.FIRST_STEP_HIGH_QUERY_STRING;
+	// test(url);
+	// // MEDIUM
+	// url =
+	// "https://www.ebi.ac.uk/ena/portal/api/search?result=read_study&fields=study_accession&format=tsv&query="
+	// + ElixirENAConnector.FIRST_STEP_MEDIUM_QUERY_STRING;
+	// test(url);
 
     }
 
@@ -50,6 +53,7 @@ public class ElixirEnaTest {
 	IOUtils.copy(s, fos);
 	s.close();
 	String filePath = tmpFile.getAbsolutePath();
+	System.out.println(tmpFile.getAbsolutePath());
 	HashSet<String> projects = new HashSet<String>();
 	try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
 	    String line;
@@ -57,7 +61,7 @@ public class ElixirEnaTest {
 		String[] split = line.split("\t");
 		projects.add(split[0]);
 	    }
-	    System.out.println(url);	    
+	    System.out.println(url);
 	    System.out.println(projects.size());
 	    tmpFile.delete();
 	} catch (IOException e) {
