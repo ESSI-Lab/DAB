@@ -2,6 +2,7 @@
  * @module ResultSet
  * @submodule Refinement
  **/
+import { GIAPI } from '../../core/GIAPI.js';
 
 /**
  * This object is <a href="../classes/ResultSet.html#resSetRef">optionally provided</a> as 

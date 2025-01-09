@@ -1,6 +1,7 @@
 /**
  * @module UI
  **/
+import { GIAPI } from '../core/GIAPI.js';
 
 /**
  * This widget localizes all the <a href="../classes/GINode.html" class="crosslink">nodes</a> of the current

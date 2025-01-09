@@ -106,6 +106,9 @@ pubSub.subscribe(subscription, onUpdates, onExpiration, onConnectionError);<br>
  * @class PubSubManager
  * @constructor
  */
+
+import { GIAPI } from '../core/GIAPI.js';
+
 GIAPI.PubSubManager = function(dabNode) {
 
 	var manager = {};

@@ -1,0 +1,307 @@
+@import url("../giapi/jquery/jquery-ui-1.11.14.min.css" );
+@import url("../giapi/jtable/highlight.css" );
+@import url("../giapi/jtable/jtable_jqueryui.css" );
+@import url("https://cdn.jsdelivr.net/npm/ol@v10.3.1/ol.css" );
+@import url("../giapi/ol-layerswitcher/ol-layerswitcher.css" );
+@import url("../giapi/css/giapi.css" );
+@import url("../giapi/css/portal.css" );
+@import url("../css/fonts-min.css" );
+@import url("../css/treeview.css" );
+@import url("https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" );
+
+			#hideMapInputControl.toggle-button{
+				width: 28px !important;
+ 			    height: 28px !important;			    
+				margin-left: -30px;
+	    		left: -205px;
+ 			    margin-top: 57px !important;
+			    border-radius: 3px;
+			    padding: 0px !important;
+			    background: gray url(http://api.geodab.eu/docs/assets/img/bbox-selection.png) 0px 0px no-repeat !important;	
+ 			}			
+			#hideMapInputControl.toggle-button-on{
+				background: white url(http://api.geodab.eu/docs/assets/img/bbox-selection.png) 0px 0px no-repeat !important;	
+			}		 
+			#controlToggleIcon{
+				display: none;
+			}		
+			.layers-control-table-div {
+			    opacity: 1 !important;
+			    margin-left: -198px !important;
+			}
+		
+			/* -------------------------------- */
+			/* header                           */
+			/*                                  */
+			#headerDiv{
+			    border: 1px solid #c0c0c0;
+ 			    background: #c0c0c0;
+			    margin-bottom: 0px;
+ 			}
+			#logoDiv{
+		    	vertical-align: top;
+		    	display: inline-block;
+			}
+			#what-div{
+				display: inline-block;
+				vertical-align: top;
+			}
+			#from-div{
+				display: inline-block;
+				margin-left: -10px;
+				vertical-align: top;			
+			}
+			#to-div{
+				display: inline-block;
+				margin-left: -10px;
+				vertical-align: top;
+			}	
+			#where-div{	
+				display: inline-block;
+				margin-left: -10px;			
+				vertical-align: top;
+  			}		
+			#adv-search-div{
+				margin-top: 2px;	
+				margin-left: 10px;
+				display: inline-block;
+				vertical-align: top;
+  			}
+  			
+  			#advConstDiv{
+			  	z-index: 1;		    
+  			}
+  			
+			#search-button{
+				display: inline-block;
+		    	vertical-align: top;
+ 			}
+ 			#hide-results-button{
+				display: inline-block;
+				margin-top: 7px;
+ 			}
+ 			
+			
+			/* -------------------------------- */
+			/* tabs                             */
+			/*                                  */
+			#tabs-ul{
+				 
+			}
+		    #tabs-div{
+		    	position: absolute; 
+				z-index: 99;
+			    border: none;
+			    background: transparent;
+ 		    }
+		    .tabs-element{			 
+ 			}
+ 			.ui-widget-header[role="tablist"] {
+			    border: 1px solid #999999;
+			    background: #999999;
+			}
+		    
+		    /* -------------------------------- */
+			/* results tab                      */
+			/*                                  */
+			#results-tab{
+			}	
+		    li[aria-controls="results-tab"]{
+
+		    }
+		    .resultset-layout-ul{			
+			}
+		    .series-browser-widget-table {
+		    	position: absolute;
+			    border: 1px solid #c0c0c0;
+			    background: rgb(221, 221, 221);		
+			}
+			#paginator-widget{
+				z-index: 100;
+				position: absolute; 
+ 				text-align: center;
+				display:inline-block;
+				background: #c0c0c0;
+			}
+			.paginator-widget-results-label {
+			    font-size: 1.0em;
+			}
+			.paginator-widget-button {
+			    padding: 3px;
+			    border-radius: 0px;
+			    height: 20px;
+			    font-size: 1.4em;			   
+			}
+			.paginator-widget-button-first {
+			   	padding-left: 8px;
+  			    padding-right: 8px;	   
+			}
+			.paginator-widget-button-last {
+			   	padding-left: 8px;
+  			    padding-right: 8px;	   
+			}
+			.paginator-widget-button-prev{
+				padding-right: 7px;
+			}
+			.paginator-widget-button-next{
+				padding-left: 7px;
+			}
+			.resultset-layout-table-div{
+ 				padding-right:0px!important;
+			}
+									
+			/* -------------------------------- */
+			/* sources tab                      */
+			/*                                  */
+			#sources-tab{
+				overflow: auto;
+				box-shadow: none;
+				background: rgb(221, 221, 221);
+			}			
+			.sources-widget{
+				box-shadow: none;
+				background: transparent;			 
+			}			
+			
+			/* -------------------------------- */
+			/* filters tab                      */
+			/*                                  */
+			#filters-tab{
+			    overflow-y: auto;
+			}
+						
+			/* -------------------------------- */
+			/* browse  tab                      */
+			/*                                  */
+			#browse-tab{
+		    	overflow-y: auto;
+ 				background: rgb(221, 221, 221);
+				font-size: 11px;
+			}
+			#browse-tree-div{
+				max-height: 455px;
+				overflow: auto;
+			}
+			
+			/* -------------------------------- */
+			/* map                              */
+			/*                                  */
+			.map-widget-div {
+			    background:transparent;
+			    padding: 0px; 
+			    border-radius: 0px; 
+			}						
+			
+		 
+			/* -------------------------------- */
+			/* constraints widget               */
+			/*                                  */
+		    .cnst-widget-where-input-control-div.resultset-layout{
+		    	display:none;
+  		    }
+		    .cnst-widget-where-input-control-button{
+		    	display:none;
+		    }
+
+		    /* -------------------------------- */
+			/* ui nodes                         */
+			/*    								*/
+			.no-overview-div {
+			    background: #ddd;
+			}
+			.common-ui-node-report-div {
+    			background: #ECEFF1;
+			}
+			.common-ui-node-report-div:hover {
+			    box-shadow: none;
+			    background: white;
+			}
+			.common-ui-node-report-div-hover {
+			    box-shadow: none;
+			    background: #ECEFF1!important
+			}		 
+			.common-ui-node-button-div .toggle-button{
+				font-size: 12px;
+			    padding: 2px;
+			}
+			.common-ui-node-button-div .font-awesome-button{
+				font-size: 12px;
+			    padding: 3px;
+			}
+			.common-ui-node-browse-collection-icon {
+ 			    margin-left: -21px;
+ 			    font-size: 1.3em;		 
+			}
+			.common-ui-node-browse-collection-button {
+			    width: 25px;
+			    height: 25px;		    
+			}
+			.common-ui-node-collection-check {			   
+			    font-size: 0.7em;			  
+			}			 
+			.common-ui-node-report-content-table-right{
+				font-size: 11px;
+			}
+			.common-ui-node-report-content-table-left{
+				font-size: 11px;
+			}
+			.common-ui-node-report-content-table-left-td{
+				font-size: 11px;
+			}
+			.common-ui-node-report-content-table-right-td {
+				font-size: 11px;
+			}
+			.common-ui-node-report-title {
+		        font-size: 11px;
+ 		    }
+		    .common-ui-node-report-desc {
+		    	font-size: 11px!important
+		    }		  
+		    .common-ui-node-time-label{
+		    	font-size: 11px;
+		    }
+		    .gbif-ui-node-occ-button-div div[class*='button']{
+		    	padding-left: 3px!important;
+	    		padding-top: 3px!important;
+				padding-bottom: 3px!important;
+		    	padding-right: 10px!important;
+		    }
+		    .gbif-ui-node-occ-button-div label{
+		    	font-size: 11px;
+		    }			   		    
+		    .gbif-ui-node-filters-button-div label{
+		    	font-size: 11px;
+		    }
+		    .gbif-ui-node-filters-button-div div[class*='button']{
+		    	padding: 4px!important;
+		        padding-right: 8px!important;	
+		    }
+		    .gbif-ui-node-filters-button-div div[class*='toggle-button'] i{
+		    	font-size:  17px;
+		    }
+		    .gbif-ui-node-filters-button-div div[class*='toggle-button']{
+		    	width:170px!important
+			}		    
+		    .gbif-ui-node-occurrence-count-div {
+ 		        padding: 4px;
+ 		    }
+		    .report-desc{
+		    	font-size: 12px;
+		    }
+		    .gbif-ui-node-occurrence-count-div {
+		        width: 200px;
+ 		        font-size: 12px;
+		    }
+			.classification-table{
+				font-size: 11px;
+			}
+			
+		    /* -------------------------------- */
+			/* jquery ui                        */
+			/*                                  */
+			#ui-datepicker-div{
+				z-index: 99!important
+			}
+			.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {
+				font-size: 95%;
+			}

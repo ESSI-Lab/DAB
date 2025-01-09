@@ -108,6 +108,9 @@ Specific Earth Observation constraints.
 
  * @extends GINode
  **/
+
+import { GIAPI } from './GIAPI.js';
+
 GIAPI.DAB = function(dabEndpoint, viewId, servicePath, cswPath, openSearchPath) {
 
     var report = {

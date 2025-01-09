@@ -1,3 +1,6 @@
+
+import { GIAPI } from '../core/GIAPI.js';
+
 GIAPI.DownloadWidget = function(options) {
 	
 	var widget = {};

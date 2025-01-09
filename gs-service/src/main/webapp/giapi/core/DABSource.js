@@ -31,6 +31,9 @@
  * @class DABSource
  * @extends GINode
  **/
+
+import { GIAPI } from './GIAPI.js';
+
 GIAPI.DABSource = function(report, dabNode) {
 
     var node = GIAPI.GINode(report, dabNode, dabNode.servicePath());

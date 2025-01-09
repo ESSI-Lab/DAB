@@ -15,6 +15,8 @@
  * @class Concept
  **/
 
+import { GIAPI } from '../core/GIAPI.js';
+
 GIAPI.Concept = function() {
 
 	var outConcept = {};

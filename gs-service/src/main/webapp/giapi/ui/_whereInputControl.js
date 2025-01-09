@@ -1,3 +1,6 @@
+
+import { GIAPI } from '../core/GIAPI.js';
+
 GIAPI._whereInputControl = function(resultsMapWidget, options) {
 
 	var inControl = {};

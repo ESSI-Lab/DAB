@@ -1,6 +1,7 @@
 /**
  * @module UI
  **/
+import { GIAPI } from '../core/GIAPI.js';
 
 /**
  *  This widget retrieves the available {{#crossLink "DAB/sources:method"}}sources{{/crossLink}} during its initialization, and allows to select which

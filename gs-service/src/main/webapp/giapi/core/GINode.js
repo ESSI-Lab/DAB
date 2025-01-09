@@ -28,6 +28,9 @@
  *
  * @class GINode
  **/
+
+import { GIAPI } from './GIAPI.js';
+
 GIAPI.GINode = function() {
 
     var EXTRA_SMALL_SIZE = 48;

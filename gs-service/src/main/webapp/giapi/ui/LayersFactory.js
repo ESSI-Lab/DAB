@@ -1,6 +1,9 @@
 /**
  * 
  */
+
+import { GIAPI } from '../core/GIAPI.js';
+
 GIAPI.LayersFactory = new function() {
 
 	var factory = {};

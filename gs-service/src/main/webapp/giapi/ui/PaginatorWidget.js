@@ -2,6 +2,7 @@
  * @module UI
  **/
 
+import { GIAPI } from '../core/GIAPI.js';
 
 /**
  * A widget to control a <a href="../classes/Paginator.html" class="crosslink">Paginator</a> object. The following CSS is required:<pre><code>&lt;!-- API CSS --&gt;

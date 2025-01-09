@@ -12,6 +12,9 @@
  *
  * @class Paginator
  **/
+
+import { GIAPI } from '../../core/GIAPI.js';
+
 GIAPI.Paginator = function() {
     
     if(arguments && arguments.length > 0){

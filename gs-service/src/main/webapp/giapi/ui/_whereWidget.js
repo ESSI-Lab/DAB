@@ -1,3 +1,6 @@
+
+import { GIAPI } from '../core/GIAPI.js';
+
 GIAPI._whereWidget = function(dabNode, whereOpt, inputId) {
 
 	var widget = {};

@@ -4,6 +4,7 @@
  * @module UI
  * @main UI 
  **/
+import { GIAPI } from '../core/GIAPI.js';
 
  /**
   *  A <code>ResultSetLayout</code> displays the {{#crossLink "UINode/isRenderable:method"}}renderable nodes{{/crossLink}} of the 

@@ -9,12 +9,10 @@
  */
 
 
-(function(){
-
 	"use strict";
 
 	//Declare root variable - window in the browser, global on the server
-	var root = this,
+	var root = window,
 		previous = root.Chart;
 
 	//Occupy the global variable of Chart, and create a simple base class
@@ -2250,12 +2248,8 @@
 		return Chart;
 	};
 
-}).call(this);
 
-(function(){
-	"use strict";
-
-	var root = this,
+	var root = window,
 		Chart = root.Chart,
 		helpers = Chart.helpers;
 
@@ -2554,12 +2548,8 @@
 	});
 
 
-}).call(this);
 
-(function(){
-	"use strict";
-
-	var root = this,
+	var root = window,
 		Chart = root.Chart,
 		//Cache a local reference to Chart.helpers
 		helpers = Chart.helpers;
@@ -2749,12 +2739,9 @@
 		defaults : helpers.merge(defaultConfig,{percentageInnerCutout : 0})
 	});
 
-}).call(this);
 
-(function(){
-	"use strict";
 
-	var root = this,
+	var root = window,
 		Chart = root.Chart,
 		helpers = Chart.helpers;
 
@@ -3133,12 +3120,8 @@
 	});
 
 
-}).call(this);
 
-(function(){
-	"use strict";
-
-	var root = this,
+	var root = window,
 		Chart = root.Chart,
 		//Cache a local reference to Chart.helpers
 		helpers = Chart.helpers;
@@ -3384,12 +3367,8 @@
 		}
 	});
 
-}).call(this);
 
-(function(){
-	"use strict";
-
-	var root = this,
+	var root = window,
 		Chart = root.Chart,
 		helpers = Chart.helpers;
 
@@ -3730,5 +3709,3 @@
 
 
 
-
-}).call(this);

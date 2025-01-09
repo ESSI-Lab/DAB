@@ -1,6 +1,7 @@
 /**
  * @module UI
  **/
+import { GIAPI } from '../core/GIAPI.js';
 
 GIAPI.OL_Map = function(options) {
 

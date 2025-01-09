@@ -13,6 +13,10 @@
  * @class PropertyName
  * @static
  **/
+
+import { GIAPI } from '../core/GIAPI.js';
+
+
 GIAPI.PropertyName = {
     /**
      * The <code>SCOPE_NOTE</code> {{#crossLink "Property"}}property{{/crossLink}} name

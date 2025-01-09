@@ -8,6 +8,9 @@
  *
  * @class Page
  **/
+
+import { GIAPI } from '../../core/GIAPI.js';
+
 GIAPI.Page = function(nodes, size) {
 
     if (nodes && !Array.isArray(nodes)) {

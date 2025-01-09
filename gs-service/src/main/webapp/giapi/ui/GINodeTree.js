@@ -1,6 +1,7 @@
 /**
  * @module UI
  **/
+import { GIAPI } from '../core/GIAPI.js';
 
 /**
  * This control is based on the <a href="http://developer.yahoo.com/yui/treeview/" target="blank">YUI TreeView Control</a> version 2.9.0 (scripts are included in the minified version of the API) 
@@ -159,7 +160,7 @@ GIAPI.GINodeTree = function(dabNode, divId, options) {
     };
 
     if (!options || !options.onError) {
-        onError = function(errorNode, error) {
+        var onError = function(errorNode, error) {
 
             errorNode.label = errorNode.label + ' (' + error + ')';
             nodeTree.tree.draw();

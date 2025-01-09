@@ -10,6 +10,8 @@
  * @class ButtonsFactory
  */
 
+import { GIAPI } from '../core/GIAPI.js';
+
 GIAPI.ButtonsFactory = {
 		
 	/**

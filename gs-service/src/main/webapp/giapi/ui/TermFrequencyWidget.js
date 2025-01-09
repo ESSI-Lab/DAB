@@ -1,6 +1,7 @@
 /**
  * @module UI
  **/
+import { GIAPI } from '../core/GIAPI.js';
 
 /**
  * A widget to control and visualize a <a href="../classes/TermFrequency.html" class="crosslink">TermFrequency</a> object.<br> 

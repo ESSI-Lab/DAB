@@ -16,7 +16,7 @@
  * @class GIAPI
  * @static
  **/
-var GIAPI = {
+export const GIAPI = {
 
     demo : {
         

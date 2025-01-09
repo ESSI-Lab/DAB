@@ -1,3 +1,6 @@
+
+import { GIAPI } from '../core/GIAPI.js';
+
 /**
  * A toggle button with e possible <a href="#method_state">states</a>. When the button switches to 'on', the target element <code>options.targetId</code> becomes visible, otherwise it is hide.<br>
  * <li> Button 'off' (initial state):<br>

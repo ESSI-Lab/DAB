@@ -1,6 +1,7 @@
 /**
  * @module UI
  **/
+import { GIAPI } from '../core/GIAPI.js';
 
 /**
  *  This widget allows to select all the available <a href="#method_constraints" class="crosslink">constraints</a> of 

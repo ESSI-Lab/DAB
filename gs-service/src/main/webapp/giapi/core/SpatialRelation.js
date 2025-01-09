@@ -11,6 +11,7 @@
  * @class SpatialRelation
  * @static
  **/
+import { GIAPI } from './GIAPI.js';
 
 GIAPI.SpatialRelation = {
 

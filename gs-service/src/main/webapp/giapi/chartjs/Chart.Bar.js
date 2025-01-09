@@ -1,7 +1,6 @@
-(function(){
-	"use strict";
 
-	var root = this,
+
+	var root = window,
 		Chart = root.Chart,
 		helpers = Chart.helpers;
 
@@ -322,4 +321,3 @@
 	});
 
 
-}).call(this);

@@ -2,6 +2,9 @@
  * @module PubSub 
  **/
 
+import { GIAPI } from '../core/GIAPI.js';
+
+
 /**
  * This object allows to {{#crossLink "PubSubManager/subscribe:method"}}make a subscription{{/crossLink}} to the 
  * {{#crossLink "PubSubManager"}}{{/crossLink}}.<br>

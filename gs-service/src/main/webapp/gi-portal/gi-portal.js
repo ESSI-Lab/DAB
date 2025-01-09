@@ -1,21 +1,15 @@
-<!DOCTYPE html>
-<html>
-     
-    <head>
-    	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-        <title>Search portal</title>
-        <link rel="shortcut icon" type="image/png" href="https://api.geodab.eu/docs/assets/favicon.png">
-     		
-		<script type="module" src="gi-portal/libraries.js"></script>		
- 	
- 		<link rel="stylesheet" type="text/css" href="gi-portal/gi-portal.css" />       
-                                
-		<!-- jtable option --> 
-		<script type="module">
-		
-		import { GIAPI } from './giapi/core/GIAPI.js'
+import { GIAPI } from '../giapi/core/GIAPI.js';
 
+var view = 'his-central';
+
+	
+	
+	export function initializePortal(config) {
+    	view = config.view;
+    	document.title = config.title;
+    }
+	
 		    $.extend(true, $.hik.jtable.prototype.options, {
 		        jqueryuiTheme: true
 		    });
@@ -33,48 +27,43 @@
 		        }
 		    }
 		};
-			
-		        GIAPI.logger.enabled = true;
-		         	
-		        GIAPI.search = {};
-		        	        
-		        var view = null;
-		        var viewParam = getUrlParameter('view');							        	        
-				if (typeof viewParam !== 'undefined') {
-				  	view = viewParam;
-				}
-					        	        
-	            // GIAPI.search.dab = GIAPI.DAB('http://localhost:9090/gs-service', view, 'services/essi','csw');
-				// GIAPI.search.dab = GIAPI.DAB('https://gs-service-preproduction.geodab.eu/gs-service', view, 'services/essi','csw');
-	            GIAPI.search.dab = GIAPI.DAB('./', view, 'services/essi','csw');
-	            
-		        jQuery(function() {
-		        	     
-// 		        var logos = '<a style="display:inline-block" target=_blank href="http://api.geodab.eu/"><img style="margin-top:-3px;" src="http://api.geodab.eu/docs/assets/img/api-logo-small-2.png"></img></a>';
-// 		        logos += '<a style="display:inline-block" target=_blank href="http://www.iia.cnr.it/"><img style="vertical-align: super" src="http://api.geodab.eu/docs/assets/img/iia.png"></img></a>';
-// 		        logos += '<a style="display:inline-block" target=_blank href="http://www.uos-firenze.iia.cnr.it/"><img style="vertical-align: super" src="http://api.geodab.eu/docs/assets/img/essilab.png"></img></a>';
-	       	          
-		        var logos = '<a style="display:inline-block" target=_blank href="http://api.geodab.eu/"><img style="margin-top:-3px;" src="http://api.geodab.eu/docs/assets/img/api-logo-small-2.png"></img></a>';
-		  
-		        jQuery('#logoDiv').html(logos);	  
-	        	
+		
+		
+        
+	       
+        
+	        GIAPI.logger.enabled = true;
+	         	
+	        GIAPI.search = {};
+	                      	
+	        
+            // GIAPI.search.dab = GIAPI.DAB('http://localhost:9090/gs-service', view, 'services/essi','csw');
+			// GIAPI.search.dab = GIAPI.DAB('https://gs-service-preproduction.geodab.eu/gs-service', view, 'services/essi','csw');
+            GIAPI.search.dab = GIAPI.DAB('../', view, 'services/essi','csw');
+            
+	        jQuery(function() {
+	        
+	        var seadatanetLogos = '<a style="display:inline-block" target=_blank href="https://www.seadatanet.org/"><img style="width: 56px;" src="http://api.geodab.eu/docs/assets/img/sdn_logo.png"></img></a><a style="display:inline-block" target=_blank href="http://www.iia.cnr.it/"><img style="vertical-align: super" src="http://api.geodab.eu/docs/assets/img/iia.png"></img></a><a style="display:inline-block" targ et=_blank href="http://www.uos-firenze.iia.cnr.it/"><img style="vertical-align: super" src="http://api.geodab.eu/docs/assets/img/essilab.png"></img></a>';
+	     
+	        var standardLogos = '<a style="display:inline-block" target=_blank href="http://api.geodab.eu/"><img style="margin-top:-3px;" src="http://api.geodab.eu/docs/assets/img/api-logo-small-2.png"></img></a><a style="display:inline-block" target=_blank href="http://www.eurogeoss.eu/"><img src="http://api.geodab.eu/docs/assets/img/eurogeoss-small.png"></img></a><a style="display:inline-block" target=_blank href="http://www.iia.cnr.it/"><img style="vertical-align: super" src="http://api.geodab.eu/docs/assets/img/iia.png"></img></a><a style="display:inline-block" targ et=_blank href="http://www.uos-firenze.iia.cnr.it/"><img style="vertical-align: super" src="http://api.geodab.eu/docs/assets/img/essilab.png"></img></a>';
+	        	        	
 	        	// init the tabs	        	
             	jQuery('#tabs-div').tabs({
-	          		  activate: function( event, ui ) {   
-	          			  
-	          			 // hides/shows the paginator widget
-	          			  if(ui.newPanel.selector === '#results-tab'){
-	          				  jQuery('#paginator-widget').css('display','block');
-	          			  }else{
-	          				  jQuery('#paginator-widget').css('display','none');
-	          			  }
-	          			  
-	          			  // refreshes the filters accordion 
-	          			  if(ui.newPanel.selector === '#filters-tab'){
-	           				  jQuery('#filters-tab').accordion('refresh');
-	           			  }  
-	          		  }
-      		    });
+          		  activate: function( event, ui ) {   
+          			  
+          			 // hides/shows the paginator widget
+          			  if(ui.newPanel.selector === '#results-tab'){
+          				  jQuery('#paginator-widget').css('display','block');
+          			  }else{
+          				  jQuery('#paginator-widget').css('display','none');
+          			  }
+          			  
+          			  // refreshes the filters accordion 
+          			  if(ui.newPanel.selector === '#filters-tab'){
+           				  jQuery('#filters-tab').accordion('refresh');
+           			  }  
+          		  }
+ 		    	});
             	
 	        	//------------------------------------------------------------------
 	        	// header settings
@@ -82,12 +71,12 @@
             	jQuery('#headerDiv').css('padding','10px');
             	jQuery('#headerDiv').css('padding-top','5px');
             	jQuery('#headerDiv').css('height','30px');
-            	
+		     	
             	//------------------------------------------------------------------
 	        	// logo div settings
 	        	//
             	jQuery('#logoDiv').css('margin-top','-2px');
-            	jQuery('#logoDiv').css('margin-left','10px');
+            	jQuery('#logoDiv').css('margin-left','50px');
           
             	var baseWidth = 600;
             	
@@ -97,7 +86,11 @@
             	jQuery('#search-button').css('margin-left','-3px');
             	jQuery('#search-button').css('margin-top','5px');
             	
-            	
+            	//------------------------------------------------------------------
+	        	// adv search button
+	        	//
+            	jQuery('#adv-search-button').css('margin-top','6px');
+             	
             	//------------------------------------------------------------------
 	        	// tabs
 	        	//
@@ -118,9 +111,9 @@
             	jQuery('li[aria-controls="results-tab"').css('margin-left','190px');
 
             	var css = 'width: '+(baseWidth + 22)+'px';
-             	GIAPI.UI_Utils.appendStyle('.resultset-layout-ul {'+css+'}');
+            	GIAPI.UI_Utils.appendStyle('.resultset-layout-ul {'+css+'}');
 
-                jQuery('#paginator-widget').css('width',(baseWidth + 30)+'px');
+            jQuery('#paginator-widget').css('width',(baseWidth + 30)+'px');
             	jQuery('#paginator-widget').css('height','55px');
             	jQuery('#paginator-widget').css('top','108px');
             	jQuery('#paginator-widget').css('left','18px');
@@ -128,7 +121,7 @@
             	css = 'width: 290px;';
             	css += 'margin-left:640px;';
             	css += 'margin-top:-99px;';           	
-             	GIAPI.UI_Utils.appendStyle('.series-browser-widget-table {'+css+'}');
+            GIAPI.UI_Utils.appendStyle('.series-browser-widget-table {'+css+'}');
              	
              	//------------------------------------------------------------------
             	// sources tab
@@ -161,57 +154,69 @@
             	// nodes
             	//
             	var css = 'width: '+(baseWidth )+'px';
-             	GIAPI.UI_Utils.appendStyle('.classification-table {'+css+'}');
+            		GIAPI.UI_Utils.appendStyle('.classification-table {'+css+'}');
             	
             	//------------------------------------
-                // ResultsMapWidget
-                //
-            	GIAPI.search.resultsMapWidget = GIAPI.ResultsMapWidget('resMapWidget', 30, -5, {
+            // ResultsMapWidget
+            //
+            	GIAPI.search.resultsMapWidget = GIAPI.ResultsMapWidget('resMapWidget', 42, 10, {
             		
-	            	'width': '100%',
-	            	'height': jQuery(window).height()-70,
-	            	'markerTitle': function(node){
-	        			
-	        			return node.report().title;
-	        		},
-	        		
-	        	    'mapType' : 'ol',
-	        		
- 	        		'showSelectionControl': true,
-
-	//                	'onMarkerClick': function(node) {
-	//             		},
-	        		
-	        		'dabNode':  GIAPI.search.dab,
-	        			        		
-// 	        		'wmsEndpoint' : 'https://geoportale.regione.lazio.it/geoserver/ows',
-
-	        		'onMarkerMouseOver': function(node) {
-	        			
-	        			window.open('#section-div-'+node.uiId, '_self');   
-	        			jQuery('#section-'+node.uiId+' div').first().addClass('common-ui-node-report-div-hover');
-	        		},
-	        		
-	        		'onMarkerMouseOut': function(node) {
-	        			
-	        			jQuery('#section-'+node.uiId+' div').first().removeClass('common-ui-node-report-div-hover');
-	        		},
-	        		
-	        		//'mapTypeControlOptions': {
-        	        //        style : google.maps.MapTypeControlStyle.HORIZONTAL_BAR,	        	     
-        	        //      position : google.maps.ControlPosition.TOP_RIGHT
-	        		//},
-	        		 
- 	            	'zoom': 4,
-	        		'addLayers': false,
-	        		
-	        		'showLayersControl':true,
-	        		'layersControlWidth': 180,
-	        		'layersControlHeight': 200,
-	        		'layersControlOpacity': 0.9,
-	            });  
+		            	'width': '100%',
+		            	'height': jQuery(window).height()-70,
+		            	'markerTitle': function(node){
+		        			
+		        			return node.report().title;
+		        		},
+		        		
+		        	    'mapType' : 'ol',
+		        		
+	 	        		'showSelectionControl': true,
+	
+		//                	'onMarkerClick': function(node) {
+		//             		},
+		        		
+		        		'dabNode':  GIAPI.search.dab,
+		        				        				        			        		
+	 	        		// 'wmsEndpoint' : 'http://localhost:9090/gs-service/services/essi/view/his-central-hapes/wms',
+	 	        		'wmsEndpoint' : 'https://geoportale.regione.lazio.it/geoserver/ows',
+	
+	  	        		'clusterWMS': true,
+	  	        		'clusterWMSToken': 'his_central-568a4888-d6bd-4be3-b7a6-d9887997bb0f',
+	  	        		'clusterWMSView': view,
+	  	        		'clusterWMSLayerName': view,
+	  	        		'clusterWMSLayerTitle': view,	  	        		
+	  	        		
+	  	        		'stationInfoId': 'stationInfo',	  	    	  	        		
+	  	        		'stationNameAddId' : 'platformNameConstraint',
+	  	        		
+	  	        		'advancedConstraintDivId': 'advConstDiv',
+	  	        		
+		        		'onMarkerMouseOver': function(node) {
+		        			
+		        			window.open('#section-div-'+node.uiId, '_self');   
+		        			jQuery('#section-'+node.uiId+' div').first().addClass('common-ui-node-report-div-hover');
+		        		},
+		        		
+		        		'onMarkerMouseOut': function(node) {
+		        			
+		        			jQuery('#section-'+node.uiId+' div').first().removeClass('common-ui-node-report-div-hover');
+		        		},
+		        		
+		        		//'mapTypeControlOptions': {
+	        	        //        style : google.maps.MapTypeControlStyle.HORIZONTAL_BAR,	        	     
+	        	        //      position : google.maps.ControlPosition.TOP_RIGHT
+		        		//},
+		        		 
+	 	            	'zoom': 6,
+		        		'addLayers': false,
+		        		
+		        		'showLayersControl':true,
+		        		'layersControlWidth': 180,
+		        		'layersControlHeight': 200,
+		        		'layersControlOpacity': 0.9,
+		        });  
             	            	             	            	           	
-            	//------------------------------------
+             	//------------------------------------
                 // search button
                 //
 	      	 	var searchButton  = GIAPI.FontAwesomeButton({
@@ -256,34 +261,34 @@
              	
              	jQuery('#hide-results-button').append(hideResultsButton);
              	
-            	jQuery(document).on('click','#hideResultsButton',function(){      
-
-            		if(jQuery('#hideResultsButton').is(":checked")){
-
-            			jQuery('#paginator-widget').css('display','none');
-            			jQuery('#tabs-div').css('display','none');
-
-            		}else{
-
-            			jQuery('#paginator-widget').css('display','inline-block');
-            			jQuery('#tabs-div').css('display','block');
-					}
-            	});       
+	            	jQuery(document).on('click','#hideResultsButton',function(){      
+	
+	            		if(jQuery('#hideResultsButton').is(":checked")){
+	
+	            			jQuery('#paginator-widget').css('display','none');
+	            			jQuery('#tabs-div').css('display','none');
+	
+	            		}else{
+	
+	            			jQuery('#paginator-widget').css('display','inline-block');
+	            			jQuery('#tabs-div').css('display','block');
+						}
+	            	});       
             	
       	 	    //------------------------------------
                 // ConstraintsWidget
                 //
                 GIAPI.search.constWidget = GIAPI.ConstraintsWidget(GIAPI.search.dab, {
-            		'keyDownAction': (function(){ GIAPI.search.discover();}),
-            		'fieldsWidth': 205             	
+	            		'keyDownAction': (function(){ GIAPI.search.discover();}),
+	            		'fieldsWidth': 205             	
                 });
                 
                 GIAPI.search.constWidget.whatConstraint('add',{
-                	 showOptDialog: true , 
-                	 showResultSetExtensionOpt: true, 
-                	 optDialogPosition : 'bottom',
-                	 showHelpIcon: false,
-                	 resizable:true
+	                	 showOptDialog: true , 
+	                	 showResultSetExtensionOpt: true, 
+	                	 optDialogPosition : 'bottom',
+	                	 showHelpIcon: false,
+	                	 resizable:true
                 });      
                 
                 GIAPI.search.constWidget.append('what-div');
@@ -316,7 +321,7 @@
       	        jQuery('#where-div').append(document.getElementById("mapControlDiv"));
       	             	      
       	        //
-            	// toggle button for the map input control (mapControlDiv)
+           	 	// toggle button for the map input control (mapControlDiv)
      			//
      			
      			var layerSelectorDisplay = 'none';
@@ -353,34 +358,28 @@
 					}
             	});           	
             	           	    
-      	        jQuery('#where-div').append(hideMapInputControlButton);
+     	    jQuery('#where-div').append(hideMapInputControlButton);
 
-	      	  	jQuery('#onoffswitch-div-hideMapInputControl').css('z-index','1');
+      	  	jQuery('#onoffswitch-div-hideMapInputControl').css('z-index','1');
 	        	jQuery('#onoffswitch-div-hideMapInputControl').css('margin-top','-22px');
 	        	jQuery('#onoffswitch-div-hideMapInputControl').css('margin-left','100px');
 	          	            	                  	      	          
-      	        //
+	            //
                 // advanced search div        
                 //
                     
-                GIAPI.search.constWidget.advancedSearch(
-            		'advConstDiv',
-            		'adv-search-div',
-            		[
-            			GIAPI.search.constWidget.textConstraint('get','instrumentTitle'),
-            			GIAPI.search.constWidget.textConstraint('get','attributeTitle'),
-            			GIAPI.search.constWidget.textConstraint('get','platformTitle'),
-            			GIAPI.search.constWidget.hlConstraint ('get'),
-            			GIAPI.search.constWidget.booleanConstraint('get','gdc'),
-            			GIAPI.search.constWidget.evtOrdConstraint('get'),
-            			GIAPI.search.constWidget.textConstraint('get','magt', {
-                           	'values': [{'label':'All magnitudes','value':''}, {'label':'ML'},{'label':'Mw'}],
-                           	'readOnlyValues': true}),
-                        GIAPI.search.constWidget.numericConstraint('get','maxmag',{'minValue': 0, 'step': 0.1}),
-                        GIAPI.search.constWidget.numericConstraint('get','minmag',{'minValue': 0, 'step': 0.1})	
-            		]              
+         	    GIAPI.search.constWidget.advancedSearch(
+               		'advConstDiv',
+               		'adv-search-div',
+               		[
+               			GIAPI.search.constWidget.textConstraint('get','instrumentTitle'),
+               			GIAPI.search.constWidget.textConstraint('get','attributeTitle'),
+               			GIAPI.search.constWidget.textConstraint('get','platformTitle', 
+               					{id:'platformNameConstraint', helpIconImage: 'fa-wifi' }),
+               			GIAPI.search.constWidget.booleanConstraint('get','isValidated')
+               		]              
                 ); 
-         	
+            	
       	        //------------------------------------
                 // PaginatorWidget
                 //
@@ -390,9 +389,9 @@
                 		{'onPagination': function(action){
 
                 	        GIAPI.UI_Utils.discoverDialog('open');
-                  		},
-                  		'border': 'none'
-                	}
+                  	},
+                  	'border': 'none'
+                	    }
                 );
                 
                 //------------------------------------
@@ -402,16 +401,17 @@
                  	'width':'auto',    
                  	'height':'auto',
                  	'viewId': view,
-                	'include': function(source){                		
+                		'include': function(source){                		
                 		// includes only harvested sources to speedup the initialization
-                		return source.contentType () === 'harvested';
+                			return source.contentType () === 'harvested';
                  	},
                 	
-                	'onSourcesReady':  function(sources){                        
-                    	// starts the init discover
-                        GIAPI.search.discover();  
-                	}
+	                	'onSourcesReady':  function(sources){                        
+	                    	// starts the init discover
+	                        GIAPI.search.discover();  
+                		}
                 });
+                
                 GIAPI.UI_Utils.appendStyle('#sources-tab{ max-height: '+(jQuery(window).height()-150)+ 'px}');
                
                 //------------------------------------
@@ -428,82 +428,6 @@
                 
                 jQuery('#filters-tab').css('height',jQuery(window).height()-150);
                 
-                //-------------------------------
-                // GINodeTree
-                //
-                var lastClickedLabel;
-                GIAPI.search.tfWidget.nodeTree = GIAPI.GINodeTree(GIAPI.search.dab,'browse-tree-div',{
-                	
-//                	expandRoot: true,
-                	onCreateNode: function(labelId, label, giNode, parentTreeNode, expandNext, isRoot){
-                		
-                		    if(giNode){
-                 		            		           		 
-		                		jQuery(document).on('click','#'+labelId, function(){	 
-		                				                
-		                			jQuery('#'+lastClickedLabel).css('text-decoration','none');
-		                			jQuery('#'+labelId).css('text-decoration','underline');
-		                			
-		                			lastClickedLabel = labelId; 
-		                			
-		                			var id = 'browse-info-div';
-		                			jQuery('#'+id).remove();
-		                					
-		                			if(giNode.report().service && giNode.report().service.source){
-		                				
-		       	                        var css = 'padding-bottom: 5px;';
-	 		                			css += 'margin-top: 5px;';
-			                			
-			                			var div = '<div id="browse-info-div" style="'+css+'"></div>'
-			                			jQuery('#browse-tab').append(div);	        	                       
-	                					
-	        	                        var sourceInfo = GIAPI.Source_UINode(giNode,id);	     
-	        	                        sourceInfo.updateMap();	    	        	                        
-	    
-	        	                  	    jQuery('#'+id+' > table').css('width','100%');
-	        	                  	    jQuery('#'+id+' > table').css('margin-left','0px');
-	        	                  	    jQuery('#'+id+' > table').css('margin-top','0px');
-	
-	                 				}else{	 
-	                					
-	                					var css = 'border: 1px solid #9E9E9E;';
- 			                			css += 'margin-bottom: 3px;';
-			                			css += 'margin-top: 5px;';
-			                		    css += 'height:100%;';
-			                			
-			                			var div = '<div id="browse-info-div" style="'+css+'"></div>'
-			                			jQuery('#browse-tab').append(div);	        	                       
-	      	                					                			
-			                			var Common_UINode_No_Aside = function(options) {
-			            	             	
-			            	            	var uiNode = GIAPI.Common_UINode(options);	
-			            	            	
-			            	            	options.asideDom = function(node,options,asideId){                	
-			            	            	};
-			            	            	
-			            	            	options.onAsideReady = function(aside,node){               	
-			            	            	};
-			            	
-			            	            	return uiNode;
-			            	            };
-			            	            
-			                			var node = Common_UINode_No_Aside({
-			                				noTitle: true,
-			                				mapWidget: GIAPI.search.resultsMapWidget
-			                			});
-			                			node.render(giNode,0,0,0,id);		  
-		                			}
-		                			
-		                			return false;                			
-		                		});
-	                		}
-	                		
-	                		return label;
-            		}              	 
-                });
-                GIAPI.UI_Utils.appendStyle('#browse-info-div div[class=common-ui-node-report-div]{ padding-bottom: 5px}');
-                GIAPI.UI_Utils.appendStyle('#browse-tab{ max-height: '+(jQuery(window).height()-150)+ 'px}');
-
                           
                 //------------------------------------
                 // ResultSetLayout
@@ -520,40 +444,21 @@
 	
 	            	return uiNode;
 	            };
-	            
- 				var IrisEvent_UINode_No_Aside = function(options) {
-	             	
-	            	var uiNode = GIAPI.IrisEvent_UINode(options);	
-	            	
-	            	options.asideDom = function(node,options,asideId){                	
-	            	};
-	            	
-	            	options.onAsideReady = function(aside,node){               	
-	            	};
-	
-	            	return uiNode;
-	            };
 	                     
 	            
                 // creates the layout
 	            GIAPI.search.resultSetLayout = GIAPI.ResultSetLayout('results-tab',{
 	            	                	
 	            	// registers the ui nodes
-                	'uiNodes' : [Common_UINode_No_Aside, IrisEvent_UINode_No_Aside],
+                	'uiNodes' : [Common_UINode_No_Aside],
                 	
                 	// set the widgets to update
                 	'mapWidget' : GIAPI.search.resultsMapWidget,
                 	'pagWidget' : GIAPI.search.paginatorWidget,
                     'tfWidget' : GIAPI.search.tfWidget,
                     
-                    // set the onUpdateReady function with the implementation
-                	// provided by GBIF_UINode
-                	'onUpdateReady': function(renderedNodes){ 
-                		GIAPI.GBIF_UINode.onUpdateReady(GIAPI.search.dab, renderedNodes)
-                	},
                    	
-                    // enables the collection browsing ------------------
-                	'browseCollection': true,
+                	'browseCollection': false,
                 	'browseCollectionMapType': 'ol',
                 	'onDiscoverResponse': GIAPI.search.onDiscoverResponse,
                  	// ---------------------------------------------------
@@ -573,34 +478,34 @@
             	
                 var constraints = GIAPI.search.constWidget.constraints();                
                 constraints.where  = GIAPI.search.resultsMapWidget.where();
-                    	        
+                                    	        
                 var tokenParam = getUrlParameter('token');							        	        
     			
-    	        if (typeof tokenParam !== 'undefined') {
-    				
-    			    constraints.kvp.push(
-    	                 	
-    	                	{'key':'token','value':tokenParam}
-    	             );
-    			}
+	    	        if (typeof tokenParam !== 'undefined') {
+	    				
+	    			    constraints.kvp.push(
+	    	                 	
+	    	                	{'key':'token','value':tokenParam}
+	    	             );
+	    			}
                 
                 var options =  GIAPI.search.constWidget.options();
-//                options.pageSize = GIAPI.search.pageSizeWidget.value();
+
                 options.spatialRelation = GIAPI.search.resultsMapWidget.spatialRelation();
                 
+                constraints.spatialOp = options.spatialRelation;
+        		    
+                GIAPI.search.resultsMapWidget.updateWMSClusterLayers(constraints);
+              
                 // set the termFrequency option
                 options.termFrequency = 'source,keyword,format,protocol';
-                
-                // var onStatus = function(status){
-                //	  GIAPI.UI_Utils.discoverDialog('update',status);
-                // };
-                               
+                                                        
                 try {                	               	
-                	GIAPI.search.dab.discover( GIAPI.search.onDiscoverResponse, constraints, options);               	
-                	GIAPI.UI_Utils.discoverDialog('open');
+	                	GIAPI.search.dab.discover( GIAPI.search.onDiscoverResponse, constraints, options);               	
+	                	GIAPI.UI_Utils.discoverDialog('open');
                 
                 } catch(err) {
-                	GIAPI.UI_Utils.dialog('open',{title:'Error',message:err});
+                		GIAPI.UI_Utils.dialog('open',{title:'Error',message:err});
                 }
             };
                                   	               
@@ -632,65 +537,3 @@
                     GIAPI.UI_Utils.discoverDialog('close');
                 }
             };
-           </script>
-    </head>
-    
-    <body>
-    	
-        <div id="controlToggleButtonDiv"></div> 
-        
-        <div id="headerDiv">
-        
-    		<div id="search-button"></div>
-    		
-    		<div id="hide-results-button"></div>    	
-    			
-        	<div id="what-div"></div>
-        	<div id="from-div"></div>
-        	<div id="to-div"></div>
-        	
-        	<div id="where-div"></div>
-        	      	
-        	<div id="adv-search-div"></div>
-         	
-        	<div id="logoDiv" >
-	        	      	
-	       </div>
-          	
-	   </div>
-       	    
-       <div id="resMapWidget"></div>
-       
-       <div id="paginator-widget"></div>       
-       
-	   <div id="tabs-div">
-	   
-            <ul id="tabs-ul">
-                <li><a style="margin-left: -60px;" href="#results-tab">RESULTS</a></li>
-                <li><a href="#filters-tab">FILTERS</a></li>
-                <li><a href="#sources-tab">SOURCES</a></li>
-                <li><a href="#browse-tab">BROWSING</a></li>              
-                
-            </ul>
-            						               
-            <div class="tabs-element" id="results-tab">                 
-            </div>
-            
-            <div class="tabs-element" id="filters-tab">	                    
-            </div>
-               
-            <div class="tabs-element" id="sources-tab">
-            </div>
-            
-             <div class="tabs-element" id="browse-tab">
-            	<div id="browse-tree-div"></div>
-            	<div id="browse-info-div"></div>
-            </div>
-                          	                                           
-	   </div>  	
-        
-       <div id="advConstDialog"></div>
-     
-    </body>
-    
-</html>

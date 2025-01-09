@@ -8,6 +8,9 @@
  *
  * @class SourceStatus
  **/
+
+import { GIAPI } from './GIAPI.js';
+
 GIAPI.SourceStatus = function(status) {
     
     return {

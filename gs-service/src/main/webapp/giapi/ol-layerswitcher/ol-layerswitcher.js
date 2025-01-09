@@ -1,7 +1,7 @@
 (function(global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('ol/control/Control'), require('ol/Observable'), require('ol/layer/Group')) :
 		typeof define === 'function' && define.amd ? define(['ol/control/Control', 'ol/Observable', 'ol/layer/Group'], factory) :
-			(global.LayerSwitcher = factory(global.ol.control.Control, global.ol.Observable, global.ol.layer.Group));
+			(window.LayerSwitcher = factory(window.ol.control.Control, window.ol.Observable, window.ol.layer.Group));
 }(this, (function(Control, ol_Observable, LayerGroup) {
 	'use strict';
 

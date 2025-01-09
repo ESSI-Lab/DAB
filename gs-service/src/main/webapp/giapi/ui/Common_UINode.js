@@ -1,6 +1,7 @@
 /**
  * @module UI
  **/
+import { GIAPI } from '../core/GIAPI.js';
 
 /**
  *  This class extends <code>{{#crossLink "UINode"}}{{/crossLink}}</code> in order to provide a common graphical representation of the 

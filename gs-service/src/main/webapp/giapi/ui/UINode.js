@@ -1,6 +1,7 @@
 /**
  * @module UI
  **/
+import { GIAPI } from '../core/GIAPI.js';
 
  /**
   *  A <code>UINode</code> is a {{#crossLink "UINode/render:method"}}graphical representation{{/crossLink}} of a <code>{{#crossLink "GINode"}}node{{/crossLink}}</code> which can be 

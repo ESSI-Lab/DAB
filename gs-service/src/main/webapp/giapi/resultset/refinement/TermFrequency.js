@@ -60,6 +60,8 @@ dab.discover(onResponse, options);
  *
  * @class TermFrequency
  **/
+import { GIAPI } from '../../core/GIAPI.js';
+
 GIAPI.TermFrequency = function(dabNode, cnstr, options, onStatus, onResponse, termFrequency, reset) {
 
     var tf = {};

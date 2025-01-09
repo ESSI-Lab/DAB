@@ -9,6 +9,10 @@
  * @class Relation
  * @static
  **/
+
+import { GIAPI } from '../core/GIAPI.js';
+
+
 GIAPI.Relation = {
     /**
      *

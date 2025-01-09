@@ -1,3 +1,6 @@
+
+import { GIAPI } from '../core/GIAPI.js';
+
 GIAPI.SeriesBrowserWidget = function(options) {
 
 	var widget = {};
