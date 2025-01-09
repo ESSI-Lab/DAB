@@ -30,8 +30,6 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import com.marklogic.xcc.exceptions.RequestException;
-
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.bond.jaxb.ViewFactory;
@@ -42,7 +40,6 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.ontology.GSKnowledgeResourceDescription;
 import eu.essi_lab.model.ontology.d2k.serialization.J2RDFSerializer;
 import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.model.resource.stax.GIResourceParser;
 
 /**
  * @author Fabrizio
@@ -58,35 +55,35 @@ public abstract class DatabaseWriter implements DatabaseProvider {
      * @see GSResource#getPrivateId()
      */
     public void store(GSResource resource) throws GSException {
-    
-        GSSource source = resource.getSource();
-    
-        Database markLogicDB = getDatabase();
-    
-        try {
-    
-            SourceStorageWorker worker = markLogicDB.getWorker(source.getUniqueIdentifier());
-    
-            DatabaseFolder folder = markLogicDB.findWritingFolder(worker);
-    
-            Document asDocument = resource.asDocument(true);
-    
-            String key = resource.getPrivateId();
-            folder.store(key, asDocument);
-    
-        } catch (Exception e) {
-    
-            GSLoggerFactory.getLogger(getClass()).error("Unable to store resource {}", resource.getPrivateId(), e);
-    
-            throw GSException.createException(//
-        	    getClass(), //
-        	    e.getMessage(), //
-        	    null, //
-        	    ErrorInfo.ERRORTYPE_INTERNAL, //
-        	    ErrorInfo.SEVERITY_ERROR, //
-        	    "DatabaseWriterStoreResourceError", //
-        	    e);
-        }
+
+	GSSource source = resource.getSource();
+
+	Database markLogicDB = getDatabase();
+
+	try {
+
+	    SourceStorageWorker worker = markLogicDB.getWorker(source.getUniqueIdentifier());
+
+	    DatabaseFolder folder = markLogicDB.findWritingFolder(worker);
+
+	    Document asDocument = resource.asDocument(true);
+
+	    String key = resource.getPrivateId();
+	    folder.store(key, asDocument);
+
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error("Unable to store resource {}", resource.getPrivateId(), e);
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    "DatabaseWriterStoreResourceError", //
+		    e);
+	}
     }
 
     /**
@@ -115,54 +112,37 @@ public abstract class DatabaseWriter implements DatabaseProvider {
      * @throws GSException
      */
     public void update(GSResource resource) throws GSException {
-    
-        GSSource source = resource.getSource();
-    
-        Database markLogicDB = getDatabase();
-    
-        try {
-    
-            SourceStorageWorker worker = markLogicDB.getWorker(source.getUniqueIdentifier());
-    
-            Document asDocument = resource.asDocument(true);
-    
-            String key = resource.getPrivateId();
-    
-            DatabaseFolder folder = markLogicDB.findWritingFolder(worker);
-    
-            folder.replace(key, asDocument);
-    
-        } catch (Exception e) {
-    
-            GSLoggerFactory.getLogger(getClass()).error("Unable to update resource {}", resource.getPrivateId(), e);
-    
-            throw GSException.createException(//
-        	    getClass(), //
-        	    e.getMessage(), //
-        	    null, //
-        	    ErrorInfo.ERRORTYPE_INTERNAL, //
-        	    ErrorInfo.SEVERITY_ERROR, //
-        	    "DatabaseWriterUpdateResourceError", //
-        	    e);
-        }
+
+	GSSource source = resource.getSource();
+
+	Database markLogicDB = getDatabase();
+
+	try {
+
+	    SourceStorageWorker worker = markLogicDB.getWorker(source.getUniqueIdentifier());
+
+	    Document asDocument = resource.asDocument(true);
+
+	    String key = resource.getPrivateId();
+
+	    DatabaseFolder folder = markLogicDB.findWritingFolder(worker);
+
+	    folder.replace(key, asDocument);
+
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error("Unable to update resource {}", resource.getPrivateId(), e);
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    "DatabaseWriterUpdateResourceError", //
+		    e);
+	}
     }
-
-    /**
-     * Stores the given <code>document</code> according to the provided <code>identifier</code>
-     *
-     * @param identifier
-     * @param document
-     * @throws GSException
-     */
-    public abstract void store(String identifier, Document document) throws GSException;
-
-    /**
-     * Removes the document with the provided <code>identifier</code>
-     *
-     * @param resource
-     * @throws GSException if document is not present or other errors occurred
-     */
-    public abstract void removeDocument(String identifier) throws GSException;
 
     /**
      * Stores the given user, overwriting a possible existing user with same identifier
@@ -171,30 +151,30 @@ public abstract class DatabaseWriter implements DatabaseProvider {
      * @throws GSException
      */
     public void store(GSUser user) throws GSException {
-    
-        try {
-    
-            DatabaseFolder folder = getDatabase().getUsersFolder();
-    
-            Document document = user.asDocument(true);
-    
-            folder.store(user.getUri(), document);
-    
-            folder.replace(user.getUri(), document);
-    
-        } catch (Exception e) {
-    
-            GSLoggerFactory.getLogger(getClass()).error("Unable to store user {}", user.getIdentifier(), e);
-    
-            throw GSException.createException(//
-        	    getClass(), //
-        	    e.getMessage(), //
-        	    null, //
-        	    ErrorInfo.ERRORTYPE_INTERNAL, //
-        	    ErrorInfo.SEVERITY_ERROR, //
-        	    "DatabaseWriterStoreUserError", //
-        	    e);
-        }
+
+	try {
+
+	    DatabaseFolder folder = getDatabase().getUsersFolder();
+
+	    Document document = user.asDocument(true);
+
+	    folder.store(user.getUri(), document);
+
+	    folder.replace(user.getUri(), document);
+
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error("Unable to store user {}", user.getIdentifier(), e);
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    "DatabaseWriterStoreUserError", //
+		    e);
+	}
     }
 
     /**
@@ -204,25 +184,25 @@ public abstract class DatabaseWriter implements DatabaseProvider {
      * @throws GSException
      */
     public void removeUser(String userIdentifier) throws GSException {
-    
-        try {
-    
-            DatabaseFolder folder = getDatabase().getUsersFolder();
-    
-            folder.remove(GSUser.toURI(userIdentifier));
-    
-        } catch (Exception e) {
-    
-            GSLoggerFactory.getLogger(getClass()).error("Unable to remove user {}", userIdentifier, e);
-            throw GSException.createException(//
-        	    getClass(), //
-        	    e.getMessage(), //
-        	    null, //
-        	    ErrorInfo.ERRORTYPE_INTERNAL, //
-        	    ErrorInfo.SEVERITY_ERROR, //
-        	    "DatabaseWriterRemoveUserError", //
-        	    e);
-        }
+
+	try {
+
+	    DatabaseFolder folder = getDatabase().getUsersFolder();
+
+	    folder.remove(GSUser.toURI(userIdentifier));
+
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error("Unable to remove user {}", userIdentifier, e);
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    "DatabaseWriterRemoveUserError", //
+		    e);
+	}
     }
 
     /**
@@ -232,40 +212,40 @@ public abstract class DatabaseWriter implements DatabaseProvider {
      * @throws GSException
      */
     public void store(View view) throws GSException {
-    
-        try {
-    
-            String id = view.getId();
-    
-            DatabaseFolder folder = getDatabase().getViewFolder(true);
-    
-            ViewFactory factory = new ViewFactory();
-    
-            Marshaller marshaller = factory.createMarshaller();
-    
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    
-            marshaller.marshal(view, baos);
-    
-            byte[] bytes = baos.toByteArray();
-    
-            folder.storeBinary(id, new ByteArrayInputStream(bytes));
-    
-            folder.replaceBinary(id, new ByteArrayInputStream(bytes));
-    
-        } catch (Exception e) {
-    
-            GSLoggerFactory.getLogger(getClass()).error("Unable to store view {}", view.getId(), e);
-    
-            throw GSException.createException(//
-        	    getClass(), //
-        	    e.getMessage(), //
-        	    null, //
-        	    ErrorInfo.ERRORTYPE_INTERNAL, //
-        	    ErrorInfo.SEVERITY_ERROR, //
-        	    "DatabaseWriterStoreViewError", //
-        	    e);
-        }
+
+	try {
+
+	    String id = view.getId();
+
+	    DatabaseFolder folder = getDatabase().getViewFolder(true);
+
+	    ViewFactory factory = new ViewFactory();
+
+	    Marshaller marshaller = factory.createMarshaller();
+
+	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+	    marshaller.marshal(view, baos);
+
+	    byte[] bytes = baos.toByteArray();
+
+	    folder.storeBinary(id, new ByteArrayInputStream(bytes));
+
+	    folder.replaceBinary(id, new ByteArrayInputStream(bytes));
+
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error("Unable to store view {}", view.getId(), e);
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    "DatabaseWriterStoreViewError", //
+		    e);
+	}
     }
 
     /**
@@ -275,25 +255,25 @@ public abstract class DatabaseWriter implements DatabaseProvider {
      * @throws GSException
      */
     public void removeView(String id) throws GSException {
-    
-        try {
-    
-            DatabaseFolder folder = getDatabase().getViewFolder(true);
-    
-            folder.remove(id);
-    
-        } catch (Exception e) {
-    
-            GSLoggerFactory.getLogger(getClass()).error("Unable to remove view {}", id, e);
-            throw GSException.createException(//
-        	    getClass(), //
-        	    e.getMessage(), //
-        	    null, //
-        	    ErrorInfo.ERRORTYPE_INTERNAL, //
-        	    ErrorInfo.SEVERITY_ERROR, //
-        	    "DatabaseWriterRemoveViewError", //
-        	    e);
-        }
+
+	try {
+
+	    DatabaseFolder folder = getDatabase().getViewFolder(true);
+
+	    folder.remove(id);
+
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error("Unable to remove view {}", id, e);
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    "DatabaseWriterRemoveViewError", //
+		    e);
+	}
     }
 
     /**
