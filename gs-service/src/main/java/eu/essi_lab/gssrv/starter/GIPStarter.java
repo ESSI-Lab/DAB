@@ -34,6 +34,7 @@ import javax.xml.bind.JAXBException;
 
 import org.quartz.SchedulerException;
 
+import eu.essi_lab.api.database.cfg.DatabaseSource;
 import eu.essi_lab.augmenter.worker.AugmentationReportsHandler;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.ConfigurationSource;
@@ -58,7 +59,6 @@ import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting.JobStoreType;
 import eu.essi_lab.cfga.source.FileSource;
-import eu.essi_lab.cfga.source.MarkLogicSource;
 import eu.essi_lab.configuration.ClusterType;
 import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.gssrv.conf.task.ErrorLogsPublisherTask;
@@ -68,6 +68,7 @@ import eu.essi_lab.harvester.HarvestingReportsHandler;
 import eu.essi_lab.jaxb.common.CommonContext;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.Dataset;
@@ -77,6 +78,7 @@ import eu.essi_lab.profiler.wms.extent.WMSLayer;
 import eu.essi_lab.profiler.wms.extent.map.WMSGetMapHandler;
 import eu.essi_lab.request.executor.schedule.DownloadReportsHandler;
 import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
+import eu.essi_lab.wrapper.marklogic.MarkLogicWrapper;
 
 /**
  * @author Fabrizio
@@ -255,7 +257,11 @@ public class GIPStarter {
 		// xdbc://user:password@hostname:8000,8004/dbName/folder/
 		//
 
-		source = new MarkLogicSource(split[0], configFileName);
+		String xdbc = split[0];
+		
+		StorageInfo uri = MarkLogicWrapper.fromXDBC(xdbc);
+		
+		source = new DatabaseSource(uri, configFileName);
 
 	    } else {
 
