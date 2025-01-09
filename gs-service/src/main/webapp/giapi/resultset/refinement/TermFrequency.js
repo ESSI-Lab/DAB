@@ -75,7 +75,7 @@ GIAPI.TermFrequency = function(dabNode, cnstr, options, onStatus, onResponse, te
         GIAPI.tfHelper.checkedItems = {};
     }
 
-    for (p in termFrequency) {
+    for (let p in termFrequency) {
         targets.push(p);
     }
 

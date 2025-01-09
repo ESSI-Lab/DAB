@@ -589,7 +589,7 @@ GIAPI.GINode = function() {
                 size = MEDIUM_SIZE;
                 break;
         }
-       
+       var overviewLink
         if(overview){
         	overviewLink = overview[options.index];
         }else if(options.force){

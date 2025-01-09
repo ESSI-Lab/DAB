@@ -289,7 +289,7 @@ GIAPI.ResultSetLayout = function(id, options) {
 		   	          var opt = {};
 		   	          // set a reference to this layout
 		   	          opt.layout = layout;
-		   	     	  for(property in options){
+		   	     	  for(let property in options){
 		   	     		  opt[property] = options[property];
 		   	    	  }
 	   	        

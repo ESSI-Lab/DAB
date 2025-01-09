@@ -488,7 +488,7 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 
 		var paginator = resultSet.paginator;
 		var page = paginator.page();
-		arrayFeatures = new Object();
+		var arrayFeatures = new Object();
 
 		if (options.showNoResultsMsg && count === 0) {
 
