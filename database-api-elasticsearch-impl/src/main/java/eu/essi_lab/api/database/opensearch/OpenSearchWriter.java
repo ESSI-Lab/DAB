@@ -63,18 +63,6 @@ public class OpenSearchWriter extends DatabaseWriter {
     }
 
     @Override
-    public void store(String identifier, Document document) throws GSException {
-	// TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void removeDocument(String identifier) throws GSException {
-	// TODO Auto-generated method stub
-
-    }
-
-    @Override
     public void storeRDF(Node rdf) throws GSException {
 	// TODO Auto-generated method stub
 

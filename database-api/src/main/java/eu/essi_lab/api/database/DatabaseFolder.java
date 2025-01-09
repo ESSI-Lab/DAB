@@ -84,25 +84,7 @@ public interface DatabaseFolder {
      */
     boolean storeBinary(String key, InputStream res) throws Exception, UnsupportedOperationException;
 
-    /**
-     * Stores a binary resource with the specified <code>key</code> in this folder <i>(optional operation)</i>.<br>
-     * Key should not contain
-     * slashes.<br>
-     * Use {@link #exists} to test whether a resource with the specified <code>key</code> already exists.
-     * this method also explicitly stores a property associated with the stored document indicating the last update
-     * date. The property
-     * element name is
-     *
-     * @param key the key of the resource.
-     * @param res the resource to be stored.
-     * @param timeStamp a date to use as timestamp
-     * @return
-     * @throws Exception if the key is already used or problems occur
-     * @throws UnsupportedOperationException if this repository does not support this operation
-     */
-    boolean storeBinary(String key, InputStream res, Date timeStamp) throws Exception, UnsupportedOperationException;
-
-    /**
+       /**
      * Returns the DOM resource with the specified <code>key</code>.<br>
      * Key should not contain slashes.<br>
      * Use {@link #exists} to test
@@ -124,21 +106,7 @@ public interface DatabaseFolder {
      * @throws Exception if the resource does not exist or problems occur
      */
     InputStream getBinary(String key) throws Exception;
-
-    /**
-     * @param key
-     * @return
-     * @throws Exception
-     */
-    Optional<Node> getBinaryProperties(String key) throws Exception;
-
-    /**
-     * @param key
-     * @return
-     * @throws Exception
-     */
-    Optional<Date> getBinaryTimestamp(String key) throws Exception;
-
+    
     /**
      * Replace with <code>newDoc</code> the content of the XML resource with the specified <code>key</code>.<br>
      * Key should not contain

@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -145,13 +144,6 @@ public class VolatileFolder implements DatabaseFolder {
     }
 
     @Override
-    public boolean storeBinary(String key, InputStream res, Date modificationDate) throws Exception, UnsupportedOperationException {
-
-	ModifiedInputStream put = streamsMap.put(key, new ModifiedInputStream(res, modificationDate));
-	return put == null;
-    }
-
-    @Override
     public Node get(String key) throws Exception {
 
 	return documentsMap.get(key);
@@ -161,18 +153,6 @@ public class VolatileFolder implements DatabaseFolder {
     public InputStream getBinary(String key) throws Exception {
 
 	return streamsMap.get(key).getInputStream();
-    }
-
-    @Override
-    public Optional<Node> getBinaryProperties(String key) throws Exception {
-
-	return Optional.empty();
-    }
-
-    @Override
-    public Optional<Date> getBinaryTimestamp(String key) throws Exception {
-
-	return Optional.of(streamsMap.get(key).getDateStamp());
     }
 
     @Override
