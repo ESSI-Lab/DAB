@@ -4,17 +4,27 @@
 package eu.essi_lab.api.database.opensearch;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.http.HttpHost;
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
+import org.opensearch.client.RestClient;
+import org.opensearch.client.RestClientBuilder;
+import org.opensearch.client.json.jackson.JacksonJsonpMapper;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.OpenSearchException;
+import org.opensearch.client.opensearch._types.mapping.TypeMapping;
+import org.opensearch.client.opensearch.indices.CreateIndexRequest;
+import org.opensearch.client.opensearch.indices.CreateIndexResponse;
 import org.opensearch.client.opensearch.indices.ExistsRequest;
+import org.opensearch.client.transport.OpenSearchTransport;
 import org.opensearch.client.transport.aws.AwsSdk2Transport;
 import org.opensearch.client.transport.aws.AwsSdk2TransportOptions;
-import org.opensearch.client.transport.endpoints.BooleanResponse;
+import org.opensearch.client.transport.rest_client.RestClientTransport;
 
 /*-
  * #%L
@@ -41,7 +51,9 @@ import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.StorageInfo;
+import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import software.amazon.awssdk.http.SdkHttpClient;
 import software.amazon.awssdk.http.apache.ApacheHttpClient;
@@ -52,105 +64,175 @@ import software.amazon.awssdk.regions.Region;
  */
 public class OpenSearchDatabase extends Database {
 
+    /**
+     * @author Fabrizio
+     */
+    public enum OpenSearchServiceType {
+
+	OPEN_SEARCH_MANAGED("es"),
+
+	OPEN_SEARCH_SERVERLESS("aoss");
+
+	private String type;
+
+	/**
+	 * 
+	 */
+	private OpenSearchServiceType(String type) {
+
+	    this.type = type;
+	}
+
+	/**
+	 * @return the type
+	 */
+	public String getType() {
+
+	    return type;
+	}
+
+	/**
+	 * @param type
+	 * @return
+	 */
+	public static OpenSearchServiceType decode(String type) {
+
+	    return type.equals(OPEN_SEARCH_MANAGED.getType()) ? OPEN_SEARCH_MANAGED : OPEN_SEARCH_SERVERLESS;
+	}
+
+	/**
+	 * S@return
+	 */
+	public static List<String> types() {
+
+	    return Arrays.asList(OpenSearchServiceType.values()).stream().map(t -> t.getType()).collect(Collectors.toList());
+	}
+    }
+
     private OpenSearchClient client;
     private String identifier;
     private DatabaseSetting setting;
 
-    public static void main(String[] args) throws OpenSearchException, IOException {
+    public static final String META_FOLDER_INDEX = "resources-meta-index";
+    public static final String DATA_FOLDER_INDEX = "resources-data-index";
+    public static final String USERS_INDEX = USERS_FOLDER + "-index";
+    public static final String VIEWS_INDEX = VIEWS_FOLDER + "-index";
+    public static final String AUGMENTER_PROPERTIES_INDEX = AUGMENTERS_FOLDER + "-index";
+    public static final String MISC_INDEX = "misc-index";
+    public static final String CONFIGURATION_INDEX = "configuration-index";
 
-	AwsSdk2TransportOptions awsSdk2TransportOptions = AwsSdk2TransportOptions.builder().//
-		build();
+    public static final List<String> INDEXES_LIST = Arrays.asList(//
+	    META_FOLDER_INDEX, //
+	    DATA_FOLDER_INDEX, //
+	    USERS_INDEX, //
+	    VIEWS_INDEX, //
+	    AUGMENTER_PROPERTIES_INDEX, //
+	    MISC_INDEX//
+    );
 
-	SdkHttpClient httpClient = ApacheHttpClient.builder().build();
-
-	AwsSdk2Transport awsSdk2Transport = new AwsSdk2Transport(//
-		httpClient, //
-		"w6iz16h1nis29el1etjd.us-east-1.aoss.amazonaws.com", //
-		"aoss", // Amazon OpenSearch Serverless
-		Region.US_EAST_1, // signing service region
-		awsSdk2TransportOptions);
-
-	OpenSearchClient client = new OpenSearchClient(awsSdk2Transport);
-
-	// InfoResponse info = client.info();
-
-	// create the index
-	ExistsRequest existsIndexRequest = new ExistsRequest.Builder().index("movies-index").build();
-
-	BooleanResponse exists = client.indices().exists(existsIndexRequest);
-
-	System.out.println(exists);
-
-	// String index = "movies";
-	//
-	// CreateIndexRequest createIndexRequest = new CreateIndexRequest.Builder().index(index).build();
-	//
-	// try {
-	// client.indices().create(createIndexRequest);
-	//
-	// // add settings to the index
-	// IndexSettings indexSettings = new IndexSettings.Builder().build();
-	// PutIndicesSettingsRequest putSettingsRequest = new
-	// PutIndicesSettingsRequest.Builder().index(index).settings(indexSettings)
-	// .build();
-	//
-	// client.indices().putSettings(putSettingsRequest);
-	//
-	// System.out.println(client.indices());
-	//
-	// } catch (OpenSearchException ex) {
-	// final String errorType = Objects.requireNonNull(ex.response().error().type());
-	// if (!errorType.equals("resource_already_exists_exception")) {
-	// throw ex;
-	// }
-	// }
-
-	//
-	//
-	//
-
-	httpClient.close();
-    }
+    private SdkHttpClient httpClient;
+    private boolean initialized;
 
     @Override
     public void initialize(StorageInfo storageInfo) throws GSException {
 
-	System.setProperty("aws.accessKeyId", storageInfo.getUser());
-	System.setProperty("aws.secretAccessKey", storageInfo.getPassword());
+	if (!initialized) {
 
-	identifier = storageInfo.getIdentifier() == null ? UUID.randomUUID().toString() : storageInfo.getIdentifier();
+	    System.setProperty("aws.accessKeyId", storageInfo.getUser());
+	    System.setProperty("aws.secretAccessKey", storageInfo.getPassword());
 
-	AwsSdk2TransportOptions awsSdk2TransportOptions = AwsSdk2TransportOptions.builder().//
+	    identifier = storageInfo.getIdentifier() == null ? UUID.randomUUID().toString() : storageInfo.getIdentifier();
+
+	    AwsSdk2TransportOptions awsSdk2TransportOptions = AwsSdk2TransportOptions.builder().//
+
+		    build();
+
+	    httpClient = ApacheHttpClient.builder().build();
+
+	    String serviceName = OpenSearchServiceType.decode(storageInfo.getType().get()).getType();
+
+	    HttpHost httpHost = HttpHost.create(storageInfo.getUri());
+
+	    String schemeName = httpHost.getSchemeName();
+
+	    if (schemeName.equals("http")) {
+
+		RestClient restClient = RestClient.builder(httpHost)
+			.setHttpClientConfigCallback(new RestClientBuilder.HttpClientConfigCallback() {
+			    @Override
+			    public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {
+
+				return httpClientBuilder.setSSLContext(null);
+			    }
+			}).build();
+
+		OpenSearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
+
+		client = new OpenSearchClient(transport);
+
+	    } else {
+
+		AwsSdk2Transport awsSdk2Transport = new AwsSdk2Transport(//
+			httpClient, //
+			httpHost.getHostName(), //
+			serviceName, //
+			Region.US_EAST_1, //
+			awsSdk2TransportOptions);
+
+		client = new OpenSearchClient(awsSdk2Transport);
+	    }
+
+	    //
+	    //
+	    //
+
+	    for (String index : INDEXES_LIST) {
+
+		boolean exists = checkIndex(index);
+
+		if (!exists) {
+
+		    createIndex(index);
+		}
+	    }
+
+	    initialized = true;
+	}
+    }
+
+    /**
+     * @throws GSException
+     */
+    private void createIndex(String index) throws GSException {
+
+	TypeMapping mapping = new TypeMapping.Builder().//
+		withJson(getClass().getClassLoader().getResourceAsStream("mappings/base-mapping.json")).//
 		build();
 
-	SdkHttpClient httpClient = ApacheHttpClient.builder().build();
-
-	String serviceName = storageInfo.getType().get().equals("OpenSearch") ? "es" : "aoss";
-
-	AwsSdk2Transport awsSdk2Transport = new AwsSdk2Transport(//
-		httpClient, //
-		HttpHost.create(storageInfo.getUri()).getHostName(), //
-		serviceName, //
-		Region.US_EAST_1, //
-		awsSdk2TransportOptions);
-
-	client = new OpenSearchClient(awsSdk2Transport);
-
-	//
-	//
-	//
+	CreateIndexRequest createIndexRequest = new CreateIndexRequest.Builder().//
+		index(index).//
+		mappings(mapping).//
+		build();
 
 	try {
 
-	    checkIndex("resources-index");
+	    CreateIndexResponse response = client.indices().create(createIndexRequest);
 
-	    checkIndex("users-index");
+	    if (!response.acknowledged()) {
 
-	    checkIndex("views-index");
+		throw GSException.createException(//
+			getClass(), //
+			null, //
+			ErrorInfo.ERRORTYPE_SERVICE, //
+			ErrorInfo.SEVERITY_FATAL, //
+			"OpenSearchDatabaseCreate" + index + "NotAcknowledgedError");
+	    }
 
 	} catch (Exception ex) {
 
-	    throw GSException.createException(getClass(), "OpenSearchDatabaseInitilizationError", ex);
+	    GSLoggerFactory.getLogger(getClass()).error(ex);
+
+	    throw GSException.createException(getClass(), "OpenSearchDatabaseCreate" + index + "Error", ex);
 	}
     }
 
@@ -160,11 +242,20 @@ public class OpenSearchDatabase extends Database {
      * @throws IOException
      * @throws OpenSearchException
      */
-    private boolean checkIndex(String indexName) throws OpenSearchException, IOException {
+    private boolean checkIndex(String indexName) throws GSException {
 
 	ExistsRequest existsIndexRequest = new ExistsRequest.Builder().index(indexName).build();
 
-	return client.indices().exists(existsIndexRequest).value();
+	try {
+
+	    return client.indices().exists(existsIndexRequest).value();
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(ex);
+
+	    throw GSException.createException(getClass(), "OpenSearchDatabaseCheckIndexError", ex);
+	}
     }
 
     @Override
@@ -230,6 +321,7 @@ public class OpenSearchDatabase extends Database {
     @Override
     public void release() throws GSException {
 
+	httpClient.close();
     }
 
     @Override
@@ -241,8 +333,7 @@ public class OpenSearchDatabase extends Database {
     @Override
     public boolean supports(StorageInfo dbInfo) {
 
-	return dbInfo.getType().isPresent()
-		&& (dbInfo.getType().get().equals("OpenSearch") || dbInfo.getType().get().equals("OpenSearchServerless"));
+	return dbInfo.getType().isPresent() && OpenSearchServiceType.types().contains(dbInfo.getType().get());
     }
 
     @Override
@@ -262,4 +353,40 @@ public class OpenSearchDatabase extends Database {
 
 	return "OpenSearch";
     }
+
+    /**
+     * @return
+     */
+    public OpenSearchClient getClient() {
+
+	return client;
+    }
+
+    /**
+     * @param name
+     * @return
+     */
+    private String normalizeName(String name) {
+
+	if (!getIdentifier().equals("ROOT") && !name.contains(getIdentifier())) {
+	    return "/" + getIdentifier() + "_" + name + "/";
+	}
+
+	return "/" + name + "/";
+    }
+
+    /**
+     * @param name
+     * @throws IllegalArgumentException
+     */
+    private void checkName(String name) throws IllegalArgumentException {
+
+	if (name == null)
+	    throw new IllegalArgumentException("Argument cannot be null");
+
+	if (name.startsWith("/") || name.contains("\\") || name.endsWith("/")) {
+	    throw new IllegalArgumentException("Argument cannot start with or end with slashes and it can not contain back slashes");
+	}
+    }
+
 }

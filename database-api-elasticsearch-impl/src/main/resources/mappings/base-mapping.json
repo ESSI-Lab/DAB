@@ -1,0 +1,14 @@
+{
+	"mappings": {
+		"properties": {
+		
+			"databaseId": {
+				"type": "text"
+			},
+			
+			"folderName": {
+				"type": "text"
+			}
+		}
+	}
+}

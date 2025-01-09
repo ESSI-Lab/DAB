@@ -26,8 +26,14 @@ package eu.essi_lab.api.database.opensearch;
 
 import java.io.InputStream;
 
+import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch.core.IndexRequest;
+import org.opensearch.client.opensearch.core.IndexResponse;
+import org.opensearch.client.opensearch.indices.PutMappingRequest;
+import org.opensearch.client.opensearch.indices.PutMappingResponse;
 import org.w3c.dom.Node;
 
+import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFolder;
 
 /**
@@ -39,12 +45,12 @@ public class OpenSearchFolder implements DatabaseFolder {
     private OpenSearchDatabase database;
 
     /**
-     * @param openSearchDb
+     * @param database
      * @param name
      */
-    public OpenSearchFolder(OpenSearchDatabase openSearchDb, String name) {
+    public OpenSearchFolder(OpenSearchDatabase database, String name) {
 
-	this.database = openSearchDb;
+	this.database = database;
 	this.name = name;
     }
 
@@ -56,13 +62,25 @@ public class OpenSearchFolder implements DatabaseFolder {
 
     @Override
     public boolean store(String key, FolderEntry entry, EntryType type) throws Exception {
-	// TODO Auto-generated method stub
+
+	OpenSearchClient client = database.getClient();
+
+	IndexData indexData = IndexData.of(this, key, entry, type);
+
+	PutMappingRequest mappingRequest = indexData.getMappingRequest();
+
+	PutMappingResponse putMappingResponse = client.indices().putMapping(mappingRequest);
+
+	IndexRequest<String> indexRequest = indexData.getIndexRequest();
+
+	IndexResponse indexResponse = client.index(indexRequest);
+
 	return false;
     }
 
     @Override
     public boolean replace(String key, FolderEntry entry, EntryType type) throws Exception {
-	// TODO Auto-generated method stub
+
 	return false;
     }
 
@@ -105,6 +123,15 @@ public class OpenSearchFolder implements DatabaseFolder {
     @Override
     public void clear() throws Exception {
 
+    }
+
+    /**
+     * @return
+     */
+    @Override
+    public Database getDatabase() {
+
+	return database;
     }
 
 }
