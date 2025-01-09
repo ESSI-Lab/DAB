@@ -22,6 +22,9 @@ package eu.essi_lab.api.database;
  */
 
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -30,6 +33,111 @@ import org.w3c.dom.Node;
  * @author Fabrizio
  */
 public interface DatabaseFolder {
+
+    /**
+     * @author Fabrizio
+     */
+    public static class FolderEntry {
+
+	private Document document;
+	private InputStream stream;
+
+	/**
+	 * @param document
+	 */
+	private FolderEntry(Document document) {
+
+	    this.document = document;
+	}
+
+	/**
+	 * @param stream
+	 */
+	private FolderEntry(InputStream stream) {
+
+	    this.stream = stream;
+	}
+
+	/**
+	 * @return
+	 */
+	public Optional<InputStream> getInputStream() {
+
+	    return Optional.ofNullable(stream);
+	}
+
+	/**
+	 * @return
+	 */
+	public Optional<Document> getDocument() {
+
+	    return Optional.ofNullable(document);
+	}
+
+	/**
+	 * @param document
+	 * @return
+	 */
+	public static FolderEntry of(Document document) {
+
+	    return new FolderEntry(document);
+	}
+
+	/**
+	 * @param stream
+	 * @return
+	 */
+	public static FolderEntry of(InputStream stream) {
+
+	    return new FolderEntry(stream);
+	}
+    }
+
+    /**
+     * @author Fabrizio
+     */
+    public enum EntryType {
+
+	USER("user"), //
+	VIEW("view"), //
+	META_FOLDER_ENTRY("metaFolderItem"), //
+	DATA_FOLDER_ENTRY("dataFolderItem"), //
+	AUGMENTER_PROPERTIES("augmenterProperties"), //
+	CONFIGURATION("configuration"), //
+	MISC("misc");
+
+	private String type;
+
+	/**
+	 * @param type
+	 */
+	private EntryType(String type) {
+
+	    this.type = type;
+	}
+
+	/**
+	 * @return the type
+	 */
+	public String getType() {
+
+	    return type;
+	}
+
+	/**
+	 * @param type
+	 * @return
+	 * @throws NoSuchElementException
+	 */
+	public EntryType decode(String type) throws NoSuchElementException {
+
+	    return Arrays.asList(EntryType.values()).//
+		    stream().//
+		    filter(t -> t.getType().equals(type)).//
+		    findFirst().//
+		    orElseThrow();
+	}
+    }
 
     /**
      * If this folder is a DAB source folder, this method returns the related source identifier by removing from this
@@ -67,22 +175,48 @@ public interface DatabaseFolder {
      * @return false if the key already exists, true if the store was performed with success
      * @throws Exception if the key is already used or problems occur
      */
-    boolean store(String key, Document doc) throws Exception;
+    default boolean store(String key, FolderEntry entry) throws Exception {
+
+	return store(key, entry, EntryType.MISC);
+    }
 
     /**
-     * Stores a binary resource with the specified <code>key</code> in this folder <i>(optional operation)</i>.<br>
+     * Stores a DOM resource with the specified <code>key</code> in this folder.<br>
+     * Key should not contain slashes.<br>
+     * Use {@link #exists}
+     * to test whether a resource with the specified <code>key</code> already exists
+     *
+     * @param key the key of the resource
+     * @param res the resource to be stored
+     * @return false if the key already exists, true if the store was performed with success
+     * @throws Exception if the key is already used or problems occur
+     */
+    boolean store(String key, FolderEntry entry, EntryType type) throws Exception;
+
+    /**
+     * Replace with <code>newDoc</code> the content of the XML resource with the specified <code>key</code>.<br>
      * Key should not contain
      * slashes.<br>
-     * Use {@link #exists} to test whether a resource with the specified <code>key</code> already exists.
-     * this method also explicitly stores a property associated with the stored document indicating the last update date
+     * Use {@link #exists} to test whether a resource with the specified <code>key</code> exists
      *
-     * @param key the key of the resource.
-     * @param res the resource to be stored.
-     * @return false if the key already exists, true if the store was performed with success
+     * @return true if the replacement was made, false if the resource does not exist (no insert is done in this case)
      * @throws Exception if problems occur
-     * @throws UnsupportedOperationException if this repository does not support this operation
      */
-    boolean storeBinary(String key, InputStream res) throws Exception, UnsupportedOperationException;
+    default boolean replace(String key, FolderEntry entry) throws Exception {
+
+	return replace(key, entry, EntryType.MISC);
+    }
+
+    /**
+     * Replace with <code>newDoc</code> the content of the XML resource with the specified <code>key</code>.<br>
+     * Key should not contain
+     * slashes.<br>
+     * Use {@link #exists} to test whether a resource with the specified <code>key</code> exists
+     *
+     * @return true if the replacement was made, false if the resource does not exist (no insert is done in this case)
+     * @throws Exception if problems occur
+     */
+    boolean replace(String key, FolderEntry entry, EntryType type) throws Exception;
 
     /**
      * Returns the DOM resource with the specified <code>key</code>.<br>
@@ -106,31 +240,6 @@ public interface DatabaseFolder {
      * @throws Exception if the resource does not exist or problems occur
      */
     InputStream getBinary(String key) throws Exception;
-
-    /**
-     * Replace with <code>newDoc</code> the content of the XML resource with the specified <code>key</code>.<br>
-     * Key should not contain
-     * slashes.<br>
-     * Use {@link #exists} to test whether a resource with the specified <code>key</code> exists
-     *
-     * @return true if the replacement was made, false if the resource does not exist (no insert is done in this case)
-     * @throws Exception if problems occur
-     */
-    boolean replace(String key, Document newDoc) throws Exception;
-
-    /**
-     * Replaces a binary resource with the specified <code>key</code> in this folder <i>(optional operation)</i>.<br>
-     * Key should not contain
-     * slashes.<br>
-     * Use {@link #exists} to test whether a resource with the specified <code>key</code> exists
-     *
-     * @param key the key of the resource.
-     * @param res the resource to be stored.
-     * @return true if the replacement was made, false if the resource does not exist (no insert is done in this case)
-     * @throws Exception if problems occur
-     * @throws UnsupportedOperationException if not supported operation
-     */
-    boolean replaceBinary(String key, InputStream res) throws Exception, UnsupportedOperationException;
 
     /**
      * Removes the resource with the specified <code>key</code>.<br>

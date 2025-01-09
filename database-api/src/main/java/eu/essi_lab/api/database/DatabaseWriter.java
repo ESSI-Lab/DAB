@@ -30,6 +30,8 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import eu.essi_lab.api.database.DatabaseFolder.EntryType;
+import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.bond.jaxb.ViewFactory;
@@ -69,7 +71,7 @@ public abstract class DatabaseWriter implements DatabaseProvider {
 	    Document asDocument = resource.asDocument(true);
 
 	    String key = resource.getPrivateId();
-	    folder.store(key, asDocument);
+	    folder.store(key, FolderEntry.of(asDocument), EntryType.DATA_FOLDER_ENTRY);
 
 	} catch (Exception e) {
 
@@ -127,7 +129,7 @@ public abstract class DatabaseWriter implements DatabaseProvider {
 
 	    DatabaseFolder folder = markLogicDB.findWritingFolder(worker);
 
-	    folder.replace(key, asDocument);
+	    folder.replace(key, FolderEntry.of(asDocument), EntryType.DATA_FOLDER_ENTRY);
 
 	} catch (Exception e) {
 
@@ -158,9 +160,9 @@ public abstract class DatabaseWriter implements DatabaseProvider {
 
 	    Document document = user.asDocument(true);
 
-	    folder.store(user.getUri(), document);
+	    folder.store(user.getUri(), FolderEntry.of(document), EntryType.USER);
 
-	    folder.replace(user.getUri(), document);
+	    folder.replace(user.getUri(), FolderEntry.of(document), EntryType.USER);
 
 	} catch (Exception e) {
 
@@ -229,9 +231,9 @@ public abstract class DatabaseWriter implements DatabaseProvider {
 
 	    byte[] bytes = baos.toByteArray();
 
-	    folder.storeBinary(id, new ByteArrayInputStream(bytes));
+	    folder.store(id, FolderEntry.of(new ByteArrayInputStream(bytes)), EntryType.VIEW);
 
-	    folder.replaceBinary(id, new ByteArrayInputStream(bytes));
+	    folder.replace(id, FolderEntry.of(new ByteArrayInputStream(bytes)), EntryType.VIEW);
 
 	} catch (Exception e) {
 

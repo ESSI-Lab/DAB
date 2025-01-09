@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -118,17 +119,33 @@ public class VolatileFolder implements DatabaseFolder {
     }
 
     @Override
-    public boolean store(String key, Document doc) throws Exception {
+    public boolean store(String key, FolderEntry entry, EntryType type) throws Exception {
 
-	Document put = documentsMap.put(key, doc);
+	Optional<Document> document = entry.getDocument();
+
+	if (document.isPresent()) {
+
+	    Document put = documentsMap.put(key, document.get());
+	    return put == null;
+	}
+
+	ModifiedInputStream put = streamsMap.put(key, new ModifiedInputStream(entry.getInputStream().get()));
 	return put == null;
     }
 
     @Override
-    public boolean storeBinary(String key, InputStream res) throws Exception, UnsupportedOperationException {
+    public boolean replace(String key, FolderEntry entry, EntryType type) throws Exception {
 
-	ModifiedInputStream put = streamsMap.put(key, new ModifiedInputStream(res));
-	return put == null;
+	Optional<Document> document = entry.getDocument();
+
+	if (document.isPresent()) {
+
+	    Document put = documentsMap.put(key, document.get());
+	    return put != null;
+	}
+
+	ModifiedInputStream put = streamsMap.put(key, new ModifiedInputStream(entry.getInputStream().get()));
+	return put != null;
     }
 
     @Override
@@ -141,20 +158,6 @@ public class VolatileFolder implements DatabaseFolder {
     public InputStream getBinary(String key) throws Exception {
 
 	return streamsMap.get(key).getInputStream();
-    }
-
-    @Override
-    public boolean replace(String key, Document newDoc) throws Exception {
-
-	Document put = documentsMap.put(key, newDoc);
-	return put != null;
-    }
-
-    @Override
-    public boolean replaceBinary(String key, InputStream res) throws Exception, UnsupportedOperationException {
-
-	ModifiedInputStream put = streamsMap.put(key, new ModifiedInputStream(res));
-	return put != null;
     }
 
     @Override

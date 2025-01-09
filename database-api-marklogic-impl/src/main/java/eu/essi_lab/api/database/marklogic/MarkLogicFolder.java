@@ -22,6 +22,7 @@ package eu.essi_lab.api.database.marklogic;
  */
 
 import java.io.InputStream;
+import java.util.Optional;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -30,7 +31,6 @@ import com.marklogic.xcc.ResultSequence;
 import com.marklogic.xcc.exceptions.RequestException;
 
 import eu.essi_lab.api.database.DatabaseFolder;
-import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StringUtils;
 
@@ -81,27 +81,29 @@ public class MarkLogicFolder implements DatabaseFolder {
     }
 
     @Override
-    public boolean store(String key, Document doc) throws Exception {
+    public boolean store(String key, FolderEntry entry, EntryType type) throws Exception {
 
-	return mlDataBase.getWrapper().store(createResourceUri(uri, key), doc);
+	Optional<Document> document = entry.getDocument();
+
+	if (document.isPresent()) {
+
+	    return mlDataBase.getWrapper().store(createResourceUri(uri, key), document.get());
+	}
+
+	return mlDataBase.getWrapper().storeBinary(createResourceUri(uri, key), entry.getInputStream().get());
     }
 
     @Override
-    public boolean replace(String key, Document doc) throws Exception {
+    public boolean replace(String key, FolderEntry entry, EntryType type) throws Exception {
 
-	return mlDataBase.getWrapper().replace(createResourceUri(uri, key), doc);
-    }
+	Optional<Document> document = entry.getDocument();
 
-    @Override
-    public boolean storeBinary(String key, InputStream res) throws Exception {
+	if (document.isPresent()) {
 
-	return mlDataBase.getWrapper().storeBinary(createResourceUri(uri, key), res);
-    }
+	    return mlDataBase.getWrapper().replace(createResourceUri(uri, key), document.get());
+	}
 
-    @Override
-    public boolean replaceBinary(String key, InputStream res) throws Exception {
-
-	return mlDataBase.getWrapper().replaceBinary(createResourceUri(uri, key), res);
+	return mlDataBase.getWrapper().replaceBinary(createResourceUri(uri, key), entry.getInputStream().get());
     }
 
     @Override

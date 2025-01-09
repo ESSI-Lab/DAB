@@ -35,6 +35,8 @@ import org.json.JSONObject;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFolder;
+import eu.essi_lab.api.database.DatabaseFolder.EntryType;
+import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.cfga.ConfigurationSource;
 import eu.essi_lab.cfga.setting.Setting;
@@ -139,13 +141,21 @@ public class DatabaseSource implements ConfigurationSource {
 	JSONArray array = new JSONArray();
 	settings.forEach(item -> array.put(item.getObject()));
 
-	boolean replaced = folder.replaceBinary(this.completeConfigName, IOStreamUtils.asStream(array.toString(3)));
+	boolean replaced = folder.replace(//
+		this.completeConfigName, //
+		FolderEntry.of(IOStreamUtils.asStream(array.toString(3))), //
+		EntryType.CONFIGURATION);
+
 	GSLoggerFactory.getLogger(getClass()).trace("Source replaced: " + replaced);
 
 	boolean stored = false;
 	if (!replaced) {
 
-	    stored = folder.storeBinary(this.completeConfigName, IOStreamUtils.asStream(array.toString(3)));
+	    stored = folder.store(//
+		    this.completeConfigName, //
+		    FolderEntry.of(IOStreamUtils.asStream(array.toString(3))), //
+		    EntryType.CONFIGURATION);
+
 	    GSLoggerFactory.getLogger(getClass()).trace("Source stored: " + stored);
 	}
 
@@ -190,7 +200,7 @@ public class DatabaseSource implements ConfigurationSource {
 
 		InputStream inputStream = updateLockTimestamp(lockFile);
 
-		boolean replaced = folder.replaceBinary(lockFileName, inputStream);
+		boolean replaced = folder.replace(lockFileName, FolderEntry.of(inputStream));
 
 		if (!replaced) {
 
@@ -205,7 +215,7 @@ public class DatabaseSource implements ConfigurationSource {
 
 	InputStream lockFile = createLockFile(owner);
 
-	boolean stored = folder.storeBinary(lockFileName, lockFile);
+	boolean stored = folder.store(lockFileName, FolderEntry.of(lockFile));
 
 	if (!stored) {
 
@@ -350,7 +360,7 @@ public class DatabaseSource implements ConfigurationSource {
 
 	String backupCompleteName = backupName + ".json.backup";
 
-	boolean stored = folder.storeBinary(backupCompleteName, clone);
+	boolean stored = folder.store(backupCompleteName, FolderEntry.of(clone), EntryType.CONFIGURATION);
 
 	GSLoggerFactory.getLogger(getClass()).trace("Source stored: " + stored);
 

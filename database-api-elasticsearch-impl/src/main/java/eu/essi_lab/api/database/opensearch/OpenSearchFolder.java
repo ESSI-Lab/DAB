@@ -26,7 +26,6 @@ package eu.essi_lab.api.database.opensearch;
 
 import java.io.InputStream;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import eu.essi_lab.api.database.DatabaseFolder;
@@ -56,14 +55,14 @@ public class OpenSearchFolder implements DatabaseFolder {
     }
 
     @Override
-    public boolean store(String key, Document doc) throws Exception {
-
+    public boolean store(String key, FolderEntry entry, EntryType type) throws Exception {
+	// TODO Auto-generated method stub
 	return false;
     }
 
     @Override
-    public boolean storeBinary(String key, InputStream res) throws Exception, UnsupportedOperationException {
-
+    public boolean replace(String key, FolderEntry entry, EntryType type) throws Exception {
+	// TODO Auto-generated method stub
 	return false;
     }
 
@@ -77,18 +76,6 @@ public class OpenSearchFolder implements DatabaseFolder {
     public InputStream getBinary(String key) throws Exception {
 
 	return null;
-    }
-
-    @Override
-    public boolean replace(String key, Document newDoc) throws Exception {
-
-	return false;
-    }
-
-    @Override
-    public boolean replaceBinary(String key, InputStream res) throws Exception, UnsupportedOperationException {
-
-	return false;
     }
 
     @Override

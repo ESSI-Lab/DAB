@@ -50,6 +50,8 @@ import com.google.common.io.ByteStreams;
 import com.marklogic.xcc.exceptions.RequestException;
 
 import eu.essi_lab.api.database.Database.IdentifierType;
+import eu.essi_lab.api.database.DatabaseFolder.EntryType;
+import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.iso.datamodel.classes.MIMetadata;
@@ -470,7 +472,10 @@ public class SourceStorageWorker {
 	//
 	debug("Storing WRITING_FOLDER tag to folder " + writingFolder.getName() + " STARTED", writingFolder.getName(), status);
 
-	writingFolder.storeBinary(WRITING_FOLDER, new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8)));
+	writingFolder.store(//
+		WRITING_FOLDER, //
+		FolderEntry.of(new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8))), //
+		EntryType.DATA_FOLDER_ENTRY);
 
 	debug("Storing WRITING_FOLDER tag to folder " + writingFolder.getName() + " ENDED", writingFolder.getName(), status);
 
@@ -627,11 +632,14 @@ public class SourceStorageWorker {
      */
     void storeHarvestingProperties(HarvestingProperties properties) throws Exception {
 
-	DatabaseFolder sourceFolder = getMetaFolder();
+	DatabaseFolder metaFolder = getMetaFolder();
 
-	sourceFolder.remove(HarvestingProperties.getFileName());
+	metaFolder.remove(HarvestingProperties.getFileName());
 
-	sourceFolder.storeBinary(HarvestingProperties.getFileName(), properties.asStream());
+	metaFolder.store(//
+		HarvestingProperties.getFileName(), //
+		FolderEntry.of(properties.asStream()), //
+		EntryType.META_FOLDER_ENTRY);
     }
 
     /**
@@ -675,10 +683,10 @@ public class SourceStorageWorker {
 	ByteArrayInputStream document = new ByteArrayInputStream(byteArray);
 
 	if (exists) {
-	    getMetaFolder().replaceBinary(fileName, document);
+	    getMetaFolder().replace(fileName, FolderEntry.of(document), EntryType.META_FOLDER_ENTRY);
 
 	} else {
-	    getMetaFolder().storeBinary(fileName, document);
+	    getMetaFolder().store(fileName, FolderEntry.of(document), EntryType.META_FOLDER_ENTRY);
 	}
 
 	// GSLoggerFactory.getLogger(getClass()).debug("Updating of " + (error ? "error" : "warn") + " harvesting report
@@ -730,11 +738,11 @@ public class SourceStorageWorker {
      * @param status
      */
     protected void debug(String message, Optional<SchedulerJobStatus> status) {
-    
-        status.ifPresent(s -> s.addInfoMessage(message));
-    
-        GSLoggerFactory.getLogger(getClass()).debug(message);
-        report.add(message);
+
+	status.ifPresent(s -> s.addInfoMessage(message));
+
+	GSLoggerFactory.getLogger(getClass()).debug(message);
+	report.add(message);
     }
 
     /**
@@ -1005,7 +1013,7 @@ public class SourceStorageWorker {
 
 	    debug("Replacing index STARTED", status);
 
-	    boolean replaced = metaFolder.replace(indexName, doc.getDocument());
+	    boolean replaced = metaFolder.replace(indexName, FolderEntry.of(doc.getDocument()), EntryType.META_FOLDER_ENTRY);
 
 	    debug("Replacing index " + (replaced ? "SUCCEEDED" : "FAILED"), status);
 
@@ -1013,13 +1021,13 @@ public class SourceStorageWorker {
 
 	} else {
 
-	    debug("Storing index STARTED", status);
+	    debug("Storing index doc STARTED", status);
 
-	    boolean stored = metaFolder.store(indexName, doc.getDocument());
+	    boolean stored = metaFolder.store(indexName, FolderEntry.of(doc.getDocument()), EntryType.META_FOLDER_ENTRY);
 
-	    debug("Storing index " + (stored ? "SUCCEEDED" : "FAILED"), status);
+	    debug("Storing index doc " + (stored ? "SUCCEEDED" : "FAILED"), status);
 
-	    debug("Storing index ENDED", status);
+	    debug("Storing index doc ENDED", status);
 	}
 
 	debug("Handling data folder index file ENDED", status);
@@ -1193,7 +1201,7 @@ public class SourceStorageWorker {
 		    resource.getPropertyHandler().setIsDeleted(true);
 		}
 		// 5) copies the resource in the new folder
-		newFolder.store(resource.getPrivateId(), resource.asDocument(false));
+		newFolder.store(resource.getPrivateId(), FolderEntry.of(resource.asDocument(false)), EntryType.DATA_FOLDER_ENTRY);
 
 		logger.iterationEnded();
 	    }
@@ -1260,7 +1268,7 @@ public class SourceStorageWorker {
 	    }
 
 	    // 5) replaces the resource in the new folder
-	    newFolder.replace(resource.getPrivateId(), resource.asDocument(false));
+	    newFolder.replace(resource.getPrivateId(), FolderEntry.of(resource.asDocument(false)), EntryType.DATA_FOLDER_ENTRY);
 
 	    logger.iterationEnded();
 	}
@@ -1327,7 +1335,8 @@ public class SourceStorageWorker {
 		    recoverExtendedElements(oldResource, newResource);
 
 		    // replaces the resource
-		    newFolder.replace(newResource.getPrivateId(), newResource.asDocument(false));
+		    newFolder.replace(newResource.getPrivateId(), FolderEntry.of(newResource.asDocument(false)),
+			    EntryType.DATA_FOLDER_ENTRY);
 
 		    logger.iterationEnded();
 		}

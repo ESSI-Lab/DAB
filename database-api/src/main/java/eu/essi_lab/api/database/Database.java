@@ -1,6 +1,8 @@
 package eu.essi_lab.api.database;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import com.marklogic.xcc.exceptions.RequestException;
@@ -91,6 +93,7 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
 	}
     }
 
+   
     /**
      * 
      */

@@ -32,6 +32,7 @@ import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseExecutor;
 import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.DatabaseReader;
+import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.setting.driver.SharedCacheDriverSetting;
@@ -221,7 +222,7 @@ public class DatabaseCacheDriver implements ISharedRepositoryDriver<SharedCacheD
 
 	    InputStream stream = serializer.toStream(sharedContent);
 
-	    optFolder.get().storeBinary(identifier, stream);
+	    optFolder.get().store(identifier,  FolderEntry.of(stream));
 
 	    GSLoggerFactory.getLogger(getClass()).info("Storing binary to folder {} ENDED", optFolder.get().getName());
 
