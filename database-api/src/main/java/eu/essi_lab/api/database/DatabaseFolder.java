@@ -22,8 +22,6 @@ package eu.essi_lab.api.database;
  */
 
 import java.io.InputStream;
-import java.util.Date;
-import java.util.Optional;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -84,7 +82,7 @@ public interface DatabaseFolder {
      */
     boolean storeBinary(String key, InputStream res) throws Exception, UnsupportedOperationException;
 
-       /**
+    /**
      * Returns the DOM resource with the specified <code>key</code>.<br>
      * Key should not contain slashes.<br>
      * Use {@link #exists} to test
@@ -106,7 +104,7 @@ public interface DatabaseFolder {
      * @throws Exception if the resource does not exist or problems occur
      */
     InputStream getBinary(String key) throws Exception;
-    
+
     /**
      * Replace with <code>newDoc</code> the content of the XML resource with the specified <code>key</code>.<br>
      * Key should not contain
