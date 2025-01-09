@@ -633,7 +633,7 @@ public class MarkLogicReader implements DatabaseReader {
 
 	query += "let $id := '" + viewId + "' \n";
 
-	query += "for $uris in cts:uris((),(), cts:directory-query(\"/" + viewFolder.getCompleteName() + "/\", \"infinity\")   ) \n";
+	query += "for $uris in cts:uris((),(), cts:directory-query(\"/" + viewFolder.getName() + "/\", \"infinity\")   ) \n";
 
 	query += "let $doc :=  fn:document($uris) \n";
 

@@ -333,7 +333,7 @@ public class SourceStorageWorker {
 
 		    if (!recovery && !resumed) {
 			// clears the writing folder
-			debug("Cleaning " + writingFolder.getURI(), writingFolder.getURI(), status);
+			debug("Cleaning " + writingFolder.getName(), writingFolder.getName(), status);
 			writingFolder.clear();
 		    }
 		}
@@ -460,19 +460,19 @@ public class SourceStorageWorker {
 		    SOURCE_STORAGE_GET_WRITING_FOLDER_HARVESTING_STARTED_ERROR);
 	}
 
-	debug("Selected writing folder " + writingFolder.getURI() + " for " + strategy.name() + " harvesting with recovery flag " + recovery
-		+ " / resumed flag " + resumed, status);
+	debug("Selected writing folder " + writingFolder.getName() + " for " + strategy.name() + " harvesting with recovery flag "
+		+ recovery + " / resumed flag " + resumed, status);
 
 	// -------------------------------------------------------------------------
 	//
 	// this marker can be used to find the folder to preserve in case
 	// the end method is not called for some reason
 	//
-	debug("Storing WRITING_FOLDER tag to folder " + writingFolder.getURI() + " STARTED", writingFolder.getURI(), status);
+	debug("Storing WRITING_FOLDER tag to folder " + writingFolder.getName() + " STARTED", writingFolder.getName(), status);
 
 	writingFolder.storeBinary(WRITING_FOLDER, new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8)));
 
-	debug("Storing WRITING_FOLDER tag to folder " + writingFolder.getURI() + " ENDED", writingFolder.getURI(), status);
+	debug("Storing WRITING_FOLDER tag to folder " + writingFolder.getName() + " ENDED", writingFolder.getName(), status);
 
 	if (getMetaFolder().exists(ERRORS_REPORT_FILE_NAME)) {
 
@@ -730,11 +730,20 @@ public class SourceStorageWorker {
      * @param status
      */
     protected void debug(String message, Optional<SchedulerJobStatus> status) {
+    
+        status.ifPresent(s -> s.addInfoMessage(message));
+    
+        GSLoggerFactory.getLogger(getClass()).debug(message);
+        report.add(message);
+    }
 
-	status.ifPresent(s -> s.addInfoMessage(message));
+    /**
+     * @param folder
+     * @return
+     */
+    private String findSourceIdentifier(DatabaseFolder folder) {
 
-	GSLoggerFactory.getLogger(getClass()).debug(message);
-	report.add(message);
+	return DatabaseFolder.computeSourceIdentifier(database, folder);
     }
 
     /**
@@ -962,7 +971,7 @@ public class SourceStorageWorker {
 
 	DatabaseFolder metaFolder = getMetaFolder();
 
-	String sourceId = metaFolder.getSimpleName().replace(META_PREFIX, "");
+	String sourceId = findSourceIdentifier(metaFolder);
 	String indexName = createDataFolderIndexName(sourceId);
 
 	debug("Handling data folder index file STARTED", status);
@@ -975,14 +984,14 @@ public class SourceStorageWorker {
 	DatabaseFolder dataFolder = Arrays.asList(database.getFolders()).//
 		stream().//
 
-		filter(f -> f.getCompleteName().equals(database.getIdentifier() + "_" + sourceId + DATA_1_PREFIX) || //
-			f.getCompleteName().equals(database.getIdentifier() + "_" + sourceId + DATA_2_PREFIX))
+		filter(f -> f.getName().equals(database.getIdentifier() + "_" + sourceId + DATA_1_PREFIX) || //
+			f.getName().equals(database.getIdentifier() + "_" + sourceId + DATA_2_PREFIX))
 		.
 
 		findFirst().//
 		get();
 
-	String dataFolderPostFix = dataFolder.getCompleteName().endsWith(DATA_1_PREFIX) ? DATA_1_PREFIX : DATA_2_PREFIX;
+	String dataFolderPostFix = dataFolder.getName().endsWith(DATA_1_PREFIX) ? DATA_1_PREFIX : DATA_2_PREFIX;
 
 	debug("Data folder postfix [" + dataFolderPostFix + "]", status);
 
@@ -1160,8 +1169,8 @@ public class SourceStorageWorker {
 	    }
 
 	    // 1) get the original ids of the old folder and the original ids from the new folder
-	    List<String> newIds = database.getIdentifiers(IdentifierType.ORIGINAL, newFolder.getCompleteName(), false);
-	    List<String> oldIds = database.getIdentifiers(IdentifierType.ORIGINAL, oldFolder.getCompleteName(), false);
+	    List<String> newIds = database.getIdentifiers(IdentifierType.ORIGINAL, newFolder.getName(), false);
+	    List<String> oldIds = database.getIdentifiers(IdentifierType.ORIGINAL, oldFolder.getName(), false);
 
 	    // 2) removes all the ids of the new folder from the ids of the old folder.
 	    // the remaining are the original ids of the removed resources (they are in the old folder
@@ -1171,7 +1180,7 @@ public class SourceStorageWorker {
 	    debug("Found " + oldIds.size() + " deleted records", status);
 
 	    GSSource gsSource = new GSSource();
-	    gsSource.setUniqueIdentifier(oldFolder.getSimpleName());
+	    gsSource.setUniqueIdentifier(findSourceIdentifier(oldFolder));
 
 	    IterationLogger logger = new IterationLogger(this, oldIds.size());
 	    logger.setMessage("Total progress: ");
@@ -1200,7 +1209,7 @@ public class SourceStorageWorker {
 	DatabaseFolder newFolder = getWritingFolder(status);
 
 	// 1) get the original ids of the old folder and the original ids from the new folder
-	List<String> newIds = database.getIdentifiers(IdentifierType.ORIGINAL, newFolder.getCompleteName(), false);
+	List<String> newIds = database.getIdentifiers(IdentifierType.ORIGINAL, newFolder.getName(), false);
 
 	DatabaseFolder oldFolder = null;
 
@@ -1211,7 +1220,7 @@ public class SourceStorageWorker {
 	}
 
 	if (oldFolder != null) {
-	    List<String> oldIds = database.getIdentifiers(IdentifierType.ORIGINAL, oldFolder.getCompleteName(), false);
+	    List<String> oldIds = database.getIdentifiers(IdentifierType.ORIGINAL, oldFolder.getName(), false);
 
 	    // 2) removes all the old ids from the new folder ids
 	    // the remaining are the ids of the new resources
@@ -1221,7 +1230,7 @@ public class SourceStorageWorker {
 	debug("Found " + newIds.size() + " new records", status);
 
 	GSSource gsSource = new GSSource();
-	gsSource.setUniqueIdentifier(newFolder.getSimpleName());
+	gsSource.setUniqueIdentifier(findSourceIdentifier(newFolder));
 
 	IterationLogger logger = new IterationLogger(this, newIds.size());
 	logger.setMessage("Total progress: ");
@@ -1277,8 +1286,8 @@ public class SourceStorageWorker {
 		oldFolder = getData1Folder();
 	    }
 
-	    List<String> newIds = database.getIdentifiers(IdentifierType.ORIGINAL, newFolder.getCompleteName(), false);
-	    List<String> oldIds = database.getIdentifiers(IdentifierType.ORIGINAL, oldFolder.getCompleteName(), false);
+	    List<String> newIds = database.getIdentifiers(IdentifierType.ORIGINAL, newFolder.getName(), false);
+	    List<String> oldIds = database.getIdentifiers(IdentifierType.ORIGINAL, oldFolder.getName(), false);
 
 	    @SuppressWarnings("unchecked")
 	    Collection<String> intersection = CollectionUtils.intersection(newIds, oldIds);
@@ -1288,7 +1297,7 @@ public class SourceStorageWorker {
 		debug("Found " + intersection.size() + " common records to check", status);
 
 		GSSource gsSource = new GSSource();
-		gsSource.setUniqueIdentifier(oldFolder.getSimpleName());
+		gsSource.setUniqueIdentifier(findSourceIdentifier(oldFolder));
 
 		IterationLogger logger = new IterationLogger(this, intersection.size());
 		logger.setMessage("Total progress: ");

@@ -47,19 +47,26 @@ public class MarkLogicFolder implements DatabaseFolder {
     protected String uri;
     protected MarkLogicDatabase mlDataBase;
 
+    /**
+     * @param mlDB
+     * @param uri
+     */
     public MarkLogicFolder(MarkLogicDatabase mlDB, String uri) {
+
 	this.mlDataBase = mlDB;
 	this.uri = uri;
     }
 
-    @Override
+    /**
+     * @return
+     */
     public String getURI() {
 
 	return uri;
     }
 
     @Override
-    public String getCompleteName() {
+    public String getName() {
 
 	String name = new String(uri);
 	if (uri.startsWith("/")) {
@@ -71,18 +78,6 @@ public class MarkLogicFolder implements DatabaseFolder {
 	}
 
 	return name;
-    }
-
-    @Override
-    public String getSimpleName() {
-
-	String simpleName = getCompleteName();
-	simpleName = simpleName.replace(mlDataBase.getIdentifier() + "_", "");
-	simpleName = simpleName.replace(SourceStorageWorker.META_PREFIX, "");
-	simpleName = simpleName.replace(SourceStorageWorker.DATA_1_PREFIX, "");
-	simpleName = simpleName.replace(SourceStorageWorker.DATA_2_PREFIX, "");
-
-	return simpleName;
     }
 
     @Override
@@ -103,7 +98,6 @@ public class MarkLogicFolder implements DatabaseFolder {
 	return mlDataBase.getWrapper().storeBinary(createResourceUri(uri, key), res);
     }
 
-   
     @Override
     public boolean replaceBinary(String key, InputStream res) throws Exception {
 
@@ -126,39 +120,39 @@ public class MarkLogicFolder implements DatabaseFolder {
 	return mlDataBase.getWrapper().getBinary(createResourceUri(uri, key));
     }
 
-//    @Override
-//    public Optional<Node> getBinaryProperties(String key) throws Exception {
-//
-//	return mlDataBase.getWrapper().getBinaryProperties(createResourceUri(uri, key));
-//    }
-//    
-//    @Override
-//    public boolean storeBinary(String key, InputStream res, Date timeStamp) throws Exception {
-//
-//	return mlDataBase.getWrapper().storeBinary(createResourceUri(uri, key), res, timeStamp);
-//    }
-//
-//    @Override
-//    public Optional<Date> getBinaryTimestamp(String key) throws Exception {
-//
-//	Optional<Node> props = getBinaryProperties(key);
-//
-//	if (props.isPresent()) {
-//
-//	    XMLNodeReader reader = new XMLNodeReader(props.get());
-//
-//	    String timeStampString = reader.evaluateString("//*[local-name()='" + MarkLogicWrapper.DOC_TIMESTAMP + "']");
-//
-//	    if (timeStampString != null && !timeStampString.isEmpty()) {
-//
-//		long timeStamp = Long.valueOf(timeStampString);
-//
-//		return Optional.of(new Date(timeStamp));
-//	    }
-//	}
-//
-//	return Optional.empty();
-//    }
+    // @Override
+    // public Optional<Node> getBinaryProperties(String key) throws Exception {
+    //
+    // return mlDataBase.getWrapper().getBinaryProperties(createResourceUri(uri, key));
+    // }
+    //
+    // @Override
+    // public boolean storeBinary(String key, InputStream res, Date timeStamp) throws Exception {
+    //
+    // return mlDataBase.getWrapper().storeBinary(createResourceUri(uri, key), res, timeStamp);
+    // }
+    //
+    // @Override
+    // public Optional<Date> getBinaryTimestamp(String key) throws Exception {
+    //
+    // Optional<Node> props = getBinaryProperties(key);
+    //
+    // if (props.isPresent()) {
+    //
+    // XMLNodeReader reader = new XMLNodeReader(props.get());
+    //
+    // String timeStampString = reader.evaluateString("//*[local-name()='" + MarkLogicWrapper.DOC_TIMESTAMP + "']");
+    //
+    // if (timeStampString != null && !timeStampString.isEmpty()) {
+    //
+    // long timeStamp = Long.valueOf(timeStampString);
+    //
+    // return Optional.of(new Date(timeStamp));
+    // }
+    // }
+    //
+    // return Optional.empty();
+    // }
 
     @Override
     public boolean remove(String key) throws Exception {
@@ -212,7 +206,8 @@ public class MarkLogicFolder implements DatabaseFolder {
 
 	while (counter < size) {
 
-	    String xQuery = "for $i in cts:uris(\"" + uri + "\",'document', cts:directory-query('"+uri+"', 'infinity'))[1 to " + step + "] return xdmp:document-delete( $i )";
+	    String xQuery = "for $i in cts:uris(\"" + uri + "\",'document', cts:directory-query('" + uri + "', 'infinity'))[1 to " + step
+		    + "] return xdmp:document-delete( $i )";
 	    mlDataBase.execXQuery(xQuery);
 
 	    counter += CLEARING_STEP;
@@ -221,7 +216,8 @@ public class MarkLogicFolder implements DatabaseFolder {
 
 		double percentage = (((double) counter) / size) * 100;
 
-		String status = "[" + StringUtils.format(counter) + "/" + StringUtils.format(size) + "] - " + StringUtils.format(percentage) + " %";
+		String status = "[" + StringUtils.format(counter) + "/" + StringUtils.format(size) + "] - " + StringUtils.format(percentage)
+			+ " %";
 
 		GSLoggerFactory.getLogger(getClass()).debug("Status: {}", status);
 	    }

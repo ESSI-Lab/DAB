@@ -115,7 +115,7 @@ public class ListViewIdsQueryHandler {
 
 	query += "let $creator := '" + creator + "' \n";
 
-	query += "for $uris in cts:uris((),(), cts:directory-query(\"/" + viewFolder.getCompleteName() + "/\", \"infinity\")   ) \n";
+	query += "for $uris in cts:uris((),(), cts:directory-query(\"/" + viewFolder.getName() + "/\", \"infinity\")   ) \n";
 
 	query += "let $doc :=  fn:document($uris)  \n";
 
@@ -141,7 +141,7 @@ public class ListViewIdsQueryHandler {
 
 	query += "let $owner := '" + owner + "' \n";
 
-	query += "for $uris in cts:uris((),(), cts:directory-query(\"/" + viewFolder.getCompleteName() + "/\", \"infinity\")   ) \n";
+	query += "for $uris in cts:uris((),(), cts:directory-query(\"/" + viewFolder.getName() + "/\", \"infinity\")   ) \n";
 
 	query += "let $doc :=  fn:document($uris)  \n";
 
@@ -170,7 +170,7 @@ public class ListViewIdsQueryHandler {
 
 	query += "let $creator := '" + creator + "' \n";
 
-	query += "for $uris in cts:uris((),(), cts:directory-query(\"/" + viewFolder.getCompleteName() + "/\", \"infinity\")   ) \n";
+	query += "for $uris in cts:uris((),(), cts:directory-query(\"/" + viewFolder.getName() + "/\", \"infinity\")   ) \n";
 
 	query += "let $doc :=  fn:document($uris)  \n";
 
@@ -204,7 +204,7 @@ public class ListViewIdsQueryHandler {
 
 	query += "let $visibility := '" + viewVisibility.name() + "' \n";
 
-	query += "for $uris in cts:uris((),(), cts:directory-query(\"/" + viewFolder.getCompleteName() + "/\", \"infinity\")   ) \n";
+	query += "for $uris in cts:uris((),(), cts:directory-query(\"/" + viewFolder.getName() + "/\", \"infinity\")   ) \n";
 
 	query += "let $doc :=  fn:document($uris)  \n";
 
@@ -236,7 +236,7 @@ public class ListViewIdsQueryHandler {
 
 	query += "let $visibility := '" + viewVisibility.name() + "' \n";
 
-	query += "for $uris in cts:uris((),(), cts:directory-query(\"/" + viewFolder.getCompleteName() + "/\", \"infinity\")   ) \n";
+	query += "for $uris in cts:uris((),(), cts:directory-query(\"/" + viewFolder.getName() + "/\", \"infinity\")   ) \n";
 
 	query += "let $doc :=  fn:document($uris)  \n";
 

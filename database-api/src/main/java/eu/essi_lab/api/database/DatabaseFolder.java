@@ -32,27 +32,29 @@ import org.w3c.dom.Node;
 public interface DatabaseFolder {
 
     /**
-     * Returns the URI of this folder which is like the complete name but with the starting and trailing '/' (e.g.:
-     * /SUITE_ID_sourcename-data-2/)
-     *
-     * @throws Exception if the key is already used or problems occur.
+     * If this folder is a DAB source folder, this method returns the related source identifier by removing from this
+     * folder name the database identifier and the other folder prefixes used to generate the folder name.<br>
+     * If this folder is not a DAB source folder, it returns this folder name.
+     * 
+     * @param database
+     * @param folder
+     * @return
      */
-    String getURI();
+    public static String computeSourceIdentifier(Database database, DatabaseFolder folder) {
+
+	String name = folder.getName();
+	name = name.replace(database.getIdentifier() + "_", "");
+	name = name.replace(SourceStorageWorker.META_PREFIX, "");
+	name = name.replace(SourceStorageWorker.DATA_1_PREFIX, "");
+	name = name.replace(SourceStorageWorker.DATA_2_PREFIX, "");
+
+	return name;
+    }
 
     /**
-     * Returns the complete name of this folder which also includes the suite identifier and the data-x postfix (e.g.:
-     * SUITE_ID_sourcename-data-2)
-     *
-     * @throws Exception if the key is already used or problems occur
+     * Returns the name of this folder
      */
-    String getCompleteName();
-
-    /**
-     * Returns the name of this folder which includes only the name of the related source (e.g.: sourcename)
-     *
-     * @throws Exception if the key is already used or problems occur
-     */
-    String getSimpleName();
+    String getName();
 
     /**
      * Stores a DOM resource with the specified <code>key</code> in this folder.<br>

@@ -30,57 +30,29 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import eu.essi_lab.api.database.DatabaseFolder;
-import eu.essi_lab.api.database.SourceStorageWorker;
 
 /**
  * @author Fabrizio
  */
 public class OpenSearchFolder implements DatabaseFolder {
 
-    private String uri;
-    private OpenSearchDatabase openSearchDb;
+    private String name;
+    private OpenSearchDatabase database;
 
     /**
      * @param openSearchDb
-     * @param uri
+     * @param name
      */
-    public OpenSearchFolder(OpenSearchDatabase openSearchDb, String uri) {
+    public OpenSearchFolder(OpenSearchDatabase openSearchDb, String name) {
 
-	this.openSearchDb = openSearchDb;
-	this.uri = uri;
+	this.database = openSearchDb;
+	this.name = name;
     }
 
     @Override
-    public String getURI() {
-
-	return uri;
-    }
-
-    @Override
-    public String getCompleteName() {
-
-	String name = new String(uri);
-	if (uri.startsWith("/")) {
-	    name = name.substring(1, uri.length());
-	}
-
-	if (uri.endsWith("/")) {
-	    name = name.substring(0, uri.length() - 2);
-	}
+    public String getName() {
 
 	return name;
-    }
-
-    @Override
-    public String getSimpleName() {
-
-	String simpleName = getCompleteName();
-	simpleName = simpleName.replace(openSearchDb.getIdentifier() + "_", "");
-	simpleName = simpleName.replace(SourceStorageWorker.META_PREFIX, "");
-	simpleName = simpleName.replace(SourceStorageWorker.DATA_1_PREFIX, "");
-	simpleName = simpleName.replace(SourceStorageWorker.DATA_2_PREFIX, "");
-
-	return simpleName;
     }
 
     @Override

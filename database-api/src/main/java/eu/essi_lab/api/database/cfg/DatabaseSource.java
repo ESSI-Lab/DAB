@@ -371,6 +371,6 @@ public class DatabaseSource implements ConfigurationSource {
     @Override
     public String getLocation() {
 
-	return folder.getCompleteName() + "\\" + this.completeConfigName;
+	return folder.getName() + "\\" + this.completeConfigName;
     }
 }

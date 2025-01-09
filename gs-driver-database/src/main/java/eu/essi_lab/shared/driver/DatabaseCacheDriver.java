@@ -215,7 +215,7 @@ public class DatabaseCacheDriver implements ISharedRepositoryDriver<SharedCacheD
 
 	try {
 
-	    GSLoggerFactory.getLogger(getClass()).info("Storing binary to folder {} STARTED", optFolder.get().getURI());
+	    GSLoggerFactory.getLogger(getClass()).info("Storing binary to folder {} STARTED", optFolder.get().getName());
 
 	    String identifier = contentIdentifier(sharedContent.getIdentifier(), sharedContent.getType());
 
@@ -223,7 +223,7 @@ public class DatabaseCacheDriver implements ISharedRepositoryDriver<SharedCacheD
 
 	    optFolder.get().storeBinary(identifier, stream);
 
-	    GSLoggerFactory.getLogger(getClass()).info("Storing binary to folder {} ENDED", optFolder.get().getURI());
+	    GSLoggerFactory.getLogger(getClass()).info("Storing binary to folder {} ENDED", optFolder.get().getName());
 
 	} catch (Exception e) {
 

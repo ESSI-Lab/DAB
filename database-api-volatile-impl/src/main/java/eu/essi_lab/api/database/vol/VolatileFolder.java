@@ -112,19 +112,7 @@ public class VolatileFolder implements DatabaseFolder {
     }
 
     @Override
-    public String getURI() {
-
-	return null;
-    }
-
-    @Override
-    public String getCompleteName() {
-
-	return this.folderName;
-    }
-
-    @Override
-    public String getSimpleName() {
+    public String getName() {
 
 	return this.folderName;
     }
