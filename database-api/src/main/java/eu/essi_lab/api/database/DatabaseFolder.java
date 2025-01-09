@@ -285,4 +285,9 @@ public interface DatabaseFolder {
      */
     void clear() throws Exception;
 
+    /**
+     * @return
+     */
+    Database getDatabase();
+
 }

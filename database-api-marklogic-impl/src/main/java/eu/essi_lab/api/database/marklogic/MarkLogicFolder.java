@@ -30,6 +30,7 @@ import org.w3c.dom.Node;
 import com.marklogic.xcc.ResultSequence;
 import com.marklogic.xcc.exceptions.RequestException;
 
+import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StringUtils;
@@ -231,5 +232,11 @@ public class MarkLogicFolder implements DatabaseFolder {
     private String createResourceUri(String uri, String key) {
 
 	return uri + key;
+    }
+
+    @Override
+    public Database getDatabase() {
+
+	return mlDataBase;
     }
 }
