@@ -25,35 +25,62 @@ package eu.essi_lab.api.database.opensearch;
  */
 
 import java.io.InputStream;
-import java.util.Date;
-import java.util.Optional;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import eu.essi_lab.api.database.DatabaseFolder;
+import eu.essi_lab.api.database.SourceStorageWorker;
 
 /**
  * @author Fabrizio
  */
 public class OpenSearchFolder implements DatabaseFolder {
 
+    private String uri;
+    private OpenSearchDatabase openSearchDb;
+
+    /**
+     * @param openSearchDb
+     * @param uri
+     */
+    public OpenSearchFolder(OpenSearchDatabase openSearchDb, String uri) {
+
+	this.openSearchDb = openSearchDb;
+	this.uri = uri;
+    }
+
     @Override
     public String getURI() {
 
-	return null;
+	return uri;
     }
 
     @Override
     public String getCompleteName() {
 
-	return null;
+	String name = new String(uri);
+	if (uri.startsWith("/")) {
+	    name = name.substring(1, uri.length());
+	}
+
+	if (uri.endsWith("/")) {
+	    name = name.substring(0, uri.length() - 2);
+	}
+
+	return name;
     }
 
     @Override
     public String getSimpleName() {
 
-	return null;
+	String simpleName = getCompleteName();
+	simpleName = simpleName.replace(openSearchDb.getIdentifier() + "_", "");
+	simpleName = simpleName.replace(SourceStorageWorker.META_PREFIX, "");
+	simpleName = simpleName.replace(SourceStorageWorker.DATA_1_PREFIX, "");
+	simpleName = simpleName.replace(SourceStorageWorker.DATA_2_PREFIX, "");
+
+	return simpleName;
     }
 
     @Override
@@ -69,12 +96,6 @@ public class OpenSearchFolder implements DatabaseFolder {
     }
 
     @Override
-    public boolean storeBinary(String key, InputStream res, Date timeStamp) throws Exception, UnsupportedOperationException {
-
-	return false;
-    }
-
-    @Override
     public Node get(String key) throws Exception {
 
 	return null;
@@ -84,18 +105,6 @@ public class OpenSearchFolder implements DatabaseFolder {
     public InputStream getBinary(String key) throws Exception {
 
 	return null;
-    }
-
-    @Override
-    public Optional<Node> getBinaryProperties(String key) throws Exception {
-
-	return Optional.empty();
-    }
-
-    @Override
-    public Optional<Date> getBinaryTimestamp(String key) throws Exception {
-
-	return Optional.empty();
     }
 
     @Override

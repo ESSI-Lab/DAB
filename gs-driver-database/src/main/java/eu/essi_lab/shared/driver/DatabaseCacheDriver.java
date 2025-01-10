@@ -221,7 +221,7 @@ public class DatabaseCacheDriver implements ISharedRepositoryDriver<SharedCacheD
 
 	    InputStream stream = serializer.toStream(sharedContent);
 
-	    optFolder.get().storeBinary(identifier, stream, new Date());
+	    optFolder.get().storeBinary(identifier, stream);
 
 	    GSLoggerFactory.getLogger(getClass()).info("Storing binary to folder {} ENDED", optFolder.get().getURI());
 

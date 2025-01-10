@@ -133,7 +133,7 @@ public class DatabaseInfoPublisher extends RuntimeInfoPublisher {
 			XMLDocumentReader reader = new XMLDocumentReader(document);
 			reader.setNamespaceContext(new CommonNameSpaceContext());
 
-			writer.store(createURI(provider.getName()), reader.getDocument());
+//			writer.store(createURI(provider.getName()), reader.getDocument());
 		    }
 
 		} catch (Exception e) {

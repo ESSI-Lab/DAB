@@ -22,8 +22,6 @@ package eu.essi_lab.api.database.marklogic;
  */
 
 import java.io.InputStream;
-import java.util.Date;
-import java.util.Optional;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -35,8 +33,6 @@ import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StringUtils;
-import eu.essi_lab.lib.xml.XMLNodeReader;
-import eu.essi_lab.wrapper.marklogic.MarkLogicWrapper;
 
 /**
  * @author Fabrizio
@@ -107,12 +103,7 @@ public class MarkLogicFolder implements DatabaseFolder {
 	return mlDataBase.getWrapper().storeBinary(createResourceUri(uri, key), res);
     }
 
-    @Override
-    public boolean storeBinary(String key, InputStream res, Date timeStamp) throws Exception {
-
-	return mlDataBase.getWrapper().storeBinary(createResourceUri(uri, key), res, timeStamp);
-    }
-
+   
     @Override
     public boolean replaceBinary(String key, InputStream res) throws Exception {
 
@@ -135,33 +126,39 @@ public class MarkLogicFolder implements DatabaseFolder {
 	return mlDataBase.getWrapper().getBinary(createResourceUri(uri, key));
     }
 
-    @Override
-    public Optional<Node> getBinaryProperties(String key) throws Exception {
-
-	return mlDataBase.getWrapper().getBinaryProperties(createResourceUri(uri, key));
-    }
-
-    @Override
-    public Optional<Date> getBinaryTimestamp(String key) throws Exception {
-
-	Optional<Node> props = getBinaryProperties(key);
-
-	if (props.isPresent()) {
-
-	    XMLNodeReader reader = new XMLNodeReader(props.get());
-
-	    String timeStampString = reader.evaluateString("//*[local-name()='" + MarkLogicWrapper.DOC_TIMESTAMP + "']");
-
-	    if (timeStampString != null && !timeStampString.isEmpty()) {
-
-		long timeStamp = Long.valueOf(timeStampString);
-
-		return Optional.of(new Date(timeStamp));
-	    }
-	}
-
-	return Optional.empty();
-    }
+//    @Override
+//    public Optional<Node> getBinaryProperties(String key) throws Exception {
+//
+//	return mlDataBase.getWrapper().getBinaryProperties(createResourceUri(uri, key));
+//    }
+//    
+//    @Override
+//    public boolean storeBinary(String key, InputStream res, Date timeStamp) throws Exception {
+//
+//	return mlDataBase.getWrapper().storeBinary(createResourceUri(uri, key), res, timeStamp);
+//    }
+//
+//    @Override
+//    public Optional<Date> getBinaryTimestamp(String key) throws Exception {
+//
+//	Optional<Node> props = getBinaryProperties(key);
+//
+//	if (props.isPresent()) {
+//
+//	    XMLNodeReader reader = new XMLNodeReader(props.get());
+//
+//	    String timeStampString = reader.evaluateString("//*[local-name()='" + MarkLogicWrapper.DOC_TIMESTAMP + "']");
+//
+//	    if (timeStampString != null && !timeStampString.isEmpty()) {
+//
+//		long timeStamp = Long.valueOf(timeStampString);
+//
+//		return Optional.of(new Date(timeStamp));
+//	    }
+//	}
+//
+//	return Optional.empty();
+//    }
 
     @Override
     public boolean remove(String key) throws Exception {

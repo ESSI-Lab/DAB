@@ -25,7 +25,6 @@ import java.io.UnsupportedEncodingException;
 
 import javax.xml.transform.TransformerException;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import com.marklogic.xcc.exceptions.RequestException;
@@ -71,55 +70,6 @@ public class MarkLogicWriter extends DatabaseWriter {
 		    ErrorInfo.ERRORTYPE_INTERNAL, //
 		    ErrorInfo.SEVERITY_ERROR, //
 		    MARK_LOGIC_RESOURCE_REMOVAL_ERROR, //
-		    e);
-	}
-    }
-
-    @Override
-    public void store(String identifier, Document document) throws GSException {
-
-	MarkLogicDatabase markLogicDB = getDatabase();
-
-	try {
-
-	    markLogicDB.getWrapper().store(identifier, document);
-
-	} catch (Exception e) {
-
-	    GSLoggerFactory.getLogger(getClass()).error("Unable to store document {}", identifier, e);
-
-	    throw GSException.createException(//
-		    getClass(), //
-		    e.getMessage(), //
-		    null, //
-		    ErrorInfo.ERRORTYPE_INTERNAL, //
-		    ErrorInfo.SEVERITY_ERROR, //
-		    MARK_LOGIC_WRITER_DOCUMENT_STORING_ERROR, //
-		    e);
-	}
-
-    }
-
-    @Override
-    public void removeDocument(String identifier) throws GSException {
-
-	MarkLogicDatabase markLogicDB = getDatabase();
-
-	try {
-
-	    markLogicDB.getWrapper().remove(identifier);
-
-	} catch (Exception e) {
-
-	    GSLoggerFactory.getLogger(getClass()).error("Unable to remove document {}", identifier, e);
-
-	    throw GSException.createException(//
-		    getClass(), //
-		    e.getMessage(), //
-		    null, //
-		    ErrorInfo.ERRORTYPE_INTERNAL, //
-		    ErrorInfo.SEVERITY_ERROR, //
-		    MARK_LOGIC_WRITER_DOCUMENT_REMOVAL_ERROR, //
 		    e);
 	}
     }

@@ -1,4 +1,7 @@
-package eu.essi_lab.cfga.source;
+/**
+ * 
+ */
+package eu.essi_lab.api.database.cfg;
 
 /*-
  * #%L
@@ -23,7 +26,6 @@ package eu.essi_lab.cfga.source;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -31,9 +33,9 @@ import java.util.Optional;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.marklogic.xcc.ResultItem;
-import com.marklogic.xcc.exceptions.XccConfigException;
-
+import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.DatabaseFolder;
+import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.cfga.ConfigurationSource;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.lib.utils.ClonableInputStream;
@@ -41,76 +43,50 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.StorageInfo;
-import eu.essi_lab.wrapper.marklogic.MarkLogicWrapper;
+import eu.essi_lab.model.exceptions.GSException;
 
 /**
  * @author Fabrizio
  */
-public class MarkLogicSource implements ConfigurationSource {
+public class DatabaseSource implements ConfigurationSource {
 
-    private MarkLogicWrapper wrapper;
-    private String configUri;
-    private String lockUri;
-    private String configFolder;
+    private String lockFileName;
     private String configName;
+    private String completeConfigName;
+    private DatabaseFolder folder;
 
     /**
-     * xdbc://user:password@hostname:8000,8004/dbName/defaultConf/
-     * 
-     * @param xdbc
-     * @param configName
-     * @throws XccConfigException
-     * @throws URISyntaxException
+     * @param storageInfo
+     * @param configName config file name without extension
+     * @throws GSException
      */
-    public MarkLogicSource(String xdbc, String configName) throws XccConfigException, URISyntaxException {
+    public DatabaseSource(StorageInfo storageInfo, String configName) throws GSException {
 
-	StorageInfo uri = MarkLogicWrapper.fromXDBC(xdbc);
+	Database database = DatabaseFactory.get(storageInfo);
 
-	this.wrapper = new MarkLogicWrapper(uri);
+	this.folder = database.getFolder(storageInfo.getIdentifier(), true).get();
 
-	init(uri, configName);
-    }
-
-    /**
-     * @param uri
-     * @throws XccConfigException
-     * @throws URISyntaxException
-     */
-    public MarkLogicSource(StorageInfo uri, String configName) throws XccConfigException, URISyntaxException {
-
-	this.wrapper = new MarkLogicWrapper(uri.getUri(), uri.getUser(), uri.getPassword(), uri.getName());
-
-	init(uri, configName);
+	init(storageInfo, configName);
     }
 
     /**
      * 
      */
-    private MarkLogicSource() {
+    private DatabaseSource() {
 
     }
 
     /**
-     * @param uri
+     * @param storageInfo
      * @param configName
      */
-    private void init(StorageInfo uri, String configName) {
+    private void init(StorageInfo storageInfo, String configName) {
 
 	this.configName = configName;
 
-	this.configFolder = uri.getIdentifier();
+	this.completeConfigName = configName + ".json";
 
-	this.configUri = "/" + configFolder + "/" + configName + ".json";
-
-	this.lockUri = "/" + configFolder + "/lock.json";
-    }
-
-    /**
-     * @return the wrapper
-     */
-    public MarkLogicWrapper getWrapper() {
-
-	return wrapper;
+	this.lockFileName = "lock.json";
     }
 
     @Override
@@ -163,13 +139,13 @@ public class MarkLogicSource implements ConfigurationSource {
 	JSONArray array = new JSONArray();
 	settings.forEach(item -> array.put(item.getObject()));
 
-	boolean replaced = wrapper.replaceBinary(configUri, IOStreamUtils.asStream(array.toString(3)));
+	boolean replaced = folder.replaceBinary(this.completeConfigName, IOStreamUtils.asStream(array.toString(3)));
 	GSLoggerFactory.getLogger(getClass()).trace("Source replaced: " + replaced);
 
 	boolean stored = false;
 	if (!replaced) {
 
-	    stored = wrapper.storeBinary(configUri, IOStreamUtils.asStream(array.toString(3)));
+	    stored = folder.storeBinary(this.completeConfigName, IOStreamUtils.asStream(array.toString(3)));
 	    GSLoggerFactory.getLogger(getClass()).trace("Source stored: " + stored);
 	}
 
@@ -214,7 +190,7 @@ public class MarkLogicSource implements ConfigurationSource {
 
 		InputStream inputStream = updateLockTimestamp(lockFile);
 
-		boolean replaced = wrapper.replaceBinary(lockUri, inputStream);
+		boolean replaced = folder.replaceBinary(lockFileName, inputStream);
 
 		if (!replaced) {
 
@@ -229,7 +205,7 @@ public class MarkLogicSource implements ConfigurationSource {
 
 	InputStream lockFile = createLockFile(owner);
 
-	boolean stored = wrapper.storeBinary(lockUri, lockFile);
+	boolean stored = folder.storeBinary(lockFileName, lockFile);
 
 	if (!stored) {
 
@@ -244,7 +220,7 @@ public class MarkLogicSource implements ConfigurationSource {
 
 	if (isLocked().isPresent()) {
 
-	    return wrapper.remove(lockUri);
+	    return folder.remove(lockFileName);
 	}
 
 	return false;
@@ -299,31 +275,7 @@ public class MarkLogicSource implements ConfigurationSource {
      */
     private InputStream getBinaryConfig() throws Exception {
 
-	ResultItem next = wrapper.submit(getConfigQuery()).next();
-
-	if (next != null) {
-
-	    return next.asInputStream();
-	}
-
-	return null;
-    }
-
-    /**
-     * @return
-     */
-    private String getConfigQuery() {
-
-	String query = "xquery version \"1.0-ml\"; \n";
-
-	query += "declare namespace html = \"http://www.w3.org/1999/xhtml\";  \n";
-
-	// query += "import module namespace gs=\"http://flora.eu/gi-suite/1.0/dataModel/schema\" at
-	// \"/gs-modules/functions-module.xqy\"; \n";
-
-	query += "fn:document('" + this.configUri + "')\n";
-
-	return query;
+	return folder.getBinary(completeConfigName);
     }
 
     /**
@@ -373,7 +325,7 @@ public class MarkLogicSource implements ConfigurationSource {
      */
     private Optional<JSONObject> getLockFile() throws Exception {
 
-	InputStream binary = wrapper.getBinary(lockUri);
+	InputStream binary = folder.getBinary(lockFileName);
 
 	if (binary != null) {
 
@@ -385,7 +337,7 @@ public class MarkLogicSource implements ConfigurationSource {
     }
 
     @Override
-    public MarkLogicSource backup() throws Exception {
+    public DatabaseSource backup() throws Exception {
 
 	String date = ISO8601DateTimeUtils.getISO8601DateTime().//
 		replace("-", "_").//
@@ -396,9 +348,9 @@ public class MarkLogicSource implements ConfigurationSource {
 
 	String backupName = configName + "_" + date;
 
-	String backupUri = "/" + this.configFolder + "/" + backupName + ".json.backup";
+	String backupCompleteName = backupName + ".json.backup";
 
-	boolean stored = wrapper.storeBinary(backupUri, clone);
+	boolean stored = folder.storeBinary(backupCompleteName, clone);
 
 	GSLoggerFactory.getLogger(getClass()).trace("Source stored: " + stored);
 
@@ -406,13 +358,12 @@ public class MarkLogicSource implements ConfigurationSource {
 	    throw new RuntimeException("Source backup not stored");
 	}
 
-	MarkLogicSource backupSource = new MarkLogicSource();
+	DatabaseSource backupSource = new DatabaseSource();
 
-	backupSource.wrapper = this.wrapper;
 	backupSource.configName = backupName;
-	backupSource.configUri = backupUri;
-	backupSource.configFolder = this.configFolder;
-	backupSource.lockUri = this.lockUri;
+	backupSource.completeConfigName = backupCompleteName;
+	backupSource.lockFileName = this.lockFileName;
+	backupSource.folder = this.folder;
 
 	return backupSource;
     }
@@ -420,6 +371,6 @@ public class MarkLogicSource implements ConfigurationSource {
     @Override
     public String getLocation() {
 
-	return this.configUri;
+	return folder.getCompleteName() + "\\" + this.completeConfigName;
     }
 }

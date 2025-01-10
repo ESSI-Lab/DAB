@@ -23,7 +23,6 @@ package eu.essi_lab.api.database.vol;
 
 import java.util.Iterator;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import eu.essi_lab.api.database.Database;
@@ -130,24 +129,6 @@ public class VolatileDatabaseWriter extends DatabaseWriter {
 	    }
 	}
 
-    }
-
-    @Override
-    public void store(String identifier, Document document) throws GSException {
-
-	synchronized (getDatabase().getDocumentsMap()) {
-
-	    getDatabase().getDocumentsMap().put(identifier, document);
-	}
-    }
-
-    @Override
-    public void removeDocument(String identifier) throws GSException {
-
-	synchronized (getDatabase().getDocumentsMap()) {
-
-	    getDatabase().getDocumentsMap().remove(identifier);
-	}
     }
 
     @Override

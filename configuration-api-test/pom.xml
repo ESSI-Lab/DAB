@@ -46,6 +46,46 @@
 							</systemPropertyVariables>
 						</configuration>
 					</plugin>
+					
+					<plugin>
+						<groupId>io.fabric8</groupId>
+						<artifactId>docker-maven-plugin</artifactId>
+
+						<configuration>
+							<systemPropertyVariables>
+								<!--suppress MavenModelInspection -->
+								<dbUrl>
+									xdbc://${docker.host.address}:${gi-marklogic.rest-port},${gi-marklogic.xdbc-port}</dbUrl>
+								<dbUser>${dbUser}</dbUser>
+								<dbPassword>${dbPassword}</dbPassword>
+							</systemPropertyVariables>
+							
+							
+							<images>
+
+								<image>
+									<alias>gi-marklogic</alias>
+									<name>${marklogic.registry}</name>
+									<run>
+										<ports>
+											<port>gi-marklogic.rest-port:8000</port>
+											<port>gi-marklogic.xdbc-port:8004</port>
+											<port>healthcheck.port:7997</port>
+										</ports>
+										<wait>
+											<http>
+												<!--suppress MavenModelInspection -->
+												<url>http://${docker.host.address}:${healthcheck.port}</url>
+											</http>
+											<time>${fabric8-timeout}</time>
+										</wait>
+									</run>
+								</image>
+
+							</images>
+						</configuration>
+					</plugin>
+					
 					<plugin>
 						<groupId>io.fabric8</groupId>
 						<artifactId>docker-maven-plugin</artifactId>
