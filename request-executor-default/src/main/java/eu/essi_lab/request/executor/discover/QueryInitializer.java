@@ -41,6 +41,7 @@ import eu.essi_lab.messages.PerformanceLogger;
 import eu.essi_lab.messages.QueryInitializerMessage;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
+import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.EmptyBond;
 import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
@@ -323,11 +324,13 @@ public class QueryInitializer implements IQueryInitializer {
 	Bond cleanDisjunctiveNormalForm = simplifyConjunctions(disjunctiveNormalForm);
 	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - aggregated conjunctions");
 	Bond aggregatedConjunctions = aggregateConjunctions(cleanDisjunctiveNormalForm);
+
+	Bond likeSourcesSimplification = getLikeSourcesSimplifiedForm(aggregatedConjunctions);
 	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - cleanup");
 	// this seems not to be needed... already per source aggregated at this point!
 	// Bond ret = getPerSourceAggregation(aggregatedConjunctions);
 	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - done");
-	return aggregatedConjunctions;
+	return likeSourcesSimplification;
 
     }
 
@@ -415,6 +418,75 @@ public class QueryInitializer implements IQueryInitializer {
 	    }
 	}
 
+	return bond;
+    }
+
+    /**
+     * In case of conjunctions of sources, simplifications are possible! e.g. (S like 1) AND (S1) -> S1
+     *
+     * @param bond
+     * @return
+     */
+    private Bond getLikeSourcesSimplifiedForm(Bond bond) {
+	if (bond == null) {
+	    return null;
+	}
+	if (bond instanceof LogicalBond) {
+	    LogicalBond lb = (LogicalBond) bond;
+	    LogicalOperator operator = lb.getLogicalOperator();
+	    if (operator.equals(LogicalOperator.AND)) {
+		List<Bond> operands = lb.getOperands();
+		List<ResourcePropertyBond> sourceBonds = new ArrayList<>();
+		List<ResourcePropertyBond> likeBonds = new ArrayList<>();
+		List<Bond> others = new ArrayList<>();
+		for (Bond operand : operands) {
+		    if (isSourceIdentifierBond(operand)) {
+			sourceBonds.add((ResourcePropertyBond) operand);
+		    } else if (isSourceIdentifierLikeBond(operand)) {
+			likeBonds.add((ResourcePropertyBond) operand);
+		    } else {
+			others.add(operand);
+		    }
+		}
+		if (sourceBonds.size() > 1) {
+		    return null;
+		}
+		if (sourceBonds.size() == 1 && likeBonds.size() > 0) {
+		    ResourcePropertyBond sourceBond = sourceBonds.get(0);
+		    String id = sourceBond.getPropertyValue();
+		    boolean ok = true;
+		    for (ResourcePropertyBond likeBond : likeBonds) {
+			String value = likeBond.getPropertyValue();
+			if (!id.contains(value)) {
+			    ok = false;
+			}
+		    }
+		    if (ok) {
+			return sourceBond;
+		    } else {
+			return null;
+		    }
+		}
+	    } else if (operator.equals(LogicalOperator.OR)) {
+		List<Bond> cleaned = new ArrayList<Bond>();
+		for (Bond operand : lb.getOperands()) {
+		    Bond c = getLikeSourcesSimplifiedForm(operand);
+		    if (c != null) {
+			cleaned.add(c);
+		    }
+		}
+		switch (cleaned.size()) {
+		case 0:
+		    return null;
+		case 1:
+		    return cleaned.get(0);
+		default:
+		    lb.getOperands().clear();
+		    lb.getOperands().addAll(cleaned);
+		    break;
+		}
+	    }
+	}
 	return bond;
     }
 
@@ -1364,7 +1436,23 @@ public class QueryInitializer implements IQueryInitializer {
 	if (bond == null) {
 	    return false;
 	}
-	return BondFactory.isResourcePropertyBond(bond, ResourceProperty.SOURCE_ID);
+	boolean bool = BondFactory.isResourcePropertyBond(bond, ResourceProperty.SOURCE_ID);
+	if (bool) {
+	    return (((ResourcePropertyBond) bond).getOperator().equals(BondOperator.EQUAL));
+	}
+	return bool;
+    }
+
+    private boolean isSourceIdentifierLikeBond(Bond bond) {
+
+	if (bond == null) {
+	    return false;
+	}
+	boolean bool = BondFactory.isResourcePropertyBond(bond, ResourceProperty.SOURCE_ID);
+	if (bool) {
+	    return (((ResourcePropertyBond) bond).getOperator().equals(BondOperator.LIKE));
+	}
+	return bool;
     }
 
     @Override

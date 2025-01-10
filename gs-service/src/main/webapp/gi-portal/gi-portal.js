@@ -1,14 +1,13 @@
 
 import { GIAPI } from '../giapi/core/GIAPI.js';
 
-var view = 'his-central';
+var view = '';
 
-	
-	
-	export function initializePortal(config) {
-    	view = config.view;
-    	document.title = config.title;
-    }
+export function initializePortal(config) {
+	view = config.view;
+	document.title = config.title;
+
+
 	
 		    $.extend(true, $.hik.jtable.prototype.options, {
 		        jqueryuiTheme: true
@@ -537,3 +536,8 @@ var view = 'his-central';
                     GIAPI.UI_Utils.discoverDialog('close');
                 }
             };
+
+}
+
+	
+

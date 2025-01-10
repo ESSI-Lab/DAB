@@ -28,6 +28,6 @@ import eu.essi_lab.access.datacache.StationRecord;
 
 public interface WMSFeatureInfoGenerator {
 
-    public InputStream getInfoPage(String viewId, List<StationRecord>stations,String contentType, WMSGetFeatureInfoRequest request);
+    public InputStream getInfoPage(String viewId, List<StationRecord>stations,int total,String contentType, WMSGetFeatureInfoRequest request);
     
 }

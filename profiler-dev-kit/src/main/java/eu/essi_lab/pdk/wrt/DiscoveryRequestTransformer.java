@@ -249,21 +249,22 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
 			return;
 		    }
 
-		    Optional<GSSource> source = allSources.stream().filter(s -> s.getUniqueIdentifier().equals(value)).findFirst();
-		    ;
-
-		    if (source.isPresent()) {
-			sources.add(source.get());
-		    } else {
-			// // the request validation MUST check the sources ids,
-			// // this exception should NEVER be thrown
-			// GSException exception = GSException.createException(//
-			// getClass(), //
-			// "Unidentified source: " + value, null, //
-			// ErrorInfo.ERRORTYPE_CLIENT, //
-			// ErrorInfo.SEVERITY_ERROR, //
-			// UNIDENTIFIED_SOURCE_ERROR);//
-			// excList.add(exception);
+		    switch (bond.getOperator()) {
+		    case EQUAL:
+			Optional<GSSource> source = allSources.stream().filter(s -> s.getUniqueIdentifier().equals(value)).findFirst();
+			if (source.isPresent()) {
+			    sources.add(source.get());
+			}
+			break;
+		    case LIKE:
+			for (GSSource s : allSources) {
+			    if (s.getUniqueIdentifier().contains(value)) {
+				sources.add(s);
+			    }
+			}
+			break;
+		    default:
+			break;
 		    }
 		}
 	    }

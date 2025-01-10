@@ -480,38 +480,7 @@ WMO reserves the right to change or amend the Terms of Use for using WHOS and sh
 				}
 				
 				
-				//
-				// Station/platform
-				//
-				
-				var stationType =  findValue(data, i, 'REAL_TIME') === 'Yes' ? "Real time" : "Non real time";
-				
-				var status  = findValue(data, i, 'STATUS') === "A" ? "Active" : "No longer active";
-
-			    var geoLocation = getGeoLocation(data, i);		
-			    
-				items.push("<tr><td class='data_table_headers_separator' colspan='2'></td></tr>");	
-				
-				items.push("<tr><td class='data_table_header' colspan='2'>Station/platform</td></tr>");	
-				
-				items.push("<tr><td>HYCOS ID</td><td>"+ findValue(data, i, 'HYCOSID')  +"</td></tr>");	
-				
-				items.push("<tr><td>Station ID</td><td>"+ findValue(data, i, 'STATION_ID')  +"</td></tr>");	
-				
-				items.push("<tr><td>Territory of origin of data</td><td>"+ findValue(data, i, 'COUNTRY')  +"</td></tr>");	
-				
-				items.push("<tr><td>Supervising organization</td><td>"+ findValueOrEmpty(data, i, 'INSTITUTE')  +"</td></tr>");	
-				
-				items.push("<tr><td>Station/platform name</td><td>"+ findValue(data, i, 'STATION_NAME')  +"</td></tr>");	
-				
-				// as for Igor meeting 2020-12-3
-// 				items.push("<tr><td>Station/platform type</td><td>"+""+"</td></tr>");	
-				
-				items.push("<tr><td>Geospatial location</td><td>"+geoLocation+"</td></tr>");	
-				
-				items.push("<tr><td>Station operating status</td><td>"+ status +"</td></tr>");				
-				
-				items.push("<tr><td>Total drainage area</td><td>"+ findValue(data, i, 'DRAINAGE_AREA') +" (km2) </td></tr>");				 
+				 
 
 				
 				$("<table></table>", {
@@ -913,6 +882,43 @@ WMO reserves the right to change or amend the Terms of Use for using WHOS and sh
 					}
 					return 0;
 				})
+				
+								//
+				// Station/platform
+				//
+				
+				var stationType =  findValue(data, i, 'REAL_TIME') === 'Yes' ? "Real time" : "Non real time";
+				
+				var status  = findValue(data, i, 'STATUS') === "A" ? "Active" : "No longer active";
+
+			    var geoLocation = getGeoLocation(data, i);		
+			    
+			    var stationTable = "<table>"
+				stationTable += "<tr><td class='data_table_headers_separator' colspan='2'></td></tr>";	
+				
+				stationTable += "<tr><td class='data_table_header' colspan='2'>Station/platform</td></tr>";	
+				
+				stationTable += "<tr><td>Station ID</td><td>"+ findValue(data, 0, 'platform_id')  +"</td></tr>";	
+
+				stationTable += "<tr><td>Territory of origin of data</td><td>"+ findValue(data, 0, 'COUNTRY')  +"</td></tr>";	
+				
+				stationTable += "<tr><td>Supervising organization</td><td>"+ findValueOrEmpty(data, 0, 'INSTITUTE')  +"</td></tr>";	
+				
+				stationTable += "<tr><td>Station/platform name</td><td>"+ findValue(data, 0, 'platform_label')  +"</td></tr>";	
+				
+				// as for Igor meeting 2020-12-3
+// 				stationTable += "<tr><td>Station/platform type</td><td>"+""+"</td></tr>";	
+				
+				stationTable += "<tr><td>Geospatial location</td><td>"+geoLocation+"</td></tr>";	
+				
+				stationTable += "<tr><td>Station operating status</td><td>"+ status +"</td></tr>";				
+				
+				stationTable += "<tr><td>Total drainage area</td><td>"+ findValue(data, 0, 'DRAINAGE_AREA') +" (km2) </td></tr>";
+				
+				stationTable += "</table>";
+				
+				$(stationTable).appendTo("#timeseries");
+				
 				
 				for (var x = 0, len = data.length; x < len; x++) {
 

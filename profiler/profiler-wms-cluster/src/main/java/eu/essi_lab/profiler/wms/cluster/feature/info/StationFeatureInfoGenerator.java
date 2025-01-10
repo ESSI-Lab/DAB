@@ -36,18 +36,19 @@ import eu.essi_lab.profiler.wms.cluster.WMSRequest.Parameter;
 public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 
     @Override
-    public InputStream getInfoPage(String viewId, List<StationRecord> stations, String contentType, WMSGetFeatureInfoRequest request) {
+    public InputStream getInfoPage(String viewId, List<StationRecord> stations, int total, String contentType,
+	    WMSGetFeatureInfoRequest request) {
 
 	StringBuilder htmlBuilder = new StringBuilder();
 
-	htmlBuilder = build(htmlBuilder, false);
+	htmlBuilder = build(htmlBuilder, stations.size(), total, false);
 
 	JSONArray json = new JSONArray();
 
 	JSONObject geoJson = new JSONObject();
 
 	geoJson.put("type", "FeatureCollection");
-	geoJson.put("totalFeatures", "unknown");
+	geoJson.put("totalFeatures", total);
 	geoJson.put("numberReturned", stations.size());
 	geoJson.put("timeStamp", ISO8601DateTimeUtils.getISO8601DateTime());
 	geoJson.put("crs", request.getParameterValue(Parameter.CRS));
@@ -122,7 +123,7 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 
 	if (stations.isEmpty()) {
 
-	    htmlBuilder = build(new StringBuilder(), true);
+	    htmlBuilder = build(new StringBuilder(), stations.size(), 0, true);
 
 	} else {
 
@@ -174,7 +175,8 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 	builder.append("<tr>\n");
 	builder.append("  <td style='vertical-align: middle;'>" + station.getDatasetName() + "</td>    \n");
 	builder.append("  <td style='text-align: center;'>" + image + "</td>\n");
-	builder.append("  <td style='text-align: center; cursor:pointer' id='addToSearch_"+station.getDatasetName()+"'><i class=\"font-awesome-button-icon fa fa-plus-circle\" style=\"color:darkred; font-size:15px;\" aria-hidden=\"true\"></i></td>\n");
+	builder.append("  <td style='text-align: center; cursor:pointer' id='addToSearch_" + station.getDatasetName()
+		+ "'><i class=\"font-awesome-button-icon fa fa-plus-circle\" style=\"color:darkred; font-size:15px;\" aria-hidden=\"true\"></i></td>\n");
 	builder.append("  <td style='border: 1px solid transparent; background: transparent;'></td>\n");
 
 	builder.append("</tr>\n");
@@ -186,7 +188,7 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
      * @param empty
      * @return
      */
-    private StringBuilder build(StringBuilder builder, boolean empty) {
+    private StringBuilder build(StringBuilder builder, int returned, int total, boolean empty) {
 
 	builder.append("<html>\n");
 	builder.append("  <head>\n");
@@ -227,14 +229,17 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 	builder.append("  <body>\n");
 
 	if (!empty) {
-
+	    String info = "";
+	    if (returned!=total) {
+		info =" (" + returned + " of " + total + ")";
+	    }
 	    builder.append("<div style='max-height: 400px; overflow-y: auto'><table class='featureInfo'>\n");
-
 	    builder.append("<tr>\n");
-	    builder.append(" <th >Station name</th>\n");
+	    builder.append(" <th >Station" + info + "</th>\n");
 	    builder.append(" <th >Station info</th>\n");
 	    builder.append(" <th >Add to search</th>\n");
-	    builder.append(" <th title='Close' id='closePopup' style='background: white; cursor: pointer; background:'><i class=\"font-awesome-button-icon fa fa-times\" style=\"font-size:15px;\" aria-hidden=\"true\"></i></th>\n");
+	    builder.append(
+		    " <th title='Close' id='closePopup' style='background: white; cursor: pointer; background:'><i class=\"font-awesome-button-icon fa fa-times\" style=\"font-size:15px;\" aria-hidden=\"true\"></i></th>\n");
 	    builder.append(" </tr>\n");
 
 	} else {
