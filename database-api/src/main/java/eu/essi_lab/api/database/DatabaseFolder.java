@@ -61,6 +61,14 @@ public interface DatabaseFolder {
 	/**
 	 * @return
 	 */
+	public String getDataType() {
+
+	    return getDocument().isPresent() ? "doc" : "binary";
+	}
+
+	/**
+	 * @return
+	 */
 	public Optional<InputStream> getInputStream() {
 
 	    return Optional.ofNullable(stream);
@@ -98,10 +106,23 @@ public interface DatabaseFolder {
      */
     public enum EntryType {
 
+	//
+	// meta-folder entries
+	//
+
+	HARVESTING_WARN_REPORT("harvestingWarnReport"), //
+	HARVESTING_ERROR_REPORT("harvestingWarnReport"), //
+	HARVESTING_PROPERTIES("harvestingProperties"), //
+	DATA_FOLDER_INDEX_DOC("dataFolderIndexDoc"), //
+
+	//
+	//
+	//
+
 	USER("user"), //
 	VIEW("view"), //
-	META_FOLDER_ENTRY("metaFolderItem"), //
 	DATA_FOLDER_ENTRY("dataFolderItem"), //
+
 	AUGMENTER_PROPERTIES("augmenterProperties"), //
 	CONFIGURATION("configuration"), //
 	MISC("misc");
@@ -140,7 +161,7 @@ public interface DatabaseFolder {
     }
 
     /**
-     * If this folder is a DAB source folder, this method returns the related source identifier by removing from this
+     * If this folder is a source folder, this method returns the related source identifier by removing from this
      * folder name the database identifier and the other folder prefixes used to generate the folder name.<br>
      * If this folder is not a DAB source folder, it returns this folder name.
      * 
@@ -148,7 +169,7 @@ public interface DatabaseFolder {
      * @param folder
      * @return
      */
-    public static String computeSourceIdentifier(Database database, DatabaseFolder folder) {
+    public static String computeSourceId(Database database, DatabaseFolder folder) {
 
 	String name = folder.getName();
 	name = name.replace(database.getIdentifier() + "_", "");

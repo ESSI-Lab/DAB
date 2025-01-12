@@ -17,29 +17,53 @@ import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase.OpenSearchServiceType;
+import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 
 /**
  * @author Fabrizio
  */
-public class OpenSearchInitTest {
+public class OpenSearchdatabaseInitTest {
 
-    @Test
-    public void databaseProviderTest() throws GSException {
+    /**
+     * @return
+     */
+    public static StorageInfo createStorageInfo() {
 
 	StorageInfo storageInfo = new StorageInfo();
-	storageInfo.setIdentifier("test");
+	storageInfo.setIdentifier("testDb");
 	storageInfo.setType(OpenSearchServiceType.OPEN_SEARCH_MANAGED.getType());
 	storageInfo.setUser("admin");
 	storageInfo.setPassword("admin");
 	storageInfo.setUri("http://localhost:9200");
 
-	Database database = DatabaseFactory.get(storageInfo);
+	return storageInfo;
+    }
+
+    /**
+     * @return
+     * @throws GSException
+     */
+    public static OpenSearchDatabase create() throws GSException {
+
+	StorageInfo storageInfo = createStorageInfo();
+
+	OpenSearchDatabase database = (OpenSearchDatabase) DatabaseFactory.get(storageInfo);
+
+	database.initializeIndexes();
+
+	return database;
+    }
+
+    @Test
+    public void databaseProviderTest() throws GSException {
+
+	Database database = create();
 	assertNotNull(database);
 
 	String identifier = database.getIdentifier();
-	assertEquals("test", identifier);
+	assertEquals("testDb", identifier);
     }
 
     /**
@@ -51,27 +75,15 @@ public class OpenSearchInitTest {
     @Test
     public void tesIndexesCreation() throws OpenSearchException, IOException, GSException {
 
-	StorageInfo storageInfo = new StorageInfo();
-	storageInfo.setIdentifier("test");
-	storageInfo.setType(OpenSearchServiceType.OPEN_SEARCH_MANAGED.getType());
-	storageInfo.setUser("admin");
-	storageInfo.setPassword("admin");
-	storageInfo.setUri("http://localhost:9200");
+	OpenSearchDatabase database = create();
 
 	//
 	//
 	//
 
-	OpenSearchDatabase database = new OpenSearchDatabase();
-	database.initialize(storageInfo);
+	for (IndexMapping mapping : IndexMapping.MAPPINGS) {
 
-	//
-	//
-	//
-
-	for (String index : OpenSearchDatabase.INDEXES_LIST) {
-
-	    ExistsRequest existsIndexRequest = new ExistsRequest.Builder().index(index).build();
+	    ExistsRequest existsIndexRequest = new ExistsRequest.Builder().index(mapping.getIndex()).build();
 
 	    boolean created = database.getClient().indices().exists(existsIndexRequest).value();
 

@@ -50,6 +50,7 @@ import org.opensearch.client.transport.rest_client.RestClientTransport;
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.SourceStorageWorker;
+import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.StorageInfo;
@@ -113,24 +114,6 @@ public class OpenSearchDatabase extends Database {
     private String identifier;
     private DatabaseSetting setting;
 
-    public static final String META_FOLDER_INDEX = "resources-meta-index";
-    public static final String DATA_FOLDER_INDEX = "resources-data-index";
-    public static final String USERS_INDEX = USERS_FOLDER + "-index";
-    public static final String VIEWS_INDEX = VIEWS_FOLDER + "-index";
-    public static final String AUGMENTER_PROPERTIES_INDEX = AUGMENTERS_FOLDER + "-index";
-    public static final String MISC_INDEX = "misc-index";
-    public static final String CONFIGURATION_INDEX = "configuration-index";
-
-    public static final List<String> INDEXES_LIST = Arrays.asList(//
-	    META_FOLDER_INDEX, //
-	    DATA_FOLDER_INDEX, //
-	    USERS_INDEX, //
-	    VIEWS_INDEX, //
-	    AUGMENTER_PROPERTIES_INDEX, //
-	    MISC_INDEX,//
-	    CONFIGURATION_INDEX
-    );
-
     private SdkHttpClient httpClient;
     private boolean initialized;
 
@@ -158,18 +141,7 @@ public class OpenSearchDatabase extends Database {
 
 	    if (schemeName.equals("http")) {
 
-		RestClient restClient = RestClient.builder(httpHost)
-			.setHttpClientConfigCallback(new RestClientBuilder.HttpClientConfigCallback() {
-			    @Override
-			    public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {
-
-				return httpClientBuilder.setSSLContext(null);
-			    }
-			}).build();
-
-		OpenSearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
-
-		client = new OpenSearchClient(transport);
+		client = createNoSSLContextClient(storageInfo);
 
 	    } else {
 
@@ -187,15 +159,7 @@ public class OpenSearchDatabase extends Database {
 	    //
 	    //
 
-	    for (String index : INDEXES_LIST) {
-
-		boolean exists = checkIndex(index);
-
-		if (!exists) {
-
-		    createIndex(index);
-		}
-	    }
+	    initializeIndexes();
 
 	    initialized = true;
 	}
@@ -204,15 +168,52 @@ public class OpenSearchDatabase extends Database {
     /**
      * @throws GSException
      */
-    private void createIndex(String index) throws GSException {
+    public void initializeIndexes() throws GSException {
 
-	TypeMapping mapping = new TypeMapping.Builder().//
-		withJson(getClass().getClassLoader().getResourceAsStream("mappings/base-mapping.json")).//
+	for (IndexMapping mapping : IndexMapping.MAPPINGS) {
+
+	    boolean exists = checkIndex(mapping.getIndex());
+
+	    if (!exists) {
+
+		createIndex(mapping);
+	    }
+	}
+    }
+
+    /**
+     * @param storageInfo
+     * @return
+     */
+    public static OpenSearchClient createNoSSLContextClient(StorageInfo storageInfo) {
+
+	HttpHost httpHost = HttpHost.create(storageInfo.getUri());
+
+	RestClient restClient = RestClient.builder(httpHost).setHttpClientConfigCallback(new RestClientBuilder.HttpClientConfigCallback() {
+	    @Override
+	    public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {
+
+		return httpClientBuilder.setSSLContext(null);
+	    }
+	}).build();
+
+	OpenSearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
+
+	return new OpenSearchClient(transport);
+    }
+
+    /**
+     * @throws GSException
+     */
+    private void createIndex(IndexMapping mapping) throws GSException {
+
+	TypeMapping typeMapping = new TypeMapping.Builder().//
+		withJson(mapping.getMappingStream()).//
 		build();
 
 	CreateIndexRequest createIndexRequest = new CreateIndexRequest.Builder().//
-		index(index).//
-		mappings(mapping).//
+		index(mapping.getIndex()).//
+		mappings(typeMapping).//
 		build();
 
 	try {
@@ -226,14 +227,14 @@ public class OpenSearchDatabase extends Database {
 			null, //
 			ErrorInfo.ERRORTYPE_SERVICE, //
 			ErrorInfo.SEVERITY_FATAL, //
-			"OpenSearchDatabaseCreate" + index + "NotAcknowledgedError");
+			"OpenSearchDatabaseCreate" + mapping.getIndex() + "NotAcknowledgedError");
 	    }
 
 	} catch (Exception ex) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(ex);
 
-	    throw GSException.createException(getClass(), "OpenSearchDatabaseCreate" + index + "Error", ex);
+	    throw GSException.createException(getClass(), "OpenSearchDatabaseCreate" + mapping.getIndex() + "Error", ex);
 	}
     }
 
@@ -322,7 +323,10 @@ public class OpenSearchDatabase extends Database {
     @Override
     public void release() throws GSException {
 
-	httpClient.close();
+	if (httpClient != null) {
+
+	    httpClient.close();
+	}
     }
 
     @Override

@@ -1,0 +1,496 @@
+/**
+ * 
+ */
+package eu.essi_lab.api.database.opensearch.index;
+
+import java.io.ByteArrayInputStream;
+
+/*-
+ * #%L
+ * Discovery and Access Broker (DAB) Community Edition (CE)
+ * %%
+ * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * #L%
+ */
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Optional;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.json.JSONObject;
+import org.opensearch.client.opensearch.core.IndexRequest;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
+import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.DatabaseFolder;
+import eu.essi_lab.api.database.DatabaseFolder.EntryType;
+import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
+import eu.essi_lab.api.database.SourceStorageWorker;
+import eu.essi_lab.api.database.SourceStorageWorker.DataFolderIndexDocument;
+import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
+import eu.essi_lab.api.database.opensearch.index.mappings.AugmentersMapping;
+import eu.essi_lab.api.database.opensearch.index.mappings.ConfigurationMapping;
+import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
+import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
+import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
+import eu.essi_lab.api.database.opensearch.index.mappings.MiscMapping;
+import eu.essi_lab.api.database.opensearch.index.mappings.UsersMapping;
+import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
+import eu.essi_lab.lib.utils.IOStreamUtils;
+import eu.essi_lab.lib.xml.XMLFactories;
+import eu.essi_lab.model.auth.GSUser;
+
+/**
+ * @author Fabrizio
+ */
+public class IndexData {
+
+    /**
+     * @author Fabrizio
+     */
+    public enum DataType {
+
+	/**
+	 * 
+	 */
+	BINARY("binary"),
+
+	/**
+	 * 
+	 */
+	DOC("doc");
+
+	private String type;
+
+	/**
+	 * @param type
+	 */
+	private DataType(String type) {
+
+	    this.type = type;
+	}
+
+	/**
+	 * @return the type
+	 */
+	public String getType() {
+
+	    return type;
+	}
+
+	/**
+	 * @param type
+	 * @return
+	 */
+	public static DataType decode(String type) {
+
+	    return Arrays.asList(values()).//
+		    stream().//
+		    filter(t -> t.getType().equals(type)).//
+		    findFirst().//
+		    orElseThrow();
+	}
+
+    }
+
+    public static final String BINARY_DATA_TYPE = "binary";
+
+    //
+    // base properties
+    //
+    public static final String DATABASE_ID = "databaseId";
+    public static final String FOLDER_NAME = "folderName";
+    public static final String FOLDER_ID = "folderId";
+    public static final String RESOURCE_KEY = "resourceKey";
+    public static final String RESOURCE_ID = "resourceId";
+    public static final String BINARY_PROPERTY = "binaryProperty";
+    public static final String DATA_TYPE = "dataType";
+
+    //
+    //
+    //
+
+    public static final String ALL_INDEXES = "_all";
+
+    private JSONObject object;
+    private IndexMapping mapping;
+    private String indexId;
+    private String indexName;
+
+    /**
+     * @param folder
+     * @param key
+     * @param entry
+     * @param type
+     * @return
+     * @throws IOException
+     * @throws TransformerException
+     */
+    public static IndexData of(//
+	    DatabaseFolder folder, //
+	    String key, //
+	    FolderEntry entry, //
+	    EntryType type)
+
+	    throws IOException, TransformerException {
+
+	IndexData indexData = new IndexData();
+
+	//
+	// put the base properties
+	//
+
+	indexData.object.put(RESOURCE_KEY, key);
+	indexData.object.put(RESOURCE_ID, OpenSearchFolder.getResourceId(folder, key));
+
+	indexData.object.put(DATABASE_ID, folder.getDatabase().getIdentifier());
+	indexData.object.put(FOLDER_NAME, folder.getName());
+	indexData.object.put(FOLDER_ID, OpenSearchFolder.getFolderId(folder));
+
+	indexData.object.put(DATA_TYPE, entry.getDataType());
+
+	indexData.indexId = OpenSearchFolder.getResourceId(folder, key);
+
+	//
+	// encodes the binary property
+	//
+
+	String encodedString = encode(entry);
+
+	//
+	//
+	//
+
+	switch (type) {
+
+	case DATA_FOLDER_ENTRY:
+
+	    indexData.mapping = DataFolderMapping.get();
+
+	    indexData.indexName = DataFolderMapping.get().getIndex();
+
+	    break;
+
+	case AUGMENTER_PROPERTIES:
+
+	    indexData.mapping = AugmentersMapping.get();
+
+	    indexData.indexName = AugmentersMapping.get().getIndex();
+
+	    break;
+
+	case CONFIGURATION:
+
+	    indexData.mapping = ConfigurationMapping.get();
+
+	    indexData.indexName = ConfigurationMapping.get().getIndex();
+
+	    break;
+
+	case MISC:
+
+	    indexData.mapping = MiscMapping.get();
+
+	    indexData.indexName = MiscMapping.get().getIndex();
+
+	    break;
+	case USER:
+
+	    indexData.object.put(BINARY_PROPERTY, UsersMapping.USER);
+	    indexData.object.put(UsersMapping.USER, encodedString);
+
+	    GSUser user = GSUser.createOrNull(entry.getDocument().get());
+
+	    indexData.object.put(UsersMapping.USER_ID, user.getIdentifier());
+	    user.getUserIdentifierType().ifPresent(t -> indexData.object.put(UsersMapping.USER_ID_TYPE, t.getType()));
+
+	    indexData.object.put(UsersMapping.ENABLED, user.isEnabled());
+	    indexData.object.put(UsersMapping.USER_ROLE, user.getRole());
+
+	    indexData.mapping = UsersMapping.get();
+
+	    indexData.indexName = UsersMapping.get().getIndex();
+
+	    break;
+	case VIEW:
+
+	    indexData.mapping = ViewsMapping.get();
+
+	    indexData.indexName = ViewsMapping.get().getIndex();
+
+	    break;
+
+	case DATA_FOLDER_INDEX_DOC:
+
+	    indexData.object.put(BINARY_PROPERTY, MetaFolderMapping.INDEX_DOC);
+	    indexData.object.put(MetaFolderMapping.INDEX_DOC, encodedString);
+
+	    DataFolderIndexDocument doc = new DataFolderIndexDocument(entry.getDocument().get());
+
+	    indexData.object.put(MetaFolderMapping.DATA_FOLDER, doc.getDataFolder());
+
+	    String sourceId = DatabaseFolder.computeSourceId(folder.getDatabase(), folder);
+	    indexData.object.put(MetaFolderMapping.SOURCE_ID, sourceId);
+
+	    indexData.mapping = MetaFolderMapping.get();
+
+	    indexData.indexName = MetaFolderMapping.get().getIndex();
+
+	    break;
+
+	case HARVESTING_ERROR_REPORT:
+
+	    indexData.object.put(BINARY_PROPERTY, MetaFolderMapping.ERRORS_REPORT);
+	    indexData.object.put(MetaFolderMapping.ERRORS_REPORT, encodedString);
+
+	    sourceId = DatabaseFolder.computeSourceId(folder.getDatabase(), folder);
+	    indexData.object.put(MetaFolderMapping.SOURCE_ID, sourceId);
+
+	    indexData.mapping = MetaFolderMapping.get();
+
+	    indexData.indexName = MetaFolderMapping.get().getIndex();
+
+	    break;
+
+	case HARVESTING_WARN_REPORT:
+
+	    indexData.object.put(BINARY_PROPERTY, MetaFolderMapping.WARN_REPORT);
+	    indexData.object.put(MetaFolderMapping.WARN_REPORT, encodedString);
+
+	    sourceId = DatabaseFolder.computeSourceId(folder.getDatabase(), folder);
+	    indexData.object.put(MetaFolderMapping.SOURCE_ID, sourceId);
+
+	    indexData.mapping = MetaFolderMapping.get();
+
+	    indexData.indexName = MetaFolderMapping.get().getIndex();
+
+	    break;
+
+	case HARVESTING_PROPERTIES:
+
+	    indexData.object.put(BINARY_PROPERTY, MetaFolderMapping.HARVESTING_PROPERTIES);
+	    indexData.object.put(MetaFolderMapping.HARVESTING_PROPERTIES, encodedString);
+
+	    sourceId = DatabaseFolder.computeSourceId(folder.getDatabase(), folder);
+	    indexData.object.put(MetaFolderMapping.SOURCE_ID, sourceId);
+
+	    indexData.mapping = MetaFolderMapping.get();
+
+	    indexData.indexName = MetaFolderMapping.get().getIndex();
+
+	    break;
+	}
+
+	indexData.mapping.setEntryType(type);
+
+	return indexData;
+    }
+
+    /**
+     * 
+     */
+    private IndexData() {
+
+	object = new JSONObject();
+    }
+
+    /**
+     * @return the request
+     */
+    public IndexMapping getMapping() {
+
+	return mapping;
+    }
+
+    /**
+     * @return
+     */
+    public IndexRequest<JSONObject> getRequest() {
+
+	return new IndexRequest.Builder<JSONObject>().//
+		index(mapping.getIndex()).//
+		document(object).//
+		id(indexId).//
+		build();
+    }
+
+    /**
+     * @return the index
+     */
+    public String getIndex() {
+
+	return indexName;
+    }
+
+    /**
+     * @param folder
+     */
+    public static Optional<String> detectIndex(OpenSearchFolder folder) {
+
+	String name = folder.getName();
+
+	if (name.contains(SourceStorageWorker.META_PREFIX)) {
+
+	    return Optional.of(MetaFolderMapping.META_FOLDER_INDEX);
+	}
+
+	if (name.contains(SourceStorageWorker.DATA_1_PREFIX) || name.contains(SourceStorageWorker.DATA_2_PREFIX)) {
+
+	    return Optional.of(DataFolderMapping.DATA_FOLDER_INDEX);
+	}
+
+	if (name.contains(Database.USERS_FOLDER)) {
+
+	    return Optional.of(UsersMapping.USERS_INDEX);
+	}
+
+	if (name.contains(Database.VIEWS_FOLDER)) {
+
+	    return Optional.of(ViewsMapping.VIEWS_INDEX);
+	}
+
+	if (name.contains(Database.AUGMENTERS_FOLDER)) {
+
+	    return Optional.of(AugmentersMapping.AUGMENTERS_INDEX);
+	}
+
+	//
+	// misc-index and configuration-index cannot be
+	// detected from the folder name
+	//
+	return Optional.empty();
+    }
+
+    /**
+     * @return the
+     */
+    public String getIndexId() {
+
+	return indexId;
+    }
+
+    /**
+     * @return
+     */
+    public String getData() {
+
+	return object.toString();
+    }
+
+    /**
+     * @param entry
+     * @return
+     * @throws IOException
+     * @throws TransformerException
+     */
+    public static String encode(FolderEntry entry) throws IOException, TransformerException {
+
+	byte[] bytes = null;
+
+	if (entry.getDocument().isPresent()) {
+
+	    Document doc = entry.getDocument().get();
+
+	    bytes = toString(doc).getBytes();
+
+	} else {
+
+	    InputStream stream = entry.getInputStream().get();
+	    bytes = IOStreamUtils.getBytes(stream);
+	}
+
+	return Base64.getEncoder().encodeToString(bytes);
+    }
+
+    /**
+     * @param binaryData
+     * @return
+     */
+    public static InputStream decode(String binaryData) {
+
+	byte[] decoded = Base64.getDecoder().decode(binaryData);
+	return new ByteArrayInputStream(decoded);
+    }
+
+    /**
+     * @param document
+     * @return
+     * @throws TransformerException
+     */
+    private static String toString(Document document) throws TransformerException {
+
+	TransformerFactory transformerFactory = TransformerFactory.newInstance();
+	Transformer transformer = transformerFactory.newTransformer();
+
+	StringWriter stringWriter = new StringWriter();
+	transformer.transform(new DOMSource(document), new StreamResult(stringWriter));
+
+	return stringWriter.toString();
+    }
+
+    /**
+     * @param source
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public static JSONObject toJSONObject(Object source) {
+
+	return new JSONObject((HashMap<String, String>) source);
+    }
+
+    /**
+     * @param source
+     * @return
+     * @throws SAXException
+     * @throws IOException
+     * @throws ParserConfigurationException
+     */
+    public static Document toDocument(InputStream source) throws SAXException, IOException, ParserConfigurationException {
+
+	DocumentBuilderFactory factory = XMLFactories.newDocumentBuilderFactory();
+	DocumentBuilder builder = factory.newDocumentBuilder();
+
+	return builder.parse(source);
+    }
+
+    /**
+     * @param jsonObject
+     * @return
+     */
+    public static InputStream toStream(Object source) {
+
+	JSONObject jsonObject = toJSONObject(source);
+
+	String binaryProperty = jsonObject.getString("binaryProperty");
+	String binaryData = jsonObject.getString(binaryProperty);
+
+	return decode(binaryData);
+    }
+}

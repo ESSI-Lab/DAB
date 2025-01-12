@@ -42,8 +42,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import com.google.common.io.ByteStreams;
@@ -141,6 +143,46 @@ public class SourceStorageWorker {
 		    indexName + //
 		    " xmlns:" + NameSpace.GI_SUITE_DATA_MODEL_SCHEMA_PREFIX + "=\"" + NameSpace.GI_SUITE_DATA_MODEL + "\">"
 		    + dataFolderPostfix + "</gs:" + indexName + ">");
+	}
+
+	/**
+	 * @param stream
+	 * @throws IOException
+	 * @throws SAXException
+	 */
+	public DataFolderIndexDocument(InputStream stream) throws SAXException, IOException {
+
+	    super(stream);
+	}
+
+	/**
+	 * @param doc
+	 */
+	public DataFolderIndexDocument(Document doc) {
+
+	    super(doc);
+	}
+
+	/**
+	 * @return
+	 * @throws XPathExpressionException
+	 */
+	public String getDataFolder() {
+
+	    return getDataFolderPrefix().substring(1);
+	}
+
+	/**
+	 * @return
+	 */
+	public String getDataFolderPrefix() {
+
+	    try {
+		return evaluateTextContent(".//text()").get(0);
+	    } catch (XPathExpressionException e) {
+	    }
+
+	    return null;
 	}
     }
 
@@ -639,7 +681,7 @@ public class SourceStorageWorker {
 	metaFolder.store(//
 		HarvestingProperties.getFileName(), //
 		FolderEntry.of(properties.asStream()), //
-		EntryType.META_FOLDER_ENTRY);
+		EntryType.HARVESTING_PROPERTIES);
     }
 
     /**
@@ -682,11 +724,14 @@ public class SourceStorageWorker {
 	byteArray = outputStream.toByteArray();
 	ByteArrayInputStream document = new ByteArrayInputStream(byteArray);
 
+	EntryType entryType = fileName.equals(ERRORS_REPORT_FILE_NAME) ? EntryType.HARVESTING_ERROR_REPORT
+		: EntryType.HARVESTING_WARN_REPORT;
+
 	if (exists) {
-	    getMetaFolder().replace(fileName, FolderEntry.of(document), EntryType.META_FOLDER_ENTRY);
+	    getMetaFolder().replace(fileName, FolderEntry.of(document), entryType);
 
 	} else {
-	    getMetaFolder().store(fileName, FolderEntry.of(document), EntryType.META_FOLDER_ENTRY);
+	    getMetaFolder().store(fileName, FolderEntry.of(document), entryType);
 	}
 
 	// GSLoggerFactory.getLogger(getClass()).debug("Updating of " + (error ? "error" : "warn") + " harvesting report
@@ -751,7 +796,7 @@ public class SourceStorageWorker {
      */
     private String findSourceIdentifier(DatabaseFolder folder) {
 
-	return DatabaseFolder.computeSourceIdentifier(database, folder);
+	return DatabaseFolder.computeSourceId(database, folder);
     }
 
     /**
@@ -1011,19 +1056,19 @@ public class SourceStorageWorker {
 
 	if (metaFolder.exists(indexName)) {
 
-	    debug("Replacing index STARTED", status);
+	    debug("Replacing index doc STARTED", status);
 
-	    boolean replaced = metaFolder.replace(indexName, FolderEntry.of(doc.getDocument()), EntryType.META_FOLDER_ENTRY);
+	    boolean replaced = metaFolder.replace(indexName, FolderEntry.of(doc.getDocument()), EntryType.DATA_FOLDER_INDEX_DOC);
 
-	    debug("Replacing index " + (replaced ? "SUCCEEDED" : "FAILED"), status);
+	    debug("Replacing index doc " + (replaced ? "SUCCEEDED" : "FAILED"), status);
 
-	    debug("Replacing index ENDED", status);
+	    debug("Replacing index doc ENDED", status);
 
 	} else {
 
 	    debug("Storing index doc STARTED", status);
 
-	    boolean stored = metaFolder.store(indexName, FolderEntry.of(doc.getDocument()), EntryType.META_FOLDER_ENTRY);
+	    boolean stored = metaFolder.store(indexName, FolderEntry.of(doc.getDocument()), EntryType.DATA_FOLDER_INDEX_DOC);
 
 	    debug("Storing index doc " + (stored ? "SUCCEEDED" : "FAILED"), status);
 

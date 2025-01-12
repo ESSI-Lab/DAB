@@ -1,0 +1,197 @@
+/**
+ * 
+ */
+package eu.essi_lab.api.database.opensearch.index;
+
+import java.util.Optional;
+
+import org.json.JSONObject;
+
+import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.DatabaseFolder;
+import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
+import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
+import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
+import eu.essi_lab.api.database.opensearch.index.mappings.UsersMapping;
+import eu.essi_lab.model.auth.UserIdentifierType;
+
+/**
+ * @author Fabrizio
+ */
+public class SourceWrapper {
+
+    private JSONObject source;
+
+    /**
+     * @param source
+     */
+    public SourceWrapper(JSONObject source) {
+
+	this.source = source;
+    }
+
+    /**
+     * - corresponds to the '_index' property
+     * - see {@link OpenSearchFolder#getResourceId(DatabaseFolder, String)}
+     */
+    public String getResourceId() {
+
+	return source.getString(IndexData.RESOURCE_ID);
+    }
+
+    /**
+     * - the key of the stored resource
+     */
+    public String getResourceKey() {
+
+	return source.getString(IndexData.RESOURCE_KEY);
+    }
+
+    /**
+     * - see {@link DatabaseFolder#getName()}
+     */
+    public String getFolderName() {
+
+	return source.getString(IndexData.FOLDER_NAME);
+    }
+
+    /**
+     * - see {@link OpenSearchFolder#getFolderId(eu.essi_lab.api.database.DatabaseFolder)}
+     */
+    public String getFolderId() {
+
+	return source.getString(IndexData.FOLDER_ID);
+    }
+
+    /**
+     * - see {@link Database#getIdentifier()}
+     */
+    public String getDatabaseId() {
+
+	return source.getString(IndexData.DATABASE_ID);
+    }
+
+    /**
+     * - this property indicates where (under which property) the binary is stored
+     */
+    public String getBinaryProperty() {
+
+	return source.getString(IndexData.BINARY_PROPERTY);
+    }
+
+    /**
+     * - possible values: see {@link DataType}
+     */
+    public DataType getDataType() {
+
+	return DataType.decode(source.getString(IndexData.DATA_TYPE));
+    }
+
+    /**
+     * - meta-folder-index property
+     */
+    public Optional<String> getSourceId() {
+
+	return Optional.ofNullable(source.optString(MetaFolderMapping.SOURCE_ID, null));
+    }
+
+    /**
+     * - 'meta-folder-index' property<br>
+     * - possible values: 'data-1', 'data-2'
+     */
+    public Optional<String> getDataFolder() {
+
+	return Optional.ofNullable(source.optString(MetaFolderMapping.DATA_FOLDER, null));
+    }
+
+    /**
+     * - 'meta-folder-index' property<br>
+     * - base64 encoded<br>
+     * - the index doc storage is not strictly required, since the value of the data folder is
+     * indexed by the 'dataFolder' property (see #getDataFolder())
+     */
+    public Optional<String> getIndexDoc() {
+
+	return Optional.ofNullable(source.optString(MetaFolderMapping.INDEX_DOC, null));
+    }
+
+    /**
+     * - 'meta-folder-index' property<br>
+     * - base64 encoded
+     */
+    public Optional<String> getHarvestingProperties() {
+
+	return Optional.ofNullable(source.optString(MetaFolderMapping.HARVESTING_PROPERTIES, null));
+    }
+
+    /**
+     * - 'meta-folder-index' property<br>
+     * - base64 encoded
+     */
+    public Optional<String> getErrorsReport() {
+
+	return Optional.ofNullable(source.optString(MetaFolderMapping.ERRORS_REPORT, null));
+    }
+
+    /**
+     * - 'meta-folder-index' property<br>
+     * - base64 encoded
+     */
+    public Optional<String> getWarnReport() {
+
+	return Optional.ofNullable(source.optString(MetaFolderMapping.WARN_REPORT, null));
+    }
+
+    /**
+     * - 'users-index' property<br>
+     * - base64 encoded
+     */
+    public Optional<String> getUser() {
+
+	return Optional.ofNullable(source.optString(UsersMapping.USER, null));
+    }
+
+    /**
+     * - 'users-index' property<br>
+     */
+    public Optional<String> getUserIdentifier() {
+
+	return Optional.ofNullable(source.optString(UsersMapping.USER_ID, null));
+    }
+
+    /**
+     * - 'users-index' property<br>
+     */
+    public Optional<UserIdentifierType> getUserIdentifierType() {
+	
+	String optType = source.optString(UsersMapping.USER_ID_TYPE, null);
+	if(optType != null) {
+	    
+	    return UserIdentifierType.fromType(optType);
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * - 'users-index' property<br>
+     */
+    public Optional<String> getUserRole() {
+
+	return Optional.ofNullable(source.optString(UsersMapping.USER_ROLE, null));
+    }
+
+    /**
+     * - 'users-index' property<br>
+     */
+    public Optional<Boolean> getUserEnabled() {
+
+	return Optional.ofNullable(source.optBooleanObject(UsersMapping.ENABLED, null));
+    }
+
+    @Override
+    public String toString() {
+
+	return source.toString(3);
+    }
+}

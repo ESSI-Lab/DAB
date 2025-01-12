@@ -45,6 +45,8 @@ import org.w3c.dom.Node;
 
 import eu.essi_lab.iso.datamodel.DOMSerializer;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.GSLoggerFactory.GSLogger;
 import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.model.GSProperty;
 
@@ -113,6 +115,22 @@ public class GSUser extends DOMSerializer implements Serializable {
     }
 
     /**
+     * @param node
+     * @return
+     * @throws JAXBException
+     */
+    public static GSUser createOrNull(Node node) {
+
+	try {
+	    return new GSUser().fromNode(node);
+	} catch (JAXBException e) {
+	    GSLoggerFactory.getLogger(GSUser.class).error(e);
+	}
+
+	return null;
+    }
+
+    /**
      * 
      */
     public GSUser() {
@@ -159,11 +177,11 @@ public class GSUser extends DOMSerializer implements Serializable {
 
     @XmlTransient
     public Optional<UserIdentifierType> getUserIdentifierType() {
-	
+
 	@SuppressWarnings("unchecked")
 	GSProperty<String> property = getProperty(IDENTIFIER_TYPE_ELEMENT_NAME);
-	if(property != null){
-	    
+	if (property != null) {
+
 	    return UserIdentifierType.fromType(property.getValue().toString());
 	}
 

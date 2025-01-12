@@ -221,7 +221,7 @@ public class VolatileDatabase extends Database {
     public Optional<DatabaseFolder> getFolder(String folderName, boolean createIfNotExist) throws GSException {
 
 	Optional<VolatileFolder> opt = getFodersList().stream()
-		.filter(f -> DatabaseFolder.computeSourceIdentifier(this, f).equals(folderName)).findFirst();
+		.filter(f -> DatabaseFolder.computeSourceId(this, f).equals(folderName)).findFirst();
 
 	if (opt.isPresent()) {
 	    return Optional.of(opt.get());

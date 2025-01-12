@@ -1,5 +1,8 @@
 {
 	"mappings": {
+	
+		"dynamic": "true",
+	    	
 		"properties": {
 		
 			"databaseId": {
@@ -7,6 +10,26 @@
 			},
 			
 			"folderName": {
+				"type": "text"
+			},
+			
+			"folderId": {
+				"type": "text"
+			},
+			
+			"resourceKey": {
+				"type": "text"
+			},
+			
+			"resourceId": {
+				"type": "text"
+			},
+			
+			"binaryProperty": {
+				"type": "text"
+			},
+			
+			"dataType": {
 				"type": "text"
 			}
 		}
