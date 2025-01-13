@@ -117,7 +117,6 @@ public class IndexData {
 		    findFirst().//
 		    orElseThrow();
 	}
-
     }
 
     public static final String BINARY_DATA_TYPE = "binary";
@@ -125,11 +124,12 @@ public class IndexData {
     //
     // base properties
     //
+    public static final String INDEX = "index";
     public static final String DATABASE_ID = "databaseId";
     public static final String FOLDER_NAME = "folderName";
     public static final String FOLDER_ID = "folderId";
-    public static final String RESOURCE_KEY = "resourceKey";
-    public static final String RESOURCE_ID = "resourceId";
+    public static final String ENTRY_NAME = "entryName";
+    public static final String ENTRY_ID = "entryId";
     public static final String BINARY_PROPERTY = "binaryProperty";
     public static final String DATA_TYPE = "dataType";
 
@@ -142,7 +142,7 @@ public class IndexData {
     private JSONObject object;
     private IndexMapping mapping;
     private String indexId;
-    private String indexName;
+    private String index;
 
     /**
      * @param folder
@@ -167,8 +167,8 @@ public class IndexData {
 	// put the base properties
 	//
 
-	indexData.object.put(RESOURCE_KEY, key);
-	indexData.object.put(RESOURCE_ID, OpenSearchFolder.getResourceId(folder, key));
+	indexData.object.put(ENTRY_NAME, key);
+	indexData.object.put(ENTRY_ID, OpenSearchFolder.getEntryId(folder, key));
 
 	indexData.object.put(DATABASE_ID, folder.getDatabase().getIdentifier());
 	indexData.object.put(FOLDER_NAME, folder.getName());
@@ -176,7 +176,7 @@ public class IndexData {
 
 	indexData.object.put(DATA_TYPE, entry.getDataType());
 
-	indexData.indexId = OpenSearchFolder.getResourceId(folder, key);
+	indexData.indexId = OpenSearchFolder.getEntryId(folder, key);
 
 	//
 	// encodes the binary property
@@ -194,7 +194,7 @@ public class IndexData {
 
 	    indexData.mapping = DataFolderMapping.get();
 
-	    indexData.indexName = DataFolderMapping.get().getIndex();
+	    indexData.index = DataFolderMapping.get().getIndex();
 
 	    break;
 
@@ -202,7 +202,7 @@ public class IndexData {
 
 	    indexData.mapping = AugmentersMapping.get();
 
-	    indexData.indexName = AugmentersMapping.get().getIndex();
+	    indexData.index = AugmentersMapping.get().getIndex();
 
 	    break;
 
@@ -210,7 +210,7 @@ public class IndexData {
 
 	    indexData.mapping = ConfigurationMapping.get();
 
-	    indexData.indexName = ConfigurationMapping.get().getIndex();
+	    indexData.index = ConfigurationMapping.get().getIndex();
 
 	    break;
 
@@ -218,7 +218,7 @@ public class IndexData {
 
 	    indexData.mapping = MiscMapping.get();
 
-	    indexData.indexName = MiscMapping.get().getIndex();
+	    indexData.index = MiscMapping.get().getIndex();
 
 	    break;
 	case USER:
@@ -236,14 +236,14 @@ public class IndexData {
 
 	    indexData.mapping = UsersMapping.get();
 
-	    indexData.indexName = UsersMapping.get().getIndex();
+	    indexData.index = UsersMapping.get().getIndex();
 
 	    break;
 	case VIEW:
 
 	    indexData.mapping = ViewsMapping.get();
 
-	    indexData.indexName = ViewsMapping.get().getIndex();
+	    indexData.index = ViewsMapping.get().getIndex();
 
 	    break;
 
@@ -261,7 +261,7 @@ public class IndexData {
 
 	    indexData.mapping = MetaFolderMapping.get();
 
-	    indexData.indexName = MetaFolderMapping.get().getIndex();
+	    indexData.index = MetaFolderMapping.get().getIndex();
 
 	    break;
 
@@ -275,7 +275,7 @@ public class IndexData {
 
 	    indexData.mapping = MetaFolderMapping.get();
 
-	    indexData.indexName = MetaFolderMapping.get().getIndex();
+	    indexData.index = MetaFolderMapping.get().getIndex();
 
 	    break;
 
@@ -289,7 +289,7 @@ public class IndexData {
 
 	    indexData.mapping = MetaFolderMapping.get();
 
-	    indexData.indexName = MetaFolderMapping.get().getIndex();
+	    indexData.index = MetaFolderMapping.get().getIndex();
 
 	    break;
 
@@ -303,14 +303,55 @@ public class IndexData {
 
 	    indexData.mapping = MetaFolderMapping.get();
 
-	    indexData.indexName = MetaFolderMapping.get().getIndex();
+	    indexData.index = MetaFolderMapping.get().getIndex();
 
 	    break;
 	}
 
 	indexData.mapping.setEntryType(type);
 
+	indexData.object.put(INDEX, indexData.index);
+
 	return indexData;
+    }
+
+    /**
+     * @param folder
+     */
+    public static Optional<String> detectIndex(OpenSearchFolder folder) {
+    
+        String name = folder.getName();
+    
+        if (name.contains(SourceStorageWorker.META_PREFIX)) {
+    
+            return Optional.of(MetaFolderMapping.META_FOLDER_INDEX);
+        }
+    
+        if (name.contains(SourceStorageWorker.DATA_1_PREFIX) || name.contains(SourceStorageWorker.DATA_2_PREFIX)) {
+    
+            return Optional.of(DataFolderMapping.DATA_FOLDER_INDEX);
+        }
+    
+        if (name.contains(Database.USERS_FOLDER)) {
+    
+            return Optional.of(UsersMapping.USERS_INDEX);
+        }
+    
+        if (name.contains(Database.VIEWS_FOLDER)) {
+    
+            return Optional.of(ViewsMapping.VIEWS_INDEX);
+        }
+    
+        if (name.contains(Database.AUGMENTERS_FOLDER)) {
+    
+            return Optional.of(AugmentersMapping.AUGMENTERS_INDEX);
+        }
+    
+        //
+        // misc-index and configuration-index cannot be
+        // detected from the folder name
+        //
+        return Optional.empty();
     }
 
     /**
@@ -346,52 +387,13 @@ public class IndexData {
      */
     public String getIndex() {
 
-	return indexName;
-    }
-
-    /**
-     * @param folder
-     */
-    public static Optional<String> detectIndex(OpenSearchFolder folder) {
-
-	String name = folder.getName();
-
-	if (name.contains(SourceStorageWorker.META_PREFIX)) {
-
-	    return Optional.of(MetaFolderMapping.META_FOLDER_INDEX);
-	}
-
-	if (name.contains(SourceStorageWorker.DATA_1_PREFIX) || name.contains(SourceStorageWorker.DATA_2_PREFIX)) {
-
-	    return Optional.of(DataFolderMapping.DATA_FOLDER_INDEX);
-	}
-
-	if (name.contains(Database.USERS_FOLDER)) {
-
-	    return Optional.of(UsersMapping.USERS_INDEX);
-	}
-
-	if (name.contains(Database.VIEWS_FOLDER)) {
-
-	    return Optional.of(ViewsMapping.VIEWS_INDEX);
-	}
-
-	if (name.contains(Database.AUGMENTERS_FOLDER)) {
-
-	    return Optional.of(AugmentersMapping.AUGMENTERS_INDEX);
-	}
-
-	//
-	// misc-index and configuration-index cannot be
-	// detected from the folder name
-	//
-	return Optional.empty();
+	return index;
     }
 
     /**
      * @return the
      */
-    public String getIndexId() {
+    public String getEntryId() {
 
 	return indexId;
     }
@@ -481,15 +483,13 @@ public class IndexData {
     }
 
     /**
-     * @param jsonObject
+     * @param source
      * @return
      */
-    public static InputStream toStream(Object source) {
+    public static InputStream toStream(JSONObject source) {
 
-	JSONObject jsonObject = toJSONObject(source);
-
-	String binaryProperty = jsonObject.getString("binaryProperty");
-	String binaryData = jsonObject.getString(binaryProperty);
+	String binaryProperty = source.getString("binaryProperty");
+	String binaryData = source.getString(binaryProperty);
 
 	return decode(binaryData);
     }

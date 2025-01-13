@@ -127,9 +127,9 @@ public class OpenSearchFolder implements DatabaseFolder {
     @Override
     public Node get(String key) throws Exception {
 
-	Object source = _getSource(key);
+	JSONObject source = _getSource(key);
 
-	SourceWrapper wrapper = new SourceWrapper(IndexData.toJSONObject(source));
+	SourceWrapper wrapper = new SourceWrapper(source);
 
 	if (wrapper.getDataType() == DataType.BINARY) {
 
@@ -152,7 +152,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 
 	Optional<String> index = IndexData.detectIndex(this);
 
-	String id = getResourceId(this, key);
+	String id = getEntryId(this, key);
 
 	boolean deleted = false;
 
@@ -190,7 +190,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 
 	Optional<String> index = IndexData.detectIndex(this);
 
-	String id = getResourceId(this, key);
+	String id = getEntryId(this, key);
 
 	boolean exists = false;
 
@@ -222,7 +222,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 	SearchResponse<Object> response = client.search(s -> {
 
 	    s.query(searchQuery).// includes only the key
-		    source(src -> src.filter(new SourceFilter.Builder().includes(IndexData.RESOURCE_KEY).build()));
+		    source(src -> src.filter(new SourceFilter.Builder().includes(IndexData.ENTRY_NAME).build()));
 
 	    return s;
 
@@ -232,7 +232,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 	List<Hit<Object>> hitsList = hits.hits();
 
 	return hitsList.stream().//
-		map(hit -> IndexData.toJSONObject(hit.source()).getString(IndexData.RESOURCE_KEY)).//
+		map(hit -> IndexData.toJSONObject(hit.source()).getString(IndexData.ENTRY_NAME)).//
 		collect(Collectors.toList()).//
 		toArray(new String[] {});//
     }
@@ -307,7 +307,7 @@ public class OpenSearchFolder implements DatabaseFolder {
      * @param key
      * @return
      */
-    public static String getResourceId(DatabaseFolder folder, String resourceKey) {
+    public static String getEntryId(DatabaseFolder folder, String resourceKey) {
 
 	return getFolderId(folder) + "_" + resourceKey;
     }
@@ -319,7 +319,7 @@ public class OpenSearchFolder implements DatabaseFolder {
      */
     public SourceWrapper getSourceWrapper(String key) throws Exception {
 
-	return new SourceWrapper(IndexData.toJSONObject(_getSource(key)));
+	return new SourceWrapper(_getSource(key));
     }
 
     /**
@@ -327,15 +327,15 @@ public class OpenSearchFolder implements DatabaseFolder {
      * @return
      * @throws Exception
      */
-    private Object _getSource(String key) throws Exception {
+    private JSONObject _getSource(String key) throws Exception {
 
 	OpenSearchClient client = database.getClient();
 
 	Optional<String> index = IndexData.detectIndex(this);
 
-	String id = getResourceId(this, key);
+	String id = getEntryId(this, key);
 
-	Object source = null;
+	JSONObject source = null;
 
 	if (index.isPresent() && !forceGetBinaryBySearchQuery) {
 
@@ -346,7 +346,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 
 	    GetResponse<Object> response = client.get(getRequest, Object.class);
 
-	    source = response.source();
+	    source = IndexData.toJSONObject(response.source());
 
 	} else {
 
@@ -415,7 +415,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 
 	Response response = generic.execute(//
 		Requests.builder().//
-			endpoint(indexData.getIndex() + "/_doc/" + indexData.getIndexId()).//
+			endpoint(indexData.getIndex() + "/_doc/" + indexData.getEntryId()).//
 			method("POST").//
 			json(indexData.getData()).build());
 
@@ -475,7 +475,7 @@ public class OpenSearchFolder implements DatabaseFolder {
      * @return
      * @throws Exception
      */
-    private Object searchBinarySource(OpenSearchClient client, Query searchQuery, String key) throws Exception {
+    private JSONObject searchBinarySource(OpenSearchClient client, Query searchQuery, String key) throws Exception {
 
 	SearchResponse<Object> searchResponse = client.search(s -> {
 	    s.query(searchQuery);
@@ -492,7 +492,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 	List<Hit<Object>> hitsList = hits.hits();
 	Hit<Object> hit = hitsList.get(0);
 
-	return hit.source();
+	return IndexData.toJSONObject(hit.source());
     }
 
     /**
@@ -547,7 +547,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 		build();
 
 	MatchQuery keyQuery = new MatchQuery.Builder().//
-		field(IndexData.RESOURCE_KEY).query(new FieldValue.Builder().//
+		field(IndexData.ENTRY_NAME).query(new FieldValue.Builder().//
 			stringValue(key).//
 			build())
 		.//

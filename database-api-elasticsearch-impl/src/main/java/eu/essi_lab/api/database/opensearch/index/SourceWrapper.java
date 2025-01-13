@@ -3,6 +3,27 @@
  */
 package eu.essi_lab.api.database.opensearch.index;
 
+/*-
+ * #%L
+ * Discovery and Access Broker (DAB) Community Edition (CE)
+ * %%
+ * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * #L%
+ */
+
 import java.util.Optional;
 
 import org.json.JSONObject;
@@ -32,19 +53,27 @@ public class SourceWrapper {
 
     /**
      * - corresponds to the '_index' property
-     * - see {@link OpenSearchFolder#getResourceId(DatabaseFolder, String)}
      */
-    public String getResourceId() {
+    public String getIndex() {
 
-	return source.getString(IndexData.RESOURCE_ID);
+	return source.getString(IndexData.INDEX);
     }
 
     /**
-     * - the key of the stored resource
+     * - corresponds to the '_id' property
+     * - see {@link OpenSearchFolder#getEntryId(DatabaseFolder, String)}
      */
-    public String getResourceKey() {
+    public String getEntryId() {
 
-	return source.getString(IndexData.RESOURCE_KEY);
+	return source.getString(IndexData.ENTRY_ID);
+    }
+
+    /**
+     * - the name (key) of the stored entry
+     */
+    public String getEntryName() {
+
+	return source.getString(IndexData.ENTRY_NAME);
     }
 
     /**
@@ -163,10 +192,10 @@ public class SourceWrapper {
      * - 'users-index' property<br>
      */
     public Optional<UserIdentifierType> getUserIdentifierType() {
-	
+
 	String optType = source.optString(UsersMapping.USER_ID_TYPE, null);
-	if(optType != null) {
-	    
+	if (optType != null) {
+
 	    return UserIdentifierType.fromType(optType);
 	}
 

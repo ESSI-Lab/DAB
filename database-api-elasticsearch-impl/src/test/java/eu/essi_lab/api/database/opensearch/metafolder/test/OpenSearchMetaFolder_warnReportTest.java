@@ -8,6 +8,7 @@ import java.io.InputStream;
 import org.junit.Assert;
 import org.junit.Test;
 
+import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
@@ -58,15 +59,17 @@ public class OpenSearchMetaFolder_warnReportTest extends OpenSearchTest {
 	// base properties
 	//
 
+	Assert.assertEquals(MetaFolderMapping.META_FOLDER_INDEX, wrapper.getIndex());
+
 	Assert.assertEquals(database.getIdentifier(), wrapper.getDatabaseId());
 
 	Assert.assertEquals(folderName, wrapper.getFolderName());
 
 	Assert.assertEquals(OpenSearchFolder.getFolderId(folder), wrapper.getFolderId());
 
-	Assert.assertEquals(OpenSearchFolder.getResourceId(folder, key), wrapper.getResourceId());
+	Assert.assertEquals(OpenSearchFolder.getEntryId(folder, key), wrapper.getEntryId());
 
-	Assert.assertEquals(key, wrapper.getResourceKey());
+	Assert.assertEquals(key, wrapper.getEntryName());
 
 	Assert.assertEquals(MetaFolderMapping.WARN_REPORT, wrapper.getBinaryProperty());
 
@@ -84,6 +87,7 @@ public class OpenSearchMetaFolder_warnReportTest extends OpenSearchTest {
 	Assert.assertTrue(wrapper.getHarvestingProperties().isEmpty());
 	Assert.assertTrue(wrapper.getErrorsReport().isEmpty());
 	Assert.assertTrue(wrapper.getIndexDoc().isEmpty());
+	Assert.assertTrue(wrapper.getDataFolder().isEmpty());
     }
 
     @Test

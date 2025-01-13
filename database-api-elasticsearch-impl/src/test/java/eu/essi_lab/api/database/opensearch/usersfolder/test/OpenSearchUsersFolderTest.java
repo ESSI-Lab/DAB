@@ -17,6 +17,7 @@ import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
+import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.UsersMapping;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchdatabaseInitTest;
@@ -56,15 +57,17 @@ public class OpenSearchUsersFolderTest extends OpenSearchTest {
 	// base properties
 	//
 
+	Assert.assertEquals(UsersMapping.USERS_INDEX, wrapper.getIndex());
+
 	Assert.assertEquals(database.getIdentifier(), wrapper.getDatabaseId());
 
 	Assert.assertEquals(folderName, wrapper.getFolderName());
 
 	Assert.assertEquals(OpenSearchFolder.getFolderId(folder), wrapper.getFolderId());
 
-	Assert.assertEquals(OpenSearchFolder.getResourceId(folder, key), wrapper.getResourceId());
+	Assert.assertEquals(OpenSearchFolder.getEntryId(folder, key), wrapper.getEntryId());
 
-	Assert.assertEquals(key, wrapper.getResourceKey());
+	Assert.assertEquals(key, wrapper.getEntryName());
 
 	Assert.assertEquals(UsersMapping.USER, wrapper.getBinaryProperty());
 

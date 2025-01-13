@@ -59,15 +59,17 @@ public class OpenSearchMetaFolder_errorsReportTest extends OpenSearchTest {
 	// base properties
 	//
 
+	Assert.assertEquals(MetaFolderMapping.META_FOLDER_INDEX, wrapper.getIndex());
+
 	Assert.assertEquals(database.getIdentifier(), wrapper.getDatabaseId());
 
 	Assert.assertEquals(folderName, wrapper.getFolderName());
 
 	Assert.assertEquals(OpenSearchFolder.getFolderId(folder), wrapper.getFolderId());
 
-	Assert.assertEquals(OpenSearchFolder.getResourceId(folder, key), wrapper.getResourceId());
+	Assert.assertEquals(OpenSearchFolder.getEntryId(folder, key), wrapper.getEntryId());
 
-	Assert.assertEquals(key, wrapper.getResourceKey());
+	Assert.assertEquals(key, wrapper.getEntryName());
 
 	Assert.assertEquals(MetaFolderMapping.ERRORS_REPORT, wrapper.getBinaryProperty());
 
@@ -85,6 +87,7 @@ public class OpenSearchMetaFolder_errorsReportTest extends OpenSearchTest {
 	Assert.assertTrue(wrapper.getHarvestingProperties().isEmpty());
 	Assert.assertTrue(wrapper.getWarnReport().isEmpty());
 	Assert.assertTrue(wrapper.getIndexDoc().isEmpty());
+	Assert.assertTrue(wrapper.getDataFolder().isEmpty());
     }
 
     @Test

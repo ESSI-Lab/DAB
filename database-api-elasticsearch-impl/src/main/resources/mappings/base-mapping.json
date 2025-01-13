@@ -5,6 +5,10 @@
 	    	
 		"properties": {
 		
+			"index": {
+				"type": "text"
+			},
+		
 			"databaseId": {
 				"type": "text"
 			},

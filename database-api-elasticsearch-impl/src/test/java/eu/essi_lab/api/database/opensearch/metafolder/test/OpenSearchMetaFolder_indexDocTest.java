@@ -59,15 +59,17 @@ public class OpenSearchMetaFolder_indexDocTest extends OpenSearchTest {
 	// base properties
 	//
 
+	Assert.assertEquals(MetaFolderMapping.META_FOLDER_INDEX, wrapper.getIndex());
+
 	Assert.assertEquals(database.getIdentifier(), wrapper.getDatabaseId());
 
 	Assert.assertEquals(folderName, wrapper.getFolderName());
 
 	Assert.assertEquals(OpenSearchFolder.getFolderId(folder), wrapper.getFolderId());
 
-	Assert.assertEquals(OpenSearchFolder.getResourceId(folder, key), wrapper.getResourceId());
+	Assert.assertEquals(OpenSearchFolder.getEntryId(folder, key), wrapper.getEntryId());
 
-	Assert.assertEquals(key, wrapper.getResourceKey());
+	Assert.assertEquals(key, wrapper.getEntryName());
 
 	Assert.assertEquals(MetaFolderMapping.INDEX_DOC, wrapper.getBinaryProperty());
 
@@ -78,6 +80,8 @@ public class OpenSearchMetaFolder_indexDocTest extends OpenSearchTest {
 	//
 
 	Assert.assertEquals(SOURCE_ID, wrapper.getSourceId().get());
+
+	Assert.assertEquals(SourceStorageWorker.DATA_1_PREFIX.substring(1), wrapper.getDataFolder().get());
 
 	Assert.assertEquals(//
 		IndexData.encode(FolderEntry.of(doc.getDocument())), wrapper.getIndexDoc().get());
