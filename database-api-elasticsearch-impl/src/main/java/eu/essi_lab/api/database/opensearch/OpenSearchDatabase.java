@@ -177,7 +177,7 @@ public class OpenSearchDatabase extends Database {
 
 	    if (!exists) {
 
-		createIndexWithGenericCLient(mapping);
+		createIndex(mapping);
 	    }
 	}
     }
@@ -201,81 +201,6 @@ public class OpenSearchDatabase extends Database {
 	OpenSearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
 
 	return new OpenSearchClient(transport);
-    }
-
-    /**
-     * @param mapping
-     * @throws GSException
-     */
-    private void createIndex(IndexMapping mapping) throws GSException {
-
-	TypeMapping typeMapping = new TypeMapping.Builder().//
-		withJson(mapping.getMappingStream()).//
-		build();
-
-	CreateIndexRequest createIndexRequest = new CreateIndexRequest.Builder().//
-		index(mapping.getIndex()).//
-		mappings(typeMapping).//
-		build();
-
-	try {
-
-	    CreateIndexResponse response = client.indices().create(createIndexRequest);
-
-	    if (!response.acknowledged()) {
-
-		throw GSException.createException(//
-			getClass(), //
-			null, //
-			ErrorInfo.ERRORTYPE_SERVICE, //
-			ErrorInfo.SEVERITY_FATAL, //
-			"OpenSearchDatabaseCreate" + mapping.getIndex() + "NotAcknowledgedError");
-	    }
-
-	} catch (Exception ex) {
-
-	    GSLoggerFactory.getLogger(getClass()).error(ex);
-
-	    throw GSException.createException(getClass(), "OpenSearchDatabaseCreate" + mapping.getIndex() + "Error", ex);
-	}
-    }
-
-    /**
-     * @throws GSException
-     */
-    private void createIndexWithGenericCLient(IndexMapping mapping) throws GSException {
-
-	try {
-
-	    Response response = client.generic().execute(//
-		    Requests.builder().//
-			    endpoint(mapping.getIndex()).//
-			    method("PUT").//
-			    json(mapping.getMapping()).build());
-
-	    String bodyAsString = response.getBody().//
-		    get().//
-		    bodyAsString();
-
-	    JSONObject responseObject = new JSONObject(bodyAsString);
-
-	    if (!responseObject.getBoolean("acknowledged")) {
-
-		throw GSException.createException(//
-			getClass(), //
-			null, //
-			ErrorInfo.ERRORTYPE_SERVICE, //
-			ErrorInfo.SEVERITY_FATAL, //
-			"OpenSearchDatabaseCreate" + mapping.getIndex() + "NotAcknowledgedError");
-	    }
-
-	} catch (Exception ex) {
-
-	    GSLoggerFactory.getLogger(getClass()).error(ex);
-
-	    throw GSException.createException(getClass(), "OpenSearchDatabaseCreate" + mapping.getIndex() + "Error", ex);
-	}
-
     }
 
     /**
@@ -408,30 +333,78 @@ public class OpenSearchDatabase extends Database {
     }
 
     /**
-     * @param name
-     * @return
+     * @param mapping
+     * @throws GSException
      */
-    private String normalizeName(String name) {
+    private void createIndex(IndexMapping mapping) throws GSException {
 
-	if (!getIdentifier().equals("ROOT") && !name.contains(getIdentifier())) {
-	    return "/" + getIdentifier() + "_" + name + "/";
+	TypeMapping typeMapping = new TypeMapping.Builder().//
+		withJson(mapping.getMappingStream()).//
+		build();
+
+	CreateIndexRequest createIndexRequest = new CreateIndexRequest.Builder().//
+		index(mapping.getIndex()).//
+		mappings(typeMapping).//
+		build();
+
+	try {
+
+	    CreateIndexResponse response = client.indices().create(createIndexRequest);
+
+	    if (!response.acknowledged()) {
+
+		throw GSException.createException(//
+			getClass(), //
+			null, //
+			ErrorInfo.ERRORTYPE_SERVICE, //
+			ErrorInfo.SEVERITY_FATAL, //
+			"OpenSearchDatabaseCreate" + mapping.getIndex() + "NotAcknowledgedError");
+	    }
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(ex);
+
+	    throw GSException.createException(getClass(), "OpenSearchDatabaseCreate" + mapping.getIndex() + "Error", ex);
 	}
-
-	return "/" + name + "/";
     }
 
     /**
-     * @param name
-     * @throws IllegalArgumentException
+     * @throws GSException
      */
-    private void checkName(String name) throws IllegalArgumentException {
+    @SuppressWarnings("unused")
+    private void createIndexWithGenericCLient(IndexMapping mapping) throws GSException {
 
-	if (name == null)
-	    throw new IllegalArgumentException("Argument cannot be null");
+	try {
 
-	if (name.startsWith("/") || name.contains("\\") || name.endsWith("/")) {
-	    throw new IllegalArgumentException("Argument cannot start with or end with slashes and it can not contain back slashes");
+	    Response response = client.generic().execute(//
+		    Requests.builder().//
+			    endpoint(mapping.getIndex()).//
+			    method("PUT").//
+			    json(mapping.getMapping()).build());
+
+	    String bodyAsString = response.getBody().//
+		    get().//
+		    bodyAsString();
+
+	    JSONObject responseObject = new JSONObject(bodyAsString);
+
+	    if (!responseObject.getBoolean("acknowledged")) {
+
+		throw GSException.createException(//
+			getClass(), //
+			null, //
+			ErrorInfo.ERRORTYPE_SERVICE, //
+			ErrorInfo.SEVERITY_FATAL, //
+			"OpenSearchDatabaseCreate" + mapping.getIndex() + "NotAcknowledgedError");
+	    }
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(ex);
+
+	    throw GSException.createException(getClass(), "OpenSearchDatabaseCreate" + mapping.getIndex() + "Error", ex);
 	}
-    }
 
+    }
 }
