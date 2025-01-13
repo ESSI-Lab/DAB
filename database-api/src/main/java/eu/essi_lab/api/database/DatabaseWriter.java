@@ -1,10 +1,6 @@
 package eu.essi_lab.api.database;
 
-import java.io.ByteArrayInputStream;
-
-import javax.xml.bind.Marshaller;
-
-import org.apache.commons.io.output.ByteArrayOutputStream;
+import java.io.InputStream;
 
 /*-
  * #%L
@@ -34,7 +30,6 @@ import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.bond.View;
-import eu.essi_lab.messages.bond.jaxb.ViewFactory;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.exceptions.ErrorInfo;
@@ -221,19 +216,11 @@ public abstract class DatabaseWriter implements DatabaseProvider {
 
 	    DatabaseFolder folder = getDatabase().getViewFolder(true);
 
-	    ViewFactory factory = new ViewFactory();
+	    InputStream stream = view.toStream();
 
-	    Marshaller marshaller = factory.createMarshaller();
+	    folder.store(id, FolderEntry.of(stream), EntryType.VIEW);
 
-	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-	    marshaller.marshal(view, baos);
-
-	    byte[] bytes = baos.toByteArray();
-
-	    folder.store(id, FolderEntry.of(new ByteArrayInputStream(bytes)), EntryType.VIEW);
-
-	    folder.replace(id, FolderEntry.of(new ByteArrayInputStream(bytes)), EntryType.VIEW);
+	    folder.replace(id, FolderEntry.of(stream), EntryType.VIEW);
 
 	} catch (Exception e) {
 

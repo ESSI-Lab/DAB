@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.json.JSONObject;
 import org.opensearch.client.opensearch._types.mapping.BinaryProperty;
@@ -61,6 +62,16 @@ public abstract class IndexMapping {
 	MAPPINGS.add(MiscMapping.get());
 	MAPPINGS.add(UsersMapping.get());
 	MAPPINGS.add(ViewsMapping.get());
+    }
+
+    /**
+     * @return
+     */
+    public static List<String> getMappings() {
+
+	return MAPPINGS.stream().//
+		map(i -> i.getIndex()).//
+		collect(Collectors.toList());
     }
 
     /**

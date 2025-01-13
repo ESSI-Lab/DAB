@@ -69,7 +69,7 @@ public interface DatabaseFolder {
 	/**
 	 * @return
 	 */
-	public Optional<InputStream> getInputStream() {
+	public Optional<InputStream> getStream() {
 
 	    return Optional.ofNullable(stream);
 	}

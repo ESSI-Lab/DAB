@@ -130,7 +130,7 @@ public class VolatileFolder implements DatabaseFolder {
 	    return put == null;
 	}
 
-	ModifiedInputStream put = streamsMap.put(key, new ModifiedInputStream(entry.getInputStream().get()));
+	ModifiedInputStream put = streamsMap.put(key, new ModifiedInputStream(entry.getStream().get()));
 	return put == null;
     }
 
@@ -145,7 +145,7 @@ public class VolatileFolder implements DatabaseFolder {
 	    return put != null;
 	}
 
-	ModifiedInputStream put = streamsMap.put(key, new ModifiedInputStream(entry.getInputStream().get()));
+	ModifiedInputStream put = streamsMap.put(key, new ModifiedInputStream(entry.getStream().get()));
 	return put != null;
     }
 

@@ -3,7 +3,6 @@
  */
 package eu.essi_lab.api.database.opensearch;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -12,12 +11,14 @@ import java.util.stream.Collectors;
 
 import org.apache.http.HttpHost;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
+import org.json.JSONObject;
 import org.opensearch.client.RestClient;
 import org.opensearch.client.RestClientBuilder;
 import org.opensearch.client.json.jackson.JacksonJsonpMapper;
 import org.opensearch.client.opensearch.OpenSearchClient;
-import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch._types.mapping.TypeMapping;
+import org.opensearch.client.opensearch.generic.Requests;
+import org.opensearch.client.opensearch.generic.Response;
 import org.opensearch.client.opensearch.indices.CreateIndexRequest;
 import org.opensearch.client.opensearch.indices.CreateIndexResponse;
 import org.opensearch.client.opensearch.indices.ExistsRequest;
@@ -172,11 +173,11 @@ public class OpenSearchDatabase extends Database {
 
 	for (IndexMapping mapping : IndexMapping.MAPPINGS) {
 
-	    boolean exists = checkIndex(mapping.getIndex());
+	    boolean exists = checkIndex(getClient(), mapping.getIndex());
 
 	    if (!exists) {
 
-		createIndex(mapping);
+		createIndexWithGenericCLient(mapping);
 	    }
 	}
     }
@@ -203,6 +204,7 @@ public class OpenSearchDatabase extends Database {
     }
 
     /**
+     * @param mapping
      * @throws GSException
      */
     private void createIndex(IndexMapping mapping) throws GSException {
@@ -239,12 +241,50 @@ public class OpenSearchDatabase extends Database {
     }
 
     /**
+     * @throws GSException
+     */
+    private void createIndexWithGenericCLient(IndexMapping mapping) throws GSException {
+
+	try {
+
+	    Response response = client.generic().execute(//
+		    Requests.builder().//
+			    endpoint(mapping.getIndex()).//
+			    method("PUT").//
+			    json(mapping.getMapping()).build());
+
+	    String bodyAsString = response.getBody().//
+		    get().//
+		    bodyAsString();
+
+	    JSONObject responseObject = new JSONObject(bodyAsString);
+
+	    if (!responseObject.getBoolean("acknowledged")) {
+
+		throw GSException.createException(//
+			getClass(), //
+			null, //
+			ErrorInfo.ERRORTYPE_SERVICE, //
+			ErrorInfo.SEVERITY_FATAL, //
+			"OpenSearchDatabaseCreate" + mapping.getIndex() + "NotAcknowledgedError");
+	    }
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(ex);
+
+	    throw GSException.createException(getClass(), "OpenSearchDatabaseCreate" + mapping.getIndex() + "Error", ex);
+	}
+
+    }
+
+    /**
+     * @param client
      * @param indexName
      * @return
-     * @throws IOException
-     * @throws OpenSearchException
+     * @throws GSException
      */
-    private boolean checkIndex(String indexName) throws GSException {
+    public static boolean checkIndex(OpenSearchClient client, String indexName) throws GSException {
 
 	ExistsRequest existsIndexRequest = new ExistsRequest.Builder().index(indexName).build();
 
@@ -254,9 +294,9 @@ public class OpenSearchDatabase extends Database {
 
 	} catch (Exception ex) {
 
-	    GSLoggerFactory.getLogger(getClass()).error(ex);
+	    GSLoggerFactory.getLogger(OpenSearchDatabase.class).error(ex);
 
-	    throw GSException.createException(getClass(), "OpenSearchDatabaseCheckIndexError", ex);
+	    throw GSException.createException(OpenSearchDatabase.class, "OpenSearchDatabaseCheckIndexError", ex);
 	}
     }
 

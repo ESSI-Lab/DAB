@@ -217,7 +217,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 
 	OpenSearchClient client = database.getClient();
 
-	Query searchQuery = buildSearchQuery();
+	Query searchQuery = buildSearchFolderEntriesQuery();
 
 	SearchResponse<Object> response = client.search(s -> {
 
@@ -255,7 +255,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 
 	} else {
 
-	    Query searchQuery = buildSearchQuery();
+	    Query searchQuery = buildSearchFolderEntriesQuery();
 	    count = count(client, searchQuery);
 	}
 
@@ -272,7 +272,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 	DeleteByQueryRequest deleteRequest = new DeleteByQueryRequest.Builder().//
 		allowNoIndices(true).//
 		index(index).//
-		query(buildSearchQuery()).//
+		query(buildSearchFolderEntriesQuery()).//
 		build();
 
 	client.deleteByQuery(deleteRequest);
@@ -348,6 +348,11 @@ public class OpenSearchFolder implements DatabaseFolder {
 
 	    source = IndexData.toJSONObject(response.source());
 
+	    if (source != null) {
+
+		source.put(IndexData.INDEX, index.get());
+	    }
+
 	} else {
 
 	    Query searchQuery = buildSearchQuery(key);
@@ -359,6 +364,8 @@ public class OpenSearchFolder implements DatabaseFolder {
 
 	    throw new Exception("Resource with key '" + key + "' not found");
 	}
+
+	source.put(IndexData.ENTRY_ID, id);
 
 	return source;
     }
@@ -492,14 +499,18 @@ public class OpenSearchFolder implements DatabaseFolder {
 	List<Hit<Object>> hitsList = hits.hits();
 	Hit<Object> hit = hitsList.get(0);
 
-	return IndexData.toJSONObject(hit.source());
+	JSONObject source = IndexData.toJSONObject(hit.source());
+
+	source.put(IndexData.INDEX, hit.index());
+
+	return source;
     }
 
     /**
      * This query searches all records of this folder.<br>
      * databaseId = getDatabase().getIdentifier() && folderName = getName()
      */
-    private Query buildSearchQuery() {
+    private Query buildSearchFolderEntriesQuery() {
 
 	MatchQuery databaseIdQuery = new MatchQuery.Builder().//
 		field(IndexData.DATABASE_ID).query(new FieldValue.Builder().//

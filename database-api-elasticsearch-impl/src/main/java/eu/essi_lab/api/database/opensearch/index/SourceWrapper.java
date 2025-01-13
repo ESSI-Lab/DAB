@@ -34,6 +34,8 @@ import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.UsersMapping;
+import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
+import eu.essi_lab.messages.bond.View.ViewVisibility;
 import eu.essi_lab.model.auth.UserIdentifierType;
 
 /**
@@ -53,6 +55,8 @@ public class SourceWrapper {
 
     /**
      * - corresponds to the '_index' property
+     * - this property is not indexed with the source, to avoid field duplication, instead it is
+     * copied from the response to the source
      */
     public String getIndex() {
 
@@ -62,6 +66,8 @@ public class SourceWrapper {
     /**
      * - corresponds to the '_id' property
      * - see {@link OpenSearchFolder#getEntryId(DatabaseFolder, String)}
+     * - this property is not indexed with the source, to avoid field duplication, instead it is
+     * copied from the response to the source
      */
     public String getEntryId() {
 
@@ -181,7 +187,7 @@ public class SourceWrapper {
     }
 
     /**
-     * - 'users-index' property<br>
+     * - 'users-index' property
      */
     public Optional<String> getUserIdentifier() {
 
@@ -189,7 +195,7 @@ public class SourceWrapper {
     }
 
     /**
-     * - 'users-index' property<br>
+     * - 'users-index' property
      */
     public Optional<UserIdentifierType> getUserIdentifierType() {
 
@@ -203,7 +209,7 @@ public class SourceWrapper {
     }
 
     /**
-     * - 'users-index' property<br>
+     * - 'users-index' property
      */
     public Optional<String> getUserRole() {
 
@@ -211,11 +217,66 @@ public class SourceWrapper {
     }
 
     /**
-     * - 'users-index' property<br>
+     * - 'users-index' property<
      */
     public Optional<Boolean> getUserEnabled() {
 
 	return Optional.ofNullable(source.optBooleanObject(UsersMapping.ENABLED, null));
+    }
+
+    /**
+     * - 'views-index' property<br>
+     * - base64 encoded
+     */
+    public Optional<String> getView() {
+
+	return Optional.ofNullable(source.optString(ViewsMapping.VIEW, null));
+    }
+
+    /**
+     * - 'views-index' property
+     */
+    public Optional<String> getViewId() {
+
+	return Optional.ofNullable(source.optString(ViewsMapping.VIEW_ID, null));
+    }
+
+    /**
+     * - 'views-index' property
+     */
+    public Optional<String> getViewLabel() {
+
+	return Optional.ofNullable(source.optString(ViewsMapping.VIEW_LABEL, null));
+    }
+
+    /**
+     * - 'views-index' property
+     */
+    public Optional<String> getViewOwner() {
+
+	return Optional.ofNullable(source.optString(ViewsMapping.VIEW_OWNER, null));
+    }
+
+    /**
+     * - 'views-index' property
+     */
+    public Optional<String> getViewCreator() {
+
+	return Optional.ofNullable(source.optString(ViewsMapping.VIEW_CREATOR, null));
+    }
+
+    /**
+     * - 'views-index' property
+     */
+    public Optional<ViewVisibility> getViewVisibility() {
+
+	String visibility = source.optString(ViewsMapping.VIEW_VISIBILITY, null);
+	if (visibility != null) {
+
+	    return Optional.of(ViewVisibility.fromName(visibility));
+	}
+
+	return Optional.empty();
     }
 
     @Override

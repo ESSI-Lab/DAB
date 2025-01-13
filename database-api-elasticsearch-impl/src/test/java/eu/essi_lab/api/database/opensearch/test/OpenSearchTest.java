@@ -10,9 +10,8 @@ import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch.indices.DeleteIndexRequest;
 
-import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
-import eu.essi_lab.api.database.opensearch.index.IndexData;
+import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.model.exceptions.GSException;
 
 /**
@@ -30,9 +29,17 @@ public class OpenSearchTest {
 
 	OpenSearchClient client = OpenSearchDatabase.createNoSSLContextClient(OpenSearchdatabaseInitTest.createStorageInfo());
 
-	DeleteIndexRequest indexRequest = new DeleteIndexRequest.Builder().index(IndexData.ALL_INDEXES).build();
+	for (String index : IndexMapping.getMappings()) {
 
-	client.indices().delete(indexRequest);
+	    if (OpenSearchDatabase.checkIndex(client, index)) {
+
+		DeleteIndexRequest indexRequest = new DeleteIndexRequest.Builder().//
+			index(index).//
+			build();
+
+		client.indices().delete(indexRequest);
+	    }
+	}
     }
 
     /**

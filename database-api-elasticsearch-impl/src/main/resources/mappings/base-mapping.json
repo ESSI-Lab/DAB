@@ -21,11 +21,11 @@
 				"type": "text"
 			},
 			
-			"resourceKey": {
+			"entryName": {
 				"type": "text"
 			},
 			
-			"resourceId": {
+			"entryId": {
 				"type": "text"
 			},
 			

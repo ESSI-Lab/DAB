@@ -11,9 +11,9 @@ import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
 
-import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
+import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.index.IndexData;

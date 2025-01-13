@@ -91,7 +91,7 @@ public class MarkLogicFolder implements DatabaseFolder {
 	    return mlDataBase.getWrapper().store(createResourceUri(uri, key), document.get());
 	}
 
-	return mlDataBase.getWrapper().storeBinary(createResourceUri(uri, key), entry.getInputStream().get());
+	return mlDataBase.getWrapper().storeBinary(createResourceUri(uri, key), entry.getStream().get());
     }
 
     @Override
@@ -104,7 +104,7 @@ public class MarkLogicFolder implements DatabaseFolder {
 	    return mlDataBase.getWrapper().replace(createResourceUri(uri, key), document.get());
 	}
 
-	return mlDataBase.getWrapper().replaceBinary(createResourceUri(uri, key), entry.getInputStream().get());
+	return mlDataBase.getWrapper().replaceBinary(createResourceUri(uri, key), entry.getStream().get());
     }
 
     @Override

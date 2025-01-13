@@ -34,6 +34,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Optional;
 
+import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -63,8 +64,11 @@ import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.MiscMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.UsersMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
+import eu.essi_lab.lib.utils.ClonableInputStream;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.xml.XMLFactories;
+import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.model.auth.GSUser;
 
 /**
@@ -168,8 +172,6 @@ public class IndexData {
 	//
 
 	indexData.object.put(ENTRY_NAME, key);
-	indexData.object.put(ENTRY_ID, OpenSearchFolder.getEntryId(folder, key));
-
 	indexData.object.put(DATABASE_ID, folder.getDatabase().getIdentifier());
 	indexData.object.put(FOLDER_NAME, folder.getName());
 	indexData.object.put(FOLDER_ID, OpenSearchFolder.getFolderId(folder));
@@ -182,7 +184,14 @@ public class IndexData {
 	// encodes the binary property
 	//
 
-	String encodedString = encode(entry);
+	ClonableInputStream stream = null;
+
+	if (entry.getStream().isPresent()) {
+
+	    stream = new ClonableInputStream(entry.getStream().get());
+	}
+
+	String encodedString = encode(entry.getDocument().orElse(null), stream);
 
 	//
 	//
@@ -240,6 +249,24 @@ public class IndexData {
 
 	    break;
 	case VIEW:
+
+	    indexData.object.put(BINARY_PROPERTY, ViewsMapping.VIEW);
+	    indexData.object.put(ViewsMapping.VIEW, encodedString);
+
+	    try {
+
+		View view = View.fromStream(stream.clone());
+
+		indexData.object.put(ViewsMapping.VIEW_ID, view.getId());
+		indexData.object.put(ViewsMapping.VIEW_LABEL, view.getLabel());
+		indexData.object.put(ViewsMapping.VIEW_OWNER, view.getOwner());
+		indexData.object.put(ViewsMapping.VIEW_CREATOR, view.getCreator());
+		indexData.object.put(ViewsMapping.VIEW_VISIBILITY, view.getVisibility().name());
+
+	    } catch (JAXBException e) {
+
+		GSLoggerFactory.getLogger(IndexData.class).error(e);
+	    }
 
 	    indexData.mapping = ViewsMapping.get();
 
@@ -319,39 +346,39 @@ public class IndexData {
      * @param folder
      */
     public static Optional<String> detectIndex(OpenSearchFolder folder) {
-    
-        String name = folder.getName();
-    
-        if (name.contains(SourceStorageWorker.META_PREFIX)) {
-    
-            return Optional.of(MetaFolderMapping.META_FOLDER_INDEX);
-        }
-    
-        if (name.contains(SourceStorageWorker.DATA_1_PREFIX) || name.contains(SourceStorageWorker.DATA_2_PREFIX)) {
-    
-            return Optional.of(DataFolderMapping.DATA_FOLDER_INDEX);
-        }
-    
-        if (name.contains(Database.USERS_FOLDER)) {
-    
-            return Optional.of(UsersMapping.USERS_INDEX);
-        }
-    
-        if (name.contains(Database.VIEWS_FOLDER)) {
-    
-            return Optional.of(ViewsMapping.VIEWS_INDEX);
-        }
-    
-        if (name.contains(Database.AUGMENTERS_FOLDER)) {
-    
-            return Optional.of(AugmentersMapping.AUGMENTERS_INDEX);
-        }
-    
-        //
-        // misc-index and configuration-index cannot be
-        // detected from the folder name
-        //
-        return Optional.empty();
+
+	String name = folder.getName();
+
+	if (name.contains(SourceStorageWorker.META_PREFIX)) {
+
+	    return Optional.of(MetaFolderMapping.META_FOLDER_INDEX);
+	}
+
+	if (name.contains(SourceStorageWorker.DATA_1_PREFIX) || name.contains(SourceStorageWorker.DATA_2_PREFIX)) {
+
+	    return Optional.of(DataFolderMapping.DATA_FOLDER_INDEX);
+	}
+
+	if (name.contains(Database.USERS_FOLDER)) {
+
+	    return Optional.of(UsersMapping.USERS_INDEX);
+	}
+
+	if (name.contains(Database.VIEWS_FOLDER)) {
+
+	    return Optional.of(ViewsMapping.VIEWS_INDEX);
+	}
+
+	if (name.contains(Database.AUGMENTERS_FOLDER)) {
+
+	    return Optional.of(AugmentersMapping.AUGMENTERS_INDEX);
+	}
+
+	//
+	// misc-index and configuration-index cannot be
+	// detected from the folder name
+	//
+	return Optional.empty();
     }
 
     /**
@@ -408,6 +435,29 @@ public class IndexData {
 
     /**
      * @param entry
+     * @param stream
+     * @return
+     * @throws IOException
+     * @throws TransformerException
+     */
+    private static String encode(Document doc, ClonableInputStream stream) throws IOException, TransformerException {
+
+	byte[] bytes = null;
+
+	if (doc != null) {
+
+	    bytes = toString(doc).getBytes();
+
+	} else {
+
+	    bytes = IOStreamUtils.getBytes(stream.clone());
+	}
+
+	return Base64.getEncoder().encodeToString(bytes);
+    }
+
+    /**
+     * @param entry
      * @return
      * @throws IOException
      * @throws TransformerException
@@ -424,7 +474,7 @@ public class IndexData {
 
 	} else {
 
-	    InputStream stream = entry.getInputStream().get();
+	    InputStream stream = entry.getStream().get();
 	    bytes = IOStreamUtils.getBytes(stream);
 	}
 

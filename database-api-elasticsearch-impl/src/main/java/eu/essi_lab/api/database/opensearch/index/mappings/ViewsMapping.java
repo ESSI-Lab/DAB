@@ -3,6 +3,8 @@
  */
 package eu.essi_lab.api.database.opensearch.index.mappings;
 
+import org.opensearch.client.opensearch._types.mapping.FieldType;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -31,7 +33,20 @@ import eu.essi_lab.api.database.Database;
  */
 public class ViewsMapping extends IndexMapping {
 
+    /**
+     * 
+     */
     public static final String VIEWS_INDEX = Database.VIEWS_FOLDER + "-index";
+
+    //
+    // views-index properties
+    //
+    public static final String VIEW = "view";
+    public static final String VIEW_ID = "viewID";
+    public static final String VIEW_LABEL = "viewLabel";
+    public static final String VIEW_OWNER = "viewOwner";
+    public static final String VIEW_CREATOR = "viewCreator";
+    public static final String VIEW_VISIBILITY = "viewVisibility";
 
     /**
     * 
@@ -39,6 +54,13 @@ public class ViewsMapping extends IndexMapping {
     protected ViewsMapping() {
 
 	super(VIEWS_INDEX);
+
+	// mandatory
+	addProperty(VIEW_ID, FieldType.Text.jsonValue());
+	addProperty(VIEW_LABEL, FieldType.Text.jsonValue());
+	addProperty(VIEW_OWNER, FieldType.Text.jsonValue());
+	addProperty(VIEW_CREATOR, FieldType.Text.jsonValue());
+	addProperty(VIEW_VISIBILITY, FieldType.Text.jsonValue());
     }
 
     /**
