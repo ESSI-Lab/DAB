@@ -209,6 +209,9 @@ public class IndexData {
 
 	case AUGMENTER_PROPERTIES:
 
+	    indexData.object.put(BINARY_PROPERTY, AugmentersMapping.AUGMENTER_PROPERTIES);
+	    indexData.object.put(AugmentersMapping.AUGMENTER_PROPERTIES, encodedString);
+
 	    indexData.mapping = AugmentersMapping.get();
 
 	    indexData.index = AugmentersMapping.get().getIndex();
@@ -336,8 +339,6 @@ public class IndexData {
 	}
 
 	indexData.mapping.setEntryType(type);
-
-	indexData.object.put(INDEX, indexData.index);
 
 	return indexData;
     }

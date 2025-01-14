@@ -57,6 +57,7 @@ import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.utils.IterationLogger;
 import eu.essi_lab.lib.utils.PropertiesUtils;
 import eu.essi_lab.lib.utils.StringUtils;
+import eu.essi_lab.messages.AugmenterProperties;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.JobStatus.JobPhase;
 import eu.essi_lab.messages.Page;

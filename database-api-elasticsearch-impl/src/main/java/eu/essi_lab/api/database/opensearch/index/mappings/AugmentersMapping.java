@@ -3,6 +3,8 @@
  */
 package eu.essi_lab.api.database.opensearch.index.mappings;
 
+import org.opensearch.client.opensearch._types.mapping.FieldType;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -27,11 +29,22 @@ package eu.essi_lab.api.database.opensearch.index.mappings;
 import eu.essi_lab.api.database.Database;
 
 /**
+ * This index includes the properties files with the runtime status of the standalone augmenters and
+ * has no search properties
+ * 
  * @author Fabrizio
  */
 public class AugmentersMapping extends IndexMapping {
 
+    /**
+     * 
+     */
     public static final String AUGMENTERS_INDEX = Database.AUGMENTERS_FOLDER + "-index";
+
+    /**
+     * 
+     */
+    public static final String AUGMENTER_PROPERTIES = "augmenterProperties";
 
     /**
      * @param index
@@ -39,6 +52,8 @@ public class AugmentersMapping extends IndexMapping {
     protected AugmentersMapping() {
 
 	super(AUGMENTERS_INDEX);
+
+	addProperty(AUGMENTER_PROPERTIES, FieldType.Binary.jsonValue());
     }
 
     /**

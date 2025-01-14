@@ -22,7 +22,6 @@ import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchdatabaseInitTest;
-import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.messages.HarvestingProperties;
 
 /**
@@ -45,14 +44,14 @@ public class OpenSearchMetaFolder_harvestingPropertiesTest extends OpenSearchTes
 
 	HarvestingProperties properties = new HarvestingProperties();
 	properties.put("key", "value");
+	properties.put("key1", "value1");
+	properties.put("key2", "value2");
 
 	String key = "harvesting.properties";
 
-	ClonableInputStream stream = new ClonableInputStream(properties.asStream());
-
 	folder.store(//
 		key, //
-		FolderEntry.of(stream.clone()), //
+		FolderEntry.of(properties.asStream()), //
 		EntryType.HARVESTING_PROPERTIES);
 
 	SourceWrapper wrapper = folder.getSourceWrapper(key);
@@ -83,14 +82,31 @@ public class OpenSearchMetaFolder_harvestingPropertiesTest extends OpenSearchTes
 
 	Assert.assertEquals(SOURCE_ID, wrapper.getSourceId().get());
 
-	Assert.assertEquals(//
-		IndexData.encode(FolderEntry.of(stream.clone())), wrapper.getHarvestingProperties().get() //
-	);
-
 	Assert.assertTrue(wrapper.getIndexDoc().isEmpty());
 	Assert.assertTrue(wrapper.getWarnReport().isEmpty());
 	Assert.assertTrue(wrapper.getErrorsReport().isEmpty());
 	Assert.assertTrue(wrapper.getDataFolder().isEmpty());
+
+	//
+	// binary data test
+	//
+
+	String binaryData = wrapper.getHarvestingProperties().get();
+	InputStream stream = IndexData.decode(binaryData);
+	HarvestingProperties fromStream = HarvestingProperties.fromStream(stream);
+
+	Assert.assertEquals(properties, fromStream);
+
+	Assert.assertEquals(properties.toString(), fromStream.toString());
+
+	//
+	// low level test omitted since it is not guaranteed that the base 64 encoded strings
+	// are always equals
+	//
+	// Assert.assertEquals(//
+	// IndexData.encode(FolderEntry.of(properties.asStream())), //
+	// wrapper.getHarvestingProperties().get() //
+	// );
     }
 
     @Test
