@@ -5,5 +5,6 @@
     "centerLon": "0",
     "zoom": "1",
     "minZoom": "1",
-    "maxZoom": "10"
+    "maxZoom": "10",
+    "token": "whos-d40a452b-b865-4fbe-8165-43a96ebf1b3d"
 }

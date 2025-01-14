@@ -3,10 +3,13 @@ import { GIAPI } from '../giapi/core/GIAPI.js';
 
 var view = '';
 
+var token = '';
+
 
 
 export function initializePortal(config) {
 	view = config.view;
+	token = config.token;
 	document.title = config.title;
 
 	var centerLat = config.centerLat;	
@@ -185,7 +188,7 @@ export function initializePortal(config) {
 	 	        		'wmsEndpoint' : 'https://geoportale.regione.lazio.it/geoserver/ows',
 	
 	  	        		'clusterWMS': true,
-	  	        		'clusterWMSToken': 'his_central-568a4888-d6bd-4be3-b7a6-d9887997bb0f',
+	  	        		'clusterWMSToken': token,
 	  	        		'clusterWMSView': view,
 	  	        		'clusterWMSLayerName': view,
 	  	        		'clusterWMSLayerTitle': view,	  	        		
