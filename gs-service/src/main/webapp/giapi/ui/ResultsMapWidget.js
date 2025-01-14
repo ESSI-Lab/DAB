@@ -366,6 +366,7 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 		var servicePath = options.dabNode.servicePath();
 
 		var url = endpoint + servicePath + '/token/' + options.clusterWMSToken + '/view/' + options.clusterWMSView + '/wms-cluster?' + query;
+		
 		var online = {
 
 			'function': 'download',
@@ -684,7 +685,8 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 			groupSelectStyle: 'children', // Can be 'children' [default], 'group' or 'none',
 
 			clusterWMS: options.clusterWMS,
-			clusterWMSToken: options.clusterWMS,
+			clusterWMSToken: options.clusterWMSToken,
+			
 			clusterWMSView: options.clusterWMSView,
 			clusterWMSLayer: options.clusterWMSLayer,
 			clusterWMSLayerName: options.clusterWMSLayerName,

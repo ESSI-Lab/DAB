@@ -91,6 +91,7 @@
 			LayerSwitcher.dabEndpoint = this.options.dabEndpoint;
 			LayerSwitcher.servicePath = this.options.servicePath;
 			LayerSwitcher.clusterWMSToken = this.options.clusterWMSToken;
+			
 			LayerSwitcher.clusterWMSView = this.options.clusterWMSView;
 			LayerSwitcher.clusterWMSLayerName = this.options.clusterWMSLayerName;
 			LayerSwitcher.clusterWMSLayerTitle = this.options.clusterWMSLayerTitle;

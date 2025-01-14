@@ -166,7 +166,9 @@ export function initializePortal(config) {
             	//------------------------------------
             // ResultsMapWidget
             //
+            
             	GIAPI.search.resultsMapWidget = GIAPI.ResultsMapWidget('resMapWidget', centerLat, centerLon, {
+					
             		
 		            	'width': '100%',
 		            	'height': jQuery(window).height()-70,
