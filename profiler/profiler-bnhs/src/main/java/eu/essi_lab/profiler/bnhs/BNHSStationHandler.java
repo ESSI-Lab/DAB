@@ -42,6 +42,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
+import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
 import eu.essi_lab.lib.net.utils.whos.HydroOntology;
@@ -179,7 +181,7 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 
 	    if (optionalView.isPresent()) {
 
-		//discoveryMessage.setView(optionalView.get());
+		// discoveryMessage.setView(optionalView.get());
 	    }
 
 	    discoveryMessage.setPermittedBond(bond);
@@ -195,6 +197,11 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 	    for (int i = 0; i < resources.size(); i++) {
 
 		GSResource resource = resources.get(i);
+
+		String sourceId = resource.getSource().getUniqueIdentifier();
+		String sourceLabel = resource.getSource().getLabel();
+
+		GeographicBoundingBox bbox = resource.getHarmonizedMetadata().getCoreMetadata().getBoundingBox();
 
 		String platformId = resource.getExtensionHandler().getUniquePlatformIdentifier().isPresent() ? //
 			resource.getExtensionHandler().getUniquePlatformIdentifier().get() : "";
@@ -265,8 +272,14 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 			    e.printStackTrace();
 			}
 		    }
-
 		}
+		ResponsibleParty poc = resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getPointOfContact();
+		String institute = null;
+		if (poc!=null) {
+		    institute = poc.getOrganisationName();
+		}
+		String country = resource.getExtensionHandler().getCountry().isPresent() ? //
+			resource.getExtensionHandler().getCountry().get().toString() : null;
 		String timeInterpolation = resource.getExtensionHandler().getTimeInterpolation().isPresent() ? //
 			resource.getExtensionHandler().getTimeInterpolation().get().toString() : "";
 		String timeSupport = resource.getExtensionHandler().getTimeSupport().isPresent() ? //
@@ -322,10 +335,26 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 
 		JSONObject object = new JSONObject();
 
+		object = create(object, "source_id", sourceId, "Source ID");
+
+		object = create(object, "source_label", sourceLabel, "Source label");
+
+		if (bbox != null) {
+		    object = create(object, "latitude", bbox.getBigDecimalNorth().toString(), "latitude");
+		    object = create(object, "longitude", bbox.getBigDecimalEast().toString(), "longitude");
+		}
+
 		object = create(object, "platform_id", platformId, "Station ID");
 
 		object = create(object, "platform_label", platformLabel, "Station/platform name");
 
+		if (country !=null) {
+		    object = create(object, "COUNTRY", country, "Country");
+		}
+		if (institute
+			!=null) {
+		    object = create(object, "ORIGINATOR", institute, "Originator");
+		}
 		//
 		// attribute
 		//
@@ -342,6 +371,8 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 
 		object = create(object, "attribute_units_abbreviation", attributeUnitsAbbreviation, "Measurement unit (abbreviation)");
 
+
+		
 		//
 		// time
 		//

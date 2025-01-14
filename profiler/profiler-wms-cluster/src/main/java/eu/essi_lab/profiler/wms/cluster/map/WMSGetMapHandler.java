@@ -43,6 +43,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.ServiceLoader;
 
 import javax.imageio.ImageIO;
@@ -491,63 +492,69 @@ public class WMSGetMapHandler extends StreamingRequestHandler {
     public static Color getRandomColorFromSourceId(String sourceId) {
 	int transparency = 200;
 	String hexacode = null;
-//	switch (sourceId) {
-//	case "ita-sir-toscana":
-//	    hexacode = "#e30613";
-//	    break;
-//	case "hisCentralItaMarche":
-//	    hexacode = "#ffffff";
-//	    break;
-//	case "hisCentralItaFriuli":
-//	    hexacode = "#0063e7";
-//	    break;
-//	case "ita-sir-veneto":
-//	    hexacode = "#c84a46";
-//	    break;
-//	case "hisCentralItaLazio":
-//	    hexacode = "#0075d0";
-//	    break;
-//	case "hisCentralItaAosta":
-//	    hexacode = "#000000";
-//	    break;
-//	case "hisCentralItaPiemonte":
-//	    hexacode = "#d5001d";
-//	    break;
-//	case "hisCentralItaLiguria":
-//	    hexacode = "#009cce";
-//	    break;
-//	case "hisCentralItaBolzano":
-//	    hexacode = "#000000";
-//	    break;
-//	case "ita-sir-lombardia":
-//	    hexacode = "#00a040";
-//	    break;
-//	case "ita-sir-emilia-romagna":
-//	    hexacode = "#009a49";
-//	    break;
-//	case "ita-sir-sardegna":
-//	    hexacode = "#d80000";
-//	    break;
-//	case "ita-sir-basilicata":
-//	    hexacode = "#2c4878";
-//	    break;
-//	case "ita-sir-umbria":
-//	    hexacode = "#00943a";
-//	    break;
-//
-//	default:
-//	    break;
-//	}
-//	if (hexacode != null) {
-//	    Color color = Color.decode(hexacode);
-//	    Color transparentColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), transparency);
-//	    return transparentColor;
-//	}
+	// switch (sourceId) {
+	// case "ita-sir-toscana":
+	// hexacode = "#e30613";
+	// break;
+	// case "hisCentralItaMarche":
+	// hexacode = "#ffffff";
+	// break;
+	// case "hisCentralItaFriuli":
+	// hexacode = "#0063e7";
+	// break;
+	// case "ita-sir-veneto":
+	// hexacode = "#c84a46";
+	// break;
+	// case "hisCentralItaLazio":
+	// hexacode = "#0075d0";
+	// break;
+	// case "hisCentralItaAosta":
+	// hexacode = "#000000";
+	// break;
+	// case "hisCentralItaPiemonte":
+	// hexacode = "#d5001d";
+	// break;
+	// case "hisCentralItaLiguria":
+	// hexacode = "#009cce";
+	// break;
+	// case "hisCentralItaBolzano":
+	// hexacode = "#000000";
+	// break;
+	// case "ita-sir-lombardia":
+	// hexacode = "#00a040";
+	// break;
+	// case "ita-sir-emilia-romagna":
+	// hexacode = "#009a49";
+	// break;
+	// case "ita-sir-sardegna":
+	// hexacode = "#d80000";
+	// break;
+	// case "ita-sir-basilicata":
+	// hexacode = "#2c4878";
+	// break;
+	// case "ita-sir-umbria":
+	// hexacode = "#00943a";
+	// break;
+	//
+	// default:
+	// break;
+	// }
+	// if (hexacode != null) {
+	// Color color = Color.decode(hexacode);
+	// Color transparentColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), transparency);
+	// return transparentColor;
+	// }
 	int hash = sourceId.hashCode();
-	int r = (hash & 0xFF0000) >> 16;
-	int g = (hash & 0x00FF00) >> 8;
-	int b = (hash & 0x0000FF);
-	return new Color(r, g, b, transparency);
+	// int r = (hash & 0xFF0000) >> 16;
+	// int g = (hash & 0x00FF00) >> 8;
+	// int b = (hash & 0x0000FF);
+	// return new Color(r, g, b, transparency);
+	Random random = new Random(hash);
+	final float hue = random.nextFloat();
+	final float saturation = 0.5f + 0.6f * random.nextFloat();// 1.0 for brilliant, 0.0 for dull
+
+	final float luminance = 0.5f + 0.6f * random.nextFloat(); // 1.0 for brighter, 0.0 for black
+	return Color.getHSBColor(hue, saturation, luminance);
     }
 
     public static String decodeFormat(String format) {

@@ -249,6 +249,14 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 
 	GIAPI.UI_Utils.appendStyle(style);
 
+	if (!options.minZoom) {
+		options.minZoom = 1;
+	}
+	
+	if (!options.maxZoom) {
+		options.maxZoom = 10;
+	}
+	
 	if (!options.zoom) {
 		options.zoom = 6;
 	}

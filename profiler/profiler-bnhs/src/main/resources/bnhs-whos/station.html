@@ -6,6 +6,10 @@
 		
 		<title>WHOS-broker: Station page</title>
 		
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v7.0.0/ol.css">
+  
+  		<script src="/gs-service/giapi/ol/ol.js"></script>
+		
 		<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 		
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
@@ -19,7 +23,10 @@
 		<script src="https://kit.fontawesome.com/2ec30275d7.js" crossorigin="anonymous"></script>
 		
 		<style>
-		
+		    #map {
+      width: 30%;
+      height: 400px;
+    }
 			/** 
 			 *  Colors	 
 			 */
@@ -164,6 +171,14 @@
 			.data_table tr:hover {
 			
 				background-color: var(--color3);
+			}
+						.station_table_header {						
+				  font-size: 25px;
+				  padding-top: 4px;
+				  padding-bottom: 4px;
+				  text-align: left;
+				  background-color: var(--color2);
+				  color: var(--color4);
 			}
 			
 			.data_table_header {
@@ -365,10 +380,11 @@ World Meteorological Organization (hereinafter: WMO) shall not be held liable fo
 WMO reserves the right to change or amend the Terms of Use for using WHOS and shall not be responsible for any harm that may result from such changes.<br><br>
 <div class="footer_dialog"><span><sup id="footnote-1">1</sup> “Free and unrestricted” means the data is provided on a non-discriminatory basis and without charge.</span></div><br><br>
 		</div>
+		
 	
 		<div class="page_header">
 		
-			<div class="main_title">WMO Hydrological Observing System (WHOS)</div><div class="sub_title">WHOS STATION’S TIME SERIES DATA</div>
+			<div class="main_title">WMO Hydrological Observing System (WHOS)</div><div class="sub_title">Station information page</div>
 						
 			<a target=_blank href="https://public.wmo.int/en"><div class="wmo_logo"></div></a>
 			<a target=_blank href="https://public.wmo.int/en"><div class="wmo_logo_below"></div></a>
@@ -388,14 +404,41 @@ WMO reserves the right to change or amend the Terms of Use for using WHOS and sh
 			 
 			</div>		 		
  		</div>
+ 		
+
 		
-		<div id='timeseries' class="loading_div"></div>
+		<div id='timeseries' class="loading_div">
+		
+		 		<table width='30%'>
+				<tr><td class='station_table_headers_separator' colspan='2'></td></tr>
+				
+				<tr><td class='station_table_header' colspan='2'>Station/platform</td></tr>	
+				
+				<tr><td>Name</td><td id="station-name-td"></td></tr>
+				
+				<tr><td>Data publisher</td><td id="source-label-td"></td></tr>
+				
+				<tr><td>Territory of origin of data</td><td id="country-td"></td></tr>
+				
+				<tr><td>Supervising organization</td><td id="originator-td"></td></tr>	
+				
+				<tr><td>Geospatial location</td><td id="geolocation-td"></td></tr>	
+
+				</table>
+ 		
+ 		
+		<div id="map"></div>
+		
+		
+		</div>
+		
+		
 		
 		<div class="page_footer">
 		
 			<div style='margin-top:50px'>* Please note that data plotting for the full extent might take a large amount of time</div>
 			
-			<div class="dev_footer">Developed by CNR-IIA</div>				
+			<div class="dev_footer"></div>				
 						 			
 			<a target=_blank href="https://essi-lab.eu/"><div class="cnr_logo"></div></a>
 						
@@ -607,32 +650,7 @@ WMO reserves the right to change or amend the Terms of Use for using WHOS and sh
 				return findValue(data, i, 'attribute_label')+" by gauge.  "+area+" "+effArea+" ("+shape+")";						
 			};
 					
-			var getGeoLocation = function(data, i){
-				
-				var lat = findValue(data, i, 'LATITUDE');
-				
-				var lon = findValue(data, i, 'LONGITUDE');
-				
-				var river = findValue(data, i, 'RIVER');
-				
-				var verticalExt = findValue(data, i, 'vertical_extent');
-				
-				if(river){
-					river = river.replace('RIVER','') + " river";
-				}else{
-					river = "unknown";
-				}
-								
-				var geoLocation = river+", lat: "+lat +"° lon: "+lon+"°";
-				
-				if(verticalExt){
-					// as for Igor meeting 2020-12-3
-// 					geoLocation += ", height "+verticalExt+" m amsl";
-				}
-				
-				
-				return geoLocation;
-			};
+
 			
 			var createPlot = function(data, i, recent){
 					
@@ -839,7 +857,7 @@ WMO reserves the right to change or amend the Terms of Use for using WHOS and sh
 				        	
 				        	var dataId = button.id.substring(button.id.indexOf('_') + 1, button.id.length);
 							
-							var query = "../../../essi/view/whos-arctic/cuahsi_1_1.asmx?"; 
+							var query = "../../../cuahsi_1_1.asmx?"; 
 							
 							query += "request=GetValuesObject&site="+data[dataId].platform_id.value+"&variable="+data[dataId].attribute_id.value;
 							
@@ -887,37 +905,63 @@ WMO reserves the right to change or amend the Terms of Use for using WHOS and sh
 				// Station/platform
 				//
 				
-				var stationType =  findValue(data, i, 'REAL_TIME') === 'Yes' ? "Real time" : "Non real time";
-				
-				var status  = findValue(data, i, 'STATUS') === "A" ? "Active" : "No longer active";
 
-			    var geoLocation = getGeoLocation(data, i);		
+
+				
+				var lat = findValue(data, 0, 'latitude');
+				
+				var lon = findValue(data, 0, 'longitude');
+				
+				var geoLocation = "lat: "+lat +"° lon: "+lon+"°";
+				
+			    const pointerCoordinates = ol.proj.fromLonLat([lon, lat]);
+
+			    // Create a vector layer for the pointer
+			    const pointerLayer = new ol.layer.Vector({
+			      source: new ol.source.Vector({
+			        features: [
+			          new ol.Feature({
+			            geometry: new ol.geom.Point(pointerCoordinates),
+			          }),
+			        ],
+			      }),
+			      style: new ol.style.Style({
+			        image: new ol.style.Circle({
+			          radius: 6,
+			          fill: new ol.style.Fill({ color: 'red' }),
+			          stroke: new ol.style.Stroke({ color: 'white', width: 2 }),
+			        }),
+			      }),
+			    });
+
+			    // Create the map
+			    const map = new ol.Map({
+			      target: 'map',
+			      layers: [
+			        // Base layer using OpenStreetMap
+			        new ol.layer.Tile({
+			          source: new ol.source.OSM(),
+			        }),
+			        // Pointer layer
+			        pointerLayer,
+			      ],
+			      view: new ol.View({
+			        center: pointerCoordinates,
+			        zoom: 3,
+			      }),
+			    });
+				
 			    
-			    var stationTable = "<table>"
-				stationTable += "<tr><td class='data_table_headers_separator' colspan='2'></td></tr>";	
+			    document.getElementById('station-name-td').innerHTML=findValue(data, 0, 'platform_label');
+					
+			    document.getElementById('source-label-td').innerHTML= findValue(data, 0, 'source_label');
+					
+			    document.getElementById('country-td').innerHTML= findValue(data, 0, 'COUNTRY');	
+					
+			    document.getElementById('originator-td').innerHTML= findValueOrEmpty(data, 0, 'ORIGINATOR');	
+					
+			    document.getElementById('geolocation-td').innerHTML=geoLocation;
 				
-				stationTable += "<tr><td class='data_table_header' colspan='2'>Station/platform</td></tr>";	
-				
-				stationTable += "<tr><td>Station ID</td><td>"+ findValue(data, 0, 'platform_id')  +"</td></tr>";	
-
-				stationTable += "<tr><td>Territory of origin of data</td><td>"+ findValue(data, 0, 'COUNTRY')  +"</td></tr>";	
-				
-				stationTable += "<tr><td>Supervising organization</td><td>"+ findValueOrEmpty(data, 0, 'INSTITUTE')  +"</td></tr>";	
-				
-				stationTable += "<tr><td>Station/platform name</td><td>"+ findValue(data, 0, 'platform_label')  +"</td></tr>";	
-				
-				// as for Igor meeting 2020-12-3
-// 				stationTable += "<tr><td>Station/platform type</td><td>"+""+"</td></tr>";	
-				
-				stationTable += "<tr><td>Geospatial location</td><td>"+geoLocation+"</td></tr>";	
-				
-				stationTable += "<tr><td>Station operating status</td><td>"+ status +"</td></tr>";				
-				
-				stationTable += "<tr><td>Total drainage area</td><td>"+ findValue(data, 0, 'DRAINAGE_AREA') +" (km2) </td></tr>";
-				
-				stationTable += "</table>";
-				
-				$(stationTable).appendTo("#timeseries");
 				
 				
 				for (var x = 0, len = data.length; x < len; x++) {

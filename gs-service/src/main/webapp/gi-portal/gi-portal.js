@@ -3,11 +3,16 @@ import { GIAPI } from '../giapi/core/GIAPI.js';
 
 var view = '';
 
+
+
 export function initializePortal(config) {
 	view = config.view;
 	document.title = config.title;
 
-
+	var centerLat = config.centerLat;	
+	var centerLon = config.centerLon;
+	var zoom = config.zoom;
+	var minZoom = config.minZoom;
 	
 		    $.extend(true, $.hik.jtable.prototype.options, {
 		        jqueryuiTheme: true
@@ -158,7 +163,7 @@ export function initializePortal(config) {
             	//------------------------------------
             // ResultsMapWidget
             //
-            	GIAPI.search.resultsMapWidget = GIAPI.ResultsMapWidget('resMapWidget', 42, 10, {
+            	GIAPI.search.resultsMapWidget = GIAPI.ResultsMapWidget('resMapWidget', centerLat, centerLon, {
             		
 		            	'width': '100%',
 		            	'height': jQuery(window).height()-70,
@@ -206,7 +211,8 @@ export function initializePortal(config) {
 	        	        //      position : google.maps.ControlPosition.TOP_RIGHT
 		        		//},
 		        		 
-	 	            	'zoom': 6,
+	 	            	'zoom': zoom,
+	 	            	'minZoom': minZoom,
 		        		'addLayers': false,
 		        		
 		        		'showLayersControl':true,

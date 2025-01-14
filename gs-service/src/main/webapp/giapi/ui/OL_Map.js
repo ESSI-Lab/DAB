@@ -158,11 +158,13 @@ GIAPI.OL_Map = function(options) {
 
 		view: new ol.View({
 			projection: 'EPSG:3857',
-			constrainResolution: true,
+			constrainResolution: false,
 
 			center: ol.proj.transform([options.longitude, options.latitude], 'EPSG:4326', 'EPSG:3857'),
-
+			//minZoom: options.minZoom,
+			//maxZoom: options.maxZoom,
 			zoom: options.zoom
+			
 		})
 	});
 	
