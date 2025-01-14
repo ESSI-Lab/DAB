@@ -26,7 +26,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -619,48 +618,44 @@ public class WMS_1_3_0WQeMSResourceMapper extends OriginalIdentifierMapper {
 
 	} else {
 
-	    try {
-		if (layer != null) {
-		    List<Dimension> dimensions = layer.getDimensions();
-		    for (Dimension d : dimensions) {
-			String dimensionName = d.getValue();
-			if (dimensionName.contains(",")) {
-			    String[] splittedDimesion = dimensionName.split(",");
-			    if (splittedDimesion != null && splittedDimesion.length > 1) {
-				String startTime = splittedDimesion[0].split("_")[0];
-				String endTime = splittedDimesion[splittedDimesion.length - 1].split("_")[0];
+	    if (layer != null) {
+		List<Dimension> dimensions = layer.getDimensions();
+		for (Dimension d : dimensions) {
+		    String dimensionName = d.getValue();
+		    if (dimensionName.contains(",")) {
+			String[] splittedDimesion = dimensionName.split(",");
+			if (splittedDimesion != null && splittedDimesion.length > 1) {
+			    String startTime = splittedDimesion[0].split("_")[0];
+			    String endTime = splittedDimesion[splittedDimesion.length - 1].split("_")[0];
 
-				Optional<Date> startDateTime = null;
-				Optional<Date> endDateTime = null;
-
-				startDateTime = ISO8601DateTimeUtils.parseNotStandardToDate(startTime);
-				endDateTime = ISO8601DateTimeUtils.parseNotStandardToDate(endTime);
-
-				if (startDateTime.isPresent() && endDateTime.isPresent()) {
-				    Date beginPosition = startDateTime.get();
-				    Date endPosition = endDateTime.get();
-				    identification.addTemporalExtent(ISO8601DateTimeUtils.getISO8601DateTime(beginPosition),
-					    ISO8601DateTimeUtils.getISO8601DateTime(endPosition));
-				}
-			    }
-
-			} else {
-			    // start time only
-			    String startTime = dimensionName.split("_")[0];
 			    Optional<Date> startDateTime = null;
+			    Optional<Date> endDateTime = null;
+
 			    startDateTime = ISO8601DateTimeUtils.parseNotStandardToDate(startTime);
+			    endDateTime = ISO8601DateTimeUtils.parseNotStandardToDate(endTime);
 
-			    if (startDateTime.isPresent()) {
+			    if (startDateTime.isPresent() && endDateTime.isPresent()) {
 				Date beginPosition = startDateTime.get();
+				Date endPosition = endDateTime.get();
 				identification.addTemporalExtent(ISO8601DateTimeUtils.getISO8601DateTime(beginPosition),
-					ISO8601DateTimeUtils.getISO8601DateTime(beginPosition));
-
+					ISO8601DateTimeUtils.getISO8601DateTime(endPosition));
 			    }
+			}
+
+		    } else {
+			// start time only
+			String startTime = dimensionName.split("_")[0];
+			Optional<Date> startDateTime = null;
+			startDateTime = ISO8601DateTimeUtils.parseNotStandardToDate(startTime);
+
+			if (startDateTime.isPresent()) {
+			    Date beginPosition = startDateTime.get();
+			    identification.addTemporalExtent(ISO8601DateTimeUtils.getISO8601DateTime(beginPosition),
+				    ISO8601DateTimeUtils.getISO8601DateTime(beginPosition));
+
 			}
 		    }
 		}
-	    } catch (ParseException e) {
-		GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
 	    }
 	}
 

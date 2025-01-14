@@ -66,7 +66,7 @@ public abstract class DatabaseWriter implements DatabaseProvider {
 	    Document asDocument = resource.asDocument(true);
 
 	    String key = resource.getPrivateId();
-	    folder.store(key, FolderEntry.of(asDocument), EntryType.DATA_FOLDER_ENTRY);
+	    folder.store(key, FolderEntry.of(asDocument), EntryType.GS_RESOURCE);
 
 	} catch (Exception e) {
 
@@ -124,7 +124,7 @@ public abstract class DatabaseWriter implements DatabaseProvider {
 
 	    DatabaseFolder folder = markLogicDB.findWritingFolder(worker);
 
-	    folder.replace(key, FolderEntry.of(asDocument), EntryType.DATA_FOLDER_ENTRY);
+	    folder.replace(key, FolderEntry.of(asDocument), EntryType.GS_RESOURCE);
 
 	} catch (Exception e) {
 

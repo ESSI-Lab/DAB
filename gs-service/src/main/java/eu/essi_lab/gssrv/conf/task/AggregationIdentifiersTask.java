@@ -297,7 +297,7 @@ public class AggregationIdentifiersTask extends AbstractCustomTask {
 		Document asDocument = dataset.asDocument(true);
 
 		String key = dataset.getPrivateId();
-		folder.replace(key, FolderEntry.of(asDocument), EntryType.DATA_FOLDER_ENTRY);
+		folder.replace(key, FolderEntry.of(asDocument), EntryType.GS_RESOURCE);
 
 		GSLoggerFactory.getLogger(getClass()).info("Handling child [" + (childrenIndex + 1) + "/" + childrenIds.size() + "] ENDED");
 

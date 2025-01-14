@@ -116,12 +116,18 @@ public interface DatabaseFolder {
 	DATA_FOLDER_INDEX_DOC("dataFolderIndexDoc"), //
 
 	//
+	// data-folder entries
+	//
+	
+	GS_RESOURCE("gsResource"), //
+	WRITING_FOLDER_TAG("writingFolderTag"),
+
+	//
 	//
 	//
 
 	USER("user"), //
 	VIEW("view"), //
-	DATA_FOLDER_ENTRY("dataFolderItem"), //
 
 	AUGMENTER_PROPERTIES("augmenterProperties"), //
 	CONFIGURATION("configuration"), //

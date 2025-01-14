@@ -1,5 +1,8 @@
 package eu.essi_lab.model.resource;
 
+import java.util.Arrays;
+import java.util.List;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -63,7 +66,7 @@ public enum ResourceProperty implements Queryable {
      * 
      */
     IS_DELETED("isDeleted", ContentType.BOOLEAN),
-    
+
     /**
      * 
      */
@@ -97,7 +100,7 @@ public enum ResourceProperty implements Queryable {
     /**
      * 
      */
-    MEDATADATA_QUALITY("metadataQuality", ContentType.INTEGER),
+    METADATA_QUALITY("metadataQuality", ContentType.INTEGER),
 
     /**
      *  
@@ -168,7 +171,7 @@ public enum ResourceProperty implements Queryable {
      * IS TIMESERIES
      */
     IS_TIMESERIES("isTimeseries", ContentType.BOOLEAN),
-    
+
     /**
      * IS GRID
      */
@@ -272,4 +275,13 @@ public enum ResourceProperty implements Queryable {
 
 	return (ResourceProperty) Queryable.fromName(name, values());
     }
+
+    /**
+     * @return
+     */
+    public static List<ResourceProperty> listValues() {
+
+	return Arrays.asList(values());
+    }
+
 }

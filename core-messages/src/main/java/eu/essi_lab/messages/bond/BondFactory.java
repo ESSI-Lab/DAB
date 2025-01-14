@@ -750,7 +750,7 @@ public class BondFactory {
      */
     public static ResourcePropertyBond createMetadataQualityBond(BondOperator operator, int quality) {
 
-	return createResourcePropertyBond(operator, ResourceProperty.MEDATADATA_QUALITY, String.valueOf(quality));
+	return createResourcePropertyBond(operator, ResourceProperty.METADATA_QUALITY, String.valueOf(quality));
     }
 
     /**

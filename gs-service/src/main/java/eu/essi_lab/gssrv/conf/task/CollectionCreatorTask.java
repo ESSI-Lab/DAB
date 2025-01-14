@@ -166,9 +166,9 @@ public class CollectionCreatorTask extends AbstractCustomTask {
 	    String key = dataset.getOriginalId().get();
 	    if (folder.exists(key)) {
 		toDelete.remove(key);
-		folder.replace(key, FolderEntry.of(asDocument),EntryType.DATA_FOLDER_ENTRY);
+		folder.replace(key, FolderEntry.of(asDocument),EntryType.GS_RESOURCE);
 	    } else {
-		folder.store(key, FolderEntry.of(asDocument),EntryType.DATA_FOLDER_ENTRY);
+		folder.store(key, FolderEntry.of(asDocument),EntryType.GS_RESOURCE);
 	    }
 
 	}

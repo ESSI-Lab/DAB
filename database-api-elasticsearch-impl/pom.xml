@@ -19,6 +19,12 @@
 			<artifactId>database-api</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>eu.essi_lab</groupId>
+			<artifactId>database-indexes</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>eu.essi_lab</groupId>

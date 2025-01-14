@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -64,12 +65,20 @@ import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.MiscMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.UsersMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
+import eu.essi_lab.indexes.IndexedElements;
 import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.XMLFactories;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.model.auth.GSUser;
+import eu.essi_lab.model.index.jaxb.BoundingBox;
+import eu.essi_lab.model.index.jaxb.CardinalValues;
+import eu.essi_lab.model.index.jaxb.IndexesMetadata;
+import eu.essi_lab.model.resource.GSResource;
+import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.ResourceProperty;
 
 /**
  * @author Fabrizio
@@ -157,6 +166,7 @@ public class IndexData {
      * @throws IOException
      * @throws TransformerException
      */
+    @SuppressWarnings("incomplete-switch")
     public static IndexData of(//
 	    DatabaseFolder folder, //
 	    String key, //
@@ -199,7 +209,132 @@ public class IndexData {
 
 	switch (type) {
 
-	case DATA_FOLDER_ENTRY:
+	case GS_RESOURCE:
+
+	    indexData.object.put(BINARY_PROPERTY, DataFolderMapping.GS_RESOURCE);
+	    indexData.object.put(DataFolderMapping.GS_RESOURCE, encodedString);
+
+	    GSResource gsResource = GSResource.createOrNull(entry.getDocument().get());
+
+	    IndexesMetadata metadata = gsResource.getIndexesMetadata();
+
+	    //
+	    // bbox
+	    //
+	    if (metadata.readBoundingBox().isPresent()) {
+
+		BoundingBox bbox = metadata.readBoundingBox().get();
+
+		indexData.object.put(BoundingBox.AREA_ELEMENT_NAME, Double.valueOf(bbox.getArea()));
+		indexData.object.put(BoundingBox.IS_CROSSED_ELEMENT_NAME, Boolean.valueOf(bbox.getIsCrossed()));
+
+		bbox.getCardinalValues().forEach(cv -> { //
+
+		    indexData.object.put(BoundingBox.SOUTH_ELEMENT_NAME, Double.valueOf(cv.getSouth()));
+		    indexData.object.put(BoundingBox.WEST_ELEMENT_NAME, Double.valueOf(cv.getWest()));
+		    indexData.object.put(BoundingBox.NORTH_ELEMENT_NAME, Double.valueOf(cv.getNorth()));
+		    indexData.object.put(BoundingBox.EAST_ELEMENT_NAME, Double.valueOf(cv.getEast()));
+
+		    indexData.object.put(MetadataElement.BOUNDING_BOX.getName(), asShape(cv));
+		});
+
+	    } else {
+
+		indexData.object.put(IndexedElements.BOUNDING_BOX_NULL.getElementName(), true);
+	    }
+
+	    //
+	    // temp extent begin
+	    //
+	    metadata.read(MetadataElement.TEMP_EXTENT_BEGIN).//
+		    forEach(v -> parseDateTime(v).//
+			    ifPresent(dt -> indexData.object.put(MetadataElement.TEMP_EXTENT_BEGIN.getName(), dt)));
+
+	    if (!metadata.read(IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName()).isEmpty()) {
+
+		put(metadata, indexData, IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName(), Boolean.class);
+	    }
+
+	    if (!metadata.read(IndexedElements.TEMP_EXTENT_BEGIN_NULL.getElementName()).isEmpty()) {
+
+		put(metadata, indexData, IndexedElements.TEMP_EXTENT_BEGIN_NULL.getElementName(), Boolean.class);
+	    }
+
+	    //
+	    // temp extent end
+	    //
+	    metadata.read(MetadataElement.TEMP_EXTENT_END).//
+		    forEach(v -> parseDateTime(v).//
+			    ifPresent(dt -> indexData.object.put(MetadataElement.TEMP_EXTENT_END.getName(), dt)));
+
+	    if (!metadata.read(IndexedElements.TEMP_EXTENT_END_NOW.getElementName()).isEmpty()) {
+
+		put(metadata, indexData, IndexedElements.TEMP_EXTENT_END_NOW.getElementName(), Boolean.class);
+	    }
+
+	    if (!metadata.read(IndexedElements.TEMP_EXTENT_END_NULL.getElementName()).isEmpty()) {
+
+		put(metadata, indexData, IndexedElements.TEMP_EXTENT_END_NULL.getElementName(), Boolean.class);
+	    }
+
+	    //
+	    // other metadata elements
+	    //
+	    MetadataElement.listValues().forEach(el -> {
+
+		switch (el.getContentType()) {
+		case BOOLEAN:
+		    put(metadata, indexData, el, Boolean.class);
+		    break;
+		case DOUBLE:
+		    put(metadata, indexData, el, Double.class);
+		    break;
+		case INTEGER:
+		    put(metadata, indexData, el, Integer.class);
+		    break;
+		case LONG:
+		    put(metadata, indexData, el, Long.class);
+		    break;
+		case TEXTUAL:
+		    put(metadata, indexData, el, String.class);
+		    break;
+		}
+	    });
+
+	    //
+	    // resource properties
+	    //
+	    ResourceProperty.listValues().forEach(rp -> {
+
+		switch (rp.getContentType()) {
+		case BOOLEAN:
+		    put(metadata, indexData, rp, Boolean.class);
+		    break;
+		case DOUBLE:
+		    put(metadata, indexData, rp, Double.class);
+		    break;
+		case INTEGER:
+		    put(metadata, indexData, rp, Integer.class);
+		    break;
+		case LONG:
+		    put(metadata, indexData, rp, Long.class);
+		    break;
+		case TEXTUAL:
+		    put(metadata, indexData, rp, String.class);
+		    break;
+		}
+	    });
+
+	    indexData.mapping = DataFolderMapping.get();
+
+	    indexData.index = DataFolderMapping.get().getIndex();
+
+	    break;
+
+	case WRITING_FOLDER_TAG:
+
+	    indexData.object.put(BINARY_PROPERTY, DataFolderMapping.WRITING_FOLDER_TAG);
+	    indexData.object.put(DataFolderMapping.WRITING_FOLDER_TAG, encodedString);
 
 	    indexData.mapping = DataFolderMapping.get();
 
@@ -233,6 +368,7 @@ public class IndexData {
 	    indexData.index = MiscMapping.get().getIndex();
 
 	    break;
+
 	case USER:
 
 	    indexData.object.put(BINARY_PROPERTY, UsersMapping.USER);
@@ -251,6 +387,7 @@ public class IndexData {
 	    indexData.index = UsersMapping.get().getIndex();
 
 	    break;
+
 	case VIEW:
 
 	    indexData.object.put(BINARY_PROPERTY, ViewsMapping.VIEW);
@@ -543,5 +680,154 @@ public class IndexData {
 	String binaryData = source.getString(binaryProperty);
 
 	return decode(binaryData);
+    }
+
+    /**
+     * @param value
+     * @return
+     */
+    private static Optional<Long> parseDateTime(String value) {
+
+	if (value.equals("now")) {
+	    return Optional.of(new Date().getTime());
+	}
+
+	Optional<Date> date = ISO8601DateTimeUtils.parseISO8601ToDate(value);
+	if (date.isEmpty()) {
+
+	    date = ISO8601DateTimeUtils.parseNotStandardToDate(value);
+
+	    if (date.isEmpty()) {
+
+		date = ISO8601DateTimeUtils.parseNotStandard2ToDate(value);
+	    }
+	}
+
+	return date.map(d -> d.getTime());
+    }
+
+    /**
+     * 
+     */
+    private static final Double TOL = Math.pow(10, -4); // 11 meters
+
+    /**
+     * @param cardinalValues
+     * @return
+     */
+    private static Optional<String> asShape(CardinalValues cardinalValues) {
+
+	String north = cardinalValues.getNorth();
+	String east = cardinalValues.getEast();
+	String south = cardinalValues.getSouth();
+	String west = cardinalValues.getWest();
+
+	double e = Double.parseDouble(east);
+	double w = Double.parseDouble(west);
+	double s = Double.parseDouble(south);
+	double n = Double.parseDouble(north);
+
+	String es = e + " " + s;
+	String ws = w + " " + s;
+	String en = e + " " + n;
+	String wn = w + " " + n;
+
+	if (e > (180 + TOL)) {
+
+	    e = e - 180;
+	    w = w - 180;
+	}
+
+	if (n <= 90 && s >= -90 && e >= -180 && e <= 180 && w <= 180 && w >= -180) {
+
+	    if (n >= s) {
+
+		boolean snEqual = (Math.abs(n - s) < TOL);
+		boolean weEqual = (Math.abs(w - e) < TOL);
+
+		if (snEqual && weEqual) {
+		    String shape = "POINT (" + ws + ")";
+		    return Optional.of(shape);
+
+		} else if (!snEqual && !weEqual) {
+		    String shape = "POLYGON ((" + ws + "," + wn + "," + en + "," + es + "," + ws + "))";
+		    return Optional.of(shape);
+
+		} else {
+		    if (snEqual && !weEqual) {
+			// line: let's give a width
+			double length = Math.abs(w - e);
+			double width = length / 10.0;
+			s = s - width;
+			n = n + width;
+		    } else if (!snEqual && weEqual) {
+			// line: let's give a width
+			double length = Math.abs(s - n);
+			double width = length / 10.0;
+			w = w - width;
+			e = e + width;
+		    }
+
+		    es = "180 " + s;
+		    ws = "-180 " + s;
+		    en = "180 " + n;
+		    wn = "-180 " + n;
+		    String shape = "POLYGON ((" + ws + "," + wn + "," + en + "," + es + "," + ws + "))";
+
+		    return Optional.of(shape);
+		}
+	    }
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @param metadata
+     * @param indexData
+     * @param elName
+     * @param valueClass
+     */
+    private static void put(IndexesMetadata metadata, IndexData indexData, String elName, Class<?> valueClass) {
+
+	metadata.read(elName).forEach(v -> { //
+
+	    if (valueClass.equals(Integer.class)) {
+
+		indexData.object.put(elName, Integer.valueOf(v));
+	    }
+
+	    if (valueClass.equals(Double.class)) {
+
+		indexData.object.put(elName, Double.valueOf(v));
+	    }
+
+	    if (valueClass.equals(Boolean.class)) {
+
+		indexData.object.put(elName, Boolean.valueOf(v));
+	    }
+	});
+    }
+
+    /**
+     * @param metadata
+     * @param indexData
+     * @param mel
+     * @param valueClass
+     */
+    private static void put(IndexesMetadata metadata, IndexData indexData, MetadataElement mel, Class<?> valueClass) {
+
+	put(metadata, indexData, mel.getName(), valueClass);
+    }
+
+    /**
+     * @param metadata
+     * @param indexData
+     * @param rp
+     * @param valueClass
+     */
+    private static void put(IndexesMetadata metadata, IndexData indexData, ResourceProperty rp, Class<?> valueClass) {
+
+	put(metadata, indexData, rp.getName(), valueClass);
     }
 }

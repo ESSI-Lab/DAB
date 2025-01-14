@@ -118,7 +118,7 @@ public final class IndexedResourceElements extends IndexedElementsGroup {
      * The value is set by the {@link IndexedElementsWriter} when the metadata is stored.<br>
      * See {@link ResourcePropertyHandler#setMetadataQuality()}
      */
-    public static final IndexedResourceProperty MEDATADATA_QUALITY = new IndexedResourceProperty(ResourceProperty.MEDATADATA_QUALITY);
+    public static final IndexedResourceProperty MEDATADATA_QUALITY = new IndexedResourceProperty(ResourceProperty.METADATA_QUALITY);
 
     /**
      * See {@link ResourcePropertyHandler#setEssentialVarsQuality(int)()}

@@ -87,10 +87,10 @@ public class SourceStorageWorker {
     public static final String DATA_2_PREFIX = "-data-2";
     public static final String DATA_1_PREFIX = "-data-1";
     public static final String DATA_FOLDER_POSTFIX = "_dataFolder";
+    public static final String WRITING_FOLDER_TAG = "writingFolder";
 
     private String sourceId;
     private String startTimeStamp;
-    private static final String WRITING_FOLDER = "writingFolder";
 
     private static final String SOURCE_STORAGE_GET_WRITING_FOLDER_ERROR = "SOURCE_STORAGE_GET_WRITING_FOLDER_ERROR";
     private static final String SOURCE_STORAGE_GET_WRITING_FOLDER_HARVESTING_STARTED_ERROR = "SOURCE_STORAGE_GET_WRITING_FOLDER_HARVESTING_STARTED_ERROR";
@@ -118,6 +118,14 @@ public class SourceStorageWorker {
 
 	this.sourceId = sourceId;
 	this.database = database;
+    }
+
+    /**
+     * @return
+     */
+    public static InputStream createWritingFolderTag() {
+
+	return new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8));
     }
 
     /**
@@ -365,7 +373,7 @@ public class SourceStorageWorker {
 
 		    debug("Found data-1 and data-2 folders", status);
 
-		    if (getData1Folder().exists(WRITING_FOLDER)) {
+		    if (getData1Folder().exists(WRITING_FOLDER_TAG)) {
 			// the last writing folder was the data-1, so it is overridden
 			debug("Data-1 folder has WRITING_FOLDER tag", status);
 			writingFolder = getData1Folder();
@@ -409,7 +417,7 @@ public class SourceStorageWorker {
 			writingFolder = getData2Folder();
 
 			debug("Removing WRITING_FOLDER tag from data-1", status);
-			getData1Folder().remove(WRITING_FOLDER);
+			getData1Folder().remove(WRITING_FOLDER_TAG);
 		    }
 
 		    // ----------------------------------------
@@ -437,7 +445,7 @@ public class SourceStorageWorker {
 			writingFolder = getData1Folder();
 
 			debug("Removing WRITING_FOLDER tag from data-2", status);
-			getData2Folder().remove(WRITING_FOLDER);
+			getData2Folder().remove(WRITING_FOLDER_TAG);
 		    }
 		}
 	    }
@@ -515,9 +523,9 @@ public class SourceStorageWorker {
 	debug("Storing WRITING_FOLDER tag to folder " + writingFolder.getName() + " STARTED", writingFolder.getName(), status);
 
 	writingFolder.store(//
-		WRITING_FOLDER, //
-		FolderEntry.of(new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8))), //
-		EntryType.DATA_FOLDER_ENTRY);
+		WRITING_FOLDER_TAG, //
+		FolderEntry.of(createWritingFolderTag()), //
+		EntryType.WRITING_FOLDER_TAG);
 
 	debug("Storing WRITING_FOLDER tag to folder " + writingFolder.getName() + " ENDED", writingFolder.getName(), status);
 
@@ -613,7 +621,7 @@ public class SourceStorageWorker {
 
 		    writingFolder = getData1Folder();
 
-		    getData1Folder().remove(WRITING_FOLDER);
+		    getData1Folder().remove(WRITING_FOLDER_TAG);
 
 		    if (existsData2Folder()) {
 			removeData2Folder();
@@ -623,7 +631,7 @@ public class SourceStorageWorker {
 
 		    writingFolder = getData2Folder();
 
-		    getData2Folder().remove(WRITING_FOLDER);
+		    getData2Folder().remove(WRITING_FOLDER_TAG);
 
 		    if (existsData1Folder()) {
 			removeData1Folder();
@@ -639,7 +647,7 @@ public class SourceStorageWorker {
 
 	    writingFolder = getData1Folder();
 
-	    getData1Folder().remove(WRITING_FOLDER);
+	    getData1Folder().remove(WRITING_FOLDER_TAG);
 	}
 
 	debug("Updating harvesting properties STARTED", status);
@@ -920,13 +928,13 @@ public class SourceStorageWorker {
 
 		debug("Removing data-1 writing folder tag", status);
 
-		getData1Folder().remove(WRITING_FOLDER);
+		getData1Folder().remove(WRITING_FOLDER_TAG);
 
 	    } else {
 
 		debug("Removing data-2 writing folder tag", status);
 
-		getData2Folder().remove(WRITING_FOLDER);
+		getData2Folder().remove(WRITING_FOLDER_TAG);
 	    }
 
 	    if (dataYexists) {
@@ -1183,7 +1191,7 @@ public class SourceStorageWorker {
 
 	if (existsData1Folder()) {
 
-	    return getData1Folder().exists(WRITING_FOLDER);
+	    return getData1Folder().exists(WRITING_FOLDER_TAG);
 	}
 
 	return false;
@@ -1197,7 +1205,7 @@ public class SourceStorageWorker {
 
 	if (existsData2Folder()) {
 
-	    return getData2Folder().exists(WRITING_FOLDER);
+	    return getData2Folder().exists(WRITING_FOLDER_TAG);
 	}
 
 	return false;
@@ -1246,7 +1254,10 @@ public class SourceStorageWorker {
 		    resource.getPropertyHandler().setIsDeleted(true);
 		}
 		// 5) copies the resource in the new folder
-		newFolder.store(resource.getPrivateId(), FolderEntry.of(resource.asDocument(false)), EntryType.DATA_FOLDER_ENTRY);
+		newFolder.store(//
+			resource.getPrivateId(), //
+			FolderEntry.of(resource.asDocument(false)), //
+			EntryType.GS_RESOURCE);
 
 		logger.iterationEnded();
 	    }
@@ -1313,7 +1324,10 @@ public class SourceStorageWorker {
 	    }
 
 	    // 5) replaces the resource in the new folder
-	    newFolder.replace(resource.getPrivateId(), FolderEntry.of(resource.asDocument(false)), EntryType.DATA_FOLDER_ENTRY);
+	    newFolder.replace(//
+		    resource.getPrivateId(), //
+		    FolderEntry.of(resource.asDocument(false)), //
+		    EntryType.GS_RESOURCE);
 
 	    logger.iterationEnded();
 	}
@@ -1380,8 +1394,9 @@ public class SourceStorageWorker {
 		    recoverExtendedElements(oldResource, newResource);
 
 		    // replaces the resource
-		    newFolder.replace(newResource.getPrivateId(), FolderEntry.of(newResource.asDocument(false)),
-			    EntryType.DATA_FOLDER_ENTRY);
+		    newFolder.replace(//
+			    newResource.getPrivateId(), //
+			    FolderEntry.of(newResource.asDocument(false)), EntryType.GS_RESOURCE);
 
 		    logger.iterationEnded();
 		}
