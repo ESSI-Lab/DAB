@@ -108,7 +108,11 @@ public class OpenSearchFolder implements DatabaseFolder {
 	//
 	// }
 
-	return storeWithGenericClient(client, indexData);
+	boolean stored = storeWithGenericClient(client, indexData);
+
+	synch();
+
+	return stored;
     }
 
     @Override
@@ -180,6 +184,8 @@ public class OpenSearchFolder implements DatabaseFolder {
 	    deleted = response.deleted() == 1; // 0 otherwise
 	}
 
+	synch();
+	
 	return deleted;
     }
 
@@ -276,6 +282,8 @@ public class OpenSearchFolder implements DatabaseFolder {
 		build();
 
 	client.deleteByQuery(deleteRequest);
+	
+	synch();
     }
 
     /**
@@ -408,6 +416,15 @@ public class OpenSearchFolder implements DatabaseFolder {
     public void forceRemoveByQuery(boolean force) {
 
 	this.forceRemoveByQuery = force;
+    }
+
+    /**
+     * @throws IOException
+     * @throws OpenSearchException
+     */
+    private void synch() throws OpenSearchException, IOException {
+    
+        database.getClient().indices().refresh();
     }
 
     /**

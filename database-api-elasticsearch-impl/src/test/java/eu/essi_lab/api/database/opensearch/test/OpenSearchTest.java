@@ -41,15 +41,4 @@ public class OpenSearchTest {
 	    }
 	}
     }
-
-    /**
-     * @param database
-     * @throws OpenSearchException
-     * @throws IOException
-     */
-    protected void refreshIndexes(OpenSearchDatabase database) throws OpenSearchException, IOException {
-
-	database.getClient().indices().refresh();
-    }
-
 }

@@ -154,8 +154,6 @@ public class OpenSearchMetaFolder_harvestingPropertiesTest extends OpenSearchTes
 		FolderEntry.of(properties.asStream()), //
 		EntryType.HARVESTING_PROPERTIES));
 
-	refreshIndexes(database);
-
 	//
 	//
 	//
@@ -219,8 +217,6 @@ public class OpenSearchMetaFolder_harvestingPropertiesTest extends OpenSearchTes
 
 	Assert.assertTrue(folder.remove(key));
 
-	refreshIndexes(database);
-
 	Assert.assertFalse(folder.exists(key));
 
 	//
@@ -232,8 +228,6 @@ public class OpenSearchMetaFolder_harvestingPropertiesTest extends OpenSearchTes
 		FolderEntry.of(properties.asStream()), //
 		EntryType.HARVESTING_PROPERTIES));
 
-	refreshIndexes(database);
-
 	//
 	//
 	//
@@ -241,8 +235,6 @@ public class OpenSearchMetaFolder_harvestingPropertiesTest extends OpenSearchTes
 	folder.forceRemoveByQuery(true);
 
 	Assert.assertTrue(folder.remove(key));
-
-	refreshIndexes(database);
 
 	folder.forceExistsBySearchQuery(true);
 
@@ -268,8 +260,6 @@ public class OpenSearchMetaFolder_harvestingPropertiesTest extends OpenSearchTes
 		key + "_3", //
 		FolderEntry.of(properties.asStream()), //
 		EntryType.HARVESTING_PROPERTIES);
-
-	refreshIndexes(database);
 
 	Assert.assertEquals(3, folder.size());
 
@@ -298,8 +288,6 @@ public class OpenSearchMetaFolder_harvestingPropertiesTest extends OpenSearchTes
 
 	folder.clear();
 
-	refreshIndexes(database);
-
 	Assert.assertEquals(0, folder.size());
 
 	Assert.assertEquals(0, folder.listKeys().length);
@@ -318,16 +306,12 @@ public class OpenSearchMetaFolder_harvestingPropertiesTest extends OpenSearchTes
 		FolderEntry.of(properties.asStream()), //
 		EntryType.HARVESTING_PROPERTIES));
 
-	refreshIndexes(database);
-
 	properties.put("key4", "value4");
 
 	Assert.assertTrue(folder.replace(//
 		key, //
 		FolderEntry.of(properties.asStream()), //
 		EntryType.HARVESTING_PROPERTIES));
-
-	refreshIndexes(database);
 
 	InputStream binary2 = folder.getBinary(key);
 
