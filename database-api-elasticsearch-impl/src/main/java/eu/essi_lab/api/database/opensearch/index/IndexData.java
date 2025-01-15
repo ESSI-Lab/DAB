@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 import javax.xml.bind.JAXBException;
@@ -45,6 +46,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.joda.time.DateTime;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.opensearch.client.opensearch.core.IndexRequest;
 import org.w3c.dom.Document;
@@ -66,6 +69,7 @@ import eu.essi_lab.api.database.opensearch.index.mappings.MiscMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.UsersMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
 import eu.essi_lab.indexes.IndexedElements;
+import eu.essi_lab.iso.datamodel.classes.BoundingPolygon;
 import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
@@ -74,7 +78,6 @@ import eu.essi_lab.lib.xml.XMLFactories;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.index.jaxb.BoundingBox;
-import eu.essi_lab.model.index.jaxb.CardinalValues;
 import eu.essi_lab.model.index.jaxb.IndexesMetadata;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
@@ -219,25 +222,30 @@ public class IndexData {
 	    IndexesMetadata metadata = gsResource.getIndexesMetadata();
 
 	    //
-	    // bbox
+	    // shape
 	    //
-	    if (metadata.readBoundingBox().isPresent()) {
 
-		BoundingBox bbox = metadata.readBoundingBox().get();
+	    List<BoundingPolygon> boundingPolygons = gsResource.getHarmonizedMetadata().//
+		    getCoreMetadata().//
+		    getDataIdentification().//
+		    getBoundingPolygonsList();
 
-		indexData.object.put(BoundingBox.AREA_ELEMENT_NAME, Double.valueOf(bbox.getArea()));
-		indexData.object.put(BoundingBox.IS_CROSSED_ELEMENT_NAME, Boolean.valueOf(bbox.getIsCrossed()));
+	    Optional<Shape> shape = Optional.empty();
 
-		bbox.getCardinalValues().forEach(cv -> { //
+	    if (!boundingPolygons.isEmpty()) {
 
-		    indexData.object.put(BoundingBox.SOUTH_ELEMENT_NAME, Double.valueOf(cv.getSouth()));
-		    indexData.object.put(BoundingBox.WEST_ELEMENT_NAME, Double.valueOf(cv.getWest()));
-		    indexData.object.put(BoundingBox.NORTH_ELEMENT_NAME, Double.valueOf(cv.getNorth()));
-		    indexData.object.put(BoundingBox.EAST_ELEMENT_NAME, Double.valueOf(cv.getEast()));
+		shape = Shape.of(boundingPolygons.get(0));
 
-		    indexData.object.put(MetadataElement.BOUNDING_BOX.getName(), asShape(cv));
-		});
+	    } else if (metadata.readBoundingBox().isPresent()) {
 
+		shape = Shape.of(metadata.readBoundingBox().get());
+	    }
+
+	    if (!shape.isEmpty()) {
+
+		indexData.object.put(MetadataElement.BOUNDING_BOX.getName(), shape.get().getShape());
+		indexData.object.put(BoundingBox.AREA_ELEMENT_NAME, shape.get().getArea());
+		
 	    } else {
 
 		indexData.object.put(IndexedElements.BOUNDING_BOX_NULL.getElementName(), true);
@@ -246,9 +254,8 @@ public class IndexData {
 	    //
 	    // temp extent begin
 	    //
-	    metadata.read(MetadataElement.TEMP_EXTENT_BEGIN).//
-		    forEach(v -> parseDateTime(v).//
-			    ifPresent(dt -> indexData.object.put(MetadataElement.TEMP_EXTENT_BEGIN.getName(), dt)));
+
+	    put(metadata, indexData, MetadataElement.TEMP_EXTENT_BEGIN, DateTime.class);
 
 	    if (!metadata.read(IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName()).isEmpty()) {
 
@@ -263,9 +270,7 @@ public class IndexData {
 	    //
 	    // temp extent end
 	    //
-	    metadata.read(MetadataElement.TEMP_EXTENT_END).//
-		    forEach(v -> parseDateTime(v).//
-			    ifPresent(dt -> indexData.object.put(MetadataElement.TEMP_EXTENT_END.getName(), dt)));
+	    put(metadata, indexData, MetadataElement.TEMP_EXTENT_END, DateTime.class);
 
 	    if (!metadata.read(IndexedElements.TEMP_EXTENT_END_NOW.getElementName()).isEmpty()) {
 
@@ -707,82 +712,6 @@ public class IndexData {
     }
 
     /**
-     * 
-     */
-    private static final Double TOL = Math.pow(10, -4); // 11 meters
-
-    /**
-     * @param cardinalValues
-     * @return
-     */
-    private static Optional<String> asShape(CardinalValues cardinalValues) {
-
-	String north = cardinalValues.getNorth();
-	String east = cardinalValues.getEast();
-	String south = cardinalValues.getSouth();
-	String west = cardinalValues.getWest();
-
-	double e = Double.parseDouble(east);
-	double w = Double.parseDouble(west);
-	double s = Double.parseDouble(south);
-	double n = Double.parseDouble(north);
-
-	String es = e + " " + s;
-	String ws = w + " " + s;
-	String en = e + " " + n;
-	String wn = w + " " + n;
-
-	if (e > (180 + TOL)) {
-
-	    e = e - 180;
-	    w = w - 180;
-	}
-
-	if (n <= 90 && s >= -90 && e >= -180 && e <= 180 && w <= 180 && w >= -180) {
-
-	    if (n >= s) {
-
-		boolean snEqual = (Math.abs(n - s) < TOL);
-		boolean weEqual = (Math.abs(w - e) < TOL);
-
-		if (snEqual && weEqual) {
-		    String shape = "POINT (" + ws + ")";
-		    return Optional.of(shape);
-
-		} else if (!snEqual && !weEqual) {
-		    String shape = "POLYGON ((" + ws + "," + wn + "," + en + "," + es + "," + ws + "))";
-		    return Optional.of(shape);
-
-		} else {
-		    if (snEqual && !weEqual) {
-			// line: let's give a width
-			double length = Math.abs(w - e);
-			double width = length / 10.0;
-			s = s - width;
-			n = n + width;
-		    } else if (!snEqual && weEqual) {
-			// line: let's give a width
-			double length = Math.abs(s - n);
-			double width = length / 10.0;
-			w = w - width;
-			e = e + width;
-		    }
-
-		    es = "180 " + s;
-		    ws = "-180 " + s;
-		    en = "180 " + n;
-		    wn = "-180 " + n;
-		    String shape = "POLYGON ((" + ws + "," + wn + "," + en + "," + es + "," + ws + "))";
-
-		    return Optional.of(shape);
-		}
-	    }
-	}
-
-	return Optional.empty();
-    }
-
-    /**
      * @param metadata
      * @param indexData
      * @param elName
@@ -790,23 +719,38 @@ public class IndexData {
      */
     private static void put(IndexesMetadata metadata, IndexData indexData, String elName, Class<?> valueClass) {
 
+	// boolean type is always a single value, no reason to store a boolean array
+	if (valueClass.equals(Boolean.class) && !metadata.read(elName).isEmpty()) {
+
+	    indexData.object.put(elName, Boolean.valueOf(metadata.read(elName).get(0)));
+
+	    return;
+	}
+
+	JSONArray array = new JSONArray();
+
 	metadata.read(elName).forEach(v -> { //
 
 	    if (valueClass.equals(Integer.class)) {
 
-		indexData.object.put(elName, Integer.valueOf(v));
+		array.put(Integer.valueOf(v));
 	    }
 
 	    if (valueClass.equals(Double.class)) {
 
-		indexData.object.put(elName, Double.valueOf(v));
+		array.put(Double.valueOf(v));
 	    }
 
-	    if (valueClass.equals(Boolean.class)) {
+	    if (valueClass.equals(DateTime.class)) {
 
-		indexData.object.put(elName, Boolean.valueOf(v));
+		parseDateTime(v).ifPresent(dt -> array.put(dt));
 	    }
 	});
+
+	if (array.length() > 0) {
+
+	    indexData.object.put(elName, array);
+	}
     }
 
     /**

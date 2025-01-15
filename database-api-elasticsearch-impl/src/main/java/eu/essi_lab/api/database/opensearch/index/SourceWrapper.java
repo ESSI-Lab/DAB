@@ -3,6 +3,10 @@
  */
 package eu.essi_lab.api.database.opensearch.index;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -25,7 +29,9 @@ package eu.essi_lab.api.database.opensearch.index;
  */
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import eu.essi_lab.api.database.Database;
@@ -33,11 +39,14 @@ import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.mappings.AugmentersMapping;
+import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.UsersMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
 import eu.essi_lab.messages.bond.View.ViewVisibility;
 import eu.essi_lab.model.auth.UserIdentifierType;
+import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.ResourceProperty;
 
 /**
  * @author Fabrizio
@@ -287,6 +296,59 @@ public class SourceWrapper {
     public Optional<String> getAugmenterProperties() {
 
 	return Optional.ofNullable(source.optString(AugmentersMapping.AUGMENTER_PROPERTIES, null));
+    }
+
+    /**
+     * - 'data-folder-index' property<br>
+     */
+    public boolean hasWritingFolderTag() {
+
+	return source.has(DataFolderMapping.WRITING_FOLDER_TAG);
+    }
+
+    /**
+     * - 'data-folder-index' property<br>
+     * - base64 encoded
+     */
+    public Optional<String> getGSResource() {
+
+	return Optional.ofNullable(source.optString(DataFolderMapping.GS_RESOURCE, null));
+    }
+
+    /**
+     * - 'data-folder-index' property
+     */
+    public List<String> getGSResourceProperties(MetadataElement el) {
+
+	return getGSResourceProperties(el.getName());
+    }
+
+    /**
+     * - 'data-folder-index' property
+     */
+    public List<String> getGSResourceProperties(ResourceProperty rp) {
+
+	return getGSResourceProperties(rp.getName());
+    }
+
+    /**
+     * - 'data-folder-index' property
+     */
+    public List<String> getGSResourceProperties(String property) {
+
+	if (source.has(property)) {
+
+	    Object object = source.get(property);
+
+	    if (object instanceof JSONArray) {
+
+		return ((JSONArray) object).toList().stream().map(v -> v.toString()).collect(Collectors.toList());
+	    }
+
+	    return Arrays.asList(object.toString());
+	}
+
+	return new ArrayList<String>();
     }
 
     @Override

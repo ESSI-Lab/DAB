@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -71,7 +72,7 @@ public class IndexesMetadata extends DOMSerializer {
     }
 
     @XmlAnyElement
-    private List<JAXBElement<String>> properties;
+    private List<Object> properties;
 
     @XmlElement(name = "bbox", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     private BoundingBox bbox;
@@ -117,7 +118,7 @@ public class IndexesMetadata extends DOMSerializer {
      * @param element
      * @throws IllegalArgumentException if the supplied element has no value/s
      */
-    public void write(IndexedElement element)   {
+    public void write(IndexedElement element) {
 
 	if (element instanceof IndexedMetadataElement) {
 
@@ -155,12 +156,7 @@ public class IndexesMetadata extends DOMSerializer {
 
 	for (Object next : properties) {
 
-	    String name = null;
-	    if (next instanceof JAXBElement<?>) {
-		name = ((JAXBElement<?>) next).getName().getLocalPart();
-	    } else {
-		name = ((Node) next).getLocalName();
-	    }
+	    String name = getPropertyName(next);
 
 	    if (name.equals(elementName)) {
 
@@ -170,6 +166,50 @@ public class IndexesMetadata extends DOMSerializer {
 	}
 
 	return out;
+    }
+
+    @Override
+    public String toString() {
+
+	StringBuilder builder = new StringBuilder();
+
+	getProperties().forEach(prop -> {
+
+	    builder.append(prop);
+	    builder.append(":");
+	    builder.append(read(prop));
+	    builder.append("\n");
+	});
+
+	return builder.toString();
+    }
+
+    /**
+     * @return
+     */
+    public List<String> getProperties() {
+
+	return properties.//
+		stream().//
+		map(prop -> getPropertyName(prop)).//
+		sorted().//
+		collect(Collectors.toList());
+    }
+
+    /**
+     * @param property
+     * @return
+     */
+    private String getPropertyName(Object property) {
+
+	String name = null;
+	if (property instanceof JAXBElement<?>) {
+	    name = ((JAXBElement<?>) property).getName().getLocalPart();
+	} else {
+	    name = ((Node) property).getLocalName();
+	}
+
+	return name;
     }
 
     /**
@@ -227,13 +267,7 @@ public class IndexesMetadata extends DOMSerializer {
 	while (iterator.hasNext()) {
 
 	    Object next = iterator.next();
-	    String name = null;
-
-	    if (next instanceof JAXBElement<?>) {
-		name = ((JAXBElement<?>) next).getName().getLocalPart();
-	    } else {
-		name = ((Node) next).getLocalName();
-	    }
+	    String name = getPropertyName(next);
 
 	    if (name.equals(elementName)) {
 		iterator.remove();
