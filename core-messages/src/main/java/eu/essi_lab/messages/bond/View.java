@@ -223,6 +223,10 @@ public class View implements Serializable {
 
     public void setVisibility(ViewVisibility viewVisibility) {
 
+	if (viewVisibility == null) {
+	    throw new IllegalArgumentException();
+	}
+
 	this.visibility = viewVisibility.name();
     }
 

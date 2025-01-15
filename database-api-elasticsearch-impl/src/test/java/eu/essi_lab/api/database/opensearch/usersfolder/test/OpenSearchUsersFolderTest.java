@@ -84,6 +84,65 @@ public class OpenSearchUsersFolderTest extends OpenSearchTest {
 	Assert.assertEquals(//
 		IndexData.encode(FolderEntry.of(user.asDocument(true))), wrapper.getUser().get());
     }
+    
+    @Test
+    public void sourceTest2() throws Exception {
+
+	OpenSearchDatabase database = OpenSearchdatabaseInitTest.create();
+
+	String folderName = Database.USERS_FOLDER;
+
+	OpenSearchFolder folder = new OpenSearchFolder(database, folderName);
+
+	//
+	//
+
+	GSUser user = new GSUser();
+	user.setEnabled(false);
+	user.setIdentifier("identifier");
+
+	String key = user.getIdentifier();
+
+	folder.store(//
+		key, //
+		FolderEntry.of(user.asDocument(true)), //
+		EntryType.USER);
+
+	SourceWrapper wrapper = folder.getSourceWrapper(key);
+
+	//
+	// base properties
+	//
+
+	Assert.assertEquals(UsersMapping.USERS_INDEX, wrapper.getIndex());
+
+	Assert.assertEquals(database.getIdentifier(), wrapper.getDatabaseId());
+
+	Assert.assertEquals(folderName, wrapper.getFolderName());
+
+	Assert.assertEquals(OpenSearchFolder.getFolderId(folder), wrapper.getFolderId());
+
+	Assert.assertEquals(OpenSearchFolder.getEntryId(folder, key), wrapper.getEntryId());
+
+	Assert.assertEquals(key, wrapper.getEntryName());
+
+	Assert.assertEquals(UsersMapping.USER, wrapper.getBinaryProperty());
+
+	Assert.assertEquals(DataType.DOC, wrapper.getDataType());
+
+	//
+	// users-index property
+	//
+
+	Assert.assertEquals(user.getIdentifier(), wrapper.getUserIdentifier().get());
+	Assert.assertFalse(user.getUserIdentifierType().isPresent());
+	Assert.assertFalse( wrapper.getUserRole().isPresent());
+	Assert.assertEquals(user.isEnabled(), wrapper.getUserEnabled().get());
+
+	Assert.assertEquals(//
+		IndexData.encode(FolderEntry.of(user.asDocument(true))), wrapper.getUser().get());
+    }
+
 
     @Test
     public void folderTest() throws Exception {

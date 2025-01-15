@@ -44,7 +44,6 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 	view.setLabel("View label");
 	view.setOwner("View owner");
 	view.setCreator("View creator");
-	view.setVisibility(ViewVisibility.PRIVATE);
 
 	String key = view.getId();
 
@@ -103,7 +102,6 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 
 	View view = new View();
 	view.setId("viewId");
-
 	view.setVisibility(ViewVisibility.PUBLIC);
 
 	String key = view.getId();
