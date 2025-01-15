@@ -177,7 +177,7 @@ public class OpenSearchDatabase extends Database {
 
 	    if (!exists) {
 
-		createIndex(mapping);
+		createIndexWithGenericCLient(mapping);
 	    }
 	}
     }
@@ -336,6 +336,7 @@ public class OpenSearchDatabase extends Database {
      * @param mapping
      * @throws GSException
      */
+    @SuppressWarnings("unused")
     private void createIndex(IndexMapping mapping) throws GSException {
 
 	TypeMapping typeMapping = new TypeMapping.Builder().//
@@ -372,7 +373,6 @@ public class OpenSearchDatabase extends Database {
     /**
      * @throws GSException
      */
-    @SuppressWarnings("unused")
     private void createIndexWithGenericCLient(IndexMapping mapping) throws GSException {
 
 	try {
