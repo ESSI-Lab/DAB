@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.json.JSONObject;
@@ -84,15 +83,6 @@ public abstract class IndexMapping {
     }
 
     /**
-     * @param propertyKey
-     * @return
-     */
-    public Optional<PutMappingRequest> getRequest(String propertyKey) {
-
-	return updatable() ? Optional.of(createBinaryRequest(propertyKey, getIndex())) : Optional.empty();
-    }
-
-    /**
      * @return
      */
     public String getIndex() {
@@ -134,14 +124,6 @@ public abstract class IndexMapping {
     }
 
     /**
-     * @return
-     */
-    protected boolean updatable() {
-
-	return false;
-    }
-
-    /**
      * @param key
      * @param type
      */
@@ -175,7 +157,8 @@ public abstract class IndexMapping {
      * @param index
      * @return
      */
-    private PutMappingRequest createBinaryRequest(String key, String index) {
+    @SuppressWarnings("unused")
+    private PutMappingRequest createPutMappingRequest(String key, String index) {
 
 	Property property = new Property.Builder().//
 		binary(new BinaryProperty.Builder().build()).//
