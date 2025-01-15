@@ -139,18 +139,13 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 			j = Integer.parseInt(jParameter);
 		    }
 
-		    // BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-		    //
-		    // Graphics2D ig2 = bi.createGraphics();
-		    //
-		    // int r = 8;
-
 		    if (bboxString != null && crs != null) {
 			String[] split = bboxString.split(",");
-			BigDecimal minx = null;
-			BigDecimal miny = null;
-			BigDecimal maxx = null;
-			BigDecimal maxy = null;
+
+			BigDecimal miny = new BigDecimal(split[0]);
+			BigDecimal minx = new BigDecimal(split[1]);
+			BigDecimal maxy = new BigDecimal(split[2]);
+			BigDecimal maxx = new BigDecimal(split[3]);
 
 			//
 			if (version.equals("1.3.0") && crs.equals("EPSG:4326")) {
@@ -168,22 +163,6 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 			    maxx = new BigDecimal(split[2]);
 			    maxy = new BigDecimal(split[3]);
 
-			    if (crs.equals("EPSG:3857")) {
-
-				SimpleEntry<Double, Double> lower = new SimpleEntry<>(minx.doubleValue(), miny.doubleValue());
-				SimpleEntry<Double, Double> upper = new SimpleEntry<>(maxx.doubleValue(), maxy.doubleValue());
-				SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> bbox3857 = new SimpleEntry<>(lower,
-					upper);
-				SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> bbox4326 = CRSUtils
-					.translateBBOX(bbox3857, CRS.EPSG_3857(), CRS.EPSG_4326());
-				lower = bbox4326.getKey();
-				upper = bbox4326.getValue();
-
-				minx = new BigDecimal(lower.getValue());
-				miny = new BigDecimal(lower.getKey());
-				maxx = new BigDecimal(upper.getValue());
-				maxy = new BigDecimal(upper.getKey());
-			    }
 			}
 
 			if (crs.equals("EPSG:4326")) {
@@ -210,6 +189,23 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 			double fmaxx = bminx + (i + r) * pixelWidth;
 			double fmaxy = bmaxy - (j - r) * pixelHeight;
 			double fminy = bmaxy - (j + r) * pixelHeight;
+
+			if (crs.equals("EPSG:3857")) {
+
+			    SimpleEntry<Double, Double> lower = new SimpleEntry<>(fminx, fminy);
+			    SimpleEntry<Double, Double> upper = new SimpleEntry<>(fmaxx, fmaxy);
+			    SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> bbox3857 = new SimpleEntry<>(lower,
+				    upper);
+			    SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> bbox4326 = CRSUtils
+				    .translateBBOX(bbox3857, CRS.EPSG_3857(), CRS.EPSG_4326());
+			    lower = bbox4326.getKey();
+			    upper = bbox4326.getValue();
+
+			    fminx = new BigDecimal(lower.getValue()).doubleValue();
+			    fminy = new BigDecimal(lower.getKey()).doubleValue();
+			    fmaxx = new BigDecimal(upper.getValue()).doubleValue();
+			    fmaxy = new BigDecimal(upper.getKey()).doubleValue();
+			}
 
 			BBOX bbox = new BBOX(crs, fminx, fminy, fmaxx, fmaxy);
 			List<SimpleEntry<String, String>> properties = new ArrayList();
@@ -270,7 +266,8 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 			    stations.add(station);
 			}
 
-			InputStream stream = generator.getInfoPage(viewId, stations,resultSet.getCountResponse().getCount(), format, request);
+			InputStream stream = generator.getInfoPage(viewId, stations, resultSet.getCountResponse().getCount(), format,
+				request);
 
 			IOUtils.copy(stream, output);
 

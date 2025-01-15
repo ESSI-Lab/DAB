@@ -438,10 +438,10 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 		stream = BNHSStationHandler.class.getClassLoader().getResourceAsStream("bnhs/station.html");
 		break;
 	    case "whos":
-		stream = BNHSStationHandler.class.getClassLoader().getResourceAsStream("bnhs-whos/station.html");
+		stream = BNHSStationHandler.class.getClassLoader().getResourceAsStream("whos/station.html");
 		break;
 	    case "his-central":
-		stream = BNHSStationHandler.class.getClassLoader().getResourceAsStream("bnhs-his-central/station.html");
+		stream = BNHSStationHandler.class.getClassLoader().getResourceAsStream("hisc/station.html");
 		break;
 	    }
 

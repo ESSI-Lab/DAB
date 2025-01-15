@@ -266,7 +266,6 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 			List<WMSClusterResponse> responseList = executor.execute(request);
 
 			int bbboxIndex = 0;
-			Color randomColor = getRandomColorFromSourceId(UUID.randomUUID().toString());
 			for (WMSClusterResponse response : responseList) {
 
 			    SpatialExtent bbox = response.getBbox();
@@ -299,7 +298,7 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 
 			    // blue square per debug
 			    if (debug) {
-				ig2.setColor(randomColor);
+				ig2.setColor(getRandomColorFromSourceId(UUID.randomUUID().toString()));
 				ig2.setStroke(new BasicStroke(1)); // Slightly thicker line for the border
 				ig2.drawRect(subMinX, subMinY, subImageWidth - 2, subImageHeight - 2);
 				String debugString = bbboxIndex++ + ": " + bbox;
@@ -431,7 +430,7 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 				    double percentage = percentages.get(i).getValue();
 				    double arcAngle = 360 * (percentage / 100); // Convert percentage to degrees
 				    Color color = getRandomColorFromSourceId(percentages.get(i).getKey());
-				    ig2.setColor(color);
+				    ig2.setColor(addTransparency(color));
 				    ig2.fillArc(pieMinX, pieMinY, pieDiameter, pieDiameter, (int) Math.round(startAngle),
 					    (int) Math.round(arcAngle));
 				    startAngle += arcAngle;
@@ -442,18 +441,18 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 
 				// Draw the white background rectangle
 				int padding = 1; // Padding around the text
-				ig2.setColor(new Color(255, 255, 255, 128));
+				ig2.setColor(addTransparency(Color.WHITE));
 				ig2.fillRoundRect(centerLabelX - labelWidth / 2-padding, centerLabelY - labelHeight / 2, labelWidth+2*padding, labelHeight,5,5);
 
 				// Draw the black border around the white background
-				ig2.setColor(Color.BLACK);
+				ig2.setColor(addTransparency(Color.BLACK));
 				ig2.drawRoundRect(centerLabelX - labelWidth / 2-padding, centerLabelY - labelHeight / 2, labelWidth+2*padding, labelHeight,5,5);
 
 				// Draw the label text
-				ig2.setColor(Color.BLACK);
+				ig2.setColor(addTransparency(Color.BLACK));
 				ig2.drawString(centerLabel, centerLabelX - labelWidth / 2, (int)( centerLabelY + labelHeight / 2.8));
 
-				ig2.setColor(Color.BLACK);
+				ig2.setColor(addTransparency(Color.BLACK));
 				ig2.setStroke(new BasicStroke(1)); // Thin line for the border
 				ig2.drawOval(pieMinX, pieMinY, pieDiameter, pieDiameter);
 
@@ -476,12 +475,12 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 				}
 				if (offsetX != 0 || offsetY != 0) {
 				    ig2.setStroke(new BasicStroke(2));
-				    ig2.setColor(Color.gray);
+				    ig2.setColor(addTransparency(Color.gray));
 				    ig2.drawLine(centroidX - stationDiameterInPixels, centroidY - stationDiameterInPixels,
 					    centroidX + stationDiameterInPixels, centroidY + stationDiameterInPixels);
 				    ig2.drawLine(centroidX - stationDiameterInPixels, centroidY + stationDiameterInPixels,
 					    centroidX + stationDiameterInPixels, centroidY - stationDiameterInPixels);
-				    ig2.setColor(Color.gray);
+				    ig2.setColor(addTransparency(Color.gray));
 				    ig2.drawLine(centroidX, centroidY, centroidX + offsetX, centroidY + offsetY);
 				}
 
@@ -610,6 +609,8 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 
 		}
 
+
+
 		private int getXPixel(Integer imageWidthInPixel, Double stationX, double imageMinX, double imageWidthX) {
 		    return (int) ((stationX - imageMinX) * (imageWidthInPixel / imageWidthX));
 		}
@@ -635,6 +636,13 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 	}
     }
 
+	private Color addTransparency(Color color) {
+	    if (color.getTransparency()==1) {
+		color = new Color(color.getRed(),color.getGreen(),color.getBlue(),200);
+	    }
+	    return color;
+	}
+    
     /**
      * @param webRequest
      * @return
