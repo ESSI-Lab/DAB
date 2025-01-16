@@ -350,6 +350,19 @@ public class SourceWrapper {
 
 	return new ArrayList<String>();
     }
+    
+    /**
+     * 
+     * @param hideBinary
+     * @return
+     */
+    public String toStringHideBinary() {
+	
+	JSONObject clone = new JSONObject(source.toString());
+	clone.remove(getBinaryProperty());
+
+	return clone.toString(3);
+    }
 
     @Override
     public String toString() {

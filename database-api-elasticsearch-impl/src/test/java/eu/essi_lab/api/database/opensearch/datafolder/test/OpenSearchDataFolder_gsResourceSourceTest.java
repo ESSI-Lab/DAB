@@ -4,7 +4,6 @@
 package eu.essi_lab.api.database.opensearch.datafolder.test;
 
 import java.io.InputStream;
-import java.util.Iterator;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,7 +22,6 @@ import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchdatabaseInitTest;
 import eu.essi_lab.indexes.IndexedElementsWriter;
-import eu.essi_lab.iso.datamodel.classes.BoundingPolygon;
 import eu.essi_lab.model.index.jaxb.IndexesMetadata;
 import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.GSResource;

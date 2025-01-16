@@ -31,7 +31,6 @@ import java.util.stream.Collectors;
 import org.json.JSONObject;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 
@@ -210,6 +209,12 @@ public class Shape {
     public double getArea() {
 
 	return objectBox.getDouble(AREA);
+    }
+
+    @Override
+    public String toString() {
+
+	return "shape: " + getShape() + "\n" + "area: " + getArea();
     }
 
     /**

@@ -245,7 +245,7 @@ public class IndexData {
 
 		indexData.object.put(MetadataElement.BOUNDING_BOX.getName(), shape.get().getShape());
 		indexData.object.put(BoundingBox.AREA_ELEMENT_NAME, shape.get().getArea());
-		
+
 	    } else {
 
 		indexData.object.put(IndexedElements.BOUNDING_BOX_NULL.getElementName(), true);
@@ -576,6 +576,12 @@ public class IndexData {
 	return object.toString();
     }
 
+    @Override
+    public String toString() {
+
+	return object.toString(3);
+    }
+
     /**
      * @param entry
      * @param stream
@@ -719,14 +725,6 @@ public class IndexData {
      */
     private static void put(IndexesMetadata metadata, IndexData indexData, String elName, Class<?> valueClass) {
 
-	// boolean type is always a single value, no reason to store a boolean array
-	if (valueClass.equals(Boolean.class) && !metadata.read(elName).isEmpty()) {
-
-	    indexData.object.put(elName, Boolean.valueOf(metadata.read(elName).get(0)));
-
-	    return;
-	}
-
 	JSONArray array = new JSONArray();
 
 	metadata.read(elName).forEach(v -> { //
@@ -739,6 +737,11 @@ public class IndexData {
 	    if (valueClass.equals(Double.class)) {
 
 		array.put(Double.valueOf(v));
+	    }
+
+	    if (valueClass.equals(Boolean.class)) {
+
+		array.put(Boolean.valueOf(v));
 	    }
 
 	    if (valueClass.equals(DateTime.class)) {
