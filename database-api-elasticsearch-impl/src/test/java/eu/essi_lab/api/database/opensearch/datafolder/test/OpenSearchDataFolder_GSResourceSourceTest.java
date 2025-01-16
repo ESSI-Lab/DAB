@@ -28,7 +28,7 @@ import eu.essi_lab.model.resource.GSResource;
 /**
  * @author Fabrizio
  */
-public class OpenSearchDataFolder_gsResourceSourceTest extends OpenSearchTest {
+public class OpenSearchDataFolder_GSResourceSourceTest extends OpenSearchTest {
 
     @Test
     public void sourceTest() throws Exception {
