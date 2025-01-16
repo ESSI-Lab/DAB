@@ -59,7 +59,7 @@ public class ShapeTest {
 	double area = optShape.get().getArea();
 	Assert.assertEquals(Double.valueOf(0), Double.valueOf(area));
     }
-    
+
     //
     // POLYGON from BoundingPolygon
     //
@@ -191,7 +191,7 @@ public class ShapeTest {
 
 	String shape = optShape.get().getShape();
 
-	Assert.assertEquals("MULTIPOINT ((10.0 10.0), (20.0 20.0), (30.0 30.0))", shape);
+	Assert.assertEquals("MULTIPOINT (10.0 10.0, 20.0 20.0, 30.0 30.0)", shape);
 
 	double area = optShape.get().getArea();
 
@@ -235,6 +235,163 @@ public class ShapeTest {
 	double area = optShape.get().getArea();
 
 	Assert.assertEquals(Double.valueOf(400), Double.valueOf(area));
+    }
+
+    //
+    // POLYGON with south > north. SpatialIndexHelper in this case switches north with south.
+    // It is the right behavior?
+    //
+    @Test
+    public void southGTNorthPolygonTest() {
+
+	Dataset dataset = new Dataset();
+
+	GeographicBoundingBox box = new GeographicBoundingBox();
+
+	box.setBigDecimalNorth(new BigDecimal(-10));
+	box.setBigDecimalSouth(new BigDecimal(10));
+
+	box.setBigDecimalEast(new BigDecimal(10));
+	box.setBigDecimalWest(new BigDecimal(-10));
+
+	dataset.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().addGeographicBoundingBox(box);
+
+	IndexedElementsWriter.write(dataset);
+
+	//
+	//
+	//
+
+	BoundingBox boundingBox = dataset.getIndexesMetadata().readBoundingBox().get();
+
+	Optional<Shape> optShape = Shape.of(boundingBox);
+
+	Assert.assertTrue(optShape.isPresent());
+
+	String shape = optShape.get().getShape();
+
+	Assert.assertEquals("POLYGON ((-10.0 -10.0, -10.0 10.0, 10.0 10.0, 10.0 -10.0, -10.0 -10.0))", shape);
+
+	double area = optShape.get().getArea();
+
+	Assert.assertEquals(Double.valueOf(400), Double.valueOf(area));
+    }
+
+    //
+    // POLYGON with south > north. SpatialIndexHelper in this case switches north with south.
+    // It is the right behavior?
+    //
+    @Test
+    public void outOfScaleValuesPolygonTest() {
+
+	//
+	// west < -180
+	//
+
+	{
+
+	    Dataset dataset = new Dataset();
+
+	    GeographicBoundingBox box = new GeographicBoundingBox();
+
+	    box.setBigDecimalNorth(new BigDecimal(10));
+	    box.setBigDecimalSouth(new BigDecimal(-10));
+
+	    box.setBigDecimalEast(new BigDecimal(10));
+
+	    box.setBigDecimalWest(new BigDecimal(-190));
+
+	    dataset.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().addGeographicBoundingBox(box);
+
+	    IndexedElementsWriter.write(dataset);
+
+	    BoundingBox boundingBox = dataset.getIndexesMetadata().readBoundingBox().get();
+
+	    Assert.assertFalse(Shape.of(boundingBox).isPresent());
+	}
+
+	//
+	// west > 180
+	//
+
+	{
+
+	    Dataset dataset = new Dataset();
+
+	    GeographicBoundingBox box = new GeographicBoundingBox();
+
+	    box.setBigDecimalNorth(new BigDecimal(10));
+	    box.setBigDecimalSouth(new BigDecimal(-10));
+
+	    box.setBigDecimalEast(new BigDecimal(10));
+
+	    box.setBigDecimalWest(new BigDecimal(190));
+
+	    dataset.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().addGeographicBoundingBox(box);
+
+	    IndexedElementsWriter.write(dataset);
+
+	    BoundingBox boundingBox = dataset.getIndexesMetadata().readBoundingBox().get();
+
+	    Assert.assertFalse(Shape.of(boundingBox).isPresent());
+	}
+
+	//
+	// east > 180. in this case (e > (180 + TOL)) east is reduced of 180
+	//
+
+	{
+
+	    Dataset dataset = new Dataset();
+
+	    GeographicBoundingBox box = new GeographicBoundingBox();
+
+	    box.setBigDecimalNorth(new BigDecimal(10));
+	    box.setBigDecimalSouth(new BigDecimal(-10));
+
+	    box.setBigDecimalEast(new BigDecimal(190));
+
+	    box.setBigDecimalWest(new BigDecimal(10));
+
+	    dataset.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().addGeographicBoundingBox(box);
+
+	    IndexedElementsWriter.write(dataset);
+
+	    BoundingBox boundingBox = dataset.getIndexesMetadata().readBoundingBox().get();
+
+	    Optional<Shape> optShape = Shape.of(boundingBox);
+
+	    Assert.assertTrue(optShape.isPresent());
+
+	    Shape shape = optShape.get();
+
+	    Assert.assertEquals("POLYGON ((10.0 -10.0, 10.0 10.0, 190.0 10.0, 190.0 -10.0, 10.0 -10.0))", shape.getShape());
+	}
+
+	//
+	// east < -180
+	//
+
+	{
+	    Dataset dataset = new Dataset();
+
+	    GeographicBoundingBox box = new GeographicBoundingBox();
+
+	    box.setBigDecimalNorth(new BigDecimal(10));
+	    box.setBigDecimalSouth(new BigDecimal(-10));
+
+	    box.setBigDecimalEast(new BigDecimal(-190));
+
+	    box.setBigDecimalWest(new BigDecimal(10));
+
+	    dataset.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().addGeographicBoundingBox(box);
+
+	    IndexedElementsWriter.write(dataset);
+
+	    BoundingBox boundingBox = dataset.getIndexesMetadata().readBoundingBox().get();
+
+	    Assert.assertFalse(Shape.of(boundingBox).isPresent());
+	}
     }
 
     //
