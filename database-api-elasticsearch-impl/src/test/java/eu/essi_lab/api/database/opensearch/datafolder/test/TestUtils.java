@@ -99,8 +99,9 @@ public class TestUtils {
 		}
 
 	    } else if (prop.equals(IndexedElements.TEMP_EXTENT_BEGIN_NULL.getElementName()) || //
-		    prop.equals(IndexedElements.TEMP_EXTENT_END_NULL.getElementName()) //
-
+		    prop.equals(IndexedElements.TEMP_EXTENT_END_NULL.getElementName()) || //
+		    prop.equals(IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName()) || //
+		    prop.equals(IndexedElements.TEMP_EXTENT_END_NOW.getElementName()) //
 	    ) {
 
 		//
