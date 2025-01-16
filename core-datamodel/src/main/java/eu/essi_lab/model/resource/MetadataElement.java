@@ -24,6 +24,7 @@ package eu.essi_lab.model.resource;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import eu.essi_lab.model.Queryable;
@@ -768,6 +769,21 @@ public enum MetadataElement implements Queryable {
     public static MetadataElement fromName(String name) throws IllegalArgumentException {
 
 	return (MetadataElement) Queryable.fromName(name, values());
+    }
+
+    /**
+     * @param name
+     * @return
+     */
+    public static Optional<MetadataElement> optFromName(String name) {
+
+	try {
+	    return Optional.of(fromName(name));
+
+	} catch (IllegalArgumentException ex) {
+	}
+
+	return Optional.empty();
     }
 
     /**

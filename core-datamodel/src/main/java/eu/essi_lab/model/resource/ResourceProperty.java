@@ -25,6 +25,7 @@ import java.util.List;
  */
 
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.index.IndexedMetadataElement;
@@ -274,6 +275,21 @@ public enum ResourceProperty implements Queryable {
     public static ResourceProperty fromName(String name) throws IllegalArgumentException {
 
 	return (ResourceProperty) Queryable.fromName(name, values());
+    }
+
+    /**
+     * @param name
+     * @return
+     */
+    public static Optional<ResourceProperty> optFromName(String name) {
+
+	try {
+	    return Optional.of(fromName(name));
+
+	} catch (IllegalArgumentException ex) {
+	}
+
+	return Optional.empty();
     }
 
     /**
