@@ -3,24 +3,19 @@
  */
 package eu.essi_lab.api.database.opensearch.datafolder.test;
 
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.w3c.dom.Node;
 
-import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
-import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchdatabaseInitTest;
@@ -28,7 +23,6 @@ import eu.essi_lab.indexes.IndexedElementsWriter;
 import eu.essi_lab.iso.datamodel.classes.BoundingPolygon;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.model.resource.Dataset;
-import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 
 /**
@@ -114,7 +108,7 @@ public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
 	//
 	//
 
-	testResources(wrapper, dataset, folder, key);
+	TestUtils.compareResources(wrapper, dataset, folder, key);
     }
 
     @Test
@@ -199,7 +193,7 @@ public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
 	//
 	//
 
-	testResources(wrapper, dataset, folder, key);
+	TestUtils.compareResources(wrapper, dataset, folder, key);
     }
 
     @Test
@@ -274,7 +268,7 @@ public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
 	//
 	//
 
-	testResources(wrapper, dataset, folder, key);
+	TestUtils.compareResources(wrapper, dataset, folder, key);
     }
 
     @Test
@@ -369,7 +363,7 @@ public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
 	//
 	//
 
-	testResources(wrapper, dataset, folder, key);
+	TestUtils.compareResources(wrapper, dataset, folder, key);
     }
 
     @Test
@@ -444,7 +438,7 @@ public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
 	//
 	//
 
-	testResources(wrapper, dataset, folder, key);
+	TestUtils.compareResources(wrapper, dataset, folder, key);
     }
 
     @Test
@@ -541,7 +535,7 @@ public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
 	//
 	//
 
-	testResources(wrapper, dataset, folder, key);
+	TestUtils.compareResources(wrapper, dataset, folder, key);
     }
 
     @Test
@@ -638,31 +632,6 @@ public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
 	//
 	//
 
-	testResources(wrapper, dataset, folder, key);
-    }
-
-    /**
-     * @param wrapper
-     * @param dataset
-     * @param folder
-     * @param key
-     * @throws Exception
-     */
-    private void testResources(SourceWrapper wrapper, GSResource dataset, DatabaseFolder folder, String key) throws Exception {
-
-	Optional<String> optResource = wrapper.getGSResource();
-	Assert.assertTrue(optResource.isPresent());
-
-	String base64resource = optResource.get();
-	InputStream decoded = IndexData.decode(base64resource);
-
-	GSResource gsResource1 = GSResource.create(decoded);
-
-	Node binary = folder.get(key);
-
-	GSResource gsResource2 = GSResource.create(binary);
-
-	OpenSearchDataFolder_gsResourceSourceTest.compareProperties(wrapper, dataset, gsResource1);
-	OpenSearchDataFolder_gsResourceSourceTest.compareProperties(wrapper, dataset, gsResource2);
+	TestUtils.compareResources(wrapper, dataset, folder, key);
     }
 }

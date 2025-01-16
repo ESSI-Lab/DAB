@@ -3,35 +3,32 @@
  */
 package eu.essi_lab.api.database.opensearch.datafolder.test;
 
-import java.io.InputStream;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.w3c.dom.Node;
 
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
-import eu.essi_lab.api.database.opensearch.index.IndexData;
-import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
-import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
-import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchdatabaseInitTest;
 import eu.essi_lab.indexes.IndexedElementsWriter;
+import eu.essi_lab.iso.datamodel.classes.BoundingPolygon;
 import eu.essi_lab.model.resource.Dataset;
-import eu.essi_lab.model.resource.GSResource;
+import eu.essi_lab.model.resource.MetadataElement;
 
 /**
- * @author Fabrizio
+ * @author Fabrizio  
  */
-public class OpenSearchDataFolder_gsResourceSourceTest extends OpenSearchTest {
+public class OpenSearchDataFolder_GSResourceTempExtentTest {
 
     @Test
-    public void sourceTest() throws Exception {
+    public void lineStringFromBoundingPolygonTest() throws Exception {
 
 	OpenSearchDatabase database = OpenSearchdatabaseInitTest.create();
 
@@ -49,6 +46,22 @@ public class OpenSearchDataFolder_gsResourceSourceTest extends OpenSearchTest {
 	dataset.setPrivateId(privateId);
 	dataset.setOriginalId(UUID.randomUUID().toString());
 	dataset.setPublicId(UUID.randomUUID().toString());
+
+	BoundingPolygon boundingPolygon = new BoundingPolygon();
+
+	List<List<Double>> list = new ArrayList<>();
+
+	List<Double> list1 = Arrays.asList(10.0, 20.0);
+	List<Double> list2 = Arrays.asList(15.0, 25.0);
+	List<Double> list3 = Arrays.asList(25.0, 35.0);
+
+	list.add(list1);
+	list.add(list2);
+	list.add(list3);
+
+	boundingPolygon.setMultiPoints(list);
+
+	dataset.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().addBoundingPolygon(boundingPolygon);
 
 	//
 	//
@@ -68,27 +81,25 @@ public class OpenSearchDataFolder_gsResourceSourceTest extends OpenSearchTest {
 		FolderEntry.of(dataset.asDocument(true)), //
 		EntryType.GS_RESOURCE);
 
+	//
+	//
+	//
+
 	SourceWrapper wrapper = folder.getSourceWrapper(key);
 
+	System.out.println(wrapper.toStringHideBinary());
+
 	//
-	// base properties
+	//
 	//
 
-	Assert.assertEquals(DataFolderMapping.DATA_FOLDER_INDEX, wrapper.getIndex());
+	List<String> bboxes = wrapper.getGSResourceProperties(MetadataElement.BOUNDING_BOX);
 
-	Assert.assertEquals(database.getIdentifier(), wrapper.getDatabaseId());
+	Assert.assertEquals(Integer.valueOf(1), Integer.valueOf(bboxes.size()));
 
-	Assert.assertEquals(folderName, wrapper.getFolderName());
+	String shape = bboxes.get(0);
 
-	Assert.assertEquals(OpenSearchFolder.getFolderId(folder), wrapper.getFolderId());
-
-	Assert.assertEquals(OpenSearchFolder.getEntryId(folder, key), wrapper.getEntryId());
-
-	Assert.assertEquals(key, wrapper.getEntryName());
-
-	Assert.assertEquals(DataFolderMapping.GS_RESOURCE, wrapper.getBinaryProperty());
-
-	Assert.assertEquals(DataType.DOC, wrapper.getDataType());
+	Assert.assertEquals("LINESTRING (10.0 20.0, 15.0 25.0, 25.0 35.0)", shape);
 
 	//
 	//
@@ -96,5 +107,4 @@ public class OpenSearchDataFolder_gsResourceSourceTest extends OpenSearchTest {
 
 	TestUtils.compareResources(wrapper, dataset, folder, key);
     }
-
 }

@@ -76,6 +76,7 @@ import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.XMLFactories;
 import eu.essi_lab.messages.bond.View;
+import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.index.jaxb.BoundingBox;
 import eu.essi_lab.model.index.jaxb.IndexesMetadata;
@@ -169,7 +170,6 @@ public class IndexData {
      * @throws IOException
      * @throws TransformerException
      */
-    @SuppressWarnings("incomplete-switch")
     public static IndexData of(//
 	    DatabaseFolder folder, //
 	    String key, //
@@ -225,12 +225,12 @@ public class IndexData {
 	    // shape
 	    //
 
+	    Optional<Shape> shape = Optional.empty();
+
 	    List<BoundingPolygon> boundingPolygons = gsResource.getHarmonizedMetadata().//
 		    getCoreMetadata().//
 		    getDataIdentification().//
 		    getBoundingPolygonsList();
-
-	    Optional<Shape> shape = Optional.empty();
 
 	    if (!boundingPolygons.isEmpty()) {
 
@@ -287,23 +287,7 @@ public class IndexData {
 	    //
 	    MetadataElement.listValues().forEach(el -> {
 
-		switch (el.getContentType()) {
-		case BOOLEAN:
-		    put(metadata, indexData, el, Boolean.class);
-		    break;
-		case DOUBLE:
-		    put(metadata, indexData, el, Double.class);
-		    break;
-		case INTEGER:
-		    put(metadata, indexData, el, Integer.class);
-		    break;
-		case LONG:
-		    put(metadata, indexData, el, Long.class);
-		    break;
-		case TEXTUAL:
-		    put(metadata, indexData, el, String.class);
-		    break;
-		}
+		put(el, metadata, indexData);
 	    });
 
 	    //
@@ -311,23 +295,7 @@ public class IndexData {
 	    //
 	    ResourceProperty.listValues().forEach(rp -> {
 
-		switch (rp.getContentType()) {
-		case BOOLEAN:
-		    put(metadata, indexData, rp, Boolean.class);
-		    break;
-		case DOUBLE:
-		    put(metadata, indexData, rp, Double.class);
-		    break;
-		case INTEGER:
-		    put(metadata, indexData, rp, Integer.class);
-		    break;
-		case LONG:
-		    put(metadata, indexData, rp, Long.class);
-		    break;
-		case TEXTUAL:
-		    put(metadata, indexData, rp, String.class);
-		    break;
-		}
+		put(rp, metadata, indexData);
 	    });
 
 	    indexData.mapping = DataFolderMapping.get();
@@ -697,7 +665,7 @@ public class IndexData {
      * @param value
      * @return
      */
-    private static Optional<Long> parseDateTime(String value) {
+    public static Optional<Long> parseDateTime(String value) {
 
 	if (value.equals("now")) {
 	    return Optional.of(new Date().getTime());
@@ -718,6 +686,38 @@ public class IndexData {
     }
 
     /**
+     * @param quer
+     * @param metadata
+     * @param indexData
+     */
+    @SuppressWarnings("incomplete-switch")
+    private static void put(Queryable quer, IndexesMetadata metadata, IndexData indexData) {
+
+	switch (quer.getContentType()) {
+	case BOOLEAN:
+	    put(metadata, indexData, quer.getName(), Boolean.class);
+	    break;
+	case DOUBLE:
+	    put(metadata, indexData, quer.getName(), Double.class);
+	    break;
+	case INTEGER:
+	    put(metadata, indexData, quer.getName(), Integer.class);
+	    break;
+	case LONG:
+	    put(metadata, indexData, quer.getName(), Long.class);
+	    break;
+	case TEXTUAL:
+	    put(metadata, indexData, quer.getName(), String.class);
+	    break;
+	case ISO8601_DATE:
+	case ISO8601_DATE_TIME:
+	    put(metadata, indexData, quer.getName(), DateTime.class);
+	    break;
+	}
+
+    }
+
+    /**
      * @param metadata
      * @param indexData
      * @param elName
@@ -728,6 +728,11 @@ public class IndexData {
 	JSONArray array = new JSONArray();
 
 	metadata.read(elName).forEach(v -> { //
+
+	    if (valueClass.equals(String.class)) {
+
+		array.put(String.valueOf(v));
+	    }
 
 	    if (valueClass.equals(Integer.class)) {
 
@@ -741,7 +746,20 @@ public class IndexData {
 
 	    if (valueClass.equals(Boolean.class)) {
 
-		array.put(Boolean.valueOf(v));
+		boolean val = Boolean.valueOf(v);
+
+		//
+		// particular case to support the Null elements that in the
+		// GSResource indexed elements, they are present to indicate that the related
+		// property is missing, but they have no value (e.g: tmpExtentEnd_Null indicates that
+		// there is no temp extend end)
+		//
+		if (v.isEmpty()) {
+
+		    val = true;
+		}
+
+		array.put(val);
 	    }
 
 	    if (valueClass.equals(DateTime.class)) {
