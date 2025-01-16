@@ -1022,6 +1022,7 @@ public class BondFactory {
     public static ResourcePropertyBond createResourcePropertyBond(BondOperator operator, ResourceProperty property, String value) {
 
 	if (operator != BondOperator.EQUAL && //
+		operator != BondOperator.LIKE && //
 		operator != BondOperator.NOT_EQUAL && //
 		operator != BondOperator.GREATER && //
 		operator != BondOperator.GREATER_OR_EQUAL && //

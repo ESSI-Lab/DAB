@@ -1,4 +1,4 @@
-/**
+ /**
  * @module UI
  **/
 import { GIAPI } from '../core/GIAPI.js';
@@ -178,6 +178,7 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 	var showRectangles = true;
 	var rectanglesArray = [];
 	var _inputControl;
+	var wait = false;
 
 	if (!options) {
 		options = {};
@@ -390,9 +391,14 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 				return;
 			}
 			const data = wmsLayer.getData(evt.pixel);
-			const hit = data && data[3] == 255; // transparent pixels have zero for data[3]
+			const hit = data && data[3] > 0; // transparent pixels have zero for data[3]
+			//const hit = data && data[3] == 255; // transparent pixels have zero for data[3]
 			console.log(data)
-			widget.map.getTargetElement().style.cursor = hit ? 'pointer' : '';
+			
+			if (!wait){
+				widget.map.getTargetElement().style.cursor = hit ? 'pointer' : '';
+			}
+			
 		});
 
 		//
@@ -421,8 +427,24 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 				
 				return false;
 			}
+			
+			const data = wmsLayer.getData(evt.pixel);
+			const hit = data && data[3] == 255; // transparent pixels have zero for data[3]
+			if (!hit){
+				  const clickedCoordinates = evt.coordinate;
+
+				  const view = widget.map.getView();
+				  view.setCenter(clickedCoordinates);
+				  const currentZoom = view.getZoom();
+				  if (currentZoom !== undefined) {
+				    view.setZoom(currentZoom + 1); // Increase zoom by 1
+				  }
+				  return true;
+			}
+			
 
 			widget.map.getTargetElement().style.cursor = 'wait';
+			wait = true;
 
 			document.getElementById('stationInfo').innerHTML = '';
 
@@ -442,6 +464,7 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 					.then((html) => {
 
 						widget.map.getTargetElement().style.cursor = 'pointer';
+						wait= false;
 
 						document.getElementById(options.stationInfoId).innerHTML = html;
 						overlay.setPosition(coordinate);
@@ -675,13 +698,17 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 		popup.setPositioning('top-right');
 	};
 
+
+
 	var createLayersControl = function() {
+	
 
 		var layerSwitcher = new ol.control.LayerSwitcher({
 			tipLabel: 'Show layers control', //
 			collapseTipLabel: 'Hide layers control',//
 			activationMode: 'click', //
-			startActive: true, //
+			
+			startActive: options.startActive, //
 			groupSelectStyle: 'children', // Can be 'children' [default], 'group' or 'none',
 
 			clusterWMS: options.clusterWMS,
@@ -694,6 +721,8 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 			dabEndpoint: options.dabNode.endpoint(),
 			servicePath: options.dabNode.servicePath()
 		});
+		
+		
 
 		widget.map.addControl(layerSwitcher);
 	};

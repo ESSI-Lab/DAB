@@ -6,5 +6,9 @@
     "zoom": "6",
     "minZoom": "6",
     "maxZoom": "10",
-    "token": "his_central-568a4888-d6bd-4be3-b7a6-d9887997bb0f"
+    "token": "his_central-568a4888-d6bd-4be3-b7a6-d9887997bb0f",
+    "resultsVisibility": "true",
+    "bboxSelectorVisibility": "true",
+    "layersSelectorVisibility": "true",
+    "layersSelectorButtonVisibility": "true"
 }

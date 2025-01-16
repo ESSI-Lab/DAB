@@ -24,7 +24,10 @@
 			}		 
 			#controlToggleIcon{
 				display: none;
-			}		
+			}	
+			#disclaimer-div{
+			display:none
+			}	
 			.layers-control-table-div {
 			    opacity: 1 !important;
 			    margin-left: -198px !important;
