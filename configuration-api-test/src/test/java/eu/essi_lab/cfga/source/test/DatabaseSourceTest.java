@@ -19,56 +19,41 @@ import eu.essi_lab.model.StorageInfo;
 /**
  * @author Fabrizio
  */
-public class DatabaseSourceTest extends ConfigurationSourceTest {
+public abstract class DatabaseSourceTest extends ConfigurationSourceTest {
 
-    private static final StorageInfo URI = new StorageInfo(System.getProperty("dbUrl"));
+    protected StorageInfo storageInfo;
 
-    static {
+    /**
+     * @param info
+     */
+    public DatabaseSourceTest(StorageInfo info) {
 
-	URI.setIdentifier("configtest");
-	URI.setPassword(System.getProperty("dbPassword"));
-	URI.setUser(System.getProperty("dbUser"));
-	URI.setName("TEST-DB");
-    }
-
-    @Before
-    public void init() throws Exception {
-
-	StorageInfo clone = URI.clone();
-	clone.setIdentifier("ROOT");
-
-	Database database = DatabaseFactory.get(clone);
-
-	if (database instanceof MarkLogicDatabase) {
-
-	    MarkLogicDatabase db = (MarkLogicDatabase) database;
-	    db.removeAllFolders();
-	}
+	this.storageInfo = info;
     }
 
     @Test
     public void locationTest() throws Exception {
 
-	DatabaseSource source = new DatabaseSource(URI, "test-config");
+	DatabaseSource source = new DatabaseSource(storageInfo, "test-config");
 	Assert.assertEquals("configtest\\test-config.json", source.getLocation());
     }
 
     @Test
     public void listTest() throws Exception {
 
-	super.listTest(new DatabaseSource(URI, "test-config"));
+	super.listTest(new DatabaseSource(storageInfo, "test-config"));
     }
 
     @Test
     public void lockTest() throws Exception {
 
-	super.lockTest(new DatabaseSource(URI, "test-config"));
+	super.lockTest(new DatabaseSource(storageInfo, "test-config"));
     }
 
     @Test
     public void backupTest() throws Exception {
 
-	DatabaseSource source = new DatabaseSource(URI, "test-config");
+	DatabaseSource source = new DatabaseSource(storageInfo, "test-config");
 
 	Setting setting1 = new Setting();
 	Setting setting2 = new Setting();
