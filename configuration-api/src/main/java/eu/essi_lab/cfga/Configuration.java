@@ -81,6 +81,20 @@ public class Configuration {
     }
 
     /**
+     * Creates an in-memory only configuration with no related source.<br>
+     * 
+     * @param list
+     * @throws Exception
+     */
+    public Configuration(JSONArray array) throws Exception {
+
+	this.list = new ArrayList<Setting>();
+	array.forEach(obj -> this.list.add(new Setting((JSONObject) obj)));
+	
+ 	this.listenerList = new ArrayList<>();
+    }
+
+    /**
      * @param configName
      * @throws Exception
      */
