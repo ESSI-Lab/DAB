@@ -6,7 +6,6 @@ package eu.essi_lab.api.database.opensearch;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.http.HttpHost;
@@ -71,43 +70,67 @@ public class OpenSearchDatabase extends Database {
      */
     public enum OpenSearchServiceType {
 
-	OPEN_SEARCH_MANAGED("es"),
-
-	OPEN_SEARCH_SERVERLESS("aoss");
-
-	private String type;
+	/**
+	 * es -> internally used to create the AwsSdk2Transport
+	 * osm -> (OpenSearch Managed) protocol used as database type in the {@link StorageInfo} and
+	 * in the GSService VM argument "configuration.url". E.g: osm://localhost/testDb/prodConfig
+	 */
+	OPEN_SEARCH_MANAGED("es", "osm"),
 
 	/**
-	 * 
+	 * es -> internally used to create the AwsSdk2Transport
+	 * osm -> (OpenSearch Serverless) protocol used as database type in the {@link StorageInfo} and
+	 * in the GSService VM argument "configuration.url". E.g: osm://localhost/testDb/preprodConfig
 	 */
-	private OpenSearchServiceType(String type) {
+	OPEN_SEARCH_SERVERLESS("aoss", "oss");
 
-	    this.type = type;
+	private String protocol;
+	private String serviceName;
+
+	/**
+	 * @param serviceName
+	 * @param type
+	 */
+	private OpenSearchServiceType(String serviceName, String type) {
+
+	    this.serviceName = serviceName;
+	    this.protocol = type;
 	}
 
 	/**
 	 * @return the type
 	 */
-	public String getType() {
+	public String getProtocol() {
 
-	    return type;
+	    return protocol;
 	}
 
 	/**
-	 * @param type
+	 * @return the type
+	 */
+	String getServiceName() {
+
+	    return serviceName;
+	}
+
+	/**
+	 * @param protocol
 	 * @return
 	 */
-	public static OpenSearchServiceType decode(String type) {
+	public static OpenSearchServiceType decode(String protocol) {
 
-	    return type.equals(OPEN_SEARCH_MANAGED.getType()) ? OPEN_SEARCH_MANAGED : OPEN_SEARCH_SERVERLESS;
+	    return protocol.equals(OPEN_SEARCH_MANAGED.getProtocol()) ? OPEN_SEARCH_MANAGED : OPEN_SEARCH_SERVERLESS;
 	}
 
 	/**
-	 * S@return
+	 * @return
 	 */
-	public static List<String> types() {
+	public static List<String> protocols() {
 
-	    return Arrays.asList(OpenSearchServiceType.values()).stream().map(t -> t.getType()).collect(Collectors.toList());
+	    return Arrays.asList(OpenSearchServiceType.values()).//
+		    stream().//
+		    map(p -> p.getProtocol()).//
+		    collect(Collectors.toList());
 	}
     }
 
@@ -126,7 +149,8 @@ public class OpenSearchDatabase extends Database {
 	    System.setProperty("aws.accessKeyId", storageInfo.getUser());
 	    System.setProperty("aws.secretAccessKey", storageInfo.getPassword());
 
-	    identifier = storageInfo.getIdentifier() == null ? UUID.randomUUID().toString() : storageInfo.getIdentifier();
+	    // the identifier is same as name
+	    identifier = storageInfo.getName();
 
 	    AwsSdk2TransportOptions awsSdk2TransportOptions = AwsSdk2TransportOptions.builder().//
 
@@ -134,7 +158,7 @@ public class OpenSearchDatabase extends Database {
 
 	    httpClient = ApacheHttpClient.builder().build();
 
-	    String serviceName = OpenSearchServiceType.decode(storageInfo.getType().get()).getType();
+	    String serviceName = OpenSearchServiceType.decode(storageInfo.getType().get()).getServiceName();
 
 	    HttpHost httpHost = HttpHost.create(storageInfo.getUri());
 
@@ -234,6 +258,11 @@ public class OpenSearchDatabase extends Database {
     @Override
     public DatabaseFolder getFolder(String folderName) throws GSException {
 
+	if (existsFolder(folderName)) {
+
+	    return new OpenSearchFolder(this, folderName);
+	}
+
 	return null;
     }
 
@@ -303,7 +332,7 @@ public class OpenSearchDatabase extends Database {
     @Override
     public boolean supports(StorageInfo dbInfo) {
 
-	return dbInfo.getType().isPresent() && OpenSearchServiceType.types().contains(dbInfo.getType().get());
+	return dbInfo.getType().isPresent() && OpenSearchServiceType.protocols().contains(dbInfo.getType().get());
     }
 
     @Override

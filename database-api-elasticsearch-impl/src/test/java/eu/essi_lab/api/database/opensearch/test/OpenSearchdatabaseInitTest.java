@@ -32,8 +32,9 @@ public class OpenSearchdatabaseInitTest {
     public static StorageInfo createStorageInfo() {
 
 	StorageInfo storageInfo = new StorageInfo();
-	storageInfo.setIdentifier("testDb");
-	storageInfo.setType(OpenSearchServiceType.OPEN_SEARCH_MANAGED.getType());
+	// the identifier is set same as name
+	storageInfo.setName("testDb");
+	storageInfo.setType(OpenSearchServiceType.OPEN_SEARCH_MANAGED.getProtocol());
 	storageInfo.setUser("admin");
 	storageInfo.setPassword("admin");
 	storageInfo.setUri("http://localhost:9200");
