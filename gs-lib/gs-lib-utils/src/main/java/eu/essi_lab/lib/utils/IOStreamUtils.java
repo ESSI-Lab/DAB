@@ -25,6 +25,7 @@ package eu.essi_lab.lib.utils;
  */
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -78,11 +79,10 @@ public class IOStreamUtils {
      * @throws java.io.IOException
      */
     public static byte[] getBytes(InputStream input) throws IOException {
-
-	byte[] targetArray = new byte[input.available()];
-
-	input.read(targetArray);
-	return targetArray;
+	ByteArrayOutputStream result = new ByteArrayOutputStream();
+	copy(input, result);
+	result.close();
+	return result.toByteArray();
     }
 
     /**
