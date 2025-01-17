@@ -122,7 +122,9 @@ GIAPI.OL_Map = function(options) {
 	//
 	//
 
+
 	var controls = [ //
+		// Add the zoom slider
 		new ol.control.Attribution(),//
 		new ol.control.MousePosition({//
 			//undefinedHTML : 'outside',
@@ -136,6 +138,11 @@ GIAPI.OL_Map = function(options) {
 		new ol.control.Rotate({//
 			autoHide: true
 		})];
+
+
+	if (options.zoomSlider) {
+		controls.push(new ol.control.ZoomSlider());
+	}
 
 	if (options.fullscreenControl) {
 		controls.push(new ol.control.FullScreen());
@@ -164,68 +171,79 @@ GIAPI.OL_Map = function(options) {
 			//minZoom: options.minZoom,
 			//maxZoom: options.maxZoom,
 			zoom: options.zoom
-			
+
 		})
 	});
-	
+
 	//
 	// base maps group
 	//
+
+
+
+
+	var satelliteLayer = new ol.layer.Tile({
+
+		title: 'Satellite',
+		type: 'base',
+		visible: false,
+
+		source: new ol.source.XYZ({
+			attributions: attributions,
+			url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+		})
+	});
+
+
+	var osmLayer = new ol.layer.Tile({
+		title: 'OpenStreetMap',
+		type: 'base',
+		visible: true,
+		source: new ol.source.OSM(),
+		tileSize: 512,
+	});
+
+	var unLayer = new ol.layer.Tile({
+
+		title: 'United Nations',
+		type: 'base',
+		visible: false,
+
+		source: new ol.source.XYZ({
+			attributions: attributions,
+			url: 'https://geoservices.un.org/arcgis/rest/services/ClearMap_WebTopo/MapServer/tile/{z}/{y}/{x}',
+		})
+	});
+
+
+
+	var layers = [
+
+		satelliteLayer,
+
+		osmLayer,
+
+		unLayer
+
+	];
 
 	var baseMapsGroup = new ol.layer.Group({
 
 		'title': 'Base maps',
 
-		layers: [
-
-			//			 new ol.layer.Tile({
-			//	         	  	title : 'Satellite',
-			//	        	  	type : 'base',
-			//	            	visible : false,
-			//					tileSize: 512,	
-			//	          		source: new ol.source.XYZ({
-			//	          			attributions: attributions,	
-			//	    		    	url: 'https://api.maptiler.com/tiles/satellite/{z}/{x}/{y}.jpg?key=SxEF6iVAIInskgqkJKps'
-			//	    		    })
-			//	    		 })			 
-			//			 
-			//			 ,new ol.layer.Tile({
-			//	         	  	title : 'Streets',
-			//	        	  	type : 'base',
-			//	            	visible : false,
-			//	          	    
-			//					source: new ol.source.TileJSON({
-			//	            		// attributions: attributions,	
-			//	 					url: 'https://maps.gnosis.earth/ogcapi/collections/NaturalEarth:raster:HYP_HR_SR_OB_DR/map/tiles/WebMercatorQuad?f=tilejson',
-			//		 				tileSize: 512,
-			//		 				crossOrigin: 'anonymous'      		    
-			//	 	     	})
-			//	 		 }),
-
-			new ol.layer.Tile({
-
-				title: 'Satellite',
-				type: 'base',
-				visible: false,
-
-				source: new ol.source.XYZ({
-					attributions: attributions,
-					url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-					//maxZoom: 19
-				})
-			}),
-
-			new ol.layer.Tile({
-				title: 'OSM',
-				type: 'base',
-				visible: true,
-				source: new ol.source.OSM(),
-				tileSize: 512,
-				// wrapX : false
-			})
-
-		]
+		layers: layers
 	});
+
+	if (options.defaultLayer !== undefined) {
+		layers.forEach((layer) => {
+			layer.setVisible(false);
+			var title = layer.get('title');
+			if (title===options.defaultLayer){
+				layer.setVisible(true);
+			}
+		});
+
+	}
 
 	//
 	// overlay group

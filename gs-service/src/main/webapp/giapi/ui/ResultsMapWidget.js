@@ -393,7 +393,7 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 			const data = wmsLayer.getData(evt.pixel);
 			const hit = data && data[3] > 0; // transparent pixels have zero for data[3]
 			//const hit = data && data[3] == 255; // transparent pixels have zero for data[3]
-			console.log(data)
+			
 			
 			if (!wait){
 				widget.map.getTargetElement().style.cursor = hit ? 'pointer' : '';

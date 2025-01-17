@@ -32,6 +32,11 @@
 			    opacity: 1 !important;
 			    margin-left: -198px !important;
 			}
+			.ol-zoomslider {
+			  right: 10px !important; /* Position it 10px from the right edge */
+			  left: auto !important;  /* Remove the default left positioning */
+			top: 100px !important;
+			}
 		
 			/* -------------------------------- */
 			/* header                           */

@@ -4,13 +4,11 @@ var view = '';
 
 var token = '';
 
-var disclaimer = '';
 
 export function initializePortal(config) {
 	view = config.view;
 	token = config.token;
 	document.title = config.title;
-	disclaimer = config.disclaimer;
 
 
 	var centerLat = config.centerLat;
@@ -171,13 +169,13 @@ export function initializePortal(config) {
 
 		var showLayersControl = true;
 
-		if (config.layersSelectorButtonVisibility && config.layersSelectorButtonVisibility === "false") {
+		if (config.layersSelectorButtonVisibility !== undefined && !config.layersSelectorButtonVisibility) {
 			showLayersControl = false;
 		}
 
 		var startActive = true;
 
-		if (config.layersSelectorVisibility && config.layersSelectorVisibility === "false") {
+		if (config.layersSelectorVisibility !== undefined && !config.layersSelectorVisibility ) {
 			startActive = false;
 		}
 
@@ -238,6 +236,8 @@ export function initializePortal(config) {
 			'layersControlWidth': 180,
 			'layersControlHeight': 200,
 			'layersControlOpacity': 0.9,
+			'zoomSlider': config.zoomSlider,
+			'defaultLayer': config.defaultLayer
 		});
 
 
@@ -352,17 +352,16 @@ export function initializePortal(config) {
 		jQuery('#where-div').append(document.getElementById("mapControlDiv"));
 
 
-		jQuery('#disclaimer-div').append(disclaimer);
+		jQuery('#disclaimer-div').append(config.disclaimer);
 
-
-
-		if (disclaimer && disclaimer.trim()) {
+		if (config.disclaimer && config.disclaimer.trim()) {
 			var agreed = false;
 			$(document).ready(function() {
 				$("#disclaimer-div").dialog({
 					resizable: false,
 					height: "auto",
 					width: 800,
+					title: config.disclaimerTitle,
 					modal: true,
 					buttons: [
 						{
@@ -564,6 +563,10 @@ export function initializePortal(config) {
 
 		// set the termFrequency option
 		options.termFrequency = 'source,keyword,format,protocol';
+		
+		if (config.filters!==undefined){
+			options.termFrequency=config.filters;
+		}
 
 		try {
 			GIAPI.search.dab.discover(GIAPI.search.onDiscoverResponse, constraints, options);
@@ -603,11 +606,11 @@ export function initializePortal(config) {
 		}
 	};
 
-	if (config.resultsVisibility && config.resultsVisibility === "false") {
+	if (config.resultsVisibility !== undefined && !config.resultsVisibility) {
 		$('#hideResultsButton').click();
 	}
 
-	if (config.bboxSelectorVisibility && config.bboxSelectorVisibility === "false") {
+	if (config.bboxSelectorVisibility !== undefined && !config.bboxSelectorVisibility) {
 		$('#hideMapInputControl').click();
 	}
 
