@@ -354,7 +354,7 @@ public class DatabaseSource implements ConfigurationSource {
 		replace(":", "_").//
 		replace(".", "");
 
-	InputStream clone = new ClonableInputStream(getBinaryConfig()).clone();
+	InputStream clone = getBinaryConfig();
 
 	String backupName = configName + "_" + date;
 
