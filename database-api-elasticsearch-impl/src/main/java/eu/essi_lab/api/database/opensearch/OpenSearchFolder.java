@@ -100,14 +100,6 @@ public class OpenSearchFolder implements DatabaseFolder {
 
 	IndexData indexData = IndexData.of(this, key, entry, type);
 
-	// Optional<PutMappingRequest> mappingRequest = indexData.getMapping().getRequest(key);
-	//
-	// if (mappingRequest.isPresent()) {
-	//
-	// PutMappingResponse putMappingResponse = client.indices().putMapping(mappingRequest.get());
-	//
-	// }
-
 	boolean stored = storeWithGenericClient(client, indexData);
 
 	synch();
