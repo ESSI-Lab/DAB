@@ -145,53 +145,59 @@ public class Shape {
 
 	List<List<Double>> multiPoints = polygon.getMultiPoints();
 
-	List<Double> first = multiPoints.get(0);
+	if (!multiPoints.isEmpty()) {
 
-	List<Double> last = multiPoints.get(multiPoints.size() - 1);
+	    List<Double> first = multiPoints.get(0);
 
-	String closing = "";
+	    List<Double> last = multiPoints.get(multiPoints.size() - 1);
 
-	if (first.equals(last)) {
+	    String closing = "";
 
-	    shape = "POLYGON ((";
-	    closing = "))";
+	    if (first.equals(last)) {
 
+		shape = "POLYGON ((";
+		closing = "))";
+
+	    } else {
+
+		shape = "LINESTRING (";
+		closing = ")";
+	    }
+
+	    for (int i = 0; i < multiPoints.size(); i++) {
+
+		List<Double> list = multiPoints.get(i);
+
+		String collect = list.stream().//
+			map(v -> String.valueOf(v)).//
+			collect(Collectors.joining(" "));
+
+		shape += collect;
+
+		if (i < multiPoints.size() - 1) {
+
+		    shape += ", ";
+		}
+	    }
+
+	    shape += closing;
+
+	    try {
+
+		Geometry geometry = READER.read(shape);
+
+		double area = geometry.getArea();
+
+		objectBox.put(SHAPE, shape);
+		objectBox.put(AREA, area);
+
+	    } catch (ParseException e) {
+
+		GSLoggerFactory.getLogger(getClass()).error(e);
+	    }
 	} else {
 
-	    shape = "LINESTRING (";
-	    closing = ")";
-	}
-
-	for (int i = 0; i < multiPoints.size(); i++) {
-
-	    List<Double> list = multiPoints.get(i);
-
-	    String collect = list.stream().//
-		    map(v -> String.valueOf(v)).//
-		    collect(Collectors.joining(" "));
-
-	    shape += collect;
-
-	    if (i < multiPoints.size() - 1) {
-
-		shape += ", ";
-	    }
-	}
-
-	shape += closing;
-
-	try {
-
-	    Geometry geometry = READER.read(shape);
-
-	    double area = geometry.getArea();
-
-	    objectBox.put(SHAPE, shape);
-	    objectBox.put(AREA, area);
-
-	} catch (ParseException e) {
-
-	    GSLoggerFactory.getLogger(getClass()).error(e);
+	    empty = true;
 	}
     }
 

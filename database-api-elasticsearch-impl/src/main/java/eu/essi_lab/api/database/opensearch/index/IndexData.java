@@ -235,8 +235,9 @@ public class IndexData {
 	    if (!boundingPolygons.isEmpty()) {
 
 		shape = Shape.of(boundingPolygons.get(0));
+	    }
 
-	    } else if (metadata.readBoundingBox().isPresent()) {
+	    if (shape.isEmpty() && metadata.readBoundingBox().isPresent()) {
 
 		shape = Shape.of(metadata.readBoundingBox().get());
 	    }
@@ -667,9 +668,7 @@ public class IndexData {
      */
     public static Optional<Long> parseDateTime(String value) {
 
-	if (value.equals("now")) {
-	    return Optional.of(new Date().getTime());
-	}
+	value = value.replace("/", "-");
 
 	Optional<Date> date = ISO8601DateTimeUtils.parseISO8601ToDate(value);
 	if (date.isEmpty()) {
@@ -734,17 +733,22 @@ public class IndexData {
 		array.put(String.valueOf(v));
 	    }
 
-	    if (valueClass.equals(Integer.class)) {
+	    else if (valueClass.equals(Integer.class)) {
 
 		array.put(Integer.valueOf(v));
 	    }
 
-	    if (valueClass.equals(Double.class)) {
+	    else if (valueClass.equals(Double.class)) {
 
 		array.put(Double.valueOf(v));
 	    }
 
-	    if (valueClass.equals(Boolean.class)) {
+	    else if (valueClass.equals(Long.class)) {
+
+		array.put(Long.valueOf(v));
+	    }
+
+	    else if (valueClass.equals(Boolean.class)) {
 
 		boolean val = Boolean.valueOf(v);
 
@@ -762,7 +766,7 @@ public class IndexData {
 		array.put(val);
 	    }
 
-	    if (valueClass.equals(DateTime.class)) {
+	    else if (valueClass.equals(DateTime.class)) {
 
 		parseDateTime(v).ifPresent(dt -> array.put(dt));
 	    }
@@ -785,14 +789,4 @@ public class IndexData {
 	put(metadata, indexData, mel.getName(), valueClass);
     }
 
-    /**
-     * @param metadata
-     * @param indexData
-     * @param rp
-     * @param valueClass
-     */
-    private static void put(IndexesMetadata metadata, IndexData indexData, ResourceProperty rp, Class<?> valueClass) {
-
-	put(metadata, indexData, rp.getName(), valueClass);
-    }
 }

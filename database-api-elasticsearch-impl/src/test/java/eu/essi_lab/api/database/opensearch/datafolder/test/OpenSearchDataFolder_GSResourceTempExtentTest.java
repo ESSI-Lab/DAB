@@ -276,6 +276,86 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
     }
 
     @Test
+    public void tempExtentBeginNowWithStringValueTest() throws Exception {
+
+	OpenSearchDatabase database = OpenSearchdatabaseInitTest.create();
+
+	String folderName = OpenSearchDataFolder_writingFolderTagTest.getFolderName(database);
+
+	OpenSearchFolder folder = new OpenSearchFolder(database, folderName);
+
+	//
+	//
+	//
+
+	String privateId = UUID.randomUUID().toString();
+
+	Dataset dataset = new Dataset();
+	dataset.setPrivateId(privateId);
+	dataset.setOriginalId(UUID.randomUUID().toString());
+	dataset.setPublicId(UUID.randomUUID().toString());
+
+	TemporalExtent temporalExtent = new TemporalExtent();
+	temporalExtent.setBeginPosition("now");
+
+	dataset.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().addTemporalExtent(temporalExtent);
+
+	//
+	//
+	//
+	IndexedElementsWriter.write(dataset);
+	//
+	//
+	//
+
+	String key = privateId;
+
+	//
+	//
+	//
+
+	folder.store(key, //
+		FolderEntry.of(dataset.asDocument(true)), //
+		EntryType.GS_RESOURCE);
+
+	//
+	//
+	//
+
+	SourceWrapper wrapper = folder.getSourceWrapper(key);
+
+	System.out.println(wrapper.toStringHideBinary());
+
+	//
+	//
+	//
+
+	checkTempExtendBegin(wrapper, Optional.empty());
+
+	checkTempExtentBeginNull(wrapper, false);
+
+	checkTempExtentBeginNow(wrapper, true);
+
+	checkTempExtentBeginBeforeNow(wrapper, Optional.empty());
+
+	//
+	//
+	//
+
+	checkTempExtendEnd(wrapper, Optional.empty());
+
+	checkTempExtentEndNow(wrapper, false);
+
+	checkTempExtentEndNull(wrapper, true);
+
+	//
+	//
+	//
+
+	TestUtils.compareResources(wrapper, dataset, folder, key);
+    }
+
+    @Test
     public void tempExtentEndNowTest() throws Exception {
 
 	OpenSearchDatabase database = OpenSearchdatabaseInitTest.create();
@@ -297,6 +377,86 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 
 	TemporalExtent temporalExtent = new TemporalExtent();
 	temporalExtent.setIndeterminateEndPosition(TimeIndeterminateValueType.NOW);
+
+	dataset.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().addTemporalExtent(temporalExtent);
+
+	//
+	//
+	//
+	IndexedElementsWriter.write(dataset);
+	//
+	//
+	//
+
+	String key = privateId;
+
+	//
+	//
+	//
+
+	folder.store(key, //
+		FolderEntry.of(dataset.asDocument(true)), //
+		EntryType.GS_RESOURCE);
+
+	//
+	//
+	//
+
+	SourceWrapper wrapper = folder.getSourceWrapper(key);
+
+	System.out.println(wrapper.toStringHideBinary());
+
+	//
+	//
+	//
+
+	checkTempExtendBegin(wrapper, Optional.empty());
+
+	checkTempExtentBeginNull(wrapper, true);
+
+	checkTempExtentBeginNow(wrapper, false);
+
+	checkTempExtentBeginBeforeNow(wrapper, Optional.empty());
+
+	//
+	//
+	//
+
+	checkTempExtendEnd(wrapper, Optional.empty());
+
+	checkTempExtentEndNull(wrapper, false);
+
+	checkTempExtentEndNow(wrapper, true);
+
+	//
+	//
+	//
+
+	TestUtils.compareResources(wrapper, dataset, folder, key);
+    }
+
+    @Test
+    public void tempExtentEndNowWithStringValueTest() throws Exception {
+
+	OpenSearchDatabase database = OpenSearchdatabaseInitTest.create();
+
+	String folderName = OpenSearchDataFolder_writingFolderTagTest.getFolderName(database);
+
+	OpenSearchFolder folder = new OpenSearchFolder(database, folderName);
+
+	//
+	//
+	//
+
+	String privateId = UUID.randomUUID().toString();
+
+	Dataset dataset = new Dataset();
+	dataset.setPrivateId(privateId);
+	dataset.setOriginalId(UUID.randomUUID().toString());
+	dataset.setPublicId(UUID.randomUUID().toString());
+
+	TemporalExtent temporalExtent = new TemporalExtent();
+	temporalExtent.setEndPosition("now");
 
 	dataset.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().addTemporalExtent(temporalExtent);
 

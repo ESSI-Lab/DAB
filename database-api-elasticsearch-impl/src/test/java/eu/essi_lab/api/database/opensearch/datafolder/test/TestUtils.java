@@ -60,8 +60,9 @@ public class TestUtils {
      * @param res1
      * @param res2
      * @return
+     * @throws Exception
      */
-    private static boolean compareProperties(SourceWrapper wrapper, GSResource res1, GSResource res2) {
+    private static boolean compareProperties(SourceWrapper wrapper, GSResource res1, GSResource res2) throws Exception {
 
 	IndexesMetadata indexesMetadata1 = res1.getIndexesMetadata();
 	IndexesMetadata indexesMetadata2 = res2.getIndexesMetadata();
@@ -70,9 +71,19 @@ public class TestUtils {
 
 	equals &= indexesMetadata1.getProperties().equals(indexesMetadata2.getProperties());
 
+	if (!equals) {
+
+	    throw new Exception();
+	}
+
 	for (String prop : indexesMetadata1.getProperties()) {
 
 	    equals &= indexesMetadata1.read(prop).equals(indexesMetadata2.read(prop));
+
+	    if (!equals) {
+
+		throw new Exception();
+	    }
 
 	    if (prop.equals(IndexedElements.BOUNDING_BOX_NULL.getElementName())) {
 
@@ -93,9 +104,19 @@ public class TestUtils {
 
 		    equals &= !bboxes.isEmpty();
 
+		    if (!equals) {
+
+			throw new Exception();
+		    }
+
 		} else {
 
 		    equals &= bboxes.isEmpty();
+
+		    if (!equals) {
+
+			throw new Exception();
+		    }
 		}
 
 	    } else if (prop.equals(IndexedElements.TEMP_EXTENT_BEGIN_NULL.getElementName()) || //
@@ -120,6 +141,11 @@ public class TestUtils {
 			isPresent();
 
 		equals &= nullElementValue == present;
+
+		if (!equals) {
+
+		    throw new Exception();
+		}
 
 	    } else {
 
@@ -146,9 +172,66 @@ public class TestUtils {
 
 		    equals &= longDataTimes.equals(collect);
 
+		    if (!equals) {
+
+			throw new Exception();
+		    }
+
 		} else {
 
-		    equals &= wrapper.getGSResourceProperties(prop).equals(indexesMetadata1.read(prop));
+		    //
+		    // double values such 1.0 are converted by JSONArray by removing the 0
+		    // after the decimal separator, so we convert also the GSResource indexed field
+		    // in order to adjust the test
+		    //
+		    List<String> list = indexesMetadata1.read(prop);
+
+		    List<String> values = list.//
+			    subList(0, list.size() > 10 ? 10 : list.size()).stream().//
+			    map(v -> {
+
+				try {
+				    Double.valueOf(v);
+				    if (v.endsWith(".0")) {
+
+					return v.replace(".0", "");
+				    }
+				} catch (NumberFormatException ex) {
+
+				}
+
+				return v;
+
+			    }).//
+			    collect(Collectors.toList());
+
+		    List<String> gsResourceProperties = wrapper.getGSResourceProperties(prop);
+
+		    List<String> wrapperValues = gsResourceProperties.//
+			    subList(0, gsResourceProperties.size() > 10 ? 10 : gsResourceProperties.size()).stream().//
+			    map(v -> {
+
+				try {
+				    Double.valueOf(v);
+				    if (v.endsWith(".0")) {
+
+					return v.replace(".0", "");
+				    }
+				} catch (NumberFormatException ex) {
+
+				}
+
+				return v;
+
+			    }).//
+			    collect(Collectors.toList());
+
+		    equals &= wrapperValues.equals(values);
+
+		    if (!equals) {
+
+			throw new Exception();
+		    }
 		}
 	    }
 	}

@@ -3,19 +3,15 @@
  */
 package eu.essi_lab.api.database.opensearch.datafolder.test;
 
-import java.io.InputStream;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.w3c.dom.Node;
 
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
-import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
@@ -23,7 +19,6 @@ import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchdatabaseInitTest;
 import eu.essi_lab.indexes.IndexedElementsWriter;
 import eu.essi_lab.model.resource.Dataset;
-import eu.essi_lab.model.resource.GSResource;
 
 /**
  * @author Fabrizio
