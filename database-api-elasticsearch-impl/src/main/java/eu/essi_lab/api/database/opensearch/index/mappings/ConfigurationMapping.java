@@ -3,6 +3,8 @@
  */
 package eu.essi_lab.api.database.opensearch.index.mappings;
 
+import org.opensearch.client.opensearch._types.mapping.FieldType;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -29,7 +31,21 @@ package eu.essi_lab.api.database.opensearch.index.mappings;
  */
 public class ConfigurationMapping extends IndexMapping {
 
+    /**
+     * 
+     */
     public static final String CONFIGURATION_INDEX = "configuration-index";
+    
+    /**
+     * 
+     */
+    public static final String CONFIGURATION_NAME = "configurationName";
+
+    /**
+     * 
+     */
+    public static final String CONFIGURATION = "configuration";
+
 
     /**
      * @return
@@ -46,7 +62,8 @@ public class ConfigurationMapping extends IndexMapping {
 
 	super(CONFIGURATION_INDEX);
 
-	addProperty("name", "keyword");
-	addProperty("configuration", "binary");
+	addProperty(CONFIGURATION, FieldType.Binary.jsonValue());
+	
+	addProperty(CONFIGURATION_NAME, FieldType.Text.jsonValue());
     }
 }

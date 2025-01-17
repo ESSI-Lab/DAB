@@ -39,6 +39,7 @@ import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.mappings.AugmentersMapping;
+import eu.essi_lab.api.database.opensearch.index.mappings.ConfigurationMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.UsersMapping;
@@ -350,14 +351,30 @@ public class SourceWrapper {
 
 	return new ArrayList<String>();
     }
-    
+
     /**
-     * 
+     * - 'configuration-index' property<br>
+     * - base64 encoded
+     */
+    public Optional<String> getConfiguration() {
+
+	return Optional.ofNullable(source.optString(ConfigurationMapping.CONFIGURATION, null));
+    }
+
+    /**
+     * - 'configuration-index' property
+     */
+    public Optional<String> getConfigurationName() {
+
+	return Optional.ofNullable(source.optString(ConfigurationMapping.CONFIGURATION_NAME, null));
+    }
+
+    /**
      * @param hideBinary
      * @return
      */
     public String toStringHideBinary() {
-	
+
 	JSONObject clone = new JSONObject(source.toString());
 	clone.remove(getBinaryProperty());
 

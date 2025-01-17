@@ -328,6 +328,11 @@ public class IndexData {
 	    break;
 
 	case CONFIGURATION:
+	    
+	    indexData.object.put(BINARY_PROPERTY, ConfigurationMapping.CONFIGURATION);
+	    indexData.object.put(ConfigurationMapping.CONFIGURATION, encodedString);
+
+	    indexData.object.put(ConfigurationMapping.CONFIGURATION_NAME, key);
 
 	    indexData.mapping = ConfigurationMapping.get();
 

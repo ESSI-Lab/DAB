@@ -103,6 +103,11 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
      * 
      */
     public static final String AUGMENTERS_FOLDER = "augmenters";
+    /*
+     * 
+     */
+    public static final String CONFIGURATION_FOLDER = "configuration";
+
 
     /**
      * Initializes a data base instance with the given <code>storageInfo</code>
