@@ -74,7 +74,9 @@ public class DiscoveryBondParser implements BondParser<DiscoveryBondHandler> {
     }
 
     private void parse(Bond bond) {
-
+	if (bond==null) {
+	    return;
+	}
 	if (bond instanceof LogicalBond) {
 
 	    LogicalBond b = (LogicalBond) bond;

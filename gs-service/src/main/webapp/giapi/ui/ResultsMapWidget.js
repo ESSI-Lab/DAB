@@ -341,6 +341,12 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 
 		query += 'to=' + ((constraints.when && constraints.when.to) || '') + '&';
 
+		if (constraints.sources) {
+			var sources = constraints.sources;
+			query += 'sources=' + sources + '&';
+
+		}
+
 		if (constraints.where) {
 
 			var where = constraints.where;

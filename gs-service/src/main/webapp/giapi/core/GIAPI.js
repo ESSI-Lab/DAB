@@ -119,10 +119,9 @@ export const GIAPI = {
 
     query : function(dabEndpoint, constraints, options, parentId, targetId, sources, queryID, viewId, servicePath,openSearchPath) {
     	
-        if (!queryID) {
+    	if (!queryID) {
             queryID = GIAPI.random();
         }
-    	
     	//*******************
     	// Basic constraints
     	//*******************

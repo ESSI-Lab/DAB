@@ -102,15 +102,14 @@ public class MarkLogicExecutor extends MarkLogicReader implements DatabaseExecut
 
 	    template = template.replace("VIEW_QUERY", viewQuery);
 
-	    LogicalBond constraints = request.getConstraints();
+	    Bond constraints = request.getConstraints();
 	    DiscoveryMessage message = new DiscoveryMessage();
 	    message.setUserBond(constraints);
-	    MarkLogicDiscoveryBondHandler bondHandler = new MarkLogicDiscoveryBondHandler(message, null);
+	    MarkLogicDiscoveryBondHandler bondHandler = new MarkLogicDiscoveryBondHandler(message, getDatabase());
 	    DiscoveryBondParser bondParser = new DiscoveryBondParser(message.getUserBond().get());
 	    bondParser.parse(bondHandler);
-
 	    template = template.replace("PARAMS_QUERY", bondHandler.getParsedQuery());
-	    
+
 	    //
 	    //
 	    //

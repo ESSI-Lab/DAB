@@ -552,7 +552,7 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 		// WMS Layers selector
 		//
 
-		if (options.wmsEndpoint) {
+		if (options.wmsEndpoint!==undefined) {
 
 			var layersSelectorButton = GIAPI.ButtonsFactory.onOffSwitchButton('Select', 'Hide', {
 				'id': 'layersSelectorButton',

@@ -848,6 +848,10 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 				help = 'Name of the parameter described by the measurement value';
 				label = 'Parameter name';
 				break;
+			case 'riverName':
+				help = 'Name of the river object of measurement';
+				label = 'River name';
+				break;
 			default: throw 'Invalid constraint: ' + constraint;
 		}
 
@@ -1221,7 +1225,8 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 			'origOrgId',
 			'attributeId',
 			'attributeTitle',
-			'isValidated'
+			'isValidated',
+			'riverName'
 		];
 
 		constraints.kvp = [];

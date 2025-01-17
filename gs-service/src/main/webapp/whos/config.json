@@ -15,5 +15,10 @@
     "layersSelectorButtonVisibility": true,
     "zoomSlider":true,
     "defaultLayer": "United Nations",
-    "filters": "source,keyword"
+    "filters": "source,keyword,organisationName,attributeTitle,platformTitle,instrumentTitle",
+    "instrumentSearch": true,
+    "attributeSearch": true,
+    "platformSearch": true,
+    "riverSearch": true
+    
 }

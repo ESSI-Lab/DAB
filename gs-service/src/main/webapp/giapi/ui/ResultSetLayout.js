@@ -369,7 +369,7 @@ GIAPI.ResultSetLayout = function(id, options) {
 	};
 	
  	var updateWidgets = function(resultSet, tf){
-		
+			
 		if(options.mapWidget){
 	       	 options.mapWidget.update(resultSet);
         }

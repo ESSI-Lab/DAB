@@ -145,7 +145,7 @@ GIAPI.TermFrequency = function(dabNode, cnstr, options, onStatus, onResponse, te
                         if (!GIAPI.tfHelper.checkedItems[target]) {
                             GIAPI.tfHelper.checkedItems[target] = [];
                         }
-
+						
                         GIAPI.tfHelper.checkedItems[target].push(item);
                         found = true;
                     }

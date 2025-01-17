@@ -175,7 +175,7 @@ export function initializePortal(config) {
 
 		var startActive = true;
 
-		if (config.layersSelectorVisibility !== undefined && !config.layersSelectorVisibility ) {
+		if (config.layersSelectorVisibility !== undefined && !config.layersSelectorVisibility) {
 			startActive = false;
 		}
 
@@ -198,8 +198,8 @@ export function initializePortal(config) {
 
 			'dabNode': GIAPI.search.dab,
 
-			// 'wmsEndpoint' : 'http://localhost:9090/gs-service/services/essi/view/his-central-hapes/wms',
-			'wmsEndpoint': 'https://geoportale.regione.lazio.it/geoserver/ows',
+
+			'wmsEndpoint': config.wmsEndpoint,
 
 			'clusterWMS': true,
 			'clusterWMSToken': token,
@@ -431,16 +431,31 @@ export function initializePortal(config) {
 		// advanced search div        
 		//
 
+
+var advancedConstraints = [];
+if (config.instrumentSearch!==undefined&&config.instrumentSearch){
+	advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'instrumentTitle'));
+}
+if (config.attributeSearch!==undefined&&config.attributeSearch){
+	advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'attributeTitle'));
+}
+if (config.platformSearch!==undefined&&config.platformSearch){
+	advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'platformTitle',
+					{ id: 'platformNameConstraint', helpIconImage: 'fa-wifi' }));
+}
+if (config.validatedSearch!==undefined&&config.validatedSearch){
+	advancedConstraints.push(GIAPI.search.constWidget.booleanConstraint('get', 'isValidated'));
+}
+
+if (config.riverSearch!==undefined&&config.riverSearch){
+	advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'riverName',{helpIconImage: 'fa-water' }));
+}
+  
+
 		GIAPI.search.constWidget.advancedSearch(
 			'advConstDiv',
 			'adv-search-div',
-			[
-				GIAPI.search.constWidget.textConstraint('get', 'instrumentTitle'),
-				GIAPI.search.constWidget.textConstraint('get', 'attributeTitle'),
-				GIAPI.search.constWidget.textConstraint('get', 'platformTitle',
-					{ id: 'platformNameConstraint', helpIconImage: 'fa-wifi' }),
-				GIAPI.search.constWidget.booleanConstraint('get', 'isValidated')
-			]
+			advancedConstraints
 		);
 
 		//------------------------------------
@@ -543,7 +558,10 @@ export function initializePortal(config) {
 		var constraints = GIAPI.search.constWidget.constraints();
 		constraints.where = GIAPI.search.resultsMapWidget.where();
 
+		var sources = GIAPI.search.dab.findSources(null);
 		var tokenParam = getUrlParameter('token');
+
+		constraints.sources = sources;
 
 		if (typeof tokenParam !== 'undefined') {
 
@@ -563,9 +581,9 @@ export function initializePortal(config) {
 
 		// set the termFrequency option
 		options.termFrequency = 'source,keyword,format,protocol';
-		
-		if (config.filters!==undefined){
-			options.termFrequency=config.filters;
+
+		if (config.filters !== undefined) {
+			options.termFrequency = config.filters;
 		}
 
 		try {

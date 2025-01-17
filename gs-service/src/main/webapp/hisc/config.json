@@ -12,5 +12,11 @@
     "layersSelectorVisibility": true,
     "layersSelectorButtonVisibility": true,
     "zoomSlider":false,
-    "defaultLayer": "OpenStreetMap"
+    "defaultLayer": "OpenStreetMap",
+    "instrumentSearch": true,
+    "attributeSearch": true,
+    "platformSearch": true,
+    "validatedSearch": true,
+    "riverSearch": true,
+    "wmsEndpoint": "https://geoportale.regione.lazio.it/geoserver/ows"
 }
