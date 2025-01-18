@@ -20,4 +20,12 @@ public class FoldersMapping extends IndexMapping {
 
 	super(FOLDERS_INDEX);
     }
+
+    /**
+     * @return
+     */
+    public static final FoldersMapping get() {
+
+	return new FoldersMapping();
+    }
 }
