@@ -27,6 +27,7 @@ import java.io.IOException;
  */
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Optional;
 
 import org.json.JSONObject;
@@ -82,11 +83,8 @@ public class OpenSearchFolder implements DatabaseFolder {
     @Override
     public boolean replace(String key, FolderEntry entry, EntryType type) throws Exception {
 
-	if (exists(key)) {
-
-	    if (remove(key)) {
-		return store(key, entry, type);
-	    }
+	if (remove(key)) {
+	    return store(key, entry, type);
 	}
 
 	return false;
@@ -101,7 +99,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 
 	if (wrapper.getDataType() == DataType.BINARY) {
 
-	    throw new Exception("Resource with key " + key + " is not a document, use 'getBinary'");
+	    return null;
 	}
 
 	return IndexData.toDocument(IndexData.toStream(source));
@@ -146,6 +144,20 @@ public class OpenSearchFolder implements DatabaseFolder {
 		searchQuery, //
 		IndexData.ENTRY_NAME).//
 		toArray(new String[] {});
+    }
+
+    /**
+     * @return
+     * @throws Exception
+     */
+    public List<String> listIds() throws Exception {
+
+	Query searchQuery = wrapper.buildSearchEntriesQuery(this);
+
+	return wrapper.searchProperty(//
+		searchQuery, //
+		IndexData.ENTRY_ID);//
+
     }
 
     @Override
@@ -228,17 +240,10 @@ public class OpenSearchFolder implements DatabaseFolder {
 
 	source = wrapper.getSource(index, entryId);
 
-	if (source.isPresent()) {
-
-	    source.get().put(IndexData.INDEX, index);
-	}
-
 	if (source.isEmpty()) {
 
 	    throw new Exception("Resource with key '" + key + "' not found");
 	}
-
-	source.get().put(IndexData.ENTRY_ID, entryId);
 
 	return source.get();
     }
