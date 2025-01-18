@@ -139,12 +139,6 @@ public class OpenSearchMetaFolder_harvestingPropertiesTest extends OpenSearchTes
 
 	Assert.assertEquals(0, folder.size());
 
-	folder.forceCountBySearchQuery(true);
-
-	Assert.assertEquals(0, folder.size());
-
-	folder.forceCountBySearchQuery(false);
-
 	//
 	//
 	//
@@ -160,19 +154,7 @@ public class OpenSearchMetaFolder_harvestingPropertiesTest extends OpenSearchTes
 
 	Assert.assertEquals(1, folder.size());
 
-	folder.forceCountBySearchQuery(true);
-
-	Assert.assertEquals(1, folder.size());
-
-	folder.forceCountBySearchQuery(false);
-
 	Assert.assertTrue(folder.exists(key));
-
-	folder.forceExistsBySearchQuery(true);
-
-	Assert.assertTrue(folder.exists(key));
-
-	folder.forceExistsBySearchQuery(false);
 
 	//
 	//
@@ -197,11 +179,7 @@ public class OpenSearchMetaFolder_harvestingPropertiesTest extends OpenSearchTes
 	Assert.assertEquals(properties.get("key2"), fromStream.get("key2"));
 	Assert.assertEquals(properties.get("key3"), fromStream.get("key3"));
 
-	folder.forceGetBinaryBySearchQuery(true);
-
 	binary = folder.getBinary(key);
-
-	folder.forceGetBinaryBySearchQuery(false);
 
 	Assert.assertNotNull(binary);
 
@@ -232,11 +210,7 @@ public class OpenSearchMetaFolder_harvestingPropertiesTest extends OpenSearchTes
 	//
 	//
 
-	folder.forceRemoveByQuery(true);
-
 	Assert.assertTrue(folder.remove(key));
-
-	folder.forceExistsBySearchQuery(true);
 
 	Assert.assertFalse(folder.exists(key));
 
@@ -262,12 +236,6 @@ public class OpenSearchMetaFolder_harvestingPropertiesTest extends OpenSearchTes
 		EntryType.HARVESTING_PROPERTIES);
 
 	Assert.assertEquals(3, folder.size());
-
-	folder.forceCountBySearchQuery(true);
-
-	Assert.assertEquals(3, folder.size());
-
-	folder.forceCountBySearchQuery(false);
 
 	//
 	//
@@ -318,8 +286,6 @@ public class OpenSearchMetaFolder_harvestingPropertiesTest extends OpenSearchTes
 	HarvestingProperties fromStream2 = HarvestingProperties.fromStream(binary2);
 
 	Assert.assertEquals(fromStream2.get("key4"), properties.get("key4"));
-
-	folder.forceGetBinaryBySearchQuery(true);
 
 	binary2 = folder.getBinary(key);
 

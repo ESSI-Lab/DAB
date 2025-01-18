@@ -328,7 +328,7 @@ public class IndexData {
 	    break;
 
 	case CONFIGURATION:
-	    
+
 	    indexData.object.put(BINARY_PROPERTY, ConfigurationMapping.CONFIGURATION);
 	    indexData.object.put(ConfigurationMapping.CONFIGURATION, encodedString);
 
@@ -462,40 +462,39 @@ public class IndexData {
     /**
      * @param folder
      */
-    public static Optional<String> detectIndex(OpenSearchFolder folder) {
+    public static String detectIndex(OpenSearchFolder folder) {
 
 	String name = folder.getName();
 
 	if (name.contains(SourceStorageWorker.META_PREFIX)) {
 
-	    return Optional.of(MetaFolderMapping.META_FOLDER_INDEX);
+	    return MetaFolderMapping.META_FOLDER_INDEX;
 	}
 
-	if (name.contains(SourceStorageWorker.DATA_1_PREFIX) || name.contains(SourceStorageWorker.DATA_2_PREFIX)) {
+	else if (name.contains(SourceStorageWorker.DATA_1_PREFIX) || name.contains(SourceStorageWorker.DATA_2_PREFIX)) {
 
-	    return Optional.of(DataFolderMapping.DATA_FOLDER_INDEX);
+	    return DataFolderMapping.DATA_FOLDER_INDEX;
 	}
 
-	if (name.contains(Database.USERS_FOLDER)) {
+	else if (name.contains(Database.USERS_FOLDER)) {
 
-	    return Optional.of(UsersMapping.USERS_INDEX);
+	    return UsersMapping.USERS_INDEX;
 	}
 
-	if (name.contains(Database.VIEWS_FOLDER)) {
+	else if (name.contains(Database.VIEWS_FOLDER)) {
 
-	    return Optional.of(ViewsMapping.VIEWS_INDEX);
+	    return ViewsMapping.VIEWS_INDEX;
 	}
 
-	if (name.contains(Database.AUGMENTERS_FOLDER)) {
+	else if (name.contains(Database.AUGMENTERS_FOLDER)) {
 
-	    return Optional.of(AugmentersMapping.AUGMENTERS_INDEX);
+	    return AugmentersMapping.AUGMENTERS_INDEX;
 	}
 
-	//
-	// misc-index and configuration-index cannot be
-	// detected from the folder name
-	//
-	return Optional.empty();
+	else {// name.contains(Database.CONFIGURATION_FOLDER
+
+	    return ConfigurationMapping.CONFIGURATION_INDEX;
+	}
     }
 
     /**
