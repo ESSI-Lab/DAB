@@ -6,13 +6,9 @@ package eu.essi_lab.cfga.source.test;
 import java.util.Arrays;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
-import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.cfg.DatabaseSource;
-import eu.essi_lab.api.database.factory.DatabaseFactory;
-import eu.essi_lab.api.database.marklogic.MarkLogicDatabase;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.model.StorageInfo;
 
