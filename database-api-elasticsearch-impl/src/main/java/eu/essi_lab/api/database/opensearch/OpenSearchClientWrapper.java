@@ -11,11 +11,10 @@ import java.util.stream.Collectors;
 
 import org.json.JSONObject;
 import org.opensearch.client.opensearch.OpenSearchClient;
-import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch._types.Result;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
-import org.opensearch.client.opensearch._types.query_dsl.MatchQuery;
+import org.opensearch.client.opensearch._types.query_dsl.MatchPhraseQuery;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch.core.CountRequest;
 import org.opensearch.client.opensearch.core.DeleteByQueryRequest;
@@ -64,34 +63,16 @@ public class OpenSearchClientWrapper {
 
 	GetResponse<Object> response = client.get(getRequest, Object.class);
 
-	return Optional.ofNullable(IndexData.toJSONObject(response.source()));
-    }
+	if (response.found()) {
 
-    /**
-     * @param searchQuery
-     * @param property
-     * @return
-     * @throws OpenSearchException
-     * @throws IOException
-     */
-    public List<String> searchProperty(Query searchQuery, String property) throws OpenSearchException, IOException {
+	    JSONObject source = IndexData.toJSONObject(response.source());
 
-	SearchResponse<Object> response = client.search(builder -> {
+	    decorateSource(source, index, entryId);
 
-	    builder.query(searchQuery).// includes only the given property
-		    source(src -> src.filter(new SourceFilter.Builder().includes(property).//
-			    build()));
+	    return Optional.of(source);
+	}
 
-	    return builder;
-
-	}, Object.class);
-
-	HitsMetadata<Object> hits = response.hits();
-	List<Hit<Object>> hitsList = hits.hits();
-
-	return hitsList.stream().//
-		map(hit -> IndexData.toJSONObject(hit.source()).getString(property)).//
-		collect(Collectors.toList());
+	return Optional.empty();
     }
 
     /**
@@ -119,9 +100,44 @@ public class OpenSearchClientWrapper {
 
 	JSONObject source = IndexData.toJSONObject(hit.source());
 
-	source.put(IndexData.INDEX, hit.index());
+	decorateSource(source, hit.index(), hit.id());
 
 	return Optional.of(source);
+    }
+
+    /**
+     * @param searchQuery
+     * @param property
+     * @return
+     * @throws OpenSearchException
+     * @throws IOException
+     */
+    public List<String> searchProperty(Query searchQuery, String property) throws OpenSearchException, IOException {
+
+	SearchResponse<Object> response = client.search(builder -> {
+
+	    builder.query(searchQuery).// includes only the given property
+		    source(src -> src.filter(new SourceFilter.Builder().includes(property).//
+			    build()));
+
+	    return builder;
+
+	}, Object.class);
+
+	HitsMetadata<Object> hits = response.hits();
+	List<Hit<Object>> hitsList = hits.hits();
+
+	return hitsList.stream().//
+
+		map(hit -> {
+
+		    JSONObject source = IndexData.toJSONObject(hit.source());
+		    return decorateSource(source, hit.index(), hit.id());
+		}).//
+
+		map(source -> source.getString(property)).//
+
+		collect(Collectors.toList());
     }
 
     /**
@@ -236,18 +252,26 @@ public class OpenSearchClientWrapper {
      */
     public Query buildSearchEntriesQuery(OpenSearchFolder folder) {
 
-	MatchQuery databaseIdQuery = new MatchQuery.Builder().//
-		field(IndexData.DATABASE_ID).query(new FieldValue.Builder().//
-			stringValue(folder.getDatabase().getIdentifier()).//
-			build())
-		.//
+	// MatchQuery databaseIdQuery = new MatchQuery.Builder().//
+	// field(IndexData.DATABASE_ID).query(new FieldValue.Builder().//
+	// stringValue(folder.getDatabase().getIdentifier()).//
+	// build())
+	// .//
+	// build();
+	//
+	// MatchQuery folderNameQuery = new MatchQuery.Builder().//
+	// field(IndexData.FOLDER_NAME).query(new FieldValue.Builder().//
+	// stringValue(folder.getName()).//
+	// build())
+	// .//
+	// build();
+
+	MatchPhraseQuery databaseIdQuery = new MatchPhraseQuery.Builder().//
+		field(IndexData.DATABASE_ID).query(folder.getDatabase().getIdentifier()).//
 		build();
 
-	MatchQuery folderNameQuery = new MatchQuery.Builder().//
-		field(IndexData.FOLDER_NAME).query(new FieldValue.Builder().//
-			stringValue(folder.getName()).//
-			build())
-		.//
+	MatchPhraseQuery folderNameQuery = new MatchPhraseQuery.Builder().//
+		field(IndexData.FOLDER_NAME).query(folder.getName()).//
 		build();
 
 	List<Query> queryList = Arrays.asList(//
@@ -268,25 +292,37 @@ public class OpenSearchClientWrapper {
      */
     public Query buildSearchQuery(OpenSearchFolder folder, String key) {
 
-	MatchQuery databaseIdQuery = new MatchQuery.Builder().//
-		field(IndexData.DATABASE_ID).query(new FieldValue.Builder().//
-			stringValue(folder.getDatabase().getIdentifier()).//
-			build())
-		.//
+	// MatchQuery databaseIdQuery = new MatchQuery.Builder().//
+	// field(IndexData.DATABASE_ID).query(new FieldValue.Builder().//
+	// stringValue(folder.getDatabase().getIdentifier()).//
+	// build())
+	// .//
+	// build();
+	//
+	// MatchQuery folderNameQuery = new MatchQuery.Builder().//
+	// field(IndexData.FOLDER_NAME).query(new FieldValue.Builder().//
+	// stringValue(folder.getName()).//
+	// build())
+	// .//
+	// build();
+	//
+	// MatchQuery keyQuery = new MatchQuery.Builder().//
+	// field(IndexData.ENTRY_NAME).query(new FieldValue.Builder().//
+	// stringValue(key).//
+	// build())
+	// .//
+	// build();
+
+	MatchPhraseQuery databaseIdQuery = new MatchPhraseQuery.Builder().//
+		field(IndexData.DATABASE_ID).query(folder.getDatabase().getIdentifier()).//
 		build();
 
-	MatchQuery folderNameQuery = new MatchQuery.Builder().//
-		field(IndexData.FOLDER_NAME).query(new FieldValue.Builder().//
-			stringValue(folder.getName()).//
-			build())
-		.//
+	MatchPhraseQuery folderNameQuery = new MatchPhraseQuery.Builder().//
+		field(IndexData.FOLDER_NAME).query(folder.getName()).//
 		build();
 
-	MatchQuery keyQuery = new MatchQuery.Builder().//
-		field(IndexData.ENTRY_NAME).query(new FieldValue.Builder().//
-			stringValue(key).//
-			build())
-		.//
+	MatchPhraseQuery keyQuery = new MatchPhraseQuery.Builder().//
+		field(IndexData.ENTRY_NAME).query(key).//
 		build();
 
 	List<Query> queryList = Arrays.asList(//
@@ -332,15 +368,29 @@ public class OpenSearchClientWrapper {
     }
 
     /**
+     * @param source
+     * @param _index
+     * @param _id
+     * @return
+     */
+    private JSONObject decorateSource(JSONObject source, String _index, String _id) {
+
+	source.put(IndexData.INDEX, _index);
+	source.put(IndexData.ENTRY_ID, _id);
+
+	return source;
+    }
+
+    /**
      * @param index
      * @param entryId
      * @return
      */
     private GetRequest buildGetRequest(String index, String entryId) {
-    
-        return new GetRequest.Builder().//
-        	index(index).//
-        	id(entryId).//
-        	build();
+
+	return new GetRequest.Builder().//
+		index(index).//
+		id(entryId).//
+		build();
     }
 }
