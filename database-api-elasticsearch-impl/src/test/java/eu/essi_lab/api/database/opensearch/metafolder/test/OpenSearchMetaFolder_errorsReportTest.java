@@ -12,12 +12,13 @@ import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
+import eu.essi_lab.api.database.opensearch.datafolder.test.TestUtils;
 import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
-import eu.essi_lab.api.database.opensearch.test.OpenSearchdatabaseInitTest;
+import eu.essi_lab.api.database.opensearch.test.OpenSearchDatabaseInitTest;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 
 /**
@@ -28,9 +29,9 @@ public class OpenSearchMetaFolder_errorsReportTest extends OpenSearchTest {
     @Test
     public void sourceTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchdatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
 
-	String folderName = OpenSearchMetaFolder_harvestingPropertiesTest.getFolderName(database);
+	String folderName = TestUtils.getMetaFolderName(database);
 
 	OpenSearchFolder folder = new OpenSearchFolder(database, folderName);
 
@@ -78,7 +79,7 @@ public class OpenSearchMetaFolder_errorsReportTest extends OpenSearchTest {
 	// meta-folder-index property
 	//
 
-	Assert.assertEquals(SOURCE_ID, wrapper.getSourceId().get());
+	Assert.assertEquals(TestUtils.SOURCE_ID, wrapper.getSourceId().get());
 
 	Assert.assertEquals(//
 		IndexData.encode(FolderEntry.of(IOStreamUtils.asStream(errorsReport))), wrapper.getErrorsReport().get());
@@ -92,9 +93,9 @@ public class OpenSearchMetaFolder_errorsReportTest extends OpenSearchTest {
     @Test
     public void folderTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchdatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
 
-	String folderName = OpenSearchMetaFolder_harvestingPropertiesTest.getFolderName(database);
+	String folderName = TestUtils.getMetaFolderName(database);
 
 	OpenSearchFolder folder = new OpenSearchFolder(database, folderName);
 

@@ -19,15 +19,11 @@ import eu.essi_lab.model.exceptions.GSException;
  */
 public class OpenSearchTest {
 
-    /**
-     * 
-     */
-    public static final String SOURCE_ID = "acronet";
-
+   
     @Before
     public void before() throws GSException, OpenSearchException, IOException {
 
-	OpenSearchClient client = OpenSearchDatabase.createNoSSLContextClient(OpenSearchdatabaseInitTest.createStorageInfo());
+	OpenSearchClient client = OpenSearchDatabase.createNoSSLContextClient(OpenSearchDatabaseInitTest.createStorageInfo());
 
 	for (String index : IndexMapping.getMappings()) {
 

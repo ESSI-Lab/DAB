@@ -16,12 +16,13 @@ import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.SourceStorageWorker.DataFolderIndexDocument;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
+import eu.essi_lab.api.database.opensearch.datafolder.test.TestUtils;
 import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
-import eu.essi_lab.api.database.opensearch.test.OpenSearchdatabaseInitTest;
+import eu.essi_lab.api.database.opensearch.test.OpenSearchDatabaseInitTest;
 
 /**
  * @author Fabrizio
@@ -31,22 +32,22 @@ public class OpenSearchMetaFolder_indexDocTest extends OpenSearchTest {
     @Test
     public void sourceTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchdatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
 
-	String folderName = OpenSearchMetaFolder_harvestingPropertiesTest.getFolderName(database);
+	String folderName = TestUtils.getMetaFolderName(database);
 
 	OpenSearchFolder folder = new OpenSearchFolder(database, folderName);
 
 	//
 	//
 
-	String indexName = SourceStorageWorker.createDataFolderIndexName(SOURCE_ID);
+	String indexName = SourceStorageWorker.createDataFolderIndexName(TestUtils.SOURCE_ID);
 
 	DataFolderIndexDocument doc = new DataFolderIndexDocument(//
 		indexName, //
 		SourceStorageWorker.DATA_1_PREFIX);
 
-	String key = SOURCE_ID + SourceStorageWorker.DATA_1_PREFIX;
+	String key = TestUtils.SOURCE_ID + SourceStorageWorker.DATA_1_PREFIX;
 
 	folder.store(//
 		key, //
@@ -79,7 +80,7 @@ public class OpenSearchMetaFolder_indexDocTest extends OpenSearchTest {
 	// meta-folder-index property
 	//
 
-	Assert.assertEquals(SOURCE_ID, wrapper.getSourceId().get());
+	Assert.assertEquals(TestUtils.SOURCE_ID, wrapper.getSourceId().get());
 
 	Assert.assertEquals(SourceStorageWorker.DATA_1_PREFIX.substring(1), wrapper.getDataFolder().get());
 
@@ -94,9 +95,9 @@ public class OpenSearchMetaFolder_indexDocTest extends OpenSearchTest {
     @Test
     public void folderTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchdatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
 
-	String folderName = OpenSearchMetaFolder_harvestingPropertiesTest.getFolderName(database);
+	String folderName = TestUtils.getMetaFolderName(database);
 
 	OpenSearchFolder folder = new OpenSearchFolder(database, folderName);
 
@@ -104,7 +105,7 @@ public class OpenSearchMetaFolder_indexDocTest extends OpenSearchTest {
 	//
 	//
 
-	String indexName = SourceStorageWorker.createDataFolderIndexName(SOURCE_ID);
+	String indexName = SourceStorageWorker.createDataFolderIndexName(TestUtils.SOURCE_ID);
 
 	DataFolderIndexDocument doc = new DataFolderIndexDocument(//
 		indexName, //
@@ -114,7 +115,7 @@ public class OpenSearchMetaFolder_indexDocTest extends OpenSearchTest {
 
 	Assert.assertEquals(SourceStorageWorker.DATA_1_PREFIX, doc.getDataFolderPrefix());
 
-	String key = SOURCE_ID + SourceStorageWorker.DATA_1_PREFIX;
+	String key = TestUtils.SOURCE_ID + SourceStorageWorker.DATA_1_PREFIX;
 
 	//
 	//

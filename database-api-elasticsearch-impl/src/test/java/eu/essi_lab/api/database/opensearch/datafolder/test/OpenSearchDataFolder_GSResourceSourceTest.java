@@ -16,7 +16,7 @@ import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
-import eu.essi_lab.api.database.opensearch.test.OpenSearchdatabaseInitTest;
+import eu.essi_lab.api.database.opensearch.test.OpenSearchDatabaseInitTest;
 import eu.essi_lab.indexes.IndexedElementsWriter;
 import eu.essi_lab.model.resource.Dataset;
 
@@ -28,9 +28,9 @@ public class OpenSearchDataFolder_GSResourceSourceTest extends OpenSearchTest {
     @Test
     public void sourceTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchdatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
 
-	String folderName = OpenSearchDataFolder_writingFolderTagTest.getFolderName(database);
+	String folderName = TestUtils.getDataFolderName(database);
 
 	OpenSearchFolder folder = new OpenSearchFolder(database, folderName);
 

@@ -18,7 +18,7 @@ import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
-import eu.essi_lab.api.database.opensearch.test.OpenSearchdatabaseInitTest;
+import eu.essi_lab.api.database.opensearch.test.OpenSearchDatabaseInitTest;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.bond.View.ViewVisibility;
 
@@ -30,7 +30,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
     @Test
     public void sourceTest1() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchdatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
 
 	String folderName = Database.VIEWS_FOLDER;
 
@@ -91,7 +91,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
     @Test
     public void sourceTest2() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchdatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
 
 	String folderName = Database.VIEWS_FOLDER;
 
@@ -152,7 +152,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
     @Test
     public void folderTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchdatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
 
 	String folderName = Database.VIEWS_FOLDER;
 

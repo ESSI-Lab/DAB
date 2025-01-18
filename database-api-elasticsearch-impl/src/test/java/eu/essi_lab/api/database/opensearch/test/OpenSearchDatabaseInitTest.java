@@ -24,7 +24,7 @@ import eu.essi_lab.model.exceptions.GSException;
 /**
  * @author Fabrizio
  */
-public class OpenSearchdatabaseInitTest {
+public class OpenSearchDatabaseInitTest {
 
     /**
      * @return

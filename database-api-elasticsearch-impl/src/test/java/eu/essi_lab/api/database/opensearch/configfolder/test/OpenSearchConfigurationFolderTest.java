@@ -19,7 +19,7 @@ import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.ConfigurationMapping;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
-import eu.essi_lab.api.database.opensearch.test.OpenSearchdatabaseInitTest;
+import eu.essi_lab.api.database.opensearch.test.OpenSearchDatabaseInitTest;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.lib.utils.IOStreamUtils;
@@ -32,7 +32,7 @@ public class OpenSearchConfigurationFolderTest extends OpenSearchTest {
     @Test
     public void sourceTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchdatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
 
 	String folderName = Database.CONFIGURATION_FOLDER;
 
@@ -88,7 +88,7 @@ public class OpenSearchConfigurationFolderTest extends OpenSearchTest {
     @Test
     public void folderTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchdatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
 
 	String folderName = Database.CONFIGURATION_FOLDER;
 

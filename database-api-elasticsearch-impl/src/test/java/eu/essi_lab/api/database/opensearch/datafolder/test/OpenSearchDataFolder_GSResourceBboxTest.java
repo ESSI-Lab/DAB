@@ -18,7 +18,7 @@ import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
-import eu.essi_lab.api.database.opensearch.test.OpenSearchdatabaseInitTest;
+import eu.essi_lab.api.database.opensearch.test.OpenSearchDatabaseInitTest;
 import eu.essi_lab.indexes.IndexedElementsWriter;
 import eu.essi_lab.iso.datamodel.classes.BoundingPolygon;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
@@ -33,9 +33,9 @@ public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
     @Test
     public void lineStringFromBoundingPolygonTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchdatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
 
-	String folderName = OpenSearchDataFolder_writingFolderTagTest.getFolderName(database);
+	String folderName = TestUtils.getDataFolderName(database);
 
 	OpenSearchFolder folder = new OpenSearchFolder(database, folderName);
 
@@ -114,9 +114,9 @@ public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
     @Test
     public void polygonFromBoundingPolygonTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchdatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
 
-	String folderName = OpenSearchDataFolder_writingFolderTagTest.getFolderName(database);
+	String folderName = TestUtils.getDataFolderName(database);
 
 	OpenSearchFolder folder = new OpenSearchFolder(database, folderName);
 
@@ -199,9 +199,9 @@ public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
     @Test
     public void pointTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchdatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
 
-	String folderName = OpenSearchDataFolder_writingFolderTagTest.getFolderName(database);
+	String folderName = TestUtils.getDataFolderName(database);
 
 	OpenSearchFolder folder = new OpenSearchFolder(database, folderName);
 
@@ -274,9 +274,9 @@ public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
     @Test
     public void multiPointTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchdatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
 
-	String folderName = OpenSearchDataFolder_writingFolderTagTest.getFolderName(database);
+	String folderName = TestUtils.getDataFolderName(database);
 
 	OpenSearchFolder folder = new OpenSearchFolder(database, folderName);
 
@@ -369,9 +369,9 @@ public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
     @Test
     public void polygonTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchdatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
 
-	String folderName = OpenSearchDataFolder_writingFolderTagTest.getFolderName(database);
+	String folderName = TestUtils.getDataFolderName(database);
 
 	OpenSearchFolder folder = new OpenSearchFolder(database, folderName);
 
@@ -444,9 +444,9 @@ public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
     @Test
     public void multiPolygonTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchdatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
 
-	String folderName = OpenSearchDataFolder_writingFolderTagTest.getFolderName(database);
+	String folderName = TestUtils.getDataFolderName(database);
 
 	OpenSearchFolder folder = new OpenSearchFolder(database, folderName);
 
@@ -541,9 +541,9 @@ public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
     @Test
     public void geometryCollectionTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchdatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
 
-	String folderName = OpenSearchDataFolder_writingFolderTagTest.getFolderName(database);
+	String folderName = TestUtils.getDataFolderName(database);
 
 	OpenSearchFolder folder = new OpenSearchFolder(database, folderName);
 

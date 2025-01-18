@@ -17,29 +17,21 @@ import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
-import eu.essi_lab.api.database.opensearch.test.OpenSearchdatabaseInitTest;
+import eu.essi_lab.api.database.opensearch.test.OpenSearchDatabaseInitTest;
 
 /**
  * @author Fabrizio
  */
 public class OpenSearchDataFolder_writingFolderTagTest extends OpenSearchTest {
 
-    /**
-     * @param database
-     * @return
-     */
-    public static String getFolderName(OpenSearchDatabase database) {
-
-	return SOURCE_ID + // source id
-		SourceStorageWorker.DATA_1_PREFIX;//
-    }
+   
 
     @Test
     public void sourceTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchdatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
 
-	String folderName = getFolderName(database);
+	String folderName = TestUtils.getDataFolderName(database);
 
 	OpenSearchFolder folder = new OpenSearchFolder(database, folderName);
 

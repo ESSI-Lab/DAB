@@ -12,6 +12,8 @@ import org.junit.Assert;
 import org.w3c.dom.Node;
 
 import eu.essi_lab.api.database.DatabaseFolder;
+import eu.essi_lab.api.database.SourceStorageWorker;
+import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.indexes.IndexedElements;
@@ -25,6 +27,31 @@ import eu.essi_lab.model.resource.ResourceProperty;
  * @author Fabrizio
  */
 public class TestUtils {
+
+    /**
+     * 
+     */
+    public static final String SOURCE_ID = "acronet";
+
+    /**
+     * @param database
+     * @return
+     */
+    public static String getMetaFolderName(OpenSearchDatabase database) {
+
+	return SOURCE_ID + // source id
+		SourceStorageWorker.META_PREFIX;//
+    }
+
+    /**
+     * @param database
+     * @return
+     */
+    public static String getDataFolderName(OpenSearchDatabase database) {
+
+	return SOURCE_ID + // source id
+		SourceStorageWorker.DATA_1_PREFIX;//
+    }
 
     /**
      * @param wrapper
