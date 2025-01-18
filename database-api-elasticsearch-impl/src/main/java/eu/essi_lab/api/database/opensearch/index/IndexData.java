@@ -139,14 +139,15 @@ public class IndexData {
     public static final String BINARY_DATA_TYPE = "binary";
 
     //
-    // base properties
+    // base source properties
     //
     public static final String INDEX = "index";
+    public static final String ENTRY_ID = "entryId";
+
     public static final String DATABASE_ID = "databaseId";
     public static final String FOLDER_NAME = "folderName";
     public static final String FOLDER_ID = "folderId";
     public static final String ENTRY_NAME = "entryName";
-    public static final String ENTRY_ID = "entryId";
     public static final String BINARY_PROPERTY = "binaryProperty";
     public static final String DATA_TYPE = "dataType";
 
