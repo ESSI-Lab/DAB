@@ -125,9 +125,9 @@ public class OpenSearchMetaFolder_errorsReportTest extends OpenSearchTest {
 	Assert.assertEquals(errorsReport, retrievedReport);
 
 	//
-	// trying to get a binary as a doc throws an exception
+	// trying to get a binary as a doc return null
 	//
 
-	Assert.assertThrows(Exception.class, () -> folder.get(key));
+	Assert.assertNull(folder.get(key));
     }
 }

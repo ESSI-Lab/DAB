@@ -93,22 +93,33 @@ public class OpenSearchFolder implements DatabaseFolder {
     @Override
     public Node get(String key) throws Exception {
 
-	JSONObject source = _getSource(key);
+	Optional<JSONObject> source = _getSource(key);
 
-	SourceWrapper wrapper = new SourceWrapper(source);
+	if (source.isEmpty()) {
+
+	    return null;
+	}
+
+	SourceWrapper wrapper = new SourceWrapper(source.get());
 
 	if (wrapper.getDataType() == DataType.BINARY) {
 
 	    return null;
 	}
 
-	return IndexData.toDocument(IndexData.toStream(source));
+	return IndexData.toDocument(IndexData.toStream(source.get()));
     }
 
     @Override
     public InputStream getBinary(String key) throws Exception {
 
-	return IndexData.toStream(_getSource(key));
+	Optional<JSONObject> source = _getSource(key);
+	if (source.isEmpty()) {
+
+	    return null;
+	}
+
+	return IndexData.toStream(source.get());
     }
 
     @Override
@@ -222,7 +233,7 @@ public class OpenSearchFolder implements DatabaseFolder {
      */
     public SourceWrapper getSourceWrapper(String key) throws Exception {
 
-	return new SourceWrapper(_getSource(key));
+	return new SourceWrapper(_getSource(key).orElse(null));
     }
 
     /**
@@ -230,22 +241,13 @@ public class OpenSearchFolder implements DatabaseFolder {
      * @return
      * @throws Exception
      */
-    private JSONObject _getSource(String key) throws Exception {
+    private Optional<JSONObject> _getSource(String key) throws Exception {
 
 	String index = IndexData.detectIndex(this);
 
 	String entryId = getEntryId(this, key);
 
-	Optional<JSONObject> source = Optional.empty();
-
-	source = wrapper.getSource(index, entryId);
-
-	if (source.isEmpty()) {
-
-	    throw new Exception("Resource with key '" + key + "' not found");
-	}
-
-	return source.get();
+	return wrapper.getSource(index, entryId);
     }
 
     /**

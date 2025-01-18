@@ -28,7 +28,7 @@ public class OpenSearchDataFolder_writingFolderTagTest extends OpenSearchTest {
      * @param database
      * @return
      */
-    static String getFolderName(OpenSearchDatabase database) {
+    public static String getFolderName(OpenSearchDatabase database) {
 
 	return SOURCE_ID + // source id
 		SourceStorageWorker.DATA_1_PREFIX;//
@@ -97,7 +97,6 @@ public class OpenSearchDataFolder_writingFolderTagTest extends OpenSearchTest {
 
 	folder.remove(key);
 
-	wrapper = folder.getSourceWrapper(key);
-	Assert.assertFalse(wrapper.hasWritingFolderTag());
+	Assert.assertNull(folder.getBinary(key));
     }
 }
