@@ -11,6 +11,7 @@ import org.junit.Test;
 import eu.essi_lab.api.database.cfg.DatabaseSource;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.model.StorageInfo;
+import eu.essi_lab.model.exceptions.GSException;
 
 /**
  * @author Fabrizio
@@ -30,26 +31,35 @@ public abstract class DatabaseSourceTest extends ConfigurationSourceTest {
     @Test
     public void locationTest() throws Exception {
 
-	DatabaseSource source = new DatabaseSource(storageInfo, "test-config");
+	DatabaseSource source = create();
 	Assert.assertEquals("configtest\\test-config.json", source.getLocation());
     }
 
     @Test
     public void listTest() throws Exception {
 
-	super.listTest(new DatabaseSource(storageInfo, "test-config"));
+	super.listTest(create());
     }
 
     @Test
     public void lockTest() throws Exception {
 
-	super.lockTest(new DatabaseSource(storageInfo, "test-config"));
+	super.lockTest(create());
+    }
+
+    /**
+     * @return
+     * @throws GSException
+     */
+    protected DatabaseSource create() throws GSException {
+
+	return new DatabaseSource(storageInfo, "test-config");
     }
 
     @Test
     public void backupTest() throws Exception {
 
-	DatabaseSource source = new DatabaseSource(storageInfo, "test-config");
+	DatabaseSource source = create();
 
 	Setting setting1 = new Setting();
 	Setting setting2 = new Setting();

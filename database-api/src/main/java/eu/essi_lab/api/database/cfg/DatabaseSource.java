@@ -40,7 +40,6 @@ import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.cfga.ConfigurationSource;
 import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
@@ -55,26 +54,41 @@ public class DatabaseSource implements ConfigurationSource {
     private String lockFileName;
     private String configName;
     private String completeConfigName;
-    private DatabaseFolder folder;
+    protected DatabaseFolder folder;
 
     /**
+     * Constructor to use for OpenSearch
+     * 
+     * @param storageInfo
+     * @param folder it must be {@link Database#CONFIGURATION_FOLDER}
+     * @param configName "testConfig", "preprodConfig", "prodConfig"
+     * @throws GSException
+     */
+    public DatabaseSource(StorageInfo storageInfo, String folder, String configName) throws GSException {
+
+	Database database = DatabaseFactory.get(storageInfo);
+
+	this.folder = database.getFolder(folder, true).get();
+
+	init(storageInfo, configName);
+    }
+
+    /**
+     * Constructor to use for MarkLogic
+     * 
      * @param storageInfo
      * @param configName config file name without extension
      * @throws GSException
      */
     public DatabaseSource(StorageInfo storageInfo, String configName) throws GSException {
 
-	Database database = DatabaseFactory.get(storageInfo);
-
-	this.folder = database.getFolder(storageInfo.getIdentifier(), true).get();
-
-	init(storageInfo, configName);
+	this(storageInfo, storageInfo.getIdentifier(), configName);
     }
 
     /**
      * 
      */
-    private DatabaseSource() {
+    protected DatabaseSource() {
 
     }
 
@@ -82,7 +96,7 @@ public class DatabaseSource implements ConfigurationSource {
      * @param storageInfo
      * @param configName
      */
-    private void init(StorageInfo storageInfo, String configName) {
+    protected void init(StorageInfo storageInfo, String configName) {
 
 	this.configName = configName;
 
@@ -200,7 +214,10 @@ public class DatabaseSource implements ConfigurationSource {
 
 		InputStream inputStream = updateLockTimestamp(lockFile);
 
-		boolean replaced = folder.replace(lockFileName, FolderEntry.of(inputStream));
+		boolean replaced = folder.replace(//
+			lockFileName, //
+			FolderEntry.of(inputStream), //
+			EntryType.CONFIGURATION_LOCK);
 
 		if (!replaced) {
 
@@ -215,7 +232,10 @@ public class DatabaseSource implements ConfigurationSource {
 
 	InputStream lockFile = createLockFile(owner);
 
-	boolean stored = folder.store(lockFileName, FolderEntry.of(lockFile));
+	boolean stored = folder.store(//
+		lockFileName, //
+		FolderEntry.of(lockFile), //
+		EntryType.CONFIGURATION_LOCK);
 
 	if (!stored) {
 
