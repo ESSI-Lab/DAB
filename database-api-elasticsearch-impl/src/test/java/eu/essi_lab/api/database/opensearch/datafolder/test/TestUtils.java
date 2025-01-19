@@ -39,7 +39,17 @@ public class TestUtils {
      */
     public static String getMetaFolderName(OpenSearchDatabase database) {
 
-	return SOURCE_ID + // source id
+	return getMetaFolderName(database, SOURCE_ID);
+    }
+
+    /**
+     * @param database
+     * @param sourceId
+     * @return
+     */
+    public static String getMetaFolderName(OpenSearchDatabase database, String sourceId) {
+
+	return sourceId + // source id
 		SourceStorageWorker.META_PREFIX;//
     }
 

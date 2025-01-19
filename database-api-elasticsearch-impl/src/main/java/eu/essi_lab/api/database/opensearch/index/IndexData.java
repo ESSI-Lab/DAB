@@ -66,6 +66,7 @@ import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.MiscMapping;
+import eu.essi_lab.api.database.opensearch.index.mappings.FolderRegistryMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.UsersMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
 import eu.essi_lab.indexes.IndexedElements;
@@ -159,8 +160,37 @@ public class IndexData {
 
     private JSONObject object;
     private IndexMapping mapping;
-    private String indexId;
+    private String entryId;
     private String index;
+
+    /**
+     * @param folder
+     * @param key
+     */
+    public static IndexData of(DatabaseFolder folder) {
+
+	IndexData indexData = new IndexData();
+
+	String entryName = FolderRegistryMapping.getEntryName(folder);
+
+	indexData.object.put(ENTRY_NAME, entryName);
+	indexData.object.put(DATABASE_ID, folder.getDatabase().getIdentifier());
+
+	indexData.object.put(FOLDER_NAME, folder.getName());
+	indexData.object.put(FOLDER_ID, OpenSearchFolder.getFolderId(folder));
+
+	indexData.object.put(DATA_TYPE, EntryType.REGISTERED_FOLDER);
+
+	indexData.entryId = FolderRegistryMapping.getEntryId(folder);
+
+	indexData.mapping = FolderRegistryMapping.get();
+
+	indexData.mapping.setEntryType(EntryType.REGISTERED_FOLDER);
+
+	indexData.index = FolderRegistryMapping.get().getIndex();
+
+	return indexData;
+    }
 
     /**
      * @param folder
@@ -171,6 +201,7 @@ public class IndexData {
      * @throws IOException
      * @throws TransformerException
      */
+    @SuppressWarnings("incomplete-switch")
     public static IndexData of(//
 	    DatabaseFolder folder, //
 	    String key, //
@@ -192,7 +223,7 @@ public class IndexData {
 
 	indexData.object.put(DATA_TYPE, entry.getDataType());
 
-	indexData.indexId = OpenSearchFolder.getEntryId(folder, key);
+	indexData.entryId = OpenSearchFolder.getEntryId(folder, key);
 
 	//
 	// encodes the binary property
@@ -467,34 +498,39 @@ public class IndexData {
 
 	String name = folder.getName();
 
+	if (name.endsWith(FolderRegistryMapping.ENTRY_POSTFIX)) {
+
+	    return FolderRegistryMapping.get().getIndex();
+	}
+
 	if (name.contains(SourceStorageWorker.META_PREFIX)) {
 
-	    return MetaFolderMapping.META_FOLDER_INDEX;
+	    return MetaFolderMapping.get().getIndex();
 	}
 
 	else if (name.contains(SourceStorageWorker.DATA_1_PREFIX) || name.contains(SourceStorageWorker.DATA_2_PREFIX)) {
 
-	    return DataFolderMapping.DATA_FOLDER_INDEX;
+	    return DataFolderMapping.get().getIndex();
 	}
 
 	else if (name.contains(Database.USERS_FOLDER)) {
 
-	    return UsersMapping.USERS_INDEX;
+	    return UsersMapping.get().getIndex();
 	}
 
 	else if (name.contains(Database.VIEWS_FOLDER)) {
 
-	    return ViewsMapping.VIEWS_INDEX;
+	    return ViewsMapping.get().getIndex();
 	}
 
 	else if (name.contains(Database.AUGMENTERS_FOLDER)) {
 
-	    return AugmentersMapping.AUGMENTERS_INDEX;
+	    return AugmentersMapping.get().getIndex();
 	}
 
 	else {// name.contains(Database.CONFIGURATION_FOLDER
 
-	    return ConfigurationMapping.CONFIGURATION_INDEX;
+	    return ConfigurationMapping.get().getIndex();
 	}
     }
 
@@ -522,7 +558,7 @@ public class IndexData {
 	return new IndexRequest.Builder<JSONObject>().//
 		index(mapping.getIndex()).//
 		document(object).//
-		id(indexId).//
+		id(entryId).//
 		build();
     }
 
@@ -539,7 +575,7 @@ public class IndexData {
      */
     public String getEntryId() {
 
-	return indexId;
+	return entryId;
     }
 
     /**

@@ -22,8 +22,6 @@ package eu.essi_lab.api.database;
  */
 
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.w3c.dom.Document;
@@ -110,60 +108,34 @@ public interface DatabaseFolder {
 	// meta-folder entries
 	//
 
-	HARVESTING_WARN_REPORT("harvestingWarnReport"), //
-	HARVESTING_ERROR_REPORT("harvestingWarnReport"), //
-	HARVESTING_PROPERTIES("harvestingProperties"), //
-	DATA_FOLDER_INDEX_DOC("dataFolderIndexDoc"), //
+	HARVESTING_WARN_REPORT, //
+	HARVESTING_ERROR_REPORT, //
+	HARVESTING_PROPERTIES, //
+	DATA_FOLDER_INDEX_DOC, //
 
 	//
 	// data-folder entries
 	//
-	
-	GS_RESOURCE("gsResource"), //
-	WRITING_FOLDER_TAG("writingFolderTag"),
+
+	GS_RESOURCE, //
+	WRITING_FOLDER_TAG,
 
 	//
 	//
 	//
 
-	USER("user"), //
-	VIEW("view"), //
+	USER, //
+	VIEW, //
 
-	AUGMENTER_PROPERTIES("augmenterProperties"), //
-	CONFIGURATION("configuration"), //
-	MISC("misc");
+	AUGMENTER_PROPERTIES, //
+	CONFIGURATION, //
+	MISC,
 
-	private String type;
+	//
+	//
+	//
 
-	/**
-	 * @param type
-	 */
-	private EntryType(String type) {
-
-	    this.type = type;
-	}
-
-	/**
-	 * @return the type
-	 */
-	public String getType() {
-
-	    return type;
-	}
-
-	/**
-	 * @param type
-	 * @return
-	 * @throws NoSuchElementException
-	 */
-	public EntryType decode(String type) throws NoSuchElementException {
-
-	    return Arrays.asList(EntryType.values()).//
-		    stream().//
-		    filter(t -> t.getType().equals(type)).//
-		    findFirst().//
-		    orElseThrow();
-	}
+	REGISTERED_FOLDER;
     }
 
     /**
