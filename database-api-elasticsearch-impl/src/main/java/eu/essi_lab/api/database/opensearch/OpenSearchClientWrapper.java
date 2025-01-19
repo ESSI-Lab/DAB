@@ -368,6 +368,15 @@ public class OpenSearchClientWrapper {
     }
 
     /**
+     * @throws IOException
+     * @throws OpenSearchException
+     */
+    public void synch() throws OpenSearchException, IOException {
+
+	client.indices().refresh();
+    }
+
+    /**
      * @param source
      * @param _index
      * @param _id

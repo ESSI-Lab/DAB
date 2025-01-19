@@ -3,8 +3,6 @@
  */
 package eu.essi_lab.api.database.opensearch;
 
-import java.io.IOException;
-
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -31,7 +29,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.json.JSONObject;
-import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch.core.DeleteByQueryRequest;
 import org.w3c.dom.Node;
@@ -75,7 +72,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 
 	boolean stored = wrapper.storeWithGenericClient(indexData);
 
-	synch();
+	wrapper.synch();
 
 	return stored;
     }
@@ -131,7 +128,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 
 	boolean deleted = wrapper.delete(index, id);
 
-	synch();
+	wrapper.synch();
 
 	return deleted;
     }
@@ -189,7 +186,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 
 	wrapper.deleteByQuery(queryRequest);
 
-	synch();
+	wrapper.synch();
     }
 
     /**
@@ -248,14 +245,5 @@ public class OpenSearchFolder implements DatabaseFolder {
 	String entryId = getEntryId(this, key);
 
 	return wrapper.getSource(index, entryId);
-    }
-
-    /**
-     * @throws IOException
-     * @throws OpenSearchException
-     */
-    private void synch() throws OpenSearchException, IOException {
-
-	database.getClient().indices().refresh();
     }
 }
