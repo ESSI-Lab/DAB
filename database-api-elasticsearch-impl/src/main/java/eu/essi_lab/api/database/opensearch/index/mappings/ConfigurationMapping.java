@@ -45,6 +45,12 @@ public class ConfigurationMapping extends IndexMapping {
      * 
      */
     public static final String CONFIGURATION = "configuration";
+    
+    /**
+     * 
+     */
+    public static final String CONFIGURATION_LOCK = "configuration-lock";
+
 
     /**
      * @return

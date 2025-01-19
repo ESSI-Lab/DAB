@@ -370,6 +370,15 @@ public class SourceWrapper {
     }
 
     /**
+     * - 'configuration-index' property
+     * - base64 encoded
+     */
+    public Optional<String> getConfigurationLock() {
+
+	return Optional.ofNullable(source.optString(ConfigurationMapping.CONFIGURATION_LOCK, null));
+    }
+
+    /**
      * @param hideBinary
      * @return
      */

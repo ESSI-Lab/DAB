@@ -4,8 +4,10 @@
 package eu.essi_lab.api.database.opensearch.configfolder.test;
 
 import java.io.InputStream;
+import java.util.UUID;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -45,44 +47,96 @@ public class OpenSearchConfigurationFolderTest extends OpenSearchTest {
 
 	String configName = "testConfig.json";
 
-	String key = configName;
+	String configKey = configName;
 
 	folder.store(//
-		key, //
+		configKey, //
 		FolderEntry.of(IOStreamUtils.asStream(configuration.toString())), //
 		EntryType.CONFIGURATION);
 
-	SourceWrapper wrapper = folder.getSourceWrapper(key);
+	JSONObject lockFile = new JSONObject();
+	lockFile.put("owner", UUID.randomUUID().toString());
+	lockFile.put("timeStamp", System.currentTimeMillis());
 
-	//
-	// base properties
-	//
+	String lockKey = "lock.json";
 
-	Assert.assertEquals(ConfigurationMapping.get().getIndex(), wrapper.getIndex());
+	folder.store(//
+		lockKey, //
+		FolderEntry.of(IOStreamUtils.asStream(lockFile.toString(3))), //
+		EntryType.CONFIGURATION_LOCK);
 
-	Assert.assertEquals(database.getIdentifier(), wrapper.getDatabaseId());
+	{
 
-	Assert.assertEquals(folderName, wrapper.getFolderName());
+	    SourceWrapper wrapper = folder.getSourceWrapper(configKey);
 
-	Assert.assertEquals(OpenSearchFolder.getFolderId(folder), wrapper.getFolderId());
+	    //
+	    // configuration: base properties
+	    //
 
-	Assert.assertEquals(OpenSearchFolder.getEntryId(folder, key), wrapper.getEntryId());
+	    Assert.assertEquals(ConfigurationMapping.get().getIndex(), wrapper.getIndex());
 
-	Assert.assertEquals(key, wrapper.getEntryName());
+	    Assert.assertEquals(database.getIdentifier(), wrapper.getDatabaseId());
 
-	Assert.assertEquals(ConfigurationMapping.CONFIGURATION, wrapper.getBinaryProperty());
+	    Assert.assertEquals(folderName, wrapper.getFolderName());
 
-	Assert.assertEquals(DataType.BINARY, wrapper.getDataType());
+	    Assert.assertEquals(OpenSearchFolder.getFolderId(folder), wrapper.getFolderId());
 
-	//
-	// configuaration-index property
-	//
+	    Assert.assertEquals(OpenSearchFolder.getEntryId(folder, configKey), wrapper.getEntryId());
 
-	Assert.assertEquals(configName, wrapper.getConfigurationName().get());
+	    Assert.assertEquals(configKey, wrapper.getEntryName());
 
-	Assert.assertEquals(//
-		IndexData.encode(FolderEntry.of(IOStreamUtils.asStream(configuration.toString()))), //
-		wrapper.getConfiguration().get());
+	    Assert.assertEquals(ConfigurationMapping.CONFIGURATION, wrapper.getBinaryProperty());
+
+	    Assert.assertEquals(DataType.BINARY, wrapper.getDataType());
+
+	    //
+	    // configuaration-index property
+	    //
+
+	    Assert.assertEquals(configName, wrapper.getConfigurationName().get());
+
+	    Assert.assertEquals(//
+		    IndexData.encode(FolderEntry.of(IOStreamUtils.asStream(configuration.toString()))), //
+		    wrapper.getConfiguration().get());
+
+	    //
+	    //
+	    //
+
+	}
+
+	{
+
+	    SourceWrapper wrapper = folder.getSourceWrapper(lockKey);
+
+	    //
+	    // configuration lock: base properties
+	    //
+
+	    Assert.assertEquals(ConfigurationMapping.get().getIndex(), wrapper.getIndex());
+
+	    Assert.assertEquals(database.getIdentifier(), wrapper.getDatabaseId());
+
+	    Assert.assertEquals(folderName, wrapper.getFolderName());
+
+	    Assert.assertEquals(OpenSearchFolder.getFolderId(folder), wrapper.getFolderId());
+
+	    Assert.assertEquals(database.getIdentifier() + "_" + folderName + "_" + lockKey, wrapper.getEntryId());
+
+	    Assert.assertEquals(lockKey, wrapper.getEntryName());
+
+	    Assert.assertEquals(ConfigurationMapping.CONFIGURATION_LOCK, wrapper.getBinaryProperty());
+
+	    Assert.assertEquals(DataType.BINARY, wrapper.getDataType());
+
+	    //
+	    // configuaration-index property
+	    //
+
+	    Assert.assertEquals(//
+		    IndexData.encode(FolderEntry.of(IOStreamUtils.asStream(lockFile.toString(3)))), //
+		    wrapper.getConfigurationLock().get());
+	}
     }
 
     @Test

@@ -128,11 +128,15 @@ public interface DatabaseFolder {
 	VIEW, //
 
 	AUGMENTER_PROPERTIES, //
+	
+	//
+	// configuration-index entries
+	//
 	CONFIGURATION, //
-	MISC,
-
+	CONFIGURATION_LOCK,//
+	
 	//
-	//
+	// folder-registry-index entry	
 	//
 
 	REGISTERED_FOLDER;
@@ -174,37 +178,7 @@ public interface DatabaseFolder {
      * @return false if the key already exists, true if the store was performed with success
      * @throws Exception if the key is already used or problems occur
      */
-    default boolean store(String key, FolderEntry entry) throws Exception {
-
-	return store(key, entry, EntryType.MISC);
-    }
-
-    /**
-     * Stores a DOM resource with the specified <code>key</code> in this folder.<br>
-     * Key should not contain slashes.<br>
-     * Use {@link #exists}
-     * to test whether a resource with the specified <code>key</code> already exists
-     *
-     * @param key the key of the resource
-     * @param res the resource to be stored
-     * @return false if the key already exists, true if the store was performed with success
-     * @throws Exception if the key is already used or problems occur
-     */
     boolean store(String key, FolderEntry entry, EntryType type) throws Exception;
-
-    /**
-     * Replace with <code>newDoc</code> the content of the XML resource with the specified <code>key</code>.<br>
-     * Key should not contain
-     * slashes.<br>
-     * Use {@link #exists} to test whether a resource with the specified <code>key</code> exists
-     *
-     * @return true if the replacement was made, false if the resource does not exist (no insert is done in this case)
-     * @throws Exception if problems occur
-     */
-    default boolean replace(String key, FolderEntry entry) throws Exception {
-
-	return replace(key, entry, EntryType.MISC);
-    }
 
     /**
      * Replace with <code>newDoc</code> the content of the XML resource with the specified <code>key</code>.<br>

@@ -362,6 +362,15 @@ public class IndexData {
 	    indexData.mapping = ConfigurationMapping.get();
 
 	    break;
+	    
+	case CONFIGURATION_LOCK:
+	    
+	    indexData.object.put(BINARY_PROPERTY, ConfigurationMapping.CONFIGURATION_LOCK);
+	    indexData.object.put(ConfigurationMapping.CONFIGURATION_LOCK, encodedString);
+	    	    
+	    indexData.mapping = ConfigurationMapping.get();
+
+	    break;
 
 	case USER:
 
