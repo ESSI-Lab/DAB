@@ -75,5 +75,9 @@ public class OpenSearchSourceTest extends DatabaseSourceTest {
 		client.indices().delete(indexRequest);
 	    }
 	}
+
+	// recreate the indexes
+	OpenSearchDatabase database = new OpenSearchDatabase();
+	database.initialize(INFO);
     }
 }

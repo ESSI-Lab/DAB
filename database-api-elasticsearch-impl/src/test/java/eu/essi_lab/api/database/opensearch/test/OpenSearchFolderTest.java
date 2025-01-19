@@ -51,6 +51,9 @@ public class OpenSearchFolderTest extends OpenSearchTest {
 	//
 	//
 
+	Assert.assertFalse(folder.remove(key));
+	Assert.assertFalse(folder.exists(key));
+
 	assertEmpty(folder, key, view1, view2);
 
 	Assert.assertTrue(store(folder, view1, key));
@@ -112,6 +115,9 @@ public class OpenSearchFolderTest extends OpenSearchTest {
 	//
 	//
 	//
+
+	Assert.assertFalse(folder.remove(key));
+	Assert.assertFalse(folder.exists(key));
 
 	assertEmpty(folder, key, doc1, doc2);
 

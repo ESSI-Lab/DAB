@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 
 import org.json.JSONObject;
 import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch._types.ErrorCause;
+import org.opensearch.client.opensearch._types.ErrorResponse;
 import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch._types.Result;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
@@ -374,6 +376,18 @@ public class OpenSearchClientWrapper {
     public void synch() throws OpenSearchException, IOException {
 
 	client.indices().refresh();
+    }
+
+    /**
+     * @param ex
+     * @return
+     */
+    @SuppressWarnings("unused")
+    private boolean indexNotFound(OpenSearchException ex) {
+
+	ErrorResponse response = ex.response();
+	ErrorCause error = response.error();
+	return error.type().equals("index_not_found_exception");
     }
 
     /**
