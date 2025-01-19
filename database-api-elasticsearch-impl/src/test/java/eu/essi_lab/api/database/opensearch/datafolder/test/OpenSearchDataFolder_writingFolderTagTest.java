@@ -59,7 +59,7 @@ public class OpenSearchDataFolder_writingFolderTagTest extends OpenSearchTest {
 	// base properties
 	//
 
-	Assert.assertEquals(DataFolderMapping.DATA_FOLDER_INDEX, wrapper.getIndex());
+	Assert.assertEquals(DataFolderMapping.get().getIndex(), wrapper.getIndex());
 
 	Assert.assertEquals(database.getIdentifier(), wrapper.getDatabaseId());
 

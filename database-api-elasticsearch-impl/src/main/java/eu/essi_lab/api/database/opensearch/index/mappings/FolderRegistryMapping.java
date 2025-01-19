@@ -14,7 +14,7 @@ public class FolderRegistryMapping extends IndexMapping {
     /**
      * 
      */
-    public static final String FOLDER_REGISTRY_INDEX = "folder-registry-index";
+    private static final String FOLDER_REGISTRY_INDEX = "folder-registry-index";
 
     /**
      * 

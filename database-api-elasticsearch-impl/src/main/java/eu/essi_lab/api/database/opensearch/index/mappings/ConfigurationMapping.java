@@ -34,8 +34,8 @@ public class ConfigurationMapping extends IndexMapping {
     /**
      * 
      */
-    public static final String CONFIGURATION_INDEX = "configuration-index";
-    
+    private static final String CONFIGURATION_INDEX = "configuration-index";
+
     /**
      * 
      */
@@ -45,7 +45,6 @@ public class ConfigurationMapping extends IndexMapping {
      * 
      */
     public static final String CONFIGURATION = "configuration";
-
 
     /**
      * @return
@@ -63,7 +62,7 @@ public class ConfigurationMapping extends IndexMapping {
 	super(CONFIGURATION_INDEX);
 
 	addProperty(CONFIGURATION, FieldType.Binary.jsonValue());
-	
+
 	addProperty(CONFIGURATION_NAME, FieldType.Text.jsonValue());
     }
 }

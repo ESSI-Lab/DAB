@@ -58,7 +58,6 @@ public abstract class IndexMapping {
 	MAPPINGS.add(ConfigurationMapping.get());
 	MAPPINGS.add(DataFolderMapping.get());
 	MAPPINGS.add(MetaFolderMapping.get());
-	MAPPINGS.add(MiscMapping.get());
 	MAPPINGS.add(UsersMapping.get());
 	MAPPINGS.add(ViewsMapping.get());
 	MAPPINGS.add(FolderRegistryMapping.get());

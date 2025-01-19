@@ -59,7 +59,7 @@ public class OpenSearchMetaFolder_warnReportTest extends OpenSearchTest {
 	// base properties
 	//
 
-	Assert.assertEquals(MetaFolderMapping.META_FOLDER_INDEX, wrapper.getIndex());
+	Assert.assertEquals(MetaFolderMapping.get().getIndex(), wrapper.getIndex());
 
 	Assert.assertEquals(database.getIdentifier(), wrapper.getDatabaseId());
 

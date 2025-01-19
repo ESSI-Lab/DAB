@@ -63,10 +63,9 @@ import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.index.mappings.AugmentersMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.ConfigurationMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
+import eu.essi_lab.api.database.opensearch.index.mappings.FolderRegistryMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
-import eu.essi_lab.api.database.opensearch.index.mappings.MiscMapping;
-import eu.essi_lab.api.database.opensearch.index.mappings.FolderRegistryMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.UsersMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
 import eu.essi_lab.indexes.IndexedElements;
@@ -333,8 +332,6 @@ public class IndexData {
 
 	    indexData.mapping = DataFolderMapping.get();
 
-	    indexData.index = DataFolderMapping.get().getIndex();
-
 	    break;
 
 	case WRITING_FOLDER_TAG:
@@ -344,8 +341,6 @@ public class IndexData {
 
 	    indexData.mapping = DataFolderMapping.get();
 
-	    indexData.index = DataFolderMapping.get().getIndex();
-
 	    break;
 
 	case AUGMENTER_PROPERTIES:
@@ -354,8 +349,6 @@ public class IndexData {
 	    indexData.object.put(AugmentersMapping.AUGMENTER_PROPERTIES, encodedString);
 
 	    indexData.mapping = AugmentersMapping.get();
-
-	    indexData.index = AugmentersMapping.get().getIndex();
 
 	    break;
 
@@ -367,16 +360,6 @@ public class IndexData {
 	    indexData.object.put(ConfigurationMapping.CONFIGURATION_NAME, key);
 
 	    indexData.mapping = ConfigurationMapping.get();
-
-	    indexData.index = ConfigurationMapping.get().getIndex();
-
-	    break;
-
-	case MISC:
-
-	    indexData.mapping = MiscMapping.get();
-
-	    indexData.index = MiscMapping.get().getIndex();
 
 	    break;
 
@@ -394,8 +377,6 @@ public class IndexData {
 	    indexData.object.put(UsersMapping.USER_ROLE, user.getRole());
 
 	    indexData.mapping = UsersMapping.get();
-
-	    indexData.index = UsersMapping.get().getIndex();
 
 	    break;
 
@@ -421,8 +402,6 @@ public class IndexData {
 
 	    indexData.mapping = ViewsMapping.get();
 
-	    indexData.index = ViewsMapping.get().getIndex();
-
 	    break;
 
 	case DATA_FOLDER_INDEX_DOC:
@@ -439,8 +418,6 @@ public class IndexData {
 
 	    indexData.mapping = MetaFolderMapping.get();
 
-	    indexData.index = MetaFolderMapping.get().getIndex();
-
 	    break;
 
 	case HARVESTING_ERROR_REPORT:
@@ -452,8 +429,6 @@ public class IndexData {
 	    indexData.object.put(MetaFolderMapping.SOURCE_ID, sourceId);
 
 	    indexData.mapping = MetaFolderMapping.get();
-
-	    indexData.index = MetaFolderMapping.get().getIndex();
 
 	    break;
 
@@ -467,8 +442,6 @@ public class IndexData {
 
 	    indexData.mapping = MetaFolderMapping.get();
 
-	    indexData.index = MetaFolderMapping.get().getIndex();
-
 	    break;
 
 	case HARVESTING_PROPERTIES:
@@ -481,10 +454,10 @@ public class IndexData {
 
 	    indexData.mapping = MetaFolderMapping.get();
 
-	    indexData.index = MetaFolderMapping.get().getIndex();
-
 	    break;
 	}
+
+	indexData.index = indexData.mapping.getIndex();
 
 	indexData.mapping.setEntryType(type);
 

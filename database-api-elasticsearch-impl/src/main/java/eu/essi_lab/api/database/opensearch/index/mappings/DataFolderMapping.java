@@ -40,7 +40,7 @@ public class DataFolderMapping extends IndexMapping {
     /**
      * 
      */
-    public static final String DATA_FOLDER_INDEX = "data-folder-index";
+    private static final String DATA_FOLDER_INDEX = "data-folder-index";
 
     /**
      * 

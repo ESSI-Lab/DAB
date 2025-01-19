@@ -34,7 +34,7 @@ public class MetaFolderMapping extends IndexMapping {
     /**
      * 
      */
-    public static final String META_FOLDER_INDEX = "meta-folder-index";
+    private static final String META_FOLDER_INDEX = "meta-folder-index";
 
     //
     // meta-folder-index properties

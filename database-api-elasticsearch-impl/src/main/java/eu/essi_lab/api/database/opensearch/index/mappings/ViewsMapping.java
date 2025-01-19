@@ -36,7 +36,7 @@ public class ViewsMapping extends IndexMapping {
     /**
      * 
      */
-    public static final String VIEWS_INDEX = Database.VIEWS_FOLDER + "-index";
+    private static final String VIEWS_INDEX = Database.VIEWS_FOLDER + "-index";
 
     //
     // views-index properties

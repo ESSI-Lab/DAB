@@ -58,7 +58,7 @@ public class OpenSearchConfigurationFolderTest extends OpenSearchTest {
 	// base properties
 	//
 
-	Assert.assertEquals(ConfigurationMapping.CONFIGURATION_INDEX, wrapper.getIndex());
+	Assert.assertEquals(ConfigurationMapping.get().getIndex(), wrapper.getIndex());
 
 	Assert.assertEquals(database.getIdentifier(), wrapper.getDatabaseId());
 

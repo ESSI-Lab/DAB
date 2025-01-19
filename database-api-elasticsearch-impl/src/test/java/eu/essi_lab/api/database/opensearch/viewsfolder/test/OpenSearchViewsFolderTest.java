@@ -58,7 +58,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 	// base properties
 	//
 
-	Assert.assertEquals(ViewsMapping.VIEWS_INDEX, wrapper.getIndex());
+	Assert.assertEquals(ViewsMapping.get().getIndex(), wrapper.getIndex());
 
 	Assert.assertEquals(database.getIdentifier(), wrapper.getDatabaseId());
 
@@ -117,7 +117,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 	// base properties
 	//
 
-	Assert.assertEquals(ViewsMapping.VIEWS_INDEX, wrapper.getIndex());
+	Assert.assertEquals(ViewsMapping.get().getIndex(), wrapper.getIndex());
 
 	Assert.assertEquals(database.getIdentifier(), wrapper.getDatabaseId());
 

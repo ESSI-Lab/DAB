@@ -60,7 +60,7 @@ public class OpenSearchMetaFolder_harvestingPropertiesTest extends OpenSearchTes
 	// base properties
 	//
 
-	Assert.assertEquals(MetaFolderMapping.META_FOLDER_INDEX, wrapper.getIndex());
+	Assert.assertEquals(MetaFolderMapping.get().getIndex(), wrapper.getIndex());
 
 	Assert.assertEquals(database.getIdentifier(), wrapper.getDatabaseId());
 

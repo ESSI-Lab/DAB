@@ -36,7 +36,7 @@ public class UsersMapping extends IndexMapping {
     /**
      * 
      */
-    public static final String USERS_INDEX = Database.USERS_FOLDER + "-index";
+    private static final String USERS_INDEX = Database.USERS_FOLDER + "-index";
 
     //
     // users-index properties
@@ -67,7 +67,7 @@ public class UsersMapping extends IndexMapping {
 	addProperty(USER_ID, FieldType.Text.jsonValue());
 	addProperty(USER_ROLE, FieldType.Text.jsonValue());
 	addProperty(ENABLED, FieldType.Boolean.jsonValue());
-	
+
 	// optional
 	addProperty(USER_ID_TYPE, FieldType.Text.jsonValue());
     }

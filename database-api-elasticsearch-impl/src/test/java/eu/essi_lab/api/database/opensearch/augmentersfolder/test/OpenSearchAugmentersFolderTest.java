@@ -61,7 +61,7 @@ public class OpenSearchAugmentersFolderTest extends OpenSearchTest {
 	// base properties
 	//
 
-	Assert.assertEquals(AugmentersMapping.AUGMENTERS_INDEX, wrapper.getIndex());
+	Assert.assertEquals(AugmentersMapping.get().getIndex(), wrapper.getIndex());
 
 	Assert.assertEquals(database.getIdentifier(), wrapper.getDatabaseId());
 

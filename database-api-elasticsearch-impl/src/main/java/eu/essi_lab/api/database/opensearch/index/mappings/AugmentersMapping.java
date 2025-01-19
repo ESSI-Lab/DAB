@@ -39,7 +39,7 @@ public class AugmentersMapping extends IndexMapping {
     /**
      * 
      */
-    public static final String AUGMENTERS_INDEX = Database.AUGMENTERS_FOLDER + "-index";
+    private static final String AUGMENTERS_INDEX = Database.AUGMENTERS_FOLDER + "-index";
 
     /**
      * 
