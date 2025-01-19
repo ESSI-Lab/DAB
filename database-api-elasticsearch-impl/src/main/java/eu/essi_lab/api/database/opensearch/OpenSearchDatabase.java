@@ -3,6 +3,7 @@
  */
 package eu.essi_lab.api.database.opensearch;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -149,8 +150,12 @@ public class OpenSearchDatabase extends Database {
 	    System.setProperty("aws.accessKeyId", storageInfo.getUser());
 	    System.setProperty("aws.secretAccessKey", storageInfo.getPassword());
 
-	    // the identifier is same as name
-	    identifier = storageInfo.getName();
+	    //
+	    // if missing, the identifier is same as name
+	    // the identifier is missing when the storage info comes from the
+	    // configuration, where the identifier field is missing
+	    //
+	    identifier = storageInfo.getIdentifier() != null ? storageInfo.getIdentifier() : storageInfo.getName();
 
 	    AwsSdk2TransportOptions awsSdk2TransportOptions = AwsSdk2TransportOptions.builder().//
 
@@ -269,13 +274,39 @@ public class OpenSearchDatabase extends Database {
     @Override
     public Optional<DatabaseFolder> getFolder(String folderName, boolean createIfNotExist) throws GSException {
 
+	OpenSearchFolder folder = new OpenSearchFolder(this, folderName);
+
+	if (existsFolder(folderName)) {
+
+	    return Optional.of(folder);
+	}
+
+	if (!createIfNotExist) {
+
+	    return Optional.empty();
+	}
+
+	boolean created = addFolder(folderName);
+
+	if (created) {
+
+	    return Optional.ofNullable(folder);
+	}
+
 	return Optional.empty();
     }
 
     @Override
     public boolean existsFolder(String folderName) throws GSException {
 
-	return false;
+	try {
+
+	    return FolderRegistry.get(this).isRegistered(new OpenSearchFolder(this, folderName));
+
+	} catch (Exception ex) {
+
+	    throw GSException.createException(OpenSearchDatabase.class, "OpenSearchDatabaseExistsFolderError", ex);
+	}
     }
 
     @Override
@@ -287,11 +318,34 @@ public class OpenSearchDatabase extends Database {
     @Override
     public boolean removeFolder(String folderName) throws GSException {
 
-	return false;
+	try {
+
+	    OpenSearchFolder folder = new OpenSearchFolder(this, folderName);
+	    folder.clear();
+
+	    return FolderRegistry.get(this).deregister(folder);
+
+	} catch (Exception ex) {
+
+	    throw GSException.createException(OpenSearchDatabase.class, "OpenSearchDatabaseRemoceFolderError", ex);
+	}
     }
 
     @Override
     public boolean addFolder(String folderName) throws GSException {
+
+	if (!existsFolder(folderName)) {
+
+	    OpenSearchFolder folder = new OpenSearchFolder(this, folderName);
+
+	    try {
+		return FolderRegistry.get(this).register(folder);
+
+	    } catch (IOException e) {
+
+		throw GSException.createException(getClass(), "OpenSearchDatabaseAddFolderError", e);
+	    }
+	}
 
 	return false;
     }
