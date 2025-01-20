@@ -14,9 +14,9 @@ import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch.indices.ExistsRequest;
 
 import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.Database.OpenSearchServiceType;
 import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
-import eu.essi_lab.api.database.opensearch.OpenSearchDatabase.OpenSearchServiceType;
 import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
