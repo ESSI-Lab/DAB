@@ -316,7 +316,7 @@ export function initializePortal(config) {
 
 		GIAPI.search.constWidget.whatConstraint('add', {
 			showOptDialog: true,
-			showResultSetExtensionOpt: true,
+			showResultSetExtensionOpt: false,
 			optDialogPosition: 'bottom',
 			showHelpIcon: false,
 			resizable: true

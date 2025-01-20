@@ -88,6 +88,10 @@ public class TermFrequencyMapType {
     @XmlElementWrapper(name = MetadataElement.ATTRIBUTE_TITLE_EL_NAME, namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     private ArrayList<TermFrequencyItem> attributeTitle;
+    
+    @XmlElementWrapper(name = MetadataElement.OBSERVED_PROPERTY_URI_EL_NAME, namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
+    @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
+    private ArrayList<TermFrequencyItem> observedPropertyURI;
 
     @XmlElementWrapper(name = MetadataElement.ORGANISATION_NAME_EL_NAME, namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
@@ -141,6 +145,7 @@ public class TermFrequencyMapType {
 	origOrgDesc= new ArrayList<TermFrequencyItem>();
 	attributeId = new ArrayList<TermFrequencyItem>();
 	attributeTitle = new ArrayList<TermFrequencyItem>();
+	observedPropertyURI = new ArrayList<TermFrequencyItem>();
 	orgName = new ArrayList<TermFrequencyItem>();
 	sscScore = new ArrayList<TermFrequencyItem>();
 	prodType = new ArrayList<TermFrequencyItem>();
@@ -231,6 +236,11 @@ public class TermFrequencyMapType {
     @XmlTransient
     public ArrayList<TermFrequencyItem> getAttributeTitle() {
 	return attributeTitle;
+    }
+    
+    @XmlTransient
+    public ArrayList<TermFrequencyItem> getObservedPropertyURI() {
+	return observedPropertyURI;
     }
 
     @XmlTransient

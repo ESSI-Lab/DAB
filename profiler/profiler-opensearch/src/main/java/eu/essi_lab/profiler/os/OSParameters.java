@@ -467,6 +467,21 @@ public abstract class OSParameters {
 	    return createBond(value, MetadataElement.ATTRIBUTE_TITLE);
 	}
     };
+    
+    /**
+    *
+    */
+    public static final OSParameter OBSERVED_PROPERTY_URI = new OSParameter("observedPropertyURI", "string", null, "{gs:observedPropertyURI}") {
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    if (value == null || value.equals("")) {
+		return Optional.empty();
+	    }
+
+	    return createBond(value, MetadataElement.OBSERVED_PROPERTY_URI);
+	}
+    };
 
     /**
      *

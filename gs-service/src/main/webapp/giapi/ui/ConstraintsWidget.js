@@ -946,15 +946,27 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 				label = 'Legal acc. const.';
 				break;
 			case 'luc':
-				values = [{ 'label': 'Search all records', 'value': '' }, { 'label': 'Only records with legal use constraints', 'value': 'true' }, { 'label': 'Only records without legal use constraints', 'value': 'false' }];
+				values = [{ 'label': 'Search all records', 'value': '' },
+				{ 'label': 'Only records with legal use constraints', 'value': 'true' },
+				{ 'label': 'Only records without legal use constraints', 'value': 'false' }];
 				label = 'Legal use const.';
 				break;
 			case 'rosetta':
-				values = [{ 'label': 'Basic search by exact term', 'value': '' }, { 'label': 'Advanced search w/ Rosetta Stone translations', 'value': 'true' }, { 'label': 'Advanced search w/ Rosetta Stone narrow matches', 'value': 'narrow' }, { 'label': 'Advanced search w/ Rosetta Stone broad matches', 'value': 'broad' }];
+				values = [{ 'label': 'Basic search by exact term', 'value': '' }, 
+				{ 'label': 'Advanced search w/ Rosetta Stone translations', 'value': 'true' }, 
+				{ 'label': 'Advanced search w/ Rosetta Stone narrow matches', 'value': 'narrow' },
+				 { 'label': 'Advanced search w/ Rosetta Stone broad matches', 'value': 'broad' }];
+				label = 'Use ODIP Rosetta Stone service.';
+				break;
+			case 'semantics':
+				values = [{ 'label': 'Basic search by exact term', 'value': '' }, 
+				{ 'label': 'Advanced search w/ translations', 'value': 'sameas' }, 
+				{ 'label': 'Advanced search w/ translations and narrow matches', 'value': 'narrow' }];
 				label = 'Use ODIP Rosetta Stone service.';
 				break;
 			case 'isValidated':
-				values = [{ 'label': 'Search all records', 'value': '' }, { 'label': 'Search validated records', 'value': 'true' }];
+				values = [{ 'label': 'Search all records', 'value': '' },
+				{ 'label': 'Search validated records', 'value': 'true' }];
 				help = 'Optionally limits the search to validated records only';
 				label = 'Validated records';
 				break;

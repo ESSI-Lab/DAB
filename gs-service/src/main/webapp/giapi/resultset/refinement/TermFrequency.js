@@ -81,6 +81,8 @@ GIAPI.TermFrequency = function(dabNode, cnstr, options, onStatus, onResponse, te
 		targets.push(p);
 	}
 
+	targets.sort();
+	
 	/**
 	 * Checks the {{#crossLink "TermFrequencyItem"}}term frequency items{{/crossLink}} of the given term frequency <code>target</code>. 
 	 * Once the {{#crossLink "TermFrequencyItem"}}items{{/crossLink}} are checked,
@@ -234,31 +236,11 @@ GIAPI.TermFrequency = function(dabNode, cnstr, options, onStatus, onResponse, te
 		};
 
 		_onResponse._origin = 'termFrequency';
-		dabNode.discover(_onResponse, tf._cnstr, options, onStatus);
-		const consts = {
-		}
-		var source = tf._cnstr.source;
-		var organisationName = tf._cnstr.organisationName;
-		var platformTitle = tf._cnstr.platformTitle;
-		var keyword = tf._cnstr.keyword;
-		var attributeTitle = tf._cnstr.attributeTitle;
 
-		if (Array.isArray(source) && source.length > 0) {
-			consts.sources = [source[0]];
-		}
-		if (Array.isArray(organisationName) && organisationName.length > 0) {
-			consts.organisationName = [organisationName[0]];
-		}
-		if (Array.isArray(platformTitle) && platformTitle.length > 0) {
-			consts.platformTitle = [platformTitle[0]];
-		}
-		if (Array.isArray(keyword) && keyword.length > 0) {
-			consts.keyword = [keyword[0]];
-		}
-		if (Array.isArray(attributeTitle) && attributeTitle.length > 0) {
-			consts.attributeTitle = [attributeTitle[0]];
-		}
-		GIAPI.search.resultsMapWidget.updateWMSClusterLayers(consts);
+		dabNode.discover(_onResponse, tf._cnstr, options, onStatus);
+		tf._cnstr.sources = tf._cnstr.source;
+		
+		GIAPI.search.resultsMapWidget.updateWMSClusterLayers(tf._cnstr);
 
 
 	};

@@ -19,6 +19,7 @@
     "instrumentSearch": true,
     "attributeSearch": true,
     "platformSearch": true,
+    "ontology": "whos",
     "riverSearch": true
     
 }

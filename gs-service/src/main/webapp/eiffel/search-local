@@ -611,7 +611,7 @@
                 
                 GIAPI.search.constWidget.whatConstraint('add',{
                 	 showOptDialog: false , 
-                	 showResultSetExtensionOpt: true, 
+                	 showResultSetExtensionOpt: false, 
                 	 optDialogPosition : 'bottom',
                 	 showHelpIcon: false,
                 	 resizable:true

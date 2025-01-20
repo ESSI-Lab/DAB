@@ -216,6 +216,7 @@ export const GIAPI = {
         var instr = '';
         var platTitle = '';
         var attrTitle = '';
+        var attrURI = '';
         var orgName = '';
 
 		if (kvp) {
@@ -283,6 +284,11 @@ export const GIAPI = {
 					continue;
 				}
 				
+				if( key === 'observedPropertyURI'){
+					attrURI = val;
+					continue;
+				}
+				
 				if( key === 'orgName'){
 					orgName = val;
 					continue;
@@ -308,6 +314,7 @@ export const GIAPI = {
         instr = options && options.termFrequency && GIAPI.readConstraint(constraints, 'instrumentTitle') || instr;
         platTitle = options && options.termFrequency && GIAPI.readConstraint(constraints, 'platformTitle') || platTitle;
         attrTitle = options && options.termFrequency && GIAPI.readConstraint(constraints, 'attributeTitle') || attrTitle;
+        attrURI = options && options.termFrequency && GIAPI.readConstraint(constraints, 'observedPropertyURI') || attrURI;
         orgName = options && options.termFrequency && GIAPI.readConstraint(constraints, 'organisationName') || orgName;
 
 
@@ -385,7 +392,7 @@ export const GIAPI = {
 	        }else{
 	        	// by default all the targets are selected
 	        	// termFrequency = 'keyword,format,providerID,protocol,instrumentId,platformId,origOrgId,attributeId,sscScore';
-		        termFrequency = 'keyword,format,providerID,protocol,instrumentId,platformId,origOrgId,attributeId,instrumentTitle,platformTitle,orgName,attributeTitle';
+		        termFrequency = 'keyword,format,providerID,protocol,instrumentId,platformId,origOrgId,attributeId,instrumentTitle,platformTitle,orgName,attributeTitle,observedPropertyURI';
 	        }
         }
         
@@ -429,6 +436,7 @@ export const GIAPI = {
         httpGet += 'instrumentTitle=' + instr + '&';
         httpGet += 'platformTitle=' + platTitle + '&';
         httpGet += 'attributeTitle=' + attrTitle + '&';        
+        httpGet += 'observedPropertyURI=' + attrURI + '&';
         httpGet += 'organisationName=' + orgName + '&';
         
   
