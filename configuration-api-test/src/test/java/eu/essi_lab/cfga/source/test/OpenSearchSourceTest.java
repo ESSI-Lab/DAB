@@ -10,9 +10,11 @@ import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch.indices.DeleteIndexRequest;
 
 import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.Database.DatabaseImpl;
+import eu.essi_lab.api.database.Database.OpenSearchServiceType;
 import eu.essi_lab.api.database.cfg.DatabaseSource;
+import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
-import eu.essi_lab.api.database.opensearch.OpenSearchDatabase.OpenSearchServiceType;
 import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -48,7 +50,7 @@ public class OpenSearchSourceTest extends DatabaseSourceTest {
      */
     protected DatabaseSource create() throws GSException {
 
-	return new DatabaseSource(storageInfo, Database.CONFIGURATION_FOLDER, "test-config");
+	return DatabaseSource.of(DatabaseImpl.OPENSEARCH, storageInfo, "test-config");
     }
 
     /**
@@ -76,7 +78,7 @@ public class OpenSearchSourceTest extends DatabaseSourceTest {
 	    }
 	}
 
-	OpenSearchDatabase database = new OpenSearchDatabase();
+	OpenSearchDatabase database = (OpenSearchDatabase) DatabaseFactory.get(INFO);
 	database.initializeIndexes();
     }
 }
