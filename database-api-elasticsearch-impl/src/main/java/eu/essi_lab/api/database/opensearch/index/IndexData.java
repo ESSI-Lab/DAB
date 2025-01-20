@@ -61,6 +61,7 @@ import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.SourceStorageWorker.DataFolderIndexDocument;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.index.mappings.AugmentersMapping;
+import eu.essi_lab.api.database.opensearch.index.mappings.CacheMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.ConfigurationMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.FolderRegistryMapping;
@@ -362,12 +363,12 @@ public class IndexData {
 	    indexData.mapping = ConfigurationMapping.get();
 
 	    break;
-	    
+
 	case CONFIGURATION_LOCK:
-	    
+
 	    indexData.object.put(BINARY_PROPERTY, ConfigurationMapping.CONFIGURATION_LOCK);
 	    indexData.object.put(ConfigurationMapping.CONFIGURATION_LOCK, encodedString);
-	    	    
+
 	    indexData.mapping = ConfigurationMapping.get();
 
 	    break;
@@ -464,6 +465,14 @@ public class IndexData {
 	    indexData.mapping = MetaFolderMapping.get();
 
 	    break;
+	case CACHE_ENTRY:
+
+	    indexData.object.put(BINARY_PROPERTY, CacheMapping.CACHED_ENTRY);
+	    indexData.object.put(CacheMapping.CACHED_ENTRY, encodedString);
+
+	    indexData.mapping = CacheMapping.get();
+
+	    break;
 	}
 
 	indexData.index = indexData.mapping.getIndex();
@@ -510,7 +519,11 @@ public class IndexData {
 	    return AugmentersMapping.get().getIndex();
 	}
 
-	else {// name.contains(Database.CONFIGURATION_FOLDER
+	else if (name.contains(Database.CACHE_FOLDER)) {
+
+	    return CacheMapping.get().getIndex();
+
+	} else {// name.contains(Database.CONFIGURATION_FOLDER
 
 	    return ConfigurationMapping.get().getIndex();
 	}

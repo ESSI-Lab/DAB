@@ -22,19 +22,16 @@ package eu.essi_lab.shared.driver;
  */
 
 import java.io.InputStream;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import eu.essi_lab.api.database.Database;
-import eu.essi_lab.api.database.DatabaseExecutor;
 import eu.essi_lab.api.database.DatabaseFolder;
-import eu.essi_lab.api.database.DatabaseReader;
+import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.factory.DatabaseFactory;
-import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.setting.driver.SharedCacheDriverSetting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.StorageInfo;
@@ -53,8 +50,6 @@ import eu.essi_lab.shared.serializer.SharedContentSerializers;
 public class DatabaseCacheDriver implements ISharedRepositoryDriver<SharedCacheDriverSetting> {
 
     static final String DRIVER_TYPE = "DatabaseCache";
-
-    private static final String CACHE_FOLDER_NAME = "driverCache";
 
     private static final int TRHREAD_POOL_SIZE = 10;
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(TRHREAD_POOL_SIZE);
@@ -108,7 +103,7 @@ public class DatabaseCacheDriver implements ISharedRepositoryDriver<SharedCacheD
 
 	    Database database = getDatabase();
 
-	    Optional<DatabaseFolder> optFolder = database.getFolder(CACHE_FOLDER_NAME, true);
+	    Optional<DatabaseFolder> optFolder = database.getFolder(Database.CACHE_FOLDER, true);
 
 	    if (optFolder.isPresent()) {
 
@@ -178,7 +173,7 @@ public class DatabaseCacheDriver implements ISharedRepositoryDriver<SharedCacheD
 
 	    Database database = getDatabase();
 
-	    Optional<DatabaseFolder> optFolder = database.getFolder(CACHE_FOLDER_NAME, true);
+	    Optional<DatabaseFolder> optFolder = database.getFolder(Database.CACHE_FOLDER, true);
 
 	    if (optFolder.isPresent()) {
 
@@ -222,7 +217,7 @@ public class DatabaseCacheDriver implements ISharedRepositoryDriver<SharedCacheD
 
 	    InputStream stream = serializer.toStream(sharedContent);
 
-	    optFolder.get().store(identifier,  FolderEntry.of(stream));
+	    optFolder.get().store(identifier, FolderEntry.of(stream), EntryType.CACHE_ENTRY);
 
 	    GSLoggerFactory.getLogger(getClass()).info("Storing binary to folder {} ENDED", optFolder.get().getName());
 
@@ -267,15 +262,6 @@ public class DatabaseCacheDriver implements ISharedRepositoryDriver<SharedCacheD
 	Database database = DatabaseFactory.get(uri);
 
 	return database;
-    }
-
-    private DatabaseExecutor getDatabaseExecutor() throws GSException {
-
-	StorageInfo uri = setting.getDatabaseCacheSetting().get().asStorageUri();
-
-	DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(uri);
-
-	return executor;
     }
 
     private SharedContentSerializer getSerializerOrThrowEx(SharedContentType type) throws GSException {

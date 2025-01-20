@@ -39,6 +39,7 @@ import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.mappings.AugmentersMapping;
+import eu.essi_lab.api.database.opensearch.index.mappings.CacheMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.ConfigurationMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
@@ -376,6 +377,15 @@ public class SourceWrapper {
     public Optional<String> getConfigurationLock() {
 
 	return Optional.ofNullable(source.optString(ConfigurationMapping.CONFIGURATION_LOCK, null));
+    }
+
+    /**
+     * - 'cache-index' property
+     * - base64 encoded
+     */
+    public Optional<String> getCachedEntry() {
+
+	return Optional.ofNullable(source.optString(CacheMapping.CACHED_ENTRY, null));
     }
 
     /**

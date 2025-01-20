@@ -139,7 +139,14 @@ public interface DatabaseFolder {
 	// folder-registry-index entry	
 	//
 
-	REGISTERED_FOLDER;
+	REGISTERED_FOLDER,
+	
+	//
+	// cache-index entry
+	//
+	
+	CACHE_ENTRY;
+	
     }
 
     /**

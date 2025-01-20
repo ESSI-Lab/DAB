@@ -61,7 +61,9 @@ public abstract class IndexMapping {
 	MAPPINGS.add(UsersMapping.get());
 	MAPPINGS.add(ViewsMapping.get());
 	MAPPINGS.add(FolderRegistryMapping.get());
-    }
+	MAPPINGS.add(CacheMapping.get());
+    }	
+
 
     /**
      * @return

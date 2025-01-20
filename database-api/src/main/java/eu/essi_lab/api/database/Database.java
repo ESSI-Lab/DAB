@@ -180,6 +180,10 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
      * 
      */
     public static final String CONFIGURATION_FOLDER = "configuration";
+    /*
+     * 
+     */
+    public static final String CACHE_FOLDER = "cache";
 
     /**
      * @param startupUri
