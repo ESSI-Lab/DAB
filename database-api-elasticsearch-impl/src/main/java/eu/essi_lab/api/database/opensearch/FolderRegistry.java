@@ -25,8 +25,11 @@ package eu.essi_lab.api.database.opensearch;
  */
 
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.opensearch.client.opensearch._types.OpenSearchException;
+import org.opensearch.client.opensearch._types.query_dsl.Query;
 
 import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.mappings.FolderRegistryMapping;
@@ -37,6 +40,7 @@ import eu.essi_lab.api.database.opensearch.index.mappings.FolderRegistryMapping;
 public class FolderRegistry {
 
     private OpenSearchClientWrapper wrapper;
+    private OpenSearchDatabase database;
 
     /**
      * @param database
@@ -52,6 +56,7 @@ public class FolderRegistry {
      */
     private FolderRegistry(OpenSearchDatabase database) {
 
+	this.database = database;
 	this.wrapper = new OpenSearchClientWrapper(database.getClient());
     }
 
@@ -102,5 +107,21 @@ public class FolderRegistry {
 	String id = FolderRegistryMapping.getEntryId(folder);
 
 	return wrapper.entryExists(index, id);
+    }
+
+    /**
+     * @return
+     * @throws OpenSearchException
+     * @throws IOException
+     */
+    public List<OpenSearchFolder> getRegisteredFolders() throws OpenSearchException, IOException {
+
+	Query query = wrapper.buildSearchRegistryQuery(database.getIdentifier());
+
+	List<String> names = wrapper.searchProperty(query, IndexData.FOLDER_NAME);
+
+	return names.stream().//
+		map(name -> new OpenSearchFolder(this.database, name)).//
+		collect(Collectors.toList());
     }
 }
