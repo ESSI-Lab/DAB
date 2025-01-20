@@ -25,7 +25,7 @@ public class OpenSearchTest {
 
 	OpenSearchClient client = OpenSearchDatabase.createNoSSLContextClient(OpenSearchDatabaseInitTest.createStorageInfo());
 
-	for (String index : IndexMapping.getMappings()) {
+	for (String index : IndexMapping.getIndexes()) {
 
 	    if (OpenSearchDatabase.checkIndex(client, index)) {
 

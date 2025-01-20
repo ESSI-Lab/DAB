@@ -66,7 +66,7 @@ public class OpenSearchSourceTest extends DatabaseSourceTest {
 
 	OpenSearchClient client = OpenSearchDatabase.createNoSSLContextClient(INFO);
 
-	for (String index : IndexMapping.getMappings()) {
+	for (String index : IndexMapping.getIndexes()) {
 
 	    if (OpenSearchDatabase.checkIndex(client, index)) {
 

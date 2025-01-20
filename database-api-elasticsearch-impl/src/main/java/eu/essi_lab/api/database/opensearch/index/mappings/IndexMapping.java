@@ -68,7 +68,7 @@ public abstract class IndexMapping {
     /**
      * @return
      */
-    public static List<String> getMappings() {
+    public static List<String> getIndexes() {
 
 	return MAPPINGS.stream().//
 		map(i -> i.getIndex()).//
