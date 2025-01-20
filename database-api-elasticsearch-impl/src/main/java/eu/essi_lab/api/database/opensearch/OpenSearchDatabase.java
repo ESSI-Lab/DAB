@@ -70,10 +70,12 @@ public class OpenSearchDatabase extends Database {
 
     private SdkHttpClient httpClient;
     private boolean initialized;
+    private StorageInfo storageInfo;
 
     @Override
     public void initialize(StorageInfo storageInfo) throws GSException {
 
+	this.storageInfo = storageInfo;
 	if (!initialized) {
 
 	    System.setProperty("aws.accessKeyId", storageInfo.getUser());
@@ -186,7 +188,7 @@ public class OpenSearchDatabase extends Database {
     @Override
     public SourceStorageWorker getWorker(String sourceId) throws GSException {
 
-	return null;
+	return new SourceStorageWorker(sourceId, this);
     }
 
     @Override
@@ -241,7 +243,16 @@ public class OpenSearchDatabase extends Database {
     @Override
     public DatabaseFolder[] getFolders() throws GSException {
 
-	return null;
+	try {
+
+	    List<OpenSearchFolder> folders = FolderRegistry.get(this).getRegisteredFolders();
+
+	    return folders.toArray(new OpenSearchFolder[] {});
+
+	} catch (Exception ex) {
+
+	    throw GSException.createException(OpenSearchDatabase.class, "OpenSearchDatabaseGetFoldersError", ex);
+	}
     }
 
     @Override
@@ -279,12 +290,11 @@ public class OpenSearchDatabase extends Database {
 	return false;
     }
 
-    @Override
-    public DatabaseFolder findWritingFolder(SourceStorageWorker worker) throws GSException {
-
-	return null;
-    }
-
+    /**
+     * Not implemented. Used in deprecated {@link SourceStorageWorker} testISOCompliance, recverTags and
+     * testISCompliance
+     * methods
+     */
     @Override
     public List<String> getIdentifiers(IdentifierType type, String folderName, boolean excludDeleted) throws GSException {
 
@@ -294,7 +304,7 @@ public class OpenSearchDatabase extends Database {
     @Override
     public StorageInfo getStorageInfo() {
 
-	return null;
+	return storageInfo;
     }
 
     @Override
@@ -315,7 +325,8 @@ public class OpenSearchDatabase extends Database {
     @Override
     public boolean supports(StorageInfo dbInfo) {
 
-	return dbInfo.getType().isPresent() && OpenSearchServiceType.protocols().contains(dbInfo.getType().get());
+	return dbInfo.getType().isPresent() && //
+		OpenSearchServiceType.protocols().contains(dbInfo.getType().get());
     }
 
     @Override
@@ -333,7 +344,7 @@ public class OpenSearchDatabase extends Database {
     @Override
     public String getType() {
 
-	return "OpenSearch";
+	return DatabaseImpl.OPENSEARCH.getName();
     }
 
     /**
