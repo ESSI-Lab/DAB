@@ -25,6 +25,7 @@ package eu.essi_lab.api.database.opensearch;
  */
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -57,6 +58,8 @@ import org.opensearch.client.opensearch.generic.Requests;
 import org.opensearch.client.opensearch.generic.Response;
 
 import eu.essi_lab.api.database.opensearch.index.IndexData;
+import eu.essi_lab.api.database.opensearch.index.mappings.FolderRegistryMapping;
+import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 
 /**
  * @author Fabrizio
@@ -297,11 +300,17 @@ public class OpenSearchClientWrapper {
 		field(IndexData.FOLDER_NAME).query(folder.getName()).//
 		build();
 
-	List<Query> queryList = Arrays.asList(//
-		databaseIdQuery.toQuery(), //
-		folderNameQuery.toQuery());
+	List<Query> mustList = new ArrayList<>();
 
-	BoolQuery boolQuery = new BoolQuery.Builder().must(queryList).build();
+	mustList.add(databaseIdQuery.toQuery());
+	mustList.add(folderNameQuery.toQuery());
+
+	List<Query> shouldList = buildIndexesQuery();
+
+	BoolQuery boolQuery = new BoolQuery.Builder().//
+		must(mustList).//
+		should(shouldList).//
+		build();
 
 	return boolQuery.toQuery();
     }
@@ -348,10 +357,39 @@ public class OpenSearchClientWrapper {
 		field(IndexData.ENTRY_NAME).query(key).//
 		build();
 
+	List<Query> mustList = new ArrayList<>();
+
+	mustList.add(databaseIdQuery.toQuery());
+	mustList.add(folderNameQuery.toQuery());
+	mustList.add(keyQuery.toQuery());
+
+	List<Query> shouldList = buildIndexesQuery();
+
+	BoolQuery boolQuery = new BoolQuery.Builder().//
+		must(mustList).//
+		should(shouldList).//
+		build();
+
+	return boolQuery.toQuery();
+    }
+
+    /**
+     * @param databaseId
+     * @return
+     */
+    public Query buildSearchRegistryQuery(String databaseId) {
+
+	MatchPhraseQuery databaseIdQuery = new MatchPhraseQuery.Builder().//
+		field(IndexData.DATABASE_ID).query(databaseId).//
+		build();
+
+	MatchPhraseQuery folderRegistryIndexQuery = new MatchPhraseQuery.Builder().//
+		field("_index").query(FolderRegistryMapping.get().getIndex()).//
+		build();
+
 	List<Query> queryList = Arrays.asList(//
 		databaseIdQuery.toQuery(), //
-		folderNameQuery.toQuery(), //
-		keyQuery.toQuery());
+		folderRegistryIndexQuery.toQuery());
 
 	BoolQuery boolQuery = new BoolQuery.Builder().must(queryList).build();
 
@@ -397,6 +435,28 @@ public class OpenSearchClientWrapper {
     public void synch() throws OpenSearchException, IOException {
 
 	client.indices().refresh();
+    }
+
+    /**
+     * @return
+     */
+    private List<Query> buildIndexesQuery() {
+
+	List<String> indexes = IndexMapping.getIndexes();
+
+	List<Query> queryList = new ArrayList<>();
+
+	indexes.forEach(index -> {
+
+	    queryList.add(new MatchPhraseQuery.Builder().//
+		    field("_index").//
+		    query(index).//
+		    build().//
+		    toQuery());
+
+	});
+
+	return queryList;
     }
 
     /**
