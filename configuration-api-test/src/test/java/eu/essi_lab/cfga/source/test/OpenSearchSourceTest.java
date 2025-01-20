@@ -76,8 +76,7 @@ public class OpenSearchSourceTest extends DatabaseSourceTest {
 	    }
 	}
 
-	// recreate the indexes
 	OpenSearchDatabase database = new OpenSearchDatabase();
-	database.initialize(INFO);
+	database.initializeIndexes();
     }
 }
