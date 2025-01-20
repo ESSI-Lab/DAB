@@ -920,48 +920,6 @@ public class MarkLogicDatabase extends Database {
 	return out.toArray(new MarkLogicFolder[] {});
     }
 
-    @Override
-    public DatabaseFolder findWritingFolder(SourceStorageWorker worker) throws GSException {
-
-	DatabaseFolder folder = worker.getWritingFolder(Optional.empty());
-
-	if (folder == null) {
-
-	    if (worker.existsData1Folder() && worker.existsData2Folder()) {
-
-		throw GSException.createException(//
-			getClass(), //
-			"Both data-1 and data-2 folders exist", //
-			null, //
-			ErrorInfo.ERRORTYPE_INTERNAL, //
-			ErrorInfo.SEVERITY_ERROR, //
-			"MarkLogicBothDataFoldersExistError" //
-		);
-	    }
-
-	    if (worker.existsData1Folder()) {
-
-		return worker.getData1Folder();
-	    }
-
-	    if (worker.existsData2Folder()) {
-
-		return worker.getData2Folder();
-	    }
-
-	    throw GSException.createException(//
-		    getClass(), //
-		    "No data folder found", //
-		    null, //
-		    ErrorInfo.ERRORTYPE_INTERNAL, //
-		    ErrorInfo.SEVERITY_ERROR, //
-		    "MarkLogicNODataFoldersExistError" //
-	    );
-	}
-
-	return folder;
-    }
-
     public MarkLogicFolder[] getDataFolders() throws GSException {
 
 	MarkLogicFolder[] folders = getFolders();

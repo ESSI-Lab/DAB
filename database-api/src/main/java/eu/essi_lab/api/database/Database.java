@@ -33,6 +33,7 @@ import com.marklogic.xcc.exceptions.RequestException;
 import eu.essi_lab.cfga.Configurable;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.model.StorageInfo;
+import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 
 /**
@@ -331,7 +332,46 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
      * @throws GSException
      * @throws RequestException
      */
-    public abstract DatabaseFolder findWritingFolder(SourceStorageWorker worker) throws GSException;
+    public DatabaseFolder findWritingFolder(SourceStorageWorker worker) throws GSException {
+
+	DatabaseFolder folder = worker.getWritingFolder(Optional.empty());
+
+	if (folder == null) {
+
+	    if (worker.existsData1Folder() && worker.existsData2Folder()) {
+
+		throw GSException.createException(//
+			getClass(), //
+			"Both data-1 and data-2 folders exist", //
+			null, //
+			ErrorInfo.ERRORTYPE_INTERNAL, //
+			ErrorInfo.SEVERITY_ERROR, //
+			"DatabaseBothDataFoldersExistError" //
+		);
+	    }
+
+	    if (worker.existsData1Folder()) {
+
+		return worker.getData1Folder();
+	    }
+
+	    if (worker.existsData2Folder()) {
+
+		return worker.getData2Folder();
+	    }
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    "No data folder found", //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    "DatabaseNoDataFoldersExistError" //
+	    );
+	}
+
+	return folder;
+    }
 
     /**
      * @param type
