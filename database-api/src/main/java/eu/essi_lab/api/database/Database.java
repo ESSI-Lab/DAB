@@ -1,7 +1,11 @@
 package eu.essi_lab.api.database;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.marklogic.xcc.exceptions.RequestException;
 
@@ -92,6 +96,75 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
     }
 
     /**
+     * @author Fabrizio
+     */
+    public enum OpenSearchServiceType {
+
+	/**
+	 * es -> internally used to create the AwsSdk2Transport
+	 * osm -> (OpenSearch Managed) protocol used as database type in the {@link StorageInfo} and
+	 * in the GSService VM argument "configuration.url". E.g: osm://localhost/prod/prodConfig
+	 */
+	OPEN_SEARCH_MANAGED("es", "osm"),
+
+	/**
+	 * es -> internally used to create the AwsSdk2Transport
+	 * osm -> (OpenSearch Serverless) protocol used as database type in the {@link StorageInfo} and
+	 * in the GSService VM argument "configuration.url". E.g: oss://localhost/preprod/preprodConfig
+	 */
+	OPEN_SEARCH_SERVERLESS("aoss", "oss");
+
+	private String protocol;
+	private String serviceName;
+
+	/**
+	 * @param serviceName
+	 * @param protocol
+	 */
+	private OpenSearchServiceType(String serviceName, String protocol) {
+
+	    this.serviceName = serviceName;
+	    this.protocol = protocol;
+	}
+
+	/**
+	 * @return
+	 */
+	public String getProtocol() {
+
+	    return protocol;
+	}
+
+	/**
+	 * @return
+	 */
+	public String getServiceName() {
+
+	    return serviceName;
+	}
+
+	/**
+	 * @param protocol
+	 * @return
+	 */
+	public static OpenSearchServiceType decode(String protocol) {
+
+	    return protocol.equals(OPEN_SEARCH_MANAGED.getProtocol()) ? OPEN_SEARCH_MANAGED : OPEN_SEARCH_SERVERLESS;
+	}
+
+	/**
+	 * @return
+	 */
+	public static List<String> protocols() {
+
+	    return Arrays.asList(OpenSearchServiceType.values()).//
+		    stream().//
+		    map(p -> p.getProtocol()).//
+		    collect(Collectors.toList());
+	}
+    }
+
+    /**
      * 
      */
     public static final String USERS_FOLDER = "users";
@@ -108,6 +181,88 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
      */
     public static final String CONFIGURATION_FOLDER = "configuration";
 
+    /**
+     * @param startupUri
+     * @return
+     */
+    public static DatabaseImpl getImpl(String startupUri) {
+
+	if (startupUri.startsWith("xdbc")) {
+
+	    return DatabaseImpl.MARK_LOGIC;
+	}
+
+	if (startupUri.startsWith(OpenSearchServiceType.OPEN_SEARCH_MANAGED.getProtocol())
+		|| startupUri.startsWith(OpenSearchServiceType.OPEN_SEARCH_SERVERLESS.getProtocol())) {
+
+	    return DatabaseImpl.OPENSEARCH;
+	}
+
+	return null;
+    }
+
+    /**
+     * @param uri
+     * @return
+     */
+    public static boolean isStartupUri(String uri) {
+
+	return uri.startsWith("xdbc") || //
+		uri.startsWith(OpenSearchServiceType.OPEN_SEARCH_MANAGED.getProtocol())
+		|| uri.startsWith(OpenSearchServiceType.OPEN_SEARCH_SERVERLESS.getProtocol());
+    }
+
+    /**
+     * E.g: "xdbc://user:password@hostname:8000,8004/dbName/folder/"
+     * E.g: "osm://productionhost/prod/prodConfig"
+     * E.g: "oss://productionhost/prod/prodConfig"
+     *
+     * @param startupUri
+     * @return
+     * @throws URISyntaxException
+     */
+    public static StorageInfo getInfo(String startupUri) throws URISyntaxException {
+
+	StorageInfo storageInfo = new StorageInfo();
+
+	if (startupUri.startsWith("xdbc")) {
+
+	    String xdbc = startupUri.replace("xdbc://", "xdbc_");
+
+	    // uri --> xdbc://hostname:8000,8004
+	    String uri = "xdbc://" + xdbc.substring(xdbc.indexOf("@") + 1, xdbc.indexOf("/"));
+	    String user = xdbc.substring(xdbc.indexOf("_") + 1, xdbc.indexOf(":"));
+	    String password = xdbc.substring(xdbc.indexOf(":") + 1, xdbc.indexOf("@"));
+
+	    xdbc = xdbc.substring(xdbc.indexOf("/") + 1); // dnName/defaultConf/
+	    String dbName = xdbc.substring(0, xdbc.indexOf("/"));
+	    String folder = xdbc.substring(xdbc.indexOf("/") + 1, xdbc.lastIndexOf("/"));
+
+	    storageInfo.setUri(uri);
+	    storageInfo.setUser(user);
+	    storageInfo.setPassword(password);
+	    storageInfo.setIdentifier(folder);
+	    storageInfo.setName(dbName);
+
+	} else {
+
+	    URI uri = new URI(startupUri);
+
+	    String env = uri.getPath().split("/+")[1];
+	    String configName = uri.getPath().split("/+")[2];
+
+	    OpenSearchServiceType serviceType = OpenSearchServiceType.decode(uri.getScheme());
+
+	    storageInfo = new StorageInfo();
+	    storageInfo.setIdentifier(env);
+	    storageInfo.setName(Database.CONFIGURATION_FOLDER);
+	    storageInfo.setType(serviceType.getProtocol());
+	    storageInfo.setUser(configName); // config name encoded ad user name
+	    storageInfo.setUri("https://" + uri.getAuthority());
+	}
+
+	return storageInfo;
+    }
 
     /**
      * Initializes a data base instance with the given <code>storageInfo</code>

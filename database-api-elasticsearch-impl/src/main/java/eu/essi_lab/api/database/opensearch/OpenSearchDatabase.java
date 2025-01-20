@@ -4,10 +4,8 @@
 package eu.essi_lab.api.database.opensearch;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apache.http.HttpHost;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
@@ -65,75 +63,6 @@ import software.amazon.awssdk.regions.Region;
  * @author Fabrizio
  */
 public class OpenSearchDatabase extends Database {
-
-    /**
-     * @author Fabrizio
-     */
-    public enum OpenSearchServiceType {
-
-	/**
-	 * es -> internally used to create the AwsSdk2Transport
-	 * osm -> (OpenSearch Managed) protocol used as database type in the {@link StorageInfo} and
-	 * in the GSService VM argument "configuration.url". E.g: osm://localhost/testDb/prodConfig
-	 */
-	OPEN_SEARCH_MANAGED("es", "osm"),
-
-	/**
-	 * es -> internally used to create the AwsSdk2Transport
-	 * osm -> (OpenSearch Serverless) protocol used as database type in the {@link StorageInfo} and
-	 * in the GSService VM argument "configuration.url". E.g: osm://localhost/testDb/preprodConfig
-	 */
-	OPEN_SEARCH_SERVERLESS("aoss", "oss");
-
-	private String protocol;
-	private String serviceName;
-
-	/**
-	 * @param serviceName
-	 * @param type
-	 */
-	private OpenSearchServiceType(String serviceName, String type) {
-
-	    this.serviceName = serviceName;
-	    this.protocol = type;
-	}
-
-	/**
-	 * @return the type
-	 */
-	public String getProtocol() {
-
-	    return protocol;
-	}
-
-	/**
-	 * @return the type
-	 */
-	String getServiceName() {
-
-	    return serviceName;
-	}
-
-	/**
-	 * @param protocol
-	 * @return
-	 */
-	public static OpenSearchServiceType decode(String protocol) {
-
-	    return protocol.equals(OPEN_SEARCH_MANAGED.getProtocol()) ? OPEN_SEARCH_MANAGED : OPEN_SEARCH_SERVERLESS;
-	}
-
-	/**
-	 * @return
-	 */
-	public static List<String> protocols() {
-
-	    return Arrays.asList(OpenSearchServiceType.values()).//
-		    stream().//
-		    map(p -> p.getProtocol()).//
-		    collect(Collectors.toList());
-	}
-    }
 
     private OpenSearchClient client;
     private String identifier;
