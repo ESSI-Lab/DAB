@@ -37,22 +37,24 @@ import eu.essi_lab.model.resource.GSResource;
  */
 public class OpenSearchWriter extends DatabaseWriter {
 
+    private Database dataBase;
+
     @Override
     public void setDatabase(Database dataBase) {
-	// TODO Auto-generated method stub
 
+	this.dataBase = dataBase;
     }
 
     @Override
-    public Database getDatabase() {
-	// TODO Auto-generated method stub
-	return null;
+    public OpenSearchDatabase getDatabase() {
+
+	return (OpenSearchDatabase) dataBase;
     }
 
     @Override
-    public boolean supports(StorageInfo dbUri) {
-	// TODO Auto-generated method stub
-	return false;
+    public boolean supports(StorageInfo info) {
+
+	return OpenSearchDatabase.isSupported(info);
     }
 
     @Override
@@ -62,13 +64,13 @@ public class OpenSearchWriter extends DatabaseWriter {
     }
 
     @Override
-    public void storeRDF(Node rdf) throws GSException {
+    public void remove(String propertyName, String propertyValue) throws GSException {
 	// TODO Auto-generated method stub
 
     }
 
     @Override
-    public void remove(String propertyName, String propertyValue) throws GSException {
+    public void storeRDF(Node rdf) throws GSException {
 	// TODO Auto-generated method stub
 
     }
