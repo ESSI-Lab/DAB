@@ -577,6 +577,7 @@ if (config.riverSearch!==undefined&&config.riverSearch){
 
 		constraints.spatialOp = options.spatialRelation;
 
+
 		GIAPI.search.resultsMapWidget.updateWMSClusterLayers(constraints);
 
 		// set the termFrequency option

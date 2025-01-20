@@ -26,28 +26,28 @@ var dab = GIAPI.DAB('https://api.geodab.eu/dab');<br>
 var refined = false;<br>
 // defines discover response callback function
  var onResponse = function(response){<br>     
-    var resultSet = response[0];<br>    
-    // retrieves the TermFrequency object
-    var tf = resultSet.termFrequency;<br>
-    // retrieves the term frequency items of  
-    // all the available term frequency targets
-    var kwdTerms = tf.items('keyword');
-    var frmTerms = tf.items('format');
-    var proTerms = tf.items('protocol');
-    var srcTerms = tf.items('source');<br>
-    if(refined){// exit
-    	return;
-    }<br>
-    // checks the first term of the keyword target
-    tf.checkItems('keyword',[ kwdTerms[0] ]);<br>    
-    // refines the discover; the new result set contains only 
-    // nodes matching the first term of the keyword target
-    tf.refine();<br>   
-    refined = true;
+	var resultSet = response[0];<br>    
+	// retrieves the TermFrequency object
+	var tf = resultSet.termFrequency;<br>
+	// retrieves the term frequency items of  
+	// all the available term frequency targets
+	var kwdTerms = tf.items('keyword');
+	var frmTerms = tf.items('format');
+	var proTerms = tf.items('protocol');
+	var srcTerms = tf.items('source');<br>
+	if(refined){// exit
+		return;
+	}<br>
+	// checks the first term of the keyword target
+	tf.checkItems('keyword',[ kwdTerms[0] ]);<br>    
+	// refines the discover; the new result set contains only 
+	// nodes matching the first term of the keyword target
+	tf.refine();<br>   
+	refined = true;
 };<br>
 // setting the termFrequency option
 var options = {  
-    "termFrequency": "keyword,format,protocol,source"
+	"termFrequency": "keyword,format,protocol,source"
 };<br>
 // starts discover
 dab.discover(onResponse, options);
@@ -64,331 +64,357 @@ import { GIAPI } from '../../core/GIAPI.js';
 
 GIAPI.TermFrequency = function(dabNode, cnstr, options, onStatus, onResponse, termFrequency, reset) {
 
-    var tf = {};
-    tf._id = 'termFrequency_' + GIAPI.random();
-    tf._cnstr = GIAPI.clone(cnstr);
-    
-    var targets = [];
-    if(!tf._cnstr){
-    	tf._cnstr = {};
-    }
-    
-    if (!GIAPI.tfHelper.checkedItems || reset) {
-        GIAPI.tfHelper.checkedItems = {};
-    }
+	var tf = {};
+	tf._id = 'termFrequency_' + GIAPI.random();
+	tf._cnstr = GIAPI.clone(cnstr);
 
-    for (let p in termFrequency) {
-        targets.push(p);
-    }
+	var targets = [];
+	if (!tf._cnstr) {
+		tf._cnstr = {};
+	}
 
-    /**
-     * Checks the {{#crossLink "TermFrequencyItem"}}term frequency items{{/crossLink}} of the given term frequency <code>target</code>. 
-     * Once the {{#crossLink "TermFrequencyItem"}}items{{/crossLink}} are checked,
-     * the {{#crossLink "TermFrequency/refine:method"}}{{/crossLink}} method is ready to be called.<br>
-     * 
-     * See also {{#crossLink "TermFrequency/refine:method"}}{{/crossLink}} method
-     *          
-     * @param {String} target
-     * @param {TermFrequencyItem[]} targetItems
-     *
-     * @method checkItems
-     */
-    tf.checkItems = function(target, targetItems) {
-    
-        var items = tf.items(target);
-        var checkedItems = GIAPI.tfHelper.checkedItems[target];
-        var found = false;
+	if (!GIAPI.tfHelper.checkedItems || reset) {
+		GIAPI.tfHelper.checkedItems = {};
+	}
 
-        // checked item deselected
-        if (checkedItems && targetItems.length < checkedItems.length) {
+	for (let p in termFrequency) {
+		targets.push(p);
+	}
 
-            for (var i = 0; i < checkedItems.length; i++) {
+	/**
+	 * Checks the {{#crossLink "TermFrequencyItem"}}term frequency items{{/crossLink}} of the given term frequency <code>target</code>. 
+	 * Once the {{#crossLink "TermFrequencyItem"}}items{{/crossLink}} are checked,
+	 * the {{#crossLink "TermFrequency/refine:method"}}{{/crossLink}} method is ready to be called.<br>
+	 * 
+	 * See also {{#crossLink "TermFrequency/refine:method"}}{{/crossLink}} method
+	 *          
+	 * @param {String} target
+	 * @param {TermFrequencyItem[]} targetItems
+	 *
+	 * @method checkItems
+	 */
+	tf.checkItems = function(target, targetItems) {
 
-                for (var j = 0; j < targetItems.length; j++) {
+		var items = tf.items(target);
+		var checkedItems = GIAPI.tfHelper.checkedItems[target];
+		var found = false;
 
-                    var chkItem = checkedItems[i];
-                    var trgItem = targetItems[j];
+		// checked item deselected
+		if (checkedItems && targetItems.length < checkedItems.length) {
 
-                    if (chkItem.term === trgItem.term) {
-                        chkItem.veryfied = true;
-                    }
-                };
-            };
+			for (var i = 0; i < checkedItems.length; i++) {
 
-            var temp = [];
+				for (var j = 0; j < targetItems.length; j++) {
 
-            for (var i = 0; i < checkedItems.length; i++) {
+					var chkItem = checkedItems[i];
+					var trgItem = targetItems[j];
 
-                if (checkedItems[i].veryfied) {
+					if (chkItem.term === trgItem.term) {
+						chkItem.veryfied = true;
+					}
+				};
+			};
 
-                    var item = checkedItems[i];
-                    delete (item.veryfied);
+			var temp = [];
 
-                    temp.push(item);
-                }
-            }
+			for (var i = 0; i < checkedItems.length; i++) {
 
-            GIAPI.tfHelper.checkedItems[target] = temp;
+				if (checkedItems[i].veryfied) {
 
-        } else {
+					var item = checkedItems[i];
+					delete (item.veryfied);
 
-            // new item selected
-            for (var i = 0; i < items.length && !found; i++) {
+					temp.push(item);
+				}
+			}
 
-                for (var j = 0; j < targetItems.length; j++) {
+			GIAPI.tfHelper.checkedItems[target] = temp;
 
-                    var item = items[i];
-                    var trgItem = targetItems[j];
+		} else {
 
-                    if (item.term === trgItem.term && !tf.isCheckedItem(target, item)) {
+			// new item selected
+			for (var i = 0; i < items.length && !found; i++) {
 
-                        if (!GIAPI.tfHelper.checkedItems[target]) {
-                            GIAPI.tfHelper.checkedItems[target] = [];
-                        }
-						
-                        GIAPI.tfHelper.checkedItems[target].push(item);
-                        found = true;
-                    }
-                };
-            };
-        }
+				for (var j = 0; j < targetItems.length; j++) {
 
-        // console.log(JSON.stringify(GIAPI.tfHelper.checkedItems, null, 4));
-    };
+					var item = items[i];
+					var trgItem = targetItems[j];
 
-    /**
-     * Refines the related {{#crossLink "ResultSet"}}result set{{/crossLink}} by adding constraints basing on the
-     * currently checked {{#crossLink "TermFrequencyItem"}}term frequency items{{/crossLink}}.<br>
-     * 
-     * See also {{#crossLink "TermFrequency/checkItems:method"}}{{/crossLink}} method.<br>
-     * See also {{#crossLink "TermFrequency/items:method"}}{{/crossLink}} method
-     *
-     * @method refine
-     */
-    tf.refine = function() {
+					if (item.term === trgItem.term && !tf.isCheckedItem(target, item)) {
 
-        for (var i = 0; i < tf.targets().length; i++) {
+						if (!GIAPI.tfHelper.checkedItems[target]) {
+							GIAPI.tfHelper.checkedItems[target] = [];
+						}
 
-            var target = tf.targets()[i];
-            
-            delete (tf._cnstr[target]);
-          
-            var checkedItems = GIAPI.tfHelper.checkedItems[target];
-            if (checkedItems) {
-                var values = [];
-                for (var j = 0; j < checkedItems.length; j++) {
-                    
-                    var term = checkedItems[j].sourceId ? checkedItems[j].sourceId : checkedItems[j].term;
-                    
-                    if(target == 'score'){
-                    	term = term.replace(' - ',',');
-                    	term = '['+term+']';
-                    }
-                    
-                    values.push(term);
-                };
+						GIAPI.tfHelper.checkedItems[target].push(item);
+						found = true;
+					}
+				};
+			};
+		}
 
-                tf._cnstr[target] = values;
-            }
-        };
+		// console.log(JSON.stringify(GIAPI.tfHelper.checkedItems, null, 4));
+	};
 
-        // console.log(JSON.stringify(constraints, null, 4));
+	/**
+	 * Refines the related {{#crossLink "ResultSet"}}result set{{/crossLink}} by adding constraints basing on the
+	 * currently checked {{#crossLink "TermFrequencyItem"}}term frequency items{{/crossLink}}.<br>
+	 * 
+	 * See also {{#crossLink "TermFrequency/checkItems:method"}}{{/crossLink}} method.<br>
+	 * See also {{#crossLink "TermFrequency/items:method"}}{{/crossLink}} method
+	 *
+	 * @method refine
+	 */
+	tf.refine = function() {
 
-        // signals that the discover is started from this object (not from the DAB)
-        tf._cnstr.tfDiscover = true;
-        
-        var _onResponse = function(response){
-        	
-        	var termFreq = response[0].termFrequency;
-        	
-        	// ---------------------------------------------------------------
-        	// ensures that all the checked items have the updated frequencies
-        	// 
-            //
-        	for(var trg = 0; trg < termFreq.targets().length; trg++){
-        		
-        		var curTarget = termFreq.targets()[trg];
-        		
-        		var checkedItems = termFreq.checkedItems(curTarget);
-        		
-        		if(checkedItems){
-        		
-	        		for(var chk = 0; chk < checkedItems.length; chk++){
-	        			
-	        			var curChk = termFreq.checkedItems(curTarget)[chk];
-	        			
-	        			for(var it = 0; it < termFreq.items(curTarget).length; it++){
-	        				
-	        				var curItem = termFreq.items(curTarget)[it];
-	        				
-	        				if(curChk.term === curItem.term){
-	        					
-	        					curChk.freq = curItem.freq;
-	        				}
-	        			}      			
-	        		}
-        		}
-        	}
-           	
-         	onResponse.apply(this,[response]);
-        };
-        
-        _onResponse._origin = 'termFrequency';
-        dabNode.discover(_onResponse, tf._cnstr, options, onStatus);
-    };
-    
-    /**
-     * Clear all the checked {{#crossLink "TermFrequencyItem"}}term frequency items{{/crossLink}} related to the
-     * given term frequency <code>target</code>.<br>
-     * 
-     * See also {{#crossLink "TermFrequency/checkItems:method"}}{{/crossLink}} method
-     *
-     * @method clearCheckedItems
-     *
-     * @param {String} target a term frequency target. Available targets are:
-     * <ul>
-     *   <li><b>keyword</b> </li>
-     *   <li><b>format</b> </li>
-     *   <li><b>source</b> </li>
-     *   <li><b>protocol</b> </li>
-     * </ul> 
-     */
-    tf.clearCheckedItems = function(target) {
-        
-        GIAPI.tfHelper.checkedItems[target] = null;
-    };
+		for (var i = 0; i < tf.targets().length; i++) {
 
-    /**
-     * Return an array of all the checked {{#crossLink "TermFrequencyItem"}}term frequency items{{/crossLink}} related to the
-     * given term frequency <code>target</code>.<br>
-     * 
-     * See also {{#crossLink "TermFrequency/checkItems:method"}}{{/crossLink}} method
-     *
-     * @method checkedItems
-     *
-     * @param {String} target a term frequency target. Available targets are:
-     * <ul>
-     *   <li><b>keyword</b> </li>
-     *   <li><b>format</b> </li>
-     *   <li><b>source</b> </li>
-     *   <li><b>protocol</b> </li>
-     * </ul> 
-     * @return {TermFrequencyItem[]} array of checked {{#crossLink "TermFrequencyItem"}}term frequency items{{/crossLink}}
-     */
-    tf.checkedItems = function(target) {
+			var target = tf.targets()[i];
 
-        return GIAPI.tfHelper.checkedItems[target];
-    };
+			delete (tf._cnstr[target]);
 
-    /**
-     * Return <code>true</code> if the given {{#crossLink "TermFrequencyItem"}}term frequency items{{/crossLink}} related to the
-     * given term frequency <code>target</code> is checked.<br>
-     * 
-     * See also {{#crossLink "TermFrequency/checkItems:method"}}{{/crossLink}} method
-     *
-     * @method isCheckedItem
-     *
-     * @param {String} target a term frequency target. Available targets are:
-     * <ul>
-     *   <li><b>keyword</b> </li>
-     *   <li><b>format</b> </li>
-     *   <li><b>source</b> </li>
-     *   <li><b>protocol</b> </li>
-     * </ul> 
-     * @param {TermFrequencyItem} item the {{#crossLink "TermFrequencyItem"}}term frequency item{{/crossLink}} to check
-     */
-    tf.isCheckedItem = function(target, item) {
+			var checkedItems = GIAPI.tfHelper.checkedItems[target];
+			if (checkedItems) {
+				var values = [];
+				for (var j = 0; j < checkedItems.length; j++) {
 
-        var items = GIAPI.tfHelper.checkedItems[target];
-        if (items) {
+					var term = checkedItems[j].sourceId ? checkedItems[j].sourceId : checkedItems[j].term;
 
-            for (var i = 0; i < items.length; i++) {
+					if (target == 'score') {
+						term = term.replace(' - ', ',');
+						term = '[' + term + ']';
+					}
 
-                if (items[i].term === item.term) {
-                    return true;
-                }
-            };
-        }
+					values.push(term);
+				};
 
-        return false;
-    };
+				tf._cnstr[target] = values;
+			}
+		};
 
-    /**
-     * Return an array of all the available term frequency targets. Available targets are:
-     * <ul>
-     *   <li><b>keyword</b> </li>
-     *   <li><b>format</b> </li>
-     *   <li><b>source</b> </li>
-     *   <li><b>protocol</b> </li>
-     * </ul>
-     *
-     * See also <a href="../classes/DAB.html#termfreq">termFrequency option</a>
-     *
-     * @method targets
-     *
-     * @return {String[]} array of all the available term frequency targets
-     */
-    tf.targets = function() {
+		// console.log(JSON.stringify(constraints, null, 4));
 
-        return targets;
-    };
+		// signals that the discover is started from this object (not from the DAB)
+		tf._cnstr.tfDiscover = true;
 
-    /**
-     * Returns the number of all the available term frequency targets.<br>
-     * 
-     * See also {{#crossLink "TermFrequency/targets:method"}}{{/crossLink}} method
-     *
-     * @method targetsCount
-     *
-     * @return {Integer} the number of all the available term frequency targets
-     */
-    tf.targetsCount = function() {
+		var _onResponse = function(response) {
 
-        return targets.length;
-    };
+			var termFreq = response[0].termFrequency;
 
-    /**
-     * Returns an array of all the available {{#crossLink "TermFrequencyItem"}}term frequency items{{/crossLink}} related to the
-     * given <code>target</code>
-     *
-     * @method items
-     *
-     * @param {String} target a term frequency target. Available targets are:
-     * <ul>
-     *   <li><b>keyword</b> </li>
-     *   <li><b>format</b> </li>
-     *   <li><b>source</b> </li>
-     *   <li><b>protocol</b> </li>
-     * </ul> 
-     * @return {TermFrequencyItem[]} array of all the available {{#crossLink "TermFrequencyItem"}}term frequency items{{/crossLink}} related to the
-     * given <code>target</code>
-     */
-    tf.items = function(target) {
+			// ---------------------------------------------------------------
+			// ensures that all the checked items have the updated frequencies
+			// 
+			//
+			for (var trg = 0; trg < termFreq.targets().length; trg++) {
 
-        return termFrequency[target];
-    };
+				var curTarget = termFreq.targets()[trg];
 
-    /**
-     * Returns the number of all the available {{#crossLink "TermFrequencyItem"}}term frequency items{{/crossLink}}
-     * related to the given <code>target</code>
-     *
-     * @method itemsCount
-     * 
-     * @param {String} target a term frequency target. Available targets are:
-     * <ul>
-     *   <li><b>keyword</b> </li>
-     *   <li><b>format</b> </li>
-     *   <li><b>source</b> </li>
-     *   <li><b>protocol</b> </li>
-     * </ul> 
-     * 
-     * @return {Integer} the number of all the available {{#crossLink "TermFrequencyItem"}}term frequency items{{/crossLink}}
-     * related to the given <code>target</code>
-     */
-    tf.itemsCount = function(target) {
+				var checkedItems = termFreq.checkedItems(curTarget);
 
-        return termFrequency[target].length;
-    };
+				if (checkedItems) {
 
-    return tf;
+					for (var chk = 0; chk < checkedItems.length; chk++) {
+
+						var curChk = termFreq.checkedItems(curTarget)[chk];
+
+						for (var it = 0; it < termFreq.items(curTarget).length; it++) {
+
+							var curItem = termFreq.items(curTarget)[it];
+
+							if (curChk.term === curItem.term) {
+
+								curChk.freq = curItem.freq;
+							}
+						}
+					}
+				}
+			}
+
+			onResponse.apply(this, [response]);
+		};
+
+		_onResponse._origin = 'termFrequency';
+		dabNode.discover(_onResponse, tf._cnstr, options, onStatus);
+		const consts = {
+		}
+		var source = tf._cnstr.source;
+		var organisationName = tf._cnstr.organisationName;
+		var platformTitle = tf._cnstr.platformTitle;
+		var keyword = tf._cnstr.keyword;
+		var attributeTitle = tf._cnstr.attributeTitle;
+
+		if (Array.isArray(source) && source.length > 0) {
+			consts.sources = [source[0]];
+		}
+		if (Array.isArray(organisationName) && organisationName.length > 0) {
+			consts.organisationName = [organisationName[0]];
+		}
+		if (Array.isArray(platformTitle) && platformTitle.length > 0) {
+			consts.platformTitle = [platformTitle[0]];
+		}
+		if (Array.isArray(keyword) && keyword.length > 0) {
+			consts.keyword = [keyword[0]];
+		}
+		if (Array.isArray(attributeTitle) && attributeTitle.length > 0) {
+			consts.attributeTitle = [attributeTitle[0]];
+		}
+		GIAPI.search.resultsMapWidget.updateWMSClusterLayers(consts);
+
+
+	};
+
+	/**
+	 * Clear all the checked {{#crossLink "TermFrequencyItem"}}term frequency items{{/crossLink}} related to the
+	 * given term frequency <code>target</code>.<br>
+	 * 
+	 * See also {{#crossLink "TermFrequency/checkItems:method"}}{{/crossLink}} method
+	 *
+	 * @method clearCheckedItems
+	 *
+	 * @param {String} target a term frequency target. Available targets are:
+	 * <ul>
+	 *   <li><b>keyword</b> </li>
+	 *   <li><b>format</b> </li>
+	 *   <li><b>source</b> </li>
+	 *   <li><b>protocol</b> </li>
+	 * </ul> 
+	 */
+	tf.clearCheckedItems = function(target) {
+
+		GIAPI.tfHelper.checkedItems[target] = null;
+	};
+
+	/**
+	 * Return an array of all the checked {{#crossLink "TermFrequencyItem"}}term frequency items{{/crossLink}} related to the
+	 * given term frequency <code>target</code>.<br>
+	 * 
+	 * See also {{#crossLink "TermFrequency/checkItems:method"}}{{/crossLink}} method
+	 *
+	 * @method checkedItems
+	 *
+	 * @param {String} target a term frequency target. Available targets are:
+	 * <ul>
+	 *   <li><b>keyword</b> </li>
+	 *   <li><b>format</b> </li>
+	 *   <li><b>source</b> </li>
+	 *   <li><b>protocol</b> </li>
+	 * </ul> 
+	 * @return {TermFrequencyItem[]} array of checked {{#crossLink "TermFrequencyItem"}}term frequency items{{/crossLink}}
+	 */
+	tf.checkedItems = function(target) {
+
+		return GIAPI.tfHelper.checkedItems[target];
+	};
+
+	/**
+	 * Return <code>true</code> if the given {{#crossLink "TermFrequencyItem"}}term frequency items{{/crossLink}} related to the
+	 * given term frequency <code>target</code> is checked.<br>
+	 * 
+	 * See also {{#crossLink "TermFrequency/checkItems:method"}}{{/crossLink}} method
+	 *
+	 * @method isCheckedItem
+	 *
+	 * @param {String} target a term frequency target. Available targets are:
+	 * <ul>
+	 *   <li><b>keyword</b> </li>
+	 *   <li><b>format</b> </li>
+	 *   <li><b>source</b> </li>
+	 *   <li><b>protocol</b> </li>
+	 * </ul> 
+	 * @param {TermFrequencyItem} item the {{#crossLink "TermFrequencyItem"}}term frequency item{{/crossLink}} to check
+	 */
+	tf.isCheckedItem = function(target, item) {
+
+		var items = GIAPI.tfHelper.checkedItems[target];
+		if (items) {
+
+			for (var i = 0; i < items.length; i++) {
+
+				if (items[i].term === item.term) {
+					return true;
+				}
+			};
+		}
+
+		return false;
+	};
+
+	/**
+	 * Return an array of all the available term frequency targets. Available targets are:
+	 * <ul>
+	 *   <li><b>keyword</b> </li>
+	 *   <li><b>format</b> </li>
+	 *   <li><b>source</b> </li>
+	 *   <li><b>protocol</b> </li>
+	 * </ul>
+	 *
+	 * See also <a href="../classes/DAB.html#termfreq">termFrequency option</a>
+	 *
+	 * @method targets
+	 *
+	 * @return {String[]} array of all the available term frequency targets
+	 */
+	tf.targets = function() {
+
+		return targets;
+	};
+
+	/**
+	 * Returns the number of all the available term frequency targets.<br>
+	 * 
+	 * See also {{#crossLink "TermFrequency/targets:method"}}{{/crossLink}} method
+	 *
+	 * @method targetsCount
+	 *
+	 * @return {Integer} the number of all the available term frequency targets
+	 */
+	tf.targetsCount = function() {
+
+		return targets.length;
+	};
+
+	/**
+	 * Returns an array of all the available {{#crossLink "TermFrequencyItem"}}term frequency items{{/crossLink}} related to the
+	 * given <code>target</code>
+	 *
+	 * @method items
+	 *
+	 * @param {String} target a term frequency target. Available targets are:
+	 * <ul>
+	 *   <li><b>keyword</b> </li>
+	 *   <li><b>format</b> </li>
+	 *   <li><b>source</b> </li>
+	 *   <li><b>protocol</b> </li>
+	 * </ul> 
+	 * @return {TermFrequencyItem[]} array of all the available {{#crossLink "TermFrequencyItem"}}term frequency items{{/crossLink}} related to the
+	 * given <code>target</code>
+	 */
+	tf.items = function(target) {
+
+		return termFrequency[target];
+	};
+
+	/**
+	 * Returns the number of all the available {{#crossLink "TermFrequencyItem"}}term frequency items{{/crossLink}}
+	 * related to the given <code>target</code>
+	 *
+	 * @method itemsCount
+	 * 
+	 * @param {String} target a term frequency target. Available targets are:
+	 * <ul>
+	 *   <li><b>keyword</b> </li>
+	 *   <li><b>format</b> </li>
+	 *   <li><b>source</b> </li>
+	 *   <li><b>protocol</b> </li>
+	 * </ul> 
+	 * 
+	 * @return {Integer} the number of all the available {{#crossLink "TermFrequencyItem"}}term frequency items{{/crossLink}}
+	 * related to the given <code>target</code>
+	 */
+	tf.itemsCount = function(target) {
+
+		return termFrequency[target].length;
+	};
+
+	return tf;
 };

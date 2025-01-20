@@ -15,8 +15,9 @@
     "defaultLayer": "OpenStreetMap",
     "instrumentSearch": true,
     "attributeSearch": true,
+    "filters": "source,keyword,organisationName,attributeTitle,platformTitle",
     "platformSearch": true,
     "validatedSearch": true,
-    "riverSearch": true,
+    "riverSearch": false,
     "wmsEndpoint": "https://geoportale.regione.lazio.it/geoserver/ows"
 }
