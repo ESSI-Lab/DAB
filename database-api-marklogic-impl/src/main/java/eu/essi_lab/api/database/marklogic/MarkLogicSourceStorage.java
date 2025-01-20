@@ -23,7 +23,6 @@ package eu.essi_lab.api.database.marklogic;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.SourceStorage;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.model.StorageInfo;
 
 /**
@@ -32,15 +31,6 @@ import eu.essi_lab.model.StorageInfo;
 public class MarkLogicSourceStorage extends SourceStorage {
 
     private MarkLogicDatabase markLogicDB;
-    private StorageInfo dbUri;
-
-    /**
-     * 
-     */
-    public MarkLogicSourceStorage() {
-
-	configure(ConfigurationWrapper.getSourceStorageSettings());
-    }
 
     @Override
     public String getType() {
@@ -61,11 +51,10 @@ public class MarkLogicSourceStorage extends SourceStorage {
     }
 
     @Override
-    public boolean supports(StorageInfo dbUri) {
+    public boolean supports(StorageInfo info) {
 
-	if (MarkLogicDatabase.isSupported(dbUri)) {
+	if (MarkLogicDatabase.isSupported(info)) {
 
-	    this.dbUri = dbUri;
 	    return true;
 	}
 

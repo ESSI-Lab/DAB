@@ -321,12 +321,22 @@ public class OpenSearchDatabase extends Database {
 
 	return identifier;
     }
+    
+    /** 
+     * 
+     * @param info
+     * @return
+     */
+    public static boolean isSupported(StorageInfo info) {
+
+	return info.getType().isPresent() && //
+		OpenSearchServiceType.protocols().contains(info.getType().get());
+    }
 
     @Override
-    public boolean supports(StorageInfo dbInfo) {
+    public boolean supports(StorageInfo info) {
 
-	return dbInfo.getType().isPresent() && //
-		OpenSearchServiceType.protocols().contains(dbInfo.getType().get());
+	return isSupported(info);
     }
 
     @Override
