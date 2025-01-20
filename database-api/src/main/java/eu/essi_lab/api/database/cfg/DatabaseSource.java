@@ -26,6 +26,7 @@ package eu.essi_lab.api.database.cfg;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +35,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.Database.DatabaseImpl;
 import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
@@ -57,14 +59,12 @@ public class DatabaseSource implements ConfigurationSource {
     protected DatabaseFolder folder;
 
     /**
-     * Constructor to use for OpenSearch
-     * 
      * @param storageInfo
-     * @param folder it must be {@link Database#CONFIGURATION_FOLDER}
-     * @param configName "testConfig", "preprodConfig", "prodConfig"
+     * @param folder
+     * @param configName
      * @throws GSException
      */
-    public DatabaseSource(StorageInfo storageInfo, String folder, String configName) throws GSException {
+    private DatabaseSource(StorageInfo storageInfo, String folder, String configName) throws GSException {
 
 	Database database = DatabaseFactory.get(storageInfo);
 
@@ -74,15 +74,70 @@ public class DatabaseSource implements ConfigurationSource {
     }
 
     /**
-     * Constructor to use for MarkLogic
+     * The <code>startupUri</code> provides all the required info to initialize the source in non
+     * local environment such as production, preproduction, etc.<br>
+     * <br>
+     * For <b>MarkLogic</b> it must be like this: "xdbc://user:password@hostname:8000,8004/dbName/configFolder/" where
+     * 'configFolder' indicates the db folder where the configuration is stored. The configuration name is not necessary
+     * since it is hard-coded.<br>
+     * E.g.: "xdbc://user:password@productionhost:8000,8004/PRODUCTION-DB/production/"<br>
+     * <br>
+     * For <b>OpenSearch</b> it can have two kind of protocols: <i>osm</i> or <i>oss</i> that respectively means
+     * <i>OpenSearch Managed</i> and <i>OpenSearch Serverless</i>. The uri must be like this:<br>
+     * "osm://hostname/environment/configName" where <code>environment</code> and <code>configName</code>
+     * can have different values according to the
+     * target environment such as production, preproduction, etc...<br>
+     * For example, <code>environment</code> could be 'prod' or 'preprod' and <code>configName</code> can be
+     * 'prodConfig' or 'preprodConfig'.<br>
+     * E.g.: "osm://productionhost/prod/prodConfig"<br>
+     * E.g.: "oss://preproductionhost/preprod/preProdConfig"<br>
      * 
-     * @param storageInfo
-     * @param configName config file name without extension
+     * @see Database#getInfo(String)
+     * @see Database#isStartupUri(String)
+     * @param impl
+     * @param startupUri
+     * @return
+     * @throws GSException
+     * @throws URISyntaxException
+     */
+    public static DatabaseSource of(String startupUri) throws GSException, URISyntaxException {
+
+	StorageInfo info = Database.getInfo(startupUri);
+	
+	DatabaseImpl impl = Database.getImpl(startupUri);
+	
+	switch (impl) {
+	case MARK_LOGIC:
+
+	    return new DatabaseSource(info, info.getIdentifier(), "gs-configuration");
+
+	case OPENSEARCH:
+
+	    return new DatabaseSource(info, Database.CONFIGURATION_FOLDER, info.getUser());
+	}
+
+	return null;
+    }
+
+    /**
+     * @param impl
+     * @param configName
+     * @return
      * @throws GSException
      */
-    public DatabaseSource(StorageInfo storageInfo, String configName) throws GSException {
+    public static DatabaseSource of(DatabaseImpl impl, StorageInfo storageInfo, String configName) throws GSException {
 
-	this(storageInfo, storageInfo.getIdentifier(), configName);
+	switch (impl) {
+	case MARK_LOGIC:
+
+	    return new DatabaseSource(storageInfo, storageInfo.getIdentifier(), configName);
+
+	case OPENSEARCH:
+
+	    return new DatabaseSource(storageInfo, Database.CONFIGURATION_FOLDER, configName);
+	}
+
+	return null;
     }
 
     /**
