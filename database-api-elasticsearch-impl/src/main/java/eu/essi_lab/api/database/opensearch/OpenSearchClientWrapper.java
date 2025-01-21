@@ -229,7 +229,11 @@ public class OpenSearchClientWrapper {
      */
     public DeleteByQueryResponse deleteByQuery(DeleteByQueryRequest request) throws OpenSearchException, IOException {
 
-	return client.deleteByQuery(request);
+	DeleteByQueryResponse response = client.deleteByQuery(request);
+
+	synch();
+
+	return response;
     }
 
     /**
@@ -247,6 +251,8 @@ public class OpenSearchClientWrapper {
 		build();
 
 	DeleteResponse response = client.delete(deleteRequest);
+
+	synch();
 
 	return response.result() == Result.Deleted;
     }
