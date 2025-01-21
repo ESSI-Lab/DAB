@@ -29,8 +29,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBException;
@@ -39,7 +37,6 @@ import javax.xml.bind.Unmarshaller;
 import org.w3c.dom.Node;
 
 import com.marklogic.xcc.ResultSequence;
-import com.marklogic.xcc.exceptions.RequestException;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.Database.IdentifierType;
@@ -50,7 +47,6 @@ import eu.essi_lab.api.database.marklogic.search.DistinctQueryHandler;
 import eu.essi_lab.api.database.marklogic.search.MarkLogicDiscoveryBondHandler;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StreamUtils;
-import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.PerformanceLogger;
@@ -138,51 +134,6 @@ public class MarkLogicReader implements DatabaseReader {
     }
 
     @Override
-    public boolean resourceExists(IdentifierType identifierType, String identifier) throws GSException {
-
-	String index = null;
-	switch (identifierType) {
-	case ORIGINAL:
-	    index = ResourceProperty.ORIGINAL_ID.getName();
-	    break;
-	case PRIVATE:
-	    return !getResources(identifierType, identifier).isEmpty();
-
-	case PUBLIC:
-	    index = MetadataElement.IDENTIFIER.getName();
-	    break;
-	}
-
-	String xQuery = "xquery version \"1.0-ml\";\n";
-	xQuery += "import module namespace gs=\"http://flora.eu/gi-suite/1.0/dataModel/schema\" at \"/gs-modules/functions-module.xqy\";\n";
-	xQuery += "xdmp:estimate(cts:search(doc(), cts:element-range-query(fn:QName('" + NameSpace.GS_DATA_MODEL_SCHEMA_URI + "','";
-	xQuery += index + "')";
-	xQuery += ",'=','" + identifier + "',(\"score-function=linear\"),0.0),(\"unfiltered\",\"score-simple\"),0))";
-
-	try {
-	    int result = Integer.valueOf(markLogicDB.execXQuery(xQuery).asString());
-	    return result > 0;
-
-	} catch (RequestException e) {
-
-	    throw GSException.createException(//
-		    getClass(), //
-		    e.getMessage(), //
-		    null, //
-		    ErrorInfo.ERRORTYPE_INTERNAL, //
-		    ErrorInfo.SEVERITY_ERROR, //
-		    MARK_LOGIC_RESOURCE_EXISTS_ERROR, //
-		    e);
-	}
-    }
-
-    @Override
-    public boolean resourceExists(String originalIdentifier, GSSource source) throws GSException {
-
-	return getResource(originalIdentifier, source) != null;
-    }
-
-    @Override
     public List<GSResource> getResources(IdentifierType identifierType, String identifier) throws GSException {
 
 	List<GSResource> out = new ArrayList<GSResource>();
@@ -204,18 +155,8 @@ public class MarkLogicReader implements DatabaseReader {
 
 	    switch (identifierType) {
 	    case PRIVATE:
-		//
-		// privateId is not indexed
-		//
-		DatabaseFolder[] folders = markLogicDB.getDataFolders();
-		for (DatabaseFolder folder : folders) {
-
-		    Node node = folder.get(identifier);
-		    if (Objects.nonNull(node)) {
-			return Arrays.asList(GSResource.create(node));
-		    }
-		}
-		return out;
+		bond = BondFactory.createPrivateIdentifierBond(identifier);
+		break;
 	    case ORIGINAL:
 		bond = BondFactory.createOriginalIdentifierBond(identifier);
 		break;
@@ -255,46 +196,7 @@ public class MarkLogicReader implements DatabaseReader {
     }
 
     @Override
-    public GSResource getResource(String originalIdentifier, GSSource source) throws GSException {
-
-	return getResource(originalIdentifier, source, false);
-    }
-
-    /**
-     * @param originalIdentifier
-     * @param source
-     * @param includeDeleted
-     * @return
-     * @throws GSException
-     */
-    @Override
-    public GSResource getResource(String originalIdentifier, GSSource source, boolean includeDeleted) throws GSException {
-
-	List<GSResource> resultsList = getResources(originalIdentifier, source, includeDeleted);
-	if (!resultsList.isEmpty()) {
-
-	    if (resultsList.size() > 1) {
-		//
-		// this should no longer happen from GIP-423
-		//
-		GSLoggerFactory.getLogger(MarkLogicReader.class).warn("Found {} resources with originalId [{}] from the source [{}] !!!",
-			resultsList.size(), originalIdentifier, source.getUniqueIdentifier());
-	    }
-
-	    return resultsList.get(0);
-	}
-
-	return null;
-    }
-
-    /**
-     * Special method used during the tag recovering phase. Normally different resources with same original id are not
-     * allowed, but at the
-     * end of a non-first harvesting, it is common to have 2 copies of the same resource, from the previous harvesting
-     * and from the current
-     * one
-     */
-    @Override
+    @Deprecated
     public List<GSResource> getResources(String originalIdentifier, GSSource source, boolean includeDeleted) throws GSException {
 
 	DiscoveryMessage message = new DiscoveryMessage();
@@ -330,6 +232,199 @@ public class MarkLogicReader implements DatabaseReader {
 	}
 
 	return resultSet.getResultsList();
+    }
+
+    @Override
+    public List<GSUser> getUsers() throws GSException {
+
+	try {
+
+	    // GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Getting users STARTED");
+
+	    String suiteId = getDatabase().getIdentifier();
+
+	    String query = "cts:search(doc(),cts:directory-query('/" + suiteId + "_" + MarkLogicDatabase.USERS_FOLDER
+		    + "/'),('unfiltered','score-simple'),0)";
+
+	    List<GSUser> users = StreamUtils.iteratorToStream(getDatabase().execXQuery(query).iterator()).//
+		    map(item -> {
+			try {
+			    return GSUser.create(item.asInputStream());
+			} catch (JAXBException e) {
+			    GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
+			    e.printStackTrace();
+			}
+			return null;
+		    }).filter(Objects::nonNull).//
+		    collect(Collectors.toList());
+
+	    // GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Getting users ENDED");
+	    // GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Found {} users", users.size());
+
+	    return users;
+
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(MarkLogicReader.class).error("Exception requesting users: {}", e.getMessage());
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    MARK_LOGIC_GET_USERS_ERROR, //
+		    e);
+	}
+    }
+
+    @Override
+    public Optional<View> getView(String viewId) throws GSException {
+
+	try {
+
+	    if (viewFolder == null) {
+
+		viewFolder = getDatabase().getViewFolder(false);
+
+		if (viewFolder == null) {
+
+		    GSLoggerFactory.getLogger(getClass()).warn("View folder missing");
+
+		    return Optional.empty();
+		}
+	    }
+
+	    String viewQuery = getViewQuery(viewFolder, viewId);
+
+	    MarkLogicWrapper wrapper = getDatabase().getWrapper();
+
+	    ResultSequence resultSequence = wrapper.submit(viewQuery);
+
+	    if (resultSequence.hasNext()) {
+
+		ViewFactory factory = new ViewFactory();
+
+		Unmarshaller unmarshaller = factory.createUnmarshaller();
+
+		InputStream stream = resultSequence.next().asInputStream();
+
+		View view = (View) unmarshaller.unmarshal(stream);
+
+		// GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Unmarshalling view {} ENDED", id);
+
+		return Optional.of(view);
+
+	    } else {
+
+		GSLoggerFactory.getLogger(getClass()).warn("View {} not found", viewId);
+
+		return Optional.empty();
+	    }
+
+	    // ViewFactory factory = new ViewFactory();
+	    //
+	    // Unmarshaller unmarshaller = factory.createUnmarshaller();
+	    //
+	    // if (viewFolder.exists(id)) {
+	    //
+	    // // GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Getting view {} STARTED", id);
+	    //
+	    // InputStream binary = viewFolder.getBinary(id);
+	    //
+	    // // GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Getting view {} ENDED", id);
+	    //
+	    // // GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Unmarshalling view {} STARTED", id);
+	    //
+	    // View view = (View) unmarshaller.unmarshal(binary);
+	    //
+	    // // GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Unmarshalling view {} ENDED", id);
+	    //
+	    // return Optional.of(view);
+	    // }
+	    //
+	    // return Optional.empty();
+
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error("Exception requesting view: {}", e.getMessage(), e);
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    MARK_LOGIC_GET_RESOURCE_ERROR, //
+		    e);
+	}
+    }
+
+    @Override
+    public List<String> getViewIdentifiers(GetViewIdentifiersRequest request) throws GSException {
+
+	try {
+
+	    DatabaseFolder folder = getDatabase().getViewFolder(false);
+
+	    if (folder == null) {
+
+		return new ArrayList<>();
+	    }
+
+	    String[] ret = folder.listKeys();
+
+	    List<String> idsList = new ArrayList<>(Arrays.asList(ret));
+
+	    if (request.getCreator().isPresent() || request.getOwner().isPresent()) {
+
+		if (viewFolder == null) {
+
+		    GSLoggerFactory.getLogger(getClass()).info("Get view folder STARTED");
+
+		    viewFolder = getDatabase().getViewFolder(false);
+
+		    GSLoggerFactory.getLogger(getClass()).info("Get view folder ENDED");
+
+		    if (viewFolder == null) {
+
+			GSLoggerFactory.getLogger(getClass()).warn("View folder missing");
+
+			return new ArrayList<>();
+		    }
+		}
+
+		String viewQuery = ListViewIdsQueryHandler.getListViewIdsQuery(folder, request);
+
+		MarkLogicWrapper wrapper = getDatabase().getWrapper();
+
+		ResultSequence resultSequence = wrapper.submit(viewQuery);
+
+		idsList = Arrays.asList(resultSequence.asStrings());
+	    }
+
+	    int fromIndex = Math.min(idsList.size(), request.getStart());
+	    int toIndex = Math.min(idsList.size(), request.getStart() + request.getCount());
+
+	    idsList = idsList.subList(fromIndex, toIndex);
+
+	    return idsList;
+
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(MarkLogicReader.class).error("Exception requesting views from {} to {}", request.getStart(),
+		    request.getCount());
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    MARK_LOGIC_LIST_KEYS_ERROR, //
+		    e);
+	}
+
     }
 
     /**
@@ -472,132 +567,6 @@ public class MarkLogicReader implements DatabaseReader {
 	return resultSet;
     }
 
-    @Override
-    public List<GSUser> getUsers() throws GSException {
-
-	try {
-
-	    // GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Getting users STARTED");
-
-	    String suiteId = getDatabase().getIdentifier();
-
-	    String query = "cts:search(doc(),cts:directory-query('/" + suiteId + "_" + MarkLogicDatabase.USERS_FOLDER
-		    + "/'),('unfiltered','score-simple'),0)";
-
-	    List<GSUser> users = StreamUtils.iteratorToStream(getDatabase().execXQuery(query).iterator()).//
-		    map(item -> {
-			try {
-			    return GSUser.create(item.asInputStream());
-			} catch (JAXBException e) {
-			    GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
-			    e.printStackTrace();
-			}
-			return null;
-		    }).filter(Objects::nonNull).//
-		    collect(Collectors.toList());
-
-	    // GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Getting users ENDED");
-	    // GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Found {} users", users.size());
-
-	    return users;
-
-	} catch (Exception e) {
-
-	    GSLoggerFactory.getLogger(MarkLogicReader.class).error("Exception requesting users: {}", e.getMessage());
-
-	    throw GSException.createException(//
-		    getClass(), //
-		    e.getMessage(), //
-		    null, //
-		    ErrorInfo.ERRORTYPE_INTERNAL, //
-		    ErrorInfo.SEVERITY_ERROR, //
-		    MARK_LOGIC_GET_USERS_ERROR, //
-		    e);
-	}
-    }
-
-    @Override
-    public Optional<View> getView(String viewId) throws GSException {
-
-	try {
-
-	    if (viewFolder == null) {
-
-		viewFolder = getDatabase().getViewFolder(false);
-
-		if (viewFolder == null) {
-
-		    GSLoggerFactory.getLogger(getClass()).warn("View folder missing");
-
-		    return Optional.empty();
-		}
-	    }
-
-	    String viewQuery = getViewQuery(viewFolder, viewId);
-
-	    MarkLogicWrapper wrapper = getDatabase().getWrapper();
-
-	    ResultSequence resultSequence = wrapper.submit(viewQuery);
-
-	    if (resultSequence.hasNext()) {
-
-		ViewFactory factory = new ViewFactory();
-
-		Unmarshaller unmarshaller = factory.createUnmarshaller();
-
-		InputStream stream = resultSequence.next().asInputStream();
-
-		View view = (View) unmarshaller.unmarshal(stream);
-
-		// GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Unmarshalling view {} ENDED", id);
-
-		return Optional.of(view);
-
-	    } else {
-
-		GSLoggerFactory.getLogger(getClass()).warn("View {} not found", viewId);
-
-		return Optional.empty();
-	    }
-
-	    // ViewFactory factory = new ViewFactory();
-	    //
-	    // Unmarshaller unmarshaller = factory.createUnmarshaller();
-	    //
-	    // if (viewFolder.exists(id)) {
-	    //
-	    // // GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Getting view {} STARTED", id);
-	    //
-	    // InputStream binary = viewFolder.getBinary(id);
-	    //
-	    // // GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Getting view {} ENDED", id);
-	    //
-	    // // GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Unmarshalling view {} STARTED", id);
-	    //
-	    // View view = (View) unmarshaller.unmarshal(binary);
-	    //
-	    // // GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Unmarshalling view {} ENDED", id);
-	    //
-	    // return Optional.of(view);
-	    // }
-	    //
-	    // return Optional.empty();
-
-	} catch (Exception e) {
-
-	    GSLoggerFactory.getLogger(getClass()).error("Exception requesting view: {}", e.getMessage(), e);
-
-	    throw GSException.createException(//
-		    getClass(), //
-		    e.getMessage(), //
-		    null, //
-		    ErrorInfo.ERRORTYPE_INTERNAL, //
-		    ErrorInfo.SEVERITY_ERROR, //
-		    MARK_LOGIC_GET_RESOURCE_ERROR, //
-		    e);
-	}
-    }
-
     /**
      * @param viewId
      * @return
@@ -621,101 +590,4 @@ public class MarkLogicReader implements DatabaseReader {
 
 	return query;
     }
-
-    @Override
-    public List<String> getViewIdentifiers(GetViewIdentifiersRequest request) throws GSException {
-
-	try {
-
-	    DatabaseFolder folder = getDatabase().getViewFolder(false);
-
-	    if (folder == null) {
-
-		return new ArrayList<>();
-	    }
-
-	    String[] ret = folder.listKeys();
-
-	    List<String> idsList = new ArrayList<>(Arrays.asList(ret));
-
-	    if (request.getCreator().isPresent() || request.getOwner().isPresent()) {
-
-		if (viewFolder == null) {
-
-		    GSLoggerFactory.getLogger(getClass()).info("Get view folder STARTED");
-
-		    viewFolder = getDatabase().getViewFolder(false);
-
-		    GSLoggerFactory.getLogger(getClass()).info("Get view folder ENDED");
-
-		    if (viewFolder == null) {
-
-			GSLoggerFactory.getLogger(getClass()).warn("View folder missing");
-
-			return new ArrayList<>();
-		    }
-		}
-
-		String viewQuery = ListViewIdsQueryHandler.getListViewIdsQuery(folder, request);
-
-		MarkLogicWrapper wrapper = getDatabase().getWrapper();
-
-		ResultSequence resultSequence = wrapper.submit(viewQuery);
-
-		idsList = Arrays.asList(resultSequence.asStrings());
-	    }
-
-	    int fromIndex = Math.min(idsList.size(), request.getStart());
-	    int toIndex = Math.min(idsList.size(), request.getStart() + request.getCount());
-
-	    idsList = idsList.subList(fromIndex, toIndex);
-
-	    return idsList;
-
-	} catch (Exception e) {
-
-	    GSLoggerFactory.getLogger(MarkLogicReader.class).error("Exception requesting views from {} to {}", request.getStart(),
-		    request.getCount());
-
-	    throw GSException.createException(//
-		    getClass(), //
-		    e.getMessage(), //
-		    null, //
-		    ErrorInfo.ERRORTYPE_INTERNAL, //
-		    ErrorInfo.SEVERITY_ERROR, //
-		    MARK_LOGIC_LIST_KEYS_ERROR, //
-		    e);
-	}
-
-    }
-
-    public static void main(String[] args) {
-
-	String s = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
-	s += "<view>";
-	s += "<viewBond>";
-	s += "   <viewIdentifier>view3</viewIdentifier>";
-	s += "</viewBond>";
-	s += "<creationTime>2022-10-13T11:42:46.485+02:00</creationTime>";
-	s += " <creator>creator1</creator>";
-	s += " <id>id3</id>";
-	s += "</view>";
-
-	s += "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
-	s += "<view>";
-	s += "<viewBond>";
-	s += "  <viewIdentifier>view4</viewIdentifier>";
-	s += "</viewBond>";
-	s += "<creationTime>2022-10-13T11:42:46.580+02:00</creationTime>";
-	s += "<creator>creator1</creator>";
-	s += "<id>id4</id>";
-	s += "</view>";
-
-	Pattern pattern = Pattern.compile("<id>(.*?)</id>");
-	Matcher matcher = pattern.matcher(s);
-	while (matcher.find()) {
-	    System.out.println(matcher.group(1));
-	}
-    }
-
 }
