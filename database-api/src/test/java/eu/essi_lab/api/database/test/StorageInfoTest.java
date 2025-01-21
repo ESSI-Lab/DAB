@@ -130,4 +130,19 @@ public class StorageInfoTest {
 	Assert.assertEquals(Database.CONFIGURATION_FOLDER, info.getName());
 	Assert.assertEquals(OpenSearchServiceType.OPEN_SEARCH_SERVERLESS.getProtocol(), info.getType().get());
     }
+    
+    @Test
+    public void openSearchLocalTest() throws URISyntaxException {
+
+	String uri = "osl://localhost/test/testConfig";
+
+	StorageInfo info = Database.getInfo(uri);
+
+	Assert.assertEquals("testConfig", info.getUser());
+	Assert.assertNull(info.getPassword());
+	Assert.assertEquals("http://localhost", info.getUri());
+	Assert.assertEquals("test", info.getIdentifier());
+	Assert.assertEquals(Database.CONFIGURATION_FOLDER, info.getName());
+	Assert.assertEquals(OpenSearchServiceType.OPEN_SEARCH_LOCAL.getProtocol(), info.getType().get());
+    }
 }

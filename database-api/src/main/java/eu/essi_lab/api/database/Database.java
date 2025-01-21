@@ -113,7 +113,11 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
 	 * osm -> (OpenSearch Serverless) protocol used as database type in the {@link StorageInfo} and
 	 * in the GSService VM argument "configuration.url". E.g: oss://localhost/preprod/preprodConfig
 	 */
-	OPEN_SEARCH_SERVERLESS("aoss", "oss");
+	OPEN_SEARCH_SERVERLESS("aoss", "oss"),
+	/**
+	 * osl -> (OpenSearch Local) for test environment. E.g: osl://localhost/test/testConfig
+	 */
+	OPEN_SEARCH_LOCAL("osl", "osl");
 
 	private String protocol;
 	private String serviceName;
@@ -150,7 +154,11 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
 	 */
 	public static OpenSearchServiceType decode(String protocol) {
 
-	    return protocol.equals(OPEN_SEARCH_MANAGED.getProtocol()) ? OPEN_SEARCH_MANAGED : OPEN_SEARCH_SERVERLESS;
+	    return Arrays.asList(values()).//
+		    stream().//
+		    filter(v -> v.getProtocol().equals(protocol)).//
+		    findFirst().//
+		    orElseThrow();
 	}
 
 	/**
@@ -221,7 +229,8 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
      * E.g: "xdbc://user:password@hostname:8000,8004/dbName/folder/"
      * E.g: "osm://productionhost/prod/prodConfig"
      * E.g: "oss://productionhost/prod/prodConfig"
-     *
+     * E.g: "osl://productionhost/test/testConfig"
+     * 
      * @param startupUri
      * @return
      * @throws URISyntaxException
@@ -263,7 +272,12 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
 	    storageInfo.setName(Database.CONFIGURATION_FOLDER);
 	    storageInfo.setType(serviceType.getProtocol());
 	    storageInfo.setUser(configName); // config name encoded ad user name
-	    storageInfo.setUri("https://" + uri.getAuthority());
+
+	    if (serviceType == OpenSearchServiceType.OPEN_SEARCH_LOCAL) {
+		storageInfo.setUri("http://" + uri.getAuthority());
+	    } else {
+		storageInfo.setUri("https://" + uri.getAuthority());
+	    }
 	}
 
 	return storageInfo;
