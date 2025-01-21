@@ -25,6 +25,7 @@ package eu.essi_lab.api.database.opensearch;
  */
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -42,6 +43,7 @@ import org.opensearch.client.opensearch._types.query_dsl.MatchPhraseQuery;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch.core.CountRequest;
 import org.opensearch.client.opensearch.core.DeleteByQueryRequest;
+import org.opensearch.client.opensearch.core.DeleteByQueryResponse;
 import org.opensearch.client.opensearch.core.DeleteRequest;
 import org.opensearch.client.opensearch.core.DeleteResponse;
 import org.opensearch.client.opensearch.core.ExistsRequest;
@@ -58,6 +60,7 @@ import org.opensearch.client.opensearch.generic.Requests;
 import org.opensearch.client.opensearch.generic.Response;
 
 import eu.essi_lab.api.database.opensearch.index.IndexData;
+import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.FolderRegistryMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 
@@ -107,7 +110,7 @@ public class OpenSearchClientWrapper {
      * @return
      * @throws Exception
      */
-    public Optional<JSONObject> searchSource(Query searchQuery, String key) throws Exception {
+    public List<InputStream> searchBinaries(Query searchQuery) throws Exception {
 
 	SearchResponse<Object> searchResponse = client.search(s -> {
 	    s.query(searchQuery);
@@ -116,19 +119,19 @@ public class OpenSearchClientWrapper {
 	}, Object.class);
 
 	HitsMetadata<Object> hits = searchResponse.hits();
-	if (hits.total().value() == 0) {
-
-	    return Optional.empty();
-	}
-
 	List<Hit<Object>> hitsList = hits.hits();
-	Hit<Object> hit = hitsList.get(0);
 
-	JSONObject source = IndexData.toJSONObject(hit.source());
+	return hitsList.stream().//
 
-	decorateSource(source, hit.index(), hit.id());
+		map(hit -> {
 
-	return Optional.of(source);
+		    SourceWrapper wrapper = new SourceWrapper(IndexData.toJSONObject(hit.source()));
+		    String binaryValue = wrapper.getBinaryValue();
+
+		    return IndexData.decode(binaryValue);
+		}).//
+
+		collect(Collectors.toList());
     }
 
     /**
@@ -186,9 +189,9 @@ public class OpenSearchClientWrapper {
      * @throws IOException
      * @throws OpenSearchException
      */
-    public void deleteByQuery(DeleteByQueryRequest request) throws OpenSearchException, IOException {
+    public DeleteByQueryResponse deleteByQuery(DeleteByQueryRequest request) throws OpenSearchException, IOException {
 
-	client.deleteByQuery(request);
+	return client.deleteByQuery(request);
     }
 
     /**
@@ -316,58 +319,73 @@ public class OpenSearchClientWrapper {
     }
 
     /**
-     * Builds a query which searches all entries of the given <code>folder</code>
-     * having the given <code>key</code>.<br>
-     * <b>Constraints</b>: databaseId = getDatabase().getIdentifier() AND folderName = getName() AND key = key
+     * Builds a query which searches the entries with the given <code>property</code> and
+     * <code>propertyValue</code> that are stored in the database with id <code>databaseId</code> and in the index
+     * <code>index</code>
+     * <b>Constraints</b>: databaseId = getDatabase().getIdentifier() AND property = property AND property.value =
+     * propertyValue AND _index = index
      * 
-     * @param key
+     * @param databaseId
+     * @param index
+     * @param property
+     * @param propertyValue
+     * @return
      */
-    public Query buildSearchQuery(OpenSearchFolder folder, String key) {
-
-	// MatchQuery databaseIdQuery = new MatchQuery.Builder().//
-	// field(IndexData.DATABASE_ID).query(new FieldValue.Builder().//
-	// stringValue(folder.getDatabase().getIdentifier()).//
-	// build())
-	// .//
-	// build();
-	//
-	// MatchQuery folderNameQuery = new MatchQuery.Builder().//
-	// field(IndexData.FOLDER_NAME).query(new FieldValue.Builder().//
-	// stringValue(folder.getName()).//
-	// build())
-	// .//
-	// build();
-	//
-	// MatchQuery keyQuery = new MatchQuery.Builder().//
-	// field(IndexData.ENTRY_NAME).query(new FieldValue.Builder().//
-	// stringValue(key).//
-	// build())
-	// .//
-	// build();
+    public Query buildSearchQuery(String databaseId, String index, String property, String propertyValue) {
 
 	MatchPhraseQuery databaseIdQuery = new MatchPhraseQuery.Builder().//
-		field(IndexData.DATABASE_ID).query(folder.getDatabase().getIdentifier()).//
-		build();
-
-	MatchPhraseQuery folderNameQuery = new MatchPhraseQuery.Builder().//
-		field(IndexData.FOLDER_NAME).query(folder.getName()).//
+		field(IndexData.DATABASE_ID).query(databaseId).//
 		build();
 
 	MatchPhraseQuery keyQuery = new MatchPhraseQuery.Builder().//
-		field(IndexData.ENTRY_NAME).query(key).//
+		field(property).query(propertyValue).//
+		build();
+
+	MatchPhraseQuery indexQuery = new MatchPhraseQuery.Builder().//
+		field("_index").//
+		query(index).//
 		build();
 
 	List<Query> mustList = new ArrayList<>();
 
 	mustList.add(databaseIdQuery.toQuery());
-	mustList.add(folderNameQuery.toQuery());
 	mustList.add(keyQuery.toQuery());
-
-	List<Query> shouldList = buildIndexesQuery();
+	mustList.add(indexQuery.toQuery());
 
 	BoolQuery boolQuery = new BoolQuery.Builder().//
 		must(mustList).//
-		should(shouldList).//
+		build();
+
+	return boolQuery.toQuery();
+    }
+
+    /**
+     * Builds a query which searches the entries in the database with id <code>databaseId</code> and in the index
+     * <code>index</code>
+     * <b>Constraints</b>: databaseId = getDatabase().getIdentifier() AND _index = index
+     * 
+     * @param databaseId
+     * @param index
+     * @return
+     */
+    public Query buildSearchQuery(String databaseId, String index) {
+
+	MatchPhraseQuery databaseIdQuery = new MatchPhraseQuery.Builder().//
+		field(IndexData.DATABASE_ID).query(databaseId).//
+		build();
+
+	MatchPhraseQuery indexQuery = new MatchPhraseQuery.Builder().//
+		field("_index").//
+		query(index).//
+		build();
+
+	List<Query> mustList = new ArrayList<>();
+
+	mustList.add(databaseIdQuery.toQuery());
+	mustList.add(indexQuery.toQuery());
+
+	BoolQuery boolQuery = new BoolQuery.Builder().//
+		must(mustList).//
 		build();
 
 	return boolQuery.toQuery();
@@ -435,6 +453,94 @@ public class OpenSearchClientWrapper {
     public void synch() throws OpenSearchException, IOException {
 
 	client.indices().refresh();
+    }
+
+    /**
+     * @param searchQuery
+     * @param key
+     * @return
+     * @throws Exception
+     */
+    private Optional<JSONObject> searchSource(Query searchQuery, String key) throws Exception {
+    
+        SearchResponse<Object> searchResponse = client.search(s -> {
+            s.query(searchQuery);
+            return s;
+    
+        }, Object.class);
+    
+        HitsMetadata<Object> hits = searchResponse.hits();
+        if (hits.total().value() == 0) {
+    
+            return Optional.empty();
+        }
+    
+        List<Hit<Object>> hitsList = hits.hits();
+        Hit<Object> hit = hitsList.get(0);
+    
+        JSONObject source = IndexData.toJSONObject(hit.source());
+    
+        decorateSource(source, hit.index(), hit.id());
+    
+        return Optional.of(source);
+    }
+
+    /**
+     * Builds a query which searches the entry of the given <code>folder</code>
+     * having the given <code>key</code>.<br>
+     * <b>Constraints</b>: databaseId = getDatabase().getIdentifier() AND folderName = getName() AND key = key
+     * 
+     * @param key
+     */
+    private Query buildSearchQuery(OpenSearchFolder folder, String key) {
+    
+        // MatchQuery databaseIdQuery = new MatchQuery.Builder().//
+        // field(IndexData.DATABASE_ID).query(new FieldValue.Builder().//
+        // stringValue(folder.getDatabase().getIdentifier()).//
+        // build())
+        // .//
+        // build();
+        //
+        // MatchQuery folderNameQuery = new MatchQuery.Builder().//
+        // field(IndexData.FOLDER_NAME).query(new FieldValue.Builder().//
+        // stringValue(folder.getName()).//
+        // build())
+        // .//
+        // build();
+        //
+        // MatchQuery keyQuery = new MatchQuery.Builder().//
+        // field(IndexData.ENTRY_NAME).query(new FieldValue.Builder().//
+        // stringValue(key).//
+        // build())
+        // .//
+        // build();
+    
+        MatchPhraseQuery databaseIdQuery = new MatchPhraseQuery.Builder().//
+        	field(IndexData.DATABASE_ID).query(folder.getDatabase().getIdentifier()).//
+        	build();
+    
+        MatchPhraseQuery folderNameQuery = new MatchPhraseQuery.Builder().//
+        	field(IndexData.FOLDER_NAME).query(folder.getName()).//
+        	build();
+    
+        MatchPhraseQuery keyQuery = new MatchPhraseQuery.Builder().//
+        	field(IndexData.ENTRY_NAME).query(key).//
+        	build();
+    
+        List<Query> mustList = new ArrayList<>();
+    
+        mustList.add(databaseIdQuery.toQuery());
+        mustList.add(folderNameQuery.toQuery());
+        mustList.add(keyQuery.toQuery());
+    
+        List<Query> shouldList = buildIndexesQuery();
+    
+        BoolQuery boolQuery = new BoolQuery.Builder().//
+        	must(mustList).//
+        	should(shouldList).//
+        	build();
+    
+        return boolQuery.toQuery();
     }
 
     /**
