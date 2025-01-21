@@ -473,28 +473,6 @@ public class MarkLogicReader implements DatabaseReader {
     }
 
     @Override
-    public Optional<GSUser> getUser(String identifier) throws GSException {
-
-	try {
-
-	    return getUsers().stream().filter(u -> u.getIdentifier().equals(identifier)).findFirst();
-
-	} catch (Exception e) {
-
-	    GSLoggerFactory.getLogger(MarkLogicReader.class).error("Exception requesting user {}", identifier);
-
-	    throw GSException.createException(//
-		    getClass(), //
-		    e.getMessage(), //
-		    null, //
-		    ErrorInfo.ERRORTYPE_INTERNAL, //
-		    ErrorInfo.SEVERITY_ERROR, //
-		    MARK_LOGIC_GET_USER_ERROR, //
-		    e);
-	}
-    }
-
-    @Override
     public List<GSUser> getUsers() throws GSException {
 
 	try {

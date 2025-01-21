@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 import eu.essi_lab.api.database.Database.IdentifierType;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.auth.GSUser;
@@ -45,7 +46,19 @@ public interface DatabaseReader extends DatabaseProvider, UserBaseClient {
      * @return the optional user
      * @throws GSException
      */
-    Optional<GSUser> getUser(String userName) throws GSException;
+    public default Optional<GSUser> getUser(String identifier) throws GSException {
+
+	try {
+
+	    return getUsers().stream().filter(u -> u.getIdentifier().equals(identifier)).findFirst();
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(ex);
+
+	    throw GSException.createException(getClass(), "DatabaseGetUserError", ex);
+	}
+    }
 
     /**
      * Gets all the available {@link GSUser}s
