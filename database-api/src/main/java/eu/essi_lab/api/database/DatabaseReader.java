@@ -94,7 +94,10 @@ public interface DatabaseReader extends DatabaseProvider, UserBaseClient {
      * @return
      * @throws GSException if error occurs during the request processing
      */
-    public boolean resourceExists(IdentifierType identifierType, String identifier) throws GSException;
+    public default boolean resourceExists(IdentifierType identifierType, String identifier) throws GSException{
+	
+	return !getResources(identifierType, identifier).isEmpty();
+    }
 
     /**
      * Get the {@link GSResource} identified by a {@link HarmonizedMetadata} with the given
@@ -111,12 +114,21 @@ public interface DatabaseReader extends DatabaseProvider, UserBaseClient {
     public List<GSResource> getResources(IdentifierType identifierType, String identifier) throws GSException;
 
     /**
+     * Special method that WAS used during the tag recovering phase. Normally different resources with same original id are not
+     * allowed, but at the end of a non-first harvesting, it is common to have 2 copies of the same resource, from the
+     * previous harvesting and from the current one.<br>
+     * 
+     * From GIP-423 this phase is no longer required, since resources with same original id of the same source
+     * are no longer replaced (this was the reason why this phase was necessary, because the new resource with same
+     * original id lacked the tags possibly present in the previous copy of the resource)
+     *
      * @param originalIdentifier
      * @param source
      * @param includeDeleted
      * @return
      * @throws GSException
      */
+    @Deprecated
     public List<GSResource> getResources(String originalIdentifier, GSSource source, boolean includeDeleted) throws GSException;
 
     /**
@@ -126,7 +138,24 @@ public interface DatabaseReader extends DatabaseProvider, UserBaseClient {
      * @return
      * @throws GSException
      */
-    public GSResource getResource(String originalIdentifier, GSSource source, boolean includeDeleted) throws GSException;
+    public default GSResource getResource(String originalIdentifier, GSSource source, boolean includeDeleted) throws GSException {
+
+	List<GSResource> resultsList = getResources(originalIdentifier, source, includeDeleted);
+	if (!resultsList.isEmpty()) {
+
+	    if (resultsList.size() > 1) {
+		//
+		// this should no longer happen from GIP-423
+		//
+		GSLoggerFactory.getLogger(getClass()).warn("Found {} resources with originalId [{}] from the source [{}] !!!",
+			resultsList.size(), originalIdentifier, source.getUniqueIdentifier());
+	    }
+
+	    return resultsList.get(0);
+	}
+
+	return null;
+    }
 
     /**
      * Verify if there is a resource that match the given
@@ -137,7 +166,10 @@ public interface DatabaseReader extends DatabaseProvider, UserBaseClient {
      * @return true if there is a resource who match given identifier and source
      * @throws GSException if error occurs during the request processing
      */
-    public boolean resourceExists(String originalIdentifier, GSSource source) throws GSException;
+    public default boolean resourceExists(String originalIdentifier, GSSource source) throws GSException {
+
+	return getResource(originalIdentifier, source) != null;
+    }
 
     /**
      * Get the {@link GSResource} identified by the given
@@ -151,5 +183,8 @@ public interface DatabaseReader extends DatabaseProvider, UserBaseClient {
      * @throws GSException if error occurs during the request processing
      * @see DatabaseWriter#store(GSResource)
      */
-    public GSResource getResource(String originalIdentifier, GSSource source) throws GSException;
+    public default GSResource getResource(String originalIdentifier, GSSource source) throws GSException {
+
+	return getResource(originalIdentifier, source, false);
+    }
 }
