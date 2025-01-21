@@ -125,6 +125,14 @@ public class SourceWrapper {
 
 	return source.getString(IndexData.BINARY_PROPERTY);
     }
+    
+    /**
+     * - uses {@link #getBinaryProperty()} to retrieve the binary value
+     */
+    public String getBinaryValue() {
+
+	return source.getString(source.getString(IndexData.BINARY_PROPERTY));
+    }
 
     /**
      * - possible values: see {@link DataType}
