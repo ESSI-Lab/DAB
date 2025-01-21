@@ -89,10 +89,7 @@ public class OpenSearchWriter extends DatabaseWriter {
 
 	    Long deleted = response.deleted();
 
-	    if (deleted != 1) {
-
-		GSLoggerFactory.getLogger(OpenSearchDatabase.class).warn("Deleted count: {}", deleted);
-	    }
+	    GSLoggerFactory.getLogger(OpenSearchDatabase.class).debug("Deleted count: {}", deleted);
 
 	} catch (Exception ex) {
 
@@ -104,7 +101,7 @@ public class OpenSearchWriter extends DatabaseWriter {
 
     //
     // NOT IMPLEMENTED AT THE MOMENT
-    // 
+    //
     @Override
     public void storeRDF(Node rdf) throws GSException {
 
