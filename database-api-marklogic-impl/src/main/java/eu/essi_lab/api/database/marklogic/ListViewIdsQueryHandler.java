@@ -52,7 +52,7 @@ public class ListViewIdsQueryHandler {
 
 	Optional<String> creator = request.getCreator();
 	Optional<String> owner = request.getOwner();
-	Optional<ViewVisibility> visibility = request.getViewVisibility();
+	Optional<ViewVisibility> visibility = request.getVisibility();
 
 	if (!creator.isPresent() && !owner.isPresent() && !visibility.isPresent()) {
 

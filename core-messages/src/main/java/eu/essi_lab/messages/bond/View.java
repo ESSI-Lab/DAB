@@ -38,6 +38,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.bond.jaxb.ViewFactory;
 
 /**
@@ -144,6 +145,23 @@ public class View implements Serializable {
 	Unmarshaller unmarshaller = factory.createUnmarshaller();
 
 	return (View) unmarshaller.unmarshal(stream);
+    }
+
+    /**
+     * @param stream
+     * @return
+     * @throws JAXBException
+     */
+    public static View createOrNull(InputStream stream) {
+
+	try {
+	    return fromStream(stream);
+	} catch (JAXBException e) {
+
+	    GSLoggerFactory.getLogger(View.class).error(e);
+	}
+
+	return null;
     }
 
     /**

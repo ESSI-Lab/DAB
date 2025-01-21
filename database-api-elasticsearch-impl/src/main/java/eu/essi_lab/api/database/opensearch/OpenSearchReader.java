@@ -25,12 +25,19 @@ package eu.essi_lab.api.database.opensearch;
  */
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.opensearch.client.opensearch._types.query_dsl.Query;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.Database.IdentifierType;
 import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.GetViewIdentifiersRequest;
+import eu.essi_lab.api.database.opensearch.index.mappings.UsersMapping;
+import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.StorageInfo;
@@ -43,45 +50,98 @@ import eu.essi_lab.model.resource.GSResource;
  */
 public class OpenSearchReader implements DatabaseReader {
 
-    @Override
-    public boolean supports(StorageInfo dbUri) {
+    private OpenSearchDatabase database;
+    private OpenSearchClientWrapper wrapper;
 
-	return false;
+    @Override
+    public void setDatabase(Database database) {
+
+	this.database = (OpenSearchDatabase) database;
+	this.wrapper = new OpenSearchClientWrapper(this.database.getClient());
     }
 
     @Override
-    public void setDatabase(Database dataBase) {
+    public OpenSearchDatabase getDatabase() {
 
+	return (OpenSearchDatabase) database;
     }
 
     @Override
-    public Database getDatabase() {
+    public boolean supports(StorageInfo info) {
 
-	return null;
-    }
-
-    @Override
-    public Optional<GSUser> getUser(String userName) throws GSException {
-
-	return Optional.empty();
+	return OpenSearchDatabase.isSupported(info);
     }
 
     @Override
     public List<GSUser> getUsers() throws GSException {
 
-	return null;
+	Query query = wrapper.buildSearchQuery(getDatabase().getIdentifier(), UsersMapping.get().getIndex());
+
+	try {
+	    return wrapper.searchBinaries(query).//
+		    stream().//
+		    map(binary -> GSUser.createOrNull(binary)).//
+		    filter(Objects::nonNull).//
+		    collect(Collectors.toList());
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(OpenSearchDatabase.class).error(ex);
+
+	    throw GSException.createException(getClass(), "OpenSearchReaderGetUsersError", ex);
+	}
     }
 
     @Override
     public Optional<View> getView(String viewId) throws GSException {
 
-	return Optional.empty();
+	Query query = wrapper.buildSearchQuery(//
+		getDatabase().getIdentifier(), //
+		ViewsMapping.get().getIndex(), //
+		ViewsMapping.VIEW_ID, //
+		viewId);
+
+	try {
+	    return wrapper.searchBinaries(query).//
+		    stream().//
+		    map(binary -> View.createOrNull(binary)).//
+		    filter(Objects::nonNull).//
+		    findFirst();
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(OpenSearchDatabase.class).error(ex);
+
+	    throw GSException.createException(getClass(), "OpenSearchReaderGetViewByIdError", ex);
+	}
     }
 
     @Override
     public List<String> getViewIdentifiers(GetViewIdentifiersRequest request) throws GSException {
 
-	return null;
+	Query query = wrapper.buildSearchViewsQuery(//
+		database.getIdentifier(), //
+		request.getCreator(), //
+		request.getOwner(), //
+		request.getVisibility()//
+	);
+	try {
+
+	    List<String> list = wrapper.searchProperty(query, ViewsMapping.VIEW_ID);
+
+	    int fromIndex = Math.min(list.size(), request.getStart());
+	    int toIndex = Math.min(list.size(), request.getStart() + request.getCount());
+
+	    list = list.subList(fromIndex, toIndex);
+
+	    return list;
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(OpenSearchDatabase.class).error(ex);
+
+	    throw GSException.createException(getClass(), "OpenSearchReaderGetViewIdentifiersError", ex);
+	}
     }
 
     @Override
