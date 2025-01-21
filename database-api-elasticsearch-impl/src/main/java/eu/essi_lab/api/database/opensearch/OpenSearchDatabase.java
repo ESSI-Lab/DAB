@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.http.HttpHost;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.json.JSONObject;
@@ -236,6 +237,8 @@ public class OpenSearchDatabase extends Database {
 
 	} catch (Exception ex) {
 
+	    GSLoggerFactory.getLogger(OpenSearchDatabase.class).error(ex);
+
 	    throw GSException.createException(OpenSearchDatabase.class, "OpenSearchDatabaseExistsFolderError", ex);
 	}
     }
@@ -250,6 +253,8 @@ public class OpenSearchDatabase extends Database {
 	    return folders.toArray(new OpenSearchFolder[] {});
 
 	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(OpenSearchDatabase.class).error(ex);
 
 	    throw GSException.createException(OpenSearchDatabase.class, "OpenSearchDatabaseGetFoldersError", ex);
 	}
@@ -267,6 +272,8 @@ public class OpenSearchDatabase extends Database {
 
 	} catch (Exception ex) {
 
+	    GSLoggerFactory.getLogger(OpenSearchDatabase.class).error(ex);
+
 	    throw GSException.createException(OpenSearchDatabase.class, "OpenSearchDatabaseRemoceFolderError", ex);
 	}
     }
@@ -281,24 +288,25 @@ public class OpenSearchDatabase extends Database {
 	    try {
 		return FolderRegistry.get(this).register(folder);
 
-	    } catch (IOException e) {
+	    } catch (IOException ex) {
 
-		throw GSException.createException(getClass(), "OpenSearchDatabaseAddFolderError", e);
+		GSLoggerFactory.getLogger(OpenSearchDatabase.class).error(ex);
+
+		throw GSException.createException(getClass(), "OpenSearchDatabaseAddFolderError", ex);
 	    }
 	}
 
 	return false;
     }
 
-    /**
-     * Not implemented. Used in deprecated {@link SourceStorageWorker} testISOCompliance, recverTags and
-     * testISCompliance
-     * methods
-     */
+    //
+    // NOT IMPLEMENTED AT THE MOMENT. Used in deprecated SourceStorageWorker testISOCompliance, recoverTags and
+    // testISCompliance methods
+    // 
     @Override
     public List<String> getIdentifiers(IdentifierType type, String folderName, boolean excludDeleted) throws GSException {
 
-	return null;
+	throw new NotImplementedException();
     }
 
     @Override
@@ -321,9 +329,8 @@ public class OpenSearchDatabase extends Database {
 
 	return identifier;
     }
-    
-    /** 
-     * 
+
+    /**
      * @param info
      * @return
      */

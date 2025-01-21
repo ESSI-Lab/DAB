@@ -122,11 +122,6 @@ public class MarkLogicWriter extends DatabaseWriter {
 	}
     }
 
-    /**
-     * @param recoveryRemovalToken
-     * @param count
-     * @throws RequestException
-     */
     @Override
     public void remove(String propertyName, String propertyValue) throws GSException {
 

@@ -55,13 +55,13 @@ public abstract class DatabaseWriter implements DatabaseProvider {
 
 	GSSource source = resource.getSource();
 
-	Database markLogicDB = getDatabase();
+	Database database = getDatabase();
 
 	try {
 
-	    SourceStorageWorker worker = markLogicDB.getWorker(source.getUniqueIdentifier());
+	    SourceStorageWorker worker = database.getWorker(source.getUniqueIdentifier());
 
-	    DatabaseFolder folder = markLogicDB.findWritingFolder(worker);
+	    DatabaseFolder folder = database.findWritingFolder(worker);
 
 	    Document asDocument = resource.asDocument(true);
 
@@ -112,17 +112,17 @@ public abstract class DatabaseWriter implements DatabaseProvider {
 
 	GSSource source = resource.getSource();
 
-	Database markLogicDB = getDatabase();
+	Database database = getDatabase();
 
 	try {
 
-	    SourceStorageWorker worker = markLogicDB.getWorker(source.getUniqueIdentifier());
+	    SourceStorageWorker worker = database.getWorker(source.getUniqueIdentifier());
 
 	    Document asDocument = resource.asDocument(true);
 
 	    String key = resource.getPrivateId();
 
-	    DatabaseFolder folder = markLogicDB.findWritingFolder(worker);
+	    DatabaseFolder folder = database.findWritingFolder(worker);
 
 	    folder.replace(key, FolderEntry.of(asDocument), EntryType.GS_RESOURCE);
 

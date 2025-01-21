@@ -30,9 +30,9 @@ package eu.essi_lab.api.database;
 public interface DatabaseProvider extends DatabaseCompliant {
 
     /**
-     * @param dataBase
+     * @param database
      */
-    public void setDatabase(Database dataBase);
+    public void setDatabase(Database database);
 
     /**
      * @return
