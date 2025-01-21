@@ -129,6 +129,22 @@ public class GSUser extends DOMSerializer implements Serializable {
 
 	return null;
     }
+    
+    /**
+     * @param stream
+     * @return
+     * @throws JAXBException
+     */
+    public static GSUser createOrNull(InputStream stream) {
+
+	try {
+	    return new GSUser().fromStream(stream);
+	} catch (JAXBException e) {
+	    GSLoggerFactory.getLogger(GSUser.class).error(e);
+	}
+
+	return null;
+    }
 
     /**
      * 
