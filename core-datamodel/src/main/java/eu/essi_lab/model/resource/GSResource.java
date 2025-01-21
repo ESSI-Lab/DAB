@@ -288,6 +288,23 @@ public abstract class GSResource extends DOMSerializer {
 	}
 	return null;
     }
+    
+    /**
+     * @param node
+     * @return
+     * @throws JAXBException
+     */
+    public static GSResource createOrNull(InputStream stream) {
+
+	try {
+	    return new GSResource() {
+	    }.fromStream(stream);
+	} catch (JAXBException e) {
+	    GSLoggerFactory.getLogger(GSResource.class).error(e);
+	}
+	return null;
+    }
+
 
     @Override
     public GSResource fromStream(InputStream stream) throws JAXBException {
