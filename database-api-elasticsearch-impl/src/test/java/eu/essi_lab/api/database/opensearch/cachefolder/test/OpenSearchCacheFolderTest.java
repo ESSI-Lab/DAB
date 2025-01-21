@@ -103,6 +103,8 @@ public class OpenSearchCacheFolderTest extends OpenSearchTest {
 
 	Assert.assertEquals(DataType.BINARY, wrapper.getDataType());
 
+	Assert.assertEquals(wrapper.getCachedEntry().get(), wrapper.getBinaryValue());
+
 	JSONObject decodedObject = new JSONObject(//
 		IOStreamUtils.asUTF8String(//
 			IndexData.decode(wrapper.getCachedEntry().get())));

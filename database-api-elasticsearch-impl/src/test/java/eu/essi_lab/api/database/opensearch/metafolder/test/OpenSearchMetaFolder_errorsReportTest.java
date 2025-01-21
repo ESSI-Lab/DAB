@@ -49,9 +49,9 @@ public class OpenSearchMetaFolder_errorsReportTest extends OpenSearchTest {
 	//
 	//
 
-	folder.store(key, //
+	Assert.assertTrue(folder.store(key, //
 		FolderEntry.of(IOStreamUtils.asStream(errorsReport)), //
-		EntryType.HARVESTING_ERROR_REPORT);
+		EntryType.HARVESTING_ERROR_REPORT));
 
 	SourceWrapper wrapper = folder.getSourceWrapper(key);
 
@@ -74,6 +74,8 @@ public class OpenSearchMetaFolder_errorsReportTest extends OpenSearchTest {
 	Assert.assertEquals(MetaFolderMapping.ERRORS_REPORT, wrapper.getBinaryProperty());
 
 	Assert.assertEquals(DataType.BINARY, wrapper.getDataType());
+
+	Assert.assertEquals(wrapper.getErrorsReport().get(), wrapper.getBinaryValue());
 
 	//
 	// meta-folder-index property

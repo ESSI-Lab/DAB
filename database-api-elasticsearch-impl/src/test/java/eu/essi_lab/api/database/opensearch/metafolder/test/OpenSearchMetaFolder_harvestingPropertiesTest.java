@@ -20,8 +20,8 @@ import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
-import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchDatabaseInitTest;
+import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 import eu.essi_lab.messages.HarvestingProperties;
 
 /**
@@ -49,10 +49,10 @@ public class OpenSearchMetaFolder_harvestingPropertiesTest extends OpenSearchTes
 
 	String key = "harvesting.properties";
 
-	folder.store(//
+	Assert.assertTrue(folder.store(//
 		key, //
 		FolderEntry.of(properties.asStream()), //
-		EntryType.HARVESTING_PROPERTIES);
+		EntryType.HARVESTING_PROPERTIES));
 
 	SourceWrapper wrapper = folder.getSourceWrapper(key);
 
@@ -75,6 +75,8 @@ public class OpenSearchMetaFolder_harvestingPropertiesTest extends OpenSearchTes
 	Assert.assertEquals(MetaFolderMapping.HARVESTING_PROPERTIES, wrapper.getBinaryProperty());
 
 	Assert.assertEquals(DataType.BINARY, wrapper.getDataType());
+
+	Assert.assertEquals(wrapper.getHarvestingProperties().get(), wrapper.getBinaryValue());
 
 	//
 	// meta-folder-index property

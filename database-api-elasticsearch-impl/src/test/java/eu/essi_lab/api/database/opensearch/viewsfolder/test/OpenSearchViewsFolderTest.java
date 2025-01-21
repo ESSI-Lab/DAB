@@ -47,10 +47,10 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 
 	String key = view.getId();
 
-	folder.store(//
+	Assert.assertTrue(folder.store(//
 		key, //
 		FolderEntry.of(view.toStream()), //
-		EntryType.VIEW);
+		EntryType.VIEW));
 
 	SourceWrapper wrapper = folder.getSourceWrapper(key);
 
@@ -73,6 +73,8 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 	Assert.assertEquals(ViewsMapping.VIEW, wrapper.getBinaryProperty());
 
 	Assert.assertEquals(DataType.BINARY, wrapper.getDataType());
+
+	Assert.assertEquals(wrapper.getView().get(), wrapper.getBinaryValue());
 
 	//
 	// viws-index property

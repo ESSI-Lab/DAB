@@ -20,8 +20,8 @@ import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.ConfigurationMapping;
-import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchDatabaseInitTest;
+import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.lib.utils.IOStreamUtils;
@@ -60,10 +60,10 @@ public class OpenSearchConfigurationFolderTest extends OpenSearchTest {
 
 	String lockKey = "lock.json";
 
-	folder.store(//
+	Assert.assertTrue(folder.store(//
 		lockKey, //
 		FolderEntry.of(IOStreamUtils.asStream(lockFile.toString(3))), //
-		EntryType.CONFIGURATION_LOCK);
+		EntryType.CONFIGURATION_LOCK));
 
 	{
 
@@ -88,6 +88,8 @@ public class OpenSearchConfigurationFolderTest extends OpenSearchTest {
 	    Assert.assertEquals(ConfigurationMapping.CONFIGURATION, wrapper.getBinaryProperty());
 
 	    Assert.assertEquals(DataType.BINARY, wrapper.getDataType());
+
+	    Assert.assertEquals(wrapper.getConfiguration().get(), wrapper.getBinaryValue());
 
 	    //
 	    // configuaration-index property

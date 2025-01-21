@@ -49,10 +49,10 @@ public class OpenSearchMetaFolder_indexDocTest extends OpenSearchTest {
 
 	String key = TestUtils.SOURCE_ID + SourceStorageWorker.DATA_1_PREFIX;
 
-	folder.store(//
+	Assert.assertTrue(folder.store(//
 		key, //
 		FolderEntry.of(doc.getDocument()), //
-		EntryType.DATA_FOLDER_INDEX_DOC);
+		EntryType.DATA_FOLDER_INDEX_DOC));
 
 	SourceWrapper wrapper = folder.getSourceWrapper(key);
 
@@ -75,6 +75,8 @@ public class OpenSearchMetaFolder_indexDocTest extends OpenSearchTest {
 	Assert.assertEquals(MetaFolderMapping.INDEX_DOC, wrapper.getBinaryProperty());
 
 	Assert.assertEquals(DataType.DOC, wrapper.getDataType());
+
+	Assert.assertEquals(wrapper.getIndexDoc().get(), wrapper.getBinaryValue());
 
 	//
 	// meta-folder-index property

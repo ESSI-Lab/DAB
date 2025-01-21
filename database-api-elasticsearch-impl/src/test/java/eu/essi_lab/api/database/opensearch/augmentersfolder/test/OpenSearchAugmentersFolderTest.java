@@ -18,8 +18,8 @@ import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.AugmentersMapping;
-import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchDatabaseInitTest;
+import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 import eu.essi_lab.messages.AugmenterProperties;
 
 /**
@@ -51,9 +51,9 @@ public class OpenSearchAugmentersFolderTest extends OpenSearchTest {
 	//
 	//
 
-	folder.store(key, //
+	Assert.assertTrue(folder.store(key, //
 		FolderEntry.of(properties.asStream()), //
-		EntryType.AUGMENTER_PROPERTIES);
+		EntryType.AUGMENTER_PROPERTIES));
 
 	SourceWrapper wrapper = folder.getSourceWrapper(key);
 
@@ -76,6 +76,8 @@ public class OpenSearchAugmentersFolderTest extends OpenSearchTest {
 	Assert.assertEquals(AugmentersMapping.AUGMENTER_PROPERTIES, wrapper.getBinaryProperty());
 
 	Assert.assertEquals(DataType.BINARY, wrapper.getDataType());
+
+	Assert.assertEquals(wrapper.getAugmenterProperties().get(), wrapper.getBinaryValue());
 
 	//
 	// augmenters-folder-index property
