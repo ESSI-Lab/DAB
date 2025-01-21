@@ -29,21 +29,26 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.Database.IdentifierType;
 import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.GetViewIdentifiersRequest;
+import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.UsersMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.model.GSSource;
+import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
+import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.ResourceProperty;
 
 /**
  * @author Fabrizio
@@ -145,38 +150,53 @@ public class OpenSearchReader implements DatabaseReader {
     }
 
     @Override
-    public boolean resourceExists(IdentifierType identifierType, String identifier) throws GSException {
+    public List<GSResource> getResources(IdentifierType type, String identifier) throws GSException {
 
-	return false;
+	Queryable property = null;
+	switch (type) {
+	case OAI_HEADER:
+	    property = ResourceProperty.OAI_PMH_HEADER_ID;
+	    break;
+	case ORIGINAL:
+	    property = ResourceProperty.ORIGINAL_ID;
+	    break;
+	case PRIVATE:
+	    property = ResourceProperty.PRIVATE_ID;
+	    break;
+	case PUBLIC:
+	    property = MetadataElement.IDENTIFIER;
+	    break;
+	}
+
+	Query query = wrapper.buildSearchQuery(//
+		database.getIdentifier(), //
+		DataFolderMapping.get().getIndex(), //
+		property.getName(), //
+		identifier);
+
+	try {
+	    return wrapper.searchBinaries(query).//
+		    stream().//
+		    map(binary -> GSResource.createOrNull(binary)).//
+		    filter(Objects::nonNull).//
+		    collect(Collectors.toList());
+	    
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(OpenSearchDatabase.class).error(ex);
+
+	    throw GSException.createException(getClass(), "OpenSearchReaderGetResourcesError", ex);
+	}
     }
 
+    //
+    // NOT IMPLEMENTED. implementation not required since this method call is deprecated
+    //
     @Override
-    public List<GSResource> getResources(IdentifierType identifierType, String identifier) throws GSException {
-
-	return null;
-    }
-
-    @Override
-    public boolean resourceExists(String originalIdentifier, GSSource source) throws GSException {
-
-	return false;
-    }
-
-    @Override
-    public GSResource getResource(String originalIdentifier, GSSource source) throws GSException {
-
-	return null;
-    }
-
-    @Override
+    @Deprecated
     public List<GSResource> getResources(String originalIdentifier, GSSource source, boolean includeDeleted) throws GSException {
-	// TODO Auto-generated method stub
-	return null;
+
+	throw new NotImplementedException();
     }
 
-    @Override
-    public GSResource getResource(String originalIdentifier, GSSource source, boolean includeDeleted) throws GSException {
-	// TODO Auto-generated method stub
-	return null;
-    }
 }
