@@ -206,7 +206,8 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
 	}
 
 	if (startupUri.startsWith(OpenSearchServiceType.OPEN_SEARCH_MANAGED.getProtocol())
-		|| startupUri.startsWith(OpenSearchServiceType.OPEN_SEARCH_SERVERLESS.getProtocol())) {
+		|| startupUri.startsWith(OpenSearchServiceType.OPEN_SEARCH_SERVERLESS.getProtocol())
+		|| startupUri.startsWith(OpenSearchServiceType.OPEN_SEARCH_LOCAL.getProtocol())) {
 
 	    return DatabaseImpl.OPENSEARCH;
 	}
@@ -222,7 +223,8 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
 
 	return uri.startsWith("xdbc") || //
 		uri.startsWith(OpenSearchServiceType.OPEN_SEARCH_MANAGED.getProtocol())
-		|| uri.startsWith(OpenSearchServiceType.OPEN_SEARCH_SERVERLESS.getProtocol());
+		|| uri.startsWith(OpenSearchServiceType.OPEN_SEARCH_SERVERLESS.getProtocol())
+		|| uri.startsWith(OpenSearchServiceType.OPEN_SEARCH_LOCAL.getProtocol());
     }
 
     /**
