@@ -62,6 +62,9 @@ public class SemanticProfiler extends Profiler<SemanticProfilerSetting> {
 
 	VariableTableHandler handler1 = new VariableTableHandler();
 	selector.register(new VariableTableRequestFilter(), handler1);
+	
+	CountriesTableHandler handler3 = new CountriesTableHandler();
+	selector.register(new CountryTableRequestFilter(), handler3);
 
 	SPARQLHandler handler2 = new SPARQLHandler();
 	selector.register(new SPARQLRequestFilter(), handler2);

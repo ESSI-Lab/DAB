@@ -85,6 +85,16 @@ public class StationRecord {
     private String whosCategory;
 
     private String sourceIdentifier;
+    
+    private String sourceLabel;
+
+    public String getSourceLabel() {
+        return sourceLabel;
+    }
+
+    public void setSourceLabel(String sourceLabel) {
+        this.sourceLabel = sourceLabel;
+    }
 
     private Integer lastDayObservations;
 

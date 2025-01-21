@@ -57,8 +57,10 @@ import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.model.resource.data.CRS;
 import eu.essi_lab.model.resource.data.CRSUtils;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
@@ -226,6 +228,7 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 			discoveryMessage.getResourceSelector().setIndexesPolicy(IndexesPolicy.NONE);
 			discoveryMessage.getResourceSelector().setSubset(ResourceSubset.NONE);
 			discoveryMessage.getResourceSelector().addIndex(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER);
+			discoveryMessage.getResourceSelector().addIndex(ResourceProperty.SOURCE_ID);
 			discoveryMessage.getResourceSelector().addIndex(MetadataElement.PLATFORM_TITLE);
 			discoveryMessage.getResourceSelector().setIncludeOriginal(false);
 			discoveryMessage.setPage(new Page(1, maxRecords));
@@ -258,11 +261,18 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 			    String platformTitle = result.substring(result.indexOf("<gs:platformTitle>"),
 				    result.indexOf("</gs:platformTitle>"));
 			    platformTitle = platformTitle.replace("<gs:platformTitle>", "");
-
+			    String sourceId = result.substring(result.indexOf("<gs:sourceId>"), result.indexOf("</gs:sourceId>"));			    
+			    sourceId = sourceId.replace("<gs:sourceId>", "");
+			    GSSource source = ConfigurationWrapper.getSource(sourceId);
+			    String sourceLabel = "unknown";
+			    if (source!=null) {
+				sourceLabel = source.getLabel();
+			    }
 			    StationRecord station = new StationRecord();
 			    station.setPlatformIdentifier(id);
 			    station.setPlatformName(platformTitle);
 			    station.setDatasetName(platformTitle);
+			    station.setSourceLabel(sourceLabel);
 			    stations.add(station);
 			}
 

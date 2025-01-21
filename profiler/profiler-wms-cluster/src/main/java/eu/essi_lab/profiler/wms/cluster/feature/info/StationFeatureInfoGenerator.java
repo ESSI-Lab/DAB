@@ -174,6 +174,7 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 
 	builder.append("<tr>\n");
 	builder.append("  <td style='vertical-align: middle;'>" + station.getDatasetName() + "</td>    \n");
+	builder.append("  <td style='vertical-align: middle;'>" + station.getSourceLabel() + "</td>    \n");
 	builder.append("  <td style='text-align: center;'>" + image + "</td>\n");
 	builder.append("  <td style='text-align: center; cursor:pointer' id='addToSearch_" + station.getDatasetName()
 		+ "'><i class=\"font-awesome-button-icon fa fa-plus-circle\" style=\"color:darkred; font-size:15px;\" aria-hidden=\"true\"></i></td>\n");
@@ -236,6 +237,7 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 	    builder.append("<div style='max-height: 400px; overflow-y: auto'><table class='featureInfo'>\n");
 	    builder.append("<tr>\n");
 	    builder.append(" <th >Station" + info + "</th>\n");
+	    builder.append(" <th >Source</th>\n");
 	    builder.append(" <th >Station info</th>\n");
 	    builder.append(" <th >Add to search</th>\n");
 	    builder.append(
