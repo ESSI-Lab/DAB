@@ -3,6 +3,11 @@
  */
 package eu.essi_lab.api.database.opensearch;
 
+import org.apache.commons.lang3.NotImplementedException;
+import org.opensearch.client.opensearch._types.query_dsl.Query;
+import org.opensearch.client.opensearch.core.DeleteByQueryRequest;
+import org.opensearch.client.opensearch.core.DeleteByQueryResponse;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -28,6 +33,9 @@ import org.w3c.dom.Node;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseWriter;
+import eu.essi_lab.api.database.opensearch.index.IndexData;
+import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
@@ -37,18 +45,20 @@ import eu.essi_lab.model.resource.GSResource;
  */
 public class OpenSearchWriter extends DatabaseWriter {
 
-    private Database dataBase;
+    private OpenSearchDatabase database;
+    private OpenSearchClientWrapper wrapper;
 
     @Override
-    public void setDatabase(Database dataBase) {
+    public void setDatabase(Database database) {
 
-	this.dataBase = dataBase;
+	this.database = (OpenSearchDatabase) database;
+	this.wrapper = new OpenSearchClientWrapper(this.database.getClient());
     }
 
     @Override
     public OpenSearchDatabase getDatabase() {
 
-	return (OpenSearchDatabase) dataBase;
+	return (OpenSearchDatabase) database;
     }
 
     @Override
@@ -59,20 +69,45 @@ public class OpenSearchWriter extends DatabaseWriter {
 
     @Override
     public void remove(GSResource resource) throws GSException {
-	// TODO Auto-generated method stub
 
+	remove(IndexData.ENTRY_NAME, resource.getPrivateId());
     }
 
     @Override
     public void remove(String propertyName, String propertyValue) throws GSException {
-	// TODO Auto-generated method stub
 
+	Query query = wrapper.buildSearchQuery(//
+		getDatabase().getIdentifier(), //
+		DataFolderMapping.get().getIndex(), //
+		propertyName, //
+		propertyValue);
+
+	DeleteByQueryRequest request = wrapper.buildDeleteByQueryRequest(DataFolderMapping.get().getIndex(), query);
+
+	try {
+	    DeleteByQueryResponse response = wrapper.deleteByQuery(request);
+
+	    Long deleted = response.deleted();
+
+	    if (deleted != 1) {
+
+		GSLoggerFactory.getLogger(OpenSearchDatabase.class).warn("Deleted count: {}", deleted);
+	    }
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(OpenSearchDatabase.class).error(ex);
+
+	    throw GSException.createException(getClass(), "OpenSearchWriterRemoveByPropertiesError", ex);
+	}
     }
 
+    //
+    // NOT IMPLEMENTED AT THE MOMENT
+    // 
     @Override
     public void storeRDF(Node rdf) throws GSException {
-	// TODO Auto-generated method stub
 
+	throw new NotImplementedException();
     }
-
 }
