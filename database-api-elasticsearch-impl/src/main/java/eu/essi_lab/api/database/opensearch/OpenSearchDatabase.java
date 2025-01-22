@@ -72,6 +72,41 @@ public class OpenSearchDatabase extends Database {
     private boolean initialized;
     private StorageInfo storageInfo;
 
+    /**
+     * @return
+     */
+    public static StorageInfo createLocalServiceInfo() {
+
+	StorageInfo info = new StorageInfo();
+
+	info.setUser("test");// ignored
+	info.setPassword("test");// ignored
+
+	// optional, if missing the http scheme is used to discriminate the service type
+	info.setType(OpenSearchServiceType.OPEN_SEARCH_LOCAL.getProtocol());
+
+	// the identifier is set same as name in the db initialization
+	info.setName("test");
+	info.setUri("http://localhost:9200");
+
+	return info;
+    }
+
+    /**
+     * @return
+     * @throws GSException
+     */
+    public static OpenSearchDatabase createLocalService() throws GSException {
+
+	StorageInfo info = createLocalServiceInfo();
+
+	OpenSearchDatabase database = new OpenSearchDatabase();
+
+	database.initialize(info);
+
+	return database;
+    }
+
     @Override
     public void initialize(StorageInfo storageInfo) throws GSException {
 
@@ -100,7 +135,7 @@ public class OpenSearchDatabase extends Database {
 	    String serviceName = serviceType.getServiceName();
 
 	    HttpHost httpHost = HttpHost.create(storageInfo.getUri());
-	 
+
 	    String schemeName = httpHost.getSchemeName();
 
 	    if (schemeName.equals("http") || serviceType == OpenSearchServiceType.OPEN_SEARCH_LOCAL) {

@@ -25,7 +25,6 @@ import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.AugmentersMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.UsersMapping;
-import eu.essi_lab.api.database.opensearch.test.OpenSearchDatabaseInitTest;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.auth.UserIdentifierType;
@@ -38,7 +37,7 @@ public class OpenSearchUsersFolderTest extends OpenSearchTest {
     @Test
     public void sourceTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
 
 	String folderName = Database.USERS_FOLDER;
 
@@ -95,7 +94,7 @@ public class OpenSearchUsersFolderTest extends OpenSearchTest {
     @Test
     public void sourceTest2() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
 
 	String folderName = Database.USERS_FOLDER;
 
@@ -155,7 +154,7 @@ public class OpenSearchUsersFolderTest extends OpenSearchTest {
     @Test
     public void folderTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
 
 	String folderName = Database.USERS_FOLDER;
 
@@ -197,7 +196,7 @@ public class OpenSearchUsersFolderTest extends OpenSearchTest {
     @Test
     public void searchUsersTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
 
 	String folderName = Database.USERS_FOLDER;
 

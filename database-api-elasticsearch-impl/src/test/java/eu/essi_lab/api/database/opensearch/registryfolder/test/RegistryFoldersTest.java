@@ -10,7 +10,6 @@ import eu.essi_lab.api.database.opensearch.FolderRegistry;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.datafolder.test.TestUtils;
-import eu.essi_lab.api.database.opensearch.test.OpenSearchDatabaseInitTest;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 
 /**
@@ -21,7 +20,7 @@ public class RegistryFoldersTest extends OpenSearchTest {
     @Test
     public void test() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
 
 	String folderName1 = TestUtils.getMetaFolderName(database, "source_1");
 	String folderName2 = TestUtils.getMetaFolderName(database, "source_2");

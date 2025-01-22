@@ -9,7 +9,6 @@ import org.junit.Test;
 import eu.essi_lab.api.database.Database.DatabaseImpl;
 import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
-import eu.essi_lab.api.database.opensearch.test.OpenSearchDatabaseInitTest;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.model.StorageInfo;
@@ -23,7 +22,7 @@ public class OpenSearchDatabaseTest extends OpenSearchTest {
     @Test
     public void basicAndFoldersTest() throws GSException {
 
-	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
 
 	//
 	//
@@ -31,7 +30,7 @@ public class OpenSearchDatabaseTest extends OpenSearchTest {
 
 	Assert.assertEquals(DatabaseImpl.OPENSEARCH.getName(), database.getType());
 
-	Assert.assertEquals(OpenSearchDatabaseInitTest.createStorageInfo(), database.getStorageInfo());
+	Assert.assertEquals(OpenSearchDatabase.createLocalServiceInfo(), database.getStorageInfo());
 
 	//
 	//
@@ -43,14 +42,14 @@ public class OpenSearchDatabaseTest extends OpenSearchTest {
 	//
 	//
 
-	Assert.assertTrue(database.supports(OpenSearchDatabaseInitTest.createStorageInfo()));
+	Assert.assertTrue(database.supports(OpenSearchDatabase.createLocalServiceInfo()));
 
-	StorageInfo clone = OpenSearchDatabaseInitTest.createStorageInfo().clone();
+	StorageInfo clone = OpenSearchDatabase.createLocalServiceInfo().clone();
 	clone.setType(null);
 
 	Assert.assertFalse(database.supports(clone));
 
-	StorageInfo clone2 = OpenSearchDatabaseInitTest.createStorageInfo().clone();
+	StorageInfo clone2 = OpenSearchDatabase.createLocalServiceInfo().clone();
 	clone2.setType("type");
 
 	Assert.assertFalse(database.supports(clone2));

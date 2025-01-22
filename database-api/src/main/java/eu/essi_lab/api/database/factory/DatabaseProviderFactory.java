@@ -48,34 +48,34 @@ public class DatabaseProviderFactory {
 
     private DatabaseProviderFactory() {
     }
-    
+
     /**
      * Loads the available {@link DatabaseFinder}s using the {@link ServiceLoader} API and
-     * selects the one suitable for the given <code>dbUri</code>
+     * selects the one suitable for the given <code>info</code>
      *
-     * @param dbUri
+     * @param info
      * @return the suitable {@link DatabaseFinder} or <code>null</code> if none is found
-     * @throws GSException if dbUri is <code>null</code> or dbUri.getUri is <code>null</code>
+     * @throws GSException if info is <code>null</code> or info.getUri is <code>null</code>
      */
-    public static DatabaseFinder getFinder(StorageInfo dbUri) throws GSException {
+    public static DatabaseFinder getFinder(StorageInfo info) throws GSException {
 
 	synchronized (DatabaseFactory.PROVIDER_LOCK) {
 
-	    DatabaseFinder mapped = FINDERS_MAP.get(dbUri);
+	    DatabaseFinder mapped = FINDERS_MAP.get(info);
 	    if (mapped != null) {
 
 		return mapped;
 	    }
 
-	    Database database = DatabaseFactory.get(dbUri);
+	    Database database = DatabaseFactory.get(info);
 
 	    for (DatabaseFinder finder : ServiceLoader.load(DatabaseFinder.class)) {
 
-		if (finder.supports(dbUri)) {
+		if (finder.supports(info)) {
 
 		    finder.setDatabase(database);
 
-		    FINDERS_MAP.put(dbUri, finder);
+		    FINDERS_MAP.put(info, finder);
 
 		    return finder;
 		}
@@ -83,7 +83,7 @@ public class DatabaseProviderFactory {
 	}
 
 	throw GSException.createException(DatabaseProviderFactory.class, //
-		"Suitable provider not found: " + dbUri, //
+		"Suitable provider not found: " + info, //
 		null, //
 		ErrorInfo.ERRORTYPE_INTERNAL, //
 		ErrorInfo.SEVERITY_FATAL, //
@@ -93,31 +93,31 @@ public class DatabaseProviderFactory {
 
     /**
      * Loads the available {@link DatabaseReader}s using the {@link ServiceLoader} API and
-     * selects the one suitable for the given <code>dbUri</code>
+     * selects the one suitable for the given <code>info</code>
      *
-     * @param dbUri
+     * @param info
      * @return the suitable {@link DatabaseReader} or <code>null</code> if none is found
-     * @throws GSException if dbUri is <code>null</code> or dbUri.getUri is <code>null</code>
+     * @throws GSException if info is <code>null</code> or info.getUri is <code>null</code>
      */
-    public static DatabaseReader getReader(StorageInfo dbUri) throws GSException {
+    public static DatabaseReader getReader(StorageInfo info) throws GSException {
 
 	synchronized (DatabaseFactory.PROVIDER_LOCK) {
 
-	    DatabaseReader mapped = READERS_MAP.get(dbUri);
+	    DatabaseReader mapped = READERS_MAP.get(info);
 	    if (mapped != null) {
 
 		return mapped;
 	    }
 
-	    Database database = DatabaseFactory.get(dbUri);
+	    Database database = DatabaseFactory.get(info);
 
 	    for (DatabaseReader reader : ServiceLoader.load(DatabaseReader.class)) {
 
-		if (reader.supports(dbUri)) {
+		if (reader.supports(info)) {
 
 		    reader.setDatabase(database);
 
-		    READERS_MAP.put(dbUri, reader);
+		    READERS_MAP.put(info, reader);
 
 		    return reader;
 		}
@@ -125,7 +125,7 @@ public class DatabaseProviderFactory {
 	}
 
 	throw GSException.createException(DatabaseProviderFactory.class, //
-		"Suitable provider not found: " + dbUri, //
+		"Suitable provider not found: " + info, //
 		null, //
 		ErrorInfo.ERRORTYPE_INTERNAL, //
 		ErrorInfo.SEVERITY_FATAL, //
@@ -135,31 +135,31 @@ public class DatabaseProviderFactory {
 
     /**
      * Loads the available {@link DatabaseWriter}s using the {@link ServiceLoader} API and
-     * selects the one suitable for the given <code>dbUri</code>
+     * selects the one suitable for the given <code>info</code>
      *
-     * @param dbUri
+     * @param info
      * @return the suitable {@link DatabaseWriter} or <code>null</code> if none is found
-     * @throws GSException if dbUri is <code>null</code> or dbUri.getUri is <code>null</code>
+     * @throws GSException if info is <code>null</code> or info.getUri is <code>null</code>
      */
-    public static DatabaseWriter getWriter(StorageInfo dbUri) throws GSException {
+    public static DatabaseWriter getWriter(StorageInfo info) throws GSException {
 
 	synchronized (DatabaseFactory.PROVIDER_LOCK) {
 
-	    DatabaseWriter mapped = WRITERS_MAP.get(dbUri);
+	    DatabaseWriter mapped = WRITERS_MAP.get(info);
 	    if (mapped != null) {
 
 		return mapped;
 	    }
 
-	    Database database = DatabaseFactory.get(dbUri);
+	    Database database = DatabaseFactory.get(info);
 
 	    for (DatabaseWriter writer : ServiceLoader.load(DatabaseWriter.class)) {
 
-		if (writer.supports(dbUri)) {
+		if (writer.supports(info)) {
 
 		    writer.setDatabase(database);
 
-		    WRITERS_MAP.put(dbUri, writer);
+		    WRITERS_MAP.put(info, writer);
 
 		    return writer;
 		}
@@ -167,7 +167,7 @@ public class DatabaseProviderFactory {
 	}
 
 	throw GSException.createException(DatabaseProviderFactory.class, //
-		"Suitable provider not found: " + dbUri, //
+		"Suitable provider not found: " + info, //
 		null, //
 		ErrorInfo.ERRORTYPE_INTERNAL, //
 		ErrorInfo.SEVERITY_FATAL, //
@@ -177,31 +177,31 @@ public class DatabaseProviderFactory {
 
     /**
      * Loads the available {@link DatabaseExecutor}s using the {@link ServiceLoader} API and
-     * selects the one suitable for the given <code>dbUri</code>
+     * selects the one suitable for the given <code>info</code>
      *
-     * @param dbUri
+     * @param info
      * @return the suitable {@link DatabaseWriter} or <code>null</code> if none is found
-     * @throws GSException if dbUri is <code>null</code> or dbUri.getUri is <code>null</code>
+     * @throws GSException if info is <code>null</code> or info.getUri is <code>null</code>
      */
-    public static DatabaseExecutor getExecutor(StorageInfo dbUri) throws GSException {
+    public static DatabaseExecutor getExecutor(StorageInfo info) throws GSException {
 
 	synchronized (DatabaseFactory.PROVIDER_LOCK) {
 
-	    DatabaseExecutor mapped = EXECUTORS_MAP.get(dbUri);
+	    DatabaseExecutor mapped = EXECUTORS_MAP.get(info);
 	    if (mapped != null) {
 
 		return mapped;
 	    }
 
-	    Database database = DatabaseFactory.get(dbUri);
+	    Database database = DatabaseFactory.get(info);
 
 	    for (DatabaseExecutor executor : ServiceLoader.load(DatabaseExecutor.class)) {
 
-		if (executor.supports(dbUri)) {
+		if (executor.supports(info)) {
 
 		    executor.setDatabase(database);
 
-		    EXECUTORS_MAP.put(dbUri, executor);
+		    EXECUTORS_MAP.put(info, executor);
 
 		    return executor;
 		}
@@ -209,7 +209,7 @@ public class DatabaseProviderFactory {
 	}
 
 	throw GSException.createException(DatabaseProviderFactory.class, //
-		"Suitable provider not found: " + dbUri, //
+		"Suitable provider not found: " + info, //
 		null, //
 		ErrorInfo.ERRORTYPE_INTERNAL, //
 		ErrorInfo.SEVERITY_FATAL, //
@@ -219,31 +219,31 @@ public class DatabaseProviderFactory {
 
     /**
      * Loads the available {@link DatabaseExecutor}s using the {@link ServiceLoader} API and
-     * selects the one suitable for the given <code>dbUri</code>
+     * selects the one suitable for the given <code>info</code>
      *
-     * @param dbUri
+     * @param info
      * @return the suitable {@link DatabaseWriter} or <code>null</code> if none is found
-     * @throws GSException if dbUri is <code>null</code> or dbUri.getUri is <code>null</code>
+     * @throws GSException if info is <code>null</code> or info.getUri is <code>null</code>
      */
-    public static DatabaseSemanticsExecutor getSemanticsExecutor(StorageInfo dbUri) throws GSException {
+    public static DatabaseSemanticsExecutor getSemanticsExecutor(StorageInfo info) throws GSException {
 
 	synchronized (DatabaseFactory.PROVIDER_LOCK) {
 
-	    DatabaseSemanticsExecutor mapped = SEMANTICS_MAP.get(dbUri);
+	    DatabaseSemanticsExecutor mapped = SEMANTICS_MAP.get(info);
 	    if (mapped != null) {
 
 		return mapped;
 	    }
 
-	    Database database = DatabaseFactory.get(dbUri);
+	    Database database = DatabaseFactory.get(info);
 
 	    for (DatabaseSemanticsExecutor executor : ServiceLoader.load(DatabaseSemanticsExecutor.class)) {
 
-		if (executor.supports(dbUri)) {
+		if (executor.supports(info)) {
 
 		    executor.setDatabase(database);
 
-		    SEMANTICS_MAP.put(dbUri, executor);
+		    SEMANTICS_MAP.put(info, executor);
 
 		    return executor;
 		}
@@ -251,7 +251,7 @@ public class DatabaseProviderFactory {
 	}
 
 	throw GSException.createException(DatabaseProviderFactory.class, //
-		"Suitable provider not found: " + dbUri, //
+		"Suitable provider not found: " + info, //
 		null, //
 		ErrorInfo.ERRORTYPE_INTERNAL, //
 		ErrorInfo.SEVERITY_FATAL, //
@@ -261,21 +261,21 @@ public class DatabaseProviderFactory {
 
     /**
      * Loads the available {@link SourceStorage}s using the {@link ServiceLoader} API and
-     * selects the one suitable for the given <code>dbUri</code>
+     * selects the one suitable for the given <code>info</code>
      *
-     * @param dbUri
+     * @param info
      * @return the suitable {@link SourceStorage} or <code>null</code> if none is found
-     * @throws GSException if dbUri is <code>null</code> or dbUri.getUri is <code>null</code>
+     * @throws GSException if info is <code>null</code> or info.getUri is <code>null</code>
      */
-    public static SourceStorage getSourceStorage(StorageInfo dbUri) throws GSException {
+    public static SourceStorage getSourceStorage(StorageInfo info) throws GSException {
 
 	synchronized (DatabaseFactory.PROVIDER_LOCK) {
 
-	    Database database = DatabaseFactory.get(dbUri);
+	    Database database = DatabaseFactory.get(info);
 
 	    for (SourceStorage storage : ServiceLoader.load(SourceStorage.class)) {
 
-		if (storage.supports(dbUri)) {
+		if (storage.supports(info)) {
 
 		    storage.setDatabase(database);
 
@@ -285,7 +285,7 @@ public class DatabaseProviderFactory {
 	}
 
 	throw GSException.createException(DatabaseProviderFactory.class, //
-		"Suitable provider not found: " + dbUri, //
+		"Suitable provider not found: " + info, //
 		null, //
 		ErrorInfo.ERRORTYPE_INTERNAL, //
 		ErrorInfo.SEVERITY_FATAL, //

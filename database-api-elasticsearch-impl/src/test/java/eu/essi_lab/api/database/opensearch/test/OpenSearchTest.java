@@ -23,7 +23,7 @@ public class OpenSearchTest {
     @Before
     public void before() throws GSException, OpenSearchException, IOException {
 
-	OpenSearchClient client = OpenSearchDatabase.createNoSSLContextClient(OpenSearchDatabaseInitTest.createStorageInfo());
+	OpenSearchClient client = OpenSearchDatabase.createNoSSLContextClient(OpenSearchDatabase.createLocalServiceInfo());
 
 	for (String index : IndexMapping.getIndexes()) {
 

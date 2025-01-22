@@ -20,7 +20,6 @@ import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
-import eu.essi_lab.api.database.opensearch.test.OpenSearchDatabaseInitTest;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 import eu.essi_lab.messages.HarvestingProperties;
 
@@ -32,7 +31,7 @@ public class OpenSearchMetaFolder_harvestingPropertiesTest extends OpenSearchTes
     @Test
     public void sourceTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
 
 	String folderName = TestUtils.getMetaFolderName(database);
 
@@ -114,7 +113,7 @@ public class OpenSearchMetaFolder_harvestingPropertiesTest extends OpenSearchTes
     @Test
     public void folderTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
 
 	String folderName = TestUtils.getMetaFolderName(database);
 

@@ -17,7 +17,6 @@ import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
-import eu.essi_lab.api.database.opensearch.test.OpenSearchDatabaseInitTest;
 
 /**
  * @author Fabrizio
@@ -29,7 +28,7 @@ public class OpenSearchDataFolder_writingFolderTagTest extends OpenSearchTest {
     @Test
     public void sourceTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
 
 	String folderName = TestUtils.getDataFolderName(database);
 

@@ -74,38 +74,25 @@ public class DatabaseSource implements ConfigurationSource {
     }
 
     /**
-     * The <code>startupUri</code> provides all the required info to initialize the source in non
-     * local environment such as production, preproduction, etc.<br>
-     * <br>
-     * For <b>MarkLogic</b> it must be like this: "xdbc://user:password@hostname:8000,8004/dbName/configFolder/" where
-     * 'configFolder' indicates the db folder where the configuration is stored. The configuration name is not necessary
-     * since it is hard-coded.<br>
-     * E.g.: "xdbc://user:password@productionhost:8000,8004/PRODUCTION-DB/production/"<br>
-     * <br>
-     * For <b>OpenSearch</b> it can have three kind of protocols: <i>osm</i>, <i>oss</i>, <i>osl</i> that respectively means
-     * <i>OpenSearch Managed</i>, <i>OpenSearch Serverless</i> and  <i>OpenSearch Local</i>. The uri must be like this:<br>
-     * "osm://awsaccesskey:awssecretkey@hostname/environment/configName" where <code>environment</code> and <code>configName</code>
-     * can have different values according to the target environment such as test, production, preproduction, etc...<br>
-     * For example, <code>environment</code> could be 'test', 'prod', 'preprod' and <code>configName</code> can be
-     * 'testCondig', 'prodConfig' or 'preprodConfig'.<br>
+     * E.g: "xdbc://user:password@hostname:8000,8004/dbName/folder/"
      * E.g.: "osm://awsaccesskey:awssecretkey@productionhost/prod/prodConfig"<br>
      * E.g.: "oss://awsaccesskey:awssecretkey@preproductionhost/preprod/preProdConfig"<br>
      * E.g.: "osl://awsaccesskey:awssecretkey@localhost:9200/test/testConfig"<br>
-     *	
-     * @see Database#getInfo(String)
-     * @see Database#isStartupUri(String)
+     * 
+     * @see Database#build(String)
+     * @see Database#check(String)
      * @param impl
-     * @param startupUri
+     * @param url
      * @return
      * @throws GSException
      * @throws URISyntaxException
      */
-    public static DatabaseSource of(String startupUri) throws GSException, URISyntaxException {
+    public static DatabaseSource of(String url) throws GSException, URISyntaxException {
 
-	StorageInfo info = Database.getInfo(startupUri);
-	
-	DatabaseImpl impl = Database.getImpl(startupUri);
-	
+	StorageInfo info = DatabaseSourceUrl.build(url);
+
+	DatabaseImpl impl = DatabaseSourceUrl.detectImpl(url);
+
 	switch (impl) {
 	case MARK_LOGIC:
 

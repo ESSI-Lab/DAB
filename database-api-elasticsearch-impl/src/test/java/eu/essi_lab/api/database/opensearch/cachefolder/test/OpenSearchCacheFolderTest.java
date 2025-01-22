@@ -16,7 +16,6 @@ import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.CacheMapping;
-import eu.essi_lab.api.database.opensearch.test.OpenSearchDatabaseInitTest;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 
@@ -28,7 +27,7 @@ public class OpenSearchCacheFolderTest extends OpenSearchTest {
     @Test
     public void test() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
 
 	String folderName = Database.CACHE_FOLDER;
 

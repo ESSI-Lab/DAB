@@ -34,8 +34,8 @@ import javax.xml.bind.JAXBException;
 
 import org.quartz.SchedulerException;
 
-import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.cfg.DatabaseSource;
+import eu.essi_lab.api.database.cfg.DatabaseSourceUrl;
 import eu.essi_lab.augmenter.worker.AugmentationReportsHandler;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.ConfigurationSource;
@@ -248,15 +248,15 @@ public class GIPStarter {
 
 	    ConfigurationSource source = null;
 
-	    String configFileName = "gs-configuration";
-
-	    if (Database.isStartupUri(configURL)) {
+	    if (DatabaseSourceUrl.check(configURL)) {
 
 		String startupUri = split[0];
 
 		source = DatabaseSource.of(startupUri);
 
 	    } else {
+
+		String configFileName = "gs-configuration";
 
 		if (configURL.startsWith("file:temp")) {
 

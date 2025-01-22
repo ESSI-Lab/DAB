@@ -8,9 +8,9 @@ import java.net.URISyntaxException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.Database.DatabaseImpl;
 import eu.essi_lab.api.database.Database.OpenSearchServiceType;
+import eu.essi_lab.api.database.cfg.DatabaseSourceUrl;
 import eu.essi_lab.model.StorageInfo;
 
 /**
@@ -23,37 +23,37 @@ public class StorageInfoTest {
 
 	{
 	    String uri = "xdbc://user:password@hostname:8000,8004/dbName/folder/";
-	    Assert.assertTrue(Database.isStartupUri(uri));
+	    Assert.assertTrue(DatabaseSourceUrl.check(uri));
 	}
 
 	{
 	    String uri = "osm://awsaccesskey:awssecretkey@productionhost/prod/prodConfig";
-	    Assert.assertTrue(Database.isStartupUri(uri));
+	    Assert.assertTrue(DatabaseSourceUrl.check(uri));
 	}
 
 	{
 	    String uri = "oss://awsaccesskey:awssecretkey@productionhost/prod/prodConfig";
-	    Assert.assertTrue(Database.isStartupUri(uri));
+	    Assert.assertTrue(DatabaseSourceUrl.check(uri));
 	}
-	
+
 	{
 	    String uri = "osl://awsaccesskey:awssecretkey@localhost/test/testConfig";
-	    Assert.assertTrue(Database.isStartupUri(uri));
+	    Assert.assertTrue(DatabaseSourceUrl.check(uri));
 	}
 
 	{
 	    String uri = "http://awsaccesskey:awssecretkey@productionhost/prod/prodConfig";
-	    Assert.assertFalse(Database.isStartupUri(uri));
+	    Assert.assertFalse(DatabaseSourceUrl.check(uri));
 	}
 
 	{
 	    String uri = "https://awsaccesskey:awssecretkey@productionhost/prod/prodConfig";
-	    Assert.assertFalse(Database.isStartupUri(uri));
+	    Assert.assertFalse(DatabaseSourceUrl.check(uri));
 	}
 
 	{
 	    String uri = "productionhost/prod/prodConfig";
-	    Assert.assertFalse(Database.isStartupUri(uri));
+	    Assert.assertFalse(DatabaseSourceUrl.check(uri));
 	}
     }
 
@@ -62,37 +62,37 @@ public class StorageInfoTest {
 
 	{
 	    String uri = "xdbc://user:password@hostname:8000,8004/dbName/folder/";
-	    Assert.assertEquals(DatabaseImpl.MARK_LOGIC, Database.getImpl(uri));
+	    Assert.assertEquals(DatabaseImpl.MARK_LOGIC, DatabaseSourceUrl.detectImpl(uri));
 	}
 
 	{
 	    String uri = "osm://awsaccesskey:awssecretkey@productionhost/prod/prodConfig";
-	    Assert.assertEquals(DatabaseImpl.OPENSEARCH, Database.getImpl(uri));
+	    Assert.assertEquals(DatabaseImpl.OPENSEARCH, DatabaseSourceUrl.detectImpl(uri));
 	}
 
 	{
 	    String uri = "oss://awsaccesskey:awssecretkey@productionhost/prod/prodConfig";
-	    Assert.assertEquals(DatabaseImpl.OPENSEARCH, Database.getImpl(uri));
+	    Assert.assertEquals(DatabaseImpl.OPENSEARCH, DatabaseSourceUrl.detectImpl(uri));
 	}
-	
+
 	{
 	    String uri = "osl://awsaccesskey:awssecretkey@localhost:9200/test/testConfig";
-	    Assert.assertEquals(DatabaseImpl.OPENSEARCH, Database.getImpl(uri));
+	    Assert.assertEquals(DatabaseImpl.OPENSEARCH, DatabaseSourceUrl.detectImpl(uri));
 	}
 
 	{
 	    String uri = "os://awsaccesskey:awssecretkey@productionhost/prod/prodConfig";
-	    Assert.assertNull(Database.getImpl(uri));
+	    Assert.assertNull(DatabaseSourceUrl.detectImpl(uri));
 	}
 
 	{
 	    String uri = "http://awsaccesskey:awssecretkey@productionhost/prod/prodConfig";
-	    Assert.assertNull(Database.getImpl(uri));
+	    Assert.assertNull(DatabaseSourceUrl.detectImpl(uri));
 	}
 
 	{
 	    String uri = "user:password@hostname:8000,8004/dbName/folder/";
-	    Assert.assertNull(Database.getImpl(uri));
+	    Assert.assertNull(DatabaseSourceUrl.detectImpl(uri));
 	}
     }
 
@@ -101,7 +101,7 @@ public class StorageInfoTest {
 
 	String uri = "xdbc://user:password@hostname:8000,8004/dbName/folder/";
 
-	StorageInfo info = Database.getInfo(uri);
+	StorageInfo info = DatabaseSourceUrl.build(uri);
 
 	Assert.assertEquals("user", info.getUser());
 	Assert.assertEquals("password", info.getPassword());
@@ -116,7 +116,7 @@ public class StorageInfoTest {
 
 	String uri = "osm://awsaccesskey:awssecretkey@productionhost/prod/prodConfig";
 
-	StorageInfo info = Database.getInfo(uri);
+	StorageInfo info = DatabaseSourceUrl.build(uri);
 
 	Assert.assertEquals("awsaccesskey", info.getUser());
 	Assert.assertEquals("awssecretkey", info.getPassword());
@@ -135,7 +135,7 @@ public class StorageInfoTest {
 
 	String uri = "oss://awsaccesskey:awssecretkey@productionhost/preprod/preProdConfig";
 
-	StorageInfo info = Database.getInfo(uri);
+	StorageInfo info = DatabaseSourceUrl.build(uri);
 
 	Assert.assertEquals("awsaccesskey", info.getUser());
 	Assert.assertEquals("awssecretkey", info.getPassword());
@@ -154,7 +154,7 @@ public class StorageInfoTest {
 
 	String uri = "osl://awsaccesskey:awssecretkey@localhost:9200/test/testConfig";
 
-	StorageInfo info = Database.getInfo(uri);
+	StorageInfo info = DatabaseSourceUrl.build(uri);
 
 	Assert.assertEquals("awsaccesskey", info.getUser());
 	Assert.assertEquals("awssecretkey", info.getPassword());

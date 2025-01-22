@@ -20,7 +20,6 @@ import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
-import eu.essi_lab.api.database.opensearch.test.OpenSearchDatabaseInitTest;
 import eu.essi_lab.indexes.IndexedElementsWriter;
 import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.lib.net.downloader.Downloader;
@@ -39,7 +38,7 @@ public class OpenSearchDataFolder_GSResourceFromOAIListRecordsTest extends OpenS
     @Test
     public void test() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
 
 	String folderName = "test" + SourceStorageWorker.DATA_1_PREFIX;
 

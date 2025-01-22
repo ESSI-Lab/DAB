@@ -1,7 +1,5 @@
 package eu.essi_lab.api.database;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -194,98 +192,6 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
      * 
      */
     public static final String CACHE_FOLDER = "cache";
-
-    /**
-     * @param startupUri
-     * @return
-     */
-    public static DatabaseImpl getImpl(String startupUri) {
-
-	if (startupUri.startsWith("xdbc")) {
-
-	    return DatabaseImpl.MARK_LOGIC;
-	}
-
-	return OpenSearchServiceType.protocols().stream().anyMatch(p -> startupUri.startsWith(p)) ? DatabaseImpl.OPENSEARCH : null;
-    }
-
-    /**
-     * @param uri
-     * @return
-     */
-    public static boolean isStartupUri(String uri) {
-
-	return uri.startsWith("xdbc") || //
-		OpenSearchServiceType.protocols().stream().anyMatch(p -> uri.startsWith(p));
-    }
-
-    /**
-     * E.g: "xdbc://user:password@hostname:8000,8004/dbName/folder/"
-     * E.g: "osm://awsaccesskey:awssecretkey@productionhost/prod/prodConfig"
-     * E.g: "oss://awsaccesskey:awssecretkey@productionhost/prod/prodConfig"
-     * E.g: "osl://awsaccesskey:awssecretkey@localhost:9200/test/testConfig"
-     * 
-     * @param startupUri
-     * @return
-     * @throws URISyntaxException
-     */
-    public static StorageInfo getInfo(String startupUri) throws URISyntaxException {
-
-	StorageInfo storageInfo = new StorageInfo();
-
-	if (startupUri.startsWith("xdbc")) {
-
-	    String xdbc = startupUri.replace("xdbc://", "xdbc_");
-
-	    // uri --> xdbc://hostname:8000,8004
-	    String uri = "xdbc://" + xdbc.substring(xdbc.indexOf("@") + 1, xdbc.indexOf("/"));
-	    String user = xdbc.substring(xdbc.indexOf("_") + 1, xdbc.indexOf(":"));
-	    String password = xdbc.substring(xdbc.indexOf(":") + 1, xdbc.indexOf("@"));
-
-	    xdbc = xdbc.substring(xdbc.indexOf("/") + 1); // dnName/defaultConf/
-	    String dbName = xdbc.substring(0, xdbc.indexOf("/"));
-	    String folder = xdbc.substring(xdbc.indexOf("/") + 1, xdbc.lastIndexOf("/"));
-
-	    storageInfo.setUri(uri);
-	    storageInfo.setUser(user);
-	    storageInfo.setPassword(password);
-	    storageInfo.setIdentifier(folder);
-	    storageInfo.setName(dbName);
-
-	} else {
-
-	    URI uri = new URI(startupUri);
-
-	    String env = uri.getPath().split("/+")[1];
-	    String configName = uri.getPath().split("/+")[2];
-
-	    String userInfo = uri.getRawUserInfo();
-	    String accessKey = userInfo.split(":")[0];
-	    String secretKey = userInfo.split(":")[1];
-
-	    String host = uri.getHost();
-	    String port = uri.getPort() > 0 ? ":" + uri.getPort() : "";
-
-	    OpenSearchServiceType serviceType = OpenSearchServiceType.decode(uri.getScheme());
-
-	    storageInfo = new StorageInfo();
-	    storageInfo.setType(serviceType.getProtocol());
-
-	    storageInfo.setIdentifier(env);
-	    storageInfo.setName(configName);
-
-	    storageInfo.setUser(accessKey);
-	    storageInfo.setPassword(secretKey);
-
-	    if (serviceType == OpenSearchServiceType.OPEN_SEARCH_LOCAL) {
-		storageInfo.setUri("http://" + host + port);
-	    } else {
-		storageInfo.setUri("https://" + host);
-	    }
-	}
-
-	return storageInfo;
-    }
 
     /**
      * 

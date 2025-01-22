@@ -16,7 +16,6 @@ import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
-import eu.essi_lab.api.database.opensearch.test.OpenSearchDatabaseInitTest;
 import eu.essi_lab.indexes.IndexedElements;
 import eu.essi_lab.indexes.IndexedElementsWriter;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
@@ -34,7 +33,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
     @Test
     public void onlyTempExtentBeginTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
 
 	String folderName = TestUtils.getDataFolderName(database);
 
@@ -116,7 +115,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
     @Test
     public void tempExtentBeginBeforeNowTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
 
 	String folderName = TestUtils.getDataFolderName(database);
 
@@ -198,7 +197,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
     @Test
     public void tempExtentBeginNowTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
 
 	String folderName = TestUtils.getDataFolderName(database);
 
@@ -278,7 +277,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
     @Test
     public void tempExtentBeginNowWithStringValueTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
 
 	String folderName = TestUtils.getDataFolderName(database);
 
@@ -358,7 +357,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
     @Test
     public void tempExtentEndNowTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
 
 	String folderName = TestUtils.getDataFolderName(database);
 
@@ -438,7 +437,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
     @Test
     public void tempExtentEndNowWithStringValueTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
 
 	String folderName = TestUtils.getDataFolderName(database);
 
@@ -518,7 +517,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
     @Test
     public void onlyTempExtentEndTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
 
 	String folderName = TestUtils.getDataFolderName(database);
 
@@ -600,7 +599,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
     @Test
     public void bothTempExtentTest() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
 
 	String folderName = TestUtils.getDataFolderName(database);
 

@@ -28,7 +28,7 @@ public class OpenSearchFolderTest extends OpenSearchTest {
     @Test
     public void testWithBinary() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
 
 	String folderName = Database.VIEWS_FOLDER;
 
@@ -91,7 +91,7 @@ public class OpenSearchFolderTest extends OpenSearchTest {
     @Test
     public void testWithDoc() throws Exception {
 
-	OpenSearchDatabase database = OpenSearchDatabaseInitTest.create();
+	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
 
 	String folderName = TestUtils.getMetaFolderName(database);
 
