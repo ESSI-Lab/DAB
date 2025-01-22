@@ -17,9 +17,9 @@ import eu.essi_lab.model.StorageInfo;
  * @author Fabrizio
  */
 public class StorageInfoTest {
-    
+
     @Test
-    public void isTest() throws URISyntaxException {
+    public void isStartupUriTest() throws URISyntaxException {
 
 	{
 	    String uri = "xdbc://user:password@hostname:8000,8004/dbName/folder/";
@@ -27,25 +27,30 @@ public class StorageInfoTest {
 	}
 
 	{
-	    String uri = "osm://productionhost/prod/prodConfig";
+	    String uri = "osm://awsaccesskey:awssecretkey@productionhost/prod/prodConfig";
 	    Assert.assertTrue(Database.isStartupUri(uri));
 	}
 
 	{
-	    String uri = "oss://productionhost/prod/prodConfig";
+	    String uri = "oss://awsaccesskey:awssecretkey@productionhost/prod/prodConfig";
 	    Assert.assertTrue(Database.isStartupUri(uri));
 	}
 	
 	{
-	    String uri = "http://productionhost/prod/prodConfig";
-	    Assert.assertFalse(Database.isStartupUri(uri));
+	    String uri = "osl://awsaccesskey:awssecretkey@localhost/test/testConfig";
+	    Assert.assertTrue(Database.isStartupUri(uri));
 	}
-	
+
 	{
-	    String uri = "https://productionhost/prod/prodConfig";
+	    String uri = "http://awsaccesskey:awssecretkey@productionhost/prod/prodConfig";
 	    Assert.assertFalse(Database.isStartupUri(uri));
 	}
-	
+
+	{
+	    String uri = "https://awsaccesskey:awssecretkey@productionhost/prod/prodConfig";
+	    Assert.assertFalse(Database.isStartupUri(uri));
+	}
+
 	{
 	    String uri = "productionhost/prod/prodConfig";
 	    Assert.assertFalse(Database.isStartupUri(uri));
@@ -61,25 +66,30 @@ public class StorageInfoTest {
 	}
 
 	{
-	    String uri = "osm://productionhost/prod/prodConfig";
-	    Assert.assertEquals(DatabaseImpl.OPENSEARCH,  Database.getImpl(uri));
+	    String uri = "osm://awsaccesskey:awssecretkey@productionhost/prod/prodConfig";
+	    Assert.assertEquals(DatabaseImpl.OPENSEARCH, Database.getImpl(uri));
 	}
 
 	{
-	    String uri = "oss://productionhost/prod/prodConfig";
-	    Assert.assertEquals(DatabaseImpl.OPENSEARCH,  Database.getImpl(uri));
+	    String uri = "oss://awsaccesskey:awssecretkey@productionhost/prod/prodConfig";
+	    Assert.assertEquals(DatabaseImpl.OPENSEARCH, Database.getImpl(uri));
 	}
 	
 	{
-	    String uri = "os://productionhost/prod/prodConfig";
-	    Assert.assertNull(Database.getImpl(uri));
+	    String uri = "osl://awsaccesskey:awssecretkey@localhost:9200/test/testConfig";
+	    Assert.assertEquals(DatabaseImpl.OPENSEARCH, Database.getImpl(uri));
 	}
-	
+
 	{
-	    String uri = "http://productionhost/prod/prodConfig";
+	    String uri = "os://awsaccesskey:awssecretkey@productionhost/prod/prodConfig";
 	    Assert.assertNull(Database.getImpl(uri));
 	}
-	
+
+	{
+	    String uri = "http://awsaccesskey:awssecretkey@productionhost/prod/prodConfig";
+	    Assert.assertNull(Database.getImpl(uri));
+	}
+
 	{
 	    String uri = "user:password@hostname:8000,8004/dbName/folder/";
 	    Assert.assertNull(Database.getImpl(uri));
@@ -104,45 +114,57 @@ public class StorageInfoTest {
     @Test
     public void openSearchManagedTest() throws URISyntaxException {
 
-	String uri = "osm://productionhost/prod/prodConfig";
+	String uri = "osm://awsaccesskey:awssecretkey@productionhost/prod/prodConfig";
 
 	StorageInfo info = Database.getInfo(uri);
 
-	Assert.assertEquals("prodConfig", info.getUser());
-	Assert.assertNull(info.getPassword());
+	Assert.assertEquals("awsaccesskey", info.getUser());
+	Assert.assertEquals("awssecretkey", info.getPassword());
+
 	Assert.assertEquals("https://productionhost", info.getUri());
+
 	Assert.assertEquals("prod", info.getIdentifier());
-	Assert.assertEquals(Database.CONFIGURATION_FOLDER, info.getName());
+
+	Assert.assertEquals("prodConfig", info.getName());
+
 	Assert.assertEquals(OpenSearchServiceType.OPEN_SEARCH_MANAGED.getProtocol(), info.getType().get());
     }
 
     @Test
     public void openSearchServerlessTest() throws URISyntaxException {
 
-	String uri = "oss://productionhost/prod/prodConfig";
+	String uri = "oss://awsaccesskey:awssecretkey@productionhost/preprod/preProdConfig";
 
 	StorageInfo info = Database.getInfo(uri);
 
-	Assert.assertEquals("prodConfig", info.getUser());
-	Assert.assertNull(info.getPassword());
+	Assert.assertEquals("awsaccesskey", info.getUser());
+	Assert.assertEquals("awssecretkey", info.getPassword());
+
 	Assert.assertEquals("https://productionhost", info.getUri());
-	Assert.assertEquals("prod", info.getIdentifier());
-	Assert.assertEquals(Database.CONFIGURATION_FOLDER, info.getName());
+
+	Assert.assertEquals("preprod", info.getIdentifier());
+
+	Assert.assertEquals("preProdConfig", info.getName());
+
 	Assert.assertEquals(OpenSearchServiceType.OPEN_SEARCH_SERVERLESS.getProtocol(), info.getType().get());
     }
-    
+
     @Test
     public void openSearchLocalTest() throws URISyntaxException {
 
-	String uri = "osl://localhost/test/testConfig";
+	String uri = "osl://awsaccesskey:awssecretkey@localhost:9200/test/testConfig";
 
 	StorageInfo info = Database.getInfo(uri);
 
-	Assert.assertEquals("testConfig", info.getUser());
-	Assert.assertNull(info.getPassword());
-	Assert.assertEquals("http://localhost", info.getUri());
+	Assert.assertEquals("awsaccesskey", info.getUser());
+	Assert.assertEquals("awssecretkey", info.getPassword());
+
+	Assert.assertEquals("http://localhost:9200", info.getUri());
+
 	Assert.assertEquals("test", info.getIdentifier());
-	Assert.assertEquals(Database.CONFIGURATION_FOLDER, info.getName());
+
+	Assert.assertEquals("testConfig", info.getName());
+
 	Assert.assertEquals(OpenSearchServiceType.OPEN_SEARCH_LOCAL.getProtocol(), info.getType().get());
     }
 }

@@ -65,7 +65,7 @@ public class OpenSearchAugmentersFolderTest extends OpenSearchTest {
 
 	Assert.assertEquals(database.getIdentifier(), wrapper.getDatabaseId());
 
-	Assert.assertEquals(folderName, wrapper.getFolderName());
+	Assert.assertEquals(folder.getName(), wrapper.getFolderName());
 
 	Assert.assertEquals(OpenSearchFolder.getFolderId(folder), wrapper.getFolderId());
 

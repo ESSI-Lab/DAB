@@ -32,11 +32,14 @@ public class OpenSearchDatabaseInitTest {
     public static StorageInfo createStorageInfo() {
 
 	StorageInfo storageInfo = new StorageInfo();
-	// the identifier is set same as name
-	storageInfo.setName("testDb");
-	storageInfo.setType(OpenSearchServiceType.OPEN_SEARCH_MANAGED.getProtocol());
-	storageInfo.setUser("admin");
-	storageInfo.setPassword("admin");
+	
+	storageInfo.setUser("admin");// ignored
+	storageInfo.setPassword("admin");// ignored
+	// optional, if missing the http scheme is used to discriminate the service type
+	storageInfo.setType(OpenSearchServiceType.OPEN_SEARCH_LOCAL.getProtocol()); 
+
+	// the identifier is set same as name in the db initialization
+	storageInfo.setName("test");
 	storageInfo.setUri("http://localhost:9200");
 
 	return storageInfo;
@@ -64,7 +67,7 @@ public class OpenSearchDatabaseInitTest {
 	assertNotNull(database);
 
 	String identifier = database.getIdentifier();
-	assertEquals("testDb", identifier);
+	assertEquals("test", identifier);
     }
 
     /**

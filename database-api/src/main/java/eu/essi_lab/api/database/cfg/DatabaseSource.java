@@ -82,16 +82,16 @@ public class DatabaseSource implements ConfigurationSource {
      * since it is hard-coded.<br>
      * E.g.: "xdbc://user:password@productionhost:8000,8004/PRODUCTION-DB/production/"<br>
      * <br>
-     * For <b>OpenSearch</b> it can have two kind of protocols: <i>osm</i> or <i>oss</i> that respectively means
-     * <i>OpenSearch Managed</i> and <i>OpenSearch Serverless</i>. The uri must be like this:<br>
-     * "osm://hostname/environment/configName" where <code>environment</code> and <code>configName</code>
-     * can have different values according to the
-     * target environment such as production, preproduction, etc...<br>
-     * For example, <code>environment</code> could be 'prod' or 'preprod' and <code>configName</code> can be
-     * 'prodConfig' or 'preprodConfig'.<br>
-     * E.g.: "osm://productionhost/prod/prodConfig"<br>
-     * E.g.: "oss://preproductionhost/preprod/preProdConfig"<br>
-     * 
+     * For <b>OpenSearch</b> it can have three kind of protocols: <i>osm</i>, <i>oss</i>, <i>osl</i> that respectively means
+     * <i>OpenSearch Managed</i>, <i>OpenSearch Serverless</i> and  <i>OpenSearch Local</i>. The uri must be like this:<br>
+     * "osm://awsaccesskey:awssecretkey@hostname/environment/configName" where <code>environment</code> and <code>configName</code>
+     * can have different values according to the target environment such as test, production, preproduction, etc...<br>
+     * For example, <code>environment</code> could be 'test', 'prod', 'preprod' and <code>configName</code> can be
+     * 'testCondig', 'prodConfig' or 'preprodConfig'.<br>
+     * E.g.: "osm://awsaccesskey:awssecretkey@productionhost/prod/prodConfig"<br>
+     * E.g.: "oss://awsaccesskey:awssecretkey@preproductionhost/preprod/preProdConfig"<br>
+     * E.g.: "osl://awsaccesskey:awssecretkey@localhost:9200/test/testConfig"<br>
+     *	
      * @see Database#getInfo(String)
      * @see Database#isStartupUri(String)
      * @param impl
@@ -113,7 +113,7 @@ public class DatabaseSource implements ConfigurationSource {
 
 	case OPENSEARCH:
 
-	    return new DatabaseSource(info, Database.CONFIGURATION_FOLDER, info.getUser());
+	    return new DatabaseSource(info, Database.CONFIGURATION_FOLDER, info.getName());
 	}
 
 	return null;
