@@ -38,8 +38,10 @@ import java.math.BigDecimal;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
@@ -56,6 +58,10 @@ import eu.essi_lab.api.database.DatabaseExecutor.WMSClusterRequest;
 import eu.essi_lab.api.database.DatabaseExecutor.WMSClusterResponse;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.lib.net.utils.whos.HISCentralOntology;
+import eu.essi_lab.lib.net.utils.whos.HydroOntology;
+import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
+import eu.essi_lab.lib.net.utils.whos.WHOSOntology;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
@@ -713,7 +719,8 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 	addSimpleValueBonds(parser, "organizationName", andBond, MetadataElement.ORGANISATION_NAME);
 	addSimpleValueBonds(parser, "platformTitle", andBond, MetadataElement.PLATFORM_TITLE);
 	addSimpleValueBonds(parser, "keyword", andBond, MetadataElement.KEYWORD);
-	addSimpleValueBonds(parser, "attributeTitle", andBond, MetadataElement.ATTRIBUTE_TITLE);
+
+	addAttributeBond(parser, andBond);
 
 	Optional<String> from = parser.getOptionalValue("from");
 
@@ -763,15 +770,6 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 		    instrumentTitle.get()));
 	}
 
-	Optional<String> attributeTitle = parser.getOptionalValue("attributeTitle");
-	if (attributeTitle.isPresent() && !attributeTitle.get().equals(KeyValueParser.UNDEFINED)) {
-
-	    andBond.getOperands().add(BondFactory.createSimpleValueBond(//
-		    BondOperator.EQUAL, //
-		    MetadataElement.ATTRIBUTE_TITLE, //
-		    attributeTitle.get()));
-	}
-
 	Optional<String> platformTitle = parser.getOptionalValue("platformTitle");
 	if (platformTitle.isPresent() && !platformTitle.get().equals(KeyValueParser.UNDEFINED)) {
 
@@ -797,6 +795,74 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 	// return andBond.getOperands().get(0);
 	// }
 	return andBond;
+    }
+
+    private void addAttributeBond(KeyValueParser parser, LogicalBond andBond) {
+	Optional<String> propertyString = parser.getOptionalValue("attributeTitle");
+	Optional<String> semantics = parser.getOptionalValue("semantics");
+	Optional<String> ontology = parser.getOptionalValue("ontology");
+	HydroOntology ho = null;
+	if (semantics.isPresent() && !semantics.get().equals(KeyValueParser.UNDEFINED)) {
+	    if (ontology.isPresent() && !ontology.get().equals(KeyValueParser.UNDEFINED)) {
+		switch (ontology.get()) {
+		case "whos":
+		    ho = new WHOSOntology();
+		    break;
+		case "his-central":
+		    ho = new HISCentralOntology();
+		    break;
+		default:
+		    break;
+		}
+	    }
+	}
+
+	List<String> attributeTitles = new ArrayList<String>();
+	LogicalBond orBond = BondFactory.createOrBond();
+	if (propertyString.isPresent() && !propertyString.get().equals(KeyValueParser.UNDEFINED)) {
+
+	    String value = propertyString.get();
+
+	    if (value != null && !value.isEmpty()) {
+		if (value.contains(",")) {
+		    String[] split = value.split(",");
+
+		    for (String s : split) {
+			attributeTitles.add(s);
+		    }
+		} else {
+		    attributeTitles.add(value);
+		}
+	    }
+	}
+
+	for (String attributeTitle : attributeTitles) {
+
+	    SimpleValueBond bond = BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.ATTRIBUTE_TITLE, attributeTitle);
+	    orBond.getOperands().add(bond);
+	    if (ho != null) {
+		List<SKOSConcept> concepts = ho.findConcepts(attributeTitle, true, false);
+		HashSet<String> uris = new HashSet<String>();
+		for (SKOSConcept concept : concepts) {
+		    uris.add(concept.getURI());
+		}
+		for (String uri : uris) {
+		    SimpleValueBond b = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.OBSERVED_PROPERTY_URI, uri);
+		    orBond.getOperands().add(b);
+		}
+	    }
+	}
+	switch (orBond.getOperands().size()) {
+	case 0:
+	    break;
+	case 1:
+	    andBond.getOperands().add(orBond.getFirstOperand());
+	    break;
+	default:
+	    andBond.getOperands().add(orBond);
+
+	}
+
     }
 
     private void addSimpleValueBonds(KeyValueParser parser, String propertyName, LogicalBond andBond, MetadataElement element) {

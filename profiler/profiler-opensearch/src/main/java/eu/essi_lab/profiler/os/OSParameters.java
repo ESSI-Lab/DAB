@@ -307,7 +307,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(value, MetadataElement.INSTRUMENT_TITLE);
+	    return createBond(BondOperator.LIKE, value, MetadataElement.INSTRUMENT_TITLE);
 	}
     };
 
@@ -337,7 +337,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(value, MetadataElement.PLATFORM_TITLE);
+	    return createBond(BondOperator.LIKE, value, MetadataElement.PLATFORM_TITLE);
 	}
     };
 
@@ -422,7 +422,17 @@ public abstract class OSParameters {
     *
     */
     public static final OSParameter ROSETTA = new OSParameter("rosetta", "string", null, "{gs:rosetta}");
+    
+    /**
+    *
+    */
+    public static final OSParameter SEMANTICS = new OSParameter("semantics", "string", null, "{gs:semantics}");
 
+    /**
+    *
+    */
+    public static final OSParameter ONTOLOGY = new OSParameter("ontology", "string", null, "{gs:ontology}");
+    
     /**
     *
     */
@@ -464,7 +474,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(value, MetadataElement.ATTRIBUTE_TITLE);
+	    return createBond(BondOperator.LIKE, value, MetadataElement.ATTRIBUTE_TITLE);
 	}
     };
     
@@ -1247,12 +1257,16 @@ public abstract class OSParameters {
 		lon1 >= lon2 ? lon1 : lon2, relatedValues); // east
     }
 
+    private static Optional<Bond> createBond(String value, MetadataElement element) {
+	return createBond(BondOperator.EQUAL, value, element);
+    }
+    
     /**
      * @param value
      * @param element
      * @return
      */
-    private static Optional<Bond> createBond(String value, MetadataElement element) {
+    public static Optional<Bond> createBond(BondOperator operator, String value, MetadataElement element) {
 
 	if (value == null || value.equals("")) {
 	    return Optional.empty();
@@ -1262,7 +1276,7 @@ public abstract class OSParameters {
 	    String[] split = value.split(" AND ");
 	    LogicalBond bond = BondFactory.createAndBond();
 	    for (String s : split) {
-		bond.getOperands().add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, element, s.trim()));
+		bond.getOperands().add(BondFactory.createSimpleValueBond(operator, element, s.trim()));
 	    }
 	    return Optional.of(bond);
 	}
@@ -1271,12 +1285,12 @@ public abstract class OSParameters {
 	    String[] split = value.split(" OR ");
 	    LogicalBond bond = BondFactory.createOrBond();
 	    for (String s : split) {
-		bond.getOperands().add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, element, s.trim()));
+		bond.getOperands().add(BondFactory.createSimpleValueBond(operator, element, s.trim()));
 	    }
 	    return Optional.of(bond);
 	}
 
-	return Optional.of(BondFactory.createSimpleValueBond(BondOperator.EQUAL, element, value.trim()));
+	return Optional.of(BondFactory.createSimpleValueBond(operator, element, value.trim()));
     }
 
 }

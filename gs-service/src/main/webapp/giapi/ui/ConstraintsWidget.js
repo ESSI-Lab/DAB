@@ -960,9 +960,10 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 				break;
 			case 'semantics':
 				values = [{ 'label': 'Basic search by exact term', 'value': '' }, 
-				{ 'label': 'Advanced search w/ translations', 'value': 'sameas' }, 
-				{ 'label': 'Advanced search w/ translations and narrow matches', 'value': 'narrow' }];
-				label = 'Use ODIP Rosetta Stone service.';
+				//{ 'label': 'Semantic search w/ translations', 'value': 'sameas' }, 
+				{ 'label': 'Semantic search w/ translations and narrow matches', 'value': 'sameas-narrow' }];
+				help = 'Exact search or semantic search with ontology support for translations and narrower terms.<br/>Please check the online browsers for possible terms:<br/><a href="https://hydro.geodab.eu/ontology-browser/hydro-ontology.html?http://hydro.geodab.eu/hydro-ontology/concept/1">WHOS ontology</a><br/><a href="http://ontology.his-central.geodab.eu/ontology-browser/his-central-ontology.html?http://ontology.his-central.geodab.eu/hydro-ontology/concept/1">HIS-Central ontology</a><br/>';
+				label = 'Semantics';
 				break;
 			case 'isValidated':
 				values = [{ 'label': 'Search all records', 'value': '' },
@@ -1232,6 +1233,7 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 			'rosetta',
 			'instrumentId',
 			'instrumentTitle',
+			'semantics',
 			'platformId',
 			'platformTitle',
 			'origOrgId',
@@ -1966,7 +1968,6 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 
 		var td = '';
 		if (help) {
-			
 			var imageId = 'fa-question-circle-o';
 			
 			if (title.toLowerCase().includes('instrument')) {
@@ -1988,6 +1989,7 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 			if (title.toLowerCase().includes('validated')) {
 				imageId = 'fa-check-square-o';
 			}
+			
 			
 			imageId = imageId_ || imageId;
 			

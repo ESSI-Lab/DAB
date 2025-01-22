@@ -8,7 +8,7 @@
     "maxZoom": 10,
     "token": "his_central-568a4888-d6bd-4be3-b7a6-d9887997bb0f",
     "resultsVisibility": true,
-    "bboxSelectorVisibility": true,
+    "bboxSelectorVisibility": false,
     "layersSelectorVisibility": true,
     "layersSelectorButtonVisibility": true,
     "zoomSlider":false,
@@ -19,6 +19,8 @@
     "platformSearch": true,
     "validatedSearch": true,
     "riverSearch": false,
+    "semanticSearch": true,
+    "semanticSearchValue":1,
     "ontology": "his-central",
     "wmsEndpoint": "https://geoportale.regione.lazio.it/geoserver/ows"
 }
