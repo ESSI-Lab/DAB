@@ -49,7 +49,6 @@ import org.opensearch.client.transport.rest_client.RestClientTransport;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFolder;
-import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -79,6 +78,7 @@ public class OpenSearchDatabase extends Database {
 	this.storageInfo = storageInfo;
 	if (!initialized) {
 
+	    // both ignored for local local protocol
 	    System.setProperty("aws.accessKeyId", storageInfo.getUser());
 	    System.setProperty("aws.secretAccessKey", storageInfo.getPassword());
 
@@ -95,13 +95,15 @@ public class OpenSearchDatabase extends Database {
 
 	    httpClient = ApacheHttpClient.builder().build();
 
-	    String serviceName = OpenSearchServiceType.decode(storageInfo.getType().get()).getServiceName();
+	    OpenSearchServiceType serviceType = OpenSearchServiceType.decode(storageInfo.getType().get());
+
+	    String serviceName = serviceType.getServiceName();
 
 	    HttpHost httpHost = HttpHost.create(storageInfo.getUri());
-
+	 
 	    String schemeName = httpHost.getSchemeName();
 
-	    if (schemeName.equals("http")) {
+	    if (schemeName.equals("http") || serviceType == OpenSearchServiceType.OPEN_SEARCH_LOCAL) {
 
 		client = createNoSSLContextClient(storageInfo);
 
@@ -184,12 +186,6 @@ public class OpenSearchDatabase extends Database {
 
 	    throw GSException.createException(OpenSearchDatabase.class, "OpenSearchDatabaseCheckIndexError", ex);
 	}
-    }
-
-    @Override
-    public SourceStorageWorker getWorker(String sourceId) throws GSException {
-
-	return new SourceStorageWorker(sourceId, this);
     }
 
     @Override
@@ -302,7 +298,7 @@ public class OpenSearchDatabase extends Database {
     //
     // NOT IMPLEMENTED AT THE MOMENT. Used in deprecated SourceStorageWorker testISOCompliance, recoverTags and
     // testISCompliance methods
-    // 
+    //
     @Override
     public List<String> getIdentifiers(IdentifierType type, String folderName, boolean excludDeleted) throws GSException {
 
