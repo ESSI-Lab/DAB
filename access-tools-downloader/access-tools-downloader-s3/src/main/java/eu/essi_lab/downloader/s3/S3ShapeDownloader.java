@@ -49,17 +49,13 @@ import org.geotools.map.FeatureLayer;
 import org.geotools.map.MapContent;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.lite.StreamingRenderer;
-import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.LineSymbolizer;
-import org.geotools.styling.SLD;
 import org.geotools.styling.Stroke;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import com.google.api.services.sheets.v4.model.Color;
 
 import eu.essi_lab.access.DataDownloader;
 import eu.essi_lab.accessor.s3.FeatureMetadata;
@@ -99,6 +95,7 @@ public class S3ShapeDownloader extends DataDownloader {
 		super.setOnlineResource(resource, onlineResourceId);
 		String linkage = online.getLinkage();
 		this.client = new S3ShapeFileClient(linkage);
+		
 		this.name = online.getName();
 	}
 

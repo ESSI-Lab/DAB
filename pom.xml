@@ -116,8 +116,8 @@
 		<!-- The AWS SDK for Java - BOM module (J11 UPDATED) -->
 		<aws-java-sdk-bom.version>1.12.709</aws-java-sdk-bom.version>
 
-		<!-- S3 Transfer Manager (J11 UPDATED) -->
-		<s3-transfer-manager.version>2.25.40</s3-transfer-manager.version>
+		<!-- S3 Transfer Manager (J11 UPDATED) --> 
+		<s3-transfer-manager.version>2.29.46</s3-transfer-manager.version>
 
 		<!-- Authzforce (to update it, some code changes are required) -->
 		<authzforce.version>13.3.1</authzforce.version>

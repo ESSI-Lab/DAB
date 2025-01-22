@@ -934,6 +934,18 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 		var help;
 		var label;
 		var values; // = [ {'label':'','value':''}, {'label':'Yes','value':'true'}, {'label':'No','value':'false'} ];
+		var correctHelp = 'Exact search or semantic search with ontology support for translations and narrower terms.<br/>Please check the online ontology browser for possible terms:<br/>';
+
+
+		if (options!== undefined && options.ontology !== undefined) {
+			if (options.ontology === "his-central") {
+				correctHelp += '<a href="http://ontology.his-central.geodab.eu/ontology-browser/his-central-ontology.html?http://ontology.his-central.geodab.eu/hydro-ontology/concept/1">HIS-Central ontology</a><br/>';
+			}
+			if (options.ontology === "whos") {
+				correctHelp += '<a href="https://hydro.geodab.eu/ontology-browser/hydro-ontology.html?http://hydro.geodab.eu/hydro-ontology/concept/1">WHOS ontology</a><br/>';
+			}
+		}
+
 		switch (constraint) {
 			case 'gdc':
 				values = [{ 'label': 'Search all records', 'value': '' }, { 'label': 'Only GEOSS Data Core records', 'value': 'true' }, { 'label': 'Only Non GEOSS Data Core records', 'value': 'false' }];
@@ -952,17 +964,17 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 				label = 'Legal use const.';
 				break;
 			case 'rosetta':
-				values = [{ 'label': 'Basic search by exact term', 'value': '' }, 
-				{ 'label': 'Advanced search w/ Rosetta Stone translations', 'value': 'true' }, 
+				values = [{ 'label': 'Basic search by exact term', 'value': '' },
+				{ 'label': 'Advanced search w/ Rosetta Stone translations', 'value': 'true' },
 				{ 'label': 'Advanced search w/ Rosetta Stone narrow matches', 'value': 'narrow' },
-				 { 'label': 'Advanced search w/ Rosetta Stone broad matches', 'value': 'broad' }];
+				{ 'label': 'Advanced search w/ Rosetta Stone broad matches', 'value': 'broad' }];
 				label = 'Use ODIP Rosetta Stone service.';
 				break;
 			case 'semantics':
-				values = [{ 'label': 'Basic search by exact term', 'value': '' }, 
+				values = [{ 'label': 'Basic search by exact term', 'value': '' },
 				//{ 'label': 'Semantic search w/ translations', 'value': 'sameas' }, 
 				{ 'label': 'Semantic search w/ translations and narrow matches', 'value': 'sameas-narrow' }];
-				help = 'Exact search or semantic search with ontology support for translations and narrower terms.<br/>Please check the online browsers for possible terms:<br/><a href="https://hydro.geodab.eu/ontology-browser/hydro-ontology.html?http://hydro.geodab.eu/hydro-ontology/concept/1">WHOS ontology</a><br/><a href="http://ontology.his-central.geodab.eu/ontology-browser/his-central-ontology.html?http://ontology.his-central.geodab.eu/hydro-ontology/concept/1">HIS-Central ontology</a><br/>';
+				help = correctHelp;
 				label = 'Semantics';
 				break;
 			case 'isValidated':
@@ -1364,12 +1376,12 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 		id,
 		label,
 		help,
-	    values,
+		values,
 		time,
 		minDate,
 		maxDate,
 		ro,
-        showHelpIcon,
+		showHelpIcon,
 		helpIconImage,
 		initValue,
 		whatResizable) {
@@ -1969,30 +1981,30 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 		var td = '';
 		if (help) {
 			var imageId = 'fa-question-circle-o';
-			
+
 			if (title.toLowerCase().includes('instrument')) {
 				imageId = 'fa-thermometer-full';
 			}
-			
+
 			if (title.toLowerCase().includes('platform')) {
 				imageId = 'fa-ship';
 			}
-			
+
 			if (title.toLowerCase().includes('originator')) {
 				imageId = 'fa-users';
 			}
-			
+
 			if (title.toLowerCase().includes('attribute') || title.toLowerCase().includes('parameter')) {
 				imageId = 'fa-bar-chart';
 			}
-			
+
 			if (title.toLowerCase().includes('validated')) {
 				imageId = 'fa-check-square-o';
 			}
-			
-			
+
+
 			imageId = imageId_ || imageId;
-			
+
 			td = '<td style="vertical-align: middle;height: ' + (fixedHeight + 1) + 'px;" id="' + id + '">' +
 				GIAPI.UI_Utils.helpImage(title, help, 'margin-left: -4px;', imageId, 'odip-help') +
 				'</td>';
