@@ -26,7 +26,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -112,7 +111,6 @@ public class MarkLogicDatabase extends Database {
     private String dbIdentifier;
     private StorageInfo dbInfo;
     private boolean initialized;
-    private HashMap<String, MarkLogicSourceStorageWorker> workersMap;
     private RegisteredQueriesManager regQueriesManager;
     //
     // ---
@@ -150,11 +148,6 @@ public class MarkLogicDatabase extends Database {
     static {
 
 	System.setProperty("xcc.httpcompliant", "true");
-    }
-
-    public MarkLogicDatabase() {
-
-	workersMap = new HashMap<>();
     }
 
     @Override
@@ -362,7 +355,7 @@ public class MarkLogicDatabase extends Database {
 		if (sourceId != null) {
 
 		    MarkLogicSourceStorageWorker worker = new MarkLogicSourceStorageWorker(sourceId, this);
-		    workersMap.put(sourceId, worker);
+		    getWorkersMap().put(sourceId, worker);
 		}
 	    }
 
@@ -724,23 +717,6 @@ public class MarkLogicDatabase extends Database {
 		    MARKLOGIC_SEARCH_ERROR, //
 		    e);
 	}
-    }
-
-    /**
-     * @return
-     * @throws GSException
-     * @throws Exception
-     */
-    @Override
-    public SourceStorageWorker getWorker(String sourceId) throws GSException {
-
-	MarkLogicSourceStorageWorker worker = workersMap.get(sourceId);
-	if (worker == null) {
-	    worker = new MarkLogicSourceStorageWorker(sourceId, this);
-	    workersMap.put(sourceId, worker);
-	}
-
-	return worker;
     }
 
     /**

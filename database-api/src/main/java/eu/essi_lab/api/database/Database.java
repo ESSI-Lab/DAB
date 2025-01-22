@@ -3,6 +3,7 @@ package eu.essi_lab.api.database;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -205,14 +206,7 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
 	    return DatabaseImpl.MARK_LOGIC;
 	}
 
-	if (startupUri.startsWith(OpenSearchServiceType.OPEN_SEARCH_MANAGED.getProtocol())
-		|| startupUri.startsWith(OpenSearchServiceType.OPEN_SEARCH_SERVERLESS.getProtocol())
-		|| startupUri.startsWith(OpenSearchServiceType.OPEN_SEARCH_LOCAL.getProtocol())) {
-
-	    return DatabaseImpl.OPENSEARCH;
-	}
-
-	return null;
+	return OpenSearchServiceType.protocols().stream().anyMatch(p -> startupUri.startsWith(p)) ? DatabaseImpl.OPENSEARCH : null;
     }
 
     /**
@@ -222,16 +216,14 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
     public static boolean isStartupUri(String uri) {
 
 	return uri.startsWith("xdbc") || //
-		uri.startsWith(OpenSearchServiceType.OPEN_SEARCH_MANAGED.getProtocol())
-		|| uri.startsWith(OpenSearchServiceType.OPEN_SEARCH_SERVERLESS.getProtocol())
-		|| uri.startsWith(OpenSearchServiceType.OPEN_SEARCH_LOCAL.getProtocol());
+		OpenSearchServiceType.protocols().stream().anyMatch(p -> uri.startsWith(p));
     }
 
     /**
      * E.g: "xdbc://user:password@hostname:8000,8004/dbName/folder/"
-     * E.g: "osm://productionhost/prod/prodConfig"
-     * E.g: "oss://productionhost/prod/prodConfig"
-     * E.g: "osl://productionhost/test/testConfig"
+     * E.g: "osm://awsaccesskey:awssecretkey@productionhost/prod/prodConfig"
+     * E.g: "oss://awsaccesskey:awssecretkey@productionhost/prod/prodConfig"
+     * E.g: "osl://awsaccesskey:awssecretkey@localhost:9200/test/testConfig"
      * 
      * @param startupUri
      * @return
@@ -267,22 +259,45 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
 	    String env = uri.getPath().split("/+")[1];
 	    String configName = uri.getPath().split("/+")[2];
 
+	    String userInfo = uri.getRawUserInfo();
+	    String accessKey = userInfo.split(":")[0];
+	    String secretKey = userInfo.split(":")[1];
+
+	    String host = uri.getHost();
+	    String port = uri.getPort() > 0 ? ":" + uri.getPort() : "";
+
 	    OpenSearchServiceType serviceType = OpenSearchServiceType.decode(uri.getScheme());
 
 	    storageInfo = new StorageInfo();
-	    storageInfo.setIdentifier(env);
-	    storageInfo.setName(Database.CONFIGURATION_FOLDER);
 	    storageInfo.setType(serviceType.getProtocol());
-	    storageInfo.setUser(configName); // config name encoded ad user name
+
+	    storageInfo.setIdentifier(env);
+	    storageInfo.setName(configName);
+
+	    storageInfo.setUser(accessKey);
+	    storageInfo.setPassword(secretKey);
 
 	    if (serviceType == OpenSearchServiceType.OPEN_SEARCH_LOCAL) {
-		storageInfo.setUri("http://" + uri.getAuthority());
+		storageInfo.setUri("http://" + host + port);
 	    } else {
-		storageInfo.setUri("https://" + uri.getAuthority());
+		storageInfo.setUri("https://" + host);
 	    }
 	}
 
 	return storageInfo;
+    }
+
+    /**
+     * 
+     */
+    private HashMap<String, SourceStorageWorker> workersMap;
+
+    /**
+     * 
+     */
+    public Database() {
+
+	workersMap = new HashMap<String, SourceStorageWorker>();
     }
 
     /**
@@ -294,11 +309,20 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
     public abstract void initialize(StorageInfo storageInfo) throws GSException;
 
     /**
-     * @param sourceId
      * @return
      * @throws GSException
+     * @throws Exception
      */
-    public abstract SourceStorageWorker getWorker(String sourceId) throws GSException;
+    public SourceStorageWorker getWorker(String sourceId) throws GSException {
+
+	SourceStorageWorker worker = workersMap.get(sourceId);
+	if (worker == null) {
+	    worker = createSourceStorageWorker(sourceId);
+	    workersMap.put(sourceId, worker);
+	}
+
+	return worker;
+    }
 
     /**
      * @param folderName
@@ -443,6 +467,23 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
     public DatabaseFolder getAugmentersFolder() throws GSException {
 
 	return getProtectedFolder(AUGMENTERS_FOLDER, true);
+    }
+
+    /**
+     * @return the workersMap
+     */
+    protected HashMap<String, SourceStorageWorker> getWorkersMap() {
+
+	return workersMap;
+    }
+
+    /**
+     * @param sourceId
+     * @throws GSException
+     */
+    protected SourceStorageWorker createSourceStorageWorker(String sourceId) throws GSException {
+
+	return new SourceStorageWorker(sourceId, this);
     }
 
     /**
