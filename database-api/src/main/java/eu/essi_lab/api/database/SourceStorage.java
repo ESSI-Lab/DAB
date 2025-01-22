@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Optional;
 
 import eu.essi_lab.cfga.Configurable;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.database.SourceStorageSetting;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -50,8 +49,6 @@ public abstract class SourceStorage implements DatabaseProvider, Configurable<So
      * 
      */
     public SourceStorage() {
-
-	configure(ConfigurationWrapper.getSourceStorageSettings());
     }
 
     /**
