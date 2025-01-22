@@ -26,6 +26,7 @@ package eu.essi_lab.api.database.cfg;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -34,11 +35,13 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.Database.DatabaseImpl;
 import eu.essi_lab.api.database.DatabaseFolder;
+import eu.essi_lab.api.database.DatabaseFolder.EntryType;
+import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.cfga.ConfigurationSource;
 import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
@@ -53,26 +56,81 @@ public class DatabaseSource implements ConfigurationSource {
     private String lockFileName;
     private String configName;
     private String completeConfigName;
-    private DatabaseFolder folder;
+    protected DatabaseFolder folder;
 
     /**
      * @param storageInfo
-     * @param configName config file name without extension
+     * @param folder
+     * @param configName
      * @throws GSException
      */
-    public DatabaseSource(StorageInfo storageInfo, String configName) throws GSException {
+    private DatabaseSource(StorageInfo storageInfo, String folder, String configName) throws GSException {
 
 	Database database = DatabaseFactory.get(storageInfo);
 
-	this.folder = database.getFolder(storageInfo.getIdentifier(), true).get();
+	this.folder = database.getFolder(folder, true).get();
 
 	init(storageInfo, configName);
     }
 
     /**
+     * E.g: "xdbc://user:password@hostname:8000,8004/dbName/folder/"
+     * E.g.: "osm://awsaccesskey:awssecretkey@productionhost/prod/prodConfig"<br>
+     * E.g.: "oss://awsaccesskey:awssecretkey@preproductionhost/preprod/preProdConfig"<br>
+     * E.g.: "osl://awsaccesskey:awssecretkey@localhost:9200/test/testConfig"<br>
+     * 
+     * @see Database#build(String)
+     * @see Database#check(String)
+     * @param impl
+     * @param url
+     * @return
+     * @throws GSException
+     * @throws URISyntaxException
+     */
+    public static DatabaseSource of(String url) throws GSException, URISyntaxException {
+
+	StorageInfo info = DatabaseSourceUrl.build(url);
+
+	DatabaseImpl impl = DatabaseSourceUrl.detectImpl(url);
+
+	switch (impl) {
+	case MARK_LOGIC:
+
+	    return new DatabaseSource(info, info.getIdentifier(), "gs-configuration");
+
+	case OPENSEARCH:
+
+	    return new DatabaseSource(info, Database.CONFIGURATION_FOLDER, info.getName());
+	}
+
+	return null;
+    }
+
+    /**
+     * @param impl
+     * @param configName
+     * @return
+     * @throws GSException
+     */
+    public static DatabaseSource of(DatabaseImpl impl, StorageInfo storageInfo, String configName) throws GSException {
+
+	switch (impl) {
+	case MARK_LOGIC:
+
+	    return new DatabaseSource(storageInfo, storageInfo.getIdentifier(), configName);
+
+	case OPENSEARCH:
+
+	    return new DatabaseSource(storageInfo, Database.CONFIGURATION_FOLDER, configName);
+	}
+
+	return null;
+    }
+
+    /**
      * 
      */
-    private DatabaseSource() {
+    protected DatabaseSource() {
 
     }
 
@@ -80,7 +138,7 @@ public class DatabaseSource implements ConfigurationSource {
      * @param storageInfo
      * @param configName
      */
-    private void init(StorageInfo storageInfo, String configName) {
+    protected void init(StorageInfo storageInfo, String configName) {
 
 	this.configName = configName;
 
@@ -139,13 +197,21 @@ public class DatabaseSource implements ConfigurationSource {
 	JSONArray array = new JSONArray();
 	settings.forEach(item -> array.put(item.getObject()));
 
-	boolean replaced = folder.replaceBinary(this.completeConfigName, IOStreamUtils.asStream(array.toString(3)));
+	boolean replaced = folder.replace(//
+		this.completeConfigName, //
+		FolderEntry.of(IOStreamUtils.asStream(array.toString(3))), //
+		EntryType.CONFIGURATION);
+
 	GSLoggerFactory.getLogger(getClass()).trace("Source replaced: " + replaced);
 
 	boolean stored = false;
 	if (!replaced) {
 
-	    stored = folder.storeBinary(this.completeConfigName, IOStreamUtils.asStream(array.toString(3)));
+	    stored = folder.store(//
+		    this.completeConfigName, //
+		    FolderEntry.of(IOStreamUtils.asStream(array.toString(3))), //
+		    EntryType.CONFIGURATION);
+
 	    GSLoggerFactory.getLogger(getClass()).trace("Source stored: " + stored);
 	}
 
@@ -190,7 +256,10 @@ public class DatabaseSource implements ConfigurationSource {
 
 		InputStream inputStream = updateLockTimestamp(lockFile);
 
-		boolean replaced = folder.replaceBinary(lockFileName, inputStream);
+		boolean replaced = folder.replace(//
+			lockFileName, //
+			FolderEntry.of(inputStream), //
+			EntryType.CONFIGURATION_LOCK);
 
 		if (!replaced) {
 
@@ -205,7 +274,10 @@ public class DatabaseSource implements ConfigurationSource {
 
 	InputStream lockFile = createLockFile(owner);
 
-	boolean stored = folder.storeBinary(lockFileName, lockFile);
+	boolean stored = folder.store(//
+		lockFileName, //
+		FolderEntry.of(lockFile), //
+		EntryType.CONFIGURATION_LOCK);
 
 	if (!stored) {
 
@@ -344,13 +416,13 @@ public class DatabaseSource implements ConfigurationSource {
 		replace(":", "_").//
 		replace(".", "");
 
-	InputStream clone = new ClonableInputStream(getBinaryConfig()).clone();
+	InputStream clone = getBinaryConfig();
 
 	String backupName = configName + "_" + date;
 
 	String backupCompleteName = backupName + ".json.backup";
 
-	boolean stored = folder.storeBinary(backupCompleteName, clone);
+	boolean stored = folder.store(backupCompleteName, FolderEntry.of(clone), EntryType.CONFIGURATION);
 
 	GSLoggerFactory.getLogger(getClass()).trace("Source stored: " + stored);
 
@@ -371,6 +443,6 @@ public class DatabaseSource implements ConfigurationSource {
     @Override
     public String getLocation() {
 
-	return folder.getCompleteName() + "\\" + this.completeConfigName;
+	return folder.getName() + "\\" + this.completeConfigName;
     }
 }

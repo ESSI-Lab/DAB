@@ -38,6 +38,8 @@ import eu.essi_lab.api.database.DatabaseFinder;
 import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.SourceStorage;
+import eu.essi_lab.api.database.DatabaseFolder.EntryType;
+import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
@@ -295,7 +297,7 @@ public class AggregationIdentifiersTask extends AbstractCustomTask {
 		Document asDocument = dataset.asDocument(true);
 
 		String key = dataset.getPrivateId();
-		folder.replace(key, asDocument);
+		folder.replace(key, FolderEntry.of(asDocument), EntryType.GS_RESOURCE);
 
 		GSLoggerFactory.getLogger(getClass()).info("Handling child [" + (childrenIndex + 1) + "/" + childrenIds.size() + "] ENDED");
 

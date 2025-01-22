@@ -334,7 +334,7 @@ public class ISO8601DateTimeUtils {
 
     // parse date in format yyyyMMdd
     // return the ISO Date
-    public static Optional<Date> parseNotStandardToDate(String dateTimeString) throws ParseException {
+    public static Optional<Date> parseNotStandardToDate(String dateTimeString) {
 
 	try {
 	    SimpleDateFormat dateFormat = new SimpleDateFormat(NOT_STANDARD);
@@ -344,7 +344,7 @@ public class ISO8601DateTimeUtils {
 
 	    return Optional.of(date);
 
-	} catch (RuntimeException e) {
+	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(ISO8601DateTimeUtils.class).warn("Unparsable Date: {}", dateTimeString, e);
 	}
 
@@ -353,7 +353,7 @@ public class ISO8601DateTimeUtils {
 
     // parse date in format yyyyMMddHHmm
     // return the ISO Date
-    public static Optional<Date> parseNotStandard2ToDate(String dateTimeString) throws ParseException {
+    public static Optional<Date> parseNotStandard2ToDate(String dateTimeString) {
 
 	try {
 	    SimpleDateFormat dateFormat = new SimpleDateFormat(NOT_STANDARD2);
@@ -363,7 +363,7 @@ public class ISO8601DateTimeUtils {
 
 	    return Optional.of(date);
 
-	} catch (RuntimeException e) {
+	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(ISO8601DateTimeUtils.class).warn("Unparsable Date: {}", dateTimeString, e);
 	}
 
@@ -429,7 +429,7 @@ public class ISO8601DateTimeUtils {
     }
 
     public static SimpleEntry<BigDecimal, String> getUnitsValueFromDuration(Duration duration) {
-	if (duration==null) {
+	if (duration == null) {
 	    return null;
 	}
 	BigDecimal decimal = null;
@@ -466,7 +466,7 @@ public class ISO8601DateTimeUtils {
     }
 
     public static String getTimeUnitsAbbreviation(String timeUnits) {
-	if (timeUnits==null) {
+	if (timeUnits == null) {
 	    return null;
 	}
 	switch (timeUnits.toLowerCase()) {

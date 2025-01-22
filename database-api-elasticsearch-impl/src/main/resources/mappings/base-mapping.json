@@ -1,0 +1,41 @@
+{
+	"mappings": {
+	
+		"dynamic": "true",
+	    	
+		"properties": {
+		
+			"index": {
+				"type": "text"
+			},
+		
+			"databaseId": {
+				"type": "text"
+			},
+			
+			"folderName": {
+				"type": "text"
+			},
+			
+			"folderId": {
+				"type": "text"
+			},
+			
+			"entryName": {
+				"type": "text"
+			},
+			
+			"entryId": {
+				"type": "text"
+			},
+			
+			"binaryProperty": {
+				"type": "text"
+			},
+			
+			"dataType": {
+				"type": "text"
+			}
+		}
+	}
+}

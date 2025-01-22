@@ -26,6 +26,7 @@ package eu.essi_lab.api.database.opensearch;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.SourceStorage;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.model.StorageInfo;
 
 /**
@@ -33,26 +34,37 @@ import eu.essi_lab.model.StorageInfo;
  */
 public class OpenSearchSourceStorage extends SourceStorage {
 
+    private Database dataBase;
+
+    /**
+     * 
+     */
+    public OpenSearchSourceStorage() {
+
+	configure(ConfigurationWrapper.getSourceStorageSettings());
+    }
+
     @Override
     public void setDatabase(Database dataBase) {
 
+	this.dataBase = dataBase;
     }
 
     @Override
-    public Database getDatabase() {
+    public OpenSearchDatabase getDatabase() {
 
-	return null;
+	return (OpenSearchDatabase) dataBase;
     }
 
     @Override
-    public boolean supports(StorageInfo dbUri) {
+    public boolean supports(StorageInfo info) {
 
-	return false;
+	return OpenSearchDatabase.isSupported(info);
     }
 
     @Override
     public String getType() {
 
-	return null;
+	return "OpenSearchSourceStorage";
     }
 }

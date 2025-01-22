@@ -22,6 +22,7 @@ package eu.essi_lab.api.database;
  */
 
 import java.io.InputStream;
+import java.util.Optional;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -32,27 +33,146 @@ import org.w3c.dom.Node;
 public interface DatabaseFolder {
 
     /**
-     * Returns the URI of this folder which is like the complete name but with the starting and trailing '/' (e.g.:
-     * /SUITE_ID_sourcename-data-2/)
-     *
-     * @throws Exception if the key is already used or problems occur.
+     * @author Fabrizio
      */
-    String getURI();
+    public static class FolderEntry {
+
+	private Document document;
+	private InputStream stream;
+
+	/**
+	 * @param document
+	 */
+	private FolderEntry(Document document) {
+
+	    this.document = document;
+	}
+
+	/**
+	 * @param stream
+	 */
+	private FolderEntry(InputStream stream) {
+
+	    this.stream = stream;
+	}
+
+	/**
+	 * @return
+	 */
+	public String getDataType() {
+
+	    return getDocument().isPresent() ? "doc" : "binary";
+	}
+
+	/**
+	 * @return
+	 */
+	public Optional<InputStream> getStream() {
+
+	    return Optional.ofNullable(stream);
+	}
+
+	/**
+	 * @return
+	 */
+	public Optional<Document> getDocument() {
+
+	    return Optional.ofNullable(document);
+	}
+
+	/**
+	 * @param document
+	 * @return
+	 */
+	public static FolderEntry of(Document document) {
+
+	    return new FolderEntry(document);
+	}
+
+	/**
+	 * @param stream
+	 * @return
+	 */
+	public static FolderEntry of(InputStream stream) {
+
+	    return new FolderEntry(stream);
+	}
+    }
 
     /**
-     * Returns the complete name of this folder which also includes the suite identifier and the data-x postfix (e.g.:
-     * SUITE_ID_sourcename-data-2)
-     *
-     * @throws Exception if the key is already used or problems occur
+     * @author Fabrizio
      */
-    String getCompleteName();
+    public enum EntryType {
+
+	//
+	// meta-folder entries
+	//
+
+	HARVESTING_WARN_REPORT, //
+	HARVESTING_ERROR_REPORT, //
+	HARVESTING_PROPERTIES, //
+	DATA_FOLDER_INDEX_DOC, //
+
+	//
+	// data-folder entries
+	//
+
+	GS_RESOURCE, //
+	WRITING_FOLDER_TAG,
+
+	//
+	//
+	//
+
+	USER, //
+	VIEW, //
+
+	AUGMENTER_PROPERTIES, //
+	
+	//
+	// configuration-index entries
+	//
+	CONFIGURATION, //
+	CONFIGURATION_LOCK,//
+	
+	//
+	// folder-registry-index entry	
+	//
+
+	REGISTERED_FOLDER,
+	
+	//
+	// cache-index entry
+	//
+	
+	CACHE_ENTRY;
+	
+    }
 
     /**
-     * Returns the name of this folder which includes only the name of the related source (e.g.: sourcename)
-     *
-     * @throws Exception if the key is already used or problems occur
+     * If this folder is a source folder, this method returns the related source identifier by removing from this
+     * folder name the database identifier and the other folder prefixes used to generate the folder name.<br>
+     * If this folder is not a DAB source folder, it returns this folder name.
+     * 
+     * @param database
+     * @param folder
+     * @return
      */
-    String getSimpleName();
+    public static String computeSourceId(Database database, DatabaseFolder folder) {
+
+	String name = folder.getName();
+	name = name.replace(database.getIdentifier() + "_", "");
+	name = name.replace(SourceStorageWorker.META_PREFIX, "");
+	name = name.replace(SourceStorageWorker.DATA_1_PREFIX, "");
+	name = name.replace(SourceStorageWorker.DATA_2_PREFIX, "");
+
+	return name;
+    }
+
+    /**
+     * Returns the name of this folder
+     */
+    String getName();
 
     /**
      * Stores a DOM resource with the specified <code>key</code> in this folder.<br>
@@ -65,22 +185,18 @@ public interface DatabaseFolder {
      * @return false if the key already exists, true if the store was performed with success
      * @throws Exception if the key is already used or problems occur
      */
-    boolean store(String key, Document doc) throws Exception;
+    boolean store(String key, FolderEntry entry, EntryType type) throws Exception;
 
     /**
-     * Stores a binary resource with the specified <code>key</code> in this folder <i>(optional operation)</i>.<br>
+     * Replace with <code>newDoc</code> the content of the XML resource with the specified <code>key</code>.<br>
      * Key should not contain
      * slashes.<br>
-     * Use {@link #exists} to test whether a resource with the specified <code>key</code> already exists.
-     * this method also explicitly stores a property associated with the stored document indicating the last update date
+     * Use {@link #exists} to test whether a resource with the specified <code>key</code> exists
      *
-     * @param key the key of the resource.
-     * @param res the resource to be stored.
-     * @return false if the key already exists, true if the store was performed with success
+     * @return true if the replacement was made, false if the resource does not exist (no insert is done in this case)
      * @throws Exception if problems occur
-     * @throws UnsupportedOperationException if this repository does not support this operation
      */
-    boolean storeBinary(String key, InputStream res) throws Exception, UnsupportedOperationException;
+    boolean replace(String key, FolderEntry entry, EntryType type) throws Exception;
 
     /**
      * Returns the DOM resource with the specified <code>key</code>.<br>
@@ -104,31 +220,6 @@ public interface DatabaseFolder {
      * @throws Exception if the resource does not exist or problems occur
      */
     InputStream getBinary(String key) throws Exception;
-
-    /**
-     * Replace with <code>newDoc</code> the content of the XML resource with the specified <code>key</code>.<br>
-     * Key should not contain
-     * slashes.<br>
-     * Use {@link #exists} to test whether a resource with the specified <code>key</code> exists
-     *
-     * @return true if the replacement was made, false if the resource does not exist (no insert is done in this case)
-     * @throws Exception if problems occur
-     */
-    boolean replace(String key, Document newDoc) throws Exception;
-
-    /**
-     * Replaces a binary resource with the specified <code>key</code> in this folder <i>(optional operation)</i>.<br>
-     * Key should not contain
-     * slashes.<br>
-     * Use {@link #exists} to test whether a resource with the specified <code>key</code> exists
-     *
-     * @param key the key of the resource.
-     * @param res the resource to be stored.
-     * @return true if the replacement was made, false if the resource does not exist (no insert is done in this case)
-     * @throws Exception if problems occur
-     * @throws UnsupportedOperationException if not supported operation
-     */
-    boolean replaceBinary(String key, InputStream res) throws Exception, UnsupportedOperationException;
 
     /**
      * Removes the resource with the specified <code>key</code>.<br>
@@ -173,5 +264,10 @@ public interface DatabaseFolder {
      * @throws Exception if problems occur.
      */
     void clear() throws Exception;
+
+    /**
+     * @return
+     */
+    Database getDatabase();
 
 }

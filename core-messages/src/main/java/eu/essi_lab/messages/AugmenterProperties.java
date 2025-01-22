@@ -1,4 +1,4 @@
-package eu.essi_lab.augmenter.worker;
+package eu.essi_lab.messages;
 
 /*-
  * #%L
@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import eu.essi_lab.cfga.gs.setting.augmenter.worker.AugmenterWorkerSetting;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.utils.IterationLogger;
 import eu.essi_lab.lib.utils.PropertiesUtils;
@@ -50,15 +49,6 @@ public class AugmenterProperties extends Properties {
 	setBeginTimestamp();
 	setStart(1);
 	setProperty(ITERATIONS_COUNT, "1");
-    }
-
-    /**
-     * @param setting
-     * @return
-     */
-    public static String getFileName(AugmenterWorkerSetting setting) {
-
-	return setting.getIdentifier() + ".properties";
     }
 
     /**

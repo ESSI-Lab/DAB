@@ -293,7 +293,14 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 			if (checkStringValue(beginPosition)) {
 
-			    getValues().add(beginPosition);
+			    if (beginPosition.equals("now")) {
+
+				resource.getIndexesMetadata().write(IndexedElements.TEMP_EXTENT_BEGIN_NOW);
+
+			    } else {
+
+				getValues().add(beginPosition);
+			    }
 			} else {
 
 			    resource.getIndexesMetadata().write(IndexedElements.TEMP_EXTENT_BEGIN_NULL);
@@ -339,8 +346,14 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 			if (checkStringValue(endPosition)) {
 
-			    getValues().add(endPosition);
+			    if (endPosition.equals("now")) {
 
+				resource.getIndexesMetadata().write(IndexedElements.TEMP_EXTENT_END_NOW);
+
+			    } else {
+
+				getValues().add(endPosition);
+			    }
 			} else {
 
 			    resource.getIndexesMetadata().write(IndexedElements.TEMP_EXTENT_END_NULL);
@@ -1955,7 +1968,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    }
 	}
     };
-    
+
     public static final IndexedMetadataElement QUANTITY_TYPES = new IndexedMetadataElement(MetadataElement.QUANTITY_TYPES) {
 	@Override
 	public void defineValues(GSResource resource) {

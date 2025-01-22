@@ -23,7 +23,6 @@ import eu.essi_lab.cfga.gs.DefaultConfiguration;
 import eu.essi_lab.cfga.gs.setting.augmenter.AugmenterSetting;
 import eu.essi_lab.cfga.gs.setting.augmenter.worker.AugmenterWorkerSetting;
 import eu.essi_lab.cfga.gs.setting.augmenter.worker.AugmenterWorkerSettingLoader;
-import eu.essi_lab.cfga.option.ValuesLoader;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.SettingUtils;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting.SchedulingGroup;

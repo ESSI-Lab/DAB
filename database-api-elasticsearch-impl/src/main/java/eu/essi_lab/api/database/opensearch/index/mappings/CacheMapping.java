@@ -1,4 +1,7 @@
-package eu.essi_lab.access.datacache;
+/**
+ * 
+ */
+package eu.essi_lab.api.database.opensearch.index.mappings;
 
 /*-
  * #%L
@@ -21,16 +24,41 @@ package eu.essi_lab.access.datacache;
  * #L%
  */
 
-import java.math.BigDecimal;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.Date;
+import org.opensearch.client.opensearch._types.mapping.FieldType;
 
-import eu.essi_lab.model.resource.data.CRS;
-import eu.essi_lab.model.resource.data.CRSUtils;
+import eu.essi_lab.api.database.Database;
 
-public class Shape {
+/**
+ * @author Fabrizio
+ */
+public class CacheMapping extends IndexMapping {
 
-   private Polygon4326 polygon;
-   private String id;
+    /**
+     * 
+     */
+    private static final String CACHE_INDEX = Database.CACHE_FOLDER + "-index";
+
+    /**
+     * 
+     */
+    public static final String CACHED_ENTRY = "cachedData";
+
+    /**
+     * @param index
+     */
+    protected CacheMapping() {
+
+	super(CACHE_INDEX);
+
+	addProperty(CACHED_ENTRY, FieldType.Binary.jsonValue());
+    }
+
+    /**
+     * @return
+     */
+    public static final CacheMapping get() {
+
+	return new CacheMapping();
+    }
 
 }

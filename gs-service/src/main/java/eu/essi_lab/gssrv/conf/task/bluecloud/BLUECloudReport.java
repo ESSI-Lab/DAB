@@ -105,37 +105,37 @@ public class BLUECloudReport extends MetadataReport {
 	}
 
 	@Override
-	public MetadataElement[] getCoreMetadataElements() {
-		return new MetadataElement[] { //
-				MetadataElement.IDENTIFIER, //
-				MetadataElement.TITLE, //
-				MetadataElement.KEYWORD, //
-				MetadataElement.KEYWORD_URI, //
-				MetadataElement.BOUNDING_BOX, //
-				MetadataElement.TEMPORAL_EXTENT, //
-				MetadataElement.PARAMETER, //
-				MetadataElement.PARAMETER_URI, //
-				MetadataElement.INSTRUMENT, //
-				MetadataElement.INSTRUMENT_URI, //
-				MetadataElement.PLATFORM, //
-				MetadataElement.PLATFORM_URI, //
-				MetadataElement.ORGANIZATION, //
-				MetadataElement.ORGANIZATION_URI, //
-				MetadataElement.ORGANIZATION_ROLE, //
-				MetadataElement.DATESTAMP, //
-				MetadataElement.REVISION_DATE, //
-				MetadataElement.RESOURCE_IDENTIFIER//
+	public BlueCloudMetadataElement[] getCoreMetadataElements() {
+		return new BlueCloudMetadataElement[] { //
+				BlueCloudMetadataElement.IDENTIFIER, //
+				BlueCloudMetadataElement.TITLE, //
+				BlueCloudMetadataElement.KEYWORD, //
+				BlueCloudMetadataElement.KEYWORD_URI, //
+				BlueCloudMetadataElement.BOUNDING_BOX, //
+				BlueCloudMetadataElement.TEMPORAL_EXTENT, //
+				BlueCloudMetadataElement.PARAMETER, //
+				BlueCloudMetadataElement.PARAMETER_URI, //
+				BlueCloudMetadataElement.INSTRUMENT, //
+				BlueCloudMetadataElement.INSTRUMENT_URI, //
+				BlueCloudMetadataElement.PLATFORM, //
+				BlueCloudMetadataElement.PLATFORM_URI, //
+				BlueCloudMetadataElement.ORGANIZATION, //
+				BlueCloudMetadataElement.ORGANIZATION_URI, //
+				BlueCloudMetadataElement.ORGANIZATION_ROLE, //
+				BlueCloudMetadataElement.DATESTAMP, //
+				BlueCloudMetadataElement.REVISION_DATE, //
+				BlueCloudMetadataElement.RESOURCE_IDENTIFIER//
 		};
 	}
 
 	@Override
-	public MetadataElement[] getOptionalMetadataElements() {
-		return new MetadataElement[] { //
-				MetadataElement.KEYWORD_TYPE, //
-				MetadataElement.CRUISE, //
-				MetadataElement.CRUISE_URI, //
-				MetadataElement.PROJECT, //
-				MetadataElement.PROJECT_URI, //
+	public BlueCloudMetadataElement[] getOptionalMetadataElements() {
+		return new BlueCloudMetadataElement[] { //
+				BlueCloudMetadataElement.KEYWORD_TYPE, //
+				BlueCloudMetadataElement.CRUISE, //
+				BlueCloudMetadataElement.CRUISE_URI, //
+				BlueCloudMetadataElement.PROJECT, //
+				BlueCloudMetadataElement.PROJECT_URI, //
 		};
 	}
 

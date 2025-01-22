@@ -26,7 +26,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -112,7 +111,6 @@ public class MarkLogicDatabase extends Database {
     private String dbIdentifier;
     private StorageInfo dbInfo;
     private boolean initialized;
-    private HashMap<String, MarkLogicSourceStorageWorker> workersMap;
     private RegisteredQueriesManager regQueriesManager;
     //
     // ---
@@ -150,11 +148,6 @@ public class MarkLogicDatabase extends Database {
     static {
 
 	System.setProperty("xcc.httpcompliant", "true");
-    }
-
-    public MarkLogicDatabase() {
-
-	workersMap = new HashMap<>();
     }
 
     @Override
@@ -357,12 +350,12 @@ public class MarkLogicDatabase extends Database {
 
 	    DatabaseFolder[] folders = getFolders();
 	    for (int i = 0; i < folders.length; i++) {
-		String sourceId = SourceStorageWorker.retrieveSourceName(dbIdentifier, folders[i].getCompleteName());
+		String sourceId = SourceStorageWorker.retrieveSourceName(dbIdentifier, folders[i].getName());
 
 		if (sourceId != null) {
 
 		    MarkLogicSourceStorageWorker worker = new MarkLogicSourceStorageWorker(sourceId, this);
-		    workersMap.put(sourceId, worker);
+		    getWorkersMap().put(sourceId, worker);
 		}
 	    }
 
@@ -728,23 +721,6 @@ public class MarkLogicDatabase extends Database {
 
     /**
      * @return
-     * @throws GSException
-     * @throws Exception
-     */
-    @Override
-    public SourceStorageWorker getWorker(String sourceId) throws GSException {
-
-	MarkLogicSourceStorageWorker worker = workersMap.get(sourceId);
-	if (worker == null) {
-	    worker = new MarkLogicSourceStorageWorker(sourceId, this);
-	    workersMap.put(sourceId, worker);
-	}
-
-	return worker;
-    }
-
-    /**
-     * @return
      */
 
     public ContentSource getContentSource() {
@@ -895,7 +871,7 @@ public class MarkLogicDatabase extends Database {
     }
 
     @Override
-    public DatabaseFolder[] getFolders() throws GSException {
+    public MarkLogicFolder[] getFolders() throws GSException {
 
 	ResultSequence ret = null;
 	try {
@@ -920,54 +896,12 @@ public class MarkLogicDatabase extends Database {
 	return out.toArray(new MarkLogicFolder[] {});
     }
 
-    @Override
-    public DatabaseFolder findWritingFolder(SourceStorageWorker worker) throws GSException {
+    public MarkLogicFolder[] getDataFolders() throws GSException {
 
-	DatabaseFolder folder = worker.getWritingFolder(Optional.empty());
-
-	if (folder == null) {
-
-	    if (worker.existsData1Folder() && worker.existsData2Folder()) {
-
-		throw GSException.createException(//
-			getClass(), //
-			"Both data-1 and data-2 folders exist", //
-			null, //
-			ErrorInfo.ERRORTYPE_INTERNAL, //
-			ErrorInfo.SEVERITY_ERROR, //
-			"MarkLogicBothDataFoldersExistError" //
-		);
-	    }
-
-	    if (worker.existsData1Folder()) {
-
-		return worker.getData1Folder();
-	    }
-
-	    if (worker.existsData2Folder()) {
-
-		return worker.getData2Folder();
-	    }
-
-	    throw GSException.createException(//
-		    getClass(), //
-		    "No data folder found", //
-		    null, //
-		    ErrorInfo.ERRORTYPE_INTERNAL, //
-		    ErrorInfo.SEVERITY_ERROR, //
-		    "MarkLogicNODataFoldersExistError" //
-	    );
-	}
-
-	return folder;
-    }
-
-    public DatabaseFolder[] getDataFolders() throws GSException {
-
-	DatabaseFolder[] folders = getFolders();
-	ArrayList<DatabaseFolder> out = new ArrayList<>();
+	MarkLogicFolder[] folders = getFolders();
+	ArrayList<MarkLogicFolder> out = new ArrayList<>();
 	for (int i = 0; i < folders.length; i++) {
-	    DatabaseFolder folder = folders[i];
+	    MarkLogicFolder folder = folders[i];
 	    String uri = folder.getURI();
 	    if (!uri.endsWith(SourceStorageWorker.META_PREFIX + "/")) {
 		out.add(folder);
@@ -976,12 +910,12 @@ public class MarkLogicDatabase extends Database {
 	return out.toArray(new MarkLogicFolder[] {});
     }
 
-    public DatabaseFolder[] getMetaFolders() throws GSException {
+    public MarkLogicFolder[] getMetaFolders() throws GSException {
 
-	DatabaseFolder[] folders = getFolders();
-	ArrayList<DatabaseFolder> out = new ArrayList<>();
+	MarkLogicFolder[] folders = getFolders();
+	ArrayList<MarkLogicFolder> out = new ArrayList<>();
 	for (int i = 0; i < folders.length; i++) {
-	    DatabaseFolder folder = folders[i];
+	    MarkLogicFolder folder = folders[i];
 	    String uri = folder.getURI();
 	    if (uri.endsWith(SourceStorageWorker.META_PREFIX + "/")) {
 		out.add(folder);
@@ -990,12 +924,12 @@ public class MarkLogicDatabase extends Database {
 	return out.toArray(new MarkLogicFolder[] {});
     }
 
-    public DatabaseFolder[] getProtectedFolders() throws GSException {
+    public MarkLogicFolder[] getProtectedFolders() throws GSException {
 
-	DatabaseFolder[] folders = getFolders();
-	ArrayList<DatabaseFolder> out = new ArrayList<>();
+	MarkLogicFolder[] folders = getFolders();
+	ArrayList<MarkLogicFolder> out = new ArrayList<>();
 	for (int i = 0; i < folders.length; i++) {
-	    DatabaseFolder folder = folders[i];
+	    MarkLogicFolder folder = folders[i];
 	    String uri = folder.getURI();
 	    if (getProtectedFoldersNames().stream().anyMatch(n -> uri.startsWith("/" + n))) {
 		out.add(folder);
@@ -1034,7 +968,7 @@ public class MarkLogicDatabase extends Database {
 
 	    folder.clear();
 
-	    String name = folder.getCompleteName();
+	    String name = folder.getName();
 	    removeFolder(name);
 	}
     }
@@ -1046,8 +980,8 @@ public class MarkLogicDatabase extends Database {
      */
     public void removeFolders() throws Exception {
 
-	DatabaseFolder[] folders = getFolders();
-	for (DatabaseFolder folder : folders) {
+	MarkLogicFolder[] folders = getFolders();
+	for (MarkLogicFolder folder : folders) {
 
 	    boolean noneMatch = getProtectedFoldersNames().//
 		    stream().//
@@ -1057,7 +991,7 @@ public class MarkLogicDatabase extends Database {
 
 		folder.clear();
 
-		String name = folder.getCompleteName();
+		String name = folder.getName();
 		removeFolder(name);
 	    }
 	}

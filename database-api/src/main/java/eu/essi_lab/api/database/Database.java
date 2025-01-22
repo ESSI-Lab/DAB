@@ -1,7 +1,10 @@
 package eu.essi_lab.api.database;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.marklogic.xcc.exceptions.RequestException;
 
@@ -29,6 +32,7 @@ import com.marklogic.xcc.exceptions.RequestException;
 import eu.essi_lab.cfga.Configurable;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.model.StorageInfo;
+import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 
 /**
@@ -92,6 +96,83 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
     }
 
     /**
+     * @author Fabrizio
+     */
+    public enum OpenSearchServiceType {
+
+	/**
+	 * es -> internally used to create the AwsSdk2Transport
+	 * osm -> (OpenSearch Managed) protocol used as database type in the {@link StorageInfo} and
+	 * in the GSService VM argument "configuration.url". E.g: osm://localhost/prod/prodConfig
+	 */
+	OPEN_SEARCH_MANAGED("es", "osm"),
+
+	/**
+	 * es -> internally used to create the AwsSdk2Transport
+	 * osm -> (OpenSearch Serverless) protocol used as database type in the {@link StorageInfo} and
+	 * in the GSService VM argument "configuration.url". E.g: oss://localhost/preprod/preprodConfig
+	 */
+	OPEN_SEARCH_SERVERLESS("aoss", "oss"),
+	/**
+	 * osl -> (OpenSearch Local) for test environment. E.g: osl://localhost/test/testConfig
+	 */
+	OPEN_SEARCH_LOCAL("osl", "osl");
+
+	private String protocol;
+	private String serviceName;
+
+	/**
+	 * @param serviceName
+	 * @param protocol
+	 */
+	private OpenSearchServiceType(String serviceName, String protocol) {
+
+	    this.serviceName = serviceName;
+	    this.protocol = protocol;
+	}
+
+	/**
+	 * @return
+	 */
+	public String getProtocol() {
+
+	    return protocol;
+	}
+
+	/**
+	 * @return
+	 */
+	public String getServiceName() {
+
+	    return serviceName;
+	}
+
+	/**
+	 * @param protocol
+	 * @return
+	 */
+	public static OpenSearchServiceType decode(String protocol) {
+
+	    return Arrays.asList(values()).//
+		    stream().//
+		    filter(v -> v.getProtocol().equals(protocol)).//
+		    findFirst().//
+		    orElseThrow();
+	}
+
+	/**
+	 * @return
+	 */
+	public static List<String> protocols() {
+
+	    return Arrays.asList(OpenSearchServiceType.values()).//
+		    stream().//
+		    map(p -> p.getProtocol()).//
+		    collect(Collectors.toList());
+	}
+    }
+
+    /**
      * 
      */
     public static final String USERS_FOLDER = "users";
@@ -103,6 +184,27 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
      * 
      */
     public static final String AUGMENTERS_FOLDER = "augmenters";
+    /*
+     * 
+     */
+    public static final String CONFIGURATION_FOLDER = "configuration";
+    /*
+     * 
+     */
+    public static final String CACHE_FOLDER = "cache";
+
+    /**
+     * 
+     */
+    private HashMap<String, SourceStorageWorker> workersMap;
+
+    /**
+     * 
+     */
+    public Database() {
+
+	workersMap = new HashMap<String, SourceStorageWorker>();
+    }
 
     /**
      * Initializes a data base instance with the given <code>storageInfo</code>
@@ -113,11 +215,20 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
     public abstract void initialize(StorageInfo storageInfo) throws GSException;
 
     /**
-     * @param sourceId
      * @return
      * @throws GSException
+     * @throws Exception
      */
-    public abstract SourceStorageWorker getWorker(String sourceId) throws GSException;
+    public SourceStorageWorker getWorker(String sourceId) throws GSException {
+
+	SourceStorageWorker worker = workersMap.get(sourceId);
+	if (worker == null) {
+	    worker = createSourceStorageWorker(sourceId);
+	    workersMap.put(sourceId, worker);
+	}
+
+	return worker;
+    }
 
     /**
      * @param folderName
@@ -167,7 +278,46 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
      * @throws GSException
      * @throws RequestException
      */
-    public abstract DatabaseFolder findWritingFolder(SourceStorageWorker worker) throws GSException;
+    public DatabaseFolder findWritingFolder(SourceStorageWorker worker) throws GSException {
+
+	DatabaseFolder folder = worker.getWritingFolder(Optional.empty());
+
+	if (folder == null) {
+
+	    if (worker.existsData1Folder() && worker.existsData2Folder()) {
+
+		throw GSException.createException(//
+			getClass(), //
+			"Both data-1 and data-2 folders exist", //
+			null, //
+			ErrorInfo.ERRORTYPE_INTERNAL, //
+			ErrorInfo.SEVERITY_ERROR, //
+			"DatabaseBothDataFoldersExistError" //
+		);
+	    }
+
+	    if (worker.existsData1Folder()) {
+
+		return worker.getData1Folder();
+	    }
+
+	    if (worker.existsData2Folder()) {
+
+		return worker.getData2Folder();
+	    }
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    "No data folder found", //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    "DatabaseNoDataFoldersExistError" //
+	    );
+	}
+
+	return folder;
+    }
 
     /**
      * @param type
@@ -223,6 +373,23 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
     public DatabaseFolder getAugmentersFolder() throws GSException {
 
 	return getProtectedFolder(AUGMENTERS_FOLDER, true);
+    }
+
+    /**
+     * @return the workersMap
+     */
+    protected HashMap<String, SourceStorageWorker> getWorkersMap() {
+
+	return workersMap;
+    }
+
+    /**
+     * @param sourceId
+     * @throws GSException
+     */
+    protected SourceStorageWorker createSourceStorageWorker(String sourceId) throws GSException {
+
+	return new SourceStorageWorker(sourceId, this);
     }
 
     /**

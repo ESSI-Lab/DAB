@@ -119,9 +119,8 @@ public class PolytopeMapper extends OriginalIdentifierMapper {
 	 * column9: stationid@hdr (Name of station)
 	 */
 
-	
 	dataset.getPropertyHandler().setIsTimeseries(true);
-	
+
 	String originalMetadata = originalMD.getMetadata();
 	Map<PolytopeVariable, PolytopeStation> mapStations = getMapStations(originalMetadata);
 
@@ -353,7 +352,6 @@ public class PolytopeMapper extends OriginalIdentifierMapper {
 	    coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(o);
 
 	    coreMetadata.getMIMetadata().getDistribution().getDistributionOnline().setIdentifier(resourceIdentifier);
-		
 
 	}
 
@@ -466,11 +464,8 @@ public class PolytopeMapper extends OriginalIdentifierMapper {
 
 	Optional<Date> startDateTime = null;
 
-	try {
-	    startDateTime = ISO8601DateTimeUtils.parseNotStandardToDate(date);
-	} catch (ParseException e) {
-	    GSLoggerFactory.getLogger(PolytopeMapper.class).error(e.getMessage());
-	}
+	startDateTime = ISO8601DateTimeUtils.parseNotStandardToDate(date);
+
 	if (startDateTime.isPresent()) {
 	    Date begin = startDateTime.get();
 	    if (time != null) {

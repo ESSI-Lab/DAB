@@ -145,6 +145,34 @@ public class GetViewIdentifiersRequest {
     }
 
     /**
+     * @param creator
+     * @return
+     */
+    public static GetViewIdentifiersRequest create(String creator) {
+
+	return new GetViewIdentifiersRequest(null, null, creator, null, null);
+    }
+    
+    /**
+     * @param viewVisibity
+     * @return
+     */
+    public static GetViewIdentifiersRequest create(ViewVisibility viewVisibity) {
+
+	return new GetViewIdentifiersRequest(null, null, null, null, viewVisibity);
+    }
+
+    /**
+     * @param creator
+     * @param owner
+     * @return
+     */
+    public static GetViewIdentifiersRequest create(String creator, String owner) {
+
+	return new GetViewIdentifiersRequest(null, null, creator, owner, null);
+    }
+
+    /**
      * @param start
      * @param count
      * @param creator
@@ -205,7 +233,7 @@ public class GetViewIdentifiersRequest {
     /**
      * @return
      */
-    public Optional<ViewVisibility> getViewVisibility() {
+    public Optional<ViewVisibility> getVisibility() {
 
 	return Optional.ofNullable(viewVisibility);
     }

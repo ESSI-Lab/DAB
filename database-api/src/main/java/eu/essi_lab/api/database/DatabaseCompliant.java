@@ -36,9 +36,9 @@ public interface DatabaseCompliant {
      * parameter.
      * <code>dbUri</code> parameter validation is not assumed to be implemented in this method
      * 
-     * @param dbUri
+     * @param info
      * @return <code>true</code> if this implementation supports the {@link Database} referenced by
      *         the parameter, <code>false</code> otherwise
      */
-    public boolean supports(StorageInfo dbUri);
+    public boolean supports(StorageInfo info);
 }
