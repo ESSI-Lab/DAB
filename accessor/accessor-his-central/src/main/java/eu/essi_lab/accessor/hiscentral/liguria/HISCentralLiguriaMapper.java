@@ -21,7 +21,6 @@ package eu.essi_lab.accessor.hiscentral.liguria;
  * #L%
  */
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
@@ -330,10 +329,10 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
 	coreMetadata.addDistributionFormat("WaterML 1.1");
 
 	String abstrakt = "";
-	
-	if(varName.contains("(")) {
+
+	if (varName.contains("(")) {
 	    String splittedVar = varName.split("\\(")[0];
-	    varName = splittedVar.substring(0, splittedVar.length()-1);
+	    varName = splittedVar.substring(0, splittedVar.length() - 1);
 	}
 
 	coreMetadata.getMIMetadata().getDataIdentification().setCitationTitle(stationName + " (" + stationCode + ") - " + varName);
@@ -429,7 +428,7 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
 	referenceSystem.setCode("EPSG:4326");
 	referenceSystem.setCodeSpace("EPSG");
 	coreMetadata.getMIMetadata().addReferenceSystemInfo(referenceSystem);
-	
+
 	coreMetadata.addBoundingBox(//
 		pointLat / div, //
 		pointLon / div, //
@@ -558,20 +557,13 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
 
 	String res = null;
 	Optional<Date> date;
-	try {
-	    date = ISO8601DateTimeUtils.parseNotStandard2ToDate(timePosition);
 
-	    if (date.isPresent()) {
-		res = ISO8601DateTimeUtils.getISO8601DateTime(date.get());
-	    }
-	    return res;
+	date = ISO8601DateTimeUtils.parseNotStandard2ToDate(timePosition);
 
-	} catch (ParseException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+	if (date.isPresent()) {
+	    res = ISO8601DateTimeUtils.getISO8601DateTime(date.get());
 	}
 	return res;
-
     }
 
 }

@@ -1,10 +1,6 @@
 package eu.essi_lab.api.database;
 
-import java.io.ByteArrayInputStream;
-
-import javax.xml.bind.Marshaller;
-
-import org.apache.commons.io.output.ByteArrayOutputStream;
+import java.io.InputStream;
 
 /*-
  * #%L
@@ -30,9 +26,11 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import eu.essi_lab.api.database.DatabaseFolder.EntryType;
+import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
+import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.bond.View;
-import eu.essi_lab.messages.bond.jaxb.ViewFactory;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.exceptions.ErrorInfo;
@@ -58,18 +56,18 @@ public abstract class DatabaseWriter implements DatabaseProvider {
 
 	GSSource source = resource.getSource();
 
-	Database markLogicDB = getDatabase();
+	Database database = getDatabase();
 
 	try {
 
-	    SourceStorageWorker worker = markLogicDB.getWorker(source.getUniqueIdentifier());
+	    SourceStorageWorker worker = database.getWorker(source.getUniqueIdentifier());
 
-	    DatabaseFolder folder = markLogicDB.findWritingFolder(worker);
+	    DatabaseFolder folder = database.findWritingFolder(worker);
 
 	    Document asDocument = resource.asDocument(true);
 
 	    String key = resource.getPrivateId();
-	    folder.store(key, asDocument);
+	    folder.store(key, FolderEntry.of(asDocument), EntryType.GS_RESOURCE);
 
 	} catch (Exception e) {
 
@@ -115,19 +113,19 @@ public abstract class DatabaseWriter implements DatabaseProvider {
 
 	GSSource source = resource.getSource();
 
-	Database markLogicDB = getDatabase();
+	Database database = getDatabase();
 
 	try {
 
-	    SourceStorageWorker worker = markLogicDB.getWorker(source.getUniqueIdentifier());
+	    SourceStorageWorker worker = database.getWorker(source.getUniqueIdentifier());
 
 	    Document asDocument = resource.asDocument(true);
 
 	    String key = resource.getPrivateId();
 
-	    DatabaseFolder folder = markLogicDB.findWritingFolder(worker);
+	    DatabaseFolder folder = database.findWritingFolder(worker);
 
-	    folder.replace(key, asDocument);
+	    folder.replace(key, FolderEntry.of(asDocument), EntryType.GS_RESOURCE);
 
 	} catch (Exception e) {
 
@@ -158,9 +156,9 @@ public abstract class DatabaseWriter implements DatabaseProvider {
 
 	    Document document = user.asDocument(true);
 
-	    folder.store(user.getUri(), document);
+	    folder.store(user.getUri(), FolderEntry.of(document), EntryType.USER);
 
-	    folder.replace(user.getUri(), document);
+	    folder.replace(user.getUri(), FolderEntry.of(document), EntryType.USER);
 
 	} catch (Exception e) {
 
@@ -219,19 +217,13 @@ public abstract class DatabaseWriter implements DatabaseProvider {
 
 	    DatabaseFolder folder = getDatabase().getViewFolder(true);
 
-	    ViewFactory factory = new ViewFactory();
+	    InputStream stream = view.toStream();
 
-	    Marshaller marshaller = factory.createMarshaller();
+	    ClonableInputStream clone = new ClonableInputStream(stream);
+	    	    
+	    folder.store(id, FolderEntry.of(clone.clone()), EntryType.VIEW);
 
-	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-	    marshaller.marshal(view, baos);
-
-	    byte[] bytes = baos.toByteArray();
-
-	    folder.storeBinary(id, new ByteArrayInputStream(bytes));
-
-	    folder.replaceBinary(id, new ByteArrayInputStream(bytes));
+	    folder.replace(id, FolderEntry.of(clone.clone()), EntryType.VIEW);
 
 	} catch (Exception e) {
 

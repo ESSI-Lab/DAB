@@ -224,7 +224,7 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	    String marsRequestExpver = marsRequest.optString("expver");
 	    String marsRequestClass = marsRequest.optString("class");
 	    String platformName = datasetInfo.optString("platform");
-	    
+
 	    boolean isMeteoTracker = platformName.toLowerCase().contains("meteotracker") ? true : false;
 
 	    String queryPath = "?class=" + marsRequestClass + "&date=" + marsRequestDate + "&expver=" + marsRequestExpver + "&stream="
@@ -332,7 +332,7 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword(variableLabel);
 	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword(variableKey);
 	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword(variableName);
-	    
+
 	    Keywords kwd = new Keywords();
 	    kwd.setTypeCode("platform");
 	    kwd.addKeyword(platformName);
@@ -569,12 +569,13 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 		linkage = PolytopeIonBeamMetadataConnector.BASE_URL + PolytopeIonBeamMetadataConnector.RETRIEVE_URL + url;
 	    } else {
 		linkage = PolytopeIonBeamMetadataConnector.BASE_URL + PolytopeIonBeamMetadataConnector.RETRIEVE_URL + queryPath;
-//		startDate = startDate.replace("Z", "+00:00");
-//		linkage = PolytopeIonBeamMetadataConnector.BASE_URL + "retrieve?project=public&platform=meteotracker&observation_variable="
-//			+ variableKey + "&datetime=" + URLEncoder.encode(startDate, "UTF-8")
-//			+ "&filter=select+*+from+result+where+source_id+%3D+%27" + stationId + "%27%3B&format=json";// +
-//														    // station.getName()
-//														    // +
+		// startDate = startDate.replace("Z", "+00:00");
+		// linkage = PolytopeIonBeamMetadataConnector.BASE_URL +
+		// "retrieve?project=public&platform=meteotracker&observation_variable="
+		// + variableKey + "&datetime=" + URLEncoder.encode(startDate, "UTF-8")
+		// + "&filter=select+*+from+result+where+source_id+%3D+%27" + stationId + "%27%3B&format=json";// +
+		// // station.getName()
+		// // +
 		// buildingURL;
 	    }
 
@@ -765,11 +766,8 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 
 	Optional<Date> startDateTime = null;
 
-	try {
-	    startDateTime = ISO8601DateTimeUtils.parseNotStandardToDate(date);
-	} catch (ParseException e) {
-	    GSLoggerFactory.getLogger(PolytopeIonBeamMetadataMapper.class).error(e.getMessage());
-	}
+	startDateTime = ISO8601DateTimeUtils.parseNotStandardToDate(date);
+
 	if (startDateTime.isPresent()) {
 	    Date begin = startDateTime.get();
 	    if (time != null) {

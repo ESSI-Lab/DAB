@@ -112,8 +112,8 @@ public class IdentifierDecorator {
 	    String originalId = incomingResource.getOriginalId().get();
 	    //
 	    // this method searches for resources with the provided original identifier
-	    // in the whole DB, included the temporary folders in order
-	    // to apply the isDuplicate check since
+	    // in the whole DB, included the temporary/writing folders in order
+	    // to apply the isDuplicate check 
 	    //
 	    List<GSResource> existingResources = getDatabaseReader().getResources(IdentifierType.ORIGINAL, originalId);
 

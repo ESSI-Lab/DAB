@@ -49,7 +49,6 @@ public abstract class SourceStorage implements DatabaseProvider, Configurable<So
      * 
      */
     public SourceStorage() {
-
     }
 
     /**

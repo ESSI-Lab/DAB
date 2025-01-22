@@ -101,49 +101,6 @@ public class MarkLogicWrapper {
     private JSONDocumentManager jsonDocumentManager;
 
     /**
-     * @param xdbc
-     * @return
-     */
-    public static StorageInfo fromXDBC(String xdbc) {
-
-	//
-	// xdbc://user:password@hostname:8000,8004/dbName/folder/
-	//
-
-	xdbc = xdbc.replace("xdbc://", "xdbc_");
-
-	// uri --> xdbc://hostname:8000,8004
-	String uri = "xdbc://" + xdbc.substring(xdbc.indexOf("@") + 1, xdbc.indexOf("/"));
-	String user = xdbc.substring(xdbc.indexOf("_") + 1, xdbc.indexOf(":"));
-	String password = xdbc.substring(xdbc.indexOf(":") + 1, xdbc.indexOf("@"));
-
-	xdbc = xdbc.substring(xdbc.indexOf("/") + 1); // dnName/defaultConf/
-	String dbName = xdbc.substring(0, xdbc.indexOf("/"));
-	String folder = xdbc.substring(xdbc.indexOf("/") + 1, xdbc.lastIndexOf("/"));
-
-	StorageInfo storageUri = new StorageInfo();
-	storageUri.setUri(uri);
-	storageUri.setUser(user);
-	storageUri.setPassword(password);
-	storageUri.setIdentifier(folder);
-	storageUri.setName(dbName);
-
-	return storageUri;
-    }
-
-    /**
-     * xdbc://user:password@hostname:8000,8004/dbName/folder/
-     * 
-     * @param uri
-     * @throws URISyntaxException
-     * @throws XccConfigException
-     */
-    public MarkLogicWrapper(String xdbc) throws URISyntaxException, XccConfigException {
-
-	this(fromXDBC(xdbc));
-    }
-
-    /**
      * @param uri
      * @throws URISyntaxException
      * @throws XccConfigException

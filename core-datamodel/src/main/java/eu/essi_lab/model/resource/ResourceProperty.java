@@ -1,5 +1,8 @@
 package eu.essi_lab.model.resource;
 
+import java.util.Arrays;
+import java.util.List;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -22,6 +25,7 @@ package eu.essi_lab.model.resource;
  */
 
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.index.IndexedMetadataElement;
@@ -63,7 +67,7 @@ public enum ResourceProperty implements Queryable {
      * 
      */
     IS_DELETED("isDeleted", ContentType.BOOLEAN),
-    
+
     /**
      * 
      */
@@ -97,7 +101,7 @@ public enum ResourceProperty implements Queryable {
     /**
      * 
      */
-    MEDATADATA_QUALITY("metadataQuality", ContentType.INTEGER),
+    METADATA_QUALITY("metadataQuality", ContentType.INTEGER),
 
     /**
      *  
@@ -168,7 +172,7 @@ public enum ResourceProperty implements Queryable {
      * IS TIMESERIES
      */
     IS_TIMESERIES("isTimeseries", ContentType.BOOLEAN),
-    
+
     /**
      * IS GRID
      */
@@ -272,4 +276,28 @@ public enum ResourceProperty implements Queryable {
 
 	return (ResourceProperty) Queryable.fromName(name, values());
     }
+
+    /**
+     * @param name
+     * @return
+     */
+    public static Optional<ResourceProperty> optFromName(String name) {
+
+	try {
+	    return Optional.of(fromName(name));
+
+	} catch (IllegalArgumentException ex) {
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @return
+     */
+    public static List<ResourceProperty> listValues() {
+
+	return Arrays.asList(values());
+    }
+
 }

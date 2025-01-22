@@ -37,28 +37,28 @@ import eu.essi_lab.lib.xml.XMLDocumentReader;
  */
 public class DocumentReport {
 
-	private HashMap<MetadataElement, List<String>> map = new HashMap<>();
+	private HashMap<BlueCloudMetadataElement, List<String>> map = new HashMap<>();
 	private XMLDocumentReader document;
 
 	public DocumentReport(XMLDocumentReader document) {
 		this.document = document;
 	}
 
-	public HashMap<MetadataElement, List<String>> getMap() {
+	public HashMap<BlueCloudMetadataElement, List<String>> getMap() {
 		return map;
 	}
 
-	public void addMetadata(MetadataElement element, List<String> values) {
+	public void addMetadata(BlueCloudMetadataElement element, List<String> values) {
 		map.put(element, values);
 	}
 
-	public void addMetadata(MetadataElement element, String value) {
+	public void addMetadata(BlueCloudMetadataElement element, String value) {
 		List<String> list = new ArrayList<>();
 		list.add(value);
 		map.put(element, list);
 	}
 
-	public void addValues(MetadataElement element) throws XPathExpressionException {
+	public void addValues(BlueCloudMetadataElement element) throws XPathExpressionException {
 
 		String[] paths = element.getPaths();
 		List<String> values = new ArrayList<String>();

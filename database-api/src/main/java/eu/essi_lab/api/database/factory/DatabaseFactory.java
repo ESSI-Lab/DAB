@@ -24,6 +24,7 @@ package eu.essi_lab.api.database.factory;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.stream.Collectors;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -59,54 +60,56 @@ public class DatabaseFactory {
      * Loads the available {@link Database}s using the {@link ServiceLoader} API and
      * selects the one suitable for the given <code>dbUri</code>
      *
-     * @param dbUri
+     * @param info
      * @return the suitable {@link Database} or <code>null</code> if none is found
      * @throws GSException if dbUri is <code>null</code> or dbUri.getUri is <code>null</code>
      */
-    public static Database get(StorageInfo dbUri) throws GSException {
+    public static Database get(StorageInfo info) throws GSException {
 
-	if (dbUri == null || dbUri.getUri() == null) {
+	if (info == null || info.getUri() == null) {
 
 	    throw GSException.createException(//
 		    DatabaseFactory.class, //
-		    "Missing provider uri", //
+		    "Missing provider info", //
 		    null, //
 		    null, //
 		    ErrorInfo.ERRORTYPE_CLIENT, //
 		    ErrorInfo.SEVERITY_ERROR, //
-		    "DatabaseFactoryMissingUriError", //
+		    "DatabaseFactoryMissingInfoError", //
 		    null);
 	}
 
 	synchronized (PROVIDER_LOCK) {
 
-	    if (PROVIDERS_MAP.containsKey(dbUri)) {
+	    if (PROVIDERS_MAP.containsKey(info)) {
 
-		return PROVIDERS_MAP.get(dbUri);
+		return PROVIDERS_MAP.get(info);
 	    }
 
 	    for (Database database : ServiceLoader.load(Database.class)) {
 
-		if (database.supports(dbUri)) {
+		if (database.supports(info)) {
 
-		    GSLoggerFactory.getLogger(DatabaseProviderFactory.class).debug("Initialization of database provider for uri {} STARTED",
-			    dbUri.getUri());
+		    GSLoggerFactory.getLogger(DatabaseProviderFactory.class)
+			    .debug("Initialization of database provider for info {} STARTED", info.getUri());
 
-		    database.initialize(dbUri);
+		    database.initialize(info);
 
-		    PROVIDERS_MAP.put(dbUri, database);
+		    PROVIDERS_MAP.put(info, database);
 
-		    GSLoggerFactory.getLogger(DatabaseProviderFactory.class).debug("Initialization of database provider for uri {} ENDED",
-			    dbUri.getUri());
+		    GSLoggerFactory.getLogger(DatabaseProviderFactory.class).debug("Initialization of database provider for info {} ENDED",
+			    info.getUri());
 
-		    GSLoggerFactory.getLogger(DatabaseFactory.class).trace("Providers map keys: [" + PROVIDERS_MAP.keySet() + "]");
+		    GSLoggerFactory.getLogger(DatabaseFactory.class).trace("Providers:\n\n{}",
+
+			    PROVIDERS_MAP.keySet().stream().map(i -> i.toString()).collect(Collectors.joining(",\n\n")));
 
 		    return database;
 		}
 	    }
 
 	    throw GSException.createException(DatabaseProviderFactory.class, //
-		    "Suitable provider not found: " + dbUri, //
+		    "Suitable provider not found: " + info, //
 		    null, //
 		    ErrorInfo.ERRORTYPE_INTERNAL, //
 		    ErrorInfo.SEVERITY_FATAL, //

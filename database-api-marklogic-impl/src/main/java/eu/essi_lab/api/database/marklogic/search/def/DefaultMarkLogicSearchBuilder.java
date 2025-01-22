@@ -342,7 +342,7 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 
 	    return buildCTSLogicQuery(CTSLogicOperator.OR, operands.toArray(new String[] {}));
 
-	case MEDATADATA_QUALITY:
+	case METADATA_QUALITY:
 	case ESSENTIAL_VARS_QUALITY:
 	case ACCESS_QUALITY:
 	case DOWNLOAD_TIME:

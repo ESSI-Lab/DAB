@@ -13,6 +13,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import eu.essi_lab.lib.xml.XMLNodeReader;
 import eu.essi_lab.model.GSProperty;
 
 public class GSUserTest extends GSAuthorizationEntityTest {
@@ -52,12 +53,28 @@ public class GSUserTest extends GSAuthorizationEntityTest {
 	GSProperty<String> attribute2 = new GSProperty<>("pippo", "ciccio");
 
 	user.setAttributes(Arrays.asList(attribute1, attribute2));
+	
+	//
+	//
+	//
 
 	InputStream asStream = user.asStream();
 
 	GSUser unmarhalledUser = GSUser.create(asStream);
 
 	Assert.assertEquals(user, unmarhalledUser);
+	
+	//
+	//
+	//
+	
+	
+	System.out.println(XMLNodeReader.asString(user.asDocument(true)));
+
+	GSUser gsUser3 = GSUser.create(user.asDocument(true));
+	
+	Assert.assertEquals(user, gsUser3);
+
     }
 
     @Test

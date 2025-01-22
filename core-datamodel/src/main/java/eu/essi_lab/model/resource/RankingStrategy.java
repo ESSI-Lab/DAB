@@ -258,7 +258,7 @@ public class RankingStrategy implements Serializable {
 	    return isGDCWeight;
 	}
 
-	if (property.equals(ResourceProperty.MEDATADATA_QUALITY.getName())) {
+	if (property.equals(ResourceProperty.METADATA_QUALITY.getName())) {
 	    return mdqWeight;
 	}
 

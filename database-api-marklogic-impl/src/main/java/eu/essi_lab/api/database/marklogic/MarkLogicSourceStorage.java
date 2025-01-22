@@ -32,7 +32,6 @@ import eu.essi_lab.model.StorageInfo;
 public class MarkLogicSourceStorage extends SourceStorage {
 
     private MarkLogicDatabase markLogicDB;
-    private StorageInfo dbUri;
 
     /**
      * 
@@ -61,11 +60,10 @@ public class MarkLogicSourceStorage extends SourceStorage {
     }
 
     @Override
-    public boolean supports(StorageInfo dbUri) {
+    public boolean supports(StorageInfo info) {
 
-	if (MarkLogicDatabase.isSupported(dbUri)) {
+	if (MarkLogicDatabase.isSupported(info)) {
 
-	    this.dbUri = dbUri;
 	    return true;
 	}
 
