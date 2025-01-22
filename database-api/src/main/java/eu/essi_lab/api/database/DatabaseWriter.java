@@ -28,6 +28,7 @@ import org.w3c.dom.Node;
 
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
+import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.model.GSSource;
@@ -218,9 +219,11 @@ public abstract class DatabaseWriter implements DatabaseProvider {
 
 	    InputStream stream = view.toStream();
 
-	    folder.store(id, FolderEntry.of(stream), EntryType.VIEW);
+	    ClonableInputStream clone = new ClonableInputStream(stream);
+	    	    
+	    folder.store(id, FolderEntry.of(clone.clone()), EntryType.VIEW);
 
-	    folder.replace(id, FolderEntry.of(stream), EntryType.VIEW);
+	    folder.replace(id, FolderEntry.of(clone.clone()), EntryType.VIEW);
 
 	} catch (Exception e) {
 
