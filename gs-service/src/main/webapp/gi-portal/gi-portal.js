@@ -432,25 +432,34 @@ export function initializePortal(config) {
 		//
 
 
-var advancedConstraints = [];
-if (config.instrumentSearch!==undefined&&config.instrumentSearch){
-	advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'instrumentTitle'));
-}
-if (config.attributeSearch!==undefined&&config.attributeSearch){
-	advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'attributeTitle'));
-}
-if (config.platformSearch!==undefined&&config.platformSearch){
-	advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'platformTitle',
-					{ id: 'platformNameConstraint', helpIconImage: 'fa-wifi' }));
-}
-if (config.validatedSearch!==undefined&&config.validatedSearch){
-	advancedConstraints.push(GIAPI.search.constWidget.booleanConstraint('get', 'isValidated'));
-}
+		var advancedConstraints = [];
+		if (config.instrumentSearch !== undefined && config.instrumentSearch) {
+			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'instrumentTitle'));
+		}
+		if (config.attributeSearch !== undefined && config.attributeSearch) {
+			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'attributeTitle'));
+		}
+		if (config.platformSearch !== undefined && config.platformSearch) {
+			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'platformTitle',
+				{ id: 'platformNameConstraint', helpIconImage: 'fa-wifi' }));
+		}
+		if (config.validatedSearch !== undefined && config.validatedSearch) {
+			advancedConstraints.push(GIAPI.search.constWidget.booleanConstraint('get', 'isValidated'));
+		}
 
-if (config.riverSearch!==undefined&&config.riverSearch){
-	advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'riverName',{helpIconImage: 'fa-water' }));
-}
-  
+		if (config.riverSearch !== undefined && config.riverSearch) {
+			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'riverName', { helpIconImage: 'fa-tint' }));
+		}
+
+		var semanticValue = 0;
+		if (config.semanticSearchValue!==undefined){
+			semanticValue = config.semanticSearchValue;
+		}
+
+		if (config.semanticSearch !== undefined && config.semanticSearch) {
+			advancedConstraints.push(GIAPI.search.constWidget.booleanConstraint('get', 'semantics', {value:semanticValue, helpIconImage: 'fa-comments' }));
+		}
+
 
 		GIAPI.search.constWidget.advancedSearch(
 			'advConstDiv',
@@ -577,11 +586,14 @@ if (config.riverSearch!==undefined&&config.riverSearch){
 
 		constraints.spatialOp = options.spatialRelation;
 
+		constraints.ontology = config.ontology;
 
 		GIAPI.search.resultsMapWidget.updateWMSClusterLayers(constraints);
 
 		// set the termFrequency option
 		options.termFrequency = 'source,keyword,format,protocol';
+
+		
 
 		if (config.filters !== undefined) {
 			options.termFrequency = config.filters;
