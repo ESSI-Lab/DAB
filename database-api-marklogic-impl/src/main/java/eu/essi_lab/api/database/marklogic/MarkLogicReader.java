@@ -155,8 +155,18 @@ public class MarkLogicReader implements DatabaseReader {
 
 	    switch (identifierType) {
 	    case PRIVATE:
-		bond = BondFactory.createPrivateIdentifierBond(identifier);
-		break;
+		//
+		// privateId is not indexed in prod env
+		//
+		DatabaseFolder[] folders = markLogicDB.getDataFolders();
+		for (DatabaseFolder folder : folders) {
+
+		    Node node = folder.get(identifier);
+		    if (Objects.nonNull(node)) {
+			return Arrays.asList(GSResource.create(node));
+		    }
+		}
+		return out;
 	    case ORIGINAL:
 		bond = BondFactory.createOriginalIdentifierBond(identifier);
 		break;
