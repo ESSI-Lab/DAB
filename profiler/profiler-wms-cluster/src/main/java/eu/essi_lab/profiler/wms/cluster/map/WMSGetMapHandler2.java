@@ -235,8 +235,8 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 				tmpBboxMinX = minx.doubleValue() + j * bboxWidth;
 				double tmpBboxMaxX = tmpBboxMinX + bboxWidth;
 				double tmpBboxMaxY = tmpBboxMinY + bboxHeight;
-				System.out.println("Original bbox: minx " + tmpBboxMinX + " miny " + tmpBboxMinY + " maxx " + tmpBboxMaxX
-					+ " maxy " + tmpBboxMaxY);
+//				System.out.println("Original bbox: minx " + tmpBboxMinX + " miny " + tmpBboxMinY + " maxx " + tmpBboxMaxX
+//					+ " maxy " + tmpBboxMaxY);
 				if (outputCRS.contains("3857")) {
 				    SimpleEntry<Double, Double> lower = new SimpleEntry<>(tmpBboxMinX, tmpBboxMinY);
 				    SimpleEntry<Double, Double> upper = new SimpleEntry<>(tmpBboxMaxX, tmpBboxMaxY);
@@ -265,7 +265,7 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 				}
 				SpatialExtent tmp = new SpatialExtent(tmpBboxMinY, tmpBboxMinX, tmpBboxMaxY, tmpBboxMaxX);
 				request.addExtent(tmp);
-				System.out.println("Created request with bbox " + tmp);
+//				System.out.println("Created request with bbox " + tmp);
 
 			    }
 			}
@@ -777,6 +777,15 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 		    BondOperator.EQUAL, //
 		    MetadataElement.PLATFORM_TITLE, //
 		    platformTitle.get()));
+	}
+	
+	Optional<String> observedPropertyURI = parser.getOptionalValue("observedPropertyURI");
+	if (observedPropertyURI.isPresent() && !observedPropertyURI.get().equals(KeyValueParser.UNDEFINED)) {
+
+	    andBond.getOperands().add(BondFactory.createSimpleValueBond(//
+		    BondOperator.EQUAL, //
+		    MetadataElement.OBSERVED_PROPERTY_URI, //
+		    observedPropertyURI.get()));
 	}
 
 	Optional<String> isValidated = parser.getOptionalValue("isValidated");
