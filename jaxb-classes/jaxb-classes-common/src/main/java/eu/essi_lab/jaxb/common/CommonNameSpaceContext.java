@@ -153,7 +153,9 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
     public static final String WMS_1_3_0_QWeMS_NS_URI = "urn:ogc:serviceType:WebMapService:QWeMS:1.3.0";
     public static final String POLYTOPE = "http://essi-lab.eu/Polytope";
     public static final String POLYTOPE_METEOTRACKER = "http://essi-lab.eu/Polytope/Meteotracker";
+    
     public static final String POLYTOPE_IONBEAM = "http://essi-lab.eu/Polytope/IonBeam";
+    public static final String POLYTOPE_IONBEAM_TRACKER = "http://essi-lab.eu/IonBeam/Tracker";
 
     public static final String DWS_URI = "urn:essi:serviceType:DWS";
 

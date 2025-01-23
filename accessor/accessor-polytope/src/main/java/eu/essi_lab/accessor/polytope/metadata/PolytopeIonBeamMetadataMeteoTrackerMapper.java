@@ -21,8 +21,10 @@ package eu.essi_lab.accessor.polytope.metadata;
  * #L%
  */
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -30,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
 
@@ -359,91 +362,72 @@ public class PolytopeIonBeamMetadataMeteoTrackerMapper extends PolytopeIonBeamMe
 
     }
 
+    protected Map<PolytopeIonBeamMetadataMeteoTrackerVariable, PolytopeIonBeamMetadataStation> getMapStations(String originalMetadata) {
+
+	Map<PolytopeIonBeamMetadataMeteoTrackerVariable, PolytopeIonBeamMetadataStation> mapStations = new HashMap<>();
+	try {
+	    // delimiter seems to be ; by default
+	    Reader in = new StringReader(originalMetadata);
+	    String d = ";";
+	    char delimiter = d.charAt(0);
+	    Iterable<CSVRecord> records = CSVFormat.RFC4180.withDelimiter(delimiter).withFirstRecordAsHeader().parse(in);
+	    mapStations = readCSV(records);
+
+	} catch (Exception e) {
+	    // TODO: handle exception
+	    logger.error(e.getMessage());
+	    Reader reader = new StringReader(originalMetadata);
+	    Iterable<CSVRecord> records = null;
+	    try {
+		records = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(reader);
+	    } catch (IOException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	    }
+
+	    mapStations = readCSV(records);
+
+	}
+
+	return mapStations;
+    }
+
     protected Map<PolytopeIonBeamMetadataMeteoTrackerVariable, PolytopeIonBeamMetadataStation> readCSV(Iterable<CSVRecord> records) {
 
 	Map<PolytopeIonBeamMetadataMeteoTrackerVariable, PolytopeIonBeamMetadataStation> mapStations = new HashMap<>();
-	Double minLon = null;
-	Double minLat = null;
-	Double maxLon = null;
-	Double maxLat = null;
-	Double minAlt = null;
-	Double maxAlt = null;
-	String updatedDateTime = null;
-	List<List<Double>> multiPoints = new ArrayList<List<Double>>();
+
 	for (CSVRecord record : records) {
+
 	    String stationName = record.get("stationid@hdr");
 	    String lat = record.get("lat@hdr");
 	    String lon = record.get("lon@hdr");
 	    String date = record.get("andate@desc");
 	    String time = record.get("antime@desc");
-	    String varName = record.get("varno@body");
-	    String timeDelay = record.get("min@body");
-	    String alt = record.get("stalt@hdr");
 	    String dateTime = buildDate(date, time);
-	    Double latDouble = Double.valueOf(lat);
-	    Double lonDouble = Double.valueOf(lon);
-	    Double altDouble = Double.valueOf(alt);
-
-	    List<Double> lat_lon_alt = new ArrayList<>();
-	    lat_lon_alt.add(latDouble);
-	    lat_lon_alt.add(lonDouble);
-	    lat_lon_alt.add(altDouble);
-	    multiPoints.add(lat_lon_alt);
+	    String varName = record.get("varno@body");
+	    String alt = record.get("stalt@hdr");
 	    PolytopeIonBeamMetadataMeteoTrackerVariable pv = PolytopeIonBeamMetadataMeteoTrackerVariable.decode(varName);
 
 	    if (mapStations.isEmpty()) {
-		minLat = latDouble;
-		minLon = lonDouble;
-		maxLat = latDouble;
-		maxLon = lonDouble;
-		minAlt = altDouble;
-		maxAlt = altDouble;
 		PolytopeIonBeamMetadataStation station = new PolytopeIonBeamMetadataStation();
 		station.setName(stationName);
 		station.setStationCode(stationName);
-		station.setMultiPoint(multiPoints);
 		station.setMinLat(lat);
 		station.setMaxLat(lat);
 		station.setMinLon(lon);
 		station.setMaxLon(lon);
-		updatedDateTime = updateDateTime(dateTime, timeDelay.trim());
-		station.setStartDateTime(updatedDateTime);
-		station.setEndDateTime(updatedDateTime);
+		station.setStartDateTime(dateTime);
+		station.setEndDateTime(dateTime);
 		station.setMinElevation(alt);
 		station.setMaxElevation(alt);
+
 		mapStations.put(pv, station);
 
 	    } else {
 		PolytopeIonBeamMetadataStation polStation = mapStations.get(pv);
 		if (polStation != null) {
 		    // already saved -- update it
-		    updatedDateTime = updateDateTime(dateTime, timeDelay.trim());
-		    polStation.setEndDateTime(updatedDateTime);
-		    polStation.setMultiPoint(multiPoints);
-		    if (minLat != null && minLat > latDouble) {
-			minLat = latDouble;
-			polStation.setMinLat(lat);
-		    }
-		    if (minLon != null && minLon > lonDouble) {
-			minLon = lonDouble;
-			polStation.setMinLon(lon);
-		    }
-		    if (maxLat != null && maxLat < latDouble) {
-			maxLat = latDouble;
-			polStation.setMaxLat(lat);
-		    }
-		    if (maxLon != null && maxLon < lonDouble) {
-			maxLon = lonDouble;
-			polStation.setMaxLon(lon);
-		    }
-		    if (minAlt != null && minAlt > altDouble) {
-			minAlt = altDouble;
-			polStation.setMinElevation(alt);
-		    }
-		    if (maxAlt != null && maxAlt < altDouble) {
-			maxAlt = altDouble;
-			polStation.setMaxElevation(alt);
-		    }
+		    polStation.setEndDateTime(dateTime);
 
 		} else {
 		    // this should never happen
@@ -452,8 +436,8 @@ public class PolytopeIonBeamMetadataMeteoTrackerMapper extends PolytopeIonBeamMe
 		    polStation.setName(stationName);
 		    polStation.setStationCode(stationName);
 		    polStation.setMinLat(lat);
-		    polStation.setMaxLat(lat);
 		    polStation.setMinLon(lon);
+		    polStation.setMaxLat(lat);
 		    polStation.setMaxLon(lon);
 		    polStation.setStartDateTime(dateTime);
 		    polStation.setEndDateTime(dateTime);
@@ -473,7 +457,7 @@ public class PolytopeIonBeamMetadataMeteoTrackerMapper extends PolytopeIonBeamMe
 	Date newDate = null;
 	if (d.isPresent()) {
 	    BigDecimal minutes = new BigDecimal(delay);
-	    newDate = updateDateTime(d.get(), minutes);	    
+	    newDate = updateDateTime(d.get(), minutes);
 	}
 	return (newDate == null) ? updatedDateTime : ISO8601DateTimeUtils.getISO8601DateTime(newDate);
     }
