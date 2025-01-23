@@ -107,7 +107,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 	    return null;
 	}
 
-	return IndexData.toDocument(IndexData.toStream(source.get()));
+	return IndexData.toNode(IndexData.toStream(source.get()));
     }
 
     @Override

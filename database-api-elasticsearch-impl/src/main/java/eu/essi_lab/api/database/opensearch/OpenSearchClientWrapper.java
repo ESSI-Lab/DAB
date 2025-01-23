@@ -30,7 +30,9 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.json.JSONObject;
@@ -61,12 +63,15 @@ import org.opensearch.client.opensearch.core.search.SourceFilter;
 import org.opensearch.client.opensearch.generic.OpenSearchGenericClient;
 import org.opensearch.client.opensearch.generic.Requests;
 import org.opensearch.client.opensearch.generic.Response;
+import org.w3c.dom.Node;
 
 import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.FolderRegistryMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.messages.PerformanceLogger;
 import eu.essi_lab.messages.bond.View.ViewVisibility;
 import jakarta.json.stream.JsonGenerator;
 
@@ -91,11 +96,16 @@ public class OpenSearchClientWrapper {
      */
     public static List<InputStream> toBinaryList(SearchResponse<Object> searchResponse) {
 
+	PerformanceLogger pl = new PerformanceLogger(//
+		PerformanceLogger.PerformancePhase.OPENSEARCH_WRAPPER_TO_BINARY_LIST, //
+		UUID.randomUUID().toString(), //
+		Optional.empty());
+
 	HitsMetadata<Object> hits = searchResponse.hits();
 
 	List<Hit<Object>> hitsList = hits.hits();
 
-	return hitsList.stream().//
+	List<InputStream> list = hitsList.stream().//
 
 		map(hit -> {
 
@@ -106,6 +116,63 @@ public class OpenSearchClientWrapper {
 		}).//
 
 		collect(Collectors.toList());
+
+	pl.logPerformance(GSLoggerFactory.getLogger(OpenSearchClientWrapper.class));
+
+	return list;
+    }
+
+    /**
+     * @param searchResponse
+     * @return
+     */
+    public static List<String> toStringList(SearchResponse<Object> searchResponse) {
+
+	PerformanceLogger pl = new PerformanceLogger(//
+		PerformanceLogger.PerformancePhase.OPENSEARCH_WRAPPER_TO_STRING_LIST, //
+		UUID.randomUUID().toString(), //
+		Optional.empty());
+
+	HitsMetadata<Object> hits = searchResponse.hits();
+
+	List<Hit<Object>> hitsList = hits.hits();
+
+	List<String> list = hitsList.stream().//
+
+		map(hit -> {
+
+		    SourceWrapper wrapper = new SourceWrapper(IndexData.toJSONObject(hit.source()));
+		    String binaryValue = wrapper.getBinaryValue();
+
+		    return IndexData.decodeToString(binaryValue);
+		}).//
+
+		collect(Collectors.toList());
+
+	pl.logPerformance(GSLoggerFactory.getLogger(OpenSearchClientWrapper.class));
+
+	return list;
+    }
+
+    /**
+     * @param searchResponse
+     * @return
+     */
+    public static List<Node> toNodeList(SearchResponse<Object> searchResponse) {
+
+	PerformanceLogger pl = new PerformanceLogger(//
+		PerformanceLogger.PerformancePhase.OPENSEARCH_WRAPPER_TO_NODE_LIST, //
+		UUID.randomUUID().toString(), //
+		Optional.empty());
+
+	List<Node> list = toBinaryList(searchResponse).//
+		stream().map(stream -> IndexData.toNodeOrNull(stream)).//
+		filter(Objects::nonNull).//
+		collect(Collectors.toList());
+
+	pl.logPerformance(GSLoggerFactory.getLogger(OpenSearchClientWrapper.class));
+
+	return list;
     }
 
     /**
@@ -197,7 +264,12 @@ public class OpenSearchClientWrapper {
      */
     public SearchResponse<Object> search(Query searchQuery, int start, int size) throws Exception {
 
-	return client.search(builder -> {
+	PerformanceLogger pl = new PerformanceLogger(//
+		PerformanceLogger.PerformancePhase.OPENSEARCH_WRAPPER_SEARCH, //
+		UUID.randomUUID().toString(), //
+		Optional.empty());
+
+	SearchResponse<Object> response = client.search(builder -> {
 
 	    builder.query(searchQuery).//
 		    from(start).//
@@ -206,6 +278,10 @@ public class OpenSearchClientWrapper {
 	    return builder;
 
 	}, Object.class);
+
+	pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
+
+	return response;
     }
 
     /**
