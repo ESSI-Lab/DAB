@@ -56,13 +56,13 @@ import eu.essi_lab.model.resource.ResourceProperty;
 public class OpenSearchReader implements DatabaseReader {
 
     private OpenSearchDatabase database;
-    private OpenSearchClientWrapper wrapper;
+    private OpenSearchWrapper wrapper;
 
     @Override
     public void setDatabase(Database database) {
 
 	this.database = (OpenSearchDatabase) database;
-	this.wrapper = new OpenSearchClientWrapper(this.database.getClient());
+	this.wrapper = new OpenSearchWrapper(this.database.getClient());
     }
 
     @Override

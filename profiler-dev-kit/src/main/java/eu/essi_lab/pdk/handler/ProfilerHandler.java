@@ -245,7 +245,7 @@ public abstract class ProfilerHandler//
 	}
 
 	logger.info("[3/5] Result set retrieving STARTED");
-	pl = new PerformanceLogger(PerformanceLogger.PerformancePhase.RESULT_SET_RETRIEVING, rid, owr);
+	pl = new PerformanceLogger(PerformanceLogger.PerformancePhase.RESULT_SET_OVERALL_RETRIEVING, rid, owr);
 
 	executorResponse = getExecutor().retrieve(message);
 
@@ -340,7 +340,7 @@ public abstract class ProfilerHandler//
 		    + (maxIterations == -1 ? "X" : maxIterations) + "] STARTED");
 
 	    logger.info("[" + message.getRequestId() + "] [3/5] Result set retrieving STARTED");
-	    PerformanceLogger pl = new PerformanceLogger(PerformanceLogger.PerformancePhase.RESULT_SET_RETRIEVING, rid, owr);
+	    PerformanceLogger pl = new PerformanceLogger(PerformanceLogger.PerformancePhase.RESULT_SET_OVERALL_RETRIEVING, rid, owr);
 
 	    executorResponse = getExecutor().retrieve(message);
 

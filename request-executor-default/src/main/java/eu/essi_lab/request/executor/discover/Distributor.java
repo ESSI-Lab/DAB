@@ -24,6 +24,7 @@ package eu.essi_lab.request.executor.discover;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -36,6 +37,7 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.TaskListExecutor;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
+import eu.essi_lab.messages.PerformanceLogger;
 import eu.essi_lab.messages.ReducedDiscoveryMessage;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.bond.Bond;
@@ -246,7 +248,7 @@ public class Distributor implements IDistributor {
     }
 
     private int getTimeout(DiscoveryMessage message) {
-	Integer timeout = message.getRequestTimeout();
+	Integer timeout = 1000000; //message.getRequestTimeout();
 	if (timeout == null) {
 	    timeout = DEFAULT_EXECUTION_TIMEOUT;
 	    // String msg = "Timeout not specified in message. Using default of: " + timeout + "s";
@@ -284,7 +286,23 @@ public class Distributor implements IDistributor {
      */
     public <T> ResultSet<T> retrieve(DiscoveryMessage message, Class<T> clazz) throws GSException {
 
+	PerformanceLogger pl = new PerformanceLogger(//
+		PerformanceLogger.PerformancePhase.RESULT_SET_COUNTING, //
+		message.getRequestId(), //
+		Optional.ofNullable(message.getWebRequest()));
+
 	CountSet countSet = count(message);
+
+	pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
+
+	//
+	//
+	//
+
+	pl = new PerformanceLogger(//
+		PerformanceLogger.PerformancePhase.RESULT_SET_RETRIEVING, //
+		message.getRequestId(), //
+		Optional.ofNullable(message.getWebRequest()));
 
 	int size = queryExecutors.size();
 	log.debug("Retrieving results from {} executors", size);
@@ -421,6 +439,8 @@ public class Distributor implements IDistributor {
 
 	List<Future<ResultSet<T>>> futures = taskList.executeAndWait(timeout);
 
+	pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
+
 	// GSLoggerFactory.getLogger(getClass()).info("Retrieving tasks ENDED futures: {}", futures.size());
 
 	// restores the original page because the data base modifies the page of the message
@@ -536,10 +556,9 @@ public class Distributor implements IDistributor {
      */
     private void addError(GSException ex, int executor, String errorCode, String message) {
 
-	ex.getErrorInfoList()
-		.add(createErrorInfo(//
-			errorCode, //
-			message + queryExecutors.get(executor).getSourceIdentifier()));
+	ex.getErrorInfoList().add(createErrorInfo(//
+		errorCode, //
+		message + queryExecutors.get(executor).getSourceIdentifier()));
 
     }
 }

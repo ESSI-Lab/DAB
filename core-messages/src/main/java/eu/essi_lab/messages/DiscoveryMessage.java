@@ -317,6 +317,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     /**
      * @param enabled
      */
+    @Deprecated
     public void setQueryRegistrationEnabled(boolean enabled) {
 
 	getHeader().add(new GSProperty<Boolean>(QUERY_REGISTRATION, enabled));
@@ -325,6 +326,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     /**
      * @return
      */
+    @Deprecated
     public boolean isQueryRegistrationEnabled() {
 
 	return getHeader().get(QUERY_REGISTRATION, Boolean.class);

@@ -13,10 +13,10 @@ import org.junit.Test;
 
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
+import eu.essi_lab.api.database.opensearch.ConversionUtils;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.datafolder.test.TestUtils;
-import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
@@ -93,7 +93,7 @@ public class OpenSearchMetaFolder_harvestingPropertiesTest extends OpenSearchTes
 	//
 
 	String binaryData = wrapper.getHarvestingProperties().get();
-	InputStream stream = IndexData.decode(binaryData);
+	InputStream stream = ConversionUtils.decode(binaryData);
 	HarvestingProperties fromStream = HarvestingProperties.fromStream(stream);
 
 	Assert.assertEquals(properties, fromStream);
@@ -105,7 +105,7 @@ public class OpenSearchMetaFolder_harvestingPropertiesTest extends OpenSearchTes
 	// are always equals
 	//
 	// Assert.assertEquals(//
-	// IndexData.encode(FolderEntry.of(properties.asStream())), //
+	// ConversionUtils.encode(FolderEntry.of(properties.asStream())), //
 	// wrapper.getHarvestingProperties().get() //
 	// );
     }

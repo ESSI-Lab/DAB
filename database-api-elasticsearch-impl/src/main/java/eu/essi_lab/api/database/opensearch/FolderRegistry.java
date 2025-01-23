@@ -39,7 +39,7 @@ import eu.essi_lab.api.database.opensearch.index.mappings.FolderRegistryMapping;
  */
 public class FolderRegistry {
 
-    private OpenSearchClientWrapper wrapper;
+    private OpenSearchWrapper wrapper;
     private OpenSearchDatabase database;
 
     /**
@@ -57,7 +57,7 @@ public class FolderRegistry {
     private FolderRegistry(OpenSearchDatabase database) {
 
 	this.database = database;
-	this.wrapper = new OpenSearchClientWrapper(database.getClient());
+	this.wrapper = new OpenSearchWrapper(database.getClient());
     }
 
     /**
