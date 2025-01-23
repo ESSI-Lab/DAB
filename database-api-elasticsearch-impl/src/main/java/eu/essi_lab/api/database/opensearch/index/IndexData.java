@@ -59,6 +59,7 @@ import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.SourceStorageWorker.DataFolderIndexDocument;
+import eu.essi_lab.api.database.opensearch.OpenSearchClientWrapper;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.index.mappings.AugmentersMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.CacheMapping;
@@ -684,6 +685,27 @@ public class IndexData {
 	DocumentBuilder builder = factory.newDocumentBuilder();
 
 	return builder.parse(source);
+    }
+
+    /**
+     * @param source
+     * @return
+     * @throws SAXException
+     * @throws IOException
+     * @throws ParserConfigurationException
+     */
+    public static Document toDocumentOrNull(InputStream source) {
+
+	DocumentBuilderFactory factory = XMLFactories.newDocumentBuilderFactory();
+	try {
+	    DocumentBuilder builder = factory.newDocumentBuilder();
+	    return builder.parse(source);
+	    
+	} catch (Exception ex) {
+	    GSLoggerFactory.getLogger(OpenSearchClientWrapper.class).error(ex);
+	}
+
+	return null;
     }
 
     /**
