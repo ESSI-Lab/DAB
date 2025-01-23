@@ -26,6 +26,7 @@ package eu.essi_lab.api.database.opensearch;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,6 +34,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.json.JSONObject;
+import org.opensearch.client.json.JsonpSerializable;
+import org.opensearch.client.json.jsonb.JsonbJsonpMapper;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.ErrorCause;
 import org.opensearch.client.opensearch._types.ErrorResponse;
@@ -65,6 +68,7 @@ import eu.essi_lab.api.database.opensearch.index.mappings.FolderRegistryMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
 import eu.essi_lab.messages.bond.View.ViewVisibility;
+import jakarta.json.stream.JsonGenerator;
 
 /**
  * @author Fabrizio
@@ -79,6 +83,46 @@ public class OpenSearchClientWrapper {
     public OpenSearchClientWrapper(OpenSearchClient client) {
 
 	this.client = client;
+    }
+
+    /**
+     * @param searchResponse
+     * @return
+     */
+    public static List<InputStream> toBinaryList(SearchResponse<Object> searchResponse) {
+
+	HitsMetadata<Object> hits = searchResponse.hits();
+
+	List<Hit<Object>> hitsList = hits.hits();
+
+	return hitsList.stream().//
+
+		map(hit -> {
+
+		    SourceWrapper wrapper = new SourceWrapper(IndexData.toJSONObject(hit.source()));
+		    String binaryValue = wrapper.getBinaryValue();
+
+		    return IndexData.decode(binaryValue);
+		}).//
+
+		collect(Collectors.toList());
+    }
+
+    /**
+     * @param obj
+     * @return
+     */
+    public static String toJson(JsonpSerializable obj) {
+
+	StringWriter stringWriter = new StringWriter();
+
+	JsonbJsonpMapper mapper = new JsonbJsonpMapper();
+	JsonGenerator generator = mapper.jsonProvider().createGenerator(stringWriter);
+
+	mapper.serialize(obj, generator);
+	generator.close();
+
+	return stringWriter.toString();
     }
 
     /**
@@ -141,6 +185,27 @@ public class OpenSearchClientWrapper {
 		}).//
 
 		collect(Collectors.toList());
+    }
+
+    /**
+     * @param searchQuery
+     * @param properties
+     * @param start
+     * @param size
+     * @return
+     * @throws Exception
+     */
+    public SearchResponse<Object> search(Query searchQuery, int start, int size) throws Exception {
+
+	return client.search(builder -> {
+
+	    builder.query(searchQuery).//
+		    from(start).//
+		    size(size);
+
+	    return builder;
+
+	}, Object.class);
     }
 
     /**
@@ -357,6 +422,7 @@ public class OpenSearchClientWrapper {
 	BoolQuery boolQuery = new BoolQuery.Builder().//
 		must(mustList).//
 		should(shouldList).//
+		minimumShouldMatch("1").//
 		build();
 
 	return boolQuery.toQuery();
@@ -395,7 +461,6 @@ public class OpenSearchClientWrapper {
 		    build();
 
 	    mustList.add(creatorQuery.toQuery());
-
 	}
 
 	if (owner.isPresent()) {
@@ -406,7 +471,6 @@ public class OpenSearchClientWrapper {
 		    build();
 
 	    mustList.add(ownerQuery.toQuery());
-
 	}
 
 	if (visibility.isPresent()) {
@@ -426,6 +490,8 @@ public class OpenSearchClientWrapper {
 	BoolQuery boolQuery = new BoolQuery.Builder().//
 		must(mustList).//
 		should(shouldList).//
+		minimumShouldMatch("1").//
+
 		build();
 
 	return boolQuery.toQuery();
@@ -433,10 +499,7 @@ public class OpenSearchClientWrapper {
 
     /**
      * Builds a query which searches the entries with the given <code>property</code> and
-     * <code>propertyValue</code> that are stored in the database with id <code>databaseId</code> and in the index
-     * <code>index</code>
-     * <b>Constraints</b>: databaseId = getDatabase().getIdentifier() AND property = property AND property.value =
-     * propertyValue AND _index = index
+     * <code>propertyValue</code>
      * 
      * @param databaseId
      * @param index
@@ -446,14 +509,36 @@ public class OpenSearchClientWrapper {
      */
     public Query buildSearchQuery(String databaseId, String index, String property, String propertyValue) {
 
+	return buildSearchQuery(databaseId, index, property, Arrays.asList(propertyValue));
+    }
+
+    /**
+     * Builds a query which searches the entries with the given <code>property</code> and
+     * matching one or more <code>propertyValues</code>
+     * 
+     * @param databaseId
+     * @param index
+     * @param property
+     * @param propertyValues
+     * @return
+     */
+    public Query buildSearchQuery(String databaseId, String index, String property, List<String> propertyValues) {
+
 	MatchPhraseQuery databaseIdQuery = new MatchPhraseQuery.Builder().//
 		field(IndexData.DATABASE_ID).query(databaseId).//
 		build();
 
-	MatchPhraseQuery propertyQuery = new MatchPhraseQuery.Builder().//
-		field(property).//
-		query(propertyValue).//
-		build();
+	List<Query> shouldList = new ArrayList<>();
+
+	propertyValues.forEach(v -> {
+
+	    MatchPhraseQuery propertyQuery = new MatchPhraseQuery.Builder().//
+		    field(property).//
+		    query(v).//
+		    build();
+
+	    shouldList.add(propertyQuery.toQuery());
+	});
 
 	MatchPhraseQuery indexQuery = new MatchPhraseQuery.Builder().//
 		field("_index").//
@@ -463,11 +548,12 @@ public class OpenSearchClientWrapper {
 	List<Query> mustList = new ArrayList<>();
 
 	mustList.add(databaseIdQuery.toQuery());
-	mustList.add(propertyQuery.toQuery());
 	mustList.add(indexQuery.toQuery());
 
 	BoolQuery boolQuery = new BoolQuery.Builder().//
+		should(shouldList).//
 		must(mustList).//
+		minimumShouldMatch("1").//
 		build();
 
 	return boolQuery.toQuery();
@@ -476,7 +562,6 @@ public class OpenSearchClientWrapper {
     /**
      * Builds a query which searches the entries in the database with id <code>databaseId</code> and in the index
      * <code>index</code>
-     * <b>Constraints</b>: databaseId = getDatabase().getIdentifier() AND _index = index
      * 
      * @param databaseId
      * @param index
@@ -652,6 +737,7 @@ public class OpenSearchClientWrapper {
 	BoolQuery boolQuery = new BoolQuery.Builder().//
 		must(mustList).//
 		should(shouldList).//
+		minimumShouldMatch("1").//
 		build();
 
 	return boolQuery.toQuery();
