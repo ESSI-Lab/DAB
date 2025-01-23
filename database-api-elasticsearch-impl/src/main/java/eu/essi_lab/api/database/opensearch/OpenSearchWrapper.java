@@ -78,14 +78,14 @@ import jakarta.json.stream.JsonGenerator;
 /**
  * @author Fabrizio
  */
-public class OpenSearchClientWrapper {
+public class OpenSearchWrapper {
 
     private OpenSearchClient client;
 
     /**
      * @param client
      */
-    public OpenSearchClientWrapper(OpenSearchClient client) {
+    public OpenSearchWrapper(OpenSearchClient client) {
 
 	this.client = client;
     }
@@ -117,7 +117,7 @@ public class OpenSearchClientWrapper {
 
 		collect(Collectors.toList());
 
-	pl.logPerformance(GSLoggerFactory.getLogger(OpenSearchClientWrapper.class));
+	pl.logPerformance(GSLoggerFactory.getLogger(OpenSearchWrapper.class));
 
 	return list;
     }
@@ -149,7 +149,7 @@ public class OpenSearchClientWrapper {
 
 		collect(Collectors.toList());
 
-	pl.logPerformance(GSLoggerFactory.getLogger(OpenSearchClientWrapper.class));
+	pl.logPerformance(GSLoggerFactory.getLogger(OpenSearchWrapper.class));
 
 	return list;
     }
@@ -170,7 +170,7 @@ public class OpenSearchClientWrapper {
 		filter(Objects::nonNull).//
 		collect(Collectors.toList());
 
-	pl.logPerformance(GSLoggerFactory.getLogger(OpenSearchClientWrapper.class));
+	pl.logPerformance(GSLoggerFactory.getLogger(OpenSearchWrapper.class));
 
 	return list;
     }

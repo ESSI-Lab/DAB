@@ -20,7 +20,7 @@ import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.GetViewIdentifiersRequest;
-import eu.essi_lab.api.database.opensearch.OpenSearchClientWrapper;
+import eu.essi_lab.api.database.opensearch.OpenSearchWrapper;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.index.IndexData;
@@ -213,7 +213,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 	//
 	//
 
-	OpenSearchClientWrapper wrapper = new OpenSearchClientWrapper(database.getClient());
+	OpenSearchWrapper wrapper = new OpenSearchWrapper(database.getClient());
 
 	//
 	//
@@ -340,7 +340,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 	//
 	//
 
-	OpenSearchClientWrapper wrapper = new OpenSearchClientWrapper(database.getClient());
+	OpenSearchWrapper wrapper = new OpenSearchWrapper(database.getClient());
 
 	Query query = wrapper.buildSearchQuery(//
 		database.getIdentifier(), //
@@ -488,7 +488,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 	//
 	//
 
-	OpenSearchClientWrapper wrapper = new OpenSearchClientWrapper(database.getClient());
+	OpenSearchWrapper wrapper = new OpenSearchWrapper(database.getClient());
 
 	//
 	// all

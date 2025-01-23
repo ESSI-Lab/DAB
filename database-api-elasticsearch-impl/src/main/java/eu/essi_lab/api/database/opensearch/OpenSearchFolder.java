@@ -46,7 +46,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 
     private String name;
     private OpenSearchDatabase database;
-    private OpenSearchClientWrapper wrapper;
+    private OpenSearchWrapper wrapper;
 
     /**
      * @param database
@@ -59,7 +59,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 	// for compatibility with MarkLogic, the returned name includes also the database id
 	//
 	this.name = name.startsWith(database.getIdentifier()) ? name : database.getIdentifier() + "_" + name;
-	this.wrapper = new OpenSearchClientWrapper(database.getClient());
+	this.wrapper = new OpenSearchWrapper(database.getClient());
     }
 
     @Override
