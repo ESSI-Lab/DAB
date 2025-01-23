@@ -142,10 +142,10 @@ public abstract class MetadataReport {
 		document.setNamespaceContext(new ISO2014NameSpaceContext());
 		DocumentReport documentReport = new DocumentReport(document);
 
-		List<MetadataElement> toTest = new ArrayList<>();
+		List<BlueCloudMetadataElement> toTest = new ArrayList<>();
 		toTest.addAll(Arrays.asList(getCoreMetadataElements()));
 		toTest.addAll(Arrays.asList(getOptionalMetadataElements()));
-		for (MetadataElement element : toTest) {
+		for (BlueCloudMetadataElement element : toTest) {
 		    documentReport.addValues(element);
 		}
 
@@ -155,7 +155,7 @@ public abstract class MetadataReport {
 	    }
 
 	    reportManager.printStatistics();
-	    HashMap<MetadataElement, ReportResult> results = reportManager.getReportResults();
+	    HashMap<BlueCloudMetadataElement, ReportResult> results = reportManager.getReportResults();
 	    List<String[]> table = createTable(results);
 	    tables.put(viewId, table);
 
@@ -204,24 +204,24 @@ public abstract class MetadataReport {
 
     protected abstract String getPostRequest();
 
-    private List<String[]> createTable(HashMap<MetadataElement, ReportResult> map) {
+    private List<String[]> createTable(HashMap<BlueCloudMetadataElement, ReportResult> map) {
 	List<String[]> table = new ArrayList<>();
 	table.add(new String[] { "Core metadata element", "Path", "Samples", "Vocabularies", "Occurrence (%)" });
 
-	for (MetadataElement element : getCoreMetadataElements()) {
+	for (BlueCloudMetadataElement element : getCoreMetadataElements()) {
 	    table.add(getRow(map, element));
 	}
 
 	table.add(new String[] { "Optional metadata element", "Path", "Samples", "Vocabularies", "Occurrence (%)" });
 
-	for (MetadataElement element : getOptionalMetadataElements()) {
+	for (BlueCloudMetadataElement element : getOptionalMetadataElements()) {
 	    table.add(getRow(map, element));
 	}
 
 	return table;
     }
 
-    private String[] getRow(HashMap<MetadataElement, ReportResult> map, MetadataElement reportElement) {
+    private String[] getRow(HashMap<BlueCloudMetadataElement, ReportResult> map, BlueCloudMetadataElement reportElement) {
 	String metadata = reportElement.toString();
 	String path = reportElement.getPathHtml();
 	boolean isVocabulary = false;
@@ -341,9 +341,9 @@ public abstract class MetadataReport {
 
     }
 
-    public abstract MetadataElement[] getCoreMetadataElements();
+    public abstract BlueCloudMetadataElement[] getCoreMetadataElements();
 
-    public abstract MetadataElement[] getOptionalMetadataElements();
+    public abstract BlueCloudMetadataElement[] getOptionalMetadataElements();
 
     private String createHTMLTable(HashMap<String, List<String[]>> tableMap) {
 

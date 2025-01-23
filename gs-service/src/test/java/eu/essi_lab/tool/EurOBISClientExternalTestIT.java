@@ -17,7 +17,7 @@ import org.w3c.dom.Node;
 
 import eu.essi_lab.accessor.eurobis.EurOBISClient;
 import eu.essi_lab.gssrv.conf.task.bluecloud.DocumentReport;
-import eu.essi_lab.gssrv.conf.task.bluecloud.MetadataElement;
+import eu.essi_lab.gssrv.conf.task.bluecloud.BlueCloudMetadataElement;
 import eu.essi_lab.gssrv.conf.task.bluecloud.MetadataManager;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
@@ -84,9 +84,9 @@ public class EurOBISClientExternalTestIT {
 	    }
 
 	    DocumentReport bcm = new DocumentReport(metadata);
-	    bcm.addMetadata(MetadataElement.IDENTIFIER, id);
-	    bcm.addMetadata(MetadataElement.TITLE, metadata.evaluateString("/*:eml/*:dataset/*:title"));
-	    bcm.addMetadata(MetadataElement.KEYWORD, metadata.evaluateString("/*:eml/*:dataset/*:keywordSet/*:keyword"));
+	    bcm.addMetadata(BlueCloudMetadataElement.IDENTIFIER, id);
+	    bcm.addMetadata(BlueCloudMetadataElement.TITLE, metadata.evaluateString("/*:eml/*:dataset/*:title"));
+	    bcm.addMetadata(BlueCloudMetadataElement.KEYWORD, metadata.evaluateString("/*:eml/*:dataset/*:keywordSet/*:keyword"));
 	    String desc = metadata.evaluateString("/*:eml/*:dataset/*:coverage/*:geographicCoverage/*:geographicDescription");
 	    if (desc != null) {
 		if (!desc.contains("http://marineregions.org/mrgid")) {
@@ -94,13 +94,13 @@ public class EurOBISClientExternalTestIT {
 		}
 	    }
 	    // bcm.addMetadata(BlueCloudElement.GEOGRAPHIC_DESCRIPTION, desc);
-	    bcm.addMetadata(MetadataElement.BOUNDING_BOX, metadata
+	    bcm.addMetadata(BlueCloudMetadataElement.BOUNDING_BOX, metadata
 		    .evaluateString("/*:eml/*:dataset/*:coverage/*:geographicCoverage/*:boundingCoordinates/*:westBoundingCoordinate"));
-	    bcm.addMetadata(MetadataElement.TEMPORAL_EXTENT,
+	    bcm.addMetadata(BlueCloudMetadataElement.TEMPORAL_EXTENT,
 		    metadata.evaluateString("/*:eml/*:dataset/*:coverage/*:temporalCoverage/*:rangeOfDates/*:beginDate/*:calendarDate"));
 	    // bcm.addMetadata(BlueCloudElement.PARAMETER, metadata.evaluateString("/*:eml/*:dataset"));
 	    // bcm.addMetadata(BlueCloudElement.PLATFORM, metadata.evaluateString("/*:eml/*:dataset/"));
-	    bcm.addMetadata(MetadataElement.ORGANIZATION, metadata.evaluateString("/*:eml/*:dataset/*:creator/*:organizationName"));
+	    bcm.addMetadata(BlueCloudMetadataElement.ORGANIZATION, metadata.evaluateString("/*:eml/*:dataset/*:creator/*:organizationName"));
 
 	    MetadataManager.getInstance().addMetadata(metadataURL, bcm);
 

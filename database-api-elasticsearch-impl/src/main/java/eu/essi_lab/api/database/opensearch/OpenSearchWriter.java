@@ -3,6 +3,11 @@
  */
 package eu.essi_lab.api.database.opensearch;
 
+import org.apache.commons.lang3.NotImplementedException;
+import org.opensearch.client.opensearch._types.query_dsl.Query;
+import org.opensearch.client.opensearch.core.DeleteByQueryRequest;
+import org.opensearch.client.opensearch.core.DeleteByQueryResponse;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -24,11 +29,13 @@ package eu.essi_lab.api.database.opensearch;
  * #L%
  */
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseWriter;
+import eu.essi_lab.api.database.opensearch.index.IndexData;
+import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
@@ -38,40 +45,66 @@ import eu.essi_lab.model.resource.GSResource;
  */
 public class OpenSearchWriter extends DatabaseWriter {
 
-    @Override
-    public void setDatabase(Database dataBase) {
-	// TODO Auto-generated method stub
+    private OpenSearchDatabase database;
+    private OpenSearchWrapper wrapper;
 
+    @Override
+    public void setDatabase(Database database) {
+
+	this.database = (OpenSearchDatabase) database;
+	this.wrapper = new OpenSearchWrapper(this.database.getClient());
     }
 
     @Override
-    public Database getDatabase() {
-	// TODO Auto-generated method stub
-	return null;
+    public OpenSearchDatabase getDatabase() {
+
+	return (OpenSearchDatabase) database;
     }
 
     @Override
-    public boolean supports(StorageInfo dbUri) {
-	// TODO Auto-generated method stub
-	return false;
+    public boolean supports(StorageInfo info) {
+
+	return OpenSearchDatabase.isSupported(info);
     }
 
     @Override
     public void remove(GSResource resource) throws GSException {
-	// TODO Auto-generated method stub
 
-    }
-
-    @Override
-    public void storeRDF(Node rdf) throws GSException {
-	// TODO Auto-generated method stub
-
+	remove(IndexData.ENTRY_NAME, resource.getPrivateId());
     }
 
     @Override
     public void remove(String propertyName, String propertyValue) throws GSException {
-	// TODO Auto-generated method stub
 
+	Query query = wrapper.buildSearchQuery(//
+		getDatabase().getIdentifier(), //
+		DataFolderMapping.get().getIndex(), //
+		propertyName, //
+		propertyValue);
+
+	DeleteByQueryRequest request = wrapper.buildDeleteByQueryRequest(DataFolderMapping.get().getIndex(), query);
+
+	try {
+	    DeleteByQueryResponse response = wrapper.deleteByQuery(request);
+
+	    Long deleted = response.deleted();
+
+	    GSLoggerFactory.getLogger(OpenSearchDatabase.class).debug("Deleted count: {}", deleted);
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(OpenSearchDatabase.class).error(ex);
+
+	    throw GSException.createException(getClass(), "OpenSearchWriterRemoveByPropertiesError", ex);
+	}
     }
 
+    //
+    // NOT IMPLEMENTED AT THE MOMENT
+    //
+    @Override
+    public void storeRDF(Node rdf) throws GSException {
+
+	throw new NotImplementedException();
+    }
 }

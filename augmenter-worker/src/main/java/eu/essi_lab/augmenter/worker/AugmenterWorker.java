@@ -39,6 +39,8 @@ import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFinder;
 import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.DatabaseWriter;
+import eu.essi_lab.api.database.DatabaseFolder.EntryType;
+import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.augmenter.Augmenter;
@@ -55,6 +57,7 @@ import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.utils.IterationLogger;
 import eu.essi_lab.lib.utils.PropertiesUtils;
 import eu.essi_lab.lib.utils.StringUtils;
+import eu.essi_lab.messages.AugmenterProperties;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.JobStatus.JobPhase;
 import eu.essi_lab.messages.Page;
@@ -486,7 +489,7 @@ public class AugmenterWorker extends SchedulerWorker<AugmenterWorkerSetting> {
 	String fileName = setting.getIdentifier() + ".properties";
 	AugmenterProperties augmenterProperties = new AugmenterProperties();
 
-	folder.storeBinary(fileName, augmenterProperties.asStream());
+	folder.store(fileName, FolderEntry.of(augmenterProperties.asStream()), EntryType.AUGMENTER_PROPERTIES);
 
 	return augmenterProperties;
     }
@@ -526,15 +529,15 @@ public class AugmenterWorker extends SchedulerWorker<AugmenterWorkerSetting> {
      * @throws Exception
      */
     private void updateProperties(//
-	    AugmenterProperties properties,//
-	    AugmenterWorkerSetting setting,//
+	    AugmenterProperties properties, //
+	    AugmenterWorkerSetting setting, //
 	    DatabaseReader reader) throws Exception {
 
 	DatabaseFolder folder = getPropertiesFolder(getSetting(), reader.getDatabase()).get();
 
 	String fileName = setting.getIdentifier() + ".properties";
 
-	folder.replaceBinary(fileName, properties.asStream());
+	folder.replace(fileName, FolderEntry.of(properties.asStream()), EntryType.AUGMENTER_PROPERTIES);
     }
 
     /**

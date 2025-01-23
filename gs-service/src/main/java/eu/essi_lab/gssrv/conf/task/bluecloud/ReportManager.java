@@ -38,9 +38,9 @@ public class ReportManager {
 		return metadatas;
 	}
 
-	private HashMap<MetadataElement, ReportResult> reportResults = new HashMap<>();
+	private HashMap<BlueCloudMetadataElement, ReportResult> reportResults = new HashMap<>();
 
-	public HashMap<MetadataElement, ReportResult> getReportResults() {
+	public HashMap<BlueCloudMetadataElement, ReportResult> getReportResults() {
 		return reportResults;
 	}
 
@@ -61,11 +61,11 @@ public class ReportManager {
 		for (Entry<String, DocumentReport> entry : set) {
 			String id = entry.getKey();
 			DocumentReport metadata = entry.getValue();
-			HashMap<MetadataElement, List<String>> innerMap = metadata.getMap();
-			Set<Entry<MetadataElement, List<String>>> innerEntries = innerMap.entrySet();
-			for (Entry<MetadataElement, List<String>> innerEntry : innerEntries) {
+			HashMap<BlueCloudMetadataElement, List<String>> innerMap = metadata.getMap();
+			Set<Entry<BlueCloudMetadataElement, List<String>>> innerEntries = innerMap.entrySet();
+			for (Entry<BlueCloudMetadataElement, List<String>> innerEntry : innerEntries) {
 
-				MetadataElement element = innerEntry.getKey();
+				BlueCloudMetadataElement element = innerEntry.getKey();
 				List<String> values = innerEntry.getValue();
 				if (values != null && !values.isEmpty()) {
 					ReportResult reportResult = reportResults.get(element);
@@ -78,8 +78,8 @@ public class ReportManager {
 				}
 			}
 		}
-		for (Entry<MetadataElement, ReportResult> entry : reportResults.entrySet()) {
-			MetadataElement element = entry.getKey();
+		for (Entry<BlueCloudMetadataElement, ReportResult> entry : reportResults.entrySet()) {
+			BlueCloudMetadataElement element = entry.getKey();
 			ReportResult reportResult = entry.getValue();
 			int count = reportResult.getCount();
 			int percent = (int) (((double) count / (double) total) * 100.0);

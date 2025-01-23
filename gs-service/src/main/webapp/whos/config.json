@@ -19,6 +19,8 @@
     "instrumentSearch": true,
     "attributeSearch": true,
     "platformSearch": true,
+    "semanticSearch": true,    
+    "semanticSearchValue":1,
     "ontology": "whos",
     "riverSearch": true
     

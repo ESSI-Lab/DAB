@@ -386,6 +386,13 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 			query += 'spatialOp=' + spatialOp + '&';
 		}
 
+		if (constraints.ontology) {
+
+			var ontology = constraints.ontology;
+			query += 'ontology=' + ontology + '&';
+		}
+
+
 		if (constraints.kvp) {
 
 			constraints.kvp.forEach(function(item) {

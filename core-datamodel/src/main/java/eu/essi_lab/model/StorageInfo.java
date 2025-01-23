@@ -189,12 +189,12 @@ public class StorageInfo implements Serializable {
     @Override
     public String toString() {
 
-	return "URI: " + this.uri + //
-		", identifier: " + this.identifier + //
-		", name: " + this.name + //
-		", user: " + this.user + //
-		", password: " + this.password + //
-		", type: " + this.type;
+	return "- URI: " + this.uri + //
+		"\n- Identifier: " + this.identifier + //
+		"\n- Name: " + this.name + //
+		"\n- User: " + this.user + //
+		"\n- Password: " + this.password + //
+		"\n- Type: " + this.type;
 
     }
 

@@ -1,5 +1,8 @@
 package eu.essi_lab.messages.bond;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -25,10 +28,18 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+
+import org.apache.commons.io.output.ByteArrayOutputStream;
+
+import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.messages.bond.jaxb.ViewFactory;
 
 /**
  * The view object describes a view (a set of predefined constraints associated with a label and a description). Views
@@ -113,6 +124,66 @@ public class View implements Serializable {
 	setCreator(creator);
     }
 
+    /**
+     * @return
+     * @throws JAXBException
+     */
+    public InputStream toStream() throws JAXBException {
+
+	return toStream(this);
+    }
+
+    /**
+     * @param stream
+     * @return
+     * @throws JAXBException
+     */
+    public static View fromStream(InputStream stream) throws JAXBException {
+
+	ViewFactory factory = new ViewFactory();
+
+	Unmarshaller unmarshaller = factory.createUnmarshaller();
+
+	return (View) unmarshaller.unmarshal(stream);
+    }
+
+    /**
+     * @param stream
+     * @return
+     * @throws JAXBException
+     */
+    public static View createOrNull(InputStream stream) {
+
+	try {
+	    return fromStream(stream);
+	} catch (JAXBException e) {
+
+	    GSLoggerFactory.getLogger(View.class).error(e);
+	}
+
+	return null;
+    }
+
+    /**
+     * @param view
+     * @return
+     * @throws JAXBException
+     */
+    public static InputStream toStream(View view) throws JAXBException {
+
+	ViewFactory factory = new ViewFactory();
+
+	Marshaller marshaller = factory.createMarshaller();
+
+	ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+	marshaller.marshal(view, baos);
+
+	byte[] bytes = baos.toByteArray();
+
+	return new ByteArrayInputStream(bytes);
+    }
+
     public Date getCreationTime() {
 	return creationTime;
     }
@@ -169,6 +240,10 @@ public class View implements Serializable {
     }
 
     public void setVisibility(ViewVisibility viewVisibility) {
+
+	if (viewVisibility == null) {
+	    throw new IllegalArgumentException();
+	}
 
 	this.visibility = viewVisibility.name();
     }

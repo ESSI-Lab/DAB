@@ -571,11 +571,8 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 
 	Optional<Date> startDateTime = null;
 
-	try {
-	    startDateTime = ISO8601DateTimeUtils.parseNotStandardToDate(date);
-	} catch (ParseException e) {
-	    GSLoggerFactory.getLogger(PolytopeIonBeamMetadataMapper.class).error(e.getMessage());
-	}
+	startDateTime = ISO8601DateTimeUtils.parseNotStandardToDate(date);
+
 	if (startDateTime.isPresent()) {
 	    Date begin = startDateTime.get();
 	    if (time != null) {

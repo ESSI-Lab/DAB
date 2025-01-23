@@ -42,14 +42,18 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import com.google.common.io.ByteStreams;
 import com.marklogic.xcc.exceptions.RequestException;
 
 import eu.essi_lab.api.database.Database.IdentifierType;
+import eu.essi_lab.api.database.DatabaseFolder.EntryType;
+import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.iso.datamodel.classes.MIMetadata;
@@ -83,10 +87,10 @@ public class SourceStorageWorker {
     public static final String DATA_2_PREFIX = "-data-2";
     public static final String DATA_1_PREFIX = "-data-1";
     public static final String DATA_FOLDER_POSTFIX = "_dataFolder";
+    public static final String WRITING_FOLDER_TAG = "writingFolder";
 
     private String sourceId;
     private String startTimeStamp;
-    private static final String WRITING_FOLDER = "writingFolder";
 
     private static final String SOURCE_STORAGE_GET_WRITING_FOLDER_ERROR = "SOURCE_STORAGE_GET_WRITING_FOLDER_ERROR";
     private static final String SOURCE_STORAGE_GET_WRITING_FOLDER_HARVESTING_STARTED_ERROR = "SOURCE_STORAGE_GET_WRITING_FOLDER_HARVESTING_STARTED_ERROR";
@@ -117,6 +121,14 @@ public class SourceStorageWorker {
     }
 
     /**
+     * @return
+     */
+    public static InputStream createWritingFolderTag() {
+
+	return new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8));
+    }
+
+    /**
      * @param sourceId
      * @return
      */
@@ -139,6 +151,46 @@ public class SourceStorageWorker {
 		    indexName + //
 		    " xmlns:" + NameSpace.GI_SUITE_DATA_MODEL_SCHEMA_PREFIX + "=\"" + NameSpace.GI_SUITE_DATA_MODEL + "\">"
 		    + dataFolderPostfix + "</gs:" + indexName + ">");
+	}
+
+	/**
+	 * @param stream
+	 * @throws IOException
+	 * @throws SAXException
+	 */
+	public DataFolderIndexDocument(InputStream stream) throws SAXException, IOException {
+
+	    super(stream);
+	}
+
+	/**
+	 * @param doc
+	 */
+	public DataFolderIndexDocument(Document doc) {
+
+	    super(doc);
+	}
+
+	/**
+	 * @return
+	 * @throws XPathExpressionException
+	 */
+	public String getDataFolder() {
+
+	    return getDataFolderPrefix().substring(1);
+	}
+
+	/**
+	 * @return
+	 */
+	public String getDataFolderPrefix() {
+
+	    try {
+		return evaluateTextContent(".//text()").get(0);
+	    } catch (XPathExpressionException e) {
+	    }
+
+	    return null;
 	}
     }
 
@@ -321,7 +373,7 @@ public class SourceStorageWorker {
 
 		    debug("Found data-1 and data-2 folders", status);
 
-		    if (getData1Folder().exists(WRITING_FOLDER)) {
+		    if (getData1Folder().exists(WRITING_FOLDER_TAG)) {
 			// the last writing folder was the data-1, so it is overridden
 			debug("Data-1 folder has WRITING_FOLDER tag", status);
 			writingFolder = getData1Folder();
@@ -333,7 +385,7 @@ public class SourceStorageWorker {
 
 		    if (!recovery && !resumed) {
 			// clears the writing folder
-			debug("Cleaning " + writingFolder.getURI(), writingFolder.getURI(), status);
+			debug("Cleaning " + writingFolder.getName(), writingFolder.getName(), status);
 			writingFolder.clear();
 		    }
 		}
@@ -365,7 +417,7 @@ public class SourceStorageWorker {
 			writingFolder = getData2Folder();
 
 			debug("Removing WRITING_FOLDER tag from data-1", status);
-			getData1Folder().remove(WRITING_FOLDER);
+			getData1Folder().remove(WRITING_FOLDER_TAG);
 		    }
 
 		    // ----------------------------------------
@@ -393,7 +445,7 @@ public class SourceStorageWorker {
 			writingFolder = getData1Folder();
 
 			debug("Removing WRITING_FOLDER tag from data-2", status);
-			getData2Folder().remove(WRITING_FOLDER);
+			getData2Folder().remove(WRITING_FOLDER_TAG);
 		    }
 		}
 	    }
@@ -460,19 +512,22 @@ public class SourceStorageWorker {
 		    SOURCE_STORAGE_GET_WRITING_FOLDER_HARVESTING_STARTED_ERROR);
 	}
 
-	debug("Selected writing folder " + writingFolder.getURI() + " for " + strategy.name() + " harvesting with recovery flag " + recovery
-		+ " / resumed flag " + resumed, status);
+	debug("Selected writing folder " + writingFolder.getName() + " for " + strategy.name() + " harvesting with recovery flag "
+		+ recovery + " / resumed flag " + resumed, status);
 
 	// -------------------------------------------------------------------------
 	//
 	// this marker can be used to find the folder to preserve in case
 	// the end method is not called for some reason
 	//
-	debug("Storing WRITING_FOLDER tag to folder " + writingFolder.getURI() + " STARTED", writingFolder.getURI(), status);
+	debug("Storing WRITING_FOLDER tag to folder " + writingFolder.getName() + " STARTED", writingFolder.getName(), status);
 
-	writingFolder.storeBinary(WRITING_FOLDER, new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8)));
+	writingFolder.store(//
+		WRITING_FOLDER_TAG, //
+		FolderEntry.of(createWritingFolderTag()), //
+		EntryType.WRITING_FOLDER_TAG);
 
-	debug("Storing WRITING_FOLDER tag to folder " + writingFolder.getURI() + " ENDED", writingFolder.getURI(), status);
+	debug("Storing WRITING_FOLDER tag to folder " + writingFolder.getName() + " ENDED", writingFolder.getName(), status);
 
 	if (getMetaFolder().exists(ERRORS_REPORT_FILE_NAME)) {
 
@@ -566,7 +621,7 @@ public class SourceStorageWorker {
 
 		    writingFolder = getData1Folder();
 
-		    getData1Folder().remove(WRITING_FOLDER);
+		    getData1Folder().remove(WRITING_FOLDER_TAG);
 
 		    if (existsData2Folder()) {
 			removeData2Folder();
@@ -576,7 +631,7 @@ public class SourceStorageWorker {
 
 		    writingFolder = getData2Folder();
 
-		    getData2Folder().remove(WRITING_FOLDER);
+		    getData2Folder().remove(WRITING_FOLDER_TAG);
 
 		    if (existsData1Folder()) {
 			removeData1Folder();
@@ -592,7 +647,7 @@ public class SourceStorageWorker {
 
 	    writingFolder = getData1Folder();
 
-	    getData1Folder().remove(WRITING_FOLDER);
+	    getData1Folder().remove(WRITING_FOLDER_TAG);
 	}
 
 	debug("Updating harvesting properties STARTED", status);
@@ -627,11 +682,14 @@ public class SourceStorageWorker {
      */
     void storeHarvestingProperties(HarvestingProperties properties) throws Exception {
 
-	DatabaseFolder sourceFolder = getMetaFolder();
+	DatabaseFolder metaFolder = getMetaFolder();
 
-	sourceFolder.remove(HarvestingProperties.getFileName());
+	metaFolder.remove(HarvestingProperties.getFileName());
 
-	sourceFolder.storeBinary(HarvestingProperties.getFileName(), properties.asStream());
+	metaFolder.store(//
+		HarvestingProperties.getFileName(), //
+		FolderEntry.of(properties.asStream()), //
+		EntryType.HARVESTING_PROPERTIES);
     }
 
     /**
@@ -674,11 +732,14 @@ public class SourceStorageWorker {
 	byteArray = outputStream.toByteArray();
 	ByteArrayInputStream document = new ByteArrayInputStream(byteArray);
 
+	EntryType entryType = fileName.equals(ERRORS_REPORT_FILE_NAME) ? EntryType.HARVESTING_ERROR_REPORT
+		: EntryType.HARVESTING_WARN_REPORT;
+
 	if (exists) {
-	    getMetaFolder().replaceBinary(fileName, document);
+	    getMetaFolder().replace(fileName, FolderEntry.of(document), entryType);
 
 	} else {
-	    getMetaFolder().storeBinary(fileName, document);
+	    getMetaFolder().store(fileName, FolderEntry.of(document), entryType);
 	}
 
 	// GSLoggerFactory.getLogger(getClass()).debug("Updating of " + (error ? "error" : "warn") + " harvesting report
@@ -735,6 +796,15 @@ public class SourceStorageWorker {
 
 	GSLoggerFactory.getLogger(getClass()).debug(message);
 	report.add(message);
+    }
+
+    /**
+     * @param folder
+     * @return
+     */
+    private String findSourceIdentifier(DatabaseFolder folder) {
+
+	return DatabaseFolder.computeSourceId(database, folder);
     }
 
     /**
@@ -858,13 +928,13 @@ public class SourceStorageWorker {
 
 		debug("Removing data-1 writing folder tag", status);
 
-		getData1Folder().remove(WRITING_FOLDER);
+		getData1Folder().remove(WRITING_FOLDER_TAG);
 
 	    } else {
 
 		debug("Removing data-2 writing folder tag", status);
 
-		getData2Folder().remove(WRITING_FOLDER);
+		getData2Folder().remove(WRITING_FOLDER_TAG);
 	    }
 
 	    if (dataYexists) {
@@ -962,7 +1032,7 @@ public class SourceStorageWorker {
 
 	DatabaseFolder metaFolder = getMetaFolder();
 
-	String sourceId = metaFolder.getSimpleName().replace(META_PREFIX, "");
+	String sourceId = findSourceIdentifier(metaFolder);
 	String indexName = createDataFolderIndexName(sourceId);
 
 	debug("Handling data folder index file STARTED", status);
@@ -975,14 +1045,14 @@ public class SourceStorageWorker {
 	DatabaseFolder dataFolder = Arrays.asList(database.getFolders()).//
 		stream().//
 
-		filter(f -> f.getCompleteName().equals(database.getIdentifier() + "_" + sourceId + DATA_1_PREFIX) || //
-			f.getCompleteName().equals(database.getIdentifier() + "_" + sourceId + DATA_2_PREFIX))
+		filter(f -> f.getName().equals(database.getIdentifier() + "_" + sourceId + DATA_1_PREFIX) || //
+			f.getName().equals(database.getIdentifier() + "_" + sourceId + DATA_2_PREFIX))
 		.
 
 		findFirst().//
 		get();
 
-	String dataFolderPostFix = dataFolder.getCompleteName().endsWith(DATA_1_PREFIX) ? DATA_1_PREFIX : DATA_2_PREFIX;
+	String dataFolderPostFix = dataFolder.getName().endsWith(DATA_1_PREFIX) ? DATA_1_PREFIX : DATA_2_PREFIX;
 
 	debug("Data folder postfix [" + dataFolderPostFix + "]", status);
 
@@ -994,23 +1064,23 @@ public class SourceStorageWorker {
 
 	if (metaFolder.exists(indexName)) {
 
-	    debug("Replacing index STARTED", status);
+	    debug("Replacing index doc STARTED", status);
 
-	    boolean replaced = metaFolder.replace(indexName, doc.getDocument());
+	    boolean replaced = metaFolder.replace(indexName, FolderEntry.of(doc.getDocument()), EntryType.DATA_FOLDER_INDEX_DOC);
 
-	    debug("Replacing index " + (replaced ? "SUCCEEDED" : "FAILED"), status);
+	    debug("Replacing index doc " + (replaced ? "SUCCEEDED" : "FAILED"), status);
 
-	    debug("Replacing index ENDED", status);
+	    debug("Replacing index doc ENDED", status);
 
 	} else {
 
-	    debug("Storing index STARTED", status);
+	    debug("Storing index doc STARTED", status);
 
-	    boolean stored = metaFolder.store(indexName, doc.getDocument());
+	    boolean stored = metaFolder.store(indexName, FolderEntry.of(doc.getDocument()), EntryType.DATA_FOLDER_INDEX_DOC);
 
-	    debug("Storing index " + (stored ? "SUCCEEDED" : "FAILED"), status);
+	    debug("Storing index doc " + (stored ? "SUCCEEDED" : "FAILED"), status);
 
-	    debug("Storing index ENDED", status);
+	    debug("Storing index doc ENDED", status);
 	}
 
 	debug("Handling data folder index file ENDED", status);
@@ -1121,7 +1191,7 @@ public class SourceStorageWorker {
 
 	if (existsData1Folder()) {
 
-	    return getData1Folder().exists(WRITING_FOLDER);
+	    return getData1Folder().exists(WRITING_FOLDER_TAG);
 	}
 
 	return false;
@@ -1135,7 +1205,7 @@ public class SourceStorageWorker {
 
 	if (existsData2Folder()) {
 
-	    return getData2Folder().exists(WRITING_FOLDER);
+	    return getData2Folder().exists(WRITING_FOLDER_TAG);
 	}
 
 	return false;
@@ -1160,8 +1230,8 @@ public class SourceStorageWorker {
 	    }
 
 	    // 1) get the original ids of the old folder and the original ids from the new folder
-	    List<String> newIds = database.getIdentifiers(IdentifierType.ORIGINAL, newFolder.getCompleteName(), false);
-	    List<String> oldIds = database.getIdentifiers(IdentifierType.ORIGINAL, oldFolder.getCompleteName(), false);
+	    List<String> newIds = database.getIdentifiers(IdentifierType.ORIGINAL, newFolder.getName(), false);
+	    List<String> oldIds = database.getIdentifiers(IdentifierType.ORIGINAL, oldFolder.getName(), false);
 
 	    // 2) removes all the ids of the new folder from the ids of the old folder.
 	    // the remaining are the original ids of the removed resources (they are in the old folder
@@ -1171,7 +1241,7 @@ public class SourceStorageWorker {
 	    debug("Found " + oldIds.size() + " deleted records", status);
 
 	    GSSource gsSource = new GSSource();
-	    gsSource.setUniqueIdentifier(oldFolder.getSimpleName());
+	    gsSource.setUniqueIdentifier(findSourceIdentifier(oldFolder));
 
 	    IterationLogger logger = new IterationLogger(this, oldIds.size());
 	    logger.setMessage("Total progress: ");
@@ -1184,7 +1254,10 @@ public class SourceStorageWorker {
 		    resource.getPropertyHandler().setIsDeleted(true);
 		}
 		// 5) copies the resource in the new folder
-		newFolder.store(resource.getPrivateId(), resource.asDocument(false));
+		newFolder.store(//
+			resource.getPrivateId(), //
+			FolderEntry.of(resource.asDocument(false)), //
+			EntryType.GS_RESOURCE);
 
 		logger.iterationEnded();
 	    }
@@ -1200,7 +1273,7 @@ public class SourceStorageWorker {
 	DatabaseFolder newFolder = getWritingFolder(status);
 
 	// 1) get the original ids of the old folder and the original ids from the new folder
-	List<String> newIds = database.getIdentifiers(IdentifierType.ORIGINAL, newFolder.getCompleteName(), false);
+	List<String> newIds = database.getIdentifiers(IdentifierType.ORIGINAL, newFolder.getName(), false);
 
 	DatabaseFolder oldFolder = null;
 
@@ -1211,7 +1284,7 @@ public class SourceStorageWorker {
 	}
 
 	if (oldFolder != null) {
-	    List<String> oldIds = database.getIdentifiers(IdentifierType.ORIGINAL, oldFolder.getCompleteName(), false);
+	    List<String> oldIds = database.getIdentifiers(IdentifierType.ORIGINAL, oldFolder.getName(), false);
 
 	    // 2) removes all the old ids from the new folder ids
 	    // the remaining are the ids of the new resources
@@ -1221,7 +1294,7 @@ public class SourceStorageWorker {
 	debug("Found " + newIds.size() + " new records", status);
 
 	GSSource gsSource = new GSSource();
-	gsSource.setUniqueIdentifier(newFolder.getSimpleName());
+	gsSource.setUniqueIdentifier(findSourceIdentifier(newFolder));
 
 	IterationLogger logger = new IterationLogger(this, newIds.size());
 	logger.setMessage("Total progress: ");
@@ -1251,7 +1324,10 @@ public class SourceStorageWorker {
 	    }
 
 	    // 5) replaces the resource in the new folder
-	    newFolder.replace(resource.getPrivateId(), resource.asDocument(false));
+	    newFolder.replace(//
+		    resource.getPrivateId(), //
+		    FolderEntry.of(resource.asDocument(false)), //
+		    EntryType.GS_RESOURCE);
 
 	    logger.iterationEnded();
 	}
@@ -1277,8 +1353,8 @@ public class SourceStorageWorker {
 		oldFolder = getData1Folder();
 	    }
 
-	    List<String> newIds = database.getIdentifiers(IdentifierType.ORIGINAL, newFolder.getCompleteName(), false);
-	    List<String> oldIds = database.getIdentifiers(IdentifierType.ORIGINAL, oldFolder.getCompleteName(), false);
+	    List<String> newIds = database.getIdentifiers(IdentifierType.ORIGINAL, newFolder.getName(), false);
+	    List<String> oldIds = database.getIdentifiers(IdentifierType.ORIGINAL, oldFolder.getName(), false);
 
 	    @SuppressWarnings("unchecked")
 	    Collection<String> intersection = CollectionUtils.intersection(newIds, oldIds);
@@ -1288,7 +1364,7 @@ public class SourceStorageWorker {
 		debug("Found " + intersection.size() + " common records to check", status);
 
 		GSSource gsSource = new GSSource();
-		gsSource.setUniqueIdentifier(oldFolder.getSimpleName());
+		gsSource.setUniqueIdentifier(findSourceIdentifier(oldFolder));
 
 		IterationLogger logger = new IterationLogger(this, intersection.size());
 		logger.setMessage("Total progress: ");
@@ -1318,7 +1394,9 @@ public class SourceStorageWorker {
 		    recoverExtendedElements(oldResource, newResource);
 
 		    // replaces the resource
-		    newFolder.replace(newResource.getPrivateId(), newResource.asDocument(false));
+		    newFolder.replace(//
+			    newResource.getPrivateId(), //
+			    FolderEntry.of(newResource.asDocument(false)), EntryType.GS_RESOURCE);
 
 		    logger.iterationEnded();
 		}

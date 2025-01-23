@@ -6,69 +6,57 @@ package eu.essi_lab.cfga.source.test;
 import java.util.Arrays;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
-import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.cfg.DatabaseSource;
-import eu.essi_lab.api.database.factory.DatabaseFactory;
-import eu.essi_lab.api.database.marklogic.MarkLogicDatabase;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.model.StorageInfo;
+import eu.essi_lab.model.exceptions.GSException;
 
 /**
  * @author Fabrizio
  */
-public class DatabaseSourceTest extends ConfigurationSourceTest {
+public abstract class DatabaseSourceTest extends ConfigurationSourceTest {
 
-    private static final StorageInfo URI = new StorageInfo(System.getProperty("dbUrl"));
+    protected StorageInfo storageInfo;
 
-    static {
+    /**
+     * @param info
+     */
+    public DatabaseSourceTest(StorageInfo info) {
 
-	URI.setIdentifier("configtest");
-	URI.setPassword(System.getProperty("dbPassword"));
-	URI.setUser(System.getProperty("dbUser"));
-	URI.setName("TEST-DB");
-    }
-
-    @Before
-    public void init() throws Exception {
-
-	StorageInfo clone = URI.clone();
-	clone.setIdentifier("ROOT");
-
-	Database database = DatabaseFactory.get(clone);
-
-	if (database instanceof MarkLogicDatabase) {
-
-	    MarkLogicDatabase db = (MarkLogicDatabase) database;
-	    db.removeAllFolders();
-	}
+	this.storageInfo = info;
     }
 
     @Test
     public void locationTest() throws Exception {
 
-	DatabaseSource source = new DatabaseSource(URI, "test-config");
+	DatabaseSource source = create();
 	Assert.assertEquals("configtest\\test-config.json", source.getLocation());
     }
 
     @Test
     public void listTest() throws Exception {
 
-	super.listTest(new DatabaseSource(URI, "test-config"));
+	super.listTest(create());
     }
 
     @Test
     public void lockTest() throws Exception {
 
-	super.lockTest(new DatabaseSource(URI, "test-config"));
+	super.lockTest(create());
     }
+
+    /**
+     * @return
+     * @throws GSException
+     */
+    protected abstract DatabaseSource create() throws GSException;
 
     @Test
     public void backupTest() throws Exception {
 
-	DatabaseSource source = new DatabaseSource(URI, "test-config");
+	DatabaseSource source = create();
 
 	Setting setting1 = new Setting();
 	Setting setting2 = new Setting();

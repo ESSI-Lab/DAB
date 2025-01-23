@@ -21,7 +21,6 @@ package eu.essi_lab.accessor.thunder;
  * #L%
  */
 
-import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
@@ -78,7 +77,6 @@ public class ThunderMapper extends OriginalIdentifierMapper {
 	return dataset;
     }
 
-    
     @Override
     public String getSupportedOriginalMetadataSchema() {
 	return CommonNameSpaceContext.THUNDER_URI;
@@ -115,11 +113,8 @@ public class ThunderMapper extends OriginalIdentifierMapper {
 	    TimeIndeterminateValueType startIndeterminate = TimeIndeterminateValueType.AFTER;
 	    Optional<Date> startDateTime = null;
 
-	    try {
-		startDateTime = ISO8601DateTimeUtils.parseNotStandardToDate(station.getStartDate());
-	    } catch (ParseException e) {
-		logger.error(e.getMessage());
-	    }
+	    startDateTime = ISO8601DateTimeUtils.parseNotStandardToDate(station.getStartDate());
+
 	    if (startDateTime.isPresent()) {
 		Date begin = startDateTime.get();
 		String stringStart = ISO8601DateTimeUtils.getISO8601DateTime(begin);
@@ -129,11 +124,9 @@ public class ThunderMapper extends OriginalIdentifierMapper {
 	    if (station.getEndDate() != null) {
 		TimeIndeterminateValueType endTimeInderminate = TimeIndeterminateValueType.NOW;
 		Optional<Date> endDateTime = null;
-		try {
-		    endDateTime = ISO8601DateTimeUtils.parseNotStandardToDate(station.getEndDate());
-		} catch (ParseException e) {
-		    logger.error(e.getMessage());
-		}
+
+		endDateTime = ISO8601DateTimeUtils.parseNotStandardToDate(station.getEndDate());
+
 		if (endDateTime.isPresent()) {
 		    Date end = endDateTime.get();
 		    String stringEnd = ISO8601DateTimeUtils.getISO8601DateTime(end);
@@ -206,7 +199,7 @@ public class ThunderMapper extends OriginalIdentifierMapper {
 	//
 	// URL + variable
 	//
-//	String id = UUID.nameUUIDFromBytes((splittedStrings[0] + splittedStrings[11]).getBytes()).toString();
+	// String id = UUID.nameUUIDFromBytes((splittedStrings[0] + splittedStrings[11]).getBytes()).toString();
 
 	coreMetadata.getMIMetadata().addHierarchyLevelScopeCodeListValue("dataset");
 
@@ -252,7 +245,7 @@ public class ThunderMapper extends OriginalIdentifierMapper {
 	creatorTechContact.setOrganisationName("Tripura University");
 	creatorTechContact.setRoleCode("pointOfContact");
 	creatorTechContact.setIndividualName("Anirban Guha");
-	
+
 	Contact contactcreatorTechContactInfo = new Contact();
 	Address addresscreatorTechContact = new Address();
 	addresscreatorTechContact.addElectronicMailAddress("anirbanguha@tripurauniv.in");
@@ -264,19 +257,18 @@ public class ThunderMapper extends OriginalIdentifierMapper {
 	otherTechContact.setOrganisationName("Tripura University");
 	otherTechContact.setRoleCode("author");
 	otherTechContact.setIndividualName("Prasanth S.");
-	
+
 	ResponsibleParty otherContact = new ResponsibleParty();
 
 	otherContact.setOrganisationName("Massachusetts Institute of Technology (MIT)");
 	otherContact.setRoleCode("author");
 	otherContact.setIndividualName("Earle Williams");
-	
+
 	Contact contactotherContactInfo = new Contact();
 	Address addressotherContact = new Address();
 	addressotherContact.addElectronicMailAddress("ekagww@gmail.com");
 	contactotherContactInfo.setAddress(addressotherContact);
 	otherContact.setContactInfo(contactotherContactInfo);
-
 
 	coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(creatorContact);
 	coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(otherTechContact);

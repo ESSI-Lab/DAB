@@ -683,10 +683,10 @@ public class HarvestingAndDiscoveryTest {
 	    IndexedElementsWriter.write(dataset);
 	    if (quality > 0) {
 		// overrides the quality
-		dataset.getIndexesMetadata().remove(ResourceProperty.MEDATADATA_QUALITY.getName());
+		dataset.getIndexesMetadata().remove(ResourceProperty.METADATA_QUALITY.getName());
 
 		dataset.getIndexesMetadata()
-			.write(new IndexedResourceProperty(ResourceProperty.MEDATADATA_QUALITY, String.valueOf(quality)));
+			.write(new IndexedResourceProperty(ResourceProperty.METADATA_QUALITY, String.valueOf(quality)));
 
 	    }
 	    if (rd.getResourceTimeStamp() != null) {

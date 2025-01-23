@@ -21,7 +21,7 @@ package eu.essi_lab.gssrv.conf.task.bluecloud;
  * #L%
  */
 
-public enum MetadataElement {
+public enum BlueCloudMetadataElement {
     IDENTIFIER("//gmd:fileIdentifier/gco:CharacterString"), //
     TITLE("/gmi2019:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:title/*[1]"), //
     KEYWORD("/gmi2019:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords[not(gmd:type) or not(contains('platform parameter instrument cruise project',gmd:type/gmd:MD_KeywordTypeCode/@codeListValue))]/gmd:keyword/*[1]"), //
@@ -64,7 +64,7 @@ public enum MetadataElement {
     RESOURCE_IDENTIFIER(
 	    "/gmi2019:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:identifier/gmd:MD_Identifier/gmd:code/gco:CharacterString");
 
-    private MetadataElement(String... path) {
+    private BlueCloudMetadataElement(String... path) {
 	this.paths = path;
     }
 

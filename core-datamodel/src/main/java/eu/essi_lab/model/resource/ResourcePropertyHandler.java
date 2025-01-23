@@ -107,7 +107,7 @@ public class ResourcePropertyHandler {
 	    return;
 	}
 
-	resource.setProperty(ResourceProperty.MEDATADATA_QUALITY, String.valueOf(quality));
+	resource.setProperty(ResourceProperty.METADATA_QUALITY, String.valueOf(quality));
     }
 
     /**
@@ -131,7 +131,7 @@ public class ResourcePropertyHandler {
      */
     public Optional<Integer> getMetadataQuality() {
 
-	Optional<String> value = resource.getPropertyValue(ResourceProperty.MEDATADATA_QUALITY);
+	Optional<String> value = resource.getPropertyValue(ResourceProperty.METADATA_QUALITY);
 	if (value.isPresent()) {
 
 	    return Optional.of(Integer.valueOf(value.get()));

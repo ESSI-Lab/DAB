@@ -388,7 +388,8 @@ public class DataIdentification extends Identification {
      */
     public void addGeographicBoundingBox(GeographicBoundingBox bbox) {
 
-	addGeographicBoundingBox(null, bbox.getBigDecimalNorth(), bbox.getBigDecimalWest(), bbox.getBigDecimalSouth(), bbox.getBigDecimalEast());
+	addGeographicBoundingBox(null, bbox.getBigDecimalNorth(), bbox.getBigDecimalWest(), bbox.getBigDecimalSouth(),
+		bbox.getBigDecimalEast());
     }
 
     /**
@@ -640,6 +641,16 @@ public class DataIdentification extends Identification {
      * @return
      */
     public Iterator<BoundingPolygon> getBoundingPolygons() {
+
+	return getBoundingPolygonsList().iterator();
+    }
+
+    /**
+     * @XPathDirective(target = "./*:extent/gmd:EX_Extent", parent =
+     *                        "gmd:geographicElement", position = Position.LAST)
+     * @return
+     */
+    public List<BoundingPolygon> getBoundingPolygonsList() {
 	List<BoundingPolygon> ret = new ArrayList<>();
 	if (getElementType().isSetExtent()) {
 	    List<EXExtentPropertyType> extents = getElementType().getExtent();
@@ -663,7 +674,7 @@ public class DataIdentification extends Identification {
 		}
 	    }
 	}
-	return ret.iterator();
+	return ret;
     }
 
     // *****

@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 
 import org.json.JSONArray;
@@ -77,6 +78,21 @@ public class WMSLayersHandler extends DefaultRequestHandler {
 
 	    String endpoint = parser.getValue("endpoint");
 	    String version = parser.getValue("version");
+	    
+	    if (!endpoint.startsWith("http")) {
+		// relative endpoint
+		HttpServletRequest req = webRequest.getServletRequest();
+		String scheme = req.getScheme();
+	        String serverName = req.getServerName();
+	        int serverPort = req.getServerPort();
+	        StringBuilder url = new StringBuilder();
+	        url.append(scheme).append("://").append(serverName);
+	        if ((scheme.equals("http") && serverPort != 80) || (scheme.equals("https") && serverPort != 443)) {
+	            url.append(":").append(serverPort);
+	        }
+	        url.append(endpoint);
+	        endpoint = url.toString();
+	    }
 
 	    String capRequest = endpoint + "?service=WMS&request=GetCapabilities&version=" + version;
 

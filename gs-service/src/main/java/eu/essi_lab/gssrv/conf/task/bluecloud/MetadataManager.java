@@ -50,14 +50,14 @@ public class MetadataManager {
 	int size = metadatas.size();
 	System.out.println("Metadata documents: " + size);
 	Set<Entry<String, DocumentReport>> set = metadatas.entrySet();
-	HashMap<MetadataElement, Integer> map = new HashMap<>();
+	HashMap<BlueCloudMetadataElement, Integer> map = new HashMap<>();
 	for (Entry<String, DocumentReport> entry : set) {
 	    String id = entry.getKey();
 	    DocumentReport metadata = entry.getValue();
-	    HashMap<MetadataElement, List<String>> innerMap = metadata.getMap();
-	    Set<Entry<MetadataElement, List<String>>> innerEntries = innerMap.entrySet();
-	    for (Entry<MetadataElement, List<String>> innerEntry : innerEntries) {
-		MetadataElement element = innerEntry.getKey();
+	    HashMap<BlueCloudMetadataElement, List<String>> innerMap = metadata.getMap();
+	    Set<Entry<BlueCloudMetadataElement, List<String>>> innerEntries = innerMap.entrySet();
+	    for (Entry<BlueCloudMetadataElement, List<String>> innerEntry : innerEntries) {
+		BlueCloudMetadataElement element = innerEntry.getKey();
 		List<String> values = innerEntry.getValue();
 		if (values != null && !values.isEmpty()) {
 		    Integer count = map.get(element);
@@ -69,8 +69,8 @@ public class MetadataManager {
 		}
 	    }
 	}
-	for (Entry<MetadataElement, Integer> entry : map.entrySet()) {
-	    MetadataElement element = entry.getKey();
+	for (Entry<BlueCloudMetadataElement, Integer> entry : map.entrySet()) {
+	    BlueCloudMetadataElement element = entry.getKey();
 	    Integer value = entry.getValue();
 	    int percent = (int) (((double) value / (double) size) * 100.0);
 	    System.out.println(element + ": " + value + " (" + percent + "%)");

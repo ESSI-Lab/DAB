@@ -60,7 +60,7 @@ public class HarmonizedMetadataIndexesTest {
 	    }
 	});
 
-	List<MetadataElement> elements = MetadataElement.getOrderedElements();
+	List<MetadataElement> elements = MetadataElement.listOrderedValues();
 
 	for (MetadataElement element : elements) {
 	    indexesMetadata.write(new IndexedElement(element.getName(), UUID.randomUUID().toString()));
