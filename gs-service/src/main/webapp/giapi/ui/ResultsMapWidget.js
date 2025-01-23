@@ -346,6 +346,11 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 			query += 'sources=' + value + '&';
 
 		}
+		
+		if (constraints.observedPropertyURI){
+			var value = constraints.observedPropertyURI;
+			query += 'observedPropertyURI=' + value + '&';
+		}
 
 		if (constraints.organisationName) {
 			var value = constraints.organisationName;

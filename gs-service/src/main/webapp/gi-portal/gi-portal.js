@@ -5,6 +5,42 @@ var view = '';
 var token = '';
 
 
+
+$(document).ready(function(){
+  $("#loadButton").click(function(){
+    var url = "http://localhost/ontology-browser/hydro-ontology.html?http://hydro.geodab.eu/hydro-ontology/concept/1"; 
+
+    // Create the dialog
+    $("<div id='dialog'></div>")
+      .html('<iframe src="' + url + '" width="100%" height="100%" id="myIframe"></iframe>')
+      .dialog({
+        title: "Iframe Content",
+        modal: true
+      });
+
+    // Listen for messages from the iframe
+    window.addEventListener('message', (event) => {
+      if (event.origin === "http://localhost") { // Verify message origin
+        console.log("Message received from iframe:", event.data);
+      }
+    });
+
+    // Attach 'load' event listener to the iframe
+    $("#myIframe").on('load', function() {
+      try {
+        // Send a message to the iframe to trigger event listening
+        this.contentWindow.postMessage('startListening', '*'); 
+      } catch(error) {
+        console.error("Error sending message to iframe:", error);
+      }
+    });
+  });
+});
+
+
+
+
+
 export function initializePortal(config) {
 	view = config.view;
 	token = config.token;
@@ -15,6 +51,7 @@ export function initializePortal(config) {
 	var centerLon = config.centerLon;
 	var zoom = config.zoom;
 	var minZoom = config.minZoom;
+
 
 
 	$.extend(true, $.hik.jtable.prototype.options, {
