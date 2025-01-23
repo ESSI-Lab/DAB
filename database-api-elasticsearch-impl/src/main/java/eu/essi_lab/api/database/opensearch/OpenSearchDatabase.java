@@ -82,7 +82,7 @@ public class OpenSearchDatabase extends Database {
 	info.setUser("test");// ignored
 	info.setPassword("test");// ignored
 
-	// optional, if missing the http scheme is used to discriminate the service type
+	// mandatory
 	info.setType(OpenSearchServiceType.OPEN_SEARCH_LOCAL.getProtocol());
 
 	// the identifier is set same as name in the db initialization
