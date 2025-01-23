@@ -51,6 +51,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.opensearch.client.opensearch.core.IndexRequest;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import eu.essi_lab.api.database.Database;
@@ -647,6 +648,16 @@ public class IndexData {
     }
 
     /**
+     * @param binaryData
+     * @return
+     */
+    public static String decodeToString(String binaryData) {
+
+	byte[] decoded = Base64.getDecoder().decode(binaryData);
+	return new String(decoded);
+    }
+
+    /**
      * @param document
      * @return
      * @throws TransformerException
@@ -679,7 +690,7 @@ public class IndexData {
      * @throws IOException
      * @throws ParserConfigurationException
      */
-    public static Document toDocument(InputStream source) throws SAXException, IOException, ParserConfigurationException {
+    public static Node toNode(InputStream source) throws SAXException, IOException, ParserConfigurationException {
 
 	DocumentBuilderFactory factory = XMLFactories.newDocumentBuilderFactory();
 	DocumentBuilder builder = factory.newDocumentBuilder();
@@ -694,13 +705,13 @@ public class IndexData {
      * @throws IOException
      * @throws ParserConfigurationException
      */
-    public static Document toDocumentOrNull(InputStream source) {
+    public static Node toNodeOrNull(InputStream source) {
 
 	DocumentBuilderFactory factory = XMLFactories.newDocumentBuilderFactory();
 	try {
 	    DocumentBuilder builder = factory.newDocumentBuilder();
 	    return builder.parse(source);
-	    
+
 	} catch (Exception ex) {
 	    GSLoggerFactory.getLogger(OpenSearchClientWrapper.class).error(ex);
 	}
