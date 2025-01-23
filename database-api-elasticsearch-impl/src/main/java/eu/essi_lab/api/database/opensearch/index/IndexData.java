@@ -3,8 +3,6 @@
  */
 package eu.essi_lab.api.database.opensearch.index;
 
-import java.io.ByteArrayInputStream;
-
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -27,32 +25,18 @@ import java.io.ByteArrayInputStream;
  */
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
 import javax.xml.bind.JAXBException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.opensearch.client.opensearch.core.IndexRequest;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFolder;
@@ -60,7 +44,7 @@ import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.SourceStorageWorker.DataFolderIndexDocument;
-import eu.essi_lab.api.database.opensearch.OpenSearchWrapper;
+import eu.essi_lab.api.database.opensearch.ConversionUtils;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.index.mappings.AugmentersMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.CacheMapping;
@@ -75,9 +59,7 @@ import eu.essi_lab.indexes.IndexedElements;
 import eu.essi_lab.iso.datamodel.classes.BoundingPolygon;
 import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.lib.xml.XMLFactories;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.auth.GSUser;
@@ -238,7 +220,7 @@ public class IndexData {
 	    stream = new ClonableInputStream(entry.getStream().get());
 	}
 
-	String encodedString = encode(entry.getDocument().orElse(null), stream);
+	String encodedString = ConversionUtils.encode(entry.getDocument().orElse(null), stream);
 
 	//
 	//
@@ -587,148 +569,6 @@ public class IndexData {
     public String toString() {
 
 	return object.toString(3);
-    }
-
-    /**
-     * @param entry
-     * @param stream
-     * @return
-     * @throws IOException
-     * @throws TransformerException
-     */
-    private static String encode(Document doc, ClonableInputStream stream) throws IOException, TransformerException {
-
-	byte[] bytes = null;
-
-	if (doc != null) {
-
-	    bytes = toString(doc).getBytes();
-
-	} else {
-
-	    bytes = IOStreamUtils.getBytes(stream.clone());
-	}
-
-	return Base64.getEncoder().encodeToString(bytes);
-    }
-
-    /**
-     * @param entry
-     * @return
-     * @throws IOException
-     * @throws TransformerException
-     */
-    public static String encode(FolderEntry entry) throws IOException, TransformerException {
-
-	byte[] bytes = null;
-
-	if (entry.getDocument().isPresent()) {
-
-	    Document doc = entry.getDocument().get();
-
-	    bytes = toString(doc).getBytes();
-
-	} else {
-
-	    InputStream stream = entry.getStream().get();
-	    bytes = IOStreamUtils.getBytes(stream);
-	}
-
-	return Base64.getEncoder().encodeToString(bytes);
-    }
-
-    /**
-     * @param binaryData
-     * @return
-     */
-    public static InputStream decode(String binaryData) {
-
-	byte[] decoded = Base64.getDecoder().decode(binaryData);
-	return new ByteArrayInputStream(decoded);
-    }
-
-    /**
-     * @param binaryData
-     * @return
-     */
-    public static String decodeToString(String binaryData) {
-
-	byte[] decoded = Base64.getDecoder().decode(binaryData);
-	return new String(decoded);
-    }
-
-    /**
-     * @param document
-     * @return
-     * @throws TransformerException
-     */
-    private static String toString(Document document) throws TransformerException {
-
-	TransformerFactory transformerFactory = TransformerFactory.newInstance();
-	Transformer transformer = transformerFactory.newTransformer();
-
-	StringWriter stringWriter = new StringWriter();
-	transformer.transform(new DOMSource(document), new StreamResult(stringWriter));
-
-	return stringWriter.toString();
-    }
-
-    /**
-     * @param source
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    public static JSONObject toJSONObject(Object source) {
-
-	return new JSONObject((HashMap<String, String>) source);
-    }
-
-    /**
-     * @param source
-     * @return
-     * @throws SAXException
-     * @throws IOException
-     * @throws ParserConfigurationException
-     */
-    public static Node toNode(InputStream source) throws SAXException, IOException, ParserConfigurationException {
-
-	DocumentBuilderFactory factory = XMLFactories.newDocumentBuilderFactory();
-	DocumentBuilder builder = factory.newDocumentBuilder();
-
-	return builder.parse(source);
-    }
-
-    /**
-     * @param source
-     * @return
-     * @throws SAXException
-     * @throws IOException
-     * @throws ParserConfigurationException
-     */
-    public static Node toNodeOrNull(InputStream source) {
-
-	DocumentBuilderFactory factory = XMLFactories.newDocumentBuilderFactory();
-	try {
-	    DocumentBuilder builder = factory.newDocumentBuilder();
-	    return builder.parse(source);
-
-	} catch (Exception ex) {
-	    GSLoggerFactory.getLogger(OpenSearchWrapper.class).error(ex);
-	}
-
-	return null;
-    }
-
-    /**
-     * @param source
-     * @return
-     */
-    public static InputStream toStream(JSONObject source) {
-
-	String binaryProperty = source.getString("binaryProperty");
-	String binaryData = source.getString(binaryProperty);
-
-	return decode(binaryData);
     }
 
     /**

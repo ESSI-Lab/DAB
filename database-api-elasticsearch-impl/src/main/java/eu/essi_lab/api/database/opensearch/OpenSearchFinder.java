@@ -127,14 +127,14 @@ public class OpenSearchFinder implements DatabaseFinder {
 		    message.getRequestId(), //
 		    Optional.ofNullable(message.getWebRequest()));
 
-	    List<GSResource> resources = OpenSearchWrapper.toBinaryList(response).//
+	    List<GSResource> resources = ConversionUtils.toBinaryList(response).//
 		    stream().//
 		    map(binary -> GSResource.createOrNull(binary)).//
 		    filter(Objects::nonNull).//
 		    collect(Collectors.toList());
 
 	    pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
-	   
+
 	    //
 	    //
 	    //
@@ -172,7 +172,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	    SearchResponse<Object> response = discover_(message);
 
-	    List<Node> nodes = OpenSearchWrapper.toNodeList(response);
+	    List<Node> nodes = ConversionUtils.toNodeList(response);
 
 	    resultSet.setResultsList(nodes);
 
@@ -195,7 +195,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	    SearchResponse<Object> response = discover_(message);
 
-	    List<String> nodes = OpenSearchWrapper.toStringList(response);
+	    List<String> nodes = ConversionUtils.toStringList(response);
 
 	    resultSet.setResultsList(nodes);
 
@@ -257,7 +257,8 @@ public class OpenSearchFinder implements DatabaseFinder {
 	    int start = message.getPage().getStart() - 1;
 	    int size = message.getPage().getSize();
 
-	    GSLoggerFactory.getLogger(getClass()).debug("\n\n{}\n\n", new JSONObject(OpenSearchWrapper.toJson(query)).toString(3));
+	    GSLoggerFactory.getLogger(getClass()).debug("\n\n{}\n\n",
+		    new JSONObject(ConversionUtils.toJsonObject(query).toString(3)).toString(3));
 
 	    SearchResponse<Object> search = wrapper.search(query, start, size);
 

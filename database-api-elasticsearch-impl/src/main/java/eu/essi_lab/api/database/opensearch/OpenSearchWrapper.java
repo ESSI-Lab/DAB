@@ -26,18 +26,14 @@ package eu.essi_lab.api.database.opensearch;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.json.JSONObject;
-import org.opensearch.client.json.JsonpSerializable;
-import org.opensearch.client.json.jsonb.JsonbJsonpMapper;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.ErrorCause;
 import org.opensearch.client.opensearch._types.ErrorResponse;
@@ -63,7 +59,6 @@ import org.opensearch.client.opensearch.core.search.SourceFilter;
 import org.opensearch.client.opensearch.generic.OpenSearchGenericClient;
 import org.opensearch.client.opensearch.generic.Requests;
 import org.opensearch.client.opensearch.generic.Response;
-import org.w3c.dom.Node;
 
 import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
@@ -73,7 +68,6 @@ import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.PerformanceLogger;
 import eu.essi_lab.messages.bond.View.ViewVisibility;
-import jakarta.json.stream.JsonGenerator;
 
 /**
  * @author Fabrizio
@@ -91,108 +85,6 @@ public class OpenSearchWrapper {
     }
 
     /**
-     * @param searchResponse
-     * @return
-     */
-    public static List<InputStream> toBinaryList(SearchResponse<Object> searchResponse) {
-
-	PerformanceLogger pl = new PerformanceLogger(//
-		PerformanceLogger.PerformancePhase.OPENSEARCH_WRAPPER_TO_BINARY_LIST, //
-		UUID.randomUUID().toString(), //
-		Optional.empty());
-
-	HitsMetadata<Object> hits = searchResponse.hits();
-
-	List<Hit<Object>> hitsList = hits.hits();
-
-	List<InputStream> list = hitsList.stream().//
-
-		map(hit -> {
-
-		    SourceWrapper wrapper = new SourceWrapper(IndexData.toJSONObject(hit.source()));
-		    String binaryValue = wrapper.getBinaryValue();
-
-		    return IndexData.decode(binaryValue);
-		}).//
-
-		collect(Collectors.toList());
-
-	pl.logPerformance(GSLoggerFactory.getLogger(OpenSearchWrapper.class));
-
-	return list;
-    }
-
-    /**
-     * @param searchResponse
-     * @return
-     */
-    public static List<String> toStringList(SearchResponse<Object> searchResponse) {
-
-	PerformanceLogger pl = new PerformanceLogger(//
-		PerformanceLogger.PerformancePhase.OPENSEARCH_WRAPPER_TO_STRING_LIST, //
-		UUID.randomUUID().toString(), //
-		Optional.empty());
-
-	HitsMetadata<Object> hits = searchResponse.hits();
-
-	List<Hit<Object>> hitsList = hits.hits();
-
-	List<String> list = hitsList.stream().//
-
-		map(hit -> {
-
-		    SourceWrapper wrapper = new SourceWrapper(IndexData.toJSONObject(hit.source()));
-		    String binaryValue = wrapper.getBinaryValue();
-
-		    return IndexData.decodeToString(binaryValue);
-		}).//
-
-		collect(Collectors.toList());
-
-	pl.logPerformance(GSLoggerFactory.getLogger(OpenSearchWrapper.class));
-
-	return list;
-    }
-
-    /**
-     * @param searchResponse
-     * @return
-     */
-    public static List<Node> toNodeList(SearchResponse<Object> searchResponse) {
-
-	PerformanceLogger pl = new PerformanceLogger(//
-		PerformanceLogger.PerformancePhase.OPENSEARCH_WRAPPER_TO_NODE_LIST, //
-		UUID.randomUUID().toString(), //
-		Optional.empty());
-
-	List<Node> list = toBinaryList(searchResponse).//
-		stream().map(stream -> IndexData.toNodeOrNull(stream)).//
-		filter(Objects::nonNull).//
-		collect(Collectors.toList());
-
-	pl.logPerformance(GSLoggerFactory.getLogger(OpenSearchWrapper.class));
-
-	return list;
-    }
-
-    /**
-     * @param obj
-     * @return
-     */
-    public static String toJson(JsonpSerializable obj) {
-
-	StringWriter stringWriter = new StringWriter();
-
-	JsonbJsonpMapper mapper = new JsonbJsonpMapper();
-	JsonGenerator generator = mapper.jsonProvider().createGenerator(stringWriter);
-
-	mapper.serialize(obj, generator);
-	generator.close();
-
-	return stringWriter.toString();
-    }
-
-    /**
      * @param index
      * @param entryId
      * @return
@@ -207,7 +99,7 @@ public class OpenSearchWrapper {
 
 	if (response.found()) {
 
-	    JSONObject source = IndexData.toJSONObject(response.source());
+	    JSONObject source = ConversionUtils.toJSONObject(response.source());
 
 	    decorateSource(source, index, entryId);
 
@@ -227,31 +119,9 @@ public class OpenSearchWrapper {
      */
     public List<InputStream> searchBinaries(Query searchQuery, int start, int size) throws Exception {
 
-	SearchResponse<Object> searchResponse = client.search(builder -> {
+	SearchResponse<Object> searchResponse = search(searchQuery, start, size);
 
-	    builder.query(searchQuery).//
-		    from(start).//
-		    size(size);
-
-	    return builder;
-
-	}, Object.class);
-
-	HitsMetadata<Object> hits = searchResponse.hits();
-
-	List<Hit<Object>> hitsList = hits.hits();
-
-	return hitsList.stream().//
-
-		map(hit -> {
-
-		    SourceWrapper wrapper = new SourceWrapper(IndexData.toJSONObject(hit.source()));
-		    String binaryValue = wrapper.getBinaryValue();
-
-		    return IndexData.decode(binaryValue);
-		}).//
-
-		collect(Collectors.toList());
+	return ConversionUtils.toBinaryList(searchResponse);
     }
 
     /**
@@ -339,7 +209,7 @@ public class OpenSearchWrapper {
 
 		map(hit -> {
 
-		    JSONObject source = IndexData.toJSONObject(hit.source());
+		    JSONObject source = ConversionUtils.toJSONObject(hit.source());
 		    return decorateSource(source, hit.index(), hit.id());
 		}).//
 
@@ -753,7 +623,7 @@ public class OpenSearchWrapper {
 	List<Hit<Object>> hitsList = hits.hits();
 	Hit<Object> hit = hitsList.get(0);
 
-	JSONObject source = IndexData.toJSONObject(hit.source());
+	JSONObject source = ConversionUtils.toJSONObject(hit.source());
 
 	decorateSource(source, hit.index(), hit.id());
 

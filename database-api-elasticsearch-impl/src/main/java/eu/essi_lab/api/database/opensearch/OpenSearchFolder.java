@@ -107,7 +107,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 	    return null;
 	}
 
-	return IndexData.toNode(IndexData.toStream(source.get()));
+	return ConversionUtils.toNode(ConversionUtils.toStream(source.get()));
     }
 
     @Override
@@ -119,7 +119,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 	    return null;
 	}
 
-	return IndexData.toStream(source.get());
+	return ConversionUtils.toStream(source.get());
     }
 
     @Override

@@ -10,10 +10,10 @@ import org.junit.Test;
 
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
+import eu.essi_lab.api.database.opensearch.ConversionUtils;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.datafolder.test.TestUtils;
-import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
@@ -83,7 +83,7 @@ public class OpenSearchMetaFolder_warnReportTest extends OpenSearchTest {
 	Assert.assertEquals(TestUtils.SOURCE_ID, wrapper.getSourceId().get());
 
 	Assert.assertEquals(//
-		IndexData.encode(FolderEntry.of(IOStreamUtils.asStream(warnReport))), wrapper.getWarnReport().get());
+		ConversionUtils.encode(FolderEntry.of(IOStreamUtils.asStream(warnReport))), wrapper.getWarnReport().get());
 
 	Assert.assertTrue(wrapper.getHarvestingProperties().isEmpty());
 	Assert.assertTrue(wrapper.getErrorsReport().isEmpty());

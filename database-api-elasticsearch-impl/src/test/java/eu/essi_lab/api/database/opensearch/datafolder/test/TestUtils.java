@@ -13,6 +13,7 @@ import org.w3c.dom.Node;
 
 import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.SourceStorageWorker;
+import eu.essi_lab.api.database.opensearch.ConversionUtils;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
@@ -80,7 +81,7 @@ public class TestUtils {
 	Assert.assertTrue(optResource.isPresent());
 
 	String base64resource = optResource.get();
-	InputStream decoded = IndexData.decode(base64resource);
+	InputStream decoded = ConversionUtils.decode(base64resource);
 
 	GSResource decodedResource = GSResource.create(decoded);
 

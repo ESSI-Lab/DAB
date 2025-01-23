@@ -12,9 +12,9 @@ import org.junit.Test;
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
+import eu.essi_lab.api.database.opensearch.ConversionUtils;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
-import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.AugmentersMapping;
@@ -87,7 +87,7 @@ public class OpenSearchAugmentersFolderTest extends OpenSearchTest {
 	//
 
 	String binaryData = wrapper.getAugmenterProperties().get();
-	InputStream stream = IndexData.decode(binaryData);
+	InputStream stream = ConversionUtils.decode(binaryData);
 	AugmenterProperties fromStream = AugmenterProperties.fromStream(stream);
 
 	Assert.assertEquals(properties, fromStream);
@@ -99,7 +99,7 @@ public class OpenSearchAugmentersFolderTest extends OpenSearchTest {
 	// are always equals
 	//
 	// Assert.assertEquals(//
-	// IndexData.encode(FolderEntry.of(properties.asStream())), //
+	// ConversionUtils.encode(FolderEntry.of(properties.asStream())), //
 	// wrapper.getAugmenterProperties().get() //
 	// );
     }
