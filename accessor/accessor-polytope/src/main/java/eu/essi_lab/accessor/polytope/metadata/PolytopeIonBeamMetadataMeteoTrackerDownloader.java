@@ -29,11 +29,14 @@ import java.io.StringReader;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.net.http.HttpResponse;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.csv.CSVFormat;
@@ -85,7 +88,7 @@ public class PolytopeIonBeamMetadataMeteoTrackerDownloader extends DataDownloade
 		online.getFunctionCode().equals("download") && //
 		online.getLinkage() != null && //
 		online.getProtocol() != null && //
-		online.getProtocol().equals(CommonNameSpaceContext.POLYTOPE_IONBEAM_TRACKER));
+		online.getProtocol().equals(CommonNameSpaceContext.IONBEAM_TRACKER));
     }
 
     @Override
@@ -221,6 +224,7 @@ public class PolytopeIonBeamMetadataMeteoTrackerDownloader extends DataDownloade
 	    String varId = (splittedId.length > 2) ? splittedId[splittedId.length - 1] : splittedId[1];
 	    PolytopeIonBeamMetadataMeteoTrackerVariable var = PolytopeIonBeamMetadataMeteoTrackerVariable.decode(varId);
 	    String units = var.getUnit();
+	    String toMatch = var.getKey();
 	    List<JSONObject> ret = new ArrayList<>();
 	    File tempFile;
 	    ret = getData(online.getLinkage());
@@ -246,20 +250,28 @@ public class PolytopeIonBeamMetadataMeteoTrackerDownloader extends DataDownloade
 		List<Long> times = new ArrayList<>();
 		List<Integer> temperatures = new ArrayList<>();
 
+		boolean isTemperature = false;
+
+		if (units.contains("°C") || units.contains("ºC") || units.contains("K")) {
+		    units = units.replace("°C", "K").replace("ºC", "K");
+		    isTemperature = true;
+		}
+
 		for (JSONObject obj : ret) {
 
 		    // CASTING
 
-		    String date = obj.optString("date");
-		    String time = obj.optString("time");
-		    String minutes = obj.optString("minutes");
+		    String chunkDate = obj.optString("chunk_date");
+		    String chunkTime = obj.optString("chunk_time");
 
-		    Date parsed = convertToDate(date, time, minutes);
+		    String combined = chunkDate + chunkTime;
+
+		    // Date parsed = convertToDate(date, time, minutes);
 
 		    Double lat = obj.optDouble("lat");
 		    Double lon = obj.optDouble("lon");
 		    Double altitude = obj.optDouble("altitude");
-		    BigDecimal value = obj.optBigDecimal("observed_value", null);
+		    BigDecimal value = obj.optBigDecimal(toMatch, null);
 
 		    // String time = obj.optString("time");
 		    // Date initialDateTime = ISO8601DateTimeUtils.parseISO8601(time);
@@ -269,20 +281,26 @@ public class PolytopeIonBeamMetadataMeteoTrackerDownloader extends DataDownloade
 		    // // timeOffset);
 
 		    if (value != null) {
-
+			// BigDecimal dataValue = new BigDecimal(value);
+			if (isTemperature && value.compareTo(new BigDecimal("100")) < 0) {
+			    // from Celsius to Kelvin
+			    BigDecimal kelvin = new BigDecimal("273.15");
+			    value = value.add(kelvin);
+			}
 			value = value.setScale(2, BigDecimal.ROUND_FLOOR);
 			int valueInteger = value.multiply(new BigDecimal(100)).intValue();
 
-			if (parsed != null && optStart.isPresent() && optEnd.isPresent()) {
-			    if (!isValid(optStart.get(), optEnd.get(), parsed)) {
-				continue;
-			    }
+			if (combined != null) {
+			    Optional<Date> parsed = transformDate(combined);
 
-			    lats.add(lat.doubleValue());
-			    lons.add(lon.doubleValue());
-			    alts.add(null);
-			    times.add(parsed.getTime());
-			    temperatures.add(valueInteger);
+			    if (parsed != null && parsed.isPresent()) {
+
+				lats.add(lat.doubleValue());
+				lons.add(lon.doubleValue());
+				alts.add(altitude);
+				times.add(parsed.get().getTime());
+				temperatures.add(valueInteger);
+			    }
 
 			}
 		    }
@@ -306,6 +324,7 @@ public class PolytopeIonBeamMetadataMeteoTrackerDownloader extends DataDownloade
 		    GSLoggerFactory.getLogger(getClass()).info("Attribute: " + a.getShortName() + " " + a.toString());
 		}
 		dataset.close();
+		return tempFile;
 	    }
 
 	} catch (Exception e) {
@@ -313,6 +332,7 @@ public class PolytopeIonBeamMetadataMeteoTrackerDownloader extends DataDownloade
 	    ex = e;
 	}
 
+	
 	throw GSException.createException(//
 		getClass(), //
 		ex.getMessage(), //
@@ -369,6 +389,23 @@ public class PolytopeIonBeamMetadataMeteoTrackerDownloader extends DataDownloade
 	}
 
 	return out;
+    }
+
+    private Optional<Date> transformDate(String date) throws ParseException {
+
+	try {
+	    // Define a SimpleDateFormat with the combined pattern
+	    SimpleDateFormat inputFormat = new SimpleDateFormat("yyyyMMddHHmm");
+
+	    // Parse the combined string into a Date object
+	    Date d = inputFormat.parse(date);
+	    inputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+	    return Optional.of(d);
+
+	} catch (RuntimeException e) {
+	    GSLoggerFactory.getLogger(ISO8601DateTimeUtils.class).warn("Unparsable Date: {}", date, e);
+	}
+	return Optional.empty();
     }
 
     private boolean isValid(Date startDate, Date endDate, Date date) {

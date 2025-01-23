@@ -155,7 +155,7 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
     public static final String POLYTOPE_METEOTRACKER = "http://essi-lab.eu/Polytope/Meteotracker";
     
     public static final String POLYTOPE_IONBEAM = "http://essi-lab.eu/Polytope/IonBeam";
-    public static final String POLYTOPE_IONBEAM_TRACKER = "http://essi-lab.eu/IonBeam/Tracker";
+    public static final String IONBEAM_TRACKER = "http://essi-lab.eu/IonBeam/Tracker";
 
     public static final String DWS_URI = "urn:essi:serviceType:DWS";
 
@@ -249,6 +249,7 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
 	map.put("sigedacriveruri", SIGEDAC_RIVER_URI);
 	map.put("dif", DIF_URI);
 	map.put("meteotracker", METEOTRACKER);
+	map.put("ionbeamtracker", IONBEAM_TRACKER);
 	map.put("trigger", TRIGGER);
 	map.put("smartcitizenkit", SMARTCITIZENKIT);
 	map.put("acronet", ACRONET);

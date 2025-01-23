@@ -174,7 +174,7 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 	    if (stationsArray.isEmpty()) {
 		stationsArray = getList(STATIONS_URL,time);
 	    }
-
+	    GSLoggerFactory.getLogger(getClass()).info("Station number: " + stationsArray.length());
 	    if (start < stationsArray.length() && !maxNumberReached) {
 
 		int end = start + pageSize;
@@ -211,13 +211,12 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 				    ret.addRecord(PolytopeIonBeamMetadataMapper.create(datasetMetadata, var.getKey()));
 				}
 			    } else if (platform.toLowerCase().contains("meteo")) {
-				{
 
 				    for (PolytopeIonBeamMetadataMeteoTrackerVariable var : PolytopeIonBeamMetadataMeteoTrackerVariable
 					    .values()) {
-					ret.addRecord(PolytopeIonBeamMetadataMapper.create(datasetMetadata, var.getKey()));
+					ret.addRecord(PolytopeIonBeamMetadataMeteoTrackerMapper.create(datasetMetadata, var.getKey()));
 				    }
-				}
+				
 
 			    }
 			    
@@ -330,7 +329,7 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
     public List<String> listMetadataFormats() {
 	List<String> toret = new ArrayList<>();
 	toret.add(CommonNameSpaceContext.POLYTOPE_IONBEAM);
-	// toret.add(CommonNameSpaceContext.POLYTOPE_METEOTRACKER);
+	toret.add(CommonNameSpaceContext.IONBEAM_TRACKER);
 	return toret;
     }
 
@@ -360,7 +359,7 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
     
     @Override
     public boolean supportsIncrementalHarvesting() throws GSException {
-	return true;
+	return false;
     }
 
 
