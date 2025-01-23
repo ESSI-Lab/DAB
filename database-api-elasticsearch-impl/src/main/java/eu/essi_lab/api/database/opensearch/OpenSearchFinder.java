@@ -44,6 +44,7 @@ import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.PerformanceLogger;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.bond.Bond;
+import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
 import eu.essi_lab.messages.bond.parser.IdentifierBondHandler;
 import eu.essi_lab.messages.count.DiscoveryCountResponse;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
@@ -115,7 +116,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 
     @Override
     public ResultSet<GSResource> discover(DiscoveryMessage message) throws GSException {
-
+	
 	ResultSet<GSResource> resultSet = new ResultSet<>();
 
 	try {
@@ -216,42 +217,13 @@ public class OpenSearchFinder implements DatabaseFinder {
      */
     private SearchResponse<Object> discover_(DiscoveryMessage message) throws GSException {
 
-	Optional<Bond> userBond = message.getUserBond();
-
-	List<String> sources = message.getSources().//
-		stream().//
-		map(s -> s.getUniqueIdentifier()).//
-		collect(Collectors.toList());
-
-	//
-	// simple discovery query
-	//
-	Query query = wrapper.buildSearchQuery(//
-		database.getIdentifier(), //
-		DataFolderMapping.get().getIndex(), //
-		ResourceProperty.SOURCE_ID.getName(), //
-		sources//
-	);
-
-	//
-	// get record by id query
-	//
-	if (userBond.isPresent()) {
-
-	    IdentifierBondHandler parser = new IdentifierBondHandler(userBond.get());
-
-	    if (parser.isCanonicalQueryByIdentifiers()) {
-
-		List<String> identifiers = parser.getIdentifiers();
-
-		query = wrapper.buildSearchQuery(//
-			database.getIdentifier(), //
-			DataFolderMapping.get().getIndex(), //
-			MetadataElement.IDENTIFIER.getName(), //
-			identifiers);//
-	    }
-	}
-
+	OpenSearchDiscoveryBondHandler handler = new OpenSearchDiscoveryBondHandler(message);
+	DiscoveryBondParser bondParser = new DiscoveryBondParser(message.getPermittedBond());
+	bondParser.parse(handler);
+	
+	Query query = handler.getQuery();
+	System.out.println(ConversionUtils.toJsonObject(query).toString(3));
+	
 	try {
 
 	    int start = message.getPage().getStart() - 1;

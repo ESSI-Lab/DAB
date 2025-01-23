@@ -37,6 +37,7 @@ import org.json.JSONObject;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.ErrorCause;
 import org.opensearch.client.opensearch._types.ErrorResponse;
+import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch._types.Result;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
@@ -61,7 +62,6 @@ import org.opensearch.client.opensearch.generic.Requests;
 import org.opensearch.client.opensearch.generic.Response;
 
 import eu.essi_lab.api.database.opensearch.index.IndexData;
-import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.FolderRegistryMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;

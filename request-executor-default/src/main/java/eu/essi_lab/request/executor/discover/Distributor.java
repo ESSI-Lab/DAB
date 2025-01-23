@@ -248,7 +248,7 @@ public class Distributor implements IDistributor {
     }
 
     private int getTimeout(DiscoveryMessage message) {
-	Integer timeout = message.getRequestTimeout();
+	Integer timeout = 1000000; //message.getRequestTimeout();
 	if (timeout == null) {
 	    timeout = DEFAULT_EXECUTION_TIMEOUT;
 	    // String msg = "Timeout not specified in message. Using default of: " + timeout + "s";
