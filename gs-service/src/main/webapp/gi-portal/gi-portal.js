@@ -5,42 +5,6 @@ var view = '';
 var token = '';
 
 
-
-$(document).ready(function(){
-  $("#loadButton").click(function(){
-    var url = "http://localhost/ontology-browser/hydro-ontology.html?http://hydro.geodab.eu/hydro-ontology/concept/1"; 
-
-    // Create the dialog
-    $("<div id='dialog'></div>")
-      .html('<iframe src="' + url + '" width="100%" height="100%" id="myIframe"></iframe>')
-      .dialog({
-        title: "Iframe Content",
-        modal: true
-      });
-
-    // Listen for messages from the iframe
-    window.addEventListener('message', (event) => {
-      if (event.origin === "http://localhost") { // Verify message origin
-        console.log("Message received from iframe:", event.data);
-      }
-    });
-
-    // Attach 'load' event listener to the iframe
-    $("#myIframe").on('load', function() {
-      try {
-        // Send a message to the iframe to trigger event listening
-        this.contentWindow.postMessage('startListening', '*'); 
-      } catch(error) {
-        console.error("Error sending message to iframe:", error);
-      }
-    });
-  });
-});
-
-
-
-
-
 export function initializePortal(config) {
 	view = config.view;
 	token = config.token;
@@ -71,6 +35,8 @@ export function initializePortal(config) {
 			}
 		}
 	};
+
+ 
 
 
 
@@ -246,7 +212,6 @@ export function initializePortal(config) {
 
 			'stationInfoId': 'stationInfo',
 			'stationNameAddId': 'platformNameConstraint',
-
 			'advancedConstraintDivId': 'advConstDiv',
 
 			'onMarkerMouseOver': function(node) {
@@ -347,6 +312,7 @@ export function initializePortal(config) {
 		// ConstraintsWidget
 		//
 		GIAPI.search.constWidget = GIAPI.ConstraintsWidget(GIAPI.search.dab, {
+			'ontology': config.ontology,
 			'keyDownAction': (function() { GIAPI.search.discover(); }),
 			'fieldsWidth': 205
 		});
@@ -435,6 +401,8 @@ export function initializePortal(config) {
 			'borderColor': 'rgba(44, 62, 80, 0.07)'
 		});
 
+
+
 		jQuery(document).on('click', '#hideMapInputControl', function() {
 
 			if (jQuery('#hideMapInputControl').is(":checked")) {
@@ -474,7 +442,7 @@ export function initializePortal(config) {
 			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'instrumentTitle'));
 		}
 		if (config.attributeSearch !== undefined && config.attributeSearch) {
-			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'attributeTitle'));
+			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'attributeTitle',{ id: 'attributeNameConstraint'}));
 		}
 		if (config.platformSearch !== undefined && config.platformSearch) {
 			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'platformTitle',
@@ -489,12 +457,12 @@ export function initializePortal(config) {
 		}
 
 		var semanticValue = 0;
-		if (config.semanticSearchValue!==undefined){
+		if (config.semanticSearchValue !== undefined) {
 			semanticValue = config.semanticSearchValue;
 		}
 
 		if (config.semanticSearch !== undefined && config.semanticSearch) {
-			advancedConstraints.push(GIAPI.search.constWidget.booleanConstraint('get', 'semantics', {ontology:config.ontology, value:semanticValue, helpIconImage: 'fa-comments' }));
+			advancedConstraints.push(GIAPI.search.constWidget.booleanConstraint('get', 'semantics', { ontology: config.ontology, value: semanticValue, helpIconImage: 'fa-comments' }));
 		}
 
 
@@ -630,7 +598,7 @@ export function initializePortal(config) {
 		// set the termFrequency option
 		options.termFrequency = 'source,keyword,format,protocol';
 
-		
+
 
 		if (config.filters !== undefined) {
 			options.termFrequency = config.filters;

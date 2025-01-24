@@ -459,12 +459,13 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 		widget.map.addOverlay(overlay);
 
 
-		// [*2] open the advanced search panel after the inpute field value 
+		// [*2] open the advanced search panel after the input field value 
 		// has been set (see [*1])
 		jQuery('#' + options.stationNameAddId).on("change", function() {
 
 			jQuery("#" + options.advancedConstraintDivId).css("display", "block");
 		});
+		
 
 		//
 		// updates the station info panel after a click
