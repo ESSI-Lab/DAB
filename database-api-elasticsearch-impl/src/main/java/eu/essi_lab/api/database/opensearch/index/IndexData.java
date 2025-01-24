@@ -126,8 +126,8 @@ public class IndexData {
     //
     // base source properties
     //
-    public static final String INDEX = "index";
-    public static final String ENTRY_ID = "entryId";
+    public static final String INDEX = "index"; // see wrapper.decorateSource
+    public static final String ENTRY_ID = "entryId"; // see wrapper.decorateSource
 
     public static final String DATABASE_ID = "databaseId";
     public static final String FOLDER_NAME = "folderName";
@@ -140,7 +140,7 @@ public class IndexData {
     //
     //
 
-    public static final String ALL_INDEXES = "_all";
+    public static final String _INDEX = "_index";
 
     private JSONObject object;
     private IndexMapping mapping;
