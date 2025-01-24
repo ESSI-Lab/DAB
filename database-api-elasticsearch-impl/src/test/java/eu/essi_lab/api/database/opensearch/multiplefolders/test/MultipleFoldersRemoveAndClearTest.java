@@ -606,9 +606,9 @@ public class MultipleFoldersRemoveAndClearTest extends OpenSearchTest {
 
 	DataFolderIndexDocument indexDoc = new DataFolderIndexDocument(//
 		indexName, //
-		SourceStorageWorker.DATA_1_PREFIX);
+		SourceStorageWorker.DATA_1_POSTFIX);
 
-	String indexDocKey = sourceId + SourceStorageWorker.DATA_1_PREFIX;
+	String indexDocKey = sourceId + SourceStorageWorker.DATA_1_POSTFIX;
 
 	folder.store(//
 		indexDocKey, //
@@ -702,7 +702,7 @@ public class MultipleFoldersRemoveAndClearTest extends OpenSearchTest {
 	    String sourceId, //
 	    int entriesCount) throws Exception {
 
-	String folderName = sourceId + SourceStorageWorker.DATA_1_PREFIX;//
+	String folderName = sourceId + SourceStorageWorker.DATA_1_POSTFIX;//
 
 	OpenSearchFolder folder = new OpenSearchFolder(database, folderName);
 

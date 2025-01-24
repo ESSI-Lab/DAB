@@ -163,8 +163,8 @@ public interface DatabaseFolder {
 	String name = folder.getName();
 	name = name.replace(database.getIdentifier() + "_", "");
 	name = name.replace(SourceStorageWorker.META_PREFIX, "");
-	name = name.replace(SourceStorageWorker.DATA_1_PREFIX, "");
-	name = name.replace(SourceStorageWorker.DATA_2_PREFIX, "");
+	name = name.replace(SourceStorageWorker.DATA_1_POSTFIX, "");
+	name = name.replace(SourceStorageWorker.DATA_2_POSTFIX, "");
 
 	return name;
     }

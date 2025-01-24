@@ -84,8 +84,10 @@ import eu.essi_lab.model.resource.ResourceProperty;
 public class SourceStorageWorker {
 
     public static final String META_PREFIX = "-meta";
-    public static final String DATA_2_PREFIX = "-data-2";
-    public static final String DATA_1_PREFIX = "-data-1";
+    public static final String DATA_1_SHORT_POSTFIX = "data-1";
+    public static final String DATA_2_SHORT_POSTFIX = "data-2";
+    public static final String DATA_2_POSTFIX = "-data-2";
+    public static final String DATA_1_POSTFIX = "-data-1";
     public static final String DATA_FOLDER_POSTFIX = "_dataFolder";
     public static final String WRITING_FOLDER_TAG = "writingFolder";
 
@@ -175,7 +177,7 @@ public class SourceStorageWorker {
 	 * @return
 	 * @throws XPathExpressionException
 	 */
-	public String getDataFolder() {
+	public String getShortDataFolderPostfix() {
 
 	    return getDataFolderPrefix().substring(1);
 	}
@@ -272,7 +274,7 @@ public class SourceStorageWorker {
      */
     public DatabaseFolder getData2Folder() throws GSException {
 
-	return database.getFolder(sourceId + DATA_2_PREFIX);
+	return database.getFolder(sourceId + DATA_2_POSTFIX);
     }
 
     /**
@@ -281,7 +283,7 @@ public class SourceStorageWorker {
      */
     public DatabaseFolder getData1Folder() throws GSException {
 
-	return database.getFolder(sourceId + DATA_1_PREFIX);
+	return database.getFolder(sourceId + DATA_1_POSTFIX);
     }
 
     /**
@@ -290,7 +292,7 @@ public class SourceStorageWorker {
      */
     public boolean existsData1Folder() throws GSException {
 
-	return database.existsFolder(sourceId + DATA_1_PREFIX);
+	return database.existsFolder(sourceId + DATA_1_POSTFIX);
     }
 
     /**
@@ -299,7 +301,7 @@ public class SourceStorageWorker {
      */
     public boolean existsData2Folder() throws GSException {
 
-	return database.existsFolder(sourceId + DATA_2_PREFIX);
+	return database.existsFolder(sourceId + DATA_2_POSTFIX);
     }
 
     /**
@@ -1045,14 +1047,14 @@ public class SourceStorageWorker {
 	DatabaseFolder dataFolder = Arrays.asList(database.getFolders()).//
 		stream().//
 
-		filter(f -> f.getName().equals(database.getIdentifier() + "_" + sourceId + DATA_1_PREFIX) || //
-			f.getName().equals(database.getIdentifier() + "_" + sourceId + DATA_2_PREFIX))
+		filter(f -> f.getName().equals(database.getIdentifier() + "_" + sourceId + DATA_1_POSTFIX) || //
+			f.getName().equals(database.getIdentifier() + "_" + sourceId + DATA_2_POSTFIX))
 		.
 
 		findFirst().//
 		get();
 
-	String dataFolderPostFix = dataFolder.getName().endsWith(DATA_1_PREFIX) ? DATA_1_PREFIX : DATA_2_PREFIX;
+	String dataFolderPostFix = dataFolder.getName().endsWith(DATA_1_POSTFIX) ? DATA_1_POSTFIX : DATA_2_POSTFIX;
 
 	debug("Data folder postfix [" + dataFolderPostFix + "]", status);
 
@@ -1487,7 +1489,7 @@ public class SourceStorageWorker {
      */
     private void addData2Folder() throws GSException {
 
-	database.addFolder(sourceId + DATA_2_PREFIX);
+	database.addFolder(sourceId + DATA_2_POSTFIX);
     }
 
     /**
@@ -1495,7 +1497,7 @@ public class SourceStorageWorker {
      */
     private void addData1Folder() throws GSException {
 
-	database.addFolder(sourceId + DATA_1_PREFIX);
+	database.addFolder(sourceId + DATA_1_POSTFIX);
     }
 
     /**
@@ -1503,7 +1505,7 @@ public class SourceStorageWorker {
      */
     private void removeData1Folder() throws GSException {
 
-	database.removeFolder(sourceId + DATA_1_PREFIX);
+	database.removeFolder(sourceId + DATA_1_POSTFIX);
     }
 
     /**
@@ -1511,7 +1513,7 @@ public class SourceStorageWorker {
      */
     private void removeData2Folder() throws GSException {
 
-	database.removeFolder(sourceId + DATA_2_PREFIX);
+	database.removeFolder(sourceId + DATA_2_POSTFIX);
     }
 
     /**

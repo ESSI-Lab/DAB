@@ -40,7 +40,7 @@ public class OpenSearchDataFolder_GSResourceFromOAIListRecordsTest extends OpenS
 
 	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
 
-	String folderName = "test" + SourceStorageWorker.DATA_1_PREFIX;
+	String folderName = "test" + SourceStorageWorker.DATA_1_POSTFIX;
 
 	OpenSearchFolder folder = new OpenSearchFolder(database, folderName);
 

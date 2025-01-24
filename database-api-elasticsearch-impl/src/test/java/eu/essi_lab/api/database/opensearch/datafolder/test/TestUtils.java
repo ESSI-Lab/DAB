@@ -61,7 +61,7 @@ public class TestUtils {
     public static String getDataFolderName(OpenSearchDatabase database) {
 
 	return SOURCE_ID + // source id
-		SourceStorageWorker.DATA_1_PREFIX;//
+		SourceStorageWorker.DATA_1_POSTFIX;//
     }
 
     /**

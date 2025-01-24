@@ -44,9 +44,9 @@ public class OpenSearchMetaFolder_indexDocTest extends OpenSearchTest {
 
 	DataFolderIndexDocument doc = new DataFolderIndexDocument(//
 		indexName, //
-		SourceStorageWorker.DATA_1_PREFIX);
+		SourceStorageWorker.DATA_1_POSTFIX);
 
-	String key = TestUtils.SOURCE_ID + SourceStorageWorker.DATA_1_PREFIX;
+	String key = TestUtils.SOURCE_ID + SourceStorageWorker.DATA_1_POSTFIX;
 
 	Assert.assertTrue(folder.store(//
 		key, //
@@ -83,7 +83,7 @@ public class OpenSearchMetaFolder_indexDocTest extends OpenSearchTest {
 
 	Assert.assertEquals(TestUtils.SOURCE_ID, wrapper.getSourceId().get());
 
-	Assert.assertEquals(SourceStorageWorker.DATA_1_PREFIX.substring(1), wrapper.getDataFolder().get());
+	Assert.assertEquals(SourceStorageWorker.DATA_1_POSTFIX.substring(1), wrapper.getDataFolder().get());
 
 	Assert.assertEquals(//
 		ConversionUtils.encode(FolderEntry.of(doc.getDocument())), wrapper.getIndexDoc().get());
@@ -110,13 +110,13 @@ public class OpenSearchMetaFolder_indexDocTest extends OpenSearchTest {
 
 	DataFolderIndexDocument doc = new DataFolderIndexDocument(//
 		indexName, //
-		SourceStorageWorker.DATA_1_PREFIX);
+		SourceStorageWorker.DATA_1_POSTFIX);
 
-	Assert.assertEquals(SourceStorageWorker.DATA_1_PREFIX.substring(1), doc.getDataFolder());
+	Assert.assertEquals(SourceStorageWorker.DATA_1_POSTFIX.substring(1), doc.getShortDataFolderPostfix());
 
-	Assert.assertEquals(SourceStorageWorker.DATA_1_PREFIX, doc.getDataFolderPrefix());
+	Assert.assertEquals(SourceStorageWorker.DATA_1_POSTFIX, doc.getDataFolderPrefix());
 
-	String key = TestUtils.SOURCE_ID + SourceStorageWorker.DATA_1_PREFIX;
+	String key = TestUtils.SOURCE_ID + SourceStorageWorker.DATA_1_POSTFIX;
 
 	//
 	//
@@ -132,9 +132,9 @@ public class OpenSearchMetaFolder_indexDocTest extends OpenSearchTest {
 
 	DataFolderIndexDocument doc2 = new DataFolderIndexDocument((Document) node);
 
-	Assert.assertEquals(SourceStorageWorker.DATA_1_PREFIX.substring(1), doc2.getDataFolder());
+	Assert.assertEquals(SourceStorageWorker.DATA_1_POSTFIX.substring(1), doc2.getShortDataFolderPostfix());
 
-	Assert.assertEquals(SourceStorageWorker.DATA_1_PREFIX, doc2.getDataFolderPrefix());
+	Assert.assertEquals(SourceStorageWorker.DATA_1_POSTFIX, doc2.getDataFolderPrefix());
 
 	//
 	// trying to get a doc as a binary always works
@@ -144,8 +144,8 @@ public class OpenSearchMetaFolder_indexDocTest extends OpenSearchTest {
 
 	DataFolderIndexDocument doc3 = new DataFolderIndexDocument(binary);
 
-	Assert.assertEquals(SourceStorageWorker.DATA_1_PREFIX.substring(1), doc3.getDataFolder());
+	Assert.assertEquals(SourceStorageWorker.DATA_1_POSTFIX.substring(1), doc3.getShortDataFolderPostfix());
 
-	Assert.assertEquals(SourceStorageWorker.DATA_1_PREFIX, doc3.getDataFolderPrefix());
+	Assert.assertEquals(SourceStorageWorker.DATA_1_POSTFIX, doc3.getDataFolderPrefix());
     }
 }

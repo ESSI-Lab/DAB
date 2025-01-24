@@ -104,11 +104,11 @@ public class OpenSearchFolderTest extends OpenSearchTest {
 
 	DataFolderIndexDocument doc1 = new DataFolderIndexDocument(//
 		indexName, //
-		SourceStorageWorker.DATA_1_PREFIX);
+		SourceStorageWorker.DATA_1_POSTFIX);
 
 	DataFolderIndexDocument doc2 = new DataFolderIndexDocument(//
 		indexName, //
-		SourceStorageWorker.DATA_2_PREFIX);
+		SourceStorageWorker.DATA_2_POSTFIX);
 
 	String key = UUID.randomUUID().toString();
 
@@ -128,7 +128,7 @@ public class OpenSearchFolderTest extends OpenSearchTest {
 	Assert.assertNotNull(folder.getBinary(key));
 	Assert.assertTrue(folder.exists(key));
 
-	Assert.assertEquals(SourceStorageWorker.DATA_1_PREFIX, new DataFolderIndexDocument(folder.getBinary(key)).getDataFolderPrefix());
+	Assert.assertEquals(SourceStorageWorker.DATA_1_POSTFIX, new DataFolderIndexDocument(folder.getBinary(key)).getDataFolderPrefix());
 
 	Assert.assertEquals(1, folder.size());
 	Assert.assertEquals(1, folder.listKeys().length);
@@ -139,7 +139,7 @@ public class OpenSearchFolderTest extends OpenSearchTest {
 	Assert.assertEquals(1, folder.listKeys().length);
 	Assert.assertEquals(1, folder.listIds().size());
 
-	Assert.assertEquals(SourceStorageWorker.DATA_2_PREFIX, new DataFolderIndexDocument(folder.getBinary(key)).getDataFolderPrefix());
+	Assert.assertEquals(SourceStorageWorker.DATA_2_POSTFIX, new DataFolderIndexDocument(folder.getBinary(key)).getDataFolderPrefix());
 
 	Assert.assertTrue(folder.remove(key));
 
