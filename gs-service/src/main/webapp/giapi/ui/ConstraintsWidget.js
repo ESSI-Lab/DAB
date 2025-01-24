@@ -2038,7 +2038,7 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 	var conceptBaseUrl = "";
 	if (options !== undefined && options.ontology !== undefined) {
 		if (options.ontology === "his-central") {
-			ontologyUrl = 'http://ontology.his-central.geodab.eu/ontology-browser/his-central-ontology.html?http://ontology.his-central.geodab.eu/hydro-ontology/concept/1';
+			ontologyUrl = 'https://ontology.his-central.geodab.eu/ontology-browser/his-central-ontology.html?http://ontology.his-central.geodab.eu/hydro-ontology/concept/1';
 			conceptBaseUrl = 'http://ontology.his-central.geodab.eu/hydro-ontology/concept/';
 		}
 		if (options.ontology === "whos") {
