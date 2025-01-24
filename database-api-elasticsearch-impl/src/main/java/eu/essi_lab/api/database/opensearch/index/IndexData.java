@@ -157,13 +157,13 @@ public class IndexData {
 
 	String entryName = FolderRegistryMapping.getEntryName(folder);
 
-	indexData.object.put(ENTRY_NAME, entryName);
-	indexData.object.put(DATABASE_ID, folder.getDatabase().getIdentifier());
+	indexData.put(ENTRY_NAME, entryName);
+	indexData.put(DATABASE_ID, folder.getDatabase().getIdentifier());
 
-	indexData.object.put(FOLDER_NAME, folder.getName());
-	indexData.object.put(FOLDER_ID, OpenSearchFolder.getFolderId(folder));
+	indexData.put(FOLDER_NAME, folder.getName());
+	indexData.put(FOLDER_ID, OpenSearchFolder.getFolderId(folder));
 
-	indexData.object.put(DATA_TYPE, EntryType.REGISTERED_FOLDER);
+	indexData.put(DATA_TYPE, EntryType.REGISTERED_FOLDER);
 
 	indexData.entryId = FolderRegistryMapping.getEntryId(folder);
 
@@ -200,12 +200,12 @@ public class IndexData {
 	// put the base properties
 	//
 
-	indexData.object.put(ENTRY_NAME, key);
-	indexData.object.put(DATABASE_ID, folder.getDatabase().getIdentifier());
-	indexData.object.put(FOLDER_NAME, folder.getName());
-	indexData.object.put(FOLDER_ID, OpenSearchFolder.getFolderId(folder));
+	indexData.put(ENTRY_NAME, key);
+	indexData.put(DATABASE_ID, folder.getDatabase().getIdentifier());
+	indexData.put(FOLDER_NAME, folder.getName());
+	indexData.put(FOLDER_ID, OpenSearchFolder.getFolderId(folder));
 
-	indexData.object.put(DATA_TYPE, entry.getDataType());
+	indexData.put(DATA_TYPE, entry.getDataType());
 
 	indexData.entryId = OpenSearchFolder.getEntryId(folder, key);
 
@@ -230,8 +230,14 @@ public class IndexData {
 
 	case GS_RESOURCE:
 
-	    indexData.object.put(BINARY_PROPERTY, DataFolderMapping.GS_RESOURCE);
-	    indexData.object.put(DataFolderMapping.GS_RESOURCE, encodedString);
+	    indexData.put(BINARY_PROPERTY, DataFolderMapping.GS_RESOURCE);
+	    indexData.put(DataFolderMapping.GS_RESOURCE, encodedString);
+
+	    String dataFolder = folder.getName().endsWith(SourceStorageWorker.DATA_1_SHORT_POSTFIX) //
+		    ? SourceStorageWorker.DATA_1_SHORT_POSTFIX //
+		    : SourceStorageWorker.DATA_2_SHORT_POSTFIX; //
+
+	    indexData.put(MetaFolderMapping.DATA_FOLDER, dataFolder);
 
 	    GSResource gsResource = GSResource.createOrNull(entry.getDocument().get());
 
@@ -260,12 +266,12 @@ public class IndexData {
 
 	    if (!shape.isEmpty()) {
 
-		indexData.object.put(MetadataElement.BOUNDING_BOX.getName(), shape.get().getShape());
-		indexData.object.put(BoundingBox.AREA_ELEMENT_NAME, shape.get().getArea());
+		indexData.put(MetadataElement.BOUNDING_BOX.getName(), shape.get().getShape());
+		indexData.put(BoundingBox.AREA_ELEMENT_NAME, shape.get().getArea());
 
 	    } else {
 
-		indexData.object.put(IndexedElements.BOUNDING_BOX_NULL.getElementName(), true);
+		indexData.put(IndexedElements.BOUNDING_BOX_NULL.getElementName(), true);
 	    }
 
 	    //
@@ -321,8 +327,8 @@ public class IndexData {
 
 	case WRITING_FOLDER_TAG:
 
-	    indexData.object.put(BINARY_PROPERTY, DataFolderMapping.WRITING_FOLDER_TAG);
-	    indexData.object.put(DataFolderMapping.WRITING_FOLDER_TAG, encodedString);
+	    indexData.put(BINARY_PROPERTY, DataFolderMapping.WRITING_FOLDER_TAG);
+	    indexData.put(DataFolderMapping.WRITING_FOLDER_TAG, encodedString);
 
 	    indexData.mapping = DataFolderMapping.get();
 
@@ -330,8 +336,8 @@ public class IndexData {
 
 	case AUGMENTER_PROPERTIES:
 
-	    indexData.object.put(BINARY_PROPERTY, AugmentersMapping.AUGMENTER_PROPERTIES);
-	    indexData.object.put(AugmentersMapping.AUGMENTER_PROPERTIES, encodedString);
+	    indexData.put(BINARY_PROPERTY, AugmentersMapping.AUGMENTER_PROPERTIES);
+	    indexData.put(AugmentersMapping.AUGMENTER_PROPERTIES, encodedString);
 
 	    indexData.mapping = AugmentersMapping.get();
 
@@ -339,10 +345,10 @@ public class IndexData {
 
 	case CONFIGURATION:
 
-	    indexData.object.put(BINARY_PROPERTY, ConfigurationMapping.CONFIGURATION);
-	    indexData.object.put(ConfigurationMapping.CONFIGURATION, encodedString);
+	    indexData.put(BINARY_PROPERTY, ConfigurationMapping.CONFIGURATION);
+	    indexData.put(ConfigurationMapping.CONFIGURATION, encodedString);
 
-	    indexData.object.put(ConfigurationMapping.CONFIGURATION_NAME, key);
+	    indexData.put(ConfigurationMapping.CONFIGURATION_NAME, key);
 
 	    indexData.mapping = ConfigurationMapping.get();
 
@@ -350,8 +356,8 @@ public class IndexData {
 
 	case CONFIGURATION_LOCK:
 
-	    indexData.object.put(BINARY_PROPERTY, ConfigurationMapping.CONFIGURATION_LOCK);
-	    indexData.object.put(ConfigurationMapping.CONFIGURATION_LOCK, encodedString);
+	    indexData.put(BINARY_PROPERTY, ConfigurationMapping.CONFIGURATION_LOCK);
+	    indexData.put(ConfigurationMapping.CONFIGURATION_LOCK, encodedString);
 
 	    indexData.mapping = ConfigurationMapping.get();
 
@@ -359,16 +365,16 @@ public class IndexData {
 
 	case USER:
 
-	    indexData.object.put(BINARY_PROPERTY, UsersMapping.USER);
-	    indexData.object.put(UsersMapping.USER, encodedString);
+	    indexData.put(BINARY_PROPERTY, UsersMapping.USER);
+	    indexData.put(UsersMapping.USER, encodedString);
 
 	    GSUser user = GSUser.createOrNull(entry.getDocument().get());
 
-	    indexData.object.put(UsersMapping.USER_ID, user.getIdentifier());
-	    user.getUserIdentifierType().ifPresent(t -> indexData.object.put(UsersMapping.USER_ID_TYPE, t.getType()));
+	    indexData.put(UsersMapping.USER_ID, user.getIdentifier());
+	    user.getUserIdentifierType().ifPresent(t -> indexData.put(UsersMapping.USER_ID_TYPE, t.getType()));
 
-	    indexData.object.put(UsersMapping.ENABLED, user.isEnabled());
-	    indexData.object.put(UsersMapping.USER_ROLE, user.getRole());
+	    indexData.put(UsersMapping.ENABLED, user.isEnabled());
+	    indexData.put(UsersMapping.USER_ROLE, user.getRole());
 
 	    indexData.mapping = UsersMapping.get();
 
@@ -376,18 +382,18 @@ public class IndexData {
 
 	case VIEW:
 
-	    indexData.object.put(BINARY_PROPERTY, ViewsMapping.VIEW);
-	    indexData.object.put(ViewsMapping.VIEW, encodedString);
+	    indexData.put(BINARY_PROPERTY, ViewsMapping.VIEW);
+	    indexData.put(ViewsMapping.VIEW, encodedString);
 
 	    try {
 
 		View view = View.fromStream(stream.clone());
 
-		indexData.object.put(ViewsMapping.VIEW_ID, view.getId());
-		indexData.object.put(ViewsMapping.VIEW_LABEL, view.getLabel());
-		indexData.object.put(ViewsMapping.VIEW_OWNER, view.getOwner());
-		indexData.object.put(ViewsMapping.VIEW_CREATOR, view.getCreator());
-		indexData.object.put(ViewsMapping.VIEW_VISIBILITY, view.getVisibility().name());
+		indexData.put(ViewsMapping.VIEW_ID, view.getId());
+		indexData.put(ViewsMapping.VIEW_LABEL, view.getLabel());
+		indexData.put(ViewsMapping.VIEW_OWNER, view.getOwner());
+		indexData.put(ViewsMapping.VIEW_CREATOR, view.getCreator());
+		indexData.put(ViewsMapping.VIEW_VISIBILITY, view.getVisibility().name());
 
 	    } catch (JAXBException e) {
 
@@ -400,15 +406,15 @@ public class IndexData {
 
 	case DATA_FOLDER_INDEX_DOC:
 
-	    indexData.object.put(BINARY_PROPERTY, MetaFolderMapping.INDEX_DOC);
-	    indexData.object.put(MetaFolderMapping.INDEX_DOC, encodedString);
+	    indexData.put(BINARY_PROPERTY, MetaFolderMapping.INDEX_DOC);
+	    indexData.put(MetaFolderMapping.INDEX_DOC, encodedString);
 
 	    DataFolderIndexDocument doc = new DataFolderIndexDocument(entry.getDocument().get());
 
-	    indexData.object.put(MetaFolderMapping.DATA_FOLDER, doc.getDataFolder());
+	    indexData.put(MetaFolderMapping.DATA_FOLDER, doc.getShortDataFolderPostfix());
 
 	    String sourceId = DatabaseFolder.computeSourceId(folder.getDatabase(), folder);
-	    indexData.object.put(MetaFolderMapping.SOURCE_ID, sourceId);
+	    indexData.put(MetaFolderMapping.SOURCE_ID, sourceId);
 
 	    indexData.mapping = MetaFolderMapping.get();
 
@@ -416,11 +422,11 @@ public class IndexData {
 
 	case HARVESTING_ERROR_REPORT:
 
-	    indexData.object.put(BINARY_PROPERTY, MetaFolderMapping.ERRORS_REPORT);
-	    indexData.object.put(MetaFolderMapping.ERRORS_REPORT, encodedString);
+	    indexData.put(BINARY_PROPERTY, MetaFolderMapping.ERRORS_REPORT);
+	    indexData.put(MetaFolderMapping.ERRORS_REPORT, encodedString);
 
 	    sourceId = DatabaseFolder.computeSourceId(folder.getDatabase(), folder);
-	    indexData.object.put(MetaFolderMapping.SOURCE_ID, sourceId);
+	    indexData.put(MetaFolderMapping.SOURCE_ID, sourceId);
 
 	    indexData.mapping = MetaFolderMapping.get();
 
@@ -428,11 +434,11 @@ public class IndexData {
 
 	case HARVESTING_WARN_REPORT:
 
-	    indexData.object.put(BINARY_PROPERTY, MetaFolderMapping.WARN_REPORT);
-	    indexData.object.put(MetaFolderMapping.WARN_REPORT, encodedString);
+	    indexData.put(BINARY_PROPERTY, MetaFolderMapping.WARN_REPORT);
+	    indexData.put(MetaFolderMapping.WARN_REPORT, encodedString);
 
 	    sourceId = DatabaseFolder.computeSourceId(folder.getDatabase(), folder);
-	    indexData.object.put(MetaFolderMapping.SOURCE_ID, sourceId);
+	    indexData.put(MetaFolderMapping.SOURCE_ID, sourceId);
 
 	    indexData.mapping = MetaFolderMapping.get();
 
@@ -440,19 +446,19 @@ public class IndexData {
 
 	case HARVESTING_PROPERTIES:
 
-	    indexData.object.put(BINARY_PROPERTY, MetaFolderMapping.HARVESTING_PROPERTIES);
-	    indexData.object.put(MetaFolderMapping.HARVESTING_PROPERTIES, encodedString);
+	    indexData.put(BINARY_PROPERTY, MetaFolderMapping.HARVESTING_PROPERTIES);
+	    indexData.put(MetaFolderMapping.HARVESTING_PROPERTIES, encodedString);
 
 	    sourceId = DatabaseFolder.computeSourceId(folder.getDatabase(), folder);
-	    indexData.object.put(MetaFolderMapping.SOURCE_ID, sourceId);
+	    indexData.put(MetaFolderMapping.SOURCE_ID, sourceId);
 
 	    indexData.mapping = MetaFolderMapping.get();
 
 	    break;
 	case CACHE_ENTRY:
 
-	    indexData.object.put(BINARY_PROPERTY, CacheMapping.CACHED_ENTRY);
-	    indexData.object.put(CacheMapping.CACHED_ENTRY, encodedString);
+	    indexData.put(BINARY_PROPERTY, CacheMapping.CACHED_ENTRY);
+	    indexData.put(CacheMapping.CACHED_ENTRY, encodedString);
 
 	    indexData.mapping = CacheMapping.get();
 
@@ -483,7 +489,7 @@ public class IndexData {
 	    return MetaFolderMapping.get().getIndex();
 	}
 
-	else if (name.contains(SourceStorageWorker.DATA_1_PREFIX) || name.contains(SourceStorageWorker.DATA_2_PREFIX)) {
+	else if (name.contains(SourceStorageWorker.DATA_1_POSTFIX) || name.contains(SourceStorageWorker.DATA_2_POSTFIX)) {
 
 	    return DataFolderMapping.get().getIndex();
 	}
@@ -520,7 +526,17 @@ public class IndexData {
 
 	object = new JSONObject();
     }
-
+    
+    /**
+     * 
+     * @param field
+     * @param value
+     */
+    private void put(String field, Object value) {
+	
+	object.put(field, value);
+    }
+    
     /**
      * @return the request
      */
@@ -683,7 +699,7 @@ public class IndexData {
 
 	if (array.length() > 0) {
 
-	    indexData.object.put(elName, array);
+	    indexData.put(elName, array);
 	}
     }
 

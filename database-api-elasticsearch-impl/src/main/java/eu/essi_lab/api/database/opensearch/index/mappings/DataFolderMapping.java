@@ -61,6 +61,8 @@ public class DataFolderMapping extends IndexMapping {
 	addProperty(GS_RESOURCE, FieldType.Binary.jsonValue());
 	addProperty(WRITING_FOLDER_TAG, FieldType.Binary.jsonValue());
 
+	addProperty(MetaFolderMapping.DATA_FOLDER, FieldType.Text.jsonValue());
+
 	// --------------------------------------------------
 	//
 	// gs-resource explicit mappings from MetadataElement
