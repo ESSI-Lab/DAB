@@ -38,6 +38,7 @@ import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
+import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
 
 /**
  * @author Fabrizio
@@ -149,7 +150,7 @@ public class OpenSearchFolder implements DatabaseFolder {
     @Override
     public String[] listKeys() throws Exception {
 
-	Query searchQuery = wrapper.buildSearchEntriesQuery(this);
+	Query searchQuery = OpenSearchQueryBuilder.buildSearchEntriesQuery(this);
 
 	return wrapper.searchProperty(//
 		searchQuery, //
@@ -163,7 +164,7 @@ public class OpenSearchFolder implements DatabaseFolder {
      */
     public List<String> listIds() throws Exception {
 
-	Query searchQuery = wrapper.buildSearchEntriesQuery(this);
+	Query searchQuery = OpenSearchQueryBuilder.buildSearchEntriesQuery(this);
 
 	return wrapper.searchProperty(//
 		searchQuery, //
@@ -174,7 +175,7 @@ public class OpenSearchFolder implements DatabaseFolder {
     @Override
     public int size() throws Exception {
 
-	Query query = wrapper.buildSearchEntriesQuery(this);
+	Query query = OpenSearchQueryBuilder.buildSearchEntriesQuery(this);
 	return (int) wrapper.count(query);
     }
 
@@ -183,7 +184,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 
 	String index = IndexData.detectIndex(this);
 
-	Query query = wrapper.buildSearchEntriesQuery(this);
+	Query query = OpenSearchQueryBuilder.buildSearchEntriesQuery(this);
 
 	DeleteByQueryRequest queryRequest = wrapper.buildDeleteByQueryRequest(index, query);
 

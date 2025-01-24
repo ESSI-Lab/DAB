@@ -39,6 +39,7 @@ import eu.essi_lab.api.database.GetViewIdentifiersRequest;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.UsersMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
+import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.model.GSSource;
@@ -80,7 +81,7 @@ public class OpenSearchReader implements DatabaseReader {
     @Override
     public List<GSUser> getUsers() throws GSException {
 
-	Query query = wrapper.buildSearchQuery(getDatabase().getIdentifier(), UsersMapping.get().getIndex());
+	Query query = OpenSearchQueryBuilder.buildSearchQuery(getDatabase().getIdentifier(), UsersMapping.get().getIndex());
 
 	try {
 	    return wrapper.searchBinaries(query).//
@@ -100,7 +101,7 @@ public class OpenSearchReader implements DatabaseReader {
     @Override
     public Optional<View> getView(String viewId) throws GSException {
 
-	Query query = wrapper.buildSearchQuery(//
+	Query query = OpenSearchQueryBuilder.buildSearchQuery(//
 		getDatabase().getIdentifier(), //
 		ViewsMapping.get().getIndex(), //
 		ViewsMapping.VIEW_ID, //
@@ -124,7 +125,7 @@ public class OpenSearchReader implements DatabaseReader {
     @Override
     public List<String> getViewIdentifiers(GetViewIdentifiersRequest request) throws GSException {
 
-	Query query = wrapper.buildSearchViewsQuery(//
+	Query query = OpenSearchQueryBuilder.buildSearchViewsQuery(//
 		database.getIdentifier(), //
 		request.getCreator(), //
 		request.getOwner(), //
@@ -168,7 +169,7 @@ public class OpenSearchReader implements DatabaseReader {
 	    break;
 	}
 
-	Query query = wrapper.buildSearchQuery(//
+	Query query = OpenSearchQueryBuilder.buildSearchQuery(//
 		database.getIdentifier(), //
 		DataFolderMapping.get().getIndex(), //
 		property.getName(), //
@@ -180,7 +181,7 @@ public class OpenSearchReader implements DatabaseReader {
 		    map(binary -> GSResource.createOrNull(binary)).//
 		    filter(Objects::nonNull).//
 		    collect(Collectors.toList());
-	    
+
 	} catch (Exception ex) {
 
 	    GSLoggerFactory.getLogger(OpenSearchDatabase.class).error(ex);

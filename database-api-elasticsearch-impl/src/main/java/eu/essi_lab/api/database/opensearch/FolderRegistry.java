@@ -33,6 +33,7 @@ import org.opensearch.client.opensearch._types.query_dsl.Query;
 
 import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.mappings.FolderRegistryMapping;
+import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
 
 /**
  * @author Fabrizio
@@ -116,7 +117,7 @@ public class FolderRegistry {
      */
     public List<OpenSearchFolder> getRegisteredFolders() throws OpenSearchException, IOException {
 
-	Query query = wrapper.buildSearchRegistryQuery(database.getIdentifier());
+	Query query = OpenSearchQueryBuilder.buildSearchRegistryQuery(database.getIdentifier());
 
 	List<String> names = wrapper.searchProperty(query, IndexData.FOLDER_NAME);
 

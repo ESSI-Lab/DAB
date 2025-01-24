@@ -23,6 +23,7 @@ import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.UsersMapping;
+import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 import eu.essi_lab.indexes.IndexedElementsWriter;
 import eu.essi_lab.model.resource.Dataset;
@@ -124,7 +125,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 	//
 	//
 
-	Query query = wrapper.buildSearchQuery(database.getIdentifier(), DataFolderMapping.get().getIndex());
+	Query query = OpenSearchQueryBuilder.buildSearchQuery(database.getIdentifier(), DataFolderMapping.get().getIndex());
 
 	List<GSResource> resources = wrapper.searchBinaries(query).//
 		stream().//
@@ -138,7 +139,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 	//
 	//
 
-	query = wrapper.buildSearchQuery(//
+	query = OpenSearchQueryBuilder.buildSearchQuery(//
 		database.getIdentifier(), //
 		DataFolderMapping.get().getIndex(), //
 		ResourceProperty.PRIVATE_ID.getName(), //
@@ -158,7 +159,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 	//
 	//
 
-	query = wrapper.buildSearchQuery(//
+	query = OpenSearchQueryBuilder.buildSearchQuery(//
 		database.getIdentifier(), //
 		DataFolderMapping.get().getIndex(), //
 		MetadataElement.TITLE.getName(), //
@@ -178,7 +179,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 	// wrong property
 	//
 
-	query = wrapper.buildSearchQuery(//
+	query = OpenSearchQueryBuilder.buildSearchQuery(//
 		database.getIdentifier(), //
 		DataFolderMapping.get().getIndex(), //
 		MetadataElement.ABSTRACT.getName(), //
@@ -196,7 +197,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 	// wrong index
 	//
 
-	query = wrapper.buildSearchQuery(//
+	query = OpenSearchQueryBuilder.buildSearchQuery(//
 		database.getIdentifier(), //
 		UsersMapping.get().getIndex(), //
 		MetadataElement.TITLE.getName(), //
@@ -214,7 +215,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 	// undefined property
 	//
 
-	query = wrapper.buildSearchQuery(//
+	query = OpenSearchQueryBuilder.buildSearchQuery(//
 		database.getIdentifier(), //
 		DataFolderMapping.get().getIndex(), //
 		"undefined_property", //
@@ -232,7 +233,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 	// undefined value
 	//
 
-	query = wrapper.buildSearchQuery(//
+	query = OpenSearchQueryBuilder.buildSearchQuery(//
 		database.getIdentifier(), //
 		DataFolderMapping.get().getIndex(), //
 		MetadataElement.TITLE.getName(), //
@@ -260,14 +261,13 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 	//
 	//
 	//
-	
+
 	int TOTAL = 14;
 
 	int RESOURCE_A = 5;
 	int RESOURCE_B = 3;
 	int RESOURCE_C = 4;
 	int RESOURCE_D = 2;
-
 
 	storeResources(folder, "resourceA", "titleA", "abstractA", RESOURCE_A);
 
@@ -279,13 +279,12 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 
 	OpenSearchWrapper wrapper = new OpenSearchWrapper(database.getClient());
 
-	
 	int folderSize = folder.size();
 	Assert.assertEquals(TOTAL, folderSize);
 
 	OpenSearchWriter writer = new OpenSearchWriter();
 	writer.setDatabase(database);
-	
+
 	//
 	// removes the resourceA_0
 	//
@@ -321,7 +320,6 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 	    Assert.assertNotNull(folder.get("resourceA_4"));
 	}
 
-	
 	//
 	// removes the resourceC_2
 	//
@@ -376,7 +374,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 	    //
 	    //
 
-	    Query titleAquery = wrapper.buildSearchQuery(//
+	    Query titleAquery = OpenSearchQueryBuilder.buildSearchQuery(//
 		    database.getIdentifier(), //
 		    DataFolderMapping.get().getIndex(), //
 		    MetadataElement.TITLE.getName(), //
@@ -394,7 +392,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 	    //
 	    //
 
-	    Query titleBquery = wrapper.buildSearchQuery(//
+	    Query titleBquery = OpenSearchQueryBuilder.buildSearchQuery(//
 		    database.getIdentifier(), //
 		    DataFolderMapping.get().getIndex(), //
 		    MetadataElement.TITLE.getName(), //
@@ -412,7 +410,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 	    //
 	    //
 
-	    Query titleCquery = wrapper.buildSearchQuery(//
+	    Query titleCquery = OpenSearchQueryBuilder.buildSearchQuery(//
 		    database.getIdentifier(), //
 		    DataFolderMapping.get().getIndex(), //
 		    MetadataElement.TITLE.getName(), //
@@ -430,7 +428,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 	    //
 	    //
 
-	    Query titleDquery = wrapper.buildSearchQuery(//
+	    Query titleDquery = OpenSearchQueryBuilder.buildSearchQuery(//
 		    database.getIdentifier(), //
 		    DataFolderMapping.get().getIndex(), //
 		    MetadataElement.TITLE.getName(), //
@@ -449,8 +447,8 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 
 	//
 	// removes all resourceC by abstract
-	// 
-	
+	//
+
 	{
 	    writer.remove(MetadataElement.ABSTRACT.getName(), "abstractC");
 
@@ -461,7 +459,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 	    //
 	    //
 
-	    Query titleAquery = wrapper.buildSearchQuery(//
+	    Query titleAquery = OpenSearchQueryBuilder.buildSearchQuery(//
 		    database.getIdentifier(), //
 		    DataFolderMapping.get().getIndex(), //
 		    MetadataElement.TITLE.getName(), //
@@ -479,7 +477,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 	    //
 	    //
 
-	    Query titleBquery = wrapper.buildSearchQuery(//
+	    Query titleBquery = OpenSearchQueryBuilder.buildSearchQuery(//
 		    database.getIdentifier(), //
 		    DataFolderMapping.get().getIndex(), //
 		    MetadataElement.TITLE.getName(), //
@@ -492,12 +490,12 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 		    collect(Collectors.toList());
 
 	    Assert.assertEquals(RESOURCE_B, titleBresources.size());
-	
+
 	    //
 	    //
 	    //
 
-	    Query titleDquery = wrapper.buildSearchQuery(//
+	    Query titleDquery = OpenSearchQueryBuilder.buildSearchQuery(//
 		    database.getIdentifier(), //
 		    DataFolderMapping.get().getIndex(), //
 		    MetadataElement.TITLE.getName(), //
@@ -510,12 +508,12 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 		    collect(Collectors.toList());
 
 	    Assert.assertEquals(RESOURCE_D, titleDresources.size());
-	    
+
 	    //
 	    //
 	    //
 
-	    Query titleCquery = wrapper.buildSearchQuery(//
+	    Query titleCquery = OpenSearchQueryBuilder.buildSearchQuery(//
 		    database.getIdentifier(), //
 		    DataFolderMapping.get().getIndex(), //
 		    MetadataElement.TITLE.getName(), //

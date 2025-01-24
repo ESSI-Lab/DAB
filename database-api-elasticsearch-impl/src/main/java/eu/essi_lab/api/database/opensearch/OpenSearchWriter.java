@@ -35,6 +35,7 @@ import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseWriter;
 import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
+import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -76,7 +77,7 @@ public class OpenSearchWriter extends DatabaseWriter {
     @Override
     public void remove(String propertyName, String propertyValue) throws GSException {
 
-	Query query = wrapper.buildSearchQuery(//
+	Query query = OpenSearchQueryBuilder.buildSearchQuery(//
 		getDatabase().getIdentifier(), //
 		DataFolderMapping.get().getIndex(), //
 		propertyName, //

@@ -25,6 +25,7 @@ import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.AugmentersMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.UsersMapping;
+import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.auth.UserIdentifierType;
@@ -219,7 +220,7 @@ public class OpenSearchUsersFolderTest extends OpenSearchTest {
 	//
 	//
 	
-	Query query = wrapper.buildSearchQuery(database.getIdentifier(), UsersMapping.get().getIndex());
+	Query query = OpenSearchQueryBuilder.buildSearchQuery(database.getIdentifier(), UsersMapping.get().getIndex());
 
 	List<GSUser> users = wrapper.searchBinaries(query).//
 		stream().//
@@ -233,7 +234,7 @@ public class OpenSearchUsersFolderTest extends OpenSearchTest {
 	//
 	//
 	
-	query = wrapper.buildSearchQuery(//
+	query = OpenSearchQueryBuilder.buildSearchQuery(//
 		database.getIdentifier(), //
 		UsersMapping.get().getIndex(), //
 		UsersMapping.USER_ID, //
@@ -254,7 +255,7 @@ public class OpenSearchUsersFolderTest extends OpenSearchTest {
 	//
 	//
 
-	query = wrapper.buildSearchQuery(//
+	query = OpenSearchQueryBuilder.buildSearchQuery(//
 		database.getIdentifier(), //
 		UsersMapping.get().getIndex(), //
 		UsersMapping.USER_ROLE, //
@@ -274,7 +275,7 @@ public class OpenSearchUsersFolderTest extends OpenSearchTest {
 	// undefined value
 	//
 	
-	query = wrapper.buildSearchQuery(//
+	query = OpenSearchQueryBuilder.buildSearchQuery(//
 		database.getIdentifier(), //
 		UsersMapping.get().getIndex(), //
 		UsersMapping.USER_ROLE, //
@@ -292,7 +293,7 @@ public class OpenSearchUsersFolderTest extends OpenSearchTest {
 	// undefined property
 	//
 	
-	query = wrapper.buildSearchQuery(//
+	query = OpenSearchQueryBuilder.buildSearchQuery(//
 		database.getIdentifier(), //
 		UsersMapping.get().getIndex(), //
 		"unknown_property", //
@@ -310,7 +311,7 @@ public class OpenSearchUsersFolderTest extends OpenSearchTest {
 	// wrong index
 	//
 	
-	query = wrapper.buildSearchQuery(//
+	query = OpenSearchQueryBuilder.buildSearchQuery(//
 		database.getIdentifier(), //
 		AugmentersMapping.get().getIndex(), //
 		UsersMapping.USER_ROLE, //

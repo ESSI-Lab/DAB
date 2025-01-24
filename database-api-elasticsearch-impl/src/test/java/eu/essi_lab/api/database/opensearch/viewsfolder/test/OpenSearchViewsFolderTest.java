@@ -28,6 +28,7 @@ import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.UsersMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
+import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.bond.View.ViewVisibility;
@@ -219,7 +220,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 	//
 	//
 
-	Query query = wrapper.buildSearchQuery(//
+	Query query = OpenSearchQueryBuilder.buildSearchQuery(//
 		database.getIdentifier(), //
 		ViewsMapping.get().getIndex(), //
 		ViewsMapping.VIEW_ID, //
@@ -239,7 +240,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 	//
 	//
 
-	query = wrapper.buildSearchQuery(//
+	query = OpenSearchQueryBuilder.buildSearchQuery(//
 		database.getIdentifier(), //
 		ViewsMapping.get().getIndex(), //
 		ViewsMapping.VIEW_LABEL, //
@@ -259,7 +260,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 	//
 	//
 
-	query = wrapper.buildSearchQuery(//
+	query = OpenSearchQueryBuilder.buildSearchQuery(//
 		database.getIdentifier(), //
 		ViewsMapping.get().getIndex(), //
 		ViewsMapping.VIEW_CREATOR, //
@@ -277,7 +278,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 	// wrong index
 	//
 
-	query = wrapper.buildSearchQuery(//
+	query = OpenSearchQueryBuilder.buildSearchQuery(//
 		database.getIdentifier(), //
 		UsersMapping.get().getIndex(), //
 		ViewsMapping.VIEW_LABEL, //
@@ -295,7 +296,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 	//
 	//
 
-	query = wrapper.buildSearchQuery(//
+	query = OpenSearchQueryBuilder.buildSearchQuery(//
 		database.getIdentifier(), //
 		ViewsMapping.get().getIndex());
 
@@ -311,7 +312,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 	// wrong index
 	//
 
-	query = wrapper.buildSearchQuery(//
+	query = OpenSearchQueryBuilder.buildSearchQuery(//
 		database.getIdentifier(), //
 		UsersMapping.get().getIndex());
 
@@ -342,7 +343,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 
 	OpenSearchWrapper wrapper = new OpenSearchWrapper(database.getClient());
 
-	Query query = wrapper.buildSearchQuery(//
+	Query query = OpenSearchQueryBuilder.buildSearchQuery(//
 		database.getIdentifier(), //
 		ViewsMapping.get().getIndex());
 
@@ -498,7 +499,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 
 	    GetViewIdentifiersRequest request = GetViewIdentifiersRequest.create();
 
-	    Query query = wrapper.buildSearchViewsQuery(//
+	    Query query = OpenSearchQueryBuilder.buildSearchViewsQuery(//
 		    database.getIdentifier(), //
 		    request.getCreator(), //
 		    request.getOwner(), //
@@ -519,7 +520,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 	{
 	    GetViewIdentifiersRequest request = GetViewIdentifiersRequest.create();
 
-	    Query query = wrapper.buildSearchViewsQuery(//
+	    Query query = OpenSearchQueryBuilder.buildSearchViewsQuery(//
 		    database.getIdentifier(), //
 		    request.getCreator(), //
 		    request.getOwner(), //
@@ -540,7 +541,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 	{
 	    GetViewIdentifiersRequest request = GetViewIdentifiersRequest.create();
 
-	    Query query = wrapper.buildSearchViewsQuery(//
+	    Query query = OpenSearchQueryBuilder.buildSearchViewsQuery(//
 		    database.getIdentifier(), //
 		    request.getCreator(), //
 		    request.getOwner(), //
@@ -564,7 +565,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 		    ViewVisibility.PUBLIC//
 	    );
 
-	    Query query = wrapper.buildSearchViewsQuery(//
+	    Query query = OpenSearchQueryBuilder.buildSearchViewsQuery(//
 		    database.getIdentifier(), //
 		    request.getCreator(), //
 		    request.getOwner(), //
@@ -588,7 +589,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 		    ViewVisibility.PRIVATE//
 	    );
 
-	    Query query = wrapper.buildSearchViewsQuery(//
+	    Query query = OpenSearchQueryBuilder.buildSearchViewsQuery(//
 		    database.getIdentifier(), //
 		    request.getCreator(), //
 		    request.getOwner(), //
@@ -612,7 +613,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 		    ViewVisibility.PUBLIC//
 	    );
 
-	    Query query = wrapper.buildSearchViewsQuery(//
+	    Query query = OpenSearchQueryBuilder.buildSearchViewsQuery(//
 		    database.getIdentifier(), //
 		    request.getCreator(), //
 		    request.getOwner(), //
@@ -636,7 +637,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 		    ViewVisibility.PRIVATE//
 	    );
 
-	    Query query = wrapper.buildSearchViewsQuery(//
+	    Query query = OpenSearchQueryBuilder.buildSearchViewsQuery(//
 		    database.getIdentifier(), //
 		    request.getCreator(), //
 		    request.getOwner(), //
@@ -660,7 +661,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 		    ViewVisibility.PUBLIC//
 	    );
 
-	    Query query = wrapper.buildSearchViewsQuery(//
+	    Query query = OpenSearchQueryBuilder.buildSearchViewsQuery(//
 		    database.getIdentifier(), //
 		    request.getCreator(), //
 		    request.getOwner(), //
@@ -684,7 +685,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 		    ViewVisibility.PRIVATE//
 	    );
 
-	    Query query = wrapper.buildSearchViewsQuery(//
+	    Query query = OpenSearchQueryBuilder.buildSearchViewsQuery(//
 		    database.getIdentifier(), //
 		    request.getCreator(), //
 		    request.getOwner(), //
@@ -706,7 +707,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 	    GetViewIdentifiersRequest request = GetViewIdentifiersRequest.create(//
 		    "creator1");
 
-	    Query query = wrapper.buildSearchViewsQuery(//
+	    Query query = OpenSearchQueryBuilder.buildSearchViewsQuery(//
 		    database.getIdentifier(), //
 		    request.getCreator(), //
 		    request.getOwner(), //
@@ -728,7 +729,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 	    GetViewIdentifiersRequest request = GetViewIdentifiersRequest.create(//
 		    "creator2");
 
-	    Query query = wrapper.buildSearchViewsQuery(//
+	    Query query = OpenSearchQueryBuilder.buildSearchViewsQuery(//
 		    database.getIdentifier(), //
 		    request.getCreator(), //
 		    request.getOwner(), //
@@ -750,7 +751,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 	    GetViewIdentifiersRequest request = GetViewIdentifiersRequest.create(//
 		    "creator3");
 
-	    Query query = wrapper.buildSearchViewsQuery(//
+	    Query query = OpenSearchQueryBuilder.buildSearchViewsQuery(//
 		    database.getIdentifier(), //
 		    request.getCreator(), //
 		    request.getOwner(), //
@@ -772,7 +773,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 	    GetViewIdentifiersRequest request = GetViewIdentifiersRequest.create(//
 		    ViewVisibility.PUBLIC);
 
-	    Query query = wrapper.buildSearchViewsQuery(//
+	    Query query = OpenSearchQueryBuilder.buildSearchViewsQuery(//
 		    database.getIdentifier(), //
 		    request.getCreator(), //
 		    request.getOwner(), //
@@ -794,7 +795,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 	    GetViewIdentifiersRequest request = GetViewIdentifiersRequest.create(//
 		    ViewVisibility.PRIVATE);
 
-	    Query query = wrapper.buildSearchViewsQuery(//
+	    Query query = OpenSearchQueryBuilder.buildSearchViewsQuery(//
 		    database.getIdentifier(), //
 		    request.getCreator(), //
 		    request.getOwner(), //
@@ -816,7 +817,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 	    GetViewIdentifiersRequest request = GetViewIdentifiersRequest.create(//
 		    "creator1", "ownerA");
 
-	    Query query = wrapper.buildSearchViewsQuery(//
+	    Query query = OpenSearchQueryBuilder.buildSearchViewsQuery(//
 		    database.getIdentifier(), //
 		    request.getCreator(), //
 		    request.getOwner(), //
@@ -838,7 +839,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 	    GetViewIdentifiersRequest request = GetViewIdentifiersRequest.create(//
 		    "creator1", "ownerB");
 
-	    Query query = wrapper.buildSearchViewsQuery(//
+	    Query query = OpenSearchQueryBuilder.buildSearchViewsQuery(//
 		    database.getIdentifier(), //
 		    request.getCreator(), //
 		    request.getOwner(), //
