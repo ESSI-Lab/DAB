@@ -25,8 +25,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.json.JSONObject;
-import org.opensearch.client.json.JsonpSerializable;
 import org.opensearch.client.json.jsonb.JsonbJsonpMapper;
+import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch.core.SearchResponse;
 import org.opensearch.client.opensearch.core.search.Hit;
 import org.opensearch.client.opensearch.core.search.HitsMetadata;
@@ -42,6 +42,7 @@ import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.xml.XMLFactories;
 import eu.essi_lab.messages.PerformanceLogger;
 import jakarta.json.stream.JsonGenerator;
+import jakarta.json.stream.JsonParser;
 
 /**
  * @author Fabrizio
@@ -124,7 +125,7 @@ public class ConversionUtils {
      * @param obj
      * @return
      */
-    public static JSONObject toJsonObject(JsonpSerializable obj) {
+    public static JSONObject toJSONObject(Query obj) {
 
 	StringWriter stringWriter = new StringWriter();
 
@@ -136,7 +137,21 @@ public class ConversionUtils {
 
 	return new JSONObject(stringWriter.toString());
     }
-    
+
+    /**
+     * @param obj
+     * @return
+     */
+    public static Query toQuery(JSONObject obj) {
+
+	JsonbJsonpMapper mapper = new JsonbJsonpMapper();
+
+	JsonParser parser = mapper.jsonProvider().//
+		createParser(new ByteArrayInputStream(obj.toString(3).getBytes()));
+
+	return mapper.deserialize(parser, Query.class);
+    }
+
     /**
      * @param doc
      * @param stream
@@ -239,7 +254,7 @@ public class ConversionUtils {
      */
     public static Node toNodeOrNull(InputStream source) {
 
- 	try {
+	try {
 	    return toNode(source);
 
 	} catch (Exception ex) {
