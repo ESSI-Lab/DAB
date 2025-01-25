@@ -353,7 +353,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 
 	GetViewIdentifiersRequest request = GetViewIdentifiersRequest.create();
 
-	List<String> ids = wrapper.searchProperty(query, ViewsMapping.VIEW_ID).//
+	List<String> ids = wrapper.searchField(query, ViewsMapping.VIEW_ID).//
 		stream().//
 		sorted().//
 		collect(Collectors.toList());
@@ -368,7 +368,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 
 	request = GetViewIdentifiersRequest.create(0, 3);
 
-	ids = wrapper.searchProperty(query, ViewsMapping.VIEW_ID).//
+	ids = wrapper.searchField(query, ViewsMapping.VIEW_ID).//
 		stream().//
 		sorted().//
 		collect(Collectors.toList());
@@ -387,7 +387,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 
 	request = GetViewIdentifiersRequest.create(1, 3);
 
-	ids = wrapper.searchProperty(query, ViewsMapping.VIEW_ID).//
+	ids = wrapper.searchField(query, ViewsMapping.VIEW_ID).//
 		stream().//
 		sorted().//
 		collect(Collectors.toList());
@@ -406,7 +406,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 
 	request = GetViewIdentifiersRequest.create(1, 1);
 
-	ids = wrapper.searchProperty(query, ViewsMapping.VIEW_ID).//
+	ids = wrapper.searchField(query, ViewsMapping.VIEW_ID).//
 		stream().//
 		sorted().//
 		collect(Collectors.toList());
@@ -423,7 +423,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 
 	request = GetViewIdentifiersRequest.create(15, 3);
 
-	ids = wrapper.searchProperty(query, ViewsMapping.VIEW_ID).//
+	ids = wrapper.searchField(query, ViewsMapping.VIEW_ID).//
 		stream().//
 		sorted().//
 		collect(Collectors.toList());
@@ -506,7 +506,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 		    request.getVisibility()//
 	    );
 
-	    List<String> ids = wrapper.searchProperty(query, ViewsMapping.VIEW_ID, 0, TOTAL);
+	    List<String> ids = wrapper.searchField(query, ViewsMapping.VIEW_ID, 0, TOTAL);
 
 	    ids = subList(ids, request);
 
@@ -527,7 +527,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 		    request.getVisibility()//
 	    );
 
-	    List<String> ids = wrapper.searchProperty(query, ViewsMapping.VIEW_ID, 0, TOTAL + 10);
+	    List<String> ids = wrapper.searchField(query, ViewsMapping.VIEW_ID, 0, TOTAL + 10);
 
 	    ids = subList(ids, request);
 
@@ -548,7 +548,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 		    request.getVisibility()//
 	    );
 
-	    List<String> ids = wrapper.searchProperty(query, ViewsMapping.VIEW_ID, TOTAL + 10, TOTAL);
+	    List<String> ids = wrapper.searchField(query, ViewsMapping.VIEW_ID, TOTAL + 10, TOTAL);
 
 	    ids = subList(ids, request);
 
@@ -572,7 +572,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 		    request.getVisibility()//
 	    );
 
-	    List<String> ids = wrapper.searchProperty(query, ViewsMapping.VIEW_ID, 0, TOTAL);
+	    List<String> ids = wrapper.searchField(query, ViewsMapping.VIEW_ID, 0, TOTAL);
 
 	    ids = subList(ids, request);
 
@@ -596,7 +596,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 		    request.getVisibility()//
 	    );
 
-	    List<String> ids = wrapper.searchProperty(query, ViewsMapping.VIEW_ID, 0, TOTAL);
+	    List<String> ids = wrapper.searchField(query, ViewsMapping.VIEW_ID, 0, TOTAL);
 
 	    ids = subList(ids, request);
 
@@ -620,7 +620,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 		    request.getVisibility()//
 	    );
 
-	    List<String> ids = wrapper.searchProperty(query, ViewsMapping.VIEW_ID, 0, TOTAL);
+	    List<String> ids = wrapper.searchField(query, ViewsMapping.VIEW_ID, 0, TOTAL);
 
 	    ids = subList(ids, request);
 
@@ -644,7 +644,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 		    request.getVisibility()//
 	    );
 
-	    List<String> ids = wrapper.searchProperty(query, ViewsMapping.VIEW_ID, 0, TOTAL);
+	    List<String> ids = wrapper.searchField(query, ViewsMapping.VIEW_ID, 0, TOTAL);
 
 	    ids = subList(ids, request);
 
@@ -668,7 +668,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 		    request.getVisibility()//
 	    );
 
-	    List<String> ids = wrapper.searchProperty(query, ViewsMapping.VIEW_ID, 0, TOTAL);
+	    List<String> ids = wrapper.searchField(query, ViewsMapping.VIEW_ID, 0, TOTAL);
 
 	    ids = subList(ids, request);
 
@@ -692,7 +692,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 		    request.getVisibility()//
 	    );
 
-	    List<String> ids = wrapper.searchProperty(query, ViewsMapping.VIEW_ID, 0, TOTAL);
+	    List<String> ids = wrapper.searchField(query, ViewsMapping.VIEW_ID, 0, TOTAL);
 
 	    ids = subList(ids, request);
 
@@ -714,7 +714,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 		    request.getVisibility()//
 	    );
 
-	    List<String> ids = wrapper.searchProperty(query, ViewsMapping.VIEW_ID, 0, TOTAL);
+	    List<String> ids = wrapper.searchField(query, ViewsMapping.VIEW_ID, 0, TOTAL);
 
 	    ids = subList(ids, request);
 
@@ -736,7 +736,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 		    request.getVisibility()//
 	    );
 
-	    List<String> ids = wrapper.searchProperty(query, ViewsMapping.VIEW_ID, 0, TOTAL);
+	    List<String> ids = wrapper.searchField(query, ViewsMapping.VIEW_ID, 0, TOTAL);
 
 	    ids = subList(ids, request);
 
@@ -758,7 +758,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 		    request.getVisibility()//
 	    );
 
-	    List<String> ids = wrapper.searchProperty(query, ViewsMapping.VIEW_ID, 0, TOTAL);
+	    List<String> ids = wrapper.searchField(query, ViewsMapping.VIEW_ID, 0, TOTAL);
 
 	    ids = subList(ids, request);
 
@@ -780,7 +780,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 		    request.getVisibility()//
 	    );
 
-	    List<String> ids = wrapper.searchProperty(query, ViewsMapping.VIEW_ID, 0, TOTAL);
+	    List<String> ids = wrapper.searchField(query, ViewsMapping.VIEW_ID, 0, TOTAL);
 
 	    ids = subList(ids, request);
 
@@ -802,7 +802,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 		    request.getVisibility()//
 	    );
 
-	    List<String> ids = wrapper.searchProperty(query, ViewsMapping.VIEW_ID, 0, TOTAL);
+	    List<String> ids = wrapper.searchField(query, ViewsMapping.VIEW_ID, 0, TOTAL);
 
 	    ids = subList(ids, request);
 
@@ -824,7 +824,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 		    request.getVisibility()//
 	    );
 
-	    List<String> ids = wrapper.searchProperty(query, ViewsMapping.VIEW_ID, 0, TOTAL);
+	    List<String> ids = wrapper.searchField(query, ViewsMapping.VIEW_ID, 0, TOTAL);
 
 	    ids = subList(ids, request);
 
@@ -846,7 +846,7 @@ public class OpenSearchViewsFolderTest extends OpenSearchTest {
 		    request.getVisibility()//
 	    );
 
-	    List<String> ids = wrapper.searchProperty(query, ViewsMapping.VIEW_ID, 0, TOTAL);
+	    List<String> ids = wrapper.searchField(query, ViewsMapping.VIEW_ID, 0, TOTAL);
 
 	    ids = subList(ids, request);
 

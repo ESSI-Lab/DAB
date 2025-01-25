@@ -119,7 +119,7 @@ public class FolderRegistry {
 
 	Query query = OpenSearchQueryBuilder.buildSearchRegistryQuery(database.getIdentifier());
 
-	List<String> names = wrapper.searchProperty(query, IndexData.FOLDER_NAME);
+	List<String> names = wrapper.searchField(query, IndexData.FOLDER_NAME);
 
 	return names.stream().//
 		map(name -> new OpenSearchFolder(this.database, name)).//

@@ -133,7 +133,7 @@ public class OpenSearchReader implements DatabaseReader {
 	);
 	try {
 
-	    List<String> list = wrapper.searchProperty(query, ViewsMapping.VIEW_ID);
+	    List<String> list = wrapper.searchField(query, ViewsMapping.VIEW_ID);
 
 	    int fromIndex = Math.min(list.size(), request.getStart());
 	    int toIndex = Math.min(list.size(), request.getStart() + request.getCount());

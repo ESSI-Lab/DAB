@@ -152,7 +152,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 
 	Query searchQuery = OpenSearchQueryBuilder.buildSearchEntriesQuery(this);
 
-	return wrapper.searchProperty(//
+	return wrapper.searchField(//
 		searchQuery, //
 		IndexData.ENTRY_NAME).//
 		toArray(new String[] {});
@@ -166,7 +166,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 
 	Query searchQuery = OpenSearchQueryBuilder.buildSearchEntriesQuery(this);
 
-	return wrapper.searchProperty(//
+	return wrapper.searchField(//
 		searchQuery, //
 		IndexData.ENTRY_ID);//
 
