@@ -102,9 +102,19 @@ public class RankingStrategy implements Serializable {
      */
     public int computeRangeWeight(IndexedElement el, int value) {
 
+	return computeRangeWeight(el.getElementName(), value);
+    }
+    
+    /**
+     * @param el
+     * @param value
+     * @return
+     */
+    public int computeRangeWeight(String el, int value) {
+
 	double maxRangeVarWeight = getMaximumRangeVariableWeight();
 
-	double weight = Double.valueOf(getPropertyValue(el.getElementName())) * value;
+	double weight = Double.valueOf(getPropertyValue(el)) * value;
 
 	return (int) ((weight / maxRangeVarWeight) * MAX_ML_WEIGHT);
     }
