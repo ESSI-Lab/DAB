@@ -241,7 +241,7 @@ public class CustomBondFactory {
     }
 
     /**
-     * Creates a custom bond using {@link BondOperator#NULL} as operator
+     * Creates a custom bond using {@link BondOperator#NOT_EXISTS} as operator
      *
      * @param queryable the target property
      * @return
@@ -251,7 +251,7 @@ public class CustomBondFactory {
 
 	checkName(queryable.getName());
 
-	return createCustomBond(queryable, BondOperator.NULL, null);
+	return createCustomBond(queryable, BondOperator.NOT_EXISTS, null);
     }
 
     /**

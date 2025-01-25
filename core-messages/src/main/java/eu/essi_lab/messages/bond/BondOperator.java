@@ -34,8 +34,8 @@ public enum BondOperator {
     GREATER_OR_EQUAL(">="), //
     LESS_OR_EQUAL("<="), //
 
-    NULL, //
-    NOT_NULL, //
+    NOT_EXISTS, //
+    EXISTS, //
     
     MIN, //
     MAX, //

@@ -51,8 +51,8 @@ public abstract class MetadataElementBond<T> extends QueryableBond<T> {
      * <ul>
      * <li>{@link BondOperator#MAX}</li>
      * <li>{@link BondOperator#MIN}</li>
-     * <li>{@link BondOperator#NULL}</li>
-     * <li>{@link BondOperator#NOT_NULL}</li>
+     * <li>{@link BondOperator#NOT_EXISTS}</li>
+     * <li>{@link BondOperator#EXISTS}</li>
      * <li></li>
      * <li></li>
      * </ul>

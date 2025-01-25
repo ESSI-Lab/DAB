@@ -49,8 +49,8 @@ public class SimpleValueBond extends MetadataElementBond<String> {
      * <ul>
      * <li>{@link BondOperator#MAX}</li>
      * <li>{@link BondOperator#MIN}</li>
-     * <li>{@link BondOperator#NULL}</li>
-     * <li>{@link BondOperator#NOT_NULL}</li>
+     * <li>{@link BondOperator#NOT_EXISTS}</li>
+     * <li>{@link BondOperator#EXISTS}</li>
      * </ul>
      * 
      * @param operator

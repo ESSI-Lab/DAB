@@ -218,47 +218,47 @@ public class BondFactory {
     }
 
     /**
-     * Creates a {@link SimpleValueBond} using {@link BondOperator#NULL} as operator
+     * Creates a {@link SimpleValueBond} using {@link BondOperator#NOT_EXISTS} as operator
      * 
      * @param element
      * @return
      */
     public static SimpleValueBond createMissingSimpleValueBond(MetadataElement element) {
 
-	return new SimpleValueBond(BondOperator.NULL, element, null);
+	return new SimpleValueBond(BondOperator.NOT_EXISTS, element, null);
     }
 
     /**
-     * Creates a {@link ResourcePropertyBond} using {@link BondOperator#NULL} as operator.
+     * Creates a {@link ResourcePropertyBond} using {@link BondOperator#NOT_EXISTS} as operator.
      * 
      * @param property
      * @return
      */
     public static ResourcePropertyBond createMissingResourcePropertyBond(ResourceProperty property) throws IllegalArgumentException {
 
-	return new ResourcePropertyBond(BondOperator.NULL, property);
+	return new ResourcePropertyBond(BondOperator.NOT_EXISTS, property);
     }
 
     /**
-     * Creates a {@link SimpleValueBond} using {@link BondOperator#NOT_NULL} as operator
+     * Creates a {@link SimpleValueBond} using {@link BondOperator#EXISTS} as operator
      * 
      * @param element
      * @return
      */
     public static SimpleValueBond createExistsSimpleValueBond(MetadataElement element) {
 
-	return new SimpleValueBond(BondOperator.NOT_NULL, element, null);
+	return new SimpleValueBond(BondOperator.EXISTS, element, null);
     }
 
     /**
-     * Creates a {@link ResourcePropertyBond} using {@link BondOperator#NOT_NULL} as operator.
+     * Creates a {@link ResourcePropertyBond} using {@link BondOperator#EXISTS} as operator.
      * 
      * @param property
      * @return
      */
     public static ResourcePropertyBond createExistsResourcePropertyBond(ResourceProperty property) throws IllegalArgumentException {
 
-	return new ResourcePropertyBond(BondOperator.NOT_NULL, property);
+	return new ResourcePropertyBond(BondOperator.EXISTS, property);
     }
 
     /**
