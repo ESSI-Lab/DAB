@@ -210,7 +210,7 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 	BondOperator operator = bond.getOperator();
 	QualifiedName name = new QualifiedName(NameSpace.GI_SUITE_DATA_MODEL, property.getName());
 
-	if (operator == BondOperator.NULL || operator == BondOperator.NOT_NULL) {
+	if (operator == BondOperator.NOT_EXISTS || operator == BondOperator.EXISTS) {
 
 	    return createExistsOrNotExistsQuery(operator, name, property);
 	}
@@ -261,7 +261,7 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 	BondOperator operator = bond.getOperator();
 	QualifiedName name = new QualifiedName(NameSpace.GI_SUITE_DATA_MODEL, property.getName());
 
-	if (operator == BondOperator.NULL || operator == BondOperator.NOT_NULL) {
+	if (operator == BondOperator.NOT_EXISTS || operator == BondOperator.EXISTS) {
 
 	    return createExistsOrNotExistsQuery(operator, name, property);
 	}
@@ -688,8 +688,8 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 
 	switch (operator) {
 
-	case NULL:
-	case NOT_NULL:
+	case NOT_EXISTS:
+	case EXISTS:
 
 	    return createExistsOrNotExistsQuery(operator, qName, element);
 
@@ -807,7 +807,7 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 
 	String existsQuery = buildCTSElementRangeQuery(qName, "!=", "", ranking.computePropertyWeight(element), true);
 
-	if (operator == BondOperator.NULL) {
+	if (operator == BondOperator.NOT_EXISTS) {
 
 	    return buildCTSNotQuery(existsQuery);
 	}
@@ -825,8 +825,8 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 	/**
 	 * to support this operator, each element must have a correspondent NULL element in the IndexedElements group
 	 */
-	case NULL:
-	case NOT_NULL:
+	case NOT_EXISTS:
+	case EXISTS:
 
 	    throw new IllegalArgumentException("NULL operator on double and integer elements not yet supported");
 
@@ -846,7 +846,7 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
     @SuppressWarnings("incomplete-switch")
     private String execTempExtentStrategy(Queryable element, BondOperator operator, String value) {
 
-	if (operator == BondOperator.NULL) {
+	if (operator == BondOperator.NOT_EXISTS) {
 
 	    return execTempExtentNullStrategy((MetadataElement) element);
 	}
