@@ -822,6 +822,17 @@ public class BondFactory {
     }
 
     /**
+     * Applies this bond to resources having the minimum or maximum value of the given <code>property</code>
+     * 
+     * @param operator {@link BondOperator#MIN} or {@link BondOperator#MAX}
+     */
+    public static ResourcePropertyBond createMinMaxResourcePropertyBond(ResourceProperty property, BondOperator operator)
+	    throws IllegalArgumentException {
+
+	return new ResourcePropertyBond(operator, property, null);
+    }
+
+    /**
      * @param identifier
      * @return
      */
@@ -938,7 +949,7 @@ public class BondFactory {
 
 	return new ResourcePropertyBond(BondOperator.EQUAL, ResourceProperty.IS_GRID, String.valueOf(isGridBond));
     }
-    
+
     /**
      * @param isVectorBond
      * @return

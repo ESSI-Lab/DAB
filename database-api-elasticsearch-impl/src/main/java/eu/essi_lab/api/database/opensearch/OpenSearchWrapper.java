@@ -26,7 +26,9 @@ package eu.essi_lab.api.database.opensearch;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -38,6 +40,10 @@ import org.opensearch.client.opensearch._types.ErrorCause;
 import org.opensearch.client.opensearch._types.ErrorResponse;
 import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch._types.Result;
+import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
+import org.opensearch.client.opensearch._types.aggregations.MaxAggregation;
+import org.opensearch.client.opensearch._types.aggregations.MinAggregation;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch.core.CountRequest;
 import org.opensearch.client.opensearch.core.DeleteByQueryRequest;
@@ -58,6 +64,7 @@ import org.opensearch.client.opensearch.generic.Requests;
 import org.opensearch.client.opensearch.generic.Response;
 
 import eu.essi_lab.api.database.opensearch.index.IndexData;
+import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.PerformanceLogger;
 
@@ -169,6 +176,60 @@ public class OpenSearchWrapper {
     public List<String> searchProperty(Query searchQuery, String property) throws OpenSearchException, IOException {
 
 	return searchProperty(searchQuery, property, 0, 10);
+    }
+
+    public static void main(String[] args) throws Exception {
+
+	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+
+	OpenSearchWrapper wrapper = new OpenSearchWrapper(database.getClient());
+
+	Query query = OpenSearchQueryBuilder.buildMatchAllQuery();
+
+	double maxValue = wrapper.findMinMaxValue(query, "title", true);
+
+	System.out.println(maxValue);
+
+    }
+
+    /**
+     * See <a href=
+     * "https://stackoverflow.com/questions/74823431/how-to-implement-nested-aggregations-using-opensearch-java-client">Nested
+     * aggregations</a>
+     * 
+     * @param searchQuery
+     * @param field
+     * @param max
+     * @return
+     * @throws IOException
+     * @throws OpenSearchException
+     */
+    public double findMinMaxValue(Query searchQuery, String field, boolean max) throws OpenSearchException, IOException {
+
+	Map<String, Aggregation> map = new HashMap<>();
+
+	Aggregation agg = max ? new Aggregation.Builder().max(new MaxAggregation.Builder().field(field).build()).build()
+		: new Aggregation.Builder().min(new MinAggregation.Builder().field(field).build()).build();
+
+	map.put("1", agg);
+
+	SearchResponse<Object> response = client.search(builder -> {
+
+	    builder.query(searchQuery).//
+		    aggregations(map);
+
+	    return builder;
+
+	}, Object.class);
+
+	Map<String, Aggregate> aggregations = response.aggregations();
+
+	if (max) {
+
+	    return aggregations.get("1").max().value();
+	}
+
+	return aggregations.get("1").min().value();
     }
 
     /**

@@ -3,6 +3,7 @@
  */
 package eu.essi_lab.api.database.opensearch.query;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import java.util.Optional;
 
 import org.json.JSONObject;
 import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
 import org.opensearch.client.opensearch._types.query_dsl.ExistsQuery;
 import org.opensearch.client.opensearch._types.query_dsl.MatchAllQuery;
@@ -21,12 +23,14 @@ import org.opensearch.client.opensearch._types.query_dsl.RangeQuery.Builder;
 
 import eu.essi_lab.api.database.opensearch.ConversionUtils;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
+import eu.essi_lab.api.database.opensearch.OpenSearchWrapper;
 import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.FolderRegistryMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.View.ViewVisibility;
@@ -42,12 +46,16 @@ public class OpenSearchQueryBuilder {
     private StringBuilder builder;
     private RankingStrategy ranking;
     private boolean deletedIncluded;
+    private OpenSearchWrapper wrapper;
 
     /**
+     * @param wrapper
      * @param ranking
      */
-    public OpenSearchQueryBuilder(RankingStrategy ranking, HashMap<String, String> dataFolderMap, boolean deletedIncluded) {
+    public OpenSearchQueryBuilder(OpenSearchWrapper wrapper, RankingStrategy ranking, HashMap<String, String> dataFolderMap,
+	    boolean deletedIncluded) {
 
+	this.wrapper = wrapper;
 	this.ranking = ranking;
 	this.dfMap = dataFolderMap;
 	this.deletedIncluded = deletedIncluded;
@@ -129,6 +137,124 @@ public class OpenSearchQueryBuilder {
 
 		).//
 		build().//
+		toQuery();
+    }
+
+    /**
+     * @param field
+     * @param max
+     * @return
+     * @throws Exception
+     */
+    public Query buildMinMaxValueQuery(String field, boolean max) throws Exception {
+
+	return buildMinMaxValueQuery(buildMatchAllQuery(), field, max);
+    }
+
+    /**
+     * @param query
+     * @param field
+     * @param max
+     * @return
+     * @throws Exception
+     */
+    public Query buildMinMaxValueQuery(Query query, String field, boolean max) throws Exception {
+
+	double minOrMax = wrapper.findMinMaxValue(//
+		query, //
+		field, //
+		max);
+
+	Query out = OpenSearchQueryBuilder.buildRangeQuery(field, BondOperator.EQUAL, String.valueOf(minOrMax));
+
+	if (query != null) {
+
+	    out = new BoolQuery.Builder().//
+		    filter(query, out).build().//
+		    toQuery();
+	}
+
+	return out;
+    }
+
+    /**
+     * @param sourceId
+     * @param minOrMax
+     * @throws IOException
+     * @throws OpenSearchException
+     */
+    public Query buildMinMaxResourceTimeStampValue(String sourceId, BondOperator operator) throws Exception {
+
+	Query sourceIdQuery = buildMatchAllQuery();
+
+	if (sourceId != null) {
+
+	    sourceIdQuery = OpenSearchQueryBuilder.buildRangeQuery(//
+		    ResourceProperty.SOURCE_ID.getName(), //
+		    BondOperator.EQUAL, //
+		    sourceId);
+
+	}
+
+	return buildMinMaxValueQuery(//
+		sourceIdQuery, //
+		ResourceProperty.RESOURCE_TIME_STAMP.getName(), //
+		operator == BondOperator.MAX);
+    }
+
+    /**
+     * @return
+     */
+    public Query build(boolean count) {
+
+	Query searchQuery = ConversionUtils.toQuery(new JSONObject(builder.toString()));
+
+	Query basicQuery = buildBasicQuery(count);
+
+	Query indexQuery = buildIndexQuery(DataFolderMapping.get().getIndex());
+
+	return new BoolQuery.Builder().//
+		must(searchQuery, basicQuery, indexQuery).//
+		build().//
+		toQuery();
+    }
+
+    /**
+     * @param value
+     * @return
+     */
+    public static Query buildIsGDCQuery(String value) {
+
+	ArrayList<Query> list = new ArrayList<Query>();
+
+	List<String> ids = ConfigurationWrapper.getGDCSourceSetting().getSelectedSourcesIds();
+	ids.forEach(id -> list.add(buildRangeQuery(//
+		ResourceProperty.SOURCE_ID.getName(), BondOperator.EQUAL, id)));
+
+	list.add(buildRangeQuery(ResourceProperty.IS_GEOSS_DATA_CORE.getName(), BondOperator.EQUAL, value));
+
+	return new BoolQuery.Builder().//
+		filter(list).//
+		build().//
+		toQuery();
+
+    }
+
+    /**
+     * @param sourceId
+     * @return
+     */
+    public static Query buildMinMaxQuery(String sourceId) {
+
+	Query sourceIdQuery = buildRangeQuery(//
+		ResourceProperty.SOURCE_ID.getName(), //
+		BondOperator.EQUAL, //
+		sourceId);
+
+	Query indexQuery = buildIndexQuery(DataFolderMapping.get().getIndex());
+
+	return new BoolQuery.Builder().//
+		filter(sourceIdQuery, indexQuery).build().//
 		toQuery();
     }
 
@@ -303,21 +429,125 @@ public class OpenSearchQueryBuilder {
 	return boolQuery.toQuery();
     }
 
+    //
+    //
+    //
+
+    /**
+     * @param field
+     * @return
+     */
+    public static Query buildExistsFieldQuery(String field) {
+
+	return new ExistsQuery.Builder().field(field).build().toQuery();
+    }
+
+    /**
+     * @param field
+     * @return
+     */
+    public static Query buildNotExistsFieldQuery(String field) {
+
+	return createNotQuery(buildExistsFieldQuery(field));
+    }
+
+    //
+    // base queries
+    //
+
+    //
+    //
+    //
+
+    /**
+     * Supported operators:
+     * <ul>
+     * <li>{@link BondOperator#EQUAL}</li>
+     * <li>{@link BondOperator#NOT_EQUAL}</li>
+     * <li>{@link BondOperator#GREATER}</li>
+     * <li>{@link BondOperator#GREATER_OR_EQUAL}</li>
+     * <li>{@link BondOperator#LESS}</li>
+     * <li>{@link BondOperator#LESS_OR_EQUAL}</li>
+     * </ul>
+     * 
+     * @param field
+     * @param operator
+     * @param value
+     * @param boost
+     * @return
+     */
+    public static Query buildRangeQuery(String field, BondOperator operator, String value) {
+
+	return buildRangeQuery(field, operator, value, 1);
+    }
+
+    /**
+     * Supported operators:
+     * <ul>
+     * <li>{@link BondOperator#EQUAL}</li>
+     * <li>{@link BondOperator#NOT_EQUAL}</li>
+     * <li>{@link BondOperator#GREATER}</li>
+     * <li>{@link BondOperator#GREATER_OR_EQUAL}</li>
+     * <li>{@link BondOperator#LESS}</li>
+     * <li>{@link BondOperator#LESS_OR_EQUAL}</li>
+     * </ul>
+     * 
+     * @param field
+     * @param operator
+     * @param value
+     * @param boost
+     * @return
+     */
+    @SuppressWarnings("incomplete-switch")
+    public static Query buildRangeQuery(String field, BondOperator operator, String value, float boost) {
+
+	Builder builder = new RangeQuery.Builder().//
+		field(value);
+
+	if (boost > 1) {
+
+	    builder = builder.boost(null);
+	}
+
+	switch (operator) {
+	case EQUAL:
+
+	    return buildMatchPhraseQuery(field, value);
+
+	case NOT_EQUAL:
+
+	    return createNotQuery(buildMatchPhraseQuery(field, value));
+
+	case GREATER:
+
+	    builder = builder.gt(JsonData.of(value));
+	    break;
+
+	case GREATER_OR_EQUAL:
+
+	    builder = builder.gte(JsonData.of(value));
+	    break;
+
+	case LESS:
+
+	    builder = builder.lt(JsonData.of(value));
+	    break;
+
+	case LESS_OR_EQUAL:
+
+	    builder = builder.lte(JsonData.of(value));
+	    break;
+	}
+
+	return builder.build().toQuery();
+    }
+
     /**
      * @return
      */
-    public Query build(boolean count) {
+    public static Query buildMatchAllQuery() {
 
-	Query searchQuery = ConversionUtils.toQuery(new JSONObject(builder.toString()));
-
-	Query basicQuery = buildBasicQuery(count);
-
-	Query indexQuery = buildIndexQuery(DataFolderMapping.get().getIndex());
-
-	return new BoolQuery.Builder().//
-		must(searchQuery, basicQuery, indexQuery).//
-		build().//
-		toQuery();
+	return new MatchAllQuery.Builder().build().toQuery();
     }
 
     /**
@@ -372,6 +602,10 @@ public class OpenSearchQueryBuilder {
 	return buildMatchPhraseQuery(IndexData.FOLDER_NAME, folder.getName());
     }
 
+    //
+    //
+    //
+
     /**
      * @param sourceId
      * @return
@@ -393,14 +627,6 @@ public class OpenSearchQueryBuilder {
     /**
      * @return
      */
-    private static Query buildMatchAllQuery() {
-
-	return new MatchAllQuery.Builder().build().toQuery();
-    }
-
-    /**
-     * @return
-     */
     private static List<Query> buildIndexesQueryList() {
 
 	List<String> indexes = IndexMapping.getIndexes();
@@ -417,6 +643,10 @@ public class OpenSearchQueryBuilder {
 
     //
     // base queries
+    //
+
+    //
+    //
     //
 
     /**
@@ -458,9 +688,7 @@ public class OpenSearchQueryBuilder {
      */
     private Query buildDeletedExcludedQuery() {
 
-	Query missingField = new BoolQuery.Builder().//
-		mustNot(buildExistsFieldQuery(ResourceProperty.IS_DELETED.getName())).build().//
-		toQuery();
+	Query missingField = createNotQuery(buildExistsFieldQuery(ResourceProperty.IS_DELETED.getName()));
 
 	return new BoolQuery.Builder().//
 		should(missingField, //
@@ -535,57 +763,21 @@ public class OpenSearchQueryBuilder {
 	return boolQuery.toQuery();
     }
 
-    //
-    //
-    //
-
     /**
-     * @param field
+     * @param query
      * @return
      */
-    private static Query buildExistsFieldQuery(String field) {
+    private static Query createNotQuery(Query query) {
 
-	return new ExistsQuery.Builder().field(field).build().toQuery();
+	return new BoolQuery.Builder().//
+		mustNot(query).//
+		build().//
+		toQuery();
     }
 
-    /**
-     * @param field
-     * @param operator
-     * @param value
-     * @param boost
-     * @return
-     */
-    @SuppressWarnings("incomplete-switch")
-    private Query buildRangeQuery(String field, BondOperator operator, String value, float boost) {
-
-	Builder builder = new RangeQuery.Builder().//
-		field(value).//
-		boost(boost);//
-
-	switch (operator) {
-	case GREATER:
-
-	    builder = builder.gt(JsonData.of(value));
-	    break;
-
-	case GREATER_OR_EQUAL:
-
-	    builder = builder.gte(JsonData.of(value));
-	    break;
-
-	case LESS:
-
-	    builder = builder.lt(JsonData.of(value));
-	    break;
-
-	case LESS_OR_EQUAL:
-
-	    builder = builder.lte(JsonData.of(value));
-	    break;
-	}
-
-	return builder.build().toQuery();
-    }
+    //
+    //
+    //
 
     /**
      * @see https://opensearch.org/docs/latest/query-dsl/term-vs-full-text/

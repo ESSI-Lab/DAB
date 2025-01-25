@@ -10,8 +10,11 @@ import java.util.Optional;
 import org.opensearch.client.opensearch._types.query_dsl.MatchPhraseQuery;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 
+import eu.essi_lab.api.database.opensearch.OpenSearchWrapper;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.bond.Bond;
+import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.QueryableBond;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
@@ -22,7 +25,7 @@ import eu.essi_lab.messages.bond.ViewBond;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondHandler;
 import eu.essi_lab.model.OrderingDirection;
 import eu.essi_lab.model.Queryable;
-import eu.essi_lab.model.resource.RankingStrategy;
+import eu.essi_lab.model.resource.ResourceProperty;
 
 /**
  * 2) aggiungere le basic queries, come quelle di ML per il ranking su document quality, etc
@@ -32,32 +35,29 @@ import eu.essi_lab.model.resource.RankingStrategy;
  */
 public class OpenSearchBondHandler implements DiscoveryBondHandler {
 
-    private RankingStrategy ranking;
     private boolean dataFolderCheckEnabled;
-    private boolean deletedIncluded;
     private int maxFrequencyMapItems;
     private List<Queryable> tfTargets;
     private Optional<OrderingDirection> orderingDirection;
     private Optional<Queryable> orderingProperty;
-
-    private HashMap<String, String> dataFolderMap;
     private OpenSearchQueryBuilder queryBuilder;
 
     /**
+     * @param wrapper
      * @param message
      * @param map
      */
-    public OpenSearchBondHandler(DiscoveryMessage message, HashMap<String, String> map) {
+    public OpenSearchBondHandler(OpenSearchWrapper wrapper, DiscoveryMessage message, HashMap<String, String> map) {
 
-	this.dataFolderMap = map;
-	this.ranking = message.getRankingStrategy();
 	this.dataFolderCheckEnabled = message.isDataFolderCheckEnabled();
-	this.deletedIncluded = message.isDeletedIncluded();
 	this.maxFrequencyMapItems = message.getMaxFrequencyMapItems();
 	this.tfTargets = message.getTermFrequencyTargets();
 	this.orderingDirection = message.getOrderingDirection();
 	this.orderingProperty = message.getOrderingProperty();
-	this.queryBuilder = new OpenSearchQueryBuilder(ranking, map, deletedIncluded);
+	this.queryBuilder = new OpenSearchQueryBuilder(//
+		wrapper, message.getRankingStrategy(), //
+		map, //
+		message.isDeletedIncluded());
     }
 
     @Override
@@ -82,100 +82,93 @@ public class OpenSearchBondHandler implements DiscoveryBondHandler {
 	switch (bond.getLogicalOperator()) {
 	case AND:
 	    queryBuilder.appendClosingTag(false);
-
 	    break;
-
 	case OR:
-
 	    queryBuilder.appendClosingTag(true);
-
 	    break;
 
 	case NOT:
 	    queryBuilder.appendClosingTag(false);
-
 	    break;
 	}
-
     }
 
     @Override
     public void resourcePropertyBond(ResourcePropertyBond bond) {
 
-	Query query = new MatchPhraseQuery.Builder().//
-		field(bond.getProperty().getName()).//
-		query(bond.getPropertyValue()).//
-		build().//
-		toQuery();
+	ResourceProperty property = bond.getProperty();
 
-	switch (bond.getProperty()) {
-	case ACCESS_QUALITY:
-	    break;
-	case COMPLIANCE_LEVEL:
-	    break;
-	case DOWNLOAD_TIME:
-	    break;
-	case ESSENTIAL_VARS_QUALITY:
-	    break;
-	case EXECUTION_TIME:
-	    break;
-	case HAS_LOWEST_RANKING:
-	    break;
-	case IS_DELETED:
-	    break;
-	case IS_DOWNLOADABLE:
-	    break;
-	case IS_EIFFEL_RECORD:
-	    break;
-	case IS_EXECUTABLE:
-	    break;
-	case IS_GEOSS_DATA_CORE:
-	    break;
-	case IS_GRID:
-	    break;
-	case IS_ISO_COMPLIANT:
-	    break;
-	case IS_TIMESERIES:
-	    break;
-	case IS_TRAJECTORY:
-	    break;
-	case IS_TRANSFORMABLE:
-	    break;
-	case IS_VALIDATED:
-	    break;
-	case IS_VECTOR:
-	    break;
-	case METADATA_QUALITY:
-	    break;
-	case OAI_PMH_HEADER_ID:
-	    break;
-	case ORIGINAL_ID:
-	    break;
-	case PRIVATE_ID:
-	    break;
-	case PUBLIC_ID:
-	    break;
-	case RECOVERY_REMOVAL_TOKEN:
-	    break;
-	case RESOURCE_TIME_STAMP:
-	    break;
-	case SOURCE_ID:
+	String value = bond.getPropertyValue();
+	String name = property.getName();
+	BondOperator operator = bond.getOperator();
 
-	    query = queryBuilder.buildSourceIdQuery(bond);
+	if (operator == BondOperator.EXISTS) {
 
-	    break;
-
-	case SSC_SCORE:
-	    break;
-	case SUCCEEDED_TEST:
-	    break;
-	case TEST_TIME_STAMP:
-	    break;
-	case TYPE:
-	    break;
+	    queryBuilder.append(OpenSearchQueryBuilder.buildExistsFieldQuery(name));
+	    return;
 	}
 
-	queryBuilder.append(query);
+	if (operator == BondOperator.NOT_EXISTS) {
+
+	    queryBuilder.append(OpenSearchQueryBuilder.buildNotExistsFieldQuery(name));
+	    return;
+	}
+
+	if (operator == BondOperator.MAX || operator == BondOperator.MIN) {
+
+	    //
+	    // see BondFactory.createMinMaxResourceTimeStampBond and OAIPMH profiler
+	    //
+	    if (bond.getProperty() == ResourceProperty.RESOURCE_TIME_STAMP) {
+
+		try {
+
+		    queryBuilder.append(queryBuilder.buildMinMaxResourceTimeStampValue(value, bond.getOperator()));
+		    return;
+
+		} catch (Exception ex) {
+
+		    GSLoggerFactory.getLogger(getClass()).error(ex);
+		}
+	    } else {
+		//
+		// see BondFactory.createMinMaxResourcePropertyBond
+		//
+		switch (bond.getProperty().getContentType()) {
+		case DOUBLE:
+		case INTEGER:
+		case LONG:
+
+		    try {
+			queryBuilder.append(queryBuilder.buildMinMaxValueQuery(name, operator == BondOperator.MAX));
+			return;
+
+		    } catch (Exception ex) {
+
+			GSLoggerFactory.getLogger(getClass()).error(ex);
+		    }
+
+		default:
+		    throw new IllegalArgumentException("Min/max query on non numeric field: " + name);
+		}
+	    }
+	}
+
+	switch (property) {
+	case SOURCE_ID:
+
+	    queryBuilder.append(queryBuilder.buildSourceIdQuery(bond));
+	    return;
+
+	case IS_GEOSS_DATA_CORE:
+
+	    queryBuilder.append(OpenSearchQueryBuilder.buildIsGDCQuery(value));
+	    return;
+
+	default:
+
+	    queryBuilder.append(OpenSearchQueryBuilder.buildRangeQuery(name, operator, value));
+	}
     }
 
     @Override
