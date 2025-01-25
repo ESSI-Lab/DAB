@@ -171,19 +171,19 @@ public class OpenSearchQueryBuilder {
      * @return
      */
     public static Query buildDataFolderQuery(String databaseId, List<String> sourceIds) {
-	
+
 	ArrayList<Query> idsQueries = new ArrayList<Query>();
 	sourceIds.forEach(id -> idsQueries.add(buildSourceIdQuery(id)));
-	
+
 	Query query = new BoolQuery.Builder().should(idsQueries).minimumShouldMatch("1").build().toQuery();
 
 	BoolQuery boolQuery = new BoolQuery.Builder().//
 		filter(buildDatabaseIdQuery(databaseId), //
-			
-			buildExistsFieldQuery(MetaFolderMapping.DATA_FOLDER),//
-			
-			buildIndexQuery(MetaFolderMapping.get().getIndex()), //			
-			
+
+			buildExistsFieldQuery(MetaFolderMapping.DATA_FOLDER), //
+
+			buildIndexQuery(MetaFolderMapping.get().getIndex()), //
+
 			query)
 		.//
 		build();
@@ -543,7 +543,7 @@ public class OpenSearchQueryBuilder {
      * @param field
      * @return
      */
-    private static  Query buildExistsFieldQuery(String field) {
+    private static Query buildExistsFieldQuery(String field) {
 
 	return new ExistsQuery.Builder().field(field).build().toQuery();
     }
@@ -595,13 +595,20 @@ public class OpenSearchQueryBuilder {
      */
     private static Query buildMatchPhraseQuery(String field, String value, float boost) {
 
-	return new MatchPhraseQuery.Builder().//
+	org.opensearch.client.opensearch._types.query_dsl.MatchPhraseQuery.Builder builder = new MatchPhraseQuery.Builder().//
 		field(field).//
 		query(value).//
-		boost(boost).//
+		build().//
+		toBuilder();
+
+	if (boost > 1) {
+
+	    builder = builder.boost(boost);
+	}
+
+	return builder.//
 		build().//
 		toQuery();
-
     }
 
     /**
