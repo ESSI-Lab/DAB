@@ -3,6 +3,7 @@
  */
 package eu.essi_lab.api.database.opensearch;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -37,23 +38,22 @@ import org.w3c.dom.Node;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFinder;
-import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
+import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
+import eu.essi_lab.api.database.opensearch.query.OpenSearchBondHandler;
+import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StreamUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.PerformanceLogger;
+import eu.essi_lab.messages.RequestMessage;
 import eu.essi_lab.messages.ResultSet;
-import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
-import eu.essi_lab.messages.bond.parser.IdentifierBondHandler;
 import eu.essi_lab.messages.count.DiscoveryCountResponse;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMapType;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.ResourceProperty;
 
 /**
  * @author Fabrizio
@@ -87,7 +87,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	try {
 
-	    int total = (int) discover_(message).hits().total().value();
+	    int total = (int) discover_(message, true).hits().total().value();
 
 	    DiscoveryCountResponse response = new DiscoveryCountResponse();
 
@@ -116,12 +116,12 @@ public class OpenSearchFinder implements DatabaseFinder {
 
     @Override
     public ResultSet<GSResource> discover(DiscoveryMessage message) throws GSException {
-	
+
 	ResultSet<GSResource> resultSet = new ResultSet<>();
 
 	try {
 
-	    SearchResponse<Object> response = discover_(message);
+	    SearchResponse<Object> response = discover_(message, false);
 
 	    PerformanceLogger pl = new PerformanceLogger(//
 		    PerformanceLogger.PerformancePhase.OPENSEARCH_FINDER_RESOURCES_CREATION, //
@@ -171,7 +171,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	try {
 
-	    SearchResponse<Object> response = discover_(message);
+	    SearchResponse<Object> response = discover_(message, false);
 
 	    List<Node> nodes = ConversionUtils.toNodeList(response);
 
@@ -194,7 +194,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	try {
 
-	    SearchResponse<Object> response = discover_(message);
+	    SearchResponse<Object> response = discover_(message, false);
 
 	    List<String> nodes = ConversionUtils.toStringList(response);
 
@@ -214,23 +214,66 @@ public class OpenSearchFinder implements DatabaseFinder {
      * @param message
      * @return
      * @throws GSException
+     * @throws Exception
      */
-    private SearchResponse<Object> discover_(DiscoveryMessage message) throws GSException {
+    private HashMap<String, String> getSourceDataFolderMap(RequestMessage message) throws GSException {
 
-	OpenSearchDiscoveryBondHandler handler = new OpenSearchDiscoveryBondHandler(message);
+	HashMap<String, String> out = new HashMap<>();
+
+	List<String> ids = message.getSources().//
+		stream().//
+		map(s -> s.getUniqueIdentifier()).//
+		collect(Collectors.toList());
+
+	Query query = OpenSearchQueryBuilder.buildDataFolderQuery(getDatabase().getIdentifier(), ids);
+
+	try {
+
+	    wrapper.search(query, 0, ids.size()).//
+		    hits().//
+		    hits().//
+		    stream().//
+		    map(hit -> ConversionUtils.toJSONObject(hit.source()))//
+		    .forEach(obj -> {
+
+			out.put(obj.getString(MetaFolderMapping.SOURCE_ID), //
+				obj.getString(MetaFolderMapping.DATA_FOLDER));
+		    });
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(ex);
+	    throw GSException.createException(getClass(), "OpenSearchFinderSourceDataFolderMapError", ex);
+	}
+
+	return out;
+    }
+
+    /**
+     * @param message
+     * @return
+     * @throws GSException
+     */
+    private SearchResponse<Object> discover_(DiscoveryMessage message, boolean count) throws GSException {
+
+	HashMap<String, String> map = getSourceDataFolderMap(message);
+
 	DiscoveryBondParser bondParser = new DiscoveryBondParser(message.getPermittedBond());
+
+	OpenSearchBondHandler handler = new OpenSearchBondHandler(wrapper, message, map);
+
 	bondParser.parse(handler);
-	
-	Query query = handler.getQuery();
-	System.out.println(ConversionUtils.toJsonObject(query).toString(3));
-	
+
+	Query query = handler.getQuery(count);
+	System.out.println(ConversionUtils.toJSONObject(query).toString(3));
+
 	try {
 
 	    int start = message.getPage().getStart() - 1;
 	    int size = message.getPage().getSize();
 
 	    GSLoggerFactory.getLogger(getClass()).debug("\n\n{}\n\n",
-		    new JSONObject(ConversionUtils.toJsonObject(query).toString(3)).toString(3));
+		    new JSONObject(ConversionUtils.toJSONObject(query).toString(3)).toString(3));
 
 	    SearchResponse<Object> search = wrapper.search(query, start, size);
 
