@@ -26,9 +26,8 @@ package eu.essi_lab.api.database.opensearch;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -37,11 +36,8 @@ import org.json.JSONObject;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.ErrorCause;
 import org.opensearch.client.opensearch._types.ErrorResponse;
-import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch._types.Result;
-import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
-import org.opensearch.client.opensearch._types.query_dsl.MatchPhraseQuery;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch.core.CountRequest;
 import org.opensearch.client.opensearch.core.DeleteByQueryRequest;
@@ -62,12 +58,8 @@ import org.opensearch.client.opensearch.generic.Requests;
 import org.opensearch.client.opensearch.generic.Response;
 
 import eu.essi_lab.api.database.opensearch.index.IndexData;
-import eu.essi_lab.api.database.opensearch.index.mappings.FolderRegistryMapping;
-import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
-import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.PerformanceLogger;
-import eu.essi_lab.messages.bond.View.ViewVisibility;
 
 /**
  * @author Fabrizio
@@ -213,8 +205,8 @@ public class OpenSearchWrapper {
 		    return decorateSource(source, hit.index(), hit.id());
 		}).//
 
-		map(source -> source.getString(property)).//
-
+		map(source -> source.has(property) ? source.getString(property) : null).//
+		filter(Objects::nonNull).//
 		collect(Collectors.toList());
     }
 
@@ -331,235 +323,6 @@ public class OpenSearchWrapper {
     }
 
     /**
-     * Builds a query which searches all entries of the given <code>folder</code>.<br>
-     * <b>Constraints</b>: databaseId = getDatabase().getIdentifier() AND folderName = getName()
-     */
-    public Query buildSearchEntriesQuery(OpenSearchFolder folder) {
-
-	// MatchQuery databaseIdQuery = new MatchQuery.Builder().//
-	// field(IndexData.DATABASE_ID).query(new FieldValue.Builder().//
-	// stringValue(folder.getDatabase().getIdentifier()).//
-	// build())
-	// .//
-	// build();
-	//
-	// MatchQuery folderNameQuery = new MatchQuery.Builder().//
-	// field(IndexData.FOLDER_NAME).query(new FieldValue.Builder().//
-	// stringValue(folder.getName()).//
-	// build())
-	// .//
-	// build();
-
-	MatchPhraseQuery databaseIdQuery = new MatchPhraseQuery.Builder().//
-		field(IndexData.DATABASE_ID).query(folder.getDatabase().getIdentifier()).//
-		build();
-
-	MatchPhraseQuery folderNameQuery = new MatchPhraseQuery.Builder().//
-		field(IndexData.FOLDER_NAME).query(folder.getName()).//
-		build();
-
-	List<Query> mustList = new ArrayList<>();
-
-	mustList.add(databaseIdQuery.toQuery());
-	mustList.add(folderNameQuery.toQuery());
-
-	List<Query> shouldList = buildIndexesQuery();
-
-	BoolQuery boolQuery = new BoolQuery.Builder().//
-		must(mustList).//
-		should(shouldList).//
-		minimumShouldMatch("1").//
-		build();
-
-	return boolQuery.toQuery();
-    }
-
-    /**
-     * @param databaseId
-     * @param creator
-     * @param owner
-     * @param visibility
-     * @return
-     */
-    public Query buildSearchViewsQuery(//
-	    String databaseId, //
-	    Optional<String> creator, //
-	    Optional<String> owner, //
-	    Optional<ViewVisibility> visibility) {
-
-	MatchPhraseQuery databaseIdQuery = new MatchPhraseQuery.Builder().//
-		field(IndexData.DATABASE_ID).//
-		query(databaseId).//
-		build();
-
-	MatchPhraseQuery indexQuery = new MatchPhraseQuery.Builder().//
-		field("_index").//
-		query(ViewsMapping.get().getIndex()).//
-		build();
-
-	List<Query> mustList = new ArrayList<>();
-
-	if (creator.isPresent()) {
-
-	    MatchPhraseQuery creatorQuery = new MatchPhraseQuery.Builder().//
-		    field(ViewsMapping.VIEW_CREATOR).//
-		    query(creator.get()).//
-		    build();
-
-	    mustList.add(creatorQuery.toQuery());
-	}
-
-	if (owner.isPresent()) {
-
-	    MatchPhraseQuery ownerQuery = new MatchPhraseQuery.Builder().//
-		    field(ViewsMapping.VIEW_OWNER).//
-		    query(owner.get()).//
-		    build();
-
-	    mustList.add(ownerQuery.toQuery());
-	}
-
-	if (visibility.isPresent()) {
-
-	    MatchPhraseQuery visibilityQuery = new MatchPhraseQuery.Builder().//
-		    field(ViewsMapping.VIEW_VISIBILITY).//
-		    query(visibility.get().name()).//
-		    build();
-	    mustList.add(visibilityQuery.toQuery());
-	}
-
-	mustList.add(databaseIdQuery.toQuery());
-	mustList.add(indexQuery.toQuery());
-
-	List<Query> shouldList = buildIndexesQuery();
-
-	BoolQuery boolQuery = new BoolQuery.Builder().//
-		must(mustList).//
-		should(shouldList).//
-		minimumShouldMatch("1").//
-
-		build();
-
-	return boolQuery.toQuery();
-    }
-
-    /**
-     * Builds a query which searches the entries with the given <code>property</code> and
-     * <code>propertyValue</code>
-     * 
-     * @param databaseId
-     * @param index
-     * @param property
-     * @param propertyValue
-     * @return
-     */
-    public Query buildSearchQuery(String databaseId, String index, String property, String propertyValue) {
-
-	return buildSearchQuery(databaseId, index, property, Arrays.asList(propertyValue));
-    }
-
-    /**
-     * Builds a query which searches the entries with the given <code>property</code> and
-     * matching one or more <code>propertyValues</code>
-     * 
-     * @param databaseId
-     * @param index
-     * @param property
-     * @param propertyValues
-     * @return
-     */
-    public Query buildSearchQuery(String databaseId, String index, String property, List<String> propertyValues) {
-
-	MatchPhraseQuery databaseIdQuery = new MatchPhraseQuery.Builder().//
-		field(IndexData.DATABASE_ID).query(databaseId).//
-		build();
-
-	List<Query> shouldList = new ArrayList<>();
-
-	propertyValues.forEach(v -> {
-
-	    MatchPhraseQuery propertyQuery = new MatchPhraseQuery.Builder().//
-		    field(property).//
-		    query(v).//
-		    build();
-
-	    shouldList.add(propertyQuery.toQuery());
-	});
-
-	MatchPhraseQuery indexQuery = new MatchPhraseQuery.Builder().//
-		field("_index").//
-		query(index).//
-		build();
-
-	List<Query> mustList = new ArrayList<>();
-
-	mustList.add(databaseIdQuery.toQuery());
-	mustList.add(indexQuery.toQuery());
-
-	BoolQuery boolQuery = new BoolQuery.Builder().//
-		should(shouldList).//
-		must(mustList).//
-		minimumShouldMatch("1").//
-		build();
-
-	return boolQuery.toQuery();
-    }
-
-    /**
-     * Builds a query which searches the entries in the database with id <code>databaseId</code> and in the index
-     * <code>index</code>
-     * 
-     * @param databaseId
-     * @param index
-     * @return
-     */
-    public Query buildSearchQuery(String databaseId, String index) {
-
-	MatchPhraseQuery databaseIdQuery = new MatchPhraseQuery.Builder().//
-		field(IndexData.DATABASE_ID).query(databaseId).//
-		build();
-
-	MatchPhraseQuery indexQuery = new MatchPhraseQuery.Builder().//
-		field("_index").//
-		query(index).//
-		build();
-
-	List<Query> mustList = new ArrayList<>();
-
-	mustList.add(databaseIdQuery.toQuery());
-	mustList.add(indexQuery.toQuery());
-
-	BoolQuery boolQuery = new BoolQuery.Builder().//
-		must(mustList).//
-		build();
-
-	return boolQuery.toQuery();
-    }
-
-    /**
-     * @param databaseId
-     * @return
-     */
-    public Query buildSearchRegistryQuery(String databaseId) {
-
-	MatchPhraseQuery databaseIdQuery = new MatchPhraseQuery.Builder().//
-		field(IndexData.DATABASE_ID).query(databaseId).//
-		build();
-
-	MatchPhraseQuery folderRegistryIndexQuery = new MatchPhraseQuery.Builder().//
-		field("_index").query(FolderRegistryMapping.get().getIndex()).//
-		build();
-
-	List<Query> queryList = Arrays.asList(//
-		databaseIdQuery.toQuery(), //
-		folderRegistryIndexQuery.toQuery());
-
-	BoolQuery boolQuery = new BoolQuery.Builder().must(queryList).build();
-
-	return boolQuery.toQuery();
-    }
-
-    /**
      * @param index
      * @return
      * @throws OpenSearchException
@@ -628,87 +391,6 @@ public class OpenSearchWrapper {
 	decorateSource(source, hit.index(), hit.id());
 
 	return Optional.of(source);
-    }
-
-    /**
-     * Builds a query which searches the entry of the given <code>folder</code>
-     * having the given <code>key</code>.<br>
-     * <b>Constraints</b>: databaseId = getDatabase().getIdentifier() AND folderName = getName() AND key = key
-     * 
-     * @param key
-     */
-    private Query buildSearchQuery(OpenSearchFolder folder, String key) {
-
-	// MatchQuery databaseIdQuery = new MatchQuery.Builder().//
-	// field(IndexData.DATABASE_ID).query(new FieldValue.Builder().//
-	// stringValue(folder.getDatabase().getIdentifier()).//
-	// build())
-	// .//
-	// build();
-	//
-	// MatchQuery folderNameQuery = new MatchQuery.Builder().//
-	// field(IndexData.FOLDER_NAME).query(new FieldValue.Builder().//
-	// stringValue(folder.getName()).//
-	// build())
-	// .//
-	// build();
-	//
-	// MatchQuery keyQuery = new MatchQuery.Builder().//
-	// field(IndexData.ENTRY_NAME).query(new FieldValue.Builder().//
-	// stringValue(key).//
-	// build())
-	// .//
-	// build();
-
-	MatchPhraseQuery databaseIdQuery = new MatchPhraseQuery.Builder().//
-		field(IndexData.DATABASE_ID).query(folder.getDatabase().getIdentifier()).//
-		build();
-
-	MatchPhraseQuery folderNameQuery = new MatchPhraseQuery.Builder().//
-		field(IndexData.FOLDER_NAME).query(folder.getName()).//
-		build();
-
-	MatchPhraseQuery keyQuery = new MatchPhraseQuery.Builder().//
-		field(IndexData.ENTRY_NAME).query(key).//
-		build();
-
-	List<Query> mustList = new ArrayList<>();
-
-	mustList.add(databaseIdQuery.toQuery());
-	mustList.add(folderNameQuery.toQuery());
-	mustList.add(keyQuery.toQuery());
-
-	List<Query> shouldList = buildIndexesQuery();
-
-	BoolQuery boolQuery = new BoolQuery.Builder().//
-		must(mustList).//
-		should(shouldList).//
-		minimumShouldMatch("1").//
-		build();
-
-	return boolQuery.toQuery();
-    }
-
-    /**
-     * @return
-     */
-    private List<Query> buildIndexesQuery() {
-
-	List<String> indexes = IndexMapping.getIndexes();
-
-	List<Query> queryList = new ArrayList<>();
-
-	indexes.forEach(index -> {
-
-	    queryList.add(new MatchPhraseQuery.Builder().//
-		    field("_index").//
-		    query(index).//
-		    build().//
-		    toQuery());
-
-	});
-
-	return queryList;
     }
 
     /**

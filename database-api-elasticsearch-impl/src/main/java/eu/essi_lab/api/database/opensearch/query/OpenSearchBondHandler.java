@@ -57,7 +57,7 @@ public class OpenSearchBondHandler implements DiscoveryBondHandler {
 	this.tfTargets = message.getTermFrequencyTargets();
 	this.orderingDirection = message.getOrderingDirection();
 	this.orderingProperty = message.getOrderingProperty();
-	this.queryBuilder = new OpenSearchQueryBuilder(map);
+	this.queryBuilder = new OpenSearchQueryBuilder(ranking, map, deletedIncluded);
     }
 
     @Override
@@ -217,10 +217,11 @@ public class OpenSearchBondHandler implements DiscoveryBondHandler {
     }
 
     /**
+     * @param count
      * @return
      */
-    public Query getQuery() {
+    public Query getQuery(boolean count) {
 
-	return queryBuilder.build();
+	return queryBuilder.build(count);
     }
 }
