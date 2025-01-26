@@ -67,6 +67,7 @@ import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.PerformanceLogger;
+import eu.essi_lab.model.Queryable;
 
 /**
  * @author Fabrizio
@@ -121,6 +122,40 @@ public class OpenSearchWrapper {
 	SearchResponse<Object> searchResponse = search(searchQuery, start, size);
 
 	return ConversionUtils.toBinaryList(searchResponse);
+    }
+
+    /**
+     * @param searchQuery
+     * @param start
+     * @param size
+     * @param tfTargets
+     * @param maxItems
+     * @return
+     * @throws Exception
+     */
+    public SearchResponse<Object> count(Query searchQuery, List<Queryable> tfTargets, int maxItems) throws Exception {
+
+	PerformanceLogger pl = new PerformanceLogger(//
+		PerformanceLogger.PerformancePhase.OPENSEARCH_WRAPPER_SEARCH, //
+		UUID.randomUUID().toString(), //
+		Optional.empty());
+
+	SearchResponse<Object> response = client.search(builder -> {
+
+	    builder.query(searchQuery).size(0);
+
+	    tfTargets.forEach(trg -> {
+
+		builder.aggregations(trg.getName(), agg -> agg.terms(t -> t.field(trg.getName() + "_"))).size(maxItems);
+	    });
+
+	    return builder;
+
+	}, Object.class);
+
+	pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
+
+	return response;
     }
 
     /**
@@ -230,31 +265,31 @@ public class OpenSearchWrapper {
      * @throws OpenSearchException
      */
     public double findMinMaxValue(Query searchQuery, String field, boolean max) throws OpenSearchException, IOException {
-    
-        Map<String, Aggregation> map = new HashMap<>();
-    
-        Aggregation agg = max ? new Aggregation.Builder().max(new MaxAggregation.Builder().field(field).build()).build()
-        	: new Aggregation.Builder().min(new MinAggregation.Builder().field(field).build()).build();
-    
-        map.put("1", agg);
-    
-        SearchResponse<Object> response = client.search(builder -> {
-    
-            builder.query(searchQuery).//
-        	    aggregations(map);
-    
-            return builder;
-    
-        }, Object.class);
-    
-        Map<String, Aggregate> aggregations = response.aggregations();
-    
-        if (max) {
-    
-            return aggregations.get("1").max().value();
-        }
-    
-        return aggregations.get("1").min().value();
+
+	Map<String, Aggregation> map = new HashMap<>();
+
+	Aggregation agg = max ? new Aggregation.Builder().max(new MaxAggregation.Builder().field(field).build()).build()
+		: new Aggregation.Builder().min(new MinAggregation.Builder().field(field).build()).build();
+
+	map.put("1", agg);
+
+	SearchResponse<Object> response = client.search(builder -> {
+
+	    builder.query(searchQuery).//
+		    aggregations(map);
+
+	    return builder;
+
+	}, Object.class);
+
+	Map<String, Aggregate> aggregations = response.aggregations();
+
+	if (max) {
+
+	    return aggregations.get("1").max().value();
+	}
+
+	return aggregations.get("1").min().value();
     }
 
     /**
@@ -480,16 +515,16 @@ public class OpenSearchWrapper {
     }
 
     public static void main(String[] args) throws Exception {
-    
-        OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
-    
-        OpenSearchWrapper wrapper = new OpenSearchWrapper(database.getClient());
-    
-        Query query = OpenSearchQueryBuilder.buildMatchAllQuery();
-    
-        double maxValue = wrapper.findMinMaxValue(query, "title", true);
-    
-        System.out.println(maxValue);
-    
+
+	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+
+	OpenSearchWrapper wrapper = new OpenSearchWrapper(database.getClient());
+
+	Query query = OpenSearchQueryBuilder.buildMatchAllQuery();
+
+	double maxValue = wrapper.findMinMaxValue(query, "title", true);
+
+	System.out.println(maxValue);
+
     }
 }
