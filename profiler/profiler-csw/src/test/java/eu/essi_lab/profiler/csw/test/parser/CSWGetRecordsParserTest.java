@@ -108,7 +108,7 @@ public class CSWGetRecordsParserTest {
 	    }
 	    {
 		SimpleValueBond el = (SimpleValueBond) array[1];
-		Assert.assertEquals(BondOperator.NULL, el.getOperator());
+		Assert.assertEquals(BondOperator.NOT_EXISTS, el.getOperator());
 	    }
 
 	    {

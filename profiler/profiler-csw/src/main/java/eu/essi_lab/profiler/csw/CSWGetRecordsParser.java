@@ -610,7 +610,7 @@ public class CSWGetRecordsParser {
 	    return BondOperator.EQUAL;
 	}
 	if (operator.matches("(?i).*PropertyIsNull.*")) {
-	    return BondOperator.NULL;
+	    return BondOperator.NOT_EXISTS;
 	}
 	if (operator.matches("(?i).*PropertyIsNotEqualTo.*")) {
 	    return BondOperator.NOT_EQUAL;
