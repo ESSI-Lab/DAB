@@ -279,6 +279,43 @@ public class ConversionUtils {
     }
 
     /**
+     * @param dateTime
+     * @return
+     */
+    public static Optional<Long> parseToLong(String dateTime) {
+
+	dateTime = dateTime.replace("/", "-");
+
+	Optional<Date> date = ISO8601DateTimeUtils.parseISO8601ToDate(dateTime);
+	if (date.isEmpty()) {
+
+	    date = ISO8601DateTimeUtils.parseNotStandardToDate(dateTime);
+
+	    if (date.isEmpty()) {
+
+		date = ISO8601DateTimeUtils.parseNotStandard2ToDate(dateTime);
+	    }
+	}
+
+	return date.map(d -> d.getTime());
+    }
+
+    /**
+     * @param dateTime
+     * @return
+     */
+    public static String parseToLongString(String dateTime) {
+
+	Optional<Long> longValue = ConversionUtils.parseToLong(dateTime);
+	if (longValue.isPresent()) {
+
+	    return longValue.get().toString();
+	}
+
+	throw new IllegalArgumentException("Unparsable date/date time value: " + dateTime);
+    }
+
+    /**
      * @param <T>
      * @param searchResponse
      * @param type
@@ -313,27 +350,5 @@ public class ConversionUtils {
 	transformer.transform(new DOMSource(document), new StreamResult(stringWriter));
 
 	return stringWriter.toString();
-    }
-
-    /**
-     * @param dateTime
-     * @return
-     */
-    public static Optional<Long> parseToLong(String dateTime) {
-
-	dateTime = dateTime.replace("/", "-");
-
-	Optional<Date> date = ISO8601DateTimeUtils.parseISO8601ToDate(dateTime);
-	if (date.isEmpty()) {
-
-	    date = ISO8601DateTimeUtils.parseNotStandardToDate(dateTime);
-
-	    if (date.isEmpty()) {
-
-		date = ISO8601DateTimeUtils.parseNotStandard2ToDate(dateTime);
-	    }
-	}
-
-	return date.map(d -> d.getTime());
     }
 }
