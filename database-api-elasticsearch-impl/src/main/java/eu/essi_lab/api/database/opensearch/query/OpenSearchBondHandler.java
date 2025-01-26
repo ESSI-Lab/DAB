@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-import org.opensearch.client.opensearch._types.query_dsl.MatchPhraseQuery;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 
 import eu.essi_lab.api.database.opensearch.OpenSearchWrapper;
@@ -25,6 +24,7 @@ import eu.essi_lab.messages.bond.ViewBond;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondHandler;
 import eu.essi_lab.model.OrderingDirection;
 import eu.essi_lab.model.Queryable;
+import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
 
 /**
@@ -176,12 +176,21 @@ public class OpenSearchBondHandler implements DiscoveryBondHandler {
     @Override
     public void simpleValueBond(SimpleValueBond bond) {
 
-	MatchPhraseQuery query = new MatchPhraseQuery.Builder().//
-		field(bond.getProperty().getName()).//
-		query(bond.getPropertyValue()).//
-		build();
+	Query query = null;
 
-	queryBuilder.append(query.toQuery());
+	if (bond.getProperty() == MetadataElement.SUBJECT) {
+
+	    query = queryBuilder.buildSubjectQuery(bond.getPropertyValue(), bond.getOperator());
+
+	} else {
+
+	    query = queryBuilder.buildMetadataElementQuery(//
+		    bond.getProperty(), //
+		    bond.getOperator(), //
+		    bond.getPropertyValue());
+	}
+
+	queryBuilder.append(query);
     }
 
     @Override
@@ -193,6 +202,7 @@ public class OpenSearchBondHandler implements DiscoveryBondHandler {
     @Override
     public void spatialBond(SpatialBond bond) {
 
+	queryBuilder.append(OpenSearchQueryBuilder.buildGeoShapeQuery(bond));
     }
 
     @Override

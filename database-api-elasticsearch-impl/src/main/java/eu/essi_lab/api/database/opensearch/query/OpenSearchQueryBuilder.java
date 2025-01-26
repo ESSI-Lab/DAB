@@ -10,11 +10,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch._types.GeoShapeRelation;
 import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
 import org.opensearch.client.opensearch._types.query_dsl.ExistsQuery;
+import org.opensearch.client.opensearch._types.query_dsl.GeoShapeFieldQuery;
+import org.opensearch.client.opensearch._types.query_dsl.GeoShapeQuery;
 import org.opensearch.client.opensearch._types.query_dsl.MatchAllQuery;
 import org.opensearch.client.opensearch._types.query_dsl.MatchPhraseQuery;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
@@ -33,7 +37,11 @@ import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
+import eu.essi_lab.messages.bond.SpatialBond;
+import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.bond.View.ViewVisibility;
+import eu.essi_lab.model.Queryable.ContentType;
+import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.RankingStrategy;
 import eu.essi_lab.model.resource.ResourceProperty;
 
@@ -203,6 +211,60 @@ public class OpenSearchQueryBuilder {
     }
 
     /**
+     * @param el
+     * @param operator
+     * @param value
+     * @return
+     */
+    @SuppressWarnings("incomplete-switch")
+    public Query buildMetadataElementQuery(MetadataElement el, BondOperator operator, String value) {
+
+	switch (operator) {
+	case EXISTS:
+	    return buildExistsFieldQuery(el.getName());
+
+	case NOT_EXISTS:
+	    return buildNotExistsFieldQuery(el.getName());
+
+	case NOT_EQUAL:
+	case EQUAL:
+	case GREATER:
+	case GREATER_OR_EQUAL:
+	case LESS:
+	case LESS_OR_EQUAL:
+
+	    if (el.getContentType() == ContentType.ISO8601_DATE || el.getContentType() == ContentType.ISO8601_DATE_TIME) {
+
+		value = ConversionUtils.parseToLongString(value);
+	    }
+
+	    return buildRangeQuery(el.getName(), operator, value, ranking.computePropertyWeight(el));
+
+	case LIKE:
+
+	    return buildMatchPhraseQuery(el.getName(), value, ranking.computePropertyWeight(el));
+	}
+
+	throw new IllegalArgumentException("Operator " + operator + " not supported for field " + el.getName());
+    }
+
+    /**
+     * @param value
+     * @param operator
+     */
+    public Query buildSubjectQuery(String value, BondOperator operator) {
+
+	BoolQuery boolQuery = new BoolQuery.Builder().//
+		should(buildMetadataElementQuery(MetadataElement.KEYWORD, operator, value), //
+			buildMetadataElementQuery(MetadataElement.TOPIC_CATEGORY, operator, value)//
+		).//
+		minimumShouldMatch("1").//
+		build();
+
+	return boolQuery.toQuery();
+    }
+
+    /**
      * @return
      */
     public Query build(boolean count) {
@@ -215,6 +277,42 @@ public class OpenSearchQueryBuilder {
 
 	return new BoolQuery.Builder().//
 		must(searchQuery, basicQuery, indexQuery).//
+		build().//
+		toQuery();
+    }
+
+    @SuppressWarnings("incomplete-switch")
+    public static Query buildGeoShapeQuery(SpatialBond bond) {
+
+	JSONObject shape = buildEnvelope(bond);
+
+	org.opensearch.client.opensearch._types.query_dsl.GeoShapeFieldQuery.Builder shapeBuilder = new GeoShapeFieldQuery.Builder().//
+		shape(JsonData.of(shape.toMap()));
+
+	BondOperator operator = bond.getOperator();
+	switch (operator) {
+	case BBOX:
+	case INTERSECTS:
+	    shapeBuilder = shapeBuilder.relation(GeoShapeRelation.Intersects);
+	    break;
+	case CONTAINED:
+	    shapeBuilder = shapeBuilder.relation(GeoShapeRelation.Contains);
+	    break;
+	case CONTAINS:
+	    shapeBuilder = shapeBuilder.relation(GeoShapeRelation.Within);
+	    break;
+	case DISJOINT:
+	    shapeBuilder = shapeBuilder.relation(GeoShapeRelation.Disjoint);
+	    break;
+	case INTERSECTS_ANY_POINT_NOT_CONTAINS:
+	    // not supported
+	    break;
+	}
+
+	return new GeoShapeQuery.Builder().//
+		field(MetadataElement.BOUNDING_BOX.getName()).//
+		boost(1f).//
+		shape(shapeBuilder.build()).//
 		build().//
 		toQuery();
     }
@@ -451,14 +549,6 @@ public class OpenSearchQueryBuilder {
 	return createNotQuery(buildExistsFieldQuery(field));
     }
 
-    //
-    // base queries
-    //
-
-    //
-    //
-    //
-
     /**
      * Supported operators:
      * <ul>
@@ -520,22 +610,22 @@ public class OpenSearchQueryBuilder {
 
 	case GREATER:
 
-	    builder = builder.gt(JsonData.of(value));
+	    builder = builder.gt(JsonData.of(value)).field(field);
 	    break;
 
 	case GREATER_OR_EQUAL:
 
-	    builder = builder.gte(JsonData.of(value));
+	    builder = builder.gte(JsonData.of(value)).field(field);
 	    break;
 
 	case LESS:
 
-	    builder = builder.lt(JsonData.of(value));
+	    builder = builder.lt(JsonData.of(value)).field(field);
 	    break;
 
 	case LESS_OR_EQUAL:
 
-	    builder = builder.lte(JsonData.of(value));
+	    builder = builder.lte(JsonData.of(value)).field(field);
 	    break;
 	}
 
@@ -548,6 +638,35 @@ public class OpenSearchQueryBuilder {
     public static Query buildMatchAllQuery() {
 
 	return new MatchAllQuery.Builder().build().toQuery();
+    }
+
+    /**
+     * @param bond
+     * @return
+     */
+    private static JSONObject buildEnvelope(SpatialBond bond) {
+
+	SpatialExtent extent = (SpatialExtent) bond.getPropertyValue();
+
+	JSONObject object = new JSONObject();
+	object.put("type", "envelope");
+
+	JSONArray coord = new JSONArray();
+
+	object.put("coordinates", coord);
+
+	JSONArray nw = new JSONArray();
+	nw.put(extent.getWest());
+	nw.put(extent.getNorth());
+
+	JSONArray se = new JSONArray();
+	se.put(extent.getEast());
+	se.put(extent.getSouth());
+
+	coord.put(nw);
+	coord.put(se);
+
+	return object;
     }
 
     /**
