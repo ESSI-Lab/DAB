@@ -3,6 +3,9 @@
  **/
 import { GIAPI } from '../core/GIAPI.js';
 
+
+
+
 /**
  *  This widget allows to select all the available <a href="#method_constraints" class="crosslink">constraints</a> of 
  *  the <a href="../classes/DAB.html#method_discover" class="crosslink">discover</a>; it also allows to set some <a href="#method_options" class="crosslink">options</a>.<br>
@@ -206,6 +209,7 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 		jQuery("#" + advConstDivId).css("background-color", options.advConstDivBckColor);
 		jQuery("#" + advConstDivId).css("padding", "10px");
 		jQuery("#" + advConstDivId).css("padding-right", "3px");
+
 	};
 
 	/**
@@ -845,7 +849,7 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 				label = 'Parameter id';
 				break;
 			case 'attributeTitle':
-				help = 'Name of the parameter described by the measurement value';
+				help = 'Name of the parameter described by the measurement value<br/><br/><button id="pButton">Browse and select parameters from the ontology</button>';
 				label = 'Parameter name';
 				break;
 			case 'riverName':
@@ -937,7 +941,7 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 		var correctHelp = 'Exact search or semantic search with ontology support for translations and narrower terms.<br/>Please check the online ontology browser for possible terms:<br/>';
 
 
-		if (options!== undefined && options.ontology !== undefined) {
+		if (options !== undefined && options.ontology !== undefined) {
 			if (options.ontology === "his-central") {
 				correctHelp += '<a href="http://ontology.his-central.geodab.eu/ontology-browser/his-central-ontology.html?http://ontology.his-central.geodab.eu/hydro-ontology/concept/1">HIS-Central ontology</a><br/>';
 			}
@@ -1372,6 +1376,17 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 			'</td></tr>';
 	};
 
+
+
+	function parameterButtonClicked() {
+
+
+		$('#pDialog').dialog('isOpen') ? $('#pDialog').dialog('close') : $('#pDialog').dialog('open');
+
+
+
+	}
+
 	var createTextField = function(
 		id,
 		label,
@@ -1436,6 +1451,8 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 				}
 			}
 		}));
+
+
 
 		if (time) {
 			timeObjects.push({
@@ -2016,6 +2033,74 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 
 		jQuery('#' + id).val('');
 	};
+	var dialogCreated = false;
+	var ontologyUrl = "";
+	var conceptBaseUrl = "";
+	if (options !== undefined && options.ontology !== undefined) {
+		if (options.ontology === "his-central") {
+			ontologyUrl = 'http://ontology.his-central.geodab.eu/ontology-browser/his-central-ontology.html?http://ontology.his-central.geodab.eu/hydro-ontology/concept/1';
+			conceptBaseUrl = 'http://ontology.his-central.geodab.eu/hydro-ontology/concept/';
+		}
+		if (options.ontology === "whos") {
+			ontologyUrl = 'https://hydro.geodab.eu/ontology-browser/hydro-ontology.html?http://hydro.geodab.eu/hydro-ontology/concept/1';
+			conceptBaseUrl = 'http://hydro.geodab.eu/hydro-ontology/concept/';
+		}
+	}
+	//ontologyUrl = 'http://localhost/ontology-browser/hydro-ontology.html?http://hydro.geodab.eu/hydro-ontology/concept/1';
+	//conceptBaseUrl = 'http://hydro.geodab.eu/hydro-ontology/concept/';
+
+
+	jQuery(document).on('click', '#pButton', (function() {
+
+		if (!dialogCreated) {
+			// Create the dialog
+			$('<div  id="pDialog"></div>')
+				.html('<iframe src="' + ontologyUrl + '" id="parameterFrame"></iframe><div style="margin-top: 10px; text-align: center;"><label for="selectedParameter"><b>Selected parameter: </b></label><span id="selectedParameter"><b>None</b></span></div>')
+				.dialog({
+					title: "Select a parameter from the ontology",
+					width: 850,      // Width of the dialog
+					height: 700,     // Height of the dialog
+					autoOpen: true,
+					modal: true
+				});
+
+			// Listen for messages from the iframe
+			window.addEventListener('message', (event) => {
+
+				try {
+					const data = event.data;
+					console.log(data);
+					// Verify that data is an object and has the "name" property
+					if (typeof data === "object" && data !== null && "selectedConcept" in data&& "selectedConceptId" in data) {
+						var conceptURI = conceptBaseUrl+data.selectedConceptId;
+						$("#selectedParameter").text(data.selectedConcept +" ("+conceptURI+")"); // Update the display
+						jQuery('#attributeNameConstraint').val(conceptURI);
+
+					} else {
+						console.warn("Invalid message: 'selectedConcept' property is missing or not an object");
+					}
+				} catch (error) {
+					console.error("Failed to process message:", error);
+				}
+
+			});
+
+			// Attach 'load' event listener to the iframe
+			$("#parameterFrame").on('load', function() {
+				try {
+					// Send a message to the iframe to trigger event listening
+					this.contentWindow.postMessage('startListening', '*');
+				} catch (error) {
+					console.error("Error sending message to iframe:", error);
+				}
+			});
+			dialogCreated = true;
+		} else {
+
+			$('#pDialog').dialog('isOpen') ? $('#pDialog').dialog('close') : $('#pDialog').dialog('open');
+
+		}
+	}));
 
 	return widget;
 };

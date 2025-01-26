@@ -17,6 +17,7 @@ export function initializePortal(config) {
 	var minZoom = config.minZoom;
 
 
+
 	$.extend(true, $.hik.jtable.prototype.options, {
 		jqueryuiTheme: true
 	});
@@ -34,6 +35,8 @@ export function initializePortal(config) {
 			}
 		}
 	};
+
+ 
 
 
 
@@ -209,7 +212,6 @@ export function initializePortal(config) {
 
 			'stationInfoId': 'stationInfo',
 			'stationNameAddId': 'platformNameConstraint',
-
 			'advancedConstraintDivId': 'advConstDiv',
 
 			'onMarkerMouseOver': function(node) {
@@ -310,6 +312,7 @@ export function initializePortal(config) {
 		// ConstraintsWidget
 		//
 		GIAPI.search.constWidget = GIAPI.ConstraintsWidget(GIAPI.search.dab, {
+			'ontology': config.ontology,
 			'keyDownAction': (function() { GIAPI.search.discover(); }),
 			'fieldsWidth': 205
 		});
@@ -398,6 +401,8 @@ export function initializePortal(config) {
 			'borderColor': 'rgba(44, 62, 80, 0.07)'
 		});
 
+
+
 		jQuery(document).on('click', '#hideMapInputControl', function() {
 
 			if (jQuery('#hideMapInputControl').is(":checked")) {
@@ -437,7 +442,7 @@ export function initializePortal(config) {
 			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'instrumentTitle'));
 		}
 		if (config.attributeSearch !== undefined && config.attributeSearch) {
-			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'attributeTitle'));
+			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'attributeTitle',{ id: 'attributeNameConstraint'}));
 		}
 		if (config.platformSearch !== undefined && config.platformSearch) {
 			advancedConstraints.push(GIAPI.search.constWidget.textConstraint('get', 'platformTitle',
@@ -452,12 +457,12 @@ export function initializePortal(config) {
 		}
 
 		var semanticValue = 0;
-		if (config.semanticSearchValue!==undefined){
+		if (config.semanticSearchValue !== undefined) {
 			semanticValue = config.semanticSearchValue;
 		}
 
 		if (config.semanticSearch !== undefined && config.semanticSearch) {
-			advancedConstraints.push(GIAPI.search.constWidget.booleanConstraint('get', 'semantics', {ontology:config.ontology, value:semanticValue, helpIconImage: 'fa-comments' }));
+			advancedConstraints.push(GIAPI.search.constWidget.booleanConstraint('get', 'semantics', { ontology: config.ontology, value: semanticValue, helpIconImage: 'fa-comments' }));
 		}
 
 
@@ -593,7 +598,7 @@ export function initializePortal(config) {
 		// set the termFrequency option
 		options.termFrequency = 'source,keyword,format,protocol';
 
-		
+
 
 		if (config.filters !== undefined) {
 			options.termFrequency = config.filters;
