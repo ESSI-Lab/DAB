@@ -3,10 +3,13 @@
  */
 package eu.essi_lab.api.database.opensearch.index.mappings;
 
+import java.util.Arrays;
+
 import org.opensearch.client.opensearch._types.mapping.FieldType;
 
 import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.indexes.IndexedElements;
+import eu.essi_lab.messages.termfrequency.TermFrequencyMap.TermFrequencyTarget;
 import eu.essi_lab.model.index.jaxb.BoundingBox;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
@@ -79,21 +82,21 @@ public class DataFolderMapping extends IndexMapping {
 	    case DOUBLE:
 		addProperty(el.getName(), FieldType.Double.jsonValue());
 		break;
-		
+
 	    case INTEGER:
 		addProperty(el.getName(), FieldType.Integer.jsonValue());
 		break;
-		
+
 	    case ISO8601_DATE:
 	    case ISO8601_DATE_TIME:
 	    case LONG:
 		addProperty(el.getName(), FieldType.Long.jsonValue());
 		break;
-		
+
 	    case SPATIAL:
 		addProperty(el.getName(), FieldType.GeoShape.jsonValue());
 		break;
-		
+
 	    case TEXTUAL:
 		addProperty(el.getName(), FieldType.Text.jsonValue());
 		break;
@@ -162,6 +165,19 @@ public class DataFolderMapping extends IndexMapping {
 		addProperty(rp.getName(), FieldType.Text.jsonValue());
 		break;
 	    }
+	});
+
+	// -------------------------------------------------------------------------------
+	//
+	// term frequency targets are indexed as 'keyword' type in order to be aggregated
+	// since 'text' fields are not optimised for aggregations
+	//
+	// --------------------------------------------------------------------------------
+
+	Arrays.asList(TermFrequencyTarget.values()).forEach(trg -> {
+
+	    String name = trg.getName() + "_";
+	    addProperty(name, FieldType.Keyword.jsonValue());
 	});
     }
 

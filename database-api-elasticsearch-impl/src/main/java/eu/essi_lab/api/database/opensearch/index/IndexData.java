@@ -35,6 +35,8 @@ import javax.xml.transform.TransformerException;
 import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.opengis.metadata.identification.KeywordType;
+import org.opensearch.client.opensearch._types.mapping.KeywordProperty;
 import org.opensearch.client.opensearch.core.IndexRequest;
 
 import eu.essi_lab.api.database.Database;
@@ -56,9 +58,11 @@ import eu.essi_lab.api.database.opensearch.index.mappings.UsersMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
 import eu.essi_lab.indexes.IndexedElements;
 import eu.essi_lab.iso.datamodel.classes.BoundingPolygon;
+import eu.essi_lab.jaxb.wms._1_1_1.Keyword;
 import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.bond.View;
+import eu.essi_lab.messages.termfrequency.TermFrequencyMap.TermFrequencyTarget;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.index.jaxb.BoundingBox;
@@ -239,7 +243,7 @@ public class IndexData {
 
 	    GSResource gsResource = GSResource.createOrNull(entry.getDocument().get());
 
-	    IndexesMetadata metadata = gsResource.getIndexesMetadata();
+	    IndexesMetadata indexesMd = gsResource.getIndexesMetadata();
 
 	    //
 	    // shape
@@ -257,9 +261,9 @@ public class IndexData {
 		shape = Shape.of(boundingPolygons.get(0));
 	    }
 
-	    if (shape.isEmpty() && metadata.readBoundingBox().isPresent()) {
+	    if (shape.isEmpty() && indexesMd.readBoundingBox().isPresent()) {
 
-		shape = Shape.of(metadata.readBoundingBox().get());
+		shape = Shape.of(indexesMd.readBoundingBox().get());
 	    }
 
 	    if (!shape.isEmpty()) {
@@ -272,21 +276,21 @@ public class IndexData {
 	    // temp extent begin
 	    //
 
-	    put(metadata, indexData, MetadataElement.TEMP_EXTENT_BEGIN, DateTime.class);
+	    put(indexesMd, indexData, MetadataElement.TEMP_EXTENT_BEGIN, DateTime.class);
 
-	    if (!metadata.read(IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName()).isEmpty()) {
+	    if (!indexesMd.read(IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName()).isEmpty()) {
 
-		put(metadata, indexData, IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName(), Boolean.class);
+		put(indexesMd, indexData, IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName(), Boolean.class);
 	    }
 
 	    //
 	    // temp extent end
 	    //
-	    put(metadata, indexData, MetadataElement.TEMP_EXTENT_END, DateTime.class);
+	    put(indexesMd, indexData, MetadataElement.TEMP_EXTENT_END, DateTime.class);
 
-	    if (!metadata.read(IndexedElements.TEMP_EXTENT_END_NOW.getElementName()).isEmpty()) {
+	    if (!indexesMd.read(IndexedElements.TEMP_EXTENT_END_NOW.getElementName()).isEmpty()) {
 
-		put(metadata, indexData, IndexedElements.TEMP_EXTENT_END_NOW.getElementName(), Boolean.class);
+		put(indexesMd, indexData, IndexedElements.TEMP_EXTENT_END_NOW.getElementName(), Boolean.class);
 	    }
 
 	    //
@@ -294,7 +298,7 @@ public class IndexData {
 	    //
 	    MetadataElement.listValues().forEach(el -> {
 
-		put(el, metadata, indexData);
+		put(el, indexesMd, indexData);
 	    });
 
 	    //
@@ -302,7 +306,15 @@ public class IndexData {
 	    //
 	    ResourceProperty.listValues().forEach(rp -> {
 
-		put(rp, metadata, indexData);
+		put(rp, indexesMd, indexData);
+	    });
+
+	    //
+	    // term frequency targets
+	    //
+	    Arrays.asList(TermFrequencyTarget.values()).forEach(trg -> {
+
+		put(indexesMd, indexData, trg.getName(), KeywordProperty.class);
 	    });
 
 	    indexData.mapping = DataFolderMapping.get();
@@ -572,54 +584,53 @@ public class IndexData {
 
     /**
      * @param quer
-     * @param metadata
+     * @param indexesMd
      * @param indexData
      */
     @SuppressWarnings("incomplete-switch")
-    private static void put(Queryable quer, IndexesMetadata metadata, IndexData indexData) {
+    private static void put(Queryable quer, IndexesMetadata indexesMd, IndexData indexData) {
 
 	switch (quer.getContentType()) {
 	case BOOLEAN:
-	    put(metadata, indexData, quer.getName(), Boolean.class);
+	    put(indexesMd, indexData, quer.getName(), Boolean.class);
 	    break;
 	case DOUBLE:
-	    put(metadata, indexData, quer.getName(), Double.class);
+	    put(indexesMd, indexData, quer.getName(), Double.class);
 	    break;
 	case INTEGER:
-	    put(metadata, indexData, quer.getName(), Integer.class);
+	    put(indexesMd, indexData, quer.getName(), Integer.class);
 	    break;
 	case LONG:
-	    put(metadata, indexData, quer.getName(), Long.class);
+	    put(indexesMd, indexData, quer.getName(), Long.class);
 	    break;
 	case TEXTUAL:
-	    put(metadata, indexData, quer.getName(), String.class);
+	    put(indexesMd, indexData, quer.getName(), String.class);
 	    break;
 	case ISO8601_DATE:
 	case ISO8601_DATE_TIME:
-	    put(metadata, indexData, quer.getName(), DateTime.class);
+	    put(indexesMd, indexData, quer.getName(), DateTime.class);
 	    break;
 	}
 
     }
 
     /**
-     * @param metadata
+     * @param indexesMd
      * @param indexData
      * @param elName
      * @param valueClass
      */
-    private static void put(IndexesMetadata metadata, IndexData indexData, String elName, Class<?> valueClass) {
+    private static void put(IndexesMetadata indexesMd, IndexData indexData, String elName, Class<?> valueClass) {
 
 	JSONArray array = new JSONArray();
 
-	metadata.read(elName).forEach(v -> { //
+	indexesMd.read(elName).forEach(v -> { //
 
-	    if (valueClass.equals(String.class)) {
+	    if (valueClass.equals(String.class) || valueClass.equals(KeywordProperty.class)) {
 
 		array.put(String.valueOf(v));
-	    }
 
-	    else if (valueClass.equals(Integer.class)) {
+	    } else if (valueClass.equals(Integer.class)) {
 
 		array.put(Integer.valueOf(v));
 	    }
@@ -658,7 +669,9 @@ public class IndexData {
 
 	if (array.length() > 0) {
 
-	    indexData.put(elName, array);
+	    String name = valueClass.equals(KeywordProperty.class) ? elName + "_" : elName;
+
+	    indexData.put(name, array);
 	}
     }
 
