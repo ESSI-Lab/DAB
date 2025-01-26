@@ -138,6 +138,8 @@ public class OpenSearchBondHandler implements DiscoveryBondHandler {
 		case DOUBLE:
 		case INTEGER:
 		case LONG:
+		case ISO8601_DATE: // mapped to long
+		case ISO8601_DATE_TIME: // mapped to long
 
 		    try {
 			queryBuilder.append(queryBuilder.buildMinMaxValueQuery(name, operator == BondOperator.MAX));
