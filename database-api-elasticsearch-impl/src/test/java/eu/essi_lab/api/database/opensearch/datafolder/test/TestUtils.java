@@ -15,7 +15,6 @@ import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.opensearch.ConversionUtils;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
-import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.indexes.IndexedElements;
 import eu.essi_lab.model.Queryable.ContentType;
@@ -123,42 +122,13 @@ public class TestUtils {
 		throw new Exception();
 	    }
 
-	    if (prop.equals(IndexedElements.BOUNDING_BOX_NULL.getElementName())) {
+	    if (prop.equals(IndexedElements.BOUNDING_BOX_NULL.getElementName()) || 
+		    prop.equals(IndexedElements.TEMP_EXTENT_BEGIN_NULL.getElementName()) || 
+		    prop.equals(IndexedElements.TEMP_EXTENT_END_NULL.getElementName())){
 
-		boolean hasBoundingPolygons = !res1.getHarmonizedMetadata().//
-			getCoreMetadata().//
-			getDataIdentification().//
-			getBoundingPolygonsList().//
-			isEmpty();
+		continue;
 
-		//
-		// bounding polygons are not put in the GSResource indexed elements, so in this case
-		// the GSResource has the bbox_Null element, but the JSON source has
-		// the bounding polygons related shape
-		//
-		List<String> bboxes = wrapper.getGSResourceProperties(MetadataElement.BOUNDING_BOX);
-
-		if (hasBoundingPolygons) {
-
-		    equals &= !bboxes.isEmpty();
-
-		    if (!equals) {
-
-			throw new Exception();
-		    }
-
-		} else {
-
-		    equals &= bboxes.isEmpty();
-
-		    if (!equals) {
-
-			throw new Exception();
-		    }
-		}
-
-	    } else if (prop.equals(IndexedElements.TEMP_EXTENT_BEGIN_NULL.getElementName()) || //
-		    prop.equals(IndexedElements.TEMP_EXTENT_END_NULL.getElementName()) || //
+	    } else if ( //
 		    prop.equals(IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName()) || //
 		    prop.equals(IndexedElements.TEMP_EXTENT_END_NOW.getElementName()) //
 	    ) {
@@ -204,7 +174,7 @@ public class TestUtils {
 
 		    List<Long> collect = indexesMetadata1.read(prop).//
 			    stream().//
-			    map(v -> IndexData.parseDateTime(v).get()).//
+			    map(v -> ConversionUtils.parseToLong(v).get()).//
 			    sorted().//
 			    collect(Collectors.toList());
 

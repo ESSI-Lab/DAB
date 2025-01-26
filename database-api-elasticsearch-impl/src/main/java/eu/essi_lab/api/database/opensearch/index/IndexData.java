@@ -26,7 +26,6 @@ package eu.essi_lab.api.database.opensearch.index;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,7 +58,6 @@ import eu.essi_lab.indexes.IndexedElements;
 import eu.essi_lab.iso.datamodel.classes.BoundingPolygon;
 import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.auth.GSUser;
@@ -268,10 +266,6 @@ public class IndexData {
 
 		indexData.put(MetadataElement.BOUNDING_BOX.getName(), shape.get().getShape());
 		indexData.put(BoundingBox.AREA_ELEMENT_NAME, shape.get().getArea());
-
-	    } else {
-
-		indexData.put(IndexedElements.BOUNDING_BOX_NULL.getElementName(), true);
 	    }
 
 	    //
@@ -285,11 +279,6 @@ public class IndexData {
 		put(metadata, indexData, IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName(), Boolean.class);
 	    }
 
-	    if (!metadata.read(IndexedElements.TEMP_EXTENT_BEGIN_NULL.getElementName()).isEmpty()) {
-
-		put(metadata, indexData, IndexedElements.TEMP_EXTENT_BEGIN_NULL.getElementName(), Boolean.class);
-	    }
-
 	    //
 	    // temp extent end
 	    //
@@ -298,11 +287,6 @@ public class IndexData {
 	    if (!metadata.read(IndexedElements.TEMP_EXTENT_END_NOW.getElementName()).isEmpty()) {
 
 		put(metadata, indexData, IndexedElements.TEMP_EXTENT_END_NOW.getElementName(), Boolean.class);
-	    }
-
-	    if (!metadata.read(IndexedElements.TEMP_EXTENT_END_NULL.getElementName()).isEmpty()) {
-
-		put(metadata, indexData, IndexedElements.TEMP_EXTENT_END_NULL.getElementName(), Boolean.class);
 	    }
 
 	    //
@@ -526,17 +510,16 @@ public class IndexData {
 
 	object = new JSONObject();
     }
-    
+
     /**
-     * 
      * @param field
      * @param value
      */
     private void put(String field, Object value) {
-	
+
 	object.put(field, value);
     }
-    
+
     /**
      * @return the request
      */
@@ -585,28 +568,6 @@ public class IndexData {
     public String toString() {
 
 	return object.toString(3);
-    }
-
-    /**
-     * @param value
-     * @return
-     */
-    public static Optional<Long> parseDateTime(String value) {
-
-	value = value.replace("/", "-");
-
-	Optional<Date> date = ISO8601DateTimeUtils.parseISO8601ToDate(value);
-	if (date.isEmpty()) {
-
-	    date = ISO8601DateTimeUtils.parseNotStandardToDate(value);
-
-	    if (date.isEmpty()) {
-
-		date = ISO8601DateTimeUtils.parseNotStandard2ToDate(value);
-	    }
-	}
-
-	return date.map(d -> d.getTime());
     }
 
     /**
@@ -678,10 +639,8 @@ public class IndexData {
 		boolean val = Boolean.valueOf(v);
 
 		//
-		// particular case to support the Null elements that in the
-		// GSResource indexed elements, they are present to indicate that the related
-		// property is missing, but they have no value (e.g: tmpExtentEnd_Null indicates that
-		// there is no temp extend end)
+		// particular case to support tmpExtentEnd_Now and tmpExtentBegin_Now elements that in the
+		// GSResource indexed elements, if present, they have no value but they indicates 'true'
 		//
 		if (v.isEmpty()) {
 
@@ -693,7 +652,7 @@ public class IndexData {
 
 	    else if (valueClass.equals(DateTime.class)) {
 
-		parseDateTime(v).ifPresent(dt -> array.put(dt));
+		ConversionUtils.parseToLong(v).ifPresent(dt -> array.put(dt));
 	    }
 	});
 

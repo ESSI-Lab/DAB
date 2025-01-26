@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.Base64;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -39,6 +40,7 @@ import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.XMLFactories;
 import eu.essi_lab.messages.PerformanceLogger;
 import jakarta.json.stream.JsonGenerator;
@@ -311,5 +313,27 @@ public class ConversionUtils {
 	transformer.transform(new DOMSource(document), new StreamResult(stringWriter));
 
 	return stringWriter.toString();
+    }
+
+    /**
+     * @param dateTime
+     * @return
+     */
+    public static Optional<Long> parseToLong(String dateTime) {
+
+	dateTime = dateTime.replace("/", "-");
+
+	Optional<Date> date = ISO8601DateTimeUtils.parseISO8601ToDate(dateTime);
+	if (date.isEmpty()) {
+
+	    date = ISO8601DateTimeUtils.parseNotStandardToDate(dateTime);
+
+	    if (date.isEmpty()) {
+
+		date = ISO8601DateTimeUtils.parseNotStandard2ToDate(dateTime);
+	    }
+	}
+
+	return date.map(d -> d.getTime());
     }
 }

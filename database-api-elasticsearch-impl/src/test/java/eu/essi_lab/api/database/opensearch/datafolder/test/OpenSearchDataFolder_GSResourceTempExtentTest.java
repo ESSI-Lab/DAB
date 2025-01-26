@@ -12,9 +12,9 @@ import org.junit.Test;
 
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
+import eu.essi_lab.api.database.opensearch.ConversionUtils;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
-import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.indexes.IndexedElements;
 import eu.essi_lab.indexes.IndexedElementsWriter;
@@ -89,7 +89,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 
 	checkTempExtendBegin(wrapper, Optional.of(dateTime));
 
-	checkTempExtentBeginNull(wrapper, false);
+	checkTempExtentBeginPresent(wrapper, true);
 
 	checkTempExtentBeginNow(wrapper, false);
 
@@ -103,7 +103,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 
 	checkTempExtentEndNow(wrapper, false);
 
-	checkTempExtentEndNull(wrapper, true);
+	checkTempExtentEndPresent(wrapper, false);
 
 	//
 	//
@@ -171,7 +171,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 
 	checkTempExtendBegin(wrapper, Optional.empty());
 
-	checkTempExtentBeginNull(wrapper, false);
+	checkTempExtentBeginPresent(wrapper, false);
 
 	checkTempExtentBeginNow(wrapper, false);
 
@@ -185,7 +185,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 
 	checkTempExtentEndNow(wrapper, false);
 
-	checkTempExtentEndNull(wrapper, true);
+	checkTempExtentEndPresent(wrapper, false);
 
 	//
 	//
@@ -251,7 +251,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 
 	checkTempExtendBegin(wrapper, Optional.empty());
 
-	checkTempExtentBeginNull(wrapper, false);
+	checkTempExtentBeginPresent(wrapper, false);
 
 	checkTempExtentBeginNow(wrapper, true);
 
@@ -265,7 +265,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 
 	checkTempExtentEndNow(wrapper, false);
 
-	checkTempExtentEndNull(wrapper, true);
+	checkTempExtentEndPresent(wrapper, false);
 
 	//
 	//
@@ -331,7 +331,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 
 	checkTempExtendBegin(wrapper, Optional.empty());
 
-	checkTempExtentBeginNull(wrapper, false);
+	checkTempExtentBeginPresent(wrapper, false);
 
 	checkTempExtentBeginNow(wrapper, true);
 
@@ -345,7 +345,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 
 	checkTempExtentEndNow(wrapper, false);
 
-	checkTempExtentEndNull(wrapper, true);
+	checkTempExtentEndPresent(wrapper, false);
 
 	//
 	//
@@ -411,7 +411,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 
 	checkTempExtendBegin(wrapper, Optional.empty());
 
-	checkTempExtentBeginNull(wrapper, true);
+	checkTempExtentBeginPresent(wrapper, false);
 
 	checkTempExtentBeginNow(wrapper, false);
 
@@ -423,7 +423,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 
 	checkTempExtendEnd(wrapper, Optional.empty());
 
-	checkTempExtentEndNull(wrapper, false);
+	checkTempExtentEndPresent(wrapper, false);
 
 	checkTempExtentEndNow(wrapper, true);
 
@@ -491,7 +491,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 
 	checkTempExtendBegin(wrapper, Optional.empty());
 
-	checkTempExtentBeginNull(wrapper, true);
+	checkTempExtentBeginPresent(wrapper, false);
 
 	checkTempExtentBeginNow(wrapper, false);
 
@@ -503,7 +503,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 
 	checkTempExtendEnd(wrapper, Optional.empty());
 
-	checkTempExtentEndNull(wrapper, false);
+	checkTempExtentEndPresent(wrapper, false);
 
 	checkTempExtentEndNow(wrapper, true);
 
@@ -573,7 +573,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 
 	checkTempExtendEnd(wrapper, Optional.of(dateTime));
 
-	checkTempExtentEndNull(wrapper, false);
+	checkTempExtentEndPresent(wrapper, true);
 
 	checkTempExtentEndNow(wrapper, false);
 
@@ -585,7 +585,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 
 	checkTempExtentBeginNow(wrapper, false);
 
-	checkTempExtentBeginNull(wrapper, true);
+	checkTempExtentBeginPresent(wrapper, false);
 
 	checkTempExtentBeginBeforeNow(wrapper, Optional.empty());
 
@@ -658,7 +658,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 
 	checkTempExtendBegin(wrapper, Optional.of(beginDateTime));
 
-	checkTempExtentBeginNull(wrapper, false);
+	checkTempExtentBeginPresent(wrapper, true);
 
 	checkTempExtentBeginBeforeNow(wrapper, Optional.empty());
 
@@ -670,7 +670,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 
 	checkTempExtendEnd(wrapper, Optional.of(endDateTime));
 
-	checkTempExtentEndNull(wrapper, false);
+	checkTempExtentEndPresent(wrapper, true);
 
 	checkTempExtentEndNow(wrapper, false);
 
@@ -709,7 +709,7 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
 
 	if (dateTime.isPresent()) {
 
-	    Long longValue = IndexData.parseDateTime(dateTime.get()).get();
+	    Long longValue = ConversionUtils.parseToLong(dateTime.get()).get();
 
 	    Assert.assertEquals(longValue, Long.valueOf(list.get(0)));
 
@@ -723,9 +723,9 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
      * @param wrapper
      * @param expectPresent
      */
-    private void checkTempExtentBeginNull(SourceWrapper wrapper, boolean expectPresent) {
+    private void checkTempExtentBeginPresent(SourceWrapper wrapper, boolean expectPresent) {
 
-	checkProperty(wrapper, IndexedElements.TEMP_EXTENT_BEGIN_NULL.getElementName(), expectPresent);
+	checkProperty(wrapper, MetadataElement.TEMP_EXTENT_BEGIN.getName(), expectPresent);
     }
 
     /**
@@ -768,9 +768,9 @@ public class OpenSearchDataFolder_GSResourceTempExtentTest {
      * @param wrapper
      * @param expectPresent
      */
-    private void checkTempExtentEndNull(SourceWrapper wrapper, boolean expectPresent) {
+    private void checkTempExtentEndPresent(SourceWrapper wrapper, boolean expectPresent) {
 
-	checkProperty(wrapper, IndexedElements.TEMP_EXTENT_END_NULL.getElementName(), expectPresent);
+	checkProperty(wrapper, MetadataElement.TEMP_EXTENT_END.getName(), expectPresent);
     }
 
     /**
