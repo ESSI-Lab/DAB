@@ -44,6 +44,7 @@ import eu.essi_lab.model.resource.ResourceProperty;
  * @param <T> the type of the queryable property which reflects the content of the related {@link IndexedElement}. For
  *        example, {@link IndexedElement}s having a simple textual content, can have the {@link String} type
  */
+@SuppressWarnings("serial")
 public class QueryableBond<T> implements Bond {
 
     @XmlElements({ @XmlElement(name = "metadataElement", type = MetadataElement.class),

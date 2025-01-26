@@ -36,6 +36,7 @@ import eu.essi_lab.model.resource.MetadataElement;
  *        data base. In most cases the String or Boolean type is enough, but in some cases a complex type can be
  *        required (see {@link SpatialBond} )
  */
+@SuppressWarnings("serial")
 public abstract class MetadataElementBond<T> extends QueryableBond<T> {
 
     /**

@@ -33,6 +33,7 @@ import eu.essi_lab.model.resource.MetadataElement;
  * @see SpatialBond
  * @author Fabrizio
  */
+@SuppressWarnings("serial")
 @XmlRootElement
 public class SimpleValueBond extends MetadataElementBond<String> {
 
