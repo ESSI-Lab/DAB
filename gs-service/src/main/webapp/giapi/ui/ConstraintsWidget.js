@@ -2038,8 +2038,13 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 	var conceptBaseUrl = "";
 	if (options !== undefined && options.ontology !== undefined) {
 		if (options.ontology === "his-central") {
+<<<<<<< HEAD
 			ontologyUrl = 'http://his-central-ontology.geodab.eu/ontology-browser/his-central-ontology.html?http://his-central-ontology.geodab.eu/hydro-ontology/concept/1';
 			conceptBaseUrl = 'http://his-central-ontology.geodab.eu/hydro-ontology/concept/';
+=======
+			ontologyUrl = 'https://ontology.his-central.geodab.eu/ontology-browser/his-central-ontology.html?http://ontology.his-central.geodab.eu/hydro-ontology/concept/1';
+			conceptBaseUrl = 'http://ontology.his-central.geodab.eu/hydro-ontology/concept/';
+>>>>>>> branch 'main' of git@github.com:ESSI-Lab/DAB.git
 		}
 		if (options.ontology === "whos") {
 			ontologyUrl = 'https://hydro.geodab.eu/ontology-browser/hydro-ontology.html?http://hydro.geodab.eu/hydro-ontology/concept/1';
