@@ -276,6 +276,14 @@ public class IndexesMetadata extends DOMSerializer {
     }
 
     /**
+     * 
+     */
+    public void clear() {
+
+	properties.clear();
+    }
+
+    /**
      * @return
      */
     public boolean isEmpty() {
