@@ -142,12 +142,12 @@ public class OpenSearchWrapper {
 
 	SearchResponse<Object> response = client.search(builder -> {
 
-	    builder.query(searchQuery).size(0);
-
 	    tfTargets.forEach(trg -> {
 
 		builder.aggregations(trg.getName(), agg -> agg.terms(t -> t.field(trg.getName() + "_"))).size(maxItems);
 	    });
+
+	    builder.query(searchQuery).size(0);
 
 	    return builder;
 
