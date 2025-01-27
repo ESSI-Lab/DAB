@@ -32,11 +32,13 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -47,7 +49,12 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.json.JSONObject;
+import org.opensearch.client.json.JsonpSerializable;
 import org.opensearch.client.json.jsonb.JsonbJsonpMapper;
+import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.Buckets;
+import org.opensearch.client.opensearch._types.aggregations.StringTermsAggregate;
+import org.opensearch.client.opensearch._types.aggregations.StringTermsBucket;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch.core.SearchResponse;
 import org.opensearch.client.opensearch.core.search.Hit;
@@ -64,6 +71,10 @@ import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.XMLFactories;
 import eu.essi_lab.messages.PerformanceLogger;
+import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
+import eu.essi_lab.messages.termfrequency.TermFrequencyMapType;
+import eu.essi_lab.messages.termfrequency.TermFrequencyMap.TermFrequencyTarget;
+import eu.essi_lab.model.resource.GSResource;
 import jakarta.json.stream.JsonGenerator;
 import jakarta.json.stream.JsonParser;
 
@@ -71,6 +82,107 @@ import jakarta.json.stream.JsonParser;
  * @author Fabrizio
  */
 public class ConversionUtils {
+    
+    /**
+     * @param aggs
+     * @return
+     */
+    public static TermFrequencyMapType fromAgg(Map<String, Aggregate> aggs) {
+    
+        TermFrequencyMapType mapType = new TermFrequencyMapType();
+    
+        aggs.keySet().forEach(target -> {
+    
+            Aggregate aggregate = aggs.get(target);
+            StringTermsAggregate sterms = aggregate.sterms();
+    
+            Buckets<StringTermsBucket> buckets = sterms.buckets();
+            List<StringTermsBucket> array = buckets.array();
+    
+            for (StringTermsBucket bucket : array) {
+    
+        	int count = (int) bucket.docCount();
+        	String term = bucket.key();
+    
+        	TermFrequencyItem item = new TermFrequencyItem();
+        	item.setTerm(term);
+        	item.setDecodedTerm(term);
+        	item.setFreq(count);
+        	item.setLabel(target);
+    
+        	switch (TermFrequencyTarget.fromValue(target)) {
+        	case ATTRIBUTE_IDENTIFIER:
+        	    mapType.getAttributeId().add(item);
+        	    break;
+        	case ATTRIBUTE_TITLE:
+        	    mapType.getAttributeTitle().add(item);
+        	    break;
+        	case FORMAT:
+        	    mapType.getFormat().add(item);
+        	    break;
+        	case INSTRUMENT_IDENTIFIER:
+        	    mapType.getInstrumentId().add(item);
+        	    break;
+        	case INSTRUMENT_TITLE:
+        	    mapType.getAttributeTitle().add(item);
+        	    break;
+        	case KEYWORD:
+        	    mapType.getKeyword().add(item);
+        	    break;
+        	case OBSERVED_PROPERTY_URI:
+        	    mapType.getObservedPropertyURI().add(item);
+        	    break;
+        	case ORGANISATION_NAME:
+        	    mapType.getOrganisationName().add(item);
+        	    break;
+        	case ORIGINATOR_ORGANISATION_DESCRIPTION:
+        	    mapType.getOrigOrgDescription().add(item);
+        	    break;
+        	case ORIGINATOR_ORGANISATION_IDENTIFIER:
+        	    mapType.getOrigOrgId().add(item);
+        	    break;
+        	case PLATFORM_IDENTIFIER:
+        	    mapType.getPlatformId().add(item);
+        	    break;
+        	case PLATFORM_TITLE:
+        	    mapType.getPlatformTitle().add(item);
+        	    break;
+        	case PROD_TYPE:
+        	    mapType.getProdType().add(item);
+        	    break;
+        	case PROTOCOL:
+        	    mapType.getProtocol().add(item);
+        	    break;
+        	case S3_INSTRUMENT_IDX:
+        	    mapType.getS3InstrumentIdx().add(item);
+        	    break;
+        	case S3_PRODUCT_LEVEL:
+        	    mapType.getS3ProductLevel().add(item);
+        	    break;
+        	case S3_TIMELINESS:
+        	    mapType.getS3Timeliness().add(item);
+        	    break;
+        	case SAR_POL_CH:
+        	    mapType.getSarPolCh().add(item);
+        	    break;
+        	case SENSOR_OP_MODE:
+        	    mapType.getSensorOpMode().add(item);
+        	    break;
+        	case SENSOR_SWATH:
+        	    mapType.getSensorSwath().add(item);
+        	    break;
+        	case SOURCE:
+        	    mapType.getSourceId().add(item);
+        	    break;
+        	case SSC_SCORE:
+        	    mapType.getSSCScore().add(item);
+        	    break;
+        	}
+            }
+        });
+    
+        return mapType;
+    }
 
     /**
      * @param searchResponse
@@ -148,7 +260,7 @@ public class ConversionUtils {
      * @param obj
      * @return
      */
-    public static JSONObject toJSONObject(Query obj) {
+    public static JSONObject toJSONObject(JsonpSerializable obj) {
 
 	StringWriter stringWriter = new StringWriter();
 
@@ -196,6 +308,28 @@ public class ConversionUtils {
 	}
 
 	return Base64.getEncoder().encodeToString(bytes);
+    }
+
+    /**
+     * @param resource
+     * @return
+     * @throws IOException
+     * @throws SAXException
+     * @throws JAXBException
+     * @throws ParserConfigurationException
+     * @throws TransformerException
+     */
+    public static String encode(GSResource resource) {
+
+	try {
+	    byte[] bytes = toString(resource.asDocument(false)).getBytes();
+	    return Base64.getEncoder().encodeToString(bytes);
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(ConversionUtils.class).error(ex);
+	}
+
+	return null;
     }
 
     /**

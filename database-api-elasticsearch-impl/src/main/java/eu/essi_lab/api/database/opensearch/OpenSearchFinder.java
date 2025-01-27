@@ -12,9 +12,6 @@ import java.util.stream.Collectors;
 
 import org.json.JSONObject;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
-import org.opensearch.client.opensearch._types.aggregations.Buckets;
-import org.opensearch.client.opensearch._types.aggregations.StringTermsAggregate;
-import org.opensearch.client.opensearch._types.aggregations.StringTermsBucket;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch.core.SearchResponse;
 
@@ -54,9 +51,7 @@ import eu.essi_lab.messages.RequestMessage;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
 import eu.essi_lab.messages.count.DiscoveryCountResponse;
-import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
-import eu.essi_lab.messages.termfrequency.TermFrequencyMap.TermFrequencyTarget;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMapType;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -111,7 +106,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	    Map<String, Aggregate> aggregations = searchResponse.aggregations();
 
-	    TermFrequencyMapType mapType = fromAgg(aggregations);
+	    TermFrequencyMapType mapType = ConversionUtils.fromAgg(aggregations);
 
 	    TermFrequencyMap tfMap = new TermFrequencyMap(mapType);
 
@@ -224,107 +219,6 @@ public class OpenSearchFinder implements DatabaseFinder {
     }
 
     /**
-     * @param aggs
-     * @return
-     */
-    private TermFrequencyMapType fromAgg(Map<String, Aggregate> aggs) {
-    
-        TermFrequencyMapType mapType = new TermFrequencyMapType();
-    
-        aggs.keySet().forEach(target -> {
-    
-            Aggregate aggregate = aggs.get(target);
-            StringTermsAggregate sterms = aggregate.sterms();
-    
-            Buckets<StringTermsBucket> buckets = sterms.buckets();
-            List<StringTermsBucket> array = buckets.array();
-    
-            for (StringTermsBucket bucket : array) {
-    
-        	int count = (int) bucket.docCount();
-        	String term = bucket.key();
-    
-        	TermFrequencyItem item = new TermFrequencyItem();
-        	item.setTerm(term);
-        	item.setDecodedTerm(term);
-        	item.setFreq(count);
-        	item.setLabel(target);
-    
-        	switch (TermFrequencyTarget.fromValue(target)) {
-        	case ATTRIBUTE_IDENTIFIER:
-        	    mapType.getAttributeId().add(item);
-        	    break;
-        	case ATTRIBUTE_TITLE:
-        	    mapType.getAttributeTitle().add(item);
-        	    break;
-        	case FORMAT:
-        	    mapType.getFormat().add(item);
-        	    break;
-        	case INSTRUMENT_IDENTIFIER:
-        	    mapType.getInstrumentId().add(item);
-        	    break;
-        	case INSTRUMENT_TITLE:
-        	    mapType.getAttributeTitle().add(item);
-        	    break;
-        	case KEYWORD:
-        	    mapType.getKeyword().add(item);
-        	    break;
-        	case OBSERVED_PROPERTY_URI:
-        	    mapType.getObservedPropertyURI().add(item);
-        	    break;
-        	case ORGANISATION_NAME:
-        	    mapType.getOrganisationName().add(item);
-        	    break;
-        	case ORIGINATOR_ORGANISATION_DESCRIPTION:
-        	    mapType.getOrigOrgDescription().add(item);
-        	    break;
-        	case ORIGINATOR_ORGANISATION_IDENTIFIER:
-        	    mapType.getOrigOrgId().add(item);
-        	    break;
-        	case PLATFORM_IDENTIFIER:
-        	    mapType.getPlatformId().add(item);
-        	    break;
-        	case PLATFORM_TITLE:
-        	    mapType.getPlatformTitle().add(item);
-        	    break;
-        	case PROD_TYPE:
-        	    mapType.getProdType().add(item);
-        	    break;
-        	case PROTOCOL:
-        	    mapType.getProtocol().add(item);
-        	    break;
-        	case S3_INSTRUMENT_IDX:
-        	    mapType.getS3InstrumentIdx().add(item);
-        	    break;
-        	case S3_PRODUCT_LEVEL:
-        	    mapType.getS3ProductLevel().add(item);
-        	    break;
-        	case S3_TIMELINESS:
-        	    mapType.getS3Timeliness().add(item);
-        	    break;
-        	case SAR_POL_CH:
-        	    mapType.getSarPolCh().add(item);
-        	    break;
-        	case SENSOR_OP_MODE:
-        	    mapType.getSensorOpMode().add(item);
-        	    break;
-        	case SENSOR_SWATH:
-        	    mapType.getSensorSwath().add(item);
-        	    break;
-        	case SOURCE:
-        	    mapType.getSourceId().add(item);
-        	    break;
-        	case SSC_SCORE:
-        	    mapType.getSSCScore().add(item);
-        	    break;
-        	}
-            }
-        });
-    
-        return mapType;
-    }
-
-    /**
      * @param message
      * @return
      * @throws GSException
@@ -379,7 +273,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 	bondParser.parse(handler);
 
 	Query query = handler.getQuery(count);
-	System.out.println(ConversionUtils.toJSONObject(query).toString(3));
+	// System.out.println(ConversionUtils.toJSONObject(query).toString(3));
 
 	try {
 
