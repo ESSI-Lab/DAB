@@ -45,6 +45,7 @@ import org.opensearch.client.opensearch._types.query_dsl.MatchPhraseQuery;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch._types.query_dsl.RangeQuery;
 import org.opensearch.client.opensearch._types.query_dsl.RangeQuery.Builder;
+import org.opensearch.client.opensearch._types.query_dsl.WildcardQuery;
 
 import eu.essi_lab.api.database.opensearch.ConversionUtils;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
@@ -263,7 +264,7 @@ public class OpenSearchQueryBuilder {
 
 	case LIKE:
 
-	    return buildMatchPhraseQuery(el.getName(), value, ranking.computePropertyWeight(el));
+	    return buildWildCardQuery(el.getName(), value, ranking.computePropertyWeight(el));
 	}
 
 	throw new IllegalArgumentException("Operator " + operator + " not supported for field " + el.getName());
@@ -941,6 +942,31 @@ public class OpenSearchQueryBuilder {
 	return builder.//
 		build().//
 		toQuery();
+    }
+
+    /**
+     * @param field
+     * @param value
+     * @param boost
+     * @return
+     */
+    private static Query buildWildCardQuery(String field, String value, float boost) {
+
+	org.opensearch.client.opensearch._types.query_dsl.WildcardQuery.Builder builder = new WildcardQuery.Builder().//
+		field(field).//
+		value(value).//
+		build().//
+		toBuilder();
+
+	if (boost > 1) {
+
+	    builder = builder.boost(boost);
+	}
+
+	return builder.//
+		build().//
+		toQuery();
+
     }
 
     /**
