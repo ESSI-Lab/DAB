@@ -35,7 +35,6 @@ import javax.xml.transform.TransformerException;
 import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.opengis.metadata.identification.KeywordType;
 import org.opensearch.client.opensearch._types.mapping.KeywordProperty;
 import org.opensearch.client.opensearch.core.IndexRequest;
 
@@ -58,11 +57,9 @@ import eu.essi_lab.api.database.opensearch.index.mappings.UsersMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
 import eu.essi_lab.indexes.IndexedElements;
 import eu.essi_lab.iso.datamodel.classes.BoundingPolygon;
-import eu.essi_lab.jaxb.wms._1_1_1.Keyword;
 import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.bond.View;
-import eu.essi_lab.messages.termfrequency.TermFrequencyMap.TermFrequencyTarget;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.index.jaxb.BoundingBox;
@@ -310,11 +307,11 @@ public class IndexData {
 	    });
 
 	    //
-	    // term frequency targets
+	    // keyword fields for aggregation
 	    //
-	    Arrays.asList(TermFrequencyTarget.values()).forEach(trg -> {
+	    DataFolderMapping.AGGREGABLE_FIELDS.forEach(field -> {
 
-		put(indexesMd, indexData, trg.getName(), KeywordProperty.class);
+		put(indexesMd, indexData, field, KeywordProperty.class);
 	    });
 
 	    indexData.mapping = DataFolderMapping.get();
@@ -633,19 +630,16 @@ public class IndexData {
 	    } else if (valueClass.equals(Integer.class)) {
 
 		array.put(Integer.valueOf(v));
-	    }
 
-	    else if (valueClass.equals(Double.class)) {
+	    } else if (valueClass.equals(Double.class)) {
 
 		array.put(Double.valueOf(v));
-	    }
 
-	    else if (valueClass.equals(Long.class)) {
+	    } else if (valueClass.equals(Long.class)) {
 
 		array.put(Long.valueOf(v));
-	    }
 
-	    else if (valueClass.equals(Boolean.class)) {
+	    } else if (valueClass.equals(Boolean.class)) {
 
 		boolean val = Boolean.valueOf(v);
 
@@ -659,9 +653,8 @@ public class IndexData {
 		}
 
 		array.put(val);
-	    }
 
-	    else if (valueClass.equals(DateTime.class)) {
+	    } else if (valueClass.equals(DateTime.class)) {
 
 		ConversionUtils.parseToLong(v).ifPresent(dt -> array.put(dt));
 	    }
@@ -669,7 +662,8 @@ public class IndexData {
 
 	if (array.length() > 0) {
 
-	    String name = valueClass.equals(KeywordProperty.class) ? elName + "_" : elName;
+	    // keyword fields used for aggregation
+	    String name = valueClass.equals(KeywordProperty.class) ? DataFolderMapping.toAggField(elName) : elName;
 
 	    indexData.put(name, array);
 	}

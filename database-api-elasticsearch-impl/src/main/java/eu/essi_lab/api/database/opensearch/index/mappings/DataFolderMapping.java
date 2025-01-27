@@ -3,13 +3,14 @@
  */
 package eu.essi_lab.api.database.opensearch.index.mappings;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.opensearch.client.opensearch._types.mapping.FieldType;
 
 import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.indexes.IndexedElements;
-import eu.essi_lab.messages.termfrequency.TermFrequencyMap.TermFrequencyTarget;
+import eu.essi_lab.model.Queryable.ContentType;
 import eu.essi_lab.model.index.jaxb.BoundingBox;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
@@ -51,6 +52,8 @@ public class DataFolderMapping extends IndexMapping {
     public static final String GS_RESOURCE = "gsResource";
     // the source storage worker key must be preserved
     public static final String WRITING_FOLDER_TAG = SourceStorageWorker.WRITING_FOLDER_TAG;
+
+    public static final List<String> AGGREGABLE_FIELDS = new ArrayList<>();
 
     /**
      * 
@@ -169,16 +172,46 @@ public class DataFolderMapping extends IndexMapping {
 
 	// -------------------------------------------------------------------------------
 	//
-	// term frequency targets are indexed as 'keyword' type in order to be aggregated
+	// some fields are mapped also as 'keyword' type in order to be aggregated
 	// since 'text' fields are not optimised for aggregations
 	//
 	// --------------------------------------------------------------------------------
 
-	Arrays.asList(TermFrequencyTarget.values()).forEach(trg -> {
+	MetadataElement.listValues().forEach(el -> {
 
-	    String name = trg.getName() + "_";
-	    addProperty(name, FieldType.Keyword.jsonValue());
+	    if (el != MetadataElement.ANY_TEXT && //
+		    el != MetadataElement.ABSTRACT && //
+		    el != MetadataElement.ONLINE_LINKAGE && //
+		    el != MetadataElement.AGGREGATED_RESOURCE_IDENTIFIER && //
+		    el.getContentType() == ContentType.TEXTUAL) {
+
+		addProperty(toAggField(el.getName()), FieldType.Keyword.jsonValue());
+
+		AGGREGABLE_FIELDS.add(el.getName());
+	    }
 	});
+
+	ResourceProperty.listValues().forEach(rp -> {
+
+	    if (rp != ResourceProperty.PUBLIC_ID && //
+		    rp != ResourceProperty.PRIVATE_ID && //
+		    rp != ResourceProperty.ORIGINAL_ID && //
+		    rp.getContentType() == ContentType.TEXTUAL) {
+
+		addProperty(toAggField(rp.getName()), FieldType.Keyword.jsonValue());
+
+		AGGREGABLE_FIELDS.add(rp.getName());
+	    }
+	});
+    }
+
+    /**
+     * @param field
+     * @return
+     */
+    public static String toAggField(String field) {
+
+	return field + "_";
     }
 
     /**
