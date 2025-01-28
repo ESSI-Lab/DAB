@@ -40,6 +40,7 @@ import org.w3c.dom.Node;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFinder;
+import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
 import eu.essi_lab.api.database.opensearch.query.OpenSearchBondHandler;
 import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
@@ -53,6 +54,7 @@ import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
 import eu.essi_lab.messages.count.DiscoveryCountResponse;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMapType;
+import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
@@ -84,14 +86,38 @@ public class OpenSearchFinder implements DatabaseFinder {
 	return OpenSearchDatabase.isSupported(info);
     }
 
+    /**
+     * @param aggregations
+     * @param element
+     * @return
+     */
+    private int getCardinalityValue(Map<String, Aggregate> aggregations, Optional<Queryable> element) {
+
+	Aggregate aggregate = aggregations.get(DataFolderMapping.toAggField(element.get().getName()));
+	return (int) aggregate.cardinality().value();
+    }
+
     @Override
     public DiscoveryCountResponse count(DiscoveryMessage message) throws GSException {
 
-	try {
+	try {	  
 
 	    SearchResponse<Object> searchResponse = discover_(message, true);
 
-	    int total = (int) searchResponse.hits().total().value();
+	    Map<String, Aggregate> aggregations = searchResponse.aggregations();
+
+	    int total = 0;
+
+	    Optional<Queryable> element = message.getDistinctValuesElement();
+
+	    if (element.isPresent()) {
+
+		total = getCardinalityValue(aggregations, element);
+
+	    } else {
+
+		total = (int) searchResponse.hits().total().value();
+	    }
 
 	    DiscoveryCountResponse response = new DiscoveryCountResponse();
 
@@ -104,13 +130,14 @@ public class OpenSearchFinder implements DatabaseFinder {
 		response.setCount(total);
 	    }
 
-	    Map<String, Aggregate> aggregations = searchResponse.aggregations();
+	    if (element.isEmpty()) {
 
-	    TermFrequencyMapType mapType = ConversionUtils.fromAgg(aggregations);
+		TermFrequencyMapType mapType = ConversionUtils.fromAgg(aggregations);
 
-	    TermFrequencyMap tfMap = new TermFrequencyMap(mapType);
+		TermFrequencyMap tfMap = new TermFrequencyMap(mapType);
 
-	    response.setTermFrequencyMap(tfMap);
+		response.setTermFrequencyMap(tfMap);
+	    }
 
 	    return response;
 
@@ -126,23 +153,40 @@ public class OpenSearchFinder implements DatabaseFinder {
     public ResultSet<GSResource> discover(DiscoveryMessage message) throws GSException {
 
 	ResultSet<GSResource> resultSet = new ResultSet<>();
+	List<GSResource> resources = null;
 
 	try {
 
-	    SearchResponse<Object> response = discover_(message, false);
+	    if (message.getDistinctValuesElement().isPresent()) {
 
-	    PerformanceLogger pl = new PerformanceLogger(//
-		    PerformanceLogger.PerformancePhase.OPENSEARCH_FINDER_RESOURCES_CREATION, //
-		    message.getRequestId(), //
-		    Optional.ofNullable(message.getWebRequest()));
+		Query query = builQuery(message, false);
 
-	    List<GSResource> resources = ConversionUtils.toBinaryList(response).//
-		    stream().//
-		    map(binary -> GSResource.createOrNull(binary)).//
-		    filter(Objects::nonNull).//
-		    collect(Collectors.toList());
+		resources = wrapper.findDistinctSources(//
+			query, //
+			message.getDistinctValuesElement().get(), message.getPage().getSize()).//
+			stream().//
+			map(s -> ConversionUtils.toStream(s)).//
+			map(binary -> GSResource.createOrNull(binary)).//
+			filter(Objects::nonNull).//
+			collect(Collectors.toList());
 
-	    pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
+	    } else {
+
+		SearchResponse<Object> response = discover_(message, false);
+
+		PerformanceLogger pl = new PerformanceLogger(//
+			PerformanceLogger.PerformancePhase.OPENSEARCH_FINDER_RESOURCES_CREATION, //
+			message.getRequestId(), //
+			Optional.ofNullable(message.getWebRequest()));
+
+		resources = ConversionUtils.toBinaryList(response).//
+			stream().//
+			map(binary -> GSResource.createOrNull(binary)).//
+			filter(Objects::nonNull).//
+			collect(Collectors.toList());
+
+		pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
+	    }
 
 	    //
 	    //
@@ -262,7 +306,7 @@ public class OpenSearchFinder implements DatabaseFinder {
      * @return
      * @throws GSException
      */
-    private SearchResponse<Object> discover_(DiscoveryMessage message, boolean count) throws GSException {
+    private Query builQuery(DiscoveryMessage message, boolean count) throws GSException {
 
 	HashMap<String, String> map = getSourceDataFolderMap(message);
 
@@ -272,8 +316,17 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	bondParser.parse(handler);
 
-	Query query = handler.getQuery(count);
-	// System.out.println(ConversionUtils.toJSONObject(query).toString(3));
+	return handler.getQuery(count);
+    }
+
+    /**
+     * @param message
+     * @return
+     * @throws GSException
+     */
+    private SearchResponse<Object> discover_(DiscoveryMessage message, boolean count) throws GSException {
+
+	Query query = builQuery(message, count);
 
 	try {
 
@@ -284,7 +337,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 		    new JSONObject(ConversionUtils.toJSONObject(query).toString(3)).toString(3));
 
 	    SearchResponse<Object> response = count ? //
-		    wrapper.count(query, message.getTermFrequencyTargets(), message.getMaxFrequencyMapItems()) : //
+		    wrapper.count(query, message) : //
 		    wrapper.search(query, start, size);
 
 	    return response;
