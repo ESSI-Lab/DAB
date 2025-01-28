@@ -42,8 +42,11 @@ import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch._types.Result;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
 import org.opensearch.client.opensearch._types.aggregations.Aggregation;
+import org.opensearch.client.opensearch._types.aggregations.CardinalityAggregation;
 import org.opensearch.client.opensearch._types.aggregations.MaxAggregation;
 import org.opensearch.client.opensearch._types.aggregations.MinAggregation;
+import org.opensearch.client.opensearch._types.aggregations.StringTermsAggregate;
+import org.opensearch.client.opensearch._types.aggregations.TermsAggregation;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch.core.CountRequest;
 import org.opensearch.client.opensearch.core.DeleteByQueryRequest;
@@ -55,7 +58,11 @@ import org.opensearch.client.opensearch.core.GetRequest;
 import org.opensearch.client.opensearch.core.GetResponse;
 import org.opensearch.client.opensearch.core.IndexRequest;
 import org.opensearch.client.opensearch.core.IndexResponse;
+import org.opensearch.client.opensearch.core.MsearchRequest;
+import org.opensearch.client.opensearch.core.MsearchResponse;
 import org.opensearch.client.opensearch.core.SearchResponse;
+import org.opensearch.client.opensearch.core.msearch.MultiSearchResponseItem;
+import org.opensearch.client.opensearch.core.msearch.RequestItem;
 import org.opensearch.client.opensearch.core.search.Hit;
 import org.opensearch.client.opensearch.core.search.HitsMetadata;
 import org.opensearch.client.opensearch.core.search.SourceFilter;
@@ -64,8 +71,10 @@ import org.opensearch.client.opensearch.generic.Requests;
 import org.opensearch.client.opensearch.generic.Response;
 
 import eu.essi_lab.api.database.opensearch.index.IndexData;
+import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.PerformanceLogger;
 import eu.essi_lab.model.Queryable;
 
@@ -133,25 +142,54 @@ public class OpenSearchWrapper {
      * @return
      * @throws Exception
      */
-    public SearchResponse<Object> count(Query searchQuery, List<Queryable> tfTargets, int maxItems) throws Exception {
+    public SearchResponse<Object> count(Query searchQuery, DiscoveryMessage message) throws Exception {
 
 	PerformanceLogger pl = new PerformanceLogger(//
 		PerformanceLogger.PerformancePhase.OPENSEARCH_WRAPPER_SEARCH, //
 		UUID.randomUUID().toString(), //
 		Optional.empty());
 
-	SearchResponse<Object> response = client.search(builder -> {
+	Optional<Queryable> element = message.getDistinctValuesElement();
+	SearchResponse<Object> response = null;
 
-	    tfTargets.forEach(trg -> {
+	if (element.isPresent()) {
 
-		builder.aggregations(trg.getName(), agg -> agg.terms(t -> t.field(trg.getName() + "_"))).size(maxItems);
-	    });
+	    CardinalityAggregation agg = CardinalityAggregation.of(a -> a.field(
 
-	    builder.query(searchQuery).size(0);
+		    DataFolderMapping.toAggField(element.get().getName())));
 
-	    return builder;
+	    Aggregation aggregation = Aggregation.of(a -> a.cardinality(agg));
 
-	}, Object.class);
+	    response = client.search(builder -> {
+
+		builder.aggregations(DataFolderMapping.toAggField(element.get().getName()), aggregation);
+
+		builder.query(searchQuery).size(0);
+
+		return builder;
+
+	    }, Object.class);
+
+	} else {
+
+	    List<Queryable> targets = message.getTermFrequencyTargets();
+	    int maxItems = message.getMaxFrequencyMapItems();
+
+	    response = client.search(builder -> {
+
+		targets.forEach(trg -> {
+
+		    builder.aggregations(trg.getName(), agg -> agg.terms(t -> t.field(
+
+			    DataFolderMapping.toAggField(trg.getName())))).size(maxItems);
+		});
+
+		builder.query(searchQuery).size(0);
+
+		return builder;
+
+	    }, Object.class);
+	}
 
 	pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
 
@@ -159,10 +197,41 @@ public class OpenSearchWrapper {
     }
 
     /**
+     * @param target
+     * @param distValues
+     * @return
+     * @throws IOException
+     * @throws OpenSearchException
+     */
+    public List<JSONObject> findDistinctSources(Query searchQuery, Queryable target, int size) throws Exception {
+
+	List<String> distValues = findDistinctValues(searchQuery, target, size);
+
+	List<RequestItem> items = OpenSearchQueryBuilder.buildDistinctValuesItems(distValues, target);
+
+	MsearchResponse<Object> msResponse = client.msearch(
+
+		new MsearchRequest.Builder().//
+			index(DataFolderMapping.get().getIndex()).//
+			searches(items).//
+			build(),
+
+		Object.class);
+
+	List<MultiSearchResponseItem<Object>> responses = msResponse.responses();
+
+	return responses.//
+		stream().//
+		map(r -> ConversionUtils.toJSONObject(r.result().hits().hits().get(0).source())).//
+		collect(Collectors.toList());
+    }
+
+    /**
      * @param searchQuery
      * @param properties
      * @param start
      * @param size
+     * @param distinct
      * @return
      * @throws Exception
      */
@@ -443,6 +512,45 @@ public class OpenSearchWrapper {
     public void synch() throws OpenSearchException, IOException {
 
 	client.indices().refresh();
+    }
+
+    /**
+     * @param target
+     * @param size
+     * @return
+     * @throws IOException
+     * @throws Exception
+     */
+    private List<String> findDistinctValues(Query searchQuery, Queryable target, int size) throws Exception {
+    
+        TermsAggregation termsAgg = TermsAggregation.of(//
+        	a -> a.field(DataFolderMapping.toAggField(target.getName())).//
+        		size(size));
+    
+        Aggregation agg = Aggregation.of(a -> a.terms(termsAgg));
+    
+        SearchResponse<Object> aggResponse = client.search(builder -> {
+    
+            builder.aggregations(target.getName(), agg);
+    
+            builder.query(searchQuery).//
+        	    index(DataFolderMapping.get().getIndex()).//
+        	    size(0);
+    
+            return builder;
+    
+        }, Object.class);
+    
+        Map<String, Aggregate> aggregations = aggResponse.aggregations();
+        Aggregate aggregate = aggregations.get(target.getName());
+    
+        StringTermsAggregate sterms = aggregate.sterms();
+    
+        return sterms.buckets().//
+        	array().//
+        	stream().//
+        	map(b -> b.key()).//
+        	collect(Collectors.toList());
     }
 
     /**
