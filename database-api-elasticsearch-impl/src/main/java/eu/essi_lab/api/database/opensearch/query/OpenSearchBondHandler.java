@@ -57,8 +57,6 @@ import eu.essi_lab.model.resource.ResourceProperty;
 public class OpenSearchBondHandler implements DiscoveryBondHandler {
 
     private boolean dataFolderCheckEnabled;
-    private int maxFrequencyMapItems;
-    private List<Queryable> tfTargets;
     private Optional<OrderingDirection> orderingDirection;
     private Optional<Queryable> orderingProperty;
     private OpenSearchQueryBuilder queryBuilder;
@@ -71,8 +69,6 @@ public class OpenSearchBondHandler implements DiscoveryBondHandler {
     public OpenSearchBondHandler(OpenSearchWrapper wrapper, DiscoveryMessage message, HashMap<String, String> map) {
 
 	this.dataFolderCheckEnabled = message.isDataFolderCheckEnabled();
-	this.maxFrequencyMapItems = message.getMaxFrequencyMapItems();
-	this.tfTargets = message.getTermFrequencyTargets();
 	this.orderingDirection = message.getOrderingDirection();
 	this.orderingProperty = message.getOrderingProperty();
 	this.queryBuilder = new OpenSearchQueryBuilder(//
