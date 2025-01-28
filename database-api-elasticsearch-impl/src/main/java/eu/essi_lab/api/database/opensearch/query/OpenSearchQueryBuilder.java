@@ -27,7 +27,6 @@ package eu.essi_lab.api.database.opensearch.query;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -44,6 +43,7 @@ import org.opensearch.client.opensearch._types.query_dsl.ExistsQuery;
 import org.opensearch.client.opensearch._types.query_dsl.GeoShapeFieldQuery;
 import org.opensearch.client.opensearch._types.query_dsl.GeoShapeQuery;
 import org.opensearch.client.opensearch._types.query_dsl.MatchAllQuery;
+import org.opensearch.client.opensearch._types.query_dsl.MatchNoneQuery;
 import org.opensearch.client.opensearch._types.query_dsl.MatchPhraseQuery;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch._types.query_dsl.RangeQuery;
@@ -668,6 +668,14 @@ public class OpenSearchQueryBuilder {
     public static Query buildMatchAllQuery() {
 
 	return new MatchAllQuery.Builder().build().toQuery();
+    }
+    
+    /**
+     * @return
+     */
+    public static Query buildMatchNoneQuery() {
+
+	return new MatchNoneQuery.Builder().build().toQuery();
     }
 
     /**
