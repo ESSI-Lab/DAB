@@ -164,7 +164,9 @@ public class OpenSearchWrapper {
 
 		builder.aggregations(DataFolderMapping.toAggField(element.get().getName()), aggregation);
 
-		builder.query(searchQuery).size(0);
+		builder.query(searchQuery).//
+			index(DataFolderMapping.get().getIndex()).//
+			size(0);
 
 		return builder;
 
@@ -184,7 +186,9 @@ public class OpenSearchWrapper {
 			    DataFolderMapping.toAggField(trg.getName())))).size(maxItems);
 		});
 
-		builder.query(searchQuery).size(0);
+		builder.query(searchQuery).//
+			index(DataFolderMapping.get().getIndex()).//
+			size(0);
 
 		return builder;
 
@@ -245,7 +249,7 @@ public class OpenSearchWrapper {
 	SearchResponse<Object> response = client.search(builder -> {
 
 	    builder.query(searchQuery).//
-		    from(start).//
+		    index(DataFolderMapping.get().getIndex()).from(start).//
 		    size(size);
 
 	    return builder;
@@ -522,35 +526,35 @@ public class OpenSearchWrapper {
      * @throws Exception
      */
     private List<String> findDistinctValues(Query searchQuery, Queryable target, int size) throws Exception {
-    
-        TermsAggregation termsAgg = TermsAggregation.of(//
-        	a -> a.field(DataFolderMapping.toAggField(target.getName())).//
-        		size(size));
-    
-        Aggregation agg = Aggregation.of(a -> a.terms(termsAgg));
-    
-        SearchResponse<Object> aggResponse = client.search(builder -> {
-    
-            builder.aggregations(target.getName(), agg);
-    
-            builder.query(searchQuery).//
-        	    index(DataFolderMapping.get().getIndex()).//
-        	    size(0);
-    
-            return builder;
-    
-        }, Object.class);
-    
-        Map<String, Aggregate> aggregations = aggResponse.aggregations();
-        Aggregate aggregate = aggregations.get(target.getName());
-    
-        StringTermsAggregate sterms = aggregate.sterms();
-    
-        return sterms.buckets().//
-        	array().//
-        	stream().//
-        	map(b -> b.key()).//
-        	collect(Collectors.toList());
+
+	TermsAggregation termsAgg = TermsAggregation.of(//
+		a -> a.field(DataFolderMapping.toAggField(target.getName())).//
+			size(size));
+
+	Aggregation agg = Aggregation.of(a -> a.terms(termsAgg));
+
+	SearchResponse<Object> aggResponse = client.search(builder -> {
+
+	    builder.aggregations(target.getName(), agg);
+
+	    builder.query(searchQuery).//
+		    index(DataFolderMapping.get().getIndex()).//
+		    size(0);
+
+	    return builder;
+
+	}, Object.class);
+
+	Map<String, Aggregate> aggregations = aggResponse.aggregations();
+	Aggregate aggregate = aggregations.get(target.getName());
+
+	StringTermsAggregate sterms = aggregate.sterms();
+
+	return sterms.buckets().//
+		array().//
+		stream().//
+		map(b -> b.key()).//
+		collect(Collectors.toList());
     }
 
     /**

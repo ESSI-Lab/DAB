@@ -305,10 +305,8 @@ public class OpenSearchQueryBuilder {
 
 	Query basicQuery = buildBasicQuery(count);
 
-	Query indexQuery = buildIndexQuery(DataFolderMapping.get().getIndex());
-
 	return new BoolQuery.Builder().//
-		must(searchQuery, basicQuery, indexQuery).//
+		must(searchQuery, basicQuery).//
 		build().//
 		toQuery();
     }
