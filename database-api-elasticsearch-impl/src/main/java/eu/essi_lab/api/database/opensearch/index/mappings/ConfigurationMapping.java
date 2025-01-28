@@ -45,19 +45,25 @@ public class ConfigurationMapping extends IndexMapping {
      * 
      */
     public static final String CONFIGURATION = "configuration";
-    
+
     /**
      * 
      */
     public static final String CONFIGURATION_LOCK = "configuration-lock";
 
+    private static ConfigurationMapping instance;
 
     /**
      * @return
      */
     public static final ConfigurationMapping get() {
 
-	return new ConfigurationMapping();
+	if (instance == null) {
+
+	    instance = new ConfigurationMapping();
+	}
+
+	return instance;
     }
 
     /**

@@ -55,6 +55,8 @@ public class DataFolderMapping extends IndexMapping {
 
     public static final List<String> AGGREGABLE_FIELDS = new ArrayList<>();
 
+    private static DataFolderMapping instance;
+
     /**
      * 
      *  
@@ -219,6 +221,11 @@ public class DataFolderMapping extends IndexMapping {
      */
     public static final DataFolderMapping get() {
 
-	return new DataFolderMapping();
+	if (instance == null) {
+
+	    instance = new DataFolderMapping();
+	}
+
+	return instance;
     }
 }
