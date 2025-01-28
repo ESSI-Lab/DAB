@@ -75,6 +75,7 @@ import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap.TermFrequencyTarget;
 import eu.essi_lab.messages.web.KeyValueParser;
 import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.MetadataElement;
@@ -213,7 +214,8 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 
 			double tol = 0.0000000001;
 
-			DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(ConfigurationWrapper.getDatabaseURI());
+			StorageInfo uri = ConfigurationWrapper.getDatabaseURI();
+			DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(uri);
 
 			WMSClusterRequest request = new WMSClusterRequest();
 
