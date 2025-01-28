@@ -101,7 +101,7 @@ public class DataFolderMapping extends IndexMapping {
 	    case ISO8601_DATE:
 	    case ISO8601_DATE_TIME:
 	    case LONG:
-		addProperty(el.getName(), FieldType.Long.jsonValue());
+		addProperty(el.getName(), FieldType.Date.jsonValue());
 		break;
 
 	    case SPATIAL:
@@ -167,7 +167,7 @@ public class DataFolderMapping extends IndexMapping {
 		break;
 	    case ISO8601_DATE:
 	    case ISO8601_DATE_TIME:
-		addProperty(rp.getName(), FieldType.Long.jsonValue());
+		addProperty(rp.getName(), FieldType.Date.jsonValue());
 		break;
 	    case LONG:
 		addProperty(rp.getName(), FieldType.Long.jsonValue());

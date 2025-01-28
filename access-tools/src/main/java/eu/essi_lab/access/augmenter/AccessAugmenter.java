@@ -300,6 +300,7 @@ public class AccessAugmenter extends ResourceAugmenter<AugmenterSetting> {
 	    resource.getPropertyHandler().setIsTransformable(true);
 	    // this property is true only if the data can be downloaded and is valid
 	    resource.getPropertyHandler().setIsDownloadable(true);
+	    resource.getPropertyHandler().setLastDownloadDate();
 	    setNotExecutable(resource);
 	    report.getDownloadTime().ifPresent(time -> resource.getPropertyHandler().addDownloadTime(time));
 
@@ -312,6 +313,7 @@ public class AccessAugmenter extends ResourceAugmenter<AugmenterSetting> {
 
 	    resource.getPropertyHandler().setIsTransformable(true);
 	    resource.getPropertyHandler().setIsDownloadable(true);
+	    resource.getPropertyHandler().setLastDownloadDate();
 	    resource.getPropertyHandler().setIsExecutable(true);
 
 	    report.getDownloadTime().ifPresent(time -> resource.getPropertyHandler().addDownloadTime(time));

@@ -157,6 +157,11 @@ public enum ResourceProperty implements Queryable {
      * DOWNLOAD TEST
      */
     DOWNLOAD_TIME("testDownloadTime", ContentType.LONG),
+    
+    /**
+     * DOWNLOAD DATE
+     */
+    LAST_DOWNLOAD_DATE("lastDownloadDate", ContentType.ISO8601_DATE_TIME),
 
     /**
      * EXECUTION TEST
