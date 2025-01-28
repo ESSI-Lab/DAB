@@ -61,8 +61,7 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 
     @Override
     public boolean supports(StorageInfo dbUri) {
-return dbUri.getType().isPresent()&&dbUri.getType().get().equals("osl");
-//	return false;
+    	return OpenSearchDatabase.isSupported(dbUri);
     }
 
     @Override
