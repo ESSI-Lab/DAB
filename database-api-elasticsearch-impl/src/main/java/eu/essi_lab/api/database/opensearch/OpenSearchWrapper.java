@@ -144,10 +144,10 @@ public class OpenSearchWrapper {
      */
     public SearchResponse<Object> count(Query searchQuery, DiscoveryMessage message) throws Exception {
 
-	PerformanceLogger pl = new PerformanceLogger(//
-		PerformanceLogger.PerformancePhase.OPENSEARCH_WRAPPER_SEARCH, //
-		UUID.randomUUID().toString(), //
-		Optional.empty());
+//	PerformanceLogger pl = new PerformanceLogger(//
+//		PerformanceLogger.PerformancePhase.OPENSEARCH_WRAPPER_SEARCH, //
+//		UUID.randomUUID().toString(), //
+//		Optional.empty());
 
 	Optional<Queryable> element = message.getDistinctValuesElement();
 	SearchResponse<Object> response = null;
@@ -195,7 +195,7 @@ public class OpenSearchWrapper {
 	    }, Object.class);
 	}
 
-	pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
+//	pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
 
 	return response;
     }
@@ -241,10 +241,10 @@ public class OpenSearchWrapper {
      */
     public SearchResponse<Object> search(Query searchQuery, int start, int size) throws Exception {
 
-	PerformanceLogger pl = new PerformanceLogger(//
-		PerformanceLogger.PerformancePhase.OPENSEARCH_WRAPPER_SEARCH, //
-		UUID.randomUUID().toString(), //
-		Optional.empty());
+//	PerformanceLogger pl = new PerformanceLogger(//
+//		PerformanceLogger.PerformancePhase.OPENSEARCH_WRAPPER_SEARCH, //
+//		UUID.randomUUID().toString(), //
+//		Optional.empty());
 
 	SearchResponse<Object> response = client.search(builder -> {
 
@@ -256,7 +256,7 @@ public class OpenSearchWrapper {
 
 	}, Object.class);
 
-	pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
+//	pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
 
 	return response;
     }

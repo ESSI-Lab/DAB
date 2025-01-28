@@ -190,10 +190,10 @@ public class ConversionUtils {
      */
     public static List<InputStream> toBinaryList(SearchResponse<Object> searchResponse) {
 
-	PerformanceLogger pl = new PerformanceLogger(//
-		PerformanceLogger.PerformancePhase.OPENSEARCH_WRAPPER_TO_BINARY_LIST, //
-		UUID.randomUUID().toString(), //
-		Optional.empty());
+//	PerformanceLogger pl = new PerformanceLogger(//
+//		PerformanceLogger.PerformancePhase.OPENSEARCH_WRAPPER_TO_BINARY_LIST, //
+//		UUID.randomUUID().toString(), //
+//		Optional.empty());
 
 	List<InputStream> list = toList(searchResponse, hit -> {
 
@@ -202,7 +202,7 @@ public class ConversionUtils {
 	    return decode(binaryValue);
 	});
 
-	pl.logPerformance(GSLoggerFactory.getLogger(OpenSearchWrapper.class));
+//	pl.logPerformance(GSLoggerFactory.getLogger(OpenSearchWrapper.class));
 
 	return list;
     }
