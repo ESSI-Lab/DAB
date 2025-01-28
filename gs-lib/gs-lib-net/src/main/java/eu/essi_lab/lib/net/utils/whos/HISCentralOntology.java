@@ -23,6 +23,6 @@ package eu.essi_lab.lib.net.utils.whos;
 
 public class HISCentralOntology extends HydroOntology{
     public HISCentralOntology() {
-	super("http://ontology.his-central.geodab.eu/hydro-ontology");
+	super("http://his-central-ontology.geodab.eu/hydro-ontology");
     }
 }
