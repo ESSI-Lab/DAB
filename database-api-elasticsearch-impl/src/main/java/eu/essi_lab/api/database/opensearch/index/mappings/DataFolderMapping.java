@@ -75,7 +75,7 @@ public class DataFolderMapping extends IndexMapping {
 	//
 	// --------------------------------------------------
 
-	MetadataElement.listOrderedValues().forEach(el -> {
+	MetadataElement.listValues().forEach(el -> {
 
 	    switch (el.getContentType()) {
 	    case BOOLEAN:
@@ -211,7 +211,7 @@ public class DataFolderMapping extends IndexMapping {
      */
     public static String toAggField(String field) {
 
-	return field + "_";
+	return field + "_keyword";
     }
 
     /**

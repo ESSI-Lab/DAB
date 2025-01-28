@@ -27,13 +27,16 @@ package eu.essi_lab.api.database.opensearch.query;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.GeoShapeRelation;
 import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
@@ -45,7 +48,13 @@ import org.opensearch.client.opensearch._types.query_dsl.MatchPhraseQuery;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch._types.query_dsl.RangeQuery;
 import org.opensearch.client.opensearch._types.query_dsl.RangeQuery.Builder;
+import org.opensearch.client.opensearch._types.query_dsl.TermQuery;
+import org.opensearch.client.opensearch._types.query_dsl.TermsQuery;
+import org.opensearch.client.opensearch._types.query_dsl.TermsQueryField;
 import org.opensearch.client.opensearch._types.query_dsl.WildcardQuery;
+import org.opensearch.client.opensearch.core.msearch.MultisearchBody;
+import org.opensearch.client.opensearch.core.msearch.MultisearchHeader;
+import org.opensearch.client.opensearch.core.msearch.RequestItem;
 
 import eu.essi_lab.api.database.opensearch.ConversionUtils;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
@@ -62,6 +71,7 @@ import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.SpatialBond;
 import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.bond.View.ViewVisibility;
+import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.Queryable.ContentType;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.RankingStrategy;
@@ -663,6 +673,35 @@ public class OpenSearchQueryBuilder {
     }
 
     /**
+     * @param distValues
+     * @param target
+     * @return
+     */
+    public static List<RequestItem> buildDistinctValuesItems(List<String> distValues, Queryable target) {
+
+	return distValues.stream()
+
+		.map(value -> buildMatchPhraseQuery(//
+			DataFolderMapping.toAggField(target.getName()), value))//
+
+		.map(query ->
+
+		new RequestItem.Builder().//
+			header(new MultisearchHeader.Builder().//
+				index(DataFolderMapping.get().getIndex()).//
+
+				build())
+			.body(new MultisearchBody.Builder().//
+				size(1).//
+				query(query).//
+				build())
+			.//
+			build()
+
+		).collect(Collectors.toList());
+    }
+
+    /**
      * @param bond
      * @return
      */
@@ -941,6 +980,40 @@ public class OpenSearchQueryBuilder {
 
 	return builder.//
 		build().//
+		toQuery();
+    }
+
+    /**
+     * @param field
+     * @param value
+     * @return
+     */
+    private static Query buildTermQuery(String field, String value) {
+
+	return new TermQuery.Builder().//
+		field(field).//
+		value(new FieldValue.Builder().stringValue(value).build()).//
+		build().//
+		toQuery();
+
+    }
+
+    /**
+     * @param field
+     * @param values
+     * @return
+     */
+    private static Query buildTermsQuery(String field, List<String> values) {
+
+	return new TermsQuery.Builder().//
+		field(field).//
+		terms(new TermsQueryField.Builder().//
+			value(values.//
+				stream().//
+				map(v -> new FieldValue.Builder().stringValue(v).build()).//
+				collect(Collectors.toList()))
+			.build())
+		.build().//
 		toQuery();
     }
 
