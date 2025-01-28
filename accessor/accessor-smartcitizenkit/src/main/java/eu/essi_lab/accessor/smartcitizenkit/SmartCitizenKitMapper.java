@@ -802,6 +802,7 @@ public class SmartCitizenKitMapper extends OriginalIdentifierMapper {
 
 	} catch (Exception e) {
 	    // TODO: handle exception
+	    logger.error(e.getMessage());
 	}
 
 	coreMetadata.getMIMetadata().getDistribution().getDistributionOnline().setIdentifier(resourceIdentifier);

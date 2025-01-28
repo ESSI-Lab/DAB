@@ -139,7 +139,7 @@ public class SmartCitizenKitConnector extends HarvestedQueryConnector<SmartCitiz
 		recordCount = deviceArray.length();
 
 		for (int i = 0; i < recordCount; i++) {
-
+		    try {
 		    JSONObject datasetMetadata = deviceArray.getJSONObject(i);
 		    String id = datasetMetadata.optString("id");
 		    if (id != null && !id.isEmpty()) {
@@ -153,6 +153,7 @@ public class SmartCitizenKitConnector extends HarvestedQueryConnector<SmartCitiz
 
 				    JSONObject sensorInfo = sensorArray.getJSONObject(k);
 				    JSONObject mesurementObj = sensorInfo.optJSONObject("measurement");
+				    if(mesurementObj != null) {
 				    String key = mesurementObj.optString("uuid");
 
 				    if (key != null && variablesIdentifier.contains(key)
@@ -160,10 +161,14 @@ public class SmartCitizenKitConnector extends HarvestedQueryConnector<SmartCitiz
 					ret.addRecord(SmartCitizenKitMapper.create(datasetMetadata, sensorInfo));
 					partialNumbers++;
 				    }
+				    }
 				}
 			    }
 			}
 
+		    }
+		    }catch (Exception e) {
+			e.printStackTrace();
 		    }
 
 		}
@@ -206,7 +211,7 @@ public class SmartCitizenKitConnector extends HarvestedQueryConnector<SmartCitiz
 	if (getResult.isPresent()) {
 	    stream = getResult.get();
 	    cis = new ClonableInputStream(stream);
-	    GSLoggerFactory.getLogger(getClass()).info("Stream result " + IOStreamUtils.asUTF8String(cis.clone()));
+	    //GSLoggerFactory.getLogger(getClass()).info("Stream result " + IOStreamUtils.asUTF8String(cis.clone()));
 	    arr = new JSONArray(IOStreamUtils.asUTF8String(cis.clone()));
 	    stream.close();
 
