@@ -72,8 +72,8 @@ import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.XMLFactories;
 import eu.essi_lab.messages.PerformanceLogger;
 import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
-import eu.essi_lab.messages.termfrequency.TermFrequencyMapType;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap.TermFrequencyTarget;
+import eu.essi_lab.messages.termfrequency.TermFrequencyMapType;
 import eu.essi_lab.model.resource.GSResource;
 import jakarta.json.stream.JsonGenerator;
 import jakarta.json.stream.JsonParser;
@@ -82,106 +82,106 @@ import jakarta.json.stream.JsonParser;
  * @author Fabrizio
  */
 public class ConversionUtils {
-    
+
     /**
      * @param aggs
      * @return
      */
     public static TermFrequencyMapType fromAgg(Map<String, Aggregate> aggs) {
-    
-        TermFrequencyMapType mapType = new TermFrequencyMapType();
-    
-        aggs.keySet().forEach(target -> {
-    
-            Aggregate aggregate = aggs.get(target);
-            StringTermsAggregate sterms = aggregate.sterms();
-    
-            Buckets<StringTermsBucket> buckets = sterms.buckets();
-            List<StringTermsBucket> array = buckets.array();
-    
-            for (StringTermsBucket bucket : array) {
-    
-        	int count = (int) bucket.docCount();
-        	String term = bucket.key();
-    
-        	TermFrequencyItem item = new TermFrequencyItem();
-        	item.setTerm(term);
-        	item.setDecodedTerm(term);
-        	item.setFreq(count);
-        	item.setLabel(target);
-    
-        	switch (TermFrequencyTarget.fromValue(target)) {
-        	case ATTRIBUTE_IDENTIFIER:
-        	    mapType.getAttributeId().add(item);
-        	    break;
-        	case ATTRIBUTE_TITLE:
-        	    mapType.getAttributeTitle().add(item);
-        	    break;
-        	case FORMAT:
-        	    mapType.getFormat().add(item);
-        	    break;
-        	case INSTRUMENT_IDENTIFIER:
-        	    mapType.getInstrumentId().add(item);
-        	    break;
-        	case INSTRUMENT_TITLE:
-        	    mapType.getAttributeTitle().add(item);
-        	    break;
-        	case KEYWORD:
-        	    mapType.getKeyword().add(item);
-        	    break;
-        	case OBSERVED_PROPERTY_URI:
-        	    mapType.getObservedPropertyURI().add(item);
-        	    break;
-        	case ORGANISATION_NAME:
-        	    mapType.getOrganisationName().add(item);
-        	    break;
-        	case ORIGINATOR_ORGANISATION_DESCRIPTION:
-        	    mapType.getOrigOrgDescription().add(item);
-        	    break;
-        	case ORIGINATOR_ORGANISATION_IDENTIFIER:
-        	    mapType.getOrigOrgId().add(item);
-        	    break;
-        	case PLATFORM_IDENTIFIER:
-        	    mapType.getPlatformId().add(item);
-        	    break;
-        	case PLATFORM_TITLE:
-        	    mapType.getPlatformTitle().add(item);
-        	    break;
-        	case PROD_TYPE:
-        	    mapType.getProdType().add(item);
-        	    break;
-        	case PROTOCOL:
-        	    mapType.getProtocol().add(item);
-        	    break;
-        	case S3_INSTRUMENT_IDX:
-        	    mapType.getS3InstrumentIdx().add(item);
-        	    break;
-        	case S3_PRODUCT_LEVEL:
-        	    mapType.getS3ProductLevel().add(item);
-        	    break;
-        	case S3_TIMELINESS:
-        	    mapType.getS3Timeliness().add(item);
-        	    break;
-        	case SAR_POL_CH:
-        	    mapType.getSarPolCh().add(item);
-        	    break;
-        	case SENSOR_OP_MODE:
-        	    mapType.getSensorOpMode().add(item);
-        	    break;
-        	case SENSOR_SWATH:
-        	    mapType.getSensorSwath().add(item);
-        	    break;
-        	case SOURCE:
-        	    mapType.getSourceId().add(item);
-        	    break;
-        	case SSC_SCORE:
-        	    mapType.getSSCScore().add(item);
-        	    break;
-        	}
-            }
-        });
-    
-        return mapType;
+
+	TermFrequencyMapType mapType = new TermFrequencyMapType();
+
+	aggs.keySet().forEach(target -> {
+
+	    Aggregate aggregate = aggs.get(target);
+	    StringTermsAggregate sterms = aggregate.sterms();
+
+	    Buckets<StringTermsBucket> buckets = sterms.buckets();
+	    List<StringTermsBucket> array = buckets.array();
+
+	    for (StringTermsBucket bucket : array) {
+
+		int count = (int) bucket.docCount();
+		String term = bucket.key();
+
+		TermFrequencyItem item = new TermFrequencyItem();
+		item.setTerm(term);
+		item.setDecodedTerm(term);
+		item.setFreq(count);
+		item.setLabel(target);
+
+		switch (TermFrequencyTarget.fromValue(target)) {
+		case ATTRIBUTE_IDENTIFIER:
+		    mapType.getAttributeId().add(item);
+		    break;
+		case ATTRIBUTE_TITLE:
+		    mapType.getAttributeTitle().add(item);
+		    break;
+		case FORMAT:
+		    mapType.getFormat().add(item);
+		    break;
+		case INSTRUMENT_IDENTIFIER:
+		    mapType.getInstrumentId().add(item);
+		    break;
+		case INSTRUMENT_TITLE:
+		    mapType.getAttributeTitle().add(item);
+		    break;
+		case KEYWORD:
+		    mapType.getKeyword().add(item);
+		    break;
+		case OBSERVED_PROPERTY_URI:
+		    mapType.getObservedPropertyURI().add(item);
+		    break;
+		case ORGANISATION_NAME:
+		    mapType.getOrganisationName().add(item);
+		    break;
+		case ORIGINATOR_ORGANISATION_DESCRIPTION:
+		    mapType.getOrigOrgDescription().add(item);
+		    break;
+		case ORIGINATOR_ORGANISATION_IDENTIFIER:
+		    mapType.getOrigOrgId().add(item);
+		    break;
+		case PLATFORM_IDENTIFIER:
+		    mapType.getPlatformId().add(item);
+		    break;
+		case PLATFORM_TITLE:
+		    mapType.getPlatformTitle().add(item);
+		    break;
+		case PROD_TYPE:
+		    mapType.getProdType().add(item);
+		    break;
+		case PROTOCOL:
+		    mapType.getProtocol().add(item);
+		    break;
+		case S3_INSTRUMENT_IDX:
+		    mapType.getS3InstrumentIdx().add(item);
+		    break;
+		case S3_PRODUCT_LEVEL:
+		    mapType.getS3ProductLevel().add(item);
+		    break;
+		case S3_TIMELINESS:
+		    mapType.getS3Timeliness().add(item);
+		    break;
+		case SAR_POL_CH:
+		    mapType.getSarPolCh().add(item);
+		    break;
+		case SENSOR_OP_MODE:
+		    mapType.getSensorOpMode().add(item);
+		    break;
+		case SENSOR_SWATH:
+		    mapType.getSensorSwath().add(item);
+		    break;
+		case SOURCE:
+		    mapType.getSourceId().add(item);
+		    break;
+		case SSC_SCORE:
+		    mapType.getSSCScore().add(item);
+		    break;
+		}
+	    }
+	});
+
+	return mapType;
     }
 
     /**
