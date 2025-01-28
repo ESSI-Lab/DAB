@@ -169,6 +169,8 @@ public class OpenSearchDatabase extends Database {
      */
     public void initializeIndexes() throws GSException {
 
+	GSLoggerFactory.getLogger(getClass()).info("Indexes init STARTED");
+
 	for (IndexMapping mapping : IndexMapping.MAPPINGS) {
 
 	    boolean exists = checkIndex(getClient(), mapping.getIndex());
@@ -178,6 +180,8 @@ public class OpenSearchDatabase extends Database {
 		createIndexWithGenericCLient(mapping);
 	    }
 	}
+
+	GSLoggerFactory.getLogger(getClass()).info("Indexes init ENDED");
     }
 
     /**
@@ -407,7 +411,6 @@ public class OpenSearchDatabase extends Database {
      * @param mapping
      * @throws GSException
      */
-    @SuppressWarnings("unused")
     private void createIndex(IndexMapping mapping) throws GSException {
 
 	TypeMapping typeMapping = new TypeMapping.Builder().//
@@ -453,6 +456,9 @@ public class OpenSearchDatabase extends Database {
 			    endpoint(mapping.getIndex()).//
 			    method("PUT").//
 			    json(mapping.getMapping()).build());
+
+	    // synch
+	    client.indices().refresh();
 
 	    String bodyAsString = response.getBody().//
 		    get().//
