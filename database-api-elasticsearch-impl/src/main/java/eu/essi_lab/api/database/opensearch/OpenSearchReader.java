@@ -81,10 +81,10 @@ public class OpenSearchReader implements DatabaseReader {
     @Override
     public List<GSUser> getUsers() throws GSException {
 
-	Query query = OpenSearchQueryBuilder.buildSearchQuery(getDatabase().getIdentifier(), UsersMapping.get().getIndex());
+	Query query = OpenSearchQueryBuilder.buildSearchQuery(getDatabase().getIdentifier());
 
 	try {
-	    return wrapper.searchBinaries(query).//
+	    return wrapper.searchBinaries(UsersMapping.get().getIndex(), query).//
 		    stream().//
 		    map(binary -> GSUser.createOrNull(binary)).//
 		    filter(Objects::nonNull).//
@@ -103,12 +103,11 @@ public class OpenSearchReader implements DatabaseReader {
 
 	Query query = OpenSearchQueryBuilder.buildSearchQuery(//
 		getDatabase().getIdentifier(), //
-		ViewsMapping.get().getIndex(), //
 		ViewsMapping.VIEW_ID, //
 		viewId);
 
 	try {
-	    return wrapper.searchBinaries(query).//
+	    return wrapper.searchBinaries(ViewsMapping.get().getIndex(), query).//
 		    stream().//
 		    map(binary -> View.createOrNull(binary)).//
 		    filter(Objects::nonNull).//
@@ -133,7 +132,10 @@ public class OpenSearchReader implements DatabaseReader {
 	);
 	try {
 
-	    List<String> list = wrapper.searchField(query, ViewsMapping.VIEW_ID);
+	    List<String> list = wrapper.searchField(//
+		    ViewsMapping.get().getIndex(), //
+		    query, //
+		    ViewsMapping.VIEW_ID);
 
 	    int fromIndex = Math.min(list.size(), request.getStart());
 	    int toIndex = Math.min(list.size(), request.getStart() + request.getCount());
@@ -171,12 +173,11 @@ public class OpenSearchReader implements DatabaseReader {
 
 	Query query = OpenSearchQueryBuilder.buildSearchQuery(//
 		database.getIdentifier(), //
-		DataFolderMapping.get().getIndex(), //
 		property.getName(), //
 		identifier);
 
 	try {
-	    return wrapper.searchBinaries(query).//
+	    return wrapper.searchBinaries(DataFolderMapping.get().getIndex(), query).//
 		    stream().//
 		    map(binary -> GSResource.createOrNull(binary)).//
 		    filter(Objects::nonNull).//
