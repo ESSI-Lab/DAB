@@ -267,14 +267,14 @@ public class IndexData {
 
 		indexData.put(MetadataElement.BOUNDING_BOX.getName(), shape.get().getShape());
 		indexData.put(BoundingBox.AREA_ELEMENT_NAME, shape.get().getArea());
+		indexData.put(DataFolderMapping.CENTROID, shape.get().getCentroid());
 	    }
 	    
 	    //
 	    //
 	    //
 	    
-	    Object centroid= null;
-	    indexData.put(DataFolderMapping.CENTROID, centroid);
+	    
 
 	    //
 	    // temp extent begin
