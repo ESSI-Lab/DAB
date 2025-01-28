@@ -86,17 +86,6 @@ public class OpenSearchFinder implements DatabaseFinder {
 	return OpenSearchDatabase.isSupported(info);
     }
 
-    /**
-     * @param aggregations
-     * @param element
-     * @return
-     */
-    private int getCardinalityValue(Map<String, Aggregate> aggregations, Optional<Queryable> element) {
-
-	Aggregate aggregate = aggregations.get(DataFolderMapping.toAggField(element.get().getName()));
-	return (int) aggregate.cardinality().value();
-    }
-
     @Override
     public DiscoveryCountResponse count(DiscoveryMessage message) throws GSException {
 
@@ -260,6 +249,17 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	    throw GSException.createException(getClass(), "OpenSearchFinderDiscoverError", ex);
 	}
+    }
+
+    /**
+     * @param aggregations
+     * @param element
+     * @return
+     */
+    private int getCardinalityValue(Map<String, Aggregate> aggregations, Optional<Queryable> element) {
+    
+        Aggregate aggregate = aggregations.get(DataFolderMapping.toAggField(element.get().getName()));
+        return (int) aggregate.cardinality().value();
     }
 
     /**
