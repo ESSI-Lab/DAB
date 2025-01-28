@@ -117,9 +117,12 @@ public class FolderRegistry {
      */
     public List<OpenSearchFolder> getRegisteredFolders() throws OpenSearchException, IOException {
 
-	Query query = OpenSearchQueryBuilder.buildSearchRegistryQuery(database.getIdentifier());
+	Query query = OpenSearchQueryBuilder.buildSearchQuery(database.getIdentifier());
 
-	List<String> names = wrapper.searchField(query, IndexData.FOLDER_NAME);
+	List<String> names = wrapper.searchField(//
+		FolderRegistryMapping.get().getIndex(), //
+		query, //
+		IndexData.FOLDER_NAME);
 
 	return names.stream().//
 		map(name -> new OpenSearchFolder(this.database, name)).//

@@ -127,7 +127,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 
 	Query query = OpenSearchQueryBuilder.buildSearchQuery(database.getIdentifier(), DataFolderMapping.get().getIndex());
 
-	List<GSResource> resources = wrapper.searchBinaries(query).//
+	List<GSResource> resources = wrapper.searchBinaries(DataFolderMapping.get().getIndex(), query).//
 		stream().//
 		map(binary -> GSResource.createOrNull(binary)).//
 		filter(Objects::nonNull).//
@@ -145,7 +145,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 		ResourceProperty.PRIVATE_ID.getName(), //
 		"GSResource_0");
 
-	resources = wrapper.searchBinaries(query).//
+	resources = wrapper.searchBinaries(DataFolderMapping.get().getIndex(), query).//
 		stream().//
 		map(binary -> GSResource.createOrNull(binary)).//
 		filter(Objects::nonNull).//
@@ -165,7 +165,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 		MetadataElement.TITLE.getName(), //
 		"Title_5");
 
-	resources = wrapper.searchBinaries(query).//
+	resources = wrapper.searchBinaries(DataFolderMapping.get().getIndex(), query).//
 		stream().//
 		map(binary -> GSResource.createOrNull(binary)).//
 		filter(Objects::nonNull).//
@@ -185,7 +185,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 		MetadataElement.ABSTRACT.getName(), //
 		"Title_5");
 
-	resources = wrapper.searchBinaries(query).//
+	resources = wrapper.searchBinaries(DataFolderMapping.get().getIndex(), query).//
 		stream().//
 		map(binary -> GSResource.createOrNull(binary)).//
 		filter(Objects::nonNull).//
@@ -203,7 +203,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 		MetadataElement.TITLE.getName(), //
 		"Title_5");
 
-	resources = wrapper.searchBinaries(query).//
+	resources = wrapper.searchBinaries(DataFolderMapping.get().getIndex(), query).//
 		stream().//
 		map(binary -> GSResource.createOrNull(binary)).//
 		filter(Objects::nonNull).//
@@ -221,7 +221,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 		"undefined_property", //
 		"Title_5");
 
-	resources = wrapper.searchBinaries(query).//
+	resources = wrapper.searchBinaries(DataFolderMapping.get().getIndex(), query).//
 		stream().//
 		map(binary -> GSResource.createOrNull(binary)).//
 		filter(Objects::nonNull).//
@@ -239,7 +239,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 		MetadataElement.TITLE.getName(), //
 		"unknown");
 
-	resources = wrapper.searchBinaries(query).//
+	resources = wrapper.searchBinaries(DataFolderMapping.get().getIndex(), query).//
 		stream().//
 		map(binary -> GSResource.createOrNull(binary)).//
 		filter(Objects::nonNull).//
@@ -380,7 +380,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 		    MetadataElement.TITLE.getName(), //
 		    "titleA");
 
-	    List<GSResource> titleAresources = wrapper.searchBinaries(titleAquery).//
+	    List<GSResource> titleAresources = wrapper.searchBinaries(DataFolderMapping.get().getIndex(), titleAquery).//
 		    stream().//
 		    map(binary -> GSResource.createOrNull(binary)).//
 		    filter(Objects::nonNull).//
@@ -398,7 +398,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 		    MetadataElement.TITLE.getName(), //
 		    "titleB");
 
-	    List<GSResource> titleBresources = wrapper.searchBinaries(titleBquery).//
+	    List<GSResource> titleBresources = wrapper.searchBinaries(DataFolderMapping.get().getIndex(), titleBquery).//
 		    stream().//
 		    map(binary -> GSResource.createOrNull(binary)).//
 		    filter(Objects::nonNull).//
@@ -416,7 +416,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 		    MetadataElement.TITLE.getName(), //
 		    "titleC");
 
-	    List<GSResource> titleCresources = wrapper.searchBinaries(titleCquery).//
+	    List<GSResource> titleCresources = wrapper.searchBinaries(DataFolderMapping.get().getIndex(), titleCquery).//
 		    stream().//
 		    map(binary -> GSResource.createOrNull(binary)).//
 		    filter(Objects::nonNull).//
@@ -434,7 +434,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 		    MetadataElement.TITLE.getName(), //
 		    "titleD");
 
-	    List<GSResource> titleDresources = wrapper.searchBinaries(titleDquery).//
+	    List<GSResource> titleDresources = wrapper.searchBinaries(DataFolderMapping.get().getIndex(), titleDquery).//
 		    stream().//
 		    map(binary -> GSResource.createOrNull(binary)).//
 		    filter(Objects::nonNull).//
@@ -465,7 +465,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 		    MetadataElement.TITLE.getName(), //
 		    "titleA");
 
-	    List<GSResource> titleAresources = wrapper.searchBinaries(titleAquery).//
+	    List<GSResource> titleAresources = wrapper.searchBinaries(DataFolderMapping.get().getIndex(), titleAquery).//
 		    stream().//
 		    map(binary -> GSResource.createOrNull(binary)).//
 		    filter(Objects::nonNull).//
@@ -483,7 +483,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 		    MetadataElement.TITLE.getName(), //
 		    "titleB");
 
-	    List<GSResource> titleBresources = wrapper.searchBinaries(titleBquery).//
+	    List<GSResource> titleBresources = wrapper.searchBinaries(DataFolderMapping.get().getIndex(), titleBquery).//
 		    stream().//
 		    map(binary -> GSResource.createOrNull(binary)).//
 		    filter(Objects::nonNull).//
@@ -501,7 +501,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 		    MetadataElement.TITLE.getName(), //
 		    "titleD");
 
-	    List<GSResource> titleDresources = wrapper.searchBinaries(titleDquery).//
+	    List<GSResource> titleDresources = wrapper.searchBinaries(DataFolderMapping.get().getIndex(), titleDquery).//
 		    stream().//
 		    map(binary -> GSResource.createOrNull(binary)).//
 		    filter(Objects::nonNull).//
@@ -519,7 +519,7 @@ public class OpenSearchDataFolder_GSResourceTest extends OpenSearchTest {
 		    MetadataElement.TITLE.getName(), //
 		    "titleC");
 
-	    List<GSResource> titleCresources = wrapper.searchBinaries(titleCquery).//
+	    List<GSResource> titleCresources = wrapper.searchBinaries(DataFolderMapping.get().getIndex(), titleCquery).//
 		    stream().//
 		    map(binary -> GSResource.createOrNull(binary)).//
 		    filter(Objects::nonNull).//

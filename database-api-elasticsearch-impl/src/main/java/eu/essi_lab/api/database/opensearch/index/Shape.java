@@ -45,404 +45,407 @@ import eu.essi_lab.model.index.jaxb.CardinalValues;
  */
 public class Shape {
 
-	/**
-	 * 
-	 */
-	private static final Double TOL = Math.pow(10, -4); // 11 meters
+    /**
+     * 
+     */
+    private static final Double TOL = Math.pow(10, -4); // 11 meters
 
-	private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
-	private static final WKTReader READER = new WKTReader(GEOMETRY_FACTORY);
+    private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
+    private static final WKTReader READER = new WKTReader(GEOMETRY_FACTORY);
 
-	public static String SHAPE = "shape";
-	public static String AREA = "area";
-	public static String CENTROID = "centroid";
+    public static String SHAPE = "shape";
+    public static String AREA = "area";
+    public static String CENTROID = "centroid";
 
-	/**
-	 * @param bbox
-	 * @return
-	 */
-	public static Optional<Shape> of(BoundingBox bbox) {
+    /**
+     * @param bbox
+     * @return
+     */
+    public static Optional<Shape> of(BoundingBox bbox) {
 
-		Shape shape = new Shape(bbox);
+	Shape shape = new Shape(bbox);
 
-		if (!shape.empty) {
+	if (!shape.empty) {
 
-			return Optional.of(shape);
+	    return Optional.of(shape);
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @param polygons
+     * @return
+     */
+    public static Optional<Shape> of(BoundingPolygon polygon) {
+
+	Shape shape = new Shape(polygon);
+
+	if (!shape.empty) {
+
+	    return Optional.of(shape);
+	}
+
+	return Optional.empty();
+    }
+
+    private boolean empty;
+    private JSONObject objectBox;
+
+    /**
+     * @param shape
+     * @param area
+     * @throws ParseException
+     */
+    private Shape(BoundingBox bbox) {
+
+	objectBox = new JSONObject();
+
+	try {
+
+	    Optional<String> shape = asShape(bbox);
+
+	    if (shape.isPresent()) {
+
+		Geometry geometry = READER.read(shape.get());
+
+		double area = geometry.getArea();
+
+		String _shape = shape.get();
+
+		// OpenSearch do not likes the inner points with parentheses
+		if (_shape.startsWith("MULTIPOINT")) {
+
+		    _shape = _shape.replace("(", "");
+		    _shape = _shape.replace(")", "");
+		    _shape = _shape.replace("MULTIPOINT ", "MULTIPOINT (");
+		    _shape = _shape + ")";
 		}
 
-		return Optional.empty();
+		objectBox.put(SHAPE, _shape);
+
+		Point c = geometry.getCentroid();
+		double x = c.getX();
+		double y = c.getY();
+		objectBox.put(CENTROID, "POINT (" + x + " " + y + ")");
+		objectBox.put(AREA, area);
+
+	    } else {
+
+		empty = true;
+	    }
+
+	} catch (ParseException e) {
+	    
+	    empty = true;
+
+	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
+    }
 
-	/**
-	 * @param polygons
-	 * @return
-	 */
-	public static Optional<Shape> of(BoundingPolygon polygon) {
+    /**
+     * @param polygons
+     */
+    private Shape(BoundingPolygon polygon) {
 
-		Shape shape = new Shape(polygon);
+	objectBox = new JSONObject();
 
-		if (!shape.empty) {
+	String shape = null;
 
-			return Optional.of(shape);
+	List<List<Double>> multiPoints = polygon.getMultiPoints();
+
+	if (!multiPoints.isEmpty()) {
+
+	    List<Double> first = multiPoints.get(0);
+
+	    List<Double> last = multiPoints.get(multiPoints.size() - 1);
+
+	    String closing = "";
+
+	    if (first.equals(last)) {
+
+		shape = "POLYGON ((";
+		closing = "))";
+
+	    } else {
+
+		shape = "LINESTRING (";
+		closing = ")";
+	    }
+
+	    for (int i = 0; i < multiPoints.size(); i++) {
+
+		List<Double> list = multiPoints.get(i);
+
+		String collect = list.stream().//
+			map(v -> String.valueOf(v)).//
+			collect(Collectors.joining(" "));
+
+		shape += collect;
+
+		if (i < multiPoints.size() - 1) {
+
+		    shape += ", ";
 		}
+	    }
 
-		return Optional.empty();
+	    shape += closing;
+
+	    try {
+
+		Geometry geometry = READER.read(shape);
+
+		double area = geometry.getArea();
+		objectBox.put(AREA, area);
+
+		Point c = geometry.getCentroid();
+		double x = c.getX();
+		double y = c.getY();
+		objectBox.put(CENTROID, "POINT (" + x + " " + y + ")");
+
+		objectBox.put(SHAPE, shape);
+
+	    } catch (ParseException e) {
+		
+		empty = true;
+
+		GSLoggerFactory.getLogger(getClass()).error(e);
+		
+		return;
+	    }
+	} else {
+
+	    empty = true;
+	}
+    }
+
+    /**
+     * @return
+     */
+    public String getShape() {
+
+	return objectBox.getString(SHAPE);
+    }
+
+    /**
+     * @return
+     */
+    public double getArea() {
+
+	return objectBox.getDouble(AREA);
+    }
+
+    /**
+     * @return
+     */
+    public String getCentroid() {
+
+	return objectBox.getString(CENTROID);
+    }
+
+    @Override
+    public String toString() {
+
+	return "shape: " + getShape() + "\n" + "area: " + getArea();
+    }
+
+    /**
+     * @param cardinalValues
+     * @param single
+     * @return
+     */
+    private static Optional<String> asPoint(CardinalValues cardinalValues) {
+
+	double e = Double.parseDouble(cardinalValues.getEast());
+	double w = Double.parseDouble(cardinalValues.getWest());
+	double s = Double.parseDouble(cardinalValues.getSouth());
+	double n = Double.parseDouble(cardinalValues.getNorth());
+
+	String ws = w + " " + s;
+
+	if (e > (180 + TOL)) {
+
+	    e = e - 180;
+	    w = w - 180;
 	}
 
-	private boolean empty;
-	private JSONObject objectBox;
+	if (n <= 90 && s >= -90 && e >= -180 && e <= 180 && w <= 180 && w >= -180) {
 
-	/**
-	 * @param shape
-	 * @param area
-	 * @throws ParseException
-	 */
-	private Shape(BoundingBox bbox) {
+	    if (n >= s) {
 
-		objectBox = new JSONObject();
+		boolean snEqual = (Math.abs(n - s) < TOL);
+		boolean weEqual = (Math.abs(w - e) < TOL);
 
-		try {
+		if (snEqual && weEqual) {
 
-			Optional<String> shape = asShape(bbox);
-
-			if (shape.isPresent()) {
-
-				Geometry geometry = READER.read(shape.get());
-
-				double area = geometry.getArea();
-
-				String _shape = shape.get();
-
-				// OpenSearch do not likes the inner points with parentheses
-				if (_shape.startsWith("MULTIPOINT")) {
-
-					_shape = _shape.replace("(", "");
-					_shape = _shape.replace(")", "");
-					_shape = _shape.replace("MULTIPOINT ", "MULTIPOINT (");
-					_shape = _shape + ")";
-				}
-
-
-
-				objectBox.put(SHAPE, _shape);
-				
-				Point c = geometry.getCentroid();
-				double x = c.getX();
-				double y = c.getY();
-				objectBox.put(CENTROID, "POINT (" + x + " " + y + ")");
-				objectBox.put(AREA, area);
-
-			} else {
-
-				empty = true;
-			}
-
-		} catch (ParseException e) {
-
-			GSLoggerFactory.getLogger(getClass()).error(e);
+		    String shape = "POINT (" + ws + ")";
+		    return Optional.of(shape);
 		}
+	    }
 	}
 
-	/**
-	 * @param polygons
-	 */
-	private Shape(BoundingPolygon polygon) {
+	return Optional.empty();
+    }
 
-		objectBox = new JSONObject();
+    /**
+     * @param cardinalValues
+     * @param single
+     * @return
+     */
+    private static Optional<String> asPolygon(CardinalValues cardinalValues) {
 
-		String shape = null;
+	double e = Double.parseDouble(cardinalValues.getEast());
+	double w = Double.parseDouble(cardinalValues.getWest());
+	double s = Double.parseDouble(cardinalValues.getSouth());
+	double n = Double.parseDouble(cardinalValues.getNorth());
 
-		List<List<Double>> multiPoints = polygon.getMultiPoints();
+	String es = e + " " + s;
+	String ws = w + " " + s;
+	String en = e + " " + n;
+	String wn = w + " " + n;
 
-		if (!multiPoints.isEmpty()) {
+	if (e > (180 + TOL)) {
 
-			List<Double> first = multiPoints.get(0);
-
-			List<Double> last = multiPoints.get(multiPoints.size() - 1);
-
-			String closing = "";
-
-			if (first.equals(last)) {
-
-				shape = "POLYGON ((";
-				closing = "))";
-
-			} else {
-
-				shape = "LINESTRING (";
-				closing = ")";
-			}
-
-			for (int i = 0; i < multiPoints.size(); i++) {
-
-				List<Double> list = multiPoints.get(i);
-
-				String collect = list.stream().//
-						map(v -> String.valueOf(v)).//
-						collect(Collectors.joining(" "));
-
-				shape += collect;
-
-				if (i < multiPoints.size() - 1) {
-
-					shape += ", ";
-				}
-			}
-
-			shape += closing;
-
-			try {
-
-				Geometry geometry = READER.read(shape);
-
-				double area = geometry.getArea();
-				objectBox.put(AREA, area);
-				
-				Point c = geometry.getCentroid();
-				double x = c.getX();
-				double y = c.getY();
-				objectBox.put(CENTROID, "POINT (" + x + " " + y + ")");
-				
-				objectBox.put(SHAPE, shape);
-				
-
-			} catch (ParseException e) {
-
-				GSLoggerFactory.getLogger(getClass()).error(e);
-			}
-		} else {
-
-			empty = true;
-		}
+	    e = e - 180;
+	    w = w - 180;
 	}
 
-	/**
-	 * @return
-	 */
-	public String getShape() {
+	if (n <= 90 && s >= -90 && e >= -180 && e <= 180 && w <= 180 && w >= -180) {
 
-		return objectBox.getString(SHAPE);
-	}
+	    if (n >= s) {
 
-	/**
-	 * @return
-	 */
-	public double getArea() {
+		boolean snEqual = (Math.abs(n - s) < TOL);
+		boolean weEqual = (Math.abs(w - e) < TOL);
 
-		return objectBox.getDouble(AREA);
-	}
+		if (snEqual && weEqual) {
 
-	/**
-	 * @return
-	 */
-	public String getCentroid() {
+		    return Optional.empty();
 
-		return objectBox.getString(CENTROID);
-	}
+		} else if (!snEqual && !weEqual) {
 
-	@Override
-	public String toString() {
-
-		return "shape: " + getShape() + "\n" + "area: " + getArea();
-	}
-
-	/**
-	 * @param cardinalValues
-	 * @param single
-	 * @return
-	 */
-	private static Optional<String> asPoint(CardinalValues cardinalValues) {
-
-		double e = Double.parseDouble(cardinalValues.getEast());
-		double w = Double.parseDouble(cardinalValues.getWest());
-		double s = Double.parseDouble(cardinalValues.getSouth());
-		double n = Double.parseDouble(cardinalValues.getNorth());
-
-		String ws = w + " " + s;
-
-		if (e > (180 + TOL)) {
-
-			e = e - 180;
-			w = w - 180;
-		}
-
-		if (n <= 90 && s >= -90 && e >= -180 && e <= 180 && w <= 180 && w >= -180) {
-
-			if (n >= s) {
-
-				boolean snEqual = (Math.abs(n - s) < TOL);
-				boolean weEqual = (Math.abs(w - e) < TOL);
-
-				if (snEqual && weEqual) {
-
-					String shape = "POINT (" + ws + ")";
-					return Optional.of(shape);
-				}
-			}
-		}
-
-		return Optional.empty();
-	}
-
-	/**
-	 * @param cardinalValues
-	 * @param single
-	 * @return
-	 */
-	private static Optional<String> asPolygon(CardinalValues cardinalValues) {
-
-		double e = Double.parseDouble(cardinalValues.getEast());
-		double w = Double.parseDouble(cardinalValues.getWest());
-		double s = Double.parseDouble(cardinalValues.getSouth());
-		double n = Double.parseDouble(cardinalValues.getNorth());
-
-		String es = e + " " + s;
-		String ws = w + " " + s;
-		String en = e + " " + n;
-		String wn = w + " " + n;
-
-		if (e > (180 + TOL)) {
-
-			e = e - 180;
-			w = w - 180;
-		}
-
-		if (n <= 90 && s >= -90 && e >= -180 && e <= 180 && w <= 180 && w >= -180) {
-
-			if (n >= s) {
-
-				boolean snEqual = (Math.abs(n - s) < TOL);
-				boolean weEqual = (Math.abs(w - e) < TOL);
-
-				if (snEqual && weEqual) {
-
-					return Optional.empty();
-
-				} else if (!snEqual && !weEqual) {
-
-					String shape = "POLYGON ((" + ws + ", " + wn + ", " + en + ", " + es + ", " + ws + "))";
-					return Optional.of(shape);
-
-				} else {
-					if (snEqual && !weEqual) {
-						// line: let's give a width
-						double length = Math.abs(w - e);
-						double width = length / 10.0;
-						s = s - width;
-						n = n + width;
-					} else if (!snEqual && weEqual) {
-						// line: let's give a width
-						double length = Math.abs(s - n);
-						double width = length / 10.0;
-						w = w - width;
-						e = e + width;
-					}
-
-					es = "180 " + s;
-					ws = "-180 " + s;
-					en = "180 " + n;
-					wn = "-180 " + n;
-
-					String shape = "POLYGON ((" + ws + ", " + wn + ", " + en + ", " + es + ", " + ws + "))";
-
-					return Optional.of(shape);
-				}
-			}
-		}
-
-		return Optional.empty();
-	}
-
-	/**
-	 * @param bbox
-	 * @return
-	 */
-	private static Optional<String> asShape(BoundingBox bbox) {
-
-		List<CardinalValues> cardinalValues = bbox.getCardinalValues();
-
-		if (cardinalValues.size() == 1) {
-
-			//
-			// POLYGON
-			//
-			Optional<String> polygon = asPolygon(cardinalValues.get(0));
-
-			if (polygon.isPresent()) {
-
-				return polygon;
-			}
-
-			//
-			// POINT
-			//
-			return asPoint(cardinalValues.get(0));
+		    String shape = "POLYGON ((" + ws + ", " + wn + ", " + en + ", " + es + ", " + ws + "))";
+		    return Optional.of(shape);
 
 		} else {
+		    if (snEqual && !weEqual) {
+			// line: let's give a width
+			double length = Math.abs(w - e);
+			double width = length / 10.0;
+			s = s - width;
+			n = n + width;
+		    } else if (!snEqual && weEqual) {
+			// line: let's give a width
+			double length = Math.abs(s - n);
+			double width = length / 10.0;
+			w = w - width;
+			e = e + width;
+		    }
 
-			String shape = null;
+		    es = "180 " + s;
+		    ws = "-180 " + s;
+		    en = "180 " + n;
+		    wn = "-180 " + n;
 
-			StringBuilder shapeBuilder = new StringBuilder();
+		    String shape = "POLYGON ((" + ws + ", " + wn + ", " + en + ", " + es + ", " + ws + "))";
 
-			boolean polygons = false;
-			boolean points = false;
-
-			for (int i = 0; i < cardinalValues.size(); i++) {
-
-				CardinalValues val = cardinalValues.get(i);
-
-				Optional<String> polygon = asPolygon(val);
-				if (polygon.isPresent()) {
-
-					shapeBuilder.append(polygon.get());
-
-					polygons = true;
-				}
-
-				Optional<String> point = asPoint(val);
-				if (point.isPresent()) {
-
-					shapeBuilder.append(point.get());
-
-					points = true;
-				}
-
-				if (i < cardinalValues.size() - 1) {
-
-					shapeBuilder.append(", ");
-				}
-			}
-
-			//
-			// MULTYPOLYGON
-			//
-			if (polygons && !points) {
-
-				shape = shapeBuilder.toString().replace("POLYGON ", "");
-
-				shape = "MULTIPOLYGON (" + shape;
-
-				//
-				// MULTIPOINT
-				//
-			} else if (!polygons && points) {
-
-				shape = shapeBuilder.toString().replace("POINT ", "");
-
-				shape = "MULTIPOINT (" + shape;
-
-			} else if (polygons && points) {
-
-				//
-				// GEOMETRYCOLLECTION
-				//
-
-				shape = "GEOMETRYCOLLECTION (" + shapeBuilder.toString();
-			}
-
-			shape += ")";
-
-			return Optional.ofNullable(shape);
+		    return Optional.of(shape);
 		}
+	    }
 	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @param bbox
+     * @return
+     */
+    private static Optional<String> asShape(BoundingBox bbox) {
+
+	List<CardinalValues> cardinalValues = bbox.getCardinalValues();
+
+	if (cardinalValues.size() == 1) {
+
+	    //
+	    // POLYGON
+	    //
+	    Optional<String> polygon = asPolygon(cardinalValues.get(0));
+
+	    if (polygon.isPresent()) {
+
+		return polygon;
+	    }
+
+	    //
+	    // POINT
+	    //
+	    return asPoint(cardinalValues.get(0));
+
+	} else {
+
+	    String shape = null;
+
+	    StringBuilder shapeBuilder = new StringBuilder();
+
+	    boolean polygons = false;
+	    boolean points = false;
+
+	    for (int i = 0; i < cardinalValues.size(); i++) {
+
+		CardinalValues val = cardinalValues.get(i);
+
+		Optional<String> polygon = asPolygon(val);
+		if (polygon.isPresent()) {
+
+		    shapeBuilder.append(polygon.get());
+
+		    polygons = true;
+		}
+
+		Optional<String> point = asPoint(val);
+		if (point.isPresent()) {
+
+		    shapeBuilder.append(point.get());
+
+		    points = true;
+		}
+
+		if (i < cardinalValues.size() - 1) {
+
+		    shapeBuilder.append(", ");
+		}
+	    }
+
+	    //
+	    // MULTYPOLYGON
+	    //
+	    if (polygons && !points) {
+
+		shape = shapeBuilder.toString().replace("POLYGON ", "");
+
+		shape = "MULTIPOLYGON (" + shape;
+
+		//
+		// MULTIPOINT
+		//
+	    } else if (!polygons && points) {
+
+		shape = shapeBuilder.toString().replace("POINT ", "");
+
+		shape = "MULTIPOINT (" + shape;
+
+	    } else if (polygons && points) {
+
+		//
+		// GEOMETRYCOLLECTION
+		//
+
+		shape = "GEOMETRYCOLLECTION (" + shapeBuilder.toString();
+	    }
+
+	    shape += ")";
+
+	    return Optional.ofNullable(shape);
+	}
+    }
 }

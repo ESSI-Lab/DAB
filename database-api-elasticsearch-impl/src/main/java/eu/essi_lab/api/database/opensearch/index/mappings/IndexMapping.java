@@ -62,8 +62,12 @@ public abstract class IndexMapping {
 	MAPPINGS.add(ViewsMapping.get());
 	MAPPINGS.add(FolderRegistryMapping.get());
 	MAPPINGS.add(CacheMapping.get());
-    }	
+    }
 
+    /**
+     * 
+     */
+    public static final String ALL_INDEXES = "*";
 
     /**
      * @return

@@ -433,11 +433,8 @@ public class OpenSearchQueryBuilder {
 
 	BoolQuery boolQuery = new BoolQuery.Builder().//
 		filter(buildDatabaseIdQuery(databaseId), //
-
 			buildExistsFieldQuery(MetaFolderMapping.DATA_FOLDER), //
-
 			buildIndexQuery(MetaFolderMapping.get().getIndex()), //
-
 			query)
 		.//
 		build();
@@ -460,8 +457,6 @@ public class OpenSearchQueryBuilder {
 
 	Query databaseIdQuery = buildDatabaseIdQuery(databaseId);
 
-	Query indexQuery = buildIndexQuery(ViewsMapping.get().getIndex());
-
 	List<Query> filterList = new ArrayList<>();
 
 	if (creator.isPresent()) {
@@ -480,7 +475,6 @@ public class OpenSearchQueryBuilder {
 	}
 
 	filterList.add(databaseIdQuery);
-	filterList.add(indexQuery);
 
 	List<Query> shouldList = buildIndexesQueryList();
 
@@ -505,6 +499,50 @@ public class OpenSearchQueryBuilder {
     public static Query buildSearchQuery(String databaseId, String index, String field, String fieldValue) {
 
 	return buildSearchQuery(databaseId, index, field, Arrays.asList(fieldValue));
+    }
+
+    /**
+     * Builds a query which searches the entries with the given <code>field</code> and
+     * <code>fieldValue</code>
+     * 
+     * @param databaseId
+     * @param index
+     * @param field
+     * @param fieldValue
+     * @return
+     */
+    public static Query buildSearchQuery(String databaseId, String field, String fieldValue) {
+
+	return buildSearchQuery(databaseId, field, Arrays.asList(fieldValue));
+    }
+
+    /**
+     * Builds a query which searches the entries with the given <code>field</code> and
+     * matching one or more <code>fieldValues</code>
+     * 
+     * @param databaseId
+     * @param index
+     * @param field
+     * @param fieldValues
+     * @return
+     */
+    public static Query buildSearchQuery(String databaseId, String field, List<String> fieldValues) {
+
+	List<Query> shouldList = new ArrayList<>();
+
+	fieldValues.forEach(v -> {
+
+	    shouldList.add(buildMatchPhraseQuery(field, v));
+	});
+
+	BoolQuery boolQuery = new BoolQuery.Builder().//
+
+		filter(buildDatabaseIdQuery(databaseId)).//
+		should(shouldList).//
+		minimumShouldMatch("1").//
+		build();
+
+	return boolQuery.toQuery();
     }
 
     /**
@@ -552,6 +590,22 @@ public class OpenSearchQueryBuilder {
 		filter(buildDatabaseIdQuery(databaseId), //
 			buildIndexQuery(index)//
 		).//
+		build();
+
+	return boolQuery.toQuery();
+    }
+
+    /**
+     * Builds a query which searches the entries in the database with id <code>databaseId</code>
+     * 
+     * @param databaseId
+     * @param index
+     * @return
+     */
+    public static Query buildSearchQuery(String databaseId) {
+
+	BoolQuery boolQuery = new BoolQuery.Builder().//
+		filter(buildDatabaseIdQuery(databaseId)).//
 		build();
 
 	return boolQuery.toQuery();
@@ -669,7 +723,7 @@ public class OpenSearchQueryBuilder {
 
 	return new MatchAllQuery.Builder().build().toQuery();
     }
-    
+
     /**
      * @return
      */
