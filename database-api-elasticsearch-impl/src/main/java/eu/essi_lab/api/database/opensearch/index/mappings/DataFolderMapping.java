@@ -53,6 +53,9 @@ public class DataFolderMapping extends IndexMapping {
     // the source storage worker key must be preserved
     public static final String WRITING_FOLDER_TAG = SourceStorageWorker.WRITING_FOLDER_TAG;
 
+    
+    public static final String CENTROID = "centroid";
+
     public static final List<String> AGGREGABLE_FIELDS = new ArrayList<>();
 
     private static DataFolderMapping instance;
@@ -70,7 +73,10 @@ public class DataFolderMapping extends IndexMapping {
 	addProperty(WRITING_FOLDER_TAG, FieldType.Binary.jsonValue());
 
 	addProperty(MetaFolderMapping.DATA_FOLDER, FieldType.Text.jsonValue());
-
+	
+	// centroid
+	addProperty(CENTROID, FieldType.GeoPoint.jsonValue());
+	
 	// --------------------------------------------------
 	//
 	// gs-resource explicit mappings from MetadataElement
