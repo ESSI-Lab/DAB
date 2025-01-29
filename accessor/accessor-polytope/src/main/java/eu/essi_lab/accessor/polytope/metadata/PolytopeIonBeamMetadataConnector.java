@@ -99,7 +99,6 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
     private Downloader downloader;
 
     private JSONArray stationsArray;
-    
 
     private Logger logger = GSLoggerFactory.getLogger(this.getClass());
 
@@ -170,9 +169,9 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 		    GSLoggerFactory.getLogger(getClass()).info("Incremental harvesting enabled starting from: " + timestamp);
 		}
 	    }
-	    
+
 	    if (stationsArray.isEmpty()) {
-		stationsArray = getList(STATIONS_URL,time);
+		stationsArray = getList(STATIONS_URL, time);
 	    }
 	    GSLoggerFactory.getLogger(getClass()).info("Station number: " + stationsArray.length());
 	    if (start < stationsArray.length() && !maxNumberReached) {
@@ -197,35 +196,37 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 
 			if (platform != null) {
 
-//			    JSONArray jsonArray = new JSONArray();
-//			    for (int k = 0; k < marsRequestArray.length(); k++) {
-//				JSONObject m = marsRequestArray.getJSONObject(k);
-//				String req = m.optString("url");
-//				if (req.contains(id)) {
-//				    jsonArray.put(m);
-//				}
-//			    }
+			    // JSONArray jsonArray = new JSONArray();
+			    // for (int k = 0; k < marsRequestArray.length(); k++) {
+			    // JSONObject m = marsRequestArray.getJSONObject(k);
+			    // String req = m.optString("url");
+			    // if (req.contains(id)) {
+			    // jsonArray.put(m);
+			    // }
+			    // }
 
 			    if (platform.toLowerCase().contains("acronet")) {
 				for (PolytopeIonBeamMetadataAcronetVariable var : PolytopeIonBeamMetadataAcronetVariable.values()) {
 				    ret.addRecord(PolytopeIonBeamMetadataMapper.create(datasetMetadata, var.getKey()));
 				}
+
 			    } else if (platform.toLowerCase().contains("meteo")) {
 
-				    for (PolytopeIonBeamMetadataMeteoTrackerVariable var : PolytopeIonBeamMetadataMeteoTrackerVariable
-					    .values()) {
-					ret.addRecord(PolytopeIonBeamMetadataMeteoTrackerMapper.create(datasetMetadata, var.getKey()));
-				    }
-				
-
+				for (PolytopeIonBeamMetadataMeteoTrackerVariable var : PolytopeIonBeamMetadataMeteoTrackerVariable
+					.values()) {
+				    ret.addRecord(PolytopeIonBeamMetadataMeteoTrackerMapper.create(datasetMetadata, var.getKey()));
+				}
+			    } else if (platform.toLowerCase().contains("smart_citizen_kit")) {
+				for (PolytopeIonBeamMetadataSmartKitVariable var : PolytopeIonBeamMetadataSmartKitVariable.values()) {
+				    ret.addRecord(PolytopeIonBeamMetadataMapper.create(datasetMetadata, var.getKey()));
+				}
 			    }
-			    
-			}
 
+			}
 		    }
 		}
-		    ret.setResumptionToken(String.valueOf(start + count));
-		    logger.debug("ADDED {} records. Number of analyzed floats: {}", partialNumbers, String.valueOf(start + count));
+		ret.setResumptionToken(String.valueOf(start + count));
+		logger.debug("ADDED {} records. Number of analyzed floats: {}", partialNumbers, String.valueOf(start + count));
 	    } else {
 		GSLoggerFactory.getLogger(getClass()).info("ERROR getting items.");
 	    }
@@ -246,11 +247,11 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
     private JSONArray getList(String path, Long time) throws Exception {
 
 	String url = getSourceURL() + path;
-	
-	if(time != null) {
-	    //query with time
+
+	if (time != null) {
+	    // query with time
 	}
-	
+
 	GSLoggerFactory.getLogger(getClass()).info("Getting " + url);
 
 	Downloader downloader = new Downloader();
@@ -266,7 +267,7 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 
 	if (stream != null) {
 	    ClonableInputStream cis = new ClonableInputStream(stream);
-	    //GSLoggerFactory.getLogger(getClass()).info("Stream result " + IOStreamUtils.asUTF8String(cis.clone()));
+	    // GSLoggerFactory.getLogger(getClass()).info("Stream result " + IOStreamUtils.asUTF8String(cis.clone()));
 	    JSONArray arr = new JSONArray(IOStreamUtils.asUTF8String(cis.clone()));
 	    stream.close();
 	    return arr;
@@ -297,8 +298,8 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 
 	if (stream != null) {
 	    ClonableInputStream cis = new ClonableInputStream(stream);
-//	    GSLoggerFactory.getLogger(PolytopeIonBeamMetadataConnector.class)
-//		    .info("Stream result " + IOStreamUtils.asUTF8String(cis.clone()));
+	    // GSLoggerFactory.getLogger(PolytopeIonBeamMetadataConnector.class)
+	    // .info("Stream result " + IOStreamUtils.asUTF8String(cis.clone()));
 	    JSONArray arr = new JSONArray(IOStreamUtils.asUTF8String(cis.clone()));
 	    if (arr != null) {
 		for (int i = 0; i < arr.length(); i++) {
@@ -321,9 +322,6 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 
 	this.downloader = downloader;
     }
-
-
-
 
     @Override
     public List<String> listMetadataFormats() {
@@ -356,12 +354,11 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 
 	return TYPE;
     }
-    
+
     @Override
     public boolean supportsIncrementalHarvesting() throws GSException {
 	return false;
     }
-
 
     @Override
     protected PolytopeIonBeamMetadataConnectorSetting initSetting() {
