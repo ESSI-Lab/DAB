@@ -296,7 +296,7 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 		coreMetadata.getMIMetadata().getDataIdentification().addTemporalExtent(extent);
 	    }
 
-	    coreMetadata.setTitle("Acquisitions of " + variableLabel + " through" + platformTitle + ": " + stationId);
+	    coreMetadata.setTitle("Acquisitions of " + variableLabel + " through " + platformTitle + ": " + stationId);
 
 	    coreMetadata.setAbstract("This dataset contains " + variableLabel
 		    + " timeseries from I-CHANGE Citizen Observatory Archive (COA), acquired by a specific observing mobile weather station ("
@@ -498,8 +498,8 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	    Online o = new Online();
 	    o.setLinkage(linkage);
 	    o.setFunctionCode("download");
-	    o.setName(internalId + ":" + variableKey);
-	    o.setIdentifier(internalId + ":" + variableId);
+	    o.setName(platformName + ":" + internalId + ":" + variableKey);
+	    o.setIdentifier(internalId + ":" + variableId + ":" + platformName);
 	    o.setProtocol(CommonNameSpaceContext.POLYTOPE_IONBEAM);
 	    o.setDescription(variableLabel + " Station name: " + stationId);
 	    coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(o);

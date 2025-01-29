@@ -219,9 +219,19 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 	    String identifier = online.getName();
 	    String[] splittedId = identifier.split(":");
 	    String varId = (splittedId.length > 2) ? splittedId[splittedId.length - 1] : splittedId[1];
-	    PolytopeIonBeamMetadataAcronetVariable var = PolytopeIonBeamMetadataAcronetVariable.decode(varId);
-	    String units = var.getUnit();
-	    String toMatch = var.getKey();
+	    String platformName = splittedId[0];
+	    String units = "";
+	    String toMatch = "";
+	    if(platformName.toLowerCase().contains("acronet")) {
+		 PolytopeIonBeamMetadataAcronetVariable acronetVar = PolytopeIonBeamMetadataAcronetVariable.decode(varId);
+		 units = acronetVar.getUnit();
+		 toMatch = acronetVar.getKey();
+	    }else if(platformName.toLowerCase().contains("smart")) {
+		PolytopeIonBeamMetadataSmartKitVariable smartVar = PolytopeIonBeamMetadataSmartKitVariable.decode(varId);
+		units = smartVar.getUnit();
+		toMatch = smartVar.getKey();
+	    }
+	   
 	    List<JSONObject> ret = new ArrayList<>();
 	    File tempFile;
 
