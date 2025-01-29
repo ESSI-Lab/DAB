@@ -213,13 +213,12 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	    String marsRequestClass = marsRequest.optString("class");
 	    String platformName = datasetInfo.optString("platform");
 
-
-	    boolean isMeteoTracker = platformName.toLowerCase().contains("meteotracker") ? true : false;
-
-	    String queryPath = marsRequestTime.isEmpty() ? "?class=" + marsRequestClass + "&date=" + marsRequestDate + "&expver=" + marsRequestExpver + "&stream="
-		    + marsRequestStream + "&platform=" + platformName + "&station_id=" + internalId : "?class=" + marsRequestClass + "&date=" + marsRequestDate + "&time=" + marsRequestTime +"&expver=" + marsRequestExpver + "&stream="
-			    + marsRequestStream + "&platform=" + platformName + "&station_id=" + internalId ;
-
+	    String queryPath = marsRequestTime.isEmpty()
+		    ? "?class=" + marsRequestClass + "&date=" + marsRequestDate + "&expver=" + marsRequestExpver + "&stream="
+			    + marsRequestStream + "&platform=" + platformName + "&station_id=" + internalId
+		    : "?class=" + marsRequestClass + "&date=" + marsRequestDate + "&time=" + marsRequestTime + "&expver="
+			    + marsRequestExpver + "&stream=" + marsRequestStream + "&platform=" + platformName + "&station_id="
+			    + internalId;
 
 	    String variableLabel = null;
 	    String variableKey = null;
@@ -229,36 +228,26 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	    String variableDescription = null;
 	    String url = null;
 
-
-
-	    if (isMeteoTracker) {
-		// meteotracker use-case
-		dataset.getPropertyHandler().setIsTrajectory(true);
-		PolytopeIonBeamMetadataMeteoTrackerVariable variable = PolytopeIonBeamMetadataMeteoTrackerVariable.decode(varType);
+	    // acronet
+	    String platformTitle = "";
+	    dataset.getPropertyHandler().setIsTimeseries(true);
+	    if (platformName.toLowerCase().contains("acronet")) {
+		platformTitle = "ACRONET station";
+		PolytopeIonBeamMetadataAcronetVariable variable = PolytopeIonBeamMetadataAcronetVariable.decode(varType);
 		variableLabel = variable.getLabel();
 		variableKey = variable.getKey();
 		variableUnits = variable.getUnit();
 		variableName = variable.name();
 	    } else {
-		// acronet
-		dataset.getPropertyHandler().setIsTimeseries(true);
-		if (platformName.toLowerCase().contains("acronet")) {
-		    PolytopeIonBeamMetadataAcronetVariable variable = PolytopeIonBeamMetadataAcronetVariable.decode(varType);
-		    variableLabel = variable.getLabel();
-		    variableKey = variable.getKey();
-		    variableUnits = variable.getUnit();
-		    variableName = variable.name();
-		} else {
-		    //smart citizen kit
-		    PolytopeIonBeamMetadataSmartKitVariable variable = PolytopeIonBeamMetadataSmartKitVariable.decode(varType);
-		    variableLabel = variable.getLabel();
-		    variableKey = variable.getKey();
-		    variableUnits = variable.getUnit();
-		    variableName = variable.name();
-		    variableDescription = variable.getDescription();
-		}
+		// smart citizen kit
+		platformTitle = "Smart Citizen Kit device";
+		PolytopeIonBeamMetadataSmartKitVariable variable = PolytopeIonBeamMetadataSmartKitVariable.decode(varType);
+		variableLabel = variable.getLabel();
+		variableKey = variable.getKey();
+		variableUnits = variable.getUnit();
+		variableName = variable.name();
+		variableDescription = variable.getDescription();
 	    }
-
 
 	    Resolution resolution = Resolution.HOURLY;
 
@@ -307,11 +296,11 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 		coreMetadata.getMIMetadata().getDataIdentification().addTemporalExtent(extent);
 	    }
 
-	    coreMetadata.setTitle("Acquisitions of " + variableLabel + " through through ACRONET device: " + stationId);
+	    coreMetadata.setTitle("Acquisitions of " + variableLabel + " through" + platformTitle + ": " + stationId);
 
 	    coreMetadata.setAbstract("This dataset contains " + variableLabel
-		    + " timeseries from I-CHANGE Citizen Observatory, acquired by a specific observing mobile weather station (" + stationId
-		    + " ).");
+		    + " timeseries from I-CHANGE Citizen Observatory Archive (COA), acquired by a specific observing mobile weather station ("
+		    + stationId + " ).");
 
 	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword(POLYTOPE_IONBEAM);
 
@@ -362,10 +351,10 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	    // 44.4005098, 8.675219 44.400353, 8.6750815 44.4002186, 8.6655395 44.3914033, 8.665203 44.3911424, 8.664728
 	    // 44.3910255, 8.6391694 44.386031))",
 
-	    //List<JSONObject> jsonResponse = new ArrayList<JSONObject>();
+	    // List<JSONObject> jsonResponse = new ArrayList<JSONObject>();
 
 	    String linkage = PolytopeIonBeamMetadataConnector.BASE_URL + PolytopeIonBeamMetadataConnector.RETRIEVE_URL + queryPath;
-	    //jsonResponse = getSessionData(queryPath);
+	    // jsonResponse = getSessionData(queryPath);
 	    // startDate = startDate.replace("Z", "+00:00");
 	    // linkage = PolytopeIonBeamMetadataConnector.BASE_URL +
 	    // "retrieve?project=public&platform=meteotracker&observation_variable="
@@ -375,7 +364,6 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	    // // +
 	    // buildingURL;
 
-
 	    // bounding box
 
 	    if (lat != null && lon != null) {
@@ -383,15 +371,14 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 		BigDecimal pointLon = new BigDecimal(lon);
 		coreMetadata.addBoundingBox(pointLat, pointLon, pointLat, pointLon);
 	    }
-	    
-	    // elevation
-//	    if (minAlt != null && maxAlt != null) {
-//		VerticalExtent verticalExtent = new VerticalExtent();
-//		verticalExtent.setMinimumValue(minAlt);
-//		verticalExtent.setMaximumValue(maxAlt);
-//		coreMetadata.getMIMetadata().getDataIdentification().addVerticalExtent(verticalExtent);
-//	    }
 
+	    // elevation
+	    // if (minAlt != null && maxAlt != null) {
+	    // VerticalExtent verticalExtent = new VerticalExtent();
+	    // verticalExtent.setMinimumValue(minAlt);
+	    // verticalExtent.setMaximumValue(maxAlt);
+	    // coreMetadata.getMIMetadata().getDataIdentification().addVerticalExtent(verticalExtent);
+	    // }
 
 	    // elevation
 	    // String minElevation = station.getMinElevation();
@@ -474,7 +461,8 @@ public class PolytopeIonBeamMetadataMapper extends OriginalIdentifierMapper {
 	    coverageDescription.setAttributeIdentifier(variableId);
 	    coverageDescription.setAttributeTitle(variableLabel);
 
-	    String attributeDescription = (variableDescription != null) ? variableDescription + " Units: " + variableUnits : variableLabel + " Units: " + variableUnits;
+	    String attributeDescription = (variableDescription != null) ? variableDescription + " Units: " + variableUnits
+		    : variableLabel + " Units: " + variableUnits;
 
 	    coverageDescription.setAttributeDescription(attributeDescription);
 	    coreMetadata.getMIMetadata().addCoverageDescription(coverageDescription);
