@@ -15,6 +15,7 @@ import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.opensearch.ConversionUtils;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
+import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.indexes.IndexedElements;
 import eu.essi_lab.model.Queryable.ContentType;
@@ -82,7 +83,9 @@ public class TestUtils {
 	String base64resource = optResource.get();
 	InputStream decoded = ConversionUtils.decode(base64resource);
 
+	// this resource has no indexes, they must be added
 	GSResource decodedResource = GSResource.create(decoded);
+	IndexData.decorate(wrapper.getSource(), decodedResource);
 
 	Node binary = folder.get(key);
 
@@ -106,6 +109,12 @@ public class TestUtils {
 
 	boolean equals = true;
 
+	indexesMetadata1.remove(IndexedElements.BOUNDING_BOX_NULL.getElementName());
+	indexesMetadata1.remove(IndexedElements.TEMP_EXTENT_BEGIN_NULL.getElementName());
+	indexesMetadata1.remove(IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName());
+	indexesMetadata1.remove(IndexedElements.TEMP_EXTENT_END_NOW.getElementName());
+	indexesMetadata1.remove(IndexedElements.TEMP_EXTENT_END_NULL.getElementName());
+
 	equals &= indexesMetadata1.getProperties().equals(indexesMetadata2.getProperties());
 
 	if (!equals) {
@@ -115,21 +124,27 @@ public class TestUtils {
 
 	for (String prop : indexesMetadata1.getProperties()) {
 
-	    equals &= indexesMetadata1.read(prop).equals(indexesMetadata2.read(prop));
+	    List<String> prop1 = indexesMetadata1.read(prop);
+	    List<String> prop2 = indexesMetadata2.read(prop).//
+		    stream().//
+		    map(v -> v.replace(".000Z", "Z")).//
+		    collect(Collectors.toList());
+
+	    equals &= prop1.equals(prop2);
 
 	    if (!equals) {
 
 		throw new Exception();
 	    }
 
-	    if (prop.equals(IndexedElements.BOUNDING_BOX_NULL.getElementName()) || 
-		    prop.equals(IndexedElements.TEMP_EXTENT_BEGIN_NULL.getElementName()) || 
-		    prop.equals(IndexedElements.TEMP_EXTENT_END_NULL.getElementName())){
+	    if (prop.equals(IndexedElements.BOUNDING_BOX_NULL.getElementName())
+		    || prop.equals(IndexedElements.TEMP_EXTENT_BEGIN_NULL.getElementName())
+		    || prop.equals(IndexedElements.TEMP_EXTENT_END_NULL.getElementName())) {
 
 		continue;
 
 	    } else if ( //
-		    prop.equals(IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName()) || //
+	    prop.equals(IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName()) || //
 		    prop.equals(IndexedElements.TEMP_EXTENT_END_NOW.getElementName()) //
 	    ) {
 

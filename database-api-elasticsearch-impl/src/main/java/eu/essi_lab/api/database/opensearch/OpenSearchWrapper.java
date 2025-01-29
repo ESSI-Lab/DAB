@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.json.JSONObject;
@@ -75,9 +74,7 @@ import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.PerformanceLogger;
 import eu.essi_lab.model.Queryable;
 
 /**
@@ -203,11 +200,11 @@ public class OpenSearchWrapper {
     }
 
     /**
+     * @param searchQuery
      * @param target
-     * @param distValues
+     * @param size
      * @return
-     * @throws IOException
-     * @throws OpenSearchException
+     * @throws Exception
      */
     public List<JSONObject> findDistinctSources(Query searchQuery, Queryable target, int size) throws Exception {
 
@@ -267,6 +264,17 @@ public class OpenSearchWrapper {
     /**
      * @param index
      * @param searchQuery
+     * @return
+     * @throws Exception
+     */
+    public SearchResponse<Object> search(String index, Query searchQuery) throws Exception {
+
+	return search(index, searchQuery, 0, 10);
+    }
+
+    /**
+     * @param index
+     * @param searchQuery
      * @param properties
      * @param start
      * @param size
@@ -295,6 +303,34 @@ public class OpenSearchWrapper {
 	// pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
 
 	return response;
+    }
+
+    /**
+     * @param index
+     * @param searchQuery
+     * @param start
+     * @param size
+     * @return
+     * @throws Exception
+     */
+    public List<JSONObject> searchSources(String index, Query searchQuery, int start, int size) throws Exception {
+
+	SearchResponse<Object> response = search(index, searchQuery, start, size);
+
+	return ConversionUtils.toJSONSourcesList(response);
+    }
+
+    /**
+     * @param index
+     * @param searchQuery
+     * @return
+     * @throws Exception
+     */
+    public List<JSONObject> searchSources(String index, Query searchQuery) throws Exception {
+
+	SearchResponse<Object> response = search(index, searchQuery, 0, 10);
+
+	return ConversionUtils.toJSONSourcesList(response);
     }
 
     /**

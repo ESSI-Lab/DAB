@@ -26,6 +26,7 @@ package eu.essi_lab.api.database.opensearch.index;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,9 +60,12 @@ import eu.essi_lab.indexes.IndexedElements;
 import eu.essi_lab.iso.datamodel.classes.BoundingPolygon;
 import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.model.Queryable;
+import eu.essi_lab.model.Queryable.ContentType;
 import eu.essi_lab.model.auth.GSUser;
+import eu.essi_lab.model.index.IndexedElement;
 import eu.essi_lab.model.index.jaxb.BoundingBox;
 import eu.essi_lab.model.index.jaxb.IndexesMetadata;
 import eu.essi_lab.model.resource.GSResource;
@@ -229,9 +233,6 @@ public class IndexData {
 
 	case GS_RESOURCE:
 
-	    indexData.put(BINARY_PROPERTY, DataFolderMapping.GS_RESOURCE);
-	    indexData.put(DataFolderMapping.GS_RESOURCE, encodedString);
-
 	    String dataFolder = folder.getName().endsWith(SourceStorageWorker.DATA_1_SHORT_POSTFIX) //
 		    ? SourceStorageWorker.DATA_1_SHORT_POSTFIX //
 		    : SourceStorageWorker.DATA_2_SHORT_POSTFIX; //
@@ -269,12 +270,10 @@ public class IndexData {
 		indexData.put(BoundingBox.AREA_ELEMENT_NAME, shape.get().getArea());
 		indexData.put(DataFolderMapping.CENTROID, shape.get().getCentroid());
 	    }
-	    
+
 	    //
 	    //
 	    //
-	    
-	    
 
 	    //
 	    // temp extent begin
@@ -320,6 +319,14 @@ public class IndexData {
 
 		put(indexesMd, indexData, field, KeywordProperty.class);
 	    });
+
+	    // clear the indexes (all but the bbox) before storing the binary property
+	    indexesMd.clear(false);
+
+	    encodedString = ConversionUtils.encode(gsResource);
+
+	    indexData.put(BINARY_PROPERTY, DataFolderMapping.GS_RESOURCE);
+	    indexData.put(DataFolderMapping.GS_RESOURCE, encodedString);
 
 	    indexData.mapping = DataFolderMapping.get();
 
@@ -517,6 +524,65 @@ public class IndexData {
 
 	    return ConfigurationMapping.get().getIndex();
 	}
+    }
+
+    /**
+     * @param source
+     * @param res
+     * @return
+     */
+    public static GSResource decorate(JSONObject source, GSResource res) {
+
+	IndexesMetadata indexesMd = res.getIndexesMetadata();
+
+	ResourceProperty.listValues().forEach(pr -> {
+
+	    if (source.has(pr.getName())) {
+
+		IndexedElement element = new IndexedElement(pr.getName());
+		source.getJSONArray(pr.getName()).forEach(v -> {
+
+		    Object value = v;
+
+		    if (pr.getContentType() == ContentType.ISO8601_DATE || pr.getContentType() == ContentType.ISO8601_DATE_TIME) {
+
+			value = ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds(new Date(Long.valueOf(v.toString())));
+		    }
+
+		    element.getValues().add(value.toString());
+		});
+
+		indexesMd.write(element);
+	    }
+	});
+
+	MetadataElement.listValues().forEach(el -> {
+
+	    if (source.has(el.getName())) {
+
+		// bbox is already in, the IndexesMetadata.clear(false) do not remove it
+		// see IndexData
+		if (!el.getName().equals(MetadataElement.BOUNDING_BOX.getName())) {
+
+		    IndexedElement element = new IndexedElement(el.getName());
+		    source.getJSONArray(el.getName()).forEach(v -> {
+
+			Object value = v;
+
+			if (el.getContentType() == ContentType.ISO8601_DATE || el.getContentType() == ContentType.ISO8601_DATE_TIME) {
+
+			    value = ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds(new Date(Long.valueOf(v.toString())));
+			}
+
+			element.getValues().add(value.toString());
+		    });
+
+		    indexesMd.write(element);
+		}
+	    }
+	});
+
+	return res;
     }
 
     /**
