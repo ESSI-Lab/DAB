@@ -21,7 +21,12 @@ package eu.essi_lab.accessor.polytope.metadata;
  * #L%
  */
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -29,15 +34,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TimeZone;
 
+import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import eu.essi_lab.iso.datamodel.classes.BoundingPolygon;
 import eu.essi_lab.iso.datamodel.classes.Citation;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
+import eu.essi_lab.iso.datamodel.classes.Keywords;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
 import eu.essi_lab.iso.datamodel.classes.Online;
+import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
@@ -50,19 +61,53 @@ import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.ExtensionHandler;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.OriginalMetadata;
+import eu.essi_lab.ommdk.OriginalIdentifierMapper;
 import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
 
 /**
  * @author roncella
  */
-public class PolytopeIonBeamMetadataMeteoTrackerMapper extends PolytopeIonBeamMetadataMapper {
+public class PolytopeIonBeamMetadataMeteoTrackerMapper extends OriginalIdentifierMapper {
 
-    private static final String POLYTOPE_METEOTRACKER = "POLYTOPE METEOTRACKER";
+    private static final String POLYTOPE_IONBEAM_TRACKER = "POLYTOPE_IONBEAM_TRACKER";
 
     private Logger logger = GSLoggerFactory.getLogger(this.getClass());
 
     public PolytopeIonBeamMetadataMeteoTrackerMapper() {
 	// do nothing
+    }
+
+    public static OriginalMetadata create(JSONObject datasetInfo, String varType) {
+	OriginalMetadata originalMetadata = new OriginalMetadata();
+
+	originalMetadata.setSchemeURI(CommonNameSpaceContext.IONBEAM_TRACKER);
+
+	JSONObject jsonObject = new JSONObject();
+	jsonObject.put("dataset-info", datasetInfo);
+	jsonObject.put("var-type", varType);
+
+	originalMetadata.setMetadata(jsonObject.toString(4));
+
+	return originalMetadata;
+
+    }
+
+    /**
+     * @param metadata
+     * @return
+     */
+    private JSONObject retrieveDatasetInfo(OriginalMetadata metadata) {
+
+	return new JSONObject(metadata.getMetadata()).getJSONObject("dataset-info");
+    }
+
+    /**
+     * @param metadata
+     * @return
+     */
+    private String retrieveVarInfo(OriginalMetadata metadata) {
+
+	return new JSONObject(metadata.getMetadata()).optString("var-type");
     }
 
     public enum Resolution {
@@ -82,65 +127,129 @@ public class PolytopeIonBeamMetadataMeteoTrackerMapper extends PolytopeIonBeamMe
 
     @Override
     public String getSupportedOriginalMetadataSchema() {
-	return CommonNameSpaceContext.POLYTOPE_METEOTRACKER;
+	return CommonNameSpaceContext.IONBEAM_TRACKER;
     }
 
     private void mapMetadata(OriginalMetadata originalMD, Dataset dataset) {
 
-	/**
-	 * METEOTRACKER
-	 * 26 columns (first column (0) empty)
-	 * codetype@body;entryno@body;varno@body;statid@hdr;obstype@hdr;codetype@hdr;source@hdr;stationid@hdr;groupid@hdr;reportype@hdr;class@desc;
-	 * type@desc;stream@desc;expver@desc;levtype@desc;date@hdr;time@hdr;andate@desc;antime@desc;stalt@hdr;press@body;obsvalue@body;lat@hdr;lon@hdr;min@body
-	 * column4: varno@body (identifier of variable)
-	 * column19: andate@desc (date of measure)
-	 * column20: antime@desc (time of measure)
-	 * column24: lat@hdr (station latitude)
-	 * column25: lon@hdr (station longitude)
-	 * column21: stalt@hdr (station altitude)
-	 * column23: obsvalue@body (value of variable)
-	 * column9: stationid@hdr (Name of station)
-	 */
+	//
+	// DATASET INFO
+	// {
+	// "external_id": "62ab72c11d8e11061d32002a",
+	// "platform": "meteotracker",
+	// "location_point": "POINT (8.65711845 44.3934191)",
+	// "location_bbox": "POLYGON ((8.675219 44.386031, 8.675219 44.4008072, 8.6390179 44.4008072, 8.6390179
+	// 44.386031, 8.675219 44.386031))",
+	// "location_hull": "POLYGON ((8.6391694 44.386031, 8.6391037 44.3860898, 8.6390179 44.3863223, 8.6391489
+	// 44.3864548, 8.6393916 44.3866083, 8.6636556 44.3988833, 8.6672147 44.4002499, 8.6676504 44.4003547, 8.6690215
+	// 44.4005383, 8.6708526 44.4007344, 8.6736574 44.4008072, 8.6742229 44.4007635, 8.6746885 44.4006371, 8.6750503
+	// 44.4005098, 8.675219 44.400353, 8.6750815 44.4002186, 8.6655395 44.3914033, 8.665203 44.3911424, 8.664728
+	// 44.3910255, 8.6391694 44.386031))",
+	// "start_time": "2022-06-16T18:13:15Z",
+	// "stop_time": "2022-06-16T18:21:09Z",
+	// "authors": [
+	// {
+	// "name": "genova_living_lab_1",
+	// "description": null,
+	// "url": null
+	// },
+	// {
+	// "name": "meteotracker",
+	// "description": null,
+	// "url": null
+	// }
+	// ],
+	// "sensors": [
+	// {
+	// "name": "meteotracker Sensor",
+	// "description": "A placeholder sensor that is likely composed of multiple physical devices.",
+	// "url": null,
+	// "properties": [
+	// {
+	// "key": "relative_humidity_near_surface",
+	// "name": "relative_humidity_near_surface",
+	// "unit": "%",
+	// "description": null,
+	// "url": null
+	// },
+	//
+	// {
+	// "key": "altitude",
+	// "name": "altitude",
+	// "unit": "m",
+	// "description": "The altitude of the observation, referenced to WGS84 (EPSG: 4326)",
+	// "url": null
+	// }
+	// ]
+	// }
+	// ]
+	// }
 
-	dataset.getPropertyHandler().setIsTrajectory(true);
+	try {
 
-	String originalMetadata = originalMD.getMetadata();
-	Map<PolytopeIonBeamMetadataMeteoTrackerVariable, PolytopeIonBeamMetadataStation> mapStations = getMapStations(originalMetadata);
+	    JSONObject datasetInfo = retrieveDatasetInfo(originalMD);
 
-	if (!mapStations.isEmpty()) {
+	    String varType = retrieveVarInfo(originalMD);
 
-	    PolytopeIonBeamMetadataStation station = mapStations.get(PolytopeIonBeamMetadataMeteoTrackerVariable.TEMPERATURE);
-	    PolytopeIonBeamMetadataMeteoTrackerVariable variable = PolytopeIonBeamMetadataMeteoTrackerVariable.TEMPERATURE;
-	    String abbreviation = "K";
-	    String buildingURL = "_TEMP.csv";
-	    if (station == null) {
-		station = mapStations.get(PolytopeIonBeamMetadataMeteoTrackerVariable.HUMIDITY);
-		variable = PolytopeIonBeamMetadataMeteoTrackerVariable.HUMIDITY;
-		buildingURL = "_HUM.csv";
-		abbreviation = "%";
-	    }
+	    String stationName = datasetInfo.optString("name");
+	    String stationId = datasetInfo.optString("external_id");
+
+	    String internalId = datasetInfo.optString("internal_id");
+
+	    JSONObject location = datasetInfo.optJSONObject("location");
+	    Double lat = location.optDoubleObject("lat", null);
+	    Double lon = location.optDoubleObject("lon", null);
+
+	    JSONObject time_span = datasetInfo.optJSONObject("time_span");
+	    String startDate = time_span.optString("start");
+	    String endDate = time_span.optString("end");
+	    JSONArray authors = datasetInfo.optJSONArray("authors");
+
+	    JSONObject marsRequest = datasetInfo.optJSONObject("mars_selection");
+	    String marsRequestDate = marsRequest.optString("date");
+	    String marsRequestStream = marsRequest.optString("stream");
+	    String marsRequestExpver = marsRequest.optString("expver");
+	    String marsRequestClass = marsRequest.optString("class");
+	    String platformName = datasetInfo.optString("platform");
+
+	    String queryPath = "?class=" + marsRequestClass + "&date=" + marsRequestDate + "&expver=" + marsRequestExpver + "&stream="
+		    + marsRequestStream + "&aggregation_type=by_time&platform=" + platformName + "&station_id=" + internalId;
+
+	    String variableLabel = null;
+	    String variableKey = null;
+	    String variableName = null;
+	    String variableUnits = null;
+	    // String url = null;
+
+	    // if (array != null && !array.isEmpty()) {
+	    // JSONObject arrayObj = array.getJSONObject(0);
+	    // url = arrayObj.optString("url");
+	    // if (url != null && !url.isEmpty()) {
+	    // url = url.contains("retrieve?") ? url.split("retrieve")[1] : url;
+	    // }
+	    //
+	    // }
+
+	    dataset.getPropertyHandler().setIsTrajectory(true);
+	    PolytopeIonBeamMetadataMeteoTrackerVariable variable = PolytopeIonBeamMetadataMeteoTrackerVariable.decode(varType);
+	    variableLabel = variable.getLabel();
+	    variableKey = variable.getKey();
+	    variableUnits = variable.getUnit();
+	    variableName = variable.name();
+
+	    Resolution resolution = Resolution.HOURLY;
 
 	    // TEMPORAL EXTENT
 	    CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
 	    TemporalExtent extent = new TemporalExtent();
 
-	    String startDate = station.getStartDateTime();
-	    String endDate = station.getEndDateTime();
 	    if (startDate != null && !startDate.isEmpty()) {
 
 		extent.setBeginPosition(startDate);
 
-		// Date begin = setTime(startDate, station.getStartTime());
-		//
-		// if (begin != null) {
-		// String stringStart = ISO8601DateTimeUtils.getISO8601DateTime(begin);
-
-		// }
-
 		if (endDate != null && !endDate.isEmpty()) {
 
 		    extent.setEndPosition(endDate);
-
 		}
 
 		/**
@@ -174,20 +283,14 @@ public class PolytopeIonBeamMetadataMeteoTrackerMapper extends PolytopeIonBeamMe
 
 		coreMetadata.getMIMetadata().getDataIdentification().addTemporalExtent(extent);
 	    }
-	    if (!station.getName().equals("")) {
-		coreMetadata.setTitle(
-			"Acquisitions of " + variable.getLabel() + " through MeteoTracker mobile weather station: " + station.getName());
-		coreMetadata.setAbstract("This dataset contains " + variable.name().toLowerCase()
-			+ " timeseries form I-CHANGE Citizen Observatory, acquired by a specific observing mobile weather station ("
-			+ station.getName() + ") of the MeteoTracker.");
-	    } else {
-		coreMetadata.setTitle("Acquisitions of " + variable.getLabel() + " through MeteoTracker mobile weather station: "
-			+ station.getStationCode());
-		coreMetadata.setAbstract("This dataset contains " + variable.name().toLowerCase()
-			+ " timeseries form I-CHANGE Citizen Observatory, acquired by a specific observing mobile weather station ("
-			+ station.getName() + ") of the MeteoTracker.");
-	    }
-	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword(POLYTOPE_METEOTRACKER);
+
+	    coreMetadata.setTitle("Acquisitions of " + variableLabel + " through MeteoTracker mobile weather station: " + stationId);
+
+	    coreMetadata.setAbstract("This dataset contains " + variableLabel
+		    + " timeseries from I-CHANGE Citizen Observatory, acquired by a specific observing mobile weather station (" + stationId
+		    + " ).");
+
+	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword(POLYTOPE_IONBEAM_TRACKER);
 
 	    coreMetadata.getMIMetadata().getDataIdentification()
 		    .setCitationPublicationDate(ISO8601DateTimeUtils.getISO8601Date(new Date()));
@@ -202,15 +305,23 @@ public class PolytopeIonBeamMetadataMeteoTrackerMapper extends PolytopeIonBeamMe
 	    // coreMetadata.getMIMetadata().getDataIdentification().addKeyword("ICAO: " + station.getIcao());
 	    // }
 
-	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword(station.getName());
-	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword(station.getStationCode());
-	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword(variable.toString().toLowerCase());
+	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword(variableLabel);
+	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword(variableKey);
+	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword(variableName);
+
+	    Keywords kwd = new Keywords();
+	    kwd.setTypeCode("platform");
+	    kwd.addKeyword(platformName);
+	    coreMetadata.getMIMetadata().getDataIdentification().addKeywords(kwd);
+
+	    if (resolution.equals(Resolution.HOURLY))
+		coreMetadata.getMIMetadata().getDataIdentification().addKeyword("hourly");
 
 	    ExtensionHandler handler = dataset.getExtensionHandler();
 	    handler.setTimeUnits("h");
 	    handler.setTimeResolution("1");
 	    handler.setAttributeMissingValue("-9999");
-	    handler.setAttributeUnitsAbbreviation(abbreviation);
+	    handler.setAttributeUnitsAbbreviation(variableUnits);
 
 	    //
 	    // URL + variable
@@ -220,43 +331,147 @@ public class PolytopeIonBeamMetadataMeteoTrackerMapper extends PolytopeIonBeamMe
 	    coreMetadata.getMIMetadata().addHierarchyLevelScopeCodeListValue("dataset");
 
 	    // bounding box (Multipoint)
+	    // "POLYGON ((8.6391694 44.386031, 8.6391037 44.3860898, 8.6390179 44.3863223, 8.6391489
+	    // 44.3864548, 8.6393916 44.3866083, 8.6636556 44.3988833, 8.6672147 44.4002499, 8.6676504 44.4003547,
+	    // 8.6690215
+	    // 44.4005383, 8.6708526 44.4007344, 8.6736574 44.4008072, 8.6742229 44.4007635, 8.6746885 44.4006371,
+	    // 8.6750503
+	    // 44.4005098, 8.675219 44.400353, 8.6750815 44.4002186, 8.6655395 44.3914033, 8.665203 44.3911424, 8.664728
+	    // 44.3910255, 8.6391694 44.386031))",
 
-	    List<List<Double>> multiPoint = station.getMultiPoint();
+	    List<JSONObject> jsonResponse = new ArrayList<JSONObject>();
 
-	    if (multiPoint != null && multiPoint.size() > 0) {
+	    String linkage = PolytopeIonBeamMetadataConnector.BASE_URL + PolytopeIonBeamMetadataConnector.RETRIEVE_URL + queryPath;
+	    jsonResponse = getSessionData(queryPath);
+	    // startDate = startDate.replace("Z", "+00:00");
+	    // linkage = PolytopeIonBeamMetadataConnector.BASE_URL +
+	    // "retrieve?project=public&platform=meteotracker&observation_variable="
+	    // + variableKey + "&datetime=" + URLEncoder.encode(startDate, "UTF-8")
+	    // + "&filter=select+*+from+result+where+source_id+%3D+%27" + stationId + "%27%3B&format=json";// +
+	    // // station.getName()
+	    // // +
+	    // buildingURL;
 
+	    List<List<Double>> multiPoints = new ArrayList<List<Double>>();
+	    Double minLon = null;
+	    Double minLat = null;
+	    Double maxLon = null;
+	    Double maxLat = null;
+	    Double minAlt = null;
+	    Double maxAlt = null;
+	    for (JSONObject obj : jsonResponse) {
+
+		BigDecimal alt = obj.optBigDecimal("altitude", null);
+		Double lonDouble = obj.optDouble("lon");
+		Double latDouble = obj.optDouble("lat");
+		// Double latDouble = Double.valueOf(lat);
+		// Double lonDouble = Double.valueOf(lon);
+		Double altDouble = alt.doubleValue();
+
+		List<Double> lat_lon_alt = new ArrayList<>();
+		lat_lon_alt.add(latDouble);
+		lat_lon_alt.add(lonDouble);
+		lat_lon_alt.add(altDouble);
+		multiPoints.add(lat_lon_alt);
+
+		if (minLat == null)
+		    minLat = latDouble;
+		if (minLon == null)
+		    minLon = lonDouble;
+		if (maxLat == null)
+		    maxLat = latDouble;
+		if (maxLon == null)
+		    maxLon = lonDouble;
+		if (minAlt == null)
+		    minAlt = altDouble;
+		if (maxAlt == null)
+		    maxAlt = altDouble;
+
+		if (minLat != null && minLat > latDouble) {
+		    minLat = latDouble;
+		}
+		if (minLon != null && minLon > lonDouble) {
+		    minLon = lonDouble;
+		}
+		if (maxLat != null && maxLat < latDouble) {
+		    maxLat = latDouble;
+		}
+		if (maxLon != null && maxLon < lonDouble) {
+		    maxLon = lonDouble;
+		}
+		if (minAlt != null && minAlt > altDouble) {
+		    minAlt = altDouble;
+		}
+		if (maxAlt != null && maxAlt < altDouble) {
+		    maxAlt = altDouble;
+		}
+
+	    }
+
+	    // Double[] bbox = multipointToBbox(coordinates);
+
+	    // bounding box (Multipoint)
+
+	    if (multiPoints != null && multiPoints.size() > 0) {
 		BoundingPolygon myPolygon = new BoundingPolygon();
 
-		myPolygon.setMultiPoints(multiPoint);
+		myPolygon.setMultiPoints(multiPoints);
 
 		coreMetadata.getMIMetadata().getDataIdentification().addBoundingPolygon(myPolygon);
 
 	    }
+	    // bounding box
+	    if (minLon != null && minLat != null && maxLon != null && maxLat != null) {
 
-	    String minLon = station.getMinLon();
-	    String maxLon = station.getMaxLon();
-	    String minLat = station.getMinLat();
-	    String maxLat = station.getMaxLat();
-	    if (minLon != null && !minLon.isEmpty() && minLat != null && !minLat.isEmpty() && maxLon != null && !maxLon.isEmpty()
-		    && maxLat != null && !maxLat.isEmpty()) {
+		coreMetadata.addBoundingBox(maxLat, minLon, minLat, maxLon);
 
-		coreMetadata.addBoundingBox(Double.parseDouble(maxLat), Double.parseDouble(minLon), Double.parseDouble(minLat),
-			Double.parseDouble(maxLon));
+	    } else {
 
+		coreMetadata.addBoundingBox(lat, lon, lat, lon);
+	    }
+	    // elevation
+	    if (minAlt != null && maxAlt != null) {
+		VerticalExtent verticalExtent = new VerticalExtent();
+		verticalExtent.setMinimumValue(minAlt);
+		verticalExtent.setMaximumValue(maxAlt);
+		coreMetadata.getMIMetadata().getDataIdentification().addVerticalExtent(verticalExtent);
 	    }
 
 	    // elevation
-	    String minElevation = station.getMinElevation();
-	    String maxElevation = station.getMaxElevation();
-	    if (minElevation != null && !minElevation.equals("") && maxElevation != null && !maxElevation.equals("")) {
-		VerticalExtent verticalExtent = new VerticalExtent();
-		if (isDouble(minElevation)) {
-		    verticalExtent.setMinimumValue(Double.parseDouble(minElevation));
+	    // String minElevation = station.getMinElevation();
+	    // String maxElevation = station.getMaxElevation();
+	    // if (minElevation != null && !minElevation.equals("") && maxElevation != null && !maxElevation.equals(""))
+	    // {
+	    // VerticalExtent verticalExtent = new VerticalExtent();
+	    // if (isDouble(minElevation)) {
+	    // verticalExtent.setMinimumValue(Double.parseDouble(minElevation));
+	    // }
+	    // if (isDouble(maxElevation)) {
+	    // verticalExtent.setMaximumValue(Double.parseDouble(maxElevation));
+	    // }
+	    // coreMetadata.getMIMetadata().getDataIdentification().addVerticalExtent(verticalExtent);
+	    // }
+
+	    // contact point
+	    if (authors != null) {
+		String owner = null;
+		for (int k = 0; k < authors.length(); k++) {
+		    JSONObject authorObj = authors.optJSONObject(k);
+		    if (authorObj != null) {
+			String authorName = authorObj.optString("name");
+			if (!authorName.contains("meteotracker")) {
+			    owner = authorName;
+			    break;
+			}
+		    }
 		}
-		if (isDouble(maxElevation)) {
-		    verticalExtent.setMaximumValue(Double.parseDouble(maxElevation));
+		if (owner != null) {
+		    ResponsibleParty creatorContact = new ResponsibleParty();
+		    creatorContact.setOrganisationName(owner);
+		    creatorContact.setRoleCode("originator");
+		    // creatorContact.setIndividualName("Anirban Guha");
+		    coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(creatorContact);
 		}
-		coreMetadata.getMIMetadata().getDataIdentification().addVerticalExtent(verticalExtent);
 	    }
 
 	    // contact point
@@ -272,24 +487,6 @@ public class PolytopeIonBeamMetadataMeteoTrackerMapper extends PolytopeIonBeamMe
 	    // contactcreatorContactInfo.setAddress(address);
 	    // creatorContact.setContactInfo(contactcreatorContactInfo);
 	    //
-	    // ResponsibleParty creatorTechContact = new ResponsibleParty();
-	    //
-	    // creatorTechContact.setOrganisationName("Tripura University");
-	    // creatorTechContact.setRoleCode("pointOfContact");
-	    // creatorTechContact.setIndividualName("Anirban Guha");
-	    //
-	    // Contact contactcreatorTechContactInfo = new Contact();
-	    // Address addresscreatorTechContact = new Address();
-	    // addresscreatorTechContact.addElectronicMailAddress("anirbanguha@tripurauniv.in");
-	    // contactcreatorTechContactInfo.setAddress(addresscreatorTechContact); //
-	    // creatorTechContact.setContactInfo(contactcreatorTechContactInfo);
-	    //
-	    //
-	    //
-	    // coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(creatorContact);
-	    // coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(otherTechContact);
-	    // coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(creatorTechContact);
-	    // coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(otherContact);
 
 	    /**
 	     * MIPLATFORM
@@ -297,16 +494,16 @@ public class PolytopeIonBeamMetadataMeteoTrackerMapper extends PolytopeIonBeamMe
 
 	    MIPlatform platform = new MIPlatform();
 
-	    String platformIdentifier = "i-change-citizen-observatory-archive:" + station.getStationCode();
+	    String platformIdentifier = "i-change-citizen-observatory-ionbeam:" + stationId;
 
 	    platform.setMDIdentifierCode(platformIdentifier);
 
-	    String siteDescription = station.getName();
+	    String siteDescription = stationId;
 
 	    platform.setDescription(siteDescription);
 
 	    Citation platformCitation = new Citation();
-	    platformCitation.setTitle(station.getName());
+	    platformCitation.setTitle(stationId);
 	    platform.setCitation(platformCitation);
 
 	    coreMetadata.getMIMetadata().addMIPlatform(platform);
@@ -316,12 +513,12 @@ public class PolytopeIonBeamMetadataMeteoTrackerMapper extends PolytopeIonBeamMe
 	     **/
 
 	    CoverageDescription coverageDescription = new CoverageDescription();
-	    String variableId = variable.toString();
+	    String variableId = "IONBEAM:" + variableName;
 
 	    coverageDescription.setAttributeIdentifier(variableId);
-	    coverageDescription.setAttributeTitle(variable.getLabel());
+	    coverageDescription.setAttributeTitle(variableLabel);
 
-	    String attributeDescription = variable.toString() + " Units: " + variable.getUnit();
+	    String attributeDescription = variableLabel + " Units: " + variableUnits;
 
 	    coverageDescription.setAttributeDescription(attributeDescription);
 	    coreMetadata.getMIMetadata().addCoverageDescription(coverageDescription);
@@ -340,160 +537,239 @@ public class PolytopeIonBeamMetadataMeteoTrackerMapper extends PolytopeIonBeamMe
 	    //
 	    // coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(online);
 
-	    String resourceIdentifier = generateCode(dataset, variable.getId() + ":" + station.getName());
+	    String resourceIdentifier = generateCode(dataset, variableKey + ":" + stationId);
 
 	    coreMetadata.getDataIdentification().setResourceIdentifier(resourceIdentifier);
 
-	    String linkage = "https://i-change.s3.amazonaws.com/meteotracker_" + station.getName() + buildingURL;
+	    // https://ionbeam-dev.ecmwf.int/api/v1/retrieve?project=public&platform=meteotracker&observation_variable=air_temperature_near_surface&
+	    // datetime=2022-06-16T18%3A13%3A15%2B00%3A00&filter=select+%2A+from+result+where+source_id+%3D+%2762ab72c11d8e11061d32002a%27%3B&format=csv
+
+	    /**
+	     * Linkage url to be parametized:
+	     * project={public, i-change}
+	     * platform = {meteotracker, acronet, smart}
+	     * observation_variable = platform.getKey()
+	     */
+
 	    Online o = new Online();
 	    o.setLinkage(linkage);
 	    o.setFunctionCode("download");
-	    o.setName(station.getName() + " - " + variable);
-	    o.setIdentifier(variable.getId() + ":" + station.getName());
-	    o.setProtocol(CommonNameSpaceContext.POLYTOPE_METEOTRACKER);
-	    o.setDescription(variable + " Station name: " + station.getName());
+	    o.setName(internalId + ":" + variableKey);
+	    o.setIdentifier(internalId + ":" + variableId);
+
+	    o.setProtocol(CommonNameSpaceContext.IONBEAM_TRACKER);
+
+	    o.setDescription(variableLabel + " Station name: " + stationId);
 	    coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(o);
 
 	    coreMetadata.getMIMetadata().getDistribution().getDistributionOnline().setIdentifier(resourceIdentifier);
+
+	} catch (Exception e) {
+	    e.printStackTrace();
 	}
 
     }
 
-    protected Map<PolytopeIonBeamMetadataMeteoTrackerVariable, PolytopeIonBeamMetadataStation> readCSV(Iterable<CSVRecord> records) {
+    private List<JSONObject> getSessionData(String queryPath) throws Exception {
+	// e.g.
+	// http://ionbeam-ichange.ecmwf-ichange.f.ewcloud.host/api/v1/retrieve?class=rd&date=20241129&expver=xxxx&stream=lwda&platform=meteotracker&source_id=674954b21def300ee9705dcc
+	List<JSONObject> ret = new ArrayList<>();
+	String url = PolytopeIonBeamMetadataConnector.BASE_URL + PolytopeIonBeamMetadataConnector.RETRIEVE_URL + queryPath;
+	GSLoggerFactory.getLogger(getClass()).info("Getting " + url);
+	ret = PolytopeIonBeamMetadataConnector.getResultList(url);
+	return ret;
 
-	Map<PolytopeIonBeamMetadataMeteoTrackerVariable, PolytopeIonBeamMetadataStation> mapStations = new HashMap<>();
-	Double minLon = null;
-	Double minLat = null;
-	Double maxLon = null;
-	Double maxLat = null;
-	Double minAlt = null;
-	Double maxAlt = null;
-	String updatedDateTime = null;
-	List<List<Double>> multiPoints = new ArrayList<List<Double>>();
-	for (CSVRecord record : records) {
-	    String stationName = record.get("stationid@hdr");
-	    String lat = record.get("lat@hdr");
-	    String lon = record.get("lon@hdr");
-	    String date = record.get("andate@desc");
-	    String time = record.get("antime@desc");
-	    String varName = record.get("varno@body");
-	    String timeDelay = record.get("min@body");
-	    String alt = record.get("stalt@hdr");
-	    String dateTime = buildDate(date, time);
-	    Double latDouble = Double.valueOf(lat);
-	    Double lonDouble = Double.valueOf(lon);
-	    Double altDouble = Double.valueOf(alt);
+    }
 
-	    List<Double> lat_lon_alt = new ArrayList<>();
-	    lat_lon_alt.add(latDouble);
-	    lat_lon_alt.add(lonDouble);
-	    lat_lon_alt.add(altDouble);
-	    multiPoints.add(lat_lon_alt);
-	    PolytopeIonBeamMetadataMeteoTrackerVariable pv = PolytopeIonBeamMetadataMeteoTrackerVariable.decode(varName);
-
-	    if (mapStations.isEmpty()) {
-		minLat = latDouble;
-		minLon = lonDouble;
-		maxLat = latDouble;
-		maxLon = lonDouble;
-		minAlt = altDouble;
-		maxAlt = altDouble;
-		PolytopeIonBeamMetadataStation station = new PolytopeIonBeamMetadataStation();
-		station.setName(stationName);
-		station.setStationCode(stationName);
-		station.setMultiPoint(multiPoints);
-		station.setMinLat(lat);
-		station.setMaxLat(lat);
-		station.setMinLon(lon);
-		station.setMaxLon(lon);
-		updatedDateTime = updateDateTime(dateTime, timeDelay.trim());
-		station.setStartDateTime(updatedDateTime);
-		station.setEndDateTime(updatedDateTime);
-		station.setMinElevation(alt);
-		station.setMaxElevation(alt);
-		mapStations.put(pv, station);
-
-	    } else {
-		PolytopeIonBeamMetadataStation polStation = mapStations.get(pv);
-		if (polStation != null) {
-		    // already saved -- update it
-		    updatedDateTime = updateDateTime(dateTime, timeDelay.trim());
-		    polStation.setEndDateTime(updatedDateTime);
-		    polStation.setMultiPoint(multiPoints);
-		    if (minLat != null && minLat > latDouble) {
-			minLat = latDouble;
-			polStation.setMinLat(lat);
+    private Double[] multipointToBbox(String[] coordinates) {
+	Double[] bbox = new Double[4];
+	Double maxlat = null;
+	Double minlat = null;
+	Double maxlon = null;
+	Double minlon = null;
+	try {
+	    for (int i = 0; i < coordinates.length; i++) {
+		if (i % 2 == 0) {
+		    String value = coordinates[i].replaceAll("\\[", "").replaceAll("\\]", "");
+		    Double val = Double.valueOf(value);
+		    if (maxlon == null) {
+			maxlon = val;
+			minlon = val;
 		    }
-		    if (minLon != null && minLon > lonDouble) {
-			minLon = lonDouble;
-			polStation.setMinLon(lon);
+		    if (val > maxlon) {
+			maxlon = val;
 		    }
-		    if (maxLat != null && maxLat < latDouble) {
-			maxLat = latDouble;
-			polStation.setMaxLat(lat);
-		    }
-		    if (maxLon != null && maxLon < lonDouble) {
-			maxLon = lonDouble;
-			polStation.setMaxLon(lon);
-		    }
-		    if (minAlt != null && minAlt > altDouble) {
-			minAlt = altDouble;
-			polStation.setMinElevation(alt);
-		    }
-		    if (maxAlt != null && maxAlt < altDouble) {
-			maxAlt = altDouble;
-			polStation.setMaxElevation(alt);
+		    if (val < minlon) {
+			minlon = val;
 		    }
 
 		} else {
-		    // this should never happen
-		    // now one csv for variable
-		    polStation = new PolytopeIonBeamMetadataStation();
-		    polStation.setName(stationName);
-		    polStation.setStationCode(stationName);
-		    polStation.setMinLat(lat);
-		    polStation.setMaxLat(lat);
-		    polStation.setMinLon(lon);
-		    polStation.setMaxLon(lon);
-		    polStation.setStartDateTime(dateTime);
-		    polStation.setEndDateTime(dateTime);
-
-		    mapStations.put(pv, polStation);
+		    String value = coordinates[i].replaceAll("\\[", "").replaceAll("\\]", "");
+		    Double val = Double.valueOf(value);
+		    if (maxlat == null) {
+			maxlat = val;
+			minlat = val;
+		    }
+		    if (val > maxlat) {
+			maxlat = val;
+		    }
+		    if (val < minlat) {
+			minlat = val;
+		    }
 		}
-
+	    }
+	    if (maxlat != null && maxlon != null) {
+		bbox[0] = minlon;
+		bbox[1] = minlat;
+		bbox[2] = maxlon;
+		bbox[3] = maxlat;
+		return bbox;
 	    }
 
+	    return new Double[0];
+	} catch (Exception e) {
+	    logger.warn("Exception converting multipoint to bounding box", e);
+	    return new Double[0];
 	}
-
-	return mapStations;
     }
 
-    public static String updateDateTime(String updatedDateTime, String delay) {
-	Optional<Date> d = ISO8601DateTimeUtils.parseISO8601ToDate(updatedDateTime);
-	Date newDate = null;
-	if (d.isPresent()) {
-	    BigDecimal minutes = new BigDecimal(delay);
-	    newDate = updateDateTime(d.get(), minutes);	    
-	}
-	return (newDate == null) ? updatedDateTime : ISO8601DateTimeUtils.getISO8601DateTime(newDate);
+    protected String buildDate(String date, String time) {
+
+	Date initialDate = setTime(date, time);
+	String dateTime = ISO8601DateTimeUtils.getISO8601DateTime(initialDate);
+	return dateTime;
     }
 
-    public static Date updateDateTime(Date initialDateTime, BigDecimal minutes) {
-	long distTimeInMs = Math.round(minutes.doubleValue() * 60000);
-	return new Date(initialDateTime.getTime() + distTimeInMs);
+    /**
+     * @param date
+     * @param time
+     * @return
+     *         startTime should be: 0000,0001,0002,....2100,2200,2300
+     */
+    public static Date setTime(String date, String time) {
+
+	Optional<Date> startDateTime = null;
+
+	
+	startDateTime = ISO8601DateTimeUtils.parseNotStandardToDate(date);
+	
+	if (startDateTime.isPresent()) {
+	    Date begin = startDateTime.get();
+	    if (time != null) {
+		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+		cal.setTime(begin);
+		if (time.length() < 4) {
+		    for (int i = 0; i <= 4 - time.length(); i++) {
+			time = "0" + time;
+		    }
+		}
+		int t = 0;
+		switch (time) {
+		case "0000":
+		    t = 0;
+		    break;
+		case "0100":
+		    t = 1;
+		    break;
+		case "0200":
+		    t = 2;
+		    break;
+		case "0300":
+		    t = 3;
+		    break;
+		case "0400":
+		    t = 4;
+		    break;
+		case "0500":
+		    t = 5;
+		    break;
+		case "0600":
+		    t = 6;
+		    break;
+		case "0700":
+		    t = 7;
+		    break;
+		case "0800":
+		    t = 8;
+		    break;
+		case "0900":
+		    t = 9;
+		    break;
+		case "1000":
+		    t = 10;
+		    break;
+		case "1100":
+		    t = 11;
+		    break;
+		case "1200":
+		    t = 12;
+		    break;
+		case "1300":
+		    t = 13;
+		    break;
+		case "1400":
+		    t = 14;
+		    break;
+		case "1500":
+		    t = 15;
+		    break;
+		case "1600":
+		    t = 16;
+		    break;
+		case "1700":
+		    t = 17;
+		    break;
+		case "1800":
+		    t = 18;
+		    break;
+		case "1900":
+		    t = 19;
+		    break;
+		case "2000":
+		    t = 20;
+		    break;
+		case "2100":
+		    t = 21;
+		    break;
+		case "2200":
+		    t = 22;
+		    break;
+		case "2300":
+		    t = 23;
+		    break;
+
+		default:
+		    t = 0;
+		    break;
+		}
+
+		cal.set(Calendar.HOUR_OF_DAY, t);
+
+		return cal.getTime();
+	    }
+
+	    return begin;
+	}
+
+	return null;
+    }
+
+    protected boolean isDouble(String str) {
+	try {
+	    // check if it can be parsed as any double
+	    Double.parseDouble(str);
+	    return true;
+	} catch (NumberFormatException e) {
+	    return false;
+	}
     }
 
     public static void main(String[] args) {
 
-	String minutes = "38.60";
+	String t = "2024-12-12T23:06:20.011000Z";
 
-	double t = Double.parseDouble(minutes);
-	Date date = new Date();
-	long distTimeInMs = Math.round(t * 60000);
-	Date newDate = new Date(date.getTime() + distTimeInMs);
-	System.out.println(newDate.toString());
-	newDate = new Date(newDate.getTime() + distTimeInMs);
-	System.out.println(newDate.toString());
+	Optional<Date> ddd = ISO8601DateTimeUtils.parseISO8601ToDate(t);
+
 	TemporalExtent extent = new TemporalExtent();
 	TimeIndeterminateValueType endTimeInderminate = TimeIndeterminateValueType.NOW;
 	extent.setIndeterminateEndPosition(endTimeInderminate);
