@@ -48,12 +48,19 @@ public class UsersMapping extends IndexMapping {
     public static final String USER_ROLE = "userRole";
     public static final String ENABLED = "enabled";
 
+    private static UsersMapping instance;
+
     /**
      * @return
      */
     public static final UsersMapping get() {
 
-	return new UsersMapping();
+	if (instance == null) {
+
+	    instance = new UsersMapping();
+	}
+
+	return instance;
     }
 
     /**

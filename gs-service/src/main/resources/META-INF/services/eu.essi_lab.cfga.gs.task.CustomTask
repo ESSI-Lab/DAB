@@ -3,6 +3,7 @@ eu.essi_lab.gssrv.conf.task.IndexesSizeViewerTask
 eu.essi_lab.gssrv.conf.task.DeletedRecordsRemovalTask
 eu.essi_lab.gssrv.conf.task.MarkLogicCacheCleanerTask
 eu.essi_lab.gssrv.conf.task.DatabaseCacheStatusTask
+eu.essi_lab.gssrv.conf.task.DownloadTestTask
 eu.essi_lab.gssrv.conf.task.MarklogicFolderCleanerTask
 eu.essi_lab.gssrv.conf.task.GEOSSAccessedSourceTask
 eu.essi_lab.gssrv.conf.task.DataHarvesterTask

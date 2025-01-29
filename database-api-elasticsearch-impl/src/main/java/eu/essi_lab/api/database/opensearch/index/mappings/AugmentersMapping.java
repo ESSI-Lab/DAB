@@ -46,6 +46,8 @@ public class AugmentersMapping extends IndexMapping {
      */
     public static final String AUGMENTER_PROPERTIES = "augmenterProperties";
 
+    private static AugmentersMapping instance;
+
     /**
      * @param index
      */
@@ -61,6 +63,11 @@ public class AugmentersMapping extends IndexMapping {
      */
     public static final AugmentersMapping get() {
 
-	return new AugmentersMapping();
+	if (instance == null) {
+
+	    instance = new AugmentersMapping();
+	}
+
+	return instance;
     }
 }

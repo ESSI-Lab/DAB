@@ -26,6 +26,7 @@ package eu.essi_lab.api.database.opensearch;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,6 +73,7 @@ import org.opensearch.client.opensearch.generic.Response;
 
 import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
+import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -126,9 +128,9 @@ public class OpenSearchWrapper {
      * @return
      * @throws Exception
      */
-    public List<InputStream> searchBinaries(Query searchQuery, int start, int size) throws Exception {
+    public List<InputStream> searchBinaries(String index, Query searchQuery, int start, int size) throws Exception {
 
-	SearchResponse<Object> searchResponse = search(searchQuery, start, size);
+	SearchResponse<Object> searchResponse = search(index, searchQuery, start, size);
 
 	return ConversionUtils.toBinaryList(searchResponse);
     }
@@ -144,10 +146,10 @@ public class OpenSearchWrapper {
      */
     public SearchResponse<Object> count(Query searchQuery, DiscoveryMessage message) throws Exception {
 
-	PerformanceLogger pl = new PerformanceLogger(//
-		PerformanceLogger.PerformancePhase.OPENSEARCH_WRAPPER_SEARCH, //
-		UUID.randomUUID().toString(), //
-		Optional.empty());
+	// PerformanceLogger pl = new PerformanceLogger(//
+	// PerformanceLogger.PerformancePhase.OPENSEARCH_WRAPPER_SEARCH, //
+	// UUID.randomUUID().toString(), //
+	// Optional.empty());
 
 	Optional<Queryable> element = message.getDistinctValuesElement();
 	SearchResponse<Object> response = null;
@@ -164,7 +166,9 @@ public class OpenSearchWrapper {
 
 		builder.aggregations(DataFolderMapping.toAggField(element.get().getName()), aggregation);
 
-		builder.query(searchQuery).size(0);
+		builder.query(searchQuery).//
+			index(DataFolderMapping.get().getIndex()).//
+			size(0);
 
 		return builder;
 
@@ -184,14 +188,16 @@ public class OpenSearchWrapper {
 			    DataFolderMapping.toAggField(trg.getName())))).size(maxItems);
 		});
 
-		builder.query(searchQuery).size(0);
+		builder.query(searchQuery).//
+			index(DataFolderMapping.get().getIndex()).//
+			size(0);
 
 		return builder;
 
 	    }, Object.class);
 	}
 
-	pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
+	// pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
 
 	return response;
     }
@@ -227,6 +233,39 @@ public class OpenSearchWrapper {
     }
 
     /**
+     * @param index
+     * @param searchQuery
+     * @param fields
+     * @param start
+     * @param size
+     * @return
+     * @throws Exception
+     */
+    public SearchResponse<Object> search(String index, Query searchQuery, List<String> fields, int start, int size)
+
+	    throws Exception {
+
+	SearchResponse<Object> response = client.search(builder -> {
+
+	    builder.query(searchQuery).//
+
+		    index(index).//
+		    from(start).//
+		    size(size).source(src -> src.filter(new SourceFilter.Builder().includes(fields).//
+			    build()));
+
+	    return builder;
+
+	}, Object.class);
+
+	// pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
+
+	return response;
+
+    }
+
+    /**
+     * @param index
      * @param searchQuery
      * @param properties
      * @param start
@@ -235,16 +274,17 @@ public class OpenSearchWrapper {
      * @return
      * @throws Exception
      */
-    public SearchResponse<Object> search(Query searchQuery, int start, int size) throws Exception {
+    public SearchResponse<Object> search(String index, Query searchQuery, int start, int size) throws Exception {
 
-	PerformanceLogger pl = new PerformanceLogger(//
-		PerformanceLogger.PerformancePhase.OPENSEARCH_WRAPPER_SEARCH, //
-		UUID.randomUUID().toString(), //
-		Optional.empty());
+	// PerformanceLogger pl = new PerformanceLogger(//
+	// PerformanceLogger.PerformancePhase.OPENSEARCH_WRAPPER_SEARCH, //
+	// UUID.randomUUID().toString(), //
+	// Optional.empty());
 
 	SearchResponse<Object> response = client.search(builder -> {
 
 	    builder.query(searchQuery).//
+		    index(index).//
 		    from(start).//
 		    size(size);
 
@@ -252,7 +292,7 @@ public class OpenSearchWrapper {
 
 	}, Object.class);
 
-	pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
+	// pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
 
 	return response;
     }
@@ -265,9 +305,9 @@ public class OpenSearchWrapper {
      * @return
      * @throws Exception
      */
-    public List<InputStream> searchBinaries(Query searchQuery) throws Exception {
+    public List<InputStream> searchBinaries(String index, Query searchQuery) throws Exception {
 
-	return searchBinaries(searchQuery, 0, 10);
+	return searchBinaries(index, searchQuery, 0, 10);
     }
 
     /**
@@ -277,9 +317,9 @@ public class OpenSearchWrapper {
      * @throws OpenSearchException
      * @throws IOException
      */
-    public List<String> searchField(Query searchQuery, String field) throws OpenSearchException, IOException {
+    public List<String> searchField(String index, Query searchQuery, String field) throws OpenSearchException, IOException {
 
-	return searchField(searchQuery, field, 0, 10);
+	return searchField(index, searchQuery, field, 0, 10);
     }
 
     /**
@@ -291,11 +331,19 @@ public class OpenSearchWrapper {
      * @throws OpenSearchException
      * @throws IOException
      */
-    public List<String> searchField(Query searchQuery, String field, int start, int size) throws OpenSearchException, IOException {
+    public List<String> searchField(String index, Query searchQuery, String field, int start, int size)
+	    throws OpenSearchException, IOException {
 
 	SearchResponse<Object> response = client.search(builder -> {
 
+	    List<String> indexes = Arrays.asList(index);
+	    if (index.equals(IndexMapping.ALL_INDEXES)) {
+
+		indexes = IndexMapping.getIndexes();
+	    }
+
 	    builder.query(searchQuery).//
+		    index(indexes).//
 		    from(start).//
 		    size(size).// includes only the given property
 		    source(src -> src.filter(new SourceFilter.Builder().includes(field).//
@@ -522,35 +570,35 @@ public class OpenSearchWrapper {
      * @throws Exception
      */
     private List<String> findDistinctValues(Query searchQuery, Queryable target, int size) throws Exception {
-    
-        TermsAggregation termsAgg = TermsAggregation.of(//
-        	a -> a.field(DataFolderMapping.toAggField(target.getName())).//
-        		size(size));
-    
-        Aggregation agg = Aggregation.of(a -> a.terms(termsAgg));
-    
-        SearchResponse<Object> aggResponse = client.search(builder -> {
-    
-            builder.aggregations(target.getName(), agg);
-    
-            builder.query(searchQuery).//
-        	    index(DataFolderMapping.get().getIndex()).//
-        	    size(0);
-    
-            return builder;
-    
-        }, Object.class);
-    
-        Map<String, Aggregate> aggregations = aggResponse.aggregations();
-        Aggregate aggregate = aggregations.get(target.getName());
-    
-        StringTermsAggregate sterms = aggregate.sterms();
-    
-        return sterms.buckets().//
-        	array().//
-        	stream().//
-        	map(b -> b.key()).//
-        	collect(Collectors.toList());
+
+	TermsAggregation termsAgg = TermsAggregation.of(//
+		a -> a.field(DataFolderMapping.toAggField(target.getName())).//
+			size(size));
+
+	Aggregation agg = Aggregation.of(a -> a.terms(termsAgg));
+
+	SearchResponse<Object> aggResponse = client.search(builder -> {
+
+	    builder.aggregations(target.getName(), agg);
+
+	    builder.query(searchQuery).//
+		    index(DataFolderMapping.get().getIndex()).//
+		    size(0);
+
+	    return builder;
+
+	}, Object.class);
+
+	Map<String, Aggregate> aggregations = aggResponse.aggregations();
+	Aggregate aggregate = aggregations.get(target.getName());
+
+	StringTermsAggregate sterms = aggregate.sterms();
+
+	return sterms.buckets().//
+		array().//
+		stream().//
+		map(b -> b.key()).//
+		collect(Collectors.toList());
     }
 
     /**

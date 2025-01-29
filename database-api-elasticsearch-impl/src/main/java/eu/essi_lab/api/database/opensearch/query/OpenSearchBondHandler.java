@@ -25,7 +25,6 @@ package eu.essi_lab.api.database.opensearch.query;
  */
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Optional;
 
 import org.opensearch.client.opensearch._types.query_dsl.Query;
@@ -49,9 +48,6 @@ import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
 
 /**
- * 2) aggiungere le basic queries, come quelle di ML per il ranking su document quality, etc
- * 3) mapping corretto dei bond
- * 
  * @author Fabrizio
  */
 public class OpenSearchBondHandler implements DiscoveryBondHandler {
@@ -155,11 +151,11 @@ public class OpenSearchBondHandler implements DiscoveryBondHandler {
 		case DOUBLE:
 		case INTEGER:
 		case LONG:
-		case ISO8601_DATE: // mapped to long
-		case ISO8601_DATE_TIME: // mapped to long
+		case ISO8601_DATE:
+		case ISO8601_DATE_TIME:
 
 		    try {
-			queryBuilder.append(queryBuilder.buildMinMaxValueQuery(name, operator == BondOperator.MAX));
+			queryBuilder.append(queryBuilder.buildMinMaxValueQuery(name, operator == BondOperator.MAX, true));
 			return;
 
 		    } catch (Exception ex) {

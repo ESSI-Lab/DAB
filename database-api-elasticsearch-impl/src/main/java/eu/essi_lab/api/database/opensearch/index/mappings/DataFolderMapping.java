@@ -53,7 +53,11 @@ public class DataFolderMapping extends IndexMapping {
     // the source storage worker key must be preserved
     public static final String WRITING_FOLDER_TAG = SourceStorageWorker.WRITING_FOLDER_TAG;
 
+    public static final String CENTROID = "centroid";
+
     public static final List<String> AGGREGABLE_FIELDS = new ArrayList<>();
+
+    private static DataFolderMapping instance;
 
     /**
      * 
@@ -68,6 +72,9 @@ public class DataFolderMapping extends IndexMapping {
 	addProperty(WRITING_FOLDER_TAG, FieldType.Binary.jsonValue());
 
 	addProperty(MetaFolderMapping.DATA_FOLDER, FieldType.Text.jsonValue());
+
+	// centroid
+	addProperty(CENTROID, FieldType.GeoPoint.jsonValue());
 
 	// --------------------------------------------------
 	//
@@ -90,10 +97,13 @@ public class DataFolderMapping extends IndexMapping {
 		addProperty(el.getName(), FieldType.Integer.jsonValue());
 		break;
 
-	    case ISO8601_DATE:
-	    case ISO8601_DATE_TIME:
 	    case LONG:
 		addProperty(el.getName(), FieldType.Long.jsonValue());
+		break;
+
+	    case ISO8601_DATE:
+	    case ISO8601_DATE_TIME:
+		addProperty(el.getName(), FieldType.Date.jsonValue());
 		break;
 
 	    case SPATIAL:
@@ -159,7 +169,7 @@ public class DataFolderMapping extends IndexMapping {
 		break;
 	    case ISO8601_DATE:
 	    case ISO8601_DATE_TIME:
-		addProperty(rp.getName(), FieldType.Long.jsonValue());
+		addProperty(rp.getName(), FieldType.Date.jsonValue());
 		break;
 	    case LONG:
 		addProperty(rp.getName(), FieldType.Long.jsonValue());
@@ -219,6 +229,11 @@ public class DataFolderMapping extends IndexMapping {
      */
     public static final DataFolderMapping get() {
 
-	return new DataFolderMapping();
+	if (instance == null) {
+
+	    instance = new DataFolderMapping();
+	}
+
+	return instance;
     }
 }

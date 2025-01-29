@@ -3,6 +3,7 @@
  */
 package eu.essi_lab.api.database.opensearch;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -89,7 +90,7 @@ public class OpenSearchFinder implements DatabaseFinder {
     @Override
     public DiscoveryCountResponse count(DiscoveryMessage message) throws GSException {
 
-	try {	  
+	try {
 
 	    SearchResponse<Object> searchResponse = discover_(message, true);
 
@@ -257,9 +258,9 @@ public class OpenSearchFinder implements DatabaseFinder {
      * @return
      */
     private int getCardinalityValue(Map<String, Aggregate> aggregations, Optional<Queryable> element) {
-    
-        Aggregate aggregate = aggregations.get(DataFolderMapping.toAggField(element.get().getName()));
-        return (int) aggregate.cardinality().value();
+
+	Aggregate aggregate = aggregations.get(DataFolderMapping.toAggField(element.get().getName()));
+	return (int) aggregate.cardinality().value();
     }
 
     /**
@@ -281,7 +282,14 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	try {
 
-	    wrapper.search(query, 0, ids.size()).//
+	    SearchResponse<Object> response = wrapper.search(//
+		    MetaFolderMapping.get().getIndex(), //
+		    query, //
+		    Arrays.asList(MetaFolderMapping.SOURCE_ID, MetaFolderMapping.DATA_FOLDER), //
+		    0, //
+		    ids.size());//
+
+	    response.//
 		    hits().//
 		    hits().//
 		    stream().//
@@ -297,6 +305,17 @@ public class OpenSearchFinder implements DatabaseFinder {
 	    GSLoggerFactory.getLogger(getClass()).error(ex);
 	    throw GSException.createException(getClass(), "OpenSearchFinderSourceDataFolderMapError", ex);
 	}
+
+	ids.forEach(id -> {
+	    //	
+	    // this is to avoid retrieval of resources belonging to a source that is
+	    // referenced in the query, but that is currently executing its first harvesting 
+	    //
+	    if (out.get(id) == null) {
+
+		out.put(id, "not-available");
+	    }
+	});
 
 	return out;
     }
@@ -338,7 +357,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	    SearchResponse<Object> response = count ? //
 		    wrapper.count(query, message) : //
-		    wrapper.search(query, start, size);
+		    wrapper.search(DataFolderMapping.get().getIndex(), query, start, size);
 
 	    return response;
 

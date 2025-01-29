@@ -43,6 +43,8 @@ public class CacheMapping extends IndexMapping {
      */
     public static final String CACHED_ENTRY = "cachedData";
 
+    private static CacheMapping instance;
+
     /**
      * @param index
      */
@@ -58,7 +60,12 @@ public class CacheMapping extends IndexMapping {
      */
     public static final CacheMapping get() {
 
-	return new CacheMapping();
+	if (instance == null) {
+
+	    instance = new CacheMapping();
+	}
+
+	return instance;
     }
 
 }

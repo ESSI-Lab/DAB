@@ -79,6 +79,15 @@ public class ResourcePropertyHandler {
 	setResourceTimeStamp(ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds());
     }
 
+    public void setLastDownloadDate() {
+    	resource.setProperty(ResourceProperty.LAST_DOWNLOAD_DATE, ISO8601DateTimeUtils.getISO8601DateTime());
+    }
+    
+    public Optional<String> getLastDownloadDate() {
+    	return resource.getPropertyValue(ResourceProperty.LAST_DOWNLOAD_DATE);
+    }
+    
+    
     /**
      * Set the {@link ResourceProperty#RESOURCE_TIME_STAMP} property with the supplied date-time in ISO8601 format
      */

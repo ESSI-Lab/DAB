@@ -46,12 +46,19 @@ public class MetaFolderMapping extends IndexMapping {
     public static final String ERRORS_REPORT = "errorsReport";
     public static final String WARN_REPORT = "warnReport";
 
+    private static MetaFolderMapping instance;
+
     /**
      * @return
      */
     public static final MetaFolderMapping get() {
 
-	return new MetaFolderMapping();
+	if (instance == null) {
+
+	    instance = new MetaFolderMapping();
+	}
+
+	return instance;
     }
 
     /**

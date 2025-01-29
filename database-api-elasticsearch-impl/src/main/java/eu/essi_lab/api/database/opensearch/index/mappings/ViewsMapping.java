@@ -48,6 +48,8 @@ public class ViewsMapping extends IndexMapping {
     public static final String VIEW_CREATOR = "viewCreator";
     public static final String VIEW_VISIBILITY = "viewVisibility";
 
+    private static ViewsMapping instance;
+
     /**
     * 
     */
@@ -68,6 +70,11 @@ public class ViewsMapping extends IndexMapping {
      */
     public static final ViewsMapping get() {
 
-	return new ViewsMapping();
+	if (instance == null) {
+
+	    instance = new ViewsMapping();
+	}
+
+	return instance;
     }
 }

@@ -42,6 +42,8 @@ public class FolderRegistryMapping extends IndexMapping {
      */
     public static final String ENTRY_POSTFIX = "_registered-folder";
 
+    private static FolderRegistryMapping instance;
+
     /**
      * 
      */
@@ -73,6 +75,11 @@ public class FolderRegistryMapping extends IndexMapping {
      */
     public static final FolderRegistryMapping get() {
 
-	return new FolderRegistryMapping();
+	if (instance == null) {
+
+	    instance = new FolderRegistryMapping();
+	}
+
+	return instance;
     }
 }

@@ -222,7 +222,7 @@ public class OpenSearchUsersFolderTest extends OpenSearchTest {
 	
 	Query query = OpenSearchQueryBuilder.buildSearchQuery(database.getIdentifier(), UsersMapping.get().getIndex());
 
-	List<GSUser> users = wrapper.searchBinaries(query).//
+	List<GSUser> users = wrapper.searchBinaries(UsersMapping.get().getIndex(), query).//
 		stream().//
 		map(binary -> GSUser.createOrNull(binary)).//
 		filter(Objects::nonNull).//
@@ -240,7 +240,7 @@ public class OpenSearchUsersFolderTest extends OpenSearchTest {
 		UsersMapping.USER_ID, //
 		"User_3");
 
-	users = wrapper.searchBinaries(query).//
+	users = wrapper.searchBinaries(UsersMapping.get().getIndex(), query).//
 		stream().//
 		map(binary -> GSUser.createOrNull(binary)).//
 		filter(Objects::nonNull).//
@@ -261,7 +261,7 @@ public class OpenSearchUsersFolderTest extends OpenSearchTest {
 		UsersMapping.USER_ROLE, //
 		"Role_5");
 
-	users = wrapper.searchBinaries(query).//
+	users = wrapper.searchBinaries(UsersMapping.get().getIndex(), query).//
 		stream().//
 		map(binary -> GSUser.createOrNull(binary)).//
 		filter(Objects::nonNull).//
@@ -281,7 +281,7 @@ public class OpenSearchUsersFolderTest extends OpenSearchTest {
 		UsersMapping.USER_ROLE, //
 		"Role_11");
 
-	users = wrapper.searchBinaries(query).//
+	users = wrapper.searchBinaries(UsersMapping.get().getIndex(), query).//
 		stream().//
 		map(binary -> GSUser.createOrNull(binary)).//
 		filter(Objects::nonNull).//
@@ -299,7 +299,7 @@ public class OpenSearchUsersFolderTest extends OpenSearchTest {
 		"unknown_property", //
 		"Role_5");
 
-	users = wrapper.searchBinaries(query).//
+	users = wrapper.searchBinaries(UsersMapping.get().getIndex(), query).//
 		stream().//
 		map(binary -> GSUser.createOrNull(binary)).//
 		filter(Objects::nonNull).//
@@ -317,7 +317,7 @@ public class OpenSearchUsersFolderTest extends OpenSearchTest {
 		UsersMapping.USER_ROLE, //
 		"Role_5");
 
-	users = wrapper.searchBinaries(query).//
+	users = wrapper.searchBinaries(UsersMapping.get().getIndex(), query).//
 		stream().//
 		map(binary -> GSUser.createOrNull(binary)).//
 		filter(Objects::nonNull).//

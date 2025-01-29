@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import org.json.JSONObject;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 
@@ -54,6 +55,7 @@ public class Shape {
 
     public static String SHAPE = "shape";
     public static String AREA = "area";
+    public static String CENTROID = "centroid";
 
     /**
      * @param bbox
@@ -121,6 +123,11 @@ public class Shape {
 		}
 
 		objectBox.put(SHAPE, _shape);
+
+		Point c = geometry.getCentroid();
+		double x = c.getX();
+		double y = c.getY();
+		objectBox.put(CENTROID, "POINT (" + x + " " + y + ")");
 		objectBox.put(AREA, area);
 
 	    } else {
@@ -129,6 +136,8 @@ public class Shape {
 	    }
 
 	} catch (ParseException e) {
+	    
+	    empty = true;
 
 	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
@@ -187,13 +196,22 @@ public class Shape {
 		Geometry geometry = READER.read(shape);
 
 		double area = geometry.getArea();
-
-		objectBox.put(SHAPE, shape);
 		objectBox.put(AREA, area);
 
+		Point c = geometry.getCentroid();
+		double x = c.getX();
+		double y = c.getY();
+		objectBox.put(CENTROID, "POINT (" + x + " " + y + ")");
+
+		objectBox.put(SHAPE, shape);
+
 	    } catch (ParseException e) {
+		
+		empty = true;
 
 		GSLoggerFactory.getLogger(getClass()).error(e);
+		
+		return;
 	    }
 	} else {
 
@@ -215,6 +233,14 @@ public class Shape {
     public double getArea() {
 
 	return objectBox.getDouble(AREA);
+    }
+
+    /**
+     * @return
+     */
+    public String getCentroid() {
+
+	return objectBox.getString(CENTROID);
     }
 
     @Override
