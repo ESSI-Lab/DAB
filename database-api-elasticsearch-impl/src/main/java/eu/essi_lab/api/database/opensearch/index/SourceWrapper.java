@@ -125,7 +125,7 @@ public class SourceWrapper {
 
 	return source.getString(IndexData.BINARY_PROPERTY);
     }
-    
+
     /**
      * - uses {@link #getBinaryProperty()} to retrieve the binary value
      */
@@ -413,4 +413,13 @@ public class SourceWrapper {
 
 	return source.toString(3);
     }
+
+    /**
+     * @return
+     */
+    public JSONObject getSource() {
+
+	return source;
+    }
+
 }
