@@ -87,6 +87,14 @@ public class ResourcePropertyHandler {
     	return resource.getPropertyValue(ResourceProperty.LAST_DOWNLOAD_DATE);
     }
     
+    public void setLastFailedDownloadDate() {
+    	resource.setProperty(ResourceProperty.LAST_FAILED_DOWNLOAD_DATE, ISO8601DateTimeUtils.getISO8601DateTime());
+    }
+    
+    public Optional<String> getLastFailedDownloadDate() {
+    	return resource.getPropertyValue(ResourceProperty.LAST_FAILED_DOWNLOAD_DATE);
+    }
+    
     
     /**
      * Set the {@link ResourceProperty#RESOURCE_TIME_STAMP} property with the supplied date-time in ISO8601 format

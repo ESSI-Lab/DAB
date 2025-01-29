@@ -279,6 +279,7 @@ public class AccessAugmenter extends ResourceAugmenter<AugmenterSetting> {
 
 	    setNotTransformable(resource);
 	    setNotDownloadable(resource);
+	    resource.getPropertyHandler().setLastFailedDownloadDate();
 	    setNotExecutable(resource);
 
 	    GSLoggerFactory.getLogger(getClass()).warn("Unmanageable resource");
@@ -289,6 +290,7 @@ public class AccessAugmenter extends ResourceAugmenter<AugmenterSetting> {
 	    resource.getPropertyHandler().setIsTransformable(true);
 	    // this property is true only if the data can be downloaded and is valid
 	    setNotDownloadable(resource);
+	    resource.getPropertyHandler().setLastFailedDownloadDate();
 	    setNotExecutable(resource);
 
 	    GSLoggerFactory.getLogger(getClass()).warn("Execution test failed (download only)");
