@@ -307,7 +307,10 @@ public class OpenSearchFinder implements DatabaseFinder {
 	}
 
 	ids.forEach(id -> {
-
+	    //	
+	    // this is to avoid retrieval of resources belonging to a source that is
+	    // referenced in the query, but that is currently executing its first harvesting 
+	    //
 	    if (out.get(id) == null) {
 
 		out.put(id, "not-available");
@@ -325,11 +328,6 @@ public class OpenSearchFinder implements DatabaseFinder {
     private Query builQuery(DiscoveryMessage message, boolean count) throws GSException {
 
 	HashMap<String, String> map = getSourceDataFolderMap(message);
-
-	if (map.isEmpty()) {
-
-	    return OpenSearchQueryBuilder.buildMatchNoneQuery();
-	}
 
 	DiscoveryBondParser bondParser = new DiscoveryBondParser(message.getPermittedBond());
 
