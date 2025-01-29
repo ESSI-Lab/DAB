@@ -173,12 +173,14 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 	    if (stationsArray.isEmpty()) {
 		stationsArray = getList(STATIONS_URL, time);
 	    }
+	    boolean isLast = false;
 	    GSLoggerFactory.getLogger(getClass()).info("Station number: " + stationsArray.length());
 	    if (start < stationsArray.length() && !maxNumberReached) {
 
 		int end = start + pageSize;
 		if (end > stationsArray.length()) {
 		    end = stationsArray.length();
+		    isLast = true;
 		}
 
 		if (!getSetting().isMaxRecordsUnlimited() && mr.isPresent() && end > mr.get()) {
@@ -204,10 +206,11 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 			    // jsonArray.put(m);
 			    // }
 			    // }
-
+			    
 			    if (platform.toLowerCase().contains("acronet")) {
 				for (PolytopeIonBeamMetadataAcronetVariable var : PolytopeIonBeamMetadataAcronetVariable.values()) {
 				    ret.addRecord(PolytopeIonBeamMetadataMapper.create(datasetMetadata, var.getKey()));
+				    partialNumbers++;
 				}
 
 			    } else if (platform.toLowerCase().contains("meteo")) {
@@ -215,18 +218,24 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 				for (PolytopeIonBeamMetadataMeteoTrackerVariable var : PolytopeIonBeamMetadataMeteoTrackerVariable
 					.values()) {
 				    ret.addRecord(PolytopeIonBeamMetadataMeteoTrackerMapper.create(datasetMetadata, var.getKey()));
+				    partialNumbers++;
 				}
 			    } else if (platform.toLowerCase().contains("smart_citizen_kit")) {
 				for (PolytopeIonBeamMetadataSmartKitVariable var : PolytopeIonBeamMetadataSmartKitVariable.values()) {
 				    ret.addRecord(PolytopeIonBeamMetadataMapper.create(datasetMetadata, var.getKey()));
+				    partialNumbers++;
 				}
 			    }
 
 			}
 		    }
 		}
-		ret.setResumptionToken(String.valueOf(start + count));
-		logger.debug("ADDED {} records. Number of analyzed floats: {}", partialNumbers, String.valueOf(start + count));
+		if(isLast) {
+		    ret.setResumptionToken(null);    
+		} else {
+		    ret.setResumptionToken(String.valueOf(start + count));
+		}
+		logger.debug("ADDED {} records. Number of analyzed stations: {}", partialNumbers, String.valueOf(start + count));
 	    } else {
 		GSLoggerFactory.getLogger(getClass()).info("ERROR getting items.");
 	    }
