@@ -3,28 +3,6 @@
  */
 package eu.essi_lab.api.database.opensearch.query;
 
-/*-
- * #%L
- * Discovery and Access Broker (DAB) Community Edition (CE)
- * %%
- * Copyright (C) 2021 - 2025 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
- * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * #L%
- */
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -37,7 +15,6 @@ import org.json.JSONObject;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.GeoShapeRelation;
-import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
 import org.opensearch.client.opensearch._types.query_dsl.ExistsQuery;
 import org.opensearch.client.opensearch._types.query_dsl.GeoShapeFieldQuery;
@@ -72,7 +49,6 @@ import eu.essi_lab.messages.bond.SpatialBond;
 import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.bond.View.ViewVisibility;
 import eu.essi_lab.model.Queryable;
-import eu.essi_lab.model.Queryable.ContentType;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.RankingStrategy;
 import eu.essi_lab.model.resource.ResourceProperty;
@@ -183,29 +159,38 @@ public class OpenSearchQueryBuilder {
     /**
      * @param field
      * @param max
+     * @param date
      * @return
      * @throws Exception
      */
-    public Query buildMinMaxValueQuery(String field, boolean max) throws Exception {
+    public Query buildMinMaxValueQuery(String field, boolean max, boolean date) throws Exception {
 
-	return buildMinMaxValueQuery(buildMatchAllQuery(), field, max);
+	return buildMinMaxValueQuery(buildMatchAllQuery(), field, max, date);
     }
 
     /**
      * @param query
      * @param field
      * @param max
+     * @param date
      * @return
      * @throws Exception
      */
-    public Query buildMinMaxValueQuery(Query query, String field, boolean max) throws Exception {
+    public Query buildMinMaxValueQuery(Query query, String field, boolean max, boolean date) throws Exception {
 
 	double minOrMax = wrapper.findMinMaxValue(//
 		query, //
 		field, //
 		max);
 
-	Query out = OpenSearchQueryBuilder.buildRangeQuery(field, BondOperator.EQUAL, String.valueOf(minOrMax));
+	String stringVal = String.valueOf(minOrMax);
+
+	if (date) {
+	    // dates are internally stored are long
+	    stringVal = String.valueOf((long) minOrMax);
+	}
+
+	Query out = OpenSearchQueryBuilder.buildRangeQuery(field, BondOperator.EQUAL, stringVal);
 
 	if (query != null) {
 
@@ -219,9 +204,9 @@ public class OpenSearchQueryBuilder {
 
     /**
      * @param sourceId
-     * @param minOrMax
-     * @throws IOException
-     * @throws OpenSearchException
+     * @param operator
+     * @return
+     * @throws Exception
      */
     public Query buildMinMaxResourceTimeStampValue(String sourceId, BondOperator operator) throws Exception {
 
@@ -233,13 +218,13 @@ public class OpenSearchQueryBuilder {
 		    ResourceProperty.SOURCE_ID.getName(), //
 		    BondOperator.EQUAL, //
 		    sourceId);
-
 	}
 
 	return buildMinMaxValueQuery(//
 		sourceIdQuery, //
 		ResourceProperty.RESOURCE_TIME_STAMP.getName(), //
-		operator == BondOperator.MAX);
+		operator == BondOperator.MAX, //
+		true);
     }
 
     /**
@@ -264,11 +249,6 @@ public class OpenSearchQueryBuilder {
 	case GREATER_OR_EQUAL:
 	case LESS:
 	case LESS_OR_EQUAL:
-
-	    if (el.getContentType() == ContentType.ISO8601_DATE || el.getContentType() == ContentType.ISO8601_DATE_TIME) {
-
-		value = ConversionUtils.parseToLongString(value);
-	    }
 
 	    return buildRangeQuery(el.getName(), operator, value, ranking.computePropertyWeight(el));
 
