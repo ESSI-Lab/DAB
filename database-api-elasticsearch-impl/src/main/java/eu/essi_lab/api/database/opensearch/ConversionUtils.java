@@ -64,6 +64,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
+import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -188,12 +189,18 @@ public class ConversionUtils {
      * @param searchResponse
      * @return
      */
-    public static List<InputStream> toBinaryList(SearchResponse<Object> searchResponse) {
+    public static List<JSONObject> toJSONSourcesList(SearchResponse<Object> searchResponse) {
 
-//	PerformanceLogger pl = new PerformanceLogger(//
-//		PerformanceLogger.PerformancePhase.OPENSEARCH_WRAPPER_TO_BINARY_LIST, //
-//		UUID.randomUUID().toString(), //
-//		Optional.empty());
+	List<JSONObject> list = toList(searchResponse, hit -> toJSONObject(hit.source()));
+
+	return list;
+    }
+
+    /**
+     * @param searchResponse
+     * @return
+     */
+    public static List<InputStream> toBinaryList(SearchResponse<Object> searchResponse) {
 
 	List<InputStream> list = toList(searchResponse, hit -> {
 
@@ -201,8 +208,6 @@ public class ConversionUtils {
 	    String binaryValue = wrapper.getBinaryValue();
 	    return decode(binaryValue);
 	});
-
-//	pl.logPerformance(GSLoggerFactory.getLogger(OpenSearchWrapper.class));
 
 	return list;
     }
@@ -274,15 +279,15 @@ public class ConversionUtils {
     }
 
     /**
-     * @param obj
+     * @param query
      * @return
      */
-    public static Query toQuery(JSONObject obj) {
+    public static Query toQuery(JSONObject query) {
 
 	JsonbJsonpMapper mapper = new JsonbJsonpMapper();
 
 	JsonParser parser = mapper.jsonProvider().//
-		createParser(new ByteArrayInputStream(obj.toString(3).getBytes()));
+		createParser(new ByteArrayInputStream(query.toString(3).getBytes()));
 
 	return mapper.deserialize(parser, Query.class);
     }
@@ -375,6 +380,27 @@ public class ConversionUtils {
 
 	byte[] decoded = Base64.getDecoder().decode(binaryData);
 	return new String(decoded);
+    }
+
+    /**
+     * @param source
+     * @return
+     */
+    public static Optional<GSResource> toGSResource(JSONObject source) {
+
+	try {
+
+	    InputStream stream = toStream(source);
+	    GSResource res = GSResource.create(stream);
+
+	    return Optional.of(IndexData.decorate(source, res));
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(ConversionUtils.class).error(ex);
+	}
+
+	return Optional.empty();
     }
 
     /**

@@ -38,6 +38,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.Random;
 
 import javax.imageio.ImageIO;
 import javax.ws.rs.WebApplicationException;
@@ -56,7 +57,7 @@ import eu.essi_lab.pdk.handler.StreamingRequestHandler;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import eu.essi_lab.profiler.wms.cluster.WMSClusterProfilerSetting;
 import eu.essi_lab.profiler.wms.cluster.WMSRequest.Parameter;
-import eu.essi_lab.profiler.wms.cluster.map.WMSGetMapHandler;
+import eu.essi_lab.profiler.wms.cluster.map.WMSGetMapHandler2;
 
 /**
  * @author boldrini
@@ -105,6 +106,74 @@ public class WMSGetLegendHandler extends StreamingRequestHandler {
 	return ret;
 
     }
+    
+    public static Color getRandomColorFromSourceId(String sourceId,boolean availability) {
+   	int transparency = 200;
+   	String hexacode = null;
+   	// switch (sourceId) {
+   	// case "ita-sir-toscana":
+   	// hexacode = "#e30613";
+   	// break;
+   	// case "hisCentralItaMarche":
+   	// hexacode = "#ffffff";
+   	// break;
+   	// case "hisCentralItaFriuli":
+   	// hexacode = "#0063e7";
+   	// break;
+   	// case "ita-sir-veneto":
+   	// hexacode = "#c84a46";
+   	// break;
+   	// case "hisCentralItaLazio":
+   	// hexacode = "#0075d0";
+   	// break;
+   	// case "hisCentralItaAosta":
+   	// hexacode = "#000000";
+   	// break;
+   	// case "hisCentralItaPiemonte":
+   	// hexacode = "#d5001d";
+   	// break;
+   	// case "hisCentralItaLiguria":
+   	// hexacode = "#009cce";
+   	// break;
+   	// case "hisCentralItaBolzano":
+   	// hexacode = "#000000";
+   	// break;
+   	// case "ita-sir-lombardia":
+   	// hexacode = "#00a040";
+   	// break;
+   	// case "ita-sir-emilia-romagna":
+   	// hexacode = "#009a49";
+   	// break;
+   	// case "ita-sir-sardegna":
+   	// hexacode = "#d80000";
+   	// break;
+   	// case "ita-sir-basilicata":
+   	// hexacode = "#2c4878";
+   	// break;
+   	// case "ita-sir-umbria":
+   	// hexacode = "#00943a";
+   	// break;
+   	//
+   	// default:
+   	// break;
+   	// }
+   	// if (hexacode != null) {
+   	// Color color = Color.decode(hexacode);
+   	// Color transparentColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), transparency);
+   	// return transparentColor;
+   	// }
+   	int hash = sourceId.hashCode();
+   	// int r = (hash & 0xFF0000) >> 16;
+   	// int g = (hash & 0x00FF00) >> 8;
+   	// int b = (hash & 0x0000FF);
+   	// return new Color(r, g, b, transparency);
+   	Random random = new Random(hash);
+   	final float hue = random.nextFloat();
+   	final float saturation = 0.5f + 0.6f * random.nextFloat();// 1.0 for brilliant, 0.0 for dull
+
+   	final float luminance = 0.5f + 0.6f * random.nextFloat(); // 1.0 for brighter, 0.0 for black
+   	return Color.getHSBColor(hue, saturation, luminance);
+       }
 
     @Override
     public StreamingOutput getStreamingResponse(WebRequest webRequest) throws GSException {
@@ -135,6 +204,10 @@ public class WMSGetLegendHandler extends StreamingRequestHandler {
 
 		    // String version = checkParameter(map, Parameter.VERSION);
 		    String layers = checkParameter(map, Parameter.LAYERS);
+		    boolean availability = false;
+		    if (layers.endsWith("availability")) {
+			availability = true;
+		    }
 		    // String styles = checkParameter(map,Parameter.STYLES);
 		    // String crs = checkParameter(map, Parameter.CRS);
 		    // String bboxString = checkParameter(map, Parameter.BBOX);
@@ -191,7 +264,7 @@ public class WMSGetLegendHandler extends StreamingRequestHandler {
 			    }
 			    label = label.trim();
 			}
-			InfoLegend info = new InfoLegend(WMSGetMapHandler.getRandomColorFromSourceId(sourceId), label);
+			InfoLegend info = new InfoLegend(WMSGetMapHandler2.getRandomColorFromSourceId(sourceId, availability), label);
 			infos.add(info);
 		    }
 

@@ -37,19 +37,23 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
+import java.util.Random;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
 
 import com.amazonaws.util.IOUtils;
 
+import eu.essi_lab.access.availability.AvailabilityMonitor;
 import eu.essi_lab.access.datacache.BBOX;
 import eu.essi_lab.access.datacache.BBOX4326;
 import eu.essi_lab.access.datacache.StationRecord;
@@ -62,6 +66,8 @@ import eu.essi_lab.lib.net.utils.whos.HISCentralOntology;
 import eu.essi_lab.lib.net.utils.whos.HydroOntology;
 import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
 import eu.essi_lab.lib.net.utils.whos.WHOSOntology;
+import eu.essi_lab.messages.ValidationMessage;
+import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
@@ -82,16 +88,171 @@ import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.model.resource.data.CRS;
 import eu.essi_lab.model.resource.data.CRSUtils;
+import eu.essi_lab.pdk.handler.StreamingRequestHandler;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.profiler.wms.cluster.WMSRequest.Parameter;
 
 /**
  * @author boldrini
  */
-public class WMSGetMapHandler2 extends WMSGetMapHandler {
+public class WMSGetMapHandler2 extends StreamingRequestHandler {
+
+    @Override
+    public ValidationMessage validate(WebRequest request) throws GSException {
+
+	ValidationMessage ret = new ValidationMessage();
+	try {
+	    new WMSMapRequest(request);
+	    WMSMapRequest map = new WMSMapRequest(request);
+	    String layers = checkParameter(map, Parameter.LAYERS);
+	    // String styles = checkParameter(map,Parameter.STYLES);
+	    String crs = checkParameter(map, Parameter.CRS);
+	    String bboxString = checkParameter(map, Parameter.BBOX);
+	    String widthString = checkParameter(map, Parameter.WIDTH);
+	    String heightString = checkParameter(map, Parameter.HEIGHT);
+
+	    ret.setResult(ValidationResult.VALIDATION_SUCCESSFUL);
+	} catch (Exception e) {
+	    ret.setError("Missing mandatory parameter: " + e.getMessage());
+	    ret.setLocator(e.getMessage());
+	    ret.setResult(ValidationResult.VALIDATION_FAILED);
+	}
+
+	return ret;
+    }
+
+    public static String checkParameter(WMSMapRequest map, Parameter parameter) throws Exception {
+	String ret = map.getParameterValue(parameter);
+	if (ret == null) {
+	    throw new Exception(parameter.getKeys()[0]);
+	}
+	return ret;
+
+    }
+
+    @Override
+    public MediaType getMediaType(WebRequest webRequest) {
+
+	return new MediaType("image", "png");
+    }
+
+    public static String decodeFormat(String format) {
+	if (format == null || format.isEmpty()) {
+	    format = "PNG";
+	}
+	if (format.toLowerCase().contains("png")) {
+	    format = "PNG";
+	}
+	if (format.toLowerCase().contains("jpeg")) {
+	    format = "JPEG";
+	}
+	if (format.toLowerCase().contains("jpg")) {
+	    format = "JPG";
+	}
+	if (format.toLowerCase().contains("gif")) {
+	    format = "GIF";
+	}
+	return format;
+    }
+
+    public static Color getRandomColorFromSourceId(String sourceId, boolean availability) {
+	if (availability) {
+	    Date goodDate = AvailabilityMonitor.getInstance().getLastDownloadDate(sourceId);
+	    Date failedDate = AvailabilityMonitor.getInstance().getLastFailedDownloadDate(sourceId);
+	    if (failedDate != null && (goodDate == null || failedDate.after(goodDate))) {
+		// there was an error, and it was the last result
+		return Color.red;
+	    }
+	    // download never done
+	    if (goodDate == null) {
+		return Color.blue;
+	    } else {
+		Calendar calendar = Calendar.getInstance();
+		Date now = calendar.getTime(); // Current date
+
+		// Set calendar to one week ago
+		calendar.add(Calendar.DAY_OF_YEAR, -7);
+		Date oneMonthAgo = calendar.getTime();
+
+		// within last week a download occurred
+		if (goodDate.after(oneMonthAgo) && goodDate.before(now)) {
+		    return Color.green;
+		} else {
+		    // a download occurred more than a week ago
+		    return Color.green.brighter();
+		}
+	    }
+	}
+	int transparency = 200;
+	String hexacode = null;
+	// switch (sourceId) {
+	// case "ita-sir-toscana":
+	// hexacode = "#e30613";
+	// break;
+	// case "hisCentralItaMarche":
+	// hexacode = "#ffffff";
+	// break;
+	// case "hisCentralItaFriuli":
+	// hexacode = "#0063e7";
+	// break;
+	// case "ita-sir-veneto":
+	// hexacode = "#c84a46";
+	// break;
+	// case "hisCentralItaLazio":
+	// hexacode = "#0075d0";
+	// break;
+	// case "hisCentralItaAosta":
+	// hexacode = "#000000";
+	// break;
+	// case "hisCentralItaPiemonte":
+	// hexacode = "#d5001d";
+	// break;
+	// case "hisCentralItaLiguria":
+	// hexacode = "#009cce";
+	// break;
+	// case "hisCentralItaBolzano":
+	// hexacode = "#000000";
+	// break;
+	// case "ita-sir-lombardia":
+	// hexacode = "#00a040";
+	// break;
+	// case "ita-sir-emilia-romagna":
+	// hexacode = "#009a49";
+	// break;
+	// case "ita-sir-sardegna":
+	// hexacode = "#d80000";
+	// break;
+	// case "ita-sir-basilicata":
+	// hexacode = "#2c4878";
+	// break;
+	// case "ita-sir-umbria":
+	// hexacode = "#00943a";
+	// break;
+	//
+	// default:
+	// break;
+	// }
+	// if (hexacode != null) {
+	// Color color = Color.decode(hexacode);
+	// Color transparentColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), transparency);
+	// return transparentColor;
+	// }
+	int hash = sourceId.hashCode();
+	// int r = (hash & 0xFF0000) >> 16;
+	// int g = (hash & 0x00FF00) >> 8;
+	// int b = (hash & 0x0000FF);
+	// return new Color(r, g, b, transparency);
+	Random random = new Random(hash);
+	final float hue = random.nextFloat();
+	final float saturation = 0.5f + 0.6f * random.nextFloat();// 1.0 for brilliant, 0.0 for dull
+
+	final float luminance = 0.5f + 0.6f * random.nextFloat(); // 1.0 for brighter, 0.0 for black
+	return Color.getHSBColor(hue, saturation, luminance);
+    }
 
     @Override
     public StreamingOutput getStreamingResponse(WebRequest webRequest) throws GSException {
+	boolean availability = false;
 	try {
 
 	    WMSMapRequest map = new WMSMapRequest(webRequest);
@@ -102,6 +263,10 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 
 	    String version = checkParameter(map, Parameter.VERSION).isEmpty() ? "1.3.0" : checkParameter(map, Parameter.VERSION);
 	    String layers = checkParameter(map, Parameter.LAYERS);
+	    if (layers.endsWith("availability")) {
+		availability = true;
+	    }
+	    boolean finalAvailability = availability;
 	    // String styles = checkParameter(map,Parameter.STYLES);
 	    String crs = checkParameter(map, Parameter.CRS).toUpperCase();
 	    String bboxString = checkParameter(map, Parameter.BBOX);
@@ -237,8 +402,9 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 				tmpBboxMinX = minx.doubleValue() + j * bboxWidth;
 				double tmpBboxMaxX = tmpBboxMinX + bboxWidth;
 				double tmpBboxMaxY = tmpBboxMinY + bboxHeight;
-//				System.out.println("Original bbox: minx " + tmpBboxMinX + " miny " + tmpBboxMinY + " maxx " + tmpBboxMaxX
-//					+ " maxy " + tmpBboxMaxY);
+				// System.out.println("Original bbox: minx " + tmpBboxMinX + " miny " + tmpBboxMinY + "
+				// maxx " + tmpBboxMaxX
+				// + " maxy " + tmpBboxMaxY);
 				if (outputCRS.contains("3857")) {
 				    SimpleEntry<Double, Double> lower = new SimpleEntry<>(tmpBboxMinX, tmpBboxMinY);
 				    SimpleEntry<Double, Double> upper = new SimpleEntry<>(tmpBboxMaxX, tmpBboxMaxY);
@@ -267,7 +433,7 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 				}
 				SpatialExtent tmp = new SpatialExtent(tmpBboxMinY, tmpBboxMinX, tmpBboxMaxY, tmpBboxMaxX);
 				request.addExtent(tmp);
-//				System.out.println("Created request with bbox " + tmp);
+				// System.out.println("Created request with bbox " + tmp);
 
 			    }
 			}
@@ -310,7 +476,7 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 
 			    // blue square per debug
 			    if (debug) {
-				ig2.setColor(getRandomColorFromSourceId(UUID.randomUUID().toString()));
+				ig2.setColor(getRandomColorFromSourceId(UUID.randomUUID().toString(), false));
 				ig2.setStroke(new BasicStroke(1)); // Slightly thicker line for the border
 				ig2.drawRect(subMinX, subMinY, subImageWidth - 2, subImageHeight - 2);
 				String debugString = bbboxIndex++ + ": " + bbox;
@@ -441,7 +607,7 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 				for (int i = 0; i < percentages.size(); i++) {
 				    double percentage = percentages.get(i).getValue();
 				    double arcAngle = 360 * (percentage / 100); // Convert percentage to degrees
-				    Color color = getRandomColorFromSourceId(percentages.get(i).getKey());
+				    Color color = getRandomColorFromSourceId(percentages.get(i).getKey(), finalAvailability);
 				    ig2.setColor(addTransparency(color));
 				    ig2.fillArc(pieMinX, pieMinY, pieDiameter, pieDiameter, (int) Math.round(startAngle),
 					    (int) Math.round(arcAngle));
@@ -574,7 +740,7 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 				    Color color = Color.red;
 				    String sourceId = station.getSourceIdentifier();
 				    if (sourceId != null) {
-					color = getRandomColorFromSourceId(sourceId);
+					color = getRandomColorFromSourceId(sourceId, finalAvailability);
 				    }
 				    Color ac = new Color(color.getRed(), color.getGreen(), color.getBlue());
 				    ig2.setColor(ac);
@@ -780,7 +946,7 @@ public class WMSGetMapHandler2 extends WMSGetMapHandler {
 		    MetadataElement.PLATFORM_TITLE, //
 		    platformTitle.get()));
 	}
-	
+
 	Optional<String> observedPropertyURI = parser.getOptionalValue("observedPropertyURI");
 	if (observedPropertyURI.isPresent() && !observedPropertyURI.get().equals(KeyValueParser.UNDEFINED)) {
 

@@ -276,11 +276,16 @@ public class IndexesMetadata extends DOMSerializer {
     }
 
     /**
-     * 
+     * @param removeBbox
      */
-    public void clear() {
+    public void clear(boolean removeBbox) {
 
 	properties.clear();
+
+	if (removeBbox) {
+
+	    this.bbox = null;
+	}
     }
 
     /**

@@ -38,6 +38,7 @@ import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
+import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
 
@@ -109,6 +110,11 @@ public class OpenSearchFolder implements DatabaseFolder {
 	    return null;
 	}
 
+	if (wrapper.getBinaryProperty().equals(DataFolderMapping.GS_RESOURCE)) {
+
+	    return ConversionUtils.toGSResource(source.get()).get().asDocument(true);
+	}
+
 	return ConversionUtils.toNode(ConversionUtils.toStream(source.get()));
     }
 
@@ -116,9 +122,17 @@ public class OpenSearchFolder implements DatabaseFolder {
     public InputStream getBinary(String key) throws Exception {
 
 	Optional<JSONObject> source = _getSource(key);
+
 	if (source.isEmpty()) {
 
 	    return null;
+	}
+
+	SourceWrapper wrapper = new SourceWrapper(source.get());
+
+	if (wrapper.getBinaryProperty().equals(DataFolderMapping.GS_RESOURCE)) {
+
+	    return ConversionUtils.toGSResource(source.get()).get().asStream();
 	}
 
 	return ConversionUtils.toStream(source.get());
@@ -154,7 +168,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 	Query searchQuery = OpenSearchQueryBuilder.buildSearchEntriesQuery(this);
 
 	return wrapper.searchField(//
-		IndexMapping.ALL_INDEXES,//
+		IndexMapping.ALL_INDEXES, //
 		searchQuery, //
 		IndexData.ENTRY_NAME).//
 		toArray(new String[] {});
@@ -169,7 +183,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 	Query searchQuery = OpenSearchQueryBuilder.buildSearchEntriesQuery(this);
 
 	return wrapper.searchField(//
-		IndexMapping.ALL_INDEXES,//
+		IndexMapping.ALL_INDEXES, //
 		searchQuery, //
 		IndexData.ENTRY_ID);//
 

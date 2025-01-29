@@ -155,8 +155,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 			query, //
 			message.getDistinctValuesElement().get(), message.getPage().getSize()).//
 			stream().//
-			map(s -> ConversionUtils.toStream(s)).//
-			map(binary -> GSResource.createOrNull(binary)).//
+			map(s -> ConversionUtils.toGSResource(s).orElse(null)).//
 			filter(Objects::nonNull).//
 			collect(Collectors.toList());
 
@@ -169,9 +168,9 @@ public class OpenSearchFinder implements DatabaseFinder {
 			message.getRequestId(), //
 			Optional.ofNullable(message.getWebRequest()));
 
-		resources = ConversionUtils.toBinaryList(response).//
+		resources = ConversionUtils.toJSONSourcesList(response).//
 			stream().//
-			map(binary -> GSResource.createOrNull(binary)).//
+			map(s -> ConversionUtils.toGSResource(s).orElse(null)).//
 			filter(Objects::nonNull).//
 			collect(Collectors.toList());
 
@@ -184,12 +183,12 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	    if (message.isOutputSources()) {
 
-		List<GSResource> collect = resources.//
+		List<GSResource> list = resources.//
 			stream().//
 			filter(StreamUtils.distinctBy(GSResource::getSource)).//
 			collect(Collectors.toList());
 
-		resultSet.setResultsList(collect);
+		resultSet.setResultsList(list);
 
 	    } else {
 
@@ -307,9 +306,9 @@ public class OpenSearchFinder implements DatabaseFinder {
 	}
 
 	ids.forEach(id -> {
-	    //	
+	    //
 	    // this is to avoid retrieval of resources belonging to a source that is
-	    // referenced in the query, but that is currently executing its first harvesting 
+	    // referenced in the query, but that is currently executing its first harvesting
 	    //
 	    if (out.get(id) == null) {
 
