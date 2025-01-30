@@ -177,9 +177,9 @@ public class OpenSearchReader implements DatabaseReader {
 		identifier);
 
 	try {
-	    return wrapper.searchBinaries(DataFolderMapping.get().getIndex(), query).//
+	    return wrapper.searchSources(DataFolderMapping.get().getIndex(), query).//
 		    stream().//
-		    map(binary -> GSResource.createOrNull(binary)).//
+		    map(s -> ConversionUtils.toGSResource(s).orElse(null)).//
 		    filter(Objects::nonNull).//
 		    collect(Collectors.toList());
 
