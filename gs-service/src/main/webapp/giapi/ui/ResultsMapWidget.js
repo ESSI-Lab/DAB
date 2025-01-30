@@ -443,24 +443,26 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 		var array = GIAPI.LayersFactory.layers(onlineArray, 'urn:ogc:serviceType:WebMapService:', options);
 		var wmsLayer = array[0];
 
-		//
-		// set the pointer cursor when over a tile
-		//
-		widget.map.on('pointermove', function(evt) {
+		if (options.availability === undefined || !options.availability) {
+			//
+			// set the pointer cursor when over a tile
+			//
+			widget.map.on('pointermove', function(evt) {
 
-			if (evt.dragging) {
-				return;
-			}
-			const data = wmsLayer.getData(evt.pixel);
-			const hit = data && data[3] > 0; // transparent pixels have zero for data[3]
-			//const hit = data && data[3] == 255; // transparent pixels have zero for data[3]
+				if (evt.dragging) {
+					return;
+				}
+				const data = wmsLayer.getData(evt.pixel);
+				const hit = data && data[3] > 0; // transparent pixels have zero for data[3]
+				//const hit = data && data[3] == 255; // transparent pixels have zero for data[3]
 
 
-			if (!wait) {
-				widget.map.getTargetElement().style.cursor = hit ? 'pointer' : '';
-			}
+				if (!wait) {
+					widget.map.getTargetElement().style.cursor = hit ? 'pointer' : '';
+				}
 
-		});
+			});
+		}
 
 		//
 		// creates an overlay to anchor the popup to the map
