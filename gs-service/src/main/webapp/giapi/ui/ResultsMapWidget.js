@@ -171,6 +171,7 @@ import { GIAPI } from '../core/GIAPI.js';
 
 GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 
+	var layerSwitcher;
 	var widget = {};
 	var selection;
 	var noResultsOverlay;
@@ -346,8 +347,8 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 			query += 'sources=' + value + '&';
 
 		}
-		
-		if (constraints.observedPropertyURI){
+
+		if (constraints.observedPropertyURI) {
 			var value = constraints.observedPropertyURI;
 			query += 'observedPropertyURI=' + value + '&';
 		}
@@ -406,6 +407,16 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 			});
 		}
 
+		var layerName = options.clusterWMSLayerName;
+		var layerTitle = options.clusterWMSLayerTitle;
+
+		if (options.availability !== undefined && options.availability) {
+			query += 'styles=availability&';
+			layerName += '.availability';
+			layerTitle += ' data availability';
+
+		}
+
 		var onlineArray = [];
 		var protocol = 'urn:ogc:serviceType:WebMapService:1.3.0:HTTP';
 
@@ -419,15 +430,17 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 		var online = {
 
 			'function': 'download',
-			'name': options.clusterWMSLayerName,
-			'title': options.clusterWMSLayerTitle,
+			'name': layerName,
+			'title': layerTitle,
 			'protocol': protocol,
 			'url': url
 		};
 
 		onlineArray.push(online);
 
-		var array = GIAPI.LayersFactory.layers(onlineArray, 'urn:ogc:serviceType:WebMapService:');
+
+
+		var array = GIAPI.LayersFactory.layers(onlineArray, 'urn:ogc:serviceType:WebMapService:', options);
 		var wmsLayer = array[0];
 
 		//
@@ -465,7 +478,7 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 
 			jQuery("#" + options.advancedConstraintDivId).css("display", "block");
 		});
-		
+
 
 		//
 		// updates the station info panel after a click
@@ -554,10 +567,18 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 	widget.updateWMSClusterLayers = function(constraints) {
 
 		var layerArray = createWMSCLusterLayer(options, constraints);
+		options.availability = true;
+		options.visible = false;
+		var layerArray2 = createWMSCLusterLayer(options, constraints);
 
 		olMap.removeLayers(layerArray);
-
 		olMap.addLayers(layerArray);
+
+		olMap.removeLayers(layerArray2);
+		olMap.addLayers(layerArray2);
+
+		layerSwitcher.renderPanel();
+
 	}
 
 	/**
@@ -752,7 +773,7 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 	var createLayersControl = function() {
 
 
-		var layerSwitcher = new ol.control.LayerSwitcher({
+		layerSwitcher = new ol.control.LayerSwitcher({
 			tipLabel: 'Show layers control', //
 			collapseTipLabel: 'Hide layers control',//
 			activationMode: 'click', //
@@ -771,9 +792,8 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 			servicePath: options.dabNode.servicePath()
 		});
 
-
-
 		widget.map.addControl(layerSwitcher);
+
 	};
 
 	var userSelectionControl = function() {

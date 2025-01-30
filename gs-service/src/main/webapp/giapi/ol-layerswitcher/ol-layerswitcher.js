@@ -86,7 +86,7 @@
 			this.groupSelectStyle = LayerSwitcher.getGroupSelectStyle(options.groupSelectStyle);
 			this.reverse = options.reverse !== false;
 			this.options = options;
-			
+
 			LayerSwitcher.clusterWMS = this.options.clusterWMS;
 			LayerSwitcher.dabEndpoint = this.options.dabEndpoint;
 			LayerSwitcher.servicePath = this.options.servicePath;
@@ -278,6 +278,22 @@
 				LayerSwitcher.renderPanel(map, panel, options);
 			});
 
+//			const checkbox = document.createElement("input"); // Create the checkbox
+//			checkbox.type = "checkbox";
+//			checkbox.id = "availabilityCheckbox"; // Optional: Set an ID
+//			checkbox.checked = false; // Optional: Set initial checked state
+//			function handleAvailabilityCheckboxClick(event) {
+//				console.log("Checkbox clicked! Checked:", event.target.checked);
+//			}
+//			checkbox.addEventListener("click", handleAvailabilityCheckboxClick);
+//
+//			const label = document.createElement("label"); // Create a label
+//			label.htmlFor = checkbox.id;
+//			label.textContent = "Show data availability"; // Set label text
+//
+//			panel.appendChild(checkbox); // Append the checkbox to the panel
+//			panel.appendChild(label); // Append the label to the panel
+
 			//
 			// appends the WMS cluster legend
 			//
@@ -296,8 +312,9 @@
 					LayerSwitcher.legendImage.src = url;
 				}
 
-				panel.appendChild(LayerSwitcher.legendImage);
+				panel.appendChild(LayerSwitcher.legendImage);				
 			}
+			
 
 			// Create the event.
 			const rendercomplete_event = new Event('rendercomplete');
