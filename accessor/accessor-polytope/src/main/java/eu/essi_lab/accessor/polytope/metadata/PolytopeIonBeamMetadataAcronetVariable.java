@@ -53,6 +53,7 @@ public enum PolytopeIonBeamMetadataAcronetVariable {
     GUSTING_WIND_DIRECTION(113,"gusting wind direction", "wind_gust_direction", "Degrees"),
     RAIN(115,"Rain", "rainfall","mm"),
     PRESSURE(107, "Air Pressure", "air_pressure_near_surface", "Pa"),
+    BATTERY(199, "Battery", "battery_level", "percent"),
     HUMIDITY(58, "2m rel. humidity","relative_humidity_near_surface", "percent");
     
     

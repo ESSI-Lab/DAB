@@ -265,9 +265,9 @@ public class WMSCapabilitiesHandler extends DefaultRequestHandler {
 	    
 	    BoundingBox wbbox3857 = new BoundingBox();
 	    wbbox3857.setCRS("EPSG:3857");
-	    
-	    SimpleEntry<Double, Double> lower = new SimpleEntry<>(35.984, 5.193);
-	    SimpleEntry<Double, Double> upper = new SimpleEntry<>(20.251, 47.793);
+
+	    SimpleEntry<Double, Double> lower = new SimpleEntry<>(south, west);
+	    SimpleEntry<Double, Double> upper = new SimpleEntry<>(east, north);
 	    SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> sourceCorners = new SimpleEntry<>(lower, upper);
 	    SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> bbox3857 = CRSUtils.translateBBOX(
 		    sourceCorners,
@@ -297,7 +297,18 @@ public class WMSCapabilitiesHandler extends DefaultRequestHandler {
 	    style.getLegendURLs().add(legend);
 	    layer.getStyles().add(style);
 	    rootLayer.getLayers().add(layer);
-
+	    
+	    
+	    Layer layer2 = new Layer();
+	    layer2.setName(view+".availability");
+	    layer2.setTitle(view+ " availability");
+	    layer2.setAbstract(view);
+	    layer2.setQueryable(true);
+	    layer2.setEXGeographicBoundingBox(bbox);
+	    	    layer2.getBoundingBoxes().add(wbbox4326);
+	    	 layer2.getBoundingBoxes().add(wbbox3857);
+	    
+	    	 rootLayer.getLayers().add(layer2);
 	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 	    JAXBWMS.getInstance().getMarshaller().marshal(capabilities, baos);

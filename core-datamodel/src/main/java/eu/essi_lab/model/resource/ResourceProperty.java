@@ -162,6 +162,11 @@ public enum ResourceProperty implements Queryable {
      * DOWNLOAD DATE
      */
     LAST_DOWNLOAD_DATE("lastDownloadDate", ContentType.ISO8601_DATE_TIME),
+    
+    /**
+     * FAILED DOWNLOAD DATE
+     */
+    LAST_FAILED_DOWNLOAD_DATE("lastFailedDownloadDate", ContentType.ISO8601_DATE_TIME),
 
     /**
      * EXECUTION TEST

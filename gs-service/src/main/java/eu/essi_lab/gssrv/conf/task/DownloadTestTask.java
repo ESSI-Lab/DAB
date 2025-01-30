@@ -82,100 +82,94 @@ import eu.essi_lab.request.executor.IDiscoveryExecutor;
  */
 public class DownloadTestTask extends AbstractCustomTask {
 
-	@Override
-	public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
+    @Override
+    public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
 
-		log(status, "Data download test task STARTED");
+	log(status, "Data download test task STARTED");
 
-		// SETTINGS RETRIEVAL
-		CustomTaskSetting taskSettings = retrieveSetting(context);
+	// SETTINGS RETRIEVAL
+	CustomTaskSetting taskSettings = retrieveSetting(context);
 
-		Optional<String> taskOptions = taskSettings.getTaskOptions();
+	Optional<String> taskOptions = taskSettings.getTaskOptions();
 
-		String viewId = null;
-		if (taskOptions.isPresent()) {
-			String options = taskOptions.get();
-			if (options != null) {
-				viewId = options;
-			}
-		}
-
-		if (viewId == null) {
-
-			GSLoggerFactory.getLogger(getClass()).info("No view specified by download test task");
-
-			status.setPhase(JobPhase.CANCELED);
-			return;
-		}
-		
-		ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-		IDiscoveryExecutor executor = loader.iterator().next();
-
-		DiscoveryMessage discoveryMessage = new DiscoveryMessage();
-
-		discoveryMessage.setRequestId(UUID.randomUUID().toString());
-
-		discoveryMessage.getResourceSelector().setIndexesPolicy(IndexesPolicy.NONE);
-		discoveryMessage.getResourceSelector().setSubset(ResourceSubset.FULL);
-		discoveryMessage.setPage(new Page(1, 1000));
-		discoveryMessage.setIteratedWorkflow(IterationMode.FULL_RESPONSE);
-		discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
-		StorageInfo uri = ConfigurationWrapper.getDatabaseURI();
-		discoveryMessage.setDataBaseURI(uri);
-
-		Optional<View> view = WebRequestTransformer.findView(ConfigurationWrapper.getDatabaseURI(), viewId);
-		WebRequestTransformer.setView(view.get().getId(), ConfigurationWrapper.getDatabaseURI(), discoveryMessage);
-		discoveryMessage.setUserBond(BondFactory.createResourcePropertyBond(BondOperator.EQUAL, ResourceProperty.IS_DOWNLOADABLE, "true"));
-		discoveryMessage.setDistinctValuesElement(ResourceProperty.SOURCE_ID);
-		ResultSet<GSResource> resultSet = executor.retrieve(discoveryMessage);
-		List<GSResource> resources = resultSet.getResultsList();
-		
-		AccessAugmenter augmenter = new AccessAugmenter();
-		
-		DatabaseWriter writer = DatabaseProviderFactory.getWriter(ConfigurationWrapper.getDatabaseURI());
-		
-		for (int i = 0; i < resources.size(); i++) {
-			
-
-			
-		    GSResource resource = resources.get(i);
-		    
-		    
-		    Optional<GSResource> augmented = augmenter.augment(resource);
-		    
-		    if (augmented.isEmpty()) {
-		    	GSLoggerFactory.getLogger(getClass()).error("Was not able to augment");
-		    }else {
-		    	GSResource a = augmented.get();
-		    	Optional<String> lastDownload = a.getPropertyHandler().getLastDownloadDate();
-		    	if (lastDownload.isEmpty()) {
-		    		GSLoggerFactory.getLogger(getClass()).error("Was not able to download");
-		    	}else {
-		    		writer.update(augmented.get());
-					GSLoggerFactory.getLogger(getClass()).info("Augmented resource from source {}",a.getSource().getUniqueIdentifier());
-
-		    	}
-		    }
-		    
-
-			// CHECKING CANCELED JOB
-
-			if (ConfigurationWrapper.isJobCanceled(context)) {
-				GSLoggerFactory.getLogger(getClass()).info("Data download test task CANCELED view id {} ", viewId);
-
-				status.setPhase(JobPhase.CANCELED);
-				return;
-			}
-
-		
-		}
-
-		log(status, "Data download test task ENDED");
+	String viewId = null;
+	if (taskOptions.isPresent()) {
+	    String options = taskOptions.get();
+	    if (options != null) {
+		viewId = options;
+	    }
 	}
 
-	@Override
-	public String getName() {
+	if (viewId == null) {
 
-		return "Data download test task";
+	    GSLoggerFactory.getLogger(getClass()).info("No view specified by download test task");
+
+	    status.setPhase(JobPhase.CANCELED);
+	    return;
 	}
+
+	ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
+	IDiscoveryExecutor executor = loader.iterator().next();
+
+	DiscoveryMessage discoveryMessage = new DiscoveryMessage();
+
+	discoveryMessage.setRequestId(UUID.randomUUID().toString());
+
+	discoveryMessage.setPage(new Page(1, 1000));
+	discoveryMessage.setIteratedWorkflow(IterationMode.FULL_RESPONSE);
+	discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
+	StorageInfo uri = ConfigurationWrapper.getDatabaseURI();
+	discoveryMessage.setDataBaseURI(uri);
+
+	Optional<View> view = WebRequestTransformer.findView(ConfigurationWrapper.getDatabaseURI(), viewId);
+	WebRequestTransformer.setView(view.get().getId(), ConfigurationWrapper.getDatabaseURI(), discoveryMessage);
+	discoveryMessage.setUserBond(BondFactory.createResourcePropertyBond(BondOperator.EQUAL, ResourceProperty.IS_DOWNLOADABLE, "true"));
+	discoveryMessage.setDistinctValuesElement(ResourceProperty.SOURCE_ID);
+	ResultSet<GSResource> resultSet = executor.retrieve(discoveryMessage);
+	List<GSResource> resources = resultSet.getResultsList();
+
+	AccessAugmenter augmenter = new AccessAugmenter();
+
+	DatabaseWriter writer = DatabaseProviderFactory.getWriter(ConfigurationWrapper.getDatabaseURI());
+
+	for (int i = 0; i < resources.size(); i++) {
+
+	    GSResource resource = resources.get(i);
+
+	    Optional<GSResource> augmented = augmenter.augment(resource);
+
+	    if (augmented.isEmpty()) {
+		GSLoggerFactory.getLogger(getClass()).error("Was not able to augment");
+	    } else {
+		GSResource a = augmented.get();
+		Optional<String> lastDownload = a.getPropertyHandler().getLastDownloadDate();
+		if (lastDownload.isEmpty()) {
+		    GSLoggerFactory.getLogger(getClass()).error("Was not able to download");
+		} else {
+		    GSLoggerFactory.getLogger(getClass()).info("Was able to download resource from source {}",
+			    a.getSource().getUniqueIdentifier());
+
+		}
+		writer.update(augmented.get());
+	    }
+
+	    // CHECKING CANCELED JOB
+
+	    if (ConfigurationWrapper.isJobCanceled(context)) {
+		GSLoggerFactory.getLogger(getClass()).info("Data download test task CANCELED view id {} ", viewId);
+
+		status.setPhase(JobPhase.CANCELED);
+		return;
+	    }
+
+	}
+
+	log(status, "Data download test task ENDED");
+    }
+
+    @Override
+    public String getName() {
+
+	return "Data download test task";
+    }
 }

@@ -26,6 +26,10 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.net.http.HttpResponse;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -102,73 +106,33 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
     public List<DataDescriptor> getRemoteDescriptors() throws GSException {
 	List<DataDescriptor> ret = new ArrayList<>();
 	DataDescriptor descriptor = new DataDescriptor();
+	descriptor.setDataType(DataType.TIME_SERIES);
+	descriptor.setDataFormat(DataFormat.WATERML_1_1());
+	descriptor.setCRS(CRS.EPSG_4326());
+	GeographicBoundingBox bbox = resource.getHarmonizedMetadata().getCoreMetadata().getBoundingBox();
 
-	try {
-	    if (resource.getHarmonizedMetadata().getExtendedMetadata().getReader().evaluateString("//*:fullDescriptor/*:dataType")
-		    .toLowerCase().contains("trajectory")) {
-		descriptor.setDataType(DataType.TRAJECTORY);
-		descriptor.setDataFormat(DataFormat.NETCDF());
-		descriptor.setCRS(CRS.EPSG_4326());
-		Iterator<BoundingPolygon> iterator = resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification()
-			.getBoundingPolygons();
-		Double south = null;
-		Double north = null;
-		Double east = null;
-		Double west = null;
-		Double top = null;
-		Double bottom = null;
-		if (iterator != null) {
-		    while (iterator.hasNext()) {
-			BoundingPolygon polygon = iterator.next();
-			List<List<Double>> multiPoints = polygon.getMultiPoints();
-			for (List<Double> m : multiPoints) {
-			    Double lat = m.get(0);
-			    Double lon = m.get(1);
-			    if (south == null || lat < south) {
-				south = lat;
-			    }
-			    if (north == null || lat > north) {
-				north = lat;
-			    }
-			    if (west == null || lon < west) {
-				west = lon;
-			    }
-			    if (east == null || lon > east) {
-				east = lon;
-			    }
-			    if (m.size() > 2) {
-				Double alt = m.get(2);
-				if (bottom == null || alt < bottom) {
-				    bottom = alt;
-				}
-				if (top == null || alt > top) {
-				    top = alt;
-				}
-			    }
-			}
-		    }
-		}
+	if (bbox != null) {
+	    Double lat = bbox.getNorth();
+	    Double lon = bbox.getEast();
 
-		descriptor.setEPSG4326SpatialDimensions(north, east, south, west);
-		descriptor.getFirstSpatialDimension().getContinueDimension().setLowerTolerance(0.01);
-		descriptor.getFirstSpatialDimension().getContinueDimension().setUpperTolerance(0.01);
-		descriptor.getSecondSpatialDimension().getContinueDimension().setLowerTolerance(0.01);
-		descriptor.getSecondSpatialDimension().getContinueDimension().setUpperTolerance(0.01);
+	    descriptor.setEPSG4326SpatialDimensions(lat, lon);
+	    descriptor.getFirstSpatialDimension().getContinueDimension().setSize(1l);
+	    descriptor.getSecondSpatialDimension().getContinueDimension().setSize(1l);
+	    descriptor.getFirstSpatialDimension().getContinueDimension().setLowerTolerance(0.01);
+	    descriptor.getFirstSpatialDimension().getContinueDimension().setUpperTolerance(0.01);
+	    descriptor.getSecondSpatialDimension().getContinueDimension().setLowerTolerance(0.01);
+	    descriptor.getSecondSpatialDimension().getContinueDimension().setUpperTolerance(0.01);
+	}
 
-		if (bottom != null && top != null) {
-		    descriptor.setVerticalDimension(bottom, top);
-		}
-
-	    } else {
-		descriptor.setDataType(DataType.TIME_SERIES);
-		descriptor.setDataFormat(DataFormat.WATERML_1_1());
-		descriptor.setCRS(CRS.EPSG_4326());
-		GeographicBoundingBox bbox = resource.getHarmonizedMetadata().getCoreMetadata().getBoundingBox();
-
-		if (bbox != null) {
-		    Double lat = bbox.getNorth();
-		    Double lon = bbox.getEast();
-
+	Iterator<BoundingPolygon> iterator = resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification()
+		.getBoundingPolygons();
+	if (iterator != null) {
+	    while (iterator.hasNext()) {
+		BoundingPolygon polygon = iterator.next();
+		List<List<Double>> multiPoints = polygon.getMultiPoints();
+		for (List<Double> m : multiPoints) {
+		    Double lat = m.get(0);
+		    Double lon = m.get(1);
 		    descriptor.setEPSG4326SpatialDimensions(lat, lon);
 		    descriptor.getFirstSpatialDimension().getContinueDimension().setSize(1l);
 		    descriptor.getSecondSpatialDimension().getContinueDimension().setSize(1l);
@@ -177,30 +141,7 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 		    descriptor.getSecondSpatialDimension().getContinueDimension().setLowerTolerance(0.01);
 		    descriptor.getSecondSpatialDimension().getContinueDimension().setUpperTolerance(0.01);
 		}
-
-		Iterator<BoundingPolygon> iterator = resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification()
-			.getBoundingPolygons();
-		if (iterator != null) {
-		    while (iterator.hasNext()) {
-			BoundingPolygon polygon = iterator.next();
-			List<List<Double>> multiPoints = polygon.getMultiPoints();
-			for (List<Double> m : multiPoints) {
-			    Double lat = m.get(0);
-			    Double lon = m.get(1);
-			    descriptor.setEPSG4326SpatialDimensions(lat, lon);
-			    descriptor.getFirstSpatialDimension().getContinueDimension().setSize(1l);
-			    descriptor.getSecondSpatialDimension().getContinueDimension().setSize(1l);
-			    descriptor.getFirstSpatialDimension().getContinueDimension().setLowerTolerance(0.01);
-			    descriptor.getFirstSpatialDimension().getContinueDimension().setUpperTolerance(0.01);
-			    descriptor.getSecondSpatialDimension().getContinueDimension().setLowerTolerance(0.01);
-			    descriptor.getSecondSpatialDimension().getContinueDimension().setUpperTolerance(0.01);
-			}
-		    }
-		}
 	    }
-	} catch (XPathExpressionException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
 	}
 
 	//
@@ -278,113 +219,121 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 	    String identifier = online.getName();
 	    String[] splittedId = identifier.split(":");
 	    String varId = (splittedId.length > 2) ? splittedId[splittedId.length - 1] : splittedId[1];
-	    PolytopeIonBeamMetadataMeteoTrackerVariable var = PolytopeIonBeamMetadataMeteoTrackerVariable.decode(varId);
-	    String units = var.getUnit();
+	    String platformName = splittedId[0];
+	    String units = "";
+	    String toMatch = "";
+	    if(platformName.toLowerCase().contains("acronet")) {
+		 PolytopeIonBeamMetadataAcronetVariable acronetVar = PolytopeIonBeamMetadataAcronetVariable.decode(varId);
+		 units = acronetVar.getUnit();
+		 toMatch = acronetVar.getKey();
+	    }else if(platformName.toLowerCase().contains("smart")) {
+		PolytopeIonBeamMetadataSmartKitVariable smartVar = PolytopeIonBeamMetadataSmartKitVariable.decode(varId);
+		units = smartVar.getUnit();
+		toMatch = smartVar.getKey();
+	    }
+	   
 	    List<JSONObject> ret = new ArrayList<>();
 	    File tempFile;
-	    ret = getData(online.getLinkage());
 
-	    /**
-	     * METEOTRACKER USE CASE
-	     */
+	    List<Date[]> dates = new ArrayList<Date[]>();
+	    if (optStart.isPresent() && optEnd.isPresent()) {
+		dates = checkDates(optStart.get(), optEnd.get());
+	    }
 
-	    if (resource.getHarmonizedMetadata().getExtendedMetadata().getReader().evaluateString("//*:fullDescriptor/*:dataType")
-		    .toLowerCase().contains("trajectory")) {
+	    TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
+	    DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
 
-		tempFile = File.createTempFile(getClass().getSimpleName(), ".nc");
-		tempFile.deleteOnExit();
-		H13SingleTrajectoryWriter writer = new H13SingleTrajectoryWriter(tempFile.getAbsolutePath());
+	    boolean isTemperature = false;
 
-		SimpleTrajectory trajectory = new SimpleTrajectory();
-		trajectory.setIdentifier(online.getIdentifier());
-		trajectory.setName(online.getName());
-		trajectory.setDescription(online.getDescription());
+	    if (units.contains("°C") || units.contains("ºC") || units.contains("K")) {
+		units = units.replace("°C", "K").replace("ºC", "K");
+		isTemperature = true;
+	    }
 
-		List<Double> lats = new ArrayList<>();
-		List<Double> lons = new ArrayList<>();
-		List<Double> alts = new ArrayList<>();
-		List<Long> times = new ArrayList<>();
-		List<Integer> temperatures = new ArrayList<>();
+	    for (Date[] d : dates) {
 
-		for (JSONObject obj : ret) {
+		startString = convertISODateToIonBeamDate(ISO8601DateTimeUtils.getISO8601DateTime(d[0]));
+		endString = convertISODateToIonBeamDate(ISO8601DateTimeUtils.getISO8601DateTime(d[1]));
+		ret = getData(online.getLinkage(), startString, endString);
 
-		    // CASTING
+		int count = 0;
+		if (ret != null && !ret.isEmpty()) {
 
-		    String date = obj.optString("date");
-		    String time = obj.optString("time");
-		    String minutes = obj.optString("minutes");
+		    for (JSONObject obj : ret) {
 
-		    Date parsed = convertToDate(date, time, minutes);
+			// JSONArray data = ret.optJSONArray("values");
+			// JSONArray timeLine = ret.optJSONArray("timeline");
+			// System.out.println(data.length());
+			// System.out.println(timeLine.length());
+			// for (int j = 0; j < data.length(); j++) {
 
-		    Double lat = obj.optDouble("lat");
-		    Double lon = obj.optDouble("lon");
-		    Double altitude = obj.optDouble("altitude");
-		    BigDecimal value = obj.optBigDecimal("observed_value", null);
+			String chunkDate = obj.optString("chunk_date");
+			String chunkTime = obj.optString("chunk_time");
+			// Combine date and time into a single string
+			String combined = chunkDate + chunkTime; // "202501211700"
 
-		    // String time = obj.optString("time");
-		    // Date initialDateTime = ISO8601DateTimeUtils.parseISO8601(time);
-		    // // BigDecimal timeOffset = new BigDecimal(timeOffsetString);
-		    // Date observationDateTime = initialDateTime;//
-		    // PolytopeMeteoTrackerMapper.updateDateTime(initialDateTime,
-		    // // timeOffset);
+			BigDecimal value = obj.optBigDecimal(toMatch, null);// data.optBigDecimal(1, null);//
+			// obj.optBigDecimal(varId.toLowerCase(),
+			// null);// data.optString("value");
+			ValueSingleVariable variable = new ValueSingleVariable();
 
-		    if (value != null) {
+			if (value != null && value.doubleValue() != -9998.0) {
 
-			value = value.setScale(2, BigDecimal.ROUND_FLOOR);
-			int valueInteger = value.multiply(new BigDecimal(100)).intValue();
+			    //
+			    // value
+			    //
 
-			if (parsed != null && optStart.isPresent() && optEnd.isPresent()) {
-			    if (!isValid(optStart.get(), optEnd.get(), parsed)) {
-				continue;
+			    // BigDecimal dataValue = new BigDecimal(value);
+			    if (isTemperature && value.compareTo(new BigDecimal("100")) < 0) {
+				// from Celsius to Kelvin
+				BigDecimal kelvin = new BigDecimal("273.15");
+				value = value.add(kelvin);
 			    }
+			    value = value.setScale(2, BigDecimal.ROUND_FLOOR);
+			    // int valueInteger = value.multiply(new BigDecimal(100)).intValue();
 
-			    lats.add(lat.doubleValue());
-			    lons.add(lon.doubleValue());
-			    alts.add(null);
-			    times.add(parsed.getTime());
-			    temperatures.add(valueInteger);
+			    variable.setValue(value);
 
+			    if (combined != null) {
+
+				Optional<Date> parsed = transformDate(combined);
+
+				// Date parsed =
+				// Date.from(dateTime.atZone(ZoneId.of(TimeZone.getTimeZone("GMT").getID())).toInstant());
+
+				if (parsed != null && parsed.isPresent()) {
+
+				    // Date parsed = iso8601OutputFormat.parse(date);
+
+				    GregorianCalendar gregCal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+				    gregCal.setTime(parsed.get());
+
+				    XMLGregorianCalendar xmlGregCal = xmlFactory.newXMLGregorianCalendar(gregCal);
+				    variable.setDateTimeUTC(xmlGregCal);
+
+				    //
+				    //
+				    //
+
+				    addValue(tsrt, variable);
+				    count++;
+				}
+			    }
 			}
 		    }
+
 		}
-
-		NetCDFVariable<Long> timeVariable = new NetCDFVariable<>("time", times, "milliseconds since 1970-01-01 00:00:00",
-			ucar.ma2.DataType.LONG);
-		NetCDFVariable<Double> latVariable = new NetCDFVariable<>("lat", lats, "degrees_north", ucar.ma2.DataType.DOUBLE);
-		NetCDFVariable<Double> lonVariable = new NetCDFVariable<>("lon", lons, "degrees_east", ucar.ma2.DataType.DOUBLE);
-		NetCDFVariable<Double> altVariable = new NetCDFVariable<>("z", alts, "m", ucar.ma2.DataType.DOUBLE);
-		NetCDFVariable<Integer> temperatureVariable = new NetCDFVariable<>(var.getLabel(), temperatures, units,
-			ucar.ma2.DataType.INT);
-		temperatureVariable.addAttribute("long_name", var.getLabel());
-		temperatureVariable.addAttribute("scale_factor", .01);
-		NetCDFVariable[] variables = new NetCDFVariable[] { temperatureVariable };
-		writer.write(trajectory, timeVariable, latVariable, lonVariable, altVariable, variables);
-
-		FeatureDataset dataset = FeatureDatasetFactoryManager.open(FeatureType.TRAJECTORY, tempFile.getAbsolutePath(), null, null);
-		List<ucar.nc2.Attribute> attributes = dataset.getDataVariables().get(0).getAttributes();
-		for (ucar.nc2.Attribute a : attributes) {
-		    GSLoggerFactory.getLogger(getClass()).info("Attribute: " + a.getShortName() + " " + a.toString());
-		}
-		dataset.close();
-
-	    } else {
-		/**
-		 * no trajectory use-case
-		 */
-
-		if (ret != null) {
-
-		    TimeSeriesResponseType tsrt = addValues(startString, endString, ret);
-
-		    JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);
-		    File tmpFile = File.createTempFile(getClass().getSimpleName(), ".wml");
-
-		    tmpFile.deleteOnExit();
-		    JAXBWML.getInstance().marshal(response, tmpFile);
-
-		    return tmpFile;
-		}
+		if (count > 0)
+		    break;
 	    }
+
+	    JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);
+	    tempFile = File.createTempFile(getClass().getSimpleName(), ".wml");
+
+	    tempFile.deleteOnExit();
+	    JAXBWML.getInstance().marshal(response, tempFile);
+
+	    return tempFile;
 
 	} catch (Exception e) {
 
@@ -401,12 +350,70 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 
     }
 
-    private Date convertToDate(String date, String time, String minutes) {
-	// TODO Auto-generated method stub
-	return null;
+    private Optional<Date> transformDate(String date) throws ParseException {
+
+	try {
+	    // Define a SimpleDateFormat with the combined pattern
+	    SimpleDateFormat inputFormat = new SimpleDateFormat("yyyyMMddHHmm");
+
+	    // Parse the combined string into a Date object
+	    Date d = inputFormat.parse(date);
+	    inputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+	    return Optional.of(d);
+
+	} catch (RuntimeException e) {
+	    GSLoggerFactory.getLogger(ISO8601DateTimeUtils.class).warn("Unparsable Date: {}", date, e);
+	}
+	return Optional.empty();
     }
 
-    private List<JSONObject> getData(String linkage) throws Exception {
+    private String convertISODateToIonBeamDate(String date) {
+	String[] splitted = date.split("T");
+	String acronetDate = splitted[0].replace("-", "");
+	return acronetDate;
+    }
+
+    private List<Date[]> checkDates(Date startDate, Date endDate) {
+	List<Date[]> dateRanges = new ArrayList<>();
+
+	// Calculate the difference in days between the two dates
+	long diffInMillies = Math.abs(endDate.getTime() - startDate.getTime());
+	long diffInDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+
+	// If the difference is 10 days or less, return the original range
+	if (diffInDays <= 10) {
+	    dateRanges.add(new Date[] { startDate, endDate });
+	    return dateRanges;
+	} else if (diffInDays > 30) {
+	    // take last 30 days
+	    startDate = new Date(endDate.getTime() - TimeUnit.MILLISECONDS.convert(30, TimeUnit.DAYS));
+	    diffInDays = 30;
+	}
+
+	// Otherwise, split the dates into ranges of at most 10 days
+	Date currentStartDate = startDate;
+	boolean maxRequestsReached = false;
+	int count = 0;
+	while (diffInDays > 10 && !maxRequestsReached) {
+	    Date currentEndDate = new Date(currentStartDate.getTime() + TimeUnit.MILLISECONDS.convert(10, TimeUnit.DAYS));
+	    dateRanges.add(new Date[] { currentStartDate, currentEndDate });
+
+	    currentStartDate = new Date(currentEndDate.getTime() + TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS));
+	    diffInDays -= 10;
+	    count++;
+	    if (count > 2) {
+		maxRequestsReached = true;
+		endDate = new Date(currentStartDate.getTime() + TimeUnit.MILLISECONDS.convert(10, TimeUnit.DAYS));
+	    }
+	}
+
+	// Add the final range
+	dateRanges.add(new Date[] { currentStartDate, endDate });
+
+	return dateRanges;
+    }
+
+    private List<JSONObject> getData(String linkage, String startTime, String endTime) throws Exception {
 
 	ArrayList<JSONObject> out = Lists.newArrayList();
 
@@ -414,18 +421,22 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 	    PolytopeIonBeamMetadataConnector.BEARER_TOKEN = PolytopeIonBeamMetadataConnector.getBearerToken();
 	}
 
-	GSLoggerFactory.getLogger(getClass()).info("Getting " + linkage);
+	// Create the new date parameter
+	String updatedDate = "date=" + startTime + "/to/" + endTime + "/by/1";
+	String updatedUrl = linkage.replaceFirst("date=[^&]+", updatedDate);
+
+	GSLoggerFactory.getLogger(getClass()).info("Getting " + updatedUrl);
 
 	Downloader downloader = new Downloader();
 	downloader.setRetryPolicy(20, TimeUnit.SECONDS, 2);
 
 	HttpResponse<InputStream> stationResponse = downloader.downloadResponse(//
-		linkage.trim(), //
+		updatedUrl.trim(), //
 		HttpHeaderUtils.build("Authorization", "Bearer " + PolytopeIonBeamMetadataConnector.BEARER_TOKEN));
 
 	InputStream stream = stationResponse.body();
 
-	GSLoggerFactory.getLogger(getClass()).info("Got " + linkage);
+	GSLoggerFactory.getLogger(getClass()).info("Got " + updatedUrl);
 
 	if (stream != null) {
 
@@ -448,88 +459,6 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 	}
 
 	return out;
-    }
-
-    private TimeSeriesResponseType addValues(String startString, String endString, List<JSONObject> jsonObj) {
-
-	TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
-
-	// try {
-	// // delimiter seems to be ; by default
-	// Reader in = new StringReader(csv);
-	// String d = ";";
-	// char delimiter = d.charAt(0);
-	// Iterable<CSVRecord> records = CSVFormat.RFC4180.withDelimiter(delimiter).withFirstRecordAsHeader().parse(in);
-	// tsrt = getValues(startString, endString, records);
-	//
-	// } catch (Exception e) {
-	// // TODO: handle exception
-	// GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
-	// Reader reader = new StringReader(csv);
-	// Iterable<CSVRecord> records = null;
-	// try {
-	// records = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(reader);
-	// } catch (IOException e1) {
-	// // TODO Auto-generated catch block
-	// e1.printStackTrace();
-	// }
-	//
-	// tsrt = getValues(startString, endString, records);
-	//
-	// }
-
-	return tsrt;
-    }
-
-    private TimeSeriesResponseType getValues(String startString, String endString, Iterable<CSVRecord> records) {
-
-	TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
-
-	Optional<Date> optStart = ISO8601DateTimeUtils.parseISO8601ToDate(startString);
-	Optional<Date> optEnd = ISO8601DateTimeUtils.parseISO8601ToDate(endString);
-	for (CSVRecord record : records) {
-	    String date = record.get("andate@desc");
-	    String time = record.get("antime@desc");
-	    String varValue = record.get("obsvalue@body");
-	    Date valueDate = PolytopeIonBeamMetadataMapper.setTime(date, time);
-	    if (valueDate != null && optStart.isPresent() && optEnd.isPresent()) {
-		if (!isValid(optStart.get(), optEnd.get(), valueDate))
-		    continue;
-
-		ValueSingleVariable variable = new ValueSingleVariable();
-
-		if (varValue != null && !varValue.isEmpty()) {
-		    //
-		    // value
-		    //
-
-		    BigDecimal dataValue = new BigDecimal(varValue);
-		    dataValue = dataValue.setScale(2, BigDecimal.ROUND_DOWN);
-		    variable.setValue(dataValue);
-
-		    //
-		    // date
-		    //
-
-		    GregorianCalendar gregCal = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
-		    gregCal.setTime(valueDate);
-
-		    XMLGregorianCalendar xmlGregCal = null;
-		    try {
-			xmlGregCal = DatatypeFactory.newInstance().newXMLGregorianCalendar(gregCal);
-		    } catch (DatatypeConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		    }
-		    variable.setDateTimeUTC(xmlGregCal);
-
-		    addValue(tsrt, variable);
-		}
-
-	    }
-	}
-
-	return tsrt;
     }
 
     private boolean isValid(Date startDate, Date endDate, Date date) {
@@ -555,6 +484,25 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 	}
 
 	return false;
+    }
+
+    public static void main(String[] args) {
+	String linkage = "http://ionbeam-ichange.ecmwf-ichange.f.ewcloud.host/api/v1/retrieve?class=rd&date=20250117/to/20250122/by/1&expver=xxxx&stream=lwda&aggregation_type=by_time&platform=acronet&station_id=7ce702412e21a86e";
+	System.out.println("Linkage URL: " + linkage);
+	// Define new dates in ISO format
+	LocalDate startDate = LocalDate.parse("2025-02-01"); // Replace with your desired date
+	LocalDate endDate = LocalDate.parse("2025-02-05"); // Replace with your desired date
+
+	// Format dates back to yyyyMMdd
+	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+	String formattedStartDate = startDate.format(formatter);
+	String formattedEndDate = endDate.format(formatter);
+
+	// Create the new date parameter
+	String updatedDate = "date=" + formattedStartDate + "/to/" + formattedEndDate + "/by/1";
+
+	String updatedUrl = linkage.replaceFirst("date=[^&]+", updatedDate);
+	System.out.println("Updated URL: " + updatedUrl);
     }
 
 }
