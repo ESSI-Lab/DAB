@@ -568,6 +568,8 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 	 */
 	widget.updateWMSClusterLayers = function(constraints) {
 
+		options.availability = false;
+		options.visible = true;
 		var layerArray = createWMSCLusterLayer(options, constraints);
 		options.availability = true;
 		options.visible = false;
