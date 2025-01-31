@@ -43,6 +43,7 @@ import org.opensearch.client.opensearch._types.query_dsl.GeoShapeQuery;
 import org.opensearch.client.opensearch._types.query_dsl.MatchAllQuery;
 import org.opensearch.client.opensearch._types.query_dsl.MatchNoneQuery;
 import org.opensearch.client.opensearch._types.query_dsl.MatchPhraseQuery;
+import org.opensearch.client.opensearch._types.query_dsl.MatchQuery;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch._types.query_dsl.RangeQuery;
 import org.opensearch.client.opensearch._types.query_dsl.RangeQuery.Builder;
@@ -275,7 +276,24 @@ public class OpenSearchQueryBuilder {
 
 	case LIKE:
 
-	    return buildWildCardQuery(el.getName(), value, ranking.computePropertyWeight(el));
+	    value = normalize(value);
+
+	    List<String> terms = Arrays.asList(value.split(" "));
+
+	    if (terms.size() == 1 || !isWildcardQuery(value)) {
+
+		if (isWildcardQuery(value)) {
+
+		    return buildWildCardQuery(el.getName(), value, ranking.computePropertyWeight(el));
+		}
+
+		return buildMatchPhraseQuery(el.getName(), value, ranking.computePropertyWeight(el));
+	    }
+
+	    return buildWildCardQuery(//
+		    DataFolderMapping.toKeywordField(el.getName()), //
+		    "*" + value + "*", //
+		    ranking.computePropertyWeight(el));
 	}
 
 	throw new IllegalArgumentException("Operator " + operator + " not supported for field " + el.getName());
@@ -743,7 +761,7 @@ public class OpenSearchQueryBuilder {
 	return distValues.stream()
 
 		.map(value -> buildMatchPhraseQuery(//
-			DataFolderMapping.toAggField(target.getName()), value))//
+			DataFolderMapping.toKeywordField(target.getName()), value))//
 
 		.map(query ->
 
@@ -760,6 +778,34 @@ public class OpenSearchQueryBuilder {
 			build()
 
 		).collect(Collectors.toList());
+    }
+
+    /**
+     * @param value
+     * @return
+     */
+    private boolean isWildcardQuery(String value) {
+    
+        return value.contains("*") || value.contains("?");
+    }
+
+    /**
+     * @param term
+     * @return
+     */
+    private String normalize(String term) {
+    
+        if (term.startsWith("*")) {
+    
+            term = term.substring(1, term.length());
+        }
+    
+        if (term.endsWith("*")) {
+    
+            term = term.substring(0, term.length() - 1);
+        }
+    
+        return term;
     }
 
     /**
@@ -1045,6 +1091,30 @@ public class OpenSearchQueryBuilder {
     }
 
     /**
+     * @see https://opensearch.org/docs/latest/query-dsl/term-vs-full-text/
+     * @param field
+     * @param value
+     * @return
+     */
+    private static Query buildMatchQuery(String field, String value, float boost) {
+
+	org.opensearch.client.opensearch._types.query_dsl.MatchQuery.Builder builder = new MatchQuery.Builder().//
+		field(field).//
+		query(new FieldValue.Builder().stringValue(value).build()).//
+		build().//
+		toBuilder();
+
+	if (boost > 1) {
+
+	    builder = builder.boost(boost);
+	}
+
+	return builder.//
+		build().//
+		toQuery();
+    }
+
+    /**
      * @param field
      * @param value
      * @return
@@ -1088,6 +1158,7 @@ public class OpenSearchQueryBuilder {
 
 	org.opensearch.client.opensearch._types.query_dsl.WildcardQuery.Builder builder = new WildcardQuery.Builder().//
 		field(field).//
+		caseInsensitive(true).//
 		value(value).//
 		build().//
 		toBuilder();
