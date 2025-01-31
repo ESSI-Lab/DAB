@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -12,7 +14,7 @@
 	<name>ESSI-Lab Accessors</name>
 	<description>ESSI-Lab Accessor</description>
 	<packaging>pom</packaging>
-	
+
 	<modules>
 		<module>accessor-bnhs</module>
 		<module>accessor-cdi</module>
@@ -39,7 +41,7 @@
 		<module>accessor-hydroshare</module>
 		<module>accessor-obis</module>
 		<module>accessor-socat</module>
-		<module>accessor-south-africa</module>		
+		<module>accessor-south-africa</module>
 		<module>accessor-egaskro</module>
 		<module>accessor-digital-globe</module>
 		<module>accessor-nasa-gsfc</module>
@@ -70,26 +72,26 @@
 		<module>accessor-inpe</module>
 		<module>accessor-china-geoss</module>
 		<module>accessor-imo-hydro</module>
-	    <module>accessor-hydro-nve</module>
-	    <module>accessor-hydro-paraguay</module>
-    	<module>accessor-thunder</module>
-    	<module>accessor-wod</module>
-    	<module>accessor-thredds</module>
-    	<module>accessor-aviso</module>
-    	<module>accessor-ecv-inventory</module>
-    	<module>accessor-elixir-ena</module>
-    	<module>accessor-nextgeoss</module>
-    	<module>accessor-argo</module>
-    	<module>accessor-wekeo</module>
-    	<module>accessor-icos</module>
-    	<module>accessor-prisma</module>
-    	<module>accessor-invenio</module>
-    	<module>accessor-his-central</module>
-    	<module>accessor-saeon</module>
-    	<module>accessor-stac</module>
-    	<module>accessor-nmdis-erddap</module>
-    	<module>accessor-wis</module>
-    	<module>accessor-niwa</module>
+		<module>accessor-hydro-nve</module>
+		<module>accessor-hydro-paraguay</module>
+		<module>accessor-thunder</module>
+		<module>accessor-wod</module>
+		<module>accessor-thredds</module>
+		<module>accessor-aviso</module>
+		<module>accessor-ecv-inventory</module>
+		<module>accessor-elixir-ena</module>
+		<module>accessor-nextgeoss</module>
+		<module>accessor-argo</module>
+		<module>accessor-wekeo</module>
+		<module>accessor-icos</module>
+		<module>accessor-prisma</module>
+		<module>accessor-invenio</module>
+		<module>accessor-his-central</module>
+		<module>accessor-saeon</module>
+		<module>accessor-stac</module>
+		<module>accessor-nmdis-erddap</module>
+		<module>accessor-wis</module>
+		<module>accessor-niwa</module>
 		<module>accessor-polytope</module>
 		<module>accessor-bluecloud</module>
 		<module>accessor-whos-paraguay</module>
@@ -105,9 +107,10 @@
 		<module>accessor-acronet</module>
 		<module>accessor-geo-mountain</module>
 		<module>accessor-agrostac</module>
+		<module>accessor-oai-set-wrapper</module>
 	</modules>
-		
-	<dependencies>		
+
+	<dependencies>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>core-datamodel</artifactId>

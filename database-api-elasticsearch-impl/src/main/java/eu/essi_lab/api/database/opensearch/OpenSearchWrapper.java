@@ -119,21 +119,6 @@ public class OpenSearchWrapper {
 
     /**
      * @param searchQuery
-     * @param properties
-     * @param start
-     * @param size
-     * @return
-     * @throws Exception
-     */
-    public List<InputStream> searchBinaries(String index, Query searchQuery, int start, int size) throws Exception {
-
-	SearchResponse<Object> searchResponse = search(index, searchQuery, start, size);
-
-	return ConversionUtils.toBinaryList(searchResponse);
-    }
-
-    /**
-     * @param searchQuery
      * @param start
      * @param size
      * @param tfTargets
@@ -306,6 +291,34 @@ public class OpenSearchWrapper {
     }
 
     /**
+     * @param searchQuery
+     * @param properties
+     * @param start
+     * @param size
+     * @return
+     * @throws Exception
+     */
+    public List<InputStream> searchBinaries(String index, Query searchQuery, int start, int size) throws Exception {
+    
+        SearchResponse<Object> searchResponse = search(index, searchQuery, start, size);
+    
+        return ConversionUtils.toBinaryList(searchResponse);
+    }
+
+    /**
+     * Retrieves first 10 entries
+     * 
+     * @param searchQuery
+     * @param key
+     * @return
+     * @throws Exception
+     */
+    public List<InputStream> searchBinaries(String index, Query searchQuery) throws Exception {
+    
+        return searchBinaries(index, searchQuery, 0, 10);
+    }
+
+    /**
      * @param index
      * @param searchQuery
      * @param start
@@ -331,19 +344,6 @@ public class OpenSearchWrapper {
 	SearchResponse<Object> response = search(index, searchQuery, 0, 10);
 
 	return ConversionUtils.toJSONSourcesList(response);
-    }
-
-    /**
-     * Retrieves first 10 entries
-     * 
-     * @param searchQuery
-     * @param key
-     * @return
-     * @throws Exception
-     */
-    public List<InputStream> searchBinaries(String index, Query searchQuery) throws Exception {
-
-	return searchBinaries(index, searchQuery, 0, 10);
     }
 
     /**
