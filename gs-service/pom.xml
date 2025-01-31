@@ -1090,7 +1090,13 @@
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>accessor-agrostac</artifactId>
 			<version>${project.parent.version}</version>
-		</dependency>				
+		</dependency>		
+		
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-oai-pmh-wrapper</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>		
 					
 		<!-- odip utils -->
 		<dependency>
