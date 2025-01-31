@@ -312,14 +312,6 @@ public class IndexData {
 		put(rp, indexesMd, indexData);
 	    });
 
-	    //
-	    // keyword fields for aggregation
-	    //
-	    DataFolderMapping.AGGREGABLE_FIELDS.forEach(field -> {
-
-		put(indexesMd, indexData, field, KeywordProperty.class);
-	    });
-
 	    // clear the indexes (all but the bbox) before storing the binary property
 	    indexesMd.clear(false);
 
@@ -675,6 +667,9 @@ public class IndexData {
 	    break;
 	case TEXTUAL:
 	    put(indexesMd, indexData, quer.getName(), String.class);
+
+	    // keyword fields used for aggregation and wildcard queries
+	    put(indexesMd, indexData, quer.getName(), KeywordProperty.class);
 	    break;
 	case ISO8601_DATE:
 	case ISO8601_DATE_TIME:
@@ -735,8 +730,8 @@ public class IndexData {
 
 	if (array.length() > 0) {
 
-	    // keyword fields used for aggregation
-	    String name = valueClass.equals(KeywordProperty.class) ? DataFolderMapping.toAggField(elName) : elName;
+	    // keyword fields used for aggregation and wildcard queries
+	    String name = valueClass.equals(KeywordProperty.class) ? DataFolderMapping.toKeywordField(elName) : elName;
 
 	    indexData.put(name, array);
 	}

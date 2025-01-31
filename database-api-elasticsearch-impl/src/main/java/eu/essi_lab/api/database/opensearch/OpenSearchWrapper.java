@@ -140,13 +140,13 @@ public class OpenSearchWrapper {
 
 	    CardinalityAggregation agg = CardinalityAggregation.of(a -> a.field(
 
-		    DataFolderMapping.toAggField(element.get().getName())));
+		    DataFolderMapping.toKeywordField(element.get().getName())));
 
 	    Aggregation aggregation = Aggregation.of(a -> a.cardinality(agg));
 
 	    response = client.search(builder -> {
 
-		builder.aggregations(DataFolderMapping.toAggField(element.get().getName()), aggregation);
+		builder.aggregations(DataFolderMapping.toKeywordField(element.get().getName()), aggregation);
 
 		builder.query(searchQuery).//
 			index(DataFolderMapping.get().getIndex()).//
@@ -167,7 +167,7 @@ public class OpenSearchWrapper {
 
 		    builder.aggregations(trg.getName(), agg -> agg.terms(t -> t.field(
 
-			    DataFolderMapping.toAggField(trg.getName())))).size(maxItems);
+			    DataFolderMapping.toKeywordField(trg.getName())))).size(maxItems);
 		});
 
 		builder.query(searchQuery).//
@@ -608,7 +608,7 @@ public class OpenSearchWrapper {
     private List<String> findDistinctValues(Query searchQuery, Queryable target, int size) throws Exception {
 
 	TermsAggregation termsAgg = TermsAggregation.of(//
-		a -> a.field(DataFolderMapping.toAggField(target.getName())).//
+		a -> a.field(DataFolderMapping.toKeywordField(target.getName())).//
 			size(size));
 
 	Aggregation agg = Aggregation.of(a -> a.terms(termsAgg));

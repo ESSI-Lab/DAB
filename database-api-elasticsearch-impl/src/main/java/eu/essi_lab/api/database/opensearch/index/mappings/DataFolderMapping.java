@@ -3,14 +3,10 @@
  */
 package eu.essi_lab.api.database.opensearch.index.mappings;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.opensearch.client.opensearch._types.mapping.FieldType;
 
 import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.indexes.IndexedElements;
-import eu.essi_lab.model.Queryable.ContentType;
 import eu.essi_lab.model.index.jaxb.BoundingBox;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
@@ -54,8 +50,6 @@ public class DataFolderMapping extends IndexMapping {
     public static final String WRITING_FOLDER_TAG = SourceStorageWorker.WRITING_FOLDER_TAG;
 
     public static final String CENTROID = "centroid";
-
-    public static final List<String> AGGREGABLE_FIELDS = new ArrayList<>();
 
     private static DataFolderMapping instance;
 
@@ -112,6 +106,11 @@ public class DataFolderMapping extends IndexMapping {
 
 	    case TEXTUAL:
 		addProperty(el.getName(), FieldType.Text.jsonValue());
+
+		// textual fields are mapped also as 'keyword' type in order to be aggregated
+		// since 'text' fields are not optimised for aggregations
+		addProperty(toKeywordField(el.getName()), FieldType.Keyword.jsonValue());
+
 		break;
 	    }
 	});
@@ -176,41 +175,11 @@ public class DataFolderMapping extends IndexMapping {
 		break;
 	    case TEXTUAL:
 		addProperty(rp.getName(), FieldType.Text.jsonValue());
+		// textual fields are mapped also as 'keyword' type in order to be aggregated
+		// since 'text' fields are not optimised for aggregations
+		addProperty(toKeywordField(rp.getName()), FieldType.Keyword.jsonValue());
+
 		break;
-	    }
-	});
-
-	// -------------------------------------------------------------------------------
-	//
-	// some fields are mapped also as 'keyword' type in order to be aggregated
-	// since 'text' fields are not optimised for aggregations
-	//
-	// --------------------------------------------------------------------------------
-
-	MetadataElement.listValues().forEach(el -> {
-
-	    if (el != MetadataElement.ANY_TEXT && //
-		    el != MetadataElement.ABSTRACT && //
-		    el != MetadataElement.ONLINE_LINKAGE && //
-		    el != MetadataElement.AGGREGATED_RESOURCE_IDENTIFIER && //
-		    el.getContentType() == ContentType.TEXTUAL) {
-
-		addProperty(toAggField(el.getName()), FieldType.Keyword.jsonValue());
-
-		AGGREGABLE_FIELDS.add(el.getName());
-	    }
-	});
-
-	ResourceProperty.listValues().forEach(rp -> {
-
-	    if (rp != ResourceProperty.PUBLIC_ID && //
-		    rp != ResourceProperty.PRIVATE_ID && //
-		    rp != ResourceProperty.ORIGINAL_ID && //
-		    rp.getContentType() == ContentType.TEXTUAL) {
-
-		addProperty(toAggField(rp.getName()), FieldType.Keyword.jsonValue());
-
-		AGGREGABLE_FIELDS.add(rp.getName());
 	    }
 	});
     }
@@ -219,7 +188,7 @@ public class DataFolderMapping extends IndexMapping {
      * @param field
      * @return
      */
-    public static String toAggField(String field) {
+    public static String toKeywordField(String field) {
 
 	return field + "_keyword";
     }

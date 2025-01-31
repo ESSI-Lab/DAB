@@ -258,7 +258,7 @@ public class OpenSearchFinder implements DatabaseFinder {
      */
     private int getCardinalityValue(Map<String, Aggregate> aggregations, Optional<Queryable> element) {
 
-	Aggregate aggregate = aggregations.get(DataFolderMapping.toAggField(element.get().getName()));
+	Aggregate aggregate = aggregations.get(DataFolderMapping.toKeywordField(element.get().getName()));
 	return (int) aggregate.cardinality().value();
     }
 
