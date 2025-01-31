@@ -130,22 +130,23 @@ public class DownloadTestTask extends AbstractCustomTask {
 	List<GSResource> resources = resultSet.getResultsList();
 
 	boolean accessAugmenter = false;
-	
+
 	ResourceAugmenter augmenter;
-	
+
 	if (accessAugmenter) {
-	    augmenter = new AccessAugmenter();    
-	}else {
+	    augmenter = new AccessAugmenter();
+	} else {
 	    augmenter = new StationPortalAugmenter();
-	    ((StationPortalAugmenter)augmenter).setView(viewId); 
+	    ((StationPortalAugmenter) augmenter).setView(viewId);
 	}
-	 
 
 	DatabaseWriter writer = DatabaseProviderFactory.getWriter(ConfigurationWrapper.getDatabaseURI());
 
-	
-	
+	GSLoggerFactory.getLogger(getClass()).info("Found {} sources", resources.size());
+
 	for (int i = 0; i < resources.size(); i++) {
+
+	    GSLoggerFactory.getLogger(getClass()).info("At source {} of {} sources", (i + 1), resources.size());
 
 	    GSResource resource = resources.get(i);
 

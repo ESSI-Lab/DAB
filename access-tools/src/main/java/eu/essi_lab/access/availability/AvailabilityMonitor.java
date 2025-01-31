@@ -119,7 +119,8 @@ public class AvailabilityMonitor {
     }
 
     public Date getLastDownloadDate(String sourceId) {
-	while (lastDownloadDatesbySource == null) {
+	GSLoggerFactory.getLogger(getClass()).info("asked for last download date for source {}",sourceId);
+	while (lastDownloadDatesbySource == null) {		
 	    try {
 		Thread.sleep(1000);
 	    } catch (InterruptedException e) {
