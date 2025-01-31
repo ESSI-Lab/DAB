@@ -238,7 +238,7 @@ GIAPI.OL_Map = function(options) {
 		layers.forEach((layer) => {
 			layer.setVisible(false);
 			var title = layer.get('title');
-			if (title===options.defaultLayer){
+			if (title === options.defaultLayer) {
 				layer.setVisible(true);
 			}
 		});
@@ -541,14 +541,21 @@ GIAPI.OL_Map = function(options) {
 
 				var ext = convert(where);
 
-				var polygon = ol.geom.Polygon.fromExtent(ext);
-				var feature = new ol.Feature({
-					geometry: polygon
-				});
+				try {
 
-				feature.setStyle(bboxesFeatureStyle);
+					var polygon = ol.geom.Polygon.fromExtent(ext);
+					var feature = new ol.Feature({
+						geometry: polygon
+					});
 
-				bboxesVector.addFeature(feature);
+					feature.setStyle(bboxesFeatureStyle);
+
+					bboxesVector.addFeature(feature);
+
+				} catch (error) {
+					console.error(error);
+				}
+
 			}
 		}
 
