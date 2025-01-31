@@ -498,6 +498,7 @@ GIAPI.OL_Map = function(options) {
 		}
 
 		if (options.onMarkerClick) {
+			
 
 			map.on('pointermove', function(e) {
 

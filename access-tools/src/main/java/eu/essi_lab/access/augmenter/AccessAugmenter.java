@@ -234,6 +234,7 @@ public class AccessAugmenter extends ResourceAugmenter<AugmenterSetting> {
 		    break;
 		}
 	    } catch (Exception e) {
+		e.printStackTrace();
 		GSLoggerFactory.getLogger(getClass()).debug("Data compliance test ENDED unexpectedly");
 	    } finally {
 		if (report != null) {
