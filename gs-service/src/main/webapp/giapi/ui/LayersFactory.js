@@ -41,6 +41,11 @@ GIAPI.LayersFactory = new function() {
 					var name = on.name;
 					var url = on.url;
 					var title = on.title || on.description || on.name;
+					var visible = true;
+					if (opt_options.visible !== undefined) {
+						visible = opt_options.visible;
+					}
+
 
 					var getMapParams = {
 						'LAYERS': name,
@@ -58,6 +63,7 @@ GIAPI.LayersFactory = new function() {
 						out.push(new ol.layer.TileLayer({
 							name: name,
 							title: title,
+							visible: visible,
 
 							source: new ol.source.TileWMS({
 								crossOrigin: 'anonymous',
@@ -77,7 +83,7 @@ GIAPI.LayersFactory = new function() {
 						});
 
 						var layer = new ol.layer.Tile({
-
+							visible: visible,
 							name: name,
 							title: title,
 							source: source

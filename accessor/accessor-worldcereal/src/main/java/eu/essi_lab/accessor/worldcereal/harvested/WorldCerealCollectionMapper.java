@@ -114,12 +114,14 @@ public class WorldCerealCollectionMapper extends FileIdentifierMapper {
 
     private static final String ADDITIONAL_DATA = "additionalData";
 
-    private static final String BACKGROUND_INFO_URL = "https://ewoc-rdm-ui.iiasa.ac.at/details/WorldCereal_crop_legend_ui_v2_20240709.pdf";
-
-    private static final String IRRIGATION_INFO_URL = "https://ewoc-rdm-ui.iiasa.ac.at/details/WorldCereal_irrigation_legend_ui_v2_20240709.pdf";
-    private static final String CONFIDENCE_SCORE_URL = "https://ewoc-rdm-ui.iiasa.ac.at/details/WorldCereal_ConfidenceScoreCalculations_v1_1.pdf";
-    private static final String CALCULATION_DATE_URL = "https://ewoc-rdm-ui.iiasa.ac.at/details/WorldCereal_DerivingValidityTime_v1_1.pdf";
-
+    //private static final String BACKGROUND_INFO_URL = "https://ewoc-rdm-ui.iiasa.ac.at/details/WorldCereal_crop_legend_ui_v2_20240709.pdf";//https://artifactory.vgt.vito.be/artifactory/auxdata-public/worldcereal/legend/WorldCereal_LC_CT_legend_latest.pdf
+    private static final String BACKGROUND_INFO_URL = "https://artifactory.vgt.vito.be/artifactory/auxdata-public/worldcereal/legend/WorldCereal_LC_CT_legend_latest.pdf";
+    //private static final String IRRIGATION_INFO_URL = "https://ewoc-rdm-ui.iiasa.ac.at/details/WorldCereal_irrigation_legend_ui_v2_20240709.pdf";//https://artifactory.vgt.vito.be/artifactory/auxdata-public/worldcereal/legend/WorldCereal_IRR_legend_latest.pdf
+    private static final String IRRIGATION_INFO_URL = "https://artifactory.vgt.vito.be/artifactory/auxdata-public/worldcereal/legend/WorldCereal_IRR_legend_latest.pdf";
+    //private static final String CONFIDENCE_SCORE_URL = "https://ewoc-rdm-ui.iiasa.ac.at/details/WorldCereal_ConfidenceScoreCalculations_v1_1.pdf";//https://rdm.esa-worldcereal.org/details/WorldCereal_ConfidenceScoreCalculations_v1_1.pdf
+    private static final String CONFIDENCE_SCORE_URL = "https://rdm.esa-worldcereal.org/details/WorldCereal_ConfidenceScoreCalculations_v1_1.pdf";
+    //private static final String CALCULATION_DATE_URL = "https://ewoc-rdm-ui.iiasa.ac.at/details/WorldCereal_DerivingValidityTime_v1_1.pdf";//https://rdm.esa-worldcereal.org/details/WorldCereal_DerivingValidityTime_v1_1.pdf
+    private static final String CALCULATION_DATE_URL = "https://rdm.esa-worldcereal.org/details/WorldCereal_DerivingValidityTime_v1_1.pdf";
     private static final int THRESOLD = 10000;
 
     private List<String> keywords = Arrays.asList("crop type", "land cover", "reference data","WorldCereal");
