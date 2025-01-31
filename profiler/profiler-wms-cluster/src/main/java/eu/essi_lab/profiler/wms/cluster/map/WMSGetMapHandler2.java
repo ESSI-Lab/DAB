@@ -386,7 +386,7 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 
 			request.setConstraints(constraints);
 			request.setMaxResults(minimumClusterSize);
-			request.setMaxTermFrequencyItems(3);
+			request.setMaxTermFrequencyItems(10);
 			request.setView(view.get());
 
 			int divisions = 3;

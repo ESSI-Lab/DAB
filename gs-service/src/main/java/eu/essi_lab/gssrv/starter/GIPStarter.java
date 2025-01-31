@@ -34,6 +34,7 @@ import javax.xml.bind.JAXBException;
 
 import org.quartz.SchedulerException;
 
+import eu.essi_lab.access.availability.AvailabilityMonitor;
 import eu.essi_lab.api.database.cfg.DatabaseSource;
 import eu.essi_lab.api.database.cfg.DatabaseSourceUrl;
 import eu.essi_lab.augmenter.worker.AugmentationReportsHandler;
@@ -745,6 +746,7 @@ public class GIPStarter {
      * 
      */
     private void initCaches() {
+	AvailabilityMonitor.getInstance();
 
 	// init caches, but only for specific production nodes
 	ExecutionMode executionMode = ExecutionMode.get();

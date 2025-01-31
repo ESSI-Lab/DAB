@@ -176,8 +176,8 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 	builder.append("  <td style='vertical-align: middle;'>" + station.getDatasetName() + "</td>    \n");
 	builder.append("  <td style='vertical-align: middle;'>" + station.getSourceLabel() + "</td>    \n");
 	builder.append("  <td style='text-align: center;'>" + image + "</td>\n");
-	builder.append("  <td style='text-align: center; cursor:pointer' id='addToSearch_" + station.getDatasetName()
-		+ "'><i class=\"font-awesome-button-icon fa fa-plus-circle\" style=\"color:darkred; font-size:15px;\" aria-hidden=\"true\"></i></td>\n");
+//	builder.append("  <td style='text-align: center; cursor:pointer' id='addToSearch_" + station.getDatasetName()
+//		+ "'><i class=\"font-awesome-button-icon fa fa-plus-circle\" style=\"color:darkred; font-size:15px;\" aria-hidden=\"true\"></i></td>\n");
 	builder.append("  <td style='border: 1px solid transparent; background: transparent;'></td>\n");
 
 	builder.append("</tr>\n");
@@ -239,7 +239,7 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 	    builder.append(" <th >Station" + info + "</th>\n");
 	    builder.append(" <th >Source</th>\n");
 	    builder.append(" <th >Station info</th>\n");
-	    builder.append(" <th >Add to search</th>\n");
+//	    builder.append(" <th >Add to search</th>\n");
 	    builder.append(
 		    " <th title='Close' id='closePopup' style='background: white; cursor: pointer; background:'><i class=\"font-awesome-button-icon fa fa-times\" style=\"font-size:15px;\" aria-hidden=\"true\"></i></th>\n");
 	    builder.append(" </tr>\n");
