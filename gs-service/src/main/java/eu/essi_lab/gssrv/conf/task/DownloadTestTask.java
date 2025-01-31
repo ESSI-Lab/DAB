@@ -45,6 +45,7 @@ import eu.essi_lab.access.datacache.StatisticsRecord;
 import eu.essi_lab.api.database.DatabaseExecutor;
 import eu.essi_lab.api.database.DatabaseWriter;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
+import eu.essi_lab.augmenter.ResourceAugmenter;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.dc_connector.DataCacheConnectorSetting;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
@@ -128,10 +129,22 @@ public class DownloadTestTask extends AbstractCustomTask {
 	ResultSet<GSResource> resultSet = executor.retrieve(discoveryMessage);
 	List<GSResource> resources = resultSet.getResultsList();
 
-	AccessAugmenter augmenter = new AccessAugmenter();
+	boolean accessAugmenter = false;
+	
+	ResourceAugmenter augmenter;
+	
+	if (accessAugmenter) {
+	    augmenter = new AccessAugmenter();    
+	}else {
+	    augmenter = new StationPortalAugmenter();
+	    ((StationPortalAugmenter)augmenter).setView(viewId); 
+	}
+	 
 
 	DatabaseWriter writer = DatabaseProviderFactory.getWriter(ConfigurationWrapper.getDatabaseURI());
 
+	
+	
 	for (int i = 0; i < resources.size(); i++) {
 
 	    GSResource resource = resources.get(i);

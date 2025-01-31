@@ -91,7 +91,7 @@ for $bbox in $splitBoxes
 
               {<gs:termFrequency xmlns:gs="http://flora.eu/gi-suite/1.0/dataModel/schema">
 
-              {gs:tf('sourceId', $query,'50')}
+              {gs:tf('sourceId', $query,'MAX_TF_ITEMS')}
 
               </gs:termFrequency>}
               </gs:estimate>

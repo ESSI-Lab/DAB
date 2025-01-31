@@ -92,6 +92,8 @@ public class MarkLogicExecutor extends MarkLogicReader implements DatabaseExecut
 		    collect(Collectors.joining("§", "'", "'"));
 
 	    template = template.replace("MAX_RESULTS", String.valueOf(request.getMaxResults()));
+	    
+	    template = template.replace("MAX_TF_ITEMS", String.valueOf(request.getMaxTermFrequencyItems()));
 
 	    template = template.replace("BBOXES", bboxes);
 

@@ -98,6 +98,15 @@ public interface DatabaseExecutor extends DatabaseProvider {
     public class WMSClusterRequest {
 
 	private int maxResults;
+	private int maxTermFrequencyItems = 50;
+	public int getMaxTermFrequencyItems() {
+	    return maxTermFrequencyItems;
+	}
+
+	public void setMaxTermFrequencyItems(int maxTermFrequencyItems) {
+	    this.maxTermFrequencyItems = maxTermFrequencyItems;
+	}
+
 	private List<SpatialExtent> extents;
 	private View view;
 	private Bond constraints;
