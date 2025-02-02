@@ -3,9 +3,7 @@
  */
 package eu.essi_lab.api.database.opensearch;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /*-
  * #%L
@@ -29,29 +27,20 @@ import java.util.Arrays;
  */
 
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.json.JSONObject;
-import org.w3c.dom.Node;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseExecutor;
-import eu.essi_lab.api.database.DatabaseExecutor.WMSClusterResponse;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.IOStreamUtils;
-import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
 import eu.essi_lab.messages.stats.StatisticsMessage;
 import eu.essi_lab.messages.stats.StatisticsResponse;
-import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.MetadataElement;
 
 /**
