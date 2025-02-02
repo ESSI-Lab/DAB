@@ -181,6 +181,50 @@ public class IndexData {
 
     /**
      * @param folder
+     * @param gsResource
+     * @return
+     */
+    public static IndexData of(OpenSearchFolder folder, GSResource gsResource) {
+
+	IndexData indexData = new IndexData();
+
+	//
+	// put the base properties
+	//
+
+	indexData.put(ENTRY_NAME, gsResource.getPrivateId());
+	indexData.put(DATABASE_ID, folder.getDatabase().getIdentifier());
+	indexData.put(FOLDER_NAME, folder.getName());
+	indexData.put(FOLDER_ID, OpenSearchFolder.getFolderId(folder));
+
+	indexData.put(DATA_TYPE, "doc");
+
+	indexData.entryId = OpenSearchFolder.getEntryId(folder, gsResource.getPrivateId());
+
+	String dataFolder = folder.getName().endsWith(SourceStorageWorker.DATA_1_SHORT_POSTFIX) //
+		? SourceStorageWorker.DATA_1_SHORT_POSTFIX //
+		: SourceStorageWorker.DATA_2_SHORT_POSTFIX; //
+
+	indexData.put(MetaFolderMapping.DATA_FOLDER, dataFolder);
+
+	handleResource(indexData, gsResource);
+
+	String encodedString = ConversionUtils.encode(gsResource);
+
+	indexData.put(BINARY_PROPERTY, DataFolderMapping.GS_RESOURCE);
+	indexData.put(DataFolderMapping.GS_RESOURCE, encodedString);
+
+	indexData.mapping = DataFolderMapping.get();
+
+	indexData.index = indexData.mapping.getIndex();
+
+	indexData.mapping.setEntryType(EntryType.GS_RESOURCE);
+
+	return indexData;
+    }
+
+    /**
+     * @param folder
      * @param key
      * @param entry
      * @param type
@@ -241,79 +285,7 @@ public class IndexData {
 
 	    GSResource gsResource = GSResource.createOrNull(entry.getDocument().get());
 
-	    IndexesMetadata indexesMd = gsResource.getIndexesMetadata();
-
-	    //
-	    // shape
-	    //
-
-	    Optional<Shape> shape = Optional.empty();
-
-	    List<BoundingPolygon> boundingPolygons = gsResource.getHarmonizedMetadata().//
-		    getCoreMetadata().//
-		    getDataIdentification().//
-		    getBoundingPolygonsList();
-
-	    if (!boundingPolygons.isEmpty()) {
-
-		shape = Shape.of(boundingPolygons.get(0));
-	    }
-
-	    if (shape.isEmpty() && indexesMd.readBoundingBox().isPresent()) {
-
-		shape = Shape.of(indexesMd.readBoundingBox().get());
-	    }
-
-	    if (!shape.isEmpty()) {
-
-		indexData.put(MetadataElement.BOUNDING_BOX.getName(), shape.get().getShape());
-		indexData.put(BoundingBox.AREA_ELEMENT_NAME, shape.get().getArea());
-		indexData.put(DataFolderMapping.CENTROID, shape.get().getCentroid());
-	    }
-
-	    //
-	    //
-	    //
-
-	    //
-	    // temp extent begin
-	    //
-
-	    put(indexesMd, indexData, MetadataElement.TEMP_EXTENT_BEGIN, DateTime.class);
-
-	    if (!indexesMd.read(IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName()).isEmpty()) {
-
-		put(indexesMd, indexData, IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName(), Boolean.class);
-	    }
-
-	    //
-	    // temp extent end
-	    //
-	    put(indexesMd, indexData, MetadataElement.TEMP_EXTENT_END, DateTime.class);
-
-	    if (!indexesMd.read(IndexedElements.TEMP_EXTENT_END_NOW.getElementName()).isEmpty()) {
-
-		put(indexesMd, indexData, IndexedElements.TEMP_EXTENT_END_NOW.getElementName(), Boolean.class);
-	    }
-
-	    //
-	    // other metadata elements
-	    //
-	    MetadataElement.listValues().forEach(el -> {
-
-		put(el, indexesMd, indexData);
-	    });
-
-	    //
-	    // resource properties
-	    //
-	    ResourceProperty.listValues().forEach(rp -> {
-
-		put(rp, indexesMd, indexData);
-	    });
-
-	    // clear the indexes (all but the bbox) before storing the binary property
-	    indexesMd.clear(false);
+	    handleResource(indexData, gsResource);
 
 	    encodedString = ConversionUtils.encode(gsResource);
 
@@ -586,15 +558,6 @@ public class IndexData {
     }
 
     /**
-     * @param field
-     * @param value
-     */
-    private void put(String field, Object value) {
-
-	object.put(field, value);
-    }
-
-    /**
      * @return the request
      */
     public IndexMapping getMapping() {
@@ -633,15 +596,113 @@ public class IndexData {
     /**
      * @return
      */
-    public String getData() {
+    public String getDataString() {
 
 	return object.toString();
+    }
+
+    /**
+     * @return
+     */
+    public JSONObject getDataObject() {
+
+	return object;
     }
 
     @Override
     public String toString() {
 
 	return object.toString(3);
+    }
+
+    /**
+     * @param field
+     * @param value
+     */
+    private void put(String field, Object value) {
+
+	object.put(field, value);
+    }
+
+    /**
+     * @param indexData
+     * @param gsResource
+     */
+    private static void handleResource(IndexData indexData, GSResource gsResource) {
+
+	IndexesMetadata indexesMd = gsResource.getIndexesMetadata();
+
+	//
+	// shape
+	//
+
+	Optional<Shape> shape = Optional.empty();
+
+	List<BoundingPolygon> boundingPolygons = gsResource.getHarmonizedMetadata().//
+		getCoreMetadata().//
+		getDataIdentification().//
+		getBoundingPolygonsList();
+
+	if (!boundingPolygons.isEmpty()) {
+
+	    shape = Shape.of(boundingPolygons.get(0));
+	}
+
+	if (shape.isEmpty() && indexesMd.readBoundingBox().isPresent()) {
+
+	    shape = Shape.of(indexesMd.readBoundingBox().get());
+	}
+
+	if (!shape.isEmpty()) {
+
+	    indexData.put(MetadataElement.BOUNDING_BOX.getName(), shape.get().getShape());
+	    indexData.put(BoundingBox.AREA_ELEMENT_NAME, shape.get().getArea());
+	    indexData.put(DataFolderMapping.CENTROID, shape.get().getCentroid());
+	}
+
+	//
+	//
+	//
+
+	//
+	// temp extent begin
+	//
+
+	put(indexesMd, indexData, MetadataElement.TEMP_EXTENT_BEGIN, DateTime.class);
+
+	if (!indexesMd.read(IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName()).isEmpty()) {
+
+	    put(indexesMd, indexData, IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName(), Boolean.class);
+	}
+
+	//
+	// temp extent end
+	//
+	put(indexesMd, indexData, MetadataElement.TEMP_EXTENT_END, DateTime.class);
+
+	if (!indexesMd.read(IndexedElements.TEMP_EXTENT_END_NOW.getElementName()).isEmpty()) {
+
+	    put(indexesMd, indexData, IndexedElements.TEMP_EXTENT_END_NOW.getElementName(), Boolean.class);
+	}
+
+	//
+	// other metadata elements
+	//
+	MetadataElement.listValues().forEach(el -> {
+
+	    put(el, indexesMd, indexData);
+	});
+
+	//
+	// resource properties
+	//
+	ResourceProperty.listValues().forEach(rp -> {
+
+	    put(rp, indexesMd, indexData);
+	});
+
+	// clear the indexes (all but the bbox) before storing the binary property
+	indexesMd.clear(false);
     }
 
     /**
