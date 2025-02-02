@@ -97,8 +97,9 @@ public class SourceStorageWorker {
     private static final String SOURCE_STORAGE_GET_WRITING_FOLDER_ERROR = "SOURCE_STORAGE_GET_WRITING_FOLDER_ERROR";
     private static final String SOURCE_STORAGE_GET_WRITING_FOLDER_HARVESTING_STARTED_ERROR = "SOURCE_STORAGE_GET_WRITING_FOLDER_HARVESTING_STARTED_ERROR";
     private static final String SOURCE_STORAGE_DECTECT_WRITING_FOLDER_HARVESTING_END_ERROR = "SOURCE_STORAGE_DECTECT_WRITING_FOLDER_HARVESTING_END_ERROR";
-    private static final String ERRORS_REPORT_FILE_NAME = "errorsReport";
-    private static final String WARN_REPORT_FILE_NAME = "warnReport";
+   
+    public static final String ERRORS_REPORT_FILE_NAME = "errorsReport";
+    public static final String WARN_REPORT_FILE_NAME = "warnReport";
 
     /**
      * 

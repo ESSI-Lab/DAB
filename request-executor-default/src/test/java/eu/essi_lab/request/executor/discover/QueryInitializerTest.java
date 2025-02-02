@@ -61,9 +61,9 @@ public class QueryInitializerTest {
 
 	this.queryInitializer.setRequestAuthorizationConverter(requestAuthorizationConverter);
 	message = new DiscoveryMessage();
-	property1Bond = BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "p1");
-	property2Bond = BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "p2");
-	property3Bond = BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "p3");
+	property1Bond = BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "p1");
+	property2Bond = BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "p2");
+	property3Bond = BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "p3");
 	source1Bond = BondFactory.createSourceIdentifierBond("source1");
 	source2Bond = BondFactory.createSourceIdentifierBond("source2");
 	source12Bond = BondFactory.createOrBond(source1Bond, source2Bond);

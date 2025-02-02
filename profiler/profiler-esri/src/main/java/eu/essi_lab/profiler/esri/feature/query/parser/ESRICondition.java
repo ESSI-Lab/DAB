@@ -78,7 +78,7 @@ public class ESRICondition extends ESRIToken {
 	MetadataElement element = field.getMetadataElement();
 	BondOperator operator = BondOperator.EQUAL;
 	if (ignoreCase) {
-	    operator = BondOperator.LIKE;
+	    operator = BondOperator.TEXT_SEARCH;
 	}
 	SimpleValueBond bond = BondFactory.createSimpleValueBond(operator, element, getLiteral());
 

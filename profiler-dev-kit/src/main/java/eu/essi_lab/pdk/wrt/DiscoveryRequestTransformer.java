@@ -256,7 +256,7 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
 			    sources.add(source.get());
 			}
 			break;
-		    case LIKE:
+		    case TEXT_SEARCH:
 			for (GSSource s : allSources) {
 			    if (s.getUniqueIdentifier().contains(value)) {
 				sources.add(s);

@@ -104,7 +104,7 @@ public class CSWGetRecordsParserTest {
 
 	    {
 		SimpleValueBond el = (SimpleValueBond) array[0];
-		Assert.assertEquals(BondOperator.LIKE, el.getOperator());
+		Assert.assertEquals(BondOperator.TEXT_SEARCH, el.getOperator());
 	    }
 	    {
 		SimpleValueBond el = (SimpleValueBond) array[1];

@@ -118,7 +118,7 @@ public class ViewTest {
 	testJAXB(BondFactory.createMinMaxResourceTimeStampBond(BondOperator.MIN));
 
 	// simple value bond
-	testJAXB(BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "my title"));
+	testJAXB(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "my title"));
 
 	testJAXB(BondFactory.createSimpleValueBond(//
 		BondOperator.GREATER_OR_EQUAL, //

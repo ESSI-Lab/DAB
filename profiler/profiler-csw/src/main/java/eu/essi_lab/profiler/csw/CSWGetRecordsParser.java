@@ -374,7 +374,7 @@ public class CSWGetRecordsParser {
 
 		BondOperator bondOperator = decode(operator);
 		if (bondOperator == BondOperator.EQUAL && !matchCase) {
-		    bondOperator = BondOperator.LIKE;
+		    bondOperator = BondOperator.TEXT_SEARCH;
 		}
 
 		String propertyName = pnt.getContent().get(0).toString();
@@ -433,7 +433,7 @@ public class CSWGetRecordsParser {
 
 	    if (name != null && typeValue != null) {
 
-		return createBond(BondOperator.LIKE, name, typeValue);
+		return createBond(BondOperator.TEXT_SEARCH, name, typeValue);
 	    }
 	}
 
@@ -604,7 +604,7 @@ public class CSWGetRecordsParser {
     private BondOperator decode(String operator) {
 
 	if (operator.matches("(?i).*PropertyIsLike.*")) {
-	    return BondOperator.LIKE;
+	    return BondOperator.TEXT_SEARCH;
 	}
 	if (operator.matches("(?i).*PropertyIsEqualTo.*")) {
 	    return BondOperator.EQUAL;

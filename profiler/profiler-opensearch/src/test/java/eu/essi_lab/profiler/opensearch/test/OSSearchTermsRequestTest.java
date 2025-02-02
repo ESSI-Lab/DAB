@@ -31,7 +31,7 @@ public class OSSearchTermsRequestTest {
 
 	    SimpleValueBond userBond = (SimpleValueBond) transformer.getUserBond(webRequest);
 
-	    Assert.assertEquals(userBond.getOperator(), BondOperator.LIKE);
+	    Assert.assertEquals(userBond.getOperator(), BondOperator.TEXT_SEARCH);
 
 	    Assert.assertEquals(userBond.getProperty().getName(), "title");
 
@@ -57,7 +57,7 @@ public class OSSearchTermsRequestTest {
 
 	    SimpleValueBond userBond = (SimpleValueBond) transformer.getUserBond(webRequest);
 
-	    Assert.assertEquals(userBond.getOperator(), BondOperator.LIKE);
+	    Assert.assertEquals(userBond.getOperator(), BondOperator.TEXT_SEARCH);
 
 	    Assert.assertEquals(userBond.getProperty().getName(), "anyText");
 

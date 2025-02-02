@@ -1450,7 +1450,7 @@ public class QueryInitializer implements IQueryInitializer {
 	}
 	boolean bool = BondFactory.isResourcePropertyBond(bond, ResourceProperty.SOURCE_ID);
 	if (bool) {
-	    return (((ResourcePropertyBond) bond).getOperator().equals(BondOperator.LIKE));
+	    return (((ResourcePropertyBond) bond).getOperator().equals(BondOperator.TEXT_SEARCH));
 	}
 	return bool;
     }

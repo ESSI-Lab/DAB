@@ -505,7 +505,7 @@ public class ConfigurationWrapper {
 		case EQUAL:
 		    out.add(resBond.getPropertyValue());
 		    break;
-		case LIKE:
+		case TEXT_SEARCH:
 
 		    List<String> ids = getHarvestedAndMixedSources().//
 			    stream().//

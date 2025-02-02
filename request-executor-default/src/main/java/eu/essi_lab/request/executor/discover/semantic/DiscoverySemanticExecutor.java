@@ -271,10 +271,10 @@ public class DiscoverySemanticExecutor implements IDiscoverySemanticExecutor {
 
 	if (queryable instanceof MetadataElement) {
 
-	    return BondFactory.createSimpleValueBond(BondOperator.LIKE, (MetadataElement) queryable, value);
+	    return BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, (MetadataElement) queryable, value);
 	}
 
-	return BondFactory.createResourcePropertyBond(BondOperator.LIKE, (ResourceProperty) queryable, value);
+	return BondFactory.createResourcePropertyBond(BondOperator.TEXT_SEARCH, (ResourceProperty) queryable, value);
     }
 
     /**

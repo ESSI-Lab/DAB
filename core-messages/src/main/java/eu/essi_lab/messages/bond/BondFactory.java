@@ -272,7 +272,7 @@ public class BondFactory {
      * The supplied <code>operator</code> must be one of the following binary operators:
      * <ul>
      * <li>{@link BondOperator#EQUAL}</li>
-     * <li>{@link BondOperator#LIKE}</li>
+     * <li>{@link BondOperator#TEXT_SEARCH}</li>
      * <li>{@link BondOperator#LESS}</li>
      * <li>{@link BondOperator#LESS_OR_EQUAL}</li>
      * <li>{@link BondOperator#GREATER}</li>
@@ -291,7 +291,7 @@ public class BondFactory {
 
 	if (operator != BondOperator.EQUAL && //
 		operator != BondOperator.NOT_EQUAL && //
-		operator != BondOperator.LIKE && //
+		operator != BondOperator.TEXT_SEARCH && //
 		operator != BondOperator.LESS && //
 		operator != BondOperator.LESS_OR_EQUAL && //
 		operator != BondOperator.GREATER && //
@@ -314,8 +314,8 @@ public class BondFactory {
 
 	List<Bond> resList = new ArrayList<>();
 	for (String s : keywords) {
-	    Bond b = BondFactory.createOrBond(BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, s),
-		    BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, s));
+	    Bond b = BondFactory.createOrBond(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, s),
+		    BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, s));
 	    resList.add(b);
 	}
 
@@ -340,7 +340,7 @@ public class BondFactory {
      * The supplied <code>operator</code> must be one of the following binary operators:
      * <ul>
      * <li>{@link BondOperator#EQUAL}</li>
-     * <li>{@link BondOperator#LIKE}</li>
+     * <li>{@link BondOperator#TEXT_SEARCH}</li>
      * <li>{@link BondOperator#LESS}</li>
      * <li>{@link BondOperator#LESS_OR_EQUAL}</li>
      * <li>{@link BondOperator#GREATER}</li>
@@ -359,7 +359,7 @@ public class BondFactory {
 
 	if (operator != BondOperator.EQUAL && //
 		operator != BondOperator.NOT_EQUAL && //
-		operator != BondOperator.LIKE && //
+		operator != BondOperator.TEXT_SEARCH && //
 		operator != BondOperator.LESS && //
 		operator != BondOperator.LESS_OR_EQUAL && //
 		operator != BondOperator.GREATER && //
@@ -1033,7 +1033,7 @@ public class BondFactory {
     public static ResourcePropertyBond createResourcePropertyBond(BondOperator operator, ResourceProperty property, String value) {
 
 	if (operator != BondOperator.EQUAL && //
-		operator != BondOperator.LIKE && //
+		operator != BondOperator.TEXT_SEARCH && //
 		operator != BondOperator.NOT_EQUAL && //
 		operator != BondOperator.GREATER && //
 		operator != BondOperator.GREATER_OR_EQUAL && //

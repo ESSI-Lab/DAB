@@ -26,7 +26,8 @@ package eu.essi_lab.messages.bond;
 
 public enum BondOperator {
 
-    LIKE, //
+    TEXT_SEARCH, //
+    
     EQUAL("="), //
     NOT_EQUAL("!="), //
     GREATER(">"), //
@@ -40,8 +41,8 @@ public enum BondOperator {
     MIN, //
     MAX, //
 
-    INTERSECTS, // Intersection
-    DISJOINT, // Disjoint
+    INTERSECTS,
+    DISJOINT, 
     BBOX, // BBOX is "NOT DISJOINT"
     CONTAINS, // target bbox contains resources bbox
     CONTAINED, // resources bbox contains target bbox

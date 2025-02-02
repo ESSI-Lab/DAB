@@ -78,7 +78,7 @@ public class RestSemanticRequestTransformer extends SemanticRequestTransformer {
 	OntologyPropertyBond bond = null;
 	if (search != null) {
 
-	    bond = BondFactory.createOntologyPropertyBond(BondOperator.LIKE, OntologyObjectProperty.ABSTRACT, search);
+	    bond = BondFactory.createOntologyPropertyBond(BondOperator.TEXT_SEARCH, OntologyObjectProperty.ABSTRACT, search);
 	}
 
 	return Optional.ofNullable(bond);

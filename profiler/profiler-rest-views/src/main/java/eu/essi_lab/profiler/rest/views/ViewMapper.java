@@ -275,9 +275,9 @@ public class ViewMapper {
 
 		    String keyword = keywordsArray.getString(i);
 
-		    Bond keywordBond = BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, keyword);
-		    Bond titleBond = BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, keyword);
-		    Bond abstractBond = BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.ABSTRACT, keyword);
+		    Bond keywordBond = BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, keyword);
+		    Bond titleBond = BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, keyword);
+		    Bond abstractBond = BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.ABSTRACT, keyword);
 
 		    keywordsBond.getOperands().add(keywordBond);
 		    keywordsBond.getOperands().add(titleBond);

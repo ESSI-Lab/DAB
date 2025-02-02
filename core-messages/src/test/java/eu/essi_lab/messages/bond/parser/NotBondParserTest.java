@@ -41,8 +41,8 @@ public class NotBondParserTest {
     @Before
     public void init() {
 	this.parser = new NotBondParser();
-	property1Bond = BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "precipitation");
-	property2Bond = BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "temperature");
+	property1Bond = BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "precipitation");
+	property2Bond = BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "temperature");
 	source1Bond = BondFactory.createSourceIdentifierBond("source1");
 	source2Bond = BondFactory.createSourceIdentifierBond("source2");
 	s1p1Bond = BondFactory.createAndBond(property1Bond, source1Bond);

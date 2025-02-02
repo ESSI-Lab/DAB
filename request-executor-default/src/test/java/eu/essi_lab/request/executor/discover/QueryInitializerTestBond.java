@@ -26,148 +26,148 @@ public class QueryInitializerTestBond {
 
     private static LogicalBond createKeywordTitleBond() {
 	return BondFactory.createOrBond(//
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Energy"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Energy"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Temperature"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Temperature"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Surface radiation budget"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Surface radiation budget"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Earth Radiation budget"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Earth Radiation budget"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Surface Temperature"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Surface Temperature"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Upper Air Temperature"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Upper Air Temperature"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Surface Air wind speed"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Surface Air wind speed"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Upper Air wind speed"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Upper Air wind speed"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Albedo"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Albedo"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "heat flux"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "heat flux"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Land surface temperture"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Land surface temperture"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Ocean surface heat flux"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Ocean surface heat flux"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Sea surface temperature"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Sea surface temperature"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Sea subsurface Temperature"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Sea subsurface Temperature"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Surface wind"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Surface wind"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Upper Air wind"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Upper Air wind"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Pressure"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Pressure"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Lightning"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Lightning"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Aerosol"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Aerosol"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Surfac currents"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Surfac currents"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "subsurface currents"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "subsurface currents"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Ocean surface stress"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Ocean surface stress"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Sea state"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Sea state"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Transient facies"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Transient facies"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Carbon cycle"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Carbon cycle"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "GHGs"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "GHGs"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Carbon dioxide"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Carbon dioxide"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Methane"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Methane"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "GHG"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "GHG"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Soil Carbon"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Soil Carbon"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Biomass"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Biomass"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Inorganic carbon"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Inorganic carbon"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Nitrous oxide"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Nitrous oxide"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Hydrosphere"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Hydrosphere"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Precipitation"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Precipitation"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Cloud properties"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Cloud properties"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "water vapour"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "water vapour"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "surface temperature"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "surface temperature"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Soil moisture"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Soil moisture"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "River discharge"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "River discharge"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Lakes"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Lakes"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Groundwater"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Groundwater"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Surface salinity"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Surface salinity"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Subsurface salinity"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Subsurface salinity"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "sea level"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "sea level"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "sea temperature"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "sea temperature"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Snow"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Snow"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Ice"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Ice"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Glaciers"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Glaciers"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Ice sheets"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Ice sheets"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Ice shelves"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Ice shelves"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Permafrost"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Permafrost"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Sea Ice"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Sea Ice"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Biosphere"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Biosphere"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Land cover"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Land cover"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Leaf Area Index"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Leaf Area Index"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "LAI"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "LAI"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE,
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Energy"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Energy"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Temperature"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Temperature"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Surface radiation budget"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Surface radiation budget"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Earth Radiation budget"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Earth Radiation budget"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Surface Temperature"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Surface Temperature"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Upper Air Temperature"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Upper Air Temperature"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Surface Air wind speed"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Surface Air wind speed"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Upper Air wind speed"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Upper Air wind speed"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Albedo"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Albedo"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "heat flux"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "heat flux"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Land surface temperture"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Land surface temperture"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Ocean surface heat flux"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Ocean surface heat flux"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Sea surface temperature"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Sea surface temperature"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Sea subsurface Temperature"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Sea subsurface Temperature"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Surface wind"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Surface wind"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Upper Air wind"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Upper Air wind"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Pressure"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Pressure"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Lightning"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Lightning"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Aerosol"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Aerosol"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Surfac currents"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Surfac currents"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "subsurface currents"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "subsurface currents"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Ocean surface stress"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Ocean surface stress"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Sea state"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Sea state"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Transient facies"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Transient facies"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Carbon cycle"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Carbon cycle"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "GHGs"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "GHGs"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Carbon dioxide"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Carbon dioxide"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Methane"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Methane"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "GHG"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "GHG"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Soil Carbon"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Soil Carbon"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Biomass"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Biomass"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Inorganic carbon"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Inorganic carbon"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Nitrous oxide"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Nitrous oxide"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Hydrosphere"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Hydrosphere"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Precipitation"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Precipitation"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Cloud properties"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Cloud properties"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "water vapour"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "water vapour"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "surface temperature"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "surface temperature"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Soil moisture"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Soil moisture"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "River discharge"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "River discharge"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Lakes"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Lakes"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Groundwater"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Groundwater"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Surface salinity"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Surface salinity"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Subsurface salinity"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Subsurface salinity"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "sea level"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "sea level"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "sea temperature"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "sea temperature"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Snow"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Snow"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Ice"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Ice"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Glaciers"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Glaciers"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Ice sheets"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Ice sheets"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Ice shelves"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Ice shelves"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Permafrost"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Permafrost"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Sea Ice"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Sea Ice"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Biosphere"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Biosphere"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Land cover"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Land cover"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Leaf Area Index"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Leaf Area Index"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "LAI"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "LAI"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE,
 			"Fraction of Absorbed Photosynthetically Active Radiation"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD,
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD,
 			"Fraction of Absorbed Photosynthetically Active Radiation"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "FAPAR"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "FAPAR"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Fire"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Fire"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Plankton"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Plankton"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Oxygen"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Oxygen"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Nutrients"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Nutrients"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Ocean color"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Ocean color"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Marine habitat"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Marine habitat"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Energy"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Energy"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Human use"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Human use"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Natural Resources"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Natural Resources"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "Water Use"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "Water Use"), //
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "GHG fluxes"),
-		BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, "GHG fluxes")//
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "FAPAR"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "FAPAR"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Fire"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Fire"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Plankton"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Plankton"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Oxygen"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Oxygen"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Nutrients"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Nutrients"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Ocean color"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Ocean color"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Marine habitat"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Marine habitat"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Energy"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Energy"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Human use"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Human use"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Natural Resources"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Natural Resources"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "Water Use"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "Water Use"), //
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "GHG fluxes"),
+		BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, "GHG fluxes")//
 
 	);
     }
