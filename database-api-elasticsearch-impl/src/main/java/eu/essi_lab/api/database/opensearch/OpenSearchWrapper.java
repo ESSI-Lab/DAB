@@ -525,7 +525,7 @@ public class OpenSearchWrapper {
 		Requests.builder().//
 			endpoint(indexData.getIndex() + "/_doc/" + indexData.getEntryId()).//
 			method("POST").//
-			json(indexData.getData()).build());
+			json(indexData.getDataString()).build());
 
 	String bodyAsString = response.getBody().//
 		get().//

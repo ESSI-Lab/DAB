@@ -274,7 +274,7 @@ public class OpenSearchQueryBuilder {
 
 	    return buildRangeQuery(el.getName(), operator, value, ranking.computePropertyWeight(el));
 
-	case LIKE:
+	case TEXT_SEARCH:
 
 	    value = normalize(value);
 

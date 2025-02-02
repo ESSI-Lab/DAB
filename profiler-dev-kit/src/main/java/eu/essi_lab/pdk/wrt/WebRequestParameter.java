@@ -271,12 +271,12 @@ public abstract class WebRequestParameter {
      * &#64;Override
      * public Optional&lt;Bond&gt; asBond(String value) {
      * 
-     *     return Optional.of(BondFactory.createSimpleElementBond(BondOperator.LIKE, MetadataElement.TITLE, value));
+     *     return Optional.of(BondFactory.createSimpleElementBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, value));
      * }
      * </pre>
      * 
      * If the semantic of the parameter relates to an exact match, the {@link BondOperator#EQUAL} should be used instead
-     * of {@link BondOperator#LIKE}
+     * of {@link BondOperator#TEXT_SEARCH}
      * 
      * <pre>
      * &#64;Override

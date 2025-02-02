@@ -61,7 +61,7 @@ public class CustomBondFactory {
      * The supplied <code>operator</code> must be one of the following binary operators:
      * <ul>
      * <li>{@link BondOperator#EQUAL}</li>
-     * <li>{@link BondOperator#LIKE}</li>
+     * <li>{@link BondOperator#TEXT_SEARCH}</li>
      * <li>{@link BondOperator#LESS}</li>
      * <li>{@link BondOperator#LESS_OR_EQUAL}</li>
      * <li>{@link BondOperator#GREATER}</li>
@@ -85,7 +85,7 @@ public class CustomBondFactory {
 
 	if (operator != BondOperator.EQUAL && //
 		operator != BondOperator.NOT_EQUAL && //
-		operator != BondOperator.LIKE && //
+		operator != BondOperator.TEXT_SEARCH && //
 		operator != BondOperator.LESS && //
 		operator != BondOperator.LESS_OR_EQUAL && //
 		operator != BondOperator.GREATER && //

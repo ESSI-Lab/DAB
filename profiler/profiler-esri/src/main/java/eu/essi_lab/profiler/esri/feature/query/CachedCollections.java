@@ -392,7 +392,7 @@ public class CachedCollections {
 		}
 		String attributeName = field.getName();
 		Expression expr1 = ff.property(attributeName);
-		if (operator.equals(BondOperator.LIKE)) {
+		if (operator.equals(BondOperator.TEXT_SEARCH)) {
 		    filters.add(ff.like(expr1, value, "*", "%", "!", false));
 		} else {
 		    filters.add(ff.like(expr1, value, "*", "%", "!", true));

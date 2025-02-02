@@ -307,7 +307,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(BondOperator.LIKE, value, MetadataElement.INSTRUMENT_TITLE);
+	    return createBond(BondOperator.TEXT_SEARCH, value, MetadataElement.INSTRUMENT_TITLE);
 	}
     };
 
@@ -337,7 +337,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(BondOperator.LIKE, value, MetadataElement.PLATFORM_TITLE);
+	    return createBond(BondOperator.TEXT_SEARCH, value, MetadataElement.PLATFORM_TITLE);
 	}
     };
 
@@ -474,7 +474,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(BondOperator.LIKE, value, MetadataElement.ATTRIBUTE_TITLE);
+	    return createBond(BondOperator.TEXT_SEARCH, value, MetadataElement.ATTRIBUTE_TITLE);
 	}
     };
     

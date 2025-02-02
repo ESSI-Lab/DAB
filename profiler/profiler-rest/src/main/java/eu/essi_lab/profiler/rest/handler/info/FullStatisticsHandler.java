@@ -447,7 +447,7 @@ public class FullStatisticsHandler extends DefaultRequestHandler {
 	    case LESS_OR_EQUAL:
 		return BondOperator.LESS_OR_EQUAL;
 	    case LIKE:
-		return BondOperator.LIKE;
+		return BondOperator.TEXT_SEARCH;
 	    case NOT_EQUAL:
 		return BondOperator.NOT_EQUAL;
 	    default:

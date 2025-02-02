@@ -73,7 +73,7 @@ public class SimpleValueBond extends MetadataElementBond<String> {
      * <ul>
      * <li>{@link BondOperator#EQUAL}</li>
      * <li>{@link BondOperator#NOT_EQUAL}</li>
-     * <li>{@link BondOperator#LIKE}</li>
+     * <li>{@link BondOperator#TEXT_SEARCH}</li>
      * <li>{@link BondOperator#LESS}</li>
      * <li>{@link BondOperator#LESS_OR_EQUAL}</li>
      * <li>{@link BondOperator#GREATER}</li>

@@ -27,8 +27,8 @@ public class DefaultViewManagerTest {
     @Before
     public void init() throws GSException {
 	this.manager = Mockito.spy(new DefaultViewManager());
-	this.view1 = BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "temperature");
-	this.view2 = BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "discharge");
+	this.view1 = BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "temperature");
+	this.view2 = BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "discharge");
 	this.view3 = BondFactory.createAndBond(BondFactory.createViewBond("view1"), BondFactory.createViewBond("view2"));
 	this.view4 = BondFactory.createOrBond(view3, view1);
 	ViewFactory vf = new ViewFactory();

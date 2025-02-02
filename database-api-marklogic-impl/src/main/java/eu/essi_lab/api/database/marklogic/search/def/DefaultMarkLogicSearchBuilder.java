@@ -702,7 +702,7 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 
 	    return buildCTSElementRangeQuery(qName, operator.asMathOperator(), value, ranking.computePropertyWeight(element), true);
 
-	case LIKE:
+	case TEXT_SEARCH:
 
 	    Optional<Properties> keyValueOption = ConfigurationWrapper.getSystemSettings().getKeyValueOptions();
 	    if (keyValueOption.isPresent()) {

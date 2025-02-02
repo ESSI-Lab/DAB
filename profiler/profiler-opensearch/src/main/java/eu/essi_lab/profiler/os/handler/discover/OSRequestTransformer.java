@@ -397,7 +397,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 			break;
 		    }
 		}
-		SimpleValueBond bond = BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.ATTRIBUTE_TITLE, value);
+		SimpleValueBond bond = BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.ATTRIBUTE_TITLE, value);
 		operands.add(bond);
 		if (ho != null) {
 		    List<SKOSConcept> concepts = ho.findConcepts(value, true, false);
@@ -770,7 +770,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 		&& !searchTerms.isEmpty()) {
 
 	    List<Bond> innerBonds = new ArrayList<>();
-	    innerBonds.add(BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, searchTerms));
+	    innerBonds.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, searchTerms));
 
 	    HydroOntology ho = new HISCentralOntology();
 	    List<SKOSConcept> concepts = ho.findConcepts(searchTerms, true, false);
@@ -861,23 +861,23 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 		ArrayList<Bond> operands = new ArrayList<>();
 
 		if (searchFields.toLowerCase().contains("anytext")) {
-		    operands.add(BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.ANY_TEXT, searchTerm));
+		    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.ANY_TEXT, searchTerm));
 		}
 
 		if (searchFields.toLowerCase().contains("title")) {
-		    operands.add(BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, searchTerm));
+		    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, searchTerm));
 		}
 
 		if (searchFields.toLowerCase().contains("subject")) {
-		    operands.add(BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.SUBJECT, searchTerm));
+		    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.SUBJECT, searchTerm));
 		}
 
 		if (searchFields.toLowerCase().contains("abstract") || searchFields.toLowerCase().contains("description")) {
-		    operands.add(BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.ABSTRACT, searchTerm));
+		    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.ABSTRACT, searchTerm));
 		}
 
 		if (searchFields.toLowerCase().contains("keyword")) {
-		    operands.add(BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.KEYWORD, searchTerm));
+		    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, searchTerm));
 		}
 
 		switch (operands.size()) {

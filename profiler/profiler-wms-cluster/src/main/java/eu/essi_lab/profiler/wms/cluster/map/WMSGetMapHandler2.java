@@ -846,12 +846,12 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 	    LogicalBond orBond = BondFactory.createOrBond();
 
 	    orBond.getOperands().add(BondFactory.createSimpleValueBond(//
-		    BondOperator.LIKE, //
+		    BondOperator.TEXT_SEARCH, //
 		    MetadataElement.TITLE, //
 		    what.get()));
 
 	    orBond.getOperands().add(BondFactory.createSimpleValueBond(//
-		    BondOperator.LIKE, //
+		    BondOperator.TEXT_SEARCH, //
 		    MetadataElement.KEYWORD, //
 		    what.get()));
 
@@ -1016,7 +1016,7 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 
 	for (String attributeTitle : attributeTitles) {
 
-	    SimpleValueBond bond = BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.ATTRIBUTE_TITLE, attributeTitle);
+	    SimpleValueBond bond = BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.ATTRIBUTE_TITLE, attributeTitle);
 	    orBond.getOperands().add(bond);
 	    if (ho != null) {
 		List<SKOSConcept> concepts = ho.findConcepts(attributeTitle, true, false);

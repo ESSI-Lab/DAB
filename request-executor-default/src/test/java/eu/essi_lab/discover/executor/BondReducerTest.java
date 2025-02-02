@@ -47,7 +47,7 @@ public class BondReducerTest {
     @Before
     public void init() {
 	this.reducer = new BondReducer();
-	property1Bond = BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "precipitation");
+	property1Bond = BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "precipitation");
 	source1Bond = BondFactory.createSourceIdentifierBond("source1");
 	source2Bond = BondFactory.createSourceIdentifierBond("source2");
 	s1p1Bond = BondFactory.createAndBond(property1Bond, source1Bond);

@@ -31,7 +31,7 @@ public class BondParserUsageExample {
 	SpatialBond spatialBond = BondFactory.createSpatialExtentBond(BondOperator.CONTAINS, spatialExtent);
 	firstBondList.add(spatialBond);
 
-	SimpleValueBond searchTermsBond = BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "pippo");
+	SimpleValueBond searchTermsBond = BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "pippo");
 	firstBondList.add(searchTermsBond);
 
 	String startTime = "1900";
@@ -55,7 +55,7 @@ public class BondParserUsageExample {
 	spatialBond = BondFactory.createSpatialExtentBond(BondOperator.CONTAINS, spatialExtent);
 	secondBondList.add(spatialBond);
 
-	searchTermsBond = BondFactory.createSimpleValueBond(BondOperator.LIKE, MetadataElement.TITLE, "ciccio");
+	searchTermsBond = BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "ciccio");
 	secondBondList.add(searchTermsBond);
 
 	startTime = "2010";

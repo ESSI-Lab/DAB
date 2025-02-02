@@ -47,7 +47,7 @@ public class ESRIParserTest {
 	bond = parser.parse("(UPPER(country) = 'NORWAY')", fields);
 	if (bond instanceof SimpleValueBond) {
 	    SimpleValueBond svb = (SimpleValueBond) bond;
-	    assertEquals(BondOperator.LIKE, svb.getOperator());
+	    assertEquals(BondOperator.TEXT_SEARCH, svb.getOperator());
 	    assertEquals(MetadataElement.COUNTRY, svb.getProperty());
 	    assertEquals("NORWAY", svb.getPropertyValue());
 	} else {
@@ -65,7 +65,7 @@ public class ESRIParserTest {
 	    bond = operands.get(0);
 	    if (bond instanceof SimpleValueBond) {
 		SimpleValueBond svb = (SimpleValueBond) bond;
-		assertEquals(BondOperator.LIKE, svb.getOperator());
+		assertEquals(BondOperator.TEXT_SEARCH, svb.getOperator());
 		assertEquals(MetadataElement.COUNTRY, svb.getProperty());
 		assertEquals("NORWAY", svb.getPropertyValue());
 	    } else {

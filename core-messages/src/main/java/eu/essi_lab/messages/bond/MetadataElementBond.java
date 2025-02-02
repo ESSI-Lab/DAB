@@ -70,7 +70,7 @@ public abstract class MetadataElementBond<T> extends QueryableBond<T> {
      * a binary operator. Accepted operators are:
      * <ul>
      * <li>{@link BondOperator#EQUAL}</li>
-     * <li>{@link BondOperator#LIKE}</li>
+     * <li>{@link BondOperator#TEXT_SEARCH}</li>
      * <li>{@link BondOperator#LESS}</li>
      * <li>{@link BondOperator#LESS_OR_EQUAL}</li>
      * <li>{@link BondOperator#GREATER}</li>

@@ -183,7 +183,7 @@ public class ModuleMarkLogicSearchBuilder extends DefaultMarkLogicSearchBuilder 
 
 	    return MarkLogicModuleQueryBuilder.getInstance().getSourceIdQuery(value, markLogicDB.getIdentifier());
 
-	case LIKE:
+	case TEXT_SEARCH:
 
 	    return MarkLogicModuleQueryBuilder.getInstance().getSourceIdLikeQuery(value, markLogicDB.getIdentifier());
 	}
