@@ -27,13 +27,11 @@ package eu.essi_lab.api.database.opensearch.index.mappings;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.json.JSONObject;
 import org.opensearch.client.opensearch._types.mapping.BinaryProperty;
-import org.opensearch.client.opensearch._types.mapping.FieldType;
 import org.opensearch.client.opensearch._types.mapping.Property;
 import org.opensearch.client.opensearch.indices.PutMappingRequest;
 
@@ -74,7 +72,7 @@ public abstract class IndexMapping {
     //
     // Lucene doesn't allow terms that contain more than 32k bytes
     //
-    private static final int MAX_TERMS_CHARACTER = 30000;
+    public static final int MAX_TERMS_CHARACTER = 30000;
 
     /**
      * @return
@@ -144,9 +142,6 @@ public abstract class IndexMapping {
 
 	JSONObject property = new JSONObject();
 	property.put("type", type);
-	if (type.equals(FieldType.Keyword.jsonValue())) {
-	    property.put("ignore_above", MAX_TERMS_CHARACTER);
-	}
 
 	mapping.getJSONObject("mappings").//
 		getJSONObject("properties").//

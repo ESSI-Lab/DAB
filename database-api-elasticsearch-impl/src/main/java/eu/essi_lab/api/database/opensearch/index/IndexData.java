@@ -754,6 +754,11 @@ public class IndexData {
 
 	    if (valueClass.equals(String.class) || valueClass.equals(KeywordProperty.class)) {
 
+		if (valueClass.equals(KeywordProperty.class) && v.length() > IndexMapping.MAX_TERMS_CHARACTER) {
+
+		    v = v.substring(0, IndexMapping.MAX_TERMS_CHARACTER);
+		}
+
 		array.put(String.valueOf(v));
 
 	    } else if (valueClass.equals(Integer.class)) {
