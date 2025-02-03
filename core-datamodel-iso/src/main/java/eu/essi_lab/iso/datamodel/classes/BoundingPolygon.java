@@ -29,8 +29,11 @@ import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 
+import org.w3c.dom.Node;
+
 import eu.essi_lab.iso.datamodel.ISOMetadata;
 import eu.essi_lab.jaxb.common.ObjectFactories;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import net.opengis.gml.v_3_2_0.AbstractRingPropertyType;
 import net.opengis.gml.v_3_2_0.AbstractRingType;
 import net.opengis.gml.v_3_2_0.DirectPositionListType;
@@ -59,6 +62,35 @@ public class BoundingPolygon extends ISOMetadata<EXBoundingPolygonType> {
     public BoundingPolygon() {
 
 	super(new EXBoundingPolygonType());
+    }
+
+    /**
+     * @param node
+     * @return
+     * @throws JAXBException
+     */
+    public static BoundingPolygon create(Node node) throws JAXBException {
+
+	EXBoundingPolygonType type = new BoundingPolygon().fromNode(node);
+
+	return new BoundingPolygon(type);
+    }
+
+    /**
+     * @param node
+     * @return
+     * @throws JAXBException
+     */
+    public static BoundingPolygon createOrNull(Node node) {
+
+	try {
+	    return create(node);
+	} catch (JAXBException ex) {
+
+	    GSLoggerFactory.getLogger(BoundingPolygon.class).error(ex);
+	}
+
+	return null;
     }
 
     @Override
@@ -105,7 +137,7 @@ public class BoundingPolygon extends ISOMetadata<EXBoundingPolygonType> {
 	    pointMembers.add(pointType);
 	}
 	multiPoint.setPointMember(pointMembers);
-	//if lat lon alt ---> EPSG:4979
+	// if lat lon alt ---> EPSG:4979
 	if (multiPoint.getPointMember().get(0).getPoint().getPos().getValue().size() == 3) {
 	    multiPoint.setSrsName("EPSG:4979");
 	}

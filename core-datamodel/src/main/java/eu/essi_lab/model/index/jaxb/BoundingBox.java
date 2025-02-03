@@ -58,9 +58,24 @@ public class BoundingBox extends DOMSerializer {
 	}
     }
 
+    /**
+     * @param stream
+     * @return
+     * @throws JAXBException
+     */
     public static BoundingBox create(InputStream stream) throws JAXBException {
 
 	return new BoundingBox().fromStream(stream);
+    }
+
+    /**
+     * @param stream
+     * @return
+     * @throws JAXBException
+     */
+    public static BoundingBox create(Node node) throws JAXBException {
+
+	return new BoundingBox().fromNode(node);
     }
 
     public static final String AREA_ELEMENT_NAME = "area";
