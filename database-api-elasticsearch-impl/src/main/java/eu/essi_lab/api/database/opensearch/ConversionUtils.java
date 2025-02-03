@@ -327,7 +327,30 @@ public class ConversionUtils {
     public static String encode(GSResource resource) {
 
 	try {
-	    byte[] bytes = toString(resource.asDocument(false)).getBytes();
+
+	    return encode(resource.asDocument(false));
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(ConversionUtils.class).error(ex);
+	}
+
+	return null;
+    }
+
+    /**
+     * @param resource
+     * @return
+     * @throws IOException
+     * @throws SAXException
+     * @throws JAXBException
+     * @throws ParserConfigurationException
+     * @throws TransformerException
+     */
+    public static String encode(Document resourceDoc) {
+
+	try {
+	    byte[] bytes = toString(resourceDoc).getBytes();
 	    return Base64.getEncoder().encodeToString(bytes);
 	} catch (Exception ex) {
 
