@@ -3,11 +3,11 @@
  */
 package eu.essi_lab.api.database.opensearch.datafolder.test;
 
-import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.w3c.dom.Node;
 
@@ -15,9 +15,12 @@ import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.opensearch.ConversionUtils;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
+import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
+import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.indexes.IndexedElements;
+import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.model.Queryable.ContentType;
 import eu.essi_lab.model.index.jaxb.IndexesMetadata;
 import eu.essi_lab.model.resource.GSResource;
@@ -65,64 +68,143 @@ public class TestUtils {
     }
 
     /**
+     * @param targetSource
+     * @param decodedSource
+     */
+    private static void compareJSONObjects(JSONObject targetSource, JSONObject decodedSource) {
+
+	targetSource.remove(DataFolderMapping.GS_RESOURCE);
+
+	decodedSource.remove(DataFolderMapping.GS_RESOURCE);
+
+	Assert.assertEquals(targetSource.toString(), decodedSource.toString());
+    }
+
+    /**
      * @param wrapper
-     * @param targetDataset
+     * @param originalDataset
      * @param folder
      * @param key
      * @throws Exception
      */
     public static void compareResources(//
 	    SourceWrapper wrapper, //
-	    GSResource targetDataset, //
+	    GSResource originalDataset, //
 	    DatabaseFolder folder, //
 	    String key) throws Exception {
 
-	Optional<String> optResource = wrapper.getGSResource();
-	Assert.assertTrue(optResource.isPresent());
+	//
+	// 1) retrieves the stored dataset from the Base64 encoded string
+	//
 
-	String base64resource = optResource.get();
-	InputStream decoded = ConversionUtils.decode(base64resource);
+	Assert.assertTrue(wrapper.getGSResource().isPresent());
 
-	// this resource has no indexes, they must be added
-	GSResource decodedResource = GSResource.create(decoded);
-	IndexData.decorate(wrapper.getSource(), decodedResource);
+	String base64Dataset = wrapper.getGSResource().get();
+
+	ClonableInputStream storedDatasetStream = new ClonableInputStream(ConversionUtils.decode(base64Dataset));
+
+	GSResource storedDataset = GSResource.create(storedDatasetStream.clone());
+
+	// resources are stored without indexes (except the bbox), they must be added before the comparison
+	IndexData.decorate(wrapper.getSource(), storedDataset);
+
+	//
+	// 2) compares the stored dataset indexes with the original one indexes
+	//
+
+	Assert.assertTrue(compareIndexedElements(wrapper, originalDataset, storedDataset));
+
+	//
+	// 3.1) compares the JSON objects resulting from the mapping of the two resources
+	//
+	// [ the IndexData method used here for the mapping reads the indexes value from the IndexesMetadata ]
+	// [ and it removes the IndexesMetadata from the dataset, so in order to preserve the original dataset ]
+	// [ for the next tests, we use a clone ]
+	//
+
+	IndexData ofTargetMethod_1 = null;
+	IndexData ofDecodedMethod_1 = null;
+
+	IndexData ofTargetMethod_2 = null;
+	IndexData ofDecodedMethod_2 = null;
+
+	{
+
+	    ofTargetMethod_1 = IndexData.of((OpenSearchFolder) folder, GSResource.create(originalDataset.asDocument(true)));
+
+	    ofDecodedMethod_1 = IndexData.of((OpenSearchFolder) folder, GSResource.create(storedDataset.asDocument(true)));
+
+	    compareJSONObjects(ofTargetMethod_1.getDataObject(), ofDecodedMethod_1.getDataObject());
+	}
+
+	//
+	// 3.2) compares the JSON objects resulting from the mapping of the two resources
+	//
+	// [ the IndexData method used here for the mapping reads the indexes using the XMLDocumentReader ]
+	// [ and it removes the IndexesMetadata from the dataset, so in order to preserve the original dataset ]
+	// [ for the next tests, we use a clone ]
+	//
+	{
+
+	    ofTargetMethod_2 = IndexData.of((OpenSearchFolder) folder, GSResource.create(originalDataset.asDocument(true)).asStream());
+
+	    ofDecodedMethod_2 = IndexData.of((OpenSearchFolder) folder, GSResource.create(storedDataset.asDocument(true)).asStream());
+
+	    compareJSONObjects(ofTargetMethod_2.getDataObject(), ofDecodedMethod_2.getDataObject());
+	}
+
+	//
+	// 3.3) compares the JSON objects resulting from the two mapping methods
+	//
+
+	compareJSONObjects(ofTargetMethod_1.getDataObject(), ofTargetMethod_2.getDataObject());
+
+	compareJSONObjects(ofDecodedMethod_1.getDataObject(), ofDecodedMethod_2.getDataObject());
+
+	//
+	// 4) retrieves the dataset from the folder and compares the indexes with the original one
+	//
 
 	Node binary = folder.get(key);
 
-	GSResource folderResource = GSResource.create(binary);
+	GSResource folderDataset = GSResource.create(binary);
 
-	Assert.assertTrue(compareProperties(wrapper, targetDataset, decodedResource));
-	Assert.assertTrue(compareProperties(wrapper, targetDataset, folderResource));
+	Assert.assertTrue(compareIndexedElements(wrapper, originalDataset, folderDataset));
     }
 
     /**
      * @param wrapper
-     * @param res1
-     * @param res2
+     * @param originalResource
+     * @param storedResource
      * @return
      * @throws Exception
      */
-    private static boolean compareProperties(SourceWrapper wrapper, GSResource res1, GSResource res2) throws Exception {
+    private static boolean compareIndexedElements(SourceWrapper wrapper, GSResource originalResource, GSResource storedResource)
+	    throws Exception {
 
-	IndexesMetadata indexesMetadata1 = res1.getIndexesMetadata();
-	IndexesMetadata indexesMetadata2 = res2.getIndexesMetadata();
+	IndexesMetadata indexesMetadata1 = originalResource.getIndexesMetadata();
+	IndexesMetadata indexesMetadata2 = storedResource.getIndexesMetadata();
 
 	boolean equals = true;
 
-	indexesMetadata1.remove(IndexedElements.BOUNDING_BOX_NULL.getElementName());
-	indexesMetadata1.remove(IndexedElements.TEMP_EXTENT_BEGIN_NULL.getElementName());
-	indexesMetadata1.remove(IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName());
-	indexesMetadata1.remove(IndexedElements.TEMP_EXTENT_END_NOW.getElementName());
-	indexesMetadata1.remove(IndexedElements.TEMP_EXTENT_END_NULL.getElementName());
+	List<String> indexes1Prop = indexesMetadata1.getProperties().//
+		stream().//
+		//
+		// filter out the bbox_Null properties since it is not mapped 
+		// because if the dataset has BoundingPolygon it is not indexed, so the JSON source
+		// have the bbox value but the original dataset
+		//
+		filter(p -> !p.equals(IndexedElements.BOUNDING_BOX_NULL.getElementName())).
+		collect(Collectors.toList());
 
-	equals &= indexesMetadata1.getProperties().equals(indexesMetadata2.getProperties());
+	equals &= indexes1Prop.equals(indexesMetadata2.getProperties());
 
 	if (!equals) {
 
 	    throw new Exception();
 	}
 
-	for (String prop : indexesMetadata1.getProperties()) {
+	for (String prop : indexes1Prop) {
 
 	    List<String> prop1 = indexesMetadata1.read(prop);
 	    List<String> prop2 = indexesMetadata2.read(prop).//
@@ -137,13 +219,7 @@ public class TestUtils {
 		throw new Exception();
 	    }
 
-	    if (prop.equals(IndexedElements.BOUNDING_BOX_NULL.getElementName())
-		    || prop.equals(IndexedElements.TEMP_EXTENT_BEGIN_NULL.getElementName())
-		    || prop.equals(IndexedElements.TEMP_EXTENT_END_NULL.getElementName())) {
-
-		continue;
-
-	    } else if ( //
+	    if ( //
 	    prop.equals(IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName()) || //
 		    prop.equals(IndexedElements.TEMP_EXTENT_END_NOW.getElementName()) //
 	    ) {
@@ -179,7 +255,13 @@ public class TestUtils {
 		    contType = MetadataElement.optFromName(prop).map(rp -> rp.getContentType());
 		}
 
-		if (contType.get() == ContentType.ISO8601_DATE || contType.get() == ContentType.ISO8601_DATE_TIME) {
+		if (!contType.isPresent()) {
+
+		    // null properties have no content type
+		    Assert.assertTrue(prop.endsWith("_Null"));
+		}
+
+		else if (contType.get() == ContentType.ISO8601_DATE || contType.get() == ContentType.ISO8601_DATE_TIME) {
 
 		    List<Long> longDataTimes = wrapper.getGSResourceProperties(prop).//
 			    stream().//
