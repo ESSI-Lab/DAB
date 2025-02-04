@@ -32,7 +32,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -648,42 +647,29 @@ public class IndexData {
 
 	if (source.has(IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName())) {
 
-	    IndexedElement element = new IndexedElement(IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName());
-	    element.getValues().add("");
-	    indexesMd.write(element);
+	    indexesMd.write(IndexedElements.TEMP_EXTENT_BEGIN_NOW);
 	}
 
 	if (source.has(IndexedElements.TEMP_EXTENT_END_NOW.getElementName())) {
 
-	    IndexedElement element = new IndexedElement(IndexedElements.TEMP_EXTENT_END_NOW.getElementName());
-	    element.getValues().add("");
-	    indexesMd.write(element);
+	    indexesMd.write(IndexedElements.TEMP_EXTENT_END_NOW);
 	}
 
-	if (!source.has(MetadataElement.TEMP_EXTENT_BEGIN.getName())
-		&& !source.has(MetadataElement.TEMP_EXTENT_BEGIN_BEFORE_NOW.getName())  && 
-		!source.has(IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName())) {
+	if (!source.has(MetadataElement.TEMP_EXTENT_BEGIN.getName()) && //
+		!source.has(MetadataElement.TEMP_EXTENT_BEGIN_BEFORE_NOW.getName()) //
+		&& !source.has(IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName())) {
 
-	    IndexedElement element = new IndexedElement(IndexedElements.TEMP_EXTENT_BEGIN_NULL.getElementName());
-	    element.getValues().add("");
-	    indexesMd.write(element);
+	    indexesMd.write(IndexedElements.TEMP_EXTENT_BEGIN_NULL);
 	}
 
 	if (!source.has(MetadataElement.TEMP_EXTENT_END.getName()) && !source.has(IndexedElements.TEMP_EXTENT_END_NOW.getElementName())) {
 
-	    IndexedElement element = new IndexedElement(IndexedElements.TEMP_EXTENT_END_NULL.getElementName());
-	    element.getValues().add("");
-	    indexesMd.write(element);
+	    indexesMd.write(IndexedElements.TEMP_EXTENT_END_NULL);
 	}
 
-	List<BoundingPolygon> boundingPolygons = res.getHarmonizedMetadata().getCoreMetadata().getDataIdentification()
-		.getBoundingPolygonsList();
+	if (!source.has(MetadataElement.BOUNDING_BOX.getName())) {
 
-	if (!source.has(MetadataElement.BOUNDING_BOX.getName()) && boundingPolygons.isEmpty()) {
-
-	    IndexedElement element = new IndexedElement(IndexedElements.BOUNDING_BOX_NULL.getElementName());
-	    element.getValues().add("");
-	    indexesMd.write(element);
+	    indexesMd.write(IndexedElements.BOUNDING_BOX_NULL);
 	}
 
 	return res;
@@ -1082,6 +1068,8 @@ public class IndexData {
 		    v = v.substring(0, IndexMapping.MAX_TERMS_CHARACTER);
 		}
 
+		v = v.trim().strip();
+		
 		array.put(String.valueOf(v));
 
 	    } else if (valueClass.equals(Integer.class)) {
