@@ -45,7 +45,7 @@ public class SpatialIndexHelper {
     private static final double MAX_AREA = 64800;
 
     private SpatialIndexHelper() {
-	//force static usage
+	// force static usage
     }
 
     static void addBBoxes(GSResource resource, IndexedMetadataElement element) {
@@ -55,8 +55,8 @@ public class SpatialIndexHelper {
 
 	ArrayList<Double[]> values = new ArrayList<>();
 
-	List<DataIdentification> dataIdList = Lists.newArrayList(
-		resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getDataIdentifications());
+	List<DataIdentification> dataIdList = Lists
+		.newArrayList(resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getDataIdentifications());
 	List<GeographicBoundingBox> bboxes = new ArrayList<>();
 
 	for (DataIdentification dataId : dataIdList) {
@@ -90,9 +90,9 @@ public class SpatialIndexHelper {
 		}
 
 	    } catch (Exception e) {
-
+		resource.getIndexesMetadata().write(IndexedElements.BOUNDING_BOX_NULL);
 		GSLoggerFactory.getLogger(SpatialIndexHelper.class).warn("Exception parsing bbox", e);
-
+		return;
 	    }
 
 	    break;
