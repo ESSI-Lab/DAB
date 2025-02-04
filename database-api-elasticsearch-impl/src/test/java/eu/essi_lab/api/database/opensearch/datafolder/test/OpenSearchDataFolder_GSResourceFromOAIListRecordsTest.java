@@ -117,12 +117,6 @@ public class OpenSearchDataFolder_GSResourceFromOAIListRecordsTest extends OpenS
 
 	    SourceWrapper wrapper = folder.getSourceWrapper(key);
 
-	    // System.out.println(wrapper.toStringHideBinary());
-
-	    //
-	    //
-	    //
-
 	    //
 	    //
 	    //
