@@ -11,7 +11,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.json.JSONObject;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch.core.SearchResponse;
@@ -65,6 +64,8 @@ import eu.essi_lab.model.resource.GSResource;
  */
 public class OpenSearchFinder implements DatabaseFinder {
 
+    static boolean debugQueries = false;
+
     private OpenSearchDatabase database;
     private OpenSearchWrapper wrapper;
 
@@ -92,7 +93,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	try {
 
-	    SearchResponse<Object> searchResponse = discover_(message, true);
+	    SearchResponse<Object> searchResponse = search_(message, true);
 
 	    Map<String, Aggregate> aggregations = searchResponse.aggregations();
 
@@ -161,7 +162,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	    } else {
 
-		SearchResponse<Object> response = discover_(message, false);
+		SearchResponse<Object> response = search_(message, false);
 
 		PerformanceLogger pl = new PerformanceLogger(//
 			PerformanceLogger.PerformancePhase.OPENSEARCH_FINDER_RESOURCES_CREATION, //
@@ -212,7 +213,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	try {
 
-	    SearchResponse<Object> response = discover_(message, false);
+	    SearchResponse<Object> response = search_(message, false);
 
 	    List<Node> nodes = ConversionUtils.toNodeList(response);
 
@@ -235,7 +236,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	try {
 
-	    SearchResponse<Object> response = discover_(message, false);
+	    SearchResponse<Object> response = search_(message, false);
 
 	    List<String> nodes = ConversionUtils.toStringList(response);
 
@@ -278,6 +279,12 @@ public class OpenSearchFinder implements DatabaseFinder {
 		collect(Collectors.toList());
 
 	Query query = OpenSearchQueryBuilder.buildDataFolderQuery(getDatabase().getIdentifier(), ids);
+
+	if (debugQueries) {
+
+	    GSLoggerFactory.getLogger(getClass()).debug("--- GET SOURCES DATA FOLDER MAP ---");
+	    GSLoggerFactory.getLogger(getClass()).debug("\n\n{}\n\n", ConversionUtils.toJSONObject(query).toString(3));
+	}
 
 	try {
 
@@ -342,7 +349,23 @@ public class OpenSearchFinder implements DatabaseFinder {
      * @return
      * @throws GSException
      */
-    private SearchResponse<Object> discover_(DiscoveryMessage message, boolean count) throws GSException {
+    private SearchResponse<Object> search_(DiscoveryMessage message, boolean count) throws GSException {
+
+	PerformanceLogger pl = null;
+
+	if (count) {
+
+	    pl = new PerformanceLogger(//
+		    PerformanceLogger.PerformancePhase.OPENSEARCH_FINDER_COUNT, //
+		    message.getRequestId(), //
+		    Optional.ofNullable(message.getWebRequest()));
+	} else {
+
+	    pl = new PerformanceLogger(//
+		    PerformanceLogger.PerformancePhase.OPENSEARCH_FINDER_DISCOVERY, //
+		    message.getRequestId(), //
+		    Optional.ofNullable(message.getWebRequest()));
+	}
 
 	Query query = builQuery(message, count);
 
@@ -351,12 +374,17 @@ public class OpenSearchFinder implements DatabaseFinder {
 	    int start = message.getPage().getStart() - 1;
 	    int size = message.getPage().getSize();
 
-	    GSLoggerFactory.getLogger(getClass()).debug("\n\n{}\n\n",
-		    new JSONObject(ConversionUtils.toJSONObject(query).toString(3)).toString(3));
+	    if (debugQueries) {
+
+		GSLoggerFactory.getLogger(getClass()).debug(count ? "--- COUNT ---" : "--- DISCOVER ---");
+		GSLoggerFactory.getLogger(getClass()).debug("\n\n{}\n\n", ConversionUtils.toJSONObject(query).toString(3));
+	    }
 
 	    SearchResponse<Object> response = count ? //
 		    wrapper.count(query, message) : //
 		    wrapper.search(DataFolderMapping.get().getIndex(), query, start, size);
+
+	    pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
 
 	    return response;
 
