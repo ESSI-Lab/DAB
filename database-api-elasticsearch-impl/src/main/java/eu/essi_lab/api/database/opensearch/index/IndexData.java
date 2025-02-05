@@ -33,6 +33,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.xml.bind.JAXBException;
@@ -694,11 +695,11 @@ public class IndexData {
     /**
      * @return
      */
-    public IndexRequest<JSONObject> getRequest() {
+    public IndexRequest<Map<String,Object>> getIndexRequest() {
 
-	return new IndexRequest.Builder<JSONObject>().//
+	return new IndexRequest.Builder<Map<String,Object>>().//
 		index(mapping.getIndex()).//
-		document(object).//
+		document(object.toMap()).//
 		id(entryId).//
 		build();
     }

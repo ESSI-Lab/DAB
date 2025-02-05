@@ -301,10 +301,10 @@ public class OpenSearchWrapper {
      * @throws Exception
      */
     public List<InputStream> searchBinaries(String index, Query searchQuery, int start, int size) throws Exception {
-    
-        SearchResponse<Object> searchResponse = search(index, searchQuery, start, size);
-    
-        return ConversionUtils.toBinaryList(searchResponse);
+
+	SearchResponse<Object> searchResponse = search(index, searchQuery, start, size);
+
+	return ConversionUtils.toBinaryList(searchResponse);
     }
 
     /**
@@ -316,8 +316,8 @@ public class OpenSearchWrapper {
      * @throws Exception
      */
     public List<InputStream> searchBinaries(String index, Query searchQuery) throws Exception {
-    
-        return searchBinaries(index, searchQuery, 0, 10);
+
+	return searchBinaries(index, searchQuery, 0, 10);
     }
 
     /**
@@ -539,10 +539,6 @@ public class OpenSearchWrapper {
     }
 
     /**
-     * {@link IndexRequest} works only with a <i>POJO</i> body;
-     * using other types of body such as {@link String} of {@link JSONObject} do not works!
-     * 
-     * @param client
      * @param indexData
      * @return
      * @throws OpenSearchException
@@ -550,7 +546,7 @@ public class OpenSearchWrapper {
      */
     public boolean storeWithOpenSearchClient(IndexData indexData) throws OpenSearchException, IOException {
 
-	IndexRequest<JSONObject> indexRequest = indexData.getRequest();
+	IndexRequest<Map<String, Object>> indexRequest = indexData.getIndexRequest();
 
 	IndexResponse indexResponse = client.index(indexRequest);
 

@@ -76,7 +76,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 
 	IndexData indexData = IndexData.of(this, key, entry, type);
 
-	boolean stored = wrapper.storeWithGenericClient(indexData);
+	boolean stored = wrapper.storeWithOpenSearchClient(indexData);
 
 	wrapper.synch();
 
