@@ -66,6 +66,7 @@ import org.opensearch.client.opensearch.core.msearch.RequestItem;
 import org.opensearch.client.opensearch.core.search.Hit;
 import org.opensearch.client.opensearch.core.search.HitsMetadata;
 import org.opensearch.client.opensearch.core.search.SourceFilter;
+import org.opensearch.client.opensearch.core.search.TrackHits;
 import org.opensearch.client.opensearch.generic.OpenSearchGenericClient;
 import org.opensearch.client.opensearch.generic.Requests;
 import org.opensearch.client.opensearch.generic.Response;
@@ -171,6 +172,7 @@ public class OpenSearchWrapper {
 		});
 
 		builder.query(searchQuery).//
+			trackTotalHits(new TrackHits.Builder().enabled(true).build()).//
 			index(DataFolderMapping.get().getIndex()).//
 			size(0);
 
