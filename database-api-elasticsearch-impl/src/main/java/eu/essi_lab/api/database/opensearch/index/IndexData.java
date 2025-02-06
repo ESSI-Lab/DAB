@@ -695,9 +695,9 @@ public class IndexData {
     /**
      * @return
      */
-    public IndexRequest<Map<String,Object>> getIndexRequest() {
+    public IndexRequest<Map<String, Object>> getIndexRequest() {
 
-	return new IndexRequest.Builder<Map<String,Object>>().//
+	return new IndexRequest.Builder<Map<String, Object>>().//
 		index(mapping.getIndex()).//
 		document(object.toMap()).//
 		id(entryId).//
@@ -1070,7 +1070,7 @@ public class IndexData {
 		}
 
 		v = v.trim().strip();
-		
+
 		array.put(String.valueOf(v));
 
 	    } else if (valueClass.equals(Integer.class)) {
