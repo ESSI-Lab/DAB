@@ -76,6 +76,14 @@ public interface DatabaseReader extends DatabaseProvider, UserBaseClient {
      * @throws GSException
      */
     Optional<View> getView(String viewId) throws GSException;
+    
+    /**
+     * Get all the available views
+     * 
+     * @return
+     * @throws GSException
+     */
+    List<View> getViews() throws GSException;
 
     /**
      * Gets the list of view identifiers

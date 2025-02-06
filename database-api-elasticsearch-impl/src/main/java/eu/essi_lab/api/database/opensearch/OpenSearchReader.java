@@ -122,6 +122,29 @@ public class OpenSearchReader implements DatabaseReader {
     }
 
     @Override
+    public List<View> getViews() throws GSException {
+
+	Query query = OpenSearchQueryBuilder.buildSearchQuery(//
+		getDatabase().getIdentifier(), //
+		ViewsMapping.VIEW_ID //
+	);
+
+	try {
+	    return wrapper.searchBinaries(ViewsMapping.get().getIndex(), query).//
+		    stream().//
+		    map(binary -> View.createOrNull(binary)).//
+		    filter(Objects::nonNull).//
+		    collect(Collectors.toList());
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(OpenSearchDatabase.class).error(ex);
+
+	    throw GSException.createException(getClass(), "OpenSearchReaderGetViewsError", ex);
+	}
+    }
+
+    @Override
     public List<String> getViewIdentifiers(GetViewIdentifiersRequest request) throws GSException {
 
 	Query query = OpenSearchQueryBuilder.buildSearchViewsQuery(//

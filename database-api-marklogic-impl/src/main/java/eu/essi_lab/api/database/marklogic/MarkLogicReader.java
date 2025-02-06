@@ -37,6 +37,7 @@ import javax.xml.bind.Unmarshaller;
 import org.w3c.dom.Node;
 
 import com.marklogic.xcc.ResultSequence;
+import com.marklogic.xcc.types.XdmItem;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.Database.IdentifierType;
@@ -76,17 +77,6 @@ import eu.essi_lab.wrapper.marklogic.MarkLogicWrapper;
  * @author Fabrizio
  */
 public class MarkLogicReader implements DatabaseReader {
-
-    //
-    // ERROR MESSAGES
-    //
-    private static final String MARK_LOGIC_DISCOVER_RESULTS_JAXB_ERROR = "MARK_LOGIC_DISCOVER_RESULTS_JAXB_ERROR";
-    private static final String MARK_LOGIC_GET_RESOURCE_ERROR = "MARK_LOGIC_GET_RESOURCE_ERROR";
-    private static final String MARK_LOGIC_LIST_KEYS_ERROR = "MARK_LOGIC_LIST_KEYS_ERROR";
-    private static final String MARK_LOGIC_GET_USER_ERROR = "MARK_LOGIC_GET_USER_ERROR";
-    private static final String MARK_LOGIC_GET_USERS_ERROR = "MARK_LOGIC_GET_USERS_ERROR";
-    private static final String MARK_LOGIC_RESOURCE_EXISTS_ERROR = "MARK_LOGIC_RESOURCE_EXISTS_ERROR";
-    private static final String MARK_LOGIC_GET_FOLDER_ERROR = "MARK_LOGIC_GET_FOLDER_ERROR";
 
     //
     // LOGS
@@ -198,7 +188,7 @@ public class MarkLogicReader implements DatabaseReader {
 		    null, //
 		    ErrorInfo.ERRORTYPE_INTERNAL, //
 		    ErrorInfo.SEVERITY_ERROR, //
-		    MARK_LOGIC_GET_RESOURCE_ERROR, //
+		    "MarkLogicReaderGetResourcesError", //
 		    e);
 	}
 
@@ -283,9 +273,73 @@ public class MarkLogicReader implements DatabaseReader {
 		    null, //
 		    ErrorInfo.ERRORTYPE_INTERNAL, //
 		    ErrorInfo.SEVERITY_ERROR, //
-		    MARK_LOGIC_GET_USERS_ERROR, //
+		    "MarkLogicReaderGetUsersError", //
 		    e);
 	}
+    }
+
+    @Override
+    public List<View> getViews() throws GSException {
+
+	try {
+
+	    ArrayList<View> out = new ArrayList<View>();
+
+	    if (viewFolder == null) {
+
+		viewFolder = getDatabase().getViewFolder(false);
+
+		if (viewFolder == null) {
+
+		    GSLoggerFactory.getLogger(getClass()).warn("View folder missing");
+
+		    return out;
+		}
+	    }
+
+	    String viewQuery = getViewsQuery(viewFolder);
+
+	    MarkLogicWrapper wrapper = getDatabase().getWrapper();
+
+	    ViewFactory factory = new ViewFactory();
+
+	    Unmarshaller unmarshaller = factory.createUnmarshaller();
+
+	    ResultSequence resultSequence = wrapper.submit(viewQuery);
+
+	    XdmItem[] array = resultSequence.toArray();
+
+	    GSLoggerFactory.getLogger(getClass()).debug("View found: {}", array.length);
+
+	    for (int i = 0; i < array.length; i++) {
+
+		XdmItem xdmItem = array[i];
+
+		InputStream stream = xdmItem.asInputStream();
+
+		View view = (View) unmarshaller.unmarshal(stream);
+
+		out.add(view);
+	    }
+
+	    return out;
+
+	} catch (
+
+	Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error("Exception requesting view: {}", e.getMessage(), e);
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    "MarkLogicReaderGetViewsError", //
+		    e);
+	}
+
     }
 
     @Override
@@ -332,29 +386,6 @@ public class MarkLogicReader implements DatabaseReader {
 		return Optional.empty();
 	    }
 
-	    // ViewFactory factory = new ViewFactory();
-	    //
-	    // Unmarshaller unmarshaller = factory.createUnmarshaller();
-	    //
-	    // if (viewFolder.exists(id)) {
-	    //
-	    // // GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Getting view {} STARTED", id);
-	    //
-	    // InputStream binary = viewFolder.getBinary(id);
-	    //
-	    // // GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Getting view {} ENDED", id);
-	    //
-	    // // GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Unmarshalling view {} STARTED", id);
-	    //
-	    // View view = (View) unmarshaller.unmarshal(binary);
-	    //
-	    // // GSLoggerFactory.getLogger(MarkLogicReader.class).trace("Unmarshalling view {} ENDED", id);
-	    //
-	    // return Optional.of(view);
-	    // }
-	    //
-	    // return Optional.empty();
-
 	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(getClass()).error("Exception requesting view: {}", e.getMessage(), e);
@@ -365,7 +396,7 @@ public class MarkLogicReader implements DatabaseReader {
 		    null, //
 		    ErrorInfo.ERRORTYPE_INTERNAL, //
 		    ErrorInfo.SEVERITY_ERROR, //
-		    MARK_LOGIC_GET_RESOURCE_ERROR, //
+		    "MarkLogicReaderGetViewError", //
 		    e);
 	}
     }
@@ -431,7 +462,7 @@ public class MarkLogicReader implements DatabaseReader {
 		    null, //
 		    ErrorInfo.ERRORTYPE_INTERNAL, //
 		    ErrorInfo.SEVERITY_ERROR, //
-		    MARK_LOGIC_LIST_KEYS_ERROR, //
+		    "MarkLogicReaderGetViewIdsError", //
 		    e);
 	}
 
@@ -512,7 +543,7 @@ public class MarkLogicReader implements DatabaseReader {
 			null, //
 			ErrorInfo.ERRORTYPE_INTERNAL, //
 			ErrorInfo.SEVERITY_ERROR, //
-			MARK_LOGIC_DISCOVER_RESULTS_JAXB_ERROR, //
+			"MarkLogicReaderDiscoverResultsJAXBError", //
 			e);
 	    }
 	}
@@ -597,6 +628,28 @@ public class MarkLogicReader implements DatabaseReader {
 	query += "let $xml := if ($doc/node() instance of binary()) then (xdmp:binary-decode(fn:doc($uris)/node(), \"UTF-8\")) else $doc \n";
 
 	query += "where (fn:contains($xml,fn:concat('<id>',$id,'</id>')) or $doc//id = $id) return $xml";
+
+	return query;
+    }
+
+    /**
+     * @param viewFolder
+     * @return
+     */
+    private String getViewsQuery(DatabaseFolder viewFolder) {
+
+	String query = "xquery version \"1.0-ml\"; \n";
+	query += "declare namespace html = \"http://www.w3.org/1999/xhtml\"; \n";
+
+	query += "import module namespace gs=\"http://flora.eu/gi-suite/1.0/dataModel/schema\" at \"/gs-modules/functions-module.xqy\"; \n";
+
+	query += "for $uris in cts:uris((),(), cts:directory-query(\"/" + viewFolder.getName() + "/\", \"infinity\")   ) \n";
+
+	query += "let $doc :=  fn:document($uris) \n";
+
+	query += "let $xml := if ($doc/node() instance of binary()) then (xdmp:binary-decode(fn:doc($uris)/node(), \"UTF-8\")) else $doc \n";
+
+	query += "return $xml";
 
 	return query;
     }

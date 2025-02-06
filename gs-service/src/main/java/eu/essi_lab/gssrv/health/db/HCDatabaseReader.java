@@ -264,4 +264,10 @@ public class HCDatabaseReader extends Database implements DatabaseReader, Databa
 
 	return null;
     }
+
+    @Override
+    public List<View> getViews() throws GSException {
+
+	return null;
+    }
 }

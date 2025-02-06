@@ -139,6 +139,12 @@ public class VolatileDatabaseReader implements DatabaseReader {
 		collect(Collectors.toList());
     }
 
+    @Override
+    public List<View> getViews() throws GSException {
+
+	return getDatabase().getViewsList();
+    }
+
     /**
      * @param message
      * @return
