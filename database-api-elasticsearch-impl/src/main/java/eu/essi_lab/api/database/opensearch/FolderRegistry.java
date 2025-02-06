@@ -69,7 +69,7 @@ public class FolderRegistry {
 
 	IndexData indexData = IndexData.of(folder);
 
-	boolean stored = wrapper.storeWithGenericClient(indexData);
+	boolean stored = wrapper.storeWithOpenSearchClient(indexData);
 
 	wrapper.synch();
 

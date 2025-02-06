@@ -241,7 +241,7 @@ public class ISO8601DateTimeUtils {
 	     */
 	    return Optional.of(parsed.toDate());
 	} catch (RuntimeException e) {
-	    GSLoggerFactory.getLogger(ISO8601DateTimeUtils.class).warn("Unparsable Date: {}", dateTimeString, e);
+	    GSLoggerFactory.getLogger(ISO8601DateTimeUtils.class).warn("Unparsable Date: {}", dateTimeString);
 	}
 
 	return Optional.empty();
@@ -345,7 +345,7 @@ public class ISO8601DateTimeUtils {
 	    return Optional.of(date);
 
 	} catch (Exception e) {
-	    GSLoggerFactory.getLogger(ISO8601DateTimeUtils.class).warn("Unparsable Date: {}", dateTimeString, e);
+	    GSLoggerFactory.getLogger(ISO8601DateTimeUtils.class).warn("Unparsable Date: {}", dateTimeString);
 	}
 
 	return Optional.empty();
@@ -364,7 +364,7 @@ public class ISO8601DateTimeUtils {
 	    return Optional.of(date);
 
 	} catch (Exception e) {
-	    GSLoggerFactory.getLogger(ISO8601DateTimeUtils.class).warn("Unparsable Date: {}", dateTimeString, e);
+	    GSLoggerFactory.getLogger(ISO8601DateTimeUtils.class).warn("Unparsable Date: {}", dateTimeString);
 	}
 
 	return Optional.empty();

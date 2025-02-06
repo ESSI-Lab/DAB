@@ -23,6 +23,7 @@ package eu.essi_lab.model.index.jaxb;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -152,7 +153,7 @@ public class IndexesMetadata extends DOMSerializer {
      */
     public List<String> read(String elementName) {
 
-	ArrayList<String> out = Lists.newArrayList();
+	List<String> out = Lists.newArrayList();
 
 	for (Object next : properties) {
 
@@ -160,7 +161,7 @@ public class IndexesMetadata extends DOMSerializer {
 
 	    if (name.equals(elementName)) {
 
-		String text = extractTextContent(next);
+		String text = extractTextContent(next).trim().strip();
 		out.add(text);
 	    }
 	}

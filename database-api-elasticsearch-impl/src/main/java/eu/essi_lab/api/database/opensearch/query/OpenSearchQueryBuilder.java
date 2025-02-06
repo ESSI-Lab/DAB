@@ -90,7 +90,10 @@ public class OpenSearchQueryBuilder {
      * @param wrapper
      * @param ranking
      */
-    public OpenSearchQueryBuilder(OpenSearchWrapper wrapper, RankingStrategy ranking, HashMap<String, String> dataFolderMap,
+    public OpenSearchQueryBuilder(//
+	    OpenSearchWrapper wrapper,//
+	    RankingStrategy ranking,//
+	    HashMap<String, String> dataFolderMap,//
 	    boolean deletedIncluded) {
 
 	this.wrapper = wrapper;
@@ -276,15 +279,13 @@ public class OpenSearchQueryBuilder {
 
 	case TEXT_SEARCH:
 
-	    value = normalize(value);
-
 	    List<String> terms = Arrays.asList(value.split(" "));
 
 	    if (terms.size() == 1 || !isWildcardQuery(value)) {
 
 		if (isWildcardQuery(value)) {
 
-		    return buildWildCardQuery(el.getName(), value, ranking.computePropertyWeight(el));
+		    return buildWildCardQuery(DataFolderMapping.toKeywordField(el.getName()), value, ranking.computePropertyWeight(el));
 		}
 
 		return buildMatchPhraseQuery(el.getName(), value, ranking.computePropertyWeight(el));

@@ -128,25 +128,25 @@ public interface DatabaseFolder {
 	VIEW, //
 
 	AUGMENTER_PROPERTIES, //
-	
+
 	//
 	// configuration-index entries
 	//
 	CONFIGURATION, //
-	CONFIGURATION_LOCK,//
-	
+	CONFIGURATION_LOCK, //
+
 	//
-	// folder-registry-index entry	
+	// folder-registry-index entry
 	//
 
 	REGISTERED_FOLDER,
-	
+
 	//
 	// cache-index entry
 	//
-	
+
 	CACHE_ENTRY;
-	
+
     }
 
     /**
@@ -160,8 +160,22 @@ public interface DatabaseFolder {
      */
     public static String computeSourceId(Database database, DatabaseFolder folder) {
 
-	String name = folder.getName();
-	name = name.replace(database.getIdentifier() + "_", "");
+	return computeSourceId(database.getIdentifier(), folder.getName());
+    }
+
+    /**
+     * If this folder is a source folder, this method returns the related source identifier by removing from this
+     * folder name the database identifier and the other folder prefixes used to generate the folder name.<br>
+     * If this folder is not a DAB source folder, it returns this folder name.
+     * 
+     * @param database
+     * @param folder
+     * @return
+     */
+    public static String computeSourceId(String databaseId, String folderName) {
+
+	String name = folderName;
+	name = name.replace(databaseId + "_", "");
 	name = name.replace(SourceStorageWorker.META_PREFIX, "");
 	name = name.replace(SourceStorageWorker.DATA_1_POSTFIX, "");
 	name = name.replace(SourceStorageWorker.DATA_2_POSTFIX, "");

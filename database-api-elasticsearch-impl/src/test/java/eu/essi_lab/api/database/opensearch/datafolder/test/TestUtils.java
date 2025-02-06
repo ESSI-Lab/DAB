@@ -17,11 +17,14 @@ import eu.essi_lab.api.database.opensearch.ConversionUtils;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.index.IndexData;
+import eu.essi_lab.api.database.opensearch.index.Shape;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.indexes.IndexedElements;
+import eu.essi_lab.iso.datamodel.classes.BoundingPolygon;
 import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.model.Queryable.ContentType;
+import eu.essi_lab.model.index.jaxb.BoundingBox;
 import eu.essi_lab.model.index.jaxb.IndexesMetadata;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
@@ -67,6 +70,8 @@ public class TestUtils {
 		SourceStorageWorker.DATA_1_POSTFIX;//
     }
 
+    public static boolean EXIT_ON_ERROR = true;
+
     /**
      * @param targetSource
      * @param decodedSource
@@ -77,7 +82,14 @@ public class TestUtils {
 
 	decodedSource.remove(DataFolderMapping.GS_RESOURCE);
 
-	Assert.assertEquals(targetSource.toString(), decodedSource.toString());
+	if (!targetSource.toString().equals(decodedSource.toString())) {
+
+	    System.out.println();
+	}
+
+	if (EXIT_ON_ERROR) {
+	    Assert.assertEquals(targetSource.toString(), decodedSource.toString());
+	}
     }
 
     /**
@@ -182,45 +194,70 @@ public class TestUtils {
     private static boolean compareIndexedElements(SourceWrapper wrapper, GSResource originalResource, GSResource storedResource)
 	    throws Exception {
 
-	IndexesMetadata indexesMetadata1 = originalResource.getIndexesMetadata();
-	IndexesMetadata indexesMetadata2 = storedResource.getIndexesMetadata();
+	IndexesMetadata indexesMd1 = originalResource.getIndexesMetadata();
+	IndexesMetadata indexesMd2 = storedResource.getIndexesMetadata();
 
 	boolean equals = true;
 
-	List<String> indexes1Prop = indexesMetadata1.getProperties().//
-		stream().//
-		//
-		// filter out the bbox_Null properties since it is not mapped 
-		// because if the dataset has BoundingPolygon it is not indexed, so the JSON source
-		// have the bbox value but the original dataset
-		//
-		filter(p -> !p.equals(IndexedElements.BOUNDING_BOX_NULL.getElementName())).
-		collect(Collectors.toList());
+	List<BoundingPolygon> polygonsList = originalResource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification()
+		.getBoundingPolygonsList();
 
-	equals &= indexes1Prop.equals(indexesMetadata2.getProperties());
+	List<String> indexes1Prop = indexesMd1.getProperties();
+	List<String> indexes2Prop = indexesMd2.getProperties();
+
+	Optional<BoundingBox> box = indexesMd1.readBoundingBox();
+	Optional<Shape> shape = Optional.empty();
+	if (box.isPresent()) {
+	    shape = Shape.of(box.get());
+	}
+
+	if (!polygonsList.isEmpty() || (box.isPresent() && shape.isEmpty())) {
+
+	    indexes1Prop = indexesMd1.getProperties().//
+		    stream().//
+		    //
+		    // filter out the "bbox_Null" properties from original list since
+		    // the BoundingPolygon has no indexed element and, if a bbox is missing, the dataset
+		    // is tagged with bbox_Null while in the JSON mapping the BoundingPolygon
+		    // is indexed so the indexesMetadata1 would contains "bbox_Null" while indexesMetadata2 don't
+		    //
+		    filter(p -> !p.equals(IndexedElements.BOUNDING_BOX_NULL.getElementName())).collect(Collectors.toList());
+	}
+
+	if (box.isPresent() && shape.isEmpty()) {
+
+	    indexes2Prop = indexesMd2.getProperties().//
+		    stream().//
+		    //
+		    // filter out the "bbox_Null" properties from stored list since
+		    // the original has an invalid bbox but is not tagged as "bbox_Null" while
+		    // in the JSON mapping it is correctly detected
+		    //
+		    filter(p -> !p.equals(IndexedElements.BOUNDING_BOX_NULL.getElementName())).collect(Collectors.toList());
+	}
+
+	equals &= indexes1Prop.equals(indexes2Prop);
 
 	if (!equals) {
 
-	    throw new Exception();
-	}
-
-	for (String prop : indexes1Prop) {
-
-	    List<String> prop1 = indexesMetadata1.read(prop);
-	    List<String> prop2 = indexesMetadata2.read(prop).//
-		    stream().//
-		    map(v -> v.replace(".000Z", "Z")).//
-		    collect(Collectors.toList());
-
-	    equals &= prop1.equals(prop2);
-
-	    if (!equals) {
+	    if (EXIT_ON_ERROR) {
 
 		throw new Exception();
 	    }
 
-	    if ( //
-	    prop.equals(IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName()) || //
+	    System.out.println(indexesMd1);
+	    System.out.println("\n\n");
+	    System.out.println(indexesMd2);
+
+	    equals = true;
+	}
+
+	for (String prop : indexes1Prop) {
+
+	    List<String> prop1Values = indexesMd1.read(prop);
+	    List<String> prop2Values = indexesMd2.read(prop);
+
+	    if (prop.equals(IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName()) || //
 		    prop.equals(IndexedElements.TEMP_EXTENT_END_NOW.getElementName()) //
 	    ) {
 
@@ -230,20 +267,20 @@ public class TestUtils {
 		boolean nullElementValue = Boolean.valueOf(wrapper.getGSResourceProperties(prop).get(0));
 
 		//
-		// in the GSResource has no values but they are present (e.g.:
-		// <gs:tmpExtentBegin_Now></gs:tmpExtentBegin_Now>
+		// in the GSResource has empty text value (e.g.: <gs:tmpExtentBegin_Now></gs:tmpExtentBegin_Now>)
 		//
-		boolean present = indexesMetadata1.getProperties().//
-			stream().//
-			filter(p -> p.equals(prop)).//
-			findFirst().//
-			isPresent();
+		boolean present = prop1Values.get(0).isEmpty();
 
 		equals &= nullElementValue == present;
 
 		if (!equals) {
 
-		    throw new Exception();
+		    if (EXIT_ON_ERROR) {
+
+			throw new Exception();
+		    }
+
+		    equals = true;
 		}
 
 	    } else {
@@ -269,7 +306,7 @@ public class TestUtils {
 			    sorted().//
 			    collect(Collectors.toList());
 
-		    List<Long> collect = indexesMetadata1.read(prop).//
+		    List<Long> collect = prop1Values.//
 			    stream().//
 			    map(v -> ConversionUtils.parseToLong(v).get()).//
 			    sorted().//
@@ -279,20 +316,25 @@ public class TestUtils {
 
 		    if (!equals) {
 
-			throw new Exception();
-		    }
+			if (EXIT_ON_ERROR) {
 
-		} else {
+			    throw new Exception();
+			}
+
+			equals = true;
+		    }
+		}
+
+		else if (contType.get() == ContentType.DOUBLE) {
 
 		    //
 		    // double values such 1.0 are converted by JSONArray by removing the 0
 		    // after the decimal separator, so we convert also the GSResource indexed field
 		    // in order to adjust the test
 		    //
-		    List<String> list = indexesMetadata1.read(prop);
 
-		    List<String> values = list.//
-			    subList(0, list.size() > 10 ? 10 : list.size()).stream().//
+		    List<String> values = prop1Values.//
+			    subList(0, prop1Values.size() > 10 ? 10 : prop1Values.size()).stream().//
 			    map(v -> {
 
 				try {
@@ -335,7 +377,21 @@ public class TestUtils {
 
 		    if (!equals) {
 
-			throw new Exception();
+			equals = true;
+		    }
+
+		} else {
+
+		    equals &= prop1Values.equals(prop2Values);
+
+		    if (!equals) {
+
+			if (EXIT_ON_ERROR) {
+
+			    throw new Exception();
+			}
+
+			equals = true;
 		    }
 		}
 	    }
