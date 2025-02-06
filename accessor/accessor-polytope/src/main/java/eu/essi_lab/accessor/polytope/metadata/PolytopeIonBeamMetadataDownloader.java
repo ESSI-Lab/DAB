@@ -380,7 +380,7 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 
 	try {
 	    // Define a SimpleDateFormat with the combined pattern
-	    SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSz");
+	    SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSXXX");
 
 	    // Parse the combined string into a Date object
 	    Date d = inputFormat.parse(date);
