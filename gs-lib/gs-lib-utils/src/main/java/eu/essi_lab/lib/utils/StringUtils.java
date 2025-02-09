@@ -54,7 +54,7 @@ public class StringUtils {
      */
     public static String format(int value) {
 
-	return format(Double.valueOf(value));
+	return format((double)value);
     }
 
     /**
