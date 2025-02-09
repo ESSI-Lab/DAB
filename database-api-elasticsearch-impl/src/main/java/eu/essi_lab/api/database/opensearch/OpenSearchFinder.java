@@ -334,8 +334,7 @@ public class OpenSearchFinder implements DatabaseFinder {
      * @throws GSException
      */
     private Query builQuery(DiscoveryMessage message, boolean count) throws GSException {
-	
-	
+
 	if (message.getUserBond().isPresent()) {
 
 	    IdentifierBondHandler parser = new IdentifierBondHandler(message.getUserBond().get());
@@ -343,7 +342,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 	    if (parser.isCanonicalQueryByIdentifiers()) {
 
 		List<String> identifiers = parser.getIdentifiers();
-		
+
 		return OpenSearchQueryBuilder.buildSearchQuery(//
 			database.getIdentifier(), //
 			MetadataElement.IDENTIFIER.getName(), //
@@ -351,7 +350,14 @@ public class OpenSearchFinder implements DatabaseFinder {
 	    }
 	}
 
+	PerformanceLogger pl = new PerformanceLogger(//
+		PerformanceLogger.PerformancePhase.OPENSEARCH_FINDER_GET_SOURCES_DATA_DIR_MAP, //
+		message.getRequestId(), //
+		Optional.ofNullable(message.getWebRequest()));
+
 	HashMap<String, String> map = getSourceDataFolderMap(message);
+
+	pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
 
 	DiscoveryBondParser bondParser = new DiscoveryBondParser(message.getPermittedBond());
 
