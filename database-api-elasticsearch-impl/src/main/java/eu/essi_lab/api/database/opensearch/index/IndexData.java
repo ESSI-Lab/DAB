@@ -1073,14 +1073,17 @@ public class IndexData {
 
 	    if (valueClass.equals(String.class) || valueClass.equals(KeywordProperty.class)) {
 
+		v = v.trim().strip();
+
 		if (valueClass.equals(KeywordProperty.class) && v.length() > IndexMapping.MAX_KEYWORD_LENGTH) {
 
 		    v = v.substring(0, IndexMapping.MAX_KEYWORD_LENGTH);
 		}
 
-		v = v.trim().strip();
+		if (v.length() > 1) {
 
-		array.put(String.valueOf(v));
+		    array.put(String.valueOf(v));
+		}
 
 	    } else if (valueClass.equals(Integer.class)) {
 
