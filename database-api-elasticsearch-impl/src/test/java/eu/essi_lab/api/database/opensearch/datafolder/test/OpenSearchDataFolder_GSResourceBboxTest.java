@@ -441,6 +441,82 @@ public class OpenSearchDataFolder_GSResourceBboxTest extends OpenSearchTest {
     }
 
     @Test
+    public void invalidBboxToPointTest() throws Exception {
+
+	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+
+	String folderName = TestUtils.getDataFolderName(database);
+
+	OpenSearchFolder folder = new OpenSearchFolder(database, folderName);
+
+	//
+	//
+	//
+
+	String privateId = UUID.randomUUID().toString();
+
+	Dataset dataset = new Dataset();
+	dataset.setPrivateId(privateId);
+	dataset.setOriginalId(UUID.randomUUID().toString());
+	dataset.setPublicId(UUID.randomUUID().toString());
+
+	GeographicBoundingBox box = new GeographicBoundingBox();
+
+	box.setBigDecimalNorth(new BigDecimal(65.583));
+	box.setBigDecimalEast(new BigDecimal(188.983)); // value is normalized
+
+	box.setBigDecimalSouth(new BigDecimal(65.583));
+	box.setBigDecimalWest(new BigDecimal(188.983)); // value is normalized
+
+	dataset.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().addGeographicBoundingBox(box);
+
+	//
+	//
+	//
+	IndexedElementsWriter.write(dataset);
+	//
+	//
+	//
+
+	String key = privateId;
+
+	//
+	//
+	//
+
+	folder.store(key, //
+		FolderEntry.of(dataset.asDocument(true)), //
+		EntryType.GS_RESOURCE);
+
+	//
+	//
+	//
+
+	SourceWrapper wrapper = folder.getSourceWrapper(key);
+
+	System.out.println(wrapper.toStringHideBinary());
+
+	//
+	//
+	//
+
+	List<String> bboxes = wrapper.getGSResourceProperties(MetadataElement.BOUNDING_BOX);
+
+	Assert.assertEquals(Integer.valueOf(1), Integer.valueOf(bboxes.size()));
+
+	String shape = bboxes.get(0);
+
+	Assert.assertEquals("POINT (8.983000000000004 65.583)", shape);
+
+	//
+	//
+	//
+
+	TestUtils.compareResources(wrapper, dataset, folder, key);
+    }
+
+    
+    @Test
     public void multiPolygonTest() throws Exception {
 
 	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
