@@ -35,6 +35,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.transform.TransformerException;
@@ -1069,6 +1070,9 @@ public class IndexData {
 
 	JSONArray array = new JSONArray();
 
+	// only distinct values
+	values = values.stream().distinct().collect(Collectors.toList());
+	
 	values.forEach(v -> { //
 
 	    if (valueClass.equals(String.class) || valueClass.equals(KeywordProperty.class)) {
