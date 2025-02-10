@@ -490,14 +490,20 @@ public class ConversionUtils {
 
 	dateTime = dateTime.replace("/", "-");
 
-	Optional<Date> date = ISO8601DateTimeUtils.parseISO8601ToDate(dateTime);
+	Optional<Date> date = ISO8601DateTimeUtils.parseNotStandardToDate(dateTime);
+
 	if (date.isEmpty()) {
 
-	    date = ISO8601DateTimeUtils.parseNotStandardToDate(dateTime);
+	    date = ISO8601DateTimeUtils.parseNotStandard2ToDate(dateTime);
 
 	    if (date.isEmpty()) {
 
-		date = ISO8601DateTimeUtils.parseNotStandard2ToDate(dateTime);
+		date = ISO8601DateTimeUtils.parseNotStandard3ToDate(dateTime);
+
+		if (date.isEmpty()) {
+
+		    date = ISO8601DateTimeUtils.parseISO8601ToDate(dateTime);
+		}
 	    }
 	}
 
