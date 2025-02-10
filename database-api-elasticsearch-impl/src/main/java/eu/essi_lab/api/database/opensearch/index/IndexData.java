@@ -401,7 +401,7 @@ public class IndexData {
 	    indexData.put(MetaFolderMapping.SOURCE_ID, sourceId);
 
 	    indexData.put(BINARY_PROPERTY, DataFolderMapping.WRITING_FOLDER_TAG);
-	    indexData.put(DataFolderMapping.WRITING_FOLDER_TAG, DataFolderMapping.WRITING_FOLDER_TAG);
+	    indexData.put(DataFolderMapping.WRITING_FOLDER_TAG, "");
 
 	    indexData.mapping = DataFolderMapping.get();
 
@@ -1120,10 +1120,39 @@ public class IndexData {
 
 	if (array.length() > 0) {
 
-	    // keyword fields used for aggregation and wildcard queries
-	    String name = valueClass.equals(KeywordProperty.class) ? DataFolderMapping.toKeywordField(elName) : elName;
+	    if (valueClass.equals(DateTime.class)) {
 
-	    indexData.put(name, array);
+		array.forEach(v -> {
+
+		    // dates always indexed as long
+		    indexData.put(elName, array);
+		});
+
+		JSONArray dateTimeStringArray = new JSONArray();
+
+		array.toList().//
+			stream().//
+			// indexed as date only if not preceding the epoch
+			filter(v -> Long.valueOf(v.toString()).compareTo(ISO8601DateTimeUtils.EPOCH) >= 0).//
+			// mapping to ISO-8601 string
+			map(v -> ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds(new Date(Long.valueOf(v.toString())))).
+
+			forEach(date -> dateTimeStringArray.put(date));
+
+		String dateField = DataFolderMapping.toDateField(elName);
+
+		if (!dateTimeStringArray.isEmpty()) {
+
+		    indexData.put(dateField, dateTimeStringArray);
+		}
+
+	    } else {
+
+		// keyword fields used for aggregation and wildcard queries
+		String name = valueClass.equals(KeywordProperty.class) ? DataFolderMapping.toKeywordField(elName) : elName;
+
+		indexData.put(name, array);
+	    }
 	}
     }
 
