@@ -71,6 +71,11 @@ public class ISO8601DateTimeUtils {
     /**
      * 
      */
+    public static long EPOCH = ISO8601DateTimeUtils.parseISO8601ToDate("1970-01-01T00:00:00Z").get().getTime();
+
+    /**
+     * 
+     */
     public static void setGISuiteDefaultTimeZone() {
 
 	TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
