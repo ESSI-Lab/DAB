@@ -220,7 +220,7 @@ public enum MetadataElement implements Queryable {
     /**
      * 
      */
-    REVISION_DATE("revisionDate"),
+    REVISION_DATE("revisionDate", ContentType.ISO8601_DATE_TIME),
 
     /**
      *
@@ -423,12 +423,12 @@ public enum MetadataElement implements Queryable {
     /**
      *
      */
-    CREATION_DATE("creationDate"),
+    CREATION_DATE("creationDate", ContentType.ISO8601_DATE_TIME),
 
     /**
      *
      */
-    PUBLICATION_DATE("publicationDate"),
+    PUBLICATION_DATE("publicationDate", ContentType.ISO8601_DATE_TIME),
     //
 
     /**
