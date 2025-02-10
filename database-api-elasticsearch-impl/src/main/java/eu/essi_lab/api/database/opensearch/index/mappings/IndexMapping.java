@@ -72,7 +72,7 @@ public abstract class IndexMapping {
     //
     // Lucene doesn't allow terms that contain more than 32k bytes
     //
-    public static final int MAX_TERMS_CHARACTER = 30000;
+    public static final int MAX_KEYWORD_LENGTH = 32000;
 
     /**
      * @return

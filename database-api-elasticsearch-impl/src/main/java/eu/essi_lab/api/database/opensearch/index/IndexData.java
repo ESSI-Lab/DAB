@@ -212,7 +212,7 @@ public class IndexData {
 
     /**
      * @param folder
-     * @param gsResource
+     * @param resourceStream
      * @return
      * @throws Exception
      */
@@ -1073,9 +1073,9 @@ public class IndexData {
 
 	    if (valueClass.equals(String.class) || valueClass.equals(KeywordProperty.class)) {
 
-		if (valueClass.equals(KeywordProperty.class) && v.length() > IndexMapping.MAX_TERMS_CHARACTER) {
+		if (valueClass.equals(KeywordProperty.class) && v.length() > IndexMapping.MAX_KEYWORD_LENGTH) {
 
-		    v = v.substring(0, IndexMapping.MAX_TERMS_CHARACTER);
+		    v = v.substring(0, IndexMapping.MAX_KEYWORD_LENGTH);
 		}
 
 		v = v.trim().strip();
