@@ -150,29 +150,30 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 
 	    HarvestingProperties properties = listRecords.getHarvestingProperties();
 
-	    Long time = null;
+	    Date dateTime = null;
+	    String iso8601DateTime = null;
 
 	    if (properties != null && !properties.isEmpty() && !listRecords.isRecovered()) {
 
 		String timestamp = properties.getEndHarvestingTimestamp();
 		if (timestamp != null) {
 		    @SuppressWarnings("deprecation")
-		    Date date = ISO8601DateTimeUtils.parseISO8601(timestamp);
-		    Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-		    calendar.setTime(date);
-		    calendar.set(Calendar.HOUR_OF_DAY, 0);
-		    calendar.set(Calendar.MINUTE, 0);
-		    calendar.set(Calendar.SECOND, 0);
-		    calendar.set(Calendar.MILLISECOND, 0);
-		    Date updatedDate = calendar.getTime();
-		    time = updatedDate.getTime();
-		    GSLoggerFactory.getLogger(getClass()).info("Incremental harvesting enabled starting from: " + timestamp);
+		    long time = ISO8601DateTimeUtils.parseISO8601(timestamp).getTime();
+		    iso8601DateTime = ISO8601DateTimeUtils.getISO8601DateTime(new Date(time));
+		    //dateTime = new Date(time);
+		    GSLoggerFactory.getLogger(getClass()).info("Incremental harvesting enabled starting from: " + iso8601DateTime);
 		}
 	    }
 
-	    if (stationsArray.isEmpty()) {
-		stationsArray = getList(STATIONS_URL, time);
+	    if(start == 0) {
+		//first loop
+		stationsArray = getList(STATIONS_URL, iso8601DateTime);
+	    }else {
+		if (stationsArray.isEmpty()) {
+		    stationsArray = getList(STATIONS_URL, iso8601DateTime);
+		}
 	    }
+	    
 	    boolean isLast = false;
 	    GSLoggerFactory.getLogger(getClass()).info("Station number: " + stationsArray.length());
 	    if (start < stationsArray.length() && !maxNumberReached) {
@@ -206,7 +207,7 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 			    // jsonArray.put(m);
 			    // }
 			    // }
-			    
+
 			    if (platform.toLowerCase().contains("acronet")) {
 				for (PolytopeIonBeamMetadataAcronetVariable var : PolytopeIonBeamMetadataAcronetVariable.values()) {
 				    ret.addRecord(PolytopeIonBeamMetadataMapper.create(datasetMetadata, var.getKey()));
@@ -230,8 +231,8 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 			}
 		    }
 		}
-		if(isLast) {
-		    ret.setResumptionToken(null);    
+		if (isLast) {
+		    ret.setResumptionToken(null);
 		} else {
 		    ret.setResumptionToken(String.valueOf(start + count));
 		}
@@ -253,12 +254,13 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 
     }
 
-    private JSONArray getList(String path, Long time) throws Exception {
+    private JSONArray getList(String path, String dateString) throws Exception {
 
 	String url = getSourceURL() + path;
 
-	if (time != null) {
-	    // query with time
+	if (dateString != null) {
+	    //String iso8601DateTime = ISO8601DateTimeUtils.getISO8601DateTime(date);
+	    url+= "?start_time=" + dateString; 
 	}
 
 	GSLoggerFactory.getLogger(getClass()).info("Getting " + url);
@@ -366,7 +368,7 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 
     @Override
     public boolean supportsIncrementalHarvesting() throws GSException {
-	return false;
+	return true;
     }
 
     @Override

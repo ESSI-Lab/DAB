@@ -51,6 +51,7 @@ import eu.essi_lab.messages.PerformanceLogger;
 import eu.essi_lab.messages.RequestMessage;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
+import eu.essi_lab.messages.bond.parser.IdentifierBondHandler;
 import eu.essi_lab.messages.count.DiscoveryCountResponse;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMapType;
@@ -58,6 +59,7 @@ import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
+import eu.essi_lab.model.resource.MetadataElement;
 
 /**
  * @author Fabrizio
@@ -333,7 +335,29 @@ public class OpenSearchFinder implements DatabaseFinder {
      */
     private Query builQuery(DiscoveryMessage message, boolean count) throws GSException {
 
+	if (message.getUserBond().isPresent()) {
+
+	    IdentifierBondHandler parser = new IdentifierBondHandler(message.getUserBond().get());
+
+	    if (parser.isCanonicalQueryByIdentifiers()) {
+
+		List<String> identifiers = parser.getIdentifiers();
+
+		return OpenSearchQueryBuilder.buildSearchQuery(//
+			database.getIdentifier(), //
+			MetadataElement.IDENTIFIER.getName(), //
+			identifiers.get(0));//
+	    }
+	}
+
+	PerformanceLogger pl = new PerformanceLogger(//
+		PerformanceLogger.PerformancePhase.OPENSEARCH_FINDER_GET_SOURCES_DATA_DIR_MAP, //
+		message.getRequestId(), //
+		Optional.ofNullable(message.getWebRequest()));
+
 	HashMap<String, String> map = getSourceDataFolderMap(message);
+
+	pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
 
 	DiscoveryBondParser bondParser = new DiscoveryBondParser(message.getPermittedBond());
 

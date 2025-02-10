@@ -101,6 +101,8 @@ public class Shape {
 
 	objectBox = new JSONObject();
 
+	empty = true;
+
 	try {
 
 	    Optional<String> shape = asShape(bbox);
@@ -109,35 +111,36 @@ public class Shape {
 
 		Geometry geometry = READER.read(shape.get());
 
-		double area = geometry.getArea();
+		if (geometry.isValid()) {
 
-		String _shape = shape.get();
+		    double area = geometry.getArea();
+		    objectBox.put(AREA, area);
 
-		// OpenSearch do not likes the inner points with parentheses
-		if (_shape.startsWith("MULTIPOINT")) {
+		    String _shape = shape.get();
 
-		    _shape = _shape.replace("(", "");
-		    _shape = _shape.replace(")", "");
-		    _shape = _shape.replace("MULTIPOINT ", "MULTIPOINT (");
-		    _shape = _shape + ")";
+		    // OpenSearch do not likes the inner points with parentheses
+		    if (_shape.startsWith("MULTIPOINT")) {
+
+			_shape = _shape.replace("(", "");
+			_shape = _shape.replace(")", "");
+			_shape = _shape.replace("MULTIPOINT ", "MULTIPOINT (");
+			_shape = _shape + ")";
+		    }
+
+		    objectBox.put(SHAPE, _shape);
+
+		    Point c = geometry.getCentroid();
+
+		    double x = c.getX();
+		    double y = c.getY();
+
+		    objectBox.put(CENTROID, "POINT (" + x + " " + y + ")");
+
+		    empty = false;
 		}
-
-		objectBox.put(SHAPE, _shape);
-
-		Point c = geometry.getCentroid();
-		double x = c.getX();
-		double y = c.getY();
-		objectBox.put(CENTROID, "POINT (" + x + " " + y + ")");
-		objectBox.put(AREA, area);
-
-	    } else {
-
-		empty = true;
 	    }
 
 	} catch (ParseException e) {
-	    
-	    empty = true;
 
 	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
@@ -149,6 +152,8 @@ public class Shape {
     private Shape(BoundingPolygon polygon) {
 
 	objectBox = new JSONObject();
+
+	empty = true;
 
 	String shape = null;
 
@@ -194,28 +199,29 @@ public class Shape {
 	    try {
 
 		Geometry geometry = READER.read(shape);
+		
+		if (geometry.isValid()) {
 
-		double area = geometry.getArea();
-		objectBox.put(AREA, area);
+		    double area = geometry.getArea();
+		    objectBox.put(AREA, area);
 
-		Point c = geometry.getCentroid();
-		double x = c.getX();
-		double y = c.getY();
-		objectBox.put(CENTROID, "POINT (" + x + " " + y + ")");
+		    Point c = geometry.getCentroid();
+		    double x = c.getX();
+		    double y = c.getY();
+		    
+		    objectBox.put(CENTROID, "POINT (" + x + " " + y + ")");
 
-		objectBox.put(SHAPE, shape);
+		    objectBox.put(SHAPE, shape);
+
+		    empty = false;
+		}
 
 	    } catch (ParseException e) {
-		
-		empty = true;
 
 		GSLoggerFactory.getLogger(getClass()).error(e);
-		
+
 		return;
 	    }
-	} else {
-
-	    empty = true;
 	}
     }
 
@@ -299,16 +305,16 @@ public class Shape {
 	double s = Double.parseDouble(cardinalValues.getSouth());
 	double n = Double.parseDouble(cardinalValues.getNorth());
 
-	String es = e + " " + s;
-	String ws = w + " " + s;
-	String en = e + " " + n;
-	String wn = w + " " + n;
-
 	if (e > (180 + TOL)) {
 
 	    e = e - 180;
 	    w = w - 180;
 	}
+
+	String es = e + " " + s;
+	String ws = w + " " + s;
+	String en = e + " " + n;
+	String wn = w + " " + n;
 
 	if (n <= 90 && s >= -90 && e >= -180 && e <= 180 && w <= 180 && w >= -180) {
 

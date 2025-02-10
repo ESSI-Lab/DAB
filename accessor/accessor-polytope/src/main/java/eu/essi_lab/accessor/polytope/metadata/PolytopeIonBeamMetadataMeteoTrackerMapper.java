@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
+import java.util.UUID;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
@@ -128,6 +129,25 @@ public class PolytopeIonBeamMetadataMeteoTrackerMapper extends OriginalIdentifie
     @Override
     public String getSupportedOriginalMetadataSchema() {
 	return CommonNameSpaceContext.IONBEAM_TRACKER;
+    }
+    
+    @Override
+    protected String createOriginalIdentifier(GSResource resource) {
+
+	String metadata = resource.getOriginalMetadata().getMetadata();
+	OriginalMetadata om = new OriginalMetadata();
+	om.setMetadata(metadata);
+	
+	JSONObject object = retrieveDatasetInfo(om);
+	String varName = retrieveVarInfo(om);
+
+	if (object.has("internal_id")) {
+	    String toHash = object.getString("internal_id") + "_" + varName;
+	    String uuid = UUID.nameUUIDFromBytes(toHash.getBytes()).toString();
+	    return uuid;
+	}
+
+	return null;
     }
 
     private void mapMetadata(OriginalMetadata originalMD, Dataset dataset) {

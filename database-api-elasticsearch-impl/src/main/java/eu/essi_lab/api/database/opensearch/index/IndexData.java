@@ -391,8 +391,17 @@ public class IndexData {
 
 	case WRITING_FOLDER_TAG:
 
+	    dataFolder = folder.getName().endsWith(SourceStorageWorker.DATA_1_SHORT_POSTFIX) //
+		    ? SourceStorageWorker.DATA_1_SHORT_POSTFIX //
+		    : SourceStorageWorker.DATA_2_SHORT_POSTFIX; //
+
+	    indexData.put(MetaFolderMapping.DATA_FOLDER, dataFolder);
+
+	    String sourceId = DatabaseFolder.computeSourceId(folder.getDatabase(), folder);
+	    indexData.put(MetaFolderMapping.SOURCE_ID, sourceId);
+
 	    indexData.put(BINARY_PROPERTY, DataFolderMapping.WRITING_FOLDER_TAG);
-	    indexData.put(DataFolderMapping.WRITING_FOLDER_TAG, encodedString);
+	    indexData.put(DataFolderMapping.WRITING_FOLDER_TAG, DataFolderMapping.WRITING_FOLDER_TAG);
 
 	    indexData.mapping = DataFolderMapping.get();
 
@@ -477,7 +486,7 @@ public class IndexData {
 
 	    indexData.put(MetaFolderMapping.DATA_FOLDER, doc.getShortDataFolderPostfix());
 
-	    String sourceId = DatabaseFolder.computeSourceId(folder.getDatabase(), folder);
+	    sourceId = DatabaseFolder.computeSourceId(folder.getDatabase(), folder);
 	    indexData.put(MetaFolderMapping.SOURCE_ID, sourceId);
 
 	    indexData.mapping = MetaFolderMapping.get();
@@ -695,9 +704,9 @@ public class IndexData {
     /**
      * @return
      */
-    public IndexRequest<Map<String,Object>> getIndexRequest() {
+    public IndexRequest<Map<String, Object>> getIndexRequest() {
 
-	return new IndexRequest.Builder<Map<String,Object>>().//
+	return new IndexRequest.Builder<Map<String, Object>>().//
 		index(mapping.getIndex()).//
 		document(object.toMap()).//
 		id(entryId).//
@@ -1070,7 +1079,7 @@ public class IndexData {
 		}
 
 		v = v.trim().strip();
-		
+
 		array.put(String.valueOf(v));
 
 	    } else if (valueClass.equals(Integer.class)) {
