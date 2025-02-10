@@ -181,6 +181,9 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 	var _inputControl;
 	var wait = false;
 
+	var mouseMoveHandler = null;
+	var mouseClickHandler = null;
+
 	if (!options) {
 		options = {};
 	}
@@ -330,6 +333,93 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 		_inputControl.add(widget.map);
 	}
 
+	function createMouseMoveHandler(wmsLayer) {
+		return function mouseMoveFunction(evt) {
+
+			if (evt===undefined){
+				return;
+			}
+
+			if (evt.dragging) {
+				return;
+			}
+
+			const data = wmsLayer.getData(evt.pixel);
+			const hit = data && data[3] > 0; // transparent pixels have zero for data[3]
+			//const hit = data && data[3] == 255; // transparent pixels have zero for data[3]
+
+
+			if (!wait) {
+				widget.map.getTargetElement().style.cursor = hit ? 'pointer' : '';
+			}
+
+		};
+	}
+
+	function createMouseClickHandler(wmsLayer,overlay) {
+		return function mouseClickFunction(evt) {
+
+			const data = wmsLayer.getData(evt.pixel);
+
+			var hit = data && data[3] > 0; // transparent pixels have zero for data[3]
+
+			if (!hit) {
+				return false;
+			}
+
+			//console.log(data);
+			hit = data && data[3] == 255; // transparent pixels have zero for data[3]
+			if (!hit) {
+				const clickedCoordinates = evt.coordinate;
+
+				const view = widget.map.getView();
+				view.setCenter(clickedCoordinates);
+				const currentZoom = view.getZoom();
+				if (currentZoom !== undefined) {
+					view.setZoom(currentZoom + 1); // Increase zoom by 1
+				}
+				return true;
+			}
+
+
+			widget.map.getTargetElement().style.cursor = 'wait';
+			wait = true;
+
+			document.getElementById('stationInfo').innerHTML = '';
+
+			const coordinate = evt.coordinate;
+
+			const viewResolution = /** @type {number} */ (widget.map.getView().getResolution());
+			const url = wmsLayer.getSource().getFeatureInfoUrl(
+				evt.coordinate,
+				viewResolution,
+				'EPSG:3857',
+				{ 'INFO_FORMAT': 'text/html' },
+			);
+
+			if (url) {
+				fetch(url)
+					.then((response) => response.text())
+					.then((html) => {
+
+						document.getElementById(options.stationInfoId).innerHTML = html;
+						overlay.setPosition(coordinate);
+
+						widget.map.getTargetElement().style.cursor = 'pointer';
+						wait = false;
+
+						// closes the station info popup on a X click
+						jQuery('#closePopup').on("click", function() {
+
+							overlay.setPosition(undefined);
+							return false;
+						});
+
+					});
+			}
+		};
+	}
+
 	var createWMSCLusterLayer = function(options, constraints) {
 
 		if (!constraints) {
@@ -447,22 +537,13 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 			//
 			// set the pointer cursor when over a tile
 			//
-			widget.map.on('pointermove', function(evt) {
+			if (mouseMoveHandler!=null) {
+				widget.map.un('pointermove',mouseMoveHandler);
+			}			
+			var mmf = createMouseMoveHandler(wmsLayer);			
+			widget.map.on('pointermove', mmf);
+			mouseMoveHandler = mmf;
 
-				if (evt.dragging) {
-					return;
-				}
-
-				const data = wmsLayer.getData(evt.pixel);
-				const hit = data && data[3] > 0; // transparent pixels have zero for data[3]
-				//const hit = data && data[3] == 255; // transparent pixels have zero for data[3]
-
-
-				if (!wait) {
-					widget.map.getTargetElement().style.cursor = hit ? 'pointer' : '';
-				}
-
-			});
 
 			//
 			// creates an overlay to anchor the popup to the map
@@ -473,100 +554,13 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 
 			widget.map.addOverlay(overlay);
 
+			if (mouseClickHandler!=null) {
+				widget.map.un('singleclick',mouseClickHandler);
+			}
+			var mcf = createMouseClickHandler(wmsLayer,overlay);
+			widget.map.on('singleclick', mcf);
+			mouseClickHandler = mcf;
 
-
-
-
-			//		// [*2] open the advanced search panel after the input field value 
-			//		// has been set (see [*1])
-			//		jQuery('#' + options.stationNameAddId).on("change", function() {
-			//
-			//			jQuery("#" + options.advancedConstraintDivId).css("display", "block");
-			//		});
-
-
-			//
-			// updates the station info panel after a click
-			//
-			widget.map.on('singleclick', function(evt) {
-
-
-
-
-				const data = wmsLayer.getData(evt.pixel);
-
-				var hit = data && data[3] > 0; // transparent pixels have zero for data[3]
-
-				if (!hit) {
-					return false;
-				}
-
-				console.log(data);
-				hit = data && data[3] == 255; // transparent pixels have zero for data[3]
-				if (!hit) {
-					const clickedCoordinates = evt.coordinate;
-
-					const view = widget.map.getView();
-					view.setCenter(clickedCoordinates);
-					const currentZoom = view.getZoom();
-					if (currentZoom !== undefined) {
-						view.setZoom(currentZoom + 1); // Increase zoom by 1
-					}
-					return true;
-				}
-
-
-				widget.map.getTargetElement().style.cursor = 'wait';
-				wait = true;
-
-				document.getElementById('stationInfo').innerHTML = '';
-
-				const coordinate = evt.coordinate;
-
-				const viewResolution = /** @type {number} */ (widget.map.getView().getResolution());
-				const url = wmsLayer.getSource().getFeatureInfoUrl(
-					evt.coordinate,
-					viewResolution,
-					'EPSG:3857',
-					{ 'INFO_FORMAT': 'text/html' },
-				);
-
-				if (url) {
-					fetch(url)
-						.then((response) => response.text())
-						.then((html) => {
-
-							document.getElementById(options.stationInfoId).innerHTML = html;
-							overlay.setPosition(coordinate);
-
-							widget.map.getTargetElement().style.cursor = 'pointer';
-							wait = false;
-
-							// closes the station info popup on a X click
-							jQuery('#closePopup').on("click", function() {
-
-								overlay.setPosition(undefined);
-								return false;
-							});
-
-							// adds the station name to the advanced station name field
-							// and opens the advanced constraints panel
-							//						jQuery('[id^=addToSearch]').on("click", function() {
-							//
-							//							var name = this.id.substring(this.id.indexOf('_') + 1, this.id.length);
-							//
-							//							// set the value of the input field
-							//							jQuery('#' + options.stationNameAddId).val(name);
-							//
-							//							// [*1] triggers the value changed event to open the 
-							//							// adv. constraints panel (see [*2])
-							//							jQuery('#' + options.stationNameAddId).trigger("change");
-							//
-							//							return false;
-							//						});
-						});
-				}
-			});
 
 		}
 
