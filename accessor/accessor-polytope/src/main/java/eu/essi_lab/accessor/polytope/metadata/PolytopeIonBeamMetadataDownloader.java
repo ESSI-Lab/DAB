@@ -429,10 +429,10 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 	long diffInDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
 
 	// If the difference is 10 days or less, return the original range
-	if (diffInDays > 30) {
+	if (diffInDays > 32) {
 	    // take last 30 days
 	    newStartDate = new Date(newEndDate.getTime() - TimeUnit.MILLISECONDS.convert(30, TimeUnit.DAYS));
-	    diffInDays = 30;
+	    diffInDays = 32;
 	}
 
 	// Otherwise, split the dates into ranges of at most 10 days
@@ -443,10 +443,10 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 	    Date currentEndDate = new Date(currentStartDate.getTime() + TimeUnit.MILLISECONDS.convert(8, TimeUnit.DAYS));
 	    dateRanges.add(new Date[] { currentStartDate, currentEndDate });
 
-	    currentStartDate = new Date(currentEndDate.getTime() + TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS));
+	    currentStartDate = new Date(currentEndDate.getTime());
 	    diffInDays -= 8;
 	    count++;
-	    if (count > 2) {
+	    if (count > 3) {
 		maxRequestsReached = true;
 		newEndDate = new Date(currentStartDate.getTime() + TimeUnit.MILLISECONDS.convert(8, TimeUnit.DAYS));
 	    }
