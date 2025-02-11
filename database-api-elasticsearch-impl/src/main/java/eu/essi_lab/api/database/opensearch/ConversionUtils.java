@@ -28,12 +28,14 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TimeZone;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -495,7 +497,7 @@ public class ConversionUtils {
 
 	if (dateTime.length() == "yyyy".length()) {
 
-	    date = ISO8601DateTimeUtils.parseNotStandard3ToDate(dateTime);
+	    date = parseYYYToDate(dateTime);
 
 	} else if (dateTime.length() == "yyyyMMddHHmm".length()) {
 
@@ -541,6 +543,27 @@ public class ConversionUtils {
 	}
 
 	throw new IllegalArgumentException("Unparsable date/date time value: " + dateTime);
+    }
+
+    /**
+     * @param dateTimeString
+     * @return
+     */
+    private static Optional<Date> parseYYYToDate(String dateTimeString) {
+
+	try {
+	    SimpleDateFormat dateFormat = new SimpleDateFormat(ISO8601DateTimeUtils.ISO_WITH_MILLIS);
+	    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+	    Date date = dateFormat.parse(dateTimeString + "-01-01T00:00:00Z");
+
+	    return Optional.of(date);
+
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(ISO8601DateTimeUtils.class).warn("Unparsable Date: {}", dateTimeString);
+	}
+
+	return Optional.empty();
     }
 
     /**

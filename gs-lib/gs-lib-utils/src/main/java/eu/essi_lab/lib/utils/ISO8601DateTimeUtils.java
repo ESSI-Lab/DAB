@@ -47,14 +47,13 @@ import org.joda.time.format.ISODateTimeFormat;
 
 public class ISO8601DateTimeUtils {
 
-    private static final String ISO_WITH_MILLIS = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+    public static final String ISO_WITH_MILLIS = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
     private static final String NOT_STANDARD = "yyyyMMdd";
 
     private static final String NOT_STANDARD2 = "yyyyMMddHHmm";
-    
-    private static final String NOT_STANDARD3 = "yyyy";
 
+    private static final String NOT_STANDARD3 = "yyyy";
 
     private static DatatypeFactory df = null;
 
@@ -75,7 +74,7 @@ public class ISO8601DateTimeUtils {
      * 
      */
     public static long EPOCH = ISO8601DateTimeUtils.parseISO8601ToDate("1970-01-01T00:00:00Z").get().getTime();
-    
+
     /**
      * 
      */
@@ -106,8 +105,6 @@ public class ISO8601DateTimeUtils {
 	Date now = new Date();
 	return getISO8601DateTimeWithMilliseconds(now);
     }
-    
-    
 
     /**
      * @return
@@ -351,27 +348,27 @@ public class ISO8601DateTimeUtils {
     // return the ISO Date
     public static Optional<Date> parseNotStandardToDate(String dateTimeString) {
 
-	try {
-	    SimpleDateFormat dateFormat = new SimpleDateFormat(NOT_STANDARD);
-	    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-	    Date date = dateFormat.parse(dateTimeString);
-
-	    return Optional.of(date);
-
-	} catch (Exception e) {
-	    GSLoggerFactory.getLogger(ISO8601DateTimeUtils.class).warn("Unparsable Date: {}", dateTimeString);
-	}
-
-	return Optional.empty();
+	return parseToDate(dateTimeString, NOT_STANDARD);
     }
 
     // parse date in format yyyyMMddHHmm
     // return the ISO Date
     public static Optional<Date> parseNotStandard2ToDate(String dateTimeString) {
 
+	return parseToDate(dateTimeString, NOT_STANDARD2);
+    }
+
+  
+
+    /**
+     * @param dateTimeString
+     * @param pattern
+     * @return
+     */
+    public static Optional<Date> parseToDate(String dateTimeString, String pattern) {
+
 	try {
-	    SimpleDateFormat dateFormat = new SimpleDateFormat(NOT_STANDARD2);
+	    SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
 	    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
 	    Date date = dateFormat.parse(dateTimeString);
@@ -383,27 +380,8 @@ public class ISO8601DateTimeUtils {
 	}
 
 	return Optional.empty();
+
     }
-    
-    // parse date in format yyyy
-    // return the ISO Date
-    public static Optional<Date> parseNotStandard3ToDate(String dateTimeString) {
-
-	try {
-	    SimpleDateFormat dateFormat = new SimpleDateFormat(ISO_WITH_MILLIS);
-	    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-	    Date date = dateFormat.parse(dateTimeString+"-01-01T00:00:00Z");
-
-	    return Optional.of(date);
-
-	} catch (Exception e) {
-	    GSLoggerFactory.getLogger(ISO8601DateTimeUtils.class).warn("Unparsable Date: {}", dateTimeString);
-	}
-
-	return Optional.empty();
-    }
-
 
     /**
      * Given a date time expressed in ISO8601 (e.g.: 2021-08-04T10:40:00) which refers to the given
