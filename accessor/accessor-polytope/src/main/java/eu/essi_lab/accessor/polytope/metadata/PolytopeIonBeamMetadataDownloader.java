@@ -36,6 +36,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -186,6 +187,7 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
     @Override
     public File download(DataDescriptor descriptor) throws GSException {
 	Exception ex = null;
+	List<CSVRecord> ret = null;
 
 	try {
 
@@ -238,7 +240,7 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 		toMatch = smartVar.getKey();
 	    }
 
-	    Iterable<CSVRecord> ret = null;
+	    
 	    File tempFile;
 
 	    // List<Date[]> dates = new ArrayList<Date[]>();
@@ -262,7 +264,20 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 	    // endString = convertISODateToIonBeamDate(ISO8601DateTimeUtils.getISO8601DateTime(d[1]));
 	    // ret = getData(online.getLinkage(), startString, endString);
 
-	    ret = getCSVData(online.getLinkage(), startString, endString, stationId);
+	    ret = getCSVData(online.getLinkage(), startString, endString, stationId, platformName);
+	    
+	    if(ret == null) {
+		//multiple requests needed
+		Iterable<CSVRecord> out = null;
+		ret = new ArrayList<CSVRecord>();
+		List<Date[]> dates = checkDates(startString, endString);
+		for (Date[] d : dates) {
+		    out = getCSVData(online.getLinkage(), ISO8601DateTimeUtils.getISO8601DateTime(d[0]), ISO8601DateTimeUtils.getISO8601DateTime(d[1]), stationId, platformName);
+		    for(CSVRecord r: out) {
+			ret.add(r);
+		    }
+		}
+	    }
 
 	    int count = 0;
 	    if (ret != null) {
@@ -272,7 +287,7 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 		    String date = obj.get("datetime");
 		    String varValue = obj.get(toMatch);
 		    Optional<Date> valueDate = simpleDateTransform(date);
-		    if (date != null && optStart.isPresent() && optEnd.isPresent() && valueDate.isPresent()) {
+		    if (date != null && optStart.isPresent() && optEnd.isPresent() && valueDate.isPresent() && varValue != null && !varValue.isEmpty()) {
 			if (!isValid(optStart.get(), optEnd.get(), valueDate.get()))
 			    continue;
 
@@ -377,10 +392,11 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
     }
 
     private Optional<Date> simpleDateTransform(String date) throws ParseException {
-
+	SimpleDateFormat inputFormat = null;
 	try {
 	    // Define a SimpleDateFormat with the combined pattern
-	    SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSXXX");
+	    inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssXXX");
+	   
 
 	    // Parse the combined string into a Date object
 	    Date d = inputFormat.parse(date);
@@ -389,6 +405,9 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 
 	} catch (RuntimeException e) {
 	    GSLoggerFactory.getLogger(ISO8601DateTimeUtils.class).warn("Unparsable Date: {}", date, e);
+	    inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSXXX");
+	    Date d = inputFormat.parse(date);
+	    inputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 	}
 	return Optional.empty();
     }
@@ -399,42 +418,42 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 	return acronetDate;
     }
 
-    private List<Date[]> checkDates(Date startDate, Date endDate) {
+    private List<Date[]> checkDates(String startDate, String endDate) {
 	List<Date[]> dateRanges = new ArrayList<>();
-
+	Optional<Date> optStartDate = ISO8601DateTimeUtils.parseISO8601ToDate(startDate);
+	Optional<Date> optEndDate = ISO8601DateTimeUtils.parseISO8601ToDate(endDate);
+	Date newStartDate = optStartDate.get();
+	Date newEndDate = optEndDate.get();
 	// Calculate the difference in days between the two dates
-	long diffInMillies = Math.abs(endDate.getTime() - startDate.getTime());
+	long diffInMillies = Math.abs(newEndDate.getTime() - newStartDate.getTime());
 	long diffInDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
 
 	// If the difference is 10 days or less, return the original range
-	if (diffInDays <= 10) {
-	    dateRanges.add(new Date[] { startDate, endDate });
-	    return dateRanges;
-	} else if (diffInDays > 30) {
+	if (diffInDays > 30) {
 	    // take last 30 days
-	    startDate = new Date(endDate.getTime() - TimeUnit.MILLISECONDS.convert(30, TimeUnit.DAYS));
+	    newStartDate = new Date(newEndDate.getTime() - TimeUnit.MILLISECONDS.convert(30, TimeUnit.DAYS));
 	    diffInDays = 30;
 	}
 
 	// Otherwise, split the dates into ranges of at most 10 days
-	Date currentStartDate = startDate;
+	Date currentStartDate = newStartDate;
 	boolean maxRequestsReached = false;
 	int count = 0;
-	while (diffInDays > 10 && !maxRequestsReached) {
-	    Date currentEndDate = new Date(currentStartDate.getTime() + TimeUnit.MILLISECONDS.convert(10, TimeUnit.DAYS));
+	while (diffInDays > 8 && !maxRequestsReached) {
+	    Date currentEndDate = new Date(currentStartDate.getTime() + TimeUnit.MILLISECONDS.convert(8, TimeUnit.DAYS));
 	    dateRanges.add(new Date[] { currentStartDate, currentEndDate });
 
 	    currentStartDate = new Date(currentEndDate.getTime() + TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS));
-	    diffInDays -= 10;
+	    diffInDays -= 8;
 	    count++;
 	    if (count > 2) {
 		maxRequestsReached = true;
-		endDate = new Date(currentStartDate.getTime() + TimeUnit.MILLISECONDS.convert(10, TimeUnit.DAYS));
+		newEndDate = new Date(currentStartDate.getTime() + TimeUnit.MILLISECONDS.convert(8, TimeUnit.DAYS));
 	    }
 	}
 
 	// Add the final range
-	dateRanges.add(new Date[] { currentStartDate, endDate });
+	dateRanges.add(new Date[] { currentStartDate, newEndDate });
 
 	return dateRanges;
     }
@@ -453,20 +472,22 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 
 	GSLoggerFactory.getLogger(getClass()).info("Getting " + updatedUrl);
 
-	Downloader downloader = new Downloader();
-	downloader.setRetryPolicy(20, TimeUnit.SECONDS, 2);
+	HashMap<String, String> headers = new HashMap<>();
+	headers.put("Authorization", "Bearer " + PolytopeIonBeamMetadataConnector.BEARER_TOKEN);
 
-	HttpResponse<InputStream> stationResponse = downloader.downloadResponse(//
-		updatedUrl.trim(), //
-		HttpHeaderUtils.build("Authorization", "Bearer " + PolytopeIonBeamMetadataConnector.BEARER_TOKEN));
-
-	InputStream stream = stationResponse.body();
+	Optional<String> response = downloader.downloadOptionalString(updatedUrl.trim(), HttpHeaderUtils.build(headers));
+//
+//	HttpResponse<InputStream> stationResponse = downloader.downloadResponse(//
+//		updatedUrl.trim(), //
+//		HttpHeaderUtils.build("Authorization", "Bearer " + PolytopeIonBeamMetadataConnector.BEARER_TOKEN));
+//
+//	InputStream stream = stationResponse.body();
+	
 
 	GSLoggerFactory.getLogger(getClass()).info("Got " + updatedUrl);
 
-	if (stream != null) {
+	if (response.isPresent()) {
 
-	    ClonableInputStream clone = new ClonableInputStream(stream);
 
 	    // String res = IOStreamUtils.asUTF8String(clone.clone());
 	    //
@@ -474,21 +495,25 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 	    // return getData(linkage);
 	    // }
 
-	    JSONArray array = new JSONArray(IOStreamUtils.asUTF8String(clone.clone()));
+	    String responseString = response.get();
+	    JSONArray array = new JSONArray(responseString);
 
 	    for (int i = 0; i < array.length(); i++) {
 
 		JSONObject object = array.getJSONObject(i);
 		out.add(object);
 	    }
-	    stream.close();
+	   
 	}
 
 	return out;
     }
+    
+    private List<CSVRecord> getCSVData(String linkage, String startTime, String endTime, String stationId, String platform)
+	    throws Exception {
 
-    private Iterable<CSVRecord> getCSVData(String linkage, String startTime, String endTime, String stationId) throws Exception {
-
+	List<CSVRecord> ret = new ArrayList<CSVRecord>();
+	
 	Iterable<CSVRecord> out = null;
 
 	if (PolytopeIonBeamMetadataConnector.BEARER_TOKEN == null) {
@@ -497,52 +522,53 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 
 	// Create the new parameters for the request
 	// ?format=csv&start_time=2025-01-31T00%3A00%3A00Z&end_time=2025-01-31T23%3A59%3A59Z&station_id=246ede0dd7e9d4c8
-	String updatedParameters = "format=csv&start_time=" + startTime + "&end_time=" + endTime + "&station_id=" + stationId;
+	String updatedParameters = "format=csv&platform=" + platform + "&start_time=" + startTime + "&end_time=" + endTime + "&station_id="
+		+ stationId;
 	String updatedUrl = linkage.split("\\?")[0] + "?" + updatedParameters;
 
 	GSLoggerFactory.getLogger(getClass()).info("Getting " + updatedUrl);
 
-	Downloader downloader = new Downloader();
-	downloader.setRetryPolicy(20, TimeUnit.SECONDS, 2);
+	HashMap<String, String> headers = new HashMap<>();
+	headers.put("Authorization", "Bearer " + PolytopeIonBeamMetadataConnector.BEARER_TOKEN);
 
-	HttpResponse<InputStream> stationResponse = downloader.downloadResponse(//
-		updatedUrl.trim(), //
-		HttpHeaderUtils.build("Authorization", "Bearer " + PolytopeIonBeamMetadataConnector.BEARER_TOKEN));
+	Optional<String> response = downloader.downloadOptionalString(updatedUrl.trim(), HttpHeaderUtils.build(headers));
 
-	InputStream stream = stationResponse.body();
+	if (response.isPresent()) {
 
-	GSLoggerFactory.getLogger(getClass()).info("Got " + updatedUrl);
-
-	if (stream != null) {
-
-	    ClonableInputStream clone = new ClonableInputStream(stream);
-	    String response = IOStreamUtils.asUTF8String(clone.clone());
+	    String responseString = response.get();
+	    //*no data use-case
+	    if(responseString.toLowerCase().contains("no data found")) {
+		return ret;
+	    }
+	    //*multiple requests needed
+	    if(responseString.toLowerCase().contains("200 data granules")) {
+		return null;
+	    }
 	    try {
 		// delimiter seems to be ; by default
-		Reader in = new StringReader(response);
-		String d = ";";
-		char delimiter = d.charAt(0);
-		out = CSVFormat.RFC4180.withDelimiter(delimiter).withFirstRecordAsHeader().parse(in);
+		Reader in = new StringReader(responseString);
+		out = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(in);
+		    for(CSVRecord r: out) {
+			ret.add(r);
+		    }
 
 	    } catch (Exception e) {
-		// TODO: handle exception
+		//multiple requests needeed
 		GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
-		Reader reader = new StringReader(response);
-		Iterable<CSVRecord> records = null;
-		try {
-		    records = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(reader);
-		} catch (IOException e1) {
-		    // TODO Auto-generated catch block
-		    e1.printStackTrace();
-		    return null;
-		}
-
+		//try 
+//		List<Date[]> dates = checkDates(startTime, endTime);
+//		for (Date[] d : dates) {
+//		    out = getCSVData(linkage, ISO8601DateTimeUtils.getISO8601DateTime(d[0]), ISO8601DateTimeUtils.getISO8601DateTime(d[1]), stationId, platform);
+//		    for(CSVRecord r: out) {
+//			ret.add(r);
+//		    }
+//		}
+//		return ret;   
 	    }
 
-	    stream.close();
 	}
 
-	return out;
+	return ret;
     }
 
     private boolean isValid(Date startDate, Date endDate, Date date) {
@@ -570,7 +596,7 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 	return false;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 	String linkage = "http://ionbeam-ichange.ecmwf-ichange.f.ewcloud.host/api/v1/retrieve?class=rd&date=20250117/to/20250122/by/1&expver=xxxx&stream=lwda&aggregation_type=by_time&platform=acronet&station_id=7ce702412e21a86e";
 	System.out.println("Linkage URL: " + linkage);
 	// Define new dates in ISO format
@@ -587,6 +613,25 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 
 	String updatedUrl = linkage.replaceFirst("date=[^&]+", updatedDate);
 	System.out.println("Updated URL: " + updatedUrl);
+
+	String d = "2025-02-03 12:00:00+00:00";
+		   //"2025-01-31 05:28:29.011000+00:00"
+	// Define a SimpleDateFormat with the combined pattern
+	SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSXXX");
+
+	// Parse the combined string into a Date object
+	Date d1;
+	try {
+	 d1 = inputFormat.parse(d);
+	 inputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+	}catch (Exception e) {
+	 inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssXXX");
+	 d1= inputFormat.parse(d);
+	 System.out.println(d1.getTime());
+	}
+	
+	
+
     }
 
 }
