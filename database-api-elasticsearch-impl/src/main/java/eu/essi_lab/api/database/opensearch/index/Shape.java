@@ -199,7 +199,7 @@ public class Shape {
 	    try {
 
 		Geometry geometry = READER.read(shape);
-		
+
 		if (geometry.isValid()) {
 
 		    double area = geometry.getArea();
@@ -208,7 +208,7 @@ public class Shape {
 		    Point c = geometry.getCentroid();
 		    double x = c.getX();
 		    double y = c.getY();
-		    
+
 		    objectBox.put(CENTROID, "POINT (" + x + " " + y + ")");
 
 		    objectBox.put(SHAPE, shape);
@@ -267,13 +267,13 @@ public class Shape {
 	double s = Double.parseDouble(cardinalValues.getSouth());
 	double n = Double.parseDouble(cardinalValues.getNorth());
 
-	String ws = w + " " + s;
-
 	if (e > (180 + TOL)) {
 
 	    e = e - 180;
 	    w = w - 180;
 	}
+
+	String ws = w + " " + s;
 
 	if (n <= 90 && s >= -90 && e >= -180 && e <= 180 && w <= 180 && w >= -180) {
 

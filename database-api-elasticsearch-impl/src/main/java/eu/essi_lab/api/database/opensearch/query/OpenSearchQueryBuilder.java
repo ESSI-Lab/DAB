@@ -65,12 +65,14 @@ import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.SpatialBond;
 import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.bond.View.ViewVisibility;
 import eu.essi_lab.model.Queryable;
+import eu.essi_lab.model.Queryable.ContentType;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.RankingStrategy;
 import eu.essi_lab.model.resource.ResourceProperty;
@@ -91,9 +93,9 @@ public class OpenSearchQueryBuilder {
      * @param ranking
      */
     public OpenSearchQueryBuilder(//
-	    OpenSearchWrapper wrapper,//
-	    RankingStrategy ranking,//
-	    HashMap<String, String> dataFolderMap,//
+	    OpenSearchWrapper wrapper, //
+	    RankingStrategy ranking, //
+	    HashMap<String, String> dataFolderMap, //
 	    boolean deletedIncluded) {
 
 	this.wrapper = wrapper;
@@ -210,11 +212,6 @@ public class OpenSearchQueryBuilder {
 
 	String stringVal = String.valueOf(minOrMax);
 
-	if (date) {
-	    // dates are internally stored are long
-	    stringVal = String.valueOf((long) minOrMax);
-	}
-
 	Query out = OpenSearchQueryBuilder.buildRangeQuery(field, BondOperator.EQUAL, stringVal);
 
 	if (query != null) {
@@ -253,6 +250,91 @@ public class OpenSearchQueryBuilder {
     }
 
     /**
+     * @param bond
+     * @return
+     */
+    public Query buildResourcePropertyQuery(ResourcePropertyBond bond) {
+
+	ResourceProperty property = bond.getProperty();
+
+	String value = bond.getPropertyValue();
+	String name = property.getName();
+	ContentType contentType = property.getContentType();
+	
+	BondOperator operator = bond.getOperator();
+
+	if (operator == BondOperator.EXISTS) {
+
+	    return buildExistsFieldQuery(name);
+
+	}
+
+	if (operator == BondOperator.NOT_EXISTS) {
+
+	    return buildNotExistsFieldQuery(name);
+	}
+
+	if (operator == BondOperator.MAX || operator == BondOperator.MIN) {
+
+	    //
+	    // see BondFactory.createMinMaxResourceTimeStampBond and OAIPMH profiler
+	    //
+	    if (bond.getProperty() == ResourceProperty.RESOURCE_TIME_STAMP) {
+
+		try {
+
+		    return buildMinMaxResourceTimeStampValue(value, bond.getOperator());
+
+		} catch (Exception ex) {
+
+		    GSLoggerFactory.getLogger(getClass()).error(ex);
+		}
+	    } else {
+		//
+		// see BondFactory.createMinMaxResourcePropertyBond
+		//
+		switch (bond.getProperty().getContentType()) {
+		case DOUBLE:
+		case INTEGER:
+		case LONG:
+		case ISO8601_DATE:
+		case ISO8601_DATE_TIME:
+
+		    try {
+			return buildMinMaxValueQuery(name, operator == BondOperator.MAX, true);
+
+		    } catch (Exception ex) {
+
+			GSLoggerFactory.getLogger(getClass()).error(ex);
+		    }
+
+		default:
+		    throw new IllegalArgumentException("Min/max query on non numeric field: " + name);
+		}
+	    }
+	}
+
+	switch (property) {
+	case SOURCE_ID:
+
+	    return buildSourceIdQuery(bond);
+
+	case IS_GEOSS_DATA_CORE:
+
+	    return buildIsGDCQuery(value);
+
+	default:
+	    
+	    if (contentType == ContentType.ISO8601_DATE || contentType == ContentType.ISO8601_DATE_TIME) {
+
+		value = ConversionUtils.parseToLongString(value);
+	    }
+
+	    return buildRangeQuery(name, operator, value);
+	}
+    }
+
+    /**
      * @param el
      * @param operator
      * @param value
@@ -274,6 +356,11 @@ public class OpenSearchQueryBuilder {
 	case GREATER_OR_EQUAL:
 	case LESS:
 	case LESS_OR_EQUAL:
+
+	    if (el.getContentType() == ContentType.ISO8601_DATE || el.getContentType() == ContentType.ISO8601_DATE_TIME) {
+
+		value = ConversionUtils.parseToLongString(value);
+	    }
 
 	    return buildRangeQuery(el.getName(), operator, value, ranking.computePropertyWeight(el));
 
@@ -786,8 +873,8 @@ public class OpenSearchQueryBuilder {
      * @return
      */
     private boolean isWildcardQuery(String value) {
-    
-        return value.contains("*") || value.contains("?");
+
+	return value.contains("*") || value.contains("?");
     }
 
     /**
@@ -795,18 +882,18 @@ public class OpenSearchQueryBuilder {
      * @return
      */
     private String normalize(String term) {
-    
-        if (term.startsWith("*")) {
-    
-            term = term.substring(1, term.length());
-        }
-    
-        if (term.endsWith("*")) {
-    
-            term = term.substring(0, term.length() - 1);
-        }
-    
-        return term;
+
+	if (term.startsWith("*")) {
+
+	    term = term.substring(1, term.length());
+	}
+
+	if (term.endsWith("*")) {
+
+	    term = term.substring(0, term.length() - 1);
+	}
+
+	return term;
     }
 
     /**

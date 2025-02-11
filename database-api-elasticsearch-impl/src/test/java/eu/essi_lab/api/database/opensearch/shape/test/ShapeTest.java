@@ -365,7 +365,7 @@ public class ShapeTest {
 
 	    Shape shape = optShape.get();
 
-	    Assert.assertEquals("POLYGON ((10.0 -10.0, 10.0 10.0, 190.0 10.0, 190.0 -10.0, 10.0 -10.0))", shape.getShape());
+	    Assert.assertEquals("POLYGON ((-170.0 -10.0, -170.0 10.0, 10.0 10.0, 10.0 -10.0, -170.0 -10.0))", shape.getShape());
 	}
 
 	//
@@ -404,31 +404,31 @@ public class ShapeTest {
 
 	GeographicBoundingBox box1 = new GeographicBoundingBox();
 
-	box1.setBigDecimalNorth(new BigDecimal(10));
-	box1.setBigDecimalEast(new BigDecimal(10));
+	box1.setBigDecimalNorth(new BigDecimal(48));
+	box1.setBigDecimalEast(new BigDecimal(5));
 
-	box1.setBigDecimalSouth(new BigDecimal(-10));
-	box1.setBigDecimalWest(new BigDecimal(-10));
+	box1.setBigDecimalSouth(new BigDecimal(43));
+	box1.setBigDecimalWest(new BigDecimal(-2));
 
 	dataset.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().addGeographicBoundingBox(box1);
 
 	GeographicBoundingBox box2 = new GeographicBoundingBox();
 
-	box2.setBigDecimalNorth(new BigDecimal(20));
-	box2.setBigDecimalEast(new BigDecimal(20));
+	box2.setBigDecimalNorth(new BigDecimal(50));
+	box2.setBigDecimalEast(new BigDecimal(27));
 
-	box2.setBigDecimalSouth(new BigDecimal(-20));
-	box2.setBigDecimalWest(new BigDecimal(-20));
+	box2.setBigDecimalSouth(new BigDecimal(44));
+	box2.setBigDecimalWest(new BigDecimal(16));
 
 	dataset.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().addGeographicBoundingBox(box2);
 
 	GeographicBoundingBox box3 = new GeographicBoundingBox();
 
-	box3.setBigDecimalNorth(new BigDecimal(30));
-	box3.setBigDecimalEast(new BigDecimal(30));
+	box3.setBigDecimalNorth(new BigDecimal(34));
+	box3.setBigDecimalEast(new BigDecimal(13));
 
-	box3.setBigDecimalSouth(new BigDecimal(-30));
-	box3.setBigDecimalWest(new BigDecimal(-30));
+	box3.setBigDecimalSouth(new BigDecimal(31));
+	box3.setBigDecimalWest(new BigDecimal(6));
 
 	dataset.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().addGeographicBoundingBox(box3);
 
@@ -446,13 +446,13 @@ public class ShapeTest {
 
 	String shape = optShape.get().getShape();
 
-	String multi = "MULTIPOLYGON (((-10.0 -10.0, -10.0 10.0, 10.0 10.0, 10.0 -10.0, -10.0 -10.0)), ((-20.0 -20.0, -20.0 20.0, 20.0 20.0, 20.0 -20.0, -20.0 -20.0)), ((-30.0 -30.0, -30.0 30.0, 30.0 30.0, 30.0 -30.0, -30.0 -30.0)))";
+	String multi = "MULTIPOLYGON (((-2.0 43.0, -2.0 48.0, 5.0 48.0, 5.0 43.0, -2.0 43.0)), ((16.0 44.0, 16.0 50.0, 27.0 50.0, 27.0 44.0, 16.0 44.0)), ((6.0 31.0, 6.0 34.0, 13.0 34.0, 13.0 31.0, 6.0 31.0)))";
 
 	Assert.assertEquals(multi, shape);
 
 	double area = optShape.get().getArea();
 
-	Assert.assertEquals(Double.valueOf(5600), Double.valueOf(area));
+	Assert.assertEquals(Double.valueOf(122), Double.valueOf(area));
     }
 
     //

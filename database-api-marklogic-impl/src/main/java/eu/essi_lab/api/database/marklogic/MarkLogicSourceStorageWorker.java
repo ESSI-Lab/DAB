@@ -67,6 +67,10 @@ public class MarkLogicSourceStorageWorker extends SourceStorageWorker {
 		    MarkLogicScalarType.STRING.getType());
 
 	    debug("Adding data folder range index ENDED", status);
+
+	} else {
+
+	    debug("Index " + indexName + " already exists", status);
 	}
     }
 }

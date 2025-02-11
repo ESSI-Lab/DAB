@@ -1,0 +1,1288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gs:Dataset xmlns:gs="http://flora.eu/gi-suite/1.0/dataModel/schema" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <gs:source gs:orderingDirection="ASCENDING" gs:resultsPriority="UNSET" gs:strategy="HARVESTED" gs:uniqueIdentifier="UUID-8994bd4b-0e93-4217-af91-d621673e8e7b">
+    <gs:endpoint>http://geoss:gcibroker@metadata.diasjp.net/gcidab/</gs:endpoint>
+    <gs:label>Data Integration and Analysis System (DIAS) - Japan</gs:label>
+  </gs:source>
+  <gs:harmonizedMetadata>
+    <gs:coreMetadata>
+      <gs:isoMetadata>
+	<gmi:MI_Metadata>
+	  <gmd:fileIdentifier>
+	    <gco:CharacterString>1a7cb07f-82df-4ba3-93bd-5c25faf43409</gco:CharacterString>
+	  </gmd:fileIdentifier>
+	  <gmd:language>
+	    <gco:CharacterString>English</gco:CharacterString>
+	  </gmd:language>
+	  <gmd:characterSet>
+	    <gmd:MD_CharacterSetCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode" codeListValue="utf8"/>
+	  </gmd:characterSet>
+	  <gmd:contact>
+	    <gmd:CI_ResponsibleParty>
+	      <gmd:individualName>
+		<gco:CharacterString>Takahiro INOUE</gco:CharacterString>
+	      </gmd:individualName>
+	      <gmd:organisationName>
+		<gco:CharacterString>Remote Sensing Technology Center of Japan</gco:CharacterString>
+	      </gmd:organisationName>
+	      <gmd:contactInfo>
+		<gmd:CI_Contact>
+		  <gmd:address>
+		    <gmd:CI_Address/>
+		  </gmd:address>
+		</gmd:CI_Contact>
+	      </gmd:contactInfo>
+	      <gmd:role>
+		<gmd:CI_RoleCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="auther"/>
+	      </gmd:role>
+	    </gmd:CI_ResponsibleParty>
+	  </gmd:contact>
+	  <gmd:dateStamp>
+	    <gco:Date>2023</gco:Date>
+	  </gmd:dateStamp>
+	  <gmd:metadataStandardName>
+	    <gco:CharacterString>DIAS Core Metadata Profile (based-on ISO 19115:2003/19139)</gco:CharacterString>
+	  </gmd:metadataStandardName>
+	  <gmd:metadataStandardVersion>
+	    <gco:CharacterString>1.0(draft)</gco:CharacterString>
+	  </gmd:metadataStandardVersion>
+	  <gmd:spatialRepresentationInfo>
+	    <gmd:MD_GridSpatialRepresentation>
+	      <gmd:numberOfDimensions>
+		<gco:Integer>0</gco:Integer>
+	      </gmd:numberOfDimensions>
+	      <gmd:cellGeometry>
+		<gmd:MD_CellGeometryCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CellGeometryCode" codeListValue="area"/>
+	      </gmd:cellGeometry>
+	      <gmd:transformationParameterAvailability>
+		<gco:Boolean>false</gco:Boolean>
+	      </gmd:transformationParameterAvailability>
+	    </gmd:MD_GridSpatialRepresentation>
+	  </gmd:spatialRepresentationInfo>
+	  <gmd:identificationInfo>
+	    <gmd:MD_DataIdentification>
+	      <gmd:citation>
+		<gmd:CI_Citation>
+		  <gmd:title>
+		    <gco:CharacterString>CReSS Daily Simulation (around Japan 2km mesh)</gco:CharacterString>
+		  </gmd:title>
+		  <gmd:alternateTitle>
+		    <gco:CharacterString>CReSS_JPN20DK</gco:CharacterString>
+		  </gmd:alternateTitle>
+		  <gmd:date>
+		    <gmd:CI_Date>
+		      <gmd:date>
+			<gco:Date>2020/08/20</gco:Date>
+		      </gmd:date>
+		      <gmd:dateType>
+			<gmd:CI_DateTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode" codeListValue="publication"/>
+		      </gmd:dateType>
+		    </gmd:CI_Date>
+		  </gmd:date>
+		  <gmd:edition>
+		    <gco:CharacterString/>
+		  </gmd:edition>
+		  <gmd:identifier>
+		    <gmd:MD_Identifier>
+		      <gmd:authority>
+			<gmd:CI_Citation>
+			  <gmd:title>
+			    <gco:CharacterString>DIAS (Data Integration and Analysis System)</gco:CharacterString>
+			  </gmd:title>
+			  <gmd:date/>
+			</gmd:CI_Citation>
+		      </gmd:authority>
+		      <gmd:code>
+			<gco:CharacterString>597:CReSS_JPN20DK</gco:CharacterString>
+		      </gmd:code>
+		    </gmd:MD_Identifier>
+		  </gmd:identifier>
+		  <gmd:identifier>
+		    <gmd:MD_Identifier>
+		      <gmd:authority>
+			<gmd:CI_Citation>
+			  <gmd:title>
+			    <gco:CharacterString>IDF (International DOI Foundation)</gco:CharacterString>
+			  </gmd:title>
+			  <gmd:date/>
+			</gmd:CI_Citation>
+		      </gmd:authority>
+		      <gmd:code>
+			<gco:CharacterString>doi:10.20783/DIAS.597</gco:CharacterString>
+		      </gmd:code>
+		    </gmd:MD_Identifier>
+		  </gmd:identifier>
+		  <gmd:otherCitationDetails>
+		    <gco:CharacterString/>
+		  </gmd:otherCitationDetails>
+		</gmd:CI_Citation>
+	      </gmd:citation>
+	      <gmd:abstract>
+		<gco:CharacterString>The Laboratory of Meteorology, Institute for Space-Earth Environmental Research, Nagoya University, has been performing daily high-resolution weather simulations using the cloud resolving storm model CReSS (Cloud Resolving Storm Simulator). To demonstrate how well the current model can simulate real-world weather, the results of the simulations are mainly intended for experts. This dataset is the original data from that simulation, shown on the Web page "CReSS Daily Simulation".
+
+The area of calcuration is about 2300km by 2800km, surrounding Japan, with about 2km grid size. The map projection method is the Lambert Conformal Conic.
+
+The actual simulations are performed prior to the actual time, but due to the limitations of the Meteorological Service Act, only results prior to the current time are made available to the public.
+
+If you wish to use this data to conduct weather forecasting services in Japan, you must follow the appropriate procedures in accordance with the Meteorological Service Act. Please contact the Japan Meteorological Agency for more information on the law.
+
+The simulations are calculated once a day for up to 36 hours ahead.
+This dataset contains the following 17 three dimensional variables and 30 two dimensional variables, the former being output every three hours and the latter every hour.
+
+3D Variables:
+
+u : x components of velocity [m/s]
+v : y components of velocity [m/s]
+w : z components of velocity [m/s]
+p : pressure [Pa]
+pt : potential temperature [K]
+qv : water vapor mixing ratio [kg/kg]
+qc : cloud water mixing ratio [kg/kg]
+qr : rain water mixing ratio [kg/kg]
+qi : cloud ice mixing ratio [kg/kg]
+qs : snow mixing ratio [kg/kg]
+qg : graupel mixing ratio [kg/kg]
+nci : cloud ice concentrations [1/kg]
+ncs : snow concentrations [1/kg]
+ncg : graupel concentrations [1/kg]
+qt : tracer mixing ratio
+tke : turbulent kinetic energy [J/kg]
+zph : z physical coordinates [m]
+
+2D variables:
+
+us : x components of velocity at an altitude of 10m [m/s]
+vs : y components of velocity at an altitude of 10m [m/s]
+ps : pressure at an altitude of 1.5m [Pa]
+pts : potential temperature at an altitude of 1.5m [K]
+qvs : water vapor mixing ratio at an altitude of 1.5m [kg/kg]
+tgs : soil and sea surface temperature [K]
+hs : sensible heat over surface [W/m^2]
+le : latent heat over surface [W/m^2]
+rgd : global solar radiation [W/m^2]
+rsd : net downward short wave radiation [W/m^2]
+rld : downward long wave radiation [W/m^2]
+rlu : upward long wave radiation [W/m^2]
+cdl : cloud cover in lower layer
+cdm : cloud cover in middle layer
+cdh : cloud cover in upper layer
+cdave : averaged cloud cover
+usflx : surface momentum flux for x components of velocity [N/m^2]
+vsflx : surface momentum flux for y components of velocity [N/m^2]
+ptsflx : surface heat flux [(kg K)/(m^2 s)]
+qvsflx : surface moisture flux [kg/(m^2 s)]
+pcr : cloud water fall rate [m/s]
+pca : accumulated cloud water fall [m]
+prr : rain fall rate [m/s]
+pra : accumulated rain fall [m]
+pir : cloud ice fall rate [m/s]
+pia : accumulated cloud ice fall [m]
+psr : snow fall rate [m/s]
+psa : accumulated snow fall [m]
+pgr : graupel fall rate [m/s]
+pga : accumulated graupel fall [m]
+</gco:CharacterString>
+	      </gmd:abstract>
+	      <gmd:pointOfContact>
+		<gmd:CI_ResponsibleParty>
+		  <gmd:individualName>
+		    <gco:CharacterString>Masaya Kato</gco:CharacterString>
+		  </gmd:individualName>
+		  <gmd:organisationName>
+		    <gco:CharacterString>Institute for Space-Earth Environmental Research, Nagoya Univ.</gco:CharacterString>
+		  </gmd:organisationName>
+		  <gmd:contactInfo>
+		    <gmd:CI_Contact>
+		      <gmd:phone>
+			<gmd:CI_Telephone>
+			  <gmd:voice>
+			    <gco:CharacterString>052-789-3495</gco:CharacterString>
+			  </gmd:voice>
+			</gmd:CI_Telephone>
+		      </gmd:phone>
+		      <gmd:address>
+			<gmd:CI_Address>
+			  <gmd:deliveryPoint>
+			    <gco:CharacterString>Furo-cho</gco:CharacterString>
+			  </gmd:deliveryPoint>
+			  <gmd:city>
+			    <gco:CharacterString>Chikusa-ku, Nagoya</gco:CharacterString>
+			  </gmd:city>
+			  <gmd:administrativeArea>
+			    <gco:CharacterString>Aichi</gco:CharacterString>
+			  </gmd:administrativeArea>
+			  <gmd:postalCode>
+			    <gco:CharacterString>464-8601</gco:CharacterString>
+			  </gmd:postalCode>
+			  <gmd:country>
+			    <gco:CharacterString>Japan</gco:CharacterString>
+			  </gmd:country>
+			  <gmd:electronicMailAddress>
+			    <gco:CharacterString>kato@rain.isee.nagoya-u.ac.jp</gco:CharacterString>
+			  </gmd:electronicMailAddress>
+			</gmd:CI_Address>
+		      </gmd:address>
+		    </gmd:CI_Contact>
+		  </gmd:contactInfo>
+		  <gmd:role>
+		    <gmd:CI_RoleCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="pointOfContact"/>
+		  </gmd:role>
+		</gmd:CI_ResponsibleParty>
+	      </gmd:pointOfContact>
+	      <gmd:pointOfContact>
+		<gmd:CI_ResponsibleParty>
+		  <gmd:individualName>
+		    <gco:CharacterString>Kazuhisa Tsuboki</gco:CharacterString>
+		  </gmd:individualName>
+		  <gmd:organisationName>
+		    <gco:CharacterString>Institute for Space-Earth Environmental Research, Nagoya Univ.</gco:CharacterString>
+		  </gmd:organisationName>
+		  <gmd:contactInfo>
+		    <gmd:CI_Contact>
+		      <gmd:address>
+			<gmd:CI_Address>
+			  <gmd:electronicMailAddress>
+			    <gco:CharacterString>tsuboki@nagoya-u.jp</gco:CharacterString>
+			  </gmd:electronicMailAddress>
+			</gmd:CI_Address>
+		      </gmd:address>
+		    </gmd:CI_Contact>
+		  </gmd:contactInfo>
+		  <gmd:role>
+		    <gmd:CI_RoleCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="originator"/>
+		  </gmd:role>
+		</gmd:CI_ResponsibleParty>
+	      </gmd:pointOfContact>
+	      <gmd:descriptiveKeywords>
+		<gmd:MD_Keywords>
+		  <gmd:keyword>
+		    <gco:CharacterString>Atmosphere &gt; Atmospheric Temperature &gt; </gco:CharacterString>
+		  </gmd:keyword>
+		  <gmd:keyword>
+		    <gco:CharacterString>Atmosphere &gt; Precipitation &gt; </gco:CharacterString>
+		  </gmd:keyword>
+		  <gmd:keyword>
+		    <gco:CharacterString>Atmosphere &gt; Atmospheric Phenomena &gt; Typhoons</gco:CharacterString>
+		  </gmd:keyword>
+		  <gmd:keyword>
+		    <gco:CharacterString>Atmosphere &gt; Clouds</gco:CharacterString>
+		  </gmd:keyword>
+		  <gmd:keyword>
+		    <gco:CharacterString>Atmosphere &gt; Atmospheric Radiation</gco:CharacterString>
+		  </gmd:keyword>
+		  <gmd:keyword>
+		    <gco:CharacterString>Atmosphere &gt; Atmospheric Water Vapor</gco:CharacterString>
+		  </gmd:keyword>
+		  <gmd:type>
+		    <gmd:MD_KeywordTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="theme"/>
+		  </gmd:type>
+		  <gmd:thesaurusName>
+		    <gmd:CI_Citation>
+		      <gmd:title>
+			<gco:CharacterString>GCMD_science</gco:CharacterString>
+		      </gmd:title>
+		      <gmd:date/>
+		    </gmd:CI_Citation>
+		  </gmd:thesaurusName>
+		</gmd:MD_Keywords>
+	      </gmd:descriptiveKeywords>
+	      <gmd:descriptiveKeywords>
+		<gmd:MD_Keywords>
+		  <gmd:keyword>
+		    <gco:CharacterString>ATMOSPHERIC PROCESSES &gt; Mesoscale meteorology</gco:CharacterString>
+		  </gmd:keyword>
+		  <gmd:keyword>
+		    <gco:CharacterString>ATMOSPHERIC PROCESSES &gt; Convective processes</gco:CharacterString>
+		  </gmd:keyword>
+		  <gmd:keyword>
+		    <gco:CharacterString>ATMOSPHERIC PROCESSES &gt; Precipitation</gco:CharacterString>
+		  </gmd:keyword>
+		  <gmd:keyword>
+		    <gco:CharacterString>ATMOSPHERIC PROCESSES &gt; Regional modeling</gco:CharacterString>
+		  </gmd:keyword>
+		  <gmd:type>
+		    <gmd:MD_KeywordTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="theme"/>
+		  </gmd:type>
+		  <gmd:thesaurusName>
+		    <gmd:CI_Citation>
+		      <gmd:title>
+			<gco:CharacterString>AGU</gco:CharacterString>
+		      </gmd:title>
+		      <gmd:date/>
+		    </gmd:CI_Citation>
+		  </gmd:thesaurusName>
+		</gmd:MD_Keywords>
+	      </gmd:descriptiveKeywords>
+	      <gmd:descriptiveKeywords>
+		<gmd:MD_Keywords>
+		  <gmd:keyword>
+		    <gco:CharacterString>Weather</gco:CharacterString>
+		  </gmd:keyword>
+		  <gmd:type>
+		    <gmd:MD_KeywordTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="theme"/>
+		  </gmd:type>
+		  <gmd:thesaurusName>
+		    <gmd:CI_Citation>
+		      <gmd:title>
+			<gco:CharacterString>GEOSS</gco:CharacterString>
+		      </gmd:title>
+		      <gmd:date/>
+		    </gmd:CI_Citation>
+		  </gmd:thesaurusName>
+		</gmd:MD_Keywords>
+	      </gmd:descriptiveKeywords>
+	      <gmd:descriptiveKeywords>
+		<gmd:MD_Keywords>
+		  <gmd:keyword>
+		    <gco:CharacterString>Asia &gt; Eastern Asia &gt; Japan</gco:CharacterString>
+		  </gmd:keyword>
+		  <gmd:type>
+		    <gmd:MD_KeywordTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="place"/>
+		  </gmd:type>
+		  <gmd:thesaurusName>
+		    <gmd:CI_Citation>
+		      <gmd:title>
+			<gco:CharacterString>Country</gco:CharacterString>
+		      </gmd:title>
+		      <gmd:date/>
+		    </gmd:CI_Citation>
+		  </gmd:thesaurusName>
+		</gmd:MD_Keywords>
+	      </gmd:descriptiveKeywords>
+	      <gmd:descriptiveKeywords>
+		<gmd:MD_Keywords>
+		  <gmd:keyword>
+		    <gco:CharacterString>Models</gco:CharacterString>
+		  </gmd:keyword>
+		  <gmd:type>
+		    <gmd:MD_KeywordTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="theme"/>
+		  </gmd:type>
+		  <gmd:thesaurusName>
+		    <gmd:CI_Citation>
+		      <gmd:title>
+			<gco:CharacterString>GCMD_platform</gco:CharacterString>
+		      </gmd:title>
+		      <gmd:date/>
+		    </gmd:CI_Citation>
+		  </gmd:thesaurusName>
+		</gmd:MD_Keywords>
+	      </gmd:descriptiveKeywords>
+	      <gmd:resourceConstraints>
+		<gmd:MD_Constraints>
+		  <gmd:useLimitation>
+		    <gco:CharacterString>geossUserRegistration</gco:CharacterString>
+		  </gmd:useLimitation>
+		</gmd:MD_Constraints>
+	      </gmd:resourceConstraints>
+	      <gmd:resourceConstraints>
+		<gmd:MD_LegalConstraints>
+		  <gmd:useConstraints>
+		    <gmd:MD_RestrictionCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode" codeListValue="otherRestrictions"/>
+		  </gmd:useConstraints>
+		  <gmd:otherConstraints>
+		    <gco:CharacterString>This dataset is distributed under the CC BY-SA 4.0 International License.
+
+http://creativecommons.org/licenses/by-sa/4.0/
+
+The data author will not guarantee that the results of the simulations that produced this dataset are correct or represent the actual weather.
+
+No responsibility is assumed by anyone, including the creator (and all individuals and organizations involved in the creation of this dataset, and the same applies below). No liability of any kind shall be assumed by anyone, including the creator.
+
+No one, including the creator, shall be held liable or responsible for any detriment or damage or loss (whether financial, material, personal, emotional, social or otherwise) resulting from the use of or in connection with this dataset.</gco:CharacterString>
+		  </gmd:otherConstraints>
+		</gmd:MD_LegalConstraints>
+	      </gmd:resourceConstraints>
+	      <gmd:spatialRepresentationType>
+		<gmd:MD_SpatialRepresentationTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_SpatialRepresentationTypeCode" codeListValue="grid"/>
+	      </gmd:spatialRepresentationType>
+	      <gmd:language>
+		<gco:CharacterString>English</gco:CharacterString>
+	      </gmd:language>
+	      <gmd:characterSet>
+		<gmd:MD_CharacterSetCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode" codeListValue="utf8"/>
+	      </gmd:characterSet>
+	      <gmd:topicCategory>
+		<gmd:MD_TopicCategoryCode>climatologyMeteorologyAtmosphere</gmd:MD_TopicCategoryCode>
+	      </gmd:topicCategory>
+	      <gmd:environmentDescription>
+		<gco:CharacterString>Each directory contains binary data files and corresponding Grads ctl files. The extension ".bin" is for the data file and ".ctl" is for the Grads ctl file. A file basename ending in "_dmp" is for 3D variables, one ending in "_mon" is for a horizontal 2D variables,  "_geography" is for the geographical data. The "YYYYMMDDhhZ" part of the file name indicates the simulation start date and the data output date.</gco:CharacterString>
+	      </gmd:environmentDescription>
+	      <gmd:extent>
+		<gmd:EX_Extent>
+		  <gmd:description>
+		    <gco:CharacterString>Hourly</gco:CharacterString>
+		  </gmd:description>
+		  <gmd:geographicElement>
+		    <gmd:EX_GeographicBoundingBox>
+		      <gmd:westBoundLongitude>
+			<gco:Decimal>120.178</gco:Decimal>
+		      </gmd:westBoundLongitude>
+		      <gmd:eastBoundLongitude>
+			<gco:Decimal>149.518</gco:Decimal>
+		      </gmd:eastBoundLongitude>
+		      <gmd:southBoundLatitude>
+			<gco:Decimal>20.8597</gco:Decimal>
+		      </gmd:southBoundLatitude>
+		      <gmd:northBoundLatitude>
+			<gco:Decimal>46.463</gco:Decimal>
+		      </gmd:northBoundLatitude>
+		    </gmd:EX_GeographicBoundingBox>
+		  </gmd:geographicElement>
+		  <gmd:geographicElement>
+		    <gmd:EX_GeographicDescription>
+		      <gmd:geographicIdentifier>
+			<gmd:MD_Identifier>
+			  <gmd:code>
+			    <gco:CharacterString/>
+			  </gmd:code>
+			</gmd:MD_Identifier>
+		      </gmd:geographicIdentifier>
+		    </gmd:EX_GeographicDescription>
+		  </gmd:geographicElement>
+		  <gmd:temporalElement>
+		    <gmd:EX_TemporalExtent>
+		      <gmd:extent>
+			<gml:TimePeriod gml:id="observationDateTime">
+			  <gml:beginPosition>20130526</gml:beginPosition>
+			  <gml:endPosition>9999-12-31</gml:endPosition>
+			</gml:TimePeriod>
+		      </gmd:extent>
+		    </gmd:EX_TemporalExtent>
+		  </gmd:temporalElement>
+		</gmd:EX_Extent>
+	      </gmd:extent>
+	      <gmd:supplementalInformation>
+		<gco:CharacterString>Tsuboki, K., and A. Sakakibara (2002), Large-scale parallel computing of Cloud Resolving Storm Simulator, in High Performance Computing, edited by H. P. Zima, K. Joe, M. Sato, Y. Seo, and M. Shimasaki, pp. 243-259, Springer, New York.
+Tsuboki, K. (2008), High-resolution simulations of high-impact weather systems using the cloud-resolving model on the Earth Simulator, In High Resolution Numerical Modeling of the Atmosphere and Ocean, edited by K. Hamilton, and W. Ohfuchi, pp. 141-156, Springer, New York.
+
+</gco:CharacterString>
+	      </gmd:supplementalInformation>
+	    </gmd:MD_DataIdentification>
+	  </gmd:identificationInfo>
+	  <gmd:identificationInfo>
+	    <gmd:MD_DataIdentification>
+	      <gmd:citation>
+		<gmd:CI_Citation>
+		  <gmd:title>
+		    <gco:CharacterString>CReSS Daily Simulation (around Japan 2km mesh)</gco:CharacterString>
+		  </gmd:title>
+		  <gmd:alternateTitle>
+		    <gco:CharacterString>CReSS_JPN20DK</gco:CharacterString>
+		  </gmd:alternateTitle>
+		  <gmd:date>
+		    <gmd:CI_Date>
+		      <gmd:date>
+			<gco:Date>2020/08/20</gco:Date>
+		      </gmd:date>
+		      <gmd:dateType>
+			<gmd:CI_DateTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode" codeListValue="publication"/>
+		      </gmd:dateType>
+		    </gmd:CI_Date>
+		  </gmd:date>
+		  <gmd:edition>
+		    <gco:CharacterString/>
+		  </gmd:edition>
+		  <gmd:identifier>
+		    <gmd:MD_Identifier>
+		      <gmd:code>
+			<gco:CharacterString>CReSS_JPN20DK20230727100643-DIAS20221121113753-en</gco:CharacterString>
+		      </gmd:code>
+		    </gmd:MD_Identifier>
+		  </gmd:identifier>
+		  <gmd:otherCitationDetails>
+		    <gco:CharacterString/>
+		  </gmd:otherCitationDetails>
+		</gmd:CI_Citation>
+	      </gmd:citation>
+	      <gmd:abstract>
+		<gco:CharacterString>This dataset is released from DIAS (Data Integration and Analysis System).
+              </gco:CharacterString>
+	      </gmd:abstract>
+	      <gmd:pointOfContact>
+		<gmd:CI_ResponsibleParty>
+		  <gmd:individualName>
+		    <gco:CharacterString>DIAS Office</gco:CharacterString>
+		  </gmd:individualName>
+		  <gmd:organisationName>
+		    <gco:CharacterString>Japan Agency for Marine-Earth Science and Technology</gco:CharacterString>
+		  </gmd:organisationName>
+		  <gmd:contactInfo>
+		    <gmd:CI_Contact>
+		      <gmd:phone>
+			<gmd:CI_Telephone/>
+		      </gmd:phone>
+		      <gmd:address>
+			<gmd:CI_Address>
+			  <gmd:deliveryPoint>
+			    <gco:CharacterString>3173-25, Showa-Cho, Kanazawa-ku</gco:CharacterString>
+			  </gmd:deliveryPoint>
+			  <gmd:city>
+			    <gco:CharacterString>Yokohama-shi</gco:CharacterString>
+			  </gmd:city>
+			  <gmd:administrativeArea>
+			    <gco:CharacterString>Kanagawa</gco:CharacterString>
+			  </gmd:administrativeArea>
+			  <gmd:postalCode>
+			    <gco:CharacterString>236-0001</gco:CharacterString>
+			  </gmd:postalCode>
+			  <gmd:country>
+			    <gco:CharacterString>Japan</gco:CharacterString>
+			  </gmd:country>
+			  <gmd:electronicMailAddress>
+			    <gco:CharacterString>dias-office@diasjp.net</gco:CharacterString>
+			  </gmd:electronicMailAddress>
+			</gmd:CI_Address>
+		      </gmd:address>
+		    </gmd:CI_Contact>
+		  </gmd:contactInfo>
+		  <gmd:role>
+		    <gmd:CI_RoleCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="pointOfContact"/>
+		  </gmd:role>
+		</gmd:CI_ResponsibleParty>
+	      </gmd:pointOfContact>
+	      <gmd:descriptiveKeywords>
+		<gmd:MD_Keywords>
+		  <gmd:keyword>
+		    <gco:CharacterString>DIAS &amp;amp;gt; Data Integration and Analysis System</gco:CharacterString>
+		  </gmd:keyword>
+		  <gmd:type>
+		    <gmd:MD_KeywordTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="theme"/>
+		  </gmd:type>
+		  <gmd:thesaurusName>
+		    <gmd:CI_Citation>
+		      <gmd:title>
+			<gco:CharacterString>No_Dictionary</gco:CharacterString>
+		      </gmd:title>
+		      <gmd:date/>
+		    </gmd:CI_Citation>
+		  </gmd:thesaurusName>
+		</gmd:MD_Keywords>
+	      </gmd:descriptiveKeywords>
+	      <gmd:resourceConstraints>
+		<gmd:MD_Constraints>
+		  <gmd:useLimitation>
+		    <gco:CharacterString>geossUserRegistration</gco:CharacterString>
+		  </gmd:useLimitation>
+		</gmd:MD_Constraints>
+	      </gmd:resourceConstraints>
+	      <gmd:resourceConstraints>
+		<gmd:MD_LegalConstraints>
+		  <gmd:useConstraints>
+		    <gmd:MD_RestrictionCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode" codeListValue="otherRestrictions"/>
+		  </gmd:useConstraints>
+		  <gmd:otherConstraints>
+		    <gco:CharacterString>If data provider does not have data policy, DIAS Terms of Service (https://diasjp.net/en/terms/) and DIAS Privacy Policy (https://diasjp.net/en/privacy/) apply. </gco:CharacterString>
+		  </gmd:otherConstraints>
+		  <gmd:otherConstraints>
+		    <gco:CharacterString>If there is a conflict between DIAS Terms of Service and data provider's policy, the data provider's policy shall prevail.</gco:CharacterString>
+		  </gmd:otherConstraints>
+		  <gmd:otherConstraints>
+		    <gco:CharacterString>If you plan to use this dataset for a conference presentation, paper, journal article, or report etc., please include acknowledgments referred to following examples. If the data provider describes examples of acknowledgments, include them as well.
+" In this study, [Name of Dataset] provided by [Name of Data Provider] was utilized. This dataset was also collected and provided under the Data Integration and Analysis System (DIAS), which was developed and operated by a project supported by the Ministry of Education, Culture, Sports, Science and Technology.  "</gco:CharacterString>
+		  </gmd:otherConstraints>
+		  <gmd:otherConstraints>
+		    <gco:CharacterString>If data provider does not have data policy, disclaimer of DIAS Terms of Service (https://diasjp.net/en/terms/) apply. </gco:CharacterString>
+		  </gmd:otherConstraints>
+		  <gmd:otherConstraints>
+		    <gco:CharacterString>If there is a conflict between DIAS Terms of Service and data provider's policy, the data provider's policy shall prevail.</gco:CharacterString>
+		  </gmd:otherConstraints>
+		</gmd:MD_LegalConstraints>
+	      </gmd:resourceConstraints>
+	      <gmd:language>
+		<gco:CharacterString>English</gco:CharacterString>
+	      </gmd:language>
+	    </gmd:MD_DataIdentification>
+	  </gmd:identificationInfo>
+	  <gmd:distributionInfo>
+	    <gmd:MD_Distribution>
+	      <gmd:distributionFormat>
+		<gmd:MD_Format>
+		  <gmd:name>
+		    <gco:CharacterString>Fortran binary data</gco:CharacterString>
+		  </gmd:name>
+		  <gmd:version>
+		    <gco:CharacterString>N/A</gco:CharacterString>
+		  </gmd:version>
+		  <gmd:specification>
+		    <gco:CharacterString>4byte binary (big endian)</gco:CharacterString>
+		  </gmd:specification>
+		</gmd:MD_Format>
+	      </gmd:distributionFormat>
+	      <gmd:transferOptions>
+		<gmd:MD_DigitalTransferOptions>
+		  <gmd:onLine>
+		    <gmd:CI_OnlineResource>
+		      <gmd:linkage>
+			<gmd:URL>https://data.diasjp.net/dl/storages/filelist/dataset:597</gmd:URL>
+		      </gmd:linkage>
+		      <gmd:description>
+			<gco:CharacterString>file download</gco:CharacterString>
+		      </gmd:description>
+		    </gmd:CI_OnlineResource>
+		  </gmd:onLine>
+		</gmd:MD_DigitalTransferOptions>
+	      </gmd:transferOptions>
+	      <gmd:transferOptions>
+		<gmd:MD_DigitalTransferOptions>
+		  <gmd:onLine>
+		    <gmd:CI_OnlineResource>
+		      <gmd:linkage>
+			<gmd:URL>http://metadata.diasjp.net/dmm/doc/CReSS_JPN20DK20230727100643-DIAS20221121113753-en.html</gmd:URL>
+		      </gmd:linkage>
+		      <gmd:description>
+			<gco:CharacterString>DIAS metadata</gco:CharacterString>
+		      </gmd:description>
+		    </gmd:CI_OnlineResource>
+		  </gmd:onLine>
+		</gmd:MD_DigitalTransferOptions>
+	      </gmd:transferOptions>
+	    </gmd:MD_Distribution>
+	  </gmd:distributionInfo>
+	  <gmd:dataQualityInfo>
+	    <gmd:DQ_DataQuality>
+	      <gmd:scope>
+		<gmd:DQ_Scope>
+		  <gmd:level>
+		    <gmd:MD_ScopeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ScopeCode" codeListValue="dataset"/>
+		  </gmd:level>
+		</gmd:DQ_Scope>
+	      </gmd:scope>
+	      <gmd:lineage>
+		<gmd:LI_Lineage/>
+	      </gmd:lineage>
+	    </gmd:DQ_DataQuality>
+	  </gmd:dataQualityInfo>
+	</gmi:MI_Metadata>
+      </gs:isoMetadata>
+    </gs:coreMetadata>
+    <gs:augmentedMetadata/>
+    <gs:extendedMetadata>
+      <gs:extension>
+	<gs:OriginatorOrganisationDescription>Institute for Space-Earth Environmental Research, Nagoya Univ.</gs:OriginatorOrganisationDescription>
+      </gs:extension>
+    </gs:extendedMetadata>
+  </gs:harmonizedMetadata>
+  <gs:originalMetadata>
+    <gs:schemeURI>http://www.isotc211.org/2005/gmd</gs:schemeURI>
+    <gs:metadata>&lt;![CDATA[&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt;&amp;lt;gmd:MD_Metadata xmlns:gml=&amp;quot;http://www.opengis.net/gml&amp;quot; xmlns:xdt=&amp;quot;http://www.w3.org/2005/02/xpath-datatypes&amp;quot; xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot; xmlns:xlink=&amp;quot;http://www.w3.org/1999/xlink&amp;quot; xmlns:xs=&amp;quot;http://www.w3.org/2001/XMLSchema&amp;quot; xmlns:xsi=&amp;quot;http://www.w3.org/2001/XMLSchema-instance&amp;quot; xmlns:gmd=&amp;quot;http://www.isotc211.org/2005/gmd&amp;quot; xmlns:gsr=&amp;quot;http://www.isotc211.org/2005/gsr&amp;quot; xmlns:gss=&amp;quot;http://www.isotc211.org/2005/gss&amp;quot; xmlns:gts=&amp;quot;http://www.isotc211.org/2005/gts&amp;quot; xmlns:gco=&amp;quot;http://www.isotc211.org/2005/gco&amp;quot; xsi:schemaLocation=&amp;quot;http://www.isotc211.org/2005/gmd http://www.isotc211.org/2005/gmd/gmd.xsd&amp;quot;&amp;gt;&amp;lt;gmd:fileIdentifier&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;CReSS_JPN20DK20230727100643-DIAS20221121113753-en&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:fileIdentifier&amp;gt;&amp;lt;gmd:language&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;English&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:language&amp;gt;&amp;lt;gmd:characterSet&amp;gt;
+&amp;lt;gmd:MD_CharacterSetCode codeListValue=&amp;quot;utf8&amp;quot; codeList=&amp;quot;http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode&amp;quot;/&amp;gt;
+&amp;lt;/gmd:characterSet&amp;gt;&amp;lt;gmd:contact&amp;gt;&amp;lt;gmd:CI_ResponsibleParty xmlns:fn=&amp;quot;http://www.w3.org/2005/xpath-functions&amp;quot;&amp;gt;&amp;lt;gmd:individualName xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;Takahiro INOUE&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:individualName&amp;gt;&amp;lt;gmd:organisationName xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;Remote Sensing Technology Center of Japan&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:organisationName&amp;gt;&amp;lt;gmd:contactInfo&amp;gt;&amp;lt;gmd:CI_Contact&amp;gt;&amp;lt;gmd:address&amp;gt;&amp;lt;gmd:CI_Address/&amp;gt;&amp;lt;/gmd:address&amp;gt;&amp;lt;/gmd:CI_Contact&amp;gt;&amp;lt;/gmd:contactInfo&amp;gt;&amp;lt;gmd:role xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gmd:CI_RoleCode codeList=&amp;quot;http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode&amp;quot; codeListValue=&amp;quot;auther&amp;quot;/&amp;gt;
+&amp;lt;/gmd:role&amp;gt;&amp;lt;/gmd:CI_ResponsibleParty&amp;gt;&amp;lt;/gmd:contact&amp;gt;&amp;lt;gmd:dateStamp&amp;gt;
+&amp;lt;gco:Date&amp;gt;2023-07-27&amp;lt;/gco:Date&amp;gt;
+&amp;lt;/gmd:dateStamp&amp;gt;&amp;lt;gmd:metadataStandardName&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;DIAS Core Metadata Profile (based-on ISO 19115:2003/19139)&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:metadataStandardName&amp;gt;&amp;lt;gmd:metadataStandardVersion&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;1.0(draft)&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:metadataStandardVersion&amp;gt;&amp;lt;gmd:spatialRepresentationInfo&amp;gt;
+&amp;lt;gmd:MD_GridSpatialRepresentation&amp;gt;
+&amp;lt;gmd:numberOfDimensions&amp;gt;
+&amp;lt;gco:Integer&amp;gt;0&amp;lt;/gco:Integer&amp;gt;
+&amp;lt;/gmd:numberOfDimensions&amp;gt;
+&amp;lt;gmd:cellGeometry&amp;gt;
+&amp;lt;gmd:MD_CellGeometryCode codeListValue=&amp;quot;area&amp;quot; codeList=&amp;quot;http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CellGeometryCode&amp;quot;/&amp;gt;
+&amp;lt;/gmd:cellGeometry&amp;gt;
+&amp;lt;gmd:transformationParameterAvailability&amp;gt;
+&amp;lt;gco:Boolean&amp;gt;false&amp;lt;/gco:Boolean&amp;gt;
+&amp;lt;/gmd:transformationParameterAvailability&amp;gt;
+&amp;lt;/gmd:MD_GridSpatialRepresentation&amp;gt;
+&amp;lt;/gmd:spatialRepresentationInfo&amp;gt;&amp;lt;gmd:identificationInfo&amp;gt;&amp;lt;gmd:MD_DataIdentification xmlns:fn=&amp;quot;http://www.w3.org/2005/xpath-functions&amp;quot;&amp;gt;&amp;lt;gmd:citation xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gmd:CI_Citation&amp;gt;
+&amp;lt;gmd:title&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;CReSS Daily Simulation (around Japan 2km mesh)&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:title&amp;gt;
+&amp;lt;gmd:alternateTitle&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;CReSS_JPN20DK&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:alternateTitle&amp;gt;
+&amp;lt;gmd:date&amp;gt;
+&amp;lt;gmd:CI_Date&amp;gt;
+&amp;lt;gmd:date&amp;gt;
+&amp;lt;gco:Date&amp;gt;2020/08/20&amp;lt;/gco:Date&amp;gt;
+&amp;lt;/gmd:date&amp;gt;
+&amp;lt;gmd:dateType&amp;gt;
+&amp;lt;gmd:CI_DateTypeCode codeList=&amp;quot;http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode&amp;quot; codeListValue=&amp;quot;publication&amp;quot;/&amp;gt;
+&amp;lt;/gmd:dateType&amp;gt;
+&amp;lt;/gmd:CI_Date&amp;gt;
+&amp;lt;/gmd:date&amp;gt;
+&amp;lt;gmd:edition&amp;gt;
+&amp;lt;gco:CharacterString/&amp;gt;
+&amp;lt;/gmd:edition&amp;gt;
+&amp;lt;gmd:identifier&amp;gt;
+&amp;lt;gmd:MD_Identifier&amp;gt;
+&amp;lt;gmd:authority&amp;gt;
+&amp;lt;gmd:CI_Citation&amp;gt;
+&amp;lt;gmd:title&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;DIAS (Data Integration and Analysis System)&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:title&amp;gt;
+&amp;lt;gmd:date/&amp;gt;
+&amp;lt;/gmd:CI_Citation&amp;gt;
+&amp;lt;/gmd:authority&amp;gt;
+&amp;lt;gmd:code&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;597:CReSS_JPN20DK&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:code&amp;gt;
+&amp;lt;/gmd:MD_Identifier&amp;gt;
+&amp;lt;/gmd:identifier&amp;gt;
+&amp;lt;gmd:identifier&amp;gt;
+&amp;lt;gmd:MD_Identifier&amp;gt;
+&amp;lt;gmd:authority&amp;gt;
+&amp;lt;gmd:CI_Citation&amp;gt;
+&amp;lt;gmd:title&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;IDF (International DOI Foundation)&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:title&amp;gt;
+&amp;lt;gmd:date/&amp;gt;
+&amp;lt;/gmd:CI_Citation&amp;gt;
+&amp;lt;/gmd:authority&amp;gt;
+&amp;lt;gmd:code&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;doi:10.20783/DIAS.597&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:code&amp;gt;
+&amp;lt;/gmd:MD_Identifier&amp;gt;
+&amp;lt;/gmd:identifier&amp;gt;
+&amp;lt;gmd:otherCitationDetails&amp;gt;
+&amp;lt;gco:CharacterString/&amp;gt;
+&amp;lt;/gmd:otherCitationDetails&amp;gt;
+&amp;lt;/gmd:CI_Citation&amp;gt;
+&amp;lt;/gmd:citation&amp;gt;&amp;lt;gmd:abstract xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;The Laboratory of Meteorology, Institute for Space-Earth Environmental Research, Nagoya University, has been performing daily high-resolution weather simulations using the cloud resolving storm model CReSS (Cloud Resolving Storm Simulator). To demonstrate how well the current model can simulate real-world weather, the results of the simulations are mainly intended for experts. This dataset is the original data from that simulation, shown on the Web page &amp;quot;CReSS Daily Simulation&amp;quot;.
+
+The area of calcuration is about 2300km by 2800km, surrounding Japan, with about 2km grid size. The map projection method is the Lambert Conformal Conic.
+
+The actual simulations are performed prior to the actual time, but due to the limitations of the Meteorological Service Act, only results prior to the current time are made available to the public.
+
+If you wish to use this data to conduct weather forecasting services in Japan, you must follow the appropriate procedures in accordance with the Meteorological Service Act. Please contact the Japan Meteorological Agency for more information on the law.
+
+The simulations are calculated once a day for up to 36 hours ahead.
+This dataset contains the following 17 three dimensional variables and 30 two dimensional variables, the former being output every three hours and the latter every hour.
+
+3D Variables:
+
+u : x components of velocity [m/s]
+v : y components of velocity [m/s]
+w : z components of velocity [m/s]
+p : pressure [Pa]
+pt : potential temperature [K]
+qv : water vapor mixing ratio [kg/kg]
+qc : cloud water mixing ratio [kg/kg]
+qr : rain water mixing ratio [kg/kg]
+qi : cloud ice mixing ratio [kg/kg]
+qs : snow mixing ratio [kg/kg]
+qg : graupel mixing ratio [kg/kg]
+nci : cloud ice concentrations [1/kg]
+ncs : snow concentrations [1/kg]
+ncg : graupel concentrations [1/kg]
+qt : tracer mixing ratio
+tke : turbulent kinetic energy [J/kg]
+zph : z physical coordinates [m]
+
+2D variables:
+
+us : x components of velocity at an altitude of 10m [m/s]
+vs : y components of velocity at an altitude of 10m [m/s]
+ps : pressure at an altitude of 1.5m [Pa]
+pts : potential temperature at an altitude of 1.5m [K]
+qvs : water vapor mixing ratio at an altitude of 1.5m [kg/kg]
+tgs : soil and sea surface temperature [K]
+hs : sensible heat over surface [W/m^2]
+le : latent heat over surface [W/m^2]
+rgd : global solar radiation [W/m^2]
+rsd : net downward short wave radiation [W/m^2]
+rld : downward long wave radiation [W/m^2]
+rlu : upward long wave radiation [W/m^2]
+cdl : cloud cover in lower layer
+cdm : cloud cover in middle layer
+cdh : cloud cover in upper layer
+cdave : averaged cloud cover
+usflx : surface momentum flux for x components of velocity [N/m^2]
+vsflx : surface momentum flux for y components of velocity [N/m^2]
+ptsflx : surface heat flux [(kg K)/(m^2 s)]
+qvsflx : surface moisture flux [kg/(m^2 s)]
+pcr : cloud water fall rate [m/s]
+pca : accumulated cloud water fall [m]
+prr : rain fall rate [m/s]
+pra : accumulated rain fall [m]
+pir : cloud ice fall rate [m/s]
+pia : accumulated cloud ice fall [m]
+psr : snow fall rate [m/s]
+psa : accumulated snow fall [m]
+pgr : graupel fall rate [m/s]
+pga : accumulated graupel fall [m]
+&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:abstract&amp;gt;&amp;lt;gmd:pointOfContact&amp;gt;&amp;lt;gmd:CI_ResponsibleParty&amp;gt;&amp;lt;gmd:individualName xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;Masaya Kato&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:individualName&amp;gt;&amp;lt;gmd:organisationName xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;Institute for Space-Earth Environmental Research, Nagoya Univ.&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:organisationName&amp;gt;&amp;lt;gmd:contactInfo&amp;gt;&amp;lt;gmd:CI_Contact&amp;gt;&amp;lt;gmd:phone xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gmd:CI_Telephone&amp;gt;
+&amp;lt;gmd:voice&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;052-789-3495&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:voice&amp;gt;
+&amp;lt;/gmd:CI_Telephone&amp;gt;
+&amp;lt;/gmd:phone&amp;gt;&amp;lt;gmd:address&amp;gt;&amp;lt;gmd:CI_Address&amp;gt;&amp;lt;gmd:deliveryPoint xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;Furo-cho&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:deliveryPoint&amp;gt;&amp;lt;gmd:city xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;Chikusa-ku, Nagoya&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:city&amp;gt;&amp;lt;gmd:administrativeArea xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;Aichi&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:administrativeArea&amp;gt;&amp;lt;gmd:postalCode xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;464-8601&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:postalCode&amp;gt;&amp;lt;gmd:country xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;Japan&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:country&amp;gt;&amp;lt;gmd:electronicMailAddress xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;&amp;lt;gco:CharacterString&amp;gt;kato@rain.isee.nagoya-u.ac.jp&amp;lt;/gco:CharacterString&amp;gt;&amp;lt;/gmd:electronicMailAddress&amp;gt;&amp;lt;/gmd:CI_Address&amp;gt;&amp;lt;/gmd:address&amp;gt;&amp;lt;/gmd:CI_Contact&amp;gt;&amp;lt;/gmd:contactInfo&amp;gt;&amp;lt;gmd:role xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gmd:CI_RoleCode codeList=&amp;quot;http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode&amp;quot; codeListValue=&amp;quot;pointOfContact&amp;quot;/&amp;gt;
+&amp;lt;/gmd:role&amp;gt;&amp;lt;/gmd:CI_ResponsibleParty&amp;gt;&amp;lt;/gmd:pointOfContact&amp;gt;&amp;lt;gmd:pointOfContact&amp;gt;&amp;lt;gmd:CI_ResponsibleParty&amp;gt;&amp;lt;gmd:individualName xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;Kazuhisa Tsuboki&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:individualName&amp;gt;&amp;lt;gmd:organisationName xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;Institute for Space-Earth Environmental Research, Nagoya Univ.&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:organisationName&amp;gt;&amp;lt;gmd:contactInfo&amp;gt;&amp;lt;gmd:CI_Contact&amp;gt;&amp;lt;gmd:address&amp;gt;&amp;lt;gmd:CI_Address&amp;gt;&amp;lt;gmd:electronicMailAddress xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;&amp;lt;gco:CharacterString&amp;gt;tsuboki@nagoya-u.jp&amp;lt;/gco:CharacterString&amp;gt;&amp;lt;/gmd:electronicMailAddress&amp;gt;&amp;lt;/gmd:CI_Address&amp;gt;&amp;lt;/gmd:address&amp;gt;&amp;lt;/gmd:CI_Contact&amp;gt;&amp;lt;/gmd:contactInfo&amp;gt;&amp;lt;gmd:role xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gmd:CI_RoleCode codeList=&amp;quot;http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode&amp;quot; codeListValue=&amp;quot;originator&amp;quot;/&amp;gt;
+&amp;lt;/gmd:role&amp;gt;&amp;lt;/gmd:CI_ResponsibleParty&amp;gt;&amp;lt;/gmd:pointOfContact&amp;gt;&amp;lt;gmd:descriptiveKeywords xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gmd:MD_Keywords&amp;gt;
+&amp;lt;gmd:keyword&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;Atmosphere &amp;amp;gt; Atmospheric Temperature &amp;amp;gt; &amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:keyword&amp;gt;
+&amp;lt;gmd:keyword&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;Atmosphere &amp;amp;gt; Precipitation &amp;amp;gt; &amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:keyword&amp;gt;
+&amp;lt;gmd:keyword&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;Atmosphere &amp;amp;gt; Atmospheric Phenomena &amp;amp;gt; Typhoons&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:keyword&amp;gt;
+&amp;lt;gmd:keyword&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;Atmosphere &amp;amp;gt; Clouds&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:keyword&amp;gt;
+&amp;lt;gmd:keyword&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;Atmosphere &amp;amp;gt; Atmospheric Radiation&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:keyword&amp;gt;
+&amp;lt;gmd:keyword&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;Atmosphere &amp;amp;gt; Atmospheric Water Vapor&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:keyword&amp;gt;
+&amp;lt;gmd:type&amp;gt;
+&amp;lt;gmd:MD_KeywordTypeCode codeList=&amp;quot;http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode&amp;quot; codeListValue=&amp;quot;theme&amp;quot;/&amp;gt;
+&amp;lt;/gmd:type&amp;gt;
+&amp;lt;gmd:thesaurusName&amp;gt;
+&amp;lt;gmd:CI_Citation&amp;gt;
+&amp;lt;gmd:title&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;GCMD_science&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:title&amp;gt;
+&amp;lt;gmd:date/&amp;gt;
+&amp;lt;/gmd:CI_Citation&amp;gt;
+&amp;lt;/gmd:thesaurusName&amp;gt;
+&amp;lt;/gmd:MD_Keywords&amp;gt;
+&amp;lt;/gmd:descriptiveKeywords&amp;gt;&amp;lt;gmd:descriptiveKeywords xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gmd:MD_Keywords&amp;gt;
+&amp;lt;gmd:keyword&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;ATMOSPHERIC PROCESSES &amp;amp;gt; Mesoscale meteorology&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:keyword&amp;gt;
+&amp;lt;gmd:keyword&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;ATMOSPHERIC PROCESSES &amp;amp;gt; Convective processes&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:keyword&amp;gt;
+&amp;lt;gmd:keyword&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;ATMOSPHERIC PROCESSES &amp;amp;gt; Precipitation&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:keyword&amp;gt;
+&amp;lt;gmd:keyword&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;ATMOSPHERIC PROCESSES &amp;amp;gt; Regional modeling&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:keyword&amp;gt;
+&amp;lt;gmd:type&amp;gt;
+&amp;lt;gmd:MD_KeywordTypeCode codeList=&amp;quot;http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode&amp;quot; codeListValue=&amp;quot;theme&amp;quot;/&amp;gt;
+&amp;lt;/gmd:type&amp;gt;
+&amp;lt;gmd:thesaurusName&amp;gt;
+&amp;lt;gmd:CI_Citation&amp;gt;
+&amp;lt;gmd:title&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;AGU&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:title&amp;gt;
+&amp;lt;gmd:date/&amp;gt;
+&amp;lt;/gmd:CI_Citation&amp;gt;
+&amp;lt;/gmd:thesaurusName&amp;gt;
+&amp;lt;/gmd:MD_Keywords&amp;gt;
+&amp;lt;/gmd:descriptiveKeywords&amp;gt;&amp;lt;gmd:descriptiveKeywords xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gmd:MD_Keywords&amp;gt;
+&amp;lt;gmd:keyword&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;Weather&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:keyword&amp;gt;
+&amp;lt;gmd:type&amp;gt;
+&amp;lt;gmd:MD_KeywordTypeCode codeList=&amp;quot;http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode&amp;quot; codeListValue=&amp;quot;theme&amp;quot;/&amp;gt;
+&amp;lt;/gmd:type&amp;gt;
+&amp;lt;gmd:thesaurusName&amp;gt;
+&amp;lt;gmd:CI_Citation&amp;gt;
+&amp;lt;gmd:title&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;GEOSS&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:title&amp;gt;
+&amp;lt;gmd:date/&amp;gt;
+&amp;lt;/gmd:CI_Citation&amp;gt;
+&amp;lt;/gmd:thesaurusName&amp;gt;
+&amp;lt;/gmd:MD_Keywords&amp;gt;
+&amp;lt;/gmd:descriptiveKeywords&amp;gt;&amp;lt;gmd:descriptiveKeywords xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gmd:MD_Keywords&amp;gt;
+&amp;lt;gmd:keyword&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;Asia &amp;amp;gt; Eastern Asia &amp;amp;gt; Japan&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:keyword&amp;gt;
+&amp;lt;gmd:type&amp;gt;
+&amp;lt;gmd:MD_KeywordTypeCode codeList=&amp;quot;http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode&amp;quot; codeListValue=&amp;quot;place&amp;quot;/&amp;gt;
+&amp;lt;/gmd:type&amp;gt;
+&amp;lt;gmd:thesaurusName&amp;gt;
+&amp;lt;gmd:CI_Citation&amp;gt;
+&amp;lt;gmd:title&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;Country&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:title&amp;gt;
+&amp;lt;gmd:date/&amp;gt;
+&amp;lt;/gmd:CI_Citation&amp;gt;
+&amp;lt;/gmd:thesaurusName&amp;gt;
+&amp;lt;/gmd:MD_Keywords&amp;gt;
+&amp;lt;/gmd:descriptiveKeywords&amp;gt;&amp;lt;gmd:descriptiveKeywords xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gmd:MD_Keywords&amp;gt;
+&amp;lt;gmd:keyword&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;Models&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:keyword&amp;gt;
+&amp;lt;gmd:type&amp;gt;
+&amp;lt;gmd:MD_KeywordTypeCode codeList=&amp;quot;http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode&amp;quot; codeListValue=&amp;quot;theme&amp;quot;/&amp;gt;
+&amp;lt;/gmd:type&amp;gt;
+&amp;lt;gmd:thesaurusName&amp;gt;
+&amp;lt;gmd:CI_Citation&amp;gt;
+&amp;lt;gmd:title&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;GCMD_platform&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:title&amp;gt;
+&amp;lt;gmd:date/&amp;gt;
+&amp;lt;/gmd:CI_Citation&amp;gt;
+&amp;lt;/gmd:thesaurusName&amp;gt;
+&amp;lt;/gmd:MD_Keywords&amp;gt;
+&amp;lt;/gmd:descriptiveKeywords&amp;gt;&amp;lt;gmd:resourceConstraints&amp;gt;&amp;lt;gmd:MD_Constraints&amp;gt;&amp;lt;gmd:useLimitation&amp;gt;&amp;lt;gco:CharacterString&amp;gt;geossUserRegistration&amp;lt;/gco:CharacterString&amp;gt;&amp;lt;/gmd:useLimitation&amp;gt;&amp;lt;/gmd:MD_Constraints&amp;gt;&amp;lt;/gmd:resourceConstraints&amp;gt;&amp;lt;gmd:resourceConstraints xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gmd:MD_LegalConstraints&amp;gt;
+&amp;lt;gmd:useConstraints&amp;gt;
+&amp;lt;gmd:MD_RestrictionCode codeListValue=&amp;quot;otherRestrictions&amp;quot; codeList=&amp;quot;http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode&amp;quot;/&amp;gt;
+&amp;lt;/gmd:useConstraints&amp;gt;
+&amp;lt;gmd:otherConstraints&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;This dataset is distributed under the CC BY-SA 4.0 International License.
+
+http://creativecommons.org/licenses/by-sa/4.0/
+
+The data author will not guarantee that the results of the simulations that produced this dataset are correct or represent the actual weather.
+
+No responsibility is assumed by anyone, including the creator (and all individuals and organizations involved in the creation of this dataset, and the same applies below). No liability of any kind shall be assumed by anyone, including the creator.
+
+No one, including the creator, shall be held liable or responsible for any detriment or damage or loss (whether financial, material, personal, emotional, social or otherwise) resulting from the use of or in connection with this dataset.&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:otherConstraints&amp;gt;
+&amp;lt;/gmd:MD_LegalConstraints&amp;gt;
+&amp;lt;/gmd:resourceConstraints&amp;gt;&amp;lt;gmd:spatialRepresentationType xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gmd:MD_SpatialRepresentationTypeCode codeListValue=&amp;quot;grid&amp;quot; codeList=&amp;quot;http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_SpatialRepresentationTypeCode&amp;quot;/&amp;gt;
+&amp;lt;/gmd:spatialRepresentationType&amp;gt;&amp;lt;gmd:language xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;English&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:language&amp;gt;&amp;lt;gmd:characterSet xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gmd:MD_CharacterSetCode codeListValue=&amp;quot;utf8&amp;quot; codeList=&amp;quot;http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode&amp;quot;/&amp;gt;
+&amp;lt;/gmd:characterSet&amp;gt;&amp;lt;gmd:topicCategory xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gmd:MD_TopicCategoryCode&amp;gt;climatologyMeteorologyAtmosphere&amp;lt;/gmd:MD_TopicCategoryCode&amp;gt;
+&amp;lt;/gmd:topicCategory&amp;gt;&amp;lt;gmd:environmentDescription xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;Each directory contains binary data files and corresponding Grads ctl files. The extension &amp;quot;.bin&amp;quot; is for the data file and &amp;quot;.ctl&amp;quot; is for the Grads ctl file. A file basename ending in &amp;quot;_dmp&amp;quot; is for 3D variables, one ending in &amp;quot;_mon&amp;quot; is for a horizontal 2D variables,  &amp;quot;_geography&amp;quot; is for the geographical data. The &amp;quot;YYYYMMDDhhZ&amp;quot; part of the file name indicates the simulation start date and the data output date.&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:environmentDescription&amp;gt;&amp;lt;gmd:extent&amp;gt;&amp;lt;gmd:EX_Extent&amp;gt;&amp;lt;gmd:description xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;Hourly&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:description&amp;gt;&amp;lt;gmd:geographicElement xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gmd:EX_GeographicBoundingBox&amp;gt;
+&amp;lt;gmd:westBoundLongitude&amp;gt;
+&amp;lt;gco:Decimal&amp;gt;120.178&amp;lt;/gco:Decimal&amp;gt;
+&amp;lt;/gmd:westBoundLongitude&amp;gt;
+&amp;lt;gmd:eastBoundLongitude&amp;gt;
+&amp;lt;gco:Decimal&amp;gt;149.518&amp;lt;/gco:Decimal&amp;gt;
+&amp;lt;/gmd:eastBoundLongitude&amp;gt;
+&amp;lt;gmd:southBoundLatitude&amp;gt;
+&amp;lt;gco:Decimal&amp;gt;20.8597&amp;lt;/gco:Decimal&amp;gt;
+&amp;lt;/gmd:southBoundLatitude&amp;gt;
+&amp;lt;gmd:northBoundLatitude&amp;gt;
+&amp;lt;gco:Decimal&amp;gt;46.463&amp;lt;/gco:Decimal&amp;gt;
+&amp;lt;/gmd:northBoundLatitude&amp;gt;
+&amp;lt;/gmd:EX_GeographicBoundingBox&amp;gt;
+&amp;lt;/gmd:geographicElement&amp;gt;&amp;lt;gmd:geographicElement&amp;gt;&amp;lt;gmd:EX_GeographicDescription&amp;gt;&amp;lt;gmd:geographicIdentifier&amp;gt;&amp;lt;gmd:MD_Identifier&amp;gt;&amp;lt;gmd:code&amp;gt;&amp;lt;gco:CharacterString/&amp;gt;&amp;lt;/gmd:code&amp;gt;&amp;lt;/gmd:MD_Identifier&amp;gt;&amp;lt;/gmd:geographicIdentifier&amp;gt;&amp;lt;/gmd:EX_GeographicDescription&amp;gt;&amp;lt;/gmd:geographicElement&amp;gt;&amp;lt;gmd:temporalElement xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gmd:EX_TemporalExtent&amp;gt;
+&amp;lt;gmd:extent&amp;gt;
+&amp;lt;gml:TimePeriod gml:id=&amp;quot;observationDateTime&amp;quot;&amp;gt;
+&amp;lt;gml:beginPosition&amp;gt;20130526&amp;lt;/gml:beginPosition&amp;gt;
+&amp;lt;gml:endPosition&amp;gt;9999-12-31&amp;lt;/gml:endPosition&amp;gt;
+&amp;lt;/gml:TimePeriod&amp;gt;
+&amp;lt;/gmd:extent&amp;gt;
+&amp;lt;/gmd:EX_TemporalExtent&amp;gt;
+&amp;lt;/gmd:temporalElement&amp;gt;&amp;lt;/gmd:EX_Extent&amp;gt;&amp;lt;/gmd:extent&amp;gt;&amp;lt;gmd:supplementalInformation xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;Tsuboki, K., and A. Sakakibara (2002), Large-scale parallel computing of Cloud Resolving Storm Simulator, in High Performance Computing, edited by H. P. Zima, K. Joe, M. Sato, Y. Seo, and M. Shimasaki, pp. 243-259, Springer, New York.
+Tsuboki, K. (2008), High-resolution simulations of high-impact weather systems using the cloud-resolving model on the Earth Simulator, In High Resolution Numerical Modeling of the Atmosphere and Ocean, edited by K. Hamilton, and W. Ohfuchi, pp. 141-156, Springer, New York.
+
+&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:supplementalInformation&amp;gt;&amp;lt;/gmd:MD_DataIdentification&amp;gt;&amp;lt;/gmd:identificationInfo&amp;gt;&amp;lt;gmd:identificationInfo&amp;gt;&amp;lt;gmd:MD_DataIdentification xmlns:fn=&amp;quot;http://www.w3.org/2005/xpath-functions&amp;quot;&amp;gt;&amp;lt;gmd:citation xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gmd:CI_Citation&amp;gt;
+&amp;lt;gmd:title&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;CReSS Daily Simulation (around Japan 2km mesh)&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:title&amp;gt;
+&amp;lt;gmd:alternateTitle&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;CReSS_JPN20DK&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:alternateTitle&amp;gt;
+&amp;lt;gmd:date&amp;gt;
+&amp;lt;gmd:CI_Date&amp;gt;
+&amp;lt;gmd:date&amp;gt;
+&amp;lt;gco:Date&amp;gt;2020/08/20&amp;lt;/gco:Date&amp;gt;
+&amp;lt;/gmd:date&amp;gt;
+&amp;lt;gmd:dateType&amp;gt;
+&amp;lt;gmd:CI_DateTypeCode codeList=&amp;quot;http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode&amp;quot; codeListValue=&amp;quot;publication&amp;quot;/&amp;gt;
+&amp;lt;/gmd:dateType&amp;gt;
+&amp;lt;/gmd:CI_Date&amp;gt;
+&amp;lt;/gmd:date&amp;gt;
+&amp;lt;gmd:edition&amp;gt;
+&amp;lt;gco:CharacterString/&amp;gt;
+&amp;lt;/gmd:edition&amp;gt;
+&amp;lt;gmd:identifier&amp;gt;
+&amp;lt;gmd:MD_Identifier&amp;gt;
+&amp;lt;gmd:code&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;CReSS_JPN20DK20230727100643-DIAS20221121113753-en&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:code&amp;gt;
+&amp;lt;/gmd:MD_Identifier&amp;gt;
+&amp;lt;/gmd:identifier&amp;gt;
+&amp;lt;gmd:otherCitationDetails&amp;gt;
+&amp;lt;gco:CharacterString/&amp;gt;
+&amp;lt;/gmd:otherCitationDetails&amp;gt;
+&amp;lt;/gmd:CI_Citation&amp;gt;
+&amp;lt;/gmd:citation&amp;gt;&amp;lt;gmd:abstract&amp;gt;&amp;lt;gco:CharacterString&amp;gt;This dataset is released from DIAS (Data Integration and Analysis System).
+              &amp;lt;/gco:CharacterString&amp;gt;&amp;lt;/gmd:abstract&amp;gt;&amp;lt;gmd:pointOfContact&amp;gt;&amp;lt;gmd:CI_ResponsibleParty&amp;gt;&amp;lt;gmd:individualName xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;DIAS Office&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:individualName&amp;gt;&amp;lt;gmd:organisationName xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;Japan Agency for Marine-Earth Science and Technology&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:organisationName&amp;gt;&amp;lt;gmd:contactInfo&amp;gt;&amp;lt;gmd:CI_Contact&amp;gt;&amp;lt;gmd:phone xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gmd:CI_Telephone/&amp;gt;
+&amp;lt;/gmd:phone&amp;gt;&amp;lt;gmd:address&amp;gt;&amp;lt;gmd:CI_Address&amp;gt;&amp;lt;gmd:deliveryPoint xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;3173-25, Showa-Cho, Kanazawa-ku&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:deliveryPoint&amp;gt;&amp;lt;gmd:city xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;Yokohama-shi&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:city&amp;gt;&amp;lt;gmd:administrativeArea xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;Kanagawa&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:administrativeArea&amp;gt;&amp;lt;gmd:postalCode xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;236-0001&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:postalCode&amp;gt;&amp;lt;gmd:country xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;Japan&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:country&amp;gt;&amp;lt;gmd:electronicMailAddress xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;&amp;lt;gco:CharacterString&amp;gt;dias-office@diasjp.net&amp;lt;/gco:CharacterString&amp;gt;&amp;lt;/gmd:electronicMailAddress&amp;gt;&amp;lt;/gmd:CI_Address&amp;gt;&amp;lt;/gmd:address&amp;gt;&amp;lt;/gmd:CI_Contact&amp;gt;&amp;lt;/gmd:contactInfo&amp;gt;&amp;lt;gmd:role xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gmd:CI_RoleCode codeList=&amp;quot;http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode&amp;quot; codeListValue=&amp;quot;pointOfContact&amp;quot;/&amp;gt;
+&amp;lt;/gmd:role&amp;gt;&amp;lt;/gmd:CI_ResponsibleParty&amp;gt;&amp;lt;/gmd:pointOfContact&amp;gt;&amp;lt;gmd:descriptiveKeywords xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gmd:MD_Keywords&amp;gt;
+&amp;lt;gmd:keyword&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;DIAS &amp;amp;amp;amp;gt; Data Integration and Analysis System&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:keyword&amp;gt;
+&amp;lt;gmd:type&amp;gt;
+&amp;lt;gmd:MD_KeywordTypeCode codeList=&amp;quot;http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode&amp;quot; codeListValue=&amp;quot;theme&amp;quot;/&amp;gt;
+&amp;lt;/gmd:type&amp;gt;
+&amp;lt;gmd:thesaurusName&amp;gt;
+&amp;lt;gmd:CI_Citation&amp;gt;
+&amp;lt;gmd:title&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;No_Dictionary&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:title&amp;gt;
+&amp;lt;gmd:date/&amp;gt;
+&amp;lt;/gmd:CI_Citation&amp;gt;
+&amp;lt;/gmd:thesaurusName&amp;gt;
+&amp;lt;/gmd:MD_Keywords&amp;gt;
+&amp;lt;/gmd:descriptiveKeywords&amp;gt;&amp;lt;gmd:resourceConstraints&amp;gt;&amp;lt;gmd:MD_Constraints&amp;gt;&amp;lt;gmd:useLimitation&amp;gt;&amp;lt;gco:CharacterString&amp;gt;geossUserRegistration&amp;lt;/gco:CharacterString&amp;gt;&amp;lt;/gmd:useLimitation&amp;gt;&amp;lt;/gmd:MD_Constraints&amp;gt;&amp;lt;/gmd:resourceConstraints&amp;gt;&amp;lt;gmd:resourceConstraints xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gmd:MD_LegalConstraints&amp;gt;
+&amp;lt;gmd:useConstraints&amp;gt;
+&amp;lt;gmd:MD_RestrictionCode codeListValue=&amp;quot;otherRestrictions&amp;quot; codeList=&amp;quot;http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode&amp;quot;/&amp;gt;
+&amp;lt;/gmd:useConstraints&amp;gt;
+&amp;lt;gmd:otherConstraints&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;If data provider does not have data policy, DIAS Terms of Service (https://diasjp.net/en/terms/) and DIAS Privacy Policy (https://diasjp.net/en/privacy/) apply. &amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:otherConstraints&amp;gt;
+&amp;lt;gmd:otherConstraints&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;If there is a conflict between DIAS Terms of Service and data provider&amp;apos;s policy, the data provider&amp;apos;s policy shall prevail.&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:otherConstraints&amp;gt;
+&amp;lt;gmd:otherConstraints&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;If you plan to use this dataset for a conference presentation, paper, journal article, or report etc., please include acknowledgments referred to following examples. If the data provider describes examples of acknowledgments, include them as well.
+&amp;quot; In this study, [Name of Dataset] provided by [Name of Data Provider] was utilized. This dataset was also collected and provided under the Data Integration and Analysis System (DIAS), which was developed and operated by a project supported by the Ministry of Education, Culture, Sports, Science and Technology.  &amp;quot;&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:otherConstraints&amp;gt;
+&amp;lt;gmd:otherConstraints&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;If data provider does not have data policy, disclaimer of DIAS Terms of Service (https://diasjp.net/en/terms/) apply. &amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:otherConstraints&amp;gt;
+&amp;lt;gmd:otherConstraints&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;If there is a conflict between DIAS Terms of Service and data provider&amp;apos;s policy, the data provider&amp;apos;s policy shall prevail.&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:otherConstraints&amp;gt;
+&amp;lt;/gmd:MD_LegalConstraints&amp;gt;
+&amp;lt;/gmd:resourceConstraints&amp;gt;&amp;lt;gmd:language xmlns:fn=&amp;quot;http://www.w3.org/2005/02/xpath-functions&amp;quot;&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;English&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:language&amp;gt;&amp;lt;/gmd:MD_DataIdentification&amp;gt;&amp;lt;/gmd:identificationInfo&amp;gt;&amp;lt;gmd:distributionInfo&amp;gt;&amp;lt;gmd:MD_Distribution&amp;gt;&amp;lt;gmd:distributionFormat&amp;gt;
+&amp;lt;gmd:MD_Format&amp;gt;
+&amp;lt;gmd:name&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;Fortran binary data&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:name&amp;gt;
+&amp;lt;gmd:version&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;N/A&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:version&amp;gt;
+&amp;lt;gmd:specification&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;4byte binary (big endian)&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:specification&amp;gt;
+&amp;lt;/gmd:MD_Format&amp;gt;
+&amp;lt;/gmd:distributionFormat&amp;gt;&amp;lt;gmd:transferOptions&amp;gt;&amp;lt;gmd:MD_DigitalTransferOptions&amp;gt;
+&amp;lt;gmd:onLine&amp;gt;
+&amp;lt;gmd:CI_OnlineResource&amp;gt;
+&amp;lt;gmd:linkage&amp;gt;
+&amp;lt;gmd:URL&amp;gt;https://data.diasjp.net/dl/storages/filelist/dataset:597&amp;lt;/gmd:URL&amp;gt;
+&amp;lt;/gmd:linkage&amp;gt;
+&amp;lt;gmd:description&amp;gt;
+&amp;lt;gco:CharacterString&amp;gt;file download&amp;lt;/gco:CharacterString&amp;gt;
+&amp;lt;/gmd:description&amp;gt;
+&amp;lt;/gmd:CI_OnlineResource&amp;gt;
+&amp;lt;/gmd:onLine&amp;gt;
+&amp;lt;/gmd:MD_DigitalTransferOptions&amp;gt;&amp;lt;/gmd:transferOptions&amp;gt;&amp;lt;gmd:transferOptions&amp;gt;&amp;lt;gmd:MD_DigitalTransferOptions&amp;gt;&amp;lt;gmd:onLine&amp;gt;&amp;lt;gmd:CI_OnlineResource&amp;gt;&amp;lt;gmd:linkage&amp;gt;&amp;lt;gmd:URL&amp;gt;http://metadata.diasjp.net/dmm/doc/CReSS_JPN20DK20230727100643-DIAS20221121113753-en.html&amp;lt;/gmd:URL&amp;gt;&amp;lt;/gmd:linkage&amp;gt;&amp;lt;gmd:description&amp;gt;&amp;lt;gco:CharacterString&amp;gt;DIAS metadata&amp;lt;/gco:CharacterString&amp;gt;&amp;lt;/gmd:description&amp;gt;&amp;lt;/gmd:CI_OnlineResource&amp;gt;&amp;lt;/gmd:onLine&amp;gt;&amp;lt;/gmd:MD_DigitalTransferOptions&amp;gt;&amp;lt;/gmd:transferOptions&amp;gt;&amp;lt;/gmd:MD_Distribution&amp;gt;&amp;lt;/gmd:distributionInfo&amp;gt;&amp;lt;gmd:dataQualityInfo&amp;gt;
+&amp;lt;gmd:DQ_DataQuality&amp;gt;
+&amp;lt;gmd:scope&amp;gt;
+&amp;lt;gmd:DQ_Scope&amp;gt;
+&amp;lt;gmd:level&amp;gt;
+&amp;lt;gmd:MD_ScopeCode codeListValue=&amp;quot;dataset&amp;quot; codeList=&amp;quot;http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ScopeCode&amp;quot;/&amp;gt;
+&amp;lt;/gmd:level&amp;gt;
+&amp;lt;/gmd:DQ_Scope&amp;gt;
+&amp;lt;/gmd:scope&amp;gt;
+&amp;lt;gmd:lineage&amp;gt;
+&amp;lt;gmd:LI_Lineage/&amp;gt;
+&amp;lt;/gmd:lineage&amp;gt;
+&amp;lt;/gmd:DQ_DataQuality&amp;gt;
+&amp;lt;/gmd:dataQualityInfo&amp;gt;&amp;lt;/gmd:MD_Metadata&amp;gt;]]&gt;</gs:metadata>
+  </gs:originalMetadata>
+  <gs:indexesMetadata>
+    <gs:resourceType>Dataset</gs:resourceType>
+    <gs:sourceId>UUID-8994bd4b-0e93-4217-af91-d621673e8e7b</gs:sourceId>
+    <gs:originalId>CReSS_JPN20DK20230727100643-DIAS20221121113753-en</gs:originalId>
+    <gs:recoveryRemovalToken>963f1afa-3f72-478f-9710-219a94ade302</gs:recoveryRemovalToken>
+    <gs:privateId>1a7cb07f-82df-4ba3-93bd-5c25faf43409</gs:privateId>
+    <gs:resourceTimeStamp>2024-05-07T20:23:23.362Z</gs:resourceTimeStamp>
+    <gs:metadataQuality>4</gs:metadataQuality>
+    <gs:abstract>The Laboratory of Meteorology, Institute for Space-Earth Environmental Research, Nagoya University, has been performing daily high-resolution weather simulations using the cloud resolving storm model CReSS (Cloud Resolving Storm Simulator). To demonstrate how well the current model can simulate real-world weather, the results of the simulations are mainly intended for experts. This dataset is the original data from that simulation, shown on the Web page "CReSS Daily Simulation".
+
+The area of calcuration is about 2300km by 2800km, surrounding Japan, with about 2km grid size. The map projection method is the Lambert Conformal Conic.
+
+The actual simulations are performed prior to the actual time, but due to the limitations of the Meteorological Service Act, only results prior to the current time are made available to the public.
+
+If you wish to use this data to conduct weather forecasting services in Japan, you must follow the appropriate procedures in accordance with the Meteorological Service Act. Please contact the Japan Meteorological Agency for more information on the law.
+
+The simulations are calculated once a day for up to 36 hours ahead.
+This dataset contains the following 17 three dimensional variables and 30 two dimensional variables, the former being output every three hours and the latter every hour.
+
+3D Variables:
+
+u : x components of velocity [m/s]
+v : y components of velocity [m/s]
+w : z components of velocity [m/s]
+p : pressure [Pa]
+pt : potential temperature [K]
+qv : water vapor mixing ratio [kg/kg]
+qc : cloud water mixing ratio [kg/kg]
+qr : rain water mixing ratio [kg/kg]
+qi : cloud ice mixing ratio [kg/kg]
+qs : snow mixing ratio [kg/kg]
+qg : graupel mixing ratio [kg/kg]
+nci : cloud ice concentrations [1/kg]
+ncs : snow concentrations [1/kg]
+ncg : graupel concentrations [1/kg]
+qt : tracer mixing ratio
+tke : turbulent kinetic energy [J/kg]
+zph : z physical coordinates [m]
+
+2D variables:
+
+us : x components of velocity at an altitude of 10m [m/s]
+vs : y components of velocity at an altitude of 10m [m/s]
+ps : pressure at an altitude of 1.5m [Pa]
+pts : potential temperature at an altitude of 1.5m [K]
+qvs : water vapor mixing ratio at an altitude of 1.5m [kg/kg]
+tgs : soil and sea surface temperature [K]
+hs : sensible heat over surface [W/m^2]
+le : latent heat over surface [W/m^2]
+rgd : global solar radiation [W/m^2]
+rsd : net downward short wave radiation [W/m^2]
+rld : downward long wave radiation [W/m^2]
+rlu : upward long wave radiation [W/m^2]
+cdl : cloud cover in lower layer
+cdm : cloud cover in middle layer
+cdh : cloud cover in upper layer
+cdave : averaged cloud cover
+usflx : surface momentum flux for x components of velocity [N/m^2]
+vsflx : surface momentum flux for y components of velocity [N/m^2]
+ptsflx : surface heat flux [(kg K)/(m^2 s)]
+qvsflx : surface moisture flux [kg/(m^2 s)]
+pcr : cloud water fall rate [m/s]
+pca : accumulated cloud water fall [m]
+prr : rain fall rate [m/s]
+pra : accumulated rain fall [m]
+pir : cloud ice fall rate [m/s]
+pia : accumulated cloud ice fall [m]
+psr : snow fall rate [m/s]
+psa : accumulated snow fall [m]
+pgr : graupel fall rate [m/s]
+pga : accumulated graupel fall [m]
+</gs:abstract>
+    <gs:abstract>This dataset is released from DIAS (Data Integration and Analysis System).
+              </gs:abstract>
+    <gs:alternateTitle>CReSS_JPN20DK</gs:alternateTitle>
+    <gs:alternateTitle>CReSS_JPN20DK</gs:alternateTitle>
+    <gs:anyText>1a7cb07f-82df-4ba3-93bd-5c25faf43409 English Takahiro INOUE Remote Sensing Technology Center of Japan 2023-07-27 DIAS Core Metadata Profile (based-on ISO 19115:2003/19139) 1.0(draft) 0 false CReSS Daily Simulation (around Japan 2km mesh) CReSS_JPN20DK 2020/08/20 DIAS (Data Integration and Analysis System) 597:CReSS_JPN20DK IDF (International DOI Foundation) doi:10.20783/DIAS.597 The Laboratory of Meteorology, Institute for Space-Earth Environmental Research, Nagoya University, has been performing daily high-resolution weather simulations using the cloud resolving storm model CReSS (Cloud Resolving Storm Simulator). To demonstrate how well the current model can simulate real-world weather, the results of the simulations are mainly intended for experts. This dataset is the original data from that simulation, shown on the Web page "CReSS Daily Simulation". The area of calcuration is about 2300km by 2800km, surrounding Japan, with about 2km grid size. The map projection method is the Lambert Conformal Conic. The actual simulations are performed prior to the actual time, but due to the limitations of the Meteorological Service Act, only results prior to the current time are made available to the public. If you wish to use this data to conduct weather forecasting services in Japan, you must follow the appropriate procedures in accordance with the Meteorological Service Act. Please contact the Japan Meteorological Agency for more information on the law. The simulations are calculated once a day for up to 36 hours ahead. This dataset contains the following 17 three dimensional variables and 30 two dimensional variables, the former being output every three hours and the latter every hour. 3D Variables: u : x components of velocity [m/s] v : y components of velocity [m/s] w : z components of velocity [m/s] p : pressure [Pa] pt : potential temperature [K] qv : water vapor mixing ratio [kg/kg] qc : cloud water mixing ratio [kg/kg] qr : rain water mixing ratio [kg/kg] qi : cloud ice mixing ratio [kg/kg] qs : snow mixing ratio [kg/kg] qg : graupel mixing ratio [kg/kg] nci : cloud ice concentrations [1/kg] ncs : snow concentrations [1/kg] ncg : graupel concentrations [1/kg] qt : tracer mixing ratio tke : turbulent kinetic energy [J/kg] zph : z physical coordinates [m] 2D variables: us : x components of velocity at an altitude of 10m [m/s] vs : y components of velocity at an altitude of 10m [m/s] ps : pressure at an altitude of 1.5m [Pa] pts : potential temperature at an altitude of 1.5m [K] qvs : water vapor mixing ratio at an altitude of 1.5m [kg/kg] tgs : soil and sea surface temperature [K] hs : sensible heat over surface [W/m^2] le : latent heat over surface [W/m^2] rgd : global solar radiation [W/m^2] rsd : net downward short wave radiation [W/m^2] rld : downward long wave radiation [W/m^2] rlu : upward long wave radiation [W/m^2] cdl : cloud cover in lower layer cdm : cloud cover in middle layer cdh : cloud cover in upper layer cdave : averaged cloud cover usflx : surface momentum flux for x components of velocity [N/m^2] vsflx : surface momentum flux for y components of velocity [N/m^2] ptsflx : surface heat flux [(kg K)/(m^2 s)] qvsflx : surface moisture flux [kg/(m^2 s)] pcr : cloud water fall rate [m/s] pca : accumulated cloud water fall [m] prr : rain fall rate [m/s] pra : accumulated rain fall [m] pir : cloud ice fall rate [m/s] pia : accumulated cloud ice fall [m] psr : snow fall rate [m/s] psa : accumulated snow fall [m] pgr : graupel fall rate [m/s] pga : accumulated graupel fall [m] Masaya Kato Institute for Space-Earth Environmental Research, Nagoya Univ. 052-789-3495 Furo-cho Chikusa-ku, Nagoya Aichi 464-8601 Japan kato@rain.isee.nagoya-u.ac.jp Kazuhisa Tsuboki Institute for Space-Earth Environmental Research, Nagoya Univ. tsuboki@nagoya-u.jp Atmosphere &gt; Atmospheric Temperature &gt; Atmosphere &gt; Precipitation &gt; Atmosphere &gt; Atmospheric Phenomena &gt; Typhoons Atmosphere &gt; Clouds Atmosphere &gt; Atmospheric Radiation Atmosphere &gt; Atmospheric Water Vapor GCMD_science ATMOSPHERIC PROCESSES &gt; Mesoscale meteorology ATMOSPHERIC PROCESSES &gt; Convective processes ATMOSPHERIC PROCESSES &gt; Precipitation ATMOSPHERIC PROCESSES &gt; Regional modeling AGU Weather GEOSS Asia &gt; Eastern Asia &gt; Japan Country Models GCMD_platform geossUserRegistration This dataset is distributed under the CC BY-SA 4.0 International License. http://creativecommons.org/licenses/by-sa/4.0/ The data author will not guarantee that the results of the simulations that produced this dataset are correct or represent the actual weather. No responsibility is assumed by anyone, including the creator (and all individuals and organizations involved in the creation of this dataset, and the same applies below). No liability of any kind shall be assumed by anyone, including the creator. No one, including the creator, shall be held liable or responsible for any detriment or damage or loss (whether financial, material, personal, emotional, social or otherwise) resulting from the use of or in connection with this dataset. English climatologyMeteorologyAtmosphere Each directory contains binary data files and corresponding Grads ctl files. The extension ".bin" is for the data file and ".ctl" is for the Grads ctl file. A file basename ending in "_dmp" is for 3D variables, one ending in "_mon" is for a horizontal 2D variables, "_geography" is for the geographical data. The "YYYYMMDDhhZ" part of the file name indicates the simulation start date and the data output date. Hourly 120.178 149.518 20.8597 46.463 20130526 9999-12-31 Tsuboki, K., and A. Sakakibara (2002), Large-scale parallel computing of Cloud Resolving Storm Simulator, in High Performance Computing, edited by H. P. Zima, K. Joe, M. Sato, Y. Seo, and M. Shimasaki, pp. 243-259, Springer, New York. Tsuboki, K. (2008), High-resolution simulations of high-impact weather systems using the cloud-resolving model on the Earth Simulator, In High Resolution Numerical Modeling of the Atmosphere and Ocean, edited by K. Hamilton, and W. Ohfuchi, pp. 141-156, Springer, New York. CReSS Daily Simulation (around Japan 2km mesh) CReSS_JPN20DK 2020/08/20 CReSS_JPN20DK20230727100643-DIAS20221121113753-en This dataset is released from DIAS (Data Integration and Analysis System). DIAS Office Japan Agency for Marine-Earth Science and Technology 3173-25, Showa-Cho, Kanazawa-ku Yokohama-shi Kanagawa 236-0001 Japan dias-office@diasjp.net DIAS &amp;amp;gt; Data Integration and Analysis System No_Dictionary geossUserRegistration If data provider does not have data policy, DIAS Terms of Service (https://diasjp.net/en/terms/) and DIAS Privacy Policy (https://diasjp.net/en/privacy/) apply. If there is a conflict between DIAS Terms of Service and data provider's policy, the data provider's policy shall prevail. If you plan to use this dataset for a conference presentation, paper, journal article, or report etc., please include acknowledgments referred to following examples. If the data provider describes examples of acknowledgments, include them as well. " In this study, [Name of Dataset] provided by [Name of Data Provider] was utilized. This dataset was also collected and provided under the Data Integration and Analysis System (DIAS), which was developed and operated by a project supported by the Ministry of Education, Culture, Sports, Science and Technology. " If data provider does not have data policy, disclaimer of DIAS Terms of Service (https://diasjp.net/en/terms/) apply. If there is a conflict between DIAS Terms of Service and data provider's policy, the data provider's policy shall prevail. English Fortran binary data N/A 4byte binary (big endian) https://data.diasjp.net/dl/storages/filelist/dataset:597 file download http://metadata.diasjp.net/dmm/doc/CReSS_JPN20DK20230727100643-DIAS20221121113753-en.html DIAS metadata</gs:anyText>
+    <gs:dataSize>1</gs:dataSize>
+    <gs:dateStamp>2023-07-27</gs:dateStamp>
+    <gs:fileId>1a7cb07f-82df-4ba3-93bd-5c25faf43409</gs:fileId>
+    <gs:format>Fortran binary data</gs:format>
+    <gs:hasAccessLegalConst>false</gs:hasAccessLegalConst>
+    <gs:hasOtherLegalConst>true</gs:hasOtherLegalConst>
+    <gs:hasSecurityConst>false</gs:hasSecurityConst>
+    <gs:hasUseLegalConst>true</gs:hasUseLegalConst>
+    <gs:keyword>Atmosphere &gt; Atmospheric Temperature &gt; </gs:keyword>
+    <gs:keyword>Atmosphere &gt; Precipitation &gt; </gs:keyword>
+    <gs:keyword>Atmosphere &gt; Atmospheric Phenomena &gt; Typhoons</gs:keyword>
+    <gs:keyword>Atmosphere &gt; Clouds</gs:keyword>
+    <gs:keyword>Atmosphere &gt; Atmospheric Radiation</gs:keyword>
+    <gs:keyword>Atmosphere &gt; Atmospheric Water Vapor</gs:keyword>
+    <gs:keyword>ATMOSPHERIC PROCESSES &gt; Mesoscale meteorology</gs:keyword>
+    <gs:keyword>ATMOSPHERIC PROCESSES &gt; Convective processes</gs:keyword>
+    <gs:keyword>ATMOSPHERIC PROCESSES &gt; Precipitation</gs:keyword>
+    <gs:keyword>ATMOSPHERIC PROCESSES &gt; Regional modeling</gs:keyword>
+    <gs:keyword>Weather</gs:keyword>
+    <gs:keyword>Asia &gt; Eastern Asia &gt; Japan</gs:keyword>
+    <gs:keyword>Models</gs:keyword>
+    <gs:keyword>DIAS &amp;amp;gt; Data Integration and Analysis System</gs:keyword>
+    <gs:keywordType>theme</gs:keywordType>
+    <gs:keywordType>theme</gs:keywordType>
+    <gs:keywordType>theme</gs:keywordType>
+    <gs:keywordType>place</gs:keywordType>
+    <gs:keywordType>theme</gs:keywordType>
+    <gs:language>English</gs:language>
+    <gs:onlineLinkage>https://data.diasjp.net/dl/storages/filelist/dataset:597</gs:onlineLinkage>
+    <gs:onlineLinkage>http://metadata.diasjp.net/dmm/doc/CReSS_JPN20DK20230727100643-DIAS20221121113753-en.html</gs:onlineLinkage>
+    <gs:organisationName>Institute for Space-Earth Environmental Research, Nagoya Univ.</gs:organisationName>
+    <gs:organisationName>Institute for Space-Earth Environmental Research, Nagoya Univ.</gs:organisationName>
+    <gs:origOrgDesc>Institute for Space-Earth Environmental Research, Nagoya Univ.</gs:origOrgDesc>
+    <gs:publicationDate>2020/08/20</gs:publicationDate>
+    <gs:publicationDate>2020/08/20</gs:publicationDate>
+    <gs:resLanguage>English</gs:resLanguage>
+    <gs:resLanguage>English</gs:resLanguage>
+    <gs:resourceId>597:CReSS_JPN20DK</gs:resourceId>
+    <gs:title>CReSS Daily Simulation (around Japan 2km mesh)</gs:title>
+    <gs:title>CReSS Daily Simulation (around Japan 2km mesh)</gs:title>
+    <gs:tmpExtentBegin_Null/>
+    <gs:tmpExtentBegin>20130526</gs:tmpExtentBegin>
+    <gs:tmpExtentEnd_Null/>
+    <gs:tmpExtentEnd>9999-12-31</gs:tmpExtentEnd>
+    <gs:topicCategory>climatologyMeteorologyAtmosphere</gs:topicCategory>
+    <gs:bbox>
+      <gs:sw>20.8597 120.178</gs:sw>
+      <gs:se>20.8597 149.518</gs:se>
+      <gs:nw>46.463 120.178</gs:nw>
+      <gs:ne>46.463 149.518</gs:ne>
+      <gs:isCrossed>false</gs:isCrossed>
+      <gs:area>751.201</gs:area>
+      <gs:center>33.66135 134.848</gs:center>
+      <gs:disjValues>
+	<gs:disjSouth>20.8597</gs:disjSouth>
+	<gs:disjWest>120.178</gs:disjWest>
+	<gs:disjNorth>46.463</gs:disjNorth>
+	<gs:disjEast>149.518</gs:disjEast>
+      </gs:disjValues>
+      <gs:cardinalValues>
+	<gs:values>
+	  <gs:south>20.8597</gs:south>
+	  <gs:west>120.178</gs:west>
+	  <gs:east>149.518</gs:east>
+	  <gs:north>46.463</gs:north>
+	</gs:values>
+      </gs:cardinalValues>
+    </gs:bbox>
+  </gs:indexesMetadata>
+</gs:Dataset>

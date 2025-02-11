@@ -30,10 +30,8 @@ import java.util.Optional;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 
 import eu.essi_lab.api.database.opensearch.OpenSearchWrapper;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.bond.Bond;
-import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.QueryableBond;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
@@ -45,7 +43,6 @@ import eu.essi_lab.messages.bond.parser.DiscoveryBondHandler;
 import eu.essi_lab.model.OrderingDirection;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.ResourceProperty;
 
 /**
  * @author Fabrizio
@@ -109,81 +106,9 @@ public class OpenSearchBondHandler implements DiscoveryBondHandler {
     @Override
     public void resourcePropertyBond(ResourcePropertyBond bond) {
 
-	ResourceProperty property = bond.getProperty();
+	Query query = queryBuilder.buildResourcePropertyQuery(bond);
 
-	String value = bond.getPropertyValue();
-	String name = property.getName();
-	BondOperator operator = bond.getOperator();
-
-	if (operator == BondOperator.EXISTS) {
-
-	    queryBuilder.append(OpenSearchQueryBuilder.buildExistsFieldQuery(name));
-	    return;
-	}
-
-	if (operator == BondOperator.NOT_EXISTS) {
-
-	    queryBuilder.append(OpenSearchQueryBuilder.buildNotExistsFieldQuery(name));
-	    return;
-	}
-
-	if (operator == BondOperator.MAX || operator == BondOperator.MIN) {
-
-	    //
-	    // see BondFactory.createMinMaxResourceTimeStampBond and OAIPMH profiler
-	    //
-	    if (bond.getProperty() == ResourceProperty.RESOURCE_TIME_STAMP) {
-
-		try {
-
-		    queryBuilder.append(queryBuilder.buildMinMaxResourceTimeStampValue(value, bond.getOperator()));
-		    return;
-
-		} catch (Exception ex) {
-
-		    GSLoggerFactory.getLogger(getClass()).error(ex);
-		}
-	    } else {
-		//
-		// see BondFactory.createMinMaxResourcePropertyBond
-		//
-		switch (bond.getProperty().getContentType()) {
-		case DOUBLE:
-		case INTEGER:
-		case LONG:
-		case ISO8601_DATE:
-		case ISO8601_DATE_TIME:
-
-		    try {
-			queryBuilder.append(queryBuilder.buildMinMaxValueQuery(name, operator == BondOperator.MAX, true));
-			return;
-
-		    } catch (Exception ex) {
-
-			GSLoggerFactory.getLogger(getClass()).error(ex);
-		    }
-
-		default:
-		    throw new IllegalArgumentException("Min/max query on non numeric field: " + name);
-		}
-	    }
-	}
-
-	switch (property) {
-	case SOURCE_ID:
-
-	    queryBuilder.append(queryBuilder.buildSourceIdQuery(bond));
-	    return;
-
-	case IS_GEOSS_DATA_CORE:
-
-	    queryBuilder.append(OpenSearchQueryBuilder.buildIsGDCQuery(value));
-	    return;
-
-	default:
-
-	    queryBuilder.append(OpenSearchQueryBuilder.buildRangeQuery(name, operator, value));
-	}
+	queryBuilder.append(query);
     }
 
     @Override

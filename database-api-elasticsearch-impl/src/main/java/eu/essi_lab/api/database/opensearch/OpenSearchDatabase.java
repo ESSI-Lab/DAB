@@ -336,7 +336,7 @@ public class OpenSearchDatabase extends Database {
 
     //
     // NOT IMPLEMENTED AT THE MOMENT. Used in deprecated SourceStorageWorker testISOCompliance, recoverTags and
-    // testISCompliance methods
+    // testISCompliance methods and also in markDeletedRecords (which could be used)
     //
     @Override
     public List<String> getIdentifiers(IdentifierType type, String folderName, boolean excludDeleted) throws GSException {

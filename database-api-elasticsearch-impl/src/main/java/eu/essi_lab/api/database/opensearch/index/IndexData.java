@@ -35,6 +35,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.transform.TransformerException;
@@ -197,22 +198,29 @@ public class IndexData {
      */
     public static void main(String[] args) throws Exception {
 
-	URL resource = IndexData.class.getClassLoader().getResource("test.xml");
+	// URL resource = IndexData.class.getClassLoader().getResource("test.xml");
+	//
+	// File file = new File(resource.toURI());
+	//
+	// OpenSearchDatabase localService = OpenSearchDatabase.createLocalService();
+	//
+	// OpenSearchFolder folder = new OpenSearchFolder(localService, "testFolder");
+	//
+	// IndexData indexData = IndexData.of(folder, file);
+	//
+	// System.out.println(indexData);
+	//
+	// Optional<Long> toLong = ConversionUtils.parseToLong("2025-01-01");
+	//
+	Optional<Date> notStandardToDate = ISO8601DateTimeUtils.parseNotStandard3ToDate("2023");
+	System.out.println(notStandardToDate);
 
-	File file = new File(resource.toURI());
-
-	OpenSearchDatabase localService = OpenSearchDatabase.createLocalService();
-
-	OpenSearchFolder folder = new OpenSearchFolder(localService, "testFolder");
-
-	IndexData indexData = IndexData.of(folder, file);
-
-	System.out.println(indexData);
+	// System.out.println(toLong);
     }
 
     /**
      * @param folder
-     * @param gsResource
+     * @param resourceStream
      * @return
      * @throws Exception
      */
@@ -401,7 +409,7 @@ public class IndexData {
 	    indexData.put(MetaFolderMapping.SOURCE_ID, sourceId);
 
 	    indexData.put(BINARY_PROPERTY, DataFolderMapping.WRITING_FOLDER_TAG);
-	    indexData.put(DataFolderMapping.WRITING_FOLDER_TAG, DataFolderMapping.WRITING_FOLDER_TAG);
+	    indexData.put(DataFolderMapping.WRITING_FOLDER_TAG, "");
 
 	    indexData.mapping = DataFolderMapping.get();
 
@@ -1069,40 +1077,46 @@ public class IndexData {
 
 	JSONArray array = new JSONArray();
 
-	values.forEach(v -> { //
+	// only distinct values
+	values = values.stream().distinct().collect(Collectors.toList());
+
+	values.forEach(value -> { //
 
 	    if (valueClass.equals(String.class) || valueClass.equals(KeywordProperty.class)) {
 
-		if (valueClass.equals(KeywordProperty.class) && v.length() > IndexMapping.MAX_TERMS_CHARACTER) {
+		value = value.trim().strip();
 
-		    v = v.substring(0, IndexMapping.MAX_TERMS_CHARACTER);
+		if (valueClass.equals(KeywordProperty.class) && value.length() > IndexMapping.MAX_KEYWORD_LENGTH) {
+
+		    value = value.substring(0, IndexMapping.MAX_KEYWORD_LENGTH);
 		}
 
-		v = v.trim().strip();
+		if (value.length() > 1) {
 
-		array.put(String.valueOf(v));
+		    array.put(String.valueOf(value));
+		}
 
 	    } else if (valueClass.equals(Integer.class)) {
 
-		array.put(Integer.valueOf(v));
+		array.put(Integer.valueOf(value));
 
 	    } else if (valueClass.equals(Double.class)) {
 
-		array.put(Double.valueOf(v));
+		array.put(Double.valueOf(value));
 
 	    } else if (valueClass.equals(Long.class)) {
 
-		array.put(Long.valueOf(v));
+		array.put(Long.valueOf(value));
 
 	    } else if (valueClass.equals(Boolean.class)) {
 
-		boolean val = Boolean.valueOf(v);
+		boolean val = Boolean.valueOf(value);
 
 		//
 		// particular case to support tmpExtentEnd_Now and tmpExtentBegin_Now elements that in the
 		// GSResource indexed elements, if present, they have no value but they indicates 'true'
 		//
-		if (v.isEmpty()) {
+		if (value.isEmpty()) {
 
 		    val = true;
 		}
@@ -1111,16 +1125,47 @@ public class IndexData {
 
 	    } else if (valueClass.equals(DateTime.class)) {
 
-		ConversionUtils.parseToLong(v).ifPresent(dt -> array.put(dt));
+		ConversionUtils.parseToLong(value).ifPresent(dt -> array.put(dt));
 	    }
 	});
 
 	if (array.length() > 0) {
 
-	    // keyword fields used for aggregation and wildcard queries
-	    String name = valueClass.equals(KeywordProperty.class) ? DataFolderMapping.toKeywordField(elName) : elName;
+	    if (valueClass.equals(DateTime.class)) {
 
-	    indexData.put(name, array);
+		if (!array.isEmpty()) {
+
+		    // dates always indexed as long
+		    indexData.put(elName, array);
+		}
+
+		JSONArray dateTimeStringArray = new JSONArray();
+
+		array.toList().//
+			stream().//
+
+			// indexed as date only if not preceding the epoch
+			filter(v -> Long.valueOf(v.toString()).compareTo(ISO8601DateTimeUtils.EPOCH) >= 0).//
+
+			// mapping to ISO-8601 string
+			map(v -> ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds(new Date(Long.valueOf(v.toString())))).
+
+			forEach(date -> dateTimeStringArray.put(date));
+
+		if (!dateTimeStringArray.isEmpty()) {
+
+		    String dateField = DataFolderMapping.toDateField(elName);
+
+		    indexData.put(dateField, dateTimeStringArray);
+		}
+
+	    } else {
+
+		// keyword fields used for aggregation and wildcard queries
+		String name = valueClass.equals(KeywordProperty.class) ? DataFolderMapping.toKeywordField(elName) : elName;
+
+		indexData.put(name, array);
+	    }
 	}
     }
 
