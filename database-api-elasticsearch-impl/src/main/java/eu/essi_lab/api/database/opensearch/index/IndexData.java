@@ -29,7 +29,6 @@ import java.io.FileInputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -56,7 +55,6 @@ import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.SourceStorageWorker.DataFolderIndexDocument;
 import eu.essi_lab.api.database.opensearch.ConversionUtils;
-import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.index.mappings.AugmentersMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.CacheMapping;
@@ -72,13 +70,9 @@ import eu.essi_lab.iso.datamodel.classes.BoundingPolygon;
 import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.lib.xml.XMLDocumentReader;
-import eu.essi_lab.lib.xml.XMLDocumentWriter;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.model.Queryable;
-import eu.essi_lab.model.Queryable.ContentType;
 import eu.essi_lab.model.auth.GSUser;
-import eu.essi_lab.model.index.IndexedElement;
 import eu.essi_lab.model.index.jaxb.BoundingBox;
 import eu.essi_lab.model.index.jaxb.IndexesMetadata;
 import eu.essi_lab.model.resource.GSResource;
@@ -211,9 +205,11 @@ public class IndexData {
 	// System.out.println(indexData);
 	//
 	// Optional<Long> toLong = ConversionUtils.parseToLong("2025-01-01");
-	//
-	Optional<Date> notStandardToDate = ISO8601DateTimeUtils.parseNotStandard3ToDate("2023");
-	System.out.println(notStandardToDate);
+
+	Optional<Long> toLong = ConversionUtils.parseToLong("19841231-01-01T00:00:00Z");
+
+//	Optional<Date> notStandardToDate = ISO8601DateTimeUtils.parseNotStandard3ToDate("2023");
+	System.out.println(toLong);
 
 	// System.out.println(toLong);
     }
@@ -228,11 +224,11 @@ public class IndexData {
 
 	IndexData indexData = new IndexData();
 
-	Document node = (Document) ConversionUtils.toNode(resourceStream);
+	Document doc = (Document) ConversionUtils.toNode(resourceStream);
 
-	XMLDocumentReader reader = new XMLDocumentReader(node);
+	XMLDocumentHandler handler = new XMLDocumentHandler(doc);
 
-	String privateId = readValues(reader, ResourceProperty.PRIVATE_ID.getName()).get(0);
+	String privateId = readValues(handler, ResourceProperty.PRIVATE_ID.getName()).get(0);
 
 	//
 	// put the base properties
@@ -253,9 +249,9 @@ public class IndexData {
 
 	indexData.put(MetaFolderMapping.DATA_FOLDER, dataFolder);
 
-	handleResource(indexData, reader);
+	handleResource(indexData, handler);
 
-	String encodedString = ConversionUtils.encode(reader.getDocument());
+	String encodedString = ConversionUtils.encode(handler.getDocument());
 
 	indexData.put(BINARY_PROPERTY, DataFolderMapping.GS_RESOURCE);
 	indexData.put(DataFolderMapping.GS_RESOURCE, encodedString);
@@ -601,99 +597,6 @@ public class IndexData {
     }
 
     /**
-     * @param source
-     * @param res
-     * @return
-     */
-    public static GSResource decorate(JSONObject source, GSResource res) {
-
-	IndexesMetadata indexesMd = res.getIndexesMetadata();
-
-	ResourceProperty.listValues().forEach(pr -> {
-
-	    if (source.has(pr.getName())) {
-
-		IndexedElement element = new IndexedElement(pr.getName());
-		source.getJSONArray(pr.getName()).forEach(v -> {
-
-		    Object value = v;
-
-		    if (pr.getContentType() == ContentType.ISO8601_DATE || pr.getContentType() == ContentType.ISO8601_DATE_TIME) {
-
-			value = ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds(new Date(Long.valueOf(v.toString())));
-		    }
-
-		    if (!element.getValues().contains(value)) {
-
-			element.getValues().add(value.toString());
-		    }
-		});
-
-		if (!indexesMd.getProperties().contains(pr.getName())) {
-
-		    indexesMd.write(element);
-		}
-	    }
-	});
-
-	MetadataElement.listValues().forEach(el -> {
-
-	    if (source.has(el.getName())) {
-
-		// bbox is already in, the IndexesMetadata.clear(false) do not remove it
-		// @see IndexData
-		if (!el.getName().equals(MetadataElement.BOUNDING_BOX.getName())) {
-
-		    IndexedElement element = new IndexedElement(el.getName());
-
-		    source.getJSONArray(el.getName()).forEach(v -> {
-
-			Object value = v;
-
-			if (el.getContentType() == ContentType.ISO8601_DATE || el.getContentType() == ContentType.ISO8601_DATE_TIME) {
-
-			    value = ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds(new Date(Long.valueOf(v.toString())));
-			}
-
-			element.getValues().add(value.toString());
-		    });
-
-		    indexesMd.write(element);
-		}
-	    }
-	});
-
-	if (source.has(IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName())) {
-
-	    indexesMd.write(IndexedElements.TEMP_EXTENT_BEGIN_NOW);
-	}
-
-	if (source.has(IndexedElements.TEMP_EXTENT_END_NOW.getElementName())) {
-
-	    indexesMd.write(IndexedElements.TEMP_EXTENT_END_NOW);
-	}
-
-	if (!source.has(MetadataElement.TEMP_EXTENT_BEGIN.getName()) && //
-		!source.has(MetadataElement.TEMP_EXTENT_BEGIN_BEFORE_NOW.getName()) //
-		&& !source.has(IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName())) {
-
-	    indexesMd.write(IndexedElements.TEMP_EXTENT_BEGIN_NULL);
-	}
-
-	if (!source.has(MetadataElement.TEMP_EXTENT_END.getName()) && !source.has(IndexedElements.TEMP_EXTENT_END_NOW.getElementName())) {
-
-	    indexesMd.write(IndexedElements.TEMP_EXTENT_END_NULL);
-	}
-
-	if (!source.has(MetadataElement.BOUNDING_BOX.getName())) {
-
-	    indexesMd.write(IndexedElements.BOUNDING_BOX_NULL);
-	}
-
-	return res;
-    }
-
-    /**
      * 
      */
     private IndexData() {
@@ -774,7 +677,7 @@ public class IndexData {
      * @throws XPathExpressionException
      * @throws JAXBException
      */
-    private static void handleResource(IndexData indexData, XMLDocumentReader reader) throws XPathExpressionException, JAXBException {
+    private static void handleResource(IndexData indexData, XMLDocumentHandler handler) throws XPathExpressionException, JAXBException {
 
 	//
 	// shape
@@ -782,7 +685,7 @@ public class IndexData {
 
 	Optional<Shape> shape = Optional.empty();
 
-	Optional<BoundingPolygon> polygon = Arrays.asList(reader.evaluateNodes("//*:EX_BoundingPolygon")).//
+	Optional<BoundingPolygon> polygon = handler.evaluateNodes("//*:EX_BoundingPolygon").//
 		stream().//
 		map(n -> BoundingPolygon.createOrNull(n)).//
 		findFirst();
@@ -792,7 +695,7 @@ public class IndexData {
 	    shape = Shape.of(polygon.get());
 	}
 
-	Node bboxNode = reader.evaluateNode("//*:indexesMetadata/*:bbox");
+	Node bboxNode = handler.evaluateNode("//*:indexesMetadata/*:bbox");
 
 	if (bboxNode != null) {
 
@@ -812,7 +715,7 @@ public class IndexData {
 	// temp extent begin
 	//
 
-	List<String> values = readValues(reader, MetadataElement.TEMP_EXTENT_BEGIN.getName());
+	List<String> values = readValues(handler, MetadataElement.TEMP_EXTENT_BEGIN.getName());
 
 	if (!values.isEmpty()) {
 
@@ -823,7 +726,7 @@ public class IndexData {
 	// temp extent begin now
 	//
 
-	if (exists(reader, IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName())) {
+	if (exists(handler, IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName())) {
 
 	    put(Arrays.asList("true"), indexData, IndexedElements.TEMP_EXTENT_BEGIN_NOW.getElementName(), Boolean.class);
 	}
@@ -832,7 +735,7 @@ public class IndexData {
 	// temp extent end
 	//
 
-	values = readValues(reader, MetadataElement.TEMP_EXTENT_END.getName());
+	values = readValues(handler, MetadataElement.TEMP_EXTENT_END.getName());
 
 	if (!values.isEmpty()) {
 
@@ -843,7 +746,7 @@ public class IndexData {
 	// temp extent end now
 	//
 
-	if (exists(reader, IndexedElements.TEMP_EXTENT_END_NOW.getElementName())) {
+	if (exists(handler, IndexedElements.TEMP_EXTENT_END_NOW.getElementName())) {
 
 	    put(Arrays.asList("true"), indexData, IndexedElements.TEMP_EXTENT_END_NOW.getElementName(), Boolean.class);
 	}
@@ -854,7 +757,7 @@ public class IndexData {
 	MetadataElement.listValues().forEach(el -> {
 
 	    try {
-		List<String> v = readValues(reader, el.getName());
+		List<String> v = readValues(handler, el.getName());
 		put(el, v, indexData);
 
 	    } catch (XPathExpressionException ex) {
@@ -869,7 +772,7 @@ public class IndexData {
 	ResourceProperty.listValues().forEach(rp -> {
 
 	    try {
-		List<String> v = readValues(reader, rp.getName());
+		List<String> v = readValues(handler, rp.getName());
 		put(rp, v, indexData);
 
 	    } catch (XPathExpressionException ex) {
@@ -878,22 +781,20 @@ public class IndexData {
 	    }
 	});
 
-	XMLDocumentWriter writer = new XMLDocumentWriter(reader);
-
 	// clear the indexes (all but the bbox) before storing the binary property
-	writer.remove("//*:indexesMetadata");
+	handler.remove("//*:indexesMetadata");
     }
 
     /**
-     * @param reader
+     * @param handler
      * @param elName
      * @return
      * @throws XPathExpressionException
      */
-    private static boolean exists(XMLDocumentReader reader, String elName) {
+    private static boolean exists(XMLDocumentHandler handler, String elName) {
 
 	try {
-	    return reader.evaluateBoolean("exists(//*:indexesMetadata/*:" + elName + ")");
+	    return handler.evaluateBoolean("exists(//*:indexesMetadata/*:" + elName + ")");
 	} catch (XPathExpressionException ex) {
 
 	    GSLoggerFactory.getLogger(IndexData.class).error(ex);
@@ -991,14 +892,14 @@ public class IndexData {
     }
 
     /**
-     * @param reader
+     * @param handler
      * @param el
      * @return
      * @throws XPathExpressionException
      */
-    private static List<String> readValues(XMLDocumentReader reader, String el) throws XPathExpressionException {
+    private static List<String> readValues(XMLDocumentHandler handler, String el) throws XPathExpressionException {
 
-	return reader.evaluateTextContent("//*:indexesMetadata/*:" + el + "/text()");
+	return handler.evaluateTextContent("//*:indexesMetadata/*:" + el + "/text()");
     }
 
     /**
