@@ -390,7 +390,7 @@ public class ISO8601DateTimeUtils {
     public static Optional<Date> parseNotStandard3ToDate(String dateTimeString) {
 
 	try {
-	    SimpleDateFormat dateFormat = new SimpleDateFormat(NOT_STANDARD3);
+	    SimpleDateFormat dateFormat = new SimpleDateFormat(ISO_WITH_MILLIS);
 	    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
 	    Date date = dateFormat.parse(dateTimeString+"-01-01T00:00:00Z");
