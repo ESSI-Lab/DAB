@@ -116,8 +116,7 @@ public class DataFolderMapping extends IndexMapping {
 
 		// textual fields are mapped also as 'keyword' type in order to be aggregated
 		// since 'text' fields are not optimised for aggregations
-		// ignoring malformed keyword, in case the IndexMapping.MAX_KEYWORD_LENGTH cut is not enough!
-		addProperty(toKeywordField(el.getName()), FieldType.Keyword.jsonValue(), true);
+		addProperty(toKeywordField(el.getName()), FieldType.Keyword.jsonValue());
 
 		break;
 	    }
@@ -191,8 +190,7 @@ public class DataFolderMapping extends IndexMapping {
 		addProperty(rp.getName(), FieldType.Text.jsonValue());
 		// textual fields are mapped also as 'keyword' type in order to be aggregated
 		// since 'text' fields are not optimised for aggregations
-		// ignoring malformed keyword, in case the IndexMapping.MAX_KEYWORD_LENGTH cut is not enough!
-		addProperty(toKeywordField(rp.getName()), FieldType.Keyword.jsonValue(), true);
+		addProperty(toKeywordField(rp.getName()), FieldType.Keyword.jsonValue());
 
 		break;
 	    }
