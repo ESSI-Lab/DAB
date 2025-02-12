@@ -154,7 +154,7 @@ public abstract class IndexMapping {
 	JSONObject property = new JSONObject();
 	property.put("type", type);
 	if (ignoreMalformed) {
-	    property.put("ignoreMalformed", true);
+	    property.put("ignore_malformed", true);
 	}
 
 	mapping.getJSONObject("mappings").//
