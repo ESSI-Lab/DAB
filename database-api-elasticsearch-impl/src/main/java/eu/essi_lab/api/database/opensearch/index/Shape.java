@@ -104,7 +104,7 @@ public class Shape {
 
 	empty = true;
 
-	if (Integer.valueOf(bbox.getArea()) == 0) {
+	if (Double.valueOf(bbox.getArea()) == 0) {
 
 	    return;
 	}
