@@ -35,7 +35,6 @@ import java.util.Optional;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.amazonaws.services.s3.model.AmazonS3Exception;
 
 import eu.essi_lab.cfga.ConfigurationSource;
 import eu.essi_lab.cfga.setting.Setting;
@@ -178,7 +177,7 @@ public class S3Source implements ConfigurationSource {
 
 	    manager.download(bucketName, configName + ".json", tempFile);
 
-	} catch (AmazonS3Exception ex) {
+	} catch (Exception ex) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(ex);
 

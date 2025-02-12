@@ -21,34 +21,17 @@ package eu.essi_lab.lib.net.s3;
  * #L%
  */
 
-import static com.amazonaws.services.s3.internal.Constants.MB;
-
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
-import com.amazonaws.AmazonServiceException;
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.Bucket;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.ListObjectsV2Request;
-import com.amazonaws.services.s3.model.ListObjectsV2Result;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.S3ObjectSummary;
-import com.amazonaws.services.s3.transfer.Download;
-import com.amazonaws.services.s3.transfer.MultipleFileUpload;
-import com.amazonaws.services.s3.transfer.ObjectCannedAclProvider;
-import com.amazonaws.services.s3.transfer.TransferManager;
-import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
-import com.amazonaws.services.s3.transfer.Upload;
 import com.github.jsonldjava.shaded.com.google.common.base.Optional;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -57,14 +40,35 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.S3CrtAsyncClientBuilder;
+import software.amazon.awssdk.services.s3.S3Utilities;
+import software.amazon.awssdk.services.s3.model.Bucket;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetUrlRequest;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
+import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
+import software.amazon.awssdk.services.s3.model.S3Object;
 import software.amazon.awssdk.transfer.s3.S3TransferManager;
 import software.amazon.awssdk.transfer.s3.model.CompletedDirectoryDownload;
+import software.amazon.awssdk.transfer.s3.model.CompletedDirectoryUpload;
+import software.amazon.awssdk.transfer.s3.model.CompletedFileUpload;
 import software.amazon.awssdk.transfer.s3.model.DirectoryDownload;
 import software.amazon.awssdk.transfer.s3.model.DownloadDirectoryRequest;
 import software.amazon.awssdk.transfer.s3.model.DownloadDirectoryRequest.Builder;
+import software.amazon.awssdk.transfer.s3.model.DownloadFileRequest;
+import software.amazon.awssdk.transfer.s3.model.FileDownload;
+import software.amazon.awssdk.transfer.s3.model.FileUpload;
+import software.amazon.awssdk.transfer.s3.model.UploadDirectoryRequest;
+import software.amazon.awssdk.transfer.s3.model.UploadFileRequest;
+import software.amazon.awssdk.transfer.s3.progress.LoggingTransferListener;
 
 /**
  * @author Fabrizio
+ * @author boldrini
  */
 public class S3TransferWrapper {
 
@@ -175,24 +179,21 @@ public class S3TransferWrapper {
      */
     public void uploadDir(String dirPath, String bucketName, String keyPrefix, boolean recursive) {
 
-	TransferManager xfer_mgr = createManager();
+	File directory = new File(dirPath);
 
-	ObjectCannedAclProvider aclProvider = aclPublicRead ? f -> CannedAccessControlList.PublicRead : null;
+	File[] children = directory.listFiles();
 
-	try {
-	    MultipleFileUpload xfer = xfer_mgr.uploadDirectory(bucketName, keyPrefix, new File(dirPath), recursive, null, null,
-		    aclProvider);
-
-	    S3UploadProgress.showTransferProgress(xfer);
-
-	    S3UploadProgress.waitForCompletion(xfer);
-
-	} catch (AmazonServiceException e) {
-
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	for (File file : children) {
+	    if (file.isDirectory()) {
+		if (recursive) {
+		    uploadDir(file.getAbsolutePath(), bucketName, keyPrefix + "/" + file.getName(), recursive);
+		}
+	    }
+	    if (file.isFile()) {
+		uploadFile(file.getAbsolutePath(), bucketName, keyPrefix + "/" + file.getName());
+	    }
 	}
 
-	xfer_mgr.shutdownNow();
     }
 
     public void downloadDir(File destination, String bucketName) {
@@ -218,15 +219,14 @@ public class S3TransferWrapper {
 		    myAccessKey, mySecretKey);
 	    GSLoggerFactory.getLogger(getClass()).debug("Creating AWS credentials ENDED");
 	} else {
-	    
+
 	    GSLoggerFactory.getLogger(getClass()).debug("Creating AWS credentials not needed");
 	}
 
 	S3CrtAsyncClientBuilder builder = S3AsyncClient.//
 		crtBuilder().//
 		region(Region.US_EAST_1).//
-		targetThroughputInGbps(20.0).//
-		minimumPartSizeInBytes(8L * MB);
+		targetThroughputInGbps(20.0);
 
 	if (awsCreds != null) {
 	    GSLoggerFactory.getLogger(getClass()).debug("Creating credentials provider STARTED");
@@ -257,16 +257,7 @@ public class S3TransferWrapper {
 	downloadObjectsToDirectory(transferManager, destination, bucketName, folderName);
     }
 
-    private Integer downloadObjectsToDirectory(//
-	    S3TransferManager transferManager, //
-	    File destination, //
-	    String bucketName) {
-	return downloadObjectsToDirectory(//
-		transferManager, //
-		destination, //
-		bucketName, null);
-    }
-
+ 
     /**
      * @param transferManager
      * @param destination
@@ -319,24 +310,11 @@ public class S3TransferWrapper {
      */
     public void uploadFileList(List<File> files, String bucketName, String virtualDirectoryKeyPrefix) {
 
-	TransferManager xfer_mgr = createManager();
-
-	ObjectCannedAclProvider aclProvider = aclPublicRead ? f -> CannedAccessControlList.PublicRead : null;
-
-	try {
-	    MultipleFileUpload xfer = xfer_mgr.uploadFileList(bucketName, virtualDirectoryKeyPrefix, files.get(0).getParentFile(), files,
-		    null, null, aclProvider);
-
-	    S3UploadProgress.showTransferProgress(xfer);
-
-	    S3UploadProgress.waitForCompletion(xfer);
-
-	} catch (AmazonServiceException e) {
-
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	for (File file : files) {
+	    uploadFile(file.getAbsolutePath(), bucketName,virtualDirectoryKeyPrefix+file.getName());
 	}
 
-	xfer_mgr.shutdownNow();
+	System.out.println("All files uploaded successfully.");
     }
 
     /**
@@ -361,28 +339,32 @@ public class S3TransferWrapper {
 	    keyName = file.getName();
 	}
 
-	TransferManager xfer_mgr = createManager();
+	S3TransferManager xfer_mgr = createManager();
 
-	PutObjectRequest request = new PutObjectRequest(bucketName, keyName, file);
+	PutObjectRequest.Builder requestBuilder = PutObjectRequest.builder().bucket(bucketName).key(keyName);
 
 	if (aclPublicRead) {
-
-	    request = new PutObjectRequest(bucketName, keyName, file).withCannedAcl(CannedAccessControlList.PublicRead);
+	    requestBuilder.acl(ObjectCannedACL.PUBLIC_READ);
+	} else {
+	    requestBuilder.acl(ObjectCannedACL.PRIVATE);
 	}
 
-	try {
-	    Upload xfer = xfer_mgr.upload(request);
+	PutObjectRequest putObjectRequest = requestBuilder.build();
 
-	    S3UploadProgress.showTransferProgress(xfer);
+	// Create UploadFileRequest
+	UploadFileRequest uploadFileRequest = UploadFileRequest.builder().putObjectRequest(putObjectRequest).source(file.toPath()).build();
 
-	    S3UploadProgress.waitForCompletion(xfer);
+	// Start the upload
+	FileUpload upload = xfer_mgr.uploadFile(uploadFileRequest);
 
-	} catch (AmazonServiceException e) {
+	// Show progress and wait for completion
+	CompletableFuture<CompletedFileUpload> uploadCompletion = upload.completionFuture();
+	uploadCompletion.join(); // Blocking call to wait for upload completion
 
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	}
+	System.out.println("Upload completed!");
 
-	xfer_mgr.shutdownNow();
+	// Shutdown transfer manager
+	xfer_mgr.close();
     }
 
     /**
@@ -390,9 +372,14 @@ public class S3TransferWrapper {
      */
     public List<Bucket> listBuckets() {
 
-	AmazonS3 client = createClient();
+	S3AsyncClient client = createClient();
 
-	return client.listBuckets();
+	try {
+	    return client.listBuckets().get().buckets();
+	} catch (InterruptedException | ExecutionException e) {
+	    e.printStackTrace();
+	    return null;
+	}
     }
 
     /**
@@ -402,15 +389,15 @@ public class S3TransferWrapper {
      */
     public int countObjects(String bucketName, String virtualDirectoryKeyPrefix) {
 
-	ListObjectsV2Result objects = listObjects(bucketName, virtualDirectoryKeyPrefix);
+	ListObjectsV2Response listResponse = listObjects(bucketName, virtualDirectoryKeyPrefix);
 	String nextContinuationToken = null;
 
 	int count = 0;
 	do {
 
-	    count += objects.getObjectSummaries().size();
-	    nextContinuationToken = objects.getNextContinuationToken();
-	    objects = listObjects(bucketName, virtualDirectoryKeyPrefix, nextContinuationToken);
+	    count += listResponse.contents().size();
+	    nextContinuationToken = listResponse.nextContinuationToken();
+	    listResponse = listObjects(bucketName, virtualDirectoryKeyPrefix, nextContinuationToken);
 
 	} while (nextContinuationToken != null);
 
@@ -425,11 +412,16 @@ public class S3TransferWrapper {
      */
     public void download(String bucketName, String objectKey, File destination) throws MalformedURLException {
 
-	TransferManager xfer_mgr = createManager();
+	S3TransferManager xfer_mgr = createManager();
 
-	Download download = xfer_mgr.download(bucketName, objectKey, destination);
+	GetObjectRequest getObjectRequest = GetObjectRequest.builder().bucket(bucketName).key(objectKey).build();
 
-	while (!download.isDone()) {
+	DownloadFileRequest downloadRequest = DownloadFileRequest.builder().getObjectRequest(getObjectRequest).destination(destination)
+		.build();
+
+	FileDownload download = xfer_mgr.downloadFile(downloadRequest);
+
+	while (download.progress().snapshot().ratioTransferred().getAsDouble() < 1) {
 
 	    try {
 		Thread.sleep(DOWNLOAD_SLEEP_TIME);
@@ -444,7 +436,7 @@ public class S3TransferWrapper {
      * @param bucketName
      * @return
      */
-    public List<S3ObjectSummary> listObjectsSummaries(String bucketName) {
+    public List<S3Object> listObjectsSummaries(String bucketName) {
 
 	return listObjectSummaries(bucketName, null);
     }
@@ -454,20 +446,20 @@ public class S3TransferWrapper {
      * @param virtualDirectoryKeyPrefix
      * @return
      */
-    public List<S3ObjectSummary> listObjectSummaries(String bucketName, String virtualDirectoryKeyPrefix) {
+    public List<S3Object> listObjectSummaries(String bucketName, String virtualDirectoryKeyPrefix) {
 
-	List<S3ObjectSummary> out = new ArrayList<>();
+	List<S3Object> out = new ArrayList<>();
 
-	ListObjectsV2Result objects = virtualDirectoryKeyPrefix == null ? listObjects(bucketName)
+	ListObjectsV2Response objects = virtualDirectoryKeyPrefix == null ? listObjects(bucketName)
 		: listObjects(bucketName, virtualDirectoryKeyPrefix);
 
 	String nextContinuationToken = null;
 
 	do {
 
-	    out.addAll(objects.getObjectSummaries());
+	    out.addAll(objects.contents());
 
-	    nextContinuationToken = objects.getNextContinuationToken();
+	    nextContinuationToken = objects.nextContinuationToken();
 	    objects = listObjects(bucketName, virtualDirectoryKeyPrefix, nextContinuationToken);
 
 	} while (nextContinuationToken != null);
@@ -481,32 +473,50 @@ public class S3TransferWrapper {
      * @param nextContinuationToken
      * @return
      */
-    public ListObjectsV2Result listObjects(String bucketName, String virtualDirectoryKeyPrefix, String nextContinuationToken) {
+    public ListObjectsV2Response listObjects(String bucketName, String virtualDirectoryKeyPrefix, String nextContinuationToken) {
 
-	AmazonS3 client = createClient();
+	S3AsyncClient client = createClient();
 
-	ListObjectsV2Request request = new ListObjectsV2Request();
+	ListObjectsV2Request.Builder requestBuilder = ListObjectsV2Request.builder().bucket(bucketName);
+
+	// Set continuation token if provided
 	if (nextContinuationToken != null) {
-	    request.setContinuationToken(nextContinuationToken);
+	    requestBuilder.continuationToken(nextContinuationToken);
 	}
 
-	request.setBucketName(bucketName);
+	// Set prefix for virtual directory if provided
 	if (virtualDirectoryKeyPrefix != null) {
-	    request.setPrefix(virtualDirectoryKeyPrefix);
+	    requestBuilder.prefix(virtualDirectoryKeyPrefix);
 	}
 
-	return client.listObjectsV2(request);
+	// Build the request and call listObjectsV2
+	ListObjectsV2Request request = requestBuilder.build();
+	ListObjectsV2Response response = null;
+	try {
+	    response = client.listObjectsV2(request).get();
+	} catch (Exception e) {
+	    e.printStackTrace();
+	}
+
+	return response;
     }
 
     /**
      * @param request
      * @return
      */
-    public ListObjectsV2Result listObjects(ListObjectsV2Request request) {
+    public ListObjectsV2Response listObjects(ListObjectsV2Request request) {
 
-	AmazonS3 client = createClient();
+	S3AsyncClient client = createClient();
 
-	return client.listObjectsV2(request);
+	ListObjectsV2Response ret = null;
+	try {
+	    ret = client.listObjectsV2(request).get();
+	} catch (InterruptedException | ExecutionException e) {
+	    e.printStackTrace();
+	}
+
+	return ret;
     }
 
     /**
@@ -514,22 +524,38 @@ public class S3TransferWrapper {
      * @param prefix
      * @return
      */
-    public ListObjectsV2Result listObjects(String bucketName, String prefix) {
+    public ListObjectsV2Response listObjects(String bucketName, String prefix) {
+	S3AsyncClient client = createClient();
 
-	AmazonS3 client = createClient();
+	ListObjectsV2Request request = ListObjectsV2Request.builder().bucket(bucketName).prefix(prefix).build();
 
-	return client.listObjectsV2(bucketName, prefix);
+	CompletableFuture<ListObjectsV2Response> response = client.listObjectsV2(request);
+
+	try {
+	    return response.get();
+	} catch (InterruptedException | ExecutionException e) {
+	    e.printStackTrace();
+	    return null;
+	}
     }
 
     /**
      * @param bucketName
      * @return
      */
-    public ListObjectsV2Result listObjects(String bucketName) {
+    public ListObjectsV2Response listObjects(String bucketName) {
+	S3AsyncClient client = createClient();
 
-	AmazonS3 client = createClient();
+	ListObjectsV2Request request = ListObjectsV2Request.builder().bucket(bucketName).build();
 
-	return client.listObjectsV2(bucketName);
+	CompletableFuture<ListObjectsV2Response> response = client.listObjectsV2(request);
+
+	try {
+	    return response.get();
+	} catch (InterruptedException | ExecutionException e) {
+	    e.printStackTrace();
+	    return null;
+	}
     }
 
     /**
@@ -538,14 +564,17 @@ public class S3TransferWrapper {
      */
     public void deleteObject(String bucketName, String objectKey) {
 
-	AmazonS3 client = createClient();
+	S3AsyncClient client = createClient();
 
 	try {
-	    client.deleteObject(bucketName, objectKey);
+	    DeleteObjectRequest request = DeleteObjectRequest.builder().bucket(bucketName).key(objectKey).build();
 
-	} catch (AmazonServiceException e) {
+	    CompletableFuture<DeleteObjectResponse> future = client.deleteObject(request);
 
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	    future.join();
+
+	} catch (S3Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error(e.awsErrorDetails().errorMessage(), e);
 	}
     }
 
@@ -556,42 +585,71 @@ public class S3TransferWrapper {
      */
     public URL getObjectURL(String bucketName, String key) {
 
-	AmazonS3 s3Client = createClient();
+	S3AsyncClient s3Client = createClient();
+	S3Utilities s3Utilities = s3Client.utilities();
 
-	return s3Client.getUrl(bucketName, key);
+	return s3Utilities.getUrl(GetUrlRequest.builder().bucket(bucketName).key(key).build());
     }
 
     /**
      * @param namePrefix
      * @return
      */
-    private TransferManager createManager() {
+    private S3TransferManager createManager() {
 
-	AmazonS3 s3Client = createClient();
+	S3AsyncClient s3AsyncClient = createClient();
 
-	if (this.endpoint != null) {
-	    s3Client.setEndpoint(this.endpoint);
-	}
+	S3TransferManager transferManager = //
+		S3TransferManager.//
+			builder().//
+			s3Client(s3AsyncClient).build();
 
-	return TransferManagerBuilder.//
-		standard().//
-		withS3Client(s3Client).//
-		build();
+	return transferManager;
     }
 
     /**
      * @return
      */
-    private AmazonS3 createClient() {
+    private S3AsyncClient createClient() {
 
-	AWSCredentials awsCredentials = new BasicAWSCredentials(this.accessKey, this.secreteKey);
+	GSLoggerFactory.getLogger(getClass()).debug("Creating AWS credentials STARTED");
 
-	AmazonS3 s3Client = AmazonS3ClientBuilder.//
-		standard().//
-		withRegion(Regions.US_EAST_1).//
-		withCredentials(new AWSStaticCredentialsProvider(awsCredentials)).//
-		build();
+	AwsBasicCredentials awsCreds = null;
 
-	return s3Client;
+	String myAccessKey = getAccessKey();
+
+	String mySecretKey = getSecretKey();
+
+	if (myAccessKey != null && mySecretKey != null) {
+	    awsCreds = AwsBasicCredentials.create(//
+		    myAccessKey, mySecretKey);
+	    GSLoggerFactory.getLogger(getClass()).debug("Creating AWS credentials ENDED");
+	} else {
+
+	    GSLoggerFactory.getLogger(getClass()).debug("Creating AWS credentials not needed");
+	}
+
+	S3CrtAsyncClientBuilder builder = S3AsyncClient.//
+		crtBuilder().//
+		region(Region.US_EAST_1).//
+		targetThroughputInGbps(20.0).//
+		minimumPartSizeInBytes(8L * 1048576l);
+
+	if (awsCreds != null) {
+	    GSLoggerFactory.getLogger(getClass()).debug("Creating credentials provider STARTED");
+
+	    StaticCredentialsProvider staticCredentials = StaticCredentialsProvider.create(awsCreds);
+
+	    builder = builder.credentialsProvider(staticCredentials);
+
+	    GSLoggerFactory.getLogger(getClass()).debug("Creating credentials provider ENDED");
+
+	}
+
+	GSLoggerFactory.getLogger(getClass()).debug("Creating client STARTED");
+
+	S3AsyncClient s3AsyncClient = builder.build();
+
+	return s3AsyncClient;
     }
 }

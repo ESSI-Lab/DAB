@@ -111,13 +111,13 @@
 		<org.hibernate.version>6.2.5.Final</org.hibernate.version>
 
 		<!-- AWS IoT Device SDK Java (J11 UPDATED) -->
-		<aws-iot-device-sdk.version>1.20.5</aws-iot-device-sdk.version>
+		<aws-iot-device-sdk.version>1.23.0</aws-iot-device-sdk.version>
 
 		<!-- The AWS SDK for Java - BOM module (J11 UPDATED) -->
-		<aws-java-sdk-bom.version>1.12.709</aws-java-sdk-bom.version>
+		<aws-java-sdk-bom.version>2.30.16</aws-java-sdk-bom.version>
 
-		<!-- S3 Transfer Manager (J11 UPDATED) --> 
-		<s3-transfer-manager.version>2.29.46</s3-transfer-manager.version>
+		<!-- S3 Transfer Manager (J11 UPDATED) -->
+		<!--s3-transfer-manager.version>2.29.46</s3-transfer-manager.version-->
 
 		<!-- Authzforce (to update it, some code changes are required) -->
 		<authzforce.version>13.3.1</authzforce.version>
@@ -402,21 +402,24 @@
 				<version>${com.helger-ph-schematron-validator.version}</version>
 			</dependency>
 
-			<!-- As for AWS guide it's recommended to import the BOM:
-			https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/setup-project-maven.html -->
-			<dependency>
-				<groupId>com.amazonaws</groupId>
-				<artifactId>aws-java-sdk-bom</artifactId>
-				<version>${aws-java-sdk-bom.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-
 			<dependency>
 				<groupId>software.amazon.awssdk</groupId>
-				<artifactId>s3-transfer-manager</artifactId>
-				<version>${s3-transfer-manager.version}</version>
+				<artifactId>bom</artifactId>
+				<version>${aws-java-sdk-bom.version}</version>
+				<type>pom</type>
 			</dependency>
+			
+	<dependency>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>s3-transfer-manager</artifactId>
+		<version>${aws-java-sdk-bom.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>software.amazon.awssdk.crt</groupId>
+			<artifactId>aws-crt</artifactId>
+			<version>0.34.0</version>
+		</dependency>
 
 			<!-- OGC Schemas from Aleksei Valikov -->
 			<dependency>
