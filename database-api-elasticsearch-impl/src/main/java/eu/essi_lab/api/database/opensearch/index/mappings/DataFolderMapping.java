@@ -99,14 +99,16 @@ public class DataFolderMapping extends IndexMapping {
 	    case ISO8601_DATE_TIME:
 		// indexed as long to save also date before the epoch
 		addProperty(el.getName(), FieldType.Long.jsonValue());
-		
+
 		// indexes as date (when possible) for manual searches and for dashboard
-		addProperty(toDateField(el.getName()), FieldType.Date.jsonValue());
+		// ignoring malformed dates
+		addProperty(toDateField(el.getName()), FieldType.Date.jsonValue(), true);
 
 		break;
 
 	    case SPATIAL:
-		addProperty(el.getName(), FieldType.GeoShape.jsonValue());
+		// ignoring malformed shapes
+		addProperty(el.getName(), FieldType.GeoShape.jsonValue(), true);
 		break;
 
 	    case TEXTUAL:
@@ -173,11 +175,12 @@ public class DataFolderMapping extends IndexMapping {
 		break;
 	    case ISO8601_DATE:
 	    case ISO8601_DATE_TIME:
-		
+
 		addProperty(rp.getName(), FieldType.Long.jsonValue());
-		
+
 		// indexes as date (when possible) for manual searches and for dashboard
-		addProperty(toDateField(rp.getName()), FieldType.Date.jsonValue());
+		// ignoring malformed dates (it should never happen)
+		addProperty(toDateField(rp.getName()), FieldType.Date.jsonValue(), true);
 
 		break;
 	    case LONG:
@@ -193,7 +196,7 @@ public class DataFolderMapping extends IndexMapping {
 	    }
 	});
     }
-    
+
     /**
      * @param field
      * @return

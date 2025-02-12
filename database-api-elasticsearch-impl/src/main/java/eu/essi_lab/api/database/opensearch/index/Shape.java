@@ -29,6 +29,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.json.JSONObject;
+import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -253,6 +254,38 @@ public class Shape {
     public String toString() {
 
 	return "shape: " + getShape() + "\n" + "area: " + getArea();
+    }
+
+    /**
+     * @param p1
+     * @param p2
+     * @param p3
+     * @return
+     */
+    private static boolean areCollinear(Coordinate p1, Coordinate p2, Coordinate p3) {
+
+	double determinant = p1.x * (p2.y - p3.y) + //
+		p2.x * (p3.y - p1.y) + //
+		p3.x * (p1.y - p2.y);
+
+	return determinant == 0;
+    }
+
+    /**
+     * @param coordinates
+     * @return
+     */
+    private static boolean checkCollinearCoordinates(Coordinate[] coordinates) {
+
+	for (int i = 0; i < coordinates.length - 2; i++) {
+
+	    if (areCollinear(coordinates[i], coordinates[i + 1], coordinates[i + 2])) {
+
+		return true;
+	    }
+	}
+
+	return false;
     }
 
     /**
