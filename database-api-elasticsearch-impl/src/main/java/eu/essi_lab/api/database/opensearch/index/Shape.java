@@ -104,11 +104,6 @@ public class Shape {
 
 	empty = true;
 
-	if (Double.valueOf(bbox.getArea()) == 0) {
-
-	    return;
-	}
-
 	try {
 
 	    Optional<String> shape = asShape(bbox);
