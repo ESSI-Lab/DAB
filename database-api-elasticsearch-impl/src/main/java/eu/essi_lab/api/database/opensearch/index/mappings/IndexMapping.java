@@ -68,11 +68,12 @@ public abstract class IndexMapping {
      * 
      */
     public static final String ALL_INDEXES = "*";
-    
+
     //
     // Lucene doesn't allow terms that contain more than 32k bytes
+    // Elasticsearch suggests to use ignore_above = 32766 / 4 = 8191 since UTF-8 characters may occupy at most 4 bytes.
     //
-    public static final int MAX_KEYWORD_LENGTH = 32000;
+    public static final int MAX_KEYWORD_LENGTH = 32766 / 4;
 
     /**
      * @return
