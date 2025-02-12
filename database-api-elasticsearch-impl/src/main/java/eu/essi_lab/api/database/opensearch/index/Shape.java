@@ -141,7 +141,7 @@ public class Shape {
 		}
 	    }
 
-	} catch (ParseException e) {
+	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
@@ -217,7 +217,7 @@ public class Shape {
 		    empty = false;
 		}
 
-	    } catch (ParseException e) {
+	    } catch (Exception e) {
 
 		GSLoggerFactory.getLogger(getClass()).error(e);
 
