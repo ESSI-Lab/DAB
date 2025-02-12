@@ -141,8 +141,21 @@ public abstract class IndexMapping {
      */
     protected void addProperty(String key, String type) {
 
+	addProperty(key, type, false);
+    }
+
+    /**
+     * @param key
+     * @param type
+     * @param ignoreMalformed
+     */
+    protected void addProperty(String key, String type, boolean ignoreMalformed) {
+
 	JSONObject property = new JSONObject();
 	property.put("type", type);
+	if (ignoreMalformed) {
+	    property.put("ignoreMalformed", true);
+	}
 
 	mapping.getJSONObject("mappings").//
 		getJSONObject("properties").//
