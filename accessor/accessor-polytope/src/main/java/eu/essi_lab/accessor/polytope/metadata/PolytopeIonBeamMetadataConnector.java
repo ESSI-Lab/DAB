@@ -238,7 +238,7 @@ public class PolytopeIonBeamMetadataConnector extends HarvestedQueryConnector<Po
 		}
 		logger.debug("ADDED {} records. Number of analyzed stations: {}", partialNumbers, String.valueOf(start + count));
 	    } else {
-		GSLoggerFactory.getLogger(getClass()).info("ERROR getting items.");
+		GSLoggerFactory.getLogger(getClass()).info("Getting empty stations/device items.");
 	    }
 
 	} catch (Exception e) {
