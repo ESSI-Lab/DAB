@@ -90,11 +90,6 @@
 		  <artifactId>opensearch-rest-high-level-client</artifactId>
 		</dependency>
 		
-		<dependency>
-			<groupId>com.amazonaws</groupId>
-			<artifactId>aws-java-sdk-elasticsearch</artifactId>
-		</dependency>
-
 		
 	</dependencies>
 	

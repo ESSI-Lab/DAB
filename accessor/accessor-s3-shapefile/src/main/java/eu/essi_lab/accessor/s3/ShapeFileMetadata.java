@@ -71,7 +71,7 @@ public class ShapeFileMetadata {
 
 		FeatureMetadata f = new FeatureMetadata();
 		// Print feature attributes
-		System.out.println("Feature ID: " + feature.getID());
+		// System.out.println("Feature ID: " + feature.getID());
 		f.setId(feature.getID());
 		GeometryAttribute geomAttr = feature.getDefaultGeometryProperty();
 		for (AttributeDescriptor attr : feature.getFeatureType().getAttributeDescriptors()) {
@@ -80,14 +80,14 @@ public class ShapeFileMetadata {
 		    }
 		    Object a = feature.getAttribute(attr.getName());
 		    f.getAttributes().put(attr.getName().getLocalPart(), a.toString());
-		    System.out.println("X" + attr.getName() + ": " + a);
+		    // System.out.println("X" + attr.getName() + ": " + a);
 
 		}
 
 		// Get and print the bounding box (geometry extent)
 		BoundingBox boundingBox = feature.getBounds();
-		System.out.println("Bounding Box: " + boundingBox);
-		System.out.println("---------------------------------");
+		// System.out.println("Bounding Box: " + boundingBox);
+		// System.out.println("---------------------------------");
 
 		f.setWest(new BigDecimal(boundingBox.getMinX()));
 		f.setEast(new BigDecimal(boundingBox.getMaxX()));

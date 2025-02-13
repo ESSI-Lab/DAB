@@ -269,12 +269,12 @@ public class ErrorLogsPublisherTask extends AbstractCustomTask implements ErrorL
 	    manager.get().listObjectsSummaries(ERROR_LOGS_BUCKET_NAME).
 
 		    stream().//
-		    filter(s -> daysBeforeLogs ? !s.getKey().contains(ISO8601DateTimeUtils.getISO8601Date()) : true).//
+		    filter(s -> daysBeforeLogs ? !s.key().contains(ISO8601DateTimeUtils.getISO8601Date()) : true).//
 		    forEach(summary -> {
 
 			try {
 
-			    manager.get().download(ERROR_LOGS_BUCKET_NAME, summary.getKey(), new File(LOGS_FOLDER, summary.getKey()));
+			    manager.get().download(ERROR_LOGS_BUCKET_NAME, summary.key(), new File(LOGS_FOLDER, summary.key()));
 
 			} catch (MalformedURLException e) {
 

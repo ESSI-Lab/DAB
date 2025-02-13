@@ -25,11 +25,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.amazonaws</groupId>
-			<artifactId>aws-java-sdk-elasticsearch</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>cloud.localstack</groupId>
 			<artifactId>localstack-utils</artifactId>
 		</dependency>	

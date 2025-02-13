@@ -27,8 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-import com.amazonaws.handlers.AbstractRequestHandler;
-
 import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.lib.utils.GSLoggerFactory.GSLogger;
 import eu.essi_lab.lib.utils.HostNamePropertyUtils;

@@ -15,13 +15,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.amazonaws.services.s3.model.Bucket;
-import com.amazonaws.services.s3.model.S3ObjectSummary;
-
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.net.utils.HttpConnectionUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 /**
  * @author Fabrizio
@@ -38,8 +36,8 @@ public class S3TransferManagerExternalTestIT {
 
 	S3TransferWrapper manager = createManager();
 
-	List<S3ObjectSummary> objectsSummaries = manager.listObjectsSummaries(TEST_BUCKET_NAME);
-	objectsSummaries.stream().map(s -> s.getKey()).forEach(key -> manager.deleteObject(TEST_BUCKET_NAME, key));
+	List<S3Object> objectsSummaries = manager.listObjectsSummaries(TEST_BUCKET_NAME);
+	objectsSummaries.stream().map(s -> s.key()).forEach(key -> manager.deleteObject(TEST_BUCKET_NAME, key));
     }
 
     /**
@@ -72,7 +70,7 @@ public class S3TransferManagerExternalTestIT {
 	//
 	//
 
-	List<S3ObjectSummary> objectsSummaries = manager.listObjectsSummaries(TEST_BUCKET_NAME);
+	List<S3Object> objectsSummaries = manager.listObjectsSummaries(TEST_BUCKET_NAME);
 	Assert.assertEquals(0, objectsSummaries.size());
 
 	Assert.assertEquals(0, manager.countObjects(TEST_BUCKET_NAME, null));
@@ -86,7 +84,7 @@ public class S3TransferManagerExternalTestIT {
 	objectsSummaries = manager.listObjectsSummaries(TEST_BUCKET_NAME);
 	Assert.assertEquals(1, objectsSummaries.size());
 
-	String key = objectsSummaries.get(0).getKey();
+	String key = objectsSummaries.get(0).key();
 	Assert.assertEquals(tempFile.getName(), key);
 
 	//
@@ -134,7 +132,7 @@ public class S3TransferManagerExternalTestIT {
 	//
 	//
 
-	List<S3ObjectSummary> objectsSummaries = manager.listObjectsSummaries(TEST_BUCKET_NAME);
+	List<S3Object> objectsSummaries = manager.listObjectsSummaries(TEST_BUCKET_NAME);
 	Assert.assertEquals(0, objectsSummaries.size());
 
 	Assert.assertEquals(0, manager.countObjects(TEST_BUCKET_NAME, null));
@@ -150,7 +148,7 @@ public class S3TransferManagerExternalTestIT {
 	//
 	//
 
-	String key = objectsSummaries.get(0).getKey();
+	String key = objectsSummaries.get(0).key();
 	Assert.assertEquals(objectName, key);
 
 	//
@@ -199,7 +197,7 @@ public class S3TransferManagerExternalTestIT {
 	//
 	//
 
-	List<S3ObjectSummary> objectsSummaries = manager.listObjectsSummaries(TEST_BUCKET_NAME);
+	List<S3Object> objectsSummaries = manager.listObjectsSummaries(TEST_BUCKET_NAME);
 	Assert.assertEquals(0, objectsSummaries.size());
 
 	Assert.assertEquals(0, manager.countObjects(TEST_BUCKET_NAME, null));
@@ -219,7 +217,7 @@ public class S3TransferManagerExternalTestIT {
 	//
 	//
 
-	objectsSummaries.stream().map(s -> s.getKey()).forEach(key -> {
+	objectsSummaries.stream().map(s -> s.key()).forEach(key -> {
 
 	    URL objectURL = manager.getObjectURL(TEST_BUCKET_NAME, key);
 
@@ -236,7 +234,7 @@ public class S3TransferManagerExternalTestIT {
 	//
 	//
 
-	objectsSummaries.stream().map(s -> s.getKey()).forEach(key -> manager.deleteObject(TEST_BUCKET_NAME, key));
+	objectsSummaries.stream().map(s -> s.key()).forEach(key -> manager.deleteObject(TEST_BUCKET_NAME, key));
 
 	objectsSummaries = manager.listObjectsSummaries(TEST_BUCKET_NAME);
 	Assert.assertEquals(0, objectsSummaries.size());
@@ -263,7 +261,7 @@ public class S3TransferManagerExternalTestIT {
 	//
 	//
 
-	List<S3ObjectSummary> objectsSummaries = manager.listObjectsSummaries(TEST_BUCKET_NAME);
+	List<S3Object> objectsSummaries = manager.listObjectsSummaries(TEST_BUCKET_NAME);
 	Assert.assertEquals(0, objectsSummaries.size());
 
 	Assert.assertEquals(0, manager.countObjects(TEST_BUCKET_NAME, prefixName));
@@ -279,13 +277,13 @@ public class S3TransferManagerExternalTestIT {
 
 	Assert.assertEquals(filesList.size(), manager.countObjects(TEST_BUCKET_NAME, prefixName));
 
-	objectsSummaries.stream().map(s -> s.getKey()).forEach(key -> Assert.assertTrue(key.startsWith(prefixName)));
+	objectsSummaries.stream().map(s -> s.key()).forEach(key -> Assert.assertTrue(key.startsWith(prefixName)));
 
 	//
 	//
 	//
 
-	objectsSummaries.stream().map(s -> s.getKey()).forEach(key -> manager.deleteObject(TEST_BUCKET_NAME, key));
+	objectsSummaries.stream().map(s -> s.key()).forEach(key -> manager.deleteObject(TEST_BUCKET_NAME, key));
 
 	objectsSummaries = manager.listObjectsSummaries(TEST_BUCKET_NAME);
 	Assert.assertEquals(0, objectsSummaries.size());
@@ -327,7 +325,7 @@ public class S3TransferManagerExternalTestIT {
 	//
 	//
 
-	List<S3ObjectSummary> objectsSummaries = manager.listObjectsSummaries(TEST_BUCKET_NAME);
+	List<S3Object> objectsSummaries = manager.listObjectsSummaries(TEST_BUCKET_NAME);
 	Assert.assertEquals(0, objectsSummaries.size());
 
 	//
@@ -343,12 +341,15 @@ public class S3TransferManagerExternalTestIT {
 	//
 	//
 
-	objectsSummaries.stream().map(s -> s.getKey()).forEach(key -> {
+	objectsSummaries.stream().map(s -> s.key()).forEach(key -> {
 
 	    URL objectURL = manager.getObjectURL(TEST_BUCKET_NAME, key);
 
 	    try {
 		boolean connectivity = HttpConnectionUtils.checkConnectivity(objectURL.toString());
+		if (connectivity!=publicACLRead) {
+		    System.out.println();
+		}
 		Assert.assertEquals(connectivity, publicACLRead);
 
 	    } catch (URISyntaxException e) {
@@ -360,7 +361,7 @@ public class S3TransferManagerExternalTestIT {
 	//
 	//
 
-	objectsSummaries.stream().map(s -> s.getKey()).forEach(key -> manager.deleteObject(TEST_BUCKET_NAME, key));
+	objectsSummaries.stream().map(s -> s.key()).forEach(key -> manager.deleteObject(TEST_BUCKET_NAME, key));
 
 	objectsSummaries = manager.listObjectsSummaries(TEST_BUCKET_NAME);
 	Assert.assertEquals(0, objectsSummaries.size());
@@ -404,7 +405,7 @@ public class S3TransferManagerExternalTestIT {
 	//
 	//
 
-	List<S3ObjectSummary> objectsSummaries = manager.listObjectsSummaries(TEST_BUCKET_NAME);
+	List<S3Object> objectsSummaries = manager.listObjectsSummaries(TEST_BUCKET_NAME);
 	Assert.assertEquals(0, objectsSummaries.size());
 
 	//
@@ -420,13 +421,13 @@ public class S3TransferManagerExternalTestIT {
 	//
 	//
 
-	objectsSummaries.stream().map(s -> s.getKey()).forEach(key -> Assert.assertTrue(key.startsWith(prefixName)));
+	objectsSummaries.stream().map(s -> s.key()).forEach(key -> Assert.assertTrue(key.startsWith(prefixName)));
 
 	//
 	//
 	//
 
-	objectsSummaries.stream().map(s -> s.getKey()).forEach(key -> manager.deleteObject(TEST_BUCKET_NAME, key));
+	objectsSummaries.stream().map(s -> s.key()).forEach(key -> manager.deleteObject(TEST_BUCKET_NAME, key));
 
 	objectsSummaries = manager.listObjectsSummaries(TEST_BUCKET_NAME);
 	Assert.assertEquals(0, objectsSummaries.size());
@@ -444,11 +445,11 @@ public class S3TransferManagerExternalTestIT {
 
 	S3TransferWrapper manager = createManager();
 
-	List<Bucket> listBuckets = manager.listBuckets();
+	List<software.amazon.awssdk.services.s3.model.Bucket> listBuckets = manager.listBuckets();
 
 	Assert.assertFalse(listBuckets.isEmpty());
 
-	Assert.assertTrue(listBuckets.stream().anyMatch(b -> b.getName().equals(TEST_BUCKET_NAME)));
+	Assert.assertTrue(listBuckets.stream().anyMatch(b -> b.name().equals(TEST_BUCKET_NAME)));
     }
 
     /**
@@ -459,6 +460,10 @@ public class S3TransferManagerExternalTestIT {
 	File tempDirectory = IOStreamUtils.getUserTempDirectory();
 	File s3tmanTestFolder = new File(tempDirectory + File.separator + "s3tman");
 	s3tmanTestFolder.mkdirs();
+	File[] files = s3tmanTestFolder.listFiles();
+	for (File file : files) {
+	    file.delete();
+	}
 
 	filesList.forEach(file -> {
 
