@@ -8,12 +8,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.amazonaws.services.s3.model.S3ObjectSummary;
-
 import eu.essi_lab.cfga.gs.DefaultConfiguration;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.source.S3Source;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 /**
  * @author Fabrizio
@@ -35,8 +34,9 @@ public class S3SourceExternalTestIT {
 
 	S3TransferWrapper manager = createWrapper();
 
-	List<S3ObjectSummary> objectsSummaries = manager.listObjectsSummaries(TEST_BUCKET_NAME);
-	objectsSummaries.stream().map(s -> s.getKey()).forEach(key -> manager.deleteObject(TEST_BUCKET_NAME, key));
+	List<S3Object> objectsSummaries = manager.listObjectsSummaries(TEST_BUCKET_NAME);
+	
+	objectsSummaries.stream().map(s -> s.key()).forEach(key -> manager.deleteObject(TEST_BUCKET_NAME, key));
     }
 
     @Test
