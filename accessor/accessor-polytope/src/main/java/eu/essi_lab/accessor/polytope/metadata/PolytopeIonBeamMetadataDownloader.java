@@ -253,8 +253,8 @@ public class PolytopeIonBeamMetadataDownloader extends WMLDataDownloader {
 
 	    boolean isTemperature = false;
 
-	    if (units.contains("°C") || units.contains("ºC") || units.contains("K")) {
-		units = units.replace("°C", "K").replace("ºC", "K");
+	    if (units.contains("°C") || units.contains("ºC") || units.contains("K") || units.contains("Kelvin")) {
+		units = units.replace("°C", "K").replace("ºC", "K").replace("Kelvin", "K");
 		isTemperature = true;
 	    }
 
