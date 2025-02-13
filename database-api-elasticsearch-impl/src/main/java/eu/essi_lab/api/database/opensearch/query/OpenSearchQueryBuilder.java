@@ -65,6 +65,7 @@ import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.indexes.SpatialIndexHelper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
@@ -73,6 +74,7 @@ import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.bond.View.ViewVisibility;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.Queryable.ContentType;
+import eu.essi_lab.model.index.jaxb.BoundingBox;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.RankingStrategy;
 import eu.essi_lab.model.resource.ResourceProperty;
@@ -260,7 +262,7 @@ public class OpenSearchQueryBuilder {
 	String value = bond.getPropertyValue();
 	String name = property.getName();
 	ContentType contentType = property.getContentType();
-	
+
 	BondOperator operator = bond.getOperator();
 
 	if (operator == BondOperator.EXISTS) {
@@ -324,7 +326,7 @@ public class OpenSearchQueryBuilder {
 	    return buildIsGDCQuery(value);
 
 	default:
-	    
+
 	    if (contentType == ContentType.ISO8601_DATE || contentType == ContentType.ISO8601_DATE_TIME) {
 
 		value = ConversionUtils.parseToLongString(value);
@@ -419,24 +421,61 @@ public class OpenSearchQueryBuilder {
     }
 
     @SuppressWarnings("incomplete-switch")
-    public static Query buildGeoShapeQuery(SpatialBond bond) {
+    public Query buildGeoShapeQuery(SpatialBond bond) {
 
 	JSONObject shape = buildEnvelope(bond);
 
 	org.opensearch.client.opensearch._types.query_dsl.GeoShapeFieldQuery.Builder shapeBuilder = new GeoShapeFieldQuery.Builder().//
 		shape(JsonData.of(shape.toMap()));
 
+	Query weightedQuery = null;
+
+	SpatialExtent extent = (SpatialExtent) bond.getPropertyValue();
+
+	double w = extent.getWest();
+	double e = extent.getEast();
+
+	String north = String.valueOf(extent.getNorth());
+	String south = String.valueOf(extent.getSouth());
+	String east = String.valueOf(e);
+	String west = String.valueOf(w);
+
+	double area = SpatialIndexHelper.computeArea(//
+		Double.valueOf(west), //
+		Double.valueOf(east), //
+		Double.valueOf(south), //
+		Double.valueOf(north));
+
 	BondOperator operator = bond.getOperator();
 	switch (operator) {
 	case BBOX:
 	case INTERSECTS:
+
 	    shapeBuilder = shapeBuilder.relation(GeoShapeRelation.Intersects);
+
 	    break;
+
 	case CONTAINED:
+
 	    shapeBuilder = shapeBuilder.relation(GeoShapeRelation.Contains);
+
+	    weightedQuery = buildContainedWeightQuery(area, 500);
+
 	    break;
+
 	case CONTAINS:
+
 	    shapeBuilder = shapeBuilder.relation(GeoShapeRelation.Within);
+
+	    List<Query> operands = new ArrayList<>();
+
+	    for (int min = 0; min <= 90; min += 10) {
+
+		operands.add(buildAreaWeightedQuery(min, area));
+	    }
+
+	    weightedQuery = buildOrBoolQuery(operands);
+
 	    break;
 	case DISJOINT:
 	    shapeBuilder = shapeBuilder.relation(GeoShapeRelation.Disjoint);
@@ -446,12 +485,14 @@ public class OpenSearchQueryBuilder {
 	    break;
 	}
 
-	return new GeoShapeQuery.Builder().//
+	Query geoShapeQuery = new GeoShapeQuery.Builder().//
 		field(MetadataElement.BOUNDING_BOX.getName()).//
 		boost(1f).//
 		shape(shapeBuilder.build()).//
 		build().//
 		toQuery();
+
+	return weightedQuery == null ? geoShapeQuery : buildAndBoolQuery(weightedQuery, geoShapeQuery);
     }
 
     /**
@@ -780,7 +821,7 @@ public class OpenSearchQueryBuilder {
      * @return
      */
     @SuppressWarnings("incomplete-switch")
-    public static Query buildRangeQuery(String field, BondOperator operator, String value, float boost) {
+    public static Query buildRangeQuery(String field, BondOperator operator, String value, double boost) {
 
 	Builder builder = new RangeQuery.Builder().//
 		field(value);
@@ -866,6 +907,138 @@ public class OpenSearchQueryBuilder {
 			build()
 
 		).collect(Collectors.toList());
+    }
+
+    /**
+     * @param operands
+     * @return
+     */
+    private Query buildAndBoolQuery(List<Query> operands) {
+    
+        return new BoolQuery.Builder().//
+        	must(operands).//
+        	build().//
+        	toQuery();
+    }
+
+    /**
+     * @param operands
+     * @return
+     */
+    private Query buildOrBoolQuery(List<Query> operands, int minimumShouldMatch) {
+    
+        return new BoolQuery.Builder().//
+        	should(operands).//
+        	minimumShouldMatch(String.valueOf(minimumShouldMatch)).//
+        	build().//
+        	toQuery();
+    }
+
+    /**
+     * @param operands
+     * @return
+     */
+    private Query buildOrBoolQuery(List<Query> operands) {
+    
+        return buildOrBoolQuery(operands, 1);
+    }
+
+    /**
+     * @param operands
+     * @return
+     */
+    private Query buildAndBoolQuery(Query... operands) {
+    
+        return buildAndBoolQuery(Arrays.asList(operands));
+    }
+
+    /**
+     * @param target
+     * @param value
+     * @return
+     */
+    private double percent(double target, int value) {
+    
+        return (target / 100) * value;
+    }
+
+    /**
+     * @param minValue
+     * @param area
+     * @return
+     */
+    private Query buildAreaWeightedQuery(int minValue, double area) {
+    
+        int maxValue = minValue + 10;
+    
+        if (minValue == 0) {
+    
+            return buildAndBoolQuery(//
+    
+        	    buildRangeQuery(BoundingBox.AREA_QUALIFIED_NAME.getLocalPart(), BondOperator.GREATER_OR_EQUAL, String.valueOf(minValue),
+        		    ranking.computeBoundingBoxWeight(area, maxValue)), //
+    
+        	    buildRangeQuery(BoundingBox.AREA_QUALIFIED_NAME.getLocalPart(), BondOperator.LESS,
+        		    String.valueOf(percent(area, maxValue)), ranking.computeBoundingBoxWeight(area, maxValue))//
+            );
+        }
+    
+        if (minValue == 90) {
+    
+            return buildAndBoolQuery(//
+    
+        	    buildRangeQuery(BoundingBox.AREA_QUALIFIED_NAME.getLocalPart(), BondOperator.GREATER_OR_EQUAL, String.valueOf(minValue),
+        		    ranking.computeBoundingBoxWeight(area, maxValue)), //
+    
+        	    buildRangeQuery(BoundingBox.AREA_QUALIFIED_NAME.getLocalPart(), BondOperator.LESS_OR_EQUAL, String.valueOf(area),
+        		    ranking.computeBoundingBoxWeight(area, maxValue))//
+            );
+        }
+    
+        return buildAndBoolQuery(//
+    
+        	buildRangeQuery(BoundingBox.AREA_QUALIFIED_NAME.getLocalPart(), BondOperator.GREATER_OR_EQUAL,
+        		String.valueOf(percent(area, minValue)), ranking.computeBoundingBoxWeight(area, maxValue)), //
+    
+        	buildRangeQuery(BoundingBox.AREA_QUALIFIED_NAME.getLocalPart(), BondOperator.LESS, String.valueOf(percent(area, maxValue)),
+        		ranking.computeBoundingBoxWeight(area, maxValue))//
+        );
+    }
+
+    /**
+     * @param area
+     * @param areaMultiplier how many times the resource area can be bigger than the target <code>area</code>
+     * @return
+     */
+    private Query buildContainedWeightQuery(double area, int areaMultiplier) {
+    
+        int maxArea = areaMultiplier * 100;
+        int steps = maxArea / 11;
+    
+        String innerQuery = "";
+    
+        int areaPercent = 1;
+    
+        ArrayList<Query> operands = new ArrayList<Query>();
+    
+        for (int weight = 0; weight <= 100; weight += 10) {
+    
+            operands.add(buildAndBoolQuery(
+    
+        	    buildRangeQuery(BoundingBox.AREA_QUALIFIED_NAME.getLocalPart(), BondOperator.GREATER_OR_EQUAL,
+        		    String.valueOf(percent(area, areaPercent)),
+    
+        		    ranking.computeBoundingBoxWeight(area, weight)),
+    
+        	    buildRangeQuery(BoundingBox.AREA_QUALIFIED_NAME.getLocalPart(), BondOperator.LESS,
+        		    String.valueOf(percent(area, areaPercent + steps)),
+    
+        		    ranking.computeBoundingBoxWeight(area, weight))));
+    
+            areaPercent += steps;
+        }
+    
+        return buildOrBoolQuery(operands);
     }
 
     /**
@@ -1043,7 +1216,7 @@ public class OpenSearchQueryBuilder {
 	list.add(buildMatchAllQuery());
 	list.add(buildGDCWeightQuery());
 	list.add(buildMDQWeightQuery());
-//	list.add(buildEVWeightQuery());
+	// list.add(buildEVWeightQuery());
 	list.add(buildAQWeightQuery());
 
 	if (!deletedIncluded) {
