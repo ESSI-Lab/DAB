@@ -1043,7 +1043,7 @@ public class OpenSearchQueryBuilder {
 	list.add(buildMatchAllQuery());
 	list.add(buildGDCWeightQuery());
 	list.add(buildMDQWeightQuery());
-	list.add(buildEVWeightQuery());
+//	list.add(buildEVWeightQuery());
 	list.add(buildAQWeightQuery());
 
 	if (!deletedIncluded) {
