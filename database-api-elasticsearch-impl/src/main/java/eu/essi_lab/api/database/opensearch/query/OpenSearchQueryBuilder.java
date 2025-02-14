@@ -175,14 +175,9 @@ public class OpenSearchQueryBuilder {
 	    return buildSourceIdQuery(bond.getPropertyValue());
 	}
 
-	return new BoolQuery.Builder().//
-		filter(//
-			buildSourceIdQuery(bond.getPropertyValue()), //
-			buildMatchPhraseQuery(MetaFolderMapping.DATA_FOLDER, dataFolder)//
+	return buildFilterQuery(buildSourceIdQuery(bond.getPropertyValue()), //
+		buildMatchPhraseQuery(MetaFolderMapping.DATA_FOLDER, dataFolder));
 
-		).//
-		build().//
-		toQuery();
     }
 
     /**
@@ -218,9 +213,7 @@ public class OpenSearchQueryBuilder {
 
 	if (query != null) {
 
-	    out = new BoolQuery.Builder().//
-		    filter(query, out).build().//
-		    toQuery();
+	    out = buildFilterQuery(query, out);
 	}
 
 	return out;
@@ -395,14 +388,10 @@ public class OpenSearchQueryBuilder {
      */
     public Query buildSubjectQuery(String value, BondOperator operator) {
 
-	BoolQuery boolQuery = new BoolQuery.Builder().//
-		should(buildMetadataElementQuery(MetadataElement.KEYWORD, operator, value), //
-			buildMetadataElementQuery(MetadataElement.TOPIC_CATEGORY, operator, value)//
-		).//
-		minimumShouldMatch("1").//
-		build();
+	return buildOrBoolQuery(//
+		buildMetadataElementQuery(MetadataElement.KEYWORD, operator, value), //
+		buildMetadataElementQuery(MetadataElement.TOPIC_CATEGORY, operator, value));
 
-	return boolQuery.toQuery();
     }
 
     /**
@@ -414,10 +403,7 @@ public class OpenSearchQueryBuilder {
 
 	Query basicQuery = buildBasicQuery(count);
 
-	return new BoolQuery.Builder().//
-		must(searchQuery, basicQuery).//
-		build().//
-		toQuery();
+	return buildAndBoolQuery(searchQuery, basicQuery);
     }
 
     @SuppressWarnings("incomplete-switch")
@@ -509,11 +495,7 @@ public class OpenSearchQueryBuilder {
 
 	list.add(buildRangeQuery(ResourceProperty.IS_GEOSS_DATA_CORE.getName(), BondOperator.EQUAL, value));
 
-	return new BoolQuery.Builder().//
-		filter(list).//
-		build().//
-		toQuery();
-
+	return buildFilterQuery(list);
     }
 
     /**
@@ -529,9 +511,8 @@ public class OpenSearchQueryBuilder {
 
 	Query indexQuery = buildIndexQuery(DataFolderMapping.get().getIndex());
 
-	return new BoolQuery.Builder().//
-		filter(sourceIdQuery, indexQuery).build().//
-		toQuery();
+	return buildFilterQuery(sourceIdQuery, indexQuery);
+
     }
 
     /**
@@ -540,12 +521,7 @@ public class OpenSearchQueryBuilder {
      */
     public static Query buildSearchRegistryQuery(String databaseId) {
 
-	BoolQuery boolQuery = new BoolQuery.Builder().//
-		filter(buildDatabaseIdQuery(databaseId), //
-			buildRegistyIndexQuery())
-		.build();
-
-	return boolQuery.toQuery();
+	return buildFilterQuery(buildDatabaseIdQuery(databaseId), buildRegistyIndexQuery());
     }
 
     /**
@@ -565,6 +541,9 @@ public class OpenSearchQueryBuilder {
 		build();
 
 	return boolQuery.toQuery();
+
+	// return buildFilterQuery(buildDatabaseIdQuery(folder.getDatabase().getIdentifier()),
+	// buildFolderNameQuery(folder));
     }
 
     /**
@@ -577,17 +556,12 @@ public class OpenSearchQueryBuilder {
 	ArrayList<Query> idsQueries = new ArrayList<Query>();
 	sourceIds.forEach(id -> idsQueries.add(buildSourceIdQuery(id)));
 
-	Query query = new BoolQuery.Builder().should(idsQueries).minimumShouldMatch("1").build().toQuery();
-
-	BoolQuery boolQuery = new BoolQuery.Builder().//
-		filter(buildDatabaseIdQuery(databaseId), //
-			buildExistsFieldQuery(MetaFolderMapping.DATA_FOLDER), //
-			buildIndexQuery(MetaFolderMapping.get().getIndex()), //
-			query)
-		.//
-		build();
-
-	return boolQuery.toQuery();
+	return buildFilterQuery(//
+		buildDatabaseIdQuery(databaseId), //
+		buildExistsFieldQuery(MetaFolderMapping.DATA_FOLDER), //
+		buildIndexQuery(MetaFolderMapping.get().getIndex()), //
+		buildOrBoolQuery(idsQueries)//
+	);
     }
 
     /**
@@ -733,14 +707,8 @@ public class OpenSearchQueryBuilder {
      * @return
      */
     public static Query buildSearchQuery(String databaseId, String index) {
-
-	BoolQuery boolQuery = new BoolQuery.Builder().//
-		filter(buildDatabaseIdQuery(databaseId), //
-			buildIndexQuery(index)//
-		).//
-		build();
-
-	return boolQuery.toQuery();
+	
+	return buildFilterQuery(buildDatabaseIdQuery(databaseId), buildIndexQuery(index));
     }
 
     /**
@@ -752,11 +720,8 @@ public class OpenSearchQueryBuilder {
      */
     public static Query buildSearchQuery(String databaseId) {
 
-	BoolQuery boolQuery = new BoolQuery.Builder().//
-		filter(buildDatabaseIdQuery(databaseId)).//
-		build();
+	return buildFilterQuery(buildDatabaseIdQuery(databaseId));
 
-	return boolQuery.toQuery();
     }
 
     //
@@ -913,43 +878,82 @@ public class OpenSearchQueryBuilder {
      * @param operands
      * @return
      */
-    private Query buildAndBoolQuery(List<Query> operands) {
-    
-        return new BoolQuery.Builder().//
-        	must(operands).//
-        	build().//
-        	toQuery();
+    private static Query buildFilterQuery(List<Query> operands) {
+
+	return new BoolQuery.Builder().//
+		filter(operands).//
+		build().//
+		toQuery();
     }
 
     /**
      * @param operands
      * @return
      */
-    private Query buildOrBoolQuery(List<Query> operands, int minimumShouldMatch) {
-    
-        return new BoolQuery.Builder().//
-        	should(operands).//
-        	minimumShouldMatch(String.valueOf(minimumShouldMatch)).//
-        	build().//
-        	toQuery();
+    private static Query buildFilterQuery(Query... operands) {
+
+	return buildFilterQuery(Arrays.asList(operands));
     }
 
     /**
      * @param operands
      * @return
      */
-    private Query buildOrBoolQuery(List<Query> operands) {
-    
-        return buildOrBoolQuery(operands, 1);
+    private static Query buildAndBoolQuery(List<Query> operands) {
+
+	return new BoolQuery.Builder().//
+		must(operands).//
+		build().//
+		toQuery();
     }
 
     /**
      * @param operands
      * @return
      */
-    private Query buildAndBoolQuery(Query... operands) {
-    
-        return buildAndBoolQuery(Arrays.asList(operands));
+    private static Query buildOrBoolQuery(List<Query> operands, int minimumShouldMatch) {
+
+	return new BoolQuery.Builder().//
+		should(operands).//
+		minimumShouldMatch(String.valueOf(minimumShouldMatch)).//
+		build().//
+		toQuery();
+    }
+
+    /**
+     * @param operands
+     * @return
+     */
+    private static Query buildOrBoolQuery(List<Query> operands) {
+
+	return buildOrBoolQuery(operands, 1);
+    }
+
+    /**
+     * @param operands
+     * @return
+     */
+    private static Query buildOrBoolQuery(int minimumShouldMatch, Query... operands) {
+
+	return buildOrBoolQuery(Arrays.asList(operands), minimumShouldMatch);
+    }
+
+    /**
+     * @param operands
+     * @return
+     */
+    private static Query buildOrBoolQuery(Query... operands) {
+
+	return buildOrBoolQuery(Arrays.asList(operands), 1);
+    }
+
+    /**
+     * @param operands
+     * @return
+     */
+    private static Query buildAndBoolQuery(Query... operands) {
+
+	return buildAndBoolQuery(Arrays.asList(operands));
     }
 
     /**
@@ -958,8 +962,8 @@ public class OpenSearchQueryBuilder {
      * @return
      */
     private double percent(double target, int value) {
-    
-        return (target / 100) * value;
+
+	return (target / 100) * value;
     }
 
     /**
@@ -968,41 +972,41 @@ public class OpenSearchQueryBuilder {
      * @return
      */
     private Query buildAreaWeightedQuery(int minValue, double area) {
-    
-        int maxValue = minValue + 10;
-    
-        if (minValue == 0) {
-    
-            return buildAndBoolQuery(//
-    
-        	    buildRangeQuery(BoundingBox.AREA_QUALIFIED_NAME.getLocalPart(), BondOperator.GREATER_OR_EQUAL, String.valueOf(minValue),
-        		    ranking.computeBoundingBoxWeight(area, maxValue)), //
-    
-        	    buildRangeQuery(BoundingBox.AREA_QUALIFIED_NAME.getLocalPart(), BondOperator.LESS,
-        		    String.valueOf(percent(area, maxValue)), ranking.computeBoundingBoxWeight(area, maxValue))//
-            );
-        }
-    
-        if (minValue == 90) {
-    
-            return buildAndBoolQuery(//
-    
-        	    buildRangeQuery(BoundingBox.AREA_QUALIFIED_NAME.getLocalPart(), BondOperator.GREATER_OR_EQUAL, String.valueOf(minValue),
-        		    ranking.computeBoundingBoxWeight(area, maxValue)), //
-    
-        	    buildRangeQuery(BoundingBox.AREA_QUALIFIED_NAME.getLocalPart(), BondOperator.LESS_OR_EQUAL, String.valueOf(area),
-        		    ranking.computeBoundingBoxWeight(area, maxValue))//
-            );
-        }
-    
-        return buildAndBoolQuery(//
-    
-        	buildRangeQuery(BoundingBox.AREA_QUALIFIED_NAME.getLocalPart(), BondOperator.GREATER_OR_EQUAL,
-        		String.valueOf(percent(area, minValue)), ranking.computeBoundingBoxWeight(area, maxValue)), //
-    
-        	buildRangeQuery(BoundingBox.AREA_QUALIFIED_NAME.getLocalPart(), BondOperator.LESS, String.valueOf(percent(area, maxValue)),
-        		ranking.computeBoundingBoxWeight(area, maxValue))//
-        );
+
+	int maxValue = minValue + 10;
+
+	if (minValue == 0) {
+
+	    return buildAndBoolQuery(//
+
+		    buildRangeQuery(BoundingBox.AREA_QUALIFIED_NAME.getLocalPart(), BondOperator.GREATER_OR_EQUAL, String.valueOf(minValue),
+			    ranking.computeBoundingBoxWeight(area, maxValue)), //
+
+		    buildRangeQuery(BoundingBox.AREA_QUALIFIED_NAME.getLocalPart(), BondOperator.LESS,
+			    String.valueOf(percent(area, maxValue)), ranking.computeBoundingBoxWeight(area, maxValue))//
+	    );
+	}
+
+	if (minValue == 90) {
+
+	    return buildAndBoolQuery(//
+
+		    buildRangeQuery(BoundingBox.AREA_QUALIFIED_NAME.getLocalPart(), BondOperator.GREATER_OR_EQUAL, String.valueOf(minValue),
+			    ranking.computeBoundingBoxWeight(area, maxValue)), //
+
+		    buildRangeQuery(BoundingBox.AREA_QUALIFIED_NAME.getLocalPart(), BondOperator.LESS_OR_EQUAL, String.valueOf(area),
+			    ranking.computeBoundingBoxWeight(area, maxValue))//
+	    );
+	}
+
+	return buildAndBoolQuery(//
+
+		buildRangeQuery(BoundingBox.AREA_QUALIFIED_NAME.getLocalPart(), BondOperator.GREATER_OR_EQUAL,
+			String.valueOf(percent(area, minValue)), ranking.computeBoundingBoxWeight(area, maxValue)), //
+
+		buildRangeQuery(BoundingBox.AREA_QUALIFIED_NAME.getLocalPart(), BondOperator.LESS, String.valueOf(percent(area, maxValue)),
+			ranking.computeBoundingBoxWeight(area, maxValue))//
+	);
     }
 
     /**
@@ -1011,34 +1015,34 @@ public class OpenSearchQueryBuilder {
      * @return
      */
     private Query buildContainedWeightQuery(double area, int areaMultiplier) {
-    
-        int maxArea = areaMultiplier * 100;
-        int steps = maxArea / 11;
-    
-        String innerQuery = "";
-    
-        int areaPercent = 1;
-    
-        ArrayList<Query> operands = new ArrayList<Query>();
-    
-        for (int weight = 0; weight <= 100; weight += 10) {
-    
-            operands.add(buildAndBoolQuery(
-    
-        	    buildRangeQuery(BoundingBox.AREA_QUALIFIED_NAME.getLocalPart(), BondOperator.GREATER_OR_EQUAL,
-        		    String.valueOf(percent(area, areaPercent)),
-    
-        		    ranking.computeBoundingBoxWeight(area, weight)),
-    
-        	    buildRangeQuery(BoundingBox.AREA_QUALIFIED_NAME.getLocalPart(), BondOperator.LESS,
-        		    String.valueOf(percent(area, areaPercent + steps)),
-    
-        		    ranking.computeBoundingBoxWeight(area, weight))));
-    
-            areaPercent += steps;
-        }
-    
-        return buildOrBoolQuery(operands);
+
+	int maxArea = areaMultiplier * 100;
+	int steps = maxArea / 11;
+
+	String innerQuery = "";
+
+	int areaPercent = 1;
+
+	ArrayList<Query> operands = new ArrayList<Query>();
+
+	for (int weight = 0; weight <= 100; weight += 10) {
+
+	    operands.add(buildAndBoolQuery(
+
+		    buildRangeQuery(BoundingBox.AREA_QUALIFIED_NAME.getLocalPart(), BondOperator.GREATER_OR_EQUAL,
+			    String.valueOf(percent(area, areaPercent)),
+
+			    ranking.computeBoundingBoxWeight(area, weight)),
+
+		    buildRangeQuery(BoundingBox.AREA_QUALIFIED_NAME.getLocalPart(), BondOperator.LESS,
+			    String.valueOf(percent(area, areaPercent + steps)),
+
+			    ranking.computeBoundingBoxWeight(area, weight))));
+
+	    areaPercent += steps;
+	}
+
+	return buildOrBoolQuery(operands);
     }
 
     /**
