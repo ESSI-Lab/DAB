@@ -140,7 +140,7 @@ public class OpenSearchBondHandler implements DiscoveryBondHandler {
     @Override
     public void spatialBond(SpatialBond bond) {
 
-	queryBuilder.append(OpenSearchQueryBuilder.buildGeoShapeQuery(bond));
+	queryBuilder.append(queryBuilder.buildGeoShapeQuery(bond));
     }
 
     @Override
