@@ -305,6 +305,10 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 		remoteDescriptor.fillMissingInformationOf(targetDescriptor);
 	    }
 	    CRS validatedCRS = remoteDescriptor.getCRS();
+	    if(validatedCRS == null) {
+		validatedCRS = CRS.EPSG_4326();
+		remoteDescriptor.setCRS(validatedCRS);
+	    }
 	    String validatedCRSIdentifier = validatedCRS.getIdentifier();
 	    if (validatedCRSIdentifier == null || validatedCRSIdentifier.isEmpty()) {
 		// the CRS identifier is set from the original CRS identifier, in case where the validator didn't
