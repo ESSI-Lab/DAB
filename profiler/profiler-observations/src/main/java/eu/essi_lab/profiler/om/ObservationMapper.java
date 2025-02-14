@@ -227,7 +227,7 @@ public class ObservationMapper {
 	// timeseries.setFeatureOfInterest(uniquePlatformCode, platformName);
 
 	observation.addParameter("source", source.getLabel());
-	
+
 	observation.addParameter("observedPropertyDefinition", parser.getAttributeDescription());
 
 	observation.setFeatureOfInterest(platform);
@@ -332,9 +332,12 @@ public class ObservationMapper {
 		observation.setUOM(parser.unitsAbbreviation);
 	    } else {
 		String u = parser.unitsAbbreviation;
-		if (u != null && (u.contains("°C") || u.contains("ºC"))) {
-		    u = u.replace("°C", "K").replace("ºC", "K");
+		if (u != null && (u.contains("°C") || u.contains("ºC") || u.contains("Kelvin"))) {
+		    u = u.replace("°C", "K").replace("ºC", "K").replace("Kelvin", "K");
 		    ;
+		}
+		if (u != null && (u.contains("percent"))) {
+		    u = u.replace("percent", "%");
 		}
 		parser.unitsAbbreviation = u;
 		observation.setUOM(u);
@@ -344,9 +347,11 @@ public class ObservationMapper {
 		observation.setUOM(parser.units);
 	    } else {
 		String u = parser.units;
-		if (u != null && (u.contains("°C") || u.contains("ºC"))) {
-		    u = u.replace("°C", "K").replace("ºC", "K");
-		    ;
+		if (u != null && (u.contains("°C") || u.contains("ºC") || u.contains("Kelvin"))) {
+		    u = u.replace("°C", "K").replace("ºC", "K").replace("Kelvin", "K");
+		}
+		if (u != null && (u.contains("percent"))) {
+		    u = u.replace("percent", "%");
 		}
 		parser.units = u;
 		observation.setUOM(u);
