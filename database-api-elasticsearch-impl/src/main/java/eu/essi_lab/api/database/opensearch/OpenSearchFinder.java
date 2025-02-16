@@ -271,7 +271,7 @@ public class OpenSearchFinder implements DatabaseFinder {
      * @throws GSException
      * @throws Exception
      */
-    private HashMap<String, String> getSourceDataFolderMap(RequestMessage message) throws GSException {
+    private HashMap<String, String> getSourcesDataMap(RequestMessage message) throws GSException {
 
 	HashMap<String, String> out = new HashMap<>();
 
@@ -284,7 +284,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	if (debugQueries) {
 
-	    GSLoggerFactory.getLogger(getClass()).debug("--- GET SOURCES DATA FOLDER MAP ---");
+	    GSLoggerFactory.getLogger(getClass()).debug("--- GET SOURCES DATA MAP ---");
 	    GSLoggerFactory.getLogger(getClass()).debug("\n\n{}\n\n", ConversionUtils.toJSONObject(query).toString(3));
 	}
 
@@ -295,7 +295,8 @@ public class OpenSearchFinder implements DatabaseFinder {
 		    query, //
 		    Arrays.asList(MetaFolderMapping.SOURCE_ID, MetaFolderMapping.DATA_FOLDER), //
 		    0, //
-		    ids.size());//
+		    ids.size(), //
+		    true);// requesting cache
 
 	    response.//
 		    hits().//
@@ -318,6 +319,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 	    //
 	    // this is to avoid retrieval of resources belonging to a source that is
 	    // referenced in the query, but that is currently executing its first harvesting
+	    // or that is not yet been harvested
 	    //
 	    if (out.get(id) == null) {
 
@@ -355,7 +357,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 		message.getRequestId(), //
 		Optional.ofNullable(message.getWebRequest()));
 
-	HashMap<String, String> map = getSourceDataFolderMap(message);
+	HashMap<String, String> map = getSourcesDataMap(message);
 
 	pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
 

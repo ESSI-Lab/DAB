@@ -222,22 +222,34 @@ public class OpenSearchWrapper {
      * @param fields
      * @param start
      * @param size
+     * @param requestCache
      * @return
      * @throws Exception
      */
-    public SearchResponse<Object> search(String index, Query searchQuery, List<String> fields, int start, int size)
+    public SearchResponse<Object> search(//
+	    String index, //
+	    Query searchQuery, //
+	    List<String> fields, //
+	    int start, //
+	    int size, //
+	    boolean requestCache)
 
 	    throws Exception {
 
 	SearchResponse<Object> response = client.search(builder -> {
 
 	    builder.query(searchQuery).//
-
 		    index(index).//
 		    from(start).//
-		    size(size).source(src -> src.filter(new SourceFilter.Builder().includes(fields).//
+		    size(size).//
+		    source(src -> src.filter(new SourceFilter.Builder().includes(fields).//
 			    build()));
 
+	    if(requestCache) {
+		
+		builder.requestCache(true);
+	    }
+	    
 	    return builder;
 
 	}, Object.class);
@@ -245,7 +257,25 @@ public class OpenSearchWrapper {
 	// pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
 
 	return response;
+    }
 
+    /**
+     * @param index
+     * @param searchQuery
+     * @param fields
+     * @param start
+     * @param size
+     * @return
+     * @throws Exception
+     */
+    public SearchResponse<Object> search(//
+	    String index,//
+	    Query searchQuery,//
+	    List<String> fields,//
+	    int start,//
+	    int size) throws Exception{
+
+	return search(index, searchQuery, fields, start, size, false);
     }
 
     /**
