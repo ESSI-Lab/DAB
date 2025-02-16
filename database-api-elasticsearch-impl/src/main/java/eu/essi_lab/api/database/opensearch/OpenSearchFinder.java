@@ -49,6 +49,8 @@ import eu.essi_lab.lib.utils.StreamUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.PerformanceLogger;
 import eu.essi_lab.messages.RequestMessage;
+import eu.essi_lab.messages.ResourceSelector;
+import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
 import eu.essi_lab.messages.bond.parser.IdentifierBondHandler;
@@ -94,7 +96,8 @@ public class OpenSearchFinder implements DatabaseFinder {
     public DiscoveryCountResponse count(DiscoveryMessage message) throws GSException {
 
 	try {
-	    debugQueries = true;
+	    //debugQueries = true;
+
 	    SearchResponse<Object> searchResponse = search_(message, true);
 
 	    Map<String, Aggregate> aggregations = searchResponse.aggregations();
@@ -154,9 +157,14 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 		Query query = builQuery(message, false);
 
-		resources = wrapper.findDistinctSources(//
+		resources = wrapper.aggregateWithNestedAgg(//
+
 			query, //
-			message.getDistinctValuesElement().get(), message.getPage().getSize()).//
+
+			message.getDistinctValuesElement().get(), //
+
+			message.getPage().getSize()).//
+
 			stream().//
 			map(s -> ConversionUtils.toGSResource(s).orElse(null)).//
 			filter(Objects::nonNull).//

@@ -26,6 +26,7 @@ package eu.essi_lab.api.database.opensearch;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +36,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.json.JSONObject;
+import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.ErrorCause;
 import org.opensearch.client.opensearch._types.ErrorResponse;
@@ -42,11 +44,15 @@ import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch._types.Result;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
 import org.opensearch.client.opensearch._types.aggregations.Aggregation;
+import org.opensearch.client.opensearch._types.aggregations.Buckets;
 import org.opensearch.client.opensearch._types.aggregations.CardinalityAggregation;
 import org.opensearch.client.opensearch._types.aggregations.MaxAggregation;
 import org.opensearch.client.opensearch._types.aggregations.MinAggregation;
 import org.opensearch.client.opensearch._types.aggregations.StringTermsAggregate;
+import org.opensearch.client.opensearch._types.aggregations.StringTermsBucket;
 import org.opensearch.client.opensearch._types.aggregations.TermsAggregation;
+import org.opensearch.client.opensearch._types.aggregations.TopHitsAggregate;
+import org.opensearch.client.opensearch._types.aggregations.TopHitsAggregation;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch.core.CountRequest;
 import org.opensearch.client.opensearch.core.DeleteByQueryRequest;
@@ -60,6 +66,7 @@ import org.opensearch.client.opensearch.core.IndexRequest;
 import org.opensearch.client.opensearch.core.IndexResponse;
 import org.opensearch.client.opensearch.core.MsearchRequest;
 import org.opensearch.client.opensearch.core.MsearchResponse;
+import org.opensearch.client.opensearch.core.SearchRequest;
 import org.opensearch.client.opensearch.core.SearchResponse;
 import org.opensearch.client.opensearch.core.msearch.MultiSearchResponseItem;
 import org.opensearch.client.opensearch.core.msearch.RequestItem;
@@ -193,9 +200,78 @@ public class OpenSearchWrapper {
      * @return
      * @throws Exception
      */
-    public List<JSONObject> findDistinctSources(Query searchQuery, Queryable target, int size) throws Exception {
+    @SuppressWarnings("serial")
+    public List<JSONObject> aggregateWithNestedAgg(Query searchQuery, Queryable target, int size) throws Exception {
 
-	List<String> distValues = findDistinctValues(searchQuery, target, size);
+	String topHitsAggName = "top_hits_agg";
+	String termsAggName = "terms_agg";
+
+	Map<String, Aggregation> map = new HashMap<>();
+
+	Aggregation topHitsAgg = new Aggregation.Builder().// takes the first result
+		topHits(new TopHitsAggregation.Builder().size(1).build()).build();
+
+	Aggregation termsAgg = new Aggregation.Builder().terms(//
+		new TermsAggregation.Builder().//
+			field(DataFolderMapping.toKeywordField(target.getName())).//
+			size(size).//
+			build())
+		.//
+		aggregations(new HashMap<>() {
+		    {
+			put(topHitsAggName, topHitsAgg);
+		    }
+		}).build();
+
+	map.put(termsAggName, termsAgg);
+
+	SearchRequest searchRequest = new SearchRequest.Builder().//
+		index(DataFolderMapping.get().getIndex()).//
+		size(0).//
+		aggregations(map).//
+		build();
+
+	SearchResponse<Object> response = client.search(searchRequest, Object.class);
+
+	Map<String, Aggregate> aggregations = response.aggregations();
+	Aggregate termsAggregate = aggregations.get(termsAggName);
+
+	StringTermsAggregate sterms = termsAggregate.sterms();
+
+	Buckets<StringTermsBucket> buckets = sterms.buckets();
+
+	List<StringTermsBucket> array = buckets.array();
+
+	ArrayList<JSONObject> out = new ArrayList<>();
+
+	for (StringTermsBucket stringTermsBucket : array) {
+
+	    Map<String, Aggregate> topHits = stringTermsBucket.aggregations();
+
+	    Aggregate aggregate = topHits.get(topHitsAggName);
+	    TopHitsAggregate topHitsAggregate = aggregate.topHits();
+
+	    HitsMetadata<JsonData> hits = topHitsAggregate.hits();
+	    Hit<JsonData> hit = hits.hits().get(0);
+
+	    JsonData source = hit.source();
+	    JSONObject jsonObject = new JSONObject(source.toString());
+	    out.add(jsonObject);
+	}
+
+	return out;
+    }
+
+    /**
+     * @param searchQuery
+     * @param target
+     * @param size
+     * @return
+     * @throws Exception
+     */
+    public List<JSONObject> aggregateWithMultiSerch(Query searchQuery, Queryable target, int size) throws Exception {
+
+	List<String> distValues = findDistinctValues(searchQuery, target, 1000);
 
 	List<RequestItem> items = OpenSearchQueryBuilder.buildDistinctValuesItems(distValues, target);
 
@@ -214,6 +290,7 @@ public class OpenSearchWrapper {
 		stream().//
 		map(r -> ConversionUtils.toJSONObject(r.result().hits().hits().get(0).source())).//
 		collect(Collectors.toList());
+
     }
 
     /**
@@ -245,11 +322,11 @@ public class OpenSearchWrapper {
 		    source(src -> src.filter(new SourceFilter.Builder().includes(fields).//
 			    build()));
 
-	    if(requestCache) {
-		
+	    if (requestCache) {
+
 		builder.requestCache(true);
 	    }
-	    
+
 	    return builder;
 
 	}, Object.class);
@@ -269,11 +346,11 @@ public class OpenSearchWrapper {
      * @throws Exception
      */
     public SearchResponse<Object> search(//
-	    String index,//
-	    Query searchQuery,//
-	    List<String> fields,//
-	    int start,//
-	    int size) throws Exception{
+	    String index, //
+	    Query searchQuery, //
+	    List<String> fields, //
+	    int start, //
+	    int size) throws Exception {
 
 	return search(index, searchQuery, fields, start, size, false);
     }
