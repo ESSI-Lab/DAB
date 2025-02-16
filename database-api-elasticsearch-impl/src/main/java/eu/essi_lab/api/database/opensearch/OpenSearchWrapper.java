@@ -218,26 +218,7 @@ public class OpenSearchWrapper {
 	Builder topHitsBuilder = new TopHitsAggregation.Builder().//
 		size(1);
 
-	if (!queryables.isEmpty()) {
-
-	    List<String> toInclude = queryables.stream().map(q -> q.getName()).collect(Collectors.toList());
-
-	    topHitsBuilder.source(src -> src.filter(new SourceFilter.Builder().includes(toInclude).//
-		    build()));
-
-	} else {
-
-	    //
-	    // if no fields are specified, excludes all the *_keyword fields since they are
-	    // not used to decorate the GSResources by the ResourceDecorator
-	    //
-
-	    List<String> toExclude = get_keywordsFields(ResourceProperty.listQueryables());
-	    toExclude.addAll(get_keywordsFields(MetadataElement.listQueryables()));
-
-	    topHitsBuilder.source(src -> src.filter(new SourceFilter.Builder().excludes(toExclude).//
-		    build()));
-	}
+	handleSourceFields(topHitsBuilder, null, queryables.stream().map(q -> q.getName()).collect(Collectors.toList()));
 
 	Aggregation topHitsAgg = new Aggregation.Builder().// takes the first result
 
@@ -361,23 +342,7 @@ public class OpenSearchWrapper {
 		builder.size(size);
 	    }
 
-	    if (!fields.isEmpty()) {
-
-		builder.source(src -> src.filter(new SourceFilter.Builder().includes(fields).//
-			build()));
-	    } else {
-		//
-		// if no fields are specified, excludes all the *_keyword fields since they are
-		// not used to decorate the datasets by the ResourceDecorator.
-		// this exclusion has effect only if the target of the query are GSResources
-		//
-
-		List<String> toExclud = get_keywordsFields(ResourceProperty.listQueryables());
-		toExclud.addAll(get_keywordsFields(MetadataElement.listQueryables()));
-
-		builder.source(src -> src.filter(new SourceFilter.Builder().excludes(toExclud).//
-			build()));
-	    }
+	    handleSourceFields(null, builder, fields);
 
 	    if (requestCache) {
 
@@ -715,6 +680,50 @@ public class OpenSearchWrapper {
     }
 
     /**
+     * @param topHitsBuilder
+     * @param searchBuilder
+     * @param fields
+     */
+    private void handleSourceFields(//
+	    org.opensearch.client.opensearch._types.aggregations.TopHitsAggregation.Builder topHitsBuilder, //
+	    org.opensearch.client.opensearch.core.SearchRequest.Builder searchBuilder, //
+	    List<String> fields) {
+
+	if (!fields.isEmpty()) {
+
+	    if (topHitsBuilder != null) {
+
+		topHitsBuilder.source(src -> src.filter(new SourceFilter.Builder().includes(fields).//
+			build()));
+
+	    } else {
+
+		searchBuilder.source(src -> src.filter(new SourceFilter.Builder().includes(fields).//
+			build()));
+	    }
+	} else {
+
+	    //
+	    // if no fields are specified, excludes all the *_keyword fields since they are
+	    // not used to decorate the datasets by the ResourceDecorator.
+	    // this exclusion has effect only if the target of the query are GSResources
+	    //
+	    List<String> toExclude = get_keywordsFields(ResourceProperty.listQueryables());
+	    toExclude.addAll(get_keywordsFields(MetadataElement.listQueryables()));
+
+	    if (topHitsBuilder != null) {
+
+		topHitsBuilder.source(src -> src.filter(new SourceFilter.Builder().excludes(toExclude).//
+			build()));
+	    } else {
+
+		searchBuilder.source(src -> src.filter(new SourceFilter.Builder().excludes(toExclude).//
+			build()));
+	    }
+	}
+    }
+
+    /**
      * @param list
      * @return
      */
@@ -764,36 +773,6 @@ public class OpenSearchWrapper {
 		stream().//
 		map(b -> b.key()).//
 		collect(Collectors.toList());
-    }
-
-    /**
-     * @param searchQuery
-     * @param key
-     * @return
-     * @throws Exception
-     */
-    private Optional<JSONObject> searchSource(Query searchQuery, String key) throws Exception {
-
-	SearchResponse<Object> searchResponse = client.search(s -> {
-	    s.query(searchQuery);
-	    return s;
-
-	}, Object.class);
-
-	HitsMetadata<Object> hits = searchResponse.hits();
-	if (hits.total().value() == 0) {
-
-	    return Optional.empty();
-	}
-
-	List<Hit<Object>> hitsList = hits.hits();
-	Hit<Object> hit = hitsList.get(0);
-
-	JSONObject source = ConversionUtils.toJSONObject(hit.source());
-
-	decorateSource(source, hit.index(), hit.id());
-
-	return Optional.of(source);
     }
 
     /**
