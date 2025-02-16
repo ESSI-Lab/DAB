@@ -40,7 +40,7 @@ import eu.essi_lab.model.resource.ResourceProperty;
  * 
  * @author Fabrizio
  */
-public class ResourceSelector implements Serializable{
+public class ResourceSelector implements Serializable {
 
     /**
      * 
@@ -224,7 +224,7 @@ public class ResourceSelector implements Serializable{
 	 * no metadata selected by default
 	 */
 	NONE
-	
+
     }
 
     private List<Queryable> quaryableList;
@@ -356,6 +356,14 @@ public class ResourceSelector implements Serializable{
     public List<String> getIndexes() {
 
 	return quaryableList.stream().map(q -> q.getName()).collect(Collectors.toList());
+    }
+
+    /**
+     * Returns the list of selected indexes queryables
+     */
+    public List<Queryable> getIndexesQueryables() {
+
+	return quaryableList;
     }
 
     /**
