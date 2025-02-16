@@ -314,5 +314,13 @@ public enum ResourceProperty implements Queryable {
 
 	return Arrays.asList(values());
     }
+    
+    /**
+     * @return
+     */
+    public static List<Queryable> listQueryables() {
+
+	return Arrays.asList(values());
+    }
 
 }
