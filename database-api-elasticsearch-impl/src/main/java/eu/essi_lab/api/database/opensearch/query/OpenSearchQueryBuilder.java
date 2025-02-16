@@ -857,16 +857,16 @@ public class OpenSearchQueryBuilder {
 	org.opensearch.client.opensearch._types.query_dsl.BoolQuery.Builder builder = new BoolQuery.Builder();
 
 	if (!filter.isEmpty()) {
-	    builder = builder.filter(filter);
+	    builder.filter(filter);
 	}
 
 	if (!should.isEmpty()) {
-	    builder = builder.should(should);
-	    builder = builder.minimumShouldMatch("1");
+	    builder.should(should);
+	    builder.minimumShouldMatch("1");
 	}
 
 	if (!must.isEmpty()) {
-	    builder = builder.must(must);
+	    builder.must(must);
 	}
 
 	return builder.build().toQuery();
