@@ -53,6 +53,7 @@ import org.opensearch.client.opensearch._types.aggregations.StringTermsBucket;
 import org.opensearch.client.opensearch._types.aggregations.TermsAggregation;
 import org.opensearch.client.opensearch._types.aggregations.TopHitsAggregate;
 import org.opensearch.client.opensearch._types.aggregations.TopHitsAggregation;
+import org.opensearch.client.opensearch._types.aggregations.TopHitsAggregation.Builder;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch.core.CountRequest;
 import org.opensearch.client.opensearch.core.DeleteByQueryRequest;
@@ -80,10 +81,12 @@ import org.opensearch.client.opensearch.generic.Response;
 
 import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
-import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.model.Queryable;
+import eu.essi_lab.model.Queryable.ContentType;
+import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.ResourceProperty;
 
 /**
  * @author Fabrizio
@@ -201,15 +204,47 @@ public class OpenSearchWrapper {
      * @throws Exception
      */
     @SuppressWarnings("serial")
-    public List<JSONObject> aggregateWithNestedAgg(Query searchQuery, Queryable target, int size) throws Exception {
+    public List<JSONObject> aggregateWithNestedAgg(//
+	    Query searchQuery, //
+	    List<Queryable> queryables, //
+	    Queryable target, //
+	    int size) throws Exception {
 
 	String topHitsAggName = "top_hits_agg";
 	String termsAggName = "terms_agg";
 
 	Map<String, Aggregation> map = new HashMap<>();
 
+	Builder topHitsBuilder = new TopHitsAggregation.Builder().//
+		size(1);
+
+	if (!queryables.isEmpty()) {
+
+	    List<String> toInclude = queryables.stream().map(q -> q.getName()).collect(Collectors.toList());
+
+	    topHitsBuilder.source(src -> src.filter(new SourceFilter.Builder().includes(toInclude).//
+		    build()));
+
+	} else {
+
+	    //
+	    // if no fields are specified, excludes all the *_keyword fields since they are
+	    // not used to decorate the GSResources by the ResourceDecorator
+	    //
+
+	    List<String> toExclude = get_keywordsFields(ResourceProperty.listQueryables());
+	    toExclude.addAll(get_keywordsFields(MetadataElement.listQueryables()));
+
+	    topHitsBuilder.source(src -> src.filter(new SourceFilter.Builder().excludes(toExclude).//
+		    build()));
+	}
+
 	Aggregation topHitsAgg = new Aggregation.Builder().// takes the first result
-		topHits(new TopHitsAggregation.Builder().size(1).build()).build();
+
+		topHits(new TopHitsAggregation.Builder().//
+			size(1).//
+			build())
+		.build();
 
 	Aggregation termsAgg = new Aggregation.Builder().terms(//
 		new TermsAggregation.Builder().//
@@ -318,9 +353,31 @@ public class OpenSearchWrapper {
 	    builder.query(searchQuery).//
 		    index(index).//
 		    from(start).//
-		    size(size).//
 		    source(src -> src.filter(new SourceFilter.Builder().includes(fields).//
 			    build()));
+
+	    if (size > 0) {
+
+		builder.size(size);
+	    }
+
+	    if (!fields.isEmpty()) {
+
+		builder.source(src -> src.filter(new SourceFilter.Builder().includes(fields).//
+			build()));
+	    } else {
+		//
+		// if no fields are specified, excludes all the *_keyword fields since they are
+		// not used to decorate the datasets by the ResourceDecorator.
+		// this exclusion has effect only if the target of the query are GSResources
+		//
+
+		List<String> toExclud = get_keywordsFields(ResourceProperty.listQueryables());
+		toExclud.addAll(get_keywordsFields(MetadataElement.listQueryables()));
+
+		builder.source(src -> src.filter(new SourceFilter.Builder().excludes(toExclud).//
+			build()));
+	    }
 
 	    if (requestCache) {
 
@@ -358,17 +415,6 @@ public class OpenSearchWrapper {
     /**
      * @param index
      * @param searchQuery
-     * @return
-     * @throws Exception
-     */
-    public SearchResponse<Object> search(String index, Query searchQuery) throws Exception {
-
-	return search(index, searchQuery, 0, 10);
-    }
-
-    /**
-     * @param index
-     * @param searchQuery
      * @param properties
      * @param start
      * @param size
@@ -378,25 +424,7 @@ public class OpenSearchWrapper {
      */
     public SearchResponse<Object> search(String index, Query searchQuery, int start, int size) throws Exception {
 
-	// PerformanceLogger pl = new PerformanceLogger(//
-	// PerformanceLogger.PerformancePhase.OPENSEARCH_WRAPPER_SEARCH, //
-	// UUID.randomUUID().toString(), //
-	// Optional.empty());
-
-	SearchResponse<Object> response = client.search(builder -> {
-
-	    builder.query(searchQuery).//
-		    index(index).//
-		    from(start).//
-		    size(size);
-
-	    return builder;
-
-	}, Object.class);
-
-	// pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
-
-	return response;
+	return search(index, searchQuery, Arrays.asList(), start, size, false);
     }
 
     /**
@@ -409,14 +437,12 @@ public class OpenSearchWrapper {
      */
     public List<InputStream> searchBinaries(String index, Query searchQuery, int start, int size) throws Exception {
 
-	SearchResponse<Object> searchResponse = search(index, searchQuery, start, size);
+	SearchResponse<Object> searchResponse = search(index, searchQuery, Arrays.asList(), start, size, false);
 
 	return ConversionUtils.toBinaryList(searchResponse);
     }
 
     /**
-     * Retrieves first 10 entries
-     * 
      * @param searchQuery
      * @param key
      * @return
@@ -424,7 +450,7 @@ public class OpenSearchWrapper {
      */
     public List<InputStream> searchBinaries(String index, Query searchQuery) throws Exception {
 
-	return searchBinaries(index, searchQuery, 0, 10);
+	return searchBinaries(index, searchQuery, 0, -1);
     }
 
     /**
@@ -437,7 +463,7 @@ public class OpenSearchWrapper {
      */
     public List<JSONObject> searchSources(String index, Query searchQuery, int start, int size) throws Exception {
 
-	SearchResponse<Object> response = search(index, searchQuery, start, size);
+	SearchResponse<Object> response = search(index, searchQuery, Arrays.asList(), start, size, false);
 
 	return ConversionUtils.toJSONSourcesList(response);
     }
@@ -450,7 +476,7 @@ public class OpenSearchWrapper {
      */
     public List<JSONObject> searchSources(String index, Query searchQuery) throws Exception {
 
-	SearchResponse<Object> response = search(index, searchQuery, 0, 10);
+	SearchResponse<Object> response = search(index, searchQuery, Arrays.asList(), 0, -1, false);
 
 	return ConversionUtils.toJSONSourcesList(response);
     }
@@ -459,12 +485,11 @@ public class OpenSearchWrapper {
      * @param searchQuery
      * @param field
      * @return
-     * @throws OpenSearchException
-     * @throws IOException
+     * @throws Exception
      */
-    public List<String> searchField(String index, Query searchQuery, String field) throws OpenSearchException, IOException {
+    public List<String> searchField(String index, Query searchQuery, String field) throws Exception {
 
-	return searchField(index, searchQuery, field, 0, 10);
+	return searchField(index, searchQuery, field, 0, -1);
     }
 
     /**
@@ -473,30 +498,16 @@ public class OpenSearchWrapper {
      * @param start
      * @param size
      * @return
-     * @throws OpenSearchException
-     * @throws IOException
+     * @throws Exception
      */
-    public List<String> searchField(String index, Query searchQuery, String field, int start, int size)
-	    throws OpenSearchException, IOException {
+    public List<String> searchField(//
+	    String index, //
+	    Query searchQuery, //
+	    String field, //
+	    int start, //
+	    int size) throws Exception {
 
-	SearchResponse<Object> response = client.search(builder -> {
-
-	    List<String> indexes = Arrays.asList(index);
-	    if (index.equals(IndexMapping.ALL_INDEXES)) {
-
-		indexes = IndexMapping.getIndexes();
-	    }
-
-	    builder.query(searchQuery).//
-		    index(indexes).//
-		    from(start).//
-		    size(size).// includes only the given property
-		    source(src -> src.filter(new SourceFilter.Builder().includes(field).//
-			    build()));
-
-	    return builder;
-
-	}, Object.class);
+	SearchResponse<Object> response = search(index, searchQuery, Arrays.asList(field), start, size, false);
 
 	HitsMetadata<Object> hits = response.hits();
 	List<Hit<Object>> hitsList = hits.hits();
@@ -701,6 +712,19 @@ public class OpenSearchWrapper {
     public void synch() throws OpenSearchException, IOException {
 
 	client.indices().refresh();
+    }
+
+    /**
+     * @param list
+     * @return
+     */
+    private List<String> get_keywordsFields(List<Queryable> list) {
+
+	return list.stream().//
+		filter(rp -> rp.getContentType() == ContentType.TEXTUAL).//
+		map(rp -> DataFolderMapping.toKeywordField(rp.getName())).//
+		collect(Collectors.toList());
+
     }
 
     /**

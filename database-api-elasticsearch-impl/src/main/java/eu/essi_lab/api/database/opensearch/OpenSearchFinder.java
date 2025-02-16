@@ -96,7 +96,7 @@ public class OpenSearchFinder implements DatabaseFinder {
     public DiscoveryCountResponse count(DiscoveryMessage message) throws GSException {
 
 	try {
-	    //debugQueries = true;
+	    // debugQueries = true;
 
 	    SearchResponse<Object> searchResponse = search_(message, true);
 
@@ -157,12 +157,13 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 		Query query = builQuery(message, false);
 
+		List<Queryable> queryables = message.getResourceSelector().getIndexesQueryables();
+
 		resources = wrapper.aggregateWithNestedAgg(//
 
 			query, //
-
+			queryables, //
 			message.getDistinctValuesElement().get(), //
-
 			message.getPage().getSize()).//
 
 			stream().//
