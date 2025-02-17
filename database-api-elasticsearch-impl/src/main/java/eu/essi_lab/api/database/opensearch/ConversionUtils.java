@@ -485,6 +485,22 @@ public class ConversionUtils {
     }
 
     /**
+     * @param document
+     * @return
+     * @throws TransformerException
+     */
+    public static String toString(Document document) throws TransformerException {
+    
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+    
+        StringWriter stringWriter = new StringWriter();
+        transformer.transform(new DOMSource(document), new StreamResult(stringWriter));
+    
+        return stringWriter.toString();
+    }
+
+    /**
      * @param dateTime
      * @return
      */
@@ -585,21 +601,5 @@ public class ConversionUtils {
 		collect(Collectors.toList());
 
 	return list;
-    }
-
-    /**
-     * @param document
-     * @return
-     * @throws TransformerException
-     */
-    private static String toString(Document document) throws TransformerException {
-
-	TransformerFactory transformerFactory = TransformerFactory.newInstance();
-	Transformer transformer = transformerFactory.newTransformer();
-
-	StringWriter stringWriter = new StringWriter();
-	transformer.transform(new DOMSource(document), new StreamResult(stringWriter));
-
-	return stringWriter.toString();
     }
 }
