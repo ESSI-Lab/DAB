@@ -112,10 +112,9 @@ public class FolderRegistry {
 
     /**
      * @return
-     * @throws OpenSearchException
-     * @throws IOException
+     * @throws Exception 
      */
-    public List<OpenSearchFolder> getRegisteredFolders() throws OpenSearchException, IOException {
+    public List<OpenSearchFolder> getRegisteredFolders() throws Exception {
 
 	Query query = OpenSearchQueryBuilder.buildSearchQuery(database.getIdentifier());
 

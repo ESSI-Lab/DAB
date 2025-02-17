@@ -67,7 +67,7 @@ public class ServletListener implements ServletContextListener {
 	Chronometer chronometer = new Chronometer();
 	chronometer.start();
 
-	GSLoggerFactory.getLogger(ServletListener.class).info("GI-suite initialization STARTED");
+	GSLoggerFactory.getLogger(ServletListener.class).info("DAB initialization STARTED");
 
 	try {
 
@@ -75,15 +75,15 @@ public class ServletListener implements ServletContextListener {
 
 	} catch (GSException e) {
 
-	    GSLoggerFactory.getLogger(ServletListener.class).error("Error starting GI-suite");
+	    GSLoggerFactory.getLogger(ServletListener.class).error("Error starting DAB");
 
 	    e.log();
 
 	    System.exit(1);
 	}
 
-	GSLoggerFactory.getLogger(ServletListener.class).info("GI-suite  initialization ENDED");
-	GSLoggerFactory.getLogger(ServletListener.class).info("GI-suite  initialization time: {}", chronometer.formatElapsedTime());
+	GSLoggerFactory.getLogger(ServletListener.class).info("DAB initialization ENDED");
+	GSLoggerFactory.getLogger(ServletListener.class).info("DAB initialization time: {}", chronometer.formatElapsedTime());
     }
 
     public void contextDestroyed(ServletContextEvent sce) {

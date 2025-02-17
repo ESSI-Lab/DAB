@@ -388,7 +388,7 @@ public class OpenSearchQueryBuilder {
      */
     public Query buildSubjectQuery(String value, BondOperator operator) {
 
-	return buildOrBoolQuery(//
+	return buildShouldQuery(//
 		buildMetadataElementQuery(MetadataElement.KEYWORD, operator, value), //
 		buildMetadataElementQuery(MetadataElement.TOPIC_CATEGORY, operator, value));
 
@@ -403,7 +403,7 @@ public class OpenSearchQueryBuilder {
 
 	Query basicQuery = buildBasicQuery(count);
 
-	return buildAndBoolQuery(searchQuery, basicQuery);
+	return buildMustQuery(searchQuery, basicQuery);
     }
 
     @SuppressWarnings("incomplete-switch")
@@ -460,7 +460,7 @@ public class OpenSearchQueryBuilder {
 		operands.add(buildAreaWeightedQuery(min, area));
 	    }
 
-	    weightedQuery = buildOrBoolQuery(operands);
+	    weightedQuery = buildShouldQuery(operands);
 
 	    break;
 	case DISJOINT:
@@ -478,7 +478,7 @@ public class OpenSearchQueryBuilder {
 		build().//
 		toQuery();
 
-	return weightedQuery == null ? geoShapeQuery : buildAndBoolQuery(weightedQuery, geoShapeQuery);
+	return weightedQuery == null ? geoShapeQuery : buildMustQuery(weightedQuery, geoShapeQuery);
     }
 
     /**
@@ -530,20 +530,10 @@ public class OpenSearchQueryBuilder {
      */
     public static Query buildSearchEntriesQuery(OpenSearchFolder folder) {
 
-	BoolQuery boolQuery = new BoolQuery.Builder().//
-
-		filter(buildDatabaseIdQuery(folder.getDatabase().getIdentifier()), //
-			buildFolderNameQuery(folder))
-		.//
-
-		should(buildIndexesQueryList()).//
-		minimumShouldMatch("1").//
-		build();
-
-	return boolQuery.toQuery();
-
-	// return buildFilterQuery(buildDatabaseIdQuery(folder.getDatabase().getIdentifier()),
-	// buildFolderNameQuery(folder));
+	return buildBoolQuery(//
+		Arrays.asList(buildDatabaseIdQuery(folder.getDatabase().getIdentifier()), //
+			buildFolderNameQuery(folder)), //
+		buildIndexesQueryList(), Arrays.asList());
     }
 
     /**
@@ -560,7 +550,7 @@ public class OpenSearchQueryBuilder {
 		buildDatabaseIdQuery(databaseId), //
 		buildExistsFieldQuery(MetaFolderMapping.DATA_FOLDER), //
 		buildIndexQuery(MetaFolderMapping.get().getIndex()), //
-		buildOrBoolQuery(idsQueries)//
+		buildShouldQuery(idsQueries)//
 	);
     }
 
@@ -600,12 +590,7 @@ public class OpenSearchQueryBuilder {
 
 	List<Query> shouldList = buildIndexesQueryList();
 
-	return new BoolQuery.Builder().//
-		filter(filterList).//
-		should(shouldList).//
-		minimumShouldMatch("1").//
-		build().//
-		toQuery();
+	return buildBoolQuery(filterList, shouldList, Arrays.asList());
     }
 
     /**
@@ -657,14 +642,7 @@ public class OpenSearchQueryBuilder {
 	    shouldList.add(buildMatchPhraseQuery(field, v));
 	});
 
-	BoolQuery boolQuery = new BoolQuery.Builder().//
-
-		filter(buildDatabaseIdQuery(databaseId)).//
-		should(shouldList).//
-		minimumShouldMatch("1").//
-		build();
-
-	return boolQuery.toQuery();
+	return buildBoolQuery(Arrays.asList(buildDatabaseIdQuery(databaseId)), shouldList, Arrays.asList());
     }
 
     /**
@@ -686,16 +664,10 @@ public class OpenSearchQueryBuilder {
 	    shouldList.add(buildMatchPhraseQuery(field, v));
 	});
 
-	BoolQuery boolQuery = new BoolQuery.Builder().//
-
-		filter(buildDatabaseIdQuery(databaseId), //
-			buildIndexQuery(index))
-		.//
-		should(shouldList).//
-		minimumShouldMatch("1").//
-		build();
-
-	return boolQuery.toQuery();
+	return buildBoolQuery(//
+		Arrays.asList(buildDatabaseIdQuery(databaseId), buildIndexQuery(index)), //
+		shouldList, //
+		Arrays.asList());
     }
 
     /**
@@ -707,7 +679,7 @@ public class OpenSearchQueryBuilder {
      * @return
      */
     public static Query buildSearchQuery(String databaseId, String index) {
-	
+
 	return buildFilterQuery(buildDatabaseIdQuery(databaseId), buildIndexQuery(index));
     }
 
@@ -875,6 +847,32 @@ public class OpenSearchQueryBuilder {
     }
 
     /**
+     * @param filter
+     * @param should
+     * @param must
+     * @return
+     */
+    private static Query buildBoolQuery(List<Query> filter, List<Query> should, List<Query> must) {
+
+	org.opensearch.client.opensearch._types.query_dsl.BoolQuery.Builder builder = new BoolQuery.Builder();
+
+	if (!filter.isEmpty()) {
+	    builder.filter(filter);
+	}
+
+	if (!should.isEmpty()) {
+	    builder.should(should);
+	    builder.minimumShouldMatch("1");
+	}
+
+	if (!must.isEmpty()) {
+	    builder.must(must);
+	}
+
+	return builder.build().toQuery();
+    }
+
+    /**
      * @param operands
      * @return
      */
@@ -899,7 +897,7 @@ public class OpenSearchQueryBuilder {
      * @param operands
      * @return
      */
-    private static Query buildAndBoolQuery(List<Query> operands) {
+    private static Query buildMustQuery(List<Query> operands) {
 
 	return new BoolQuery.Builder().//
 		must(operands).//
@@ -911,7 +909,7 @@ public class OpenSearchQueryBuilder {
      * @param operands
      * @return
      */
-    private static Query buildOrBoolQuery(List<Query> operands, int minimumShouldMatch) {
+    private static Query buildShouldQuery(List<Query> operands, int minimumShouldMatch) {
 
 	return new BoolQuery.Builder().//
 		should(operands).//
@@ -924,36 +922,36 @@ public class OpenSearchQueryBuilder {
      * @param operands
      * @return
      */
-    private static Query buildOrBoolQuery(List<Query> operands) {
+    private static Query buildShouldQuery(List<Query> operands) {
 
-	return buildOrBoolQuery(operands, 1);
+	return buildShouldQuery(operands, 1);
     }
 
     /**
      * @param operands
      * @return
      */
-    private static Query buildOrBoolQuery(int minimumShouldMatch, Query... operands) {
+    private static Query buildShouldQuery(int minimumShouldMatch, Query... operands) {
 
-	return buildOrBoolQuery(Arrays.asList(operands), minimumShouldMatch);
+	return buildShouldQuery(Arrays.asList(operands), minimumShouldMatch);
     }
 
     /**
      * @param operands
      * @return
      */
-    private static Query buildOrBoolQuery(Query... operands) {
+    private static Query buildShouldQuery(Query... operands) {
 
-	return buildOrBoolQuery(Arrays.asList(operands), 1);
+	return buildShouldQuery(Arrays.asList(operands), 1);
     }
 
     /**
      * @param operands
      * @return
      */
-    private static Query buildAndBoolQuery(Query... operands) {
+    private static Query buildMustQuery(Query... operands) {
 
-	return buildAndBoolQuery(Arrays.asList(operands));
+	return buildMustQuery(Arrays.asList(operands));
     }
 
     /**
@@ -977,7 +975,7 @@ public class OpenSearchQueryBuilder {
 
 	if (minValue == 0) {
 
-	    return buildAndBoolQuery(//
+	    return buildMustQuery(//
 
 		    buildRangeQuery(BoundingBox.AREA_QUALIFIED_NAME.getLocalPart(), BondOperator.GREATER_OR_EQUAL, String.valueOf(minValue),
 			    ranking.computeBoundingBoxWeight(area, maxValue)), //
@@ -989,7 +987,7 @@ public class OpenSearchQueryBuilder {
 
 	if (minValue == 90) {
 
-	    return buildAndBoolQuery(//
+	    return buildMustQuery(//
 
 		    buildRangeQuery(BoundingBox.AREA_QUALIFIED_NAME.getLocalPart(), BondOperator.GREATER_OR_EQUAL, String.valueOf(minValue),
 			    ranking.computeBoundingBoxWeight(area, maxValue)), //
@@ -999,7 +997,7 @@ public class OpenSearchQueryBuilder {
 	    );
 	}
 
-	return buildAndBoolQuery(//
+	return buildMustQuery(//
 
 		buildRangeQuery(BoundingBox.AREA_QUALIFIED_NAME.getLocalPart(), BondOperator.GREATER_OR_EQUAL,
 			String.valueOf(percent(area, minValue)), ranking.computeBoundingBoxWeight(area, maxValue)), //
@@ -1027,7 +1025,7 @@ public class OpenSearchQueryBuilder {
 
 	for (int weight = 0; weight <= 100; weight += 10) {
 
-	    operands.add(buildAndBoolQuery(
+	    operands.add(buildMustQuery(
 
 		    buildRangeQuery(BoundingBox.AREA_QUALIFIED_NAME.getLocalPart(), BondOperator.GREATER_OR_EQUAL,
 			    String.valueOf(percent(area, areaPercent)),
@@ -1042,7 +1040,7 @@ public class OpenSearchQueryBuilder {
 	    areaPercent += steps;
 	}
 
-	return buildOrBoolQuery(operands);
+	return buildShouldQuery(operands);
     }
 
     /**
@@ -1228,11 +1226,7 @@ public class OpenSearchQueryBuilder {
 	    list.add(buildDeletedExcludedQuery());
 	}
 
-	return new BoolQuery.Builder().//
-		should(list).//
-		minimumShouldMatch("1").//
-		build().//
-		toQuery();
+	return buildShouldQuery(list);
     }
 
     /**
