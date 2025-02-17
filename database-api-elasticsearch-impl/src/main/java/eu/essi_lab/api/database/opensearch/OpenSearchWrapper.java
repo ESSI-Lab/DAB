@@ -638,36 +638,20 @@ public class OpenSearchWrapper {
     }
 
     /**
-     * @param index
-     * @return
-     * @throws OpenSearchException
-     * @throws IOException
-     */
-    public int count(String index) throws OpenSearchException, IOException {
-
-	CountRequest countRequest = new CountRequest.Builder().//
-		index(index).build();
-
-	return (int) client.count(countRequest).count();
-    }
-
-    /**
      * @param searchQuery
      * @return
      * @throws IOException
      * @throws OpenSearchException
      */
-    public int count(Query searchQuery) throws OpenSearchException, IOException {
+    public int count(String index, Query searchQuery) throws OpenSearchException, IOException {
 
-	SearchResponse<Object> searchResponse = client.search(builder -> {
-	    builder.query(searchQuery).//
-		    trackTotalHits(new TrackHits.Builder().enabled(true).build());
-	    return builder;
+	CountRequest countRequest = new CountRequest.Builder().//
+		query(searchQuery).//
+		index(index).//
+		build();
 
-	}, Object.class);
+	return (int) client.count(countRequest).count();
 
-	HitsMetadata<Object> hits = searchResponse.hits();
-	return (int) hits.total().value();
     }
 
     /**
