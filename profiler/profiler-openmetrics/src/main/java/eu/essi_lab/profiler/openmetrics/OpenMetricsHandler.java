@@ -62,7 +62,7 @@ public class OpenMetricsHandler extends StreamingRequestHandler {
     static {
 
 	interestingViews.add("his-central");
-	interestingViews.add("whos");
+//	interestingViews.add("whos");
 
 	ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 	Runnable task = new Runnable() {
