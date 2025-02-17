@@ -165,10 +165,12 @@ public class OpenSearchFolder implements DatabaseFolder {
     @Override
     public String[] listKeys() throws Exception {
 
-	Query searchQuery = OpenSearchQueryBuilder.buildSearchEntriesQuery(this);
+	String index = IndexData.detectIndex(this);
+
+	Query searchQuery = OpenSearchQueryBuilder.buildFolderEntriesQuery(this);
 
 	return wrapper.searchField(//
-		IndexMapping.ALL_INDEXES, //
+		index, //
 		searchQuery, //
 		IndexData.ENTRY_NAME).//
 		toArray(new String[] {});
@@ -180,10 +182,12 @@ public class OpenSearchFolder implements DatabaseFolder {
      */
     public List<String> listIds() throws Exception {
 
-	Query searchQuery = OpenSearchQueryBuilder.buildSearchEntriesQuery(this);
+	String index = IndexData.detectIndex(this);
+
+	Query searchQuery = OpenSearchQueryBuilder.buildFolderEntriesQuery(this);
 
 	return wrapper.searchField(//
-		IndexMapping.ALL_INDEXES, //
+		index, //
 		searchQuery, //
 		IndexData.ENTRY_ID);//
 
@@ -191,9 +195,12 @@ public class OpenSearchFolder implements DatabaseFolder {
 
     @Override
     public int size() throws Exception {
+	
+	String index = IndexData.detectIndex(this);
 
-	Query query = OpenSearchQueryBuilder.buildSearchEntriesQuery(this);
-	return (int) wrapper.count(query);
+	Query query = OpenSearchQueryBuilder.buildFolderEntriesQuery(this);
+	
+	return (int) wrapper.count(index, query);
     }
 
     @Override
@@ -201,7 +208,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 
 	String index = IndexData.detectIndex(this);
 
-	Query query = OpenSearchQueryBuilder.buildSearchEntriesQuery(this);
+	Query query = OpenSearchQueryBuilder.buildFolderEntriesQuery(this);
 
 	DeleteByQueryRequest queryRequest = wrapper.buildDeleteByQueryRequest(index, query);
 

@@ -148,7 +148,7 @@ public class MarkLogicReader implements DatabaseReader {
 		//
 		// privateId is not indexed in prod env
 		//
-		DatabaseFolder[] folders = markLogicDB.getDataFolders();
+		List<DatabaseFolder> folders = markLogicDB.getDataFolders();
 		for (DatabaseFolder folder : folders) {
 
 		    Node node = folder.get(identifier);

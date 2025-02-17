@@ -176,7 +176,7 @@ public interface DatabaseFolder {
 
 	String name = folderName;
 	name = name.replace(databaseId + "_", "");
-	name = name.replace(SourceStorageWorker.META_PREFIX, "");
+	name = name.replace(SourceStorageWorker.META_POSTFIX, "");
 	name = name.replace(SourceStorageWorker.DATA_1_POSTFIX, "");
 	name = name.replace(SourceStorageWorker.DATA_2_POSTFIX, "");
 

@@ -83,7 +83,7 @@ import eu.essi_lab.model.resource.ResourceProperty;
  */
 public class SourceStorageWorker {
 
-    public static final String META_PREFIX = "-meta";
+    public static final String META_POSTFIX = "-meta";
     public static final String DATA_1_SHORT_POSTFIX = "data-1";
     public static final String DATA_2_SHORT_POSTFIX = "data-2";
     public static final String DATA_2_POSTFIX = "-data-2";
@@ -258,10 +258,10 @@ public class SourceStorageWorker {
      */
     public static String retrieveSourceName(String suiteId, String folderName) {
 
-	if (folderName.endsWith(SourceStorageWorker.META_PREFIX)) {
+	if (folderName.endsWith(SourceStorageWorker.META_POSTFIX)) {
 
 	    folderName = folderName.replace(suiteId + "_", "");
-	    folderName = folderName.replace(META_PREFIX, "");
+	    folderName = folderName.replace(META_POSTFIX, "");
 
 	    return folderName;
 	}
@@ -1465,7 +1465,7 @@ public class SourceStorageWorker {
      */
     private void addMetaFolder() throws GSException {
 
-	database.addFolder(sourceId + META_PREFIX);
+	database.addFolder(sourceId + META_POSTFIX);
     }
 
     /**
@@ -1474,7 +1474,7 @@ public class SourceStorageWorker {
      */
     private DatabaseFolder getMetaFolder() throws GSException {
 
-	return database.getFolder(sourceId + META_PREFIX);
+	return database.getFolder(sourceId + META_POSTFIX);
     }
 
     /**
@@ -1482,7 +1482,7 @@ public class SourceStorageWorker {
      */
     private String getMetaFolderName() {
 
-	return sourceId + META_PREFIX;
+	return sourceId + META_POSTFIX;
     }
 
     /**

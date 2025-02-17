@@ -594,7 +594,7 @@ public class MultipleFoldersRemoveAndClearTest extends OpenSearchTest {
 	    String sourceId, //
 	    int entriesCount) throws Exception {
 
-	String folderName = sourceId + SourceStorageWorker.META_PREFIX;//
+	String folderName = sourceId + SourceStorageWorker.META_POSTFIX;//
 
 	OpenSearchFolder folder = new OpenSearchFolder(database, folderName);
 
