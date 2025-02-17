@@ -208,7 +208,7 @@ public class OpenSearchWrapper {
     @SuppressWarnings("serial")
     public List<JSONObject> aggregateWithNestedAgg(//
 	    Query searchQuery, //
-	    List<Queryable> queryables, //
+	    List<Queryable> sourceFields, //
 	    Queryable target, //
 	    int size) throws Exception {
 
@@ -220,7 +220,7 @@ public class OpenSearchWrapper {
 	Builder topHitsBuilder = new TopHitsAggregation.Builder().//
 		size(1);
 
-	handleSourceFields(topHitsBuilder, null, queryables.stream().map(q -> q.getName()).collect(Collectors.toList()));
+	handleSourceFields(topHitsBuilder, null, sourceFields.stream().map(q -> q.getName()).collect(Collectors.toList()));
 
 	Aggregation topHitsAgg = new Aggregation.Builder().// takes the first result
 
