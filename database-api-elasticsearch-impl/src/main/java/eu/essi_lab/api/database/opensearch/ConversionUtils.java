@@ -28,12 +28,14 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TimeZone;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -64,7 +66,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
-import eu.essi_lab.api.database.opensearch.index.IndexData;
+import eu.essi_lab.api.database.opensearch.index.ResourceDecorator;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -416,7 +418,7 @@ public class ConversionUtils {
 	    InputStream stream = toStream(source);
 	    GSResource res = GSResource.create(stream);
 
-	    return Optional.of(IndexData.decorate(source, res));
+	    return Optional.of(ResourceDecorator.get().decorate(source, res));
 
 	} catch (Exception ex) {
 
@@ -486,22 +488,46 @@ public class ConversionUtils {
      * @param dateTime
      * @return
      */
+    @SuppressWarnings("deprecation")
     public static Optional<Long> parseToLong(String dateTime) {
 
 	dateTime = dateTime.replace("/", "-");
 
-	Optional<Date> date = ISO8601DateTimeUtils.parseISO8601ToDate(dateTime);
-	if (date.isEmpty()) {
+	Optional<Date> date = Optional.empty();
+
+	if (dateTime.length() == "yyyy".length()) {
+
+	    date = parseYYYToDate(dateTime);
+
+	} else if (dateTime.length() == "yyyyMMddHHmm".length()) {
+
+	    date = ISO8601DateTimeUtils.parseNotStandard2ToDate(dateTime);
+
+	} else if (dateTime.length() == "yyyyMMdd".length()) {
 
 	    date = ISO8601DateTimeUtils.parseNotStandardToDate(dateTime);
 
-	    if (date.isEmpty()) {
+	} else if (dateTime.length() == "yyyy-MM-ddTHH:mm:ss.SSSZ".length() || //
+		dateTime.length() == "yyyy-MM-ddTHH:mm:ssZ".length() || //
+		dateTime.length() == "yyyy-MM-ddTHH:mm:ss.SSS".length() || //
+		dateTime.length() == "yyyy-MM-ddTHH:mm:ss".length()//
+	) {
 
-		date = ISO8601DateTimeUtils.parseNotStandard2ToDate(dateTime);
-	    }
+	    date = ISO8601DateTimeUtils.parseISO8601ToDate(dateTime);
 	}
 
-	return date.map(d -> d.getTime());
+	if (!date.isEmpty()) {
+
+	    int year = date.get().getYear();
+	    if (year > 9999) {
+
+		return Optional.empty();
+	    }
+
+	    return date.map(d -> d.getTime());
+	}
+
+	return Optional.empty();
     }
 
     /**
@@ -517,6 +543,27 @@ public class ConversionUtils {
 	}
 
 	throw new IllegalArgumentException("Unparsable date/date time value: " + dateTime);
+    }
+
+    /**
+     * @param dateTimeString
+     * @return
+     */
+    private static Optional<Date> parseYYYToDate(String dateTimeString) {
+
+	try {
+	    SimpleDateFormat dateFormat = new SimpleDateFormat(ISO8601DateTimeUtils.ISO_WITH_MILLIS);
+	    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+	    Date date = dateFormat.parse(dateTimeString + "-01-01T00:00:00Z");
+
+	    return Optional.of(date);
+
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(ISO8601DateTimeUtils.class).warn("Unparsable Date: {}", dateTimeString);
+	}
+
+	return Optional.empty();
     }
 
     /**

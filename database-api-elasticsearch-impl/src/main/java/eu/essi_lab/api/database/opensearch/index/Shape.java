@@ -29,6 +29,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.json.JSONObject;
+import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -140,7 +141,7 @@ public class Shape {
 		}
 	    }
 
-	} catch (ParseException e) {
+	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
@@ -199,7 +200,7 @@ public class Shape {
 	    try {
 
 		Geometry geometry = READER.read(shape);
-		
+
 		if (geometry.isValid()) {
 
 		    double area = geometry.getArea();
@@ -208,7 +209,7 @@ public class Shape {
 		    Point c = geometry.getCentroid();
 		    double x = c.getX();
 		    double y = c.getY();
-		    
+
 		    objectBox.put(CENTROID, "POINT (" + x + " " + y + ")");
 
 		    objectBox.put(SHAPE, shape);
@@ -216,7 +217,7 @@ public class Shape {
 		    empty = false;
 		}
 
-	    } catch (ParseException e) {
+	    } catch (Exception e) {
 
 		GSLoggerFactory.getLogger(getClass()).error(e);
 
@@ -256,6 +257,38 @@ public class Shape {
     }
 
     /**
+     * @param p1
+     * @param p2
+     * @param p3
+     * @return
+     */
+    private static boolean areCollinear(Coordinate p1, Coordinate p2, Coordinate p3) {
+
+	double determinant = p1.x * (p2.y - p3.y) + //
+		p2.x * (p3.y - p1.y) + //
+		p3.x * (p1.y - p2.y);
+
+	return determinant == 0;
+    }
+
+    /**
+     * @param coordinates
+     * @return
+     */
+    private static boolean checkCollinearCoordinates(Coordinate[] coordinates) {
+
+	for (int i = 0; i < coordinates.length - 2; i++) {
+
+	    if (areCollinear(coordinates[i], coordinates[i + 1], coordinates[i + 2])) {
+
+		return true;
+	    }
+	}
+
+	return false;
+    }
+
+    /**
      * @param cardinalValues
      * @param single
      * @return
@@ -267,13 +300,13 @@ public class Shape {
 	double s = Double.parseDouble(cardinalValues.getSouth());
 	double n = Double.parseDouble(cardinalValues.getNorth());
 
-	String ws = w + " " + s;
-
 	if (e > (180 + TOL)) {
 
 	    e = e - 180;
 	    w = w - 180;
 	}
+
+	String ws = w + " " + s;
 
 	if (n <= 90 && s >= -90 && e >= -180 && e <= 180 && w <= 180 && w >= -180) {
 

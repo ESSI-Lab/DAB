@@ -1,17 +1,13 @@
 package eu.essi_lab.accessor.eurobis.ld;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-
-import com.amazonaws.util.IOUtils;
 
 /**
  * @author boldrini

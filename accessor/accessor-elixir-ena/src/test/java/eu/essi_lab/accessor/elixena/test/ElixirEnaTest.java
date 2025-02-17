@@ -11,7 +11,7 @@ import java.util.Optional;
 
 import org.junit.Test;
 
-import com.amazonaws.util.IOUtils;
+import com.github.jsonldjava.shaded.com.google.common.io.ByteStreams;
 
 import eu.essi_lab.accessor.elixena.ElixirENAConnector;
 import eu.essi_lab.lib.net.downloader.Downloader;
@@ -50,7 +50,7 @@ public class ElixirEnaTest {
 	File tmpFile = File.createTempFile("elixir-ena", ".tsv");
 	tmpFile.deleteOnExit();
 	FileOutputStream fos = new FileOutputStream(tmpFile);
-	IOUtils.copy(s, fos);
+	ByteStreams.copy(s, fos);
 	s.close();
 	String filePath = tmpFile.getAbsolutePath();
 	System.out.println(tmpFile.getAbsolutePath());

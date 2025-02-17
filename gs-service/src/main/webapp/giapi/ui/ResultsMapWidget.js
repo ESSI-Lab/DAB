@@ -750,13 +750,23 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 	 * 
 	 */
 	widget.addLayers = function(layers) {
-
+		
 		addLayers(layers);
 	};
 
 	var addLayers = function(layers) {
 
 		olMap.addLayers(layers);
+	};
+	
+	widget.removeLayers = function(layers) {
+		
+		removeLayers(layers);
+	};
+	
+	var removeLayers = function(layers) {
+
+		olMap.removeLayers(layers);
 	};
 
 	var createNoResultsOverlay = function() {

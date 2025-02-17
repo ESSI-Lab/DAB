@@ -17,6 +17,7 @@ import eu.essi_lab.api.database.opensearch.ConversionUtils;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.index.IndexData;
+import eu.essi_lab.api.database.opensearch.index.ResourceDecorator;
 import eu.essi_lab.api.database.opensearch.index.Shape;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
@@ -118,7 +119,7 @@ public class TestUtils {
 	GSResource storedDataset = GSResource.create(storedDatasetStream.clone());
 
 	// resources are stored without indexes (except the bbox), they must be added before the comparison
-	IndexData.decorate(wrapper.getSource(), storedDataset);
+	ResourceDecorator.get().decorate(wrapper.getSource(), storedDataset);
 
 	//
 	// 2) compares the stored dataset indexes with the original one indexes

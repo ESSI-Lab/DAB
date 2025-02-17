@@ -32,7 +32,9 @@ import java.net.http.HttpResponse;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -226,60 +228,50 @@ public class PolytopeIonBeamMetadataMeteoTrackerDownloader extends DataDownloade
 	    PolytopeIonBeamMetadataMeteoTrackerVariable var = PolytopeIonBeamMetadataMeteoTrackerVariable.decode(varId);
 	    String units = var.getUnit();
 	    String toMatch = var.getKey();
-	    Iterable<CSVRecord> ret = null;
+	    List<CSVRecord> ret = null;
+	    List<JSONObject> marsRes = null;
 	    File tempFile;
-	    //ret = getData(online.getLinkage());
-	    ret = getCSVData(online.getLinkage(), startString, endString, stationId);
+	    
+	    // try with mars request
+	    marsRes = getData(online.getLinkage());
 
 	    /**
 	     * METEOTRACKER USE CASE
 	     */
+	    tempFile = File.createTempFile(getClass().getSimpleName(), ".nc");
+	    tempFile.deleteOnExit();
+	    H13SingleTrajectoryWriter writer = new H13SingleTrajectoryWriter(tempFile.getAbsolutePath());
 
-	    if (ret != null) {
+	    SimpleTrajectory trajectory = new SimpleTrajectory();
+	    trajectory.setIdentifier(online.getIdentifier());
+	    trajectory.setName(online.getName());
+	    trajectory.setDescription(online.getDescription());
 
-		tempFile = File.createTempFile(getClass().getSimpleName(), ".nc");
-		tempFile.deleteOnExit();
-		H13SingleTrajectoryWriter writer = new H13SingleTrajectoryWriter(tempFile.getAbsolutePath());
+	    List<Double> lats = new ArrayList<>();
+	    List<Double> lons = new ArrayList<>();
+	    List<Double> alts = new ArrayList<>();
+	    List<Long> times = new ArrayList<>();
+	    List<Integer> temperatures = new ArrayList<>();
 
-		SimpleTrajectory trajectory = new SimpleTrajectory();
-		trajectory.setIdentifier(online.getIdentifier());
-		trajectory.setName(online.getName());
-		trajectory.setDescription(online.getDescription());
+	    boolean isTemperature = false;
 
-		List<Double> lats = new ArrayList<>();
-		List<Double> lons = new ArrayList<>();
-		List<Double> alts = new ArrayList<>();
-		List<Long> times = new ArrayList<>();
-		List<Integer> temperatures = new ArrayList<>();
+	    if (units.contains("°C") || units.contains("ºC") || units.contains("K") || units.contains("Kelvin")) {
+		units = units.replace("°C", "K").replace("ºC", "K").replace("Kelvin", "K");
+		isTemperature = true;
+	    }
 
-		boolean isTemperature = false;
+   
 
-		if (units.contains("°C") || units.contains("ºC") || units.contains("K")) {
-		    units = units.replace("°C", "K").replace("ºC", "K");
-		    isTemperature = true;
-		}
-
-		for (CSVRecord obj : ret) {
-
-		    // CASTING
-
-		    String date = obj.get("datetime");
-		    String varValue = obj.get(toMatch);
-		    Optional<Date> valueDate = simpleDateTransform(date);
-		    // Date parsed = convertToDate(date, time, minutes);
-
-		    String lat = obj.get("lat");
-		    String lon = obj.get("lon");
-		    String altitude = obj.get("altitude");
-		    BigDecimal value = new BigDecimal(varValue);
-
-		    // String time = obj.optString("time");
-		    // Date initialDateTime = ISO8601DateTimeUtils.parseISO8601(time);
-		    // // BigDecimal timeOffset = new BigDecimal(timeOffsetString);
-		    // Date observationDateTime = initialDateTime;//
-		    // PolytopeMeteoTrackerMapper.updateDateTime(initialDateTime,
-		    // // timeOffset);
-
+	    if (marsRes != null && !marsRes.isEmpty()) {
+		for (JSONObject obj : marsRes) {
+		    String time = obj.optString("datetime");
+		    Date initialDateTime = ISO8601DateTimeUtils.parseISO8601(time);
+		    // BigDecimal timeOffset = new BigDecimal(timeOffsetString);
+		    Date observationDateTime = initialDateTime;
+		    BigDecimal value = obj.optBigDecimal(toMatch, null);
+		    BigDecimal lat = obj.optBigDecimal("lat", null);
+		    BigDecimal lon = obj.optBigDecimal("lon", null);
+		    BigDecimal alt = obj.optBigDecimal("altitude", null);
 		    if (value != null) {
 			// BigDecimal dataValue = new BigDecimal(value);
 			if (isTemperature && value.compareTo(new BigDecimal("100")) < 0) {
@@ -290,49 +282,101 @@ public class PolytopeIonBeamMetadataMeteoTrackerDownloader extends DataDownloade
 			value = value.setScale(2, BigDecimal.ROUND_FLOOR);
 			int valueInteger = value.multiply(new BigDecimal(100)).intValue();
 
-//			if (combined != null) {
-//			    Optional<Date> parsed = transformDate(combined);
+			// if (combined != null) {
+			// Optional<Date> parsed = transformDate(combined);
 
-			    if (date != null && valueDate.isPresent()) {
+			if (initialDateTime != null) {
 
-				lats.add(Double.valueOf(lat));
-				lons.add(Double.valueOf(lon));
-				alts.add(Double.valueOf(altitude));
-				times.add(valueDate.get().getTime());
-				temperatures.add(valueInteger);
-			    }
+			    lats.add(lat.doubleValue());
+			    lons.add(lon.doubleValue());
+			    alts.add(alt.doubleValue());
+			    times.add(initialDateTime.getTime());
+			    temperatures.add(valueInteger);
+			}
 
-			//}
+			// }
 		    }
+
+		}
+	    } else {
+		// try with rest request
+		
+		Date[] dates = enlargeDates(startString, endString);
+		ret = getCSVData(online.getLinkage(), ISO8601DateTimeUtils.getISO8601DateTime(dates[0]), ISO8601DateTimeUtils.getISO8601DateTime(dates[0]), stationId);
+		for (CSVRecord obj : ret) {
+
+		    // CASTING
+		    String date = obj.get("datetime");
+		    String varValue = obj.get(toMatch);
+		    Optional<Date> valueDate = simpleDateTransform(date);
+		    // Date parsed = convertToDate(date, time, minutes);
+
+		    String lat = obj.get("lat");
+		    String lon = obj.get("lon");
+		    String altitude = obj.get("altitude");
+
+		    if (varValue == null || varValue.isEmpty()) {
+			continue;
+		    }
+
+		    BigDecimal value = new BigDecimal(varValue);
+
+		    // String time = obj.optString("time");
+		    // Date initialDateTime = ISO8601DateTimeUtils.parseISO8601(time);
+		    // // BigDecimal timeOffset = new BigDecimal(timeOffsetString);
+		    // Date observationDateTime = initialDateTime;//
+		    // PolytopeMeteoTrackerMapper.updateDateTime(initialDateTime,
+		    // // timeOffset);
+
+		    // BigDecimal dataValue = new BigDecimal(value);
+		    if (isTemperature && value.compareTo(new BigDecimal("100")) < 0) {
+			// from Celsius to Kelvin
+			BigDecimal kelvin = new BigDecimal("273.15");
+			value = value.add(kelvin);
+		    }
+		    value = value.setScale(2, BigDecimal.ROUND_FLOOR);
+		    int valueInteger = value.multiply(new BigDecimal(100)).intValue();
+
+		    // if (combined != null) {
+		    // Optional<Date> parsed = transformDate(combined);
+
+		    if (date != null && valueDate.isPresent()) {
+
+			lats.add(Double.valueOf(lat));
+			lons.add(Double.valueOf(lon));
+			alts.add(Double.valueOf(altitude));
+			times.add(valueDate.get().getTime());
+			temperatures.add(valueInteger);
+		    }
+
+		    // }
 		}
 
-		NetCDFVariable<Long> timeVariable = new NetCDFVariable<>("time", times, "milliseconds since 1970-01-01 00:00:00",
-			ucar.ma2.DataType.LONG);
-		NetCDFVariable<Double> latVariable = new NetCDFVariable<>("lat", lats, "degrees_north", ucar.ma2.DataType.DOUBLE);
-		NetCDFVariable<Double> lonVariable = new NetCDFVariable<>("lon", lons, "degrees_east", ucar.ma2.DataType.DOUBLE);
-		NetCDFVariable<Double> altVariable = new NetCDFVariable<>("z", alts, "m", ucar.ma2.DataType.DOUBLE);
-		NetCDFVariable<Integer> temperatureVariable = new NetCDFVariable<>(var.getLabel(), temperatures, units,
-			ucar.ma2.DataType.INT);
-		temperatureVariable.addAttribute("long_name", var.getLabel());
-		temperatureVariable.addAttribute("scale_factor", .01);
-		NetCDFVariable[] variables = new NetCDFVariable[] { temperatureVariable };
-		writer.write(trajectory, timeVariable, latVariable, lonVariable, altVariable, variables);
-
-		FeatureDataset dataset = FeatureDatasetFactoryManager.open(FeatureType.TRAJECTORY, tempFile.getAbsolutePath(), null, null);
-		List<ucar.nc2.Attribute> attributes = dataset.getDataVariables().get(0).getAttributes();
-		for (ucar.nc2.Attribute a : attributes) {
-		    GSLoggerFactory.getLogger(getClass()).info("Attribute: " + a.getShortName() + " " + a.toString());
-		}
-		dataset.close();
-		return tempFile;
 	    }
+	    NetCDFVariable<Long> timeVariable = new NetCDFVariable<>("time", times, "milliseconds since 1970-01-01 00:00:00",
+		    ucar.ma2.DataType.LONG);
+	    NetCDFVariable<Double> latVariable = new NetCDFVariable<>("lat", lats, "degrees_north", ucar.ma2.DataType.DOUBLE);
+	    NetCDFVariable<Double> lonVariable = new NetCDFVariable<>("lon", lons, "degrees_east", ucar.ma2.DataType.DOUBLE);
+	    NetCDFVariable<Double> altVariable = new NetCDFVariable<>("z", alts, "m", ucar.ma2.DataType.DOUBLE);
+	    NetCDFVariable<Integer> temperatureVariable = new NetCDFVariable<>(var.getLabel(), temperatures, units, ucar.ma2.DataType.INT);
+	    temperatureVariable.addAttribute("long_name", var.getLabel());
+	    temperatureVariable.addAttribute("scale_factor", .01);
+	    NetCDFVariable[] variables = new NetCDFVariable[] { temperatureVariable };
+	    writer.write(trajectory, timeVariable, latVariable, lonVariable, altVariable, variables);
+
+	    FeatureDataset dataset = FeatureDatasetFactoryManager.open(FeatureType.TRAJECTORY, tempFile.getAbsolutePath(), null, null);
+	    List<ucar.nc2.Attribute> attributes = dataset.getDataVariables().get(0).getAttributes();
+	    for (ucar.nc2.Attribute a : attributes) {
+		GSLoggerFactory.getLogger(getClass()).info("Attribute: " + a.getShortName() + " " + a.toString());
+	    }
+	    dataset.close();
+	    return tempFile;
 
 	} catch (Exception e) {
 
 	    ex = e;
 	}
 
-	
 	throw GSException.createException(//
 		getClass(), //
 		ex.getMessage(), //
@@ -342,12 +386,11 @@ public class PolytopeIonBeamMetadataMeteoTrackerDownloader extends DataDownloade
 		"POLYTOPE ERROR");
     }
 
-
     private Optional<Date> simpleDateTransform(String date) throws ParseException {
-
+	SimpleDateFormat inputFormat = null;
 	try {
 	    // Define a SimpleDateFormat with the combined pattern
-	    SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSXXX");
+	    inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssXXX");
 
 	    // Parse the combined string into a Date object
 	    Date d = inputFormat.parse(date);
@@ -356,11 +399,16 @@ public class PolytopeIonBeamMetadataMeteoTrackerDownloader extends DataDownloade
 
 	} catch (RuntimeException e) {
 	    GSLoggerFactory.getLogger(ISO8601DateTimeUtils.class).warn("Unparsable Date: {}", date, e);
+	    inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSXXX");
+	    Date d = inputFormat.parse(date);
+	    inputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 	}
 	return Optional.empty();
     }
 
-    private Iterable<CSVRecord> getCSVData(String linkage, String startTime, String endTime, String stationId) throws Exception {
+    private List<CSVRecord> getCSVData(String linkage, String startTime, String endTime, String stationId) throws Exception {
+
+	List<CSVRecord> ret = new ArrayList<CSVRecord>();
 
 	Iterable<CSVRecord> out = null;
 
@@ -370,93 +418,78 @@ public class PolytopeIonBeamMetadataMeteoTrackerDownloader extends DataDownloade
 
 	// Create the new parameters for the request
 	// ?format=csv&start_time=2025-01-31T00%3A00%3A00Z&end_time=2025-01-31T23%3A59%3A59Z&station_id=246ede0dd7e9d4c8
-	String updatedParameters = "format=csv&start_time=" + startTime + "&end_time=" + endTime + "&station_id=" + stationId;
+	String updatedParameters = "format=csv&platform=meteotracker&start_time=" + startTime + "&end_time=" + endTime + "&station_id="
+		+ stationId;
 	String updatedUrl = linkage.split("\\?")[0] + "?" + updatedParameters;
 
 	GSLoggerFactory.getLogger(getClass()).info("Getting " + updatedUrl);
 
-	Downloader downloader = new Downloader();
-	downloader.setRetryPolicy(20, TimeUnit.SECONDS, 2);
+	HashMap<String, String> headers = new HashMap<>();
+	headers.put("Authorization", "Bearer " + PolytopeIonBeamMetadataConnector.BEARER_TOKEN);
 
-	HttpResponse<InputStream> stationResponse = downloader.downloadResponse(//
-		updatedUrl.trim(), //
-		HttpHeaderUtils.build("Authorization", "Bearer " + PolytopeIonBeamMetadataConnector.BEARER_TOKEN));
+	Optional<String> response = downloader.downloadOptionalString(updatedUrl.trim(), HttpHeaderUtils.build(headers));
 
-	InputStream stream = stationResponse.body();
+	if (response.isPresent()) {
 
-	GSLoggerFactory.getLogger(getClass()).info("Got " + updatedUrl);
-
-	if (stream != null) {
-
-	    ClonableInputStream clone = new ClonableInputStream(stream);
-	    String response = IOStreamUtils.asUTF8String(clone.clone());
+	    String responseString = response.get();
+	    // *no data use-case
+	    if (responseString.toLowerCase().contains("no data found")) {
+		return ret;
+	    }
+	    // *multiple requests needed
+	    if (responseString.toLowerCase().contains("200 data granules")) {
+		return null;
+	    }
 	    try {
 		// delimiter seems to be ; by default
-		Reader in = new StringReader(response);
-		String d = ";";
-		char delimiter = d.charAt(0);
-		 out = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(in);
+		Reader in = new StringReader(responseString);
+		out = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(in);
+		for (CSVRecord r : out) {
+		    ret.add(r);
+		}
 
 	    } catch (Exception e) {
-		// TODO: handle exception
 		GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
-		Reader reader = new StringReader(response);
-		try {
-		    out = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(reader);
-		} catch (IOException e1) {
-		    // TODO Auto-generated catch block
-		    e1.printStackTrace();
-		    return null;
-		}
 
 	    }
 
-	    stream.close();
 	}
 
-	return out;
+	return ret;
     }
 
-    
     private List<JSONObject> getData(String linkage) throws Exception {
 
 	ArrayList<JSONObject> out = Lists.newArrayList();
 
-	if (PolytopeIonBeamMetadataConnector.BEARER_TOKEN == null) {
-	    PolytopeIonBeamMetadataConnector.BEARER_TOKEN = PolytopeIonBeamMetadataConnector.getBearerToken();
-	}
-
-	GSLoggerFactory.getLogger(getClass()).info("Getting " + linkage);
-
-	Downloader downloader = new Downloader();
-	downloader.setRetryPolicy(20, TimeUnit.SECONDS, 2);
-
-	HttpResponse<InputStream> stationResponse = downloader.downloadResponse(//
-		linkage.trim(), //
-		HttpHeaderUtils.build("Authorization", "Bearer " + PolytopeIonBeamMetadataConnector.BEARER_TOKEN));
-
-	InputStream stream = stationResponse.body();
-
-	GSLoggerFactory.getLogger(getClass()).info("Got " + linkage);
-
-	if (stream != null) {
-
-	    ClonableInputStream clone = new ClonableInputStream(stream);
-
-	    // String res = IOStreamUtils.asUTF8String(clone.clone());
-	    //
-	    // if (res.toLowerCase().contains("invalid token provided")) {
-	    // return getData(linkage);
-	    // }
-
-	    JSONArray array = new JSONArray(IOStreamUtils.asUTF8String(clone.clone()));
-
-	    for (int i = 0; i < array.length(); i++) {
-
-		JSONObject object = array.getJSONObject(i);
-		out.add(object);
+	try {
+	    if (PolytopeIonBeamMetadataConnector.BEARER_TOKEN == null) {
+		PolytopeIonBeamMetadataConnector.BEARER_TOKEN = PolytopeIonBeamMetadataConnector.getBearerToken();
 	    }
-	    stream.close();
+
+	    GSLoggerFactory.getLogger(getClass()).info("Getting " + linkage);
+
+	    HashMap<String, String> headers = new HashMap<>();
+	    headers.put("Authorization", "Bearer " + PolytopeIonBeamMetadataConnector.BEARER_TOKEN);
+
+	    Optional<String> response = downloader.downloadOptionalString(linkage.trim(), HttpHeaderUtils.build(headers));
+
+	    if (response.isPresent()) {
+
+		String responseString = response.get();
+
+		JSONArray array = new JSONArray(responseString);
+
+		for (int i = 0; i < array.length(); i++) {
+
+		    JSONObject object = array.getJSONObject(i);
+		    out.add(object);
+		}
+
+	    }
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error("Error Getting data from: " + linkage);
+	    return out;
 	}
 
 	return out;
@@ -502,5 +535,41 @@ public class PolytopeIonBeamMetadataMeteoTrackerDownloader extends DataDownloade
 
 	return DataDescriptor.TIME_DIMENSION_NAME.equalsIgnoreCase(dimensionName);
     }
+    
+    private Date[] enlargeDates(String startDate, String endDate) {
+	Date[] dateRanges = null;
+	Optional<Date> optStartDate = ISO8601DateTimeUtils.parseISO8601ToDate(startDate);
+	Optional<Date> optEndDate = ISO8601DateTimeUtils.parseISO8601ToDate(endDate);
+	
+	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+	sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+	Date newStartDate = optStartDate.get();
+	Calendar startCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        startCalendar.setTime(newStartDate);
 
+        // Set minutes, seconds, and milliseconds to zero (HH:00:00.000)
+        startCalendar.set(Calendar.MINUTE, 0);
+        startCalendar.set(Calendar.SECOND, 0);
+        startCalendar.set(Calendar.MILLISECOND, 0);
+
+        // Format the adjusted date back to string
+        Optional<Date> newOptStartDate = ISO8601DateTimeUtils.parseISO8601ToDate(sdf.format(startCalendar.getTime()));
+       
+	Date newEndDate = optEndDate.get();
+	
+	Calendar endCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        endCalendar.setTime(newEndDate);
+
+        endCalendar.add(Calendar.HOUR_OF_DAY, 1);
+        endCalendar.set(Calendar.MINUTE, 0);
+        endCalendar.set(Calendar.SECOND, 0);
+        endCalendar.set(Calendar.MILLISECOND, 0);
+	
+        Optional<Date> endOptStartDate = ISO8601DateTimeUtils.parseISO8601ToDate(sdf.format(endCalendar.getTime()));
+	
+        dateRanges = new Date[] { newOptStartDate.get(), endOptStartDate.get() };
+
+	return dateRanges;
+    }
+    
 }

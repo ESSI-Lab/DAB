@@ -21,7 +21,7 @@
 	;
 
 #selectedParameter {
-	 font-weight: bold;
+	font-weight: bold;
 }
 
 #hideMapInputControl.toggle-button {
@@ -37,19 +37,22 @@
 		no-repeat !important;
 }
 
-
 #parameterFrame {
 	width: 100%;
-    height: 95%;
-    border: none;
-    display: block; /* Prevents unwanted space around the iframe */
-    margin: 0 auto; /* Centers the iframe horizontally */
+	height: 95%;
+	border: none;
+	display: block; /* Prevents unwanted space around the iframe */
+	margin: 0 auto; /* Centers the iframe horizontally */
 }
 
 #hideMapInputControl.toggle-button-on {
 	background: white
 		url(http://api.geodab.eu/docs/assets/img/bbox-selection.png) 0px 0px
 		no-repeat !important;
+}
+
+.highlighted {
+	background-color: #0076ff;
 }
 
 #controlToggleIcon {

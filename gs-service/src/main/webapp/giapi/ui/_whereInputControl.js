@@ -1,4 +1,4 @@
-
+ 
 import { GIAPI } from '../core/GIAPI.js';
 
 GIAPI._whereInputControl = function(resultsMapWidget, options) {
@@ -17,6 +17,8 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 	var spRelId = GIAPI.random();
 	var spRelDivId = GIAPI.random();
 	var applyId = GIAPI.random();
+	
+	var shapeLayer = null;
 
 	var predefinedLayers = [];
 
@@ -365,6 +367,19 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 
 			jQuery(document).on('click', '#' + rowId, function() {
 
+				if ($('#' + rowId + ' > td').hasClass('highlighted')) {
+
+					$('#layerSelectorTable td').removeClass('highlighted');
+					if (shapeLayer!=null){
+							resultsMapWidget.removeLayers(shapeLayer);
+						}
+						shapeLayer = null;
+					return;
+				}
+				$('#layerSelectorTable td').removeClass('highlighted');
+        
+				$('#' + rowId + ' > td').addClass('highlighted');
+        
 				var title = jQuery('#' + rowId + ' > td').text();
 
 				predefinedLayers.forEach((layer) => {
@@ -392,7 +407,12 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 
 						var mapLayers = GIAPI.LayersFactory.layers(onlineArray, 'urn:ogc:serviceType:WebMapService:');
 
+						if (shapeLayer!=null){
+							resultsMapWidget.removeLayers(shapeLayer);
+						}
+
 						resultsMapWidget.addLayers(mapLayers);
+						shapeLayer = mapLayers;
 
 						//
 						// add the layer bbox
@@ -410,6 +430,13 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 
 						updateSelection();
 						fitMapToBounds();
+						jQuery('#' + westFieldId).val('');
+						jQuery('#' + southFieldId).val('');
+						jQuery('#' + eastFieldId).val('');
+						jQuery('#' + northFieldId).val('');
+
+
+						updateSelection();
 					}
 				});
 			});

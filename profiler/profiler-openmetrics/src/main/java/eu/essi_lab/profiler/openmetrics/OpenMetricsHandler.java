@@ -24,6 +24,7 @@ package eu.essi_lab.profiler.openmetrics;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Optional;
@@ -37,6 +38,7 @@ import javax.ws.rs.core.StreamingOutput;
 
 import com.google.common.base.Charsets;
 
+import eu.essi_lab.access.availability.AvailabilityMonitor;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.ValidationMessage;
@@ -58,6 +60,10 @@ public class OpenMetricsHandler extends StreamingRequestHandler {
     private static HashSet<String> interestingViews = new HashSet<String>();
 
     static {
+
+	interestingViews.add("his-central");
+	interestingViews.add("whos");
+
 	ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 	Runnable task = new Runnable() {
 
@@ -73,13 +79,14 @@ public class OpenMetricsHandler extends StreamingRequestHandler {
 			e1.printStackTrace();
 		    }
 		    HashMap<String, Stats> overallStats = sourceStats.getStatistics();
+		    HashMap<String, Integer> availability = new HashMap<String, Integer>();
 		    HashMap<String, Integer> datasets = new HashMap<String, Integer>();
 		    HashMap<String, Integer> platforms = new HashMap<String, Integer>();
 		    HashMap<String, Integer> variables = new HashMap<String, Integer>();
-		    
+
 		    HashMap<String, Double> coreMetadataCompleteness = new HashMap<String, Double>();
 		    HashMap<String, Double> fullMetadataCompleteness = new HashMap<String, Double>();
-		    	    
+		    GSLoggerFactory.getLogger(getClass()).info("source stats completed");
 		    synchronized (registries) {
 
 			PrometheusMeterRegistry registry = registries.get(view);
@@ -92,12 +99,27 @@ public class OpenMetricsHandler extends StreamingRequestHandler {
 				    .register(registry);
 			    try {
 				Stats stats = overallStats.get(source);
+
+				Date lastGoodDownload = AvailabilityMonitor.getInstance().getLastDownloadDate(source);
+				Date lastBadDownload = AvailabilityMonitor.getInstance().getLastFailedDownloadDate(source);
+				Integer downloadAvailable = 0;
+				if (lastGoodDownload != null) {
+				    if (lastBadDownload == null || lastBadDownload.before(lastGoodDownload)) {
+					downloadAvailable = 1;
+				    }
+				}
+				availability.put(source, downloadAvailable);
+				io.micrometer.core.instrument.Gauge.builder("download_availability", availability, g -> g.get(source))//
+					.description("Download availability ")//
+					.tag("source", source).//
+					register(registry);
+
 				datasets.put(source, Integer.parseInt(stats.getTimeSeriesCount()));
 				io.micrometer.core.instrument.Gauge.builder("timeseries_total", datasets, g -> g.get(source))//
 					.description("Total number of timeseries ")//
 					.tag("source", source).//
 					register(registry);
-				
+
 				platforms.put(source, Integer.parseInt(stats.getSiteCount()));
 				io.micrometer.core.instrument.Gauge.builder("platforms_total", platforms, g -> g.get(source))//
 					.description("Total number of platforms ")//
@@ -109,26 +131,26 @@ public class OpenMetricsHandler extends StreamingRequestHandler {
 					.description("Total number of variables ")//
 					.tag("source", source).//
 					register(registry);
-				
-				
+
 				platforms.put(source, Integer.parseInt(stats.getSiteCount()));
 				io.micrometer.core.instrument.Gauge.builder("platforms_total", platforms, g -> g.get(source))//
 					.description("Total number of platforms ")//
 					.tag("source", source).//
 					register(registry);
-				
-				
+
 				coreMetadataCompleteness.put(source, 95.);
-				io.micrometer.core.instrument.Gauge.builder("core_metadata_completeness", coreMetadataCompleteness, g -> g.get(source))//
-				.description("Core metadata availability percentage")//
-				.tag("source", source).//
-				register(registry);
-				
+				io.micrometer.core.instrument.Gauge
+					.builder("core_metadata_completeness", coreMetadataCompleteness, g -> g.get(source))//
+					.description("Core metadata availability percentage")//
+					.tag("source", source).//
+					register(registry);
+
 				fullMetadataCompleteness.put(source, 70.);
-				io.micrometer.core.instrument.Gauge.builder("full_metadata_completeness", fullMetadataCompleteness, g -> g.get(source))//
-				.description("Full metadata availability percentage")//
-				.tag("source", source).//
-				register(registry);
+				io.micrometer.core.instrument.Gauge
+					.builder("full_metadata_completeness", fullMetadataCompleteness, g -> g.get(source))//
+					.description("Full metadata availability percentage")//
+					.tag("source", source).//
+					register(registry);
 
 				// String content = "<tr><td colspan='15'><br/>"//
 				// + "Data provider: <b>" + source + "</b><br/>"//

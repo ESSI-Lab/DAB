@@ -80,22 +80,21 @@ public class ResourcePropertyHandler {
     }
 
     public void setLastDownloadDate() {
-    	resource.setProperty(ResourceProperty.LAST_DOWNLOAD_DATE, ISO8601DateTimeUtils.getISO8601DateTime());
+	resource.setProperty(ResourceProperty.LAST_DOWNLOAD_DATE, ISO8601DateTimeUtils.getISO8601DateTime());
     }
-    
+
     public Optional<String> getLastDownloadDate() {
-    	return resource.getPropertyValue(ResourceProperty.LAST_DOWNLOAD_DATE);
+	return resource.getPropertyValue(ResourceProperty.LAST_DOWNLOAD_DATE);
     }
-    
+
     public void setLastFailedDownloadDate() {
-    	resource.setProperty(ResourceProperty.LAST_FAILED_DOWNLOAD_DATE, ISO8601DateTimeUtils.getISO8601DateTime());
+	resource.setProperty(ResourceProperty.LAST_FAILED_DOWNLOAD_DATE, ISO8601DateTimeUtils.getISO8601DateTime());
     }
-    
+
     public Optional<String> getLastFailedDownloadDate() {
-    	return resource.getPropertyValue(ResourceProperty.LAST_FAILED_DOWNLOAD_DATE);
+	return resource.getPropertyValue(ResourceProperty.LAST_FAILED_DOWNLOAD_DATE);
     }
-    
-    
+
     /**
      * Set the {@link ResourceProperty#RESOURCE_TIME_STAMP} property with the supplied date-time in ISO8601 format
      */
@@ -366,6 +365,24 @@ public class ResourcePropertyHandler {
 	resource.setProperty(ResourceProperty.OAI_PMH_HEADER_ID, String.valueOf(identifier));
     }
 
+    /**
+     * Get the {@link ResourceProperty#SOURCE_DEPLOYMENT} property
+     */
+    public Optional<String> getSourceDeployment() {
+
+	return resource.getPropertyValue(ResourceProperty.SOURCE_DEPLOYMENT);
+    }
+
+    /**
+     * Set the {@link ResourceProperty#SOURCE_DEPLOYMENT} property
+     * 
+     * @param deployment
+     */
+    public void setSourceDeployment(String deployment) {
+
+	resource.setProperty(ResourceProperty.SOURCE_DEPLOYMENT, String.valueOf(deployment));
+    }
+
     // ----------------------------------------
     //
     // ACCESS PROPERTIES SET BY AccessAugmenter
@@ -546,7 +563,7 @@ public class ResourcePropertyHandler {
 
 	return Boolean.valueOf(resource.getPropertyValue(ResourceProperty.IS_TIMESERIES).orElse("false"));
     }
-    
+
     /**
      * Set the {@link ResourceProperty#IS_VECTOR} property
      * 

@@ -26,10 +26,9 @@ import java.io.FileOutputStream;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import com.amazonaws.util.IOUtils;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;

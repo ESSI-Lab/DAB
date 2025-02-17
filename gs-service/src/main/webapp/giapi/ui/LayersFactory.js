@@ -42,7 +42,7 @@ GIAPI.LayersFactory = new function() {
 					var url = on.url;
 					var title = on.title || on.description || on.name;
 					var visible = true;
-					if (opt_options.visible !== undefined) {
+					if (opt_options && opt_options.visible !== undefined) {
 						visible = opt_options.visible;
 					}
 

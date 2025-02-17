@@ -4,9 +4,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-
-import com.amazonaws.util.IOUtils;
 
 public class TurtleFixerTest {
 
