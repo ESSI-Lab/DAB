@@ -93,6 +93,8 @@ import eu.essi_lab.model.resource.ResourceProperty;
  */
 public class OpenSearchWrapper {
 
+    private static final Integer MAX_DEFAULT_HISTS = 10000;
+
     private OpenSearchClient client;
 
     /**
@@ -287,7 +289,7 @@ public class OpenSearchWrapper {
      */
     public List<JSONObject> aggregateWithMultiSerch(Query searchQuery, Queryable target, int size) throws Exception {
 
-	List<String> distValues = findDistinctValues(searchQuery, target, 1000);
+	List<String> distValues = findDistinctValues(searchQuery, target, size);
 
 	List<RequestItem> items = OpenSearchQueryBuilder.buildDistinctValuesItems(distValues, target);
 
@@ -337,10 +339,7 @@ public class OpenSearchWrapper {
 		    source(src -> src.filter(new SourceFilter.Builder().includes(fields).//
 			    build()));
 
-	    if (size > 0) {
-
-		builder.size(size);
-	    }
+	    builder.size(size > 0 ? size : MAX_DEFAULT_HISTS);
 
 	    handleSourceFields(null, builder, fields);
 
@@ -661,7 +660,8 @@ public class OpenSearchWrapper {
     public int count(Query searchQuery) throws OpenSearchException, IOException {
 
 	SearchResponse<Object> searchResponse = client.search(builder -> {
-	    builder.query(searchQuery);
+	    builder.query(searchQuery).//
+		    trackTotalHits(new TrackHits.Builder().enabled(true).build());
 	    return builder;
 
 	}, Object.class);
