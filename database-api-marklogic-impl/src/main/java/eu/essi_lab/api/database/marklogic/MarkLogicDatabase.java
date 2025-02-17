@@ -896,34 +896,6 @@ public class MarkLogicDatabase extends Database {
 	return out.toArray(new MarkLogicFolder[] {});
     }
 
-    public MarkLogicFolder[] getDataFolders() throws GSException {
-
-	MarkLogicFolder[] folders = getFolders();
-	ArrayList<MarkLogicFolder> out = new ArrayList<>();
-	for (int i = 0; i < folders.length; i++) {
-	    MarkLogicFolder folder = folders[i];
-	    String uri = folder.getURI();
-	    if (!uri.endsWith(SourceStorageWorker.META_PREFIX + "/")) {
-		out.add(folder);
-	    }
-	}
-	return out.toArray(new MarkLogicFolder[] {});
-    }
-
-    public MarkLogicFolder[] getMetaFolders() throws GSException {
-
-	MarkLogicFolder[] folders = getFolders();
-	ArrayList<MarkLogicFolder> out = new ArrayList<>();
-	for (int i = 0; i < folders.length; i++) {
-	    MarkLogicFolder folder = folders[i];
-	    String uri = folder.getURI();
-	    if (uri.endsWith(SourceStorageWorker.META_PREFIX + "/")) {
-		out.add(folder);
-	    }
-	}
-	return out.toArray(new MarkLogicFolder[] {});
-    }
-
     public MarkLogicFolder[] getProtectedFolders() throws GSException {
 
 	MarkLogicFolder[] folders = getFolders();
