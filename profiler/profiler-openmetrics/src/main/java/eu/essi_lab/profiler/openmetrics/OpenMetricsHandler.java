@@ -174,7 +174,11 @@ public class OpenMetricsHandler extends StreamingRequestHandler {
 
 			}
 		    }
+		    GSLoggerFactory.getLogger(getClass()).info("Updated metrics for view {}", view);
+
 		}
+		GSLoggerFactory.getLogger(getClass()).info("Updating all views");
+
 	    }
 	};
 	scheduler.scheduleAtFixedRate(task, 0, 30, TimeUnit.MINUTES);
