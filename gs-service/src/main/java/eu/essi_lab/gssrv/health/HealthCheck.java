@@ -114,10 +114,10 @@ public class HealthCheck {
 
 	} else {
 	    //
-	    // at start only one GI-Suite starter thread should make health check and that should pass. Other threads
+	    // at start only one DAB starter thread should make health check and that should pass. Other threads
 	    // will return false.
 	    //
-	    GSLoggerFactory.getLogger(getClass()).info("Not GI-Suite starter thread");
+	    GSLoggerFactory.getLogger(getClass()).info("Not DAB starter thread");
 	    return false;
 	}
     }
