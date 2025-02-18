@@ -214,18 +214,19 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 
 			    ColumnDescriptor.create("Comment", 150, true, true, (s) -> getComment(s)), //
 
+			    ColumnDescriptor.create("Deployment", 150, true, true, (s) -> getDeployment(s)), //
+
 			    ColumnDescriptor.create("Repeat count", 150, true, true,
 				    (s) -> SchedulerSupport.getInstance().getRepeatCount(s)), //
 
 			    ColumnDescriptor.create("Repeat interval", 150, true, true,
 				    (s) -> SchedulerSupport.getInstance().getRepeatInterval(s)), //
 
-			    ColumnDescriptor.create("Status", 100, true, true, (s) -> SchedulerSupport.getInstance().getJobPhase(s),//
-				   
+			    ColumnDescriptor.create("Status", 100, true, true, (s) -> SchedulerSupport.getInstance().getJobPhase(s), //
+
 				    (item1, item2) -> item1.get("Status").compareTo(item2.get("Status")), //
 
-				    new JobPhaseColumnRenderer()
-			    ), //
+				    new JobPhaseColumnRenderer()), //
 
 			    ColumnDescriptor.create("Fired time", 150, true, true, (s) -> SchedulerSupport.getInstance().getFiredTime(s)), //
 
@@ -288,16 +289,16 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 	 */
 	private String getSourceId(Setting setting) {
 
-	    JSONObject object = setting.getObject().getJSONObject("harvestedAccessorsSetting");
+	    return getValue(setting, "identifier");
+	}
 
-	    return object.keySet().//
-		    stream().//
-		    filter(key -> isJSONObject(object, key) && object.getJSONObject(key).has("sourceSetting")).//
-		    map(key -> object.getJSONObject(key).getJSONObject("sourceSetting").getJSONObject("identifier")).//
-		    findFirst().//
-		    get().//
-		    getJSONArray("values").//
-		    getString(0);
+	/**
+	 * @param setting
+	 * @return
+	 */
+	private String getDeployment(Setting setting) {
+
+	    return getValue(setting, "sourceDeployment");
 	}
 
 	/**
@@ -306,18 +307,28 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 	 */
 	private String getComment(Setting setting) {
 
+	    return getValue(setting, "sourceComment");
+	}
+
+	/**
+	 * @param setting
+	 * @param field
+	 * @return
+	 */
+	private String getValue(Setting setting, String field) {
+
 	    JSONObject object = setting.getObject().getJSONObject("harvestedAccessorsSetting");
 
-	    JSONObject sourceComment = object.keySet().//
+	    JSONObject sourceDeployment = object.keySet().//
 		    stream().//
 		    filter(key -> isJSONObject(object, key) && object.getJSONObject(key).has("sourceSetting")).//
-		    map(key -> object.getJSONObject(key).getJSONObject("sourceSetting").getJSONObject("sourceComment")).//
+		    map(key -> object.getJSONObject(key).getJSONObject("sourceSetting").getJSONObject(field)).//
 		    findFirst().//
 		    get();
 
-	    if (sourceComment.has("values")) {
+	    if (sourceDeployment.has("values")) {
 
-		return sourceComment.getJSONArray("values").getString(0);
+		return sourceDeployment.getJSONArray("values").toList().stream().map(v -> v.toString()).collect(Collectors.joining(","));
 	    }
 
 	    return "";

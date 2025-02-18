@@ -59,6 +59,7 @@ public class GSSourceSetting extends Setting {
     private static final String COMMENT_OPTION_KEY = "sourceComment";
     private static final String BROKERING_STRATEGY_OPTION_KEY = "brokeringStrategy";
     private static final String DISCOVERY_OPTIONS_KEY = "discoveryOptions";
+    private static final String DEPLOYMENT_OPTION_KEY = "sourceDeployment";
 
     public GSSourceSetting() {
 
@@ -88,6 +89,17 @@ public class GSSourceSetting extends Setting {
 	    Option<String> option = StringOptionBuilder.get().//
 		    withKey(LABEL_OPTION_KEY).//
 		    withLabel("Source label").//
+		    required().//
+		    cannotBeDisabled().//
+		    build();
+
+	    addOption(option);
+	}
+
+	{
+	    Option<String> option = StringOptionBuilder.get().//
+		    withKey(DEPLOYMENT_OPTION_KEY).//
+		    withLabel("Source deployment").//
 		    required().//
 		    cannotBeDisabled().//
 		    build();
@@ -249,6 +261,23 @@ public class GSSourceSetting extends Setting {
 	    return list.stream().map(s -> SettingUtils.downCast(s, AccessorSetting.class).getSource()).collect(Collectors.toList());
 
 	}
+    }
+
+    /**
+     * @return
+     */
+    public List<String> getSourceDeployment() {
+
+	return getOption(DEPLOYMENT_OPTION_KEY, String.class).map(option -> option.getValues()).orElse(new ArrayList<String>());
+    }
+
+    /**
+     * @param deployment
+     */
+    public void addSourceDeployment(String deployment) {
+
+	getOption(DEPLOYMENT_OPTION_KEY, String.class).get().addValue(deployment);
+
     }
 
     /**
@@ -474,6 +503,8 @@ public class GSSourceSetting extends Setting {
 	    setSourceLabel(source.getLabel());
 	}
 
+	source.getDeployment().forEach(dep -> addSourceDeployment(dep));
+
 	MetadataElement ordProperty = source.getOrderingProperty() != null ? MetadataElement.fromName(source.getOrderingProperty()) : null;
 
 	setDiscoveryOptions(source.getResultsPriority(), ordProperty, source.getOrderingDirection());
@@ -493,6 +524,8 @@ public class GSSourceSetting extends Setting {
 	source.setLabel(getSourceLabel());
 
 	source.setUniqueIdentifier(getSourceIdentifier());
+
+	getSourceDeployment().forEach(dep -> source.addDeployment(dep));
 
 	Optional<MetadataElement> orderingProperty = getOrderingProperty();
 
