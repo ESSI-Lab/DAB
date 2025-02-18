@@ -312,16 +312,7 @@ public class Downloader {
 
 	    HttpResponse<InputStream> ret = downloadResponse(url, headers);
 
-	    boolean emptyBody = HttpConnectionUtils.emptyBody(ret);
-
-	    int statusCode = ret.statusCode();
-	    	    
-	    if (emptyBody || statusCode != 200) {
-
-		return Optional.empty();
-	    }
-
-	    return Optional.of(ret.body());
+	    return getStream(ret);
 
 	} catch (Exception e) {
 
@@ -329,6 +320,25 @@ public class Downloader {
 	}
 
 	return Optional.empty();
+    }
+
+    /**
+     * 
+     * @param response
+     * @return
+     */
+    public static Optional<InputStream> getStream(HttpResponse<InputStream> response) {
+
+	boolean emptyBody = HttpConnectionUtils.emptyBody(response);
+
+	int statusCode = response.statusCode();
+
+	if (emptyBody || statusCode != 200) {
+
+	    return Optional.empty();
+	}
+
+	return Optional.of(response.body());
     }
 
     /**
