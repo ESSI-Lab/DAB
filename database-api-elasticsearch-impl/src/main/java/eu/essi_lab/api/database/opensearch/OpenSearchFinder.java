@@ -49,8 +49,6 @@ import eu.essi_lab.lib.utils.StreamUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.PerformanceLogger;
 import eu.essi_lab.messages.RequestMessage;
-import eu.essi_lab.messages.ResourceSelector;
-import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
 import eu.essi_lab.messages.bond.parser.IdentifierBondHandler;
@@ -406,18 +404,25 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	try {
 
-	    int start = message.getPage().getStart() - 1;
-	    int size = message.getPage().getSize();
-
 	    if (debugQueries) {
 
 		GSLoggerFactory.getLogger(getClass()).debug(count ? "--- COUNT ---" : "--- DISCOVER ---");
 		GSLoggerFactory.getLogger(getClass()).debug("\n\n{}\n\n", ConversionUtils.toJSONObject(query).toString(3));
 	    }
 
-	    SearchResponse<Object> response = count ? //
-		    wrapper.count(query, message) : //
-		    wrapper.search(DataFolderMapping.get().getIndex(), query, start, size);
+	    SearchResponse<Object> response = null;
+
+	    if (count) {
+
+		response = wrapper.count(query, message);
+
+	    } else {
+
+		int start = message.getPage().getStart() - 1;
+		int size = message.getPage().getSize();
+
+		response = wrapper.search(DataFolderMapping.get().getIndex(), query, start, size);
+	    }
 
 	    pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
 
