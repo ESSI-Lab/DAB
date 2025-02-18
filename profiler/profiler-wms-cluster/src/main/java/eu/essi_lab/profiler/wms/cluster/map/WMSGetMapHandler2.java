@@ -54,6 +54,7 @@ import javax.ws.rs.core.StreamingOutput;
 import com.amazonaws.util.IOUtils;
 
 import eu.essi_lab.access.availability.AvailabilityMonitor;
+import eu.essi_lab.access.availability.DownloadInformation;
 import eu.essi_lab.access.datacache.BBOX;
 import eu.essi_lab.access.datacache.BBOX4326;
 import eu.essi_lab.access.datacache.StationRecord;
@@ -157,8 +158,10 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 
     public static Color getRandomColorFromSourceId(String sourceId, boolean availability) {
 	if (availability) {
-	    Date goodDate = AvailabilityMonitor.getInstance().getLastDownloadDate(sourceId);
-	    Date failedDate = AvailabilityMonitor.getInstance().getLastFailedDownloadDate(sourceId);
+	    DownloadInformation goodInfo = AvailabilityMonitor.getInstance().getLastDownloadDate(sourceId);
+	    DownloadInformation badInfo = AvailabilityMonitor.getInstance().getLastFailedDownloadDate(sourceId);
+	    Date goodDate = goodInfo == null ? null : goodInfo.getDate();
+	    Date failedDate = badInfo == null ? null : badInfo.getDate();
 	    if (failedDate != null && (goodDate == null || failedDate.after(goodDate))) {
 		// there was an error, and it was the last result
 		return Color.red;
@@ -1016,7 +1019,8 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 
 	for (String attributeTitle : attributeTitles) {
 
-	    SimpleValueBond bond = BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.ATTRIBUTE_TITLE, attributeTitle);
+	    SimpleValueBond bond = BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.ATTRIBUTE_TITLE,
+		    attributeTitle);
 	    orBond.getOperands().add(bond);
 	    if (ho != null) {
 		List<SKOSConcept> concepts = ho.findConcepts(attributeTitle, true, false);
