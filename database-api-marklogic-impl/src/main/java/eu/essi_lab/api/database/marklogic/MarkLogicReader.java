@@ -367,9 +367,7 @@ public class MarkLogicReader implements DatabaseReader {
 
 	    if (resultSequence.hasNext()) {
 
-		ViewFactory factory = new ViewFactory();
-
-		Unmarshaller unmarshaller = factory.createUnmarshaller();
+		Unmarshaller unmarshaller = ViewFactory.createUnmarshaller();
 
 		InputStream stream = resultSequence.next().asInputStream();
 
