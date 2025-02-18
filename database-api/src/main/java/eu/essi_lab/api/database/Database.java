@@ -1,5 +1,6 @@
 package eu.essi_lab.api.database;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -373,6 +374,32 @@ public abstract class Database implements DatabaseCompliant, Configurable<Databa
     public DatabaseFolder getAugmentersFolder() throws GSException {
 
 	return getProtectedFolder(AUGMENTERS_FOLDER, true);
+    }
+
+    /**
+     * @return
+     * @throws GSException
+     */
+    public List<DatabaseFolder> getDataFolders() throws GSException {
+
+	return Arrays.asList(getFolders()).//
+		stream().//
+		filter(f -> f.getName().endsWith(SourceStorageWorker.DATA_1_POSTFIX)
+			|| f.getName().endsWith(SourceStorageWorker.DATA_2_POSTFIX))
+		.//
+		collect(Collectors.toList());
+    }
+
+    /**
+     * @return
+     * @throws GSException
+     */
+    public List<DatabaseFolder> getMetaFolders() throws GSException {
+
+	return Arrays.asList(getFolders()).//
+		stream().//
+		filter(f -> f.getName().endsWith(SourceStorageWorker.META_POSTFIX)).//
+		collect(Collectors.toList());
     }
 
     /**

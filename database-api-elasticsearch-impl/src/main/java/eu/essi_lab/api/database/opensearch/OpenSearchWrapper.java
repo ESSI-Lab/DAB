@@ -93,6 +93,8 @@ import eu.essi_lab.model.resource.ResourceProperty;
  */
 public class OpenSearchWrapper {
 
+    private static final Integer MAX_DEFAULT_HISTS = 10000;
+
     private OpenSearchClient client;
 
     /**
@@ -206,7 +208,7 @@ public class OpenSearchWrapper {
     @SuppressWarnings("serial")
     public List<JSONObject> aggregateWithNestedAgg(//
 	    Query searchQuery, //
-	    List<Queryable> queryables, //
+	    List<Queryable> sourceFields, //
 	    Queryable target, //
 	    int size) throws Exception {
 
@@ -218,7 +220,7 @@ public class OpenSearchWrapper {
 	Builder topHitsBuilder = new TopHitsAggregation.Builder().//
 		size(1);
 
-	handleSourceFields(topHitsBuilder, null, queryables.stream().map(q -> q.getName()).collect(Collectors.toList()));
+	handleSourceFields(topHitsBuilder, null, sourceFields.stream().map(q -> q.getName()).collect(Collectors.toList()));
 
 	Aggregation topHitsAgg = new Aggregation.Builder().// takes the first result
 
@@ -287,7 +289,7 @@ public class OpenSearchWrapper {
      */
     public List<JSONObject> aggregateWithMultiSerch(Query searchQuery, Queryable target, int size) throws Exception {
 
-	List<String> distValues = findDistinctValues(searchQuery, target, 1000);
+	List<String> distValues = findDistinctValues(searchQuery, target, size);
 
 	List<RequestItem> items = OpenSearchQueryBuilder.buildDistinctValuesItems(distValues, target);
 
@@ -337,10 +339,7 @@ public class OpenSearchWrapper {
 		    source(src -> src.filter(new SourceFilter.Builder().includes(fields).//
 			    build()));
 
-	    if (size > 0) {
-
-		builder.size(size);
-	    }
+	    builder.size(size > 0 ? size : MAX_DEFAULT_HISTS);
 
 	    handleSourceFields(null, builder, fields);
 
@@ -639,35 +638,20 @@ public class OpenSearchWrapper {
     }
 
     /**
-     * @param index
-     * @return
-     * @throws OpenSearchException
-     * @throws IOException
-     */
-    public int count(String index) throws OpenSearchException, IOException {
-
-	CountRequest countRequest = new CountRequest.Builder().//
-		index(index).build();
-
-	return (int) client.count(countRequest).count();
-    }
-
-    /**
      * @param searchQuery
      * @return
      * @throws IOException
      * @throws OpenSearchException
      */
-    public int count(Query searchQuery) throws OpenSearchException, IOException {
+    public int count(String index, Query searchQuery) throws OpenSearchException, IOException {
 
-	SearchResponse<Object> searchResponse = client.search(builder -> {
-	    builder.query(searchQuery);
-	    return builder;
+	CountRequest countRequest = new CountRequest.Builder().//
+		query(searchQuery).//
+		index(index).//
+		build();
 
-	}, Object.class);
+	return (int) client.count(countRequest).count();
 
-	HitsMetadata<Object> hits = searchResponse.hits();
-	return (int) hits.total().value();
     }
 
     /**

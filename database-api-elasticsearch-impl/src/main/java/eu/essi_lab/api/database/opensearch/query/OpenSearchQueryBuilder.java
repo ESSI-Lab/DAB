@@ -528,12 +528,9 @@ public class OpenSearchQueryBuilder {
      * Builds a query which searches all entries of the given <code>folder</code>.<br>
      * <b>Constraints</b>: databaseId = getDatabase().getIdentifier() AND folderName = getName()
      */
-    public static Query buildSearchEntriesQuery(OpenSearchFolder folder) {
-
-	return buildBoolQuery(//
-		Arrays.asList(buildDatabaseIdQuery(folder.getDatabase().getIdentifier()), //
-			buildFolderNameQuery(folder)), //
-		buildIndexesQueryList(), Arrays.asList());
+    public static Query buildFolderEntriesQuery(OpenSearchFolder folder) {
+	
+	return buildFilterQuery(buildDatabaseIdQuery(folder.getDatabase().getIdentifier()), buildFolderNameQuery(folder));
     }
 
     /**

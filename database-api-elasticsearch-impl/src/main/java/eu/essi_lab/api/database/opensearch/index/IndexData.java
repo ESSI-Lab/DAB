@@ -561,7 +561,7 @@ public class IndexData {
 	    return FolderRegistryMapping.get().getIndex();
 	}
 
-	if (name.contains(SourceStorageWorker.META_PREFIX)) {
+	if (name.contains(SourceStorageWorker.META_POSTFIX)) {
 
 	    return MetaFolderMapping.get().getIndex();
 	}
