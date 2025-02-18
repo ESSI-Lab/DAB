@@ -57,6 +57,7 @@ import eu.essi_lab.cfga.gui.components.option.listener.OptionValuesLoaderListene
 import eu.essi_lab.cfga.option.ISODateTime;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.setting.Setting;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
  * @author Fabrizio
@@ -364,7 +365,7 @@ public class OptionComponentFactory {
 
 	List<String> values = StringValuesReader.readValues(option);
 
-	// GSLoggerFactory.getLogger(ComponentFactory.class).debug("Values: " + values);
+	GSLoggerFactory.getLogger(ComponentFactory.class).debug("Values: " + values);
 
 	select.setItems(values);
 
