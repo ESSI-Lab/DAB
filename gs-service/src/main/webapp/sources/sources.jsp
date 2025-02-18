@@ -15,7 +15,6 @@
 <%@page import="eu.essi_lab.messages.DiscoveryMessage"%>
 <%@page import="java.util.ServiceLoader"%>
 <%@page import="eu.essi_lab.request.executor.IDiscoveryExecutor"%>
-<%@page import="eu.essi_lab.access.availability.AvailabilityMonitor"%>
 <%@page import="eu.essi_lab.lib.utils.ISO8601DateTimeUtils"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Set"%>
@@ -34,7 +33,6 @@
 </head>
 <body>
 	<%
-	AvailabilityMonitor monitor = AvailabilityMonitor.getInstance();
 
 	String viewId = request.getParameter("view");
 

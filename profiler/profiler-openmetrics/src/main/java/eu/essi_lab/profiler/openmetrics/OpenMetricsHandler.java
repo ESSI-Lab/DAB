@@ -1,5 +1,8 @@
 package eu.essi_lab.profiler.openmetrics;
 
+import java.io.File;
+import java.io.FileInputStream;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -24,164 +27,38 @@ package eu.essi_lab.profiler.openmetrics;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
 
+import org.apache.commons.io.IOUtils;
+
 import com.google.common.base.Charsets;
 
-import eu.essi_lab.access.availability.AvailabilityMonitor;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
-import eu.essi_lab.profiler.semantic.SourceStatistics;
-import eu.essi_lab.profiler.semantic.Stats;
-import io.micrometer.core.instrument.Gauge;
-import io.micrometer.prometheus.PrometheusConfig;
-import io.micrometer.prometheus.PrometheusMeterRegistry;
 
 public class OpenMetricsHandler extends StreamingRequestHandler {
-    private static HashMap<String, PrometheusMeterRegistry> registries = new HashMap<String, PrometheusMeterRegistry>();
 
-    private static HashSet<String> interestingViews = new HashSet<String>();
+    private static Optional<S3TransferWrapper> manager = null;
 
-    static {
+    public synchronized Optional<S3TransferWrapper> getS3TransferManager() {
 
-	interestingViews.add("his-central");
-//	interestingViews.add("whos");
+	if (this.manager == null || this.manager.isEmpty()) {
 
-	ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-	Runnable task = new Runnable() {
+	    this.manager = ConfigurationWrapper.getS3TransferManager();
+	}
 
-	    @Override
-	    public void run() {
-		GSLoggerFactory.getLogger(getClass()).info("Updating metrics");
-		for (String view : interestingViews) {
-		    GSLoggerFactory.getLogger(getClass()).info("Updating metrics for view {}", view);
-		    SourceStatistics sourceStats = null;
-		    try {
-			sourceStats = new SourceStatistics(null, Optional.of(view), ResourceProperty.SOURCE_ID);
-		    } catch (Exception e1) {
-			e1.printStackTrace();
-		    }
-		    HashMap<String, Stats> overallStats = sourceStats.getStatistics();
-		    HashMap<String, Integer> availability = new HashMap<String, Integer>();
-		    HashMap<String, Integer> datasets = new HashMap<String, Integer>();
-		    HashMap<String, Integer> platforms = new HashMap<String, Integer>();
-		    HashMap<String, Integer> variables = new HashMap<String, Integer>();
-
-		    HashMap<String, Double> coreMetadataCompleteness = new HashMap<String, Double>();
-		    HashMap<String, Double> fullMetadataCompleteness = new HashMap<String, Double>();
-		    GSLoggerFactory.getLogger(getClass()).info("source stats completed");
-		    synchronized (registries) {
-
-			PrometheusMeterRegistry registry = registries.get(view);
-			for (String source : overallStats.keySet()) {
-
-			    GSSource s = ConfigurationWrapper.getSource(source);
-			    Gauge.builder("source_info", () -> 1)//
-				    .description("Metadata about each source.")//
-				    .tags("source_id", source, "source_label", s.getLabel())//
-				    .register(registry);
-			    try {
-				Stats stats = overallStats.get(source);
-
-				Date lastGoodDownload = AvailabilityMonitor.getInstance().getLastDownloadDate(source);
-				Date lastBadDownload = AvailabilityMonitor.getInstance().getLastFailedDownloadDate(source);
-				Integer downloadAvailable = 0;
-				if (lastGoodDownload != null) {
-				    if (lastBadDownload == null || lastBadDownload.before(lastGoodDownload)) {
-					downloadAvailable = 1;
-				    }
-				}
-				availability.put(source, downloadAvailable);
-				io.micrometer.core.instrument.Gauge.builder("download_availability", availability, g -> g.get(source))//
-					.description("Download availability ")//
-					.tag("source", source).//
-					register(registry);
-
-				datasets.put(source, Integer.parseInt(stats.getTimeSeriesCount()));
-				io.micrometer.core.instrument.Gauge.builder("timeseries_total", datasets, g -> g.get(source))//
-					.description("Total number of timeseries ")//
-					.tag("source", source).//
-					register(registry);
-
-				platforms.put(source, Integer.parseInt(stats.getSiteCount()));
-				io.micrometer.core.instrument.Gauge.builder("platforms_total", platforms, g -> g.get(source))//
-					.description("Total number of platforms ")//
-					.tag("source", source).//
-					register(registry);
-
-				variables.put(source, Integer.parseInt(stats.getAttributeCount()));
-				io.micrometer.core.instrument.Gauge.builder("variables_total", variables, g -> g.get(source))//
-					.description("Total number of variables ")//
-					.tag("source", source).//
-					register(registry);
-
-				platforms.put(source, Integer.parseInt(stats.getSiteCount()));
-				io.micrometer.core.instrument.Gauge.builder("platforms_total", platforms, g -> g.get(source))//
-					.description("Total number of platforms ")//
-					.tag("source", source).//
-					register(registry);
-
-				coreMetadataCompleteness.put(source, 95.);
-				io.micrometer.core.instrument.Gauge
-					.builder("core_metadata_completeness", coreMetadataCompleteness, g -> g.get(source))//
-					.description("Core metadata availability percentage")//
-					.tag("source", source).//
-					register(registry);
-
-				fullMetadataCompleteness.put(source, 70.);
-				io.micrometer.core.instrument.Gauge
-					.builder("full_metadata_completeness", fullMetadataCompleteness, g -> g.get(source))//
-					.description("Full metadata availability percentage")//
-					.tag("source", source).//
-					register(registry);
-
-				// String content = "<tr><td colspan='15'><br/>"//
-				// + "Data provider: <b>" + source + "</b><br/>"//
-				// + "#Platforms: " + stats.getSiteCount() + "<br/>"//
-				// + "#Variables:" + stats.getAttributeCount() + "<br/>"//
-				// + "#Timeseries:" + stats.getTimeSeriesCount() + "<br/>"//
-				// + "Begin:" + stats.getBegin() + "<br/>"//
-				// + "End:" + stats.getEnd() + "<br/>"//
-				// + "BBOX(w,s,e,n): " + stats.getWest() + "," + stats.getSouth() + "," +
-				// stats.getEast() +
-				// ","
-				// + stats.getNorth() + "<br/>" //
-				// + "Altitude:" + stats.getMinimumAltitude() + "/" + stats.getMaximumAltitude() +
-				// "<br/>"//
-				// + "</td></tr>" + "" //
-				// + "<tr>";
-			    } catch (Exception e) {
-				e.printStackTrace();
-				GSLoggerFactory.getLogger(getClass()).error(e);
-			    }
-
-			}
-		    }
-		    GSLoggerFactory.getLogger(getClass()).info("Updated metrics for view {}", view);
-
-		}
-		GSLoggerFactory.getLogger(getClass()).info("Updating all views");
-
-	    }
-	};
-	scheduler.scheduleAtFixedRate(task, 0, 30, TimeUnit.MINUTES);
+	return this.manager;
     }
 
     @Override
@@ -206,10 +83,6 @@ public class OpenMetricsHandler extends StreamingRequestHandler {
 	Optional<String> optionalView = webRequest.extractViewId();
 	String viewId = optionalView.isPresent() ? optionalView.get() : null;
 
-	if (viewId != null) {
-	    interestingViews.add(viewId);
-	}
-
 	return new StreamingOutput() {
 
 	    @Override
@@ -221,17 +94,21 @@ public class OpenMetricsHandler extends StreamingRequestHandler {
 		    writer.close();
 		    return;
 		}
-		String ret = "";
-		synchronized (registries) {
-		    PrometheusMeterRegistry registry = registries.get(viewId);
-		    if (registry == null) {
-			PrometheusConfig config = PrometheusConfig.DEFAULT;
-			registry = new PrometheusMeterRegistry(config);
-			registries.put(viewId, registry);
+		getS3TransferManager();
+		if (manager.isPresent()) {
+		    File tmpFile = File.createTempFile(getClass().getSimpleName() + "-" + viewId, ".txt");
+		    boolean result = manager.get().download("dabreporting", "monitoring/" + viewId + ".txt", tmpFile);
+		    if (!result) {
+			GSLoggerFactory.getLogger(getClass()).error("Exception occurred, please contact DAB administrator");
+		    } else {
+			FileInputStream fis = new FileInputStream(tmpFile);
+			IOUtils.copy(fis, writer, StandardCharsets.UTF_8);
+			fis.close();
+			tmpFile.delete();
 		    }
-		    ret = registry.scrape();
+
 		}
-		writer.write(ret);
+
 		writer.write("# EOF");
 		writer.flush();
 		writer.close();

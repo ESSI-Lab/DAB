@@ -25,7 +25,9 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -46,6 +48,8 @@ import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetUrlRequest;
+import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
+import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
@@ -55,6 +59,7 @@ import software.amazon.awssdk.services.s3.model.S3Object;
 import software.amazon.awssdk.transfer.s3.S3TransferManager;
 import software.amazon.awssdk.transfer.s3.model.CompletedDirectoryDownload;
 import software.amazon.awssdk.transfer.s3.model.CompletedDirectoryUpload;
+import software.amazon.awssdk.transfer.s3.model.CompletedFileDownload;
 import software.amazon.awssdk.transfer.s3.model.CompletedFileUpload;
 import software.amazon.awssdk.transfer.s3.model.DirectoryDownload;
 import software.amazon.awssdk.transfer.s3.model.DownloadDirectoryRequest;
@@ -257,7 +262,6 @@ public class S3TransferWrapper {
 	downloadObjectsToDirectory(transferManager, destination, bucketName, folderName);
     }
 
- 
     /**
      * @param transferManager
      * @param destination
@@ -311,7 +315,7 @@ public class S3TransferWrapper {
     public void uploadFileList(List<File> files, String bucketName, String virtualDirectoryKeyPrefix) {
 
 	for (File file : files) {
-	    uploadFile(file.getAbsolutePath(), bucketName,virtualDirectoryKeyPrefix+file.getName());
+	    uploadFile(file.getAbsolutePath(), bucketName, virtualDirectoryKeyPrefix + file.getName());
 	}
 
 	System.out.println("All files uploaded successfully.");
@@ -404,13 +408,28 @@ public class S3TransferWrapper {
 	return count;
     }
 
+    public Date getObjectDate(String bucketName, String objectKey) {
+	try {
+	    SimpleEntry<S3AsyncClient, S3TransferManager> pair = createManagerAndClient();
+	    HeadObjectRequest headRequest = HeadObjectRequest.builder().bucket(bucketName).key(objectKey).build();
+	    HeadObjectResponse response = pair.getKey().headObject(headRequest).get();
+	    return new Date(1000l * response.lastModified().getEpochSecond());
+	} catch (Exception e) {
+	    return null;
+	}
+    }
+
     /**
      * @param bucketName
      * @param objectKey
      * @param destination
      * @throws MalformedURLException
      */
-    public void download(String bucketName, String objectKey, File destination) throws MalformedURLException {
+    public boolean download(String bucketName, String objectKey, File destination) throws MalformedURLException {
+
+	if (getObjectDate(bucketName, objectKey)==null) {
+	    return false;
+	}
 
 	S3TransferManager xfer_mgr = createManager();
 
@@ -421,15 +440,15 @@ public class S3TransferWrapper {
 
 	FileDownload download = xfer_mgr.downloadFile(downloadRequest);
 
-	while (download.progress().snapshot().ratioTransferred().getAsDouble() < 1) {
+	CompletableFuture<CompletedFileDownload> future = download.completionFuture();
 
-	    try {
-		Thread.sleep(DOWNLOAD_SLEEP_TIME);
-
-	    } catch (InterruptedException e) {
-		GSLoggerFactory.getLogger(getClass()).error(e);
-	    }
+	try {
+	    future.get();
+	} catch (Exception e) {
+	    return false;
 	}
+
+	return true;
     }
 
     /**
@@ -595,7 +614,7 @@ public class S3TransferWrapper {
      * @param namePrefix
      * @return
      */
-    private S3TransferManager createManager() {
+    private SimpleEntry<S3AsyncClient, S3TransferManager> createManagerAndClient() {
 
 	S3AsyncClient s3AsyncClient = createClient();
 
@@ -604,7 +623,12 @@ public class S3TransferWrapper {
 			builder().//
 			s3Client(s3AsyncClient).build();
 
-	return transferManager;
+	return new SimpleEntry<S3AsyncClient, S3TransferManager>(s3AsyncClient, transferManager);
+    }
+
+    private S3TransferManager createManager() {
+
+	return createManagerAndClient().getValue();
     }
 
     /**
