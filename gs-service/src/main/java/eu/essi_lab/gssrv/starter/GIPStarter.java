@@ -114,7 +114,7 @@ public class GIPStarter {
 
 	mode = ExecutionMode.get();
 
-	GSLoggerFactory.getLogger(GIPStarter.class).info("GI-suite is starting in execution mode {}", mode);
+	GSLoggerFactory.getLogger(GIPStarter.class).info("DAB is starting in execution mode {}", mode);
 
 	if (ExecutionMode.skipAuthorization()) {
 	    GSLoggerFactory.getLogger(GIPStarter.class).info("Auhtorization skipped by administrator");
@@ -746,7 +746,8 @@ public class GIPStarter {
      * 
      */
     private void initCaches() {
-	AvailabilityMonitor.getInstance();
+
+//	AvailabilityMonitor.getInstance();
 
 	// init caches, but only for specific production nodes
 	ExecutionMode executionMode = ExecutionMode.get();
