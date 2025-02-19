@@ -335,16 +335,6 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	KeyValueParser keyValueParser = new KeyValueParser(request.getFormData().get());
 	OSRequestParser parser = new OSRequestParser(keyValueParser);
 
-	OSParameter sources = WebRequestParameter.findParameter(OSParameters.PARENTS.getName(), OSParameters.class);
-	OSParameter id = WebRequestParameter.findParameter(OSParameters.ID.getName(), OSParameters.class);
-	String sourcesValue = parser.parse(sources);
-	String idValue = parser.parse(id);
-	if ((sourcesValue != null && sourcesValue.equals("ROOT"))
-		|| (request.getQueryString().toLowerCase().contains("getcontent") && idValue.equals("ROOT"))) {
-	    // get sources request
-	    return null;
-	}
-
 	// creates the bond list
 	ArrayList<Bond> bondList = new ArrayList<>();
 
