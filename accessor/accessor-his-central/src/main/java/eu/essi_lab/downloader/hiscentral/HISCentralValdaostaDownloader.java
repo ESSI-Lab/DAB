@@ -191,7 +191,8 @@ public class HISCentralValdaostaDownloader extends WMLDataDownloader {
 	    endTime = convertDate(end);
 	    String link = online.getLinkage().contains("data_time_series/") ? online.getLinkage().split("data_time_series/")[0]
 		    : online.getLinkage();
-	    String linkage = link + "data_frame_time_series/" + online.getIdentifier() + "/" + startTime + "/" + endTime;
+	    String id = online.getName().split("_")[1];
+	    String linkage = link + "data_frame_time_series/" + id + "/" + startTime + "/" + endTime;
 
 	    JSONObject jsonObj = getData(linkage);
 
@@ -309,7 +310,7 @@ public class HISCentralValdaostaDownloader extends WMLDataDownloader {
 	    GSLoggerFactory.getLogger(getClass()).info("Got " + linkage);
 
 	    int responseCode = getStationResponse.statusCode();
-	    if (responseCode > 400) {
+	    if (responseCode >= 400) {
 		// repeat again
 		HISCentralValdaostaConnector.BEARER_TOKEN = HISCentralValdaostaConnector.getBearerToken(connector.getSourceURL());
 
