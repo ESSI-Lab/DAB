@@ -471,7 +471,7 @@ public class ConfigurationWrapper {
 
 	Bond bond = view.getBond();
 
-	findSourceIdentifiers(bond, sourceIds);
+	findSourceIdentifiers(bond, sourceIds, view.getSourceDeployment());
 
 	return getSources(null, false).//
 		stream().//
@@ -484,7 +484,7 @@ public class ConfigurationWrapper {
      * @param out
      */
     @SuppressWarnings("incomplete-switch")
-    private static void findSourceIdentifiers(Bond bond, List<String> out) {
+    private static void findSourceIdentifiers(Bond bond, List<String> out, String sourceDeployment) {
 
 	if (bond instanceof LogicalBond) {
 
@@ -492,12 +492,13 @@ public class ConfigurationWrapper {
 
 	    for (Bond operand : logicalBond.getOperands()) {
 
-		findSourceIdentifiers(operand, out);
+		findSourceIdentifiers(operand, out, sourceDeployment);
 	    }
 
 	} else if (bond instanceof ResourcePropertyBond) {
 
 	    ResourcePropertyBond resBond = (ResourcePropertyBond) bond;
+	    
 	    if (resBond.getProperty() == ResourceProperty.SOURCE_ID) {
 
 		BondOperator operator = resBond.getOperator();
@@ -516,6 +517,20 @@ public class ConfigurationWrapper {
 		    out.addAll(ids);
 		    break;
 		}
+	    } else if (resBond.getProperty() == ResourceProperty.SOURCE_DEPLOYMENT) {
+
+		BondOperator operator = resBond.getOperator();
+
+		List<String> ids = getHarvestedAndMixedSources().//
+			stream().//
+
+			filter(s -> operator == BondOperator.EQUAL ? s.getDeployment().contains(sourceDeployment) : //
+				s.getDeployment().stream().anyMatch(dep -> dep.startsWith(sourceDeployment)))
+			.//
+			map(s -> s.getUniqueIdentifier()).//
+			collect(Collectors.toList());
+
+		out.addAll(ids);
 	    }
 	}
     }
