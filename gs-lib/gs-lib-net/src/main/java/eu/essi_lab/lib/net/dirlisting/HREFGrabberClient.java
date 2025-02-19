@@ -25,18 +25,12 @@ package eu.essi_lab.lib.net.dirlisting;
  */
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import org.apache.commons.io.IOUtils;
 
 import com.google.common.collect.Lists;
 
@@ -125,37 +119,7 @@ public class HREFGrabberClient {
 	Downloader downloader = new Downloader();
 	ArrayList<String> list = Lists.newArrayList();
 
-	String user = null;
-	String pwd = null;
-	String userInfo = url.getUserInfo();
-	if (userInfo != null) {
-	    String[] split = userInfo.split(":");
-	    if (split.length == 2) {
-		user = split[0];
-		pwd = split[1];
-	    }
-	}
-
-	String html_ = null;
-
-	if (user != null && pwd != null) {
-
-	    HttpResponse<InputStream> response = downloader.downloadResponse(url.toExternalForm(), user, pwd);
-
-	    Optional<InputStream> stream = Downloader.getStream(response);
-
-	    if (stream.isPresent()) {
-
-		String _html_ = IOUtils.toString(stream.get(), StandardCharsets.UTF_8);
-		stream.get().close();
-
-		html_ = this.html != null ? this.html : _html_;
-	    }
-	} else {
-
-	    html_ = this.html != null ? this.html : downloader.downloadOptionalString(url.toExternalForm()).orElse(null);
-	}
-
+	String html_ = this.html != null ? this.html : downloader.downloadOptionalString(url.toExternalForm()).orElse(null);
 	if (html_ == null) {
 	    return list;
 	}
