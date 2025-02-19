@@ -251,17 +251,14 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
 
 		    switch (bond.getOperator()) {
 		    case EQUAL:
-			Optional<GSSource> source = allSources.stream().filter(s -> s.getUniqueIdentifier().equals(value)).findFirst();
-			if (source.isPresent()) {
-			    sources.add(source.get());
-			}
+
+			allSources.stream().filter(s -> s.getUniqueIdentifier().equals(value)).forEach(s -> sources.add(s));
+
 			break;
 		    case TEXT_SEARCH:
-			for (GSSource s : allSources) {
-			    if (s.getUniqueIdentifier().contains(value)) {
-				sources.add(s);
-			    }
-			}
+
+			allSources.stream().filter(s -> s.getUniqueIdentifier().contains(value)).forEach(s -> sources.add(s));
+
 			break;
 		    default:
 			break;
@@ -324,10 +321,6 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
 
 	if (!excList.isEmpty()) {
 	    throw excList.get(0);
-	}
-
-	if (sources.isEmpty()) {
-	    sources.addAll(ConfigurationWrapper.getAllSources());
 	}
 
 	for (String excludedSource : exclusionList) {
