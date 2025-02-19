@@ -219,6 +219,8 @@
 		<!-- GDAL -->
 		<org.gdal.version>2.1.0</org.gdal.version>
 
+		<jna.version>5.14.0</jna.version>
+
 		<!-- JAXB and schemas -->
 		<org.jvnet.ogc-gml-v_3_2_1.version>2.4.0</org.jvnet.ogc-gml-v_3_2_1.version>
 		<org.jvnet.ogc-gml-v_3_2_0.version>2.6.1</org.jvnet.ogc-gml-v_3_2_0.version>
@@ -409,17 +411,17 @@
 				<type>pom</type>
 			</dependency>
 			
-	<dependency>
-			<groupId>software.amazon.awssdk</groupId>
-			<artifactId>s3-transfer-manager</artifactId>
-		<version>${aws-java-sdk-bom.version}</version>
-		</dependency>
+			<dependency>
+				<groupId>software.amazon.awssdk</groupId>
+				<artifactId>s3-transfer-manager</artifactId>
+			<version>${aws-java-sdk-bom.version}</version>
+			</dependency>
 
-		<dependency>
-			<groupId>software.amazon.awssdk.crt</groupId>
-			<artifactId>aws-crt</artifactId>
-			<version>0.34.0</version>
-		</dependency>
+			<dependency>
+				<groupId>software.amazon.awssdk.crt</groupId>
+				<artifactId>aws-crt</artifactId>
+				<version>0.34.0</version>
+			</dependency>
 
 			<!-- OGC Schemas from Aleksei Valikov -->
 			<dependency>
@@ -509,6 +511,18 @@
 			</dependency>
 
 			<dependency>
+				<groupId>net.java.dev.jna</groupId>
+				<artifactId>jna</artifactId>
+				<version>${jna.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>net.java.dev.jna</groupId>
+				<artifactId>jna-platform</artifactId>
+				<version>${jna.version}</version>
+			</dependency>
+
+			<dependency>
 				<groupId>org.geotools</groupId>
 				<artifactId>gt-netcdf</artifactId>
 				<version>${geotools-version}</version>
@@ -524,6 +538,10 @@
 					<exclusion>
 						<groupId>org.glassfish.jaxb</groupId>
 						<artifactId>jaxb-runtime</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>net.java.dev.jna</groupId>
+						<artifactId>jna</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>
@@ -625,6 +643,12 @@
 				<groupId>cloud.localstack</groupId>
 				<artifactId>localstack-utils</artifactId>
 				<version>${cloud.localstack.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>net.java.dev.jna</groupId>
+						<artifactId>jna</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 
 			<dependency>
@@ -822,6 +846,16 @@
 	</dependencyManagement>
 
 	<dependencies>
+
+		<dependency>
+			<groupId>net.java.dev.jna</groupId>
+			<artifactId>jna</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>net.java.dev.jna</groupId>
+			<artifactId>jna-platform</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
