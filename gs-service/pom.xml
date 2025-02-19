@@ -1137,11 +1137,7 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>access-tools-downloader-s3</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
+
 		
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>

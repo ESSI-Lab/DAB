@@ -89,8 +89,9 @@
 		  <groupId>org.opensearch.client</groupId>
 		  <artifactId>opensearch-rest-high-level-client</artifactId>
 		</dependency>
-		
-		
+
+
+
 	</dependencies>
 	
 	<profiles>

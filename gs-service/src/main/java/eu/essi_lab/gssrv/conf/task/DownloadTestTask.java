@@ -21,56 +21,40 @@ package eu.essi_lab.gssrv.conf.task;
  * #L%
  */
 
-import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.UUID;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 import org.quartz.JobExecutionContext;
 
 import eu.essi_lab.access.augmenter.AccessAugmenter;
-import eu.essi_lab.access.augmenter.DataCacheAugmenter;
-import eu.essi_lab.access.datacache.DataCacheConnector;
-import eu.essi_lab.access.datacache.DataCacheConnectorFactory;
-import eu.essi_lab.access.datacache.StatisticsRecord;
-import eu.essi_lab.api.database.DatabaseExecutor;
 import eu.essi_lab.api.database.DatabaseWriter;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.augmenter.ResourceAugmenter;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.dc_connector.DataCacheConnectorSetting;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
 import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
-import eu.essi_lab.gssrv.conf.task.collection.SourceCollectionCreator.PropertyResult;
-import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
+import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.TaskListExecutor;
+import eu.essi_lab.lib.utils.IOStreamUtils;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.JobStatus.JobPhase;
+import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.RequestMessage.IterationMode;
-import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
-import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
+import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.View;
-import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.Page;
-import eu.essi_lab.messages.ResultSet;
-import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
-import eu.essi_lab.pdk.rsm.access.AccessQueryUtils;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
 
@@ -144,27 +128,64 @@ public class DownloadTestTask extends AbstractCustomTask {
 
 	GSLoggerFactory.getLogger(getClass()).info("Found {} sources", resources.size());
 
-	for (int i = 0; i < resources.size(); i++) {
+	Optional<S3TransferWrapper> optS3TransferManager = getS3TransferManager();
 
-	    GSLoggerFactory.getLogger(getClass()).info("At source {} of {} sources", (i + 1), resources.size());
+	for (int i = 0; i < resources.size(); i++) {
 
 	    GSResource resource = resources.get(i);
 
+	    String sourceId = resource.getSource().getUniqueIdentifier();
+	    GSLoggerFactory.getLogger(getClass()).info("At source {} ({})of {} sources. Resource id: {}", (i + 1),
+		    resource.getSource().getLabel(), resources.size(), resource.getPublicId());
 	    Optional<GSResource> augmented = augmenter.augment(resource);
-
+	    String result = "bad";
 	    if (augmented.isEmpty()) {
 		GSLoggerFactory.getLogger(getClass()).error("Was not able to augment");
 	    } else {
 		GSResource a = augmented.get();
 		Optional<String> lastDownload = a.getPropertyHandler().getLastDownloadDate();
+		Optional<String> lastFailedDownload = a.getPropertyHandler().getLastFailedDownloadDate();
 		if (lastDownload.isEmpty()) {
 		    GSLoggerFactory.getLogger(getClass()).error("Was not able to download");
 		} else {
-		    GSLoggerFactory.getLogger(getClass()).info("Was able to download resource from source {}",
-			    a.getSource().getUniqueIdentifier());
+		    Date downloadDate = ISO8601DateTimeUtils.parseISO8601ToDate(lastDownload.get()).get();
+		    Date failedDate = null;
+		    if (lastFailedDownload.isPresent()) {
+			failedDate = ISO8601DateTimeUtils.parseISO8601ToDate(lastFailedDownload.get()).get();
+		    }
+		    if (failedDate == null || failedDate.before(downloadDate)) {
+			result = "good";
+			GSLoggerFactory.getLogger(getClass()).info("Was able to download resource from source {}",
+				a.getSource().getUniqueIdentifier());
+		    }
 
 		}
 		writer.update(augmented.get());
+	    }
+
+	    if (optS3TransferManager.isPresent()) {
+
+		GSLoggerFactory.getLogger(getClass()).info("Transfer download stats to s3 STARTED");
+
+		S3TransferWrapper manager = optS3TransferManager.get();
+		manager.setACLPublicRead(true);
+
+		File tempFile = File.createTempFile(getClass().getSimpleName() + sourceId + result, ".txt");
+
+		String platformId = "unknown";
+		if (resource.getExtensionHandler().getUniquePlatformIdentifier().isPresent()) {
+		    platformId = resource.getExtensionHandler().getUniquePlatformIdentifier().get();
+		}
+
+		String text = ISO8601DateTimeUtils.getISO8601DateTime() + "\n" + platformId;
+
+		Files.copy(IOStreamUtils.asStream(text), tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+		manager.uploadFile(tempFile.getAbsolutePath(), "dabreporting", "download-availability/" + sourceId + "-" + result + ".txt");
+
+		tempFile.delete();
+
+		GSLoggerFactory.getLogger(getClass()).info("Transfer of data availability test to s3 ENDED");
 	    }
 
 	    // CHECKING CANCELED JOB
