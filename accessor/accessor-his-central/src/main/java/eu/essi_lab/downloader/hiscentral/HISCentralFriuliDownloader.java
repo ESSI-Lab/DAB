@@ -189,77 +189,88 @@ public class HISCentralFriuliDownloader extends WMLDataDownloader {
 		endString = ISO8601DateTimeUtils.getISO8601Date(new Date());
 	    }
 
-	    startString = convertDate(startString);
-	    endString = convertDate(endString);
-	    String linkage = online.getLinkage() + "&from=" + startString + "&to=" + endString;
+	    Optional<Date> startDate = ISO8601DateTimeUtils.parseISO8601ToDate(startString);
+	    Optional<Date> endDate = ISO8601DateTimeUtils.parseISO8601ToDate(endString);
+	    List<Date[]> dates = new ArrayList<Date[]>();
+	    if (startDate.isPresent() && endDate.isPresent()) {
+		dates = buildDates(startDate.get(), endDate.get());
+	    }
 
-	    JSONObject jsonObj = getData(linkage);
+	    TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
+	    DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
 
-	    if (jsonObj != null) {
+	    for (Date[] d : dates) {
 
-		JSONArray valuesData = jsonObj.optJSONArray("data");
+		startString = convertDate(ISO8601DateTimeUtils.getISO8601DateTime(d[0]));
+		endString = convertDate(ISO8601DateTimeUtils.getISO8601DateTime(d[1]));
+		String linkage = online.getLinkage() + "&from=" + startString + "&to=" + endString;
+		JSONObject jsonObj = getData(linkage);
 
-		TimeSeriesResponseType tsrt = getTimeSeriesTemplate();
+		if (jsonObj != null && !jsonObj.isEmpty()) {
 
-		DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
-		DateFormat iso8601OutputFormat = null;
+		    JSONArray valuesData = jsonObj.optJSONArray("data");
 
-		if (valuesData != null) {
+		    DateFormat iso8601OutputFormat = null;
 
-		    for (Object arr : valuesData) {
+		    if (valuesData != null) {
 
-			JSONObject data = (JSONObject) arr;
+			for (Object arr : valuesData) {
 
-			String valueString = data.optString("value");
+			    JSONObject data = (JSONObject) arr;
 
-			ValueSingleVariable variable = new ValueSingleVariable();
+			    String valueString = data.optString("value");
 
-			if (valueString != null && !valueString.isEmpty()) {
+			    ValueSingleVariable variable = new ValueSingleVariable();
 
-			    //
-			    // value
-			    //
+			    if (valueString != null && !valueString.isEmpty()) {
 
-			    BigDecimal dataValue = new BigDecimal(valueString);
-			    variable.setValue(dataValue);
+				//
+				// value
+				//
 
-			    //
-			    // date
-			    //
+				BigDecimal dataValue = new BigDecimal(valueString);
+				variable.setValue(dataValue);
 
-			    String date = data.optString("datetime");
+				//
+				// date
+				//
 
-			    if (iso8601OutputFormat == null) {
-				iso8601OutputFormat = date.contains(" ") ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ITALIAN)
-					: new SimpleDateFormat("yyyy-MM-dd", Locale.ITALIAN);
-				iso8601OutputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+				String date = data.optString("datetime");
+
+				if (iso8601OutputFormat == null) {
+				    iso8601OutputFormat = date.contains(" ") ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ITALIAN)
+					    : new SimpleDateFormat("yyyy-MM-dd", Locale.ITALIAN);
+				    iso8601OutputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+				}
+
+				Date parsed = iso8601OutputFormat.parse(date);
+
+				GregorianCalendar gregCal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+				gregCal.setTime(parsed);
+
+				XMLGregorianCalendar xmlGregCal = xmlFactory.newXMLGregorianCalendar(gregCal);
+				variable.setDateTimeUTC(xmlGregCal);
+
+				//
+				//
+				//
+
+				addValue(tsrt, variable);
 			    }
-
-			    Date parsed = iso8601OutputFormat.parse(date);
-
-			    GregorianCalendar gregCal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
-			    gregCal.setTime(parsed);
-
-			    XMLGregorianCalendar xmlGregCal = xmlFactory.newXMLGregorianCalendar(gregCal);
-			    variable.setDateTimeUTC(xmlGregCal);
-
-			    //
-			    //
-			    //
-
-			    addValue(tsrt, variable);
 			}
 		    }
+
 		}
 
-		JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);
-		File tmpFile = File.createTempFile(getClass().getSimpleName(), ".wml");
-
-		tmpFile.deleteOnExit();
-		JAXBWML.getInstance().marshal(response, tmpFile);
-
-		return tmpFile;
 	    }
+
+	    JAXBElement<TimeSeriesResponseType> response = factory.createTimeSeriesResponse(tsrt);
+	    File tmpFile = File.createTempFile(getClass().getSimpleName(), ".wml");
+
+	    tmpFile.deleteOnExit();
+	    JAXBWML.getInstance().marshal(response, tmpFile);
+
+	    return tmpFile;
 
 	} catch (Exception e) {
 
@@ -323,6 +334,41 @@ public class HISCentralFriuliDownloader extends WMLDataDownloader {
 	}
 
 	return null;
+    }
+
+    private List<Date[]> buildDates(Date startDate, Date endDate) {
+	List<Date[]> dateRanges = new ArrayList<>();
+
+	// Calculate the difference in days between the two dates
+	long diffInMillies = Math.abs(endDate.getTime() - startDate.getTime());
+	long diffInDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+
+	// If the difference is 30 days or less, return the original range
+	if (diffInDays <= 30) {
+	    dateRanges.add(new Date[] { startDate, endDate });
+	    return dateRanges;
+	}
+
+	// Otherwise, split the dates into ranges of at most 30 days
+	Date currentStartDate = startDate;
+	boolean maxRequestsReached = false;
+	int count = 0;
+	while (diffInDays > 30) {
+	    Date currentEndDate = new Date(currentStartDate.getTime() + TimeUnit.MILLISECONDS.convert(30, TimeUnit.DAYS));
+	    dateRanges.add(new Date[] { currentStartDate, currentEndDate });
+	    currentStartDate = new Date(currentEndDate.getTime() + TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS));
+	    diffInDays -= 30;
+
+	    // if (diff > 2) {
+	    // maxRequestsReached = true;
+	    // endDate = new Date(currentStartDate.getTime() + TimeUnit.MILLISECONDS.convert(10, TimeUnit.DAYS));
+	    // }
+	}
+
+	// Add the final range
+	dateRanges.add(new Date[] { currentStartDate, endDate });
+
+	return dateRanges;
     }
 
     /**
