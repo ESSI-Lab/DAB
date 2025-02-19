@@ -791,7 +791,6 @@ public class IdentifierDecoratorTest {
 				return true;
 			}
 		}).when(sourcePrioritySetting).isPrioritySource(Mockito.any());
-
 		GSResource resource = new Dataset();
 		resource.setSource(source);
 		String originalId = UUID.randomUUID().toString();
