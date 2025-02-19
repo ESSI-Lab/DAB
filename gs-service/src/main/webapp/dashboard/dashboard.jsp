@@ -56,10 +56,25 @@
 	    message.setPage(new Page(1, 1000));
 
 	    List<GSSource> sources = ConfigurationWrapper.getViewSources(view);
-
+	    out.println("<!DOCTYPE html>\n" + //
+	    "<html lang=\"en\">\n" + //
+	    "<head>\n" + //
+	    "<meta charset=\"UTF-8\">\n" + //
+	    "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" + //
+	    "<title>Load Page in Div</title>\n" + //
+	    "<script>\n" + //
+	    "function loadIframe(sourceId) {\n" + //
+	    "document.getElementById(\"details\").innerHTML =\n" + // 
+	    "'<iframe src=\"dashboard-details.jsp?source='+sourceId+'&view=" + viewId
+	    + "\" width=\"600\" height=\"400\" style=\"border: none;\"></iframe>';\n" + //
+	    "}\n" + //
+	    "</script>\n" + //
+	    "</head>\n" + //
+	    "<body>");
 	    out.println("<h1>" + viewId.toUpperCase() + " monitoring dashboard</h1>");
 	    out.println("<h2>Data availability</h2>");
-	    out.println("<table><tr><th>Source</th><th>Status</th><th>Last success download date</th><th>Last failed download date</th></tr>");
+	    out.println(
+	    "<table><tr><th>Source</th><th>Status</th><th>Detailed info</th><th>Last success download date</th><th>Last failed download date</th></tr>");
 
 	    sources.sort(new Comparator<GSSource>() {
 		public int compare(GSSource o1, GSSource o2) {
@@ -112,9 +127,8 @@
 	    if (lastGood != null && (lastBad == null || lastGood.after(lastBad))) {
 			status = "<td bgcolor='green'><b>Download available</b></td>";
 	    }
-	    out.println("<tr><td>" + sourceString + "</td>" + status + "<td><a href='" + lastGoodStationID + "'>" + lastGood
-			    + "</></td><td><a href='/gs-service/services/view/his-central/bnhs/station/" + lastBadStationID + "/'>" + lastBad
-			    + "</a></td></tr>");
+	    out.println("<tr><td>" + sourceString + "</td>" + status + "<td><button onclick=\"loadIframe('" + sourceId + "')\">Details</button></td><td>" + lastGood + "</td><td>" + lastBad
+			    + "</td></tr>");
 		}
 	    } catch (Exception e) {
 		e.printStackTrace();
@@ -122,7 +136,7 @@
 		executor.shutdown();
 	    }
 
-	    out.println("</table>");
+	    out.println("</table><p>Details:</p><div id=\"details\">Click the info buttons to load the details.</div></body></html>");
 
 	} else {
 	    out.println("A view parameter is needed here");
