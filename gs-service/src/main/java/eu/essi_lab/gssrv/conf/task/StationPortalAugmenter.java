@@ -95,7 +95,7 @@ public class StationPortalAugmenter extends ResourceAugmenter<AugmenterSetting> 
 
 	    Calendar calendar = Calendar.getInstance();
 	    calendar.setTime(endDate.get());
-	    calendar.add(Calendar.MONTH, -2);
+	    calendar.add(Calendar.MONTH, -1);
 	    Date startDate = calendar.getTime();
 	    String startTime = ISO8601DateTimeUtils.getISO8601DateTime(startDate);
 	    String dataUrl = baseUrl + "gs-service/services/view/" + viewId + "/gwis/iv/?format=rdb,1.0&startDT=" + startTime + "&endDT=" + endTime + "&sites="

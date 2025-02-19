@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 import javax.ws.rs.WebApplicationException;
@@ -54,6 +55,7 @@ import javax.ws.rs.core.StreamingOutput;
 import com.amazonaws.util.IOUtils;
 
 import eu.essi_lab.access.availability.AvailabilityMonitor;
+import eu.essi_lab.access.availability.DownloadInformation;
 import eu.essi_lab.access.datacache.BBOX;
 import eu.essi_lab.access.datacache.BBOX4326;
 import eu.essi_lab.access.datacache.StationRecord;
@@ -66,6 +68,7 @@ import eu.essi_lab.lib.net.utils.whos.HISCentralOntology;
 import eu.essi_lab.lib.net.utils.whos.HydroOntology;
 import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
 import eu.essi_lab.lib.net.utils.whos.WHOSOntology;
+import eu.essi_lab.lib.utils.ExpiringCache;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.bond.Bond;
@@ -155,16 +158,30 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 	return format;
     }
 
+    private static ExpiringCache<Color> availibilityCache = new ExpiringCache<Color>();
+
+    static {
+	availibilityCache.setDuration(TimeUnit.MINUTES.toMillis(120));
+    }
+
     public static Color getRandomColorFromSourceId(String sourceId, boolean availability) {
 	if (availability) {
-	    Date goodDate = AvailabilityMonitor.getInstance().getLastDownloadDate(sourceId);
-	    Date failedDate = AvailabilityMonitor.getInstance().getLastFailedDownloadDate(sourceId);
+	    Color cachedAvailability = availibilityCache.get(sourceId);
+	    if (cachedAvailability!=null ) {
+		return cachedAvailability;
+	    }
+	    DownloadInformation goodInfo = AvailabilityMonitor.getInstance().getLastDownloadDate(sourceId);
+	    DownloadInformation badInfo = AvailabilityMonitor.getInstance().getLastFailedDownloadDate(sourceId);
+	    Date goodDate = goodInfo == null ? null : goodInfo.getDate();
+	    Date failedDate = badInfo == null ? null : badInfo.getDate();
 	    if (failedDate != null && (goodDate == null || failedDate.after(goodDate))) {
 		// there was an error, and it was the last result
+		availibilityCache.put(sourceId, Color.red);
 		return Color.red;
 	    }
 	    // download never done
 	    if (goodDate == null) {
+		availibilityCache.put(sourceId, Color.blue);
 		return Color.blue;
 	    } else {
 		Calendar calendar = Calendar.getInstance();
@@ -176,9 +193,11 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 
 		// within last week a download occurred
 		if (goodDate.after(oneMonthAgo) && goodDate.before(now)) {
+		    availibilityCache.put(sourceId, Color.green);
 		    return Color.green;
 		} else {
 		    // a download occurred more than a week ago
+		    availibilityCache.put(sourceId, Color.green.brighter());
 		    return Color.green.brighter();
 		}
 	    }
@@ -1016,7 +1035,8 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 
 	for (String attributeTitle : attributeTitles) {
 
-	    SimpleValueBond bond = BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.ATTRIBUTE_TITLE, attributeTitle);
+	    SimpleValueBond bond = BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.ATTRIBUTE_TITLE,
+		    attributeTitle);
 	    orBond.getOperands().add(bond);
 	    if (ho != null) {
 		List<SKOSConcept> concepts = ho.findConcepts(attributeTitle, true, false);

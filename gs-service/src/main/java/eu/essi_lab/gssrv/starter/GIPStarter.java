@@ -747,8 +747,6 @@ public class GIPStarter {
      */
     private void initCaches() {
 
-//	AvailabilityMonitor.getInstance();
-
 	// init caches, but only for specific production nodes
 	ExecutionMode executionMode = ExecutionMode.get();
 	switch (executionMode) {

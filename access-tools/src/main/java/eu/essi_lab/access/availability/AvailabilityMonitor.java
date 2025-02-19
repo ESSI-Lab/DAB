@@ -21,210 +21,121 @@ package eu.essi_lab.access.availability;
  * #L%
  */
 
-import java.util.Arrays;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Optional;
-import java.util.ServiceLoader;
-import java.util.UUID;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.Page;
-import eu.essi_lab.messages.RequestMessage.IterationMode;
-import eu.essi_lab.messages.bond.BondFactory;
-import eu.essi_lab.messages.bond.BondOperator;
-import eu.essi_lab.messages.ResultSet;
-import eu.essi_lab.messages.stats.ResponseItem;
-import eu.essi_lab.messages.stats.StatisticsMessage;
-import eu.essi_lab.messages.stats.StatisticsResponse;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.StorageInfo;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.ResourceProperty;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
-import eu.essi_lab.request.executor.IStatisticsExecutor;
 
 public class AvailabilityMonitor {
 
-	private static AvailabilityMonitor instance = null;
+    private static AvailabilityMonitor instance = null;
+    private static Optional<S3TransferWrapper> manager = null;
 
-	private AvailabilityMonitor() {
+    private AvailabilityMonitor() {
+
+    }
+
+    public static AvailabilityMonitor getInstance() {
+	if (instance == null) {
+	    instance = new AvailabilityMonitor();
+	}
+	return instance;
+    }
+
+    public synchronized Optional<S3TransferWrapper> getS3TransferManager() {
+
+	if (this.manager == null || this.manager.isEmpty()) {
+
+	    this.manager = ConfigurationWrapper.getS3TransferManager();
 	}
 
-	public static AvailabilityMonitor getInstance() {
-		if (instance == null) {
-			instance = new AvailabilityMonitor();
+	return this.manager;
+    }
+
+    public DownloadInformation getLastDownloadDate(boolean good, String sourceId) {
+	String status = "good";
+	if (!good) {
+	    status = "bad";
+	}
+	GSLoggerFactory.getLogger(getClass()).info("asked for last download platform for source {}", sourceId);
+	getS3TransferManager();
+	if (manager.isPresent()) {
+	    try {
+		Date downloaded = manager.get().getObjectDate("dabreporting", "download-availability/" + sourceId + "-" + status + ".txt");
+		if (downloaded != null) {
+		    return new DownloadInformation(true, downloaded, null);
+		} else {
+		    return null;
 		}
-		return instance;
+
+	    } catch (Exception e) {
+		e.printStackTrace();
+	    }
+	} else {
+	    GSLoggerFactory.getLogger(getClass()).error("S3 manager is needed");
 	}
+	return null;
+    }
 
-	private static HashMap<String, Date> lastDownloadDatesbySource = null;
-	private static HashMap<String, Date> lastFailedDownloadDatesbySource = null;
-	private static HashMap<String, String> lastPlatformbySource = null;
-	private static HashMap<String, String> lastFailedPlatformbySource = null;
+    public DownloadInformation getLastDownloadDate(String sourceId) {
+	return getLastDownloadDate(true, sourceId);
+    }
 
-	static {
+    public DownloadInformation getLastFailedDownloadDate(String sourceId) {
+	return getLastDownloadDate(false, sourceId);
+    }
 
-		ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-
-		Runnable task = new Runnable() {
-
-			@Override
-			public void run() {
-				ServiceLoader<IDiscoveryExecutor> dloader = ServiceLoader.load(IDiscoveryExecutor.class);
-				IDiscoveryExecutor dexecutor = dloader.iterator().next();
-
-				HashMap<String, Date> good = new HashMap<String, Date>();
-				HashMap<String, Date> failed = new HashMap<String, Date>();
-				HashMap<String, String> goodStations = new HashMap<String, String>();
-				HashMap<String, String> failedStations = new HashMap<String, String>();
-				GSLoggerFactory.getLogger(getClass()).info("Running availability monitor task");
-				StatisticsMessage statisticsMessage = new StatisticsMessage();
-				List<GSSource> allSources = ConfigurationWrapper.getAllSources();
-				// set the required properties
-				statisticsMessage.setSources(allSources);
-				statisticsMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
-				statisticsMessage.groupBy(ResourceProperty.SOURCE_ID);
-				Page page = new Page();
-				page.setStart(1);
-				page.setSize(1000);
-				statisticsMessage.setPage(page);
-				statisticsMessage.computeMax(Arrays.asList(ResourceProperty.LAST_DOWNLOAD_DATE,
-						ResourceProperty.LAST_FAILED_DOWNLOAD_DATE, MetadataElement.UNIQUE_PLATFORM_IDENTIFIER));
-				ServiceLoader<IStatisticsExecutor> loader = ServiceLoader.load(IStatisticsExecutor.class);
-				IStatisticsExecutor executor = loader.iterator().next();
-				StatisticsResponse response;
-				try {
-					response = executor.compute(statisticsMessage);
-					List<ResponseItem> items = response.getItems();
-					for (ResponseItem responseItem : items) {
-						String sourceId = responseItem.getGroupedBy().isPresent() ? responseItem.getGroupedBy().get()
-								: null;
-
-						String dateString = responseItem.getMax(ResourceProperty.LAST_DOWNLOAD_DATE).get().getValue();
-						if (dateString != null && !dateString.isEmpty()) {
-							Optional<Date> optionalDate = ISO8601DateTimeUtils.parseISO8601ToDate(dateString);
-							if (optionalDate.isPresent()) {
-								good.put(sourceId, optionalDate.get());
-
-								DiscoveryMessage discoveryMessage = new DiscoveryMessage();
-								discoveryMessage.setRequestId(UUID.randomUUID().toString());
-								discoveryMessage.setPage(new Page(1, 1000));
-								discoveryMessage.setIteratedWorkflow(IterationMode.FULL_RESPONSE);
-								discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
-								StorageInfo uri = ConfigurationWrapper.getDatabaseURI();
-								discoveryMessage.setDataBaseURI(uri);
-								discoveryMessage.setUserBond(
-										BondFactory.createAndBond(BondFactory.createSourceIdentifierBond(sourceId),
-												BondFactory.createResourcePropertyBond(BondOperator.EQUAL,
-														ResourceProperty.LAST_DOWNLOAD_DATE,
-														ISO8601DateTimeUtils.getISO8601DateTime(optionalDate.get()))));
-								ResultSet<GSResource> resultSet = dexecutor.retrieve(discoveryMessage);
-								List<GSResource> resources = resultSet.getResultsList();
-								if (!resources.isEmpty()) {
-									String id = resources.get(0).getExtensionHandler().getUniquePlatformIdentifier().get();
-									goodStations.put(sourceId, id);
-								}
-							}
-						}
-						String failedDateString = responseItem.getMax(ResourceProperty.LAST_FAILED_DOWNLOAD_DATE).get()
-								.getValue();
-						if (failedDateString != null && !failedDateString.isEmpty()) {
-							Optional<Date> optionalDate = ISO8601DateTimeUtils.parseISO8601ToDate(failedDateString);
-							if (optionalDate.isPresent()) {
-								failed.put(sourceId, optionalDate.get());
-								
-								DiscoveryMessage discoveryMessage = new DiscoveryMessage();
-								discoveryMessage.setRequestId(UUID.randomUUID().toString());
-								discoveryMessage.setPage(new Page(1, 1));
-								discoveryMessage.setIteratedWorkflow(IterationMode.FULL_RESPONSE);
-								discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
-								StorageInfo uri = ConfigurationWrapper.getDatabaseURI();
-								discoveryMessage.setDataBaseURI(uri);
-								discoveryMessage.setUserBond(
-										BondFactory.createAndBond(BondFactory.createSourceIdentifierBond(sourceId),
-												BondFactory.createResourcePropertyBond(BondOperator.EQUAL,
-														ResourceProperty.LAST_FAILED_DOWNLOAD_DATE,
-														ISO8601DateTimeUtils.getISO8601DateTime(optionalDate.get()))));
-//								discoveryMessage.setUserBond(BondFactory.createSourceIdentifierBond(sourceId));
-								ResultSet<GSResource> resultSet = dexecutor.retrieve(discoveryMessage);
-								List<GSResource> resources = resultSet.getResultsList();
-								if (!resources.isEmpty()) {
-									String id = resources.get(0).getExtensionHandler().getUniquePlatformIdentifier().get();
-									failedStations.put(sourceId, id);
-								}
-							}
-						}
-
-					}
-				} catch (GSException e) {
-					e.printStackTrace();
-				}
-				lastDownloadDatesbySource = good;
-				lastFailedDownloadDatesbySource = failed;
-				lastPlatformbySource = goodStations;
-				lastFailedPlatformbySource = failedStations;
-			}
-		};
-
-		// Schedule the task to run every 5 seconds with an initial delay of 0 seconds
-		scheduler.scheduleAtFixedRate(task, 0, 10, TimeUnit.MINUTES);
-
+    public DownloadInformation getLastDownloadInformation(boolean good, String sourceId) {
+	String status = "good";
+	if (!good) {
+	    status = "bad";
 	}
+	GSLoggerFactory.getLogger(getClass()).info("asked for last download platform for source {}", sourceId);
+	getS3TransferManager();
+	if (manager.isPresent()) {
+	    try {
+		File tmp = File.createTempFile(getClass().getSimpleName(), ".txt");
 
-	public String getLastDownloadPlatformId(String sourceId) {
-		GSLoggerFactory.getLogger(getClass()).info("asked for last download platform for source {}", sourceId);
-		while (lastPlatformbySource == null) {
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+		boolean downloaded = manager.get().download("dabreporting", "download-availability/" + sourceId + "-" + status + ".txt",
+			tmp);
+		if (downloaded) {
+		    try (BufferedReader br = new BufferedReader(new FileReader(tmp))) {
+			String date = br.readLine();
+			String platformId = br.readLine();
+			tmp.delete();
+			return new DownloadInformation(true, ISO8601DateTimeUtils.parseISO8601ToDate(date).get(), platformId);
+		    } catch (IOException e) {
+			e.printStackTrace();
+		    }
+		} else {
+		    if (tmp.exists()) {
+			tmp.delete();
+		    }
+		    return null;
 		}
-		return lastPlatformbySource.get(sourceId);
-	}
 
-	public String getLastFailedDownloadPlatformId(String sourceId) {
-		while (lastFailedPlatformbySource == null) {
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		return lastFailedPlatformbySource.get(sourceId);
+	    } catch (Exception e) {
+		e.printStackTrace();
+	    }
+	} else {
+	    GSLoggerFactory.getLogger(getClass()).error("S3 manager is needed");
 	}
+	return null;
+    }
 
-	public Date getLastDownloadDate(String sourceId) {
-		GSLoggerFactory.getLogger(getClass()).info("asked for last download date for source {}", sourceId);
-		while (lastDownloadDatesbySource == null) {
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		return lastDownloadDatesbySource.get(sourceId);
-	}
+    public DownloadInformation getLastDownloadInformation(String sourceId) {
+	return getLastDownloadInformation(true, sourceId);
+    }
 
-	public Date getLastFailedDownloadDate(String sourceId) {
-		while (lastFailedDownloadDatesbySource == null) {
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		return lastFailedDownloadDatesbySource.get(sourceId);
-	}
+    public DownloadInformation getLastFailedDownloadInformation(String sourceId) {
+	return getLastDownloadInformation(false, sourceId);
+    }
 
 }

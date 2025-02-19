@@ -23,7 +23,6 @@
 	</dependencies>
 
 	<modules>
-		<module>access-tools-downloader-s3</module>
 		<module>access-tools-downloader-usgs</module>		
 		<module>access-tools-downloader-wcs</module>
 		<module>access-tools-downloader-wof</module>
