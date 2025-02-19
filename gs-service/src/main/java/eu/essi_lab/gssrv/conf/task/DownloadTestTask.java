@@ -132,11 +132,11 @@ public class DownloadTestTask extends AbstractCustomTask {
 
 	for (int i = 0; i < resources.size(); i++) {
 
-	    GSLoggerFactory.getLogger(getClass()).info("At source {} of {} sources", (i + 1), resources.size());
-
 	    GSResource resource = resources.get(i);
-	    String sourceId = resource.getSource().getUniqueIdentifier();
 
+	    String sourceId = resource.getSource().getUniqueIdentifier();
+	    GSLoggerFactory.getLogger(getClass()).info("At source {} ({})of {} sources. Resource id: {}", (i + 1),
+		    resource.getSource().getLabel(), resources.size(), resource.getPublicId());
 	    Optional<GSResource> augmented = augmenter.augment(resource);
 	    String result = "bad";
 	    if (augmented.isEmpty()) {
@@ -144,7 +144,7 @@ public class DownloadTestTask extends AbstractCustomTask {
 	    } else {
 		GSResource a = augmented.get();
 		Optional<String> lastDownload = a.getPropertyHandler().getLastDownloadDate();
-		Optional<String> lastFailedDownload = a.getPropertyHandler().getLastDownloadDate();
+		Optional<String> lastFailedDownload = a.getPropertyHandler().getLastFailedDownloadDate();
 		if (lastDownload.isEmpty()) {
 		    GSLoggerFactory.getLogger(getClass()).error("Was not able to download");
 		} else {

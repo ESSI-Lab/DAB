@@ -840,7 +840,7 @@ public class ConfigurationWrapper {
 	S3TransferWrapper manager = new S3TransferWrapper();
 	manager.setAccessKey(accessKey);
 	manager.setSecretKey(secretKey);
-
+	manager.initialize();
 	return Optional.of(manager);
     }
 
