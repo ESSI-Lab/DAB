@@ -252,11 +252,10 @@ public class HarvesterWorker extends SchedulerWorker<HarvestingSetting> {
 	// 1) IndentifierDecoratorComponent
 	//
 
-	Boolean preserveIds = harvConnSetting.preserveIdentifiers();
+
 
 	IdentifierDecorator identifierDecorator = new IdentifierDecorator(//
 		ConfigurationWrapper.getSourcePrioritySetting(), //
-		preserveIds, //
 		dataBaseReader);
 
 	harvester.getPlan().getComponents().add(new IdentifierDecoratorComponent(identifierDecorator));
