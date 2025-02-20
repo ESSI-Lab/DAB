@@ -113,7 +113,7 @@ public class StatisticsTask extends AbstractCustomTask {
 
 		DownloadInformation goodInfo = AvailabilityMonitor.getInstance().getLastDownloadDate(source);
 		Date lastGoodDownload = goodInfo == null ? null : goodInfo.getDate();
-		DownloadInformation badInfo = AvailabilityMonitor.getInstance().getLastDownloadDate(source);
+		DownloadInformation badInfo = AvailabilityMonitor.getInstance().getLastFailedDownloadDate(source);
 		Date lastBadDownload = badInfo == null ? null : badInfo.getDate();
 
 		Integer downloadAvailable = 0;

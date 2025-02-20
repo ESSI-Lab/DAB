@@ -4,6 +4,7 @@
 package eu.essi_lab.api.database.opensearch;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /*-
  * #%L
@@ -27,11 +28,29 @@ import java.util.ArrayList;
  */
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.json.JSONObject;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
+import org.opensearch.client.opensearch._types.aggregations.Buckets;
+import org.opensearch.client.opensearch._types.aggregations.StringTermsAggregate;
+import org.opensearch.client.opensearch._types.aggregations.StringTermsBucket;
+import org.opensearch.client.opensearch._types.aggregations.TermsAggregation;
+import org.opensearch.client.opensearch._types.aggregations.TopHitsAggregate;
+import org.opensearch.client.opensearch._types.aggregations.TopHitsAggregation;
+import org.opensearch.client.opensearch._types.aggregations.TopHitsAggregation.Builder;
+import org.opensearch.client.opensearch.core.SearchRequest;
+import org.opensearch.client.opensearch.core.SearchResponse;
+import org.opensearch.client.opensearch.core.search.Hit;
+import org.opensearch.client.opensearch.core.search.HitsMetadata;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseExecutor;
+import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.bond.Bond;
@@ -48,20 +67,30 @@ import eu.essi_lab.model.resource.MetadataElement;
  */
 public class OpenSearchExecutor implements DatabaseExecutor {
 
-    @Override
+    private Database database;
+	private OpenSearchClient client;
+	private OpenSearchWrapper wrapper;
+
+	@Override
     public boolean supports(StorageInfo dbUri) {
     	return OpenSearchDatabase.isSupported(dbUri);
     }
 
     @Override
-    public void setDatabase(Database dataBase) {
+    public void setDatabase(Database database) {
+    	this.database = database;
+    	if (database instanceof OpenSearchDatabase) {
+			OpenSearchDatabase osd = (OpenSearchDatabase) database;
+			this.client = osd.getClient();
+			this.wrapper = new OpenSearchWrapper(client);
+		}
 
     }
 
     @Override
     public Database getDatabase() {
 
-	return null;
+	return database;
     }
 
     @Override
@@ -102,125 +131,50 @@ public class OpenSearchExecutor implements DatabaseExecutor {
     @Override
     public List<WMSClusterResponse> execute(WMSClusterRequest request) throws GSException {
 
-//	return null;
-    	try {
-
-    	    ArrayList<WMSClusterResponse> responseList = new ArrayList<WMSClusterResponse>();
-
-//    	    DecimalFormat format = new DecimalFormat();
-//    	    format.setMaximumFractionDigits(5);
-
-//    	    String template = IOStreamUtils.asUTF8String(//
-//    		    getClass().getClassLoader().getResourceAsStream("wms-cluster-query-template.txt"));
-
-    	    List<SpatialExtent> extents = request.getExtents();
-
-//    	    String bboxes = extents.//
-//    		    stream().//
-//    		    map(e -> format.format(e.getSouth()) + "," + format.format(e.getWest()) + "," + format.format(e.getNorth()) + ","
-//    			    + format.format(e.getEast()))
-//    		    .//
-//    		    collect(Collectors.joining("§", "'", "'"));
-
-//    	    template = template.replace("MAX_RESULTS", String.valueOf(request.getMaxResults()));
-//
-//    	    template = template.replace("BBOXES", bboxes);
-
-//    	    String viewQuery = ConfigurationWrapper.getViewSources(request.getView()).//
-//    		    stream().//
-//    		    map(v -> "gs:siq('" + v.getUniqueIdentifier() + "','preprodenvconf')\n").//
-//    		    collect(Collectors.joining(",", "gs:orq((", "))"));
-
-//    	    template = template.replace("VIEW_QUERY", viewQuery);
-
-    	    Bond constraints = request.getConstraints();
-    	    DiscoveryMessage message = new DiscoveryMessage();
-    	    message.setUserBond(constraints);
-//    	    MarkLogicDiscoveryBondHandler bondHandler = new MarkLogicDiscoveryBondHandler(message, getDatabase());
-    	    DiscoveryBondParser bondParser = new DiscoveryBondParser(message.getUserBond().get());
-//    	    bondParser.parse(bondHandler);
-//    	    template = template.replace("PARAMS_QUERY", bondHandler.getParsedQuery());
-
-    	    //
-    	    //
-    	    //
-
-//    	    String responseString = getDatabase().getWrapper().submit(template).asString();
-
-//    	    XMLDocumentReader reader = new XMLDocumentReader(responseString);
-
-    	    //
-    	    // estimate responses
-    	    //
-
-//    	    List<Node> estimateNodes = Arrays.asList(reader.evaluateNodes("//*:response/*:estimate"));
-
-//    	    for (Node estimateNode : estimateNodes) {
-    		WMSClusterResponse response = new WMSClusterResponse();
-//    		String bbox = reader.evaluateString(estimateNode, "@*:bbox");
-//    		response.setBbox(bbox);
-
-//    		Integer stationsCount = Integer.valueOf(reader.evaluateString(estimateNode, "*:stationsCount/text()"));
-//    		Integer totalCount = Integer.valueOf(reader.evaluateString(estimateNode, "*:totalCount/text()"));
-
-    		// term frequency
-//    		Node termFrequency = reader.evaluateNode(estimateNode, "*:termFrequency");
-
-//    		TermFrequencyMap map = TermFrequencyMap.create(termFrequency);
-
-//    		response.setTotalCount(totalCount);
-//    		response.setStationsCount(stationsCount);
-
-//    		response.setMap(map);
-
-    		// average extent
-//    		Node avgBbox = reader.evaluateNode(estimateNode, "*:avgBbox");
-//    		double south = Double.valueOf(reader.evaluateString(avgBbox, "*:south"));
-//    		double west = Double.valueOf(reader.evaluateString(avgBbox, "*:west"));
-//    		double north = Double.valueOf(reader.evaluateString(avgBbox, "*:north"));
-//    		double east = Double.valueOf(reader.evaluateString(avgBbox, "*:east"));
-
-//    		response.setAvgBbox(new SpatialExtent(south, west, north, east));
-
-//    		responseList.add(response);
+//    	GET data-folder-index/_search
+//    	{
+//    	  "size": 0,
+//    	  "query": {
+//    	    "bool": {
+//    	      "must": [
+//    	        { 
+//    	          "range": { 
+//    	            "tmpExtentBegin_date": { 
+//    	              "gte": "2024-01-01T00:00:00", 
+//    	              "lte": "2024-12-31T23:59:59" 
+//    	            } 
+//    	          } 
+//    	        }
+//    	      ]
 //    	    }
-
-    	    //
-    	    // datasets responses
-    	    //
-
-//    	    List<Node> datasetsNodes = Arrays.asList(reader.evaluateNodes("//*:response/*:datasets"));
-
-//    	    for (Node datasetsNode : datasetsNodes) {
-//    		WMSClusterResponse response = new WMSClusterResponse();
-
-//    		String bbox = reader.evaluateString(datasetsNode, "@*:bbox");
-//    		response.setBbox(bbox);
-
-//    		List<Dataset> datasets = Arrays.asList(reader.evaluateNodes(datasetsNode, "*:Dataset")).//
-//    			stream().map(n -> {
-//    			    try {
-//    				return (Dataset) Dataset.create(n);
-//    			    } catch (Exception ex) {
-//    				GSLoggerFactory.getLogger(getClass()).error(ex);
-//    			    }
-//    			    return null;
-//    			}).//
-//    			filter(Objects::nonNull).//
-//    			collect(Collectors.toList());
-
-//    		response.setDatasets(datasets);
-
-//    		responseList.add(response);
+//    	  },
+//    	  "aggs": {
+//    	    "regions": {
+//    	      "filters": {
+//    	        "filters": {
+//    	          "region_1": { "geo_bounding_box": { "bbox": { "top_left": { "lat": 90.0, "lon": -180.0 }, "bottom_right": { "lat": 0.0, "lon": 180.0 } } } },
+//    	          "region_2": { "geo_bounding_box": { "bbox": { "top_left": { "lat": 0.0, "lon": -180.0 }, "bottom_right": { "lat": -90.0, "lon": 180.0 } } } }
+//    	        }
+//    	      },
+//    	      "aggs": {
+//    	                "record_count": { "value_count": { "field": "_id" } },
+//    	        "top_providers": {
+//    	          "terms": {
+//    	            "field": "sourceId_keyword",
+//    	            "size": 5
+//    	          }
+//    	          },
+//    	        "centroid": {
+//    	          "geo_centroid": { "field": "centroid" }
+//    	        }
+//    	        
+//    	        
+//    	      }
 //    	    }
+//    	  }
+//    	}
 
-    	    return responseList;
-    	} catch (Exception e) {
-
-    	    GSLoggerFactory.getLogger(getClass()).error(e);
-
-    	    throw GSException.createException(getClass(), "OpenSearchExecutorWMSClusterError", e);
-    	}
+    	return null;
 
     }
 
