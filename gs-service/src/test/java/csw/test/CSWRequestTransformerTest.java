@@ -111,7 +111,7 @@ public class CSWRequestTransformerTest {
 
 		message.setUserBond(getUserBond(request));
 
-		List<GSSource> sources = getSources(message.getUserBond().get());
+		List<GSSource> sources = getSources(message.getUserBond().get(), Optional.empty());
 		message.setSources(sources);
 
 		return message;

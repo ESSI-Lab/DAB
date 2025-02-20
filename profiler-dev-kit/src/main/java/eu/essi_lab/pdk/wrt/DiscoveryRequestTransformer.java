@@ -154,7 +154,7 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
 	    }
 	}
 
-	List<GSSource> sources = getSources(finalBond);
+	List<GSSource> sources = getSources(finalBond, optionalView);
 	message.setSources(sources);
 
 	ResourceSelector selector = getSelector(message.getWebRequest());
@@ -223,7 +223,7 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
      * of the {@link
      * DiscoveryMessage} bonds
      */
-    protected List<GSSource> getSources(Bond bond) throws GSException {
+    protected List<GSSource> getSources(Bond bond, Optional<View> optionalView) throws GSException {
 
 	logger.trace("Getting sources STARTED");
 
@@ -321,6 +321,17 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
 
 	if (!excList.isEmpty()) {
 	    throw excList.get(0);
+	}
+
+	if (sources.isEmpty()) {
+	    if (optionalView.isPresent()) {
+
+		sources.addAll(ConfigurationWrapper.getViewSources(optionalView.get()));
+
+	    } else {
+
+		sources.addAll(ConfigurationWrapper.getAllSources());
+	    }
 	}
 
 	for (String excludedSource : exclusionList) {
