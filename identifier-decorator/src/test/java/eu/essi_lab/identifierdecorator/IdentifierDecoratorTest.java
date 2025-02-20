@@ -26,8 +26,10 @@ import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.cfga.gs.setting.SourcePrioritySetting;
 import eu.essi_lab.messages.HarvestingProperties;
 import eu.essi_lab.model.GSSource;
+import eu.essi_lab.model.ResultsPriority;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.Dataset;
+import eu.essi_lab.model.resource.DatasetCollection;
 import eu.essi_lab.model.resource.GSResource;
 import java.util.Arrays;
 import java.util.UUID;
@@ -63,7 +65,9 @@ public class IdentifierDecoratorTest {
 
 		expectedException.expect(GSException.class);
 
-		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, Boolean.TRUE, dbReader));
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
 
 		GSSource source = new GSSource();
 		source.setLabel("Source");
@@ -77,8 +81,32 @@ public class IdentifierDecoratorTest {
 	}
 
 	@Test
+	public void test0_1() throws DuplicatedResourceException, ConflictingResourceException, GSException {
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).allowNullOriginalId();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+
+		GSResource resource = new Dataset();
+		resource.setSource(source);
+		Assert.assertNull(resource.getPublicId());
+
+		decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
+
+		Assert.assertNotNull(resource.getPublicId());
+	}
+
+	@Test
 	public void test1() {
-		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, Boolean.TRUE, dbReader));
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
 
 		GSSource source = new GSSource();
 		source.setLabel("Source");
@@ -96,7 +124,10 @@ public class IdentifierDecoratorTest {
 
 	@Test
 	public void test2() throws DuplicatedResourceException, ConflictingResourceException, GSException {
-		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, Boolean.TRUE, dbReader));
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
 
 		GSSource source = new GSSource();
 		source.setLabel("Source");
@@ -114,7 +145,10 @@ public class IdentifierDecoratorTest {
 
 	@Test
 	public void test3() throws DuplicatedResourceException, ConflictingResourceException, GSException {
-		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, Boolean.TRUE, dbReader));
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
 
 		GSSource source = new GSSource();
 		source.setLabel("Source");
@@ -158,7 +192,10 @@ public class IdentifierDecoratorTest {
 	public void test4() throws DuplicatedResourceException, ConflictingResourceException, GSException {
 
 		expectedException.expect(DuplicatedResourceException.class);
-		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, Boolean.TRUE, dbReader));
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
 
 		GSSource source = new GSSource();
 		source.setLabel("Source");
@@ -205,7 +242,10 @@ public class IdentifierDecoratorTest {
 	public void test5() throws DuplicatedResourceException, ConflictingResourceException, GSException {
 
 		expectedException.expect(DuplicatedResourceException.class);
-		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, Boolean.TRUE, dbReader));
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
 
 		GSSource source = new GSSource();
 		source.setLabel("Source");
@@ -252,7 +292,10 @@ public class IdentifierDecoratorTest {
 	public void test6() throws DuplicatedResourceException, ConflictingResourceException, GSException {
 
 		expectedException.expect(DuplicatedResourceException.class);
-		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, Boolean.TRUE, dbReader));
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
 
 		GSSource source = new GSSource();
 		source.setLabel("Source");
@@ -299,7 +342,10 @@ public class IdentifierDecoratorTest {
 	public void test7() throws DuplicatedResourceException, ConflictingResourceException, GSException {
 
 		expectedException.expect(DuplicatedResourceException.class);
-		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, Boolean.TRUE, dbReader));
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
 
 		GSSource source = new GSSource();
 		source.setLabel("Source");
@@ -345,7 +391,9 @@ public class IdentifierDecoratorTest {
 	@Test
 	public void test8() throws DuplicatedResourceException, ConflictingResourceException, GSException {
 
-		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, Boolean.TRUE, dbReader));
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
 
 		GSSource source = new GSSource();
 		source.setLabel("Source");
@@ -394,7 +442,9 @@ public class IdentifierDecoratorTest {
 
 		expectedException.expect(DuplicatedResourceException.class);
 
-		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, Boolean.TRUE, dbReader));
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
 
 		GSSource source = new GSSource();
 		source.setLabel("Source");
@@ -451,7 +501,9 @@ public class IdentifierDecoratorTest {
 
 		expectedException.expect(DuplicatedResourceException.class);
 
-		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, Boolean.TRUE, dbReader));
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
 
 		GSSource source = new GSSource();
 		source.setLabel("Source");
@@ -507,7 +559,10 @@ public class IdentifierDecoratorTest {
 
 	@Test
 	public void test11() throws DuplicatedResourceException, ConflictingResourceException, GSException {
-		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, Boolean.TRUE, dbReader));
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
 
 		GSSource source = new GSSource();
 		source.setLabel("Source");
@@ -573,7 +628,10 @@ public class IdentifierDecoratorTest {
 
 	@Test
 	public void test12() throws DuplicatedResourceException, ConflictingResourceException, GSException {
-		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, Boolean.TRUE, dbReader));
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
 
 		GSSource source = new GSSource();
 		source.setLabel("Source");
@@ -641,7 +699,10 @@ public class IdentifierDecoratorTest {
 	public void test13() throws DuplicatedResourceException, ConflictingResourceException, GSException {
 
 		expectedException.expect(DuplicatedResourceException.class);
-		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, Boolean.TRUE, dbReader));
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
 
 		GSSource source = new GSSource();
 		source.setLabel("Source");
@@ -708,7 +769,10 @@ public class IdentifierDecoratorTest {
 	public void test14() throws DuplicatedResourceException, ConflictingResourceException, GSException {
 
 		expectedException.expect(DuplicatedResourceException.class);
-		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, Boolean.TRUE, dbReader));
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
 
 		GSSource source = new GSSource();
 		source.setLabel("Source");
@@ -774,7 +838,9 @@ public class IdentifierDecoratorTest {
 	@Test
 	public void test15() throws DuplicatedResourceException, ConflictingResourceException, GSException {
 
-		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, Boolean.TRUE, dbReader));
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
 
 		GSSource source = new GSSource();
 		source.setLabel("Source");
@@ -791,6 +857,7 @@ public class IdentifierDecoratorTest {
 				return true;
 			}
 		}).when(sourcePrioritySetting).isPrioritySource(Mockito.any());
+
 		GSResource resource = new Dataset();
 		resource.setSource(source);
 		String originalId = UUID.randomUUID().toString();
@@ -827,13 +894,14 @@ public class IdentifierDecoratorTest {
 
 	}
 
-
-
 	@Test
 	public void test16() throws DuplicatedResourceException, ConflictingResourceException, GSException {
 
 		expectedException.expect(ConflictingResourceException.class);
-		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, Boolean.TRUE, dbReader));
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
 
 		GSSource source = new GSSource();
 		source.setLabel("Source");
@@ -883,8 +951,120 @@ public class IdentifierDecoratorTest {
 
 		decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
 
+	}
 
+	@Test
+	public void test17() {
 
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).mantainUUID();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+
+		GSResource resource = new Dataset();
+		resource.setSource(source);
+		String originalId = UUID.randomUUID().toString();
+		resource.setOriginalId(originalId);
+
+		Assert.assertTrue(decorator.useOriginalId(resource, originalId));
+	}
+
+	@Test
+	public void test18() {
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		Mockito.doReturn(Boolean.FALSE).when(sourcePrioritySetting).mantainUUID();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+
+		GSResource resource = new Dataset();
+		resource.setSource(source);
+		String originalId = UUID.randomUUID().toString();
+		resource.setOriginalId(originalId);
+
+		Assert.assertFalse(decorator.useOriginalId(resource, originalId));
+	}
+
+	@Test
+	public void test19() {
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		Mockito.doReturn(Boolean.FALSE).when(sourcePrioritySetting).mantainUUID();
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).mantainCollectionId();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+		source.setResultsPriority(ResultsPriority.COLLECTION);
+
+		GSResource resource = new DatasetCollection();
+		resource.setSource(source);
+		String originalId = "collectionid";
+		resource.setOriginalId(originalId);
+
+		Assert.assertTrue(decorator.useOriginalId(resource, originalId));
+	}
+
+	@Test
+	public void test20() {
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		Mockito.doReturn(Boolean.FALSE).when(sourcePrioritySetting).mantainUUID();
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).mantainCollectionId();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+		source.setResultsPriority(ResultsPriority.DATASET);
+
+		GSResource resource = new DatasetCollection();
+		resource.setSource(source);
+		String originalId = "collectionid";
+		resource.setOriginalId(originalId);
+
+		Assert.assertFalse(decorator.useOriginalId(resource, originalId));
+	}
+
+	@Test
+	public void test21() {
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+
+		Mockito.doReturn(Boolean.FALSE).when(sourcePrioritySetting).mantainUUID();
+
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).mantainCollectionId();
+
+		IdentifierDecorator decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
+
+		GSSource source = new GSSource();
+		source.setLabel("Source");
+		source.setUniqueIdentifier("identifier");
+		source.setResultsPriority(ResultsPriority.COLLECTION);
+
+		GSResource resource = new Dataset();
+		resource.setSource(source);
+		String originalId = "datasetid";
+		resource.setOriginalId(originalId);
+
+		Assert.assertFalse(decorator.useOriginalId(resource, originalId));
 	}
 
 }

@@ -20,8 +20,8 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.Dataset;
 
 /**
- * @see https://confluence.geodab.eu/pages/viewpage.action?spaceKey=GPD&title=Identifier+Decorator
  * @author Fabrizio
+ * @see https://confluence.geodab.eu/pages/viewpage.action?spaceKey=GPD&title=Identifier+Decorator
  */
 public class DuplicatedResourceTest {
 
@@ -67,10 +67,9 @@ public class DuplicatedResourceTest {
 		} catch (GSException e) {
 		}
 
-
-
-		SourcePrioritySetting sourcePrioritySetting=Mockito.mock(SourcePrioritySetting.class);
-		decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting,Boolean.TRUE,dbReader));
+		SourcePrioritySetting sourcePrioritySetting = Mockito.mock(SourcePrioritySetting.class);
+		Mockito.doReturn(Boolean.TRUE).when(sourcePrioritySetting).preserveIdentifiers();
+		decorator = Mockito.spy(new IdentifierDecorator(sourcePrioritySetting, dbReader));
 
 		Mockito.when(decorator.getDatabaseReader()).thenReturn(dbReader);
 	}
