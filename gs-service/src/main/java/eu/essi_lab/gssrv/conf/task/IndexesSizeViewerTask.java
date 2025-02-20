@@ -66,7 +66,7 @@ public class IndexesSizeViewerTask extends AbstractCustomTask {
 	format.setGroupingUsed(true);
 	format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.ITALIAN));
 
-	StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo databaseURI = ConfigurationWrapper.getStorageInfo();
 
 	DatabaseReader dbReader = DatabaseProviderFactory.getReader(databaseURI);
 	MarkLogicDatabase dataBase = ((MarkLogicDatabase) dbReader.getDatabase());

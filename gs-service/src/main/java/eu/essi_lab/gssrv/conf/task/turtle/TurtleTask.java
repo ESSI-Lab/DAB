@@ -256,7 +256,7 @@ public class TurtleTask extends AbstractCustomTask {
 		discoveryMessage.getResourceSelector().setSubset(ResourceSubset.FULL);
 
 		discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
-		discoveryMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+		discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 		ResourcePropertyBond bond = BondFactory.createSourceIdentifierBond(sourceId);
 		discoveryMessage.setPermittedBond(bond);
 		discoveryMessage.setUserBond(bond);

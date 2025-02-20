@@ -224,7 +224,7 @@ public class TermsHandler extends StreamingRequestHandler {
 
 		    Page page = discoveryMessage.getPage();
 
-		    DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(ConfigurationWrapper.getDatabaseURI());
+		    DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(ConfigurationWrapper.getStorageInfo());
 
 		    List<String> results = executor.getIndexValues(discoveryMessage, metadata, page.getStart(), page.getSize());
 

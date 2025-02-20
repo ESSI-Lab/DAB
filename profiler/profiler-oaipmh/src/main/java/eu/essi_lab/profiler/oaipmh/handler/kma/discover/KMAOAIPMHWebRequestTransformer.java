@@ -45,7 +45,7 @@ public class KMAOAIPMHWebRequestTransformer extends OAIPMHRequestTransformer {
 
 	DiscoveryMessage refinedMessage = super.refineMessage(message);
 
-	setView("KMA", ConfigurationWrapper.getDatabaseURI(), refinedMessage);
+	setView("KMA", ConfigurationWrapper.getStorageInfo(), refinedMessage);
 
 	return refinedMessage;
     }

@@ -78,7 +78,7 @@ public class ARPARESTSourcesHandler extends DefaultRequestHandler {
     @Override
     public String getStringResponse(WebRequest webRequest) throws GSException {
 
-	StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo databaseURI = ConfigurationWrapper.getStorageInfo();
 	DatabaseReader reader = DatabaseProviderFactory.getReader(databaseURI);
 
 	JSONArray ret = new JSONArray();
@@ -118,7 +118,7 @@ public class ARPARESTSourcesHandler extends DefaultRequestHandler {
 
 	    // set the required properties
 	    statisticsMessage.setSources(allSources);
-	    statisticsMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	    statisticsMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 	    statisticsMessage.setWebRequest(webRequest);
 
 	    // set the user bond

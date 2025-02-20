@@ -140,7 +140,7 @@ public class GetViewWorker extends ViewWorker {
 
 	    // set the required properties
 	    statisticsMessage.setSources(allSources);
-	    statisticsMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	    statisticsMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 	    statisticsMessage.setWebRequest(request);
 
 	    // set the user bond

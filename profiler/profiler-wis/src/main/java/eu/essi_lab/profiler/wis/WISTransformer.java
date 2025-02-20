@@ -81,7 +81,7 @@ public class WISTransformer extends DiscoveryRequestTransformer {
 	    JSONObject inputs = json.getJSONObject("inputs");
 	    view = inputs.getString("collection");
 	    }
-	    StorageInfo storageUri = ConfigurationWrapper.getDatabaseURI();
+	    StorageInfo storageUri = ConfigurationWrapper.getStorageInfo();
 	    setView(view, storageUri, message);
 	} catch (IOException e) {
 	    // TODO Auto-generated catch block

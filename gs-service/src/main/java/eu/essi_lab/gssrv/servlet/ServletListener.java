@@ -91,7 +91,7 @@ public class ServletListener implements ServletContextListener {
 	GSLoggerFactory.getLogger(ServletListener.class).info("Context destroyng STARTED");
 
 	try {
-	    StorageInfo uri = ConfigurationWrapper.getDatabaseURI();
+	    StorageInfo uri = ConfigurationWrapper.getStorageInfo();
 
 	    GSLoggerFactory.getLogger(getClass()).info("Releasing database resources");
 

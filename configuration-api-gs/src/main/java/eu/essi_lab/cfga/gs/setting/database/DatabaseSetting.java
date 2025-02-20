@@ -447,7 +447,7 @@ public final class DatabaseSetting extends Setting implements EditableSetting {
     /***
      * @return
      */
-    public StorageInfo asStorageUri() {
+    public StorageInfo asStorageInfo() {
 
 	StorageInfo storageUri = new StorageInfo();
 

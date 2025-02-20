@@ -60,7 +60,7 @@ public class SettingResetTest {
 	String databasePassword = databaseSetting.getDatabasePassword();
 	Assert.assertEquals("password", databasePassword);
 
-	StorageInfo storageUri = databaseSetting.asStorageUri();
+	StorageInfo storageUri = databaseSetting.asStorageInfo();
 
 	Assert.assertEquals("folder", storageUri.getIdentifier());
 
@@ -81,7 +81,7 @@ public class SettingResetTest {
 
 	Assert.assertFalse(databaseSetting.isVolatile());
 
-	Assert.assertNotNull(databaseSetting.asStorageUri());
+	Assert.assertNotNull(databaseSetting.asStorageInfo());
 
 	String configurationFolder = databaseSetting.getConfigurationFolder();
 	Assert.assertNull(configurationFolder);
@@ -98,7 +98,7 @@ public class SettingResetTest {
 	String databasePassword = databaseSetting.getDatabasePassword();
 	Assert.assertNull(databasePassword);
 
-	StorageInfo storageUri = databaseSetting.asStorageUri();
+	StorageInfo storageUri = databaseSetting.asStorageInfo();
 
 	Assert.assertNull(storageUri.getIdentifier());
 

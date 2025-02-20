@@ -106,7 +106,7 @@ public class GetObservationTransformer extends AccessRequestTransformer {
 	DiscoveryMessage discoveryMessage = new DiscoveryMessage();
 
 	if (optionalViewId.isPresent()) {
-	    StorageInfo storageUri = ConfigurationWrapper.getDatabaseURI();
+	    StorageInfo storageUri = ConfigurationWrapper.getStorageInfo();
 
 	    Optional<View> optionalView = WebRequestTransformer.findView(storageUri, optionalViewId.get());
 
@@ -121,7 +121,7 @@ public class GetObservationTransformer extends AccessRequestTransformer {
 	discoveryMessage.setPage(new Page(1, 1));
 
 	discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
-	discoveryMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 
 	List<Bond> bonds = new ArrayList<>();
 
@@ -320,7 +320,7 @@ public class GetObservationTransformer extends AccessRequestTransformer {
 	discoveryMessage.setPage(new Page(1, 1));
 
 	discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
-	discoveryMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 
 	SimpleValueBond bond = BondFactory.createSimpleValueBond(//
 		BondOperator.EQUAL, //

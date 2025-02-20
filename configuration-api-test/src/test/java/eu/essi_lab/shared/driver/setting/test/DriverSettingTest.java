@@ -65,7 +65,7 @@ public class DriverSettingTest {
 
 	DatabaseSetting databaseCacheSetting = setting.getElasticSearchSetting().get();
 
-	StorageInfo asStorageUri = databaseCacheSetting.asStorageUri();
+	StorageInfo asStorageUri = databaseCacheSetting.asStorageInfo();
 
 	Assert.assertNull(asStorageUri.getIdentifier());
 	Assert.assertNull(asStorageUri.getPassword());
@@ -89,7 +89,7 @@ public class DriverSettingTest {
 
 	DatabaseSetting databaseCacheSetting = setting.getElasticSearchSetting().get();
 
-	StorageInfo asStorageUri = databaseCacheSetting.asStorageUri();
+	StorageInfo asStorageUri = databaseCacheSetting.asStorageInfo();
 
 	Assert.assertEquals("name", asStorageUri.getName());
     }
@@ -213,7 +213,7 @@ public class DriverSettingTest {
 
 	DatabaseSetting databaseCacheSetting = setting.getDatabaseCacheSetting().get();
 
-	StorageInfo asStorageUri = databaseCacheSetting.asStorageUri();
+	StorageInfo asStorageUri = databaseCacheSetting.asStorageInfo();
 
 	Assert.assertNull(asStorageUri.getIdentifier());
 	Assert.assertNull(asStorageUri.getPassword());
@@ -239,7 +239,7 @@ public class DriverSettingTest {
 
 	DatabaseSetting databaseCacheSetting = setting.getDatabaseCacheSetting().get();
 
-	StorageInfo asStorageUri = databaseCacheSetting.asStorageUri();
+	StorageInfo asStorageUri = databaseCacheSetting.asStorageInfo();
 
 	Assert.assertEquals("name", asStorageUri.getName());
 

@@ -139,9 +139,9 @@ public class ConfigurationWrapper {
     /**
      * @return
      */
-    public static StorageInfo getDatabaseURI() {
+    public static StorageInfo getStorageInfo() {
 
-	return getDatabaseSetting().asStorageUri();
+	return getDatabaseSetting().asStorageInfo();
     }
 
     /**

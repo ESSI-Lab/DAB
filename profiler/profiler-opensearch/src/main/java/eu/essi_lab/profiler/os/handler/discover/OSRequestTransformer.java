@@ -114,7 +114,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 	message = super.refineMessage(message);
 
-	StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo databaseURI = ConfigurationWrapper.getStorageInfo();
 
 	//
 	// covering mode: overrides the satellites sources results priority,
@@ -557,7 +557,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 	if (viewId != null && !viewId.equals(KeyValueParser.UNDEFINED)) {
 
-	    view = WebRequestTransformer.findView(ConfigurationWrapper.getDatabaseURI(), viewId);
+	    view = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
 	}
 
 	if (sources == null || sources.equals(KeyValueParser.UNDEFINED)) {

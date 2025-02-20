@@ -34,20 +34,17 @@
 </head>
 <body>
 	<%
-	
-		
-	
-	    String view = request.getParameter("view");
-	if (view==null || view.isEmpty()){
+	String view = request.getParameter("view");
+		if (view==null || view.isEmpty()){
 	    out.println("Unexpected: view parameter missing");
 	    return;
-	}
+		}
 
 	    List<GSSource> allSources = ConfigurationWrapper.getAllSources();
 	    StatisticsMessage statisticsMessage = new StatisticsMessage();
 	    // set the required properties
 	    statisticsMessage.setSources(allSources);
-	    statisticsMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	    statisticsMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 	    // statisticsMessage.setSharedRepositoryInfo(ConfigurationUtils.getSharedRepositoryInfo());
 
 	    ServiceLoader<IStatisticsExecutor> loader = ServiceLoader.load(IStatisticsExecutor.class);
@@ -55,9 +52,9 @@
 	    statisticsMessage.groupBy(ResourceProperty.SOURCE_ID);
 	    // set the view
 	    WebRequestTransformer.setView(//
-			    view, //
-			    statisticsMessage.getDataBaseURI(), //
-			    statisticsMessage);
+				    view, //
+				    statisticsMessage.getDataBaseURI(), //
+				    statisticsMessage);
 
 	    // pagination works with grouped results. in this case there is one result item for each
 	    // source/country/etc.
@@ -84,37 +81,37 @@
 	    // 	statisticsMessage.setUserBond(BondFactory.createSourceIdentifierBond("seadatanet-open"));
 	    // 	statisticsMessage.groupBy(queryable);
 	    List<ResponseItem> items = executor.compute(statisticsMessage).getItems();
-		out.println("<p>This page lists available protocols from distribution information of each source</p>");
+			out.println("<p>This page lists available protocols from distribution information of each source</p>");
 
 	    for (ResponseItem item : items) {
 
-		String sourceId = item.getGroupedBy().get();
-		
-		GSSource source = ConfigurationWrapper.getSource(sourceId);
-		
-		
-		out.println("<h2>"+source.getLabel()+"</h2>");
-		
-			Optional<ComputationResult> frequency = item.getFrequency(MetadataElement.ONLINE_PROTOCOL);
+			String sourceId = item.getGroupedBy().get();
+			
+			GSSource source = ConfigurationWrapper.getSource(sourceId);
+			
+			
+			out.println("<h2>"+source.getLabel()+"</h2>");
+			
+				Optional<ComputationResult> frequency = item.getFrequency(MetadataElement.ONLINE_PROTOCOL);
 
-			if (frequency.isPresent()) {
-			    List<TermFrequencyItem> list = frequency.get().getFrequencyItems();
-			    if (!list.isEmpty()) {
-				out.println("<table>");
-				out.println("<tr><th>Term</th><th>Occurrences</th></tr>");
-				for (TermFrequencyItem it : list) {
-				    String label = it.getLabel();
-				    int freq = it.getFreq();
-				    String term = it.getTerm();
-				    out.println("<tr><td>"+term + "</td><td>"+ freq + "</td></tr>");
+				if (frequency.isPresent()) {
+				    List<TermFrequencyItem> list = frequency.get().getFrequencyItems();
+				    if (!list.isEmpty()) {
+					out.println("<table>");
+					out.println("<tr><th>Term</th><th>Occurrences</th></tr>");
+					for (TermFrequencyItem it : list) {
+					    String label = it.getLabel();
+					    int freq = it.getFreq();
+					    String term = it.getTerm();
+					    out.println("<tr><td>"+term + "</td><td>"+ freq + "</td></tr>");
+					}
+					out.println("</table>");
+				    } else {
+					out.println("Empty list");
+				    }
+				} else {
+				    out.println("Frequency not present");
 				}
-				out.println("</table>");
-			    } else {
-				out.println("Empty list");
-			    }
-			} else {
-			    out.println("Frequency not present");
-			}
 
 	    }
 	%>

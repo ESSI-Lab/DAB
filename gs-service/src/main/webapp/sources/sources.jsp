@@ -33,10 +33,9 @@
 </head>
 <body>
 	<%
-
 	String viewId = request.getParameter("view");
 
-	if (viewId != null && !viewId.trim().isEmpty()) {
+		if (viewId != null && !viewId.trim().isEmpty()) {
 
 	    ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
 	    IDiscoveryExecutor executor = loader.iterator().next();
@@ -46,11 +45,11 @@
 	    discoveryMessage.setPage(new Page(1, 1000));
 	    discoveryMessage.setIteratedWorkflow(IterationMode.FULL_RESPONSE);
 	    discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
-	    StorageInfo uri = ConfigurationWrapper.getDatabaseURI();
+	    StorageInfo uri = ConfigurationWrapper.getStorageInfo();
 	    discoveryMessage.setDataBaseURI(uri);
 
-	    Optional<View> view = WebRequestTransformer.findView(ConfigurationWrapper.getDatabaseURI(), viewId);
-	    WebRequestTransformer.setView(view.get().getId(), ConfigurationWrapper.getDatabaseURI(), discoveryMessage);
+	    Optional<View> view = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
+	    WebRequestTransformer.setView(view.get().getId(), ConfigurationWrapper.getStorageInfo(), discoveryMessage);
 	    discoveryMessage.setDistinctValuesElement(ResourceProperty.SOURCE_ID);
 	    ResultSet<GSResource> resultSet = executor.retrieve(discoveryMessage);
 	    List<GSResource> resources = resultSet.getResultsList();
@@ -58,34 +57,34 @@
 	    out.println("<h2>Sources</h2>");
 
 	    resources.sort(new Comparator<GSResource>() {
-		public int compare(GSResource o1, GSResource o2) {
+			public int compare(GSResource o1, GSResource o2) {
 	    return o1.getSource().getLabel().compareTo(o2.getSource().getLabel());
-		}
+			}
 	    });
 
 	    out.println("<ul>");
 	    for (GSResource resource : resources) {
-		GSSource source = resource.getSource();
-		String sourceId = source.getUniqueIdentifier();
-		String sourceLabel = source.getLabel();
-		out.println("<li><p>" + sourceId + "</p><p>" + sourceLabel + "</p></li>");
+			GSSource source = resource.getSource();
+			String sourceId = source.getUniqueIdentifier();
+			String sourceLabel = source.getLabel();
+			out.println("<li><p>" + sourceId + "</p><p>" + sourceLabel + "</p></li>");
 	    }
 	    out.println("</ul>");
 
 	    int i = 0;
 	    out.println("List<Source>sources = new ArrayList();");
 	    for (GSResource resource : resources) {
-		GSSource source = resource.getSource();
-		String sourceId = source.getUniqueIdentifier();
-		String sourceLabel = source.getLabel();
-		out.println("sources.add(new Source(\"" + sourceId + "\", \"" + sourceLabel + "\"));");
-		i++;
+			GSSource source = resource.getSource();
+			String sourceId = source.getUniqueIdentifier();
+			String sourceLabel = source.getLabel();
+			out.println("sources.add(new Source(\"" + sourceId + "\", \"" + sourceLabel + "\"));");
+			i++;
 	    }
 	    out.println("addDeployment(\"" + viewId + "\", sources);");
 
-	} else {
+		} else {
 	    out.println("A view parameter is needed here");
-	}
+		}
 	%>
 </body>
 </html>

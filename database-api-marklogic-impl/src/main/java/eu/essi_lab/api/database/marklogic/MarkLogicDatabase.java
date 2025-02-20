@@ -216,7 +216,7 @@ public class MarkLogicDatabase extends Database {
     public void configure(DatabaseSetting setting) {
 
 	try {
-	    initialize(setting.asStorageUri());
+	    initialize(setting.asStorageInfo());
 
 	} catch (GSException e) {
 

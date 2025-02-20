@@ -144,7 +144,7 @@ public class CachedCollections {
 			WebRequestTransformer.setView(view, storageUri, discoveryMessage);
 
 			discoveryMessage.setSources(ConfigurationWrapper.getAllSources());
-			discoveryMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+			discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 
 			tmpResultSet = executor.retrieveNodes(discoveryMessage);
 

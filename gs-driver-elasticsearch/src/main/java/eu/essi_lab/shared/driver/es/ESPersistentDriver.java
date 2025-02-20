@@ -253,7 +253,7 @@ public class ESPersistentDriver implements ISharedRepositoryDriver<SharedPersist
 
     private IESConnector getConnectorOrThrowEx() throws GSException {
 
-	Optional<IESConnector> optional = getConnector(setting.getElasticSearchSetting().get().asStorageUri());
+	Optional<IESConnector> optional = getConnector(setting.getElasticSearchSetting().get().asStorageInfo());
 
 	return optional.orElseThrow(() -> GSException.createException(//
 

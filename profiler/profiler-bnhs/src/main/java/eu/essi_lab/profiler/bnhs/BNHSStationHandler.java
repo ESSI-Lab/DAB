@@ -150,7 +150,7 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 	    discoveryMessage.setPage(new Page(1, DEFAULT_PAGE_SIZE));
 	    discoveryMessage.setIteratedWorkflow(IterationMode.FULL_RESPONSE);
 	    discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
-	    discoveryMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	    discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 
 	    Set<Bond> operands = new HashSet<>();
 
@@ -175,7 +175,7 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 
 	    LogicalBond bond = BondFactory.createAndBond(operands);
 
-	    StorageInfo storageUri = ConfigurationWrapper.getDatabaseURI();
+	    StorageInfo storageUri = ConfigurationWrapper.getStorageInfo();
 
 	    Optional<View> optionalView = WebRequestTransformer.findView(storageUri, viewId);
 

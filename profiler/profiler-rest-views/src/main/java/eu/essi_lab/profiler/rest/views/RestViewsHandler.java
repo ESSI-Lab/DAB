@@ -350,7 +350,7 @@ public class RestViewsHandler extends DefaultRequestHandler {
 
 	message.setCurrentUser(webRequest.getCurrentUser());
 
-	message.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	message.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 
 	String query = webRequest.getQueryString();
 
@@ -534,7 +534,7 @@ public class RestViewsHandler extends DefaultRequestHandler {
      */
     private DatabaseReader getDatabaseReader() throws GSException {
 
-	return DatabaseProviderFactory.getReader(ConfigurationWrapper.getDatabaseURI());
+	return DatabaseProviderFactory.getReader(ConfigurationWrapper.getStorageInfo());
     }
 
     /**

@@ -278,7 +278,7 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 
 	    String viewId = webRequest.extractViewId().get();
 
-	    Optional<View> view = WebRequestTransformer.findView(ConfigurationWrapper.getDatabaseURI(), viewId);
+	    Optional<View> view = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
 
 	    String version = checkParameter(map, Parameter.VERSION).isEmpty() ? "1.3.0" : checkParameter(map, Parameter.VERSION);
 	    String layers = checkParameter(map, Parameter.LAYERS);
@@ -398,7 +398,7 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 
 			double tol = 0.0000000001;
 
-			StorageInfo uri = ConfigurationWrapper.getDatabaseURI();
+			StorageInfo uri = ConfigurationWrapper.getStorageInfo();
 			DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(uri);
 
 			WMSClusterRequest request = new WMSClusterRequest();
