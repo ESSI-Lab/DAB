@@ -390,7 +390,7 @@ public class WISUtils {
 	discoveryMessage.setPage(new Page(1, 1000));
 	discoveryMessage.setIteratedWorkflow(IterationMode.FULL_RESPONSE);
 	discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
-	StorageInfo uri = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo uri = ConfigurationWrapper.getStorageInfo();
 	discoveryMessage.setDataBaseURI(uri);
 
 	String viewId = null;

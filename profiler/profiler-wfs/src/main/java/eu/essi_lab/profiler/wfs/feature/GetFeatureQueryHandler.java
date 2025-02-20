@@ -103,7 +103,7 @@ public class GetFeatureQueryHandler extends WFSQueryHandler {
 	    }
 
 	    discoveryMessage.setSources(ConfigurationWrapper.getAllSources());
-	    discoveryMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	    discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 
 	    tmpResultSet = executor.retrieveNodes(discoveryMessage);
 

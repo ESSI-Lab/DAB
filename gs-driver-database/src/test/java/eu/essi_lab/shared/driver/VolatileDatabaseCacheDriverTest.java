@@ -11,7 +11,7 @@ import eu.essi_lab.model.StorageInfo;
  */
 public class VolatileDatabaseCacheDriverTest extends DatabaseCacheDriverTest {
 
-    private static final StorageInfo TEST_DB_URI = new DatabaseSetting(true).asStorageUri();
+    private static final StorageInfo TEST_DB_URI = new DatabaseSetting(true).asStorageInfo();
 
     /**
      * @param uri

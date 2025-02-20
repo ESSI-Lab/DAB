@@ -93,7 +93,7 @@ public class AugmenterWorkerSettingImpl extends AugmenterWorkerSetting {
 	@Override
 	protected List<String> loadValues(Optional<String> input) throws Exception {
 
-	    DatabaseReader reader = DatabaseProviderFactory.getReader(ConfigurationWrapper.getDatabaseURI());
+	    DatabaseReader reader = DatabaseProviderFactory.getReader(ConfigurationWrapper.getStorageInfo());
 
 	    return reader.getViewIdentifiers(GetViewIdentifiersRequest.create());
 	}

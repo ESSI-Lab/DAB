@@ -60,7 +60,7 @@ public class RestViewsSourcesHandler extends DefaultRequestHandler {
     @Override
     public String getStringResponse(WebRequest webRequest) throws GSException {
 
-	StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo databaseURI = ConfigurationWrapper.getStorageInfo();
 	DatabaseReader reader = DatabaseProviderFactory.getReader(databaseURI);
 
 	//

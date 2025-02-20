@@ -101,7 +101,7 @@ public abstract class StreamingRequestHandler extends DefaultRequestHandler {
 
 	    message.setCurrentUser(request.getCurrentUser());
 
-	    message.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	    message.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 
 	    message.setPage(new Page());
 

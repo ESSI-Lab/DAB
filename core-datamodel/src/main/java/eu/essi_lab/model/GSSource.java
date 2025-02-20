@@ -22,6 +22,8 @@ package eu.essi_lab.model;
  */
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -60,6 +62,10 @@ public class GSSource implements Serializable {
     @XmlElement(namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     private String label;
 
+    @NotNull(message = "deployment field of GSSource cannot be null")
+    @XmlElement(namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
+    private List<String> deployment;
+
     @XmlAttribute(namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     private OrderingDirection orderingDirection = OrderingDirection.ASCENDING;
 
@@ -75,6 +81,7 @@ public class GSSource implements Serializable {
     public GSSource() {
 	setResultsPriority(ResultsPriority.UNSET);
 	setOrderingDirection(OrderingDirection.ASCENDING);
+	this.deployment = new ArrayList<String>();
     }
 
     @XmlTransient
@@ -96,6 +103,18 @@ public class GSSource implements Serializable {
      */
     public void setOrderingProperty(String orderingProperty) {
 	this.orderingProperty = orderingProperty;
+    }
+
+    @XmlTransient
+    public List<String> getDeployment() {
+	return deployment;
+    }
+
+    /**
+     * @param deployment
+     */
+    public void addDeployment(String deployment) {
+	this.deployment.add(deployment);
     }
 
     @XmlTransient
@@ -153,7 +172,7 @@ public class GSSource implements Serializable {
     }
 
     @Override
-    
+
     public String toString() {
 	return this.getLabel() + " [" + this.getUniqueIdentifier() + "] [" + this.getEndpoint() + "]";
     }
@@ -166,10 +185,17 @@ public class GSSource implements Serializable {
 	    GSSource s = (GSSource) o;
 	    return s.getBrokeringStrategy() == this.getBrokeringStrategy() && //
 		    (s.getEndpoint() == null && this.getEndpoint() == null || s.getEndpoint().equals(this.getEndpoint()) && //
-		     s.getOrderingDirection() == this.getOrderingDirection() && s.getOrderingProperty() == this.getOrderingProperty() && //
-		     s.getResultsPriority() == this.getResultsPriority() && //
-		    (s.getUniqueIdentifier() == null && this.getUniqueIdentifier() == null || s.getUniqueIdentifier().equals(this.getUniqueIdentifier())) && //
-		    (s.getVersion() == null && this.getVersion() == null || s.getVersion().equals(this.getVersion())));//
+			    s.getOrderingDirection() == this.getOrderingDirection() && s.getOrderingProperty() == this.getOrderingProperty()
+			    && //
+			    s.getResultsPriority() == this.getResultsPriority() && //
+			    (s.getUniqueIdentifier() == null && this.getUniqueIdentifier() == null
+				    || s.getUniqueIdentifier().equals(this.getUniqueIdentifier()))
+			    && //
+			    (s.getVersion() == null && this.getVersion() == null || s.getVersion().equals(this.getVersion())) &&
+
+			    (s.getDeployment() == null && this.getDeployment() == null || s.getDeployment().equals(this.getDeployment())) //
+
+		    );//
 	}
 
 	return false;

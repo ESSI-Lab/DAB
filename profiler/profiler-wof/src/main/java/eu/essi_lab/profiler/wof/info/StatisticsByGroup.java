@@ -44,7 +44,7 @@ public abstract class StatisticsByGroup implements StatisticsGenerator {
 
 	// set the required properties
 	statisticsMessage.setSources(allSources);
-	statisticsMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	statisticsMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 //	statisticsMessage.setSharedRepositoryInfo(ConfigurationWrapper.getSharedRepositoryInfo());
 	statisticsMessage.setWebRequest(webRequest);
 

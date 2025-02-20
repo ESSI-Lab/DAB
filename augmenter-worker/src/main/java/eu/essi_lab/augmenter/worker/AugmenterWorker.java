@@ -120,7 +120,7 @@ public class AugmenterWorker extends SchedulerWorker<AugmenterWorkerSetting> {
 
 	AugmentationReportsHandler.sendAugmentationEmail(true, context.isRecovering(), getSetting());
 
-	StorageInfo storageURI = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo storageURI = ConfigurationWrapper.getStorageInfo();
 
 	DatabaseReader reader = DatabaseProviderFactory.getReader(storageURI);
 	DatabaseWriter writer = DatabaseProviderFactory.getWriter(storageURI);

@@ -96,7 +96,7 @@ public class HydroCSVViewsHandler extends DefaultRequestHandler {
 	// } catch (Exception e) {
 	// }
 
-	StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo databaseURI = ConfigurationWrapper.getStorageInfo();
 	DatabaseReader reader = DatabaseProviderFactory.getReader(databaseURI);
 
 	List<String> viewIdentifiers = reader.getViewIdentifiers(GetViewIdentifiersRequest.create(start, count));
@@ -149,7 +149,7 @@ public class HydroCSVViewsHandler extends DefaultRequestHandler {
 
 	    // set the required properties
 	    statisticsMessage.setSources(allSources);
-	    statisticsMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	    statisticsMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 	    statisticsMessage.setWebRequest(webRequest);
 
 	    // set the user bond

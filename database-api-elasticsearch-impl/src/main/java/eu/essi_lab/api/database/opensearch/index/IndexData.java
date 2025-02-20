@@ -208,7 +208,7 @@ public class IndexData {
 
 	Optional<Long> toLong = ConversionUtils.parseToLong("19841231-01-01T00:00:00Z");
 
-//	Optional<Date> notStandardToDate = ISO8601DateTimeUtils.parseNotStandard3ToDate("2023");
+	// Optional<Date> notStandardToDate = ISO8601DateTimeUtils.parseNotStandard3ToDate("2023");
 	System.out.println(toLong);
 
 	// System.out.println(toLong);
@@ -471,6 +471,9 @@ public class IndexData {
 		indexData.put(ViewsMapping.VIEW_OWNER, view.getOwner());
 		indexData.put(ViewsMapping.VIEW_CREATOR, view.getCreator());
 		indexData.put(ViewsMapping.VIEW_VISIBILITY, view.getVisibility().name());
+		if (view.getSourceDeployment() != null) {
+		    indexData.put(ViewsMapping.SOURCE_DEPLOYMENT, view.getSourceDeployment());
+		}
 
 	    } catch (JAXBException e) {
 

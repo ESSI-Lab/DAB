@@ -144,7 +144,7 @@ public class UserFinder {
 
 	UserFinder finder = new UserFinder();
 
-	StorageInfo storageUri = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo storageUri = ConfigurationWrapper.getStorageInfo();
 
 	DatabaseReader reader = DatabaseProviderFactory.getReader(storageUri);
 	DatabaseWriter writer = DatabaseProviderFactory.getWriter(storageUri);

@@ -53,7 +53,7 @@ public class SourceStatistics {
 	List<GSSource> allSources = ConfigurationWrapper.getAllSources();
 	// set the required properties
 	statisticsMessage.setSources(allSources);
-	statisticsMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	statisticsMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 
 	// set the view
 	if (viewId.isPresent()) {

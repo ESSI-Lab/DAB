@@ -92,7 +92,7 @@ public class WISMetadataTask extends AbstractCustomTask {
 	StatisticsMessage statisticsMessage = new StatisticsMessage();
 	// set the required properties
 	statisticsMessage.setSources(allSources);
-	statisticsMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	statisticsMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 	// statisticsMessage.setSharedRepositoryInfo(ConfigurationUtils.getSharedRepositoryInfo());
 	WebRequestTransformer.setView(//
 		"gs-view-source(" + targetSource + ")", //

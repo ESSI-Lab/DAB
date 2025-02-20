@@ -154,7 +154,7 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
 	    }
 	}
 
-	List<GSSource> sources = getSources(finalBond);
+	List<GSSource> sources = getSources(finalBond, optionalView);
 	message.setSources(sources);
 
 	ResourceSelector selector = getSelector(message.getWebRequest());
@@ -223,7 +223,7 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
      * of the {@link
      * DiscoveryMessage} bonds
      */
-    protected List<GSSource> getSources(Bond bond) throws GSException {
+    protected List<GSSource> getSources(Bond bond, Optional<View> optionalView) throws GSException {
 
 	logger.trace("Getting sources STARTED");
 
@@ -251,17 +251,14 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
 
 		    switch (bond.getOperator()) {
 		    case EQUAL:
-			Optional<GSSource> source = allSources.stream().filter(s -> s.getUniqueIdentifier().equals(value)).findFirst();
-			if (source.isPresent()) {
-			    sources.add(source.get());
-			}
+
+			allSources.stream().filter(s -> s.getUniqueIdentifier().equals(value)).forEach(s -> sources.add(s));
+
 			break;
 		    case TEXT_SEARCH:
-			for (GSSource s : allSources) {
-			    if (s.getUniqueIdentifier().contains(value)) {
-				sources.add(s);
-			    }
-			}
+
+			allSources.stream().filter(s -> s.getUniqueIdentifier().contains(value)).forEach(s -> sources.add(s));
+
 			break;
 		    default:
 			break;
@@ -327,7 +324,14 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
 	}
 
 	if (sources.isEmpty()) {
-	    sources.addAll(ConfigurationWrapper.getAllSources());
+	    if (optionalView.isPresent()) {
+
+		sources.addAll(ConfigurationWrapper.getViewSources(optionalView.get()));
+
+	    } else {
+
+		sources.addAll(ConfigurationWrapper.getAllSources());
+	    }
 	}
 
 	for (String excludedSource : exclusionList) {

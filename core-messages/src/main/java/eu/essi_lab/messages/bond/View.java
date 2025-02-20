@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -91,6 +92,7 @@ public class View implements Serializable {
     private Date expirationTime;
     private String visibility;
     private String owner;
+    private String sourceDeployment;
 
     @XmlElements({ @XmlElement(name = "viewBond", type = ViewBond.class), //
 	    @XmlElement(name = "resourcePropertyBond", type = ResourcePropertyBond.class), //
@@ -142,7 +144,7 @@ public class View implements Serializable {
 
 	ViewFactory factory = new ViewFactory();
 
-	Unmarshaller unmarshaller = factory.createUnmarshaller();
+	Unmarshaller unmarshaller = ViewFactory.createUnmarshaller();
 
 	return (View) unmarshaller.unmarshal(stream);
     }
@@ -171,9 +173,7 @@ public class View implements Serializable {
      */
     public static InputStream toStream(View view) throws JAXBException {
 
-	ViewFactory factory = new ViewFactory();
-
-	Marshaller marshaller = factory.createMarshaller();
+	Marshaller marshaller = ViewFactory.createMarshaller();
 
 	ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -255,6 +255,20 @@ public class View implements Serializable {
 
     public void setBond(Bond bond) {
 	this.bond = bond;
+    }
+
+    /**
+     * @return the sourceDeployment
+     */
+    public String getSourceDeployment() {
+	return sourceDeployment;
+    }
+
+    /**
+     * @param sourceDeployment
+     */
+    public void setSourceDeployment(String sourceDeployment) {
+	this.sourceDeployment = sourceDeployment;
     }
 
     @Override

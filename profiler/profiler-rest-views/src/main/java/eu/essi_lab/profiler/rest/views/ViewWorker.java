@@ -63,7 +63,7 @@ public class ViewWorker {
     public ViewWorker(RequestMessage message) throws GSException {
 	this.message = message;
 	this.request = message.getWebRequest();
-	this.databaseURI = ConfigurationWrapper.getDatabaseURI();
+	this.databaseURI = ConfigurationWrapper.getStorageInfo();
 	this.reader = DatabaseProviderFactory.getReader(databaseURI);
 	this.writer = DatabaseProviderFactory.getWriter(databaseURI);
     }

@@ -123,7 +123,7 @@ public class WISDatasetDiscoveryMetadataHandler extends StreamingRequestHandler 
 		    // VIEW
 		    Optional<String> optionalView = webRequest.extractViewId();
 		    if (optionalView.isPresent()) {
-			StorageInfo storageUri = ConfigurationWrapper.getDatabaseURI();
+			StorageInfo storageUri = ConfigurationWrapper.getStorageInfo();
 			Optional<View> v = WebRequestTransformer.findView(storageUri, optionalView.get());
 			if (v.isPresent()) {
 			    discoveryMessage.setView(v.get());

@@ -114,7 +114,7 @@ public class GIPStarter {
 
 	mode = ExecutionMode.get();
 
-	GSLoggerFactory.getLogger(GIPStarter.class).info("GI-suite is starting in execution mode {}", mode);
+	GSLoggerFactory.getLogger(GIPStarter.class).info("DAB is starting in execution mode {}", mode);
 
 	if (ExecutionMode.skipAuthorization()) {
 	    GSLoggerFactory.getLogger(GIPStarter.class).info("Auhtorization skipped by administrator");
