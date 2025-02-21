@@ -4,6 +4,7 @@
 package eu.essi_lab.api.database.opensearch;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /*-
  * #%L
@@ -31,29 +32,36 @@ import java.util.Map;
 import java.io.IOException;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.json.JSONObject;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.LatLonGeoLocation;
 import org.opensearch.client.opensearch._types.OpenSearchException;
+import org.opensearch.client.opensearch._types.SortOptions;
+import org.opensearch.client.opensearch._types.SortOrder;
 import org.opensearch.client.opensearch._types.TopLeftBottomRightGeoBounds;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
 import org.opensearch.client.opensearch._types.aggregations.Aggregation;
+import org.opensearch.client.opensearch._types.aggregations.BucketSortAggregation;
 import org.opensearch.client.opensearch._types.aggregations.Buckets;
 import org.opensearch.client.opensearch._types.aggregations.FiltersAggregation;
 import org.opensearch.client.opensearch._types.aggregations.FiltersBucket;
 import org.opensearch.client.opensearch._types.aggregations.GeoCentroidAggregate;
+import org.opensearch.client.opensearch._types.aggregations.StringTermsAggregate;
 import org.opensearch.client.opensearch._types.aggregations.StringTermsBucket;
 import org.opensearch.client.opensearch._types.query_dsl.GeoBoundingBoxQuery;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch._types.query_dsl.RangeQuery;
 import org.opensearch.client.opensearch.core.SearchRequest;
 import org.opensearch.client.opensearch.core.SearchResponse;
+import org.opensearch.client.opensearch.core.search.Hit;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseExecutor;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.bond.Bond;
@@ -61,9 +69,23 @@ import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.stats.StatisticsMessage;
 import eu.essi_lab.messages.stats.StatisticsResponse;
+import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
+import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
+import eu.essi_lab.messages.termfrequency.TermFrequencyMapType;
+import eu.essi_lab.messages.termfrequency.TermFrequencyMap.TermFrequencyTarget;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.index.IndexedElement;
+import eu.essi_lab.model.index.IndexedMetadataElement;
+import eu.essi_lab.model.index.IndexedResourceProperty;
+import eu.essi_lab.model.index.jaxb.BoundingBox;
+import eu.essi_lab.model.index.jaxb.CardinalValues;
+import eu.essi_lab.model.index.jaxb.DisjointValues;
+import eu.essi_lab.model.resource.Dataset;
+import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
+import eu.essi_lab.model.resource.ResourceProperty;
+import jakarta.json.JsonObject;
 
 /**
  * @author Fabrizio
@@ -165,113 +187,254 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	// }
 	// },
 	// "aggs": {
-	// "record_count": { "value_count": { "field": "_id" } },
-	// "top_providers": {
+	// "average_centroid": {
+	// "geo_centroid": { "field": "centroid" }
+	// },
+	// "providers": {
 	// "terms": {
 	// "field": "sourceId_keyword",
+	// "size": 10,
+	// "order": { "unique_location_count": "desc" }
+	// },
+	// "aggs": {
+	// "unique_location_count": {
+	// "cardinality": { "field": "uniquePlatformId_keyword" }
+	// },
+	//
+	// "top_5_filter": {
+	// "bucket_sort": {
+	// "sort": [{ "unique_location_count": { "order": "desc" } }],
 	// "size": 5
 	// }
-	// },
-	// "centroid": {
-	// "geo_centroid": { "field": "centroid" }
-	// }
-	//
-	//
 	// }
 	// }
 	// }
 	// }
-//	DiscoveryMessage message = new DiscoveryMessage();
-//	List<Bond>bonds = new ArrayList<Bond>();
-//	bonds.add(request.getConstraints());
-//	bonds.add(BondFactory.)
-//	message.setUserBond();
-//	message.setView(request.getView());
-//	Query query = finder.buildQuery(message, false);
-//
-//	// Bounding box queries for regions
-//	List<SpatialExtent> extents = request.getExtents();
-//	List<Entry<String, Query>> entries = new ArrayList<Map.Entry<String, Query>>();
-//	for (int i = 0; i < extents.size(); i++) {
-//	    SpatialExtent extent = extents.get(i);
-//	    Query regionQuery = Query.of(q -> q.geoBoundingBox(g -> g.field("bbox")//
-//		    .boundingBox(bb -> bb.tlbr(new TopLeftBottomRightGeoBounds.Builder()//
-//			    .topLeft(tl -> tl.latlon(ll -> ll.lat(extent.getNorth()).lon(extent.getWest())))//
-//			    .bottomRight(br -> br.latlon(ll -> ll.lat(extent.getSouth()).lon(extent.getEast()))).build()))));
-//	    SimpleEntry<String, Query> entry = new SimpleEntry<String, Query>("region" + i, regionQuery);
-//	    entries.add(entry);
-//	}
-//
-//	Buckets<Query> regionBuckets = Buckets.of(b -> b.keyed(Map.ofEntries(entries.toArray(new Entry[] {}))));
-//	// Filters aggregation for regions
-//	Aggregation regionsAggregation = Aggregation.of(a -> a.filters(f -> f.filters(regionBuckets) //
-//	).aggregations("record_count", ag -> ag.valueCount(vc -> vc.field("_id")))//
-//		.aggregations("top_providers", ag -> ag.terms(t -> t.field("sourceId_keyword").size(request.getMaxTermFrequencyItems())))//
-//		.aggregations("centroid", ag -> ag.geoCentroid(gc -> gc.field("centroid"))));
-//
-//	// Build the search request
-//	SearchRequest searchRequest = SearchRequest//
-//		.of(s -> s.index(DataFolderMapping.get().getIndex()).size(0).query(query).aggregations("regions", regionsAggregation));
-//
-//	// Execute search request
-//	try {
-//	    SearchResponse<Void> response = client.search(searchRequest, Void.class);
-//
-//	    Map<String, Aggregate> aggregations = response.aggregations();
-//	    Aggregate regionsAgg = aggregations.get("regions");
-//
-//	    if (regionsAgg == null || regionsAgg.isFilters() == false) {
-//		System.out.println("No region aggregation found!");
-//		GSLoggerFactory.getLogger(getClass()).error("No region aggregation found!");
-//	    }
-//
-//	    // Extract buckets (regions)
-//	    List<FiltersBucket> responseRegionBuckets = regionsAgg.filters().buckets().array();
-//	    List<WMSClusterResponse> ret = new ArrayList<DatabaseExecutor.WMSClusterResponse>();
-//
-//	    for (FiltersBucket regionBucket : responseRegionBuckets) {
-//		WMSClusterResponse regionResponse = new WMSClusterResponse();
-//		String regionName = regionBucket.toString(); // e.g., "region_1" or "region_2"
-//		long recordCount = regionBucket.docCount(); // Total records in the region
-//		regionResponse.setTotalCount((int) recordCount);
-//		regionResponse.setStationsCount((int) recordCount);
-//		
-//		System.out.println("Region: " + regionName);
-//		System.out.println("  Record Count: " + recordCount);
-//
-//		// Get top providers aggregation
-//		Aggregate topProvidersAgg = regionBucket.aggregations().get("top_providers");
-//		if (topProvidersAgg != null && topProvidersAgg.isSterms()) {
-//		    List<StringTermsBucket> topProviders = topProvidersAgg.sterms().buckets().array();
-//		    System.out.println("  Top Providers:");
-//		    for (StringTermsBucket providerBucket : topProviders) {
-//			System.out.println("    " + providerBucket.key() + ": " + providerBucket.docCount());
-//		    }
-//		    
-//		}
-//
-//		// Get centroid aggregation
-//		Aggregate centroidAgg = regionBucket.aggregations().get("centroid");
-//		if (centroidAgg != null && centroidAgg.isGeoCentroid()) {
-//		    GeoCentroidAggregate centroid = centroidAgg.geoCentroid();
-//		    if (centroid.location() != null) {
-//			SpatialExtent avgBbox = new SpatialExtent(centroid.location().latlon().lat(), centroid.location().latlon().lon(),
-//				centroid.location().latlon().lat(), centroid.location().latlon().lon());
-//			regionResponse.setAvgBbox(avgBbox);
-//		    } else {
-//			GSLoggerFactory.getLogger(getClass()).error("no centroid available");
-//		    }
-//
-//		}
-//
-//		ret.add(regionResponse);
-//	    }
-//
-//	    return ret;
-//	} catch (Exception e) {
-//	    e.printStackTrace();
-//	    GSLoggerFactory.getLogger(getClass()).error(e);
-//	}
+	// }
+	// }
+	// }
+
+	DiscoveryMessage message = new DiscoveryMessage();
+	List<Bond> bonds = new ArrayList<Bond>();
+	if (request.getConstraints() != null) {
+	    bonds.add(request.getConstraints());
+	}
+	if (request.getView() != null && request.getView().getBond() != null) {
+	    message.setSources(ConfigurationWrapper.getViewSources(request.getView()));
+	    bonds.add(request.getView().getBond());
+	}
+	switch (bonds.size()) {
+	case 0:
+	    // nothing to do
+	    break;
+	case 1:
+	    message.setUserBond(bonds.get(0));
+	    message.setPermittedBond(bonds.get(0));
+	    break;
+	default:
+	    message.setUserBond(BondFactory.createAndBond(bonds));
+	    message.setPermittedBond(BondFactory.createAndBond(bonds));
+	    break;
+	}
+
+	Query query = bonds.isEmpty() ? null : finder.buildQuery(message, true);
+
+	// Bounding box queries for regions
+	List<SpatialExtent> extents = request.getExtents();
+	Map<String, SpatialExtent> extentMap = new HashMap<>();
+	List<Entry<String, Query>> entries = new ArrayList<Map.Entry<String, Query>>();
+	for (int i = 0; i < extents.size(); i++) {
+	    SpatialExtent extent = extents.get(i);
+	    String name = "region" + i;
+	    if (extent.getName() != null) {
+		name = extent.getName();
+	    }
+	    extentMap.put(name, extent);
+	    Query regionQuery = Query.of(q -> q.geoBoundingBox(g -> g.field("bbox")//
+		    .boundingBox(bb -> bb.tlbr(new TopLeftBottomRightGeoBounds.Builder()//
+			    .topLeft(tl -> tl.latlon(ll -> ll.lat(extent.getNorth()).lon(extent.getWest())))//
+			    .bottomRight(br -> br.latlon(ll -> ll.lat(extent.getSouth()).lon(extent.getEast()))).build()))));
+	    SimpleEntry<String, Query> entry = new SimpleEntry<String, Query>(name, regionQuery);
+	    entries.add(entry);
+	}
+
+	Buckets<Query> regionBuckets = Buckets.of(b -> b.keyed(Map.ofEntries(entries.toArray(new Entry[] {}))));
+	// Filters aggregation for regions
+	Aggregation regionsAggregation = Aggregation.of(a -> a.filters(f -> f.filters(regionBuckets) //
+	).aggregations(Map.of( //
+		"average_centroid", Aggregation.of(gc -> gc//
+			.geoCentroid(geo -> geo.field("centroid"))//
+		), //
+		"total_unique_location_count", Aggregation.of(c -> c//
+			.cardinality(card -> card.field("uniquePlatformId_keyword"))//
+		), //
+		"providers", Aggregation.of(t -> t//
+			.terms(term -> term//
+				.field("sourceId_keyword")//
+				.size(request.getMaxTermFrequencyItems())//
+				.order(Map.of("unique_location_count", SortOrder.Desc))//
+			)//
+			.aggregations(Map.of(//
+				"unique_location_count", Aggregation.of(c -> c//
+					.cardinality(card -> card.field("uniquePlatformId_keyword"))//
+				), //
+				"top_5_filter", Aggregation.of(bs -> bs//
+					.bucketSort(BucketSortAggregation.of(b -> b//
+						.sort(List.of(//
+							SortOptions.of(s -> s//
+								.field(f -> f.field("unique_location_count").order(SortOrder.Desc))//
+							)//
+						))//
+						.size(request.getMaxTermFrequencyItems())//
+					)//
+					)//
+				))//
+			)), //
+
+		"distinct_location_samples", Aggregation.of(agg -> agg //
+			.terms(t -> t //
+				.field("uniquePlatformId_keyword") //
+				.size(request.getMaxResults()) //
+			) //
+			.aggregations("sample_record", subAgg -> subAgg //
+				.topHits(th -> th //
+					.size(1) //
+					.source(src -> src //
+						.filter(flt -> flt.includes("uniquePlatformId", "sourceId", "centroid"))//
+					)//
+				)//
+			)//
+
+		)//
+
+	)
+
+	));
+
+	// Build the search request
+	SearchRequest searchRequest = SearchRequest//
+		.of(s -> s.index(DataFolderMapping.get().getIndex()).size(0).query(query).aggregations("regions", regionsAggregation));
+
+	// Execute search request
+	try {
+
+	    SearchResponse<Void> response = client.search(searchRequest, Void.class);
+
+	    Map<String, Aggregate> aggregations = response.aggregations();
+	    Aggregate regionsAgg = aggregations.get("regions");
+
+	    if (regionsAgg == null || regionsAgg.isFilters() == false) {
+		GSLoggerFactory.getLogger(getClass()).error("No region aggregation found!");
+	    }
+
+	    // Extract buckets (regions)
+	    Set<Entry<String, FiltersBucket>> responseRegionBuckets = regionsAgg.filters().buckets().keyed().entrySet();
+	    List<WMSClusterResponse> ret = new ArrayList<DatabaseExecutor.WMSClusterResponse>();
+
+	    for (Entry<String, FiltersBucket> entry : responseRegionBuckets) {
+		String name = entry.getKey();
+		SpatialExtent extent = extentMap.get(name);
+		FiltersBucket region = entry.getValue();
+		WMSClusterResponse regionResponse = new WMSClusterResponse();
+		if (extent != null) {
+		    regionResponse.setBbox(extent);
+		}
+		// String regionName = regionBucket.toString(); // e.g., "region_1" or "region_2"
+		// long recordCount = regionBucket.docCount(); // Total records in the region
+		// regionResponse.setTotalCount((int) recordCount);
+		// regionResponse.setStationsCount((int) recordCount);
+
+		// System.out.println("Region: " + regionName);
+		// System.out.println(" Record Count: " + recordCount);
+
+		GeoCentroidAggregate centroidAgg = region.aggregations().get("average_centroid").geoCentroid();
+		if (centroidAgg != null && centroidAgg.location() != null) {
+		    double lat = centroidAgg.location().latlon().lat();
+		    double lon = centroidAgg.location().latlon().lon();
+		    SpatialExtent avgBbox = new SpatialExtent(lat, lon, lat, lon);
+		    regionResponse.setAvgBbox(avgBbox);
+		}
+
+		regionResponse.setTotalCount((int) region.docCount());
+		Aggregate uniqueCountAgg = region.aggregations().get("total_unique_location_count");
+		long totalStationCount = uniqueCountAgg.cardinality().value();
+		regionResponse.setStationsCount((int) totalStationCount);
+		// Get top providers aggregation
+		if (totalStationCount < request.getMaxResults()) {
+		    StringTermsAggregate distinctSamplesAgg = region.aggregations().get("distinct_location_samples").sterms();
+
+		    for (StringTermsBucket distinctBucket : distinctSamplesAgg.buckets().array()) {
+			String uniqueLocationId = distinctBucket.key();
+			List<Hit<JsonData>> sampleRecords = distinctBucket.aggregations().get("sample_record").topHits().hits().hits();
+			List<Dataset> datasets = new ArrayList<Dataset>();
+			for (Hit<JsonData> record : sampleRecords) {
+			    JsonObject json = record.source().toJson().asJsonObject();
+			    String platformId = json.getJsonArray("uniquePlatformId").getString(0);
+			    String sourceId = json.getJsonArray("sourceId").getString(0);
+			    String centroid = json.getJsonString("centroid").toString();
+			    centroid = centroid.substring(centroid.indexOf("(")+1).replace(")", "").trim();
+			    String[] split = centroid.split(" ");
+			    String lat = split[0];
+			    String lon = split[1];
+			    Dataset dataset = new Dataset();
+			    dataset.getIndexesMetadata()
+				    .write(new IndexedElement(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER.getName(), platformId));
+			    dataset.getIndexesMetadata().write(new IndexedResourceProperty(ResourceProperty.SOURCE_ID, sourceId));
+
+			    BoundingBox boxIndexMetadata = new BoundingBox();
+			    CardinalValues valuesMetadata = new CardinalValues();
+			    valuesMetadata.setEast(lon);
+			    valuesMetadata.setWest(lon);
+			    valuesMetadata.setNorth(lat);
+			    valuesMetadata.setSouth(lat);
+			    boxIndexMetadata.addCardinalValues(valuesMetadata);
+			    dataset.getIndexesMetadata().write(new IndexedMetadataElement(boxIndexMetadata) {
+				@Override
+				public void defineValues(GSResource resource) {
+				}
+			    });
+
+			    dataset.getIndexesMetadata()
+				    .write(new IndexedElement(MetadataElement.BOUNDING_BOX.getName(), uniqueLocationId));
+			    // String title = .t("title").asText();
+			    // String identifier = record.source().get("identifier").asText();
+			    datasets.add(dataset);
+
+			}
+
+			regionResponse.setDatasets(datasets);
+		    }
+		} else {
+		    Aggregate providersAgg = region.aggregations().get("providers");
+
+		    if (providersAgg != null && providersAgg.isSterms()) {
+			List<StringTermsBucket> providers = providersAgg.sterms().buckets().array();
+			TermFrequencyMapType mapType = new TermFrequencyMapType();
+			for (StringTermsBucket provider : providers) {
+			    String sourceId = provider.key();
+			    long timeseriesCount = provider.docCount();
+			    long stationsCount = provider.aggregations().get("unique_location_count").cardinality().value();
+			    TermFrequencyItem item = new TermFrequencyItem();
+			    item.setTerm(sourceId);
+			    item.setDecodedTerm(sourceId);
+			    item.setFreq((int) stationsCount);
+			    item.setLabel("source");
+			    mapType.getSourceId().add(item);
+			}
+
+			TermFrequencyMap tfm = new TermFrequencyMap(mapType);
+
+			regionResponse.setMap(tfm);
+		    }
+		    ret.add(regionResponse);
+		}
+	    }
+
+	    return ret;
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	}
 	//
 	return null;
 
