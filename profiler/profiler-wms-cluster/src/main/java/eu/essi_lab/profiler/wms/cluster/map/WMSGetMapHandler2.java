@@ -316,7 +316,7 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 		    int stationDiameterInPixels = 8;
 		    int minimumClusterDiameterInPixels = 10;
 		    int fontSizeInPixels = 10;
-		    double maxDiameterRatio = 0.4; // pie diameter with respect to sub image
+		    double maxDiameterRatio = 0.6; // pie diameter with respect to sub image
 
 		    boolean eachPieinEachSubTile = false;
 
