@@ -374,8 +374,8 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 			    String centroid = json.getJsonString("centroid").toString();
 			    centroid = centroid.substring(centroid.indexOf("(")+1).replace(")", "").trim();
 			    String[] split = centroid.split(" ");
-			    String lat = split[0];
-			    String lon = split[1];
+			    String lat = split[1];
+			    String lon = split[0];
 			    Dataset dataset = new Dataset();
 			    dataset.getIndexesMetadata()
 				    .write(new IndexedElement(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER.getName(), platformId));
