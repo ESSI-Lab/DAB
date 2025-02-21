@@ -153,7 +153,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	    if (message.getDistinctValuesElement().isPresent()) {
 
-		Query query = builQuery(message, false);
+		Query query = buildQuery(message, false);
 
 		List<Queryable> queryables = message.getResourceSelector().getIndexesQueryables();
 
@@ -342,7 +342,7 @@ public class OpenSearchFinder implements DatabaseFinder {
      * @return
      * @throws GSException
      */
-    private Query builQuery(DiscoveryMessage message, boolean count) throws GSException {
+    public Query buildQuery(DiscoveryMessage message, boolean count) throws GSException {
 
 	if (message.getUserBond().isPresent()) {
 
@@ -400,7 +400,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 		    Optional.ofNullable(message.getWebRequest()));
 	}
 
-	Query query = builQuery(message, count);
+	Query query = buildQuery(message, count);
 
 	try {
 
