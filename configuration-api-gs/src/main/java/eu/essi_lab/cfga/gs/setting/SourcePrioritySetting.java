@@ -60,7 +60,7 @@ public class SourcePrioritySetting extends Setting implements EditableSetting {
 
 		setName("Identifier Management");
 		setDescription(
-				"Define Identifier Management global (DAB-level) policies.\nSelect one or more sources to prioritize");
+				"Define global (DAB-level) Identifier Management options.\nSelect one or more sources to prioritize");
 		setCanBeDisabled(false);
 		enableCompactMode(false);
 
