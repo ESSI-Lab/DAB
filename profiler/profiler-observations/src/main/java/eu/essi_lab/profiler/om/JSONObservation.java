@@ -34,175 +34,186 @@ import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 
 public class JSONObservation {
 
-    JSONObject timeseries = new JSONObject();
-    JSONObject metadata = new JSONObject();
-    JSONObject defaultPointMetadata = new JSONObject();
-    JSONArray points = new JSONArray();
-    JSONArray parameters = new JSONArray();
-    private ObservationType type;
+	JSONObject timeseries = new JSONObject();
+	JSONObject metadata = new JSONObject();
+	JSONObject defaultPointMetadata = new JSONObject();
+	JSONArray points = new JSONArray();
+	JSONArray parameters = new JSONArray();
+	private ObservationType type;
 
-    public enum ObservationType {
-	TrajectoryObservation, TimeSeriesObservation, SamplingSurfaceObservation
-    }
-
-    public ObservationType getType() {
-	return type;
-    }
-
-    public JSONObservation(ObservationType type) {
-	this.type = type;
-	timeseries.put("type", type.name());
-	JSONObject result = new JSONObject();
-	result.put("metadata", metadata);
-	result.put("defaultPointMetadata", defaultPointMetadata);
-	result.put("points", points);
-	timeseries.put("result", result);
-	timeseries.put("parameter", parameters);
-    }
-
-    // OBSERVATION
-    public void setId(String id) {
-	timeseries.put("id", id);
-    }
-
-    public void setPhenomenonTime(Date begin, Date end) {
-	JSONObject time = new JSONObject();
-	time.put("begin", ISO8601DateTimeUtils.getISO8601DateTime(begin));
-	time.put("end", ISO8601DateTimeUtils.getISO8601DateTime(end));
-	timeseries.put("phenomenonTime", time);
-    }
-
-    public void setObservedProperty(String href, String title) {
-	JSONObject observedProperty = new JSONObject();
-	observedProperty.put("href", href);
-	observedProperty.put("title", title);
-	timeseries.put("observedProperty", observedProperty);
-    }
-
-    public String getId() {
-	if (timeseries.has("id")) {
-	    return timeseries.getString("id");
+	public enum ObservationType {
+		TrajectoryObservation, TimeSeriesObservation, SamplingSurfaceObservation
 	}
-	return null;
-    }
 
-    public String getObservedPropertyTitle() {
-	if (timeseries.has("observedProperty")) {
-	    JSONObject observedProperty = timeseries.getJSONObject("observedProperty");
-	    if (observedProperty.has("title")) {
-		return observedProperty.getString("title");
-	    }
+	public ObservationType getType() {
+		return type;
 	}
-	return null;
-    }
 
-    public void setProcedure(String href, String title) {
-	JSONObject link = new JSONObject();
-	link.put("href", href);
-	link.put("title", title);
-	timeseries.put("procedure", link);
-    }
-
-    public void setFeatureOfInterest(String href, String title) {
-	JSONObject link = new JSONObject();
-	link.put("href", href);
-	link.put("title", title);
-	timeseries.put("featureOfInterest", link);
-    }
-
-    public void setFeatureOfInterest(JSONFeature platform) {
-
-	timeseries.put("featureOfInterest", platform.getJSONObject());
-    }
-
-    public JSONFeature getFeatureOfInterest() {
-	if (timeseries.has("featureOfInterest")) {
-	    JSONObject foi = timeseries.getJSONObject("featureOfInterest");
-	    JSONFeature ret = getJSONFeature(foi);
-	    return ret;
+	public JSONObservation(ObservationType type) {
+		this.type = type;
+		timeseries.put("type", type.name());
+		JSONObject result = new JSONObject();
+		result.put("metadata", metadata);
+		result.put("defaultPointMetadata", defaultPointMetadata);
+		result.put("points", points);
+		timeseries.put("result", result);
+		timeseries.put("parameter", parameters);
 	}
-	return null;
-    }
 
-    public JSONFeature getJSONFeature(JSONObject foi) {
-	return new JSONFeature(foi);
-    }
-
-    public void setResultTime(Date date) {
-	timeseries.put("resultTime", ISO8601DateTimeUtils.getISO8601DateTime(date));
-    }
-
-    // METADATA
-
-    public void setIntendedObservationSpacing(Duration period) {
-	metadata.put("intendedObservationSpacing", period.toString());
-    }
-
-    // DEFAULT POINT METADATA
-    public void setInterpolationType(String href, String title) {
-	JSONObject link = new JSONObject();
-	link.put("href", href);
-	link.put("title", title);
-	defaultPointMetadata.put("interpolationType", link);
-    }
-
-    public void setQuality(String href, String title) {
-	JSONObject link = new JSONObject();
-	link.put("href", href);
-	link.put("title", title);
-	defaultPointMetadata.put("quality", link);
-    }
-
-    public void setUOM(String uom) {
-	defaultPointMetadata.put("uom", uom);
-    }
-
-    public void setAggregationDuration(Duration duration) {
-	defaultPointMetadata.put("aggregationDuration", duration.toString());
-    }
-
-    // POINTS
-    public void addPoint(Date date, BigDecimal value) {
-	JSONObject point = new JSONObject();
-	JSONObject time = new JSONObject();
-	time.put("instant", ISO8601DateTimeUtils.getISO8601DateTime(date));
-	point.put("time", time);
-	point.put("value", value);
-	points.put(point);
-    }
-
-    public void addPointAndLocation(Date date, BigDecimal value, List<Double> coordinates) {
-	JSONObject point = new JSONObject();
-	JSONObject time = new JSONObject();
-	time.put("instant", ISO8601DateTimeUtils.getISO8601DateTime(date));
-	JSONObject shape = new JSONObject();
-	shape.put("type","Point");
-	JSONArray coords = new JSONArray();
-	for (Double c : coordinates) {
-	    coords.put(c);
+	// OBSERVATION
+	public void setId(String id) {
+		timeseries.put("id", id);
 	}
-	shape.put("coordinates", coords);
-	point.put(getGeometryName(), shape);
-	point.put("time", time);
-	point.put("value", value);
-	points.put(point);
-    }
 
-    public String getGeometryName() {
-   	return "shape";
-       }
+	public void setPhenomenonTime(Date begin, Date end) {
+		JSONObject time = new JSONObject();
+		time.put("begin", ISO8601DateTimeUtils.getISO8601DateTime(begin));
+		time.put("end", ISO8601DateTimeUtils.getISO8601DateTime(end));
+		timeseries.put("phenomenonTime", time);
+	}
 
-    // UTILS
-    public JSONObject getJSONObject() {
-	return timeseries;
-    }
+	public void setObservedProperty(String href, String title) {
+		JSONObject observedProperty = new JSONObject();
+		observedProperty.put("href", href);
+		observedProperty.put("title", title);
+		timeseries.put("observedProperty", observedProperty);
+	}
 
-    public void addParameter(String name, String value) {
-	JSONObject parameter = new JSONObject();
-	parameter.put("name", name);
-	parameter.put("value", value);
-	parameters.put(parameter);
+	public String getId() {
+		if (timeseries.has("id")) {
+			return timeseries.getString("id");
+		}
+		return null;
+	}
 
-    }
+	public String getObservedPropertyTitle() {
+		if (timeseries.has("observedProperty")) {
+			JSONObject observedProperty = timeseries.getJSONObject("observedProperty");
+			if (observedProperty.has("title")) {
+				return observedProperty.getString("title");
+			}
+		}
+		return null;
+	}
+
+	public void setProcedure(String href, String title) {
+		JSONObject link = new JSONObject();
+		link.put("href", href);
+		link.put("title", title);
+		timeseries.put("procedure", link);
+	}
+
+	public void setFeatureOfInterest(String href, String title) {
+		JSONObject link = new JSONObject();
+		link.put("href", href);
+		link.put("title", title);
+		timeseries.put("featureOfInterest", link);
+	}
+
+	public void setFeatureOfInterest(JSONFeature platform) {
+
+		timeseries.put("featureOfInterest", platform.getJSONObject());
+	}
+
+	public JSONFeature getFeatureOfInterest() {
+		if (timeseries.has("featureOfInterest")) {
+			JSONObject foi = timeseries.getJSONObject("featureOfInterest");
+			JSONFeature ret = getJSONFeature(foi);
+			return ret;
+		}
+		return null;
+	}
+
+	public JSONFeature getJSONFeature(JSONObject foi) {
+		return new JSONFeature(foi);
+	}
+
+	public void setResultTime(Date date) {
+		timeseries.put("resultTime", ISO8601DateTimeUtils.getISO8601DateTime(date));
+	}
+
+	// METADATA
+
+	public void setIntendedObservationSpacing(Duration period) {
+		metadata.put("intendedObservationSpacing", period.toString());
+	}
+
+	// DEFAULT POINT METADATA
+	public void setInterpolationType(String href, String title) {
+		JSONObject link = new JSONObject();
+		link.put("href", href);
+		link.put("title", title);
+		defaultPointMetadata.put("interpolationType", link);
+	}
+
+	public void setQuality(String href, String title) {
+		JSONObject link = new JSONObject();
+		link.put("href", href);
+		link.put("title", title);
+		defaultPointMetadata.put("quality", link);
+	}
+
+	public void setUOM(String uom) {
+		defaultPointMetadata.put("uom", uom);
+	}
+
+	public void setAggregationDuration(Duration duration) {
+		defaultPointMetadata.put("aggregationDuration", duration.toString());
+	}
+
+	// POINTS
+	public void addPoint(Date date, BigDecimal value) {
+		JSONObject point = new JSONObject();
+		JSONObject time = new JSONObject();
+		time.put("instant", ISO8601DateTimeUtils.getISO8601DateTime(date));
+		point.put("time", time);
+		point.put("value", value);
+		points.put(point);
+	}
+
+	public void addPointAndLocation(Date date, BigDecimal value, List<Double> coordinates) {
+		JSONObject point = new JSONObject();
+		JSONObject time = new JSONObject();
+		time.put("instant", ISO8601DateTimeUtils.getISO8601DateTime(date));
+		JSONObject shape = new JSONObject();
+		shape.put("type", "Point");
+		JSONArray coords = new JSONArray();
+		for (Double c : coordinates) {
+			coords.put(c);
+		}
+		shape.put("coordinates", coords);
+		point.put(getGeometryName(), shape);
+		point.put("time", time);
+		point.put("value", value);
+		points.put(point);
+	}
+
+	public String getGeometryName() {
+		return "shape";
+	}
+
+	// UTILS
+	public JSONObject getJSONObject() {
+		return timeseries;
+	}
+
+	public void addParameter(String name, String value) {
+		JSONObject parameter = new JSONObject();
+		parameter.put("name", name);
+		parameter.put("value", value);
+		parameters.put(parameter);
+
+	}
+
+	public void addInstrument(String instrument) {
+		if (!timeseries.has("procedure")) {
+			JSONArray array = new JSONArray();
+			timeseries.put("procedure", array);
+		}
+		JSONArray array = timeseries.getJSONArray("procedure");
+		array.put(instrument);
+		timeseries.put("procedure", array);
+
+	}
 
 }
