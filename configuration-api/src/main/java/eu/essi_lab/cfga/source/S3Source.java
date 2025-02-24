@@ -23,6 +23,8 @@ package eu.essi_lab.cfga.source;
 
 import java.io.File;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
@@ -49,6 +51,42 @@ public class S3Source implements ConfigurationSource {
     private S3TransferWrapper wrapper;
     private String bucketName;
     private String configName;
+
+    /**
+     * s3://awsaccesskey:awssecretkey@bucket/config.json
+     * 
+     * @param configURL
+     * @return
+     * @throws URISyntaxException
+     */
+    public static S3Source of(String configURL) throws URISyntaxException {
+
+	URI uri = new URI(configURL);
+
+	String userInfo = uri.getUserInfo();
+	String accessKey = userInfo.split(":")[0];
+	String secretKey = userInfo.split(":")[1];
+
+	String bucketName = uri.getHost();
+	String configName = uri.getPath().substring(1, uri.getPath().length());
+
+	S3TransferWrapper wrapper = new S3TransferWrapper();
+	wrapper.setAccessKey(accessKey);
+	wrapper.setSecretKey(secretKey);
+
+	return new S3Source(wrapper, bucketName, configName);
+    }
+
+    /**
+     * s3://awsaccesskey:awssecretkey@bucket/config.json
+     * 
+     * @param url
+     * @return
+     */
+    public static boolean check(String url) {
+
+	return url.startsWith("s3://");
+    }
 
     /**
      * @param wrapper
@@ -251,6 +289,14 @@ public class S3Source implements ConfigurationSource {
     public Optional<String> isLocked() throws Exception {
 
 	throw new UnsupportedOperationException();
+    }
+
+    /**
+     * @return
+     */
+    public S3TransferWrapper getWrapper() {
+
+	return wrapper;
     }
 
 }

@@ -1,5 +1,6 @@
 package eu.essi_lab.cfga.source.test;
 
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,6 +39,25 @@ public class S3SourceExternalTestIT {
 	List<S3Object> objectsSummaries = manager.listObjectsSummaries(TEST_BUCKET_NAME);
 
 	objectsSummaries.stream().map(s -> s.key()).forEach(key -> manager.deleteObject(TEST_BUCKET_NAME, key));
+    }
+
+    @Test
+    public void startupUrlTest() throws URISyntaxException {
+
+	S3Source source = S3Source
+		.of("s3://" + System.getProperty("accessKey") + ":" + System.getProperty("secretKey") + "@bucket/config.json");
+
+	String location = source.getLocation();
+
+	Assert.assertEquals("bucket/config.json", location);
+
+	S3TransferWrapper wrapper = source.getWrapper();
+
+	String accessKey = wrapper.getAccessKey();
+	String secretKey = wrapper.getSecretKey();
+
+	Assert.assertEquals(System.getProperty("accessKey"), accessKey);
+	Assert.assertEquals(System.getProperty("secretKey"), secretKey);
     }
 
     @Test

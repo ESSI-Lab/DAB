@@ -61,6 +61,7 @@ import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting.JobStoreType;
 import eu.essi_lab.cfga.source.FileSource;
+import eu.essi_lab.cfga.source.S3Source;
 import eu.essi_lab.configuration.ClusterType;
 import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.gssrv.conf.task.ErrorLogsPublisherTask;
@@ -251,9 +252,24 @@ public class DABStarter {
 
 	    if (DatabaseSourceUrl.check(configURL)) {
 
+		//
+		// -Dconfiguration.url=xdbc://user:password@hostname:8000,8004/dbName/folder/
+		// -Dconfiguration.url=osm://awsaccesskey:awssecretkey@productionhost/prod/prodConfig
+		//
+
 		String startupUri = split[0];
 
 		source = DatabaseSource.of(startupUri);
+
+	    } else if (S3Source.check(configURL)) {
+
+		//
+		// -Dconfiguration.url=s3://awsaccesskey:awssecretkey@bucket/config.json
+		//
+
+		String startupUri = split[0];
+
+		source = S3Source.of(startupUri);
 
 	    } else {
 
