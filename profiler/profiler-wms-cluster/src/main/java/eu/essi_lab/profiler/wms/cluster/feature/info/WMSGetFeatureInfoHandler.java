@@ -243,10 +243,9 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 			String viewId = webRequest.extractViewId().get();
 			Optional<View> view = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
 			WebRequestTransformer.setView(view.get().getId(), ConfigurationWrapper.getStorageInfo(), discoveryMessage);
-			LogicalBond bond = BondFactory.createAndBond(BondFactory.createSpatialExtentBond(BondOperator.INTERSECTS, extent),view.get().getBond());
-			discoveryMessage.setUserBond(bond);
+			discoveryMessage.setUserBond(BondFactory.createSpatialExtentBond(BondOperator.INTERSECTS, extent));
 
-			discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
+			discoveryMessage.setSources(ConfigurationWrapper.getViewSources(view.get()));
 			discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 			
 
