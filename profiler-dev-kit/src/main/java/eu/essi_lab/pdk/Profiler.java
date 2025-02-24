@@ -64,6 +64,7 @@ import eu.essi_lab.pdk.validation.WebRequestValidator;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
 import eu.essi_lab.rip.RuntimeInfoProvider;
+import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
 
 /**
  * A <code>Profiler</code> implements the business logic of a "GI-suite web service" (from here referred as "profiler
@@ -452,11 +453,24 @@ public abstract class Profiler<PS extends ProfilerSetting> implements Configurab
 	    throw e;
 
 	} finally {
+		
+		
 
 	    GSLoggerFactory.getLogger(getClass()).traceMemoryUsage(getRequestLogPrefix(request) + " FHSM ENDED: ");
 
 	    GSLoggerFactory.getLogger(getClass()).info("{} ENDED - handling time: {}", getRequestLogPrefix(request),
 		    chronometer.formatElapsedTime());
+	    
+		Optional<ElasticsearchInfoPublisher> publisher = null;
+		
+		publisher = ElasticsearchInfoPublisher.create(request);
+		if (publisher.isPresent()) {
+			if (validationMessage != null) {
+			    publisher.get().publish(validationMessage);
+			}
+		}
+
+		
 
 	}
 

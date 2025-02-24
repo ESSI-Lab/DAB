@@ -224,7 +224,7 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 			bonds.add(request.getConstraints());
 		}
 		if (request.getView() != null && request.getView().getBond() != null) {
-			message.setSources(ConfigurationWrapper.getViewSources(request.getView()));
+//			message.setSources(ConfigurationWrapper.getViewSources(request.getView()));
 			bonds.add(request.getView().getBond());
 		}
 		switch (bonds.size()) {
