@@ -35,7 +35,6 @@ import java.util.Optional;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-
 import eu.essi_lab.cfga.ConfigurationSource;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
@@ -133,9 +132,13 @@ public class S3Source implements ConfigurationSource {
 
 	if (binaryConfig != null) {
 
-	    String string = IOStreamUtils.asUTF8String(stream);
-	    JSONArray jsonArray = new JSONArray(string);
-	    out = jsonArray.length() == 0;
+	    String string = IOStreamUtils.asUTF8String(stream).trim();
+	    if (string.isEmpty()) {
+		out = true;
+	    } else {
+		JSONArray jsonArray = new JSONArray(string);
+		out = jsonArray.length() == 0;
+	    }
 	}
 
 	stream.close();
