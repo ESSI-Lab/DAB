@@ -64,7 +64,6 @@ import eu.essi_lab.pdk.validation.WebRequestValidator;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
 import eu.essi_lab.rip.RuntimeInfoProvider;
-import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
 
 /**
  * A <code>Profiler</code> implements the business logic of a "GI-suite web service" (from here referred as "profiler
@@ -327,16 +326,13 @@ public abstract class Profiler<PS extends ProfilerSetting> implements Configurab
     @Override
     public final Response handle(WebRequest request) throws GSException {
 
-	Optional<ElasticsearchInfoPublisher> publisher = null;
+//	Optional<ElasticsearchInfoPublisher> publisher = null;
 
 	String rid = request.getRequestId();
 
 	RequestManager.getInstance().updateThreadName(getClass(), rid);
 
-	publisher = ElasticsearchInfoPublisher.create(request);
-	if (publisher.isPresent()) {
-	    publisher.get().publish(request);
-	}
+
 
 	Response cached = ProxyCache.getInstance().getCachedResponse(request);
 	if (cached != null) {
@@ -344,10 +340,6 @@ public abstract class Profiler<PS extends ProfilerSetting> implements Configurab
 	    chronometer.start();
 	    GSLoggerFactory.getLogger(getClass()).info("{} ENDED - handling time: {}", getRequestLogPrefix(request),
 		    chronometer.formatElapsedTime());
-	    publisher.get().publish(chronometer);
-	    publisher.get().publish(new ResponseInfoProvider(cached));
-	    publisher.get().publish(this);
-	    publisher.get().write();
 	    return cached;
 	}
 
@@ -465,22 +457,6 @@ public abstract class Profiler<PS extends ProfilerSetting> implements Configurab
 
 	    GSLoggerFactory.getLogger(getClass()).info("{} ENDED - handling time: {}", getRequestLogPrefix(request),
 		    chronometer.formatElapsedTime());
-
-	    if (publisher.isPresent()) {
-
-		publisher.get().publish(chronometer);
-
-		if (validationMessage != null) {
-		    publisher.get().publish(validationMessage);
-		}
-
-		if (response != null) {
-		    publisher.get().publish(new ResponseInfoProvider(response));
-		}
-		publisher.get().publish(this);
-
-		publisher.get().write();
-	    }
 
 	}
 
