@@ -390,7 +390,7 @@ public class DABStarter {
 
 		boolean replaced = configuration.replace(systemSetting);
 
-		if (!replaced) {
+		if (!replaced && !configuration.contains(systemSetting)) {
 
 		    throw GSException.createException(//
 			    ServletListener.class, //
@@ -414,7 +414,7 @@ public class DABStarter {
 
 		replaced = configuration.replace(rateLimiterSetting);
 
-		if (!replaced) {
+		if (!replaced && !configuration.contains(rateLimiterSetting)) {
 
 		    throw GSException.createException(//
 			    ServletListener.class, //
@@ -442,7 +442,7 @@ public class DABStarter {
 
 		    replaced = configuration.replace(schedulerSetting);
 
-		    if (!replaced) {
+		    if (!replaced && !configuration.contains(schedulerSetting)) {
 
 			throw GSException.createException(//
 				ServletListener.class, //
