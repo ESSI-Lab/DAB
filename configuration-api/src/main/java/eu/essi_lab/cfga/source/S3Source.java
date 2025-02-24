@@ -46,18 +46,18 @@ import eu.essi_lab.lib.utils.IOStreamUtils;
  */
 public class S3Source implements ConfigurationSource {
 
-    private S3TransferWrapper manager;
+    private S3TransferWrapper wrapper;
     private String bucketName;
     private String configName;
 
     /**
-     * @param manager
+     * @param wrapper
      * @param bucketName
      * @param configName
      */
-    public S3Source(S3TransferWrapper manager, String bucketName, String configName) {
+    public S3Source(S3TransferWrapper wrapper, String bucketName, String configName) {
 
-	this.manager = manager;
+	this.wrapper = wrapper;
 	this.bucketName = bucketName;
 	this.configName = configName;
     }
@@ -107,9 +107,9 @@ public class S3Source implements ConfigurationSource {
 	JSONArray configArray = new JSONArray();
 	settings.forEach(item -> configArray.put(item.getObject()));
 
-	File tempFile = uploadConfig(configArray, manager, bucketName, configName);
+	File tempFile = uploadConfig(configArray, wrapper, bucketName, configName);
 
-	manager.uploadFile(tempFile.getAbsolutePath(), bucketName, configName + ".json");
+	wrapper.uploadFile(tempFile.getAbsolutePath(), bucketName, configName + ".json");
 
 	tempFile.delete();
 
@@ -178,7 +178,7 @@ public class S3Source implements ConfigurationSource {
 
 	try {
 
-	    manager.download(bucketName, configName + ".json", tempFile);
+	    wrapper.download(bucketName, configName + ".json", tempFile);
 
 	} catch (Exception ex) {
 
