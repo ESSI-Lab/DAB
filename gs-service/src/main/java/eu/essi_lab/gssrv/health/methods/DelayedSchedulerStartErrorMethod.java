@@ -23,7 +23,7 @@ package eu.essi_lab.gssrv.health.methods;
 
 import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.gssrv.health.GSPingMethod;
-import eu.essi_lab.gssrv.starter.GIPStarter;
+import eu.essi_lab.gssrv.starter.DABStarter;
 
 /**
  * @author Fabrizio
@@ -33,7 +33,7 @@ public class DelayedSchedulerStartErrorMethod implements GSPingMethod {
     @Override
     public void ping() throws Exception {
 
-	if (GIPStarter.schedulerStartError) {
+	if (DABStarter.schedulerStartError) {
 
 	    throw new Exception("Delayed scheduler start error!");
 	}
