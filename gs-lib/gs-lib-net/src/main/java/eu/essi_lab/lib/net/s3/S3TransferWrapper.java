@@ -291,6 +291,8 @@ public class S3TransferWrapper {
      */
     public void uploadFile(String filePath, String bucketName, String keyName) {
 
+	GSLoggerFactory.getLogger(getClass()).debug("Upload file STARTED");
+
 	File file = new File(filePath);
 
 	if (keyName == null) {
@@ -318,8 +320,7 @@ public class S3TransferWrapper {
 	CompletableFuture<CompletedFileUpload> uploadCompletion = upload.completionFuture();
 	uploadCompletion.join(); // Blocking call to wait for upload completion
 
-	System.out.println("Upload completed!");
-
+	GSLoggerFactory.getLogger(getClass()).debug("Upload file ENDED");
     }
 
     /**
