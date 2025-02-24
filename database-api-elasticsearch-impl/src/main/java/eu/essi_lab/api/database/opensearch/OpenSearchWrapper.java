@@ -245,6 +245,7 @@ public class OpenSearchWrapper {
 
 	SearchRequest searchRequest = new SearchRequest.Builder().//
 		index(DataFolderMapping.get().getIndex()).//
+		query(searchQuery).//
 		size(0).//
 		aggregations(map).//
 		build();
