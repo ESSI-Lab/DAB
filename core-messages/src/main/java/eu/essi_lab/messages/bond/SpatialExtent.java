@@ -27,6 +27,16 @@ public class SpatialExtent implements SpatialEntity {
     private double south;
     private double east;
     private double north;
+    
+    private String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     /**
      * No-arg constructor only to be used by JAXB
