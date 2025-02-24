@@ -65,7 +65,7 @@ import eu.essi_lab.cfga.setting.validation.ValidationContext;
 import eu.essi_lab.cfga.setting.validation.ValidationResponse;
 import eu.essi_lab.cfga.setting.validation.ValidationResponse.ValidationResult;
 import eu.essi_lab.configuration.ExecutionMode;
-import eu.essi_lab.gssrv.starter.GIPStarter;
+import eu.essi_lab.gssrv.starter.DABStarter;
 import eu.essi_lab.harvester.worker.HarvestingSettingImpl;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.auth.GSUser;
@@ -139,7 +139,7 @@ public class GSConfigurationView extends ConfigurationView {
 
 	OAuthSetting setting = ConfigurationWrapper.getOAuthSetting();
 	ValidationResponse response = setting.getValidator().get().validate(//
-		GIPStarter.configuration, //
+		DABStarter.configuration, //
 		setting, //
 		ValidationContext.edit());
 
@@ -161,7 +161,7 @@ public class GSConfigurationView extends ConfigurationView {
 		    //
 		    // at this point we use the original configuration, not the clone
 		    //
-		    GIPStarter.configuration, oAuthSetting, //
+		    DABStarter.configuration, oAuthSetting, //
 		    requestURL);
 
 	    editDialog.open();
@@ -294,7 +294,7 @@ public class GSConfigurationView extends ConfigurationView {
 
 	    SelectionUtils.deepClean(clone);
 
-	    boolean changes = !GIPStarter.configuration.equals(clone);
+	    boolean changes = !DABStarter.configuration.equals(clone);
 
 	    getSaveButton().setEnabled(changes);
 	}
@@ -480,7 +480,7 @@ public class GSConfigurationView extends ConfigurationView {
 
     /**
      * This method is called every time the client window is loaded.<br>
-     * Returns a clone with disabled autoreload of the {@link GIPStarter#configuration}. Changes applied to this
+     * Returns a clone with disabled autoreload of the {@link DABStarter#configuration}. Changes applied to this
      * configuration instance are
      * not applied to the source configuration until this configuration is flushed and the source configuration performs
      * the autoreload.<br>
@@ -500,7 +500,7 @@ public class GSConfigurationView extends ConfigurationView {
 
 	// GIPStarter.configuration.addChangeEventListener(this);
 
-	Configuration clone = GIPStarter.configuration.clone();
+	Configuration clone = DABStarter.configuration.clone();
 
 	return clone;
     }

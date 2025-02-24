@@ -14,16 +14,40 @@ import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.SourceStorageWorker;
+import eu.essi_lab.api.database.Database.OpenSearchServiceType;
 import eu.essi_lab.api.database.SourceStorageWorker.DataFolderIndexDocument;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.datafolder.test.TestUtils;
 import eu.essi_lab.messages.bond.View;
+import eu.essi_lab.model.StorageInfo;
 
 /**
  * @author Fabrizio
  */
 public class OpenSearchFolderTest extends OpenSearchTest {
+
+    /**
+     * Not a test, use it to remove folders
+     * 
+     * @throws Exception
+     */
+    public void test() throws Exception {
+
+	StorageInfo info = new StorageInfo();
+
+	info.setIdentifier("identifier");
+	info.setName("identifier");
+	info.setUser("user");
+	info.setPassword("password");
+	info.setUri("https://");
+	info.setType(OpenSearchServiceType.OPEN_SEARCH_MANAGED.getProtocol());
+
+	OpenSearchDatabase osDB_ = new OpenSearchDatabase();
+	osDB_.initialize(info);
+
+	osDB_.removeFolder("foldername");
+    }
 
     @Test
     public void testWithBinary() throws Exception {

@@ -22,8 +22,9 @@ package eu.essi_lab.cfga.source;
  */
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
@@ -35,30 +36,66 @@ import java.util.Optional;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-
 import eu.essi_lab.cfga.ConfigurationSource;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 
 /**
  * @author Fabrizio
  */
 public class S3Source implements ConfigurationSource {
 
-    private S3TransferWrapper manager;
+    private S3TransferWrapper wrapper;
     private String bucketName;
     private String configName;
 
     /**
-     * @param manager
-     * @param bucketName
-     * @param configName
+     * s3://awsaccesskey:awssecretkey@bucket/config.json
+     * 
+     * @param configURL
+     * @return
+     * @throws URISyntaxException
      */
-    public S3Source(S3TransferWrapper manager, String bucketName, String configName) {
+    public static S3Source of(String configURL) throws URISyntaxException {
 
-	this.manager = manager;
+	URI uri = new URI(configURL);
+
+	String userInfo = uri.getUserInfo();
+	String accessKey = userInfo.split(":")[0];
+	String secretKey = userInfo.split(":")[1];
+
+	String bucketName = uri.getHost();
+	String configName = uri.getPath().substring(1, uri.getPath().length());
+
+	S3TransferWrapper wrapper = new S3TransferWrapper();
+	wrapper.setAccessKey(accessKey);
+	wrapper.setSecretKey(secretKey);
+
+	return new S3Source(wrapper, bucketName, configName);
+    }
+
+    /**
+     * s3://awsaccesskey:awssecretkey@bucket/config.json
+     * 
+     * @param url
+     * @return
+     */
+    public static boolean check(String url) {
+
+	return url.startsWith("s3://");
+    }
+
+    /**
+     * @param wrapper
+     * @param bucketName
+     * @param configName must include the extension (".json")
+     */
+    public S3Source(S3TransferWrapper wrapper, String bucketName, String configName) {
+
+	this.wrapper = wrapper;
 	this.bucketName = bucketName;
 	this.configName = configName;
     }
@@ -108,9 +145,9 @@ public class S3Source implements ConfigurationSource {
 	JSONArray configArray = new JSONArray();
 	settings.forEach(item -> configArray.put(item.getObject()));
 
-	File tempFile = uploadConfig(configArray, manager, bucketName, configName);
+	File tempFile = uploadConfig(configArray, wrapper, bucketName, configName);
 
-	manager.uploadFile(tempFile.getAbsolutePath(), bucketName, configName + ".json");
+	wrapper.uploadFile(tempFile.getAbsolutePath(), bucketName, configName);
 
 	tempFile.delete();
 
@@ -133,9 +170,13 @@ public class S3Source implements ConfigurationSource {
 
 	if (binaryConfig != null) {
 
-	    String string = IOStreamUtils.asUTF8String(stream);
-	    JSONArray jsonArray = new JSONArray(string);
-	    out = jsonArray.length() == 0;
+	    String string = IOStreamUtils.asUTF8String(stream).trim();
+	    if (string.isEmpty()) {
+		out = true;
+	    } else {
+		JSONArray jsonArray = new JSONArray(string);
+		out = jsonArray.length() == 0;
+	    }
 	}
 
 	stream.close();
@@ -156,7 +197,7 @@ public class S3Source implements ConfigurationSource {
 
 	Files.copy(configStream, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-	manager.uploadFile(tempFile.getAbsolutePath(), bucketName, configName + ".json");
+	manager.uploadFile(tempFile.getAbsolutePath(), bucketName, configName);
 
 	configStream.close();
 
@@ -175,7 +216,7 @@ public class S3Source implements ConfigurationSource {
 
 	try {
 
-	    manager.download(bucketName, configName + ".json", tempFile);
+	    wrapper.download(bucketName, configName, tempFile);
 
 	} catch (Exception ex) {
 
@@ -189,6 +230,41 @@ public class S3Source implements ConfigurationSource {
 	GSLoggerFactory.getLogger(getClass()).trace("Get binary config ENDED");
 
 	return Optional.of(new SimpleEntry<>(binaryConfig, tempFile));
+    }
+
+    @Override
+    public S3Source backup() throws Exception {
+
+	GSLoggerFactory.getLogger(getClass()).trace("Source backup STARTED");
+
+	String date = ISO8601DateTimeUtils.getISO8601DateTime().//
+		replace("-", "_").//
+		replace(":", "_").//
+		replace(".", "");
+
+	Optional<SimpleEntry<InputStream, File>> clone = getBinaryConfig();
+
+	String backupName = configName + "_" + date;
+
+	String backupCompleteName = backupName + ".json.backup";
+
+	wrapper.uploadFile(clone.get().getValue().getAbsolutePath(), this.bucketName, backupCompleteName);
+
+	S3Source backupSource = new S3Source(this.wrapper, this.bucketName, backupCompleteName);
+
+	backupSource.wrapper = this.wrapper;
+	backupSource.configName = backupCompleteName;
+	backupSource.bucketName = this.bucketName;
+
+	GSLoggerFactory.getLogger(getClass()).trace("Source backup ENDED");
+
+	return backupSource;
+    }
+
+    @Override
+    public String getLocation() {
+
+	return bucketName + "/" + configName;
     }
 
     @Override
@@ -215,18 +291,12 @@ public class S3Source implements ConfigurationSource {
 	throw new UnsupportedOperationException();
     }
 
-    @Override
-    public ConfigurationSource backup() throws IOException {
+    /**
+     * @return
+     */
+    public S3TransferWrapper getWrapper() {
 
-	//
-	// TODO
-	//
-	return null;
+	return wrapper;
     }
 
-    @Override
-    public String getLocation() {
-
-	return bucketName + "/" + configName + ".json";
-    }
 }

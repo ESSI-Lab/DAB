@@ -31,7 +31,7 @@ import eu.essi_lab.cfga.gui.components.ComponentFactory;
 import eu.essi_lab.cfga.gui.components.listener.ButtonChangeListener;
 import eu.essi_lab.cfga.gui.dialog.ConfirmationDialog;
 import eu.essi_lab.cfga.gui.dialog.NotificationDialog;
-import eu.essi_lab.gssrv.starter.GIPStarter;
+import eu.essi_lab.gssrv.starter.DABStarter;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
@@ -185,7 +185,7 @@ class SaveConfirmationDialog extends ConfirmationDialog {
 	    // this node, the changes are already available without waiting for the autoreload
 	    // useful for testing purpose
 	    //
-	    GIPStarter.configuration.reload();
+	    DABStarter.configuration.reload();
 
 	    view.updateScheduler();
 
