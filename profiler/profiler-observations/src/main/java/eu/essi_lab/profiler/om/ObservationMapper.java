@@ -169,6 +169,12 @@ public class ObservationMapper {
 	} else {
 	    observation = createObservation(view.get().getId(), ObservationType.TimeSeriesObservation);
 	}
+	
+	if (parser.getInstrumentNames()!=null ) {
+		for (String instrument : parser.getInstrumentNames()) {
+			observation.addInstrument(instrument);
+		}
+	}
 
 	if (parser.getPlatformName() != null && !parser.getPlatformName().equals("")) {
 	    platform.setName(parser.getPlatformName());
