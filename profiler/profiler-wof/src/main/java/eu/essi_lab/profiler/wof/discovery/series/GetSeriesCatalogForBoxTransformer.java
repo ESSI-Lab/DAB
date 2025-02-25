@@ -154,6 +154,7 @@ public class GetSeriesCatalogForBoxTransformer extends DiscoveryRequestTransform
 		    break;
 		case 1:
 		    operands.add(keywords.get(0));
+		    break;
 		default:
 		    LogicalBond orBond = BondFactory.createOrBond(keywords.toArray(new Bond[] {}));
 		    operands.add(orBond);
