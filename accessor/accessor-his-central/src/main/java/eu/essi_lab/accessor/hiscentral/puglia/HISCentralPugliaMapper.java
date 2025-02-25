@@ -219,6 +219,8 @@ public class HISCentralPugliaMapper extends FileIdentifierMapper {
 	String measureId = measure.optString("id_measure");
 	String measureName = measure.optString("measure_name");
 	String measureUnits = measure.optString("measure_unit");
+	
+	measureName = measureName.toLowerCase().contains("precipitazione") ? "Precipitazione" : measureName;
 
 	String timeSeriesId = stationInfo.optString("time-series-id");
 
