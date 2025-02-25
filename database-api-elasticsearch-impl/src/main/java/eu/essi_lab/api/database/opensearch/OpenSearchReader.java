@@ -3,6 +3,8 @@
  */
 package eu.essi_lab.api.database.opensearch;
 
+import java.util.Arrays;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -29,7 +31,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 
 import eu.essi_lab.api.database.Database;
@@ -214,14 +215,26 @@ public class OpenSearchReader implements DatabaseReader {
 	}
     }
 
-    //
-    // NOT IMPLEMENTED. implementation not required since this method call is deprecated
-    //
     @Override
-    @Deprecated
     public List<GSResource> getResources(String originalIdentifier, GSSource source, boolean includeDeleted) throws GSException {
 
-	throw new NotImplementedException();
-    }
+	Query query = OpenSearchQueryBuilder.buildSearchQuery(//
+		database.getIdentifier(), //
+		Arrays.asList(ResourceProperty.ORIGINAL_ID.getName(), ResourceProperty.SOURCE_ID.getName()), //
+		Arrays.asList(originalIdentifier, source.getUniqueIdentifier()));
 
+	try {
+	    return wrapper.searchSources(DataFolderMapping.get().getIndex(), query).//
+		    stream().//
+		    map(s -> ConversionUtils.toGSResource(s).orElse(null)).//
+		    filter(Objects::nonNull).//
+		    collect(Collectors.toList());
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(OpenSearchDatabase.class).error(ex);
+
+	    throw GSException.createException(getClass(), "OpenSearchReaderGetResourcesError", ex);
+	}
+    }
 }
