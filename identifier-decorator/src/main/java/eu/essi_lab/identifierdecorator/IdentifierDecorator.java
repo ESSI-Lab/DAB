@@ -1,5 +1,10 @@
 package eu.essi_lab.identifierdecorator;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -35,10 +40,6 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.DatasetCollection;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.ResourceType;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
 
 /**
  * @author Fabrizio
@@ -117,6 +118,7 @@ public class IdentifierDecorator {
 	List<GSResource> existingResources = getDatabaseReader().getResources(IdentifierType.ORIGINAL, originalId);
 
 	if (!existingResources.isEmpty()) {
+
 	    GSLoggerFactory.getLogger(getClass()).debug("Found [{}] existing resources with original id [{}]", //
 		    existingResources.size(), //
 		    originalId);
@@ -144,7 +146,6 @@ public class IdentifierDecorator {
 		    // resource
 		    //
 		    throw new DuplicatedResourceException(incomingResource, existingResource, originalId, duplicationCase);
-
 		}
 	    }
 	}
@@ -218,7 +219,7 @@ public class IdentifierDecorator {
 	    decorateIdentifier(incomingResource, incomingResource.getSource(), originalId);
 	}
 
-	if (requiresPartentIdDecorator(incomingResource, originalId)) {
+	if (requiresParentIdDecorator(incomingResource, originalId)) {
 
 	    String oldparentid = incomingResource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier();
 	    String newparentid = generatePersistentIdentifier(oldparentid, incomingResource.getSource().getUniqueIdentifier());
@@ -230,8 +231,15 @@ public class IdentifierDecorator {
 
     }
 
-    public boolean requiresPartentIdDecorator(GSResource resource, String originalid) {
+    /**
+     * @param resource
+     * @param originalid
+     * @return
+     */
+    public boolean requiresParentIdDecorator(GSResource resource, String originalid) {
+
 	String parentid = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier();
+
 	boolean validParentId = parentid != null && !parentid.equalsIgnoreCase("")
 		&& !parentid.equalsIgnoreCase(resource.getSource().getUniqueIdentifier());
 
@@ -243,6 +251,7 @@ public class IdentifierDecorator {
 
 	GSResource collection = new DatasetCollection();
 	collection.setSource(resource.getSource());
+
 	if (useOriginalId(collection, parentid))
 	    return false;
 
@@ -447,8 +456,7 @@ public class IdentifierDecorator {
 
 	return collectionCondition || //
 		uuidCondition || //
-		isPrioritySource//
-	;
+		isPrioritySource;
     }
 
 }
