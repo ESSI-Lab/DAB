@@ -643,6 +643,9 @@ public class OpenSearchQueryBuilder {
     }
 
     /**
+     * Builds a bool <i>must query</i> which searches the entries with the given <code>fields</code> matching
+     * the related value in <code>fieldValues</code>, according to the <code>field/fieldValue</code> position in the lists
+     * 
      * @param databaseId
      * @param fields
      * @param fieldsValue
@@ -657,7 +660,7 @@ public class OpenSearchQueryBuilder {
 	    list.add(buildMatchPhraseQuery(fields.get(i), fieldsValue.get(i)));
 	}
 
-	return buildBoolQuery(Arrays.asList(buildDatabaseIdQuery(databaseId)), list, Arrays.asList());
+	return buildBoolQuery(Arrays.asList(buildDatabaseIdQuery(databaseId)), Arrays.asList(), list);
     }
 
     /**
