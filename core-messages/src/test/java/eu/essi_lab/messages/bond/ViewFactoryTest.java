@@ -9,25 +9,22 @@ import eu.essi_lab.messages.bond.jaxb.ViewFactory;
 
 public class ViewFactoryTest {
 
-    private ViewFactory factory;
-
     @Rule
     public ExpectedException exceptions = ExpectedException.none();
 
     @Before
     public void init() {
-	this.factory = new ViewFactory();
-
+	new ViewFactory();
     }
 
     @Test
     public void testMarshaller() throws Exception {
-	factory.createMarshaller();
+	ViewFactory.createMarshaller();
     }
 
     @Test
     public void testUnmarshaller() throws Exception {
-	factory.createUnmarshaller();
+	ViewFactory.createUnmarshaller();
     }
 
 }

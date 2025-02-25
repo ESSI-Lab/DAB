@@ -55,6 +55,13 @@ public class IndexedElementsWriter {
 	//
 	resource.getPropertyHandler().setResourceTimeStamp();
 
+	// ----------------------------------
+	//
+	// add the source deployment
+	//
+	List<String> deployment = resource.getSource().getDeployment();
+	deployment.forEach(dep -> resource.getPropertyHandler().addSourceDeployment(dep));
+
 	// --------------------------
 	//
 	// metadata quality

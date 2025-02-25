@@ -72,7 +72,9 @@ public class GSSourceSettingTest {
 	sourceSetting.setSourceEndpoint("endpoint");
 	sourceSetting.setSourceLabel("label");
 	sourceSetting.setDiscoveryOptions(ResultsPriority.COLLECTION, MetadataElement.ABSTRACT, OrderingDirection.DESCENDING);
-
+	sourceSetting.addSourceDeployment("dep1");
+	sourceSetting.addSourceDeployment("dep2");
+	sourceSetting.addSourceDeployment("dep3");
 	sourceSetting.setSourceComment("comment");
 
 	setValuesTest(sourceSetting);
@@ -153,6 +155,8 @@ public class GSSourceSettingTest {
 	Assert.assertFalse(sourceSetting.isEditable());
 
 	Assert.assertFalse(sourceSetting.getSourceComment().isPresent());
+	
+	Assert.assertTrue(sourceSetting.getSourceDeployment().isEmpty());
 
 	//
 	//
@@ -170,6 +174,8 @@ public class GSSourceSettingTest {
 	Assert.assertNull(asSource.getUniqueIdentifier());
 
 	Assert.assertNull(asSource.getOrderingProperty());
+	
+	Assert.assertTrue(asSource.getDeployment().isEmpty());
     }
 
     private void setValuesTest(GSSourceSetting sourceSetting) {
@@ -186,6 +192,12 @@ public class GSSourceSettingTest {
 	Assert.assertEquals(MetadataElement.ABSTRACT, sourceSetting.getOrderingProperty().get());
 
 	Assert.assertEquals("comment", sourceSetting.getSourceComment().get());
+	
+	Assert.assertEquals(3, sourceSetting.getSourceDeployment().size());
+
+	Assert.assertEquals("dep1", sourceSetting.getSourceDeployment().get(0));
+	Assert.assertEquals("dep2", sourceSetting.getSourceDeployment().get(1));
+	Assert.assertEquals("dep3", sourceSetting.getSourceDeployment().get(2));
 
 	//
 	//

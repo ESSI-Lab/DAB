@@ -93,7 +93,7 @@ public class GWISProfiler extends Profiler<GWISProfilerSetting> {
 	vm.setError(message);
 	vm.setErrorCode(ExceptionCode.NO_APPLICABLE_CODE.toString());
 
-	return onValidationFailed(null, vm);
+	return Response.status(Status.INTERNAL_SERVER_ERROR).type(MediaType.APPLICATION_XML).entity("").build();
     }
 
     @Override

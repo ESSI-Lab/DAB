@@ -137,8 +137,9 @@ public class DirectoryListingConnector extends HarvestedQueryConnector<Directory
 	    original.setSchemeURI(getSetting().getSelectedSchema());
 
 	    Downloader downloader = new Downloader();
-	    String metadata = downloader.downloadOptionalString(url.toExternalForm()).orElse(null);
-	    original.setMetadata(metadata);
+	    Optional<String> metadata = downloader.downloadOptionalString(url.toExternalForm());
+
+	    metadata.ifPresent(md -> original.setMetadata(md));
 
 	    response.addRecord(original);
 	    logger.iterationEnded();

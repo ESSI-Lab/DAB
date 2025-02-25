@@ -1,5 +1,7 @@
 package eu.essi_lab.messages;
 
+import java.math.BigDecimal;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB) Community Edition (CE)
@@ -32,6 +34,7 @@ import javax.xml.stream.XMLInputFactory;
 
 import org.json.JSONObject;
 
+import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.utils.StringUtils;
@@ -46,10 +49,11 @@ import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.model.resource.data.DataObject;
 
 /**
- * A result set represents the result of a discovery or access query. The query results
- * can be get and set respectively with the methods {@link #getResultsList()} and {@link #setResultsList(List)}.<br>
- * The parametric type <code>T</code> determines the Java type of the results; subclasses <i>should</i> only
- * set the appropriate type
+ * A result set represents the result of a discovery or access query. The query
+ * results can be get and set respectively with the methods
+ * {@link #getResultsList()} and {@link #setResultsList(List)}.<br>
+ * The parametric type <code>T</code> determines the Java type of the results;
+ * subclasses <i>should</i> only set the appropriate type
  *
  * @param <T> the type of the query results
  * @author Fabrizio
@@ -61,241 +65,290 @@ import eu.essi_lab.model.resource.data.DataObject;
  */
 public class ResultSet<T> extends MessageResponse<T, CountSet> {
 
-    private XMLInputFactory factory;
+	private XMLInputFactory factory;
 
-    /**
-     * 
-     */
-    public ResultSet() {
-	super();
-    }
-
-    public ResultSet(List<T> results) {
-	setException(GSException.createException());
-	setResultsList(results);
-    }
-
-    @Override
-    public HashMap<String, List<String>> provideInfo() {
-
-	HashMap<String, List<String>> map = super.provideInfo();
-
-	map.put(//
-		RuntimeInfoElement.RESULT_SET_TIME_STAMP.getName(), //
-		Arrays.asList(ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds()));
-	map.put(//
-		RuntimeInfoElement.RESULT_SET_TIME_STAMP_MILLIS.getName(), //
-		Arrays.asList(String.valueOf(System.currentTimeMillis())));
-
-	CountSet countResponse = getCountResponse();
-	if (countResponse != null) {
-
-	    int count = countResponse.getCount();
-	    map.put(RuntimeInfoElement.RESULT_SET_MATCHED.getName(), Arrays.asList(String.valueOf(count)));
+	/**
+	 * 
+	 */
+	public ResultSet() {
+		super();
 	}
 
-	List<? extends T> resultsList = getResultsList();
-	if (resultsList != null) {
+	public ResultSet(List<T> results) {
+		setException(GSException.createException());
+		setResultsList(results);
+	}
 
-	    int size = resultsList.size();
-	    map.put(RuntimeInfoElement.RESULT_SET_RETURNED.getName(), Arrays.asList(String.valueOf(size)));
+	@Override
+	public HashMap<String, List<String>> provideInfo() {
 
-	    if (!resultsList.isEmpty()) {
+		HashMap<String, List<String>> map = super.provideInfo();
 
-		List<String> discResourceTitlesList = new ArrayList<String>();
-		List<String> discResourceAttributeTitlesList = new ArrayList<String>();
-		List<String> discResourceIdsList = new ArrayList<String>();
+		map.put(//
+				RuntimeInfoElement.RESULT_SET_TIME_STAMP.getName(), //
+				Arrays.asList(ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds()));
+		map.put(//
+				RuntimeInfoElement.RESULT_SET_TIME_STAMP_MILLIS.getName(), //
+				Arrays.asList(String.valueOf(System.currentTimeMillis())));
 
-		List<String> discSourceIdsList = new ArrayList<String>();
-		List<String> discSourceLabelsList = new ArrayList<String>();
+		CountSet countResponse = getCountResponse();
+		if (countResponse != null) {
 
-		List<String> accessSourceIdsList = new ArrayList<String>();
-		List<String> accessSourceLabelsList = new ArrayList<String>();
+			int count = countResponse.getCount();
+			map.put(RuntimeInfoElement.RESULT_SET_MATCHED.getName(), Arrays.asList(String.valueOf(count)));
+		}
 
-		resultsList.forEach(item -> {
+		List<? extends T> resultsList = getResultsList();
+		if (resultsList != null) {
 
-		    if (item instanceof GSResource) {
+			int size = resultsList.size();
+			map.put(RuntimeInfoElement.RESULT_SET_RETURNED.getName(), Arrays.asList(String.valueOf(size)));
 
-			GSResource resource = (GSResource) item;
+			if (!resultsList.isEmpty()) {
 
-			String title = resource.getHarmonizedMetadata().getCoreMetadata().getTitle();
+				List<String> discResourceTitlesList = new ArrayList<String>();
+				List<String> discResourceAttributeTitlesList = new ArrayList<String>();
+				List<String> discResourceIdsList = new ArrayList<String>();
 
-			if (StringUtils.isNotEmptyAndNotNull(title)) {
-			    discResourceTitlesList.add(title);
-			}
+				List<String> discSourceIdsList = new ArrayList<String>();
+				List<String> discSourceLabelsList = new ArrayList<String>();
 
-			discResourceIdsList.add(resource.getHarmonizedMetadata().getCoreMetadata().getIdentifier());
+				List<String> discBboxNorthList = new ArrayList<String>();
+				List<String> discBboxSouthList = new ArrayList<String>();
+				List<String> discBboxEastList = new ArrayList<String>();
+				List<String> discBboxWestList = new ArrayList<String>();
 
-			try {
+				List<String> accessSourceIdsList = new ArrayList<String>();
+				List<String> accessSourceLabelsList = new ArrayList<String>();
 
-			    discResourceAttributeTitlesList.add(resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
-				    .getCoverageDescription().getAttributeTitle());
+				resultsList.forEach(item -> {
 
-			} catch (Exception e) {
-			}
+					if (item instanceof GSResource) {
 
-			//
-			//
-			//
+						GSResource resource = (GSResource) item;
 
-			GSSource source = resource.getSource();
+						String title = resource.getHarmonizedMetadata().getCoreMetadata().getTitle();
 
-			discSourceIdsList.add(source.getUniqueIdentifier());
-			discSourceLabelsList.add(source.getLabel());
+						if (StringUtils.isNotEmptyAndNotNull(title)) {
+							discResourceTitlesList.add(title);
+						}
 
-		    } else if (item instanceof DataObject) {
+						discResourceIdsList.add(resource.getHarmonizedMetadata().getCoreMetadata().getIdentifier());
 
-			DataObject object = (DataObject) item;
-			DataDescriptor descriptor = object.getDataDescriptor();
+						try {
 
-			DataDescriptorRuntimeInfo.publishDataDescriptorInfo(TargetProvider.RESULT_SET, descriptor, map);
+							discResourceAttributeTitlesList.add(resource.getHarmonizedMetadata().getCoreMetadata()
+									.getMIMetadata().getCoverageDescription().getAttributeTitle());
 
-			Optional<GSResource> resource = object.getResource();
+						} catch (Exception e) {
+						}
 
-			if (resource.isPresent()) {
+						//
+						//
+						//
+						
+						GeographicBoundingBox bbox = resource.getHarmonizedMetadata().getCoreMetadata()
+								.getBoundingBox();
+						if (bbox != null) {
+							BigDecimal optEast = bbox.getBigDecimalEast();
+							BigDecimal optWest = bbox.getBigDecimalEast();
+							BigDecimal optSouth = bbox.getBigDecimalEast();
+							BigDecimal optNorth = bbox.getBigDecimalEast();
+							discBboxNorthList.add(optNorth.toString());
+							discBboxSouthList.add(optSouth.toString());
+							discBboxEastList.add(optEast.toString());
+							discBboxWestList.add(optWest.toString());
+						}
 
-			    GSSource source = resource.get().getSource();
+						GSSource source = resource.getSource();
 
-			    GSLoggerFactory.getLogger(getClass()).trace("Accessed source: " + source.getLabel());
-			    GSLoggerFactory.getLogger(getClass()).trace("Accessed source id: " + source.getUniqueIdentifier());
+						discSourceIdsList.add(source.getUniqueIdentifier());
+						discSourceLabelsList.add(source.getLabel());
 
-			    accessSourceIdsList.add(source.getUniqueIdentifier());
-			    accessSourceLabelsList.add(source.getLabel());
-			}
-		    } else if (item instanceof String) {
+					} else if (item instanceof DataObject) {
 
-			String strJSON = (String) item;
+						DataObject object = (DataObject) item;
+						DataDescriptor descriptor = object.getDataDescriptor();
 
-			try {
-			    JSONObject json = new JSONObject(strJSON);
+						DataDescriptorRuntimeInfo.publishDataDescriptorInfo(TargetProvider.RESULT_SET, descriptor, map);
 
-			    if (json.has("title")) {
+						Optional<GSResource> resource = object.getResource();
 
-				discResourceTitlesList.add(json.getString("title"));
-			    }
+						if (resource.isPresent()) {
 
-			    if (json.has("id")) {
+							GSSource source = resource.get().getSource();
 
-				discResourceIdsList.add(json.getString("id"));
-			    }
+							GSLoggerFactory.getLogger(getClass()).trace("Accessed source: " + source.getLabel());
+							GSLoggerFactory.getLogger(getClass())
+									.trace("Accessed source id: " + source.getUniqueIdentifier());
 
-			    if (json.has("attributeTitle")) {
+							accessSourceIdsList.add(source.getUniqueIdentifier());
+							accessSourceLabelsList.add(source.getLabel());
+							GeographicBoundingBox bbox = resource.get().getHarmonizedMetadata().getCoreMetadata()
+									.getBoundingBox();
+							if (bbox != null) {
+								BigDecimal optEast = bbox.getBigDecimalEast();
+								BigDecimal optWest = bbox.getBigDecimalEast();
+								BigDecimal optSouth = bbox.getBigDecimalEast();
+								BigDecimal optNorth = bbox.getBigDecimalEast();
+								discBboxNorthList.add(optNorth.toString());
+								discBboxSouthList.add(optSouth.toString());
+								discBboxEastList.add(optEast.toString());
+								discBboxWestList.add(optWest.toString());
+							}
 
-				discResourceAttributeTitlesList.add(json.getString("attributeTitle"));
-			    }
+						}
+					} else if (item instanceof String) {
 
-			    if (json.has("source")) {
+						String strJSON = (String) item;
 
-				JSONObject jsonSource = json.getJSONObject("source");
+						try {
+							JSONObject json = new JSONObject(strJSON);
 
-				String sourceId = jsonSource.getString("id");
-				String sourceLabel = jsonSource.getString("title");
+							if (json.has("title")) {
 
-				discSourceIdsList.add(sourceId);
-				discSourceLabelsList.add(sourceLabel);
-			    }
+								discResourceTitlesList.add(json.getString("title"));
+							}
 
-			} catch (Exception e) {
+							if (json.has("id")) {
 
-			    if (strJSON.startsWith("<entry")) {
+								discResourceIdsList.add(json.getString("id"));
+							}
 
-				String xmlEntry = strJSON;
-				
-				try {
+							if (json.has("attributeTitle")) {
 
-				    StAXDocumentParser parser = new StAXDocumentParser(xmlEntry);
+								discResourceAttributeTitlesList.add(json.getString("attributeTitle"));
+							}
 
-				    parser.add(Arrays.asList(new QName("entry"), new QName("id")), v -> discResourceIdsList.add(v));
+							if (json.has("source")) {
 
-				    parser.add(Arrays.asList(new QName("entry"), new QName("title")), v -> discResourceTitlesList.add(v));
+								JSONObject jsonSource = json.getJSONObject("source");
 
-				    parser.add(Arrays.asList(new QName("entry"), new QName("sourceId")), v -> discSourceIdsList.add(v));
+								String sourceId = jsonSource.getString("id");
+								String sourceLabel = jsonSource.getString("title");
 
-				    parser.add(Arrays.asList(new QName("entry"), new QName("sourceTitle")), v -> discSourceLabelsList.add(v));
+								discSourceIdsList.add(sourceId);
+								discSourceLabelsList.add(sourceLabel);
+							}
 
-				    parser.parse();
+						} catch (Exception e) {
 
-				} catch (Exception ex) {
+							if (strJSON.startsWith("<entry")) {
 
-				    GSLoggerFactory.getLogger(getClass()).error(ex.getMessage());
+								String xmlEntry = strJSON;
+
+								try {
+
+									StAXDocumentParser parser = new StAXDocumentParser(xmlEntry);
+
+									parser.add(Arrays.asList(new QName("entry"), new QName("id")),
+											v -> discResourceIdsList.add(v));
+
+									parser.add(Arrays.asList(new QName("entry"), new QName("title")),
+											v -> discResourceTitlesList.add(v));
+
+									parser.add(Arrays.asList(new QName("entry"), new QName("sourceId")),
+											v -> discSourceIdsList.add(v));
+
+									parser.add(Arrays.asList(new QName("entry"), new QName("sourceTitle")),
+											v -> discSourceLabelsList.add(v));
+
+									parser.parse();
+
+								} catch (Exception ex) {
+
+									GSLoggerFactory.getLogger(getClass()).error(ex.getMessage());
+								}
+							}
+						}
+					}
+				});
+
+				if (!discResourceIdsList.isEmpty()) {
+					map.put(RuntimeInfoElement.RESULT_SET_RESOURCE_ID.getName(), discResourceIdsList);
 				}
-			    }
+
+				if (!discResourceTitlesList.isEmpty()) {
+					map.put(RuntimeInfoElement.RESULT_SET_RESOURCE_TITLE.getName(), discResourceTitlesList);
+				}
+
+				if (!discResourceAttributeTitlesList.isEmpty()) {
+					map.put(RuntimeInfoElement.RESULT_SET_ATTRIBUTE_TITLE.getName(), discResourceAttributeTitlesList);
+				}
+				
+				if (!discBboxNorthList.isEmpty()) {
+				    map.put(RuntimeInfoElement.RESULT_SET_BBOX_NORTH.getName(), discBboxNorthList);
+				}
+				if (!discBboxSouthList.isEmpty()) {
+				    map.put(RuntimeInfoElement.RESULT_SET_BBOX_SOUTH.getName(), discBboxSouthList);
+				}
+				if (!discBboxWestList.isEmpty()) {
+				    map.put(RuntimeInfoElement.RESULT_SET_BBOX_WEST.getName(), discBboxWestList);
+				}
+				if (!discBboxEastList.isEmpty()) {
+				    map.put(RuntimeInfoElement.RESULT_SET_BBOX_EAST.getName(), discBboxEastList);
+				}
+
+				//
+				//
+				//
+
+				if (!discSourceIdsList.isEmpty()) {
+					map.put(RuntimeInfoElement.RESULT_SET_DISCOVERY_SOURCE_ID.getName(), discSourceIdsList);
+				}
+
+				if (!discSourceLabelsList.isEmpty()) {
+					map.put(RuntimeInfoElement.RESULT_SET_DISCOVERY_SOURCE_LABEL.getName(), discSourceLabelsList);
+				}
+
+				//
+				//
+				//
+
+				if (!accessSourceIdsList.isEmpty()) {
+					map.put(RuntimeInfoElement.RESULT_SET_ACCESS_SOURCE_ID.getName(), accessSourceIdsList);
+				}
+
+				if (!accessSourceLabelsList.isEmpty()) {
+					map.put(RuntimeInfoElement.RESULT_SET_ACCESS_SOURCE_LABEL.getName(), accessSourceLabelsList);
+				}
 			}
-		    }
-		});
-
-		if (!discResourceIdsList.isEmpty()) {
-		    map.put(RuntimeInfoElement.RESULT_SET_RESOURCE_ID.getName(), discResourceIdsList);
 		}
 
-		if (!discResourceTitlesList.isEmpty()) {
-		    map.put(RuntimeInfoElement.RESULT_SET_RESOURCE_TITLE.getName(), discResourceTitlesList);
-		}
-
-		if (!discResourceAttributeTitlesList.isEmpty()) {
-		    map.put(RuntimeInfoElement.RESULT_SET_ATTRIBUTE_TITLE.getName(), discResourceAttributeTitlesList);
-		}
-
-		//
-		//
-		//
-
-		if (!discSourceIdsList.isEmpty()) {
-		    map.put(RuntimeInfoElement.RESULT_SET_DISCOVERY_SOURCE_ID.getName(), discSourceIdsList);
-		}
-
-		if (!discSourceLabelsList.isEmpty()) {
-		    map.put(RuntimeInfoElement.RESULT_SET_DISCOVERY_SOURCE_LABEL.getName(), discSourceLabelsList);
-		}
-
-		//
-		//
-		//
-
-		if (!accessSourceIdsList.isEmpty()) {
-		    map.put(RuntimeInfoElement.RESULT_SET_ACCESS_SOURCE_ID.getName(), accessSourceIdsList);
-		}
-
-		if (!accessSourceLabelsList.isEmpty()) {
-		    map.put(RuntimeInfoElement.RESULT_SET_ACCESS_SOURCE_LABEL.getName(), accessSourceLabelsList);
-		}
-	    }
+		return map;
 	}
 
-	return map;
-    }
+	/**
+	 * Creates a new {@link ResultSet} which is a clone of the supplied
+	 * <code>resultSet</code> but without {@link #getResultsList()}
+	 * 
+	 * @param resultSet a non <code>null</code> {@link ResultSet} to clone
+	 */
+	public ResultSet(ResultSet<?> resultSet) {
+		setException(resultSet.getException());
+		setCountResponse(resultSet.getCountResponse());
+	}
 
-    /**
-     * Creates a new {@link ResultSet} which is a clone of the supplied <code>resultSet</code>
-     * but without {@link #getResultsList()}
-     * 
-     * @param resultSet a non <code>null</code> {@link ResultSet} to clone
-     */
-    public ResultSet(ResultSet<?> resultSet) {
-	setException(resultSet.getException());
-	setCountResponse(resultSet.getCountResponse());
-    }
+	/**
+	 * Creates a new {@link ResultSet} which is a clone of the supplied
+	 * <code>resultSet</code> but without {@link #getResultsList()}
+	 * 
+	 * @param resultSet a non <code>null</code> {@link ResultSet} to clone
+	 */
+	public ResultSet(MessageResponse<?, CountSet> resultSet) {
+		setException(resultSet.getException());
+		setCountResponse(resultSet.getCountResponse());
+	}
 
-    /**
-     * Creates a new {@link ResultSet} which is a clone of the supplied <code>resultSet</code>
-     * but without {@link #getResultsList()}
-     * 
-     * @param resultSet a non <code>null</code> {@link ResultSet} to clone
-     */
-    public ResultSet(MessageResponse<?, CountSet> resultSet) {
-	setException(resultSet.getException());
-	setCountResponse(resultSet.getCountResponse());
-    }
+	@Override
+	public String getName() {
 
-    @Override
-    public String getName() {
+		return "RESULT_SET";
+	}
 
-	return "RESULT_SET";
-    }
-
-    public static void main(String[] args) {
-	JSONObject test = new JSONObject();
-	test.put("key", "test':{{\" \b \f \n \r \t \\");
-	System.out.println(test.toString());
-    }
+	public static void main(String[] args) {
+		JSONObject test = new JSONObject();
+		test.put("key", "test':{{\" \b \f \n \r \t \\");
+		System.out.println(test.toString());
+	}
 }

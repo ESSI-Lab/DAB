@@ -95,7 +95,7 @@ public class FullStatisticsHandler extends DefaultRequestHandler {
     @Override
     public String getStringResponse(WebRequest webRequest) throws GSException {
 
-	StorageInfo uri = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo uri = ConfigurationWrapper.getStorageInfo();
 	GSLoggerFactory.getLogger(FullStatisticsHandler.class).debug("Storage uri: {}", uri);
 
 	DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(uri);
@@ -258,7 +258,7 @@ public class FullStatisticsHandler extends DefaultRequestHandler {
 
 	List<Bond> operands = new ArrayList<Bond>();
 
-	StorageInfo storageUri = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo storageUri = ConfigurationWrapper.getStorageInfo();
 
 	Optional<String> viewId = webRequest.extractViewId();
 

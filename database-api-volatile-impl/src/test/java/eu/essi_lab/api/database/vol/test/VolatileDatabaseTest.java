@@ -19,7 +19,7 @@ import eu.essi_lab.model.exceptions.GSException;
  */
 public class VolatileDatabaseTest {
 
-    private static final StorageInfo TEST_DB_URI = new DatabaseSetting(true).asStorageUri();
+    private static final StorageInfo TEST_DB_URI = new DatabaseSetting(true).asStorageInfo();
     static {
 	TEST_DB_URI.setIdentifier("test");
     }

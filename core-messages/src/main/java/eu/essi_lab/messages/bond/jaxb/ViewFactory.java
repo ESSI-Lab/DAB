@@ -35,11 +35,18 @@ import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.bond.View.ViewVisibility;
 import eu.essi_lab.messages.bond.ViewBond;
 
+/**
+ * 
+ */
 public class ViewFactory {
+
     public ViewFactory() {
     }
 
-    public Marshaller createMarshaller() {
+    /**
+     * @return
+     */
+    public static Marshaller createMarshaller() {
 	try {
 	    JAXBContext jc = createContext();
 	    Marshaller m = jc.createMarshaller();
@@ -52,7 +59,10 @@ public class ViewFactory {
 	return null;
     }
 
-    public Unmarshaller createUnmarshaller() {
+    /**
+     * @return
+     */
+    public static Unmarshaller createUnmarshaller() {
 	try {
 	    JAXBContext jc = createContext();
 	    Unmarshaller u = jc.createUnmarshaller();
@@ -64,8 +74,17 @@ public class ViewFactory {
 	return null;
     }
 
-    private JAXBContext createContext() throws JAXBException {
-	return JAXBContext.newInstance(View.class, ViewBond.class, LogicalBond.class, ResourcePropertyBond.class, SimpleValueBond.class,
+    /**
+     * @return
+     * @throws JAXBException
+     */
+    private static JAXBContext createContext() throws JAXBException {
+	return JAXBContext.newInstance(//
+		View.class, //
+		ViewBond.class, //
+		LogicalBond.class, //
+		ResourcePropertyBond.class, //
+		SimpleValueBond.class, // FS
 		SpatialBond.class);
     }
 
@@ -77,7 +96,7 @@ public class ViewFactory {
      */
     public View createView(String id, String label, Bond bond) {
 
-	return createView(id, label, bond, null, null, null);
+	return createView(id, label, bond, null, null, null, null);
     }
 
     /**
@@ -89,7 +108,34 @@ public class ViewFactory {
      */
     public View createView(String id, String label, String creator, Bond bond) {
 
-	return createView(id, label, bond, creator, null, null);
+	return createView(id, label, bond, creator, null, null, null);
+    }
+
+    /**
+     * @param id
+     * @param label
+     * @param creator
+     * @param bond
+     * @param viewVisibility
+     * @return
+     */
+    public View createView(String id, String label, String creator, Bond bond, ViewVisibility viewVisibility) {
+
+	return createView(id, label, bond, creator, null, viewVisibility, null);
+    }
+
+    /**
+     * @param id
+     * @param label
+     * @param creator
+     * @param owner
+     * @param bond
+     * @param viewVisibility
+     * @return
+     */
+    public View createView(String id, String label, String creator, String owner, Bond bond, ViewVisibility viewVisibility) {
+
+	return createView(id, label, bond, creator, owner, viewVisibility, null);
     }
 
     /**
@@ -101,7 +147,14 @@ public class ViewFactory {
      * @param viewVisibility
      * @return
      */
-    public View createView(String id, String label, Bond bond, String creator, String owner, ViewVisibility viewVisibility) {
+    public View createView(//
+	    String id, //
+	    String label, //
+	    Bond bond, //
+	    String creator, //
+	    String owner, //
+	    ViewVisibility viewVisibility, //
+	    String sourceDeployment) {
 
 	View ret = new View();
 	ret.setId(id);
@@ -111,6 +164,9 @@ public class ViewFactory {
 	ret.setOwner(owner);
 	if (viewVisibility != null) {
 	    ret.setVisibility(viewVisibility);
+	}
+	if (sourceDeployment != null) {
+	    ret.setSourceDeployment(sourceDeployment);
 	}
 	return ret;
     }

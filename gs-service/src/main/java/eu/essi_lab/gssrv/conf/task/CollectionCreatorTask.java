@@ -121,7 +121,7 @@ public class CollectionCreatorTask extends AbstractCustomTask {
      */
     public void run(String sourceId) throws Exception {
 
-	StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo databaseURI = ConfigurationWrapper.getStorageInfo();
 	run(sourceId, databaseURI);
     }
 

@@ -109,7 +109,7 @@ public class FeatureLayer0Stations extends FeatureLayer {
 	// set the required properties
 	statisticsMessage.setSources(allSources);
 
-	StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo databaseURI = ConfigurationWrapper.getStorageInfo();
 	GSLoggerFactory.getLogger(getClass()).info("Searching view in repository {}", databaseURI);
 
 	statisticsMessage.setDataBaseURI(databaseURI);

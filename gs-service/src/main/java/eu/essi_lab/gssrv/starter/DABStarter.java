@@ -61,6 +61,7 @@ import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting.JobStoreType;
 import eu.essi_lab.cfga.source.FileSource;
+import eu.essi_lab.cfga.source.S3Source;
 import eu.essi_lab.configuration.ClusterType;
 import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.gssrv.conf.task.ErrorLogsPublisherTask;
@@ -83,7 +84,7 @@ import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
 /**
  * @author Fabrizio
  */
-public class GIPStarter {
+public class DABStarter {
 
     /**
     * 
@@ -108,18 +109,18 @@ public class GIPStarter {
     /**
      * 
      */
-    public GIPStarter() {
+    public DABStarter() {
 
-	GSLoggerFactory.getLogger(GIPStarter.class).info("Retrieving execution mode");
+	GSLoggerFactory.getLogger(DABStarter.class).info("Retrieving execution mode");
 
 	mode = ExecutionMode.get();
 
-	GSLoggerFactory.getLogger(GIPStarter.class).info("GI-suite is starting in execution mode {}", mode);
+	GSLoggerFactory.getLogger(DABStarter.class).info("DAB is starting in execution mode {}", mode);
 
 	if (ExecutionMode.skipAuthorization()) {
-	    GSLoggerFactory.getLogger(GIPStarter.class).info("Auhtorization skipped by administrator");
+	    GSLoggerFactory.getLogger(DABStarter.class).info("Auhtorization skipped by administrator");
 	} else {
-	    GSLoggerFactory.getLogger(GIPStarter.class).info("Auhtorization activated by administrator");
+	    GSLoggerFactory.getLogger(DABStarter.class).info("Auhtorization activated by administrator");
 	}
 
     }
@@ -218,7 +219,7 @@ public class GIPStarter {
 
 	try {
 
-	    GSLoggerFactory.getLogger(GIPStarter.class).info("Initializing configuration STARTED");
+	    GSLoggerFactory.getLogger(DABStarter.class).info("Initializing configuration STARTED");
 
 	    //
 	    // 1) Retrieves the configuration.url parameter
@@ -231,13 +232,13 @@ public class GIPStarter {
 
 	    if (configURL == null || configURL.isEmpty()) {
 
-		GSLoggerFactory.getLogger(GIPStarter.class).warn("Configuration URL not found, using fallback URL: local FS temp");
+		GSLoggerFactory.getLogger(DABStarter.class).warn("Configuration URL not found, using fallback URL: local FS temp");
 		configURL = "file:temp";
 	    }
 
 	    String[] split = configURL.split("!");
 
-	    GSLoggerFactory.getLogger(GIPStarter.class).info("Configuration URL: {}", configURL);
+	    GSLoggerFactory.getLogger(DABStarter.class).info("Configuration URL: {}", configURL);
 
 	    //
 	    // 2) Creates the source
@@ -251,9 +252,24 @@ public class GIPStarter {
 
 	    if (DatabaseSourceUrl.check(configURL)) {
 
+		//
+		// -Dconfiguration.url=xdbc://user:password@hostname:8000,8004/dbName/folder/
+		// -Dconfiguration.url=osm://awsaccesskey:awssecretkey@productionhost/prod/prodConfig
+		//
+
 		String startupUri = split[0];
 
 		source = DatabaseSource.of(startupUri);
+
+	    } else if (S3Source.check(configURL)) {
+
+		//
+		// -Dconfiguration.url=s3://awsaccesskey:awssecretkey@bucket/config.json
+		//
+
+		String startupUri = split[0];
+
+		source = S3Source.of(startupUri);
 
 	    } else {
 
@@ -266,7 +282,7 @@ public class GIPStarter {
 		    // -Dconfiguration.url=file:temp demo
 		    //
 
-		    GSLoggerFactory.getLogger(GIPStarter.class).info("Local FS configuration on the temp user directory");
+		    GSLoggerFactory.getLogger(DABStarter.class).info("Local FS configuration on the temp user directory");
 
 		    source = new FileSource(configFileName);
 
@@ -276,7 +292,7 @@ public class GIPStarter {
 		    // -Dconfiguration.url=file://path/preprodenvconf/
 		    // -Dconfiguration.url=file://path/preprodenvconf!demo
 		    //
-		    GSLoggerFactory.getLogger(GIPStarter.class).info("Local FS configuration on given path");
+		    GSLoggerFactory.getLogger(DABStarter.class).info("Local FS configuration on given path");
 
 		    String path = split[0].replace("file://", "");
 		    path = path + File.separator + configFileName + ".json";
@@ -309,7 +325,7 @@ public class GIPStarter {
 
 		case "default":
 
-		    GSLoggerFactory.getLogger(GIPStarter.class).info("Creating and flushing new default configuration");
+		    GSLoggerFactory.getLogger(DABStarter.class).info("Creating and flushing new default configuration");
 
 		    configuration = new DefaultConfiguration(source, ConfigurationWrapper.CONFIG_RELOAD_TIME_UNIT,
 			    ConfigurationWrapper.CONFIG_RELOAD_TIME);
@@ -318,7 +334,7 @@ public class GIPStarter {
 
 		case "demo":
 
-		    GSLoggerFactory.getLogger(GIPStarter.class).info("Creating and flushing new demo configuration");
+		    GSLoggerFactory.getLogger(DABStarter.class).info("Creating and flushing new demo configuration");
 
 		    configuration = new DemoConfiguration(source, ConfigurationWrapper.CONFIG_RELOAD_TIME_UNIT,
 			    ConfigurationWrapper.CONFIG_RELOAD_TIME);
@@ -334,7 +350,7 @@ public class GIPStarter {
 
 	    } else {
 
-		GSLoggerFactory.getLogger(GIPStarter.class).info("Creating configuration from existing source");
+		GSLoggerFactory.getLogger(DABStarter.class).info("Creating configuration from existing source");
 		configuration = new Configuration(source, ConfigurationWrapper.CONFIG_RELOAD_TIME_UNIT,
 			ConfigurationWrapper.CONFIG_RELOAD_TIME);
 	    }
@@ -355,7 +371,7 @@ public class GIPStarter {
 	    //
 	    if (mode == ExecutionMode.LOCAL_PRODUCTION) {
 
-		GSLoggerFactory.getLogger(GIPStarter.class).info("Creating local config with VOLATILE job store STARTED");
+		GSLoggerFactory.getLogger(DABStarter.class).info("Creating local config with VOLATILE job store STARTED");
 
 		// pause the autoreload to the current config instance, probably not required...
 		configuration.pauseAutoreload();
@@ -374,7 +390,7 @@ public class GIPStarter {
 
 		boolean replaced = configuration.replace(systemSetting);
 
-		if (!replaced) {
+		if (!replaced && !configuration.contains(systemSetting)) {
 
 		    throw GSException.createException(//
 			    ServletListener.class, //
@@ -398,7 +414,7 @@ public class GIPStarter {
 
 		replaced = configuration.replace(rateLimiterSetting);
 
-		if (!replaced) {
+		if (!replaced && !configuration.contains(rateLimiterSetting)) {
 
 		    throw GSException.createException(//
 			    ServletListener.class, //
@@ -426,7 +442,7 @@ public class GIPStarter {
 
 		    replaced = configuration.replace(schedulerSetting);
 
-		    if (!replaced) {
+		    if (!replaced && !configuration.contains(schedulerSetting)) {
 
 			throw GSException.createException(//
 				ServletListener.class, //
@@ -441,14 +457,14 @@ public class GIPStarter {
 
 		configuration = FileSource.switchSource(configuration);
 
-		GSLoggerFactory.getLogger(GIPStarter.class).info("Creating local config with VOLATILE job store ENDED");
+		GSLoggerFactory.getLogger(DABStarter.class).info("Creating local config with VOLATILE job store ENDED");
 	    }
 
-	    GIPStarter.configuration = configuration;
+	    DABStarter.configuration = configuration;
 
 	    ConfigurationWrapper.setConfiguration(configuration);
 
-	    GSLoggerFactory.getLogger(GIPStarter.class).info("Initializing configuration ENDED");
+	    GSLoggerFactory.getLogger(DABStarter.class).info("Initializing configuration ENDED");
 
 	} catch (GSException gsex) {
 
@@ -473,7 +489,7 @@ public class GIPStarter {
      */
     private CheckResponse checkConfig() throws GSException {
 
-	GSLoggerFactory.getLogger(GIPStarter.class).info("Configuration check STARTED");
+	GSLoggerFactory.getLogger(DABStarter.class).info("Configuration check STARTED");
 
 	// ---------------------------------
 	//
@@ -573,12 +589,12 @@ public class GIPStarter {
 	    //
 	    if (similarityCheckResponse.getCheckResult() == CheckResult.CHECK_SUCCESSFUL) {
 
-		GSLoggerFactory.getLogger(GIPStarter.class)
+		GSLoggerFactory.getLogger(DABStarter.class)
 			.warn("ConfigEditableSetting check failed while SimilarityCheck do not failed !!!");
 	    }
 	}
 
-	GSLoggerFactory.getLogger(GIPStarter.class).info("Configuration check ENDED");
+	GSLoggerFactory.getLogger(DABStarter.class).info("Configuration check ENDED");
 
 	//
 	// note that this method returns only the response of the {@link SimilarityCheckMethod} so the
@@ -676,17 +692,17 @@ public class GIPStarter {
 	//
 	try {
 
-	    GSLoggerFactory.getLogger(GIPStarter.class).debug("JAXB initialization STARTED");
+	    GSLoggerFactory.getLogger(DABStarter.class).debug("JAXB initialization STARTED");
 
 	    CommonContext.createMarshaller(true);
 	    CommonContext.createUnmarshaller();
 	    new Dataset();
 
-	    GSLoggerFactory.getLogger(GIPStarter.class).debug("JAXB initialization ENDED");
+	    GSLoggerFactory.getLogger(DABStarter.class).debug("JAXB initialization ENDED");
 
 	} catch (JAXBException e) {
 
-	    GSLoggerFactory.getLogger(GIPStarter.class).error("Fatal error on startup, JAXB could not be initialized", e);
+	    GSLoggerFactory.getLogger(DABStarter.class).error("Fatal error on startup, JAXB could not be initialized", e);
 
 	    throw GSException.createException(//
 		    this.getClass(), //
@@ -712,17 +728,17 @@ public class GIPStarter {
 
 	if (skipHealthCheck != null && skipHealthCheck.equals("true")) {
 
-	    GSLoggerFactory.getLogger(GIPStarter.class).info("Skipping health check according to system variable 'skip.healthcheck'");
+	    GSLoggerFactory.getLogger(DABStarter.class).info("Skipping health check according to system variable 'skip.healthcheck'");
 	    return;
 	}
 
-	GSLoggerFactory.getLogger(GIPStarter.class).info("Health check at startup");
+	GSLoggerFactory.getLogger(DABStarter.class).info("Health check at startup");
 
 	HealthCheck checker = new HealthCheck();
 
 	boolean healthy = checker.isHealthy(true);
 
-	GSLoggerFactory.getLogger(GIPStarter.class).info("Health check at startup result {}", healthy);
+	GSLoggerFactory.getLogger(DABStarter.class).info("Health check at startup result {}", healthy);
 
 	if (healthy) {
 
@@ -788,7 +804,7 @@ public class GIPStarter {
 		    .valueOf(keyValueOptions.get().getProperty("schedulerStartDelay", String.valueOf(DEFAULT_SCHEDULER_START_DELAY)));
 	}
 
-	GSLoggerFactory.getLogger(GIPStarter.class).info("Scheduler will start in {} minutes", schedulerStartDelay);
+	GSLoggerFactory.getLogger(DABStarter.class).info("Scheduler will start in {} minutes", schedulerStartDelay);
 
 	new Timer().schedule(new TimerTask() {
 
@@ -797,23 +813,23 @@ public class GIPStarter {
 
 		try {
 
-		    GSLoggerFactory.getLogger(GIPStarter.class).info("Delayed scheduler start STARTED");
+		    GSLoggerFactory.getLogger(DABStarter.class).info("Delayed scheduler start STARTED");
 
 		    SchedulerViewSetting schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
 
-		    GSLoggerFactory.getLogger(GIPStarter.class).info("JobStore type: {}", schedulerSetting.getJobStoreType());
+		    GSLoggerFactory.getLogger(DABStarter.class).info("JobStore type: {}", schedulerSetting.getJobStoreType());
 
 		    Scheduler scheduler = SchedulerFactory.getScheduler(schedulerSetting, false);
 
 		    scheduler.start();
 
-		    GSLoggerFactory.getLogger(GIPStarter.class).info("Delayed scheduler start ENDED");
+		    GSLoggerFactory.getLogger(DABStarter.class).info("Delayed scheduler start ENDED");
 
 		} catch (Exception e) {
 
 		    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 
-		    GIPStarter.schedulerStartError = true;
+		    DABStarter.schedulerStartError = true;
 		}
 	    }
 
@@ -825,11 +841,11 @@ public class GIPStarter {
      */
     private void startScheduler() throws GSException {
 
-	GSLoggerFactory.getLogger(GIPStarter.class).info("Starting scheduler STARTED");
+	GSLoggerFactory.getLogger(DABStarter.class).info("Starting scheduler STARTED");
 
 	SchedulerViewSetting schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
 
-	GSLoggerFactory.getLogger(GIPStarter.class).info("JobStore type: {}", schedulerSetting.getJobStoreType());
+	GSLoggerFactory.getLogger(DABStarter.class).info("JobStore type: {}", schedulerSetting.getJobStoreType());
 
 	Scheduler scheduler = SchedulerFactory.getScheduler(schedulerSetting, false);
 
@@ -860,6 +876,6 @@ public class GIPStarter {
 		    e);
 	}
 
-	GSLoggerFactory.getLogger(GIPStarter.class).info("Starting scheduler ENDED");
+	GSLoggerFactory.getLogger(DABStarter.class).info("Starting scheduler ENDED");
     }
 }

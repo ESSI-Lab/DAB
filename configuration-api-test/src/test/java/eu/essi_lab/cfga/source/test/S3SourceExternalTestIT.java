@@ -1,5 +1,7 @@
 package eu.essi_lab.cfga.source.test;
 
+import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -27,7 +29,7 @@ public class S3SourceExternalTestIT {
     /**
      * 
      */
-    private static final String TEST_CONFIG_NAME = "testconfig";
+    private static final String TEST_CONFIG_NAME = "testconfig.json";
 
     @Before
     public void deleteConfig() {
@@ -35,8 +37,27 @@ public class S3SourceExternalTestIT {
 	S3TransferWrapper manager = createWrapper();
 
 	List<S3Object> objectsSummaries = manager.listObjectsSummaries(TEST_BUCKET_NAME);
-	
+
 	objectsSummaries.stream().map(s -> s.key()).forEach(key -> manager.deleteObject(TEST_BUCKET_NAME, key));
+    }
+
+    @Test
+    public void startupUrlTest() throws URISyntaxException {
+
+	S3Source source = S3Source
+		.of("s3://" + System.getProperty("accessKey") + ":" + System.getProperty("secretKey") + "@bucket/config.json");
+
+	String location = source.getLocation();
+
+	Assert.assertEquals("bucket/config.json", location);
+
+	S3TransferWrapper wrapper = source.getWrapper();
+
+	String accessKey = wrapper.getAccessKey();
+	String secretKey = wrapper.getSecretKey();
+
+	Assert.assertEquals(System.getProperty("accessKey"), accessKey);
+	Assert.assertEquals(System.getProperty("secretKey"), secretKey);
     }
 
     @Test
@@ -150,7 +171,7 @@ public class S3SourceExternalTestIT {
 	S3Source.uploadConfig(configuration.toJSONArray(), manager, TEST_BUCKET_NAME, TEST_CONFIG_NAME);
 
 	//
-	// in the default config the first ordered setting is a "ARPA HydroCSV" 
+	// in the default config the first ordered setting is a "ARPA HydroCSV"
 	// a ProfilerSetting which is editable
 	//
 
@@ -200,6 +221,32 @@ public class S3SourceExternalTestIT {
 	boolean editable2 = setting2.isEditable();
 
 	Assert.assertFalse(editable2);
+    }
+
+    @Test
+    public void backupTest() throws Exception {
+
+	S3TransferWrapper manager = createWrapper();
+
+	S3Source source = new S3Source(manager, TEST_BUCKET_NAME, TEST_CONFIG_NAME);
+
+	Setting setting1 = new Setting();
+	Setting setting2 = new Setting();
+	Setting setting3 = new Setting();
+
+	source.flush(Arrays.asList(setting1, setting2, setting3));
+
+	S3Source backup = source.backup();
+
+	Assert.assertFalse(backup.isEmptyOrMissing());
+
+	List<Setting> list = backup.list();
+
+	Assert.assertEquals(3, list.size());
+
+	// Assert.assertEquals(source.getSource().getParent(), backup.getSource().getParent());
+
+	Assert.assertTrue(backup.getLocation().endsWith(".backup"));
     }
 
     /**

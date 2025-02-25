@@ -54,11 +54,13 @@ import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
+import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.SpatialExtent;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.model.resource.data.CRS;
@@ -66,6 +68,7 @@ import eu.essi_lab.model.resource.data.CRSUtils;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.profiler.wms.cluster.WMSRequest.Parameter;
+import eu.essi_lab.request.executor.IDiscoveryExecutor;
 import eu.essi_lab.request.executor.IDiscoveryStringExecutor;
 
 /**
@@ -237,32 +240,29 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 			double west = fminx;
 			double east = fmaxx;
 			SpatialExtent extent = new SpatialExtent(south, west, north, east);
+			String viewId = webRequest.extractViewId().get();
+			Optional<View> view = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
+			WebRequestTransformer.setView(view.get().getId(), ConfigurationWrapper.getStorageInfo(), discoveryMessage);
 			discoveryMessage.setUserBond(BondFactory.createSpatialExtentBond(BondOperator.INTERSECTS, extent));
 
-			discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
-			discoveryMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
-			String viewId = webRequest.extractViewId().get();
-			Optional<View> view = WebRequestTransformer.findView(ConfigurationWrapper.getDatabaseURI(), viewId);
-			WebRequestTransformer.setView(view.get().getId(), ConfigurationWrapper.getDatabaseURI(), discoveryMessage);
+			discoveryMessage.setSources(ConfigurationWrapper.getViewSources(view.get()));
+			discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
+			
 
 			Page userPage = discoveryMessage.getPage();
 			userPage.setStart(1);
 			userPage.setSize(maxRecords);
 			discoveryMessage.setPage(userPage);
 
-			ServiceLoader<IDiscoveryStringExecutor> loader = ServiceLoader.load(IDiscoveryStringExecutor.class);
-			IDiscoveryStringExecutor discoveryExecutor = loader.iterator().next();
+			ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
+			IDiscoveryExecutor discoveryExecutor = loader.iterator().next();
 
-			ResultSet<String> resultSet = discoveryExecutor.retrieveStrings(discoveryMessage);
-			List<String> results = resultSet.getResultsList();
-			for (String result : results) {
-			    String id = result.substring(result.indexOf("<gs:uniquePlatformId>"), result.indexOf("</gs:uniquePlatformId>"));
-			    id = id.replace("<gs:uniquePlatformId>", "");
-			    String platformTitle = result.substring(result.indexOf("<gs:platformTitle>"),
-				    result.indexOf("</gs:platformTitle>"));
-			    platformTitle = platformTitle.replace("<gs:platformTitle>", "");
-			    String sourceId = result.substring(result.indexOf("<gs:sourceId>"), result.indexOf("</gs:sourceId>"));			    
-			    sourceId = sourceId.replace("<gs:sourceId>", "");
+			ResultSet<GSResource> resultSet = discoveryExecutor.retrieve(discoveryMessage);
+			List<GSResource> results = resultSet.getResultsList();
+			for (GSResource result : results) {
+				String id = result.getExtensionHandler().getUniquePlatformIdentifier().get();
+				String platformTitle = result.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getMIPlatform().getCitation().getTitle();
+			    String sourceId = result.getSource().getUniqueIdentifier();			    
 			    GSSource source = ConfigurationWrapper.getSource(sourceId);
 			    String sourceLabel = "unknown";
 			    if (source!=null) {

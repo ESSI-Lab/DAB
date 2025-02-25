@@ -34,7 +34,7 @@ import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.validation.ValidationContext;
 import eu.essi_lab.cfga.setting.validation.ValidationResponse;
 import eu.essi_lab.cfga.setting.validation.ValidationResponse.ValidationResult;
-import eu.essi_lab.gssrv.starter.GIPStarter;
+import eu.essi_lab.gssrv.starter.DABStarter;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
@@ -93,7 +93,7 @@ class AdminConfigurationDialog extends SettingEditDialog {
 
 	    try {
 
-		GIPStarter.configuration.flush();
+		DABStarter.configuration.flush();
 
 		LoginDialog dialog = new LoginDialog(requestURL);
 

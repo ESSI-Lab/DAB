@@ -279,7 +279,7 @@ public class SourceCollectionCreator {
 	StatisticsMessage statisticsMessage = new StatisticsMessage();
 	// set the required properties
 	statisticsMessage.setSources(allSources);
-	statisticsMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	statisticsMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 	// statisticsMessage.setSharedRepositoryInfo(ConfigurationUtils.getSharedRepositoryInfo());
 
 	ServiceLoader<IStatisticsExecutor> loader = ServiceLoader.load(IStatisticsExecutor.class);
@@ -366,7 +366,7 @@ public class SourceCollectionCreator {
 	discoveryMessage.setPage(new Page(1, 1000));
 	discoveryMessage.setIteratedWorkflow(IterationMode.FULL_RESPONSE);
 	discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
-	StorageInfo uri = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo uri = ConfigurationWrapper.getStorageInfo();
 	discoveryMessage.setDataBaseURI(uri);
 
 	discoveryMessage.setUserBond(BondFactory.createSourceIdentifierBond(sourceId));

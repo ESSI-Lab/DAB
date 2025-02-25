@@ -156,7 +156,7 @@ public class StatusCheckerFeedHandler extends DefaultRequestHandler {
 	message.computeFrequency(Arrays.asList(MetadataElement.ONLINE_LINKAGE), 100);
 	message.groupBy(ResourceProperty.SOURCE_ID);
 
-	StorageInfo uri = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo uri = ConfigurationWrapper.getStorageInfo();
 
 	message.setPermittedBond(inclusionFilter());
 
@@ -249,7 +249,7 @@ public class StatusCheckerFeedHandler extends DefaultRequestHandler {
 
 	message.setResourceSelector(selector);
 
-	StorageInfo uri = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo uri = ConfigurationWrapper.getStorageInfo();
 
 	DatabaseFinder finder = DatabaseProviderFactory.getFinder(uri);
 
@@ -392,7 +392,7 @@ public class StatusCheckerFeedHandler extends DefaultRequestHandler {
      */
     private LogicalBond inclusionFilter() throws GSException {
 
-	StorageInfo uri = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo uri = ConfigurationWrapper.getStorageInfo();
 
 	View view = WebRequestTransformer.findView(uri, "geoss").get();
 

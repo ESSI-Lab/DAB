@@ -59,6 +59,7 @@ import eu.essi_lab.pdk.rsm.access.AccessQueryUtils;
 import eu.essi_lab.request.executor.AbstractAuthorizedExecutor;
 import eu.essi_lab.request.executor.IAccessExecutor;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
+import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
 import eu.essi_lab.workflow.builder.Workflow;
 import eu.essi_lab.workflow.builder.WorkflowBuilder;
 
@@ -154,6 +155,20 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 		    ACCESS_EXECUTOR_TOO_MANY_RESOURCES);
 	}
 
+	Optional<ElasticsearchInfoPublisher> publisher = ElasticsearchInfoPublisher.create(accessMessage.getWebRequest());
+
+	if (publisher.isPresent()) {
+
+	    try {
+
+		publisher.get().publish(resultSet);
+
+	    } catch (Exception e) {
+		GSLoggerFactory.getLogger(getClass()).error("Error initializing ElasticSearch: {}", e.getMessage());
+	    }
+	}
+    
+	
 	GSResource resource = resultSet.getResultsList().get(0);
 	DataDescriptor targetDescriptor = accessMessage.getTargetDataDescriptor();
 

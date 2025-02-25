@@ -53,7 +53,7 @@ public class MarklogicFolderCleanerTask extends AbstractCustomTask {
 
 	log(status, "Big folders cleaner task STARTED");
 
-	StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo databaseURI = ConfigurationWrapper.getStorageInfo();
 
 	DatabaseReader dbReader = DatabaseProviderFactory.getReader(databaseURI);
 	MarkLogicWrapper wrapper = ((MarkLogicDatabase) dbReader.getDatabase()).getWrapper();

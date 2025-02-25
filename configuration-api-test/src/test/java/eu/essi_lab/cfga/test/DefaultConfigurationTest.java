@@ -276,7 +276,7 @@ public class DefaultConfigurationTest {
 
 	Assert.assertTrue(databaseSetting.isVolatile());
 
-	StorageInfo databaseURI = databaseSetting.asStorageUri();
+	StorageInfo databaseURI = databaseSetting.asStorageInfo();
 
 	Assert.assertNotNull(databaseURI.getUri());
 	Assert.assertNotNull(databaseURI.getName());

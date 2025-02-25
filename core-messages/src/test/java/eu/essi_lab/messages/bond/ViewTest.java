@@ -31,7 +31,7 @@ public class ViewTest {
 
 	request = WebRequest.createGET("http://localhost:9090/gs-service/services/semantic/token/pippo/view/view1/anotherpath");
 	Assert.assertEquals("pippo", request.extractTokenId().get());
-	
+
 	request = WebRequest.createGET("http://localhost:9090/gs-service/services/semantic/token/pluto/");
 	Assert.assertEquals("pluto", request.extractTokenId().get());
 
@@ -109,6 +109,28 @@ public class ViewTest {
     }
 
     @Test
+    public void test() throws JAXBException {
+
+	View view = new View();
+	view.setSourceDeployment("geoss");
+
+	Assert.assertEquals("geoss", view.getSourceDeployment());
+
+	ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+	Marshaller m = ViewFactory.createMarshaller();
+
+	m.marshal(view, System.out);
+	m.marshal(view, baos);
+
+	ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+	Unmarshaller u = ViewFactory.createUnmarshaller();
+
+	View view2 = (View) u.unmarshal(bais);
+	Assert.assertEquals(view.getSourceDeployment(), view2.getSourceDeployment());
+    }
+
+    @Test
     public void testJAXB() throws Exception {
 
 	// view bond
@@ -163,11 +185,11 @@ public class ViewTest {
 	ViewFactory factory = new ViewFactory();
 	View view = factory.createView("id1", "label 1", bond);
 	ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	Marshaller m = factory.createMarshaller();
+	Marshaller m = ViewFactory.createMarshaller();
 	m.marshal(view, System.out);
 	m.marshal(view, baos);
 	ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-	Unmarshaller u = factory.createUnmarshaller();
+	Unmarshaller u = ViewFactory.createUnmarshaller();
 	Object result = u.unmarshal(bais);
 	assertEquals(view, result);
 	System.out.println("Done!");

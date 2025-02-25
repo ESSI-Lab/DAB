@@ -91,7 +91,7 @@ public class AugmenterWorkerExternalTestIT {
 	while (!test1Ended) {
 	}
 
-	StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo databaseURI = ConfigurationWrapper.getStorageInfo();
 	DatabaseFinder finder = DatabaseProviderFactory.getFinder(databaseURI);
 
 	DiscoveryMessage message = new DiscoveryMessage();
@@ -131,7 +131,7 @@ public class AugmenterWorkerExternalTestIT {
     private void harvestOAIPMH() throws Exception {
 
 	// clears the volatile db
-	StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo databaseURI = ConfigurationWrapper.getStorageInfo();
 	Database dataBase = DatabaseFactory.get(databaseURI);
 	VolatileDatabase database = (VolatileDatabase) dataBase;
 	database.clear();

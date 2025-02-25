@@ -50,7 +50,7 @@ public class PrivateIdEncoderTask extends AbstractCustomTask {
 
 	log(status, "Private identifier encoder task STARTED");
 
-	StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo databaseURI = ConfigurationWrapper.getStorageInfo();
 
 	DatabaseReader dbReader = DatabaseProviderFactory.getReader(databaseURI);
 	MarkLogicWrapper wrapper = ((MarkLogicDatabase) dbReader.getDatabase()).getWrapper();

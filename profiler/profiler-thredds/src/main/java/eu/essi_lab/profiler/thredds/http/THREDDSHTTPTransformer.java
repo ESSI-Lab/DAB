@@ -105,7 +105,7 @@ public class THREDDSHTTPTransformer extends AccessRequestTransformer {
 	discoveryMessage.setPage(new Page(1, 1));
 
 	discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
-	discoveryMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 
 	SimpleValueBond bond = BondFactory.createSimpleValueBond(//
 		BondOperator.EQUAL, //

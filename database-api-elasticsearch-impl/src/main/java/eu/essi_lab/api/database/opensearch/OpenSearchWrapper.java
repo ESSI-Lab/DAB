@@ -180,7 +180,7 @@ public class OpenSearchWrapper {
 
 		    builder.aggregations(trg.getName(), agg -> agg.terms(t -> t.field(
 
-			    DataFolderMapping.toKeywordField(trg.getName())))).size(maxItems);
+			    DataFolderMapping.toKeywordField(trg.getName())).size(maxItems)));
 		});
 
 		builder.query(searchQuery).//
@@ -245,6 +245,7 @@ public class OpenSearchWrapper {
 
 	SearchRequest searchRequest = new SearchRequest.Builder().//
 		index(DataFolderMapping.get().getIndex()).//
+		query(searchQuery).//
 		size(0).//
 		aggregations(map).//
 		build();

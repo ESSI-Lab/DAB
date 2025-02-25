@@ -249,7 +249,7 @@ public class GetValuesTransformer extends AccessRequestTransformer {
 	message.getResourceSelector().setSubset(ResourceSubset.FULL);
 	message.getResourceSelector().setIncludeOriginal(false);
 	message.setSources(ConfigurationWrapper.getHarvestedSources());
-	message.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+	message.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 
 	GSLoggerFactory.getLogger(getClass()).info("Resource discovery STARTED");
 
@@ -325,7 +325,7 @@ public class GetValuesTransformer extends AccessRequestTransformer {
     private DataDescriptor getDefaultDescriptor(String requestId, String onlineIdentifier) throws GSException {
 
 	List<GSSource> sources = ConfigurationWrapper.getHarvestedSources();
-	StorageInfo databaseURI = ConfigurationWrapper.getDatabaseURI();
+	StorageInfo databaseURI = ConfigurationWrapper.getStorageInfo();
 	ResultSet<GSResource> resultSet = AccessQueryUtils.findResource(requestId, sources, onlineIdentifier, databaseURI);
 
 	if (resultSet.getResultsList().isEmpty()) {

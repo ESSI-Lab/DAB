@@ -368,19 +368,19 @@ public class ResourcePropertyHandler {
     /**
      * Get the {@link ResourceProperty#SOURCE_DEPLOYMENT} property
      */
-    public Optional<String> getSourceDeployment() {
+    public List<String> getSourceDeployment() {
 
-	return resource.getPropertyValue(ResourceProperty.SOURCE_DEPLOYMENT);
+	return resource.getPropertyValues(ResourceProperty.SOURCE_DEPLOYMENT);
     }
 
     /**
-     * Set the {@link ResourceProperty#SOURCE_DEPLOYMENT} property
+     * Add the {@link ResourceProperty#SOURCE_DEPLOYMENT} property
      * 
      * @param deployment
      */
-    public void setSourceDeployment(String deployment) {
+    public void addSourceDeployment(String deployment) {
 
-	resource.setProperty(ResourceProperty.SOURCE_DEPLOYMENT, String.valueOf(deployment));
+	resource.addProperty(ResourceProperty.SOURCE_DEPLOYMENT, deployment);
     }
 
     // ----------------------------------------

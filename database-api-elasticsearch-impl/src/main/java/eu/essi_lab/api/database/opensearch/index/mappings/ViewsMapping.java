@@ -47,6 +47,7 @@ public class ViewsMapping extends IndexMapping {
     public static final String VIEW_OWNER = "viewOwner";
     public static final String VIEW_CREATOR = "viewCreator";
     public static final String VIEW_VISIBILITY = "viewVisibility";
+    public static final String SOURCE_DEPLOYMENT = "sourceDeployment";
 
     private static ViewsMapping instance;
 
@@ -63,6 +64,7 @@ public class ViewsMapping extends IndexMapping {
 	addProperty(VIEW_OWNER, FieldType.Text.jsonValue());
 	addProperty(VIEW_CREATOR, FieldType.Text.jsonValue());
 	addProperty(VIEW_VISIBILITY, FieldType.Text.jsonValue());
+	addProperty(SOURCE_DEPLOYMENT, FieldType.Text.jsonValue());
     }
 
     /**

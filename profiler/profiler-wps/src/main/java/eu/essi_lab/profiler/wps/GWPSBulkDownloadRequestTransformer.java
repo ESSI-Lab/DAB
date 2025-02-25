@@ -131,7 +131,7 @@ public class GWPSBulkDownloadRequestTransformer extends WebRequestTransformer<Bu
 			    message.getResourceSelector().setSubset(ResourceSubset.FULL);
 
 			    message.setSources(ConfigurationWrapper.getHarvestedSources());
-			    message.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+			    message.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 
 			    GSLoggerFactory.getLogger(getClass()).info("Resource discovery STARTED");
 

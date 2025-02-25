@@ -52,7 +52,7 @@ public class OAIPMHListSetsHandler extends OAIPMHServiceInfoHandler {
 
 	if (viewId.isPresent()) {
 
-	    view = DiscoveryRequestTransformer.findView(ConfigurationWrapper.getDatabaseURI(), viewId.get());
+	    view = DiscoveryRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId.get());
 	}
 
 	List<GSSource> list = view.isPresent() ? //

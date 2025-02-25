@@ -6,6 +6,7 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -110,7 +111,7 @@ public class CSWRequestTransformerTest {
 
 		message.setUserBond(getUserBond(request));
 
-		List<GSSource> sources = getSources(message.getUserBond().get());
+		List<GSSource> sources = getSources(message.getUserBond().get(), Optional.empty());
 		message.setSources(sources);
 
 		return message;

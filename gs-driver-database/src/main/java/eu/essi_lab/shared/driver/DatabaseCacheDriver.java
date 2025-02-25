@@ -257,7 +257,7 @@ public class DatabaseCacheDriver implements ISharedRepositoryDriver<SharedCacheD
 
     private Database getDatabase() throws GSException {
 
-	StorageInfo uri = setting.getDatabaseCacheSetting().get().asStorageUri();
+	StorageInfo uri = setting.getDatabaseCacheSetting().get().asStorageInfo();
 
 	Database database = DatabaseFactory.get(uri);
 

@@ -323,6 +323,8 @@ public class DefaultMarkLogicSearchBuilder implements MarkLogicSearchBuilder {
 	case TEST_TIME_STAMP:
 	case TYPE:
 	case RECOVERY_REMOVAL_TOKEN:
+	case LAST_DOWNLOAD_DATE:
+	case LAST_FAILED_DOWNLOAD_DATE:
 
 	    return buildCTSElementRangeQuery(name, bond.getOperator().asMathOperator(), value, true);
 

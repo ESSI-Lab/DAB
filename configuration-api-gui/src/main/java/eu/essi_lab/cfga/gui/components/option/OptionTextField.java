@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import com.vaadin.flow.component.textfield.TextField;
 
@@ -63,9 +64,9 @@ public class OptionTextField extends TextField implements OnKeyUpValidationListe
 
 	    // GSLoggerFactory.getLogger(getClass()).debug("Primitive option value: " + option.getValue());
 
-	    List<String> values = StringValuesReader.readValues(option);
+	    String values = StringValuesReader.readValues(option).stream().collect(Collectors.joining(","));
 
-	    setValue(values.get(0));
+	    setValue(values);
 
 	} else {
 

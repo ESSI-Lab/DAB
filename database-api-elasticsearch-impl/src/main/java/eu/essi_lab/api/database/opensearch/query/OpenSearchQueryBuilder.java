@@ -529,7 +529,7 @@ public class OpenSearchQueryBuilder {
      * <b>Constraints</b>: databaseId = getDatabase().getIdentifier() AND folderName = getName()
      */
     public static Query buildFolderEntriesQuery(OpenSearchFolder folder) {
-	
+
 	return buildFilterQuery(buildDatabaseIdQuery(folder.getDatabase().getIdentifier()), buildFolderNameQuery(folder));
     }
 
@@ -545,8 +545,8 @@ public class OpenSearchQueryBuilder {
 
 	return buildFilterQuery(//
 		buildDatabaseIdQuery(databaseId), //
-		buildExistsFieldQuery(MetaFolderMapping.DATA_FOLDER), //
 		buildIndexQuery(MetaFolderMapping.get().getIndex()), //
+		buildExistsFieldQuery(MetaFolderMapping.DATA_FOLDER), //
 		buildShouldQuery(idsQueries)//
 	);
     }
@@ -640,6 +640,24 @@ public class OpenSearchQueryBuilder {
 	});
 
 	return buildBoolQuery(Arrays.asList(buildDatabaseIdQuery(databaseId)), shouldList, Arrays.asList());
+    }
+
+    /**
+     * @param databaseId
+     * @param fields
+     * @param fieldsValue
+     * @return
+     */
+    public static Query buildSearchQuery(String databaseId, List<String> fields, List<String> fieldsValue) {
+
+	List<Query> list = new ArrayList<>();
+
+	for (int i = 0; i < fields.size(); i++) {
+
+	    list.add(buildMatchPhraseQuery(fields.get(i), fieldsValue.get(i)));
+	}
+
+	return buildBoolQuery(Arrays.asList(buildDatabaseIdQuery(databaseId)), list, Arrays.asList());
     }
 
     /**

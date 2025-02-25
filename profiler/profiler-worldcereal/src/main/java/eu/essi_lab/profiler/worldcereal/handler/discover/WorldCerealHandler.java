@@ -164,7 +164,7 @@ public class WorldCerealHandler extends DiscoveryHandler<String> {
 		discMessage.getResourceSelector().setSubset(ResourceSubset.FULL);
 
 		discMessage.setSources(ConfigurationWrapper.getMixedSources());
-		discMessage.setDataBaseURI(ConfigurationWrapper.getDatabaseURI());
+		discMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 
 		GSLoggerFactory.getLogger(getClass()).info("Resource discovery STARTED");
 
