@@ -64,244 +64,241 @@ import org.quartz.JobExecutionContext;
  */
 public class ParentIdentifierDecoratorTask extends AbstractCustomTask {
 
-	@Override
-	public String getName() {
-		return "Parent Identifier Decorator Task";
+    @Override
+    public String getName() {
+	return "Parent Identifier Decorator Task";
+    }
+
+    @Override
+    public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
+
+	log(status, "Parent Identifier Decorator Task START");
+
+	Optional<String> taskOptions = readTaskOptions(context, status);
+
+	if (!taskOptions.isPresent()) {
+
+	    log(status, "Custom task options missing, unable to perform task");
+
+	    return;
 	}
 
-	@Override
-	public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
+	List<String> targetSourceIds = Arrays.asList(taskOptions.get().split(","));
 
-		log(status, "Parent Identifier Decorator Task START");
+	List<GSSource> collectedSources = readConfiguredSources().stream()
+		.filter(source -> targetSourceIds.contains(source.getUniqueIdentifier())).collect(Collectors.toList());
 
-		Optional<String> taskOptions = readTaskOptions(context, status);
-
-		if (!taskOptions.isPresent()) {
-
-			log(status, "Custom task options missing, unable to perform task");
-
-			return;
-		}
-
-		List<String> targetSourceIds = Arrays.asList(taskOptions.get().split(","));
-
-		List<GSSource> collectedSources = readConfiguredSources().stream().filter(
-				source -> targetSourceIds.contains(source.getUniqueIdentifier())).collect(
-				Collectors.toList());
-
-		if (targetSourceIds.size() - collectedSources.size() != 0) {
-			GSLoggerFactory.getLogger(getClass()).warn("Size of configured target sources ids ({}) is different from the size of "
-					+ "collected sources ({})", targetSourceIds.size(), collectedSources.size());
-			log(status, "Warning: size of configured target sources ids is different from the size of collected sources", false);
-		}
-
-		for (GSSource source : collectedSources) {
-			try {
-				decorateParentIdentifiers(source, status);
-			} catch (GSException gsException) {
-
-				log(status, "Exception running parent identifier decorator on source " + source.getLabel());
-			}
-		}
-
+	if (targetSourceIds.size() - collectedSources.size() != 0) {
+	    GSLoggerFactory.getLogger(getClass()).warn(
+		    "Size of configured target sources ids ({}) is different from the size of " + "collected sources ({})",
+		    targetSourceIds.size(), collectedSources.size());
+	    log(status, "Warning: size of configured target sources ids is different from the size of collected sources", false);
 	}
 
-	private void decorateParentIdentifiers(GSSource source, SchedulerJobStatus status) throws GSException {
+	for (GSSource source : collectedSources) {
+	    try {
+		decorateParentIdentifiers(source, status);
+	    } catch (GSException gsException) {
+
+		log(status, "Exception running parent identifier decorator on source " + source.getLabel());
+	    }
+	}
+
+    }
+
+    private void decorateParentIdentifiers(GSSource source, SchedulerJobStatus status) throws GSException {
+
+	log(status,
+		String.format("Starting parent identifier decorator for source %s (%s)", source.getLabel(), source.getUniqueIdentifier()));
+
+	DatabaseReader reader = getDataBaseReader();
+	DatabaseWriter writer = getDataBaseWriter();
+	DatabaseFinder finder = getDataBaseFinder();
+
+	Map<String, String> alreadyCheckedParentIds = new HashMap<>();
+
+	int count = countResourcesWithParentId(finder, source);
+
+	log(status, String.format("Found %d resources with parent identifier in source %s (%s)", count, source.getLabel(),
+		source.getUniqueIdentifier()));
+
+	int start = 1;
+
+	while (start <= count) {
+
+	    log(status, String.format("Decorating resources from %d to %d in source %s (%s)", start, count, source.getLabel(),
+		    source.getUniqueIdentifier()));
+
+	    List<GSResource> resources = getResourcesWithParentId(finder, source, start, 10);
+
+	    for (GSResource resource : resources) {
+
+		decorateResource(resource, source, alreadyCheckedParentIds, status, reader, writer);
+
+	    }
+
+	    start = start + 10;
+	}
+
+	log(status, "Completed parent identifier decorator for source " + source.getLabel());
+
+    }
+
+    int countResourcesWithParentId(DatabaseFinder finder, GSSource source) throws GSException {
+
+	DiscoveryMessage message = createDiscoveryMessage(source);
+
+	return finder.count(message).getCount();
+    }
+
+    private DiscoveryMessage createDiscoveryMessage(GSSource source) {
+	DiscoveryMessage message = new DiscoveryMessage();
+	message.setRequestId(UUID.randomUUID().toString());
+
+	ResourcePropertyBond sourceIdBond = BondFactory.createResourcePropertyBond(BondOperator.EQUAL, ResourceProperty.SOURCE_ID,
+		source.getUniqueIdentifier());
+	SimpleValueBond parentIdExistsBond = BondFactory.createExistsSimpleValueBond(MetadataElement.PARENT_IDENTIFIER);
+
+	LogicalBond andBond = BondFactory.createAndBond(sourceIdBond, parentIdExistsBond);
+
+	message.setPermittedBond(andBond);
+	message.setNormalizedBond(andBond);
+	message.setUserBond(andBond);
+
+	return message;
+    }
+
+    List<GSResource> getResourcesWithParentId(DatabaseFinder finder, GSSource source, Integer start, Integer count) throws GSException {
+
+	DiscoveryMessage message = createDiscoveryMessage(source);
+
+	message.setPage(new Page(start, count));
+
+	ResultSet<GSResource> resultSet = finder.discover(message);
+	return resultSet.getResultsList();
+
+    }
+
+    List<GSSource> readConfiguredSources() {
+	return ConfigurationWrapper.getAllSources();
+    }
+
+    Optional<String> readTaskOptions(JobExecutionContext context, SchedulerJobStatus status) {
+
+	HarvestingSetting harvestingSetting = SettingUtils.downCast(SchedulerUtils.getSetting(context), HarvestingSettingImpl.class);
+
+	Optional<CustomTaskSetting> customTaskSetting = harvestingSetting.getCustomTaskSetting();
+
+	if (!customTaskSetting.isPresent()) {
+	    log(status, "Custom task setting is missing, unable to perform task");
+
+	    return Optional.empty();
+	}
+
+	return customTaskSetting.get().getTaskOptions();
+
+    }
+
+    DatabaseReader getDataBaseReader() throws GSException {
+
+	StorageInfo dataBaseURI = ConfigurationWrapper.getStorageInfo();
+	GSLoggerFactory.getLogger(getClass()).debug("Configured Database URI: {}", dataBaseURI.getUri());
+
+	return DatabaseProviderFactory.getReader(dataBaseURI);
+
+    }
+
+    DatabaseFinder getDataBaseFinder() throws GSException {
+
+	StorageInfo dataBaseURI = ConfigurationWrapper.getStorageInfo();
+	GSLoggerFactory.getLogger(getClass()).debug("Configured Database URI: {}", dataBaseURI.getUri());
+
+	return DatabaseProviderFactory.getFinder(dataBaseURI);
+
+    }
+
+    DatabaseWriter getDataBaseWriter() throws GSException {
+
+	StorageInfo dataBaseURI = ConfigurationWrapper.getStorageInfo();
+	GSLoggerFactory.getLogger(getClass()).debug("Configured Database URI: {}", dataBaseURI.getUri());
+
+	return DatabaseProviderFactory.getWriter(dataBaseURI);
+
+    }
+
+    private void decorateResource(GSResource resource, GSSource source, Map<String, String> alreadyCheckedParentIds,
+	    SchedulerJobStatus status, DatabaseReader reader, DatabaseWriter writer) throws GSException {
+
+	String parentid = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier();
+
+	log(status, String.format("Resource %s has parent id %s", resource.getPublicId(), parentid));
+
+	if (alreadyCheckedParentIds.get(parentid) != null) {
+	    String workingparentid = alreadyCheckedParentIds.get(parentid);
+
+	    log(status, String.format("Parent id %s already checked, correct parent id is %s", parentid, workingparentid));
+
+	    if (!parentid.equalsIgnoreCase(workingparentid)) {
+		resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().setParentIdentifier(workingparentid);
+
+		writeResource(resource, writer, status);
+	    }
+
+	    return;
+	}
+
+	log(status, String.format("Reading by public id %s", parentid));
+
+	List<GSResource> collections = reader.getResources(Database.IdentifierType.PUBLIC, parentid);
+	log(status, String.format("Found %d resources with public id %s", collections.size(), parentid));
+
+	if (!collections.isEmpty()) {
+
+	    alreadyCheckedParentIds.put(parentid, parentid);
+
+	} else {
+
+	    IdentifierDecorator identifierDec = new IdentifierDecorator();
+	    String totestParentid;
+
+	    if (identifierDec.isDecoratedId(parentid, source)) {
+
+		totestParentid = identifierDec.retrieveOriginalId(parentid, source);
+
+	    } else {
+		totestParentid = identifierDec.generatePersistentIdentifier(parentid, source.getUniqueIdentifier());
+	    }
+
+	    log(status, String.format("Reading by public id %s", totestParentid));
+
+	    collections = reader.getResources(Database.IdentifierType.PUBLIC, totestParentid);
+	    log(status, String.format("Found %d resources with public id %s", collections.size(), totestParentid));
+
+	    if (!collections.isEmpty()) {
+
+		resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().setParentIdentifier(totestParentid);
+		writeResource(resource, writer, status);
+		alreadyCheckedParentIds.put(parentid, totestParentid);
+	    } else {
+		GSLoggerFactory.getLogger(getClass()).warn("Can not find parent resources of {} with parent id {} from {} ({})",
+			resource.getPublicId(), resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier(),
+			source.getLabel(), source.getUniqueIdentifier());
 
 		log(status,
-				String.format("Starting parent identifier decorator for source %s (%s)", source.getLabel(), source.getUniqueIdentifier()));
+			String.format("WARNING: Can not find parent resources of %s with parent id %s from %s (%s)", resource.getPublicId(),
+				resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier(), source.getLabel(),
+				source.getUniqueIdentifier()),
+			false);
 
-		DatabaseReader reader = getDataBaseReader();
-		DatabaseWriter writer = getDataBaseWriter();
-		DatabaseFinder finder = getDataBaseFinder();
-
-		Map<String, String> alreadyCheckedParentIds = new HashMap<>();
-
-		int count = countResourcesWithParentId(finder, source);
-
-		log(status, String.format("Found %d resources with parent identifier in source %s (%s)", count, source.getLabel(),
-				source.getUniqueIdentifier()));
-
-		int start = 1;
-
-		while (start <= count) {
-
-			log(status, String.format("Decorating resources from %d to %d in source %s (%s)", start, count,
-					source.getLabel(),
-					source.getUniqueIdentifier()));
-
-			List<GSResource> resources = getResourcesWithParentId(finder, source, start, 10);
-
-			for (GSResource resource : resources) {
-
-				decorateResource(resource, source, alreadyCheckedParentIds, status, reader, writer);
-
-			}
-
-			start = start + 10;
-		}
-
-		log(status, "Completed parent identifier decorator for source " + source.getLabel());
-
+	    }
 	}
+    }
 
-	int countResourcesWithParentId(DatabaseFinder finder, GSSource source) throws GSException {
+    void writeResource(GSResource resource, DatabaseWriter databaseWriter, SchedulerJobStatus status) throws GSException {
+	log(status, String.format("Writing resource %s with new parent id %s", resource.getPublicId(),
+		resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier()));
+	databaseWriter.remove(resource);
+	databaseWriter.store(resource);
 
-		DiscoveryMessage message = createDiscoveryMessage(source);
-
-		return finder.count(message).getCount();
-	}
-
-	private DiscoveryMessage createDiscoveryMessage(GSSource source) {
-		DiscoveryMessage message = new DiscoveryMessage();
-		message.setRequestId(UUID.randomUUID().toString());
-
-		ResourcePropertyBond sourceIdBond = BondFactory.createResourcePropertyBond(BondOperator.EQUAL, ResourceProperty.SOURCE_ID,
-				source.getUniqueIdentifier());
-		SimpleValueBond parentIdExistsBond = BondFactory.createExistsSimpleValueBond(MetadataElement.PARENT_IDENTIFIER);
-
-		LogicalBond andBond = BondFactory.createAndBond(sourceIdBond, parentIdExistsBond);
-
-		message.setPermittedBond(andBond);
-		message.setNormalizedBond(andBond);
-		message.setUserBond(andBond);
-
-		return message;
-	}
-
-	List<GSResource> getResourcesWithParentId(DatabaseFinder finder, GSSource source, Integer start, Integer count) throws GSException {
-
-		DiscoveryMessage message = createDiscoveryMessage(source);
-
-		message.setPage(new Page(start, count));
-
-		ResultSet<GSResource> resultSet = finder.discover(message);
-		return resultSet.getResultsList();
-
-	}
-
-	List<GSSource> readConfiguredSources() {
-		return ConfigurationWrapper.getAllSources();
-	}
-
-	Optional<String> readTaskOptions(JobExecutionContext context, SchedulerJobStatus status) {
-
-		HarvestingSetting harvestingSetting = SettingUtils.downCast(SchedulerUtils.getSetting(context), HarvestingSettingImpl.class);
-
-		Optional<CustomTaskSetting> customTaskSetting = harvestingSetting.getCustomTaskSetting();
-
-		if (!customTaskSetting.isPresent()) {
-			log(status, "Custom task setting is missing, unable to perform task");
-
-			return Optional.empty();
-		}
-
-		return customTaskSetting.get().getTaskOptions();
-
-	}
-
-	DatabaseReader getDataBaseReader() throws GSException {
-
-		StorageInfo dataBaseURI = ConfigurationWrapper.getDatabaseURI();
-		GSLoggerFactory.getLogger(getClass()).debug("Configured Database URI: {}", dataBaseURI.getUri());
-
-		return DatabaseProviderFactory.getReader(dataBaseURI);
-
-	}
-
-	DatabaseFinder getDataBaseFinder() throws GSException {
-
-		StorageInfo dataBaseURI = ConfigurationWrapper.getDatabaseURI();
-		GSLoggerFactory.getLogger(getClass()).debug("Configured Database URI: {}", dataBaseURI.getUri());
-
-		return DatabaseProviderFactory.getFinder(dataBaseURI);
-
-	}
-
-	DatabaseWriter getDataBaseWriter() throws GSException {
-
-		StorageInfo dataBaseURI = ConfigurationWrapper.getDatabaseURI();
-		GSLoggerFactory.getLogger(getClass()).debug("Configured Database URI: {}", dataBaseURI.getUri());
-
-		return DatabaseProviderFactory.getWriter(dataBaseURI);
-
-	}
-
-	private void decorateResource(GSResource resource, GSSource source, Map<String, String> alreadyCheckedParentIds,
-			SchedulerJobStatus status,
-			DatabaseReader reader,
-			DatabaseWriter writer) throws GSException {
-
-		String parentid = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier();
-
-		log(status, String.format("Resource %s has parent id %s", resource.getPublicId(), parentid));
-
-		if (alreadyCheckedParentIds.get(parentid) != null) {
-			String workingparentid = alreadyCheckedParentIds.get(parentid);
-
-			log(status, String.format("Parent id %s already checked, correct parent id is %s", parentid, workingparentid));
-
-			if (!parentid.equalsIgnoreCase(workingparentid)) {
-				resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().setParentIdentifier(workingparentid);
-
-				writeResource(resource, writer, status);
-			}
-
-			return;
-		}
-
-		log(status, String.format("Reading by public id %s", parentid));
-
-		List<GSResource> collections = reader.getResources(Database.IdentifierType.PUBLIC, parentid);
-		log(status, String.format("Found %d resources with public id %s", collections.size(), parentid));
-
-		if (!collections.isEmpty()) {
-
-			alreadyCheckedParentIds.put(parentid, parentid);
-
-		} else {
-
-			IdentifierDecorator identifierDec = new IdentifierDecorator();
-			String totestParentid;
-
-			if (identifierDec.isDecoratedId(parentid, source)) {
-
-				totestParentid = identifierDec.retrieveOriginalId(parentid, source);
-
-			} else {
-				totestParentid = identifierDec.generatePersistentIdentifier(parentid, source.getUniqueIdentifier());
-			}
-
-			log(status, String.format("Reading by public id %s", totestParentid));
-
-			collections = reader.getResources(Database.IdentifierType.PUBLIC, totestParentid);
-			log(status, String.format("Found %d resources with public id %s", collections.size(), totestParentid));
-
-			if (!collections.isEmpty()) {
-
-				resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().setParentIdentifier(totestParentid);
-				writeResource(resource, writer, status);
-				alreadyCheckedParentIds.put(parentid, totestParentid);
-			} else {
-				GSLoggerFactory.getLogger(getClass()).warn("Can not find parent resources of {} with parent id {} from {} ({})",
-						resource.getPublicId()
-						, resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier(), source.getLabel(),
-						source.getUniqueIdentifier());
-
-				log(status, String.format("WARNING: Can not find parent resources of %s with parent id %s from %s (%s)",
-						resource.getPublicId(),
-						resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier(), source.getLabel(),
-						source.getUniqueIdentifier()), false);
-
-			}
-		}
-	}
-
-	void writeResource(GSResource resource, DatabaseWriter databaseWriter, SchedulerJobStatus status) throws GSException {
-		log(status, String.format("Writing resource %s with new parent id %s", resource.getPublicId(),
-				resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier()));
-		databaseWriter.remove(resource);
-		databaseWriter.store(resource);
-
-	}
+    }
 }
