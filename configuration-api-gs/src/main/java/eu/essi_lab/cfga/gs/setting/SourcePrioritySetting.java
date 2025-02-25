@@ -59,7 +59,7 @@ public class SourcePrioritySetting extends Setting implements EditableSetting {
     public SourcePrioritySetting() {
 
 	setName("Identifier Management");
-	setDescription("Define global (DAB-level) Identifier Management options.\nSelect one or more sources to prioritize");
+	setDescription("Define global (DAB-level) Identifier Management options and optionally select one or more sources to prioritize. Collections and datasets of 'priority sources' maintain their original id during harvesting");
 	setCanBeDisabled(false);
 	enableCompactMode(false);
 
@@ -67,10 +67,10 @@ public class SourcePrioritySetting extends Setting implements EditableSetting {
 	// setting with available sources
 	//
 	Setting sourcesSetting = new Setting();
+	sourcesSetting.setName("Select one or more 'priority source'");
 	sourcesSetting.setCanBeDisabled(false);
 	sourcesSetting.setEditable(false);
-	sourcesSetting.setShowHeader(false);
-
+	sourcesSetting.setShowHeader(true);
 	sourcesSetting.setIdentifier(SOURCES_SETTING_IDENTIFIER);
 	sourcesSetting.setSelectionMode(SelectionMode.MULTI);
 
