@@ -229,7 +229,7 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 			discoveryMessage.setDistinctValuesElement(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER);
 			discoveryMessage.setRequestId(getClass().getSimpleName() + "-" + (new Date().getTime()));
 			discoveryMessage.getResourceSelector().setIndexesPolicy(IndexesPolicy.NONE);
-			discoveryMessage.getResourceSelector().setSubset(ResourceSubset.NONE);
+			discoveryMessage.getResourceSelector().setSubset(ResourceSubset.FULL);
 			discoveryMessage.getResourceSelector().addIndex(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER);
 			discoveryMessage.getResourceSelector().addIndex(ResourceProperty.SOURCE_ID);
 			discoveryMessage.getResourceSelector().addIndex(MetadataElement.PLATFORM_TITLE);
