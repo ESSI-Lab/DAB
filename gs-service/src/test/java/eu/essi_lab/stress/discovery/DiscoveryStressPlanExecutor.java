@@ -31,6 +31,8 @@ public class DiscoveryStressPlanExecutor {
 
     public void execute(DiscoveryStressPlanResultCollector resultCollector) throws InterruptedException {
 
+	resultCollector.setHost(host);
+
 	List<DiscoveryStressTestExecutor> tasks = new ArrayList<>();
 
 	for (int i = 0; i < plan.getMultiplicationFactor(); i++) {

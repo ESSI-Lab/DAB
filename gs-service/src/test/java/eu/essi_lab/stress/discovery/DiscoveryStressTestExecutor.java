@@ -56,7 +56,11 @@ public class DiscoveryStressTestExecutor implements Callable<DiscoveryStressTest
 
 	    result.setCode(code);
 	    result.setRequest(url);
-	    result.setExecTime(gap);
+
+	    result.setStart(start);
+	    result.setEnd(end);
+
+	    result.setTest(test);
 
 	    return result;
 

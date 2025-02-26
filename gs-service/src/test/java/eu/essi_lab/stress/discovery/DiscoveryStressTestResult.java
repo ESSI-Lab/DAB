@@ -9,7 +9,10 @@ public class DiscoveryStressTestResult {
 
     private String request;
 
-    private Long execTime;
+    private Long start;
+    private Long end;
+
+    private DiscoveryStressTest test;
 
     public int getCode() {
 	return code;
@@ -28,10 +31,30 @@ public class DiscoveryStressTestResult {
     }
 
     public Long getExecTime() {
-	return execTime;
+	return end - start;
     }
 
-    public void setExecTime(Long execTime) {
-	this.execTime = execTime;
+    public void setTest(DiscoveryStressTest test) {
+	this.test = test;
+    }
+
+    public DiscoveryStressTest getTest() {
+	return test;
+    }
+
+    public Long getEnd() {
+	return end;
+    }
+
+    public void setEnd(Long end) {
+	this.end = end;
+    }
+
+    public Long getStart() {
+	return start;
+    }
+
+    public void setStart(Long start) {
+	this.start = start;
     }
 }
