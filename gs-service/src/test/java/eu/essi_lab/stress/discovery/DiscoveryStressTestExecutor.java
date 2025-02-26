@@ -50,7 +50,6 @@ public class DiscoveryStressTestExecutor implements Callable<DiscoveryStressTest
 
 	    logger.info("Completed {}", url);
 	    long end = System.currentTimeMillis();
-	    long gap = end - start;
 
 	    Integer code = response.statusCode();
 

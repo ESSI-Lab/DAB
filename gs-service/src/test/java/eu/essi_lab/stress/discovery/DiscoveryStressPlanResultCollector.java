@@ -46,7 +46,6 @@ public class DiscoveryStressPlanResultCollector {
 	} catch (IOException e) {
 	    throw new RuntimeException(e);
 	}
-
     }
 
     private Long meanExecutionTime() {
