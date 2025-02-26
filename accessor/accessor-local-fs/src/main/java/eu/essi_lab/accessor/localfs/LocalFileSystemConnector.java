@@ -267,6 +267,7 @@ public class LocalFileSystemConnector extends HarvestedQueryConnector<LocalFileS
 	    reader.setNamespaceContext(new CommonNameSpaceContext());
 	    return reader.evaluateBoolean("exists(" + recordName + ")");
 	} catch (Exception ex) {
+	    GSLoggerFactory.getLogger(getClass()).error(ex);
 	    return false;
 	}
     }
