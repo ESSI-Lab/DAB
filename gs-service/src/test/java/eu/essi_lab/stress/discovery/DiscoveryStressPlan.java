@@ -9,6 +9,7 @@ import java.util.List;
 public class DiscoveryStressPlan {
 
     private int parallelRequests = 1;
+    private int multiplicationFactor = 4;
 
     private List<DiscoveryStressTest> stressTests = new ArrayList<>();
 
@@ -26,5 +27,13 @@ public class DiscoveryStressPlan {
 
     public List<DiscoveryStressTest> getStressTests() {
 	return stressTests;
+    }
+
+    public int getMultiplicationFactor() {
+	return multiplicationFactor;
+    }
+
+    public void setMultiplicationFactor(int multiplicationFactor) {
+	this.multiplicationFactor = multiplicationFactor;
     }
 }

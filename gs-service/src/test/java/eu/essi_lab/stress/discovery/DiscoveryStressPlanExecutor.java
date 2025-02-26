@@ -1,6 +1,8 @@
 package eu.essi_lab.stress.discovery;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -29,8 +31,15 @@ public class DiscoveryStressPlanExecutor {
 
     public void execute(DiscoveryStressPlanResultCollector resultCollector) throws InterruptedException {
 
-	List<DiscoveryStressTestExecutor> tasks = this.plan.getStressTests().stream().map(
-		test -> new DiscoveryStressTestExecutor(test, host)).collect(Collectors.toList());
+	List<DiscoveryStressTestExecutor> tasks = new ArrayList<>();
+
+	for (int i = 0; i < plan.getMultiplicationFactor(); i++) {
+
+	    this.plan.getStressTests().stream().map(
+		    test -> new DiscoveryStressTestExecutor(test, host)).collect(Collectors.toCollection(() -> tasks));
+	}
+
+	Collections.shuffle(tasks);
 
 	List<Future<DiscoveryStressTestResult>> futures = executor.invokeAll(tasks);
 
@@ -46,12 +55,9 @@ public class DiscoveryStressPlanExecutor {
 	    }
 	});
 
-
-
 	GSLoggerFactory.getLogger(getClass()).info("collect ENDED");
 	executor.shutdown();
-	executor.awaitTermination(10L,TimeUnit.MINUTES);
-
+	executor.awaitTermination(10L, TimeUnit.MINUTES);
 
     }
 
