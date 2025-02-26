@@ -42,6 +42,12 @@ public class DiscoveryStressPlanResultCollector {
 	    writer.write(title);
 	    writer.write(summary);
 	    writer.write("\n\n");
+
+
+	    for (DiscoveryStressTestResult result : getResults()) {
+		writer.write(result.getResponseFile());
+		writer.write("\n");
+	    }
 	    writer.flush();
 	} catch (IOException e) {
 	    throw new RuntimeException(e);

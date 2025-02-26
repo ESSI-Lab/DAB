@@ -14,6 +14,8 @@ public class DiscoveryStressTestResult {
 
     private DiscoveryStressTest test;
 
+    private String responseFile;
+
     public int getCode() {
 	return code;
     }
@@ -56,5 +58,13 @@ public class DiscoveryStressTestResult {
 
     public void setStart(Long start) {
 	this.start = start;
+    }
+
+    public String getResponseFile() {
+	return responseFile;
+    }
+
+    public void setResponseFile(String responseFile) {
+	this.responseFile = responseFile;
     }
 }
