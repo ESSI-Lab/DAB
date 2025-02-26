@@ -29,6 +29,10 @@ public class DiscoveryStressTest {
 	if (searchText != null)
 	    st = searchText;
 
+	String boundignbox = "";
+	if (bbox != null)
+	    boundignbox = bbox;
+
 	StringBuilder builder = new StringBuilder("");
 
 	builder.append("searchFields=title,keywords")//
@@ -42,7 +46,8 @@ public class DiscoveryStressTest {
 		.append("&")//
 		.append("st=").append(st)//
 		.append("&")//
-		.append("sources=");
+		.append("sources=")//
+		.append("&bbox=").append(boundignbox);
 
 	sources.stream().forEach(s -> builder.append(s).append(","));
 
